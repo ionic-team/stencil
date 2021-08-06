@@ -1,7 +1,6 @@
 import { setupDomTests } from '../util';
 
-
-describe('slot-basic-order', function() {
+describe('slot-basic-order', function () {
   const { setupDom, tearDownDom } = setupDomTests(document);
   let app: HTMLElement;
 
@@ -10,7 +9,6 @@ describe('slot-basic-order', function() {
   });
   afterEach(tearDownDom);
 
-
   it('render', async () => {
     let result = app.querySelector('slot-basic-order-root');
     expect(result.textContent).toEqual('abc');
@@ -18,5 +16,4 @@ describe('slot-basic-order', function() {
     const hiddenCmp = app.querySelector('[hidden]');
     expect(hiddenCmp).toBe(null);
   });
-
 });

@@ -7,8 +7,6 @@ import { Component } from '@stencil/core';
       color: red;
     }
   `,
-  shadow: true
+  shadow: true,
 })
-export class ShadowDomSlotBasic {
-
-}
+export class ShadowDomSlotBasic {}

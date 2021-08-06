@@ -1,10 +1,9 @@
 import { Component, State, h } from '@stencil/core';
 
 @Component({
-  tag: 'lifecycle-update-a'
+  tag: 'lifecycle-update-a',
 })
 export class LifecycleUpdateA {
-
   @State() values: number[] = [];
 
   testClick() {
@@ -12,9 +11,10 @@ export class LifecycleUpdateA {
     this.values = this.values.slice();
 
     const li = document.createElement('li');
-    li.innerHTML = `<span style="color:gray">async add child components to lifecycle-update-a</span> ${this.values[this.values.length - 1]}`;
+    li.innerHTML = `<span style="color:gray">async add child components to lifecycle-update-a</span> ${
+      this.values[this.values.length - 1]
+    }`;
     document.getElementById('output')!.appendChild(li);
-
   }
 
   componentWillLoad() {
@@ -22,7 +22,7 @@ export class LifecycleUpdateA {
     li.innerHTML = `<span style="color:maroon">lifecycle-update-a</span> <span style="color:blue">componentWillLoad</span>`;
     document.getElementById('output')!.appendChild(li);
 
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       setTimeout(resolve, 10);
     });
   }
@@ -34,27 +34,30 @@ export class LifecycleUpdateA {
   }
 
   componentWillUpdate() {
-
     const li = document.createElement('li');
-    li.innerHTML = `<span style="color:maroon">lifecycle-update-a</span> <span style="color:cyan">componentWillUpdate</span> ${this.values[this.values.length - 1]}`;
+    li.innerHTML = `<span style="color:maroon">lifecycle-update-a</span> <span style="color:cyan">componentWillUpdate</span> ${
+      this.values[this.values.length - 1]
+    }`;
     document.getElementById('output')!.appendChild(li);
   }
 
   componentDidUpdate() {
     const li = document.createElement('li');
-    li.innerHTML = `<span style="color:maroon">lifecycle-update-a</span> <span style="color:limegreen">componentDidUpdate</span> ${this.values[this.values.length - 1]}`;
+    li.innerHTML = `<span style="color:maroon">lifecycle-update-a</span> <span style="color:limegreen">componentDidUpdate</span> ${
+      this.values[this.values.length - 1]
+    }`;
     document.getElementById('output')!.appendChild(li);
   }
 
   render() {
     return (
       <div>
-        <button onClick={this.testClick.bind(this)} class='test'>
+        <button onClick={this.testClick.bind(this)} class="test">
           Add Child Components
         </button>
-        <hr/>
-        {this.values.map(value => {
-          return <lifecycle-update-b value={value}></lifecycle-update-b>
+        <hr />
+        {this.values.map((value) => {
+          return <lifecycle-update-b value={value}></lifecycle-update-b>;
         })}
       </div>
     );

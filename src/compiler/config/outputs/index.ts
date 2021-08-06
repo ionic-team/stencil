@@ -16,12 +16,12 @@ import { validateCustomElementBundle } from './validate-custom-element-bundle';
 export const validateOutputTargets = (config: d.Config, diagnostics: d.Diagnostic[]) => {
   const userOutputs = (config.outputTargets || []).slice();
 
-  userOutputs.forEach(outputTarget => {
+  userOutputs.forEach((outputTarget) => {
     if (!VALID_TYPES.includes(outputTarget.type)) {
       const err = buildError(diagnostics);
       err.messageText = `Invalid outputTarget type "${
         outputTarget.type
-      }". Valid outputTarget types include: ${VALID_TYPES.map(t => `"${t}"`).join(', ')}`;
+      }". Valid outputTarget types include: ${VALID_TYPES.map((t) => `"${t}"`).join(', ')}`;
     }
   });
 

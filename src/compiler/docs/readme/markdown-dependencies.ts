@@ -13,7 +13,7 @@ export const depsToMarkdown = (cmp: d.JsonDocsComponent, cmps: d.JsonDocsCompone
   content.push(``);
 
   if (cmp.dependents.length > 0) {
-    const usedBy = cmp.dependents.map(tag => ' - ' + getCmpLink(cmp, tag, cmps));
+    const usedBy = cmp.dependents.map((tag) => ' - ' + getCmpLink(cmp, tag, cmps));
 
     content.push(`### Used by`);
     content.push(``);
@@ -21,7 +21,7 @@ export const depsToMarkdown = (cmp: d.JsonDocsComponent, cmps: d.JsonDocsCompone
     content.push(``);
   }
   if (cmp.dependencies.length > 0) {
-    const dependsOn = cmp.dependencies.map(tag => '- ' + getCmpLink(cmp, tag, cmps));
+    const dependsOn = cmp.dependencies.map((tag) => '- ' + getCmpLink(cmp, tag, cmps));
 
     content.push(`### Depends on`);
     content.push(``);
@@ -33,7 +33,7 @@ export const depsToMarkdown = (cmp: d.JsonDocsComponent, cmps: d.JsonDocsCompone
   content.push('```mermaid');
   content.push('graph TD;');
   deps.forEach(([key, deps]) => {
-    deps.forEach(dep => {
+    deps.forEach((dep) => {
       content.push(`  ${key} --> ${dep}`);
     });
   });
@@ -48,7 +48,7 @@ export const depsToMarkdown = (cmp: d.JsonDocsComponent, cmps: d.JsonDocsCompone
 };
 
 const getCmpLink = (from: d.JsonDocsComponent, to: string, cmps: d.JsonDocsComponent[]) => {
-  const destCmp = cmps.find(c => c.tag === to);
+  const destCmp = cmps.find((c) => c.tag === to);
   if (destCmp) {
     const cmpRelPath = normalizePath(relative(from.dirPath, destCmp.dirPath));
     return `[${to}](${cmpRelPath})`;

@@ -2,10 +2,9 @@ import { Component, Prop, Method } from '@stencil/core';
 import { SomeTypes } from '../util';
 
 @Component({
-  tag: 'attribute-complex'
+  tag: 'attribute-complex',
 })
 export class AttributeComplex {
-
   @Prop() nu0 = 1;
   @Prop() nu1?: number;
   @Prop() nu2?: SomeTypes.Number;
@@ -18,14 +17,14 @@ export class AttributeComplex {
   @Prop() str1?: string;
   @Prop() str2?: SomeTypes.String;
 
-  private _obj = {name: 'James bond'};
+  private _obj = { name: 'James bond' };
   @Prop()
   get obj() {
     return JSON.stringify(this._obj);
   }
   set obj(newVal: string) {
     if (typeof newVal === 'string') {
-      this._obj = {name: newVal};
+      this._obj = { name: newVal };
     }
   }
 

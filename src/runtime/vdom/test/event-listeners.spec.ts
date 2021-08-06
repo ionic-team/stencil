@@ -37,7 +37,7 @@ describe('event listeners', () => {
           result.push(1);
         },
       },
-      h('a', null, 'Click my parent'),
+      h('a', null, 'Click my parent')
     );
 
     const vnode2 = h(
@@ -47,7 +47,7 @@ describe('event listeners', () => {
           result.push(2);
         },
       },
-      h('a', null, 'Click my parent'),
+      h('a', null, 'Click my parent')
     );
 
     patch(vnode0, vnode1, document);

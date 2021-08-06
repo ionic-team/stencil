@@ -608,5 +608,4 @@ describe('parse props', () => {
     expect(t.property.type).toBe('boolean');
     expect(t.property.attribute).toBe('val');
   });
-
 });

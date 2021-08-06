@@ -1,4 +1,3 @@
-
 import { Component, State, h } from '@stencil/core';
 
 @Component({
@@ -19,10 +18,9 @@ import { Component, State, h } from '@stencil/core';
     [bold=true] {
       font-weight: bold;
     }
-  `
+  `,
 })
 export class AttributeHost {
-
   @State() attrsAdded = false;
 
   testClick() {
@@ -39,7 +37,6 @@ export class AttributeHost {
       propsToRender.margin = '';
       propsToRender.bold = 'true';
       propsToRender['no-attr'] = null;
-
     } else {
       propsToRender.content = 'attributes removed';
       propsToRender.padding = false;
@@ -55,10 +52,9 @@ export class AttributeHost {
           'border-color': this.attrsAdded ? 'black' : '',
           display: this.attrsAdded ? 'block' : 'inline-block',
           fontSize: this.attrsAdded ? '24px' : '',
-          '--css-var': this.attrsAdded ? '12' : ''
+          '--css-var': this.attrsAdded ? '12' : '',
         }}
-      />
-    ]
-
+      />,
+    ];
   }
 }

@@ -23,7 +23,7 @@ export function parse5Plugin(opts: BuildOptions): Plugin {
       return null;
     },
     generateBundle(_, bundle) {
-      Object.keys(bundle).forEach(fileName => {
+      Object.keys(bundle).forEach((fileName) => {
         // not minifying, but we are reducing whitespace
         const chunk = bundle[fileName] as OutputChunk;
         if (chunk.type === 'chunk') {

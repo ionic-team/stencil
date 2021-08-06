@@ -3,7 +3,14 @@ import color from 'ansi-colors';
 import execa from 'execa';
 import Listr, { ListrTask } from 'listr';
 import { BuildOptions } from './utils/options';
-import { isValidVersionInput, SEMVER_INCREMENTS, isVersionGreater, isPrereleaseVersion, updateChangeLog, postGithubRelease } from './utils/release-utils';
+import {
+  isValidVersionInput,
+  SEMVER_INCREMENTS,
+  isVersionGreater,
+  isPrereleaseVersion,
+  updateChangeLog,
+  postGithubRelease,
+} from './utils/release-utils';
 import { validateBuild } from './test/validate-build';
 import { createLicense } from './license';
 import { bundleBuild } from './build';
@@ -39,7 +46,7 @@ export function runReleaseTasks(opts: BuildOptions, args: string[]) {
       task: () => {
         if (!pkg.private && isPrereleaseVersion(newVersion) && !opts.tag) {
           throw new Error(
-            'You must specify a dist-tag using --tag when publishing a pre-release version. This prevents accidentally tagging unstable versions as "latest". https://docs.npmjs.com/cli/dist-tag',
+            'You must specify a dist-tag using --tag when publishing a pre-release version. This prevents accidentally tagging unstable versions as "latest". https://docs.npmjs.com/cli/dist-tag'
           );
         }
       },
@@ -54,7 +61,7 @@ export function runReleaseTasks(opts: BuildOptions, args: string[]) {
           .then(() => execa('npm', ['config', 'get', 'tag-version-prefix']))
           .then(
             ({ stdout }) => (tagPrefix = stdout),
-            () => {},
+            () => {}
           )
           .then(() => execa('git', ['rev-parse', '--quiet', '--verify', `refs/tags/${tagPrefix}${newVersion}`]))
           .then(
@@ -63,13 +70,13 @@ export function runReleaseTasks(opts: BuildOptions, args: string[]) {
                 throw new Error(`Git tag \`${tagPrefix}${newVersion}\` already exists.`);
               }
             },
-            err => {
+            (err) => {
               // Command fails with code 1 and no output if the tag does not exist, even though `--quiet` is provided
               // https://github.com/sindresorhus/np/pull/73#discussion_r72385685
               if (err.stdout !== '' || err.stderr !== '') {
                 throw err;
               }
-            },
+            }
           ),
       skip: () => isDryRun,
     },
@@ -102,7 +109,7 @@ export function runReleaseTasks(opts: BuildOptions, args: string[]) {
           }
         }),
       skip: () => isDryRun,
-    },
+    }
   );
 
   if (!opts.isPublishRelease) {
@@ -152,7 +159,7 @@ export function runReleaseTasks(opts: BuildOptions, args: string[]) {
         task: () => {
           return updateChangeLog(opts);
         },
-      },
+      }
     );
   }
 
@@ -205,7 +212,7 @@ export function runReleaseTasks(opts: BuildOptions, args: string[]) {
           }
           return execa('git', cmdArgs, { cwd: rootDir });
         },
-      },
+      }
     );
 
     if (opts.tag !== 'next' && opts.tag !== 'test') {
@@ -239,12 +246,20 @@ export function runReleaseTasks(opts: BuildOptions, args: string[]) {
     .run()
     .then(() => {
       if (opts.isPublishRelease) {
-        console.log(`\n ${opts.vermoji}  ${color.bold.magenta(pkg.name)} ${color.bold.yellow(newVersion)} published!! ${opts.vermoji}\n`);
+        console.log(
+          `\n ${opts.vermoji}  ${color.bold.magenta(pkg.name)} ${color.bold.yellow(newVersion)} published!! ${
+            opts.vermoji
+          }\n`
+        );
       } else {
-        console.log(`\n ${opts.vermoji}  ${color.bold.magenta(pkg.name)} ${color.bold.yellow(newVersion)} prepared, check the diffs and commit ${opts.vermoji}\n`);
+        console.log(
+          `\n ${opts.vermoji}  ${color.bold.magenta(pkg.name)} ${color.bold.yellow(
+            newVersion
+          )} prepared, check the diffs and commit ${opts.vermoji}\n`
+        );
       }
     })
-    .catch(err => {
+    .catch((err) => {
       console.log(`\n🤒  ${color.red(err)}\n`);
       console.log(err);
       process.exit(1);

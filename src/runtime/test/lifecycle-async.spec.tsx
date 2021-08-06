@@ -6,7 +6,7 @@ describe('lifecycle async', () => {
     @Component({ tag: 'cmp-a' })
     class CmpA {
       componentWillLoad() {
-        return new Promise(resolve => {
+        return new Promise((resolve) => {
           setTimeout(resolve);
         });
       }
@@ -43,7 +43,7 @@ describe('lifecycle async', () => {
       }
 
       componentWillLoad() {
-        return new Promise(resolve => {
+        return new Promise((resolve) => {
           setTimeout(() => {
             log += ' componentWillLoad';
             resolve();
@@ -56,7 +56,7 @@ describe('lifecycle async', () => {
       }
 
       componentWillUpdate() {
-        return new Promise(resolve => {
+        return new Promise((resolve) => {
           setTimeout(() => {
             log += ' componentWillUpdate';
             resolve();
@@ -69,7 +69,7 @@ describe('lifecycle async', () => {
       }
 
       componentWillRender() {
-        return new Promise(resolve => {
+        return new Promise((resolve) => {
           setTimeout(() => {
             log += ' componentWillRender';
             resolve();
@@ -93,13 +93,17 @@ describe('lifecycle async', () => {
     });
 
     expect(root.textContent).toBe('connectedCallback componentWillLoad componentWillRender render');
-    expect(log.trim()).toEqual('connectedCallback componentWillLoad componentWillRender render componentDidRender componentDidLoad');
+    expect(log.trim()).toEqual(
+      'connectedCallback componentWillLoad componentWillRender render componentDidRender componentDidLoad'
+    );
 
     log = '';
     root.prop = 1;
     await waitForChanges();
 
-    expect(log.trim()).toBe('propDidChange componentWillUpdate componentWillRender render componentDidRender componentDidUpdate');
+    expect(log.trim()).toBe(
+      'propDidChange componentWillUpdate componentWillRender render componentDidRender componentDidUpdate'
+    );
   });
 
   it('windows emits event', async () => {

@@ -1,6 +1,13 @@
 import type * as d from '../../../declarations';
 import { buildError, isBoolean, isString } from '@utils';
-import { COPY, DIST_GLOBAL_STYLES, DIST_LAZY, WWW, isOutputTargetWww, isOutputTargetDist } from '../../output-targets/output-utils';
+import {
+  COPY,
+  DIST_GLOBAL_STYLES,
+  DIST_LAZY,
+  WWW,
+  isOutputTargetWww,
+  isOutputTargetDist,
+} from '../../output-targets/output-utils';
 import { getAbsolutePath } from '../config-utils';
 import { isAbsolute, join } from 'path';
 import { validateCopy } from '../validate-copy';
@@ -12,7 +19,10 @@ export const validateWww = (config: d.Config, diagnostics: d.Diagnostic[], userO
   const hasE2eTests = !!(config.flags && config.flags.e2e);
   const userWwwOutputs = userOutputs.filter(isOutputTargetWww);
 
-  if (!hasOutputTargets || (hasE2eTests && !userOutputs.some(isOutputTargetWww) && !userOutputs.some(isOutputTargetDist))) {
+  if (
+    !hasOutputTargets ||
+    (hasE2eTests && !userOutputs.some(isOutputTargetWww) && !userOutputs.some(isOutputTargetDist))
+  ) {
     userWwwOutputs.push({ type: WWW });
   }
 

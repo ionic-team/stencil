@@ -93,35 +93,25 @@ export const consoleDevInfo = (..._: any[]) => {
   /* noop for hydrate */
 };
 
-export const setErrorHandler = (handler: d.ErrorHandler) => customError = handler;
+export const setErrorHandler = (handler: d.ErrorHandler) => (customError = handler);
 
 /*hydrate context start*/ export const Context = {}; /*hydrate context end*/
 
 export const plt: d.PlatformRuntime = {
   $flags$: 0,
   $resourcesUrl$: '',
-  jmp: h => h(),
-  raf: h => requestAnimationFrame(h),
+  jmp: (h) => h(),
+  raf: (h) => requestAnimationFrame(h),
   ael: (el, eventName, listener, opts) => el.addEventListener(eventName, listener, opts),
   rel: (el, eventName, listener, opts) => el.removeEventListener(eventName, listener, opts),
   ce: (eventName, opts) => new win.CustomEvent(eventName, opts),
 };
 
-export const setPlatformHelpers = (helpers: { 
+export const setPlatformHelpers = (helpers: {
   jmp?: (c: any) => any;
   raf?: (c: any) => number;
-  ael?: (
-    el: any,
-    eventName: string,
-    listener: any,
-    options: any,
-  ) => void;
-  rel?: (
-    el: any,
-    eventName: string,
-    listener: any,
-    options: any,
-  ) => void;
+  ael?: (el: any, eventName: string, listener: any, options: any) => void;
+  rel?: (el: any, eventName: string, listener: any, options: any) => void;
   ce?: (eventName: string, opts?: any) => any;
 }) => {
   Object.assign(plt, helpers);
@@ -148,8 +138,8 @@ export const registerHost = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta
     $instanceValues$: new Map(),
     $renderCount$: 0,
   };
-  hostRef.$onInstancePromise$ = new Promise(r => (hostRef.$onInstanceResolve$ = r));
-  hostRef.$onReadyPromise$ = new Promise(r => (hostRef.$onReadyResolve$ = r));
+  hostRef.$onInstancePromise$ = new Promise((r) => (hostRef.$onInstanceResolve$ = r));
+  hostRef.$onReadyPromise$ = new Promise((r) => (hostRef.$onReadyResolve$ = r));
   elm['s-p'] = [];
   elm['s-rc'] = [];
   addHostEventListeners(elm, hostRef, cmpMeta.$listeners$, false);

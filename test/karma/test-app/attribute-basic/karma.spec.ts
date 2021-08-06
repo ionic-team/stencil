@@ -1,7 +1,6 @@
 import { setupDomTests, waitForChanges } from '../util';
 
-
-describe('attribute-basic', function() {
+describe('attribute-basic', function () {
   const { setupDom, tearDownDom } = setupDomTests(document);
   let app: HTMLElement;
 
@@ -27,5 +26,4 @@ describe('attribute-basic', function() {
     expect(app.querySelector('.customAttr').textContent).toBe('my-custom-attr-update');
     expect(app.querySelector('.getter').textContent).toBe('getter-update');
   });
-
 });

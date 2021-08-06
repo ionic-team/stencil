@@ -37,7 +37,7 @@ describe('prop', () => {
         return this._accessor;
       }
       set accessor(newVal) {
-       this._accessor = newVal;
+        this._accessor = newVal;
       }
       render() {
         return `${this.boolFalse}-${this.boolTrue}-${this.str}-${this.num}-${this.accessor}`;
@@ -76,7 +76,7 @@ describe('prop', () => {
         return this._accessor;
       }
       set accessor(newVal) {
-       this._accessor = newVal;
+        this._accessor = newVal;
       }
       render() {
         return `${this.boolFalse}-${this.boolTrue}-${this.str}-${this.num}-${this.accessor}`;
@@ -147,7 +147,9 @@ describe('prop', () => {
     class CmpA {
       private _num = 1;
       @Prop()
-      get num() { return this._num; }
+      get num() {
+        return this._num;
+      }
       set num(newValue: number) {
         if (newValue % 2 === 0) this._num = newValue;
       }

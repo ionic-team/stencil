@@ -14,8 +14,14 @@ export const propsToMarkdown = (props: d.JsonDocsProp[]) => {
 
   table.addHeader(['Property', 'Attribute', 'Description', 'Type', 'Default']);
 
-  props.forEach(prop => {
-    table.addRow([getPropertyField(prop), getAttributeField(prop), getDocsField(prop), `\`${prop.type}\``, `\`${prop.default}\``]);
+  props.forEach((prop) => {
+    table.addRow([
+      getPropertyField(prop),
+      getAttributeField(prop),
+      getDocsField(prop),
+      `\`${prop.type}\``,
+      `\`${prop.default}\``,
+    ]);
   });
 
   content.push(...table.toMarkdown());
@@ -34,7 +40,11 @@ const getAttributeField = (prop: d.JsonDocsProp) => {
 };
 
 const getDocsField = (prop: d.JsonDocsProp) => {
-  let docField = `${prop.deprecation !== undefined ? `<span style="color:red">**[DEPRECATED]**</span> ${prop.deprecation}<br/><br/>` : ''}${prop.docs}`;
-  if (prop.getter && !prop.setter) docField+= ` (readonly)`;
+  let docField = `${
+    prop.deprecation !== undefined
+      ? `<span style="color:red">**[DEPRECATED]**</span> ${prop.deprecation}<br/><br/>`
+      : ''
+  }${prop.docs}`;
+  if (prop.getter && !prop.setter) docField += ` (readonly)`;
   return docField;
 };

@@ -8,7 +8,7 @@ export async function serveDirectoryIndex(
   devServerConfig: d.DevServerConfig,
   serverCtx: d.DevServerContext,
   req: d.HttpRequest,
-  res: ServerResponse,
+  res: ServerResponse
 ) {
   const indexFilePath = path.join(req.filePath, 'index.html');
   req.stats = await serverCtx.sys.stat(indexFilePath);
@@ -43,7 +43,7 @@ export async function serveDirectoryIndex(
         responseHeaders({
           'content-type': 'text/html; charset=utf-8',
           'x-directory-index': req.pathname,
-        }),
+        })
       );
 
       res.write(templateHtml);
@@ -68,7 +68,7 @@ async function getFiles(sys: d.CompilerSystem, baseUrl: URL, dirItemNames: strin
   }
 
   return items
-    .map(item => {
+    .map((item) => {
       return `
         <li class="${item.isDirectory ? 'directory' : 'file'}">
           <a href="${item.pathname}">
@@ -82,7 +82,7 @@ async function getFiles(sys: d.CompilerSystem, baseUrl: URL, dirItemNames: strin
 
 async function getDirectoryItems(sys: d.CompilerSystem, baseUrl: URL, dirFilePaths: string[]) {
   const items = await Promise.all(
-    dirFilePaths.map(async dirFilePath => {
+    dirFilePaths.map(async (dirFilePath) => {
       const fileName = path.basename(dirFilePath);
       const url = new URL(fileName, baseUrl);
       const stats = await sys.stat(dirFilePath);
@@ -94,7 +94,7 @@ async function getDirectoryItems(sys: d.CompilerSystem, baseUrl: URL, dirFilePat
       };
 
       return item;
-    }),
+    })
   );
   return items;
 }

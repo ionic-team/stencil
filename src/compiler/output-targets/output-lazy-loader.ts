@@ -10,10 +10,14 @@ export const outputLazyLoader = async (config: d.Config, compilerCtx: d.Compiler
     return;
   }
 
-  await Promise.all(outputTargets.map(o => generateLoader(config, compilerCtx, o)));
+  await Promise.all(outputTargets.map((o) => generateLoader(config, compilerCtx, o)));
 };
 
-const generateLoader = async (config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDistLazyLoader) => {
+const generateLoader = async (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  outputTarget: d.OutputTargetDistLazyLoader
+) => {
   const loaderPath = outputTarget.dir;
   const es2017Dir = outputTarget.esmDir;
   const es5Dir = outputTarget.esmEs5Dir || es2017Dir;
@@ -27,17 +31,17 @@ const generateLoader = async (config: d.Config, compilerCtx: d.CompilerCtx, outp
 
   const packageJsonContent = JSON.stringify(
     {
-      'name': config.fsNamespace + '-loader',
-      'typings': './index.d.ts',
-      'module': './index.js',
-      'main': './index.cjs.js',
+      name: config.fsNamespace + '-loader',
+      typings: './index.d.ts',
+      module: './index.js',
+      main: './index.cjs.js',
       'jsnext:main': './index.es2017.js',
-      'es2015': './index.es2017.js',
-      'es2017': './index.es2017.js',
-      'unpkg': './cdn.js',
+      es2015: './index.es2017.js',
+      es2017: './index.es2017.js',
+      unpkg: './cdn.js',
     },
     null,
-    2,
+    2
   );
 
   const es5EntryPoint = join(es5Dir, 'loader.js');

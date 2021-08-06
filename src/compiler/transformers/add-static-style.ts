@@ -11,7 +11,11 @@ import ts from 'typescript';
  *   static get style() { return "styles"; }
  * }
  */
-export const addStaticStyleGetterWithinClass = (classMembers: ts.ClassElement[], cmp: d.ComponentCompilerMeta, commentOriginalSelector: boolean) => {
+export const addStaticStyleGetterWithinClass = (
+  classMembers: ts.ClassElement[],
+  cmp: d.ComponentCompilerMeta,
+  commentOriginalSelector: boolean
+) => {
   const styleLiteral = getStyleLiteral(cmp, commentOriginalSelector);
   if (styleLiteral) {
     classMembers.push(createStaticGetter('style', styleLiteral));
@@ -23,10 +27,16 @@ export const addStaticStyleGetterWithinClass = (classMembers: ts.ClassElement[],
  * const MyComponent = class {}
  * MyComponent.style = "styles";
  */
-export const addStaticStylePropertyToClass = (styleStatements: ts.Statement[], cmp: d.ComponentCompilerMeta, commentOriginalSelector: boolean) => {
+export const addStaticStylePropertyToClass = (
+  styleStatements: ts.Statement[],
+  cmp: d.ComponentCompilerMeta,
+  commentOriginalSelector: boolean
+) => {
   const styleLiteral = getStyleLiteral(cmp, commentOriginalSelector);
   if (styleLiteral) {
-    const statement = ts.createStatement(ts.createAssignment(ts.createPropertyAccess(ts.createIdentifier(cmp.componentClassName), 'style'), styleLiteral));
+    const statement = ts.createStatement(
+      ts.createAssignment(ts.createPropertyAccess(ts.createIdentifier(cmp.componentClassName), 'style'), styleLiteral)
+    );
     styleStatements.push(statement);
   }
 };
@@ -44,10 +54,14 @@ const getStyleLiteral = (cmp: d.ComponentCompilerMeta, commentOriginalSelector: 
   return null;
 };
 
-const getMultipleModeStyle = (cmp: d.ComponentCompilerMeta, styles: d.StyleCompiler[], commentOriginalSelector: boolean) => {
+const getMultipleModeStyle = (
+  cmp: d.ComponentCompilerMeta,
+  styles: d.StyleCompiler[],
+  commentOriginalSelector: boolean
+) => {
   const styleModes: ts.ObjectLiteralElementLike[] = [];
 
-  styles.forEach(style => {
+  styles.forEach((style) => {
     if (typeof style.styleStr === 'string') {
       // inline the style string
       // static get style() { return { ios: "string" }; }

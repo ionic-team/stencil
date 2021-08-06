@@ -4,7 +4,7 @@ export const buildEvents = (): d.BuildEvents => {
   const evCallbacks: EventCallback[] = [];
 
   const off = (callback: any) => {
-    const index = evCallbacks.findIndex(ev => ev.callback === callback);
+    const index = evCallbacks.findIndex((ev) => ev.callback === callback);
     if (index > -1) {
       evCallbacks.splice(index, 1);
       return true;

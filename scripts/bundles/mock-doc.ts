@@ -47,7 +47,14 @@ export async function mockDoc(opts: BuildOptions) {
   const mockDocBundle: RollupOptions = {
     input: join(inputDir, 'index.js'),
     output: [esOutput, cjsOutput],
-    plugins: [parse5Plugin(opts), sizzlePlugin(opts), aliasPlugin(opts), replacePlugin(opts), rollupResolve(), rollupCommonjs()],
+    plugins: [
+      parse5Plugin(opts),
+      sizzlePlugin(opts),
+      aliasPlugin(opts),
+      replacePlugin(opts),
+      rollupResolve(),
+      rollupCommonjs(),
+    ],
   };
 
   await bundleDtsPromise;
@@ -71,14 +78,14 @@ return exports;
 async function bundleMockDocDts(inputDir: string, outputDir: string) {
   // only reason we can do this is because we already know the shape
   // of mock-doc's dts files and how we want them to come together
-  const srcDtsFiles = (await fs.readdir(inputDir)).filter(f => {
+  const srcDtsFiles = (await fs.readdir(inputDir)).filter((f) => {
     return f.endsWith('.d.ts') && !f.endsWith('index.d.ts') && !f.endsWith('index.d.ts-bundled.d.ts');
   });
 
   const output = await Promise.all(
-    srcDtsFiles.map(inputDtsFile => {
+    srcDtsFiles.map((inputDtsFile) => {
       return getDtsContent(inputDir, inputDtsFile);
-    }),
+    })
   );
 
   const srcIndexDts = await fs.readFile(join(inputDir, 'index.d.ts'), 'utf8');
@@ -91,7 +98,7 @@ async function getDtsContent(inputDir: string, inputDtsFile: string) {
   const srcDtsText = await fs.readFile(join(inputDir, inputDtsFile), 'utf8');
   const allLines = srcDtsText.split('\n');
 
-  const filteredLines = allLines.filter(ln => {
+  const filteredLines = allLines.filter((ln) => {
     if (ln.trim().startsWith('///')) {
       return false;
     }
@@ -111,7 +118,7 @@ async function getDtsContent(inputDir: string, inputDtsFile: string) {
   });
 
   let dtsContent = filteredLines
-    .map(ln => {
+    .map((ln) => {
       if (ln.trim().startsWith('export ')) {
         ln = ln.replace('export ', '');
       }
@@ -126,15 +133,15 @@ async function getDtsContent(inputDir: string, inputDtsFile: string) {
 }
 
 function getMockDocExports(srcIndexDts: string) {
-  const exportLines = srcIndexDts.split('\n').filter(ln => ln.trim().startsWith('export {'));
+  const exportLines = srcIndexDts.split('\n').filter((ln) => ln.trim().startsWith('export {'));
   const dtsExports: string[] = [];
 
-  exportLines.forEach(ln => {
+  exportLines.forEach((ln) => {
     const splt = ln.split('{')[1].split('}')[0].trim();
     const exportNames = splt
       .split(',')
-      .map(n => n.trim())
-      .filter(n => n.length > 0);
+      .map((n) => n.trim())
+      .filter((n) => n.length > 0);
     dtsExports.push(...exportNames);
   });
 

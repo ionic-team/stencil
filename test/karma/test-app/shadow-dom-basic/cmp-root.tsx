@@ -1,6 +1,5 @@
 import { Component, h } from '@stencil/core';
 
-
 @Component({
   tag: 'shadow-dom-basic-root',
   styles: `
@@ -8,10 +7,9 @@ import { Component, h } from '@stencil/core';
       background: rgb(255, 255, 0);
     }
   `,
-  shadow: true
+  shadow: true,
 })
 export class ShadowDomBasicRoot {
-
   render() {
     return (
       <shadow-dom-basic>
@@ -19,5 +17,4 @@ export class ShadowDomBasicRoot {
       </shadow-dom-basic>
     );
   }
-
 }

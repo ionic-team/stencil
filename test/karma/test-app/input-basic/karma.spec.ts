@@ -1,7 +1,6 @@
 import { setupDomTests, waitForChanges } from '../util';
 
-
-describe('attribute-basic', function() {
+describe('attribute-basic', function () {
   const { setupDom, tearDownDom } = setupDomTests(document);
   let app: HTMLElement;
 
@@ -22,5 +21,4 @@ describe('attribute-basic', function() {
     await waitForChanges();
     expect(input.value).toBe('value');
   });
-
 });

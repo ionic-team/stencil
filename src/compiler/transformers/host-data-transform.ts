@@ -3,9 +3,13 @@ import { H, HOST, RUNTIME_APIS, addCoreRuntimeApi } from './core-runtime-apis';
 import ts from 'typescript';
 
 export const transformHostData = (classElements: ts.ClassElement[], moduleFile: d.Module) => {
-  const hasHostData = classElements.some(e => ts.isMethodDeclaration(e) && (e.name as any).escapedText === 'hostData');
+  const hasHostData = classElements.some(
+    (e) => ts.isMethodDeclaration(e) && (e.name as any).escapedText === 'hostData'
+  );
   if (hasHostData) {
-    const renderIndex = classElements.findIndex(e => ts.isMethodDeclaration(e) && (e.name as any).escapedText === 'render');
+    const renderIndex = classElements.findIndex(
+      (e) => ts.isMethodDeclaration(e) && (e.name as any).escapedText === 'render'
+    );
     if (renderIndex >= 0) {
       const renderMethod = classElements[renderIndex] as ts.MethodDeclaration;
       classElements[renderIndex] = ts.updateMethod(
@@ -18,7 +22,7 @@ export const transformHostData = (classElements: ts.ClassElement[], moduleFile: 
         renderMethod.typeParameters,
         renderMethod.parameters,
         renderMethod.type,
-        renderMethod.body,
+        renderMethod.body
       );
     }
     classElements.push(syntheticRender(moduleFile, renderIndex >= 0));
@@ -38,7 +42,7 @@ const syntheticRender = (moduleFile: d.Module, hasRender: boolean) => {
   if (hasRender) {
     hArguments.push(
       // this.render()
-      ts.createCall(ts.createPropertyAccess(ts.createThis(), INTERNAL_RENDER), undefined, undefined),
+      ts.createCall(ts.createPropertyAccess(ts.createThis(), INTERNAL_RENDER), undefined, undefined)
     );
   }
 
@@ -56,7 +60,7 @@ const syntheticRender = (moduleFile: d.Module, hasRender: boolean) => {
     undefined,
     undefined,
     undefined,
-    ts.createBlock([ts.createReturn(ts.createCall(ts.createIdentifier(H), undefined, hArguments))]),
+    ts.createBlock([ts.createReturn(ts.createCall(ts.createIdentifier(H), undefined, hArguments))])
   );
 };
 

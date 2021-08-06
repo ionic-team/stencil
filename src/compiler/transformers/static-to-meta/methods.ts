@@ -13,7 +13,7 @@ export const parseStaticMethods = (staticMembers: ts.ClassElement[]): d.Componen
     return [];
   }
 
-  return methodNames.map(methodName => {
+  return methodNames.map((methodName) => {
     return {
       name: methodName,
       docs: parsedMethods[methodName].docs,

@@ -5,8 +5,8 @@ export const config: Config = {
   tsconfig: 'tsconfig.json',
   outputTargets: [
     {
-      type: 'dist'
-    }
+      type: 'dist',
+    },
   ],
-  globalScript: 'src/global.ts'
+  globalScript: 'src/global.ts',
 };

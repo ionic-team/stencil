@@ -2,24 +2,28 @@ import type * as d from '../../declarations';
 import { sortBy } from '@utils';
 import { getDefaultBundles } from './default-bundles';
 
-export function computeUsedComponents(config: d.Config, defaultBundles: d.ComponentCompilerMeta[][], allCmps: d.ComponentCompilerMeta[]) {
+export function computeUsedComponents(
+  config: d.Config,
+  defaultBundles: d.ComponentCompilerMeta[][],
+  allCmps: d.ComponentCompilerMeta[]
+) {
   if (!config.excludeUnusedDependencies) {
-    return new Set(allCmps.map(c => c.tagName));
+    return new Set(allCmps.map((c) => c.tagName));
   }
   const usedComponents = new Set<string>();
 
   // All components
-  defaultBundles.forEach(entry => {
-    entry.forEach(cmp => usedComponents.add(cmp.tagName));
+  defaultBundles.forEach((entry) => {
+    entry.forEach((cmp) => usedComponents.add(cmp.tagName));
   });
-  allCmps.forEach(cmp => {
+  allCmps.forEach((cmp) => {
     if (!cmp.isCollectionDependency) {
       usedComponents.add(cmp.tagName);
     }
   });
-  allCmps.forEach(cmp => {
+  allCmps.forEach((cmp) => {
     if (cmp.isCollectionDependency) {
-      if (cmp.dependents.some(dep => usedComponents.has(dep))) {
+      if (cmp.dependents.some((dep) => usedComponents.has(dep))) {
         usedComponents.add(cmp.tagName);
       }
     }
@@ -29,45 +33,47 @@ export function computeUsedComponents(config: d.Config, defaultBundles: d.Compon
 }
 
 export function generateComponentBundles(config: d.Config, buildCtx: d.BuildCtx): d.ComponentCompilerMeta[][] {
-  const cmps = sortBy(buildCtx.components, cmp => cmp.dependents.length);
+  const cmps = sortBy(buildCtx.components, (cmp) => cmp.dependents.length);
   const defaultBundles = getDefaultBundles(config, buildCtx, cmps);
   const usedComponents = computeUsedComponents(config, defaultBundles, cmps);
 
   if (config.devMode) {
-    return cmps.filter(c => usedComponents.has(c.tagName)).map(cmp => [cmp]);
+    return cmps.filter((c) => usedComponents.has(c.tagName)).map((cmp) => [cmp]);
   }
 
   // Visit components that are already in one of the default bundlers
   const alreadyBundled = new Set();
-  defaultBundles.forEach(entry => {
-    entry.forEach(cmp => alreadyBundled.add(cmp));
+  defaultBundles.forEach((entry) => {
+    entry.forEach((cmp) => alreadyBundled.add(cmp));
   });
 
-  const bundlers: d.ComponentCompilerMeta[][] = cmps.filter(cmp => usedComponents.has(cmp.tagName) && !alreadyBundled.has(cmp)).map(c => [c]);
+  const bundlers: d.ComponentCompilerMeta[][] = cmps
+    .filter((cmp) => usedComponents.has(cmp.tagName) && !alreadyBundled.has(cmp))
+    .map((c) => [c]);
 
-  return [...defaultBundles, ...optimizeBundlers(bundlers, 0.6)].filter(b => b.length > 0);
+  return [...defaultBundles, ...optimizeBundlers(bundlers, 0.6)].filter((b) => b.length > 0);
 }
 
 function optimizeBundlers(bundles: d.ComponentCompilerMeta[][], threshold: number) {
   const cmpIndexMap = new Map<string, number>();
   bundles.forEach((entry, index) => {
-    entry.forEach(cmp => {
+    entry.forEach((cmp) => {
       cmpIndexMap.set(cmp.tagName, index);
     });
   });
 
   const visited = new Uint8Array(bundles.length);
-  const matrix = bundles.map(entry => {
+  const matrix = bundles.map((entry) => {
     const vector = new Uint8Array(bundles.length);
-    entry.forEach(cmp => {
-      cmp.dependents.forEach(tag => {
+    entry.forEach((cmp) => {
+      cmp.dependents.forEach((tag) => {
         const index = cmpIndexMap.get(tag);
         if (index !== undefined) {
           vector[index] = 1;
         }
       });
     });
-    entry.forEach(cmp => {
+    entry.forEach((cmp) => {
       const index = cmpIndexMap.get(cmp.tagName);
       if (index !== undefined) {
         vector[index] = 0;

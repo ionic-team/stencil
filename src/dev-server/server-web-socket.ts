@@ -5,7 +5,7 @@ import { noop } from '@utils';
 
 export function createWebSocket(
   httpServer: Server,
-  onMessageFromClient: (msg: d.DevServerMessage) => void,
+  onMessageFromClient: (msg: d.DevServerMessage) => void
 ): DevWebSocket {
   const wsConfig: ws.ServerOptions = {
     server: httpServer,
@@ -18,7 +18,7 @@ export function createWebSocket(
   }
 
   wsServer.on('connection', (ws: DevWS) => {
-    ws.on('message', data => {
+    ws.on('message', (data) => {
       // the server process has received a message from the browser
       // pass the message received from the browser to the main cli process
       try {
@@ -47,7 +47,7 @@ export function createWebSocket(
     sendToBrowser: (msg: d.DevServerMessage) => {
       if (msg && wsServer && wsServer.clients) {
         const data = JSON.stringify(msg);
-        wsServer.clients.forEach(ws => {
+        wsServer.clients.forEach((ws) => {
           if (ws.readyState === ws.OPEN) {
             ws.send(data);
           }
@@ -57,10 +57,10 @@ export function createWebSocket(
     close: () => {
       return new Promise((resolve, reject) => {
         clearInterval(pingInternval);
-        wsServer.clients.forEach(ws => {
+        wsServer.clients.forEach((ws) => {
           ws.close(1000);
         });
-        wsServer.close(err => {
+        wsServer.close((err) => {
           if (err) {
             reject(err);
           } else {

@@ -1,7 +1,7 @@
 import { Component, State, h } from '@stencil/core';
 
 @Component({
-  tag: 'slot-light-dom-root'
+  tag: 'slot-light-dom-root',
 })
 export class SlotLightDomRoot {
   @State() a = 'a';
@@ -39,52 +39,35 @@ export class SlotLightDomRoot {
       <div>
         <button onClick={this.testClick.bind(this)}>Test</button>
 
-        <slot-light-dom-content class='results1'>{this.a}</slot-light-dom-content>
+        <slot-light-dom-content class="results1">{this.a}</slot-light-dom-content>
 
-        <slot-light-dom-content class='results2'>
-          {this.b}
+        <slot-light-dom-content class="results2">{this.b}</slot-light-dom-content>
+
+        <slot-light-dom-content class="results3">
+          <nav>{this.c}</nav>
         </slot-light-dom-content>
 
-        <slot-light-dom-content class='results3'>
-          <nav>
-          {this.c}
-          </nav>
-        </slot-light-dom-content>
-
-        <slot-light-dom-content class='results4'>
-          <nav>
-            {this.d}
-          </nav>
+        <slot-light-dom-content class="results4">
+          <nav>{this.d}</nav>
           {this.e}
         </slot-light-dom-content>
 
-        <slot-light-dom-content class='results5'>
+        <slot-light-dom-content class="results5">
           {this.f}
-          <nav>
-            {this.g}
-          </nav>
+          <nav>{this.g}</nav>
         </slot-light-dom-content>
 
-        <slot-light-dom-content class='results6'>
+        <slot-light-dom-content class="results6">
           {this.h}
-          <nav>
-            {this.i}
-          </nav>
+          <nav>{this.i}</nav>
           {this.j}
         </slot-light-dom-content>
 
-        <slot-light-dom-content class='results7'>
-          <nav>
-            {this.k}
-          </nav>
-          <nav>
-            {this.l}
-          </nav>
-          <nav>
-            {this.m}
-          </nav>
+        <slot-light-dom-content class="results7">
+          <nav>{this.k}</nav>
+          <nav>{this.l}</nav>
+          <nav>{this.m}</nav>
         </slot-light-dom-content>
-
       </div>
     );
   }

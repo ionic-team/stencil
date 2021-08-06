@@ -6,7 +6,11 @@ import { getBuildTimestamp } from '../build/build-ctx';
 import { JsonDocsValue } from '../../declarations';
 import { typescriptVersion, version } from '../../version';
 
-export const generateDocData = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx): Promise<d.JsonDocs> => {
+export const generateDocData = async (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  buildCtx: d.BuildCtx
+): Promise<d.JsonDocs> => {
   return {
     timestamp: getBuildTimestamp(),
     compiler: {
@@ -18,9 +22,13 @@ export const generateDocData = async (config: d.Config, compilerCtx: d.CompilerC
   };
 };
 
-const getDocsComponents = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx): Promise<d.JsonDocsComponent[]> => {
+const getDocsComponents = async (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  buildCtx: d.BuildCtx
+): Promise<d.JsonDocsComponent[]> => {
   const results = await Promise.all(
-    buildCtx.moduleFiles.map(async moduleFile => {
+    buildCtx.moduleFiles.map(async (moduleFile) => {
       const filePath = moduleFile.sourceFilePath;
       const dirPath = normalizePath(dirname(filePath));
       const readmePath = normalizePath(join(dirPath, 'readme.md'));
@@ -28,8 +36,8 @@ const getDocsComponents = async (config: d.Config, compilerCtx: d.CompilerCtx, b
       const readme = await getUserReadmeContent(compilerCtx, readmePath);
       const usage = await generateUsages(compilerCtx, usagesDir);
       return moduleFile.cmps
-        .filter(cmp => !cmp.internal && !cmp.isCollectionDependency)
-        .map(cmp => ({
+        .filter((cmp) => !cmp.internal && !cmp.isCollectionDependency)
+        .map((cmp) => ({
           dirPath,
           filePath: relative(config.rootDir, filePath),
           fileName: basename(filePath),
@@ -54,17 +62,17 @@ const getDocsComponents = async (config: d.Config, compilerCtx: d.CompilerCtx, b
           parts: getDocsParts(cmp.htmlParts, cmp.docs.tags),
           listeners: getDocsListeners(cmp.listeners),
         }));
-    }),
+    })
   );
 
-  return sortBy(flatOne(results), cmp => cmp.tag);
+  return sortBy(flatOne(results), (cmp) => cmp.tag);
 };
 
 const buildDocsDepGraph = (cmp: d.ComponentCompilerMeta, cmps: d.ComponentCompilerMeta[]) => {
   const dependencies: d.JsonDocsDependencyGraph = {};
   function walk(tagName: string) {
     if (!dependencies[tagName]) {
-      const cmp = cmps.find(c => c.tagName === tagName);
+      const cmp = cmps.find((c) => c.tagName === tagName);
       const deps = cmp.directDependencies;
       if (deps.length > 0) {
         dependencies[tagName] = deps;
@@ -75,7 +83,7 @@ const buildDocsDepGraph = (cmp: d.ComponentCompilerMeta, cmps: d.ComponentCompil
   walk(cmp.tagName);
 
   // load dependents
-  cmp.directDependents.forEach(tagName => {
+  cmp.directDependents.forEach((tagName) => {
     if (dependencies[tagName] && !dependencies[tagName].includes(cmp.tagName)) {
       dependencies[tagName].push(cmp.tagName);
     } else {
@@ -96,13 +104,16 @@ const getDocsEncapsulation = (cmp: d.ComponentCompilerMeta): 'shadow' | 'scoped'
 };
 
 const getDocsProperties = (cmpMeta: d.ComponentCompilerMeta): d.JsonDocsProp[] => {
-  return sortBy([...getRealProperties(cmpMeta.properties), ...getVirtualProperties(cmpMeta.virtualProperties)], p => p.name);
+  return sortBy(
+    [...getRealProperties(cmpMeta.properties), ...getVirtualProperties(cmpMeta.virtualProperties)],
+    (p) => p.name
+  );
 };
 
 const getRealProperties = (properties: d.ComponentCompilerProperty[]): d.JsonDocsProp[] => {
   return properties
-    .filter(member => !member.internal)
-    .map(member => ({
+    .filter((member) => !member.internal)
+    .map((member) => ({
       name: member.name,
       type: member.complexType.resolved,
       mutable: member.mutable,
@@ -123,7 +134,7 @@ const getRealProperties = (properties: d.ComponentCompilerProperty[]): d.JsonDoc
 };
 
 const getVirtualProperties = (virtualProps: d.ComponentCompilerVirtualProperty[]): d.JsonDocsProp[] => {
-  return virtualProps.map(member => ({
+  return virtualProps.map((member) => ({
     name: member.name,
     type: member.type,
     mutable: false,
@@ -145,9 +156,9 @@ const getVirtualProperties = (virtualProps: d.ComponentCompilerVirtualProperty[]
 
 const parseTypeIntoValues = (type: string) => {
   if (typeof type === 'string') {
-    const unions = type.split('|').map(u => u.trim());
+    const unions = type.split('|').map((u) => u.trim());
     const parsedUnions: JsonDocsValue[] = [];
-    unions.forEach(u => {
+    unions.forEach((u) => {
       if (u === 'true') {
         parsedUnions.push({
           value: 'true',
@@ -188,13 +199,13 @@ const parseTypeIntoValues = (type: string) => {
 };
 
 const getDocsMethods = (methods: d.ComponentCompilerMethod[]): d.JsonDocsMethod[] => {
-  return sortBy(methods, member => member.name)
-    .filter(member => !member.internal)
-    .map(member => ({
+  return sortBy(methods, (member) => member.name)
+    .filter((member) => !member.internal)
+    .map((member) => ({
       name: member.name,
       returns: {
         type: member.complexType.return,
-        docs: member.docs.tags.filter(t => t.name === 'return').join('\n'),
+        docs: member.docs.tags.filter((t) => t.name === 'return').join('\n'),
       },
       signature: `${member.name}${member.complexType.signature}`,
       parameters: [], // TODO
@@ -205,9 +216,9 @@ const getDocsMethods = (methods: d.ComponentCompilerMethod[]): d.JsonDocsMethod[
 };
 
 const getDocsEvents = (events: d.ComponentCompilerEvent[]): d.JsonDocsEvent[] => {
-  return sortBy(events, eventMeta => eventMeta.name.toLowerCase())
-    .filter(eventMeta => !eventMeta.internal)
-    .map(eventMeta => ({
+  return sortBy(events, (eventMeta) => eventMeta.name.toLowerCase())
+    .filter((eventMeta) => !eventMeta.internal)
+    .map((eventMeta) => ({
       event: eventMeta.name,
       detail: eventMeta.complexType.resolved,
       bubbles: eventMeta.bubbles,
@@ -224,7 +235,7 @@ const getDocsStyles = (cmpMeta: d.ComponentCompilerMeta): d.JsonDocsStyle[] => {
     return [];
   }
 
-  return sortBy(cmpMeta.styleDocs, o => o.name.toLowerCase()).map(styleDoc => {
+  return sortBy(cmpMeta.styleDocs, (o) => o.name.toLowerCase()).map((styleDoc) => {
     return {
       name: styleDoc.name,
       annotation: styleDoc.annotation || '',
@@ -234,7 +245,7 @@ const getDocsStyles = (cmpMeta: d.ComponentCompilerMeta): d.JsonDocsStyle[] => {
 };
 
 const getDocsListeners = (listeners: d.ComponentCompilerListener[]): d.JsonDocsListener[] => {
-  return listeners.map(listener => ({
+  return listeners.map((listener) => ({
     event: listener.name,
     target: listener.target,
     capture: listener.capture,
@@ -243,7 +254,7 @@ const getDocsListeners = (listeners: d.ComponentCompilerListener[]): d.JsonDocsL
 };
 
 const getDocsDeprecationText = (tags: d.JsonDocsTag[]) => {
-  const deprecation = tags.find(t => t.name === 'deprecated');
+  const deprecation = tags.find((t) => t.name === 'deprecated');
   if (deprecation) {
     return deprecation.text || '';
   }
@@ -253,22 +264,22 @@ const getDocsDeprecationText = (tags: d.JsonDocsTag[]) => {
 const getDocsSlots = (tags: d.JsonDocsTag[]): d.JsonDocsSlot[] => {
   return sortBy(
     getNameText('slot', tags).map(([name, docs]) => ({ name, docs })),
-    a => a.name,
+    (a) => a.name
   );
 };
 
 const getDocsParts = (vdom: string[], tags: d.JsonDocsTag[]): d.JsonDocsSlot[] => {
   const docsParts = getNameText('part', tags).map(([name, docs]) => ({ name, docs }));
-  const vdomParts = vdom.map(name => ({ name, docs: '' }));
+  const vdomParts = vdom.map((name) => ({ name, docs: '' }));
   return sortBy(
-    unique([...docsParts, ...vdomParts], p => p.name),
-    p => p.name,
+    unique([...docsParts, ...vdomParts], (p) => p.name),
+    (p) => p.name
   );
 };
 
 export const getNameText = (name: string, tags: d.JsonDocsTag[]) => {
   return tags
-    .filter(tag => tag.name === name && tag.text)
+    .filter((tag) => tag.name === name && tag.text)
     .map(({ text }) => {
       const [namePart, ...rest] = (' ' + text).split(' - ');
       return [namePart.trim(), rest.join(' - ').trim()];
@@ -319,7 +330,7 @@ const generateUsages = async (compilerCtx: d.CompilerCtx, usagesDir: string) => 
     const usages: d.JsonDocsUsage = {};
 
     await Promise.all(
-      usageFilePaths.map(async f => {
+      usageFilePaths.map(async (f) => {
         if (!f.isFile) {
           return;
         }
@@ -334,12 +345,12 @@ const generateUsages = async (compilerCtx: d.CompilerCtx, usagesDir: string) => 
         const key = parts.join('.');
 
         usages[key] = await compilerCtx.fs.readFile(f.absPath);
-      }),
+      })
     );
 
     Object.keys(usages)
       .sort()
-      .forEach(key => {
+      .forEach((key) => {
         rtn[key] = usages[key];
       });
   } catch (e) {}

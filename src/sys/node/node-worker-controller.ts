@@ -42,10 +42,10 @@ export class NodeWorkerController extends EventEmitter implements d.WorkerMainCo
   onExit(workerId: number) {
     setTimeout(() => {
       let doQueue = false;
-      const worker = this.workers.find(w => w.id === workerId);
+      const worker = this.workers.find((w) => w.id === workerId);
 
       if (worker) {
-        worker.tasks.forEach(t => {
+        worker.tasks.forEach((t) => {
           t.retries++;
           this.taskQueue.unshift(t);
           doQueue = true;
@@ -77,7 +77,7 @@ export class NodeWorkerController extends EventEmitter implements d.WorkerMainCo
       this.onExit(workerId);
     });
 
-    worker.on('error', err => {
+    worker.on('error', (err) => {
       this.onError(err, workerId);
     });
 
@@ -85,7 +85,7 @@ export class NodeWorkerController extends EventEmitter implements d.WorkerMainCo
   }
 
   stopWorker(workerId: number) {
-    const worker = this.workers.find(w => w.id === workerId);
+    const worker = this.workers.find((w) => w.id === workerId);
     if (worker) {
       worker.stop();
 
@@ -147,7 +147,7 @@ export class NodeWorkerController extends EventEmitter implements d.WorkerMainCo
 
   cancelTasks() {
     for (const worker of this.workers) {
-      worker.tasks.forEach(t => t.reject(TASK_CANCELED_MSG));
+      worker.tasks.forEach((t) => t.reject(TASK_CANCELED_MSG));
       worker.tasks.clear();
     }
     this.taskQueue.length = 0;
@@ -163,7 +163,7 @@ export class NodeWorkerController extends EventEmitter implements d.WorkerMainCo
 
       this.taskQueue.length = 0;
 
-      const workerIds = this.workers.map(w => w.id);
+      const workerIds = this.workers.map((w) => w.id);
       for (const workerId of workerIds) {
         this.stopWorker(workerId);
       }
@@ -172,7 +172,7 @@ export class NodeWorkerController extends EventEmitter implements d.WorkerMainCo
 }
 
 export function getNextWorker(workers: NodeWorkerMain[]) {
-  const availableWorkers = workers.filter(w => {
+  const availableWorkers = workers.filter((w) => {
     if (w.stopped) {
       // nope, don't use this worker if it's exiting
       return false;

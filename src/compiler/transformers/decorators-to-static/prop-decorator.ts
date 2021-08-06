@@ -19,19 +19,33 @@ export const propDecoratorsToStatic = (
   decoratedProps: ts.ClassElement[],
   typeChecker: ts.TypeChecker,
   watchable: Set<string>,
-  newMembers: ts.ClassElement[],
+  newMembers: ts.ClassElement[]
 ) => {
   const properties = decoratedProps
-    .filter(prop => (ts.isPropertyDeclaration(prop) && !!prop.name) || ts.isGetAccessor(prop))
-    .map(prop => parsePropDecorator(diagnostics, typeChecker, prop as ts.PropertyDeclaration | ts.GetAccessorDeclaration, watchable, newMembers))
-    .filter(prop => prop != null);
+    .filter((prop) => (ts.isPropertyDeclaration(prop) && !!prop.name) || ts.isGetAccessor(prop))
+    .map((prop) =>
+      parsePropDecorator(
+        diagnostics,
+        typeChecker,
+        prop as ts.PropertyDeclaration | ts.GetAccessorDeclaration,
+        watchable,
+        newMembers
+      )
+    )
+    .filter((prop) => prop != null);
 
   if (properties.length > 0) {
     newMembers.push(createStaticGetter('properties', ts.createObjectLiteral(properties, true)));
   }
 };
 
-const parsePropDecorator = (diagnostics: d.Diagnostic[], typeChecker: ts.TypeChecker, prop: ts.PropertyDeclaration | ts.GetAccessorDeclaration, watchable: Set<string>, newMembers: ts.ClassElement[]) => {
+const parsePropDecorator = (
+  diagnostics: d.Diagnostic[],
+  typeChecker: ts.TypeChecker,
+  prop: ts.PropertyDeclaration | ts.GetAccessorDeclaration,
+  watchable: Set<string>,
+  newMembers: ts.ClassElement[]
+) => {
   const propDecorator = prop.decorators.find(isDecoratorNamed('Prop'));
   if (propDecorator == null) {
     return null;
@@ -44,7 +58,8 @@ const parsePropDecorator = (diagnostics: d.Diagnostic[], typeChecker: ts.TypeChe
 
   if (isMemberPrivate(prop)) {
     const err = buildError(diagnostics);
-    err.messageText = 'Properties decorated with the @Prop() decorator cannot be "private" nor "protected". More info: https://stenciljs.com/docs/properties';
+    err.messageText =
+      'Properties decorated with the @Prop() decorator cannot be "private" nor "protected". More info: https://stenciljs.com/docs/properties';
     augmentDiagnosticWithNode(err, prop.modifiers[0]);
   }
 
@@ -84,9 +99,9 @@ const parsePropDecorator = (diagnostics: d.Diagnostic[], typeChecker: ts.TypeChe
     propMeta.defaultValue = prop.initializer.getText();
   } else if (ts.isGetAccessorDeclaration(prop)) {
     // shallow comb to find default value for a getter
-    const returnSt = prop.body.statements.find(st => ts.isReturnStatement(st)) as ts.ReturnStatement;
+    const returnSt = prop.body.statements.find((st) => ts.isReturnStatement(st)) as ts.ReturnStatement;
     const retExp = returnSt.expression;
-    if (ts.isLiteralExpression(retExp))  {
+    if (ts.isLiteralExpression(retExp)) {
       propMeta.defaultValue = retExp.getText();
     } else if (ts.isPropertyAccessExpression(retExp)) {
       const nameToFind = retExp.name.getText();
@@ -101,12 +116,12 @@ const parsePropDecorator = (diagnostics: d.Diagnostic[], typeChecker: ts.TypeChe
 };
 
 const findSetter = (propName: string, members: ts.ClassElement[]) => {
-  return members.find(m => ts.isSetAccessor(m) && m.name.getText() === propName) as ts.SetAccessorDeclaration
-}
+  return members.find((m) => ts.isSetAccessor(m) && m.name.getText() === propName) as ts.SetAccessorDeclaration;
+};
 
 const findGetProp = (propName: string, members: ts.ClassElement[]) => {
-  return members.find(m => ts.isPropertyDeclaration(m) && m.name.getText() === propName) as ts.PropertyDeclaration
-}
+  return members.find((m) => ts.isPropertyDeclaration(m) && m.name.getText() === propName) as ts.PropertyDeclaration;
+};
 
 const getAttributeName = (propName: string, propOptions: d.PropOptions) => {
   if (propOptions.attribute === null) {
@@ -134,7 +149,11 @@ const getReflect = (diagnostics: d.Diagnostic[], propDecorator: ts.Decorator, pr
   return false;
 };
 
-const getComplexType = (typeChecker: ts.TypeChecker, node: ts.PropertyDeclaration | ts.GetAccessorDeclaration, type: ts.Type): d.ComponentCompilerPropertyComplexType => {
+const getComplexType = (
+  typeChecker: ts.TypeChecker,
+  node: ts.PropertyDeclaration | ts.GetAccessorDeclaration,
+  type: ts.Type
+): d.ComponentCompilerPropertyComplexType => {
   const nodeType = node.type;
   return {
     original: nodeType ? nodeType.getText() : typeToString(typeChecker, type),
@@ -175,7 +194,7 @@ export const propTypeFromTSType = (type: ts.Type) => {
 const checkType = (type: ts.Type, check: (type: ts.Type) => boolean) => {
   if (type.flags & ts.TypeFlags.Union) {
     const union = type as ts.UnionType;
-    if (union.types.some(type => checkType(type, check))) {
+    if (union.types.some((type) => checkType(type, check))) {
       return true;
     }
   }

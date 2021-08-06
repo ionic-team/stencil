@@ -1,7 +1,6 @@
 import { setupDomTests, waitForChanges } from '../util';
 
-
-describe('attribute-boolean', function() {
+describe('attribute-boolean', function () {
   const { setupDom, tearDownDom } = setupDomTests(document);
   let app: HTMLElement;
 
@@ -28,12 +27,10 @@ describe('attribute-boolean', function() {
     expect(child.getAttribute('noreflect')).toBe(null);
     expect(child.getAttribute('tappable')).toBe(null);
 
-
     const button = app.querySelector('button');
     button.click();
 
     await waitForChanges();
-
 
     expect(root.getAttribute('aria-hidden')).toBe('true');
     expect(root.getAttribute('fixedtrue')).toBe('true');

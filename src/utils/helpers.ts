@@ -5,15 +5,15 @@ export const toLowerCase = (str: string) => str.toLowerCase();
 export const toDashCase = (str: string) =>
   toLowerCase(
     str
-      .replace(/([A-Z0-9])/g, g => ' ' + g[0])
+      .replace(/([A-Z0-9])/g, (g) => ' ' + g[0])
       .trim()
-      .replace(/ /g, '-'),
+      .replace(/ /g, '-')
   );
 
 export const dashToPascalCase = (str: string) =>
   toLowerCase(str)
     .split('-')
-    .map(segment => segment.charAt(0).toUpperCase() + segment.slice(1))
+    .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
     .join('');
 
 export const toTitleCase = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
@@ -48,9 +48,9 @@ export const flatOne = <T>(array: T[][]): T[] => {
   }, [] as T[]);
 };
 
-export const unique = <T>(array: T[], predicate: (item: T) => any = i => i): T[] => {
+export const unique = <T>(array: T[], predicate: (item: T) => any = (i) => i): T[] => {
   const set = new Set();
-  return array.filter(item => {
+  return array.filter((item) => {
     const key = predicate(item);
     if (key == null) {
       return true;

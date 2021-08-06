@@ -1,10 +1,9 @@
 import { Component, Element, h } from '@stencil/core';
 
 @Component({
-  tag: 'attribute-basic-root'
+  tag: 'attribute-basic-root',
 })
 export class AttributeBasicRoot {
-
   @Element() el!: HTMLElement;
   url?: URL;
 
@@ -26,7 +25,9 @@ export class AttributeBasicRoot {
       <div>
         <button onClick={this.testClick.bind(this)}>Test</button>
         <attribute-basic></attribute-basic>
-        <div>hostname: {this.url!.hostname}, pathname: {this.url!.pathname}</div>
+        <div>
+          hostname: {this.url!.hostname}, pathname: {this.url!.pathname}
+        </div>
       </div>
     );
   }

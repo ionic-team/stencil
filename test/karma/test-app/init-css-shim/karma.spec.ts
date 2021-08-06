@@ -25,5 +25,4 @@ describe('init-css-shim', () => {
     imagePath = imagePath.replace(/\'/g, '');
     expect(imagePath).toBe(`url(https://www.google.com/favicon.ico)`);
   });
-
 });
