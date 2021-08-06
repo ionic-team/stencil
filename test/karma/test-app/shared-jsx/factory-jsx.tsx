@@ -4,7 +4,6 @@ import { Component, h } from '@stencil/core';
   tag: 'factory-jsx',
 })
 export class FactoryJSX {
-
   getJsxNode() {
     return <div>Factory JSX</div>;
   }

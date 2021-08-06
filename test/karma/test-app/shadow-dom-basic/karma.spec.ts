@@ -1,7 +1,6 @@
 import { setupDomTests } from '../util';
 
-
-describe('shadow-dom-basic', function() {
+describe('shadow-dom-basic', function () {
   const { setupDom, tearDownDom } = setupDomTests(document);
   let app: HTMLElement;
 
@@ -63,5 +62,4 @@ describe('shadow-dom-basic', function() {
     const lightBG = window.getComputedStyle(elm.children[0].children[1]).backgroundColor;
     expect(lightBG).toBe('rgb(255, 255, 0)');
   }
-
 });

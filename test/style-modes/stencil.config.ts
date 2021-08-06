@@ -2,13 +2,12 @@ import { Config } from '../../internal';
 import { sass } from '@stencil/sass';
 
 export const config: Config = {
-
   hashFileNames: false,
 
   outputTargets: [
     {
       type: 'www',
-      serviceWorker: null
+      serviceWorker: null,
     },
     {
       type: 'dist-custom-elements-bundle',
@@ -17,15 +16,12 @@ export const config: Config = {
         {
           src: 'custom-elements.html',
           dest: '../custom-elements.html',
-          warn: true
-        }
-      ]
-    }
+          warn: true,
+        },
+      ],
+    },
   ],
   globalScript: 'src/global.ts',
   enableCache: false,
-  plugins: [
-    sass()
-  ]
-
+  plugins: [sass()],
 };

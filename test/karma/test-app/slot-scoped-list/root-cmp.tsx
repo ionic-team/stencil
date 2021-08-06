@@ -1,7 +1,7 @@
 import { Component, Prop, h } from '@stencil/core';
 
 @Component({
-  tag: 'slot-list-light-scoped-root'
+  tag: 'slot-list-light-scoped-root',
 })
 export class SlotListLightScopedRoot {
   @Prop({ mutable: true })

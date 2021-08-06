@@ -4,7 +4,6 @@ import { Component, Host, h } from '@stencil/core';
   tag: 'static-styles',
 })
 export class StaticStyles {
-
   render() {
     return (
       <Host>

@@ -9,7 +9,9 @@ export class MockCustomElementRegistry implements CustomElementRegistry {
 
   define(tagName: string, cstr: any, options?: any) {
     if (tagName.toLowerCase() !== tagName) {
-      throw new Error(`Failed to execute 'define' on 'CustomElementRegistry': "${tagName}" is not a valid custom element name`);
+      throw new Error(
+        `Failed to execute 'define' on 'CustomElementRegistry': "${tagName}" is not a valid custom element name`
+      );
     }
 
     if (this.__registry == null) {
@@ -20,7 +22,7 @@ export class MockCustomElementRegistry implements CustomElementRegistry {
     if (this.__whenDefined != null) {
       const whenDefinedResolveFns = this.__whenDefined.get(tagName);
       if (whenDefinedResolveFns != null) {
-        whenDefinedResolveFns.forEach(whenDefinedResolveFn => {
+        whenDefinedResolveFns.forEach((whenDefinedResolveFn) => {
           whenDefinedResolveFn();
         });
         whenDefinedResolveFns.length = 0;
@@ -31,7 +33,7 @@ export class MockCustomElementRegistry implements CustomElementRegistry {
     const doc = this.win.document;
     if (doc != null) {
       const hosts = doc.querySelectorAll(tagName);
-      hosts.forEach(host => {
+      hosts.forEach((host) => {
         if (upgradedElements.has(host) === false) {
           tempDisableCallbacks.add(doc);
 
@@ -86,7 +88,7 @@ export class MockCustomElementRegistry implements CustomElementRegistry {
       return Promise.resolve();
     }
 
-    return new Promise<void>(resolve => {
+    return new Promise<void>((resolve) => {
       if (this.__whenDefined == null) {
         this.__whenDefined = new Map();
       }
@@ -141,7 +143,7 @@ export function createCustomElement(customElements: MockCustomElementRegistry, o
         }
         return false;
       },
-    },
+    }
   );
 
   const elm = new MockHTMLElement(ownerDocument, tagName);
@@ -165,19 +167,19 @@ export function connectNode(ownerDocument: any, node: MockNode) {
         fireConnectedCallback(node);
       }
 
-      const shadowRoot = ((node as any) as Element).shadowRoot;
+      const shadowRoot = (node as any as Element).shadowRoot;
       if (shadowRoot != null) {
-        shadowRoot.childNodes.forEach(childNode => {
+        shadowRoot.childNodes.forEach((childNode) => {
           connectNode(ownerDocument, childNode as any);
         });
       }
     }
 
-    node.childNodes.forEach(childNode => {
+    node.childNodes.forEach((childNode) => {
       connectNode(ownerDocument, childNode);
     });
   } else {
-    node.childNodes.forEach(childNode => {
+    node.childNodes.forEach((childNode) => {
       childNode.ownerDocument = ownerDocument;
     });
   }
@@ -214,7 +216,10 @@ export function attributeChanged(node: MockNode, attrName: string, oldValue: str
   attrName = attrName.toLowerCase();
 
   const observedAttributes = (node as any).constructor.observedAttributes as string[];
-  if (Array.isArray(observedAttributes) === true && observedAttributes.some(obs => obs.toLowerCase() === attrName) === true) {
+  if (
+    Array.isArray(observedAttributes) === true &&
+    observedAttributes.some((obs) => obs.toLowerCase() === attrName) === true
+  ) {
     try {
       (node as any).attributeChangedCallback(attrName, oldValue, newValue);
     } catch (e) {

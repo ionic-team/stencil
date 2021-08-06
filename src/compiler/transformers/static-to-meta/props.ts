@@ -13,7 +13,7 @@ export const parseStaticProps = (staticMembers: ts.ClassElement[]): d.ComponentC
     return [];
   }
 
-  return propNames.map(propName => {
+  return propNames.map((propName) => {
     const val = parsedProps[propName];
     return {
       name: propName,

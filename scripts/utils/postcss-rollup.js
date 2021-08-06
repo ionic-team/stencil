@@ -21,7 +21,7 @@ export default {
             return path.join(dir, importee + '.es6');
           }
         }
-      }
-    }
-  ]
+      },
+    },
+  ],
 };

@@ -16,7 +16,7 @@ describe('vdom-relocation', () => {
       render() {
         return (
           <my-child>
-            {this.data.map(a => (
+            {this.data.map((a) => (
               <div>{a}</div>
             ))}
           </my-child>

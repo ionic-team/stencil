@@ -345,7 +345,7 @@ const applyStrictSelectorScope = (selector: string, scopeSelector: string, hostS
 const scopeSelector = (selector: string, scopeSelectorText: string, hostSelector: string, slotSelector: string) => {
   return selector
     .split(',')
-    .map(shallowPart => {
+    .map((shallowPart) => {
       if (slotSelector && shallowPart.indexOf('.' + slotSelector) > -1) {
         return shallowPart.trim();
       }
@@ -359,13 +359,24 @@ const scopeSelector = (selector: string, scopeSelectorText: string, hostSelector
     .join(', ');
 };
 
-const scopeSelectors = (cssText: string, scopeSelectorText: string, hostSelector: string, slotSelector: string, commentOriginalSelector: boolean) => {
+const scopeSelectors = (
+  cssText: string,
+  scopeSelectorText: string,
+  hostSelector: string,
+  slotSelector: string,
+  commentOriginalSelector: boolean
+) => {
   return processRules(cssText, (rule: CssRule) => {
     let selector = rule.selector;
     let content = rule.content;
     if (rule.selector[0] !== '@') {
       selector = scopeSelector(rule.selector, scopeSelectorText, hostSelector, slotSelector);
-    } else if (rule.selector.startsWith('@media') || rule.selector.startsWith('@supports') || rule.selector.startsWith('@page') || rule.selector.startsWith('@document')) {
+    } else if (
+      rule.selector.startsWith('@media') ||
+      rule.selector.startsWith('@supports') ||
+      rule.selector.startsWith('@page') ||
+      rule.selector.startsWith('@document')
+    ) {
       content = scopeSelectors(rule.content, scopeSelectorText, hostSelector, slotSelector, commentOriginalSelector);
     }
 
@@ -377,7 +388,13 @@ const scopeSelectors = (cssText: string, scopeSelectorText: string, hostSelector
   });
 };
 
-const scopeCssText = (cssText: string, scopeId: string, hostScopeId: string, slotScopeId: string, commentOriginalSelector: boolean) => {
+const scopeCssText = (
+  cssText: string,
+  scopeId: string,
+  hostScopeId: string,
+  slotScopeId: string,
+  commentOriginalSelector: boolean
+) => {
   cssText = insertPolyfillHostInCssText(cssText);
   cssText = convertColonHost(cssText);
   cssText = convertColonHostContext(cssText);
@@ -421,10 +438,15 @@ export const scopeCss = (cssText: string, scopeId: string, commentOriginalSelect
       return rule;
     };
 
-    cssText = processRules(cssText, rule => {
+    cssText = processRules(cssText, (rule) => {
       if (rule.selector[0] !== '@') {
         return processCommentedSelector(rule);
-      } else if (rule.selector.startsWith('@media') || rule.selector.startsWith('@supports') || rule.selector.startsWith('@page') || rule.selector.startsWith('@document')) {
+      } else if (
+        rule.selector.startsWith('@media') ||
+        rule.selector.startsWith('@supports') ||
+        rule.selector.startsWith('@page') ||
+        rule.selector.startsWith('@document')
+      ) {
         rule.content = processRules(rule.content, processCommentedSelector);
         return rule;
       }
@@ -441,7 +463,7 @@ export const scopeCss = (cssText: string, scopeId: string, commentOriginalSelect
     });
   }
 
-  scoped.slottedSelectors.forEach(slottedSelector => {
+  scoped.slottedSelectors.forEach((slottedSelector) => {
     cssText = cssText.replace(slottedSelector.orgSelector, slottedSelector.updatedSelector);
   });
 

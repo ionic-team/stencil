@@ -11,10 +11,10 @@ export const hAsync = (nodeName: any, vnodeData: any, ...children: d.ChildType[]
       // has children and at least one of them is async
       // wait on all of them to be resolved
       return Promise.all(flatChildren)
-        .then(resolvedChildren => {
+        .then((resolvedChildren) => {
           return h(nodeName, vnodeData, ...resolvedChildren);
         })
-        .catch(err => {
+        .catch((err) => {
           consoleDevError(err);
           return h(nodeName, vnodeData);
         });

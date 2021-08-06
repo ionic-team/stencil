@@ -2,7 +2,13 @@ import type * as d from '../../declarations';
 import { augmentDiagnosticWithNode, buildWarn } from '@utils';
 import ts from 'typescript';
 
-export const validatePublicName = (diagnostics: d.Diagnostic[], memberName: string, decorator: string, memberType: string, node: ts.Node) => {
+export const validatePublicName = (
+  diagnostics: d.Diagnostic[],
+  memberName: string,
+  decorator: string,
+  memberType: string,
+  node: ts.Node
+) => {
   if (RESERVED_PUBLIC_MEMBERS.has(memberName.toLowerCase())) {
     const warn = buildWarn(diagnostics);
     warn.messageText = [
@@ -266,6 +272,6 @@ const NODE_KEYS = [
 
 const JSX_KEYS = ['ref', 'key'];
 
-const ALL_KEYS = [...HTML_ELEMENT_KEYS, ...ELEMENT_KEYS, ...NODE_KEYS, ...JSX_KEYS].map(p => p.toLowerCase());
+const ALL_KEYS = [...HTML_ELEMENT_KEYS, ...ELEMENT_KEYS, ...NODE_KEYS, ...JSX_KEYS].map((p) => p.toLowerCase());
 
 const RESERVED_PUBLIC_MEMBERS = new Set(ALL_KEYS);

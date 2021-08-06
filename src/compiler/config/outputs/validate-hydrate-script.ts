@@ -18,7 +18,7 @@ export const validateHydrateScript = (config: d.Config, userOutputs: d.OutputTar
     // we don't already have a hydrate output target
     // let's still see if we require one because of other output targets
 
-    const hasWwwOutput = userOutputs.filter(isOutputTargetWww).some(o => isString(o.indexHtml));
+    const hasWwwOutput = userOutputs.filter(isOutputTargetWww).some((o) => isString(o.indexHtml));
     const shouldBuildHydrate = config?.flags.prerender || config?.flags.ssr;
 
     if (hasWwwOutput && shouldBuildHydrate) {
@@ -41,7 +41,7 @@ export const validateHydrateScript = (config: d.Config, userOutputs: d.OutputTar
 
   const hydrateOutputTargets = userOutputs.filter(isOutputTargetHydrate);
 
-  hydrateOutputTargets.forEach(outputTarget => {
+  hydrateOutputTargets.forEach((outputTarget) => {
     if (!isString(outputTarget.dir)) {
       // no directory given, see if we've got a dist to go off of
       outputTarget.dir = 'hydrate';

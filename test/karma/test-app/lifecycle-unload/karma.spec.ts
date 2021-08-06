@@ -1,7 +1,6 @@
 import { setupDomTests, waitForChanges } from '../util';
 
-
-describe('lifecycle-unload', function() {
+describe('lifecycle-unload', function () {
   jasmine.DEFAULT_TIMEOUT_INTERVAL = 30000;
 
   const { setupDom, tearDownDom } = setupDomTests(document);
@@ -15,11 +14,9 @@ describe('lifecycle-unload', function() {
   it('fire unload methods', async () => {
     if ('shadowRoot' in HTMLElement.prototype) {
       await testNativeShadowDom();
-
     } else {
       await testSlotPolyfill();
     }
-
   });
 
   async function testNativeShadowDom() {
@@ -111,5 +108,4 @@ describe('lifecycle-unload', function() {
     expect(unload.children[3].textContent.trim()).toBe('cmp-b unload');
     expect(unload.children.length).toBe(4);
   }
-
 });

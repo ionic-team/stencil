@@ -38,7 +38,7 @@ export class MockAttributeMap {
       attr.value = String(attr.value);
     }
 
-    const existingAttr = this.__items.find(a => a.name === attr.name && a.namespaceURI === attr.namespaceURI);
+    const existingAttr = this.__items.find((a) => a.name === attr.name && a.namespaceURI === attr.namespaceURI);
     if (existingAttr != null) {
       existingAttr.value = attr.value;
     } else {
@@ -56,7 +56,7 @@ export class MockAttributeMap {
   getNamedItemNS(namespaceURI: string, attrName: string) {
     namespaceURI = getNamespaceURI(namespaceURI);
     return (
-      this.__items.find(attr => attr.name === attrName && getNamespaceURI(attr.namespaceURI) === namespaceURI) || null
+      this.__items.find((attr) => attr.name === attrName && getNamespaceURI(attr.namespaceURI) === namespaceURI) || null
     );
   }
 
@@ -106,7 +106,7 @@ export function cloneAttributes(srcAttrs: MockAttributeMap, sortByName = false) 
         sortedAttrs.push(dstAttr);
       }
 
-      sortedAttrs.sort(sortAttributes).forEach(attr => {
+      sortedAttrs.sort(sortAttributes).forEach((attr) => {
         dstAttrs.setNamedItemNS(attr);
       });
     } else {

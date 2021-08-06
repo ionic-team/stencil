@@ -19,7 +19,13 @@ export const normalizePath = (path: string) => {
   if (normalized === '') {
     return '.';
   }
-  if (rootPart === '' && secondPart && path.includes('/') && !secondPart.startsWith('.') && !secondPart.startsWith('@')) {
+  if (
+    rootPart === '' &&
+    secondPart &&
+    path.includes('/') &&
+    !secondPart.startsWith('.') &&
+    !secondPart.startsWith('@')
+  ) {
     return './' + normalized;
   }
   return normalized;
@@ -91,7 +97,11 @@ const getEncodedRootLength = (path: string): number => {
       // special case interpreted as "the machine from which the URL is being interpreted".
       const scheme = path.slice(0, schemeEnd);
       const authority = path.slice(authorityStart, authorityEnd);
-      if (scheme === 'file' && (authority === '' || authority === 'localhost') && isVolumeCharacter(path.charCodeAt(authorityEnd + 1))) {
+      if (
+        scheme === 'file' &&
+        (authority === '' || authority === 'localhost') &&
+        isVolumeCharacter(path.charCodeAt(authorityEnd + 1))
+      ) {
         const volumeSeparatorEnd = getFileUrlVolumeSeparatorEnd(path, authorityEnd + 2);
         if (volumeSeparatorEnd !== -1) {
           if (path.charCodeAt(volumeSeparatorEnd) === CharacterCodes.slash) {
@@ -114,7 +124,9 @@ const getEncodedRootLength = (path: string): number => {
   return 0;
 };
 
-const isVolumeCharacter = (charCode: number) => (charCode >= CharacterCodes.a && charCode <= CharacterCodes.z) || (charCode >= CharacterCodes.A && charCode <= CharacterCodes.Z);
+const isVolumeCharacter = (charCode: number) =>
+  (charCode >= CharacterCodes.a && charCode <= CharacterCodes.z) ||
+  (charCode >= CharacterCodes.A && charCode <= CharacterCodes.Z);
 
 const getFileUrlVolumeSeparatorEnd = (url: string, start: number) => {
   const ch0 = url.charCodeAt(start);

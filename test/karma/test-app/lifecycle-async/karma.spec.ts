@@ -1,7 +1,6 @@
 import { setupDomTests, waitForChanges } from '../util';
 
-
-describe('lifecycle-async', function() {
+describe('lifecycle-async', function () {
   const { setupDom, tearDownDom } = setupDomTests(document);
   let app: HTMLElement;
 
@@ -45,5 +44,4 @@ describe('lifecycle-async', function() {
     expect(updates[5].textContent).toBe('componentDidUpdate-a');
     expect(updates.length).toBe(6);
   });
-
 });

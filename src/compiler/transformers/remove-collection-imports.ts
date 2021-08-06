@@ -11,7 +11,7 @@ export const removeCollectionImports = (compilerCtx: d.CompilerCtx): ts.Transfor
     import { asdf } '@ionic/core';
   */
   return () => {
-    return tsSourceFile => {
+    return (tsSourceFile) => {
       let madeUpdates = false;
       const statements = tsSourceFile.statements.slice();
 
@@ -25,7 +25,7 @@ export const removeCollectionImports = (compilerCtx: d.CompilerCtx): ts.Transfor
             const importPath = n.moduleSpecifier.text;
 
             // test if this side effect import is a collection
-            const isCollectionImport = compilerCtx.collections.some(c => {
+            const isCollectionImport = compilerCtx.collections.some((c) => {
               return c.collectionName === importPath || c.moduleId === importPath;
             });
 

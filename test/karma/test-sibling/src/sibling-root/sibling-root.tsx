@@ -19,12 +19,11 @@ import { Component, h } from '@stencil/core';
       color: white;
     }
   `,
-  scoped: true
+  scoped: true,
 })
 export class SiblingRoot {
-
   componentWillLoad() {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       setTimeout(resolve, 50);
     });
   }
@@ -32,11 +31,9 @@ export class SiblingRoot {
   render() {
     return (
       <div>
-        <section>
-          sibling-shadow-dom
-        </section>
+        <section>sibling-shadow-dom</section>
         <article>
-          <slot/>
+          <slot />
         </article>
       </div>
     );

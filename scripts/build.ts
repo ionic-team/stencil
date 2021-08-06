@@ -49,7 +49,17 @@ export async function createBuild(opts: BuildOptions) {
 
   await sysNodeExternalBundles(opts);
 
-  const bundles = await Promise.all([cli(opts), compiler(opts), devServer(opts), internal(opts), mockDoc(opts), screenshot(opts), testing(opts), sysDeno(opts), sysNode(opts)]);
+  const bundles = await Promise.all([
+    cli(opts),
+    compiler(opts),
+    devServer(opts),
+    internal(opts),
+    mockDoc(opts),
+    screenshot(opts),
+    testing(opts),
+    sysDeno(opts),
+    sysNode(opts),
+  ]);
 
   return bundles.flat();
 }
@@ -58,20 +68,20 @@ export async function bundleBuild(opts: BuildOptions) {
   const bundles = await createBuild(opts);
 
   await Promise.all(
-    bundles.map(async rollupOption => {
+    bundles.map(async (rollupOption) => {
       rollupOption.onwarn = () => {};
 
       const bundle = await rollup(rollupOption);
 
       if (Array.isArray(rollupOption.output)) {
         await Promise.all(
-          rollupOption.output.map(async output => {
+          rollupOption.output.map(async (output) => {
             await bundle.write(output);
-          }),
+          })
         );
       } else {
         await bundle.write(rollupOption.output);
       }
-    }),
+    })
   );
 }

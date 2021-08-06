@@ -34,7 +34,10 @@ export async function devServer(opts: BuildOptions) {
   await fs.copy(join(opts.srcDir, 'dev-server', 'static'), join(opts.output.devServerDir, 'static'));
 
   // copy server-worker-thread.js
-  await fs.copy(join(opts.srcDir, 'dev-server', 'server-worker-thread.js'), join(opts.output.devServerDir, 'server-worker-thread.js'));
+  await fs.copy(
+    join(opts.srcDir, 'dev-server', 'server-worker-thread.js'),
+    join(opts.output.devServerDir, 'server-worker-thread.js')
+  );
 
   // copy template files
   await fs.copy(join(opts.srcDir, 'dev-server', 'templates'), join(opts.output.devServerDir, 'templates'));
@@ -204,7 +207,7 @@ export async function devServer(opts: BuildOptions) {
 
   // copy dev server client dts files
   await fs.copy(join(opts.buildDir, 'dev-server', 'client'), join(opts.output.devServerDir, 'client'), {
-    filter: src => {
+    filter: (src) => {
       if (src.endsWith('.d.ts')) {
         return true;
       }

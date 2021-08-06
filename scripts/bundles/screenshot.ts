@@ -14,7 +14,7 @@ export async function screenshot(opts: BuildOptions) {
 
   // copy @stencil/core/screenshot/index.d.ts
   await fs.copy(inputScreenshotDir, opts.output.screenshotDir, {
-    filter: f => {
+    filter: (f) => {
       if (f.endsWith('.d.ts')) {
         return true;
       }

@@ -29,7 +29,7 @@ export const taskGenerate = async (coreCompiler: CoreCompiler, config: Config) =
   const { prompt } = await import('prompts');
 
   const input =
-    config.flags.unknownArgs.find(arg => !arg.startsWith('-')) ||
+    config.flags.unknownArgs.find((arg) => !arg.startsWith('-')) ||
     ((await prompt({ name: 'tagName', type: 'text', message: 'Component tag name (dash-case):' })).tagName as string);
 
   const { dir, base: componentName } = path.parse(input);
@@ -48,17 +48,10 @@ export const taskGenerate = async (coreCompiler: CoreCompiler, config: Config) =
   await config.sys.createDir(path.join(outDir, testFolder), { recursive: true });
 
   const writtenFiles = await Promise.all(
-    extensionsToGenerate.map(extension =>
-      writeFileByExtension(
-        coreCompiler,
-        config,
-        outDir,
-        componentName,
-        extension,
-        extensionsToGenerate.includes('css'),
-      ),
-    ),
-  ).catch(error => config.logger.error(error));
+    extensionsToGenerate.map((extension) =>
+      writeFileByExtension(coreCompiler, config, outDir, componentName, extension, extensionsToGenerate.includes('css'))
+    )
+  ).catch((error) => config.logger.error(error));
 
   if (!writtenFiles) {
     return config.sys.exit(1);
@@ -70,7 +63,7 @@ export const taskGenerate = async (coreCompiler: CoreCompiler, config: Config) =
   console.log(config.logger.bold('The following files have been generated:'));
 
   const absoluteRootDir = config.rootDir;
-  writtenFiles.map(file => console.log(`  - ${path.relative(absoluteRootDir, file)}`));
+  writtenFiles.map((file) => console.log(`  - ${path.relative(absoluteRootDir, file)}`));
 };
 
 /**
@@ -101,7 +94,7 @@ const writeFileByExtension = async (
   path: string,
   name: string,
   extension: GeneratableExtension,
-  withCss: boolean,
+  withCss: boolean
 ) => {
   if (isTest(extension)) {
     path = coreCompiler.path.join(path, 'test');

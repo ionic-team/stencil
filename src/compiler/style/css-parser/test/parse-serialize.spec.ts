@@ -17,7 +17,11 @@ describe('css parse/serialize', () => {
     ['colon-space', 'a {\n    margin  : auto;\n    padding : 0;\n}\n', 'a{margin:auto;padding:0}'],
     ['duplicate', 'h1, h1, h2, h2, h3 {color:red}', 'h1,h2,h3{color:red}'],
     ['comma-attribute 1', '.foo[bar="baz,quz"] {\n  foobar: 123;\n}\n\n', '.foo[bar="baz,quz"]{foobar:123}'],
-    ['comma-attribute 2', '.bar,\n#bar[baz="qux,foo"],\n#qux {\n  foobar: 456;\n}\n\n', '.bar,#bar[baz="qux,foo"],#qux{foobar:456}'],
+    [
+      'comma-attribute 2',
+      '.bar,\n#bar[baz="qux,foo"],\n#qux {\n  foobar: 456;\n}\n\n',
+      '.bar,#bar[baz="qux,foo"],#qux{foobar:456}',
+    ],
     [
       'comma-attribute 3',
       '.baz[qux=",foo"],\n.baz[qux="foo,"],\n.baz[qux="foo,bar,baz"],\n.baz[qux=",foo,bar,baz,"],\n.baz[qux=" , foo , bar , baz , "] {\n  foobar: 789;\n}\n',
@@ -33,26 +37,42 @@ describe('css parse/serialize', () => {
       '.foo:matches(.bar,.baz),\n.foo:matches(.bar, .baz),\n.foo:matches(.bar , .baz),\n.foo:matches(.bar ,.baz) {\n  prop: value;\n}\n\n.foo:matches(.bar,.baz,.foobar),\n.foo:matches(.bar, .baz,),\n.foo:matches(,.bar , .baz) {\n  anotherprop: anothervalue;\n}\n',
       '.foo:matches(.bar,.baz){prop:value}.foo:matches(.bar,.baz,.foobar),.foo:matches(.bar,.baz,),.foo:matches(,.bar,.baz){anotherprop:anothervalue}',
     ],
-    ['comment', "/* 1 */\n\nhead, /* footer, */body/*, nav */ { /* 2 */\n  /* 3 */\n  /**/foo: 'bar';\n  /* 4 */\n} /* 5 */\n\n/* 6 */\n", "head,body{foo:'bar';}"],
+    [
+      'comment',
+      "/* 1 */\n\nhead, /* footer, */body/*, nav */ { /* 2 */\n  /* 3 */\n  /**/foo: 'bar';\n  /* 4 */\n} /* 5 */\n\n/* 6 */\n",
+      "head,body{foo:'bar';}",
+    ],
     ['comment-/*!', '/*! 1 */ div { /* 2 */ } /*! 3 */', '/*! 1 */div{}/*! 3 */'],
     [
       'comment-in',
       'a {\n    color/**/: 12px;\n    padding/*4815162342*/: 1px /**/ 2px /*13*/ 3px;\n    border/*\\**/: solid; border-top/*\\**/: none\\9;\n}\n',
       'a{color:12px;padding:1px  2px  3px;border:solid;border-top:none\\9}',
     ],
-    ['comment-url', '/* http://foo.com/bar/baz.html */\n/**/\n\nfoo { /*/*/\n  /* something */\n  bar: baz; /* http://foo.com/bar/baz.html */\n}\n', 'foo{bar:baz;}'],
+    [
+      'comment-url',
+      '/* http://foo.com/bar/baz.html */\n/**/\n\nfoo { /*/*/\n  /* something */\n  bar: baz; /* http://foo.com/bar/baz.html */\n}\n',
+      'foo{bar:baz;}',
+    ],
     [
       'custom-media',
       '@custom-media --narrow-window (max-width: 30em);\n@custom-media --wide-window screen and (min-width: 40em);\n',
       '@custom-media --narrow-window (max-width: 30em);@custom-media --wide-window screen and (min-width: 40em);',
     ],
-    ['custom-media-linebreak', '@custom-media\n    --test\n    (min-width: 200px)\n;\n', '@custom-media --test (min-width: 200px);'],
+    [
+      'custom-media-linebreak',
+      '@custom-media\n    --test\n    (min-width: 200px)\n;\n',
+      '@custom-media --test (min-width: 200px);',
+    ],
     [
       'document',
       '@-moz-document url-prefix() {\n  /* ui above */\n  .ui-select .ui-btn select {\n    /* ui inside */\n    opacity:.0001\n  }\n\n  .icon-spin {\n    height: .9em;\n  }\n}\n',
       '@-moz-document url-prefix(){.ui-select .ui-btn select{opacity:.0001}.icon-spin{height:.9em}}',
     ],
-    ['document-linebreak', '@document\n    url-prefix()\n    {\n\n        .test {\n            color: blue;\n        }\n\n    }\n', '@document url-prefix(){.test{color:blue}}'],
+    [
+      'document-linebreak',
+      '@document\n    url-prefix()\n    {\n\n        .test {\n            color: blue;\n        }\n\n    }\n',
+      '@document url-prefix(){.test{color:blue}}',
+    ],
     ['empty', '\n', ''],
     ['empty h1', 'h1 {}', ''],
     ['no selector', '{color:blue}', ''],
@@ -101,15 +121,31 @@ describe('css parse/serialize', () => {
       '@keyframes foo {\n  0% { top: 0; left: 0 }\n  30.50% { top: 50px }\n  .68% ,\n  72%\n      , 85% { left: 50px }\n  100% { top: 100px; left: 100% }\n}\n',
       '@keyframes foo{0%{top:0;left:0}30.50%{top:50px}.68%,72%,85%{left:50px}100%{top:100px;left:100%}}',
     ],
-    ['keyframes-linebreak', '@keyframes\n    test\n    {\n        from { opacity: 1; }\n        to { opacity: 0; }\n    }\n', '@keyframes test{from{opacity:1}to{opacity:0}}'],
-    ['keyframes-messed', '@keyframes fade {from\n  {opacity: 0;\n     }\nto\n  {\n     opacity: 1}}\n', '@keyframes fade{from{opacity:0}to{opacity:1}}'],
-    ['keyframes-vendor', '@-webkit-keyframes fade {\n  from { opacity: 0 }\n  to { opacity: 1 }\n}\n', '@-webkit-keyframes fade{from{opacity:0}to{opacity:1}}'],
+    [
+      'keyframes-linebreak',
+      '@keyframes\n    test\n    {\n        from { opacity: 1; }\n        to { opacity: 0; }\n    }\n',
+      '@keyframes test{from{opacity:1}to{opacity:0}}',
+    ],
+    [
+      'keyframes-messed',
+      '@keyframes fade {from\n  {opacity: 0;\n     }\nto\n  {\n     opacity: 1}}\n',
+      '@keyframes fade{from{opacity:0}to{opacity:1}}',
+    ],
+    [
+      'keyframes-vendor',
+      '@-webkit-keyframes fade {\n  from { opacity: 0 }\n  to { opacity: 1 }\n}\n',
+      '@-webkit-keyframes fade{from{opacity:0}to{opacity:1}}',
+    ],
     [
       'media',
       '@media screen, projection {\n  /* html above */\n  html {\n    /* html inside */\n    background: #fffef0;\n    color: #300;\n  }\n\n  /* body above */\n  body {\n    /* body inside */\n    max-width: 35em;\n    margin: 0 auto;\n  }\n}\n\n@media print {\n  html {\n    background: #fff;\n    color: #000;\n  }\n  body {\n    padding: 1in;\n    border: 0.5pt solid #666;\n  }\n}\n',
       '@media screen, projection{html{background:#fffef0;color:#300}body{max-width:35em;margin:0 auto}}@media print{html{background:#fff;color:#000}body{padding:1in;border:0.5pt solid #666}}',
     ],
-    ['media-linebreak', '@media\n\n(\n    min-width: 300px\n)\n{\n    .test { width: 100px; }\n}\n', '@media ( min-width: 300px ){.test{width:100px}}'],
+    [
+      'media-linebreak',
+      '@media\n\n(\n    min-width: 300px\n)\n{\n    .test { width: 100px; }\n}\n',
+      '@media ( min-width: 300px ){.test{width:100px}}',
+    ],
     [
       'media-messed',
       '@media screen, projection{ html\n  \n  {\nbackground: #fffef0;\n    color:#300;\n  }\n  body\n\n{\n    max-width: 35em;\n    margin: 0 auto;\n\n\n}\n  }\n\n@media print\n{\n              html {\n              background: #fff;\n              color: #000;\n              }\n              body {\n              padding: 1in;\n              border: 0.5pt solid #666;\n              }\n}\n',
@@ -135,8 +171,16 @@ describe('css parse/serialize', () => {
       '@namespace "http://www.w3.org/1999/xhtml";\n@namespace svg "http://www.w3.org/2000/svg";\n',
       '@namespace "http://www.w3.org/1999/xhtml";@namespace svg "http://www.w3.org/2000/svg";',
     ],
-    ['namespace-linebreak', '@namespace\n    "http://www.w3.org/1999/xhtml"\n    ;\n', '@namespace "http://www.w3.org/1999/xhtml";'],
-    ['no-semi', '\ntobi loki jane {\n  are: \'all\';\n  the-species: called "ferrets"\n}\n', 'tobi loki jane{are:\'all\';the-species:called "ferrets"}'],
+    [
+      'namespace-linebreak',
+      '@namespace\n    "http://www.w3.org/1999/xhtml"\n    ;\n',
+      '@namespace "http://www.w3.org/1999/xhtml";',
+    ],
+    [
+      'no-semi',
+      '\ntobi loki jane {\n  are: \'all\';\n  the-species: called "ferrets"\n}\n',
+      'tobi loki jane{are:\'all\';the-species:called "ferrets"}',
+    ],
     ['page-linebreak', '@page\n    toc\n    {\n        color: black;\n    }\n', '@page toc{color:black}'],
     [
       'paged-media',
@@ -149,17 +193,33 @@ describe('css parse/serialize', () => {
       "tobi loki jane{are:'all';the-species:called \"ferrets\";*even:'ie crap'}",
     ],
     ['quote-escape', 'p[qwe="a\\",b"] { color: red }\n', 'p[qwe="a\\",b"]{color:red}'],
-    ['quoted', "body {\n  background: url('some;stuff;here') 50% 50% no-repeat;\n}\n", "body{background:url('some;stuff;here') 50% 50% no-repeat}"],
+    [
+      'quoted',
+      "body {\n  background: url('some;stuff;here') 50% 50% no-repeat;\n}\n",
+      "body{background:url('some;stuff;here') 50% 50% no-repeat}",
+    ],
     ['rule', "foo {\n  bar: 'baz';\n}\n", "foo{bar:'baz'}"],
-    ['rules', "tobi {\n  name: 'tobi';\n  age: 2;\n}\n\nloki {\n  name: 'loki';\n  age: 1;\n}\n", "tobi{name:'tobi';age:2}loki{name:'loki';age:1}"],
+    [
+      'rules',
+      "tobi {\n  name: 'tobi';\n  age: 2;\n}\n\nloki {\n  name: 'loki';\n  age: 1;\n}\n",
+      "tobi{name:'tobi';age:2}loki{name:'loki';age:1}",
+    ],
     ['selectors', "foo,\nbar,\nbaz {\n  color: 'black';\n}\n", "foo,bar,baz{color:'black'}"],
     [
       'supports',
       '@supports (display: flex) or (display: box) {\n  /* flex above */\n  .flex {\n    /* flex inside */\n    display: box;\n    display: flex;\n  }\n\n  div {\n    something: else;\n  }\n}\n',
       '@supports (display: flex) or (display: box){.flex{display:box;display:flex}div{something:else}}',
     ],
-    ['supports-linebreak', '@supports\n    (display: flex)\n    {\n        .test { display: flex; }\n    }\n', '@supports (display: flex){.test{display:flex}}'],
-    ['wtf', '.wtf {\n  *overflow-x: hidden;\n  //max-height: 110px;\n  #height: 18px;\n}\n', '.wtf{*overflow-x:hidden;//max-height:110px;#height:18px}'],
+    [
+      'supports-linebreak',
+      '@supports\n    (display: flex)\n    {\n        .test { display: flex; }\n    }\n',
+      '@supports (display: flex){.test{display:flex}}',
+    ],
+    [
+      'wtf',
+      '.wtf {\n  *overflow-x: hidden;\n  //max-height: 110px;\n  #height: 18px;\n}\n',
+      '.wtf{*overflow-x:hidden;//max-height:110px;#height:18px}',
+    ],
     [
       `background url`,
       `.test  \n { background :   url(top.png) no-repeat, url(bottom.png) no-repeat, url(middle.png) no-repeat \t;}`,
@@ -170,32 +230,64 @@ describe('css parse/serialize', () => {
       `@import   url('./one.css') ; \n@import  url('./three.css')  ; /*some \ncomment!\n*/ #imports-with-comment   {   color  : #999;   }`,
       `@import url('./one.css');@import url('./three.css');#imports-with-comment{color:#999}`,
     ],
-    [`:root`, `:root  { \n--color  : red  ; } body { color:    var(--color);  nowrap: '';}`, `:root{--color:red}body{color:var(--color);nowrap:''}`],
+    [
+      `:root`,
+      `:root  { \n--color  : red  ; } body { color:    var(--color);  nowrap: '';}`,
+      `:root{--color:red}body{color:var(--color);nowrap:''}`,
+    ],
     [
       `input attr`,
       `input[type=text], input[type=password]  ,\n   input.text,   div  span  ,   select {   margin:  0.5em 0; }`,
       `input[type=text],input[type=password],input.text,div span,select{margin:0.5em 0}`,
     ],
     [`content`, `.clearfix:before { content : "\\0020"; } `, `.clearfix:before{content:"\\0020"}`],
-    [`attribute w/ ]`, `a   #i[title="my \\] long title"]  { color:red ;;}`, `a #i[title="my \\] long title"]{color:red}`],
+    [
+      `attribute w/ ]`,
+      `a   #i[title="my \\] long title"]  { color:red ;;}`,
+      `a #i[title="my \\] long title"]{color:red}`,
+    ],
     [`:focus`, `:focus   , :hover   {\n outline   : 0   ;\n}`, `:focus,:hover{outline:0}`],
     [`quotes`, `blockquote   , q {\n\t  quotes: "" "";}`, `blockquote,q{quotes:"" ""}`],
-    [`content2`, `.clear:after   ,    .container:before   { content: "."; }`, `.clear:after,.container:before{content:"."}`],
+    [
+      `content2`,
+      `.clear:after   ,    .container:before   { content: "."; }`,
+      `.clear:after,.container:before{content:"."}`,
+    ],
     [`* html`, `*   html a[id] .clear  {\n height  :  1%;\t}`, `* html a[id] .clear{height:1%}`],
     [`:not`, `a  :not(b >  w):not( #c )    :nth(2 ) {  color  :  red  ;  }`, `a :not(b>w):not(#c) :nth(2){color:red}`],
-    [`:host(.a)`, `:host ( .a )  [id]   ::slotted( b    ),\n    div   {  color : red ;  }`, `:host(.a) [id] ::slotted(b),div{color:red}`],
+    [
+      `:host(.a)`,
+      `:host ( .a )  [id]   ::slotted( b    ),\n    div   {  color : red ;  }`,
+      `:host(.a) [id] ::slotted(b),div{color:red}`,
+    ],
     [`#id`, `#id   #id > :not(a)  {color:red;}`, `#id #id>:not(a){color:red}`],
-    [`whatever`, `a b  c\n d  \t e f  #id .f + g + a.r[r] a{ \t  color    :    red    ;  \t  }`, `a b c d e f #id .f+g+a.r[r] a{color:red}`],
-    [`audio:not([controls])`, `audio:not(  [controls] )   #a[b] {color:red ;; }`, `audio:not([controls]) #a[b]{color:red}`],
+    [
+      `whatever`,
+      `a b  c\n d  \t e f  #id .f + g + a.r[r] a{ \t  color    :    red    ;  \t  }`,
+      `a b c d e f #id .f+g+a.r[r] a{color:red}`,
+    ],
+    [
+      `audio:not([controls])`,
+      `audio:not(  [controls] )   #a[b] {color:red ;; }`,
+      `audio:not([controls]) #a[b]{color:red}`,
+    ],
     [`svg:not(:root)`, `svg:not(:root)   {\t\n\roverflow \r: hidden;}`, `svg:not(:root){overflow:hidden}`],
     [
       `hr~a>[`,
       `hr  ~ a  >  [id] b + c  {   -webkit-box-sizing: content-box;  -moz-box-sizing  : content-box;      box-sizing: content-box;  }`,
       `hr~a>[id] b+c{-webkit-box-sizing:content-box;-moz-box-sizing:content-box;box-sizing:content-box}`,
     ],
-    [`::-webkit`, `input[type="number"]::-webkit-inner-spin-button  { a : a }`, `input[type="number"]::-webkit-inner-spin-button{a:a}`],
+    [
+      `::-webkit`,
+      `input[type="number"]::-webkit-inner-spin-button  { a : a }`,
+      `input[type="number"]::-webkit-inner-spin-button{a:a}`,
+    ],
     [`!important`, `img {  max-width  : 100% !important  ;}`, `img{max-width:100% !important}`],
-    [`@media (min-width:`, `@media (min-width: 768px) { .lead {  font-size: 21px;   }}`, `@media (min-width: 768px){.lead{font-size:21px}}`],
+    [
+      `@media (min-width:`,
+      `@media (min-width: 768px) { .lead {  font-size: 21px;   }}`,
+      `@media (min-width: 768px){.lead{font-size:21px}}`,
+    ],
     [
       `abbr[title]`,
       `abbr[title] , abbr   [title="hello   world"] {   cursor: help;  border-bottom:  1px dotted  #777;}`,
@@ -203,7 +295,7 @@ describe('css parse/serialize', () => {
     ],
   ];
 
-  tests.forEach(test => {
+  tests.forEach((test) => {
     it(test[0], () => {
       const results = parseCss(test[1]);
       const output = serializeCss(results.stylesheet, {});

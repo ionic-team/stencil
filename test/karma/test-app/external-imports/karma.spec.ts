@@ -19,5 +19,4 @@ describe('external-imports', () => {
     elm = app.querySelector('external-import-c');
     expect(elm.textContent.trim()).toBe('Marty McFly');
   });
-
 });

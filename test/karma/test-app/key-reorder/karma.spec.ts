@@ -1,7 +1,6 @@
 import { setupDomTests, waitForChanges } from '../util';
 
-
-describe('key-reorder', function() {
+describe('key-reorder', function () {
   const { setupDom, tearDownDom } = setupDomTests(document);
   let app: HTMLElement;
 
@@ -45,7 +44,5 @@ describe('key-reorder', function() {
     expect(item2.previousElementSibling).toBe(item3);
     expect(item3.previousElementSibling).toBe(item4);
     expect(item4.previousElementSibling).toBe(null);
-
   });
-
 });

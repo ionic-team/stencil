@@ -22,7 +22,7 @@ export const isJsonFile = (p: string) => p.endsWith('.json');
 
 export const getCommonDirName = (dirPath: string, fileName: string) => dirPath + '/' + fileName;
 
-export const isCommonDirModuleFile = (p: string) => COMMON_DIR_MODULE_EXTS.some(ext => p.endsWith(ext));
+export const isCommonDirModuleFile = (p: string) => COMMON_DIR_MODULE_EXTS.some((ext) => p.endsWith(ext));
 
 export const setPackageVersion = (pkgVersions: Map<string, string>, pkgName: string, pkgVersion: string) => {
   pkgVersions.set(pkgName, pkgVersion);

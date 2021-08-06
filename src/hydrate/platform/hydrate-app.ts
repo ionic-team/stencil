@@ -12,9 +12,9 @@ export function hydrateApp(
     win: Window,
     opts: d.HydrateFactoryOptions,
     results: d.HydrateResults,
-    resolve: (results: d.HydrateResults) => void,
+    resolve: (results: d.HydrateResults) => void
   ) => void,
-  resolve: (results: d.HydrateResults) => void,
+  resolve: (results: d.HydrateResults) => void
 ) {
   const connectedElements = new Set<any>();
   const createdElements = new Set<HTMLElement>();
@@ -78,7 +78,7 @@ export function hydrateApp(
               $tagName$: elm.nodeName.toLowerCase(),
               $flags$: null,
             },
-            null,
+            null
           ) as d.ComponentConstructor;
 
           if (Cstr != null && Cstr.cmpMeta != null) {
@@ -127,7 +127,7 @@ export function hydrateApp(
     }
 
     function waitLoop(): Promise<void> {
-      const toConnect = Array.from(createdElements).filter(elm => elm.parentElement);
+      const toConnect = Array.from(createdElements).filter((elm) => elm.parentElement);
       if (toConnect.length > 0) {
         return Promise.all(toConnect.map(connectElement)).then(waitLoop);
       }
@@ -166,7 +166,7 @@ async function hydrateComponent(
   results: d.HydrateResults,
   tagName: string,
   elm: d.HostElement,
-  waitingElements: Set<HTMLElement>,
+  waitingElements: Set<HTMLElement>
 ) {
   tagName = tagName.toLowerCase();
   const Cstr = loadModule(
@@ -174,7 +174,7 @@ async function hydrateComponent(
       $tagName$: tagName,
       $flags$: null,
     },
-    null,
+    null
   ) as d.ComponentConstructor;
 
   if (Cstr != null) {
@@ -190,7 +190,7 @@ async function hydrateComponent(
 
         const ref = getHostRef(elm);
         const modeName = !ref.$modeName$ ? '$' : ref.$modeName$;
-        if (!results.components.some(c => c.tag === tagName && c.mode === modeName)) {
+        if (!results.components.some((c) => c.tag === tagName && c.mode === modeName)) {
           results.components.push({
             tag: tagName,
             mode: modeName,

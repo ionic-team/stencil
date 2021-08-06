@@ -63,7 +63,15 @@ if (process.platform === 'win32') {
 
 module.exports = function (config) {
   config.set({
-    plugins: ['karma-chrome-launcher', 'karma-browserstack-launcher', 'karma-ie-launcher', 'karma-edge-launcher', 'karma-jasmine', 'karma-typescript', 'karma-polyfill'],
+    plugins: [
+      'karma-chrome-launcher',
+      'karma-browserstack-launcher',
+      'karma-ie-launcher',
+      'karma-edge-launcher',
+      'karma-jasmine',
+      'karma-typescript',
+      'karma-polyfill',
+    ],
     browsers: browserStack ? Object.keys(browserStackLaunchers) : Object.keys(localLaunchers),
 
     singleRun: true, // set this to false to leave the browser open

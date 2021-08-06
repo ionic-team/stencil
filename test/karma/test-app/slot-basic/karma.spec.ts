@@ -1,7 +1,6 @@
 import { setupDomTests, waitForChanges } from '../util';
 
-
-describe('slot-basic', function() {
+describe('slot-basic', function () {
   const { setupDom, tearDownDom } = setupDomTests(document);
   let app: HTMLElement;
 
@@ -10,9 +9,7 @@ describe('slot-basic', function() {
   });
   afterEach(tearDownDom);
 
-
   it('button click rerenders', async () => {
-
     function testValues(inc: number) {
       let result = app.querySelector('.inc');
       expect(result.textContent).toEqual('Rendered: ' + inc);
@@ -105,5 +102,4 @@ describe('slot-basic', function() {
     await waitForChanges();
     testValues(3);
   });
-
 });

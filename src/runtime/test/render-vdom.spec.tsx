@@ -998,7 +998,7 @@ describe('render-vdom', () => {
         @Element() el: HTMLElement;
 
         render() {
-          return <Host ref={el => (this.selfRef = el)}></Host>;
+          return <Host ref={(el) => (this.selfRef = el)}></Host>;
         }
       }
 
@@ -1017,7 +1017,7 @@ describe('render-vdom', () => {
         divRef: HTMLElement;
         @Prop() visible = true;
         render() {
-          return this.visible && <div ref={el => (this.divRef = el)}>Hello VDOM</div>;
+          return this.visible && <div ref={(el) => (this.divRef = el)}>Hello VDOM</div>;
         }
       }
 

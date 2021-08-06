@@ -11,7 +11,7 @@ export const extTransformsPlugin = (
   config: d.Config,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
-  bundleOpts: BundleOptions,
+  bundleOpts: BundleOptions
 ): Plugin => {
   return {
     name: 'extTransformsPlugin',
@@ -34,7 +34,7 @@ export const extTransformsPlugin = (
         const commentOriginalSelector = bundleOpts.platform === 'hydrate' && data.encapsulation === 'shadow';
 
         if (data.tag) {
-          cmp = buildCtx.components.find(c => c.tagName === data.tag);
+          cmp = buildCtx.components.find((c) => c.tagName === data.tag);
           const moduleFile = cmp && compilerCtx.moduleMap.get(cmp.sourceFilePath);
 
           if (moduleFile) {
@@ -43,10 +43,10 @@ export const extTransformsPlugin = (
             const relPath = relative(config.srcDir, pluginTransforms.id);
 
             await Promise.all(
-              collectionDirs.map(async outputTarget => {
+              collectionDirs.map(async (outputTarget) => {
                 const collectionPath = join(outputTarget.collectionDir, relPath);
                 await compilerCtx.fs.writeFile(collectionPath, pluginTransforms.code);
-              }),
+              })
             );
           }
         }
@@ -82,7 +82,7 @@ export const extTransformsPlugin = (
           this.error('Plugin CSS transform error');
         }
 
-        const hasUpdatedStyle = buildCtx.stylesUpdated.some(s => {
+        const hasUpdatedStyle = buildCtx.stylesUpdated.some((s) => {
           return s.styleTag === data.tag && s.styleMode === data.mode && s.styleText === cssTransformResults.styleText;
         });
 

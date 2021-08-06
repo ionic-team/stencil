@@ -2,7 +2,6 @@ const fs = require('fs');
 const path = require('path');
 const hydrate = require('../dist/hydrate');
 
-
 async function run() {
   const indexPath = path.join(__dirname, 'index.html');
   const html = fs.readFileSync(indexPath, 'utf8');
@@ -16,7 +15,7 @@ async function run() {
 
   console.log('prerendered karma test');
 
-  results.diagnostics.forEach(d => {
+  results.diagnostics.forEach((d) => {
     console.log(d.level, d.header, d.messageText);
   });
 }

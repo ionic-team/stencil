@@ -1,7 +1,6 @@
 import { setupDomTests, waitForChanges } from '../util';
 
-
-describe('delegates-focus', function() {
+describe('delegates-focus', function () {
   if (navigator.userAgent.indexOf('Chrome') === -1 || navigator.userAgent.indexOf('Edge') > -1) {
     // Edge also puts "Chrome" in the user agent, and at
     // this time Edge does not support delegatesFocus
@@ -36,5 +35,4 @@ describe('delegates-focus', function() {
     const noDelegateFocusStyles2 = window.getComputedStyle(noDelegateFocusElm);
     expect(noDelegateFocusStyles2.borderColor).toBe('rgb(255, 0, 0)');
   });
-
 });

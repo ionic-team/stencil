@@ -5,13 +5,12 @@ import { Component, h } from '@stencil/core';
   shadow: true,
 })
 export class SlotChildrenRoot {
-
   render() {
     return (
       <section>
         ShadowRoot1
         <article>
-          <slot/>
+          <slot />
         </article>
         ShadowRoot2
       </section>
