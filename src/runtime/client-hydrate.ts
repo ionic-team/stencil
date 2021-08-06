@@ -1,11 +1,24 @@
 import type * as d from '../declarations';
 import { BUILD } from '@app-data';
-import { CONTENT_REF_ID, HYDRATE_CHILD_ID, HYDRATE_ID, NODE_TYPE, ORG_LOCATION_ID, SLOT_NODE_ID, TEXT_NODE_ID } from './runtime-constants';
+import {
+  CONTENT_REF_ID,
+  HYDRATE_CHILD_ID,
+  HYDRATE_ID,
+  NODE_TYPE,
+  ORG_LOCATION_ID,
+  SLOT_NODE_ID,
+  TEXT_NODE_ID,
+} from './runtime-constants';
 import { doc, plt, supportsShadow } from '@platform';
 import { newVNode } from './vdom/h';
 import { createTime } from './profile';
 
-export const initializeClientHydrate = (hostElm: d.HostElement, tagName: string, hostId: string, hostRef: d.HostRef) => {
+export const initializeClientHydrate = (
+  hostElm: d.HostElement,
+  tagName: string,
+  hostId: string,
+  hostRef: d.HostRef
+) => {
   const endHydrate = createTime('hydrateClient', tagName);
   const shadowRoot = hostElm.shadowRoot;
   const childRenderNodes: RenderNodeData[] = [];
@@ -22,7 +35,7 @@ export const initializeClientHydrate = (hostElm: d.HostElement, tagName: string,
 
   clientHydrate(vnode, childRenderNodes, slotNodes, shadowRootNodes, hostElm, hostElm, hostId);
 
-  childRenderNodes.map(c => {
+  childRenderNodes.map((c) => {
     const orgLocationId = c.$hostId$ + '.' + c.$nodeId$;
     const orgLocationNode = plt.$orgLocNodes$.get(orgLocationId);
     const node = c.$elm$ as d.RenderNode;
@@ -44,7 +57,7 @@ export const initializeClientHydrate = (hostElm: d.HostElement, tagName: string,
   });
 
   if (BUILD.shadowDom && shadowRoot) {
-    shadowRootNodes.map(shadowRootNode => {
+    shadowRootNodes.map((shadowRootNode) => {
       if (shadowRootNode) {
         shadowRoot.appendChild(shadowRootNode as any);
       }
@@ -60,7 +73,7 @@ const clientHydrate = (
   shadowRootNodes: d.RenderNode[],
   hostElm: d.HostElement,
   node: d.RenderNode,
-  hostId: string,
+  hostId: string
 ) => {
   let childNodeType: string;
   let childIdSplt: string[];
@@ -113,13 +126,29 @@ const clientHydrate = (
 
     // recursively drill down, end to start so we can remove nodes
     for (i = node.childNodes.length - 1; i >= 0; i--) {
-      clientHydrate(parentVNode, childRenderNodes, slotNodes, shadowRootNodes, hostElm, node.childNodes[i] as any, hostId);
+      clientHydrate(
+        parentVNode,
+        childRenderNodes,
+        slotNodes,
+        shadowRootNodes,
+        hostElm,
+        node.childNodes[i] as any,
+        hostId
+      );
     }
 
     if (node.shadowRoot) {
       // keep drilling down through the shadow root nodes
       for (i = node.shadowRoot.childNodes.length - 1; i >= 0; i--) {
-        clientHydrate(parentVNode, childRenderNodes, slotNodes, shadowRootNodes, hostElm, node.shadowRoot.childNodes[i] as any, hostId);
+        clientHydrate(
+          parentVNode,
+          childRenderNodes,
+          slotNodes,
+          shadowRootNodes,
+          hostElm,
+          node.shadowRoot.childNodes[i] as any,
+          hostId
+        );
       }
     }
   } else if (node.nodeType === NODE_TYPE.CommentNode) {

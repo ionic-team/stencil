@@ -1,7 +1,7 @@
 import { Component, h } from '@stencil/core';
 
 @Component({
-  tag: 'slot-light-scoped-list'
+  tag: 'slot-light-scoped-list',
 })
 export class SlotLightScopedList {
   render() {
@@ -10,7 +10,7 @@ export class SlotLightScopedList {
       <article class="list-wrapper" style={{ border: '2px solid green' }}>
         <slot></slot>
       </article>,
-      <div>That's it....</div>
+      <div>That's it....</div>,
     ];
   }
 }

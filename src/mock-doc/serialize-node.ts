@@ -151,7 +151,7 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
         if (opts.prettyHtml && attrName === 'class') {
           attrValue = attr.value = attrValue
             .split(' ')
-            .filter(t => t !== '')
+            .filter((t) => t !== '')
             .sort()
             .join(' ')
             .trim();
@@ -219,7 +219,7 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
 
       if (opts.excludeTagContent == null || opts.excludeTagContent.includes(tagName) === false) {
         const childNodes =
-          tagName === 'template' ? (((node as any) as HTMLTemplateElement).content.childNodes as any) : node.childNodes;
+          tagName === 'template' ? ((node as any as HTMLTemplateElement).content.childNodes as any) : node.childNodes;
         const childNodeLength = childNodes.length;
 
         if (childNodeLength > 0) {

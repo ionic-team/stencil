@@ -24,21 +24,21 @@ export const validateTsConfig = async (config: d.Config, sys: d.CompilerSystem, 
       tsconfig.path = readTsConfig.path;
       const host: ts.ParseConfigFileHost = {
         ...ts.sys,
-        readFile: p => {
+        readFile: (p) => {
           if (p === tsconfig.path) {
             return readTsConfig.content;
           }
           return sys.readFileSync(p);
         },
-        readDirectory: p => sys.readDirSync(p),
-        fileExists: p => sys.accessSync(p),
+        readDirectory: (p) => sys.readDirSync(p),
+        fileExists: (p) => sys.accessSync(p),
         onUnRecoverableConfigFileDiagnostic: (e: any) => console.error(e),
       };
 
       const results = ts.getParsedCommandLineOfConfigFile(tsconfig.path, {}, host);
 
       if (results.errors && results.errors.length > 0) {
-        results.errors.forEach(configErr => {
+        results.errors.forEach((configErr) => {
           const tsDiagnostic = loadTypeScriptDiagnostic(configErr);
           if (tsDiagnostic.code === '18003') {
             // "No inputs were found in config file"
@@ -81,7 +81,9 @@ export const validateTsConfig = async (config: d.Config, sys: d.CompilerSystem, 
           tsconfig.compilerOptions = results.options;
 
           const target = tsconfig.compilerOptions.target ?? ts.ScriptTarget.ES5;
-          if ([ts.ScriptTarget.ES3, ts.ScriptTarget.ES5, ts.ScriptTarget.ES2015, ts.ScriptTarget.ES2016].includes(target)) {
+          if (
+            [ts.ScriptTarget.ES3, ts.ScriptTarget.ES5, ts.ScriptTarget.ES2015, ts.ScriptTarget.ES2016].includes(target)
+          ) {
             const warn = buildWarn(tsconfig.diagnostics);
             warn.messageText = `To improve bundling, it is always recommended to set the tsconfig.json “target” setting to "es2017". Note that the compiler will automatically handle transpilation for ES5-only browsers.`;
           }
@@ -151,14 +153,16 @@ const createDefaultTsConfig = (config: d.Config) =>
         jsxFactory: 'h',
         jsxFragmentFactory: 'Fragment',
         sourceMap: !!config.sourceMap,
-        inlineSources: !!config.sourceMap
+        inlineSources: !!config.sourceMap,
       },
       include: [relative(config.rootDir, config.srcDir)],
     },
     null,
-    2,
+    2
   );
 
-const hasSrcDirectoryInclude = (includeProp: string[], src: string) => Array.isArray(includeProp) && includeProp.includes(src);
+const hasSrcDirectoryInclude = (includeProp: string[], src: string) =>
+  Array.isArray(includeProp) && includeProp.includes(src);
 
-const hasStencilConfigInclude = (includeProp: string[]) => Array.isArray(includeProp) && includeProp.includes('stencil.config.ts');
+const hasStencilConfigInclude = (includeProp: string[]) =>
+  Array.isArray(includeProp) && includeProp.includes('stencil.config.ts');

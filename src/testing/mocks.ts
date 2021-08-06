@@ -153,5 +153,5 @@ export function mockDocument(html: string = null) {
 
 export function mockWindow(html: string = null) {
   const win = new MockWindow(html);
-  return (win as any) as Window;
+  return win as any as Window;
 }

@@ -17,12 +17,12 @@ xdescribe('outputTarget, www / dist / docs', () => {
     config.rootDir = path.join(root, 'User', 'testing', '/');
     config.namespace = 'TestApp';
     config.outputTargets = [
-      ({
+      {
         type: 'www',
         dir: 'custom-www',
         buildDir: 'www-build',
         indexHtml: 'custom-index.htm',
-      } as any) as d.OutputTargetDist,
+      } as any as d.OutputTargetDist,
       {
         type: 'dist',
         dir: 'custom-dist',
@@ -46,14 +46,25 @@ xdescribe('outputTarget, www / dist / docs', () => {
       }`,
       [path.join(root, 'User', 'testing', 'src', 'index.html')]: `<cmp-a></cmp-a>`,
       [path.join(config.sys.getClientPath('polyfills/index.js'))]: `/* polyfills */`,
-      [path.join(root, 'User', 'testing', 'src', 'components', 'cmp-a.tsx')]: `@Component({ tag: 'cmp-a' }) export class CmpA {}`,
+      [path.join(
+        root,
+        'User',
+        'testing',
+        'src',
+        'components',
+        'cmp-a.tsx'
+      )]: `@Component({ tag: 'cmp-a' }) export class CmpA {}`,
     });
     await compiler.fs.commit();
 
     const r = await compiler.build();
     expect(r.diagnostics).toHaveLength(0);
 
-    expectFiles(compiler.fs, [path.join(root, 'User', 'testing', 'custom-dist', 'cjs'), path.join(root, 'User', 'testing', 'custom-dist', 'esm', 'polyfills', 'index.js'), path.join(root, 'User', 'testing', 'custom-dist', 'esm', 'polyfills', 'index.js.map')]);
+    expectFiles(compiler.fs, [
+      path.join(root, 'User', 'testing', 'custom-dist', 'cjs'),
+      path.join(root, 'User', 'testing', 'custom-dist', 'esm', 'polyfills', 'index.js'),
+      path.join(root, 'User', 'testing', 'custom-dist', 'esm', 'polyfills', 'index.js.map'),
+    ]);
 
     doNotExpectFiles(compiler.fs, [
       path.join(root, 'User', 'testing', 'www', '/'),

@@ -66,7 +66,7 @@ export function createLicense(rootDir: string) {
   });
 
   const licenses = bundledDeps
-    .map(l => l.license)
+    .map((l) => l.license)
     .reduce((arr, l) => {
       if (!arr.includes(l)) {
         arr.push(l);
@@ -81,22 +81,22 @@ export function createLicense(rootDir: string) {
 
 The published Stencil distribution contains the following licenses:
 
-${licenses.map(l => `    ` + l).join('\n')}
+${licenses.map((l) => `    ` + l).join('\n')}
 
 The following distributions have been modified to be bundled within this distribution:
 
 --------
 
-${bundledDeps.map(l => l.content).join('\n')}
+${bundledDeps.map((l) => l.content).join('\n')}
 
 `.trim() + '\n';
 
   fs.writeFileSync(thirdPartyLicensesRootPath, output);
 
   const licenseSource: string[] = [];
-  bundledDeps.forEach(d => {
+  bundledDeps.forEach((d) => {
     licenseSource.push(d.moduleId);
-    d.dependencies.forEach(childDep => {
+    d.dependencies.forEach((childDep) => {
       licenseSource.push(`  ${childDep}`);
     });
     licenseSource.push('');
@@ -107,7 +107,7 @@ ${bundledDeps.map(l => l.content).join('\n')}
 
 function createBundledDeps(opts: BuildOptions, bundledDeps: BundledDep[], deps: string[]) {
   if (Array.isArray(deps)) {
-    deps.forEach(moduleId => {
+    deps.forEach((moduleId) => {
       if (includeDepLicense(bundledDeps, moduleId)) {
         const bundledDep = createBundledDepLicense(opts, moduleId);
         bundledDeps.push(bundledDep);
@@ -133,7 +133,7 @@ function createBundledDepLicense(opts: BuildOptions, moduleId: string): BundledD
 
   if (Array.isArray(pkgJson.licenses)) {
     const bundledLicenses = [];
-    pkgJson.licenses.forEach(l => {
+    pkgJson.licenses.forEach((l) => {
       if (l.type) {
         license = l.type;
         bundledLicenses.push(l.type);
@@ -164,7 +164,7 @@ function createBundledDepLicense(opts: BuildOptions, moduleId: string): BundledD
     depLicense
       .trim()
       .split('\n')
-      .forEach(ln => {
+      .forEach((ln) => {
         output.push(`> ${ln}`);
       });
   }
@@ -196,7 +196,7 @@ function getContributors(prop: any) {
   if (Array.isArray(prop)) {
     return prop
       .map(getAuthor)
-      .filter(c => !!c)
+      .filter((c) => !!c)
       .join(', ');
   }
 
@@ -222,7 +222,7 @@ function getAuthor(c: any) {
 }
 
 function getBundledDepLicenseContent(opts: BuildOptions, moduleId: string) {
-  const licenseFiles = ['LICENSE', 'LICENSE.md', 'LICENSE-MIT', 'LICENSE.txt']
+  const licenseFiles = ['LICENSE', 'LICENSE.md', 'LICENSE-MIT', 'LICENSE.txt'];
   for (const licenseFile of licenseFiles) {
     try {
       const licensePath = join(opts.nodeModulesDir, moduleId, licenseFile);
@@ -238,7 +238,7 @@ function includeDepLicense(bundledDeps: BundledDep[], moduleId: string) {
   if (moduleId.startsWith('@types/')) {
     return false;
   }
-  if (bundledDeps.some(b => b.moduleId === moduleId)) {
+  if (bundledDeps.some((b) => b.moduleId === moduleId)) {
     return false;
   }
   return true;

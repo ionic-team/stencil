@@ -53,7 +53,12 @@ export const transpileSync = (code: string, opts: TranspileOptions = {}) => {
   return results;
 };
 
-const transpileCode = (config: Config, transpileOpts: TranspileOptions, transformOpts: TransformOptions, results: TranspileResults) => {
+const transpileCode = (
+  config: Config,
+  transpileOpts: TranspileOptions,
+  transformOpts: TransformOptions,
+  results: TranspileResults
+) => {
   const transpileResults = transpileModule(config, results.code, transformOpts);
 
   results.diagnostics.push(...transpileResults.diagnostics);
@@ -87,11 +92,11 @@ const transpileCode = (config: Config, transpileOpts: TranspileOptions, transfor
   if (moduleFile) {
     results.outputFilePath = moduleFile.jsFilePath;
 
-    moduleFile.cmps.forEach(cmp => {
+    moduleFile.cmps.forEach((cmp) => {
       results.data.push(getPublicCompilerMeta(cmp));
     });
 
-    moduleFile.originalImports.forEach(originalImport => {
+    moduleFile.originalImports.forEach((originalImport) => {
       results.imports.push({
         path: originalImport,
       });
@@ -103,7 +108,7 @@ const transpileCss = async (transformInput: TransformCssToEsmInput, results: Tra
   const cssResults = await transformCssToEsm(transformInput);
   results.code = cssResults.output;
   results.map = cssResults.map;
-  results.imports = cssResults.imports.map(p => ({ path: p.importPath }));
+  results.imports = cssResults.imports.map((p) => ({ path: p.importPath }));
   results.diagnostics.push(...cssResults.diagnostics);
 };
 
@@ -111,7 +116,7 @@ const transpileCssSync = (transformInput: TransformCssToEsmInput, results: Trans
   const cssResults = transformCssToEsmSync(transformInput);
   results.code = cssResults.output;
   results.map = cssResults.map;
-  results.imports = cssResults.imports.map(p => ({ path: p.importPath }));
+  results.imports = cssResults.imports.map((p) => ({ path: p.importPath }));
   results.diagnostics.push(...cssResults.diagnostics);
 };
 

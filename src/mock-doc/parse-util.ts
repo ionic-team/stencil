@@ -36,7 +36,6 @@ function getParser(ownerDocument: MockDocument) {
   }
 
   const treeAdapter: TreeAdapter = {
-    
     createDocument() {
       const doc = ownerDocument.createElement(NODE_NAMES.DOCUMENT_NODE);
       (doc as any)['x-mode'] = 'no-quirks';
@@ -91,7 +90,7 @@ function getParser(ownerDocument: MockDocument) {
     },
 
     setDocumentType(doc: MockDocument, name: string, publicId: string, systemId: string) {
-      let doctypeNode = doc.childNodes.find(n => n.nodeType === NODE_TYPES.DOCUMENT_TYPE_NODE);
+      let doctypeNode = doc.childNodes.find((n) => n.nodeType === NODE_TYPES.DOCUMENT_TYPE_NODE);
 
       if (doctypeNode == null) {
         doctypeNode = ownerDocument.createDocumentTypeNode();
@@ -159,7 +158,7 @@ function getParser(ownerDocument: MockDocument) {
     },
 
     getAttrList(element: MockElement) {
-      const attrs: Attribute[] = element.attributes.__items.map(attr => {
+      const attrs: Attribute[] = element.attributes.__items.map((attr) => {
         return {
           name: attr.name,
           value: attr.value,

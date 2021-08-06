@@ -1,7 +1,6 @@
 import { setupDomTests, waitForChanges } from '../util';
 
-
-describe('lifecycle-update', function() {
+describe('lifecycle-update', function () {
   const { setupDom, tearDownDom } = setupDomTests(document);
   let app: HTMLElement;
 
@@ -24,7 +23,6 @@ describe('lifecycle-update', function() {
     expect(loads[0].textContent).toBe('lifecycle-update-a componentWillLoad');
     expect(loads[1].textContent).toBe('lifecycle-update-a componentDidLoad');
 
-
     expect(loads[2].textContent).toBe('async add child components to lifecycle-update-a 1');
     expect(loads[3].textContent).toBe('lifecycle-update-a componentWillUpdate 1');
     expect(loads[4].textContent).toBe('lifecycle-update-b componentWillLoad 1');
@@ -36,7 +34,6 @@ describe('lifecycle-update', function() {
 
     button.click();
     await waitForChanges();
-
 
     loads = app.querySelectorAll('#output li');
     expect(loads[0].textContent).toBe('lifecycle-update-a componentWillLoad');
@@ -57,5 +54,4 @@ describe('lifecycle-update', function() {
     expect(loads[15].textContent).toBe('lifecycle-update-a componentDidUpdate 2');
     expect(loads.length).toBe(16);
   });
-
 });

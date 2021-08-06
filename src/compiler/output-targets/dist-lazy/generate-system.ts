@@ -6,8 +6,14 @@ import { join } from 'path';
 import type { OutputOptions, RollupBuild } from 'rollup';
 import { relativeImport } from '../output-utils';
 
-export const generateSystem = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, rollupBuild: RollupBuild, outputTargets: d.OutputTargetDistLazy[]) => {
-  const systemOutputs = outputTargets.filter(o => !!o.systemDir);
+export const generateSystem = async (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  buildCtx: d.BuildCtx,
+  rollupBuild: RollupBuild,
+  outputTargets: d.OutputTargetDistLazy[]
+) => {
+  const systemOutputs = outputTargets.filter((o) => !!o.systemDir);
 
   if (systemOutputs.length > 0) {
     const esmOpts: OutputOptions = {
@@ -16,34 +22,63 @@ export const generateSystem = async (config: d.Config, compilerCtx: d.CompilerCt
       chunkFileNames: config.hashFileNames ? 'p-[hash].system.js' : '[name]-[hash].system.js',
       assetFileNames: config.hashFileNames ? 'p-[hash][extname]' : '[name]-[hash][extname]',
       preferConst: true,
-      sourcemap: !!config.sourceMap
+      sourcemap: !!config.sourceMap,
     };
     const results = await generateRollupOutput(rollupBuild, esmOpts, config, buildCtx.entryModules);
     if (results != null) {
-      const destinations = systemOutputs.map(o => o.esmDir);
-      await generateLazyModules(config, compilerCtx, buildCtx, outputTargets[0].type, destinations, results, 'es5', true, '.system');
+      const destinations = systemOutputs.map((o) => o.esmDir);
+      await generateLazyModules(
+        config,
+        compilerCtx,
+        buildCtx,
+        outputTargets[0].type,
+        destinations,
+        results,
+        'es5',
+        true,
+        '.system'
+      );
       await generateSystemLoaders(config, compilerCtx, results, systemOutputs);
     }
   }
 };
 
-const generateSystemLoaders = (config: d.Config, compilerCtx: d.CompilerCtx, rollupResult: d.RollupResult[], systemOutputs: d.OutputTargetDistLazy[]) => {
-  const loaderFilename = rollupResult.find(r => r.type === 'chunk' && r.isBrowserLoader).fileName;
+const generateSystemLoaders = (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  rollupResult: d.RollupResult[],
+  systemOutputs: d.OutputTargetDistLazy[]
+) => {
+  const loaderFilename = rollupResult.find((r) => r.type === 'chunk' && r.isBrowserLoader).fileName;
 
-  return Promise.all(systemOutputs.map(o => writeSystemLoader(config, compilerCtx, loaderFilename, o)));
+  return Promise.all(systemOutputs.map((o) => writeSystemLoader(config, compilerCtx, loaderFilename, o)));
 };
 
-const writeSystemLoader = async (config: d.Config, compilerCtx: d.CompilerCtx, loaderFilename: string, outputTarget: d.OutputTargetDistLazy) => {
+const writeSystemLoader = async (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  loaderFilename: string,
+  outputTarget: d.OutputTargetDistLazy
+) => {
   if (outputTarget.systemLoaderFile) {
     const entryPointPath = join(outputTarget.systemDir, loaderFilename);
     const relativePath = relativeImport(outputTarget.systemLoaderFile, entryPointPath);
     const loaderContent = await getSystemLoader(config, compilerCtx, relativePath, outputTarget.polyfills);
-    await compilerCtx.fs.writeFile(outputTarget.systemLoaderFile, loaderContent, { outputTargetType: outputTarget.type });
+    await compilerCtx.fs.writeFile(outputTarget.systemLoaderFile, loaderContent, {
+      outputTargetType: outputTarget.type,
+    });
   }
 };
 
-const getSystemLoader = async (config: d.Config, compilerCtx: d.CompilerCtx, corePath: string, includePolyfills: boolean) => {
-  const polyfills = includePolyfills ? await getAppBrowserCorePolyfills(config, compilerCtx) : '/* polyfills excluded */';
+const getSystemLoader = async (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  corePath: string,
+  includePolyfills: boolean
+) => {
+  const polyfills = includePolyfills
+    ? await getAppBrowserCorePolyfills(config, compilerCtx)
+    : '/* polyfills excluded */';
   return `
 'use strict';
 (function () {

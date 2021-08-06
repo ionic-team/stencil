@@ -16,7 +16,7 @@ export const updateModule = (
   sourceFileText: string,
   emitFilePath: string,
   typeChecker: ts.TypeChecker,
-  collection: d.CollectionCompilerMeta,
+  collection: d.CollectionCompilerMeta
 ) => {
   const sourceFilePath = normalizePath(tsSourceFile.fileName);
   const prevModuleFile = getModule(compilerCtx, sourceFilePath);
@@ -67,7 +67,13 @@ export const updateModule = (
   // TODO: workaround around const enums
   // find better way
   if (moduleFile.cmps.length > 0) {
-    moduleFile.staticSourceFile = ts.createSourceFile(sourceFilePath, sourceFileText, tsSourceFile.languageVersion, true, ts.ScriptKind.JS);
+    moduleFile.staticSourceFile = ts.createSourceFile(
+      sourceFilePath,
+      sourceFileText,
+      tsSourceFile.languageVersion,
+      true,
+      ts.ScriptKind.JS
+    );
   }
   return moduleFile;
 };

@@ -19,7 +19,7 @@ export const appDataPlugin = (
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   build: d.BuildConditionals,
-  platform: 'client' | 'hydrate' | 'worker',
+  platform: 'client' | 'hydrate' | 'worker'
 ): Plugin => {
   if (!platform) {
     return {
@@ -76,13 +76,13 @@ export const appDataPlugin = (
       if (!module.sourceMapFileText) return { code: module.staticSourceFileText, map: null };
 
       const sourceMap: d.SourceMap = JSON.parse(module.sourceMapFileText);
-      sourceMap.sources = sourceMap.sources.map(src => basename(src));
+      sourceMap.sources = sourceMap.sources.map((src) => basename(src));
       return { code: module.staticSourceFileText, map: sourceMap };
     },
 
     transform(code, id) {
       id = normalizePath(id);
-      if (globalScripts.some(s => s.path === id)) {
+      if (globalScripts.some((s) => s.path === id)) {
         const program = this.parse(code, {});
         const needsDefault = !(program as any).body.some((s: any) => s.type === 'ExportDefaultDeclaration');
         const defaultExport = needsDefault ? '\nexport const globalFn = () => {};\nexport default globalFn;' : '';
@@ -136,10 +136,10 @@ export const getGlobalScriptData = (config: d.Config, compilerCtx: d.CompilerCtx
     }
   }
 
-  compilerCtx.collections.forEach(collection => {
+  compilerCtx.collections.forEach((collection) => {
     if (collection.global != null && isString(collection.global.sourceFilePath)) {
       let defaultName = createJsVarName(collection.collectionName + 'GlobalScript');
-      if (globalScripts.some(s => s.defaultName === defaultName)) {
+      if (globalScripts.some((s) => s.defaultName === defaultName)) {
         defaultName += globalScripts.length;
       }
       globalScripts.push({
@@ -157,12 +157,12 @@ const appendGlobalScripts = (globalScripts: GlobalScript[], s: MagicString) => {
     s.prepend(`import appGlobalScript from '${globalScripts[0].path}';\n`);
     s.append(`export const globalScripts = appGlobalScript;\n`);
   } else if (globalScripts.length > 1) {
-    globalScripts.forEach(globalScript => {
+    globalScripts.forEach((globalScript) => {
       s.prepend(`import ${globalScript.defaultName} from '${globalScript.path}';\n`);
     });
 
     s.append(`export const globalScripts = () => {\n`);
-    globalScripts.forEach(globalScript => {
+    globalScripts.forEach((globalScript) => {
       s.append(`  ${globalScript.defaultName}();\n`);
     });
     s.append(`};\n`);
@@ -174,7 +174,7 @@ const appendGlobalScripts = (globalScripts: GlobalScript[], s: MagicString) => {
 const appendBuildConditionals = (config: d.Config, build: d.BuildConditionals, s: MagicString) => {
   const builData = Object.keys(build)
     .sort()
-    .map(key => key + ': ' + ((build as any)[key] ? 'true' : 'false'))
+    .map((key) => key + ': ' + ((build as any)[key] ? 'true' : 'false'))
     .join(', ');
 
   s.append(`export const BUILD = /* ${config.fsNamespace} */ { ${builData} };\n`);

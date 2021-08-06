@@ -4,7 +4,12 @@ import { isOutputTargetDistCollection } from '../output-utils';
 import { join, relative } from 'path';
 import { writeCollectionManifests } from '../output-collection';
 
-export const outputCollection = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, changedModuleFiles: d.Module[]) => {
+export const outputCollection = async (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  buildCtx: d.BuildCtx,
+  changedModuleFiles: d.Module[]
+) => {
   const outputTargets = config.outputTargets.filter(isOutputTargetDistCollection);
   if (outputTargets.length === 0) {
     return;
@@ -13,12 +18,12 @@ export const outputCollection = async (config: d.Config, compilerCtx: d.Compiler
   const timespan = buildCtx.createTimeSpan(`generate collections started`, true);
   try {
     await Promise.all(
-      changedModuleFiles.map(async mod => {
+      changedModuleFiles.map(async (mod) => {
         const code = mod.staticSourceFileText;
         const mapCode = mod.sourceMapFileText;
 
         await Promise.all(
-          outputTargets.map(async o => {
+          outputTargets.map(async (o) => {
             const relPath = relative(config.srcDir, mod.jsFilePath);
             const filePath = join(o.collectionDir, relPath);
             await compilerCtx.fs.writeFile(filePath, code, { outputTargetType: o.type });
@@ -27,9 +32,9 @@ export const outputCollection = async (config: d.Config, compilerCtx: d.Compiler
             const relMapPath = relative(config.srcDir, mod.sourceMapPath);
             const mapFilePath = join(o.collectionDir, relMapPath);
             await compilerCtx.fs.writeFile(mapFilePath, mapCode, { outputTargetType: o.type });
-          }),
+          })
         );
-      }),
+      })
     );
 
     await writeCollectionManifests(config, compilerCtx, buildCtx, outputTargets);

@@ -7,7 +7,12 @@ import { normalizePath } from '@utils';
 import { updateReferenceTypeImports } from './update-import-refs';
 import { updateStencilTypesImports } from './stencil-types';
 
-export const generateAppTypes = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, destination: string) => {
+export const generateAppTypes = async (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  buildCtx: d.BuildCtx,
+  destination: string
+) => {
   // only gather components that are still root ts files we've found and have component metadata
   // the compilerCtx cache may still have files that may have been deleted/renamed
   const timespan = buildCtx.createTimeSpan(`generated app types started`, true);
@@ -21,10 +26,16 @@ export const generateAppTypes = async (config: d.Config, compilerCtx: d.Compiler
 
   if (!internal) {
     componentsDtsFilePath = resolve(destination, GENERATED_DTS);
-    componentTypesFileContent = updateStencilTypesImports(destination, componentsDtsFilePath, componentTypesFileContent);
+    componentTypesFileContent = updateStencilTypesImports(
+      destination,
+      componentsDtsFilePath,
+      componentTypesFileContent
+    );
   }
 
-  const writeResults = await compilerCtx.fs.writeFile(componentsDtsFilePath, componentTypesFileContent, { immediateWrite: true });
+  const writeResults = await compilerCtx.fs.writeFile(componentsDtsFilePath, componentTypesFileContent, {
+    immediateWrite: true,
+  });
   const hasComponentsDtsChanged = writeResults.changedContent;
 
   const componentsDtsRelFileName = relative(config.rootDir, componentsDtsFilePath);
@@ -45,9 +56,9 @@ const generateComponentTypesFile = (config: d.Config, buildCtx: d.BuildCtx, inte
   let typeImportData: d.TypesImportData = {};
   const c: string[] = [];
   const allTypes = new Map<string, number>();
-  const components = buildCtx.components.filter(m => !m.isCollectionDependency);
+  const components = buildCtx.components.filter((m) => !m.isCollectionDependency);
 
-  const modules: d.TypesModule[] = components.map(cmp => {
+  const modules: d.TypesModule[] = components.map((cmp) => {
     typeImportData = updateReferenceTypeImports(typeImportData, allTypes, cmp, cmp.sourceFilePath);
     return generateComponentTypes(cmp, internal);
   });
@@ -56,7 +67,7 @@ const generateComponentTypesFile = (config: d.Config, buildCtx: d.BuildCtx, inte
   c.push(`import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";`);
 
   c.push(
-    ...Object.keys(typeImportData).map(filePath => {
+    ...Object.keys(typeImportData).map((filePath) => {
       const typeData = typeImportData[filePath];
       let importFilePath: string;
       if (isAbsolute(filePath)) {
@@ -67,7 +78,7 @@ const generateComponentTypesFile = (config: d.Config, buildCtx: d.BuildCtx, inte
 
       return `import { ${typeData
         .sort(sortImportNames)
-        .map(td => {
+        .map((td) => {
           if (td.localName === td.importName) {
             return `${td.importName}`;
           } else {
@@ -75,26 +86,26 @@ const generateComponentTypesFile = (config: d.Config, buildCtx: d.BuildCtx, inte
           }
         })
         .join(`, `)} } from "${importFilePath}";`;
-    }),
+    })
   );
 
-  c.push(`export namespace Components {\n${modules.map(m => `${m.component}`).join('\n')}\n}`);
+  c.push(`export namespace Components {\n${modules.map((m) => `${m.component}`).join('\n')}\n}`);
 
   c.push(`declare global {`);
 
-  c.push(...modules.map(m => m.element));
+  c.push(...modules.map((m) => m.element));
 
   c.push(`        interface HTMLElementTagNameMap {`);
-  c.push(...modules.map(m => `                "${m.tagName}": ${m.htmlElementName};`));
+  c.push(...modules.map((m) => `                "${m.tagName}": ${m.htmlElementName};`));
   c.push(`        }`);
 
   c.push(`}`);
 
   c.push(`declare namespace LocalJSX {`);
-  c.push(...modules.map(m => `  ${m.jsx}`));
+  c.push(...modules.map((m) => `  ${m.jsx}`));
 
   c.push(`        interface IntrinsicElements {`);
-  c.push(...modules.map(m => `              "${m.tagName}": ${m.tagNameAsPascal};`));
+  c.push(...modules.map((m) => `              "${m.tagName}": ${m.tagNameAsPascal};`));
   c.push(`        }`);
 
   c.push(`}`);
@@ -104,7 +115,12 @@ const generateComponentTypesFile = (config: d.Config, buildCtx: d.BuildCtx, inte
   c.push(`declare module "@stencil/core" {`);
   c.push(`        export namespace JSX {`);
   c.push(`                interface IntrinsicElements {`);
-  c.push(...modules.map(m => `                        "${m.tagName}": LocalJSX.${m.tagNameAsPascal} & JSXBase.HTMLAttributes<${m.htmlElementName}>;`));
+  c.push(
+    ...modules.map(
+      (m) =>
+        `                        "${m.tagName}": LocalJSX.${m.tagNameAsPascal} & JSXBase.HTMLAttributes<${m.htmlElementName}>;`
+    )
+  );
   c.push(`                }`);
   c.push(`        }`);
   c.push(`}`);

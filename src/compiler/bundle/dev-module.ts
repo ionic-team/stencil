@@ -8,7 +8,7 @@ export const devNodeModuleResolveId = async (
   config: d.Config,
   inMemoryFs: d.InMemoryFileSystem,
   resolvedId: PartialResolvedId,
-  importee: string,
+  importee: string
 ) => {
   if (!shouldCheckDevModule(resolvedId, importee)) {
     return resolvedId;
@@ -128,7 +128,7 @@ const bundleDevModule = async (
   config: d.Config,
   compilerCtx: d.CompilerCtx,
   parsedUrl: ParsedDevModuleUrl,
-  results: d.CompilerRequestResponse,
+  results: d.CompilerRequestResponse
 ) => {
   const buildCtx = new BuildContext(config, compilerCtx);
 
@@ -234,7 +234,7 @@ const parseDevModuleUrl = (config: d.Config, u: string) => {
 const getDevModuleCachePath = (config: d.Config, parsedUrl: ParsedDevModuleUrl) => {
   return join(
     config.cacheDir,
-    `dev_module_${parsedUrl.nodeModuleId}_${parsedUrl.nodeModuleVersion}_${DEV_MODULE_CACHE_BUSTER}.log`,
+    `dev_module_${parsedUrl.nodeModuleId}_${parsedUrl.nodeModuleVersion}_${DEV_MODULE_CACHE_BUSTER}.log`
   );
 };
 

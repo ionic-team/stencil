@@ -84,7 +84,7 @@ describe('attributes', () => {
         {},
         h('div', {
           'xlink:href': testUrl,
-        }),
+        })
       );
 
       hostElm = document.createElementNS(SVG_NS, 'svg') as any;

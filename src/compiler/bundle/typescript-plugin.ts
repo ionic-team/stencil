@@ -22,7 +22,7 @@ export const typescriptPlugin = (compilerCtx: d.CompilerCtx, bundleOpts: BundleO
           }
 
           const sourceMap: d.SourceMap = JSON.parse(module.sourceMapFileText);
-          sourceMap.sources = sourceMap.sources.map(src => basename(src));
+          sourceMap.sources = sourceMap.sources.map((src) => basename(src));
           return { code: module.staticSourceFileText, map: sourceMap };
         }
       }

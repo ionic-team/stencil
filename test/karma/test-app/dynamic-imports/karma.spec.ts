@@ -17,5 +17,4 @@ describe('tag-names', () => {
     await waitForChanges();
     expect(dynamicImport.textContent.trim()).toBe('2 hello2 world2');
   });
-
 });

@@ -258,13 +258,13 @@ describe('validation', () => {
 
   it('should set default generateDocs to false', () => {
     const { config } = validateConfig(userConfig);
-    expect(config.outputTargets.some(o => o.type === 'docs')).toBe(false);
+    expect(config.outputTargets.some((o) => o.type === 'docs')).toBe(false);
   });
 
   it('should default dist false and www true', () => {
     const { config } = validateConfig(userConfig);
-    expect(config.outputTargets.some(o => o.type === 'dist')).toBe(false);
-    expect(config.outputTargets.some(o => o.type === 'www')).toBe(true);
+    expect(config.outputTargets.some((o) => o.type === 'dist')).toBe(false);
+    expect(config.outputTargets.some((o) => o.type === 'www')).toBe(true);
   });
 
   it('should set devInspector false', () => {
@@ -293,13 +293,13 @@ describe('validation', () => {
 
   it('should set default generateDocs to false', () => {
     const { config } = validateConfig(userConfig);
-    expect(config.outputTargets.some(o => o.type === 'docs')).toBe(false);
+    expect(config.outputTargets.some((o) => o.type === 'docs')).toBe(false);
   });
 
   it('should default dist false and www true', () => {
     const { config } = validateConfig(userConfig);
-    expect(config.outputTargets.some(o => o.type === 'dist')).toBe(false);
-    expect(config.outputTargets.some(o => o.type === 'www')).toBe(true);
+    expect(config.outputTargets.some((o) => o.type === 'dist')).toBe(false);
+    expect(config.outputTargets.some((o) => o.type === 'www')).toBe(true);
   });
 
   it('should error for invalid outputTarget type', () => {
@@ -314,7 +314,7 @@ describe('validation', () => {
 
   it('should default outputTargets with www', () => {
     const { config } = validateConfig(userConfig);
-    expect(config.outputTargets.some(o => o.type === 'www')).toBe(true);
+    expect(config.outputTargets.some((o) => o.type === 'www')).toBe(true);
   });
 
   it('should set extras defaults', () => {

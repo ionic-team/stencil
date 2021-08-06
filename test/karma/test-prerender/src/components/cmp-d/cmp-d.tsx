@@ -1,13 +1,11 @@
 import { Component, Prop, h } from '@stencil/core';
 import { printLifecycle } from '../../global/util';
 
-
 @Component({
   tag: 'cmp-d',
-  styleUrl: 'cmp-d.css'
+  styleUrl: 'cmp-d.css',
 })
 export class CmpD {
-
   @Prop() uniqueId: string = '';
 
   componentWillLoad() {
@@ -19,8 +17,6 @@ export class CmpD {
   }
 
   render() {
-    return (
-      <div>CmpD</div>
-    );
+    return <div>CmpD</div>;
   }
 }

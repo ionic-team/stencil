@@ -6,21 +6,12 @@ import { Component, State, h } from '@stencil/core';
     button { color: black; }
     .selected { font-weight: bold; color: blue; }
   `,
-  shadow: true
+  shadow: true,
 })
 export class StateCmp {
-
   @State() selected: string;
 
-  days: string[] = [
-    'Sunday',
-    'Monday',
-    'Tuesday',
-    'Wednesday',
-    'Thursday',
-    'Friday',
-    'Saturday'
-  ];
+  days: string[] = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
   dayClicked(day: string) {
     this.selected = day;
@@ -31,14 +22,11 @@ export class StateCmp {
       <section>
         <label>What is your favorite day?</label>
         <div>
-          {this.days.map(day =>
-            <button
-              class={day === this.selected ? 'selected' : ''}
-              onClick={() => this.dayClicked(day)}
-              key={day}>
-                {day}
+          {this.days.map((day) => (
+            <button class={day === this.selected ? 'selected' : ''} onClick={() => this.dayClicked(day)} key={day}>
+              {day}
             </button>
-          )}
+          ))}
         </div>
       </section>
     );

@@ -23,7 +23,14 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys) => {
   const infoPrefix = (lines: string[]) => {
     if (lines.length) {
       const d = new Date();
-      const prefix = '[' + ('0' + d.getMinutes()).slice(-2) + ':' + ('0' + d.getSeconds()).slice(-2) + '.' + Math.floor((d.getMilliseconds() / 1000) * 10) + ']';
+      const prefix =
+        '[' +
+        ('0' + d.getMinutes()).slice(-2) +
+        ':' +
+        ('0' + d.getSeconds()).slice(-2) +
+        '.' +
+        Math.floor((d.getMilliseconds() / 1000) * 10) +
+        ']';
 
       lines[0] = dim(prefix) + lines[0].substr(prefix.length);
     }
@@ -88,7 +95,14 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys) => {
     if (lines.length) {
       const d = new Date();
 
-      const prefix = '[' + ('0' + d.getMinutes()).slice(-2) + ':' + ('0' + d.getSeconds()).slice(-2) + '.' + Math.floor((d.getMilliseconds() / 1000) * 10) + ']';
+      const prefix =
+        '[' +
+        ('0' + d.getMinutes()).slice(-2) +
+        ':' +
+        ('0' + d.getSeconds()).slice(-2) +
+        '.' +
+        Math.floor((d.getMilliseconds() / 1000) * 10) +
+        ']';
 
       lines[0] = cyan(prefix) + lines[0].substr(prefix.length);
     }
@@ -119,7 +133,15 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys) => {
     }
   };
 
-  const timespanFinish = (finishMsg: string, timeSuffix: string, colorName: 'red', textBold: boolean, newLineSuffix: boolean, debug: boolean, appendTo: string[]) => {
+  const timespanFinish = (
+    finishMsg: string,
+    timeSuffix: string,
+    colorName: 'red',
+    textBold: boolean,
+    newLineSuffix: boolean,
+    debug: boolean,
+    appendTo: string[]
+  ) => {
     let msg = finishMsg;
 
     if (colorName) {
@@ -138,7 +160,7 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys) => {
         if (mem > 0) {
           m.push(dim(` MEM: ${(mem / 1000000).toFixed(1)}MB`));
         }
-        
+
         const lines = wordWrap(m, loggerSys.getColumns());
         debugPrefix(lines);
         console.log(lines.join('\n'));
@@ -244,7 +266,7 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys) => {
 
     let outputLines: string[] = [''];
 
-    diagnostics.forEach(d => {
+    diagnostics.forEach((d) => {
       outputLines = outputLines.concat(printDiagnostic(d, cwd));
     });
 
@@ -303,7 +325,7 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys) => {
     if (diagnostic.lines && diagnostic.lines.length) {
       const lines = prepareLines(diagnostic.lines);
 
-      lines.forEach(l => {
+      lines.forEach((l) => {
         if (!isMeaningfulLine(l.text)) {
           return;
         }
@@ -391,7 +413,7 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys) => {
       return dim(text);
     }
 
-    const words = text.split(' ').map(word => {
+    const words = text.split(' ').map((word) => {
       if (JS_KEYWORDS.indexOf(word) > -1) {
         return cyan(word);
       }
@@ -473,7 +495,7 @@ export const wordWrap = (msg: any[], columns: number) => {
   const lines: string[] = [];
   const words: any[] = [];
 
-  msg.forEach(m => {
+  msg.forEach((m) => {
     if (m === null) {
       words.push('null');
     } else if (typeof m === 'undefined') {
@@ -481,7 +503,7 @@ export const wordWrap = (msg: any[], columns: number) => {
     } else if (typeof m === 'string') {
       m.replace(/\s/gm, ' ')
         .split(' ')
-        .forEach(strWord => {
+        .forEach((strWord) => {
           if (strWord.trim().length) {
             words.push(strWord.trim());
           }
@@ -502,7 +524,7 @@ export const wordWrap = (msg: any[], columns: number) => {
   });
 
   let line = INDENT;
-  words.forEach(word => {
+  words.forEach((word) => {
     if (lines.length > 25) {
       return;
     }
@@ -534,7 +556,7 @@ export const wordWrap = (msg: any[], columns: number) => {
     lines.push(line);
   }
 
-  return lines.map(line => {
+  return lines.map((line) => {
     return (line as any).trimRight();
   });
 };

@@ -18,13 +18,13 @@ export const validateDocs = (config: d.Config, diagnostics: d.Diagnostic[], user
       validateJsonDocsOutputTarget(config, diagnostics, {
         type: 'docs-json',
         file: config.flags.docsJson,
-      }),
+      })
     );
   }
 
   // json docs
   const jsonDocsOutputs = userOutputs.filter(isOutputTargetDocsJson);
-  jsonDocsOutputs.forEach(jsonDocsOutput => {
+  jsonDocsOutputs.forEach((jsonDocsOutput) => {
     docsOutputs.push(validateJsonDocsOutputTarget(config, diagnostics, jsonDocsOutput));
   });
 
@@ -38,19 +38,19 @@ export const validateDocs = (config: d.Config, diagnostics: d.Diagnostic[], user
 
   // readme docs
   const readmeDocsOutputs = userOutputs.filter(isOutputTargetDocsReadme);
-  readmeDocsOutputs.forEach(readmeDocsOutput => {
+  readmeDocsOutputs.forEach((readmeDocsOutput) => {
     docsOutputs.push(validateReadmeOutputTarget(config, readmeDocsOutput));
   });
 
   // custom docs
   const customDocsOutputs = userOutputs.filter(isOutputTargetDocsCustom);
-  customDocsOutputs.forEach(jsonDocsOutput => {
+  customDocsOutputs.forEach((jsonDocsOutput) => {
     docsOutputs.push(validateCustomDocsOutputTarget(diagnostics, jsonDocsOutput));
   });
 
   // vscode docs
   const vscodeDocsOutputs = userOutputs.filter(isOutputTargetDocsVscode);
-  vscodeDocsOutputs.forEach(vscodeDocsOutput => {
+  vscodeDocsOutputs.forEach((vscodeDocsOutput) => {
     docsOutputs.push(validateVScodeDocsOutputTarget(diagnostics, vscodeDocsOutput));
   });
   return docsOutputs;
@@ -75,7 +75,7 @@ const validateReadmeOutputTarget = (config: d.Config, outputTarget: d.OutputTarg
 const validateJsonDocsOutputTarget = (
   config: d.Config,
   diagnostics: d.Diagnostic[],
-  outputTarget: d.OutputTargetDocsJson,
+  outputTarget: d.OutputTargetDocsJson
 ) => {
   if (!isString(outputTarget.file)) {
     const err = buildError(diagnostics);

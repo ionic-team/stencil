@@ -1,7 +1,6 @@
 import { setupDomTests, waitForChanges } from '../util';
 
-
-describe('lifecycle-basic', function() {
+describe('lifecycle-basic', function () {
   const { setupDom, tearDownDom } = setupDomTests(document);
   let app: HTMLElement;
 
@@ -46,5 +45,4 @@ describe('lifecycle-basic', function() {
     expect(updates[4].textContent).toBe('componentDidUpdate-b');
     expect(updates[5].textContent).toBe('componentDidUpdate-a');
   });
-
 });

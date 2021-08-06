@@ -1,7 +1,6 @@
 import { setupDomTests, waitForChanges } from '../util';
 
-
-describe('reparent behavior (style)', function() {
+describe('reparent behavior (style)', function () {
   const { setupDom, tearDownDom } = setupDomTests(document);
   let app: HTMLElement;
 
@@ -24,7 +23,6 @@ describe('reparent behavior (style)', function() {
     await waitForChanges();
     const novars = app.querySelector('reparent-style-no-vars');
     expect(window.getComputedStyle(novars).backgroundColor).toBe('rgb(0, 128, 128)');
-
   });
 
   // This test fails in IE!

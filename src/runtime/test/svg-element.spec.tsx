@@ -11,7 +11,7 @@ describe('SVG element', () => {
       render() {
         return (
           <svg viewBox="0 0 100 4">
-            {this.lines.map(a => {
+            {this.lines.map((a) => {
               return [<text>Hola {a}</text>];
             })}
           </svg>

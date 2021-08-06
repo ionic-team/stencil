@@ -26,8 +26,6 @@ describe('shadow-dom-array', () => {
         expect(r.shadowRoot.children[2].textContent.trim()).toBe('2');
         done();
       }, 100);
-
     }, 100);
   });
-
 });

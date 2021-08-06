@@ -116,7 +116,7 @@ export function removeEventListener(elm: any, type: string, handler: any) {
   const target: EventTarget = elm;
 
   if (target != null && Array.isArray(target.__listeners) === true) {
-    const elmListener = target.__listeners.find(e => e.type === type && e.handler === handler);
+    const elmListener = target.__listeners.find((e) => e.type === type && e.handler === handler);
     if (elmListener != null) {
       const index = target.__listeners.indexOf(elmListener);
       target.__listeners.splice(index, 1);
@@ -139,8 +139,8 @@ function triggerEventListener(elm: any, ev: MockEvent) {
   ev.currentTarget = elm;
 
   if (Array.isArray(target.__listeners) === true) {
-    const listeners = target.__listeners.filter(e => e.type === ev.type);
-    listeners.forEach(listener => {
+    const listeners = target.__listeners.filter((e) => e.type === ev.type);
+    listeners.forEach((listener) => {
       try {
         listener.handler.call(target, ev);
       } catch (err) {

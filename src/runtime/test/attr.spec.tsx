@@ -292,7 +292,6 @@ describe('attribute', () => {
       `);
     });
     it('should reflect properties as attributes', async () => {
-
       @Component({ tag: 'cmp-a', shadow: true })
       class CmpA {
         @Prop({ reflect: true }) foo = 'bar';
@@ -320,7 +319,6 @@ describe('attribute', () => {
     });
 
     it('should reflect draggable', async () => {
-
       @Component({ tag: 'cmp-draggable', shadow: true })
       class CmpABC {
         @Prop() foo = false;
@@ -360,8 +358,6 @@ describe('attribute', () => {
         </mock:shadow-root>
       </cmp-draggable>
     `);
-
     });
-
   });
 });

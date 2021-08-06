@@ -10,7 +10,7 @@ export const writeLazyModule = async (
   shouldHash: boolean,
   code: string,
   sourceMap: d.SourceMap,
-  sufix: string,
+  sufix: string
 ): Promise<d.BundleModuleOutput> => {
   // code = replaceStylePlaceholders(entryModule.cmps, modeName, code);
 
@@ -21,12 +21,14 @@ export const writeLazyModule = async (
     code = code + '\n//# sourceMappingURL=' + fileName + '.map';
   }
 
-  await Promise.all(destinations.map(dst => {
-    compilerCtx.fs.writeFile(join(dst, fileName), code, { outputTargetType });
-    if (!!sourceMap) {
-      compilerCtx.fs.writeFile(join(dst, fileName) + '.map', JSON.stringify(sourceMap), { outputTargetType });
-    }
-  }));
+  await Promise.all(
+    destinations.map((dst) => {
+      compilerCtx.fs.writeFile(join(dst, fileName), code, { outputTargetType });
+      if (!!sourceMap) {
+        compilerCtx.fs.writeFile(join(dst, fileName) + '.map', JSON.stringify(sourceMap), { outputTargetType });
+      }
+    })
+  );
 
   return {
     bundleId,

@@ -1,6 +1,5 @@
 import { Component, h, Host } from '@stencil/core';
 
-
 @Component({
   tag: 'slot-nested-order-parent',
   shadow: false,

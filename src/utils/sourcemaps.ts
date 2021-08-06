@@ -6,4 +6,4 @@ export const rollupSrcMapToObj = (rollupSrcMap: RollupSourceMap): d.SourceMap =>
   if (typeof rollupSrcMap.toUrl === 'function') return JSON.parse(rollupSrcMap.toString());
   if (typeof rollupSrcMap === 'string') return JSON.parse(rollupSrcMap);
   return rollupSrcMap;
-}
+};

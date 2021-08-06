@@ -2,15 +2,20 @@ import type * as d from '../../declarations';
 import { OutputOptions, RollupBuild } from 'rollup';
 import { STENCIL_CORE_ID } from '../bundle/entry-alias-ids';
 
-export const generateRollupOutput = async (build: RollupBuild, options: OutputOptions, config: d.Config, entryModules: d.EntryModule[]): Promise<d.RollupResult[]> => {
+export const generateRollupOutput = async (
+  build: RollupBuild,
+  options: OutputOptions,
+  config: d.Config,
+  entryModules: d.EntryModule[]
+): Promise<d.RollupResult[]> => {
   if (build == null) {
     return null;
   }
 
   const { output } = await build.generate(options);
-  return output.map(chunk => {
+  return output.map((chunk) => {
     if (chunk.type === 'chunk') {
-      const isCore = Object.keys(chunk.modules).some(m => m.includes('@stencil/core'));
+      const isCore = Object.keys(chunk.modules).some((m) => m.includes('@stencil/core'));
       return {
         type: 'chunk',
         fileName: chunk.fileName,
@@ -20,7 +25,7 @@ export const generateRollupOutput = async (build: RollupBuild, options: OutputOp
         entryKey: chunk.name,
         imports: chunk.imports,
         isEntry: !!chunk.isEntry,
-        isComponent: !!chunk.isEntry && entryModules.some(m => m.entryKey === chunk.name),
+        isComponent: !!chunk.isEntry && entryModules.some((m) => m.entryKey === chunk.name),
         isBrowserLoader: chunk.isEntry && chunk.name === config.fsNamespace,
         isIndex: chunk.isEntry && chunk.name === 'index',
         isCore,

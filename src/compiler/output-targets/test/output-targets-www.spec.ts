@@ -19,7 +19,14 @@ xdescribe('outputTarget, www', () => {
 
     await compiler.fs.writeFiles({
       [path.join(root, 'User', 'testing', 'src', 'index.html')]: `<cmp-a></cmp-a>`,
-      [path.join(root, 'User', 'testing', 'src', 'components', 'cmp-a.tsx')]: `@Component({ tag: 'cmp-a' }) export class CmpA {}`,
+      [path.join(
+        root,
+        'User',
+        'testing',
+        'src',
+        'components',
+        'cmp-a.tsx'
+      )]: `@Component({ tag: 'cmp-a' }) export class CmpA {}`,
     });
     await compiler.fs.commit();
 

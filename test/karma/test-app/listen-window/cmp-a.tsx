@@ -1,8 +1,7 @@
 import { Component, Listen, State, h } from '@stencil/core';
 
-
 @Component({
-  tag: 'listen-window'
+  tag: 'listen-window',
 })
 export class ListenWindow {
   @State() clicked = 0;
@@ -24,7 +23,7 @@ export class ListenWindow {
         <div id="clicked">Clicked: {this.clicked}</div>
         <div>Scrolled: {this.scrolled}</div>
         <button>Click!</button>
-        <div style={{background: 'gray', paddingTop: '2000px'}}></div>
+        <div style={{ background: 'gray', paddingTop: '2000px' }}></div>
       </div>
     );
   }
