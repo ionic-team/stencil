@@ -6,7 +6,7 @@ const renderSlotFallbackContent = (sr: d.RenderNode, hide: boolean) => {
   if (!sr['s-hsf']) return;
   let n: d.RenderNode = sr;
 
-  while ((n = (n.previousSibling || n.parentNode) as d.RenderNode) && (n.tagName !== sr['s-hn'])) {
+  while ((n = (n.previousSibling || n.parentNode) as d.RenderNode) && n.tagName !== sr['s-hn']) {
     if (n['s-sr'] && hide && n['s-psn'] && n['s-psn'] === sr['s-sn']) {
       renderSlotFallbackContent(n, true);
       continue;
@@ -25,10 +25,10 @@ const renderSlotFallbackContent = (sr: d.RenderNode, hide: boolean) => {
       }
     }
   }
-}
+};
 
 export const updateFallbackSlotVisibility = (elm: d.RenderNode) => {
-  let childNodes: d.RenderNode[] = ((elm as d.RenderNode).__childNodes || elm.childNodes as any);
+  let childNodes: d.RenderNode[] = (elm as d.RenderNode).__childNodes || (elm.childNodes as any);
   let childNode: d.RenderNode;
   let i: number;
   let ilen: number;

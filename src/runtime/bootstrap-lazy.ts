@@ -130,10 +130,9 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
       };
 
       if (
-        !BUILD.hydrateServerSide && (
-          (cmpMeta.$flags$ & CMP_FLAGS.hasSlotRelocation) ||
-          (cmpMeta.$flags$ & (CMP_FLAGS.shadowDomEncapsulation && CMP_FLAGS.needsShadowDomShim))
-        )
+        !BUILD.hydrateServerSide &&
+        (cmpMeta.$flags$ & CMP_FLAGS.hasSlotRelocation ||
+          cmpMeta.$flags$ & (CMP_FLAGS.shadowDomEncapsulation && CMP_FLAGS.needsShadowDomShim))
       ) {
         patchPseudoShadowDom(HostElement.prototype);
         if (BUILD.cloneNodeFix) {

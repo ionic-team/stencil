@@ -832,8 +832,11 @@ describe('scoped slot', () => {
             <slot name="content">
               <slot name="before">DEFAULT BEFORE</slot>
               <slot>DEFAULT CONTENT</slot>
-              <slot name="after">DEFAULT AFTER
-                <p><slot name="nested">NESTED</slot></p>
+              <slot name="after">
+                DEFAULT AFTER
+                <p>
+                  <slot name="nested">NESTED</slot>
+                </p>
               </slot>
             </slot>
           </div>

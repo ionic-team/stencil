@@ -1,7 +1,6 @@
 import { setupDomTests, waitForChanges } from '../util';
 
-// TODO(STENCIL-18) Restore this test and fix the underlying issue.
-xdescribe('slot-fallback', () => {
+describe('slot-fallback', () => {
   const { setupDom, tearDownDom } = setupDomTests(document);
   let app: HTMLElement;
 

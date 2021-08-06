@@ -72,9 +72,11 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
       isSvgMode = newVNode.$tag$ === 'svg';
     }
     // create element
-    elm = newVNode.$elm$ = (BUILD.svg
-      ? doc.createElementNS(isSvgMode ? SVG_NS : HTML_NS, (newVNode.$tag$ as string))
-      : doc.createElement(newVNode.$tag$ as string)) as any;
+    elm = newVNode.$elm$ = (
+      BUILD.svg
+        ? doc.createElementNS(isSvgMode ? SVG_NS : HTML_NS, newVNode.$tag$ as string)
+        : doc.createElement(newVNode.$tag$ as string)
+    ) as any;
 
     if (BUILD.svg && isSvgMode && newVNode.$tag$ === 'foreignObject') {
       isSvgMode = false;
@@ -134,7 +136,7 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
           for (i = 0; i < newVNode.$children$.length; ++i) {
             // create the node
             let containerElm = elm.nodeType === 1 ? elm : parentElm;
-            while(containerElm.nodeType !== 1) {
+            while (containerElm.nodeType !== 1) {
               containerElm = containerElm.parentNode as d.RenderNode;
             }
             childNode = createElm(oldParentVNode, newVNode, i, containerElm);
@@ -147,7 +149,7 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
             // return node could have been null
             if (childNode) {
               // append our new node
-              containerElm.__appendChild ?  containerElm.__appendChild(childNode) : containerElm.appendChild(childNode);
+              containerElm.__appendChild ? containerElm.__appendChild(childNode) : containerElm.appendChild(childNode);
             }
           }
         }
@@ -169,7 +171,7 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
 const putBackInOriginalLocation = (parentElm: Node, recursive: boolean) => {
   plt.$flags$ |= PLATFORM_FLAGS.isTmpDisconnected;
 
-  const oldSlotChildNodes = ((parentElm as d.RenderNode).__childNodes || parentElm.childNodes);
+  const oldSlotChildNodes = (parentElm as d.RenderNode).__childNodes || parentElm.childNodes;
   for (let i = oldSlotChildNodes.length - 1; i >= 0; i--) {
     const childNode = oldSlotChildNodes[i] as any;
     if (childNode['s-hn'] !== hostTagName && childNode['s-ol']) {
@@ -235,10 +237,10 @@ const saveSlottedNodes = (elm: d.RenderNode) => {
     if (childNode['s-ol']) {
       if (childNode['s-hn']) childNode['s-hn'] = undefined;
     } else {
-      saveSlottedNodes(childNode)
+      saveSlottedNodes(childNode);
     }
   }
-}
+};
 
 const removeVnodes = (vnodes: d.VNode[], startIdx: number, endIdx: number, vnode?: d.VNode, elm?: d.RenderNode) => {
   for (; startIdx <= endIdx; ++startIdx) {
@@ -286,7 +288,7 @@ const updateChildren = (parentElm: d.RenderNode, oldCh: d.VNode[], newVNode: d.V
   let fbParentNodesIdx: number;
   let fbSlots: d.RenderNode[] = [];
   let fbSlotsIdx: number;
-  let fbNodes: {[name: string]: d.RenderNode[]} = {};
+  let fbNodes: { [name: string]: d.RenderNode[] } = {};
   let fbNodesIdx: number;
   let fbChildNode: d.RenderNode;
   let fbSlot: d.RenderNode;
@@ -383,8 +385,8 @@ const updateChildren = (parentElm: d.RenderNode, oldCh: d.VNode[], newVNode: d.V
 
   // reorder fallback slot nodes
   if (parentElm.parentNode && newVNode.$elm$['s-hsf']) {
-    fbParentNodes = ((parentElm.parentNode as d.RenderNode).__childNodes || parentElm.parentNode.childNodes);
-    fbParentNodesIdx = fbParentNodes.length-1;
+    fbParentNodes = (parentElm.parentNode as d.RenderNode).__childNodes || parentElm.parentNode.childNodes;
+    fbParentNodesIdx = fbParentNodes.length - 1;
 
     for (i = 0; i <= fbParentNodesIdx; ++i) {
       fbChildNode = fbParentNodes[i] as d.RenderNode;
@@ -398,12 +400,12 @@ const updateChildren = (parentElm: d.RenderNode, oldCh: d.VNode[], newVNode: d.V
       }
     }
 
-    fbSlotsIdx = fbSlots.length-1;
+    fbSlotsIdx = fbSlots.length - 1;
     for (i = 0; i <= fbSlotsIdx; ++i) {
       fbSlot = fbSlots[i];
       if (!fbNodes[fbSlot['s-sn']]) continue;
 
-      fbNodesIdx = fbNodes[fbSlot['s-sn']].length-1;
+      fbNodesIdx = fbNodes[fbSlot['s-sn']].length - 1;
       for (j = 0; j <= fbNodesIdx; ++j) {
         fbNode = fbNodes[fbSlot['s-sn']][j];
         fbSlot.parentNode.insertBefore(fbNode, fbSlot);
@@ -522,7 +524,7 @@ const relocateSlotContent = (elm: d.RenderNode) => {
       }
       // first got the content reference comment node
       // then we got it's parent, which is where all the host content is in now
-      hostContentNodes = ((node.parentNode as d.RenderNode).__childNodes || node.parentNode.childNodes);
+      hostContentNodes = (node.parentNode as d.RenderNode).__childNodes || node.parentNode.childNodes;
       slotNameAttr = childNode['s-sn'];
 
       for (j = hostContentNodes.length - 1; j >= 0; j--) {

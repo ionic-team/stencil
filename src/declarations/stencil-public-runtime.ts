@@ -316,10 +316,10 @@ export interface HTMLStencilElement extends HTMLElement {
   __innerHTML?: string;
   __innerText?: string;
   __textContent?: string;
-  __append?: (...nodes: (Node | string)[]) => void
+  __append?: (...nodes: (Node | string)[]) => void;
   __prepend?: (...nodes: (Node | string)[]) => void;
   __appendChild?: <T extends Node>(newChild: T) => T;
-  __replaceChildren?: (...nodes: (Node | string)[]) => void
+  __replaceChildren?: (...nodes: (Node | string)[]) => void;
   __insertAdjacentElement?: (position: InsertPosition, insertedElement: Element) => Element | null;
   __insertAdjacentHTML?: (where: InsertPosition, html: string) => void;
   __insertAdjacentText?: (where: InsertPosition, text: string) => void;

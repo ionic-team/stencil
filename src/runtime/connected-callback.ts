@@ -125,10 +125,10 @@ export const connectedCallback = (elm: d.HostElement) => {
         elm.classList.remove(oId + '-h', oId + '-s');
         elm.classList.add(nId + '-h', nId + '-s');
 
-        Array.from(elm.querySelectorAll('.' + oId)).forEach(c => {
+        Array.from(elm.querySelectorAll('.' + oId)).forEach((c) => {
           c.classList.remove(oId, oId + '-s');
           c.classList.add(nId, nId + '-s');
-        })
+        });
         plt.$cssShim$.updateHost(elm);
       }
     }

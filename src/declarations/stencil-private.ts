@@ -1172,14 +1172,13 @@ export interface HostElement extends HTMLElement {
   __innerHTML?: string;
   __innerText?: string;
   __textContent?: string;
-  __append?: (...nodes: (Node | string)[]) => void
+  __append?: (...nodes: (Node | string)[]) => void;
   __prepend?: (...nodes: (Node | string)[]) => void;
   __appendChild?: <T extends Node>(newChild: T) => T;
-  __replaceChildren?: (...nodes: (Node | string)[]) => void
+  __replaceChildren?: (...nodes: (Node | string)[]) => void;
   __insertAdjacentElement?: (position: InsertPosition, insertedElement: Element) => Element | null;
   __insertAdjacentHTML?: (where: InsertPosition, html: string) => void;
   __insertAdjacentText?: (where: InsertPosition, text: string) => void;
-
 
   // "s-" prefixed properties should not be property renamed
   // and should be common between all versions of stencil
@@ -1539,12 +1538,12 @@ export interface RenderNode extends HostElement {
   /**
    * Slot has fallback nodes
    */
-   ['s-hsf']?: boolean;
+  ['s-hsf']?: boolean;
 
   /**
    * Slot fallback node text content
    */
-   ['s-sfc']?: string;
+  ['s-sfc']?: string;
 
   /**
    * Host element tag name:

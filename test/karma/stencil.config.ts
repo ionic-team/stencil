@@ -32,7 +32,7 @@ export const config: Config = {
     lifecycleDOMEvents: true,
     safari10: true,
     scriptDataOpts: true,
-    shadowDomShim: true
+    shadowDomShim: true,
   },
   devServer: {
     historyApiFallback: {
