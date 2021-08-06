@@ -5,6 +5,6 @@ import { CmpA } from './cmp-a';
 @Component({
   tag: 'cmp-b',
   styleUrl: 'cmp-a.css',
-  shadow: true
+  shadow: true,
 })
 export class CmpB {}

@@ -25,7 +25,7 @@ export const parseStaticComponentMeta = (
   cmpNode: ts.ClassDeclaration,
   moduleFile: d.Module,
   nodeMap: d.NodeMap,
-  transformOpts?: d.TransformOptions,
+  transformOpts?: d.TransformOptions
 ) => {
   if (cmpNode.members == null) {
     return cmpNode;
@@ -160,7 +160,7 @@ const parseVirtualProps = (docs: d.CompilerJsDoc) => {
   return docs.tags
     .filter(({ name }) => name === 'virtualProp')
     .map(parseVirtualProp)
-    .filter(prop => !!prop);
+    .filter((prop) => !!prop);
 };
 
 const parseVirtualProp = (tag: d.CompilerJsDocTagInfo): d.ComponentCompilerVirtualProperty => {
@@ -180,7 +180,7 @@ const parseAssetsDirs = (staticMembers: ts.ClassElement[], componentFilePath: st
   const dirs: string[] = getStaticValue(staticMembers, 'assetsDirs') || [];
   const componentDir = normalizePath(dirname(componentFilePath));
 
-  return dirs.map(dir => {
+  return dirs.map((dir) => {
     // get the relative path from the component file to the assets directory
     dir = normalizePath(dir.trim());
 

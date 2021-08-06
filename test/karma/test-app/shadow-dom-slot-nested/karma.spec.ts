@@ -27,7 +27,7 @@ describe('shadow-dom-slot-nested', () => {
 
       expect(article.children.length).toBe(3);
 
-      const testShadowNested = function(i: number) {
+      const testShadowNested = function (i: number) {
         const nestedElm = article.children[i];
         const shadowRoot = nestedElm.shadowRoot;
 
@@ -48,7 +48,6 @@ describe('shadow-dom-slot-nested', () => {
       testShadowNested(0);
       testShadowNested(1);
       testShadowNested(2);
-
     } else {
       expect(elm.shadowRoot).toBe(elm);
       expect(elm.classList.contains('sc-shadow-dom-slot-nested-root-h')).toBe(true);
@@ -64,7 +63,7 @@ describe('shadow-dom-slot-nested', () => {
 
       expect(article.children.length).toBe(3);
 
-      const testSlotPolyfillNested = function(i: number) {
+      const testSlotPolyfillNested = function (i: number) {
         const nestedElm = article.children[i];
         expect(nestedElm.classList.contains('sc-shadow-dom-slot-nested-root')).toBe(true);
         expect(nestedElm.classList.contains('sc-shadow-dom-slot-nested-h')).toBe(true);
@@ -86,7 +85,5 @@ describe('shadow-dom-slot-nested', () => {
       testSlotPolyfillNested(1);
       testSlotPolyfillNested(2);
     }
-
   });
-
 });

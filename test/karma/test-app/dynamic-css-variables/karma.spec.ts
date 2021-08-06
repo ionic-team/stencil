@@ -1,7 +1,6 @@
 import { setupDomTests, waitForChanges } from '../util';
 
-
-describe('dynamic-css-variables', function() {
+describe('dynamic-css-variables', function () {
   const { setupDom, tearDownDom } = setupDomTests(document);
   let app: HTMLElement;
 
@@ -31,7 +30,5 @@ describe('dynamic-css-variables', function() {
       const headerStyles3 = window.getComputedStyle(header);
       expect(headerStyles3.color).toBe('rgb(0, 0, 255)');
     }
-
   });
-
 });

@@ -13,7 +13,7 @@ describe('globals', () => {
       html: `<cmp-a></cmp-a>`,
       autoApplyChanges: true,
     });
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       requestAnimationFrame(() => {
         page.win.requestAnimationFrame(() => {
           setTimeout(() => {
@@ -36,7 +36,6 @@ describe('globals', () => {
     expect(Build.isDev).toBe(true);
     expect(Build.isTesting).toBe(true);
   });
-
 
   it('Env is defined', () => {
     expect(Env).toEqual({});

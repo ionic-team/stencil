@@ -1,7 +1,6 @@
 import { setupDomTests, waitForChanges } from '../util';
 
-
-describe('conditional-basic', function() {
+describe('conditional-basic', function () {
   const { setupDom, tearDownDom } = setupDomTests(document);
   let app: HTMLElement;
 
@@ -15,7 +14,6 @@ describe('conditional-basic', function() {
     expect(button).toBeDefined();
   });
 
-
   it('button click rerenders', async () => {
     let button = app.querySelector('button');
     let results = app.querySelector('div.results');
@@ -27,5 +25,4 @@ describe('conditional-basic', function() {
 
     expect(results.textContent).toEqual('Content');
   });
-
 });

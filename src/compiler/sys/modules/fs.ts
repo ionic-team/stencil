@@ -38,7 +38,7 @@ export const mkdir = (fs.mkdir = (p: string, opts: any, cb: any) => {
   opts = typeof opts === 'function' ? undefined : opts;
   fs.__sys
     .createDir(p, opts)
-    .then(results => {
+    .then((results) => {
       if (cb) {
         if (results.error) {
           cb(new FsError('mkdir', p));
@@ -47,7 +47,7 @@ export const mkdir = (fs.mkdir = (p: string, opts: any, cb: any) => {
         }
       }
     })
-    .catch(e => {
+    .catch((e) => {
       cb && cb(e);
     });
 });
@@ -64,7 +64,7 @@ export const readdirSync = (fs.readdirSync = (p: string) => {
   // but if fs.readdirSync was called, the expected
   // nodejs results are of just the basename for each dir item
   const dirItems = fs.__sys.readDirSync(p);
-  return dirItems.map(dirItem => basename(dirItem));
+  return dirItems.map((dirItem) => basename(dirItem));
 });
 
 export const readFile = (fs.readFile = async (p: string, opts: any, cb: (err: any, data?: string) => void) => {
@@ -72,7 +72,7 @@ export const readFile = (fs.readFile = async (p: string, opts: any, cb: (err: an
   cb = typeof cb === 'function' ? cb : typeof opts === 'function' ? opts : null;
   fs.__sys
     .readFile(p, encoding)
-    .then(data => {
+    .then((data) => {
       if (cb) {
         if (typeof data === 'string') {
           cb(null, data);
@@ -81,7 +81,7 @@ export const readFile = (fs.readFile = async (p: string, opts: any, cb: (err: an
         }
       }
     })
-    .catch(e => {
+    .catch((e) => {
       cb && cb(e);
     });
 });
@@ -99,10 +99,10 @@ export const realpath = (fs.realpath = (p: string, opts: any, cb: (err: any, dat
   cb = typeof cb === 'function' ? cb : typeof opts === 'function' ? opts : null;
   fs.__sys
     .realpath(p)
-    .then(results => {
+    .then((results) => {
       cb && cb(results.error, results.path);
     })
-    .catch(e => {
+    .catch((e) => {
       cb && cb(e);
     });
 });
@@ -135,7 +135,7 @@ export const stat = (fs.stat = (p: string, opts: any, cb: any) => {
   cb = typeof cb === 'function' ? cb : typeof opts === 'function' ? opts : null;
   fs.__sys
     .stat(p)
-    .then(fsStats => {
+    .then((fsStats) => {
       if (cb) {
         if (fsStats.error) {
           cb(new FsError('stat', p));
@@ -150,7 +150,7 @@ export const stat = (fs.stat = (p: string, opts: any, cb: any) => {
         }
       }
     })
-    .catch(e => {
+    .catch((e) => {
       cb && cb(e);
     });
 });
@@ -163,7 +163,7 @@ export const writeFile = (fs.writeFile = (p: string, data: string, opts: any, cb
   cb = typeof cb === 'function' ? cb : typeof opts === 'function' ? opts : null;
   fs.__sys
     .writeFile(p, data)
-    .then(writeResults => {
+    .then((writeResults) => {
       if (cb) {
         if (writeResults.error) {
           cb(new FsError('writeFile', p));
@@ -172,7 +172,7 @@ export const writeFile = (fs.writeFile = (p: string, data: string, opts: any, cb
         }
       }
     })
-    .catch(e => {
+    .catch((e) => {
       cb && cb(e);
     });
 });

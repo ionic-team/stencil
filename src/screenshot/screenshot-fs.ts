@@ -33,7 +33,7 @@ function getDataFilePath(dataDir: string, screenshotId: string) {
 }
 
 export function fileExists(filePath: string) {
-  return new Promise<boolean>(resolve => {
+  return new Promise<boolean>((resolve) => {
     fs.access(filePath, (err: any) => resolve(!err));
   });
 }
@@ -75,7 +75,7 @@ export function writeFile(filePath: string, data: any) {
 }
 
 export function mkDir(filePath: string) {
-  return new Promise<void>(resolve => {
+  return new Promise<void>((resolve) => {
     fs.mkdir(filePath, () => {
       resolve();
     });
@@ -83,7 +83,7 @@ export function mkDir(filePath: string) {
 }
 
 export function rmDir(filePath: string) {
-  return new Promise<void>(resolve => {
+  return new Promise<void>((resolve) => {
     fs.rmdir(filePath, () => {
       resolve();
     });
@@ -93,7 +93,7 @@ export function rmDir(filePath: string) {
 export async function emptyDir(dir: string) {
   const files = await readDir(dir);
 
-  const promises = files.map(async fileName => {
+  const promises = files.map(async (fileName) => {
     const filePath = path.join(dir, fileName);
     const isDirFile = await isFile(filePath);
     if (isDirFile) {
@@ -105,7 +105,7 @@ export async function emptyDir(dir: string) {
 }
 
 export async function readDir(dir: string) {
-  return new Promise<string[]>(resolve => {
+  return new Promise<string[]>((resolve) => {
     fs.readdir(dir, (err, files) => {
       if (err) {
         resolve([]);
@@ -117,7 +117,7 @@ export async function readDir(dir: string) {
 }
 
 export async function isFile(itemPath: string) {
-  return new Promise<boolean>(resolve => {
+  return new Promise<boolean>((resolve) => {
     fs.stat(itemPath, (err, stat) => {
       if (err) {
         resolve(false);
@@ -129,7 +129,7 @@ export async function isFile(itemPath: string) {
 }
 
 export async function unlink(filePath: string) {
-  return new Promise<void>(resolve => {
+  return new Promise<void>((resolve) => {
     fs.unlink(filePath, () => {
       resolve();
     });

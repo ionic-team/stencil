@@ -1,11 +1,12 @@
 import { newE2EPage } from '@stencil/core/testing';
 
 describe('@Mixin', () => {
-
   it('should mixin properties', async () => {
-    const page = await newE2EPage({ html: `
+    const page = await newE2EPage({
+      html: `
       <mixin-cmp></mixin-cmp>
-    `});
+    `,
+    });
 
     const elm = await page.find('mixin-cmp div');
     expect(elm).toEqualText('Jonny B Good');
@@ -17,9 +18,11 @@ describe('@Mixin', () => {
   });
 
   it('should mixin methods', async () => {
-    const page = await newE2EPage({ html: `
+    const page = await newE2EPage({
+      html: `
       <mixin-cmp></mixin-cmp>
-    `});
+    `,
+    });
 
     const elm = await page.find('mixin-cmp');
     const methodRtnValue = await elm.callMethod('surnameWithTitle');
@@ -28,14 +31,15 @@ describe('@Mixin', () => {
   });
 
   it('should mixin anything', async () => {
-    const page = await newE2EPage({ html: `
+    const page = await newE2EPage({
+      html: `
       <mixin-cmp></mixin-cmp>
-    `});
+    `,
+    });
 
     const div = await page.find('mixin-cmp div');
     const divStyle = await div.getComputedStyle();
 
     expect(divStyle.backgroundColor).toBe('rgba(0, 0, 255, 0.1)');
-  })
-
+  });
 });

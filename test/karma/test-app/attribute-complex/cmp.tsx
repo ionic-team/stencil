@@ -2,10 +2,9 @@ import { Component, Prop, Method } from '@stencil/core';
 import { SomeTypes } from '../util';
 
 @Component({
-  tag: 'attribute-complex'
+  tag: 'attribute-complex',
 })
 export class AttributeComplex {
-
   @Prop() nu0 = 1;
   @Prop() nu1?: number;
   @Prop() nu2?: SomeTypes.Number;

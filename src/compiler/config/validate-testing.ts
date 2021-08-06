@@ -58,16 +58,22 @@ export const validateTesting = (config: d.Config, diagnostics: d.Diagnostic[]) =
       testing.screenshotConnector = join(config.rootDir, testing.screenshotConnector);
     }
   } else {
-    testing.screenshotConnector = join(config.sys.getCompilerExecutingPath(), '..', '..', 'screenshot', 'local-connector.js');
+    testing.screenshotConnector = join(
+      config.sys.getCompilerExecutingPath(),
+      '..',
+      '..',
+      'screenshot',
+      'local-connector.js'
+    );
   }
 
   if (!Array.isArray(testing.testPathIgnorePatterns)) {
-    testing.testPathIgnorePatterns = DEFAULT_IGNORE_PATTERNS.map(ignorePattern => {
+    testing.testPathIgnorePatterns = DEFAULT_IGNORE_PATTERNS.map((ignorePattern) => {
       return join(testing.rootDir, ignorePattern);
     });
 
     config.outputTargets
-      .filter(o => (isOutputTargetDist(o) || isOutputTargetWww(o)) && o.dir)
+      .filter((o) => (isOutputTargetDist(o) || isOutputTargetWww(o)) && o.dir)
       .forEach((outputTarget: d.OutputTargetWww) => {
         testing.testPathIgnorePatterns.push(outputTarget.dir);
       });
@@ -83,7 +89,9 @@ export const validateTesting = (config: d.Config, diagnostics: d.Diagnostic[]) =
     testing.setupFilesAfterEnv = [];
   }
 
-  testing.setupFilesAfterEnv.unshift(join(config.sys.getCompilerExecutingPath(), '..', '..', 'testing', 'jest-setuptestframework.js'));
+  testing.setupFilesAfterEnv.unshift(
+    join(config.sys.getCompilerExecutingPath(), '..', '..', 'testing', 'jest-setuptestframework.js')
+  );
 
   if (isString(testing.testEnvironment)) {
     if (!isAbsolute(testing.testEnvironment) && isLocalModule(testing.testEnvironment)) {

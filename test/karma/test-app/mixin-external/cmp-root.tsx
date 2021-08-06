@@ -5,7 +5,7 @@ import { Button } from 'ionic-git/core/src/components/button/button';
 @Component({
   tag: 'mixin-external',
   shadow: true,
-  styleUrl: '../../node_modules/ionic-git/core/src/components/button/button.md.scss'
+  styleUrl: '../../node_modules/ionic-git/core/src/components/button/button.md.scss',
 })
 export class MixinExternal implements ComponentInterface {
   @Prop() mixinProperty: string = 'This is a local node';
@@ -13,7 +13,7 @@ export class MixinExternal implements ComponentInterface {
   renderCopy: () => VNode;
 
   localContent(): VNode {
-    return <div>{this.mixinProperty}</div>
+    return <div>{this.mixinProperty}</div>;
   }
 
   // this is horrid. But it's a demo
@@ -23,7 +23,7 @@ export class MixinExternal implements ComponentInterface {
         return value;
       }
     }
-  }
+  };
 
   constructor() {
     this.renderCopy = this.render.bind(this);
@@ -31,7 +31,7 @@ export class MixinExternal implements ComponentInterface {
       const ionicContent = this.renderCopy();
       this.foundVChildren(this.foundVChildren(this.foundVChildren(ionicContent)[0])[0]).push(this.localContent());
       return ionicContent;
-    }
+    };
   }
 }
-export interface MixinExternal extends Button{}
+export interface MixinExternal extends Button {}

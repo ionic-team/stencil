@@ -9,9 +9,18 @@ import { getScopeId, registerStyle } from './styles';
 import { PROXY_FLAGS } from './runtime-constants';
 import { createTime, uniqueTime } from './profile';
 
-export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, hmrVersionId?: string, Cstr?: any) => {
+export const initializeComponent = async (
+  elm: d.HostElement,
+  hostRef: d.HostRef,
+  cmpMeta: d.ComponentRuntimeMeta,
+  hmrVersionId?: string,
+  Cstr?: any
+) => {
   // initializeComponent
-  if ((BUILD.lazyLoad || BUILD.hydrateServerSide || BUILD.style) && (hostRef.$flags$ & HOST_FLAGS.hasInitializedComponent) === 0) {
+  if (
+    (BUILD.lazyLoad || BUILD.hydrateServerSide || BUILD.style) &&
+    (hostRef.$flags$ & HOST_FLAGS.hasInitializedComponent) === 0
+  ) {
     if (BUILD.lazyLoad || BUILD.hydrateClientSide) {
       // we haven't initialized this element yet
       hostRef.$flags$ |= HOST_FLAGS.hasInitializedComponent;
@@ -22,7 +31,10 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
       Cstr = loadModule(cmpMeta, hostRef, hmrVersionId);
       if (Cstr.then) {
         // Await creates a micro-task avoid if possible
-        const endLoad = uniqueTime(`st:load:${cmpMeta.$tagName$}:${hostRef.$modeName$}`, `[Stencil] Load module for <${cmpMeta.$tagName$}>`);
+        const endLoad = uniqueTime(
+          `st:load:${cmpMeta.$tagName$}:${hostRef.$modeName$}`,
+          `[Stencil] Load module for <${cmpMeta.$tagName$}>`
+        );
         Cstr = await Cstr;
         endLoad();
       }
@@ -85,8 +97,13 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
       if (!styles.has(scopeId)) {
         const endRegisterStyles = createTime('registerStyles', cmpMeta.$tagName$);
 
-        if (!BUILD.hydrateServerSide && BUILD.shadowDom && BUILD.shadowDomShim && cmpMeta.$flags$ & CMP_FLAGS.needsShadowDomShim) {
-          style = await import('../utils/shadow-css').then(m => m.scopeCss(style, scopeId, false));
+        if (
+          !BUILD.hydrateServerSide &&
+          BUILD.shadowDom &&
+          BUILD.shadowDomShim &&
+          cmpMeta.$flags$ & CMP_FLAGS.needsShadowDomShim
+        ) {
+          style = await import('../utils/shadow-css').then((m) => m.scopeCss(style, scopeId, false));
         }
 
         registerStyle(scopeId, style, !!(cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation));

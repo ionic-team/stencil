@@ -26,7 +26,7 @@ export const usageToMarkdown = (usages: d.JsonDocsUsage) => {
 export const mergeUsages = (usages: d.JsonDocsUsage) => {
   const keys = Object.keys(usages);
   const map = new Map<string, string[]>();
-  keys.forEach(key => {
+  keys.forEach((key) => {
     const usage = usages[key].trim();
     const array = map.get(usage) || [];
     array.push(key);

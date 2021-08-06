@@ -35,7 +35,7 @@ export class PrerenderCmp {
         </div>
       </div>,
       <a href="/some-link">Some Link</a>,
-      <div>{this.mixinTest}</div>
+      <div>{this.mixinTest}</div>,
     ];
   }
 }

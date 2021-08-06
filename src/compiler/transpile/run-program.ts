@@ -15,7 +15,7 @@ export const runTsProgram = async (
   config: d.Config,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
-  tsBuilder: ts.BuilderProgram,
+  tsBuilder: ts.BuilderProgram
 ) => {
   const tsSyntactic = loadTypeScriptDiagnostics(tsBuilder.getSyntacticDiagnostics());
   const tsGlobal = loadTypeScriptDiagnostics(tsBuilder.getGlobalDiagnostics());
@@ -44,28 +44,27 @@ export const runTsProgram = async (
       // re-reun transpile for any mixin dependents
       let mixinDependents: ts.SourceFile[] = [];
       for (const mod of buildCtx.compilerCtx.moduleMap.values()) {
-        if (
-          mod.mixinFilePaths.length &&
-          mod.mixinFilePaths.find(file => file === tsSourceFile)
-        ) {
+        if (mod.mixinFilePaths.length && mod.mixinFilePaths.find((file) => file === tsSourceFile)) {
           mixinDependents = [
             ...mixinDependents,
             ...mod.cmps
-              .filter(cmp => cmp.mixinFilePaths.find(file => file === tsSourceFile))
-              .map(cmp => tsProgram.getSourceFile(cmp.sourceFilePath))
+              .filter((cmp) => cmp.mixinFilePaths.find((file) => file === tsSourceFile))
+              .map((cmp) => tsProgram.getSourceFile(cmp.sourceFilePath)),
           ];
         }
       }
 
-      mixinDependents.forEach(dep => tsProgram.emit(dep, emitCallback, undefined, false, {
-        before: [convertDecoratorsToStatic(config, buildCtx.diagnostics, tsTypeChecker)]
-      }));
+      mixinDependents.forEach((dep) =>
+        tsProgram.emit(dep, emitCallback, undefined, false, {
+          before: [convertDecoratorsToStatic(config, buildCtx.diagnostics, tsTypeChecker)],
+        })
+      );
     } else if (emitFilePath.endsWith('.d.ts')) {
       const srcDtsPath = normalizePath(tsSourceFile);
       const relativeEmitFilepath = getRelativeDts(config, srcDtsPath, emitFilePath);
 
       emittedDts.push(srcDtsPath);
-      typesOutputTarget.forEach(o => {
+      typesOutputTarget.forEach((o) => {
         const distPath = join(o.typesDir, relativeEmitFilepath);
         data = updateStencilTypesImports(o.typesDir, distPath, data);
         compilerCtx.fs.writeFile(distPath, data);
@@ -104,18 +103,18 @@ export const runTsProgram = async (
     // but we still want to ship them in the dist directory
     const srcRootDtsFiles = tsProgram
       .getRootFileNames()
-      .filter(f => f.endsWith('.d.ts') && !f.endsWith('components.d.ts'))
+      .filter((f) => f.endsWith('.d.ts') && !f.endsWith('components.d.ts'))
       .map(normalizePath)
-      .filter(f => !emittedDts.includes(f))
-      .map(srcRootDtsFilePath => {
+      .filter((f) => !emittedDts.includes(f))
+      .map((srcRootDtsFilePath) => {
         const relativeEmitFilepath = relative(config.srcDir, srcRootDtsFilePath);
         return Promise.all(
-          typesOutputTarget.map(async o => {
+          typesOutputTarget.map(async (o) => {
             const distPath = join(o.typesDir, relativeEmitFilepath);
             let dtsContent = await compilerCtx.fs.readFile(srcRootDtsFilePath);
             dtsContent = updateStencilTypesImports(o.typesDir, distPath, dtsContent);
             await compilerCtx.fs.writeFile(distPath, dtsContent);
-          }),
+          })
         );
       });
 
@@ -125,7 +124,7 @@ export const runTsProgram = async (
   if (config.validateTypes) {
     const tsSemantic = loadTypeScriptDiagnostics(tsBuilder.getSemanticDiagnostics());
     if (config.devMode) {
-      tsSemantic.forEach(semanticDiagnostic => {
+      tsSemantic.forEach((semanticDiagnostic) => {
         // Unused variable errors become warnings in dev mode
         if (semanticDiagnostic.code === '6133' || semanticDiagnostic.code === '6192') {
           semanticDiagnostic.level = 'warn';

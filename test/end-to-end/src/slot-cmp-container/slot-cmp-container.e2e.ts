@@ -1,4 +1,4 @@
-import { newE2EPage } from "@stencil/core/testing";
+import { newE2EPage } from '@stencil/core/testing';
 
 describe('Slots', () => {
   it('should render the slots in the correct order', async () => {

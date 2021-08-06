@@ -10,7 +10,10 @@ export const getScriptTarget = () => {
 };
 
 export const isMemberPrivate = (member: ts.ClassElement) => {
-  if (member.modifiers && member.modifiers.some(m => m.kind === ts.SyntaxKind.PrivateKeyword || m.kind === ts.SyntaxKind.ProtectedKeyword)) {
+  if (
+    member.modifiers &&
+    member.modifiers.some((m) => m.kind === ts.SyntaxKind.PrivateKeyword || m.kind === ts.SyntaxKind.ProtectedKeyword)
+  ) {
     return true;
   }
   return false;
@@ -48,7 +51,7 @@ export const convertValueToLiteral = (val: any, refs: WeakSet<any> = null) => {
 };
 
 const arrayToArrayLiteral = (list: any[], refs: WeakSet<any>): ts.ArrayLiteralExpression => {
-  const newList: any[] = list.map(l => {
+  const newList: any[] = list.map((l) => {
     return convertValueToLiteral(l, refs);
   });
   return ts.createArrayLiteral(newList);
@@ -61,8 +64,11 @@ const objectToObjectLiteral = (obj: { [key: string]: any }, refs: WeakSet<any>):
 
   refs.add(obj);
 
-  const newProperties: ts.ObjectLiteralElementLike[] = Object.keys(obj).map(key => {
-    const prop = ts.createPropertyAssignment(ts.createLiteral(key), convertValueToLiteral(obj[key], refs) as ts.Expression);
+  const newProperties: ts.ObjectLiteralElementLike[] = Object.keys(obj).map((key) => {
+    const prop = ts.createPropertyAssignment(
+      ts.createLiteral(key),
+      convertValueToLiteral(obj[key], refs) as ts.Expression
+    );
     return prop;
   });
 
@@ -70,13 +76,23 @@ const objectToObjectLiteral = (obj: { [key: string]: any }, refs: WeakSet<any>):
 };
 
 export const createStaticGetter = (propName: string, returnExpression: ts.Expression) => {
-  return ts.createGetAccessor(undefined, [ts.createToken(ts.SyntaxKind.StaticKeyword)], propName, undefined, undefined, ts.createBlock([ts.createReturn(returnExpression)]));
+  return ts.createGetAccessor(
+    undefined,
+    [ts.createToken(ts.SyntaxKind.StaticKeyword)],
+    propName,
+    undefined,
+    undefined,
+    ts.createBlock([ts.createReturn(returnExpression)])
+  );
 };
 
 export const removeDecorators = (node: ts.Node, decoratorNames: Set<string>) => {
   if (node.decorators) {
-    const updatedDecoratorList = node.decorators.filter(dec => {
-      const name = ts.isCallExpression(dec.expression) && ts.isIdentifier(dec.expression.expression) && dec.expression.expression.text;
+    const updatedDecoratorList = node.decorators.filter((dec) => {
+      const name =
+        ts.isCallExpression(dec.expression) &&
+        ts.isIdentifier(dec.expression.expression) &&
+        dec.expression.expression.text;
       return !decoratorNames.has(name);
     });
     if (updatedDecoratorList.length === 0) {
@@ -89,12 +105,16 @@ export const removeDecorators = (node: ts.Node, decoratorNames: Set<string>) => 
 };
 
 export const getStaticValue = (staticMembers: ts.ClassElement[], staticName: string): any => {
-  const staticMember: ts.GetAccessorDeclaration = staticMembers.find(member => (member.name as any).escapedText === staticName) as any;
+  const staticMember: ts.GetAccessorDeclaration = staticMembers.find(
+    (member) => (member.name as any).escapedText === staticName
+  ) as any;
   if (!staticMember || !staticMember.body || !staticMember.body.statements) {
     return null;
   }
 
-  const rtnStatement: ts.ReturnStatement = staticMember.body.statements.find(s => s.kind === ts.SyntaxKind.ReturnStatement) as any;
+  const rtnStatement: ts.ReturnStatement = staticMember.body.statements.find(
+    (s) => s.kind === ts.SyntaxKind.ReturnStatement
+  ) as any;
   if (!rtnStatement || !rtnStatement.expression) {
     return null;
   }
@@ -120,7 +140,10 @@ export const getStaticValue = (staticMembers: ts.ClassElement[], staticName: str
     return objectLiteralToObjectMap(rtnStatement.expression as any);
   }
 
-  if (expKind === ts.SyntaxKind.ArrayLiteralExpression && (rtnStatement.expression as ts.ArrayLiteralExpression).elements) {
+  if (
+    expKind === ts.SyntaxKind.ArrayLiteralExpression &&
+    (rtnStatement.expression as ts.ArrayLiteralExpression).elements
+  ) {
     return arrayLiteralToArray(rtnStatement.expression as any);
   }
 
@@ -132,7 +155,7 @@ export const getStaticValue = (staticMembers: ts.ClassElement[], staticName: str
 
     if (identifier.escapedText) {
       const obj: any = {};
-      Object.keys(identifier.escapedText).forEach(key => {
+      Object.keys(identifier.escapedText).forEach((key) => {
         obj[key] = getIdentifierValue((identifier.escapedText as any)[key]);
       });
       return obj;
@@ -143,7 +166,7 @@ export const getStaticValue = (staticMembers: ts.ClassElement[], staticName: str
 };
 
 export const arrayLiteralToArray = (arr: ts.ArrayLiteralExpression) => {
-  return arr.elements.map(element => {
+  return arr.elements.map((element) => {
     let val: any;
 
     switch (element.kind) {
@@ -277,7 +300,7 @@ export class ObjectMap {
 
 export const getAttributeTypeInfo = (baseNode: ts.Node, sourceFile: ts.SourceFile) => {
   const allReferences: d.ComponentCompilerTypeReferences = {};
-  getAllTypeReferences(baseNode).forEach(rt => {
+  getAllTypeReferences(baseNode).forEach((rt) => {
     allReferences[rt] = getTypeReferenceLocation(rt, sourceFile);
   });
   return allReferences;
@@ -299,7 +322,7 @@ const getAllTypeReferences = (node: ts.Node) => {
       referencedTypes.push(getEntityName(node.typeName));
       if (node.typeArguments) {
         node.typeArguments
-          .filter(ta => ts.isTypeReferenceNode(ta))
+          .filter((ta) => ts.isTypeReferenceNode(ta))
           .forEach((tr: ts.TypeReferenceNode) => {
             const typeName = tr.typeName as ts.Identifier;
             if (typeName && typeName.escapedText) {
@@ -316,8 +339,12 @@ const getAllTypeReferences = (node: ts.Node) => {
   return referencedTypes;
 };
 
-export const validateReferences = (diagnostics: d.Diagnostic[], references: d.ComponentCompilerTypeReferences, node: ts.Node) => {
-  Object.keys(references).forEach(refName => {
+export const validateReferences = (
+  diagnostics: d.Diagnostic[],
+  references: d.ComponentCompilerTypeReferences,
+  node: ts.Node
+) => {
+  Object.keys(references).forEach((refName) => {
     const ref = references[refName];
     if (ref.path === '@stencil/core' && MEMBER_DECORATORS_TO_REMOVE.has(refName)) {
       const err = buildError(diagnostics);
@@ -330,7 +357,7 @@ const getTypeReferenceLocation = (typeName: string, tsNode: ts.Node): d.Componen
   const sourceFileObj = tsNode.getSourceFile() as TSsourceFileWithModules;
 
   // Loop through all top level imports to find any reference to the type for 'import' reference location
-  const importTypeDeclaration = sourceFileObj.statements.find(st => {
+  const importTypeDeclaration = sourceFileObj.statements.find((st) => {
     const statement =
       ts.isImportDeclaration(st) &&
       st.importClause &&
@@ -338,7 +365,7 @@ const getTypeReferenceLocation = (typeName: string, tsNode: ts.Node): d.Componen
       st.importClause.namedBindings &&
       ts.isNamedImports(st.importClause.namedBindings) &&
       Array.isArray(st.importClause.namedBindings.elements) &&
-      st.importClause.namedBindings.elements.find(nbe => nbe.name.getText() === typeName);
+      st.importClause.namedBindings.elements.find((nbe) => nbe.name.getText() === typeName);
     if (!statement) {
       return false;
     }
@@ -360,22 +387,25 @@ const getTypeReferenceLocation = (typeName: string, tsNode: ts.Node): d.Componen
   }
 
   // Loop through all top level exports to find if any reference to the type for 'local' reference location
-  const isExported = sourceFileObj.statements.some(st => {
+  const isExported = sourceFileObj.statements.some((st) => {
     // Is the interface defined in the file and exported
     const isInterfaceDeclarationExported =
       ts.isInterfaceDeclaration(st) &&
       (<ts.Identifier>st.name).getText() === typeName &&
       Array.isArray(st.modifiers) &&
-      st.modifiers.some(mod => mod.kind === ts.SyntaxKind.ExportKeyword);
+      st.modifiers.some((mod) => mod.kind === ts.SyntaxKind.ExportKeyword);
 
     const isTypeAliasDeclarationExported =
       ts.isTypeAliasDeclaration(st) &&
       (<ts.Identifier>st.name).getText() === typeName &&
       Array.isArray(st.modifiers) &&
-      st.modifiers.some(mod => mod.kind === ts.SyntaxKind.ExportKeyword);
+      st.modifiers.some((mod) => mod.kind === ts.SyntaxKind.ExportKeyword);
 
     // Is the interface exported through a named export
-    const isTypeInExportDeclaration = ts.isExportDeclaration(st) && ts.isNamedExports(st.exportClause) && st.exportClause.elements.some(nee => nee.name.getText() === typeName);
+    const isTypeInExportDeclaration =
+      ts.isExportDeclaration(st) &&
+      ts.isNamedExports(st.exportClause) &&
+      st.exportClause.elements.some((nee) => nee.name.getText() === typeName);
 
     return isInterfaceDeclarationExported || isTypeAliasDeclarationExported || isTypeInExportDeclaration;
   });
@@ -405,7 +435,7 @@ export const resolveType = (checker: ts.TypeChecker, type: ts.Type) => {
 
   let parts = Array.from(set.keys()).sort();
   if (parts.length > 1) {
-    parts = parts.map(p => (p.indexOf('=>') >= 0 ? `(${p})` : p));
+    parts = parts.map((p) => (p.indexOf('=>') >= 0 ? `(${p})` : p));
   }
   if (parts.length > 20) {
     return typeToString(checker, type);
@@ -415,14 +445,15 @@ export const resolveType = (checker: ts.TypeChecker, type: ts.Type) => {
 };
 
 export const typeToString = (checker: ts.TypeChecker, type: ts.Type) => {
-  const TYPE_FORMAT_FLAGS = ts.TypeFormatFlags.NoTruncation | ts.TypeFormatFlags.InTypeAlias | ts.TypeFormatFlags.InElementType;
+  const TYPE_FORMAT_FLAGS =
+    ts.TypeFormatFlags.NoTruncation | ts.TypeFormatFlags.InTypeAlias | ts.TypeFormatFlags.InElementType;
 
   return checker.typeToString(type, undefined, TYPE_FORMAT_FLAGS);
 };
 
 export const parseDocsType = (checker: ts.TypeChecker, type: ts.Type, parts: Set<string>) => {
   if (type.isUnion()) {
-    (type as ts.UnionType).types.forEach(t => {
+    (type as ts.UnionType).types.forEach((t) => {
       parseDocsType(checker, t, parts);
     });
   } else {
@@ -439,10 +470,14 @@ export const getModuleFromSourceFile = (compilerCtx: d.CompilerCtx, tsSourceFile
   }
 
   const moduleFiles = Array.from(compilerCtx.moduleMap.values());
-  return moduleFiles.find(m => m.jsFilePath === sourceFilePath);
+  return moduleFiles.find((m) => m.jsFilePath === sourceFilePath);
 };
 
-export const getComponentMeta = (compilerCtx: d.CompilerCtx, tsSourceFile: ts.SourceFile, node: ts.ClassDeclaration) => {
+export const getComponentMeta = (
+  compilerCtx: d.CompilerCtx,
+  tsSourceFile: ts.SourceFile,
+  node: ts.ClassDeclaration
+) => {
   const meta = compilerCtx.nodeMap.get(node);
   if (meta) {
     return meta;
@@ -453,7 +488,7 @@ export const getComponentMeta = (compilerCtx: d.CompilerCtx, tsSourceFile: ts.So
     const staticMembers = node.members.filter(isStaticGetter);
     const tagName = getComponentTagName(staticMembers);
     if (typeof tagName === 'string') {
-      return moduleFile.cmps.find(cmp => cmp.tagName === tagName);
+      return moduleFile.cmps.find((cmp) => cmp.tagName === tagName);
     }
   }
   return undefined;
@@ -472,7 +507,11 @@ export const getComponentTagName = (staticMembers: ts.ClassElement[]) => {
 };
 
 export const isStaticGetter = (member: ts.ClassElement) => {
-  return member.kind === ts.SyntaxKind.GetAccessor && member.modifiers && member.modifiers.some(({ kind }) => kind === ts.SyntaxKind.StaticKeyword);
+  return (
+    member.kind === ts.SyntaxKind.GetAccessor &&
+    member.modifiers &&
+    member.modifiers.some(({ kind }) => kind === ts.SyntaxKind.StaticKeyword)
+  );
 };
 
 export const serializeSymbol = (checker: ts.TypeChecker, symbol: ts.Symbol): d.CompilerJsDoc => {
@@ -483,7 +522,7 @@ export const serializeSymbol = (checker: ts.TypeChecker, symbol: ts.Symbol): d.C
     };
   }
   return {
-    tags: symbol.getJsDocTags().map(tag => ({ text: tag.text, name: tag.name })),
+    tags: symbol.getJsDocTags().map((tag) => ({ text: tag.text, name: tag.name })),
     text: ts.displayPartsToString(symbol.getDocumentationComment(checker)),
   };
 };
@@ -502,7 +541,7 @@ export const serializeDocsSymbol = (checker: ts.TypeChecker, symbol: ts.Symbol) 
 
   let parts = Array.from(set.keys()).sort();
   if (parts.length > 1) {
-    parts = parts.map(p => (p.indexOf('=>') >= 0 ? `(${p})` : p));
+    parts = parts.map((p) => (p.indexOf('=>') >= 0 ? `(${p})` : p));
   }
   if (parts.length > 20) {
     return typeToString(checker, type);
@@ -512,7 +551,7 @@ export const serializeDocsSymbol = (checker: ts.TypeChecker, symbol: ts.Symbol) 
 };
 
 export const isInternal = (jsDocs: d.CompilerJsDoc | undefined) => {
-  return jsDocs && jsDocs.tags.some(s => s.name === 'internal');
+  return jsDocs && jsDocs.tags.some((s) => s.name === 'internal');
 };
 
 export const isMethod = (member: ts.ClassElement, methodName: string): member is ts.MethodDeclaration => {
@@ -521,14 +560,18 @@ export const isMethod = (member: ts.ClassElement, methodName: string): member is
 
 export const isAsyncFn = (typeChecker: ts.TypeChecker, methodDeclaration: ts.MethodDeclaration) => {
   if (methodDeclaration.modifiers) {
-    if (methodDeclaration.modifiers.some(m => m.kind === ts.SyntaxKind.AsyncKeyword)) {
+    if (methodDeclaration.modifiers.some((m) => m.kind === ts.SyntaxKind.AsyncKeyword)) {
       return true;
     }
   }
 
   const methodSignature = typeChecker.getSignatureFromDeclaration(methodDeclaration);
   const returnType = methodSignature.getReturnType();
-  const typeStr = typeChecker.typeToString(returnType, undefined, ts.TypeFormatFlags.NoTruncation | ts.TypeFormatFlags.InTypeAlias | ts.TypeFormatFlags.InElementType);
+  const typeStr = typeChecker.typeToString(
+    returnType,
+    undefined,
+    ts.TypeFormatFlags.NoTruncation | ts.TypeFormatFlags.InTypeAlias | ts.TypeFormatFlags.InElementType
+  );
 
   return typeStr.includes('Promise<');
 };
@@ -538,7 +581,7 @@ export const resolveClassName = (importSp: ts.ImportSpecifier, sourceFile?: ts.S
   if (importSp.propertyName && ts.isIdentifier(importSp.propertyName)) {
     return importSp.propertyName.getText(sourceFile);
   } else return importSp.name.getText(sourceFile);
-}
+};
 
 /** util. Returns named bindings from an import declaration */
 export const getImportNamedBindings = (importDec: ts.ImportDeclaration): ts.ImportSpecifier[] => {
@@ -549,65 +592,68 @@ export const getImportNamedBindings = (importDec: ts.ImportDeclaration): ts.Impo
     importDec.importClause.namedBindings &&
     ts.isNamedImports(importDec.importClause.namedBindings) &&
     Array.isArray(importDec.importClause.namedBindings.elements)
-  ) return importDec.importClause.namedBindings.elements;
+  )
+    return importDec.importClause.namedBindings.elements;
   return [];
-}
+};
 
 export const findImportDeclsWithMemberNames = (sourceFile: ts.SourceFile, memberNames: string[]) => {
   // loops through all source imports to find those containing member names
   let foundClassName: string;
   let impSpecs: ts.ImportSpecifier[];
-  const importDeclMap: Map<string, {declaration: ts.ImportDeclaration, identifier: string}> = new Map();
+  const importDeclMap: Map<string, { declaration: ts.ImportDeclaration; identifier: string }> = new Map();
 
-  sourceFile.statements.filter(st => ts.isImportDeclaration(st)).forEach((st: ts.ImportDeclaration) => {
-    foundClassName = null;
-    impSpecs = [];
+  sourceFile.statements
+    .filter((st) => ts.isImportDeclaration(st))
+    .forEach((st: ts.ImportDeclaration) => {
+      foundClassName = null;
+      impSpecs = [];
 
-    if (
-      st.importClause &&
-      ts.isImportClause(st.importClause) &&
-      (impSpecs = getImportNamedBindings(st)) &&
-      impSpecs.length
-    ) {
-      // named modules
-      impSpecs.forEach(nbe => {
-        if (foundClassName = memberNames.find(dec => dec === nbe.name.getText(sourceFile))) {
-          importDeclMap.set(foundClassName, {
-            declaration: st,
-            identifier: resolveClassName(nbe, sourceFile)
-          });
-        }
-      })
-    }
-    // default modules
-    if (
-      st.importClause.name &&
-      ts.isIdentifier(st.importClause.name) &&
-      (foundClassName = memberNames.find(dec => dec === st.importClause.name.getText(sourceFile)))
-    ) {
-      importDeclMap.set(foundClassName, {
-        declaration: st,
-        identifier: 'default'
-      });
-    }
-  });
+      if (
+        st.importClause &&
+        ts.isImportClause(st.importClause) &&
+        (impSpecs = getImportNamedBindings(st)) &&
+        impSpecs.length
+      ) {
+        // named modules
+        impSpecs.forEach((nbe) => {
+          if ((foundClassName = memberNames.find((dec) => dec === nbe.name.getText(sourceFile)))) {
+            importDeclMap.set(foundClassName, {
+              declaration: st,
+              identifier: resolveClassName(nbe, sourceFile),
+            });
+          }
+        });
+      }
+      // default modules
+      if (
+        st.importClause.name &&
+        ts.isIdentifier(st.importClause.name) &&
+        (foundClassName = memberNames.find((dec) => dec === st.importClause.name.getText(sourceFile)))
+      ) {
+        importDeclMap.set(foundClassName, {
+          declaration: st,
+          identifier: 'default',
+        });
+      }
+    });
   return importDeclMap;
-}
+};
 
 /** get the class names from the decorator */
 export const getMixinsFromDecorator = (mixinDecorators: ts.Decorator[], sourceFile?: ts.SourceFile) => {
   let mixinMap = new Map() as MixinDecorators;
   let mixinClassNames: string[] = [];
 
-  mixinDecorators.forEach(dec => {
+  mixinDecorators.forEach((dec) => {
     if (ts.isCallExpression(dec.expression)) {
       const mixinName = dec.expression.arguments[0].getText(sourceFile).replace(/'|"|`/g, '');
       mixinMap.set(mixinName, dec);
       mixinClassNames.push(mixinName);
     }
   });
-  return {mixinMap, mixinClassNames};
-}
+  return { mixinMap, mixinClassNames };
+};
 
 // find an import declarations from a Map via module path
 export const findImportDeclObjWithModPath = (declarationMap: Map<string, ImportDeclObj>, moduleName: string) => {
@@ -620,8 +666,8 @@ export const findImportDeclObjWithModPath = (declarationMap: Map<string, ImportD
       foundImportObjs.push(importObj);
     }
   }
-  return {classNames: classNames, importObjs: foundImportObjs};
-}
+  return { classNames: classNames, importObjs: foundImportObjs };
+};
 
 export const cloneNode = (node: any) => {
   return wsCloneNode(node, {
@@ -637,31 +683,38 @@ export const cloneNode = (node: any) => {
       );
       ts.setSourceMapRange(clonedNode, {
         source: srcMapSrc,
-        pos:  oldNode.pos,
-        end: oldNode.end
+        pos: oldNode.pos,
+        end: oldNode.end,
       });
 
       return clonedNode;
-    }
+    },
   });
-}
+};
 
-export interface ImportDeclObj {declaration: ts.ImportDeclaration, identifier: string};
+export interface ImportDeclObj {
+  declaration: ts.ImportDeclaration;
+  identifier: string;
+}
 
 export type MixinDecorators = Map<string, ts.Decorator>;
 
-export interface TSsourceFileWithModules extends ts.SourceFile { resolvedModules: Map<string, TSModule> }
+export interface TSsourceFileWithModules extends ts.SourceFile {
+  resolvedModules: Map<string, TSModule>;
+}
 
 export interface TSModule {
-  resolvedFileName: string,
-  originalPath: string | undefined,
-  extension: string,
-  isExternalLibraryImport: boolean,
-  packageId: {
-    name: string,
-    subModuleName: string,
-    version: string
-  } | undefined
+  resolvedFileName: string;
+  originalPath: string | undefined;
+  extension: string;
+  isExternalLibraryImport: boolean;
+  packageId:
+    | {
+        name: string;
+        subModuleName: string;
+        version: string;
+      }
+    | undefined;
 }
 
 export interface ConvertIdentifier {

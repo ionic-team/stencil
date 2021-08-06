@@ -1,13 +1,11 @@
 import { Component, h } from '@stencil/core';
 import { printLifecycle } from '../../global/util';
 
-
 @Component({
   tag: 'cmp-b',
-  styleUrl: 'cmp-b.css'
+  styleUrl: 'cmp-b.css',
 })
 export class CmpB {
-
   componentWillLoad() {
     printLifecycle('CmpB', 'componentWillLoad');
   }
@@ -20,7 +18,7 @@ export class CmpB {
     return (
       <div>
         <div>CmpB</div>
-        <cmp-c/>
+        <cmp-c />
       </div>
     );
   }

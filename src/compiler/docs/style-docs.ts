@@ -26,7 +26,7 @@ function parseCssComment(styleDocs: d.StyleDoc[], comment: string) {
    * @prop --max-width: Max width of the alert
    */
 
-  const lines = comment.split(/\r?\n/).map(line => {
+  const lines = comment.split(/\r?\n/).map((line) => {
     line = line.trim();
 
     while (line.startsWith('*')) {
@@ -44,7 +44,7 @@ function parseCssComment(styleDocs: d.StyleDoc[], comment: string) {
 
   const docs = comment.split(CSS_PROP_ANNOTATION);
 
-  docs.forEach(d => {
+  docs.forEach((d) => {
     const doc = d.trim();
 
     if (!doc.startsWith(`--`)) {
@@ -58,7 +58,7 @@ function parseCssComment(styleDocs: d.StyleDoc[], comment: string) {
       annotation: 'prop',
     };
 
-    if (!styleDocs.some(c => c.name === cssDoc.name && c.annotation === 'prop')) {
+    if (!styleDocs.some((c) => c.name === cssDoc.name && c.annotation === 'prop')) {
       styleDocs.push(cssDoc);
     }
   });

@@ -1,6 +1,6 @@
 import { setupDomTests } from '../util';
 
-describe('mixin-external', function() {
+describe('mixin-external', function () {
   const { setupDom, tearDownDom } = setupDomTests(document);
   let app: HTMLElement;
 
@@ -8,7 +8,6 @@ describe('mixin-external', function() {
     app = await setupDom('/mixin-external/index.html');
   });
   afterEach(tearDownDom);
-
 
   it('rerenders a mixin component from an external repo', async () => {
     if ('shadowRoot' in HTMLElement.prototype) {
@@ -37,4 +36,4 @@ describe('mixin-external', function() {
     const addedNode = mixinCmp.shadowRoot.querySelector('div');
     expect(addedNode.innerText).toBe('THIS IS A LOCAL NODE');
   }
- });
+});

@@ -5,7 +5,7 @@ import { isOutputTargetWww } from './output-utils';
 export const outputServiceWorkers = async (config: d.Config, buildCtx: d.BuildCtx) => {
   const wwwServiceOutputs = config.outputTargets
     .filter(isOutputTargetWww)
-    .filter(o => typeof o.indexHtml === 'string' && !!o.serviceWorker);
+    .filter((o) => typeof o.indexHtml === 'string' && !!o.serviceWorker);
 
   if (wwwServiceOutputs.length === 0 || config.sys.lazyRequire == null) {
     return;
@@ -20,7 +20,7 @@ export const outputServiceWorkers = async (config: d.Config, buildCtx: d.BuildCt
     const workbox: d.Workbox = config.sys.lazyRequire.require(config.rootDir, 'workbox-build');
 
     await Promise.all(
-      wwwServiceOutputs.map(outputTarget => generateServiceWorker(config, buildCtx, workbox, outputTarget)),
+      wwwServiceOutputs.map((outputTarget) => generateServiceWorker(config, buildCtx, workbox, outputTarget))
     );
   }
 };

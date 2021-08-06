@@ -1,7 +1,6 @@
 import { setupDomTests } from '../util';
 
-
-describe('slot-no-default', function() {
+describe('slot-no-default', function () {
   const { setupDom, tearDownDom } = setupDomTests(document);
   let app: HTMLElement;
 
@@ -9,7 +8,6 @@ describe('slot-no-default', function() {
     app = await setupDom('/slot-no-default/index.html');
   });
   afterEach(tearDownDom);
-
 
   it('only renders slots that havea location', async () => {
     const root = app.querySelector('slot-no-default');
@@ -29,5 +27,4 @@ describe('slot-no-default', function() {
     const footer = root.querySelector('footer');
     expect(footer.hasAttribute('hidden')).toBe(false);
   });
-
 });

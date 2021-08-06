@@ -15,7 +15,7 @@ describe('shadow-dom-mode', function () {
     const blueBg = window.getComputedStyle(blueElm).backgroundColor;
     expect(blueBg).toBe('rgb(0, 0, 255)');
 
-    return new Promise<void>(resolve => {
+    return new Promise<void>((resolve) => {
       setTimeout(() => {
         const redElm = app.querySelector('shadow-dom-mode[id="red"]');
         const redBg = window.getComputedStyle(redElm).backgroundColor;

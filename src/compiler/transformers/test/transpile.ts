@@ -7,7 +7,9 @@ import { updateModule } from '../static-to-meta/parse-static';
 import { getScriptTarget } from '../transform-utils';
 
 interface TsInputs {
-  fileName: string, code: string, sourceFile?: ts.SourceFile
+  fileName: string;
+  code: string;
+  sourceFile?: ts.SourceFile;
 }
 
 export function transpileModule(
@@ -16,7 +18,7 @@ export function transpileModule(
   compilerCtx?: d.CompilerCtx,
   sys?: d.CompilerSystem,
   beforeTransformers: ts.TransformerFactory<ts.SourceFile>[] = [],
-  afterTransformers: ts.TransformerFactory<ts.SourceFile>[] = [],
+  afterTransformers: ts.TransformerFactory<ts.SourceFile>[] = []
 ) {
   const options = ts.getDefaultCompilerOptions();
   options.isolatedModules = true;
@@ -49,13 +51,13 @@ export function transpileModule(
 
   let inputs: TsInputs[];
   if (typeof input === 'string') {
-    inputs = [{fileName: 'module.tsx', code: input}];
+    inputs = [{ fileName: 'module.tsx', code: input }];
   } else inputs = input;
 
-  inputs = inputs.map(tsInput => {
+  inputs = inputs.map((tsInput) => {
     tsInput.sourceFile = ts.createSourceFile(tsInput.fileName, tsInput.code, getScriptTarget());
     return tsInput;
-  })
+  });
 
   const emitCallback: ts.WriteFileCallback = (emitFilePath, data, _w, _e, tsSourceFiles) => {
     if (emitFilePath.endsWith('.js')) {
@@ -65,19 +67,23 @@ export function transpileModule(
   };
 
   const compilerHost: ts.CompilerHost = {
-    getSourceFile: fileName => (inputs.find(tsInput => tsInput.fileName === fileName)?.sourceFile || undefined),
+    getSourceFile: (fileName) => inputs.find((tsInput) => tsInput.fileName === fileName)?.sourceFile || undefined,
     writeFile: emitCallback,
     getDefaultLibFileName: () => 'lib.d.ts',
     useCaseSensitiveFileNames: () => false,
-    getCanonicalFileName: fileName => fileName,
+    getCanonicalFileName: (fileName) => fileName,
     getCurrentDirectory: () => '',
     getNewLine: () => '',
-    fileExists: fileName => !!inputs.find(tsInput => tsInput.fileName === fileName),
+    fileExists: (fileName) => !!inputs.find((tsInput) => tsInput.fileName === fileName),
     readFile: () => '',
     directoryExists: () => true,
     getDirectories: () => [],
   };
-  const tsProgram = ts.createProgram(inputs.map(input => input.fileName), options, compilerHost);
+  const tsProgram = ts.createProgram(
+    inputs.map((input) => input.fileName),
+    options,
+    compilerHost
+  );
   const tsTypeChecker = tsProgram.getTypeChecker();
 
   config = config || mockConfig();
@@ -98,7 +104,10 @@ export function transpileModule(
 
   tsProgram.emit(undefined, undefined, undefined, undefined, {
     before: [convertDecoratorsToStatic(config, buildCtx.diagnostics, tsTypeChecker), ...beforeTransformers],
-    after: [convertStaticToMeta(config, compilerCtx, buildCtx, tsTypeChecker, null, transformOpts), ...afterTransformers],
+    after: [
+      convertStaticToMeta(config, compilerCtx, buildCtx, tsTypeChecker, null, transformOpts),
+      ...afterTransformers,
+    ],
   });
 
   while (outputText.includes('  ')) {
@@ -106,9 +115,9 @@ export function transpileModule(
   }
 
   const mods = Array.from(compilerCtx.moduleMap.values());
-  const moduleFile: d.Module = mods[mods.length-1];
+  const moduleFile: d.Module = mods[mods.length - 1];
   const cmps = moduleFile ? moduleFile.cmps : null;
-  const cmp = Array.isArray(cmps) && cmps.length > 0 ? cmps[cmps.length-1] : null;
+  const cmp = Array.isArray(cmps) && cmps.length > 0 ? cmps[cmps.length - 1] : null;
   const tagName = cmp ? cmp.tagName : null;
   const componentClassName = cmp ? cmp.componentClassName : null;
   const properties = cmp ? cmp.properties : null;

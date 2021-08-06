@@ -24,9 +24,7 @@ export const config: Config = {
     moduleNameMapper: {
       'lodash-es': 'lodash',
     },
-    transformIgnorePatterns: [
-      "node_modules/(?!(ionic-git)/)"
-    ]
+    transformIgnorePatterns: ['node_modules/(?!(ionic-git)/)'],
   },
   outputTargets: [
     {
@@ -60,8 +58,8 @@ export const config: Config = {
     hydratedValue: '1',
   },
   env: {
-    'foo': 'bar',
-    'HOST': 'example.com'
+    foo: 'bar',
+    HOST: 'example.com',
   },
   enableCache: false,
   hashFileNames: false,

@@ -24,7 +24,8 @@ export async function internal(opts: BuildOptions) {
   // write @stencil/core/internal/package.json
   writePkgJson(opts, opts.output.internalDir, {
     name: '@stencil/core/internal',
-    description: 'Stencil internals only to be imported by the Stencil Compiler. Breaking changes can and will happen at any time.',
+    description:
+      'Stencil internals only to be imported by the Stencil Compiler. Breaking changes can and will happen at any time.',
     main: 'index.js',
     types: 'index.d.ts',
     sideEffects: false,

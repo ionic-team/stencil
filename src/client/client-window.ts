@@ -12,34 +12,27 @@ export const H = ((win as any).HTMLElement || (class {} as any)) as HTMLElement;
 export const plt: d.PlatformRuntime = {
   $flags$: 0,
   $resourcesUrl$: '',
-  jmp: h => h(),
-  raf: h => requestAnimationFrame(h),
+  jmp: (h) => h(),
+  raf: (h) => requestAnimationFrame(h),
   ael: (el, eventName, listener, opts) => el.addEventListener(eventName, listener, opts),
   rel: (el, eventName, listener, opts) => el.removeEventListener(eventName, listener, opts),
   ce: (eventName, opts) => new CustomEvent(eventName, opts),
 };
 
-export const setPlatformHelpers = (helpers: { 
+export const setPlatformHelpers = (helpers: {
   jmp?: (c: any) => any;
   raf?: (c: any) => number;
-  ael?: (
-    el: any,
-    eventName: string,
-    listener: any,
-    options: any,
-  ) => void;
-  rel?: (
-    el: any,
-    eventName: string,
-    listener: any,
-    options: any,
-  ) => void;
+  ael?: (el: any, eventName: string, listener: any, options: any) => void;
+  rel?: (el: any, eventName: string, listener: any, options: any) => void;
   ce?: (eventName: string, opts?: any) => any;
 }) => {
   Object.assign(plt, helpers);
 };
 
-export const supportsShadow = BUILD.shadowDomShim && BUILD.shadowDom ? /*@__PURE__*/ (() => (doc.head.attachShadow + '').indexOf('[native') > -1)() : true;
+export const supportsShadow =
+  BUILD.shadowDomShim && BUILD.shadowDom
+    ? /*@__PURE__*/ (() => (doc.head.attachShadow + '').indexOf('[native') > -1)()
+    : true;
 
 export const supportsListenerOptions = /*@__PURE__*/ (() => {
   let supportsListenerOptions = false;
@@ -51,7 +44,7 @@ export const supportsListenerOptions = /*@__PURE__*/ (() => {
         get() {
           supportsListenerOptions = true;
         },
-      }),
+      })
     );
   } catch (e) {}
   return supportsListenerOptions;
@@ -63,7 +56,7 @@ export const supportsConstructibleStylesheets = BUILD.constructableCSS
   ? /*@__PURE__*/ (() => {
       try {
         new CSSStyleSheet();
-        return typeof (new CSSStyleSheet()).replace === 'function';
+        return typeof new CSSStyleSheet().replace === 'function';
       } catch (e) {}
       return false;
     })()

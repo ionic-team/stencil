@@ -2,9 +2,10 @@ import { transpileModule, getStaticGetter } from './transpile';
 
 describe('parse mixins', () => {
   it('mixes in from another component class', () => {
-    const t = transpileModule([{
-      fileName: 'mixin.tsx',
-      code: `
+    const t = transpileModule([
+      {
+        fileName: 'mixin.tsx',
+        code: `
         @Component({
           tag: 'cmp-a',
           scoped: true
@@ -20,10 +21,11 @@ describe('parse mixins', () => {
           }
           privateMixinMethod() {}
         }
-      `
-    }, {
-      fileName: 'component.tsx',
-      code: `
+      `,
+      },
+      {
+        fileName: 'component.tsx',
+        code: `
         import { CmpA } from 'mixin';
         @Mixin(CmpA)
         @Component({
@@ -41,8 +43,9 @@ describe('parse mixins', () => {
           }
           privateHostMethod() {}
         }
-      `
-    }]);
+      `,
+      },
+    ]);
 
     expect(t.componentClassName).toBe('CmpB');
     expect(t.tagName).toBe('cmp-b');
@@ -68,9 +71,10 @@ describe('parse mixins', () => {
   });
 
   it('does not overwrite members on the host component from the mixin', () => {
-    const t = transpileModule([{
-      fileName: 'mixin.tsx',
-      code: `
+    const t = transpileModule([
+      {
+        fileName: 'mixin.tsx',
+        code: `
         export class CmpA {
           @Prop() hostProp: string = 'mixinProp';
           @Prop() controlProp: string = 'mixinProp';
@@ -83,10 +87,11 @@ describe('parse mixins', () => {
             return 'mixinValue';
           }
         }
-      `
-    }, {
-      fileName: 'component.tsx',
-      code: `
+      `,
+      },
+      {
+        fileName: 'component.tsx',
+        code: `
         import { CmpA } from 'mixin';
         @Mixin(CmpA)
         @Component({
@@ -104,8 +109,9 @@ describe('parse mixins', () => {
             return 'hostValue';
           }
         }
-      `
-    }]);
+      `,
+      },
+    ]);
 
     expect(t.componentClassName).toBe('CmpB');
 
@@ -117,7 +123,7 @@ describe('parse mixins', () => {
     expect(t.methods[1]).toBe(undefined);
 
     expect(t.event.name).toBe('hostEvent');
-    expect(t.event.complexType.resolved).toBe('\"hostEventReturn\"');
+    expect(t.event.complexType.resolved).toBe('"hostEventReturn"');
     expect(t.events[1]).toBe(undefined);
 
     expect(t.listeners[0].name).toBe('hostListen');
@@ -128,9 +134,10 @@ describe('parse mixins', () => {
   });
 
   it('can resolve multiple default or named exports', () => {
-    const t = transpileModule([{
-      fileName: 'mixin1.tsx',
-      code: `
+    const t = transpileModule([
+      {
+        fileName: 'mixin1.tsx',
+        code: `
         export class CmpA {
           @Prop() file1MixinPropA?: string;
         }
@@ -140,20 +147,22 @@ describe('parse mixins', () => {
         export default class CmpC {
           @Prop() willNotMixThisIn?: string;
         }
-      `
-    }, {
-      fileName: 'mixin2.tsx',
-      code: `
+      `,
+      },
+      {
+        fileName: 'mixin2.tsx',
+        code: `
         export class CmpA {
           @Prop() file2MixinPropA?: string;
         }
         export default class CmpB {
           @Prop() file2MixinPropDeafult?: string;
         }
-      `
-    }, {
-      fileName: 'component.tsx',
-      code: `
+      `,
+      },
+      {
+        fileName: 'component.tsx',
+        code: `
         import DefaultComp1, { CmpA } from 'mixin1';
         import DefaultComp2, { CmpA as CmpAFile2 } from 'mixin2';
         @Mixin(CmpA)
@@ -166,8 +175,9 @@ describe('parse mixins', () => {
         export class CmpHost {
           @Prop() hostProp?: string;
         }
-      `
-    }]);
+      `,
+      },
+    ]);
 
     expect(t.componentClassName).toBe('CmpHost');
     expect(t.tagName).toBe('cmp-host');
@@ -181,9 +191,10 @@ describe('parse mixins', () => {
   });
 
   it('merges and overwrites mixin members appropriately', () => {
-    const t = transpileModule([{
-      fileName: 'mixin1.tsx',
-      code: `
+    const t = transpileModule([
+      {
+        fileName: 'mixin1.tsx',
+        code: `
         export class CmpA {
           @Prop() overridePropA: string = 'should-get-overridden-by-b';
           @Method() overrideMethodB() {
@@ -195,20 +206,22 @@ describe('parse mixins', () => {
           @Prop() overridePropA: string = 'should-override-a';
           @Prop() overridePropC: string = 'should-get-overridden-by-host2';
         }
-      `
-    }, {
-      fileName: 'mixin2.tsx',
-      code: `
+      `,
+      },
+      {
+        fileName: 'mixin2.tsx',
+        code: `
         export class CmpC {
           @Method() overrideMethodB() {
             return true;
           }
           @Prop() overridePropC: string = 'should-get-overridden-by-host3';
         }
-      `
-    }, {
-      fileName: 'component.tsx',
-      code: `
+      `,
+      },
+      {
+        fileName: 'component.tsx',
+        code: `
         import { CmpA, CmpB } from 'mixin1';
         import { CmpC } from 'mixin2';
         @Mixin(CmpA)
@@ -220,8 +233,9 @@ describe('parse mixins', () => {
         export class CmpHost {
           @Prop() overridePropC?: string = 'should-override-c';
         }
-      `
-    }]);
+      `,
+      },
+    ]);
 
     expect(t.componentClassName).toBe('CmpHost');
     expect(t.tagName).toBe('cmp-host');
@@ -237,18 +251,20 @@ describe('parse mixins', () => {
   });
 
   it('does not include omitted class members', () => {
-    const t = transpileModule([{
-      fileName: 'mixin1.tsx',
-      code: `
+    const t = transpileModule([
+      {
+        fileName: 'mixin1.tsx',
+        code: `
         export class Mixin {
           @Prop() omittedName: string = 'I should not exist';
           @Prop() includedName: string = 'I should exist';
           @Prop() includedName2: string = 'I should exist';
         }
-      `
-    }, {
-      fileName: 'component.tsx',
-      code: `
+      `,
+      },
+      {
+        fileName: 'component.tsx',
+        code: `
         import { Mixin } from 'mixin1';
         @Mixin(Mixin)
         @Component({
@@ -256,8 +272,9 @@ describe('parse mixins', () => {
         })
         export class CmpHost {}
         export interface CmpHost extends Omit<Mixin, 'omittedName' | "omittedName2"> {}
-      `
-    }]);
+      `,
+      },
+    ]);
 
     expect(t.componentClassName).toBe('CmpHost');
     expect(t.tagName).toBe('cmp-host');
@@ -272,19 +289,21 @@ describe('parse mixins', () => {
   });
 
   it('includes picked class members only', () => {
-    const t = transpileModule([{
-      fileName: 'mixin1.tsx',
-      code: `
+    const t = transpileModule([
+      {
+        fileName: 'mixin1.tsx',
+        code: `
         export class Mixin {
           @Prop() pickedName: string = 'I should exist';
           @Prop() notPicked: string = 'I should not exist';
           @Prop() notPicked2: string = 'I should not exist';
           @Prop() pickedName2: string = 'I should exist';
         }
-      `
-    }, {
-      fileName: 'component.tsx',
-      code: `
+      `,
+      },
+      {
+        fileName: 'component.tsx',
+        code: `
         import { Mixin } from 'mixin1';
         @Mixin(Mixin)
         @Component({
@@ -292,8 +311,9 @@ describe('parse mixins', () => {
         })
         export class CmpHost {}
         export interface CmpHost extends Pick<Mixin, "pickedName" | \`pickedName2\`> {}
-      `
-    }]);
+      `,
+      },
+    ]);
 
     expect(t.componentClassName).toBe('CmpHost');
     expect(t.tagName).toBe('cmp-host');
@@ -308,48 +328,55 @@ describe('parse mixins', () => {
   });
 
   it('throws error when trying to use a mixin which uses mixins', () => {
-    const t = transpileModule([{
-      fileName: 'mixin1.tsx',
-      code: `
+    const t = transpileModule([
+      {
+        fileName: 'mixin1.tsx',
+        code: `
         export class CmpA {}
-      `
-    }, {
-      fileName: 'mixin2.tsx',
-      code: `
+      `,
+      },
+      {
+        fileName: 'mixin2.tsx',
+        code: `
         import { CmpA } from 'mixin1';
         @Mixin(CmpA)
         @Component({
           tag: 'cmp-b'
         }) export class CmpB {}
-      `
-    }, {
-      fileName: 'component.tsx',
-      code: `
+      `,
+      },
+      {
+        fileName: 'component.tsx',
+        code: `
         import { CmpB } from 'mixin2';
         @Mixin(CmpB)
         @Component({
           tag: 'cmp-host'
         })
         export class CmpHost {}
-      `
-    }]);
+      `,
+      },
+    ]);
     expect(t.diagnostics[0].level).toBe('error');
-    expect(t.diagnostics[0].messageText).toBe(`@Mixin decorator references a class (CmpB) that is itself decorated with a @Mixin (CmpA).
+    expect(t.diagnostics[0].messageText)
+      .toBe(`@Mixin decorator references a class (CmpB) that is itself decorated with a @Mixin (CmpA).
         In order to keep design and behaviour transparent, mixins cannot be nested. Consider refacoring.`);
   });
 
   it('throws warning when there are import name clashes', () => {
-    const t = transpileModule([{
-      fileName: 'mixin.tsx',
-      code: `
+    const t = transpileModule([
+      {
+        fileName: 'mixin.tsx',
+        code: `
         import { util } from 'utils';
         @Component({
           tag: 'cmp-b'
         }) export class CmpB {}
-      `
-    }, {
-      fileName: 'component.tsx',
-      code: `
+      `,
+      },
+      {
+        fileName: 'component.tsx',
+        code: `
         import { util } from 'different/utils';
         import { CmpB } from 'mixin';
         @Mixin(CmpB)
@@ -357,10 +384,12 @@ describe('parse mixins', () => {
           tag: 'cmp-host'
         })
         export class CmpHost {}
-      `
-    }]);
+      `,
+      },
+    ]);
     expect(t.diagnostics[0].level).toBe('warn');
-    expect(t.diagnostics[0].messageText).toBe(`@Mixin import uses a name already used by another import (either within the host component or another @Mixin) which can lead to unexpected results. Consider renaming.`);
+    expect(t.diagnostics[0].messageText).toBe(
+      `@Mixin import uses a name already used by another import (either within the host component or another @Mixin) which can lead to unexpected results. Consider renaming.`
+    );
   });
 });
-

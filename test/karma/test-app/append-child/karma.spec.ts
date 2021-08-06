@@ -1,7 +1,6 @@
 import { setupDomTests, waitForChanges } from '../util';
 
-
-describe('append-child', function() {
+describe('append-child', function () {
   const { setupDom, tearDownDom } = setupDomTests(document);
   let app: HTMLElement;
 
@@ -26,8 +25,9 @@ describe('append-child', function() {
     await waitForChanges();
 
     expect(app.querySelector('h1').textContent).toBe('H1 TopH1 Middle 0H1 Middle 1H1 Bottom');
-    expect(app.querySelector('article').textContent).toBe('Default TopLightDomDefault Slot 0Default Slot 1Default Bottom');
+    expect(app.querySelector('article').textContent).toBe(
+      'Default TopLightDomDefault Slot 0Default Slot 1Default Bottom'
+    );
     expect(app.querySelector('section').textContent).toBe('H6 TopH6 Middle 0H6 Middle 1H6 Bottom');
   });
-
 });

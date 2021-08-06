@@ -146,9 +146,9 @@ describe('updateElement', () => {
       $flags$: 0,
       $elm$: elm,
       $attrs$: {
-        'content': 'attributes removed',
-        'padding': false,
-        'bold': 'false',
+        content: 'attributes removed',
+        padding: false,
+        bold: 'false',
         'no-attr': null,
       },
     };
@@ -156,11 +156,11 @@ describe('updateElement', () => {
       $flags$: 0,
       $elm$: elm,
       $attrs$: {
-        'content': 'attributes added',
-        'padding': true,
-        'bold': 'true',
-        'margin': '',
-        'color': 'lime',
+        content: 'attributes added',
+        padding: true,
+        bold: 'true',
+        margin: '',
+        color: 'lime',
         'no-attr': null,
       },
     };

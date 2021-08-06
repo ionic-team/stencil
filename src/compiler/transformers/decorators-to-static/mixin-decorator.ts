@@ -1,5 +1,17 @@
 import type * as d from '../../../declarations';
-import { createStaticGetter, convertValueToLiteral, findImportDeclsWithMemberNames, getImportNamedBindings, getMixinsFromDecorator, MixinDecorators, ImportDeclObj, findImportDeclObjWithModPath, TSsourceFileWithModules, TSModule, cloneNode } from '../transform-utils';
+import {
+  createStaticGetter,
+  convertValueToLiteral,
+  findImportDeclsWithMemberNames,
+  getImportNamedBindings,
+  getMixinsFromDecorator,
+  MixinDecorators,
+  ImportDeclObj,
+  findImportDeclObjWithModPath,
+  TSsourceFileWithModules,
+  TSModule,
+  cloneNode,
+} from '../transform-utils';
 import { isDecoratorNamed } from './decorator-utils';
 import ts from 'typescript';
 import { augmentDiagnosticWithNode, buildError, buildWarn } from '@utils';
@@ -21,14 +33,14 @@ import { dirname, join } from 'path';
  * Use the classes we found during phase 1. De-dupe and merge members with host.
  */
 interface FoundMixin {
-  identifier: string, // the string used in the @Mixin
-  importDeclaration: ts.ImportDeclaration, // the matching import declaration
-  importAbsPath: string, // abs path to import
-  mixinIdentifier: string, // the class identifier used to find the mixin. Either named or default.
-  mixinClass: ts.ClassDeclaration, // the found mixinClass
-  mixinSrc: TSsourceFileWithModules, // the found mixin source file
-  mixinClassMembers: null | ts.ClassElement[] // a picked or filtered list of named class members
-};
+  identifier: string; // the string used in the @Mixin
+  importDeclaration: ts.ImportDeclaration; // the matching import declaration
+  importAbsPath: string; // abs path to import
+  mixinIdentifier: string; // the class identifier used to find the mixin. Either named or default.
+  mixinClass: ts.ClassDeclaration; // the found mixinClass
+  mixinSrc: TSsourceFileWithModules; // the found mixin source file
+  mixinClassMembers: null | ts.ClassElement[]; // a picked or filtered list of named class members
+}
 
 export type FoundMixins = Map<string, FoundMixin[]>;
 export type VisitedFiles = Map<string, ts.SourceFile>;
@@ -42,86 +54,89 @@ export const hasMixins = (
   sourceFiles: VisitedFiles,
   compilerHost: ts.CompilerHost
 ) => {
-  const classNode = sourceNode.statements.find(st => (
-    ts.isClassDeclaration(st) &&
-    st.decorators &&
-    st.decorators.find(isDecoratorNamed('Component'))
-  )) as ts.ClassDeclaration;
+  const classNode = sourceNode.statements.find(
+    (st) => ts.isClassDeclaration(st) && st.decorators && st.decorators.find(isDecoratorNamed('Component'))
+  ) as ts.ClassDeclaration;
   if (!classNode) return false;
 
   const mixinDecorators = classNode.decorators.filter(isDecoratorNamed('Mixin'));
   if (!mixinDecorators || !mixinDecorators.length) return false;
 
-  const {mixinMap, mixinClassNames} = getMixinsFromDecorator(mixinDecorators);
+  const { mixinMap, mixinClassNames } = getMixinsFromDecorator(mixinDecorators);
   if (!mixinClassNames || !mixinClassNames.length) return false;
 
   // used to setup and cache all mixin meta for efficiency.
   // e.g. we'll need to get the class members later on our second visit
-  const foundMixins = getMixinsInSources(sourceNode as TSsourceFileWithModules, sourceFiles, diagnostics, classNode, mixinMap, mixinClassNames, compilerHost);
+  const foundMixins = getMixinsInSources(
+    sourceNode as TSsourceFileWithModules,
+    sourceFiles,
+    diagnostics,
+    classNode,
+    mixinMap,
+    mixinClassNames,
+    compilerHost
+  );
   if (!foundMixins || !foundMixins.length) return false;
 
   return foundMixins;
-}
+};
 
 /**
  * Visit 1) add and merge all mixin statements with host.
  */
 export const mixinStatements = (sourceNode: ts.SourceFile, foundMixins: FoundMixin[], diagnostics: d.Diagnostic[]) => {
   const dedupeNamedStatements = (
-    baseMembers: {name: string, statement: ts.Statement}[],
-    mainMembers: {name: string, statement: ts.Statement}[],
-    toStripMembers: {name: string, statement: ts.Statement}[]
+    baseMembers: { name: string; statement: ts.Statement }[],
+    mainMembers: { name: string; statement: ts.Statement }[],
+    toStripMembers: { name: string; statement: ts.Statement }[]
   ) => {
-    const mainMemberNames = [...baseMembers, ...mainMembers].flatMap(({name}) => [name]);
-    const newMembers = toStripMembers.filter(member => !mainMemberNames.find(mn => member.name === mn));
+    const mainMemberNames = [...baseMembers, ...mainMembers].flatMap(({ name }) => [name]);
+    const newMembers = toStripMembers.filter((member) => !mainMemberNames.find((mn) => member.name === mn));
     return [...mainMembers, ...newMembers];
-  }
+  };
 
   const getNamedStatments = (source: ts.SourceFile, isHost: boolean = false) => {
-    const statements: {name: string, statement: ts.Statement}[] = [];
-    source.statements.forEach(st => {
-      if (!isHost && st.modifiers && st.modifiers.find(md => md.kind === ts.SyntaxKind.ExportKeyword)) return;
+    const statements: { name: string; statement: ts.Statement }[] = [];
+    source.statements.forEach((st) => {
+      if (!isHost && st.modifiers && st.modifiers.find((md) => md.kind === ts.SyntaxKind.ExportKeyword)) return;
 
       if (
         ts.isVariableStatement(st) &&
         ts.isVariableDeclarationList(st.declarationList) &&
         st.declarationList.declarations
       ) {
-        st.declarationList.declarations.forEach(dc => statements.push({name: dc.name.getText(), statement: st}));
-      } else if (
-        (ts.isFunctionDeclaration(st) || ts.isClassDeclaration(st)) &&
-        st.name
-      ) {
-        statements.push({name: st.name.getText(), statement: st});
+        st.declarationList.declarations.forEach((dc) => statements.push({ name: dc.name.getText(), statement: st }));
+      } else if ((ts.isFunctionDeclaration(st) || ts.isClassDeclaration(st)) && st.name) {
+        statements.push({ name: st.name.getText(), statement: st });
       }
-    })
+    });
     return statements;
-  }
+  };
   // merge impport statements
   const importStatements = collateImportDecls(sourceNode as TSsourceFileWithModules, foundMixins, diagnostics);
 
   // merge the rest (private variables and functions mainly)
   const hostStatements = getNamedStatments(sourceNode, true);
-  let allStatements: {name: string, statement: ts.Statement}[] = [];
-  foundMixins.forEach(mixinObj => {
+  let allStatements: { name: string; statement: ts.Statement }[] = [];
+  foundMixins.forEach((mixinObj) => {
     allStatements = dedupeNamedStatements(hostStatements, allStatements, getNamedStatments(mixinObj.mixinSrc));
   });
 
   return [
-    ...importStatements.map(st => cloneNode(st) ),
-    ...sourceNode.statements.filter(st => !ts.isImportDeclaration(st)),
-    ...allStatements.map(st => cloneNode(st.statement) )
+    ...importStatements.map((st) => cloneNode(st)),
+    ...sourceNode.statements.filter((st) => !ts.isImportDeclaration(st)),
+    ...allStatements.map((st) => cloneNode(st.statement)),
   ];
-}
+};
 
 /**
  * Visit 2) merge class members from all mixin sources
  */
- export const mixinClassMembers = (hostNode: ts.ClassDeclaration, mixinClasses: FoundMixins) => {
+export const mixinClassMembers = (hostNode: ts.ClassDeclaration, mixinClasses: FoundMixins) => {
   const mixinDecorators = hostNode.decorators.filter(isDecoratorNamed('Mixin'));
   if (!mixinDecorators || !mixinDecorators.length) return false;
 
-  const {mixinClassNames} = getMixinsFromDecorator(mixinDecorators);
+  const { mixinClassNames } = getMixinsFromDecorator(mixinDecorators);
   if (!mixinClassNames.length) return false;
 
   const foundMixinsClasses = mixinClasses.get(hostNode.getSourceFile().fileName);
@@ -132,7 +147,9 @@ export const mixinStatements = (sourceNode: ts.SourceFile, foundMixins: FoundMix
 
   // filter out any named members from the mixin classes that are in our host
   const mergedMembers = dedupeClassMembers(hostNode.members, classDecls);
-  mergedMembers.push(createStaticGetter('mixinFilePaths', convertValueToLiteral(foundMixinsClasses.map(cl => cl.importAbsPath))));
+  mergedMembers.push(
+    createStaticGetter('mixinFilePaths', convertValueToLiteral(foundMixinsClasses.map((cl) => cl.importAbsPath)))
+  );
 
   return ts.factory.createNodeArray(mergedMembers);
 };
@@ -150,18 +167,20 @@ export const getMixinsInSources = (
   const foundMixins: FoundMixin[] = [];
 
   if (importDeclMap.size !== decoratorMap.size) {
-    const notFound = decoratorNames.filter(incl => !importDeclMap.get(incl));
+    const notFound = decoratorNames.filter((incl) => !importDeclMap.get(incl));
 
     if (notFound.length) {
       const warn = buildWarn(diagnostics);
-      warn.messageText = `@Mixin decorator/s have class references to ${notFound.join(', ')} that cannot be found within imported declarations. Are you sure you imported them?`;
+      warn.messageText = `@Mixin decorator/s have class references to ${notFound.join(
+        ', '
+      )} that cannot be found within imported declarations. Are you sure you imported them?`;
       augmentDiagnosticWithNode(warn, decoratorMap.get(notFound[0]));
     }
   }
 
   // read & fetch the SourceFiles for all mixin classes via imported modules
   for (const [modName, mod] of source.resolvedModules.entries()) {
-    const {classNames, importObjs} = findImportDeclObjWithModPath(importDeclMap, modName);
+    const { classNames, importObjs } = findImportDeclObjWithModPath(importDeclMap, modName);
     if (!classNames.length) continue;
 
     classNames.forEach((className, i) => {
@@ -172,7 +191,11 @@ export const getMixinsInSources = (
         return;
       }
 
-      const {foundClass, sourceFile} = findMixedInClassInImport(mod.resolvedFileName, compilerHost || sourceFiles, importObjs[i]);
+      const { foundClass, sourceFile } = findMixedInClassInImport(
+        mod.resolvedFileName,
+        compilerHost || sourceFiles,
+        importObjs[i]
+      );
 
       if (!foundClass) {
         const warn = buildWarn(diagnostics);
@@ -183,7 +206,7 @@ export const getMixinsInSources = (
 
       const mixinMixin = foundClass.decorators?.filter(isDecoratorNamed('Mixin', sourceFile));
       if (mixinMixin && mixinMixin.length) {
-        const {mixinClassNames} = getMixinsFromDecorator(mixinMixin)
+        const { mixinClassNames } = getMixinsFromDecorator(mixinMixin);
         const error = buildError(diagnostics);
         error.messageText = `@Mixin decorator references a class (${className}) that is itself decorated with a @Mixin (${mixinClassNames[0]}).
         In order to keep design and behaviour transparent, mixins cannot be nested. Consider refacoring.`;
@@ -198,12 +221,12 @@ export const getMixinsInSources = (
         mixinIdentifier: importObjs[i].identifier,
         mixinClass: foundClass,
         mixinSrc: sourceFile as TSsourceFileWithModules,
-        mixinClassMembers: filterClassMemebers(source, sourceClassNode, className, foundClass)
+        mixinClassMembers: filterClassMemebers(source, sourceClassNode, className, foundClass),
       });
-    })
+    });
   }
   return foundMixins;
-}
+};
 
 const filterClassMemebers = (
   sourceNode: ts.SourceFile,
@@ -212,15 +235,12 @@ const filterClassMemebers = (
   mixinClassNode: ts.ClassDeclaration
 ) => {
   let toReturn: null | ts.ClassElement[] = null;
-  sourceNode.statements.forEach(st => {
-    if (
-      !ts.isInterfaceDeclaration(st) ||
-      st.name.getText() !== sourceClassNode.name.getText() ||
-      !st.heritageClauses
-    ) return;
+  sourceNode.statements.forEach((st) => {
+    if (!ts.isInterfaceDeclaration(st) || st.name.getText() !== sourceClassNode.name.getText() || !st.heritageClauses)
+      return;
 
-    st.heritageClauses.forEach(hc => {
-      hc.types.forEach(hct => {
+    st.heritageClauses.forEach((hc) => {
+      hc.types.forEach((hct) => {
         if (
           ts.isExpressionWithTypeArguments(hct) &&
           hct.expression.getText().match(/^(Pick|Omit)$/) &&
@@ -236,34 +256,36 @@ const filterClassMemebers = (
           if (ts.isLiteralTypeNode(filterMembers)) {
             filteredMemberNames.push((<ts.StringLiteral>filterMembers.literal).text);
           } else if (ts.isUnionTypeNode(filterMembers)) {
-            filteredMemberNames = filterMembers.types.flatMap(type => ts.isLiteralTypeNode(type) ? (<ts.StringLiteral>type.literal).text : [])
+            filteredMemberNames = filterMembers.types.flatMap((type) =>
+              ts.isLiteralTypeNode(type) ? (<ts.StringLiteral>type.literal).text : []
+            );
           }
 
           if (hct.expression.getText() === 'Omit') {
-            toReturn = mixinClassNode.members.filter(mb => (
-              !mb.name || !filteredMemberNames.includes(mb.name.getText())
-            ));
+            toReturn = mixinClassNode.members.filter(
+              (mb) => !mb.name || !filteredMemberNames.includes(mb.name.getText())
+            );
           } else if (hct.expression.getText() === 'Pick') {
-            toReturn = mixinClassNode.members.filter(mb => (
-              mb.name && filteredMemberNames.includes(mb.name.getText())
-            ));
+            toReturn = mixinClassNode.members.filter(
+              (mb) => mb.name && filteredMemberNames.includes(mb.name.getText())
+            );
           }
         }
-      })
-    })
-  })
+      });
+    });
+  });
   return toReturn;
-}
+};
 
 const setUniqueImportNames = (modId: string, importNames: string[], hostImportNames: Map<string, string[]>) => {
   const foundHostImport = hostImportNames.get(modId);
   if (foundHostImport) {
     foundHostImport.push(...importNames);
   } else {
-    hostImportNames.set(modId, importNames)
+    hostImportNames.set(modId, importNames);
   }
-  return hostImportNames
-}
+  return hostImportNames;
+};
 
 const collateImportDecls = (
   hostSource: TSsourceFileWithModules,
@@ -274,29 +296,27 @@ const collateImportDecls = (
   let hostImportNames: Map<string, string[]> = new Map();
 
   for (const [modName, mod] of hostSource.resolvedModules.entries()) {
-    const decl = hostSource.statements.find(st => (
-        ts.isImportDeclaration(st) &&
-        (<ts.StringLiteral>st.moduleSpecifier).text === modName
-      )
+    const decl = hostSource.statements.find(
+      (st) => ts.isImportDeclaration(st) && (<ts.StringLiteral>st.moduleSpecifier).text === modName
     ) as ts.ImportDeclaration;
     if (!decl) continue;
 
     // strip out mixin imports
-    if (mod && foundMixins.find(mx => mx.importAbsPath === mod.resolvedFileName)) continue;
+    if (mod && foundMixins.find((mx) => mx.importAbsPath === mod.resolvedFileName)) continue;
     // host imports
     if (hostSource === hostSource) {
       const hostNameBindings = getImportNamedBindings(decl);
 
       if (hostNameBindings && hostNameBindings.length) {
         hostImportNames = setUniqueImportNames(
-          !modName.match(/^(\/|\.|\\)/) ? modName : (mod ? mod.resolvedFileName : modName),
-          hostNameBindings.map(nb => nb.name.text),
+          !modName.match(/^(\/|\.|\\)/) ? modName : mod ? mod.resolvedFileName : modName,
+          hostNameBindings.map((nb) => nb.name.text),
           hostImportNames
         );
         // hostImportNames.push(...hostNameBindings.map(nb => nb.name.text));
       } else if (decl.importClause.name) {
         hostImportNames = setUniqueImportNames(
-          !modName.match(/^(\/|\.|\\)/) ? modName : (mod ? mod.resolvedFileName : modName),
+          !modName.match(/^(\/|\.|\\)/) ? modName : mod ? mod.resolvedFileName : modName,
           [decl.importClause.name.text],
           hostImportNames
         );
@@ -306,19 +326,18 @@ const collateImportDecls = (
   }
 
   // mixin imports. Update all names to be unique to remove clashes
-  foundMixins.forEach(mx => {
+  foundMixins.forEach((mx) => {
     if (!mx.mixinSrc.resolvedModules) return;
     for (const [modName, mod] of mx.mixinSrc.resolvedModules.entries()) {
-      const decl = mx.mixinSrc.statements.find(st => (
-        ts.isImportDeclaration(st) &&
-        (<ts.StringLiteral>st.moduleSpecifier).text === modName)
+      const decl = mx.mixinSrc.statements.find(
+        (st) => ts.isImportDeclaration(st) && (<ts.StringLiteral>st.moduleSpecifier).text === modName
       ) as ts.ImportDeclaration;
       if (!decl) continue;
 
       const updatedMixin = updateMixinImportDecl(
         (<ts.StringLiteral>mx.importDeclaration.moduleSpecifier).text,
         decl,
-        {mod, modName},
+        { mod, modName },
         hostImportNames,
         diagnostics
       );
@@ -327,16 +346,16 @@ const collateImportDecls = (
         imports.push(updatedMixin.mxImport);
       }
     }
-  })
+  });
 
   return imports;
-}
+};
 
 let counter = 0;
 const updateMixinImportDecl = (
   srcFile: string,
   decl: ts.ImportDeclaration,
-  module: {mod: TSModule, modName: string},
+  module: { mod: TSModule; modName: string },
   hostImportNames: Map<string, string[]>,
   diagnostics: d.Diagnostic[]
 ) => {
@@ -346,7 +365,8 @@ const updateMixinImportDecl = (
   let modId: string;
 
   if (!module.modName.match(/^(\/|\.|\\)/)) modId = module.modName;
-  else if (module.modName.startsWith('.') && !srcFile.match(/^(\/|\.|\\)/)) modId = join(dirname(srcFile), module.modName).replace(/^(\.\/)/, '');
+  else if (module.modName.startsWith('.') && !srcFile.match(/^(\/|\.|\\)/))
+    modId = join(dirname(srcFile), module.modName).replace(/^(\.\/)/, '');
   else if (module.mod && module.mod.resolvedFileName) modId = module.mod.resolvedFileName;
 
   // if module can't be resolved & it's relative, it's best to not include it ¯\_(ツ)_/¯
@@ -356,7 +376,7 @@ const updateMixinImportDecl = (
   const createUniqueImportName = (importName: string, decl: ts.ImportDeclaration) => {
     let foundName: boolean;
     for (let [modKey, importNames] of hostImportNames.entries()) {
-      foundName = !!importNames.find(hin => hin === importName);
+      foundName = !!importNames.find((hin) => hin === importName);
 
       if (foundName && modKey !== modId) {
         const warn = buildWarn(diagnostics);
@@ -366,10 +386,8 @@ const updateMixinImportDecl = (
       if (foundName) break;
     }
     if (!foundName) hostImportNames = setUniqueImportNames(modId, [importName], hostImportNames);
-    return ts.factory.createUniqueName(
-      foundName ? importName + '_' + counter : importName
-    );
-  }
+    return ts.factory.createUniqueName(foundName ? importName + '_' + counter : importName);
+  };
 
   const updatedDecl = ts.factory.updateImportDeclaration(
     decl,
@@ -378,31 +396,28 @@ const updateMixinImportDecl = (
     ts.factory.updateImportClause(
       decl.importClause,
       false,
-      (decl.importClause.name ? createUniqueImportName(decl.importClause.name.text, decl) : undefined),
-      (
-        decl.importClause.namedBindings &&
-        ts.isNamedImports(decl.importClause.namedBindings) ?
-        ts.factory.updateNamedImports(
-          decl.importClause.namedBindings,
-          decl.importClause.namedBindings.elements.flatMap(bnd => {
-            return ts.factory.updateImportSpecifier(
-              bnd,
-              bnd.propertyName ? bnd.propertyName : bnd.name,
-              createUniqueImportName(bnd.name.text, decl)
-            )
-        })
-      ) : undefined)
+      decl.importClause.name ? createUniqueImportName(decl.importClause.name.text, decl) : undefined,
+      decl.importClause.namedBindings && ts.isNamedImports(decl.importClause.namedBindings)
+        ? ts.factory.updateNamedImports(
+            decl.importClause.namedBindings,
+            decl.importClause.namedBindings.elements.flatMap((bnd) => {
+              return ts.factory.updateImportSpecifier(
+                bnd,
+                bnd.propertyName ? bnd.propertyName : bnd.name,
+                createUniqueImportName(bnd.name.text, decl)
+              );
+            })
+          )
+        : undefined
     ),
     ts.factory.createStringLiteral(modId)
-  )
-
-
+  );
 
   return {
     mxImport: updatedDecl,
-    importNames: hostImportNames
-  }
-}
+    importNames: hostImportNames,
+  };
+};
 
 /* find and return sourceFile using imported module filename.
  * getting a sourceFile that's within the tsProgram allows typeChecker references to be maintained. */
@@ -413,14 +428,14 @@ const findMixedInClassInImport = (
 ) => {
   // attempts to get the class via name or default
   const getClassByName = (sourceFile: ts.SourceFile, toFind: string) => {
-    return (sourceFile as ts.SourceFile).statements.find(st => (
-      ts.isClassDeclaration(st) &&
-      (toFind === 'default'
-        ? ( st.modifiers && st.modifiers.find(mod => mod.kind === ts.SyntaxKind.DefaultKeyword))
-        : (st.name && toFind === st.name.getText(sourceFile))
-      )
-    )) as ts.ClassDeclaration
-  }
+    return (sourceFile as ts.SourceFile).statements.find(
+      (st) =>
+        ts.isClassDeclaration(st) &&
+        (toFind === 'default'
+          ? st.modifiers && st.modifiers.find((mod) => mod.kind === ts.SyntaxKind.DefaultKeyword)
+          : st.name && toFind === st.name.getText(sourceFile))
+    ) as ts.ClassDeclaration;
+  };
 
   let sourceFile: ts.SourceFile;
 
@@ -441,39 +456,44 @@ const findMixedInClassInImport = (
 
     if (!foundClass && toFind === 'default') {
       // attmpt to find class using export expression
-      let toFindClass = (sourceFile).statements.find(st => (
-        ts.isExportAssignment(st) &&
-        st.modifiers &&
-        st.modifiers.find(mod => mod.kind === ts.SyntaxKind.DefaultKeyword)
-      )) as ts.ExportAssignment;
+      let toFindClass = sourceFile.statements.find(
+        (st) =>
+          ts.isExportAssignment(st) &&
+          st.modifiers &&
+          st.modifiers.find((mod) => mod.kind === ts.SyntaxKind.DefaultKeyword)
+      ) as ts.ExportAssignment;
 
       if (toFindClass) {
         foundClass = getClassByName(sourceFile, toFindClass.expression.getText(sourceFile));
       }
     }
-    return {foundClass, sourceFile};
+    return { foundClass, sourceFile };
   }
-  return {foundClass: undefined, sourceFile: undefined};
-}
+  return { foundClass: undefined, sourceFile: undefined };
+};
 
 const collateMixinClassesMembers = (decoratorNames: string[], mixinClasses: FoundMixin[]) => {
   // sort map into the order of added declarations
   let deDupedMembers: ts.ClassElement[] = [];
-  decoratorNames.reverse().forEach(
-    dec => {
-      const foundClass = mixinClasses.find(mixin => mixin.identifier === dec);
-      if (foundClass) deDupedMembers = dedupeClassMembers(deDupedMembers, (foundClass.mixinClassMembers || foundClass.mixinClass.members));
-    }
-  );
+  decoratorNames.reverse().forEach((dec) => {
+    const foundClass = mixinClasses.find((mixin) => mixin.identifier === dec);
+    if (foundClass)
+      deDupedMembers = dedupeClassMembers(
+        deDupedMembers,
+        foundClass.mixinClassMembers || foundClass.mixinClass.members
+      );
+  });
   return deDupedMembers;
-}
+};
 
 /** filter out any named members from toStrip class members that are in the main */
 const dedupeClassMembers = (
   mainMembers: ts.ClassElement[] | ts.NodeArray<ts.ClassElement>,
   toStripMembers: ts.ClassElement[] | ts.NodeArray<ts.ClassElement>
 ) => {
-  const mainMemberNames = mainMembers.flatMap(({name}) => !name || !ts.isIdentifier(name) ? [] : [name.getText()]);
-  const newMembers = toStripMembers.filter(member => !mainMemberNames.find(hmn => !member.name || member.name.getText() === hmn));
+  const mainMemberNames = mainMembers.flatMap(({ name }) => (!name || !ts.isIdentifier(name) ? [] : [name.getText()]));
+  const newMembers = toStripMembers.filter(
+    (member) => !mainMemberNames.find((hmn) => !member.name || member.name.getText() === hmn)
+  );
   return [...mainMembers, ...newMembers];
-}
+};

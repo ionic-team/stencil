@@ -14,7 +14,8 @@ export const isValidVersion = (input: string) => Boolean(semver.valid(input));
 
 export const isValidVersionInput = (input: string) => SEMVER_INCREMENTS.indexOf(input) !== -1 || isValidVersion(input);
 
-export const isPrereleaseVersion = (version: string) => PRERELEASE_VERSIONS.indexOf(version) !== -1 || Boolean(semver.prerelease(version));
+export const isPrereleaseVersion = (version: string) =>
+  PRERELEASE_VERSIONS.indexOf(version) !== -1 || Boolean(semver.prerelease(version));
 
 export function getNewVersion(oldVersion: string, input: any): string {
   if (!isValidVersionInput(input)) {

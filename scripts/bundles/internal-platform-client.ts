@@ -24,7 +24,8 @@ export async function internalClient(opts: BuildOptions) {
   // write @stencil/core/internal/client/package.json
   writePkgJson(opts, outputInternalClientDir, {
     name: '@stencil/core/internal/client',
-    description: 'Stencil internal client platform to be imported by the Stencil Compiler and internal runtime. Breaking changes can and will happen at any time.',
+    description:
+      'Stencil internal client platform to be imported by the Stencil Compiler and internal runtime. Breaking changes can and will happen at any time.',
     main: 'index.js',
     sideEffects: false,
   });
@@ -98,7 +99,7 @@ export async function internalClient(opts: BuildOptions) {
           if (id === './polyfills/css-shim.js') {
             const rollupBuild = await rollup({
               input: join(inputClientDir, 'polyfills', 'css-shim', 'index.js'),
-              onwarn: message => {
+              onwarn: (message) => {
                 if (/top level of an ES module/.test(message as any)) return;
                 console.error(message);
               },
@@ -165,10 +166,10 @@ async function copyPolyfills(opts: BuildOptions, outputInternalClientPolyfillsDi
   const srcPolyfillFiles = glob.sync('*.js', { cwd: srcPolyfillsDir });
 
   await Promise.all(
-    srcPolyfillFiles.map(async fileName => {
+    srcPolyfillFiles.map(async (fileName) => {
       const src = join(srcPolyfillsDir, fileName);
       const dest = join(outputInternalClientPolyfillsDir, fileName);
       await fs.copyFile(src, dest);
-    }),
+    })
   );
 }

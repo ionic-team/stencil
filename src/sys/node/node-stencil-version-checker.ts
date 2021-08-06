@@ -18,7 +18,7 @@ export async function checkVersion(logger: Logger, currentVersion: string): Prom
           printUpdateMessage(logger, currentVersion, latestVersion);
         } else {
           console.debug(
-            `${logger.cyan('@stencil/core')} version ${logger.green(currentVersion)} is the latest version`,
+            `${logger.cyan('@stencil/core')} version ${logger.green(currentVersion)} is the latest version`
           );
         }
       };
@@ -65,7 +65,7 @@ async function requestUrl(url: string) {
   const https = await import('https');
 
   return new Promise<string>((resolve, reject) => {
-    const req = https.request(url, res => {
+    const req = https.request(url, (res) => {
       if (res.statusCode > 299) {
         reject(`url: ${url}, staus: ${res.statusCode}`);
         return;
@@ -78,7 +78,7 @@ async function requestUrl(url: string) {
         resolve(ret.join(''));
       });
 
-      res.on('data', data => {
+      res.on('data', (data) => {
         ret.push(data);
       });
     });
@@ -92,7 +92,7 @@ function requiresCheck(now: number, lastCheck: number, checkInterval: number) {
 }
 
 function getLastCheck() {
-  return new Promise<number>(resolve => {
+  return new Promise<number>((resolve) => {
     fs.readFile(getLastCheckStoragePath(), 'utf8', (err, data) => {
       if (!err && isString(data)) {
         try {
@@ -105,7 +105,7 @@ function getLastCheck() {
 }
 
 function setLastCheck() {
-  return new Promise<void>(resolve => {
+  return new Promise<void>((resolve) => {
     const now = JSON.stringify(Date.now());
     fs.writeFile(getLastCheckStoragePath(), now, () => {
       resolve();
@@ -137,7 +137,7 @@ function printUpdateMessage(logger: Logger, currentVersion: string, latestVersio
   top += BOX_TOP_RIGHT;
   o.push(top);
 
-  msg.forEach(m => {
+  msg.forEach((m) => {
     let line = BOX_VERTICAL;
     for (let i = 0; i < PADDING; i++) {
       line += ` `;

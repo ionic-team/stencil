@@ -7,14 +7,14 @@ export const generateCustomElementsBundleTypes = async (
   config: d.Config,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
-  distDtsFilePath: string,
+  distDtsFilePath: string
 ) => {
   const outputTargets = config.outputTargets.filter(isOutputTargetDistCustomElementsBundle);
 
   await Promise.all(
-    outputTargets.map(outputTarget =>
-      generateCustomElementsTypesOutput(config, compilerCtx, buildCtx, distDtsFilePath, outputTarget),
-    ),
+    outputTargets.map((outputTarget) =>
+      generateCustomElementsTypesOutput(config, compilerCtx, buildCtx, distDtsFilePath, outputTarget)
+    )
   );
 };
 
@@ -23,12 +23,12 @@ const generateCustomElementsTypesOutput = async (
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   distDtsFilePath: string,
-  outputTarget: d.OutputTargetDistCustomElementsBundle,
+  outputTarget: d.OutputTargetDistCustomElementsBundle
 ) => {
   const customElementsDtsPath = join(outputTarget.dir, 'index.d.ts');
   const componentsDtsRelPath = relDts(outputTarget.dir, distDtsFilePath);
 
-  const components = buildCtx.components.filter(m => !m.isCollectionDependency);
+  const components = buildCtx.components.filter((m) => !m.isCollectionDependency);
 
   const code = [
     `/* ${config.namespace} custom elements bundle */`,

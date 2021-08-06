@@ -6,7 +6,12 @@ import { getCurrentDirectory, IS_CASE_SENSITIVE_FILE_NAMES, IS_WEB_WORKER_ENV } 
 import { patchTypeScriptResolveModule } from './typescript-resolve-module';
 import ts from 'typescript';
 
-export const patchTsSystemFileSystem = (config: d.Config, stencilSys: d.CompilerSystem, inMemoryFs: d.InMemoryFileSystem, tsSys: ts.System) => {
+export const patchTsSystemFileSystem = (
+  config: d.Config,
+  stencilSys: d.CompilerSystem,
+  inMemoryFs: d.InMemoryFileSystem,
+  tsSys: ts.System
+) => {
   const realpath = (path: string) => {
     const rp = stencilSys.realpathSync(path);
     if (isString(rp)) {
@@ -42,18 +47,18 @@ export const patchTsSystemFileSystem = (config: d.Config, stencilSys: d.Compiler
     }
   };
 
-  tsSys.createDirectory = p => {
+  tsSys.createDirectory = (p) => {
     stencilSys.createDirSync(p, { recursive: true });
   };
 
-  tsSys.directoryExists = p => {
+  tsSys.directoryExists = (p) => {
     const s = inMemoryFs.statSync(p);
     return s.isDirectory;
   };
 
   tsSys.exit = stencilSys.exit;
 
-  tsSys.fileExists = p => {
+  tsSys.fileExists = (p) => {
     let filePath = p;
 
     if (isRemoteUrl(p)) {
@@ -68,9 +73,9 @@ export const patchTsSystemFileSystem = (config: d.Config, stencilSys: d.Compiler
 
   tsSys.getExecutingFilePath = stencilSys.getCompilerExecutingPath;
 
-  tsSys.getDirectories = p => {
+  tsSys.getDirectories = (p) => {
     const items = stencilSys.readDirSync(p);
-    return items.filter(itemPath => {
+    return items.filter((itemPath) => {
       const s = inMemoryFs.statSync(itemPath);
       return !!(s && s.exists && s.isDirectory);
     });
@@ -78,10 +83,20 @@ export const patchTsSystemFileSystem = (config: d.Config, stencilSys: d.Compiler
 
   tsSys.readDirectory = (path, extensions, exclude, include, depth) => {
     const cwd = stencilSys.getCurrentDirectory();
-    return (ts as any).matchFiles(path, extensions, exclude, include, IS_CASE_SENSITIVE_FILE_NAMES, cwd, depth, getAccessibleFileSystemEntries, realpath);
+    return (ts as any).matchFiles(
+      path,
+      extensions,
+      exclude,
+      include,
+      IS_CASE_SENSITIVE_FILE_NAMES,
+      cwd,
+      depth,
+      getAccessibleFileSystemEntries,
+      realpath
+    );
   };
 
-  tsSys.readFile = p => {
+  tsSys.readFile = (p) => {
     let filePath = p;
     const isUrl = isRemoteUrl(p);
 
@@ -114,10 +129,10 @@ const patchTsSystemWatch = (stencilSys: d.CompilerSystem, tsSys: ts.System) => {
   tsSys.watchDirectory = (p, cb, recursive) => {
     const watcher = stencilSys.watchDirectory(
       p,
-      filePath => {
+      (filePath) => {
         cb(filePath);
       },
-      recursive,
+      recursive
     );
     return {
       close() {
@@ -187,7 +202,11 @@ export const getTypescriptPathFromUrl = (config: d.Config, tsExecutingUrl: strin
   const tsBaseUrl = new URL('..', tsExecutingUrl).href;
   if (url.startsWith(tsBaseUrl)) {
     const tsFilePath = url.replace(tsBaseUrl, '/');
-    const tsNodePath = config.sys.getLocalModulePath({ rootDir: config.rootDir, moduleId: '@stencil/core', path: tsFilePath });
+    const tsNodePath = config.sys.getLocalModulePath({
+      rootDir: config.rootDir,
+      moduleId: '@stencil/core',
+      path: tsFilePath,
+    });
     return normalizePath(tsNodePath);
   }
   return url;
@@ -200,7 +219,7 @@ export const patchTypeScriptGetParsedCommandLineOfConfigFile = () => {
     const results = orgGetParsedCommandLineOfConfigFile(configFileName, optionsToExtend, host, extendedConfigCache);
 
     // manually filter out any .spec or .e2e files
-    results.fileNames = results.fileNames.filter(f => {
+    results.fileNames = results.fileNames.filter((f) => {
       // filter e2e tests
       if (f.includes('.e2e.') || f.includes('/e2e.')) {
         return false;

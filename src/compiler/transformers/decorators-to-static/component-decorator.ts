@@ -11,7 +11,7 @@ export const componentDecoratorToStatic = (
   diagnostics: d.Diagnostic[],
   cmpNode: ts.ClassDeclaration,
   newMembers: ts.ClassElement[],
-  componentDecorator: ts.Decorator,
+  componentDecorator: ts.Decorator
 ) => {
   const [componentOptions] = getDeclarationParameters<d.ComponentOptions>(componentDecorator);
   if (!componentOptions) {
@@ -58,9 +58,10 @@ const validateComponent = (
   typeChecker: ts.TypeChecker,
   componentOptions: d.ComponentOptions,
   cmpNode: ts.ClassDeclaration,
-  componentDecorator: ts.Node,
+  componentDecorator: ts.Node
 ) => {
-  const extendNode = cmpNode.heritageClauses && cmpNode.heritageClauses.find(c => c.token === ts.SyntaxKind.ExtendsKeyword);
+  const extendNode =
+    cmpNode.heritageClauses && cmpNode.heritageClauses.find((c) => c.token === ts.SyntaxKind.ExtendsKeyword);
   if (extendNode) {
     const err = buildError(diagnostics);
     err.messageText = `Classes decorated with @Component can not extend from a base class.
@@ -87,7 +88,8 @@ const validateComponent = (
 
   // check if class has more than one decorator
   const mixinDecs = cmpNode.decorators && cmpNode.decorators.filter(isDecoratorNamed('Mixin'));
-  const otherDecorator = cmpNode.decorators && cmpNode.decorators.filter(d => (d !== componentDecorator && !mixinDecs.includes(d)));
+  const otherDecorator =
+    cmpNode.decorators && cmpNode.decorators.filter((d) => d !== componentDecorator && !mixinDecs.includes(d));
   if (otherDecorator.length) {
     const err = buildError(diagnostics);
     err.messageText = `Classes decorated with @Component can not be decorated with more decorators.
@@ -115,10 +117,10 @@ const validateComponent = (
   if (!config._isTesting) {
     const nonTypeExports = typeChecker
       .getExportsOfModule(typeChecker.getSymbolAtLocation(cmpNode.getSourceFile()))
-      .filter(symbol => (symbol.flags & (ts.SymbolFlags.Interface | ts.SymbolFlags.TypeAlias)) === 0)
-      .filter(symbol => symbol.name !== cmpNode.name.text);
+      .filter((symbol) => (symbol.flags & (ts.SymbolFlags.Interface | ts.SymbolFlags.TypeAlias)) === 0)
+      .filter((symbol) => symbol.name !== cmpNode.name.text);
 
-    nonTypeExports.forEach(symbol => {
+    nonTypeExports.forEach((symbol) => {
       const err = buildError(diagnostics);
       err.messageText = `To allow efficient bundling, modules using @Component() can only have a single export which is the component class itself.
       Any other exports should be moved to a separate file.
@@ -138,7 +140,7 @@ const findTagNode = (propName: string, node: ts.Node) => {
   if (ts.isDecorator(node) && ts.isCallExpression(node.expression)) {
     const arg = node.expression.arguments[0];
     if (ts.isObjectLiteralExpression(arg)) {
-      arg.properties.forEach(p => {
+      arg.properties.forEach((p) => {
         if (ts.isPropertyAssignment(p)) {
           if (p.name.getText() === propName) {
             node = p.initializer;

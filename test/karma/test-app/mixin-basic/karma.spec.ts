@@ -1,6 +1,6 @@
 import { setupDomTests, waitForChanges } from '../util';
 
-describe('mixin-basic', function() {
+describe('mixin-basic', function () {
   const { setupDom, tearDownDom } = setupDomTests(document);
   let app: HTMLElement;
 
@@ -12,8 +12,12 @@ describe('mixin-basic', function() {
   it('rerenders a mixin component', async () => {
     const mixinCmp = app.querySelector('mixin-basic');
     expect(mixinCmp.querySelector('h1').textContent).toBe(`I'm a jsx node from a mixed in component`);
-    expect(mixinCmp.querySelector('.privateMethodBasic').textContent).toBe(`I'm a private prop from basic class ssalc cisab morf porp etavirp a m'I1`);
-    expect(mixinCmp.querySelector('.privateMethodComponent').textContent).toBe(`I'm a private prop from component tnenopmoc morf porp etavirp a m'I2`);
+    expect(mixinCmp.querySelector('.privateMethodBasic').textContent).toBe(
+      `I'm a private prop from basic class ssalc cisab morf porp etavirp a m'I1`
+    );
+    expect(mixinCmp.querySelector('.privateMethodComponent').textContent).toBe(
+      `I'm a private prop from component tnenopmoc morf porp etavirp a m'I2`
+    );
     expect(mixinCmp.querySelector('.stateBasic').textContent).toBe(`I'm a state from a basic class`);
     expect(mixinCmp.querySelector('.stateComponent').textContent).toBe(`I'm a state from a component`);
     expect(mixinCmp.propFromComponent).toBe(`I'm a prop from a component`);

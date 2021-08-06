@@ -19,7 +19,7 @@ export class NodeWorkerMain extends EventEmitter {
   }
 
   fork(forkModulePath: string) {
-    const filteredArgs = process.execArgv.filter(v => !/^--(debug|inspect)/.test(v));
+    const filteredArgs = process.execArgv.filter((v) => !/^--(debug|inspect)/.test(v));
 
     const options: cp.ForkOptions = {
       execArgv: filteredArgs,
@@ -31,22 +31,22 @@ export class NodeWorkerMain extends EventEmitter {
     this.childProcess = cp.fork(forkModulePath, [], options);
 
     this.childProcess.stdout.setEncoding('utf8');
-    this.childProcess.stdout.on('data', data => {
+    this.childProcess.stdout.on('data', (data) => {
       console.log(data);
     });
 
     this.childProcess.stderr.setEncoding('utf8');
-    this.childProcess.stderr.on('data', data => {
+    this.childProcess.stderr.on('data', (data) => {
       console.log(data);
     });
 
     this.childProcess.on('message', this.receiveFromWorker.bind(this));
 
-    this.childProcess.on('error', err => {
+    this.childProcess.on('error', (err) => {
       this.emit('error', err);
     });
 
-    this.childProcess.once('exit', code => {
+    this.childProcess.once('exit', (code) => {
       this.exitCode = code;
       this.emit('exit', code);
     });
@@ -68,7 +68,7 @@ export class NodeWorkerMain extends EventEmitter {
       return;
     }
 
-    const success = this.childProcess.send(msg, error => {
+    const success = this.childProcess.send(msg, (error) => {
       if (error && error instanceof Error) {
         return;
       }
@@ -78,7 +78,7 @@ export class NodeWorkerMain extends EventEmitter {
       if (this.sendQueue.length > 0) {
         const queueCopy = this.sendQueue.slice();
         this.sendQueue = [];
-        queueCopy.forEach(d => this.sendToWorker(d));
+        queueCopy.forEach((d) => this.sendToWorker(d));
       }
     });
 
@@ -116,7 +116,7 @@ export class NodeWorkerMain extends EventEmitter {
   stop() {
     this.stopped = true;
 
-    this.tasks.forEach(t => t.reject(TASK_CANCELED_MSG));
+    this.tasks.forEach((t) => t.reject(TASK_CANCELED_MSG));
     this.tasks.clear();
 
     if (this.successfulMessage) {

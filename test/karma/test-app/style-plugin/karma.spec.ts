@@ -1,6 +1,6 @@
 import { setupDomTests } from '../util';
 
-describe('style-plugin', function() {
+describe('style-plugin', function () {
   const { setupDom, tearDownDom } = setupDomTests(document);
   let app: HTMLElement;
 
