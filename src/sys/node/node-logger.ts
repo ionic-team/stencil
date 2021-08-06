@@ -61,7 +61,7 @@ export const createNodeLogger = (c: { process: any }) => {
     const update = (text: string) => {
       text = text.substr(0, prcs.stdout.columns - 5) + '\x1b[0m';
       return (promise = promise.then(() => {
-        return new Promise<any>(resolve => {
+        return new Promise<any>((resolve) => {
           readline.clearLine(prcs.stdout, 0);
           readline.cursorTo(prcs.stdout, 0, null);
           prcs.stdout.write(text, resolve);

@@ -10,9 +10,7 @@ describe('slot-scoped-list', () => {
   afterEach(tearDownDom);
 
   it('renders this list in correct slots', async () => {
-    let button: HTMLButtonElement = app.querySelector(
-      'slot-list-light-scoped-root button'
-    );
+    let button: HTMLButtonElement = app.querySelector('slot-list-light-scoped-root button');
     let list = app.querySelector('slot-dynamic-scoped-list');
 
     expect(button).toBeTruthy();

@@ -139,10 +139,10 @@ export function createDenoSys(c: { Deno?: any } = {}) {
       }
       return results;
     },
-    createWorkerController: maxConcurrentWorkers => createDenoWorkerMainController(sys, maxConcurrentWorkers),
+    createWorkerController: (maxConcurrentWorkers) => createDenoWorkerMainController(sys, maxConcurrentWorkers),
     async destroy() {
       const waits: Promise<void>[] = [];
-      destroys.forEach(cb => {
+      destroys.forEach((cb) => {
         try {
           const rtn = cb();
           if (rtn && rtn.then) {
@@ -169,8 +169,8 @@ export function createDenoSys(c: { Deno?: any } = {}) {
     async ensureDependencies(opts) {
       const timespan = opts.logger.createTimeSpan(`ensure dependencies start`, true);
       const diagnostics: Diagnostic[] = [];
-      const stencilDep = opts.dependencies.find(dep => dep.name === '@stencil/core');
-      const typescriptDep = opts.dependencies.find(dep => dep.name === 'typescript');
+      const stencilDep = opts.dependencies.find((dep) => dep.name === '@stencil/core');
+      const typescriptDep = opts.dependencies.find((dep) => dep.name === 'typescript');
 
       stencilRemoteUrl = new URL(`../../compiler/stencil.js`, import.meta.url).href;
       if (!isRemoteUrl(stencilRemoteUrl)) {
@@ -214,8 +214,8 @@ export function createDenoSys(c: { Deno?: any } = {}) {
       };
     },
     async ensureResources(opts) {
-      const stencilDep = opts.dependencies.find(dep => dep.name === '@stencil/core');
-      const typescriptDep = opts.dependencies.find(dep => dep.name === 'typescript');
+      const stencilDep = opts.dependencies.find((dep) => dep.name === '@stencil/core');
+      const typescriptDep = opts.dependencies.find((dep) => dep.name === 'typescript');
 
       const deps: { url: string; path: string }[] = [];
 
@@ -238,7 +238,7 @@ export function createDenoSys(c: { Deno?: any } = {}) {
 
       if (!stencilResourcesExist) {
         opts.logger.debug(`stencilBaseUrl: ${stencilBaseUrl.href}`);
-        stencilDep.resources.forEach(p => {
+        stencilDep.resources.forEach((p) => {
           deps.push({
             url: new URL(p, stencilBaseUrl).href,
             path: sys.getLocalModulePath({ rootDir: opts.rootDir, moduleId: stencilDep.name, path: p }),
@@ -247,7 +247,7 @@ export function createDenoSys(c: { Deno?: any } = {}) {
       }
 
       if (!typescriptResourcesExist) {
-        typescriptDep.resources.forEach(p => {
+        typescriptDep.resources.forEach((p) => {
           deps.push({
             url: sys.getRemoteModuleUrl({ moduleId: typescriptDep.name, version: typescriptDep.version, path: p }),
             path: sys.getLocalModulePath({ rootDir: opts.rootDir, moduleId: typescriptDep.name, path: p }),
@@ -261,7 +261,7 @@ export function createDenoSys(c: { Deno?: any } = {}) {
         const timespan = opts.logger.createTimeSpan(`ensure resources start`, true);
 
         await Promise.all(
-          deps.map(async dep => {
+          deps.map(async (dep) => {
             const rsp = await fetch(dep.url);
             if (rsp.ok) {
               const content = rsp.text();
@@ -274,13 +274,13 @@ export function createDenoSys(c: { Deno?: any } = {}) {
             } else {
               opts.logger.error(`unable to fetch: ${dep.url}`);
             }
-          }),
+          })
         );
 
         timespan.finish(`ensure resources end: ${deps.length}`);
       }
     },
-    exit: async exitCode => {
+    exit: async (exitCode) => {
       deno.exit(exitCode);
     },
     getCompilerExecutingPath() {
@@ -653,7 +653,7 @@ export function createDenoSys(c: { Deno?: any } = {}) {
       release: deno.build.vendor,
       totalmem: 0,
     },
-    applyGlobalPatch: async fromDir => {
+    applyGlobalPatch: async (fromDir) => {
       const { applyNodeCompat } = await import('@deno-node-compat');
       applyNodeCompat({ fromDir });
     },

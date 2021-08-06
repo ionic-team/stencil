@@ -96,7 +96,7 @@ patchPropAttributes(
   },
   {
     type: 'submit',
-  },
+  }
 );
 
 export class MockImageElement extends MockHTMLElement {
@@ -174,7 +174,7 @@ patchPropAttributes(
   },
   {
     type: 'text',
-  },
+  }
 );
 
 export class MockFormElement extends MockHTMLElement {
@@ -411,7 +411,7 @@ function fullUrl(elm: MockElement, attrName: string) {
         try {
           const url = new URL(val, loc.href);
           return url.href;
-        } catch (e) { }
+        } catch (e) {}
       }
     }
   }
@@ -419,7 +419,7 @@ function fullUrl(elm: MockElement, attrName: string) {
 }
 
 function patchPropAttributes(prototype: any, attrs: any, defaults: any = {}) {
-  Object.keys(attrs).forEach(propName => {
+  Object.keys(attrs).forEach((propName) => {
     const attr = attrs[propName];
     const defaultValue = defaults[propName];
 

@@ -1,6 +1,5 @@
 import { setupDomTests, waitForChanges } from '../util';
 
-
 describe('slot-fallback', () => {
   const { setupDom, tearDownDom } = setupDomTests(document);
   let app: HTMLElement;
@@ -9,7 +8,6 @@ describe('slot-fallback', () => {
     app = await setupDom('/slot-fallback/index.html');
   });
   afterEach(tearDownDom);
-
 
   it('renders fallback', async () => {
     let result: HTMLElement;
@@ -141,5 +139,4 @@ describe('slot-fallback', () => {
     result = app.querySelector('.results1 article span content-end');
     expect(result.textContent).toBe('slot light dom 2 : end');
   });
-
 });

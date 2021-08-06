@@ -62,7 +62,7 @@ export const runPluginTransforms = async (
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   id: string,
-  cmp?: d.ComponentCompilerMeta,
+  cmp?: d.ComponentCompilerMeta
 ) => {
   const pluginCtx: PluginCtx = {
     config: config,
@@ -102,7 +102,7 @@ export const runPluginTransforms = async (
         id,
         id,
         transformResults.code,
-        cmp.styleDocs,
+        cmp.styleDocs
       );
       transformResults.code = cssParseResults.styleText;
       transformResults.dependencies = cssParseResults.imports;
@@ -162,7 +162,7 @@ export const runPluginTransforms = async (
         id,
         transformResults.id,
         transformResults.code,
-        cmp.styleDocs,
+        cmp.styleDocs
       );
       transformResults.code = cssParseResults.styleText;
       transformResults.dependencies = cssParseResults.imports;
@@ -173,7 +173,7 @@ export const runPluginTransforms = async (
         buildCtx,
         id,
         transformResults.id,
-        transformResults.code,
+        transformResults.code
       );
       transformResults.code = cssParseResults.styleText;
       transformResults.dependencies = cssParseResults.imports;
@@ -188,7 +188,7 @@ export const runPluginTransformsEsmImports = async (
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   code: string,
-  id: string,
+  id: string
 ) => {
   const pluginCtx: PluginCtx = {
     config: config,
@@ -242,7 +242,7 @@ export const runPluginTransformsEsmImports = async (
               }
               if (Array.isArray(pluginTransformResults.dependencies)) {
                 const imports = pluginTransformResults.dependencies.filter(
-                  f => !transformResults.dependencies.includes(f),
+                  (f) => !transformResults.dependencies.includes(f)
                 );
                 transformResults.dependencies.push(...imports);
               }
@@ -269,11 +269,11 @@ export const runPluginTransformsEsmImports = async (
       buildCtx,
       id,
       transformResults.id,
-      transformResults.code,
+      transformResults.code
     );
     transformResults.code = cssParseResults.styleText;
     if (Array.isArray(cssParseResults.imports)) {
-      const imports = cssParseResults.imports.filter(f => !transformResults.dependencies.includes(f));
+      const imports = cssParseResults.imports.filter((f) => !transformResults.dependencies.includes(f));
       transformResults.dependencies.push(...imports);
     }
   }

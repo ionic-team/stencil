@@ -1,28 +1,25 @@
 import { Component, Prop, h } from '@stencil/core';
 
 @Component({
-  tag: 'slot-html'
+  tag: 'slot-html',
 })
 export class SlotHtml {
-
   @Prop() inc = 0;
 
   render() {
     return (
       <div>
-        <hr/>
+        <hr />
         <article>
           <span>
-            <slot name='start'/>
+            <slot name="start" />
           </span>
         </article>
-        <slot/>
+        <slot />
         <section>
-          <slot name='end'/>
+          <slot name="end" />
         </section>
       </div>
     );
   }
-
 }
-

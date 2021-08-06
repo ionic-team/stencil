@@ -15,10 +15,13 @@ export function getDefaultBundles(config: d.Config, buildCtx: d.BuildCtx, cmps: 
     return [];
   }
 
-  const mainBundle = unique([...entryPointsHints, ...flatOne(entryPointsHints.map(resolveTag).map(cmp => cmp.dependencies))]).map(resolveTag);
+  const mainBundle = unique([
+    ...entryPointsHints,
+    ...flatOne(entryPointsHints.map(resolveTag).map((cmp) => cmp.dependencies)),
+  ]).map(resolveTag);
 
   function resolveTag(tag: string) {
-    return cmps.find(cmp => cmp.tagName === tag);
+    return cmps.find((cmp) => cmp.tagName === tag);
   }
 
   return [mainBundle];
@@ -26,9 +29,9 @@ export function getDefaultBundles(config: d.Config, buildCtx: d.BuildCtx, cmps: 
 
 export function getUserConfigBundles(config: d.Config, buildCtx: d.BuildCtx, cmps: d.ComponentCompilerMeta[]) {
   const definedTags = new Set<string>();
-  const entryTags = config.bundles.map(b => {
+  const entryTags = config.bundles.map((b) => {
     return b.components
-      .map(tag => {
+      .map((tag) => {
         const tagError = validateComponentTag(tag);
         if (tagError) {
           const err = buildError(buildCtx.diagnostics);
@@ -36,7 +39,7 @@ export function getUserConfigBundles(config: d.Config, buildCtx: d.BuildCtx, cmp
           err.messageText = tagError;
         }
 
-        const component = cmps.find(cmp => cmp.tagName === tag);
+        const component = cmps.find((cmp) => cmp.tagName === tag);
         if (!component) {
           const warn = buildWarn(buildCtx.diagnostics);
           warn.header = `Stencil Config`;

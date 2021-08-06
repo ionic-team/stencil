@@ -1,37 +1,38 @@
 import { Component, State, h } from '@stencil/core';
 
-
 @Component({
-  tag: 'app-root'
+  tag: 'app-root',
 })
 export class AppRoot {
-
   @State() list: TodoItem[] = [];
 
   render() {
     const list = this.list;
-    const allChecked = list.every(item => item.checked);
+    const allChecked = list.every((item) => item.checked);
     return (
       <div>
         <header class="header">
           <h1>Todos Stencil</h1>
-          <todo-input onInputSubmit={(e: CustomEvent) => {
-            this.list = [...list, { text: e.detail }];
-          }}></todo-input>
+          <todo-input
+            onInputSubmit={(e: CustomEvent) => {
+              this.list = [...list, { text: e.detail }];
+            }}
+          ></todo-input>
         </header>
         <section class="main" hidden={!list.length}>
           <input
             id="toggle-all"
             onInput={(e: CustomEvent) => {
-              this.list = list.map(item => {
+              this.list = list.map((item) => {
                 item.checked = !!(e.target as HTMLInputElement).checked;
                 return item;
               });
             }}
             class="toggle-all"
             type="checkbox"
-            checked={allChecked}/>
-          <label htmlFor="toggle-all"/>
+            checked={allChecked}
+          />
+          <label htmlFor="toggle-all" />
           <ul class="todo-list">
             {list.map((item, index) => (
               <todo-item

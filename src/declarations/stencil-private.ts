@@ -1040,15 +1040,15 @@ export type InitServerProcess = (sendMsg: (msg: DevServerMessage) => void) => (m
 
 export interface DevResponseHeaders {
   'cache-control'?: string;
-  'expires'?: string;
+  expires?: string;
   'content-type'?: string;
   'content-length'?: number;
-  'date'?: string;
+  date?: string;
   'access-control-allow-origin'?: string;
   'access-control-expose-headers'?: string;
   'content-encoding'?: 'gzip';
-  'vary'?: 'Accept-Encoding';
-  'server'?: string;
+  vary?: 'Accept-Encoding';
+  server?: string;
   'x-directory-index'?: string;
   'x-source'?: string;
 }
@@ -1171,14 +1171,13 @@ export interface HostElement extends HTMLElement {
   __innerHTML?: string;
   __innerText?: string;
   __textContent?: string;
-  __append?: (...nodes: (Node | string)[]) => void
+  __append?: (...nodes: (Node | string)[]) => void;
   __prepend?: (...nodes: (Node | string)[]) => void;
   __appendChild?: <T extends Node>(newChild: T) => T;
-  __replaceChildren?: (...nodes: (Node | string)[]) => void
+  __replaceChildren?: (...nodes: (Node | string)[]) => void;
   __insertAdjacentElement?: (position: InsertPosition, insertedElement: Element) => Element | null;
   __insertAdjacentHTML?: (where: InsertPosition, html: string) => void;
   __insertAdjacentText?: (where: InsertPosition, text: string) => void;
-
 
   // "s-" prefixed properties should not be property renamed
   // and should be common between all versions of stencil
@@ -1233,9 +1232,7 @@ export interface InMemoryFileSystem {
   /* new compiler */
   sys?: CompilerSystem;
 
-  accessData(
-    filePath: string,
-  ): Promise<{
+  accessData(filePath: string): Promise<{
     exists: boolean;
     isDirectory: boolean;
     isFile: boolean;
@@ -1258,9 +1255,7 @@ export interface InMemoryFileSystem {
    */
   readFileSync(filePath: string, opts?: FsReadOptions): string;
   remove(itemPath: string): Promise<void>;
-  stat(
-    itemPath: string,
-  ): Promise<{
+  stat(itemPath: string): Promise<{
     isFile: boolean;
     isDirectory: boolean;
   }>;
@@ -1269,9 +1264,7 @@ export interface InMemoryFileSystem {
    * (Only typescript transpiling is allowed to use)
    * @param itemPath
    */
-  statSync(
-    itemPath: string,
-  ): {
+  statSync(itemPath: string): {
     exists: boolean;
     isFile: boolean;
     isDirectory: boolean;
@@ -1283,7 +1276,7 @@ export interface InMemoryFileSystem {
           [filePath: string]: string;
         }
       | Map<string, String>,
-    opts?: FsWriteOptions,
+    opts?: FsWriteOptions
   ): Promise<FsWriteResults[]>;
   commit(): Promise<{
     filesWritten: string[];
@@ -1440,7 +1433,7 @@ export interface Plugin {
   transform?: (
     sourceText: string,
     id: string,
-    context: PluginCtx,
+    context: PluginCtx
   ) => Promise<PluginTransformResults> | PluginTransformResults | string;
 }
 
@@ -1544,12 +1537,12 @@ export interface RenderNode extends HostElement {
   /**
    * Slot has fallback nodes
    */
-   ['s-hsf']?: boolean;
+  ['s-hsf']?: boolean;
 
   /**
    * Slot fallback node text content
    */
-   ['s-sfc']?: string;
+  ['s-sfc']?: string;
 
   /**
    * Host element tag name:
@@ -1600,7 +1593,7 @@ export type LazyBundlesRuntimeData = LazyBundleRuntimeData[];
 export type LazyBundleRuntimeData = [
   /** bundleIds */
   string,
-  ComponentRuntimeMetaCompact[],
+  ComponentRuntimeMetaCompact[]
 ];
 
 export type ComponentRuntimeMetaCompact = [
@@ -1614,7 +1607,7 @@ export type ComponentRuntimeMetaCompact = [
   { [memberName: string]: ComponentRuntimeMember }?,
 
   /** listeners */
-  ComponentRuntimeHostListener[]?,
+  ComponentRuntimeHostListener[]?
 ];
 
 export interface ComponentRuntimeMeta {
@@ -1640,7 +1633,7 @@ export type ComponentRuntimeMember = [
   /**
    * attribute name to observe
    */
-  string?,
+  string?
 ];
 
 export type ComponentRuntimeHostListener = [
@@ -1657,7 +1650,7 @@ export type ComponentRuntimeHostListener = [
   /**
    * event method,
    */
-  string,
+  string
 ];
 
 export type ModeBundleId = ModeBundleIds | string;
@@ -1698,13 +1691,13 @@ export interface PlatformRuntime {
     el: EventTarget,
     eventName: string,
     listener: EventListenerOrEventListenerObject,
-    options: boolean | AddEventListenerOptions,
+    options: boolean | AddEventListenerOptions
   ) => void;
   rel: (
     el: EventTarget,
     eventName: string,
     listener: EventListenerOrEventListenerObject,
-    options: boolean | AddEventListenerOptions,
+    options: boolean | AddEventListenerOptions
   ) => void;
   ce: (eventName: string, opts?: any) => CustomEvent;
 }
@@ -1728,7 +1721,7 @@ export interface ScreenshotConnector {
   getScreenshotCache(): Promise<ScreenshotCache>;
   updateScreenshotCache(
     screenshotCache: ScreenshotCache,
-    buildResults: ScreenshotBuildResults,
+    buildResults: ScreenshotBuildResults
   ): Promise<ScreenshotCache>;
   generateJsonpDataUris(build: ScreenshotBuild): Promise<void>;
   sortScreenshots(screenshots: Screenshot[]): Screenshot[];
@@ -2010,38 +2003,38 @@ export interface TransformCssToEsmOutput {
 }
 
 export interface PackageJsonData {
-  'name'?: string;
-  'version'?: string;
-  'main'?: string;
-  'description'?: string;
-  'bin'?: { [key: string]: string };
-  'browser'?: string;
-  'module'?: string;
+  name?: string;
+  version?: string;
+  main?: string;
+  description?: string;
+  bin?: { [key: string]: string };
+  browser?: string;
+  module?: string;
   'jsnext:main'?: string;
   'collection:main'?: string;
-  'unpkg'?: string;
-  'collection'?: string;
-  'types'?: string;
-  'files'?: string[];
+  unpkg?: string;
+  collection?: string;
+  types?: string;
+  files?: string[];
   ['dist-tags']?: {
     latest: string;
   };
-  'dependencies'?: {
+  dependencies?: {
     [moduleId: string]: string;
   };
-  'devDependencies'?: {
+  devDependencies?: {
     [moduleId: string]: string;
   };
-  'repository'?: {
+  repository?: {
     type?: string;
     url?: string;
   };
-  'private'?: boolean;
-  'scripts'?: {
+  private?: boolean;
+  scripts?: {
     [runName: string]: string;
   };
-  'license'?: string;
-  'keywords'?: string[];
+  license?: string;
+  keywords?: string[];
 }
 
 export interface Workbox {
@@ -2247,7 +2240,7 @@ export interface JestEnvironmentGlobal {
     fullName: string;
     testPath: string;
   };
-  env: {[prop: string]: string};
+  env: { [prop: string]: string };
   screenshotDescriptions: Set<string>;
 }
 
@@ -2447,7 +2440,7 @@ export interface CompilerWorkerContext {
     input: string,
     minifyOpts: any,
     transpile: boolean,
-    inlineHelpers: boolean,
+    inlineHelpers: boolean
   ): Promise<{ output: string; diagnostics: Diagnostic[] }>;
   prerenderWorker(prerenderRequest: PrerenderUrlRequest): Promise<PrerenderUrlResults>;
   transformCssToEsm(input: TransformCssToEsmInput): Promise<TransformCssToEsmOutput>;

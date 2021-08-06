@@ -674,14 +674,14 @@ describe(`in-memory-fs`, () => {
         '/file.less',
         '/file.styl',
       ];
-      filePaths.forEach(filePath => {
+      filePaths.forEach((filePath) => {
         expect(shouldIgnore(filePath)).toBe(false);
       });
     });
 
     it('shouldIgnore', () => {
       const filePaths = ['/User/.DS_Store', '/User/.gitignore', '/User/desktop.ini', '/User/thumbs.db'];
-      filePaths.forEach(filePath => {
+      filePaths.forEach((filePath) => {
         expect(shouldIgnore(filePath)).toBe(true);
       });
     });

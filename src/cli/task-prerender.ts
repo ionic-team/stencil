@@ -18,7 +18,7 @@ export const taskPrerender = async (coreCompiler: CoreCompiler, config: Config) 
   const diagnostics = await runPrerenderTask(coreCompiler, config, hydrateAppFilePath, null, srcIndexHtmlPath);
   config.logger.printDiagnostics(diagnostics);
 
-  if (diagnostics.some(d => d.level === 'error')) {
+  if (diagnostics.some((d) => d.level === 'error')) {
     return config.sys.exit(1);
   }
 };
@@ -28,7 +28,7 @@ export const runPrerenderTask = async (
   config: Config,
   hydrateAppFilePath: string,
   componentGraph: BuildResultsComponentGraph,
-  srcIndexHtmlPath: string,
+  srcIndexHtmlPath: string
 ) => {
   const diagnostics: Diagnostic[] = [];
 

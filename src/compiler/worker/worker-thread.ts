@@ -8,7 +8,7 @@ export const createWorkerContext = (sys: d.CompilerSystem): d.CompilerWorkerCont
   transformCssToEsm,
   prepareModule,
   optimizeCss,
-  prerenderWorker: prerenderRequest => prerenderWorker(sys, prerenderRequest),
+  prerenderWorker: (prerenderRequest) => prerenderWorker(sys, prerenderRequest),
 });
 
 export const createWorkerMessageHandler = (sys: d.CompilerSystem): d.WorkerMsgHandler => {

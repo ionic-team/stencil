@@ -56,7 +56,7 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
     consoleDevError(
       `The JSX ${
         newVNode.$text$ !== null ? `"${newVNode.$text$}" text` : `"${newVNode.$tag$}" element`
-      } node should not be shared within the same renderer. The renderer caches element lookups in order to improve performance. However, a side effect from this is that the exact same JSX node should not be reused. For more information please see https://stenciljs.com/docs/templating-jsx#avoid-shared-jsx-nodes`,
+      } node should not be shared within the same renderer. The renderer caches element lookups in order to improve performance. However, a side effect from this is that the exact same JSX node should not be reused. For more information please see https://stenciljs.com/docs/templating-jsx#avoid-shared-jsx-nodes`
     );
   }
 
@@ -65,15 +65,18 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
     elm = newVNode.$elm$ = doc.createTextNode(newVNode.$text$) as any;
   } else if (BUILD.slotRelocation && newVNode.$flags$ & (VNODE_FLAGS.isSlotReference | VNODE_FLAGS.isSlotFallback)) {
     // create a slot reference node
-    elm = newVNode.$elm$ = BUILD.isDebug || BUILD.hydrateServerSide ? slotReferenceDebugNode(newVNode) : (doc.createTextNode('') as any);
+    elm = newVNode.$elm$ =
+      BUILD.isDebug || BUILD.hydrateServerSide ? slotReferenceDebugNode(newVNode) : (doc.createTextNode('') as any);
   } else {
     if (BUILD.svg && !isSvgMode) {
       isSvgMode = newVNode.$tag$ === 'svg';
     }
     // create element
-    elm = newVNode.$elm$ = (BUILD.svg
-      ? doc.createElementNS(isSvgMode ? SVG_NS : HTML_NS, (newVNode.$tag$ as string))
-      : doc.createElement(newVNode.$tag$ as string)) as any;
+    elm = newVNode.$elm$ = (
+      BUILD.svg
+        ? doc.createElementNS(isSvgMode ? SVG_NS : HTML_NS, newVNode.$tag$ as string)
+        : doc.createElement(newVNode.$tag$ as string)
+    ) as any;
 
     if (BUILD.svg && isSvgMode && newVNode.$tag$ === 'foreignObject') {
       isSvgMode = false;
@@ -133,7 +136,7 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
           for (i = 0; i < newVNode.$children$.length; ++i) {
             // create the node
             let containerElm = elm.nodeType === 1 ? elm : parentElm;
-            while(containerElm.nodeType !== 1) {
+            while (containerElm.nodeType !== 1) {
               containerElm = containerElm.parentNode as d.RenderNode;
             }
             childNode = createElm(oldParentVNode, newVNode, i, containerElm);
@@ -146,7 +149,7 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
             // return node could have been null
             if (childNode) {
               // append our new node
-              containerElm.__appendChild ?  containerElm.__appendChild(childNode) : containerElm.appendChild(childNode);
+              containerElm.__appendChild ? containerElm.__appendChild(childNode) : containerElm.appendChild(childNode);
             }
           }
         }
@@ -168,7 +171,7 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
 const putBackInOriginalLocation = (parentElm: Node, recursive: boolean) => {
   plt.$flags$ |= PLATFORM_FLAGS.isTmpDisconnected;
 
-  const oldSlotChildNodes = ((parentElm as d.RenderNode).__childNodes || parentElm.childNodes);
+  const oldSlotChildNodes = (parentElm as d.RenderNode).__childNodes || parentElm.childNodes;
   for (let i = oldSlotChildNodes.length - 1; i >= 0; i--) {
     const childNode = oldSlotChildNodes[i] as any;
     if (childNode['s-hn'] !== hostTagName && childNode['s-ol']) {
@@ -196,7 +199,14 @@ const putBackInOriginalLocation = (parentElm: Node, recursive: boolean) => {
   plt.$flags$ &= ~PLATFORM_FLAGS.isTmpDisconnected;
 };
 
-const addVnodes = (parentElm: d.RenderNode, before: d.RenderNode, parentVNode: d.VNode, vnodes: d.VNode[], startIdx: number, endIdx: number) => {
+const addVnodes = (
+  parentElm: d.RenderNode,
+  before: d.RenderNode,
+  parentVNode: d.VNode,
+  vnodes: d.VNode[],
+  startIdx: number,
+  endIdx: number
+) => {
   let containerElm = ((BUILD.slotRelocation && parentElm['s-cr'] && parentElm['s-cr'].parentNode) || parentElm) as any;
   let childNode: Node;
   if (BUILD.shadowDom && (containerElm as any).shadowRoot && containerElm.tagName === hostTagName) {
@@ -227,10 +237,10 @@ const saveSlottedNodes = (elm: d.RenderNode) => {
     if (childNode['s-ol']) {
       if (childNode['s-hn']) childNode['s-hn'] = undefined;
     } else {
-      saveSlottedNodes(childNode)
+      saveSlottedNodes(childNode);
     }
   }
-}
+};
 
 const removeVnodes = (vnodes: d.VNode[], startIdx: number, endIdx: number, vnode?: d.VNode, elm?: d.RenderNode) => {
   for (; startIdx <= endIdx; ++startIdx) {
@@ -278,7 +288,7 @@ const updateChildren = (parentElm: d.RenderNode, oldCh: d.VNode[], newVNode: d.V
   let fbParentNodesIdx: number;
   let fbSlots: d.RenderNode[] = [];
   let fbSlotsIdx: number;
-  let fbNodes: {[name: string]: d.RenderNode[]} = {};
+  let fbNodes: { [name: string]: d.RenderNode[] } = {};
   let fbNodesIdx: number;
   let fbChildNode: d.RenderNode;
   let fbSlot: d.RenderNode;
@@ -361,15 +371,22 @@ const updateChildren = (parentElm: d.RenderNode, oldCh: d.VNode[], newVNode: d.V
   }
 
   if (oldStartIdx > oldEndIdx) {
-    addVnodes(parentElm, newCh[newEndIdx + 1] == null ? null : newCh[newEndIdx + 1].$elm$, newVNode, newCh, newStartIdx, newEndIdx);
+    addVnodes(
+      parentElm,
+      newCh[newEndIdx + 1] == null ? null : newCh[newEndIdx + 1].$elm$,
+      newVNode,
+      newCh,
+      newStartIdx,
+      newEndIdx
+    );
   } else if (BUILD.updatable && newStartIdx > newEndIdx) {
     removeVnodes(oldCh, oldStartIdx, oldEndIdx);
   }
 
   // reorder fallback slot nodes
   if (parentElm.parentNode && newVNode.$elm$['s-hsf']) {
-    fbParentNodes = ((parentElm.parentNode as d.RenderNode).__childNodes || parentElm.parentNode.childNodes);
-    fbParentNodesIdx = fbParentNodes.length-1;
+    fbParentNodes = (parentElm.parentNode as d.RenderNode).__childNodes || parentElm.parentNode.childNodes;
+    fbParentNodesIdx = fbParentNodes.length - 1;
 
     for (i = 0; i <= fbParentNodesIdx; ++i) {
       fbChildNode = fbParentNodes[i] as d.RenderNode;
@@ -383,12 +400,12 @@ const updateChildren = (parentElm: d.RenderNode, oldCh: d.VNode[], newVNode: d.V
       }
     }
 
-    fbSlotsIdx = fbSlots.length-1;
+    fbSlotsIdx = fbSlots.length - 1;
     for (i = 0; i <= fbSlotsIdx; ++i) {
       fbSlot = fbSlots[i];
       if (!fbNodes[fbSlot['s-sn']]) continue;
 
-      fbNodesIdx = fbNodes[fbSlot['s-sn']].length-1;
+      fbNodesIdx = fbNodes[fbSlot['s-sn']].length - 1;
       for (j = 0; j <= fbNodesIdx; ++j) {
         fbNode = fbNodes[fbSlot['s-sn']][j];
         fbSlot.parentNode.insertBefore(fbNode, fbSlot);
@@ -507,7 +524,7 @@ const relocateSlotContent = (elm: d.RenderNode) => {
       }
       // first got the content reference comment node
       // then we got it's parent, which is where all the host content is in now
-      hostContentNodes = ((node.parentNode as d.RenderNode).__childNodes || node.parentNode.childNodes);
+      hostContentNodes = (node.parentNode as d.RenderNode).__childNodes || node.parentNode.childNodes;
       slotNameAttr = childNode['s-sn'];
 
       for (j = hostContentNodes.length - 1; j >= 0; j--) {
@@ -520,7 +537,7 @@ const relocateSlotContent = (elm: d.RenderNode) => {
 
           if (isNodeLocatedInSlot(node, slotNameAttr)) {
             // it's possible we've already decided to relocate this node
-            relocateNodeData = relocateNodes.find(r => r.$nodeToRelocate$ === node);
+            relocateNodeData = relocateNodes.find((r) => r.$nodeToRelocate$ === node);
 
             // made some changes to slots
             // let's make sure we also double check
@@ -541,16 +558,16 @@ const relocateSlotContent = (elm: d.RenderNode) => {
             }
 
             if (node['s-sr']) {
-              relocateNodes.map(relocateNode => {
+              relocateNodes.map((relocateNode) => {
                 if (isNodeLocatedInSlot(relocateNode.$nodeToRelocate$, node['s-sn'])) {
-                  relocateNodeData = relocateNodes.find(r => r.$nodeToRelocate$ === node);
+                  relocateNodeData = relocateNodes.find((r) => r.$nodeToRelocate$ === node);
                   if (relocateNodeData && !relocateNode.$slotRefNode$) {
                     relocateNode.$slotRefNode$ = relocateNodeData.$slotRefNode$;
                   }
                 }
               });
             }
-          } else if (!relocateNodes.some(r => r.$nodeToRelocate$ === node)) {
+          } else if (!relocateNodes.some((r) => r.$nodeToRelocate$ === node)) {
             // so far this element does not have a slot home, not setting slotRefNode on purpose
             // if we never find a home for this element then we'll need to hide it
             relocateNodes.push({
@@ -620,7 +637,9 @@ render() {
   }
   if (BUILD.reflect && cmpMeta.$attrsToReflect$) {
     rootVnode.$attrs$ = rootVnode.$attrs$ || {};
-    cmpMeta.$attrsToReflect$.map(([propName, attribute]) => (rootVnode.$attrs$[attribute] = (hostElm as any)[propName]));
+    cmpMeta.$attrsToReflect$.map(
+      ([propName, attribute]) => (rootVnode.$attrs$[attribute] = (hostElm as any)[propName])
+    );
   }
 
   rootVnode.$tag$ = null;
@@ -665,7 +684,10 @@ render() {
         if (!nodeToRelocate['s-ol']) {
           // add a reference node marking this node's original location
           // keep a reference to this node for later lookups
-          orgLocationNode = BUILD.isDebug || BUILD.hydrateServerSide ? originalLocationDebugNode(nodeToRelocate) : (doc.createTextNode('') as any);
+          orgLocationNode =
+            BUILD.isDebug || BUILD.hydrateServerSide
+              ? originalLocationDebugNode(nodeToRelocate)
+              : (doc.createTextNode('') as any);
           orgLocationNode['s-nr'] = nodeToRelocate;
 
           nodeToRelocate.parentNode.insertBefore((nodeToRelocate['s-ol'] = orgLocationNode), nodeToRelocate);
@@ -694,7 +716,10 @@ render() {
             }
           }
 
-          if ((!insertBeforeNode && parentNodeRef !== nodeToRelocate.parentNode) || nodeToRelocate.nextSibling !== insertBeforeNode) {
+          if (
+            (!insertBeforeNode && parentNodeRef !== nodeToRelocate.parentNode) ||
+            nodeToRelocate.nextSibling !== insertBeforeNode
+          ) {
             // we've checked that it's worth while to relocate
             // since that the node to relocate
             // has a different next sibling or parent relocated
@@ -734,7 +759,15 @@ render() {
 
 // slot comment debug nodes only created with the `--debug` flag
 // otherwise these nodes are text nodes w/out content
-const slotReferenceDebugNode = (slotVNode: d.VNode) => doc.createComment(`<slot${slotVNode.$name$ ? ' name="' + slotVNode.$name$ + '"' : ''}> (host=${hostTagName.toLowerCase()})`);
+const slotReferenceDebugNode = (slotVNode: d.VNode) =>
+  doc.createComment(
+    `<slot${slotVNode.$name$ ? ' name="' + slotVNode.$name$ + '"' : ''}> (host=${hostTagName.toLowerCase()})`
+  );
 
 const originalLocationDebugNode = (nodeToRelocate: d.RenderNode): any =>
-  doc.createComment(`org-location for ` + (nodeToRelocate.localName ? `<${nodeToRelocate.localName}> (host=${nodeToRelocate['s-hn']})` : `[${nodeToRelocate.textContent}]`));
+  doc.createComment(
+    `org-location for ` +
+      (nodeToRelocate.localName
+        ? `<${nodeToRelocate.localName}> (host=${nodeToRelocate['s-hn']})`
+        : `[${nodeToRelocate.textContent}]`)
+  );

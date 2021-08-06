@@ -5,7 +5,7 @@ import { join } from 'path';
 import { normalizePath } from '@utils';
 
 export const validateCollection = (config: d.Config, userOutputs: d.OutputTarget[]) => {
-  return userOutputs.filter(isOutputTargetDistCollection).map(o => {
+  return userOutputs.filter(isOutputTargetDistCollection).map((o) => {
     return {
       ...o,
       dir: getAbsolutePath(config, o.dir || 'dist/collection'),

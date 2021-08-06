@@ -1,7 +1,6 @@
 import { setupDomTests } from '../util';
 
-
-describe('slotted css', function() {
+describe('slotted css', function () {
   const { setupDom, tearDownDom } = setupDomTests(document);
   let app: HTMLElement;
 
@@ -9,7 +8,6 @@ describe('slotted css', function() {
     app = await setupDom('/slotted-css/index.html');
   });
   afterEach(tearDownDom);
-
 
   it('assign slotted css', async () => {
     const elm = app.querySelector('slotted-css');
@@ -27,7 +25,5 @@ describe('slotted css', function() {
     const blueElm = elm.querySelector('.blue');
     const blueStyles = window.getComputedStyle(blueElm);
     expect(blueStyles.color).toEqual('rgb(0, 0, 255)');
-
   });
-
 });

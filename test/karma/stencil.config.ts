@@ -13,26 +13,16 @@ export const config: Config = {
   outputTargets: [
     {
       type: 'www',
-      copy: [
-        { src: '**/*.html' },
-        { src: '**/*.css' },
-        { src: 'noscript.js' }
-      ],
+      copy: [{ src: '**/*.html' }, { src: '**/*.css' }, { src: 'noscript.js' }],
     },
     {
       type: 'dist',
-      dir: 'test-dist'
-    }
+      dir: 'test-dist',
+    },
   ],
   globalScript: 'test-app/global.ts',
   globalStyle: 'test-app/style-plugin/global-sass-entry.scss',
-  plugins: [
-    nodePolyfills(),
-    sass(),
-    less(),
-    postcss(),
-    stylus()
-  ],
+  plugins: [nodePolyfills(), sass(), less(), postcss(), stylus()],
   buildEs5: true,
   extras: {
     cloneNodeFix: true,
@@ -41,12 +31,12 @@ export const config: Config = {
     lifecycleDOMEvents: true,
     safari10: true,
     scriptDataOpts: true,
-    shadowDomShim: true
+    shadowDomShim: true,
   },
   devServer: {
     historyApiFallback: {
       disableDotRule: true,
-      index: 'index.html'
-    }
-  }
+      index: 'index.html',
+    },
+  },
 };

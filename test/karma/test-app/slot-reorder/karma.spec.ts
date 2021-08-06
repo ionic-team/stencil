@@ -1,6 +1,5 @@
 import { setupDomTests, waitForChanges } from '../util';
 
-
 describe('slot-reorder', () => {
   const { setupDom, tearDownDom } = setupDomTests(document);
   let app: HTMLElement;
@@ -9,7 +8,6 @@ describe('slot-reorder', () => {
     app = await setupDom('/slot-reorder/index.html');
   });
   afterEach(tearDownDom);
-
 
   it('renders', async () => {
     let r: HTMLElement;
@@ -114,5 +112,4 @@ describe('slot-reorder', () => {
 
     reordered();
   });
-
 });

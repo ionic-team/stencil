@@ -1,10 +1,9 @@
 import { Component, Element, State, Method, h } from '@stencil/core';
 
 @Component({
-  tag: 'attribute-boolean-root'
+  tag: 'attribute-boolean-root',
 })
 export class AttributeBooleanRoot {
-
   @Element() el!: HTMLElement;
 
   @State() state = false;
@@ -16,17 +15,17 @@ export class AttributeBooleanRoot {
 
   hostData() {
     return {
-      'readonly': this.state,
-      'tappable': this.state,
-      'str': this.state ? 'hello' : null,
+      readonly: this.state,
+      tappable: this.state,
+      str: this.state ? 'hello' : null,
       'aria-hidden': `${this.state}`,
 
-      'fixedtrue': 'true',
-      'fixedfalse': 'false',
+      fixedtrue: 'true',
+      fixedfalse: 'false',
 
       'no-appear': undefined as any,
       'no-appear2': false,
-    }
+    };
   }
 
   render() {
@@ -38,7 +37,8 @@ export class AttributeBooleanRoot {
         strState={this.state as any}
         noreflect={this.state}
         tappable={this.state}
-        aria-hidden={`${this.state}`}/>
+        aria-hidden={`${this.state}`}
+      />,
     ];
   }
 }

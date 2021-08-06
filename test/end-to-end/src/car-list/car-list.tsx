@@ -18,7 +18,7 @@ export class CarList {
   @Event() carSelected: EventEmitter<CarData>;
 
   componentWillLoad() {
-    return new Promise(resolve => setTimeout(resolve, 20));
+    return new Promise((resolve) => setTimeout(resolve, 20));
   }
 
   selectCar(car: CarData) {
@@ -33,7 +33,7 @@ export class CarList {
 
     return (
       <ul>
-        {this.cars.map(car => {
+        {this.cars.map((car) => {
           return (
             <li class={car === this.selected ? 'selected' : ''} onClick={() => this.selectCar(car)}>
               <car-detail car={car}></car-detail>

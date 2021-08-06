@@ -35,7 +35,13 @@ export const buildWarn = (diagnostics: d.Diagnostic[]) => {
   return diagnostic;
 };
 
-export const buildJsonFileError = (compilerCtx: d.CompilerCtx, diagnostics: d.Diagnostic[], jsonFilePath: string, msg: string, pkgKey: string) => {
+export const buildJsonFileError = (
+  compilerCtx: d.CompilerCtx,
+  diagnostics: d.Diagnostic[],
+  jsonFilePath: string,
+  msg: string,
+  pkgKey: string
+) => {
   const err = buildError(diagnostics);
   err.messageText = msg;
   err.absFilePath = jsonFilePath;
@@ -128,14 +134,14 @@ export const hasError = (diagnostics: d.Diagnostic[]): boolean => {
   if (diagnostics == null || diagnostics.length === 0) {
     return false;
   }
-  return diagnostics.some(d => d.level === 'error' && d.type !== 'runtime');
+  return diagnostics.some((d) => d.level === 'error' && d.type !== 'runtime');
 };
 
 export const hasWarning = (diagnostics: d.Diagnostic[]): boolean => {
   if (diagnostics == null || diagnostics.length === 0) {
     return false;
   }
-  return diagnostics.some(d => d.level === 'warn');
+  return diagnostics.some((d) => d.level === 'warn');
 };
 
 export const shouldIgnoreError = (msg: any) => {

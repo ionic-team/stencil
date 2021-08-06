@@ -8,28 +8,18 @@ export let supportsShadow = true;
 export const plt: d.PlatformRuntime = {
   $flags$: 0,
   $resourcesUrl$: '',
-  jmp: h => h(),
-  raf: h => requestAnimationFrame(h),
+  jmp: (h) => h(),
+  raf: (h) => requestAnimationFrame(h),
   ael: (el, eventName, listener, opts) => el.addEventListener(eventName, listener, opts),
   rel: (el, eventName, listener, opts) => el.removeEventListener(eventName, listener, opts),
   ce: (eventName, opts) => new (win as any).CustomEvent(eventName, opts),
 };
 
-export const setPlatformHelpers = (helpers: { 
+export const setPlatformHelpers = (helpers: {
   jmp?: (c: any) => any;
   raf?: (c: any) => number;
-  ael?: (
-    el: any,
-    eventName: string,
-    listener: any,
-    options: any,
-  ) => void;
-  rel?: (
-    el: any,
-    eventName: string,
-    listener: any,
-    options: any,
-  ) => void;
+  ael?: (el: any, eventName: string, listener: any, options: any) => void;
+  rel?: (el: any, eventName: string, listener: any, options: any) => void;
   ce?: (eventName: string, opts?: any) => any;
 }) => {
   Object.assign(plt, helpers);
@@ -52,7 +42,7 @@ export function resetPlatform() {
   hostRefs.clear();
   styles.clear();
   plt.$flags$ = 0;
-  Object.keys(Context).forEach(key => delete Context[key]);
+  Object.keys(Context).forEach((key) => delete Context[key]);
 
   if (plt.$orgLocNodes$ != null) {
     plt.$orgLocNodes$.clear();
@@ -96,7 +86,7 @@ export function registerContext(context: any) {
 }
 
 export const registerComponents = (Cstrs: d.ComponentTestingConstructor[]) => {
-  Cstrs.forEach(Cstr => {
+  Cstrs.forEach((Cstr) => {
     cstrs.set(Cstr.COMPILER_META.tagName, Cstr);
   });
 };
@@ -114,7 +104,7 @@ export const isMemberInElement = (elm: any, memberName: string) => {
     if (nodeName) {
       const cstr = cstrs.get(nodeName.toLowerCase());
       if (cstr != null && cstr.COMPILER_META != null && cstr.COMPILER_META.properties != null) {
-        return cstr.COMPILER_META.properties.some(p => p.name === memberName);
+        return cstr.COMPILER_META.properties.some((p) => p.name === memberName);
       }
     }
   }

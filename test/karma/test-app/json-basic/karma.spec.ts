@@ -1,7 +1,6 @@
 import { setupDomTests } from '../util';
 
-
-describe('attribute-basic', function() {
+describe('attribute-basic', function () {
   const { setupDom, tearDownDom } = setupDomTests(document);
   let app: HTMLElement;
 
@@ -13,5 +12,4 @@ describe('attribute-basic', function() {
   it('read json content', async () => {
     expect(app.querySelector('#json-foo').textContent).toBe('bar');
   });
-
 });

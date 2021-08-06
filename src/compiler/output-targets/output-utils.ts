@@ -26,13 +26,13 @@ export const getDistEsmIndexPath = (outputTarget: d.OutputTargetDist, sourceTarg
 export const getDefineCustomElementsPath = (
   config: d.Config,
   outputTarget: d.OutputTargetDist,
-  sourceTarget: d.SourceTarget,
+  sourceTarget: d.SourceTarget
 ) => join(getDistEsmDir(outputTarget, sourceTarget), getDefineEsmFilename(config));
 
 export const getComponentsEsmBuildPath = (
   config: d.Config,
   outputTarget: d.OutputTargetDist,
-  sourceTarget: d.SourceTarget,
+  sourceTarget: d.SourceTarget
 ) => join(getDistEsmDir(outputTarget, sourceTarget), getComponentsEsmFileName(config));
 
 export const getCoreEsmFileName = (config: d.Config) => `${config.fsNamespace}.core.js`;
@@ -58,7 +58,7 @@ export const isOutputTargetDistCustomElements = (o: d.OutputTarget): o is d.Outp
   o.type === DIST_CUSTOM_ELEMENTS;
 
 export const isOutputTargetDistCustomElementsBundle = (
-  o: d.OutputTarget,
+  o: d.OutputTarget
 ): o is d.OutputTargetDistCustomElementsBundle => o.type === DIST_CUSTOM_ELEMENTS_BUNDLE;
 
 export const isOutputTargetCopy = (o: d.OutputTarget): o is d.OutputTargetCopy => o.type === COPY;
@@ -78,7 +78,7 @@ export const isOutputTargetHydrate = (o: d.OutputTarget): o is d.OutputTargetHyd
 export const isOutputTargetCustom = (o: d.OutputTarget): o is d.OutputTargetCustom => o.type === CUSTOM;
 
 export const isOutputTargetDocs = (
-  o: d.OutputTarget,
+  o: d.OutputTarget
 ): o is d.OutputTargetDocsJson | d.OutputTargetDocsReadme | d.OutputTargetDocsVscode | d.OutputTargetDocsCustom =>
   o.type === DOCS_README || o.type === DOCS_JSON || o.type === DOCS_CUSTOM || o.type === DOCS_VSCODE;
 
@@ -97,7 +97,7 @@ export const isOutputTargetStats = (o: d.OutputTarget): o is d.OutputTargetStats
 export const isOutputTargetDistTypes = (o: d.OutputTarget): o is d.OutputTargetDistTypes => o.type === DIST_TYPES;
 
 export const getComponentsFromModules = (moduleFiles: d.Module[]) =>
-  sortBy(flatOne(moduleFiles.map(m => m.cmps)), (c: d.ComponentCompilerMeta) => c.tagName);
+  sortBy(flatOne(moduleFiles.map((m) => m.cmps)), (c: d.ComponentCompilerMeta) => c.tagName);
 
 export const canSkipOutputTargets = (buildCtx: d.BuildCtx) => {
   if (buildCtx.components.length === 0) {

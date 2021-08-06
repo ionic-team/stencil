@@ -1,10 +1,9 @@
 import { Component, Listen, State, h } from '@stencil/core';
 
 @Component({
-  tag: 'lifecycle-basic-a'
+  tag: 'lifecycle-basic-a',
 })
 export class LifecycleBasicA {
-
   @State() value = '';
   @State() rendered = 0;
   @State() loads: string[] = [];
@@ -53,26 +52,22 @@ export class LifecycleBasicA {
 
     return (
       <div>
-        <button onClick={this.testClick.bind(this)} class='test'>
+        <button onClick={this.testClick.bind(this)} class="test">
           Update
         </button>
-        <hr/>
-        <div>
-          LifecycleBasicA {this.value}
-        </div>
-        <div class='rendered-a'>
-          rendered a: {this.rendered}
-        </div>
+        <hr />
+        <div>LifecycleBasicA {this.value}</div>
+        <div class="rendered-a">rendered a: {this.rendered}</div>
         <div>loads a:</div>
-        <ol class='lifecycle-loads-a'>
-          {this.loads.map(load => {
-            return <li>{load}</li>
+        <ol class="lifecycle-loads-a">
+          {this.loads.map((load) => {
+            return <li>{load}</li>;
           })}
         </ol>
         <div>updates a:</div>
-        <ol class='lifecycle-updates-a'>
-          {this.updates.map(update => {
-            return <li>{update}</li>
+        <ol class="lifecycle-updates-a">
+          {this.updates.map((update) => {
+            return <li>{update}</li>;
           })}
         </ol>
         <lifecycle-basic-b value={this.value} />

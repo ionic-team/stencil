@@ -10,9 +10,9 @@ export const validateCopy = (copy: d.CopyTask[] | boolean, defaultCopy: d.CopyTa
   }
   copy = copy.slice();
   for (const task of defaultCopy) {
-    if (copy.every(t => t.src !== task.src)) {
+    if (copy.every((t) => t.src !== task.src)) {
       copy.push(task);
     }
   }
-  return unique(copy, task => `${task.src}:${task.dest}:${task.keepDirStructure}`);
+  return unique(copy, (task) => `${task.src}:${task.dest}:${task.keepDirStructure}`);
 };

@@ -78,5 +78,5 @@ function updateStyleTextNode(styleElm: MockStyleElement) {
     styleElm.appendChild(styleElm.ownerDocument.createTextNode(''));
   }
   const textNode = styleElm.childNodes[0];
-  textNode.nodeValue = styleElm.sheet.cssRules.map(r => r.cssText).join('\n');
+  textNode.nodeValue = styleElm.sheet.cssRules.map((r) => r.cssText).join('\n');
 }

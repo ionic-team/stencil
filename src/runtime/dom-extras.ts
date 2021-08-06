@@ -11,7 +11,24 @@ export const patchCloneNode = (HostElementPrototype: any) => {
     if (BUILD.slot && deep) {
       let i = 0;
       let slotted, nonStencilNode;
-      let stencilPrivates = ['s-id', 's-cr', 's-lr', 's-rc', 's-sc', 's-p', 's-cn', 's-sr', 's-sn', 's-hn', 's-ol', 's-nr', 's-si', 's-sf', 's-sfc', 's-hsf'];
+      let stencilPrivates = [
+        's-id',
+        's-cr',
+        's-lr',
+        's-rc',
+        's-sc',
+        's-p',
+        's-cn',
+        's-sr',
+        's-sn',
+        's-hn',
+        's-ol',
+        's-nr',
+        's-si',
+        's-sf',
+        's-sfc',
+        's-hsf',
+      ];
 
       for (; i < srcNode.__childNodes.length; i++) {
         slotted = (srcNode.__childNodes[i] as any)['s-nr'];
@@ -20,7 +37,7 @@ export const patchCloneNode = (HostElementPrototype: any) => {
         if (slotted) {
           clonedNode.__appendChild(slotted.cloneNode(true));
         }
-        if (nonStencilNode){
+        if (nonStencilNode) {
           clonedNode.__appendChild((srcNode.__childNodes[i] as any).cloneNode(true));
         }
       }
@@ -41,7 +58,7 @@ export const patchPseudoShadowDom = (HostElementPrototype: any) => {
   patchSlotInnerHTML(HostElementPrototype);
   patchSlotInnerText(HostElementPrototype);
   patchTextContent(HostElementPrototype);
-}
+};
 
 const patchChildSlotNodes = (HostElementPrototype: any) => {
   class FakeNodeList extends Array {
@@ -88,7 +105,7 @@ const patchChildSlotNodes = (HostElementPrototype: any) => {
         }
       }
       return result;
-    }
+    },
   });
 };
 
@@ -100,19 +117,19 @@ const patchSlotInnerHTML = (HostElementPrototype: any) => {
   if (descriptor) Object.defineProperty(HostElementPrototype, '__innerHTML', descriptor);
 
   Object.defineProperty(HostElementPrototype, 'innerHTML', {
-    get: function() {
+    get: function () {
       let html = '';
-      this.childNodes.forEach((node: d.RenderNode) => html+= node.outerHTML || node.textContent);
+      this.childNodes.forEach((node: d.RenderNode) => (html += node.outerHTML || node.textContent));
       return html;
     },
-    set: function(value) {
+    set: function (value) {
       this.childNodes.forEach((node: d.RenderNode) => {
         if (node['s-ol']) node['s-ol'].remove();
         node.remove();
       });
       this.insertAdjacentHTML('beforeend', value);
-    }
-  })
+    },
+  });
 };
 
 const patchSlotInnerText = (HostElementPrototype: any) => {
@@ -123,19 +140,19 @@ const patchSlotInnerText = (HostElementPrototype: any) => {
   if (descriptor) Object.defineProperty(HostElementPrototype, '__innerText', descriptor);
 
   Object.defineProperty(HostElementPrototype, 'innerText', {
-    get: function() {
+    get: function () {
       let text = '';
-      this.childNodes.forEach((node: d.RenderNode) => text+= node.innerText || node.textContent.trimEnd());
+      this.childNodes.forEach((node: d.RenderNode) => (text += node.innerText || node.textContent.trimEnd()));
       return text;
     },
-    set: function(value) {
+    set: function (value) {
       this.childNodes.forEach((node: d.RenderNode) => {
         if (node['s-ol']) node['s-ol'].remove();
         node.remove();
       });
       this.insertAdjacentHTML('beforeend', value);
-    }
-  })
+    },
+  });
 };
 
 const patchTextContent = (HostElementPrototype: any) => {
@@ -144,19 +161,19 @@ const patchTextContent = (HostElementPrototype: any) => {
   if (descriptor) Object.defineProperty(HostElementPrototype, '__textContent', descriptor);
 
   Object.defineProperty(HostElementPrototype, 'textContent', {
-    get: function() {
+    get: function () {
       let text = '';
-      this.childNodes.forEach((node: d.RenderNode) => text+= node.textContent || '');
+      this.childNodes.forEach((node: d.RenderNode) => (text += node.textContent || ''));
       return text;
     },
-    set: function(value) {
+    set: function (value) {
       this.childNodes.forEach((node: d.RenderNode) => {
         if (node['s-ol']) node['s-ol'].remove();
         node.remove();
       });
       this.insertAdjacentHTML('beforeend', value);
-    }
-  })
+    },
+  });
 };
 
 export const patchNodeRemove = (ElementPrototype: any) => {
@@ -164,38 +181,38 @@ export const patchNodeRemove = (ElementPrototype: any) => {
   ElementPrototype.__remove = ElementPrototype.remove || true;
   patchNodeRemoveChild(ElementPrototype.parentNode);
 
-  ElementPrototype.remove = function(this: Element) {
+  ElementPrototype.remove = function (this: Element) {
     if (this.parentNode) {
       return this.parentNode.removeChild(this);
     }
     return (this as any).__remove();
-  }
-}
+  };
+};
 
 const patchNodeRemoveChild = (ElementPrototype: any) => {
   if (!ElementPrototype || ElementPrototype.__removeChild) return;
   ElementPrototype.__removeChild = ElementPrototype.removeChild;
-  ElementPrototype.removeChild = function(this: d.RenderNode, toRemove: d.RenderNode) {
+  ElementPrototype.removeChild = function (this: d.RenderNode, toRemove: d.RenderNode) {
     if (toRemove['s-sn']) {
-      const slotNode = getHostSlotNode((this.__childNodes || this.childNodes), toRemove['s-sn']);
+      const slotNode = getHostSlotNode(this.__childNodes || this.childNodes, toRemove['s-sn']);
       (this as any).__removeChild(toRemove);
       if (slotNode && slotNode['s-hsf']) updateFallbackSlotVisibility(this);
       return;
     }
     return (this as any).__removeChild(toRemove);
-  }
-}
+  };
+};
 
 const patchSlotAppendChild = (HostElementPrototype: any) => {
   if (HostElementPrototype.__appendChild) return;
   HostElementPrototype.__appendChild = HostElementPrototype.appendChild;
-  HostElementPrototype.appendChild = function(this: d.HostElement, newChild: d.RenderNode) {
+  HostElementPrototype.appendChild = function (this: d.HostElement, newChild: d.RenderNode) {
     const slotName = (newChild['s-sn'] = getSlotName(newChild));
     const slotNode = getHostSlotNode(this.__childNodes, slotName);
     if (slotNode) {
       const slotPlaceholder: d.RenderNode = document.createTextNode('') as any;
       slotPlaceholder['s-nr'] = newChild;
-      if(slotNode['s-cr'].parentNode) {
+      if (slotNode['s-cr'].parentNode) {
         (slotNode['s-cr'].parentNode as any).__appendChild(slotPlaceholder);
       }
       newChild['s-ol'] = slotPlaceholder;
@@ -217,7 +234,7 @@ const patchSlotAppendChild = (HostElementPrototype: any) => {
 const patchSlotPrepend = (HostElementPrototype: any) => {
   if (HostElementPrototype.__prepend) return;
   HostElementPrototype.__prepend = HostElementPrototype.prepend;
-  HostElementPrototype.prepend = function(this: d.HostElement, ...newChildren: (d.RenderNode | string)[]) {
+  HostElementPrototype.prepend = function (this: d.HostElement, ...newChildren: (d.RenderNode | string)[]) {
     newChildren.forEach((newChild: d.RenderNode | string) => {
       if (typeof newChild === 'string') {
         newChild = this.ownerDocument.createTextNode(newChild) as unknown as d.RenderNode;
@@ -227,7 +244,7 @@ const patchSlotPrepend = (HostElementPrototype: any) => {
       if (slotNode) {
         const slotPlaceholder: d.RenderNode = document.createTextNode('') as any;
         slotPlaceholder['s-nr'] = newChild;
-        if(slotNode['s-cr'].parentNode) {
+        if (slotNode['s-cr'].parentNode) {
           (slotNode['s-cr'].parentNode as any).__appendChild(slotPlaceholder);
         }
         newChild['s-ol'] = slotPlaceholder;
@@ -243,73 +260,79 @@ const patchSlotPrepend = (HostElementPrototype: any) => {
       }
       if (newChild.nodeType === 1 && !!newChild.getAttribute('slot') && this.__childNodes) newChild.hidden = true;
       return (this as any).__prepend(newChild);
-    })
+    });
   };
 };
 
 const patchSlotAppend = (HostElementPrototype: any) => {
   if (HostElementPrototype.__append) return;
   HostElementPrototype.__append = HostElementPrototype.append;
-  HostElementPrototype.append = function(this: d.HostElement, ...newChildren: (d.RenderNode | string)[]) {
+  HostElementPrototype.append = function (this: d.HostElement, ...newChildren: (d.RenderNode | string)[]) {
     newChildren.forEach((newChild: d.RenderNode | string) => {
       if (typeof newChild === 'string') {
         newChild = this.ownerDocument.createTextNode(newChild) as unknown as d.RenderNode;
       }
       this.appendChild(newChild);
-    })
+    });
   };
 };
 
 const patchSlotReplaceChildren = (HostElementPrototype: any) => {
   if (HostElementPrototype.__replaceChildren) return;
   HostElementPrototype.__replaceChildren = HostElementPrototype.replaceChildren;
-  HostElementPrototype.replaceChildren = function(this: d.HostElement, ...newChildren: (Node | string)[]) {
+  HostElementPrototype.replaceChildren = function (this: d.HostElement, ...newChildren: (Node | string)[]) {
     const slotNode = getHostSlotNode(this.__childNodes, '');
     if (slotNode) {
       const slotChildNodes = getHostSlotChildNodes(slotNode, '');
-      slotChildNodes.forEach(node => {
-        if (!node['s-sr']) { node.remove(); }
+      slotChildNodes.forEach((node) => {
+        if (!node['s-sr']) {
+          node.remove();
+        }
       });
       this.append(...newChildren);
     }
-  }
-}
+  };
+};
 
 const patchSlotInsertAdjacentHTML = (HostElementPrototype: any) => {
   if (HostElementPrototype.__insertAdjacentHTML) return;
   HostElementPrototype.__insertAdjacentHTML = HostElementPrototype.insertAdjacentHTML;
-  HostElementPrototype.insertAdjacentHTML = function(this: d.HostElement, position: InsertPosition, text: string) {
+  HostElementPrototype.insertAdjacentHTML = function (this: d.HostElement, position: InsertPosition, text: string) {
     if (position !== 'afterbegin' && position !== 'beforeend') {
       return (this as any).__insertAdjacentHTML(position, text);
     }
     const container = this.ownerDocument.createElement('_');
     let node: d.RenderNode;
-	  container.innerHTML = text;
+    container.innerHTML = text;
 
     if (position === 'afterbegin') {
       while ((node = container.firstChild as d.RenderNode)) {
         this.prepend(node);
-			}
+      }
     } else if (position === 'beforeend') {
       while ((node = container.firstChild as d.RenderNode)) {
-				this.append(node);
-			}
+        this.append(node);
+      }
     }
-  }
-}
+  };
+};
 
 const patchSlotInsertAdjacentText = (HostElementPrototype: any) => {
   if (HostElementPrototype.__insertAdjacentText) return;
   HostElementPrototype.__insertAdjacentText = HostElementPrototype.insertAdjacentText;
-  HostElementPrototype.insertAdjacentText = function(this: d.HostElement, position: InsertPosition, text: string) {
+  HostElementPrototype.insertAdjacentText = function (this: d.HostElement, position: InsertPosition, text: string) {
     this.insertAdjacentHTML(position, text);
-  }
-}
+  };
+};
 
 const patchSlotInsertAdjacentElement = (HostElementPrototype: any) => {
   if (HostElementPrototype.__insertAdjacentElement) return;
   HostElementPrototype.__insertAdjacentElement = HostElementPrototype.insertAdjacentElement;
-  HostElementPrototype.insertAdjacentElement = function(this: d.HostElement, position: InsertPosition, element: d.RenderNode) {
+  HostElementPrototype.insertAdjacentElement = function (
+    this: d.HostElement,
+    position: InsertPosition,
+    element: d.RenderNode
+  ) {
     if (position !== 'afterbegin' && position !== 'beforeend') {
       return (this as any).__insertAdjacentElement(position, element);
     }
@@ -318,15 +341,16 @@ const patchSlotInsertAdjacentElement = (HostElementPrototype: any) => {
     } else if (position === 'beforeend') {
       this.append(element);
     }
-  }
-}
+  };
+};
 
-const getSlotName = (node: d.RenderNode) => node['s-sn'] || (node.nodeType === 1 && ((node as Element).getAttribute('slot')) || node.slot) || '';
+const getSlotName = (node: d.RenderNode) =>
+  node['s-sn'] || (node.nodeType === 1 && (node as Element).getAttribute('slot')) || node.slot || '';
 
 const getHostSlotNode = (childNodes: NodeListOf<ChildNode>, slotName: string) => {
   let i = 0;
   let childNode: d.RenderNode;
-  if(!childNodes) return null;
+  if (!childNodes) return null;
 
   for (; i < childNodes.length; i++) {
     childNode = childNodes[i] as d.RenderNode;
@@ -343,7 +367,7 @@ const getHostSlotNode = (childNodes: NodeListOf<ChildNode>, slotName: string) =>
 
 const getHostSlotChildNodes = (n: d.RenderNode, slotName: string) => {
   const childNodes: d.RenderNode[] = [n];
-  while ((n = n.nextSibling as any) && (n['s-sn'] === slotName)) {
+  while ((n = n.nextSibling as any) && n['s-sn'] === slotName) {
     childNodes.push(n as any);
   }
   return childNodes;

@@ -31,8 +31,8 @@ export const emptyOutputTargets = async (config: d.Config, compilerCtx: d.Compil
   }
   const cleanDirs = config.outputTargets
     .filter(isEmptable)
-    .filter(o => o.empty === true)
-    .map(o => o.dir || (o as any).esmDir)
+    .filter((o) => o.empty === true)
+    .map((o) => o.dir || (o as any).esmDir)
     .filter(isString);
 
   if (cleanDirs.length === 0) {

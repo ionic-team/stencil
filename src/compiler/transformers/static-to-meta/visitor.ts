@@ -13,9 +13,9 @@ export const convertStaticToMeta = (
   buildCtx: d.BuildCtx,
   typeChecker: ts.TypeChecker,
   collection: d.CollectionCompilerMeta,
-  transformOpts: d.TransformOptions,
+  transformOpts: d.TransformOptions
 ): ts.TransformerFactory<ts.SourceFile> => {
-  return transformCtx => {
+  return (transformCtx) => {
     let dirPath: string;
     let moduleFile: d.Module;
 
@@ -32,7 +32,7 @@ export const convertStaticToMeta = (
       return ts.visitEachChild(node, visitNode, transformCtx);
     };
 
-    return tsSourceFile => {
+    return (tsSourceFile) => {
       dirPath = dirname(tsSourceFile.fileName);
       moduleFile = getModuleLegacy(config, compilerCtx, tsSourceFile.fileName);
       resetModuleLegacy(moduleFile);

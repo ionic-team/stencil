@@ -6,12 +6,21 @@ import { HYDRATE_FACTORY_INTRO, HYDRATE_FACTORY_OUTRO } from './hydrate-factory-
 import { updateToHydrateComponents } from './update-to-hydrate-components';
 import { writeHydrateOutputs } from './write-hydrate-outputs';
 import { RollupOptions } from 'rollup';
-import { STENCIL_HYDRATE_FACTORY_ID, STENCIL_INTERNAL_HYDRATE_ID, STENCIL_MOCK_DOC_ID } from '../../bundle/entry-alias-ids';
+import {
+  STENCIL_HYDRATE_FACTORY_ID,
+  STENCIL_INTERNAL_HYDRATE_ID,
+  STENCIL_MOCK_DOC_ID,
+} from '../../bundle/entry-alias-ids';
 import MagicString from 'magic-string';
 import { rollup } from 'rollup';
 import { join } from 'path';
 
-export const generateHydrateApp = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, outputTargets: d.OutputTargetHydrate[]) => {
+export const generateHydrateApp = async (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  buildCtx: d.BuildCtx,
+  outputTargets: d.OutputTargetHydrate[]
+) => {
   try {
     const packageDir = join(config.sys.getCompilerExecutingPath(), '..', '..');
     const input = join(packageDir, 'internal', 'hydrate', 'runner.js');
@@ -97,10 +106,10 @@ const generateHydrateFactoryEntry = async (buildCtx: d.BuildCtx) => {
 
   s.append(`import { hydrateApp, registerComponents, styles } from '${STENCIL_INTERNAL_HYDRATE_ID}';\n`);
 
-  hydrateCmps.forEach(cmpData => s.append(cmpData.importLine + '\n'));
+  hydrateCmps.forEach((cmpData) => s.append(cmpData.importLine + '\n'));
 
   s.append(`registerComponents([\n`);
-  hydrateCmps.forEach(cmpData => {
+  hydrateCmps.forEach((cmpData) => {
     s.append(`  ${cmpData.uniqueComponentClassName},\n`);
   });
   s.append(`]);\n`);

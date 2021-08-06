@@ -1,10 +1,9 @@
 import { Component, State, h } from '@stencil/core';
 
 @Component({
-  tag: 'lifecycle-unload-root'
+  tag: 'lifecycle-unload-root',
 })
 export class LifecycleUnloadRoot {
-
   @State() renderCmp = true;
 
   testClick() {
@@ -14,9 +13,7 @@ export class LifecycleUnloadRoot {
   render() {
     return (
       <div>
-        <button onClick={this.testClick.bind(this)}>
-          {this.renderCmp ? 'Remove' : 'Add'}
-        </button>
+        <button onClick={this.testClick.bind(this)}>{this.renderCmp ? 'Remove' : 'Add'}</button>
         {this.renderCmp ? <lifecycle-unload-a></lifecycle-unload-a> : null}
       </div>
     );
