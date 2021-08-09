@@ -8,7 +8,7 @@ accepted
 
 ## Context
 
-We do not have any data on how our customers use Stencil and all of it's features. We need a feature built into the Stencil CLI which tracks the following data:
+We do not have any data on how our customers use Stencil and all of its features. We need a feature built into the Stencil CLI which tracks the following data:
 
  - Machine UUID [string] The value of telemetry.token from ~/.ionic/config.json
  - CPU Model [string]
