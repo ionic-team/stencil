@@ -8,7 +8,7 @@ historical
 
 ## Context
 
-Helper/utility methods are a common artifact of a large application, and we need a wy to organize them to be reusable across the sub-modules we develop per [ADR-5](./0005-repo-structure.md)
+Helper/utility methods are a common artifact of a large application, and we need a way to organize them to be reusable across the sub-modules we develop per [ADR-5](./0005-repo-structure.md)
 
 ## Options
 1. Place helper methods within the directory that they will be commonly consumed.
