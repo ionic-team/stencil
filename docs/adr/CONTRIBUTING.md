@@ -6,7 +6,7 @@ These ADR's serve a few different people:
 2. It helps Community members understand where we're at on decisions. 
 3. It helps the Stencil team begin to have open discussion about the changes we're making to Stencil. 
 4. It helps new developers, whether they're on the Stencil team or they're in the community, learn about the decisions we've made within the code.
-5. It helps eveyone to have a running, historical list of changes that have been incorporated into the codebase. 
+5. It helps everyone to have a running, historical list of changes that have been incorporated into the codebase. 
 
 # Who can propose an ADR? 
 Anybody can propose an ADR and request for comment on them. 
