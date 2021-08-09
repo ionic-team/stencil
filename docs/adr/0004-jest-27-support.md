@@ -15,7 +15,7 @@ Jest 27 introduces [multiple breaking changes](https://jestjs.io/blog/2021/05/25
 - Moving away from [core Jasmine testing infrastructure](https://jestjs.io/blog/2021/05/25/jest-27#flipping-defaults) to `jest-circus`)
 - Changing the default runtime environment from JSDom to Node
 - Changing the signature of `getCacheKey` for file transformations
-- Inclusion of it's own type declarations, deprecating the community supported `@types/jest` package
+- Inclusion of its own type declarations, deprecating the community supported `@types/jest` package
 
 The Stencil code base needs to take these items into consideration for two similar, but distinct items to be completed:
 
