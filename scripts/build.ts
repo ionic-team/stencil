@@ -14,6 +14,7 @@ import { sysNode, sysNodeExternalBundles } from './bundles/sys-node';
 import { testing } from './bundles/testing';
 import { validateBuild } from './test/validate-build';
 import { rollup } from 'rollup';
+import type { RollupOptions } from 'rollup';
 
 export async function run(rootDir: string, args: string[]) {
   try {
@@ -34,7 +35,12 @@ export async function run(rootDir: string, args: string[]) {
   }
 }
 
-export async function createBuild(opts: BuildOptions) {
+/**
+ * Build the rollup configuration for each submodule of the project
+ * @param opts build options to be used as a part of the configuration generation
+ * @returns the rollup configurations used to build each of the project's major submodules
+ */
+export async function createBuild(opts: BuildOptions): Promise<readonly RollupOptions[]> {
   await Promise.all([
     emptyDir(opts.output.cliDir),
     emptyDir(opts.output.compilerDir),

@@ -3,7 +3,14 @@ import { getVermoji } from './vermoji';
 import { PackageData } from './write-pkg-json';
 import { readFileSync } from 'fs-extra';
 
-export function getOptions(rootDir: string, inputOpts: BuildOptions = {}) {
+/**
+ * Retrieves options used during a process that needs knowledge of various project file paths, Stencil build
+ * information, and knowledge of the GitHub repo
+ * @param rootDir the root directory of the project
+ * @param inputOpts any build options to override manually
+ * @returns an entity containing various fields used during the build process
+ */
+export function getOptions(rootDir: string, inputOpts: BuildOptions = {}): BuildOptions {
   const srcDir = join(rootDir, 'src');
   const packageJsonPath = join(rootDir, 'package.json');
   const packageLockJsonPath = join(rootDir, 'package-lock.json');
@@ -81,7 +88,12 @@ export function getOptions(rootDir: string, inputOpts: BuildOptions = {}) {
   return opts;
 }
 
-export function createReplaceData(opts: BuildOptions) {
+/**
+ * Generates an object containing versioning information of various packages installed at build time
+ * @param opts the options being used during a build
+ * @returns an object that contains package names/versions installed at the time a build was invoked
+ */
+export function createReplaceData(opts: BuildOptions): Record<string, any> {
   const CACHE_BUSTER = 7;
 
   const typescriptPkg = require(join(opts.typescriptDir, 'package.json'));
@@ -126,6 +138,12 @@ export function createReplaceData(opts: BuildOptions) {
   };
 }
 
+/**
+ * Retrieves a package from the `node_modules` directory in the given `opts` parameter
+ * @param opts the options being used during a build
+ * @param pkgName the name of the NPM package to retrieve
+ * @returns information about the retrieved package
+ */
 function getPkg(opts: BuildOptions, pkgName: string): PackageData {
   return require(join(opts.nodeModulesDir, pkgName, 'package.json'));
 }

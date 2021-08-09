@@ -11,13 +11,19 @@ import { RollupOptions, OutputOptions } from 'rollup';
 import { writePkgJson } from '../utils/write-pkg-json';
 import { getBanner } from '../utils/banner';
 
-export async function cli(opts: BuildOptions) {
+/**
+ * Generates a rollup configuration for the `cli` submodule
+ * @param opts build options needed to generate the rollup configuration
+ * @returns an array containing the generated rollup options
+ */
+export async function cli(opts: BuildOptions): Promise<readonly RollupOptions[]> {
   const inputDir = join(opts.buildDir, 'cli');
   const outputDir = opts.output.cliDir;
   const esmFilename = 'index.js';
   const cjsFilename = 'index.cjs';
   const dtsFilename = 'index.d.ts';
 
+  // used by the Deno runtime
   const esOutput: OutputOptions = {
     format: 'es',
     file: join(outputDir, esmFilename),
@@ -25,6 +31,7 @@ export async function cli(opts: BuildOptions) {
     banner: getBanner(opts, `Stencil CLI`, true),
   };
 
+  // used by the NodeJS runtime
   const cjsOutput: OutputOptions = {
     format: 'cjs',
     file: join(outputDir, cjsFilename),
