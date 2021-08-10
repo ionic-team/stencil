@@ -88,6 +88,7 @@ const patchDynamicImport = (base: string, orgScriptElm: HTMLScriptElement) => {
       if (!mod) {
         const script = doc.createElement('script');
         script.type = 'module';
+        if((window as any).NONCE_ID) script.setAttribute('nonce', (window as any).NONCE_ID);
         script.crossOrigin = orgScriptElm.crossOrigin;
         script.src = URL.createObjectURL(new Blob([`import * as m from '${url}'; window.${importFunctionName}.m = m;`], { type: 'application/javascript' }));
         mod = new Promise(resolve => {

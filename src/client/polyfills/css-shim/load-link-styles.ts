@@ -47,6 +47,8 @@ export function addGlobalLink(doc: Document, globalScopes: CSSScope[], linkElm: 
         styleEl.setAttribute('data-styles', '');
         styleEl.textContent = text;
 
+        if((window as any).NONCE_ID) styleEl.setAttribute('nonce', (window as any).NONCE_ID);
+
         addGlobalStyle(globalScopes, styleEl);
         linkElm.parentNode.insertBefore(styleEl, linkElm);
         linkElm.remove();
