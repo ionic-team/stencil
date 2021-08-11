@@ -26,10 +26,10 @@ export const inlineExternalStyleSheets = async (sys: d.CompilerSystem, appDir: s
       try {
         let styles = await sys.readFile(fsPath);
 
-        // STENCIL-23
         const optimizeResults = await optimizeCss({
           input: styles,
         });
+
         styles = optimizeResults.output;
 
         // insert inline <style>
