@@ -694,7 +694,7 @@ render() {
         }
       }
 
-      for (i = relocateNodes.length-1; i >= 0; i--) {
+      for (i = relocateNodes.length - 1; i >= 0; i--) {
         relocateData = relocateNodes[i];
         nodeToRelocate = relocateData.$nodeToRelocate$;
 
