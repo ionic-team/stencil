@@ -169,13 +169,13 @@ export interface StencilConfig {
   hydratedFlag?: HydratedFlag;
 
   /**
-   * Ionic perfers to hide all components prior to hydration with a style tag appended 
-   * to the head of the document containing some `visibility: hidden;` css rules. 
-   * 
-   * Disabling this will remove the style tag that sets `visibility: hidden;` on all 
-   * unhydrated web components. This more closely follows the HTML spec, and allows 
-   * you to set your own fallback content. 
-   * 
+   * Ionic perfers to hide all components prior to hydration with a style tag appended
+   * to the head of the document containing some `visibility: hidden;` css rules.
+   *
+   * Disabling this will remove the style tag that sets `visibility: hidden;` on all
+   * unhydrated web components. This more closely follows the HTML spec, and allows
+   * you to set your own fallback content.
+   *
    */
   invisiblePrehydration?: boolean;
 
