@@ -26,7 +26,8 @@
     "paths": {
       "@stencil/core": ["../../internal"],
       "@stencil/core/internal": ["../../internal"],
-      "@stencil/core/testing": ["../../testing"]
+      "@stencil/core/testing": ["../../testing"],
+      "@test-prehydrated-styles": ["./test-prehydrated-styles"]
     }
   },
   "include": [
@@ -35,7 +36,10 @@
     "test-app/**/*.tsx",
     "test-app/**/*.ts",
     "test-app/util.ts",
-    "test-app/global.ts"
+    "test-app/global.ts",
+    "test-prehydrated-styles/components.d.ts",
+    "test-prehydrated-styles/**/*.spec.ts",
+    "test-prehydrated-styles/**/*.tsx"
   ],
   "exclude": [
     "test-prerender",
