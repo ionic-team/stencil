@@ -13,7 +13,7 @@ export const stylesToMarkdown = (styles: d.JsonDocsStyle[]) => {
   const table = new MarkdownTable();
   table.addHeader(['Name', 'Description']);
 
-  styles.forEach(style => {
+  styles.forEach((style) => {
     table.addRow([`\`${style.name}\``, style.docs]);
   });
 

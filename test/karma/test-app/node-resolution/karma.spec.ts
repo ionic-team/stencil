@@ -13,5 +13,4 @@ describe('node-resolution', () => {
     expect(app.querySelector('#module-index').textContent).toEqual('module/index.js');
     expect(app.querySelector('#module').textContent).toEqual('module.js');
   });
-
 });

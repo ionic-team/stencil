@@ -3,17 +3,16 @@ import { Component, Listen, State, h } from '@stencil/core';
 @Component({
   tag: 'listen-jsx',
   scoped: true,
-  styles:`
+  styles: `
   :host{
     background: black;
     display: block;
     color: white;
     width: 100px;
     height: 100px;
-  }`
+  }`,
 })
 export class AttributeBasic {
-
   @State() wasClicked = '';
 
   @Listen('click')
@@ -21,8 +20,6 @@ export class AttributeBasic {
     this.wasClicked = 'Host event';
   }
   render() {
-    return (
-      <span id="result">{this.wasClicked}</span>
-    );
+    return <span id="result">{this.wasClicked}</span>;
   }
 }

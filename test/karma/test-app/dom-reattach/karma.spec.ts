@@ -1,7 +1,6 @@
 import { setupDomTests } from '../util';
 
-
-describe('dom-reattach', function() {
+describe('dom-reattach', function () {
   const { setupDom, tearDownDom } = setupDomTests(document);
   let app: HTMLElement;
 
@@ -13,5 +12,4 @@ describe('dom-reattach', function() {
   it('should have proper values', async () => {
     app;
   });
-
 });

@@ -10,9 +10,7 @@ describe('slot-shadow-list', () => {
   afterEach(tearDownDom);
 
   it('renders this list in correct slots', async () => {
-    let button: HTMLButtonElement = app.querySelector(
-      'slot-list-light-root button'
-    );
+    let button: HTMLButtonElement = app.querySelector('slot-list-light-root button');
     let list = app.querySelector('slot-dynamic-shadow-list');
 
     expect(button).toBeTruthy();

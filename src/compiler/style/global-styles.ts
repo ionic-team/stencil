@@ -13,7 +13,7 @@ export const generateGlobalStyles = async (config: d.Config, compilerCtx: d.Comp
 
   const globalStyles = await buildGlobalStyles(config, compilerCtx, buildCtx);
   if (globalStyles) {
-    await Promise.all(outputTargets.map(o => compilerCtx.fs.writeFile(o.file, globalStyles)));
+    await Promise.all(outputTargets.map((o) => compilerCtx.fs.writeFile(o.file, globalStyles)));
   }
 };
 
@@ -40,13 +40,13 @@ const buildGlobalStyles = async (config: d.Config, compilerCtx: d.CompilerCtx, b
         compilerCtx,
         buildCtx.diagnostics,
         transformResults.code,
-        globalStylePath,
+        globalStylePath
       );
       compilerCtx.cachedGlobalStyle = optimizedCss;
-      
+
       if (Array.isArray(transformResults.dependencies)) {
         const cssModuleImports = compilerCtx.cssModuleImports.get(globalStylePath) || [];
-        transformResults.dependencies.forEach(dep => {
+        transformResults.dependencies.forEach((dep) => {
           compilerCtx.addWatchFile(dep);
           if (!cssModuleImports.includes(dep)) {
             cssModuleImports.push(dep);
@@ -84,7 +84,7 @@ const canSkipGlobalStyles = async (config: d.Config, compilerCtx: d.CompilerCtx,
   }
 
   const cssModuleImports = compilerCtx.cssModuleImports.get(config.globalStyle);
-  if (cssModuleImports && buildCtx.filesChanged.some(f => cssModuleImports.includes(f))) {
+  if (cssModuleImports && buildCtx.filesChanged.some((f) => cssModuleImports.includes(f))) {
     return false;
   }
 
@@ -94,7 +94,7 @@ const canSkipGlobalStyles = async (config: d.Config, compilerCtx: d.CompilerCtx,
     buildCtx,
     config.globalStyle,
     compilerCtx.cachedGlobalStyle,
-    [],
+    []
   );
   if (hasChangedImports) {
     return false;
@@ -109,7 +109,7 @@ const hasChangedImportFile = async (
   buildCtx: d.BuildCtx,
   filePath: string,
   content: string,
-  noLoop: string[],
+  noLoop: string[]
 ): Promise<boolean> => {
   if (noLoop.includes(filePath)) {
     return false;
@@ -125,7 +125,7 @@ const hasChangedImportContent = async (
   buildCtx: d.BuildCtx,
   filePath: string,
   content: string,
-  checkedFiles: string[],
+  checkedFiles: string[]
 ) => {
   const cssImports = await getCssImports(config, compilerCtx, buildCtx, filePath, content);
   if (cssImports.length === 0) {
@@ -133,8 +133,8 @@ const hasChangedImportContent = async (
     return false;
   }
 
-  const isChangedImport = buildCtx.filesChanged.some(changedFilePath => {
-    return cssImports.some(c => c.filePath === changedFilePath);
+  const isChangedImport = buildCtx.filesChanged.some((changedFilePath) => {
+    return cssImports.some((c) => c.filePath === changedFilePath);
   });
 
   if (isChangedImport) {
@@ -143,7 +143,7 @@ const hasChangedImportContent = async (
   }
 
   // keep diggin'
-  const promises = cssImports.map(async cssImportData => {
+  const promises = cssImports.map(async (cssImportData) => {
     try {
       const content = await compilerCtx.fs.readFile(cssImportData.filePath);
       return hasChangedImportFile(config, compilerCtx, buildCtx, cssImportData.filePath, content, checkedFiles);

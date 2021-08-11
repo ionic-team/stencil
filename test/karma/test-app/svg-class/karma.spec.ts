@@ -27,5 +27,4 @@ describe('svg class', () => {
     expect(circle.getAttribute('class')).toBe('red');
     expect(rect.getAttribute('class')).toBe('blue');
   });
-
 });

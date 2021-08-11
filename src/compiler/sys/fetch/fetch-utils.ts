@@ -31,17 +31,22 @@ export const getStencilModuleUrl = (compilerExe: string, p: string) => {
   return new URL('./' + p, getStencilRootUrl(compilerExe)).href;
 };
 
-export const getStencilInternalDtsUrl = (compilerExe: string) => getStencilModuleUrl(compilerExe, 'internal/index.d.ts');
+export const getStencilInternalDtsUrl = (compilerExe: string) =>
+  getStencilModuleUrl(compilerExe, 'internal/index.d.ts');
 
-export const getCommonDirUrl = (sys: d.CompilerSystem, pkgVersions: Map<string, string>, dirPath: string, fileName: string) =>
-  getNodeModuleFetchUrl(sys, pkgVersions, dirPath) + '/' + fileName;
+export const getCommonDirUrl = (
+  sys: d.CompilerSystem,
+  pkgVersions: Map<string, string>,
+  dirPath: string,
+  fileName: string
+) => getNodeModuleFetchUrl(sys, pkgVersions, dirPath) + '/' + fileName;
 
 export const getNodeModuleFetchUrl = (sys: d.CompilerSystem, pkgVersions: Map<string, string>, filePath: string) => {
   // /node_modules/lodash/package.json
   filePath = normalizePath(filePath);
 
   // ["node_modules", "lodash", "package.json"]
-  let pathParts = filePath.split('/').filter(p => p.length);
+  let pathParts = filePath.split('/').filter((p) => p.length);
 
   const nmIndex = pathParts.lastIndexOf('node_modules');
   if (nmIndex > -1 && nmIndex < pathParts.length - 1) {
@@ -89,7 +94,7 @@ export const skipFilePathFetch = (filePath: string) => {
 
 export const skipUrlFetch = (url: string) =>
   // files we just already know not to try to resolve request
-  knownUrlSkips.some(knownSkip => url.endsWith(knownSkip));
+  knownUrlSkips.some((knownSkip) => url.endsWith(knownSkip));
 
 const knownUrlSkips = [
   '/@stencil/core/internal.js',

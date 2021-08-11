@@ -1,4 +1,4 @@
-import { hello, world } from './module2'
+import { hello, world } from './module2';
 
 var state = 0;
 

@@ -1,11 +1,9 @@
 import { Component, h, Env, Host } from '@stencil/core';
 
-
 @Component({
-  tag: 'env-data'
+  tag: 'env-data',
 })
 export class EnvData {
-
   render() {
     return (
       <Host>

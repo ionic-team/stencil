@@ -1,13 +1,11 @@
 import { Component, h } from '@stencil/core';
 
-
 @Component({
   tag: 'cmp-scoped-a',
   styleUrl: 'cmp-scoped-a.css',
-  scoped: true
+  scoped: true,
 })
 export class CmpScopedA {
-
   render() {
     return (
       <div>

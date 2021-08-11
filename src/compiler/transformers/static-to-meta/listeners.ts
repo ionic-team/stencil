@@ -8,7 +8,7 @@ export const parseStaticListeners = (staticMembers: ts.ClassElement[]): d.Compon
     return [];
   }
 
-  return parsedListeners.map(parsedListener => {
+  return parsedListeners.map((parsedListener) => {
     return {
       name: parsedListener.name,
       method: parsedListener.method,

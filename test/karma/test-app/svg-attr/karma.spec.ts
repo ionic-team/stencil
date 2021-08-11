@@ -22,5 +22,4 @@ describe('svg attr', () => {
     await waitForChanges();
     expect(rect.getAttribute('transform')).toBe(null);
   });
-
 });

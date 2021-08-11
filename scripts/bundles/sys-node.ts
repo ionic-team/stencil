@@ -170,9 +170,9 @@ function bundleExternal(opts: BuildOptions, outputDir: string, cachedDir: string
         resolve: {
           alias: {
             '@utils': join(opts.buildDir, 'utils', 'index.js'),
-            'postcss': join(opts.nodeModulesDir, 'postcss'),
+            postcss: join(opts.nodeModulesDir, 'postcss'),
             'source-map': join(opts.nodeModulesDir, 'source-map'),
-            'chalk': join(opts.bundleHelpersDir, 'empty.js'),
+            chalk: join(opts.bundleHelpersDir, 'empty.js'),
           },
         },
         optimization: {
@@ -206,7 +206,7 @@ function bundleExternal(opts: BuildOptions, outputDir: string, cachedDir: string
             resolveBundle();
           }
         }
-      },
+      }
     );
   });
 }

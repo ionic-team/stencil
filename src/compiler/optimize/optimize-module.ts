@@ -47,7 +47,7 @@ export const optimizeModule = async (config: Config, compilerCtx: CompilerCtx, o
       if (!isDebug) {
         compressOpts.passes = 2;
         compressOpts.global_defs = {
-          'supportsListenerOptions': true,
+          supportsListenerOptions: true,
           'plt.$cssShim$': false,
         };
         compressOpts.pure_funcs = compressOpts.pure_funcs || [];
@@ -67,7 +67,12 @@ export const optimizeModule = async (config: Config, compilerCtx: CompilerCtx, o
 
   const shouldTranspile = opts.sourceTarget === 'es5';
   const results = await compilerCtx.worker.prepareModule(code, minifyOpts, shouldTranspile, opts.inlineHelpers);
-  if (results != null && typeof results.output === 'string' && results.diagnostics.length === 0 && compilerCtx != null) {
+  if (
+    results != null &&
+    typeof results.output === 'string' &&
+    results.diagnostics.length === 0 &&
+    compilerCtx != null
+  ) {
     if (opts.isCore) {
       results.output = results.output.replace(/disconnectedCallback\(\)\{\},/g, '');
     }
@@ -123,7 +128,12 @@ export const getTerserOptions = (config: Config, sourceTarget: SourceTarget, pre
   return opts;
 };
 
-export const prepareModule = async (input: string, minifyOpts: MinifyOptions, transpileToEs5: boolean, inlineHelpers: boolean) => {
+export const prepareModule = async (
+  input: string,
+  minifyOpts: MinifyOptions,
+  transpileToEs5: boolean,
+  inlineHelpers: boolean
+) => {
   const results = {
     output: input,
     diagnostics: [] as Diagnostic[],

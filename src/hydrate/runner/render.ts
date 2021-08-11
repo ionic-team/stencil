@@ -19,7 +19,7 @@ export function renderToString(html: string | any, options?: SerializeDocumentOp
   const opts = normalizeHydrateOptions(options);
   opts.serializeToHtml = true;
 
-  return new Promise<HydrateResults>(resolve => {
+  return new Promise<HydrateResults>((resolve) => {
     let win: Window & typeof globalThis;
     const results = generateHydrateResults(opts);
 
@@ -63,7 +63,7 @@ export function hydrateDocument(doc: any | string, options?: HydrateDocumentOpti
   const opts = normalizeHydrateOptions(options);
   opts.serializeToHtml = false;
 
-  return new Promise<HydrateResults>(resolve => {
+  return new Promise<HydrateResults>((resolve) => {
     let win: Window & typeof globalThis;
     const results = generateHydrateResults(opts);
 
@@ -107,12 +107,12 @@ function render(
   win: Window & typeof globalThis,
   opts: HydrateFactoryOptions,
   results: HydrateResults,
-  resolve: (results: HydrateResults) => void,
+  resolve: (results: HydrateResults) => void
 ) {
   if (!(process as any).__stencilErrors) {
     (process as any).__stencilErrors = true;
 
-    process.on('unhandledRejection', e => {
+    process.on('unhandledRejection', (e) => {
       console.log('unhandledRejection', e);
     });
   }
@@ -142,7 +142,7 @@ function afterHydrate(
   win: Window,
   opts: HydrateFactoryOptions,
   results: HydrateResults,
-  resolve: (results: HydrateResults) => void,
+  resolve: (results: HydrateResults) => void
 ) {
   if (typeof opts.afterHydrate === 'function') {
     try {
@@ -168,7 +168,7 @@ function finalizeHydrate(
   doc: Document,
   opts: HydrateFactoryOptions,
   results: HydrateResults,
-  resolve: (results: HydrateResults) => void,
+  resolve: (results: HydrateResults) => void
 ) {
   try {
     inspectElement(results, doc.documentElement, 0);

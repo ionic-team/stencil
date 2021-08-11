@@ -15,13 +15,13 @@ export const generateReadme = async (
   compilerCtx: d.CompilerCtx,
   readmeOutputs: d.OutputTargetDocsReadme[],
   docsData: d.JsonDocsComponent,
-  cmps: d.JsonDocsComponent[],
+  cmps: d.JsonDocsComponent[]
 ) => {
   const isUpdate = !!docsData.readme;
   const userContent = isUpdate ? docsData.readme : getDefaultReadme(docsData);
 
   await Promise.all(
-    readmeOutputs.map(async readmeOutput => {
+    readmeOutputs.map(async (readmeOutput) => {
       if (readmeOutput.dir) {
         const readmeContent = generateMarkdown(userContent, docsData, cmps, readmeOutput);
         const relPath = relative(config.srcDir, docsData.readmePath);
@@ -35,11 +35,16 @@ export const generateReadme = async (
           }
         }
       }
-    }),
+    })
   );
 };
 
-export const generateMarkdown = (userContent: string, cmp: d.JsonDocsComponent, cmps: d.JsonDocsComponent[], readmeOutput: d.OutputTargetDocsReadme) => {
+export const generateMarkdown = (
+  userContent: string,
+  cmp: d.JsonDocsComponent,
+  cmps: d.JsonDocsComponent[],
+  readmeOutput: d.OutputTargetDocsReadme
+) => {
   //If the readmeOutput.dependencies is true or undefined the dependencies will be generated.
   const dependencies = readmeOutput.dependencies !== false ? depsToMarkdown(cmp, cmps) : [];
   return [

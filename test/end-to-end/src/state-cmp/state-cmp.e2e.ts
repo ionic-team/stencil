@@ -1,12 +1,12 @@
 import { newE2EPage } from '@stencil/core/testing';
 
-
 describe('@State', () => {
-
   it('should render all weekdays', async () => {
-    const page = await newE2EPage({ html: `
+    const page = await newE2EPage({
+      html: `
       <state-cmp></state-cmp>
-    `});
+    `,
+    });
 
     const label = await page.find('state-cmp >>> label');
     expect(label).toEqualHtml('<label>What is your favorite day?</label>');
@@ -24,9 +24,11 @@ describe('@State', () => {
   });
 
   it('should select a day and check computed styles', async () => {
-    const page = await newE2EPage({ html: `
+    const page = await newE2EPage({
+      html: `
       <state-cmp></state-cmp>
-    `});
+    `,
+    });
 
     const buttons = await page.findAll('state-cmp >>> button');
     await buttons[6].click();
@@ -45,5 +47,4 @@ describe('@State', () => {
     expect(unselectedStyle.fontWeight).not.toBe('700');
     expect(unselectedStyle.color).toBe('rgb(0, 0, 0)');
   });
-
 });

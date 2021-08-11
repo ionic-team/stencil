@@ -1,9 +1,9 @@
-import {Component, h } from '@stencil/core';
+import { Component, h } from '@stencil/core';
 import output from './output';
 
 @Component({
   tag: 'lifecycle-nested-b',
-  shadow: true
+  shadow: true,
 })
 export class Cmpb {
   async componentWillLoad() {

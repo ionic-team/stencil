@@ -9,7 +9,7 @@ export class CarDetail {
   @Prop() car: CarData;
 
   componentWillLoad() {
-    return new Promise(resolve => setTimeout(resolve, 20));
+    return new Promise((resolve) => setTimeout(resolve, 20));
   }
 
   render() {

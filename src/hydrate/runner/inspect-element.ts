@@ -11,7 +11,7 @@ export function inspectElement(results: d.HydrateResults, elm: Element, depth: n
       // we've already collected components that were hydrated
       // now that the document is completed we can count how
       // many they are and their depth
-      const cmp = results.components.find(c => c.tag === tagName);
+      const cmp = results.components.find((c) => c.tag === tagName);
       if (cmp != null) {
         cmp.count++;
         if (depth > cmp.depth) {
@@ -24,7 +24,7 @@ export function inspectElement(results: d.HydrateResults, elm: Element, depth: n
           const anchor = collectAttributes(childElm);
           anchor.href = (childElm as HTMLAnchorElement).href;
           if (typeof anchor.href === 'string') {
-            if (!results.anchors.some(a => a.href === anchor.href)) {
+            if (!results.anchors.some((a) => a.href === anchor.href)) {
               results.anchors.push(anchor);
             }
           }
@@ -34,7 +34,7 @@ export function inspectElement(results: d.HydrateResults, elm: Element, depth: n
           const img = collectAttributes(childElm);
           img.src = (childElm as HTMLImageElement).src;
           if (typeof img.src === 'string') {
-            if (!results.imgs.some(a => a.src === img.src)) {
+            if (!results.imgs.some((a) => a.src === img.src)) {
               results.imgs.push(img);
             }
           }
@@ -45,7 +45,7 @@ export function inspectElement(results: d.HydrateResults, elm: Element, depth: n
           link.href = (childElm as HTMLLinkElement).href;
           if (typeof link.rel === 'string' && link.rel.toLowerCase() === 'stylesheet') {
             if (typeof link.href === 'string') {
-              if (!results.styles.some(s => s.link === link.href)) {
+              if (!results.styles.some((s) => s.link === link.href)) {
                 delete link.rel;
                 delete link.type;
                 results.styles.push(link);
@@ -60,7 +60,7 @@ export function inspectElement(results: d.HydrateResults, elm: Element, depth: n
           if (childElm.hasAttribute('src')) {
             script.src = (childElm as HTMLScriptElement).src;
             if (typeof script.src === 'string') {
-              if (!results.scripts.some(s => s.src === script.src)) {
+              if (!results.scripts.some((s) => s.src === script.src)) {
                 results.scripts.push(script);
               }
             }

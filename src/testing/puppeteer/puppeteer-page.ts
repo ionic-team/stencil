@@ -8,13 +8,7 @@ import type {
   PageDiagnostic,
 } from './puppeteer-declarations';
 
-import type {
-  ConsoleMessage,
-  ConsoleMessageLocation,
-  JSHandle,
-  Page,
-  WaitForOptions,
-} from 'puppeteer';
+import type { ConsoleMessage, ConsoleMessageLocation, JSHandle, Page, WaitForOptions } from 'puppeteer';
 import { find, findAll } from './puppeteer-element';
 import { initPageEvents, waitForEvent } from './puppeteer-events';
 import { initPageScreenshot } from './puppeteer-screenshot';
@@ -46,7 +40,7 @@ export async function newE2EPage(opts: NewE2EPageOptions = {}): Promise<E2EPage>
     page.close = async (options?: PageCloseOptions) => {
       try {
         if (Array.isArray(page._e2eElements)) {
-          const disposes = page._e2eElements.map(async elmHande => {
+          const disposes = page._e2eElements.map(async (elmHande) => {
             if (typeof elmHande.e2eDispose === 'function') {
               await elmHande.e2eDispose();
             }
@@ -95,7 +89,7 @@ export async function newE2EPage(opts: NewE2EPageOptions = {}): Promise<E2EPage>
       return findAll(page, docHandle, selector) as any;
     };
 
-    page.waitForEvent = async eventName => {
+    page.waitForEvent = async (eventName) => {
       const docHandle = await getDocHandle();
       return waitForEvent(page, eventName, docHandle);
     };
@@ -111,7 +105,7 @@ export async function newE2EPage(opts: NewE2EPageOptions = {}): Promise<E2EPage>
         throw new Error('Set the --devtools flag in order to use E2EPage.debugger()');
       }
       return page.evaluate(() => {
-        return new Promise<void>(resolve => {
+        return new Promise<void>((resolve) => {
           // tslint:disable-next-line: no-debugger
           debugger;
           resolve();
@@ -122,7 +116,7 @@ export async function newE2EPage(opts: NewE2EPageOptions = {}): Promise<E2EPage>
     const failOnConsoleError = opts.failOnConsoleError === true;
     const failOnNetworkError = opts.failOnNetworkError === true;
 
-    page.on('console', ev => {
+    page.on('console', (ev) => {
       if (ev.type() === 'error') {
         diagnostics.push({
           type: 'error',
@@ -143,7 +137,7 @@ export async function newE2EPage(opts: NewE2EPageOptions = {}): Promise<E2EPage>
       });
       fail(err);
     });
-    page.on('requestfailed', req => {
+    page.on('requestfailed', (req) => {
       diagnostics.push({
         type: 'requestfailed',
         message: req.failure().errorText,
@@ -306,7 +300,7 @@ async function waitForChanges(page: E2EPageInternal) {
     if (page.isClosed()) {
       return;
     }
-    await Promise.all(page._e2eElements.map(elm => elm.e2eRunActions()));
+    await Promise.all(page._e2eElements.map((elm) => elm.e2eRunActions()));
 
     if (page.isClosed()) {
       return;
@@ -314,7 +308,7 @@ async function waitForChanges(page: E2EPageInternal) {
 
     await page.evaluate(() => {
       // BROWSER CONTEXT
-      return new Promise<void>(resolve => {
+      return new Promise<void>((resolve) => {
         requestAnimationFrame(() => {
           const promises: Promise<any>[] = [];
 
@@ -364,7 +358,7 @@ async function waitForChanges(page: E2EPageInternal) {
       await page.waitFor(100);
     }
 
-    await Promise.all(page._e2eElements.map(elm => elm.e2eSync()));
+    await Promise.all(page._e2eElements.map((elm) => elm.e2eSync()));
   } catch (e) {}
 }
 

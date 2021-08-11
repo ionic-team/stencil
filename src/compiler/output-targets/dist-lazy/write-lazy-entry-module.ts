@@ -9,14 +9,16 @@ export const writeLazyModule = async (
   entryModule: d.EntryModule,
   shouldHash: boolean,
   code: string,
-  sufix: string,
+  sufix: string
 ): Promise<d.BundleModuleOutput> => {
   // code = replaceStylePlaceholders(entryModule.cmps, modeName, code);
 
   const bundleId = await getBundleId(config, entryModule.entryKey, shouldHash, code, sufix);
   const fileName = `${bundleId}.entry.js`;
 
-  await Promise.all(destinations.map(dst => compilerCtx.fs.writeFile(join(dst, fileName), code, { outputTargetType })));
+  await Promise.all(
+    destinations.map((dst) => compilerCtx.fs.writeFile(join(dst, fileName), code, { outputTargetType }))
+  );
 
   return {
     bundleId,

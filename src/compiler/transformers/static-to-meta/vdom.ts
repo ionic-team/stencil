@@ -23,7 +23,7 @@ export const gatherVdomMeta = (m: d.Module | d.ComponentCompilerMeta, args: ts.N
       m.hasVdomStyle = true;
       m.hasVdomXlink = true;
     } else if (ts.isObjectLiteralExpression(objectLiteral)) {
-      objectLiteral.properties.forEach(prop => {
+      objectLiteral.properties.forEach((prop) => {
         m.hasVdomAttribute = true;
         if (ts.isSpreadAssignment(prop) || ts.isComputedPropertyName(prop.name)) {
           m.hasVdomClass = true;
@@ -57,7 +57,7 @@ export const gatherVdomMeta = (m: d.Module | d.ComponentCompilerMeta, args: ts.N
               ...prop.initializer.text
                 .toLowerCase()
                 .split(' ')
-                .filter(part => part.length > 0),
+                .filter((part) => part.length > 0)
             );
           }
           m.htmlAttrNames.push(attrName);
