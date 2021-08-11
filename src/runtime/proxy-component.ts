@@ -118,6 +118,50 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
       prototype.attributeChangedCallback = function (attrName: string, _oldValue: string, newValue: string) {
         plt.jmp(() => {
           const propName = attrNameToPropName.get(attrName);
+          const descriptor = Object.getOwnPropertyDescriptor(this, propName)
+          // there's no setter for this property. Exit
+          if (descriptor && !!descriptor.get && !descriptor.set) {
+            return;
+          }
+
+          //  In a webcomponent lifecyle the attributeChangedCallback runs prior to connectedCallback
+          //  in the case where an attribute was set inline.
+          //  ```html
+          //    <my-component some-attribute="some-value"></my-component>
+          //  ```
+          //
+          //  There is an edge case where a developer sets the attribute inline on a custom element and then programatically
+          //  changes it before it has been upgraded as shown below:
+          //
+          //  ```html
+          //    <!-- this component has _not_ been upgraded yet -->
+          //    <my-component id="test" some-attribute="some-value"></my-component>
+          //    <script>
+          //      // grab non-upgraded component
+          //      el = document.querySelector("#test");
+          //      el.someAttribute = "another-value";
+          //      // upgrade component
+          //      cutsomElements.define('my-component', MyComponent);
+          //    </script>
+          //  ```
+          //  In this case if we do not unshadow here and use the value of the shadowing property, attributeChangedCallback
+          //  will be called with `newValue = "some-value"` and will set the shadowed property (this.someAttribute = "another-value")
+          //  to the value that was set inline i.e. "some-value" from above example. When
+          //  the connectedCallback attempts to unshadow it will use "some-value" as the intial value rather than "another-value"
+          //
+          //  The case where the attribute was NOT set inline but was not set programmatically shall be handled/unshadowed
+          //  by connectedCallback as this attributeChangedCallback will not fire.
+          //
+          //  https://developers.google.com/web/fundamentals/web-components/best-practices#lazy-properties
+          //
+          //  TODO(STENCIL-16) we should think about whether or not we actually want to be reflecting the attributes to
+          //  properties here given that this goes against best practices outlined here
+          //  https://developers.google.com/web/fundamentals/web-components/best-practices#avoid-reentrancy
+          if (this.hasOwnProperty(propName)) {
+            newValue = this[propName];
+            delete this[propName];
+          }
+
           this[propName] = newValue === null && typeof this[propName] === 'boolean' ? false : newValue;
         });
       };
