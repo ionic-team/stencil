@@ -12,7 +12,7 @@ module.exports = {
     '@utils': '<rootDir>/src/utils',
   },
   coverageDirectory: './test-results/',
-  coverageReporters: ["json", "lcov", "text", "clover"],
+  coverageReporters: ['json', 'lcov', 'text', 'clover'],
   collectCoverageFrom: [
     '<rootDir>/src/app-data/**/*.{js,jsx,ts,tsx}',
     '<rootDir>/src/app-globals/**/*.{js,jsx,ts,tsx}',
@@ -25,7 +25,7 @@ module.exports = {
     '<rootDir>/src/mock-doc/**/*.{js,jsx,ts,tsx}',
     '<rootDir>/src/runtime/**/*.{js,jsx,ts,tsx}',
     '<rootDir>/src/screenshot/**/*.{js,jsx,ts,tsx}',
-    '<rootDir>/src/sys/**/*.{js,jsx,ts,tsx}',
+    '<rootDir>/src/sys/node/**/*.{js,jsx,ts,tsx}',
     '<rootDir>/src/testing/**/*.{js,jsx,ts,tsx}',
     '<rootDir>/src/utils/**/*.{js,jsx,ts,tsx}',
   ],
