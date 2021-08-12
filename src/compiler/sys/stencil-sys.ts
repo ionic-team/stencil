@@ -38,7 +38,7 @@ export const createSystem = (c?: { logger?: Logger }) => {
 
   const destroy = async () => {
     const waits: Promise<void>[] = [];
-    destroys.forEach(cb => {
+    destroys.forEach((cb) => {
       try {
         const rtn = cb();
         if (rtn && rtn.then) {
@@ -100,7 +100,7 @@ export const createSystem = (c?: { logger?: Logger }) => {
   const createDirRecursiveSync = (
     p: string,
     opts: CompilerSystemCreateDirectoryOptions,
-    results: CompilerSystemCreateDirectoryResults,
+    results: CompilerSystemCreateDirectoryResults
   ) => {
     const parentDir = dirname(p);
 
@@ -296,7 +296,7 @@ export const createSystem = (c?: { logger?: Logger }) => {
   const remoreDirSyncRecursive = (
     p: string,
     opts: CompilerSystemRemoveDirectoryOptions,
-    results: CompilerSystemRemoveDirectoryResults,
+    results: CompilerSystemRemoveDirectoryResults
   ) => {
     if (!results.error) {
       p = normalize(p);
@@ -505,6 +505,8 @@ export const createSystem = (c?: { logger?: Logger }) => {
     return results;
   };
 
+  const fetch = global.fetch;
+
   const writeFile = async (p: string, data: string) => writeFileSync(p, data);
 
   const tmpDirSync = () => '/.tmp';
@@ -516,7 +518,7 @@ export const createSystem = (c?: { logger?: Logger }) => {
   const generateContentHash = async (content: string, hashLength: number) => {
     const arrayBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(content));
     const hashArray = Array.from(new Uint8Array(arrayBuffer)); // convert buffer to byte array
-    let hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join(''); // convert bytes to hex string
+    let hashHex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join(''); // convert bytes to hex string
     if (typeof hashLength === 'number') {
       hashHex = hashHex.substr(0, hashLength);
     }
@@ -565,7 +567,7 @@ export const createSystem = (c?: { logger?: Logger }) => {
     getEnvironmentVar,
     destroy,
     encodeToBase64,
-    exit: async exitCode => logger.warn(`exit ${exitCode}`),
+    exit: async (exitCode) => logger.warn(`exit ${exitCode}`),
     getCurrentDirectory,
     getCompilerExecutingPath,
     getLocalModulePath,
@@ -583,6 +585,7 @@ export const createSystem = (c?: { logger?: Logger }) => {
     realpathSync,
     removeDestory,
     rename,
+    fetch,
     resolvePath,
     removeDir,
     removeDirSync,
@@ -598,7 +601,7 @@ export const createSystem = (c?: { logger?: Logger }) => {
     writeFileSync,
     generateContentHash,
     createWorkerController: HAS_WEB_WORKER
-      ? maxConcurrentWorkers => createWebWorkerMainController(sys, maxConcurrentWorkers)
+      ? (maxConcurrentWorkers) => createWebWorkerMainController(sys, maxConcurrentWorkers)
       : null,
     details: {
       cpuModel: '',
@@ -610,7 +613,7 @@ export const createSystem = (c?: { logger?: Logger }) => {
     copy,
   };
 
-  sys.resolveModuleId = opts => resolveModuleIdAsync(sys, null, opts);
+  sys.resolveModuleId = (opts) => resolveModuleIdAsync(sys, null, opts);
 
   return sys;
 };

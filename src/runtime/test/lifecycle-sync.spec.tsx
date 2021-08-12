@@ -133,7 +133,9 @@ describe('lifecycle sync', () => {
     });
 
     expect(root.textContent).toBe('connectedCallback componentWillLoad componentWillRender render');
-    expect(log.trim()).toEqual('connectedCallback componentWillLoad componentWillRender render componentDidRender componentDidLoad');
+    expect(log.trim()).toEqual(
+      'connectedCallback componentWillLoad componentWillRender render componentDidRender componentDidLoad'
+    );
 
     log = '';
     root.prop = 1;
@@ -141,7 +143,9 @@ describe('lifecycle sync', () => {
 
     expect(root.textContent).toBe('propDidChange componentWillUpdate componentWillRender render');
 
-    expect(log.trim()).toBe('propDidChange componentWillUpdate componentWillRender render componentDidRender componentDidUpdate');
+    expect(log.trim()).toBe(
+      'propDidChange componentWillUpdate componentWillRender render componentDidRender componentDidUpdate'
+    );
   });
 
   it('implement deep equality', async () => {

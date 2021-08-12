@@ -46,7 +46,7 @@ export const styleToStatic = (newMembers: ts.ClassElement[], componentOptions: d
       newMembers.push(createStaticGetter('styles', ts.createLiteral(styles)));
     }
   } else if (componentOptions.styles) {
-    const convertIdentifier = (componentOptions.styles as any) as ConvertIdentifier;
+    const convertIdentifier = componentOptions.styles as any as ConvertIdentifier;
     if (convertIdentifier.__identifier) {
       // import styles from './styles.css';
       // @Component({
@@ -72,8 +72,8 @@ export const styleToStatic = (newMembers: ts.ClassElement[], componentOptions: d
 
 const normalizeExtension = (styleUrls: d.CompilerModeStyles) => {
   const compilerStyleUrls: d.CompilerModeStyles = {};
-  Object.keys(styleUrls).forEach(key => {
-    compilerStyleUrls[key] = styleUrls[key].map(s => useCss(s));
+  Object.keys(styleUrls).forEach((key) => {
+    compilerStyleUrls[key] = styleUrls[key].map((s) => useCss(s));
   });
   return compilerStyleUrls;
 };
@@ -87,7 +87,7 @@ const useCss = (stylePath: string) => {
 
 const normalizeStyleUrls = (styleUrls: d.ModeStyles): d.CompilerModeStyles => {
   const compilerStyleUrls: d.CompilerModeStyles = {};
-  Object.keys(styleUrls).forEach(key => {
+  Object.keys(styleUrls).forEach((key) => {
     compilerStyleUrls[key] = normalizeStyleUrl(styleUrls[key]);
   });
   return compilerStyleUrls;

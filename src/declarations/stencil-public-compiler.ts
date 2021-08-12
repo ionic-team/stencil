@@ -539,6 +539,7 @@ export type TaskCommand =
   | 'info'
   | 'prerender'
   | 'serve'
+  | 'telemetry'
   | 'test'
   | 'version';
 
@@ -1034,6 +1035,7 @@ export interface CompilerSystem {
    */
   removeFileSync(p: string): CompilerSystemRemoveFileResults;
   setupCompiler?: (c: { ts: any }) => void;
+
   /**
    * Always returns an object. Does not throw. Check for "error" property if there's an error.
    */

@@ -1,7 +1,56 @@
-import { initializeStencilCLIConfig } from '../../state/stencil-cli-config';
-import { isInteractive, TERMINAL_INFO, tryFn, uuidv4 } from '../helpers';
+import { getStencilCLIConfig, initializeStencilCLIConfig } from '../../state/stencil-cli-config';
+import { isInteractive, TERMINAL_INFO, tryFn, uuidv4, hasDebug, hasVerbose } from '../helpers';
 import { createSystem } from '../../../compiler/sys/stencil-sys';
 import { mockLogger } from '@stencil/core/testing';
+
+describe('hasDebug', () => {
+  it('Returns true when a flag is passed', () => {
+    getStencilCLIConfig().flags = {
+      debug: true,
+      verbose: false,
+    };
+
+    expect(hasDebug()).toBe(true);
+  });
+
+  it('Returns false when a flag is not passed', () => {
+    getStencilCLIConfig().flags = {
+      debug: false,
+      verbose: false,
+    };
+
+    expect(hasDebug()).toBe(false);
+  });
+});
+
+describe('hasVerbose', () => {
+  it('Returns true when both flags are passed', () => {
+    getStencilCLIConfig().flags = {
+      debug: true,
+      verbose: true,
+    };
+
+    expect(hasVerbose()).toBe(true);
+  });
+
+  it('Returns false when the verbose flag is passed, and debug is not', () => {
+    getStencilCLIConfig().flags = {
+      debug: false,
+      verbose: true,
+    };
+
+    expect(hasVerbose()).toBe(false);
+  });
+
+  it('Returns false when the flag is not passed', () => {
+    getStencilCLIConfig().flags = {
+      debug: false,
+      verbose: false,
+    };
+
+    expect(hasVerbose()).toBe(false);
+  });
+});
 
 describe('uuidv4', () => {
   it('outputs a UUID', () => {

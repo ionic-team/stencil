@@ -75,7 +75,7 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
         return dirs;
       }, [] as string[]);
 
-    const allFsItems = await Promise.all(dirs.map(dir => readdir(dir, { recursive: true })));
+    const allFsItems = await Promise.all(dirs.map((dir) => readdir(dir, { recursive: true })));
     const reducedItems: string[] = [];
 
     for (const fsItems of allFsItems) {
@@ -96,7 +96,7 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
 
     await Promise.all(reducedItems.map(removeItem));
 
-    dirs.forEach(dir => {
+    dirs.forEach((dir) => {
       const item = getItem(dir);
       item.isFile = false;
       item.isDirectory = true;
@@ -151,7 +151,12 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
     });
   };
 
-  const readDirectory = async (initPath: string, dirPath: string, opts: d.FsReaddirOptions, collectedPaths: d.FsReaddirItem[]) => {
+  const readDirectory = async (
+    initPath: string,
+    dirPath: string,
+    opts: d.FsReaddirOptions,
+    collectedPaths: d.FsReaddirItem[]
+  ) => {
     // used internally only so we could easily recursively drill down
     // loop through this directory and sub directories
     // always a disk read!!removeDir
@@ -164,7 +169,7 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
       item.isDirectory = true;
 
       await Promise.all(
-        dirItems.map(async dirItem => {
+        dirItems.map(async (dirItem) => {
           // let's loop through each of the files we've found so far
           // create an absolute path of the item inside of this directory
           const absPath = normalizePath(dirItem);
@@ -191,7 +196,7 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
             // let's keep drilling down
             await readDirectory(initPath, absPath, opts, collectedPaths);
           }
-        }),
+        })
       );
     }
   };
@@ -200,14 +205,14 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
     if (item.isDirectory) {
       if (Array.isArray(opts.excludeDirNames)) {
         const base = basename(item.absPath);
-        if (opts.excludeDirNames.some(dir => base === dir)) {
+        if (opts.excludeDirNames.some((dir) => base === dir)) {
           return true;
         }
       }
     } else {
       if (Array.isArray(opts.excludeExtensions)) {
         const p = item.relPath.toLowerCase();
-        if (opts.excludeExtensions.some(ext => p.endsWith(ext))) {
+        if (opts.excludeExtensions.some((ext) => p.endsWith(ext))) {
           return true;
         }
       }
@@ -289,12 +294,12 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
       const dirItems = await readdir(dirPath, { recursive: true });
 
       await Promise.all(
-        dirItems.map(item => {
+        dirItems.map((item) => {
           if (item.relPath.endsWith('.gitkeep')) {
             return null;
           }
           return removeItem(item.absPath);
-        }),
+        })
       );
     } catch (e) {
       // do not throw error if the directory never existed
@@ -478,7 +483,7 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
         writes.push(writeFile(filePath, content, opts));
       });
     } else {
-      Object.keys(files).map(filePath => {
+      Object.keys(files).map((filePath) => {
         writes.push(writeFile(filePath, files[filePath], opts));
       });
     }
@@ -523,7 +528,13 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
 
     while (true) {
       p = dirname(p);
-      if (typeof p === 'string' && p.length > 0 && p !== '/' && p.endsWith(':/') === false && p.endsWith(':\\') === false) {
+      if (
+        typeof p === 'string' &&
+        p.length > 0 &&
+        p !== '/' &&
+        p.endsWith(':/') === false &&
+        p.endsWith(':\\') === false
+      ) {
         allDirs.push(p);
       } else {
         break;
@@ -565,24 +576,24 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
 
   const commitCopyFiles = (filesToCopy: string[][]) => {
     const copiedFiles = Promise.all(
-      filesToCopy.map(async data => {
+      filesToCopy.map(async (data) => {
         const src = data[0];
         const dest = data[1];
         await sys.copyFile(src, dest);
         return [src, dest];
-      }),
+      })
     );
     return copiedFiles;
   };
 
   const commitWriteFiles = (filesToWrite: string[]) => {
     const writtenFiles = Promise.all(
-      filesToWrite.map(async filePath => {
+      filesToWrite.map(async (filePath) => {
         if (typeof filePath !== 'string') {
           throw new Error(`unable to writeFile without filePath`);
         }
         return commitWriteFile(filePath);
-      }),
+      })
     );
     return writtenFiles;
   };
@@ -604,13 +615,13 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
 
   const commitDeleteFiles = async (filesToDelete: string[]) => {
     const deletedFiles = await Promise.all(
-      filesToDelete.map(async filePath => {
+      filesToDelete.map(async (filePath) => {
         if (typeof filePath !== 'string') {
           throw new Error(`unable to unlink without filePath`);
         }
         await sys.removeFile(filePath);
         return filePath;
-      }),
+      })
     );
     return deletedFiles;
   };
@@ -683,7 +694,7 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
         queueDeleteFromDisk: null,
         queueWriteToDisk: null,
         useCache: null,
-      }),
+      })
     );
     return item;
   };
@@ -698,7 +709,7 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
     const outputs: d.BuildOutput[] = [];
 
     outputTargetTypes.forEach((outputTargetType, filePath) => {
-      const output = outputs.find(o => o.type === outputTargetType);
+      const output = outputs.find((o) => o.type === outputTargetType);
       if (output) {
         output.files.push(filePath);
       } else {
@@ -709,7 +720,7 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
       }
     });
 
-    outputs.forEach(o => o.files.sort());
+    outputs.forEach((o) => o.files.sort());
 
     return outputs.sort((a, b) => {
       if (a.type < b.type) return -1;
@@ -864,14 +875,14 @@ export const getCommitInstructions = (items: d.FsItems) => {
     }
   }
 
-  instructions.dirsToDelete = instructions.dirsToDelete.filter(dir => {
+  instructions.dirsToDelete = instructions.dirsToDelete.filter((dir) => {
     if (dir === '/' || dir.endsWith(':/') === true) {
       return false;
     }
     return true;
   });
 
-  instructions.dirsToEnsure = instructions.dirsToEnsure.filter(dir => {
+  instructions.dirsToEnsure = instructions.dirsToEnsure.filter((dir) => {
     const item = items.get(dir);
     if (item != null && item.exists === true && item.isDirectory === true) {
       return false;
@@ -887,7 +898,7 @@ export const getCommitInstructions = (items: d.FsItems) => {
 
 export const shouldIgnore = (filePath: string) => {
   filePath = filePath.trim().toLowerCase();
-  return IGNORE.some(ignoreFile => filePath.endsWith(ignoreFile));
+  return IGNORE.some((ignoreFile) => filePath.endsWith(ignoreFile));
 };
 
 const IGNORE = ['.ds_store', '.gitignore', 'desktop.ini', 'thumbs.db'];

@@ -12,7 +12,7 @@ export function reorderCoreStatementsPlugin(): Plugin {
 
 function reorderCoreStatements(options: NormalizedOutputOptions, bundles: OutputBundle) {
   if (options.format === 'es') {
-    Object.keys(bundles).forEach(fileName => {
+    Object.keys(bundles).forEach((fileName) => {
       const bundle = bundles[fileName];
       if ((bundle as OutputChunk).isEntry) {
         (bundle as OutputChunk).code = reorderStatements((bundle as OutputChunk).code);
@@ -32,7 +32,7 @@ function reorderStatements(code: string) {
         const letNoInitializerStatements = s.filter(isLetNoInitializer);
         const letWithInitializer = s.filter(isLetWithInitializer);
 
-        const otherStatements = s.filter(n => !isLet(n) && !ts.isImportDeclaration(n) && !ts.isExportDeclaration(n));
+        const otherStatements = s.filter((n) => !isLet(n) && !ts.isImportDeclaration(n) && !ts.isExportDeclaration(n));
 
         return ts.updateSourceFileNode(tsSourceFile, [
           ...letNoInitializerStatements,
@@ -62,7 +62,7 @@ function reorderStatements(code: string) {
 
   function isLetWithInitializer(n: ts.Statement) {
     if (isLet(n) && n.declarationList.declarations) {
-      return n.declarationList.declarations.some(d => {
+      return n.declarationList.declarations.some((d) => {
         return !!d.initializer;
       });
     }

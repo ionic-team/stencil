@@ -19,7 +19,7 @@ async function main() {
   console.log(results);
 
   if (results.diagnostics.length > 0) {
-    results.diagnostics.forEach(d => {
+    results.diagnostics.forEach((d) => {
       console.error(`🧨  ${d.header}`);
       console.error(`🧨  ${d.messageText}`);
     });
@@ -74,7 +74,7 @@ main()
   .then(() => {
     whyIsNodeRunning();
   })
-  .catch(e => {
+  .catch((e) => {
     clearTimeout(tmr);
     console.error('🧨 ' + e + ' 🧨');
     process.exit(1);

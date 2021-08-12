@@ -10,8 +10,8 @@ export const addScriptDataAttribute = (config: d.Config, doc: Document, outputTa
   const expectedNoModuleSrc = join(resourcesUrl, entryNoModuleFilename);
 
   const scripts = Array.from(doc.querySelectorAll('script'));
-  const scriptEsm = scripts.find(s => s.getAttribute('src') === expectedEsmSrc);
-  const scriptNomodule = scripts.find(s => s.getAttribute('src') === expectedNoModuleSrc);
+  const scriptEsm = scripts.find((s) => s.getAttribute('src') === expectedEsmSrc);
+  const scriptNomodule = scripts.find((s) => s.getAttribute('src') === expectedNoModuleSrc);
 
   if (scriptEsm) {
     scriptEsm.setAttribute('data-stencil', '');

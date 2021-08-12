@@ -17,17 +17,15 @@ import { Component, h } from '@stencil/core';
       color: yellow;
     }
   `,
-  scoped: true
+  scoped: true,
 })
 export class ScopedBasic {
-
   render() {
     return [
       <div>scoped</div>,
       <p>
-        <slot/>
-      </p>
+        <slot />
+      </p>,
     ];
   }
-
 }

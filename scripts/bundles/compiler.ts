@@ -115,7 +115,7 @@ export async function compiler(opts: BuildOptions) {
         name: 'compilerMinify',
         async generateBundle(_, bundleFiles) {
           if (opts.isProd) {
-            const compilerFilename = Object.keys(bundleFiles).find(f => f.includes('stencil'));
+            const compilerFilename = Object.keys(bundleFiles).find((f) => f.includes('stencil'));
             const compilerBundle = bundleFiles[compilerFilename] as OutputChunk;
             const minified = await minifyStencilCompiler(compilerBundle.code, opts);
             await fs.writeFile(join(opts.output.compilerDir, compilerFilename.replace('.js', '.min.js')), minified);
@@ -139,7 +139,7 @@ export async function compiler(opts: BuildOptions) {
   // copy typescript default lib dts files
   const tsLibNames = await getTypeScriptDefaultLibNames(opts);
 
-  await Promise.all(tsLibNames.map(f => fs.copy(join(opts.typescriptLibDir, f), join(opts.output.compilerDir, f))));
+  await Promise.all(tsLibNames.map((f) => fs.copy(join(opts.typescriptLibDir, f), join(opts.output.compilerDir, f))));
 
   return [compilerBundle];
 }

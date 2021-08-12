@@ -19,7 +19,7 @@ describe('customElements', () => {
         static get observedAttributes() {
           return ['attr-a', 'attr-b'];
         }
-      },
+      }
     );
 
     const cmpA = document.createElement('CMP-a');
@@ -56,7 +56,7 @@ describe('customElements', () => {
         static get observedAttributes() {
           return ['attr-a', 'attr-b'];
         }
-      },
+      }
     );
 
     const cmpA = document.createElement('cmp-a');
@@ -102,7 +102,7 @@ describe('customElements', () => {
         disconnectedCallback() {
           disconnectedInc++;
         }
-      },
+      }
     );
 
     expect(connectedInc).toBe(0);
@@ -140,7 +140,7 @@ describe('customElements', () => {
         connectedCallback() {
           connectedInc++;
         }
-      },
+      }
     );
 
     expect(connectedInc).toBe(0);
@@ -168,7 +168,7 @@ describe('customElements', () => {
         connectedCallback() {
           connectedInc++;
         }
-      },
+      }
     );
 
     expect(connectedInc).toBe(0);
@@ -188,7 +188,7 @@ describe('customElements', () => {
         connectedCallback() {
           connectedInc++;
         }
-      },
+      }
     );
 
     expect(connectedInc).toBe(0);
@@ -214,7 +214,7 @@ describe('customElements', () => {
         disconnectedCallback() {
           disconnectedInc++;
         }
-      },
+      }
     );
 
     expect(connectedInc).toBe(0);

@@ -10,7 +10,7 @@ export async function serveDevClient(
   devServerConfig: d.DevServerConfig,
   serverCtx: d.DevServerContext,
   req: d.HttpRequest,
-  res: ServerResponse,
+  res: ServerResponse
 ) {
   try {
     if (isOpenInEditor(req.pathname)) {
@@ -46,7 +46,7 @@ async function serveDevClientScript(
   devServerConfig: d.DevServerConfig,
   serverCtx: d.DevServerContext,
   req: d.HttpRequest,
-  res: ServerResponse,
+  res: ServerResponse
 ) {
   try {
     if (serverCtx.connectorHtml == null) {
@@ -65,7 +65,7 @@ async function serveDevClientScript(
 
       serverCtx.connectorHtml = serverCtx.connectorHtml.replace(
         'window.__DEV_CLIENT_CONFIG__',
-        JSON.stringify(devClientConfig),
+        JSON.stringify(devClientConfig)
       );
     }
 
@@ -73,7 +73,7 @@ async function serveDevClientScript(
       200,
       responseHeaders({
         'content-type': 'text/html; charset=utf-8',
-      }),
+      })
     );
     res.write(serverCtx.connectorHtml);
     res.end();

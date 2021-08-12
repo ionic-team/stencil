@@ -120,7 +120,7 @@ const pkgs: TestPackage[] = [
 export async function validateBuild(rootDir: string) {
   const dtsEntries: string[] = [];
   const opts = getOptions(rootDir);
-  pkgs.forEach(testPkg => {
+  pkgs.forEach((testPkg) => {
     validatePackage(opts, testPkg, dtsEntries);
   });
   console.log(`🐡  Validated packages`);
@@ -151,11 +151,11 @@ function validatePackage(opts: BuildOptions, testPkg: TestPackage, dtsEntries: s
       if (!Array.isArray(pkgJson.files)) {
         throw new Error(testPkg.packageJson + ' missing "files" property');
       }
-      pkgJson.files.forEach(f => {
+      pkgJson.files.forEach((f) => {
         const pkgFile = join(pkgDir, f);
         fs.accessSync(pkgFile);
       });
-      testPkg.packageJsonFiles.forEach(testPkgFile => {
+      testPkg.packageJsonFiles.forEach((testPkgFile) => {
         if (!pkgJson.files.includes(testPkgFile)) {
           throw new Error(testPkg.packageJson + ' missing file ' + testPkgFile);
         }
@@ -170,7 +170,7 @@ function validatePackage(opts: BuildOptions, testPkg: TestPackage, dtsEntries: s
     }
 
     if (pkgJson.bin) {
-      Object.keys(pkgJson.bin).forEach(k => {
+      Object.keys(pkgJson.bin).forEach((k) => {
         const binExe = join(pkgDir, pkgJson.bin[k]);
         fs.accessSync(binExe);
       });
@@ -197,7 +197,7 @@ function validatePackage(opts: BuildOptions, testPkg: TestPackage, dtsEntries: s
   }
 
   if (testPkg.files) {
-    testPkg.files.forEach(file => {
+    testPkg.files.forEach((file) => {
       const filePath = join(rootDir, file);
       fs.statSync(filePath);
     });

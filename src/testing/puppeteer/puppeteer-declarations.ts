@@ -13,7 +13,7 @@ import type {
  */
 export type PageCloseOptions = {
   runBeforeUnload?: boolean;
-}
+};
 
 export interface NewE2EPageOptions extends WaitForOptions {
   url?: string;

@@ -116,7 +116,7 @@ async function copyTestingInternalDts(opts: BuildOptions, inputDir: string) {
   // copy testing d.ts files
 
   await fs.copy(join(inputDir), join(opts.output.testingDir), {
-    filter: f => {
+    filter: (f) => {
       if (f.endsWith('.d.ts')) {
         return true;
       }

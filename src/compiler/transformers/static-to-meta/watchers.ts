@@ -8,7 +8,7 @@ export const parseStaticWatchers = (staticMembers: ts.ClassElement[]): d.Compone
     return [];
   }
 
-  return parsedWatchers.map(parsedWatch => {
+  return parsedWatchers.map((parsedWatch) => {
     return {
       propName: parsedWatch.propName,
       methodName: parsedWatch.methodName,

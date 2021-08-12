@@ -1,6 +1,6 @@
 import { setupDomTests, waitForChanges } from '../util';
 
-describe('dom-reattach-clone', function() {
+describe('dom-reattach-clone', function () {
   const { setupDom, tearDownDom } = setupDomTests(document);
   let app: HTMLElement;
 

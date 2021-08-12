@@ -120,11 +120,11 @@ export async function flushAll() {
     }
     throw err;
   }
-  return new Promise<void>(resolve => process.nextTick(resolve));
+  return new Promise<void>((resolve) => process.nextTick(resolve));
 }
 
 export function loadModule(cmpMeta: d.ComponentRuntimeMeta, _hostRef: d.HostRef, _hmrVersionId?: string) {
-  return new Promise<any>(resolve => {
+  return new Promise<any>((resolve) => {
     queuedLoadModules.push({
       bundleId: cmpMeta.$lazyBundleId$,
       resolve: () => resolve(moduleLoaded.get(cmpMeta.$lazyBundleId$)),

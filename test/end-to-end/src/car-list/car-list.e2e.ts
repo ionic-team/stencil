@@ -26,7 +26,11 @@ describe('car-list', () => {
   });
 
   it('should set car list data', async () => {
-    const cars: CarData[] = [new CarData('Cord', 'Model 812', 1934), new CarData('Duesenberg', 'SSJ', 1935), new CarData('Alfa Romeo', '2900 8c', 1938)];
+    const cars: CarData[] = [
+      new CarData('Cord', 'Model 812', 1934),
+      new CarData('Duesenberg', 'SSJ', 1935),
+      new CarData('Alfa Romeo', '2900 8c', 1938),
+    ];
 
     elm.setProperty('cars', cars);
 

@@ -27,7 +27,7 @@ export async function serveOpenInEditor(serverCtx: d.DevServerContext, req: d.Ht
     status,
     responseHeaders({
       'content-type': 'application/json; charset=utf-8',
-    }),
+    })
   );
 
   res.write(JSON.stringify(data, null, 2));
@@ -38,7 +38,7 @@ async function parseData(
   editors: d.DevServerEditor[],
   sys: d.CompilerSystem,
   req: d.HttpRequest,
-  data: d.OpenInEditorData,
+  data: d.OpenInEditorData
 ) {
   const qs = req.searchParams;
 
@@ -66,7 +66,7 @@ async function parseData(
   let editor = qs.get('editor');
   if (typeof editor === 'string') {
     editor = editor.trim().toLowerCase();
-    if (editors.some(e => e.id === editor)) {
+    if (editors.some((e) => e.id === editor)) {
       data.editor = editor;
     } else {
       data.error = `invalid editor: ${editor}`;
@@ -90,7 +90,7 @@ async function openDataInEditor(data: d.OpenInEditorData) {
       editor: data.editor,
     };
 
-    const editor = openInEditorApi.configure(opts, err => (data.error = err + ''));
+    const editor = openInEditorApi.configure(opts, (err) => (data.error = err + ''));
 
     if (data.error) {
       return;
@@ -108,12 +108,12 @@ let editors: Promise<d.DevServerEditor[]> = null;
 
 export function getEditors() {
   if (!editors) {
-    editors = new Promise(async resolve => {
+    editors = new Promise(async (resolve) => {
       const editors: d.DevServerEditor[] = [];
 
       try {
         await Promise.all(
-          Object.keys(openInEditorApi.editors).map(async editorId => {
+          Object.keys(openInEditorApi.editors).map(async (editorId) => {
             const isSupported = await isEditorSupported(editorId);
 
             editors.push({
@@ -121,24 +121,24 @@ export function getEditors() {
               priority: EDITOR_PRIORITY[editorId],
               supported: isSupported,
             });
-          }),
+          })
         );
       } catch (e) {}
 
       resolve(
         editors
-          .filter(e => e.supported)
+          .filter((e) => e.supported)
           .sort((a, b) => {
             if (a.priority < b.priority) return -1;
             if (a.priority > b.priority) return 1;
             return 0;
           })
-          .map(e => {
+          .map((e) => {
             return {
               id: e.id,
               name: EDITORS[e.id],
             } as d.DevServerEditor;
-          }),
+          })
       );
     });
   }

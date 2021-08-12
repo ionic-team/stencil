@@ -36,7 +36,7 @@ export const createTesting = async (config: Config): Promise<Testing> => {
     try {
       if (!opts.spec && !opts.e2e) {
         config.logger.error(
-          `Testing requires either the --spec or --e2e command line flags, or both. For example, to run unit tests, use the command: stencil test --spec`,
+          `Testing requires either the --spec or --e2e command line flags, or both. For example, to run unit tests, use the command: stencil test --spec`
         );
         return false;
       }
@@ -72,7 +72,7 @@ export const createTesting = async (config: Config): Promise<Testing> => {
         // and spin up a puppeteer browser
         let buildTask: Promise<CompilerBuildResults> = null;
 
-        (config.outputTargets as OutputTargetWww[]).forEach(outputTarget => {
+        (config.outputTargets as OutputTargetWww[]).forEach((outputTarget) => {
           outputTarget.empty = false;
         });
 
@@ -83,8 +83,8 @@ export const createTesting = async (config: Config): Promise<Testing> => {
 
         if (doBuild) {
           if (compilerWatcher) {
-            buildTask = new Promise(resolve => {
-              const removeListener = compilerWatcher.on('buildFinish', buildResults => {
+            buildTask = new Promise((resolve) => {
+              const removeListener = compilerWatcher.on('buildFinish', (buildResults) => {
                 removeListener();
                 resolve(buildResults);
               });
@@ -197,7 +197,7 @@ function setupTestingConfig(config: Config) {
   config.flags.serve = false;
   config.flags.open = false;
 
-  config.outputTargets.forEach(o => {
+  config.outputTargets.forEach((o) => {
     if (o.type === 'www') {
       o.serviceWorker = null;
     }

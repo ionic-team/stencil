@@ -1,8 +1,6 @@
 import { newE2EPage, E2EPage } from '@stencil/core/testing';
 
-
 describe('@Prop', () => {
-
   let page: E2EPage;
   beforeEach(async () => {
     // example showing how new test pages can be
@@ -44,5 +42,4 @@ describe('@Prop', () => {
     const elm = await page.find('prop-cmp >>> div');
     expect(elm).toEqualText('Hello, my name is Marty McFly');
   });
-
 });

@@ -49,8 +49,8 @@ describe('load config', () => {
 
   it('empty init, no error cuz created tsconfig, warn no files', async () => {
     const c = await loadConfig({ initTsConfig: true });
-    expect(c.diagnostics.filter(d => d.level === 'error')).toHaveLength(0);
-    expect(c.diagnostics.filter(d => d.level === 'warn')).toHaveLength(1);
+    expect(c.diagnostics.filter((d) => d.level === 'error')).toHaveLength(0);
+    expect(c.diagnostics.filter((d) => d.level === 'warn')).toHaveLength(1);
     expect(c.config).toBeDefined();
     expect(c.config.sys).toBeDefined();
     expect(c.config.logger).toBeDefined();

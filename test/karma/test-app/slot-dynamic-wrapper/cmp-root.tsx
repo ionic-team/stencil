@@ -1,10 +1,9 @@
 import { Component, State, h } from '@stencil/core';
 
 @Component({
-  tag: 'slot-dynamic-wrapper-root'
+  tag: 'slot-dynamic-wrapper-root',
 })
 export class SlotDynamicWrapperRoot {
-
   @State() tag = 'section';
 
   changeWrapper() {
@@ -19,12 +18,8 @@ export class SlotDynamicWrapperRoot {
     return [
       <button onClick={this.changeWrapper.bind(this)}>Change Wrapper</button>,
       <slot-dynamic-wrapper tag={this.tag} class="results1">
-        <h1>
-          parent text
-        </h1>
-      </slot-dynamic-wrapper>
+        <h1>parent text</h1>
+      </slot-dynamic-wrapper>,
     ];
   }
-
 }
-

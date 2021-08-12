@@ -10,7 +10,6 @@ describe('slot replace wrapper', () => {
   });
   afterEach(tearDownDom);
 
-
   it('renders A', async () => {
     const result = app.querySelector('.results1 a');
     expect(result.textContent.trim()).toBe('A');
@@ -78,5 +77,4 @@ describe('slot replace wrapper', () => {
     const hiddenCmp = app.querySelector('[hidden]');
     expect(hiddenCmp).toBe(null);
   });
-
 });

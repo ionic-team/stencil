@@ -14,12 +14,11 @@ import { Component, h } from '@stencil/core';
       background: #eee;
       color: maroon;
     }
-  `
+  `,
 })
 export class CmpC {
-
   componentWillLoad() {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       setTimeout(() => {
         console.log('cmp-c componentWillLoad resolved');
         resolve();

@@ -1,6 +1,11 @@
 export const getCssSelectors = (sel: string) => {
   // reusing global SELECTORS since this is a synchronous operation
-  SELECTORS.all.length = SELECTORS.tags.length = SELECTORS.classNames.length = SELECTORS.ids.length = SELECTORS.attrs.length = 0;
+  SELECTORS.all.length =
+    SELECTORS.tags.length =
+    SELECTORS.classNames.length =
+    SELECTORS.ids.length =
+    SELECTORS.attrs.length =
+      0;
 
   sel = sel
     .replace(/\./g, ' .')
@@ -24,11 +29,7 @@ export const getCssSelectors = (sel: string) => {
     } else if (items[i].charAt(0) === '#') {
       SELECTORS.ids.push(items[i].substr(1));
     } else if (items[i].charAt(0) === '[') {
-      items[i] = items[i]
-        .substr(1)
-        .split('=')[0]
-        .split(']')[0]
-        .trim();
+      items[i] = items[i].substr(1).split('=')[0].split(']')[0].trim();
       SELECTORS.attrs.push(items[i].toLowerCase());
     } else if (/[a-z]/g.test(items[i].charAt(0))) {
       SELECTORS.tags.push(items[i].toLowerCase());

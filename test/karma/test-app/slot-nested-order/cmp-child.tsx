@@ -1,6 +1,5 @@
 import { Component, h, Host } from '@stencil/core';
 
-
 @Component({
   tag: 'slot-nested-order-child',
   shadow: false,
@@ -14,7 +13,7 @@ export class SlotNestedOrderChild {
           <slot />
         </i>
         <cmp-5>5</cmp-5>
-        <slot name="end-slot-name"/>
+        <slot name="end-slot-name" />
       </Host>
     );
   }

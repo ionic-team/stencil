@@ -1,7 +1,6 @@
 import { setupDomTests } from '../util';
 
-
-describe('build-data', function() {
+describe('build-data', function () {
   const { setupDom, tearDownDom } = setupDomTests(document);
   let app: HTMLElement;
 
@@ -15,5 +14,4 @@ describe('build-data', function() {
     expect(app.querySelector('.is-browser').textContent).toBe('isBrowser: true');
     expect(app.querySelector('.is-testing').textContent).toBe('isTesting: false');
   });
-
 });

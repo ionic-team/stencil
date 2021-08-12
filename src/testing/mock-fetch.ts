@@ -158,4 +158,11 @@ interface MockedResponseData {
 
 const FETCH_DEFAULT_PATH = '/mock-fetch-data';
 
-export { MockHeaders, MockRequest, MockRequestInit, MockRequestInfo, MockResponse, MockResponseInit } from '../mock-doc';
+export {
+  MockHeaders,
+  MockRequest,
+  MockRequestInit,
+  MockRequestInfo,
+  MockResponse,
+  MockResponseInit,
+} from '../mock-doc';

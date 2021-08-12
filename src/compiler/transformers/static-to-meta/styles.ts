@@ -4,7 +4,13 @@ import { DEFAULT_STYLE_MODE, sortBy } from '@utils';
 import { normalizeStyles } from '../../style/normalize-styles';
 import ts from 'typescript';
 
-export const parseStaticStyles = (compilerCtx: d.CompilerCtx, tagName: string, componentFilePath: string, isCollectionDependency: boolean, staticMembers: ts.ClassElement[]) => {
+export const parseStaticStyles = (
+  compilerCtx: d.CompilerCtx,
+  tagName: string,
+  componentFilePath: string,
+  isCollectionDependency: boolean,
+  staticMembers: ts.ClassElement[]
+) => {
   const styles: d.StyleCompiler[] = [];
   const styleUrlsProp = isCollectionDependency ? 'styleUrls' : 'originalStyleUrls';
   const parsedStyleUrls = getStaticValue(staticMembers, styleUrlsProp) as d.CompilerModeStyles;
@@ -29,7 +35,7 @@ export const parseStaticStyles = (compilerCtx: d.CompilerCtx, tagName: string, c
       styles.push(parseStyleIdentifier(parsedStyle, DEFAULT_STYLE_MODE));
       compilerCtx.styleModeNames.add(DEFAULT_STYLE_MODE);
     } else if (typeof parsedStyle === 'object') {
-      Object.keys(parsedStyle).forEach(modeName => {
+      Object.keys(parsedStyle).forEach((modeName) => {
         const parsedStyleMode = parsedStyle[modeName];
         if (typeof parsedStyleMode === 'string') {
           styles.push({
@@ -48,10 +54,10 @@ export const parseStaticStyles = (compilerCtx: d.CompilerCtx, tagName: string, c
   }
 
   if (parsedStyleUrls && typeof parsedStyleUrls === 'object') {
-    Object.keys(parsedStyleUrls).forEach(modeName => {
+    Object.keys(parsedStyleUrls).forEach((modeName) => {
       const externalStyles: d.ExternalStyleCompiler[] = [];
       const styleObj = parsedStyleUrls[modeName];
-      styleObj.forEach(styleUrl => {
+      styleObj.forEach((styleUrl) => {
         if (typeof styleUrl === 'string' && styleUrl.trim().length > 0) {
           externalStyles.push({
             absolutePath: null,
@@ -78,7 +84,7 @@ export const parseStaticStyles = (compilerCtx: d.CompilerCtx, tagName: string, c
 
   normalizeStyles(tagName, componentFilePath, styles);
 
-  return sortBy(styles, s => s.modeName);
+  return sortBy(styles, (s) => s.modeName);
 };
 
 const parseStyleIdentifier = (parsedStyle: ConvertIdentifier, modeName: string) => {

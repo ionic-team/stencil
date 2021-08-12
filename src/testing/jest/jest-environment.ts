@@ -35,7 +35,7 @@ export function createJestPuppeteerEnvironment() {
     }
 
     async closeOpenPages() {
-      await Promise.all(this.pages.map(page => page.close()));
+      await Promise.all(this.pages.map((page) => page.close()));
       this.pages.length = 0;
     }
 

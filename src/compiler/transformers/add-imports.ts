@@ -1,7 +1,12 @@
 import type * as d from '../../declarations';
 import ts from 'typescript';
 
-export const addImports = (transformOpts: d.TransformOptions, tsSourceFile: ts.SourceFile, importFnNames: string[], importPath: string) => {
+export const addImports = (
+  transformOpts: d.TransformOptions,
+  tsSourceFile: ts.SourceFile,
+  importFnNames: string[],
+  importPath: string
+) => {
   if (importFnNames.length === 0) {
     return tsSourceFile;
   }
@@ -19,7 +24,7 @@ const addEsmImports = (tsSourceFile: ts.SourceFile, importFnNames: string[], imp
   // ESM Imports
   // import { importNames } from 'importPath';
 
-  const importSpecifiers = importFnNames.map(importKey => {
+  const importSpecifiers = importFnNames.map((importKey) => {
     const splt = importKey.split(' as ');
     let importAs = importKey;
     let importFnName = importKey;
@@ -29,11 +34,19 @@ const addEsmImports = (tsSourceFile: ts.SourceFile, importFnNames: string[], imp
       importFnName = splt[0];
     }
 
-    return ts.createImportSpecifier(typeof importFnName === 'string' && importFnName !== importAs ? ts.createIdentifier(importFnName) : undefined, ts.createIdentifier(importAs));
+    return ts.createImportSpecifier(
+      typeof importFnName === 'string' && importFnName !== importAs ? ts.createIdentifier(importFnName) : undefined,
+      ts.createIdentifier(importAs)
+    );
   });
 
   const statements = tsSourceFile.statements.slice();
-  const newImport = ts.createImportDeclaration(undefined, undefined, ts.createImportClause(undefined, ts.createNamedImports(importSpecifiers)), ts.createLiteral(importPath));
+  const newImport = ts.createImportDeclaration(
+    undefined,
+    undefined,
+    ts.createImportClause(undefined, ts.createNamedImports(importSpecifiers)),
+    ts.createLiteral(importPath)
+  );
   statements.unshift(newImport);
   return ts.updateSourceFileNode(tsSourceFile, statements);
 };
@@ -43,7 +56,7 @@ const addCjsRequires = (tsSourceFile: ts.SourceFile, importFnNames: string[], im
   // const { a, b, c } = require(importPath);
 
   const importBinding = ts.createObjectBindingPattern(
-    importFnNames.map(importKey => {
+    importFnNames.map((importKey) => {
       const splt = importKey.split(' as ');
       let importAs = importKey;
       let importFnName = importKey;
@@ -53,15 +66,21 @@ const addCjsRequires = (tsSourceFile: ts.SourceFile, importFnNames: string[], im
         importFnName = splt[0];
       }
       return ts.createBindingElement(undefined, importFnName, importAs);
-    }),
+    })
   );
 
   const requireStatement = ts.createVariableStatement(
     undefined,
     ts.createVariableDeclarationList(
-      [ts.createVariableDeclaration(importBinding, undefined, ts.createCall(ts.createIdentifier('require'), [], [ts.createLiteral(importPath)]))],
-      ts.NodeFlags.Const,
-    ),
+      [
+        ts.createVariableDeclaration(
+          importBinding,
+          undefined,
+          ts.createCall(ts.createIdentifier('require'), [], [ts.createLiteral(importPath)])
+        ),
+      ],
+      ts.NodeFlags.Const
+    )
   );
 
   const statements = tsSourceFile.statements.slice();

@@ -7,5 +7,8 @@ export const validateBuildFiles = (config: d.Config, compilerCtx: d.CompilerCtx,
     return null;
   }
 
-  return Promise.all([validateBuildPackageJson(config, compilerCtx, buildCtx), validateManifestJson(config, compilerCtx, buildCtx)]);
+  return Promise.all([
+    validateBuildPackageJson(config, compilerCtx, buildCtx),
+    validateManifestJson(config, compilerCtx, buildCtx),
+  ]);
 };
