@@ -30,8 +30,39 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Prettier dry-run
+        run: npm run prettier.dry-run
+        shell: bash
+
       - name: Build
         run: npm run build -- --ci
+
+      - name: Test dist
+        run: npm run test.dist
+
+      - name: Test testing suite
+        run: npm run test.testing
+
+      - name: Test jest
+        run: npm run test.jest
+
+      - name: Test end-to-end
+        run: npm run test.end-to-end -- --ci
+
+      - name: Test sys-node
+        if: matrix.os != 'windows-latest'
+        run: npm run test.sys.node
+
+      - name: Pack build artifacts
+        if: matrix.os != 'windows-latest'
+        run: mv `npm pack` stencil-build.tgz
+
+      - name: Unload build artifacts
+        uses: actions/upload-artifact@master
+        if: matrix.os == 'ubuntu-latest' && matrix.node == '12.10.0'
+        with:
+          name: stencil-build
+          path: stencil-build.tgz
 
       - name: Run karma tests
         if: matrix.os == 'ubuntu-latest' && matrix.node == '12.10.0'
