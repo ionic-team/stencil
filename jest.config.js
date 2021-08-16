@@ -11,7 +11,7 @@ module.exports = {
     '@stencil/core/testing': '<rootDir>/testing/index.js',
     '@utils': '<rootDir>/src/utils',
   },
-  coverageDirectory: './test-results/',
+  coverageDirectory: './coverage/',
   coverageReporters: ['json', 'lcov', 'text', 'clover'],
   collectCoverageFrom: [
     '<rootDir>/src/app-data/**/*.{js,jsx,ts,tsx}',
