@@ -46,3 +46,4 @@ test/**/www/*
 test/**/hydrate/*
 .stencil
 /dependencies.json
+coverage/**
