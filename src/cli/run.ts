@@ -1,7 +1,7 @@
 import type { CliInitOptions, Config, TaskCommand } from '../declarations';
 import { dependencies } from '../compiler/sys/dependencies.json';
 import { findConfig } from './find-config';
-import { hasError, isFunction, shouldIgnoreError } from '@utils';
+import { hasError, isFunction, shouldIgnoreError, initializeStencilCLIConfig } from '@utils';
 import { loadCoreCompiler, CoreCompiler } from './load-compiler';
 import { loadedCompilerLog, startupLog, startupLogVersion } from './logs';
 import { parseFlags } from './parse-flags';
@@ -13,7 +13,6 @@ import { taskInfo } from './task-info';
 import { taskPrerender } from './task-prerender';
 import { taskServe } from './task-serve';
 import { taskTest } from './task-test';
-import { initializeStencilCLIConfig } from './state/stencil-cli-config';
 import { taskTelemetry } from './task-telemetry';
 import { telemetryAction } from './telemetry/telemetry';
 

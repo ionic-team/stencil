@@ -1,4 +1,4 @@
-import { getStencilCLIConfig, initializeStencilCLIConfig } from '../../state/stencil-cli-config';
+import { getStencilCLIConfig, initializeStencilCLIConfig } from '@utils';
 import * as telemetry from '../telemetry';
 import * as shouldTrack from '../shouldTrack';
 import { createSystem } from '../../../compiler/sys/stencil-sys';

@@ -1,4 +1,4 @@
-import { getCompilerSystem, getLogger, getStencilCLIConfig } from './state/stencil-cli-config';
+import { getCompilerSystem, getLogger, getStencilCLIConfig } from '@utils';
 import { checkTelemetry, disableTelemetry, enableTelemetry } from './telemetry/telemetry';
 
 export const taskTelemetry = async () => {

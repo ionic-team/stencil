@@ -1,4 +1,4 @@
-import { getCompilerSystem, getStencilCLIConfig } from '../state/stencil-cli-config';
+import { getCompilerSystem, getStencilCLIConfig } from '@utils';
 
 interface TerminalInfo {
   /**

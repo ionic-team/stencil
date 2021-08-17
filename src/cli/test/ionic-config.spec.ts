@@ -1,5 +1,5 @@
 import { mockLogger } from '@stencil/core/testing';
-import { getCompilerSystem, initializeStencilCLIConfig } from '../state/stencil-cli-config';
+import { getCompilerSystem, initializeStencilCLIConfig } from '@utils';
 import { readConfig, writeConfig, updateConfig, defaultConfig } from '../ionic-config';
 import { createSystem } from '../../compiler/sys/stencil-sys';
 import { UUID_REGEX } from '../telemetry/helpers';

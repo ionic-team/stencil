@@ -1,4 +1,4 @@
-import { getStencilCLIConfig, initializeStencilCLIConfig } from '../../state/stencil-cli-config';
+import { getStencilCLIConfig, initializeStencilCLIConfig } from '@utils';
 import { isInteractive, TERMINAL_INFO, tryFn, uuidv4, hasDebug, hasVerbose } from '../helpers';
 import { createSystem } from '../../../compiler/sys/stencil-sys';
 import { mockLogger } from '@stencil/core/testing';

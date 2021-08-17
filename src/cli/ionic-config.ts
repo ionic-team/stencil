@@ -1,4 +1,4 @@
-import { getCompilerSystem } from './state/stencil-cli-config';
+import { getCompilerSystem } from '@utils';
 import { readJson, uuidv4, UUID_REGEX } from './telemetry/helpers';
 
 export const isTest = () => process.env.JEST_WORKER_ID !== undefined;

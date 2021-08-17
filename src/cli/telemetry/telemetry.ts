@@ -2,7 +2,7 @@ import { tryFn, hasDebug, readJson, hasVerbose, uuidv4 } from './helpers';
 import { shouldTrack } from './shouldTrack';
 import { CompilerBuildResults, PackageJsonData, TaskCommand } from 'src/declarations';
 import { readConfig, updateConfig, writeConfig } from '../ionic-config';
-import { getCompilerSystem, getCoreCompiler, getStencilCLIConfig } from '../state/stencil-cli-config';
+import { getCompilerSystem, getCoreCompiler, getStencilCLIConfig } from '@utils';
 
 /**
  * Used as the object sent to the server. Value is the data tracked.
