@@ -37,6 +37,7 @@ dist/
 /testing
 
 /screenshot/index.js
+/screenshot/index.js.map
 /screenshot/package.json
 /screenshot/pixel-match.js
 /screenshot/*.d.ts
