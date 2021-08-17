@@ -1,5 +1,3 @@
-import { ReferrerPolicy } from 'types/lib.deno';
-
 declare type CustomMethodDecorator<T> = (
   target: Object,
   propertyKey: string | symbol,
