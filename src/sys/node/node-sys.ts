@@ -430,7 +430,7 @@ export function createNodeSys(c: { process?: any } = {}) {
         const tsFileWatcher = tsSysWatchDirectory(
           p,
           (fileName) => {
-            callback(normalizePath(fileName), null);
+            callback(normalizePath(fileName), 'fileUpdate');
           },
           recursive
         );
