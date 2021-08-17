@@ -1,3 +1,5 @@
+import { ReferrerPolicy } from 'types/lib.deno';
+
 declare type CustomMethodDecorator<T> = (
   target: Object,
   propertyKey: string | symbol,
@@ -758,16 +760,7 @@ export namespace JSXBase {
     media?: string;
     rel?: string;
     target?: string;
-    referrerPolicy?:
-      | ''
-      | 'no-referrer'
-      | 'no-referrer-when-downgrade'
-      | 'origin'
-      | 'origin-when-cross-origin'
-      | 'same-origin'
-      | 'strict-origin'
-      | 'strict-origin-when-cross-origin'
-      | 'unsafe-url';
+    referrerPolicy?: ReferrerPolicy;
   }
 
   export interface AudioHTMLAttributes<T> extends MediaHTMLAttributes<T> {}
