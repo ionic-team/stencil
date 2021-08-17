@@ -1,9 +1,9 @@
 import type * as d from '../../declarations';
 import { join, relative } from 'path';
+import { getStencilCompilerContext } from '@utils';
 
 export const generateHostConfig = async (
   config: d.Config,
-  compilerCtx: d.CompilerCtx,
   outputTarget: d.OutputTargetWww,
   entryModules: d.EntryModule[],
   hydrateResults: d.HydrateResults[]
@@ -31,9 +31,9 @@ export const generateHostConfig = async (
 
   const hostConfigFilePath = join(outputTarget.appDir, HOST_CONFIG_FILENAME);
 
-  await mergeUserHostConfigFile(config, compilerCtx, hostConfig);
+  await mergeUserHostConfigFile(config, hostConfig);
 
-  await compilerCtx.fs.writeFile(hostConfigFilePath, JSON.stringify(hostConfig, null, 2));
+  await getStencilCompilerContext().fs.writeFile(hostConfigFilePath, JSON.stringify(hostConfig, null, 2));
 };
 
 export const generateHostRule = (
@@ -248,10 +248,10 @@ const addServiceWorkerNoCacheControl = (outputTarget: d.OutputTargetWww, hostCon
   });
 };
 
-const mergeUserHostConfigFile = async (config: d.Config, compilerCtx: d.CompilerCtx, hostConfig: d.HostConfig) => {
+const mergeUserHostConfigFile = async (config: d.Config, hostConfig: d.HostConfig) => {
   const hostConfigFilePath = join(config.srcDir, HOST_CONFIG_FILENAME);
   try {
-    const userHostConfigStr = await compilerCtx.fs.readFile(hostConfigFilePath);
+    const userHostConfigStr = await getStencilCompilerContext().fs.readFile(hostConfigFilePath);
 
     const userHostConfig = JSON.parse(userHostConfigStr) as d.HostConfig;
 

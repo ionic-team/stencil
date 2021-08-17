@@ -2,16 +2,11 @@ import type * as d from '../../declarations';
 import { getAbsoluteBuildDir } from './html-utils';
 import { generateHashedCopy } from '../output-targets/copy/hashed-copy';
 import { injectModulePreloads } from './inject-module-preloads';
-import { isString } from '@utils';
+import { getStencilCompilerContext, isString } from '@utils';
 import { join } from 'path';
 import ts from 'typescript';
 
-export const optimizeEsmImport = async (
-  config: d.Config,
-  compilerCtx: d.CompilerCtx,
-  doc: Document,
-  outputTarget: d.OutputTargetWww
-) => {
+export const optimizeEsmImport = async (config: d.Config, doc: Document, outputTarget: d.OutputTargetWww) => {
   const resourcesUrl = getAbsoluteBuildDir(outputTarget);
   const entryFilename = `${config.fsNamespace}.esm.js`;
   const expectedSrc = join(resourcesUrl, entryFilename);
@@ -29,7 +24,7 @@ export const optimizeEsmImport = async (
   script.setAttribute('data-stencil-namespace', config.fsNamespace);
 
   const entryPath = join(outputTarget.buildDir, entryFilename);
-  const content = await compilerCtx.fs.readFile(entryPath);
+  const content = await getStencilCompilerContext().fs.readFile(entryPath);
 
   if (isString(content)) {
     // If the script is too big, instead of inlining, we hash the file and change
@@ -43,7 +38,7 @@ export const optimizeEsmImport = async (
         script.innerHTML = results.code;
       }
     } else {
-      const hashedFile = await generateHashedCopy(config, compilerCtx, entryPath);
+      const hashedFile = await generateHashedCopy(config, entryPath);
       if (hashedFile) {
         const hashedPath = join(resourcesUrl, hashedFile);
         script.setAttribute('src', hashedPath);

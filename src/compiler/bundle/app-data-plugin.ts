@@ -1,6 +1,6 @@
 import type * as d from '../../declarations';
 import MagicString from 'magic-string';
-import { createJsVarName, normalizePath, isString, loadTypeScriptDiagnostics } from '@utils';
+import { createJsVarName, normalizePath, isString, loadTypeScriptDiagnostics, getStencilCompilerContext } from '@utils';
 import type { Plugin } from 'rollup';
 import { removeCollectionImports } from '../transformers/remove-collection-imports';
 import {
@@ -14,7 +14,6 @@ import ts from 'typescript';
 
 export const appDataPlugin = (
   config: d.Config,
-  compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   build: d.BuildConditionals,
   platform: 'client' | 'hydrate' | 'worker'
@@ -24,7 +23,7 @@ export const appDataPlugin = (
       name: 'appDataPlugin',
     };
   }
-  const globalScripts = getGlobalScriptData(config, compilerCtx);
+  const globalScripts = getGlobalScriptData(config);
 
   return {
     name: 'appDataPlugin',
@@ -84,7 +83,7 @@ export const appDataPlugin = (
           compilerOptions,
           fileName: id,
           transformers: {
-            after: [removeCollectionImports(compilerCtx)],
+            after: [removeCollectionImports()],
           },
         });
 
@@ -97,12 +96,12 @@ export const appDataPlugin = (
   };
 };
 
-export const getGlobalScriptData = (config: d.Config, compilerCtx: d.CompilerCtx) => {
+export const getGlobalScriptData = (config: d.Config) => {
   const globalScripts: GlobalScript[] = [];
 
   if (isString(config.globalScript)) {
-    const mod = compilerCtx.moduleMap.get(config.globalScript);
-    const globalScript = compilerCtx.version === 2 ? config.globalScript : mod && mod.jsFilePath;
+    const mod = getStencilCompilerContext().moduleMap.get(config.globalScript);
+    const globalScript = getStencilCompilerContext().version === 2 ? config.globalScript : mod && mod.jsFilePath;
 
     if (globalScript) {
       globalScripts.push({
@@ -112,7 +111,7 @@ export const getGlobalScriptData = (config: d.Config, compilerCtx: d.CompilerCtx
     }
   }
 
-  compilerCtx.collections.forEach((collection) => {
+  getStencilCompilerContext().collections.forEach((collection) => {
     if (collection.global != null && isString(collection.global.sourceFilePath)) {
       let defaultName = createJsVarName(collection.collectionName + 'GlobalScript');
       if (globalScripts.some((s) => s.defaultName === defaultName)) {

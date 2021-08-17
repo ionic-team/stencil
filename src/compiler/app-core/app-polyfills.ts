@@ -1,7 +1,8 @@
 import type * as d from '../../declarations';
 import { join } from 'path';
+import { getStencilCompilerContext } from '@utils';
 
-export const getClientPolyfill = async (config: d.Config, compilerCtx: d.CompilerCtx, polyfillFile: string) => {
+export const getClientPolyfill = async (config: d.Config, polyfillFile: string) => {
   const polyfillFilePath = join(
     config.sys.getCompilerExecutingPath(),
     '..',
@@ -11,10 +12,10 @@ export const getClientPolyfill = async (config: d.Config, compilerCtx: d.Compile
     'polyfills',
     polyfillFile
   );
-  return compilerCtx.fs.readFile(polyfillFilePath);
+  return getStencilCompilerContext().fs.readFile(polyfillFilePath);
 };
 
-export const getAppBrowserCorePolyfills = async (config: d.Config, compilerCtx: d.CompilerCtx) => {
+export const getAppBrowserCorePolyfills = async (config: d.Config) => {
   // read all the polyfill content, in this particular order
   const polyfills = INLINE_POLYFILLS.slice();
 
@@ -22,9 +23,7 @@ export const getAppBrowserCorePolyfills = async (config: d.Config, compilerCtx: 
     polyfills.push(INLINE_CSS_SHIM);
   }
 
-  const results = await Promise.all(
-    polyfills.map((polyfillFile) => getClientPolyfill(config, compilerCtx, polyfillFile))
-  );
+  const results = await Promise.all(polyfills.map((polyfillFile) => getClientPolyfill(config, polyfillFile)));
 
   // concat the polyfills
   return results.join('\n').trim();

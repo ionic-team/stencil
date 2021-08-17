@@ -1,12 +1,11 @@
 import type * as d from '../../../declarations';
 import { writeLazyModule } from './write-lazy-entry-module';
-import { formatComponentRuntimeMeta, stringifyRuntimeData, hasDependency } from '@utils';
+import { formatComponentRuntimeMeta, stringifyRuntimeData, hasDependency, getStencilCompilerContext } from '@utils';
 import { optimizeModule } from '../../optimize/optimize-module';
 import { join } from 'path';
 
 export const generateLazyModules = async (
   config: d.Config,
-  compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   outputTargetType: string,
   destinations: string[],
@@ -28,7 +27,6 @@ export const generateLazyModules = async (
       entryComponentsResults.map((rollupResult) => {
         return generateLazyEntryModule(
           config,
-          compilerCtx,
           buildCtx,
           rollupResult,
           outputTargetType,
@@ -44,7 +42,6 @@ export const generateLazyModules = async (
       chunkResults.map((rollupResult) => {
         return writeLazyChunk(
           config,
-          compilerCtx,
           buildCtx,
           rollupResult,
           outputTargetType,
@@ -63,7 +60,6 @@ export const generateLazyModules = async (
     entryResults.map((rollupResult) => {
       return writeLazyEntry(
         config,
-        compilerCtx,
         buildCtx,
         rollupResult,
         outputTargetType,
@@ -82,7 +78,7 @@ export const generateLazyModules = async (
       .map((r: d.RollupAssetResult) => {
         return Promise.all(
           destinations.map((dest) => {
-            return compilerCtx.fs.writeFile(join(dest, r.fileName), r.content);
+            return getStencilCompilerContext().fs.writeFile(join(dest, r.fileName), r.content);
           })
         );
       })
@@ -93,7 +89,6 @@ export const generateLazyModules = async (
 
 const generateLazyEntryModule = async (
   config: d.Config,
-  compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   rollupResult: d.RollupChunkResult,
   outputTargetType: string,
@@ -108,7 +103,6 @@ const generateLazyEntryModule = async (
 
   const code = await convertChunk(
     config,
-    compilerCtx,
     buildCtx,
     sourceTarget,
     shouldMinify,
@@ -117,16 +111,7 @@ const generateLazyEntryModule = async (
     rollupResult.code
   );
 
-  const output = await writeLazyModule(
-    config,
-    compilerCtx,
-    outputTargetType,
-    destinations,
-    entryModule,
-    shouldHash,
-    code,
-    sufix
-  );
+  const output = await writeLazyModule(config, outputTargetType, destinations, entryModule, shouldHash, code, sufix);
 
   return {
     rollupResult,
@@ -138,7 +123,6 @@ const generateLazyEntryModule = async (
 
 const writeLazyChunk = async (
   config: d.Config,
-  compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   rollupResult: d.RollupChunkResult,
   outputTargetType: string,
@@ -149,7 +133,6 @@ const writeLazyChunk = async (
 ) => {
   const code = await convertChunk(
     config,
-    compilerCtx,
     buildCtx,
     sourceTarget,
     shouldMinify,
@@ -161,14 +144,13 @@ const writeLazyChunk = async (
   await Promise.all(
     destinations.map((dst) => {
       const filePath = join(dst, rollupResult.fileName);
-      return compilerCtx.fs.writeFile(filePath, code, { outputTargetType });
+      return getStencilCompilerContext().fs.writeFile(filePath, code, { outputTargetType });
     })
   );
 };
 
 const writeLazyEntry = async (
   config: d.Config,
-  compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   rollupResult: d.RollupChunkResult,
   outputTargetType: string,
@@ -182,12 +164,12 @@ const writeLazyEntry = async (
     return;
   }
   let code = rollupResult.code.replace(`[/*!__STENCIL_LAZY_DATA__*/]`, `${lazyRuntimeData}`);
-  code = await convertChunk(config, compilerCtx, buildCtx, sourceTarget, shouldMinify, false, isBrowserBuild, code);
+  code = await convertChunk(config, buildCtx, sourceTarget, shouldMinify, false, isBrowserBuild, code);
 
   await Promise.all(
     destinations.map((dst) => {
       const filePath = join(dst, rollupResult.fileName);
-      return compilerCtx.fs.writeFile(filePath, code, { outputTargetType });
+      return getStencilCompilerContext().fs.writeFile(filePath, code, { outputTargetType });
     })
   );
 };
@@ -288,7 +270,6 @@ export const sortBundleComponents = (a: d.ComponentCompilerMeta, b: d.ComponentC
 
 const convertChunk = async (
   config: d.Config,
-  compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   sourceTarget: d.SourceTarget,
   shouldMinify: boolean,
@@ -297,7 +278,7 @@ const convertChunk = async (
   code: string
 ) => {
   const inlineHelpers = isBrowserBuild || !hasDependency(buildCtx, 'tslib');
-  const optimizeResults = await optimizeModule(config, compilerCtx, {
+  const optimizeResults = await optimizeModule(config, {
     input: code,
     isCore,
     sourceTarget,

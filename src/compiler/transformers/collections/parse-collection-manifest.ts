@@ -5,7 +5,6 @@ import { parseCollectionComponents, transpileCollectionModule } from './parse-co
 
 export const parseCollectionManifest = (
   config: d.Config,
-  compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   collectionName: string,
   collectionDir: string,
@@ -28,8 +27,8 @@ export const parseCollectionManifest = (
     bundles: parseBundles(collectionManifest),
   };
 
-  parseGlobal(config, compilerCtx, buildCtx, collectionDir, collectionManifest, collection);
-  parseCollectionComponents(config, compilerCtx, buildCtx, collectionDir, collectionManifest, collection);
+  parseGlobal(config, buildCtx, collectionDir, collectionManifest, collection);
+  parseCollectionComponents(config, buildCtx, collectionDir, collectionManifest, collection);
 
   return collection;
 };
@@ -40,7 +39,6 @@ export const parseCollectionDependencies = (collectionManifest: d.CollectionMani
 
 export const parseGlobal = (
   config: d.Config,
-  compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   collectionDir: string,
   collectionManifest: d.CollectionManifest,
@@ -51,7 +49,7 @@ export const parseGlobal = (
   }
 
   const sourceFilePath = normalizePath(join(collectionDir, collectionManifest.global));
-  const globalModule = transpileCollectionModule(config, compilerCtx, buildCtx, collection, sourceFilePath);
+  const globalModule = transpileCollectionModule(config, buildCtx, collection, sourceFilePath);
   collection.global = globalModule;
 };
 

@@ -7,7 +7,7 @@ import { tsResolveModuleName } from '../sys/typescript/typescript-resolve-module
 import { isAbsolute } from 'path';
 import ts from 'typescript';
 
-export const typescriptPlugin = (compilerCtx: d.CompilerCtx, bundleOpts: BundleOptions): Plugin => {
+export const typescriptPlugin = (bundleOpts: BundleOptions): Plugin => {
   const tsPrinter = ts.createPrinter();
 
   return {
@@ -16,7 +16,7 @@ export const typescriptPlugin = (compilerCtx: d.CompilerCtx, bundleOpts: BundleO
     load(id) {
       if (isAbsolute(id)) {
         const fsFilePath = normalizeFsPath(id);
-        const mod = getModule(compilerCtx, fsFilePath);
+        const mod = getModule(fsFilePath);
         if (mod) {
           return mod.staticSourceFileText;
         }
@@ -26,7 +26,7 @@ export const typescriptPlugin = (compilerCtx: d.CompilerCtx, bundleOpts: BundleO
     transform(_, id) {
       if (isAbsolute(id)) {
         const fsFilePath = normalizeFsPath(id);
-        const mod = getModule(compilerCtx, fsFilePath);
+        const mod = getModule(fsFilePath);
         if (mod && mod.cmps.length > 0) {
           const transformed = ts.transform(mod.staticSourceFile, bundleOpts.customTransformers).transformed[0];
           return tsPrinter.printFile(transformed);
@@ -37,7 +37,7 @@ export const typescriptPlugin = (compilerCtx: d.CompilerCtx, bundleOpts: BundleO
   };
 };
 
-export const resolveIdWithTypeScript = (config: d.Config, compilerCtx: d.CompilerCtx): Plugin => {
+export const resolveIdWithTypeScript = (config: d.Config): Plugin => {
   return {
     name: `resolveIdWithTypeScript`,
 
@@ -46,7 +46,7 @@ export const resolveIdWithTypeScript = (config: d.Config, compilerCtx: d.Compile
         return null;
       }
 
-      const tsResolved = tsResolveModuleName(config, compilerCtx, importee, importer);
+      const tsResolved = tsResolveModuleName(config, importee, importer);
       if (tsResolved && tsResolved.resolvedModule) {
         // this is probably a .d.ts file for whatever reason in how TS resolves this
         // use this resolved file as the "importer"

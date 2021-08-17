@@ -1,8 +1,9 @@
 import { minfyJsId } from '../../version';
 import { minifyJs } from './minify-js';
-import type { CompilerCtx, Config, Diagnostic, SourceTarget } from '../../declarations';
+import type { Config, Diagnostic, SourceTarget } from '../../declarations';
 import type { CompressOptions, MangleOptions, MinifyOptions } from 'terser';
 import ts from 'typescript';
+import { getStencilCompilerContext } from '@utils';
 
 interface OptimizeModuleOptions {
   input: string;
@@ -13,7 +14,7 @@ interface OptimizeModuleOptions {
   modeName?: string;
 }
 
-export const optimizeModule = async (config: Config, compilerCtx: CompilerCtx, opts: OptimizeModuleOptions) => {
+export const optimizeModule = async (config: Config, opts: OptimizeModuleOptions) => {
   if ((!opts.minify && opts.sourceTarget !== 'es5') || opts.input === '') {
     return {
       output: opts.input,
@@ -21,8 +22,8 @@ export const optimizeModule = async (config: Config, compilerCtx: CompilerCtx, o
     };
   }
   const isDebug = config.logLevel === 'debug';
-  const cacheKey = await compilerCtx.cache.createKey('optimizeModule', minfyJsId, opts, isDebug);
-  const cachedContent = await compilerCtx.cache.get(cacheKey);
+  const cacheKey = await getStencilCompilerContext().cache.createKey('optimizeModule', minfyJsId, opts, isDebug);
+  const cachedContent = await getStencilCompilerContext().cache.get(cacheKey);
   if (cachedContent != null) {
     return {
       output: cachedContent,
@@ -66,17 +67,22 @@ export const optimizeModule = async (config: Config, compilerCtx: CompilerCtx, o
   }
 
   const shouldTranspile = opts.sourceTarget === 'es5';
-  const results = await compilerCtx.worker.prepareModule(code, minifyOpts, shouldTranspile, opts.inlineHelpers);
+  const results = await getStencilCompilerContext().worker.prepareModule(
+    code,
+    minifyOpts,
+    shouldTranspile,
+    opts.inlineHelpers
+  );
   if (
     results != null &&
     typeof results.output === 'string' &&
     results.diagnostics.length === 0 &&
-    compilerCtx != null
+    getStencilCompilerContext() != null
   ) {
     if (opts.isCore) {
       results.output = results.output.replace(/disconnectedCallback\(\)\{\},/g, '');
     }
-    await compilerCtx.cache.put(cacheKey, results.output);
+    await getStencilCompilerContext().cache.put(cacheKey, results.output);
   }
 
   return results;

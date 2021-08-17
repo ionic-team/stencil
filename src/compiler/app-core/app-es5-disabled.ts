@@ -1,18 +1,14 @@
 import type * as d from '../../declarations';
-import { escapeHtml } from '@utils';
+import { escapeHtml, getStencilCompilerContext } from '@utils';
 import { join } from 'path';
 
-export const generateEs5DisabledMessage = async (
-  config: d.Config,
-  compilerCtx: d.CompilerCtx,
-  outputTarget: d.OutputTargetWww
-) => {
+export const generateEs5DisabledMessage = async (config: d.Config, outputTarget: d.OutputTargetWww) => {
   // not doing an es5 right now
   // but it's possible during development the user
   // tests on a browser that doesn't support es2017
   const fileName = `${config.fsNamespace}.js`;
   const filePath = join(outputTarget.buildDir, fileName);
-  await compilerCtx.fs.writeFile(filePath, getDisabledMessageScript(config));
+  await getStencilCompilerContext().fs.writeFile(filePath, getDisabledMessageScript(config));
   return fileName;
 };
 

@@ -1,15 +1,22 @@
 import type * as d from '../../declarations';
 import { BuildContext } from '../build/build-ctx';
-import { CompilerContext } from '../build/compiler-ctx';
 import { convertDecoratorsToStatic } from '../transformers/decorators-to-static/convert-decorators';
 import { convertStaticToMeta } from '../transformers/static-to-meta/visitor';
 import { createLogger } from '../sys/logger/console-logger';
 import { getCurrentDirectory } from '../sys/environment';
-import { isNumber, isString, loadTypeScriptDiagnostics, normalizePath } from '@utils';
+import {
+  getStencilCompilerContext,
+  initializeStencilCompilerContext,
+  isNumber,
+  isString,
+  loadTypeScriptDiagnostics,
+  normalizePath,
+} from '@utils';
 import { lazyComponentTransform } from '../transformers/component-lazy/transform-lazy-component';
 import { nativeComponentTransform } from '../transformers/component-native/tranform-to-native-component';
 import { updateStencilCoreImports } from '../transformers/update-stencil-core-import';
 import ts from 'typescript';
+import { CompilerContext } from '../build/compiler-ctx';
 
 /**
  * Stand-alone compiling of a single string
@@ -21,8 +28,10 @@ export const transpileModule = (config: d.Config, input: string, transformOpts: 
       logger: createLogger(),
     };
   }
-  const compilerCtx = new CompilerContext();
-  const buildCtx = new BuildContext(config, compilerCtx);
+
+  initializeStencilCompilerContext({ compilerCtx: new CompilerContext() });
+
+  const buildCtx = new BuildContext(config);
   const tsCompilerOptions: ts.CompilerOptions = {
     ...config.tsCompilerOptions,
   };
@@ -96,13 +105,13 @@ export const transpileModule = (config: d.Config, input: string, transformOpts: 
   const typeChecker = program.getTypeChecker();
 
   const after: ts.TransformerFactory<ts.SourceFile>[] = [
-    convertStaticToMeta(config, compilerCtx, buildCtx, typeChecker, null, transformOpts),
+    convertStaticToMeta(config, buildCtx, typeChecker, null, transformOpts),
   ];
 
   if (transformOpts.componentExport === 'customelement' || transformOpts.componentExport === 'module') {
-    after.push(nativeComponentTransform(compilerCtx, transformOpts));
+    after.push(nativeComponentTransform(transformOpts));
   } else {
-    after.push(lazyComponentTransform(compilerCtx, transformOpts));
+    after.push(lazyComponentTransform(transformOpts));
   }
 
   program.emit(undefined, undefined, undefined, false, {
@@ -123,7 +132,7 @@ export const transpileModule = (config: d.Config, input: string, transformOpts: 
 
   results.diagnostics.push(...buildCtx.diagnostics);
 
-  results.moduleFile = compilerCtx.moduleMap.get(results.sourceFilePath);
+  results.moduleFile = getStencilCompilerContext().moduleMap.get(results.sourceFilePath);
 
   return results;
 };

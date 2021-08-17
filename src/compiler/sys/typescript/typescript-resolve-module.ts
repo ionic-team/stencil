@@ -11,7 +11,7 @@ import {
   isJsonFile,
 } from '../resolve/resolve-utils';
 import { IS_BROWSER_ENV, IS_NODE_ENV } from '../environment';
-import { isRemoteUrl, isString, normalizePath } from '@utils';
+import { getStencilCompilerContext, isRemoteUrl, isString, normalizePath } from '@utils';
 import { patchTsSystemFileSystem } from './typescript-sys';
 import { resolveRemoteModuleIdSync } from '../resolve/resolve-module-sync';
 import { version } from '../../../version';
@@ -38,16 +38,16 @@ export const patchTypeScriptResolveModule = (config: d.Config, inMemoryFs: d.InM
   }
 };
 
-export const tsResolveModuleName = (
-  config: d.Config,
-  compilerCtx: d.CompilerCtx,
-  moduleName: string,
-  containingFile: string
-) => {
+export const tsResolveModuleName = (config: d.Config, moduleName: string, containingFile: string) => {
   const resolveModuleName: typeof ts.resolveModuleName = (ts as any).__resolveModuleName || ts.resolveModuleName;
 
   if (moduleName && resolveModuleName && config.tsCompilerOptions) {
-    const host: ts.ModuleResolutionHost = patchTsSystemFileSystem(config, config.sys, compilerCtx.fs, ts.sys);
+    const host: ts.ModuleResolutionHost = patchTsSystemFileSystem(
+      config,
+      config.sys,
+      getStencilCompilerContext().fs,
+      ts.sys
+    );
 
     const compilerOptions: ts.CompilerOptions = { ...config.tsCompilerOptions };
     compilerOptions.resolveJsonModule = true;
@@ -57,14 +57,9 @@ export const tsResolveModuleName = (
   return null;
 };
 
-export const tsResolveModuleNamePackageJsonPath = (
-  config: d.Config,
-  compilerCtx: d.CompilerCtx,
-  moduleName: string,
-  containingFile: string
-) => {
+export const tsResolveModuleNamePackageJsonPath = (config: d.Config, moduleName: string, containingFile: string) => {
   try {
-    const resolvedModule = tsResolveModuleName(config, compilerCtx, moduleName, containingFile);
+    const resolvedModule = tsResolveModuleName(config, moduleName, containingFile);
     if (resolvedModule && resolvedModule.resolvedModule && resolvedModule.resolvedModule.resolvedFileName) {
       const rootDir = resolve('/');
       let resolvedFileName = resolvedModule.resolvedModule.resolvedFileName;

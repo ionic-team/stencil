@@ -55,7 +55,7 @@ const getPackageJsonPath = (resolvedPath: string, importee: string): string => {
   return null;
 };
 
-export const compilerRequest = async (config: d.Config, compilerCtx: d.CompilerCtx, data: d.CompilerRequest) => {
+export const compilerRequest = async (config: d.Config, data: d.CompilerRequest) => {
   const results: d.CompilerRequestResponse = {
     path: data.path,
     nodeModuleId: null,
@@ -99,7 +99,7 @@ export const compilerRequest = async (config: d.Config, compilerCtx: d.CompilerC
         }
       }
 
-      await bundleDevModule(config, compilerCtx, parsedUrl, results);
+      await bundleDevModule(config, parsedUrl, results);
 
       if (results.status === 200 && useCache) {
         results.cachePath = cachePath;
@@ -124,16 +124,11 @@ export const compilerRequest = async (config: d.Config, compilerCtx: d.CompilerC
   return results;
 };
 
-const bundleDevModule = async (
-  config: d.Config,
-  compilerCtx: d.CompilerCtx,
-  parsedUrl: ParsedDevModuleUrl,
-  results: d.CompilerRequestResponse
-) => {
-  const buildCtx = new BuildContext(config, compilerCtx);
+const bundleDevModule = async (config: d.Config, parsedUrl: ParsedDevModuleUrl, results: d.CompilerRequestResponse) => {
+  const buildCtx = new BuildContext(config);
 
   try {
-    const inputOpts = getRollupOptions(config, compilerCtx, buildCtx, {
+    const inputOpts = getRollupOptions(config, buildCtx, {
       id: parsedUrl.nodeModuleId,
       platform: 'client',
       inputs: {

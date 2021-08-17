@@ -24,7 +24,7 @@ import { removeCollectionImports } from '../../transformers/remove-collection-im
 import { updateStencilCoreImports } from '../../transformers/update-stencil-core-import';
 import MagicString from 'magic-string';
 
-export const outputLazy = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
+export const outputLazy = async (config: d.Config, buildCtx: d.BuildCtx) => {
   const outputTargets = config.outputTargets.filter(isOutputTargetDistLazy);
   if (outputTargets.length === 0) {
     return;
@@ -38,7 +38,7 @@ export const outputLazy = async (config: d.Config, compilerCtx: d.CompilerCtx, b
       id: 'lazy',
       platform: 'client',
       conditionals: getLazyBuildConditionals(config, buildCtx.components),
-      customTransformers: getLazyCustomTransformer(config, compilerCtx),
+      customTransformers: getLazyCustomTransformer(config),
       inlineWorkers: config.outputTargets.some(isOutputTargetDist),
       inputs: {
         [config.fsNamespace]: LAZY_BROWSER_ENTRY_ID,
@@ -58,13 +58,13 @@ export const outputLazy = async (config: d.Config, compilerCtx: d.CompilerCtx, b
       bundleOpts.inputs[entryModule.entryKey] = entryModule.entryKey;
     });
 
-    const rollupBuild = await bundleOutput(config, compilerCtx, buildCtx, bundleOpts);
+    const rollupBuild = await bundleOutput(config, buildCtx, bundleOpts);
     if (rollupBuild != null) {
       const [componentBundle] = await Promise.all([
-        generateEsmBrowser(config, compilerCtx, buildCtx, rollupBuild, outputTargets),
-        generateEsm(config, compilerCtx, buildCtx, rollupBuild, outputTargets),
-        generateSystem(config, compilerCtx, buildCtx, rollupBuild, outputTargets),
-        generateCjs(config, compilerCtx, buildCtx, rollupBuild, outputTargets),
+        generateEsmBrowser(config, buildCtx, rollupBuild, outputTargets),
+        generateEsm(config, buildCtx, rollupBuild, outputTargets),
+        generateSystem(config, buildCtx, rollupBuild, outputTargets),
+        generateCjs(config, buildCtx, rollupBuild, outputTargets),
       ]);
 
       if (componentBundle != null) {
@@ -78,7 +78,7 @@ export const outputLazy = async (config: d.Config, compilerCtx: d.CompilerCtx, b
   timespan.finish(`generate lazy finished`);
 };
 
-const getLazyCustomTransformer = (config: d.Config, compilerCtx: d.CompilerCtx) => {
+const getLazyCustomTransformer = (config: d.Config) => {
   const transformOpts: d.TransformOptions = {
     coreImportPath: STENCIL_CORE_ID,
     componentExport: 'lazy',
@@ -90,8 +90,8 @@ const getLazyCustomTransformer = (config: d.Config, compilerCtx: d.CompilerCtx) 
   };
   return [
     updateStencilCoreImports(transformOpts.coreImportPath),
-    lazyComponentTransform(compilerCtx, transformOpts),
-    removeCollectionImports(compilerCtx),
+    lazyComponentTransform(transformOpts),
+    removeCollectionImports(),
   ];
 };
 

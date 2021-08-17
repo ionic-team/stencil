@@ -3,13 +3,9 @@ import { buildWarn } from '../message-utils';
 import { isString, toTitleCase } from '../helpers';
 import { splitLineBreaks } from './logger-utils';
 import type { RollupError } from 'rollup';
+import { getStencilCompilerContext } from '../state/stencil-compiler-context';
 
-export const loadRollupDiagnostics = (
-  config: d.Config,
-  compilerCtx: d.CompilerCtx,
-  buildCtx: d.BuildCtx,
-  rollupError: RollupError
-) => {
+export const loadRollupDiagnostics = (config: d.Config, buildCtx: d.BuildCtx, rollupError: RollupError) => {
   const formattedCode = formatErrorCode(rollupError.code);
 
   const diagnostic: d.Diagnostic = {
@@ -39,7 +35,7 @@ export const loadRollupDiagnostics = (
     const srcFile = loc.file || rollupError.id;
     if (isString(srcFile)) {
       try {
-        const sourceText = compilerCtx.fs.readFileSync(srcFile);
+        const sourceText = getStencilCompilerContext().fs.readFileSync(srcFile);
         if (sourceText) {
           diagnostic.absFilePath = srcFile;
 

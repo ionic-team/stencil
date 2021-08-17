@@ -1,12 +1,13 @@
 import type * as d from '../../declarations';
+import { getStencilCompilerContext } from '../state/stencil-compiler-context';
 
-export const normalizeDiagnostics = (compilerCtx: d.CompilerCtx, diagnostics: d.Diagnostic[]) => {
+export const normalizeDiagnostics = (diagnostics: d.Diagnostic[]) => {
   const normalizedErrors: d.Diagnostic[] = [];
   const normalizedOthers: d.Diagnostic[] = [];
   const dups = new Set<string>();
 
   for (let i = 0; i < diagnostics.length; i++) {
-    const d = normalizeDiagnostic(compilerCtx, diagnostics[i]);
+    const d = normalizeDiagnostic(diagnostics[i]);
 
     const key = d.absFilePath + d.code + d.messageText + d.type;
     if (dups.has(key)) {
@@ -25,7 +26,7 @@ export const normalizeDiagnostics = (compilerCtx: d.CompilerCtx, diagnostics: d.
   return [...normalizedErrors, ...normalizedOthers];
 };
 
-const normalizeDiagnostic = (compilerCtx: d.CompilerCtx, diagnostic: d.Diagnostic) => {
+const normalizeDiagnostic = (diagnostic: d.Diagnostic) => {
   if (diagnostic.messageText) {
     if (typeof (<any>diagnostic.messageText).message === 'string') {
       diagnostic.messageText = (<any>diagnostic.messageText).message;
@@ -40,7 +41,7 @@ const normalizeDiagnostic = (compilerCtx: d.CompilerCtx, diagnostic: d.Diagnosti
       diagnostic.messageText = `In order to load accurate JSX types for components, the "h" function must be imported from "@stencil/core" by each component using JSX. For example: import { Component, h } from '@stencil/core';`;
 
       try {
-        const sourceText = compilerCtx.fs.readFileSync(diagnostic.absFilePath);
+        const sourceText = getStencilCompilerContext().fs.readFileSync(diagnostic.absFilePath);
         const srcLines = splitLineBreaks(sourceText);
         for (let i = 0; i < srcLines.length; i++) {
           const srcLine = srcLines[i];

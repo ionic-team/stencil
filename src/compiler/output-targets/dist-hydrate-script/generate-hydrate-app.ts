@@ -17,7 +17,6 @@ import { join } from 'path';
 
 export const generateHydrateApp = async (
   config: d.Config,
-  compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   outputTargets: d.OutputTargetHydrate[]
 ) => {
@@ -45,7 +44,7 @@ export const generateHydrateApp = async (
           },
           load(id) {
             if (id === STENCIL_HYDRATE_FACTORY_ID) {
-              return generateHydrateFactory(config, compilerCtx, buildCtx);
+              return generateHydrateFactory(config, buildCtx);
             }
             return null;
           },
@@ -61,15 +60,15 @@ export const generateHydrateApp = async (
       file: 'index.js',
     });
 
-    await writeHydrateOutputs(config, compilerCtx, buildCtx, outputTargets, rollupOutput);
+    await writeHydrateOutputs(config, buildCtx, outputTargets, rollupOutput);
   } catch (e) {
     if (!buildCtx.hasError) {
-      loadRollupDiagnostics(config, compilerCtx, buildCtx, e);
+      loadRollupDiagnostics(config, buildCtx, e);
     }
   }
 };
 
-const generateHydrateFactory = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
+const generateHydrateFactory = async (config: d.Config, buildCtx: d.BuildCtx) => {
   if (!buildCtx.hasError) {
     try {
       const cmps = buildCtx.components;
@@ -77,7 +76,7 @@ const generateHydrateFactory = async (config: d.Config, compilerCtx: d.CompilerC
 
       const appFactoryEntryCode = await generateHydrateFactoryEntry(buildCtx);
 
-      const rollupFactoryBuild = await bundleHydrateFactory(config, compilerCtx, buildCtx, build, appFactoryEntryCode);
+      const rollupFactoryBuild = await bundleHydrateFactory(config, buildCtx, build, appFactoryEntryCode);
       if (rollupFactoryBuild != null) {
         const rollupOutput = await rollupFactoryBuild.generate({
           format: 'cjs',

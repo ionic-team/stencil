@@ -1,5 +1,5 @@
 import type * as d from '../../declarations';
-import { hasError, hasWarning } from '@utils';
+import { getStencilCompilerContext, hasError, hasWarning } from '@utils';
 
 /**
  * A new BuildCtx object is created for every build
@@ -55,9 +55,10 @@ export class BuildContext implements d.BuildCtx {
   transpileBuildCount = 0;
   validateTypesPromise: Promise<d.ValidateTypesResults>;
 
-  constructor(config: d.Config, compilerCtx: d.CompilerCtx) {
+  constructor(config: d.Config) {
     this.config = config;
-    this.compilerCtx = compilerCtx;
+    // If this is a singleton... do we need this?
+    this.compilerCtx = getStencilCompilerContext();
     this.buildId = ++this.compilerCtx.activeBuildId;
 
     this.debug = config.logger.debug.bind(config.logger);

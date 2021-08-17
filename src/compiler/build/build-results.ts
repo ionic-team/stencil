@@ -1,14 +1,14 @@
 import type * as d from '../../declarations';
 import { generateHmr } from './build-hmr';
 import { getBuildTimestamp } from './build-ctx';
-import { hasError, isString, normalizeDiagnostics, fromEntries } from '@utils';
+import { hasError, isString, normalizeDiagnostics, fromEntries, getStencilCompilerContext } from '@utils';
 
-export const generateBuildResults = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
+export const generateBuildResults = (config: d.Config, buildCtx: d.BuildCtx) => {
   const componentGraph = buildCtx.componentGraph ? fromEntries(buildCtx.componentGraph.entries()) : undefined;
 
   const buildResults: d.CompilerBuildResults = {
     buildId: buildCtx.buildId,
-    diagnostics: normalizeDiagnostics(compilerCtx, buildCtx.diagnostics),
+    diagnostics: normalizeDiagnostics(buildCtx.diagnostics),
     dirsAdded: buildCtx.dirsAdded.slice().sort(),
     dirsDeleted: buildCtx.dirsDeleted.slice().sort(),
     duration: Date.now() - buildCtx.startTime,
@@ -17,17 +17,17 @@ export const generateBuildResults = (config: d.Config, compilerCtx: d.CompilerCt
     filesDeleted: buildCtx.filesDeleted.slice().sort(),
     filesUpdated: buildCtx.filesUpdated.slice().sort(),
     hasError: hasError(buildCtx.diagnostics),
-    hasSuccessfulBuild: compilerCtx.hasSuccessfulBuild,
+    hasSuccessfulBuild: getStencilCompilerContext().hasSuccessfulBuild,
     isRebuild: buildCtx.isRebuild,
     namespace: config.namespace,
-    outputs: compilerCtx.fs.getBuildOutputs(),
+    outputs: getStencilCompilerContext().fs.getBuildOutputs(),
     rootDir: config.rootDir,
     srcDir: config.srcDir,
     timestamp: getBuildTimestamp(),
     componentGraph,
   };
 
-  const hmr = generateHmr(config, compilerCtx, buildCtx);
+  const hmr = generateHmr(config, buildCtx);
   if (hmr != null) {
     buildResults.hmr = hmr;
   }
@@ -36,7 +36,7 @@ export const generateBuildResults = (config: d.Config, compilerCtx: d.CompilerCt
     buildResults.hydrateAppFilePath = buildCtx.hydrateAppFilePath;
   }
 
-  compilerCtx.lastBuildResults = Object.assign({}, buildResults as any);
+  getStencilCompilerContext().lastBuildResults = Object.assign({}, buildResults as any);
 
   return buildResults;
 };

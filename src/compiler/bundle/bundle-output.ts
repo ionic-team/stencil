@@ -3,7 +3,7 @@ import { appDataPlugin } from './app-data-plugin';
 import type { BundleOptions } from './bundle-interface';
 import { coreResolvePlugin } from './core-resolve-plugin';
 import { createCustomResolverAsync } from '../sys/resolve/resolve-module-async';
-import { createOnWarnFn, loadRollupDiagnostics, isString } from '@utils';
+import { createOnWarnFn, loadRollupDiagnostics, isString, getStencilCompilerContext } from '@utils';
 import { devNodeModuleResolveId } from './dev-module';
 import { extFormatPlugin } from './ext-format-plugin';
 import { extTransformsPlugin } from './ext-transforms-plugin';
@@ -18,33 +18,23 @@ import { serverPlugin } from './server-plugin';
 import { userIndexPlugin } from './user-index-plugin';
 import { workerPlugin } from './worker-plugin';
 
-export const bundleOutput = async (
-  config: d.Config,
-  compilerCtx: d.CompilerCtx,
-  buildCtx: d.BuildCtx,
-  bundleOpts: BundleOptions
-) => {
+export const bundleOutput = async (config: d.Config, buildCtx: d.BuildCtx, bundleOpts: BundleOptions) => {
   try {
-    const rollupOptions = getRollupOptions(config, compilerCtx, buildCtx, bundleOpts);
+    const rollupOptions = getRollupOptions(config, buildCtx, bundleOpts);
     const rollupBuild = await rollup(rollupOptions);
 
-    compilerCtx.rollupCache.set(bundleOpts.id, rollupBuild.cache);
+    getStencilCompilerContext().rollupCache.set(bundleOpts.id, rollupBuild.cache);
     return rollupBuild;
   } catch (e) {
     if (!buildCtx.hasError) {
-      loadRollupDiagnostics(config, compilerCtx, buildCtx, e);
+      loadRollupDiagnostics(config, buildCtx, e);
     }
   }
   return undefined;
 };
 
-export const getRollupOptions = (
-  config: d.Config,
-  compilerCtx: d.CompilerCtx,
-  buildCtx: d.BuildCtx,
-  bundleOpts: BundleOptions
-) => {
-  const customResolveOptions = createCustomResolverAsync(config.sys, compilerCtx.fs, [
+export const getRollupOptions = (config: d.Config, buildCtx: d.BuildCtx, bundleOpts: BundleOptions) => {
+  const customResolveOptions = createCustomResolverAsync(config.sys, getStencilCompilerContext().fs, [
     '.tsx',
     '.ts',
     '.js',
@@ -77,7 +67,7 @@ export const getRollupOptions = (
   if (config.devServer && config.devServer.experimentalDevModules) {
     nodeResolvePlugin.resolveId = async function (importee: string, importer: string) {
       const resolvedId = await orgNodeResolveId2.call(nodeResolvePlugin, importee, importer);
-      return devNodeModuleResolveId(config, compilerCtx.fs, resolvedId, importee);
+      return devNodeModuleResolveId(config, getStencilCompilerContext().fs, resolvedId, importee);
     };
   }
 
@@ -87,19 +77,19 @@ export const getRollupOptions = (
     input: bundleOpts.inputs,
 
     plugins: [
-      coreResolvePlugin(config, compilerCtx, bundleOpts.platform, bundleOpts.externalRuntime),
-      appDataPlugin(config, compilerCtx, buildCtx, bundleOpts.conditionals, bundleOpts.platform),
+      coreResolvePlugin(config, bundleOpts.platform, bundleOpts.externalRuntime),
+      appDataPlugin(config, buildCtx, bundleOpts.conditionals, bundleOpts.platform),
       lazyComponentPlugin(buildCtx),
       loaderPlugin(bundleOpts.loader),
-      userIndexPlugin(config, compilerCtx),
-      typescriptPlugin(compilerCtx, bundleOpts),
+      userIndexPlugin(config),
+      typescriptPlugin(bundleOpts),
       extFormatPlugin(config),
-      extTransformsPlugin(config, compilerCtx, buildCtx, bundleOpts),
-      workerPlugin(config, compilerCtx, buildCtx, bundleOpts.platform, !!bundleOpts.inlineWorkers),
+      extTransformsPlugin(config, buildCtx, bundleOpts),
+      workerPlugin(config, buildCtx, bundleOpts.platform, !!bundleOpts.inlineWorkers),
       serverPlugin(config, bundleOpts.platform),
       ...beforePlugins,
       nodeResolvePlugin,
-      resolveIdWithTypeScript(config, compilerCtx),
+      resolveIdWithTypeScript(config),
       rollupCommonjsPlugin({
         include: /node_modules/,
         sourceMap: config.sourceMap,
@@ -114,7 +104,7 @@ export const getRollupOptions = (
       rollupReplacePlugin({
         'process.env.NODE_ENV': config.devMode ? '"development"' : '"production"',
       }),
-      fileLoadPlugin(compilerCtx.fs),
+      fileLoadPlugin(getStencilCompilerContext().fs),
     ],
 
     treeshake: getTreeshakeOption(config, bundleOpts),
@@ -123,7 +113,7 @@ export const getRollupOptions = (
 
     onwarn: createOnWarnFn(buildCtx.diagnostics),
 
-    cache: compilerCtx.rollupCache.get(bundleOpts.id),
+    cache: getStencilCompilerContext().rollupCache.get(bundleOpts.id),
   };
 
   return rollupOptions;

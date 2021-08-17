@@ -1,16 +1,12 @@
 import type * as d from '../../declarations';
 import { AUTO_GENERATE_COMMENT } from './constants';
 import { basename, dirname, join, relative } from 'path';
-import { flatOne, normalizePath, sortBy, unique } from '@utils';
+import { flatOne, getStencilCompilerContext, normalizePath, sortBy, unique } from '@utils';
 import { getBuildTimestamp } from '../build/build-ctx';
 import { JsonDocsValue } from '../../declarations';
 import { typescriptVersion, version } from '../../version';
 
-export const generateDocData = async (
-  config: d.Config,
-  compilerCtx: d.CompilerCtx,
-  buildCtx: d.BuildCtx
-): Promise<d.JsonDocs> => {
+export const generateDocData = async (config: d.Config, buildCtx: d.BuildCtx): Promise<d.JsonDocs> => {
   return {
     timestamp: getBuildTimestamp(),
     compiler: {
@@ -18,23 +14,19 @@ export const generateDocData = async (
       version,
       typescriptVersion,
     },
-    components: await getDocsComponents(config, compilerCtx, buildCtx),
+    components: await getDocsComponents(config, buildCtx),
   };
 };
 
-const getDocsComponents = async (
-  config: d.Config,
-  compilerCtx: d.CompilerCtx,
-  buildCtx: d.BuildCtx
-): Promise<d.JsonDocsComponent[]> => {
+const getDocsComponents = async (config: d.Config, buildCtx: d.BuildCtx): Promise<d.JsonDocsComponent[]> => {
   const results = await Promise.all(
     buildCtx.moduleFiles.map(async (moduleFile) => {
       const filePath = moduleFile.sourceFilePath;
       const dirPath = normalizePath(dirname(filePath));
       const readmePath = normalizePath(join(dirPath, 'readme.md'));
       const usagesDir = normalizePath(join(dirPath, 'usage'));
-      const readme = await getUserReadmeContent(compilerCtx, readmePath);
-      const usage = await generateUsages(compilerCtx, usagesDir);
+      const readme = await getUserReadmeContent(readmePath);
+      const usage = await generateUsages(usagesDir);
       return moduleFile.cmps
         .filter((cmp) => !cmp.internal && !cmp.isCollectionDependency)
         .map((cmp) => ({
@@ -280,9 +272,9 @@ export const getNameText = (name: string, tags: d.JsonDocsTag[]) => {
     });
 };
 
-const getUserReadmeContent = async (compilerCtx: d.CompilerCtx, readmePath: string) => {
+const getUserReadmeContent = async (readmePath: string) => {
   try {
-    const existingContent = await compilerCtx.fs.readFile(readmePath);
+    const existingContent = await getStencilCompilerContext().fs.readFile(readmePath);
     const userContentIndex = existingContent.indexOf(AUTO_GENERATE_COMMENT) - 1;
     if (userContentIndex >= 0) {
       return existingContent.substring(0, userContentIndex);
@@ -315,11 +307,11 @@ const generateDocs = (readme: string, jsdoc: d.CompilerJsDoc) => {
   return contentLines.join('\n').trim();
 };
 
-const generateUsages = async (compilerCtx: d.CompilerCtx, usagesDir: string) => {
+const generateUsages = async (usagesDir: string) => {
   const rtn: d.JsonDocsUsage = {};
 
   try {
-    const usageFilePaths = await compilerCtx.fs.readdir(usagesDir);
+    const usageFilePaths = await getStencilCompilerContext().fs.readdir(usagesDir);
 
     const usages: d.JsonDocsUsage = {};
 
@@ -338,7 +330,7 @@ const generateUsages = async (compilerCtx: d.CompilerCtx, usagesDir: string) => 
         parts.pop();
         const key = parts.join('.');
 
-        usages[key] = await compilerCtx.fs.readFile(f.absPath);
+        usages[key] = await getStencilCompilerContext().fs.readFile(f.absPath);
       })
     );
 

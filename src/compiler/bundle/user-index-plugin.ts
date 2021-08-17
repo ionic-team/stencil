@@ -2,15 +2,16 @@ import type * as d from '../../declarations';
 import type { Plugin } from 'rollup';
 import { USER_INDEX_ENTRY_ID } from './entry-alias-ids';
 import { join } from 'path';
+import { getStencilCompilerContext } from '@utils';
 
-export const userIndexPlugin = (config: d.Config, compilerCtx: d.CompilerCtx): Plugin => {
+export const userIndexPlugin = (config: d.Config): Plugin => {
   return {
     name: 'userIndexPlugin',
 
     async resolveId(importee) {
       if (importee === USER_INDEX_ENTRY_ID) {
         const usersIndexJsPath = join(config.srcDir, 'index.ts');
-        const hasUserIndex = await compilerCtx.fs.access(usersIndexJsPath);
+        const hasUserIndex = await getStencilCompilerContext().fs.access(usersIndexJsPath);
         if (hasUserIndex) {
           return usersIndexJsPath;
         }

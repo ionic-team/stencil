@@ -1,12 +1,8 @@
 import type * as d from '../../declarations';
 import { join } from 'path';
+import { getStencilCompilerContext } from '@utils';
 
-export const inlineStyleSheets = (
-  compilerCtx: d.CompilerCtx,
-  doc: Document,
-  maxSize: number,
-  outputTarget: d.OutputTargetWww
-) => {
+export const inlineStyleSheets = (doc: Document, maxSize: number, outputTarget: d.OutputTargetWww) => {
   const globalLinks = Array.from(doc.querySelectorAll('link[rel=stylesheet]')) as HTMLLinkElement[];
   return Promise.all(
     globalLinks.map(async (link) => {
@@ -17,7 +13,7 @@ export const inlineStyleSheets = (
 
       try {
         const fsPath = join(outputTarget.dir, href);
-        const styles = await compilerCtx.fs.readFile(fsPath);
+        const styles = await getStencilCompilerContext().fs.readFile(fsPath);
         if (styles.length > maxSize) {
           return;
         }

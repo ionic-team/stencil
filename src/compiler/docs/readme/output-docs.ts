@@ -9,10 +9,10 @@ import { slotsToMarkdown } from './markdown-slots';
 import { partsToMarkdown } from './markdown-parts';
 import { depsToMarkdown } from './markdown-dependencies';
 import { AUTO_GENERATE_COMMENT } from '../constants';
+import { getStencilCompilerContext } from '@utils';
 
 export const generateReadme = async (
   config: d.Config,
-  compilerCtx: d.CompilerCtx,
   readmeOutputs: d.OutputTargetDocsReadme[],
   docsData: d.JsonDocsComponent,
   cmps: d.JsonDocsComponent[]
@@ -26,7 +26,7 @@ export const generateReadme = async (
         const readmeContent = generateMarkdown(userContent, docsData, cmps, readmeOutput);
         const relPath = relative(config.srcDir, docsData.readmePath);
         const absPath = join(readmeOutput.dir, relPath);
-        const results = await compilerCtx.fs.writeFile(absPath, readmeContent);
+        const results = await getStencilCompilerContext().fs.writeFile(absPath, readmeContent);
         if (results.changedContent) {
           if (isUpdate) {
             config.logger.info(`updated readme docs: ${docsData.tag}`);

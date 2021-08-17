@@ -1,26 +1,20 @@
 import type * as d from '../../../declarations';
 import { isOutputTargetDistCustomElements } from '../output-utils';
 import { dirname, join, relative } from 'path';
-import { normalizePath, dashToPascalCase } from '@utils';
+import { normalizePath, dashToPascalCase, getStencilCompilerContext } from '@utils';
 
-export const generateCustomElementsTypes = async (
-  config: d.Config,
-  compilerCtx: d.CompilerCtx,
-  buildCtx: d.BuildCtx,
-  distDtsFilePath: string
-) => {
+export const generateCustomElementsTypes = async (config: d.Config, buildCtx: d.BuildCtx, distDtsFilePath: string) => {
   const outputTargets = config.outputTargets.filter(isOutputTargetDistCustomElements);
 
   await Promise.all(
     outputTargets.map((outputTarget) =>
-      generateCustomElementsTypesOutput(config, compilerCtx, buildCtx, distDtsFilePath, outputTarget)
+      generateCustomElementsTypesOutput(config, buildCtx, distDtsFilePath, outputTarget)
     )
   );
 };
 
 export const generateCustomElementsTypesOutput = async (
   config: d.Config,
-  compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   distDtsFilePath: string,
   outputTarget: d.OutputTargetDistCustomElementsBundle | d.OutputTargetDistCustomElements
@@ -57,7 +51,7 @@ export const generateCustomElementsTypesOutput = async (
   ];
 
   const usersIndexJsPath = join(config.srcDir, 'index.ts');
-  const hasUserIndex = await compilerCtx.fs.access(usersIndexJsPath);
+  const hasUserIndex = await getStencilCompilerContext().fs.access(usersIndexJsPath);
   if (hasUserIndex) {
     const userIndexRelPath = normalizePath(dirname(componentsDtsRelPath));
     code.push(`export * from '${userIndexRelPath}';`);
@@ -65,7 +59,7 @@ export const generateCustomElementsTypesOutput = async (
     code.push(`export * from '${componentsDtsRelPath}';`);
   }
 
-  await compilerCtx.fs.writeFile(customElementsDtsPath, code.join('\n') + `\n`, {
+  await getStencilCompilerContext().fs.writeFile(customElementsDtsPath, code.join('\n') + `\n`, {
     outputTargetType: outputTarget.type,
   });
 
@@ -75,7 +69,7 @@ export const generateCustomElementsTypesOutput = async (
       const dtsCode = generateCustomElementType(componentsDtsRelPath, cmp);
       const fileName = `${cmp.tagName}.d.ts`;
       const filePath = join(outputTarget.dir, fileName);
-      await compilerCtx.fs.writeFile(filePath, dtsCode, { outputTargetType: outputTarget.type });
+      await getStencilCompilerContext().fs.writeFile(filePath, dtsCode, { outputTargetType: outputTarget.type });
     })
   );
 };

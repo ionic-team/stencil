@@ -1,6 +1,6 @@
 import type * as d from '../../declarations';
 import { addScriptDataAttribute } from '../html/add-script-attr';
-import { catchError, flatOne, unique } from '@utils';
+import { catchError, flatOne, getStencilCompilerContext, unique } from '@utils';
 import { cloneDocument, serializeNodeToHtml } from '@stencil/core/mock-doc';
 import { generateEs5DisabledMessage } from '../app-core/app-es5-disabled';
 import { generateHashedCopy } from '../output-targets/copy/hashed-copy';
@@ -16,7 +16,7 @@ import { optimizeEsmImport } from '../html/inline-esm-import';
 import { updateGlobalStylesLink } from '../html/update-global-styles-link';
 import { updateIndexHtmlServiceWorker } from '../html/inject-sw-script';
 
-export const outputWww = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
+export const outputWww = async (config: d.Config, buildCtx: d.BuildCtx) => {
   const outputTargets = config.outputTargets.filter(isOutputTargetWww);
   if (outputTargets.length === 0) {
     return;
@@ -25,9 +25,7 @@ export const outputWww = async (config: d.Config, compilerCtx: d.CompilerCtx, bu
   const timespan = buildCtx.createTimeSpan(`generate www started`, true);
   const criticalBundles = getCriticalPath(buildCtx);
 
-  await Promise.all(
-    outputTargets.map((outputTarget) => generateWww(config, compilerCtx, buildCtx, criticalBundles, outputTarget))
-  );
+  await Promise.all(outputTargets.map((outputTarget) => generateWww(config, buildCtx, criticalBundles, outputTarget)));
 
   timespan.finish(`generate www finished`);
 };
@@ -48,24 +46,23 @@ const getCriticalPath = (buildCtx: d.BuildCtx) => {
 
 const generateWww = async (
   config: d.Config,
-  compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   criticalPath: string[],
   outputTarget: d.OutputTargetWww
 ) => {
   if (!config.buildEs5) {
-    await generateEs5DisabledMessage(config, compilerCtx, outputTarget);
+    await generateEs5DisabledMessage(config, outputTarget);
   }
 
   // Copy global styles into the build directory
   // Process
   if (buildCtx.indexDoc && outputTarget.indexHtml) {
-    await generateIndexHtml(config, compilerCtx, buildCtx, criticalPath, outputTarget);
+    await generateIndexHtml(config, buildCtx, criticalPath, outputTarget);
   }
-  await generateHostConfig(compilerCtx, outputTarget);
+  await generateHostConfig(outputTarget);
 };
 
-const generateHostConfig = (compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetWww) => {
+const generateHostConfig = (outputTarget: d.OutputTargetWww) => {
   const buildDir = getAbsoluteBuildDir(outputTarget);
   const hostConfigPath = join(outputTarget.appDir, 'host.config.json');
   const hostConfigContent = JSON.stringify(
@@ -88,17 +85,18 @@ const generateHostConfig = (compilerCtx: d.CompilerCtx, outputTarget: d.OutputTa
     '  '
   );
 
-  return compilerCtx.fs.writeFile(hostConfigPath, hostConfigContent, { outputTargetType: outputTarget.type });
+  return getStencilCompilerContext().fs.writeFile(hostConfigPath, hostConfigContent, {
+    outputTargetType: outputTarget.type,
+  });
 };
 
 const generateIndexHtml = async (
   config: d.Config,
-  compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   criticalPath: string[],
   outputTarget: d.OutputTargetWww
 ) => {
-  if (compilerCtx.hasSuccessfulBuild && !buildCtx.hasHtmlChanges) {
+  if (getStencilCompilerContext().hasSuccessfulBuild && !buildCtx.hasHtmlChanges) {
     // no need to rebuild index.html if there were no app file changes
     return;
   }
@@ -113,11 +111,10 @@ const generateIndexHtml = async (
     if (!config.watch && !config.devMode) {
       const globalStylesFilename = await generateHashedCopy(
         config,
-        compilerCtx,
         join(outputTarget.buildDir, `${config.fsNamespace}.css`)
       );
-      const scriptFound = await optimizeEsmImport(config, compilerCtx, doc, outputTarget);
-      await inlineStyleSheets(compilerCtx, doc, MAX_CSS_INLINE_SIZE, outputTarget);
+      const scriptFound = await optimizeEsmImport(config, doc, outputTarget);
+      await inlineStyleSheets(doc, MAX_CSS_INLINE_SIZE, outputTarget);
       updateGlobalStylesLink(config, doc, globalStylesFilename, outputTarget);
       if (scriptFound) {
         optimizeCriticalPath(doc, criticalPath, outputTarget);
@@ -125,10 +122,12 @@ const generateIndexHtml = async (
     }
 
     const indexContent = serializeNodeToHtml(doc);
-    await compilerCtx.fs.writeFile(outputTarget.indexHtml, indexContent, { outputTargetType: outputTarget.type });
+    await getStencilCompilerContext().fs.writeFile(outputTarget.indexHtml, indexContent, {
+      outputTargetType: outputTarget.type,
+    });
 
     if (outputTarget.serviceWorker && config.flags.prerender) {
-      await compilerCtx.fs.writeFile(join(outputTarget.appDir, INDEX_ORG), indexContent, {
+      await getStencilCompilerContext().fs.writeFile(join(outputTarget.appDir, INDEX_ORG), indexContent, {
         outputTargetType: outputTarget.type,
       });
     }

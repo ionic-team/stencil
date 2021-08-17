@@ -14,10 +14,10 @@ import {
   scriptsDeleted,
 } from '../fs-watch/fs-watch-rebuild';
 import { hasServiceWorkerChanges } from '../service-worker/generate-sw';
-import { isString } from '@utils';
+import { getStencilCompilerContext, isString } from '@utils';
 import type ts from 'typescript';
 
-export const createWatchBuild = async (config: d.Config, compilerCtx: d.CompilerCtx): Promise<d.CompilerWatcher> => {
+export const createWatchBuild = async (config: d.Config): Promise<d.CompilerWatcher> => {
   let isRebuild = false;
   let tsWatchProgram: {
     program: ts.WatchOfConfigFile<ts.EmitAndSemanticDiagnosticsBuilderProgram>;
@@ -33,7 +33,7 @@ export const createWatchBuild = async (config: d.Config, compilerCtx: d.Compiler
   const filesDeleted = new Set<string>();
 
   const onBuild = async (tsBuilder: ts.BuilderProgram) => {
-    const buildCtx = new BuildContext(config, compilerCtx);
+    const buildCtx = new BuildContext(config);
     buildCtx.isRebuild = isRebuild;
     buildCtx.requiresFullBuild = !isRebuild;
     buildCtx.dirsAdded = Array.from(dirsAdded.keys()).sort();
@@ -55,11 +55,11 @@ export const createWatchBuild = async (config: d.Config, compilerCtx: d.Compiler
     filesUpdated.clear();
     filesDeleted.clear();
 
-    emitFsChange(compilerCtx, buildCtx);
+    emitFsChange(buildCtx);
 
     buildCtx.start();
 
-    const result = await build(config, compilerCtx, buildCtx, tsBuilder);
+    const result = await build(config, buildCtx, tsBuilder);
 
     if (result && !result.hasError) {
       isRebuild = true;
@@ -67,8 +67,8 @@ export const createWatchBuild = async (config: d.Config, compilerCtx: d.Compiler
   };
 
   const start = async () => {
-    const srcRead = watchSrcDirectory(config, compilerCtx);
-    const otherRead = watchRootFiles(config, compilerCtx);
+    const srcRead = watchSrcDirectory(config);
+    const otherRead = watchRootFiles(config);
     await srcRead;
     await otherRead;
     tsWatchProgram = await createTsWatchProgram(config, onBuild);
@@ -80,7 +80,7 @@ export const createWatchBuild = async (config: d.Config, compilerCtx: d.Compiler
 
   const onFsChange: d.CompilerFileWatcherCallback = (p, eventKind) => {
     if (tsWatchProgram && !isWatchIgnorePath(config, p)) {
-      updateCompilerCtxCache(config, compilerCtx, p, eventKind);
+      updateCompilerCtxCache(config, p, eventKind);
 
       switch (eventKind) {
         case 'dirAdd':
@@ -129,15 +129,15 @@ export const createWatchBuild = async (config: d.Config, compilerCtx: d.Compiler
     return watcherCloseResults;
   };
 
-  const request = async (data: d.CompilerRequest) => compilerRequest(config, compilerCtx, data);
+  const request = async (data: d.CompilerRequest) => compilerRequest(config, data);
 
-  compilerCtx.addWatchFile = (filePath) => {
+  getStencilCompilerContext().addWatchFile = (filePath) => {
     if (isString(filePath) && !watchingFiles.has(filePath) && !isWatchIgnorePath(config, filePath)) {
       watchingFiles.set(filePath, config.sys.watchFile(filePath, onFsChange));
     }
   };
 
-  compilerCtx.addWatchDir = (dirPath, recursive) => {
+  getStencilCompilerContext().addWatchDir = (dirPath, recursive) => {
     if (isString(dirPath) && !watchingDirs.has(dirPath) && !isWatchIgnorePath(config, dirPath)) {
       watchingDirs.set(dirPath, config.sys.watchDirectory(dirPath, onDirChange, recursive));
     }
@@ -148,13 +148,13 @@ export const createWatchBuild = async (config: d.Config, compilerCtx: d.Compiler
   return {
     start,
     close,
-    on: compilerCtx.events.on,
+    on: getStencilCompilerContext().events.on,
     request,
   };
 };
 
-const watchSrcDirectory = async (config: d.Config, compilerCtx: d.CompilerCtx) => {
-  const srcFiles = await compilerCtx.fs.readdir(config.srcDir, {
+const watchSrcDirectory = async (config: d.Config) => {
+  const srcFiles = await getStencilCompilerContext().fs.readdir(config.srcDir, {
     recursive: true,
     excludeDirNames: ['.cache', '.git', '.github', '.stencil', '.vscode', 'node_modules'],
     excludeExtensions: [
@@ -170,23 +170,23 @@ const watchSrcDirectory = async (config: d.Config, compilerCtx: d.CompilerCtx) =
     ],
   });
 
-  srcFiles.filter(({ isFile }) => isFile).forEach(({ absPath }) => compilerCtx.addWatchFile(absPath));
+  srcFiles.filter(({ isFile }) => isFile).forEach(({ absPath }) => getStencilCompilerContext().addWatchFile(absPath));
 
-  compilerCtx.addWatchDir(config.srcDir, true);
+  getStencilCompilerContext().addWatchDir(config.srcDir, true);
 };
 
-const watchRootFiles = async (config: d.Config, compilerCtx: d.CompilerCtx) => {
+const watchRootFiles = async (config: d.Config) => {
   // non-src files that cause a rebuild
   // mainly for root level config files, and getting an event when they change
-  const rootFiles = await compilerCtx.fs.readdir(config.rootDir, {
+  const rootFiles = await getStencilCompilerContext().fs.readdir(config.rootDir, {
     recursive: false,
     excludeDirNames: ['.cache', '.git', '.github', '.stencil', '.vscode', 'node_modules'],
   });
 
-  rootFiles.filter(({ isFile }) => isFile).forEach(({ absPath }) => compilerCtx.addWatchFile(absPath));
+  rootFiles.filter(({ isFile }) => isFile).forEach(({ absPath }) => getStencilCompilerContext().addWatchFile(absPath));
 };
 
-const emitFsChange = (compilerCtx: d.CompilerCtx, buildCtx: BuildContext) => {
+const emitFsChange = (buildCtx: BuildContext) => {
   if (
     buildCtx.dirsAdded.length > 0 ||
     buildCtx.dirsDeleted.length > 0 ||
@@ -194,7 +194,7 @@ const emitFsChange = (compilerCtx: d.CompilerCtx, buildCtx: BuildContext) => {
     buildCtx.filesAdded.length > 0 ||
     buildCtx.filesDeleted.length > 0
   ) {
-    compilerCtx.events.emit('fsChange', {
+    getStencilCompilerContext().events.emit('fsChange', {
       dirsAdded: buildCtx.dirsAdded.slice(),
       dirsDeleted: buildCtx.dirsDeleted.slice(),
       filesUpdated: buildCtx.filesUpdated.slice(),
@@ -204,20 +204,15 @@ const emitFsChange = (compilerCtx: d.CompilerCtx, buildCtx: BuildContext) => {
   }
 };
 
-const updateCompilerCtxCache = (
-  config: d.Config,
-  compilerCtx: d.CompilerCtx,
-  path: string,
-  kind: d.CompilerFileWatcherEvent
-) => {
-  compilerCtx.fs.clearFileCache(path);
-  compilerCtx.changedFiles.add(path);
+const updateCompilerCtxCache = (config: d.Config, path: string, kind: d.CompilerFileWatcherEvent) => {
+  getStencilCompilerContext().fs.clearFileCache(path);
+  getStencilCompilerContext().changedFiles.add(path);
 
   if (kind === 'fileDelete') {
-    compilerCtx.moduleMap.delete(path);
+    getStencilCompilerContext().moduleMap.delete(path);
   } else if (kind === 'dirDelete') {
     const fsRootDir = resolve('/');
-    compilerCtx.moduleMap.forEach((_, moduleFilePath) => {
+    getStencilCompilerContext().moduleMap.forEach((_, moduleFilePath) => {
       let moduleAncestorDir = dirname(moduleFilePath);
 
       for (let i = 0; i < 50; i++) {
@@ -226,9 +221,9 @@ const updateCompilerCtxCache = (
         }
 
         if (moduleAncestorDir === path) {
-          compilerCtx.fs.clearFileCache(moduleFilePath);
-          compilerCtx.moduleMap.delete(moduleFilePath);
-          compilerCtx.changedFiles.add(moduleFilePath);
+          getStencilCompilerContext().fs.clearFileCache(moduleFilePath);
+          getStencilCompilerContext().moduleMap.delete(moduleFilePath);
+          getStencilCompilerContext().changedFiles.add(moduleFilePath);
           break;
         }
 

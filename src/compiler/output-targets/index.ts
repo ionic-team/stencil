@@ -11,41 +11,42 @@ import { outputWww } from './output-www';
 import { outputCollection } from './dist-collection';
 import { outputTypes } from './output-types';
 import type { RollupCache } from 'rollup';
+import { getStencilCompilerContext } from '@utils';
 
-export const generateOutputTargets = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
+export const generateOutputTargets = async (config: d.Config, buildCtx: d.BuildCtx) => {
   const timeSpan = buildCtx.createTimeSpan('generate outputs started', true);
 
-  const changedModuleFiles = Array.from(compilerCtx.changedModules)
-    .map((filename) => compilerCtx.moduleMap.get(filename))
+  const changedModuleFiles = Array.from(getStencilCompilerContext().changedModules)
+    .map((filename) => getStencilCompilerContext().moduleMap.get(filename))
     .filter((mod) => mod && !mod.isCollectionDependency);
 
-  compilerCtx.changedModules.clear();
+  getStencilCompilerContext().changedModules.clear();
 
-  invalidateRollupCaches(compilerCtx);
+  invalidateRollupCaches();
 
   await Promise.all([
-    outputAngular(config, compilerCtx, buildCtx),
-    outputCopy(config, compilerCtx, buildCtx),
-    outputCollection(config, compilerCtx, buildCtx, changedModuleFiles),
-    outputCustomElements(config, compilerCtx, buildCtx),
-    outputCustomElementsBundle(config, compilerCtx, buildCtx),
-    outputHydrateScript(config, compilerCtx, buildCtx),
-    outputLazyLoader(config, compilerCtx),
-    outputLazy(config, compilerCtx, buildCtx),
-    outputWww(config, compilerCtx, buildCtx),
+    outputAngular(config, buildCtx),
+    outputCopy(config, buildCtx),
+    outputCollection(config, buildCtx, changedModuleFiles),
+    outputCustomElements(config, buildCtx),
+    outputCustomElementsBundle(config, buildCtx),
+    outputHydrateScript(config, buildCtx),
+    outputLazyLoader(config),
+    outputLazy(config, buildCtx),
+    outputWww(config, buildCtx),
   ]);
 
   // must run after all the other outputs
   // since it validates files were created
-  await outputDocs(config, compilerCtx, buildCtx);
-  await outputTypes(config, compilerCtx, buildCtx);
+  await outputDocs(config, buildCtx);
+  await outputTypes(config, buildCtx);
 
   timeSpan.finish('generate outputs finished');
 };
 
-const invalidateRollupCaches = (compilerCtx: d.CompilerCtx) => {
-  const invalidatedIds = compilerCtx.changedFiles;
-  compilerCtx.rollupCache.forEach((cache: RollupCache) => {
+const invalidateRollupCaches = () => {
+  const invalidatedIds = getStencilCompilerContext().changedFiles;
+  getStencilCompilerContext().rollupCache.forEach((cache: RollupCache) => {
     cache.modules.forEach((mod) => {
       if (mod.transformDependencies.some((id) => invalidatedIds.has(id))) {
         mod.originalCode = null;

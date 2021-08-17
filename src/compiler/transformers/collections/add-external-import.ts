@@ -1,12 +1,11 @@
 import type * as d from '../../../declarations';
 import { dirname } from 'path';
-import { isString, parsePackageJson } from '@utils';
+import { getStencilCompilerContext, isString, parsePackageJson } from '@utils';
 import { parseCollection } from './parse-collection-module';
 import { tsResolveModuleNamePackageJsonPath } from '../../sys/typescript/typescript-resolve-module';
 
 export const addExternalImport = (
   config: d.Config,
-  compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   moduleFile: d.Module,
   containingFile: string,
@@ -18,15 +17,15 @@ export const addExternalImport = (
     moduleFile.externalImports.sort();
   }
 
-  if (!resolveCollections || compilerCtx.resolvedCollections.has(moduleId)) {
+  if (!resolveCollections || getStencilCompilerContext().resolvedCollections.has(moduleId)) {
     // we've already handled this collection moduleId before
     return;
   }
 
-  let pkgJsonFilePath = tsResolveModuleNamePackageJsonPath(config, compilerCtx, moduleId, containingFile);
+  let pkgJsonFilePath = tsResolveModuleNamePackageJsonPath(config, moduleId, containingFile);
 
   // cache that we've already parsed this
-  compilerCtx.resolvedCollections.add(moduleId);
+  getStencilCompilerContext().resolvedCollections.add(moduleId);
 
   if (pkgJsonFilePath == null) {
     return;
@@ -44,7 +43,7 @@ export const addExternalImport = (
 
   // open up and parse the package.json
   // sync on purpose :(
-  const pkgJsonStr = compilerCtx.fs.readFileSync(pkgJsonFilePath);
+  const pkgJsonStr = getStencilCompilerContext().fs.readFileSync(pkgJsonFilePath);
   if (pkgJsonStr == null) {
     return;
   }
@@ -67,14 +66,7 @@ export const addExternalImport = (
   // this import is a stencil collection
   // let's parse it and gather all the module data about it
   // internally it'll cached collection data if we've already done this
-  const collection = parseCollection(
-    config,
-    compilerCtx,
-    buildCtx,
-    moduleId,
-    parsedPkgJson.filePath,
-    parsedPkgJson.data
-  );
+  const collection = parseCollection(config, buildCtx, moduleId, parsedPkgJson.filePath, parsedPkgJson.data);
   if (!collection) {
     return;
   }
@@ -97,15 +89,7 @@ export const addExternalImport = (
     // let's keep digging down and discover all of them
     collection.dependencies.forEach((dependencyModuleId) => {
       const resolveFromDir = dirname(pkgJsonFilePath);
-      addExternalImport(
-        config,
-        compilerCtx,
-        buildCtx,
-        moduleFile,
-        resolveFromDir,
-        dependencyModuleId,
-        resolveCollections
-      );
+      addExternalImport(config, buildCtx, moduleFile, resolveFromDir, dependencyModuleId, resolveCollections);
     });
   }
 };

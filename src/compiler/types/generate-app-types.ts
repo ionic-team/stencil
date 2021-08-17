@@ -3,16 +3,11 @@ import { COMPONENTS_DTS_HEADER, sortImportNames } from './types-utils';
 import { generateComponentTypes } from './generate-component-types';
 import { GENERATED_DTS, getComponentsDtsSrcFilePath } from '../output-targets/output-utils';
 import { isAbsolute, relative, resolve } from 'path';
-import { normalizePath } from '@utils';
+import { getStencilCompilerContext, normalizePath } from '@utils';
 import { updateReferenceTypeImports } from './update-import-refs';
 import { updateStencilTypesImports } from './stencil-types';
 
-export const generateAppTypes = async (
-  config: d.Config,
-  compilerCtx: d.CompilerCtx,
-  buildCtx: d.BuildCtx,
-  destination: string
-) => {
+export const generateAppTypes = async (config: d.Config, buildCtx: d.BuildCtx, destination: string) => {
   // only gather components that are still root ts files we've found and have component metadata
   // the compilerCtx cache may still have files that may have been deleted/renamed
   const timespan = buildCtx.createTimeSpan(`generated app types started`, true);
@@ -33,9 +28,13 @@ export const generateAppTypes = async (
     );
   }
 
-  const writeResults = await compilerCtx.fs.writeFile(componentsDtsFilePath, componentTypesFileContent, {
-    immediateWrite: true,
-  });
+  const writeResults = await getStencilCompilerContext().fs.writeFile(
+    componentsDtsFilePath,
+    componentTypesFileContent,
+    {
+      immediateWrite: true,
+    }
+  );
   const hasComponentsDtsChanged = writeResults.changedContent;
 
   const componentsDtsRelFileName = relative(config.rootDir, componentsDtsFilePath);

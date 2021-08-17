@@ -13,7 +13,7 @@ import { generateJsonDocs } from '../../../compiler/docs/json';
 import { generateVscodeDocs } from '../../../compiler/docs/vscode';
 import { outputCustom } from '../../../compiler/output-targets/output-custom';
 
-export async function outputDocs(config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) {
+export async function outputDocs(config: d.Config, buildCtx: d.BuildCtx) {
   if (!config.buildDocs) {
     return;
   }
@@ -33,13 +33,13 @@ export async function outputDocs(config: d.Config, compilerCtx: d.CompilerCtx, b
   // ensure all the styles are built first, which parses all the css docs
   await buildCtx.stylesPromise;
 
-  const docsData = await generateDocData(config, compilerCtx, buildCtx);
+  const docsData = await generateDocData(config, buildCtx);
 
   await Promise.all([
-    generateReadmeDocs(config, compilerCtx, docsData, docsOutputTargets),
-    generateJsonDocs(config, compilerCtx, docsData, docsOutputTargets),
-    generateVscodeDocs(compilerCtx, docsData, docsOutputTargets),
+    generateReadmeDocs(config, docsData, docsOutputTargets),
+    generateJsonDocs(config, docsData, docsOutputTargets),
+    generateVscodeDocs(docsData, docsOutputTargets),
     generateCustomDocs(config, docsData, docsOutputTargets),
-    outputCustom(config, compilerCtx, buildCtx, docsData, docsOutputTargets),
+    outputCustom(config, buildCtx, docsData, docsOutputTargets),
   ]);
 }

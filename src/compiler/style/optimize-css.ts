@@ -1,10 +1,9 @@
 import type * as d from '../../declarations';
 import { optimizeCssId } from '../../version';
-import { hasError, normalizePath } from '@utils';
+import { getStencilCompilerContext, hasError, normalizePath } from '@utils';
 
 export const optimizeCss = async (
   config: d.Config,
-  compilerCtx: d.CompilerCtx,
   diagnostics: d.Diagnostic[],
   styleText: string,
   filePath: string
@@ -30,14 +29,14 @@ export const optimizeCss = async (
     minify: config.minifyCss,
   };
 
-  const cacheKey = await compilerCtx.cache.createKey('optimizeCss', optimizeCssId, opts);
-  const cachedContent = await compilerCtx.cache.get(cacheKey);
+  const cacheKey = await getStencilCompilerContext().cache.createKey('optimizeCss', optimizeCssId, opts);
+  const cachedContent = await getStencilCompilerContext().cache.get(cacheKey);
   if (cachedContent != null) {
     // let's use the cached data we already figured out
     return cachedContent;
   }
 
-  const minifyResults = await compilerCtx.worker.optimizeCss(opts);
+  const minifyResults = await getStencilCompilerContext().worker.optimizeCss(opts);
   minifyResults.diagnostics.forEach((d) => {
     // collect up any diagnostics from minifying
     diagnostics.push(d);
@@ -47,7 +46,7 @@ export const optimizeCss = async (
     // cool, we got valid minified output
 
     // only cache if we got a cache key, if not it probably has an @import
-    await compilerCtx.cache.put(cacheKey, minifyResults.output);
+    await getStencilCompilerContext().cache.put(cacheKey, minifyResults.output);
 
     return minifyResults.output;
   }

@@ -5,10 +5,10 @@ import { join } from 'path';
 import type { OutputOptions, RollupBuild } from 'rollup';
 import { relativeImport } from '../output-utils';
 import type { RollupResult } from '../../../declarations';
+import { getStencilCompilerContext } from '@utils';
 
 export const generateEsm = async (
   config: d.Config,
-  compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   rollupBuild: RollupBuild,
   outputTargets: d.OutputTargetDistLazy[]
@@ -26,63 +26,38 @@ export const generateEsm = async (
     const output = await generateRollupOutput(rollupBuild, esmOpts, config, buildCtx.entryModules);
     if (output != null) {
       const es2017destinations = esmOutputs.map((o) => o.esmDir);
-      await generateLazyModules(
-        config,
-        compilerCtx,
-        buildCtx,
-        outputTargetType,
-        es2017destinations,
-        output,
-        'es2017',
-        false,
-        ''
-      );
+      await generateLazyModules(config, buildCtx, outputTargetType, es2017destinations, output, 'es2017', false, '');
 
       const es5destinations = esmEs5Outputs.map((o) => o.esmEs5Dir);
-      await generateLazyModules(
-        config,
-        compilerCtx,
-        buildCtx,
-        outputTargetType,
-        es5destinations,
-        output,
-        'es5',
-        false,
-        ''
-      );
+      await generateLazyModules(config, buildCtx, outputTargetType, es5destinations, output, 'es5', false, '');
 
-      await copyPolyfills(config, compilerCtx, esmOutputs);
-      await generateShortcuts(config, compilerCtx, outputTargets, output);
+      await copyPolyfills(config, esmOutputs);
+      await generateShortcuts(config, outputTargets, output);
     }
   }
 };
 
-const copyPolyfills = async (config: d.Config, compilerCtx: d.CompilerCtx, outputTargets: d.OutputTargetDistLazy[]) => {
+const copyPolyfills = async (config: d.Config, outputTargets: d.OutputTargetDistLazy[]) => {
   const destinations = outputTargets.filter((o) => o.polyfills).map((o) => o.esmDir);
   if (destinations.length === 0) {
     return;
   }
 
   const src = join(config.sys.getCompilerExecutingPath(), '..', '..', 'internal', 'client', 'polyfills');
-  const files = await compilerCtx.fs.readdir(src);
+  const files = await getStencilCompilerContext().fs.readdir(src);
 
   await Promise.all(
     destinations.map((dest) => {
       return Promise.all(
         files.map((f) => {
-          return compilerCtx.fs.copyFile(f.absPath, join(dest, 'polyfills', f.relPath));
+          return getStencilCompilerContext().fs.copyFile(f.absPath, join(dest, 'polyfills', f.relPath));
         })
       );
     })
   );
 };
 
-const generateShortcuts = (
-  config: d.Config,
-  compilerCtx: d.CompilerCtx,
-  outputTargets: d.OutputTargetDistLazy[],
-  rollupResult: RollupResult[]
-) => {
+const generateShortcuts = (config: d.Config, outputTargets: d.OutputTargetDistLazy[], rollupResult: RollupResult[]) => {
   const indexFilename = rollupResult.find((r) => r.type === 'chunk' && r.isIndex).fileName;
 
   return Promise.all(
@@ -93,7 +68,7 @@ const generateShortcuts = (
 
         const relativePath = relativeImport(o.esmIndexFile, entryPointPath);
         const shortcutContent = `export * from '${relativePath}';`;
-        await compilerCtx.fs.writeFile(o.esmIndexFile, shortcutContent, { outputTargetType: o.type });
+        await getStencilCompilerContext().fs.writeFile(o.esmIndexFile, shortcutContent, { outputTargetType: o.type });
       }
     })
   );

@@ -6,7 +6,6 @@ import ts from 'typescript';
 
 export const parseModuleImport = (
   config: d.Config,
-  compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   moduleFile: d.Module,
   dirPath: string,
@@ -30,15 +29,7 @@ export const parseModuleImport = (
       moduleFile.localImports.push(importPath);
     } else {
       // node resolve side effect import
-      addExternalImport(
-        config,
-        compilerCtx,
-        buildCtx,
-        moduleFile,
-        moduleFile.sourceFilePath,
-        importPath,
-        resolveCollections
-      );
+      addExternalImport(config, buildCtx, moduleFile, moduleFile.sourceFilePath, importPath, resolveCollections);
     }
   }
 };

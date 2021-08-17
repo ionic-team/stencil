@@ -6,10 +6,10 @@ import { parseModuleImport } from './import';
 import { parseStaticComponentMeta } from './component';
 import { parseStringLiteral } from './string-literal';
 import ts from 'typescript';
+import { getStencilCompilerContext } from '@utils';
 
 export const convertStaticToMeta = (
   config: d.Config,
-  compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   typeChecker: ts.TypeChecker,
   collection: d.CollectionCompilerMeta,
@@ -21,9 +21,15 @@ export const convertStaticToMeta = (
 
     const visitNode = (node: ts.Node): ts.VisitResult<ts.Node> => {
       if (ts.isClassDeclaration(node)) {
-        return parseStaticComponentMeta(compilerCtx, typeChecker, node, moduleFile, compilerCtx.nodeMap, transformOpts);
+        return parseStaticComponentMeta(
+          typeChecker,
+          node,
+          moduleFile,
+          getStencilCompilerContext().nodeMap,
+          transformOpts
+        );
       } else if (ts.isImportDeclaration(node)) {
-        parseModuleImport(config, compilerCtx, buildCtx, moduleFile, dirPath, node, !transformOpts.isolatedModules);
+        parseModuleImport(config, buildCtx, moduleFile, dirPath, node, !transformOpts.isolatedModules);
       } else if (ts.isCallExpression(node)) {
         parseCallExpression(moduleFile, node);
       } else if (ts.isStringLiteral(node)) {
@@ -34,7 +40,7 @@ export const convertStaticToMeta = (
 
     return (tsSourceFile) => {
       dirPath = dirname(tsSourceFile.fileName);
-      moduleFile = getModuleLegacy(config, compilerCtx, tsSourceFile.fileName);
+      moduleFile = getModuleLegacy(config, tsSourceFile.fileName);
       resetModuleLegacy(moduleFile);
 
       if (collection != null) {

@@ -1,12 +1,13 @@
 import type * as d from '../../../declarations';
 import { dirname, extname, join } from 'path';
+import { getStencilCompilerContext } from '@utils';
 
-export const generateHashedCopy = async (config: d.Config, compilerCtx: d.CompilerCtx, path: string) => {
+export const generateHashedCopy = async (config: d.Config, path: string) => {
   try {
-    const content = await compilerCtx.fs.readFile(path);
+    const content = await getStencilCompilerContext().fs.readFile(path);
     const hash = await config.sys.generateContentHash(content, config.hashedFileNameLength);
     const hashedFileName = `p-${hash}${extname(path)}`;
-    await compilerCtx.fs.writeFile(join(dirname(path), hashedFileName), content);
+    await getStencilCompilerContext().fs.writeFile(join(dirname(path), hashedFileName), content);
     return hashedFileName;
   } catch (e) {}
   return undefined;

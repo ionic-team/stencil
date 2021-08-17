@@ -1,6 +1,6 @@
 import type * as d from '../../declarations';
 import { basename } from 'path';
-import { isString, unique } from '@utils';
+import { getStencilCompilerContext, isString, unique } from '@utils';
 import { isOutputTargetDocsJson, isOutputTargetStats, isOutputTargetDocsVscode } from '../output-targets/output-utils';
 
 export const filesChanged = (buildCtx: d.BuildCtx) => {
@@ -65,17 +65,17 @@ export const hasHtmlChanges = (config: d.Config, buildCtx: d.BuildCtx) => {
   return srcIndexHtmlChanged;
 };
 
-export const updateCacheFromRebuild = (compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
+export const updateCacheFromRebuild = (buildCtx: d.BuildCtx) => {
   buildCtx.filesChanged.forEach((filePath) => {
-    compilerCtx.fs.clearFileCache(filePath);
+    getStencilCompilerContext().fs.clearFileCache(filePath);
   });
 
   buildCtx.dirsAdded.forEach((dirAdded) => {
-    compilerCtx.fs.clearDirCache(dirAdded);
+    getStencilCompilerContext().fs.clearDirCache(dirAdded);
   });
 
   buildCtx.dirsDeleted.forEach((dirDeleted) => {
-    compilerCtx.fs.clearDirCache(dirDeleted);
+    getStencilCompilerContext().fs.clearDirCache(dirDeleted);
   });
 };
 

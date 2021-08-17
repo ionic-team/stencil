@@ -1,5 +1,6 @@
 import type * as d from '../declarations';
 import { isString } from './helpers';
+import { getStencilCompilerContext } from './state/stencil-compiler-context';
 
 export const buildError = (diagnostics?: d.Diagnostic[]) => {
   const diagnostic: d.Diagnostic = {
@@ -35,20 +36,14 @@ export const buildWarn = (diagnostics: d.Diagnostic[]) => {
   return diagnostic;
 };
 
-export const buildJsonFileError = (
-  compilerCtx: d.CompilerCtx,
-  diagnostics: d.Diagnostic[],
-  jsonFilePath: string,
-  msg: string,
-  pkgKey: string
-) => {
+export const buildJsonFileError = (diagnostics: d.Diagnostic[], jsonFilePath: string, msg: string, pkgKey: string) => {
   const err = buildError(diagnostics);
   err.messageText = msg;
   err.absFilePath = jsonFilePath;
 
   if (typeof pkgKey === 'string') {
     try {
-      const jsonStr = compilerCtx.fs.readFileSync(jsonFilePath);
+      const jsonStr = getStencilCompilerContext().fs.readFileSync(jsonFilePath);
       const lines = jsonStr.replace(/\r/g, '\n').split('\n');
 
       for (let i = 0; i < lines.length; i++) {

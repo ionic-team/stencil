@@ -114,7 +114,7 @@ export function mockBuildCtx(config?: Config, compilerCtx?: CompilerCtx) {
   if (!compilerCtx) {
     compilerCtx = mockCompilerCtx(config);
   }
-  const buildCtx = new BuildContext(config, compilerCtx);
+  const buildCtx = new BuildContext(config);
 
   return buildCtx as BuildCtx;
 }

@@ -18,6 +18,7 @@ export const buildFinish = async (buildCtx: d.BuildCtx) => {
 };
 
 export const buildAbort = (buildCtx: d.BuildCtx) => {
+  // Why is this using the buildCtx's config and compilerCtx? This feels strange. Why are they even duplicated into the buildCtx? Ergonomics?
   return buildDone(buildCtx.config, buildCtx.compilerCtx, buildCtx, true);
 };
 
@@ -29,7 +30,7 @@ const buildDone = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx:
   }
 
   // create the build results data
-  buildCtx.buildResults = generateBuildResults(config, compilerCtx, buildCtx);
+  buildCtx.buildResults = generateBuildResults(config, buildCtx);
 
   buildCtx.debug(`${aborted ? 'aborted' : 'finished'} build, ${buildCtx.buildResults.duration}ms`);
 

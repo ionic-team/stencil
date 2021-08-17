@@ -1,12 +1,12 @@
 import type * as d from '../../../declarations';
-import { buildError, isGlob, normalizePath } from '@utils';
+import { buildError, getStencilCompilerContext, isGlob, normalizePath } from '@utils';
 import { canSkipAssetsCopy, getComponentAssetsCopyTasks } from './assets-copy-tasks';
 import { getDestAbsPath, getSrcAbsPath } from './local-copy-tasks';
 import { isOutputTargetCopy } from '../output-utils';
 import { join } from 'path';
 import minimatch from 'minimatch';
 
-export const outputCopy = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
+export const outputCopy = async (config: d.Config, buildCtx: d.BuildCtx) => {
   const outputTargets = config.outputTargets.filter(isOutputTargetCopy);
   if (outputTargets.length === 0) {
     return;
@@ -14,7 +14,7 @@ export const outputCopy = async (config: d.Config, compilerCtx: d.CompilerCtx, b
 
   const changedFiles = [...buildCtx.filesUpdated, ...buildCtx.filesAdded, ...buildCtx.dirsAdded];
   const copyTasks: Required<d.CopyTask>[] = [];
-  const needsCopyAssets = !canSkipAssetsCopy(compilerCtx, buildCtx.entryModules, buildCtx.filesChanged);
+  const needsCopyAssets = !canSkipAssetsCopy(buildCtx.entryModules, buildCtx.filesChanged);
   outputTargets.forEach((o) => {
     if (needsCopyAssets && o.copyAssets) {
       copyTasks.push(...getComponentAssetsCopyTasks(config, buildCtx, o.dir, o.copyAssets === 'collection'));
@@ -29,8 +29,8 @@ export const outputCopy = async (config: d.Config, compilerCtx: d.CompilerCtx, b
       const copyResults = await config.sys.copy(copyTasks, config.srcDir);
       if (copyResults != null) {
         buildCtx.diagnostics.push(...copyResults.diagnostics);
-        compilerCtx.fs.cancelDeleteDirectoriesFromDisk(copyResults.dirPaths);
-        compilerCtx.fs.cancelDeleteFilesFromDisk(copyResults.filePaths);
+        getStencilCompilerContext().fs.cancelDeleteDirectoriesFromDisk(copyResults.dirPaths);
+        getStencilCompilerContext().fs.cancelDeleteFilesFromDisk(copyResults.filePaths);
         copiedFiles = copyResults.filePaths.length;
       }
     } catch (e) {

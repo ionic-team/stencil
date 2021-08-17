@@ -1,9 +1,9 @@
 import type * as d from '../../declarations';
-import { buildError, buildJsonFileError } from '@utils';
+import { buildError, buildJsonFileError, getStencilCompilerContext } from '@utils';
 import { dirname, join } from 'path';
 import { isOutputTargetWww } from '../output-targets/output-utils';
 
-export const validateManifestJson = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
+export const validateManifestJson = (config: d.Config, buildCtx: d.BuildCtx) => {
   if (config.devMode) {
     return null;
   }
@@ -15,11 +15,11 @@ export const validateManifestJson = (config: d.Config, compilerCtx: d.CompilerCt
       const manifestFilePath = join(outputsTarget.dir, 'manifest.json');
 
       try {
-        const manifestContent = await compilerCtx.fs.readFile(manifestFilePath);
+        const manifestContent = await getStencilCompilerContext().fs.readFile(manifestFilePath);
         if (manifestContent) {
           try {
             const manifestData = JSON.parse(manifestContent);
-            await validateManifestJsonData(compilerCtx, buildCtx, manifestFilePath, manifestData);
+            await validateManifestJsonData(buildCtx, manifestFilePath, manifestData);
           } catch (e) {
             const err = buildError(buildCtx.diagnostics);
             err.header = `Invalid manifest.json: ${e}`;
@@ -31,31 +31,21 @@ export const validateManifestJson = (config: d.Config, compilerCtx: d.CompilerCt
   );
 };
 
-const validateManifestJsonData = async (
-  compilerCtx: d.CompilerCtx,
-  buildCtx: d.BuildCtx,
-  manifestFilePath: string,
-  manifestData: any
-) => {
+const validateManifestJsonData = async (buildCtx: d.BuildCtx, manifestFilePath: string, manifestData: any) => {
   if (Array.isArray(manifestData.icons)) {
     await Promise.all(
       manifestData.icons.map((manifestIcon: any) => {
-        return validateManifestJsonIcon(compilerCtx, buildCtx, manifestFilePath, manifestIcon);
+        return validateManifestJsonIcon(buildCtx, manifestFilePath, manifestIcon);
       })
     );
   }
 };
 
-const validateManifestJsonIcon = async (
-  compilerCtx: d.CompilerCtx,
-  buildCtx: d.BuildCtx,
-  manifestFilePath: string,
-  manifestIcon: any
-) => {
+const validateManifestJsonIcon = async (buildCtx: d.BuildCtx, manifestFilePath: string, manifestIcon: any) => {
   let iconSrc = manifestIcon.src;
   if (typeof iconSrc !== 'string') {
     const msg = `Manifest icon missing "src"`;
-    buildJsonFileError(compilerCtx, buildCtx.diagnostics, manifestFilePath, msg, `"icons"`);
+    buildJsonFileError(buildCtx.diagnostics, manifestFilePath, msg, `"icons"`);
     return;
   }
 
@@ -65,9 +55,9 @@ const validateManifestJsonIcon = async (
 
   const manifestDir = dirname(manifestFilePath);
   const iconPath = join(manifestDir, iconSrc);
-  const hasAccess = await compilerCtx.fs.access(iconPath);
+  const hasAccess = await getStencilCompilerContext().fs.access(iconPath);
   if (!hasAccess) {
     const msg = `Unable to find manifest icon "${manifestIcon.src}"`;
-    buildJsonFileError(compilerCtx, buildCtx.diagnostics, manifestFilePath, msg, `"${manifestIcon.src}"`);
+    buildJsonFileError(buildCtx.diagnostics, manifestFilePath, msg, `"${manifestIcon.src}"`);
   }
 };

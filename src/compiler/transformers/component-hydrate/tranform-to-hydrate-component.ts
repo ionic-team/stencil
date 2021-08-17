@@ -6,17 +6,14 @@ import { updateHydrateComponentClass } from './hydrate-component';
 import { updateStyleImports } from '../style-imports';
 import ts from 'typescript';
 
-export const hydrateComponentTransform = (
-  compilerCtx: d.CompilerCtx,
-  transformOpts: d.TransformOptions
-): ts.TransformerFactory<ts.SourceFile> => {
+export const hydrateComponentTransform = (transformOpts: d.TransformOptions): ts.TransformerFactory<ts.SourceFile> => {
   return (transformCtx) => {
     return (tsSourceFile) => {
-      const moduleFile = getModuleFromSourceFile(compilerCtx, tsSourceFile);
+      const moduleFile = getModuleFromSourceFile(tsSourceFile);
 
       const visitNode = (node: ts.Node): any => {
         if (ts.isClassDeclaration(node)) {
-          const cmp = getComponentMeta(compilerCtx, tsSourceFile, node);
+          const cmp = getComponentMeta(tsSourceFile, node);
           if (cmp != null) {
             return updateHydrateComponentClass(node, moduleFile, cmp);
           }

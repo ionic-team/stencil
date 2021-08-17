@@ -1,11 +1,10 @@
 import type * as d from '../../../declarations';
 import { ConvertIdentifier, getStaticValue } from '../transform-utils';
-import { DEFAULT_STYLE_MODE, sortBy } from '@utils';
+import { DEFAULT_STYLE_MODE, getStencilCompilerContext, sortBy } from '@utils';
 import { normalizeStyles } from '../../style/normalize-styles';
 import ts from 'typescript';
 
 export const parseStaticStyles = (
-  compilerCtx: d.CompilerCtx,
   tagName: string,
   componentFilePath: string,
   isCollectionDependency: boolean,
@@ -29,11 +28,11 @@ export const parseStaticStyles = (
           styleIdentifier: null,
           externalStyles: [],
         });
-        compilerCtx.styleModeNames.add(DEFAULT_STYLE_MODE);
+        getStencilCompilerContext().styleModeNames.add(DEFAULT_STYLE_MODE);
       }
     } else if ((parsedStyle as ConvertIdentifier).__identifier) {
       styles.push(parseStyleIdentifier(parsedStyle, DEFAULT_STYLE_MODE));
-      compilerCtx.styleModeNames.add(DEFAULT_STYLE_MODE);
+      getStencilCompilerContext().styleModeNames.add(DEFAULT_STYLE_MODE);
     } else if (typeof parsedStyle === 'object') {
       Object.keys(parsedStyle).forEach((modeName) => {
         const parsedStyleMode = parsedStyle[modeName];
@@ -48,7 +47,7 @@ export const parseStaticStyles = (
         } else {
           styles.push(parseStyleIdentifier(parsedStyleMode, modeName));
         }
-        compilerCtx.styleModeNames.add(modeName);
+        getStencilCompilerContext().styleModeNames.add(modeName);
       });
     }
   }
@@ -77,7 +76,7 @@ export const parseStaticStyles = (
         };
 
         styles.push(style);
-        compilerCtx.styleModeNames.add(modeName);
+        getStencilCompilerContext().styleModeNames.add(modeName);
       }
     });
   }

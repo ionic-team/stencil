@@ -1,7 +1,7 @@
 import type * as d from '../../declarations';
 import { basename, dirname, extname, join } from 'path';
 import { buildEvents } from '../events';
-import { noop, normalizePath } from '@utils';
+import { getStencilCompilerContext, noop, normalizePath } from '@utils';
 
 /**
  * The CompilerCtx is a persistent object that's reused throughout
@@ -17,7 +17,7 @@ export class CompilerContext implements d.CompilerCtx {
   activeFilesUpdated: string[] = [];
   activeDirsAdded: string[] = [];
   activeDirsDeleted: string[] = [];
-  addWatchDir: (path: string) => void = noop;
+  addWatchDir: (path: string, recursive: boolean) => void = noop;
   addWatchFile: (path: string) => void = noop;
   cache: d.Cache;
   cssModuleImports = new Map<string, string[]>();
@@ -60,10 +60,10 @@ export class CompilerContext implements d.CompilerCtx {
   }
 }
 
-export const getModuleLegacy = (_config: d.Config, compilerCtx: d.CompilerCtx, sourceFilePath: string) => {
+export const getModuleLegacy = (_config: d.Config, sourceFilePath: string) => {
   sourceFilePath = normalizePath(sourceFilePath);
 
-  const moduleFile = compilerCtx.moduleMap.get(sourceFilePath);
+  const moduleFile = getStencilCompilerContext().moduleMap.get(sourceFilePath);
   if (moduleFile != null) {
     return moduleFile;
   } else {
@@ -104,7 +104,7 @@ export const getModuleLegacy = (_config: d.Config, compilerCtx: d.CompilerCtx, s
       staticSourceFile: null,
       staticSourceFileText: '',
     };
-    compilerCtx.moduleMap.set(sourceFilePath, moduleFile);
+    getStencilCompilerContext().moduleMap.set(sourceFilePath, moduleFile);
     return moduleFile;
   }
 };

@@ -12,7 +12,6 @@ import ts from 'typescript';
 
 export const transformToNativeComponentText = (
   config: d.Config,
-  compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   cmp: d.ComponentCompilerMeta,
   inputJsText: string
@@ -39,7 +38,7 @@ export const transformToNativeComponentText = (
       compilerOptions: tsCompilerOptions,
       fileName: cmp.jsFilePath,
       transformers: {
-        after: [nativeComponentTransform(compilerCtx, transformOpts)],
+        after: [nativeComponentTransform(transformOpts)],
       },
     };
 
@@ -57,17 +56,14 @@ export const transformToNativeComponentText = (
   return outputText;
 };
 
-export const nativeComponentTransform = (
-  compilerCtx: d.CompilerCtx,
-  transformOpts: d.TransformOptions
-): ts.TransformerFactory<ts.SourceFile> => {
+export const nativeComponentTransform = (transformOpts: d.TransformOptions): ts.TransformerFactory<ts.SourceFile> => {
   return (transformCtx) => {
     return (tsSourceFile) => {
-      const moduleFile = getModuleFromSourceFile(compilerCtx, tsSourceFile);
+      const moduleFile = getModuleFromSourceFile(tsSourceFile);
 
       const visitNode = (node: ts.Node): any => {
         if (ts.isClassDeclaration(node)) {
-          const cmp = getComponentMeta(compilerCtx, tsSourceFile, node);
+          const cmp = getComponentMeta(tsSourceFile, node);
           if (cmp != null) {
             return updateNativeComponentClass(transformOpts, node, moduleFile, cmp);
           }

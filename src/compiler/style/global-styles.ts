@@ -1,58 +1,52 @@
 import type * as d from '../../declarations';
-import { catchError, normalizePath } from '@utils';
+import { catchError, getStencilCompilerContext, normalizePath } from '@utils';
 import { getCssImports } from './css-imports';
 import { isOutputTargetDistGlobalStyles } from '../output-targets/output-utils';
 import { optimizeCss } from './optimize-css';
 import { runPluginTransforms } from '../plugin/plugin';
 
-export const generateGlobalStyles = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
+export const generateGlobalStyles = async (config: d.Config, buildCtx: d.BuildCtx) => {
   const outputTargets = config.outputTargets.filter(isOutputTargetDistGlobalStyles);
   if (outputTargets.length === 0) {
     return;
   }
 
-  const globalStyles = await buildGlobalStyles(config, compilerCtx, buildCtx);
+  const globalStyles = await buildGlobalStyles(config, buildCtx);
   if (globalStyles) {
-    await Promise.all(outputTargets.map((o) => compilerCtx.fs.writeFile(o.file, globalStyles)));
+    await Promise.all(outputTargets.map((o) => getStencilCompilerContext().fs.writeFile(o.file, globalStyles)));
   }
 };
 
-const buildGlobalStyles = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
+const buildGlobalStyles = async (config: d.Config, buildCtx: d.BuildCtx) => {
   let globalStylePath = config.globalStyle;
   if (!globalStylePath) {
     return null;
   }
 
-  const canSkip = await canSkipGlobalStyles(config, compilerCtx, buildCtx);
+  const canSkip = await canSkipGlobalStyles(config, buildCtx);
   if (canSkip) {
-    return compilerCtx.cachedGlobalStyle;
+    return getStencilCompilerContext().cachedGlobalStyle;
   }
 
   try {
     globalStylePath = normalizePath(globalStylePath);
-    compilerCtx.addWatchFile(globalStylePath);
+    getStencilCompilerContext().addWatchFile(globalStylePath);
 
-    const transformResults = await runPluginTransforms(config, compilerCtx, buildCtx, globalStylePath);
+    const transformResults = await runPluginTransforms(config, buildCtx, globalStylePath);
 
     if (transformResults) {
-      const optimizedCss = await optimizeCss(
-        config,
-        compilerCtx,
-        buildCtx.diagnostics,
-        transformResults.code,
-        globalStylePath
-      );
-      compilerCtx.cachedGlobalStyle = optimizedCss;
+      const optimizedCss = await optimizeCss(config, buildCtx.diagnostics, transformResults.code, globalStylePath);
+      getStencilCompilerContext().cachedGlobalStyle = optimizedCss;
 
       if (Array.isArray(transformResults.dependencies)) {
-        const cssModuleImports = compilerCtx.cssModuleImports.get(globalStylePath) || [];
+        const cssModuleImports = getStencilCompilerContext().cssModuleImports.get(globalStylePath) || [];
         transformResults.dependencies.forEach((dep) => {
-          compilerCtx.addWatchFile(dep);
+          getStencilCompilerContext().addWatchFile(dep);
           if (!cssModuleImports.includes(dep)) {
             cssModuleImports.push(dep);
           }
         });
-        compilerCtx.cssModuleImports.set(globalStylePath, cssModuleImports);
+        getStencilCompilerContext().cssModuleImports.set(globalStylePath, cssModuleImports);
       }
       return optimizedCss;
     }
@@ -61,12 +55,12 @@ const buildGlobalStyles = async (config: d.Config, compilerCtx: d.CompilerCtx, b
     d.absFilePath = globalStylePath;
   }
 
-  compilerCtx.cachedGlobalStyle = null;
+  getStencilCompilerContext().cachedGlobalStyle = null;
   return null;
 };
 
-const canSkipGlobalStyles = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
-  if (!compilerCtx.cachedGlobalStyle) {
+const canSkipGlobalStyles = async (config: d.Config, buildCtx: d.BuildCtx) => {
+  if (!getStencilCompilerContext().cachedGlobalStyle) {
     return false;
   }
 
@@ -83,17 +77,16 @@ const canSkipGlobalStyles = async (config: d.Config, compilerCtx: d.CompilerCtx,
     return false;
   }
 
-  const cssModuleImports = compilerCtx.cssModuleImports.get(config.globalStyle);
+  const cssModuleImports = getStencilCompilerContext().cssModuleImports.get(config.globalStyle);
   if (cssModuleImports && buildCtx.filesChanged.some((f) => cssModuleImports.includes(f))) {
     return false;
   }
 
   const hasChangedImports = await hasChangedImportFile(
     config,
-    compilerCtx,
     buildCtx,
     config.globalStyle,
-    compilerCtx.cachedGlobalStyle,
+    getStencilCompilerContext().cachedGlobalStyle,
     []
   );
   if (hasChangedImports) {
@@ -105,7 +98,6 @@ const canSkipGlobalStyles = async (config: d.Config, compilerCtx: d.CompilerCtx,
 
 const hasChangedImportFile = async (
   config: d.Config,
-  compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   filePath: string,
   content: string,
@@ -116,18 +108,17 @@ const hasChangedImportFile = async (
   }
   noLoop.push(filePath);
 
-  return hasChangedImportContent(config, compilerCtx, buildCtx, filePath, content, noLoop);
+  return hasChangedImportContent(config, buildCtx, filePath, content, noLoop);
 };
 
 const hasChangedImportContent = async (
   config: d.Config,
-  compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   filePath: string,
   content: string,
   checkedFiles: string[]
 ) => {
-  const cssImports = await getCssImports(config, compilerCtx, buildCtx, filePath, content);
+  const cssImports = await getCssImports(config, buildCtx, filePath, content);
   if (cssImports.length === 0) {
     // don't bother
     return false;
@@ -145,8 +136,8 @@ const hasChangedImportContent = async (
   // keep diggin'
   const promises = cssImports.map(async (cssImportData) => {
     try {
-      const content = await compilerCtx.fs.readFile(cssImportData.filePath);
-      return hasChangedImportFile(config, compilerCtx, buildCtx, cssImportData.filePath, content, checkedFiles);
+      const content = await getStencilCompilerContext().fs.readFile(cssImportData.filePath);
+      return hasChangedImportFile(config, buildCtx, cssImportData.filePath, content, checkedFiles);
     } catch (e) {
       return false;
     }

@@ -2,10 +2,10 @@ import type * as d from '../../declarations';
 import { getScopeId } from '../style/scope-css';
 import { isOutputTargetWww } from '../output-targets/output-utils';
 import minimatch from 'minimatch';
-import { isGlob, normalizePath, sortBy } from '@utils';
+import { getStencilCompilerContext, isGlob, normalizePath, sortBy } from '@utils';
 import { basename } from 'path';
 
-export const generateHmr = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
+export const generateHmr = (config: d.Config, buildCtx: d.BuildCtx) => {
   if (config.devServer == null || config.devServer.reloadStrategy == null) {
     return null;
   }
@@ -38,7 +38,7 @@ export const generateHmr = (config: d.Config, compilerCtx: d.CompilerCtx, buildC
 
   const outputTargetsWww = config.outputTargets.filter(isOutputTargetWww);
 
-  const componentsUpdated = getComponentsUpdated(compilerCtx, buildCtx);
+  const componentsUpdated = getComponentsUpdated(buildCtx);
   if (componentsUpdated) {
     hmr.componentsUpdated = componentsUpdated;
   }
@@ -69,7 +69,7 @@ export const generateHmr = (config: d.Config, compilerCtx: d.CompilerCtx, buildC
   return hmr;
 };
 
-const getComponentsUpdated = (compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
+const getComponentsUpdated = (buildCtx: d.BuildCtx) => {
   // find all of the components that would be affected from the file changes
   if (!buildCtx.filesChanged) {
     return null;
@@ -93,7 +93,7 @@ const getComponentsUpdated = (compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) 
   }
 
   const tags = changedScriptFiles.reduce((tags, changedTsFile) => {
-    const moduleFile = compilerCtx.moduleMap.get(changedTsFile);
+    const moduleFile = getStencilCompilerContext().moduleMap.get(changedTsFile);
     if (moduleFile != null) {
       moduleFile.cmps.forEach((cmp) => {
         if (typeof cmp.tagName === 'string') {

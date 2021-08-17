@@ -3,7 +3,7 @@ import { dirname, join } from 'path';
 import { fetchModuleAsync } from '../sys/fetch/fetch-module-async';
 import { getStencilModuleUrl, packageVersions } from '../sys/fetch/fetch-utils';
 import { HYDRATED_CSS } from '../../runtime/runtime-constants';
-import { isRemoteUrl, normalizePath, normalizeFsPath } from '@utils';
+import { isRemoteUrl, normalizePath, normalizeFsPath, getStencilCompilerContext } from '@utils';
 import {
   APP_DATA_CONDITIONAL,
   STENCIL_CORE_ID,
@@ -17,7 +17,6 @@ import type { Plugin } from 'rollup';
 
 export const coreResolvePlugin = (
   config: d.Config,
-  compilerCtx: d.CompilerCtx,
   platform: 'client' | 'hydrate' | 'worker',
   externalRuntime: boolean
 ): Plugin => {
@@ -99,11 +98,11 @@ export const Build = {
   isTesting: false,
 };`;
           }
-          let code = await compilerCtx.fs.readFile(filePath);
+          let code = await getStencilCompilerContext().fs.readFile(filePath);
 
           if (typeof code !== 'string' && isRemoteUrl(compilerExe)) {
             const url = getStencilModuleUrl(compilerExe, filePath);
-            code = await fetchModuleAsync(config.sys, compilerCtx.fs, packageVersions, url, filePath);
+            code = await fetchModuleAsync(config.sys, getStencilCompilerContext().fs, packageVersions, url, filePath);
           }
 
           if (typeof code === 'string') {

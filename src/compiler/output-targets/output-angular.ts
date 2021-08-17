@@ -1,10 +1,10 @@
 import type * as d from '../../declarations';
-import { dashToPascalCase, sortBy } from '@utils';
+import { dashToPascalCase, getStencilCompilerContext, sortBy } from '@utils';
 import { dirname, join } from 'path';
 import ts from 'typescript';
 import { isOutputTargetAngular, relativeImport } from './output-utils';
 
-export const outputAngular = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
+export const outputAngular = async (config: d.Config, buildCtx: d.BuildCtx) => {
   if (!config.buildDist) {
     return;
   }
@@ -15,7 +15,7 @@ export const outputAngular = async (config: d.Config, compilerCtx: d.CompilerCtx
 
   const timespan = buildCtx.createTimeSpan(`generate angular proxies started`, true);
   await Promise.all(
-    angularOutputTargets.map((outputTarget) => angularDirectiveProxyOutput(config, compilerCtx, buildCtx, outputTarget))
+    angularOutputTargets.map((outputTarget) => angularDirectiveProxyOutput(config, buildCtx, outputTarget))
   );
 
   timespan.finish(`generate angular proxies finished`);
@@ -23,16 +23,15 @@ export const outputAngular = async (config: d.Config, compilerCtx: d.CompilerCtx
 
 export const angularDirectiveProxyOutput = (
   config: d.Config,
-  compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   outputTarget: d.OutputTargetAngular
 ) => {
   const filteredComponents = getFilteredComponents(outputTarget.excludeComponents, buildCtx.components);
 
   return Promise.all([
-    generateProxies(config, compilerCtx, buildCtx, filteredComponents, outputTarget),
-    generateAngularArray(compilerCtx, filteredComponents, outputTarget),
-    generateAngularUtils(compilerCtx, outputTarget),
+    generateProxies(config, buildCtx, filteredComponents, outputTarget),
+    generateAngularArray(filteredComponents, outputTarget),
+    generateAngularUtils(outputTarget),
   ]);
 };
 
@@ -42,7 +41,6 @@ const getFilteredComponents = (excludeComponents: string[] = [], cmps: d.Compone
 
 const generateProxies = async (
   config: d.Config,
-  compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   components: d.ComponentCompilerMeta[],
   outputTarget: d.OutputTargetAngular
@@ -70,7 +68,7 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Even
   });
 
   const formattedCode = tsPrinter.printFile(tsSourceFile);
-  return compilerCtx.fs.writeFile(outputTarget.directivesProxyFile, formattedCode);
+  return getStencilCompilerContext().fs.writeFile(outputTarget.directivesProxyFile, formattedCode);
 };
 
 const getProxies = (components: d.ComponentCompilerMeta[]) => {
@@ -162,7 +160,6 @@ const getProxyUtils = (outputTarget: d.OutputTargetAngular) => {
 };
 
 const generateAngularArray = (
-  compilerCtx: d.CompilerCtx,
   components: d.ComponentCompilerMeta[],
   outputTarget: d.OutputTargetAngular
 ): Promise<any> => {
@@ -183,12 +180,12 @@ export const DIRECTIVES = [
 ${directives}
 ];
 `;
-  return compilerCtx.fs.writeFile(outputTarget.directivesArrayFile, c);
+  return getStencilCompilerContext().fs.writeFile(outputTarget.directivesArrayFile, c);
 };
 
-const generateAngularUtils = async (compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetAngular) => {
+const generateAngularUtils = async (outputTarget: d.OutputTargetAngular) => {
   if (outputTarget.directivesUtilsFile) {
-    await compilerCtx.fs.writeFile(
+    await getStencilCompilerContext().fs.writeFile(
       outputTarget.directivesUtilsFile,
       '/* eslint-disable */\n/* tslint:disable */\n' + PROXY_UTILS
     );

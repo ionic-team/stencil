@@ -10,7 +10,6 @@ import { updateStencilCoreImports } from '../../transformers/update-stencil-core
 
 export const bundleHydrateFactory = async (
   config: d.Config,
-  compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   _build: d.BuildConditionals,
   appFactoryEntryCode: string
@@ -20,7 +19,7 @@ export const bundleHydrateFactory = async (
       id: 'hydrate',
       platform: 'hydrate',
       conditionals: getHydrateBuildConditionals(buildCtx.components),
-      customTransformers: getHydrateCustomTransformer(config, compilerCtx),
+      customTransformers: getHydrateCustomTransformer(config),
       inlineDynamicImports: true,
       inputs: {
         '@app-factory-entry': '@app-factory-entry',
@@ -30,17 +29,17 @@ export const bundleHydrateFactory = async (
       },
     };
 
-    const rollupBuild = await bundleOutput(config, compilerCtx, buildCtx, bundleOpts);
+    const rollupBuild = await bundleOutput(config, buildCtx, bundleOpts);
     return rollupBuild;
   } catch (e) {
     if (!buildCtx.hasError) {
-      loadRollupDiagnostics(config, compilerCtx, buildCtx, e);
+      loadRollupDiagnostics(config, buildCtx, e);
     }
   }
   return undefined;
 };
 
-const getHydrateCustomTransformer = (config: d.Config, compilerCtx: d.CompilerCtx) => {
+const getHydrateCustomTransformer = (config: d.Config) => {
   const transformOpts: d.TransformOptions = {
     coreImportPath: STENCIL_INTERNAL_HYDRATE_ID,
     componentExport: null,
@@ -53,7 +52,7 @@ const getHydrateCustomTransformer = (config: d.Config, compilerCtx: d.CompilerCt
 
   return [
     updateStencilCoreImports(transformOpts.coreImportPath),
-    hydrateComponentTransform(compilerCtx, transformOpts),
-    removeCollectionImports(compilerCtx),
+    hydrateComponentTransform(transformOpts),
+    removeCollectionImports(),
   ];
 };

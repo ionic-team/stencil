@@ -2,29 +2,28 @@ import type * as d from '../../../declarations';
 import { basename, join } from 'path';
 import { relocateHydrateContextConst } from './relocate-hydrate-context';
 import type { RollupOutput } from 'rollup';
+import { getStencilCompilerContext } from '@utils';
 
 export const writeHydrateOutputs = (
   config: d.Config,
-  compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   outputTargets: d.OutputTargetHydrate[],
   rollupOutput: RollupOutput
 ) => {
   return Promise.all(
     outputTargets.map((outputTarget) => {
-      return writeHydrateOutput(config, compilerCtx, buildCtx, outputTarget, rollupOutput);
+      return writeHydrateOutput(config, buildCtx, outputTarget, rollupOutput);
     })
   );
 };
 
 const writeHydrateOutput = async (
   config: d.Config,
-  compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   outputTarget: d.OutputTargetHydrate,
   rollupOutput: RollupOutput
 ) => {
-  const hydratePackageName = await getHydratePackageName(config, compilerCtx);
+  const hydratePackageName = await getHydratePackageName(config);
 
   const hydrateAppDirPath = outputTarget.dir;
 
@@ -40,8 +39,8 @@ const writeHydrateOutput = async (
   );
 
   await Promise.all([
-    copyHydrateRunnerDts(config, compilerCtx, hydrateAppDirPath),
-    compilerCtx.fs.writeFile(pkgJsonPath, pkgJsonCode),
+    copyHydrateRunnerDts(config, hydrateAppDirPath),
+    getStencilCompilerContext().fs.writeFile(pkgJsonPath, pkgJsonCode),
   ]);
 
   // always remember a path to the hydrate app that the prerendering may need later on
@@ -50,9 +49,9 @@ const writeHydrateOutput = async (
   await Promise.all(
     rollupOutput.output.map(async (output) => {
       if (output.type === 'chunk') {
-        output.code = relocateHydrateContextConst(config, compilerCtx, output.code);
+        output.code = relocateHydrateContextConst(config, output.code);
         const filePath = join(hydrateAppDirPath, output.fileName);
-        await compilerCtx.fs.writeFile(filePath, output.code, { immediateWrite: true });
+        await getStencilCompilerContext().fs.writeFile(filePath, output.code, { immediateWrite: true });
       }
     })
   );
@@ -73,10 +72,10 @@ const getHydratePackageJson = (
   return JSON.stringify(pkg, null, 2);
 };
 
-const getHydratePackageName = async (config: d.Config, compilerCtx: d.CompilerCtx) => {
+const getHydratePackageName = async (config: d.Config) => {
   try {
     const rootPkgFilePath = join(config.rootDir, 'package.json');
-    const pkgStr = await compilerCtx.fs.readFile(rootPkgFilePath);
+    const pkgStr = await getStencilCompilerContext().fs.readFile(rootPkgFilePath);
     const pkgData = JSON.parse(pkgStr) as d.PackageJsonData;
     return `${pkgData.name}/hydrate`;
   } catch (e) {}
@@ -84,11 +83,11 @@ const getHydratePackageName = async (config: d.Config, compilerCtx: d.CompilerCt
   return `${config.fsNamespace}/hydrate`;
 };
 
-const copyHydrateRunnerDts = async (config: d.Config, compilerCtx: d.CompilerCtx, hydrateAppDirPath: string) => {
+const copyHydrateRunnerDts = async (config: d.Config, hydrateAppDirPath: string) => {
   const packageDir = join(config.sys.getCompilerExecutingPath(), '..', '..');
   const srcHydrateDir = join(packageDir, 'internal', 'hydrate', 'runner.d.ts');
 
   const runnerDtsDestPath = join(hydrateAppDirPath, 'index.d.ts');
 
-  await compilerCtx.fs.copyFile(srcHydrateDir, runnerDtsDestPath);
+  await getStencilCompilerContext().fs.copyFile(srcHydrateDir, runnerDtsDestPath);
 };

@@ -1,18 +1,13 @@
 import type * as d from '../../declarations';
 import type { BundleOptions } from './bundle-interface';
-import { hasError, normalizeFsPath } from '@utils';
+import { getStencilCompilerContext, hasError, normalizeFsPath } from '@utils';
 import { isOutputTargetDistCollection } from '../output-targets/output-utils';
 import { join, relative } from 'path';
 import { parseImportPath } from '../transformers/stencil-import-path';
 import type { Plugin } from 'rollup';
 import { runPluginTransformsEsmImports } from '../plugin/plugin';
 
-export const extTransformsPlugin = (
-  config: d.Config,
-  compilerCtx: d.CompilerCtx,
-  buildCtx: d.BuildCtx,
-  bundleOpts: BundleOptions
-): Plugin => {
+export const extTransformsPlugin = (config: d.Config, buildCtx: d.BuildCtx, bundleOpts: BundleOptions): Plugin => {
   return {
     name: 'extTransformsPlugin',
 
@@ -25,17 +20,17 @@ export const extTransformsPlugin = (
       if (data != null) {
         let cmp: d.ComponentCompilerMeta;
         const filePath = normalizeFsPath(id);
-        const code = await compilerCtx.fs.readFile(filePath);
+        const code = await getStencilCompilerContext().fs.readFile(filePath);
         if (typeof code !== 'string') {
           return null;
         }
 
-        const pluginTransforms = await runPluginTransformsEsmImports(config, compilerCtx, buildCtx, code, filePath);
+        const pluginTransforms = await runPluginTransformsEsmImports(config, buildCtx, code, filePath);
         const commentOriginalSelector = bundleOpts.platform === 'hydrate' && data.encapsulation === 'shadow';
 
         if (data.tag) {
           cmp = buildCtx.components.find((c) => c.tagName === data.tag);
-          const moduleFile = cmp && compilerCtx.moduleMap.get(cmp.sourceFilePath);
+          const moduleFile = cmp && getStencilCompilerContext().moduleMap.get(cmp.sourceFilePath);
 
           if (moduleFile) {
             const collectionDirs = config.outputTargets.filter(isOutputTargetDistCollection);
@@ -45,13 +40,13 @@ export const extTransformsPlugin = (
             await Promise.all(
               collectionDirs.map(async (outputTarget) => {
                 const collectionPath = join(outputTarget.collectionDir, relPath);
-                await compilerCtx.fs.writeFile(collectionPath, pluginTransforms.code);
+                await getStencilCompilerContext().fs.writeFile(collectionPath, pluginTransforms.code);
               })
             );
           }
         }
 
-        const cssTransformResults = await compilerCtx.worker.transformCssToEsm({
+        const cssTransformResults = await getStencilCompilerContext().worker.transformCssToEsm({
           file: pluginTransforms.id,
           input: pluginTransforms.code,
           tag: data.tag,
@@ -72,7 +67,7 @@ export const extTransformsPlugin = (
         // Track dependencies
         for (const dep of pluginTransforms.dependencies) {
           this.addWatchFile(dep);
-          compilerCtx.addWatchFile(dep);
+          getStencilCompilerContext().addWatchFile(dep);
         }
 
         buildCtx.diagnostics.push(...pluginTransforms.diagnostics);

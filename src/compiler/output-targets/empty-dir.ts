@@ -8,7 +8,7 @@ import {
   isOutputTargetDistCustomElementsBundle,
   isOutputTargetDistLazy,
 } from './output-utils';
-import { isString } from '@utils';
+import { getStencilCompilerContext, isString } from '@utils';
 
 type OutputTargetEmptiable =
   | d.OutputTargetDist
@@ -25,7 +25,7 @@ const isEmptable = (o: d.OutputTarget): o is OutputTargetEmptiable =>
   isOutputTargetDistLazyLoader(o) ||
   isOutputTargetHydrate(o);
 
-export const emptyOutputTargets = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
+export const emptyOutputTargets = async (config: d.Config, buildCtx: d.BuildCtx) => {
   if (buildCtx.isRebuild) {
     return;
   }
@@ -40,7 +40,7 @@ export const emptyOutputTargets = async (config: d.Config, compilerCtx: d.Compil
   }
 
   const timeSpan = buildCtx.createTimeSpan(`cleaning ${cleanDirs.length} dirs`, true);
-  await compilerCtx.fs.emptyDirs(cleanDirs);
+  await getStencilCompilerContext().fs.emptyDirs(cleanDirs);
 
   timeSpan.finish('cleaning dirs finished');
 };

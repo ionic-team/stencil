@@ -1,6 +1,6 @@
 import type * as d from '../../../declarations';
 import { dirname, join, relative } from 'path';
-import { normalizePath } from '@utils';
+import { getStencilCompilerContext, normalizePath } from '@utils';
 
 export const getComponentAssetsCopyTasks = (
   config: d.Config,
@@ -47,12 +47,8 @@ export const getComponentAssetsCopyTasks = (
   return copyTasks;
 };
 
-export const canSkipAssetsCopy = (
-  compilerCtx: d.CompilerCtx,
-  entryModules: d.EntryModule[],
-  filesChanged: string[]
-) => {
-  if (!compilerCtx.hasSuccessfulBuild) {
+export const canSkipAssetsCopy = (entryModules: d.EntryModule[], filesChanged: string[]) => {
+  if (!getStencilCompilerContext().hasSuccessfulBuild) {
     // always copy assets if we haven't had a successful build yet
     // cannot skip build
     return false;

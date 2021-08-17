@@ -1,5 +1,5 @@
 import type * as d from '../../declarations';
-import { augmentDiagnosticWithNode, buildError, normalizePath } from '@utils';
+import { augmentDiagnosticWithNode, buildError, getStencilCompilerContext, normalizePath } from '@utils';
 import { MEMBER_DECORATORS_TO_REMOVE } from './decorators-to-static/decorators-constants';
 import ts from 'typescript';
 
@@ -455,28 +455,24 @@ export const parseDocsType = (checker: ts.TypeChecker, type: ts.Type, parts: Set
   }
 };
 
-export const getModuleFromSourceFile = (compilerCtx: d.CompilerCtx, tsSourceFile: ts.SourceFile) => {
+export const getModuleFromSourceFile = (tsSourceFile: ts.SourceFile) => {
   const sourceFilePath = normalizePath(tsSourceFile.fileName);
-  const moduleFile = compilerCtx.moduleMap.get(sourceFilePath);
+  const moduleFile = getStencilCompilerContext().moduleMap.get(sourceFilePath);
   if (moduleFile != null) {
     return moduleFile;
   }
 
-  const moduleFiles = Array.from(compilerCtx.moduleMap.values());
+  const moduleFiles = Array.from(getStencilCompilerContext().moduleMap.values());
   return moduleFiles.find((m) => m.jsFilePath === sourceFilePath);
 };
 
-export const getComponentMeta = (
-  compilerCtx: d.CompilerCtx,
-  tsSourceFile: ts.SourceFile,
-  node: ts.ClassDeclaration
-) => {
-  const meta = compilerCtx.nodeMap.get(node);
+export const getComponentMeta = (tsSourceFile: ts.SourceFile, node: ts.ClassDeclaration) => {
+  const meta = getStencilCompilerContext().nodeMap.get(node);
   if (meta) {
     return meta;
   }
 
-  const moduleFile = getModuleFromSourceFile(compilerCtx, tsSourceFile);
+  const moduleFile = getModuleFromSourceFile(tsSourceFile);
   if (moduleFile != null && node.members != null) {
     const staticMembers = node.members.filter(isStaticGetter);
     const tagName = getComponentTagName(staticMembers);

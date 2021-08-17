@@ -1,7 +1,7 @@
-import type * as d from '../../declarations';
 import ts from 'typescript';
+import { getStencilCompilerContext } from '@utils';
 
-export const removeCollectionImports = (compilerCtx: d.CompilerCtx): ts.TransformerFactory<ts.SourceFile> => {
+export const removeCollectionImports = (): ts.TransformerFactory<ts.SourceFile> => {
   /*
     // remove side effect collection imports like:
     import 'ionicons';
@@ -25,7 +25,7 @@ export const removeCollectionImports = (compilerCtx: d.CompilerCtx): ts.Transfor
             const importPath = n.moduleSpecifier.text;
 
             // test if this side effect import is a collection
-            const isCollectionImport = compilerCtx.collections.some((c) => {
+            const isCollectionImport = getStencilCompilerContext().collections.some((c) => {
               return c.collectionName === importPath || c.moduleId === importPath;
             });
 

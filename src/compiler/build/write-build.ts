@@ -1,16 +1,16 @@
 import type * as d from '../../declarations';
-import { catchError } from '@utils';
+import { catchError, getStencilCompilerContext } from '@utils';
 import { outputServiceWorkers } from '../output-targets/output-service-workers';
 import { validateBuildFiles } from './validate-files';
 
-export const writeBuild = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
+export const writeBuild = async (config: d.Config, buildCtx: d.BuildCtx) => {
   const timeSpan = buildCtx.createTimeSpan(`writeBuildFiles started`, true);
 
   let totalFilesWrote = 0;
 
   try {
     // commit all the writeFiles, mkdirs, rmdirs and unlinks to disk
-    const commitResults = await compilerCtx.fs.commit();
+    const commitResults = await getStencilCompilerContext().fs.commit();
 
     // get the results from the write to disk commit
     buildCtx.filesWritten = commitResults.filesWritten;
@@ -21,11 +21,11 @@ export const writeBuild = async (config: d.Config, compilerCtx: d.CompilerCtx, b
 
     // successful write
     // kick off writing the cached file stuff
-    // await compilerCtx.cache.commit();
-    buildCtx.debug(`in-memory-fs: ${compilerCtx.fs.getMemoryStats()}`);
-    // buildCtx.debug(`cache: ${compilerCtx.cache.getMemoryStats()}`);
+    // await getStencilCompilerContext().cache.commit();
+    buildCtx.debug(`in-memory-fs: ${getStencilCompilerContext().fs.getMemoryStats()}`);
+    // buildCtx.debug(`cache: ${getStencilCompilerContext().cache.getMemoryStats()}`);
 
-    await outputServiceWorkers(config, buildCtx), await validateBuildFiles(config, compilerCtx, buildCtx);
+    await outputServiceWorkers(config, buildCtx), await validateBuildFiles(config, buildCtx);
   } catch (e) {
     catchError(buildCtx.diagnostics, e);
   }

@@ -6,7 +6,6 @@ import { getDynamicImportFunction } from '@utils';
 
 export const generateEsmBrowser = async (
   config: d.Config,
-  compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   rollupBuild: RollupBuild,
   outputTargets: d.OutputTargetDistLazy[]
@@ -31,7 +30,6 @@ export const generateEsmBrowser = async (
       const es2017destinations = esmOutputs.map((o) => o.esmDir);
       const componentBundle = await generateLazyModules(
         config,
-        compilerCtx,
         buildCtx,
         outputTargetType,
         es2017destinations,

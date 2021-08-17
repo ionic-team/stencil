@@ -3,7 +3,7 @@ import { basename, join, relative } from 'path';
 import { convertDecoratorsToStatic } from '../transformers/decorators-to-static/convert-decorators';
 import { generateAppTypes } from '../types/generate-app-types';
 import { getComponentsFromModules, isOutputTargetDistTypes } from '../output-targets/output-utils';
-import { loadTypeScriptDiagnostics, normalizePath } from '@utils';
+import { getStencilCompilerContext, loadTypeScriptDiagnostics, normalizePath } from '@utils';
 import { resolveComponentDependencies } from '../entries/resolve-component-dependencies';
 import type ts from 'typescript';
 import { updateComponentBuildConditionals } from '../app-core/app-data';
@@ -11,12 +11,7 @@ import { updateModule } from '../transformers/static-to-meta/parse-static';
 import { updateStencilTypesImports } from '../types/stencil-types';
 import { validateTranspiledComponents } from './validate-components';
 
-export const runTsProgram = async (
-  config: d.Config,
-  compilerCtx: d.CompilerCtx,
-  buildCtx: d.BuildCtx,
-  tsBuilder: ts.BuilderProgram
-) => {
+export const runTsProgram = async (config: d.Config, buildCtx: d.BuildCtx, tsBuilder: ts.BuilderProgram) => {
   const tsSyntactic = loadTypeScriptDiagnostics(tsBuilder.getSyntacticDiagnostics());
   const tsGlobal = loadTypeScriptDiagnostics(tsBuilder.getGlobalDiagnostics());
   const tsOptions = loadTypeScriptDiagnostics(tsBuilder.getOptionsDiagnostics());
@@ -35,7 +30,7 @@ export const runTsProgram = async (
   const emittedDts: string[] = [];
   const emitCallback: ts.WriteFileCallback = (emitFilePath, data, _w, _e, tsSourceFiles) => {
     if (emitFilePath.endsWith('.js')) {
-      updateModule(config, compilerCtx, buildCtx, tsSourceFiles[0], data, emitFilePath, tsTypeChecker, null);
+      updateModule(config, buildCtx, tsSourceFiles[0], data, emitFilePath, tsTypeChecker, null);
     } else if (emitFilePath.endsWith('.d.ts')) {
       const srcDtsPath = normalizePath(tsSourceFiles[0].fileName);
       const relativeEmitFilepath = getRelativeDts(config, srcDtsPath, emitFilePath);
@@ -44,7 +39,7 @@ export const runTsProgram = async (
       typesOutputTarget.forEach((o) => {
         const distPath = join(o.typesDir, relativeEmitFilepath);
         data = updateStencilTypesImports(o.typesDir, distPath, data);
-        compilerCtx.fs.writeFile(distPath, data);
+        getStencilCompilerContext().fs.writeFile(distPath, data);
       });
     }
   };
@@ -54,13 +49,13 @@ export const runTsProgram = async (
     before: [convertDecoratorsToStatic(config, buildCtx.diagnostics, tsTypeChecker)],
   });
 
-  const changedmodules = Array.from(compilerCtx.changedModules.keys());
+  const changedmodules = Array.from(getStencilCompilerContext().changedModules.keys());
   buildCtx.debug('Transpiled modules: ' + JSON.stringify(changedmodules, null, '\n'));
 
   // Finalize components metadata
-  buildCtx.moduleFiles = Array.from(compilerCtx.moduleMap.values());
+  buildCtx.moduleFiles = Array.from(getStencilCompilerContext().moduleMap.values());
   buildCtx.components = getComponentsFromModules(buildCtx.moduleFiles);
-  updateComponentBuildConditionals(compilerCtx.moduleMap, buildCtx.components);
+  updateComponentBuildConditionals(getStencilCompilerContext().moduleMap, buildCtx.components);
   resolveComponentDependencies(buildCtx.components);
 
   validateTranspiledComponents(config, buildCtx);
@@ -70,7 +65,7 @@ export const runTsProgram = async (
   }
 
   // create the components.d.ts file and write to disk
-  const hasTypesChanged = await generateAppTypes(config, compilerCtx, buildCtx, 'src');
+  const hasTypesChanged = await generateAppTypes(config, buildCtx, 'src');
   if (hasTypesChanged) {
     return true;
   }
@@ -88,9 +83,9 @@ export const runTsProgram = async (
         return Promise.all(
           typesOutputTarget.map(async (o) => {
             const distPath = join(o.typesDir, relativeEmitFilepath);
-            let dtsContent = await compilerCtx.fs.readFile(srcRootDtsFilePath);
+            let dtsContent = await getStencilCompilerContext().fs.readFile(srcRootDtsFilePath);
             dtsContent = updateStencilTypesImports(o.typesDir, distPath, dtsContent);
-            await compilerCtx.fs.writeFile(distPath, dtsContent);
+            await getStencilCompilerContext().fs.writeFile(distPath, dtsContent);
           })
         );
       });

@@ -2,12 +2,9 @@ import type * as d from '../../../declarations';
 import { getNameText } from '../generate-doc-data';
 import { isOutputTargetDocsVscode } from '../../output-targets/output-utils';
 import { join } from 'path';
+import { getStencilCompilerContext } from '@utils';
 
-export const generateVscodeDocs = async (
-  compilerCtx: d.CompilerCtx,
-  docsData: d.JsonDocs,
-  outputTargets: d.OutputTarget[]
-) => {
+export const generateVscodeDocs = async (docsData: d.JsonDocs, outputTargets: d.OutputTarget[]) => {
   const vsCodeOutputTargets = outputTargets.filter(isOutputTargetDocsVscode);
   if (vsCodeOutputTargets.length === 0) {
     return;
@@ -28,7 +25,7 @@ export const generateVscodeDocs = async (
         })),
       };
       const jsonContent = JSON.stringify(json, null, 2);
-      await compilerCtx.fs.writeFile(outputTarget.file, jsonContent);
+      await getStencilCompilerContext().fs.writeFile(outputTarget.file, jsonContent);
     })
   );
 };

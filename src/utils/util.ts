@@ -2,6 +2,7 @@ import type * as d from '../declarations';
 import { BANNER } from './constants';
 import { buildError } from './message-utils';
 import { dashToPascalCase, isString, toDashCase } from './helpers';
+import { getStencilCompilerContext } from './state/stencil-compiler-context';
 
 export const createJsVarName = (fileName: string) => {
   if (isString(fileName)) {
@@ -154,9 +155,9 @@ export const hasDependency = (buildCtx: d.BuildCtx, depName: string) => {
 
 export const getDynamicImportFunction = (namespace: string) => `__sc_import_${namespace.replace(/\s|-/g, '_')}`;
 
-export const readPackageJson = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
+export const readPackageJson = async (config: d.Config, buildCtx: d.BuildCtx) => {
   try {
-    const pkgJson = await compilerCtx.fs.readFile(config.packageJsonFilePath);
+    const pkgJson = await getStencilCompilerContext().fs.readFile(config.packageJsonFilePath);
 
     if (pkgJson) {
       const parseResults = parsePackageJson(pkgJson, config.packageJsonFilePath);

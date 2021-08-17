@@ -1,9 +1,9 @@
 import type * as d from '../../../declarations';
 import { join } from 'path';
+import { getStencilCompilerContext } from '@utils';
 
 export const writeLazyModule = async (
   config: d.Config,
-  compilerCtx: d.CompilerCtx,
   outputTargetType: string,
   destinations: string[],
   entryModule: d.EntryModule,
@@ -17,7 +17,7 @@ export const writeLazyModule = async (
   const fileName = `${bundleId}.entry.js`;
 
   await Promise.all(
-    destinations.map((dst) => compilerCtx.fs.writeFile(join(dst, fileName), code, { outputTargetType }))
+    destinations.map((dst) => getStencilCompilerContext().fs.writeFile(join(dst, fileName), code, { outputTargetType }))
   );
 
   return {

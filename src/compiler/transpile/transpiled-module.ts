@@ -1,9 +1,8 @@
 import type * as d from '../../declarations';
-import { normalizePath } from '@utils';
+import { getStencilCompilerContext, normalizePath } from '@utils';
 import ts from 'typescript';
 
-export const getModule = (compilerCtx: d.CompilerCtx, filePath: string) =>
-  compilerCtx.moduleMap.get(normalizePath(filePath));
+export const getModule = (filePath: string) => getStencilCompilerContext().moduleMap.get(normalizePath(filePath));
 
 export const createModule = (
   staticSourceFile: ts.SourceFile, // this is NOT the original
