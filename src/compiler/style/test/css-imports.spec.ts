@@ -1,7 +1,7 @@
 import type * as d from '@stencil/core/declarations';
 import { getCssImports, isCssNodeModule, isLocalCssImport, replaceImportDeclarations } from '../css-imports';
 import { mockBuildCtx, mockConfig, mockCompilerCtx } from '@stencil/core/testing';
-import { normalizePath } from '@utils';
+import { getStencilCompilerContext, initializeStencilCompilerContext, normalizePath } from '@utils';
 import path from 'path';
 
 describe('css-imports', () => {
@@ -11,8 +11,8 @@ describe('css-imports', () => {
   let buildCtx: d.BuildCtx;
 
   beforeEach(() => {
-    compilerCtx = mockCompilerCtx(config);
-    buildCtx = mockBuildCtx(config, compilerCtx);
+    initializeStencilCompilerContext({ compilerCtx: mockCompilerCtx(config) });
+    buildCtx = mockBuildCtx(config, getStencilCompilerContext());
   });
 
   describe('isCssNodeModule', () => {
@@ -145,7 +145,7 @@ describe('css-imports', () => {
       const content = `
         @import "file-b";
       `;
-      const results = await getCssImports(config, compilerCtx, buildCtx, filePath, content);
+      const results = await getCssImports(config, buildCtx, filePath, content);
       expect(results).toEqual([
         {
           filePath: normalizePath(path.join(root, 'src', 'cmp', 'file-b.scss')),
@@ -161,7 +161,7 @@ describe('css-imports', () => {
       const content = `
         @import "file-b";
       `;
-      const results = await getCssImports(config, compilerCtx, buildCtx, filePath, content);
+      const results = await getCssImports(config, buildCtx, filePath, content);
       expect(results).toEqual([
         {
           filePath: normalizePath(path.join(root, 'src', 'cmp', 'file-b.less')),
@@ -176,7 +176,7 @@ describe('css-imports', () => {
       const content = `
         @import url(../../node_modules/@ionic/core/css/normalize.css);
       `;
-      const results = await getCssImports(config, compilerCtx, buildCtx, filePath, content);
+      const results = await getCssImports(config, buildCtx, filePath, content);
       expect(results).toEqual([
         {
           filePath: normalizePath(path.join(root, 'node_modules', '@ionic', 'core', 'css', 'normalize.css')),
@@ -191,7 +191,7 @@ describe('css-imports', () => {
       const content = `
         @import url('${normalizePath(path.join(root, 'build', 'app', 'app.css'))}');
       `;
-      const results = await getCssImports(config, compilerCtx, buildCtx, filePath, content);
+      const results = await getCssImports(config, buildCtx, filePath, content);
       expect(results).toEqual([
         {
           filePath: normalizePath(path.join(root, 'build', 'app', 'app.css')),
@@ -207,7 +207,7 @@ describe('css-imports', () => {
         @import url('file-a.css');@import  url('./file-b.css');
         @import url('../file-c.css');
       `;
-      const results = await getCssImports(config, compilerCtx, buildCtx, filePath, content);
+      const results = await getCssImports(config, buildCtx, filePath, content);
       expect(results).toEqual([
         {
           filePath: normalizePath(path.join(root, 'src', 'cmp', 'file-a.css')),
@@ -236,7 +236,7 @@ describe('css-imports', () => {
         @import url('../file-c.css');
         */
       `;
-      const results = await getCssImports(config, compilerCtx, buildCtx, filePath, content);
+      const results = await getCssImports(config, buildCtx, filePath, content);
       expect(results).toEqual([
         {
           filePath: normalizePath(path.join(root, 'src', 'cmp', 'file.css')),
@@ -253,7 +253,7 @@ describe('css-imports', () => {
         @import url("HTTPS://stenciljs.com/build/app/app.css");
         @import url('//stenciljs.com/build/app/app.css');
       `;
-      const results = await getCssImports(config, compilerCtx, buildCtx, filePath, content);
+      const results = await getCssImports(config, buildCtx, filePath, content);
       expect(results).toEqual([]);
     });
 
@@ -264,7 +264,7 @@ describe('css-imports', () => {
         @import "./file-c.css";
         @import "../global/file-d.css";
       `;
-      const results = await getCssImports(config, compilerCtx, buildCtx, filePath, content);
+      const results = await getCssImports(config, buildCtx, filePath, content);
       expect(results).toEqual([
         {
           filePath: normalizePath(path.join(root, 'src', 'cmp', 'file-b.css')),
@@ -291,7 +291,7 @@ describe('css-imports', () => {
         @import './file-c.css';
         @import '../global/file-d.css';
       `;
-      const results = await getCssImports(config, compilerCtx, buildCtx, filePath, content);
+      const results = await getCssImports(config, buildCtx, filePath, content);
       expect(results).toEqual([
         {
           filePath: normalizePath(path.join(root, 'src', 'cmp', 'file-b.css')),
@@ -322,14 +322,14 @@ describe('css-imports', () => {
       const nodeModuleCss = path.join(root, 'node_modules', '@ionic', 'core', 'dist', 'ionic', 'ionic.css');
       files.set(nodeModuleCss, `/*ionic.css*/`);
 
-      await compilerCtx.fs.writeFiles(files);
-      await compilerCtx.fs.commit();
+      await getStencilCompilerContext().fs.writeFiles(files);
+      await getStencilCompilerContext().fs.commit();
 
       const filePath = normalizePath(path.join(root, 'src', 'cmp', 'file-a.css'));
       const content = `
         @import '~@ionic/core/dist/ionic/ionic.css';
       `;
-      const results = await getCssImports(config, compilerCtx, buildCtx, filePath, content);
+      const results = await getCssImports(config, buildCtx, filePath, content);
       expect(results).toEqual([
         {
           filePath: normalizePath(path.join(root, 'node_modules', '@ionic', 'core', 'dist', 'ionic', 'ionic.css')),
@@ -350,14 +350,14 @@ describe('css-imports', () => {
       const nodeModuleMainPath = path.join(root, 'node_modules', '@ionic', 'core', 'index.css');
       files.set(nodeModuleMainPath, `/*ionic.css*/`);
 
-      await compilerCtx.fs.writeFiles(files);
-      await compilerCtx.fs.commit();
+      await getStencilCompilerContext().fs.writeFiles(files);
+      await getStencilCompilerContext().fs.commit();
 
       const filePath = normalizePath(path.join(root, 'src', 'cmp', 'file-a.css'));
       const content = `
         @import '~@ionic/core';
       `;
-      const results = await getCssImports(config, compilerCtx, buildCtx, filePath, content);
+      const results = await getCssImports(config, buildCtx, filePath, content);
       expect(results).toEqual([
         {
           filePath: normalizePath(path.join(root, 'node_modules', '@ionic', 'core', 'index.css')),
@@ -379,14 +379,14 @@ describe('css-imports', () => {
       const nodeModuleCss = path.join(root, 'node_modules', '@ionic', 'core', 'dist', 'ionic', 'ionic.css');
       files.set(nodeModuleCss, `/*ionic.css*/`);
 
-      await compilerCtx.fs.writeFiles(files);
-      await compilerCtx.fs.commit();
+      await getStencilCompilerContext().fs.writeFiles(files);
+      await getStencilCompilerContext().fs.commit();
 
       const filePath = normalizePath(path.join(root, 'src', 'cmp', 'file-a.css'));
       const content = `
         @import '~@ionic/core/dist/ionic/ionic.css';
       `;
-      const results = await getCssImports(config, compilerCtx, buildCtx, filePath, content);
+      const results = await getCssImports(config, buildCtx, filePath, content);
       expect(results).toEqual([
         {
           filePath: normalizePath(path.join(root, 'node_modules', '@ionic', 'core', 'dist', 'ionic', 'ionic.css')),
@@ -404,7 +404,7 @@ describe('css-imports', () => {
       const content = `
         @import '${normalizePath(path.join(root, 'src', 'file-b.css'))}';
       `;
-      const results = await getCssImports(config, compilerCtx, buildCtx, filePath, content);
+      const results = await getCssImports(config, buildCtx, filePath, content);
       expect(results).toEqual([
         {
           filePath: normalizePath(path.join(root, 'src', 'file-b.css')),
@@ -417,7 +417,7 @@ describe('css-imports', () => {
     it('no @import', async () => {
       const filePath = normalizePath(path.join(root, 'src', 'file-a.css'));
       const content = `body { color: red; }`;
-      const results = await getCssImports(config, compilerCtx, buildCtx, filePath, content);
+      const results = await getCssImports(config, buildCtx, filePath, content);
       expect(results).toEqual([]);
     });
   });

@@ -10,7 +10,7 @@ export const lazyComponentTransform = (transformOpts: d.TransformOptions): ts.Tr
   return (transformCtx) => {
     return (tsSourceFile) => {
       const styleStatements: ts.Statement[] = [];
-      const moduleFile = getModuleFromSourceFile(tsSourceFile);
+      let moduleFile = getModuleFromSourceFile(tsSourceFile);
 
       const visitNode = (node: ts.Node): any => {
         if (ts.isClassDeclaration(node)) {

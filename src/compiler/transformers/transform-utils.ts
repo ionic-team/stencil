@@ -457,6 +457,7 @@ export const parseDocsType = (checker: ts.TypeChecker, type: ts.Type, parts: Set
 
 export const getModuleFromSourceFile = (tsSourceFile: ts.SourceFile) => {
   const sourceFilePath = normalizePath(tsSourceFile.fileName);
+  console.log(getStencilCompilerContext().moduleMap);
   const moduleFile = getStencilCompilerContext().moduleMap.get(sourceFilePath);
   if (moduleFile != null) {
     return moduleFile;

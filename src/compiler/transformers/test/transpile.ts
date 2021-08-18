@@ -5,6 +5,7 @@ import { mockBuildCtx, mockCompilerCtx, mockConfig, mockStencilSystem } from '@s
 import ts from 'typescript';
 import { updateModule } from '../static-to-meta/parse-static';
 import { getScriptTarget } from '../transform-utils';
+import { getStencilCompilerContext, initializeStencilCompilerContext } from '@utils';
 
 export function transpileModule(
   input: string,
@@ -50,7 +51,7 @@ export function transpileModule(
   const emitCallback: ts.WriteFileCallback = (emitFilePath, data, _w, _e, tsSourceFiles) => {
     if (emitFilePath.endsWith('.js')) {
       outputText = data;
-      updateModule(config, compilerCtx, buildCtx, tsSourceFiles[0], data, emitFilePath, tsTypeChecker, null);
+      updateModule(config, buildCtx, tsSourceFiles[0], data, emitFilePath, tsTypeChecker, null);
     }
   };
 
@@ -72,10 +73,10 @@ export function transpileModule(
   const tsTypeChecker = tsProgram.getTypeChecker();
 
   config = config || mockConfig();
-  compilerCtx = compilerCtx || mockCompilerCtx(config);
+  initializeStencilCompilerContext({ compilerCtx: compilerCtx || mockCompilerCtx(config) });
   sys = sys || config.sys || (mockStencilSystem() as any);
 
-  const buildCtx = mockBuildCtx(config, compilerCtx);
+  const buildCtx = mockBuildCtx(config);
 
   const transformOpts: d.TransformOptions = {
     coreImportPath: '@stencil/core',
@@ -89,17 +90,14 @@ export function transpileModule(
 
   tsProgram.emit(undefined, undefined, undefined, undefined, {
     before: [convertDecoratorsToStatic(config, buildCtx.diagnostics, tsTypeChecker), ...beforeTransformers],
-    after: [
-      convertStaticToMeta(config, compilerCtx, buildCtx, tsTypeChecker, null, transformOpts),
-      ...afterTransformers,
-    ],
+    after: [convertStaticToMeta(config, buildCtx, tsTypeChecker, null, transformOpts), ...afterTransformers],
   });
 
   while (outputText.includes('  ')) {
     outputText = outputText.replace(/  /g, ' ');
   }
 
-  const moduleFile: d.Module = compilerCtx.moduleMap.values().next().value;
+  const moduleFile: d.Module = getStencilCompilerContext().moduleMap.values().next().value;
   const cmps = moduleFile ? moduleFile.cmps : null;
   const cmp = Array.isArray(cmps) && cmps.length > 0 ? cmps[0] : null;
   const tagName = cmp ? cmp.tagName : null;
@@ -121,7 +119,7 @@ export function transpileModule(
 
   return {
     outputText,
-    compilerCtx,
+    compilerCtx: getStencilCompilerContext(),
     buildCtx,
     diagnostics: buildCtx.diagnostics,
     moduleFile,

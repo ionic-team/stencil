@@ -127,6 +127,7 @@ export const validateTypes = async (config: d.Config, buildCtx: d.BuildCtx, outp
   const typesAbs = getComponentsDtsTypesFilePath(outputTarget);
   const recommendedPath = relative(config.rootDir, typesAbs);
 
+
   if (!isString(buildCtx.packageJson.types) || buildCtx.packageJson.types === '') {
     const msg = `package.json "types" property is required when generating a distribution. It's recommended to set the "types" property to: ${recommendedPath}`;
     packageJsonWarn(config, buildCtx, msg, `"types"`);
@@ -136,6 +137,7 @@ export const validateTypes = async (config: d.Config, buildCtx: d.BuildCtx, outp
   } else {
     const typesFile = join(config.rootDir, buildCtx.packageJson.types);
     const typesFileExists = await getStencilCompilerContext().fs.access(typesFile);
+
     if (!typesFileExists) {
       let msg = `package.json "types" property is set to "${buildCtx.packageJson.types}" but cannot be found.`;
       if (normalizePath(buildCtx.packageJson.types) !== normalizePath(recommendedPath)) {
