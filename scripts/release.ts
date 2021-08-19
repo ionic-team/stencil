@@ -13,7 +13,12 @@ import {
   isPrereleaseVersion,
 } from './utils/release-utils';
 
-export async function release(rootDir: string, args: string[]) {
+/**
+ * Runner for creating a release of Stencil
+ * @param rootDir the root directory of the Stencil repository
+ * @param args stringified arguments used to influence the release steps that are taken
+ */
+export async function release(rootDir: string, args: ReadonlyArray<string>): Promise<void> {
   const buildDir = join(rootDir, 'build');
   const releaseDataPath = join(buildDir, 'release-data.json');
 
@@ -40,34 +45,41 @@ export async function release(rootDir: string, args: string[]) {
   }
 }
 
-async function prepareRelease(opts: BuildOptions, args: string[], releaseDataPath: string) {
+/**
+ * Prepares a release of Stencil
+ * @param opts build options containing the metadata needed to release a new version of Stencil
+ * @param args stringified arguments used to influence the release steps that are taken
+ * @param releaseDataPath the fully qualified path of `release-data.json` to write to disk during this step
+ */
+async function prepareRelease(opts: BuildOptions, args: ReadonlyArray<string>, releaseDataPath: string): Promise<void> {
   const pkg = opts.packageJson;
   const oldVersion = opts.packageJson.version;
   console.log(
     `\nPrepare to publish ${opts.vermoji}  ${color.bold.magenta(pkg.name)} ${color.dim(`(currently ${oldVersion})`)}\n`
   );
 
+  const NON_SERVER_INCREMENTS: ReadonlyArray<{ name: string; value: string }> = [
+    {
+      name: 'Dry Run',
+      value: getNewVersion(oldVersion, 'patch') + '-dryrun',
+    },
+    {
+      name: 'Other (specify)',
+      value: null,
+    },
+  ];
+
   const prompts = [
     {
       type: 'list',
       name: 'version',
       message: 'Select semver increment or specify new version',
-      pageSize: SEMVER_INCREMENTS.length + 2,
+      pageSize: SEMVER_INCREMENTS.length + NON_SERVER_INCREMENTS.length,
       choices: SEMVER_INCREMENTS.map((inc) => ({
         name: `${inc}   ${prettyVersionDiff(oldVersion, inc)}`,
         value: inc,
-      })).concat([
-        new inquirer.Separator() as any,
-        {
-          name: 'Dry Run',
-          value: getNewVersion(oldVersion, 'patch') + '-dryrun',
-        },
-        {
-          name: 'Other (specify)',
-          value: null,
-        },
-      ]),
-      filter: (input: any) => (isValidVersionInput(input) ? getNewVersion(oldVersion, input) : input),
+      })).concat([new inquirer.Separator() as any, ...NON_SERVER_INCREMENTS]),
+      filter: (input: string) => (isValidVersionInput(input) ? getNewVersion(oldVersion, input) : input),
     },
     {
       type: 'input',
@@ -96,6 +108,7 @@ async function prepareRelease(opts: BuildOptions, args: string[], releaseDataPat
     .then((answers) => {
       if (answers.confirm) {
         opts.version = answers.version;
+        // write `release-data.json`
         fs.writeJsonSync(releaseDataPath, opts, { spaces: 2 });
         runReleaseTasks(opts, args);
       }
@@ -106,7 +119,12 @@ async function prepareRelease(opts: BuildOptions, args: string[], releaseDataPat
     });
 }
 
-async function publishRelease(opts: BuildOptions, args: string[]) {
+/**
+ * Initiates the publish of a Stencil release.
+ * @param opts build options containing the metadata needed to publish a new version of Stencil
+ * @param args stringified arguments used to influence the publish steps that are taken
+ */
+async function publishRelease(opts: BuildOptions, args: ReadonlyArray<string>): Promise<void> {
   const pkg = opts.packageJson;
 
   if (opts.version !== pkg.version) {
