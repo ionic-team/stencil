@@ -1,7 +1,7 @@
 import type * as d from '../../declarations';
 import MagicString from 'magic-string';
 import { createJsVarName, normalizePath, isString, loadTypeScriptDiagnostics } from '@utils';
-import type { Plugin } from 'rollup';
+import type { LoadResult, Plugin, ResolveIdResult, TransformResult } from 'rollup';
 import { removeCollectionImports } from '../transformers/remove-collection-imports';
 import {
   APP_DATA_CONDITIONAL,
@@ -31,7 +31,7 @@ export const appDataPlugin = (
   return {
     name: 'appDataPlugin',
 
-    resolveId(id, importer) {
+    resolveId(id: string, importer: string | undefined): ResolveIdResult {
       if (id === STENCIL_APP_DATA_ID || id === STENCIL_APP_GLOBALS_ID) {
         if (platform === 'worker') {
           this.error('@stencil/core packages cannot be imported from a worker.');
@@ -54,7 +54,7 @@ export const appDataPlugin = (
       return null;
     },
 
-    load(id): d.RollupLoadHook {
+    load(id: string): LoadResult {
       if (id === STENCIL_APP_GLOBALS_ID) {
         const s = new MagicString(``);
         appendGlobalScripts(globalScripts, s);
@@ -80,7 +80,7 @@ export const appDataPlugin = (
       return { code: module.staticSourceFileText, map: sourceMap };
     },
 
-    transform(code, id) {
+    transform(code: string, id: string): TransformResult {
       id = normalizePath(id);
       if (globalScripts.some((s) => s.path === id)) {
         const program = this.parse(code, {});
