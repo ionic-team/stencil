@@ -1,13 +1,13 @@
 import type * as d from '../../declarations';
 import { basename } from 'path';
 import { createJsVarName, normalizeFsPathQuery } from '@utils';
-import type { Plugin, TransformPluginContext } from 'rollup';
+import type { Plugin, TransformPluginContext, TransformResult } from 'rollup';
 
 export const extFormatPlugin = (config: d.Config): Plugin => {
   return {
     name: 'extFormatPlugin',
 
-    transform(code, importPath): d.RollupTransformHook {
+    transform(code: string, importPath: string): TransformResult {
       if (/\0/.test(importPath)) {
         return null;
       }

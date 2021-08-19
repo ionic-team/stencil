@@ -32,6 +32,8 @@ import type {
   VNodeData,
 } from './stencil-public-runtime';
 
+import type { SourceMap as RollupSourceMap } from 'rollup';
+
 export interface SourceMap {
   file: string;
   mappings: string;
@@ -41,41 +43,6 @@ export interface SourceMap {
   sourcesContent?: string[];
   version: number;
 }
-
-export interface RollupSourceMap {
-  file: string;
-  mappings: string;
-  names: string[];
-  sources: string[];
-  sourcesContent: string[];
-  version: number;
-  toString(): string;
-  toUrl(): string;
-}
-
-export type RollupTransformHook =
-  | string
-  | null
-  | {
-      code?: string;
-      map?: string | SourceMap;
-      ast?: any;
-      moduleSideEffects?: boolean | 'no-treeshake' | null;
-      syntheticNamedExports?: boolean | string | null;
-      meta?: { [plugin: string]: any } | null;
-    };
-
-export type RollupLoadHook =
-  | string
-  | null
-  | {
-      code: string;
-      map?: string | SourceMap;
-      ast?: any;
-      moduleSideEffects?: boolean | 'no-treeshake' | null;
-      syntheticNamedExports?: boolean | string | null;
-      meta?: { [plugin: string]: any } | null;
-    };
 
 export interface PrintLine {
   lineIndex: number;

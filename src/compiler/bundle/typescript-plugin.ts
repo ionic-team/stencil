@@ -2,7 +2,7 @@ import type * as d from '../../declarations';
 import type { BundleOptions } from './bundle-interface';
 import { getModule } from '../transpile/transpiled-module';
 import { isString, normalizeFsPath } from '@utils';
-import type { Plugin } from 'rollup';
+import type { LoadResult, Plugin, TransformResult } from 'rollup';
 import { tsResolveModuleName } from '../sys/typescript/typescript-resolve-module';
 import { isAbsolute, basename } from 'path';
 import ts from 'typescript';
@@ -11,7 +11,7 @@ export const typescriptPlugin = (compilerCtx: d.CompilerCtx, bundleOpts: BundleO
   return {
     name: `${bundleOpts.id}TypescriptPlugin`,
 
-    load(id): d.RollupLoadHook {
+    load(id: string): LoadResult {
       if (isAbsolute(id)) {
         const fsFilePath = normalizeFsPath(id);
         const module = getModule(compilerCtx, fsFilePath);
@@ -28,7 +28,7 @@ export const typescriptPlugin = (compilerCtx: d.CompilerCtx, bundleOpts: BundleO
       }
       return null;
     },
-    transform(_, id): d.RollupTransformHook {
+    transform(_code: string, id: string): TransformResult {
       if (isAbsolute(id)) {
         const fsFilePath = normalizeFsPath(id);
         const mod = getModule(compilerCtx, fsFilePath);
