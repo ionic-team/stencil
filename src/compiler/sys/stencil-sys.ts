@@ -505,7 +505,7 @@ export const createSystem = (c?: { logger?: Logger }) => {
     return results;
   };
 
-  const fetch = global.fetch;
+  const fetch = self?.fetch ?? global?.fetch ?? window?.fetch;
 
   const writeFile = async (p: string, data: string) => writeFileSync(p, data);
 
