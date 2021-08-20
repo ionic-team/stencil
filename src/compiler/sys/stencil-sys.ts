@@ -505,7 +505,15 @@ export const createSystem = (c?: { logger?: Logger }) => {
     return results;
   };
 
-  const fetch = self?.fetch ?? global?.fetch ?? window?.fetch;
+  // Reference fetch from a worker thread, then a browser thread, then a node thread.
+  const fetch =
+    typeof self !== 'undefined'
+      ? self?.fetch
+      : typeof window !== 'undefined'
+      ? window?.fetch
+      : typeof global !== 'undefined'
+      ? global?.fetch
+      : undefined;
 
   const writeFile = async (p: string, data: string) => writeFileSync(p, data);
 
