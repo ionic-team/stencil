@@ -505,7 +505,14 @@ export const createSystem = (c?: { logger?: Logger }) => {
     return results;
   };
 
-  // Reference fetch from a worker thread, then a browser thread, then a node thread.
+  /**
+  * `self` is the global namespace object used within a web worker.
+  * `window` is the browser's global namespace object (I reorganized this to check the reference on that second)
+  * `global` is Node's global namespace object. https://nodejs.org/api/globals.html#globals_global
+  *
+  * loading in this order should allow workers, which are most common, then browser, 
+  * then Node to grab the reference to fetch correctly. 
+  */
   const fetch =
     typeof self !== 'undefined'
       ? self?.fetch
