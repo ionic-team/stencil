@@ -1,6 +1,6 @@
-import { setupDomTests, waitForChanges } from '../util';
+import { setupDomTests } from '../util';
 
-describe('invisible-prehydration-default', function () {
+describe('invisible-prehydration-default', () => {
   const { setupDom, tearDownDom, tearDownStylesScripts } = setupDomTests(document);
 
   afterEach(tearDownDom);

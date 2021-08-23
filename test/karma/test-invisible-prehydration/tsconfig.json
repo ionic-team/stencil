@@ -28,7 +28,5 @@
       "@stencil/core/testing": ["../../../testing"]
     }
   },
-  "include": [
-    "src"
-, "../test-app/prehydrated-styles/karma.spec.ts"  ]
+  "include": ["src"]
 }

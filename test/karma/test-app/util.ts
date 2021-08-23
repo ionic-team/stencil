@@ -82,8 +82,8 @@ export function setupDomTests(document: Document) {
     document.head.querySelectorAll('style[data-styles]').forEach((e) => e.remove());
 
     [
-      '/build/testprehydrateddefaultstyles.esm.js',
-      '/build/testprehydrateddefaultstyles.js',
+      '/build/testinvisibleprehydration.esm.js',
+      '/build/testinvisibleprehydration.js',
       '/build/testprehydratedtruestyles.esm.js',
       '/build/testprehydratedtruestyles.js',
       '/build/testprehydratedfalsestyles.esm.js',

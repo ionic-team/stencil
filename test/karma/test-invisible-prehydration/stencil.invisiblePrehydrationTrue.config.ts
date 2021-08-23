@@ -1,7 +1,7 @@
 import { Config } from '../../../dist/declarations';
 
 export const config: Config = {
-  namespace: 'TestPrehydratedTrueStyles',
+  namespace: 'TestInvisibleTruePrehydration',
   tsconfig: 'tsconfig.json',
   invisiblePrehydration: true,
   outputTargets: [

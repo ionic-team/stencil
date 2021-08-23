@@ -27,7 +27,7 @@
       "@stencil/core": ["../../internal"],
       "@stencil/core/internal": ["../../internal"],
       "@stencil/core/testing": ["../../testing"],
-      "@test-prehydrated-styles": ["./test-prehydrated-styles"]
+      "@test-invisible-prehydration": ["./test-invisible-prehydration"]
     }
   },
   "include": [
@@ -37,9 +37,9 @@
     "test-app/**/*.ts",
     "test-app/util.ts",
     "test-app/global.ts",
-    "test-prehydrated-styles/components.d.ts",
-    "test-prehydrated-styles/**/*.spec.ts",
-    "test-prehydrated-styles/**/*.tsx"
+    "test-invisible-prehydration/components.d.ts",
+    "test-invisible-prehydration/**/*.spec.ts",
+    "test-invisible-prehydration/**/*.tsx"
   ],
   "exclude": [
     "test-prerender",
