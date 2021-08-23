@@ -28,8 +28,3 @@ bundled source code is properly attributed.
 
 When a third party package is bundled with Stencil, the onus is on the developers/reviewers to ensure that the package
 is added to the `entryDeps` field in the [license generation script](../../scripts/license.ts).
-
-## Links
-
-Source: [https://adr.github.io/](https://adr.github.io/)
-Template Source: [https://github.com/joelparkerhenderson/architecture-decision-record/blob/main/templates/decision-record-template-by-michael-nygard/index.md](https://github.com/joelparkerhenderson/architecture-decision-record/blob/main/templates/decision-record-template-by-michael-nygard/index.md)
