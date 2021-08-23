@@ -18,6 +18,6 @@ We use the [Node version of ADR tools](https://github.com/phodal/adr), installab
 npm install -g adr
 ```
 
-And usable per their documentation. 
+And usable per their documentation. Note that the `adr` tool should be run from the root of this repository.
 
 You can search for ADR's by running `adr s "phrase"` e.g. `adr s "proposed"` to get all the proposed documents.
