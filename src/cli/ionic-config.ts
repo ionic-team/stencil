@@ -15,6 +15,11 @@ export interface TelemetryConfig {
   'tokens.telemetry'?: string;
 }
 
+/**
+ * Reads an Ionic configuration file from disk, parses it, and performs any necessary corrections to it if ceratin
+ * values are deemed to be malformed
+ * @returns the config read from disk that has been potentially been updated
+ */
 export async function readConfig(): Promise<TelemetryConfig> {
   let config: TelemetryConfig = await readJson(defaultConfig());
 
@@ -25,7 +30,10 @@ export async function readConfig(): Promise<TelemetryConfig> {
     };
 
     await writeConfig(config);
-  } else if (!!config && !config['tokens.telemetry'].match(UUID_REGEX)) {
+  } else if (
+    !!config &&
+    (typeof config['tokens.telemetry'] !== 'string' || !config['tokens.telemetry'].match(UUID_REGEX))
+  ) {
     const newUuid = uuidv4();
     await writeConfig({ ...config, 'tokens.telemetry': newUuid });
     config['tokens.telemetry'] = newUuid;

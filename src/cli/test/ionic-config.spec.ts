@@ -44,6 +44,29 @@ describe('readConfig', () => {
     expect(!!config['tokens.telemetry'].match(UUID_REGEX)).toBe(true);
   });
 
+  it('handles a non-string telemetry token', async () => {
+    // our typings state that `tokens.telemetry` is of type `string | undefined`, but technically this value could be
+    // anything. use `undefined` to make the typings happy (this should cover all non-string telemetry tokens). the
+    // important thing here is that the value is _not_ a string for this test!
+    await writeConfig({ 'telemetry.stencil': true, 'tokens.telemetry': undefined });
+
+    const config = await readConfig();
+
+    expect(Object.keys(config).join()).toBe('telemetry.stencil,tokens.telemetry');
+    expect(config['telemetry.stencil']).toBe(true);
+    expect(config['tokens.telemetry']).toMatch(UUID_REGEX);
+  });
+
+  it('handles a non-existent telemetry token', async () => {
+    await writeConfig({ 'telemetry.stencil': true });
+
+    const config = await readConfig();
+
+    expect(Object.keys(config).join()).toBe('telemetry.stencil,tokens.telemetry');
+    expect(config['telemetry.stencil']).toBe(true);
+    expect(config['tokens.telemetry']).toMatch(UUID_REGEX);
+  });
+
   it('should read a file if it exists', async () => {
     await writeConfig({ 'telemetry.stencil': true, 'tokens.telemetry': UUID1 });
 
