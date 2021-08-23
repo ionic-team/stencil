@@ -30,10 +30,7 @@ export async function readConfig(): Promise<TelemetryConfig> {
     };
 
     await writeConfig(config);
-  } else if (
-    !!config &&
-    (typeof config['tokens.telemetry'] !== 'string' || !config['tokens.telemetry'].match(UUID_REGEX))
-  ) {
+  } else if (!UUID_REGEX.test(config['tokens.telemetry'])) {
     const newUuid = uuidv4();
     await writeConfig({ ...config, 'tokens.telemetry': newUuid });
     config['tokens.telemetry'] = newUuid;
