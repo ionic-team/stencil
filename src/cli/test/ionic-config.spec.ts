@@ -14,15 +14,14 @@ describe('readConfig', () => {
     args: [],
   });
 
+  beforeEach(async () => {
+    await getCompilerSystem().removeFile(defaultConfig());
+  });
+
   it('should create a file if it does not exist', async () => {
-    let result = await getCompilerSystem().stat(defaultConfig());
+    const result = await getCompilerSystem().stat(defaultConfig());
 
-    if (result.isFile) {
-      await getCompilerSystem().removeFile(defaultConfig());
-    }
-
-    result = await getCompilerSystem().stat(defaultConfig());
-
+    // expect the file to have been deleted by the test setup
     expect(result.isFile).toBe(false);
 
     const config = await readConfig();
@@ -30,10 +29,10 @@ describe('readConfig', () => {
     expect(Object.keys(config).join()).toBe('tokens.telemetry,telemetry.stencil');
   });
 
-  it('should fix the telemetry token if necessary', async () => {
+  it("should fix the telemetry token if it's a string, but an invalid UUID", async () => {
     await writeConfig({ 'telemetry.stencil': true, 'tokens.telemetry': 'aaaa' });
 
-    let result = await getCompilerSystem().stat(defaultConfig());
+    const result = await getCompilerSystem().stat(defaultConfig());
 
     expect(result.isFile).toBe(true);
 
@@ -41,7 +40,7 @@ describe('readConfig', () => {
 
     expect(Object.keys(config).join()).toBe('telemetry.stencil,tokens.telemetry');
     expect(config['telemetry.stencil']).toBe(true);
-    expect(!!config['tokens.telemetry'].match(UUID_REGEX)).toBe(true);
+    expect(config['tokens.telemetry']).toMatch(UUID_REGEX);
   });
 
   it('handles a non-string telemetry token', async () => {
