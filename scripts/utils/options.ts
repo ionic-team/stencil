@@ -3,7 +3,17 @@ import { getVermoji } from './vermoji';
 import { PackageData } from './write-pkg-json';
 import { readFileSync } from 'fs-extra';
 
-export function getOptions(rootDir: string, inputOpts: BuildOptions = {}) {
+/**
+ * Retrieves information used during a 'process' that requires knowledge of various project file paths, Stencil version
+ * information, and GitHub repo metadata. A 'process' may include, but is not limited to:
+ * - generating a new release
+ * - regenerating a license file
+ * - validating a build
+ * @param rootDir the root directory of the project
+ * @param inputOpts any build options to override manually
+ * @returns an entity containing various fields to be used by some process
+ */
+export function getOptions(rootDir: string, inputOpts: BuildOptions = {}): BuildOptions {
   const srcDir = join(rootDir, 'src');
   const packageJsonPath = join(rootDir, 'package.json');
   const packageLockJsonPath = join(rootDir, 'package-lock.json');
