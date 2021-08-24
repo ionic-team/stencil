@@ -7,3 +7,4 @@
 * [5. repo-structure](0005-repo-structure.md)
 * [6. organizing-utility-functions](0006-organizing-utility-functions.md)
 * [7. unit-testing-expectations](0007-unit-testing-expectations.md)
+* [8. license-attribution](0008-license-attribution.md)
