@@ -20,6 +20,7 @@ coverage/
 
 /build/
 /scripts/build/
+!/scripts/build/deno-cache
 dist/
 
 # submodule packages
