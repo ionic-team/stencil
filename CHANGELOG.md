@@ -1,3 +1,9 @@
+## 🐔 [2.7.1](https://github.com/ionic-team/stencil/compare/v2.7-0...v2.7.1) (2021-08-24)
+
+* **ci:** vendor deno for builds ([#3020](https://github.com/ionic-team/stencil/issues/3020)) ([6d8a61d](https://github.com/ionic-team/stencil/commit/6d8a61d166859ca165d85b7c7cea35b99acc53ee))
+* **compiler:** solve issue where worker thread didn't have access to fetch ([#3012](https://github.com/ionic-team/stencil/issues/3012)) ([925d4e9](https://github.com/ionic-team/stencil/commit/925d4e924264df424c3519f4c0a91b22356a2ea6))
+* **telemetry:** handle malformed telemetry tokens ([#3014](https://github.com/ionic-team/stencil/issues/3014)) ([ff75a47](https://github.com/ionic-team/stencil/commit/ff75a473279aa7b59d3dadf308566df361c74f71))
+
 ## ⛰ [2.7.1-0](https://github.com/ionic-team/stencil/compare/v2.7.0...v2.7.1-0) (2021-08-24)
 
 ### Bug Fixes
