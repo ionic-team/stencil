@@ -8,7 +8,11 @@ historical
 
 ## Context
 
-Stencil ships with multiple concepts that may not all be organized and available to customers. Stencil does not want to theoretically mandate certain tooling and bundle them into the Stencil compiler. These tools include, but are not limited to: Puppeteer and Jest. 
+Stencil supports several features for development and building web components. In order to keep the distributable as small as possible, the Stencil compiler only bundles the tooling that is absolutely necessary to compile Stencil components. Additional functionality, such as testing, requires the consumer to manually install these packages.
+
+Having peer dependencies of non-essential packages has an additional benefit of allowing end users to attempt to upgrade libraries themselves, rather than waiting for the Stencil team to release a new version of Stencil. Issues that consumers have during their upgrades can be reported via the team's issue tracker and help inform the team of potential upgrade pain points.
+
+Theoretically, in the future, this provides a way for consumers to use other Stencil supported packages that may be a preference of the component author, such as puppeteer vs playwright.
 
 ## Options
 
