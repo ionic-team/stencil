@@ -1,9 +1,22 @@
 import type * as d from '../declarations';
 import type { SourceMap as RollupSourceMap } from 'rollup';
 
-export const rollupSrcMapToObj = (rollupSrcMap: RollupSourceMap): d.SourceMap => {
-  if (!rollupSrcMap) return null;
-  if (typeof rollupSrcMap.toUrl === 'function') return JSON.parse(rollupSrcMap.toString());
-  if (typeof rollupSrcMap === 'string') return JSON.parse(rollupSrcMap);
-  return rollupSrcMap;
+/**
+ * Converts a rollup provided source map to one that Stencil can easily understand
+ * @param rollupSourceMap the sourcemap to transform
+ * @returns the transformed sourcemap
+ */
+export const rollupToStencilSourceMap = (rollupSourceMap: RollupSourceMap | undefined): d.SourceMap => {
+  if (!rollupSourceMap) {
+    return null;
+  }
+
+  return {
+    file: rollupSourceMap.file,
+    mappings: rollupSourceMap.mappings,
+    names: rollupSourceMap.names,
+    sources: rollupSourceMap.sources,
+    sourcesContent: rollupSourceMap.sourcesContent,
+    version: rollupSourceMap.version,
+  };
 };
