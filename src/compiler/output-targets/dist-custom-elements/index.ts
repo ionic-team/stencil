@@ -6,7 +6,7 @@ import {
   dashToPascalCase,
   formatComponentRuntimeMeta,
   hasError,
-  rollupSrcMapToObj,
+  rollupToStencilSourceMap,
   stringifyRuntimeData,
 } from '@utils';
 import { getCustomElementsBuildConditionals } from '../dist-custom-elements-bundle/custom-elements-build-conditionals';
@@ -76,7 +76,7 @@ const bundleCustomElements = async (
       const files = rollupOutput.output.map(async (bundle) => {
         if (bundle.type === 'chunk') {
           let code = bundle.code;
-          let sourceMap = rollupSrcMapToObj(bundle.map);
+          let sourceMap = rollupToStencilSourceMap(bundle.map);
           const optimizeResults = await optimizeModule(config, compilerCtx, {
             input: code,
             isCore: bundle.isEntry,

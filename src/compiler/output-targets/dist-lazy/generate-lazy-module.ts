@@ -1,6 +1,6 @@
 import type * as d from '../../../declarations';
 import { writeLazyModule } from './write-lazy-entry-module';
-import { formatComponentRuntimeMeta, stringifyRuntimeData, hasDependency, rollupSrcMapToObj } from '@utils';
+import { formatComponentRuntimeMeta, stringifyRuntimeData, hasDependency, rollupToStencilSourceMap } from '@utils';
 import { optimizeModule } from '../../optimize/optimize-module';
 import { join } from 'path';
 import type { SourceMap as RollupSourceMap } from 'rollup';
@@ -321,7 +321,7 @@ const convertChunk = async (
   code: string,
   rollupSrcMap: RollupSourceMap
 ) => {
-  let sourceMap = rollupSrcMapToObj(rollupSrcMap);
+  let sourceMap = rollupToStencilSourceMap(rollupSrcMap);
   const inlineHelpers = isBrowserBuild || !hasDependency(buildCtx, 'tslib');
   const optimizeResults = await optimizeModule(config, compilerCtx, {
     input: code,
