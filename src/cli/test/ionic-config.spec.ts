@@ -14,15 +14,14 @@ describe('readConfig', () => {
     args: [],
   });
 
+  beforeEach(async () => {
+    await getCompilerSystem().removeFile(defaultConfig());
+  });
+
   it('should create a file if it does not exist', async () => {
-    let result = await getCompilerSystem().stat(defaultConfig());
+    const result = await getCompilerSystem().stat(defaultConfig());
 
-    if (result.isFile) {
-      await getCompilerSystem().removeFile(defaultConfig());
-    }
-
-    result = await getCompilerSystem().stat(defaultConfig());
-
+    // expect the file to have been deleted by the test setup
     expect(result.isFile).toBe(false);
 
     const config = await readConfig();
@@ -30,10 +29,10 @@ describe('readConfig', () => {
     expect(Object.keys(config).join()).toBe('tokens.telemetry,telemetry.stencil');
   });
 
-  it('should fix the telemetry token if necessary', async () => {
+  it("should fix the telemetry token if it's a string, but an invalid UUID", async () => {
     await writeConfig({ 'telemetry.stencil': true, 'tokens.telemetry': 'aaaa' });
 
-    let result = await getCompilerSystem().stat(defaultConfig());
+    const result = await getCompilerSystem().stat(defaultConfig());
 
     expect(result.isFile).toBe(true);
 
@@ -41,7 +40,30 @@ describe('readConfig', () => {
 
     expect(Object.keys(config).join()).toBe('telemetry.stencil,tokens.telemetry');
     expect(config['telemetry.stencil']).toBe(true);
-    expect(!!config['tokens.telemetry'].match(UUID_REGEX)).toBe(true);
+    expect(config['tokens.telemetry']).toMatch(UUID_REGEX);
+  });
+
+  it('handles a non-string telemetry token', async () => {
+    // our typings state that `tokens.telemetry` is of type `string | undefined`, but technically this value could be
+    // anything. use `undefined` to make the typings happy (this should cover all non-string telemetry tokens). the
+    // important thing here is that the value is _not_ a string for this test!
+    await writeConfig({ 'telemetry.stencil': true, 'tokens.telemetry': undefined });
+
+    const config = await readConfig();
+
+    expect(Object.keys(config).join()).toBe('telemetry.stencil,tokens.telemetry');
+    expect(config['telemetry.stencil']).toBe(true);
+    expect(config['tokens.telemetry']).toMatch(UUID_REGEX);
+  });
+
+  it('handles a non-existent telemetry token', async () => {
+    await writeConfig({ 'telemetry.stencil': true });
+
+    const config = await readConfig();
+
+    expect(Object.keys(config).join()).toBe('telemetry.stencil,tokens.telemetry');
+    expect(config['telemetry.stencil']).toBe(true);
+    expect(config['tokens.telemetry']).toMatch(UUID_REGEX);
   });
 
   it('should read a file if it exists', async () => {

@@ -33,6 +33,9 @@ node_modules/
 /scripts/bundles/helpers/compiler-cjs-intro.js
 /scripts/bundles/helpers/compiler-cjs-outro.js
 
+# code coverage output
+coverage/
+
 # output from compiling Stencil projects for testing purposes
 test/**/dist/
 test/**/dist-react/
