@@ -32,5 +32,5 @@ For uninstalled peer dependencies, Stencil emits error when a `stencil` command 
 
 ## Links
 
-Code sets up supported consumer peer dependencies and their versions: [link](https://github.com/ionic-team/stencil/blob/master/src/sys/node/node-sys.ts#L586)
+Code sets up supported consumer peer dependencies and their versions: [link](https://github.com/ionic-team/stencil/blob/c3f7f2ee1182b5eb78f5bc05603064c06b788480/src/sys/node/node-sys.ts#L586)
 Example of a lazyRequire call on a node system: [link](https://github.com/ionic-team/stencil/blob/bf5f197910daab7f822a6e4c56f4f40a81c2ce7e/src/compiler/output-targets/output-service-workers.ts#L15)
