@@ -7,6 +7,12 @@ import { tsResolveModuleName } from '../sys/typescript/typescript-resolve-module
 import { isAbsolute } from 'path';
 import ts from 'typescript';
 
+/**
+ * Handles all typescript compilation. After this, the compiled javascript code is available to be worked with.
+ * @param compilerCtx The current Compiler's contextual settings.
+ * @param bundleOpts The options used to inform how to produce the bundle.
+ * @returns Plugin
+ */
 export const typescriptPlugin = (compilerCtx: d.CompilerCtx, bundleOpts: BundleOptions): Plugin => {
   const tsPrinter = ts.createPrinter();
 
@@ -37,6 +43,12 @@ export const typescriptPlugin = (compilerCtx: d.CompilerCtx, bundleOpts: BundleO
   };
 };
 
+/**
+ * Resolve (what I can only infer from this function's internals) TypeScript definition files for rollup.
+ * @param config A Config object used to refer to the consumers settings. This config should have already been validated.
+ * @param compilerCtx The current Compiler's contextual settings.
+ * @returns
+ */
 export const resolveIdWithTypeScript = (config: d.Config, compilerCtx: d.CompilerCtx): Plugin => {
   return {
     name: `resolveIdWithTypeScript`,

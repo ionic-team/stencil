@@ -5,6 +5,16 @@ import { normalizeFsPath, hasError } from '@utils';
 import { optimizeModule } from '../optimize/optimize-module';
 import { STENCIL_INTERNAL_ID } from './entry-alias-ids';
 
+/**
+ * Runs transforms to help support web workers in consumer components.
+ *
+ * @param config A Config object used to refer to the consumers settings. This config should have already been validated.
+ * @param compilerCtx The current Compiler's contextual settings.
+ * @param buildCtx The context of the current build.
+ * @param platform The platform that this plugin was called from.
+ * @param inlineWorkers ???
+ * @returns
+ */
 export const workerPlugin = (
   config: d.Config,
   compilerCtx: d.CompilerCtx,

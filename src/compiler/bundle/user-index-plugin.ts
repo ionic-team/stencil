@@ -3,6 +3,14 @@ import type { Plugin } from 'rollup';
 import { USER_INDEX_ENTRY_ID } from './entry-alias-ids';
 import { join } from 'path';
 
+/**
+ * This is called to improve incremental builds... how? Unsure.
+ *
+ * This has something to do with the USER_INDEX_ENTRY_ID and it's resolved value of the index.ts file in a consumers app.
+ * @param config A Config object used to refer to the consumers settings. This config should have already been validated.
+ * @param compilerCtx The current Compiler's contextual settings.
+ * @returns
+ */
 export const userIndexPlugin = (config: d.Config, compilerCtx: d.CompilerCtx): Plugin => {
   return {
     name: 'userIndexPlugin',

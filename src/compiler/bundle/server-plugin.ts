@@ -4,6 +4,15 @@ import type { Plugin } from 'rollup';
 import { isOutputTargetHydrate } from '../output-targets/output-utils';
 import { isAbsolute } from 'path';
 
+/**
+ * Used to filter out any imported paths that include ".server",
+ * colloquially referred to in this file as server only modules,
+ * so that the code in question is not included within a web build.
+ *
+ * @param config A Config object used to refer to the consumers settings. This config should have already been validated.
+ * @param platform The platform that this plugin was called from.
+ * @returns
+ */
 export const serverPlugin = (config: d.Config, platform: string): Plugin => {
   const isHydrateBundle = platform === 'hydrate';
   const serverVarid = `@removed-server-code`;

@@ -3,6 +3,13 @@ import { basename } from 'path';
 import { createJsVarName, normalizeFsPathQuery } from '@utils';
 import type { Plugin, TransformPluginContext } from 'rollup';
 
+/**
+ * Sanitizes and prepares external formats, like text files or SVG's, to be able to be processed in JS as an ES Module.
+ * Also runs some file size checking on those imported files to give consumer developers feedback.
+ *
+ * @param config A Config object used to refer to the consumers settings. This config should have already been validated.
+ * @returns Plugin
+ */
 export const extFormatPlugin = (config: d.Config): Plugin => {
   return {
     name: 'extFormatPlugin',

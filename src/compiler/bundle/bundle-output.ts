@@ -84,36 +84,76 @@ export const getRollupOptions = (
   const beforePlugins = config.rollupPlugins.before || [];
   const afterPlugins = config.rollupPlugins.after || [];
   const rollupOptions: RollupOptions = {
+    // Includes all the changed files as a key/value library of module id's => paths.
     input: bundleOpts.inputs,
 
     plugins: [
+      // First, we run this to resolve the compiler code to the correct path depending on a few conditions.
       coreResolvePlugin(config, compilerCtx, bundleOpts.platform, bundleOpts.externalRuntime),
+
+      // We run this next because <reason>
       appDataPlugin(config, compilerCtx, buildCtx, bundleOpts.conditionals, bundleOpts.platform),
+
+      // We run this next because <reason>
       lazyComponentPlugin(buildCtx),
+
+      // We run this next because <reason>
       loaderPlugin(bundleOpts.loader),
+
+      // We run this next because <reason>
       userIndexPlugin(config, compilerCtx),
+
+      // We run this next because <reason>
       typescriptPlugin(compilerCtx, bundleOpts),
+
+      // We run this next because <reason>
       extFormatPlugin(config),
+
+      // We run this next because <reason>
       extTransformsPlugin(config, compilerCtx, buildCtx, bundleOpts),
+
+      // We run this next because <reason>
       workerPlugin(config, compilerCtx, buildCtx, bundleOpts.platform, !!bundleOpts.inlineWorkers),
+
+      // We run this next because <reason>
       serverPlugin(config, bundleOpts.platform),
+
+      // We run this next to give space for consumers to "prepend" their own rollup plugins. This happens here so that <reason>
       ...beforePlugins,
+
+      // We run this next to help rollup locate any other modules with node's algorithm to resolve third party plugins.
       nodeResolvePlugin,
+
+      // We run this next because <reason>
       resolveIdWithTypeScript(config, compilerCtx),
+
+      // We run this next Convert CommonJS modules to ES6 (why so late though?)
       rollupCommonjsPlugin({
         include: /node_modules/,
         sourceMap: config.sourceMap,
         transformMixedEsModules: false,
         ...config.commonjs,
       }),
+
+      // We run this next to give space for consumers to "append" their own rollup plugins. This happens here so that <reason>
       ...afterPlugins,
+
+      // We run this next because <reason>
       pluginHelper(config, buildCtx, bundleOpts.platform),
+
+      // We run this next to allow consumer's json files to be processed. It's run at this point because <reason>
       rollupJsonPlugin({
         preferConst: true,
       }),
+
+      /* Automatically replace all instances of "process.env.NODE_ENV" in components. Note that there are no delimeters.
+       * It's run at this point because this is near the final step in the compilation process.
+       */
       rollupReplacePlugin({
         'process.env.NODE_ENV': config.devMode ? '"development"' : '"production"',
       }),
+
+      // We run this next because <reason>
       fileLoadPlugin(compilerCtx.fs),
     ],
 

@@ -7,6 +7,16 @@ import { parseImportPath } from '../transformers/stencil-import-path';
 import type { Plugin } from 'rollup';
 import { runPluginTransformsEsmImports } from '../plugin/plugin';
 
+/**
+ * Sanitizes and prepares external formats, like text files or SVG's to process in JS.
+ * Also runs some file size checking on those imported files to give consumer devs feedback.
+ *
+ * @param config A Config object used to refer to the consumers settings. This config should have already been validated.
+ * @param compilerCtx The current Compiler's contextual settings.
+ * @param buildCtx The context of the current build.
+ * @param bundleOpts The options used to inform how to produce the bundle.
+ * @returns
+ */
 export const extTransformsPlugin = (
   config: d.Config,
   compilerCtx: d.CompilerCtx,

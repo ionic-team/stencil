@@ -2,7 +2,21 @@ import type * as d from '../../declarations';
 import { buildError } from '@utils';
 import { relative } from 'path';
 
-export const pluginHelper = (config: d.Config, builtCtx: d.BuildCtx, platform: string) => {
+/**
+ * Check to confirm that no builtin modules are being processed.
+ * If so, prompt the user to install a module.
+ * See the bottom of the file where this plugin definition is
+ * located for the list that toggles the prompt.
+ *
+ * This plugin also has a side effect of cleaning up the import file
+ * name if it ends with a "/" character.
+ *
+ * @param config A Config object used to refer to the consumers settings. This config should have already been validated.
+ * @param buildCtx
+ * @param platform The platform that this plugin was called from.
+ * @returns
+ */
+export const pluginHelper = (config: d.Config, buildCtx: d.BuildCtx, platform: string) => {
   return {
     name: 'pluginHelper',
     resolveId(importee: string, importer: string): null {
@@ -20,7 +34,7 @@ export const pluginHelper = (config: d.Config, builtCtx: d.BuildCtx, platform: s
         if (importer) {
           fromMsg = ` from ${relative(config.rootDir, importer)}`;
         }
-        const diagnostic = buildError(builtCtx.diagnostics);
+        const diagnostic = buildError(buildCtx.diagnostics);
         diagnostic.header = `Node Polyfills Required`;
         diagnostic.messageText = `For the import "${importee}" to be bundled${fromMsg}, ensure the "rollup-plugin-node-polyfills" plugin is installed and added to the stencil config plugins (${platform}). Please see the bundling docs for more information.
         Further information: https://stenciljs.com/docs/module-bundling`;

@@ -12,6 +12,17 @@ import {
 } from './entry-alias-ids';
 import ts from 'typescript';
 
+/**
+ * This plugin will load up the app data and make some information available to the resultant build.
+ *
+ * It also does work on the Stencil consumer's globalScript file by loading and transpiling that file.
+ * @param config A Config object used to refer to the consumers settings. This config should have already been validated.
+ * @param compilerCtx The current Compiler's contextual settings.
+ * @param buildCtx The context of the current build.
+ * @param build Conditionals for the current build.
+ * @param platform The platform that this plugin was called from.
+ * @returns Plugin
+ */
 export const appDataPlugin = (
   config: d.Config,
   compilerCtx: d.CompilerCtx,

@@ -2,6 +2,11 @@ import type * as d from '../../../declarations';
 import { normalizePath } from '@utils';
 import type { Plugin } from 'rollup';
 
+/**
+ * Includes consumer components and resolves them as a part of TypeScript's incremental builds feature.
+ * @param buildCtx The context of the current build
+ * @returns Plugin
+ */
 export const lazyComponentPlugin = (buildCtx: d.BuildCtx) => {
   const entrys = new Map<string, d.EntryModule>();
 

@@ -15,6 +15,14 @@ import {
 } from './entry-alias-ids';
 import type { Plugin } from 'rollup';
 
+/**
+ * The Core Resolve plugin is used to get the correct core compiler code that should be used throughout the build process.
+ * @param config A Config object used to refer to the consumers settings. This config should have already been validated.
+ * @param compilerCtx The current Compiler's contextual settings.
+ * @param platform The platform that this plugin was called from.
+ * @param externalRuntime ???
+ * @returns Plugin
+ */
 export const coreResolvePlugin = (
   config: d.Config,
   compilerCtx: d.CompilerCtx,
