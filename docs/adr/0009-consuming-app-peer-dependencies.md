@@ -20,7 +20,7 @@ Historical
 
 ## Decision
 
-For uninstalled peer dependencies, we fire an error when a `stencil` command which depends on a peer dependency is invoked. This gives consumers a la carte behavior around the tooling they can use. [ADR-5](./0005-repo-structure.md) helped us to mandate this behavior for consuming apps. 
+For uninstalled peer dependencies, Stencil emits error when a `stencil` command which depends on a peer dependency is invoked. This gives consumers à la carte behavior around the tooling they can use. [ADR-5](./0005-repo-structure.md) helped mandate this behavior for consuming apps. 
 
 ## Consequences
 
