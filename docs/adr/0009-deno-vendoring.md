@@ -11,8 +11,8 @@ accepted
 On the morning of Monday, 2021.08.23, GitHub Continuous Integration (CI) builds of Stencil began to fail while
 attempting to retrieve Deno source files. Although Deno is at the time of this writing, an experimental feature of
 Stencil, it is required to build the final distributable. Due to these failures and their necessity to build Stencil, 
-_all_ CI builds were failing. A passing CI run is required in order to merge PRs in the Stencil repo, preventing the
-team from landing code & releasing bug fixes following the v2.7.0 release.
+_all_ CI builds were failing. A passing CI run is required in order to merge Pull Requests (PRs) in the Stencil repo,
+preventing the team from landing code & releasing bug fixes following the v2.7.0 release.
 
 ## Options
 
