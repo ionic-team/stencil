@@ -8,7 +8,7 @@ historical
 
 ## Context
 
-Stencil and it's tests demand to be run on all actively supported versions of Node. As of today, Node's working versions are 12, 14, and 16. 
+Stencil and its tests demand to be run on all actively supported versions of Node. As of today, Node's working versions are 12, 14, and 16. 
 
 ## Options
 
