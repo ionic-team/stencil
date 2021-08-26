@@ -36,7 +36,7 @@ preventing the team from landing code & releasing bug fixes following the v2.7.0
          which would cause CI to be down even longer
 3. Use Stencil's caching mechanism for Deno dependencies to gather and store them
    1. Pros
-      1. Although not the 'blessed' way to do vendoring, it would still align with [th suggested practice by the Deno team](https://deno.land/manual@v1.13.2/linking_to_external_code#but-what-if-the-host-of-the-url-goes-down-the-source-won#39t-be-available)
+      1. Although not the 'blessed' way to do vendoring, it would still align with [the suggested practice by the Deno team](https://deno.land/manual@v1.13.2/linking_to_external_code#but-what-if-the-host-of-the-url-goes-down-the-source-won#39t-be-available)
          for stability purposes
       2. No longer relying on an internet connection to download dependencies, since they would be locally available
          in the Stencil repo
