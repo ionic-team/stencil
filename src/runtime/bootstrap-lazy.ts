@@ -159,7 +159,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
   );
 
   if (BUILD.hydratedClass || BUILD.hydratedAttribute) {
-    visibilityStyle.innerHTML = cmpTags + HYDRATED_CSS;
+    visibilityStyle.innerHTML = cmpTags.sort() + HYDRATED_CSS;
     visibilityStyle.setAttribute('data-styles', '');
     head.insertBefore(visibilityStyle, metaCharset ? metaCharset.nextSibling : head.firstChild);
   }
