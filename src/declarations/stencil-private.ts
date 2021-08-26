@@ -289,13 +289,13 @@ export interface CompilerBuildStats {
     hashedFileNameLength: number;
     buildEs5: boolean | 'prod';
   };
-  esmBrowser: any;
-  esm: any;
-  es5: any;
-  system: any;
-  commonjs: any;
+  esmBrowser: CompilerBuildStatBundle[];
+  esm: CompilerBuildStatBundle[];
+  es5: CompilerBuildStatBundle[];
+  system: CompilerBuildStatBundle[];
+  commonjs: CompilerBuildStatBundle[];
   components: BuildComponent[];
-  entries: BuildEntry[];
+  entries: EntryModule[];
   rollupResults: RollupResults;
   sourceGraph: BuildSourceGraph;
   collections: {
@@ -303,6 +303,15 @@ export interface CompilerBuildStats {
     source: string;
     tags: string[];
   }[];
+}
+
+export interface CompilerBuildStatBundle {
+  key: string;
+  components: string[];
+  bundleId: string;
+  fileName: string;
+  imports: string[];
+  byteSize: number;
 }
 
 export interface BuildEntry {
