@@ -1,4 +1,4 @@
-# 9. Deno Vendoring
+# 10. Deno Vendoring
 
 Date: 2021-08-24
 
