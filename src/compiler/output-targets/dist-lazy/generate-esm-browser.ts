@@ -29,7 +29,7 @@ export const generateEsmBrowser = async (
 
     if (output != null) {
       const es2017destinations = esmOutputs.map((o) => o.esmDir);
-      const componentBundle = await generateLazyModules(
+      buildCtx.esmBrowserComponentBundle = await generateLazyModules(
         config,
         compilerCtx,
         buildCtx,
@@ -40,8 +40,7 @@ export const generateEsmBrowser = async (
         true,
         ''
       );
-      return componentBundle;
     }
   }
-  return undefined;
+  return buildCtx;
 };

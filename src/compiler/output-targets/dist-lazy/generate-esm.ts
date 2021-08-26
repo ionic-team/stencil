@@ -24,9 +24,10 @@ export const generateEsm = async (
     };
     const outputTargetType = esmOutputs[0].type;
     const output = await generateRollupOutput(rollupBuild, esmOpts, config, buildCtx.entryModules);
+
     if (output != null) {
       const es2017destinations = esmOutputs.map((o) => o.esmDir);
-      await generateLazyModules(
+      buildCtx.esmComponentBundle = await generateLazyModules(
         config,
         compilerCtx,
         buildCtx,
@@ -39,7 +40,7 @@ export const generateEsm = async (
       );
 
       const es5destinations = esmEs5Outputs.map((o) => o.esmEs5Dir);
-      await generateLazyModules(
+      buildCtx.es5ComponentBundle = await generateLazyModules(
         config,
         compilerCtx,
         buildCtx,
@@ -55,6 +56,8 @@ export const generateEsm = async (
       await generateShortcuts(config, compilerCtx, outputTargets, output);
     }
   }
+
+  return buildCtx;
 };
 
 const copyPolyfills = async (config: d.Config, compilerCtx: d.CompilerCtx, outputTargets: d.OutputTargetDistLazy[]) => {

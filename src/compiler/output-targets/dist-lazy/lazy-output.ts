@@ -59,15 +59,13 @@ export const outputLazy = async (config: d.Config, compilerCtx: d.CompilerCtx, b
 
     const rollupBuild = await bundleOutput(config, compilerCtx, buildCtx, bundleOpts);
     if (rollupBuild != null) {
-      const [componentBundle] = await Promise.all([
-        generateEsmBrowser(config, compilerCtx, buildCtx, rollupBuild, outputTargets),
-        generateEsm(config, compilerCtx, buildCtx, rollupBuild, outputTargets),
-        generateSystem(config, compilerCtx, buildCtx, rollupBuild, outputTargets),
-        generateCjs(config, compilerCtx, buildCtx, rollupBuild, outputTargets),
-      ]);
+      buildCtx = await generateEsmBrowser(config, compilerCtx, buildCtx, rollupBuild, outputTargets);
+      buildCtx = await generateEsm(config, compilerCtx, buildCtx, rollupBuild, outputTargets);
+      buildCtx = await generateSystem(config, compilerCtx, buildCtx, rollupBuild, outputTargets);
+      buildCtx = await generateCjs(config, compilerCtx, buildCtx, rollupBuild, outputTargets);
 
-      if (componentBundle != null) {
-        buildCtx.componentGraph = generateModuleGraph(buildCtx.components, componentBundle);
+      if (buildCtx.esmBrowserComponentBundle != null) {
+        buildCtx.componentGraph = generateModuleGraph(buildCtx.components, buildCtx.esmBrowserComponentBundle);
       }
     }
   } catch (e) {

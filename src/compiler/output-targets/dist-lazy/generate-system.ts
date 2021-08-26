@@ -26,7 +26,7 @@ export const generateSystem = async (
     const results = await generateRollupOutput(rollupBuild, esmOpts, config, buildCtx.entryModules);
     if (results != null) {
       const destinations = systemOutputs.map((o) => o.esmDir);
-      await generateLazyModules(
+      buildCtx.systemComponentBundle = await generateLazyModules(
         config,
         compilerCtx,
         buildCtx,
@@ -37,9 +37,12 @@ export const generateSystem = async (
         true,
         '.system'
       );
+
       await generateSystemLoaders(config, compilerCtx, results, systemOutputs);
     }
   }
+
+  return buildCtx;
 };
 
 const generateSystemLoaders = (

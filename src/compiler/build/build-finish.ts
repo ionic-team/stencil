@@ -1,5 +1,6 @@
 import type * as d from '../../declarations';
 import { generateBuildResults } from './build-results';
+import { generateBuildStats } from './build-stats';
 import { isFunction, isRemoteUrl } from '@utils';
 import { IS_NODE_ENV } from '../sys/environment';
 import { relative } from 'path';
@@ -30,6 +31,12 @@ const buildDone = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx:
 
   // create the build results data
   buildCtx.buildResults = generateBuildResults(config, compilerCtx, buildCtx);
+
+  // After the build results are available on the buildCtx, call the stats and set it.
+  // We will use this later to write the files.
+  buildCtx.buildStats = generateBuildStats(config, buildCtx);
+
+  // await writeBuildStats(config, buildCtx);
 
   buildCtx.debug(`${aborted ? 'aborted' : 'finished'} build, ${buildCtx.buildResults.duration}ms`);
 
