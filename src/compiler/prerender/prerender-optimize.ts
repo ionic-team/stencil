@@ -29,6 +29,7 @@ export const inlineExternalStyleSheets = async (sys: d.CompilerSystem, appDir: s
         const optimizeResults = await optimizeCss({
           input: styles,
         });
+
         styles = optimizeResults.output;
 
         // insert inline <style>

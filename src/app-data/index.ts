@@ -67,6 +67,7 @@ export const BUILD: BuildConditionals = {
   scriptDataOpts: false,
   shadowDomShim: false,
   slotChildNodesFix: false,
+  invisiblePrehydration: true,
   propBoolean: true,
   propNumber: true,
   propString: true,
