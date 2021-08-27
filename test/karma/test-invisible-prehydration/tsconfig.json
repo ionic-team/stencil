@@ -13,32 +13,20 @@
       "dom",
       "es2017"
     ],
-    "module": "commonjs",
+    "module": "esnext",
     "moduleResolution": "node",
     "noImplicitAny": false,
     "noImplicitReturns": false,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "pretty": true,
-    "target": "es5",
-    "outDir": "www",
+    "target": "es2017",
     "baseUrl": ".",
     "paths": {
-      "@stencil/core": ["../../internal"],
-      "@stencil/core/internal": ["../../internal"],
-      "@stencil/core/testing": ["../../testing"],
+      "@stencil/core": ["../../../internal"],
+      "@stencil/core/internal": ["../../../internal"],
+      "@stencil/core/testing": ["../../../testing"]
     }
   },
-  "include": [
-    "test-app/components.d.ts",
-    "test-app/**/*.spec.ts",
-    "test-app/**/*.tsx",
-    "test-app/**/*.ts",
-    "test-app/util.ts",
-    "test-app/global.ts"
-  ],
-  "exclude": [
-    "test-prerender",
-    "test-sibling"
-  ]
+  "include": ["src"]
 }

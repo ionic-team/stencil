@@ -164,6 +164,7 @@ export interface BuildConditionals extends Partial<BuildFeatures> {
   isTesting?: boolean;
   isDev?: boolean;
   devTools?: boolean;
+  invisiblePrehydration?: boolean;
   hydrateServerSide?: boolean;
   hydrateClientSide?: boolean;
   lifecycleDOMEvents?: boolean;

@@ -76,6 +76,26 @@ export function setupDomTests(document: Document) {
   }
 
   /**
+   * Run this after each test that needs it's resources flushed
+   */
+  function tearDownStylesScripts() {
+    document.head.querySelectorAll('style[data-styles]').forEach((e) => e.remove());
+
+    [
+      '/build/testinvisibleprehydration.esm.js',
+      '/build/testinvisibleprehydration.js',
+      '/build/testprehydratedtruestyles.esm.js',
+      '/build/testprehydratedtruestyles.js',
+      '/build/testprehydratedfalsestyles.esm.js',
+      '/build/testprehydratedfalsestyles.js',
+      '/build/testapp.esm.js',
+      '/build/testapp.js',
+    ].forEach((src) => {
+      document.querySelectorAll(`script[src="${src}"]`).forEach((e) => e.remove());
+    });
+  }
+
+  /**
    * Create web component for executing tests against
    */
   function renderTest(url: string, app: HTMLElement, waitForStencilReady: number) {
@@ -169,7 +189,7 @@ export function setupDomTests(document: Document) {
     });
   }
 
-  return { setupDom, tearDownDom };
+  return { setupDom, tearDownDom, tearDownStylesScripts };
 }
 
 /**
