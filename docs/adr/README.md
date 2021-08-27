@@ -10,4 +10,4 @@
 * [8. license-attribution](0008-license-attribution.md)
 * [9. consuming-app-peer-dependencies](0009-consuming-app-peer-dependencies.md)
 * [10. deno-vendoring](0010-deno-vendoring.md)
-
+* [11. karma-testing-constraints](0011-karma-testing-constraints.md)
