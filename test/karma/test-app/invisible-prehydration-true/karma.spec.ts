@@ -7,7 +7,7 @@ describe('invisible-prehydration-true', () => {
 
   it('the style element will not be placed in the head', async () => {
     tearDownStylesScripts();
-    let app = await setupDom('/invisible-prehydration-true/index.html', 1000);
+    await setupDom('/invisible-prehydration-true/index.html', 350);
 
     // Is the component hydrated?
     expect(document.querySelector('prehydrated-styles').innerHTML).toEqual('<div>prehydrated-styles</div>');

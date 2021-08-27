@@ -11,11 +11,5 @@ export const config: Config = {
       indexHtml: 'prehydrated-styles.html',
       serviceWorker: null,
     },
-    {
-      type: 'www',
-      empty: false,
-      indexHtml: 'prehydrated-styles.html',
-      serviceWorker: null,
-    },
   ],
 };
