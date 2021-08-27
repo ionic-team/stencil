@@ -116,7 +116,7 @@ const addCustomElementInputs = (
         const importName = foundDComp.componentClassName;
         const importAs = `$Cmp${exportName}`;
         exp.push(`import { ${importName} as ${importAs} } from '${foundDComp.sourceFilePath}';`);
-        exp.push(`if (customElements.get('${foundDComp.tagName}')) {
+        exp.push(`if (!customElements.get('${foundDComp.tagName}')) {
           customElements.define('${foundDComp.tagName}', ${importAs});
         }`);
       });
