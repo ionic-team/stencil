@@ -31,10 +31,6 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Prettier dry-run
-        run: npm run prettier.dry-run
-        shell: bash
-
       - name: Build
         run: npm run build -- --ci
 
@@ -64,3 +60,21 @@ jobs:
         with:
           name: stencil-build
           path: stencil-build.tgz
+
+  prettier:
+    name: Prettier
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '12'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Prettier dry-run
+        run: npm run prettier.dry-run
