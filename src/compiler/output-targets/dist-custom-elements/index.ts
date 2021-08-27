@@ -109,6 +109,18 @@ const addCustomElementInputs = (
       const meta = stringifyRuntimeData(formatComponentRuntimeMeta(cmp, false));
 
       exp.push(`import { proxyCustomElement } from '${STENCIL_INTERNAL_CLIENT_ID}';`);
+
+      cmp.dependencies.forEach(dCmp => {
+        const foundDComp = components.find(dComp => dComp.tagName === dCmp);
+        const exportName = dashToPascalCase(foundDComp.tagName);
+        const importName = foundDComp.componentClassName;
+        const importAs = `$Cmp${exportName}`;
+        exp.push(`import { ${importName} as ${importAs} } from '${foundDComp.sourceFilePath}';`);
+        exp.push(`if (customElements.get('${foundDComp.tagName}')) {
+          customElements.define('${foundDComp.tagName}', ${importAs});
+        }`);
+      });
+
       exp.push(`import { ${importName} as ${importAs} } from '${cmp.sourceFilePath}';`);
       exp.push(`export const ${exportName} = /*@__PURE__*/proxyCustomElement(${importAs}, ${meta});`);
     }
