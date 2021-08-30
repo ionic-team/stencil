@@ -93,8 +93,8 @@ export const validateTsConfig = async (config: d.Config, sys: d.CompilerSystem, 
             warn.messageText = `To improve bundling, it is always recommended to set the tsconfig.json “module” setting to “esnext”. Note that the compiler will automatically handle bundling both modern and legacy builds.`;
           }
 
-          tsconfig.compilerOptions.sourceMap = !!config.sourceMap;
-          tsconfig.compilerOptions.inlineSources = !!config.sourceMap;
+          tsconfig.compilerOptions.sourceMap = config.sourceMap;
+          tsconfig.compilerOptions.inlineSources = config.sourceMap;
         }
       }
     }
@@ -152,8 +152,8 @@ const createDefaultTsConfig = (config: d.Config) =>
         jsx: 'react',
         jsxFactory: 'h',
         jsxFragmentFactory: 'Fragment',
-        sourceMap: !!config.sourceMap,
-        inlineSources: !!config.sourceMap,
+        sourceMap: config.sourceMap,
+        inlineSources: config.sourceMap,
       },
       include: [relative(config.rootDir, config.srcDir)],
     },

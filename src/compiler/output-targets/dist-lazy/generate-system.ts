@@ -22,7 +22,7 @@ export const generateSystem = async (
       chunkFileNames: config.hashFileNames ? 'p-[hash].system.js' : '[name]-[hash].system.js',
       assetFileNames: config.hashFileNames ? 'p-[hash][extname]' : '[name]-[hash][extname]',
       preferConst: true,
-      sourcemap: !!config.sourceMap,
+      sourcemap: config.sourceMap,
     };
     const results = await generateRollupOutput(rollupBuild, esmOpts, config, buildCtx.entryModules);
     if (results != null) {
