@@ -95,7 +95,7 @@ export const getTerserOptions = (config: Config, sourceTarget: SourceTarget, pre
     ie8: false,
     safari10: !!config.extras.safari10,
     format: {},
-    sourceMap: !!config.sourceMap,
+    sourceMap: config.sourceMap,
   };
 
   if (sourceTarget === 'es5') {
