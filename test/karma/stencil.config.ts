@@ -13,6 +13,7 @@ export const config: Config = {
   outputTargets: [
     {
       type: 'www',
+      empty: false,
       copy: [{ src: '**/*.html' }, { src: '**/*.css' }, { src: 'noscript.js' }],
     },
     {
