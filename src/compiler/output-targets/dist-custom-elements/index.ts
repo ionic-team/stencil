@@ -115,14 +115,20 @@ const addCustomElementInputs = (
         const exportName = dashToPascalCase(foundDComp.tagName);
         const importName = foundDComp.componentClassName;
         const importAs = `$Cmp${exportName}`;
+        const meta = stringifyRuntimeData(formatComponentRuntimeMeta(cmp, false));
+
         exp.push(`import { ${importName} as ${importAs} } from '${foundDComp.sourceFilePath}';`);
         exp.push(`if (!customElements.get('${foundDComp.tagName}')) {
-          customElements.define('${foundDComp.tagName}', ${importAs});
+          const ${exportName} = /*@__PURE__*/proxyCustomElement(${importAs}, ${meta});
+          customElements.define('${foundDComp.tagName}', ${exportName});
         }`);
       });
 
       exp.push(`import { ${importName} as ${importAs} } from '${cmp.sourceFilePath}';`);
       exp.push(`export const ${exportName} = /*@__PURE__*/proxyCustomElement(${importAs}, ${meta});`);
+      exp.push(`if (!customElements.get('${cmp.tagName}')) {
+        customElements.define('${cmp.tagName}', ${exportName});
+      }`);
     }
 
     bundleOpts.inputs[cmp.tagName] = coreKey;
