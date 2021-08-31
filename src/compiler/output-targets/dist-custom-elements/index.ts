@@ -98,6 +98,7 @@ const addCustomElementInputs = (
   const components = buildCtx.components;
   components.forEach((cmp) => {
     const exp: string[] = [];
+    const def: {tagName: string; exportName: string, importAs?: string, meta?: string}[] = [];
     const exportName = dashToPascalCase(cmp.tagName);
     const importName = cmp.componentClassName;
     const importAs = `$Cmp${exportName}`;
@@ -107,28 +108,59 @@ const addCustomElementInputs = (
       exp.push(`export { ${importName} as ${exportName} } from '${cmp.sourceFilePath}';`);
     } else {
       const meta = stringifyRuntimeData(formatComponentRuntimeMeta(cmp, false));
-
       exp.push(`import { proxyCustomElement } from '${STENCIL_INTERNAL_CLIENT_ID}';`);
+      exp.push(`import { ${importName} as ${importAs} } from '${cmp.sourceFilePath}';`);
+      exp.push(`export const ${exportName} = /*@__PURE__*/proxyCustomElement(${importAs}, ${meta});`);
+      def.push({tagName: cmp.tagName, exportName });
 
       cmp.dependencies.forEach(dCmp => {
-        const foundDComp = components.find(dComp => dComp.tagName === dCmp);
-        const exportName = dashToPascalCase(foundDComp.tagName);
-        const importName = foundDComp.componentClassName;
+        const foundDep = components.find(dComp => dComp.tagName === dCmp);
+        const exportName = dashToPascalCase(foundDep.tagName);
+        const importName = foundDep.componentClassName;
         const importAs = `$Cmp${exportName}`;
         const meta = stringifyRuntimeData(formatComponentRuntimeMeta(cmp, false));
 
-        exp.push(`import { ${importName} as ${importAs} } from '${foundDComp.sourceFilePath}';`);
-        exp.push(`if (!customElements.get('${foundDComp.tagName}')) {
-          const ${exportName} = /*@__PURE__*/proxyCustomElement(${importAs}, ${meta});
-          customElements.define('${foundDComp.tagName}', ${exportName});
-        }`);
+        exp.push(`import { ${importName} as ${importAs} } from '${foundDep.sourceFilePath}';`);
+        def.push({tagName: foundDep.tagName, exportName, importAs, meta });
       });
 
-      exp.push(`import { ${importName} as ${importAs} } from '${cmp.sourceFilePath}';`);
-      exp.push(`export const ${exportName} = /*@__PURE__*/proxyCustomElement(${importAs}, ${meta});`);
-      exp.push(`if (!customElements.get('${cmp.tagName}')) {
-        customElements.define('${cmp.tagName}', ${exportName});
-      }`);
+      const c: string[] = [`const components = [`];
+      const c2: string[] = def.map(defItm => `'${defItm.tagName}', `);
+      c.push(c2.join(''), `];`);
+
+      const s: string[] = [
+        ``,
+        `export const defineCustomElements = (replaceFunc) => {`,
+        `    let tagName`,
+        `    components.forEach(cmp => {`,
+        `        switch(cmp) {`
+      ];
+      const m: string[] = def.flatMap(defItm => {
+        return [
+          ``,
+          `            case '${defItm.tagName}':`,
+          `                tagName = '${defItm.tagName}';`,
+          `                if (replaceFunc) {`,
+          `                    tagName = replaceFunc(tagName);`,
+          `                }`,
+          `                if (!customElements.get(tagName)) {`,
+          `                    ${defItm.importAs ? `const ${defItm.exportName} = /*@__PURE__*/proxyCustomElement(${defItm.importAs}, ${defItm.meta});` : ``}`,
+          `                    customElements.define(tagName, ${defItm.exportName});`,
+          `                }`,
+          `                break;`
+        ];
+      });
+      const e: string[] = [
+        ``,
+        `        }`,
+        `    })`,
+        `}`
+      ];
+
+      exp.push(c.join(''));
+      exp.push(s.join('\n'));
+      exp.push(m.join('\n'));
+      exp.push(e.join('\n'));
     }
 
     bundleOpts.inputs[cmp.tagName] = coreKey;
