@@ -130,7 +130,7 @@ const addCustomElementInputs = (
 
       const s: string[] = [
         ``,
-        `export const defineCustomElements = (replaceFunc) => {`,
+        `export const defineCustomElements = (tagRename) => {`,
         `    let tagName`,
         `    components.forEach(cmp => {`,
         `        switch(cmp) {`
@@ -140,8 +140,8 @@ const addCustomElementInputs = (
           ``,
           `            case '${defItm.tagName}':`,
           `                tagName = '${defItm.tagName}';`,
-          `                if (replaceFunc) {`,
-          `                    tagName = replaceFunc(tagName);`,
+          `                if (tagRename) {`,
+          `                    tagName = tagRename(tagName);`,
           `                }`,
           `                if (!customElements.get(tagName)) {`,
           `                    ${defItm.importAs ? `const ${defItm.exportName} = /*@__PURE__*/proxyCustomElement(${defItm.importAs}, ${defItm.meta});` : ``}`,
