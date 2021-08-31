@@ -23,9 +23,9 @@ declare module 'merge-source-map' {
    *
    * @param oldMap the original sourcemap to merge
    * @param newMap the new sourcemap to merge with the `oldMap`
-   * @returns the merged sourcemap
+   * @returns the merged sourcemap, or undefined if both maps are falsy
    */
-  function merge(oldMap: MergeSourceMap, newMap: MergeSourceMap): MergeSourceMap;
+  function merge(oldMap: MergeSourceMap, newMap: MergeSourceMap): MergeSourceMap | undefined;
 
   /**
    * mark the `merge` function as the default export of the module, so that the JSDoc for `merge` is properly picked up

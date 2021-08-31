@@ -170,7 +170,7 @@ export const prepareModule = async (
     if (tsResults.sourceMapText) {
       // need to merge sourcemaps at this point
       const mergeMap = sourceMapMerge(
-        (minifyOpts.sourceMap as SourceMapOptions).content as SourceMap,
+        (minifyOpts.sourceMap as SourceMapOptions)?.content as SourceMap,
         JSON.parse(tsResults.sourceMapText)
       ) as SourceMap;
       minifyOpts.sourceMap = { content: mergeMap };
