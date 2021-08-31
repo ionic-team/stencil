@@ -5,16 +5,6 @@
  * recreated here for type safety purposes.
  */
 declare module 'merge-source-map' {
-  interface MergeSourceMap {
-    file: string;
-    mappings: string;
-    names: string[];
-    sourceRoot?: string;
-    sources: string[];
-    sourcesContent?: string[];
-    version: number;
-  }
-
   /**
    * Merge an existing sourcemap with a new one
    *
@@ -25,7 +15,10 @@ declare module 'merge-source-map' {
    * @param newMap the new sourcemap to merge with the `oldMap`
    * @returns the merged sourcemap, or undefined if both maps are falsy
    */
-  function merge(oldMap: MergeSourceMap, newMap: MergeSourceMap): MergeSourceMap | undefined;
+  function merge(
+    oldMap: import('../src/declarations').SourceMap,
+    newMap: import('../src/declarations').SourceMap
+  ): import('../src/declarations').SourceMap | undefined;
 
   /**
    * mark the `merge` function as the default export of the module, so that the JSDoc for `merge` is properly picked up
