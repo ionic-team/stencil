@@ -14,7 +14,7 @@ export const slotsToMarkdown = (slots: d.JsonDocsSlot[]) => {
   table.addHeader(['Slot', 'Description']);
 
   slots.forEach((style) => {
-    table.addRow([style.name === '' ? '' : `\`"${style.name}"\``, style.docs]);
+    table.addRow([style.name === '' ? '' : `<code>"${style.name}"</code>`, style.docs]);
   });
 
   content.push(...table.toMarkdown());

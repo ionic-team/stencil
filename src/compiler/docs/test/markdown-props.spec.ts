@@ -32,10 +32,10 @@ describe('markdown props', () => {
     ]).join('\n');
     expect(markdown).toEqual(`## Properties
 
-| Property | Attribute | Description    | Type                | Default |
-| -------- | --------- | -------------- | ------------------- | ------- |
-| \`hello\`  | \`hello\`   | This is a prop | \`boolean \\| string\` | \`false\` |
-| \`hello\`  | --        | This is a prop | \`boolean \\| string\` | \`false\` |
+| Property           | Attribute          | Description    | Type                               | Default            |
+| ------------------ | ------------------ | -------------- | ---------------------------------- | ------------------ |
+| <code>hello</code> | <code>hello</code> | This is a prop | <code>boolean &#124; string</code> | <code>false</code> |
+| <code>hello</code> | --                 | This is a prop | <code>boolean &#124; string</code> | <code>false</code> |
 
 `);
   });

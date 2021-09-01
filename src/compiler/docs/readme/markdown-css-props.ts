@@ -14,7 +14,7 @@ export const stylesToMarkdown = (styles: d.JsonDocsStyle[]) => {
   table.addHeader(['Name', 'Description']);
 
   styles.forEach((style) => {
-    table.addRow([`\`${style.name}\``, style.docs]);
+    table.addRow([`<code>${style.name}</code>`, style.docs]);
   });
 
   content.push(...table.toMarkdown());

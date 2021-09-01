@@ -31,7 +31,7 @@ export class MarkdownTable {
 
 const escapeMarkdownTableColumn = (text: string) => {
   text = text.replace(/\r?\n/g, ' ');
-  text = text.replace(/\|/g, '\\|');
+  text = text.replace(/\|/g, '&#124;');
   return text;
 };
 

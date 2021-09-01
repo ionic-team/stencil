@@ -19,8 +19,8 @@ export const propsToMarkdown = (props: d.JsonDocsProp[]) => {
       getPropertyField(prop),
       getAttributeField(prop),
       getDocsField(prop),
-      `\`${prop.type}\``,
-      `\`${prop.default}\``,
+      `<code>${prop.type}</code>`,
+      `<code>${prop.default}</code>`,
     ]);
   });
 
@@ -32,11 +32,11 @@ export const propsToMarkdown = (props: d.JsonDocsProp[]) => {
 };
 
 const getPropertyField = (prop: d.JsonDocsProp) => {
-  return `\`${prop.name}\`${prop.required ? ' _(required)_' : ''}`;
+  return `<code>${prop.name}</code>${prop.required ? ' _(required)_' : ''}`;
 };
 
 const getAttributeField = (prop: d.JsonDocsProp) => {
-  return prop.attr ? `\`${prop.attr}\`` : '--';
+  return prop.attr ? `<code>${prop.attr}</code>` : '--';
 };
 
 const getDocsField = (prop: d.JsonDocsProp) => {

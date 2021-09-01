@@ -11,7 +11,7 @@ export const methodsToMarkdown = (methods: d.JsonDocsMethod[]) => {
   content.push(``);
 
   methods.forEach((method) => {
-    content.push(`### \`${method.signature}\``);
+    content.push(`### <code>${method.signature}</code>`);
     content.push(``);
     content.push(getDocsField(method));
     content.push(``);
@@ -34,7 +34,7 @@ export const methodsToMarkdown = (methods: d.JsonDocsMethod[]) => {
     if (method.returns) {
       content.push(`#### Returns`);
       content.push(``);
-      content.push(`Type: \`${method.returns.type}\``);
+      content.push(`Type: <code>${method.returns.type}</code>`);
       content.push(``);
       content.push(method.returns.docs);
       content.push(``);

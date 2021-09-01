@@ -15,7 +15,7 @@ export const eventsToMarkdown = (events: d.JsonDocsEvent[]) => {
   table.addHeader(['Event', 'Description', 'Type']);
 
   events.forEach((ev) => {
-    table.addRow([`\`${ev.event}\``, getDocsField(ev), `\`CustomEvent<${ev.detail}>\``]);
+    table.addRow([`<code>${ev.event}</code>`, getDocsField(ev), `<code>CustomEvent<${ev.detail}></code>`]);
   });
 
   content.push(...table.toMarkdown());
