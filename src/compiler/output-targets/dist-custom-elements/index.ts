@@ -124,13 +124,10 @@ const addCustomElementInputs = (
         def.push({tagName: foundDep.tagName, exportName, importAs, meta });
       });
 
-      const c: string[] = [`const components = [`];
-      const c2: string[] = def.map(defItm => `'${defItm.tagName}', `);
-      c.push(c2.join(''), `];`);
-
       const s: string[] = [
+        `const components = [` + def.map(defItm => `'${defItm.tagName}', `).join('') + `];`,
         ``,
-        `export const defineCustomElements = (tagRename) => {`,
+        `export const defineCustomElement = (tagRename) => {`,
         `    let tagName`,
         `    components.forEach(cmp => {`,
         `        switch(cmp) {`
@@ -157,7 +154,6 @@ const addCustomElementInputs = (
         `}`
       ];
 
-      exp.push(c.join(''));
       exp.push(s.join('\n'));
       exp.push(m.join('\n'));
       exp.push(e.join('\n'));
