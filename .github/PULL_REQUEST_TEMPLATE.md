@@ -8,7 +8,7 @@ Please check if your PR fulfills the following requirements:
 - [ ] Build (`npm run build`) was run locally and any changes were pushed
 - [ ] Unit tests (`npm test`) were run locally and passed
 - [ ] E2E Tests (`npm run test.karma.prod`) were run locally and passed
-- [ ] Prettier (`npm run format`) was run locally and passed
+- [ ] Prettier (`npm run prettier`) was run locally and passed
 
 ## Pull request type
 
