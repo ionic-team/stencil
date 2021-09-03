@@ -25,12 +25,16 @@ closeAndLock:
   dryRun: false
 
 noReply:
+  days: 30
   maxIssuesPerRun: 100
   includePullRequests: false
   label: Awaiting Reply
   responseLabel: Reply Received
   close: false
   lock: false
+  message: >
+    Hey there! Just a friendly reminder that the Stencil team would like some additional
+    input on this issue. Thanks!
   dryRun: false
 
 stale:
