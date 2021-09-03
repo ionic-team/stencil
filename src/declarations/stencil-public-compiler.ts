@@ -293,6 +293,12 @@ export interface ConfigExtras {
   scriptDataOpts?: boolean;
 
   /**
+   * Experimental flag to align the behavior of invoking `textContent` on a scoped component to act more like a
+   * component that uses the shadow DOM. Defaults to `false`
+   */
+  scopedSlotTextContentFix?: boolean;
+
+  /**
    * If enabled `true`, the runtime will check if the shadow dom shim is required. However,
    * if it's determined that shadow dom is already natively supported by the browser then
    * it does not request the shim. When set to `false` it will avoid all shadow dom tests.

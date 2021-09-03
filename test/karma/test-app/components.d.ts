@@ -47,6 +47,8 @@ export namespace Components {
     }
     interface BuildData {
     }
+    interface CmpLabel {
+    }
     interface ConditionalBasic {
     }
     interface ConditionalRerender {
@@ -354,6 +356,12 @@ declare global {
     var HTMLBuildDataElement: {
         prototype: HTMLBuildDataElement;
         new (): HTMLBuildDataElement;
+    };
+    interface HTMLCmpLabelElement extends Components.CmpLabel, HTMLStencilElement {
+    }
+    var HTMLCmpLabelElement: {
+        prototype: HTMLCmpLabelElement;
+        new (): HTMLCmpLabelElement;
     };
     interface HTMLConditionalBasicElement extends Components.ConditionalBasic, HTMLStencilElement {
     }
@@ -990,6 +998,7 @@ declare global {
         "attribute-html-root": HTMLAttributeHtmlRootElement;
         "bad-shared-jsx": HTMLBadSharedJsxElement;
         "build-data": HTMLBuildDataElement;
+        "cmp-label": HTMLCmpLabelElement;
         "conditional-basic": HTMLConditionalBasicElement;
         "conditional-rerender": HTMLConditionalRerenderElement;
         "conditional-rerender-root": HTMLConditionalRerenderRootElement;
@@ -1134,6 +1143,8 @@ declare namespace LocalJSX {
     interface BadSharedJsx {
     }
     interface BuildData {
+    }
+    interface CmpLabel {
     }
     interface ConditionalBasic {
     }
@@ -1399,6 +1410,7 @@ declare namespace LocalJSX {
         "attribute-html-root": AttributeHtmlRoot;
         "bad-shared-jsx": BadSharedJsx;
         "build-data": BuildData;
+        "cmp-label": CmpLabel;
         "conditional-basic": ConditionalBasic;
         "conditional-rerender": ConditionalRerender;
         "conditional-rerender-root": ConditionalRerenderRoot;
@@ -1519,6 +1531,7 @@ declare module "@stencil/core" {
             "attribute-html-root": LocalJSX.AttributeHtmlRoot & JSXBase.HTMLAttributes<HTMLAttributeHtmlRootElement>;
             "bad-shared-jsx": LocalJSX.BadSharedJsx & JSXBase.HTMLAttributes<HTMLBadSharedJsxElement>;
             "build-data": LocalJSX.BuildData & JSXBase.HTMLAttributes<HTMLBuildDataElement>;
+            "cmp-label": LocalJSX.CmpLabel & JSXBase.HTMLAttributes<HTMLCmpLabelElement>;
             "conditional-basic": LocalJSX.ConditionalBasic & JSXBase.HTMLAttributes<HTMLConditionalBasicElement>;
             "conditional-rerender": LocalJSX.ConditionalRerender & JSXBase.HTMLAttributes<HTMLConditionalRerenderElement>;
             "conditional-rerender-root": LocalJSX.ConditionalRerenderRoot & JSXBase.HTMLAttributes<HTMLConditionalRerenderRootElement>;
