@@ -24,12 +24,22 @@ closeAndLock:
   lock: true
   dryRun: false
 
+noReply:
+  maxIssuesPerRun: 100
+  includePullRequests: false
+  label: Awaiting Reply
+  responseLabel: Reply Received
+  close: false
+  lock: false
+  dryRun: false
+
 stale:
-  days: 30
+  days: 180
   maxIssuesPerRun: 100
   exemptLabels:
-    - help wanted
     - good first issue
+    - help wanted
+    - Reply Received
     - triage
   exemptAssigned: true
   exemptProjects: true
