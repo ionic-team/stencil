@@ -1,4 +1,17 @@
+# 🎲 [2.8.0](https://github.com/ionic-team/stencil/compare/v2.7.1...v2.8.0) (2021-09-01)
+
+### Bug Fixes
+
+* **types:** add referrerPolicy to AnchorHTMLAttributes ([#3006](https://github.com/ionic-team/stencil/issues/3006)) ([4f7c073](https://github.com/ionic-team/stencil/commit/4f7c073311192c8601bcedcacc9e8daef2b349e3))
+* **docs:** update app-es5-disabled.ts message ([#2993](https://github.com/ionic-team/stencil/issues/2993)) ([4f7c073](https://github.com/ionic-team/stencil/commit/a6ebc51fd71a98898d99cde45c9e5a14585a44c7))
+
+### Features
+
+* **compiler:** allow disabling the injected hydration stylesheet ([#2989](https://github.com/ionic-team/stencil/issues/2989)) ([a3d2928](https://github.com/ionic-team/stencil/commit/a3d2928dbc31b786aa273020b88f09d107b05474))
+
 ## 🐔 [2.7.1](https://github.com/ionic-team/stencil/compare/v2.7-0...v2.7.1) (2021-08-24)
+
+### Bug Fixes
 
 * **ci:** vendor deno for builds ([#3020](https://github.com/ionic-team/stencil/issues/3020)) ([6d8a61d](https://github.com/ionic-team/stencil/commit/6d8a61d166859ca165d85b7c7cea35b99acc53ee))
 * **compiler:** solve issue where worker thread didn't have access to fetch ([#3012](https://github.com/ionic-team/stencil/issues/3012)) ([925d4e9](https://github.com/ionic-team/stencil/commit/925d4e924264df424c3519f4c0a91b22356a2ea6))
