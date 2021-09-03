@@ -34,7 +34,7 @@ noReply:
   lock: false
   message: >
     Hey there! Just a friendly reminder that the Stencil team would like some additional
-    input on this issue. Thanks!
+    input on this issue. Thank you!
   dryRun: false
 
 stale:
