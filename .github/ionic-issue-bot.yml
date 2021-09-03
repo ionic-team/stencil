@@ -34,7 +34,7 @@ noReply:
   dryRun: false
 
 stale:
-  days: 30
+  days: 180
   maxIssuesPerRun: 100
   exemptLabels:
     - good first issue
