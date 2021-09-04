@@ -1,0 +1,10 @@
+contact_links:
+  - name: 📚 Documentation
+    url: https://github.com/ionic-team/stencil-site/issues/new/choose
+    about: This issue tracker is not for documentation issues. Please file documentation issues on the Stencil site repo.
+  - name: 💻 Create Stencil CLI
+    url: https://github.com/ionic-team/create-stencil/issues/new/choose
+    about: This issue tracker is not for Create Stencil CLI issues. Please file CLI issues on the Create Stencil CLI repo.
+  - name: 🤔 Support Question
+    url: https://forum.ionicframework.com/
+    about: This issue tracker is not for support questions. Please post your question on the Ionic Forums.
