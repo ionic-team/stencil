@@ -2,9 +2,7 @@ import { Component, h, Prop, ComponentInterface, setErrorHandler } from '@stenci
 import { newSpecPage } from '@stencil/core/testing';
 
 describe('component error handling', () => {
-
   it('calls a handler with an error and element during every lifecycle hook and render', async () => {
-
     @Component({ tag: 'cmp-a' })
     class CmpA implements ComponentInterface {
       @Prop() reRender = false;
@@ -41,10 +39,15 @@ describe('component error handling', () => {
 
     const customErrorHandler = (e: Error, el: HTMLElement) => {
       if (!el) return;
-      el.dispatchEvent(new CustomEvent('componentError', {
-        bubbles: true, cancelable: true, composed: true, detail: e
-      }));
-    }
+      el.dispatchEvent(
+        new CustomEvent('componentError', {
+          bubbles: true,
+          cancelable: true,
+          composed: true,
+          detail: e,
+        })
+      );
+    };
     setErrorHandler(customErrorHandler);
 
     const { doc, waitForChanges } = await newSpecPage({
@@ -56,10 +59,14 @@ describe('component error handling', () => {
     doc.addEventListener('componentError', handler);
     const cmpA = document.createElement('cmp-a') as any;
     doc.body.appendChild(cmpA);
-    try { await waitForChanges(); } catch(e) {}
+    try {
+      await waitForChanges();
+    } catch (e) {}
 
     cmpA.reRender = true;
-    try { await waitForChanges(); } catch(e) {}
+    try {
+      await waitForChanges();
+    } catch (e) {}
 
     return Promise.resolve().then(() => {
       expect(handler).toHaveBeenCalledTimes(9);
@@ -74,6 +81,6 @@ describe('component error handling', () => {
       expect(handler.mock.calls[6][0].detail).toStrictEqual(Error('render'));
       expect(handler.mock.calls[7][0].detail).toStrictEqual(Error('componentDidRender'));
       expect(handler.mock.calls[8][0].detail).toStrictEqual(Error('componentDidUpdate'));
-    })
+    });
   });
 });

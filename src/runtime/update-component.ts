@@ -302,7 +302,12 @@ export const appDidLoad = (who: string) => {
   }
 };
 
-export const safeCall = (instance: d.ComponentInterface, method: keyof d.ComponentInterface, arg?: any, elm?: HTMLElement) => {
+export const safeCall = (
+  instance: d.ComponentInterface,
+  method: keyof d.ComponentInterface,
+  arg?: any,
+  elm?: HTMLElement
+) => {
   if (instance && instance[method]) {
     try {
       return instance[method](arg);
