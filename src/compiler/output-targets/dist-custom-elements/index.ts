@@ -116,12 +116,10 @@ const addCustomElementInputs = (
       cmp.dependencies.forEach(dCmp => {
         const foundDep = components.find(dComp => dComp.tagName === dCmp);
         const exportName = dashToPascalCase(foundDep.tagName);
-        const importName = foundDep.componentClassName;
-        const importAs = `$Cmp${exportName}`;
-        const meta = stringifyRuntimeData(formatComponentRuntimeMeta(cmp, false));
+        const importAs = `$${exportName}DefineCustomElement`;
 
-        exp.push(`import { ${importName} as ${importAs} } from '${foundDep.sourceFilePath}';`);
-        def.push({tagName: foundDep.tagName, exportName, importAs, meta });
+        exp.push(`import { defineCustomElement as ${importAs} } from '${foundDep.sourceFilePath}';`);
+        def.push({tagName: foundDep.tagName, exportName, importAs });
       });
 
       const s: string[] = [
@@ -141,8 +139,7 @@ const addCustomElementInputs = (
           `                    tagName = tagRename(tagName);`,
           `                }`,
           `                if (!customElements.get(tagName)) {`,
-          `                    ${defItm.importAs ? `const ${defItm.exportName} = /*@__PURE__*/proxyCustomElement(${defItm.importAs}, ${defItm.meta});` : ``}`,
-          `                    customElements.define(tagName, ${defItm.exportName});`,
+          `                    ${defItm.importAs ? `${defItm.importAs}()` : `customElements.define(tagName, ${defItm.exportName});`}`,
           `                }`,
           `                break;`
         ];
