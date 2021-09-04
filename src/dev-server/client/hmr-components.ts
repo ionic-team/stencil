@@ -4,7 +4,7 @@ import { setHmrAttr, hasShadowRoot } from './hmr-util';
 export const hmrComponents = (elm: Element, versionId: string, hmrTagNames: string[]) => {
   const updatedTags: string[] = [];
 
-  hmrTagNames.forEach(hmrTagName => {
+  hmrTagNames.forEach((hmrTagName) => {
     hmrComponent(updatedTags, elm, versionId, hmrTagName);
   });
 

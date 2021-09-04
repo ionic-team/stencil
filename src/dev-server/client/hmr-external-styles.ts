@@ -2,7 +2,7 @@ import { isLinkStylesheet, isTemplate, getHmrHref, setHmrAttr, hasShadowRoot } f
 
 export const hmrExternalStyles = (elm: Element, versionId: string, cssFileNames: string[]) => {
   if (isLinkStylesheet(elm)) {
-    cssFileNames.forEach(cssFileName => {
+    cssFileNames.forEach((cssFileName) => {
       hmrStylesheetLink(elm as HTMLLinkElement, versionId, cssFileName);
     });
   }

@@ -9,7 +9,7 @@ export async function ssrPageRequest(
   devServerConfig: d.DevServerConfig,
   serverCtx: d.DevServerContext,
   req: d.HttpRequest,
-  res: ServerResponse,
+  res: ServerResponse
 ) {
   try {
     let status = 500;
@@ -17,7 +17,7 @@ export async function ssrPageRequest(
 
     const { hydrateApp, srcIndexHtml, diagnostics } = await setupHydrateApp(devServerConfig, serverCtx);
 
-    if (!diagnostics.some(diagnostic => diagnostic.level === 'error')) {
+    if (!diagnostics.some((diagnostic) => diagnostic.level === 'error')) {
       try {
         const opts = getSsrHydrateOptions(devServerConfig, serverCtx, req.url);
 
@@ -31,7 +31,7 @@ export async function ssrPageRequest(
       }
     }
 
-    if (diagnostics.some(diagnostic => diagnostic.level === 'error')) {
+    if (diagnostics.some((diagnostic) => diagnostic.level === 'error')) {
       content = getSsrErrorContent(diagnostics);
       status = 500;
     }
@@ -47,7 +47,7 @@ export async function ssrPageRequest(
       responseHeaders({
         'content-type': 'text/html; charset=utf-8',
         'content-length': Buffer.byteLength(content, 'utf8'),
-      }),
+      })
     );
     res.write(content);
     res.end();
@@ -60,7 +60,7 @@ export async function ssrStaticDataRequest(
   devServerConfig: d.DevServerConfig,
   serverCtx: d.DevServerContext,
   req: d.HttpRequest,
-  res: ServerResponse,
+  res: ServerResponse
 ) {
   try {
     const data: any = {};
@@ -68,7 +68,7 @@ export async function ssrStaticDataRequest(
 
     const { hydrateApp, srcIndexHtml, diagnostics } = await setupHydrateApp(devServerConfig, serverCtx);
 
-    if (!diagnostics.some(diagnostic => diagnostic.level === 'error')) {
+    if (!diagnostics.some((diagnostic) => diagnostic.level === 'error')) {
       try {
         const { ssrPath, hasQueryString } = getSsrStaticDataPath(req);
         const url = new URL(ssrPath, req.url);
@@ -79,14 +79,14 @@ export async function ssrStaticDataRequest(
 
         diagnostics.push(...ssrResults.diagnostics);
 
-        ssrResults.staticData.forEach(s => {
+        ssrResults.staticData.forEach((s) => {
           if (s.type === 'application/json') {
             data[s.id] = JSON.parse(s.content);
           } else {
             data[s.id] = s.content;
           }
         });
-        data.components = ssrResults.components.map(c => c.tag).sort();
+        data.components = ssrResults.components.map((c) => c.tag).sort();
         httpCache = hasQueryString;
       } catch (e) {
         catchError(diagnostics, e);
@@ -97,7 +97,7 @@ export async function ssrStaticDataRequest(
       data.diagnostics = diagnostics;
     }
 
-    const status = diagnostics.some(diagnostic => diagnostic.level === 'error') ? 500 : 200;
+    const status = diagnostics.some((diagnostic) => diagnostic.level === 'error') ? 500 : 200;
     const content = JSON.stringify(data);
     serverCtx.logRequest(req, status);
 
@@ -108,8 +108,8 @@ export async function ssrStaticDataRequest(
           'content-type': 'application/json; charset=utf-8',
           'content-length': Buffer.byteLength(content, 'utf8'),
         },
-        httpCache && status === 200,
-      ),
+        httpCache && status === 200
+      )
     );
     res.write(content);
     res.end();
@@ -226,11 +226,11 @@ function getSsrErrorContent(diagnostics: d.Diagnostic[]) {
 <body>
   <h1>SSR Dev Error</h1>
   ${diagnostics.map(
-    diagnostic => `
+    (diagnostic) => `
   <p>
     ${diagnostic.messageText}
   </p>
-  `,
+  `
   )}
 </body>
 </html>`;

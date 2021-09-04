@@ -10,7 +10,7 @@ import { emitEvent } from './event-emitter';
 
 export const attachToAncestor = (hostRef: d.HostRef, ancestorComponent: d.HostElement) => {
   if (BUILD.asyncLoading && ancestorComponent && !hostRef.$onRenderResolve$ && ancestorComponent['s-p']) {
-    ancestorComponent['s-p'].push(new Promise(r => (hostRef.$onRenderResolve$ = r)));
+    ancestorComponent['s-p'].push(new Promise((r) => (hostRef.$onRenderResolve$ = r)));
   }
 };
 
@@ -116,7 +116,7 @@ const updateComponent = async (hostRef: d.HostRef, instance: any, isInitialLoad:
     // ok, so turns out there are some child host elements
     // waiting on this parent element to load
     // let's fire off all update callbacks waiting
-    rc.map(cb => cb());
+    rc.map((cb) => cb());
     elm['s-rc'] = undefined;
   }
 
@@ -166,7 +166,7 @@ const callRender = (hostRef: d.HostRef, instance: any, elm: HTMLElement) => {
         // or we need to update the css class/attrs on the host element
         // DOM WRITE!
         if (BUILD.hydrateServerSide) {
-          return Promise.resolve(instance).then(value => renderVdom(hostRef, value))
+          return Promise.resolve(instance).then((value) => renderVdom(hostRef, value));
         } else {
           renderVdom(hostRef, instance);
         }
@@ -274,7 +274,10 @@ export const forceUpdate = (ref: any) => {
   if (BUILD.updatable) {
     const hostRef = getHostRef(ref);
     const isConnected = hostRef.$hostElement$.isConnected;
-    if (isConnected && (hostRef.$flags$ & (HOST_FLAGS.hasRendered | HOST_FLAGS.isQueuedForUpdate)) === HOST_FLAGS.hasRendered) {
+    if (
+      isConnected &&
+      (hostRef.$flags$ & (HOST_FLAGS.hasRendered | HOST_FLAGS.isQueuedForUpdate)) === HOST_FLAGS.hasRendered
+    ) {
       scheduleUpdate(hostRef, false);
     }
     // Returns "true" when the forced update was successfully scheduled
@@ -299,7 +302,12 @@ export const appDidLoad = (who: string) => {
   }
 };
 
-export const safeCall = (instance: d.ComponentInterface, method: keyof d.ComponentInterface, arg?: any, elm?: HTMLElement) => {
+export const safeCall = (
+  instance: d.ComponentInterface,
+  method: keyof d.ComponentInterface,
+  arg?: any,
+  elm?: HTMLElement
+) => {
   if (instance && instance[method]) {
     try {
       return instance[method](arg);
@@ -326,7 +334,12 @@ const emitLifecycleEvent = (elm: EventTarget, lifecycleName: string) => {
   }
 };
 
-const addHydratedFlag = (elm: Element) => (BUILD.hydratedClass ? elm.classList.add('hydrated') : BUILD.hydratedAttribute ? elm.setAttribute('hydrated', '') : undefined);
+const addHydratedFlag = (elm: Element) =>
+  BUILD.hydratedClass
+    ? elm.classList.add('hydrated')
+    : BUILD.hydratedAttribute
+    ? elm.setAttribute('hydrated', '')
+    : undefined;
 
 const serverSideConnected = (elm: any) => {
   const children = elm.children;

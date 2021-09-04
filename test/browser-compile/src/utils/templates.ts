@@ -1,16 +1,11 @@
-
-
 export interface QuickTemplate {
   source: string;
   html: string;
 }
 export const templates = new Map<string, QuickTemplate>();
 
-
-
 templates.set(`hello-world.tsx`, {
-
-source:  `
+  source: `
 import { Component } from '@stencil/core';
 
 @Component({
@@ -24,15 +19,13 @@ export class HelloWorld {
 
 }
 `,
-html: `
+  html: `
 <hello-world></hello-world>
-`
+`,
 });
 
-
-
 templates.set(`properties.tsx`, {
-source: `
+  source: `
 
 import { Component, Prop, h } from '@stencil/core';
 
@@ -53,14 +46,13 @@ export class MyName {
 }
 
 `,
-html: `
+  html: `
 <my-name first="Stencil" last="JS"></my-name>
-`});
-
-
+`,
+});
 
 templates.set(`shadow-inline-styles.tsx`, {
-source: `
+  source: `
 
 import { Component, Prop, h } from '@stencil/core';
 
@@ -82,15 +74,13 @@ export class MyButton {
 }
 
 `,
-html: `
+  html: `
 <my-button>Shadow / Inline Styles</my-button>
-`
+`,
 });
 
-
-
 templates.set(`scoped-inline-styles.tsx`, {
-source: `
+  source: `
 
 import { Component, Prop, h } from '@stencil/core';
 
@@ -112,15 +102,13 @@ export class MyButton {
 }
 
 `,
-html: `
+  html: `
 <my-button>Scoped / Inline Styles</my-button>
-`
+`,
 });
 
-
-
 templates.set(`style-esm-import.tsx`, {
-source: `
+  source: `
 
 import { Component, Prop, h } from '@stencil/core';
 import styleEsmImport from './style-import.css';
@@ -142,14 +130,13 @@ export class MyButton {
 }
 
 `,
-html: `
+  html: `
 <my-button>Style ESM Import</my-button>
-`
+`,
 });
 
-
 templates.set(`style-local-const.tsx`, {
-source: `
+  source: `
 
 import { Component, Prop, h } from '@stencil/core';
 const styleLocal = ':host { display: block; padding: 20px; background: #ddd; } :host::before { content: "styleLocal"; position: absolute; left: 0; top: 0; } button { font-size: 24px; background: maroon; color: white; font-weight: bold; }';
@@ -172,15 +159,13 @@ export class MyButton {
 }
 
 `,
-html: `
+  html: `
 <my-button>Style Local Const</my-button>
-`
+`,
 });
 
-
-
 templates.set(`style-url.tsx`, {
-source: `
+  source: `
 
 import { Component, Prop, h } from '@stencil/core';
 
@@ -201,11 +186,10 @@ export class MyButton {
 }
 
 `,
-html: `
+  html: `
 <my-button>Style Url</my-button>
-`
+`,
 });
-
 
 templates.set(`scoped-style-url.tsx`, {
   source: `
@@ -232,13 +216,11 @@ templates.set(`scoped-style-url.tsx`, {
   `,
   html: `
   <my-button>Scoped Style Url</my-button>
-  `
-  });
-
-
+  `,
+});
 
 templates.set(`shadow-modes.tsx`, {
-source: `
+  source: `
 
 import { Component, Prop, h, setMode } from '@stencil/core';
 
@@ -267,15 +249,14 @@ export class MyButton {
 }
 
 `,
-html: `
+  html: `
 <my-button mode="ios">ios Shadow Url - Blue</my-button>
 <my-button mode="md">md Shadow Url - Green</my-button>
-`
+`,
 });
 
-
 templates.set(`scoped-modes.tsx`, {
-source: `
+  source: `
 
 import { Component, Prop, h, setMode } from '@stencil/core';
 
@@ -304,15 +285,14 @@ export class MyButton {
 }
 
 `,
-html: `
+  html: `
 <my-button mode="ios">ios Scoped Url - Blue</my-button>
 <my-button mode="md">md Scoped Url - Green</my-button>
-`
+`,
 });
 
 templates.set(`my-css.css`, {
-
-source:  `
+  source: `
 @import "some-import.css";
 body {
   background: gray;
@@ -321,8 +301,7 @@ header div > span.panic {
   color: red;
 }
 `,
-html: ``
+  html: ``,
 });
-
 
 export const templateList = Array.from(templates).map(([fileName]) => fileName);

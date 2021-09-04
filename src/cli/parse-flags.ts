@@ -20,7 +20,7 @@ export const parseFlags = (args: string[], sys?: CompilerSystem): ConfigFlags =>
     const envArgs = getNpmConfigEnvArgs(sys);
     parseArgs(flags, envArgs, flags.knownArgs);
 
-    envArgs.forEach(envArg => {
+    envArgs.forEach((envArg) => {
       if (!flags.args.includes(envArg)) {
         flags.args.push(envArg);
       }
@@ -42,7 +42,7 @@ export const parseFlags = (args: string[], sys?: CompilerSystem): ConfigFlags =>
 };
 
 const parseArgs = (flags: any, args: string[], knownArgs: string[]) => {
-  ARG_OPTS.boolean.forEach(booleanName => {
+  ARG_OPTS.boolean.forEach((booleanName) => {
     const alias = (ARG_OPTS.alias as any)[booleanName];
     const flagKey = configCase(booleanName);
 
@@ -50,7 +50,7 @@ const parseArgs = (flags: any, args: string[], knownArgs: string[]) => {
       flags[flagKey] = null;
     }
 
-    args.forEach(cmdArg => {
+    args.forEach((cmdArg) => {
       if (cmdArg === `--${booleanName}`) {
         flags[flagKey] = true;
         knownArgs.push(cmdArg);
@@ -70,7 +70,7 @@ const parseArgs = (flags: any, args: string[], knownArgs: string[]) => {
     });
   });
 
-  ARG_OPTS.string.forEach(stringName => {
+  ARG_OPTS.string.forEach((stringName) => {
     const alias = (ARG_OPTS.alias as any)[stringName];
     const flagKey = configCase(stringName);
 
@@ -113,7 +113,7 @@ const parseArgs = (flags: any, args: string[], knownArgs: string[]) => {
     }
   });
 
-  ARG_OPTS.number.forEach(numberName => {
+  ARG_OPTS.number.forEach((numberName) => {
     const alias = (ARG_OPTS.alias as any)[numberName];
     const flagKey = configCase(numberName);
 

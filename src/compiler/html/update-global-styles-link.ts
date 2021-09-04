@@ -2,7 +2,12 @@ import type * as d from '../../declarations';
 import { getAbsoluteBuildDir } from './html-utils';
 import { join } from 'path';
 
-export const updateGlobalStylesLink = (config: d.Config, doc: Document, globalScriptFilename: string, outputTarget: d.OutputTargetWww) => {
+export const updateGlobalStylesLink = (
+  config: d.Config,
+  doc: Document,
+  globalScriptFilename: string,
+  outputTarget: d.OutputTargetWww
+) => {
   if (!globalScriptFilename) {
     return;
   }
@@ -15,7 +20,7 @@ export const updateGlobalStylesLink = (config: d.Config, doc: Document, globalSc
 
   const replacer = new RegExp(escapeRegExp(originalPath) + '$');
 
-  Array.from(doc.querySelectorAll('link')).forEach(link => {
+  Array.from(doc.querySelectorAll('link')).forEach((link) => {
     const href = link.getAttribute('href');
     if (href) {
       const newHref = href.replace(replacer, newPath);

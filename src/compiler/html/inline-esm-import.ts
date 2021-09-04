@@ -6,13 +6,19 @@ import { isString } from '@utils';
 import { join } from 'path';
 import ts from 'typescript';
 
-export const optimizeEsmImport = async (config: d.Config, compilerCtx: d.CompilerCtx, doc: Document, outputTarget: d.OutputTargetWww) => {
+export const optimizeEsmImport = async (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  doc: Document,
+  outputTarget: d.OutputTargetWww
+) => {
   const resourcesUrl = getAbsoluteBuildDir(outputTarget);
   const entryFilename = `${config.fsNamespace}.esm.js`;
   const expectedSrc = join(resourcesUrl, entryFilename);
 
   const script = Array.from(doc.querySelectorAll('script')).find(
-    s => s.getAttribute('type') === 'module' && !s.hasAttribute('crossorigin') && s.getAttribute('src') === expectedSrc,
+    (s) =>
+      s.getAttribute('type') === 'module' && !s.hasAttribute('crossorigin') && s.getAttribute('src') === expectedSrc
   );
 
   if (!script) {
@@ -54,7 +60,7 @@ export const updateImportPaths = (code: string, newDir: string) => {
   const tsSourceFile = ts.createSourceFile('module.ts', code, ts.ScriptTarget.Latest);
   ts.transform(tsSourceFile, [readImportPaths(orgImportPaths)]);
 
-  orgImportPaths.forEach(orgImportPath => {
+  orgImportPaths.forEach((orgImportPath) => {
     const newPath = replacePathDir(orgImportPath, newDir);
     if (newPath) {
       code = code.replace(`"${orgImportPath}"`, `"${newPath}"`);
@@ -77,13 +83,13 @@ const replacePathDir = (orgImportPath: string, newDir: string) => {
 
 const readImportPaths = (orgImportPaths: string[]): ts.TransformerFactory<ts.SourceFile> => {
   return () => {
-    return tsSourceFile => {
+    return (tsSourceFile) => {
       const importStatements = tsSourceFile.statements
         .filter(ts.isImportDeclaration)
-        .filter(s => s.moduleSpecifier != null)
-        .filter(s => ts.isStringLiteral(s.moduleSpecifier) && s.moduleSpecifier.text);
+        .filter((s) => s.moduleSpecifier != null)
+        .filter((s) => ts.isStringLiteral(s.moduleSpecifier) && s.moduleSpecifier.text);
 
-      importStatements.forEach(s => {
+      importStatements.forEach((s) => {
         if (ts.isStringLiteral(s.moduleSpecifier)) {
           orgImportPaths.push(s.moduleSpecifier.text);
         }

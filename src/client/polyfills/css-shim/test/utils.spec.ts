@@ -122,7 +122,7 @@ describe('utils', () => {
           value: 'value',
           important: false,
         },
-        { '--variable': 'value' },
+        { '--variable': 'value' }
       );
 
       testDeclaration(declarations[2], {

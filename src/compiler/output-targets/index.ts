@@ -16,8 +16,8 @@ export const generateOutputTargets = async (config: d.Config, compilerCtx: d.Com
   const timeSpan = buildCtx.createTimeSpan('generate outputs started', true);
 
   const changedModuleFiles = Array.from(compilerCtx.changedModules)
-    .map(filename => compilerCtx.moduleMap.get(filename))
-    .filter(mod => mod && !mod.isCollectionDependency);
+    .map((filename) => compilerCtx.moduleMap.get(filename))
+    .filter((mod) => mod && !mod.isCollectionDependency);
 
   compilerCtx.changedModules.clear();
 
@@ -46,8 +46,8 @@ export const generateOutputTargets = async (config: d.Config, compilerCtx: d.Com
 const invalidateRollupCaches = (compilerCtx: d.CompilerCtx) => {
   const invalidatedIds = compilerCtx.changedFiles;
   compilerCtx.rollupCache.forEach((cache: RollupCache) => {
-    cache.modules.forEach(mod => {
-      if (mod.transformDependencies.some(id => invalidatedIds.has(id))) {
+    cache.modules.forEach((mod) => {
+      if (mod.transformDependencies.some((id) => invalidatedIds.has(id))) {
         mod.originalCode = null;
       }
     });

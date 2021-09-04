@@ -15,7 +15,7 @@ export const validateStats = (userConfig: d.Config, userOutputs: d.OutputTarget[
   }
 
   outputTargets.push(...userOutputs.filter(isOutputTargetStats));
-  outputTargets.forEach(outputTarget => {
+  outputTargets.forEach((outputTarget) => {
     if (!outputTarget.file) {
       outputTarget.file = 'stencil-stats.json';
     }

@@ -38,14 +38,14 @@ xdescribe('plugin', () => {
         }
       `,
       },
-      { clearFileCache: true },
+      { clearFileCache: true }
     );
     await compiler.fs.commit();
 
     function myPlugin() {
       return {
         transform: function (sourceText: string) {
-          return new Promise(resolve => {
+          return new Promise((resolve) => {
             sourceText += `\nconsole.log('transformed!')`;
             resolve(sourceText);
           });
@@ -72,7 +72,7 @@ xdescribe('plugin', () => {
         }
       `,
       },
-      { clearFileCache: true },
+      { clearFileCache: true }
     );
     await compiler.fs.commit();
 
@@ -114,7 +114,7 @@ xdescribe('plugin', () => {
         }
       `,
       },
-      { clearFileCache: true },
+      { clearFileCache: true }
     );
     await compiler.fs.commit();
 
@@ -158,7 +158,7 @@ xdescribe('plugin', () => {
         }
       `,
       },
-      { clearFileCache: true },
+      { clearFileCache: true }
     );
     await compiler.fs.commit();
 

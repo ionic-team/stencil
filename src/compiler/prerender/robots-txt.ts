@@ -51,7 +51,7 @@ export const generateRobotsTxt = async (manager: d.PrerenderManager, sitemapResu
     }
 
     const lines = results.content.replace(/\r/g, '\n').split('\n');
-    results.content = lines.map(l => l.trim()).join('\n');
+    results.content = lines.map((l) => l.trim()).join('\n');
 
     if (typeof results.filePath !== 'string') {
       results.filePath = join(manager.outputTarget.dir, `robots.txt`);

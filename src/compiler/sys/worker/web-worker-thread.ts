@@ -67,7 +67,7 @@ export const initWebWorkerThread = (msgHandler: WorkerMsgHandler) => {
     }
   };
 
-  self.onerror = e => {
+  self.onerror = (e) => {
     // uncaught error occurred on the worker thread
     error(-1, e);
   };

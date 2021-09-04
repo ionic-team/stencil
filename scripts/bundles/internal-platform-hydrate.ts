@@ -20,7 +20,8 @@ export async function internalHydrate(opts: BuildOptions) {
   // write @stencil/core/internal/hydrate/package.json
   writePkgJson(opts, outputInternalHydrateDir, {
     name: '@stencil/core/internal/hydrate',
-    description: 'Stencil internal hydrate platform to be imported by the Stencil Compiler. Breaking changes can and will happen at any time.',
+    description:
+      'Stencil internal hydrate platform to be imported by the Stencil Compiler. Breaking changes can and will happen at any time.',
     main: 'index.js',
   });
 

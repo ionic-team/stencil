@@ -11,7 +11,7 @@ export async function denoCopyTasks(deno: typeof Deno, copyTasks: Required<d.Cop
   };
 
   try {
-    copyTasks = flatOne(await Promise.all(copyTasks.map(task => processGlobs(task, srcDir))));
+    copyTasks = flatOne(await Promise.all(copyTasks.map((task) => processGlobs(task, srcDir))));
 
     const allCopyTasks: d.CopyTask[] = [];
 
@@ -20,20 +20,20 @@ export async function denoCopyTasks(deno: typeof Deno, copyTasks: Required<d.Cop
     while (copyTasks.length > 0) {
       const tasks = copyTasks.splice(0, 100);
 
-      await Promise.all(tasks.map(copyTask => processCopyTask(deno, results, allCopyTasks, copyTask)));
+      await Promise.all(tasks.map((copyTask) => processCopyTask(deno, results, allCopyTasks, copyTask)));
     }
 
     // figure out which directories we'll need to make first
     const mkDirs = ensureDirs(allCopyTasks);
 
     try {
-      await Promise.all(mkDirs.map(dir => deno.mkdir(dir, { recursive: true })));
+      await Promise.all(mkDirs.map((dir) => deno.mkdir(dir, { recursive: true })));
     } catch (mkDirErr) {}
 
     while (allCopyTasks.length > 0) {
       const tasks = allCopyTasks.splice(0, 100);
 
-      await Promise.all(tasks.map(copyTask => deno.copyFile(copyTask.src, copyTask.dest)));
+      await Promise.all(tasks.map((copyTask) => deno.copyFile(copyTask.src, copyTask.dest)));
     }
   } catch (e) {
     catchError(results.diagnostics, e);
@@ -82,7 +82,12 @@ function createGlobCopyTask(copyTask: Required<d.CopyTask>, srcDir: string, glob
   };
 }
 
-async function processCopyTask(deno: typeof Deno, results: d.CopyResults, allCopyTasks: d.CopyTask[], copyTask: d.CopyTask) {
+async function processCopyTask(
+  deno: typeof Deno,
+  results: d.CopyResults,
+  allCopyTasks: d.CopyTask[],
+  copyTask: d.CopyTask
+) {
   try {
     copyTask.src = normalizePath(copyTask.src);
     copyTask.dest = normalizePath(copyTask.dest);
@@ -112,7 +117,12 @@ async function processCopyTask(deno: typeof Deno, results: d.CopyResults, allCop
   }
 }
 
-async function processCopyTaskDirectory(deno: typeof Deno, results: d.CopyResults, allCopyTasks: d.CopyTask[], copyTask: d.CopyTask) {
+async function processCopyTaskDirectory(
+  deno: typeof Deno,
+  results: d.CopyResults,
+  allCopyTasks: d.CopyTask[],
+  copyTask: d.CopyTask
+) {
   try {
     for await (const dirEntry of deno.readDir(copyTask.src)) {
       const subCopyTask: d.CopyTask = {
@@ -131,7 +141,7 @@ async function processCopyTaskDirectory(deno: typeof Deno, results: d.CopyResult
 function ensureDirs(copyTasks: d.CopyTask[]) {
   const mkDirs: string[] = [];
 
-  copyTasks.forEach(copyTask => {
+  copyTasks.forEach((copyTask) => {
     addMkDir(mkDirs, dirname(copyTask.dest));
   });
 
@@ -165,7 +175,7 @@ const ROOT_DIR = normalizePath(resolve('/'));
 
 function shouldIgnore(filePath: string) {
   filePath = filePath.trim().toLowerCase();
-  return IGNORE.some(ignoreFile => filePath.endsWith(ignoreFile));
+  return IGNORE.some((ignoreFile) => filePath.endsWith(ignoreFile));
 }
 
 const IGNORE = ['.ds_store', '.gitignore', 'desktop.ini', 'thumbs.db'];

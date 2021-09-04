@@ -31,7 +31,7 @@ export const createCompiler = async (config: Config) => {
   compilerCtx.cache = new Cache(config, createInMemoryFs(sys));
   await compilerCtx.cache.initCacheDir();
 
-  sys.resolveModuleId = opts => resolveModuleIdAsync(sys, compilerCtx.fs, opts);
+  sys.resolveModuleId = (opts) => resolveModuleIdAsync(sys, compilerCtx.fs, opts);
   compilerCtx.worker = createSysWorker(config);
 
   if (sys.events) {

@@ -1,9 +1,8 @@
 import { Component, h } from '@stencil/core';
-import { store } from './external-store'
-
+import { store } from './external-store';
 
 @Component({
-  tag: 'external-import-b'
+  tag: 'external-import-b',
 })
 export class ExternalImportB {
   first?: string;
@@ -17,7 +16,9 @@ export class ExternalImportB {
 
   render() {
     return (
-      <div>{this.first} {this.last}</div>
+      <div>
+        {this.first} {this.last}
+      </div>
     );
   }
 }

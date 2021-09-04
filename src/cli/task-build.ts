@@ -33,11 +33,11 @@ export const taskBuild = async (coreCompiler: CoreCompiler, config: Config) => {
         config,
         results.hydrateAppFilePath,
         results.componentGraph,
-        null,
+        null
       );
       config.logger.printDiagnostics(prerenderDiagnostics);
 
-      if (prerenderDiagnostics.some(d => d.level === 'error')) {
+      if (prerenderDiagnostics.some((d) => d.level === 'error')) {
         exitCode = 1;
       }
     }

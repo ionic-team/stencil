@@ -2,12 +2,10 @@ import { Component, h } from '@stencil/core';
 
 @Component({
   tag: 'cmp-b',
-  shadow: true
+  shadow: true,
 })
 export class CmpB {
   render() {
-    return (
-      <slot></slot>
-    );
+    return <slot></slot>;
   }
 }

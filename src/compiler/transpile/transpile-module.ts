@@ -71,7 +71,7 @@ export const transpileModule = (config: d.Config, input: string, transformOpts: 
 
   // Create a compilerHost object to allow the compiler to read and write files
   const compilerHost: ts.CompilerHost = {
-    getSourceFile: fileName => {
+    getSourceFile: (fileName) => {
       return normalizePath(fileName) === normalizePath(sourceFilePath) ? sourceFile : undefined;
     },
     writeFile: (name, text) => {
@@ -83,10 +83,10 @@ export const transpileModule = (config: d.Config, input: string, transformOpts: 
     },
     getDefaultLibFileName: () => `lib.d.ts`,
     useCaseSensitiveFileNames: () => false,
-    getCanonicalFileName: fileName => fileName,
+    getCanonicalFileName: (fileName) => fileName,
     getCurrentDirectory: () => transformOpts.currentDirectory || getCurrentDirectory(),
     getNewLine: () => ts.sys.newLine || '\n',
-    fileExists: fileName => normalizePath(fileName) === normalizePath(sourceFilePath),
+    fileExists: (fileName) => normalizePath(fileName) === normalizePath(sourceFilePath),
     readFile: () => '',
     directoryExists: () => true,
     getDirectories: () => [],
@@ -95,7 +95,9 @@ export const transpileModule = (config: d.Config, input: string, transformOpts: 
   const program = ts.createProgram([sourceFilePath], tsCompilerOptions, compilerHost);
   const typeChecker = program.getTypeChecker();
 
-  const after: ts.TransformerFactory<ts.SourceFile>[] = [convertStaticToMeta(config, compilerCtx, buildCtx, typeChecker, null, transformOpts)];
+  const after: ts.TransformerFactory<ts.SourceFile>[] = [
+    convertStaticToMeta(config, compilerCtx, buildCtx, typeChecker, null, transformOpts),
+  ];
 
   if (transformOpts.componentExport === 'customelement' || transformOpts.componentExport === 'module') {
     after.push(nativeComponentTransform(compilerCtx, transformOpts));
@@ -104,7 +106,10 @@ export const transpileModule = (config: d.Config, input: string, transformOpts: 
   }
 
   program.emit(undefined, undefined, undefined, false, {
-    before: [convertDecoratorsToStatic(config, buildCtx.diagnostics, typeChecker), updateStencilCoreImports(transformOpts.coreImportPath)],
+    before: [
+      convertDecoratorsToStatic(config, buildCtx.diagnostics, typeChecker),
+      updateStencilCoreImports(transformOpts.coreImportPath),
+    ],
     after,
   });
 

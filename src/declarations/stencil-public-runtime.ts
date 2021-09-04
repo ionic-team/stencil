@@ -1,7 +1,7 @@
 declare type CustomMethodDecorator<T> = (
   target: Object,
   propertyKey: string | symbol,
-  descriptor: TypedPropertyDescriptor<T>,
+  descriptor: TypedPropertyDescriptor<T>
 ) => TypedPropertyDescriptor<T> | void;
 
 export interface ComponentDecorator {
@@ -181,7 +181,7 @@ export declare const Build: UserBuildConditionals;
 /**
  * The `Env` object provides access to the "env" object declared in the project's `stencil.config.ts`.
  */
-export declare const Env: {[prop: string]: string | undefined};
+export declare const Env: { [prop: string]: string | undefined };
 
 /**
  * The `@Component()` decorator is used to provide metadata about the component class.
@@ -262,21 +262,11 @@ export declare const setMode: (handler: ResolutionHandler) => void;
  */
 export declare function getMode<T = string | undefined>(ref: any): T;
 
-export declare function setPlatformHelpers (helpers: {
+export declare function setPlatformHelpers(helpers: {
   jmp?: (c: any) => any;
   raf?: (c: any) => number;
-  ael?: (
-    el: any,
-    eventName: string,
-    listener: any,
-    options: any,
-  ) => void;
-  rel?: (
-    el: any,
-    eventName: string,
-    listener: any,
-    options: any,
-  ) => void;
+  ael?: (el: any, eventName: string, listener: any, options: any) => void;
+  rel?: (el: any, eventName: string, listener: any, options: any) => void;
   ce?: (eventName: string, opts?: any) => any;
 }): void;
 
@@ -1314,29 +1304,29 @@ export namespace JSXBase {
   export interface SVGAttributes<T = SVGElement> extends DOMAttributes<T> {
     // Attributes which also defined in HTMLAttributes
     // See comment in SVGDOMPropertyConfig.js
-    'class'?: string | { [className: string]: boolean };
-    'color'?: string;
-    'height'?: number | string;
-    'id'?: string;
-    'lang'?: string;
-    'max'?: number | string;
-    'media'?: string;
-    'method'?: string;
-    'min'?: number | string;
-    'name'?: string;
-    'style'?: { [key: string]: string | undefined };
-    'target'?: string;
-    'type'?: string;
-    'width'?: number | string;
+    class?: string | { [className: string]: boolean };
+    color?: string;
+    height?: number | string;
+    id?: string;
+    lang?: string;
+    max?: number | string;
+    media?: string;
+    method?: string;
+    min?: number | string;
+    name?: string;
+    style?: { [key: string]: string | undefined };
+    target?: string;
+    type?: string;
+    width?: number | string;
 
     // Other HTML properties supported by SVG elements in browsers
-    'role'?: string;
-    'tabindex'?: number;
+    role?: string;
+    tabindex?: number;
 
     // SVG Specific attributes
     'accent-height'?: number | string;
-    'accumulate'?: 'none' | 'sum';
-    'additive'?: 'replace' | 'sum';
+    accumulate?: 'none' | 'sum';
+    additive?: 'replace' | 'sum';
     'alignment-baseline'?:
       | 'auto'
       | 'baseline'
@@ -1351,63 +1341,63 @@ export namespace JSXBase {
       | 'hanging'
       | 'mathematical'
       | 'inherit';
-    'allowReorder'?: 'no' | 'yes';
-    'alphabetic'?: number | string;
-    'amplitude'?: number | string;
+    allowReorder?: 'no' | 'yes';
+    alphabetic?: number | string;
+    amplitude?: number | string;
     'arabic-form'?: 'initial' | 'medial' | 'terminal' | 'isolated';
-    'ascent'?: number | string;
-    'attributeName'?: string;
-    'attributeType'?: string;
-    'autoReverse'?: number | string;
-    'azimuth'?: number | string;
-    'baseFrequency'?: number | string;
+    ascent?: number | string;
+    attributeName?: string;
+    attributeType?: string;
+    autoReverse?: number | string;
+    azimuth?: number | string;
+    baseFrequency?: number | string;
     'baseline-shift'?: number | string;
-    'baseProfile'?: number | string;
-    'bbox'?: number | string;
-    'begin'?: number | string;
-    'bias'?: number | string;
-    'by'?: number | string;
-    'calcMode'?: number | string;
+    baseProfile?: number | string;
+    bbox?: number | string;
+    begin?: number | string;
+    bias?: number | string;
+    by?: number | string;
+    calcMode?: number | string;
     'cap-height'?: number | string;
-    'clip'?: number | string;
+    clip?: number | string;
     'clip-path'?: string;
-    'clipPathUnits'?: number | string;
+    clipPathUnits?: number | string;
     'clip-rule'?: number | string;
     'color-interpolation'?: number | string;
     'color-interpolation-filters'?: 'auto' | 's-rGB' | 'linear-rGB' | 'inherit';
     'color-profile'?: number | string;
     'color-rendering'?: number | string;
-    'contentScriptType'?: number | string;
-    'contentStyleType'?: number | string;
-    'cursor'?: number | string;
-    'cx'?: number | string;
-    'cy'?: number | string;
-    'd'?: string;
-    'decelerate'?: number | string;
-    'descent'?: number | string;
-    'diffuseConstant'?: number | string;
-    'direction'?: number | string;
-    'display'?: number | string;
-    'divisor'?: number | string;
+    contentScriptType?: number | string;
+    contentStyleType?: number | string;
+    cursor?: number | string;
+    cx?: number | string;
+    cy?: number | string;
+    d?: string;
+    decelerate?: number | string;
+    descent?: number | string;
+    diffuseConstant?: number | string;
+    direction?: number | string;
+    display?: number | string;
+    divisor?: number | string;
     'dominant-baseline'?: number | string;
-    'dur'?: number | string;
-    'dx'?: number | string;
-    'dy'?: number | string;
+    dur?: number | string;
+    dx?: number | string;
+    dy?: number | string;
     'edge-mode'?: number | string;
-    'elevation'?: number | string;
+    elevation?: number | string;
     'enable-background'?: number | string;
-    'end'?: number | string;
-    'exponent'?: number | string;
-    'externalResourcesRequired'?: number | string;
-    'fill'?: string;
+    end?: number | string;
+    exponent?: number | string;
+    externalResourcesRequired?: number | string;
+    fill?: string;
     'fill-opacity'?: number | string;
     'fill-rule'?: 'nonzero' | 'evenodd' | 'inherit';
-    'filter'?: string;
-    'filterRes'?: number | string;
-    'filterUnits'?: number | string;
+    filter?: string;
+    filterRes?: number | string;
+    filterUnits?: number | string;
     'flood-color'?: number | string;
     'flood-opacity'?: number | string;
-    'focusable'?: number | string;
+    focusable?: number | string;
     'font-family'?: string;
     'font-size'?: number | string;
     'font-size-adjust'?: number | string;
@@ -1415,113 +1405,113 @@ export namespace JSXBase {
     'font-style'?: number | string;
     'font-variant'?: number | string;
     'font-weight'?: number | string;
-    'format'?: number | string;
-    'from'?: number | string;
-    'fx'?: number | string;
-    'fy'?: number | string;
-    'g1'?: number | string;
-    'g2'?: number | string;
+    format?: number | string;
+    from?: number | string;
+    fx?: number | string;
+    fy?: number | string;
+    g1?: number | string;
+    g2?: number | string;
     'glyph-name'?: number | string;
     'glyph-orientation-horizontal'?: number | string;
     'glyph-orientation-vertical'?: number | string;
-    'glyphRef'?: number | string;
-    'gradientTransform'?: string;
-    'gradientUnits'?: string;
-    'hanging'?: number | string;
+    glyphRef?: number | string;
+    gradientTransform?: string;
+    gradientUnits?: string;
+    hanging?: number | string;
     'horiz-adv-x'?: number | string;
     'horiz-origin-x'?: number | string;
-    'href'?: string;
-    'ideographic'?: number | string;
+    href?: string;
+    ideographic?: number | string;
     'image-rendering'?: number | string;
-    'in2'?: number | string;
-    'in'?: string;
-    'intercept'?: number | string;
-    'k1'?: number | string;
-    'k2'?: number | string;
-    'k3'?: number | string;
-    'k4'?: number | string;
-    'k'?: number | string;
-    'kernelMatrix'?: number | string;
-    'kernelUnitLength'?: number | string;
-    'kerning'?: number | string;
-    'keyPoints'?: number | string;
-    'keySplines'?: number | string;
-    'keyTimes'?: number | string;
-    'lengthAdjust'?: number | string;
+    in2?: number | string;
+    in?: string;
+    intercept?: number | string;
+    k1?: number | string;
+    k2?: number | string;
+    k3?: number | string;
+    k4?: number | string;
+    k?: number | string;
+    kernelMatrix?: number | string;
+    kernelUnitLength?: number | string;
+    kerning?: number | string;
+    keyPoints?: number | string;
+    keySplines?: number | string;
+    keyTimes?: number | string;
+    lengthAdjust?: number | string;
     'letter-spacing'?: number | string;
     'lighting-color'?: number | string;
-    'limitingConeAngle'?: number | string;
-    'local'?: number | string;
+    limitingConeAngle?: number | string;
+    local?: number | string;
     'marker-end'?: string;
-    'markerHeight'?: number | string;
+    markerHeight?: number | string;
     'marker-mid'?: string;
     'marker-start'?: string;
-    'markerUnits'?: number | string;
-    'markerWidth'?: number | string;
-    'mask'?: string;
-    'maskContentUnits'?: number | string;
-    'maskUnits'?: number | string;
-    'mathematical'?: number | string;
-    'mode'?: number | string;
-    'numOctaves'?: number | string;
-    'offset'?: number | string;
-    'opacity'?: number | string;
-    'operator'?: number | string;
-    'order'?: number | string;
-    'orient'?: number | string;
-    'orientation'?: number | string;
-    'origin'?: number | string;
-    'overflow'?: number | string;
+    markerUnits?: number | string;
+    markerWidth?: number | string;
+    mask?: string;
+    maskContentUnits?: number | string;
+    maskUnits?: number | string;
+    mathematical?: number | string;
+    mode?: number | string;
+    numOctaves?: number | string;
+    offset?: number | string;
+    opacity?: number | string;
+    operator?: number | string;
+    order?: number | string;
+    orient?: number | string;
+    orientation?: number | string;
+    origin?: number | string;
+    overflow?: number | string;
     'overline-position'?: number | string;
     'overline-thickness'?: number | string;
     'paint-order'?: number | string;
-    'panose1'?: number | string;
-    'pathLength'?: number | string;
-    'patternContentUnits'?: string;
-    'patternTransform'?: number | string;
-    'patternUnits'?: string;
+    panose1?: number | string;
+    pathLength?: number | string;
+    patternContentUnits?: string;
+    patternTransform?: number | string;
+    patternUnits?: string;
     'pointer-events'?: number | string;
-    'points'?: string;
-    'pointsAtX'?: number | string;
-    'pointsAtY'?: number | string;
-    'pointsAtZ'?: number | string;
-    'preserveAlpha'?: number | string;
-    'preserveAspectRatio'?: string;
-    'primitiveUnits'?: number | string;
-    'r'?: number | string;
-    'radius'?: number | string;
-    'refX'?: number | string;
-    'refY'?: number | string;
+    points?: string;
+    pointsAtX?: number | string;
+    pointsAtY?: number | string;
+    pointsAtZ?: number | string;
+    preserveAlpha?: number | string;
+    preserveAspectRatio?: string;
+    primitiveUnits?: number | string;
+    r?: number | string;
+    radius?: number | string;
+    refX?: number | string;
+    refY?: number | string;
     'rendering-intent'?: number | string;
-    'repeatCount'?: number | string;
-    'repeatDur'?: number | string;
-    'requiredextensions'?: number | string;
-    'requiredFeatures'?: number | string;
-    'restart'?: number | string;
-    'result'?: string;
-    'rotate'?: number | string;
-    'rx'?: number | string;
-    'ry'?: number | string;
-    'scale'?: number | string;
-    'seed'?: number | string;
+    repeatCount?: number | string;
+    repeatDur?: number | string;
+    requiredextensions?: number | string;
+    requiredFeatures?: number | string;
+    restart?: number | string;
+    result?: string;
+    rotate?: number | string;
+    rx?: number | string;
+    ry?: number | string;
+    scale?: number | string;
+    seed?: number | string;
     'shape-rendering'?: number | string;
-    'slope'?: number | string;
-    'spacing'?: number | string;
-    'specularConstant'?: number | string;
-    'specularExponent'?: number | string;
-    'speed'?: number | string;
-    'spreadMethod'?: string;
-    'startOffset'?: number | string;
-    'stdDeviation'?: number | string;
-    'stemh'?: number | string;
-    'stemv'?: number | string;
-    'stitchTiles'?: number | string;
+    slope?: number | string;
+    spacing?: number | string;
+    specularConstant?: number | string;
+    specularExponent?: number | string;
+    speed?: number | string;
+    spreadMethod?: string;
+    startOffset?: number | string;
+    stdDeviation?: number | string;
+    stemh?: number | string;
+    stemv?: number | string;
+    stitchTiles?: number | string;
     'stop-color'?: string;
     'stop-opacity'?: number | string;
     'strikethrough-position'?: number | string;
     'strikethrough-thickness'?: number | string;
-    'string'?: number | string;
-    'stroke'?: string;
+    string?: number | string;
+    stroke?: string;
     'stroke-dasharray'?: string | number;
     'stroke-dashoffset'?: string | number;
     'stroke-linecap'?: 'butt' | 'round' | 'square' | 'inherit';
@@ -1529,63 +1519,63 @@ export namespace JSXBase {
     'stroke-miterlimit'?: string;
     'stroke-opacity'?: number | string;
     'stroke-width'?: number | string;
-    'surfaceScale'?: number | string;
-    'systemLanguage'?: number | string;
-    'tableValues'?: number | string;
-    'targetX'?: number | string;
-    'targetY'?: number | string;
+    surfaceScale?: number | string;
+    systemLanguage?: number | string;
+    tableValues?: number | string;
+    targetX?: number | string;
+    targetY?: number | string;
     'text-anchor'?: string;
     'text-decoration'?: number | string;
-    'textLength'?: number | string;
+    textLength?: number | string;
     'text-rendering'?: number | string;
-    'to'?: number | string;
-    'transform'?: string;
-    'u1'?: number | string;
-    'u2'?: number | string;
+    to?: number | string;
+    transform?: string;
+    u1?: number | string;
+    u2?: number | string;
     'underline-position'?: number | string;
     'underline-thickness'?: number | string;
-    'unicode'?: number | string;
+    unicode?: number | string;
     'unicode-bidi'?: number | string;
     'unicode-range'?: number | string;
     'units-per-em'?: number | string;
     'v-alphabetic'?: number | string;
-    'values'?: string;
+    values?: string;
     'vector-effect'?: number | string;
-    'version'?: string;
+    version?: string;
     'vert-adv-y'?: number | string;
     'vert-origin-x'?: number | string;
     'vert-origin-y'?: number | string;
     'v-hanging'?: number | string;
     'v-ideographic'?: number | string;
-    'viewBox'?: string;
-    'viewTarget'?: number | string;
-    'visibility'?: number | string;
+    viewBox?: string;
+    viewTarget?: number | string;
+    visibility?: number | string;
     'v-mathematical'?: number | string;
-    'widths'?: number | string;
+    widths?: number | string;
     'word-spacing'?: number | string;
     'writing-mode'?: number | string;
-    'x1'?: number | string;
-    'x2'?: number | string;
-    'x'?: number | string;
+    x1?: number | string;
+    x2?: number | string;
+    x?: number | string;
     'x-channel-selector'?: string;
     'x-height'?: number | string;
-    'xlinkActuate'?: string;
-    'xlinkArcrole'?: string;
-    'xlinkHref'?: string;
-    'xlinkRole'?: string;
-    'xlinkShow'?: string;
-    'xlinkTitle'?: string;
-    'xlinkType'?: string;
-    'xmlBase'?: string;
-    'xmlLang'?: string;
-    'xmlns'?: string;
-    'xmlSpace'?: string;
-    'y1'?: number | string;
-    'y2'?: number | string;
-    'y'?: number | string;
-    'yChannelSelector'?: string;
-    'z'?: number | string;
-    'zoomAndPan'?: string;
+    xlinkActuate?: string;
+    xlinkArcrole?: string;
+    xlinkHref?: string;
+    xlinkRole?: string;
+    xlinkShow?: string;
+    xlinkTitle?: string;
+    xlinkType?: string;
+    xmlBase?: string;
+    xmlLang?: string;
+    xmlns?: string;
+    xmlSpace?: string;
+    y1?: number | string;
+    y2?: number | string;
+    y?: number | string;
+    yChannelSelector?: string;
+    z?: number | string;
+    zoomAndPan?: string;
   }
 
   export interface DOMAttributes<T = Element> {
@@ -1751,13 +1741,13 @@ export interface CustomElementsDefineOptions {
     el: EventTarget,
     eventName: string,
     listener: EventListenerOrEventListenerObject,
-    options: boolean | AddEventListenerOptions,
+    options: boolean | AddEventListenerOptions
   ) => void;
   rel?: (
     el: EventTarget,
     eventName: string,
     listener: EventListenerOrEventListenerObject,
-    options: boolean | AddEventListenerOptions,
+    options: boolean | AddEventListenerOptions
   ) => void;
   ce?: (eventName: string, opts?: any) => CustomEvent;
 }
