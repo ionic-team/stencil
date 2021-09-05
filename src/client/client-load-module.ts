@@ -27,15 +27,12 @@ export const loadModule = (
     /* webpackExclude: /\.system\.entry\.js$/ */
     /* webpackMode: "lazy" */
     `./${bundleId}.entry.js${BUILD.hotModuleReplacement && hmrVersionId ? '?s-hmr=' + hmrVersionId : ''}`
-  ).then(
-    (importedModule) => {
-      if (!BUILD.hotModuleReplacement) {
-        cmpModules.set(bundleId, importedModule);
-      }
-      return importedModule[exportName];
-    },
-    (e: Error) => {
-      consoleError(e, hostRef.$hostElement$);
+  ).then((importedModule) => {
+    if (!BUILD.hotModuleReplacement) {
+      cmpModules.set(bundleId, importedModule);
     }
-  );
+    return importedModule[exportName];
+  }, (e: Error) => {
+    consoleError(e, hostRef.$hostElement$);
+  });
 };

@@ -31,6 +31,9 @@ export function createWebSocket(
     ws.isAlive = true;
 
     ws.on('pong', heartbeat);
+
+    // ignore invalid close frames sent by Safari 15
+    ws.on('error', console.error);
   });
 
   const pingInternval = setInterval(() => {

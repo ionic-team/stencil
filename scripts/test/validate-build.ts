@@ -9,7 +9,6 @@ import ts from 'typescript';
  * Used to triple check that the final build files
  * ready to be published are good to go
  */
-
 const pkgs: TestPackage[] = [
   {
     // cli
@@ -117,7 +116,11 @@ const pkgs: TestPackage[] = [
   },
 ];
 
-export async function validateBuild(rootDir: string) {
+/**
+ *
+ * @param rootDir the root of the Stencil repository
+ */
+export async function validateBuild(rootDir: string): Promise<void> {
   const dtsEntries: string[] = [];
   const opts = getOptions(rootDir);
   pkgs.forEach((testPkg) => {
@@ -131,7 +134,14 @@ export async function validateBuild(rootDir: string) {
   await validateTreeshaking(opts);
 }
 
-function validatePackage(opts: BuildOptions, testPkg: TestPackage, dtsEntries: string[]) {
+/**
+ * Validates a bundled package/sub-module. Validation steps include verifying that various fields in `package.json` are
+ * filled out and file references are valid.
+ * @param opts build options to be used to validate a package
+ * @param testPkg the package to validate
+ * @param dtsEntries a reference to .d.ts files to collect while validating the package
+ */
+function validatePackage(opts: BuildOptions, testPkg: TestPackage, dtsEntries: string[]): void {
   const rootDir = opts.rootDir;
 
   if (testPkg.packageJson) {
@@ -204,7 +214,12 @@ function validatePackage(opts: BuildOptions, testPkg: TestPackage, dtsEntries: s
   }
 }
 
-function validateDts(opts: BuildOptions, dtsEntries: string[]) {
+/**
+ * Validate the the .d.ts files used in the output are semantically and syntactically correct
+ * @param opts build options to be used to validate .d.ts files
+ * @param dtsEntries the .d.ts files to validate
+ */
+function validateDts(opts: BuildOptions, dtsEntries: string[]): void {
   const program = ts.createProgram(dtsEntries, {
     baseUrl: '.',
     paths: {
@@ -227,7 +242,12 @@ function validateDts(opts: BuildOptions, dtsEntries: string[]) {
   console.log(`🐟  Validated dts files`);
 }
 
-async function validateCompiler(opts: BuildOptions) {
+/**
+ * Validates the Stencil compiler. This includes verifying that the compiler, CLI and sys API can be instantiated,
+ * smoke testing the compiler's transpilation, and running a small task in the CLI.
+ * @param opts build options to be used to validate the compiler
+ */
+async function validateCompiler(opts: BuildOptions): Promise<void> {
   const compilerPath = join(opts.output.compilerDir, 'stencil.js');
   const cliPath = join(opts.output.cliDir, 'index.cjs');
   const sysNodePath = join(opts.output.sysNodeDir, 'index.js');
@@ -269,6 +289,7 @@ async function validateCompiler(opts: BuildOptions) {
   let loggedVersion = null;
   console.log = (value: string) => (loggedVersion = value);
 
+  // this runTask is intentionally not wrapped in telemetry helpers
   await cli.runTask(compiler, validated.config, 'version');
 
   console.log = orgConsoleLog;
@@ -280,6 +301,10 @@ async function validateCompiler(opts: BuildOptions) {
   console.log(`🐬  Validated cli`);
 }
 
+/**
+ * Validate tree shaking for various modules in the output
+ * @param opts build options to be used to validate treeshaking
+ */
 async function validateTreeshaking(opts: BuildOptions) {
   await validateModuleTreeshake(opts, 'app-data', join(opts.output.internalDir, 'app-data', 'index.js'));
   await validateModuleTreeshake(opts, 'client', join(opts.output.internalDir, 'client', 'index.js'));
@@ -291,7 +316,14 @@ async function validateTreeshaking(opts: BuildOptions) {
   await validateModuleTreeshake(opts, 'cli', join(opts.output.cliDir, 'index.js'));
 }
 
-async function validateModuleTreeshake(opts: BuildOptions, moduleName: string, entryModulePath: string) {
+/**
+ * Validates treeshaking for a single module & entrypoint
+ * @param opts build options to be used to validate treeshaking for a specific module
+ * @param moduleName the module to validate
+ * @param entryModulePath the entrypoint to validate
+ */
+async function validateModuleTreeshake(opts: BuildOptions, moduleName: string, entryModulePath: string): Promise<void> {
+  // this is a song, 'agadoo' by Black Lace
   const virtualInputId = `@g@doo`;
   const entryId = `@entry-module`;
   const outputFile = join(opts.scriptsBuildDir, `treeshake_${moduleName}.js`);
@@ -354,6 +386,9 @@ async function validateModuleTreeshake(opts: BuildOptions, moduleName: string, e
   console.log(`🌳  validated treeshake: ${relative(opts.rootDir, entryModulePath)}`);
 }
 
+/**
+ * Represents a package/submodule of the bundled Stencil output to validate
+ */
 interface TestPackage {
   packageJson?: string;
   packageJsonFiles?: string[];
