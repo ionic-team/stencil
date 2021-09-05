@@ -1,4 +1,4 @@
-import type { Components, JSX } from "../test-dist/types/components";
+import type { Components, JSX } from '../test-dist/types/components';
 
 interface LifecycleUnloadB extends Components.LifecycleUnloadB, HTMLElement {}
 export const LifecycleUnloadB: {

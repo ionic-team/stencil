@@ -1,4 +1,4 @@
-import type { Components, JSX } from "../test-dist/types/components";
+import type { Components, JSX } from '../test-dist/types/components';
 
 interface SlotDynamicWrapperRoot extends Components.SlotDynamicWrapperRoot, HTMLElement {}
 export const SlotDynamicWrapperRoot: {

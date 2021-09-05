@@ -1,4 +1,4 @@
-import type { Components, JSX } from "../test-dist/types/components";
+import type { Components, JSX } from '../test-dist/types/components';
 
 interface AttributeHost extends Components.AttributeHost, HTMLElement {}
 export const AttributeHost: {

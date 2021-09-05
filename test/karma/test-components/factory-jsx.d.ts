@@ -1,4 +1,4 @@
-import type { Components, JSX } from "../test-dist/types/components";
+import type { Components, JSX } from '../test-dist/types/components';
 
 interface FactoryJsx extends Components.FactoryJsx, HTMLElement {}
 export const FactoryJsx: {

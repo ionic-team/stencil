@@ -1,4 +1,4 @@
-import type { Components, JSX } from "../test-dist/types/components";
+import type { Components, JSX } from '../test-dist/types/components';
 
 interface SvgAttr extends Components.SvgAttr, HTMLElement {}
 export const SvgAttr: {

@@ -15,28 +15,41 @@ const ReflectToAttr$1 = class extends HTMLElement {
     this.dynamicStr = 'value';
     this.el.dynamicNu = 123;
   }
-  get el() { return this; }
+  get el() {
+    return this;
+  }
 };
 
-const ReflectToAttr = /*@__PURE__*/proxyCustomElement(ReflectToAttr$1, [0,"reflect-to-attr",{"str":[513],"nu":[514],"undef":[513],"null":[513],"bool":[516],"otherBool":[516,"other-bool"],"disabled":[516],"dynamicStr":[1537,"dynamic-str"],"dynamicNu":[514,"dynamic-nu"]}]);
-const components = ['reflect-to-attr', ];
+const ReflectToAttr = /*@__PURE__*/ proxyCustomElement(ReflectToAttr$1, [
+  0,
+  'reflect-to-attr',
+  {
+    str: [513],
+    nu: [514],
+    undef: [513],
+    null: [513],
+    bool: [516],
+    otherBool: [516, 'other-bool'],
+    disabled: [516],
+    dynamicStr: [1537, 'dynamic-str'],
+    dynamicNu: [514, 'dynamic-nu'],
+  },
+]);
+const components = ['reflect-to-attr'];
 
 const defineCustomElement = (tagRename) => {
   let tagName;
-  components.forEach(cmp => {
-    switch(cmp) {
-
+  components.forEach((cmp) => {
+    switch (cmp) {
       case 'reflect-to-attr':
         tagName = 'reflect-to-attr';
         if (tagRename) {
           tagName = tagRename(tagName);
         }
         if (!customElements.get(tagName)) {
-          
           customElements.define(tagName, ReflectToAttr);
         }
         break;
-
     }
   });
 };

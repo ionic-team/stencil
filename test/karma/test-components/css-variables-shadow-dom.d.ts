@@ -1,4 +1,4 @@
-import type { Components, JSX } from "../test-dist/types/components";
+import type { Components, JSX } from '../test-dist/types/components';
 
 interface CssVariablesShadowDom extends Components.CssVariablesShadowDom, HTMLElement {}
 export const CssVariablesShadowDom: {

@@ -6,29 +6,26 @@ const AngularSlotBinding = class extends HTMLElement {
     this.__registerHost();
   }
   render() {
-    return (h(Host, null, h("slot", null)));
+    return h(Host, null, h('slot', null));
   }
 };
 
-const SlotNgIf = /*@__PURE__*/proxyCustomElement(AngularSlotBinding, [4,"slot-ng-if"]);
-const components = ['slot-ng-if', ];
+const SlotNgIf = /*@__PURE__*/ proxyCustomElement(AngularSlotBinding, [4, 'slot-ng-if']);
+const components = ['slot-ng-if'];
 
 const defineCustomElement = (tagRename) => {
   let tagName;
-  components.forEach(cmp => {
-    switch(cmp) {
-
+  components.forEach((cmp) => {
+    switch (cmp) {
       case 'slot-ng-if':
         tagName = 'slot-ng-if';
         if (tagRename) {
           tagName = tagRename(tagName);
         }
         if (!customElements.get(tagName)) {
-          
           customElements.define(tagName, SlotNgIf);
         }
         break;
-
     }
   });
 };

@@ -15,13 +15,11 @@ const LifecycleUnloadB = class extends HTMLElement {
     this.results.appendChild(elm);
   }
   render() {
-    return [
-      h("article", null, "cmp-b - top"),
-      h("section", null, h("slot", null)),
-      h("nav", null, "cmp-b - bottom"),
-    ];
+    return [h('article', null, 'cmp-b - top'), h('section', null, h('slot', null)), h('nav', null, 'cmp-b - bottom')];
   }
-  get el() { return this; }
+  get el() {
+    return this;
+  }
 };
 
 export { LifecycleUnloadB as L };

@@ -8,7 +8,11 @@ const DynamicListShadowComponent = class extends HTMLElement {
     this.items = [];
   }
   render() {
-    return (h("slot-light-list", null, this.items.map((item) => (h("div", null, item)))));
+    return h(
+      'slot-light-list',
+      null,
+      this.items.map((item) => h('div', null, item))
+    );
   }
 };
 

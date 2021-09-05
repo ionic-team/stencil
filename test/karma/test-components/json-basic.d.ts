@@ -1,4 +1,4 @@
-import type { Components, JSX } from "../test-dist/types/components";
+import type { Components, JSX } from '../test-dist/types/components';
 
 interface JsonBasic extends Components.JsonBasic, HTMLElement {}
 export const JsonBasic: {

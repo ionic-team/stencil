@@ -7,7 +7,7 @@ const SlotDynamicWrapper = class extends HTMLElement {
     this.tag = 'section';
   }
   render() {
-    return (h(this.tag, null, h("slot", null)));
+    return h(this.tag, null, h('slot', null));
   }
 };
 

@@ -8,25 +8,31 @@ const CustomElementChildOptionalStringB$1 = class extends HTMLElement {
     attachShadow(this);
   }
   render() {
-    return (h("div", null, h("strong", null, "Optional Nested Component via String B Loaded!"), h("custom-element-nested-child", null)));
+    return h(
+      'div',
+      null,
+      h('strong', null, 'Optional Nested Component via String B Loaded!'),
+      h('custom-element-nested-child', null)
+    );
   }
 };
 
-const CustomElementChildOptionalStringB = /*@__PURE__*/proxyCustomElement(CustomElementChildOptionalStringB$1, [1,"custom-element-child-optional-string-b"]);
-const components = ['custom-element-child-optional-string-b', 'custom-element-nested-child', ];
+const CustomElementChildOptionalStringB = /*@__PURE__*/ proxyCustomElement(CustomElementChildOptionalStringB$1, [
+  1,
+  'custom-element-child-optional-string-b',
+]);
+const components = ['custom-element-child-optional-string-b', 'custom-element-nested-child'];
 
 const defineCustomElement = (tagRename) => {
   let tagName;
-  components.forEach(cmp => {
-    switch(cmp) {
-
+  components.forEach((cmp) => {
+    switch (cmp) {
       case 'custom-element-child-optional-string-b':
         tagName = 'custom-element-child-optional-string-b';
         if (tagRename) {
           tagName = tagRename(tagName);
         }
         if (!customElements.get(tagName)) {
-          
           customElements.define(tagName, CustomElementChildOptionalStringB);
         }
         break;
@@ -37,11 +43,13 @@ const defineCustomElement = (tagRename) => {
           tagName = tagRename(tagName);
         }
         if (!customElements.get(tagName)) {
-          const CustomElementNestedChild$1 = /*@__PURE__*/proxyCustomElement(CustomElementNestedChild, [1,"custom-element-child-optional-string-b"]);
+          const CustomElementNestedChild$1 = /*@__PURE__*/ proxyCustomElement(CustomElementNestedChild, [
+            1,
+            'custom-element-child-optional-string-b',
+          ]);
           customElements.define(tagName, CustomElementNestedChild$1);
         }
         break;
-
     }
   });
 };

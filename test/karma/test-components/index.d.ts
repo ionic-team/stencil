@@ -1,6 +1,6 @@
 /* TestApp custom elements */
 
-import type { Components, JSX } from "../test-dist/types/components";
+import type { Components, JSX } from '../test-dist/types/components';
 
 /**
  * Used to manually set the base path where assets can be found.
@@ -16,8 +16,18 @@ export declare const setAssetPath: (path: string) => void;
 
 export interface SetPlatformOptions {
   raf?: (c: FrameRequestCallback) => number;
-  ael?: (el: EventTarget, eventName: string, listener: EventListenerOrEventListenerObject, options: boolean | AddEventListenerOptions) => void;
-  rel?: (el: EventTarget, eventName: string, listener: EventListenerOrEventListenerObject, options: boolean | AddEventListenerOptions) => void;
+  ael?: (
+    el: EventTarget,
+    eventName: string,
+    listener: EventListenerOrEventListenerObject,
+    options: boolean | AddEventListenerOptions
+  ) => void;
+  rel?: (
+    el: EventTarget,
+    eventName: string,
+    listener: EventListenerOrEventListenerObject,
+    options: boolean | AddEventListenerOptions
+  ) => void;
 }
 export declare const setPlatformOptions: (opts: SetPlatformOptions) => void;
 

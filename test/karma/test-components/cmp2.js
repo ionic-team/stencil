@@ -6,7 +6,7 @@ const ConditionalRerender = class extends HTMLElement {
     this.__registerHost();
   }
   render() {
-    return (h("main", null, h("slot", null), h("nav", null, "Nav")));
+    return h('main', null, h('slot', null), h('nav', null, 'Nav'));
   }
 };
 

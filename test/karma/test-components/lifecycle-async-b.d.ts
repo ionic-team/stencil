@@ -1,4 +1,4 @@
-import type { Components, JSX } from "../test-dist/types/components";
+import type { Components, JSX } from '../test-dist/types/components';
 
 interface LifecycleAsyncB extends Components.LifecycleAsyncB, HTMLElement {}
 export const LifecycleAsyncB: {

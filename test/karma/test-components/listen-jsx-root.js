@@ -11,25 +11,27 @@ const AttributeBasicRoot = class extends HTMLElement {
     };
   }
   render() {
-    return [h("span", { id: "result-root" }, this.wasClicked), h("listen-jsx", { onClick: this.onClick })];
+    return [h('span', { id: 'result-root' }, this.wasClicked), h('listen-jsx', { onClick: this.onClick })];
   }
 };
 
-const ListenJsxRoot = /*@__PURE__*/proxyCustomElement(AttributeBasicRoot, [0,"listen-jsx-root",{"wasClicked":[32]}]);
-const components = ['listen-jsx-root', 'listen-jsx', ];
+const ListenJsxRoot = /*@__PURE__*/ proxyCustomElement(AttributeBasicRoot, [
+  0,
+  'listen-jsx-root',
+  { wasClicked: [32] },
+]);
+const components = ['listen-jsx-root', 'listen-jsx'];
 
 const defineCustomElement = (tagRename) => {
   let tagName;
-  components.forEach(cmp => {
-    switch(cmp) {
-
+  components.forEach((cmp) => {
+    switch (cmp) {
       case 'listen-jsx-root':
         tagName = 'listen-jsx-root';
         if (tagRename) {
           tagName = tagRename(tagName);
         }
         if (!customElements.get(tagName)) {
-          
           customElements.define(tagName, ListenJsxRoot);
         }
         break;
@@ -40,11 +42,14 @@ const defineCustomElement = (tagRename) => {
           tagName = tagRename(tagName);
         }
         if (!customElements.get(tagName)) {
-          const ListenJsx = /*@__PURE__*/proxyCustomElement(AttributeBasic, [0,"listen-jsx-root",{"wasClicked":[32]}]);
+          const ListenJsx = /*@__PURE__*/ proxyCustomElement(AttributeBasic, [
+            0,
+            'listen-jsx-root',
+            { wasClicked: [32] },
+          ]);
           customElements.define(tagName, ListenJsx);
         }
         break;
-
     }
   });
 };

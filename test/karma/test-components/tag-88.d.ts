@@ -1,4 +1,4 @@
-import type { Components, JSX } from "../test-dist/types/components";
+import type { Components, JSX } from '../test-dist/types/components';
 
 interface Tag88 extends Components.Tag88, HTMLElement {}
 export const Tag88: {

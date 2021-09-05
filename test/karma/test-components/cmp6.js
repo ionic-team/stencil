@@ -7,9 +7,11 @@ const ShadowDomBasic = class extends HTMLElement {
     attachShadow(this);
   }
   render() {
-    return [h("div", null, "shadow"), h("slot", null)];
+    return [h('div', null, 'shadow'), h('slot', null)];
   }
-  static get style() { return "div {\n      background: rgb(0, 0, 0);\n      color: white;\n    }"; }
+  static get style() {
+    return 'div {\n      background: rgb(0, 0, 0);\n      color: white;\n    }';
+  }
 };
 
 export { ShadowDomBasic as S };

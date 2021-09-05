@@ -14,29 +14,26 @@ const Cmpb = class extends HTMLElement {
     output('componentDidLoad-b');
   }
   render() {
-    return h("slot", null);
+    return h('slot', null);
   }
 };
 
-const LifecycleNestedB = /*@__PURE__*/proxyCustomElement(Cmpb, [1,"lifecycle-nested-b"]);
-const components = ['lifecycle-nested-b', ];
+const LifecycleNestedB = /*@__PURE__*/ proxyCustomElement(Cmpb, [1, 'lifecycle-nested-b']);
+const components = ['lifecycle-nested-b'];
 
 const defineCustomElement = (tagRename) => {
   let tagName;
-  components.forEach(cmp => {
-    switch(cmp) {
-
+  components.forEach((cmp) => {
+    switch (cmp) {
       case 'lifecycle-nested-b':
         tagName = 'lifecycle-nested-b';
         if (tagRename) {
           tagName = tagRename(tagName);
         }
         if (!customElements.get(tagName)) {
-          
           customElements.define(tagName, LifecycleNestedB);
         }
         break;
-
     }
   });
 };

@@ -1,4 +1,4 @@
-import type { Components, JSX } from "../test-dist/types/components";
+import type { Components, JSX } from '../test-dist/types/components';
 
 interface SlotDynamicShadowList extends Components.SlotDynamicShadowList, HTMLElement {}
 export const SlotDynamicShadowList: {

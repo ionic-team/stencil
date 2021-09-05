@@ -1,4 +1,4 @@
-import type { Components, JSX } from "../test-dist/types/components";
+import type { Components, JSX } from '../test-dist/types/components';
 
 interface SlotArrayBasic extends Components.SlotArrayBasic, HTMLElement {}
 export const SlotArrayBasic: {

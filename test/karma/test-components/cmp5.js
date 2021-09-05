@@ -8,7 +8,7 @@ const ShadowDomArray = class extends HTMLElement {
     this.values = [];
   }
   render() {
-    return this.values.map((v) => h("div", null, v));
+    return this.values.map((v) => h('div', null, v));
   }
 };
 

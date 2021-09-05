@@ -8,9 +8,21 @@ const SlotReorder = class extends HTMLElement {
   }
   render() {
     if (this.reordered) {
-      return (h("div", { class: "reordered" }, h("slot", { name: "slot-b" }, h("div", null, "fallback slot-b")), h("slot", null, h("div", null, "fallback default")), h("slot", { name: "slot-a" }, h("div", null, "fallback slot-a"))));
+      return h(
+        'div',
+        { class: 'reordered' },
+        h('slot', { name: 'slot-b' }, h('div', null, 'fallback slot-b')),
+        h('slot', null, h('div', null, 'fallback default')),
+        h('slot', { name: 'slot-a' }, h('div', null, 'fallback slot-a'))
+      );
     }
-    return (h("div", null, h("slot", null, h("div", null, "fallback default")), h("slot", { name: "slot-a" }, h("div", null, "fallback slot-a")), h("slot", { name: "slot-b" }, h("div", null, "fallback slot-b"))));
+    return h(
+      'div',
+      null,
+      h('slot', null, h('div', null, 'fallback default')),
+      h('slot', { name: 'slot-a' }, h('div', null, 'fallback slot-a')),
+      h('slot', { name: 'slot-b' }, h('div', null, 'fallback slot-b'))
+    );
   }
 };
 

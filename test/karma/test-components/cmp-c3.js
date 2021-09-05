@@ -21,7 +21,7 @@ const LifecycleUpdateC = class extends HTMLElement {
     document.getElementById('output').appendChild(li);
   }
   render() {
-    return h("span", null, " - lifecycle-update-c: ", this.value);
+    return h('span', null, ' - lifecycle-update-c: ', this.value);
   }
 };
 

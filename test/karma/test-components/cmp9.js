@@ -6,11 +6,7 @@ const SlotArrayComplex = class extends HTMLElement {
     this.__registerHost();
   }
   render() {
-    return [
-      h("slot", { name: "start" }),
-      h("section", null, h("slot", null)),
-      h("slot", { name: "end" }),
-    ];
+    return [h('slot', { name: 'start' }), h('section', null, h('slot', null)), h('slot', { name: 'end' })];
   }
 };
 

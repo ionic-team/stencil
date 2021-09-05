@@ -1,4 +1,4 @@
-import type { Components, JSX } from "../test-dist/types/components";
+import type { Components, JSX } from '../test-dist/types/components';
 
 interface ExternalImportB extends Components.ExternalImportB, HTMLElement {}
 export const ExternalImportB: {

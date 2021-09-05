@@ -1,4 +1,4 @@
-import type { Components, JSX } from "../test-dist/types/components";
+import type { Components, JSX } from '../test-dist/types/components';
 
 interface NoDelegatesFocus extends Components.NoDelegatesFocus, HTMLElement {}
 export const NoDelegatesFocus: {

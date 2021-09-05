@@ -21,7 +21,7 @@ const LifecycleUpdateB = class extends HTMLElement {
     document.getElementById('output').appendChild(li);
   }
   render() {
-    return (h("section", null, "lifecycle-update-b: ", this.value, h("lifecycle-update-c", { value: this.value })));
+    return h('section', null, 'lifecycle-update-b: ', this.value, h('lifecycle-update-c', { value: this.value }));
   }
 };
 

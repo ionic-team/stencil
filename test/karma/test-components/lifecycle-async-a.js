@@ -42,29 +42,55 @@ const LifecycleAsyncA$1 = class extends HTMLElement {
   }
   render() {
     this.rendered++;
-    return (h("div", null, h("button", { onClick: this.testClick.bind(this), class: "test" }, "Update"), h("hr", null), h("div", null, "LifecycleAsyncA ", this.value), h("div", { class: "rendered-a" }, "rendered a: ", this.rendered), h("div", null, "loads a:"), h("ol", { class: "lifecycle-loads-a" }, this.loads.map((load) => {
-      return h("li", null, load);
-    })), h("div", null, "updates a:"), h("ol", { class: "lifecycle-updates-a" }, this.updates.map((update) => {
-      return h("li", null, update);
-    })), h("lifecycle-async-b", { value: this.value })));
+    return h(
+      'div',
+      null,
+      h('button', { onClick: this.testClick.bind(this), class: 'test' }, 'Update'),
+      h('hr', null),
+      h('div', null, 'LifecycleAsyncA ', this.value),
+      h('div', { class: 'rendered-a' }, 'rendered a: ', this.rendered),
+      h('div', null, 'loads a:'),
+      h(
+        'ol',
+        { class: 'lifecycle-loads-a' },
+        this.loads.map((load) => {
+          return h('li', null, load);
+        })
+      ),
+      h('div', null, 'updates a:'),
+      h(
+        'ol',
+        { class: 'lifecycle-updates-a' },
+        this.updates.map((update) => {
+          return h('li', null, update);
+        })
+      ),
+      h('lifecycle-async-b', { value: this.value })
+    );
   }
 };
 
-const LifecycleAsyncA = /*@__PURE__*/proxyCustomElement(LifecycleAsyncA$1, [0,"lifecycle-async-a",{"value":[32],"loads":[32],"updates":[32]},[[0,"lifecycleLoad","lifecycleLoad"],[0,"lifecycleUpdate","lifecycleUpdate"]]]);
-const components = ['lifecycle-async-a', 'lifecycle-async-b', 'lifecycle-async-c', ];
+const LifecycleAsyncA = /*@__PURE__*/ proxyCustomElement(LifecycleAsyncA$1, [
+  0,
+  'lifecycle-async-a',
+  { value: [32], loads: [32], updates: [32] },
+  [
+    [0, 'lifecycleLoad', 'lifecycleLoad'],
+    [0, 'lifecycleUpdate', 'lifecycleUpdate'],
+  ],
+]);
+const components = ['lifecycle-async-a', 'lifecycle-async-b', 'lifecycle-async-c'];
 
 const defineCustomElement = (tagRename) => {
   let tagName;
-  components.forEach(cmp => {
-    switch(cmp) {
-
+  components.forEach((cmp) => {
+    switch (cmp) {
       case 'lifecycle-async-a':
         tagName = 'lifecycle-async-a';
         if (tagRename) {
           tagName = tagRename(tagName);
         }
         if (!customElements.get(tagName)) {
-          
           customElements.define(tagName, LifecycleAsyncA);
         }
         break;
@@ -75,7 +101,15 @@ const defineCustomElement = (tagRename) => {
           tagName = tagRename(tagName);
         }
         if (!customElements.get(tagName)) {
-          const LifecycleAsyncB$1 = /*@__PURE__*/proxyCustomElement(LifecycleAsyncB, [0,"lifecycle-async-a",{"value":[32],"loads":[32],"updates":[32]},[[0,"lifecycleLoad","lifecycleLoad"],[0,"lifecycleUpdate","lifecycleUpdate"]]]);
+          const LifecycleAsyncB$1 = /*@__PURE__*/ proxyCustomElement(LifecycleAsyncB, [
+            0,
+            'lifecycle-async-a',
+            { value: [32], loads: [32], updates: [32] },
+            [
+              [0, 'lifecycleLoad', 'lifecycleLoad'],
+              [0, 'lifecycleUpdate', 'lifecycleUpdate'],
+            ],
+          ]);
           customElements.define(tagName, LifecycleAsyncB$1);
         }
         break;
@@ -86,11 +120,18 @@ const defineCustomElement = (tagRename) => {
           tagName = tagRename(tagName);
         }
         if (!customElements.get(tagName)) {
-          const LifecycleAsyncC$1 = /*@__PURE__*/proxyCustomElement(LifecycleAsyncC, [0,"lifecycle-async-a",{"value":[32],"loads":[32],"updates":[32]},[[0,"lifecycleLoad","lifecycleLoad"],[0,"lifecycleUpdate","lifecycleUpdate"]]]);
+          const LifecycleAsyncC$1 = /*@__PURE__*/ proxyCustomElement(LifecycleAsyncC, [
+            0,
+            'lifecycle-async-a',
+            { value: [32], loads: [32], updates: [32] },
+            [
+              [0, 'lifecycleLoad', 'lifecycleLoad'],
+              [0, 'lifecycleUpdate', 'lifecycleUpdate'],
+            ],
+          ]);
           customElements.define(tagName, LifecycleAsyncC$1);
         }
         break;
-
     }
   });
 };

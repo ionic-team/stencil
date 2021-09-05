@@ -1,4 +1,4 @@
-import type { Components, JSX } from "../test-dist/types/components";
+import type { Components, JSX } from '../test-dist/types/components';
 
 interface CssCmp extends Components.CssCmp, HTMLElement {}
 export const CssCmp: {

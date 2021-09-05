@@ -18,25 +18,32 @@ const SlotListLightScopedRoot$1 = class extends HTMLElement {
     this.items = [...this.items, ...newItems];
   }
   render() {
-    return (h("div", null, h("button", { onClick: () => this.needMore() }, "More"), h("slot-dynamic-scoped-list", { items: this.items })));
+    return h(
+      'div',
+      null,
+      h('button', { onClick: () => this.needMore() }, 'More'),
+      h('slot-dynamic-scoped-list', { items: this.items })
+    );
   }
 };
 
-const SlotListLightScopedRoot = /*@__PURE__*/proxyCustomElement(SlotListLightScopedRoot$1, [0,"slot-list-light-scoped-root",{"items":[1040]}]);
-const components = ['slot-list-light-scoped-root', 'slot-dynamic-scoped-list', 'slot-light-scoped-list', ];
+const SlotListLightScopedRoot = /*@__PURE__*/ proxyCustomElement(SlotListLightScopedRoot$1, [
+  0,
+  'slot-list-light-scoped-root',
+  { items: [1040] },
+]);
+const components = ['slot-list-light-scoped-root', 'slot-dynamic-scoped-list', 'slot-light-scoped-list'];
 
 const defineCustomElement = (tagRename) => {
   let tagName;
-  components.forEach(cmp => {
-    switch(cmp) {
-
+  components.forEach((cmp) => {
+    switch (cmp) {
       case 'slot-list-light-scoped-root':
         tagName = 'slot-list-light-scoped-root';
         if (tagRename) {
           tagName = tagRename(tagName);
         }
         if (!customElements.get(tagName)) {
-          
           customElements.define(tagName, SlotListLightScopedRoot);
         }
         break;
@@ -47,7 +54,11 @@ const defineCustomElement = (tagRename) => {
           tagName = tagRename(tagName);
         }
         if (!customElements.get(tagName)) {
-          const SlotDynamicScopedList = /*@__PURE__*/proxyCustomElement(DynamicListScopedComponent, [0,"slot-list-light-scoped-root",{"items":[1040]}]);
+          const SlotDynamicScopedList = /*@__PURE__*/ proxyCustomElement(DynamicListScopedComponent, [
+            0,
+            'slot-list-light-scoped-root',
+            { items: [1040] },
+          ]);
           customElements.define(tagName, SlotDynamicScopedList);
         }
         break;
@@ -58,11 +69,14 @@ const defineCustomElement = (tagRename) => {
           tagName = tagRename(tagName);
         }
         if (!customElements.get(tagName)) {
-          const SlotLightScopedList$1 = /*@__PURE__*/proxyCustomElement(SlotLightScopedList, [0,"slot-list-light-scoped-root",{"items":[1040]}]);
+          const SlotLightScopedList$1 = /*@__PURE__*/ proxyCustomElement(SlotLightScopedList, [
+            0,
+            'slot-list-light-scoped-root',
+            { items: [1040] },
+          ]);
           customElements.define(tagName, SlotLightScopedList$1);
         }
         break;
-
     }
   });
 };

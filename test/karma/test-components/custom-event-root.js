@@ -22,30 +22,51 @@ const CustomEventCmp = class extends HTMLElement {
     this.elm.dispatchEvent(ev);
   }
   render() {
-    return (h("div", null, h("div", null, h("button", { id: "btnNoDetail", onClick: this.fireCustomEventNoDetail.bind(this) }, "Fire Custom Event, no detail")), h("div", null, h("button", { id: "btnWithDetail", onClick: this.fireCustomEventWithDetail.bind(this) }, "Fire Custom Event, with detail")), h("pre", { id: "output" }, this.output)));
+    return h(
+      'div',
+      null,
+      h(
+        'div',
+        null,
+        h(
+          'button',
+          { id: 'btnNoDetail', onClick: this.fireCustomEventNoDetail.bind(this) },
+          'Fire Custom Event, no detail'
+        )
+      ),
+      h(
+        'div',
+        null,
+        h(
+          'button',
+          { id: 'btnWithDetail', onClick: this.fireCustomEventWithDetail.bind(this) },
+          'Fire Custom Event, with detail'
+        )
+      ),
+      h('pre', { id: 'output' }, this.output)
+    );
   }
-  get elm() { return this; }
+  get elm() {
+    return this;
+  }
 };
 
-const CustomEventRoot = /*@__PURE__*/proxyCustomElement(CustomEventCmp, [0,"custom-event-root",{"output":[32]}]);
-const components = ['custom-event-root', ];
+const CustomEventRoot = /*@__PURE__*/ proxyCustomElement(CustomEventCmp, [0, 'custom-event-root', { output: [32] }]);
+const components = ['custom-event-root'];
 
 const defineCustomElement = (tagRename) => {
   let tagName;
-  components.forEach(cmp => {
-    switch(cmp) {
-
+  components.forEach((cmp) => {
+    switch (cmp) {
       case 'custom-event-root':
         tagName = 'custom-event-root';
         if (tagRename) {
           tagName = tagRename(tagName);
         }
         if (!customElements.get(tagName)) {
-          
           customElements.define(tagName, CustomEventRoot);
         }
         break;
-
     }
   });
 };

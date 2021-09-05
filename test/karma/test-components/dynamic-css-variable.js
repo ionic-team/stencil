@@ -1,6 +1,6 @@
 import { h, proxyCustomElement } from '@stencil/core/internal/client';
 
-const cmpCss = ":root{--font-color:blue}header{color:var(--font-color)}";
+const cmpCss = ':root{--font-color:blue}header{color:var(--font-color)}';
 
 const DynamicCssVariables = class extends HTMLElement {
   constructor() {
@@ -14,39 +14,41 @@ const DynamicCssVariables = class extends HTMLElement {
   changeColor() {
     if (this.bgColor === 'white') {
       this.bgColor = 'red';
-    }
-    else {
+    } else {
       this.bgColor = 'white';
     }
   }
   render() {
     return [
-      h("header", { style: this.getBackgroundStyle() }, "Dynamic CSS Variables!!"),
-      h("main", null, h("p", null, h("button", { onClick: this.changeColor.bind(this) }, "Change Color"))),
+      h('header', { style: this.getBackgroundStyle() }, 'Dynamic CSS Variables!!'),
+      h('main', null, h('p', null, h('button', { onClick: this.changeColor.bind(this) }, 'Change Color'))),
     ];
   }
-  static get style() { return cmpCss; }
+  static get style() {
+    return cmpCss;
+  }
 };
 
-const DynamicCssVariable = /*@__PURE__*/proxyCustomElement(DynamicCssVariables, [0,"dynamic-css-variable",{"bgColor":[32]}]);
-const components = ['dynamic-css-variable', ];
+const DynamicCssVariable = /*@__PURE__*/ proxyCustomElement(DynamicCssVariables, [
+  0,
+  'dynamic-css-variable',
+  { bgColor: [32] },
+]);
+const components = ['dynamic-css-variable'];
 
 const defineCustomElement = (tagRename) => {
   let tagName;
-  components.forEach(cmp => {
-    switch(cmp) {
-
+  components.forEach((cmp) => {
+    switch (cmp) {
       case 'dynamic-css-variable':
         tagName = 'dynamic-css-variable';
         if (tagRename) {
           tagName = tagRename(tagName);
         }
         if (!customElements.get(tagName)) {
-          
           customElements.define(tagName, DynamicCssVariable);
         }
         break;
-
     }
   });
 };

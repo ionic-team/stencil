@@ -7,7 +7,7 @@ const CustomElementNestedChild = class extends HTMLElement {
     attachShadow(this);
   }
   render() {
-    return (h("div", null, h("strong", null, "Nested child Loaded!")));
+    return h('div', null, h('strong', null, 'Nested child Loaded!'));
   }
 };
 

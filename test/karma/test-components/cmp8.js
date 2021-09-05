@@ -7,12 +7,11 @@ const ShadowDomSlotNested = class extends HTMLElement {
     attachShadow(this);
   }
   render() {
-    return [
-      h("header", null, "shadow dom: ", this.i),
-      h("footer", null, h("slot", null)),
-    ];
+    return [h('header', null, 'shadow dom: ', this.i), h('footer', null, h('slot', null))];
   }
-  static get style() { return "header {\n      color: red;\n    }"; }
+  static get style() {
+    return 'header {\n      color: red;\n    }';
+  }
 };
 
 export { ShadowDomSlotNested as S };

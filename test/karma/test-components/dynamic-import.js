@@ -15,29 +15,26 @@ const DynamicImport$1 = class extends HTMLElement {
     this.value = await this.getResult();
   }
   render() {
-    return h("div", null, this.value);
+    return h('div', null, this.value);
   }
 };
 
-const DynamicImport = /*@__PURE__*/proxyCustomElement(DynamicImport$1, [0,"dynamic-import",{"value":[32]}]);
-const components = ['dynamic-import', ];
+const DynamicImport = /*@__PURE__*/ proxyCustomElement(DynamicImport$1, [0, 'dynamic-import', { value: [32] }]);
+const components = ['dynamic-import'];
 
 const defineCustomElement = (tagRename) => {
   let tagName;
-  components.forEach(cmp => {
-    switch(cmp) {
-
+  components.forEach((cmp) => {
+    switch (cmp) {
       case 'dynamic-import':
         tagName = 'dynamic-import';
         if (tagRename) {
           tagName = tagRename(tagName);
         }
         if (!customElements.get(tagName)) {
-          
           customElements.define(tagName, DynamicImport);
         }
         break;
-
     }
   });
 };

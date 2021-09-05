@@ -6,7 +6,7 @@ const SlotMapOrder = class extends HTMLElement {
     this.__registerHost();
   }
   render() {
-    return h("slot", null);
+    return h('slot', null);
   }
 };
 

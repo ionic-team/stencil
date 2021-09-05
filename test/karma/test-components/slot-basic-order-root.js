@@ -7,25 +7,23 @@ const SlotBasicOrderRoot$1 = class extends HTMLElement {
     this.__registerHost();
   }
   render() {
-    return (h("slot-basic-order", null, h("content-a", null, "a"), h("content-b", null, "b"), h("content-c", null, "c")));
+    return h('slot-basic-order', null, h('content-a', null, 'a'), h('content-b', null, 'b'), h('content-c', null, 'c'));
   }
 };
 
-const SlotBasicOrderRoot = /*@__PURE__*/proxyCustomElement(SlotBasicOrderRoot$1, [0,"slot-basic-order-root"]);
-const components = ['slot-basic-order-root', 'slot-basic-order', ];
+const SlotBasicOrderRoot = /*@__PURE__*/ proxyCustomElement(SlotBasicOrderRoot$1, [0, 'slot-basic-order-root']);
+const components = ['slot-basic-order-root', 'slot-basic-order'];
 
 const defineCustomElement = (tagRename) => {
   let tagName;
-  components.forEach(cmp => {
-    switch(cmp) {
-
+  components.forEach((cmp) => {
+    switch (cmp) {
       case 'slot-basic-order-root':
         tagName = 'slot-basic-order-root';
         if (tagRename) {
           tagName = tagRename(tagName);
         }
         if (!customElements.get(tagName)) {
-          
           customElements.define(tagName, SlotBasicOrderRoot);
         }
         break;
@@ -36,11 +34,10 @@ const defineCustomElement = (tagRename) => {
           tagName = tagRename(tagName);
         }
         if (!customElements.get(tagName)) {
-          const SlotBasicOrder$1 = /*@__PURE__*/proxyCustomElement(SlotBasicOrder, [0,"slot-basic-order-root"]);
+          const SlotBasicOrder$1 = /*@__PURE__*/ proxyCustomElement(SlotBasicOrder, [0, 'slot-basic-order-root']);
           customElements.define(tagName, SlotBasicOrder$1);
         }
         break;
-
     }
   });
 };

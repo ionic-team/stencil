@@ -22,35 +22,49 @@ const SlotFallbackRoot$1 = class extends HTMLElement {
   }
   render() {
     return [
-      h("button", { onClick: this.changeFallbackContent.bind(this), class: "change-fallback-content" }, "Change Fallback Slot Content"),
-      h("button", { onClick: this.changeLightDom.bind(this), class: "change-light-dom" }, this.inc % 2 === 0 ? 'Use light dom content' : 'Use fallback slot content'),
-      h("button", { onClick: this.changeSlotContent.bind(this), class: "change-slot-content" }, "Change Slot Content"),
-      h("slot-fallback", { inc: this.fallbackInc, class: "results1" }, this.inc % 2 !== 0
-        ? [
-          h("content-default", null, this.slotContent, " : default"),
-          h("content-end", { slot: "end" }, this.slotContent, " : end"),
-          h("content-start", { slot: "start" }, this.slotContent, " : start"),
-        ]
-        : null),
+      h(
+        'button',
+        { onClick: this.changeFallbackContent.bind(this), class: 'change-fallback-content' },
+        'Change Fallback Slot Content'
+      ),
+      h(
+        'button',
+        { onClick: this.changeLightDom.bind(this), class: 'change-light-dom' },
+        this.inc % 2 === 0 ? 'Use light dom content' : 'Use fallback slot content'
+      ),
+      h('button', { onClick: this.changeSlotContent.bind(this), class: 'change-slot-content' }, 'Change Slot Content'),
+      h(
+        'slot-fallback',
+        { inc: this.fallbackInc, class: 'results1' },
+        this.inc % 2 !== 0
+          ? [
+              h('content-default', null, this.slotContent, ' : default'),
+              h('content-end', { slot: 'end' }, this.slotContent, ' : end'),
+              h('content-start', { slot: 'start' }, this.slotContent, ' : start'),
+            ]
+          : null
+      ),
     ];
   }
 };
 
-const SlotFallbackRoot = /*@__PURE__*/proxyCustomElement(SlotFallbackRoot$1, [0,"slot-fallback-root",{"fallbackInc":[32],"inc":[32],"slotContent":[32]}]);
-const components = ['slot-fallback-root', 'slot-fallback', ];
+const SlotFallbackRoot = /*@__PURE__*/ proxyCustomElement(SlotFallbackRoot$1, [
+  0,
+  'slot-fallback-root',
+  { fallbackInc: [32], inc: [32], slotContent: [32] },
+]);
+const components = ['slot-fallback-root', 'slot-fallback'];
 
 const defineCustomElement = (tagRename) => {
   let tagName;
-  components.forEach(cmp => {
-    switch(cmp) {
-
+  components.forEach((cmp) => {
+    switch (cmp) {
       case 'slot-fallback-root':
         tagName = 'slot-fallback-root';
         if (tagRename) {
           tagName = tagRename(tagName);
         }
         if (!customElements.get(tagName)) {
-          
           customElements.define(tagName, SlotFallbackRoot);
         }
         break;
@@ -61,11 +75,14 @@ const defineCustomElement = (tagRename) => {
           tagName = tagRename(tagName);
         }
         if (!customElements.get(tagName)) {
-          const SlotFallback$1 = /*@__PURE__*/proxyCustomElement(SlotFallback, [0,"slot-fallback-root",{"fallbackInc":[32],"inc":[32],"slotContent":[32]}]);
+          const SlotFallback$1 = /*@__PURE__*/ proxyCustomElement(SlotFallback, [
+            0,
+            'slot-fallback-root',
+            { fallbackInc: [32], inc: [32], slotContent: [32] },
+          ]);
           customElements.define(tagName, SlotFallback$1);
         }
         break;
-
     }
   });
 };

@@ -6,7 +6,7 @@ const SlotBasic = class extends HTMLElement {
     this.__registerHost();
   }
   render() {
-    return (h("header", null, h("section", null, h("article", null, h("slot", null)))));
+    return h('header', null, h('section', null, h('article', null, h('slot', null))));
   }
 };
 

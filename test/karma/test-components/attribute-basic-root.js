@@ -16,26 +16,32 @@ const AttributeBasicRoot$1 = class extends HTMLElement {
     cmp.setAttribute('my-custom-attr', 'my-custom-attr-update');
   }
   render() {
-    return (h("div", null, h("button", { onClick: this.testClick.bind(this) }, "Test"), h("attribute-basic", null), h("div", null, "hostname: ", this.url.hostname, ", pathname: ", this.url.pathname)));
+    return h(
+      'div',
+      null,
+      h('button', { onClick: this.testClick.bind(this) }, 'Test'),
+      h('attribute-basic', null),
+      h('div', null, 'hostname: ', this.url.hostname, ', pathname: ', this.url.pathname)
+    );
   }
-  get el() { return this; }
+  get el() {
+    return this;
+  }
 };
 
-const AttributeBasicRoot = /*@__PURE__*/proxyCustomElement(AttributeBasicRoot$1, [0,"attribute-basic-root"]);
-const components = ['attribute-basic-root', 'attribute-basic', ];
+const AttributeBasicRoot = /*@__PURE__*/ proxyCustomElement(AttributeBasicRoot$1, [0, 'attribute-basic-root']);
+const components = ['attribute-basic-root', 'attribute-basic'];
 
 const defineCustomElement = (tagRename) => {
   let tagName;
-  components.forEach(cmp => {
-    switch(cmp) {
-
+  components.forEach((cmp) => {
+    switch (cmp) {
       case 'attribute-basic-root':
         tagName = 'attribute-basic-root';
         if (tagRename) {
           tagName = tagRename(tagName);
         }
         if (!customElements.get(tagName)) {
-          
           customElements.define(tagName, AttributeBasicRoot);
         }
         break;
@@ -46,11 +52,10 @@ const defineCustomElement = (tagRename) => {
           tagName = tagRename(tagName);
         }
         if (!customElements.get(tagName)) {
-          const AttributeBasic$1 = /*@__PURE__*/proxyCustomElement(AttributeBasic, [0,"attribute-basic-root"]);
+          const AttributeBasic$1 = /*@__PURE__*/ proxyCustomElement(AttributeBasic, [0, 'attribute-basic-root']);
           customElements.define(tagName, AttributeBasic$1);
         }
         break;
-
     }
   });
 };

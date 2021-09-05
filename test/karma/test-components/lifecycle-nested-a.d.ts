@@ -1,4 +1,4 @@
-import type { Components, JSX } from "../test-dist/types/components";
+import type { Components, JSX } from '../test-dist/types/components';
 
 interface LifecycleNestedA extends Components.LifecycleNestedA, HTMLElement {}
 export const LifecycleNestedA: {

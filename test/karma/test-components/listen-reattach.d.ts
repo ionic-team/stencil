@@ -1,4 +1,4 @@
-import type { Components, JSX } from "../test-dist/types/components";
+import type { Components, JSX } from '../test-dist/types/components';
 
 interface ListenReattach extends Components.ListenReattach, HTMLElement {}
 export const ListenReattach: {

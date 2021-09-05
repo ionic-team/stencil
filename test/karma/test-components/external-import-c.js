@@ -11,29 +11,26 @@ const ExternalImportB = class extends HTMLElement {
     this.last = data().last;
   }
   render() {
-    return (h("div", null, this.first, " ", this.last));
+    return h('div', null, this.first, ' ', this.last);
   }
 };
 
-const ExternalImportC = /*@__PURE__*/proxyCustomElement(ExternalImportB, [0,"external-import-c"]);
-const components = ['external-import-c', ];
+const ExternalImportC = /*@__PURE__*/ proxyCustomElement(ExternalImportB, [0, 'external-import-c']);
+const components = ['external-import-c'];
 
 const defineCustomElement = (tagRename) => {
   let tagName;
-  components.forEach(cmp => {
-    switch(cmp) {
-
+  components.forEach((cmp) => {
+    switch (cmp) {
       case 'external-import-c':
         tagName = 'external-import-c';
         if (tagRename) {
           tagName = tagRename(tagName);
         }
         if (!customElements.get(tagName)) {
-          
           customElements.define(tagName, ExternalImportC);
         }
         break;
-
     }
   });
 };

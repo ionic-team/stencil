@@ -1,4 +1,4 @@
-import type { Components, JSX } from "../test-dist/types/components";
+import type { Components, JSX } from '../test-dist/types/components';
 
 interface SlotNoDefault extends Components.SlotNoDefault, HTMLElement {}
 export const SlotNoDefault: {

@@ -8,26 +8,26 @@ const ShadowDomBasicRoot$1 = class extends HTMLElement {
     attachShadow(this);
   }
   render() {
-    return (h("shadow-dom-basic", null, h("div", null, "light")));
+    return h('shadow-dom-basic', null, h('div', null, 'light'));
   }
-  static get style() { return "div {\n      background: rgb(255, 255, 0);\n    }"; }
+  static get style() {
+    return 'div {\n      background: rgb(255, 255, 0);\n    }';
+  }
 };
 
-const ShadowDomBasicRoot = /*@__PURE__*/proxyCustomElement(ShadowDomBasicRoot$1, [1,"shadow-dom-basic-root"]);
-const components = ['shadow-dom-basic-root', 'shadow-dom-basic', ];
+const ShadowDomBasicRoot = /*@__PURE__*/ proxyCustomElement(ShadowDomBasicRoot$1, [1, 'shadow-dom-basic-root']);
+const components = ['shadow-dom-basic-root', 'shadow-dom-basic'];
 
 const defineCustomElement = (tagRename) => {
   let tagName;
-  components.forEach(cmp => {
-    switch(cmp) {
-
+  components.forEach((cmp) => {
+    switch (cmp) {
       case 'shadow-dom-basic-root':
         tagName = 'shadow-dom-basic-root';
         if (tagRename) {
           tagName = tagRename(tagName);
         }
         if (!customElements.get(tagName)) {
-          
           customElements.define(tagName, ShadowDomBasicRoot);
         }
         break;
@@ -38,11 +38,10 @@ const defineCustomElement = (tagRename) => {
           tagName = tagRename(tagName);
         }
         if (!customElements.get(tagName)) {
-          const ShadowDomBasic$1 = /*@__PURE__*/proxyCustomElement(ShadowDomBasic, [1,"shadow-dom-basic-root"]);
+          const ShadowDomBasic$1 = /*@__PURE__*/ proxyCustomElement(ShadowDomBasic, [1, 'shadow-dom-basic-root']);
           customElements.define(tagName, ShadowDomBasic$1);
         }
         break;
-
     }
   });
 };

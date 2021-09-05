@@ -1,4 +1,4 @@
-import type { Components, JSX } from "../test-dist/types/components";
+import type { Components, JSX } from '../test-dist/types/components';
 
 interface Es5AddclassSvg extends Components.Es5AddclassSvg, HTMLElement {}
 export const Es5AddclassSvg: {

@@ -7,7 +7,11 @@ const DynamicListScopedComponent = class extends HTMLElement {
     this.items = [];
   }
   render() {
-    return (h("slot-light-scoped-list", null, this.items.map((item) => (h("div", null, item)))));
+    return h(
+      'slot-light-scoped-list',
+      null,
+      this.items.map((item) => h('div', null, item))
+    );
   }
 };
 
