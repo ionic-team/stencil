@@ -1,3 +1,3 @@
 export const utility = (str: string) => {
-  return str.split("").reverse().join("") + '1';
-}
+  return str.split('').reverse().join('') + '1';
+};

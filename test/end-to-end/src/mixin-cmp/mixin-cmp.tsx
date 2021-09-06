@@ -11,8 +11,8 @@ import { Button } from 'ionic-git/core/src/components/button/button';
   shadow: true,
   styleUrls: {
     ios: '../../node_modules/ionic-git/core/src/components/button/button.ios.scss',
-    md: '../../node_modules/ionic-git/core/src/components/button/button.md.scss'
-  }
+    md: '../../node_modules/ionic-git/core/src/components/button/button.md.scss',
+  },
 })
 export class MixinCmp implements ComponentInterface {
   @Prop() firstName = 'Jonny';

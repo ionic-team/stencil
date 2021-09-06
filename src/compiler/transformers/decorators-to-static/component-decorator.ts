@@ -88,7 +88,8 @@ const validateComponent = (
 
   // check if class has more than one decorator
   const mixinDecs = cmpNode.decorators && cmpNode.decorators.filter(isDecoratorNamed('Mixin'));
-  const otherDecorator = cmpNode.decorators && cmpNode.decorators.filter(d => (d !== componentDecorator && !mixinDecs.includes(d)));
+  const otherDecorator =
+    cmpNode.decorators && cmpNode.decorators.filter((d) => d !== componentDecorator && !mixinDecs.includes(d));
   if (otherDecorator.length) {
     const err = buildError(diagnostics);
     err.messageText = `Classes decorated with @Component can not be decorated with more decorators.

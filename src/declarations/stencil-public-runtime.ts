@@ -4,14 +4,14 @@ declare type CustomMethodDecorator<T> = (
   descriptor: TypedPropertyDescriptor<T>
 ) => TypedPropertyDescriptor<T> | void;
 
-declare type MixinType = { new(...args: any[]): any; }
+declare type MixinType = { new (...args: any[]): any };
 
 export interface ComponentDecorator {
   (opts?: ComponentOptions): ClassDecorator;
 }
 
 export interface MixinDecorator {
-  (arg0: MixinType): ClassDecorator
+  (arg0: MixinType): ClassDecorator;
 }
 
 export interface ComponentOptions {
@@ -275,21 +275,11 @@ export declare const setMode: (handler: ResolutionHandler) => void;
  */
 export declare function getMode<T = string | undefined>(ref: any): T;
 
-export declare function setPlatformHelpers (helpers: {
+export declare function setPlatformHelpers(helpers: {
   jmp?: (c: any) => any;
   raf?: (c: any) => number;
-  ael?: (
-    el: any,
-    eventName: string,
-    listener: any,
-    options: any,
-  ) => void;
-  rel?: (
-    el: any,
-    eventName: string,
-    listener: any,
-    options: any,
-  ) => void;
+  ael?: (el: any, eventName: string, listener: any, options: any) => void;
+  rel?: (el: any, eventName: string, listener: any, options: any) => void;
   ce?: (eventName: string, opts?: any) => any;
 }): void;
 

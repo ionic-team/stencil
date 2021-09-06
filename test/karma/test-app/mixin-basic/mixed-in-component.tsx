@@ -3,7 +3,7 @@ import { utility as utility2 } from './utility2';
 
 @Component({
   tag: 'mixed-in-basic',
-  shadow: true
+  shadow: true,
 })
 export class MixedBasic {
   @Event() eventFromComponent: EventEmitter<string>;
@@ -28,6 +28,6 @@ export class MixedBasic {
   @Prop() nameFiltered: string = `I won't be present at all`;
 
   renderTpl(): VNode {
-    return <h1>I'm a jsx node from a mixed in component</h1>
+    return <h1>I'm a jsx node from a mixed in component</h1>;
   }
 }

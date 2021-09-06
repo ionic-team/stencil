@@ -581,7 +581,7 @@ export const resolveClassName = (importSp: ts.ImportSpecifier, sourceFile?: ts.S
   if (importSp.propertyName && ts.isIdentifier(importSp.propertyName)) {
     return importSp.propertyName.getText(sourceFile);
   } else return importSp.name.getText(sourceFile);
-}
+};
 
 /** util. Returns named bindings from an import declaration */
 export const getImportNamedBindings = (importDec: ts.ImportDeclaration): ts.ImportSpecifier[] => {
@@ -592,65 +592,68 @@ export const getImportNamedBindings = (importDec: ts.ImportDeclaration): ts.Impo
     importDec.importClause.namedBindings &&
     ts.isNamedImports(importDec.importClause.namedBindings) &&
     Array.isArray(importDec.importClause.namedBindings.elements)
-  ) return importDec.importClause.namedBindings.elements;
+  )
+    return importDec.importClause.namedBindings.elements;
   return [];
-}
+};
 
 export const findImportDeclsWithMemberNames = (sourceFile: ts.SourceFile, memberNames: string[]) => {
   // loops through all source imports to find those containing member names
   let foundClassName: string;
   let impSpecs: ts.ImportSpecifier[];
-  const importDeclMap: Map<string, {declaration: ts.ImportDeclaration, identifier: string}> = new Map();
+  const importDeclMap: Map<string, { declaration: ts.ImportDeclaration; identifier: string }> = new Map();
 
-  sourceFile.statements.filter(st => ts.isImportDeclaration(st)).forEach((st: ts.ImportDeclaration) => {
-    foundClassName = null;
-    impSpecs = [];
+  sourceFile.statements
+    .filter((st) => ts.isImportDeclaration(st))
+    .forEach((st: ts.ImportDeclaration) => {
+      foundClassName = null;
+      impSpecs = [];
 
-    if (
-      st.importClause &&
-      ts.isImportClause(st.importClause) &&
-      (impSpecs = getImportNamedBindings(st)) &&
-      impSpecs.length
-    ) {
-      // named modules
-      impSpecs.forEach(nbe => {
-        if (foundClassName = memberNames.find(dec => dec === nbe.name.getText(sourceFile))) {
-          importDeclMap.set(foundClassName, {
-            declaration: st,
-            identifier: resolveClassName(nbe, sourceFile)
-          });
-        }
-      })
-    }
-    // default modules
-    if (
-      st.importClause.name &&
-      ts.isIdentifier(st.importClause.name) &&
-      (foundClassName = memberNames.find(dec => dec === st.importClause.name.getText(sourceFile)))
-    ) {
-      importDeclMap.set(foundClassName, {
-        declaration: st,
-        identifier: 'default'
-      });
-    }
-  });
+      if (
+        st.importClause &&
+        ts.isImportClause(st.importClause) &&
+        (impSpecs = getImportNamedBindings(st)) &&
+        impSpecs.length
+      ) {
+        // named modules
+        impSpecs.forEach((nbe) => {
+          if ((foundClassName = memberNames.find((dec) => dec === nbe.name.getText(sourceFile)))) {
+            importDeclMap.set(foundClassName, {
+              declaration: st,
+              identifier: resolveClassName(nbe, sourceFile),
+            });
+          }
+        });
+      }
+      // default modules
+      if (
+        st.importClause.name &&
+        ts.isIdentifier(st.importClause.name) &&
+        (foundClassName = memberNames.find((dec) => dec === st.importClause.name.getText(sourceFile)))
+      ) {
+        importDeclMap.set(foundClassName, {
+          declaration: st,
+          identifier: 'default',
+        });
+      }
+    });
   return importDeclMap;
-}
+};
 
 /** get the class names from the decorator */
 export const getMixinsFromDecorator = (mixinDecorators: ts.Decorator[], sourceFile?: ts.SourceFile) => {
   let mixinMap = new Map() as MixinDecorators;
   let mixinClassNames: string[] = [];
 
-  mixinDecorators.forEach(dec => {
+  mixinDecorators.forEach((dec) => {
     if (ts.isCallExpression(dec.expression)) {
       const mixinName = dec.expression.arguments[0].getText(sourceFile).replace(/'|"|`/g, '');
       mixinMap.set(mixinName, dec);
       mixinClassNames.push(mixinName);
     }
   });
-  return {mixinMap, mixinClassNames};
-}
+  return { mixinMap, mixinClassNames };
+};
 
 // find an import declarations from a Map via module path
 export const findImportDeclObjWithModPath = (declarationMap: Map<string, ImportDeclObj>, moduleName: string) => {
@@ -663,8 +666,8 @@ export const findImportDeclObjWithModPath = (declarationMap: Map<string, ImportD
       foundImportObjs.push(importObj);
     }
   }
-  return {classNames: classNames, importObjs: foundImportObjs};
-}
+  return { classNames: classNames, importObjs: foundImportObjs };
+};
 
 export const cloneNode = (node: any) => {
   return wsCloneNode(node, {
@@ -680,31 +683,38 @@ export const cloneNode = (node: any) => {
       );
       ts.setSourceMapRange(clonedNode, {
         source: srcMapSrc,
-        pos:  oldNode.pos,
-        end: oldNode.end
+        pos: oldNode.pos,
+        end: oldNode.end,
       });
 
       return clonedNode;
-    }
+    },
   });
-}
+};
 
-export interface ImportDeclObj {declaration: ts.ImportDeclaration, identifier: string};
+export interface ImportDeclObj {
+  declaration: ts.ImportDeclaration;
+  identifier: string;
+}
 
 export type MixinDecorators = Map<string, ts.Decorator>;
 
-export interface TSsourceFileWithModules extends ts.SourceFile { resolvedModules: Map<string, TSModule> }
+export interface TSsourceFileWithModules extends ts.SourceFile {
+  resolvedModules: Map<string, TSModule>;
+}
 
 export interface TSModule {
-  resolvedFileName: string,
-  originalPath: string | undefined,
-  extension: string,
-  isExternalLibraryImport: boolean,
-  packageId: {
-    name: string,
-    subModuleName: string,
-    version: string
-  } | undefined
+  resolvedFileName: string;
+  originalPath: string | undefined;
+  extension: string;
+  isExternalLibraryImport: boolean;
+  packageId:
+    | {
+        name: string;
+        subModuleName: string;
+        version: string;
+      }
+    | undefined;
 }
 
 export interface ConvertIdentifier {

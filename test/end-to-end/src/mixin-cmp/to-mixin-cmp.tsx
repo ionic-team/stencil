@@ -1,9 +1,9 @@
 import { Prop, Component, h, Host } from '@stencil/core';
 
-const css = {'background-color': 'rgba(0, 0, 255, 0.1)'};
+const css = { 'background-color': 'rgba(0, 0, 255, 0.1)' };
 
 @Component({
-  tag: 'mixed-in-cmp'
+  tag: 'mixed-in-cmp',
 })
 export class ToMixin {
   @Prop() middleName: string = 'B';
@@ -17,6 +17,6 @@ export class ToMixin {
           {this.firstName} {this.middleName} {this.surname}
         </div>
       </Host>
-    )
+    );
   }
 }

@@ -5,7 +5,7 @@ import { MixedBasic as MixedBasicAlias2 } from './mixed-in-class';
 @Mixin(MixedBasicAlias1)
 @Mixin(MixedBasicAlias2)
 @Component({
-  tag: 'mixin-basic'
+  tag: 'mixin-basic',
 })
 export class MixinBasic {
   @Element() el: HTMLElement;
@@ -20,15 +20,23 @@ export class MixinBasic {
   }
 
   render() {
-    return <div>
-      <this.renderTpl/>
-      <h2 class="privateMethodBasic">{this.privateMethodFromBasicClass()} {this.privateMethodFromBasicClassReverse()}</h2>
-      <h2 class="privateMethodComponent">{this.privateMethodFromComponent()} {this.privateMethodFromComponentReverse()}</h2>
-      <h3 class="stateBasic">{this.stateFromBasicClass}</h3>
-      <h3 class="stateComponent">{this.stateFromComponent}</h3>
-      <h4 class="eventBasic"></h4>
-      <h4 class="eventComponent"></h4>
-    </div>
+    return (
+      <div>
+        <this.renderTpl />
+        <h2 class="privateMethodBasic">
+          {this.privateMethodFromBasicClass()} {this.privateMethodFromBasicClassReverse()}
+        </h2>
+        <h2 class="privateMethodComponent">
+          {this.privateMethodFromComponent()} {this.privateMethodFromComponentReverse()}
+        </h2>
+        <h3 class="stateBasic">{this.stateFromBasicClass}</h3>
+        <h3 class="stateComponent">{this.stateFromComponent}</h3>
+        <h4 class="eventBasic"></h4>
+        <h4 class="eventComponent"></h4>
+      </div>
+    );
   }
 }
-export interface MixinBasic extends Omit<MixedBasicAlias1, 'nameClash' | 'nameFiltered'>, Omit<MixedBasicAlias2, 'nameClash'> {}
+export interface MixinBasic
+  extends Omit<MixedBasicAlias1, 'nameClash' | 'nameFiltered'>,
+    Omit<MixedBasicAlias2, 'nameClash'> {}

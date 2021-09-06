@@ -24,9 +24,7 @@ export const config: Config = {
     moduleNameMapper: {
       'lodash-es': 'lodash',
     },
-    transformIgnorePatterns: [
-      "node_modules/(?!(ionic-git)/)"
-    ]
+    transformIgnorePatterns: ['node_modules/(?!(ionic-git)/)'],
   },
   outputTargets: [
     {

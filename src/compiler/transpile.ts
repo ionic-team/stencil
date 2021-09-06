@@ -70,6 +70,8 @@ const transpileCode = (
     if (transpileOpts.sourceMap === 'inline') {
       try {
         const mapObject = JSON.parse(transpileResults.map);
+        if (!mapObject) return;
+
         mapObject.file = transpileOpts.file;
         mapObject.sources = [transpileOpts.file];
         delete mapObject.sourceRoot;
