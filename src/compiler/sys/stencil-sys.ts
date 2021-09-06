@@ -16,6 +16,8 @@ import type {
 } from '../../declarations';
 import platformPath from 'path-browserify';
 import { basename, dirname, join } from 'path';
+import * as process from 'process';
+import * as os from 'os';
 import { buildEvents } from '../events';
 import { createLogger } from './logger/console-logger';
 import { createWebWorkerMainController } from './worker/web-worker-main';
@@ -72,6 +74,14 @@ export const createSystem = (c?: { logger?: Logger }) => {
   const copyFile = async (src: string, dest: string) => {
     writeFileSync(dest, readFileSync(src));
     return true;
+  };
+
+  const isTTY = (): boolean => {
+    return !!process?.stdout?.isTTY;
+  };
+
+  const homeDir = () => {
+    return os.homedir();
   };
 
   const createDirSync = (p: string, opts?: CompilerSystemCreateDirectoryOptions) => {
@@ -495,6 +505,23 @@ export const createSystem = (c?: { logger?: Logger }) => {
     return results;
   };
 
+  /**
+   * `self` is the global namespace object used within a web worker.
+   * `window` is the browser's global namespace object (I reorganized this to check the reference on that second)
+   * `global` is Node's global namespace object. https://nodejs.org/api/globals.html#globals_global
+   *
+   * loading in this order should allow workers, which are most common, then browser,
+   * then Node to grab the reference to fetch correctly.
+   */
+  const fetch =
+    typeof self !== 'undefined'
+      ? self?.fetch
+      : typeof window !== 'undefined'
+      ? window?.fetch
+      : typeof global !== 'undefined'
+      ? global?.fetch
+      : undefined;
+
   const writeFile = async (p: string, data: string) => writeFileSync(p, data);
 
   const tmpDirSync = () => '/.tmp';
@@ -523,6 +550,10 @@ export const createSystem = (c?: { logger?: Logger }) => {
     return results;
   };
 
+  const getEnvironmentVar = (key: string) => {
+    return process?.env[key];
+  };
+
   const getLocalModulePath = (opts: { rootDir: string; moduleId: string; path: string }) =>
     join(opts.rootDir, 'node_modules', opts.moduleId, opts.path);
 
@@ -546,6 +577,9 @@ export const createSystem = (c?: { logger?: Logger }) => {
     copyFile,
     createDir,
     createDirSync,
+    homeDir,
+    isTTY,
+    getEnvironmentVar,
     destroy,
     encodeToBase64,
     exit: async (exitCode) => logger.warn(`exit ${exitCode}`),
@@ -566,6 +600,7 @@ export const createSystem = (c?: { logger?: Logger }) => {
     realpathSync,
     removeDestory,
     rename,
+    fetch,
     resolvePath,
     removeDir,
     removeDirSync,

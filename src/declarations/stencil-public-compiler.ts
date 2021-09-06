@@ -169,6 +169,17 @@ export interface StencilConfig {
   hydratedFlag?: HydratedFlag;
 
   /**
+   * Ionic perfers to hide all components prior to hydration with a style tag appended
+   * to the head of the document containing some `visibility: hidden;` css rules.
+   *
+   * Disabling this will remove the style tag that sets `visibility: hidden;` on all
+   * unhydrated web components. This more closely follows the HTML spec, and allows
+   * you to set your own fallback content.
+   *
+   */
+  invisiblePrehydration?: boolean;
+
+  /**
    * Sets the task queue used by stencil's runtime. The task queue schedules DOM read and writes
    * across the frames to efficiently render and reduce layout thrashing. By default,
    * `async` is used. It's recommended to also try each setting to decide which works
@@ -291,8 +302,8 @@ export interface ConfigExtras {
 
   /**
    * When a component is first attached to the DOM, this setting will wait a single tick before
-   * rendering. This worksaround an Angular issue, where Angular attaches the elements before
-   * settings their initial state, leading to double renders and unnecesary event dispatchs.
+   * rendering. This works around an Angular issue, where Angular attaches the elements before
+   * settings their initial state, leading to double renders and unnecessary event dispatches.
    * Defaults to `false`.
    */
   initializeNextTick?: boolean;
@@ -539,6 +550,7 @@ export type TaskCommand =
   | 'info'
   | 'prerender'
   | 'serve'
+  | 'telemetry'
   | 'test'
   | 'version';
 
@@ -902,6 +914,11 @@ export interface CompilerSystem {
    * SYNC! Does not throw.
    */
   createDirSync(p: string, opts?: CompilerSystemCreateDirectoryOptions): CompilerSystemCreateDirectoryResults;
+  homeDir(): string;
+  /**
+   * Used to determine if the current context of the terminal is TTY.
+   */
+  isTTY(): boolean;
   /**
    * Each plaform as a different way to dynamically import modules.
    */
@@ -1029,6 +1046,7 @@ export interface CompilerSystem {
    */
   removeFileSync(p: string): CompilerSystemRemoveFileResults;
   setupCompiler?: (c: { ts: any }) => void;
+
   /**
    * Always returns an object. Does not throw. Check for "error" property if there's an error.
    */

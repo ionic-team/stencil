@@ -97,7 +97,7 @@ export const transpileModule = (config: d.Config, input: string, transformOpts: 
   if (classNode) {
     const mixinDecorators = classNode.decorators.filter(isDecoratorNamed('Mixin', sourceFile));
 
-    if (mixinDecorators) {
+    if (mixinDecorators && mixinDecorators.length) {
       const { mixinClassNames } = getMixinsFromDecorator(mixinDecorators, sourceFile);
       const importDeclMap = findImportDeclsWithMemberNames(sourceFile, mixinClassNames);
 
@@ -107,6 +107,9 @@ export const transpileModule = (config: d.Config, input: string, transformOpts: 
         if (!classNames.length) return;
         recursiveDependants(sourceFilePath, sourceFiles, modPath, tsCompilerOptions);
       });
+
+      // the lack of physical mixin sourcemaps within the program for causes babel source map to crap out
+      tsCompilerOptions.inlineSourceMap = tsCompilerOptions.sourceMap;
     }
   }
 
