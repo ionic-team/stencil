@@ -1,3 +1,53 @@
+# 🎲 [2.8.0](https://github.com/ionic-team/stencil/compare/v2.7.1...v2.8.0) (2021-09-01)
+
+### Bug Fixes
+
+* **types:** add referrerPolicy to AnchorHTMLAttributes ([#3006](https://github.com/ionic-team/stencil/issues/3006)) ([4f7c073](https://github.com/ionic-team/stencil/commit/4f7c073311192c8601bcedcacc9e8daef2b349e3))
+* **docs:** update app-es5-disabled.ts message ([#2993](https://github.com/ionic-team/stencil/issues/2993)) ([4f7c073](https://github.com/ionic-team/stencil/commit/a6ebc51fd71a98898d99cde45c9e5a14585a44c7))
+
+### Features
+
+* **compiler:** allow disabling the injected hydration stylesheet ([#2989](https://github.com/ionic-team/stencil/issues/2989)) ([a3d2928](https://github.com/ionic-team/stencil/commit/a3d2928dbc31b786aa273020b88f09d107b05474))
+
+## 🐔 [2.7.1](https://github.com/ionic-team/stencil/compare/v2.7-0...v2.7.1) (2021-08-24)
+
+### Bug Fixes
+
+* **ci:** vendor deno for builds ([#3020](https://github.com/ionic-team/stencil/issues/3020)) ([6d8a61d](https://github.com/ionic-team/stencil/commit/6d8a61d166859ca165d85b7c7cea35b99acc53ee))
+* **compiler:** solve issue where worker thread didn't have access to fetch ([#3012](https://github.com/ionic-team/stencil/issues/3012)) ([925d4e9](https://github.com/ionic-team/stencil/commit/925d4e924264df424c3519f4c0a91b22356a2ea6))
+* **telemetry:** handle malformed telemetry tokens ([#3014](https://github.com/ionic-team/stencil/issues/3014)) ([ff75a47](https://github.com/ionic-team/stencil/commit/ff75a473279aa7b59d3dadf308566df361c74f71))
+
+## ⛰ [2.7.1-0](https://github.com/ionic-team/stencil/compare/v2.7.0...v2.7.1-0) (2021-08-24)
+
+### Bug Fixes
+
+* **ci:** vendor deno for builds ([#3020](https://github.com/ionic-team/stencil/issues/3020)) ([6d8a61d](https://github.com/ionic-team/stencil/commit/6d8a61d166859ca165d85b7c7cea35b99acc53ee))
+* **compiler:** solve issue where worker thread didn't have access to fetch ([#3012](https://github.com/ionic-team/stencil/issues/3012)) ([925d4e9](https://github.com/ionic-team/stencil/commit/925d4e924264df424c3519f4c0a91b22356a2ea6))
+* **telemetry:** handle malformed telemetry tokens ([#3014](https://github.com/ionic-team/stencil/issues/3014)) ([ff75a47](https://github.com/ionic-team/stencil/commit/ff75a473279aa7b59d3dadf308566df361c74f71))
+
+# 🌟 [2.7.0](https://github.com/ionic-team/stencil/compare/v2.6.0...v2.7.0) (2021-08-19)
+
+### Bug Fixes
+
+* **dev-server:** allow file change events to pass through ([#3001](https://github.com/ionic-team/stencil/issues/3001)) ([b84dd11](https://github.com/ionic-team/stencil/commit/b84dd1124e6171cdb6be58f4cc703b2e956b8fc8))
+* **dev-server:** allow web server to be run in Docker ([#2973](https://github.com/ionic-team/stencil/issues/2973)) ([42cdeae](https://github.com/ionic-team/stencil/commit/42cdeaec424fb053648a5ae97e611a7c58d69788))
+* **dev-server:** prevent crash with Safari 15 ([ed173cd](https://github.com/ionic-team/stencil/commit/ed173cdbbe53342338aa8d6b6fa305fbbf1f74ab))
+* **runtime:** prevent watchers from prematurely firing in custom elements build ([#2971](https://github.com/ionic-team/stencil/issues/2971)) ([8c375bd](https://github.com/ionic-team/stencil/commit/8c375bd4bc1b55e269db69af542fa404714c9b26))
+* **runtime:** prevent shadowing on non-upgraded components ([#2949](https://github.com/ionic-team/stencil/issues/2949)) ([afbd129](https://github.com/ionic-team/stencil/commit/afbd129be49d636a09c986e97ae85e3f9cf5080c))
+* **testing:** puppeteer v10 support ([#2939](https://github.com/ionic-team/stencil/issues/2939)) ([09afd3f](https://github.com/ionic-team/stencil/commit/09afd3fed1ad1c294d6c1677c038287212b721d2))
+
+### Features
+
+* **cli:**  add telemetry and cli features ([#2964](https://github.com/ionic-team/stencil/issues/2964)) ([1381cc7](https://github.com/ionic-team/stencil/commit/1381cc7e920d7d9880d046693762b0f2348c8b5d))
+* **cli:**  writing and reading the ionic config file ([#2963](https://github.com/ionic-team/stencil/issues/2963)) ([f981812](https://github.com/ionic-team/stencil/commit/f981812c3378310a41ce53f3020316321527f62a))
+
+# 🕹 [2.7.0-0](https://github.com/ionic-team/stencil/compare/v2.6.0...v2.7.0-0) (2021-07-07)
+
+### Bug Fixes
+
+* **runtime:** prevent shadowing on non-upgraded components ([#2949](https://github.com/ionic-team/stencil/issues/2949)) ([afbd129](https://github.com/ionic-team/stencil/commit/afbd129be49d636a09c986e97ae85e3f9cf5080c))
+* **testing:** puppeteer v10 support ([#2939](https://github.com/ionic-team/stencil/issues/2939)) ([09afd3f](https://github.com/ionic-team/stencil/commit/09afd3fed1ad1c294d6c1677c038287212b721d2))
+
 # 📟 [2.6.0](https://github.com/ionic-team/stencil/compare/v2.6.0-0...v2.6.0) (2021-06-02)
 
 ### Features

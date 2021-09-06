@@ -45,6 +45,7 @@ export function addGlobalLink(doc: Document, globalScopes: CSSScope[], linkElm: 
         if (hasRelativeUrls(text)) {
           text = fixRelativeUrls(text, url);
         }
+
         const styleEl = doc.createElement('style');
         styleEl.setAttribute('data-styles', '');
         styleEl.textContent = text;

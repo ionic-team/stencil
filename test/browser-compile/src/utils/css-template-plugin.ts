@@ -70,7 +70,7 @@ export const cssTemplatePlugin = {
   async load(id: string) {
     let code = styleImports.get(id.split('?')[0]);
     if (code) {
-      const results = await stencil.compile(code, {
+      const results = await stencil.transpile(code, {
         file: id,
       });
       return results.code;
