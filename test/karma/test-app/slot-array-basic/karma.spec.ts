@@ -1,4 +1,4 @@
-import { HTMLStencilElement } from '@stencil/core';
+import type { HTMLStencilElement } from '../../../../internal';
 import { setupDomTests } from '../util';
 
 describe('slot array basic', () => {
