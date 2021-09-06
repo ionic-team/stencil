@@ -65,6 +65,7 @@ export const BUILD: BuildConditionals = {
   safari10: false,
   scriptDataOpts: false,
   shadowDomShim: false,
+  invisiblePrehydration: true,
   propBoolean: true,
   propNumber: true,
   propString: true,

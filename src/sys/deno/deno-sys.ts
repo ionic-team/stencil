@@ -124,6 +124,12 @@ export function createDenoSys(c: { Deno?: any } = {}) {
       }
       return results;
     },
+    isTTY() {
+      return !!deno?.isatty(deno?.stdout?.rid);
+    },
+    homeDir() {
+      return deno.env.get('HOME');
+    },
     createDirSync(p, opts) {
       const results: CompilerSystemCreateDirectoryResults = {
         basename: basename(p),
@@ -283,6 +289,7 @@ export function createDenoSys(c: { Deno?: any } = {}) {
     exit: async (exitCode) => {
       deno.exit(exitCode);
     },
+    fetch,
     getCompilerExecutingPath() {
       return stencilExePath;
     },

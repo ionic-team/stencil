@@ -1,24 +1,32 @@
 name: Build & Test
 
-on: push
+on:
+  push:
+    branches:
+      - 'master'
+      - 'v3.0.0-dev'
+  pull_request:
+    branches:
+      - '**'
 
 jobs:
   build_and_test:
     strategy:
       matrix:
-        node: [12.10.0]
+        node: ['12', '14', '16']
         os: ['ubuntu-latest', 'windows-latest']
 
     name: Node ${{ matrix.node }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
 
     steps:
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v2
 
       - name: Use Node.js ${{ matrix.node }}
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node }}
+          cache: 'npm'
 
       - name: Install dependencies
         run: npm ci
@@ -51,22 +59,26 @@ jobs:
         run: mv `npm pack` stencil-build.tgz
 
       - name: Unload build artifacts
-        uses: actions/upload-artifact@master
-        if: matrix.os == 'ubuntu-latest' && matrix.node == '12.10.0'
+        uses: actions/upload-artifact@v2
+        if: matrix.os == 'ubuntu-latest' && matrix.node == '12'
         with:
           name: stencil-build
           path: stencil-build.tgz
 
-      - name: Run karma tests
-        working-directory: ./test/karma
-        if: matrix.os == 'ubuntu-latest' && matrix.node == '12.10.0'
-        run: |
-          wget "https://www.browserstack.com/browserstack-local/BrowserStackLocal-linux-x64.zip"
-          unzip BrowserStackLocal-linux-x64.zip
-          ./BrowserStackLocal -k $BROWSER_STACK_ACCESS_KEY &
-          npm ci
-          npm run karma.prod
-        env:
-          BROWSER_STACK_ACCESS_KEY: ${{ secrets.BROWSER_STACK_ACCESS_KEY }}
-          BROWSER_STACK_USERNAME: ${{ secrets.BROWSER_STACK_USERNAME }}
-          CI: true
+  prettier:
+    name: Prettier
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Prettier dry-run
+        run: npm run prettier.dry-run

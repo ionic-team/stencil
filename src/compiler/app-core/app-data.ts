@@ -153,6 +153,7 @@ export const updateBuildConditionals = (config: Config, b: BuildConditionals) =>
   b.scriptDataOpts = config.extras.scriptDataOpts;
   b.shadowDomShim = config.extras.shadowDomShim;
   b.attachStyles = true;
+  b.invisiblePrehydration = typeof config.invisiblePrehydration === 'undefined' ? true : config.invisiblePrehydration;
   if (b.shadowDomShim) {
     b.slotRelocation = b.slot;
   }

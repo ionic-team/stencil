@@ -20,6 +20,7 @@ coverage/
 
 /build/
 /scripts/build/
+!/scripts/build/deno-cache
 dist/
 
 # submodule packages
@@ -37,6 +38,7 @@ dist/
 /testing
 
 /screenshot/index.js
+/screenshot/index.js.map
 /screenshot/package.json
 /screenshot/pixel-match.js
 /screenshot/*.d.ts
@@ -45,3 +47,4 @@ test/**/www/*
 test/**/hydrate/*
 .stencil
 /dependencies.json
+coverage/**
