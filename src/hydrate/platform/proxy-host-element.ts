@@ -75,10 +75,13 @@ export function proxyHostElement(elm: d.HostElement, cmpMeta: d.ComponentRuntime
                   setValue(this, memberName, ref.$lazyInstance$[memberName], cmpMeta, !init);
                 };
                 // If there's a value from an attribute, (before the class is defined), queue & set async
-                if (ref.$lazyInstance$) { setVal(); }
-                else { ref.$onInstancePromise$.then(() => setVal(true)); }
-              }
-            })
+                if (ref.$lazyInstance$) {
+                  setVal();
+                } else {
+                  ref.$onInstancePromise$.then(() => setVal(true));
+                }
+              },
+            });
           }
         }
       } else if (memberFlags & MEMBER_FLAGS.Method) {

@@ -22,7 +22,9 @@ describe('goto root url', () => {
     // select the "prop-cmp" element within the page (same as querySelector)
     // and once it's received, then return the element's "textContent" property
     const elm = await page.find('prop-cmp >>> div');
-    expect(elm).toEqualText('Hello, my name is Stencil JS. My full name being Mr Stencil JS. I like to wear life preservers');
+    expect(elm).toEqualText(
+      'Hello, my name is Stencil JS. My full name being Mr Stencil JS. I like to wear life preservers'
+    );
 
     await page.compareScreenshot('navigate to homepage', {
       fullPage: false,

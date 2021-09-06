@@ -15,7 +15,11 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
     const prototype = (Cstr as any).prototype;
 
     members.map(([memberName, [memberFlags]]) => {
-      if ((BUILD.prop || BUILD.state) && (memberFlags & MEMBER_FLAGS.Prop || ((!BUILD.lazyLoad || flags & PROXY_FLAGS.proxyState) && memberFlags & MEMBER_FLAGS.State))) {
+      if (
+        (BUILD.prop || BUILD.state) &&
+        (memberFlags & MEMBER_FLAGS.Prop ||
+          ((!BUILD.lazyLoad || flags & PROXY_FLAGS.proxyState) && memberFlags & MEMBER_FLAGS.State))
+      ) {
         if ((memberFlags & MEMBER_FLAGS.Getter) === 0) {
           // proxyComponent - prop
           Object.defineProperty(prototype, memberName, {
@@ -37,7 +41,9 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
                   // the member is not mutable
                   (memberFlags & MEMBER_FLAGS.Mutable) === 0
                 ) {
-                  consoleDevWarn(`@Prop() "${memberName}" on <${cmpMeta.$tagName$}> is immutable but was modified from within the component.\nMore information: https://stenciljs.com/docs/properties#prop-mutability`);
+                  consoleDevWarn(
+                    `@Prop() "${memberName}" on <${cmpMeta.$tagName$}> is immutable but was modified from within the component.\nMore information: https://stenciljs.com/docs/properties#prop-mutability`
+                  );
                 }
               }
               // proxyComponent, set value
@@ -69,25 +75,33 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
                     setValue(this, memberName, ref.$lazyInstance$[memberName], cmpMeta, !init);
                   };
                   // If there's a value from an attribute, (before the class is defined), queue & set async
-                  if (ref.$lazyInstance$) { setVal(); }
-                  else { ref.$onInstancePromise$.then(() => setVal(true)); }
-                }
-              })
+                  if (ref.$lazyInstance$) {
+                    setVal();
+                  } else {
+                    ref.$onInstancePromise$.then(() => setVal(true));
+                  }
+                },
+              });
             }
           } else if (memberFlags & MEMBER_FLAGS.Setter) {
             // non-lazy setter - amends original set to fire update
             // proxyComponent - non-lazy prop setter
-            const origSetter =  Object.getOwnPropertyDescriptor(prototype, memberName).set;
+            const origSetter = Object.getOwnPropertyDescriptor(prototype, memberName).set;
             Object.defineProperty(prototype, memberName, {
               set(this: d.RuntimeRef, newValue) {
                 const ref = getHostRef(this);
                 origSetter.apply(this, [newValue]);
-                setValue(this, memberName, ref.$hostElement$[(memberName as keyof d.HostElement)], cmpMeta);
-              }
+                setValue(this, memberName, ref.$hostElement$[memberName as keyof d.HostElement], cmpMeta);
+              },
             });
           }
         }
-      } else if (BUILD.lazyLoad && BUILD.method && flags & PROXY_FLAGS.isElementConstructor && memberFlags & MEMBER_FLAGS.Method) {
+      } else if (
+        BUILD.lazyLoad &&
+        BUILD.method &&
+        flags & PROXY_FLAGS.isElementConstructor &&
+        memberFlags & MEMBER_FLAGS.Method
+      ) {
         // proxyComponent - method
         Object.defineProperty(prototype, memberName, {
           value(this: d.HostElement, ...args: any[]) {

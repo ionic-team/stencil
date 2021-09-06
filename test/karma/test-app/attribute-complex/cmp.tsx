@@ -17,14 +17,14 @@ export class AttributeComplex {
   @Prop() str1?: string;
   @Prop() str2?: SomeTypes.String;
 
-  private _obj = {name: 'James bond'};
+  private _obj = { name: 'James bond' };
   @Prop()
   get obj() {
     return JSON.stringify(this._obj);
   }
   set obj(newVal: string) {
     if (typeof newVal === 'string') {
-      this._obj = {name: newVal};
+      this._obj = { name: newVal };
     }
   }
 
