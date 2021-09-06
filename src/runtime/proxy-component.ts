@@ -118,11 +118,6 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
       prototype.attributeChangedCallback = function (attrName: string, _oldValue: string, newValue: string) {
         plt.jmp(() => {
           const propName = attrNameToPropName.get(attrName);
-          const descriptor = Object.getOwnPropertyDescriptor(this, propName)
-          // there's no setter for this property. Exit
-          if (descriptor && !!descriptor.get && !descriptor.set) {
-            return;
-          }
 
           //  In a webcomponent lifecyle the attributeChangedCallback runs prior to connectedCallback
           //  in the case where an attribute was set inline.

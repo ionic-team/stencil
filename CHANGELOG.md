@@ -1,3 +1,53 @@
+# 🎲 [2.8.0](https://github.com/ionic-team/stencil/compare/v2.7.1...v2.8.0) (2021-09-01)
+
+### Bug Fixes
+
+* **types:** add referrerPolicy to AnchorHTMLAttributes ([#3006](https://github.com/ionic-team/stencil/issues/3006)) ([4f7c073](https://github.com/ionic-team/stencil/commit/4f7c073311192c8601bcedcacc9e8daef2b349e3))
+* **docs:** update app-es5-disabled.ts message ([#2993](https://github.com/ionic-team/stencil/issues/2993)) ([4f7c073](https://github.com/ionic-team/stencil/commit/a6ebc51fd71a98898d99cde45c9e5a14585a44c7))
+
+### Features
+
+* **compiler:** allow disabling the injected hydration stylesheet ([#2989](https://github.com/ionic-team/stencil/issues/2989)) ([a3d2928](https://github.com/ionic-team/stencil/commit/a3d2928dbc31b786aa273020b88f09d107b05474))
+
+## 🐔 [2.7.1](https://github.com/ionic-team/stencil/compare/v2.7-0...v2.7.1) (2021-08-24)
+
+### Bug Fixes
+
+* **ci:** vendor deno for builds ([#3020](https://github.com/ionic-team/stencil/issues/3020)) ([6d8a61d](https://github.com/ionic-team/stencil/commit/6d8a61d166859ca165d85b7c7cea35b99acc53ee))
+* **compiler:** solve issue where worker thread didn't have access to fetch ([#3012](https://github.com/ionic-team/stencil/issues/3012)) ([925d4e9](https://github.com/ionic-team/stencil/commit/925d4e924264df424c3519f4c0a91b22356a2ea6))
+* **telemetry:** handle malformed telemetry tokens ([#3014](https://github.com/ionic-team/stencil/issues/3014)) ([ff75a47](https://github.com/ionic-team/stencil/commit/ff75a473279aa7b59d3dadf308566df361c74f71))
+
+## ⛰ [2.7.1-0](https://github.com/ionic-team/stencil/compare/v2.7.0...v2.7.1-0) (2021-08-24)
+
+### Bug Fixes
+
+* **ci:** vendor deno for builds ([#3020](https://github.com/ionic-team/stencil/issues/3020)) ([6d8a61d](https://github.com/ionic-team/stencil/commit/6d8a61d166859ca165d85b7c7cea35b99acc53ee))
+* **compiler:** solve issue where worker thread didn't have access to fetch ([#3012](https://github.com/ionic-team/stencil/issues/3012)) ([925d4e9](https://github.com/ionic-team/stencil/commit/925d4e924264df424c3519f4c0a91b22356a2ea6))
+* **telemetry:** handle malformed telemetry tokens ([#3014](https://github.com/ionic-team/stencil/issues/3014)) ([ff75a47](https://github.com/ionic-team/stencil/commit/ff75a473279aa7b59d3dadf308566df361c74f71))
+
+# 🌟 [2.7.0](https://github.com/ionic-team/stencil/compare/v2.6.0...v2.7.0) (2021-08-19)
+
+### Bug Fixes
+
+* **dev-server:** allow file change events to pass through ([#3001](https://github.com/ionic-team/stencil/issues/3001)) ([b84dd11](https://github.com/ionic-team/stencil/commit/b84dd1124e6171cdb6be58f4cc703b2e956b8fc8))
+* **dev-server:** allow web server to be run in Docker ([#2973](https://github.com/ionic-team/stencil/issues/2973)) ([42cdeae](https://github.com/ionic-team/stencil/commit/42cdeaec424fb053648a5ae97e611a7c58d69788))
+* **dev-server:** prevent crash with Safari 15 ([ed173cd](https://github.com/ionic-team/stencil/commit/ed173cdbbe53342338aa8d6b6fa305fbbf1f74ab))
+* **runtime:** prevent watchers from prematurely firing in custom elements build ([#2971](https://github.com/ionic-team/stencil/issues/2971)) ([8c375bd](https://github.com/ionic-team/stencil/commit/8c375bd4bc1b55e269db69af542fa404714c9b26))
+* **runtime:** prevent shadowing on non-upgraded components ([#2949](https://github.com/ionic-team/stencil/issues/2949)) ([afbd129](https://github.com/ionic-team/stencil/commit/afbd129be49d636a09c986e97ae85e3f9cf5080c))
+* **testing:** puppeteer v10 support ([#2939](https://github.com/ionic-team/stencil/issues/2939)) ([09afd3f](https://github.com/ionic-team/stencil/commit/09afd3fed1ad1c294d6c1677c038287212b721d2))
+
+### Features
+
+* **cli:**  add telemetry and cli features ([#2964](https://github.com/ionic-team/stencil/issues/2964)) ([1381cc7](https://github.com/ionic-team/stencil/commit/1381cc7e920d7d9880d046693762b0f2348c8b5d))
+* **cli:**  writing and reading the ionic config file ([#2963](https://github.com/ionic-team/stencil/issues/2963)) ([f981812](https://github.com/ionic-team/stencil/commit/f981812c3378310a41ce53f3020316321527f62a))
+
+# 🕹 [2.7.0-0](https://github.com/ionic-team/stencil/compare/v2.6.0...v2.7.0-0) (2021-07-07)
+
+### Bug Fixes
+
+* **runtime:** prevent shadowing on non-upgraded components ([#2949](https://github.com/ionic-team/stencil/issues/2949)) ([afbd129](https://github.com/ionic-team/stencil/commit/afbd129be49d636a09c986e97ae85e3f9cf5080c))
+* **testing:** puppeteer v10 support ([#2939](https://github.com/ionic-team/stencil/issues/2939)) ([09afd3f](https://github.com/ionic-team/stencil/commit/09afd3fed1ad1c294d6c1677c038287212b721d2))
+
 # 📟 [2.6.0](https://github.com/ionic-team/stencil/compare/v2.6.0-0...v2.6.0) (2021-06-02)
 
 ### Features
@@ -182,85 +232,9 @@
 
 # 🚗 [2.0.0](https://github.com/ionic-team/stencil/compare/v1.17.3...v2.0.0) (2020-08-31)
 
-In keeping with [Semver](https://semver.org/), Stencil `2.0.0` was released due to changes in the API (mainly from some updates to the config API). But even though this is a new major version, there are few breaking changes, and any changes will be flagged and described by the compiler during development. For the most part, most of the changes are removal of deprecated APIs that have been printing out warning logs for quite some time now.
+In keeping with [Semver](https://semver.org/), Stencil `2.0.0` was released due to changes in the API (mainly from some updates to the config API).
 
-### Opt-in for IE11, Edge 16-18 and Safari 10 Builds
-
-- **config:** update config extra defaults to not build IE11, Edge 16-18 and Safari 10 by default ([363bf59](https://github.com/ionic-team/stencil/commit/363bf59fc9212a771a766c21909263d6c4ccdf18))
-
-A change in Stencil 2 is that the IE11, Edge 16-18 and Safari 10 builds will not be enabled by default. However, the ability to opt-in is still available, and can be enabled by setting each `extras` config flag to `true`. An advantage of this is less runtime within your builds. See the [config.extras docs](https://stenciljs.com/docs/config-extras) for more info.
-
-### Opt-in for ES5 and SystemJS Builds
-
-- **config:** do not build es5 by default ([fa67d97](https://github.com/ionic-team/stencil/commit/fa67d97d043d12e0a3af0d868fa1746eb9e3badf))
-
-Just like having to opt-in for IE11, the same goes for opting-in for ES5 and SystemJS builds. For a production build in Stencil 1, it would build both ES2017/ESM files, and ES5/SystemJS files. As of Stencil 2, both dev and prod builds do not create ES5/SystemJS builds. An advantage of this is having faster production builds by not having to also downlevel to es5. See the [buildEs5](https://stenciljs.com/docs/config#buildes5) for more info.
-
-### Use `disconnectedCallback()` instead of `componentDidUnload()`
-
-- **componentDidUnload:** use disconnectedCallback instead of componentDidUnload ([4e45862](https://github.com/ionic-team/stencil/commit/4e45862f73609599a7195fcf5c93d9fb39492154))
-
-When Stencil is used within other frameworks, DOM elements may be reused, making it impossible for `componentDidUnload()` to be accurate 100% of the time if it is disconnected, then re-connected, and disconnected again. Instead, `disconnectedCallback()` is the preferred way to always know if a component was disconnected from the DOM.
-
-_Note that the runtime still works for any collections that have been built with componentDidUnload(). However, updates to Stencil 2 will require it's changed to disconnectedCallback()._
-
-### Default to `async` task queue
-
-- **taskQueue:** set "async" taskQueue as default ([f3bb121](https://github.com/ionic-team/stencil/commit/f3bb121b8130e0c4e0c344eca7078ce572ad34a5))
-
-Update taskQueue default to "async". Stencil 1 default was "congestionAsync". See [config.taskQueue](https://stenciljs.com/docs/config#taskqueue) for more info.
-
-### Restore Stencil 1 defaults
-
-```ts
-export const config: Config = {
-  buildEs5: 'prod',
-  extras: {
-    cssVarsShim: true,
-    dynamicImportShim: true,
-    safari10: true,
-    shadowDomShim: true,
-  },
-};
-```
-
-### dist package.json
-
-To ensure the extensions are built for the future and work with today's bundlers, we've found it best to use `.cjs.js` extension for CommonJS files, and `.js` for ESM files, with the idea that cjs files will no longer be needed some day, and the ESM files are the standard. _(We were using `.mjs` files, but not all of today's tooling and bundlers work well with that extension)._
-
-If you're using the `dist` output target, update the `package.json` in the root of your project, like this:
-
-```diff
-  {
--    "main": "dist/index.js",
-+    "main": "dist/index.cjs.js",
-
--    "module": "dist/index.mjs",
-+    "module": "dist/index.js",
-
--    "es2015": "dist/esm/index.mjs",
-+    "es2015": "dist/esm/index.js",
-
--    "es2017": "dist/esm/index.mjs",
-+    "es2017": "dist/esm/index.js",
-
--    "jsnext:main": "dist/esm/index.mjs",
-+    "jsnext:main": "dist/esm/index.js",
-  }
-```
-
-Additionally the `dist/loader` output directory has renamed its extensions too, but since its `dist/loader/package.json` file is auto-generated, the entries were renamed too. So unless you were referencing the loader files directly you will not have to do external updates.
-
-See the [Output Folder Structure Defaults](https://github.com/ionic-team/stencil/blob/master/src/compiler/output-targets/readme.md) for more info.
-
-### NodeJS Update
-
-- **node:** minimum of Node 12.10.0, recommend 14.5.0 or greater ([55331be](https://github.com/ionic-team/stencil/commit/55331be42f311a6e2a4e4f8ac13c01d28dc31613))
-
-With the major release, now's a good time to update the minimum and recommended version of NodeJS.
-
-- [Node Releases](https://nodejs.org/en/about/releases/)
-- [node.green](https://node.green/)
+Even though this is a new major version, there are few [BREAKING CHANGES](BREAKING_CHANGES.md), and any changes will be flagged and described by the compiler during development. For the most part, most of the changes are removal of deprecated APIs that have been printing out warning logs for quite some time now.
 
 ### TypeScript 4
 

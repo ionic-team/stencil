@@ -44,7 +44,6 @@ const getDocsField = (prop: d.JsonDocsProp) => {
     prop.deprecation !== undefined
       ? `<span style="color:red">**[DEPRECATED]**</span> ${prop.deprecation}<br/><br/>`
       : ''
-  }${prop.docs}`;
-  if (prop.getter && !prop.setter) docField += ` (readonly)`;
+  }${prop.docs}${prop.getter && !prop.setter ? ` _(readonly)_` : ``}`;
   return docField;
 };
