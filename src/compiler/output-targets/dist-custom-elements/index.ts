@@ -98,6 +98,7 @@ const addCustomElementInputs = (
   const components = buildCtx.components;
   components.forEach((cmp) => {
     const exp: string[] = [];
+    const def: {tagName: string; exportName: string, importAs?: string, meta?: string}[] = [];
     const exportName = dashToPascalCase(cmp.tagName);
     const importName = cmp.componentClassName;
     const importAs = `$Cmp${exportName}`;
@@ -107,10 +108,52 @@ const addCustomElementInputs = (
       exp.push(`export { ${importName} as ${exportName} } from '${cmp.sourceFilePath}';`);
     } else {
       const meta = stringifyRuntimeData(formatComponentRuntimeMeta(cmp, false));
-
       exp.push(`import { proxyCustomElement } from '${STENCIL_INTERNAL_CLIENT_ID}';`);
       exp.push(`import { ${importName} as ${importAs} } from '${cmp.sourceFilePath}';`);
       exp.push(`export const ${exportName} = /*@__PURE__*/proxyCustomElement(${importAs}, ${meta});`);
+      def.push({tagName: cmp.tagName, exportName });
+
+      cmp.dependencies.forEach(dCmp => {
+        const foundDep = components.find(dComp => dComp.tagName === dCmp);
+        const exportName = dashToPascalCase(foundDep.tagName);
+        const importAs = `$${exportName}DefineCustomElement`;
+
+        exp.push(`import { defineCustomElement as ${importAs} } from '${foundDep.sourceFilePath}';`);
+        def.push({tagName: foundDep.tagName, exportName, importAs });
+      });
+
+      const s: string[] = [
+        `const components = [` + def.map(defItm => `'${defItm.tagName}', `).join('') + `];`,
+        ``,
+        `export const defineCustomElement = (tagRename) => {`,
+        `    let tagName`,
+        `    components.forEach(cmp => {`,
+        `        switch(cmp) {`
+      ];
+      const m: string[] = def.flatMap(defItm => {
+        return [
+          ``,
+          `            case '${defItm.tagName}':`,
+          `                tagName = '${defItm.tagName}';`,
+          `                if (tagRename) {`,
+          `                    tagName = tagRename(tagName);`,
+          `                }`,
+          `                if (!customElements.get(tagName)) {`,
+          `                    ${defItm.importAs ? `${defItm.importAs}()` : `customElements.define(tagName, ${defItm.exportName});`}`,
+          `                }`,
+          `                break;`
+        ];
+      });
+      const e: string[] = [
+        ``,
+        `        }`,
+        `    })`,
+        `}`
+      ];
+
+      exp.push(s.join('\n'));
+      exp.push(m.join('\n'));
+      exp.push(e.join('\n'));
     }
 
     bundleOpts.inputs[cmp.tagName] = coreKey;

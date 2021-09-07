@@ -90,6 +90,7 @@ const generateCustomElementType = (componentsDtsRelPath: string, cmp: d.Componen
     `    prototype: ${tagNameAsPascal};`,
     `    new (): ${tagNameAsPascal};`,
     `};`,
+    `export const defineCustomElement: (tagRename?: (origTagName: string) => string) => void;`,
     ``,
   ];
 
