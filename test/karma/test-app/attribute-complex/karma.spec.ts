@@ -41,7 +41,7 @@ describe('attribute-complex', function () {
     expect(instance.str1).toBe('123');
     expect(instance.str2).toBe('321');
 
-    expect(instance.obj).toBe("{name: 'James bond'}");
+    expect(instance.obj).toBe('{"name":"James Pond RoboCod"}');
   });
 
   it('should cast element props', async () => {
@@ -67,6 +67,6 @@ describe('attribute-complex', function () {
     expect(instance.bool2).toBe(false);
 
     expect(instance.str0).toBe('hello'); // default value
-    expect(instance.obj).toBe("{name: 'James bond'}");
+    expect(instance.obj).toBe('{"name":"James Pond RoboCod"}');
   });
 });
