@@ -13,10 +13,12 @@ body:
           required: true
         - label: I have searched for [existing issues](https://github.com/ionic-team/stencil/issues) that already report this problem, without success.
           required: true
-  - type: textarea
+  - type: input
     attributes:
       label: Stencil Version
       description: The version number of Stencil where the issue is occurring.
+    validations:
+      required: true
   - type: textarea
     attributes:
       label: Current Behavior
@@ -40,6 +42,8 @@ body:
       label: Code Reproduction URL
       description: Please reproduce this issue in a blank Stencil starter application and provide a link to the repo. Run `npm init stencil` to quickly spin up a Stencil project. This is the best way to ensure this issue is triaged quickly. Issues without a code reproduction may be closed if the Stencil Team cannot reproduce the issue you are reporting.
       placeholder: https://github.com/...
+    validations:
+      required: true 
   - type: textarea
     attributes:
       label: Additional Information
