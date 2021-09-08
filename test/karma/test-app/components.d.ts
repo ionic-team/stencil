@@ -49,6 +49,8 @@ export namespace Components {
     }
     interface CmpLabel {
     }
+    interface CmpLabelWithSlotSibling {
+    }
     interface ConditionalBasic {
     }
     interface ConditionalRerender {
@@ -362,6 +364,12 @@ declare global {
     var HTMLCmpLabelElement: {
         prototype: HTMLCmpLabelElement;
         new (): HTMLCmpLabelElement;
+    };
+    interface HTMLCmpLabelWithSlotSiblingElement extends Components.CmpLabelWithSlotSibling, HTMLStencilElement {
+    }
+    var HTMLCmpLabelWithSlotSiblingElement: {
+        prototype: HTMLCmpLabelWithSlotSiblingElement;
+        new (): HTMLCmpLabelWithSlotSiblingElement;
     };
     interface HTMLConditionalBasicElement extends Components.ConditionalBasic, HTMLStencilElement {
     }
@@ -999,6 +1007,7 @@ declare global {
         "bad-shared-jsx": HTMLBadSharedJsxElement;
         "build-data": HTMLBuildDataElement;
         "cmp-label": HTMLCmpLabelElement;
+        "cmp-label-with-slot-sibling": HTMLCmpLabelWithSlotSiblingElement;
         "conditional-basic": HTMLConditionalBasicElement;
         "conditional-rerender": HTMLConditionalRerenderElement;
         "conditional-rerender-root": HTMLConditionalRerenderRootElement;
@@ -1145,6 +1154,8 @@ declare namespace LocalJSX {
     interface BuildData {
     }
     interface CmpLabel {
+    }
+    interface CmpLabelWithSlotSibling {
     }
     interface ConditionalBasic {
     }
@@ -1411,6 +1422,7 @@ declare namespace LocalJSX {
         "bad-shared-jsx": BadSharedJsx;
         "build-data": BuildData;
         "cmp-label": CmpLabel;
+        "cmp-label-with-slot-sibling": CmpLabelWithSlotSibling;
         "conditional-basic": ConditionalBasic;
         "conditional-rerender": ConditionalRerender;
         "conditional-rerender-root": ConditionalRerenderRoot;
@@ -1532,6 +1544,7 @@ declare module "@stencil/core" {
             "bad-shared-jsx": LocalJSX.BadSharedJsx & JSXBase.HTMLAttributes<HTMLBadSharedJsxElement>;
             "build-data": LocalJSX.BuildData & JSXBase.HTMLAttributes<HTMLBuildDataElement>;
             "cmp-label": LocalJSX.CmpLabel & JSXBase.HTMLAttributes<HTMLCmpLabelElement>;
+            "cmp-label-with-slot-sibling": LocalJSX.CmpLabelWithSlotSibling & JSXBase.HTMLAttributes<HTMLCmpLabelWithSlotSiblingElement>;
             "conditional-basic": LocalJSX.ConditionalBasic & JSXBase.HTMLAttributes<HTMLConditionalBasicElement>;
             "conditional-rerender": LocalJSX.ConditionalRerender & JSXBase.HTMLAttributes<HTMLConditionalRerenderElement>;
             "conditional-rerender-root": LocalJSX.ConditionalRerenderRoot & JSXBase.HTMLAttributes<HTMLConditionalRerenderRootElement>;

@@ -1,15 +1,16 @@
 import { Component, Host, h } from '@stencil/core';
 
 @Component({
-  tag: 'cmp-label',
+  tag: 'cmp-label-with-slot-sibling',
   scoped: true,
 })
-export class CmpLabel {
+export class CmpLabelWithSlotSibling {
   render() {
     return (
       <Host>
         <label>
           <slot />
+          <div>Non-slotted text</div>
         </label>
       </Host>
     );

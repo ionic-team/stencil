@@ -1,5 +1,6 @@
 import type * as d from '../declarations';
 import { BUILD } from '@app-data';
+import { NODE_TYPES } from '@stencil/core/mock-doc';
 import { CMP_FLAGS, HOST_FLAGS } from '@utils';
 import { PLATFORM_FLAGS } from './runtime-constants';
 import { plt, supportsShadow, getHostRef } from '@platform';
@@ -79,10 +80,12 @@ export const patchTextContent = (hostElementPrototype: HTMLElement, cmpMeta: d.C
         // get the 'default slot', which would be the first slot in a shadow tree (if we were using one), whose name is
         // the empty string
         const slotNode = getHostSlotNode(this.childNodes, '');
-        // when a slot node is found, the textContent will be found in the next sibling (text) node. only if we can
-        // find that text node should we try to pull a value from it
-        if (slotNode?.nextSibling) {
+        // when a slot node is found, the textContent _may_ be found in the next sibling (text) node, depending on how
+        // nodes were reordered during the vdom render. first try to get the text content from the sibling.
+        if (slotNode?.nextSibling?.nodeType === NODE_TYPES.TEXT_NODE) {
           return slotNode.nextSibling.textContent;
+        } else if (slotNode) {
+          return slotNode.textContent;
         } else {
           // fallback to the original implementation
           return this.__textContent;
@@ -93,10 +96,13 @@ export const patchTextContent = (hostElementPrototype: HTMLElement, cmpMeta: d.C
         // get the 'default slot', which would be the first slot in a shadow tree (if we were using one), whose name is
         // the empty string
         const slotNode = getHostSlotNode(this.childNodes, '');
-        // when a slot node is found, the textContent should be placed in the next sibling (text) node. only if we can
-        // find that text node should we try to assign a value to it it
-        if (slotNode?.nextSibling) {
+        // when a slot node is found, the textContent _may_ need to be placed in the next sibling (text) node,
+        // depending on how nodes were reordered during the vdom render. first try to set the text content on the
+        // sibling.
+        if (slotNode?.nextSibling?.nodeType === NODE_TYPES.TEXT_NODE) {
           slotNode.nextSibling.textContent = value;
+        } else if (slotNode) {
+          slotNode.textContent = value;
         } else {
           // we couldn't find a slot, but that doesn't mean that there isn't one. if this check ran before the DOM
           // loaded, we could have missed it. check for a content reference element on the scoped component and insert
