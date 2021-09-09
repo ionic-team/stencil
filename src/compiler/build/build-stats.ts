@@ -1,4 +1,4 @@
-import { byteSize } from '@utils';
+import { byteSize, sortBy } from '@utils';
 import type * as d from '../../declarations';
 
 /**
@@ -10,14 +10,15 @@ import type * as d from '../../declarations';
  */
 export function generateBuildStats(config: d.Config, buildCtx: d.BuildCtx) {
   const buildResults = buildCtx.buildResults;
-  let jsonData: any;
 
-  if (buildResults.hasError) {
-    jsonData = {
-      diagnostics: buildResults.diagnostics,
-    };
-  } else {
-    try {
+  let jsonData: d.CompilerBuildStats | { diagnostics: d.Diagnostic[] };
+
+  try {
+    if (buildResults.hasError) {
+      jsonData = {
+        diagnostics: buildResults.diagnostics,
+      };
+    } else {
       const stats: d.CompilerBuildStats = {
         timestamp: buildResults.timestamp,
         compiler: {
@@ -39,22 +40,27 @@ export function generateBuildStats(config: d.Config, buildCtx: d.BuildCtx) {
           hashedFileNameLength: config.hashedFileNameLength,
           buildEs5: config.buildEs5,
         },
-        esmBrowser: sanitizeBundlesForStats(buildCtx.esmBrowserComponentBundle),
-        esm: sanitizeBundlesForStats(buildCtx.esmComponentBundle),
-        es5: sanitizeBundlesForStats(buildCtx.es5ComponentBundle),
-        system: sanitizeBundlesForStats(buildCtx.systemComponentBundle),
-        commonjs: sanitizeBundlesForStats(buildCtx.commonJsComponentBundle),
+        formats: {
+          esmBrowser: sanitizeBundlesForStats(buildCtx.esmBrowserComponentBundle),
+          esm: sanitizeBundlesForStats(buildCtx.esmComponentBundle),
+          es5: sanitizeBundlesForStats(buildCtx.es5ComponentBundle),
+          system: sanitizeBundlesForStats(buildCtx.systemComponentBundle),
+          commonjs: sanitizeBundlesForStats(buildCtx.commonJsComponentBundle),
+        },
         components: getComponentsFileMap(config, buildCtx),
         entries: buildCtx.entryModules,
-        sourceGraph: buildResults.componentGraph,
+        componentGraph: buildResults.componentGraph,
+        sourceGraph: getSourceGraph(config, buildCtx),
         rollupResults: buildCtx.rollupResults,
         collections: getCollections(config, buildCtx),
       };
 
       jsonData = stats;
-    } catch (e) {
-      console.log(e);
     }
+  } catch (e) {
+    jsonData = {
+      diagnostics: [e.message],
+    };
   }
 
   return jsonData;
@@ -94,6 +100,17 @@ function sanitizeBundlesForStats(bundleArray: d.BundleModule[]): d.CompilerBuild
       byteSize: byteSize(bundle.rollupResult.code),
     };
   });
+}
+
+function getSourceGraph(config: d.Config, buildCtx: d.BuildCtx) {
+  let sourceGraph: d.BuildSourceGraph = {};
+
+  sortBy(buildCtx.moduleFiles, (m) => m.sourceFilePath).forEach((moduleFile) => {
+    const key = relativePath(config, moduleFile.sourceFilePath);
+    sourceGraph[key] = moduleFile.localImports.map((localImport) => relativePath(config, localImport)).sort();
+  });
+
+  return sourceGraph;
 }
 
 function getAppOutputs(config: d.Config, buildResults: d.CompilerBuildResults) {

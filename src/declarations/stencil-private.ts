@@ -1,3 +1,4 @@
+import { BuildResultsComponentGraph } from '.';
 import type {
   BuildEvents,
   BuildLog,
@@ -289,15 +290,18 @@ export interface CompilerBuildStats {
     hashedFileNameLength: number;
     buildEs5: boolean | 'prod';
   };
-  esmBrowser: CompilerBuildStatBundle[];
-  esm: CompilerBuildStatBundle[];
-  es5: CompilerBuildStatBundle[];
-  system: CompilerBuildStatBundle[];
-  commonjs: CompilerBuildStatBundle[];
+  formats: {
+    esmBrowser: CompilerBuildStatBundle[];
+    esm: CompilerBuildStatBundle[];
+    es5: CompilerBuildStatBundle[];
+    system: CompilerBuildStatBundle[];
+    commonjs: CompilerBuildStatBundle[];
+  };
   components: BuildComponent[];
   entries: EntryModule[];
   rollupResults: RollupResults;
-  sourceGraph: BuildSourceGraph;
+  sourceGraph?: BuildSourceGraph;
+  componentGraph: BuildResultsComponentGraph;
   collections: {
     name: string;
     source: string;
