@@ -28,12 +28,13 @@ proposed standard and use that for guidance as to how markdown should be formatt
    2. Cons
       1. Not everyone may be familiar with CommonMark, leading to confusion when reviewing pull requests
       2. CommonMark has yet to produce a v1.0 specification
-3. Adopt [GitHub Flavored Markdown (GFM)](https://www.iana.org/assignments/markdown-variants/GFM)
+3. Adopt [GitHub Flavored Markdown (GFM)](https://github.github.com/gfm/)
    1. Pros:
       1. Individuals may be more familiar with GFM, given the popularity of the platform
       2. Using a well adopted standard may lead to less chance of Markdown renderings not working as intended
    2. Cons:
-      1. GFM is less defined compared to CommonMark, resulting in potential ambiguities
+      1. GFM is a superset of CommonMark, which may lead to subtle incompatabilities in other renderers that do not
+         support GFM
 
 ## Decision
 
@@ -55,4 +56,4 @@ The team shall use CommonMark to guide all Markdown formatting decisions for the
 
 - [Closed Stencil PR - feat(markdown): improved export to markdown #3042](https://github.com/ionic-team/stencil/pull/3042/)
 - [CommonMark Homepage](https://commonmark.org/)
-- [GitHub Flavored Markdown (GFM)](https://www.iana.org/assignments/markdown-variants/GFM)
+- [GitHub Flavored Markdown (GFM)](https://github.github.com/gfm/)
