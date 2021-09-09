@@ -33,7 +33,6 @@ export const outputLazy = async (config: d.Config, compilerCtx: d.CompilerCtx, b
   const timespan = buildCtx.createTimeSpan(`generate lazy started`);
 
   try {
-    // const criticalBundles = getCriticalPath(buildCtx);
     const bundleOpts: BundleOptions = {
       id: 'lazy',
       platform: 'client',
