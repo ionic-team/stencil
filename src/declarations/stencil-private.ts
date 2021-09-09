@@ -200,7 +200,7 @@ export interface RollupResults {
 export interface BuildCtx {
   buildId: number;
   buildResults: CompilerBuildResults;
-  buildStats?: CompilerBuildStats;
+  buildStats?: CompilerBuildStats | { diagnostics: Diagnostic[] };
   buildMessages: string[];
   bundleBuildCount: number;
   collections: Collection[];

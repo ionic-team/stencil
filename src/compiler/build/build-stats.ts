@@ -8,7 +8,10 @@ import type * as d from '../../declarations';
  * @param buildCtx
  * @returns
  */
-export function generateBuildStats(config: d.Config, buildCtx: d.BuildCtx) {
+export function generateBuildStats(
+  config: d.Config,
+  buildCtx: d.BuildCtx
+): d.CompilerBuildStats | { diagnostics: d.Diagnostic[] } {
   const buildResults = buildCtx.buildResults;
 
   let jsonData: d.CompilerBuildStats | { diagnostics: d.Diagnostic[] };
@@ -72,7 +75,7 @@ export function generateBuildStats(config: d.Config, buildCtx: d.BuildCtx) {
  * @param buildCtx
  * @returns
  */
-export async function writeBuildStats(config: d.Config, data: d.CompilerBuildStats) {
+export async function writeBuildStats(config: d.Config, data: d.CompilerBuildStats | { diagnostics: d.Diagnostic[] }) {
   const statsTargets = config.outputTargets.filter((o) => o.type === 'stats') as d.OutputTargetStats[];
 
   await Promise.all(
