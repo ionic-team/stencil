@@ -28,6 +28,8 @@ proposed standard and use that for guidance as to how markdown should be formatt
    2. Cons
       1. Not everyone may be familiar with CommonMark, leading to confusion when reviewing pull requests
       2. CommonMark has yet to produce a v1.0 specification
+      3. CommonMark does not define a syntax for tables, requiring they be written as
+         [HTML](https://spec.commonmark.org/0.30/#html-blocks) 
 3. Adopt [GitHub Flavored Markdown (GFM)](https://github.github.com/gfm/)
    1. Pros:
       1. Individuals may be more familiar with GFM, given the popularity of the platform
