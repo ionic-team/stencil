@@ -92,7 +92,7 @@ const getLazyCustomTransformer = (config: d.Config, compilerCtx: d.CompilerCtx) 
   ];
 };
 
-const getLazyEntry = (isBrowser: boolean) => {
+const getLazyEntry = (isBrowser: boolean): string => {
   const s = new MagicString(``);
   s.append(`import { bootstrapLazy } from '${STENCIL_CORE_ID}';\n`);
 

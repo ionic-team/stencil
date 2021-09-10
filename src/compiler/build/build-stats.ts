@@ -1,12 +1,12 @@
 import { byteSize, sortBy } from '@utils';
 import type * as d from '../../declarations';
+import { isOutputTargetStats } from '../output-targets/output-utils';
 
 /**
  *
- * @param config
- * @param compilerCtx
- * @param buildCtx
- * @returns
+ * @param config the project build configuration
+ * @param buildCtx An instance of the build which holds the details about the build
+ * @returns CompilerBuildStats or an Object including diagnostics.
  */
 export function generateBuildStats(
   config: d.Config,
@@ -33,7 +33,7 @@ export function generateBuildStats(
           fsNamespace: config.fsNamespace,
           components: Object.keys(buildResults.componentGraph).length,
           entries: Object.keys(buildResults.componentGraph).length,
-          bundles: buildResults.outputs.reduce((total, en) => (total += en.files.length), 0),
+          bundles: buildResults.outputs.reduce((total, en) => total + en.files.length, 0),
           outputs: getAppOutputs(config, buildResults),
         },
         options: {
@@ -71,28 +71,31 @@ export function generateBuildStats(
 
 /**
  *
- * @param config
- * @param buildCtx
+ * @param config the project build configuration
+ * @param buildCtx An instance of the build which holds the details about the build
  * @returns
  */
 export async function writeBuildStats(config: d.Config, data: d.CompilerBuildStats | { diagnostics: d.Diagnostic[] }) {
-  const statsTargets = config.outputTargets.filter((o) => o.type === 'stats') as d.OutputTargetStats[];
+  const statsTargets = config.outputTargets.filter(isOutputTargetStats);
 
   await Promise.all(
-    statsTargets.map((outputTarget) => {
-      config.sys.writeFile(outputTarget.file, JSON.stringify(data, null, 2));
+    statsTargets.map(async (outputTarget) => {
+      const result = await config.sys.writeFile(outputTarget.file, JSON.stringify(data, null, 2));
+
+      if (result.error) {
+        config.logger.warn([`Stats failed to write file to ${outputTarget.file}: ${result.error}`]);
+      }
     })
   );
 }
 
-function sanitizeBundlesForStats(bundleArray: d.BundleModule[]): d.CompilerBuildStatBundle[] {
+function sanitizeBundlesForStats(bundleArray: ReadonlyArray<d.BundleModule>): ReadonlyArray<d.CompilerBuildStatBundle> {
   if (!bundleArray) {
     return [];
   }
 
   return bundleArray.map((bundle) => {
     return {
-      // Should probably get the file size too.
       key: bundle.entryKey,
       components: bundle.cmps.map((c) => c.tagName),
       bundleId: bundle.output.bundleId,
@@ -100,7 +103,7 @@ function sanitizeBundlesForStats(bundleArray: d.BundleModule[]): d.CompilerBuild
       imports: bundle.rollupResult.imports,
       // code: bundle.rollupResult.code, // (use this to debug)
       // Currently, this number is inaccurate vs what seems to be on disk.
-      byteSize: byteSize(bundle.rollupResult.code),
+      originalByteSize: byteSize(bundle.rollupResult.code),
     };
   });
 }

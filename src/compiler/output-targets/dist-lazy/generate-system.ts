@@ -12,7 +12,7 @@ export const generateSystem = async (
   buildCtx: d.BuildCtx,
   rollupBuild: RollupBuild,
   outputTargets: d.OutputTargetDistLazy[]
-) => {
+): Promise<d.BuildCtx> => {
   const systemOutputs = outputTargets.filter((o) => !!o.systemDir);
 
   if (systemOutputs.length > 0) {
@@ -50,7 +50,7 @@ const generateSystemLoaders = (
   compilerCtx: d.CompilerCtx,
   rollupResult: d.RollupResult[],
   systemOutputs: d.OutputTargetDistLazy[]
-) => {
+): Promise<void[]> => {
   const loaderFilename = rollupResult.find((r) => r.type === 'chunk' && r.isBrowserLoader).fileName;
 
   return Promise.all(systemOutputs.map((o) => writeSystemLoader(config, compilerCtx, loaderFilename, o)));
@@ -61,7 +61,7 @@ const writeSystemLoader = async (
   compilerCtx: d.CompilerCtx,
   loaderFilename: string,
   outputTarget: d.OutputTargetDistLazy
-) => {
+): Promise<void> => {
   if (outputTarget.systemLoaderFile) {
     const entryPointPath = join(outputTarget.systemDir, loaderFilename);
     const relativePath = relativeImport(outputTarget.systemLoaderFile, entryPointPath);
@@ -77,7 +77,7 @@ const getSystemLoader = async (
   compilerCtx: d.CompilerCtx,
   corePath: string,
   includePolyfills: boolean
-) => {
+): Promise<string> => {
   const polyfills = includePolyfills
     ? await getAppBrowserCorePolyfills(config, compilerCtx)
     : '/* polyfills excluded */';

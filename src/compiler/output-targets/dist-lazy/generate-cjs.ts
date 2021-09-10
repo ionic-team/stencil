@@ -11,7 +11,7 @@ export const generateCjs = async (
   buildCtx: d.BuildCtx,
   rollupBuild: RollupBuild,
   outputTargets: d.OutputTargetDistLazy[]
-) => {
+): Promise<d.BuildCtx> => {
   const cjsOutputs = outputTargets.filter((o) => !!o.cjsDir);
 
   if (cjsOutputs.length > 0) {
@@ -49,7 +49,7 @@ const generateShortcuts = (
   compilerCtx: d.CompilerCtx,
   rollupResult: d.RollupResult[],
   outputTargets: d.OutputTargetDistLazy[]
-) => {
+): Promise<void[]> => {
   const indexFilename = rollupResult.find((r) => r.type === 'chunk' && r.isIndex).fileName;
   return Promise.all(
     outputTargets.map(async (o) => {

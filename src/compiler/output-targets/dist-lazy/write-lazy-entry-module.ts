@@ -27,7 +27,13 @@ export const writeLazyModule = async (
   };
 };
 
-const getBundleId = async (config: d.Config, entryKey: string, shouldHash: boolean, code: string, sufix: string) => {
+const getBundleId = async (
+  config: d.Config,
+  entryKey: string,
+  shouldHash: boolean,
+  code: string,
+  sufix: string
+): Promise<string> => {
   if (shouldHash) {
     const hash = await config.sys.generateContentHash(code, config.hashedFileNameLength);
     return `p-${hash}${sufix}`;

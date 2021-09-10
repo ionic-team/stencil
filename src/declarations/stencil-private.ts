@@ -205,11 +205,11 @@ export interface BuildCtx {
   bundleBuildCount: number;
   collections: Collection[];
   compilerCtx: CompilerCtx;
-  esmBrowserComponentBundle: BundleModule[];
-  esmComponentBundle: BundleModule[];
-  es5ComponentBundle: BundleModule[];
-  systemComponentBundle: BundleModule[];
-  commonJsComponentBundle: BundleModule[];
+  esmBrowserComponentBundle: ReadonlyArray<BundleModule>;
+  esmComponentBundle: ReadonlyArray<BundleModule>;
+  es5ComponentBundle: ReadonlyArray<BundleModule>;
+  systemComponentBundle: ReadonlyArray<BundleModule>;
+  commonJsComponentBundle: ReadonlyArray<BundleModule>;
   components: ComponentCompilerMeta[];
   componentGraph: Map<string, string[]>;
   config: Config;
@@ -291,11 +291,11 @@ export interface CompilerBuildStats {
     buildEs5: boolean | 'prod';
   };
   formats: {
-    esmBrowser: CompilerBuildStatBundle[];
-    esm: CompilerBuildStatBundle[];
-    es5: CompilerBuildStatBundle[];
-    system: CompilerBuildStatBundle[];
-    commonjs: CompilerBuildStatBundle[];
+    esmBrowser: ReadonlyArray<CompilerBuildStatBundle>;
+    esm: ReadonlyArray<CompilerBuildStatBundle>;
+    es5: ReadonlyArray<CompilerBuildStatBundle>;
+    system: ReadonlyArray<CompilerBuildStatBundle>;
+    commonjs: ReadonlyArray<CompilerBuildStatBundle>;
   };
   components: BuildComponent[];
   entries: EntryModule[];
@@ -315,7 +315,7 @@ export interface CompilerBuildStatBundle {
   bundleId: string;
   fileName: string;
   imports: string[];
-  byteSize: number;
+  originalByteSize: number;
 }
 
 export interface BuildEntry {

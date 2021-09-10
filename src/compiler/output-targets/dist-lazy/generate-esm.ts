@@ -12,7 +12,7 @@ export const generateEsm = async (
   buildCtx: d.BuildCtx,
   rollupBuild: RollupBuild,
   outputTargets: d.OutputTargetDistLazy[]
-) => {
+): Promise<d.BuildCtx> => {
   const esmEs5Outputs = config.buildEs5 ? outputTargets.filter((o) => !!o.esmEs5Dir && !o.isBrowserBuild) : [];
   const esmOutputs = outputTargets.filter((o) => !!o.esmDir && !o.isBrowserBuild);
   if (esmOutputs.length + esmEs5Outputs.length > 0) {
@@ -60,7 +60,11 @@ export const generateEsm = async (
   return buildCtx;
 };
 
-const copyPolyfills = async (config: d.Config, compilerCtx: d.CompilerCtx, outputTargets: d.OutputTargetDistLazy[]) => {
+const copyPolyfills = async (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  outputTargets: d.OutputTargetDistLazy[]
+): Promise<void> => {
   const destinations = outputTargets.filter((o) => o.polyfills).map((o) => o.esmDir);
   if (destinations.length === 0) {
     return;
@@ -85,7 +89,7 @@ const generateShortcuts = (
   compilerCtx: d.CompilerCtx,
   outputTargets: d.OutputTargetDistLazy[],
   rollupResult: RollupResult[]
-) => {
+): Promise<void[]> => {
   const indexFilename = rollupResult.find((r) => r.type === 'chunk' && r.isIndex).fileName;
 
   return Promise.all(
