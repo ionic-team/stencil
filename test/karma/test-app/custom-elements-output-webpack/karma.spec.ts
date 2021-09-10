@@ -10,13 +10,16 @@ describe('custom-elements-output-webpack', () => {
   afterEach(tearDownDom);
 
   it('defines components and their dependencies', async () => {
+    expect(customElements.get('custom-element-root')).toBeDefined();
+    expect(customElements.get('custom-element-child')).toBeDefined();
+    expect(customElements.get('custom-element-nested-child')).toBeDefined();
+
     const elm = app.querySelector('custom-element-root');
-    expect(elm.shadowRoot).toBeDefined();
-
     const childElm = elm.shadowRoot.querySelector('custom-element-child');
-    expect(childElm.shadowRoot).toBeDefined();
+    const childNestedElm = childElm.shadowRoot.querySelector('custom-element-nested-child');
 
-    const childNestedElm = elm.shadowRoot.querySelector('custom-element-nested-child');
+    expect(elm.shadowRoot).toBeDefined();
+    expect(childElm.shadowRoot).toBeDefined();
     expect(childNestedElm.shadowRoot).toBeDefined();
   });
 });
