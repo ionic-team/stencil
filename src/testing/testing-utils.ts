@@ -23,21 +23,24 @@ export function shuffleArray(array: any[]) {
   return array;
 }
 
-export function expectFiles(fs: d.InMemoryFileSystem, filePaths: string[]) {
+export function expectFiles(sys: d.InMemoryFileSystem, filePaths: string[]) {
   filePaths.forEach((filePath) => {
-    fs.sys.statSync(filePath);
+    // I think this could use promises
+    sys.statSync(filePath);
   });
 }
 
-export function doNotExpectFiles(fs: d.InMemoryFileSystem, filePaths: string[]) {
+export function doNotExpectFiles(sys: d.InMemoryFileSystem, filePaths: string[]) {
   filePaths.forEach((filePath) => {
     try {
-      fs.sys.statSync(filePath);
+      // I think this could use promises
+      sys.statSync(filePath);
     } catch (e) {
       return;
     }
 
-    if (fs.accessSync(filePath)) {
+    // I think this could use promises
+    if (sys.accessSync(filePath)) {
       throw new Error(`did not expect access: ${filePath}`);
     }
   });
