@@ -71,8 +71,6 @@ const bundleCustomElements = async (
         if (bundle.type === 'chunk') {
           let code = bundle.code;
 
-          if (!!bundle.isEntry) console.log('this is the output?', bundle.code)
-
           const optimizeResults = await optimizeModule(config, compilerCtx, {
             input: code,
             isCore: bundle.isEntry,

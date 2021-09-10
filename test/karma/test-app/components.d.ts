@@ -59,11 +59,7 @@ export namespace Components {
     }
     interface CssVariablesShadowDom {
     }
-    interface CustomElementChildA {
-    }
-    interface CustomElementChildOptionalStringA {
-    }
-    interface CustomElementChildOptionalStringB {
+    interface CustomElementChild {
     }
     interface CustomElementNestedChild {
     }
@@ -401,23 +397,11 @@ declare global {
         prototype: HTMLCssVariablesShadowDomElement;
         new (): HTMLCssVariablesShadowDomElement;
     };
-    interface HTMLCustomElementChildAElement extends Components.CustomElementChildA, HTMLStencilElement {
+    interface HTMLCustomElementChildElement extends Components.CustomElementChild, HTMLStencilElement {
     }
-    var HTMLCustomElementChildAElement: {
-        prototype: HTMLCustomElementChildAElement;
-        new (): HTMLCustomElementChildAElement;
-    };
-    interface HTMLCustomElementChildOptionalStringAElement extends Components.CustomElementChildOptionalStringA, HTMLStencilElement {
-    }
-    var HTMLCustomElementChildOptionalStringAElement: {
-        prototype: HTMLCustomElementChildOptionalStringAElement;
-        new (): HTMLCustomElementChildOptionalStringAElement;
-    };
-    interface HTMLCustomElementChildOptionalStringBElement extends Components.CustomElementChildOptionalStringB, HTMLStencilElement {
-    }
-    var HTMLCustomElementChildOptionalStringBElement: {
-        prototype: HTMLCustomElementChildOptionalStringBElement;
-        new (): HTMLCustomElementChildOptionalStringBElement;
+    var HTMLCustomElementChildElement: {
+        prototype: HTMLCustomElementChildElement;
+        new (): HTMLCustomElementChildElement;
     };
     interface HTMLCustomElementNestedChildElement extends Components.CustomElementNestedChild, HTMLStencilElement {
     }
@@ -1036,9 +1020,7 @@ declare global {
         "css-cmp": HTMLCssCmpElement;
         "css-variables-no-encapsulation": HTMLCssVariablesNoEncapsulationElement;
         "css-variables-shadow-dom": HTMLCssVariablesShadowDomElement;
-        "custom-element-child-a": HTMLCustomElementChildAElement;
-        "custom-element-child-optional-string-a": HTMLCustomElementChildOptionalStringAElement;
-        "custom-element-child-optional-string-b": HTMLCustomElementChildOptionalStringBElement;
+        "custom-element-child": HTMLCustomElementChildElement;
         "custom-element-nested-child": HTMLCustomElementNestedChildElement;
         "custom-element-root": HTMLCustomElementRootElement;
         "custom-event-root": HTMLCustomEventRootElement;
@@ -1192,11 +1174,7 @@ declare namespace LocalJSX {
     }
     interface CssVariablesShadowDom {
     }
-    interface CustomElementChildA {
-    }
-    interface CustomElementChildOptionalStringA {
-    }
-    interface CustomElementChildOptionalStringB {
+    interface CustomElementChild {
     }
     interface CustomElementNestedChild {
     }
@@ -1460,9 +1438,7 @@ declare namespace LocalJSX {
         "css-cmp": CssCmp;
         "css-variables-no-encapsulation": CssVariablesNoEncapsulation;
         "css-variables-shadow-dom": CssVariablesShadowDom;
-        "custom-element-child-a": CustomElementChildA;
-        "custom-element-child-optional-string-a": CustomElementChildOptionalStringA;
-        "custom-element-child-optional-string-b": CustomElementChildOptionalStringB;
+        "custom-element-child": CustomElementChild;
         "custom-element-nested-child": CustomElementNestedChild;
         "custom-element-root": CustomElementRoot;
         "custom-event-root": CustomEventRoot;
@@ -1585,9 +1561,7 @@ declare module "@stencil/core" {
             "css-cmp": LocalJSX.CssCmp & JSXBase.HTMLAttributes<HTMLCssCmpElement>;
             "css-variables-no-encapsulation": LocalJSX.CssVariablesNoEncapsulation & JSXBase.HTMLAttributes<HTMLCssVariablesNoEncapsulationElement>;
             "css-variables-shadow-dom": LocalJSX.CssVariablesShadowDom & JSXBase.HTMLAttributes<HTMLCssVariablesShadowDomElement>;
-            "custom-element-child-a": LocalJSX.CustomElementChildA & JSXBase.HTMLAttributes<HTMLCustomElementChildAElement>;
-            "custom-element-child-optional-string-a": LocalJSX.CustomElementChildOptionalStringA & JSXBase.HTMLAttributes<HTMLCustomElementChildOptionalStringAElement>;
-            "custom-element-child-optional-string-b": LocalJSX.CustomElementChildOptionalStringB & JSXBase.HTMLAttributes<HTMLCustomElementChildOptionalStringBElement>;
+            "custom-element-child": LocalJSX.CustomElementChild & JSXBase.HTMLAttributes<HTMLCustomElementChildElement>;
             "custom-element-nested-child": LocalJSX.CustomElementNestedChild & JSXBase.HTMLAttributes<HTMLCustomElementNestedChildElement>;
             "custom-element-root": LocalJSX.CustomElementRoot & JSXBase.HTMLAttributes<HTMLCustomElementRootElement>;
             "custom-event-root": LocalJSX.CustomEventRoot & JSXBase.HTMLAttributes<HTMLCustomEventRootElement>;

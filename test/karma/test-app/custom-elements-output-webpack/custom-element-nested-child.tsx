@@ -1,14 +1,14 @@
 import { Component, h } from '@stencil/core';
 
 @Component({
-  tag: 'custom-element-child-a',
+  tag: 'custom-element-nested-child',
   shadow: true
 })
-export class CustomElementChildA {
+export class CustomElementNestedChild {
   render() {
     return (
       <div>
-        <strong>Basic Nested Component Loaded!</strong>
+        <strong>Child Nested Component Loaded!</strong>
       </div>
     );
   }
