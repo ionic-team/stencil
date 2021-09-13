@@ -93,111 +93,81 @@ const setupComponentDependencies = (
       newStatements.push(createImportStatement([`defineCustomElement as ${importAs}`], foundDep.sourceFilePath));
 
       // define a dependent component by recursively calling their own `defineCustomElement()`
-      const callExpression = ts.factory.createCallExpression(
-        ts.factory.createIdentifier(importAs),
-        undefined,
-        [ts.factory.createIdentifier('tagRename')]
-      );
+      const callExpression = ts.factory.createCallExpression(ts.factory.createIdentifier(importAs), undefined, [] );
       // `case` blocks that define the dependent components. We'll add them to our switch statement later.
-      caseStatements.push(createCaseBlock(foundDep.tagName, callExpression));
+      caseStatements.push(createCustomElementsDefineCase(foundDep.tagName, callExpression));
     });
   })
 }
 
 /**
  * Creates a case block which will be used to define components. e.g.
- * ```
- case "my-component":
-    tagName = "my-component";
-    if (tagRename) {
-        tagName = tagRename(tagName);
-      }
-      if (!customElements.get(tagName)) {
-        customElements.define(tagName, MyProxiedComponent);
-        // OR for dependent components
-        defineCustomElement(tagRename);
-      }
-      break;
-  } });
+ * ``` javascript
+ * case "my-component":
+ *   tagName = "my-component";
+ *   if (!customElements.get(tagName)) {
+ *     customElements.define(tagName, MyProxiedComponent);
+ *     // OR for dependent components
+ *     defineCustomElement(tagRename);
+ *   }
+ *   break;
+ * } });
   ```
- * @param tagName - the components' tagName saved within stencil.
- * @param actionExpression - the actual expression to call to define the customElement
+ * @param tagName the components' tagName saved within stencil.
+ * @param actionExpression the actual expression to call to define the customElement
  * @returns ts AST CaseClause
  */
-const createCaseBlock = (tagName: string, actionExpression: ts.Expression) => {
-  return ts.factory.createCaseClause(
-    ts.factory.createStringLiteral(tagName),
-    [
-      ts.factory.createExpressionStatement(
-        ts.factory.createBinaryExpression(
-          ts.factory.createIdentifier('tagName'),
-          ts.factory.createToken(ts.SyntaxKind.EqualsToken),
-          ts.factory.createStringLiteral(tagName)
+const createCustomElementsDefineCase = (tagName: string, actionExpression: ts.Expression): ts.CaseClause => {
+  return ts.factory.createCaseClause(ts.factory.createStringLiteral(tagName), [
+    ts.factory.createExpressionStatement(
+      ts.factory.createBinaryExpression(
+        ts.factory.createIdentifier('tagName'),
+        ts.factory.createToken(ts.SyntaxKind.EqualsToken),
+        ts.factory.createStringLiteral(tagName)
+      )
+    ),
+    ts.factory.createIfStatement(
+      ts.factory.createPrefixUnaryExpression(
+        ts.SyntaxKind.ExclamationToken,
+        ts.factory.createCallExpression(
+          ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('customElements'), 'get'),
+          undefined,
+          [ts.factory.createIdentifier('tagName')]
         )
       ),
-      ts.factory.createIfStatement(
-        ts.factory.createIdentifier('tagRename'),
-        ts.factory.createBlock([
-          ts.factory.createExpressionStatement(
-            ts.factory.createBinaryExpression(
-              ts.factory.createIdentifier('tagName'),
-              ts.factory.createToken(ts.SyntaxKind.EqualsToken),
-              ts.factory.createCallExpression(
-                ts.factory.createIdentifier('tagRename'),
-                undefined,
-                [ts.factory.createIdentifier('tagName')]
-              )
-            )
-          )
-        ])
-      ),
-      ts.factory.createIfStatement(
-        ts.factory.createPrefixUnaryExpression(
-          ts.SyntaxKind.ExclamationToken,
-          ts.factory.createCallExpression(
-            ts.factory.createPropertyAccessExpression(
-              ts.factory.createIdentifier('customElements'),
-              'get'
-            ),
-            undefined,
-            [ts.factory.createIdentifier('tagName')]
-          )
-        ),
-        ts.factory.createBlock([
-          ts.factory.createExpressionStatement(actionExpression)
-        ])
-      ),
-      ts.factory.createBreakStatement(),
-    ]
-  )
-}
+      ts.factory.createBlock([ts.factory.createExpressionStatement(actionExpression)])
+    ),
+    ts.factory.createBreakStatement(),
+  ]);
+};
 
 /**
  * Add the main `defineCustomElement` function e.g.
- * ```
- function defineCustomElement(tagRename) {
-   var tagName;
-   const components = ['my-component'];
-   components.forEach(cmp => { switch (cmp) {
-     case "my-component":
-       tagName = "my-component";
-       if (tagRename) {
-         tagName = tagRename(tagName);
-       }
-       if (!customElements.get(tagName)) {
-        customElements.define(tagName, MyProxiedComponent);
-        // OR for dependent components
-        defineCustomElement(tagRename);
-       }
-       break;
-   } });
- }
+ * ```javascript
+ * function defineCustomElement(tagRename) {
+ *  let tagName;
+ *  const components = ['my-component'];
+ *   components.forEach(cmp => { switch (cmp) {
+ *   case "my-component":
+ *     tagName = "my-component";
+ *     if (!customElements.get(tagName)) {
+ *      customElements.define(tagName, MyProxiedComponent);
+ *      // OR for dependent components
+ *      defineCustomElement(tagRename);
+ *     }
+ *     break;
+ *  } });
+ * }
  ```
- * @param tagNames - all components that will be defined
- * @param newStatements - new top level statement array that will get added to the AST
- * @param caseStatements - an array of case statement blocks. Will get added to `defineCustomElement` later
+ * @param tagNames all components that will be defined
+ * @param newStatements new top level statement array that will get added to the AST
+ * @param caseStatements an array of case statement blocks. Will get added to `defineCustomElement` later
  */
-const addDefineCustomElementFunction = (tagNames: string[], newStatements: ts.Statement[], caseStatements: ts.CaseClause[]) => {
+const addDefineCustomElementFunction = (
+  tagNames: string[],
+  newStatements: ts.Statement[],
+  caseStatements: ts.CaseClause[]
+) => {
   const newExpression = ts.factory.createFunctionDeclaration(
     undefined,
     [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
@@ -217,7 +187,7 @@ const addDefineCustomElementFunction = (tagNames: string[], newStatements: ts.St
       [
         ts.factory.createVariableStatement(
           undefined,
-          [ts.factory.createVariableDeclaration('tagName')]
+          ts.factory.createVariableDeclarationList([ts.factory.createVariableDeclaration('tagName')], ts.NodeFlags.Let)
         ),
         ts.factory.createVariableStatement(
           undefined,
@@ -231,7 +201,8 @@ const addDefineCustomElementFunction = (tagNames: string[], newStatements: ts.St
                   tagNames.map(tagName => ts.factory.createStringLiteral(tagName))
                 )
               )
-            ]
+            ],
+            ts.NodeFlags.Const
           )
         ),
         ts.factory.createExpressionStatement(
