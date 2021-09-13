@@ -174,14 +174,7 @@ const addDefineCustomElementFunction = (
     undefined,
     ts.factory.createIdentifier('defineCustomElement'),
     undefined,
-    [
-      ts.factory.createParameterDeclaration(
-        undefined,
-        undefined,
-        undefined,
-        ts.factory.createIdentifier('tagRename')
-      )
-    ],
+    undefined,
     undefined,
     ts.factory.createBlock(
       [
