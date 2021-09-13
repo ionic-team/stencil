@@ -63,6 +63,12 @@ export namespace Components {
     }
     interface CssVariablesShadowDom {
     }
+    interface CustomElementChild {
+    }
+    interface CustomElementNestedChild {
+    }
+    interface CustomElementRoot {
+    }
     interface CustomEventRoot {
     }
     interface DelegatesFocus {
@@ -406,6 +412,24 @@ declare global {
     var HTMLCssVariablesShadowDomElement: {
         prototype: HTMLCssVariablesShadowDomElement;
         new (): HTMLCssVariablesShadowDomElement;
+    };
+    interface HTMLCustomElementChildElement extends Components.CustomElementChild, HTMLStencilElement {
+    }
+    var HTMLCustomElementChildElement: {
+        prototype: HTMLCustomElementChildElement;
+        new (): HTMLCustomElementChildElement;
+    };
+    interface HTMLCustomElementNestedChildElement extends Components.CustomElementNestedChild, HTMLStencilElement {
+    }
+    var HTMLCustomElementNestedChildElement: {
+        prototype: HTMLCustomElementNestedChildElement;
+        new (): HTMLCustomElementNestedChildElement;
+    };
+    interface HTMLCustomElementRootElement extends Components.CustomElementRoot, HTMLStencilElement {
+    }
+    var HTMLCustomElementRootElement: {
+        prototype: HTMLCustomElementRootElement;
+        new (): HTMLCustomElementRootElement;
     };
     interface HTMLCustomEventRootElement extends Components.CustomEventRoot, HTMLStencilElement {
     }
@@ -1014,6 +1038,9 @@ declare global {
         "css-cmp": HTMLCssCmpElement;
         "css-variables-no-encapsulation": HTMLCssVariablesNoEncapsulationElement;
         "css-variables-shadow-dom": HTMLCssVariablesShadowDomElement;
+        "custom-element-child": HTMLCustomElementChildElement;
+        "custom-element-nested-child": HTMLCustomElementNestedChildElement;
+        "custom-element-root": HTMLCustomElementRootElement;
         "custom-event-root": HTMLCustomEventRootElement;
         "delegates-focus": HTMLDelegatesFocusElement;
         "dom-reattach": HTMLDomReattachElement;
@@ -1168,6 +1195,12 @@ declare namespace LocalJSX {
     interface CssVariablesNoEncapsulation {
     }
     interface CssVariablesShadowDom {
+    }
+    interface CustomElementChild {
+    }
+    interface CustomElementNestedChild {
+    }
+    interface CustomElementRoot {
     }
     interface CustomEventRoot {
     }
@@ -1429,6 +1462,9 @@ declare namespace LocalJSX {
         "css-cmp": CssCmp;
         "css-variables-no-encapsulation": CssVariablesNoEncapsulation;
         "css-variables-shadow-dom": CssVariablesShadowDom;
+        "custom-element-child": CustomElementChild;
+        "custom-element-nested-child": CustomElementNestedChild;
+        "custom-element-root": CustomElementRoot;
         "custom-event-root": CustomEventRoot;
         "delegates-focus": DelegatesFocus;
         "dom-reattach": DomReattach;
@@ -1551,6 +1587,9 @@ declare module "@stencil/core" {
             "css-cmp": LocalJSX.CssCmp & JSXBase.HTMLAttributes<HTMLCssCmpElement>;
             "css-variables-no-encapsulation": LocalJSX.CssVariablesNoEncapsulation & JSXBase.HTMLAttributes<HTMLCssVariablesNoEncapsulationElement>;
             "css-variables-shadow-dom": LocalJSX.CssVariablesShadowDom & JSXBase.HTMLAttributes<HTMLCssVariablesShadowDomElement>;
+            "custom-element-child": LocalJSX.CustomElementChild & JSXBase.HTMLAttributes<HTMLCustomElementChildElement>;
+            "custom-element-nested-child": LocalJSX.CustomElementNestedChild & JSXBase.HTMLAttributes<HTMLCustomElementNestedChildElement>;
+            "custom-element-root": LocalJSX.CustomElementRoot & JSXBase.HTMLAttributes<HTMLCustomElementRootElement>;
             "custom-event-root": LocalJSX.CustomEventRoot & JSXBase.HTMLAttributes<HTMLCustomEventRootElement>;
             "delegates-focus": LocalJSX.DelegatesFocus & JSXBase.HTMLAttributes<HTMLDelegatesFocusElement>;
             "dom-reattach": LocalJSX.DomReattach & JSXBase.HTMLAttributes<HTMLDomReattachElement>;
