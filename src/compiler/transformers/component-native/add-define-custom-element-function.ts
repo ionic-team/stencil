@@ -10,14 +10,14 @@ import { addCoreRuntimeApi, RUNTIME_APIS } from '../core-runtime-apis';
  * Adds `defineCustomElement()` function for all components.
  * @param compilerCtx - current compiler context
  * @param components - all current components within the stencil buildCtx
- * @returns - an TS AST transformer factory function
+ * @returns a TS AST transformer factory function
  */
 export const addDefineCustomElementFunctions = (
   compilerCtx: d.CompilerCtx,
   components: d.ComponentCompilerMeta[]
 ): ts.TransformerFactory<ts.SourceFile> => {
   return () => {
-    return (tsSourceFile) => {
+    return (tsSourceFile: ts.SourceFile): ts.SourceFile => {
       const moduleFile = getModuleFromSourceFile(compilerCtx, tsSourceFile);
       const newStatements: ts.Statement[] = [];
       const caseStatements: ts.CaseClause[] = [];
@@ -37,23 +37,19 @@ export const addDefineCustomElementFunctions = (
             ts.factory.createToken(ts.SyntaxKind.EqualsToken),
             creeateComponentMetadataProxy(moduleFile.cmps[0])
           )
-        )
+        );
         newStatements.push(metaExpression);
 
         // define the current component - `customElements.define(tagName, MyProxiedComponent);`
-        const callExpression = ts.factory.createCallExpression(
-          ts.factory.createPropertyAccessExpression(
-            ts.factory.createIdentifier('customElements'),
-            'define'
-          ),
+        const customElementsDefineCallExpression = ts.factory.createCallExpression(
+          ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('customElements'), 'define'),
           undefined,
-          [
-            ts.factory.createIdentifier('tagName'),
-            ts.factory.createIdentifier(cmpName)
-          ]
-        )
+          [ts.factory.createIdentifier('tagName'), ts.factory.createIdentifier(cmpName)]
+        );
         // create a `case` block that defines the current component. We'll add them to our switch statement later.
-        caseStatements.push(createCaseBlock(moduleFile.cmps[0].tagName, callExpression));
+        caseStatements.push(
+          createCustomElementsDefineCase(moduleFile.cmps[0].tagName, customElementsDefineCallExpression)
+        );
 
         setupComponentDependencies(moduleFile, components, newStatements, caseStatements, tagNames);
         addDefineCustomElementFunction(tagNames, newStatements, caseStatements);
@@ -69,15 +65,15 @@ export const addDefineCustomElementFunctions = (
       return tsSourceFile;
     };
   };
-}
+};
 
 /**
  * Adds dependent component import statements and sets up and case blocks
- * @param moduleFile - current components' module
- * @param components - all current components within the stencil buildCtx
- * @param newStatements - new top level statement array to add to that will get added to the AST
- * @param caseStatements - an array of case statement blocks to add to. Will get added to `defineCustomElement` later
- * @param tagNames - array of all related component tag-names to add to
+ * @param moduleFile current components' module
+ * @param components all current components within the stencil buildCtx
+ * @param newStatements new top level statement array to add to that will get added to the AST
+ * @param caseStatements an array of case statement blocks to add to. Will get added to `defineCustomElement` later
+ * @param tagNames array of all related component tag-names to add to
  */
 const setupComponentDependencies = (
   moduleFile: d.Module,
