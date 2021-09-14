@@ -31,14 +31,16 @@ export const addDefineCustomElementFunctions = (
 
         // wraps the initial component class in a `proxyCustomElement` wrapper.
         // This is what will be exported and called from the `defineCustomElement` call.
+        const proxyDefinition = createComponentMetadataProxy(principalComponent);
         const metaExpression = ts.factory.createExpressionStatement(
           ts.factory.createBinaryExpression(
             ts.factory.createIdentifier(principalComponent.componentClassName),
             ts.factory.createToken(ts.SyntaxKind.EqualsToken),
-            createComponentMetadataProxy(principalComponent)
+            proxyDefinition
           )
         );
         newStatements.push(metaExpression);
+        ts.addSyntheticLeadingComment(proxyDefinition, ts.SyntaxKind.MultiLineCommentTrivia, '@__PURE__', false);
 
         // define the current component - `customElements.define(tagName, MyProxiedComponent);`
         const customElementsDefineCallExpression = ts.factory.createCallExpression(
@@ -119,13 +121,6 @@ const setupComponentDependencies = (
  */
 const createCustomElementsDefineCase = (tagName: string, actionExpression: ts.Expression): ts.CaseClause => {
   return ts.factory.createCaseClause(ts.factory.createStringLiteral(tagName), [
-    ts.factory.createExpressionStatement(
-      ts.factory.createBinaryExpression(
-        ts.factory.createIdentifier('tagName'),
-        ts.factory.createToken(ts.SyntaxKind.EqualsToken),
-        ts.factory.createStringLiteral(tagName)
-      )
-    ),
     ts.factory.createIfStatement(
       ts.factory.createPrefixUnaryExpression(
         ts.SyntaxKind.ExclamationToken,
@@ -180,10 +175,6 @@ const addDefineCustomElementFunction = (
       [
         ts.factory.createVariableStatement(
           undefined,
-          ts.factory.createVariableDeclarationList([ts.factory.createVariableDeclaration('tagName')], ts.NodeFlags.Let)
-        ),
-        ts.factory.createVariableStatement(
-          undefined,
           ts.factory.createVariableDeclarationList(
             [
               ts.factory.createVariableDeclaration(
@@ -211,7 +202,7 @@ const addDefineCustomElementFunction = (
                     undefined,
                     undefined,
                     undefined,
-                    ts.factory.createIdentifier('cmp'),
+                    ts.factory.createIdentifier('tagName'),
                     undefined,
                     undefined
                   ),
@@ -220,7 +211,7 @@ const addDefineCustomElementFunction = (
                 ts.factory.createToken(ts.SyntaxKind.EqualsGreaterThanToken),
                 ts.factory.createBlock([
                   ts.factory.createSwitchStatement(
-                    ts.factory.createIdentifier('cmp'),
+                    ts.factory.createIdentifier('tagName'),
                     ts.factory.createCaseBlock(caseStatements)
                   ),
                 ])
@@ -232,6 +223,5 @@ const addDefineCustomElementFunction = (
       true
     )
   );
-
   newStatements.push(newExpression);
 };

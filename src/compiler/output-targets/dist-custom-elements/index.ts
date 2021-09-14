@@ -111,7 +111,7 @@ const addCustomElementInputs = (
       exp.push(
         `import { ${importName} as ${importAs}, defineCustomElement as cmpDefCustomEle } from '${cmp.sourceFilePath}';`
       );
-      exp.push(`export const ${exportName} = /*@__PURE__*/${importAs};`);
+      exp.push(`export const ${exportName} = ${importAs};`);
       exp.push(`export const defineCustomElement = cmpDefCustomEle;`);
     }
 
