@@ -1,7 +1,7 @@
 import { Component, h } from '@stencil/core';
 
 @Component({
-  tag: 'custom-element-child',
+  tag: 'custom-element-child-different-name-than-class',
   shadow: true,
 })
 export class CustomElementChild {
@@ -9,9 +9,6 @@ export class CustomElementChild {
     return (
       <div>
         <strong>Child Component Loaded!</strong>
-
-        <h3>Child Nested Component?</h3>
-        <custom-element-nested-child />
       </div>
     );
   }

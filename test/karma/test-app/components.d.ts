@@ -47,6 +47,10 @@ export namespace Components {
     }
     interface BuildData {
     }
+    interface CmpLabel {
+    }
+    interface CmpLabelWithSlotSibling {
+    }
     interface ConditionalBasic {
     }
     interface ConditionalRerender {
@@ -61,9 +65,13 @@ export namespace Components {
     }
     interface CustomElementChild {
     }
+    interface CustomElementChildDifferentNameThanClass {
+    }
     interface CustomElementNestedChild {
     }
     interface CustomElementRoot {
+    }
+    interface CustomElementRootDifferentNameThanClass {
     }
     interface CustomEventRoot {
     }
@@ -361,6 +369,18 @@ declare global {
         prototype: HTMLBuildDataElement;
         new (): HTMLBuildDataElement;
     };
+    interface HTMLCmpLabelElement extends Components.CmpLabel, HTMLStencilElement {
+    }
+    var HTMLCmpLabelElement: {
+        prototype: HTMLCmpLabelElement;
+        new (): HTMLCmpLabelElement;
+    };
+    interface HTMLCmpLabelWithSlotSiblingElement extends Components.CmpLabelWithSlotSibling, HTMLStencilElement {
+    }
+    var HTMLCmpLabelWithSlotSiblingElement: {
+        prototype: HTMLCmpLabelWithSlotSiblingElement;
+        new (): HTMLCmpLabelWithSlotSiblingElement;
+    };
     interface HTMLConditionalBasicElement extends Components.ConditionalBasic, HTMLStencilElement {
     }
     var HTMLConditionalBasicElement: {
@@ -403,6 +423,12 @@ declare global {
         prototype: HTMLCustomElementChildElement;
         new (): HTMLCustomElementChildElement;
     };
+    interface HTMLCustomElementChildDifferentNameThanClassElement extends Components.CustomElementChildDifferentNameThanClass, HTMLStencilElement {
+    }
+    var HTMLCustomElementChildDifferentNameThanClassElement: {
+        prototype: HTMLCustomElementChildDifferentNameThanClassElement;
+        new (): HTMLCustomElementChildDifferentNameThanClassElement;
+    };
     interface HTMLCustomElementNestedChildElement extends Components.CustomElementNestedChild, HTMLStencilElement {
     }
     var HTMLCustomElementNestedChildElement: {
@@ -414,6 +440,12 @@ declare global {
     var HTMLCustomElementRootElement: {
         prototype: HTMLCustomElementRootElement;
         new (): HTMLCustomElementRootElement;
+    };
+    interface HTMLCustomElementRootDifferentNameThanClassElement extends Components.CustomElementRootDifferentNameThanClass, HTMLStencilElement {
+    }
+    var HTMLCustomElementRootDifferentNameThanClassElement: {
+        prototype: HTMLCustomElementRootDifferentNameThanClassElement;
+        new (): HTMLCustomElementRootDifferentNameThanClassElement;
     };
     interface HTMLCustomEventRootElement extends Components.CustomEventRoot, HTMLStencilElement {
     }
@@ -1014,6 +1046,8 @@ declare global {
         "attribute-html-root": HTMLAttributeHtmlRootElement;
         "bad-shared-jsx": HTMLBadSharedJsxElement;
         "build-data": HTMLBuildDataElement;
+        "cmp-label": HTMLCmpLabelElement;
+        "cmp-label-with-slot-sibling": HTMLCmpLabelWithSlotSiblingElement;
         "conditional-basic": HTMLConditionalBasicElement;
         "conditional-rerender": HTMLConditionalRerenderElement;
         "conditional-rerender-root": HTMLConditionalRerenderRootElement;
@@ -1021,8 +1055,10 @@ declare global {
         "css-variables-no-encapsulation": HTMLCssVariablesNoEncapsulationElement;
         "css-variables-shadow-dom": HTMLCssVariablesShadowDomElement;
         "custom-element-child": HTMLCustomElementChildElement;
+        "custom-element-child-different-name-than-class": HTMLCustomElementChildDifferentNameThanClassElement;
         "custom-element-nested-child": HTMLCustomElementNestedChildElement;
         "custom-element-root": HTMLCustomElementRootElement;
+        "custom-element-root-different-name-than-class": HTMLCustomElementRootDifferentNameThanClassElement;
         "custom-event-root": HTMLCustomEventRootElement;
         "delegates-focus": HTMLDelegatesFocusElement;
         "dom-reattach": HTMLDomReattachElement;
@@ -1162,6 +1198,10 @@ declare namespace LocalJSX {
     }
     interface BuildData {
     }
+    interface CmpLabel {
+    }
+    interface CmpLabelWithSlotSibling {
+    }
     interface ConditionalBasic {
     }
     interface ConditionalRerender {
@@ -1176,9 +1216,13 @@ declare namespace LocalJSX {
     }
     interface CustomElementChild {
     }
+    interface CustomElementChildDifferentNameThanClass {
+    }
     interface CustomElementNestedChild {
     }
     interface CustomElementRoot {
+    }
+    interface CustomElementRootDifferentNameThanClass {
     }
     interface CustomEventRoot {
     }
@@ -1432,6 +1476,8 @@ declare namespace LocalJSX {
         "attribute-html-root": AttributeHtmlRoot;
         "bad-shared-jsx": BadSharedJsx;
         "build-data": BuildData;
+        "cmp-label": CmpLabel;
+        "cmp-label-with-slot-sibling": CmpLabelWithSlotSibling;
         "conditional-basic": ConditionalBasic;
         "conditional-rerender": ConditionalRerender;
         "conditional-rerender-root": ConditionalRerenderRoot;
@@ -1439,8 +1485,10 @@ declare namespace LocalJSX {
         "css-variables-no-encapsulation": CssVariablesNoEncapsulation;
         "css-variables-shadow-dom": CssVariablesShadowDom;
         "custom-element-child": CustomElementChild;
+        "custom-element-child-different-name-than-class": CustomElementChildDifferentNameThanClass;
         "custom-element-nested-child": CustomElementNestedChild;
         "custom-element-root": CustomElementRoot;
+        "custom-element-root-different-name-than-class": CustomElementRootDifferentNameThanClass;
         "custom-event-root": CustomEventRoot;
         "delegates-focus": DelegatesFocus;
         "dom-reattach": DomReattach;
@@ -1555,6 +1603,8 @@ declare module "@stencil/core" {
             "attribute-html-root": LocalJSX.AttributeHtmlRoot & JSXBase.HTMLAttributes<HTMLAttributeHtmlRootElement>;
             "bad-shared-jsx": LocalJSX.BadSharedJsx & JSXBase.HTMLAttributes<HTMLBadSharedJsxElement>;
             "build-data": LocalJSX.BuildData & JSXBase.HTMLAttributes<HTMLBuildDataElement>;
+            "cmp-label": LocalJSX.CmpLabel & JSXBase.HTMLAttributes<HTMLCmpLabelElement>;
+            "cmp-label-with-slot-sibling": LocalJSX.CmpLabelWithSlotSibling & JSXBase.HTMLAttributes<HTMLCmpLabelWithSlotSiblingElement>;
             "conditional-basic": LocalJSX.ConditionalBasic & JSXBase.HTMLAttributes<HTMLConditionalBasicElement>;
             "conditional-rerender": LocalJSX.ConditionalRerender & JSXBase.HTMLAttributes<HTMLConditionalRerenderElement>;
             "conditional-rerender-root": LocalJSX.ConditionalRerenderRoot & JSXBase.HTMLAttributes<HTMLConditionalRerenderRootElement>;
@@ -1562,8 +1612,10 @@ declare module "@stencil/core" {
             "css-variables-no-encapsulation": LocalJSX.CssVariablesNoEncapsulation & JSXBase.HTMLAttributes<HTMLCssVariablesNoEncapsulationElement>;
             "css-variables-shadow-dom": LocalJSX.CssVariablesShadowDom & JSXBase.HTMLAttributes<HTMLCssVariablesShadowDomElement>;
             "custom-element-child": LocalJSX.CustomElementChild & JSXBase.HTMLAttributes<HTMLCustomElementChildElement>;
+            "custom-element-child-different-name-than-class": LocalJSX.CustomElementChildDifferentNameThanClass & JSXBase.HTMLAttributes<HTMLCustomElementChildDifferentNameThanClassElement>;
             "custom-element-nested-child": LocalJSX.CustomElementNestedChild & JSXBase.HTMLAttributes<HTMLCustomElementNestedChildElement>;
             "custom-element-root": LocalJSX.CustomElementRoot & JSXBase.HTMLAttributes<HTMLCustomElementRootElement>;
+            "custom-element-root-different-name-than-class": LocalJSX.CustomElementRootDifferentNameThanClass & JSXBase.HTMLAttributes<HTMLCustomElementRootDifferentNameThanClassElement>;
             "custom-event-root": LocalJSX.CustomEventRoot & JSXBase.HTMLAttributes<HTMLCustomEventRootElement>;
             "delegates-focus": LocalJSX.DelegatesFocus & JSXBase.HTMLAttributes<HTMLDelegatesFocusElement>;
             "dom-reattach": LocalJSX.DomReattach & JSXBase.HTMLAttributes<HTMLDomReattachElement>;

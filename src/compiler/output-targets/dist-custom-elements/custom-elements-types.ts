@@ -92,10 +92,8 @@ const generateCustomElementType = (componentsDtsRelPath: string, cmp: d.Componen
     `};`,
     `/**`,
     ` * Used to define this component and all nested components recursively.`,
-    ` * An optional tagRename function can be passed. This is called before defining each component`,
-    ` * allowing component tags to be renamed.`,
     ` */`,
-    `export const defineCustomElement: (tagRename?: (origTagName: string) => string) => void;`,
+    `export const defineCustomElement: () => void;`,
     ``,
   ];
 

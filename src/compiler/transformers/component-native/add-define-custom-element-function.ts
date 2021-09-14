@@ -2,7 +2,7 @@ import type * as d from '../../../declarations';
 import { createImportStatement, getModuleFromSourceFile } from '../transform-utils';
 import { dashToPascalCase } from '@utils';
 import ts from 'typescript';
-import { creeateComponentMetadataProxy } from '../add-component-meta-proxy';
+import { createComponentMetadataProxy } from '../add-component-meta-proxy';
 import { addCoreRuntimeApi, RUNTIME_APIS } from '../core-runtime-apis';
 
 /**
@@ -10,14 +10,14 @@ import { addCoreRuntimeApi, RUNTIME_APIS } from '../core-runtime-apis';
  * Adds `defineCustomElement()` function for all components.
  * @param compilerCtx - current compiler context
  * @param components - all current components within the stencil buildCtx
- * @returns - an TS AST transformer factory function
+ * @returns a TS AST transformer factory function
  */
 export const addDefineCustomElementFunctions = (
   compilerCtx: d.CompilerCtx,
   components: d.ComponentCompilerMeta[]
 ): ts.TransformerFactory<ts.SourceFile> => {
   return () => {
-    return (tsSourceFile) => {
+    return (tsSourceFile: ts.SourceFile): ts.SourceFile => {
       const moduleFile = getModuleFromSourceFile(compilerCtx, tsSourceFile);
       const newStatements: ts.Statement[] = [];
       const caseStatements: ts.CaseClause[] = [];
@@ -26,34 +26,30 @@ export const addDefineCustomElementFunctions = (
       addCoreRuntimeApi(moduleFile, RUNTIME_APIS.proxyCustomElement);
 
       if (moduleFile.cmps.length) {
-        const cmpName = dashToPascalCase(moduleFile.cmps[0].tagName);
-        tagNames.push(moduleFile.cmps[0].tagName);
+        const principalComponent = moduleFile.cmps[0];
+        tagNames.push(principalComponent.tagName);
 
         // wraps the initial component class in a `proxyCustomElement` wrapper.
         // This is what will be exported and called from the `defineCustomElement` call.
         const metaExpression = ts.factory.createExpressionStatement(
           ts.factory.createBinaryExpression(
-            ts.factory.createIdentifier(cmpName),
+            ts.factory.createIdentifier(principalComponent.componentClassName),
             ts.factory.createToken(ts.SyntaxKind.EqualsToken),
-            creeateComponentMetadataProxy(moduleFile.cmps[0])
+            createComponentMetadataProxy(principalComponent)
           )
-        )
+        );
         newStatements.push(metaExpression);
 
         // define the current component - `customElements.define(tagName, MyProxiedComponent);`
-        const callExpression = ts.factory.createCallExpression(
-          ts.factory.createPropertyAccessExpression(
-            ts.factory.createIdentifier('customElements'),
-            'define'
-          ),
+        const customElementsDefineCallExpression = ts.factory.createCallExpression(
+          ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('customElements'), 'define'),
           undefined,
-          [
-            ts.factory.createIdentifier('tagName'),
-            ts.factory.createIdentifier(cmpName)
-          ]
-        )
+          [ts.factory.createIdentifier('tagName'), ts.factory.createIdentifier(principalComponent.componentClassName)]
+        );
         // create a `case` block that defines the current component. We'll add them to our switch statement later.
-        caseStatements.push(createCaseBlock(moduleFile.cmps[0].tagName, callExpression));
+        caseStatements.push(
+          createCustomElementsDefineCase(principalComponent.tagName, customElementsDefineCallExpression)
+        );
 
         setupComponentDependencies(moduleFile, components, newStatements, caseStatements, tagNames);
         addDefineCustomElementFunction(tagNames, newStatements, caseStatements);
@@ -69,15 +65,15 @@ export const addDefineCustomElementFunctions = (
       return tsSourceFile;
     };
   };
-}
+};
 
 /**
  * Adds dependent component import statements and sets up and case blocks
- * @param moduleFile - current components' module
- * @param components - all current components within the stencil buildCtx
- * @param newStatements - new top level statement array to add to that will get added to the AST
- * @param caseStatements - an array of case statement blocks to add to. Will get added to `defineCustomElement` later
- * @param tagNames - array of all related component tag-names to add to
+ * @param moduleFile current components' module
+ * @param components all current components within the stencil buildCtx
+ * @param newStatements new top level statement array to add to that will get added to the AST
+ * @param caseStatements an array of case statement blocks to add to. Will get added to `defineCustomElement` later
+ * @param tagNames array of all related component tag-names to add to
  */
 const setupComponentDependencies = (
   moduleFile: d.Module,
@@ -86,9 +82,9 @@ const setupComponentDependencies = (
   caseStatements: ts.CaseClause[],
   tagNames: string[]
 ) => {
-  moduleFile.cmps.forEach(cmp => {
-    cmp.dependencies.forEach(dCmp => {
-      const foundDep = components.find(dComp => dComp.tagName === dCmp);
+  moduleFile.cmps.forEach((cmp) => {
+    cmp.dependencies.forEach((dCmp) => {
+      const foundDep = components.find((dComp) => dComp.tagName === dCmp);
       const exportName = dashToPascalCase(foundDep.tagName);
       const importAs = `$${exportName}DefineCustomElement`;
       tagNames.push(foundDep.tagName);
@@ -97,131 +93,94 @@ const setupComponentDependencies = (
       newStatements.push(createImportStatement([`defineCustomElement as ${importAs}`], foundDep.sourceFilePath));
 
       // define a dependent component by recursively calling their own `defineCustomElement()`
-      const callExpression = ts.factory.createCallExpression(
-        ts.factory.createIdentifier(importAs),
-        undefined,
-        [ts.factory.createIdentifier('tagRename')]
-      );
+      const callExpression = ts.factory.createCallExpression(ts.factory.createIdentifier(importAs), undefined, []);
       // `case` blocks that define the dependent components. We'll add them to our switch statement later.
-      caseStatements.push(createCaseBlock(foundDep.tagName, callExpression));
+      caseStatements.push(createCustomElementsDefineCase(foundDep.tagName, callExpression));
     });
-  })
-}
+  });
+};
 
 /**
  * Creates a case block which will be used to define components. e.g.
- * ```
- case "my-component":
-    tagName = "my-component";
-    if (tagRename) {
-        tagName = tagRename(tagName);
-      }
-      if (!customElements.get(tagName)) {
-        customElements.define(tagName, MyProxiedComponent);
-        // OR for dependent components
-        defineCustomElement(tagRename);
-      }
-      break;
-  } });
+ * ``` javascript
+ * case "my-component":
+ *   tagName = "my-component";
+ *   if (!customElements.get(tagName)) {
+ *     customElements.define(tagName, MyProxiedComponent);
+ *     // OR for dependent components
+ *     defineCustomElement(tagRename);
+ *   }
+ *   break;
+ * } });
   ```
- * @param tagName - the components' tagName saved within stencil.
- * @param actionExpression - the actual expression to call to define the customElement
+ * @param tagName the components' tagName saved within stencil.
+ * @param actionExpression the actual expression to call to define the customElement
  * @returns ts AST CaseClause
  */
-const createCaseBlock = (tagName: string, actionExpression: ts.Expression) => {
-  return ts.factory.createCaseClause(
-    ts.factory.createStringLiteral(tagName),
-    [
-      ts.factory.createExpressionStatement(
-        ts.factory.createBinaryExpression(
-          ts.factory.createIdentifier('tagName'),
-          ts.factory.createToken(ts.SyntaxKind.EqualsToken),
-          ts.factory.createStringLiteral(tagName)
+const createCustomElementsDefineCase = (tagName: string, actionExpression: ts.Expression): ts.CaseClause => {
+  return ts.factory.createCaseClause(ts.factory.createStringLiteral(tagName), [
+    ts.factory.createExpressionStatement(
+      ts.factory.createBinaryExpression(
+        ts.factory.createIdentifier('tagName'),
+        ts.factory.createToken(ts.SyntaxKind.EqualsToken),
+        ts.factory.createStringLiteral(tagName)
+      )
+    ),
+    ts.factory.createIfStatement(
+      ts.factory.createPrefixUnaryExpression(
+        ts.SyntaxKind.ExclamationToken,
+        ts.factory.createCallExpression(
+          ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('customElements'), 'get'),
+          undefined,
+          [ts.factory.createIdentifier('tagName')]
         )
       ),
-      ts.factory.createIfStatement(
-        ts.factory.createIdentifier('tagRename'),
-        ts.factory.createBlock([
-          ts.factory.createExpressionStatement(
-            ts.factory.createBinaryExpression(
-              ts.factory.createIdentifier('tagName'),
-              ts.factory.createToken(ts.SyntaxKind.EqualsToken),
-              ts.factory.createCallExpression(
-                ts.factory.createIdentifier('tagRename'),
-                undefined,
-                [ts.factory.createIdentifier('tagName')]
-              )
-            )
-          )
-        ])
-      ),
-      ts.factory.createIfStatement(
-        ts.factory.createPrefixUnaryExpression(
-          ts.SyntaxKind.ExclamationToken,
-          ts.factory.createCallExpression(
-            ts.factory.createPropertyAccessExpression(
-              ts.factory.createIdentifier('customElements'),
-              'get'
-            ),
-            undefined,
-            [ts.factory.createIdentifier('tagName')]
-          )
-        ),
-        ts.factory.createBlock([
-          ts.factory.createExpressionStatement(actionExpression)
-        ])
-      ),
-      ts.factory.createBreakStatement(),
-    ]
-  )
-}
+      ts.factory.createBlock([ts.factory.createExpressionStatement(actionExpression)])
+    ),
+    ts.factory.createBreakStatement(),
+  ]);
+};
 
 /**
  * Add the main `defineCustomElement` function e.g.
- * ```
- function defineCustomElement(tagRename) {
-   var tagName;
-   const components = ['my-component'];
-   components.forEach(cmp => { switch (cmp) {
-     case "my-component":
-       tagName = "my-component";
-       if (tagRename) {
-         tagName = tagRename(tagName);
-       }
-       if (!customElements.get(tagName)) {
-        customElements.define(tagName, MyProxiedComponent);
-        // OR for dependent components
-        defineCustomElement(tagRename);
-       }
-       break;
-   } });
- }
+ * ```javascript
+ * function defineCustomElement(tagRename) {
+ *  let tagName;
+ *  const components = ['my-component'];
+ *   components.forEach(cmp => { switch (cmp) {
+ *   case "my-component":
+ *     tagName = "my-component";
+ *     if (!customElements.get(tagName)) {
+ *      customElements.define(tagName, MyProxiedComponent);
+ *      // OR for dependent components
+ *      defineCustomElement(tagRename);
+ *     }
+ *     break;
+ *  } });
+ * }
  ```
- * @param tagNames - all components that will be defined
- * @param newStatements - new top level statement array that will get added to the AST
- * @param caseStatements - an array of case statement blocks. Will get added to `defineCustomElement` later
+ * @param tagNames all components that will be defined
+ * @param newStatements new top level statement array that will get added to the AST
+ * @param caseStatements an array of case statement blocks. Will get added to `defineCustomElement` later
  */
-const addDefineCustomElementFunction = (tagNames: string[], newStatements: ts.Statement[], caseStatements: ts.CaseClause[]) => {
+const addDefineCustomElementFunction = (
+  tagNames: string[],
+  newStatements: ts.Statement[],
+  caseStatements: ts.CaseClause[]
+) => {
   const newExpression = ts.factory.createFunctionDeclaration(
     undefined,
     [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
     undefined,
     ts.factory.createIdentifier('defineCustomElement'),
     undefined,
-    [
-      ts.factory.createParameterDeclaration(
-        undefined,
-        undefined,
-        undefined,
-        ts.factory.createIdentifier('tagRename')
-      )
-    ],
+    undefined,
     undefined,
     ts.factory.createBlock(
       [
         ts.factory.createVariableStatement(
           undefined,
-          [ts.factory.createVariableDeclaration('tagName')]
+          ts.factory.createVariableDeclarationList([ts.factory.createVariableDeclaration('tagName')], ts.NodeFlags.Let)
         ),
         ts.factory.createVariableStatement(
           undefined,
@@ -232,43 +191,43 @@ const addDefineCustomElementFunction = (tagNames: string[], newStatements: ts.St
                 undefined,
                 undefined,
                 ts.factory.createArrayLiteralExpression(
-                  tagNames.map(tagName => ts.factory.createStringLiteral(tagName))
+                  tagNames.map((tagName) => ts.factory.createStringLiteral(tagName))
                 )
-              )
-            ]
+              ),
+            ],
+            ts.NodeFlags.Const
           )
         ),
         ts.factory.createExpressionStatement(
           ts.factory.createCallExpression(
-            ts.factory.createPropertyAccessExpression(
-              ts.factory.createIdentifier('components'),
-              'forEach'
-            ),
+            ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('components'), 'forEach'),
             undefined,
             [
               ts.factory.createArrowFunction(
                 undefined,
                 undefined,
-                [ts.factory.createParameterDeclaration(
-                  undefined,
-                  undefined,
-                  undefined,
-                  ts.factory.createIdentifier('cmp'),
-                  undefined,
-                  undefined
-                )],
+                [
+                  ts.factory.createParameterDeclaration(
+                    undefined,
+                    undefined,
+                    undefined,
+                    ts.factory.createIdentifier('cmp'),
+                    undefined,
+                    undefined
+                  ),
+                ],
                 undefined,
                 ts.factory.createToken(ts.SyntaxKind.EqualsGreaterThanToken),
                 ts.factory.createBlock([
                   ts.factory.createSwitchStatement(
                     ts.factory.createIdentifier('cmp'),
                     ts.factory.createCaseBlock(caseStatements)
-                  )
+                  ),
                 ])
-              )
+              ),
             ]
           )
-        )
+        ),
       ],
       true
     )

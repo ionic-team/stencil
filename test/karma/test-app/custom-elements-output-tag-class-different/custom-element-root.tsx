@@ -1,7 +1,7 @@
 import { Component, h } from '@stencil/core';
 
 @Component({
-  tag: 'custom-element-root',
+  tag: 'custom-element-root-different-name-than-class',
   shadow: true,
 })
 export class CustomElementRoot {
@@ -9,9 +9,7 @@ export class CustomElementRoot {
     return (
       <div>
         <h2>Root Element Loaded</h2>
-
-        <h3>Child Component Loaded?</h3>
-        <custom-element-child />
+        <custom-element-child-different-name-than-class></custom-element-child-different-name-than-class>
       </div>
     );
   }

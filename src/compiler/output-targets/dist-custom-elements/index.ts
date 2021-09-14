@@ -108,7 +108,9 @@ const addCustomElementInputs = (
     if (cmp.isPlain) {
       exp.push(`export { ${importName} as ${exportName} } from '${cmp.sourceFilePath}';`);
     } else {
-      exp.push(`import { ${importName} as ${importAs}, defineCustomElement as cmpDefCustomEle } from '${cmp.sourceFilePath}';`);
+      exp.push(
+        `import { ${importName} as ${importAs}, defineCustomElement as cmpDefCustomEle } from '${cmp.sourceFilePath}';`
+      );
       exp.push(`export const ${exportName} = /*@__PURE__*/${importAs};`);
       exp.push(`export const defineCustomElement = cmpDefCustomEle;`);
     }
@@ -134,7 +136,11 @@ const generateEntryPoint = (outputTarget: d.OutputTargetDistCustomElements, _bui
   return [...imp, ...exp].join('\n') + '\n';
 };
 
-const getCustomElementBundleCustomTransformer = (config: d.Config, compilerCtx: d.CompilerCtx, components: d.ComponentCompilerMeta[]) => {
+const getCustomElementBundleCustomTransformer = (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  components: d.ComponentCompilerMeta[]
+) => {
   const transformOpts: d.TransformOptions = {
     coreImportPath: STENCIL_INTERNAL_CLIENT_ID,
     componentExport: null,
