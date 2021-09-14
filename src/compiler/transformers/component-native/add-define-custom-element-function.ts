@@ -26,16 +26,16 @@ export const addDefineCustomElementFunctions = (
       addCoreRuntimeApi(moduleFile, RUNTIME_APIS.proxyCustomElement);
 
       if (moduleFile.cmps.length) {
-        const cmpName = dashToPascalCase(moduleFile.cmps[0].tagName);
-        tagNames.push(moduleFile.cmps[0].tagName);
+        const principalComponent = moduleFile.cmps[0];
+        tagNames.push(principalComponent.tagName);
 
         // wraps the initial component class in a `proxyCustomElement` wrapper.
         // This is what will be exported and called from the `defineCustomElement` call.
         const metaExpression = ts.factory.createExpressionStatement(
           ts.factory.createBinaryExpression(
-            ts.factory.createIdentifier(cmpName),
+            ts.factory.createIdentifier(principalComponent.componentClassName),
             ts.factory.createToken(ts.SyntaxKind.EqualsToken),
-            createComponentMetadataProxy(moduleFile.cmps[0])
+            createComponentMetadataProxy(principalComponent)
           )
         );
         newStatements.push(metaExpression);
@@ -44,11 +44,11 @@ export const addDefineCustomElementFunctions = (
         const customElementsDefineCallExpression = ts.factory.createCallExpression(
           ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('customElements'), 'define'),
           undefined,
-          [ts.factory.createIdentifier('tagName'), ts.factory.createIdentifier(cmpName)]
+          [ts.factory.createIdentifier('tagName'), ts.factory.createIdentifier(principalComponent.componentClassName)]
         );
         // create a `case` block that defines the current component. We'll add them to our switch statement later.
         caseStatements.push(
-          createCustomElementsDefineCase(moduleFile.cmps[0].tagName, customElementsDefineCallExpression)
+          createCustomElementsDefineCase(principalComponent.tagName, customElementsDefineCallExpression)
         );
 
         setupComponentDependencies(moduleFile, components, newStatements, caseStatements, tagNames);
