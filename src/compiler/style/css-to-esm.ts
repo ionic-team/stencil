@@ -60,7 +60,7 @@ const transformCssToEsmModule = (input: d.TransformCssToEsmInput) => {
     }
 
     const cssImports = getCssToEsmImports(varNames, results.styleText, input.file, input.mode);
-    cssImports.forEach(cssImport => {
+    cssImports.forEach((cssImport) => {
       // remove the original css @imports
       results.styleText = results.styleText.replace(cssImport.srcImportText, '');
 
@@ -72,7 +72,7 @@ const transformCssToEsmModule = (input: d.TransformCssToEsmInput) => {
           encapsulation: input.encapsulation,
           mode: input.mode,
         },
-        input.styleImportData,
+        input.styleImportData
       );
 
       // str.append(`import ${cssImport.varName} from '${importPath}';\n`);
@@ -93,13 +93,13 @@ const generateTransformCssToEsm = (input: d.TransformCssToEsmInput, results: d.T
 
   if (input.module === 'cjs') {
     // CommonJS
-    results.imports.forEach(cssImport => {
+    results.imports.forEach((cssImport) => {
       s.append(`const ${cssImport.varName} = require('${cssImport.importPath}');\n`);
     });
 
     s.append(`const ${results.defaultVarName} = `);
 
-    results.imports.forEach(cssImport => {
+    results.imports.forEach((cssImport) => {
       s.append(`${cssImport.varName} + `);
     });
 
@@ -107,13 +107,13 @@ const generateTransformCssToEsm = (input: d.TransformCssToEsmInput, results: d.T
     s.append(`module.exports = ${results.defaultVarName};`);
   } else {
     // ESM
-    results.imports.forEach(cssImport => {
+    results.imports.forEach((cssImport) => {
       s.append(`import ${cssImport.varName} from '${cssImport.importPath}';\n`);
     });
 
     s.append(`const ${results.defaultVarName} = `);
 
-    results.imports.forEach(cssImport => {
+    results.imports.forEach((cssImport) => {
       s.append(`${cssImport.varName} + `);
     });
 

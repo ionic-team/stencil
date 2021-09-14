@@ -35,5 +35,4 @@ describe('listen-reattach', () => {
     await waitForChanges();
     expect(clicked.textContent.trim()).toBe('Clicked: 4');
   });
-
 });

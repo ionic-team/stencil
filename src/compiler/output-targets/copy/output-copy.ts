@@ -15,7 +15,7 @@ export const outputCopy = async (config: d.Config, compilerCtx: d.CompilerCtx, b
   const changedFiles = [...buildCtx.filesUpdated, ...buildCtx.filesAdded, ...buildCtx.dirsAdded];
   const copyTasks: Required<d.CopyTask>[] = [];
   const needsCopyAssets = !canSkipAssetsCopy(compilerCtx, buildCtx.entryModules, buildCtx.filesChanged);
-  outputTargets.forEach(o => {
+  outputTargets.forEach((o) => {
     if (needsCopyAssets && o.copyAssets) {
       copyTasks.push(...getComponentAssetsCopyTasks(config, buildCtx, o.dir, o.copyAssets === 'collection'));
     }
@@ -45,14 +45,15 @@ const getCopyTasks = (config: d.Config, buildCtx: d.BuildCtx, o: d.OutputTargetC
   if (!Array.isArray(o.copy)) {
     return [];
   }
-  const copyTasks = !buildCtx.isRebuild || buildCtx.requiresFullBuild ? o.copy : filterCopyTasks(config, o.copy, changedFiles);
+  const copyTasks =
+    !buildCtx.isRebuild || buildCtx.requiresFullBuild ? o.copy : filterCopyTasks(config, o.copy, changedFiles);
 
-  return copyTasks.map(t => transformToAbs(t, o.dir));
+  return copyTasks.map((t) => transformToAbs(t, o.dir));
 };
 
 const filterCopyTasks = (config: d.Config, tasks: d.CopyTask[], changedFiles: string[]) => {
   if (Array.isArray(tasks)) {
-    return tasks.filter(copy => {
+    return tasks.filter((copy) => {
       let copySrc = copy.src;
       if (isGlob(copySrc)) {
         // test the glob
@@ -62,7 +63,7 @@ const filterCopyTasks = (config: d.Config, tasks: d.CopyTask[], changedFiles: st
         }
       } else {
         copySrc = normalizePath(getSrcAbsPath(config, copySrc + '/'));
-        if (changedFiles.some(f => f.startsWith(copySrc))) {
+        if (changedFiles.some((f) => f.startsWith(copySrc))) {
           return true;
         }
       }
@@ -76,7 +77,8 @@ const transformToAbs = (copyTask: d.CopyTask, dest: string): Required<d.CopyTask
   return {
     src: copyTask.src,
     dest: getDestAbsPath(copyTask.src, dest, copyTask.dest),
-    keepDirStructure: typeof copyTask.keepDirStructure === 'boolean' ? copyTask.keepDirStructure : copyTask.dest == null,
+    keepDirStructure:
+      typeof copyTask.keepDirStructure === 'boolean' ? copyTask.keepDirStructure : copyTask.dest == null,
     warn: copyTask.warn !== false,
   };
 };

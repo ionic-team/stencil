@@ -37,13 +37,17 @@ Please see our [Contributor Code of Conduct](https://github.com/ionic-team/stenc
 4. Run `npm install` (make sure you have [node](https://nodejs.org/en/) and [npm](http://blog.npmjs.org/post/85484771375/how-to-install-npm) installed first)
 
 
-#### Updates
+### Updates
 
 1. Unit test. Unit test. Unit test. Please take a look at how other unit tests are written, and you can't write too many tests.
 2. If there is a `*.spec.ts` file located in the `test/` folder, update it to include a test for your change, if needed. If this file doesn't exist, please notify us.
 3. First run `npm run build`. Then run `npm run test` or `npm run test.watch` to make sure all tests are working, regardless if a test was added.
 
-#### Testing Changes Against a Project Locally
+### Testing Changes Against a Project Locally
+
+#### Testing with `npm link`:
+
+Using `npm link` is beneficial to the development cycle in that consecutive builds of Stencil are immediately available in your project, without any additional `npm install` steps needed:
 
 1. In the directory of _stencil core_:
     1. Run `npm run build`
@@ -62,7 +66,6 @@ Please see our [Contributor Code of Conduct](https://github.com/ionic-team/stenc
     }
   }
 }
-
 ```
 
 You can then test your changes against your own stencil project.
@@ -74,11 +77,33 @@ Afterwards, to clean up:
     2. Remove the modifications to your tsconfig.json
 2. In the directory of _stencil core_, run `npm unlink`
 
-## Commit Message Format
+#### Testing with `npm pack`:
 
-We have very precise rules over how our git commit messages should be formatted. This leads to readable messages that are easy to follow when looking through the project history. We also use the git commit messages to generate our changelog. (Ok you got us, it's basically Angular's commit message format).
+There are some cases where `npm link` may fall short. For instance, when upgrading a minimum/recommended package version where the package in question has changed its typings. Rather than updating `paths` in your project's `tsconfig.json` file, it may be easier to create a tarball of the project and install in manually.
 
-`type(scope): subject`
+1. In the directory of _stencil core_:
+    1. Run `npm run build`
+    2. Run `npm pack`. This will create a tarball with the name `stencil-core-<VERSION>.tgz`
+2. In the directory of _your stencil project_:
+    1. Run `npm install --save-dev <PATH_TO_STENCIL_REPO_ON_DISK>/stencil-core-<VERSION>.tgz`. 
+       * e.g. If you cloned the stencil repo to `~/workspaces` and built v.2.6.0, you would run `npm install ~/workspaces/stencil/stencil-2.6.0.tgz`
+  
+Note that this method of testing is far more laborious than using `npm link`, and requires every step to be repeated following a change to the Stencil core source.
+
+Afterwards, to clean up:
+
+1. In the directory of your stencil project, run `npm install --save-dev stencil@<VERSION>` for the `<VERSION>` of Stencil core that was installed in your project prior to testing. 
+
+### Commit Message Format
+
+We strive to adhere to a consistent commit message format that is consistent with the
+[Angular variant of Conventional Commits](https://github.com/conventional-changelog/conventional-changelog/tree/master/packages/conventional-changelog-angular),
+with a few exceptions.
+
+This enables:
+- Anyone to easily understand *what* a commit does without reading the change itself
+- The history of changes to the project to be reviewed easily using tools such as `git log`
+- Automated tooling to be developed for important, if mundane tasks (e.g. change log generation)
 
 #### Type
 Must be one of the following:
@@ -91,6 +116,7 @@ Must be one of the following:
 * **perf**: A code change that improves performance
 * **test**: Adding missing tests
 * **chore**: Changes to the build process or auxiliary tools and libraries such as documentation generation
+* **revert**: Reverts a previous commit
 
 #### Scope
 The scope can be anything specifying place of the commit change. For example `renderer`, `compiler`, etc.
@@ -101,12 +127,66 @@ The subject contains succinct description of the change:
 * use the imperative, present tense: "change" not "changed" nor "changes"
 * do not capitalize first letter
 * do not place a period `.` at the end
-* entire length of the commit message must not go over 50 characters
+* entire length of the subject must not go over 50 characters
 * describe what the commit does, not what issue it relates to or fixes
 * **be brief, yet descriptive** - we should have a good understanding of what the commit does by reading the subject
 
+#### Footer
 
-#### Adding Documentation
+Members of the Stencil engineering team should take care to add the JIRA ticket associated with a PR in the footer of
+the git commit. Community members need not worry about adding a footer.
+
+If your pull request contains a *breaking change*, please add the text 'BREAKING CHANGE:' followed by a brief
+description. This description will be used in Stencil's auto-generated changelog under the `BREAKING CHANGES` section.
+This syntax must be used over the 'exclamation' syntax that other projects using conventional commits may follow.
+
+Note the newline separating the body from the footer, as well as between the JIRA ticket & 'BREAKING CHANGE:' notice:
+```
+<BODY>
+
+STENCIL-13: Watchers Not Firing as Expected when using the Custom Elements Build
+
+BREAKING CHANGE: Watchers may appear to not fire in existing applications, when this is the expected behavior.
+```
+
+#### Example
+
+Below is an example commit message that follows the guidance listed above:
+
+```
+fix(runtime): prevent watchers from prematurely firing
+
+Wait for the CustomElementRegistry to mark the component as ready
+before setting `isWatchReady`. Otherwise, watchers may fire prematurely
+if `customElements.get()` or `customElements.whenDefined()` resolve
+_before_ Stencil has completed instantiating a component
+
+STENCIL-13: Watchers Not Firing as Expected when using the Custom Elements Build
+
+BREAKING CHANGE: Watchers may appear to not fire in existing applications, when this is the expected behavior.
+```
+
+where:
+- the type is "fix"
+- the scope is "runtime"
+- the PR subject describes _what_ the PR is doing when applied
+- the PR body describes _what_ and _why_, rather than _how_
+- this PR is a breaking change
+
+which generates the following in the `CHANGELOG.md`:
+
+```markdown
+### Bug Fixes
+
+* **runtime:** prevent watchers from prematurely firing in custom elements build ([#2971](https://github.com/ionic-team/stencil/issues/2971)) ([8c375bd](https://github.com/ionic-team/stencil/commit/8c375bd4bc1b55e269db69af542fa404714c9b26))
+
+
+### BREAKING CHANGES
+
+* **runtime:** Watchers may appear to not fire in existing applications, when this is the expected behavior.
+```
+
+### Adding & Updating Documentation
 
 Please see the [stencil-site](https://github.com/ionic-team/stencil-site) repo to update documentation.
 

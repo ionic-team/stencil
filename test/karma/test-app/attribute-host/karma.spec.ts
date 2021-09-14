@@ -1,7 +1,6 @@
 import { setupDomTests, waitForChanges } from '../util';
 
-
-describe('attribute-host', function() {
+describe('attribute-host', function () {
   const { setupDom, tearDownDom } = setupDomTests(document);
   let app: HTMLElement;
 
@@ -86,5 +85,4 @@ describe('attribute-host', function() {
     expect(elm.getAttribute('color')).toBe('lime');
     expect(elm.getAttribute('no-attr')).toBe(null);
   });
-
 });

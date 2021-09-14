@@ -10,7 +10,7 @@ export const outputTypes = async (config: d.Config, compilerCtx: d.CompilerCtx, 
 
   const timespan = buildCtx.createTimeSpan(`generate types started`, true);
 
-  await Promise.all(outputTargets.map(outputsTarget => generateTypes(config, compilerCtx, buildCtx, outputsTarget)));
+  await Promise.all(outputTargets.map((outputsTarget) => generateTypes(config, compilerCtx, buildCtx, outputsTarget)));
 
   timespan.finish(`generate types finished`);
 };

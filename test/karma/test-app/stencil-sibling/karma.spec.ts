@@ -1,7 +1,6 @@
 import { setupDomTests } from '../util';
 
-
-describe('stencil-sibling', function() {
+describe('stencil-sibling', function () {
   const { setupDom, tearDownDom } = setupDomTests(document);
   let app: HTMLElement;
 
@@ -23,5 +22,4 @@ describe('stencil-sibling', function() {
     const article = section.nextElementSibling;
     expect(article.textContent.trim()).toBe('sibling-light-dom');
   });
-
 });

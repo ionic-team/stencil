@@ -110,7 +110,7 @@ describe('compiler', () => {
         executeTemplate(template, {
           '--ion-font2': '100px',
           '--font2': '200px',
-        }),
+        })
       ).toEqual(`
       .class {
         font-size: calc(0px + 12px);

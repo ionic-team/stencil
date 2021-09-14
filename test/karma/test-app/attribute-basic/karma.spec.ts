@@ -1,7 +1,6 @@
 import { setupDomTests, waitForChanges } from '../util';
 
-
-describe('attribute-basic', function() {
+describe('attribute-basic', function () {
   const { setupDom, tearDownDom } = setupDomTests(document);
   let app: HTMLElement;
 
@@ -25,5 +24,4 @@ describe('attribute-basic', function() {
     expect(app.querySelector('.multiWord').textContent).toBe('multiWord-update');
     expect(app.querySelector('.customAttr').textContent).toBe('my-custom-attr-update');
   });
-
 });

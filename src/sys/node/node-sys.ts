@@ -17,6 +17,7 @@ import { NodeLazyRequire } from './node-lazy-require';
 import { NodeResolveModule } from './node-resolve-module';
 import { NodeWorkerController } from './node-worker-controller';
 import path from 'path';
+import * as os from 'os';
 import type TypeScript from 'typescript';
 
 export function createNodeSys(c: { process?: any } = {}) {
@@ -52,8 +53,8 @@ export function createNodeSys(c: { process?: any } = {}) {
     name: 'node',
     version: prcs.versions.node,
     access(p) {
-      return new Promise(resolve => {
-        fs.access(p, err => resolve(!err));
+      return new Promise((resolve) => {
+        fs.access(p, (err) => resolve(!err));
       });
     },
     accessSync(p) {
@@ -98,18 +99,31 @@ export function createNodeSys(c: { process?: any } = {}) {
       opts.window.Response = global.Response;
       opts.window.FetchError = (global as any).FetchError;
     },
+    fetch: (input: any, init: any) => {
+      const nodeFetch = require(path.join(__dirname, 'node-fetch.js'));
+
+      if (typeof input === 'string') {
+        // fetch(url) w/ url string
+        const urlStr = new URL(input).href;
+        return nodeFetch.fetch(urlStr, init);
+      } else {
+        // fetch(Request) w/ request object
+        input.url = new URL(input.url).href;
+        return nodeFetch.fetch(input, init);
+      }
+    },
     checkVersion,
     copyFile(src, dst) {
-      return new Promise(resolve => {
-        fs.copyFile(src, dst, err => {
+      return new Promise((resolve) => {
+        fs.copyFile(src, dst, (err) => {
           resolve(!err);
         });
       });
     },
     createDir(p, opts) {
-      return new Promise(resolve => {
+      return new Promise((resolve) => {
         if (opts) {
-          fs.mkdir(p, opts, err => {
+          fs.mkdir(p, opts, (err) => {
             resolve({
               basename: path.basename(p),
               dirname: path.dirname(p),
@@ -119,7 +133,7 @@ export function createNodeSys(c: { process?: any } = {}) {
             });
           });
         } else {
-          fs.mkdir(p, err => {
+          fs.mkdir(p, (err) => {
             resolve({
               basename: path.basename(p),
               dirname: path.dirname(p),
@@ -152,7 +166,7 @@ export function createNodeSys(c: { process?: any } = {}) {
     },
     async destroy() {
       const waits: Promise<void>[] = [];
-      destroys.forEach(cb => {
+      destroys.forEach((cb) => {
         try {
           const rtn = cb();
           if (rtn && rtn.then) {
@@ -180,7 +194,7 @@ export function createNodeSys(c: { process?: any } = {}) {
       };
     },
     async ensureResources() {},
-    exit: async exitCode => {
+    exit: async (exitCode) => {
       await runInterruptsCallbacks();
       exit(exitCode);
     },
@@ -205,7 +219,7 @@ export function createNodeSys(c: { process?: any } = {}) {
     glob: asyncGlob,
     hardwareConcurrency,
     isSymbolicLink(p: string) {
-      return new Promise<boolean>(resolve => {
+      return new Promise<boolean>((resolve) => {
         try {
           fs.lstat(p, (err, stats) => {
             if (err) {
@@ -221,30 +235,33 @@ export function createNodeSys(c: { process?: any } = {}) {
     },
     nextTick: prcs.nextTick,
     normalizePath,
-    onProcessInterrupt: cb => {
+    onProcessInterrupt: (cb) => {
       if (!onInterruptsCallbacks.includes(cb)) {
         onInterruptsCallbacks.push(cb);
       }
     },
     platformPath: path,
     readDir(p) {
-      return new Promise(resolve => {
+      return new Promise((resolve) => {
         fs.readdir(p, (err, files) => {
           if (err) {
             resolve([]);
           } else {
             resolve(
-              files.map(f => {
+              files.map((f) => {
                 return normalizePath(path.join(p, f));
-              }),
+              })
             );
           }
         });
       });
     },
+    isTTY() {
+      return !!process?.stdout?.isTTY;
+    },
     readDirSync(p) {
       try {
-        return fs.readdirSync(p).map(f => {
+        return fs.readdirSync(p).map((f) => {
           return normalizePath(path.join(p, f));
         });
       } catch (e) {}
@@ -252,13 +269,13 @@ export function createNodeSys(c: { process?: any } = {}) {
     },
     readFile(p: string, encoding?: string) {
       if (encoding === 'binary') {
-        return new Promise<any>(resolve => {
+        return new Promise<any>((resolve) => {
           fs.readFile(p, (_, data) => {
             resolve(data);
           });
         });
       }
-      return new Promise<string>(resolve => {
+      return new Promise<string>((resolve) => {
         fs.readFile(p, 'utf8', (_, data) => {
           resolve(data);
         });
@@ -270,8 +287,14 @@ export function createNodeSys(c: { process?: any } = {}) {
       } catch (e) {}
       return undefined;
     },
+    homeDir() {
+      try {
+        return os.homedir();
+      } catch (e) {}
+      return undefined;
+    },
     realpath(p) {
-      return new Promise(resolve => {
+      return new Promise((resolve) => {
         fs.realpath(p, 'utf8', (e, data) => {
           resolve({
             path: data,
@@ -293,8 +316,8 @@ export function createNodeSys(c: { process?: any } = {}) {
       return results;
     },
     rename(oldPath, newPath) {
-      return new Promise(resolve => {
-        fs.rename(oldPath, newPath, error => {
+      return new Promise((resolve) => {
+        fs.rename(oldPath, newPath, (error) => {
           resolve({
             oldPath,
             newPath,
@@ -314,10 +337,10 @@ export function createNodeSys(c: { process?: any } = {}) {
       return normalizePath(p);
     },
     removeDir(p, opts) {
-      return new Promise(resolve => {
+      return new Promise((resolve) => {
         const recursive = !!(opts && opts.recursive);
         if (recursive) {
-          fs.rmdir(p, { recursive: true }, err => {
+          fs.rmdir(p, { recursive: true }, (err) => {
             resolve({
               basename: path.basename(p),
               dirname: path.dirname(p),
@@ -328,7 +351,7 @@ export function createNodeSys(c: { process?: any } = {}) {
             });
           });
         } else {
-          fs.rmdir(p, err => {
+          fs.rmdir(p, (err) => {
             resolve({
               basename: path.basename(p),
               dirname: path.dirname(p),
@@ -369,8 +392,8 @@ export function createNodeSys(c: { process?: any } = {}) {
       }
     },
     removeFile(p) {
-      return new Promise(resolve => {
-        fs.unlink(p, err => {
+      return new Promise((resolve) => {
+        fs.unlink(p, (err) => {
           resolve({
             basename: path.basename(p),
             dirname: path.dirname(p),
@@ -406,10 +429,10 @@ export function createNodeSys(c: { process?: any } = {}) {
       sys.watchDirectory = (p, callback, recursive) => {
         const tsFileWatcher = tsSysWatchDirectory(
           p,
-          fileName => {
-            callback(normalizePath(fileName), null);
+          (fileName) => {
+            callback(normalizePath(fileName), 'fileUpdate');
           },
-          recursive,
+          recursive
         );
 
         const close = () => {
@@ -455,7 +478,7 @@ export function createNodeSys(c: { process?: any } = {}) {
       };
     },
     stat(p) {
-      return new Promise(resolve => {
+      return new Promise((resolve) => {
         fs.stat(p, (err, fsStat) => {
           if (err) {
             resolve({
@@ -505,8 +528,8 @@ export function createNodeSys(c: { process?: any } = {}) {
       return tmpdir();
     },
     writeFile(p, content) {
-      return new Promise(resolve => {
-        fs.writeFile(p, content, err => {
+      return new Promise((resolve) => {
+        fs.writeFile(p, content, (err) => {
           resolve({ path: p, error: err });
         });
       });
@@ -534,8 +557,8 @@ export function createNodeSys(c: { process?: any } = {}) {
       return new Promise((resolve, reject) => {
         const h = createHash('sha1');
         fs.createReadStream(filePath)
-          .on('error', err => reject(err))
-          .on('data', data => h.update(data))
+          .on('error', (err) => reject(err))
+          .on('data', (data) => h.update(data))
           .on('end', () => {
             let hash = h.digest('hex').toLowerCase();
             if (typeof length === 'number') {
@@ -562,12 +585,11 @@ export function createNodeSys(c: { process?: any } = {}) {
 
   sys.lazyRequire = new NodeLazyRequire(nodeResolve, {
     // [minimumVersion, recommendedVersion]
-    '@types/jest': ['24.9.1', '26.0.20'],
-    '@types/puppeteer': ['1.19.0', '5.4.2'],
-    'jest': ['24.9.0', '26.6.3'],
+    '@types/jest': ['24.9.1', '26.0.21'],
+    jest: ['24.9.0', '26.6.3'],
     'jest-cli': ['24.9.0', '26.6.3'],
-    'pixelmatch': ['4.0.2', '4.0.2'],
-    'puppeteer': ['1.19.0', '5.5.0'],
+    pixelmatch: ['4.0.2', '4.0.2'],
+    puppeteer: ['1.19.0', '10.0.0'],
     'puppeteer-core': ['1.19.0', '5.2.1'],
     'workbox-build': ['4.3.1', '4.3.1'],
   });

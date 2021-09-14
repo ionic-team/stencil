@@ -3,7 +3,17 @@ import { getVermoji } from './vermoji';
 import { PackageData } from './write-pkg-json';
 import { readFileSync } from 'fs-extra';
 
-export function getOptions(rootDir: string, inputOpts: BuildOptions = {}) {
+/**
+ * Retrieves information used during a 'process' that requires knowledge of various project file paths, Stencil version
+ * information, and GitHub repo metadata. A 'process' may include, but is not limited to:
+ * - generating a new release
+ * - regenerating a license file
+ * - validating a build
+ * @param rootDir the root directory of the project
+ * @param inputOpts any build options to override manually
+ * @returns an entity containing various fields to be used by some process
+ */
+export function getOptions(rootDir: string, inputOpts: BuildOptions = {}): BuildOptions {
   const srcDir = join(rootDir, 'src');
   const packageJsonPath = join(rootDir, 'package.json');
   const packageLockJsonPath = join(rootDir, 'package-lock.json');
@@ -99,7 +109,8 @@ export function createReplaceData(opts: BuildOptions) {
   const autoprefixerPkg = getPkg(opts, 'autoprefixer');
   const postcssPkg = getPkg(opts, 'postcss');
 
-  const optimizeCssId = autoprefixerPkg.name + autoprefixerPkg.version + '_' + postcssPkg.name + postcssPkg.version + '_' + CACHE_BUSTER;
+  const optimizeCssId =
+    autoprefixerPkg.name + autoprefixerPkg.version + '_' + postcssPkg.name + postcssPkg.version + '_' + CACHE_BUSTER;
 
   const parse5Pkg = getPkg(opts, 'parse5');
   opts.parse5Verion = parse5Pkg.version;
@@ -108,7 +119,7 @@ export function createReplaceData(opts: BuildOptions) {
   opts.sizzleVersion = sizzlePkg.version;
 
   return {
-    '__BUILDID__': opts.buildId,
+    __BUILDID__: opts.buildId,
     '__BUILDID:BUNDLER__': bundlerId,
     '__BUILDID:MINIFYJS__': minifyJsId,
     '__BUILDID:OPTIMIZECSS__': optimizeCssId,
@@ -121,7 +132,7 @@ export function createReplaceData(opts: BuildOptions) {
     '__VERSION:TERSER__': terserPkg.version,
     '__VERSION:TYPESCRIPT__': typescriptPkg.version,
 
-    '__VERMOJI__': opts.vermoji,
+    __VERMOJI__: opts.vermoji,
   };
 }
 

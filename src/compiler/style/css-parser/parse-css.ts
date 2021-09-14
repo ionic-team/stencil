@@ -408,7 +408,7 @@ export const parseCss = (css: string, filePath?: string): ParseCssResults => {
       const m = match(re);
       if (!m) return null;
       const node: any = {
-        type: nodeType
+        type: nodeType,
       };
       (node as any)[nodeName] = m[1].trim();
       return pos(node);
@@ -423,7 +423,19 @@ export const parseCss = (css: string, filePath?: string): ParseCssResults => {
 
   const atrule = () => {
     if (css[0] !== '@') return null;
-    return atkeyframes() || atmedia() || atcustommedia() || atsupports() || atimport() || atcharset() || atnamespace() || atdocument() || atpage() || athost() || atfontface();
+    return (
+      atkeyframes() ||
+      atmedia() ||
+      atcustommedia() ||
+      atsupports() ||
+      atimport() ||
+      atcharset() ||
+      atnamespace() ||
+      atdocument() ||
+      atpage() ||
+      athost() ||
+      atfontface()
+    );
   };
 
   const rule = () => {

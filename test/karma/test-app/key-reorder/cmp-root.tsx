@@ -1,10 +1,9 @@
 import { Component, State, h } from '@stencil/core';
 
 @Component({
-  tag: 'key-reorder-root'
+  tag: 'key-reorder-root',
 })
 export class KeyReorderRoot {
-
   @State() isReversed = false;
 
   testClick() {
@@ -20,10 +19,14 @@ export class KeyReorderRoot {
     return [
       <button onClick={this.testClick.bind(this)}>Test</button>,
       <div>
-        {items.map(item => {
-          return <div key={item} id={'item-' + item}>{item}</div>
+        {items.map((item) => {
+          return (
+            <div key={item} id={'item-' + item}>
+              {item}
+            </div>
+          );
         })}
-      </div>
+      </div>,
     ];
   }
 }

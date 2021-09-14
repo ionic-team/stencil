@@ -1,6 +1,5 @@
 import { Config } from '../../../internal';
 
-
 export const config: Config = {
   namespace: 'TestPrerender',
   globalStyle: 'src/global/app.css',
@@ -12,7 +11,7 @@ export const config: Config = {
       baseUrl: 'https://karma.stenciljs.com/prerender',
       serviceWorker: null,
       empty: false,
-      prerenderConfig: 'prerender.config.js'
-    }
-  ]
+      prerenderConfig: 'prerender.config.js',
+    },
+  ],
 };

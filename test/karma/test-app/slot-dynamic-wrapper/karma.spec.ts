@@ -1,6 +1,5 @@
 import { setupDomTests, waitForChanges } from '../util';
 
-
 describe('slot-dynamic-wrapper', () => {
   const { setupDom, tearDownDom } = setupDomTests(document);
   let app: HTMLElement;
@@ -9,7 +8,6 @@ describe('slot-dynamic-wrapper', () => {
     app = await setupDom('/slot-dynamic-wrapper/index.html');
   });
   afterEach(tearDownDom);
-
 
   it('renders', async () => {
     let result: HTMLElement;
@@ -39,5 +37,4 @@ describe('slot-dynamic-wrapper', () => {
     const hiddenCmp = app.querySelector('[hidden]');
     expect(hiddenCmp).toBe(null);
   });
-
 });

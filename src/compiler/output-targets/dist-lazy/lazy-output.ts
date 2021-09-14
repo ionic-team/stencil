@@ -33,7 +33,6 @@ export const outputLazy = async (config: d.Config, compilerCtx: d.CompilerCtx, b
   const timespan = buildCtx.createTimeSpan(`generate lazy started`);
 
   try {
-    // const criticalBundles = getCriticalPath(buildCtx);
     const bundleOpts: BundleOptions = {
       id: 'lazy',
       platform: 'client',
@@ -54,7 +53,7 @@ export const outputLazy = async (config: d.Config, compilerCtx: d.CompilerCtx, b
     // we've got the compiler context filled with app modules and collection dependency modules
     // figure out how all these components should be connected
     generateEntryModules(config, buildCtx);
-    buildCtx.entryModules.forEach(entryModule => {
+    buildCtx.entryModules.forEach((entryModule) => {
       bundleOpts.inputs[entryModule.entryKey] = entryModule.entryKey;
     });
 
@@ -88,7 +87,11 @@ const getLazyCustomTransformer = (config: d.Config, compilerCtx: d.CompilerCtx) 
     style: 'static',
     styleImportData: 'queryparams',
   };
-  return [updateStencilCoreImports(transformOpts.coreImportPath), lazyComponentTransform(compilerCtx, transformOpts), removeCollectionImports(compilerCtx)];
+  return [
+    updateStencilCoreImports(transformOpts.coreImportPath),
+    lazyComponentTransform(compilerCtx, transformOpts),
+    removeCollectionImports(compilerCtx),
+  ];
 };
 
 const getLazyEntry = (isBrowser: boolean) => {

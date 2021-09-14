@@ -2,7 +2,12 @@ import type * as d from '../../../declarations';
 import { dirname, join, relative } from 'path';
 import { normalizePath } from '@utils';
 
-export const getComponentAssetsCopyTasks = (config: d.Config, buildCtx: d.BuildCtx, dest: string, collectionsPath: boolean) => {
+export const getComponentAssetsCopyTasks = (
+  config: d.Config,
+  buildCtx: d.BuildCtx,
+  dest: string,
+  collectionsPath: boolean
+) => {
   if (!dest) {
     return [];
   }
@@ -13,10 +18,10 @@ export const getComponentAssetsCopyTasks = (config: d.Config, buildCtx: d.BuildC
   const cmps = buildCtx.components;
 
   cmps
-    .filter(cmp => cmp.assetsDirs != null && cmp.assetsDirs.length > 0)
-    .forEach(cmp => {
+    .filter((cmp) => cmp.assetsDirs != null && cmp.assetsDirs.length > 0)
+    .forEach((cmp) => {
       if (!collectionsPath) {
-        cmp.assetsDirs.forEach(assetsMeta => {
+        cmp.assetsDirs.forEach((assetsMeta) => {
           copyTasks.push({
             src: assetsMeta.absolutePath,
             dest: join(dest, assetsMeta.cmpRelativePath),
@@ -25,7 +30,7 @@ export const getComponentAssetsCopyTasks = (config: d.Config, buildCtx: d.BuildC
           });
         });
       } else if (!cmp.excludeFromCollection && !cmp.isCollectionDependency) {
-        cmp.assetsDirs.forEach(assetsMeta => {
+        cmp.assetsDirs.forEach((assetsMeta) => {
           const collectionDirDestination = join(dest, relative(config.srcDir, assetsMeta.absolutePath));
           copyTasks.push({
             src: assetsMeta.absolutePath,
@@ -42,7 +47,11 @@ export const getComponentAssetsCopyTasks = (config: d.Config, buildCtx: d.BuildC
   return copyTasks;
 };
 
-export const canSkipAssetsCopy = (compilerCtx: d.CompilerCtx, entryModules: d.EntryModule[], filesChanged: string[]) => {
+export const canSkipAssetsCopy = (
+  compilerCtx: d.CompilerCtx,
+  entryModules: d.EntryModule[],
+  filesChanged: string[]
+) => {
   if (!compilerCtx.hasSuccessfulBuild) {
     // always copy assets if we haven't had a successful build yet
     // cannot skip build
@@ -53,16 +62,16 @@ export const canSkipAssetsCopy = (compilerCtx: d.CompilerCtx, entryModules: d.En
   let shouldSkipAssetsCopy = true;
 
   // loop through each of the changed files
-  filesChanged.forEach(changedFile => {
+  filesChanged.forEach((changedFile) => {
     // get the directory of where the changed file is in
     const changedFileDirPath = normalizePath(dirname(changedFile));
 
     // loop through all the possible asset directories
-    entryModules.forEach(entryModule => {
-      entryModule.cmps.forEach(cmp => {
+    entryModules.forEach((entryModule) => {
+      entryModule.cmps.forEach((cmp) => {
         if (cmp.assetsDirs != null) {
           // loop through each of the asset directories of each component
-          cmp.assetsDirs.forEach(assetsDir => {
+          cmp.assetsDirs.forEach((assetsDir) => {
             // get the absolute of the asset directory
             const assetDirPath = normalizePath(assetsDir.absolutePath);
 

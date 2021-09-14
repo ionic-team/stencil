@@ -169,6 +169,17 @@ export interface StencilConfig {
   hydratedFlag?: HydratedFlag;
 
   /**
+   * Ionic perfers to hide all components prior to hydration with a style tag appended
+   * to the head of the document containing some `visibility: hidden;` css rules.
+   *
+   * Disabling this will remove the style tag that sets `visibility: hidden;` on all
+   * unhydrated web components. This more closely follows the HTML spec, and allows
+   * you to set your own fallback content.
+   *
+   */
+  invisiblePrehydration?: boolean;
+
+  /**
    * Sets the task queue used by stencil's runtime. The task queue schedules DOM read and writes
    * across the frames to efficiently render and reduce layout thrashing. By default,
    * `async` is used. It's recommended to also try each setting to decide which works
@@ -282,6 +293,12 @@ export interface ConfigExtras {
   scriptDataOpts?: boolean;
 
   /**
+   * Experimental flag to align the behavior of invoking `textContent` on a scoped component to act more like a
+   * component that uses the shadow DOM. Defaults to `false`
+   */
+  scopedSlotTextContentFix?: boolean;
+
+  /**
    * If enabled `true`, the runtime will check if the shadow dom shim is required. However,
    * if it's determined that shadow dom is already natively supported by the browser then
    * it does not request the shim. When set to `false` it will avoid all shadow dom tests.
@@ -291,8 +308,8 @@ export interface ConfigExtras {
 
   /**
    * When a component is first attached to the DOM, this setting will wait a single tick before
-   * rendering. This worksaround an Angular issue, where Angular attaches the elements before
-   * settings their initial state, leading to double renders and unnecesary event dispatchs.
+   * rendering. This works around an Angular issue, where Angular attaches the elements before
+   * settings their initial state, leading to double renders and unnecessary event dispatches.
    * Defaults to `false`.
    */
   initializeNextTick?: boolean;
@@ -539,6 +556,7 @@ export type TaskCommand =
   | 'info'
   | 'prerender'
   | 'serve'
+  | 'telemetry'
   | 'test'
   | 'version';
 
@@ -902,6 +920,11 @@ export interface CompilerSystem {
    * SYNC! Does not throw.
    */
   createDirSync(p: string, opts?: CompilerSystemCreateDirectoryOptions): CompilerSystemCreateDirectoryResults;
+  homeDir(): string;
+  /**
+   * Used to determine if the current context of the terminal is TTY.
+   */
+  isTTY(): boolean;
   /**
    * Each plaform as a different way to dynamically import modules.
    */
@@ -1029,6 +1052,7 @@ export interface CompilerSystem {
    */
   removeFileSync(p: string): CompilerSystemRemoveFileResults;
   setupCompiler?: (c: { ts: any }) => void;
+
   /**
    * Always returns an object. Does not throw. Check for "error" property if there's an error.
    */
@@ -1674,7 +1698,7 @@ export interface TestingConfig extends JestConfig {
 export interface EmulateConfig {
   /**
    * Predefined device descriptor name, such as "iPhone X" or "Nexus 10".
-   * For a complete list please see: https://github.com/GoogleChrome/puppeteer/blob/master/DeviceDescriptors.js
+   * For a complete list please see: https://github.com/puppeteer/puppeteer/blob/main/src/common/DeviceDescriptors.ts
    */
   device?: string;
 

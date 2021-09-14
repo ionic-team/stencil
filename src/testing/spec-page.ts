@@ -69,7 +69,7 @@ export async function newSpecPage(opts: NewSpecPageOptions): Promise<SpecPage> {
     body: doc.body as any,
     build: BUILD,
     styles: styles as Map<string, string>,
-    setContent: html => {
+    setContent: (html) => {
       doc.body.innerHTML = html;
       return flushAll();
     },
@@ -93,7 +93,7 @@ export async function newSpecPage(opts: NewSpecPageOptions): Promise<SpecPage> {
     if (Array.isArray(stylesMeta)) {
       if (stylesMeta.length > 1) {
         const styles: any = {};
-        stylesMeta.forEach(style => {
+        stylesMeta.forEach((style) => {
           styles[style.modeName] = style.styleStr;
         });
         Cstr.style = styles;
@@ -107,12 +107,12 @@ export async function newSpecPage(opts: NewSpecPageOptions): Promise<SpecPage> {
     return lazyBundleRuntimeMeta;
   });
 
-  const cmpCompilerMeta = opts.components.map(Cstr => Cstr.COMPILER_META as ComponentCompilerMeta);
+  const cmpCompilerMeta = opts.components.map((Cstr) => Cstr.COMPILER_META as ComponentCompilerMeta);
   const cmpBuild = getBuildFeatures(cmpCompilerMeta);
   if (opts.strictBuild) {
     Object.assign(BUILD, cmpBuild);
   } else {
-    Object.keys(cmpBuild).forEach(key => {
+    Object.keys(cmpBuild).forEach((key) => {
       if ((cmpBuild as any)[key] === true) {
         (BUILD as any)[key] = true;
       }

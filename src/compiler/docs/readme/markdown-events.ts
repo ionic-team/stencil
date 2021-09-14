@@ -14,7 +14,7 @@ export const eventsToMarkdown = (events: d.JsonDocsEvent[]) => {
 
   table.addHeader(['Event', 'Description', 'Type']);
 
-  events.forEach(ev => {
+  events.forEach((ev) => {
     table.addRow([`\`${ev.event}\``, getDocsField(ev), `\`CustomEvent<${ev.detail}>\``]);
   });
 
@@ -26,5 +26,9 @@ export const eventsToMarkdown = (events: d.JsonDocsEvent[]) => {
 };
 
 const getDocsField = (prop: d.JsonDocsEvent) => {
-  return `${prop.deprecation !== undefined ? `<span style="color:red">**[DEPRECATED]**</span> ${prop.deprecation}<br/><br/>` : ''}${prop.docs}`;
+  return `${
+    prop.deprecation !== undefined
+      ? `<span style="color:red">**[DEPRECATED]**</span> ${prop.deprecation}<br/><br/>`
+      : ''
+  }${prop.docs}`;
 };

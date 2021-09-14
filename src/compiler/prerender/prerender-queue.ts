@@ -132,7 +132,7 @@ const prerenderUrl = async (results: d.PrerenderResults, manager: d.PrerenderMan
 
     if (manager.isDebug) {
       const filePath = relative(manager.config.rootDir, urlResults.filePath);
-      const hasError = urlResults.diagnostics.some(d => d.level === 'error');
+      const hasError = urlResults.diagnostics.some((d) => d.level === 'error');
       if (hasError) {
         timespan.finish(`prerender failed: ${previewUrl}, ${filePath}`, 'red');
       } else {
@@ -160,7 +160,7 @@ const prerenderUrl = async (results: d.PrerenderResults, manager: d.PrerenderMan
   const urlsCompletedSize = manager.urlsCompleted.size;
   if (manager.progressLogger && urlsCompletedSize > 1) {
     manager.progressLogger.update(
-      `           prerendered ${urlsCompletedSize} urls: ${manager.config.logger.dim(previewUrl)}`,
+      `           prerendered ${urlsCompletedSize} urls: ${manager.config.logger.dim(previewUrl)}`
     );
   }
 

@@ -30,7 +30,7 @@ export const setValue = (ref: d.RuntimeRef, propName: string, newVal: any, cmpMe
           '\nNew value',
           newVal,
           '\nOld value',
-          oldVal,
+          oldVal
         );
       } else if (hostRef.$flags$ & HOST_FLAGS.devOnDidLoad) {
         consoleDevWarn(
@@ -40,7 +40,7 @@ export const setValue = (ref: d.RuntimeRef, propName: string, newVal: any, cmpMe
           '\nNew value',
           newVal,
           '\nOld value',
-          oldVal,
+          oldVal
         );
       }
     }
@@ -52,7 +52,7 @@ export const setValue = (ref: d.RuntimeRef, propName: string, newVal: any, cmpMe
 
         if (watchMethods) {
           // this instance is watching for when this property changed
-          watchMethods.map(watchMethodName => {
+          watchMethods.map((watchMethodName) => {
             try {
               // fire off each of the watch methods that are watching this property
               instance[watchMethodName](newVal, oldVal, propName);
@@ -63,7 +63,10 @@ export const setValue = (ref: d.RuntimeRef, propName: string, newVal: any, cmpMe
         }
       }
 
-      if (BUILD.updatable && (flags & (HOST_FLAGS.hasRendered | HOST_FLAGS.isQueuedForUpdate)) === HOST_FLAGS.hasRendered) {
+      if (
+        BUILD.updatable &&
+        (flags & (HOST_FLAGS.hasRendered | HOST_FLAGS.isQueuedForUpdate)) === HOST_FLAGS.hasRendered
+      ) {
         if (BUILD.cmpShouldUpdate && instance.componentShouldUpdate) {
           if (instance.componentShouldUpdate(newVal, oldVal, propName) === false) {
             return;

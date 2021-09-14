@@ -7,7 +7,7 @@ export const getStyleId = (cmp: d.ComponentCompilerMeta, modeName: string, isSco
 export const escapeCssForJs = (style: string) => {
   if (typeof style === 'string') {
     return style
-      .replace(/\\[\D0-7]/g, v => '\\' + v)
+      .replace(/\\[\D0-7]/g, (v) => '\\' + v)
       .replace(/\r\n|\r|\n/g, `\\n`)
       .replace(/\"/g, `\\"`)
       .replace(/\'/g, `\\'`)

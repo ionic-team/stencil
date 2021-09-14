@@ -1,5 +1,3 @@
-
-
 const activeRendering = new Set();
 const onAppReadyCallbacks: Function[] = [];
 
@@ -33,7 +31,7 @@ function onReady(callback: Function) {
 }
 
 function waitFrame() {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     requestAnimationFrame(resolve);
   });
 }
@@ -57,10 +55,10 @@ export function setupDomTests(document: Document) {
     activeRendering.clear();
     onAppReadyCallbacks.length = 0;
     app.addEventListener('stencil_componentWillRender', (ev) => willRender(ev.target));
-    app.addEventListener('stencil_componentDidRender', (ev) => didRender(ev.target))
+    app.addEventListener('stencil_componentDidRender', (ev) => didRender(ev.target));
 
     app.className = 'test-spec';
-    testBed!.appendChild(app)
+    testBed!.appendChild(app);
 
     if (url) {
       app.setAttribute('data-url', url);
@@ -68,14 +66,34 @@ export function setupDomTests(document: Document) {
     }
 
     return Promise.resolve(app);
-  };
+  }
 
   /**
    * Run this after each test
    */
   function tearDownDom() {
     testBed!.innerHTML = '';
-  };
+  }
+
+  /**
+   * Run this after each test that needs it's resources flushed
+   */
+  function tearDownStylesScripts() {
+    document.head.querySelectorAll('style[data-styles]').forEach((e) => e.remove());
+
+    [
+      '/build/testinvisibleprehydration.esm.js',
+      '/build/testinvisibleprehydration.js',
+      '/build/testprehydratedtruestyles.esm.js',
+      '/build/testprehydratedtruestyles.js',
+      '/build/testprehydratedfalsestyles.esm.js',
+      '/build/testprehydratedfalsestyles.js',
+      '/build/testapp.esm.js',
+      '/build/testapp.js',
+    ].forEach((src) => {
+      document.querySelectorAll(`script[src="${src}"]`).forEach((e) => e.remove());
+    });
+  }
 
   /**
    * Create web component for executing tests against
@@ -101,8 +119,7 @@ export function setupDomTests(document: Document) {
 
           waitForDidLoad(promises, window.document.documentElement);
 
-          return Promise.all(promises)
-            .catch((e) => console.error(e));
+          return Promise.all(promises).catch((e) => console.error(e));
         };
 
         const stencilReady = (): Promise<any> => {
@@ -111,7 +128,7 @@ export function setupDomTests(document: Document) {
             .then(() => allReady());
         };
 
-        const indexLoaded = function(this: XMLHttpRequest) {
+        const indexLoaded = function (this: XMLHttpRequest) {
           if (this.status !== 200) {
             reject(`404: ${url}`);
             return;
@@ -146,7 +163,6 @@ export function setupDomTests(document: Document) {
             setTimeout(() => {
               resolve(app);
             }, waitForStencilReady);
-
           } else {
             const appLoad = () => {
               window.removeEventListener('appload', appLoad);
@@ -156,7 +172,7 @@ export function setupDomTests(document: Document) {
             };
             window.addEventListener('appload', appLoad);
           }
-        }
+        };
 
         var oReq = new XMLHttpRequest();
         oReq.addEventListener('load', indexLoaded);
@@ -166,7 +182,6 @@ export function setupDomTests(document: Document) {
         });
         oReq.open('GET', url);
         oReq.send();
-
       } catch (e) {
         console.error('catch error', e);
         reject(e);
@@ -174,7 +189,7 @@ export function setupDomTests(document: Document) {
     });
   }
 
-  return { setupDom, tearDownDom };
+  return { setupDom, tearDownDom, tearDownStylesScripts };
 }
 
 /**
@@ -183,7 +198,7 @@ export function setupDomTests(document: Document) {
 export function waitForChanges(timeout = 250) {
   const win = window as any;
 
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     function pageLoaded() {
       setTimeout(() => {
         onReady(resolve);

@@ -6,6 +6,7 @@ export {
   isMemberInElement,
   plt,
   supportsShadow,
+  setPlatformHelpers,
   registerComponents,
   registerContext,
   registerModule,

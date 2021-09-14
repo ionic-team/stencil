@@ -10,14 +10,14 @@ export class NodeLazyRequire implements d.LazyRequire {
 
   constructor(
     private nodeResolveModule: NodeResolveModule,
-    private lazyDependencies: { [dep: string]: [string, string] },
+    private lazyDependencies: { [dep: string]: [string, string] }
   ) {}
 
   async ensure(fromDir: string, ensureModuleIds: string[]) {
     const diagnostics: d.Diagnostic[] = [];
     const missingDeps: string[] = [];
 
-    ensureModuleIds.forEach(ensureModuleId => {
+    ensureModuleIds.forEach((ensureModuleId) => {
       if (!this.ensured.has(ensureModuleId)) {
         const [minVersion, recommendedVersion] = this.lazyDependencies[ensureModuleId];
         try {

@@ -1,6 +1,4 @@
-
 module.exports = {
-
   beforeHydrate(doc, url) {
     doc.documentElement.setAttribute('dir', 'ltr');
   },
@@ -15,8 +13,8 @@ module.exports = {
 
   hydrateOptions() {
     const hydrate = {
-      prettyHtml: true
-    }
+      prettyHtml: true,
+    };
     return hydrate;
-  }
+  },
 };

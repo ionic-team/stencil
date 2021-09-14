@@ -2,7 +2,7 @@ import { Component, Prop, h } from '@stencil/core';
 
 @Component({
   tag: 'slot-dynamic-shadow-list',
-  shadow: true
+  shadow: true,
 })
 export class DynamicListShadowComponent {
   @Prop() items: Array<string> = [];
@@ -10,7 +10,7 @@ export class DynamicListShadowComponent {
   render() {
     return (
       <slot-light-list>
-        {this.items.map(item => (
+        {this.items.map((item) => (
           <div>{item}</div>
         ))}
       </slot-light-list>

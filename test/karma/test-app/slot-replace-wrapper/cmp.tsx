@@ -1,11 +1,10 @@
 import { Component, Prop, h } from '@stencil/core';
 
 @Component({
-  tag: 'slot-replace-wrapper'
+  tag: 'slot-replace-wrapper',
 })
 export class SlotReplaceWrapper {
-
-  @Prop() href?: string;;
+  @Prop() href?: string;
 
   render() {
     const TagType = (this.href != null ? 'a' : 'div') as any;
@@ -13,16 +12,15 @@ export class SlotReplaceWrapper {
 
     return [
       <TagType {...attrs}>
-        <slot name='start'/>
+        <slot name="start" />
         <span>
-          <slot/>
+          <slot />
           <span>
-            <slot name='end'/>
+            <slot name="end" />
           </span>
         </span>
       </TagType>,
-      <hr/>
+      <hr />,
     ];
   }
-
 }

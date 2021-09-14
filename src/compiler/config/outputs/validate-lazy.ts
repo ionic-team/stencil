@@ -5,7 +5,7 @@ import { isBoolean } from '@utils';
 import { join } from 'path';
 
 export const validateLazy = (config: d.Config, userOutputs: d.OutputTarget[]) => {
-  return userOutputs.filter(isOutputTargetDistLazy).map(o => {
+  return userOutputs.filter(isOutputTargetDistLazy).map((o) => {
     const dir = getAbsolutePath(config, o.dir || join('dist', config.fsNamespace));
     const lazyOutput: d.OutputTargetDistLazy = {
       type: DIST_LAZY,

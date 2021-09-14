@@ -55,7 +55,7 @@ export function compileVar(cssText: string, template: CSSTemplate, offset: numbe
   const propName = varMeta.propName;
   const fallback = varMeta.fallback != null ? compileTemplate(varMeta.fallback) : undefined;
 
-  template.push(cssText.substring(offset, varMeta.start), params => resolveVar(params, propName, fallback));
+  template.push(cssText.substring(offset, varMeta.start), (params) => resolveVar(params, propName, fallback));
   return varMeta.end;
 }
 

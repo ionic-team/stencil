@@ -13,26 +13,17 @@ export const config: Config = {
   outputTargets: [
     {
       type: 'www',
-      copy: [
-        { src: '**/*.html' },
-        { src: '**/*.css' },
-        { src: 'noscript.js' }
-      ],
+      empty: false,
+      copy: [{ src: '**/*.html' }, { src: '**/*.css' }, { src: 'noscript.js' }],
     },
     {
       type: 'dist',
-      dir: 'test-dist'
-    }
+      dir: 'test-dist',
+    },
   ],
   globalScript: 'test-app/global.ts',
   globalStyle: 'test-app/style-plugin/global-sass-entry.scss',
-  plugins: [
-    nodePolyfills(),
-    sass(),
-    less(),
-    postcss(),
-    stylus()
-  ],
+  plugins: [nodePolyfills(), sass(), less(), postcss(), stylus()],
   buildEs5: true,
   extras: {
     appendChildSlotFix: true,
@@ -41,6 +32,7 @@ export const config: Config = {
     dynamicImportShim: true,
     lifecycleDOMEvents: true,
     safari10: true,
+    scopedSlotTextContentFix: true,
     scriptDataOpts: true,
     shadowDomShim: true,
     slotChildNodesFix: true,
@@ -48,7 +40,7 @@ export const config: Config = {
   devServer: {
     historyApiFallback: {
       disableDotRule: true,
-      index: 'index.html'
-    }
-  }
+      index: 'index.html',
+    },
+  },
 };

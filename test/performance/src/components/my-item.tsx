@@ -2,10 +2,9 @@ import { Component, Host, h, Prop } from '@stencil/core';
 
 @Component({
   tag: 'my-item',
-  shadow: true
+  shadow: true,
 })
 export class MyItem {
-
   @Prop() index = 0;
 
   render() {
@@ -20,13 +19,13 @@ export class MyItem {
           [`item-class-five-${this.index}`]: true,
           [`item-class-six-${this.index}`]: true,
           [`item-class-seven-${this.index}`]: true,
-        }}>
-          [Start{this.index}]
-          <div data-index={this.index}>
-            <slot></slot>
-          </div>
-          [End{this.index}]
-          Hello World
+        }}
+      >
+        [Start{this.index}]
+        <div data-index={this.index}>
+          <slot></slot>
+        </div>
+        [End{this.index}] Hello World
       </Host>
     );
   }

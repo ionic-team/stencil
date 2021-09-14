@@ -12,7 +12,7 @@ export async function nodeCopyTasks(copyTasks: Required<d.CopyTask>[], srcDir: s
   };
 
   try {
-    copyTasks = flatOne(await Promise.all(copyTasks.map(task => processGlobs(task, srcDir))));
+    copyTasks = flatOne(await Promise.all(copyTasks.map((task) => processGlobs(task, srcDir))));
 
     const allCopyTasks: d.CopyTask[] = [];
 
@@ -21,20 +21,20 @@ export async function nodeCopyTasks(copyTasks: Required<d.CopyTask>[], srcDir: s
     while (copyTasks.length > 0) {
       const tasks = copyTasks.splice(0, 100);
 
-      await Promise.all(tasks.map(copyTask => processCopyTask(results, allCopyTasks, copyTask)));
+      await Promise.all(tasks.map((copyTask) => processCopyTask(results, allCopyTasks, copyTask)));
     }
 
     // figure out which directories we'll need to make first
     const mkDirs = ensureDirs(allCopyTasks);
 
     try {
-      await Promise.all(mkDirs.map(dir => mkdir(dir, { recursive: true })));
+      await Promise.all(mkDirs.map((dir) => mkdir(dir, { recursive: true })));
     } catch (mkDirErr) {}
 
     while (allCopyTasks.length > 0) {
       const tasks = allCopyTasks.splice(0, 100);
 
-      await Promise.all(tasks.map(copyTask => copyFile(copyTask.src, copyTask.dest)));
+      await Promise.all(tasks.map((copyTask) => copyFile(copyTask.src, copyTask.dest)));
     }
   } catch (e) {
     catchError(results.diagnostics, e);
@@ -68,7 +68,7 @@ async function processGlobTask(copyTask: Required<d.CopyTask>, srcDir: string): 
     cwd: srcDir,
     nodir: true,
   });
-  return files.map(globRelPath => createGlobCopyTask(copyTask, srcDir, globRelPath));
+  return files.map((globRelPath) => createGlobCopyTask(copyTask, srcDir, globRelPath));
 }
 
 function createGlobCopyTask(copyTask: Required<d.CopyTask>, srcDir: string, globRelPath: string): Required<d.CopyTask> {
@@ -116,7 +116,7 @@ async function processCopyTaskDirectory(results: d.CopyResults, allCopyTasks: d.
     const dirItems = await readdir(copyTask.src);
 
     await Promise.all(
-      dirItems.map(async dirItem => {
+      dirItems.map(async (dirItem) => {
         const subCopyTask: d.CopyTask = {
           src: path.join(copyTask.src, dirItem),
           dest: path.join(copyTask.dest, dirItem),
@@ -124,7 +124,7 @@ async function processCopyTaskDirectory(results: d.CopyResults, allCopyTasks: d.
         };
 
         await processCopyTask(results, allCopyTasks, subCopyTask);
-      }),
+      })
     );
   } catch (e) {
     catchError(results.diagnostics, e);
@@ -134,7 +134,7 @@ async function processCopyTaskDirectory(results: d.CopyResults, allCopyTasks: d.
 function ensureDirs(copyTasks: d.CopyTask[]) {
   const mkDirs: string[] = [];
 
-  copyTasks.forEach(copyTask => {
+  copyTasks.forEach((copyTask) => {
     addMkDir(mkDirs, path.dirname(copyTask.dest));
   });
 
@@ -168,7 +168,7 @@ const ROOT_DIR = normalizePath(path.resolve('/'));
 
 function shouldIgnore(filePath: string) {
   filePath = filePath.trim().toLowerCase();
-  return IGNORE.some(ignoreFile => filePath.endsWith(ignoreFile));
+  return IGNORE.some((ignoreFile) => filePath.endsWith(ignoreFile));
 }
 
 const IGNORE = ['.ds_store', '.gitignore', 'desktop.ini', 'thumbs.db'];

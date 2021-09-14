@@ -1,6 +1,5 @@
 import { setupDomTests } from '../util';
 
-
 describe('slot-html', () => {
   const { setupDom, tearDownDom } = setupDomTests(document);
   let app: HTMLElement;
@@ -9,7 +8,6 @@ describe('slot-html', () => {
     app = await setupDom('/slot-html/index.html');
   });
   afterEach(tearDownDom);
-
 
   it('renders', async () => {
     let result: HTMLElement;
@@ -94,5 +92,4 @@ describe('slot-html', () => {
     const hiddenCmp = app.querySelector('[hidden]');
     expect(hiddenCmp).toBe(null);
   });
-
 });

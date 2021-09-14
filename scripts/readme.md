@@ -1,15 +1,19 @@
-# Local Build and Testing
+# Manually Testing Stencil's Browser API
 
-1. `npm run build`
-2. From the root of this local @stencil/core repo, run `npm link`
-3. From the root of a local stencil app, run `npm link @stencil/core`
-4. Every time you run `npm run build` your linked projects will have to restart the dev server.
-5. Test test test. Add unit tests for any updates and always run `npm run test`.
+Stencil's Browser API should be checked manually prior to a release. There are plans to get programmatic testing in
+place in the future.
 
+1. Build Stencil from the root of this repo: `npm run ci && npm run build.prod`
+2. `cd test/browser-compile`
+3. Start the application: `npm start`
+4. Validate the output is properly transpiled
 
 # Release
 
 1. `npm run release.prepare`
-2. Check the changelog and make sure it is good, then commit the changes.
-3. `npm run release`
-4. :tada:
+2. Check the [CHANGELOG.md](../CHANGELOG.md) and make sure it includes all the changes that have landed since the last 
+release.
+3. Commit the changes - use the commit message :emoji: v<VERSION>. e.g. :star2: v2.7.0 
+4. `npm run release`
+5. Publish the release notes in GitHub
+6. :tada:

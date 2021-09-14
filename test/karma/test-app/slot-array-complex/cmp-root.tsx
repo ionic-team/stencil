@@ -1,10 +1,9 @@
 import { Component, State, h } from '@stencil/core';
 
 @Component({
-  tag: 'slot-array-complex-root'
+  tag: 'slot-array-complex-root',
 })
 export class SlotArrayComplexRoot {
-
   @State() endSlot = false;
 
   componentDidLoad() {

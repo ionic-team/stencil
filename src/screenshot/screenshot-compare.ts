@@ -13,7 +13,7 @@ export async function compareScreenshot(
   width: number,
   height: number,
   testPath: string,
-  pixelmatchThreshold: number,
+  pixelmatchThreshold: number
 ) {
   const currentImageHash = createHash('md5').update(currentScreenshotBuf).digest('hex');
   const currentImageName = `${currentImageHash}.png`;
@@ -114,7 +114,10 @@ export async function compareScreenshot(
         pixelmatchThreshold: pixelmatchThreshold,
       };
 
-      screenshot.diff.mismatchedPixels = await getMismatchedPixels(screenshotBuildData.pixelmatchModulePath, pixelMatchInput);
+      screenshot.diff.mismatchedPixels = await getMismatchedPixels(
+        screenshotBuildData.pixelmatchModulePath,
+        pixelMatchInput
+      );
     }
   }
 
@@ -131,7 +134,7 @@ async function getMismatchedPixels(pixelmatchModulePath: string, pixelMatchInput
     }, timeout);
 
     try {
-      const filteredExecArgs = process.execArgv.filter(v => !/^--(debug|inspect)/.test(v));
+      const filteredExecArgs = process.execArgv.filter((v) => !/^--(debug|inspect)/.test(v));
 
       const options = {
         execArgv: filteredExecArgs,
@@ -148,7 +151,7 @@ async function getMismatchedPixels(pixelmatchModulePath: string, pixelMatchInput
         resolve(data);
       });
 
-      pixelMatchProcess.on('error', err => {
+      pixelMatchProcess.on('error', (err) => {
         clearTimeout(tmr);
         reject(err);
       });

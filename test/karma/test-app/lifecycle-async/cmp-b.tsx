@@ -2,10 +2,9 @@ import { Component, Event, EventEmitter, Prop, h } from '@stencil/core';
 import { timeout } from './util';
 
 @Component({
-  tag: 'lifecycle-async-b'
+  tag: 'lifecycle-async-b',
 })
 export class LifecycleAsyncB {
-
   @Prop() value = '';
   rendered = 0;
 
@@ -35,13 +34,9 @@ export class LifecycleAsyncB {
 
     return (
       <div>
-        <hr/>
-        <div>
-          LifecycleAsyncB {this.value}
-        </div>
-        <div class='rendered-b'>
-          rendered b: {this.rendered}
-        </div>
+        <hr />
+        <div>LifecycleAsyncB {this.value}</div>
+        <div class="rendered-b">rendered b: {this.rendered}</div>
         <lifecycle-async-c value={this.value} />
       </div>
     );

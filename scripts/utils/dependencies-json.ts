@@ -40,7 +40,7 @@ export async function updateDependenciesJson(opts: BuildOptions) {
 }
 
 async function getStencilResources(opts: BuildOptions) {
-  const tsLibPaths = (await getTypeScriptDefaultLibNames(opts)).map(f => `compiler/${f}`);
+  const tsLibPaths = (await getTypeScriptDefaultLibNames(opts)).map((f) => `compiler/${f}`);
 
   const resources: string[] = [
     'internal/index.js',
@@ -82,7 +82,7 @@ async function getStencilResources(opts: BuildOptions) {
 }
 
 export async function getTypeScriptDefaultLibNames(opts: BuildOptions) {
-  const tsLibNames = (await readdir(opts.typescriptLibDir)).filter(f => {
+  const tsLibNames = (await readdir(opts.typescriptLibDir)).filter((f) => {
     return f.startsWith('lib.') && f.endsWith('.d.ts');
   });
   return tsLibNames;

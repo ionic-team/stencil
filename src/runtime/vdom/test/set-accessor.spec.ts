@@ -684,7 +684,7 @@ describe('setAccessor for standard html elements', () => {
               class2
        class3  `,
         false,
-        0,
+        0
       );
       expect(elm).toHaveClasses(['class1', 'class2', 'class3']);
     });
@@ -721,7 +721,7 @@ describe('setAccessor for standard html elements', () => {
            ion-color`,
         'icon2',
         false,
-        0,
+        0
       );
       expect(elm).toHaveClasses(['icon2']);
     });
@@ -756,8 +756,8 @@ describe('setAccessor for standard html elements', () => {
       let elm = document.createElement('section');
       const newStyles = {
         'box-shadow': '1px',
-        'color': 'blue',
-        'paddingLeft': '88px',
+        color: 'blue',
+        paddingLeft: '88px',
       };
       setAccessor(elm, 'style', undefined, newStyles, false, 0);
       expect(elm.style.cssText).toEqual('box-shadow: 1px; color: blue; padding-left: 88px;');
@@ -769,10 +769,10 @@ describe('setAccessor for standard html elements', () => {
         {},
         {
           'font-size': '12px',
-          'marginRight': '55px',
+          marginRight: '55px',
         },
         false,
-        0,
+        0
       );
       expect(elm.style.cssText).toEqual('font-size: 12px; margin-right: 55px;');
 
@@ -782,13 +782,13 @@ describe('setAccessor for standard html elements', () => {
         'style',
         {
           'font-size': '12px',
-          'color': 'blue',
+          color: 'blue',
         },
         {
           'font-size': '20px',
         },
         false,
-        0,
+        0
       );
 
       expect(elm.style.cssText).toEqual('font-size: 20px;');
@@ -799,10 +799,17 @@ describe('setAccessor for standard html elements', () => {
       setAccessor(elm, 'style', undefined, undefined, false, 0);
       expect(elm.style.cssText).toEqual('');
 
-      setAccessor(elm, 'style', { 'color': 'blue', 'font-size': '12px', 'paddingLeft': '88px' }, { 'color': 'blue', 'font-size': '12px', 'paddingLeft': '88px' }, false, 0);
+      setAccessor(
+        elm,
+        'style',
+        { color: 'blue', 'font-size': '12px', paddingLeft: '88px' },
+        { color: 'blue', 'font-size': '12px', paddingLeft: '88px' },
+        false,
+        0
+      );
       expect(elm.style.cssText).toEqual('');
 
-      setAccessor(elm, 'style', { 'color': 'blue', 'font-size': '12px' }, undefined, false, 0);
+      setAccessor(elm, 'style', { color: 'blue', 'font-size': '12px' }, undefined, false, 0);
       expect(elm.style.cssText).toEqual('');
     });
 
@@ -811,7 +818,14 @@ describe('setAccessor for standard html elements', () => {
       elm.style.setProperty('color', 'black');
       elm.style.setProperty('padding', '20px');
 
-      setAccessor(elm, 'style', { color: 'blue', padding: '20px', marginRight: '88px' }, { color: 'blue', padding: '30px', marginRight: '55px' }, false, 0);
+      setAccessor(
+        elm,
+        'style',
+        { color: 'blue', padding: '20px', marginRight: '88px' },
+        { color: 'blue', padding: '30px', marginRight: '55px' },
+        false,
+        0
+      );
 
       expect(elm.style.cssText).toEqual('color: black; padding: 30px; margin-right: 55px;');
     });

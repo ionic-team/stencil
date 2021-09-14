@@ -4,6 +4,7 @@ import { runPrerenderTask } from './task-prerender';
 import { startCheckVersion, printCheckVersionResults } from './check-version';
 import { startupCompilerLog } from './logs';
 import { taskWatch } from './task-watch';
+import { telemetryBuildFinishedAction } from './telemetry/telemetry';
 
 export const taskBuild = async (coreCompiler: CoreCompiler, config: Config) => {
   if (config.flags.watch) {
@@ -23,6 +24,8 @@ export const taskBuild = async (coreCompiler: CoreCompiler, config: Config) => {
     const compiler = await coreCompiler.createCompiler(config);
     const results = await compiler.build();
 
+    await telemetryBuildFinishedAction(results);
+
     await compiler.destroy();
 
     if (results.hasError) {
@@ -33,11 +36,11 @@ export const taskBuild = async (coreCompiler: CoreCompiler, config: Config) => {
         config,
         results.hydrateAppFilePath,
         results.componentGraph,
-        null,
+        null
       );
       config.logger.printDiagnostics(prerenderDiagnostics);
 
-      if (prerenderDiagnostics.some(d => d.level === 'error')) {
+      if (prerenderDiagnostics.some((d) => d.level === 'error')) {
         exitCode = 1;
       }
     }

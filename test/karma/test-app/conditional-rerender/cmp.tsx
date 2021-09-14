@@ -1,14 +1,13 @@
 import { Component, h } from '@stencil/core';
 
 @Component({
-  tag: 'conditional-rerender'
+  tag: 'conditional-rerender',
 })
 export class ConditionalRerender {
-
   render() {
     return (
       <main>
-        <slot/>
+        <slot />
         <nav>Nav</nav>
       </main>
     );

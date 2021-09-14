@@ -22,13 +22,13 @@ export function setupGlobal(gbl: any) {
   if (gbl.window == null) {
     const win: any = (gbl.window = new MockWindow());
 
-    WINDOW_FUNCTIONS.forEach(fnName => {
+    WINDOW_FUNCTIONS.forEach((fnName) => {
       if (!(fnName in gbl)) {
         gbl[fnName] = win[fnName].bind(win);
       }
     });
 
-    WINDOW_PROPS.forEach(propName => {
+    WINDOW_PROPS.forEach((propName) => {
       if (!(propName in gbl)) {
         Object.defineProperty(gbl, propName, {
           get() {
@@ -61,13 +61,13 @@ export function teardownGlobal(gbl: any) {
 export function patchWindow(winToBePatched: any) {
   const mockWin: any = new MockWindow(false);
 
-  WINDOW_FUNCTIONS.forEach(fnName => {
+  WINDOW_FUNCTIONS.forEach((fnName) => {
     if (typeof winToBePatched[fnName] !== 'function') {
       winToBePatched[fnName] = mockWin[fnName].bind(mockWin);
     }
   });
 
-  WINDOW_PROPS.forEach(propName => {
+  WINDOW_PROPS.forEach((propName) => {
     if (winToBePatched === undefined) {
       Object.defineProperty(winToBePatched, propName, {
         get() {

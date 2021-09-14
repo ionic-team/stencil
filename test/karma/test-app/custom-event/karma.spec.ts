@@ -24,5 +24,4 @@ describe('custom event', () => {
 
     expect(output.textContent.trim()).toBe('eventWithDetail 88');
   });
-
 });

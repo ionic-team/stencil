@@ -2,7 +2,10 @@ import type * as d from '../../declarations';
 import { getTsOptionsToExtend } from './ts-config';
 import ts from 'typescript';
 
-export const createTsWatchProgram = async (config: d.Config, buildCallback: (tsBuilder: ts.BuilderProgram) => Promise<void>) => {
+export const createTsWatchProgram = async (
+  config: d.Config,
+  buildCallback: (tsBuilder: ts.BuilderProgram) => Promise<void>
+) => {
   let isRunning = false;
   let lastTsBuilder: any;
   let timeoutId: any;
@@ -37,15 +40,15 @@ export const createTsWatchProgram = async (config: d.Config, buildCallback: (tsB
     optionsToExtend,
     tsWatchSys,
     ts.createEmitAndSemanticDiagnosticsBuilderProgram,
-    reportDiagnostic => {
+    (reportDiagnostic) => {
       config.logger.debug('watch reportDiagnostic:' + reportDiagnostic.messageText);
     },
-    reportWatchStatus => {
+    (reportWatchStatus) => {
       config.logger.debug(reportWatchStatus.messageText);
-    },
+    }
   );
 
-  tsWatchHost.afterProgramCreate = async tsBuilder => {
+  tsWatchHost.afterProgramCreate = async (tsBuilder) => {
     lastTsBuilder = tsBuilder;
     isRunning = true;
     await buildCallback(tsBuilder);

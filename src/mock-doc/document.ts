@@ -28,7 +28,7 @@ export class MockDocument extends MockHTMLElement {
     if (typeof html === 'string') {
       const parsedDoc: MockDocument = parseDocumentUtil(this, html);
 
-      const documentElement = parsedDoc.children.find(elm => elm.nodeName === 'HTML');
+      const documentElement = parsedDoc.children.find((elm) => elm.nodeName === 'HTML');
       if (documentElement != null) {
         this.appendChild(documentElement);
         setOwnerDocument(documentElement, this);
@@ -40,6 +40,13 @@ export class MockDocument extends MockHTMLElement {
       documentElement.appendChild(new MockHTMLElement(this, 'head'));
       documentElement.appendChild(new MockHTMLElement(this, 'body'));
     }
+  }
+
+  get dir() {
+    return this.documentElement.dir;
+  }
+  set dir(value: string) {
+    this.documentElement.dir = value;
   }
 
   get location() {
@@ -55,7 +62,7 @@ export class MockDocument extends MockHTMLElement {
   }
 
   get baseURI() {
-    const baseNode = this.head.childNodes.find(node => node.nodeName === 'BASE') as MockBaseElement;
+    const baseNode = this.head.childNodes.find((node) => node.nodeName === 'BASE') as MockBaseElement;
     if (baseNode) {
       return baseNode.href;
     }
@@ -216,7 +223,7 @@ export class MockDocument extends MockHTMLElement {
   }
 
   get title() {
-    const title = this.head.childNodes.find(elm => elm.nodeName === 'TITLE') as MockElement;
+    const title = this.head.childNodes.find((elm) => elm.nodeName === 'TITLE') as MockElement;
     if (title != null && typeof title.textContent === 'string') {
       return title.textContent.trim();
     }
@@ -224,7 +231,7 @@ export class MockDocument extends MockHTMLElement {
   }
   set title(value: string) {
     const head = this.head;
-    let title = head.childNodes.find(elm => elm.nodeName === 'TITLE') as MockElement;
+    let title = head.childNodes.find((elm) => elm.nodeName === 'TITLE') as MockElement;
     if (title == null) {
       title = this.createElement('title');
       head.appendChild(title);
@@ -252,7 +259,7 @@ export function resetDocument(doc: Document) {
       for (let i = 0, ii = documentElement.childNodes.length; i < ii; i++) {
         const childNode = documentElement.childNodes[i];
         resetElement(childNode as any);
-        childNode.childNodes.length = 0;
+        (childNode.childNodes as any).length = 0;
       }
     }
 

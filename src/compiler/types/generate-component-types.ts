@@ -43,8 +43,8 @@ export const generateComponentTypes = (cmp: d.ComponentCompilerMeta, internal: b
 };
 
 const attributesToMultiLineString = (attributes: d.TypeInfo, jsxAttributes: boolean, internal: boolean) => {
-  const attributesStr = sortBy(attributes, a => a.name)
-    .filter(type => {
+  const attributesStr = sortBy(attributes, (a) => a.name)
+    .filter((type) => {
       if (jsxAttributes && !internal && type.internal) {
         return false;
       }
@@ -53,7 +53,7 @@ const attributesToMultiLineString = (attributes: d.TypeInfo, jsxAttributes: bool
     .reduce((fullList, type) => {
       if (type.jsdoc) {
         fullList.push(`                /**`);
-        fullList.push(...type.jsdoc.split('\n').map(line => '                  * ' + line));
+        fullList.push(...type.jsdoc.split('\n').map((line) => '                  * ' + line));
         fullList.push(`                 */`);
       }
       const optional = jsxAttributes ? !type.required : type.optional;

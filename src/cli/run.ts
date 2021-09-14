@@ -13,13 +13,20 @@ import { taskInfo } from './task-info';
 import { taskPrerender } from './task-prerender';
 import { taskServe } from './task-serve';
 import { taskTest } from './task-test';
+import { initializeStencilCLIConfig } from './state/stencil-cli-config';
+import { taskTelemetry } from './task-telemetry';
+import { telemetryAction } from './telemetry/telemetry';
 
 export const run = async (init: CliInitOptions) => {
   const { args, logger, sys } = init;
 
+  // Initialize the singleton so we can use this throughout the lifecycle of the CLI.
+  const stencilCLIConfig = initializeStencilCLIConfig({ args, logger, sys });
+
   try {
     const flags = parseFlags(args, sys);
     const task = flags.task;
+
     if (flags.debug || flags.verbose) {
       logger.setLevel('debug');
     }
@@ -32,8 +39,14 @@ export const run = async (init: CliInitOptions) => {
       sys.applyGlobalPatch(sys.getCurrentDirectory());
     }
 
+    // Update singleton with modifications
+    stencilCLIConfig.logger = logger;
+    stencilCLIConfig.task = task;
+    stencilCLIConfig.sys = sys;
+    stencilCLIConfig.flags = flags;
+
     if (task === 'help' || flags.help) {
-      taskHelp(sys, logger);
+      taskHelp();
       return;
     }
 
@@ -50,12 +63,14 @@ export const run = async (init: CliInitOptions) => {
       logger,
       dependencies: dependencies as any,
     });
+
     if (hasError(ensureDepsResults.diagnostics)) {
       logger.printDiagnostics(ensureDepsResults.diagnostics);
       return sys.exit(1);
     }
 
     const coreCompiler = await loadCoreCompiler(sys);
+    stencilCLIConfig.coreCompiler = coreCompiler;
 
     if (task === 'version' || flags.version) {
       console.log(coreCompiler.version);
@@ -67,7 +82,9 @@ export const run = async (init: CliInitOptions) => {
     loadedCompilerLog(sys, logger, flags, coreCompiler);
 
     if (task === 'info') {
-      taskInfo(coreCompiler, sys, logger);
+      await telemetryAction(async () => {
+        await taskInfo(coreCompiler, sys, logger);
+      });
       return;
     }
 
@@ -87,13 +104,17 @@ export const run = async (init: CliInitOptions) => {
       }
     }
 
+    stencilCLIConfig.validatedConfig = validated;
+
     if (isFunction(sys.applyGlobalPatch)) {
       sys.applyGlobalPatch(validated.config.rootDir);
     }
 
     await sys.ensureResources({ rootDir: validated.config.rootDir, logger, dependencies: dependencies as any });
 
-    await runTask(coreCompiler, validated.config, task);
+    await telemetryAction(async () => {
+      await runTask(coreCompiler, validated.config, task);
+    });
   } catch (e) {
     if (!shouldIgnoreError(e)) {
       logger.error(`uncaught cli error: ${e}${logger.getLevel() === 'debug' ? e.stack : ''}`);
@@ -115,13 +136,13 @@ export const runTask = async (coreCompiler: CoreCompiler, config: Config, task: 
       await taskDocs(coreCompiler, config);
       break;
 
-    case 'help':
-      taskHelp(config.sys, config.logger);
-      break;
-
     case 'generate':
     case 'g':
       await taskGenerate(coreCompiler, config);
+      break;
+
+    case 'help':
+      taskHelp();
       break;
 
     case 'prerender':
@@ -130,6 +151,10 @@ export const runTask = async (coreCompiler: CoreCompiler, config: Config, task: 
 
     case 'serve':
       await taskServe(config);
+      break;
+
+    case 'telemetry':
+      await taskTelemetry();
       break;
 
     case 'test':
@@ -142,7 +167,7 @@ export const runTask = async (coreCompiler: CoreCompiler, config: Config, task: 
 
     default:
       config.logger.error(`${config.logger.emoji('❌ ')}Invalid stencil command, please see the options below:`);
-      taskHelp(config.sys, config.logger);
+      taskHelp();
       return config.sys.exit(1);
   }
 };

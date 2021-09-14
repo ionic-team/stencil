@@ -109,7 +109,7 @@ const logHmr = (logger: d.Logger, buildCtx: d.BuildCtx) => {
 
   if (hmr.inlineStylesUpdated) {
     const inlineStyles = hmr.inlineStylesUpdated
-      .map(s => s.styleTag)
+      .map((s) => s.styleTag)
       .reduce((arr, v) => {
         if (!arr.includes(v)) {
           arr.push(v);
@@ -149,7 +149,7 @@ const cleanupUpdateMsg = (logger: d.Logger, msg: string, fileNames: string[]) =>
 };
 
 const cleanDiagnostics = (config: d.Config, diagnostics: d.Diagnostic[]) => {
-  diagnostics.forEach(diagnostic => {
+  diagnostics.forEach((diagnostic) => {
     if (!diagnostic.relFilePath && !isRemoteUrl(diagnostic.absFilePath) && diagnostic.absFilePath && config.rootDir) {
       diagnostic.relFilePath = relative(config.rootDir, diagnostic.absFilePath);
     }

@@ -9,6 +9,22 @@ describe('element', () => {
     doc = new MockDocument();
   });
 
+  it('document.documentElement dir', () => {
+    expect(doc.dir).toBe('');
+    expect(doc.documentElement.getAttribute('dir')).toBe(null);
+    doc.documentElement.setAttribute('dir', 'rtl');
+    expect(doc.documentElement.getAttribute('dir')).toBe('rtl');
+    expect(doc.dir).toBe('rtl');
+  });
+
+  it('document.dir', () => {
+    expect(doc.dir).toBe('');
+    doc.dir = 'ltr';
+    expect(doc.dir).toBe('ltr');
+    doc.dir = 'rtl';
+    expect(doc.dir).toBe('rtl');
+  });
+
   it('insertAdjacentElement beforebegin', () => {
     const elm = doc.createElement('div') as MockHTMLElement;
     elm.innerHTML = '<b>0</b>';
