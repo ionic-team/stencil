@@ -106,11 +106,10 @@ const setupComponentDependencies = (
  * Creates a case block which will be used to define components. e.g.
  * ``` javascript
  * case "my-component":
- *   tagName = "my-component";
  *   if (!customElements.get(tagName)) {
  *     customElements.define(tagName, MyProxiedComponent);
  *     // OR for dependent components
- *     defineCustomElement(tagRename);
+ *     defineCustomElement(tagName);
  *   }
  *   break;
  * } });
@@ -139,19 +138,19 @@ const createCustomElementsDefineCase = (tagName: string, actionExpression: ts.Ex
 /**
  * Add the main `defineCustomElement` function e.g.
  * ```javascript
- * function defineCustomElement(tagRename) {
- *  let tagName;
+ * function defineCustomElement() {
  *  const components = ['my-component'];
- *   components.forEach(cmp => { switch (cmp) {
- *   case "my-component":
- *     tagName = "my-component";
- *     if (!customElements.get(tagName)) {
- *      customElements.define(tagName, MyProxiedComponent);
- *      // OR for dependent components
- *      defineCustomElement(tagRename);
+ *   components.forEach(tagName => {
+ *     switch (tagName) {
+ *       case "my-component":
+ *         if (!customElements.get(tagName)) {
+ *           customElements.define(tagName, MyProxiedComponent);
+ *           // OR for dependent components
+ *           defineCustomElement(tagName);
+ *         }
+ *         break;
  *     }
- *     break;
- *  } });
+ *   });
  * }
  ```
  * @param tagNames all components that will be defined
