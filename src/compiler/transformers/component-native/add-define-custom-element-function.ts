@@ -2,7 +2,7 @@ import type * as d from '../../../declarations';
 import { createImportStatement, getModuleFromSourceFile } from '../transform-utils';
 import { dashToPascalCase } from '@utils';
 import ts from 'typescript';
-import { creeateComponentMetadataProxy } from '../add-component-meta-proxy';
+import { createComponentMetadataProxy } from '../add-component-meta-proxy';
 import { addCoreRuntimeApi, RUNTIME_APIS } from '../core-runtime-apis';
 
 /**
@@ -35,7 +35,7 @@ export const addDefineCustomElementFunctions = (
           ts.factory.createBinaryExpression(
             ts.factory.createIdentifier(cmpName),
             ts.factory.createToken(ts.SyntaxKind.EqualsToken),
-            creeateComponentMetadataProxy(moduleFile.cmps[0])
+            createComponentMetadataProxy(moduleFile.cmps[0])
           )
         );
         newStatements.push(metaExpression);
