@@ -15,9 +15,7 @@ export const addModuleMetadataProxies = (tsSourceFile: ts.SourceFile, moduleFile
 };
 
 const addComponentMetadataProxy = (compilerMeta: d.ComponentCompilerMeta) => {
-  return ts.createStatement(
-    createComponentMetadataProxy(compilerMeta)
-  );
+  return ts.createStatement(createComponentMetadataProxy(compilerMeta));
 };
 
 export const createComponentMetadataProxy = (compilerMeta: d.ComponentCompilerMeta) => {
@@ -28,4 +26,3 @@ export const createComponentMetadataProxy = (compilerMeta: d.ComponentCompilerMe
 
   return ts.createCall(ts.createIdentifier(PROXY_CUSTOM_ELEMENT), [], [literalCmpClassName, literalMeta]);
 };
-

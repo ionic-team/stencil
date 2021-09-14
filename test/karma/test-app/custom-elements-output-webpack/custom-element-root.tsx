@@ -2,10 +2,9 @@ import { Component, h } from '@stencil/core';
 
 @Component({
   tag: 'custom-element-root',
-  shadow: true
+  shadow: true,
 })
 export class CustomElementRoot {
-
   render() {
     return (
       <div>

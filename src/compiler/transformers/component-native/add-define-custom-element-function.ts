@@ -82,9 +82,9 @@ const setupComponentDependencies = (
   caseStatements: ts.CaseClause[],
   tagNames: string[]
 ) => {
-  moduleFile.cmps.forEach(cmp => {
-    cmp.dependencies.forEach(dCmp => {
-      const foundDep = components.find(dComp => dComp.tagName === dCmp);
+  moduleFile.cmps.forEach((cmp) => {
+    cmp.dependencies.forEach((dCmp) => {
+      const foundDep = components.find((dComp) => dComp.tagName === dCmp);
       const exportName = dashToPascalCase(foundDep.tagName);
       const importAs = `$${exportName}DefineCustomElement`;
       tagNames.push(foundDep.tagName);
@@ -93,12 +93,12 @@ const setupComponentDependencies = (
       newStatements.push(createImportStatement([`defineCustomElement as ${importAs}`], foundDep.sourceFilePath));
 
       // define a dependent component by recursively calling their own `defineCustomElement()`
-      const callExpression = ts.factory.createCallExpression(ts.factory.createIdentifier(importAs), undefined, [] );
+      const callExpression = ts.factory.createCallExpression(ts.factory.createIdentifier(importAs), undefined, []);
       // `case` blocks that define the dependent components. We'll add them to our switch statement later.
       caseStatements.push(createCustomElementsDefineCase(foundDep.tagName, callExpression));
     });
-  })
-}
+  });
+};
 
 /**
  * Creates a case block which will be used to define components. e.g.
@@ -191,44 +191,43 @@ const addDefineCustomElementFunction = (
                 undefined,
                 undefined,
                 ts.factory.createArrayLiteralExpression(
-                  tagNames.map(tagName => ts.factory.createStringLiteral(tagName))
+                  tagNames.map((tagName) => ts.factory.createStringLiteral(tagName))
                 )
-              )
+              ),
             ],
             ts.NodeFlags.Const
           )
         ),
         ts.factory.createExpressionStatement(
           ts.factory.createCallExpression(
-            ts.factory.createPropertyAccessExpression(
-              ts.factory.createIdentifier('components'),
-              'forEach'
-            ),
+            ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('components'), 'forEach'),
             undefined,
             [
               ts.factory.createArrowFunction(
                 undefined,
                 undefined,
-                [ts.factory.createParameterDeclaration(
-                  undefined,
-                  undefined,
-                  undefined,
-                  ts.factory.createIdentifier('cmp'),
-                  undefined,
-                  undefined
-                )],
+                [
+                  ts.factory.createParameterDeclaration(
+                    undefined,
+                    undefined,
+                    undefined,
+                    ts.factory.createIdentifier('cmp'),
+                    undefined,
+                    undefined
+                  ),
+                ],
                 undefined,
                 ts.factory.createToken(ts.SyntaxKind.EqualsGreaterThanToken),
                 ts.factory.createBlock([
                   ts.factory.createSwitchStatement(
                     ts.factory.createIdentifier('cmp'),
                     ts.factory.createCaseBlock(caseStatements)
-                  )
+                  ),
                 ])
-              )
+              ),
             ]
           )
-        )
+        ),
       ],
       true
     )

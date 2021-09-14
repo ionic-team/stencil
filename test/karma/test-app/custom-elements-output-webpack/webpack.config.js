@@ -13,7 +13,7 @@ module.exports = {
   resolve: {
     alias: {
       '@stencil/core/internal/client': '../../../internal/client',
-      '@stencil/core/internal/app-data': '../app-data'
-    }
-  }
+      '@stencil/core/internal/app-data': '../app-data',
+    },
+  },
 };

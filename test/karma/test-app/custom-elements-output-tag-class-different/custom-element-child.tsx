@@ -2,7 +2,7 @@ import { Component, h } from '@stencil/core';
 
 @Component({
   tag: 'custom-element-child-different-name-than-class',
-  shadow: true
+  shadow: true,
 })
 export class CustomElementChild {
   render() {
