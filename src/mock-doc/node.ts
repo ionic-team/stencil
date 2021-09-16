@@ -66,7 +66,7 @@ export class MockNode {
     return -1;
   }
 
-  get firstChild() {
+  get firstChild(): MockNode | null {
     return this.childNodes[0] || null;
   }
 
@@ -103,11 +103,11 @@ export class MockNode {
     return this === node;
   }
 
-  get lastChild() {
+  get lastChild(): MockNode | null {
     return this.childNodes[this.childNodes.length - 1] || null;
   }
 
-  get nextSibling() {
+  get nextSibling(): MockNode | null {
     if (this.parentNode != null) {
       const index = this.parentNode.childNodes.indexOf(this) + 1;
       return this.parentNode.childNodes[index] || null;
@@ -129,7 +129,7 @@ export class MockNode {
     this.parentNode = value;
   }
 
-  get previousSibling() {
+  get previousSibling(): MockNode | null {
     if (this.parentNode != null) {
       const index = this.parentNode.childNodes.indexOf(this) - 1;
       return this.parentNode.childNodes[index] || null;
@@ -304,7 +304,7 @@ export class MockElement extends MockNode {
     return dispatchEvent(this, ev);
   }
 
-  get firstElementChild() {
+  get firstElementChild(): MockElement | null {
     return this.children[0] || null;
   }
 
@@ -481,7 +481,7 @@ export class MockElement extends MockNode {
     this.setAttributeNS(null, 'lang', value);
   }
 
-  get lastElementChild() {
+  get lastElementChild(): MockElement | null {
     const children = this.children;
     return children[children.length - 1] || null;
   }
