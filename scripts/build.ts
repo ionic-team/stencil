@@ -9,7 +9,6 @@ import { internal } from './bundles/internal';
 import { mockDoc } from './bundles/mock-doc';
 import { release } from './release';
 import { screenshot } from './bundles/screenshot';
-import { sysDeno } from './bundles/sys-deno';
 import { sysNode, sysNodeExternalBundles } from './bundles/sys-node';
 import { testing } from './bundles/testing';
 import { validateBuild } from './test/validate-build';
@@ -68,7 +67,6 @@ export async function createBuild(opts: BuildOptions): Promise<readonly RollupOp
     mockDoc(opts),
     screenshot(opts),
     testing(opts),
-    sysDeno(opts),
     sysNode(opts),
   ]);
 
