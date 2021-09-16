@@ -91,7 +91,7 @@ export function prettyVersionDiff(oldVersion: string, inc: any): string {
 }
 
 /**
- * Write CHANGELOG.md to disk. Stencil uses the Angular-variant of convential commits; commits must be formatted
+ * Write CHANGELOG.md to disk. Stencil uses the Angular-variant of conventional commits; commits must be formatted
  * accordingly in order to be added to the changelog properly.
  * @param opts build options to be used to update the changelog
  */

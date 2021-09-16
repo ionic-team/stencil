@@ -15,7 +15,7 @@ import { createLicense } from './license';
 import { bundleBuild } from './build';
 
 /**
- * Runs a littany of tasks used to ensure a safe release of a new version of Stencil
+ * Runs a litany of tasks used to ensure a safe release of a new version of Stencil
  * @param opts build options containing the metadata needed to release a new version of Stencil
  * @param args stringified arguments used to influence the release steps that are taken
  */
