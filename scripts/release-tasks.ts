@@ -151,14 +151,9 @@ export function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<string>)
       },
       {
         title: `Set package.json version to ${color.bold.yellow(opts.version)}`,
-        task: () => {
-          const packageJson = JSON.parse(fs.readFileSync(opts.packageJsonPath, 'utf8'));
-          packageJson.version = opts.version;
-          fs.writeFileSync(opts.packageJsonPath, JSON.stringify(packageJson, null, 2) + '\n');
-
-          const packageLockJson = JSON.parse(fs.readFileSync(opts.packageLockJsonPath, 'utf8'));
-          packageLockJson.version = opts.version;
-          fs.writeFileSync(opts.packageLockJsonPath, JSON.stringify(packageLockJson, null, 2) + '\n');
+        task: async () => {
+          // use `--no-git-tag-version` to ensure that the tag for the release is not prematurely created
+          await execa('npm', ['version', '--no-git-tag-version', opts.version], { cwd: rootDir });
         },
       },
       {
