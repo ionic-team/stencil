@@ -200,7 +200,7 @@ export function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<string>)
           if (isDryRun) {
             return console.log(`[dry-run] ${cmd} ${cmdArgs.join(' ')}`);
           }
-          return execa('git', cmdArgs, { cwd: rootDir });
+          return execa(cmd, cmdArgs, { cwd: rootDir });
         },
       },
       {
@@ -212,7 +212,7 @@ export function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<string>)
           if (isDryRun) {
             return console.log(`[dry-run] ${cmd} ${cmdArgs.join(' ')}`);
           }
-          return execa('git', cmdArgs, { cwd: rootDir });
+          return execa(cmd, cmdArgs, { cwd: rootDir });
         },
       }
     );
@@ -221,13 +221,13 @@ export function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<string>)
       tasks.push({
         title: 'Also set "next" npm tag on @stencil/core',
         task: () => {
-          const cmd = 'git';
+          const cmd = 'npm';
           const cmdArgs = ['dist-tag', 'add', '@stencil/core@' + opts.version, 'next'];
 
           if (isDryRun) {
             return console.log(`[dry-run] ${cmd} ${cmdArgs.join(' ')}`);
           }
-          return execa('npm', cmdArgs, { cwd: rootDir });
+          return execa(cmd, cmdArgs, { cwd: rootDir });
         },
       });
     }
