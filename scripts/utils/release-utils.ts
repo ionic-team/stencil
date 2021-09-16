@@ -125,7 +125,14 @@ export async function postGithubRelease(opts: BuildOptions): Promise<void> {
   // https://docs.github.com/en/github/administering-a-repository/automation-for-release-forms-with-query-parameters
   const url = new URL(`https://github.com/${opts.ghRepoOrg}/${opts.ghRepoName}/releases/new`);
   url.searchParams.set('tag', versionTag);
-  url.searchParams.set('title', title);
+
+  const now = new Date();
+  let timestamp = now.getUTCFullYear() + '-';
+  timestamp += ('0' + (now.getUTCMonth() + 1)).slice(-2) + '-';
+  timestamp += ('0' + now.getUTCDate()).slice(-2);
+
+  url.searchParams.set('title', encodeURIComponent(`${title} (${timestamp})`));
+
   url.searchParams.set('body', body.trim());
   if (opts.tag === 'next' || opts.tag === 'test') {
     url.searchParams.set('prerelease', '1');
