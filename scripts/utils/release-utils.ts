@@ -126,10 +126,7 @@ export async function postGithubRelease(opts: BuildOptions): Promise<void> {
   const url = new URL(`https://github.com/${opts.ghRepoOrg}/${opts.ghRepoName}/releases/new`);
   url.searchParams.set('tag', versionTag);
 
-  const now = new Date();
-  let timestamp = now.getUTCFullYear() + '-';
-  timestamp += ('0' + (now.getUTCMonth() + 1)).slice(-2) + '-';
-  timestamp += ('0' + now.getUTCDate()).slice(-2);
+  const timestamp = new Date().toISOString().substring(0, 10);
 
   url.searchParams.set('title', encodeURIComponent(`${title} (${timestamp})`));
 
