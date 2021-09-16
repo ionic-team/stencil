@@ -24,7 +24,7 @@ describe('telemetryBuildFinishedAction', async () => {
 
     const results = {
       componentGraph: {},
-      duration: 100
+      duration: 100,
     } as d.CompilerBuildResults;
 
     await telemetry.telemetryBuildFinishedAction(config, logger, {}, sys, results);
