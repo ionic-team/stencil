@@ -90,3 +90,8 @@ export const isString = (v: any): v is string => typeof v === 'string';
 export const isIterable = (v: any): v is Iterable<any> => isDefined(v) && isFunction(v[Symbol.iterator]);
 export const isPromise = <T = any>(v: any): v is Promise<T> =>
   !!v && (typeof v === 'object' || typeof v === 'function') && typeof v.then === 'function';
+
+export function getMajorVersion(version: string): string {
+  const parts = version.split('.');
+  return parts[0];
+}
