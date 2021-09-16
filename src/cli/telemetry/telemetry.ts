@@ -1,4 +1,4 @@
-import { tryFn, readJson, hasVerbose, uuidv4, getMajorVersion } from '@utils';
+import { tryFn, readJson, hasVerbose, uuidv4, getMajorVersion, hasDebug } from '@utils';
 import { shouldTrack } from './shouldTrack';
 import * as d from '../../declarations';
 import { CoreCompiler } from '../load-compiler';
@@ -97,7 +97,7 @@ export const prepareData = async (
   component_count: number = undefined
 ): Promise<d.TrackableData> => {
   const { typescript, rollup } = coreCompiler.versions || { typescript: 'unknown', rollup: 'unknown' };
-  const { packages, packages_no_versions } = await getInstalledPackages(sys);
+  const { packages, packages_no_versions } = await getInstalledPackages(sys, config);
   const targets = await getActiveTargets(config);
   const yarn = isUsingYarn(sys);
   const stencil = coreCompiler.version || 'unknown';
@@ -135,65 +135,67 @@ export const prepareData = async (
  * @returns string[]
  */
 async function getInstalledPackages(
-  sys: d.CompilerSystem
+  sys: d.CompilerSystem,
+  config: d.Config
 ): Promise<{ packages: string[]; packages_no_versions: string[] }> {
   let packages: string[] = [],
     packages_no_versions: string[] = [],
     packageLockJson: any;
 
-  // try {
-  // Read package.json and package-lock.json
-  const appRootDir = sys.getCurrentDirectory();
+  try {
+    // Read package.json and package-lock.json
+    const appRootDir = sys.getCurrentDirectory();
 
-  const packageJson: d.PackageJsonData = await tryFn(readJson, sys, sys.resolvePath(appRootDir + '/package.json'));
+    const packageJson: d.PackageJsonData = await tryFn(readJson, sys, sys.resolvePath(appRootDir + '/package.json'));
 
-  // They don't have a package.json for some reason? Eject button.
-  if (!packageJson) {
+    // They don't have a package.json for some reason? Eject button.
+    if (!packageJson) {
+      return { packages, packages_no_versions };
+    }
+
+    const rawPackages: [string, string][] = Object.entries({
+      ...packageJson.devDependencies,
+      ...packageJson.dependencies,
+    });
+
+    // Collect packages only in the stencil, ionic, or capacitor org's:
+    // https://www.npmjs.com/org/stencil
+    const ionicPackages = rawPackages.filter(
+      ([k]) => k.startsWith('@stencil/') || k.startsWith('@ionic/') || k.startsWith('@capacitor/')
+    );
+
+    try {
+      if (!isUsingYarn(sys)) {
+        packageLockJson = await tryFn(readJson, sys, sys.resolvePath(appRootDir + '/package-lock.json'));
+
+        packages = ionicPackages.map(([k, v]) => {
+          const version =
+            packageLockJson?.dependencies[k]?.version ?? packageLockJson?.devDependencies[k]?.version ?? v;
+          return `${k}@${version}`;
+        });
+      } else if (isUsingYarn(sys)) {
+        const yarnLock = sys.readFileSync(appRootDir + '/yarn.lock');
+        packageLockJson = sys.parseYarnLockFile(yarnLock);
+
+        packages = ionicPackages.map(([k, v]) => {
+          const identifiedVersion = `${k}@${v}`;
+          const version = packageLockJson.object[identifiedVersion]?.version;
+          return `${k}@${version}`;
+        });
+      } else {
+        packages = ionicPackages.map(([k, v]) => `${k}@${v.replace('^', '')}`);
+      }
+    } catch (e) {
+      packages = ionicPackages.map(([k, v]) => `${k}@${v.replace('^', '')}`);
+    }
+
+    packages_no_versions = ionicPackages.map(([k]) => `${k}`);
+
+    return { packages, packages_no_versions };
+  } catch (err) {
+    hasDebug(config) && console.error(err);
     return { packages, packages_no_versions };
   }
-
-  const rawPackages: [string, string][] = Object.entries({
-    ...packageJson.devDependencies,
-    ...packageJson.dependencies,
-  });
-
-  // Collect packages only in the stencil, ionic, or capacitor org's:
-  // https://www.npmjs.com/org/stencil
-  const ionicPackages = rawPackages.filter(
-    ([k]) => k.startsWith('@stencil/') || k.startsWith('@ionic/') || k.startsWith('@capacitor/')
-  );
-
-  // try {
-  if (!isUsingYarn(sys)) {
-    packageLockJson = await tryFn(readJson, sys, sys.resolvePath(appRootDir + '/package-lock.json'));
-
-    packages = ionicPackages.map(([k, v]) => {
-      const version = packageLockJson?.dependencies[k]?.version ?? packageLockJson?.devDependencies[k]?.version ?? v;
-      return `${k}@${version}`;
-    });
-  } else if (isUsingYarn(sys)) {
-    const yarnLock = sys.readFileSync(appRootDir + '/yarn.lock');
-    packageLockJson = sys.parseYarnLockFile(yarnLock);
-
-    packages = ionicPackages.map(([k, v]) => {
-      const identifiedVersion = `${k}@${v}`;
-      const version = packageLockJson.object[identifiedVersion]?.version;
-      return `${k}@${version}`;
-    });
-  } else {
-    packages = ionicPackages.map(([k, v]) => `${k}@${v.replace('^', '')}`);
-  }
-  // } catch (e) {
-  //   packages = ionicPackages.map(([k, v]) => `${k}@${v.replace('^', '')}`);
-  // }
-
-  packages_no_versions = ionicPackages.map(([k]) => `${k}`);
-
-  return { packages, packages_no_versions };
-  // } catch (err) {
-  //   hasDebug(config) && console.error(err);
-  //   return { packages, packages_no_versions };
-  // }
 }
 
 /**
