@@ -51,7 +51,6 @@ export async function createBuild(opts: BuildOptions): Promise<readonly RollupOp
     emptyDir(opts.output.devServerDir),
     emptyDir(opts.output.internalDir),
     emptyDir(opts.output.mockDocDir),
-    emptyDir(opts.output.sysDenoDir),
     emptyDir(opts.output.sysNodeDir),
     emptyDir(opts.output.testingDir),
     updateDependenciesJson(opts),
