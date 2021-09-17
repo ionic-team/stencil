@@ -4,6 +4,7 @@ import { isAbsolute, join, relative } from 'path';
 import ts from 'typescript';
 
 export const validateTsConfig = async (config: d.Config, sys: d.CompilerSystem, init: d.LoadConfigInit) => {
+  console.log('validating config!!!')
   const tsconfig = {
     path: null as string,
     compilerOptions: null as any,
@@ -25,6 +26,7 @@ export const validateTsConfig = async (config: d.Config, sys: d.CompilerSystem, 
       const host: ts.ParseConfigFileHost = {
         ...ts.sys,
         readFile: (p) => {
+          console.log('SENTINEL typescript-config')
           if (p === tsconfig.path) {
             return readTsConfig.content;
           }

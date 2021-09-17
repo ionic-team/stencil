@@ -44,7 +44,7 @@ export const getComponentsEsmFileName = (config: d.Config) => `${config.fsNamesp
 export const getLoaderEsmPath = (outputTarget: d.OutputTargetDist) =>
   join(outputTarget.buildDir, outputTarget.esmLoaderPath);
 
-export const getComponentsDtsSrcFilePath = (config: d.Config) => join(config.srcDir, GENERATED_DTS);
+export const getComponentsDtsSrcFilePath = (config: d.Config) => { console.log('getComponentsDtsSrcFilePath::',config.srcDir); return join(config.srcDir, GENERATED_DTS)};
 
 export const getComponentsDtsTypesFilePath = (outputTarget: d.OutputTargetDist | d.OutputTargetDistTypes) =>
   join(outputTarget.typesDir, GENERATED_DTS);

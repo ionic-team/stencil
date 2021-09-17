@@ -18,8 +18,9 @@ export const createFullBuild = async (config: d.Config, compilerCtx: d.CompilerC
       buildCtx.isRebuild = false;
       buildCtx.requiresFullBuild = true;
       buildCtx.start();
-
+      console.log('onBuild::buildCtx started')
       const result = await build(config, compilerCtx, buildCtx, tsBuilder);
+      console.log('onBuild::build done! result is', result)
       if (result !== null) {
         if (tsWatchProgram) {
           tsWatchProgram.close();

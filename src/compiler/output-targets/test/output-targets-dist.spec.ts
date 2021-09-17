@@ -3,33 +3,43 @@ import { createCompiler } from '@stencil/core/compiler';
 import * as d from '@stencil/core/declarations';
 import { mockConfig } from '@stencil/core/testing';
 import path from 'path';
+import { validateConfig } from '../../config/validate-config';
+import { validateOutputTargets } from '../../config/outputs';
+import { validateDist } from '../../config/outputs/validate-dist';
 
 describe('outputTarget, dist', () => {
   jest.setTimeout(20000);
   let compiler: d.Compiler;
   let config: d.Config;
-  const root = path.resolve('/');
+  const root = path.resolve(__dirname);
 
   it('default dist files', async () => {
     config = mockConfig();
     config.buildAppCore = true;
-    config.rootDir = path.join(root, 'User', 'testing', '/');
+    console.log('ryan root is ', root)
+    config.rootDir = path.join(root, /*'User', 'testing',*/ '/');
     config.namespace = 'TestApp';
     config.buildEs5 = true;
-    config.globalScript = path.join(root, 'User', 'testing', 'src', 'global.ts');
+    config.globalScript = path.join(root, /*'User', 'testing',*/ 'src', 'global.ts');
     config.outputTargets = [{ type: 'dist' }];
+    config.tsconfig = path.join(__dirname, 'tsconfig.json');
+    config.srcDir = root;
 
-    // Renamed from new Compiler since Adam switch to primarily functional throughout stencil with the compiler rewrite.
+    validateDist(config, config.outputTargets);
+
     compiler = await createCompiler(config);
 
-    // The system doesn't allow for bulk writes of files - likely a symptom of adding support for mutiple systems like Deno?
     await Promise.all([
+      await compiler.sys.writeFile(
+        config.tsconfig,
+        '{"extends": "../../../testing/tsconfig.internal.json"}'
+      ),
       await compiler.sys.writeFile(
         path.join(config.sys.getCompilerExecutingPath() + 'polyfills/index.js'),
         `/* polyfills */`
       ),
       await compiler.sys.writeFile(
-        path.join(root, 'User', 'testing', 'package.json'),
+        path.join(root, /*'User', 'testing',*/ 'package.json'),
         `{
         "module": "dist/index.mjs",
         "main": "dist/index.js",
@@ -37,9 +47,9 @@ describe('outputTarget, dist', () => {
         "types": "dist/types/components.d.ts"
       }`
       ),
-      await compiler.sys.writeFile(path.join(root, 'User', 'testing', 'src', 'index.html'), `<cmp-a></cmp-a>`),
+      await compiler.sys.writeFile(path.join(root, /*'User', 'testing',*/ 'src', 'index.html'), `<cmp-a></cmp-a>`),
       await compiler.sys.writeFile(
-        path.join(root, 'User', 'testing', 'src', 'components', 'cmp-a.tsx'),
+        path.join(root, /*'User', 'testing',*/ 'src', 'components', 'cmp-a.tsx'),
         `
         @Component({
           tag: 'cmp-a',
@@ -50,19 +60,20 @@ describe('outputTarget, dist', () => {
         }) export class CmpA {}`
       ),
       await compiler.sys.writeFile(
-        path.join(root, 'User', 'testing', 'src', 'components', 'cmp-a.ios.css'),
+        path.join(root, /*'User', 'testing',*/ 'src', 'components', 'cmp-a.ios.css'),
         `cmp-a { color: blue; }`
       ),
       await compiler.sys.writeFile(
-        path.join(root, 'User', 'testing', 'src', 'components', 'cmp-a.md.css'),
+        path.join(root, /*'User', 'testing',*/ 'src', 'components', 'cmp-a.md.css'),
         `cmp-a { color: green; }`
       ),
       await compiler.sys.writeFile(
-        path.join(root, 'User', 'testing', 'src', 'global.ts'),
+        path.join(root, /*'User', 'testing',*/ 'src', 'global.ts'),
         `export default function() { console.log('my global'); }`
       ),
     ]);
 
+    // ts.createWatchProgram(config)
     // Seems some config variable passed down within this command isn't passed down all the way
     // Causing a TypeError: Cannot read property 'extendedDiagnostics' of undefined
     const r = await compiler.build();
@@ -72,35 +83,35 @@ describe('outputTarget, dist', () => {
     // unsure what could be done about that right now.
     // unsure also where the assertion within this function lies
     expectFiles(compiler.sys, [
-      path.join(root, 'User', 'testing', 'dist', 'index.js'),
-      path.join(root, 'User', 'testing', 'dist', 'index.mjs'),
+      path.join(root, /*'User', 'testing',*/ 'dist', 'index.js'),
+      path.join(root, /*'User', 'testing',*/ 'dist', 'index.mjs'),
 
-      path.join(root, 'User', 'testing', 'dist', 'collection', 'collection-manifest.json'),
-      path.join(root, 'User', 'testing', 'dist', 'collection', 'components', 'cmp-a.js'),
-      path.join(root, 'User', 'testing', 'dist', 'collection', 'components', 'cmp-a.ios.css'),
-      path.join(root, 'User', 'testing', 'dist', 'collection', 'components', 'cmp-a.md.css'),
-      path.join(root, 'User', 'testing', 'dist', 'collection', 'global.js'),
+      path.join(root, /*'User', 'testing',*/ 'dist', 'collection', 'collection-manifest.json'),
+      path.join(root, /*'User', 'testing',*/ 'dist', 'collection', 'components', 'cmp-a.js'),
+      path.join(root, /*'User', 'testing',*/ 'dist', 'collection', 'components', 'cmp-a.ios.css'),
+      path.join(root, /*'User', 'testing',*/ 'dist', 'collection', 'components', 'cmp-a.md.css'),
+      path.join(root, /*'User', 'testing',*/ 'dist', 'collection', 'global.js'),
 
-      path.join(root, 'User', 'testing', 'dist', 'esm', 'index.mjs'),
-      path.join(root, 'User', 'testing', 'dist', 'esm', 'loader.mjs'),
-      path.join(root, 'User', 'testing', 'dist', 'esm-es5', 'index.mjs'),
-      path.join(root, 'User', 'testing', 'dist', 'esm-es5', 'loader.mjs'),
-      path.join(root, 'User', 'testing', 'dist', 'esm', 'polyfills', 'index.js'),
+      path.join(root, /*'User', 'testing',*/ 'dist', 'esm', 'index.mjs'),
+      path.join(root, /*'User', 'testing',*/ 'dist', 'esm', 'loader.mjs'),
+      path.join(root, /*'User', 'testing',*/ 'dist', 'esm-es5', 'index.mjs'),
+      path.join(root, /*'User', 'testing',*/ 'dist', 'esm-es5', 'loader.mjs'),
+      path.join(root, /*'User', 'testing',*/ 'dist', 'esm', 'polyfills', 'index.js'),
 
-      path.join(root, 'User', 'testing', 'dist', 'loader'),
+      path.join(root, /*'User', 'testing',*/ 'dist', 'loader'),
 
-      path.join(root, 'User', 'testing', 'dist', 'types'),
+      path.join(root, /*'User', 'testing',*/ 'dist', 'types'),
 
-      path.join(root, 'User', 'testing', 'src', 'components.d.ts'),
+      path.join(root, /*'User', 'testing',*/ 'src', 'components.d.ts'),
     ]);
 
     // unsure where the assertion within this function lies
     doNotExpectFiles(compiler.sys, [
-      path.join(root, 'User', 'testing', 'build'),
-      path.join(root, 'User', 'testing', 'esm'),
-      path.join(root, 'User', 'testing', 'es5'),
-      path.join(root, 'User', 'testing', 'www'),
-      path.join(root, 'User', 'testing', 'index.html'),
+      path.join(root, /*'User', 'testing',*/ 'build'),
+      path.join(root, /*'User', 'testing',*/ 'esm'),
+      path.join(root, /*'User', 'testing',*/ 'es5'),
+      path.join(root, /*'User', 'testing',*/ 'www'),
+      path.join(root, /*'User', 'testing',*/ 'index.html'),
     ]);
   });
 });

@@ -13,7 +13,10 @@ export function mockConfig(sys?: CompilerSystem) {
   const rootDir = path.resolve('/');
 
   if (!sys) {
+    console.log('creating a mock testing system')
     sys = createTestingSystem();
+  } else {
+    console.log('NOT creating a mock system')
   }
   sys.getCurrentDirectory = () => rootDir;
 

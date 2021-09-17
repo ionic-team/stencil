@@ -25,6 +25,7 @@ export const runTsProgram = async (
   buildCtx.diagnostics.push(...tsOptions);
 
   if (buildCtx.hasError) {
+    console.log('runTsProgram::buildCtx has Error after loading diagnostics')
     return false;
   }
 
@@ -32,8 +33,11 @@ export const runTsProgram = async (
 
   const tsTypeChecker = tsProgram.getTypeChecker();
   const typesOutputTarget = config.outputTargets.filter(isOutputTargetDistTypes);
+  console.log('runTsProgram::all outtargets', config.outputTargets)
+  console.log('runTsProgram::filtered outtargets', typesOutputTarget)
   const emittedDts: string[] = [];
   const emitCallback: ts.WriteFileCallback = (emitFilePath, data, _w, _e, tsSourceFiles) => {
+    console.log('runTsProgram::emitCallback::emitFilePath', emitFilePath)
     if (emitFilePath.endsWith('.js')) {
       updateModule(config, compilerCtx, buildCtx, tsSourceFiles[0], data, emitFilePath, tsTypeChecker, null);
     } else if (emitFilePath.endsWith('.d.ts')) {
@@ -41,6 +45,7 @@ export const runTsProgram = async (
       const relativeEmitFilepath = getRelativeDts(config, srcDtsPath, emitFilePath);
 
       emittedDts.push(srcDtsPath);
+      console.log('runTsProgram::relativeEmitFilepath',relativeEmitFilepath)
       typesOutputTarget.forEach((o) => {
         const distPath = join(o.typesDir, relativeEmitFilepath);
         data = updateStencilTypesImports(o.typesDir, distPath, data);
@@ -55,6 +60,7 @@ export const runTsProgram = async (
   });
 
   const changedmodules = Array.from(compilerCtx.changedModules.keys());
+  console.log('Transpiled modules: ' + JSON.stringify(changedmodules, null, '\n'))
   buildCtx.debug('Transpiled modules: ' + JSON.stringify(changedmodules, null, '\n'));
 
   // Finalize components metadata

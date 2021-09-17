@@ -21,6 +21,7 @@ export const createTestingSystem = () => {
   const wrapRead = (fn: any) => {
     const orgFn = fn;
     return (...args: any[]) => {
+      console.log('doing the wrapped read')
       diskReads++;
       return orgFn.apply(orgFn, args);
     };

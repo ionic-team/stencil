@@ -16,12 +16,14 @@ export const createCompiler = async (config: Config) => {
   // actual compiler code
   // could be in a web worker on the browser
   // or the main thread in node
+  console.log(config)
   config = getConfig(config);
   const diagnostics: Diagnostic[] = [];
   const sys = config.sys;
   const compilerCtx = new CompilerContext();
 
   if (isFunction(config.sys.setupCompiler)) {
+    console.log('I am setting up the compiler with setupCompiler')
     config.sys.setupCompiler({ ts });
   }
 

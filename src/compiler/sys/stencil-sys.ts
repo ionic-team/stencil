@@ -162,14 +162,20 @@ export const createSystem = (c?: { logger?: Logger }) => {
   const readDir = async (p: string) => readDirSync(p);
 
   const readFileSync = (p: string) => {
+    console.log('readFileSync file ', p)
+
     p = normalize(p);
+    console.log('normalized file is ', p)
     const item = items.get(p);
+    console.log('items keys are ', items.entries())
+    console.log('item is ', item, item?.isFile)
     if (item && item.isFile) {
       return item.data;
     }
     return undefined;
   };
 
+console.log('doing root readFile assign')
   const readFile = async (p: string) => readFileSync(p);
 
   const realpathSync = (p: string) => {
@@ -337,7 +343,14 @@ export const createSystem = (c?: { logger?: Logger }) => {
   const statSync = (p: string): CompilerFsStats => {
     p = normalize(p);
     const item = items.get(p);
+    console.log('stencil-sys::here be items', items.entries())
+    console.log('stencil-sys::here be items keys', Array.from(items.keys()).sort())
+    console.log('stencil-sys:: p', p);
+    console.log('stencil-sys::is item?', item);
+    console.log('stencil-sys::isDirectory', item?.isDirectory, 'isFile', item?.isFile, 'is data string', item?.data)
     if (item && (item.isDirectory || (item.isFile && typeof item.data === 'string'))) {
+      console.log('stencil-sys::getting a no error back for p', p)
+
       return {
         isDirectory: item.isDirectory,
         isFile: item.isFile,
@@ -346,6 +359,7 @@ export const createSystem = (c?: { logger?: Logger }) => {
         error: null,
       };
     }
+    console.log('getting an error back for p', p)
     return {
       isDirectory: false,
       isFile: false,
@@ -476,6 +490,7 @@ export const createSystem = (c?: { logger?: Logger }) => {
   };
 
   const writeFileSync = (p: string, data: string) => {
+    console.log('stencil-sys::writing file', p)
     p = normalize(p);
     const results: CompilerSystemWriteFileResults = {
       path: p,

@@ -22,6 +22,7 @@ export const generateAppTypes = async (
   let componentTypesFileContent = generateComponentTypesFile(config, buildCtx, internal);
 
   // immediately write the components.d.ts file to disk and put it into fs memory
+  console.log('generateAppTypes::ryanfs::gonna write ', config)
   let componentsDtsFilePath = getComponentsDtsSrcFilePath(config);
 
   if (!internal) {

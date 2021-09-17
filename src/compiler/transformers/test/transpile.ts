@@ -63,7 +63,7 @@ export function transpileModule(
     getCurrentDirectory: () => '',
     getNewLine: () => '',
     fileExists: (fileName) => fileName === inputFileName,
-    readFile: () => '',
+    readFile: () => 'SENTINEL: test-transpile',
     directoryExists: () => true,
     getDirectories: () => [],
   };

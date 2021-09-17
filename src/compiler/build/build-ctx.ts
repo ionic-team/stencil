@@ -85,7 +85,7 @@ export class BuildContext implements d.BuildCtx {
 
     // debug log our new build
     this.debug(`start build, ${this.timestamp}`);
-
+    console.log('BuildContext::start::msg', msg)
     const buildStart: d.CompilerBuildStart = {
       buildId: this.buildId,
       timestamp: this.timestamp,

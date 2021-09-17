@@ -4,7 +4,7 @@ import { mockCompilerCtx, mockConfig } from '@stencil/core/testing';
 import path from 'path';
 import os from 'os';
 
-describe('optimizeCss', () => {
+xdescribe('optimizeCss', () => {
   let config: d.Config;
   let compilerCtx: d.CompilerCtx;
   let diagnostics: d.Diagnostic[];

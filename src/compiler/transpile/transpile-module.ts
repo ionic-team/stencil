@@ -87,7 +87,7 @@ export const transpileModule = (config: d.Config, input: string, transformOpts: 
     getCurrentDirectory: () => transformOpts.currentDirectory || getCurrentDirectory(),
     getNewLine: () => ts.sys.newLine || '\n',
     fileExists: (fileName) => normalizePath(fileName) === normalizePath(sourceFilePath),
-    readFile: () => '',
+    readFile: () => 'SENTINEL transpile-module',
     directoryExists: () => true,
     getDirectories: () => [],
   };

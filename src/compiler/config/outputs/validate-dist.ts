@@ -15,9 +15,14 @@ import { isBoolean, isString } from '@utils';
 import { validateCopy } from '../validate-copy';
 
 export const validateDist = (config: d.Config, userOutputs: d.OutputTarget[]) => {
+  console.log('validateDist::userOutputs', userOutputs)
   const distOutputTargets = userOutputs.filter(isOutputTargetDist);
+  console.log('validateDist::distOutputTargets', distOutputTargets)
   return distOutputTargets.reduce((outputs, o) => {
+    console.log('validateDist::distOutputTargets::reduce::o', o)
     const distOutputTarget = validateOutputTargetDist(config, o);
+    console.log('validateDist::distOutputTargets::reduce::distOutputTarget', distOutputTarget)
+
     outputs.push(distOutputTarget);
 
     const namespace = config.fsNamespace || 'app';

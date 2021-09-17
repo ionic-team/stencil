@@ -23,11 +23,17 @@ export function shuffleArray(array: any[]) {
   return array;
 }
 
-export function expectFiles(sys: d.InMemoryFileSystem, filePaths: string[]) {
-  filePaths.forEach((filePath) => {
-    // I think this could use promises
-    sys.statSync(filePath);
-  });
+/**
+ * Testing utility that ensures each of the provided `filePaths` exist
+ * @param sys the filesystem implementation to use in checking for each file
+ * @param filePaths the files to verify the existence of
+ */
+export function expectFiles(sys: d.InMemoryFileSystem, filePaths: string[]): ReadonlyArray<{
+  exists: boolean;
+  isFile: boolean;
+  isDirectory: boolean;
+}> {
+  return filePaths.map((filePath) => sys.statSync(filePath));
 }
 
 export function doNotExpectFiles(sys: d.InMemoryFileSystem, filePaths: string[]) {

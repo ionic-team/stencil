@@ -68,6 +68,7 @@ export const readdirSync = (fs.readdirSync = (p: string) => {
 });
 
 export const readFile = (fs.readFile = async (p: string, opts: any, cb: (err: any, data?: string) => void) => {
+  console.log('SENTINEL base readfile', p, opts)
   const encoding = typeof opts === 'object' ? opts.encoding : typeof opts === 'string' ? opts : 'utf-8';
   cb = typeof cb === 'function' ? cb : typeof opts === 'function' ? opts : null;
   fs.__sys
@@ -87,6 +88,7 @@ export const readFile = (fs.readFile = async (p: string, opts: any, cb: (err: an
 });
 
 export const readFileSync = (fs.readFileSync = (p: string, opts: any) => {
+  console.log('in readFileSync', p, opts)
   const encoding = typeof opts === 'object' ? opts.encoding : typeof opts === 'string' ? opts : 'utf-8';
   const data = fs.__sys.readFileSync(p, encoding);
   if (typeof data !== 'string') {

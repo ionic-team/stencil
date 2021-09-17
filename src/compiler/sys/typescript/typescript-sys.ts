@@ -187,7 +187,7 @@ const patchTypeScriptSysMinimum = () => {
       getDirectories: () => [],
       getExecutingFilePath: () => './',
       readDirectory: () => [],
-      readFile: noop,
+      readFile: () => {          console.log('SENTINEL typescript-sys was no-op'); return  '';},
       newLine: '\n',
       resolvePath: resolve,
       useCaseSensitiveFileNames: false,

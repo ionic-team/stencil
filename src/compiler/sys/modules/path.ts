@@ -20,6 +20,7 @@ export let win32: any;
 export const path: d.PlatformPath = {} as any;
 
 export const setPlatformPath = (platformPath: d.PlatformPath) => {
+  console.log('here is the platform path', platformPath)
   if (!platformPath) {
     platformPath = pathBrowserify;
   }

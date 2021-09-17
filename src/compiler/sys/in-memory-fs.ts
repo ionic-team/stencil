@@ -221,6 +221,7 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
   };
 
   const readFile = async (filePath: string, opts?: d.FsReadOptions) => {
+    console.log('SENTINEL: readFile createInMemSys')
     if (opts == null || opts.useCache === true || opts.useCache === undefined) {
       const item = getItem(filePath);
       if (item.exists && typeof item.fileText === 'string') {

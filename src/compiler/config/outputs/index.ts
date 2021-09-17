@@ -25,6 +25,8 @@ export const validateOutputTargets = (config: d.Config, diagnostics: d.Diagnosti
     }
   });
 
+  console.log('validateOutputTargets::userOutputs looped', diagnostics.length, diagnostics)
+
   config.outputTargets = [
     ...validateCollection(config, userOutputs),
     ...validateCustomElement(config, userOutputs),
