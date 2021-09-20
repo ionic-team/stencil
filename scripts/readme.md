@@ -18,6 +18,6 @@ release.
 5. Publish the release notes in GitHub
 6. Navigate to the [Stencil Site](https://github.com/ionic-team/stencil-site/pulls) repository and merge and PRs 
    containing documentation that has been approved, but not merged that is related to the release. Such PRs should be
-   labelled as `do not merge: waiting for next stencil release`. It's a good idea to review _all_ PRs through, just in
+   labelled as `do not merge: waiting for next stencil release`. It's a good idea to review _all_ PRs though, just in
    case :wink:
 7. :tada:
