@@ -1,5 +1,6 @@
 import type * as d from '../../../declarations';
 import { join } from 'path';
+import { getSourceMappingUrlForEndOfFile } from '@utils';
 
 export const writeLazyModule = async (
   config: d.Config,
@@ -18,7 +19,7 @@ export const writeLazyModule = async (
   const fileName = `${bundleId}.entry.js`;
 
   if (sourceMap) {
-    code = code + '\n//# sourceMappingURL=' + fileName + '.map';
+    code = code + getSourceMappingUrlForEndOfFile(fileName);
   }
 
   await Promise.all(

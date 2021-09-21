@@ -5,6 +5,7 @@ import {
   catchError,
   dashToPascalCase,
   formatComponentRuntimeMeta,
+  getSourceMappingUrlForEndOfFile,
   hasError,
   rollupToStencilSourceMap,
   stringifyRuntimeData,
@@ -89,7 +90,7 @@ const bundleCustomElements = async (
             sourceMap = optimizeResults.sourceMap;
           }
           if (sourceMap) {
-            code = code + '\n//# sourceMappingURL=' + bundle.fileName + '.map';
+            code = code + getSourceMappingUrlForEndOfFile(bundle.fileName);
             await compilerCtx.fs.writeFile(
               join(outputTarget.dir, bundle.fileName + '.map'),
               JSON.stringify(sourceMap),
