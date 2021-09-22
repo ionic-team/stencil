@@ -76,6 +76,8 @@ export const outputLazy = async (config: d.Config, compilerCtx: d.CompilerCtx, b
           buildCtx.es5ComponentBundle = result.buildCtx.es5ComponentBundle;
         } else if (result.name === 'esm-browser') {
           buildCtx.esmBrowserComponentBundle = result.buildCtx.esmBrowserComponentBundle;
+          buildCtx.buildResults = result.buildCtx.buildResults;
+          buildCtx.components = result.buildCtx.components;
         }
       });
 
