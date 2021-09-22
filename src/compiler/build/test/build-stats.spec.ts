@@ -18,16 +18,20 @@ describe('generateBuildStats', () => {
   it('should return a structured json object', async () => {
     buildCtx.buildResults = generateBuildResults(config, compilerCtx, buildCtx);
 
-    const result = generateBuildStats(config, buildCtx);
+    const result: d.CompilerBuildStats = generateBuildStats(config, buildCtx);
 
     if (result.hasOwnProperty('timestamp')) {
       delete result.timestamp;
     }
 
+    if (result.hasOwnProperty('compiler') && result.compiler.hasOwnProperty('version')) {
+      delete result.compiler.version;
+    }
+
     expect(result).toStrictEqual({
       app: { bundles: 0, components: 0, entries: 0, fsNamespace: undefined, namespace: 'Testing', outputs: [] },
       collections: [],
-      compiler: { name: 'in-memory', version: '0.0.0-dev.20210827160156' },
+      compiler: { name: 'in-memory' },
       componentGraph: {},
       components: [],
       entries: [],
