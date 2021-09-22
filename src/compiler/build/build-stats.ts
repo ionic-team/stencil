@@ -3,7 +3,7 @@ import type * as d from '../../declarations';
 import { isOutputTargetStats } from '../output-targets/output-utils';
 
 /**
- * Generates the Build Stats from the buildCtx. Writes any files to the file system. 
+ * Generates the Build Stats from the buildCtx. Writes any files to the file system.
  * @param config the project build configuration
  * @param buildCtx An instance of the build which holds the details about the build
  * @returns CompilerBuildStats or an Object including diagnostics.
