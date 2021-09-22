@@ -3,7 +3,7 @@ import type * as d from '../../declarations';
 import { isOutputTargetStats } from '../output-targets/output-utils';
 
 /**
- *
+ * Generates the Build Stats from the buildCtx. Writes any files to the file system. 
  * @param config the project build configuration
  * @param buildCtx An instance of the build which holds the details about the build
  * @returns CompilerBuildStats or an Object including diagnostics.
@@ -70,7 +70,7 @@ export function generateBuildStats(
 }
 
 /**
- *
+ * Writes the files from the stats config to the file system
  * @param config the project build configuration
  * @param buildCtx An instance of the build which holds the details about the build
  * @returns
@@ -83,7 +83,7 @@ export async function writeBuildStats(config: d.Config, data: d.CompilerBuildSta
       const result = await config.sys.writeFile(outputTarget.file, JSON.stringify(data, null, 2));
 
       if (result.error) {
-        config.logger.warn([`Stats failed to write file to ${outputTarget.file}: ${result.error}`]);
+        config.logger.warn([`Stats failed to write file to ${outputTarget.file}`]);
       }
     })
   );

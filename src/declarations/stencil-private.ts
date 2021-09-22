@@ -197,6 +197,11 @@ export interface RollupResults {
   modules: RollupResultModule[];
 }
 
+export interface UpdatedBuildCtx {
+  name: 'esm-browser' | 'esm' | 'cjs' | 'system';
+  buildCtx: BuildCtx;
+}
+
 export interface BuildCtx {
   buildId: number;
   buildResults: CompilerBuildResults;

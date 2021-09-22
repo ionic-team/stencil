@@ -10,7 +10,7 @@ export const generateEsmBrowser = async (
   buildCtx: d.BuildCtx,
   rollupBuild: RollupBuild,
   outputTargets: d.OutputTargetDistLazy[]
-): Promise<d.BuildCtx> => {
+): Promise<d.UpdatedBuildCtx> => {
   const esmOutputs = outputTargets.filter((o) => !!o.esmDir && !!o.isBrowserBuild);
   if (esmOutputs.length) {
     const outputTargetType = esmOutputs[0].type;
@@ -42,5 +42,6 @@ export const generateEsmBrowser = async (
       );
     }
   }
-  return buildCtx;
+
+  return { name: 'esm-browser', buildCtx };
 };

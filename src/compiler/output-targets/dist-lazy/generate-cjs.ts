@@ -11,7 +11,7 @@ export const generateCjs = async (
   buildCtx: d.BuildCtx,
   rollupBuild: RollupBuild,
   outputTargets: d.OutputTargetDistLazy[]
-): Promise<d.BuildCtx> => {
+): Promise<d.UpdatedBuildCtx> => {
   const cjsOutputs = outputTargets.filter((o) => !!o.cjsDir);
 
   if (cjsOutputs.length > 0) {
@@ -42,7 +42,7 @@ export const generateCjs = async (
     }
   }
 
-  return buildCtx;
+  return { name: 'cjs', buildCtx };
 };
 
 const generateShortcuts = (

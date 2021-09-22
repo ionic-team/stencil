@@ -12,7 +12,7 @@ export const generateSystem = async (
   buildCtx: d.BuildCtx,
   rollupBuild: RollupBuild,
   outputTargets: d.OutputTargetDistLazy[]
-): Promise<d.BuildCtx> => {
+): Promise<d.UpdatedBuildCtx> => {
   const systemOutputs = outputTargets.filter((o) => !!o.systemDir);
 
   if (systemOutputs.length > 0) {
@@ -42,7 +42,7 @@ export const generateSystem = async (
     }
   }
 
-  return buildCtx;
+  return { name: 'system', buildCtx };
 };
 
 const generateSystemLoaders = (
