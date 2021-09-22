@@ -197,7 +197,7 @@ export interface RollupResults {
   modules: RollupResultModule[];
 }
 
-export interface UpdatedBuildCtx {
+export interface UpdatedLazyBuildCtx {
   name: 'esm-browser' | 'esm' | 'cjs' | 'system';
   buildCtx: BuildCtx;
 }

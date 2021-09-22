@@ -11,7 +11,7 @@ export const generateCjs = async (
   buildCtx: d.BuildCtx,
   rollupBuild: RollupBuild,
   outputTargets: d.OutputTargetDistLazy[]
-): Promise<d.UpdatedBuildCtx> => {
+): Promise<d.UpdatedLazyBuildCtx> => {
   const cjsOutputs = outputTargets.filter((o) => !!o.cjsDir);
 
   if (cjsOutputs.length > 0) {

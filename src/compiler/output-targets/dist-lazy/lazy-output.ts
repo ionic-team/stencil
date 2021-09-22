@@ -59,7 +59,7 @@ export const outputLazy = async (config: d.Config, compilerCtx: d.CompilerCtx, b
 
     const rollupBuild = await bundleOutput(config, compilerCtx, buildCtx, bundleOpts);
     if (rollupBuild != null) {
-      const results: d.UpdatedBuildCtx[] = await Promise.all([
+      const results: d.UpdatedLazyBuildCtx[] = await Promise.all([
         generateEsmBrowser(config, compilerCtx, buildCtx, rollupBuild, outputTargets),
         generateEsm(config, compilerCtx, buildCtx, rollupBuild, outputTargets),
         generateSystem(config, compilerCtx, buildCtx, rollupBuild, outputTargets),
