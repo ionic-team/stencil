@@ -29,10 +29,11 @@ export const outputCollection = async (
             const filePath = join(o.collectionDir, relPath);
             await compilerCtx.fs.writeFile(filePath, code, { outputTargetType: o.type });
 
-            if (!mod.sourceMapPath) return;
-            const relMapPath = relative(config.srcDir, mod.sourceMapPath);
-            const mapFilePath = join(o.collectionDir, relMapPath);
-            await compilerCtx.fs.writeFile(mapFilePath, mapCode, { outputTargetType: o.type });
+            if (mod.sourceMapPath) {
+              const relativeSourceMapPath = relative(config.srcDir, mod.sourceMapPath);
+              const sourceMapOutputFilePath = join(o.collectionDir, relativeSourceMapPath);
+              await compilerCtx.fs.writeFile(sourceMapOutputFilePath, mapCode, { outputTargetType: o.type });
+            }
           })
         );
       })
