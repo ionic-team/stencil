@@ -18,7 +18,11 @@ import { removeCollectionImports } from '../../transformers/remove-collection-im
 import { STENCIL_INTERNAL_CLIENT_ID, USER_INDEX_ENTRY_ID, STENCIL_APP_GLOBALS_ID } from '../../bundle/entry-alias-ids';
 import { updateStencilCoreImports } from '../../transformers/update-stencil-core-import';
 
-export const outputCustomElements = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
+export const outputCustomElements = async (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  buildCtx: d.BuildCtx
+): Promise<void> => {
   if (!config.buildDist) {
     return;
   }
@@ -28,11 +32,12 @@ export const outputCustomElements = async (config: d.Config, compilerCtx: d.Comp
     return;
   }
 
-  const timespan = buildCtx.createTimeSpan(`generate custom elements started`);
+  const bundlingEventMessage = 'generate custom elements started';
+  const timespan = buildCtx.createTimeSpan(bundlingEventMessage);
 
   await Promise.all(outputTargets.map((o) => bundleCustomElements(config, compilerCtx, buildCtx, o)));
 
-  timespan.finish(`generate custom elements finished`);
+  timespan.finish(bundlingEventMessage);
 };
 
 const bundleCustomElements = async (
