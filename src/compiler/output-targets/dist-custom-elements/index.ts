@@ -33,11 +33,11 @@ export const outputCustomElements = async (
   }
 
   const bundlingEventMessage = 'generate custom elements';
-  const timespan = buildCtx.createTimeSpan(${bundlingEventMessage} started);
+  const timespan = buildCtx.createTimeSpan(`${bundlingEventMessage} started`);
 
   await Promise.all(outputTargets.map((o) => bundleCustomElements(config, compilerCtx, buildCtx, o)));
 
-  timespan.finish(${bundlingEventMessage} finished);
+  timespan.finish(`${bundlingEventMessage} finished`);
 };
 
 const bundleCustomElements = async (
