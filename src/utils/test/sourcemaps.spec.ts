@@ -1,4 +1,4 @@
-import { rollupToStencilSourceMap } from '@utils';
+import { getSourceMappingUrlLinker, getSourceMappingUrlForEndOfFile, rollupToStencilSourceMap } from '@utils';
 import { SourceMap as RollupSourceMap } from 'rollup';
 import type * as d from '../../declarations';
 
@@ -39,6 +39,18 @@ describe('sourcemaps', () => {
         version: 3,
       };
       expect(stencilSourceMap).toEqual(expectedSourceMap);
+    });
+  });
+
+  describe('getSourceMappingUrlLinker', () => {
+    it('returns a correctly formatted url', () => {
+      expect(getSourceMappingUrlLinker('some-pkg')).toBe('//# sourceMappingURL=some-pkg');
+    });
+  });
+
+  describe('getSourceMappingUrlLinkerWithNewline', () => {
+    it('returns a correctly formatted url', () => {
+      expect(getSourceMappingUrlForEndOfFile('some-pkg')).toBe('\n//# sourceMappingURL=some-pkg.map');
     });
   });
 });

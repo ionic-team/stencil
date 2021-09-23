@@ -1,6 +1,12 @@
 import type * as d from '../../../declarations';
 import { writeLazyModule } from './write-lazy-entry-module';
-import { formatComponentRuntimeMeta, stringifyRuntimeData, hasDependency, rollupToStencilSourceMap } from '@utils';
+import {
+  formatComponentRuntimeMeta,
+  stringifyRuntimeData,
+  hasDependency,
+  rollupToStencilSourceMap,
+  getSourceMappingUrlForEndOfFile,
+} from '@utils';
 import { optimizeModule } from '../../optimize/optimize-module';
 import { join } from 'path';
 import type { SourceMap as RollupSourceMap } from 'rollup';
@@ -167,7 +173,7 @@ const writeLazyChunk = async (
       const filePath = join(dst, rollupResult.fileName);
       let fileCode = code;
       if (rollupResult.map) {
-        fileCode = code + '\n//# sourceMappingURL=' + rollupResult.fileName + '.map';
+        fileCode = code + getSourceMappingUrlForEndOfFile(rollupResult.fileName);
         compilerCtx.fs.writeFile(filePath + '.map', JSON.stringify(sourceMap), { outputTargetType });
       }
       compilerCtx.fs.writeFile(filePath, fileCode, { outputTargetType });
@@ -208,7 +214,7 @@ const writeLazyEntry = async (
       const filePath = join(dst, rollupResult.fileName);
       let fileCode = code;
       if (sourceMap) {
-        fileCode = code + '\n//# sourceMappingURL=' + rollupResult.fileName + '.map';
+        fileCode = code + getSourceMappingUrlForEndOfFile(rollupResult.fileName);
         compilerCtx.fs.writeFile(filePath + '.map', JSON.stringify(sourceMap), { outputTargetType });
       }
       return compilerCtx.fs.writeFile(filePath, fileCode, { outputTargetType });
