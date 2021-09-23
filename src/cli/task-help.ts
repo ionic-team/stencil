@@ -1,10 +1,7 @@
-import { getCompilerSystem, getLogger } from './state/stencil-cli-config';
+import type * as d from '../declarations';
 import { taskTelemetry } from './task-telemetry';
 
-export const taskHelp = async () => {
-  const logger = getLogger();
-  const sys = getCompilerSystem();
-
+export const taskHelp = async (config: d.Config, sys: d.CompilerSystem, logger: d.Logger) => {
   const prompt = logger.dim(sys.details.platform === 'windows' ? '>' : '$');
 
   console.log(`
@@ -37,7 +34,7 @@ export const taskHelp = async () => {
 
 `);
 
-  await taskTelemetry();
+  await taskTelemetry(config, sys, logger);
 
   console.log(`
   ${logger.bold('Examples:')}

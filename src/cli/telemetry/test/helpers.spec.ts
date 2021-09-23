@@ -1,54 +1,62 @@
-import { getStencilCLIConfig, initializeStencilCLIConfig } from '../../state/stencil-cli-config';
 import { isInteractive, TERMINAL_INFO, tryFn, uuidv4, hasDebug, hasVerbose } from '../helpers';
-import { createSystem } from '../../../compiler/sys/stencil-sys';
-import { mockLogger } from '@stencil/core/testing';
+import { mockLogger, createSystem } from '@stencil/core/testing';
 
 describe('hasDebug', () => {
   it('Returns true when a flag is passed', () => {
-    getStencilCLIConfig().flags = {
-      debug: true,
-      verbose: false,
+    const config = {
+      flags: {
+        debug: true,
+        verbose: false,
+      },
     };
 
-    expect(hasDebug()).toBe(true);
+    expect(hasDebug(config)).toBe(true);
   });
 
   it('Returns false when a flag is not passed', () => {
-    getStencilCLIConfig().flags = {
-      debug: false,
-      verbose: false,
+    const config = {
+      flags: {
+        debug: false,
+        verbose: false,
+      },
     };
 
-    expect(hasDebug()).toBe(false);
+    expect(hasDebug(config)).toBe(false);
   });
 });
 
 describe('hasVerbose', () => {
   it('Returns true when both flags are passed', () => {
-    getStencilCLIConfig().flags = {
-      debug: true,
-      verbose: true,
+    const config = {
+      flags: {
+        debug: true,
+        verbose: true,
+      },
     };
 
-    expect(hasVerbose()).toBe(true);
+    expect(hasVerbose(config)).toBe(true);
   });
 
   it('Returns false when the verbose flag is passed, and debug is not', () => {
-    getStencilCLIConfig().flags = {
-      debug: false,
-      verbose: true,
+    const config = {
+      flags: {
+        debug: false,
+        verbose: true,
+      },
     };
 
-    expect(hasVerbose()).toBe(false);
+    expect(hasVerbose(config)).toBe(false);
   });
 
   it('Returns false when the flag is not passed', () => {
-    getStencilCLIConfig().flags = {
-      debug: false,
-      verbose: false,
+    const config = {
+      flags: {
+        debug: false,
+        verbose: false,
+      },
     };
 
-    expect(hasVerbose()).toBe(false);
+    expect(hasVerbose(config)).toBe(false);
   });
 });
 
@@ -61,29 +69,25 @@ describe('uuidv4', () => {
 });
 
 describe('isInteractive', () => {
-  initializeStencilCLIConfig({
-    sys: createSystem(),
-    logger: mockLogger(),
-    args: [],
-  });
+  const sys = createSystem();
 
   it('returns false by default', () => {
-    const result = isInteractive();
+    const result = isInteractive(sys, {});
     expect(result).toBe(false);
   });
 
   it('returns false when tty is false', () => {
-    const result = isInteractive({ ci: true, tty: false });
+    const result = isInteractive(sys, { flags: { ci: true } }, { ci: true, tty: false });
     expect(result).toBe(false);
   });
 
   it('returns false when ci is true', () => {
-    const result = isInteractive({ ci: true, tty: true });
+    const result = isInteractive(sys, { flags: { ci: true } }, { ci: true, tty: true });
     expect(result).toBe(false);
   });
 
   it('returns true when tty is true and ci is false', () => {
-    const result = isInteractive({ ci: false, tty: true });
+    const result = isInteractive(sys, { flags: { ci: false } }, { ci: false, tty: true });
     expect(result).toBe(true);
   });
 });

@@ -1,4 +1,3 @@
-import { TaskCommand } from 'src/cli/public';
 import type {
   BuildEvents,
   BuildLog,
@@ -23,6 +22,7 @@ import type {
   PrerenderConfig,
   StyleDoc,
   LoggerLineUpdater,
+  TaskCommand,
 } from './stencil-public-compiler';
 
 import type {

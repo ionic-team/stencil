@@ -1,7 +1,4 @@
-import { getCompilerSystem, getStencilCLIConfig } from '../state/stencil-cli-config';
 import type * as d from '../../declarations';
-
-export declare const TERMINAL_INFO: d.TerminalInfo;
 
 export const tryFn = async <T extends (...args: any[]) => Promise<R>, R>(fn: T, ...args: any[]): Promise<R | null> => {
   try {
@@ -13,15 +10,17 @@ export const tryFn = async <T extends (...args: any[]) => Promise<R>, R>(fn: T, 
   return null;
 };
 
-export const isInteractive = (object?: d.TerminalInfo): boolean => {
+export declare const TERMINAL_INFO: d.TerminalInfo;
+
+export const isInteractive = (sys: d.CompilerSystem, config: d.Config, object?: d.TerminalInfo): boolean => {
   const terminalInfo =
     object ||
     Object.freeze({
-      tty: getCompilerSystem().isTTY() ? true : false,
+      tty: sys.isTTY() ? true : false,
       ci:
         ['CI', 'BUILD_ID', 'BUILD_NUMBER', 'BITBUCKET_COMMIT', 'CODEBUILD_BUILD_ARN'].filter(
-          (v) => !!getCompilerSystem().getEnvironmentVar(v)
-        ).length > 0 || !!getStencilCLIConfig()?.flags?.ci,
+          (v) => !!sys.getEnvironmentVar(v)
+        ).length > 0 || !!config?.flags?.ci,
     });
 
   return terminalInfo.tty && !terminalInfo.ci;
@@ -44,15 +43,15 @@ export function uuidv4(): string {
  * @param path the path on the file system to read and parse
  * @returns the parsed JSON
  */
-export async function readJson(path: string): Promise<any> {
-  const file = await getCompilerSystem().readFile(path);
+export async function readJson(sys: d.CompilerSystem, path: string): Promise<any> {
+  const file = await sys.readFile(path);
   return !!file && JSON.parse(file);
 }
 
-export function hasDebug() {
-  return getStencilCLIConfig().flags.debug;
+export function hasDebug(config: d.Config) {
+  return config.flags.debug;
 }
 
-export function hasVerbose() {
-  return getStencilCLIConfig().flags.verbose && hasDebug();
+export function hasVerbose(config: d.Config) {
+  return config.flags.verbose && hasDebug(config);
 }
