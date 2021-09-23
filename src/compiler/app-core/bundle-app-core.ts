@@ -1,5 +1,5 @@
 import type * as d from '../../declarations';
-import { OutputOptions, RollupBuild } from 'rollup';
+import type { OutputAsset, OutputChunk, OutputOptions, RollupBuild } from 'rollup';
 import { STENCIL_CORE_ID } from '../bundle/entry-alias-ids';
 
 export const generateRollupOutput = async (
@@ -12,8 +12,8 @@ export const generateRollupOutput = async (
     return null;
   }
 
-  const { output } = await build.generate(options);
-  return output.map((chunk) => {
+  const { output }: { output: [OutputChunk, ...(OutputChunk | OutputAsset)[]] } = await build.generate(options);
+  return output.map((chunk: OutputChunk | OutputAsset) => {
     if (chunk.type === 'chunk') {
       const isCore = Object.keys(chunk.modules).some((m) => m.includes('@stencil/core'));
       return {
