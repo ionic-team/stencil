@@ -1,5 +1,6 @@
 import { isInteractive, TERMINAL_INFO, tryFn, uuidv4, hasDebug, hasVerbose } from '../helpers';
-import { mockLogger, createSystem } from '@stencil/core/testing';
+import { mockLogger } from '@stencil/core/testing';
+import { createSystem } from '../../../compiler/sys/stencil-sys';
 
 describe('hasDebug', () => {
   it('Returns true when a flag is passed', () => {
@@ -72,7 +73,7 @@ describe('isInteractive', () => {
   const sys = createSystem();
 
   it('returns false by default', () => {
-    const result = isInteractive(sys, {});
+    const result = isInteractive(sys, { flags: { ci: false } }, { ci: false, tty: false });
     expect(result).toBe(false);
   });
 
