@@ -1,3 +1,4 @@
+import { TaskCommand } from 'src/cli/public';
 import type {
   BuildEvents,
   BuildLog,
@@ -2483,4 +2484,59 @@ export interface ValidateTypesResults {
   diagnostics: Diagnostic[];
   dirPaths: string[];
   filePaths: string[];
+}
+
+export interface TerminalInfo {
+  /**
+   * Whether this is in CI or not.
+   */
+  readonly ci: boolean;
+  /**
+   * Whether the terminal is an interactive TTY or not.
+   */
+  readonly tty: boolean;
+}
+
+/**
+ * The task to run in order to collect the duration data point.
+ */
+export type TelemetryCallback = (...args: any[]) => void | Promise<void>;
+
+/**
+ * The model for the data that's tracked.
+ */
+export interface TrackableData {
+  yarn: boolean;
+  component_count?: number;
+  arguments: string[];
+  targets: string[];
+  task: TaskCommand;
+  duration_ms: number;
+  packages: string[];
+  packages_no_versions?: string[];
+  os_name: string;
+  os_version: string;
+  cpu_model: string;
+  typescript: string;
+  rollup: string;
+  system: string;
+  system_major?: string;
+  build: string;
+  stencil: string;
+  has_app_pwa_config: boolean;
+}
+
+/**
+ * Used as the object sent to the server. Value is the data tracked.
+ */
+export interface Metric {
+  name: string;
+  timestamp: string;
+  source: 'stencil_cli';
+  value: TrackableData;
+  session_id: string;
+}
+export interface TelemetryConfig {
+  'telemetry.stencil'?: boolean;
+  'tokens.telemetry'?: string;
 }

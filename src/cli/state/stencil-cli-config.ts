@@ -1,26 +1,26 @@
-import type { Logger, CompilerSystem, ConfigFlags, LoadConfigResults } from '../../declarations';
+import type * as d from '../../declarations';
 export type CoreCompiler = typeof import('@stencil/core/compiler');
 
 export interface StencilCLIConfigArgs {
   task?: string;
   args: string[];
-  logger: Logger;
-  sys: CompilerSystem;
-  flags?: ConfigFlags;
+  logger: d.Logger;
+  sys: d.CompilerSystem;
+  flags?: d.ConfigFlags;
   coreCompiler?: CoreCompiler;
-  validatedConfig?: LoadConfigResults;
+  validatedConfig?: d.LoadConfigResults;
 }
 
 export default class StencilCLIConfig {
   static instance: StencilCLIConfig;
 
   private _args: string[];
-  private _logger: Logger;
-  private _sys: CompilerSystem;
-  private _flags: ConfigFlags | undefined;
+  private _logger: d.Logger;
+  private _sys: d.CompilerSystem;
+  private _flags: d.ConfigFlags | undefined;
   private _task: string | undefined;
   private _coreCompiler: CoreCompiler | undefined;
-  private _validatedConfig: LoadConfigResults | undefined;
+  private _validatedConfig: d.LoadConfigResults | undefined;
 
   private constructor(options: StencilCLIConfigArgs) {
     this._args = options?.args || [];
@@ -45,14 +45,14 @@ export default class StencilCLIConfig {
   public get logger() {
     return this._logger;
   }
-  public set logger(logger: Logger) {
+  public set logger(logger: d.Logger) {
     this._logger = logger;
   }
 
   public get sys() {
     return this._sys;
   }
-  public set sys(sys: CompilerSystem) {
+  public set sys(sys: d.CompilerSystem) {
     this._sys = sys;
   }
 
@@ -73,7 +73,7 @@ export default class StencilCLIConfig {
   public get flags() {
     return this._flags;
   }
-  public set flags(flags: ConfigFlags) {
+  public set flags(flags: d.ConfigFlags) {
     this._flags = flags;
   }
 
@@ -87,7 +87,7 @@ export default class StencilCLIConfig {
   public get validatedConfig() {
     return this._validatedConfig;
   }
-  public set validatedConfig(validatedConfig: LoadConfigResults) {
+  public set validatedConfig(validatedConfig: d.LoadConfigResults) {
     this._validatedConfig = validatedConfig;
   }
 }
@@ -100,11 +100,11 @@ export function getStencilCLIConfig(): StencilCLIConfig {
   return StencilCLIConfig.getInstance();
 }
 
-export function getCompilerSystem(): CompilerSystem {
+export function getCompilerSystem(): d.CompilerSystem {
   return getStencilCLIConfig().sys;
 }
 
-export function getLogger(): Logger {
+export function getLogger(): d.Logger {
   return getStencilCLIConfig().logger;
 }
 

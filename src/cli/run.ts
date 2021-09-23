@@ -1,4 +1,4 @@
-import type { CliInitOptions, Config, TaskCommand } from '../declarations';
+import type * as d from '../declarations';
 import { dependencies } from '../compiler/sys/dependencies.json';
 import { findConfig } from './find-config';
 import { hasError, isFunction, shouldIgnoreError } from '@utils';
@@ -17,7 +17,7 @@ import { initializeStencilCLIConfig } from './state/stencil-cli-config';
 import { taskTelemetry } from './task-telemetry';
 import { telemetryAction } from './telemetry/telemetry';
 
-export const run = async (init: CliInitOptions) => {
+export const run = async (init: d.CliInitOptions) => {
   const { args, logger, sys } = init;
 
   // Initialize the singleton so we can use this throughout the lifecycle of the CLI.
@@ -123,7 +123,7 @@ export const run = async (init: CliInitOptions) => {
   }
 };
 
-export const runTask = async (coreCompiler: CoreCompiler, config: Config, task: TaskCommand) => {
+export const runTask = async (coreCompiler: CoreCompiler, config: d.Config, task: d.TaskCommand) => {
   config.flags = config.flags || {};
   config.outputTargets = config.outputTargets || [];
 

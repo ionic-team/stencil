@@ -1,17 +1,7 @@
 import { getCompilerSystem, getStencilCLIConfig } from '../state/stencil-cli-config';
+import type * as d from '../../declarations';
 
-interface TerminalInfo {
-  /**
-   * Whether this is in CI or not.
-   */
-  readonly ci: boolean;
-  /**
-   * Whether the terminal is an interactive TTY or not.
-   */
-  readonly tty: boolean;
-}
-
-export declare const TERMINAL_INFO: TerminalInfo;
+export declare const TERMINAL_INFO: d.TerminalInfo;
 
 export const tryFn = async <T extends (...args: any[]) => Promise<R>, R>(fn: T, ...args: any[]): Promise<R | null> => {
   try {
@@ -23,7 +13,7 @@ export const tryFn = async <T extends (...args: any[]) => Promise<R>, R>(fn: T, 
   return null;
 };
 
-export const isInteractive = (object?: TerminalInfo): boolean => {
+export const isInteractive = (object?: d.TerminalInfo): boolean => {
   const terminalInfo =
     object ||
     Object.freeze({
