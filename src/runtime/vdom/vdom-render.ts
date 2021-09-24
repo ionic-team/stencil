@@ -675,6 +675,7 @@ render() {
       let parentNodeRef: Node;
       let insertBeforeNode: Node;
       let refNode: d.RenderNode;
+      let ogInsertBeforeNode: Node;
       let i = 0;
 
       for (; i < relocateNodes.length; i++) {
@@ -694,7 +695,7 @@ render() {
         }
       }
 
-      for (i = relocateNodes.length - 1; i >= 0; i--) {
+      for (i = 0; i < relocateNodes.length; i++) {
         relocateData = relocateNodes[i];
         nodeToRelocate = relocateData.$nodeToRelocate$;
 
@@ -704,6 +705,7 @@ render() {
           parentNodeRef = relocateData.$slotRefNode$.parentNode;
           insertBeforeNode = relocateData.$slotRefNode$.nextSibling;
           orgLocationNode = nodeToRelocate['s-ol'] as any;
+          ogInsertBeforeNode = insertBeforeNode;
 
           while ((orgLocationNode = orgLocationNode.previousSibling as any)) {
             refNode = orgLocationNode['s-nr'];
@@ -733,6 +735,8 @@ render() {
               parentNodeRef.insertBefore(nodeToRelocate, insertBeforeNode);
               // the node may have been hidden from when it didn't have a home. Re-show.
               nodeToRelocate.hidden = false;
+            } else {
+              parentNodeRef.insertBefore(nodeToRelocate, ogInsertBeforeNode);
             }
           }
         } else {
