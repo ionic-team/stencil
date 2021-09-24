@@ -34,6 +34,7 @@ export const taskHelp = async (config: d.Config, logger: d.Logger, sys?: d.Compi
 
 `);
 
+  // TODO(STENCIL-148) make this parameter no longer optional, remove the surrounding if statement
   if (sys) {
     await taskTelemetry(config, sys, logger);
   }
@@ -41,7 +42,7 @@ export const taskHelp = async (config: d.Config, logger: d.Logger, sys?: d.Compi
   console.log(`
   ${logger.bold('Examples:')}
 
-  
+
   ${prompt} ${logger.green('stencil build --dev --watch --serve')}
   ${prompt} ${logger.green('stencil build --prerender')}
   ${prompt} ${logger.green('stencil test --spec --e2e')}
