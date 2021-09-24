@@ -1,4 +1,3 @@
-import { mockLogger } from '@stencil/core/testing';
 import { readConfig, writeConfig, updateConfig, defaultConfig } from '../ionic-config';
 import { createSystem } from '../../compiler/sys/stencil-sys';
 import { UUID_REGEX } from '../telemetry/helpers';

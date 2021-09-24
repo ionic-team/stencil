@@ -9,8 +9,9 @@ export const defaultConfig = (sys: d.CompilerSystem) =>
 export const defaultConfigDirectory = (sys: d.CompilerSystem) => sys.resolvePath(`${sys.homeDir()}/.ionic`);
 
 /**
- * Reads an Ionic configuration file from disk, parses it, and performs any necessary corrections to it if ceratin
+ * Reads an Ionic configuration file from disk, parses it, and performs any necessary corrections to it if certain
  * values are deemed to be malformed
+ * @param sys The system where the command is invoked
  * @returns the config read from disk that has been potentially been updated
  */
 export async function readConfig(sys: d.CompilerSystem): Promise<d.TelemetryConfig> {
@@ -32,6 +33,12 @@ export async function readConfig(sys: d.CompilerSystem): Promise<d.TelemetryConf
   return config;
 }
 
+/**
+ * Writes an Ionic configuration file to disk.
+ * @param sys The system where the command is invoked
+ * @param config The config passed into the Stencil command
+ * @returns boolean If the command was successful
+ */
 export async function writeConfig(sys: d.CompilerSystem, config: d.TelemetryConfig): Promise<boolean> {
   let result = false;
   try {
@@ -45,6 +52,12 @@ export async function writeConfig(sys: d.CompilerSystem, config: d.TelemetryConf
   return result;
 }
 
+/**
+ * Update a subset of the Ionic config.
+ * @param sys The system where the command is invoked
+ * @param newOptions The new options to save
+ * @returns boolean If the command was successful
+ */
 export async function updateConfig(sys: d.CompilerSystem, newOptions: d.TelemetryConfig): Promise<boolean> {
   const config = await readConfig(sys);
   return await writeConfig(sys, Object.assign(config, newOptions));

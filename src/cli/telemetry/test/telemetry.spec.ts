@@ -27,7 +27,7 @@ describe('telemetryBuildFinishedAction', async () => {
       duration: 100,
     } as d.CompilerBuildResults;
 
-    await telemetry.telemetryBuildFinishedAction(config, logger, {}, sys, results);
+    await telemetry.telemetryBuildFinishedAction(sys, config, logger, {}, results);
     expect(spyShouldTrack).toHaveBeenCalled();
 
     spyShouldTrack.mockRestore();

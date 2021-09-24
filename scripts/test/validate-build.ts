@@ -290,7 +290,7 @@ async function validateCompiler(opts: BuildOptions): Promise<void> {
   console.log = (value: string) => (loggedVersion = value);
 
   // this runTask is intentionally not wrapped in telemetry helpers
-  await cli.runTask(compiler, validated.config, 'version');
+  await cli.runTask(compiler, validated.config, nodeSys, 'version');
 
   console.log = orgConsoleLog;
 

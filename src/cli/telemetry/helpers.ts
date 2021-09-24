@@ -20,7 +20,7 @@ export const isInteractive = (sys: d.CompilerSystem, config: d.Config, object?: 
       ci:
         ['CI', 'BUILD_ID', 'BUILD_NUMBER', 'BITBUCKET_COMMIT', 'CODEBUILD_BUILD_ARN'].filter(
           (v) => !!sys.getEnvironmentVar(v)
-        ).length > 0 || !!config?.flags?.ci,
+        ).length > 0 || !!config.flags.ci,
     });
 
   return terminalInfo.tty && !terminalInfo.ci;
@@ -40,6 +40,7 @@ export function uuidv4(): string {
 
 /**
  * Reads and parses a JSON file from the given `path`
+ * @param sys The system where the command is invoked
  * @param path the path on the file system to read and parse
  * @returns the parsed JSON
  */
@@ -48,10 +49,20 @@ export async function readJson(sys: d.CompilerSystem, path: string): Promise<any
   return !!file && JSON.parse(file);
 }
 
+/**
+ * Does the command have the debug flag?
+ * @param config The config passed into the Stencil command
+ * @returns true if --debug has been passed, otherwise false
+ */
 export function hasDebug(config: d.Config) {
   return config.flags.debug;
 }
 
+/**
+ * Does the command have the verbose and debug flags?
+ * @param config The config passed into the Stencil command
+ * @returns true if both --debug and --verbose have been passed, otherwise false
+ */
 export function hasVerbose(config: d.Config) {
   return config.flags.verbose && hasDebug(config);
 }

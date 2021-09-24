@@ -6,13 +6,18 @@ import { CoreCompiler } from '../load-compiler';
 
 /**
  * Used to within taskBuild to provide the component_count property.
+ *
+ * @param sys The system where the command is invoked
+ * @param config The config passed into the Stencil command
+ * @param logger The tool used to do logging
+ * @param coreCompiler The compiler used to do builds
  * @param result The results of a compiler build.
  */
 export async function telemetryBuildFinishedAction(
+  sys: d.CompilerSystem,
   config: d.Config,
   logger: d.Logger,
   coreCompiler: CoreCompiler,
-  sys: d.CompilerSystem,
   result: d.CompilerBuildResults
 ) {
   const tracking = await shouldTrack(config, sys, config.flags.ci);
@@ -31,6 +36,10 @@ export async function telemetryBuildFinishedAction(
 
 /**
  * A function to wrap a compiler task function around. Will send telemetry if, and only if, the machine allows.
+ * @param sys The system where the command is invoked
+ * @param config The config passed into the Stencil command
+ * @param logger The tool used to do logging
+ * @param coreCompiler The compiler used to do builds
  * @param action A Promise-based function to call in order to get the duration of any given command.
  * @returns void
  */
@@ -133,8 +142,8 @@ export const prepareData = async (
  * @returns string[]
  */
 async function getInstalledPackages(sys: d.CompilerSystem, config: d.Config): Promise<{ packages: string[] }> {
-  let packages: string[] = [],
-    packageLockJson: any;
+  let packages: string[] = [];
+  let packageLockJson: any;
 
   try {
     // Read package.json and package-lock.json
@@ -198,6 +207,7 @@ export async function sendMetric(
 
 /**
  * Used to read the config file's tokens.telemetry property.
+ * @param sys The system where the command is invoked
  * @returns string
  */
 async function getTelemetryToken(sys: d.CompilerSystem) {
@@ -211,6 +221,8 @@ async function getTelemetryToken(sys: d.CompilerSystem) {
 
 /**
  * Issues a request to the telemetry server.
+ * @param sys The system where the command is invoked
+ * @param config The config passed into the Stencil command
  * @param data Data to be tracked
  */
 async function sendTelemetry(sys: d.CompilerSystem, config: d.Config, data: any) {
@@ -245,6 +257,7 @@ async function sendTelemetry(sys: d.CompilerSystem, config: d.Config, data: any)
 
 /**
  * Checks if telemetry is enabled on this machine
+ * @param sys The system where the command is invoked
  * @returns true if telemetry is enabled, false otherwise
  */
 export async function checkTelemetry(sys: d.CompilerSystem): Promise<boolean> {
@@ -258,6 +271,7 @@ export async function checkTelemetry(sys: d.CompilerSystem): Promise<boolean> {
 
 /**
  * Writes to the config file, enabling telemetry for this machine.
+ * @param sys The system where the command is invoked
  * @returns true if writing the file was successful, false otherwise
  */
 export async function enableTelemetry(sys: d.CompilerSystem): Promise<boolean> {
@@ -266,6 +280,7 @@ export async function enableTelemetry(sys: d.CompilerSystem): Promise<boolean> {
 
 /**
  * Writes to the config file, disabling telemetry for this machine.
+ * @param sys The system where the command is invoked
  * @returns true if writing the file was successful, false otherwise
  */
 export async function disableTelemetry(sys: d.CompilerSystem): Promise<boolean> {

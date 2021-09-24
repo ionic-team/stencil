@@ -36,7 +36,7 @@ export const run = async (init: d.CliInitOptions) => {
     }
 
     if (task === 'help' || flags.help) {
-      taskHelp({ flags: { task: 'help', args }, outputTargets: [] }, sys, logger);
+      await taskHelp({ flags: { task: 'help', args }, outputTargets: [] }, sys, logger);
       return;
     }
 
