@@ -42,7 +42,6 @@ export const taskHelp = async (config: d.Config, logger: d.Logger, sys?: d.Compi
   console.log(`
   ${logger.bold('Examples:')}
 
-
   ${prompt} ${logger.green('stencil build --dev --watch --serve')}
   ${prompt} ${logger.green('stencil build --prerender')}
   ${prompt} ${logger.green('stencil test --spec --e2e')}
