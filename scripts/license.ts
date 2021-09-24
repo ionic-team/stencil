@@ -114,6 +114,7 @@ ${bundledDeps.map((l) => l.content).join('\n')}
 
 /**
  * Generate license metadata for a series of dependencies
+ * @param opts metadata used during the generation of a license
  * @param bundledDeps the current list of dependencies to bundle
  * @param deps the dependencies to generate metadata for
  */
