@@ -1,7 +1,7 @@
 import type * as d from '../declarations';
 import { taskTelemetry } from './task-telemetry';
 
-export const taskHelp = async (config: d.Config, sys: d.CompilerSystem, logger: d.Logger) => {
+export const taskHelp = async (config: d.Config, logger: d.Logger, sys?: d.CompilerSystem) => {
   const prompt = logger.dim(sys.details.platform === 'windows' ? '>' : '$');
 
   console.log(`
@@ -34,7 +34,9 @@ export const taskHelp = async (config: d.Config, sys: d.CompilerSystem, logger: 
 
 `);
 
-  await taskTelemetry(config, sys, logger);
+  if (sys) {
+    await taskTelemetry(config, sys, logger);
+  }
 
   console.log(`
   ${logger.bold('Examples:')}

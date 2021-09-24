@@ -36,7 +36,7 @@ export const run = async (init: d.CliInitOptions) => {
     }
 
     if (task === 'help' || flags.help) {
-      await taskHelp({ flags: { task: 'help', args }, outputTargets: [] }, sys, logger);
+      await taskHelp({ flags: { task: 'help', args }, outputTargets: [] }, logger, sys);
       return;
     }
 
@@ -100,7 +100,7 @@ export const run = async (init: d.CliInitOptions) => {
     await sys.ensureResources({ rootDir: validated.config.rootDir, logger, dependencies: dependencies as any });
 
     await telemetryAction(sys, validated.config, logger, coreCompiler, async () => {
-      await runTask(coreCompiler, validated.config, sys, task);
+      await runTask(coreCompiler, validated.config, task, sys);
     });
   } catch (e) {
     if (!shouldIgnoreError(e)) {
@@ -113,8 +113,8 @@ export const run = async (init: d.CliInitOptions) => {
 export const runTask = async (
   coreCompiler: CoreCompiler,
   config: d.Config,
-  sys: d.CompilerSystem,
-  task: d.TaskCommand
+  task: d.TaskCommand,
+  sys?: d.CompilerSystem
 ) => {
   config.flags = config.flags || { task };
   config.outputTargets = config.outputTargets || [];
@@ -134,7 +134,7 @@ export const runTask = async (
       break;
 
     case 'help':
-      taskHelp(config, sys, config.logger);
+      taskHelp(config, config.logger, sys);
       break;
 
     case 'prerender':
@@ -146,7 +146,9 @@ export const runTask = async (
       break;
 
     case 'telemetry':
-      await taskTelemetry(config, sys, config.logger);
+      if (sys) {
+        await taskTelemetry(config, sys, config.logger);
+      }
       break;
 
     case 'test':
@@ -159,7 +161,7 @@ export const runTask = async (
 
     default:
       config.logger.error(`${config.logger.emoji('❌ ')}Invalid stencil command, please see the options below:`);
-      taskHelp(config, sys, config.logger);
+      taskHelp(config, config.logger, sys);
       return config.sys.exit(1);
   }
 };
