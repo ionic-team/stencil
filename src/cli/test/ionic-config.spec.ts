@@ -7,7 +7,7 @@ const UUID1 = '5588e0f0-02b5-4afa-8194-5d8f78683b36';
 const UUID2 = 'e5609819-5c24-4fa2-8817-e05ca10b8cae';
 
 describe('readConfig', () => {
-  const sys = createSystem();
+  const sys = createTestingSystem();
 
   beforeEach(async () => {
     await sys.removeFile(defaultConfig(sys));
