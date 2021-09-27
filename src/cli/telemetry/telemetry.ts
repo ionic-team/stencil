@@ -345,7 +345,7 @@ export async function disableTelemetry(sys: d.CompilerSystem): Promise<boolean> 
  * @param version The fully qualified semver version
  * @returns a string of the major version
  */
-export function getMajorVersion(version: string): string {
+function getMajorVersion(version: string): string {
   const parts = version.split('.');
   return parts[0];
 }
