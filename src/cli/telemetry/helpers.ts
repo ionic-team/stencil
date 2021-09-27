@@ -1,17 +1,4 @@
-import { getCompilerSystem, getStencilCLIConfig } from '../state/stencil-cli-config';
-
-interface TerminalInfo {
-  /**
-   * Whether this is in CI or not.
-   */
-  readonly ci: boolean;
-  /**
-   * Whether the terminal is an interactive TTY or not.
-   */
-  readonly tty: boolean;
-}
-
-export declare const TERMINAL_INFO: TerminalInfo;
+import type * as d from '../../declarations';
 
 export const tryFn = async <T extends (...args: any[]) => Promise<R>, R>(fn: T, ...args: any[]): Promise<R | null> => {
   try {
@@ -23,15 +10,17 @@ export const tryFn = async <T extends (...args: any[]) => Promise<R>, R>(fn: T, 
   return null;
 };
 
-export const isInteractive = (object?: TerminalInfo): boolean => {
+export declare const TERMINAL_INFO: d.TerminalInfo;
+
+export const isInteractive = (sys: d.CompilerSystem, config: d.Config, object?: d.TerminalInfo): boolean => {
   const terminalInfo =
     object ||
     Object.freeze({
-      tty: getCompilerSystem().isTTY() ? true : false,
+      tty: sys.isTTY() ? true : false,
       ci:
         ['CI', 'BUILD_ID', 'BUILD_NUMBER', 'BITBUCKET_COMMIT', 'CODEBUILD_BUILD_ARN'].filter(
-          (v) => !!getCompilerSystem().getEnvironmentVar(v)
-        ).length > 0 || !!getStencilCLIConfig()?.flags?.ci,
+          (v) => !!sys.getEnvironmentVar(v)
+        ).length > 0 || !!config.flags?.ci,
     });
 
   return terminalInfo.tty && !terminalInfo.ci;
@@ -51,18 +40,29 @@ export function uuidv4(): string {
 
 /**
  * Reads and parses a JSON file from the given `path`
+ * @param sys The system where the command is invoked
  * @param path the path on the file system to read and parse
  * @returns the parsed JSON
  */
-export async function readJson(path: string): Promise<any> {
-  const file = await getCompilerSystem().readFile(path);
+export async function readJson(sys: d.CompilerSystem, path: string): Promise<any> {
+  const file = await sys.readFile(path);
   return !!file && JSON.parse(file);
 }
 
-export function hasDebug() {
-  return getStencilCLIConfig().flags.debug;
+/**
+ * Does the command have the debug flag?
+ * @param config The config passed into the Stencil command
+ * @returns true if --debug has been passed, otherwise false
+ */
+export function hasDebug(config: d.Config) {
+  return config.flags.debug;
 }
 
-export function hasVerbose() {
-  return getStencilCLIConfig().flags.verbose && hasDebug();
+/**
+ * Does the command have the verbose and debug flags?
+ * @param config The config passed into the Stencil command
+ * @returns true if both --debug and --verbose have been passed, otherwise false
+ */
+export function hasVerbose(config: d.Config) {
+  return config.flags.verbose && hasDebug(config);
 }
