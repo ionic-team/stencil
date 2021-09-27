@@ -11,7 +11,7 @@ export const generateCjs = async (
   buildCtx: d.BuildCtx,
   rollupBuild: RollupBuild,
   outputTargets: d.OutputTargetDistLazy[]
-) => {
+): Promise<d.UpdatedLazyBuildCtx> => {
   const cjsOutputs = outputTargets.filter((o) => !!o.cjsDir);
 
   if (cjsOutputs.length > 0) {
@@ -25,7 +25,8 @@ export const generateCjs = async (
     const results = await generateRollupOutput(rollupBuild, esmOpts, config, buildCtx.entryModules);
     if (results != null) {
       const destinations = cjsOutputs.map((o) => o.cjsDir);
-      await generateLazyModules(
+
+      buildCtx.commonJsComponentBundle = await generateLazyModules(
         config,
         compilerCtx,
         buildCtx,
@@ -36,16 +37,19 @@ export const generateCjs = async (
         false,
         '.cjs'
       );
+
       await generateShortcuts(compilerCtx, results, cjsOutputs);
     }
   }
+
+  return { name: 'cjs', buildCtx };
 };
 
 const generateShortcuts = (
   compilerCtx: d.CompilerCtx,
   rollupResult: d.RollupResult[],
   outputTargets: d.OutputTargetDistLazy[]
-) => {
+): Promise<void[]> => {
   const indexFilename = rollupResult.find((r) => r.type === 'chunk' && r.isIndex).fileName;
   return Promise.all(
     outputTargets.map(async (o) => {

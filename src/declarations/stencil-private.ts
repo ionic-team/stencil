@@ -1,3 +1,4 @@
+import { BuildResultsComponentGraph } from '.';
 import type {
   BuildEvents,
   BuildLog,
@@ -197,13 +198,24 @@ export interface RollupResults {
   modules: RollupResultModule[];
 }
 
+export interface UpdatedLazyBuildCtx {
+  name: 'esm-browser' | 'esm' | 'cjs' | 'system';
+  buildCtx: BuildCtx;
+}
+
 export interface BuildCtx {
   buildId: number;
   buildResults: CompilerBuildResults;
+  buildStats?: CompilerBuildStats | { diagnostics: Diagnostic[] };
   buildMessages: string[];
   bundleBuildCount: number;
   collections: Collection[];
   compilerCtx: CompilerCtx;
+  esmBrowserComponentBundle: ReadonlyArray<BundleModule>;
+  esmComponentBundle: ReadonlyArray<BundleModule>;
+  es5ComponentBundle: ReadonlyArray<BundleModule>;
+  systemComponentBundle: ReadonlyArray<BundleModule>;
+  commonJsComponentBundle: ReadonlyArray<BundleModule>;
   components: ComponentCompilerMeta[];
   componentGraph: Map<string, string[]>;
   config: Config;
@@ -263,7 +275,8 @@ export type BuildTask = any;
 
 export type BuildStatus = 'pending' | 'error' | 'disabled' | 'default';
 
-export interface BuildStats {
+export interface CompilerBuildStats {
+  timestamp: string;
   compiler: {
     name: string;
     version: string;
@@ -274,23 +287,41 @@ export interface BuildStats {
     components: number;
     entries: number;
     bundles: number;
+    outputs: any;
   };
   options: {
     minifyJs: boolean;
     minifyCss: boolean;
     hashFileNames: boolean;
     hashedFileNameLength: number;
-    buildEs5: boolean;
+    buildEs5: boolean | 'prod';
+  };
+  formats: {
+    esmBrowser: ReadonlyArray<CompilerBuildStatBundle>;
+    esm: ReadonlyArray<CompilerBuildStatBundle>;
+    es5: ReadonlyArray<CompilerBuildStatBundle>;
+    system: ReadonlyArray<CompilerBuildStatBundle>;
+    commonjs: ReadonlyArray<CompilerBuildStatBundle>;
   };
   components: BuildComponent[];
-  entries: BuildEntry[];
+  entries: EntryModule[];
   rollupResults: RollupResults;
-  sourceGraph: BuildSourceGraph;
+  sourceGraph?: BuildSourceGraph;
+  componentGraph: BuildResultsComponentGraph;
   collections: {
     name: string;
     source: string;
     tags: string[];
   }[];
+}
+
+export interface CompilerBuildStatBundle {
+  key: string;
+  components: string[];
+  bundleId: string;
+  fileName: string;
+  imports: string[];
+  originalByteSize: number;
 }
 
 export interface BuildEntry {

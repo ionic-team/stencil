@@ -17,6 +17,12 @@ export class BuildContext implements d.BuildCtx {
   componentGraph = new Map<string, string[]>();
   config: d.Config;
   data: any = {};
+  buildStats?: d.CompilerBuildStats = undefined;
+  esmBrowserComponentBundle: d.BundleModule[];
+  esmComponentBundle: d.BundleModule[];
+  es5ComponentBundle: d.BundleModule[];
+  systemComponentBundle: d.BundleModule[];
+  commonJsComponentBundle: d.BundleModule[];
   diagnostics: d.Diagnostic[] = [];
   dirsAdded: string[] = [];
   dirsDeleted: string[] = [];
