@@ -1,5 +1,5 @@
 import * as d from '../../declarations';
-import { isInteractive } from './helpers';
+import { isInteractive } from '@utils';
 import { checkTelemetry } from './telemetry';
 
 /**

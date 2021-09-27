@@ -1,4 +1,4 @@
-import { tryFn, hasDebug, readJson, hasVerbose, uuidv4 } from './helpers';
+import { tryFn, hasDebug, readJson, hasVerbose, uuidv4 } from '@utils';
 import { shouldTrack } from './shouldTrack';
 import type * as d from '../../declarations';
 import { readConfig, updateConfig, writeConfig } from '../ionic-config';

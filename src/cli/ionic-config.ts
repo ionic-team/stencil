@@ -1,5 +1,5 @@
 import type * as d from '../declarations';
-import { readJson, uuidv4, UUID_REGEX } from './telemetry/helpers';
+import { readJson, uuidv4, UUID_REGEX } from '@utils';
 
 export const isTest = () => process.env.JEST_WORKER_ID !== undefined;
 
