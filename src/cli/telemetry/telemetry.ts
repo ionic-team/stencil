@@ -128,7 +128,7 @@ export const prepareData = async (
     arguments: config.flags.args,
     task: config.flags.task,
     stencil,
-    system: system,
+    system,
     system_major: getMajorVersion(system),
     os_name,
     os_version,
