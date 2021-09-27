@@ -107,7 +107,7 @@ export const prepareData = async (
   component_count: number = undefined
 ): Promise<d.TrackableData> => {
   const { typescript, rollup } = coreCompiler.versions || { typescript: 'unknown', rollup: 'unknown' };
-  const { packages } = await getInstalledPackages(sys, config);
+  const { packages, packages_no_versions } = await getInstalledPackages(sys, config);
   const targets = await getActiveTargets(config);
   const yarn = isUsingYarn(sys);
   const stencil = coreCompiler.version || 'unknown';
@@ -124,10 +124,12 @@ export const prepareData = async (
     component_count,
     targets,
     packages,
+    packages_no_versions,
     arguments: config.flags.args,
     task: config.flags.task,
     stencil,
-    system,
+    system: system,
+    system_major: getMajorVersion(system),
     os_name,
     os_version,
     cpu_model,
@@ -139,24 +141,27 @@ export const prepareData = async (
 };
 
 /**
- * Reads package-lock.json and package.json files in order to cross references the dependencies and devDependencies properties. Pull the current installed version of each package under the @stencil, @ionic, and @capacitor scopes.
+ * Reads package-lock.json, yarn.lock, and package.json files in order to cross reference
+ * the dependencies and devDependencies properties. Pulls up the current installed version
+ * of each package under the @stencil, @ionic, and @capacitor scopes.
  * @returns string[]
  */
-async function getInstalledPackages(sys: d.CompilerSystem, config: d.Config): Promise<{ packages: string[] }> {
+async function getInstalledPackages(
+  sys: d.CompilerSystem,
+  config: d.Config
+): Promise<{ packages: string[]; packages_no_versions: string[] }> {
   let packages: string[] = [];
-  let packageLockJson: any;
+  let packages_no_versions: string[] = [];
 
   try {
     // Read package.json and package-lock.json
     const appRootDir = sys.getCurrentDirectory();
 
-    const packageJson: d.PackageJsonData = await tryFn(readJson, sys.resolvePath(appRootDir + '/package.json'));
-
-    packageLockJson = await tryFn(readJson, sys.resolvePath(appRootDir + '/package-lock.json'));
+    const packageJson: d.PackageJsonData = await tryFn(readJson, sys, sys.resolvePath(appRootDir + '/package.json'));
 
     // They don't have a package.json for some reason? Eject button.
     if (!packageJson) {
-      return { packages };
+      return { packages, packages_no_versions };
     }
 
     const rawPackages: [string, string][] = Object.entries({
@@ -170,18 +175,65 @@ async function getInstalledPackages(sys: d.CompilerSystem, config: d.Config): Pr
       ([k]) => k.startsWith('@stencil/') || k.startsWith('@ionic/') || k.startsWith('@capacitor/')
     );
 
-    packages = packageLockJson
-      ? ionicPackages.map(
-          ([k, v]) =>
-            `${k}@${packageLockJson?.dependencies[k]?.version ?? packageLockJson?.devDependencies[k]?.version ?? v}`
-        )
-      : ionicPackages.map(([k, v]) => `${k}@${v}`);
+    try {
+      if (!isUsingYarn(sys)) {
+        packages = await npmPackages(sys, ionicPackages);
+      } else if (isUsingYarn(sys)) {
+        packages = await yarnPackages(sys, ionicPackages);
+      } else {
+        packages = ionicPackages.map(([k, v]) => `${k}@${v.replace('^', '')}`);
+      }
+    } catch (e) {
+      packages = ionicPackages.map(([k, v]) => `${k}@${v.replace('^', '')}`);
+    }
 
-    return { packages };
+    packages_no_versions = ionicPackages.map(([k]) => `${k}`);
+
+    return { packages, packages_no_versions };
   } catch (err) {
     hasDebug(config) && console.error(err);
-    return { packages };
+    return { packages, packages_no_versions };
   }
+}
+
+/**
+ * Visits the npm lock file to find the exact versions that are installed
+ * @param sys The system where the command is invoked
+ * @param ionicPackages a list of the found packages matching `@stencil`, `@capacitor`, or `@ionic` from the package.json file.
+ * @returns an array of strings of all the packages and their versions.
+ */
+async function npmPackages(sys: d.CompilerSystem, ionicPackages: [string, string][]) {
+  const appRootDir = sys.getCurrentDirectory();
+  const packageLockJson: any = await tryFn(readJson, sys, sys.resolvePath(appRootDir + '/package-lock.json'));
+
+  return ionicPackages.map(([k, v]) => {
+    let version = packageLockJson?.dependencies[k]?.version ?? packageLockJson?.devDependencies[k]?.version ?? v;
+    version = version.includes('file:') ? sanitizeDeclaredVersion(v) : version;
+    return `${k}@${version}`;
+  });
+}
+
+/**
+ * Visits the yarn lock file to find the exact versions that are installed
+ * @param sys The system where the command is invoked
+ * @param ionicPackages a list of the found packages matching `@stencil`, `@capacitor`, or `@ionic` from the package.json file.
+ * @returns an array of strings of all the packages and their versions.
+ */
+async function yarnPackages(sys: d.CompilerSystem, ionicPackages: [string, string][]) {
+  const appRootDir = sys.getCurrentDirectory();
+  const yarnLock = sys.readFileSync(appRootDir + '/yarn.lock');
+  const packageLockJson = sys.parseYarnLockFile(yarnLock);
+
+  return ionicPackages.map(([k, v]) => {
+    const identifiedVersion = `${k}@${v}`;
+    let version = packageLockJson.object[identifiedVersion]?.version;
+    version = version.includes('undefined') ? sanitizeDeclaredVersion(identifiedVersion) : version;
+    return `${k}@${version}`;
+  });
+}
+
+function sanitizeDeclaredVersion(version: string) {
+  return version.replace(/[*^~]/g, '');
 }
 
 /**
@@ -286,4 +338,14 @@ export async function enableTelemetry(sys: d.CompilerSystem): Promise<boolean> {
  */
 export async function disableTelemetry(sys: d.CompilerSystem): Promise<boolean> {
   return await updateConfig(sys, { 'telemetry.stencil': false });
+}
+
+/**
+ * Takes in a semver string in order to return the major version.
+ * @param version The fully qualified semver version
+ * @returns a string of the major version
+ */
+export function getMajorVersion(version: string): string {
+  const parts = version.split('.');
+  return parts[0];
 }

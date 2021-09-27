@@ -142,5 +142,9 @@
     "pwa",
     "progressive web app"
   ],
-  "prettier": "@ionic/prettier-config"
+  "prettier": "@ionic/prettier-config",
+  "dependencies": {
+    "@types/yarnpkg__lockfile": "^1.1.5",
+    "@yarnpkg/lockfile": "^1.1.0"
+  }
 }
