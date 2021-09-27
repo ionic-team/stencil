@@ -3,6 +3,7 @@ import { shouldTrack } from './shouldTrack';
 import type * as d from '../../declarations';
 import { readConfig, updateConfig, writeConfig } from '../ionic-config';
 import { CoreCompiler } from '../load-compiler';
+import { WWW } from '../../compiler/output-targets/output-utils';
 
 /**
  * Used to within taskBuild to provide the component_count property.
@@ -85,7 +86,7 @@ export async function telemetryAction(
 
 export function hasAppTarget(config: d.Config): boolean {
   return config.outputTargets.some(
-    (target) => target.type === 'www' && (!!target.serviceWorker || (!!target.baseUrl && target.baseUrl !== '/'))
+    (target) => target.type === WWW && (!!target.serviceWorker || (!!target.baseUrl && target.baseUrl !== '/'))
   );
 }
 
