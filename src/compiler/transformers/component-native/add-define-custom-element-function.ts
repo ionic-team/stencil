@@ -8,11 +8,13 @@ import { addCoreRuntimeApi, RUNTIME_APIS } from '../core-runtime-apis';
 /**
  * Import and define components along with any component dependents within the `dist-custom-elements` output.
  * Adds `defineCustomElement()` function for all components.
+ * @param config - the Stencil configuration file
  * @param compilerCtx - current compiler context
  * @param components - all current components within the stencil buildCtx
  * @returns a TS AST transformer factory function
  */
 export const addDefineCustomElementFunctions = (
+  config: d.Config,
   compilerCtx: d.CompilerCtx,
   components: d.ComponentCompilerMeta[]
 ): ts.TransformerFactory<ts.SourceFile> => {
@@ -55,6 +57,11 @@ export const addDefineCustomElementFunctions = (
 
         setupComponentDependencies(moduleFile, components, newStatements, caseStatements, tagNames);
         addDefineCustomElementFunction(tagNames, newStatements, caseStatements);
+
+        if (config.extras?.autoDefineCustomElements) {
+          const conditionalDefineCustomElementCall = createAutoDefinitionExpression(principalComponent.componentClassName);
+          newStatements.push(conditionalDefineCustomElementCall);
+        }
       }
 
       tsSourceFile = ts.factory.updateSourceFile(tsSourceFile, [...tsSourceFile.statements, ...newStatements]);
@@ -224,3 +231,18 @@ const addDefineCustomElementFunction = (
   );
   newStatements.push(newExpression);
 };
+
+/**
+ * Create a call to `defineCustomElement` for the principle web component.
+ * ```typescript
+ * defineCustomElement(MyPrincipalComponent);
+ * ```
+ * @returns the expression statement described above
+ */
+function createAutoDefinitionExpression(componentName: string): ts.ExpressionStatement {
+  return ts.factory.createExpressionStatement(
+    ts.factory.createCallExpression(ts.factory.createIdentifier('defineCustomElement'), undefined, [
+      ts.factory.createIdentifier(componentName),
+    ])
+  );
+}

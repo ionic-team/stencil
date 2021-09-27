@@ -151,7 +151,7 @@ const getCustomElementBundleCustomTransformer = (
     styleImportData: 'queryparams',
   };
   return [
-    addDefineCustomElementFunctions(compilerCtx, components),
+    addDefineCustomElementFunctions(config, compilerCtx, components),
     updateStencilCoreImports(transformOpts.coreImportPath),
     nativeComponentTransform(compilerCtx, transformOpts),
     removeCollectionImports(compilerCtx),
