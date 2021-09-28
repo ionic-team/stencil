@@ -88,10 +88,26 @@ export const isHtmlFile = (filePath: string) => {
   return hasFileExtension(filePath, ['html', 'htm']);
 };
 
-export const generatePreamble = (
-  config: d.Config,
-  opts: { prefix?: string; suffix?: string; defaultBanner?: boolean } = {}
-) => {
+// TODO(NOW): Fix these comments, make it clearer what we're doing once I'm sure I want to keep this stuff
+/**
+ * Internal Stencil options for configuring the preamble
+ */
+type PreambleOptions = Partial<{
+  // a line of text that will appear _after_ the user's provided preamble
+  prefix: string;
+  // a line of text that will appear at the end of the entire preamble
+  suffix: string;
+  /** whether or not the default {@link BANNER} should be displayed in the preamble */
+  defaultBanner: boolean;
+}>;
+
+/**
+ * Generate the preamble to be placed atop the main file of the build
+ * @param config the Stencil configuration file
+ * @param opts a series of configuration options to customize the preamble
+ * @return the generated preamble
+ */
+export const generatePreamble = (config: d.Config, opts: PreambleOptions = {}): string => {
   let preamble: string[] = [];
 
   if (config.preamble) {
@@ -114,7 +130,7 @@ export const generatePreamble = (
     });
   }
 
-  if (preamble.length > 1) {
+  if (preamble.length >= 1) {
     preamble = preamble.map((l) => ` * ${l}`);
 
     preamble.unshift(`/*!`);
@@ -123,9 +139,6 @@ export const generatePreamble = (
     return preamble.join('\n');
   }
 
-  if (opts.defaultBanner === true) {
-    return `/*! ${BANNER} */`;
-  }
   return '';
 };
 

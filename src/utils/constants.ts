@@ -87,5 +87,5 @@ export const XML_NS = 'http://www.w3.org/XML/1998/namespace';
 /**
  * File names and value
  */
-export const BANNER = `Built with http://stenciljs.com`;
+export const BANNER = `Built with https://stenciljs.com`;
 export const COLLECTION_MANIFEST_FILE_NAME = 'collection-manifest.json';
