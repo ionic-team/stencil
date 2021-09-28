@@ -59,7 +59,9 @@ export const addDefineCustomElementFunctions = (
         addDefineCustomElementFunction(tagNames, newStatements, caseStatements);
 
         if (config.extras?.autoDefineCustomElements) {
-          const conditionalDefineCustomElementCall = createAutoDefinitionExpression(principalComponent.componentClassName);
+          const conditionalDefineCustomElementCall = createAutoDefinitionExpression(
+            principalComponent.componentClassName
+          );
           newStatements.push(conditionalDefineCustomElementCall);
         }
       }
