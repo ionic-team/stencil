@@ -8,7 +8,7 @@ import type {
   CompilerSystem,
 } from '../../declarations';
 import { createSystem } from '../sys/stencil-sys';
-import { IS_DENO_ENV, IS_NODE_ENV, requireFunc } from '../sys/environment';
+import { IS_NODE_ENV, requireFunc } from '../sys/environment';
 import { isString } from '@utils';
 import { parseImportPath } from '../transformers/stencil-import-path';
 import { STENCIL_INTERNAL_CLIENT_ID } from '../bundle/entry-alias-ids';
@@ -45,8 +45,6 @@ export const getTranspileConfig = (input: TranspileOptions) => {
   } else if (!transpileCtx.sys) {
     if (IS_NODE_ENV) {
       transpileCtx.sys = requireFunc('../sys/node/index.js').createNodeSys();
-    } else if (IS_DENO_ENV) {
-      throw new Error(`"sys" must be provided in options`);
     } else {
       transpileCtx.sys = createSystem();
     }

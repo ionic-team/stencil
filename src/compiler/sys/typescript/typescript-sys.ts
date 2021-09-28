@@ -175,7 +175,7 @@ const patchTypeScriptSysMinimum = () => {
   if (!ts.sys) {
     // patches just the bare minimum
     // if ts.sys already exists then it must be node ts.sys
-    // otherwise we're either browser or deno
+    // otherwise we're browser
     // will be updated later on with the stencil sys
     ts.sys = {
       args: [],
