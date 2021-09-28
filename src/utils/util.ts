@@ -1,5 +1,4 @@
 import type * as d from '../declarations';
-import { BANNER } from './constants';
 import { buildError } from './message-utils';
 import { dashToPascalCase, isString, toDashCase } from './helpers';
 
@@ -88,58 +87,25 @@ export const isHtmlFile = (filePath: string) => {
   return hasFileExtension(filePath, ['html', 'htm']);
 };
 
-// TODO(NOW): Fix these comments, make it clearer what we're doing once I'm sure I want to keep this stuff
-/**
- * Internal Stencil options for configuring the preamble
- */
-type PreambleOptions = Partial<{
-  // a line of text that will appear _after_ the user's provided preamble
-  prefix: string;
-  // a line of text that will appear at the end of the entire preamble
-  suffix: string;
-  /** whether or not the default {@link BANNER} should be displayed in the preamble */
-  defaultBanner: boolean;
-}>;
-
 /**
  * Generate the preamble to be placed atop the main file of the build
  * @param config the Stencil configuration file
- * @param opts a series of configuration options to customize the preamble
  * @return the generated preamble
  */
-export const generatePreamble = (config: d.Config, opts: PreambleOptions = {}): string => {
-  let preamble: string[] = [];
+export const generatePreamble = (config: d.Config): string => {
+  const { preamble } = config;
 
-  if (config.preamble) {
-    preamble = config.preamble.split('\n');
+  if (preamble === undefined || preamble.length === 0) {
+    return '';
   }
 
-  if (typeof opts.prefix === 'string') {
-    opts.prefix.split('\n').forEach((c) => {
-      preamble.push(c);
-    });
-  }
+  // generate the body of the JSDoc-style comment
+  const preambleComment: string[] = preamble.split('\n').map((l) => ` * ${l}`);
 
-  if (opts.defaultBanner === true) {
-    preamble.push(BANNER);
-  }
+  preambleComment.unshift(`/*!`);
+  preambleComment.push(` */`);
 
-  if (typeof opts.suffix === 'string') {
-    opts.suffix.split('\n').forEach((c) => {
-      preamble.push(c);
-    });
-  }
-
-  if (preamble.length >= 1) {
-    preamble = preamble.map((l) => ` * ${l}`);
-
-    preamble.unshift(`/*!`);
-    preamble.push(` */`);
-
-    return preamble.join('\n');
-  }
-
-  return '';
+  return preambleComment.join('\n');
 };
 
 const lineBreakRegex = /\r?\n|\r/g;

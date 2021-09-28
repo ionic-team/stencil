@@ -3,7 +3,7 @@ import * as util from '../util';
 
 describe('util', () => {
   describe('generatePreamble', () => {
-    it('generates a comment with a single line preamble when no options are provided', () => {
+    it('generates a comment with a single line preamble', () => {
       const testConfig = mockConfig();
       testConfig.preamble = 'I am Stencil';
 
@@ -14,7 +14,7 @@ describe('util', () => {
  */`);
     });
 
-    it('generates a comment with a multi-line preamble when no options are provided', () => {
+    it('generates a comment with a multi-line preamble', () => {
       const testConfig = mockConfig();
       testConfig.preamble = 'I am Stencil\nHear me roar';
 
@@ -26,65 +26,7 @@ describe('util', () => {
  */`);
     });
 
-    it('generates a preamble with a prefix', () => {
-      const testConfig = mockConfig();
-      testConfig.preamble = 'I am Stencil\nHear me roar';
-
-      const result = util.generatePreamble(testConfig, { prefix: 'this is the prefix to the preamble' });
-
-      expect(result).toBe(`/*!
- * I am Stencil
- * Hear me roar
- * this is the prefix to the preamble
- */`);
-    });
-
-    it('generates a preamble with the default banner', () => {
-      const testConfig = mockConfig();
-      testConfig.preamble = 'I am Stencil\nHear me roar';
-
-      const result = util.generatePreamble(testConfig, { defaultBanner: true });
-
-      expect(result).toBe(`/*!
- * I am Stencil
- * Hear me roar
- * Built with https://stenciljs.com
- */`);
-    });
-
-    it('generates a preamble with a suffix', () => {
-      const testConfig = mockConfig();
-      testConfig.preamble = 'I am Stencil\nHear me roar';
-
-      const result = util.generatePreamble(testConfig, { suffix: 'this is the suffix to the preamble' });
-
-      expect(result).toBe(`/*!
- * I am Stencil
- * Hear me roar
- * this is the suffix to the preamble
- */`);
-    });
-
-    it('generates a preamble with multiple options provided', () => {
-      const testConfig = mockConfig();
-      testConfig.preamble = 'I am Stencil\nHear me roar';
-
-      const result = util.generatePreamble(testConfig, {
-        prefix: 'this is the prefix to the preamble',
-        defaultBanner: true,
-        suffix: 'this is the suffix to the preamble',
-      });
-
-      expect(result).toBe(`/*!
- * I am Stencil
- * Hear me roar
- * this is the prefix to the preamble
- * Built with https://stenciljs.com
- * this is the suffix to the preamble
- */`);
-    });
-
-    it('returns an empty string if no preamble, or options are provided', () => {
+    it('returns an empty string if no preamble is provided', () => {
       const testConfig = mockConfig();
 
       const result = util.generatePreamble(testConfig);
@@ -92,14 +34,13 @@ describe('util', () => {
       expect(result).toBe('');
     });
 
-    it('returns the default banner if the option is provided, and there is no preamble', () => {
+    it('returns an empty string if an empty preamble is provided', () => {
       const testConfig = mockConfig();
+      testConfig.preamble = '';
 
-      const result = util.generatePreamble(testConfig, { defaultBanner: true });
+      const result = util.generatePreamble(testConfig);
 
-      expect(result).toBe(`/*!
- * Built with https://stenciljs.com
- */`);
+      expect(result).toBe('');
     });
   });
 
