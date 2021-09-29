@@ -34,6 +34,15 @@ describe('util', () => {
       expect(result).toBe('');
     });
 
+    it('returns an empty string a null preamble is provided', () => {
+      const testConfig = mockConfig();
+      testConfig.preamble = null;
+
+      const result = util.generatePreamble(testConfig);
+
+      expect(result).toBe('');
+    });
+
     it('returns an empty string if an empty preamble is provided', () => {
       const testConfig = mockConfig();
       testConfig.preamble = '';

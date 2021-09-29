@@ -95,7 +95,7 @@ export const isHtmlFile = (filePath: string) => {
 export const generatePreamble = (config: d.Config): string => {
   const { preamble } = config;
 
-  if (preamble === undefined || preamble.length === 0) {
+  if (!preamble) {
     return '';
   }
 
