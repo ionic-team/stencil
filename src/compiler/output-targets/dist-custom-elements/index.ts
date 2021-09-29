@@ -40,7 +40,12 @@ const bundleCustomElements = async (
       id: 'customElements',
       platform: 'client',
       conditionals: getCustomElementsBuildConditionals(config, buildCtx.components),
-      customTransformers: getCustomElementBundleCustomTransformer(config, compilerCtx, buildCtx.components),
+      customTransformers: getCustomElementBundleCustomTransformer(
+        config,
+        compilerCtx,
+        buildCtx.components,
+        outputTarget
+      ),
       externalRuntime: !!outputTarget.externalRuntime,
       inlineWorkers: true,
       inputs: {
@@ -139,7 +144,8 @@ const generateEntryPoint = (outputTarget: d.OutputTargetDistCustomElements, _bui
 const getCustomElementBundleCustomTransformer = (
   config: d.Config,
   compilerCtx: d.CompilerCtx,
-  components: d.ComponentCompilerMeta[]
+  components: d.ComponentCompilerMeta[],
+  outputTarget: d.OutputTargetDistCustomElements
 ) => {
   const transformOpts: d.TransformOptions = {
     coreImportPath: STENCIL_INTERNAL_CLIENT_ID,
@@ -151,7 +157,7 @@ const getCustomElementBundleCustomTransformer = (
     styleImportData: 'queryparams',
   };
   return [
-    addDefineCustomElementFunctions(compilerCtx, components),
+    addDefineCustomElementFunctions(compilerCtx, components, outputTarget),
     updateStencilCoreImports(transformOpts.coreImportPath),
     nativeComponentTransform(compilerCtx, transformOpts),
     removeCollectionImports(compilerCtx),
