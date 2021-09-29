@@ -1,5 +1,5 @@
 import type * as d from '../../declarations';
-import { escapeHtml } from '@utils';
+import { escapeHtml, generatePreamble } from '@utils';
 import { join } from 'path';
 
 export const generateEs5DisabledMessage = async (
@@ -112,7 +112,7 @@ h2 {
   )}</code>
     </pre>
   `;
-  return `
+  return `${generatePreamble(config)}
 (function() {
   function checkSupport() {
     if (!document.body) {

@@ -5,6 +5,7 @@ import { join } from 'path';
 import type { OutputOptions, RollupBuild } from 'rollup';
 import { relativeImport } from '../output-utils';
 import type { RollupResult } from '../../../declarations';
+import { generatePreamble } from '@utils';
 
 export const generateEsm = async (
   config: d.Config,
@@ -17,6 +18,7 @@ export const generateEsm = async (
   const esmOutputs = outputTargets.filter((o) => !!o.esmDir && !o.isBrowserBuild);
   if (esmOutputs.length + esmEs5Outputs.length > 0) {
     const esmOpts: OutputOptions = {
+      banner: generatePreamble(config),
       format: 'es',
       entryFileNames: '[name].js',
       assetFileNames: '[name]-[hash][extname]',
