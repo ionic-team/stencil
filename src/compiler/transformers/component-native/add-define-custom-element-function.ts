@@ -68,11 +68,6 @@ export const addDefineCustomElementFunctions = (
 
       tsSourceFile = ts.factory.updateSourceFile(tsSourceFile, [...tsSourceFile.statements, ...newStatements]);
 
-      // keep for a sec. Useful for debugging
-      // const printer = ts.createPrinter({ newLine: 0 });
-      // const mouse = printer.printNode(ts.EmitHint.Unspecified, tsSourceFile, tsSourceFile);
-      // console.log(mouse);
-
       return tsSourceFile;
     };
   };
