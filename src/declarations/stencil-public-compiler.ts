@@ -883,7 +883,7 @@ export interface SitemapXmpResults {
  * of the actual platform it's being ran ontop of.
  */
 export interface CompilerSystem {
-  name: 'deno' | 'node' | 'in-memory';
+  name: 'node' | 'in-memory';
   version: string;
   events?: BuildEvents;
   details?: SystemDetails;

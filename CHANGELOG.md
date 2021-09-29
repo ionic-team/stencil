@@ -1,3 +1,9 @@
+## 🐱 [2.8.1](https://github.com/ionic-team/stencil/compare/v2.8.0...v2.8.1) (2021-09-15)
+
+### Bug Fixes
+
+* **runtime:** textContent for scoped components with slots ([#3047](https://github.com/ionic-team/stencil/issues/3047)) ([9fc7657](https://github.com/ionic-team/stencil/commit/9fc76579a3a3e1127ba43b354a572ac40eda3770))
+
 # 🎲 [2.8.0](https://github.com/ionic-team/stencil/compare/v2.7.1...v2.8.0) (2021-09-01)
 
 ### Bug Fixes

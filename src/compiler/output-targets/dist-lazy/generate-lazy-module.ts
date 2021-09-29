@@ -14,7 +14,7 @@ export const generateLazyModules = async (
   sourceTarget: d.SourceTarget,
   isBrowserBuild: boolean,
   sufix: string
-) => {
+): Promise<d.BundleModule[]> => {
   if (!Array.isArray(destinations) || destinations.length === 0) {
     return [];
   }
@@ -177,7 +177,7 @@ const writeLazyEntry = async (
   sourceTarget: d.SourceTarget,
   shouldMinify: boolean,
   isBrowserBuild: boolean
-) => {
+): Promise<void> => {
   if (isBrowserBuild && ['loader'].includes(rollupResult.entryKey)) {
     return;
   }
@@ -192,7 +192,7 @@ const writeLazyEntry = async (
   );
 };
 
-const formatLazyBundlesRuntimeMeta = (bundleModules: d.BundleModule[]) => {
+const formatLazyBundlesRuntimeMeta = (bundleModules: d.BundleModule[]): string => {
   const sortedBundles = bundleModules.slice().sort(sortBundleModules);
   const lazyBundles = sortedBundles.map(formatLazyRuntimeBundle);
   return stringifyRuntimeData(lazyBundles);
@@ -204,7 +204,7 @@ const formatLazyRuntimeBundle = (bundleModule: d.BundleModule): d.LazyBundleRunt
   return [bundleId, bundleCmps.map((cmp) => formatComponentRuntimeMeta(cmp, true))];
 };
 
-export const sortBundleModules = (a: d.BundleModule, b: d.BundleModule) => {
+export const sortBundleModules = (a: d.BundleModule, b: d.BundleModule): -1 | 1 | 0 => {
   const aDependents = a.cmps.reduce((dependents, cmp) => {
     dependents.push(...cmp.dependents);
     return dependents;
@@ -250,7 +250,7 @@ export const sortBundleModules = (a: d.BundleModule, b: d.BundleModule) => {
   return 0;
 };
 
-export const sortBundleComponents = (a: d.ComponentCompilerMeta, b: d.ComponentCompilerMeta) => {
+export const sortBundleComponents = (a: d.ComponentCompilerMeta, b: d.ComponentCompilerMeta): -1 | 1 | 0 => {
   // <cmp-a>
   //   <cmp-b>
   //     <cmp-c></cmp-c>
@@ -295,7 +295,7 @@ const convertChunk = async (
   isCore: boolean,
   isBrowserBuild: boolean,
   code: string
-) => {
+): Promise<string> => {
   const inlineHelpers = isBrowserBuild || !hasDependency(buildCtx, 'tslib');
   const optimizeResults = await optimizeModule(config, compilerCtx, {
     input: code,
