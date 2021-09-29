@@ -8,15 +8,15 @@ import { addCoreRuntimeApi, RUNTIME_APIS } from '../core-runtime-apis';
 /**
  * Import and define components along with any component dependents within the `dist-custom-elements` output.
  * Adds `defineCustomElement()` function for all components.
- * @param config - the Stencil configuration file
  * @param compilerCtx - current compiler context
  * @param components - all current components within the stencil buildCtx
+ * @param outputTarget - the output target being compiled
  * @returns a TS AST transformer factory function
  */
 export const addDefineCustomElementFunctions = (
-  config: d.Config,
   compilerCtx: d.CompilerCtx,
-  components: d.ComponentCompilerMeta[]
+  components: d.ComponentCompilerMeta[],
+  outputTarget: d.OutputTargetDistCustomElements
 ): ts.TransformerFactory<ts.SourceFile> => {
   return () => {
     return (tsSourceFile: ts.SourceFile): ts.SourceFile => {
@@ -58,7 +58,7 @@ export const addDefineCustomElementFunctions = (
         setupComponentDependencies(moduleFile, components, newStatements, caseStatements, tagNames);
         addDefineCustomElementFunction(tagNames, newStatements, caseStatements);
 
-        if (config.extras?.autoDefineCustomElements) {
+        if (outputTarget.autoDefineCustomElements) {
           const conditionalDefineCustomElementCall = createAutoDefinitionExpression(
             principalComponent.componentClassName
           );

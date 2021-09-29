@@ -327,13 +327,6 @@ export interface ConfigExtras {
    * can be customized at runtime. Defaults to `false`.
    */
   tagNameTransform?: boolean;
-
-  /**
-   * Enables the auto-definition of a component and its children (recursively) in the custom elements registry. This
-   * functionality allows consumers to bypass the explicit call to define a component, its children, its children's
-   * children, etc. Users of this flag should be aware that enabling this functionality may increase bundle size.
-   */
-  autoDefineCustomElements?: boolean;
 }
 
 export interface Config extends StencilConfig {
@@ -1923,6 +1916,12 @@ export interface OutputTargetDistCustomElements extends OutputTargetBaseNext {
   inlineDynamicImports?: boolean;
   includeGlobalScripts?: boolean;
   minify?: boolean;
+  /**
+   * Enables the auto-definition of a component and its children (recursively) in the custom elements registry. This
+   * functionality allows consumers to bypass the explicit call to define a component, its children, its children's
+   * children, etc. Users of this flag should be aware that enabling this functionality may increase bundle size.
+   */
+  autoDefineCustomElements?: boolean;
 }
 
 export interface OutputTargetDistCustomElementsBundle extends OutputTargetBaseNext {
