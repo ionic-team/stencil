@@ -1,7 +1,7 @@
 import type * as d from '../../../declarations';
 import type { BundleOptions } from '../../bundle/bundle-interface';
 import { bundleOutput } from '../../bundle/bundle-output';
-import { catchError, dashToPascalCase, hasError } from '@utils';
+import { catchError, dashToPascalCase, generatePreamble, hasError } from '@utils';
 import { getCustomElementsBuildConditionals } from '../dist-custom-elements-bundle/custom-elements-build-conditionals';
 import { isOutputTargetDistCustomElements } from '../output-utils';
 import { join } from 'path';
@@ -63,6 +63,7 @@ const bundleCustomElements = async (
     const build = await bundleOutput(config, compilerCtx, buildCtx, bundleOpts);
     if (build) {
       const rollupOutput = await build.generate({
+        banner: generatePreamble(config),
         format: 'esm',
         sourcemap: config.sourceMap,
         chunkFileNames: outputTarget.externalRuntime || !config.hashFileNames ? '[name].js' : 'p-[hash].js',
