@@ -20,6 +20,10 @@ export const config: Config = {
       type: 'dist',
       dir: 'test-dist',
     },
+    {
+      type: 'dist-custom-elements',
+      dir: 'test-components',
+    },
   ],
   globalScript: 'test-app/global.ts',
   globalStyle: 'test-app/style-plugin/global-sass-entry.scss',

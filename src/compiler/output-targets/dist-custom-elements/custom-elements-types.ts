@@ -90,6 +90,10 @@ const generateCustomElementType = (componentsDtsRelPath: string, cmp: d.Componen
     `    prototype: ${tagNameAsPascal};`,
     `    new (): ${tagNameAsPascal};`,
     `};`,
+    `/**`,
+    ` * Used to define this component and all nested components recursively.`,
+    ` */`,
+    `export const defineCustomElement: () => void;`,
     ``,
   ];
 
