@@ -2,7 +2,7 @@ import type * as d from '../../../declarations';
 import { generateRollupOutput } from '../../app-core/bundle-app-core';
 import { generateLazyModules } from './generate-lazy-module';
 import type { OutputOptions, RollupBuild } from 'rollup';
-import { getDynamicImportFunction } from '@utils';
+import { generatePreamble, getDynamicImportFunction } from '@utils';
 
 export const generateEsmBrowser = async (
   config: d.Config,
@@ -15,6 +15,7 @@ export const generateEsmBrowser = async (
   if (esmOutputs.length) {
     const outputTargetType = esmOutputs[0].type;
     const esmOpts: OutputOptions = {
+      banner: generatePreamble(config),
       format: 'es',
       entryFileNames: '[name].esm.js',
       chunkFileNames: config.hashFileNames ? 'p-[hash].js' : '[name]-[hash].js',

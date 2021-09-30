@@ -569,6 +569,67 @@ export const isAsyncFn = (typeChecker: ts.TypeChecker, methodDeclaration: ts.Met
   return typeStr.includes('Promise<');
 };
 
+export const createImportStatement = (importFnNames: string[], importPath: string) => {
+  // ESM Imports
+  // import { importNames } from 'importPath';
+
+  const importSpecifiers = importFnNames.map((importKey) => {
+    const splt = importKey.split(' as ');
+    let importAs = importKey;
+    let importFnName = importKey;
+
+    if (splt.length > 1) {
+      importAs = splt[1];
+      importFnName = splt[0];
+    }
+
+    return ts.createImportSpecifier(
+      typeof importFnName === 'string' && importFnName !== importAs ? ts.createIdentifier(importFnName) : undefined,
+      ts.createIdentifier(importAs)
+    );
+  });
+
+  return ts.createImportDeclaration(
+    undefined,
+    undefined,
+    ts.createImportClause(undefined, ts.createNamedImports(importSpecifiers)),
+    ts.createLiteral(importPath)
+  );
+};
+
+export const createRequireStatement = (importFnNames: string[], importPath: string) => {
+  // CommonJS require()
+  // const { a, b, c } = require(importPath);
+
+  const importBinding = ts.createObjectBindingPattern(
+    importFnNames.map((importKey) => {
+      const splt = importKey.split(' as ');
+      let importAs = importKey;
+      let importFnName = importKey;
+
+      if (splt.length > 1) {
+        importAs = splt[1];
+        importFnName = splt[0];
+      }
+      return ts.createBindingElement(undefined, importFnName, importAs);
+    })
+  );
+
+  return ts.createVariableStatement(
+    undefined,
+    ts.createVariableDeclarationList(
+      [
+        ts.createVariableDeclaration(
+          importBinding,
+          undefined,
+          ts.createCall(ts.createIdentifier('require'), [], [ts.createLiteral(importPath)])
+        ),
+      ],
+      ts.NodeFlags.Const
+    )
+  );
+};
+
 export interface ConvertIdentifier {
   __identifier: boolean;
   __escapedText: string;
