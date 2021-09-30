@@ -32,8 +32,6 @@ import type {
   VNodeData,
 } from './stencil-public-runtime';
 
-import type { SourceMap as RollupSourceMap } from 'rollup';
-
 export interface SourceMap {
   file: string;
   mappings: string;
@@ -358,6 +356,12 @@ export interface BundleEntryInputs {
   [entryKey: string]: string;
 }
 
+/**
+ * A note regarding Rollup types:
+ * As of this writing, there is no great way to import external types for packages that are directly embedded in the
+ * Stencil source. As a result, some types are duplicated here for Rollup that will be used within the codebase.
+ */
+
 export type RollupResult = RollupChunkResult | RollupAssetResult;
 
 export interface RollupAssetResult {
@@ -379,6 +383,17 @@ export interface RollupChunkResult {
   imports: string[];
   moduleFormat: ModuleFormat;
   map?: RollupSourceMap;
+}
+
+export interface RollupSourceMap {
+  file: string;
+  mappings: string;
+  names: string[];
+  sources: string[];
+  sourcesContent: string[];
+  version: number;
+  toString(): string;
+  toUrl(): string;
 }
 
 export interface BundleModule {
