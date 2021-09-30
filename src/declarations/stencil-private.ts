@@ -360,6 +360,7 @@ export interface BundleEntryInputs {
  * A note regarding Rollup types:
  * As of this writing, there is no great way to import external types for packages that are directly embedded in the
  * Stencil source. As a result, some types are duplicated here for Rollup that will be used within the codebase.
+ * Updates to rollup may require these typings to be updated.
  */
 
 export type RollupResult = RollupChunkResult | RollupAssetResult;
