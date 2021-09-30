@@ -91,6 +91,7 @@ const extractCommentsWithHash = (input: string): string[] => {
 
 const _ruleRe = /(\s*)([^;\{\}]+?)(\s*)((?:{%BLOCK%}?\s*;?)|(?:\s*;))/g;
 const _curlyRe = /([{}])/g;
+const _selectorPartsRe = /(.*?)((?<!\\)(:+|$)(.*))/;
 const OPEN_CURLY = '{';
 const CLOSE_CURLY = '}';
 const BLOCK_PLACEHOLDER = '%BLOCK%';
@@ -263,9 +264,12 @@ const applySimpleSelectorScope = (selector: string, scopeSelector: string, hostS
     const replaceBy = `.${hostSelector}`;
     return selector
       .replace(_polyfillHostNoCombinatorRe, (_, selector) => {
-        return selector.replace(/([^:]*)(:*)(.*)/, (_: string, before: string, colon: string, after: string) => {
-          return before + replaceBy + colon + after;
-        });
+        return selector.replace(
+          _selectorPartsRe,
+          (_: string, before: string, _colonGroup: string, colon: string, after: string) => {
+            return before + replaceBy + colon + after;
+          }
+        );
       })
       .replace(_polyfillHostRe, replaceBy + ' ');
   }
@@ -292,9 +296,9 @@ const applyStrictSelectorScope = (selector: string, scopeSelector: string, hostS
       // remove :host since it should be unnecessary
       const t = p.replace(_polyfillHostRe, '');
       if (t.length > 0) {
-        const matches = t.match(/([^:]*)(:*)(.*)/);
+        const matches = t.match(_selectorPartsRe);
         if (matches) {
-          scopedP = matches[1] + className + matches[2] + matches[3];
+          scopedP = matches[1] + className + matches[3] + matches[4];
         }
       }
     }
