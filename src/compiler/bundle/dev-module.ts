@@ -3,6 +3,7 @@ import { basename, dirname, join, relative } from 'path';
 import { BuildContext } from '../build/build-ctx';
 import { getRollupOptions } from './bundle-output';
 import { OutputOptions, PartialResolvedId, rollup } from 'rollup';
+import { generatePreamble } from '@utils';
 
 export const devNodeModuleResolveId = async (
   config: d.Config,
@@ -143,6 +144,7 @@ const bundleDevModule = async (
     const rollupBuild = await rollup(inputOpts);
 
     const outputOpts: OutputOptions = {
+      banner: generatePreamble(config),
       format: 'es',
     };
 

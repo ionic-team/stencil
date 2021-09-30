@@ -4,6 +4,7 @@ import { generateLazyModules } from './generate-lazy-module';
 import { join } from 'path';
 import type { OutputOptions, RollupBuild } from 'rollup';
 import { relativeImport } from '../output-utils';
+import { generatePreamble } from '@utils';
 
 export const generateCjs = async (
   config: d.Config,
@@ -17,6 +18,7 @@ export const generateCjs = async (
   if (cjsOutputs.length > 0) {
     const outputTargetType = cjsOutputs[0].type;
     const esmOpts: OutputOptions = {
+      banner: generatePreamble(config),
       format: 'cjs',
       entryFileNames: '[name].cjs.js',
       assetFileNames: '[name]-[hash][extname]',

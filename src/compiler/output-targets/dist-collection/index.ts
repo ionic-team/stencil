@@ -1,5 +1,5 @@
 import type * as d from '../../../declarations';
-import { catchError } from '@utils';
+import { catchError, generatePreamble } from '@utils';
 import { isOutputTargetDistCollection } from '../output-utils';
 import { join, relative } from 'path';
 import { writeCollectionManifests } from '../output-collection';
@@ -19,7 +19,10 @@ export const outputCollection = async (
   try {
     await Promise.all(
       changedModuleFiles.map(async (mod) => {
-        const code = mod.staticSourceFileText;
+        let code = mod.staticSourceFileText;
+        if (config.preamble) {
+          code = `${generatePreamble(config)}\n${code}`;
+        }
 
         await Promise.all(
           outputTargets.map(async (o) => {

@@ -1,16 +1,13 @@
-export const IS_DENO_ENV = typeof Deno !== 'undefined';
-
 export const IS_NODE_ENV =
-  !IS_DENO_ENV &&
   typeof global !== 'undefined' &&
   typeof require === 'function' &&
   !!global.process &&
   typeof __filename === 'string' &&
   (!(global as any as Window).origin || typeof (global as any as Window).origin !== 'string');
 
-export const OS_PLATFORM = IS_NODE_ENV ? process.platform : IS_DENO_ENV ? Deno.build.os : '';
+export const OS_PLATFORM = IS_NODE_ENV ? process.platform : '';
 
-export const IS_WINDOWS_ENV = OS_PLATFORM === 'win32' || OS_PLATFORM === 'windows';
+export const IS_WINDOWS_ENV = OS_PLATFORM === 'win32';
 
 export const IS_CASE_SENSITIVE_FILE_NAMES = !IS_WINDOWS_ENV;
 
@@ -26,6 +23,4 @@ export const IS_FETCH_ENV = typeof fetch === 'function';
 
 export const requireFunc = IS_NODE_ENV ? require : () => {};
 
-export const getCurrentDirectory: () => string = IS_NODE_ENV ? process.cwd : IS_DENO_ENV ? Deno.cwd : () => '/';
-
-declare const Deno: any;
+export const getCurrentDirectory: () => string = IS_NODE_ENV ? process.cwd : () => '/';
