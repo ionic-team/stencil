@@ -152,6 +152,7 @@ async function getInstalledPackages(
 ): Promise<{ packages: string[]; packages_no_versions: string[] }> {
   let packages: string[] = [];
   let packages_no_versions: string[] = [];
+  const yarn = isUsingYarn(sys);
 
   try {
     // Read package.json and package-lock.json
@@ -176,13 +177,7 @@ async function getInstalledPackages(
     );
 
     try {
-      if (!isUsingYarn(sys)) {
-        packages = await npmPackages(sys, ionicPackages);
-      } else if (isUsingYarn(sys)) {
-        packages = await yarnPackages(sys, ionicPackages);
-      } else {
-        packages = ionicPackages.map(([k, v]) => `${k}@${v.replace('^', '')}`);
-      }
+      packages = yarn ? await yarnPackages(sys, ionicPackages) : await npmPackages(sys, ionicPackages);
     } catch (e) {
       packages = ionicPackages.map(([k, v]) => `${k}@${v.replace('^', '')}`);
     }
@@ -221,7 +216,7 @@ async function npmPackages(sys: d.CompilerSystem, ionicPackages: [string, string
  */
 async function yarnPackages(sys: d.CompilerSystem, ionicPackages: [string, string][]) {
   const appRootDir = sys.getCurrentDirectory();
-  const yarnLock = sys.readFileSync(appRootDir + '/yarn.lock');
+  const yarnLock = sys.readFileSync(sys.resolvePath(appRootDir + '/yarn.lock'));
   const packageLockJson = sys.parseYarnLockFile(yarnLock);
 
   return ionicPackages.map(([k, v]) => {
@@ -232,6 +227,12 @@ async function yarnPackages(sys: d.CompilerSystem, ionicPackages: [string, strin
   });
 }
 
+/**
+ * This function is used for fallback purposes, where an npm or yarn lock file doesn't exist in the consumers directory.
+ * This will strip away ^ and ~ from the declared package versions in a package.json.
+ * @param version the raw semver pattern identifier version string
+ * @returns a cleaned up representation without any qualifiers
+ */
 function sanitizeDeclaredVersion(version: string) {
   return version.replace(/[*^~]/g, '');
 }
