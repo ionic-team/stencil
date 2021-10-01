@@ -200,7 +200,7 @@ const getDocsMethods = (methods: d.ComponentCompilerMethod[]): d.JsonDocsMethod[
       returns: {
         type: member.complexType.return,
         docs: member.docs.tags
-          .filter((t) => t.name === 'returns')
+          .filter((t) => t.name === 'return' || t.name === 'returns')
           .map((t) => t.text)
           .join('\n'),
       },
