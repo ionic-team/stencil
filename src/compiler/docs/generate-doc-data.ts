@@ -199,7 +199,10 @@ const getDocsMethods = (methods: d.ComponentCompilerMethod[]): d.JsonDocsMethod[
       name: member.name,
       returns: {
         type: member.complexType.return,
-        docs: member.docs.tags.filter((t) => t.name === 'return').join('\n'),
+        docs: member.docs.tags
+          .filter((t) => t.name === 'return' || t.name === 'returns')
+          .map((t) => t.text)
+          .join('\n'),
       },
       signature: `${member.name}${member.complexType.signature}`,
       parameters: [], // TODO
