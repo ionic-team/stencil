@@ -1,7 +1,7 @@
 import type * as d from '../../declarations';
 import type { Plugin, TransformResult, PluginContext } from 'rollup';
 import { bundleOutput } from './bundle-output';
-import { normalizeFsPath, hasError } from '@utils';
+import { normalizeFsPath, hasError, generatePreamble } from '@utils';
 import { optimizeModule } from '../optimize/optimize-module';
 import { STENCIL_INTERNAL_ID } from './entry-alias-ids';
 
@@ -178,10 +178,10 @@ const buildWorker = async (
   });
 
   if (build) {
-    // Generate commonjs output so we can intercept exports at runtme
+    // Generate commonjs output so we can intercept exports at runtime
     const output = await build.generate({
       format: 'commonjs',
-      banner: '(()=>{\n',
+      banner: `${generatePreamble(config)}\n(()=>{\n`,
       footer: '})();',
       intro: getWorkerIntro(workerMsgId, config.devMode),
       esModule: false,

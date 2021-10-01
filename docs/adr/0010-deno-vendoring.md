@@ -4,7 +4,7 @@ Date: 2021-08-24
 
 ## Status
 
-accepted
+deprecated - see [0013-deno-removal.md](./0013-deno-removal.md)
 
 ## Context
 
@@ -66,4 +66,5 @@ experimental feature, we accept that risk.
 
 ## Links
 
+- Document that supersedes this one: [0013-deno-removal.md](./0013-deno-removal.md)
 - PR introducing this change: [fix(ci): vendor deno for builds #3020](https://github.com/ionic-team/stencil/pull/3020)
