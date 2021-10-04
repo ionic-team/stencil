@@ -233,7 +233,7 @@ async function yarnPackages(sys: d.CompilerSystem, ionicPackages: [string, strin
  * @param version the raw semver pattern identifier version string
  * @returns a cleaned up representation without any qualifiers
  */
-function sanitizeDeclaredVersion(version: string) {
+function sanitizeDeclaredVersion(version: string): string {
   return version.replace(/[*^~]/g, '');
 }
 
