@@ -73,7 +73,14 @@ export const appDataPlugin = (
       }
 
       const module = compilerCtx.moduleMap.get(config.globalScript);
-      if (!module.sourceMapFileText) return { code: module.staticSourceFileText, map: null };
+      if (!module) {
+        return null;
+      } else if (!module.sourceMapFileText) {
+        return {
+          code: module.staticSourceFileText,
+          map: null,
+        };
+      }
 
       const sourceMap: d.SourceMap = JSON.parse(module.sourceMapFileText);
       sourceMap.sources = sourceMap.sources.map((src) => basename(src));
@@ -86,32 +93,36 @@ export const appDataPlugin = (
         const program = this.parse(code, {});
         const needsDefault = !(program as any).body.some((s: any) => s.type === 'ExportDefaultDeclaration');
         const defaultExport = needsDefault ? '\nexport const globalFn = () => {};\nexport default globalFn;' : '';
-
-        var codeMs = new MagicString(code);
-        codeMs.prepend(getContextImport(platform));
-        codeMs.append(defaultExport);
+        code = getContextImport(platform) + code + defaultExport;
 
         const compilerOptions: ts.CompilerOptions = { ...config.tsCompilerOptions };
         compilerOptions.module = ts.ModuleKind.ESNext;
 
-        const results = ts.transpileModule(codeMs.toString(), {
+        const results = ts.transpileModule(code, {
           compilerOptions,
           fileName: id,
           transformers: {
             after: [removeCollectionImports(compilerCtx)],
           },
         });
-        const sourceMap = results.sourceMapText ? JSON.parse(results.sourceMapText) : null;
         buildCtx.diagnostics.push(...loadTypeScriptDiagnostics(results.diagnostics));
 
         if (config.sourceMap) {
+          // generate the sourcemap for global script
+          const codeMs = new MagicString(code);
           const codeMap = codeMs.generateMap({
             source: id,
+            // this is the name of the sourcemap, not to be confused with the `file` field in a generated sourcemap
             file: id + '.map',
-            includeContent: true,
             hires: true,
           });
-          return { code: results.outputText, map: sourceMapMerge(codeMap, sourceMap) };
+
+          const sourceMap: d.SourceMap = results.sourceMapText ? JSON.parse(results.sourceMapText) : null;
+          if (!sourceMap) {
+            return { code: results.outputText };
+          }
+
+          return { code: results.outputText, map: sourceMapMerge(sourceMap, codeMap) };
         }
 
         return { code: results.outputText };
