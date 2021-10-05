@@ -998,6 +998,10 @@ export interface CompilerSystem {
    */
   normalizePath(p: string): string;
   onProcessInterrupt?(cb: () => void): void;
+  parseYarnLockFile?: (content: string) => {
+    type: 'success' | 'merge' | 'conflict';
+    object: any;
+  };
   platformPath: PlatformPath;
   /**
    * All return paths are full normalized paths, not just the basenames. Always returns an array, does not throw.
