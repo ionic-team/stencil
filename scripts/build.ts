@@ -9,7 +9,6 @@ import { internal } from './bundles/internal';
 import { mockDoc } from './bundles/mock-doc';
 import { release } from './release';
 import { screenshot } from './bundles/screenshot';
-import { sysDeno } from './bundles/sys-deno';
 import { sysNode, sysNodeExternalBundles } from './bundles/sys-node';
 import { testing } from './bundles/testing';
 import { validateBuild } from './test/validate-build';
@@ -52,7 +51,6 @@ export async function createBuild(opts: BuildOptions): Promise<readonly RollupOp
     emptyDir(opts.output.devServerDir),
     emptyDir(opts.output.internalDir),
     emptyDir(opts.output.mockDocDir),
-    emptyDir(opts.output.sysDenoDir),
     emptyDir(opts.output.sysNodeDir),
     emptyDir(opts.output.testingDir),
     updateDependenciesJson(opts),
@@ -68,7 +66,6 @@ export async function createBuild(opts: BuildOptions): Promise<readonly RollupOp
     mockDoc(opts),
     screenshot(opts),
     testing(opts),
-    sysDeno(opts),
     sysNode(opts),
   ]);
 

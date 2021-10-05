@@ -5,6 +5,7 @@ import { getAppBrowserCorePolyfills } from '../../app-core/app-polyfills';
 import { join } from 'path';
 import type { OutputOptions, RollupBuild } from 'rollup';
 import { relativeImport } from '../output-utils';
+import { generatePreamble } from '@utils';
 
 export const generateSystem = async (
   config: d.Config,
@@ -17,6 +18,7 @@ export const generateSystem = async (
 
   if (systemOutputs.length > 0) {
     const esmOpts: OutputOptions = {
+      banner: generatePreamble(config),
       format: 'system',
       entryFileNames: config.hashFileNames ? 'p-[hash].system.js' : '[name].system.js',
       chunkFileNames: config.hashFileNames ? 'p-[hash].system.js' : '[name]-[hash].system.js',
