@@ -107,7 +107,7 @@ export const prepareData = async (
   component_count: number = undefined
 ): Promise<d.TrackableData> => {
   const { typescript, rollup } = coreCompiler.versions || { typescript: 'unknown', rollup: 'unknown' };
-  const { packages, packages_no_versions } = await getInstalledPackages(sys, config);
+  const { packages, packagesNoVersions } = await getInstalledPackages(sys, config);
   const targets = await getActiveTargets(config);
   const yarn = isUsingYarn(sys);
   const stencil = coreCompiler.version || 'unknown';
@@ -124,7 +124,7 @@ export const prepareData = async (
     component_count,
     targets,
     packages,
-    packages_no_versions,
+    packages_no_versions: packagesNoVersions,
     arguments: config.flags.args,
     task: config.flags.task,
     stencil,
@@ -149,9 +149,9 @@ export const prepareData = async (
 async function getInstalledPackages(
   sys: d.CompilerSystem,
   config: d.Config
-): Promise<{ packages: string[]; packages_no_versions: string[] }> {
+): Promise<{ packages: string[]; packagesNoVersions: string[] }> {
   let packages: string[] = [];
-  let packages_no_versions: string[] = [];
+  let packagesNoVersions: string[] = [];
   const yarn = isUsingYarn(sys);
 
   try {
@@ -162,7 +162,7 @@ async function getInstalledPackages(
 
     // They don't have a package.json for some reason? Eject button.
     if (!packageJson) {
-      return { packages, packages_no_versions };
+      return { packages, packagesNoVersions };
     }
 
     const rawPackages: [string, string][] = Object.entries({
@@ -182,12 +182,12 @@ async function getInstalledPackages(
       packages = ionicPackages.map(([k, v]) => `${k}@${v.replace('^', '')}`);
     }
 
-    packages_no_versions = ionicPackages.map(([k]) => `${k}`);
+    packagesNoVersions = ionicPackages.map(([k]) => `${k}`);
 
-    return { packages, packages_no_versions };
+    return { packages, packagesNoVersions };
   } catch (err) {
     hasDebug(config) && console.error(err);
-    return { packages, packages_no_versions };
+    return { packages, packagesNoVersions };
   }
 }
 
@@ -217,11 +217,11 @@ async function npmPackages(sys: d.CompilerSystem, ionicPackages: [string, string
 async function yarnPackages(sys: d.CompilerSystem, ionicPackages: [string, string][]): Promise<string[]> {
   const appRootDir = sys.getCurrentDirectory();
   const yarnLock = sys.readFileSync(sys.resolvePath(appRootDir + '/yarn.lock'));
-  const packageLockJson = sys.parseYarnLockFile(yarnLock);
+  const yarnLockYml = sys.parseYarnLockFile(yarnLock);
 
   return ionicPackages.map(([k, v]) => {
     const identifiedVersion = `${k}@${v}`;
-    let version = packageLockJson.object[identifiedVersion]?.version;
+    let version = yarnLockYml.object[identifiedVersion]?.version;
     version = version.includes('undefined') ? sanitizeDeclaredVersion(identifiedVersion) : version;
     return `${k}@${version}`;
   });
