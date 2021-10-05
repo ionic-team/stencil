@@ -197,7 +197,7 @@ async function getInstalledPackages(
  * @param ionicPackages a list of the found packages matching `@stencil`, `@capacitor`, or `@ionic` from the package.json file.
  * @returns an array of strings of all the packages and their versions.
  */
-async function npmPackages(sys: d.CompilerSystem, ionicPackages: [string, string][]) {
+async function npmPackages(sys: d.CompilerSystem, ionicPackages: [string, string][]): Promise<string[]> {
   const appRootDir = sys.getCurrentDirectory();
   const packageLockJson: any = await tryFn(readJson, sys, sys.resolvePath(appRootDir + '/package-lock.json'));
 
