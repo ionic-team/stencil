@@ -1,6 +1,6 @@
 import { minfyJsId } from '../../version';
 import { minifyJs } from './minify-js';
-import type { CompilerCtx, Config, Diagnostic, SourceTarget, SourceMap } from '../../declarations';
+import type { CompilerCtx, Config, OptimizeJsResult, SourceTarget, SourceMap } from '../../declarations';
 import type { CompressOptions, MangleOptions, MinifyOptions, SourceMapOptions } from 'terser';
 import sourceMapMerge from 'merge-source-map';
 import ts from 'typescript';
@@ -15,14 +15,19 @@ interface OptimizeModuleOptions {
   modeName?: string;
 }
 
-export const optimizeModule = async (config: Config, compilerCtx: CompilerCtx, opts: OptimizeModuleOptions) => {
+export const optimizeModule = async (
+  config: Config,
+  compilerCtx: CompilerCtx,
+  opts: OptimizeModuleOptions
+): Promise<OptimizeJsResult> => {
   if ((!opts.minify && opts.sourceTarget !== 'es5') || opts.input === '') {
     return {
       output: opts.input,
-      diagnostics: [] as Diagnostic[],
-      sourceMap: opts.sourceMap as SourceMap,
+      diagnostics: [],
+      sourceMap: opts.sourceMap,
     };
   }
+
   const isDebug = config.logLevel === 'debug';
   const cacheKey = await compilerCtx.cache.createKey('optimizeModule', minfyJsId, opts, isDebug);
   const cachedContent = await compilerCtx.cache.get(cacheKey);
@@ -30,8 +35,8 @@ export const optimizeModule = async (config: Config, compilerCtx: CompilerCtx, o
     const cachedMap = await compilerCtx.cache.get(cacheKey + 'Map');
     return {
       output: cachedContent,
-      diagnostics: [] as Diagnostic[],
-      sourceMap: cachedMap ? (JSON.parse(cachedMap) as SourceMap) : null,
+      diagnostics: [],
+      sourceMap: cachedMap ? JSON.parse(cachedMap) : null,
     };
   }
 
@@ -90,7 +95,7 @@ export const optimizeModule = async (config: Config, compilerCtx: CompilerCtx, o
   return results;
 };
 
-export const getTerserOptions = (config: Config, sourceTarget: SourceTarget, prettyOutput: boolean) => {
+export const getTerserOptions = (config: Config, sourceTarget: SourceTarget, prettyOutput: boolean): MinifyOptions => {
   const opts: MinifyOptions = {
     ie8: false,
     safari10: !!config.extras.safari10,
@@ -142,11 +147,11 @@ export const prepareModule = async (
   minifyOpts: MinifyOptions,
   transpileToEs5: boolean,
   inlineHelpers: boolean
-) => {
-  const results = {
+): Promise<OptimizeJsResult> => {
+  const results: OptimizeJsResult = {
     output: input,
-    diagnostics: [] as Diagnostic[],
-    sourceMap: null as SourceMap,
+    diagnostics: [],
+    sourceMap: null,
   };
 
   if (transpileToEs5) {
@@ -172,7 +177,7 @@ export const prepareModule = async (
       const mergeMap = sourceMapMerge(
         (minifyOpts.sourceMap as SourceMapOptions)?.content as SourceMap,
         JSON.parse(tsResults.sourceMapText)
-      ) as SourceMap;
+      );
       minifyOpts.sourceMap = { content: mergeMap };
     }
   }

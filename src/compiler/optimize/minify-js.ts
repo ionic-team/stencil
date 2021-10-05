@@ -2,11 +2,11 @@ import type * as d from '../../declarations';
 import { splitLineBreaks } from '@utils';
 import { CompressOptions, MangleOptions, ManglePropertiesOptions, MinifyOptions, minify } from 'terser';
 
-export const minifyJs = async (input: string, opts?: MinifyOptions) => {
-  const results = {
+export const minifyJs = async (input: string, opts?: MinifyOptions): Promise<d.OptimizeJsResult> => {
+  const results: d.OptimizeJsResult = {
     output: input,
-    sourceMap: null as d.SourceMap,
-    diagnostics: [] as d.Diagnostic[],
+    sourceMap: null,
+    diagnostics: [],
   };
 
   if (opts) {

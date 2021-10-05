@@ -397,6 +397,15 @@ export interface RollupSourceMap {
   toUrl(): string;
 }
 
+/**
+ * Result of Stencil compressing, mangling, and otherwise 'minifying' JavaScript
+ */
+export type OptimizeJsResult = {
+  output: string;
+  diagnostics: Diagnostic[];
+  sourceMap?: SourceMap;
+};
+
 export interface BundleModule {
   entryKey: string;
   rollupResult: RollupChunkResult;
