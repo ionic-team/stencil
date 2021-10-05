@@ -2,6 +2,12 @@ import type * as d from '../../declarations';
 import { splitLineBreaks } from '@utils';
 import { CompressOptions, MangleOptions, ManglePropertiesOptions, MinifyOptions, minify } from 'terser';
 
+/**
+ * Performs the minification of JavaScript source
+ * @param input the JavaScript source to minify
+ * @param opts the options used by the minifier
+ * @returns the resulting minified JavaScript
+ */
 export const minifyJs = async (input: string, opts?: MinifyOptions): Promise<d.OptimizeJsResult> => {
   const results: d.OptimizeJsResult = {
     output: input,
