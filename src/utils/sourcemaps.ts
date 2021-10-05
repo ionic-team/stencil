@@ -29,13 +29,29 @@ export const rollupToStencilSourceMap = (rollupSourceMap: RollupSourceMap | unde
 const JS_SOURCE_MAPPING_URL_LINKER = '//# sourceMappingURL=';
 
 /**
+ * Generates an RFC-3986 compliant string for the given input.
+ * More information about RFC-3986 can be found [here](https://datatracker.ietf.org/doc/html/rfc3986)
+ * This function's original source is derived from
+ * [MDN's encodeURIComponent documentation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/encodeURIComponent#description)
+ * @param uri the URI to encode
+ * @returns the encoded URI
+ */
+const encodeUriToRfc3986 = (uri: string): string => {
+  const encodedUri = encodeURIComponent(uri);
+  // replace all '!', single quotes, '(', ')', and '*' with their hexadecimal values (UTC-16)
+  return encodedUri.replace(/[!'()*]/g, (matchedCharacter) => {
+    return '%' + matchedCharacter.charCodeAt(0).toString(16);
+  });
+};
+
+/**
  * Generates a string used to link generated code with the original source, to be placed at the end of the generated
  * code. Note that at this time, this method is _not_ RFC3986 compliant.
  * @param url the url of the source map
  * @returns a linker string, of the format {@link JS_SOURCE_MAPPING_URL_LINKER}=<url>
  */
 export const getSourceMappingUrlLinker = (url: string): string => {
-  return `${JS_SOURCE_MAPPING_URL_LINKER}${url}`;
+  return `${JS_SOURCE_MAPPING_URL_LINKER}${encodeUriToRfc3986(url)}`;
 };
 
 /**
