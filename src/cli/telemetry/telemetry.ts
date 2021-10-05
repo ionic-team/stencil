@@ -229,7 +229,7 @@ async function yarnPackages(sys: d.CompilerSystem, ionicPackages: [string, strin
 
 /**
  * This function is used for fallback purposes, where an npm or yarn lock file doesn't exist in the consumers directory.
- * This will strip away ^ and ~ from the declared package versions in a package.json.
+ * This will strip away '*', '^' and '~' from the declared package versions in a package.json.
  * @param version the raw semver pattern identifier version string
  * @returns a cleaned up representation without any qualifiers
  */
