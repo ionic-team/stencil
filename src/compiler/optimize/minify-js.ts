@@ -23,6 +23,15 @@ export const minifyJs = async (input: string, opts?: MinifyOptions): Promise<d.O
         mangleProperties.regex = new RegExp(mangleProperties.regex);
       }
     }
+    if (opts.sourceMap) {
+      /**
+       * sourceMap, when used in conjunction with compress, can lead to sourcemaps that don't in every browser. despite
+       * there being a sourcemap spec, each browser has it's own tricks for trying to get sourcemaps to properly map
+       * minified JS back to its original form. for the most consistent results across all browsers, explicitly disable
+       * compress.
+       */
+      opts.compress = undefined;
+    }
   }
 
   try {
@@ -30,9 +39,9 @@ export const minifyJs = async (input: string, opts?: MinifyOptions): Promise<d.O
 
     results.output = minifyResults.code;
     results.sourceMap = typeof minifyResults.map === 'string' ? JSON.parse(minifyResults.map) : minifyResults.map;
-
     const compress = opts.compress as CompressOptions;
     if (compress && compress.module && results.output.endsWith('};')) {
+      // stripping the semicolon here _shouldn't_ be of significant consequence for the already generated sourcemap
       results.output = results.output.substring(0, results.output.length - 1);
     }
   } catch (e) {

@@ -57,7 +57,9 @@ export const optimizeModule = async (
 
   if (opts.sourceTarget === 'es5' || opts.minify) {
     minifyOpts = getTerserOptions(config, opts.sourceTarget, isDebug);
-    if (config.sourceMap) minifyOpts.sourceMap = { content: opts.sourceMap };
+    if (config.sourceMap) {
+      minifyOpts.sourceMap = { content: opts.sourceMap };
+    }
 
     const compressOpts = minifyOpts.compress as CompressOptions;
     const mangleOptions = minifyOpts.mangle as MangleOptions;
@@ -96,7 +98,9 @@ export const optimizeModule = async (
       results.output = results.output.replace(/disconnectedCallback\(\)\{\},/g, '');
     }
     await compilerCtx.cache.put(cacheKey, results.output);
-    if (results.sourceMap) await compilerCtx.cache.put(cacheKey + 'Map', JSON.stringify(results.sourceMap));
+    if (results.sourceMap) {
+      await compilerCtx.cache.put(cacheKey + 'Map', JSON.stringify(results.sourceMap));
+    }
   }
 
   return results;
