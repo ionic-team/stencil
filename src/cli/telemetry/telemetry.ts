@@ -214,7 +214,7 @@ async function npmPackages(sys: d.CompilerSystem, ionicPackages: [string, string
  * @param ionicPackages a list of the found packages matching `@stencil`, `@capacitor`, or `@ionic` from the package.json file.
  * @returns an array of strings of all the packages and their versions.
  */
-async function yarnPackages(sys: d.CompilerSystem, ionicPackages: [string, string][]) {
+async function yarnPackages(sys: d.CompilerSystem, ionicPackages: [string, string][]): Promise<string[]> {
   const appRootDir = sys.getCurrentDirectory();
   const yarnLock = sys.readFileSync(sys.resolvePath(appRootDir + '/yarn.lock'));
   const packageLockJson = sys.parseYarnLockFile(yarnLock);
