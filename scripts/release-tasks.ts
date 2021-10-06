@@ -91,8 +91,8 @@ export function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<string>)
       title: 'Check current branch',
       task: () =>
         execa('git', ['symbolic-ref', '--short', 'HEAD']).then(({ stdout }) => {
-          if (stdout !== 'master' && !isAnyBranch) {
-            throw new Error('Not on `master` branch. Use --any-branch to publish anyway.');
+          if (stdout !== 'main' && !isAnyBranch) {
+            throw new Error('Not on `main` branch. Use --any-branch to publish anyway.');
           }
         }),
       skip: () => isDryRun,
