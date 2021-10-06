@@ -1,11 +1,13 @@
 import { minfyJsId } from '../../version';
 import { minifyJs } from './minify-js';
-import type { CompilerCtx, Config, Diagnostic, SourceTarget } from '../../declarations';
-import type { CompressOptions, MangleOptions, MinifyOptions } from 'terser';
+import type { CompilerCtx, Config, OptimizeJsResult, SourceTarget, SourceMap } from '../../declarations';
+import type { CompressOptions, MangleOptions, MinifyOptions, SourceMapOptions } from 'terser';
+import sourceMapMerge from 'merge-source-map';
 import ts from 'typescript';
 
 interface OptimizeModuleOptions {
   input: string;
+  sourceMap?: SourceMap;
   sourceTarget?: SourceTarget;
   isCore?: boolean;
   minify?: boolean;
@@ -13,20 +15,35 @@ interface OptimizeModuleOptions {
   modeName?: string;
 }
 
-export const optimizeModule = async (config: Config, compilerCtx: CompilerCtx, opts: OptimizeModuleOptions) => {
+/**
+ * Begins the process of minifying a user's JavaScript
+ * @param config the Stencil configuration file that was provided as a part of the build step
+ * @param compilerCtx the current compiler context
+ * @param opts minification options that specify how the JavaScript ought to be minified
+ * @returns the minified JavaScript result
+ */
+export const optimizeModule = async (
+  config: Config,
+  compilerCtx: CompilerCtx,
+  opts: OptimizeModuleOptions
+): Promise<OptimizeJsResult> => {
   if ((!opts.minify && opts.sourceTarget !== 'es5') || opts.input === '') {
     return {
       output: opts.input,
-      diagnostics: [] as Diagnostic[],
+      diagnostics: [],
+      sourceMap: opts.sourceMap,
     };
   }
+
   const isDebug = config.logLevel === 'debug';
   const cacheKey = await compilerCtx.cache.createKey('optimizeModule', minfyJsId, opts, isDebug);
   const cachedContent = await compilerCtx.cache.get(cacheKey);
   if (cachedContent != null) {
+    const cachedMap = await compilerCtx.cache.get(cacheKey + 'Map');
     return {
       output: cachedContent,
-      diagnostics: [] as Diagnostic[],
+      diagnostics: [],
+      sourceMap: cachedMap ? JSON.parse(cachedMap) : null,
     };
   }
 
@@ -40,6 +57,10 @@ export const optimizeModule = async (config: Config, compilerCtx: CompilerCtx, o
 
   if (opts.sourceTarget === 'es5' || opts.minify) {
     minifyOpts = getTerserOptions(config, opts.sourceTarget, isDebug);
+    if (config.sourceMap) {
+      minifyOpts.sourceMap = { content: opts.sourceMap };
+    }
+
     const compressOpts = minifyOpts.compress as CompressOptions;
     const mangleOptions = minifyOpts.mangle as MangleOptions;
 
@@ -77,16 +98,27 @@ export const optimizeModule = async (config: Config, compilerCtx: CompilerCtx, o
       results.output = results.output.replace(/disconnectedCallback\(\)\{\},/g, '');
     }
     await compilerCtx.cache.put(cacheKey, results.output);
+    if (results.sourceMap) {
+      await compilerCtx.cache.put(cacheKey + 'Map', JSON.stringify(results.sourceMap));
+    }
   }
 
   return results;
 };
 
-export const getTerserOptions = (config: Config, sourceTarget: SourceTarget, prettyOutput: boolean) => {
+/**
+ * Builds a configuration object to be used by Terser for the purposes of minifying a user's JavaScript
+ * @param config the Stencil configuration file that was provided as a part of the build step
+ * @param sourceTarget the version of JavaScript being targeted (e.g. ES2017)
+ * @param prettyOutput if true, set the necessary flags to beautify the output of terser
+ * @returns the minification options
+ */
+export const getTerserOptions = (config: Config, sourceTarget: SourceTarget, prettyOutput: boolean): MinifyOptions => {
   const opts: MinifyOptions = {
     ie8: false,
     safari10: !!config.extras.safari10,
     format: {},
+    sourceMap: config.sourceMap,
   };
 
   if (sourceTarget === 'es5') {
@@ -128,22 +160,32 @@ export const getTerserOptions = (config: Config, sourceTarget: SourceTarget, pre
   return opts;
 };
 
+/**
+ * This method is likely to be called by a worker on the compiler context, rather than directly.
+ * @param input the source code to minify
+ * @param minifyOpts options to be used by the minifier
+ * @param transpileToEs5 if true, use the TypeScript compiler to transpile the input to ES5 prior to minification
+ * @param inlineHelpers when true, emits less terse JavaScript by allowing global helpers created by the TypeScript
+ * compiler to be added directly to the transpiled source. Used only if `transpileToEs5` is true.
+ * @returns minified input, as JavaScript
+ */
 export const prepareModule = async (
   input: string,
   minifyOpts: MinifyOptions,
   transpileToEs5: boolean,
   inlineHelpers: boolean
-) => {
-  const results = {
+): Promise<OptimizeJsResult> => {
+  const results: OptimizeJsResult = {
     output: input,
-    diagnostics: [] as Diagnostic[],
+    diagnostics: [],
+    sourceMap: null,
   };
 
   if (transpileToEs5) {
     const tsResults = ts.transpileModule(input, {
       fileName: 'module.ts',
       compilerOptions: {
-        sourceMap: false,
+        sourceMap: !!minifyOpts.sourceMap,
         allowJs: true,
         target: ts.ScriptTarget.ES5,
         module: ts.ModuleKind.ESNext,
@@ -156,6 +198,15 @@ export const prepareModule = async (
       reportDiagnostics: false,
     });
     results.output = tsResults.outputText;
+
+    if (tsResults.sourceMapText) {
+      // need to merge sourcemaps at this point
+      const mergeMap = sourceMapMerge(
+        (minifyOpts.sourceMap as SourceMapOptions)?.content as SourceMap,
+        JSON.parse(tsResults.sourceMapText)
+      );
+      minifyOpts.sourceMap = { content: mergeMap };
+    }
   }
 
   if (minifyOpts) {

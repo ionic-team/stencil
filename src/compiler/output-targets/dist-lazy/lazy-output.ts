@@ -24,13 +24,14 @@ import { removeCollectionImports } from '../../transformers/remove-collection-im
 import { updateStencilCoreImports } from '../../transformers/update-stencil-core-import';
 import MagicString from 'magic-string';
 
-export const outputLazy = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
+export const outputLazy = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx): Promise<void> => {
   const outputTargets = config.outputTargets.filter(isOutputTargetDistLazy);
   if (outputTargets.length === 0) {
     return;
   }
 
-  const timespan = buildCtx.createTimeSpan(`generate lazy started`);
+  const bundleEventMessage = `generate lazy${config.sourceMap ? ' + source maps' : ''}`;
+  const timespan = buildCtx.createTimeSpan(`${bundleEventMessage} started`);
 
   try {
     const bundleOpts: BundleOptions = {
@@ -89,7 +90,7 @@ export const outputLazy = async (config: d.Config, compilerCtx: d.CompilerCtx, b
     catchError(buildCtx.diagnostics, e);
   }
 
-  timespan.finish(`generate lazy finished`);
+  timespan.finish(`${bundleEventMessage} finished`);
 };
 
 const getLazyCustomTransformer = (config: d.Config, compilerCtx: d.CompilerCtx) => {
