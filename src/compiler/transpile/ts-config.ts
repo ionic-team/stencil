@@ -10,7 +10,8 @@ export const getTsOptionsToExtend = (config: d.Config) => {
     moduleResolution: ts.ModuleResolutionKind.NodeJs,
     noEmitOnError: false,
     outDir: config.cacheDir || config.sys.tmpDirSync(),
-    sourceMap: !!config.sourceMap,
+    sourceMap: config.sourceMap,
+    inlineSources: config.sourceMap,
   };
   return tsOptions;
 };

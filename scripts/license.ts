@@ -19,6 +19,7 @@ const entryDeps = [
   'graceful-fs',
   'fast-deep-equal',
   'is-extglob',
+  'merge-source-map',
   'minimatch',
   'node-fetch',
   'open',

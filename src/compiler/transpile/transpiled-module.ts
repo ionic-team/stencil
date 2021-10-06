@@ -40,4 +40,6 @@ export const createModule = (
   originalCollectionComponentPath: null,
   originalImports: [],
   potentialCmpRefs: [],
+  sourceMapPath: null,
+  sourceMapFileText: null,
 });
