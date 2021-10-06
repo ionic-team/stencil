@@ -5,6 +5,7 @@ import {
   catchError,
   dashToPascalCase,
   formatComponentRuntimeMeta,
+  generatePreamble,
   getSourceMappingUrlForEndOfFile,
   hasError,
   rollupToStencilSourceMap,
@@ -68,6 +69,7 @@ const bundleCustomElements = async (
     const build = await bundleOutput(config, compilerCtx, buildCtx, bundleOpts);
     if (build) {
       const rollupOutput = await build.generate({
+        banner: generatePreamble(config),
         format: 'esm',
         sourcemap: config.sourceMap,
         chunkFileNames: outputTarget.externalRuntime || !config.hashFileNames ? '[name].js' : 'p-[hash].js',

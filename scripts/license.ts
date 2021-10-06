@@ -10,6 +10,7 @@ const entryDeps = [
   '@rollup/plugin-commonjs',
   '@rollup/plugin-json',
   '@rollup/plugin-node-resolve',
+  '@yarnpkg/lockfile',
   'ansi-colors',
   'autoprefixer',
   'css',

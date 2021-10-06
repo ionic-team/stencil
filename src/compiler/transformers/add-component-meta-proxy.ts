@@ -15,12 +15,14 @@ export const addModuleMetadataProxies = (tsSourceFile: ts.SourceFile, moduleFile
 };
 
 const addComponentMetadataProxy = (compilerMeta: d.ComponentCompilerMeta) => {
+  return ts.createStatement(createComponentMetadataProxy(compilerMeta));
+};
+
+export const createComponentMetadataProxy = (compilerMeta: d.ComponentCompilerMeta) => {
   const compactMeta: d.ComponentRuntimeMetaCompact = formatComponentRuntimeMeta(compilerMeta, true);
 
-  const liternalCmpClassName = ts.createIdentifier(compilerMeta.componentClassName);
-  const liternalMeta = convertValueToLiteral(compactMeta);
+  const literalCmpClassName = ts.createIdentifier(compilerMeta.componentClassName);
+  const literalMeta = convertValueToLiteral(compactMeta);
 
-  return ts.createStatement(
-    ts.createCall(ts.createIdentifier(PROXY_CUSTOM_ELEMENT), [], [liternalCmpClassName, liternalMeta])
-  );
+  return ts.createCall(ts.createIdentifier(PROXY_CUSTOM_ELEMENT), [], [literalCmpClassName, literalMeta]);
 };

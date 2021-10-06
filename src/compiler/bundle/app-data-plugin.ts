@@ -178,12 +178,12 @@ const appendGlobalScripts = (globalScripts: GlobalScript[], s: MagicString) => {
 };
 
 const appendBuildConditionals = (config: d.Config, build: d.BuildConditionals, s: MagicString) => {
-  const builData = Object.keys(build)
+  const buildData = Object.keys(build)
     .sort()
     .map((key) => key + ': ' + ((build as any)[key] ? 'true' : 'false'))
     .join(', ');
 
-  s.append(`export const BUILD = /* ${config.fsNamespace} */ { ${builData} };\n`);
+  s.append(`export const BUILD = /* ${config.fsNamespace} */ { ${buildData} };\n`);
 };
 
 const appendEnv = (config: d.Config, s: MagicString) => {

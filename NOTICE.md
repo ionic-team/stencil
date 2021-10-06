@@ -142,6 +142,13 @@ Homepage: https://github.com/rollup/plugins/tree/master/packages/pluginutils#rea
 
 --------
 
+## `@yarnpkg/lockfile`
+
+License: BSD-2-Clause
+
+
+--------
+
 ## `ansi-colors`
 
 License: MIT

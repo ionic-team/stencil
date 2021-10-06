@@ -2,7 +2,7 @@ import type * as d from '../../../declarations';
 import { generateRollupOutput } from '../../app-core/bundle-app-core';
 import { generateLazyModules } from './generate-lazy-module';
 import type { OutputOptions, RollupBuild } from 'rollup';
-import { getDynamicImportFunction } from '@utils';
+import { generatePreamble, getDynamicImportFunction } from '@utils';
 
 export const generateEsmBrowser = async (
   config: d.Config,
@@ -10,11 +10,12 @@ export const generateEsmBrowser = async (
   buildCtx: d.BuildCtx,
   rollupBuild: RollupBuild,
   outputTargets: d.OutputTargetDistLazy[]
-) => {
+): Promise<d.UpdatedLazyBuildCtx> => {
   const esmOutputs = outputTargets.filter((o) => !!o.esmDir && !!o.isBrowserBuild);
   if (esmOutputs.length) {
     const outputTargetType = esmOutputs[0].type;
     const esmOpts: OutputOptions = {
+      banner: generatePreamble(config),
       format: 'es',
       entryFileNames: '[name].esm.js',
       chunkFileNames: config.hashFileNames ? 'p-[hash].js' : '[name]-[hash].js',
@@ -30,7 +31,7 @@ export const generateEsmBrowser = async (
 
     if (output != null) {
       const es2017destinations = esmOutputs.map((o) => o.esmDir);
-      const componentBundle = await generateLazyModules(
+      buildCtx.esmBrowserComponentBundle = await generateLazyModules(
         config,
         compilerCtx,
         buildCtx,
@@ -41,8 +42,8 @@ export const generateEsmBrowser = async (
         true,
         ''
       );
-      return componentBundle;
     }
   }
-  return undefined;
+
+  return { name: 'esm-browser', buildCtx };
 };

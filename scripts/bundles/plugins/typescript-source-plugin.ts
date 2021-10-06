@@ -64,8 +64,6 @@ async function bundleTypeScriptSource(tsPath: string, opts: BuildOptions) {
 
   // make a nice clean default export
   // "process.browser" is used by typescript to know if it should use the node sys or not
-  // this ensures its using our checks. Deno should also use process.browser = true
-  // because we don't want deno using the node apis
   const o: string[] = [];
   o.push(`// TypeScript ${opts.typescriptVersion}`);
   o.push(`import { IS_NODE_ENV } from '@environment';`);

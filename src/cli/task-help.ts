@@ -1,10 +1,7 @@
-import { getCompilerSystem, getLogger } from './state/stencil-cli-config';
+import type * as d from '../declarations';
 import { taskTelemetry } from './task-telemetry';
 
-export const taskHelp = async () => {
-  const logger = getLogger();
-  const sys = getCompilerSystem();
-
+export const taskHelp = async (config: d.Config, logger: d.Logger, sys?: d.CompilerSystem) => {
   const prompt = logger.dim(sys.details.platform === 'windows' ? '>' : '$');
 
   console.log(`
@@ -37,12 +34,14 @@ export const taskHelp = async () => {
 
 `);
 
-  await taskTelemetry();
+  // TODO(STENCIL-148) make this parameter no longer optional, remove the surrounding if statement
+  if (sys) {
+    await taskTelemetry(config, sys, logger);
+  }
 
   console.log(`
   ${logger.bold('Examples:')}
 
-  
   ${prompt} ${logger.green('stencil build --dev --watch --serve')}
   ${prompt} ${logger.green('stencil build --prerender')}
   ${prompt} ${logger.green('stencil test --spec --e2e')}

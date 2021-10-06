@@ -60,15 +60,30 @@ export const outputLazy = async (config: d.Config, compilerCtx: d.CompilerCtx, b
 
     const rollupBuild = await bundleOutput(config, compilerCtx, buildCtx, bundleOpts);
     if (rollupBuild != null) {
-      const [componentBundle] = await Promise.all([
+      const results: d.UpdatedLazyBuildCtx[] = await Promise.all([
         generateEsmBrowser(config, compilerCtx, buildCtx, rollupBuild, outputTargets),
         generateEsm(config, compilerCtx, buildCtx, rollupBuild, outputTargets),
         generateSystem(config, compilerCtx, buildCtx, rollupBuild, outputTargets),
         generateCjs(config, compilerCtx, buildCtx, rollupBuild, outputTargets),
       ]);
 
-      if (componentBundle != null) {
-        buildCtx.componentGraph = generateModuleGraph(buildCtx.components, componentBundle);
+      results.forEach((result) => {
+        if (result.name === 'cjs') {
+          buildCtx.commonJsComponentBundle = result.buildCtx.commonJsComponentBundle;
+        } else if (result.name === 'system') {
+          buildCtx.systemComponentBundle = result.buildCtx.systemComponentBundle;
+        } else if (result.name === 'esm') {
+          buildCtx.esmComponentBundle = result.buildCtx.esmComponentBundle;
+          buildCtx.es5ComponentBundle = result.buildCtx.es5ComponentBundle;
+        } else if (result.name === 'esm-browser') {
+          buildCtx.esmBrowserComponentBundle = result.buildCtx.esmBrowserComponentBundle;
+          buildCtx.buildResults = result.buildCtx.buildResults;
+          buildCtx.components = result.buildCtx.components;
+        }
+      });
+
+      if (buildCtx.esmBrowserComponentBundle != null) {
+        buildCtx.componentGraph = generateModuleGraph(buildCtx.components, buildCtx.esmBrowserComponentBundle);
       }
     }
   } catch (e) {
@@ -95,7 +110,7 @@ const getLazyCustomTransformer = (config: d.Config, compilerCtx: d.CompilerCtx) 
   ];
 };
 
-const getLazyEntry = (isBrowser: boolean) => {
+const getLazyEntry = (isBrowser: boolean): string => {
   const s = new MagicString(``);
   s.append(`import { bootstrapLazy } from '${STENCIL_CORE_ID}';\n`);
 

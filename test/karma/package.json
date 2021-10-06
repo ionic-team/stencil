@@ -19,7 +19,7 @@
     "karma.prod": "npm run build.sibling && npm run build.invisible-prehydration && npm run build.app && npm run karma.webpack && npm run build.prerender && npm run karma",
     "karma.ie": "karma start karma.config.js --browsers=IE --single-run=false",
     "karma.edge": "karma start karma.config.js --browsers=Edge --single-run=false",
-    "karma.webpack": "webpack-cli --config test-app/esm-webpack/webpack.config.js",
+    "karma.webpack": "webpack-cli --config test-app/esm-webpack/webpack.config.js && webpack-cli --config test-app/custom-elements-output-webpack/webpack.config.js && webpack-cli --config test-app/custom-elements-output-tag-class-different/webpack.config.js",
     "start": "node ../../bin/stencil build --dev --watch --serve --es5"
   },
   "devDependencies": {

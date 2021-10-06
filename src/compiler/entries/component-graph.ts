@@ -1,7 +1,7 @@
 import type * as d from '../../declarations';
 import { getScopeId } from '../style/scope-css';
 
-export const generateModuleGraph = (cmps: d.ComponentCompilerMeta[], bundleModules: d.BundleModule[]) => {
+export const generateModuleGraph = (cmps: d.ComponentCompilerMeta[], bundleModules: ReadonlyArray<d.BundleModule>) => {
   const cmpMap = new Map<string, string[]>();
   cmps.forEach((cmp) => {
     const bundle = bundleModules.find((b) => b.cmps.includes(cmp));

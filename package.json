@@ -1,6 +1,6 @@
 {
   "name": "@stencil/core",
-  "version": "2.8.1",
+  "version": "2.9.0-0",
   "license": "MIT",
   "main": "./internal/stencil-core/index.cjs",
   "module": "./internal/stencil-core/index.js",
@@ -79,6 +79,8 @@
     "@types/sizzle": "^2.3.2",
     "@types/webpack": "^4.41.26",
     "@types/ws": "^7.4.0",
+    "@types/yarnpkg__lockfile": "^1.1.5",
+    "@yarnpkg/lockfile": "^1.1.0",
     "ansi-colors": "4.1.1",
     "autoprefixer": "10.2.5",
     "concurrently": "^6.0.0",

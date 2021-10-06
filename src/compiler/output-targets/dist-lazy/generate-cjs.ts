@@ -4,6 +4,7 @@ import { generateLazyModules } from './generate-lazy-module';
 import { join } from 'path';
 import type { OutputOptions, RollupBuild } from 'rollup';
 import { relativeImport } from '../output-utils';
+import { generatePreamble } from '@utils';
 
 export const generateCjs = async (
   config: d.Config,
@@ -11,12 +12,13 @@ export const generateCjs = async (
   buildCtx: d.BuildCtx,
   rollupBuild: RollupBuild,
   outputTargets: d.OutputTargetDistLazy[]
-) => {
+): Promise<d.UpdatedLazyBuildCtx> => {
   const cjsOutputs = outputTargets.filter((o) => !!o.cjsDir);
 
   if (cjsOutputs.length > 0) {
     const outputTargetType = cjsOutputs[0].type;
     const esmOpts: OutputOptions = {
+      banner: generatePreamble(config),
       format: 'cjs',
       entryFileNames: '[name].cjs.js',
       assetFileNames: '[name]-[hash][extname]',
@@ -26,7 +28,8 @@ export const generateCjs = async (
     const results = await generateRollupOutput(rollupBuild, esmOpts, config, buildCtx.entryModules);
     if (results != null) {
       const destinations = cjsOutputs.map((o) => o.cjsDir);
-      await generateLazyModules(
+
+      buildCtx.commonJsComponentBundle = await generateLazyModules(
         config,
         compilerCtx,
         buildCtx,
@@ -37,16 +40,19 @@ export const generateCjs = async (
         false,
         '.cjs'
       );
+
       await generateShortcuts(compilerCtx, results, cjsOutputs);
     }
   }
+
+  return { name: 'cjs', buildCtx };
 };
 
 const generateShortcuts = (
   compilerCtx: d.CompilerCtx,
   rollupResult: d.RollupResult[],
   outputTargets: d.OutputTargetDistLazy[]
-) => {
+): Promise<void[]> => {
   const indexFilename = rollupResult.find((r) => r.type === 'chunk' && r.isIndex).fileName;
   return Promise.all(
     outputTargets.map(async (o) => {

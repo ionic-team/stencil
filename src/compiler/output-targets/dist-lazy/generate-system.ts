@@ -5,6 +5,7 @@ import { getAppBrowserCorePolyfills } from '../../app-core/app-polyfills';
 import { join } from 'path';
 import type { OutputOptions, RollupBuild } from 'rollup';
 import { relativeImport } from '../output-utils';
+import { generatePreamble } from '@utils';
 
 export const generateSystem = async (
   config: d.Config,
@@ -12,11 +13,12 @@ export const generateSystem = async (
   buildCtx: d.BuildCtx,
   rollupBuild: RollupBuild,
   outputTargets: d.OutputTargetDistLazy[]
-) => {
+): Promise<d.UpdatedLazyBuildCtx> => {
   const systemOutputs = outputTargets.filter((o) => !!o.systemDir);
 
   if (systemOutputs.length > 0) {
     const esmOpts: OutputOptions = {
+      banner: generatePreamble(config),
       format: 'system',
       entryFileNames: config.hashFileNames ? 'p-[hash].system.js' : '[name].system.js',
       chunkFileNames: config.hashFileNames ? 'p-[hash].system.js' : '[name]-[hash].system.js',
@@ -27,7 +29,7 @@ export const generateSystem = async (
     const results = await generateRollupOutput(rollupBuild, esmOpts, config, buildCtx.entryModules);
     if (results != null) {
       const destinations = systemOutputs.map((o) => o.esmDir);
-      await generateLazyModules(
+      buildCtx.systemComponentBundle = await generateLazyModules(
         config,
         compilerCtx,
         buildCtx,
@@ -38,9 +40,12 @@ export const generateSystem = async (
         true,
         '.system'
       );
+
       await generateSystemLoaders(config, compilerCtx, results, systemOutputs);
     }
   }
+
+  return { name: 'system', buildCtx };
 };
 
 const generateSystemLoaders = (
@@ -48,7 +53,7 @@ const generateSystemLoaders = (
   compilerCtx: d.CompilerCtx,
   rollupResult: d.RollupResult[],
   systemOutputs: d.OutputTargetDistLazy[]
-) => {
+): Promise<void[]> => {
   const loaderFilename = rollupResult.find((r) => r.type === 'chunk' && r.isBrowserLoader).fileName;
 
   return Promise.all(systemOutputs.map((o) => writeSystemLoader(config, compilerCtx, loaderFilename, o)));
@@ -59,7 +64,7 @@ const writeSystemLoader = async (
   compilerCtx: d.CompilerCtx,
   loaderFilename: string,
   outputTarget: d.OutputTargetDistLazy
-) => {
+): Promise<void> => {
   if (outputTarget.systemLoaderFile) {
     const entryPointPath = join(outputTarget.systemDir, loaderFilename);
     const relativePath = relativeImport(outputTarget.systemLoaderFile, entryPointPath);
@@ -75,7 +80,7 @@ const getSystemLoader = async (
   compilerCtx: d.CompilerCtx,
   corePath: string,
   includePolyfills: boolean
-) => {
+): Promise<string> => {
   const polyfills = includePolyfills
     ? await getAppBrowserCorePolyfills(config, compilerCtx)
     : '/* polyfills excluded */';
