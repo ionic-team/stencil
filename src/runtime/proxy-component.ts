@@ -157,7 +157,12 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
             delete this[propName];
           }
 
-          this[propName] = newValue === null && typeof this[propName] === 'boolean' ? false : newValue;
+          const propDesc = Object.getOwnPropertyDescriptor(prototype, propName);
+          // test whether this property either has no 'getter' or if it does, has a 'setter'
+          // before attempting to write back to component props
+          if (!propDesc.get || !!propDesc.set) {
+            this[propName] = newValue === null && typeof this[propName] === 'boolean' ? false : newValue;
+          }
         });
       };
 
