@@ -12,7 +12,6 @@ import {
 } from './entry-alias-ids';
 import ts from 'typescript';
 import { basename } from 'path';
-import sourceMapMerge from 'merge-source-map';
 
 export const appDataPlugin = (
   config: d.Config,
@@ -114,15 +113,11 @@ export const appDataPlugin = (
             source: id,
             // this is the name of the sourcemap, not to be confused with the `file` field in a generated sourcemap
             file: id + '.map',
+            includeContent: true,
             hires: true,
           });
 
-          const sourceMap: d.SourceMap = results.sourceMapText ? JSON.parse(results.sourceMapText) : null;
-          if (!sourceMap) {
-            return { code: results.outputText };
-          }
-
-          return { code: results.outputText, map: sourceMapMerge(sourceMap, codeMap) };
+          return { code: results.outputText, map: codeMap };
         }
 
         return { code: results.outputText };
