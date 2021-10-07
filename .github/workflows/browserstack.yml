@@ -3,7 +3,7 @@ name: BrowserStack
 on:
   pull_request_target:
     branches:
-      - master
+      - main
 
 permissions: read-all
 

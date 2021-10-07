@@ -5,7 +5,7 @@ Thanks for your interest in contributing to Stencil! :tada:
 
 ## Contributing Etiquette
 
-Please see our [Contributor Code of Conduct](https://github.com/ionic-team/stencil/blob/master/CODE_OF_CONDUCT.md) for information on our rules of conduct.
+Please see our [Contributor Code of Conduct](https://github.com/ionic-team/stencil/blob/main/CODE_OF_CONDUCT.md) for information on our rules of conduct.
 
 
 ## Creating an Issue
