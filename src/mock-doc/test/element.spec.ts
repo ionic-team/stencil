@@ -432,4 +432,18 @@ describe('element', () => {
       expect(input.list).toEqual(null);
     });
   });
+
+  describe('link', () => {
+    it('href', () => {
+      const elm: MockAnchorElement = doc.createElement('a');
+      elm.href = 'http://stenciljs.com/path/to/page';
+      expect(elm.href).toBe('http://stenciljs.com/path/to/page');
+    });
+
+    it('pathname', () => {
+      const elm: MockAnchorElement = doc.createElement('a');
+      elm.href = 'http://stenciljs.com/path/to/page';
+      expect(elm.pathname).toBe('/path/to/page');
+    });
+  });
 });

@@ -82,6 +82,9 @@ export class MockAnchorElement extends MockHTMLElement {
   set href(value: string) {
     this.setAttribute('href', value);
   }
+  get pathname() {
+    return new URL(this.href).pathname;
+  }
 }
 
 export class MockButtonElement extends MockHTMLElement {
