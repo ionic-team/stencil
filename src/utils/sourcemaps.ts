@@ -33,11 +33,11 @@ const JS_SOURCE_MAPPING_URL_LINKER = '//# sourceMappingURL=';
  * More information about RFC-3986 can be found [here](https://datatracker.ietf.org/doc/html/rfc3986)
  * This function's original source is derived from
  * [MDN's encodeURIComponent documentation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/encodeURIComponent#description)
- * @param uri the URI to encode
+ * @param filename the filename to encode
  * @returns the encoded URI
  */
-const encodeUriToRfc3986 = (uri: string): string => {
-  const encodedUri = encodeURIComponent(uri);
+const encodeFilenameToRfc3986 = (filename: string): string => {
+  const encodedUri = encodeURIComponent(filename);
   // replace all '!', single quotes, '(', ')', and '*' with their hexadecimal values (UTC-16)
   return encodedUri.replace(/[!'()*]/g, (matchedCharacter) => {
     return '%' + matchedCharacter.charCodeAt(0).toString(16);
@@ -51,7 +51,7 @@ const encodeUriToRfc3986 = (uri: string): string => {
  * @returns a linker string, of the format {@link JS_SOURCE_MAPPING_URL_LINKER}=<url>
  */
 export const getSourceMappingUrlLinker = (url: string): string => {
-  return `${JS_SOURCE_MAPPING_URL_LINKER}${encodeUriToRfc3986(url)}`;
+  return `${JS_SOURCE_MAPPING_URL_LINKER}${encodeFilenameToRfc3986(url)}`;
 };
 
 /**
