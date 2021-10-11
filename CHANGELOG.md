@@ -1,3 +1,23 @@
+# 🚙 [2.9.0](https://github.com/ionic-team/stencil/compare/v2.9.0-0...v2.9.0) (2021-10-11)
+
+
+### Bug Fixes
+
+* **docs:** fix docs generation for method return values ([#3064](https://github.com/ionic-team/stencil/issues/3064)) ([dc2f6fb](https://github.com/ionic-team/stencil/commit/dc2f6fb64c4a48c2e1247de2c5411c5bcc10dfd4))
+* **output-targets:** restore stats output target ([#3030](https://github.com/ionic-team/stencil/issues/3030)) ([c76dca7](https://github.com/ionic-team/stencil/commit/c76dca7f2c01e73e1da691e45ba9c009724660d3))
+* **preamble:** restore preamble functionality ([#3085](https://github.com/ionic-team/stencil/issues/3085)) ([39caa8c](https://github.com/ionic-team/stencil/commit/39caa8cd0ff401c932eda2cc0b664ac533d2330a))
+* **test:** attempt to fix flaky prerender test ([#3095](https://github.com/ionic-team/stencil/issues/3095)) ([16b8ea4](https://github.com/ionic-team/stencil/commit/16b8ea4dabb22024872a38bc58ba1dcf1c7cc25b))
+
+
+### Features
+
+* **compiler:** consumer sourcemap support ([#3005](https://github.com/ionic-team/stencil/issues/3005)) ([bb3bf90](https://github.com/ionic-team/stencil/commit/bb3bf900884c1cc5904df16f90c1460220c1a717))
+* **deno:** remove deno from codebase ([#3067](https://github.com/ionic-team/stencil/issues/3067)) ([037b228](https://github.com/ionic-team/stencil/commit/037b228b2ffb62385a15081a84b82a345d55d880))
+* **dist-custom-elements:** automatically import and define dependencies ([#3039](https://github.com/ionic-team/stencil/issues/3039)) ([6987e43](https://github.com/ionic-team/stencil/commit/6987e4321b9dfd10710aa27a55e53e983e867729))
+* **mock-doc:** add pathname to mock anchors ([#3090](https://github.com/ionic-team/stencil/issues/3090)) ([99428c7](https://github.com/ionic-team/stencil/commit/99428c79c5202d2ffc9d6961060f105696623d6b))
+* **telemetry:** adding yarn 1 support, sanitizing data pre-flight ([#3082](https://github.com/ionic-team/stencil/issues/3082)) ([07f69cb](https://github.com/ionic-team/stencil/commit/07f69cb5b232333103cc4edaf3cf96bd36c2e8bc))
+
+
 # ⚡️ [2.9.0-0](https://github.com/ionic-team/stencil/compare/v2.8.1...v2.9.0-0) (2021-10-05)
 
 
