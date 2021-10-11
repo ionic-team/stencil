@@ -46,7 +46,7 @@ const encodeUriToRfc3986 = (uri: string): string => {
 
 /**
  * Generates a string used to link generated code with the original source, to be placed at the end of the generated
- * code. Note that at this time, this method is _not_ RFC3986 compliant.
+ * code.
  * @param url the url of the source map
  * @returns a linker string, of the format {@link JS_SOURCE_MAPPING_URL_LINKER}=<url>
  */
