@@ -39,7 +39,6 @@ describe('validateOutputTargetWww', () => {
             '**/*.system.entry.js',
             '**/*.system.js',
             '**/app.js',
-            '**/app.esm.js',
             '**/app.css',
           ],
           globPatterns: ['*.html', '**/*.{js,css,json}'],
