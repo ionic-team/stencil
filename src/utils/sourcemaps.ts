@@ -38,7 +38,7 @@ const JS_SOURCE_MAPPING_URL_LINKER = '//# sourceMappingURL=';
  */
 const encodeFilenameToRfc3986 = (filename: string): string => {
   const encodedUri = encodeURIComponent(filename);
-  // replace all '!', single quotes, '(', ')', and '*' with their hexadecimal values (UTC-16)
+  // replace all '!', single quotes, '(', ')', and '*' with their hexadecimal values (UTF-16)
   return encodedUri.replace(/[!'()*]/g, (matchedCharacter) => {
     return '%' + matchedCharacter.charCodeAt(0).toString(16);
   });
