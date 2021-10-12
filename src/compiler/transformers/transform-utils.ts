@@ -515,9 +515,18 @@ export const serializeSymbol = (checker: ts.TypeChecker, symbol: ts.Symbol): d.C
     };
   }
   return {
-    tags: symbol.getJsDocTags().map((tag) => ({ text: tag.text, name: tag.name })),
+    tags: mapJSDocTagInfo(symbol.getJsDocTags()),
     text: ts.displayPartsToString(symbol.getDocumentationComment(checker)),
   };
+};
+
+/**
+ * Maps a TypeScript 4.3+ JSDocTagInfo to a flattened Stencil CompilerJsDocTagInfo.
+ * @param tags An array of JSDocTagInfo objects.
+ * @return An array of CompilerJsDocTagInfo objects.
+ */
+export const mapJSDocTagInfo = (tags: ts.JSDocTagInfo[]): d.CompilerJsDocTagInfo[] => {
+  return tags.map((tag) => ({ ...tag, text: tag.text?.map((part) => part.text).join('') }));
 };
 
 export const serializeDocsSymbol = (checker: ts.TypeChecker, symbol: ts.Symbol) => {
