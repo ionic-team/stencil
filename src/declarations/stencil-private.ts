@@ -34,6 +34,16 @@ import type {
   VNodeData,
 } from './stencil-public-runtime';
 
+export interface SourceMap {
+  file: string;
+  mappings: string;
+  names: string[];
+  sourceRoot?: string;
+  sources: string[];
+  sourcesContent?: string[];
+  version: number;
+}
+
 export interface PrintLine {
   lineIndex: number;
   lineNumber: number;
@@ -378,6 +388,13 @@ export interface BundleEntryInputs {
   [entryKey: string]: string;
 }
 
+/**
+ * A note regarding Rollup types:
+ * As of this writing, there is no great way to import external types for packages that are directly embedded in the
+ * Stencil source. As a result, some types are duplicated here for Rollup that will be used within the codebase.
+ * Updates to rollup may require these typings to be updated.
+ */
+
 export type RollupResult = RollupChunkResult | RollupAssetResult;
 
 export interface RollupAssetResult {
@@ -398,7 +415,28 @@ export interface RollupChunkResult {
   isBrowserLoader: boolean;
   imports: string[];
   moduleFormat: ModuleFormat;
+  map?: RollupSourceMap;
 }
+
+export interface RollupSourceMap {
+  file: string;
+  mappings: string;
+  names: string[];
+  sources: string[];
+  sourcesContent: string[];
+  version: number;
+  toString(): string;
+  toUrl(): string;
+}
+
+/**
+ * Result of Stencil compressing, mangling, and otherwise 'minifying' JavaScript
+ */
+export type OptimizeJsResult = {
+  output: string;
+  diagnostics: Diagnostic[];
+  sourceMap?: SourceMap;
+};
 
 export interface BundleModule {
   entryKey: string;
@@ -747,6 +785,7 @@ export interface ComponentCompilerMeta extends ComponentCompilerFeatures {
   isCollectionDependency: boolean;
   docs: CompilerJsDoc;
   jsFilePath: string;
+  sourceMapPath: string;
   listeners: ComponentCompilerListener[];
   events: ComponentCompilerEvent[];
   methods: ComponentCompilerMethod[];
@@ -1431,6 +1470,8 @@ export interface Module {
   sourceFilePath: string;
   staticSourceFile: any;
   staticSourceFileText: string;
+  sourceMapPath: string;
+  sourceMapFileText: string;
 
   // build features
   hasVdomAttribute: boolean;
@@ -2445,7 +2486,7 @@ export interface CompilerWorkerContext {
     minifyOpts: any,
     transpile: boolean,
     inlineHelpers: boolean
-  ): Promise<{ output: string; diagnostics: Diagnostic[] }>;
+  ): Promise<{ output: string; diagnostics: Diagnostic[]; sourceMap?: SourceMap }>;
   prerenderWorker(prerenderRequest: PrerenderUrlRequest): Promise<PrerenderUrlResults>;
   transformCssToEsm(input: TransformCssToEsmInput): Promise<TransformCssToEsmOutput>;
 }
