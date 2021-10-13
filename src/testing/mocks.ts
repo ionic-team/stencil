@@ -142,8 +142,16 @@ export interface TestingSystem extends CompilerSystem {
   diskWrites: number;
 }
 
+function isTestingSystem(sys: CompilerSystem): sys is TestingSystem {
+  return 'diskReads' in sys && 'diskWrites' in sys;
+}
+
 export function mockStencilSystem(): TestingSystem {
-  return createTestingSystem();
+  const sys = createTestingSystem();
+  if (!isTestingSystem(sys)) {
+    throw new Error('sys is not a TestingSystem');
+  }
+  return sys;
 }
 
 export function mockDocument(html: string = null) {
