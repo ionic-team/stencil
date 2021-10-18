@@ -137,21 +137,8 @@ export function mockLogger() {
   return new TestingLogger();
 }
 
-export interface TestingSystem extends CompilerSystem {
-  diskReads: number;
-  diskWrites: number;
-}
-
-function isTestingSystem(sys: CompilerSystem): sys is TestingSystem {
-  return 'diskReads' in sys && 'diskWrites' in sys;
-}
-
-export function mockStencilSystem(): TestingSystem {
-  const sys = createTestingSystem();
-  if (!isTestingSystem(sys)) {
-    throw new Error('sys is not a TestingSystem');
-  }
-  return sys;
+export function mockStencilSystem(): CompilerSystem {
+  return createTestingSystem();
 }
 
 export function mockDocument(html: string = null) {
