@@ -522,10 +522,10 @@ export const serializeSymbol = (checker: ts.TypeChecker, symbol: ts.Symbol): d.C
 
 /**
  * Maps a TypeScript 4.3+ JSDocTagInfo to a flattened Stencil CompilerJsDocTagInfo.
- * @param tags An array of JSDocTagInfo objects.
- * @return An array of CompilerJsDocTagInfo objects.
+ * @param tags A readonly array of JSDocTagInfo objects.
+ * @returns An array of CompilerJsDocTagInfo objects.
  */
-export const mapJSDocTagInfo = (tags: ts.JSDocTagInfo[]): d.CompilerJsDocTagInfo[] => {
+export const mapJSDocTagInfo = (tags: readonly ts.JSDocTagInfo[]): d.CompilerJsDocTagInfo[] => {
   return tags.map((tag) => ({ ...tag, text: tag.text?.map((part) => part.text).join('') }));
 };
 
