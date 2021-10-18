@@ -526,6 +526,9 @@ export const serializeSymbol = (checker: ts.TypeChecker, symbol: ts.Symbol): d.C
  * @returns An array of CompilerJsDocTagInfo objects.
  */
 export const mapJSDocTagInfo = (tags: readonly ts.JSDocTagInfo[]): d.CompilerJsDocTagInfo[] => {
+  // The text following a tag is split semantically by TS 4.3+, e.g. '@param foo the first parameter' ->
+  // [{text: 'foo', kind: 'parameterName'}, {text: ' ', kind: 'space'}, {text: 'the first parameter', kind: 'text'}], so
+  // we join the elements to reconstruct the text.
   return tags.map((tag) => ({ ...tag, text: tag.text?.map((part) => part.text).join('') }));
 };
 
