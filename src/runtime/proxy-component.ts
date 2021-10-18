@@ -110,6 +110,15 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
           if (this.hasOwnProperty(propName)) {
             newValue = this[propName];
             delete this[propName];
+          } else if (
+            prototype.hasOwnProperty(propName) &&
+            typeof this[propName] === 'number' &&
+            this[propName] == newValue
+          ) {
+            // if the propName exists on the prototype of `Cstr`, this update may be a result of Stencil using native
+            // APIs to reflect props as attributes. Calls to `setAttribute(someElement, propName)` will result in
+            // `propName` to be converted to a `DOMString`, which may not be what we want for other primitive props.
+            return;
           }
 
           this[propName] = newValue === null && typeof this[propName] === 'boolean' ? false : newValue;
