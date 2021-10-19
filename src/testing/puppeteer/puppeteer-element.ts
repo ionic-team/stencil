@@ -50,7 +50,7 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
     return eventSpy;
   }
 
-  async click(options?: puppeteer.ClickOptions) {
+  override async click(options?: puppeteer.ClickOptions) {
     await this._elmHandle.click(options);
     await this._page.waitForChanges();
   }
@@ -186,19 +186,19 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
     });
   }
 
-  getAttribute(name: string) {
+  override getAttribute(name: string) {
     this._validate();
     return super.getAttribute(name);
   }
 
-  setAttribute(name: string, value: any) {
+  override setAttribute(name: string, value: any) {
     this._queueAction({
       setAttributeName: name,
       setAttributeValue: value,
     });
   }
 
-  removeAttribute(name: string) {
+  override removeAttribute(name: string) {
     this._queueAction({
       removeAttribute: name,
     });
@@ -211,7 +211,7 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
     });
   }
 
-  get classList() {
+  override get classList() {
     const api: any = {
       add: (...classNames: string[]) => {
         classNames.forEach((className) => {
@@ -240,60 +240,60 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
     return api;
   }
 
-  get className() {
+  override get className() {
     this._validate();
     return super.className;
   }
 
-  set className(value: string) {
+  override set className(value: string) {
     this._queueAction({
       setPropertyName: 'className',
       setPropertyValue: value,
     });
   }
 
-  get id() {
+  override get id() {
     this._validate();
     return super.id;
   }
 
-  set id(value: string) {
+  override set id(value: string) {
     this._queueAction({
       setPropertyName: 'id',
       setPropertyValue: value,
     });
   }
 
-  get innerHTML() {
+  override get innerHTML() {
     this._validate();
     return super.innerHTML;
   }
 
-  set innerHTML(value: string) {
+  override set innerHTML(value: string) {
     this._queueAction({
       setPropertyName: 'innerHTML',
       setPropertyValue: value,
     });
   }
 
-  get innerText() {
+  override get innerText() {
     this._validate();
     return super.innerText;
   }
 
-  set innerText(value: string) {
+  override set innerText(value: string) {
     this._queueAction({
       setPropertyName: 'innerText',
       setPropertyValue: value,
     });
   }
 
-  get nodeValue() {
+  override get nodeValue() {
     this._validate();
     return super.nodeValue;
   }
 
-  set nodeValue(value: string) {
+  override set nodeValue(value: string) {
     if (typeof value === 'string') {
       this._queueAction({
         setPropertyName: 'nodeValue',
@@ -302,54 +302,54 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
     }
   }
 
-  get outerHTML() {
+  override get outerHTML() {
     this._validate();
     return super.outerHTML;
   }
 
-  set outerHTML(_: any) {
+  override set outerHTML(_: any) {
     throw new Error(`outerHTML is read-only`);
   }
 
-  get shadowRoot() {
+  override get shadowRoot() {
     this._validate();
     return super.shadowRoot;
   }
 
-  set shadowRoot(value: any) {
+  override set shadowRoot(value: any) {
     super.shadowRoot = value;
   }
 
-  get tabIndex() {
+  override get tabIndex() {
     this._validate();
     return super.tabIndex;
   }
 
-  set tabIndex(value: number) {
+  override set tabIndex(value: number) {
     this._queueAction({
       setPropertyName: 'tabIndex',
       setPropertyValue: value,
     });
   }
 
-  get textContent() {
+  override get textContent() {
     this._validate();
     return super.textContent;
   }
 
-  set textContent(value: string) {
+  override set textContent(value: string) {
     this._queueAction({
       setPropertyName: 'textContent',
       setPropertyValue: value,
     });
   }
 
-  get title() {
+  override get title() {
     this._validate();
     return super.title;
   }
 
-  set title(value: string) {
+  override set title(value: string) {
     this._queueAction({
       setPropertyName: 'title',
       setPropertyValue: value,
