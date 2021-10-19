@@ -12,7 +12,12 @@ import { writePkgJson } from '../utils/write-pkg-json';
 import { getBanner } from '../utils/banner';
 import sourcemaps from 'rollup-plugin-sourcemaps';
 
-export async function cli(opts: BuildOptions) {
+/**
+ * Generates a rollup configuration for the `cli` submodule
+ * @param opts build options needed to generate the rollup configuration
+ * @returns an array containing the generated rollup options
+ */
+export async function cli(opts: BuildOptions): Promise<ReadonlyArray<RollupOptions>> {
   const inputDir = join(opts.buildDir, 'cli');
   const outputDir = opts.output.cliDir;
   const esmFilename = 'index.js';

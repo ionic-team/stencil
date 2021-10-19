@@ -1,7 +1,12 @@
-import type { Plugin } from 'rollup';
+import type { PartialResolvedId, Plugin } from 'rollup';
 import type { BuildOptions } from '../../utils/options';
 import { join } from 'path';
 
+/**
+ * Creates a rollup plugin for resolving identifiers while simultaneously externalizing them
+ * @param opts the options being used during a build
+ * @returns a rollup plugin with a build hook for resolving various identifiers
+ */
 export function aliasPlugin(opts: BuildOptions): Plugin {
   const alias = new Map([
     ['@app-data', '@stencil/core/internal/app-data'],
@@ -26,7 +31,12 @@ export function aliasPlugin(opts: BuildOptions): Plugin {
 
   return {
     name: 'aliasPlugin',
-    resolveId(id) {
+    /**
+     * A rollup build hook for resolving identifiers. [Source](https://rollupjs.org/guide/en/#resolveid)
+     * @param id the importee exactly as it is written in an import statement in the source code
+     * @returns a resolution to an import to a different id, potentially externalizing it from the bundle simultaneously
+     */
+    resolveId(id: string): PartialResolvedId | string | null {
       const externalId = alias.get(id);
       if (externalId) {
         return {
