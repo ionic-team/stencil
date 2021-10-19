@@ -9,13 +9,14 @@ export const outputCollection = async (
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   changedModuleFiles: d.Module[]
-) => {
+): Promise<void> => {
   const outputTargets = config.outputTargets.filter(isOutputTargetDistCollection);
   if (outputTargets.length === 0) {
     return;
   }
 
-  const timespan = buildCtx.createTimeSpan(`generate collections started`, true);
+  const bundlingEventMessage = `generate collections${config.sourceMap ? ' + source maps' : ''}`;
+  const timespan = buildCtx.createTimeSpan(`${bundlingEventMessage} started`, true);
   try {
     await Promise.all(
       changedModuleFiles.map(async (mod) => {
@@ -23,12 +24,19 @@ export const outputCollection = async (
         if (config.preamble) {
           code = `${generatePreamble(config)}\n${code}`;
         }
+        const mapCode = mod.sourceMapFileText;
 
         await Promise.all(
           outputTargets.map(async (o) => {
             const relPath = relative(config.srcDir, mod.jsFilePath);
             const filePath = join(o.collectionDir, relPath);
             await compilerCtx.fs.writeFile(filePath, code, { outputTargetType: o.type });
+
+            if (mod.sourceMapPath) {
+              const relativeSourceMapPath = relative(config.srcDir, mod.sourceMapPath);
+              const sourceMapOutputFilePath = join(o.collectionDir, relativeSourceMapPath);
+              await compilerCtx.fs.writeFile(sourceMapOutputFilePath, mapCode, { outputTargetType: o.type });
+            }
           })
         );
       })
@@ -39,5 +47,5 @@ export const outputCollection = async (
     catchError(buildCtx.diagnostics, e);
   }
 
-  timespan.finish(`generate collections finished`);
+  timespan.finish(`${bundlingEventMessage} finished`);
 };

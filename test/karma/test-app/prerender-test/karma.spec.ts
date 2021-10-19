@@ -42,7 +42,7 @@ describe('prerender', () => {
   });
 
   it('root slots', async () => {
-    app = await setupDom('/prerender/index.html', 500);
+    app = await setupDom('/prerender/index.html', 1000);
 
     const scoped = app.querySelector('cmp-client-scoped');
     const scopedStyle = getComputedStyle(scoped.querySelector('section'));

@@ -13,7 +13,7 @@ export class MockDocumentFragment extends MockHTMLElement {
     return getElementById(this, id);
   }
 
-  cloneNode(deep?: boolean) {
+  override cloneNode(deep?: boolean) {
     const cloned = new MockDocumentFragment(null);
 
     if (deep) {

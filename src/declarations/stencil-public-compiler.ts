@@ -93,6 +93,11 @@ export interface StencilConfig {
   plugins?: any[];
 
   /**
+   * Generate js source map files for all bundles
+   */
+  sourceMap?: boolean;
+
+  /**
    * The srcDir config specifies the directory which should contain the source typescript files
    * for each component. The standard for Stencil apps is to use src, which is the default.
    */
@@ -340,7 +345,6 @@ export interface Config extends StencilConfig {
   logLevel?: LogLevel;
   rootDir?: string;
   packageJsonFilePath?: string;
-  sourceMap?: boolean;
   suppressLogs?: boolean;
   profile?: boolean;
   tsCompilerOptions?: any;
@@ -998,6 +1002,10 @@ export interface CompilerSystem {
    */
   normalizePath(p: string): string;
   onProcessInterrupt?(cb: () => void): void;
+  parseYarnLockFile?: (content: string) => {
+    type: 'success' | 'merge' | 'conflict';
+    object: any;
+  };
   platformPath: PlatformPath;
   /**
    * All return paths are full normalized paths, not just the basenames. Always returns an array, does not throw.
