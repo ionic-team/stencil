@@ -515,9 +515,21 @@ export const serializeSymbol = (checker: ts.TypeChecker, symbol: ts.Symbol): d.C
     };
   }
   return {
-    tags: symbol.getJsDocTags().map((tag) => ({ text: tag.text, name: tag.name })),
+    tags: mapJSDocTagInfo(symbol.getJsDocTags()),
     text: ts.displayPartsToString(symbol.getDocumentationComment(checker)),
   };
+};
+
+/**
+ * Maps a TypeScript 4.3+ JSDocTagInfo to a flattened Stencil CompilerJsDocTagInfo.
+ * @param tags A readonly array of JSDocTagInfo objects.
+ * @returns An array of CompilerJsDocTagInfo objects.
+ */
+export const mapJSDocTagInfo = (tags: readonly ts.JSDocTagInfo[]): d.CompilerJsDocTagInfo[] => {
+  // The text following a tag is split semantically by TS 4.3+, e.g. '@param foo the first parameter' ->
+  // [{text: 'foo', kind: 'parameterName'}, {text: ' ', kind: 'space'}, {text: 'the first parameter', kind: 'text'}], so
+  // we join the elements to reconstruct the text.
+  return tags.map((tag) => ({ ...tag, text: tag.text?.map((part) => part.text).join('') }));
 };
 
 export const serializeDocsSymbol = (checker: ts.TypeChecker, symbol: ts.Symbol) => {
