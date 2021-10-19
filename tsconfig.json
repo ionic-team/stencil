@@ -20,6 +20,7 @@
     "outDir": "build",
     "pretty": true,
     "resolveJsonModule": true,
+    "sourceMap": true,
     "target": "es2018",
     "baseUrl": ".",
     "paths": {
