@@ -9,6 +9,7 @@
     "stencil": "bin/stencil"
   },
   "files": [
+    "!**/*.map",
     "bin/",
     "cli/",
     "compiler/",
@@ -22,7 +23,7 @@
   ],
   "scripts": {
     "start": "npm run watch",
-    "build": "node scripts && npm run tsc.prod && npm run rollup.prod.ci",
+    "build": "npm run build.prod",
     "build.prod": "node scripts && npm run tsc.scripts && npm run tsc.prod && npm run rollup.prod.ci",
     "watch": "node scripts && npm run tsc && concurrently \"npm run rollup.watch\" \"npm run tsc.watch\"",
     "release": "node scripts --release --publish",
@@ -115,6 +116,7 @@
     "prompts": "2.4.0",
     "puppeteer": "~10.0.0",
     "rollup": "2.42.3",
+    "rollup-plugin-sourcemaps": "^0.6.3",
     "semiver": "^1.1.0",
     "semver": "7.3.4",
     "sizzle": "^2.3.6",
