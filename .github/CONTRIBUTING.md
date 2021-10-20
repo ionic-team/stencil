@@ -131,7 +131,7 @@ As a workaround, it is suggested that individuals create their own Run/Debug con
 are recommended:
 
 Working directory: `~/workspaces/stencil`
-JavaScript file: `bin/Stencil`
+JavaScript file: `bin/stencil`
 Application parameters: `build --config=PATH_TO_STENCIL_PROJECT_TO_DEBUG`
 
 The `build` application parameter can be swapped with any of the supported Stencil CLI commands. If `--config` is
