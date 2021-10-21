@@ -76,6 +76,10 @@ export namespace Components {
     }
     interface CustomElementRootDifferentNameThanClass {
     }
+    interface CustomElementsDelegatesFocus {
+    }
+    interface CustomElementsNoDelegatesFocus {
+    }
     interface CustomEventRoot {
     }
     interface DelegatesFocus {
@@ -457,6 +461,18 @@ declare global {
     var HTMLCustomElementRootDifferentNameThanClassElement: {
         prototype: HTMLCustomElementRootDifferentNameThanClassElement;
         new (): HTMLCustomElementRootDifferentNameThanClassElement;
+    };
+    interface HTMLCustomElementsDelegatesFocusElement extends Components.CustomElementsDelegatesFocus, HTMLStencilElement {
+    }
+    var HTMLCustomElementsDelegatesFocusElement: {
+        prototype: HTMLCustomElementsDelegatesFocusElement;
+        new (): HTMLCustomElementsDelegatesFocusElement;
+    };
+    interface HTMLCustomElementsNoDelegatesFocusElement extends Components.CustomElementsNoDelegatesFocus, HTMLStencilElement {
+    }
+    var HTMLCustomElementsNoDelegatesFocusElement: {
+        prototype: HTMLCustomElementsNoDelegatesFocusElement;
+        new (): HTMLCustomElementsNoDelegatesFocusElement;
     };
     interface HTMLCustomEventRootElement extends Components.CustomEventRoot, HTMLStencilElement {
     }
@@ -1077,6 +1093,8 @@ declare global {
         "custom-element-nested-child": HTMLCustomElementNestedChildElement;
         "custom-element-root": HTMLCustomElementRootElement;
         "custom-element-root-different-name-than-class": HTMLCustomElementRootDifferentNameThanClassElement;
+        "custom-elements-delegates-focus": HTMLCustomElementsDelegatesFocusElement;
+        "custom-elements-no-delegates-focus": HTMLCustomElementsNoDelegatesFocusElement;
         "custom-event-root": HTMLCustomEventRootElement;
         "delegates-focus": HTMLDelegatesFocusElement;
         "dom-reattach": HTMLDomReattachElement;
@@ -1245,6 +1263,10 @@ declare namespace LocalJSX {
     interface CustomElementRoot {
     }
     interface CustomElementRootDifferentNameThanClass {
+    }
+    interface CustomElementsDelegatesFocus {
+    }
+    interface CustomElementsNoDelegatesFocus {
     }
     interface CustomEventRoot {
     }
@@ -1514,6 +1536,8 @@ declare namespace LocalJSX {
         "custom-element-nested-child": CustomElementNestedChild;
         "custom-element-root": CustomElementRoot;
         "custom-element-root-different-name-than-class": CustomElementRootDifferentNameThanClass;
+        "custom-elements-delegates-focus": CustomElementsDelegatesFocus;
+        "custom-elements-no-delegates-focus": CustomElementsNoDelegatesFocus;
         "custom-event-root": CustomEventRoot;
         "delegates-focus": DelegatesFocus;
         "dom-reattach": DomReattach;
@@ -1643,6 +1667,8 @@ declare module "@stencil/core" {
             "custom-element-nested-child": LocalJSX.CustomElementNestedChild & JSXBase.HTMLAttributes<HTMLCustomElementNestedChildElement>;
             "custom-element-root": LocalJSX.CustomElementRoot & JSXBase.HTMLAttributes<HTMLCustomElementRootElement>;
             "custom-element-root-different-name-than-class": LocalJSX.CustomElementRootDifferentNameThanClass & JSXBase.HTMLAttributes<HTMLCustomElementRootDifferentNameThanClassElement>;
+            "custom-elements-delegates-focus": LocalJSX.CustomElementsDelegatesFocus & JSXBase.HTMLAttributes<HTMLCustomElementsDelegatesFocusElement>;
+            "custom-elements-no-delegates-focus": LocalJSX.CustomElementsNoDelegatesFocus & JSXBase.HTMLAttributes<HTMLCustomElementsNoDelegatesFocusElement>;
             "custom-event-root": LocalJSX.CustomEventRoot & JSXBase.HTMLAttributes<HTMLCustomEventRootElement>;
             "delegates-focus": LocalJSX.DelegatesFocus & JSXBase.HTMLAttributes<HTMLDelegatesFocusElement>;
             "dom-reattach": LocalJSX.DomReattach & JSXBase.HTMLAttributes<HTMLDomReattachElement>;

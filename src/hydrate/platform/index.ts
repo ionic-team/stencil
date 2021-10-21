@@ -161,7 +161,6 @@ export { hydrateApp } from './hydrate-app';
 
 export {
   addHostEventListeners,
-  attachShadow,
   defineCustomElement,
   forceModeUpdate,
   proxyCustomElement,
