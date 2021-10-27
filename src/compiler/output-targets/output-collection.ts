@@ -1,60 +1,7 @@
 import type * as d from '../../declarations';
 import { COLLECTION_MANIFEST_FILE_NAME, flatOne, normalizePath, sortBy } from '@utils';
-import { isOutputTargetDistCollection } from './output-utils';
 import { join, relative } from 'path';
 import { typescriptVersion, version } from '../../version';
-
-export const outputCollections = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
-  const outputTargets = config.outputTargets.filter(isOutputTargetDistCollection);
-  if (outputTargets.length === 0) {
-    return;
-  }
-
-  const timespan = buildCtx.createTimeSpan(`generate collections started`, true);
-  const moduleFiles = buildCtx.moduleFiles.filter((m) => !m.isCollectionDependency && m.jsFilePath);
-  await Promise.all([
-    writeJsFiles(config, compilerCtx, moduleFiles, outputTargets),
-    writeCollectionManifests(config, compilerCtx, buildCtx, outputTargets),
-  ]);
-
-  timespan.finish(`generate collections finished`);
-};
-
-const writeJsFiles = (
-  config: d.Config,
-  compilerCtx: d.CompilerCtx,
-  moduleFiles: d.Module[],
-  outputTargets: d.OutputTargetDistCollection[]
-) => {
-  return Promise.all(moduleFiles.map((moduleFile) => writeModuleFile(config, compilerCtx, moduleFile, outputTargets)));
-};
-
-const writeModuleFile = async (
-  config: d.Config,
-  compilerCtx: d.CompilerCtx,
-  moduleFile: d.Module,
-  outputTargets: d.OutputTargetDistCollection[]
-) => {
-  const relPath = relative(config.srcDir, moduleFile.jsFilePath);
-  const jsContent = await compilerCtx.fs.readFile(moduleFile.jsFilePath);
-  await Promise.all(
-    outputTargets.map((o) => {
-      const outputFilePath = join(o.collectionDir, relPath);
-      return compilerCtx.fs.writeFile(outputFilePath, jsContent);
-    })
-  );
-
-  if (moduleFile.sourceMapPath) {
-    const sourceMapRelativePath = relative(config.srcDir, moduleFile.sourceMapPath);
-    const sourceMapContent = await compilerCtx.fs.readFile(moduleFile.sourceMapPath);
-    await Promise.all(
-      outputTargets.map((o) => {
-        const sourceMapOutputFilePath = join(o.collectionDir, sourceMapRelativePath);
-        return compilerCtx.fs.writeFile(sourceMapOutputFilePath, sourceMapContent);
-      })
-    );
-  }
-};
 
 export const writeCollectionManifests = async (
   config: d.Config,
