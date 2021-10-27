@@ -65,6 +65,7 @@ export const BUILD: BuildConditionals = {
   hydratedClass: true,
   safari10: false,
   scriptDataOpts: false,
+  scopedSlotTextContentFix: false,
   shadowDomShim: false,
   slotChildNodesFix: false,
   invisiblePrehydration: true,

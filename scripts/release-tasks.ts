@@ -15,7 +15,7 @@ import { createLicense } from './license';
 import { bundleBuild } from './build';
 
 /**
- * Runs a littany of tasks used to ensure a safe release of a new version of Stencil
+ * Runs a litany of tasks used to ensure a safe release of a new version of Stencil
  * @param opts build options containing the metadata needed to release a new version of Stencil
  * @param args stringified arguments used to influence the release steps that are taken
  */
@@ -91,8 +91,8 @@ export function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<string>)
       title: 'Check current branch',
       task: () =>
         execa('git', ['symbolic-ref', '--short', 'HEAD']).then(({ stdout }) => {
-          if (stdout !== 'master' && !isAnyBranch) {
-            throw new Error('Not on `master` branch. Use --any-branch to publish anyway.');
+          if (stdout !== 'main' && !isAnyBranch) {
+            throw new Error('Not on `main` branch. Use --any-branch to publish anyway.');
           }
         }),
       skip: () => isDryRun,
@@ -151,14 +151,9 @@ export function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<string>)
       },
       {
         title: `Set package.json version to ${color.bold.yellow(opts.version)}`,
-        task: () => {
-          const packageJson = JSON.parse(fs.readFileSync(opts.packageJsonPath, 'utf8'));
-          packageJson.version = opts.version;
-          fs.writeFileSync(opts.packageJsonPath, JSON.stringify(packageJson, null, 2) + '\n');
-
-          const packageLockJson = JSON.parse(fs.readFileSync(opts.packageLockJsonPath, 'utf8'));
-          packageLockJson.version = opts.version;
-          fs.writeFileSync(opts.packageLockJsonPath, JSON.stringify(packageLockJson, null, 2) + '\n');
+        task: async () => {
+          // use `--no-git-tag-version` to ensure that the tag for the release is not prematurely created
+          await execa('npm', ['version', '--no-git-tag-version', opts.version], { cwd: rootDir });
         },
       },
       {
@@ -205,7 +200,7 @@ export function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<string>)
           if (isDryRun) {
             return console.log(`[dry-run] ${cmd} ${cmdArgs.join(' ')}`);
           }
-          return execa('git', cmdArgs, { cwd: rootDir });
+          return execa(cmd, cmdArgs, { cwd: rootDir });
         },
       },
       {
@@ -217,7 +212,7 @@ export function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<string>)
           if (isDryRun) {
             return console.log(`[dry-run] ${cmd} ${cmdArgs.join(' ')}`);
           }
-          return execa('git', cmdArgs, { cwd: rootDir });
+          return execa(cmd, cmdArgs, { cwd: rootDir });
         },
       }
     );
@@ -226,13 +221,13 @@ export function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<string>)
       tasks.push({
         title: 'Also set "next" npm tag on @stencil/core',
         task: () => {
-          const cmd = 'git';
+          const cmd = 'npm';
           const cmdArgs = ['dist-tag', 'add', '@stencil/core@' + opts.version, 'next'];
 
           if (isDryRun) {
             return console.log(`[dry-run] ${cmd} ${cmdArgs.join(' ')}`);
           }
-          return execa('npm', cmdArgs, { cwd: rootDir });
+          return execa(cmd, cmdArgs, { cwd: rootDir });
         },
       });
     }

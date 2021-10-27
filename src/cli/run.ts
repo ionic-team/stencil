@@ -1,4 +1,4 @@
-import type { CliInitOptions, Config, TaskCommand } from '../declarations';
+import type * as d from '../declarations';
 import { dependencies } from '../compiler/sys/dependencies.json';
 import { findConfig } from './find-config';
 import { hasError, isFunction, shouldIgnoreError } from '@utils';
@@ -13,15 +13,11 @@ import { taskInfo } from './task-info';
 import { taskPrerender } from './task-prerender';
 import { taskServe } from './task-serve';
 import { taskTest } from './task-test';
-import { initializeStencilCLIConfig } from './state/stencil-cli-config';
 import { taskTelemetry } from './task-telemetry';
 import { telemetryAction } from './telemetry/telemetry';
 
-export const run = async (init: CliInitOptions) => {
+export const run = async (init: d.CliInitOptions) => {
   const { args, logger, sys } = init;
-
-  // Initialize the singleton so we can use this throughout the lifecycle of the CLI.
-  const stencilCLIConfig = initializeStencilCLIConfig({ args, logger, sys });
 
   try {
     const flags = parseFlags(args, sys);
@@ -39,14 +35,8 @@ export const run = async (init: CliInitOptions) => {
       sys.applyGlobalPatch(sys.getCurrentDirectory());
     }
 
-    // Update singleton with modifications
-    stencilCLIConfig.logger = logger;
-    stencilCLIConfig.task = task;
-    stencilCLIConfig.sys = sys;
-    stencilCLIConfig.flags = flags;
-
     if (task === 'help' || flags.help) {
-      taskHelp();
+      await taskHelp({ flags: { task: 'help', args }, outputTargets: [] }, logger, sys);
       return;
     }
 
@@ -70,7 +60,6 @@ export const run = async (init: CliInitOptions) => {
     }
 
     const coreCompiler = await loadCoreCompiler(sys);
-    stencilCLIConfig.coreCompiler = coreCompiler;
 
     if (task === 'version' || flags.version) {
       console.log(coreCompiler.version);
@@ -82,7 +71,7 @@ export const run = async (init: CliInitOptions) => {
     loadedCompilerLog(sys, logger, flags, coreCompiler);
 
     if (task === 'info') {
-      await telemetryAction(async () => {
+      await telemetryAction(sys, { flags: { task: 'info' }, outputTargets: [] }, logger, coreCompiler, async () => {
         await taskInfo(coreCompiler, sys, logger);
       });
       return;
@@ -104,16 +93,14 @@ export const run = async (init: CliInitOptions) => {
       }
     }
 
-    stencilCLIConfig.validatedConfig = validated;
-
     if (isFunction(sys.applyGlobalPatch)) {
       sys.applyGlobalPatch(validated.config.rootDir);
     }
 
     await sys.ensureResources({ rootDir: validated.config.rootDir, logger, dependencies: dependencies as any });
 
-    await telemetryAction(async () => {
-      await runTask(coreCompiler, validated.config, task);
+    await telemetryAction(sys, validated.config, logger, coreCompiler, async () => {
+      await runTask(coreCompiler, validated.config, task, sys);
     });
   } catch (e) {
     if (!shouldIgnoreError(e)) {
@@ -123,13 +110,18 @@ export const run = async (init: CliInitOptions) => {
   }
 };
 
-export const runTask = async (coreCompiler: CoreCompiler, config: Config, task: TaskCommand) => {
-  config.flags = config.flags || {};
+export const runTask = async (
+  coreCompiler: CoreCompiler,
+  config: d.Config,
+  task: d.TaskCommand,
+  sys?: d.CompilerSystem
+) => {
+  config.flags = config.flags || { task };
   config.outputTargets = config.outputTargets || [];
 
   switch (task) {
     case 'build':
-      await taskBuild(coreCompiler, config);
+      await taskBuild(coreCompiler, config, sys);
       break;
 
     case 'docs':
@@ -142,7 +134,7 @@ export const runTask = async (coreCompiler: CoreCompiler, config: Config, task: 
       break;
 
     case 'help':
-      taskHelp();
+      taskHelp(config, config.logger, sys);
       break;
 
     case 'prerender':
@@ -154,7 +146,10 @@ export const runTask = async (coreCompiler: CoreCompiler, config: Config, task: 
       break;
 
     case 'telemetry':
-      await taskTelemetry();
+      // TODO(STENCIL-148) make this parameter no longer optional, remove the surrounding if statement
+      if (sys) {
+        await taskTelemetry(config, sys, config.logger);
+      }
       break;
 
     case 'test':
@@ -167,7 +162,7 @@ export const runTask = async (coreCompiler: CoreCompiler, config: Config, task: 
 
     default:
       config.logger.error(`${config.logger.emoji('❌ ')}Invalid stencil command, please see the options below:`);
-      taskHelp();
+      taskHelp(config, config.logger, sys);
       return config.sys.exit(1);
   }
 };

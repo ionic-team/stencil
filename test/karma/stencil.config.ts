@@ -20,6 +20,10 @@ export const config: Config = {
       type: 'dist',
       dir: 'test-dist',
     },
+    {
+      type: 'dist-custom-elements',
+      dir: 'test-components',
+    },
   ],
   globalScript: 'test-app/global.ts',
   globalStyle: 'test-app/style-plugin/global-sass-entry.scss',
@@ -32,6 +36,7 @@ export const config: Config = {
     dynamicImportShim: true,
     lifecycleDOMEvents: true,
     safari10: true,
+    scopedSlotTextContentFix: true,
     scriptDataOpts: true,
     shadowDomShim: true,
     slotChildNodesFix: true,

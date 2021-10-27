@@ -2,7 +2,7 @@ import type * as d from '../../../declarations';
 import { normalizePath } from '@utils';
 import type { Plugin } from 'rollup';
 
-export const lazyComponentPlugin = (buildCtx: d.BuildCtx) => {
+export const lazyComponentPlugin = (buildCtx: d.BuildCtx): Plugin => {
   const entrys = new Map<string, d.EntryModule>();
 
   const plugin: Plugin = {
@@ -30,7 +30,7 @@ export const lazyComponentPlugin = (buildCtx: d.BuildCtx) => {
   return plugin;
 };
 
-const createComponentExport = (cmp: d.ComponentCompilerMeta) => {
+const createComponentExport = (cmp: d.ComponentCompilerMeta): string => {
   const originalClassName = cmp.componentClassName;
   const underscoredClassName = cmp.tagName.replace(/-/g, '_');
   const filePath = normalizePath(cmp.sourceFilePath);
