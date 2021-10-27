@@ -91,7 +91,7 @@ const extractCommentsWithHash = (input: string): string[] => {
 
 const _ruleRe = /(\s*)([^;\{\}]+?)(\s*)((?:{%BLOCK%}?\s*;?)|(?:\s*;))/g;
 const _curlyRe = /([{}])/g;
-const _selectorPartsRe = /(.*?)((?<!\\)(:+|$)(.*))/;
+const _selectorPartsRe = /(^.*?[^\\])??((:+)(.*)|$)/;
 const OPEN_CURLY = '{';
 const CLOSE_CURLY = '}';
 const BLOCK_PLACEHOLDER = '%BLOCK%';
@@ -257,20 +257,19 @@ const selectorNeedsScoping = (selector: string, scopeSelector: string) => {
   return !re.test(selector);
 };
 
+const injectScopingSelector = (selector: string, scopingSelector: string) => {
+  return selector.replace(_selectorPartsRe, (_: string, before = '', _colonGroup: string, colon = '', after = '') => {
+    return before + scopingSelector + colon + after;
+  });
+};
+
 const applySimpleSelectorScope = (selector: string, scopeSelector: string, hostSelector: string) => {
   // In Android browser, the lastIndex is not reset when the regex is used in String.replace()
   _polyfillHostRe.lastIndex = 0;
   if (_polyfillHostRe.test(selector)) {
     const replaceBy = `.${hostSelector}`;
     return selector
-      .replace(_polyfillHostNoCombinatorRe, (_, selector) => {
-        return selector.replace(
-          _selectorPartsRe,
-          (_: string, before: string, _colonGroup: string, colon: string, after: string) => {
-            return before + replaceBy + colon + after;
-          }
-        );
-      })
+      .replace(_polyfillHostNoCombinatorRe, (_, selector) => injectScopingSelector(selector, replaceBy))
       .replace(_polyfillHostRe, replaceBy + ' ');
   }
 
@@ -296,10 +295,7 @@ const applyStrictSelectorScope = (selector: string, scopeSelector: string, hostS
       // remove :host since it should be unnecessary
       const t = p.replace(_polyfillHostRe, '');
       if (t.length > 0) {
-        const matches = t.match(_selectorPartsRe);
-        if (matches) {
-          scopedP = matches[1] + className + matches[3] + matches[4];
-        }
+        scopedP = injectScopingSelector(t, className);
       }
     }
 
