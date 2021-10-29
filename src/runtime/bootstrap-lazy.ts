@@ -49,7 +49,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
     }
   }
 
-  lazyBundles.map((lazyBundle) =>
+  lazyBundles.map((lazyBundle) => {
     lazyBundle[1].map((compactMeta) => {
       const cmpMeta: d.ComponentRuntimeMeta = {
         $flags$: compactMeta[0],
@@ -159,8 +159,8 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
           proxyComponent(HostElement as any, cmpMeta, PROXY_FLAGS.isElementConstructor) as any
         );
       }
-    })
-  );
+    });
+  });
 
   if (BUILD.invisiblePrehydration && (BUILD.hydratedClass || BUILD.hydratedAttribute)) {
     visibilityStyle.innerHTML = cmpTags + HYDRATED_CSS;

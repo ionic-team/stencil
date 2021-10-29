@@ -128,7 +128,9 @@ export async function postGithubRelease(opts: BuildOptions): Promise<void> {
 
   const timestamp = new Date().toISOString().substring(0, 10);
 
-  url.searchParams.set('title', encodeURIComponent(`${title} (${timestamp})`));
+  // this will be automatically encoded for us, no need to call `encodeURIComponent` here. doing so will result in a
+  // double encoding, which does not render properly in GitHub
+  url.searchParams.set('title', `${title} (${timestamp})`);
 
   url.searchParams.set('body', body.trim());
   if (opts.tag === 'next' || opts.tag === 'test') {
