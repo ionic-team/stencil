@@ -4,7 +4,7 @@
 import type * as d from '@stencil/core/internal';
 import { createCompiler, loadConfig } from '@stencil/core/compiler';
 import path from 'path';
-import { mockConfig } from '@stencil/core/testing';
+import { mockConfig } from '../../testing/mocks';
 import { createNodeSys } from '../../sys/node';
 import { validateConfig } from '../../compiler/config/validate-config';
 import { createSystem } from '../../compiler/sys/stencil-sys';
