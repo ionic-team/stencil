@@ -12,7 +12,7 @@ import { validateRollupConfig } from './validate-rollup-config';
 import { validateTesting } from './validate-testing';
 import { validateWorkers } from './validate-workers';
 
-export const validateConfig = (userConfig?: Config): {config: Config, diagnostics: Diagnostic[]} => {
+export const validateConfig = (userConfig?: Config): { config: Config; diagnostics: Diagnostic[] } => {
   const config = Object.assign({}, userConfig || {}); // not positive it's json safe
   const diagnostics: Diagnostic[] = [];
 

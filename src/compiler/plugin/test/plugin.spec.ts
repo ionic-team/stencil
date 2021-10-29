@@ -7,7 +7,7 @@ describe('plugin', () => {
   jest.setTimeout(25000);
 
   let initConfig: d.Config = {};
-  initConfig.outputTargets = [{type: 'www'}];
+  initConfig.outputTargets = [{ type: 'www' }];
 
   let compiler: MockCompiler;
 
@@ -27,15 +27,18 @@ describe('plugin', () => {
         name: 'myPlugin',
       };
     }
-    compiler = await mockCreateCompiler({...initConfig, rollupPlugins: { before: [myPlugin()] }});
+    compiler = await mockCreateCompiler({ ...initConfig, rollupPlugins: { before: [myPlugin()] } });
     const config = compiler.config;
 
-    await config.sys.writeFile(path.join(config.srcDir, 'components', 'cmp-a.tsx'), `
+    await config.sys.writeFile(
+      path.join(config.srcDir, 'components', 'cmp-a.tsx'),
+      `
       import { Component, h } from '@stencil/core';
       @Component({ tag: 'cmp-a' }) export class CmpA {
         constructor() { }
       }
-    `);
+    `
+    );
 
     const r = await compiler.build();
     expect(r.diagnostics).toHaveLength(0);
@@ -54,15 +57,18 @@ describe('plugin', () => {
         name: 'myPlugin',
       };
     }
-    compiler = await mockCreateCompiler({...initConfig, rollupPlugins: { before: [myPlugin()] }});
+    compiler = await mockCreateCompiler({ ...initConfig, rollupPlugins: { before: [myPlugin()] } });
     const config = compiler.config;
 
-    await config.sys.writeFile(path.join(config.srcDir, 'components', 'cmp-a.tsx'), `
+    await config.sys.writeFile(
+      path.join(config.srcDir, 'components', 'cmp-a.tsx'),
+      `
       import { Component, h } from '@stencil/core';
       @Component({ tag: 'cmp-a' }) export class CmpA {
         constructor() { }
       }
-    `);
+    `
+    );
 
     const r = await compiler.build();
     expect(r.diagnostics).toHaveLength(0);
@@ -86,11 +92,12 @@ describe('plugin', () => {
       };
     }
 
-    compiler = await mockCreateCompiler({...initConfig, rollupPlugins: { before: [myPlugin()] }});
+    compiler = await mockCreateCompiler({ ...initConfig, rollupPlugins: { before: [myPlugin()] } });
     const config = compiler.config;
 
     await config.sys.writeFile(
-      path.join(config.srcDir, 'components', 'cmp-a.tsx'), `
+      path.join(config.srcDir, 'components', 'cmp-a.tsx'),
+      `
       import { depFn } from '#crazy-path!';
       import { Component, h } from '@stencil/core';
       @Component({ tag: 'cmp-a' }) export class CmpA {
@@ -98,13 +105,16 @@ describe('plugin', () => {
           depFn();
         }
       }
-    `);
+    `
+    );
     await config.sys.writeFile(
-      filePath, `
+      filePath,
+      `
       export function depFn(){
         console.log('imported depFun() 1');
       }
-    `);
+    `
+    );
 
     const r = await compiler.build();
     expect(r.diagnostics).toHaveLength(0);
@@ -128,11 +138,12 @@ describe('plugin', () => {
       };
     }
 
-    compiler = await mockCreateCompiler({...initConfig, rollupPlugins: { before: [myPlugin()] }});
+    compiler = await mockCreateCompiler({ ...initConfig, rollupPlugins: { before: [myPlugin()] } });
     const config = compiler.config;
 
     await config.sys.writeFile(
-      path.join(config.srcDir, 'components', 'cmp-a.tsx'), `
+      path.join(config.srcDir, 'components', 'cmp-a.tsx'),
+      `
       import { depFn } from '#crazy-path!'
       import { Component, h } from '@stencil/core';
       @Component({ tag: 'cmp-a' }) export class CmpA {
@@ -140,12 +151,16 @@ describe('plugin', () => {
           depFn();
         }
       }
-    `);
-    await config.sys.writeFile(filePath, `
+    `
+    );
+    await config.sys.writeFile(
+      filePath,
+      `
       export function depFn(){
         console.log('imported depFun() 2');
       }
-    `);
+    `
+    );
 
     const r = await compiler.build();
     expect(r.diagnostics).toHaveLength(0);
@@ -169,21 +184,24 @@ describe('plugin', () => {
       };
     }
 
-    compiler = await mockCreateCompiler({...initConfig, rollupPlugins: { before: [myPlugin()] }});
+    compiler = await mockCreateCompiler({ ...initConfig, rollupPlugins: { before: [myPlugin()] } });
     const config = compiler.config;
 
     await config.sys.writeFile(path.join(config.srcDir, 'components', 'style.css'), `p { color: red; }`);
-    await config.sys.writeFile(path.join(config.srcDir, 'components', 'cmp-a.tsx'), `
+    await config.sys.writeFile(
+      path.join(config.srcDir, 'components', 'cmp-a.tsx'),
+      `
       import { Component, h } from '@stencil/core';
       @Component({ tag: 'cmp-a', styleUrl: './style.css' }) export class CmpA {
         constructor() { }
       }
-    `);
+    `
+    );
 
     const r = await compiler.build();
     expect(r.diagnostics).toHaveLength(0);
 
     const cmpA = await compiler.compilerCtx.fs.readFile(path.join(mockCompilerRoot, 'www', 'build', 'cmp-a.entry.js'));
     expect(cmpA).toContain('transformed!');
-  })
+  });
 });

@@ -34,19 +34,25 @@ describe('outputTarget, www / dist / docs', () => {
     compiler = await mockCreateCompiler(config);
     config = compiler.config;
 
-    await compiler.sys.writeFile(config.packageJsonFilePath, `{
+    await compiler.sys.writeFile(
+      config.packageJsonFilePath,
+      `{
       "module": "custom-dist/index.js",
       "main": "custom-dist/index.cjs.js",
       "collection": "custom-dist/dist-collection/collection-manifest.json",
       "types": "custom-dist/custom-types/components.d.ts"
-    }`);
+    }`
+    );
     await compiler.sys.writeFile(path.join(mockCompilerRoot, 'polyfills', 'index.js'), `/* polyfills */`);
-    await config.sys.writeFile(path.join(config.srcDir, 'components', 'cmp-a.tsx'), `
+    await config.sys.writeFile(
+      path.join(config.srcDir, 'components', 'cmp-a.tsx'),
+      `
       import { Component, h } from '@stencil/core';
       @Component({ tag: 'cmp-a' }) export class CmpA {
         constructor() { }
       }
-    `);
+    `
+    );
 
     const r = await compiler.build();
     expect(r.diagnostics).toHaveLength(0);

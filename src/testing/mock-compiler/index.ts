@@ -10,7 +10,7 @@ import { validateConfig } from '../../compiler/config/validate-config';
 import { createSystem } from '../../compiler/sys/stencil-sys';
 
 export interface MockCompiler extends d.Compiler {
-  config: d.Config
+  config: d.Config;
 }
 
 // jest will run tests in parallel by default but
@@ -21,7 +21,7 @@ let currentCompiler: Promise<any> = null;
 
 // cache some original file systems functions that we will overwrite.
 // We use them to continue to refer to real, on-disk files
-const sys = createNodeSys({process: process});
+const sys = createNodeSys({ process: process });
 const ogReadFile = sys.readFile;
 const ogReadFileSync = sys.readFileSync;
 const ogReadDir = sys.readDir;
@@ -33,7 +33,9 @@ const ogStatSync = sys.statSync;
 /**
  * The root path of the compiler instance. Useful when writing new in-memory files
  */
-export const mockCompilerRoot = path.resolve(__dirname);
+export const mockCompilerRoot: mockCompilerRoot = path.resolve(__dirname);
+// idk what's happening here. No declaration is made (so throws error) unless I export this :/
+export type mockCompilerRoot = string;
 
 /**
  * Setup sensible compiler config defaults which can then be
@@ -45,7 +47,7 @@ export function initCompilerConfig(setupFs = true) {
   let config: d.Config = {};
   const root = mockCompilerRoot;
 
-  config = mockConfig((setupFs ? patchHybridFs() : null), root);
+  config = mockConfig(setupFs ? patchHybridFs() : null, root);
   config._internalTesting = true;
   config.namespace = `TestApp`;
   config.rootDir = root;
@@ -57,7 +59,7 @@ export function initCompilerConfig(setupFs = true) {
   config.enableCache = false;
   config.flags.watch = false;
   config.flags.build = true;
-  config.outputTargets = [{type: 'www'}];
+  config.outputTargets = [{ type: 'www' }];
   config.srcDir = path.join(root, 'src');
   config.tsconfig = path.join(root, 'tsconfig.json');
   config.packageJsonFilePath = path.join(root, 'package.json');
@@ -73,7 +75,6 @@ export function initCompilerConfig(setupFs = true) {
  * @returns a mock compiler object - same as a normal compiler with an accompanying final config
  */
 export async function mockCreateCompiler(userConfig: d.Config = {}): Promise<MockCompiler> {
-
   if (currentCompiler) {
     await currentCompiler;
   }
@@ -82,10 +83,10 @@ export async function mockCreateCompiler(userConfig: d.Config = {}): Promise<Moc
   });
 
   let config: d.Config = initCompilerConfig(!userConfig.sys);
-  config = {...config, ...userConfig};
+  config = { ...config, ...userConfig };
 
   // Some default files to smooth things along. They can be overwritten
-  await config.sys.createDir(path.join(config.srcDir, 'components'), {recursive: true})
+  await config.sys.createDir(path.join(config.srcDir, 'components'), { recursive: true });
 
   if (config.tsconfig && !config.sys.readFileSync(config.tsconfig)) {
     config.sys.writeFileSync(
@@ -107,27 +108,25 @@ export async function mockCreateCompiler(userConfig: d.Config = {}): Promise<Moc
         "collection": "dist/collection/collection-manifest.json",
         "types": "dist/types/components.d.ts"
       }`
-    )
+    );
   }
   if (!config.sys.readFileSync(path.join(config.rootDir, 'stencil.config.js'))) {
-    config.sys.writeFileSync(
-      path.join(config.rootDir, 'stencil.config.js'),
-      `exports.config = {};`);
+    config.sys.writeFileSync(path.join(config.rootDir, 'stencil.config.js'), `exports.config = {};`);
   }
   if (!config.sys.readFileSync(path.join(config.rootDir, 'index.html'))) {
     config.sys.writeFileSync(path.join(config.srcDir, 'index.html'), ``);
   }
 
   // belts and brances config validation
-  const loadedConfig = (await loadConfig({
+  const loadedConfig = await loadConfig({
     config,
     initTsConfig: false,
     sys: config.sys,
-  }));
+  });
   if (loadedConfig) {
     config = loadedConfig.config;
   } else {
-    throw(loadedConfig.diagnostics);
+    throw loadedConfig.diagnostics;
   }
 
   config = validateConfig(config).config;
@@ -138,14 +137,14 @@ export async function mockCreateCompiler(userConfig: d.Config = {}): Promise<Moc
   // augment destroy to clean-up our in-memory files
   const ogDestroy = compiler.destroy;
   compiler.destroy = async () => {
-    config.sys.removeDirSync(config.rootDir, {recursive: true});
+    config.sys.removeDirSync(config.rootDir, { recursive: true });
     await ogDestroy();
     currentCompilerResolve();
-  }
+  };
 
   // this helps consumers read files easily from our virtual root
   // config.rootDir = path.join(config.rootDir, config.namespace);
-  return {config, ...compiler};
+  return { config, ...compiler };
 }
 
 /**
@@ -155,78 +154,78 @@ export async function mockCreateCompiler(userConfig: d.Config = {}): Promise<Moc
  * allows reads to be done of real files whilst any writes are done in memory.
  * @returns a file system that reads real files and writes all new files to memory
  */
- function patchHybridFs() {
+function patchHybridFs() {
   const memSys = createSystem();
 
   sys.getCompilerExecutingPath = () => path.join(mockCompilerRoot, '../../../compiler/stencil.js');
 
   sys.writeFile = (p: string, content: string) => {
     return memSys.writeFile(p, content);
-  }
+  };
   sys.writeFileSync = (p: string, content: string) => {
     return memSys.writeFileSync(p, content);
-  }
+  };
   sys.readFile = async (p: string, encoding?: any) => {
     const foundReadFile = await memSys.readFile(p, encoding);
     if (foundReadFile) return foundReadFile;
-    else return ogReadFile(p, encoding)
-  }
+    else return ogReadFile(p, encoding);
+  };
   sys.readFileSync = (p: string, encoding?: any) => {
     const foundReadFile = memSys.readFileSync(p, encoding);
     if (foundReadFile) return foundReadFile;
-    else return ogReadFileSync(p, encoding)
-  }
+    else return ogReadFileSync(p, encoding);
+  };
   sys.copyFile = async (src: string, dst: string) => {
     const foundReadFile = await memSys.readFile(src);
     if (foundReadFile) return memSys.copyFile(src, dst);
     else return ogCopyFile(src, dst);
-  }
+  };
   sys.readDir = async (p: string) => {
     return [...(await ogReadDir(p)), ...(await memSys.readDir(p))];
-  }
+  };
   sys.readDirSync = (p: string) => {
     return [...ogReadDirSync(p), ...memSys.readDirSync(p)];
-  }
+  };
   sys.createDir = async (p: string, opts?: d.CompilerSystemCreateDirectoryOptions) => {
     return memSys.createDir(p, opts);
-  }
+  };
   sys.createDirSync = (p: string, opts?: d.CompilerSystemCreateDirectoryOptions) => {
     return memSys.createDirSync(p, opts);
-  }
+  };
   sys.stat = async (p: string) => {
     // in-memory fs doesn't seem to normalize for query params
     if (p.includes('?')) {
-      let {dir, ext, name} = path.parse(p)
+      let { dir, ext, name } = path.parse(p);
       p = path.join(dir, name + ext.split('?')[0]);
     }
     const foundReadFile = await memSys.stat(p);
     if (!foundReadFile.error) {
       return foundReadFile;
-    } else return ogStat(p)
-  }
+    } else return ogStat(p);
+  };
   sys.statSync = (p: string) => {
     // in-memory fs doesn't seem to normalize query params
     if (p.includes('?')) {
-      let {dir, ext, name} = path.parse(p)
+      let { dir, ext, name } = path.parse(p);
       p = path.join(dir, name + ext.split('?')[0]);
     }
     const foundReadFile = memSys.statSync(p);
     if (!foundReadFile.error) {
       return foundReadFile;
-    } else return ogStatSync(p)
-  }
+    } else return ogStatSync(p);
+  };
   sys.removeFile = (p: string) => {
     return memSys.removeFile(p);
-  }
+  };
   sys.removeFileSync = (p: string) => {
     return memSys.removeFileSync(p);
-  }
+  };
   sys.removeDir = (p: string, opts?: d.CompilerSystemRemoveDirectoryOptions) => {
     return memSys.removeDir(p, opts);
-  }
+  };
   sys.removeDirSync = (p: string, opts?: d.CompilerSystemRemoveDirectoryOptions) => {
     return memSys.removeDirSync(p, opts);
-  }
+  };
 
   return sys;
 }
