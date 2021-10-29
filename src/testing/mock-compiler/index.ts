@@ -1,10 +1,10 @@
 /** Note - keep this in it's own folder.
  * This stops typescript attempting to read more files than necessary. */
 
-import type * as d from '../../declarations';
+import type * as d from '@stencil/core/internal';
 import { createCompiler, loadConfig } from '@stencil/core/compiler';
 import path from 'path';
-import { mockConfig } from '../../testing/mocks';
+import { mockConfig } from '@stencil/core/testing';
 import { createNodeSys } from '../../sys/node';
 import { validateConfig } from '../../compiler/config/validate-config';
 import { createSystem } from '../../compiler/sys/stencil-sys';
