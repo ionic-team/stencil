@@ -1,5 +1,5 @@
 import type { JsonDocs } from './stencil-public-docs';
-import type { PrerenderUrlResults } from '../internal';
+import type { CompilerCtx, PrerenderUrlResults } from '../internal';
 export * from './stencil-public-docs';
 
 /**
@@ -350,6 +350,7 @@ export interface Config extends StencilConfig {
   tsCompilerOptions?: any;
   _isValidated?: boolean;
   _isTesting?: boolean;
+  _internalTesting?: boolean;
 }
 
 export interface HydratedFlag {
@@ -2281,6 +2282,7 @@ export interface Compiler {
   createWatcher(): Promise<CompilerWatcher>;
   destroy(): Promise<void>;
   sys: CompilerSystem;
+  compilerCtx: CompilerCtx;
 }
 
 export interface CompilerWatcher extends BuildOnEvents {

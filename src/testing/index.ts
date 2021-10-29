@@ -13,6 +13,12 @@ export {
   mockWindow,
 } from './mocks';
 export {
+  initCompilerConfig,
+  mockCreateCompiler,
+  mockCompilerRoot,
+  MockCompiler
+} from './mock-compiler';
+export {
   MockHeaders,
   MockRequest,
   MockRequestInit,

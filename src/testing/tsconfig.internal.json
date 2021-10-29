@@ -8,6 +8,7 @@
     "forceConsistentCasingInFileNames": true,
     "jsx": "react",
     "jsxFactory": "h",
+    "jsxFragmentFactory": "Fragment",
     "lib": [
       "dom",
       "es2017",
@@ -23,27 +24,18 @@
     "target": "es2017",
     "baseUrl": ".",
     "paths": {
-      "@stencil/core/cli": [
-        "../cli/index.ts"
-      ],
-      "@stencil/core/compiler": [
-        "../compiler/index.ts"
-      ],
-      "@stencil/core/declarations": [
-        "../declarations/index.ts"
-      ],
-      "@stencil/core/mock-doc": [
-        "../mock-doc/index.ts"
-      ],
-      "@stencil/core/testing": [
-        "../testing/index.ts"
-      ],
-      "@stencil/core": [
-        "../index.ts"
-      ],
-      "@utils": [
-        "../utils/index.ts"
-      ]
+      "@stencil/core/internal": ["../internal/index.ts"],
+      "@stencil/core/internal/client": ["../client/index.ts"],
+      "@stencil/core/cli": ["../cli/index.ts"],
+      "@stencil/core/compiler": ["../compiler/index.ts"],
+      "@stencil/core/declarations": ["../declarations/index.ts"],
+      "@stencil/core/mock-doc": ["../mock-doc/index.ts"],
+      "@stencil/core/testing": ["../testing/index.ts"],
+      "@stencil/core": ["../index.ts"],
+      "@utils": ["../utils/index.ts"]
     }
   }
 }
+
+
+

@@ -9,8 +9,8 @@ import { TestingLogger } from './testing-logger';
 import path from 'path';
 import { noop } from '@utils';
 
-export function mockConfig(sys?: CompilerSystem) {
-  const rootDir = path.resolve('/');
+export function mockConfig(sys?: CompilerSystem, rootDir?: string) {
+  rootDir = rootDir || path.resolve('/');
 
   if (!sys) {
     sys = createTestingSystem();

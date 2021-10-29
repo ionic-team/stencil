@@ -55,6 +55,7 @@ export const createCompiler = async (config: Config) => {
     createWatcher,
     destroy,
     sys,
+    compilerCtx,
   };
 
   config.logger.printDiagnostics(diagnostics);

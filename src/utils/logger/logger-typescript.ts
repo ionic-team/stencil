@@ -160,7 +160,7 @@ const flattenDiagnosticMessageText = (tsDiagnostic: Diagnostic, diag: string | D
   }
 
   const ignoreCodes: number[] = [];
-  const isStencilConfig = tsDiagnostic.file.fileName.includes('stencil.config');
+  const isStencilConfig = tsDiagnostic.file?.fileName.includes('stencil.config');
   if (isStencilConfig) {
     ignoreCodes.push(2322);
   }
