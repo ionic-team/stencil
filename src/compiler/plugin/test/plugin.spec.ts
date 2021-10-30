@@ -43,7 +43,7 @@ describe('plugin', () => {
     const r = await compiler.build();
     expect(r.diagnostics).toHaveLength(0);
 
-    const cmpA = await compiler.compilerCtx.fs.readFile(path.join(config.rootDir, 'www', 'build', 'cmp-a.entry.js'));
+    const cmpA = await config.sys.readFile(path.join(config.rootDir, 'www', 'build', 'cmp-a.entry.js'));
     expect(cmpA).toContain('transformed 1!');
   });
 
@@ -73,7 +73,7 @@ describe('plugin', () => {
     const r = await compiler.build();
     expect(r.diagnostics).toHaveLength(0);
 
-    const cmpA = await compiler.compilerCtx.fs.readFile(path.join(mockCompilerRoot, 'www', 'build', 'cmp-a.entry.js'));
+    const cmpA = await config.sys.readFile(path.join(mockCompilerRoot, 'www', 'build', 'cmp-a.entry.js'));
     expect(cmpA).toContain('transformed 2!');
   });
 
@@ -119,7 +119,7 @@ describe('plugin', () => {
     const r = await compiler.build();
     expect(r.diagnostics).toHaveLength(0);
 
-    const cmpA = await compiler.compilerCtx.fs.readFile(path.join(mockCompilerRoot, 'www', 'build', 'cmp-a.entry.js'));
+    const cmpA = await config.sys.readFile(path.join(mockCompilerRoot, 'www', 'build', 'cmp-a.entry.js'));
     expect(cmpA).toContain('imported depFun() 1');
   });
 
@@ -165,7 +165,7 @@ describe('plugin', () => {
     const r = await compiler.build();
     expect(r.diagnostics).toHaveLength(0);
 
-    const cmpA = await compiler.compilerCtx.fs.readFile(path.join(mockCompilerRoot, 'www', 'build', 'cmp-a.entry.js'));
+    const cmpA = await config.sys.readFile(path.join(mockCompilerRoot, 'www', 'build', 'cmp-a.entry.js'));
     expect(cmpA).toContain('imported depFun() 2');
   });
 
@@ -201,7 +201,7 @@ describe('plugin', () => {
     const r = await compiler.build();
     expect(r.diagnostics).toHaveLength(0);
 
-    const cmpA = await compiler.compilerCtx.fs.readFile(path.join(mockCompilerRoot, 'www', 'build', 'cmp-a.entry.js'));
+    const cmpA = await config.sys.readFile(path.join(mockCompilerRoot, 'www', 'build', 'cmp-a.entry.js'));
     expect(cmpA).toContain('transformed!');
   });
 });

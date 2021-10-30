@@ -1,183 +1,205 @@
-import { Compiler, Config } from '@stencil/core/compiler';
-import { mockConfig } from '@stencil/core/testing';
+import type * as d from '@stencil/core/declarations';
+import { mockCreateCompiler, MockCompiler } from '../../../testing/mock-compiler';
 import path from 'path';
+import { getLazyBuildConditionals } from '../../output-targets/dist-lazy/lazy-build-conditionals';
 
-xdescribe('build-conditionals', () => {
-  jest.setTimeout(20000);
-  let compiler: Compiler;
-  let config: Config;
-  const root = path.resolve('/');
+describe('build-conditionals', () => {
+  jest.setTimeout(25000);
+  let compiler: MockCompiler;
+  let config: d.Config = {};
 
   beforeEach(async () => {
-    config = mockConfig();
-    compiler = new Compiler(config);
-    await compiler.fs.writeFile(path.join(root, 'src', 'index.html'), `<cmp-a></cmp-a>`);
-    await compiler.fs.commit();
+    compiler = await mockCreateCompiler();
+    config = compiler.config;
   });
+  afterEach(async () => {
+    compiler.destroy();
+  })
 
   it('should import function svg/slot build conditionals, remove on rebuild, and add back on rebuild', async () => {
-    compiler.config.watch = true;
-    await compiler.fs.writeFiles({
-      [path.join(root, 'src', 'cmp-a.tsx')]: `
-        import {icon, slot} from './icon';
-        @Component({ tag: 'cmp-a', shadow: true }) export class CmpA {
-          render() {
-            return <div>{icon()}{slot()}</div>
-          }
-        }`,
-      [path.join(root, 'src', 'slot.tsx')]: `
-        export default () => <slot/>;
-      `,
-      [path.join(root, 'src', 'icon.tsx')]: `
-        import slot from './slot';
-        export const icon = () => <svg/>;
-        export { slot };
-      `,
-    });
-    await compiler.fs.commit();
-
-    let r = await compiler.build();
-    let rebuildListener = compiler.once('buildFinish');
-
-    expect(r.diagnostics).toHaveLength(0);
-    expect(r.buildConditionals).toEqual({
-      shadow: true,
-      slot: true,
-      svg: true,
-      vdom: true,
-    });
-
-    await compiler.fs.writeFiles(
-      {
-        [path.join(root, 'src', 'cmp-a.tsx')]: `@Component({ tag: 'cmp-a' }) export class CmpA {}`,
-      },
-      { clearFileCache: true }
-    );
-    await compiler.fs.commit();
-
-    compiler.trigger('fileUpdate', path.join(root, 'src', 'cmp-a.tsx'));
-
-    r = await rebuildListener;
-
-    expect(r.diagnostics).toHaveLength(0);
-    expect(r.buildConditionals).toEqual({
-      shadow: false,
-      slot: false,
-      svg: false,
-      vdom: false,
-    });
-
-    await compiler.fs.writeFiles(
-      {
-        [path.join(root, 'src', 'cmp-a.tsx')]: `
+    await config.sys.writeFile(
+      path.join(config.srcDir, 'components', 'cmp-a.tsx'), `
+      import { Component, h } from '@stencil/core';
       import {icon, slot} from './icon';
       @Component({ tag: 'cmp-a', shadow: true }) export class CmpA {
         render() {
           return <div>{icon()}{slot()}</div>
         }
-      }`,
-      },
-      { clearFileCache: true }
+      }`
     );
-    await compiler.fs.commit();
+    await config.sys.writeFile(
+      path.join(config.srcDir, 'components', 'slot.tsx'), `
+        export default () => <slot/>;
+      `
+    );
+    await config.sys.writeFile(
+      path.join(config.srcDir, 'components', 'icon.tsx'), `
+        import slot from './slot';
+        export const icon = () => <svg/>;
+        export { slot };
+      `
+    );
 
-    rebuildListener = compiler.once('buildFinish');
-
-    compiler.trigger('fileUpdate', path.join(root, 'src', 'cmp-a.tsx'));
-
-    r = await rebuildListener;
-
+    let r = await compiler.build();
     expect(r.diagnostics).toHaveLength(0);
-    expect(r.buildConditionals).toEqual({
-      shadow: true,
-      slot: true,
-      svg: true,
-      vdom: true,
-    });
+
+    let conditionals = getLazyBuildConditionals(config, r.components);
+    expect(conditionals).toEqual(
+      expect.objectContaining({
+        shadowDom: true,
+        slot: true,
+        svg: true,
+        vdomRender: true,
+      })
+    );
+
+    await config.sys.writeFile(
+      path.join(config.srcDir, 'components', 'cmp-a.tsx'), `
+      import { Component, h } from '@stencil/core';
+      @Component({ tag: 'cmp-a' }) export class CmpA {
+        render() {
+          return 'nice'
+        }
+      }
+    `);
+
+    r = await compiler.build();
+    conditionals = getLazyBuildConditionals(config, r.components);
+
+    expect(conditionals).toEqual(
+      expect.objectContaining({
+        shadowDom: false,
+        slot: false,
+        svg: false,
+        vdomRender: false,
+      })
+    );
+
+    await config.sys.writeFile(
+      path.join(config.srcDir, 'components', 'cmp-a.tsx'), `
+      import {icon, slot} from './icon';
+      @Component({ tag: 'cmp-a', shadow: true }) export class CmpA {
+        render() {
+          return <div>{icon()}{slot()}</div>
+        }
+      }`
+    );
+
+    r = await compiler.build();
+    conditionals = getLazyBuildConditionals(config, r.components);
+
+    expect(conditionals).toEqual(
+      expect.objectContaining({
+        shadowDom: true,
+        slot: true,
+        svg: true,
+        vdomRender: true,
+      })
+    );
   });
 
   it('should set slot build conditionals, not import unused svg import', async () => {
-    await compiler.fs.writeFiles({
-      [path.join(root, 'src', 'cmp-a.tsx')]: `
-        import icon from './icon';
-        @Component({ tag: 'cmp-a', shadow: true }) export class CmpA {
-          render() {
-            return <div><slot/></div>
-          }
-        }`,
-      [path.join(root, 'src', 'icon.tsx')]: `
-        export default () => <svg/>;
-      `,
-    });
-    await compiler.fs.commit();
+
+    await config.sys.writeFile(
+      path.join(config.srcDir, 'components', 'cmp-a.tsx'), `
+      import { Component, h } from '@stencil/core';
+      import icon from './icon';
+      @Component({ tag: 'cmp-a', shadow: true }) export class CmpA {
+        render() {
+          return <div><slot/></div>
+        }
+      }`
+    );
+    await config.sys.writeFile(
+      path.join(config.srcDir, 'components', 'icon.tsx'), `export default () => <svg/>;`
+    );
 
     const r = await compiler.build();
     expect(r.diagnostics).toHaveLength(0);
-    expect(r.buildConditionals).toEqual({
-      shadow: true,
-      slot: true,
-      svg: false,
-      vdom: true,
-    });
+
+    let conditionals = getLazyBuildConditionals(config, r.components);
+    expect(conditionals).toEqual(
+      expect.objectContaining({
+        shadowDom: true,
+        slot: true,
+        svg: false,
+        vdomRender: true,
+      })
+    );
   });
 
   it('should set slot build conditionals', async () => {
-    await compiler.fs.writeFiles({
-      [path.join(root, 'src', 'cmp-a.tsx')]: `@Component({ tag: 'cmp-a' }) export class CmpA {
+    await config.sys.writeFile(
+      path.join(config.srcDir, 'components', 'cmp-a.tsx'), `
+      import { Component, h } from '@stencil/core';
+      @Component({ tag: 'cmp-a' }) export class CmpA {
         render() {
           return <div><slot/></div>
         }
       }`,
-    });
-    await compiler.fs.commit();
+    );
 
     const r = await compiler.build();
     expect(r.diagnostics).toHaveLength(0);
-    expect(r.buildConditionals).toEqual({
-      shadow: false,
-      slot: true,
-      svg: false,
-      vdom: true,
-    });
+
+    let conditionals = getLazyBuildConditionals(config, r.components);
+    expect(conditionals).toEqual(
+      expect.objectContaining({
+        shadowDom: false,
+        slot: true,
+        svg: false,
+        vdomRender: true,
+      })
+    );
   });
 
   it('should set vdom build conditionals', async () => {
-    await compiler.fs.writeFiles({
-      [path.join(root, 'src', 'cmp-a.tsx')]: `@Component({ tag: 'cmp-a' }) export class CmpA {
+    await config.sys.writeFile(
+      path.join(config.srcDir, 'components', 'cmp-a.tsx'), `
+      import { Component, h } from '@stencil/core';
+      @Component({ tag: 'cmp-a' }) export class CmpA {
         render() {
           return <div>Hello World</div>
         }
       }`,
-    });
-    await compiler.fs.commit();
+    );
 
     const r = await compiler.build();
     expect(r.diagnostics).toHaveLength(0);
-    expect(r.buildConditionals).toEqual({
-      shadow: false,
-      slot: false,
-      svg: false,
-      vdom: true,
-    });
+
+    let conditionals = getLazyBuildConditionals(config, r.components);
+    expect(conditionals).toEqual(
+      expect.objectContaining({
+        shadowDom: false,
+        slot: false,
+        svg: false,
+        vdomRender: true,
+      })
+    );
   });
 
   it('should not set vdom build conditionals', async () => {
-    await compiler.fs.writeFiles({
-      [path.join(root, 'src', 'cmp-a.tsx')]: `@Component({ tag: 'cmp-a' }) export class CmpA {
+    await config.sys.writeFile(
+      path.join(config.srcDir, 'components', 'cmp-a.tsx'), `
+      import { Component, h } from '@stencil/core';
+      @Component({ tag: 'cmp-a' }) export class CmpA {
         render() {
           return 'Hello World';
         }
       }`,
-    });
-    await compiler.fs.commit();
+    );
 
     const r = await compiler.build();
     expect(r.diagnostics).toHaveLength(0);
-    expect(r.buildConditionals).toEqual({
-      shadow: false,
-      slot: false,
-      svg: false,
-      vdom: false,
-    });
+
+    let conditionals = getLazyBuildConditionals(config, r.components);
+    expect(conditionals).toEqual(
+      expect.objectContaining({
+        shadowDom: false,
+        slot: false,
+        svg: false,
+        vdomRender: false,
+      })
+    );
   });
 });

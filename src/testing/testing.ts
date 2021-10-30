@@ -1,5 +1,4 @@
 import type {
-  CompilerBuildResults,
   Compiler,
   CompilerWatcher,
   Config,
@@ -8,6 +7,7 @@ import type {
   OutputTargetWww,
   Testing,
   TestingRunOptions,
+  BuildCtx,
 } from '@stencil/core/internal';
 import { getAppScriptUrl, getAppStyleUrl } from './testing-utils';
 import { hasError } from '@utils';
@@ -70,7 +70,7 @@ export const createTesting = async (config: Config): Promise<Testing> => {
         // e2e tests only
         // do a build, start a dev server
         // and spin up a puppeteer browser
-        let buildTask: Promise<CompilerBuildResults> = null;
+        let buildTask: Promise<BuildCtx> = null;
 
         (config.outputTargets as OutputTargetWww[]).forEach((outputTarget) => {
           outputTarget.empty = false;

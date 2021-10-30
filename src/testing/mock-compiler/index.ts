@@ -8,6 +8,7 @@ import { mockConfig } from '../../testing/mocks';
 import { createNodeSys } from '../../sys/node';
 import { validateConfig } from '../../compiler/config/validate-config';
 import { createSystem } from '../../compiler/sys/stencil-sys';
+import { hasError } from '@utils';
 
 export interface MockCompiler extends d.Compiler {
   config: d.Config;
@@ -117,16 +118,17 @@ export async function mockCreateCompiler(userConfig: d.Config = {}): Promise<Moc
     config.sys.writeFileSync(path.join(config.srcDir, 'index.html'), ``);
   }
 
+
   // belts and brances config validation
   const loadedConfig = await loadConfig({
     config,
     initTsConfig: false,
     sys: config.sys,
   });
-  if (loadedConfig) {
-    config = loadedConfig.config;
-  } else {
+  if (!loadedConfig || hasError(loadedConfig.diagnostics)) {
     throw loadedConfig.diagnostics;
+  } else {
+    config = loadedConfig.config;
   }
 
   config = validateConfig(config).config;
