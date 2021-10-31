@@ -24,7 +24,8 @@ describe('service worker', () => {
 
     await config.sys.writeFile(path.join(mockCompilerRoot, 'www', 'script.js'), `/**/`);
     await config.sys.writeFile(
-      path.join(config.srcDir, 'components', 'cmp-a.tsx'), `
+      path.join(config.srcDir, 'components', 'cmp-a.tsx'),
+      `
       import { Component, h } from '@stencil/core';
       @Component({ tag: 'cmp-a' })
       export class CmpA { render() { return <p>cmp-a</p>; } }

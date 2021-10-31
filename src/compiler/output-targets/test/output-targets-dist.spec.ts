@@ -18,13 +18,18 @@ describe('outputTarget, dist', () => {
     config = compiler.config;
 
     await config.sys.writeFile(path.join(mockCompilerRoot, 'polyfills', 'index.js'), `/* polyfills */`);
-    await config.sys.writeFile(config.packageJsonFilePath, `{
+    await config.sys.writeFile(
+      config.packageJsonFilePath,
+      `{
       "module": "dist/index.js",
       "main": "dist/index.cjs.js",
       "collection": "dist/collection/collection-manifest.json",
       "types": "dist/types/components.d.ts"
-    }`);
-    await config.sys.writeFile(path.join(config.srcDir, 'components', 'cmp-a.tsx'), `
+    }`
+    );
+    await config.sys.writeFile(
+      path.join(config.srcDir, 'components', 'cmp-a.tsx'),
+      `
       import { Component, h } from '@stencil/core';
       @Component({
         tag: 'cmp-a',
@@ -33,10 +38,14 @@ describe('outputTarget, dist', () => {
           md: 'cmp-a.md.css'
         }
       }) export class CmpA {}
-    `);
+    `
+    );
     await config.sys.writeFile(path.join(config.srcDir, 'components', 'cmp-a.ios.css'), `cmp-a { color: blue; }`);
     await config.sys.writeFile(path.join(config.srcDir, 'components', 'cmp-a.md.css'), `cmp-a { color: green; }`);
-    await config.sys.writeFile(path.join(config.srcDir, 'global.ts'), `export default function() { console.log('my global'); }`);
+    await config.sys.writeFile(
+      path.join(config.srcDir, 'global.ts'),
+      `export default function() { console.log('my global'); }`
+    );
 
     const r = await compiler.build();
     expect(r.diagnostics).toHaveLength(0);

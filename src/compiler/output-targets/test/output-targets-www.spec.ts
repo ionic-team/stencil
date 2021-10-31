@@ -9,7 +9,6 @@ describe('outputTarget, www', () => {
   let config: d.Config = {};
 
   it('default www files', async () => {
-
     config.namespace = 'App';
     config.buildAppCore = true;
 

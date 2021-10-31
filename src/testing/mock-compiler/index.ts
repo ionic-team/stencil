@@ -118,7 +118,6 @@ export async function mockCreateCompiler(userConfig: d.Config = {}): Promise<Moc
     config.sys.writeFileSync(path.join(config.srcDir, 'index.html'), ``);
   }
 
-
   // belts and brances config validation
   const loadedConfig = await loadConfig({
     config,

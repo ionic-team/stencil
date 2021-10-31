@@ -14,11 +14,12 @@ describe('build-conditionals', () => {
   });
   afterEach(async () => {
     compiler.destroy();
-  })
+  });
 
   it('should import function svg/slot build conditionals, remove on rebuild, and add back on rebuild', async () => {
     await config.sys.writeFile(
-      path.join(config.srcDir, 'components', 'cmp-a.tsx'), `
+      path.join(config.srcDir, 'components', 'cmp-a.tsx'),
+      `
       import { Component, h } from '@stencil/core';
       import {icon, slot} from './icon';
       @Component({ tag: 'cmp-a', shadow: true }) export class CmpA {
@@ -28,12 +29,14 @@ describe('build-conditionals', () => {
       }`
     );
     await config.sys.writeFile(
-      path.join(config.srcDir, 'components', 'slot.tsx'), `
+      path.join(config.srcDir, 'components', 'slot.tsx'),
+      `
         export default () => <slot/>;
       `
     );
     await config.sys.writeFile(
-      path.join(config.srcDir, 'components', 'icon.tsx'), `
+      path.join(config.srcDir, 'components', 'icon.tsx'),
+      `
         import slot from './slot';
         export const icon = () => <svg/>;
         export { slot };
@@ -54,14 +57,16 @@ describe('build-conditionals', () => {
     );
 
     await config.sys.writeFile(
-      path.join(config.srcDir, 'components', 'cmp-a.tsx'), `
+      path.join(config.srcDir, 'components', 'cmp-a.tsx'),
+      `
       import { Component, h } from '@stencil/core';
       @Component({ tag: 'cmp-a' }) export class CmpA {
         render() {
           return 'nice'
         }
       }
-    `);
+    `
+    );
 
     r = await compiler.build();
     conditionals = getLazyBuildConditionals(config, r.components);
@@ -76,7 +81,8 @@ describe('build-conditionals', () => {
     );
 
     await config.sys.writeFile(
-      path.join(config.srcDir, 'components', 'cmp-a.tsx'), `
+      path.join(config.srcDir, 'components', 'cmp-a.tsx'),
+      `
       import {icon, slot} from './icon';
       @Component({ tag: 'cmp-a', shadow: true }) export class CmpA {
         render() {
@@ -99,9 +105,9 @@ describe('build-conditionals', () => {
   });
 
   it('should set slot build conditionals, not import unused svg import', async () => {
-
     await config.sys.writeFile(
-      path.join(config.srcDir, 'components', 'cmp-a.tsx'), `
+      path.join(config.srcDir, 'components', 'cmp-a.tsx'),
+      `
       import { Component, h } from '@stencil/core';
       import icon from './icon';
       @Component({ tag: 'cmp-a', shadow: true }) export class CmpA {
@@ -110,9 +116,7 @@ describe('build-conditionals', () => {
         }
       }`
     );
-    await config.sys.writeFile(
-      path.join(config.srcDir, 'components', 'icon.tsx'), `export default () => <svg/>;`
-    );
+    await config.sys.writeFile(path.join(config.srcDir, 'components', 'icon.tsx'), `export default () => <svg/>;`);
 
     const r = await compiler.build();
     expect(r.diagnostics).toHaveLength(0);
@@ -130,13 +134,14 @@ describe('build-conditionals', () => {
 
   it('should set slot build conditionals', async () => {
     await config.sys.writeFile(
-      path.join(config.srcDir, 'components', 'cmp-a.tsx'), `
+      path.join(config.srcDir, 'components', 'cmp-a.tsx'),
+      `
       import { Component, h } from '@stencil/core';
       @Component({ tag: 'cmp-a' }) export class CmpA {
         render() {
           return <div><slot/></div>
         }
-      }`,
+      }`
     );
 
     const r = await compiler.build();
@@ -155,13 +160,14 @@ describe('build-conditionals', () => {
 
   it('should set vdom build conditionals', async () => {
     await config.sys.writeFile(
-      path.join(config.srcDir, 'components', 'cmp-a.tsx'), `
+      path.join(config.srcDir, 'components', 'cmp-a.tsx'),
+      `
       import { Component, h } from '@stencil/core';
       @Component({ tag: 'cmp-a' }) export class CmpA {
         render() {
           return <div>Hello World</div>
         }
-      }`,
+      }`
     );
 
     const r = await compiler.build();
@@ -180,13 +186,14 @@ describe('build-conditionals', () => {
 
   it('should not set vdom build conditionals', async () => {
     await config.sys.writeFile(
-      path.join(config.srcDir, 'components', 'cmp-a.tsx'), `
+      path.join(config.srcDir, 'components', 'cmp-a.tsx'),
+      `
       import { Component, h } from '@stencil/core';
       @Component({ tag: 'cmp-a' }) export class CmpA {
         render() {
           return 'Hello World';
         }
-      }`,
+      }`
     );
 
     const r = await compiler.build();

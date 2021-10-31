@@ -8,15 +8,21 @@ describe('component-styles', () => {
 
   afterEach(async () => {
     compiler.destroy();
-  })
+  });
 
   it('should escape unicode characters', async () => {
     compiler = await mockCreateCompiler();
     const config = compiler.config;
-    await config.sys.writeFile(path.join(config.srcDir, 'components', 'cmp-a.css'), `.myclass:before { content: "\\F113"; }`);
-    await config.sys.writeFile(path.join(config.srcDir, 'components', 'cmp-a.tsx'), `
+    await config.sys.writeFile(
+      path.join(config.srcDir, 'components', 'cmp-a.css'),
+      `.myclass:before { content: "\\F113"; }`
+    );
+    await config.sys.writeFile(
+      path.join(config.srcDir, 'components', 'cmp-a.tsx'),
+      `
       @Component({ tag: 'cmp-a', styleUrl: 'cmp-a.css' }) export class CmpA {}
-    `);
+    `
+    );
 
     const r = await compiler.build();
     expect(r.diagnostics).toHaveLength(0);
@@ -28,10 +34,16 @@ describe('component-styles', () => {
   it('should escape octal literals', async () => {
     compiler = await mockCreateCompiler();
     const config = compiler.config;
-    await config.sys.writeFile(path.join(config.srcDir, 'components', 'cmp-a.css'), `.myclass:before { content: "\\2014 \\00A0"; }`);
-    await config.sys.writeFile(path.join(config.srcDir, 'components', 'cmp-a.tsx'), `
+    await config.sys.writeFile(
+      path.join(config.srcDir, 'components', 'cmp-a.css'),
+      `.myclass:before { content: "\\2014 \\00A0"; }`
+    );
+    await config.sys.writeFile(
+      path.join(config.srcDir, 'components', 'cmp-a.tsx'),
+      `
       @Component({ tag: 'cmp-a', styleUrl: 'cmp-a.css' }) export class CmpA {}
-    `);
+    `
+    );
 
     const r = await compiler.build();
     expect(r.diagnostics).toHaveLength(0);
@@ -50,7 +62,9 @@ describe('component-styles', () => {
     compiler = await mockCreateCompiler(config);
     config = compiler.config;
 
-    await config.sys.writeFile(path.join(config.srcDir, 'components', 'cmp-a.tsx'), `
+    await config.sys.writeFile(
+      path.join(config.srcDir, 'components', 'cmp-a.tsx'),
+      `
       import { Component, h } from '@stencil/core';
       @Component({
         tag: 'cmp-a',
@@ -60,7 +74,8 @@ describe('component-styles', () => {
         }
       })
       export class CmpA {}
-    `);
+    `
+    );
     await config.sys.writeFile(path.join(config.srcDir, 'components', 'cmp-a.ios.css'), `body{font-family:Helvetica}`);
     await config.sys.writeFile(path.join(config.srcDir, 'components', 'cmp-a.md.css'), `body{font-family:Roboto}`);
 
@@ -97,9 +112,12 @@ describe('component-styles', () => {
     };
 
     await config.sys.writeFile(path.join(config.srcDir, 'components', 'cmp-a.css'), `body{color:red}`);
-    await config.sys.writeFile(path.join(config.srcDir, 'components', 'cmp-a.tsx'), `
+    await config.sys.writeFile(
+      path.join(config.srcDir, 'components', 'cmp-a.tsx'),
+      `
       @Component({ tag: 'cmp-a', styleUrl: 'cmp-a.css' }) export class CmpA {}
-    `);
+    `
+    );
 
     const r = await compiler.build();
     expect(r.diagnostics).toHaveLength(0);
@@ -120,10 +138,16 @@ describe('component-styles', () => {
       return 'hashed';
     };
 
-    await config.sys.writeFile(path.join(config.srcDir, 'components', 'cmp-a.css'), `@import 'variables.css'; body{color:var(--color)}`);
-    await config.sys.writeFile(path.join(config.srcDir, 'components', 'cmp-a.tsx'), `
+    await config.sys.writeFile(
+      path.join(config.srcDir, 'components', 'cmp-a.css'),
+      `@import 'variables.css'; body{color:var(--color)}`
+    );
+    await config.sys.writeFile(
+      path.join(config.srcDir, 'components', 'cmp-a.tsx'),
+      `
       @Component({ tag: 'cmp-a', styleUrl: 'cmp-a.css' }) export class CmpA {}
-    `);
+    `
+    );
 
     const r = await compiler.build();
     expect(r.diagnostics).toHaveLength(1);
@@ -143,10 +167,16 @@ describe('component-styles', () => {
     };
 
     await config.sys.writeFile(path.join(config.srcDir, 'components', 'variables.css'), `:root{--color:red}`);
-    await config.sys.writeFile(path.join(config.srcDir, 'components', 'cmp-a.css'), `@import 'variables.css'; body{color:var(--color)}`);
-    await config.sys.writeFile(path.join(config.srcDir, 'components', 'cmp-a.tsx'), `
+    await config.sys.writeFile(
+      path.join(config.srcDir, 'components', 'cmp-a.css'),
+      `@import 'variables.css'; body{color:var(--color)}`
+    );
+    await config.sys.writeFile(
+      path.join(config.srcDir, 'components', 'cmp-a.tsx'),
+      `
       @Component({ tag: 'cmp-a', styleUrl: 'cmp-a.css' }) export class CmpA {}
-    `);
+    `
+    );
 
     const r = await compiler.build();
     expect(r.diagnostics).toHaveLength(0);
