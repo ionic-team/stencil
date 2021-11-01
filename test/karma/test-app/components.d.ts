@@ -47,6 +47,9 @@ export namespace Components {
     }
     interface BuildData {
     }
+    interface ChildWithReflection {
+        "val": number | any;
+    }
     interface CmpLabel {
     }
     interface CmpLabelWithSlotSibling {
@@ -72,6 +75,10 @@ export namespace Components {
     interface CustomElementRoot {
     }
     interface CustomElementRootDifferentNameThanClass {
+    }
+    interface CustomElementsDelegatesFocus {
+    }
+    interface CustomElementsNoDelegatesFocus {
     }
     interface CustomEventRoot {
     }
@@ -172,6 +179,8 @@ export namespace Components {
     interface NodeGlobals {
     }
     interface NodeResolution {
+    }
+    interface ParentWithReflectChild {
     }
     interface ReflectToAttr {
         "bool": boolean;
@@ -369,6 +378,12 @@ declare global {
         prototype: HTMLBuildDataElement;
         new (): HTMLBuildDataElement;
     };
+    interface HTMLChildWithReflectionElement extends Components.ChildWithReflection, HTMLStencilElement {
+    }
+    var HTMLChildWithReflectionElement: {
+        prototype: HTMLChildWithReflectionElement;
+        new (): HTMLChildWithReflectionElement;
+    };
     interface HTMLCmpLabelElement extends Components.CmpLabel, HTMLStencilElement {
     }
     var HTMLCmpLabelElement: {
@@ -446,6 +461,18 @@ declare global {
     var HTMLCustomElementRootDifferentNameThanClassElement: {
         prototype: HTMLCustomElementRootDifferentNameThanClassElement;
         new (): HTMLCustomElementRootDifferentNameThanClassElement;
+    };
+    interface HTMLCustomElementsDelegatesFocusElement extends Components.CustomElementsDelegatesFocus, HTMLStencilElement {
+    }
+    var HTMLCustomElementsDelegatesFocusElement: {
+        prototype: HTMLCustomElementsDelegatesFocusElement;
+        new (): HTMLCustomElementsDelegatesFocusElement;
+    };
+    interface HTMLCustomElementsNoDelegatesFocusElement extends Components.CustomElementsNoDelegatesFocus, HTMLStencilElement {
+    }
+    var HTMLCustomElementsNoDelegatesFocusElement: {
+        prototype: HTMLCustomElementsNoDelegatesFocusElement;
+        new (): HTMLCustomElementsNoDelegatesFocusElement;
     };
     interface HTMLCustomEventRootElement extends Components.CustomEventRoot, HTMLStencilElement {
     }
@@ -704,6 +731,12 @@ declare global {
     var HTMLNodeResolutionElement: {
         prototype: HTMLNodeResolutionElement;
         new (): HTMLNodeResolutionElement;
+    };
+    interface HTMLParentWithReflectChildElement extends Components.ParentWithReflectChild, HTMLStencilElement {
+    }
+    var HTMLParentWithReflectChildElement: {
+        prototype: HTMLParentWithReflectChildElement;
+        new (): HTMLParentWithReflectChildElement;
     };
     interface HTMLReflectToAttrElement extends Components.ReflectToAttr, HTMLStencilElement {
     }
@@ -1046,6 +1079,7 @@ declare global {
         "attribute-html-root": HTMLAttributeHtmlRootElement;
         "bad-shared-jsx": HTMLBadSharedJsxElement;
         "build-data": HTMLBuildDataElement;
+        "child-with-reflection": HTMLChildWithReflectionElement;
         "cmp-label": HTMLCmpLabelElement;
         "cmp-label-with-slot-sibling": HTMLCmpLabelWithSlotSiblingElement;
         "conditional-basic": HTMLConditionalBasicElement;
@@ -1059,6 +1093,8 @@ declare global {
         "custom-element-nested-child": HTMLCustomElementNestedChildElement;
         "custom-element-root": HTMLCustomElementRootElement;
         "custom-element-root-different-name-than-class": HTMLCustomElementRootDifferentNameThanClassElement;
+        "custom-elements-delegates-focus": HTMLCustomElementsDelegatesFocusElement;
+        "custom-elements-no-delegates-focus": HTMLCustomElementsNoDelegatesFocusElement;
         "custom-event-root": HTMLCustomEventRootElement;
         "delegates-focus": HTMLDelegatesFocusElement;
         "dom-reattach": HTMLDomReattachElement;
@@ -1102,6 +1138,7 @@ declare global {
         "no-delegates-focus": HTMLNoDelegatesFocusElement;
         "node-globals": HTMLNodeGlobalsElement;
         "node-resolution": HTMLNodeResolutionElement;
+        "parent-with-reflect-child": HTMLParentWithReflectChildElement;
         "reflect-to-attr": HTMLReflectToAttrElement;
         "reparent-style-no-vars": HTMLReparentStyleNoVarsElement;
         "reparent-style-with-vars": HTMLReparentStyleWithVarsElement;
@@ -1198,6 +1235,9 @@ declare namespace LocalJSX {
     }
     interface BuildData {
     }
+    interface ChildWithReflection {
+        "val"?: number | any;
+    }
     interface CmpLabel {
     }
     interface CmpLabelWithSlotSibling {
@@ -1223,6 +1263,10 @@ declare namespace LocalJSX {
     interface CustomElementRoot {
     }
     interface CustomElementRootDifferentNameThanClass {
+    }
+    interface CustomElementsDelegatesFocus {
+    }
+    interface CustomElementsNoDelegatesFocus {
     }
     interface CustomEventRoot {
     }
@@ -1330,6 +1374,8 @@ declare namespace LocalJSX {
     interface NodeGlobals {
     }
     interface NodeResolution {
+    }
+    interface ParentWithReflectChild {
     }
     interface ReflectToAttr {
         "bool"?: boolean;
@@ -1476,6 +1522,7 @@ declare namespace LocalJSX {
         "attribute-html-root": AttributeHtmlRoot;
         "bad-shared-jsx": BadSharedJsx;
         "build-data": BuildData;
+        "child-with-reflection": ChildWithReflection;
         "cmp-label": CmpLabel;
         "cmp-label-with-slot-sibling": CmpLabelWithSlotSibling;
         "conditional-basic": ConditionalBasic;
@@ -1489,6 +1536,8 @@ declare namespace LocalJSX {
         "custom-element-nested-child": CustomElementNestedChild;
         "custom-element-root": CustomElementRoot;
         "custom-element-root-different-name-than-class": CustomElementRootDifferentNameThanClass;
+        "custom-elements-delegates-focus": CustomElementsDelegatesFocus;
+        "custom-elements-no-delegates-focus": CustomElementsNoDelegatesFocus;
         "custom-event-root": CustomEventRoot;
         "delegates-focus": DelegatesFocus;
         "dom-reattach": DomReattach;
@@ -1532,6 +1581,7 @@ declare namespace LocalJSX {
         "no-delegates-focus": NoDelegatesFocus;
         "node-globals": NodeGlobals;
         "node-resolution": NodeResolution;
+        "parent-with-reflect-child": ParentWithReflectChild;
         "reflect-to-attr": ReflectToAttr;
         "reparent-style-no-vars": ReparentStyleNoVars;
         "reparent-style-with-vars": ReparentStyleWithVars;
@@ -1603,6 +1653,7 @@ declare module "@stencil/core" {
             "attribute-html-root": LocalJSX.AttributeHtmlRoot & JSXBase.HTMLAttributes<HTMLAttributeHtmlRootElement>;
             "bad-shared-jsx": LocalJSX.BadSharedJsx & JSXBase.HTMLAttributes<HTMLBadSharedJsxElement>;
             "build-data": LocalJSX.BuildData & JSXBase.HTMLAttributes<HTMLBuildDataElement>;
+            "child-with-reflection": LocalJSX.ChildWithReflection & JSXBase.HTMLAttributes<HTMLChildWithReflectionElement>;
             "cmp-label": LocalJSX.CmpLabel & JSXBase.HTMLAttributes<HTMLCmpLabelElement>;
             "cmp-label-with-slot-sibling": LocalJSX.CmpLabelWithSlotSibling & JSXBase.HTMLAttributes<HTMLCmpLabelWithSlotSiblingElement>;
             "conditional-basic": LocalJSX.ConditionalBasic & JSXBase.HTMLAttributes<HTMLConditionalBasicElement>;
@@ -1616,6 +1667,8 @@ declare module "@stencil/core" {
             "custom-element-nested-child": LocalJSX.CustomElementNestedChild & JSXBase.HTMLAttributes<HTMLCustomElementNestedChildElement>;
             "custom-element-root": LocalJSX.CustomElementRoot & JSXBase.HTMLAttributes<HTMLCustomElementRootElement>;
             "custom-element-root-different-name-than-class": LocalJSX.CustomElementRootDifferentNameThanClass & JSXBase.HTMLAttributes<HTMLCustomElementRootDifferentNameThanClassElement>;
+            "custom-elements-delegates-focus": LocalJSX.CustomElementsDelegatesFocus & JSXBase.HTMLAttributes<HTMLCustomElementsDelegatesFocusElement>;
+            "custom-elements-no-delegates-focus": LocalJSX.CustomElementsNoDelegatesFocus & JSXBase.HTMLAttributes<HTMLCustomElementsNoDelegatesFocusElement>;
             "custom-event-root": LocalJSX.CustomEventRoot & JSXBase.HTMLAttributes<HTMLCustomEventRootElement>;
             "delegates-focus": LocalJSX.DelegatesFocus & JSXBase.HTMLAttributes<HTMLDelegatesFocusElement>;
             "dom-reattach": LocalJSX.DomReattach & JSXBase.HTMLAttributes<HTMLDomReattachElement>;
@@ -1659,6 +1712,7 @@ declare module "@stencil/core" {
             "no-delegates-focus": LocalJSX.NoDelegatesFocus & JSXBase.HTMLAttributes<HTMLNoDelegatesFocusElement>;
             "node-globals": LocalJSX.NodeGlobals & JSXBase.HTMLAttributes<HTMLNodeGlobalsElement>;
             "node-resolution": LocalJSX.NodeResolution & JSXBase.HTMLAttributes<HTMLNodeResolutionElement>;
+            "parent-with-reflect-child": LocalJSX.ParentWithReflectChild & JSXBase.HTMLAttributes<HTMLParentWithReflectChildElement>;
             "reflect-to-attr": LocalJSX.ReflectToAttr & JSXBase.HTMLAttributes<HTMLReflectToAttrElement>;
             "reparent-style-no-vars": LocalJSX.ReparentStyleNoVars & JSXBase.HTMLAttributes<HTMLReparentStyleNoVarsElement>;
             "reparent-style-with-vars": LocalJSX.ReparentStyleWithVars & JSXBase.HTMLAttributes<HTMLReparentStyleWithVarsElement>;

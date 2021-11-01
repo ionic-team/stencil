@@ -1,6 +1,6 @@
 {
   "name": "@stencil/core",
-  "version": "2.9.0",
+  "version": "2.10.0",
   "license": "MIT",
   "main": "./internal/stencil-core/index.cjs",
   "module": "./internal/stencil-core/index.js",
@@ -9,6 +9,7 @@
     "stencil": "bin/stencil"
   },
   "files": [
+    "!**/*.map",
     "bin/",
     "cli/",
     "compiler/",
@@ -21,9 +22,10 @@
     "testing/"
   ],
   "scripts": {
+    "clean": "rm -rf build/ cli/ compiler/ dev-server/ internal/ mock-doc/ sys/ testing/ && npm run clean-scripts",
+    "clean-scripts": "rm -rf scripts/build",
     "start": "npm run watch",
-    "build": "node scripts && npm run tsc.prod && npm run rollup.prod.ci",
-    "build.prod": "node scripts && npm run tsc.scripts && npm run tsc.prod && npm run rollup.prod.ci",
+    "build": "node scripts --prepare && npm run tsc.prod && npm run rollup.prod.ci",
     "watch": "node scripts && npm run tsc && concurrently \"npm run rollup.watch\" \"npm run tsc.watch\"",
     "release": "node scripts --release --publish",
     "release.prepare": "node scripts --release --prepare",
@@ -115,6 +117,7 @@
     "prompts": "2.4.0",
     "puppeteer": "~10.0.0",
     "rollup": "2.42.3",
+    "rollup-plugin-sourcemaps": "^0.6.3",
     "semiver": "^1.1.0",
     "semver": "7.3.4",
     "sizzle": "^2.3.6",

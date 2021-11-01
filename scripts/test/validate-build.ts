@@ -162,6 +162,10 @@ function validatePackage(opts: BuildOptions, testPkg: TestPackage, dtsEntries: s
         throw new Error(testPkg.packageJson + ' missing "files" property');
       }
       pkgJson.files.forEach((f) => {
+        if (f === '!**/*.map') {
+          // skip sourcemaps
+          return;
+        }
         const pkgFile = join(pkgDir, f);
         fs.accessSync(pkgFile);
       });
