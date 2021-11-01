@@ -1,6 +1,6 @@
 {
   "name": "@stencil/core",
-  "version": "2.9.0",
+  "version": "2.10.0",
   "license": "MIT",
   "main": "./internal/stencil-core/index.cjs",
   "module": "./internal/stencil-core/index.js",
@@ -22,6 +22,8 @@
     "testing/"
   ],
   "scripts": {
+    "clean": "rm -rf build/ cli/ compiler/ dev-server/ internal/ mock-doc/ sys/ testing/ && npm run clean-scripts",
+    "clean-scripts": "rm -rf scripts/build",
     "start": "npm run watch",
     "build": "node scripts --prepare && npm run tsc.prod && npm run rollup.prod.ci",
     "watch": "node scripts && npm run tsc && concurrently \"npm run rollup.watch\" \"npm run tsc.watch\"",
