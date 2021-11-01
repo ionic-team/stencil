@@ -110,7 +110,12 @@ const getLazyCustomTransformer = (config: d.Config, compilerCtx: d.CompilerCtx) 
   ];
 };
 
-function generateEntryModules(config: d.Config, buildCtx: d.BuildCtx) {
+/**
+ * Generate entry modules to be used by the build process by determining how modules and components are connected
+ * @param config the Stencil configuration file that was provided as a part of the build step
+ * @param buildCtx the current build context
+ */
+function generateEntryModules(config: d.Config, buildCtx: d.BuildCtx): void {
   // figure out how modules and components connect
   try {
     const bundles = generateComponentBundles(config, buildCtx);
@@ -122,6 +127,11 @@ function generateEntryModules(config: d.Config, buildCtx: d.BuildCtx) {
   buildCtx.debug(`generateEntryModules, ${buildCtx.entryModules.length} entryModules`);
 }
 
+/**
+ * Generates an entry module to be used during the bundling process
+ * @param cmps the component metadata to create a single entry module from
+ * @returns the entry module generated
+ */
 function createEntryModule(cmps: d.ComponentCompilerMeta[]): d.EntryModule {
   // generate a unique entry key based on the components within this entry module
   cmps = sortBy(cmps, (c) => c.tagName);
