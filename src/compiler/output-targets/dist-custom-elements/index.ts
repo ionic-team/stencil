@@ -18,7 +18,6 @@ import { optimizeModule } from '../../optimize/optimize-module';
 import { removeCollectionImports } from '../../transformers/remove-collection-imports';
 import { STENCIL_INTERNAL_CLIENT_ID, USER_INDEX_ENTRY_ID, STENCIL_APP_GLOBALS_ID } from '../../bundle/entry-alias-ids';
 import { updateStencilCoreImports } from '../../transformers/update-stencil-core-import';
-import { addHTMLElementSSRClassDeclaration } from '../../transformers/component-native/add-ssr-class-declaration';
 
 export const outputCustomElements = async (
   config: d.Config,
@@ -184,7 +183,6 @@ const getCustomElementBundleCustomTransformer = (
     styleImportData: 'queryparams',
   };
   return [
-    addHTMLElementSSRClassDeclaration(),
     addDefineCustomElementFunctions(compilerCtx, components, outputTarget),
     updateStencilCoreImports(transformOpts.coreImportPath),
     nativeComponentTransform(compilerCtx, transformOpts),
