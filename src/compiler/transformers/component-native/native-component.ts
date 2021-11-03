@@ -4,7 +4,8 @@ import { addNativeConnectedCallback } from './native-connected-callback';
 import { addNativeElementGetter } from './native-element-getter';
 import { addNativeStaticStyle } from './native-static-style';
 import { addWatchers } from '../watcher-meta-transform';
-import { HTML_ELEMENT, RUNTIME_APIS, addCoreRuntimeApi } from '../core-runtime-apis';
+import { RUNTIME_APIS, addCoreRuntimeApi } from '../core-runtime-apis';
+import { HTML_ELEMENT_SSR } from './add-ssr-class-declaration';
 import { removeStaticMetaProperties } from '../remove-static-meta-properties';
 import { transformHostData } from '../host-data-transform';
 import { updateComponentClass } from '../update-component-class';
@@ -31,8 +32,8 @@ const updateNativeHostComponentHeritageClauses = (classNode: ts.ClassDeclaration
     addCoreRuntimeApi(moduleFile, RUNTIME_APIS.HTMLElement);
   }
 
-  const heritageClause = ts.createHeritageClause(ts.SyntaxKind.ExtendsKeyword, [
-    ts.createExpressionWithTypeArguments([], ts.createIdentifier(HTML_ELEMENT)),
+  const heritageClause = ts.factory.createHeritageClause(ts.SyntaxKind.ExtendsKeyword, [
+    ts.factory.createExpressionWithTypeArguments(ts.factory.createIdentifier(HTML_ELEMENT_SSR), []),
   ]);
 
   return [heritageClause];

@@ -143,6 +143,9 @@ const createCustomElementsDefineCase = (tagName: string, actionExpression: ts.Ex
  * Add the main `defineCustomElement` function e.g.
  * ```javascript
  * function defineCustomElement() {
+ *  if (typeof customElements === 'undefined') {
+ *    return;
+ *  }
  *  const components = ['my-component'];
  *   components.forEach(tagName => {
  *     switch (tagName) {
@@ -176,6 +179,15 @@ const addDefineCustomElementFunction = (
     undefined,
     ts.factory.createBlock(
       [
+        ts.factory.createIfStatement(
+          ts.factory.createStrictEquality(
+            ts.factory.createTypeOfExpression(
+              ts.factory.createIdentifier('customElements')
+            ),
+            ts.factory.createStringLiteral('undefined')
+          ),
+          ts.factory.createBlock([ts.factory.createReturnStatement()])
+        ),
         ts.factory.createVariableStatement(
           undefined,
           ts.factory.createVariableDeclarationList(
