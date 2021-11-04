@@ -1,0 +1,10 @@
+const path = require('path');
+
+TEST_ROOT_OUT_DIR = 'test-output';
+
+module.exports = {
+  TEST_OUTPUT: TEST_ROOT_OUT_DIR,
+  CUSTOM_ELEMENTS_OUT_DIR: path.join(TEST_ROOT_OUT_DIR, 'test-custom-elements'),
+  DIST_OUT_DIR: path.join(TEST_ROOT_OUT_DIR, 'test-dist'),
+  WWW_OUT_DIR: path.join(TEST_ROOT_OUT_DIR, 'test-www'),
+};
