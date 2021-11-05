@@ -181,9 +181,7 @@ const addDefineCustomElementFunction = (
       [
         ts.factory.createIfStatement(
           ts.factory.createStrictEquality(
-            ts.factory.createTypeOfExpression(
-              ts.factory.createIdentifier('customElements')
-            ),
+            ts.factory.createTypeOfExpression(ts.factory.createIdentifier('customElements')),
             ts.factory.createStringLiteral('undefined')
           ),
           ts.factory.createBlock([ts.factory.createReturnStatement()])
