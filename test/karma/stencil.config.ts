@@ -4,7 +4,7 @@ import { less } from '@stencil/less';
 import { stylus } from '@stencil/stylus';
 import { postcss } from '@stencil/postcss';
 
-const { CUSTOM_ELEMENTS_OUT_DIR, DIST_OUT_DIR, TEST_ROOT_OUT_DIR, WWW_OUT_DIR } = require('./constants');
+const { CUSTOM_ELEMENTS_OUT_DIR, DIST_OUT_DIR, TEST_OUTPUT_DIR, WWW_OUT_DIR } = require('./constants');
 import { Config } from '../../internal';
 
 export const config: Config = {
@@ -45,7 +45,7 @@ export const config: Config = {
   },
   devServer: {
     // when running `npm start`, serve from the root directory, rather than the `www` output target location
-    root: TEST_ROOT_OUT_DIR,
+    root: TEST_OUTPUT_DIR,
     historyApiFallback: {
       disableDotRule: true,
       index: 'index.html',
