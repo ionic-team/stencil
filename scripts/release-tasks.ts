@@ -171,7 +171,7 @@ export function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<string>)
         title: 'Publish @stencil/core to npm',
         task: () => {
           const cmd = 'npm';
-          const cmdArgs = ['publish'].concat(opts.tag ? ['--tag', opts.tag] : []);
+          const cmdArgs = ['publish', '--otp', opts.otp].concat(opts.tag ? ['--tag', opts.tag] : []);
 
           if (isDryRun) {
             return console.log(`[dry-run] ${cmd} ${cmdArgs.join(' ')}`);
