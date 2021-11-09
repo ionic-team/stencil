@@ -4,7 +4,7 @@ import { addNativeConnectedCallback } from './native-connected-callback';
 import { addNativeElementGetter } from './native-element-getter';
 import { addNativeStaticStyle } from './native-static-style';
 import { addWatchers } from '../watcher-meta-transform';
-import { RUNTIME_APIS, HTML_ELEMENT, addCoreRuntimeApi } from '../core-runtime-apis';
+import { HTML_ELEMENT, RUNTIME_APIS, addCoreRuntimeApi } from '../core-runtime-apis';
 import { removeStaticMetaProperties } from '../remove-static-meta-properties';
 import { transformHostData } from '../host-data-transform';
 import { updateComponentClass } from '../update-component-class';
@@ -27,25 +27,12 @@ const updateNativeHostComponentHeritageClauses = (classNode: ts.ClassDeclaration
     return classNode.heritageClauses;
   }
 
-  if (moduleFile.cmps.length > 1) {
+  if (moduleFile.cmps.length >= 1) {
     addCoreRuntimeApi(moduleFile, RUNTIME_APIS.HTMLElement);
   }
 
-  const parentClass = ts.factory.createParenthesizedExpression(
-    ts.factory.createConditionalExpression(
-      ts.factory.createStrictInequality(
-        ts.factory.createTypeOfExpression(ts.factory.createIdentifier(HTML_ELEMENT)),
-        ts.factory.createStringLiteral('undefined')
-      ),
-      null,
-      ts.factory.createIdentifier(HTML_ELEMENT),
-      null,
-      ts.factory.createClassExpression(undefined, undefined, '', undefined, undefined, undefined)
-    )
-  );
-
   const heritageClause = ts.factory.createHeritageClause(ts.SyntaxKind.ExtendsKeyword, [
-    ts.factory.createExpressionWithTypeArguments(parentClass, []),
+    ts.factory.createExpressionWithTypeArguments(ts.factory.createIdentifier(HTML_ELEMENT), [])
   ]);
 
   return [heritageClause];
