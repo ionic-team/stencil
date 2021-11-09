@@ -43,5 +43,9 @@
     "rollup-plugin-node-polyfills": "^0.1.2",
     "webpack-cli": "^3.3.12",
     "workbox-build": "4.3.1"
+  },
+  "volta": {
+    "node": "12.22.7",
+    "npm": "6.14.15"
   }
 }
