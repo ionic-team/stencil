@@ -32,7 +32,7 @@ const updateNativeHostComponentHeritageClauses = (classNode: ts.ClassDeclaration
   }
 
   const heritageClause = ts.factory.createHeritageClause(ts.SyntaxKind.ExtendsKeyword, [
-    ts.factory.createExpressionWithTypeArguments(ts.factory.createIdentifier(HTML_ELEMENT), [])
+    ts.factory.createExpressionWithTypeArguments(ts.factory.createIdentifier(HTML_ELEMENT), []),
   ]);
 
   return [heritageClause];
