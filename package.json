@@ -148,5 +148,9 @@
     "pwa",
     "progressive web app"
   ],
-  "prettier": "@ionic/prettier-config"
+  "prettier": "@ionic/prettier-config",
+  "volta": {
+    "node": "16.13.0",
+    "npm": "8.1.1"
+  }
 }

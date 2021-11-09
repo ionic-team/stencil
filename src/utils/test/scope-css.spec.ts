@@ -143,6 +143,15 @@ describe('ShadowCss', function () {
     expect(s('[is="one"] {}', 'a')).toEqual('[is="one"].a {}');
   });
 
+  it('should handle escaped ":" in selector', () => {
+    expect(s('\\:one {}', 'a')).toEqual('\\:one.a {}');
+    expect(s('one\\:two {}', 'a')).toEqual('one\\:two.a {}');
+    expect(s('one\\:two:hover {}', 'a')).toEqual('one\\:two.a:hover {}');
+    expect(s('one\\:two::before {}', 'a')).toEqual('one\\:two.a::before {}');
+    expect(s('one\\:two::before:hover {}', 'a')).toEqual('one\\:two.a::before:hover {}');
+    expect(s('one\\:two:not(.three\\:four) {}', 'a')).toEqual('one\\:two.a:not(.three\\:four) {}');
+  });
+
   describe(':host', () => {
     it('should handle no context, commentOriginalSelector', () => {
       expect(s(':host {}', 'a', true)).toEqual('/*!@:host*/.a-h {}');
