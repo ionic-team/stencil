@@ -1,3 +1,17 @@
+# 🚟 [2.11.0-0](https://github.com/ionic-team/stencil/compare/v2.10.0...v2.11.0-0) (2021-11-09)
+
+
+### Bug Fixes
+
+* **dist-custom-elements:** add ssr checks ([#3131](https://github.com/ionic-team/stencil/issues/3131)) ([9a232ea](https://github.com/ionic-team/stencil/commit/9a232ea368324f49993bd079cfdbc344abd0c69e))
+
+
+### Features
+
+* **css:** account for escaped ':' in css selectors ([#3087](https://github.com/ionic-team/stencil/issues/3087)) ([6000681](https://github.com/ionic-team/stencil/commit/600068168c86dba9ea610b5e8a0dbba00ff4d1f4))
+
+
+
 # 🦁 [2.10.0](https://github.com/ionic-team/stencil/compare/v2.9.0...v2.10.0) (2021-11-01)
 
 
