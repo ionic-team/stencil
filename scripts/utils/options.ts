@@ -191,6 +191,7 @@ export interface BuildOptions {
   parse5Verion?: string;
   sizzleVersion?: string;
   terserVersion?: string;
+  otp?: '';
 }
 
 export interface CmdLineArgs {
