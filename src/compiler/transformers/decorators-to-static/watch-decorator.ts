@@ -32,10 +32,10 @@ const parseWatchDecorator = (
   return method.decorators.filter(isDecoratorNamed('Watch')).map((decorator) => {
     const [propName] = getDeclarationParameters<string>(decorator);
     if (!watchable.has(propName)) {
-      const dianostic = config.devMode ? buildWarn(diagnostics) : buildError(diagnostics);
-      dianostic.messageText = `@Watch('${propName}') is trying to watch for changes in a property that does not exist.
+      const diagnostic = config.devMode ? buildWarn(diagnostics) : buildError(diagnostics);
+      diagnostic.messageText = `@Watch('${propName}') is trying to watch for changes in a property that does not exist.
         Make sure only properties decorated with @State() or @Prop() are watched.`;
-      augmentDiagnosticWithNode(dianostic, decorator);
+      augmentDiagnosticWithNode(diagnostic, decorator);
     }
     return {
       propName,
