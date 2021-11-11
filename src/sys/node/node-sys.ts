@@ -337,6 +337,24 @@ export function createNodeSys(c: { process?: any } = {}) {
         });
       });
     },
+    dirname(p) {
+      return path.dirname(p);
+    },
+    basename(p, ext?) {
+      return path.basename(p, ext);
+    },
+    joinPaths(...paths: string[]) {
+      return path.join(...paths);
+    },
+    relative(from, to) {
+      return path.relative(from, to);
+    },
+    EOL() {
+      return os.EOL;
+    },
+    isAbsolutePath(p) {
+      return path.isAbsolute(p);
+    },
     resolvePath(p) {
       return normalizePath(p);
     },

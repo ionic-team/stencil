@@ -925,12 +925,18 @@ export interface CompilerSystem {
    */
   createDirSync(p: string, opts?: CompilerSystemCreateDirectoryOptions): CompilerSystemCreateDirectoryResults;
   homeDir(): string;
+  joinPaths(...p: string[]): string;
+  isAbsolutePath(p: string): boolean;
+  EOL(): string;
+  dirname(path: string): string;
+  basename(path: string, ext?: string): string;
+  relative(from: string, to: string): string;
   /**
    * Used to determine if the current context of the terminal is TTY.
    */
   isTTY(): boolean;
   /**
-   * Each plaform as a different way to dynamically import modules.
+   * Each platform as a different way to dynamically import modules.
    */
   dynamicImport?(p: string): Promise<any>;
   /**

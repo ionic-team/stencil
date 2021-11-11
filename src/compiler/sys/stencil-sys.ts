@@ -15,7 +15,7 @@ import type {
   Logger,
 } from '../../declarations';
 import platformPath from 'path-browserify';
-import { basename, dirname, join } from 'path';
+import path, { basename, dirname, join, relative } from 'path';
 import * as process from 'process';
 import * as os from 'os';
 import { buildEvents } from '../events';
@@ -565,6 +565,11 @@ export const createSystem = (c?: { logger?: Logger }) => {
 
   const fileWatchTimeout = 32;
 
+  const EOL = () => os.EOL;
+
+  const isAbsolutePath = (p: string) => path.isAbsolute(p);
+  const joinPaths = (...p: string[]) => path.join(...p);
+
   createDirSync('/');
 
   const sys: CompilerSystem = {
@@ -574,12 +579,17 @@ export const createSystem = (c?: { logger?: Logger }) => {
     access,
     accessSync,
     addDestory,
+    basename,
     copyFile,
     createDir,
     createDirSync,
+    dirname,
+    EOL,
+    getEnvironmentVar,
     homeDir,
     isTTY,
-    getEnvironmentVar,
+    isAbsolutePath,
+    joinPaths,
     destroy,
     encodeToBase64,
     exit: async (exitCode) => logger.warn(`exit ${exitCode}`),
@@ -598,6 +608,7 @@ export const createSystem = (c?: { logger?: Logger }) => {
     readFileSync,
     realpath,
     realpathSync,
+    relative,
     removeDestory,
     rename,
     fetch,
