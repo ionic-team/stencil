@@ -13,13 +13,18 @@ import { sizzlePlugin } from './plugins/sizzle-plugin';
 import { sysModulesPlugin } from './plugins/sys-modules-plugin';
 import { writePkgJson } from '../utils/write-pkg-json';
 import type { BuildOptions } from '../utils/options';
-import type { RollupOptions, OutputChunk } from 'rollup';
+import type { RollupOptions, OutputChunk, TransformResult, RollupWarning } from 'rollup';
 import { typescriptSourcePlugin } from './plugins/typescript-source-plugin';
 import sourcemaps from 'rollup-plugin-sourcemaps';
 import { MinifyOptions, minify } from 'terser';
 import { terserPlugin } from './plugins/terser-plugin';
 import MagicString from 'magic-string';
 
+/**
+ * Generates a rollup configuration for the `compiler` submodule of the project
+ * @param opts the options being used during a build of the Stencil compiler
+ * @returns an array containing the generated rollup options
+ */
 export async function compiler(opts: BuildOptions) {
   const inputDir = join(opts.buildDir, 'compiler');
 
@@ -39,8 +44,16 @@ export async function compiler(opts: BuildOptions) {
     types: compilerDtsName,
   });
 
+  /**
+   * These files are wrap the compiler in an Immediately-Invoked Function Expression (IIFE). The intro contains the
+   * first half of the IIFE, and the outro contains the second half. Those files are not valid JavaScript on their own,
+   * and editors may produce warnings as a result. This comment is not in the files themselves, as doing so would lead
+   * to the comment being added to the compiler output itself. These files could be converted to non-JS files, at the
+   * cost of losing some source code highlighting in editors.
+   */
   const cjsIntro = fs.readFileSync(join(opts.bundleHelpersDir, 'compiler-cjs-intro.js'), 'utf8');
   const cjsOutro = fs.readFileSync(join(opts.bundleHelpersDir, 'compiler-cjs-outro.js'), 'utf8');
+
   const rollupWatchPath = join(opts.nodeModulesDir, 'rollup', 'dist', 'es', 'shared', 'watch.js');
   const compilerBundle: RollupOptions = {
     input: join(inputDir, 'index.js'),
@@ -61,7 +74,13 @@ export async function compiler(opts: BuildOptions) {
       terserPlugin(opts),
       {
         name: 'compilerMockDocResolvePlugin',
-        resolveId(id) {
+        /**
+         * A rollup build hook for resolving the Stencil mock-doc module, Microsoft's TypeScript event tracer, and the
+         * V8 inspector. [Source](https://rollupjs.org/guide/en/#resolveid)
+         * @param id the importee exactly as it is written in an import statement in the source code
+         * @returns an object that resolves an import to some id
+         */
+        resolveId(id: string): string | null {
           if (id === '@stencil/core/mock-doc') {
             return join(opts.buildDir, 'mock-doc', 'index.js');
           }
@@ -73,12 +92,23 @@ export async function compiler(opts: BuildOptions) {
       },
       {
         name: 'rollupResolvePlugin',
-        resolveId(id) {
+        /**
+         * A rollup build hook for resolving the fsevents. [Source](https://rollupjs.org/guide/en/#resolveid)
+         * @param id the importee exactly as it is written in an import statement in the source code
+         * @returns an object that resolves an import to some id
+         */
+        resolveId(id: string): string | undefined {
           if (id === 'fsevents') {
             return id;
           }
         },
-        load(id) {
+        /**
+         * A rollup build hook for loading the Stencil mock-doc module, Microsoft's TypeScript event tracer, the V8
+         * inspector and fsevents. [Source](https://rollupjs.org/guide/en/#load)
+         * @param id the path of the module to load
+         * @returns the module matched
+         */
+        load(id: string): string | null {
           if (id === 'fsevents' || id === '@microsoft/typescript-etw' || id === 'inspector') {
             return '';
           }
@@ -147,7 +177,7 @@ export async function compiler(opts: BuildOptions) {
       propertyReadSideEffects: false,
       unknownGlobalSideEffects: false,
     },
-    onwarn(warning) {
+    onwarn(warning: RollupWarning) {
       if (warning.code === `THIS_IS_UNDEFINED`) {
         return;
       }
