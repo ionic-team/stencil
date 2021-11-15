@@ -7,7 +7,6 @@ import { aliasPlugin } from './plugins/alias-plugin';
 import { getBanner } from '../utils/banner';
 import { getTypeScriptDefaultLibNames } from '../utils/dependencies-json';
 import { inlinedCompilerDepsPlugin } from './plugins/inlined-compiler-deps-plugin';
-import { moduleDebugPlugin } from './plugins/module-debug-plugin';
 import { parse5Plugin } from './plugins/parse5-plugin';
 import { replacePlugin } from './plugins/replace-plugin';
 import { sizzlePlugin } from './plugins/sizzle-plugin';
@@ -130,7 +129,6 @@ export async function compiler(opts: BuildOptions) {
       rollupJson({
         preferConst: true,
       }),
-      moduleDebugPlugin(opts),
       {
         name: 'compilerMinify',
         async generateBundle(_, bundleFiles) {
