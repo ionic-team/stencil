@@ -5,6 +5,10 @@ on:
     branches:
       - main
       - v3.0.0-dev
+  push:
+    branches:
+      - 'main'
+      - 'v3.0.0-dev'
 
 permissions: read-all
 
