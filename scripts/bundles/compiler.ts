@@ -16,8 +16,10 @@ import { writePkgJson } from '../utils/write-pkg-json';
 import type { BuildOptions } from '../utils/options';
 import type { RollupOptions, OutputChunk } from 'rollup';
 import { typescriptSourcePlugin } from './plugins/typescript-source-plugin';
+import sourcemaps from 'rollup-plugin-sourcemaps';
 import { MinifyOptions, minify } from 'terser';
 import { terserPlugin } from './plugins/terser-plugin';
+import MagicString from 'magic-string';
 
 export async function compiler(opts: BuildOptions) {
   const inputDir = join(opts.buildDir, 'compiler');
@@ -53,7 +55,7 @@ export async function compiler(opts: BuildOptions) {
       esModule: false,
       preferConst: true,
       freeze: false,
-      sourcemap: false,
+      sourcemap: true,
     },
     plugins: [
       typescriptSourcePlugin(opts),
@@ -89,10 +91,27 @@ export async function compiler(opts: BuildOptions) {
       },
       replacePlugin(opts),
       {
-        name: 'hackReplace',
-        transform(code) {
+        name: 'hackReplaceNodeProcessBinding',
+        /**
+         * Removes instances of calls to deprecated `process.binding()` calls
+         * @param code the code to modify
+         * @param id module's identifier
+         * @returns the modified code
+         */
+        transform(code: string, id: string): TransformResult {
           code = code.replace(` || Object.keys(process.binding('natives'))`, '');
-          return code;
+          return {
+            code: code,
+            map: new MagicString(code)
+              .generateMap({
+                source: id,
+                // this is the name of the sourcemap, not to be confused with the `file` field in a generated sourcemap
+                file: id + '.map',
+                includeContent: false,
+                hires: true,
+              })
+              .toString(),
+          };
         },
       },
       inlinedCompilerDepsPlugin(opts, inputDir),
@@ -106,6 +125,7 @@ export async function compiler(opts: BuildOptions) {
       }),
       rollupCommonjs({
         transformMixedEsModules: false,
+        sourceMap: true,
       }),
       rollupJson({
         preferConst: true,
@@ -122,6 +142,7 @@ export async function compiler(opts: BuildOptions) {
           }
         },
       },
+      sourcemaps(),
     ],
     treeshake: {
       moduleSideEffects: false,
