@@ -47,7 +47,7 @@ export interface StencilConfig {
    * However, it's still common to have styles which should be "global" across all components and the website.
    * A global CSS file is often useful to set CSS Variables.
    *
-   * Additonally, the globalStyle config is can be used to precompile styles with Sass, PostCss, etc.
+   * Additonally, the globalStyle config can be used to precompile styles with Sass, PostCss, etc.
    * Below is an example folder structure containing a webapp's global sass file, named app.css.
    */
   globalStyle?: string;
