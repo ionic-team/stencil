@@ -1,8 +1,7 @@
 import type * as d from '../../../declarations';
 import type { BundleOptions } from '../../bundle/bundle-interface';
 import { bundleOutput } from '../../bundle/bundle-output';
-import { catchError } from '@utils';
-import { generateEntryModules } from '../../entries/entry-modules';
+import { catchError, sortBy } from '@utils';
 import { getLazyBuildConditionals } from './lazy-build-conditionals';
 import { isOutputTargetDistLazy, isOutputTargetDist } from '../output-utils';
 import {
@@ -23,6 +22,7 @@ import { generateModuleGraph } from '../../entries/component-graph';
 import { removeCollectionImports } from '../../transformers/remove-collection-imports';
 import { updateStencilCoreImports } from '../../transformers/update-stencil-core-import';
 import MagicString from 'magic-string';
+import { generateComponentBundles } from '../../entries/component-bundles';
 
 export const outputLazy = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx): Promise<void> => {
   const outputTargets = config.outputTargets.filter(isOutputTargetDistLazy);
@@ -109,6 +109,39 @@ const getLazyCustomTransformer = (config: d.Config, compilerCtx: d.CompilerCtx) 
     removeCollectionImports(compilerCtx),
   ];
 };
+
+/**
+ * Generate entry modules to be used by the build process by determining how modules and components are connected
+ * @param config the Stencil configuration file that was provided as a part of the build step
+ * @param buildCtx the current build context
+ */
+function generateEntryModules(config: d.Config, buildCtx: d.BuildCtx): void {
+  // figure out how modules and components connect
+  try {
+    const bundles = generateComponentBundles(config, buildCtx);
+    buildCtx.entryModules = bundles.map(createEntryModule);
+  } catch (e) {
+    catchError(buildCtx.diagnostics, e);
+  }
+
+  buildCtx.debug(`generateEntryModules, ${buildCtx.entryModules.length} entryModules`);
+}
+
+/**
+ * Generates an entry module to be used during the bundling process
+ * @param cmps the component metadata to create a single entry module from
+ * @returns the entry module generated
+ */
+function createEntryModule(cmps: d.ComponentCompilerMeta[]): d.EntryModule {
+  // generate a unique entry key based on the components within this entry module
+  cmps = sortBy(cmps, (c) => c.tagName);
+  const entryKey = cmps.map((c) => c.tagName).join('.') + '.entry';
+
+  return {
+    cmps,
+    entryKey,
+  };
+}
 
 const getLazyEntry = (isBrowser: boolean): string => {
   const s = new MagicString(``);
