@@ -21,6 +21,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          ref: >-
+            ${{ github.event_name == 'pull_request_target' && format('refs/pull/{0}/merge', github.event.number) || '' }}
 
       - name: Use Node.js ${{ matrix.node }}
         uses: actions/setup-node@v2
