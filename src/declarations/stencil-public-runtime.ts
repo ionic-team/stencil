@@ -1689,8 +1689,8 @@ export namespace JSXBase {
     // Form Events
     onChange?: (event: Event) => void;
     onChangeCapture?: (event: Event) => void;
-    onInput?: (event: Event) => void;
-    onInputCapture?: (event: Event) => void;
+    onInput?: (event: InputEvent) => void;
+    onInputCapture?: (event: InputEvent) => void;
     onReset?: (event: Event) => void;
     onResetCapture?: (event: Event) => void;
     onSubmit?: (event: Event) => void;
