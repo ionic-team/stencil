@@ -4,16 +4,31 @@ import type { BuildOptions } from '../../utils/options';
 import { rollup, Plugin } from 'rollup';
 import { minify } from 'terser';
 
+/**
+ * Creates a rollup plugin to embed Terser into the Stencil compiler
+ * @param opts the options being used during a build of the Stencil compiler
+ * @returns the plugin that adds Terser into the generated output
+ */
 export function terserPlugin(opts: BuildOptions): Plugin {
   return {
     name: 'terserPlugin',
-    resolveId(id) {
+    /**
+     * A rollup build hook for resolving Terser. [Source](https://rollupjs.org/guide/en/#resolveid)
+     * @param id the importee exactly as it is written in an import statement in the source code
+     * @returns an object that resolves an import to a specific id
+     */
+    resolveId(id: string): string | null {
       if (id === 'terser') {
         return id;
       }
       return null;
     },
-    async load(id) {
+    /**
+     * A rollup build hook for loading Terser. [Source](https://rollupjs.org/guide/en/#load)
+     * @param id the path of the module to load
+     * @returns the Terser source
+     */
+    async load(id: string): Promise<string> | null {
       if (id === 'terser') {
         return await bundleTerser(opts);
       }
@@ -22,7 +37,12 @@ export function terserPlugin(opts: BuildOptions): Plugin {
   };
 }
 
-async function bundleTerser(opts: BuildOptions) {
+/**
+ * Creates a bundle containing Terser
+ * @param opts the options being used during a build
+ * @returns bundled Terser code
+ */
+async function bundleTerser(opts: BuildOptions): Promise<string> {
   const fileName = `terser-${opts.terserVersion.replace(/\./g, '_')}-bundle-cache${opts.isProd ? '.min' : ''}.js`;
   const cacheFile = join(opts.scriptsBuildDir, fileName);
 

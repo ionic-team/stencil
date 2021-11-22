@@ -1,3 +1,3 @@
-import { defineCustomElement } from '../../test-components/custom-element-root';
+import { defineCustomElement } from '../../test-output/test-custom-elements/custom-element-root';
 
 defineCustomElement();
