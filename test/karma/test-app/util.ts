@@ -1,3 +1,7 @@
+import * as path from 'path';
+
+const { WWW_OUT_DIR } = require('../constants');
+
 const activeRendering = new Set();
 const onAppReadyCallbacks: Function[] = [];
 
@@ -58,7 +62,7 @@ export function setupDomTests(document: Document) {
     app.addEventListener('stencil_componentDidRender', (ev) => didRender(ev.target));
 
     app.className = 'test-spec';
-    testBed!.appendChild(app);
+    testBed.appendChild(app);
 
     if (url) {
       app.setAttribute('data-url', url);
@@ -99,7 +103,7 @@ export function setupDomTests(document: Document) {
    * Create web component for executing tests against
    */
   function renderTest(url: string, app: HTMLElement, waitForStencilReady: number) {
-    url = '/base/www' + url;
+    url = path.join('base', WWW_OUT_DIR, url);
 
     return new Promise<HTMLElement>((resolve, reject) => {
       try {

@@ -1,4 +1,5 @@
 import { Config } from '../../../dist/declarations';
+const { WWW_OUT_DIR } = require('../constants');
 
 export const config: Config = {
   namespace: 'TestInvisibleTruePrehydration',
@@ -7,7 +8,7 @@ export const config: Config = {
   outputTargets: [
     {
       type: 'www',
-      dir: '../www',
+      dir: `../${WWW_OUT_DIR}`,
       empty: false,
       indexHtml: 'prehydrated-styles.html',
       serviceWorker: null,
