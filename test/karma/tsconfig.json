@@ -21,7 +21,7 @@
     "noUnusedParameters": false,
     "pretty": true,
     "target": "es5",
-    "outDir": "www",
+    "outDir": "tmp-compiled-tests",
     "baseUrl": ".",
     "paths": {
       "@stencil/core": ["../../internal"],

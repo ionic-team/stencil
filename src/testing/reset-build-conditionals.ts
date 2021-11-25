@@ -42,5 +42,6 @@ export function resetBuildConditionals(b: d.BuildConditionals) {
   b.hotModuleReplacement = false;
   b.safari10 = false;
   b.scriptDataOpts = false;
+  b.scopedSlotTextContentFix = false;
   b.slotChildNodesFix = false;
 }

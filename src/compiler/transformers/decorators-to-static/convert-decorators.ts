@@ -80,8 +80,9 @@ export const visitClassDeclaration = (
   // parser component decorator (Component)
   componentDecoratorToStatic(config, typeChecker, diagnostics, classNode, newMembers, componentDecorator);
 
-  // parse member decorators (Prop, State, Listen, Event, Method, Element and Watch)
+  // stores a reference to fields that should be watched for changes
   const watchable = new Set<string>();
+  // parse member decorators (Prop, State, Listen, Event, Method, Element and Watch)
   if (decoratedMembers.length > 0) {
     propDecoratorsToStatic(diagnostics, decoratedMembers, typeChecker, watchable, newMembers);
     stateDecoratorsToStatic(decoratedMembers, watchable, newMembers);

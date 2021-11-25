@@ -1,7 +1,7 @@
 import type * as d from '../../declarations';
 import MagicString from 'magic-string';
 import { createJsVarName, normalizePath, isString, loadTypeScriptDiagnostics } from '@utils';
-import type { Plugin } from 'rollup';
+import type { LoadResult, Plugin, ResolveIdResult, TransformResult } from 'rollup';
 import { removeCollectionImports } from '../transformers/remove-collection-imports';
 import {
   APP_DATA_CONDITIONAL,
@@ -11,6 +11,7 @@ import {
   STENCIL_INTERNAL_HYDRATE_ID,
 } from './entry-alias-ids';
 import ts from 'typescript';
+import { basename } from 'path';
 
 export const appDataPlugin = (
   config: d.Config,
@@ -29,7 +30,7 @@ export const appDataPlugin = (
   return {
     name: 'appDataPlugin',
 
-    resolveId(id, importer) {
+    resolveId(id: string, importer: string | undefined): ResolveIdResult {
       if (id === STENCIL_APP_DATA_ID || id === STENCIL_APP_GLOBALS_ID) {
         if (platform === 'worker') {
           this.error('@stencil/core packages cannot be imported from a worker.');
@@ -52,7 +53,7 @@ export const appDataPlugin = (
       return null;
     },
 
-    load(id) {
+    load(id: string): LoadResult {
       if (id === STENCIL_APP_GLOBALS_ID) {
         const s = new MagicString(``);
         appendGlobalScripts(globalScripts, s);
@@ -66,10 +67,26 @@ export const appDataPlugin = (
         appendEnv(config, s);
         return s.toString();
       }
-      return null;
+      if (id !== config.globalScript) {
+        return null;
+      }
+
+      const module = compilerCtx.moduleMap.get(config.globalScript);
+      if (!module) {
+        return null;
+      } else if (!module.sourceMapFileText) {
+        return {
+          code: module.staticSourceFileText,
+          map: null,
+        };
+      }
+
+      const sourceMap: d.SourceMap = JSON.parse(module.sourceMapFileText);
+      sourceMap.sources = sourceMap.sources.map((src) => basename(src));
+      return { code: module.staticSourceFileText, map: sourceMap };
     },
 
-    transform(code, id) {
+    transform(code: string, id: string): TransformResult {
       id = normalizePath(id);
       if (globalScripts.some((s) => s.path === id)) {
         const program = this.parse(code, {});
@@ -87,10 +104,23 @@ export const appDataPlugin = (
             after: [removeCollectionImports(compilerCtx)],
           },
         });
-
         buildCtx.diagnostics.push(...loadTypeScriptDiagnostics(results.diagnostics));
 
-        return results.outputText;
+        if (config.sourceMap) {
+          // generate the sourcemap for global script
+          const codeMs = new MagicString(code);
+          const codeMap = codeMs.generateMap({
+            source: id,
+            // this is the name of the sourcemap, not to be confused with the `file` field in a generated sourcemap
+            file: id + '.map',
+            includeContent: true,
+            hires: true,
+          });
+
+          return { code: results.outputText, map: codeMap };
+        }
+
+        return { code: results.outputText };
       }
       return null;
     },
@@ -148,12 +178,12 @@ const appendGlobalScripts = (globalScripts: GlobalScript[], s: MagicString) => {
 };
 
 const appendBuildConditionals = (config: d.Config, build: d.BuildConditionals, s: MagicString) => {
-  const builData = Object.keys(build)
+  const buildData = Object.keys(build)
     .sort()
     .map((key) => key + ': ' + ((build as any)[key] ? 'true' : 'false'))
     .join(', ');
 
-  s.append(`export const BUILD = /* ${config.fsNamespace} */ { ${builData} };\n`);
+  s.append(`export const BUILD = /* ${config.fsNamespace} */ { ${buildData} };\n`);
 };
 
 const appendEnv = (config: d.Config, s: MagicString) => {

@@ -41,4 +41,6 @@ export const createModule = (
   originalImports: [],
   potentialCmpRefs: [],
   mixinFilePaths: [],
+  sourceMapPath: null,
+  sourceMapFileText: null,
 });

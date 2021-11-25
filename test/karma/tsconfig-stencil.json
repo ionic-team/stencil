@@ -22,7 +22,6 @@
     "noUnusedParameters": true,
     "pretty": true,
     "target": "es2017",
-    "outDir": "www",
     "baseUrl": ".",
     "paths": {
       "@stencil/core": ["../../internal"],

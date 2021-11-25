@@ -152,6 +152,7 @@ export const updateBuildConditionals = (config: Config, b: BuildConditionals) =>
   b.dynamicImportShim = config.extras.dynamicImportShim;
   b.lifecycleDOMEvents = !!(b.isDebug || config._isTesting || config.extras.lifecycleDOMEvents);
   b.safari10 = config.extras.safari10;
+  b.scopedSlotTextContentFix = !!config.extras.scopedSlotTextContentFix;
   b.scriptDataOpts = config.extras.scriptDataOpts;
   b.shadowDomShim = config.extras.shadowDomShim;
   b.attachStyles = true;

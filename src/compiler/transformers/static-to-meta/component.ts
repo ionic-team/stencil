@@ -66,6 +66,7 @@ export const parseStaticComponentMeta = (
     docs,
     jsFilePath: moduleFile.jsFilePath,
     sourceFilePath: moduleFile.sourceFilePath,
+    sourceMapPath: moduleFile.sourceMapPath,
 
     hasAttributeChangedCallbackFn: false,
     hasComponentWillLoadFn: false,

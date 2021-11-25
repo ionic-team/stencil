@@ -1,6 +1,6 @@
 {
   "name": "@stencil/core",
-  "version": "2.8.0",
+  "version": "2.11.0",
   "license": "MIT",
   "main": "./internal/stencil-core/index.cjs",
   "module": "./internal/stencil-core/index.js",
@@ -9,6 +9,7 @@
     "stencil": "bin/stencil"
   },
   "files": [
+    "!**/*.map",
     "bin/",
     "cli/",
     "compiler/",
@@ -21,9 +22,10 @@
     "testing/"
   ],
   "scripts": {
+    "clean": "rm -rf build/ cli/ compiler/ dev-server/ internal/ mock-doc/ sys/ testing/ && npm run clean-scripts",
+    "clean-scripts": "rm -rf scripts/build",
     "start": "npm run watch",
-    "build": "node scripts && npm run tsc.prod && npm run rollup.prod.ci",
-    "build.prod": "node scripts && npm run tsc.scripts && npm run tsc.prod && npm run rollup.prod.ci",
+    "build": "node scripts --prepare && npm run tsc.prod && npm run rollup.prod.ci",
     "watch": "node scripts && npm run tsc && concurrently \"npm run rollup.watch\" \"npm run tsc.watch\"",
     "release": "node scripts --release --publish",
     "release.prepare": "node scripts --release --prepare",
@@ -79,6 +81,8 @@
     "@types/sizzle": "^2.3.2",
     "@types/webpack": "^4.41.26",
     "@types/ws": "^7.4.0",
+    "@types/yarnpkg__lockfile": "^1.1.5",
+    "@yarnpkg/lockfile": "^1.1.0",
     "ts-clone-node": "^0.3.24",
     "ansi-colors": "4.1.1",
     "autoprefixer": "10.2.5",
@@ -100,6 +104,7 @@
     "jest-environment-node": "^26.6.2",
     "listr": "^0.14.3",
     "magic-string": "^0.25.7",
+    "merge-source-map": "^1.1.0",
     "mime-db": "^1.46.0",
     "minimatch": "3.0.4",
     "node-fetch": "2.6.1",
@@ -109,16 +114,17 @@
     "path-browserify": "^1.0.1",
     "pixelmatch": "4.0.2",
     "postcss": "^8.2.8",
-    "prettier": "2.3.2",
+    "prettier": "2.4.0",
     "prompts": "2.4.0",
     "puppeteer": "~10.0.0",
     "rollup": "2.42.3",
+    "rollup-plugin-sourcemaps": "^0.6.3",
     "semiver": "^1.1.0",
     "semver": "7.3.4",
     "sizzle": "^2.3.6",
     "terser": "5.6.1",
     "tslib": "^2.1.0",
-    "typescript": "4.2.3",
+    "typescript": "4.3.5",
     "webpack": "^4.46.0",
     "ws": "7.4.6"
   },
@@ -143,5 +149,9 @@
     "pwa",
     "progressive web app"
   ],
-  "prettier": "@ionic/prettier-config"
+  "prettier": "@ionic/prettier-config",
+  "volta": {
+    "node": "16.13.0",
+    "npm": "8.1.1"
+  }
 }
