@@ -119,14 +119,14 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
         plt.jmp(() => {
           const propName = attrNameToPropName.get(attrName);
 
-          //  In a webcomponent lifecyle the attributeChangedCallback runs prior to connectedCallback
+          //  In a web component lifecycle the attributeChangedCallback runs prior to connectedCallback
           //  in the case where an attribute was set inline.
           //  ```html
           //    <my-component some-attribute="some-value"></my-component>
           //  ```
           //
-          //  There is an edge case where a developer sets the attribute inline on a custom element and then programatically
-          //  changes it before it has been upgraded as shown below:
+          //  There is an edge case where a developer sets the attribute inline on a custom element and then
+          //  programmatically changes it before it has been upgraded as shown below:
           //
           //  ```html
           //    <!-- this component has _not_ been upgraded yet -->
@@ -136,13 +136,13 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
           //      el = document.querySelector("#test");
           //      el.someAttribute = "another-value";
           //      // upgrade component
-          //      cutsomElements.define('my-component', MyComponent);
+          //      customElements.define('my-component', MyComponent);
           //    </script>
           //  ```
           //  In this case if we do not unshadow here and use the value of the shadowing property, attributeChangedCallback
           //  will be called with `newValue = "some-value"` and will set the shadowed property (this.someAttribute = "another-value")
           //  to the value that was set inline i.e. "some-value" from above example. When
-          //  the connectedCallback attempts to unshadow it will use "some-value" as the intial value rather than "another-value"
+          //  the connectedCallback attempts to unshadow it will use "some-value" as the initial value rather than "another-value"
           //
           //  The case where the attribute was NOT set inline but was not set programmatically shall be handled/unshadowed
           //  by connectedCallback as this attributeChangedCallback will not fire.
@@ -155,6 +155,15 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
           if (this.hasOwnProperty(propName)) {
             newValue = this[propName];
             delete this[propName];
+          } else if (
+            prototype.hasOwnProperty(propName) &&
+            typeof this[propName] === 'number' &&
+            this[propName] == newValue
+          ) {
+            // if the propName exists on the prototype of `Cstr`, this update may be a result of Stencil using native
+            // APIs to reflect props as attributes. Calls to `setAttribute(someElement, propName)` will result in
+            // `propName` to be converted to a `DOMString`, which may not be what we want for other primitive props.
+            return;
           }
 
           const propDesc = Object.getOwnPropertyDescriptor(prototype, propName);

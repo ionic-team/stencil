@@ -1,5 +1,5 @@
 import { TranspileOptions, TranspileResults, Config, TransformOptions, TransformCssToEsmInput } from '../declarations';
-import { catchError, isString } from '@utils';
+import { catchError, getSourceMappingUrlLinker, isString } from '@utils';
 import { getPublicCompilerMeta } from './transformers/add-component-meta-static';
 import { getTranspileCssConfig, getTranspileConfig, getTranspileResults } from './config/transpile-options';
 import { patchTypescript } from './sys/typescript/typescript-sys';
@@ -77,7 +77,7 @@ const transpileCode = (
         const mapBase64 = Buffer.from(JSON.stringify(mapObject), 'utf8').toString('base64');
         const sourceMapInlined = `data:application/json;charset=utf-8;base64,` + mapBase64;
         const sourceMapComment = results.code.lastIndexOf('//#');
-        results.code = results.code.slice(0, sourceMapComment) + '//# sourceMappingURL=' + sourceMapInlined;
+        results.code = results.code.slice(0, sourceMapComment) + getSourceMappingUrlLinker(sourceMapInlined);
       } catch (e) {
         console.error(e);
       }

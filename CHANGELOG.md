@@ -1,3 +1,90 @@
+# 🐌 [2.11.0](https://github.com/ionic-team/stencil/compare/v2.11.0-0...v2.11.0) (2021-11-22)
+
+
+### Bug Fixes
+
+* **dist-custom-elements:** add ssr checks ([#3131](https://github.com/ionic-team/stencil/issues/3131)) ([9a232ea](https://github.com/ionic-team/stencil/commit/9a232ea368324f49993bd079cfdbc344abd0c69e))
+
+
+### Features
+
+* **css:** account for escaped ':' in css selectors ([#3087](https://github.com/ionic-team/stencil/issues/3087)) ([6000681](https://github.com/ionic-team/stencil/commit/600068168c86dba9ea610b5e8a0dbba00ff4d1f4))
+
+
+
+# 🚟 [2.11.0-0](https://github.com/ionic-team/stencil/compare/v2.10.0...v2.11.0-0) (2021-11-09)
+
+
+### Bug Fixes
+
+* **dist-custom-elements:** add ssr checks ([#3131](https://github.com/ionic-team/stencil/issues/3131)) ([9a232ea](https://github.com/ionic-team/stencil/commit/9a232ea368324f49993bd079cfdbc344abd0c69e))
+
+
+### Features
+
+* **css:** account for escaped ':' in css selectors ([#3087](https://github.com/ionic-team/stencil/issues/3087)) ([6000681](https://github.com/ionic-team/stencil/commit/600068168c86dba9ea610b5e8a0dbba00ff4d1f4))
+
+
+
+# 🦁 [2.10.0](https://github.com/ionic-team/stencil/compare/v2.9.0...v2.10.0) (2021-11-01)
+
+
+### Bug Fixes
+
+* **compiler:** add delegatesFocus to custom elements targets ([#3117](https://github.com/ionic-team/stencil/issues/3117)) ([2ffb503](https://github.com/ionic-team/stencil/commit/2ffb5033e8eacc3eb8c38f6d8e3be4f91d1b1f22))
+* **runtime:** prevent unnecessary re-renders when reflecting props ([#3106](https://github.com/ionic-team/stencil/issues/3106)) ([63dbb47](https://github.com/ionic-team/stencil/commit/63dbb47a14cc840c8d37f1bf7ce315d306194788))
+
+
+### Features
+
+* **sourcemap:** enable rfc-3986 urls ([#3100](https://github.com/ionic-team/stencil/issues/3100)) ([4b2018a](https://github.com/ionic-team/stencil/commit/4b2018a99de1ecbc155bb1122414bdb36014bed1))
+* **typescript:** update to typescript 4.3.5 ([#3103](https://github.com/ionic-team/stencil/issues/3103)) ([e1d4e66](https://github.com/ionic-team/stencil/commit/e1d4e66462102f01395da0b092dad66e39b6a858))
+
+
+
+# 🚙 [2.9.0](https://github.com/ionic-team/stencil/compare/v2.9.0-0...v2.9.0) (2021-10-11)
+
+
+### Bug Fixes
+
+* **docs:** fix docs generation for method return values ([#3064](https://github.com/ionic-team/stencil/issues/3064)) ([dc2f6fb](https://github.com/ionic-team/stencil/commit/dc2f6fb64c4a48c2e1247de2c5411c5bcc10dfd4))
+* **output-targets:** restore stats output target ([#3030](https://github.com/ionic-team/stencil/issues/3030)) ([c76dca7](https://github.com/ionic-team/stencil/commit/c76dca7f2c01e73e1da691e45ba9c009724660d3))
+* **preamble:** restore preamble functionality ([#3085](https://github.com/ionic-team/stencil/issues/3085)) ([39caa8c](https://github.com/ionic-team/stencil/commit/39caa8cd0ff401c932eda2cc0b664ac533d2330a))
+* **test:** attempt to fix flaky prerender test ([#3095](https://github.com/ionic-team/stencil/issues/3095)) ([16b8ea4](https://github.com/ionic-team/stencil/commit/16b8ea4dabb22024872a38bc58ba1dcf1c7cc25b))
+
+
+### Features
+
+* **compiler:** consumer sourcemap support ([#3005](https://github.com/ionic-team/stencil/issues/3005)) ([bb3bf90](https://github.com/ionic-team/stencil/commit/bb3bf900884c1cc5904df16f90c1460220c1a717))
+* **deno:** remove deno from codebase ([#3067](https://github.com/ionic-team/stencil/issues/3067)) ([037b228](https://github.com/ionic-team/stencil/commit/037b228b2ffb62385a15081a84b82a345d55d880))
+* **dist-custom-elements:** automatically import and define dependencies ([#3039](https://github.com/ionic-team/stencil/issues/3039)) ([6987e43](https://github.com/ionic-team/stencil/commit/6987e4321b9dfd10710aa27a55e53e983e867729))
+* **mock-doc:** add pathname to mock anchors ([#3090](https://github.com/ionic-team/stencil/issues/3090)) ([99428c7](https://github.com/ionic-team/stencil/commit/99428c79c5202d2ffc9d6961060f105696623d6b))
+* **telemetry:** adding yarn 1 support, sanitizing data pre-flight ([#3082](https://github.com/ionic-team/stencil/issues/3082)) ([07f69cb](https://github.com/ionic-team/stencil/commit/07f69cb5b232333103cc4edaf3cf96bd36c2e8bc))
+
+
+# ⚡️ [2.9.0-0](https://github.com/ionic-team/stencil/compare/v2.8.1...v2.9.0-0) (2021-10-05)
+
+
+### Bug Fixes
+
+* **docs:** fix docs generation for method return values ([#3064](https://github.com/ionic-team/stencil/issues/3064)) ([dc2f6fb](https://github.com/ionic-team/stencil/commit/dc2f6fb64c4a48c2e1247de2c5411c5bcc10dfd4))
+* **output-targets:** restore stats output target ([#3030](https://github.com/ionic-team/stencil/issues/3030)) ([c76dca7](https://github.com/ionic-team/stencil/commit/c76dca7f2c01e73e1da691e45ba9c009724660d3))
+* **preamble:** restore preamble functionality ([#3085](https://github.com/ionic-team/stencil/issues/3085)) ([39caa8c](https://github.com/ionic-team/stencil/commit/39caa8cd0ff401c932eda2cc0b664ac533d2330a))
+
+
+### Features
+
+* **dist-custom-elements:** automatically import and define dependencies ([#3039](https://github.com/ionic-team/stencil/issues/3039)) ([6987e43](https://github.com/ionic-team/stencil/commit/6987e4321b9dfd10710aa27a55e53e983e867729))
+* **telemetry:** adding yarn 1 support, sanitizing data pre-flight ([#3082](https://github.com/ionic-team/stencil/issues/3082)) ([07f69cb](https://github.com/ionic-team/stencil/commit/07f69cb5b232333103cc4edaf3cf96bd36c2e8bc))
+
+
+
+## 🐱 [2.8.1](https://github.com/ionic-team/stencil/compare/v2.8.0...v2.8.1) (2021-09-15)
+
+### Bug Fixes
+
+* **runtime:** textContent for scoped components with slots ([#3047](https://github.com/ionic-team/stencil/issues/3047)) ([9fc7657](https://github.com/ionic-team/stencil/commit/9fc76579a3a3e1127ba43b354a572ac40eda3770))
+
 # 🎲 [2.8.0](https://github.com/ionic-team/stencil/compare/v2.7.1...v2.8.0) (2021-09-01)
 
 ### Bug Fixes

@@ -110,7 +110,6 @@ export const setAccessor = (
             // Workaround for Safari, moving the <input> caret when re-assigning the same valued
             if (memberName === 'list') {
               isProp = false;
-              // tslint:disable-next-line: triple-equals
             } else if (oldValue == null || (elm as any)[memberName] != n) {
               (elm as any)[memberName] = n;
             }

@@ -1,4 +1,5 @@
 import { Config } from '../../../internal';
+const { WWW_OUT_DIR } = require('../constants');
 
 export const config: Config = {
   namespace: 'TestPrerender',
@@ -7,7 +8,7 @@ export const config: Config = {
   outputTargets: [
     {
       type: 'www',
-      dir: '../www',
+      dir: `../${WWW_OUT_DIR}`,
       baseUrl: 'https://karma.stenciljs.com/prerender',
       serviceWorker: null,
       empty: false,

@@ -5,6 +5,7 @@ import {
   createStaticGetter,
   getAttributeTypeInfo,
   isMemberPrivate,
+  mapJSDocTagInfo,
   serializeSymbol,
   typeToString,
   validateReferences,
@@ -95,7 +96,7 @@ const parseMethodDecorator = (
     },
     docs: {
       text: ts.displayPartsToString(signature.getDocumentationComment(typeChecker)),
-      tags: signature.getJsDocTags(),
+      tags: mapJSDocTagInfo(signature.getJsDocTags()),
     },
   };
   validateReferences(diagnostics, methodMeta.complexType.references, method.type || method.name);

@@ -51,8 +51,8 @@ const parsePropDecorator = (
     return null;
   }
 
-  const decoratorParms = getDeclarationParameters<d.PropOptions>(propDecorator);
-  const propOptions: d.PropOptions = decoratorParms[0] || {};
+  const decoratorParams = getDeclarationParameters<d.PropOptions>(propDecorator);
+  const propOptions: d.PropOptions = decoratorParams[0] || {};
 
   const propName = prop.name.getText();
 
