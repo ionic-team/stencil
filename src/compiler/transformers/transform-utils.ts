@@ -515,9 +515,21 @@ export const serializeSymbol = (checker: ts.TypeChecker, symbol: ts.Symbol): d.C
     };
   }
   return {
-    tags: symbol.getJsDocTags().map((tag) => ({ text: tag.text, name: tag.name })),
+    tags: mapJSDocTagInfo(symbol.getJsDocTags()),
     text: ts.displayPartsToString(symbol.getDocumentationComment(checker)),
   };
+};
+
+/**
+ * Maps a TypeScript 4.3+ JSDocTagInfo to a flattened Stencil CompilerJsDocTagInfo.
+ * @param tags A readonly array of JSDocTagInfo objects.
+ * @returns An array of CompilerJsDocTagInfo objects.
+ */
+export const mapJSDocTagInfo = (tags: readonly ts.JSDocTagInfo[]): d.CompilerJsDocTagInfo[] => {
+  // The text following a tag is split semantically by TS 4.3+, e.g. '@param foo the first parameter' ->
+  // [{text: 'foo', kind: 'parameterName'}, {text: ' ', kind: 'space'}, {text: 'the first parameter', kind: 'text'}], so
+  // we join the elements to reconstruct the text.
+  return tags.map((tag) => ({ ...tag, text: tag.text?.map((part) => part.text).join('') }));
 };
 
 export const serializeDocsSymbol = (checker: ts.TypeChecker, symbol: ts.Symbol) => {
@@ -567,6 +579,67 @@ export const isAsyncFn = (typeChecker: ts.TypeChecker, methodDeclaration: ts.Met
   );
 
   return typeStr.includes('Promise<');
+};
+
+export const createImportStatement = (importFnNames: string[], importPath: string) => {
+  // ESM Imports
+  // import { importNames } from 'importPath';
+
+  const importSpecifiers = importFnNames.map((importKey) => {
+    const splt = importKey.split(' as ');
+    let importAs = importKey;
+    let importFnName = importKey;
+
+    if (splt.length > 1) {
+      importAs = splt[1];
+      importFnName = splt[0];
+    }
+
+    return ts.createImportSpecifier(
+      typeof importFnName === 'string' && importFnName !== importAs ? ts.createIdentifier(importFnName) : undefined,
+      ts.createIdentifier(importAs)
+    );
+  });
+
+  return ts.createImportDeclaration(
+    undefined,
+    undefined,
+    ts.createImportClause(undefined, ts.createNamedImports(importSpecifiers)),
+    ts.createLiteral(importPath)
+  );
+};
+
+export const createRequireStatement = (importFnNames: string[], importPath: string) => {
+  // CommonJS require()
+  // const { a, b, c } = require(importPath);
+
+  const importBinding = ts.createObjectBindingPattern(
+    importFnNames.map((importKey) => {
+      const splt = importKey.split(' as ');
+      let importAs = importKey;
+      let importFnName = importKey;
+
+      if (splt.length > 1) {
+        importAs = splt[1];
+        importFnName = splt[0];
+      }
+      return ts.createBindingElement(undefined, importFnName, importAs);
+    })
+  );
+
+  return ts.createVariableStatement(
+    undefined,
+    ts.createVariableDeclarationList(
+      [
+        ts.createVariableDeclaration(
+          importBinding,
+          undefined,
+          ts.createCall(ts.createIdentifier('require'), [], [ts.createLiteral(importPath)])
+        ),
+      ],
+      ts.NodeFlags.Const
+    )
+  );
 };
 
 export interface ConvertIdentifier {

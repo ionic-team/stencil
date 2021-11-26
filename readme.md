@@ -123,13 +123,13 @@ Stencil is a tool developers use to create Web Components with some powerful fea
 
 ## License
 
- - [MIT](https://raw.githubusercontent.com/ionic-team/stencil/master/LICENSE.md)
+ - [MIT](https://raw.githubusercontent.com/ionic-team/stencil/main/LICENSE.md)
 
 
 [npm-badge]: https://img.shields.io/npm/v/@stencil/core.svg
 [npm-badge-url]: https://www.npmjs.com/package/@stencil/core
 [npm-license]: https://img.shields.io/npm/l/@stencil/core.svg
-[npm-license-url]: https://github.com/ionic-team/stencil/blob/master/LICENSE
+[npm-license-url]: https://github.com/ionic-team/stencil/blob/main/LICENSE
 [circle-badge]: https://circleci.com/gh/ionic-team/stencil.svg?style=shield
 [circle-badge-url]: https://circleci.com/gh/ionic-team/stencil
 [browserstack-badge]: https://www.browserstack.com/automate/badge.svg?badge_key=WVNVbkRJdDBJQnBEMzZuWUdlMEZuTjlPUm9sOHZsSVNkUlJTRkJVQkx0ST0tLTFhbk5jRUNEVWxJL1J0SVR0WUFndnc9PQ==--90c84981a2ed2ede760ca48fbfc3fdd5b71d3e5e

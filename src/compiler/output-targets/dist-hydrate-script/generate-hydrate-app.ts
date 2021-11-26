@@ -1,6 +1,6 @@
 import type * as d from '../../../declarations';
 import { bundleHydrateFactory } from './bundle-hydrate-factory';
-import { catchError, createOnWarnFn, loadRollupDiagnostics } from '@utils';
+import { catchError, createOnWarnFn, generatePreamble, loadRollupDiagnostics } from '@utils';
 import { getBuildFeatures, updateBuildConditionals } from '../../app-core/app-data';
 import { HYDRATE_FACTORY_INTRO, HYDRATE_FACTORY_OUTRO } from './hydrate-factory-closure';
 import { updateToHydrateComponents } from './update-to-hydrate-components';
@@ -57,6 +57,7 @@ export const generateHydrateApp = async (
 
     const rollupAppBuild = await rollup(rollupOptions);
     const rollupOutput = await rollupAppBuild.generate({
+      banner: generatePreamble(config),
       format: 'cjs',
       file: 'index.js',
     });
@@ -130,8 +131,6 @@ const getHydrateBuildConditionals = (config: d.Config, cmps: d.ComponentCompiler
   build.devTools = false;
   build.hotModuleReplacement = false;
   build.cloneNodeFix = false;
-  build.appendChildSlotFix = false;
-  build.slotChildNodesFix = false;
   build.safari10 = false;
   build.shadowDomShim = false;
 

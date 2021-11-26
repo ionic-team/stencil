@@ -47,7 +47,7 @@ export interface StencilConfig {
    * However, it's still common to have styles which should be "global" across all components and the website.
    * A global CSS file is often useful to set CSS Variables.
    *
-   * Additonally, the globalStyle config is can be used to precompile styles with Sass, PostCss, etc.
+   * Additonally, the globalStyle config can be used to precompile styles with Sass, PostCss, etc.
    * Below is an example folder structure containing a webapp's global sass file, named app.css.
    */
   globalStyle?: string;
@@ -91,6 +91,11 @@ export interface StencilConfig {
    * However, either can be added using the plugin array.
    */
   plugins?: any[];
+
+  /**
+   * Generate js source map files for all bundles
+   */
+  sourceMap?: boolean;
 
   /**
    * The srcDir config specifies the directory which should contain the source typescript files
@@ -295,6 +300,14 @@ export interface ConfigExtras {
   scriptDataOpts?: boolean;
 
   /**
+   * @deprecated - this is now automatically applied when components do not use `shadow: true`
+   *
+   * Experimental flag to align the behavior of invoking `textContent` on a scoped component to act more like a
+   * component that uses the shadow DOM. Defaults to `false`
+   */
+  scopedSlotTextContentFix?: boolean;
+
+  /**
    * If enabled `true`, the runtime will check if the shadow dom shim is required. However,
    * if it's determined that shadow dom is already natively supported by the browser then
    * it does not request the shim. When set to `false` it will avoid all shadow dom tests.
@@ -312,6 +325,7 @@ export interface ConfigExtras {
 
   /**
    * @deprecated - this is now automatically applied when components do not use `shadow: true`
+   *
    * For browsers that do not support shadow dom (IE11 and Edge 18 and below), slot is polyfilled
    * to simulate the same behavior. However, the host element's `childNodes` and `children`
    * getters are not patched to only show the child nodes and elements of the default slot.
@@ -337,7 +351,6 @@ export interface Config extends StencilConfig {
   logLevel?: LogLevel;
   rootDir?: string;
   packageJsonFilePath?: string;
-  sourceMap?: boolean;
   suppressLogs?: boolean;
   profile?: boolean;
   tsCompilerOptions?: any;
@@ -880,7 +893,7 @@ export interface SitemapXmpResults {
  * of the actual platform it's being ran ontop of.
  */
 export interface CompilerSystem {
-  name: 'deno' | 'node' | 'in-memory';
+  name: 'node' | 'in-memory';
   version: string;
   events?: BuildEvents;
   details?: SystemDetails;
@@ -995,6 +1008,10 @@ export interface CompilerSystem {
    */
   normalizePath(p: string): string;
   onProcessInterrupt?(cb: () => void): void;
+  parseYarnLockFile?: (content: string) => {
+    type: 'success' | 'merge' | 'conflict';
+    object: any;
+  };
   platformPath: PlatformPath;
   /**
    * All return paths are full normalized paths, not just the basenames. Always returns an array, does not throw.
@@ -1913,6 +1930,12 @@ export interface OutputTargetDistCustomElements extends OutputTargetBaseNext {
   inlineDynamicImports?: boolean;
   includeGlobalScripts?: boolean;
   minify?: boolean;
+  /**
+   * Enables the auto-definition of a component and its children (recursively) in the custom elements registry. This
+   * functionality allows consumers to bypass the explicit call to define a component, its children, its children's
+   * children, etc. Users of this flag should be aware that enabling this functionality may increase bundle size.
+   */
+  autoDefineCustomElements?: boolean;
 }
 
 export interface OutputTargetDistCustomElementsBundle extends OutputTargetBaseNext {

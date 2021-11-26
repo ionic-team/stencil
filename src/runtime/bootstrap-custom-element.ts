@@ -63,8 +63,23 @@ export const proxyCustomElement = (Cstr: any, compactMeta: d.ComponentRuntimeMet
         originalDisconnectedCallback.call(this);
       }
     },
+    __attachShadow() {
+      if (supportsShadow) {
+        if (BUILD.shadowDelegatesFocus) {
+          this.attachShadow({
+            mode: 'open',
+            delegatesFocus: !!(cmpMeta.$flags$ & CMP_FLAGS.shadowDelegatesFocus),
+          });
+        } else {
+          this.attachShadow({ mode: 'open' });
+        }
+      } else {
+        (this as any).shadowRoot = this;
+      }
+    },
   });
   Cstr.is = cmpMeta.$tagName$;
+
   return proxyComponent(Cstr, cmpMeta, PROXY_FLAGS.isElementConstructor | PROXY_FLAGS.proxyState);
 };
 
@@ -89,13 +104,5 @@ export const forceModeUpdate = (elm: d.RenderNode) => {
         forceUpdate(elm);
       }
     }
-  }
-};
-
-export const attachShadow = (el: HTMLElement) => {
-  if (supportsShadow) {
-    el.attachShadow({ mode: 'open' });
-  } else {
-    (el as any).shadowRoot = el;
   }
 };

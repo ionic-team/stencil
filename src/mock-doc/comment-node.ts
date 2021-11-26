@@ -6,15 +6,15 @@ export class MockComment extends MockNode {
     super(ownerDocument, NODE_TYPES.COMMENT_NODE, NODE_NAMES.COMMENT_NODE, data);
   }
 
-  cloneNode(_deep?: boolean) {
+  override cloneNode(_deep?: boolean) {
     return new MockComment(null, this.nodeValue);
   }
 
-  get textContent() {
+  override get textContent() {
     return this.nodeValue;
   }
 
-  set textContent(text) {
+  override set textContent(text) {
     this.nodeValue = text;
   }
 }

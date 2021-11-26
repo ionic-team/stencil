@@ -1,6 +1,58 @@
+import { mockConfig } from '@stencil/core/testing';
 import * as util from '../util';
 
 describe('util', () => {
+  describe('generatePreamble', () => {
+    it('generates a comment with a single line preamble', () => {
+      const testConfig = mockConfig();
+      testConfig.preamble = 'I am Stencil';
+
+      const result = util.generatePreamble(testConfig);
+
+      expect(result).toBe(`/*!
+ * I am Stencil
+ */`);
+    });
+
+    it('generates a comment with a multi-line preamble', () => {
+      const testConfig = mockConfig();
+      testConfig.preamble = 'I am Stencil\nHear me roar';
+
+      const result = util.generatePreamble(testConfig);
+
+      expect(result).toBe(`/*!
+ * I am Stencil
+ * Hear me roar
+ */`);
+    });
+
+    it('returns an empty string if no preamble is provided', () => {
+      const testConfig = mockConfig();
+
+      const result = util.generatePreamble(testConfig);
+
+      expect(result).toBe('');
+    });
+
+    it('returns an empty string a null preamble is provided', () => {
+      const testConfig = mockConfig();
+      testConfig.preamble = null;
+
+      const result = util.generatePreamble(testConfig);
+
+      expect(result).toBe('');
+    });
+
+    it('returns an empty string if an empty preamble is provided', () => {
+      const testConfig = mockConfig();
+      testConfig.preamble = '';
+
+      const result = util.generatePreamble(testConfig);
+
+      expect(result).toBe('');
+    });
+  });
+
   describe('isTsFile', () => {
     it('should return true for regular .ts and .tsx files', () => {
       expect(util.isTsFile('.ts')).toEqual(true);

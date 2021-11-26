@@ -368,4 +368,23 @@ describe('validation', () => {
     expect(isWatchIgnorePath(config, '/some/image.png')).toBe(true);
     expect(isWatchIgnorePath(config, '/some/typescript.ts')).toBe(false);
   });
+
+  describe('sourceMap', () => {
+    it('sets the field to true when the set to true in the config', () => {
+      userConfig.sourceMap = true;
+      const { config } = validateConfig(userConfig);
+      expect(config.sourceMap).toBe(true);
+    });
+
+    it('sets the field to false when set to false in the config', () => {
+      userConfig.sourceMap = false;
+      const { config } = validateConfig(userConfig);
+      expect(config.sourceMap).toBe(false);
+    });
+
+    it('defaults the field to false when not set in the config', () => {
+      const { config } = validateConfig(userConfig);
+      expect(config.sourceMap).toBe(false);
+    });
+  });
 });

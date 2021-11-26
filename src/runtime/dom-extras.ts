@@ -81,10 +81,10 @@ const patchChildSlotNodes = (HostElementPrototype: any) => {
 
   Object.defineProperty(HostElementPrototype, 'children', {
     get() {
-      return (this.childNodes as FakeNodeList).flatMap((n: any) => {
+      return (this.childNodes as FakeNodeList).map((n: Node) => {
         if (n.nodeType === 1) return n;
-        else return [];
-      });
+        else return null;
+      }).filter(n => !!n);
     },
   });
   Object.defineProperty(HostElementPrototype, 'childElementCount', {
@@ -155,6 +155,10 @@ const patchSlotInnerText = (HostElementPrototype: any) => {
   });
 };
 
+/**
+ * Patches the text content accessors of a scoped component
+ * @param hostElementPrototype the `Element` to be patched
+ */
 const patchTextContent = (HostElementPrototype: any) => {
   const descriptor = Object.getOwnPropertyDescriptor(Node.prototype, 'textContent');
   // MockNode won't have these
@@ -347,6 +351,12 @@ const patchSlotInsertAdjacentElement = (HostElementPrototype: any) => {
 const getSlotName = (node: d.RenderNode) =>
   node['s-sn'] || (node.nodeType === 1 && (node as Element).getAttribute('slot')) || node.slot || '';
 
+/**
+ * Recursively searches a series of child nodes for a slot with the provided name.
+ * @param childNodes the nodes to search for a slot with a specific name.
+ * @param slotName the name of the slot to match on.
+ * @returns a reference to the slot node that matches the provided name, `null` otherwise
+ */
 const getHostSlotNode = (childNodes: NodeListOf<ChildNode>, slotName: string) => {
   let i = 0;
   let childNode: d.RenderNode;
