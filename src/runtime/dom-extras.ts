@@ -81,10 +81,12 @@ const patchChildSlotNodes = (HostElementPrototype: any) => {
 
   Object.defineProperty(HostElementPrototype, 'children', {
     get() {
-      return (this.childNodes as FakeNodeList).map((n: Node) => {
-        if (n.nodeType === 1) return n;
-        else return null;
-      }).filter(n => !!n);
+      return (this.childNodes as FakeNodeList)
+        .map((n: Node) => {
+          if (n.nodeType === 1) return n;
+          else return null;
+        })
+        .filter((n) => !!n);
     },
   });
   Object.defineProperty(HostElementPrototype, 'childElementCount', {
