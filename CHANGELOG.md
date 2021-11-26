@@ -1,3 +1,47 @@
+# 🐌 [2.11.0](https://github.com/ionic-team/stencil/compare/v2.11.0-0...v2.11.0) (2021-11-22)
+
+
+### Bug Fixes
+
+* **dist-custom-elements:** add ssr checks ([#3131](https://github.com/ionic-team/stencil/issues/3131)) ([9a232ea](https://github.com/ionic-team/stencil/commit/9a232ea368324f49993bd079cfdbc344abd0c69e))
+
+
+### Features
+
+* **css:** account for escaped ':' in css selectors ([#3087](https://github.com/ionic-team/stencil/issues/3087)) ([6000681](https://github.com/ionic-team/stencil/commit/600068168c86dba9ea610b5e8a0dbba00ff4d1f4))
+
+
+
+# 🚟 [2.11.0-0](https://github.com/ionic-team/stencil/compare/v2.10.0...v2.11.0-0) (2021-11-09)
+
+
+### Bug Fixes
+
+* **dist-custom-elements:** add ssr checks ([#3131](https://github.com/ionic-team/stencil/issues/3131)) ([9a232ea](https://github.com/ionic-team/stencil/commit/9a232ea368324f49993bd079cfdbc344abd0c69e))
+
+
+### Features
+
+* **css:** account for escaped ':' in css selectors ([#3087](https://github.com/ionic-team/stencil/issues/3087)) ([6000681](https://github.com/ionic-team/stencil/commit/600068168c86dba9ea610b5e8a0dbba00ff4d1f4))
+
+
+
+# 🦁 [2.10.0](https://github.com/ionic-team/stencil/compare/v2.9.0...v2.10.0) (2021-11-01)
+
+
+### Bug Fixes
+
+* **compiler:** add delegatesFocus to custom elements targets ([#3117](https://github.com/ionic-team/stencil/issues/3117)) ([2ffb503](https://github.com/ionic-team/stencil/commit/2ffb5033e8eacc3eb8c38f6d8e3be4f91d1b1f22))
+* **runtime:** prevent unnecessary re-renders when reflecting props ([#3106](https://github.com/ionic-team/stencil/issues/3106)) ([63dbb47](https://github.com/ionic-team/stencil/commit/63dbb47a14cc840c8d37f1bf7ce315d306194788))
+
+
+### Features
+
+* **sourcemap:** enable rfc-3986 urls ([#3100](https://github.com/ionic-team/stencil/issues/3100)) ([4b2018a](https://github.com/ionic-team/stencil/commit/4b2018a99de1ecbc155bb1122414bdb36014bed1))
+* **typescript:** update to typescript 4.3.5 ([#3103](https://github.com/ionic-team/stencil/issues/3103)) ([e1d4e66](https://github.com/ionic-team/stencil/commit/e1d4e66462102f01395da0b092dad66e39b6a858))
+
+
+
 # 🚙 [2.9.0](https://github.com/ionic-team/stencil/compare/v2.9.0-0...v2.9.0) (2021-10-11)
 
 

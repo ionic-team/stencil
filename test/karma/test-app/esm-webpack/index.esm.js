@@ -1,4 +1,4 @@
-import { defineCustomElements, applyPolyfills } from '../../test-dist/loader';
+import { defineCustomElements, applyPolyfills } from '../../test-output/test-dist/loader';
 
 applyPolyfills()
   .then(function () {

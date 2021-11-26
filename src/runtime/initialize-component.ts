@@ -121,7 +121,7 @@ export const initializeComponent = async (
   const schedule = () => scheduleUpdate(hostRef, true);
 
   if (BUILD.asyncLoading && ancestorComponent && ancestorComponent['s-rc']) {
-    // this is the intial load and this component it has an ancestor component
+    // this is the initial load and this component it has an ancestor component
     // but the ancestor component has NOT fired its will update lifecycle yet
     // so let's just cool our jets and wait for the ancestor to continue first
 
