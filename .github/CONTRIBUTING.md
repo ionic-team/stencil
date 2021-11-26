@@ -113,6 +113,11 @@ directions for every possible debugging environment.
 
 It is required that Stencil be built to run it through the debugger.
 
+Note that Stencil transpiles source code using multiple worker processes. If your debugger appears to 'hang' or get
+stuck, your debugger may not have switched to a worker process that has halted on a breakpoint. You may be able to
+avoid this altogether by setting `--max-workers=1` when you launch Stencil (with the possibility of not being able to
+reproduce timing issues between workers as a side effect).
+
 #### Debugging the Compiler in VSCode
 
 Two launch configurations for debugging the compiler can be found in the `.vscode/launch.json` configuration found in
