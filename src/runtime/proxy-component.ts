@@ -59,7 +59,9 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
             Object.defineProperty(prototype, memberName, {
               get(this: d.RuntimeRef) {
                 const ref = getHostRef(this);
-                const instance = BUILD.lazyLoad ? ref.$lazyInstance$ : prototype;
+                const instance = BUILD.lazyLoad && ref ? ref.$lazyInstance$ : prototype;
+                if (!instance) return;
+
                 return instance[memberName];
               },
               configurable: true,
@@ -74,6 +76,7 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
                     ref.$lazyInstance$[memberName] = newValue;
                     setValue(this, memberName, ref.$lazyInstance$[memberName], cmpMeta, !init);
                   };
+                  if (!ref) return;
                   // If there's a value from an attribute, (before the class is defined), queue & set async
                   if (ref.$lazyInstance$) {
                     setVal();

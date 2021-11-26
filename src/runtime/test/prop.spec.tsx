@@ -46,21 +46,21 @@ describe('prop', () => {
 
     const { root } = await newSpecPage({
       components: [CmpA],
-      html: `<cmp-a bool-false="true" bool-true="false" str="attr" num="99" accessor="accessed"></cmp-a>`,
+      html: `<cmp-a bool-false="true" bool-true="false" str="attr" num="99" accessor="accessed!"></cmp-a>`,
     });
 
     expect(root).toEqualHtml(`
-      <cmp-a bool-false="true" bool-true="false" str="attr" num="99" accessor="accessed">
-        true-false-attr-99-accessed
+      <cmp-a bool-false="true" bool-true="false" str="attr" num="99" accessor="accessed!">
+        true-false-attr-99-accessed!
       </cmp-a>
     `);
 
-    expect(root.textContent).toBe('true-false-attr-99-accessed');
+    expect(root.textContent).toBe('true-false-attr-99-accessed!');
     expect(root.boolFalse).toBe(true);
     expect(root.boolTrue).toBe(false);
     expect(root.str).toBe('attr');
     expect(root.num).toBe(99);
-    expect(root.accessor).toBe('accessed');
+    expect(root.accessor).toBe('accessed!');
   });
 
   it('set default values', async () => {
