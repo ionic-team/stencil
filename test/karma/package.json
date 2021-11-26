@@ -44,9 +44,7 @@
     "rollup-plugin-node-globals": "^1.4.0",
     "rollup-plugin-node-polyfills": "^0.1.2",
     "webpack-cli": "^3.3.12",
-    "workbox-build": "4.3.1",
-    "ionic-git": "https://gitpkg.now.sh/ionic-team/ionic-framework?main",
-    "ionicons": "^5.5.1"
+    "workbox-build": "4.3.1"
   },
   "volta": {
     "node": "12.22.7",
