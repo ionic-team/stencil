@@ -1,3 +1,2 @@
-/www
-/test-dist
-/test-components
+/test-output
+/tmp-compiled-tests

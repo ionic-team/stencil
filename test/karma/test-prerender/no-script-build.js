@@ -4,9 +4,10 @@
 
 const fs = require('fs');
 const path = require('path');
+const { WWW_OUT_DIR } = require('../constants');
 
-const wwwWithScriptPath = path.join(__dirname, '..', 'www', 'prerender', 'index.html');
-const wwwNoScriptPath = path.join(__dirname, '..', 'www', 'prerender', 'index-no-script.html');
+const wwwWithScriptPath = path.join(__dirname, '..', WWW_OUT_DIR, 'prerender', 'index.html');
+const wwwNoScriptPath = path.join(__dirname, '..', WWW_OUT_DIR, 'prerender', 'index-no-script.html');
 
 const wwwWithScript = fs.readFileSync(wwwWithScriptPath, 'utf8');
 

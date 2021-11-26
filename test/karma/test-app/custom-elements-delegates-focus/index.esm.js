@@ -1,5 +1,5 @@
-import { defineCustomElement as defineDelegatesFocus } from '../../test-components/custom-elements-delegates-focus';
-import { defineCustomElement as defineDelegatesNoFocus } from '../../test-components/custom-elements-no-delegates-focus';
+import { defineCustomElement as defineDelegatesFocus } from '../../test-output/test-custom-elements/custom-elements-delegates-focus';
+import { defineCustomElement as defineDelegatesNoFocus } from '../../test-output/test-custom-elements/custom-elements-no-delegates-focus';
 
 defineDelegatesFocus();
 defineDelegatesNoFocus();
