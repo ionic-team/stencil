@@ -26,7 +26,7 @@ export const rollupToStencilSourceMap = (rollupSourceMap: RollupSourceMap | unde
  * found in the [Linking generated code to source maps](https://sourcemaps.info/spec.html#h.lmz475t4mvbx) section of
  * the Sourcemaps V3 specification proposal.
  */
-const JS_SOURCE_MAPPING_URL_LINKER = '//# sourceMappingURL=';
+export const JS_SOURCE_MAPPING_URL_LINKER = '//# sourceMappingURL=';
 
 /**
  * Generates an RFC-3986 compliant string for the given input.

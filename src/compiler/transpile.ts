@@ -1,5 +1,5 @@
 import { TranspileOptions, TranspileResults, Config, TransformOptions, TransformCssToEsmInput } from '../declarations';
-import { catchError, getSourceMappingUrlLinker, isString } from '@utils';
+import { catchError, isString, JS_SOURCE_MAPPING_URL_LINKER } from '@utils';
 import { getPublicCompilerMeta } from './transformers/add-component-meta-static';
 import { getTranspileCssConfig, getTranspileConfig, getTranspileResults } from './config/transpile-options';
 import { patchTypescript } from './sys/typescript/typescript-sys';
@@ -74,10 +74,12 @@ const transpileCode = (
         mapObject.sources = [transpileOpts.file];
         delete mapObject.sourceRoot;
 
+        // generate a data URI for the inlined sourcemap. because we do the base-64 encoding ourselves and we do not
+        // want to encode the prefix & MIME type, build the sourcemap URI by hand
         const mapBase64 = Buffer.from(JSON.stringify(mapObject), 'utf8').toString('base64');
         const sourceMapInlined = `data:application/json;charset=utf-8;base64,` + mapBase64;
         const sourceMapComment = results.code.lastIndexOf('//#');
-        results.code = results.code.slice(0, sourceMapComment) + getSourceMappingUrlLinker(sourceMapInlined);
+        results.code = results.code.slice(0, sourceMapComment) + JS_SOURCE_MAPPING_URL_LINKER + sourceMapInlined;
       } catch (e) {
         console.error(e);
       }
