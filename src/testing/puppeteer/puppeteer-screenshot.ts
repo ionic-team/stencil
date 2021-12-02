@@ -140,6 +140,7 @@ function createPuppeteerScreenshopOptions(opts: ScreenshotOptions) {
     type: 'png',
     fullPage: opts.fullPage,
     omitBackground: opts.omitBackground,
+    captureBeyondViewport: false,
     encoding: 'binary',
   };
 
