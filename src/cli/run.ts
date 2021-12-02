@@ -134,7 +134,7 @@ export const runTask = async (
       break;
 
     case 'help':
-      taskHelp(config, config.logger, sys);
+      await taskHelp(config, config.logger, sys);
       break;
 
     case 'prerender':
@@ -162,7 +162,7 @@ export const runTask = async (
 
     default:
       config.logger.error(`${config.logger.emoji('❌ ')}Invalid stencil command, please see the options below:`);
-      taskHelp(config, config.logger, sys);
+      await taskHelp(config, config.logger, sys);
       return config.sys.exit(1);
   }
 };
