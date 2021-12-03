@@ -138,7 +138,9 @@ export class MockNode {
   }
 
   contains(otherNode: MockNode) {
-    if (otherNode === this) return true;
+    if (otherNode === this) {
+      return true;
+    }
     return this.childNodes.includes(otherNode);
   }
 
