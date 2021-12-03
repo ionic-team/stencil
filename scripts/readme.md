@@ -22,4 +22,10 @@ release.
    case :wink:
 7. If there are any 'next' branches in GitHub, say for a future major version of Stencil (e.g. `v3.0.0-dev`), now is a
    good time to sync them with the `main` branch.
-8. :tada:
+8. Perform the following tasks in JIRA:
+   1. Mark this version of Stencil as 'released' in JIRA
+   2. Move the task card in this current sprint to the 'Done' swimlane
+   3. Stub out the next release and task for the release in JIRA
+9. Ensure all GitHub Issues associated with stories/tasks that shipped in this version of Stencil are closed and
+   labeled as 'Resolution: Shipped'
+10. :tada:
