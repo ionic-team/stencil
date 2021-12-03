@@ -1,6 +1,6 @@
 import type * as d from '../../../declarations';
-import { buildError } from '@utils';
-import { VALID_TYPES } from '../../output-targets/output-utils';
+import { buildError, buildWarn } from '@utils';
+import { DIST_CUSTOM_ELEMENTS_BUNDLE, VALID_TYPES } from '../../output-targets/output-utils';
 import { validateCollection } from './validate-collection';
 import { validateCustomElement } from './validate-custom-element';
 import { validateCustomOutput } from './validate-custom-output';
@@ -22,6 +22,9 @@ export const validateOutputTargets = (config: d.Config, diagnostics: d.Diagnosti
       err.messageText = `Invalid outputTarget type "${
         outputTarget.type
       }". Valid outputTarget types include: ${VALID_TYPES.map((t) => `"${t}"`).join(', ')}`;
+    } else if (outputTarget.type === DIST_CUSTOM_ELEMENTS_BUNDLE) {
+      const warning = buildWarn(diagnostics);
+      warning.messageText = `dist-custom-elements-bundle is deprecated and will be removed in a future version. Use "dist-custom-elements" instead. If "dist-custom-elements" does not meet your needs, please add a comment to https://github.com/ionic-team/stencil/issues/3136.`;
     }
   });
 

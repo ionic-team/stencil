@@ -312,6 +312,16 @@ describe('validation', () => {
     expect(validated.diagnostics).toHaveLength(1);
   });
 
+  it('should warn when dist-custom-elements-bundle is found', () => {
+    userConfig.outputTargets = [
+      {
+        type: 'dist-custom-elements-bundle',
+      } as any,
+    ];
+    const validated = validateConfig(userConfig);
+    expect(validated.diagnostics).toHaveLength(1);
+  });
+
   it('should default outputTargets with www', () => {
     const { config } = validateConfig(userConfig);
     expect(config.outputTargets.some((o) => o.type === 'www')).toBe(true);
