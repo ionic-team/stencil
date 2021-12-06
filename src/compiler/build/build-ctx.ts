@@ -17,6 +17,12 @@ export class BuildContext implements d.BuildCtx {
   componentGraph = new Map<string, string[]>();
   config: d.Config;
   data: any = {};
+  buildStats?: d.CompilerBuildStats = undefined;
+  esmBrowserComponentBundle: d.BundleModule[];
+  esmComponentBundle: d.BundleModule[];
+  es5ComponentBundle: d.BundleModule[];
+  systemComponentBundle: d.BundleModule[];
+  commonJsComponentBundle: d.BundleModule[];
   diagnostics: d.Diagnostic[] = [];
   dirsAdded: string[] = [];
   dirsDeleted: string[] = [];
@@ -66,7 +72,9 @@ export class BuildContext implements d.BuildCtx {
   start() {
     // get the build id from the incremented activeBuildId
     // print out a good message
-    const msg = `${this.isRebuild ? 'rebuild' : 'build'}, ${this.config.fsNamespace}, ${this.config.devMode ? 'dev' : 'prod'} mode, started`;
+    const msg = `${this.isRebuild ? 'rebuild' : 'build'}, ${this.config.fsNamespace}, ${
+      this.config.devMode ? 'dev' : 'prod'
+    } mode, started`;
 
     const buildLog: d.BuildLog = {
       buildId: this.buildId,

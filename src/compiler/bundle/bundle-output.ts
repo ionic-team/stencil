@@ -22,7 +22,7 @@ export const bundleOutput = async (
   config: d.Config,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
-  bundleOpts: BundleOptions,
+  bundleOpts: BundleOptions
 ) => {
   try {
     const rollupOptions = getRollupOptions(config, compilerCtx, buildCtx, bundleOpts);
@@ -42,7 +42,7 @@ export const getRollupOptions = (
   config: d.Config,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
-  bundleOpts: BundleOptions,
+  bundleOpts: BundleOptions
 ) => {
   const customResolveOptions = createCustomResolverAsync(config.sys, compilerCtx.fs, [
     '.tsx',
@@ -92,7 +92,7 @@ export const getRollupOptions = (
       lazyComponentPlugin(buildCtx),
       loaderPlugin(bundleOpts.loader),
       userIndexPlugin(config, compilerCtx),
-      typescriptPlugin(compilerCtx, bundleOpts),
+      typescriptPlugin(compilerCtx, bundleOpts, config),
       extFormatPlugin(config),
       extTransformsPlugin(config, compilerCtx, buildCtx, bundleOpts),
       workerPlugin(config, compilerCtx, buildCtx, bundleOpts.platform, !!bundleOpts.inlineWorkers),

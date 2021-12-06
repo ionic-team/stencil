@@ -7,7 +7,7 @@ export function buildJestArgv(config: d.Config) {
 
   const args = [...config.flags.unknownArgs.slice(), ...config.flags.knownArgs.slice()];
 
-  if (!args.some(a => a.startsWith('--max-workers') || a.startsWith('--maxWorkers'))) {
+  if (!args.some((a) => a.startsWith('--max-workers') || a.startsWith('--maxWorkers'))) {
     args.push(`--max-workers=${config.maxConcurrentWorkers}`);
   }
 
@@ -42,7 +42,7 @@ export function buildJestConfig(config: d.Config) {
 
   const jestConfig: d.JestConfig = {};
 
-  Object.keys(stencilConfigTesting).forEach(key => {
+  Object.keys(stencilConfigTesting).forEach((key) => {
     if (validJestConfigKeys.includes(key)) {
       (jestConfig as any)[key] = (stencilConfigTesting as any)[key];
     }

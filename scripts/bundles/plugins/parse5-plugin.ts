@@ -5,25 +5,46 @@ import type { BuildOptions } from '../../utils/options';
 import rollupCommonjs from '@rollup/plugin-commonjs';
 import rollupResolve from '@rollup/plugin-node-resolve';
 import { rollup, OutputChunk, Plugin } from 'rollup';
+import type { NormalizedOutputOptions, OutputBundle } from 'rollup';
 import { minify } from 'terser';
 
+/**
+ * Bundles parse5, an HTML serializer & parser, into the compiler
+ * @param opts the options being used during a build of the Stencil compiler
+ * @returns the plugin that inlines parse5
+ */
 export function parse5Plugin(opts: BuildOptions): Plugin {
   return {
     name: 'parse5Plugin',
-    resolveId(id) {
+    /**
+     * A rollup build hook for resolving parse5 [Source](https://rollupjs.org/guide/en/#resolveid)
+     * @param id the importee exactly as it is written in an import statement in the source code
+     * @returns a string that resolves an import to some id
+     */
+    resolveId(id: string): string | null {
       if (id === 'parse5') {
         return id;
       }
       return null;
     },
-    async load(id) {
+    /**
+     * A rollup build hook for loading parse5. [Source](https://rollupjs.org/guide/en/#load)
+     * @param id the path of the module to load
+     * @returns parse5, pre-bundled
+     */
+    async load(id: string): Promise<string> | null {
       if (id === 'parse5') {
         return await bundleParse5(opts);
       }
       return null;
     },
-    generateBundle(_, bundle) {
-      Object.keys(bundle).forEach(fileName => {
+    /**
+     * Output generation hook used to reduce the amount of whitespace in the bundle
+     * @param _ unused output options
+     * @param bundle the bundle to minify
+     */
+    generateBundle(_: NormalizedOutputOptions, bundle: OutputBundle): void {
+      Object.keys(bundle).forEach((fileName) => {
         // not minifying, but we are reducing whitespace
         const chunk = bundle[fileName] as OutputChunk;
         if (chunk.type === 'chunk') {
@@ -34,7 +55,13 @@ export function parse5Plugin(opts: BuildOptions): Plugin {
   };
 }
 
-async function bundleParse5(opts: BuildOptions) {
+/**
+ * Bundles parse5 to be used in the Stencil output. Writes the results to disk and returns its contents. The file
+ * written to disk may be used as a simple cache to speed up subsequent build times.
+ * @param opts the options being used during a build of the Stencil compiler
+ * @returns the contents of the file containing parse5
+ */
+async function bundleParse5(opts: BuildOptions): Promise<string> {
   const fileName = `parse5-${opts.parse5Verion.replace(/\./g, '_')}-bundle-cache${opts.isProd ? '.min' : ''}.js`;
   const cacheFile = join(opts.scriptsBuildDir, fileName);
 
@@ -47,13 +74,24 @@ async function bundleParse5(opts: BuildOptions) {
     plugins: [
       {
         name: 'parse5EntryPlugin',
-        resolveId(id) {
+        /**
+         * A rollup build hook for resolving @parse5-entry [Source](https://rollupjs.org/guide/en/#resolveid)
+         * @param id the importee exactly as it is written in an import statement in the source code
+         * @returns a string that resolves an import to some id
+         */
+        resolveId(id: string): string | null {
           if (id === '@parse5-entry') {
             return id;
           }
           return null;
         },
-        load(id) {
+        /**
+         * A rollup build hook for intercepting how parse5's entry package is processed
+         * [Source](https://rollupjs.org/guide/en/#load)
+         * @param id the path of the module to load
+         * @returns source code to act as a proxy for @parse5-entry
+         */
+        load(id: string): string | null {
           if (id === '@parse5-entry') {
             return `export { parse, parseFragment } from 'parse5';`;
           }

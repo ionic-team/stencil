@@ -2,7 +2,7 @@ import type * as d from '../../declarations';
 import { getClientPolyfill } from '../app-core/app-polyfills';
 import { isOutputTargetDistLazyLoader, relativeImport } from './output-utils';
 import { join, relative } from 'path';
-import { normalizePath } from '@utils';
+import { generatePreamble, normalizePath } from '@utils';
 
 export const outputLazyLoader = async (config: d.Config, compilerCtx: d.CompilerCtx) => {
   const outputTargets = config.outputTargets.filter(isOutputTargetDistLazyLoader);
@@ -10,10 +10,14 @@ export const outputLazyLoader = async (config: d.Config, compilerCtx: d.Compiler
     return;
   }
 
-  await Promise.all(outputTargets.map(o => generateLoader(config, compilerCtx, o)));
+  await Promise.all(outputTargets.map((o) => generateLoader(config, compilerCtx, o)));
 };
 
-const generateLoader = async (config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetDistLazyLoader) => {
+const generateLoader = async (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  outputTarget: d.OutputTargetDistLazyLoader
+) => {
   const loaderPath = outputTarget.dir;
   const es2017Dir = outputTarget.esmDir;
   const es5Dir = outputTarget.esmEs5Dir || es2017Dir;
@@ -27,17 +31,17 @@ const generateLoader = async (config: d.Config, compilerCtx: d.CompilerCtx, outp
 
   const packageJsonContent = JSON.stringify(
     {
-      'name': config.fsNamespace + '-loader',
-      'typings': './index.d.ts',
-      'module': './index.js',
-      'main': './index.cjs.js',
+      name: config.fsNamespace + '-loader',
+      typings: './index.d.ts',
+      module: './index.js',
+      main: './index.cjs.js',
       'jsnext:main': './index.es2017.js',
-      'es2015': './index.es2017.js',
-      'es2017': './index.es2017.js',
-      'unpkg': './cdn.js',
+      es2015: './index.es2017.js',
+      es2017: './index.es2017.js',
+      unpkg: './cdn.js',
     },
     null,
-    2,
+    2
   );
 
   const es5EntryPoint = join(es5Dir, 'loader.js');
@@ -45,16 +49,16 @@ const generateLoader = async (config: d.Config, compilerCtx: d.CompilerCtx, outp
   const polyfillsEntryPoint = join(es2017Dir, 'polyfills/index.js');
   const cjsEntryPoint = join(cjsDir, 'loader.cjs.js');
   const polyfillsExport = `export * from '${normalizePath(relative(loaderPath, polyfillsEntryPoint))}';`;
-  const indexContent = `
+  const indexContent = `${generatePreamble(config)}
 ${es5HtmlElement}
 ${polyfillsExport}
 export * from '${normalizePath(relative(loaderPath, es5EntryPoint))}';
 `;
-  const indexES2017Content = `
+  const indexES2017Content = `${generatePreamble(config)}
 ${polyfillsExport}
 export * from '${normalizePath(relative(loaderPath, es2017EntryPoint))}';
 `;
-  const indexCjsContent = `
+  const indexCjsContent = `${generatePreamble(config)}
 module.exports = require('${normalizePath(relative(loaderPath, cjsEntryPoint))}');
 module.exports.applyPolyfills = function() { return Promise.resolve() };
 `;
@@ -71,8 +75,7 @@ module.exports.applyPolyfills = function() { return Promise.resolve() };
 };
 
 const generateIndexDts = (indexDtsPath: string, componentsDtsPath: string) => {
-  return `
-export * from '${relativeImport(indexDtsPath, componentsDtsPath, '.d.ts')}';
+  return `export * from '${relativeImport(indexDtsPath, componentsDtsPath, '.d.ts')}';
 export interface CustomElementsDefineOptions {
   exclude?: string[];
   resourcesUrl?: string;

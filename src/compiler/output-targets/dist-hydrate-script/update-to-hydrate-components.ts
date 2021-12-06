@@ -3,7 +3,7 @@ import { dashToPascalCase, sortBy, toTitleCase } from '@utils';
 
 export const updateToHydrateComponents = async (cmps: d.ComponentCompilerMeta[]) => {
   const hydrateCmps = await Promise.all(cmps.map(updateToHydrateComponent));
-  return sortBy(hydrateCmps, c => c.cmp.componentClassName);
+  return sortBy(hydrateCmps, (c) => c.cmp.componentClassName);
 };
 
 const updateToHydrateComponent = async (cmp: d.ComponentCompilerMeta) => {

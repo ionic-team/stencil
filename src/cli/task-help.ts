@@ -1,12 +1,13 @@
-import type { CompilerSystem, Logger } from '../declarations';
+import type * as d from '../declarations';
+import { taskTelemetry } from './task-telemetry';
 
-export const taskHelp = (sys: CompilerSystem, logger: Logger) => {
-  const p = logger.dim(sys.details.platform === 'windows' ? '>' : '$');
+export const taskHelp = async (config: d.Config, logger: d.Logger, sys?: d.CompilerSystem) => {
+  const prompt = logger.dim(sys.details.platform === 'windows' ? '>' : '$');
 
   console.log(`
   ${logger.bold('Build:')} ${logger.dim('Build components for development or production.')}
 
-    ${p} ${logger.green('stencil build [--dev] [--watch] [--prerender] [--debug]')}
+    ${prompt} ${logger.green('stencil build [--dev] [--watch] [--prerender] [--debug]')}
 
       ${logger.cyan('--dev')} ${logger.dim('.............')} Development build
       ${logger.cyan('--watch')} ${logger.dim('...........')} Rebuild when files update
@@ -21,7 +22,7 @@ export const taskHelp = (sys: CompilerSystem, logger: Logger) => {
 
   ${logger.bold('Test:')} ${logger.dim('Run unit and end-to-end tests.')}
 
-    ${p} ${logger.green('stencil test [--spec] [--e2e]')}
+    ${prompt} ${logger.green('stencil test [--spec] [--e2e]')}
 
       ${logger.cyan('--spec')} ${logger.dim('............')} Run unit tests with Jest
       ${logger.cyan('--e2e')} ${logger.dim('.............')} Run e2e tests with Puppeteer
@@ -29,16 +30,23 @@ export const taskHelp = (sys: CompilerSystem, logger: Logger) => {
 
   ${logger.bold('Generate:')} ${logger.dim('Bootstrap components.')}
 
-    ${p} ${logger.green('stencil generate')} or ${logger.green('stencil g')}
+    ${prompt} ${logger.green('stencil generate')} or ${logger.green('stencil g')}
 
+`);
 
+  // TODO(STENCIL-148) make this parameter no longer optional, remove the surrounding if statement
+  if (sys) {
+    await taskTelemetry(config, sys, logger);
+  }
+
+  console.log(`
   ${logger.bold('Examples:')}
 
-    ${p} ${logger.green('stencil build --dev --watch --serve')}
-    ${p} ${logger.green('stencil build --prerender')}
-    ${p} ${logger.green('stencil test --spec --e2e')}
-    ${p} ${logger.green('stencil generate')}
-    ${p} ${logger.green('stencil g my-component')}
-
+  ${prompt} ${logger.green('stencil build --dev --watch --serve')}
+  ${prompt} ${logger.green('stencil build --prerender')}
+  ${prompt} ${logger.green('stencil test --spec --e2e')}
+  ${prompt} ${logger.green('stencil telemetry on')}
+  ${prompt} ${logger.green('stencil generate')}
+  ${prompt} ${logger.green('stencil g my-component')}
 `);
 };

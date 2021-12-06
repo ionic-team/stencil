@@ -3,12 +3,13 @@ import { basename, dirname, join, relative } from 'path';
 import { BuildContext } from '../build/build-ctx';
 import { getRollupOptions } from './bundle-output';
 import { OutputOptions, PartialResolvedId, rollup } from 'rollup';
+import { generatePreamble } from '@utils';
 
 export const devNodeModuleResolveId = async (
   config: d.Config,
   inMemoryFs: d.InMemoryFileSystem,
   resolvedId: PartialResolvedId,
-  importee: string,
+  importee: string
 ) => {
   if (!shouldCheckDevModule(resolvedId, importee)) {
     return resolvedId;
@@ -128,7 +129,7 @@ const bundleDevModule = async (
   config: d.Config,
   compilerCtx: d.CompilerCtx,
   parsedUrl: ParsedDevModuleUrl,
-  results: d.CompilerRequestResponse,
+  results: d.CompilerRequestResponse
 ) => {
   const buildCtx = new BuildContext(config, compilerCtx);
 
@@ -143,6 +144,7 @@ const bundleDevModule = async (
     const rollupBuild = await rollup(inputOpts);
 
     const outputOpts: OutputOptions = {
+      banner: generatePreamble(config),
       format: 'es',
     };
 
@@ -234,7 +236,7 @@ const parseDevModuleUrl = (config: d.Config, u: string) => {
 const getDevModuleCachePath = (config: d.Config, parsedUrl: ParsedDevModuleUrl) => {
   return join(
     config.cacheDir,
-    `dev_module_${parsedUrl.nodeModuleId}_${parsedUrl.nodeModuleVersion}_${DEV_MODULE_CACHE_BUSTER}.log`,
+    `dev_module_${parsedUrl.nodeModuleId}_${parsedUrl.nodeModuleVersion}_${DEV_MODULE_CACHE_BUSTER}.log`
   );
 };
 

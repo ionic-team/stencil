@@ -1,4 +1,4 @@
-import type { CliInitOptions, Config, TaskCommand } from '../declarations';
+import type * as d from '../declarations';
 import { dependencies } from '../compiler/sys/dependencies.json';
 import { findConfig } from './find-config';
 import { hasError, isFunction, shouldIgnoreError } from '@utils';
@@ -13,13 +13,16 @@ import { taskInfo } from './task-info';
 import { taskPrerender } from './task-prerender';
 import { taskServe } from './task-serve';
 import { taskTest } from './task-test';
+import { taskTelemetry } from './task-telemetry';
+import { telemetryAction } from './telemetry/telemetry';
 
-export const run = async (init: CliInitOptions) => {
+export const run = async (init: d.CliInitOptions) => {
   const { args, logger, sys } = init;
 
   try {
     const flags = parseFlags(args, sys);
     const task = flags.task;
+
     if (flags.debug || flags.verbose) {
       logger.setLevel('debug');
     }
@@ -33,7 +36,7 @@ export const run = async (init: CliInitOptions) => {
     }
 
     if (task === 'help' || flags.help) {
-      taskHelp(sys, logger);
+      await taskHelp({ flags: { task: 'help', args }, outputTargets: [] }, logger, sys);
       return;
     }
 
@@ -50,6 +53,7 @@ export const run = async (init: CliInitOptions) => {
       logger,
       dependencies: dependencies as any,
     });
+
     if (hasError(ensureDepsResults.diagnostics)) {
       logger.printDiagnostics(ensureDepsResults.diagnostics);
       return sys.exit(1);
@@ -67,7 +71,9 @@ export const run = async (init: CliInitOptions) => {
     loadedCompilerLog(sys, logger, flags, coreCompiler);
 
     if (task === 'info') {
-      taskInfo(coreCompiler, sys, logger);
+      await telemetryAction(sys, { flags: { task: 'info' }, outputTargets: [] }, logger, coreCompiler, async () => {
+        await taskInfo(coreCompiler, sys, logger);
+      });
       return;
     }
 
@@ -93,7 +99,9 @@ export const run = async (init: CliInitOptions) => {
 
     await sys.ensureResources({ rootDir: validated.config.rootDir, logger, dependencies: dependencies as any });
 
-    await runTask(coreCompiler, validated.config, task);
+    await telemetryAction(sys, validated.config, logger, coreCompiler, async () => {
+      await runTask(coreCompiler, validated.config, task, sys);
+    });
   } catch (e) {
     if (!shouldIgnoreError(e)) {
       logger.error(`uncaught cli error: ${e}${logger.getLevel() === 'debug' ? e.stack : ''}`);
@@ -102,26 +110,31 @@ export const run = async (init: CliInitOptions) => {
   }
 };
 
-export const runTask = async (coreCompiler: CoreCompiler, config: Config, task: TaskCommand) => {
-  config.flags = config.flags || {};
+export const runTask = async (
+  coreCompiler: CoreCompiler,
+  config: d.Config,
+  task: d.TaskCommand,
+  sys?: d.CompilerSystem
+) => {
+  config.flags = config.flags || { task };
   config.outputTargets = config.outputTargets || [];
 
   switch (task) {
     case 'build':
-      await taskBuild(coreCompiler, config);
+      await taskBuild(coreCompiler, config, sys);
       break;
 
     case 'docs':
       await taskDocs(coreCompiler, config);
       break;
 
-    case 'help':
-      taskHelp(config.sys, config.logger);
-      break;
-
     case 'generate':
     case 'g':
       await taskGenerate(coreCompiler, config);
+      break;
+
+    case 'help':
+      await taskHelp(config, config.logger, sys);
       break;
 
     case 'prerender':
@@ -130,6 +143,13 @@ export const runTask = async (coreCompiler: CoreCompiler, config: Config, task: 
 
     case 'serve':
       await taskServe(config);
+      break;
+
+    case 'telemetry':
+      // TODO(STENCIL-148) make this parameter no longer optional, remove the surrounding if statement
+      if (sys) {
+        await taskTelemetry(config, sys, config.logger);
+      }
       break;
 
     case 'test':
@@ -142,7 +162,7 @@ export const runTask = async (coreCompiler: CoreCompiler, config: Config, task: 
 
     default:
       config.logger.error(`${config.logger.emoji('❌ ')}Invalid stencil command, please see the options below:`);
-      taskHelp(config.sys, config.logger);
+      await taskHelp(config, config.logger, sys);
       return config.sys.exit(1);
   }
 };

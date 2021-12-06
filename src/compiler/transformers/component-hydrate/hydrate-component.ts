@@ -7,7 +7,11 @@ import { transformHostData } from '../host-data-transform';
 import { updateLazyComponentConstructor } from '../component-lazy/lazy-constructor';
 import ts from 'typescript';
 
-export const updateHydrateComponentClass = (classNode: ts.ClassDeclaration, moduleFile: d.Module, cmp: d.ComponentCompilerMeta) => {
+export const updateHydrateComponentClass = (
+  classNode: ts.ClassDeclaration,
+  moduleFile: d.Module,
+  cmp: d.ComponentCompilerMeta
+) => {
   return ts.updateClassDeclaration(
     classNode,
     classNode.decorators,
@@ -15,11 +19,15 @@ export const updateHydrateComponentClass = (classNode: ts.ClassDeclaration, modu
     classNode.name,
     classNode.typeParameters,
     classNode.heritageClauses,
-    updateHydrateHostComponentMembers(classNode, moduleFile, cmp),
+    updateHydrateHostComponentMembers(classNode, moduleFile, cmp)
   );
 };
 
-const updateHydrateHostComponentMembers = (classNode: ts.ClassDeclaration, moduleFile: d.Module, cmp: d.ComponentCompilerMeta) => {
+const updateHydrateHostComponentMembers = (
+  classNode: ts.ClassDeclaration,
+  moduleFile: d.Module,
+  cmp: d.ComponentCompilerMeta
+) => {
   const classMembers = removeStaticMetaProperties(classNode);
 
   updateLazyComponentConstructor(classMembers, moduleFile, cmp);

@@ -56,10 +56,11 @@ export const config: Config = {
     hydratedValue: '1',
   },
   env: {
-    'foo': 'bar',
-    'HOST': 'example.com'
+    foo: 'bar',
+    HOST: 'example.com',
   },
   enableCache: false,
   hashFileNames: false,
   buildEs5: 'prod',
+  sourceMap: true,
 };

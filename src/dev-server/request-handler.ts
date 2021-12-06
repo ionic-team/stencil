@@ -38,7 +38,7 @@ export function createRequestHandler(devServerConfig: d.DevServerConfig, serverC
             req,
             res,
             `invalid basePath`,
-            `404 File Not Found, base path: ${devServerConfig.basePath}`,
+            `404 File Not Found, base path: ${devServerConfig.basePath}`
           );
         }
 
@@ -86,9 +86,9 @@ export function createRequestHandler(devServerConfig: d.DevServerConfig, serverC
     }
 
     if (typeof userRequestHandler === 'function') {
-      userRequestHandler(incomingReq, res, defaultHandler);
+      await userRequestHandler(incomingReq, res, defaultHandler);
     } else {
-      defaultHandler();
+      await defaultHandler();
     }
   };
 }
@@ -129,7 +129,7 @@ function normalizeHttpRequest(devServerConfig: d.DevServerConfig, incomingReq: I
   if (req.url) {
     const parts = req.url.pathname.replace(/\\/g, '/').split('/');
 
-    req.pathname = parts.map(part => decodeURIComponent(part)).join('/');
+    req.pathname = parts.map((part) => decodeURIComponent(part)).join('/');
     if (req.pathname.length > 0 && !isDevClient(req.pathname)) {
       req.pathname = '/' + req.pathname.substring(devServerConfig.basePath.length);
     }

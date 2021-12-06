@@ -22,7 +22,6 @@
     "noUnusedParameters": true,
     "pretty": true,
     "target": "es2017",
-    "outDir": "www",
     "baseUrl": ".",
     "paths": {
       "@stencil/core": ["../../internal"],
@@ -35,7 +34,7 @@
     "test-app/**/*.spec.ts",
     "test-app/**/*.tsx",
     "test-app/util.ts",
-    "test-app/global.ts",
+    "test-app/global.ts"
   ],
   "exclude": [
     "test-prerender",

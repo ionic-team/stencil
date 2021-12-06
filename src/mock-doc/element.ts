@@ -82,6 +82,9 @@ export class MockAnchorElement extends MockHTMLElement {
   set href(value: string) {
     this.setAttribute('href', value);
   }
+  get pathname() {
+    return new URL(this.href).pathname;
+  }
 }
 
 export class MockButtonElement extends MockHTMLElement {
@@ -96,7 +99,7 @@ patchPropAttributes(
   },
   {
     type: 'submit',
-  },
+  }
 );
 
 export class MockImageElement extends MockHTMLElement {
@@ -104,10 +107,10 @@ export class MockImageElement extends MockHTMLElement {
     super(ownerDocument, 'img');
   }
 
-  get draggable() {
+  override get draggable() {
     return this.getAttributeNS(null, 'draggable') !== 'false';
   }
-  set draggable(value: boolean) {
+  override set draggable(value: boolean) {
     this.setAttributeNS(null, 'draggable', value);
   }
 
@@ -174,7 +177,7 @@ patchPropAttributes(
   },
   {
     type: 'text',
-  },
+  }
 );
 
 export class MockFormElement extends MockHTMLElement {
@@ -240,24 +243,24 @@ export class MockStyleElement extends MockHTMLElement {
     this.sheet = new MockCSSStyleSheet(this);
   }
 
-  get innerHTML() {
+  override get innerHTML() {
     return getStyleElementText(this);
   }
-  set innerHTML(value: string) {
+  override set innerHTML(value: string) {
     setStyleElementText(this, value);
   }
 
-  get innerText() {
+  override get innerText() {
     return getStyleElementText(this);
   }
-  set innerText(value: string) {
+  override set innerText(value: string) {
     setStyleElementText(this, value);
   }
 
-  get textContent() {
+  override get textContent() {
     return getStyleElementText(this);
   }
-  set textContent(value: string) {
+  override set textContent(value: string) {
     setStyleElementText(this, value);
   }
 }
@@ -315,14 +318,14 @@ export class MockTemplateElement extends MockHTMLElement {
     this.content = new MockDocumentFragment(ownerDocument);
   }
 
-  get innerHTML() {
+  override get innerHTML() {
     return this.content.innerHTML;
   }
-  set innerHTML(html: string) {
+  override set innerHTML(html: string) {
     this.content.innerHTML = html;
   }
 
-  cloneNode(deep?: boolean) {
+  override cloneNode(deep?: boolean) {
     const cloned = new MockTemplateElement(null);
     cloned.attributes = cloneAttributes(this.attributes);
 
@@ -411,7 +414,7 @@ function fullUrl(elm: MockElement, attrName: string) {
         try {
           const url = new URL(val, loc.href);
           return url.href;
-        } catch (e) { }
+        } catch (e) {}
       }
     }
   }
@@ -419,7 +422,7 @@ function fullUrl(elm: MockElement, attrName: string) {
 }
 
 function patchPropAttributes(prototype: any, attrs: any, defaults: any = {}) {
-  Object.keys(attrs).forEach(propName => {
+  Object.keys(attrs).forEach((propName) => {
     const attr = attrs[propName];
     const defaultValue = defaults[propName];
 

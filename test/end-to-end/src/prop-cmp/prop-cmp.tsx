@@ -10,7 +10,7 @@ import { saveAs } from 'file-saver';
     ios: 'prop-cmp.ios.css',
     md: 'prop-cmp.md.css',
   },
-  shadow: true
+  shadow: true,
 })
 export class PropCmp {
   @Prop() first: string;
@@ -28,6 +28,6 @@ export class PropCmp {
         </div>
         <button onClick={() => this.saveAs()}>File Save</button>
       </Host>
-    )
+    );
   }
 }

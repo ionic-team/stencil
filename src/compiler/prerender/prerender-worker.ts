@@ -125,7 +125,7 @@ export const prerenderWorker = async (sys: d.CompilerSystem, prerenderRequest: d
     if (hydrateOpts.hashAssets && !prerenderRequest.isDebug) {
       try {
         docPromises.push(
-          hashAssets(sys, prerenderCtx, results.diagnostics, hydrateOpts, prerenderRequest.appDir, doc, url),
+          hashAssets(sys, prerenderCtx, results.diagnostics, hydrateOpts, prerenderRequest.appDir, doc, url)
         );
       } catch (e) {
         catchError(results.diagnostics, e);
@@ -142,7 +142,7 @@ export const prerenderWorker = async (sys: d.CompilerSystem, prerenderRequest: d
         results.diagnostics,
         baseUrl,
         url,
-        hydrateResults.anchors,
+        hydrateResults.anchors
       );
     }
 
@@ -174,11 +174,11 @@ export const prerenderWorker = async (sys: d.CompilerSystem, prerenderRequest: d
       const pageDir = dirname(results.filePath);
 
       await Promise.all(
-        hydrateResults.staticData.map(async s => {
+        hydrateResults.staticData.map(async (s) => {
           if (s.type === 'application/json') {
             const data: any = {
               [s.id]: JSON.parse(s.content),
-              components: hydrateResults.components.map(c => c.tag),
+              components: hydrateResults.components.map((c) => c.tag),
             };
             const dataFileName = `${s.id}.json`;
             const dataFilePath = join(pageDir, dataFileName);
@@ -188,7 +188,7 @@ export const prerenderWorker = async (sys: d.CompilerSystem, prerenderRequest: d
             const contentFilePath = join(pageDir, contentFileName);
             await sys.writeFile(contentFilePath, s.content);
           }
-        }),
+        })
       );
     }
 

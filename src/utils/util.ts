@@ -1,5 +1,4 @@
 import type * as d from '../declarations';
-import { BANNER } from './constants';
 import { buildError } from './message-utils';
 import { dashToPascalCase, isString, toDashCase } from './helpers';
 
@@ -77,7 +76,7 @@ export const isJsFile = (filePath: string) => {
 
 export const hasFileExtension = (filePath: string, extensions: string[]) => {
   filePath = filePath.toLowerCase();
-  return extensions.some(ext => filePath.endsWith('.' + ext));
+  return extensions.some((ext) => filePath.endsWith('.' + ext));
 };
 
 export const isCssFile = (filePath: string) => {
@@ -88,42 +87,25 @@ export const isHtmlFile = (filePath: string) => {
   return hasFileExtension(filePath, ['html', 'htm']);
 };
 
-export const generatePreamble = (config: d.Config, opts: { prefix?: string; suffix?: string; defaultBanner?: boolean } = {}) => {
-  let preamble: string[] = [];
+/**
+ * Generate the preamble to be placed atop the main file of the build
+ * @param config the Stencil configuration file
+ * @return the generated preamble
+ */
+export const generatePreamble = (config: d.Config): string => {
+  const { preamble } = config;
 
-  if (config.preamble) {
-    preamble = config.preamble.split('\n');
+  if (!preamble) {
+    return '';
   }
 
-  if (typeof opts.prefix === 'string') {
-    opts.prefix.split('\n').forEach(c => {
-      preamble.push(c);
-    });
-  }
+  // generate the body of the JSDoc-style comment
+  const preambleComment: string[] = preamble.split('\n').map((l) => ` * ${l}`);
 
-  if (opts.defaultBanner === true) {
-    preamble.push(BANNER);
-  }
+  preambleComment.unshift(`/*!`);
+  preambleComment.push(` */`);
 
-  if (typeof opts.suffix === 'string') {
-    opts.suffix.split('\n').forEach(c => {
-      preamble.push(c);
-    });
-  }
-
-  if (preamble.length > 1) {
-    preamble = preamble.map(l => ` * ${l}`);
-
-    preamble.unshift(`/*!`);
-    preamble.push(` */`);
-
-    return preamble.join('\n');
-  }
-
-  if (opts.defaultBanner === true) {
-    return `/*! ${BANNER} */`;
-  }
-  return '';
+  return preambleComment.join('\n');
 };
 
 const lineBreakRegex = /\r?\n|\r/g;
@@ -133,14 +115,14 @@ export function getTextDocs(docs: d.CompilerJsDoc | undefined | null) {
   }
   return `${docs.text.replace(lineBreakRegex, ' ')}
 ${docs.tags
-  .filter(tag => tag.name !== 'internal')
-  .map(tag => `@${tag.name} ${(tag.text || '').replace(lineBreakRegex, ' ')}`)
+  .filter((tag) => tag.name !== 'internal')
+  .map((tag) => `@${tag.name} ${(tag.text || '').replace(lineBreakRegex, ' ')}`)
   .join('\n')}`.trim();
 }
 
 export const getDependencies = (buildCtx: d.BuildCtx) => {
   if (buildCtx.packageJson != null && buildCtx.packageJson.dependencies != null) {
-    return Object.keys(buildCtx.packageJson.dependencies).filter(pkgName => !SKIP_DEPS.includes(pkgName));
+    return Object.keys(buildCtx.packageJson.dependencies).filter((pkgName) => !SKIP_DEPS.includes(pkgName));
   }
   return [];
 };
@@ -164,7 +146,7 @@ export const readPackageJson = async (config: d.Config, compilerCtx: d.CompilerC
       }
     }
   } catch (e) {
-    if (!config.outputTargets.some(o => o.type.includes('dist'))) {
+    if (!config.outputTargets.some((o) => o.type.includes('dist'))) {
       const diagnostic = buildError(buildCtx.diagnostics);
       diagnostic.header = `Missing "package.json"`;
       diagnostic.messageText = `Valid "package.json" file is required for distribution: ${config.packageJsonFilePath}`;
@@ -172,7 +154,10 @@ export const readPackageJson = async (config: d.Config, compilerCtx: d.CompilerC
   }
 };
 
-export const parsePackageJson = (pkgJsonStr: string, pkgJsonFilePath: string): { diagnostic: d.Diagnostic; data: d.PackageJsonData; filePath: string } => {
+export const parsePackageJson = (
+  pkgJsonStr: string,
+  pkgJsonFilePath: string
+): { diagnostic: d.Diagnostic; data: d.PackageJsonData; filePath: string } => {
   if (isString(pkgJsonFilePath)) {
     return parseJson(pkgJsonStr, pkgJsonFilePath);
   }

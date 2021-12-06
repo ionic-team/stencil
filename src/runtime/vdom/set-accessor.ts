@@ -12,7 +12,14 @@ import { isComplexType } from '@utils';
 import { isMemberInElement, plt, win } from '@platform';
 import { VNODE_FLAGS, XLINK_NS } from '../runtime-constants';
 
-export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any, newValue: any, isSvg: boolean, flags: number) => {
+export const setAccessor = (
+  elm: HTMLElement,
+  memberName: string,
+  oldValue: any,
+  newValue: any,
+  isSvg: boolean,
+  flags: number
+) => {
   if (oldValue !== newValue) {
     let isProp = isMemberInElement(elm, memberName);
     let ln = memberName.toLowerCase();
@@ -21,8 +28,8 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
       const classList = elm.classList;
       const oldClasses = parseClassList(oldValue);
       const newClasses = parseClassList(newValue);
-      classList.remove(...oldClasses.filter(c => c && !newClasses.includes(c)));
-      classList.add(...newClasses.filter(c => c && !oldClasses.includes(c)));
+      classList.remove(...oldClasses.filter((c) => c && !newClasses.includes(c)));
+      classList.add(...newClasses.filter((c) => c && !oldClasses.includes(c)));
     } else if (BUILD.vdomStyle && memberName === 'style') {
       // update style attribute, css properties and values
       if (BUILD.updatable) {
@@ -53,7 +60,12 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
       if (newValue) {
         newValue(elm);
       }
-    } else if (BUILD.vdomListener && (BUILD.lazyLoad ? !isProp : !(elm as any).__lookupSetter__(memberName)) && memberName[0] === 'o' && memberName[1] === 'n') {
+    } else if (
+      BUILD.vdomListener &&
+      (BUILD.lazyLoad ? !isProp : !(elm as any).__lookupSetter__(memberName)) &&
+      memberName[0] === 'o' &&
+      memberName[1] === 'n'
+    ) {
       // Event Handlers
       // so if the member name starts with "on" and the 3rd characters is
       // a capital letter, and it's not already a member on the element,
@@ -98,14 +110,13 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
             // Workaround for Safari, moving the <input> caret when re-assigning the same valued
             if (memberName === 'list') {
               isProp = false;
-              // tslint:disable-next-line: triple-equals
             } else if (oldValue == null || (elm as any)[memberName] != n) {
               (elm as any)[memberName] = n;
             }
           } else {
             (elm as any)[memberName] = newValue;
           }
-        } catch (e) { }
+        } catch (e) {}
       }
 
       /**

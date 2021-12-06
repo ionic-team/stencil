@@ -42,7 +42,7 @@ describe('prerender', () => {
   });
 
   it('root slots', async () => {
-    app = await setupDom('/prerender/index.html', 500);
+    app = await setupDom('/prerender/index.html', 1000);
 
     const scoped = app.querySelector('cmp-client-scoped');
     const scopedStyle = getComputedStyle(scoped.querySelector('section'));
@@ -60,9 +60,7 @@ describe('prerender', () => {
     const greenTextStyle = getComputedStyle(greenText.querySelector('text-green'));
     expect(greenTextStyle.color).toBe('rgb(0, 255, 0)');
   });
-
 });
-
 
 function testScopedStyles(app: HTMLElement) {
   const cmpScopedA = app.querySelector('cmp-scoped-a');

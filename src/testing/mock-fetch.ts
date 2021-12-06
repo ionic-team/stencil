@@ -133,9 +133,9 @@ export const mockFetch = {
 };
 
 class MockResponse404 extends MockResponse {
-  ok = false;
-  status = 404;
-  statusText = 'Not Found';
+  override ok = false;
+  override status = 404;
+  override statusText = 'Not Found';
   constructor() {
     super('', {
       headers: new MockHeaders({
@@ -143,10 +143,10 @@ class MockResponse404 extends MockResponse {
       }),
     });
   }
-  async json() {
+  override async json() {
     return { status: 404, statusText: 'Not Found' };
   }
-  async text() {
+  override async text() {
     return 'Not Found';
   }
 }
@@ -158,4 +158,11 @@ interface MockedResponseData {
 
 const FETCH_DEFAULT_PATH = '/mock-fetch-data';
 
-export { MockHeaders, MockRequest, MockRequestInit, MockRequestInfo, MockResponse, MockResponseInit } from '../mock-doc';
+export {
+  MockHeaders,
+  MockRequest,
+  MockRequestInit,
+  MockRequestInfo,
+  MockResponse,
+  MockResponseInit,
+} from '../mock-doc';

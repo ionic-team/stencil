@@ -10,11 +10,16 @@ import { dirname, resolve } from 'path';
  * @param filePath the path of the component file
  * @param config general config that all of stencil uses
  */
-export const updateReferenceTypeImports = (importDataObj: d.TypesImportData, allTypes: Map<string, number>, cmp: d.ComponentCompilerMeta, filePath: string) => {
+export const updateReferenceTypeImports = (
+  importDataObj: d.TypesImportData,
+  allTypes: Map<string, number>,
+  cmp: d.ComponentCompilerMeta,
+  filePath: string
+) => {
   const updateImportReferences = updateImportReferenceFactory(allTypes, filePath);
 
   return [...cmp.properties, ...cmp.events, ...cmp.methods]
-    .filter(cmpProp => cmpProp.complexType && cmpProp.complexType.references)
+    .filter((cmpProp) => cmpProp.complexType && cmpProp.complexType.references)
     .reduce((obj, cmpProp) => {
       return updateImportReferences(obj, cmpProp.complexType.references);
     }, importDataObj);
@@ -33,7 +38,7 @@ const updateImportReferenceFactory = (allTypes: Map<string, number>, filePath: s
 
   return (obj: d.TypesImportData, typeReferences: { [key: string]: d.ComponentCompilerTypeReference }) => {
     Object.keys(typeReferences)
-      .map(typeName => {
+      .map((typeName) => {
         return [typeName, typeReferences[typeName]] as [string, d.ComponentCompilerTypeReference];
       })
       .forEach(([typeName, type]) => {
@@ -58,7 +63,7 @@ const updateImportReferenceFactory = (allTypes: Map<string, number>, filePath: s
         obj[importFileLocation] = obj[importFileLocation] || [];
 
         // If this file already has a reference to this type move on
-        if (obj[importFileLocation].find(df => df.localName === typeName)) {
+        if (obj[importFileLocation].find((df) => df.localName === typeName)) {
           return;
         }
 

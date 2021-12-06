@@ -1,6 +1,14 @@
-import type { TranspileOptions, TranspileResults, Config, TransformOptions, TransformCssToEsmInput, ImportData, CompilerSystem } from '../../declarations';
+import type {
+  TranspileOptions,
+  TranspileResults,
+  Config,
+  TransformOptions,
+  TransformCssToEsmInput,
+  ImportData,
+  CompilerSystem,
+} from '../../declarations';
 import { createSystem } from '../sys/stencil-sys';
-import { IS_DENO_ENV, IS_NODE_ENV, requireFunc } from '../sys/environment';
+import { IS_NODE_ENV, requireFunc } from '../sys/environment';
 import { isString } from '@utils';
 import { parseImportPath } from '../transformers/stencil-import-path';
 import { STENCIL_INTERNAL_CLIENT_ID } from '../bundle/entry-alias-ids';
@@ -37,8 +45,6 @@ export const getTranspileConfig = (input: TranspileOptions) => {
   } else if (!transpileCtx.sys) {
     if (IS_NODE_ENV) {
       transpileCtx.sys = requireFunc('../sys/node/index.js').createNodeSys();
-    } else if (IS_DENO_ENV) {
-      throw new Error(`"sys" must be provided in options`);
     } else {
       transpileCtx.sys = createSystem();
     }
@@ -48,7 +54,9 @@ export const getTranspileConfig = (input: TranspileOptions) => {
     componentExport: getTranspileConfigOpt(input.componentExport, VALID_EXPORT, 'customelement'),
     componentMetadata: getTranspileConfigOpt(input.componentMetadata, VALID_METADATA, null),
     coreImportPath: isString(input.coreImportPath) ? input.coreImportPath : STENCIL_INTERNAL_CLIENT_ID,
-    currentDirectory: isString(input.currentDirectory) ? input.currentDirectory : transpileCtx.sys.getCurrentDirectory(),
+    currentDirectory: isString(input.currentDirectory)
+      ? input.currentDirectory
+      : transpileCtx.sys.getCurrentDirectory(),
     file: input.file,
     proxy: getTranspileConfigOpt(input.proxy, VALID_PROXY, 'defineproperty'),
     module: getTranspileConfigOpt(input.module, VALID_MODULE, 'esm'),
@@ -131,7 +139,11 @@ export const getTranspileConfig = (input: TranspileOptions) => {
   };
 };
 
-export const getTranspileCssConfig = (compileOpts: TranspileOptions, importData: ImportData, results: TranspileResults) => {
+export const getTranspileCssConfig = (
+  compileOpts: TranspileOptions,
+  importData: ImportData,
+  results: TranspileResults
+) => {
   const transformInput: TransformCssToEsmInput = {
     file: results.inputFilePath,
     input: results.code,

@@ -15,7 +15,7 @@ export const runTsProgram = async (
   config: d.Config,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
-  tsBuilder: ts.BuilderProgram,
+  tsBuilder: ts.BuilderProgram
 ) => {
   const tsSyntactic = loadTypeScriptDiagnostics(tsBuilder.getSyntacticDiagnostics());
   const tsGlobal = loadTypeScriptDiagnostics(tsBuilder.getGlobalDiagnostics());
@@ -34,14 +34,14 @@ export const runTsProgram = async (
   const typesOutputTarget = config.outputTargets.filter(isOutputTargetDistTypes);
   const emittedDts: string[] = [];
   const emitCallback: ts.WriteFileCallback = (emitFilePath, data, _w, _e, tsSourceFiles) => {
-    if (emitFilePath.endsWith('.js')) {
+    if (emitFilePath.endsWith('.js') || emitFilePath.endsWith('js.map')) {
       updateModule(config, compilerCtx, buildCtx, tsSourceFiles[0], data, emitFilePath, tsTypeChecker, null);
     } else if (emitFilePath.endsWith('.d.ts')) {
       const srcDtsPath = normalizePath(tsSourceFiles[0].fileName);
       const relativeEmitFilepath = getRelativeDts(config, srcDtsPath, emitFilePath);
 
       emittedDts.push(srcDtsPath);
-      typesOutputTarget.forEach(o => {
+      typesOutputTarget.forEach((o) => {
         const distPath = join(o.typesDir, relativeEmitFilepath);
         data = updateStencilTypesImports(o.typesDir, distPath, data);
         compilerCtx.fs.writeFile(distPath, data);
@@ -80,18 +80,18 @@ export const runTsProgram = async (
     // but we still want to ship them in the dist directory
     const srcRootDtsFiles = tsProgram
       .getRootFileNames()
-      .filter(f => f.endsWith('.d.ts') && !f.endsWith('components.d.ts'))
+      .filter((f) => f.endsWith('.d.ts') && !f.endsWith('components.d.ts'))
       .map(normalizePath)
-      .filter(f => !emittedDts.includes(f))
-      .map(srcRootDtsFilePath => {
+      .filter((f) => !emittedDts.includes(f))
+      .map((srcRootDtsFilePath) => {
         const relativeEmitFilepath = relative(config.srcDir, srcRootDtsFilePath);
         return Promise.all(
-          typesOutputTarget.map(async o => {
+          typesOutputTarget.map(async (o) => {
             const distPath = join(o.typesDir, relativeEmitFilepath);
             let dtsContent = await compilerCtx.fs.readFile(srcRootDtsFilePath);
             dtsContent = updateStencilTypesImports(o.typesDir, distPath, dtsContent);
             await compilerCtx.fs.writeFile(distPath, dtsContent);
-          }),
+          })
         );
       });
 
@@ -101,7 +101,7 @@ export const runTsProgram = async (
   if (config.validateTypes) {
     const tsSemantic = loadTypeScriptDiagnostics(tsBuilder.getSemanticDiagnostics());
     if (config.devMode) {
-      tsSemantic.forEach(semanticDiagnostic => {
+      tsSemantic.forEach((semanticDiagnostic) => {
         // Unused variable errors become warnings in dev mode
         if (semanticDiagnostic.code === '6133' || semanticDiagnostic.code === '6192') {
           semanticDiagnostic.level = 'warn';

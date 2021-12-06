@@ -1,10 +1,9 @@
 import { Component, State, h } from '@stencil/core';
 
 @Component({
-  tag: 'shadow-dom-array-root'
+  tag: 'shadow-dom-array-root',
 })
 export class ShadowDomArrayRoot {
-
   @State() values: number[] = [0];
 
   addValue() {
@@ -15,7 +14,7 @@ export class ShadowDomArrayRoot {
     return (
       <div>
         <button onClick={this.addValue.bind(this)}>Add Value</button>
-        <shadow-dom-array values={this.values} class='results1'/>
+        <shadow-dom-array values={this.values} class="results1" />
       </div>
     );
   }

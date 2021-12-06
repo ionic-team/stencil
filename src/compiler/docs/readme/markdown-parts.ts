@@ -13,7 +13,7 @@ export const partsToMarkdown = (parts: d.JsonDocsSlot[]) => {
   const table = new MarkdownTable();
   table.addHeader(['Part', 'Description']);
 
-  parts.forEach(style => {
+  parts.forEach((style) => {
     table.addRow([style.name === '' ? '' : `\`"${style.name}"\``, style.docs]);
   });
 

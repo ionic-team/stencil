@@ -1,5 +1,5 @@
 import { TranspileOptions, TranspileResults, Config, TransformOptions, TransformCssToEsmInput } from '../declarations';
-import { catchError, isString } from '@utils';
+import { catchError, getInlineSourceMappingUrlLinker, isString } from '@utils';
 import { getPublicCompilerMeta } from './transformers/add-component-meta-static';
 import { getTranspileCssConfig, getTranspileConfig, getTranspileResults } from './config/transpile-options';
 import { patchTypescript } from './sys/typescript/typescript-sys';
@@ -53,7 +53,12 @@ export const transpileSync = (code: string, opts: TranspileOptions = {}) => {
   return results;
 };
 
-const transpileCode = (config: Config, transpileOpts: TranspileOptions, transformOpts: TransformOptions, results: TranspileResults) => {
+const transpileCode = (
+  config: Config,
+  transpileOpts: TranspileOptions,
+  transformOpts: TransformOptions,
+  results: TranspileResults
+) => {
   const transpileResults = transpileModule(config, results.code, transformOpts);
 
   results.diagnostics.push(...transpileResults.diagnostics);
@@ -69,10 +74,9 @@ const transpileCode = (config: Config, transpileOpts: TranspileOptions, transfor
         mapObject.sources = [transpileOpts.file];
         delete mapObject.sourceRoot;
 
-        const mapBase64 = Buffer.from(JSON.stringify(mapObject), 'utf8').toString('base64');
-        const sourceMapInlined = `data:application/json;charset=utf-8;base64,` + mapBase64;
         const sourceMapComment = results.code.lastIndexOf('//#');
-        results.code = results.code.slice(0, sourceMapComment) + '//# sourceMappingURL=' + sourceMapInlined;
+        results.code =
+          results.code.slice(0, sourceMapComment) + getInlineSourceMappingUrlLinker(JSON.stringify(mapObject));
       } catch (e) {
         console.error(e);
       }
@@ -87,11 +91,11 @@ const transpileCode = (config: Config, transpileOpts: TranspileOptions, transfor
   if (moduleFile) {
     results.outputFilePath = moduleFile.jsFilePath;
 
-    moduleFile.cmps.forEach(cmp => {
+    moduleFile.cmps.forEach((cmp) => {
       results.data.push(getPublicCompilerMeta(cmp));
     });
 
-    moduleFile.originalImports.forEach(originalImport => {
+    moduleFile.originalImports.forEach((originalImport) => {
       results.imports.push({
         path: originalImport,
       });
@@ -103,7 +107,7 @@ const transpileCss = async (transformInput: TransformCssToEsmInput, results: Tra
   const cssResults = await transformCssToEsm(transformInput);
   results.code = cssResults.output;
   results.map = cssResults.map;
-  results.imports = cssResults.imports.map(p => ({ path: p.importPath }));
+  results.imports = cssResults.imports.map((p) => ({ path: p.importPath }));
   results.diagnostics.push(...cssResults.diagnostics);
 };
 
@@ -111,7 +115,7 @@ const transpileCssSync = (transformInput: TransformCssToEsmInput, results: Trans
   const cssResults = transformCssToEsmSync(transformInput);
   results.code = cssResults.output;
   results.map = cssResults.map;
-  results.imports = cssResults.imports.map(p => ({ path: p.importPath }));
+  results.imports = cssResults.imports.map((p) => ({ path: p.importPath }));
   results.diagnostics.push(...cssResults.diagnostics);
 };
 

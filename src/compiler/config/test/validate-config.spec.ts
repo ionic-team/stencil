@@ -258,13 +258,13 @@ describe('validation', () => {
 
   it('should set default generateDocs to false', () => {
     const { config } = validateConfig(userConfig);
-    expect(config.outputTargets.some(o => o.type === 'docs')).toBe(false);
+    expect(config.outputTargets.some((o) => o.type === 'docs')).toBe(false);
   });
 
   it('should default dist false and www true', () => {
     const { config } = validateConfig(userConfig);
-    expect(config.outputTargets.some(o => o.type === 'dist')).toBe(false);
-    expect(config.outputTargets.some(o => o.type === 'www')).toBe(true);
+    expect(config.outputTargets.some((o) => o.type === 'dist')).toBe(false);
+    expect(config.outputTargets.some((o) => o.type === 'www')).toBe(true);
   });
 
   it('should set devInspector false', () => {
@@ -293,13 +293,13 @@ describe('validation', () => {
 
   it('should set default generateDocs to false', () => {
     const { config } = validateConfig(userConfig);
-    expect(config.outputTargets.some(o => o.type === 'docs')).toBe(false);
+    expect(config.outputTargets.some((o) => o.type === 'docs')).toBe(false);
   });
 
   it('should default dist false and www true', () => {
     const { config } = validateConfig(userConfig);
-    expect(config.outputTargets.some(o => o.type === 'dist')).toBe(false);
-    expect(config.outputTargets.some(o => o.type === 'www')).toBe(true);
+    expect(config.outputTargets.some((o) => o.type === 'dist')).toBe(false);
+    expect(config.outputTargets.some((o) => o.type === 'www')).toBe(true);
   });
 
   it('should error for invalid outputTarget type', () => {
@@ -312,9 +312,22 @@ describe('validation', () => {
     expect(validated.diagnostics).toHaveLength(1);
   });
 
+  it('should warn when dist-custom-elements-bundle is found', () => {
+    userConfig.outputTargets = [
+      {
+        type: 'dist-custom-elements-bundle',
+      },
+    ];
+    const validated = validateConfig(userConfig);
+    expect(validated.diagnostics).toHaveLength(1);
+    expect(validated.diagnostics[0].messageText).toBe(
+      'dist-custom-elements-bundle is deprecated and will be removed in a future major version release. Use "dist-custom-elements" instead. If "dist-custom-elements" does not meet your needs, please add a comment to https://github.com/ionic-team/stencil/issues/3136.'
+    );
+  });
+
   it('should default outputTargets with www', () => {
     const { config } = validateConfig(userConfig);
-    expect(config.outputTargets.some(o => o.type === 'www')).toBe(true);
+    expect(config.outputTargets.some((o) => o.type === 'www')).toBe(true);
   });
 
   it('should set extras defaults', () => {
@@ -369,5 +382,24 @@ describe('validation', () => {
     expect(isWatchIgnorePath(config, '/some/image.jpg')).toBe(true);
     expect(isWatchIgnorePath(config, '/some/image.png')).toBe(true);
     expect(isWatchIgnorePath(config, '/some/typescript.ts')).toBe(false);
+  });
+
+  describe('sourceMap', () => {
+    it('sets the field to true when the set to true in the config', () => {
+      userConfig.sourceMap = true;
+      const { config } = validateConfig(userConfig);
+      expect(config.sourceMap).toBe(true);
+    });
+
+    it('sets the field to false when set to false in the config', () => {
+      userConfig.sourceMap = false;
+      const { config } = validateConfig(userConfig);
+      expect(config.sourceMap).toBe(false);
+    });
+
+    it('defaults the field to false when not set in the config', () => {
+      const { config } = validateConfig(userConfig);
+      expect(config.sourceMap).toBe(false);
+    });
   });
 });

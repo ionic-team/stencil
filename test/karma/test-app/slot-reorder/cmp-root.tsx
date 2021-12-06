@@ -1,11 +1,9 @@
 import { Component, State, h } from '@stencil/core';
 
-
 @Component({
-  tag: 'slot-reorder-root'
+  tag: 'slot-reorder-root',
 })
 export class SlotReorderRoot {
-
   @State() reordered = false;
 
   testClick() {
@@ -15,36 +13,34 @@ export class SlotReorderRoot {
   render() {
     return (
       <div>
-        <button onClick={this.testClick.bind(this)} class='test'>
+        <button onClick={this.testClick.bind(this)} class="test">
           Test
         </button>
 
-        <slot-reorder class='results1' reordered={this.reordered}></slot-reorder>
+        <slot-reorder class="results1" reordered={this.reordered}></slot-reorder>
 
-        <hr/>
+        <hr />
 
-        <slot-reorder class='results2' reordered={this.reordered}>
+        <slot-reorder class="results2" reordered={this.reordered}>
           <div>default content</div>
         </slot-reorder>
 
-        <hr/>
+        <hr />
 
-        <slot-reorder class='results3' reordered={this.reordered}>
-          <div slot='slot-b'>slot-b content</div>
+        <slot-reorder class="results3" reordered={this.reordered}>
+          <div slot="slot-b">slot-b content</div>
           <div>default content</div>
-          <div slot='slot-a'>slot-a content</div>
+          <div slot="slot-a">slot-a content</div>
         </slot-reorder>
 
-        <hr/>
+        <hr />
 
-        <slot-reorder class='results4' reordered={this.reordered}>
-          <div slot='slot-b'>slot-b content</div>
-          <div slot='slot-a'>slot-a content</div>
+        <slot-reorder class="results4" reordered={this.reordered}>
+          <div slot="slot-b">slot-b content</div>
+          <div slot="slot-a">slot-a content</div>
           <div>default content</div>
         </slot-reorder>
-
       </div>
     );
   }
-
 }

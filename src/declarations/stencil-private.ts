@@ -1,3 +1,4 @@
+import { BuildResultsComponentGraph } from '.';
 import type {
   BuildEvents,
   BuildLog,
@@ -22,6 +23,7 @@ import type {
   PrerenderConfig,
   StyleDoc,
   LoggerLineUpdater,
+  TaskCommand,
 } from './stencil-public-compiler';
 
 import type {
@@ -31,6 +33,16 @@ import type {
   VNode,
   VNodeData,
 } from './stencil-public-runtime';
+
+export interface SourceMap {
+  file: string;
+  mappings: string;
+  names: string[];
+  sourceRoot?: string;
+  sources: string[];
+  sourcesContent?: string[];
+  version: number;
+}
 
 export interface PrintLine {
   lineIndex: number;
@@ -152,6 +164,7 @@ export interface BuildConditionals extends Partial<BuildFeatures> {
   isTesting?: boolean;
   isDev?: boolean;
   devTools?: boolean;
+  invisiblePrehydration?: boolean;
   hydrateServerSide?: boolean;
   hydrateClientSide?: boolean;
   lifecycleDOMEvents?: boolean;
@@ -162,6 +175,7 @@ export interface BuildConditionals extends Partial<BuildFeatures> {
   constructableCSS?: boolean;
   appendChildSlotFix?: boolean;
   slotChildNodesFix?: boolean;
+  scopedSlotTextContentFix?: boolean;
   cloneNodeFix?: boolean;
   dynamicImportShim?: boolean;
   hydratedAttribute?: boolean;
@@ -194,13 +208,24 @@ export interface RollupResults {
   modules: RollupResultModule[];
 }
 
+export interface UpdatedLazyBuildCtx {
+  name: 'esm-browser' | 'esm' | 'cjs' | 'system';
+  buildCtx: BuildCtx;
+}
+
 export interface BuildCtx {
   buildId: number;
   buildResults: CompilerBuildResults;
+  buildStats?: CompilerBuildStats | { diagnostics: Diagnostic[] };
   buildMessages: string[];
   bundleBuildCount: number;
   collections: Collection[];
   compilerCtx: CompilerCtx;
+  esmBrowserComponentBundle: ReadonlyArray<BundleModule>;
+  esmComponentBundle: ReadonlyArray<BundleModule>;
+  es5ComponentBundle: ReadonlyArray<BundleModule>;
+  systemComponentBundle: ReadonlyArray<BundleModule>;
+  commonJsComponentBundle: ReadonlyArray<BundleModule>;
   components: ComponentCompilerMeta[];
   componentGraph: Map<string, string[]>;
   config: Config;
@@ -260,7 +285,8 @@ export type BuildTask = any;
 
 export type BuildStatus = 'pending' | 'error' | 'disabled' | 'default';
 
-export interface BuildStats {
+export interface CompilerBuildStats {
+  timestamp: string;
   compiler: {
     name: string;
     version: string;
@@ -271,23 +297,41 @@ export interface BuildStats {
     components: number;
     entries: number;
     bundles: number;
+    outputs: any;
   };
   options: {
     minifyJs: boolean;
     minifyCss: boolean;
     hashFileNames: boolean;
     hashedFileNameLength: number;
-    buildEs5: boolean;
+    buildEs5: boolean | 'prod';
+  };
+  formats: {
+    esmBrowser: ReadonlyArray<CompilerBuildStatBundle>;
+    esm: ReadonlyArray<CompilerBuildStatBundle>;
+    es5: ReadonlyArray<CompilerBuildStatBundle>;
+    system: ReadonlyArray<CompilerBuildStatBundle>;
+    commonjs: ReadonlyArray<CompilerBuildStatBundle>;
   };
   components: BuildComponent[];
-  entries: BuildEntry[];
+  entries: EntryModule[];
   rollupResults: RollupResults;
-  sourceGraph: BuildSourceGraph;
+  sourceGraph?: BuildSourceGraph;
+  componentGraph: BuildResultsComponentGraph;
   collections: {
     name: string;
     source: string;
     tags: string[];
   }[];
+}
+
+export interface CompilerBuildStatBundle {
+  key: string;
+  components: string[];
+  bundleId: string;
+  fileName: string;
+  imports: string[];
+  originalByteSize: number;
 }
 
 export interface BuildEntry {
@@ -344,6 +388,13 @@ export interface BundleEntryInputs {
   [entryKey: string]: string;
 }
 
+/**
+ * A note regarding Rollup types:
+ * As of this writing, there is no great way to import external types for packages that are directly embedded in the
+ * Stencil source. As a result, some types are duplicated here for Rollup that will be used within the codebase.
+ * Updates to rollup may require these typings to be updated.
+ */
+
 export type RollupResult = RollupChunkResult | RollupAssetResult;
 
 export interface RollupAssetResult {
@@ -364,7 +415,28 @@ export interface RollupChunkResult {
   isBrowserLoader: boolean;
   imports: string[];
   moduleFormat: ModuleFormat;
+  map?: RollupSourceMap;
 }
+
+export interface RollupSourceMap {
+  file: string;
+  mappings: string;
+  names: string[];
+  sources: string[];
+  sourcesContent: string[];
+  version: number;
+  toString(): string;
+  toUrl(): string;
+}
+
+/**
+ * Result of Stencil compressing, mangling, and otherwise 'minifying' JavaScript
+ */
+export type OptimizeJsResult = {
+  output: string;
+  diagnostics: Diagnostic[];
+  sourceMap?: SourceMap;
+};
 
 export interface BundleModule {
   entryKey: string;
@@ -713,6 +785,7 @@ export interface ComponentCompilerMeta extends ComponentCompilerFeatures {
   isCollectionDependency: boolean;
   docs: CompilerJsDoc;
   jsFilePath: string;
+  sourceMapPath: string;
   listeners: ComponentCompilerListener[];
   events: ComponentCompilerEvent[];
   methods: ComponentCompilerMethod[];
@@ -1040,15 +1113,15 @@ export type InitServerProcess = (sendMsg: (msg: DevServerMessage) => void) => (m
 
 export interface DevResponseHeaders {
   'cache-control'?: string;
-  'expires'?: string;
+  expires?: string;
   'content-type'?: string;
   'content-length'?: number;
-  'date'?: string;
+  date?: string;
   'access-control-allow-origin'?: string;
   'access-control-expose-headers'?: string;
   'content-encoding'?: 'gzip';
-  'vary'?: 'Accept-Encoding';
-  'server'?: string;
+  vary?: 'Accept-Encoding';
+  server?: string;
   'x-directory-index'?: string;
   'x-source'?: string;
 }
@@ -1219,9 +1292,7 @@ export interface InMemoryFileSystem {
   /* new compiler */
   sys?: CompilerSystem;
 
-  accessData(
-    filePath: string,
-  ): Promise<{
+  accessData(filePath: string): Promise<{
     exists: boolean;
     isDirectory: boolean;
     isFile: boolean;
@@ -1244,9 +1315,7 @@ export interface InMemoryFileSystem {
    */
   readFileSync(filePath: string, opts?: FsReadOptions): string;
   remove(itemPath: string): Promise<void>;
-  stat(
-    itemPath: string,
-  ): Promise<{
+  stat(itemPath: string): Promise<{
     isFile: boolean;
     isDirectory: boolean;
   }>;
@@ -1255,9 +1324,7 @@ export interface InMemoryFileSystem {
    * (Only typescript transpiling is allowed to use)
    * @param itemPath
    */
-  statSync(
-    itemPath: string,
-  ): {
+  statSync(itemPath: string): {
     exists: boolean;
     isFile: boolean;
     isDirectory: boolean;
@@ -1269,7 +1336,7 @@ export interface InMemoryFileSystem {
           [filePath: string]: string;
         }
       | Map<string, String>,
-    opts?: FsWriteOptions,
+    opts?: FsWriteOptions
   ): Promise<FsWriteResults[]>;
   commit(): Promise<{
     filesWritten: string[];
@@ -1403,6 +1470,8 @@ export interface Module {
   sourceFilePath: string;
   staticSourceFile: any;
   staticSourceFileText: string;
+  sourceMapPath: string;
+  sourceMapFileText: string;
 
   // build features
   hasVdomAttribute: boolean;
@@ -1426,7 +1495,7 @@ export interface Plugin {
   transform?: (
     sourceText: string,
     id: string,
-    context: PluginCtx,
+    context: PluginCtx
   ) => Promise<PluginTransformResults> | PluginTransformResults | string;
 }
 
@@ -1507,7 +1576,7 @@ export interface RenderNode extends HostElement {
 
   /**
    * Is a slot reference node:
-   * This is a node that represents where a slots
+   * This is a node that represents where a slot
    * was originally located.
    */
   ['s-sr']?: boolean;
@@ -1566,7 +1635,7 @@ export type LazyBundlesRuntimeData = LazyBundleRuntimeData[];
 export type LazyBundleRuntimeData = [
   /** bundleIds */
   string,
-  ComponentRuntimeMetaCompact[],
+  ComponentRuntimeMetaCompact[]
 ];
 
 export type ComponentRuntimeMetaCompact = [
@@ -1580,7 +1649,7 @@ export type ComponentRuntimeMetaCompact = [
   { [memberName: string]: ComponentRuntimeMember }?,
 
   /** listeners */
-  ComponentRuntimeHostListener[]?,
+  ComponentRuntimeHostListener[]?
 ];
 
 export interface ComponentRuntimeMeta {
@@ -1606,7 +1675,7 @@ export type ComponentRuntimeMember = [
   /**
    * attribute name to observe
    */
-  string?,
+  string?
 ];
 
 export type ComponentRuntimeHostListener = [
@@ -1623,7 +1692,7 @@ export type ComponentRuntimeHostListener = [
   /**
    * event method,
    */
-  string,
+  string
 ];
 
 export type ModeBundleId = ModeBundleIds | string;
@@ -1634,6 +1703,9 @@ export interface ModeBundleIds {
 
 export type RuntimeRef = HostElement | {};
 
+/**
+ * Interface used to track an Element, it's virtual Node (`VNode`), and other data
+ */
 export interface HostRef {
   $ancestorComponent$?: HostElement;
   $flags$: number;
@@ -1664,13 +1736,13 @@ export interface PlatformRuntime {
     el: EventTarget,
     eventName: string,
     listener: EventListenerOrEventListenerObject,
-    options: boolean | AddEventListenerOptions,
+    options: boolean | AddEventListenerOptions
   ) => void;
   rel: (
     el: EventTarget,
     eventName: string,
     listener: EventListenerOrEventListenerObject,
-    options: boolean | AddEventListenerOptions,
+    options: boolean | AddEventListenerOptions
   ) => void;
   ce: (eventName: string, opts?: any) => CustomEvent;
 }
@@ -1694,7 +1766,7 @@ export interface ScreenshotConnector {
   getScreenshotCache(): Promise<ScreenshotCache>;
   updateScreenshotCache(
     screenshotCache: ScreenshotCache,
-    buildResults: ScreenshotBuildResults,
+    buildResults: ScreenshotBuildResults
   ): Promise<ScreenshotCache>;
   generateJsonpDataUris(build: ScreenshotBuild): Promise<void>;
   sortScreenshots(screenshots: Screenshot[]): Screenshot[];
@@ -1976,38 +2048,38 @@ export interface TransformCssToEsmOutput {
 }
 
 export interface PackageJsonData {
-  'name'?: string;
-  'version'?: string;
-  'main'?: string;
-  'description'?: string;
-  'bin'?: { [key: string]: string };
-  'browser'?: string;
-  'module'?: string;
+  name?: string;
+  version?: string;
+  main?: string;
+  description?: string;
+  bin?: { [key: string]: string };
+  browser?: string;
+  module?: string;
   'jsnext:main'?: string;
   'collection:main'?: string;
-  'unpkg'?: string;
-  'collection'?: string;
-  'types'?: string;
-  'files'?: string[];
+  unpkg?: string;
+  collection?: string;
+  types?: string;
+  files?: string[];
   ['dist-tags']?: {
     latest: string;
   };
-  'dependencies'?: {
+  dependencies?: {
     [moduleId: string]: string;
   };
-  'devDependencies'?: {
+  devDependencies?: {
     [moduleId: string]: string;
   };
-  'repository'?: {
+  repository?: {
     type?: string;
     url?: string;
   };
-  'private'?: boolean;
-  'scripts'?: {
+  private?: boolean;
+  scripts?: {
     [runName: string]: string;
   };
-  'license'?: string;
-  'keywords'?: string[];
+  license?: string;
+  keywords?: string[];
 }
 
 export interface Workbox {
@@ -2213,7 +2285,7 @@ export interface JestEnvironmentGlobal {
     fullName: string;
     testPath: string;
   };
-  env: {[prop: string]: string};
+  env: { [prop: string]: string };
   screenshotDescriptions: Set<string>;
 }
 
@@ -2413,8 +2485,8 @@ export interface CompilerWorkerContext {
     input: string,
     minifyOpts: any,
     transpile: boolean,
-    inlineHelpers: boolean,
-  ): Promise<{ output: string; diagnostics: Diagnostic[] }>;
+    inlineHelpers: boolean
+  ): Promise<{ output: string; diagnostics: Diagnostic[]; sourceMap?: SourceMap }>;
   prerenderWorker(prerenderRequest: PrerenderUrlRequest): Promise<PrerenderUrlResults>;
   transformCssToEsm(input: TransformCssToEsmInput): Promise<TransformCssToEsmOutput>;
 }
@@ -2484,4 +2556,59 @@ export interface ValidateTypesResults {
   diagnostics: Diagnostic[];
   dirPaths: string[];
   filePaths: string[];
+}
+
+export interface TerminalInfo {
+  /**
+   * Whether this is in CI or not.
+   */
+  readonly ci: boolean;
+  /**
+   * Whether the terminal is an interactive TTY or not.
+   */
+  readonly tty: boolean;
+}
+
+/**
+ * The task to run in order to collect the duration data point.
+ */
+export type TelemetryCallback = (...args: any[]) => void | Promise<void>;
+
+/**
+ * The model for the data that's tracked.
+ */
+export interface TrackableData {
+  yarn: boolean;
+  component_count?: number;
+  arguments: string[];
+  targets: string[];
+  task: TaskCommand;
+  duration_ms: number;
+  packages: string[];
+  packages_no_versions?: string[];
+  os_name: string;
+  os_version: string;
+  cpu_model: string;
+  typescript: string;
+  rollup: string;
+  system: string;
+  system_major?: string;
+  build: string;
+  stencil: string;
+  has_app_pwa_config: boolean;
+}
+
+/**
+ * Used as the object sent to the server. Value is the data tracked.
+ */
+export interface Metric {
+  name: string;
+  timestamp: string;
+  source: 'stencil_cli';
+  value: TrackableData;
+  session_id: string;
+}
+export interface TelemetryConfig {
+  'telemetry.stencil'?: boolean;
+  'tokens.telemetry'?: string;
 }

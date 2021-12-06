@@ -43,6 +43,7 @@ export function mockConfig(sys?: CompilerSystem) {
     nodeResolve: {
       customResolveOptions: {},
     },
+    sourceMap: true,
   };
 
   return config;
@@ -136,12 +137,7 @@ export function mockLogger() {
   return new TestingLogger();
 }
 
-export interface TestingSystem extends CompilerSystem {
-  diskReads: number;
-  diskWrites: number;
-}
-
-export function mockStencilSystem(): TestingSystem {
+export function mockStencilSystem(): CompilerSystem {
   return createTestingSystem();
 }
 
@@ -152,5 +148,5 @@ export function mockDocument(html: string = null) {
 
 export function mockWindow(html: string = null) {
   const win = new MockWindow(html);
-  return (win as any) as Window;
+  return win as any as Window;
 }

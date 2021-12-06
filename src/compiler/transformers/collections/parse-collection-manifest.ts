@@ -9,7 +9,7 @@ export const parseCollectionManifest = (
   buildCtx: d.BuildCtx,
   collectionName: string,
   collectionDir: string,
-  collectionJsonStr: string,
+  collectionJsonStr: string
 ) => {
   const collectionManifest: d.CollectionManifest = JSON.parse(collectionJsonStr);
 
@@ -35,7 +35,7 @@ export const parseCollectionManifest = (
 };
 
 export const parseCollectionDependencies = (collectionManifest: d.CollectionManifest) => {
-  return (collectionManifest.collections || []).map(c => c.name);
+  return (collectionManifest.collections || []).map((c) => c.name);
 };
 
 export const parseGlobal = (
@@ -44,7 +44,7 @@ export const parseGlobal = (
   buildCtx: d.BuildCtx,
   collectionDir: string,
   collectionManifest: d.CollectionManifest,
-  collection: d.CollectionCompilerMeta,
+  collection: d.CollectionCompilerMeta
 ) => {
   if (typeof collectionManifest.global !== 'string') {
     return;
@@ -60,7 +60,7 @@ export const parseBundles = (collectionManifest: d.CollectionManifest) => {
     return [];
   }
 
-  return collectionManifest.bundles.map(b => {
+  return collectionManifest.bundles.map((b) => {
     return {
       components: b.components.slice().sort(),
     };

@@ -13,7 +13,7 @@ import {
 import { OPEN_IN_EDITOR_URL } from '../dev-server-constants';
 
 export const initAppUpdate = (win: d.DevClientWindow, config: d.DevClientConfig) => {
-  onBuildResults(win, buildResults => {
+  onBuildResults(win, (buildResults) => {
     appUpdate(win, config, buildResults);
   });
 };
@@ -36,7 +36,7 @@ const appUpdate = (win: d.DevClientWindow, config: d.DevClientConfig, buildResul
         window: win,
         buildResults: buildResults,
         openInEditor: editorId
-          ? data => {
+          ? (data) => {
               const qs: d.OpenInEditorData = {
                 file: data.file,
                 line: data.line,
@@ -45,7 +45,7 @@ const appUpdate = (win: d.DevClientWindow, config: d.DevClientConfig, buildResul
               };
 
               const url = `${OPEN_IN_EDITOR_URL}?${Object.keys(qs)
-                .map(k => `${k}=${(qs as any)[k]}`)
+                .map((k) => `${k}=${(qs as any)[k]}`)
                 .join('&')}`;
               win.fetch(url);
             }
@@ -119,7 +119,7 @@ const appHmr = (win: Window, hmr: d.HotModuleReplacement) => {
 
   if (results.updatedComponents.length > 0) {
     logBuild(
-      `Updated component${results.updatedComponents.length > 1 ? 's' : ''}: ${results.updatedComponents.join(', ')}`,
+      `Updated component${results.updatedComponents.length > 1 ? 's' : ''}: ${results.updatedComponents.join(', ')}`
     );
   }
 
@@ -150,9 +150,9 @@ export const appReset = (win: d.DevClientWindow, config: d.DevClientConfig, cb: 
     // let's ensure we entirely remove the service worker for this domain
     win.navigator.serviceWorker
       .getRegistration()
-      .then(swRegistration => {
+      .then((swRegistration) => {
         if (swRegistration) {
-          swRegistration.unregister().then(hasUnregistered => {
+          swRegistration.unregister().then((hasUnregistered) => {
             if (hasUnregistered) {
               logBuild(`unregistered service worker`);
             }
@@ -162,7 +162,7 @@ export const appReset = (win: d.DevClientWindow, config: d.DevClientConfig, cb: 
           cb();
         }
       })
-      .catch(err => {
+      .catch((err) => {
         logWarn('Service Worker', err);
         cb();
       });

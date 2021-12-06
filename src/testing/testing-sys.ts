@@ -1,8 +1,18 @@
+import type { CompilerSystem } from '@stencil/core/internal';
 import { createSystem } from '../compiler/sys/stencil-sys';
 import { createHash } from 'crypto';
 import path from 'path';
 
-export const createTestingSystem = () => {
+export interface TestingSystem extends CompilerSystem {
+  diskReads: number;
+  diskWrites: number;
+}
+
+function isTestingSystem(sys: CompilerSystem): sys is TestingSystem {
+  return 'diskReads' in sys && 'diskWrites' in sys;
+}
+
+export const createTestingSystem = (): TestingSystem => {
   let diskReads = 0;
   let diskWrites = 0;
   const sys = createSystem();
@@ -36,6 +46,7 @@ export const createTestingSystem = () => {
 
   sys.access = wrapRead(sys.access);
   sys.accessSync = wrapRead(sys.accessSync);
+  sys.homeDir = wrapRead(sys.homeDir);
   sys.readFile = wrapRead(sys.readFile);
   sys.readFileSync = wrapRead(sys.readFileSync);
   sys.readDir = wrapRead(sys.readDir);
@@ -51,7 +62,7 @@ export const createTestingSystem = () => {
   sys.writeFile = wrapWrite(sys.writeFile);
   sys.writeFileSync = wrapWrite(sys.writeFileSync);
 
-  return Object.defineProperties(sys, {
+  Object.defineProperties(sys, {
     diskReads: {
       get() {
         return diskReads;
@@ -69,4 +80,10 @@ export const createTestingSystem = () => {
       },
     },
   });
+
+  if (!isTestingSystem(sys)) {
+    throw new Error('could not generate TestingSystem');
+  }
+
+  return sys;
 };

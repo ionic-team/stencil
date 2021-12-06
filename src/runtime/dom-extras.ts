@@ -1,5 +1,6 @@
 import type * as d from '../declarations';
 import { BUILD } from '@app-data';
+import { NODE_TYPES } from '@stencil/core/mock-doc';
 import { CMP_FLAGS, HOST_FLAGS } from '@utils';
 import { PLATFORM_FLAGS } from './runtime-constants';
 import { plt, supportsShadow, getHostRef } from '@platform';
@@ -14,8 +15,22 @@ export const patchCloneNode = (HostElementPrototype: any) => {
     if (BUILD.slot && !isShadowDom && deep) {
       let i = 0;
       let slotted, nonStencilNode;
-      let stencilPrivates = ['s-id', 's-cr', 's-lr', 's-rc', 's-sc', 's-p', 's-cn', 's-sr', 's-sn', 's-hn', 's-ol', 's-nr', 's-si'];
-      
+      let stencilPrivates = [
+        's-id',
+        's-cr',
+        's-lr',
+        's-rc',
+        's-sc',
+        's-p',
+        's-cn',
+        's-sr',
+        's-sn',
+        's-hn',
+        's-ol',
+        's-nr',
+        's-si',
+      ];
+
       for (; i < srcNode.childNodes.length; i++) {
         slotted = (srcNode.childNodes[i] as any)['s-nr'];
         nonStencilNode = stencilPrivates.every((privateField) => !(srcNode.childNodes[i] as any)[privateField]);
@@ -26,7 +41,7 @@ export const patchCloneNode = (HostElementPrototype: any) => {
             clonedNode.appendChild(slotted.cloneNode(true));
           }
         }
-        if (nonStencilNode){
+        if (nonStencilNode) {
           clonedNode.appendChild((srcNode.childNodes[i] as any).cloneNode(true));
         }
       }
@@ -47,6 +62,60 @@ export const patchSlotAppendChild = (HostElementPrototype: any) => {
     }
     return (this as any).__appendChild(newChild);
   };
+};
+
+/**
+ * Patches the text content of an unnamed slotted node inside a scoped component
+ * @param hostElementPrototype the `Element` to be patched
+ * @param cmpMeta component runtime metadata used to determine if the component should be patched or not
+ */
+export const patchTextContent = (hostElementPrototype: HTMLElement, cmpMeta: d.ComponentRuntimeMeta): void => {
+  if (BUILD.scoped && cmpMeta.$flags$ & CMP_FLAGS.scopedCssEncapsulation) {
+    const descriptor = Object.getOwnPropertyDescriptor(Node.prototype, 'textContent');
+
+    Object.defineProperty(hostElementPrototype, '__textContent', descriptor);
+
+    Object.defineProperty(hostElementPrototype, 'textContent', {
+      get(): string | null {
+        // get the 'default slot', which would be the first slot in a shadow tree (if we were using one), whose name is
+        // the empty string
+        const slotNode = getHostSlotNode(this.childNodes, '');
+        // when a slot node is found, the textContent _may_ be found in the next sibling (text) node, depending on how
+        // nodes were reordered during the vdom render. first try to get the text content from the sibling.
+        if (slotNode?.nextSibling?.nodeType === NODE_TYPES.TEXT_NODE) {
+          return slotNode.nextSibling.textContent;
+        } else if (slotNode) {
+          return slotNode.textContent;
+        } else {
+          // fallback to the original implementation
+          return this.__textContent;
+        }
+      },
+
+      set(value: string | null) {
+        // get the 'default slot', which would be the first slot in a shadow tree (if we were using one), whose name is
+        // the empty string
+        const slotNode = getHostSlotNode(this.childNodes, '');
+        // when a slot node is found, the textContent _may_ need to be placed in the next sibling (text) node,
+        // depending on how nodes were reordered during the vdom render. first try to set the text content on the
+        // sibling.
+        if (slotNode?.nextSibling?.nodeType === NODE_TYPES.TEXT_NODE) {
+          slotNode.nextSibling.textContent = value;
+        } else if (slotNode) {
+          slotNode.textContent = value;
+        } else {
+          // we couldn't find a slot, but that doesn't mean that there isn't one. if this check ran before the DOM
+          // loaded, we could have missed it. check for a content reference element on the scoped component and insert
+          // it there
+          this.__textContent = value;
+          const contentRefElm = this['s-cr'];
+          if (contentRefElm) {
+            this.insertBefore(contentRefElm, this.firstChild);
+          }
+        }
+      },
+    });
+  }
 };
 
 export const patchChildSlotNodes = (elm: any, cmpMeta: d.ComponentRuntimeMeta) => {
@@ -73,7 +142,10 @@ export const patchChildSlotNodes = (elm: any, cmpMeta: d.ComponentRuntimeMeta) =
     Object.defineProperty(elm, 'childNodes', {
       get() {
         const childNodes = childNodesFn.call(this);
-        if ((plt.$flags$ & PLATFORM_FLAGS.isTmpDisconnected) === 0 && getHostRef(this).$flags$ & HOST_FLAGS.hasRendered) {
+        if (
+          (plt.$flags$ & PLATFORM_FLAGS.isTmpDisconnected) === 0 &&
+          getHostRef(this).$flags$ & HOST_FLAGS.hasRendered
+        ) {
           const result = new FakeNodeList();
           for (let i = 0; i < childNodes.length; i++) {
             const slot = childNodes[i]['s-nr'];
@@ -89,8 +161,15 @@ export const patchChildSlotNodes = (elm: any, cmpMeta: d.ComponentRuntimeMeta) =
   }
 };
 
-const getSlotName = (node: d.RenderNode) => node['s-sn'] || (node.nodeType === 1 && (node as Element).getAttribute('slot')) || '';
+const getSlotName = (node: d.RenderNode) =>
+  node['s-sn'] || (node.nodeType === 1 && (node as Element).getAttribute('slot')) || '';
 
+/**
+ * Recursively searches a series of child nodes for a slot with the provided name.
+ * @param childNodes the nodes to search for a slot with a specific name.
+ * @param slotName the name of the slot to match on.
+ * @returns a reference to the slot node that matches the provided name, `null` otherwise
+ */
 const getHostSlotNode = (childNodes: NodeListOf<ChildNode>, slotName: string) => {
   let i = 0;
   let childNode: d.RenderNode;

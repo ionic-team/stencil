@@ -30,19 +30,22 @@ export function loadDocumentLinks(doc: Document, globalScopes: CSSScope[]) {
 }
 
 export function loadDocumentStyles(doc: Document, globalScopes: CSSScope[]) {
-  const styleElms = Array.from(doc.querySelectorAll('style:not([data-styles]):not([data-no-shim])')) as HTMLStyleElement[];
-  return styleElms.map(style => addGlobalStyle(globalScopes, style)).some(Boolean);
+  const styleElms = Array.from(
+    doc.querySelectorAll('style:not([data-styles]):not([data-no-shim])')
+  ) as HTMLStyleElement[];
+  return styleElms.map((style) => addGlobalStyle(globalScopes, style)).some(Boolean);
 }
 
 export function addGlobalLink(doc: Document, globalScopes: CSSScope[], linkElm: HTMLLinkElement) {
   const url = linkElm.href;
   return fetch(url)
-    .then(rsp => rsp.text())
-    .then(text => {
+    .then((rsp) => rsp.text())
+    .then((text) => {
       if (hasCssVariables(text) && linkElm.parentNode) {
         if (hasRelativeUrls(text)) {
           text = fixRelativeUrls(text, url);
         }
+
         const styleEl = doc.createElement('style');
         styleEl.setAttribute('data-styles', '');
         styleEl.textContent = text;
@@ -52,7 +55,7 @@ export function addGlobalLink(doc: Document, globalScopes: CSSScope[], linkElm: 
         linkElm.remove();
       }
     })
-    .catch(err => {
+    .catch((err) => {
       console.error(err);
     });
 }

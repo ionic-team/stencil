@@ -1,20 +1,18 @@
 import { Component, h } from '@stencil/core';
 
 @Component({
-  tag: 'slot-basic'
+  tag: 'slot-basic',
 })
 export class SlotBasic {
-
   render() {
     return (
       <header>
         <section>
           <article>
-            <slot/>
+            <slot />
           </article>
         </section>
       </header>
     );
   }
-
 }

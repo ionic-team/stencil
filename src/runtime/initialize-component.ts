@@ -9,9 +9,18 @@ import { getScopeId, registerStyle } from './styles';
 import { PROXY_FLAGS } from './runtime-constants';
 import { createTime, uniqueTime } from './profile';
 
-export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef, cmpMeta: d.ComponentRuntimeMeta, hmrVersionId?: string, Cstr?: any) => {
+export const initializeComponent = async (
+  elm: d.HostElement,
+  hostRef: d.HostRef,
+  cmpMeta: d.ComponentRuntimeMeta,
+  hmrVersionId?: string,
+  Cstr?: any
+) => {
   // initializeComponent
-  if ((BUILD.lazyLoad || BUILD.hydrateServerSide || BUILD.style) && (hostRef.$flags$ & HOST_FLAGS.hasInitializedComponent) === 0) {
+  if (
+    (BUILD.lazyLoad || BUILD.hydrateServerSide || BUILD.style) &&
+    (hostRef.$flags$ & HOST_FLAGS.hasInitializedComponent) === 0
+  ) {
     if (BUILD.lazyLoad || BUILD.hydrateClientSide) {
       // we haven't initialized this element yet
       hostRef.$flags$ |= HOST_FLAGS.hasInitializedComponent;
@@ -22,7 +31,10 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
       Cstr = loadModule(cmpMeta, hostRef, hmrVersionId);
       if (Cstr.then) {
         // Await creates a micro-task avoid if possible
-        const endLoad = uniqueTime(`st:load:${cmpMeta.$tagName$}:${hostRef.$modeName$}`, `[Stencil] Load module for <${cmpMeta.$tagName$}>`);
+        const endLoad = uniqueTime(
+          `st:load:${cmpMeta.$tagName$}:${hostRef.$modeName$}`,
+          `[Stencil] Load module for <${cmpMeta.$tagName$}>`
+        );
         Cstr = await Cstr;
         endLoad();
       }
@@ -30,7 +42,7 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
         throw new Error(`Constructor for "${cmpMeta.$tagName$}#${hostRef.$modeName$}" was not found`);
       }
       if (BUILD.member && !Cstr.isProxied) {
-        // we'eve never proxied this Constructor before
+        // we've never proxied this Constructor before
         // let's add the getters/setters to its prototype before
         // the first time we create an instance of the implementation
         if (BUILD.watchCallback) {
@@ -68,7 +80,11 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
     } else {
       // sync constructor component
       Cstr = elm.constructor as any;
-      hostRef.$flags$ |= HOST_FLAGS.isWatchReady | HOST_FLAGS.hasInitializedComponent;
+      hostRef.$flags$ |= HOST_FLAGS.hasInitializedComponent;
+      // wait for the CustomElementRegistry to mark the component as ready before setting `isWatchReady`. Otherwise,
+      // watchers may fire prematurely if `customElements.get()`/`customElements.whenDefined()` resolves _before_
+      // Stencil has completed instantiating the component.
+      customElements.whenDefined(cmpMeta.$tagName$).then(() => (hostRef.$flags$ |= HOST_FLAGS.isWatchReady));
     }
 
     if (BUILD.style && Cstr.style) {
@@ -85,8 +101,13 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
       if (!styles.has(scopeId)) {
         const endRegisterStyles = createTime('registerStyles', cmpMeta.$tagName$);
 
-        if (!BUILD.hydrateServerSide && BUILD.shadowDom && BUILD.shadowDomShim && cmpMeta.$flags$ & CMP_FLAGS.needsShadowDomShim) {
-          style = await import('../utils/shadow-css').then(m => m.scopeCss(style, scopeId, false));
+        if (
+          !BUILD.hydrateServerSide &&
+          BUILD.shadowDom &&
+          BUILD.shadowDomShim &&
+          cmpMeta.$flags$ & CMP_FLAGS.needsShadowDomShim
+        ) {
+          style = await import('../utils/shadow-css').then((m) => m.scopeCss(style, scopeId, false));
         }
 
         registerStyle(scopeId, style, !!(cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation));
@@ -100,7 +121,7 @@ export const initializeComponent = async (elm: d.HostElement, hostRef: d.HostRef
   const schedule = () => scheduleUpdate(hostRef, true);
 
   if (BUILD.asyncLoading && ancestorComponent && ancestorComponent['s-rc']) {
-    // this is the intial load and this component it has an ancestor component
+    // this is the initial load and this component it has an ancestor component
     // but the ancestor component has NOT fired its will update lifecycle yet
     // so let's just cool our jets and wait for the ancestor to continue first
 

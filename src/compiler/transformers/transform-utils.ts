@@ -9,7 +9,10 @@ export const getScriptTarget = () => {
 };
 
 export const isMemberPrivate = (member: ts.ClassElement) => {
-  if (member.modifiers && member.modifiers.some(m => m.kind === ts.SyntaxKind.PrivateKeyword || m.kind === ts.SyntaxKind.ProtectedKeyword)) {
+  if (
+    member.modifiers &&
+    member.modifiers.some((m) => m.kind === ts.SyntaxKind.PrivateKeyword || m.kind === ts.SyntaxKind.ProtectedKeyword)
+  ) {
     return true;
   }
   return false;
@@ -47,7 +50,7 @@ export const convertValueToLiteral = (val: any, refs: WeakSet<any> = null) => {
 };
 
 const arrayToArrayLiteral = (list: any[], refs: WeakSet<any>): ts.ArrayLiteralExpression => {
-  const newList: any[] = list.map(l => {
+  const newList: any[] = list.map((l) => {
     return convertValueToLiteral(l, refs);
   });
   return ts.createArrayLiteral(newList);
@@ -60,8 +63,11 @@ const objectToObjectLiteral = (obj: { [key: string]: any }, refs: WeakSet<any>):
 
   refs.add(obj);
 
-  const newProperties: ts.ObjectLiteralElementLike[] = Object.keys(obj).map(key => {
-    const prop = ts.createPropertyAssignment(ts.createLiteral(key), convertValueToLiteral(obj[key], refs) as ts.Expression);
+  const newProperties: ts.ObjectLiteralElementLike[] = Object.keys(obj).map((key) => {
+    const prop = ts.createPropertyAssignment(
+      ts.createLiteral(key),
+      convertValueToLiteral(obj[key], refs) as ts.Expression
+    );
     return prop;
   });
 
@@ -69,13 +75,23 @@ const objectToObjectLiteral = (obj: { [key: string]: any }, refs: WeakSet<any>):
 };
 
 export const createStaticGetter = (propName: string, returnExpression: ts.Expression) => {
-  return ts.createGetAccessor(undefined, [ts.createToken(ts.SyntaxKind.StaticKeyword)], propName, undefined, undefined, ts.createBlock([ts.createReturn(returnExpression)]));
+  return ts.createGetAccessor(
+    undefined,
+    [ts.createToken(ts.SyntaxKind.StaticKeyword)],
+    propName,
+    undefined,
+    undefined,
+    ts.createBlock([ts.createReturn(returnExpression)])
+  );
 };
 
 export const removeDecorators = (node: ts.Node, decoratorNames: Set<string>) => {
   if (node.decorators) {
-    const updatedDecoratorList = node.decorators.filter(dec => {
-      const name = ts.isCallExpression(dec.expression) && ts.isIdentifier(dec.expression.expression) && dec.expression.expression.text;
+    const updatedDecoratorList = node.decorators.filter((dec) => {
+      const name =
+        ts.isCallExpression(dec.expression) &&
+        ts.isIdentifier(dec.expression.expression) &&
+        dec.expression.expression.text;
       return !decoratorNames.has(name);
     });
     if (updatedDecoratorList.length === 0) {
@@ -88,12 +104,16 @@ export const removeDecorators = (node: ts.Node, decoratorNames: Set<string>) => 
 };
 
 export const getStaticValue = (staticMembers: ts.ClassElement[], staticName: string): any => {
-  const staticMember: ts.GetAccessorDeclaration = staticMembers.find(member => (member.name as any).escapedText === staticName) as any;
+  const staticMember: ts.GetAccessorDeclaration = staticMembers.find(
+    (member) => (member.name as any).escapedText === staticName
+  ) as any;
   if (!staticMember || !staticMember.body || !staticMember.body.statements) {
     return null;
   }
 
-  const rtnStatement: ts.ReturnStatement = staticMember.body.statements.find(s => s.kind === ts.SyntaxKind.ReturnStatement) as any;
+  const rtnStatement: ts.ReturnStatement = staticMember.body.statements.find(
+    (s) => s.kind === ts.SyntaxKind.ReturnStatement
+  ) as any;
   if (!rtnStatement || !rtnStatement.expression) {
     return null;
   }
@@ -119,7 +139,10 @@ export const getStaticValue = (staticMembers: ts.ClassElement[], staticName: str
     return objectLiteralToObjectMap(rtnStatement.expression as any);
   }
 
-  if (expKind === ts.SyntaxKind.ArrayLiteralExpression && (rtnStatement.expression as ts.ArrayLiteralExpression).elements) {
+  if (
+    expKind === ts.SyntaxKind.ArrayLiteralExpression &&
+    (rtnStatement.expression as ts.ArrayLiteralExpression).elements
+  ) {
     return arrayLiteralToArray(rtnStatement.expression as any);
   }
 
@@ -131,7 +154,7 @@ export const getStaticValue = (staticMembers: ts.ClassElement[], staticName: str
 
     if (identifier.escapedText) {
       const obj: any = {};
-      Object.keys(identifier.escapedText).forEach(key => {
+      Object.keys(identifier.escapedText).forEach((key) => {
         obj[key] = getIdentifierValue((identifier.escapedText as any)[key]);
       });
       return obj;
@@ -142,7 +165,7 @@ export const getStaticValue = (staticMembers: ts.ClassElement[], staticName: str
 };
 
 export const arrayLiteralToArray = (arr: ts.ArrayLiteralExpression) => {
-  return arr.elements.map(element => {
+  return arr.elements.map((element) => {
     let val: any;
 
     switch (element.kind) {
@@ -276,7 +299,7 @@ export class ObjectMap {
 
 export const getAttributeTypeInfo = (baseNode: ts.Node, sourceFile: ts.SourceFile) => {
   const allReferences: d.ComponentCompilerTypeReferences = {};
-  getAllTypeReferences(baseNode).forEach(rt => {
+  getAllTypeReferences(baseNode).forEach((rt) => {
     allReferences[rt] = getTypeReferenceLocation(rt, sourceFile);
   });
   return allReferences;
@@ -298,7 +321,7 @@ const getAllTypeReferences = (node: ts.Node) => {
       referencedTypes.push(getEntityName(node.typeName));
       if (node.typeArguments) {
         node.typeArguments
-          .filter(ta => ts.isTypeReferenceNode(ta))
+          .filter((ta) => ts.isTypeReferenceNode(ta))
           .forEach((tr: ts.TypeReferenceNode) => {
             const typeName = tr.typeName as ts.Identifier;
             if (typeName && typeName.escapedText) {
@@ -315,8 +338,12 @@ const getAllTypeReferences = (node: ts.Node) => {
   return referencedTypes;
 };
 
-export const validateReferences = (diagnostics: d.Diagnostic[], references: d.ComponentCompilerTypeReferences, node: ts.Node) => {
-  Object.keys(references).forEach(refName => {
+export const validateReferences = (
+  diagnostics: d.Diagnostic[],
+  references: d.ComponentCompilerTypeReferences,
+  node: ts.Node
+) => {
+  Object.keys(references).forEach((refName) => {
     const ref = references[refName];
     if (ref.path === '@stencil/core' && MEMBER_DECORATORS_TO_REMOVE.has(refName)) {
       const err = buildError(diagnostics);
@@ -329,7 +356,7 @@ const getTypeReferenceLocation = (typeName: string, tsNode: ts.Node): d.Componen
   const sourceFileObj = tsNode.getSourceFile();
 
   // Loop through all top level imports to find any reference to the type for 'import' reference location
-  const importTypeDeclaration = sourceFileObj.statements.find(st => {
+  const importTypeDeclaration = sourceFileObj.statements.find((st) => {
     const statement =
       ts.isImportDeclaration(st) &&
       st.importClause &&
@@ -337,7 +364,7 @@ const getTypeReferenceLocation = (typeName: string, tsNode: ts.Node): d.Componen
       st.importClause.namedBindings &&
       ts.isNamedImports(st.importClause.namedBindings) &&
       Array.isArray(st.importClause.namedBindings.elements) &&
-      st.importClause.namedBindings.elements.find(nbe => nbe.name.getText() === typeName);
+      st.importClause.namedBindings.elements.find((nbe) => nbe.name.getText() === typeName);
     if (!statement) {
       return false;
     }
@@ -353,22 +380,25 @@ const getTypeReferenceLocation = (typeName: string, tsNode: ts.Node): d.Componen
   }
 
   // Loop through all top level exports to find if any reference to the type for 'local' reference location
-  const isExported = sourceFileObj.statements.some(st => {
+  const isExported = sourceFileObj.statements.some((st) => {
     // Is the interface defined in the file and exported
     const isInterfaceDeclarationExported =
       ts.isInterfaceDeclaration(st) &&
       (<ts.Identifier>st.name).getText() === typeName &&
       Array.isArray(st.modifiers) &&
-      st.modifiers.some(mod => mod.kind === ts.SyntaxKind.ExportKeyword);
+      st.modifiers.some((mod) => mod.kind === ts.SyntaxKind.ExportKeyword);
 
     const isTypeAliasDeclarationExported =
       ts.isTypeAliasDeclaration(st) &&
       (<ts.Identifier>st.name).getText() === typeName &&
       Array.isArray(st.modifiers) &&
-      st.modifiers.some(mod => mod.kind === ts.SyntaxKind.ExportKeyword);
+      st.modifiers.some((mod) => mod.kind === ts.SyntaxKind.ExportKeyword);
 
     // Is the interface exported through a named export
-    const isTypeInExportDeclaration = ts.isExportDeclaration(st) && ts.isNamedExports(st.exportClause) && st.exportClause.elements.some(nee => nee.name.getText() === typeName);
+    const isTypeInExportDeclaration =
+      ts.isExportDeclaration(st) &&
+      ts.isNamedExports(st.exportClause) &&
+      st.exportClause.elements.some((nee) => nee.name.getText() === typeName);
 
     return isInterfaceDeclarationExported || isTypeAliasDeclarationExported || isTypeInExportDeclaration;
   });
@@ -398,7 +428,7 @@ export const resolveType = (checker: ts.TypeChecker, type: ts.Type) => {
 
   let parts = Array.from(set.keys()).sort();
   if (parts.length > 1) {
-    parts = parts.map(p => (p.indexOf('=>') >= 0 ? `(${p})` : p));
+    parts = parts.map((p) => (p.indexOf('=>') >= 0 ? `(${p})` : p));
   }
   if (parts.length > 20) {
     return typeToString(checker, type);
@@ -408,14 +438,15 @@ export const resolveType = (checker: ts.TypeChecker, type: ts.Type) => {
 };
 
 export const typeToString = (checker: ts.TypeChecker, type: ts.Type) => {
-  const TYPE_FORMAT_FLAGS = ts.TypeFormatFlags.NoTruncation | ts.TypeFormatFlags.InTypeAlias | ts.TypeFormatFlags.InElementType;
+  const TYPE_FORMAT_FLAGS =
+    ts.TypeFormatFlags.NoTruncation | ts.TypeFormatFlags.InTypeAlias | ts.TypeFormatFlags.InElementType;
 
   return checker.typeToString(type, undefined, TYPE_FORMAT_FLAGS);
 };
 
 export const parseDocsType = (checker: ts.TypeChecker, type: ts.Type, parts: Set<string>) => {
   if (type.isUnion()) {
-    (type as ts.UnionType).types.forEach(t => {
+    (type as ts.UnionType).types.forEach((t) => {
       parseDocsType(checker, t, parts);
     });
   } else {
@@ -432,10 +463,14 @@ export const getModuleFromSourceFile = (compilerCtx: d.CompilerCtx, tsSourceFile
   }
 
   const moduleFiles = Array.from(compilerCtx.moduleMap.values());
-  return moduleFiles.find(m => m.jsFilePath === sourceFilePath);
+  return moduleFiles.find((m) => m.jsFilePath === sourceFilePath);
 };
 
-export const getComponentMeta = (compilerCtx: d.CompilerCtx, tsSourceFile: ts.SourceFile, node: ts.ClassDeclaration) => {
+export const getComponentMeta = (
+  compilerCtx: d.CompilerCtx,
+  tsSourceFile: ts.SourceFile,
+  node: ts.ClassDeclaration
+) => {
   const meta = compilerCtx.nodeMap.get(node);
   if (meta) {
     return meta;
@@ -446,7 +481,7 @@ export const getComponentMeta = (compilerCtx: d.CompilerCtx, tsSourceFile: ts.So
     const staticMembers = node.members.filter(isStaticGetter);
     const tagName = getComponentTagName(staticMembers);
     if (typeof tagName === 'string') {
-      return moduleFile.cmps.find(cmp => cmp.tagName === tagName);
+      return moduleFile.cmps.find((cmp) => cmp.tagName === tagName);
     }
   }
   return undefined;
@@ -465,7 +500,11 @@ export const getComponentTagName = (staticMembers: ts.ClassElement[]) => {
 };
 
 export const isStaticGetter = (member: ts.ClassElement) => {
-  return member.kind === ts.SyntaxKind.GetAccessor && member.modifiers && member.modifiers.some(({ kind }) => kind === ts.SyntaxKind.StaticKeyword);
+  return (
+    member.kind === ts.SyntaxKind.GetAccessor &&
+    member.modifiers &&
+    member.modifiers.some(({ kind }) => kind === ts.SyntaxKind.StaticKeyword)
+  );
 };
 
 export const serializeSymbol = (checker: ts.TypeChecker, symbol: ts.Symbol): d.CompilerJsDoc => {
@@ -476,9 +515,21 @@ export const serializeSymbol = (checker: ts.TypeChecker, symbol: ts.Symbol): d.C
     };
   }
   return {
-    tags: symbol.getJsDocTags().map(tag => ({ text: tag.text, name: tag.name })),
+    tags: mapJSDocTagInfo(symbol.getJsDocTags()),
     text: ts.displayPartsToString(symbol.getDocumentationComment(checker)),
   };
+};
+
+/**
+ * Maps a TypeScript 4.3+ JSDocTagInfo to a flattened Stencil CompilerJsDocTagInfo.
+ * @param tags A readonly array of JSDocTagInfo objects.
+ * @returns An array of CompilerJsDocTagInfo objects.
+ */
+export const mapJSDocTagInfo = (tags: readonly ts.JSDocTagInfo[]): d.CompilerJsDocTagInfo[] => {
+  // The text following a tag is split semantically by TS 4.3+, e.g. '@param foo the first parameter' ->
+  // [{text: 'foo', kind: 'parameterName'}, {text: ' ', kind: 'space'}, {text: 'the first parameter', kind: 'text'}], so
+  // we join the elements to reconstruct the text.
+  return tags.map((tag) => ({ ...tag, text: tag.text?.map((part) => part.text).join('') }));
 };
 
 export const serializeDocsSymbol = (checker: ts.TypeChecker, symbol: ts.Symbol) => {
@@ -495,7 +546,7 @@ export const serializeDocsSymbol = (checker: ts.TypeChecker, symbol: ts.Symbol) 
 
   let parts = Array.from(set.keys()).sort();
   if (parts.length > 1) {
-    parts = parts.map(p => (p.indexOf('=>') >= 0 ? `(${p})` : p));
+    parts = parts.map((p) => (p.indexOf('=>') >= 0 ? `(${p})` : p));
   }
   if (parts.length > 20) {
     return typeToString(checker, type);
@@ -505,7 +556,7 @@ export const serializeDocsSymbol = (checker: ts.TypeChecker, symbol: ts.Symbol) 
 };
 
 export const isInternal = (jsDocs: d.CompilerJsDoc | undefined) => {
-  return jsDocs && jsDocs.tags.some(s => s.name === 'internal');
+  return jsDocs && jsDocs.tags.some((s) => s.name === 'internal');
 };
 
 export const isMethod = (member: ts.ClassElement, methodName: string): member is ts.MethodDeclaration => {
@@ -514,16 +565,81 @@ export const isMethod = (member: ts.ClassElement, methodName: string): member is
 
 export const isAsyncFn = (typeChecker: ts.TypeChecker, methodDeclaration: ts.MethodDeclaration) => {
   if (methodDeclaration.modifiers) {
-    if (methodDeclaration.modifiers.some(m => m.kind === ts.SyntaxKind.AsyncKeyword)) {
+    if (methodDeclaration.modifiers.some((m) => m.kind === ts.SyntaxKind.AsyncKeyword)) {
       return true;
     }
   }
 
   const methodSignature = typeChecker.getSignatureFromDeclaration(methodDeclaration);
   const returnType = methodSignature.getReturnType();
-  const typeStr = typeChecker.typeToString(returnType, undefined, ts.TypeFormatFlags.NoTruncation | ts.TypeFormatFlags.InTypeAlias | ts.TypeFormatFlags.InElementType);
+  const typeStr = typeChecker.typeToString(
+    returnType,
+    undefined,
+    ts.TypeFormatFlags.NoTruncation | ts.TypeFormatFlags.InTypeAlias | ts.TypeFormatFlags.InElementType
+  );
 
   return typeStr.includes('Promise<');
+};
+
+export const createImportStatement = (importFnNames: string[], importPath: string) => {
+  // ESM Imports
+  // import { importNames } from 'importPath';
+
+  const importSpecifiers = importFnNames.map((importKey) => {
+    const splt = importKey.split(' as ');
+    let importAs = importKey;
+    let importFnName = importKey;
+
+    if (splt.length > 1) {
+      importAs = splt[1];
+      importFnName = splt[0];
+    }
+
+    return ts.createImportSpecifier(
+      typeof importFnName === 'string' && importFnName !== importAs ? ts.createIdentifier(importFnName) : undefined,
+      ts.createIdentifier(importAs)
+    );
+  });
+
+  return ts.createImportDeclaration(
+    undefined,
+    undefined,
+    ts.createImportClause(undefined, ts.createNamedImports(importSpecifiers)),
+    ts.createLiteral(importPath)
+  );
+};
+
+export const createRequireStatement = (importFnNames: string[], importPath: string) => {
+  // CommonJS require()
+  // const { a, b, c } = require(importPath);
+
+  const importBinding = ts.createObjectBindingPattern(
+    importFnNames.map((importKey) => {
+      const splt = importKey.split(' as ');
+      let importAs = importKey;
+      let importFnName = importKey;
+
+      if (splt.length > 1) {
+        importAs = splt[1];
+        importFnName = splt[0];
+      }
+      return ts.createBindingElement(undefined, importFnName, importAs);
+    })
+  );
+
+  return ts.createVariableStatement(
+    undefined,
+    ts.createVariableDeclarationList(
+      [
+        ts.createVariableDeclaration(
+          importBinding,
+          undefined,
+          ts.createCall(ts.createIdentifier('require'), [], [ts.createLiteral(importPath)])
+        ),
+      ],
+      ts.NodeFlags.Const
+    )
+  );
 };
 
 export interface ConvertIdentifier {

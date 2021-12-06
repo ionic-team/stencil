@@ -293,8 +293,8 @@ describe('validateOutputTargetWww', () => {
   describe('dist-hydrate-script', () => {
     it('should not add hydrate by default', () => {
       const { config } = validateConfig(userConfig);
-      expect(config.outputTargets.some(o => o.type === 'dist-hydrate-script')).toBe(false);
-      expect(config.outputTargets.some(o => o.type === 'www')).toBe(true);
+      expect(config.outputTargets.some((o) => o.type === 'dist-hydrate-script')).toBe(false);
+      expect(config.outputTargets.some((o) => o.type === 'www')).toBe(true);
     });
 
     it('should not add hydrate with user www', () => {
@@ -303,8 +303,8 @@ describe('validateOutputTargetWww', () => {
       };
       userConfig.outputTargets = [wwwOutputTarget];
       const { config } = validateConfig(userConfig);
-      expect(config.outputTargets.some(o => o.type === 'dist-hydrate-script')).toBe(false);
-      expect(config.outputTargets.some(o => o.type === 'www')).toBe(true);
+      expect(config.outputTargets.some((o) => o.type === 'dist-hydrate-script')).toBe(false);
+      expect(config.outputTargets.some((o) => o.type === 'www')).toBe(true);
     });
 
     it('should add hydrate with user hydrate and www outputs', () => {
@@ -316,22 +316,22 @@ describe('validateOutputTargetWww', () => {
       };
       userConfig.outputTargets = [wwwOutputTarget, hydrateOutputTarget];
       const { config } = validateConfig(userConfig);
-      expect(config.outputTargets.some(o => o.type === 'dist-hydrate-script')).toBe(true);
-      expect(config.outputTargets.some(o => o.type === 'www')).toBe(true);
+      expect(config.outputTargets.some((o) => o.type === 'dist-hydrate-script')).toBe(true);
+      expect(config.outputTargets.some((o) => o.type === 'www')).toBe(true);
     });
 
     it('should add hydrate with --prerender flag', () => {
       userConfig.flags.prerender = true;
       const { config } = validateConfig(userConfig);
-      expect(config.outputTargets.some(o => o.type === 'dist-hydrate-script')).toBe(true);
-      expect(config.outputTargets.some(o => o.type === 'www')).toBe(true);
+      expect(config.outputTargets.some((o) => o.type === 'dist-hydrate-script')).toBe(true);
+      expect(config.outputTargets.some((o) => o.type === 'www')).toBe(true);
     });
 
     it('should add hydrate with --ssr flag', () => {
       userConfig.flags.ssr = true;
       const { config } = validateConfig(userConfig);
-      expect(config.outputTargets.some(o => o.type === 'dist-hydrate-script')).toBe(true);
-      expect(config.outputTargets.some(o => o.type === 'www')).toBe(true);
+      expect(config.outputTargets.some((o) => o.type === 'dist-hydrate-script')).toBe(true);
+      expect(config.outputTargets.some((o) => o.type === 'www')).toBe(true);
     });
 
     it('should add externals and defaults', () => {

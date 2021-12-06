@@ -15,7 +15,13 @@ export const hmrWindow = (data: { window: Window; hmr: any }) => {
   };
 
   try {
-    if (!data || !data.window || !data.window.document.documentElement || !data.hmr || typeof data.hmr.versionId !== 'string') {
+    if (
+      !data ||
+      !data.window ||
+      !data.window.document.documentElement ||
+      !data.hmr ||
+      typeof data.hmr.versionId !== 'string'
+    ) {
       return results;
     }
 

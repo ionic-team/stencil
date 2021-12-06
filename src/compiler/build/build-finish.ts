@@ -1,5 +1,6 @@
 import type * as d from '../../declarations';
 import { generateBuildResults } from './build-results';
+import { generateBuildStats, writeBuildStats } from './build-stats';
 import { isFunction, isRemoteUrl } from '@utils';
 import { IS_NODE_ENV } from '../sys/environment';
 import { relative } from 'path';
@@ -12,6 +13,7 @@ export const buildFinish = async (buildCtx: d.BuildCtx) => {
     messages: buildCtx.buildMessages.slice(),
     progress: 1,
   };
+
   buildCtx.compilerCtx.events.emit('buildLog', buildLog);
 
   return results;
@@ -30,6 +32,12 @@ const buildDone = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx:
 
   // create the build results data
   buildCtx.buildResults = generateBuildResults(config, compilerCtx, buildCtx);
+
+  // After the build results are available on the buildCtx, call the stats and set it.
+  // We will use this later to write the files.
+  buildCtx.buildStats = generateBuildStats(config, buildCtx);
+
+  await writeBuildStats(config, buildCtx.buildStats);
 
   buildCtx.debug(`${aborted ? 'aborted' : 'finished'} build, ${buildCtx.buildResults.duration}ms`);
 
@@ -109,7 +117,7 @@ const logHmr = (logger: d.Logger, buildCtx: d.BuildCtx) => {
 
   if (hmr.inlineStylesUpdated) {
     const inlineStyles = hmr.inlineStylesUpdated
-      .map(s => s.styleTag)
+      .map((s) => s.styleTag)
       .reduce((arr, v) => {
         if (!arr.includes(v)) {
           arr.push(v);
@@ -149,7 +157,7 @@ const cleanupUpdateMsg = (logger: d.Logger, msg: string, fileNames: string[]) =>
 };
 
 const cleanDiagnostics = (config: d.Config, diagnostics: d.Diagnostic[]) => {
-  diagnostics.forEach(diagnostic => {
+  diagnostics.forEach((diagnostic) => {
     if (!diagnostic.relFilePath && !isRemoteUrl(diagnostic.absFilePath) && diagnostic.absFilePath && config.rootDir) {
       diagnostic.relFilePath = relative(config.rootDir, diagnostic.absFilePath);
     }

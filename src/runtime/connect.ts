@@ -12,7 +12,7 @@ export const getConnect = (_ref: d.HostRef, tagName: string) => {
   };
 
   const create = (...args: any[]) => {
-    return componentOnReady().then(el => el.create(...args));
+    return componentOnReady().then((el) => el.create(...args));
   };
 
   return {

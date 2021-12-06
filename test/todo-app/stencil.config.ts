@@ -5,8 +5,8 @@ export const config: Config = {
   outputTargets: [
     {
       type: 'www',
-      serviceWorker: null
-    }
+      serviceWorker: null,
+    },
   ],
   hashFileNames: false,
   hydratedFlag: null,
@@ -16,5 +16,5 @@ export const config: Config = {
     safari10: false,
     scriptDataOpts: false,
     shadowDomShim: false,
-  }
+  },
 };

@@ -21,5 +21,4 @@ describe('shadow-dom-slot-basic', () => {
       expect(elm.shadowRoot).toBe(elm);
     }
   });
-
 });

@@ -23,7 +23,7 @@ export const jestPreprocessor = {
 
       const results = transpile(sourceText, opts);
 
-      const hasErrors = results.diagnostics.some(diagnostic => diagnostic.level === 'error');
+      const hasErrors = results.diagnostics.some((diagnostic) => diagnostic.level === 'error');
 
       if (results.diagnostics && hasErrors) {
         const msg = results.diagnostics.map(formatDiagnostic).join('\n\n');
@@ -48,7 +48,7 @@ export const jestPreprocessor = {
     code: string,
     filePath: string,
     jestConfigStr: string,
-    transformOptions: { instrument: boolean; rootDir: string },
+    transformOptions: { instrument: boolean; rootDir: string }
   ) {
     // https://github.com/facebook/jest/blob/v23.6.0/packages/jest-runtime/src/script_transformer.js#L61-L90
     if (!this._tsCompilerOptionsKey) {
@@ -112,7 +112,7 @@ function getCompilerOptions(rootDir: string) {
     ts.sys,
     rootDir,
     undefined,
-    tsconfigFilePath,
+    tsconfigFilePath
   );
 
   return parseResult.options;

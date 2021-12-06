@@ -1,16 +1,14 @@
 import { Component, Event, EventEmitter, Prop, State, h } from '@stencil/core';
 
 @Component({
-  tag: 'lifecycle-basic-c'
+  tag: 'lifecycle-basic-c',
 })
 export class LifecycleBasicC {
-
   @Prop() value = '';
   @State() rendered = 0;
 
   @Event() lifecycleLoad!: EventEmitter;
   @Event() lifecycleUpdate!: EventEmitter;
-
 
   componentWillLoad() {
     this.lifecycleLoad.emit('componentWillLoad-c');
@@ -33,13 +31,9 @@ export class LifecycleBasicC {
 
     return (
       <div>
-        <hr/>
-        <div>
-          LifecycleBasicC {this.value}
-        </div>
-        <div class='rendered-c'>
-          rendered c: {this.rendered}
-        </div>
+        <hr />
+        <div>LifecycleBasicC {this.value}</div>
+        <div class="rendered-c">rendered c: {this.rendered}</div>
       </div>
     );
   }

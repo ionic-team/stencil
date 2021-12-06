@@ -91,6 +91,7 @@ const extractCommentsWithHash = (input: string): string[] => {
 
 const _ruleRe = /(\s*)([^;\{\}]+?)(\s*)((?:{%BLOCK%}?\s*;?)|(?:\s*;))/g;
 const _curlyRe = /([{}])/g;
+const _selectorPartsRe = /(^.*?[^\\])??((:+)(.*)|$)/;
 const OPEN_CURLY = '{';
 const CLOSE_CURLY = '}';
 const BLOCK_PLACEHOLDER = '%BLOCK%';
@@ -256,17 +257,19 @@ const selectorNeedsScoping = (selector: string, scopeSelector: string) => {
   return !re.test(selector);
 };
 
+const injectScopingSelector = (selector: string, scopingSelector: string) => {
+  return selector.replace(_selectorPartsRe, (_: string, before = '', _colonGroup: string, colon = '', after = '') => {
+    return before + scopingSelector + colon + after;
+  });
+};
+
 const applySimpleSelectorScope = (selector: string, scopeSelector: string, hostSelector: string) => {
   // In Android browser, the lastIndex is not reset when the regex is used in String.replace()
   _polyfillHostRe.lastIndex = 0;
   if (_polyfillHostRe.test(selector)) {
     const replaceBy = `.${hostSelector}`;
     return selector
-      .replace(_polyfillHostNoCombinatorRe, (_, selector) => {
-        return selector.replace(/([^:]*)(:*)(.*)/, (_: string, before: string, colon: string, after: string) => {
-          return before + replaceBy + colon + after;
-        });
-      })
+      .replace(_polyfillHostNoCombinatorRe, (_, selector) => injectScopingSelector(selector, replaceBy))
       .replace(_polyfillHostRe, replaceBy + ' ');
   }
 
@@ -292,10 +295,7 @@ const applyStrictSelectorScope = (selector: string, scopeSelector: string, hostS
       // remove :host since it should be unnecessary
       const t = p.replace(_polyfillHostRe, '');
       if (t.length > 0) {
-        const matches = t.match(/([^:]*)(:*)(.*)/);
-        if (matches) {
-          scopedP = matches[1] + className + matches[2] + matches[3];
-        }
+        scopedP = injectScopingSelector(t, className);
       }
     }
 
@@ -345,7 +345,7 @@ const applyStrictSelectorScope = (selector: string, scopeSelector: string, hostS
 const scopeSelector = (selector: string, scopeSelectorText: string, hostSelector: string, slotSelector: string) => {
   return selector
     .split(',')
-    .map(shallowPart => {
+    .map((shallowPart) => {
       if (slotSelector && shallowPart.indexOf('.' + slotSelector) > -1) {
         return shallowPart.trim();
       }
@@ -359,13 +359,24 @@ const scopeSelector = (selector: string, scopeSelectorText: string, hostSelector
     .join(', ');
 };
 
-const scopeSelectors = (cssText: string, scopeSelectorText: string, hostSelector: string, slotSelector: string, commentOriginalSelector: boolean) => {
+const scopeSelectors = (
+  cssText: string,
+  scopeSelectorText: string,
+  hostSelector: string,
+  slotSelector: string,
+  commentOriginalSelector: boolean
+) => {
   return processRules(cssText, (rule: CssRule) => {
     let selector = rule.selector;
     let content = rule.content;
     if (rule.selector[0] !== '@') {
       selector = scopeSelector(rule.selector, scopeSelectorText, hostSelector, slotSelector);
-    } else if (rule.selector.startsWith('@media') || rule.selector.startsWith('@supports') || rule.selector.startsWith('@page') || rule.selector.startsWith('@document')) {
+    } else if (
+      rule.selector.startsWith('@media') ||
+      rule.selector.startsWith('@supports') ||
+      rule.selector.startsWith('@page') ||
+      rule.selector.startsWith('@document')
+    ) {
       content = scopeSelectors(rule.content, scopeSelectorText, hostSelector, slotSelector, commentOriginalSelector);
     }
 
@@ -377,7 +388,13 @@ const scopeSelectors = (cssText: string, scopeSelectorText: string, hostSelector
   });
 };
 
-const scopeCssText = (cssText: string, scopeId: string, hostScopeId: string, slotScopeId: string, commentOriginalSelector: boolean) => {
+const scopeCssText = (
+  cssText: string,
+  scopeId: string,
+  hostScopeId: string,
+  slotScopeId: string,
+  commentOriginalSelector: boolean
+) => {
   cssText = insertPolyfillHostInCssText(cssText);
   cssText = convertColonHost(cssText);
   cssText = convertColonHostContext(cssText);
@@ -421,10 +438,15 @@ export const scopeCss = (cssText: string, scopeId: string, commentOriginalSelect
       return rule;
     };
 
-    cssText = processRules(cssText, rule => {
+    cssText = processRules(cssText, (rule) => {
       if (rule.selector[0] !== '@') {
         return processCommentedSelector(rule);
-      } else if (rule.selector.startsWith('@media') || rule.selector.startsWith('@supports') || rule.selector.startsWith('@page') || rule.selector.startsWith('@document')) {
+      } else if (
+        rule.selector.startsWith('@media') ||
+        rule.selector.startsWith('@supports') ||
+        rule.selector.startsWith('@page') ||
+        rule.selector.startsWith('@document')
+      ) {
         rule.content = processRules(rule.content, processCommentedSelector);
         return rule;
       }
@@ -441,7 +463,7 @@ export const scopeCss = (cssText: string, scopeId: string, commentOriginalSelect
     });
   }
 
-  scoped.slottedSelectors.forEach(slottedSelector => {
+  scoped.slottedSelectors.forEach((slottedSelector) => {
     cssText = cssText.replace(slottedSelector.orgSelector, slottedSelector.updatedSelector);
   });
 

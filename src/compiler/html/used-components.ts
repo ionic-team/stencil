@@ -1,7 +1,13 @@
 import type * as d from '../../declarations';
 
-export const getUsedComponents = (doc: Document, cmps: d.ComponentCompilerMeta[]) => {
-  const tags = new Set(cmps.map(cmp => cmp.tagName.toUpperCase()));
+/**
+ * Scan the provided `doc` for any known Stencil components
+ * @param doc the Document to scan
+ * @param cmps the compiler metadata of known Stencil components
+ * @returns a list of all tags that were identified as known Stencil components
+ */
+export const getUsedComponents = (doc: Document, cmps: d.ComponentCompilerMeta[]): string[] => {
+  const tags = new Set(cmps.map((cmp: d.ComponentCompilerMeta) => cmp.tagName.toUpperCase()));
   const found: string[] = [];
 
   const searchComponents = (el: Element) => {

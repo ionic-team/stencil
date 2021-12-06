@@ -15,7 +15,11 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
     const prototype = (Cstr as any).prototype;
 
     members.map(([memberName, [memberFlags]]) => {
-      if ((BUILD.prop || BUILD.state) && (memberFlags & MEMBER_FLAGS.Prop || ((!BUILD.lazyLoad || flags & PROXY_FLAGS.proxyState) && memberFlags & MEMBER_FLAGS.State))) {
+      if (
+        (BUILD.prop || BUILD.state) &&
+        (memberFlags & MEMBER_FLAGS.Prop ||
+          ((!BUILD.lazyLoad || flags & PROXY_FLAGS.proxyState) && memberFlags & MEMBER_FLAGS.State))
+      ) {
         // proxyComponent - prop
         Object.defineProperty(prototype, memberName, {
           get(this: d.RuntimeRef) {
@@ -32,11 +36,13 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
                 // the element is not constructing
                 (ref.$flags$ & HOST_FLAGS.isConstructingInstance) === 0 &&
                 // the member is a prop
-                (memberFlags & MEMBER_FLAGS.Prop) !== 0 && 
+                (memberFlags & MEMBER_FLAGS.Prop) !== 0 &&
                 // the member is not mutable
                 (memberFlags & MEMBER_FLAGS.Mutable) === 0
               ) {
-                consoleDevWarn(`@Prop() "${memberName}" on <${cmpMeta.$tagName$}> is immutable but was modified from within the component.\nMore information: https://stenciljs.com/docs/properties#prop-mutability`);
+                consoleDevWarn(
+                  `@Prop() "${memberName}" on <${cmpMeta.$tagName$}> is immutable but was modified from within the component.\nMore information: https://stenciljs.com/docs/properties#prop-mutability`
+                );
               }
             }
             // proxyComponent, set value
@@ -45,7 +51,12 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
           configurable: true,
           enumerable: true,
         });
-      } else if (BUILD.lazyLoad && BUILD.method && flags & PROXY_FLAGS.isElementConstructor && memberFlags & MEMBER_FLAGS.Method) {
+      } else if (
+        BUILD.lazyLoad &&
+        BUILD.method &&
+        flags & PROXY_FLAGS.isElementConstructor &&
+        memberFlags & MEMBER_FLAGS.Method
+      ) {
         // proxyComponent - method
         Object.defineProperty(prototype, memberName, {
           value(this: d.HostElement, ...args: any[]) {
@@ -62,6 +73,54 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
       prototype.attributeChangedCallback = function (attrName: string, _oldValue: string, newValue: string) {
         plt.jmp(() => {
           const propName = attrNameToPropName.get(attrName);
+
+          //  In a web component lifecycle the attributeChangedCallback runs prior to connectedCallback
+          //  in the case where an attribute was set inline.
+          //  ```html
+          //    <my-component some-attribute="some-value"></my-component>
+          //  ```
+          //
+          //  There is an edge case where a developer sets the attribute inline on a custom element and then
+          //  programmatically changes it before it has been upgraded as shown below:
+          //
+          //  ```html
+          //    <!-- this component has _not_ been upgraded yet -->
+          //    <my-component id="test" some-attribute="some-value"></my-component>
+          //    <script>
+          //      // grab non-upgraded component
+          //      el = document.querySelector("#test");
+          //      el.someAttribute = "another-value";
+          //      // upgrade component
+          //      customElements.define('my-component', MyComponent);
+          //    </script>
+          //  ```
+          //  In this case if we do not unshadow here and use the value of the shadowing property, attributeChangedCallback
+          //  will be called with `newValue = "some-value"` and will set the shadowed property (this.someAttribute = "another-value")
+          //  to the value that was set inline i.e. "some-value" from above example. When
+          //  the connectedCallback attempts to unshadow it will use "some-value" as the initial value rather than "another-value"
+          //
+          //  The case where the attribute was NOT set inline but was not set programmatically shall be handled/unshadowed
+          //  by connectedCallback as this attributeChangedCallback will not fire.
+          //
+          //  https://developers.google.com/web/fundamentals/web-components/best-practices#lazy-properties
+          //
+          //  TODO(STENCIL-16) we should think about whether or not we actually want to be reflecting the attributes to
+          //  properties here given that this goes against best practices outlined here
+          //  https://developers.google.com/web/fundamentals/web-components/best-practices#avoid-reentrancy
+          if (this.hasOwnProperty(propName)) {
+            newValue = this[propName];
+            delete this[propName];
+          } else if (
+            prototype.hasOwnProperty(propName) &&
+            typeof this[propName] === 'number' &&
+            this[propName] == newValue
+          ) {
+            // if the propName exists on the prototype of `Cstr`, this update may be a result of Stencil using native
+            // APIs to reflect props as attributes. Calls to `setAttribute(someElement, propName)` will result in
+            // `propName` to be converted to a `DOMString`, which may not be what we want for other primitive props.
+            return;
+          }
+
           this[propName] = newValue === null && typeof this[propName] === 'boolean' ? false : newValue;
         });
       };

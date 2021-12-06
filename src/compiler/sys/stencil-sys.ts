@@ -16,6 +16,8 @@ import type {
 } from '../../declarations';
 import platformPath from 'path-browserify';
 import { basename, dirname, join } from 'path';
+import * as process from 'process';
+import * as os from 'os';
 import { buildEvents } from '../events';
 import { createLogger } from './logger/console-logger';
 import { createWebWorkerMainController } from './worker/web-worker-main';
@@ -36,7 +38,7 @@ export const createSystem = (c?: { logger?: Logger }) => {
 
   const destroy = async () => {
     const waits: Promise<void>[] = [];
-    destroys.forEach(cb => {
+    destroys.forEach((cb) => {
       try {
         const rtn = cb();
         if (rtn && rtn.then) {
@@ -74,6 +76,14 @@ export const createSystem = (c?: { logger?: Logger }) => {
     return true;
   };
 
+  const isTTY = (): boolean => {
+    return !!process?.stdout?.isTTY;
+  };
+
+  const homeDir = () => {
+    return os.homedir();
+  };
+
   const createDirSync = (p: string, opts?: CompilerSystemCreateDirectoryOptions) => {
     p = normalize(p);
     const results: CompilerSystemCreateDirectoryResults = {
@@ -90,7 +100,7 @@ export const createSystem = (c?: { logger?: Logger }) => {
   const createDirRecursiveSync = (
     p: string,
     opts: CompilerSystemCreateDirectoryOptions,
-    results: CompilerSystemCreateDirectoryResults,
+    results: CompilerSystemCreateDirectoryResults
   ) => {
     const parentDir = dirname(p);
 
@@ -286,7 +296,7 @@ export const createSystem = (c?: { logger?: Logger }) => {
   const remoreDirSyncRecursive = (
     p: string,
     opts: CompilerSystemRemoveDirectoryOptions,
-    results: CompilerSystemRemoveDirectoryResults,
+    results: CompilerSystemRemoveDirectoryResults
   ) => {
     if (!results.error) {
       p = normalize(p);
@@ -495,6 +505,23 @@ export const createSystem = (c?: { logger?: Logger }) => {
     return results;
   };
 
+  /**
+   * `self` is the global namespace object used within a web worker.
+   * `window` is the browser's global namespace object (I reorganized this to check the reference on that second)
+   * `global` is Node's global namespace object. https://nodejs.org/api/globals.html#globals_global
+   *
+   * loading in this order should allow workers, which are most common, then browser,
+   * then Node to grab the reference to fetch correctly.
+   */
+  const fetch =
+    typeof self !== 'undefined'
+      ? self?.fetch
+      : typeof window !== 'undefined'
+      ? window?.fetch
+      : typeof global !== 'undefined'
+      ? global?.fetch
+      : undefined;
+
   const writeFile = async (p: string, data: string) => writeFileSync(p, data);
 
   const tmpDirSync = () => '/.tmp';
@@ -506,7 +533,7 @@ export const createSystem = (c?: { logger?: Logger }) => {
   const generateContentHash = async (content: string, hashLength: number) => {
     const arrayBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(content));
     const hashArray = Array.from(new Uint8Array(arrayBuffer)); // convert buffer to byte array
-    let hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join(''); // convert bytes to hex string
+    let hashHex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join(''); // convert bytes to hex string
     if (typeof hashLength === 'number') {
       hashHex = hashHex.substr(0, hashLength);
     }
@@ -521,6 +548,10 @@ export const createSystem = (c?: { logger?: Logger }) => {
     };
     logger.info('todo, copy task', copyTasks.length, srcDir);
     return results;
+  };
+
+  const getEnvironmentVar = (key: string) => {
+    return process?.env[key];
   };
 
   const getLocalModulePath = (opts: { rootDir: string; moduleId: string; path: string }) =>
@@ -546,9 +577,12 @@ export const createSystem = (c?: { logger?: Logger }) => {
     copyFile,
     createDir,
     createDirSync,
+    homeDir,
+    isTTY,
+    getEnvironmentVar,
     destroy,
     encodeToBase64,
-    exit: async exitCode => logger.warn(`exit ${exitCode}`),
+    exit: async (exitCode) => logger.warn(`exit ${exitCode}`),
     getCurrentDirectory,
     getCompilerExecutingPath,
     getLocalModulePath,
@@ -566,6 +600,7 @@ export const createSystem = (c?: { logger?: Logger }) => {
     realpathSync,
     removeDestory,
     rename,
+    fetch,
     resolvePath,
     removeDir,
     removeDirSync,
@@ -581,7 +616,7 @@ export const createSystem = (c?: { logger?: Logger }) => {
     writeFileSync,
     generateContentHash,
     createWorkerController: HAS_WEB_WORKER
-      ? maxConcurrentWorkers => createWebWorkerMainController(sys, maxConcurrentWorkers)
+      ? (maxConcurrentWorkers) => createWebWorkerMainController(sys, maxConcurrentWorkers)
       : null,
     details: {
       cpuModel: '',
@@ -593,7 +628,7 @@ export const createSystem = (c?: { logger?: Logger }) => {
     copy,
   };
 
-  sys.resolveModuleId = opts => resolveModuleIdAsync(sys, null, opts);
+  sys.resolveModuleId = (opts) => resolveModuleIdAsync(sys, null, opts);
 
   return sys;
 };

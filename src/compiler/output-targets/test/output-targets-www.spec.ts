@@ -19,7 +19,14 @@ xdescribe('outputTarget, www', () => {
 
     await compiler.fs.writeFiles({
       [path.join(root, 'User', 'testing', 'src', 'index.html')]: `<cmp-a></cmp-a>`,
-      [path.join(root, 'User', 'testing', 'src', 'components', 'cmp-a.tsx')]: `@Component({ tag: 'cmp-a' }) export class CmpA {}`,
+      [path.join(
+        root,
+        'User',
+        'testing',
+        'src',
+        'components',
+        'cmp-a.tsx'
+      )]: `@Component({ tag: 'cmp-a' }) export class CmpA {}`,
     });
     await compiler.fs.commit();
 
@@ -30,8 +37,10 @@ xdescribe('outputTarget, www', () => {
       path.join(root, 'User', 'testing', 'www'),
       path.join(root, 'User', 'testing', 'www', 'build'),
       path.join(root, 'User', 'testing', 'www', 'build', 'app.js'),
+      path.join(root, 'User', 'testing', 'www', 'build', 'app.js.map'),
       path.join(root, 'User', 'testing', 'www', 'build', 'app.esm.js'),
       path.join(root, 'User', 'testing', 'www', 'build', 'cmp-a.entry.js'),
+      path.join(root, 'User', 'testing', 'www', 'build', 'cmp-a.entry.js.map'),
 
       path.join(root, 'User', 'testing', 'www', 'index.html'),
 

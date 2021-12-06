@@ -4,7 +4,6 @@ import { Component, State, h } from '@stencil/core';
   tag: 'shadow-dom-mode-root',
 })
 export class ShadowDomModeRoot {
-
   @State() showRed = false;
 
   componentDidLoad() {
@@ -17,11 +16,8 @@ export class ShadowDomModeRoot {
     return (
       <div>
         <shadow-dom-mode id="blue" colormode="blue"></shadow-dom-mode>
-        {this.showRed ? (
-          <shadow-dom-mode id="red"></shadow-dom-mode>
-        ) : null}
+        {this.showRed ? <shadow-dom-mode id="red"></shadow-dom-mode> : null}
       </div>
     );
   }
-
 }

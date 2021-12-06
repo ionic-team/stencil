@@ -3,10 +3,14 @@ import { join } from 'path';
 import { BuildOptions, getOptions } from './utils/options';
 import { PackageData } from './utils/write-pkg-json';
 
+/**
+ * Dependencies that will be included in the Stencil output
+ */
 const entryDeps = [
   '@rollup/plugin-commonjs',
   '@rollup/plugin-json',
   '@rollup/plugin-node-resolve',
+  '@yarnpkg/lockfile',
   'ansi-colors',
   'autoprefixer',
   'css',
@@ -15,6 +19,7 @@ const entryDeps = [
   'graceful-fs',
   'fast-deep-equal',
   'is-extglob',
+  'merge-source-map',
   'minimatch',
   'node-fetch',
   'open',
@@ -51,7 +56,11 @@ const manuallyNotBundled = new Set([
   'urix',
 ]);
 
-export function createLicense(rootDir: string) {
+/**
+ * Generate LICENSE.md for Stencil
+ * @param rootDir the root directory of the Stencil repo
+ */
+export function createLicense(rootDir: string): void {
   const opts = getOptions(rootDir);
   const thirdPartyLicensesRootPath = join(opts.rootDir, 'NOTICE.md');
 
@@ -66,7 +75,7 @@ export function createLicense(rootDir: string) {
   });
 
   const licenses = bundledDeps
-    .map(l => l.license)
+    .map((l) => l.license)
     .reduce((arr, l) => {
       if (!arr.includes(l)) {
         arr.push(l);
@@ -81,22 +90,22 @@ export function createLicense(rootDir: string) {
 
 The published Stencil distribution contains the following licenses:
 
-${licenses.map(l => `    ` + l).join('\n')}
+${licenses.map((l) => `    ` + l).join('\n')}
 
 The following distributions have been modified to be bundled within this distribution:
 
 --------
 
-${bundledDeps.map(l => l.content).join('\n')}
+${bundledDeps.map((l) => l.content).join('\n')}
 
 `.trim() + '\n';
 
   fs.writeFileSync(thirdPartyLicensesRootPath, output);
 
   const licenseSource: string[] = [];
-  bundledDeps.forEach(d => {
+  bundledDeps.forEach((d) => {
     licenseSource.push(d.moduleId);
-    d.dependencies.forEach(childDep => {
+    d.dependencies.forEach((childDep) => {
       licenseSource.push(`  ${childDep}`);
     });
     licenseSource.push('');
@@ -105,19 +114,30 @@ ${bundledDeps.map(l => l.content).join('\n')}
   fs.writeFileSync(join(opts.buildDir, 'license-source.txt'), licenseSource.join('\n'));
 }
 
-function createBundledDeps(opts: BuildOptions, bundledDeps: BundledDep[], deps: string[]) {
-  if (Array.isArray(deps)) {
-    deps.forEach(moduleId => {
-      if (includeDepLicense(bundledDeps, moduleId)) {
-        const bundledDep = createBundledDepLicense(opts, moduleId);
-        bundledDeps.push(bundledDep);
+/**
+ * Generate license metadata for a series of dependencies
+ * @param opts metadata used during the generation of a license
+ * @param bundledDeps the current list of dependencies to bundle
+ * @param deps the dependencies to generate metadata for
+ */
+function createBundledDeps(opts: BuildOptions, bundledDeps: BundledDep[], deps: ReadonlyArray<string>): void {
+  deps.forEach((moduleId) => {
+    if (includeDepLicense(bundledDeps, moduleId)) {
+      const bundledDep = createBundledDepLicense(opts, moduleId);
+      bundledDeps.push(bundledDep);
 
-        createBundledDeps(opts, bundledDeps, bundledDep.dependencies);
-      }
-    });
-  }
+      // evaluate the dependencies of the dependency for inclusion
+      createBundledDeps(opts, bundledDeps, bundledDep.dependencies);
+    }
+  });
 }
 
+/**
+ * Generate license metadata for a single dependency
+ * @param opts build options to be used to determine where to inspect dependencies
+ * @param moduleId the name of the dependency to generate a license for
+ * @returns all metadata for a dependency that was able to be retrieved for the given dependency
+ */
 function createBundledDepLicense(opts: BuildOptions, moduleId: string): BundledDep {
   const pkgJsonFile = join(opts.nodeModulesDir, moduleId, 'package.json');
   const pkgJson: PackageData = fs.readJsonSync(pkgJsonFile);
@@ -133,7 +153,7 @@ function createBundledDepLicense(opts: BuildOptions, moduleId: string): BundledD
 
   if (Array.isArray(pkgJson.licenses)) {
     const bundledLicenses = [];
-    pkgJson.licenses.forEach(l => {
+    pkgJson.licenses.forEach((l) => {
       if (l.type) {
         license = l.type;
         bundledLicenses.push(l.type);
@@ -164,7 +184,7 @@ function createBundledDepLicense(opts: BuildOptions, moduleId: string): BundledD
     depLicense
       .trim()
       .split('\n')
-      .forEach(ln => {
+      .forEach((ln) => {
         output.push(`> ${ln}`);
       });
   }
@@ -181,6 +201,9 @@ function createBundledDepLicense(opts: BuildOptions, moduleId: string): BundledD
   };
 }
 
+/**
+ * Representation of a dependency that is bundled with Stencil which has a license to be written to disk
+ */
 interface BundledDep {
   moduleId: string;
   content: string;
@@ -188,41 +211,59 @@ interface BundledDep {
   dependencies: string[];
 }
 
-function getContributors(prop: any) {
-  if (typeof prop === 'string') {
-    return prop;
+/**
+ * Format the list of contributors for a dependency
+ * @param contributors the contributors, as read from a `package.json` file
+ * @returns the contributors list, formatted
+ */
+function getContributors(contributors: unknown): typeof contributors {
+  if (typeof contributors === 'string') {
+    return contributors;
   }
 
-  if (Array.isArray(prop)) {
-    return prop
+  if (Array.isArray(contributors)) {
+    return contributors
       .map(getAuthor)
-      .filter(c => !!c)
+      .filter((c) => !!c)
       .join(', ');
   }
 
-  if (prop) {
-    return getAuthor(prop);
+  if (contributors) {
+    return getAuthor(contributors);
   }
 }
 
-function getAuthor(c: any) {
-  if (typeof c === 'string') {
-    return c;
+/**
+ * Formats an individual contributor's information
+ * @param contributor the contributor information
+ * @returns the formatted contributor information
+ */
+function getAuthor(contributor: any): string {
+  if (typeof contributor === 'string') {
+    return contributor;
   }
-  if (typeof c.name === 'string') {
-    if (typeof c.url === 'string') {
-      return `[${c.name}](${c.url})`;
+  if (typeof contributor.name === 'string') {
+    if (typeof contributor.url === 'string') {
+      return `[${contributor.name}](${contributor.url})`;
     } else {
-      return c.name;
+      return contributor.name;
     }
   }
-  if (typeof c.url === 'string') {
-    return c.url;
+  if (typeof contributor.url === 'string') {
+    return contributor.url;
   }
 }
 
-function getBundledDepLicenseContent(opts: BuildOptions, moduleId: string) {
-  const licenseFiles = ['LICENSE', 'LICENSE.md', 'LICENSE-MIT', 'LICENSE.txt']
+/**
+ * Retrieve the license file for a dependency. This function assumes that the license will be provided in an external
+ * file by the dependency. It is therefore possible that the addition/removal of a license file in a dependency will
+ * alter Stencil's generated LICENSE.md file between releases.
+ * @param opts build options to be used to determine where to look for a license
+ * @param moduleId the name of the dependency to check
+ * @returns the license for a dependency, undefined if none was found
+ */
+function getBundledDepLicenseContent(opts: BuildOptions, moduleId: string): string | undefined {
+  const licenseFiles = ['LICENSE', 'LICENSE.md', 'LICENSE-MIT', 'LICENSE.txt'];
   for (const licenseFile of licenseFiles) {
     try {
       const licensePath = join(opts.nodeModulesDir, moduleId, licenseFile);
@@ -231,14 +272,20 @@ function getBundledDepLicenseContent(opts: BuildOptions, moduleId: string) {
   }
 }
 
-function includeDepLicense(bundledDeps: BundledDep[], moduleId: string) {
+/**
+ * Determines if a dependency's license should be included in the generated license file or not
+ * @param bundledDeps the current list of dependencies to bundle
+ * @param moduleId the name of the dependency to check for inclusion
+ * @returns true of the dependency's license should be included, false otherwise
+ */
+function includeDepLicense(bundledDeps: BundledDep[], moduleId: string): boolean {
   if (manuallyNotBundled.has(moduleId)) {
     return false;
   }
   if (moduleId.startsWith('@types/')) {
     return false;
   }
-  if (bundledDeps.some(b => b.moduleId === moduleId)) {
+  if (bundledDeps.some((b) => b.moduleId === moduleId)) {
     return false;
   }
   return true;

@@ -22,7 +22,7 @@ async function pageSpyOnEvent(page: pd.E2EPageInternal, eventName: string, selec
 
   const handle = await page.evaluateHandle(handler);
 
-  await addE2EListener(page, handle, eventName, ev => {
+  await addE2EListener(page, handle, eventName, (ev) => {
     eventSpy.push(ev);
   });
 
@@ -32,7 +32,7 @@ async function pageSpyOnEvent(page: pd.E2EPageInternal, eventName: string, selec
 export async function waitForEvent(
   page: pd.E2EPageInternal,
   eventName: string,
-  elementHandle: puppeteer.ElementHandle,
+  elementHandle: puppeteer.ElementHandle
 ) {
   const timeoutMs = jasmine.DEFAULT_TIMEOUT_INTERVAL * 0.5;
   const ev = await page.evaluate(
@@ -44,17 +44,17 @@ export async function waitForEvent(
 
         element.addEventListener(
           eventName,
-          ev => {
+          (ev) => {
             clearTimeout(tmr);
-            resolve(((window as unknown) as pd.BrowserWindow).stencilSerializeEvent(ev as any));
+            resolve((window as unknown as pd.BrowserWindow).stencilSerializeEvent(ev as any));
           },
-          { once: true },
+          { once: true }
         );
       });
     },
     elementHandle,
     eventName,
-    timeoutMs,
+    timeoutMs
   );
 
   await page.waitForChanges();
@@ -90,7 +90,7 @@ export class EventSpy implements EventSpy {
       });
     } else {
       let resolve: () => void;
-      const promise = new Promise<void>(r => (resolve = r));
+      const promise = new Promise<void>((r) => (resolve = r));
       this.queuedHandler.push(resolve);
       return promise.then(() => ({
         done: false,
@@ -112,7 +112,7 @@ export async function addE2EListener(
   page: pd.E2EPageInternal,
   elmHandle: puppeteer.JSHandle,
   eventName: string,
-  callback: (ev: any) => void,
+  callback: (ev: any) => void
 ) {
   // NODE CONTEXT
   const id = page._e2eEventIds++;
@@ -127,15 +127,15 @@ export async function addE2EListener(
   await executionContext.evaluate(
     (elm: any, id: number, eventName: string) => {
       elm.addEventListener(eventName, (ev: any) => {
-        ((window as unknown) as pd.BrowserWindow).stencilOnEvent(
+        (window as unknown as pd.BrowserWindow).stencilOnEvent(
           id,
-          ((window as unknown) as pd.BrowserWindow).stencilSerializeEvent(ev),
+          (window as unknown as pd.BrowserWindow).stencilSerializeEvent(ev)
         );
       });
     },
     elmHandle,
     id,
-    eventName,
+    eventName
   );
 }
 
@@ -150,7 +150,7 @@ function nodeContextEvents(waitForEvents: Map<number, pd.WaitForEvent>, eventId:
 function browserContextEvents() {
   // BROWSER CONTEXT
   const waitFrame = () => {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       requestAnimationFrame(resolve);
     });
   };
@@ -171,7 +171,7 @@ function browserContextEvents() {
 
     waitForDidLoad(promises, window.document.documentElement);
 
-    return Promise.all(promises).catch(e => console.error(e));
+    return Promise.all(promises).catch((e) => console.error(e));
   };
 
   const stencilReady = () => {
@@ -179,11 +179,11 @@ function browserContextEvents() {
       .then(() => waitFrame())
       .then(() => allReady())
       .then(() => {
-        ((window as unknown) as pd.BrowserWindow).stencilAppLoaded = true;
+        (window as unknown as pd.BrowserWindow).stencilAppLoaded = true;
       });
   };
 
-  ((window as unknown) as pd.BrowserWindow).stencilSerializeEventTarget = (target: any) => {
+  (window as unknown as pd.BrowserWindow).stencilSerializeEventTarget = (target: any) => {
     // BROWSER CONTEXT
     if (!target) {
       return null;
@@ -209,21 +209,21 @@ function browserContextEvents() {
     return null;
   };
 
-  ((window as unknown) as pd.BrowserWindow).stencilSerializeEvent = (orgEv: any) => {
+  (window as unknown as pd.BrowserWindow).stencilSerializeEvent = (orgEv: any) => {
     // BROWSER CONTEXT
     const serializedEvent: SerializedEvent = {
       bubbles: orgEv.bubbles,
       cancelBubble: orgEv.cancelBubble,
       cancelable: orgEv.cancelable,
       composed: orgEv.composed,
-      currentTarget: ((window as unknown) as pd.BrowserWindow).stencilSerializeEventTarget(orgEv.currentTarget),
+      currentTarget: (window as unknown as pd.BrowserWindow).stencilSerializeEventTarget(orgEv.currentTarget),
       defaultPrevented: orgEv.defaultPrevented,
       detail: orgEv.detail,
       eventPhase: orgEv.eventPhase,
       isTrusted: orgEv.isTrusted,
       returnValue: orgEv.returnValue,
-      srcElement: ((window as unknown) as pd.BrowserWindow).stencilSerializeEventTarget(orgEv.srcElement),
-      target: ((window as unknown) as pd.BrowserWindow).stencilSerializeEventTarget(orgEv.target),
+      srcElement: (window as unknown as pd.BrowserWindow).stencilSerializeEventTarget(orgEv.srcElement),
+      target: (window as unknown as pd.BrowserWindow).stencilSerializeEventTarget(orgEv.target),
       timeStamp: orgEv.timeStamp,
       type: orgEv.type,
       isSerializedEvent: true,

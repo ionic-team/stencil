@@ -20,10 +20,10 @@ describe('validateTesting', () => {
       configPath: path.join(ROOT, 'User', 'some', 'path', 'stencil.config.ts'),
     };
     userConfig.outputTargets = [
-      ({
+      {
         type: 'www',
         dir: path.join(ROOT, 'www'),
-      } as any) as d.OutputTargetStats,
+      } as any as d.OutputTargetStats,
     ];
   });
 
@@ -59,7 +59,13 @@ describe('validateTesting', () => {
     userConfig.flags.e2e = true;
     userConfig.flags.ci = true;
     const { config } = validateConfig(userConfig);
-    expect(config.testing.browserArgs).toEqual(['--font-render-hinting=medium', '--incognito', '--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']);
+    expect(config.testing.browserArgs).toEqual([
+      '--font-render-hinting=medium',
+      '--incognito',
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+    ]);
   });
 
   it('default browser args', () => {

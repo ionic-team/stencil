@@ -1,7 +1,16 @@
 import type * as d from '../../../declarations';
 import type { BundleOptions } from '../../bundle/bundle-interface';
 import { bundleOutput } from '../../bundle/bundle-output';
-import { catchError, dashToPascalCase, formatComponentRuntimeMeta, hasError, stringifyRuntimeData } from '@utils';
+import {
+  catchError,
+  dashToPascalCase,
+  formatComponentRuntimeMeta,
+  generatePreamble,
+  getSourceMappingUrlForEndOfFile,
+  hasError,
+  rollupToStencilSourceMap,
+  stringifyRuntimeData,
+} from '@utils';
 import { getCustomElementsBuildConditionals } from './custom-elements-build-conditionals';
 import { isOutputTargetDistCustomElementsBundle } from '../output-utils';
 import { join } from 'path';
@@ -14,8 +23,8 @@ import { updateStencilCoreImports } from '../../transformers/update-stencil-core
 export const outputCustomElementsBundle = async (
   config: d.Config,
   compilerCtx: d.CompilerCtx,
-  buildCtx: d.BuildCtx,
-) => {
+  buildCtx: d.BuildCtx
+): Promise<void> => {
   if (!config.buildDist) {
     return;
   }
@@ -25,18 +34,19 @@ export const outputCustomElementsBundle = async (
     return;
   }
 
-  const timespan = buildCtx.createTimeSpan(`generate custom elements bundle started`);
+  const bundlingEventMessage = `generate custom elements bundle${config.sourceMap ? ' + source maps' : ''}`;
+  const timespan = buildCtx.createTimeSpan(`${bundlingEventMessage} started`);
 
-  await Promise.all(outputTargets.map(o => bundleCustomElements(config, compilerCtx, buildCtx, o)));
+  await Promise.all(outputTargets.map((o) => bundleCustomElements(config, compilerCtx, buildCtx, o)));
 
-  timespan.finish(`generate custom elements bundle finished`);
+  timespan.finish(`${bundlingEventMessage} finished`);
 };
 
 const bundleCustomElements = async (
   config: d.Config,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
-  outputTarget: d.OutputTargetDistCustomElementsBundle,
+  outputTarget: d.OutputTargetDistCustomElementsBundle
 ) => {
   try {
     const bundleOpts: BundleOptions = {
@@ -59,6 +69,7 @@ const bundleCustomElements = async (
     const build = await bundleOutput(config, compilerCtx, buildCtx, bundleOpts);
     if (build) {
       const rollupOutput = await build.generate({
+        banner: generatePreamble(config),
         format: 'esm',
         sourcemap: config.sourceMap,
         chunkFileNames: outputTarget.externalRuntime || !config.hashFileNames ? '[name].js' : 'p-[hash].js',
@@ -68,17 +79,30 @@ const bundleCustomElements = async (
       });
 
       const minify = outputTarget.externalRuntime || outputTarget.minify !== true ? false : config.minifyJs;
-      const files = rollupOutput.output.map(async bundle => {
+      const files = rollupOutput.output.map(async (bundle) => {
         if (bundle.type === 'chunk') {
           let code = bundle.code;
+          let sourceMap = rollupToStencilSourceMap(bundle.map);
           const optimizeResults = await optimizeModule(config, compilerCtx, {
             input: code,
             isCore: bundle.isEntry,
             minify,
+            sourceMap,
           });
           buildCtx.diagnostics.push(...optimizeResults.diagnostics);
           if (!hasError(optimizeResults.diagnostics) && typeof optimizeResults.output === 'string') {
             code = optimizeResults.output;
+            sourceMap = optimizeResults.sourceMap;
+          }
+          if (sourceMap) {
+            code = code + getSourceMappingUrlForEndOfFile(bundle.fileName);
+            await compilerCtx.fs.writeFile(
+              join(outputTarget.dir, bundle.fileName + '.map'),
+              JSON.stringify(sourceMap),
+              {
+                outputTargetType: outputTarget.type,
+              }
+            );
           }
           await compilerCtx.fs.writeFile(join(outputTarget.dir, bundle.fileName), code, {
             outputTargetType: outputTarget.type,
@@ -100,14 +124,14 @@ const generateEntryPoint = (outputTarget: d.OutputTargetDistCustomElementsBundle
   imp.push(
     `import { proxyCustomElement } from '${STENCIL_INTERNAL_CLIENT_ID}';`,
     `export { setAssetPath, setPlatformOptions } from '${STENCIL_INTERNAL_CLIENT_ID}';`,
-    `export * from '${USER_INDEX_ENTRY_ID}';`,
+    `export * from '${USER_INDEX_ENTRY_ID}';`
   );
 
   if (outputTarget.includeGlobalScripts !== false) {
     imp.push(`import { globalScripts } from '${STENCIL_APP_GLOBALS_ID}';`, `globalScripts();`);
   }
 
-  buildCtx.components.forEach(cmp => {
+  buildCtx.components.forEach((cmp) => {
     const exportName = dashToPascalCase(cmp.tagName);
     const importName = cmp.componentClassName;
     const importAs = `$Cmp${exportName}`;

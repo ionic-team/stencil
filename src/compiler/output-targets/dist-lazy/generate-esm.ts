@@ -5,34 +5,70 @@ import { join } from 'path';
 import type { OutputOptions, RollupBuild } from 'rollup';
 import { relativeImport } from '../output-utils';
 import type { RollupResult } from '../../../declarations';
+import { generatePreamble } from '@utils';
 
-export const generateEsm = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, rollupBuild: RollupBuild, outputTargets: d.OutputTargetDistLazy[]) => {
-  const esmEs5Outputs = config.buildEs5 ? outputTargets.filter(o => !!o.esmEs5Dir && !o.isBrowserBuild) : [];
-  const esmOutputs = outputTargets.filter(o => !!o.esmDir && !o.isBrowserBuild);
+export const generateEsm = async (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  buildCtx: d.BuildCtx,
+  rollupBuild: RollupBuild,
+  outputTargets: d.OutputTargetDistLazy[]
+): Promise<d.UpdatedLazyBuildCtx> => {
+  const esmEs5Outputs = config.buildEs5 ? outputTargets.filter((o) => !!o.esmEs5Dir && !o.isBrowserBuild) : [];
+  const esmOutputs = outputTargets.filter((o) => !!o.esmDir && !o.isBrowserBuild);
   if (esmOutputs.length + esmEs5Outputs.length > 0) {
     const esmOpts: OutputOptions = {
+      banner: generatePreamble(config),
       format: 'es',
       entryFileNames: '[name].js',
       assetFileNames: '[name]-[hash][extname]',
       preferConst: true,
+      sourcemap: config.sourceMap,
     };
     const outputTargetType = esmOutputs[0].type;
     const output = await generateRollupOutput(rollupBuild, esmOpts, config, buildCtx.entryModules);
-    if (output != null) {
-      const es2017destinations = esmOutputs.map(o => o.esmDir);
-      await generateLazyModules(config, compilerCtx, buildCtx, outputTargetType, es2017destinations, output, 'es2017', false, '');
 
-      const es5destinations = esmEs5Outputs.map(o => o.esmEs5Dir);
-      await generateLazyModules(config, compilerCtx, buildCtx, outputTargetType, es5destinations, output, 'es5', false, '');
+    if (output != null) {
+      const es2017destinations = esmOutputs.map((o) => o.esmDir);
+      buildCtx.esmComponentBundle = await generateLazyModules(
+        config,
+        compilerCtx,
+        buildCtx,
+        outputTargetType,
+        es2017destinations,
+        output,
+        'es2017',
+        false,
+        ''
+      );
+
+      const es5destinations = esmEs5Outputs.map((o) => o.esmEs5Dir);
+      buildCtx.es5ComponentBundle = await generateLazyModules(
+        config,
+        compilerCtx,
+        buildCtx,
+        outputTargetType,
+        es5destinations,
+        output,
+        'es5',
+        false,
+        ''
+      );
 
       await copyPolyfills(config, compilerCtx, esmOutputs);
       await generateShortcuts(config, compilerCtx, outputTargets, output);
     }
   }
+
+  return { name: 'esm', buildCtx };
 };
 
-const copyPolyfills = async (config: d.Config, compilerCtx: d.CompilerCtx, outputTargets: d.OutputTargetDistLazy[]) => {
-  const destinations = outputTargets.filter(o => o.polyfills).map(o => o.esmDir);
+const copyPolyfills = async (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  outputTargets: d.OutputTargetDistLazy[]
+): Promise<void> => {
+  const destinations = outputTargets.filter((o) => o.polyfills).map((o) => o.esmDir);
   if (destinations.length === 0) {
     return;
   }
@@ -41,28 +77,34 @@ const copyPolyfills = async (config: d.Config, compilerCtx: d.CompilerCtx, outpu
   const files = await compilerCtx.fs.readdir(src);
 
   await Promise.all(
-    destinations.map(dest => {
+    destinations.map((dest) => {
       return Promise.all(
-        files.map(f => {
+        files.map((f) => {
           return compilerCtx.fs.copyFile(f.absPath, join(dest, 'polyfills', f.relPath));
-        }),
+        })
       );
-    }),
+    })
   );
 };
 
-const generateShortcuts = (config: d.Config, compilerCtx: d.CompilerCtx, outputTargets: d.OutputTargetDistLazy[], rollupResult: RollupResult[]) => {
-  const indexFilename = rollupResult.find(r => r.type === 'chunk' && r.isIndex).fileName;
+const generateShortcuts = (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  outputTargets: d.OutputTargetDistLazy[],
+  rollupResult: RollupResult[]
+): Promise<void[]> => {
+  const indexFilename = rollupResult.find((r) => r.type === 'chunk' && r.isIndex).fileName;
 
   return Promise.all(
-    outputTargets.map(async o => {
+    outputTargets.map(async (o) => {
       if (o.esmDir && o.esmIndexFile) {
-        const entryPointPath = config.buildEs5 && o.esmEs5Dir ? join(o.esmEs5Dir, indexFilename) : join(o.esmDir, indexFilename);
+        const entryPointPath =
+          config.buildEs5 && o.esmEs5Dir ? join(o.esmEs5Dir, indexFilename) : join(o.esmDir, indexFilename);
 
         const relativePath = relativeImport(o.esmIndexFile, entryPointPath);
         const shortcutContent = `export * from '${relativePath}';`;
         await compilerCtx.fs.writeFile(o.esmIndexFile, shortcutContent, { outputTargetType: o.type });
       }
-    }),
+    })
   );
 };

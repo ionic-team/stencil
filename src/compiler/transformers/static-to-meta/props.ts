@@ -13,13 +13,13 @@ export const parseStaticProps = (staticMembers: ts.ClassElement[]): d.ComponentC
     return [];
   }
 
-  return propNames.map(propName => {
+  return propNames.map((propName) => {
     const val = parsedProps[propName];
     return {
       name: propName,
       type: val.type,
       attribute: val.attribute ? val.attribute.toLowerCase() : undefined,
-      reflect: typeof val.reflect === 'boolean' ? val.reflect : typeof val.reflect === 'boolean' ? val.reflect : false,
+      reflect: typeof val.reflect === 'boolean' ? val.reflect : false,
       mutable: !!val.mutable,
       required: !!val.required,
       optional: !!val.optional,

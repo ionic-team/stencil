@@ -42,7 +42,7 @@ export class MockNode {
   }
 
   append(...items: (MockNode | string)[]) {
-    items.forEach(item => {
+    items.forEach((item) => {
       const isNode = typeof item === 'object' && item !== null && 'nodeType' in item;
       this.appendChild(isNode ? item : this.ownerDocument.createTextNode(String(item)));
     });
@@ -50,7 +50,7 @@ export class MockNode {
 
   prepend(...items: (MockNode | string)[]) {
     const firstChild = this.firstChild;
-    items.forEach(item => {
+    items.forEach((item) => {
       const isNode = typeof item === 'object' && item !== null && 'nodeType' in item;
       this.insertBefore(isNode ? item : this.ownerDocument.createTextNode(String(item)), firstChild);
     });
@@ -66,7 +66,7 @@ export class MockNode {
     return -1;
   }
 
-  get firstChild() {
+  get firstChild(): MockNode | null {
     return this.childNodes[0] || null;
   }
 
@@ -103,11 +103,11 @@ export class MockNode {
     return this === node;
   }
 
-  get lastChild() {
+  get lastChild(): MockNode | null {
     return this.childNodes[this.childNodes.length - 1] || null;
   }
 
-  get nextSibling() {
+  get nextSibling(): MockNode | null {
     if (this.parentNode != null) {
       const index = this.parentNode.childNodes.indexOf(this) + 1;
       return this.parentNode.childNodes[index] || null;
@@ -123,13 +123,13 @@ export class MockNode {
   }
 
   get parentElement() {
-    return ((this.parentNode as any) as MockElement) || null;
+    return (this.parentNode as any as MockElement) || null;
   }
   set parentElement(value: any) {
     this.parentNode = value;
   }
 
-  get previousSibling() {
+  get previousSibling(): MockNode | null {
     if (this.parentNode != null) {
       const index = this.parentNode.childNodes.indexOf(this) - 1;
       return this.parentNode.childNodes[index] || null;
@@ -138,6 +138,9 @@ export class MockNode {
   }
 
   contains(otherNode: MockNode) {
+    if (otherNode === this) {
+      return true;
+    }
     return this.childNodes.includes(otherNode);
   }
 
@@ -251,11 +254,11 @@ export class MockElement extends MockNode {
   }
 
   get children() {
-    return this.childNodes.filter(n => n.nodeType === NODE_TYPES.ELEMENT_NODE) as MockElement[];
+    return this.childNodes.filter((n) => n.nodeType === NODE_TYPES.ELEMENT_NODE) as MockElement[];
   }
 
   get childElementCount() {
-    return this.childNodes.filter(n => n.nodeType === NODE_TYPES.ELEMENT_NODE).length;
+    return this.childNodes.filter((n) => n.nodeType === NODE_TYPES.ELEMENT_NODE).length;
   }
 
   get className() {
@@ -273,7 +276,7 @@ export class MockElement extends MockNode {
     dispatchEvent(this, new MockEvent('click', { bubbles: true, cancelable: true, composed: true }));
   }
 
-  cloneNode(_deep?: boolean): MockElement {
+  override cloneNode(_deep?: boolean): MockElement {
     // implemented on MockElement.prototype from within element.ts
     return null;
   }
@@ -304,7 +307,7 @@ export class MockElement extends MockNode {
     return dispatchEvent(this, ev);
   }
 
-  get firstElementChild() {
+  get firstElementChild(): MockElement | null {
     return this.children[0] || null;
   }
 
@@ -481,7 +484,7 @@ export class MockElement extends MockNode {
     this.setAttributeNS(null, 'lang', value);
   }
 
-  get lastElementChild() {
+  get lastElementChild(): MockElement | null {
     const children = this.children;
     return children[children.length - 1] || null;
   }
@@ -494,7 +497,9 @@ export class MockElement extends MockNode {
     const parentElement = this.parentElement;
     if (
       parentElement != null &&
-      (parentElement.nodeType === NODE_TYPES.ELEMENT_NODE || parentElement.nodeType === NODE_TYPES.DOCUMENT_FRAGMENT_NODE || parentElement.nodeType === NODE_TYPES.DOCUMENT_NODE)
+      (parentElement.nodeType === NODE_TYPES.ELEMENT_NODE ||
+        parentElement.nodeType === NODE_TYPES.DOCUMENT_FRAGMENT_NODE ||
+        parentElement.nodeType === NODE_TYPES.DOCUMENT_NODE)
     ) {
       const children = parentElement.children;
       const index = children.indexOf(this) + 1;
@@ -515,7 +520,9 @@ export class MockElement extends MockNode {
     const parentElement = this.parentElement;
     if (
       parentElement != null &&
-      (parentElement.nodeType === NODE_TYPES.ELEMENT_NODE || parentElement.nodeType === NODE_TYPES.DOCUMENT_FRAGMENT_NODE || parentElement.nodeType === NODE_TYPES.DOCUMENT_NODE)
+      (parentElement.nodeType === NODE_TYPES.ELEMENT_NODE ||
+        parentElement.nodeType === NODE_TYPES.DOCUMENT_FRAGMENT_NODE ||
+        parentElement.nodeType === NODE_TYPES.DOCUMENT_NODE)
     ) {
       const children = parentElement.children;
       const index = children.indexOf(this) - 1;
@@ -528,7 +535,7 @@ export class MockElement extends MockNode {
     const classes = classNames
       .trim()
       .split(' ')
-      .filter(c => c.length > 0);
+      .filter((c) => c.length > 0);
     const results: MockElement[] = [];
     getElementsByClassName(this, classes, results);
     return results;
@@ -666,12 +673,12 @@ export class MockElement extends MockNode {
     this.nodeName = value;
   }
 
-  get textContent() {
+  override get textContent() {
     const text: string[] = [];
     getTextContent(this.childNodes, text);
     return text.join('');
   }
-  set textContent(value: string) {
+  override set textContent(value: string) {
     setTextContent(this, value);
   }
 
@@ -947,7 +954,7 @@ export class MockElement extends MockNode {
     /**/
   }
 
-  toString(opts?: SerializeNodeToHtmlOptions) {
+  override toString(opts?: SerializeNodeToHtmlOptions) {
     return serializeNodeToHtml(this as any, opts);
   }
 }
@@ -1007,26 +1014,26 @@ function insertBefore(parentNode: MockNode, newNode: MockNode, referenceNode: Mo
 }
 
 export class MockHTMLElement extends MockElement {
-  namespaceURI = 'http://www.w3.org/1999/xhtml';
+  override namespaceURI = 'http://www.w3.org/1999/xhtml';
 
   constructor(ownerDocument: any, nodeName: string) {
     super(ownerDocument, typeof nodeName === 'string' ? nodeName.toUpperCase() : null);
   }
 
-  get tagName() {
+  override get tagName() {
     return this.nodeName;
   }
-  set tagName(value: string) {
+  override set tagName(value: string) {
     this.nodeName = value;
   }
 
-  get attributes() {
+  override get attributes() {
     if (this.__attributeMap == null) {
       this.__attributeMap = createAttributeProxy(true);
     }
     return this.__attributeMap;
   }
-  set attributes(attrs: MockAttributeMap) {
+  override set attributes(attrs: MockAttributeMap) {
     this.__attributeMap = attrs;
   }
 }
@@ -1036,14 +1043,14 @@ export class MockTextNode extends MockNode {
     super(ownerDocument, NODE_TYPES.TEXT_NODE, NODE_NAMES.TEXT_NODE, text);
   }
 
-  cloneNode(_deep?: boolean) {
+  override cloneNode(_deep?: boolean) {
     return new MockTextNode(null, this.nodeValue);
   }
 
-  get textContent() {
+  override get textContent() {
     return this.nodeValue;
   }
-  set textContent(text) {
+  override set textContent(text) {
     this.nodeValue = text;
   }
 

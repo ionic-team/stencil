@@ -25,7 +25,7 @@ export function initServerProcess(sendMsg: d.DevServerSendMessage) {
       devServerConfig.address,
       devServerConfig.port,
       devServerConfig.basePath,
-      '/',
+      '/'
     );
     devServerConfig.root = normalizePath(devServerConfig.root);
 
@@ -44,7 +44,7 @@ export function initServerProcess(sendMsg: d.DevServerSendMessage) {
         devServerConfig.address,
         devServerConfig.port,
         devServerConfig.basePath,
-        devServerConfig.initialLoadUrl || DEV_SERVER_INIT_URL,
+        devServerConfig.initialLoadUrl || DEV_SERVER_INIT_URL
       );
       openInBrowser({ url: initialLoadUrl });
     }
@@ -55,10 +55,10 @@ export function initServerProcess(sendMsg: d.DevServerSendMessage) {
   const closeServer = () => {
     const promises: Promise<any>[] = [];
 
-    buildResultsResolves.forEach(r => r.reject('dev server closed'));
+    buildResultsResolves.forEach((r) => r.reject('dev server closed'));
     buildResultsResolves.length = 0;
 
-    compilerRequestResolves.forEach(r => r.reject('dev server closed'));
+    compilerRequestResolves.forEach((r) => r.reject('dev server closed'));
     compilerRequestResolves.length = 0;
 
     if (serverCtx) {
@@ -72,14 +72,14 @@ export function initServerProcess(sendMsg: d.DevServerSendMessage) {
     }
     if (server) {
       promises.push(
-        new Promise<void>(resolve => {
-          server.close(err => {
+        new Promise<void>((resolve) => {
+          server.close((err) => {
             if (err) {
               console.error(`close error: ${err}`);
             }
             resolve();
           });
-        }),
+        })
       );
     }
     Promise.all(promises).finally(() => {
@@ -107,7 +107,7 @@ export function initServerProcess(sendMsg: d.DevServerSendMessage) {
           }
         } else if (serverCtx) {
           if (msg.buildResults && !msg.isActivelyBuilding) {
-            buildResultsResolves.forEach(r => r.resolve(msg.buildResults));
+            buildResultsResolves.forEach((r) => r.resolve(msg.buildResults));
             buildResultsResolves.length = 0;
           }
           if (webSocket) {

@@ -9,6 +9,22 @@ describe('element', () => {
     doc = new MockDocument();
   });
 
+  it('document.documentElement dir', () => {
+    expect(doc.dir).toBe('');
+    expect(doc.documentElement.getAttribute('dir')).toBe(null);
+    doc.documentElement.setAttribute('dir', 'rtl');
+    expect(doc.documentElement.getAttribute('dir')).toBe('rtl');
+    expect(doc.dir).toBe('rtl');
+  });
+
+  it('document.dir', () => {
+    expect(doc.dir).toBe('');
+    doc.dir = 'ltr';
+    expect(doc.dir).toBe('ltr');
+    doc.dir = 'rtl';
+    expect(doc.dir).toBe('rtl');
+  });
+
   it('insertAdjacentElement beforebegin', () => {
     const elm = doc.createElement('div') as MockHTMLElement;
     elm.innerHTML = '<b>0</b>';
@@ -414,6 +430,20 @@ describe('element', () => {
       // unknown id
       input.setAttribute('list', 'unknown');
       expect(input.list).toEqual(null);
+    });
+  });
+
+  describe('link', () => {
+    it('href', () => {
+      const elm: MockAnchorElement = doc.createElement('a');
+      elm.href = 'http://stenciljs.com/path/to/page';
+      expect(elm.href).toBe('http://stenciljs.com/path/to/page');
+    });
+
+    it('pathname', () => {
+      const elm: MockAnchorElement = doc.createElement('a');
+      elm.href = 'http://stenciljs.com/path/to/page';
+      expect(elm.pathname).toBe('/path/to/page');
     });
   });
 });

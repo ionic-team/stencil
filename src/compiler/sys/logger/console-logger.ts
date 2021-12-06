@@ -6,30 +6,30 @@ export const createLogger = () => {
   let level: d.LogLevel = 'info';
 
   const logger: d.Logger = {
-    enableColors: uc => (useColors = uc),
+    enableColors: (uc) => (useColors = uc),
     getLevel: () => level,
-    setLevel: l => (level = l),
-    emoji: e => e,
+    setLevel: (l) => (level = l),
+    emoji: (e) => e,
     info: console.log.bind(console),
     warn: console.warn.bind(console),
     error: console.error.bind(console),
     debug: console.debug.bind(console),
-    red: msg => msg,
-    green: msg => msg,
-    yellow: msg => msg,
-    blue: msg => msg,
-    magenta: msg => msg,
-    cyan: msg => msg,
-    gray: msg => msg,
-    bold: msg => msg,
-    dim: msg => msg,
-    bgRed: msg => msg,
+    red: (msg) => msg,
+    green: (msg) => msg,
+    yellow: (msg) => msg,
+    blue: (msg) => msg,
+    magenta: (msg) => msg,
+    cyan: (msg) => msg,
+    gray: (msg) => msg,
+    bold: (msg) => msg,
+    dim: (msg) => msg,
+    bgRed: (msg) => msg,
     createTimeSpan: (_startMsg: string, _debug = false): d.LoggerTimeSpan => ({
       duration: () => 0,
       finish: () => 0,
     }),
     printDiagnostics(diagnostics: d.Diagnostic[]) {
-      diagnostics.forEach(diagnostic => logDiagnostic(diagnostic, useColors));
+      diagnostics.forEach((diagnostic) => logDiagnostic(diagnostic, useColors));
     },
   };
   return logger;
@@ -69,14 +69,17 @@ const logDiagnostic = (diagnostic: d.Diagnostic, useColors: boolean) => {
   msg += diagnostic.messageText;
 
   if (diagnostic.lines && diagnostic.lines.length > 0) {
-    diagnostic.lines.forEach(l => {
+    diagnostic.lines.forEach((l) => {
       msg += '\n' + l.lineNumber + ':  ' + l.text;
     });
     msg += '\n';
   }
 
   if (useColors) {
-    const styledPrefix = ['%c' + prefix, `background: ${color}; color: white; padding: 2px 3px; border-radius: 2px; font-size: 0.8em;`];
+    const styledPrefix = [
+      '%c' + prefix,
+      `background: ${color}; color: white; padding: 2px 3px; border-radius: 2px; font-size: 0.8em;`,
+    ];
     console.log(...styledPrefix, msg);
   } else if (diagnostic.level === 'error') {
     console.error(msg);

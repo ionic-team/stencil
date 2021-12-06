@@ -1,6 +1,13 @@
 export const enum VNODE_FLAGS {
   isSlotReference = 1 << 0,
+
+  // slot element has fallback content
+  // still create an element that "mocks" the slot element
   isSlotFallback = 1 << 1,
+
+  // slot element does not have fallback content
+  // create an html comment we'll use to always reference
+  // where actual slot content should sit next to
   isHost = 1 << 2,
 }
 
@@ -10,6 +17,7 @@ export const enum PROXY_FLAGS {
 }
 
 export const enum PLATFORM_FLAGS {
+  // designates a node in the DOM as being actively moved by the runtime
   isTmpDisconnected = 1 << 0,
   appLoaded = 1 << 1,
   queueSync = 1 << 2,

@@ -47,7 +47,7 @@ export interface StencilConfig {
    * However, it's still common to have styles which should be "global" across all components and the website.
    * A global CSS file is often useful to set CSS Variables.
    *
-   * Additonally, the globalStyle config is can be used to precompile styles with Sass, PostCss, etc.
+   * Additonally, the globalStyle config can be used to precompile styles with Sass, PostCss, etc.
    * Below is an example folder structure containing a webapp's global sass file, named app.css.
    */
   globalStyle?: string;
@@ -91,6 +91,11 @@ export interface StencilConfig {
    * However, either can be added using the plugin array.
    */
   plugins?: any[];
+
+  /**
+   * Generate js source map files for all bundles
+   */
+  sourceMap?: boolean;
 
   /**
    * The srcDir config specifies the directory which should contain the source typescript files
@@ -167,6 +172,17 @@ export interface StencilConfig {
    * can also be used to not include the hydrated flag at all by setting it to `null`.
    */
   hydratedFlag?: HydratedFlag;
+
+  /**
+   * Ionic perfers to hide all components prior to hydration with a style tag appended
+   * to the head of the document containing some `visibility: hidden;` css rules.
+   *
+   * Disabling this will remove the style tag that sets `visibility: hidden;` on all
+   * unhydrated web components. This more closely follows the HTML spec, and allows
+   * you to set your own fallback content.
+   *
+   */
+  invisiblePrehydration?: boolean;
 
   /**
    * Sets the task queue used by stencil's runtime. The task queue schedules DOM read and writes
@@ -282,6 +298,12 @@ export interface ConfigExtras {
   scriptDataOpts?: boolean;
 
   /**
+   * Experimental flag to align the behavior of invoking `textContent` on a scoped component to act more like a
+   * component that uses the shadow DOM. Defaults to `false`
+   */
+  scopedSlotTextContentFix?: boolean;
+
+  /**
    * If enabled `true`, the runtime will check if the shadow dom shim is required. However,
    * if it's determined that shadow dom is already natively supported by the browser then
    * it does not request the shim. When set to `false` it will avoid all shadow dom tests.
@@ -291,8 +313,8 @@ export interface ConfigExtras {
 
   /**
    * When a component is first attached to the DOM, this setting will wait a single tick before
-   * rendering. This worksaround an Angular issue, where Angular attaches the elements before
-   * settings their initial state, leading to double renders and unnecesary event dispatchs.
+   * rendering. This works around an Angular issue, where Angular attaches the elements before
+   * settings their initial state, leading to double renders and unnecessary event dispatches.
    * Defaults to `false`.
    */
   initializeNextTick?: boolean;
@@ -323,7 +345,6 @@ export interface Config extends StencilConfig {
   logLevel?: LogLevel;
   rootDir?: string;
   packageJsonFilePath?: string;
-  sourceMap?: boolean;
   suppressLogs?: boolean;
   profile?: boolean;
   tsCompilerOptions?: any;
@@ -539,6 +560,7 @@ export type TaskCommand =
   | 'info'
   | 'prerender'
   | 'serve'
+  | 'telemetry'
   | 'test'
   | 'version';
 
@@ -865,7 +887,7 @@ export interface SitemapXmpResults {
  * of the actual platform it's being ran ontop of.
  */
 export interface CompilerSystem {
-  name: 'deno' | 'node' | 'in-memory';
+  name: 'node' | 'in-memory';
   version: string;
   events?: BuildEvents;
   details?: SystemDetails;
@@ -902,6 +924,11 @@ export interface CompilerSystem {
    * SYNC! Does not throw.
    */
   createDirSync(p: string, opts?: CompilerSystemCreateDirectoryOptions): CompilerSystemCreateDirectoryResults;
+  homeDir(): string;
+  /**
+   * Used to determine if the current context of the terminal is TTY.
+   */
+  isTTY(): boolean;
   /**
    * Each plaform as a different way to dynamically import modules.
    */
@@ -975,6 +1002,10 @@ export interface CompilerSystem {
    */
   normalizePath(p: string): string;
   onProcessInterrupt?(cb: () => void): void;
+  parseYarnLockFile?: (content: string) => {
+    type: 'success' | 'merge' | 'conflict';
+    object: any;
+  };
   platformPath: PlatformPath;
   /**
    * All return paths are full normalized paths, not just the basenames. Always returns an array, does not throw.
@@ -1029,6 +1060,7 @@ export interface CompilerSystem {
    */
   removeFileSync(p: string): CompilerSystemRemoveFileResults;
   setupCompiler?: (c: { ts: any }) => void;
+
   /**
    * Always returns an object. Does not throw. Check for "error" property if there's an error.
    */
@@ -1674,7 +1706,7 @@ export interface TestingConfig extends JestConfig {
 export interface EmulateConfig {
   /**
    * Predefined device descriptor name, such as "iPhone X" or "Nexus 10".
-   * For a complete list please see: https://github.com/GoogleChrome/puppeteer/blob/master/DeviceDescriptors.js
+   * For a complete list please see: https://github.com/puppeteer/puppeteer/blob/main/src/common/DeviceDescriptors.ts
    */
   device?: string;
 
@@ -1892,6 +1924,12 @@ export interface OutputTargetDistCustomElements extends OutputTargetBaseNext {
   inlineDynamicImports?: boolean;
   includeGlobalScripts?: boolean;
   minify?: boolean;
+  /**
+   * Enables the auto-definition of a component and its children (recursively) in the custom elements registry. This
+   * functionality allows consumers to bypass the explicit call to define a component, its children, its children's
+   * children, etc. Users of this flag should be aware that enabling this functionality may increase bundle size.
+   */
+  autoDefineCustomElements?: boolean;
 }
 
 export interface OutputTargetDistCustomElementsBundle extends OutputTargetBaseNext {

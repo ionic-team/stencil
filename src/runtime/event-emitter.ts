@@ -21,6 +21,13 @@ export const createEvent = (ref: d.RuntimeRef, name: string, flags: number) => {
   };
 };
 
+/**
+ * Helper function to create & dispatch a custom Event on a provided target
+ * @param elm the target of the Event
+ * @param name the name to give the custom Event
+ * @param opts options for configuring a custom Event
+ * @returns the custom Event
+ */
 export const emitEvent = (elm: EventTarget, name: string, opts?: CustomEventInit) => {
   const ev = plt.ce(name, opts);
   elm.dispatchEvent(ev);

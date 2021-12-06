@@ -3,10 +3,9 @@ import { location as module } from './module';
 import { location as moduleIndex } from './module/index';
 
 @Component({
-  tag: 'node-resolution'
+  tag: 'node-resolution',
 })
 export class NodeResolution {
-
   render() {
     return (
       <div>
