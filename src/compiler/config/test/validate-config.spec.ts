@@ -320,6 +320,9 @@ describe('validation', () => {
     ];
     const validated = validateConfig(userConfig);
     expect(validated.diagnostics).toHaveLength(1);
+    expect(validated.diagnostics[0].messageText).toBe(
+      'dist-custom-elements-bundle is deprecated and will be removed in a future major version release. Use "dist-custom-elements" instead. If "dist-custom-elements" does not meet your needs, please add a comment to https://github.com/ionic-team/stencil/issues/3136.'
+    );
   });
 
   it('should default outputTargets with www', () => {
