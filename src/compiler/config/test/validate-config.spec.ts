@@ -316,7 +316,7 @@ describe('validation', () => {
     userConfig.outputTargets = [
       {
         type: 'dist-custom-elements-bundle',
-      } as any,
+      },
     ];
     const validated = validateConfig(userConfig);
     expect(validated.diagnostics).toHaveLength(1);

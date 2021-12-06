@@ -23,8 +23,9 @@ export const validateOutputTargets = (config: d.Config, diagnostics: d.Diagnosti
         outputTarget.type
       }". Valid outputTarget types include: ${VALID_TYPES.map((t) => `"${t}"`).join(', ')}`;
     } else if (outputTarget.type === DIST_CUSTOM_ELEMENTS_BUNDLE) {
+      // TODO(STENCIL-260): Remove this check when the 'dist-custom-elements-bundle' is removed
       const warning = buildWarn(diagnostics);
-      warning.messageText = `dist-custom-elements-bundle is deprecated and will be removed in a future version. Use "dist-custom-elements" instead. If "dist-custom-elements" does not meet your needs, please add a comment to https://github.com/ionic-team/stencil/issues/3136.`;
+      warning.messageText = `dist-custom-elements-bundle is deprecated and will be removed in a future major version release. Use "dist-custom-elements" instead. If "dist-custom-elements" does not meet your needs, please add a comment to https://github.com/ionic-team/stencil/issues/3136.`;
     }
   });
 
