@@ -47,7 +47,7 @@ export class MockCSSStyleDeclaration {
         const splt = rule.split(':');
         if (splt.length > 1) {
           const prop = splt[0].trim();
-          const value = splt[1].trim();
+          const value = splt.slice(1).join(':').trim();
           if (prop !== '' && value !== '') {
             this._styles.set(jsCaseToCssCase(prop), value);
           }
