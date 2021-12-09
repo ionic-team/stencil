@@ -35,7 +35,7 @@
     "karma-chrome-launcher": "^3.1.0",
     "karma-edge-launcher": "^0.4.2",
     "karma-ie-launcher": "^1.0.0",
-    "karma-jasmine": "^3.3.1",
+    "karma-jasmine": "^4.0.1",
     "karma-polyfill": "^1.1.0",
     "karma-typescript": "^5.0.3",
     "normalize.css": "^8.0.1",
