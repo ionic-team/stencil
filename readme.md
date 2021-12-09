@@ -1,6 +1,6 @@
 <p align="center">
   <a href="#">
-    <img alt="stencil" src="https://github.com/ionic-team/stencil/blob/main/stencil-logo.png" width="60">
+    <img alt="stencil-logo" src="https://github.com/ionic-team/stencil/blob/main/stencil-logo.png" width="60">
   </a>
 </p>
 
