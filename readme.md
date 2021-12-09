@@ -1,6 +1,6 @@
 <p align="center">
   <img align="center" href="#">
-    ![stencil](./stencil-logo.png)
+    ![stencil](https://github.com/ionic-team/stencil/blob/main/stencil-logo.png)
   </img>
 </p>
 
