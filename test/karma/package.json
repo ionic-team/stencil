@@ -40,7 +40,6 @@
     "karma-polyfill": "^1.1.0",
     "karma-typescript": "^5.0.3",
     "normalize.css": "^8.0.1",
-    "rollup-plugin-node-globals": "^1.4.0",
     "rollup-plugin-node-polyfills": "^0.1.2",
     "webpack-cli": "^4.9.1",
     "workbox-build": "4.3.1"
