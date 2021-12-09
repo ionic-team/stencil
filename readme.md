@@ -1,7 +1,7 @@
 <p align="center">
-  <img align="center" href="#">
-    ![stencil](https://github.com/ionic-team/stencil/blob/main/stencil-logo.png)
-  </img>
+  <a href="#">
+    <img alt="stencil" src="https://github.com/ionic-team/stencil/blob/main/stencil-logo.png" width="60">
+  </a>
 </p>
 
 <h1 align="center">
