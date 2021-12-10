@@ -43,7 +43,6 @@ const normalizeDiagnostic = (compilerCtx: d.CompilerCtx, diagnostic: d.Diagnosti
     if (typeof (<any>diagnostic.messageText).message === 'string') {
       diagnostic.messageText = (<any>diagnostic.messageText).message;
     } else if (typeof diagnostic.messageText === 'string' && diagnostic.messageText.indexOf('Error: ') === 0) {
-      // TODO: Does my idea break here? I don't _think_ so but we'll see that if I end up converting more things
       diagnostic.messageText = diagnostic.messageText.substr(7);
     }
   }
