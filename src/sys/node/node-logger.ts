@@ -1,11 +1,17 @@
+import { Logger } from '../../declarations';
 import { createTerminalLogger, ColorType, TerminalLoggerSys } from '../../compiler/sys/logger/terminal-logger';
 import ansiColor from 'ansi-colors';
 import fs from 'graceful-fs';
 import path from 'path';
 
-export const createNodeLogger = (c: { process: any }) => {
+/**
+ * Create a logger to run in a Node environment
+ * @param context a context with NodeJS specific details used to create the logger
+ * @returns the created logger
+ */
+export const createNodeLogger = (context: { process: NodeJS.Process }): Logger => {
   let useColors = true;
-  const prcs: NodeJS.Process = c.process;
+  const prcs: NodeJS.Process = context.process;
   const minColumns = 60;
   const maxColumns = 120;
 

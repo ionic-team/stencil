@@ -4,7 +4,13 @@ import { normalizePath } from '../normalize-path';
 import { splitLineBreaks } from './logger-utils';
 import type { Diagnostic, DiagnosticMessageChain, Node } from 'typescript';
 
-export const augmentDiagnosticWithNode = (d: d.Diagnostic, node: Node) => {
+/**
+ * Augment a `Diagnostic` with information from a `Node` in the AST to provide richer error information
+ * @param d the diagnostic to augment
+ * @param node the node to augment with additional information
+ * @returns the augmented diagnostic
+ */
+export const augmentDiagnosticWithNode = (d: d.Diagnostic, node: Node): d.Diagnostic => {
   if (!node) {
     return d;
   }
@@ -30,6 +36,7 @@ export const augmentDiagnosticWithNode = (d: d.Diagnostic, node: Node) => {
     errorCharStart: posStart.character,
     errorLength: Math.max(end - start, 1),
   };
+  // store metadata for line number and character index where the error occurred
   d.lineNumber = errorLine.lineNumber;
   d.columnNumber = errorLine.errorCharStart + 1;
   d.lines.push(errorLine);
@@ -38,6 +45,8 @@ export const augmentDiagnosticWithNode = (d: d.Diagnostic, node: Node) => {
     errorLine.errorCharStart--;
   }
 
+  // if the error did not occur on the first line of the file, add metadata for the line of code preceding the line
+  // where the error was detected to provide the user with additional context
   if (errorLine.lineIndex > 0) {
     const previousLine: d.PrintLine = {
       lineIndex: errorLine.lineIndex - 1,
@@ -50,6 +59,8 @@ export const augmentDiagnosticWithNode = (d: d.Diagnostic, node: Node) => {
     d.lines.unshift(previousLine);
   }
 
+  // if the error did not occur on the last line of the file, add metadata for the line of code following the line
+  // where the error was detected to provide the user with additional context
   if (errorLine.lineIndex + 1 < srcLines.length) {
     const nextLine: d.PrintLine = {
       lineIndex: errorLine.lineIndex + 1,

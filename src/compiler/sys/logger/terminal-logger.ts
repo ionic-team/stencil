@@ -1,6 +1,11 @@
 import { Diagnostic, Logger, LogLevel, LoggerTimeSpan, PrintLine } from '../../../declarations';
 
-export const createTerminalLogger = (loggerSys: TerminalLoggerSys) => {
+/**
+ * Create a logger for outputting information to a terminal environment
+ * @param loggerSys an underlying logger system entity used to create the terminal logger
+ * @returns the created logger
+ */
+export const createTerminalLogger = (loggerSys: TerminalLoggerSys): Logger => {
   let level: LogLevel = 'info';
   let logFilePath: string = null;
   const writeLogQueue: string[] = [];
@@ -261,7 +266,12 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys) => {
     return LOG_LEVELS.indexOf(logLevel) >= LOG_LEVELS.indexOf(level);
   };
 
-  const printDiagnostics = (diagnostics: Diagnostic[], cwd?: string) => {
+  /**
+   * Print all diagnostics to the console
+   * @param diagnostics the diagnostics to print
+   * @param cwd the current working directory
+   */
+  const printDiagnostics = (diagnostics: Diagnostic[], cwd?: string): void => {
     if (!diagnostics || diagnostics.length === 0) return;
 
     let outputLines: string[] = [''];
@@ -273,7 +283,13 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys) => {
     console.log(outputLines.join('\n'));
   };
 
-  const printDiagnostic = (diagnostic: Diagnostic, cwd?: string) => {
+  /**
+   * Formats a single diagnostic to be printed
+   * @param diagnostic the diagnostic to prepare for printing
+   * @param cwd the current working directory
+   * @returns the message from the diagnostic, formatted and split into multiple lines
+   */
+  const printDiagnostic = (diagnostic: Diagnostic, cwd?: string): ReadonlyArray<string> => {
     const outputLines = wordWrap([diagnostic.messageText], loggerSys.getColumns());
 
     let header = '';
@@ -321,12 +337,13 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys) => {
     }
 
     outputLines.push('');
-
+    // code associated with the error/warning
     if (diagnostic.lines && diagnostic.lines.length) {
-      const lines = prepareLines(diagnostic.lines);
+      const lines = removeLeadingWhitespace(diagnostic.lines);
 
       lines.forEach((l) => {
         if (!isMeaningfulLine(l.text)) {
+          // don't print lines just containing whitespace, skip those that do
           return;
         }
 
@@ -337,6 +354,7 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys) => {
         }
 
         while (msg.length < INDENT.length) {
+          // prepend spaces to the message to make sure everything is aligned
           msg = ' ' + msg;
         }
 
@@ -379,7 +397,14 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys) => {
     return outputLines;
   };
 
-  const highlightError = (errorLine: string, errorCharStart: number, errorLength: number) => {
+  /**
+   * Highlights an error
+   * @param errorLine the line containing the error
+   * @param errorCharStart the character at which the error starts
+   * @param errorLength the length of the error, how many characters should be highlighted
+   * @returns the highlighted error
+   */
+  const highlightError = (errorLine: string, errorCharStart: number, errorLength: number): string => {
     let rightSideChars = errorLine.length - errorCharStart + errorLength - 1;
     while (errorLine.length + INDENT.length > loggerSys.getColumns()) {
       if (errorCharStart > errorLine.length - errorCharStart + errorLength && errorCharStart > 5) {
@@ -397,8 +422,8 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys) => {
 
     const lineChars: string[] = [];
     const lineLength = Math.max(errorLine.length, errorCharStart + errorLength);
-    for (var i = 0; i < lineLength; i++) {
-      var chr = errorLine.charAt(i);
+    for (let i = 0; i < lineLength; i++) {
+      let chr = errorLine.charAt(i);
       if (i >= errorCharStart && i < errorCharStart + errorLength) {
         chr = bgRed(chr === '' ? ' ' : chr);
       }
@@ -408,12 +433,17 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys) => {
     return lineChars.join('');
   };
 
-  const javaScriptSyntaxHighlight = (text: string) => {
+  /**
+   * Highlights JavaScript/TypeScript syntax, taking in text and selectively highlighting keywords from the language
+   * @param text the text to highlight
+   * @returns the text with highlighted JS/TS
+   */
+  const javaScriptSyntaxHighlight = (text: string): string => {
     if (text.trim().startsWith('//')) {
       return dim(text);
     }
 
-    const words = text.split(' ').map((word) => {
+    const words = text.split(' ').map((word: string) => {
       if (JS_KEYWORDS.indexOf(word) > -1) {
         return cyan(word);
       }
@@ -423,14 +453,19 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys) => {
     return words.join(' ');
   };
 
-  const cssSyntaxHighlight = (text: string) => {
+  /**
+   * Highlights CSS syntax, taking in text and selectively highlighting keywords from the language
+   * @param text the text to highlight
+   * @returns the text with highlighted CSS
+   */
+  const cssSyntaxHighlight = (text: string): string => {
     let cssProp = true;
     const safeChars = 'abcdefghijklmnopqrstuvwxyz-_';
     const notProp = '.#,:}@$[]/*';
 
     const chars: string[] = [];
 
-    for (var i = 0; i < text.length; i++) {
+    for (let i = 0; i < text.length; i++) {
       const c = text.charAt(i);
 
       if (c === ';' || c === '{') {
@@ -491,7 +526,13 @@ export type ColorType = 'bgRed' | 'blue' | 'bold' | 'cyan' | 'dim' | 'gray' | 'g
 
 const LOG_LEVELS = ['debug', 'info', 'warn', 'error'];
 
-export const wordWrap = (msg: any[], columns: number) => {
+/**
+ * Helper function for word wrapping
+ * @param msg the message to wrap
+ * @param columns the maximum number of columns to occupy per line
+ * @returns the wrapped message
+ */
+export const wordWrap = (msg: any[], columns: number): string[] => {
   const lines: string[] = [];
   const words: any[] = [];
 
@@ -561,13 +602,21 @@ export const wordWrap = (msg: any[], columns: number) => {
   });
 };
 
-const prepareLines = (orgLines: PrintLine[]) => {
+/**
+ * Prepare the code associated with the error/warning to be logged by stripping variable length, leading whitespace
+ * @param orgLines the lines of code to log
+ * @returns the code, with leading whitespace stripped
+ */
+const removeLeadingWhitespace = (orgLines: PrintLine[]): ReadonlyArray<PrintLine> => {
+  // The number of times an attempt to strip leading whitespace should occur
+  const numberOfTries = 100;
   const lines: PrintLine[] = JSON.parse(JSON.stringify(orgLines));
 
-  for (let i = 0; i < 100; i++) {
+  for (let i = 0; i < numberOfTries; i++) {
     if (!eachLineHasLeadingWhitespace(lines)) {
       return lines;
     }
+    // each line has at least one line of whitespace. remove the leading character from each
     for (let i = 0; i < lines.length; i++) {
       lines[i].text = lines[i].text.substr(1);
       lines[i].errorCharStart--;
@@ -580,12 +629,17 @@ const prepareLines = (orgLines: PrintLine[]) => {
   return lines;
 };
 
-const eachLineHasLeadingWhitespace = (lines: PrintLine[]) => {
+/**
+ * Determine if any of the provided lines begin with whitespace or not
+ * @param lines the lines to check for whitespace
+ * @returns true if each of the provided `lines` has some leading whitespace, false otherwise
+ */
+const eachLineHasLeadingWhitespace = (lines: PrintLine[]): boolean => {
   if (!lines.length) {
     return false;
   }
 
-  for (var i = 0; i < lines.length; i++) {
+  for (let i = 0; i < lines.length; i++) {
     if (!lines[i].text || lines[i].text.length < 1) {
       return false;
     }
@@ -598,7 +652,12 @@ const eachLineHasLeadingWhitespace = (lines: PrintLine[]) => {
   return true;
 };
 
-const isMeaningfulLine = (line: string) => {
+/**
+ * Verify that a given line has more than just whitespace
+ * @param line the line to check
+ * @returns true if a line has characters other than whitespace in it, false otherwise
+ */
+const isMeaningfulLine = (line: string): boolean => {
   if (line) {
     line = line.trim();
     return line.length > 0;
