@@ -1,3 +1,8 @@
+/**
+ * The path's declared below are relative. Specifically, they are relative to the location of this file after
+ * compilation of the Stencil compiler has completed. See `scripts/bundles/testing` for the location of this file
+ * following compilation.
+ */
 const path = require('path');
 const testingDir = __dirname;
 const rootDir = path.join(testingDir, '..');

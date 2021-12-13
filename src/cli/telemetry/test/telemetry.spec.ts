@@ -4,7 +4,7 @@ import * as shouldTrack from '../shouldTrack';
 import { createSystem } from '../../../compiler/sys/stencil-sys';
 import { mockLogger } from '@stencil/core/testing';
 
-describe('telemetryBuildFinishedAction', async () => {
+describe('telemetryBuildFinishedAction', () => {
   const config = {
     outputTargets: [],
     flags: {
@@ -34,7 +34,7 @@ describe('telemetryBuildFinishedAction', async () => {
   });
 });
 
-describe('telemetryAction', async () => {
+describe('telemetryAction', () => {
   const config = {
     outputTargets: [],
     flags: {
