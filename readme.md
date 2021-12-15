@@ -101,4 +101,5 @@ To use this component, just use it like any other HTML element:
 
 ## Thanks
 Stencil's internal testing suite is supported by the [BrowserStack Open-Source Program](https://www.browserstack.com/open-source)
-<a target="_blank" href="https://www.browserstack.com/"><img width="200" src="https://www.browserstack.com/images/layout/browserstack-logo-600x315.png"></a><br>
+<br>
+<a target="_blank" href="https://www.browserstack.com/"><img width="200" src="https://www.browserstack.com/images/layout/browserstack-logo-600x315.png"></a>
