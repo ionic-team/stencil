@@ -1579,7 +1579,7 @@ export namespace JSXBase {
     zoomAndPan?: string;
   }
 
-  export interface DOMAttributes<T = Element> extends JSXAttributes {
+  export interface DOMAttributes<T> extends JSXAttributes<T> {
     slot?: string;
     part?: string;
     exportparts?: string;
@@ -1727,7 +1727,7 @@ export namespace JSXBase {
   }
 }
 
-export interface JSXAttributes {
+export interface JSXAttributes<T = Element> {
   // vdom specific
   key?: string | number;
   ref?: (elm?: T) => void;
