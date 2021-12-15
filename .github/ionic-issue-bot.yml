@@ -1,6 +1,6 @@
 triage:
-   label: "holiday triage"
-   dryRun: false
+  label: "holiday triage"
+  dryRun: false
 
 comment:
   labels:
