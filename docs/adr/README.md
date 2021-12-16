@@ -14,3 +14,4 @@
 * [12. output-markdown-format](0012-output-markdown-format.md)
 * [13. deno-removal](0013-deno-removal.md)
 * [14. adopt-volta](0014-adopt-volta.md)
+* [15. jest-27-implementation](0015-jest-27-implementation.md)
