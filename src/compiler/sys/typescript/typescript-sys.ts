@@ -83,6 +83,8 @@ export const patchTsSystemFileSystem = (
 
   tsSys.readDirectory = (path, extensions, exclude, include, depth) => {
     const cwd = stencilSys.getCurrentDirectory();
+    // TODO(STENCIL-XXXX): Remove the final argument passed to `matchFiles` when Stencil is upgraded to TS v4.5
+    // TODO(STENCIL-344): Replace `matchFiles` with a function that is publicly exposed
     return (ts as any).matchFiles(
       path,
       extensions,
@@ -92,7 +94,10 @@ export const patchTsSystemFileSystem = (
       cwd,
       depth,
       getAccessibleFileSystemEntries,
-      realpath
+      realpath,
+      // TODO: Is this the right thing to do with all the patching we do?
+      // https://github.com/parcel-bundler/parcel/pull/6784
+      ts.sys.directoryExists
     );
   };
 
