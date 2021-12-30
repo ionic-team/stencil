@@ -81,14 +81,14 @@ export class MockCustomElementRegistry implements CustomElementRegistry {
     }
   }
 
-  whenDefined(tagName: string) {
+  whenDefined(tagName: string): Promise<CustomElementConstructor> {
     tagName = tagName.toLowerCase();
 
     if (this.__registry != null && this.__registry.has(tagName) === true) {
-      return Promise.resolve();
+      return this.__registry.get(tagName).cstr;
     }
 
-    return new Promise<void>((resolve) => {
+    return new Promise<CustomElementConstructor>((resolve) => {
       if (this.__whenDefined == null) {
         this.__whenDefined = new Map();
       }
