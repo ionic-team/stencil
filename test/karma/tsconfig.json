@@ -21,12 +21,13 @@
     "noUnusedParameters": false,
     "pretty": true,
     "target": "es5",
+    "useUnknownInCatchVariables": true,
     "outDir": "tmp-compiled-tests",
     "baseUrl": ".",
     "paths": {
       "@stencil/core": ["../../internal"],
       "@stencil/core/internal": ["../../internal"],
-      "@stencil/core/testing": ["../../testing"],
+      "@stencil/core/testing": ["../../testing"]
     }
   },
   "include": [
