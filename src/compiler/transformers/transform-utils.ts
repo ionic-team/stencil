@@ -595,9 +595,12 @@ export const createImportStatement = (importFnNames: string[], importPath: strin
       importFnName = splt[0];
     }
 
-    return ts.createImportSpecifier(
-      typeof importFnName === 'string' && importFnName !== importAs ? ts.createIdentifier(importFnName) : undefined,
-      ts.createIdentifier(importAs)
+    return ts.factory.createImportSpecifier(
+      false,
+      typeof importFnName === 'string' && importFnName !== importAs
+        ? ts.factory.createIdentifier(importFnName)
+        : undefined,
+      ts.factory.createIdentifier(importAs)
     );
   });
 
