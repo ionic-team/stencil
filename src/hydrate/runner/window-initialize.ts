@@ -47,6 +47,8 @@ export function initializeWindow(
   }
 
   try {
+    // TODO(STENCIL-345) - Evaluate reconciling MockWindow, Window differences
+    // @ts-ignore
     win.customElements = null;
   } catch (e) {}
 
