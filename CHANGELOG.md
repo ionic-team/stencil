@@ -1,3 +1,22 @@
+## 🍔 [2.12.1](https://github.com/ionic-team/stencil/compare/v2.12.0...v2.12.1) (2022-01-04)
+
+
+### Bug Fixes
+
+* **vdom:** properly warn for step attr on input ([#3196](https://github.com/ionic-team/stencil/issues/3196)) ([7ffc02e](https://github.com/ionic-team/stencil/commit/7ffc02e5d07b05de45cbaf4f0cce3f3e165b3eb0))
+
+
+### Features
+
+* **typings:** add optional key and ref to slot elements ([#3177](https://github.com/ionic-team/stencil/issues/3177)) ([ce27a18](https://github.com/ionic-team/stencil/commit/ce27a18ba8ecdb2cc5401470747a7e9d91e40a44))
+
+
+### Reverts
+
+* **ionitron:** holiday triage 2020 ([#3199](https://github.com/ionic-team/stencil/issues/3199)) ([d95d43e](https://github.com/ionic-team/stencil/commit/d95d43e3055f3fe45b67be2c068f6072e83482c4)), closes [#3187](https://github.com/ionic-team/stencil/issues/3187)
+
+
+
 # ⛸ [2.12.0](https://github.com/ionic-team/stencil/compare/v2.11.0...v2.12.0) (2021-12-13)
 
 
