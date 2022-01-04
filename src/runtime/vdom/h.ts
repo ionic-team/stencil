@@ -163,16 +163,22 @@ const convertToPrivate = (node: d.ChildNode): d.VNode => {
   return vnode;
 };
 
-const validateInputProperties = (vnodeData: any) => {
-  const props = Object.keys(vnodeData);
-  const typeIndex = props.indexOf('type');
-  const minIndex = props.indexOf('min');
-  const maxIndex = props.indexOf('max');
-  const stepIndex = props.indexOf('min');
+/**
+ * Validates the ordering of attributes on an input element
+ * @param inputElm the element to validate
+ */
+const validateInputProperties = (inputElm: HTMLInputElement): void => {
+  const props = Object.keys(inputElm);
+
   const value = props.indexOf('value');
   if (value === -1) {
     return;
   }
+
+  const typeIndex = props.indexOf('type');
+  const minIndex = props.indexOf('min');
+  const maxIndex = props.indexOf('max');
+  const stepIndex = props.indexOf('step');
   if (value < typeIndex || value < minIndex || value < maxIndex || value < stepIndex) {
     consoleDevWarn(`The "value" prop of <input> should be set after "min", "max", "type" and "step"`);
   }
