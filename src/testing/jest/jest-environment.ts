@@ -45,6 +45,10 @@ export function createJestPuppeteerEnvironment() {
       await disconnectBrowser(this.browser);
       this.browser = null;
     }
+
+    getVmContext() {
+      return super.getVmContext();
+    }
   };
 
   return JestEnvironment;

@@ -51,4 +51,7 @@ module.exports = {
     '<rootDir>/testing/',
   ],
   testRegex: '/src/.*\\.spec\\.(ts|tsx|js)$',
+  // TODO(STENCIL-307): Move away from Jasmine runner for internal Stencil tests, which involves re-working environment
+  // setup
+  testRunner: 'jest-jasmine2'
 };

@@ -1,6 +1,12 @@
 import type * as d from '../../declarations';
 
-export const normalizeDiagnostics = (compilerCtx: d.CompilerCtx, diagnostics: d.Diagnostic[]) => {
+/**
+ * Iterate through a series of diagnostics to provide minor fix-ups for various edge cases, deduplicate messages, etc.
+ * @param compilerCtx the current compiler context
+ * @param diagnostics the diagnostics to normalize
+ * @returns the normalize documents
+ */
+export const normalizeDiagnostics = (compilerCtx: d.CompilerCtx, diagnostics: d.Diagnostic[]): d.Diagnostic[] => {
   const normalizedErrors: d.Diagnostic[] = [];
   const normalizedOthers: d.Diagnostic[] = [];
   const dups = new Set<string>();
@@ -25,7 +31,14 @@ export const normalizeDiagnostics = (compilerCtx: d.CompilerCtx, diagnostics: d.
   return [...normalizedErrors, ...normalizedOthers];
 };
 
-const normalizeDiagnostic = (compilerCtx: d.CompilerCtx, diagnostic: d.Diagnostic) => {
+/**
+ * Perform post-processing on a `Diagnostic` to handle a few message edge cases, massaging error message text and
+ * updating build failure contexts
+ * @param compilerCtx the current compiler
+ * @param diagnostic the diagnostic to normalize
+ * @returns the altered diagnostic
+ */
+const normalizeDiagnostic = (compilerCtx: d.CompilerCtx, diagnostic: d.Diagnostic): d.Diagnostic => {
   if (diagnostic.messageText) {
     if (typeof (<any>diagnostic.messageText).message === 'string') {
       diagnostic.messageText = (<any>diagnostic.messageText).message;
@@ -93,7 +106,12 @@ const normalizeDiagnostic = (compilerCtx: d.CompilerCtx, diagnostic: d.Diagnosti
   return diagnostic;
 };
 
-export const splitLineBreaks = (sourceText: string) => {
+/**
+ * Split a corpus by newlines. Carriage returns are treated a newlines.
+ * @param sourceText the corpus to split
+ * @returns the split text
+ */
+export const splitLineBreaks = (sourceText: string): ReadonlyArray<string> => {
   if (typeof sourceText !== 'string') return [];
   sourceText = sourceText.replace(/\\r/g, '\n');
   return sourceText.split('\n');
