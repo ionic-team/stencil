@@ -30,12 +30,12 @@ const browserStackLaunchers = {
   //   os: 'Windows',
   //   os_version: '10'
   // },
-  // bs_safari: {
-  //   base: 'BrowserStack',
-  //   browser: 'safari',
-  //   os: 'OS X',
-  //   os_version: 'Mojave'
-  // }
+  bs_safari: {
+    base: 'BrowserStack',
+    browser: 'safari',
+    os: 'OS X',
+    os_version: 'Monterey'
+  }
 };
 
 const localLaunchers = {
@@ -74,6 +74,7 @@ module.exports = function (config) {
       'karma-ie-launcher',
       'karma-edge-launcher',
       'karma-jasmine',
+      'karma-safari-launcher',
       'karma-typescript',
       'karma-polyfill',
     ],

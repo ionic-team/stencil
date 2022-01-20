@@ -101,6 +101,7 @@
     "jest": "^27.4.5",
     "jest-cli": "^27.4.5",
     "jest-environment-node": "^27.4.4",
+    "karma-safari-launcher": "^1.0.0",
     "listr": "^0.14.3",
     "magic-string": "^0.25.7",
     "merge-source-map": "^1.1.0",
