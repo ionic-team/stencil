@@ -35,7 +35,9 @@ export const outputCopy = async (config: d.Config, compilerCtx: d.CompilerCtx, b
       }
     } catch (e) {
       const err = buildError(buildCtx.diagnostics);
-      err.messageText = e.message;
+      if (e instanceof Error) {
+        err.messageText = e.message;
+      }
     }
     timespan.finish(`copy finished (${copiedFiles} file${copiedFiles === 1 ? '' : 's'})`);
   }

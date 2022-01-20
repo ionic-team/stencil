@@ -29,7 +29,7 @@ export const crawlAnchorsForNextUrls = (
           if (userFilterAnchor === false) {
             return false;
           }
-        } catch (e) {
+        } catch (e: any) {
           // user filterAnchor() error
           catchError(diagnostics, e);
           return false;
@@ -49,7 +49,7 @@ export const crawlAnchorsForNextUrls = (
 
           // standard normalizeUrl(), after user normalized
           return standardNormalizeUrl(diagnostics, userNormalizedUrl.href, currentUrl);
-        } catch (e) {
+        } catch (e: any) {
           // user normalizeUrl() error
           catchError(diagnostics, e);
         }
@@ -68,7 +68,7 @@ export const crawlAnchorsForNextUrls = (
           if (userFilterUrl === false) {
             return false;
           }
-        } catch (e) {
+        } catch (e: any) {
           // user filterUrl() error
           catchError(diagnostics, e);
           return false;
@@ -123,7 +123,7 @@ const standardFilterAnchor = (diagnostics: d.Diagnostic[], attrs: { [attrName: s
         return true;
       }
     }
-  } catch (e) {
+  } catch (e: any) {
     catchError(diagnostics, e);
   }
 
@@ -146,7 +146,7 @@ const standardNormalizeUrl = (diagnostics: d.Diagnostic[], href: string, current
       }
 
       return outputUrl;
-    } catch (e) {
+    } catch (e: any) {
       catchError(diagnostics, e);
     }
   }
@@ -183,7 +183,7 @@ const standardFilterUrl = (diagnostics: d.Diagnostic[], url: URL, currentUrl: UR
     }
 
     return true;
-  } catch (e) {
+  } catch (e: any) {
     catchError(diagnostics, e);
   }
   return false;
@@ -214,7 +214,7 @@ export const standardNormalizeHref = (prerenderConfig: d.PrerenderConfig, diagno
 
       return href;
     }
-  } catch (e) {
+  } catch (e: any) {
     catchError(diagnostics, e);
   }
 

@@ -56,7 +56,7 @@ const buildGlobalStyles = async (config: d.Config, compilerCtx: d.CompilerCtx, b
       }
       return optimizedCss;
     }
-  } catch (e) {
+  } catch (e: any) {
     const d = catchError(buildCtx.diagnostics, e);
     d.absFilePath = globalStylePath;
   }

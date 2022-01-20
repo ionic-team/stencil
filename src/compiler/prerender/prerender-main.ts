@@ -102,7 +102,7 @@ const runPrerender = async (
           );
         })
       );
-    } catch (e) {
+    } catch (e: any) {
       catchError(diagnostics, e);
     }
 
@@ -247,7 +247,7 @@ const runPrerenderOutputTarget = async (
     const statusColor = prerenderBuildErrors.length > 0 ? 'red' : 'green';
 
     timeSpan.finish(`prerendering ${statusMessage}`, statusColor, true);
-  } catch (e) {
+  } catch (e: any) {
     catchError(diagnostics, e);
   }
 };

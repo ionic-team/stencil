@@ -147,7 +147,7 @@ const prerenderUrl = async (results: d.PrerenderResults, manager: d.PrerenderMan
         addUrlToPendingQueue(manager, anchorUrl, url);
       }
     }
-  } catch (e) {
+  } catch (e: any) {
     // darn, idk, bad news
     catchError(manager.diagnostics, e);
   }
