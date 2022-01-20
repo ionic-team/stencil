@@ -12,12 +12,12 @@ const browserStackLaunchers = {
     os: 'Windows',
     os_version: '10',
   },
-  bs_firefox: {
-    base: 'BrowserStack',
-    browser: 'firefox',
-    os: 'Windows',
-    os_version: '10',
-  },
+  // bs_firefox: {
+  //   base: 'BrowserStack',
+  //   browser: 'firefox',
+  //   os: 'Windows',
+  //   os_version: '10',
+  // },
   bs_edge: {
     base: 'BrowserStack',
     browser: 'edge',
@@ -70,7 +70,6 @@ module.exports = function (config) {
     plugins: [
       'karma-chrome-launcher',
       'karma-browserstack-launcher',
-      'karma-firefox-launcher',
       'karma-ie-launcher',
       'karma-edge-launcher',
       'karma-jasmine',
