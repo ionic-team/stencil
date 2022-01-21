@@ -137,13 +137,13 @@ export const catchError = (diagnostics: d.Diagnostic[], err: Error | null | unde
   };
 
   if (isString(msg)) {
-    diagnostic.messageText = msg;
+    diagnostic.messageText = msg.length ? msg : 'UNKNOWN ERROR';
   } else if (err != null) {
     if (err.stack != null) {
       diagnostic.messageText = err.stack.toString();
     } else {
       if (err.message != null) {
-        diagnostic.messageText = err.message.toString();
+        diagnostic.messageText = err.message.length ? err.message : 'UNKNOWN ERROR';
       } else {
         diagnostic.messageText = err.toString();
       }
