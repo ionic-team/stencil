@@ -222,7 +222,7 @@ export function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<string>)
         title: 'Also set "next" npm tag on @stencil/core',
         task: () => {
           const cmd = 'npm';
-          const cmdArgs = ['dist-tag', 'add', '@stencil/core@' + opts.version, 'next'];
+          const cmdArgs = ['dist-tag', 'add', '--otp', '@stencil/core@' + opts.version, 'next'];
 
           if (isDryRun) {
             return console.log(`[dry-run] ${cmd} ${cmdArgs.join(' ')}`);
