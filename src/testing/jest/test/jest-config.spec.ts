@@ -6,12 +6,12 @@ import path from 'path';
 
 describe('jest-config', () => {
   it('pass --maxWorkers=2 arg when --max-workers=2', () => {
-    const args = ['test', '--ci', '--e2e', '--max-workers=2'];
+    const args = ['test', '--ci', '--max-workers=2'];
     const config = mockConfig();
     config.flags = parseFlags(args, config.sys);
     config.testing = {};
 
-    expect(config.flags.args).toEqual(['--ci', '--e2e', '--max-workers=2']);
+    expect(config.flags.args).toEqual(['--ci', '--max-workers=2']);
     expect(config.flags.unknownArgs).toEqual([]);
 
     const jestArgv = buildJestArgv(config);
@@ -33,7 +33,7 @@ describe('jest-config', () => {
     expect(jestArgv.maxWorkers).toBe(2);
   });
 
-  it('force --maxWorkers=4 arg when e2e test and --ci', () => {
+  it('forces --maxWorkers=4 arg when e2e test and --ci', () => {
     const args = ['test', '--ci', '--e2e'];
     const config = mockConfig();
     config.flags = parseFlags(args, config.sys);
@@ -72,6 +72,36 @@ describe('jest-config', () => {
     const jestArgv = buildJestArgv(config);
     expect(jestArgv.ci).toBe(true);
     expect(jestArgv.maxWorkers).toBe(config.maxConcurrentWorkers);
+  });
+
+  it('sets legacy jest options', () => {
+    const args = ['test'];
+    const config = mockConfig();
+    config.flags = parseFlags(args, config.sys);
+    config.testing = {};
+
+    const jestArgv = buildJestArgv(config);
+
+    expect(jestArgv.detectLeaks).toBe(false);
+    expect(jestArgv['detect-leaks']).toBe(false);
+    expect(jestArgv.detectOpenHandles).toBe(false);
+    expect(jestArgv['detect-open-handles']).toBe(false);
+    expect(jestArgv.detectLeaks).toBe(false);
+    expect(jestArgv['detect-leaks']).toBe(false);
+    expect(jestArgv.errorOnDeprecated).toBe(false);
+    expect(jestArgv['error-on-deprecated']).toBe(false);
+    expect(jestArgv.listTests).toBe(false);
+    expect(jestArgv['list-tests']).toBe(false);
+    expect(jestArgv.maxConcurrency).toBe(5);
+    expect(jestArgv['max-concurrency']).toBe(5);
+    expect(jestArgv.notifyMode).toBe('failure-change');
+    expect(jestArgv['notify-mode']).toBe('failure-change');
+    expect(jestArgv.passWithNoTests).toBe(false);
+    expect(jestArgv['pass-with-no-tests']).toBe(false);
+    expect(jestArgv.runTestsByPath).toBe(false);
+    expect(jestArgv['run-tests-by-path']).toBe(false);
+    expect(jestArgv.testLocationInResults).toBe(false);
+    expect(jestArgv['test-location-in-results']).toBe(false);
   });
 
   it('pass test spec arg to jest', () => {

@@ -1,5 +1,7 @@
 import { MockWindow } from '../window';
-import { EventTarget } from '../event';
+import { EventTarget, MockEvent } from '../event';
+import { MockElement } from '../node';
+import { MockDocument } from '../document';
 
 describe('event', () => {
   let win: MockWindow;
@@ -217,5 +219,60 @@ describe('event', () => {
     expect(ev.button).toBe(0);
     expect(ev.buttons).toBe(99);
     expect(ev.relatedTarget).toBe(null);
+  });
+
+  describe('composedPath', () => {
+    let doc: MockDocument;
+
+    beforeEach(() => {
+      doc = win.document as unknown as MockDocument;
+    });
+
+    it('returns an empty path with no target', () => {
+      const event = new MockEvent('onclick', { bubbles: true });
+      expect(event.composedPath()).toHaveLength(0);
+    });
+
+    it('returns the correct path for a simple div element', () => {
+      const event = new MockEvent('onclick', { bubbles: true });
+
+      const divElm = new MockElement(doc, 'div');
+      divElm.textContent = 'simple div text';
+      doc.body.appendChild(divElm);
+
+      divElm.dispatchEvent(event);
+
+      const composedPath = event.composedPath();
+
+      expect(composedPath).toHaveLength(5);
+      expect(composedPath[0]).toBe(divElm);
+      expect(composedPath[1]).toBe(doc.body);
+      expect(composedPath[2]).toBe(doc.documentElement);
+      expect(composedPath[3]).toBe(doc);
+      expect(composedPath[4]).toBe(win);
+    });
+
+    it('returns the correct path for a nested element', () => {
+      const event = new MockEvent('onclick', { bubbles: true });
+
+      const divElm = new MockElement(doc, 'div');
+      doc.body.appendChild(divElm);
+
+      const pElm = new MockElement(doc, 'p');
+      pElm.textContent = 'simple p text';
+      divElm.appendChild(pElm);
+
+      pElm.dispatchEvent(event);
+
+      const composedPath = event.composedPath();
+
+      expect(composedPath).toHaveLength(6);
+      expect(composedPath[0]).toBe(pElm);
+      expect(composedPath[1]).toBe(divElm);
+      expect(composedPath[2]).toBe(doc.body);
+      expect(composedPath[3]).toBe(doc.documentElement);
+      expect(composedPath[4]).toBe(doc);
+      expect(composedPath[5]).toBe(win);
+    });
   });
 });
