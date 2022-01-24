@@ -1,3 +1,13 @@
+# 🍣 [2.13.0](https://github.com/ionic-team/stencil/compare/v2.12.1...v2.13.0) (2022-01-24)
+
+
+### Features
+
+* **mock-doc:** add simple MockEvent#composedPath() impl ([#3204](https://github.com/ionic-team/stencil/issues/3204)) ([7b47d96](https://github.com/ionic-team/stencil/commit/7b47d96e1e3c6c821d5c416fbe987646b4cd1551))
+* **test:** jest 27 support ([#3189](https://github.com/ionic-team/stencil/issues/3189)) ([10efeb6](https://github.com/ionic-team/stencil/commit/10efeb6f74888f05a13a47d8afc00b5e83a3f3db))
+
+
+
 ## 🍔 [2.12.1](https://github.com/ionic-team/stencil/compare/v2.12.0...v2.12.1) (2022-01-04)
 
 
