@@ -81,7 +81,7 @@ const transformCssToEsmModule = (input: d.TransformCssToEsmInput) => {
         importPath,
       });
     });
-  } catch (e) {
+  } catch (e: any) {
     catchError(results.diagnostics, e);
   }
 

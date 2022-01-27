@@ -50,7 +50,7 @@ export const transformToNativeComponentText = (
     if (!buildCtx.hasError && typeof transpileOutput.outputText === 'string') {
       outputText = transpileOutput.outputText;
     }
-  } catch (e) {
+  } catch (e: any) {
     catchError(buildCtx.diagnostics, e);
   }
 

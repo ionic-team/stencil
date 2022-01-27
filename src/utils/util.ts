@@ -175,11 +175,12 @@ export const parseJson = (jsonStr: string, filePath?: string) => {
     try {
       rtn.data = JSON.parse(jsonStr);
     } catch (e) {
-      const msg = e.message;
       rtn.diagnostic = buildError();
       rtn.diagnostic.absFilePath = filePath;
       rtn.diagnostic.header = `Error Parsing JSON`;
-      rtn.diagnostic.messageText = msg;
+      if (e instanceof Error) {
+        rtn.diagnostic.messageText = e.message;
+      }
     }
   } else {
     rtn.diagnostic = buildError();

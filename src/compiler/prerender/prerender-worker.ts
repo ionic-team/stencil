@@ -74,7 +74,7 @@ export const prerenderWorker = async (sys: d.CompilerSystem, prerenderRequest: d
         if (isPromise(rtn)) {
           await rtn;
         }
-      } catch (e) {
+      } catch (e: any) {
         catchError(results.diagnostics, e);
       }
     }
@@ -90,7 +90,7 @@ export const prerenderWorker = async (sys: d.CompilerSystem, prerenderRequest: d
         if (typeof userWriteToFilePath === 'string') {
           results.filePath = userWriteToFilePath;
         }
-      } catch (e) {
+      } catch (e: any) {
         catchError(results.diagnostics, e);
       }
     }
@@ -127,7 +127,7 @@ export const prerenderWorker = async (sys: d.CompilerSystem, prerenderRequest: d
         docPromises.push(
           hashAssets(sys, prerenderCtx, results.diagnostics, hydrateOpts, prerenderRequest.appDir, doc, url)
         );
-      } catch (e) {
+      } catch (e: any) {
         catchError(results.diagnostics, e);
       }
     }
@@ -152,7 +152,7 @@ export const prerenderWorker = async (sys: d.CompilerSystem, prerenderRequest: d
         if (isPromise(rtn)) {
           await rtn;
         }
-      } catch (e) {
+      } catch (e: any) {
         catchError(results.diagnostics, e);
       }
     }
@@ -197,7 +197,7 @@ export const prerenderWorker = async (sys: d.CompilerSystem, prerenderRequest: d
     try {
       win.close();
     } catch (e) {}
-  } catch (e) {
+  } catch (e: any) {
     // ahh man! what happened!
     catchError(results.diagnostics, e);
   }
