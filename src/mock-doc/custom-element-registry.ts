@@ -85,7 +85,7 @@ export class MockCustomElementRegistry implements CustomElementRegistry {
     tagName = tagName.toLowerCase();
 
     if (this.__registry != null && this.__registry.has(tagName) === true) {
-      return this.__registry.get(tagName).cstr;
+      return Promise.resolve<CustomElementConstructor>(this.__registry.get(tagName).cstr);
     }
 
     return new Promise<CustomElementConstructor>((resolve) => {
