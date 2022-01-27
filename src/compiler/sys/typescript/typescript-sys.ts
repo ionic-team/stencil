@@ -83,6 +83,7 @@ export const patchTsSystemFileSystem = (
 
   tsSys.readDirectory = (path, extensions, exclude, include, depth) => {
     const cwd = stencilSys.getCurrentDirectory();
+    // TODO(STENCIL-344): Replace `matchFiles` with a function that is publicly exposed
     return (ts as any).matchFiles(
       path,
       extensions,
