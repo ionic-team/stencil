@@ -126,6 +126,8 @@ export const getRollupOptions = (
     onwarn: createOnWarnFn(buildCtx.diagnostics),
 
     cache: compilerCtx.rollupCache.get(bundleOpts.id),
+
+    external: config.rollupConfig.inputOptions.external,
   };
 
   return rollupOptions;
