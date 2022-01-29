@@ -1494,6 +1494,11 @@ export interface RollupInputOptions {
   context?: string;
   moduleContext?: ((id: string) => string) | { [id: string]: string };
   treeshake?: boolean;
+  external?:
+    | (string | RegExp)[]
+    | string
+    | RegExp
+    | ((source: string, importer: string | undefined, isResolved: boolean) => boolean | null | undefined);
 }
 
 export interface RollupOutputOptions {
