@@ -8,7 +8,12 @@ export const getScriptTarget = () => {
   return ts.ScriptTarget.ES2017;
 };
 
-export const isMemberPrivate = (member: ts.ClassElement) => {
+/**
+ * Determine if a class member is private or not
+ * @param member the class member to evaluate
+ * @returns `true` if the member has the `private` or `protected` modifier attached to it. `false` otherwise
+ */
+export const isMemberPrivate = (member: ts.ClassElement): boolean => {
   if (
     member.modifiers &&
     member.modifiers.some((m) => m.kind === ts.SyntaxKind.PrivateKeyword || m.kind === ts.SyntaxKind.ProtectedKeyword)
@@ -312,8 +317,7 @@ const getEntityName = (entity: ts.EntityName): string => {
     return getEntityName(entity.left);
   }
 };
-
-const getAllTypeReferences = (node: ts.Node) => {
+const getAllTypeReferences = (node: ts.Node): string[] => {
   const referencedTypes: string[] = [];
 
   const visit = (node: ts.Node): ts.VisitResult<ts.Node> => {
@@ -427,6 +431,7 @@ export const resolveType = (checker: ts.TypeChecker, type: ts.Type) => {
   }
 
   let parts = Array.from(set.keys()).sort();
+  // TODO(STENCIL-366): Get this section of code under tests that directly exercises this behavior
   if (parts.length > 1) {
     parts = parts.map((p) => (p.indexOf('=>') >= 0 ? `(${p})` : p));
   }
@@ -437,14 +442,20 @@ export const resolveType = (checker: ts.TypeChecker, type: ts.Type) => {
   }
 };
 
-export const typeToString = (checker: ts.TypeChecker, type: ts.Type) => {
+/**
+ * Formats a TypeScript `Type` entity as a string
+ * @param checker a reference to the TypeScript type checker
+ * @param type a TypeScript `Type` entity to format
+ * @returns the formatted string
+ */
+export const typeToString = (checker: ts.TypeChecker, type: ts.Type): string => {
   const TYPE_FORMAT_FLAGS =
     ts.TypeFormatFlags.NoTruncation | ts.TypeFormatFlags.InTypeAlias | ts.TypeFormatFlags.InElementType;
 
   return checker.typeToString(type, undefined, TYPE_FORMAT_FLAGS);
 };
 
-export const parseDocsType = (checker: ts.TypeChecker, type: ts.Type, parts: Set<string>) => {
+export const parseDocsType = (checker: ts.TypeChecker, type: ts.Type, parts: Set<string>): void => {
   if (type.isUnion()) {
     (type as ts.UnionType).types.forEach((t) => {
       parseDocsType(checker, t, parts);
@@ -507,6 +518,13 @@ export const isStaticGetter = (member: ts.ClassElement) => {
   );
 };
 
+/**
+ * Create a serialized representation of a TypeScript `Symbol` entity to expose the Symbol's text and attached JSDoc.
+ * Note that the `Symbol` being serialized is not the same as the JavaScript primitive 'symbol'.
+ * @param checker a reference to the TypeScript type checker
+ * @param symbol the `Symbol` to serialize
+ * @returns the serialized `Symbol` data
+ */
 export const serializeSymbol = (checker: ts.TypeChecker, symbol: ts.Symbol): d.CompilerJsDoc => {
   if (!checker || !symbol) {
     return {
@@ -534,6 +552,7 @@ export const mapJSDocTagInfo = (tags: readonly ts.JSDocTagInfo[]): d.CompilerJsD
 
 export const serializeDocsSymbol = (checker: ts.TypeChecker, symbol: ts.Symbol) => {
   const type = checker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration);
+  // TODO(STENCIL-365): Replace this with `return resolveType()`;
   const set = new Set<string>();
   parseDocsType(checker, type, set);
 
