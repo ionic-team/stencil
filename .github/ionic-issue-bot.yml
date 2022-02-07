@@ -37,6 +37,7 @@ stale:
   days: 180
   maxIssuesPerRun: 100
   exemptLabels:
+    - "Feature: Want this? Upvote it!"
     - good first issue
     - help wanted
     - Reply Received
