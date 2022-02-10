@@ -174,6 +174,14 @@ describe('validateTesting', () => {
       it("doesn't match files ending in test.jsx", () => {
         expect(testRegex.test('my-component-test.jsx')).toBe(false);
       });
+
+      it("doesn't match files ending in .test.t", () => {
+        expect(testRegex.test('my-component.test.t')).toBe(false);
+      });
+
+      it("doesn't match files ending in .test.j", () => {
+        expect(testRegex.test('my-component.test.j')).toBe(false);
+      });
     });
 
     describe('spec.* extensions', () => {
@@ -208,6 +216,14 @@ describe('validateTesting', () => {
       it("doesn't match files ending in spec.jsx", () => {
         expect(testRegex.test('my-component-spec.jsx')).toBe(false);
       });
+
+      it("doesn't match files ending in .spec.t", () => {
+        expect(testRegex.test('my-component.spec.t')).toBe(false);
+      });
+
+      it("doesn't match files ending in .spec.j", () => {
+        expect(testRegex.test('my-component.spec.j')).toBe(false);
+      });
     });
 
     describe('e2e.* extensions', () => {
@@ -241,6 +257,14 @@ describe('validateTesting', () => {
 
       it("doesn't match files ending in e2e.jsx", () => {
         expect(testRegex.test('my-component-e2e.jsx')).toBe(false);
+      });
+
+      it("doesn't match files ending in .spec.t", () => {
+        expect(testRegex.test('my-component.spec.t')).toBe(false);
+      });
+
+      it("doesn't match files ending in .spec.j", () => {
+        expect(testRegex.test('my-component.spec.j')).toBe(false);
       });
     });
   });
