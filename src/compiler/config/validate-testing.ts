@@ -125,7 +125,7 @@ export const validateTesting = (config: d.Config, diagnostics: d.Diagnostic[]) =
   }
 
   if (testing.testRegex === undefined) {
-    testing.testRegex = '(/__tests__/.*|\\.?(test|spec|e2e))\\.(tsx?|ts?|jsx?|js?)$';
+    testing.testRegex = '(/__tests__/.*|\\.(test|spec|e2e))\\.(tsx?|ts?|jsx?|js?)$';
   }
 
   if (Array.isArray(testing.testMatch)) {

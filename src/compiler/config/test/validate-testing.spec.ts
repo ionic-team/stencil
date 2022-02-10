@@ -125,4 +125,123 @@ describe('validateTesting', () => {
     const { config } = validateConfig(userConfig);
     expect(config.testing.testEnvironment).toBeUndefined();
   });
+
+  describe('testRegex', () => {
+    let testRegex: RegExp;
+
+    beforeEach(() => {
+      userConfig.flags.spec = true;
+
+      const { testing: testConfig } = validateConfig(userConfig).config;
+      const testRegexSetting = testConfig?.testRegex;
+
+      if (!testRegexSetting) {
+        fail('No testRegex was found in the Stencil TestingConfig. Failing test.');
+      }
+
+      testRegex = new RegExp(testRegexSetting);
+    });
+
+    describe('test.* extensions', () => {
+      it('matches files ending in .test.ts', () => {
+        expect(testRegex.test('my-component.test.ts')).toBe(true);
+      });
+
+      it('matches files ending in .test.tsx', () => {
+        expect(testRegex.test('my-component.test.tsx')).toBe(true);
+      });
+
+      it('matches files ending in .test.js', () => {
+        expect(testRegex.test('my-component.test.js')).toBe(true);
+      });
+
+      it('matches files ending in .test.jsx', () => {
+        expect(testRegex.test('my-component.test.jsx')).toBe(true);
+      });
+
+      it("doesn't match files ending in test.ts", () => {
+        expect(testRegex.test('my-component-test.ts')).toBe(false);
+      });
+
+      it("doesn't match files ending in test.tsx", () => {
+        expect(testRegex.test('my-component-test.tsx')).toBe(false);
+      });
+
+      it("doesn't match files ending in test.js", () => {
+        expect(testRegex.test('my-component-test.js')).toBe(false);
+      });
+
+      it("doesn't match files ending in test.jsx", () => {
+        expect(testRegex.test('my-component-test.jsx')).toBe(false);
+      });
+    });
+
+    describe('spec.* extensions', () => {
+      it('matches files ending in .spec.ts', () => {
+        expect(testRegex.test('my-component.spec.ts')).toBe(true);
+      });
+
+      it('matches files ending in .spec.tsx', () => {
+        expect(testRegex.test('my-component.spec.tsx')).toBe(true);
+      });
+
+      it('matches files ending in .spec.js', () => {
+        expect(testRegex.test('my-component.spec.js')).toBe(true);
+      });
+
+      it('matches files ending in .spec.jsx', () => {
+        expect(testRegex.test('my-component.spec.jsx')).toBe(true);
+      });
+
+      it("doesn't match files ending in spec.ts", () => {
+        expect(testRegex.test('my-component-spec.ts')).toBe(false);
+      });
+
+      it("doesn't match files ending in spec.tsx", () => {
+        expect(testRegex.test('my-component-spec.tsx')).toBe(false);
+      });
+
+      it("doesn't match files ending in spec.js", () => {
+        expect(testRegex.test('my-component-spec.js')).toBe(false);
+      });
+
+      it("doesn't match files ending in spec.jsx", () => {
+        expect(testRegex.test('my-component-spec.jsx')).toBe(false);
+      });
+    });
+
+    describe('e2e.* extensions', () => {
+      it('matches files ending in .e2e.ts', () => {
+        expect(testRegex.test('my-component.e2e.ts')).toBe(true);
+      });
+
+      it('matches files ending in .e2e.tsx', () => {
+        expect(testRegex.test('my-component.e2e.tsx')).toBe(true);
+      });
+
+      it('matches files ending in .e2e.js', () => {
+        expect(testRegex.test('my-component.e2e.js')).toBe(true);
+      });
+
+      it('matches files ending in .e2e.jsx', () => {
+        expect(testRegex.test('my-component.e2e.jsx')).toBe(true);
+      });
+
+      it("doesn't match files ending in e2e.ts", () => {
+        expect(testRegex.test('my-component-e2e.ts')).toBe(false);
+      });
+
+      it("doesn't match files ending in e2e.tsx", () => {
+        expect(testRegex.test('my-component-e2e.tsx')).toBe(false);
+      });
+
+      it("doesn't match files ending in e2e.js", () => {
+        expect(testRegex.test('my-component-e2e.js')).toBe(false);
+      });
+
+      it("doesn't match files ending in e2e.jsx", () => {
+        expect(testRegex.test('my-component-e2e.jsx')).toBe(false);
+      });
+    });
+  });
 });
