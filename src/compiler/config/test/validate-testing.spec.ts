@@ -259,12 +259,12 @@ describe('validateTesting', () => {
         expect(testRegex.test('my-component-e2e.jsx')).toBe(false);
       });
 
-      it("doesn't match files ending in .spec.t", () => {
-        expect(testRegex.test('my-component.spec.t')).toBe(false);
+      it("doesn't match files ending in .e2e.t", () => {
+        expect(testRegex.test('my-component.e2e.t')).toBe(false);
       });
 
-      it("doesn't match files ending in .spec.j", () => {
-        expect(testRegex.test('my-component.spec.j')).toBe(false);
+      it("doesn't match files ending in .e2e.j", () => {
+        expect(testRegex.test('my-component.e2e.j')).toBe(false);
       });
     });
   });
