@@ -116,10 +116,19 @@ export async function postGithubRelease(opts: BuildOptions): Promise<void> {
 
   let body = '';
   for (let i = 1; i < 500; i++) {
-    if (lines[i].startsWith('## ')) {
+    const currentLine = lines[i];
+
+    if (currentLine == undefined) {
+      // we don't test this as `!currentLine`, as an empty string is permitted in the changelog
       break;
     }
-    body += lines[i] + '\n';
+
+    const isMajorOrMinorVersionHeader = currentLine.startsWith('# ');
+    const isPatchVersionHeader = currentLine.startsWith('## ');
+    if (isMajorOrMinorVersionHeader || isPatchVersionHeader) {
+      break;
+    }
+    body += currentLine + '\n';
   }
 
   // https://docs.github.com/en/github/administering-a-repository/automation-for-release-forms-with-query-parameters
