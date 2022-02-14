@@ -802,6 +802,8 @@ export function cloneWindow(srcWin: Window, opts: { customElementProxy?: boolean
 
   const clonedWin = new MockWindow(false);
   if (!opts.customElementProxy) {
+    // TODO(STENCIL-345) - Evaluate reconciling MockWindow, Window differences
+    // @ts-ignore
     srcWin.customElements = null;
   }
 

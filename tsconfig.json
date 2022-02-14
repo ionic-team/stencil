@@ -22,6 +22,7 @@
     "resolveJsonModule": true,
     "sourceMap": true,
     "target": "es2018",
+    "useUnknownInCatchVariables": true,
     "baseUrl": ".",
     "paths": {
       "@app-data": ["src/app-data/index.ts"],

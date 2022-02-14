@@ -41,7 +41,7 @@ export const runPrerenderTask = async (
     });
 
     diagnostics.push(...results.diagnostics);
-  } catch (e) {
+  } catch (e: any) {
     catchError(diagnostics, e);
   }
 

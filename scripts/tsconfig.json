@@ -15,6 +15,7 @@
     "pretty": true,
     "target": "es2017",
     "incremental": false,
+    "useUnknownInCatchVariables": true
   },
   "include": [
     "**/*.ts"

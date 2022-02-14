@@ -55,7 +55,7 @@ export const build = async (
     // write outputs
     await buildCtx.stylesPromise;
     await writeBuild(config, compilerCtx, buildCtx);
-  } catch (e) {
+  } catch (e: any) {
     // ¯\_(ツ)_/¯
     catchError(buildCtx.diagnostics, e);
   }
