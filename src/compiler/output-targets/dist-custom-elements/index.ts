@@ -72,7 +72,7 @@ const bundleCustomElements = async (
       preserveEntrySignatures: 'allow-extension',
     };
 
-    addCustomElementInputs(outputTarget, buildCtx, bundleOpts);
+    addCustomElementInputs(buildCtx, bundleOpts);
 
     const build = await bundleOutput(config, compilerCtx, buildCtx, bundleOpts);
     if (build) {
@@ -125,11 +125,12 @@ const bundleCustomElements = async (
   }
 };
 
-const addCustomElementInputs = (
-  _outputTarget: d.OutputTargetDistCustomElements,
-  buildCtx: d.BuildCtx,
-  bundleOpts: BundleOptions
-) => {
+/**
+ * Create the virtual modules/input modules for the `dist-custom-elements` output target.
+ * @param buildCtx the context for the current build
+ * @param bundleOpts the bundle options to store the virtual modules under. acts as an output parameter
+ */
+const addCustomElementInputs = (buildCtx: d.BuildCtx, bundleOpts: BundleOptions): void => {
   const components = buildCtx.components;
   components.forEach((cmp) => {
     const exp: string[] = [];
