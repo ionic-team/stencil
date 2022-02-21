@@ -66,7 +66,7 @@ const bundleCustomElements = async (
         index: '\0core',
       },
       loader: {
-        '\0core': generateEntryPoint(outputTarget, buildCtx),
+        '\0core': generateEntryPoint(outputTarget),
       },
       inlineDynamicImports: outputTarget.inlineDynamicImports,
       preserveEntrySignatures: 'allow-extension',
@@ -154,7 +154,12 @@ const addCustomElementInputs = (
   });
 };
 
-const generateEntryPoint = (outputTarget: d.OutputTargetDistCustomElements, _buildCtx: d.BuildCtx) => {
+/**
+ * Generate the entrypoint (`index.ts` file) contents for the `dist-custom-elements` output target
+ * @param outputTarget the output target's configuration
+ * @returns the stringified contents to be placed in the entrypoint
+ */
+const generateEntryPoint = (outputTarget: d.OutputTargetDistCustomElements): string => {
   const imp: string[] = [];
   const exp: string[] = [];
 
