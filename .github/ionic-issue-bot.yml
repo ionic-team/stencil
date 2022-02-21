@@ -42,6 +42,7 @@ stale:
     - good first issue
     - help wanted
     - Reply Received
+    - "Request For Comments"
     - triage
   exemptAssigned: true
   exemptProjects: true
