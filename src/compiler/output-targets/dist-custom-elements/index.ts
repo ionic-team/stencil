@@ -54,12 +54,7 @@ const bundleCustomElements = async (
       id: 'customElements',
       platform: 'client',
       conditionals: getCustomElementsBuildConditionals(config, buildCtx.components),
-      customTransformers: getCustomElementBundleCustomTransformer(
-        config,
-        compilerCtx,
-        buildCtx.components,
-        outputTarget
-      ),
+      customTransformers: getCustomElementCustomTransformer(config, compilerCtx, buildCtx.components, outputTarget),
       externalRuntime: !!outputTarget.externalRuntime,
       inlineWorkers: true,
       inputs: {
@@ -184,7 +179,7 @@ const generateEntryPoint = (outputTarget: d.OutputTargetDistCustomElements): str
  * @param outputTarget the output target configuration
  * @returns a list of transformers to use in the transpilation process
  */
-const getCustomElementBundleCustomTransformer = (
+const getCustomElementCustomTransformer = (
   config: d.Config,
   compilerCtx: d.CompilerCtx,
   components: d.ComponentCompilerMeta[],
