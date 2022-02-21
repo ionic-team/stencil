@@ -162,7 +162,6 @@ const addCustomElementInputs = (buildCtx: d.BuildCtx, bundleOpts: BundleOptions)
  */
 const generateEntryPoint = (outputTarget: d.OutputTargetDistCustomElements): string => {
   const imp: string[] = [];
-  const exp: string[] = [];
 
   imp.push(
     `export { setAssetPath, setPlatformOptions } from '${STENCIL_INTERNAL_CLIENT_ID}';`,
@@ -173,7 +172,7 @@ const generateEntryPoint = (outputTarget: d.OutputTargetDistCustomElements): str
     imp.push(`import { globalScripts } from '${STENCIL_APP_GLOBALS_ID}';`, `globalScripts();`);
   }
 
-  return [...imp, ...exp].join('\n') + '\n';
+  return imp.join('\n') + '\n';
 };
 
 /**
