@@ -19,6 +19,7 @@ import { removeCollectionImports } from '../../transformers/remove-collection-im
 import { STENCIL_INTERNAL_CLIENT_ID, USER_INDEX_ENTRY_ID, STENCIL_APP_GLOBALS_ID } from '../../bundle/entry-alias-ids';
 import { proxyCustomElement } from '../../transformers/component-native/proxy-custom-element-function';
 import { updateStencilCoreImports } from '../../transformers/update-stencil-core-import';
+import ts from 'typescript';
 
 export const outputCustomElements = async (
   config: d.Config,
@@ -140,6 +141,7 @@ const addCustomElementInputs = (
     if (cmp.isPlain) {
       exp.push(`export { ${importName} as ${exportName} } from '${cmp.sourceFilePath}';`);
     } else {
+      // the `importName` may collide with the `exportName`, alias it just in case it does with `importAs`
       exp.push(
         `import { ${importName} as ${importAs}, defineCustomElement as cmpDefCustomEle } from '${cmp.sourceFilePath}';`
       );
@@ -168,12 +170,21 @@ const generateEntryPoint = (outputTarget: d.OutputTargetDistCustomElements, _bui
   return [...imp, ...exp].join('\n') + '\n';
 };
 
+/**
+ * Get the series of custom transformers that will be applied to a Stencil project's source code during the TypeScript
+ * transpilation process
+ * @param config the configuration for the Stencil project
+ * @param compilerCtx the current compiler context
+ * @param components the components that will be compiled as a part of the current build
+ * @param outputTarget the output target configuration
+ * @returns a list of transformers to use in the transpilation process
+ */
 const getCustomElementBundleCustomTransformer = (
   config: d.Config,
   compilerCtx: d.CompilerCtx,
   components: d.ComponentCompilerMeta[],
   outputTarget: d.OutputTargetDistCustomElements
-) => {
+): ts.TransformerFactory<ts.SourceFile>[] => {
   const transformOpts: d.TransformOptions = {
     coreImportPath: STENCIL_INTERNAL_CLIENT_ID,
     componentExport: null,
