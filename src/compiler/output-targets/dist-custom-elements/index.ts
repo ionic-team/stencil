@@ -17,6 +17,7 @@ import { addDefineCustomElementFunctions } from '../../transformers/component-na
 import { optimizeModule } from '../../optimize/optimize-module';
 import { removeCollectionImports } from '../../transformers/remove-collection-imports';
 import { STENCIL_INTERNAL_CLIENT_ID, USER_INDEX_ENTRY_ID, STENCIL_APP_GLOBALS_ID } from '../../bundle/entry-alias-ids';
+import { proxyCustomElement } from '../../transformers/component-native/proxy-custom-element-function';
 import { updateStencilCoreImports } from '../../transformers/update-stencil-core-import';
 
 export const outputCustomElements = async (
@@ -118,7 +119,7 @@ const bundleCustomElements = async (
       });
       await Promise.all(files);
     }
-  } catch (e) {
+  } catch (e: any) {
     catchError(buildCtx.diagnostics, e);
   }
 };
@@ -186,6 +187,7 @@ const getCustomElementBundleCustomTransformer = (
     addDefineCustomElementFunctions(compilerCtx, components, outputTarget),
     updateStencilCoreImports(transformOpts.coreImportPath),
     nativeComponentTransform(compilerCtx, transformOpts),
+    proxyCustomElement(compilerCtx, transformOpts),
     removeCollectionImports(compilerCtx),
   ];
 };

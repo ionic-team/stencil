@@ -18,7 +18,7 @@ export const removeUnusedStyles = (doc: Document, diagnostics: d.Diagnostic[]) =
         removeUnusedStyleText(usedSelectors, diagnostics, styleElms[i]);
       }
     }
-  } catch (e) {
+  } catch (e: any) {
     catchError(diagnostics, e);
   }
 };
@@ -43,7 +43,7 @@ const removeUnusedStyleText = (
       styleElm.innerHTML = serializeCss(parseResults.stylesheet, {
         usedSelectors,
       });
-    } catch (e) {
+    } catch (e: any) {
       diagnostics.push({
         level: 'warn',
         type: 'css',
@@ -51,7 +51,7 @@ const removeUnusedStyleText = (
         messageText: e,
       });
     }
-  } catch (e) {
+  } catch (e: any) {
     diagnostics.push({
       level: 'warn',
       type: 'css',

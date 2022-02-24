@@ -104,7 +104,8 @@ export const run = async (init: d.CliInitOptions) => {
     });
   } catch (e) {
     if (!shouldIgnoreError(e)) {
-      logger.error(`uncaught cli error: ${e}${logger.getLevel() === 'debug' ? e.stack : ''}`);
+      const details = `${logger.getLevel() === 'debug' && e instanceof Error ? e.stack : ''}`;
+      logger.error(`uncaught cli error: ${e}${details}`);
       return sys.exit(1);
     }
   }

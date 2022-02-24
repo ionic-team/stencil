@@ -49,7 +49,7 @@ export const nodeRequire = (id: string) => {
 
         try {
           module._compile(sourceText, fileName);
-        } catch (e) {
+        } catch (e: any) {
           catchError(results.diagnostics, e);
         }
       };
@@ -59,7 +59,7 @@ export const nodeRequire = (id: string) => {
 
       // all set, let's go ahead and reset the require back to the default
       require.extensions['.ts'] = undefined;
-    } catch (e) {
+    } catch (e: any) {
       catchError(results.diagnostics, e);
     }
   }

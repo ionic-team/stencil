@@ -82,7 +82,7 @@ export const loadConfig = async (init: LoadConfigInit = {}) => {
       results.tsconfig.exclude = tsConfigResults.exclude;
       results.tsconfig.extends = tsConfigResults.extends;
     }
-  } catch (e) {
+  } catch (e: any) {
     catchError(results.diagnostics, e);
   }
 
@@ -131,7 +131,7 @@ const evaluateConfigFile = async (sys: CompilerSystem, diagnostics: Diagnostic[]
       const evalConfig = new Function(`const exports = {}; ${sourceText}; return exports;`);
       configFileData = evalConfig();
     }
-  } catch (e) {
+  } catch (e: any) {
     catchError(diagnostics, e);
   }
 

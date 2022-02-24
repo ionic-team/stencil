@@ -253,7 +253,7 @@ export const hashAssets = async (
             });
             sys.writeFileSync(filePath, css);
           }
-        } catch (e) {
+        } catch (e: any) {
           catchError(diagnostics, e);
         }
       }

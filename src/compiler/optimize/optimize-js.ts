@@ -27,7 +27,7 @@ export const optimizeJs = async (inputOpts: OptimizeJsInput) => {
       result.output = minifyResults.output;
       result.sourceMap = minifyResults.sourceMap;
     }
-  } catch (e) {
+  } catch (e: any) {
     catchError(result.diagnostics, e);
   }
 

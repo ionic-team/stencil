@@ -45,7 +45,9 @@ export const minifyJs = async (input: string, opts?: MinifyOptions): Promise<d.O
       results.output = results.output.substring(0, results.output.length - 1);
     }
   } catch (e) {
-    console.log(e.stack);
+    if (e instanceof Error) {
+      console.log(e.stack);
+    }
     loadMinifyJsDiagnostics(input, results.diagnostics, e);
   }
 

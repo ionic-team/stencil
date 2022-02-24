@@ -65,7 +65,7 @@ export const generateRobotsTxt = async (manager: d.PrerenderManager, sitemapResu
     await manager.config.sys.writeFile(results.filePath, results.content);
 
     return results;
-  } catch (e) {
+  } catch (e: any) {
     catchError(manager.diagnostics, e);
     return null;
   }
