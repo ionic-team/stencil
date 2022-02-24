@@ -38,6 +38,15 @@ function getLegacyJestOptions(): Record<string, boolean | number | string> {
   };
 }
 
+/** @returns true if the argument sets max-workers or runInBand. */
+function argSetsWorkers(arg: string) {
+  const lowerCased = arg.toLowerCase();
+  return (lowerCased === '-i')
+    || (lowerCased === '--runinband')
+    || lowerCased.startsWith('--max-workers')
+    || lowerCased.startsWith('--maxworkers');
+}
+
 /**
  * Builds the `argv` to be used when programmatically invoking the Jest CLI
  * @param config the Stencil config to use while generating Jest CLI arguments
@@ -48,11 +57,13 @@ export function buildJestArgv(config: d.Config): Config.Argv {
 
   const args = [...config.flags.unknownArgs.slice(), ...config.flags.knownArgs.slice()];
 
-  if (config.flags.devtools) {
-    args.push('--runInBand');
-  }
-  else if (!args.some((a) => a.startsWith('--max-workers') || (a === '-i') || (a.toLowerCase() === '--runinband'))) {
-    args.push(`--max-workers=${config.maxConcurrentWorkers}`);
+  if (!args.some(argSetsWorkers)) {
+    if (config.flags.devtools) {
+      args.push('--runInBand');
+    }
+    else {
+      args.push(`--max-workers=${config.maxConcurrentWorkers}`);
+    }
   }
 
   config.logger.info(config.logger.magenta(`jest args: ${args.join(' ')}`));
