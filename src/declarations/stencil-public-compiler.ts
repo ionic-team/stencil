@@ -1552,6 +1552,17 @@ export interface JestConfig {
   coverageThreshold?: any;
 
   errorOnDeprecated?: boolean;
+
+  /**
+   * Jest will run .mjs and .js files with nearest package.json's type field set to `module` as ECMAScript Modules. If you have
+   * any other files that should run with native ESM, you need to specify their file extension here.
+   *
+   * Default is `['.ts', '.tsx', '.jsx']`.
+   *
+   * Note: Jest's ESM support is still experimental, see [its docs for more details]{@link https://jestjs.io/docs/ecmascript-modules}.
+   */
+  extensionsToTreatAsEsm?: string[];
+
   forceCoverageMatch?: any[];
   globals?: any;
   globalSetup?: string;
@@ -1696,6 +1707,14 @@ export interface TestingConfig extends JestConfig {
    * Path to the Screenshot Connector module.
    */
   screenshotConnector?: string;
+
+  /**
+   * If `true`, Jest is run with ES Modules enabled. Requires node be run with `--experimental-vm-modules` enabled.
+   * If `false` or not set, Jest is run in CommonJS mode, which uses CommonJS imports - this is the standard behavior
+   * for Jest. In CommonJS mode, all ESM files must be transpiled to CommonJS.
+   * @see https://jestjs.io/docs/ecmascript-modules
+   */
+  useESModules?: boolean;
 
   /**
    * Amount of time in milliseconds to wait before a screenshot is taken.

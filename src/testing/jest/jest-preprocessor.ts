@@ -3,9 +3,14 @@ import { loadTypeScriptDiagnostic, normalizePath } from '@utils';
 import { transpile } from '../test-transpile';
 import { ts } from '@stencil/core/compiler';
 
+type StencilTestingOptions = { useESModules: boolean; };
 // TODO(STENCIL-306): Remove support for earlier versions of Jest
 type Jest26CacheKeyOptions = { instrument: boolean; rootDir: string };
-type Jest26Config = { instrument: boolean; rootDir: string };
+interface Jest26Config {
+  instrument: boolean;
+  rootDir: string;
+  globals?: { stencil?: { testing?: StencilTestingOptions } };
+};
 type Jest27TransformOptions = { config: Jest26Config };
 
 /**
@@ -69,10 +74,13 @@ export const jestPreprocessor = {
       transformOptions = jestConfig.config;
     }
 
-    if (shouldTransform(sourcePath, sourceText)) {
+    const useESModules = transformOptions.globals?.stencil?.testing?.useESModules ?? false;
+
+    if (shouldTransform(sourcePath, sourceText, useESModules)) {
       const opts: TranspileOptions = {
         file: sourcePath,
         currentDirectory: transformOptions.rootDir,
+        module: useESModules ? 'esm' : 'cjs'
       };
 
       const tsCompilerOptions: ts.CompilerOptions = getCompilerOptions(transformOptions.rootDir);
@@ -217,9 +225,11 @@ function getCompilerOptions(rootDir: string): ts.CompilerOptions | null {
  * Determines if a file should be transformed prior to being consumed by Jest, based on the file name and its contents
  * @param filePath the path of the file
  * @param sourceText the contents of the file
+ * @param useESModules when `true`, transform output uses ES Modules; files that are already ESM are
+ * not transformed.
  * @returns `true` if the file should be transformed, `false` otherwise
  */
-export function shouldTransform(filePath: string, sourceText: string): boolean {
+export function shouldTransform(filePath: string, sourceText: string, useESModules: boolean): boolean {
   const ext = filePath.split('.').pop().toLowerCase().split('?')[0];
 
   if (ext === 'ts' || ext === 'tsx' || ext === 'jsx') {
@@ -227,17 +237,22 @@ export function shouldTransform(filePath: string, sourceText: string): boolean {
     return true;
   }
   if (ext === 'mjs') {
-    // es module extensions
-    return true;
+    // es module extensions - transform when useESModules is false
+    return !useESModules;
   }
   if (ext === 'js') {
-    // there may be false positives here
-    // but worst case scenario a commonjs file is transpiled to commonjs
-    if (sourceText.includes('import ') || sourceText.includes('import.') || sourceText.includes('import(')) {
-      return true;
+    if (useESModules) {
+      return sourceText.includes('require(');
     }
-    if (sourceText.includes('export ')) {
-      return true;
+    else {
+      // there may be false positives here
+      // but worst case scenario a commonjs file is transpiled to commonjs
+      if (sourceText.includes('import ') || sourceText.includes('import.') || sourceText.includes('import(')) {
+        return true;
+      }
+      if (sourceText.includes('export ')) {
+        return true;
+      }
     }
   }
   if (ext === 'css') {

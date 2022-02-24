@@ -43,6 +43,7 @@ export function jestSetupTestFramework() {
     global.resourcesUrl = '/build';
   });
 
+  if (globalThis.jasmine) {
   const jasmineEnv = (jasmine as any).getEnv();
   if (jasmineEnv != null) {
     jasmineEnv.addReporter({
@@ -50,6 +51,7 @@ export function jestSetupTestFramework() {
         global.currentSpec = spec;
       },
     });
+    }
   }
 
   global.screenshotDescriptions = new Set();

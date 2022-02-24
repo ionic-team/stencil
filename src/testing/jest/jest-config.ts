@@ -48,12 +48,11 @@ export function buildJestArgv(config: d.Config): Config.Argv {
 
   const args = [...config.flags.unknownArgs.slice(), ...config.flags.knownArgs.slice()];
 
-  if (!args.some((a) => a.startsWith('--max-workers') || a.startsWith('--maxWorkers'))) {
-    args.push(`--max-workers=${config.maxConcurrentWorkers}`);
-  }
-
   if (config.flags.devtools) {
     args.push('--runInBand');
+  }
+  else if (!args.some((a) => a.startsWith('--max-workers') || (a === '-i') || (a.toLowerCase() === '--runinband'))) {
+    args.push(`--max-workers=${config.maxConcurrentWorkers}`);
   }
 
   config.logger.info(config.logger.magenta(`jest args: ${args.join(' ')}`));
