@@ -44,13 +44,13 @@ export function jestSetupTestFramework() {
   });
 
   if (globalThis.jasmine) {
-  const jasmineEnv = (jasmine as any).getEnv();
-  if (jasmineEnv != null) {
-    jasmineEnv.addReporter({
-      specStarted: (spec: any) => {
-        global.currentSpec = spec;
-      },
-    });
+    const jasmineEnv = (jasmine as any).getEnv();
+    if (jasmineEnv != null) {
+      jasmineEnv.addReporter({
+        specStarted: (spec: any) => {
+          global.currentSpec = spec;
+        },
+      });
     }
   }
 
@@ -61,7 +61,9 @@ export function jestSetupTestFramework() {
   if (typeof env.__STENCIL_DEFAULT_TIMEOUT__ === 'string') {
     const time = parseInt(env.__STENCIL_DEFAULT_TIMEOUT__, 10);
     jest.setTimeout(time * 1.5);
-    jasmine.DEFAULT_TIMEOUT_INTERVAL = time;
+    if (globalThis.jasmine) {
+      jasmine.DEFAULT_TIMEOUT_INTERVAL = time;
+    }
   }
   if (typeof env.__STENCIL_ENV__ === 'string') {
     const stencilEnv = JSON.parse(env.__STENCIL_ENV__);

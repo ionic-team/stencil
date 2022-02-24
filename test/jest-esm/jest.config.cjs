@@ -6,8 +6,7 @@
 
 module.exports = {
   displayName: 'Jest tests using ESM',
-  // preset: '../../testing/jest-preset.js',
-  // testRunner: 'jest-jasmine2',
+  preset: '../../testing/jest-preset.js',
   globals: {
     stencil: {
       testing: {
@@ -15,24 +14,8 @@ module.exports = {
       }
     }
   },
-  setupFilesAfterEnv: [
-    '<rootDir>/../../testing/jest-setuptestframework.js'
-  ],
   moduleDirectories: [
     '../../node_modules'
   ],
-  moduleNameMapper: {
-    '^@stencil/core/testing$': '<rootDir>/../../testing/index.js',
-    '^@stencil/core$': '<rootDir>/../../internal/testing/index.js',
-    '^@stencil/core/internal/app-data$': '<rootDir>/../../internal/app-data/index.cjs',
-    '^@stencil/core/internal/app-globals$': '<rootDir>/../../internal/app-globals/index.js',
-    '^@stencil/core/mock-doc$': '<rootDir>/../../mock-doc/index.cjs',
-    '^@stencil/core/sys$': '<rootDir>/../../sys/node/index.js',
-    '^@stencil/core$': '<rootDir>/../../internal/testing/index.js',
-    '^@stencil/core/internal(.*)$': '<rootDir>/../../internal$1'
-  },
   extensionsToTreatAsEsm: ['.ts', '.tsx', '.jsx'],
-  transform: {
-    '^.+\\.(ts|tsx|jsx|css)$': '../../testing/jest-preprocessor.js'
-  },
 };

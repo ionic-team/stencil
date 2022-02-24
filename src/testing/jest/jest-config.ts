@@ -108,6 +108,18 @@ export function buildJestConfig(config: d.Config): string {
   if (stencilConfigTesting.coverageThreshold) {
     jestConfig.coverageThreshold = stencilConfigTesting.coverageThreshold;
   }
+  if (stencilConfigTesting.useESModules) {
+    jestConfig.globals = {
+      stencil: {
+        testing: {
+          useESModules: true
+        }
+      }
+    }
+    if (!jestConfig.extensionsToTreatAsEsm) {
+      jestConfig.extensionsToTreatAsEsm = ['.ts', '.tsx', '.jsx'];
+    }
+  }
   if (isString(stencilConfigTesting.globalSetup)) {
     jestConfig.globalSetup = stencilConfigTesting.globalSetup;
   }

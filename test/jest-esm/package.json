@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "node ../../bin/stencil build",
-    "test": "node ../../bin/stencil test --spec",
+    "test": "node --experimental-vm-modules --no-warnings ../../bin/stencil test --spec",
     "jest": "node --experimental-vm-modules --no-warnings ../../node_modules/jest-cli/bin/jest.js --maxWorkers=3"
   }
 }
