@@ -60,6 +60,28 @@ describe('jest-config', () => {
     expect(jestArgv.maxWorkers).toBe(2);
   });
 
+  it('--maxWorkers arg is set from config', () => {
+    const config = mockConfig();
+    config.testing = {};
+    config.maxConcurrentWorkers = 3;
+    config.flags = parseFlags(['test'], config.sys);
+
+    const jestArgv = buildJestArgv(config);
+    expect(jestArgv.maxWorkers).toBe(3);
+  });
+
+  it('--maxWorkers arg is not set from config when --runInBand is used', () => {
+    const config = mockConfig();
+    config.testing = {};
+    config.maxConcurrentWorkers = 3;
+
+    const args = ['test', '--runInBand'];
+    config.flags = parseFlags(args, config.sys);
+
+    const jestArgv = buildJestArgv(config);
+    expect(jestArgv.maxWorkers).toBeUndefined();
+  });
+
   it('pass --ci arg to jest', () => {
     const args = ['test', '--ci'];
     const config = mockConfig();
