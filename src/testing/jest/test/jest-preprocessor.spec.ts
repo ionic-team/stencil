@@ -1,7 +1,6 @@
 import { shouldTransform } from '../jest-preprocessor';
 
 describe('jest preprocessor', () => {
-
   describe('in CJS mode', () => {
     it('shouldTransform', () => {
       expect(shouldTransform('file.ts', '', false)).toBe(true);
@@ -43,5 +42,4 @@ describe('jest preprocessor', () => {
       expect(shouldTransform('file.js', 'console.log("hi")', true)).toBe(false);
     });
   });
-
 });

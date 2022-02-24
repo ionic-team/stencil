@@ -3,14 +3,14 @@ import { loadTypeScriptDiagnostic, normalizePath } from '@utils';
 import { transpile } from '../test-transpile';
 import { ts } from '@stencil/core/compiler';
 
-type StencilTestingOptions = { useESModules: boolean; };
+type StencilTestingOptions = { useESModules: boolean };
 // TODO(STENCIL-306): Remove support for earlier versions of Jest
 type Jest26CacheKeyOptions = { instrument: boolean; rootDir: string };
 interface Jest26Config {
   instrument: boolean;
   rootDir: string;
   globals?: { stencil?: { testing?: StencilTestingOptions } };
-};
+}
 type Jest27TransformOptions = { config: Jest26Config };
 
 /**
@@ -80,7 +80,7 @@ export const jestPreprocessor = {
       const opts: TranspileOptions = {
         file: sourcePath,
         currentDirectory: transformOptions.rootDir,
-        module: useESModules ? 'esm' : 'cjs'
+        module: useESModules ? 'esm' : 'cjs',
       };
 
       const tsCompilerOptions: ts.CompilerOptions = getCompilerOptions(transformOptions.rootDir);
@@ -243,8 +243,7 @@ export function shouldTransform(filePath: string, sourceText: string, useESModul
   if (ext === 'js') {
     if (useESModules) {
       return sourceText.includes('require(');
-    }
-    else {
+    } else {
       // there may be false positives here
       // but worst case scenario a commonjs file is transpiled to commonjs
       if (sourceText.includes('import ') || sourceText.includes('import.') || sourceText.includes('import(')) {

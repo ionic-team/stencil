@@ -41,10 +41,12 @@ function getLegacyJestOptions(): Record<string, boolean | number | string> {
 /** @returns true if the argument sets max-workers or runInBand. */
 function argSetsWorkers(arg: string) {
   const lowerCased = arg.toLowerCase();
-  return (lowerCased === '-i')
-    || (lowerCased === '--runinband')
-    || lowerCased.startsWith('--max-workers')
-    || lowerCased.startsWith('--maxworkers');
+  return (
+    lowerCased === '-i' ||
+    lowerCased === '--runinband' ||
+    lowerCased.startsWith('--max-workers') ||
+    lowerCased.startsWith('--maxworkers')
+  );
 }
 
 /**
@@ -60,8 +62,7 @@ export function buildJestArgv(config: d.Config): Config.Argv {
   if (!args.some(argSetsWorkers)) {
     if (config.flags.devtools) {
       args.push('--runInBand');
-    }
-    else {
+    } else {
       args.push(`--max-workers=${config.maxConcurrentWorkers}`);
     }
   }
@@ -123,10 +124,10 @@ export function buildJestConfig(config: d.Config): string {
     jestConfig.globals = {
       stencil: {
         testing: {
-          useESModules: true
-        }
-      }
-    }
+          useESModules: true,
+        },
+      },
+    };
     if (!jestConfig.extensionsToTreatAsEsm) {
       jestConfig.extensionsToTreatAsEsm = ['.ts', '.tsx', '.jsx'];
     }
