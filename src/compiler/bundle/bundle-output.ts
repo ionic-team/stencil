@@ -40,12 +40,20 @@ export const bundleOutput = async (
   return undefined;
 };
 
+/**
+ * Build the rollup options that will be used to transpile, minify, and otherwise transform a Stencil project
+ * @param config the Stencil configuration for the project
+ * @param compilerCtx the current compiler context
+ * @param buildCtx a context object containing information about the current build
+ * @param bundleOpts Rollup bundling options to apply to the base configuration setup by this function
+ * @returns the rollup options to be used
+ */
 export const getRollupOptions = (
   config: d.Config,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   bundleOpts: BundleOptions
-) => {
+): RollupOptions => {
   const customResolveOptions = createCustomResolverAsync(config.sys, compilerCtx.fs, [
     '.tsx',
     '.ts',
