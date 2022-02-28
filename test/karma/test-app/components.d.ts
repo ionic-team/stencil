@@ -47,6 +47,9 @@ export namespace Components {
     }
     interface BuildData {
     }
+    interface ChildReflectNanAttribute {
+        "val": number;
+    }
     interface ChildWithReflection {
         "val": number | any;
     }
@@ -180,7 +183,15 @@ export namespace Components {
     }
     interface NodeResolution {
     }
+    interface ParentReflectNanAttribute {
+    }
     interface ParentWithReflectChild {
+    }
+    interface ReflectNanAttribute {
+        "val": number;
+    }
+    interface ReflectNanAttributeHyphen {
+        "valNum": number;
     }
     interface ReflectToAttr {
         "bool": boolean;
@@ -377,6 +388,12 @@ declare global {
     var HTMLBuildDataElement: {
         prototype: HTMLBuildDataElement;
         new (): HTMLBuildDataElement;
+    };
+    interface HTMLChildReflectNanAttributeElement extends Components.ChildReflectNanAttribute, HTMLStencilElement {
+    }
+    var HTMLChildReflectNanAttributeElement: {
+        prototype: HTMLChildReflectNanAttributeElement;
+        new (): HTMLChildReflectNanAttributeElement;
     };
     interface HTMLChildWithReflectionElement extends Components.ChildWithReflection, HTMLStencilElement {
     }
@@ -732,11 +749,29 @@ declare global {
         prototype: HTMLNodeResolutionElement;
         new (): HTMLNodeResolutionElement;
     };
+    interface HTMLParentReflectNanAttributeElement extends Components.ParentReflectNanAttribute, HTMLStencilElement {
+    }
+    var HTMLParentReflectNanAttributeElement: {
+        prototype: HTMLParentReflectNanAttributeElement;
+        new (): HTMLParentReflectNanAttributeElement;
+    };
     interface HTMLParentWithReflectChildElement extends Components.ParentWithReflectChild, HTMLStencilElement {
     }
     var HTMLParentWithReflectChildElement: {
         prototype: HTMLParentWithReflectChildElement;
         new (): HTMLParentWithReflectChildElement;
+    };
+    interface HTMLReflectNanAttributeElement extends Components.ReflectNanAttribute, HTMLStencilElement {
+    }
+    var HTMLReflectNanAttributeElement: {
+        prototype: HTMLReflectNanAttributeElement;
+        new (): HTMLReflectNanAttributeElement;
+    };
+    interface HTMLReflectNanAttributeHyphenElement extends Components.ReflectNanAttributeHyphen, HTMLStencilElement {
+    }
+    var HTMLReflectNanAttributeHyphenElement: {
+        prototype: HTMLReflectNanAttributeHyphenElement;
+        new (): HTMLReflectNanAttributeHyphenElement;
     };
     interface HTMLReflectToAttrElement extends Components.ReflectToAttr, HTMLStencilElement {
     }
@@ -1079,6 +1114,7 @@ declare global {
         "attribute-html-root": HTMLAttributeHtmlRootElement;
         "bad-shared-jsx": HTMLBadSharedJsxElement;
         "build-data": HTMLBuildDataElement;
+        "child-reflect-nan-attribute": HTMLChildReflectNanAttributeElement;
         "child-with-reflection": HTMLChildWithReflectionElement;
         "cmp-label": HTMLCmpLabelElement;
         "cmp-label-with-slot-sibling": HTMLCmpLabelWithSlotSiblingElement;
@@ -1138,7 +1174,10 @@ declare global {
         "no-delegates-focus": HTMLNoDelegatesFocusElement;
         "node-globals": HTMLNodeGlobalsElement;
         "node-resolution": HTMLNodeResolutionElement;
+        "parent-reflect-nan-attribute": HTMLParentReflectNanAttributeElement;
         "parent-with-reflect-child": HTMLParentWithReflectChildElement;
+        "reflect-nan-attribute": HTMLReflectNanAttributeElement;
+        "reflect-nan-attribute-hyphen": HTMLReflectNanAttributeHyphenElement;
         "reflect-to-attr": HTMLReflectToAttrElement;
         "reparent-style-no-vars": HTMLReparentStyleNoVarsElement;
         "reparent-style-with-vars": HTMLReparentStyleWithVarsElement;
@@ -1234,6 +1273,9 @@ declare namespace LocalJSX {
     interface BadSharedJsx {
     }
     interface BuildData {
+    }
+    interface ChildReflectNanAttribute {
+        "val"?: number;
     }
     interface ChildWithReflection {
         "val"?: number | any;
@@ -1375,7 +1417,15 @@ declare namespace LocalJSX {
     }
     interface NodeResolution {
     }
+    interface ParentReflectNanAttribute {
+    }
     interface ParentWithReflectChild {
+    }
+    interface ReflectNanAttribute {
+        "val"?: number;
+    }
+    interface ReflectNanAttributeHyphen {
+        "valNum"?: number;
     }
     interface ReflectToAttr {
         "bool"?: boolean;
@@ -1522,6 +1572,7 @@ declare namespace LocalJSX {
         "attribute-html-root": AttributeHtmlRoot;
         "bad-shared-jsx": BadSharedJsx;
         "build-data": BuildData;
+        "child-reflect-nan-attribute": ChildReflectNanAttribute;
         "child-with-reflection": ChildWithReflection;
         "cmp-label": CmpLabel;
         "cmp-label-with-slot-sibling": CmpLabelWithSlotSibling;
@@ -1581,7 +1632,10 @@ declare namespace LocalJSX {
         "no-delegates-focus": NoDelegatesFocus;
         "node-globals": NodeGlobals;
         "node-resolution": NodeResolution;
+        "parent-reflect-nan-attribute": ParentReflectNanAttribute;
         "parent-with-reflect-child": ParentWithReflectChild;
+        "reflect-nan-attribute": ReflectNanAttribute;
+        "reflect-nan-attribute-hyphen": ReflectNanAttributeHyphen;
         "reflect-to-attr": ReflectToAttr;
         "reparent-style-no-vars": ReparentStyleNoVars;
         "reparent-style-with-vars": ReparentStyleWithVars;
@@ -1653,6 +1707,7 @@ declare module "@stencil/core" {
             "attribute-html-root": LocalJSX.AttributeHtmlRoot & JSXBase.HTMLAttributes<HTMLAttributeHtmlRootElement>;
             "bad-shared-jsx": LocalJSX.BadSharedJsx & JSXBase.HTMLAttributes<HTMLBadSharedJsxElement>;
             "build-data": LocalJSX.BuildData & JSXBase.HTMLAttributes<HTMLBuildDataElement>;
+            "child-reflect-nan-attribute": LocalJSX.ChildReflectNanAttribute & JSXBase.HTMLAttributes<HTMLChildReflectNanAttributeElement>;
             "child-with-reflection": LocalJSX.ChildWithReflection & JSXBase.HTMLAttributes<HTMLChildWithReflectionElement>;
             "cmp-label": LocalJSX.CmpLabel & JSXBase.HTMLAttributes<HTMLCmpLabelElement>;
             "cmp-label-with-slot-sibling": LocalJSX.CmpLabelWithSlotSibling & JSXBase.HTMLAttributes<HTMLCmpLabelWithSlotSiblingElement>;
@@ -1712,7 +1767,10 @@ declare module "@stencil/core" {
             "no-delegates-focus": LocalJSX.NoDelegatesFocus & JSXBase.HTMLAttributes<HTMLNoDelegatesFocusElement>;
             "node-globals": LocalJSX.NodeGlobals & JSXBase.HTMLAttributes<HTMLNodeGlobalsElement>;
             "node-resolution": LocalJSX.NodeResolution & JSXBase.HTMLAttributes<HTMLNodeResolutionElement>;
+            "parent-reflect-nan-attribute": LocalJSX.ParentReflectNanAttribute & JSXBase.HTMLAttributes<HTMLParentReflectNanAttributeElement>;
             "parent-with-reflect-child": LocalJSX.ParentWithReflectChild & JSXBase.HTMLAttributes<HTMLParentWithReflectChildElement>;
+            "reflect-nan-attribute": LocalJSX.ReflectNanAttribute & JSXBase.HTMLAttributes<HTMLReflectNanAttributeElement>;
+            "reflect-nan-attribute-hyphen": LocalJSX.ReflectNanAttributeHyphen & JSXBase.HTMLAttributes<HTMLReflectNanAttributeHyphenElement>;
             "reflect-to-attr": LocalJSX.ReflectToAttr & JSXBase.HTMLAttributes<HTMLReflectToAttrElement>;
             "reparent-style-no-vars": LocalJSX.ReparentStyleNoVars & JSXBase.HTMLAttributes<HTMLReparentStyleNoVarsElement>;
             "reparent-style-with-vars": LocalJSX.ReparentStyleWithVars & JSXBase.HTMLAttributes<HTMLReparentStyleWithVarsElement>;
