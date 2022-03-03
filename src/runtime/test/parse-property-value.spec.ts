@@ -73,6 +73,12 @@ describe('parse-property-value', () => {
         const result = parsePropertyValue('NaN', MEMBER_FLAGS.Boolean);
         expect(result).toBe(true);
       });
+
+      it('does not coerce a function to a boolean', () => {
+        const noOpFunction = () => false;
+        const result = parsePropertyValue(noOpFunction, MEMBER_FLAGS.Boolean);
+        expect(result).toBe(noOpFunction);
+      });
     });
 
     describe('number coercion', () => {
@@ -135,6 +141,12 @@ describe('parse-property-value', () => {
       it('returns NaN when NaN is received', () => {
         const result = parsePropertyValue(NaN, MEMBER_FLAGS.Number);
         expect(result).toBe(NaN);
+      });
+
+      it('does not coerce a function to a number', () => {
+        const noOpFunction = () => 23;
+        const result = parsePropertyValue(noOpFunction, MEMBER_FLAGS.Number);
+        expect(result).toBe(noOpFunction);
       });
     });
 
@@ -212,6 +224,12 @@ describe('parse-property-value', () => {
       it('coerces the string "NaN" to string "NaN"', () => {
         const result = parsePropertyValue('NaN', MEMBER_FLAGS.String);
         expect(result).toBe('NaN');
+      });
+
+      it('does not coerce a function to a string', () => {
+        const noOpFunction = () => 'return a string';
+        const result = parsePropertyValue(noOpFunction, MEMBER_FLAGS.String);
+        expect(result).toBe(noOpFunction);
       });
     });
 
