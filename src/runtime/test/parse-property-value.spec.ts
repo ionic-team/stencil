@@ -137,5 +137,82 @@ describe('parse-property-value', () => {
         expect(result).toBe(NaN);
       });
     });
+
+    describe('string coercion', () => {
+      it('coerces a string to a string', () => {
+        const result = parsePropertyValue('hello world', MEMBER_FLAGS.String);
+        expect(result).toBe('hello world');
+      });
+
+      it('coerces an empty string to a string', () => {
+        const result = parsePropertyValue('', MEMBER_FLAGS.String);
+        expect(result).toBe('');
+      });
+
+      it('coerces the string "false" to string "false"', () => {
+        const result = parsePropertyValue('false', MEMBER_FLAGS.String);
+        expect(result).toBe('false');
+      });
+
+      it('coerces the string "False" to string "False"', () => {
+        const result = parsePropertyValue('False', MEMBER_FLAGS.String);
+        expect(result).toBe('False');
+      });
+
+      it('coerces the string "true" to string "true"', () => {
+        const result = parsePropertyValue('true', MEMBER_FLAGS.String);
+        expect(result).toBe('true');
+      });
+
+      it('coerces the number 0 to string "0"', () => {
+        const result = parsePropertyValue(0, MEMBER_FLAGS.String);
+        expect(result).toBe('0');
+      });
+
+      it('coerces the string "0" to string "0"', () => {
+        const result = parsePropertyValue('0', MEMBER_FLAGS.String);
+        expect(result).toBe('0');
+      });
+
+      it('coerces the number 1 to string "1"', () => {
+        const result = parsePropertyValue(1, MEMBER_FLAGS.String);
+        expect(result).toBe('1');
+      });
+
+      it('coerces the string "1" to string "1"', () => {
+        const result = parsePropertyValue('1', MEMBER_FLAGS.String);
+        expect(result).toBe('1');
+      });
+
+      it('does not coerce null to string', () => {
+        const result = parsePropertyValue(null, MEMBER_FLAGS.String);
+        expect(result).toBe(null);
+      });
+
+      it('coerces the string "null" to string "null"', () => {
+        const result = parsePropertyValue('null', MEMBER_FLAGS.String);
+        expect(result).toBe('null');
+      });
+
+      it('does not coerce undefined to string', () => {
+        const result = parsePropertyValue(undefined, MEMBER_FLAGS.String);
+        expect(result).toBe(undefined);
+      });
+
+      it('coerces the string "undefined" to string "undefined"', () => {
+        const result = parsePropertyValue('undefined', MEMBER_FLAGS.String);
+        expect(result).toBe('undefined');
+      });
+
+      it('coerces NaN to string "NaN"', () => {
+        const result = parsePropertyValue(NaN, MEMBER_FLAGS.String);
+        expect(result).toBe('NaN');
+      });
+
+      it('coerces the string "NaN" to string "NaN"', () => {
+        const result = parsePropertyValue('NaN', MEMBER_FLAGS.String);
+        expect(result).toBe('NaN');
+      });
+    });
   });
 });
