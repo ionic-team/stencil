@@ -214,5 +214,17 @@ describe('parse-property-value', () => {
         expect(result).toBe('NaN');
       });
     });
+
+    describe('non-primitive MEMBER_FLAGS', () => {
+      it('returns the prop value for MEMBER_FLAGS.Any', () => {
+        const result = parsePropertyValue(23, MEMBER_FLAGS.Any);
+        expect(result).toBe(23);
+      });
+
+      it('returns the prop value for MEMBER_FLAGS.Unknown', () => {
+        const result = parsePropertyValue(23, MEMBER_FLAGS.Unknown);
+        expect(result).toBe(23);
+      });
+    });
   });
 });
