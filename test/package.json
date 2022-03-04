@@ -11,7 +11,7 @@
     "build.hello-world": "cd ./hello-world && npm run build",
     "build.hello-vdom": "cd ./hello-vdom && npm run build",
     "build.ionic": "exit 0 && cd ./ionic-app && npm ci && npm run build",
-    "build.todo": "exit 0 && cd ./todo-app && npm ci && npm run build"
+    "build.todo": "cd ./todo-app && npm ci && npm run build"
   },
   "devDependencies": {
     "brotli": "^1.3.2"
