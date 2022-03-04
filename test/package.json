@@ -10,7 +10,7 @@
     "build.end-to-end": "cd ./end-to-end && npm run build",
     "build.hello-world": "cd ./hello-world && npm run build",
     "build.hello-vdom": "cd ./hello-vdom && npm run build",
-    "build.ionic": "exit 0 && cd ./ionic-app && npm ci && npm run build",
+    "build.ionic": "cd ./ionic-app && npm ci && npm run build",
     "build.todo": "cd ./todo-app && npm ci && npm run build"
   },
   "devDependencies": {
