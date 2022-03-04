@@ -59,7 +59,7 @@ jobs:
 
       - name: Unload build artifacts
         uses: actions/upload-artifact@v2
-        if: matrix.os == 'ubuntu-latest' && matrix.node == '12'
+        if: matrix.os == 'ubuntu-latest' && matrix.node == '14'
         with:
           name: stencil-build
           path: stencil-build.tgz
