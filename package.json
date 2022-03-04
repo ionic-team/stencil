@@ -42,7 +42,7 @@
     "prettier.base": "prettier \"./{bin,scripts,src,test}/**/*.{ts,tsx,js,jsx}\"",
     "prettier.dry-run": "npm run prettier.base -- --list-different",
     "test": "jest --coverage",
-    "test.analysis": "cd test && npm run build",
+    "test.analysis": "cd test && npm run analysis.build-and-analyze",
     "test.dist": "node scripts --validate-build",
     "test.end-to-end": "cd test/end-to-end && npm ci && npm test && npm run test.dist",
     "test.jest": "jest",
@@ -50,7 +50,7 @@
     "test.karma.prod": "cd test/karma && npm ci && npm run karma.prod",
     "test.testing": "node scripts/test/validate-testing.js",
     "test.sys.node": "echo test.sys.node",
-    "test.prod": "npm run test.dist && npm run test.end-to-end && npm run test.jest && npm run test.karma && npm run test.sys.node && npm run test.testing",
+    "test.prod": "npm run test.dist && npm run test.end-to-end && npm run test.jest && npm run test.karma && npm run test.sys.node && npm run test.testing && npm run test.analysis",
     "test.watch": "jest --watch",
     "test.watch-all": "jest --watchAll --coverage"
   },
