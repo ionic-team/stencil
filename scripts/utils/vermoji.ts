@@ -2,7 +2,7 @@ import fs from 'fs-extra';
 
 const UNKNOWN_VERMOJI = '❓';
 
-const VERMOJIS = [
+let vermojis = [
   '💯',
   '☀️',
   '☕️',
@@ -318,18 +318,18 @@ const VERMOJIS = [
 ];
 
 // filter out the 'unknown version vermoji'
-VERMOJIS.filter((vermoji) => vermoji !== UNKNOWN_VERMOJI);
+vermojis = vermojis.filter((vermoji) => vermoji !== UNKNOWN_VERMOJI);
 
 export function getVermoji(changelogPath: string) {
   const changelog = fs.readFileSync(changelogPath, 'utf8');
 
   while (true) {
-    const randomIndex = Math.round(Math.random() * (VERMOJIS.length - 1));
-    const vermoji = VERMOJIS[randomIndex];
+    const randomIndex = Math.round(Math.random() * (vermojis.length - 1));
+    const vermoji = vermojis[randomIndex];
     if (changelog.includes(vermoji)) {
-      VERMOJIS.splice(randomIndex, 1);
+      vermojis.splice(randomIndex, 1);
 
-      if (VERMOJIS.length === 0) {
+      if (vermojis.length === 0) {
         console.warn(`We're out of Vermoji! Create a task to add some more!`);
         return UNKNOWN_VERMOJI;
       }
