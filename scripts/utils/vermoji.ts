@@ -1,5 +1,6 @@
 import fs from 'fs-extra';
-import { BuildOptions } from './options';
+
+const UNKNOWN_VERMOJI = '❓';
 
 const VERMOJIS = [
   '💯',
@@ -316,12 +317,23 @@ const VERMOJIS = [
   '🧀',
 ];
 
+// filter out the 'unknown version vermoji'
+VERMOJIS.filter((vermoji) => vermoji !== UNKNOWN_VERMOJI);
+
 export function getVermoji(changelogPath: string) {
   const changelog = fs.readFileSync(changelogPath, 'utf8');
 
   while (true) {
-    const vermoji = VERMOJIS[Math.round(Math.random() * (VERMOJIS.length - 1))];
-    if (!changelog.includes(vermoji)) {
+    const randomIndex = Math.round(Math.random() * (VERMOJIS.length - 1));
+    const vermoji = VERMOJIS[randomIndex];
+    if (changelog.includes(vermoji)) {
+      VERMOJIS.splice(randomIndex, 1);
+
+      if (VERMOJIS.length === 0) {
+        console.warn(`We're out of Vermoji! Create a task to add some more!`);
+        return UNKNOWN_VERMOJI;
+      }
+    } else {
       return vermoji;
     }
   }
