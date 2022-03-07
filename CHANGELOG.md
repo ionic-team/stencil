@@ -1,3 +1,14 @@
+## 🐦 [2.14.1](https://github.com/ionic-team/stencil/compare/v2.14.0...v2.14.1) (2022-03-07)
+
+
+### Bug Fixes
+
+* **bundling:** allow proper webpack treeshaking ([#3248](https://github.com/ionic-team/stencil/issues/3248)) ([5dccc85](https://github.com/ionic-team/stencil/commit/5dccc856cdaf19592d2a08f0f9b945b8bf2c4f7c))
+* **renderer:** prevent infinite loops for NaN ([#3254](https://github.com/ionic-team/stencil/issues/3254)) ([e2d4e16](https://github.com/ionic-team/stencil/commit/e2d4e1693a6aa253d7cca32649d34dfda78dac8d))
+* **testing:** don't run tests against non-test files ([#3237](https://github.com/ionic-team/stencil/issues/3237)) ([c6fda39](https://github.com/ionic-team/stencil/commit/c6fda394f256eb3be68a1a6ff2f0c2ef0193958f))
+
+
+
 # 💫 [2.14.0](https://github.com/ionic-team/stencil/compare/v2.13.0...v2.14.0) (2022-02-14)
 
 
