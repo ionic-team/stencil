@@ -324,7 +324,7 @@ export function getVermoji(changelogPath: string) {
   const changelog = fs.readFileSync(changelogPath, 'utf8');
 
   while (true) {
-    const randomIndex = Math.round(Math.random() * (vermojis.length - 1));
+    const randomIndex = Math.floor(Math.random() * vermojis.length);
     const vermoji = vermojis[randomIndex];
     if (changelog.includes(vermoji)) {
       vermojis.splice(randomIndex, 1);
