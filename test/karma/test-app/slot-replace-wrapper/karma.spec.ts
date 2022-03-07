@@ -4,9 +4,8 @@ describe('slot replace wrapper', () => {
   const { setupDom, tearDownDom } = setupDomTests(document);
   let app: HTMLElement;
 
-  beforeEach(async (done) => {
+  beforeEach(async () => {
     app = await setupDom('/slot-replace-wrapper/index.html');
-    setTimeout(done, 150);
   });
   afterEach(tearDownDom);
 
