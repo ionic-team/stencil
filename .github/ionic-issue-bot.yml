@@ -37,10 +37,12 @@ stale:
   days: 180
   maxIssuesPerRun: 100
   exemptLabels:
+    - "Bug: Needs Validation"
     - "Feature: Want this? Upvote it!"
     - good first issue
     - help wanted
     - Reply Received
+    - "Request For Comments"
     - triage
   exemptAssigned: true
   exemptProjects: true
