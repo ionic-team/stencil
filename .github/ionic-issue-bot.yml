@@ -43,6 +43,7 @@ stale:
     - help wanted
     - Reply Received
     - "Request For Comments"
+    - "Resolution: Needs Investigation"
     - triage
   exemptAssigned: true
   exemptProjects: true
