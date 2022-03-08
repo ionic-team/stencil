@@ -113,7 +113,7 @@ describe('util', () => {
       expect(util.isDtsFile('foo.spec.ts')).toEqual(false);
     });
 
-    it('should be case insenitive', () => {
+    it('should be case insensitive', () => {
       expect(util.isDtsFile('foo/bar.D.tS')).toEqual(true);
     });
   });
