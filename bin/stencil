@@ -27,7 +27,7 @@ if (isNodeLT(futureDeprecationMinVersion)) {
   console.warn(
     '\nIn an upcoming major release of Stencil, Node v' +
     recommendedVersion +
-    ' or higher will be required.\n'
+    '.0 or higher will be required.\n'
   );
 } else if (isNodeLT(recommendedVersion)) {
   console.warn(
