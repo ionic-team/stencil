@@ -1,3 +1,17 @@
+## 😃 [2.14.2](https://github.com/ionic-team/stencil/compare/v2.14.1...v2.14.2) (2022-03-10)
+
+
+### Bug Fixes
+
+* **testing:** fix test regex for 'e2e.ts' ([#3277](https://github.com/ionic-team/stencil/issues/3277)) ([cf42114](https://github.com/ionic-team/stencil/commit/cf42114edf04520c11421c60673e4f03be22df49))
+
+
+### Features
+
+* **node:** add warning of future node support ([#3271](https://github.com/ionic-team/stencil/issues/3271)) ([11e174e](https://github.com/ionic-team/stencil/commit/11e174edbe7e86a5b8b5110345bef0592c27214b))
+
+
+
 ## 🐦 [2.14.1](https://github.com/ionic-team/stencil/compare/v2.14.0...v2.14.1) (2022-03-07)
 
 
