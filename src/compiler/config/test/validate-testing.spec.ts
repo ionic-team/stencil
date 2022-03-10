@@ -159,6 +159,22 @@ describe('validateTesting', () => {
         expect(testRegex.test('my-component.test.jsx')).toBe(true);
       });
 
+      it('matches the file "test.ts"', () => {
+        expect(testRegex.test('some/path/test.ts')).toBe(true);
+      });
+
+      it('matches the file "test.tsx"', () => {
+        expect(testRegex.test('some/path/test.tsx')).toBe(true);
+      });
+
+      it('matches the file "test.js"', () => {
+        expect(testRegex.test('some/path/test.js')).toBe(true);
+      });
+
+      it('matches the file "test.jsx"', () => {
+        expect(testRegex.test('some/path/test.jsx')).toBe(true);
+      });
+
       it("doesn't match files ending in test.ts", () => {
         expect(testRegex.test('my-component-test.ts')).toBe(false);
       });
@@ -201,6 +217,22 @@ describe('validateTesting', () => {
         expect(testRegex.test('my-component.spec.jsx')).toBe(true);
       });
 
+      it('matches the file "spec.ts"', () => {
+        expect(testRegex.test('some/path/spec.ts')).toBe(true);
+      });
+
+      it('matches the file "spec.tsx"', () => {
+        expect(testRegex.test('some/path/spec.tsx')).toBe(true);
+      });
+
+      it('matches the file "spec.js"', () => {
+        expect(testRegex.test('some/path/spec.js')).toBe(true);
+      });
+
+      it('matches the file "spec.jsx"', () => {
+        expect(testRegex.test('some/path/spec.jsx')).toBe(true);
+      });
+
       it("doesn't match files ending in spec.ts", () => {
         expect(testRegex.test('my-component-spec.ts')).toBe(false);
       });
@@ -241,6 +273,22 @@ describe('validateTesting', () => {
 
       it('matches files ending in .e2e.jsx', () => {
         expect(testRegex.test('my-component.e2e.jsx')).toBe(true);
+      });
+
+      it('matches the file "e2e.ts"', () => {
+        expect(testRegex.test('some/path/e2e.ts')).toBe(true);
+      });
+
+      it('matches the file "e2e.tsx"', () => {
+        expect(testRegex.test('some/path/e2e.tsx')).toBe(true);
+      });
+
+      it('matches the file "e2e.js"', () => {
+        expect(testRegex.test('some/path/e2e.js')).toBe(true);
+      });
+
+      it('matches the file "e2e.jsx"', () => {
+        expect(testRegex.test('some/path/e2e.jsx')).toBe(true);
       });
 
       it("doesn't match files ending in e2e.ts", () => {
