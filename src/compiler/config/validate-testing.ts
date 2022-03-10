@@ -125,7 +125,18 @@ export const validateTesting = (config: d.Config, diagnostics: d.Diagnostic[]) =
   }
 
   if (testing.testRegex === undefined) {
-    testing.testRegex = '(/__tests__/.*|\\.(test|spec|e2e))\\.(tsx|ts|jsx|js)$';
+    /**
+     * The test regex covers cases of:
+     * - files under a `__tests__` directory
+     * - the case where a test file has a name such as `test.ts`, `spec.ts` or `e2e.ts`.
+     *   - these files can use any of the following file extensions: .ts, .tsx, .js, .jsx.
+     *   - this regex only handles the entire path of a file, e.g. `/some/path/e2e.ts`
+     * - the case where a test file ends with `.test.ts`, `.spec.ts`, or `.e2e.ts`.
+     *   - these files can use any of the following file extensions: .ts, .tsx, .js, .jsx.
+     *   - this regex case shall match file names such as `my-cmp.spec.ts`, `test.spec.ts`
+     *   - this regex case shall not match file names such as `attest.ts`, `bespec.ts`
+     */
+    testing.testRegex = '(/__tests__/.*|(\\.|/)(test|spec|e2e))\\.[jt]sx?';
   }
 
   if (Array.isArray(testing.testMatch)) {
