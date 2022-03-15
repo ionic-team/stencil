@@ -2,6 +2,7 @@
 'use strict';
 
 var minimumVersion = '12.10';
+var futureDeprecationMinVersion = '14.0';
 var recommendedVersion = '14.5';
 var currentVersion = process.versions.node;
 
@@ -22,7 +23,13 @@ if (isNodeLT(minimumVersion)) {
   process.exit(1);
 }
 
-if (isNodeLT(recommendedVersion)) {
+if (isNodeLT(futureDeprecationMinVersion)) {
+  console.warn(
+    '\nIn an upcoming major release of Stencil, Node v' +
+    recommendedVersion +
+    '.0 or higher will be required.\n'
+  );
+} else if (isNodeLT(recommendedVersion)) {
   console.warn(
     '\nYour current version of Node is v' +
       currentVersion +
