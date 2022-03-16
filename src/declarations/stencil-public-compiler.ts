@@ -1930,6 +1930,10 @@ export interface OutputTargetDistCustomElements extends OutputTargetBaseNext {
    * children, etc. Users of this flag should be aware that enabling this functionality may increase bundle size.
    */
   autoDefineCustomElements?: boolean;
+  /**
+   * Enables the generation of type definition files for the output target.
+   */
+  generateTypeDeclarations?: boolean;
 }
 
 export interface OutputTargetDistCustomElementsBundle extends OutputTargetBaseNext {

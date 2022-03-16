@@ -53,7 +53,13 @@ export const isTsFile = (filePath: string) => {
   return false;
 };
 
-export const isDtsFile = (filePath: string) => {
+/**
+ * Determines if a given file path points to a type declaration file (ending in .d.ts) or not. This function is
+ * case-insensitive in its heuristics.
+ * @param filePath the path to check
+ * @returns `true` if the given `filePath` points to a type declaration file, `false` otherwise
+ */
+export const isDtsFile = (filePath: string): boolean => {
   const parts = filePath.toLowerCase().split('.');
   if (parts.length > 2) {
     return parts[parts.length - 2] === 'd' && parts[parts.length - 1] === 'ts';

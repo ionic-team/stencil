@@ -7,24 +7,33 @@ import { normalizePath } from '@utils';
 import { updateReferenceTypeImports } from './update-import-refs';
 import { updateStencilTypesImports } from './stencil-types';
 
+/**
+ * Generates and writes a `components.d.ts` file to disk. This file may be written to the `src` directory of a project,
+ * or be written to a directory that is meant to be distributed (e.g. the output directory of `dist-custom-elements`).
+ * @param config the Stencil configuration associated with the project being compiled
+ * @param compilerCtx the current compiler context
+ * @param buildCtx the context associated with the current build
+ * @param destination the relative directory in the filesystem to write the type declaration file to
+ * @returns `true` if the type declaration file written to disk has changed, `false` otherwise
+ */
 export const generateAppTypes = async (
   config: d.Config,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   destination: string
-) => {
+): Promise<boolean> => {
   // only gather components that are still root ts files we've found and have component metadata
   // the compilerCtx cache may still have files that may have been deleted/renamed
   const timespan = buildCtx.createTimeSpan(`generated app types started`, true);
-  const internal = destination === 'src';
+  const areTypesInternal = destination === 'src';
 
   // Generate d.ts files for component types
-  let componentTypesFileContent = generateComponentTypesFile(config, buildCtx, internal);
+  let componentTypesFileContent = generateComponentTypesFile(config, buildCtx, areTypesInternal);
 
   // immediately write the components.d.ts file to disk and put it into fs memory
   let componentsDtsFilePath = getComponentsDtsSrcFilePath(config);
 
-  if (!internal) {
+  if (!areTypesInternal) {
     componentsDtsFilePath = resolve(destination, GENERATED_DTS);
     componentTypesFileContent = updateStencilTypesImports(
       destination,
@@ -48,11 +57,13 @@ export const generateAppTypes = async (
 };
 
 /**
- * Generate the component.d.ts file that contains types for all components
- * @param config the project build configuration
- * @param options compiler options from tsconfig
+ * Generates a `component.d.ts` file's contents, which contains the typings for all components in a Stencil project
+ * @param config the Stencil configuration associated with the project being compiled
+ * @param buildCtx the context associated with the current build
+ * @param areTypesInternal determines if non-exported type definitions are being generated or not
+ * @returns the contents of the `components.d.ts` file
  */
-const generateComponentTypesFile = (config: d.Config, buildCtx: d.BuildCtx, internal: boolean) => {
+const generateComponentTypesFile = (config: d.Config, buildCtx: d.BuildCtx, areTypesInternal: boolean): string => {
   let typeImportData: d.TypesImportData = {};
   const c: string[] = [];
   const allTypes = new Map<string, number>();
@@ -60,7 +71,7 @@ const generateComponentTypesFile = (config: d.Config, buildCtx: d.BuildCtx, inte
 
   const modules: d.TypesModule[] = components.map((cmp) => {
     typeImportData = updateReferenceTypeImports(typeImportData, allTypes, cmp, cmp.sourceFilePath);
-    return generateComponentTypes(cmp, internal);
+    return generateComponentTypes(cmp, areTypesInternal);
   });
 
   c.push(COMPONENTS_DTS_HEADER);

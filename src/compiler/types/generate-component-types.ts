@@ -5,12 +5,12 @@ import { generateMethodTypes } from './generate-method-types';
 import { generatePropTypes } from './generate-prop-types';
 
 /**
- * Generate a string based on the types that are defined within a component.
- *
+ * Generate a string based on the types that are defined within a component
  * @param cmp the metadata for the component that a type definition string is generated for
- * @param importPath the path of the component file
+ * @param areTypesInternal `true` if types being generated are for a project's internal purposes, `false` otherwise
+ * @returns the generated types string alongside additional metadata
  */
-export const generateComponentTypes = (cmp: d.ComponentCompilerMeta, internal: boolean): d.TypesModule => {
+export const generateComponentTypes = (cmp: d.ComponentCompilerMeta, areTypesInternal: boolean): d.TypesModule => {
   const tagName = cmp.tagName.toLowerCase();
   const tagNameAsPascal = dashToPascalCase(tagName);
   const htmlElementName = `HTML${tagNameAsPascal}Element`;
@@ -19,9 +19,13 @@ export const generateComponentTypes = (cmp: d.ComponentCompilerMeta, internal: b
   const methodAttributes = generateMethodTypes(cmp.methods);
   const eventAttributes = generateEventTypes(cmp.events);
 
-  const componentAttributes = attributesToMultiLineString([...propAttributes, ...methodAttributes], false, internal);
+  const componentAttributes = attributesToMultiLineString(
+    [...propAttributes, ...methodAttributes],
+    false,
+    areTypesInternal
+  );
   const isDep = cmp.isCollectionDependency;
-  const jsxAttributes = attributesToMultiLineString([...propAttributes, ...eventAttributes], true, internal);
+  const jsxAttributes = attributesToMultiLineString([...propAttributes, ...eventAttributes], true, areTypesInternal);
 
   const element = [
     `        interface ${htmlElementName} extends Components.${tagNameAsPascal}, HTMLStencilElement {`,
