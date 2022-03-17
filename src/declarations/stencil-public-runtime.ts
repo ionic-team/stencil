@@ -454,8 +454,8 @@ export interface ComponentInterface {
 }
 
 // General types important to applications using stencil built components
-export interface EventEmitter<T = any> {
-  emit: (data?: T) => CustomEvent<T>;
+export interface EventEmitter<T = any, EventCustomEvent extends CustomEvent<T> = CustomEvent<T>> {
+  emit: (data?: T) => EventCustomEvent;
 }
 
 export interface RafCallback {
