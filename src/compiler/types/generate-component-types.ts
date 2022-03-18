@@ -17,7 +17,7 @@ export const generateComponentTypes = (cmp: d.ComponentCompilerMeta, areTypesInt
 
   const propAttributes = generatePropTypes(cmp);
   const methodAttributes = generateMethodTypes(cmp.methods);
-  const eventAttributes = generateEventTypes(cmp.events);
+  const eventAttributes = generateEventTypes(cmp.events, htmlElementName);
 
   const componentAttributes = attributesToMultiLineString(
     [...propAttributes, ...methodAttributes],
