@@ -17,19 +17,15 @@ describe('generateEventTypes', () => {
         complexType: {
           original: 'CustomInterface',
         }
-      }], 'HTMLMyComponentElement')[0];
+      }], 'MyComponent')[0];
     });
 
     it('should rename event names', () => {
       expect(eventType.name).toEqual('onAction');
     });
 
-    it('should generate the event type with the complex type', () => {
-      expect(eventType.type).toContain('CustomEvent<CustomInterface>');
-    });
-
-    it('should generate the event type with the custom HTMLElement type', () => {
-      expect(eventType.type).toBe('(event: CustomEvent<CustomInterface> & { target: HTMLMyComponentElement }) => void');
+    it('should generate the event type with the component event detail and custom type', () => {
+      expect(eventType.type).toBe('(event: ComponentEvents.MyComponentEventDetail<CustomInterface>) => void');
     });
 
   });
@@ -47,15 +43,15 @@ describe('generateEventTypes', () => {
           tags: []
         },
         complexType: {}
-      }], 'HTMLMyComponentElement')[0];
+      }], 'MyComponent')[0];
     });
 
     it('should rename event names', () => {
       expect(eventType.name).toEqual('onAction');
     });
 
-    it('should generate the event type with the custom HTMLElement type', () => {
-      expect(eventType.type).toBe('CustomEvent & { target: HTMLMyComponentElement }');
+    it('should generate the event type with the component event detail', () => {
+      expect(eventType.type).toBe('ComponentEvents.MyComponentEventDetail');
     });
 
   });
