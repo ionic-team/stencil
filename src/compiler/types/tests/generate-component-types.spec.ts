@@ -32,7 +32,7 @@ describe('generateComponentTypes', () => {
     });
 
     it('jsx types should include the custom events', () => {
-      expect(res.jsx).toContain('"onIonChange"?: (event: ComponentEvents.MyComponentEventDetail<number>) => void');
+      expect(res.jsx).toContain('"onIonChange"?: (event: ComponentEvents.MyComponentCustomEvent<number>) => void');
     });
   });
 });
