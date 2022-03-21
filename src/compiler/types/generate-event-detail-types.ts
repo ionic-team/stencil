@@ -18,7 +18,7 @@ export const generateEventDetailTypes = (cmp: d.ComponentCompilerMeta): d.TypesM
 
   const isDep = cmp.isCollectionDependency;
 
-  const cmpEventInterface = `${tagNameAsPascal}EventDetail`;
+  const cmpEventInterface = `${tagNameAsPascal}CustomEvent`;
   const cmpInterface = [
     `        interface ${cmpEventInterface}<T> extends CustomEvent<T> {`,
     `                detail: T;`,

@@ -25,7 +25,7 @@ describe('generateEventTypes', () => {
     });
 
     it('should generate the event type with the component event detail and custom type', () => {
-      expect(eventType.type).toBe('(event: ComponentEvents.MyComponentEventDetail<CustomInterface>) => void');
+      expect(eventType.type).toBe('(event: ComponentEvents.MyComponentCustomEvent<CustomInterface>) => void');
     });
 
   });
@@ -51,7 +51,7 @@ describe('generateEventTypes', () => {
     });
 
     it('should generate the event type with the component event detail', () => {
-      expect(eventType.type).toBe('ComponentEvents.MyComponentEventDetail');
+      expect(eventType.type).toBe('ComponentEvents.MyComponentCustomEvent');
     });
 
   });

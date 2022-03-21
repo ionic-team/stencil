@@ -12,7 +12,7 @@ import { COMPONENT_EVENTS_NAMESPACE } from './types-utils';
 export const generateEventTypes = (cmpEvents: d.ComponentCompilerEvent[], cmpClassName: string): d.TypeInfo => {
   return cmpEvents.map((cmpEvent) => {
     const name = `on${toTitleCase(cmpEvent.name)}`;
-    const cmpEventDetailInterface = `${COMPONENT_EVENTS_NAMESPACE}.${cmpClassName}EventDetail`;
+    const cmpEventDetailInterface = `${COMPONENT_EVENTS_NAMESPACE}.${cmpClassName}CustomEvent`;
     const type = cmpEvent.complexType.original
       ? `(event: ${cmpEventDetailInterface}<${cmpEvent.complexType.original}>) => void`
       : cmpEventDetailInterface;
