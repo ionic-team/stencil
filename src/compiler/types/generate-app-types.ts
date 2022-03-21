@@ -1,6 +1,7 @@
 import type * as d from '../../declarations';
-import { COMPONENTS_DTS_HEADER, sortImportNames } from './types-utils';
+import { COMPONENTS_DTS_HEADER, COMPONENT_EVENTS_NAMESPACE, sortImportNames } from './types-utils';
 import { generateComponentTypes } from './generate-component-types';
+import { generateEventDetailTypes } from './generate-event-detail-types';
 import { GENERATED_DTS, getComponentsDtsSrcFilePath } from '../output-targets/output-utils';
 import { isAbsolute, relative, resolve } from 'path';
 import { normalizePath } from '@utils';
@@ -69,10 +70,14 @@ const generateComponentTypesFile = (config: d.Config, buildCtx: d.BuildCtx, areT
   const allTypes = new Map<string, number>();
   const components = buildCtx.components.filter((m) => !m.isCollectionDependency);
 
-  const modules: d.TypesModule[] = components.map((cmp) => {
+  const modules: d.TypesModule[] = [];
+  const componentEventDetailTypes: d.TypesModule[] = [];
+
+  for (const cmp of components) {
     typeImportData = updateReferenceTypeImports(typeImportData, allTypes, cmp, cmp.sourceFilePath);
-    return generateComponentTypes(cmp, areTypesInternal);
-  });
+    modules.push(generateComponentTypes(cmp, areTypesInternal));
+    componentEventDetailTypes.push(generateEventDetailTypes(cmp));
+  }
 
   c.push(COMPONENTS_DTS_HEADER);
   c.push(`import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";`);
@@ -100,7 +105,13 @@ const generateComponentTypesFile = (config: d.Config, buildCtx: d.BuildCtx, areT
     })
   );
 
-  c.push(`export namespace Components {\n${modules.map((m) => `${m.component}`).join('\n')}\n}`);
+  c.push(`export namespace Components {`);
+  c.push(...modules.map((m) => `${m.component}`));
+  c.push(`}`);
+
+  c.push(`export namespace ${COMPONENT_EVENTS_NAMESPACE} {`);
+  c.push(...componentEventDetailTypes.map((m) => `${m.component}`));
+  c.push(`}`);
 
   c.push(`declare global {`);
 

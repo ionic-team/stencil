@@ -16,3 +16,8 @@ export const sortImportNames = (a: d.TypesMemberNameData, b: d.TypesMemberNameDa
   if (a.localName > b.localName) return 1;
   return 0;
 };
+
+/**
+ * The name of the namespace for all component event interfaces.
+ */
+export const COMPONENT_EVENTS_NAMESPACE = 'ComponentEvents';
