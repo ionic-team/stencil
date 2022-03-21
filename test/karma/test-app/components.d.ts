@@ -6,6 +6,7 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { SomeTypes } from "./util";
+import { TestEventDetail } from "./event-custom-type/cmp";
 export namespace Components {
     interface AppendChild {
     }
@@ -108,6 +109,10 @@ export namespace Components {
     interface EsmImport {
         "propVal": number;
         "someMethod": () => Promise<void>;
+    }
+    interface EventBasic {
+    }
+    interface EventCustomType {
     }
     interface ExternalImportA {
     }
@@ -326,6 +331,532 @@ export namespace Components {
     interface Tag3dComponent {
     }
     interface Tag88 {
+    }
+}
+export namespace ComponentEvents {
+    interface AppendChildCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLAppendChildElement;
+    }
+    interface AttributeBasicCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLAttributeBasicElement;
+    }
+    interface AttributeBasicRootCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLAttributeBasicRootElement;
+    }
+    interface AttributeBooleanCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLAttributeBooleanElement;
+    }
+    interface AttributeBooleanRootCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLAttributeBooleanRootElement;
+    }
+    interface AttributeComplexCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLAttributeComplexElement;
+    }
+    interface AttributeHostCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLAttributeHostElement;
+    }
+    interface AttributeHtmlRootCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLAttributeHtmlRootElement;
+    }
+    interface BadSharedJsxCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLBadSharedJsxElement;
+    }
+    interface BuildDataCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLBuildDataElement;
+    }
+    interface ChildReflectNanAttributeCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLChildReflectNanAttributeElement;
+    }
+    interface ChildWithReflectionCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLChildWithReflectionElement;
+    }
+    interface CmpLabelCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLCmpLabelElement;
+    }
+    interface CmpLabelWithSlotSiblingCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLCmpLabelWithSlotSiblingElement;
+    }
+    interface ConditionalBasicCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLConditionalBasicElement;
+    }
+    interface ConditionalRerenderCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLConditionalRerenderElement;
+    }
+    interface ConditionalRerenderRootCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLConditionalRerenderRootElement;
+    }
+    interface CssCmpCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLCssCmpElement;
+    }
+    interface CssVariablesNoEncapsulationCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLCssVariablesNoEncapsulationElement;
+    }
+    interface CssVariablesShadowDomCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLCssVariablesShadowDomElement;
+    }
+    interface CustomElementChildCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLCustomElementChildElement;
+    }
+    interface CustomElementChildDifferentNameThanClassCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLCustomElementChildDifferentNameThanClassElement;
+    }
+    interface CustomElementNestedChildCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLCustomElementNestedChildElement;
+    }
+    interface CustomElementRootCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLCustomElementRootElement;
+    }
+    interface CustomElementRootDifferentNameThanClassCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLCustomElementRootDifferentNameThanClassElement;
+    }
+    interface CustomElementsDelegatesFocusCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLCustomElementsDelegatesFocusElement;
+    }
+    interface CustomElementsNoDelegatesFocusCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLCustomElementsNoDelegatesFocusElement;
+    }
+    interface CustomEventRootCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLCustomEventRootElement;
+    }
+    interface DelegatesFocusCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLDelegatesFocusElement;
+    }
+    interface DomReattachCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLDomReattachElement;
+    }
+    interface DomReattachCloneCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLDomReattachCloneElement;
+    }
+    interface DomReattachCloneDeepSlotCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLDomReattachCloneDeepSlotElement;
+    }
+    interface DomReattachCloneHostCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLDomReattachCloneHostElement;
+    }
+    interface DynamicCssVariableCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLDynamicCssVariableElement;
+    }
+    interface DynamicImportCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLDynamicImportElement;
+    }
+    interface Es5AddclassSvgCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLEs5AddclassSvgElement;
+    }
+    interface EsmImportCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLEsmImportElement;
+    }
+    interface EventBasicCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLEventBasicElement;
+    }
+    interface EventCustomTypeCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLEventCustomTypeElement;
+    }
+    interface ExternalImportACustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLExternalImportAElement;
+    }
+    interface ExternalImportBCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLExternalImportBElement;
+    }
+    interface ExternalImportCCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLExternalImportCElement;
+    }
+    interface FactoryJsxCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLFactoryJsxElement;
+    }
+    interface ImageImportCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLImageImportElement;
+    }
+    interface InitCssRootCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLInitCssRootElement;
+    }
+    interface InputBasicRootCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLInputBasicRootElement;
+    }
+    interface JsonBasicCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLJsonBasicElement;
+    }
+    interface KeyReorderCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLKeyReorderElement;
+    }
+    interface KeyReorderRootCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLKeyReorderRootElement;
+    }
+    interface LessCmpCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLLessCmpElement;
+    }
+    interface LifecycleAsyncACustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLLifecycleAsyncAElement;
+    }
+    interface LifecycleAsyncBCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLLifecycleAsyncBElement;
+    }
+    interface LifecycleAsyncCCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLLifecycleAsyncCElement;
+    }
+    interface LifecycleBasicACustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLLifecycleBasicAElement;
+    }
+    interface LifecycleBasicBCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLLifecycleBasicBElement;
+    }
+    interface LifecycleBasicCCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLLifecycleBasicCElement;
+    }
+    interface LifecycleNestedACustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLLifecycleNestedAElement;
+    }
+    interface LifecycleNestedBCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLLifecycleNestedBElement;
+    }
+    interface LifecycleNestedCCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLLifecycleNestedCElement;
+    }
+    interface LifecycleUnloadACustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLLifecycleUnloadAElement;
+    }
+    interface LifecycleUnloadBCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLLifecycleUnloadBElement;
+    }
+    interface LifecycleUnloadRootCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLLifecycleUnloadRootElement;
+    }
+    interface LifecycleUpdateACustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLLifecycleUpdateAElement;
+    }
+    interface LifecycleUpdateBCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLLifecycleUpdateBElement;
+    }
+    interface LifecycleUpdateCCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLLifecycleUpdateCElement;
+    }
+    interface ListenJsxCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLListenJsxElement;
+    }
+    interface ListenJsxRootCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLListenJsxRootElement;
+    }
+    interface ListenReattachCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLListenReattachElement;
+    }
+    interface ListenWindowCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLListenWindowElement;
+    }
+    interface NoDelegatesFocusCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLNoDelegatesFocusElement;
+    }
+    interface NodeGlobalsCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLNodeGlobalsElement;
+    }
+    interface NodeResolutionCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLNodeResolutionElement;
+    }
+    interface ParentReflectNanAttributeCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLParentReflectNanAttributeElement;
+    }
+    interface ParentWithReflectChildCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLParentWithReflectChildElement;
+    }
+    interface ReflectNanAttributeCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLReflectNanAttributeElement;
+    }
+    interface ReflectNanAttributeHyphenCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLReflectNanAttributeHyphenElement;
+    }
+    interface ReflectToAttrCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLReflectToAttrElement;
+    }
+    interface ReparentStyleNoVarsCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLReparentStyleNoVarsElement;
+    }
+    interface ReparentStyleWithVarsCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLReparentStyleWithVarsElement;
+    }
+    interface SassCmpCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLSassCmpElement;
+    }
+    interface ScopedBasicCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLScopedBasicElement;
+    }
+    interface ScopedBasicRootCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLScopedBasicRootElement;
+    }
+    interface ShadowDomArrayCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLShadowDomArrayElement;
+    }
+    interface ShadowDomArrayRootCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLShadowDomArrayRootElement;
+    }
+    interface ShadowDomBasicCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLShadowDomBasicElement;
+    }
+    interface ShadowDomBasicRootCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLShadowDomBasicRootElement;
+    }
+    interface ShadowDomModeCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLShadowDomModeElement;
+    }
+    interface ShadowDomModeRootCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLShadowDomModeRootElement;
+    }
+    interface ShadowDomSlotBasicCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLShadowDomSlotBasicElement;
+    }
+    interface ShadowDomSlotNestedCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLShadowDomSlotNestedElement;
+    }
+    interface ShadowDomSlotNestedRootCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLShadowDomSlotNestedRootElement;
+    }
+    interface SlotArrayBasicCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLSlotArrayBasicElement;
+    }
+    interface SlotArrayComplexCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLSlotArrayComplexElement;
+    }
+    interface SlotArrayComplexRootCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLSlotArrayComplexRootElement;
+    }
+    interface SlotArrayTopCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLSlotArrayTopElement;
+    }
+    interface SlotBasicCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLSlotBasicElement;
+    }
+    interface SlotBasicOrderCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLSlotBasicOrderElement;
+    }
+    interface SlotBasicOrderRootCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLSlotBasicOrderRootElement;
+    }
+    interface SlotBasicRootCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLSlotBasicRootElement;
+    }
+    interface SlotChildrenRootCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLSlotChildrenRootElement;
+    }
+    interface SlotDynamicScopedListCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLSlotDynamicScopedListElement;
+    }
+    interface SlotDynamicShadowListCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLSlotDynamicShadowListElement;
+    }
+    interface SlotDynamicWrapperCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLSlotDynamicWrapperElement;
+    }
+    interface SlotDynamicWrapperRootCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLSlotDynamicWrapperRootElement;
+    }
+    interface SlotFallbackCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLSlotFallbackElement;
+    }
+    interface SlotFallbackRootCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLSlotFallbackRootElement;
+    }
+    interface SlotHtmlCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLSlotHtmlElement;
+    }
+    interface SlotLightDomContentCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLSlotLightDomContentElement;
+    }
+    interface SlotLightDomRootCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLSlotLightDomRootElement;
+    }
+    interface SlotLightListCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLSlotLightListElement;
+    }
+    interface SlotLightScopedListCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLSlotLightScopedListElement;
+    }
+    interface SlotListLightRootCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLSlotListLightRootElement;
+    }
+    interface SlotListLightScopedRootCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLSlotListLightScopedRootElement;
+    }
+    interface SlotMapOrderCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLSlotMapOrderElement;
+    }
+    interface SlotMapOrderRootCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLSlotMapOrderRootElement;
+    }
+    interface SlotNestedOrderChildCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLSlotNestedOrderChildElement;
+    }
+    interface SlotNestedOrderParentCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLSlotNestedOrderParentElement;
+    }
+    interface SlotNgIfCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLSlotNgIfElement;
+    }
+    interface SlotNoDefaultCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLSlotNoDefaultElement;
+    }
+    interface SlotReorderCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLSlotReorderElement;
+    }
+    interface SlotReorderRootCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLSlotReorderRootElement;
+    }
+    interface SlotReplaceWrapperCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLSlotReplaceWrapperElement;
+    }
+    interface SlotReplaceWrapperRootCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLSlotReplaceWrapperRootElement;
+    }
+    interface SlottedCssCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLSlottedCssElement;
+    }
+    interface StaticStylesCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLStaticStylesElement;
+    }
+    interface StencilSiblingCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLStencilSiblingElement;
+    }
+    interface StylusCmpCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLStylusCmpElement;
+    }
+    interface SvgAttrCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLSvgAttrElement;
+    }
+    interface SvgClassCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLSvgClassElement;
+    }
+    interface Tag3dComponentCustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLTag3dComponentElement;
+    }
+    interface Tag88CustomEvent<T> extends CustomEvent<T> {
+        detail: T;
+        target: HTMLTag88Element;
     }
 }
 declare global {
@@ -550,6 +1081,18 @@ declare global {
     var HTMLEsmImportElement: {
         prototype: HTMLEsmImportElement;
         new (): HTMLEsmImportElement;
+    };
+    interface HTMLEventBasicElement extends Components.EventBasic, HTMLStencilElement {
+    }
+    var HTMLEventBasicElement: {
+        prototype: HTMLEventBasicElement;
+        new (): HTMLEventBasicElement;
+    };
+    interface HTMLEventCustomTypeElement extends Components.EventCustomType, HTMLStencilElement {
+    }
+    var HTMLEventCustomTypeElement: {
+        prototype: HTMLEventCustomTypeElement;
+        new (): HTMLEventCustomTypeElement;
     };
     interface HTMLExternalImportAElement extends Components.ExternalImportA, HTMLStencilElement {
     }
@@ -1141,6 +1684,8 @@ declare global {
         "dynamic-import": HTMLDynamicImportElement;
         "es5-addclass-svg": HTMLEs5AddclassSvgElement;
         "esm-import": HTMLEsmImportElement;
+        "event-basic": HTMLEventBasicElement;
+        "event-custom-type": HTMLEventCustomTypeElement;
         "external-import-a": HTMLExternalImportAElement;
         "external-import-b": HTMLExternalImportBElement;
         "external-import-c": HTMLExternalImportCElement;
@@ -1332,8 +1877,14 @@ declare namespace LocalJSX {
     interface Es5AddclassSvg {
     }
     interface EsmImport {
-        "onSomeEvent"?: (event: CustomEvent<any>) => void;
+        "onSomeEvent"?: (event: ComponentEvents.EsmImportCustomEvent<any>) => void;
         "propVal"?: number;
+    }
+    interface EventBasic {
+        "onTestEvent"?: (event: ComponentEvents.EventBasicCustomEvent<any>) => void;
+    }
+    interface EventCustomType {
+        "onTestEvent"?: (event: ComponentEvents.EventCustomTypeCustomEvent<TestEventDetail>) => void;
     }
     interface ExternalImportA {
     }
@@ -1362,25 +1913,25 @@ declare namespace LocalJSX {
     interface LifecycleAsyncA {
     }
     interface LifecycleAsyncB {
-        "onLifecycleLoad"?: (event: CustomEvent<any>) => void;
-        "onLifecycleUpdate"?: (event: CustomEvent<any>) => void;
+        "onLifecycleLoad"?: (event: ComponentEvents.LifecycleAsyncBCustomEvent<any>) => void;
+        "onLifecycleUpdate"?: (event: ComponentEvents.LifecycleAsyncBCustomEvent<any>) => void;
         "value"?: string;
     }
     interface LifecycleAsyncC {
-        "onLifecycleLoad"?: (event: CustomEvent<any>) => void;
-        "onLifecycleUpdate"?: (event: CustomEvent<any>) => void;
+        "onLifecycleLoad"?: (event: ComponentEvents.LifecycleAsyncCCustomEvent<any>) => void;
+        "onLifecycleUpdate"?: (event: ComponentEvents.LifecycleAsyncCCustomEvent<any>) => void;
         "value"?: string;
     }
     interface LifecycleBasicA {
     }
     interface LifecycleBasicB {
-        "onLifecycleLoad"?: (event: CustomEvent<any>) => void;
-        "onLifecycleUpdate"?: (event: CustomEvent<any>) => void;
+        "onLifecycleLoad"?: (event: ComponentEvents.LifecycleBasicBCustomEvent<any>) => void;
+        "onLifecycleUpdate"?: (event: ComponentEvents.LifecycleBasicBCustomEvent<any>) => void;
         "value"?: string;
     }
     interface LifecycleBasicC {
-        "onLifecycleLoad"?: (event: CustomEvent<any>) => void;
-        "onLifecycleUpdate"?: (event: CustomEvent<any>) => void;
+        "onLifecycleLoad"?: (event: ComponentEvents.LifecycleBasicCCustomEvent<any>) => void;
+        "onLifecycleUpdate"?: (event: ComponentEvents.LifecycleBasicCCustomEvent<any>) => void;
         "value"?: string;
     }
     interface LifecycleNestedA {
@@ -1599,6 +2150,8 @@ declare namespace LocalJSX {
         "dynamic-import": DynamicImport;
         "es5-addclass-svg": Es5AddclassSvg;
         "esm-import": EsmImport;
+        "event-basic": EventBasic;
+        "event-custom-type": EventCustomType;
         "external-import-a": ExternalImportA;
         "external-import-b": ExternalImportB;
         "external-import-c": ExternalImportC;
@@ -1734,6 +2287,8 @@ declare module "@stencil/core" {
             "dynamic-import": LocalJSX.DynamicImport & JSXBase.HTMLAttributes<HTMLDynamicImportElement>;
             "es5-addclass-svg": LocalJSX.Es5AddclassSvg & JSXBase.HTMLAttributes<HTMLEs5AddclassSvgElement>;
             "esm-import": LocalJSX.EsmImport & JSXBase.HTMLAttributes<HTMLEsmImportElement>;
+            "event-basic": LocalJSX.EventBasic & JSXBase.HTMLAttributes<HTMLEventBasicElement>;
+            "event-custom-type": LocalJSX.EventCustomType & JSXBase.HTMLAttributes<HTMLEventCustomTypeElement>;
             "external-import-a": LocalJSX.ExternalImportA & JSXBase.HTMLAttributes<HTMLExternalImportAElement>;
             "external-import-b": LocalJSX.ExternalImportB & JSXBase.HTMLAttributes<HTMLExternalImportBElement>;
             "external-import-c": LocalJSX.ExternalImportC & JSXBase.HTMLAttributes<HTMLExternalImportCElement>;
