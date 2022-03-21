@@ -17,5 +17,4 @@ describe('event-basic', function () {
     await waitForChanges();
     expect(app.querySelector('#lastValue').textContent).toBe('{"value":"Test value"}');
   });
-
 });

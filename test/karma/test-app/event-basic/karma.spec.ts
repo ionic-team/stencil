@@ -12,5 +12,4 @@ describe('event-basic', function () {
   it('should dispatch an event on load', () => {
     expect(app.querySelector('#counter').textContent).toBe('1');
   });
-
 });

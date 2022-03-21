@@ -23,7 +23,7 @@ export const generateEventTypes = (cmpEvents: d.ComponentCompilerEvent[], cmpCla
       required: false,
       internal: cmpEvent.internal,
       jsdoc: getTextDocs(cmpEvent.docs),
-    }
+    };
     return typeInfo;
   });
 };
