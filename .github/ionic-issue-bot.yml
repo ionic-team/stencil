@@ -38,12 +38,17 @@ stale:
   maxIssuesPerRun: 100
   exemptLabels:
     - "Bug: Needs Validation"
+    - "Bug: Validated"
     - "Feature: Want this? Upvote it!"
     - good first issue
     - help wanted
     - Reply Received
     - "Request For Comments"
+    - "Resolution: Backlog"
+    - "Resolution: Blocked"
+    - "Resolution: Needs Documentation"
     - "Resolution: Needs Investigation"
+    - "Resolution: Refine"
     - triage
   exemptAssigned: true
   exemptProjects: true
