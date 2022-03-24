@@ -344,6 +344,9 @@ export function createNodeSys(c: { process?: any } = {}) {
       return new Promise((resolve) => {
         const recursive = !!(opts && opts.recursive);
         if (recursive) {
+          // TODO(STENCIL-410): In a future version of Node, `force: true` will be required in the options argument. At
+          // the time of this writing, Stencil's Node typings do not support this option.
+          // https://nodejs.org/docs/latest-v16.x/api/deprecations.html#dep0147-fsrmdirpath--recursive-true-
           fs.rmdir(p, { recursive: true }, (err) => {
             resolve({
               basename: path.basename(p),
@@ -372,6 +375,9 @@ export function createNodeSys(c: { process?: any } = {}) {
       try {
         const recursive = !!(opts && opts.recursive);
         if (recursive) {
+          // TODO(STENCIL-410): In a future version of Node, `force: true` will be required in the options argument. At
+          // the time of this writing, Stencil's Node typings do not support this option.
+          // https://nodejs.org/docs/latest-v16.x/api/deprecations.html#dep0147-fsrmdirpath--recursive-true-
           fs.rmdirSync(p, { recursive: true });
         } else {
           fs.rmdirSync(p);
