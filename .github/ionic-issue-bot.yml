@@ -44,8 +44,6 @@ stale:
     - help wanted
     - Reply Received
     - "Request For Comments"
-    - "Resolution: Backlog"
-    - "Resolution: Blocked"
     - "Resolution: Needs Documentation"
     - "Resolution: Needs Investigation"
     - "Resolution: Refine"
