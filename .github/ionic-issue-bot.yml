@@ -49,7 +49,6 @@ noReply:
   maxIssuesPerRun: 100
   includePullRequests: false
   label: Awaiting Reply
-  responseLabel: Reply Received
   close: false
   lock: false
   dryRun: false
