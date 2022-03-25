@@ -75,7 +75,6 @@ stale:
   days: 180
   maxIssuesPerRun: 100
   exemptLabels:
-    - "Bug: Needs Validation"
     - "Bug: Validated"
     - "Feature: Want this? Upvote it!"
     - good first issue
