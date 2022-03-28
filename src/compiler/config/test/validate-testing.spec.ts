@@ -175,6 +175,22 @@ describe('validateTesting', () => {
         expect(testRegex.test('some/path/test.jsx')).toBe(true);
       });
 
+      it("doesn't match snap files ending in test.ts.snap", () => {
+        expect(testRegex.test('my-component.test.ts.snap')).toBe(false);
+      });
+
+      it("doesn't match snap files ending in test.tsx.snap", () => {
+        expect(testRegex.test('my-component.test.tsx.snap')).toBe(false);
+      });
+
+      it("doesn't match snap files ending in test.js.snap", () => {
+        expect(testRegex.test('my-component.test.js.snap')).toBe(false);
+      });
+
+      it("doesn't match snap files ending in test.jsx.snap", () => {
+        expect(testRegex.test('my-component.test.jsx.snap')).toBe(false);
+      });
+
       it("doesn't match files ending in test.ts", () => {
         expect(testRegex.test('my-component-test.ts')).toBe(false);
       });
@@ -233,6 +249,22 @@ describe('validateTesting', () => {
         expect(testRegex.test('some/path/spec.jsx')).toBe(true);
       });
 
+      it("doesn't match snap files ending in spec.ts.snap", () => {
+        expect(testRegex.test('my-component.spec.ts.snap')).toBe(false);
+      });
+
+      it("doesn't match snap files ending in spec.tsx.snap", () => {
+        expect(testRegex.test('my-component.spec.tsx.snap')).toBe(false);
+      });
+
+      it("doesn't match snap files ending in spec.js.snap", () => {
+        expect(testRegex.test('my-component.spec.js.snap')).toBe(false);
+      });
+
+      it("doesn't match snap files ending in spec.jsx.snap", () => {
+        expect(testRegex.test('my-component.spec.jsx.snap')).toBe(false);
+      });
+
       it("doesn't match files ending in spec.ts", () => {
         expect(testRegex.test('my-component-spec.ts')).toBe(false);
       });
@@ -289,6 +321,22 @@ describe('validateTesting', () => {
 
       it('matches the file "e2e.jsx"', () => {
         expect(testRegex.test('some/path/e2e.jsx')).toBe(true);
+      });
+
+      it("doesn't match snap files ending in e2e.ts.snap", () => {
+        expect(testRegex.test('my-component.e2e.ts.snap')).toBe(false);
+      });
+
+      it("doesn't match snap files ending in e2e.tsx.snap", () => {
+        expect(testRegex.test('my-component.e2e.tsx.snap')).toBe(false);
+      });
+
+      it("doesn't match snap files ending in e2e.js.snap", () => {
+        expect(testRegex.test('my-component.e2e.js.snap')).toBe(false);
+      });
+
+      it("doesn't match snap files ending in e2e.jsx.snap", () => {
+        expect(testRegex.test('my-component.e2e.jsx.snap')).toBe(false);
       });
 
       it("doesn't match files ending in e2e.ts", () => {

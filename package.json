@@ -39,7 +39,7 @@
     "rollup.watch": "rollup --watch --config",
     "license": "node scripts --license",
     "prettier": "npm run prettier.base -- --write",
-    "prettier.base": "prettier \"./{bin,scripts,src,test}/**/*.{ts,tsx,js,jsx}\"",
+    "prettier.base": "prettier \"./({bin,scripts,src,test}/**/*.{ts,tsx,js,jsx})|bin/stencil\"",
     "prettier.dry-run": "npm run prettier.base -- --list-different",
     "test": "jest --coverage",
     "test.analysis": "cd test && npm run analysis.build-and-analyze",
