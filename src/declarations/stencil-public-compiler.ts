@@ -921,7 +921,7 @@ export interface CompilerSystem {
   /**
    * Add a callback which will be ran when destroy() is called.
    */
-  addDestory(cb: () => void): void;
+  addDestroy(cb: () => void): void;
   /**
    * Always returns a boolean, does not throw.
    */
@@ -1063,7 +1063,7 @@ export interface CompilerSystem {
   /**
    * Remove a callback which will be ran when destroy() is called.
    */
-  removeDestory(cb: () => void): void;
+  removeDestroy(cb: () => void): void;
   /**
    * Rename old path to new path. Does not throw.
    */
