@@ -147,7 +147,7 @@ export const createWatchBuild = async (
     }
   };
 
-  config.sys.addDestory(close);
+  config.sys.addDestroy(close);
 
   return {
     start,

@@ -12,7 +12,7 @@ export const createSysWorker = (config: ValidatedConfig) => {
   ) {
     const workerCtrl = config.sys.createWorkerController(config.maxConcurrentWorkers);
 
-    config.sys.addDestory(() => workerCtrl.destroy());
+    config.sys.addDestroy(() => workerCtrl.destroy());
 
     config.logger.debug(`create workers, maxWorkers: ${workerCtrl.maxWorkers}`);
     return createWorkerMainContext(workerCtrl);

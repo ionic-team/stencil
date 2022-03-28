@@ -76,10 +76,10 @@ export function createNodeSys(c: { process?: any } = {}): CompilerSystem {
       } catch (e) {}
       return hasAccess;
     },
-    addDestory(cb) {
+    addDestroy(cb) {
       destroys.add(cb);
     },
-    removeDestory(cb) {
+    removeDestroy(cb) {
       destroys.delete(cb);
     },
     applyPrerenderGlobalPatch(opts) {
@@ -453,11 +453,11 @@ export function createNodeSys(c: { process?: any } = {}): CompilerSystem {
           tsFileWatcher.close();
         };
 
-        sys.addDestory(close);
+        sys.addDestroy(close);
 
         return {
           close() {
-            sys.removeDestory(close);
+            sys.removeDestroy(close);
             tsFileWatcher.close();
           },
         };
@@ -481,11 +481,11 @@ export function createNodeSys(c: { process?: any } = {}): CompilerSystem {
         const close = () => {
           tsFileWatcher.close();
         };
-        sys.addDestory(close);
+        sys.addDestroy(close);
 
         return {
           close() {
-            sys.removeDestory(close);
+            sys.removeDestroy(close);
             tsFileWatcher.close();
           },
         };
