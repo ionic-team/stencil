@@ -33,7 +33,7 @@ export const createTsWatchProgram = async (
     },
   };
 
-  config.sys.addDestory(() => tsWatchSys.clearTimeout(timeoutId));
+  config.sys.addDestroy(() => tsWatchSys.clearTimeout(timeoutId));
 
   const tsWatchHost = ts.createWatchCompilerHost(
     config.tsconfig,

@@ -143,7 +143,7 @@ export const createWatchBuild = async (config: d.Config, compilerCtx: d.Compiler
     }
   };
 
-  config.sys.addDestory(close);
+  config.sys.addDestroy(close);
 
   return {
     start,
