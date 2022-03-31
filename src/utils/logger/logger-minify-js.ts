@@ -32,7 +32,7 @@ export function loadMinifyJsDiagnostics(sourceText: string, result: d.MinifyJsRe
     d.lineNumber = errorLine.lineNumber;
     d.columnNumber = errorLine.errorCharStart;
 
-    const highlightLine = errorLine.text.substr(d.columnNumber);
+    const highlightLine = errorLine.text.slice(d.columnNumber);
     for (let i = 0; i < highlightLine.length; i++) {
       if (CHAR_BREAK.includes(highlightLine.charAt(i))) {
         break;
