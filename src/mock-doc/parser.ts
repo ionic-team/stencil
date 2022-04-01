@@ -10,7 +10,9 @@ export type DOMParserSupportedType =
 
 export class MockDOMParser {
   parseFromString(string: string, type: DOMParserSupportedType): MockDocument {
-    if (type !== 'text/html') console.error('XML parsing not implemented yet, continuing as html');
+    if (type !== 'text/html') {
+      console.error('XML parsing not implemented yet, continuing as html');
+    }
     return parseHtmlToDocument(string);
   }
 }
