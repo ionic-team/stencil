@@ -9,7 +9,7 @@ export type DOMParserSupportedType =
   | 'image/svg+xml';
 
 export class MockDOMParser {
-  parseFromString(string: string, type: DOMParserSupportedType): MockDocument {
+  parseFromString(htmlToParse: string, mimeType: DOMParserSupportedType): MockDocument {
     if (type !== 'text/html') {
       console.error('XML parsing not implemented yet, continuing as html');
     }
