@@ -13,6 +13,7 @@ module.exports = {
   },
   coverageDirectory: './coverage/',
   coverageReporters: ['json', 'lcov', 'text', 'clover'],
+  coveragePathIgnorePatterns: ['^.*\\.stub\\.tsx?$'],
   collectCoverageFrom: [
     '<rootDir>/scripts/**/*.{js,jsx,ts,tsx}',
     '!<rootDir>/scripts/build/**/*.{js,jsx,ts,tsx}',

@@ -10,6 +10,8 @@
   },
   "files": [
     "!**/*.map",
+    "!**/*.stub.ts",
+    "!**/*.stub.tsx",
     "bin/",
     "cli/",
     "compiler/",
