@@ -160,56 +160,61 @@ const configCase = (prop: string) => {
   return prop.charAt(0).toLowerCase() + prop.slice(1);
 };
 
-enum BOOLEAN_ARG_OPTS {
-  Build = 'build',
-  Cache = 'cache',
-  CheckVersion = 'check-version',
-  Ci = 'ci',
-  Compare = 'compare',
-  Debug = 'debug',
-  Dev = 'dev',
-  Devtools = 'devtools',
-  Docs = 'docs',
-  E2E = 'e2e',
-  ES5 = 'es5',
-  ESM = 'esm',
-  Headless = 'headless',
-  Help = 'help',
-  Log = 'log',
-  Open = 'open',
-  Prerender = 'prerender',
-  PrerenderExternal = 'prerender-external',
-  Prod = 'prod',
-  Profile = 'profile',
-  ServiceWorker = 'service-worker',
-  Screenshot = 'screenshot',
-  Serve = 'serve',
-  SkipNodeCheck = 'skip-node-check',
-  Spec = 'spec',
-  SSR = 'ssr',
-  Stats = 'stats',
-  UpdateScreenshot = 'update-screenshot',
-  Verbose = 'verbose',
-  Version = 'version',
-  Watch = 'watch',
-}
+const BOOLEAN_ARG_OPTS = [
+  'build',
+  'cache',
+  'check-version',
+  'ci',
+  'compare',
+  'debug',
+  'dev',
+  'devtools',
+  'docs',
+  'e2e',
+  'es5',
+  'esm',
+  'headless',
+  'help',
+  'log',
+  'open',
+  'prerender',
+  'prerender-external',
+  'prod',
+  'profile',
+  'service-worker',
+  'screenshot',
+  'serve',
+  'skip-node-check',
+  'spec',
+  'ssr',
+  'stats',
+  'update-screenshot',
+  'verbose',
+  'version',
+  'watch',
+] as const;
 
-enum NUMBER_ARG_OPTS {
-  MaxWorkers = 'max-workers',
-  Port = 'port',
-}
+const NUMBER_ARG_OPTS = [
+  'max-workers',
+  'port',
+] as const;
 
-enum STRING_ARG_OPTS {
-  Address = 'address',
-  Config = 'config',
-  DocsJSON = 'docs-json',
-  Emulate = 'emulate',
-  LogLevel = 'log-level',
-  Root = 'root',
-  ScreenshotConnector = 'screenshot-connector',
-}
+const STRING_ARG_OPTS = [
+  'address',
+  'config',
+  'docs-json',
+  'emulate',
+  'log-level',
+  'root',
+  'screenshot-connector',
+] as const;
 
-const ARG_OPTS_ALIASES: Partial<Record<BOOLEAN_ARG_OPTS | NUMBER_ARG_OPTS | STRING_ARG_OPTS, string>> = {
+type AliasMap = Partial<Record<
+  typeof BOOLEAN_ARG_OPTS[number] | typeof NUMBER_ARG_OPTS[number] | typeof STRING_ARG_OPTS[number],
+  string
+>>
+
+const ARG_OPTS_ALIASES: AliasMap= {
   config: 'c',
   help: 'h',
   port: 'p',
