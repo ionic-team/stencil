@@ -209,7 +209,7 @@ enum STRING_ARG_OPTS {
   screenshotConnector = 'screenshot-connector',
 }
 
-const ARG_OPTS_ALIASES: Partial<Record<BOOLEAN_ARG_OPTS | NUMBER_ARG_OPTS | STRING_ARG_OPTS, string | undefined>> = {
+const ARG_OPTS_ALIASES: Partial<Record<BOOLEAN_ARG_OPTS | NUMBER_ARG_OPTS | STRING_ARG_OPTS, string>> = {
   config: 'c',
   help: 'h',
   port: 'p',
