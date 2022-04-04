@@ -194,10 +194,7 @@ const BOOLEAN_ARG_OPTS = [
   'watch',
 ] as const;
 
-const NUMBER_ARG_OPTS = [
-  'max-workers',
-  'port',
-] as const;
+const NUMBER_ARG_OPTS = ['max-workers', 'port'] as const;
 
 const STRING_ARG_OPTS = [
   'address',
@@ -209,12 +206,11 @@ const STRING_ARG_OPTS = [
   'screenshot-connector',
 ] as const;
 
-type AliasMap = Partial<Record<
-  typeof BOOLEAN_ARG_OPTS[number] | typeof NUMBER_ARG_OPTS[number] | typeof STRING_ARG_OPTS[number],
-  string
->>
+type AliasMap = Partial<
+  Record<typeof BOOLEAN_ARG_OPTS[number] | typeof NUMBER_ARG_OPTS[number] | typeof STRING_ARG_OPTS[number], string>
+>;
 
-const ARG_OPTS_ALIASES: AliasMap= {
+const ARG_OPTS_ALIASES: AliasMap = {
   config: 'c',
   help: 'h',
   port: 'p',
