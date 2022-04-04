@@ -42,7 +42,7 @@ export const parseFlags = (args: string[], sys?: CompilerSystem): ConfigFlags =>
 };
 
 const parseArgs = (flags: any, args: string[], knownArgs: string[]) => {
-  Object.values(BOOLEAN_ARG_OPTS).forEach((booleanName) => {
+  BOOLEAN_ARG_OPTS.forEach((booleanName) => {
     const alias = ARG_OPTS_ALIASES[booleanName];
     const flagKey = configCase(booleanName);
 
@@ -70,7 +70,7 @@ const parseArgs = (flags: any, args: string[], knownArgs: string[]) => {
     });
   });
 
-  Object.values(STRING_ARG_OPTS).forEach((stringName) => {
+  STRING_ARG_OPTS.forEach((stringName) => {
     const alias = ARG_OPTS_ALIASES[stringName];
     const flagKey = configCase(stringName);
 
@@ -113,7 +113,7 @@ const parseArgs = (flags: any, args: string[], knownArgs: string[]) => {
     }
   });
 
-  Object.values(NUMBER_ARG_OPTS).forEach((numberName) => {
+  NUMBER_ARG_OPTS.forEach((numberName) => {
     const alias = ARG_OPTS_ALIASES[numberName];
     const flagKey = configCase(numberName);
 
