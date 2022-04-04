@@ -42,8 +42,8 @@ export const parseFlags = (args: string[], sys?: CompilerSystem): ConfigFlags =>
 };
 
 const parseArgs = (flags: any, args: string[], knownArgs: string[]) => {
-  ARG_OPTS.boolean.forEach((booleanName) => {
-    const alias = (ARG_OPTS.alias as any)[booleanName];
+  Object.values(BOOLEAN_ARG_OPTS).forEach((booleanName) => {
+    const alias = ARG_OPTS_ALIASES[booleanName];
     const flagKey = configCase(booleanName);
 
     if (typeof flags[flagKey] !== 'boolean') {
@@ -70,8 +70,8 @@ const parseArgs = (flags: any, args: string[], knownArgs: string[]) => {
     });
   });
 
-  ARG_OPTS.string.forEach((stringName) => {
-    const alias = (ARG_OPTS.alias as any)[stringName];
+  Object.values(STRING_ARG_OPTS).forEach((stringName) => {
+    const alias = ARG_OPTS_ALIASES[stringName];
     const flagKey = configCase(stringName);
 
     if (typeof flags[flagKey] !== 'string') {
@@ -113,8 +113,8 @@ const parseArgs = (flags: any, args: string[], knownArgs: string[]) => {
     }
   });
 
-  ARG_OPTS.number.forEach((numberName) => {
-    const alias = (ARG_OPTS.alias as any)[numberName];
+  Object.values(NUMBER_ARG_OPTS).forEach((numberName) => {
+    const alias = ARG_OPTS_ALIASES[numberName];
     const flagKey = configCase(numberName);
 
     if (typeof flags[flagKey] !== 'number') {
@@ -160,48 +160,60 @@ const configCase = (prop: string) => {
   return prop.charAt(0).toLowerCase() + prop.slice(1);
 };
 
-const ARG_OPTS = {
-  boolean: [
-    'build',
-    'cache',
-    'check-version',
-    'ci',
-    'compare',
-    'debug',
-    'dev',
-    'devtools',
-    'docs',
-    'e2e',
-    'es5',
-    'esm',
-    'headless',
-    'help',
-    'log',
-    'open',
-    'prerender',
-    'prerender-external',
-    'prod',
-    'profile',
-    'service-worker',
-    'screenshot',
-    'serve',
-    'skip-node-check',
-    'spec',
-    'ssr',
-    'stats',
-    'update-screenshot',
-    'verbose',
-    'version',
-    'watch',
-  ],
-  number: ['max-workers', 'port'],
-  string: ['address', 'config', 'docs-json', 'emulate', 'log-level', 'root', 'screenshot-connector'],
-  alias: {
-    config: 'c',
-    help: 'h',
-    port: 'p',
-    version: 'v',
-  },
+enum BOOLEAN_ARG_OPTS {
+  build = 'build',
+  cache = 'cache',
+  checkversion = 'check-version',
+  ci = 'ci',
+  compare = 'compare',
+  debug = 'debug',
+  dev = 'dev',
+  devtools = 'devtools',
+  docs = 'docs',
+  e2e = 'e2e',
+  es5 = 'es5',
+  esm = 'esm',
+  headless = 'headless',
+  help = 'help',
+  log = 'log',
+  open = 'open',
+  prerender = 'prerender',
+  prerenderexternal = 'prerender-external',
+  prod = 'prod',
+  profile = 'profile',
+  service = 'service-worker',
+  screenshot = 'screenshot',
+  serve = 'serve',
+  skipnodecheck = 'skip-node-check',
+  spec = 'spec',
+  ssr = 'ssr',
+  stats = 'stats',
+  updatescreenshot = 'update-screenshot',
+  verbose = 'verbose',
+  version = 'version',
+  watch = 'watch',
+}
+
+enum NUMBER_ARG_OPTS {
+  maxworkers = 'max-workers',
+  port = 'port',
+}
+
+enum STRING_ARG_OPTS {
+  address = 'address',
+  config = 'config',
+  docsJson = 'docs-json',
+  emulate = 'emulate',
+  logLevel = 'log-level',
+  root = 'root',
+  screenshotConnector = 'screenshot-connector',
+}
+
+const ARG_OPTS_ALIASES: Partial<Record<BOOLEAN_ARG_OPTS | NUMBER_ARG_OPTS | STRING_ARG_OPTS, string | undefined>> = {
+  config: 'c',
+  help: 'h',
+  port: 'p',
+  version: 'v',
 };
 
 const getNpmConfigEnvArgs = (sys: CompilerSystem) => {
