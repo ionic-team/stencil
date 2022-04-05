@@ -1,4 +1,4 @@
-import type { CompilerSystem, ConfigFlags } from '../declarations';
+import type { CompilerSystem, ConfigFlags, TaskCommand } from '../declarations';
 import { dashToPascalCase } from '@utils';
 
 export const parseFlags = (args: string[], sys?: CompilerSystem): ConfigFlags => {
