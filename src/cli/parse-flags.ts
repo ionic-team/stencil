@@ -2,7 +2,7 @@ import type { CompilerSystem, ConfigFlags } from '../declarations';
 import { dashToPascalCase } from '@utils';
 
 export const parseFlags = (args: string[], sys?: CompilerSystem): ConfigFlags => {
-  const flags: any = {
+  const flags: ConfigFlags = {
     task: null,
     args: [],
     knownArgs: [],
@@ -12,7 +12,7 @@ export const parseFlags = (args: string[], sys?: CompilerSystem): ConfigFlags =>
   // cmd line has more priority over npm scripts cmd
   flags.args = args.slice();
   if (flags.args.length > 0 && flags.args[0] && !flags.args[0].startsWith('-')) {
-    flags.task = flags.args[0];
+    flags.task = flags.args[0] as TaskCommand;
   }
   parseArgs(flags, flags.args, flags.knownArgs);
 
@@ -41,6 +41,16 @@ export const parseFlags = (args: string[], sys?: CompilerSystem): ConfigFlags =>
   return flags;
 };
 
+/**
+ * Parse command line arguments that are whitelisted via the BOOLEAN_ARG_OPTS,
+ * STRING_ARG_OPTS, and NUMBER_ARG_OPTS arrays in this file. Handles leading
+ * dashes on arguments, aliases that are defined for a small number of argument
+ * types, and parsing values for non-boolean arguments (e.g. port number).
+ *
+ * @param flags     a ConfigFlags object
+ * @param args      an array of command-line arguments to parse
+ * @param knownArgs an array to which all recognized, legal arguments are added
+ */
 const parseArgs = (flags: any, args: string[], knownArgs: string[]) => {
   BOOLEAN_ARG_OPTS.forEach((booleanName) => {
     const alias = ARG_OPTS_ALIASES[booleanName];
