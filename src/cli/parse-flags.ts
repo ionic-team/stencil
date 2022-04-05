@@ -160,6 +160,8 @@ const configCase = (prop: string) => {
   return prop.charAt(0).toLowerCase() + prop.slice(1);
 };
 
+type ArrayValuesAsUnion<T extends ReadonlyArray<string>> = T[number];
+
 const BOOLEAN_ARG_OPTS = [
   'build',
   'cache',
@@ -194,7 +196,11 @@ const BOOLEAN_ARG_OPTS = [
   'watch',
 ] as const;
 
+type BooleanArgOpt = ArrayValuesAsUnion<typeof BOOLEAN_ARG_OPTS>;
+
 const NUMBER_ARG_OPTS = ['max-workers', 'port'] as const;
+
+type NumberArgOpt = ArrayValuesAsUnion<typeof NUMBER_ARG_OPTS>;
 
 const STRING_ARG_OPTS = [
   'address',
@@ -206,9 +212,9 @@ const STRING_ARG_OPTS = [
   'screenshot-connector',
 ] as const;
 
-type AliasMap = Partial<
-  Record<typeof BOOLEAN_ARG_OPTS[number] | typeof NUMBER_ARG_OPTS[number] | typeof STRING_ARG_OPTS[number], string>
->;
+type StringArgOpt = ArrayValuesAsUnion<typeof STRING_ARG_OPTS>;
+
+type AliasMap = Partial<Record<BooleanArgOpt | NumberArgOpt | StringArgOpt, string>>;
 
 const ARG_OPTS_ALIASES: AliasMap = {
   config: 'c',
