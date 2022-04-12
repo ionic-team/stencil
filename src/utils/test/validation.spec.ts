@@ -2,7 +2,7 @@ import { validateComponentTag } from '../validation';
 
 describe('validation', () => {
   it('should error on non-string', () => {
-    // @ts-ignore
+    // @ts-ignore we're checking what happens when we pass an unexpected type (number instead of string)
     expect(validateComponentTag(3)).toBe('Tag "3" must be a string type');
   });
 
