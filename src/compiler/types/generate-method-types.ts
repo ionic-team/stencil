@@ -7,14 +7,12 @@ import { getTextDocs } from '@utils';
  * @returns the generated type metadata
  */
 export const generateMethodTypes = (cmpMeta: d.ComponentCompilerMeta): d.TypeInfo => {
-  return [
-    ...cmpMeta.methods.map((cmpMethod) => ({
-      name: cmpMethod.name,
-      type: cmpMethod.complexType.signature,
-      optional: false,
-      required: false,
-      internal: cmpMethod.internal,
-      jsdoc: getTextDocs(cmpMethod.docs),
-    })),
-  ];
+  return cmpMeta.methods.map((cmpMethod) => ({
+    name: cmpMethod.name,
+    type: cmpMethod.complexType.signature,
+    optional: false,
+    required: false,
+    internal: cmpMethod.internal,
+    jsdoc: getTextDocs(cmpMethod.docs),
+  }));
 };
