@@ -117,7 +117,6 @@ describe('generate task', () => {
       expect(writeFileSpy).toBeCalledWith(
         file.path,
         getBoilerplateByExtension('my-component', file.extension as GenerableExtension, true)
-
       );
     });
   });

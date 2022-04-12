@@ -81,7 +81,7 @@ export const taskGenerate = async (coreCompiler: CoreCompiler, config: Config): 
 /**
  * Show a checkbox prompt to select the files to be generated.
  */
-const chooseFilesToGenerate = async (): Promise<GenerableExtension[]> => {
+const chooseFilesToGenerate = async (): Promise<ReadonlyArray<GenerableExtension>> => {
   const { prompt } = await import('prompts');
   return (
     await prompt({
@@ -181,11 +181,7 @@ const isTest = (extension: GenerableExtension): boolean => {
 /**
  * Get the boilerplate for a file by its extension.
  */
-export const getBoilerplateByExtension = (
-  tagName: string,
-  extension: GenerableExtension,
-  withCss: boolean
-): string => {
+export const getBoilerplateByExtension = (tagName: string, extension: GenerableExtension, withCss: boolean): string => {
   switch (extension) {
     case 'tsx':
       return getComponentBoilerplate(tagName, withCss);
