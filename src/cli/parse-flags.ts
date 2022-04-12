@@ -1,8 +1,8 @@
-import type { CompilerSystem, ConfigFlags } from '../declarations';
+import type { CompilerSystem, ConfigFlags, TaskCommand } from '../declarations';
 import { dashToPascalCase } from '@utils';
 
 export const parseFlags = (args: string[], sys?: CompilerSystem): ConfigFlags => {
-  const flags: any = {
+  const flags: ConfigFlags = {
     task: null,
     args: [],
     knownArgs: [],
@@ -12,7 +12,7 @@ export const parseFlags = (args: string[], sys?: CompilerSystem): ConfigFlags =>
   // cmd line has more priority over npm scripts cmd
   flags.args = args.slice();
   if (flags.args.length > 0 && flags.args[0] && !flags.args[0].startsWith('-')) {
-    flags.task = flags.args[0];
+    flags.task = flags.args[0] as TaskCommand;
   }
   parseArgs(flags, flags.args, flags.knownArgs);
 
@@ -41,9 +41,19 @@ export const parseFlags = (args: string[], sys?: CompilerSystem): ConfigFlags =>
   return flags;
 };
 
+/**
+ * Parse command line arguments that are whitelisted via the BOOLEAN_ARG_OPTS,
+ * STRING_ARG_OPTS, and NUMBER_ARG_OPTS arrays in this file. Handles leading
+ * dashes on arguments, aliases that are defined for a small number of argument
+ * types, and parsing values for non-boolean arguments (e.g. port number).
+ *
+ * @param flags     a ConfigFlags object
+ * @param args      an array of command-line arguments to parse
+ * @param knownArgs an array to which all recognized, legal arguments are added
+ */
 const parseArgs = (flags: any, args: string[], knownArgs: string[]) => {
-  ARG_OPTS.boolean.forEach((booleanName) => {
-    const alias = (ARG_OPTS.alias as any)[booleanName];
+  BOOLEAN_ARG_OPTS.forEach((booleanName) => {
+    const alias = ARG_OPTS_ALIASES[booleanName];
     const flagKey = configCase(booleanName);
 
     if (typeof flags[flagKey] !== 'boolean') {
@@ -70,8 +80,8 @@ const parseArgs = (flags: any, args: string[], knownArgs: string[]) => {
     });
   });
 
-  ARG_OPTS.string.forEach((stringName) => {
-    const alias = (ARG_OPTS.alias as any)[stringName];
+  STRING_ARG_OPTS.forEach((stringName) => {
+    const alias = ARG_OPTS_ALIASES[stringName];
     const flagKey = configCase(stringName);
 
     if (typeof flags[flagKey] !== 'string') {
@@ -113,8 +123,8 @@ const parseArgs = (flags: any, args: string[], knownArgs: string[]) => {
     }
   });
 
-  ARG_OPTS.number.forEach((numberName) => {
-    const alias = (ARG_OPTS.alias as any)[numberName];
+  NUMBER_ARG_OPTS.forEach((numberName) => {
+    const alias = ARG_OPTS_ALIASES[numberName];
     const flagKey = configCase(numberName);
 
     if (typeof flags[flagKey] !== 'number') {
@@ -160,48 +170,67 @@ const configCase = (prop: string) => {
   return prop.charAt(0).toLowerCase() + prop.slice(1);
 };
 
-const ARG_OPTS = {
-  boolean: [
-    'build',
-    'cache',
-    'check-version',
-    'ci',
-    'compare',
-    'debug',
-    'dev',
-    'devtools',
-    'docs',
-    'e2e',
-    'es5',
-    'esm',
-    'headless',
-    'help',
-    'log',
-    'open',
-    'prerender',
-    'prerender-external',
-    'prod',
-    'profile',
-    'service-worker',
-    'screenshot',
-    'serve',
-    'skip-node-check',
-    'spec',
-    'ssr',
-    'stats',
-    'update-screenshot',
-    'verbose',
-    'version',
-    'watch',
-  ],
-  number: ['max-workers', 'port'],
-  string: ['address', 'config', 'docs-json', 'emulate', 'log-level', 'root', 'screenshot-connector'],
-  alias: {
-    config: 'c',
-    help: 'h',
-    port: 'p',
-    version: 'v',
-  },
+type ArrayValuesAsUnion<T extends ReadonlyArray<string>> = T[number];
+
+const BOOLEAN_ARG_OPTS = [
+  'build',
+  'cache',
+  'check-version',
+  'ci',
+  'compare',
+  'debug',
+  'dev',
+  'devtools',
+  'docs',
+  'e2e',
+  'es5',
+  'esm',
+  'headless',
+  'help',
+  'log',
+  'open',
+  'prerender',
+  'prerender-external',
+  'prod',
+  'profile',
+  'service-worker',
+  'screenshot',
+  'serve',
+  'skip-node-check',
+  'spec',
+  'ssr',
+  'stats',
+  'update-screenshot',
+  'verbose',
+  'version',
+  'watch',
+] as const;
+
+type BooleanArgOpt = ArrayValuesAsUnion<typeof BOOLEAN_ARG_OPTS>;
+
+const NUMBER_ARG_OPTS = ['max-workers', 'port'] as const;
+
+type NumberArgOpt = ArrayValuesAsUnion<typeof NUMBER_ARG_OPTS>;
+
+const STRING_ARG_OPTS = [
+  'address',
+  'config',
+  'docs-json',
+  'emulate',
+  'log-level',
+  'root',
+  'screenshot-connector',
+] as const;
+
+type StringArgOpt = ArrayValuesAsUnion<typeof STRING_ARG_OPTS>;
+
+type AliasMap = Partial<Record<BooleanArgOpt | NumberArgOpt | StringArgOpt, string>>;
+
+const ARG_OPTS_ALIASES: AliasMap = {
+  config: 'c',
+  help: 'h',
+  port: 'p',
+  version: 'v',
 };
 
 const getNpmConfigEnvArgs = (sys: CompilerSystem) => {
