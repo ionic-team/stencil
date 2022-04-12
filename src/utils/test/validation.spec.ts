@@ -1,17 +1,17 @@
 import { validateComponentTag } from '../validation';
 
 describe('validation', () => {
+  it('should error on non-string', () => {
+    // @ts-ignore
+    expect(validateComponentTag(3)).toBe('Tag "3" must be a string type');
+  });
+
   it.each([' my-tag', 'my-tag ', ' my-tag '])('should error on whitespace', (tagName) => {
     expect(validateComponentTag(tagName)).toBe('Tag can not contain white spaces');
   });
 
   it('should error on upper case', () => {
     expect(validateComponentTag('My-Tag')).toBe('Tag can not contain upper case characters');
-  });
-
-  it('should error on non-string', () => {
-    // @ts-ignore
-    expect(validateComponentTag(3)).toBe('Tag "3" must be a string type');
   });
 
   it('should error on empty string', () => {
