@@ -7,20 +7,18 @@ import { getTextDocs, toTitleCase } from '@utils';
  * @returns the generated type metadata
  */
 export const generateEventTypes = (cmpMeta: d.ComponentCompilerMeta): d.TypeInfo => {
-  return [
-    ...cmpMeta.events.map((cmpEvent) => {
-      const name = `on${toTitleCase(cmpEvent.name)}`;
-      const type = cmpEvent.complexType.original
-        ? `(event: CustomEvent<${cmpEvent.complexType.original}>) => void`
-        : `CustomEvent`;
-      return {
-        name,
-        type,
-        optional: false,
-        required: false,
-        internal: cmpEvent.internal,
-        jsdoc: getTextDocs(cmpEvent.docs),
-      };
-    }),
-  ];
+  return cmpMeta.events.map((cmpEvent) => {
+    const name = `on${toTitleCase(cmpEvent.name)}`;
+    const type = cmpEvent.complexType.original
+      ? `(event: CustomEvent<${cmpEvent.complexType.original}>) => void`
+      : `CustomEvent`;
+    return {
+      name,
+      type,
+      optional: false,
+      required: false,
+      internal: cmpEvent.internal,
+      jsdoc: getTextDocs(cmpEvent.docs),
+    };
+  });
 };
