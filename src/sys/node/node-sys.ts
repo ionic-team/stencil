@@ -593,8 +593,8 @@ export function createNodeSys(c: { process?: any } = {}) {
     jest: ['24.9.0', '27.4.5'],
     'jest-cli': ['24.9.0', '27.4.5'],
     pixelmatch: ['4.0.2', '4.0.2'],
-    puppeteer: ['1.19.0', '10.0.0'],
-    'puppeteer-core': ['1.19.0', '5.2.1'],
+    puppeteer: ['10.0.0', '13.5.2'],
+    'puppeteer-core': ['10.0.0', '13.5.2'],
     'workbox-build': ['4.3.1', '4.3.1'],
   });
 
