@@ -302,32 +302,60 @@ export class ObjectMap {
   [key: string]: ts.Expression | ObjectMap;
 }
 
-export const getAttributeTypeInfo = (baseNode: ts.Node, sourceFile: ts.SourceFile) => {
+/**
+ * Generate a series of type references for a given AST node
+ * @param baseNode the AST node to pull type references from
+ * @param sourceFile the source file in which the provided `baseNode` exists
+ * @returns the generated series of type references
+ */
+export const getAttributeTypeInfo = (
+  baseNode: ts.Node,
+  sourceFile: ts.SourceFile
+): d.ComponentCompilerTypeReferences => {
   const allReferences: d.ComponentCompilerTypeReferences = {};
-  getAllTypeReferences(baseNode).forEach((rt) => {
-    allReferences[rt] = getTypeReferenceLocation(rt, sourceFile);
+  getAllTypeReferences(baseNode).forEach((typeName: string) => {
+    allReferences[typeName] = getTypeReferenceLocation(typeName, sourceFile);
   });
   return allReferences;
 };
 
+/**
+ * Get the text-based name from a TypeScript `EntityName`, which is an identifier of some form
+ * @param entity a TypeScript `EntityName` to retrieve the name of an entity from
+ * @returns the entity's name
+ */
 const getEntityName = (entity: ts.EntityName): string => {
   if (ts.isIdentifier(entity)) {
     return entity.escapedText.toString();
   } else {
+    // We have qualified name - e.g. const x: Foo.Bar.Baz;
+    // Recurse until we find the 'base' of the qualified name
     return getEntityName(entity.left);
   }
 };
-const getAllTypeReferences = (node: ts.Node): string[] => {
+
+/**
+ * Recursively walks the provided AST to collect all TypeScript type references that are found
+ * @param node the node to walk to retrieve type information
+ * @returns the collected type references
+ */
+const getAllTypeReferences = (node: ts.Node): ReadonlyArray<string> => {
   const referencedTypes: string[] = [];
 
   const visit = (node: ts.Node): ts.VisitResult<ts.Node> => {
+    /**
+     * A type reference node will refer to some type T.
+     * e.g: In `const foo: Bar = {...}` the reference node will contain semantic information about `Bar`.
+     * In TypeScript, types that are also keywords (e.g. `number` in `const foo: number`) are not `TypeReferenceNode`s.
+     */
     if (ts.isTypeReferenceNode(node)) {
       referencedTypes.push(getEntityName(node.typeName));
       if (node.typeArguments) {
+        // a type may contain types itself (e.g. generics - Foo<Bar>)
         node.typeArguments
-          .filter((ta) => ts.isTypeReferenceNode(ta))
-          .forEach((tr: ts.TypeReferenceNode) => {
-            const typeName = tr.typeName as ts.Identifier;
+          .filter((typeArg: ts.TypeNode) => ts.isTypeReferenceNode(typeArg))
+          .forEach((typeRef: ts.TypeReferenceNode) => {
+            const typeName = typeRef.typeName as ts.Identifier;
             if (typeName && typeName.escapedText) {
               referencedTypes.push(typeName.escapedText.toString());
             }
@@ -356,6 +384,22 @@ export const validateReferences = (
   });
 };
 
+/**
+ * Determine where a TypeScript type reference originates from. This is accomplished by interrogating the AST node in
+ * which the type's name appears
+ *
+ * A type may originate:
+ * - from the same file where it is used (a type is declared in some file, `foo.ts`, and later used in the same file)
+ * - from another file (I.E. it is imported and should have an import statement somewhere in the file)
+ * - from a global context
+ * - etc.
+ *
+ * The type may be declared using the `type` or `interface` keywords.
+ *
+ * @param typeName the name of the type to find the origination of
+ * @param tsNode the TypeScript AST node being searched for the provided `typeName`
+ * @returns the context stating where the type originates from
+ */
 const getTypeReferenceLocation = (typeName: string, tsNode: ts.Node): d.ComponentCompilerTypeReference => {
   const sourceFileObj = tsNode.getSourceFile();
 

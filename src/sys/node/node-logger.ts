@@ -65,7 +65,7 @@ export const createNodeLogger = (context: { process: NodeJS.Process }): Logger =
     const readline = await import('readline');
     let promise = Promise.resolve();
     const update = (text: string) => {
-      text = text.substr(0, prcs.stdout.columns - 5) + '\x1b[0m';
+      text = text.substring(0, prcs.stdout.columns - 5) + '\x1b[0m';
       return (promise = promise.then(() => {
         return new Promise<any>((resolve) => {
           readline.clearLine(prcs.stdout, 0);

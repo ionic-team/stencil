@@ -34,7 +34,7 @@ export const updateStencilTypesImports = (typesDir: string, dtsFilePath: string,
  * Writes Stencil core typings file to disk for a dist-* output target
  * @param config the Stencil configuration associated with the project being compiled
  * @param compilerCtx the current compiler context
- * @returns
+ * @returns the results of writing one or more type declaration files to disk
  */
 export const copyStencilCoreDts = async (
   config: d.Config,

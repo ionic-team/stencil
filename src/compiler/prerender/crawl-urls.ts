@@ -208,7 +208,7 @@ export const standardNormalizeHref = (prerenderConfig: d.PrerenderConfig, diagno
         // url should NOT have a trailing slash
         if (href.endsWith('/') && url.pathname !== '/') {
           // this has a trailing slash and it's not the root path
-          href = href.substr(0, href.length - 1);
+          href = href.slice(0, -1);
         }
       }
 
