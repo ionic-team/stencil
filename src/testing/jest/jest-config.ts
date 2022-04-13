@@ -59,7 +59,7 @@ export function buildJestArgv(config: d.Config): Config.Argv {
   config.logger.info(config.logger.magenta(`jest args: ${args.join(' ')}`));
 
   let jestArgv = yargs(args).argv as Config.Argv;
-  jestArgv = { ...jestArgv, ...getLegacyJestOptions() };
+  jestArgv = { ...getLegacyJestOptions(), ...jestArgv };
   jestArgv.config = buildJestConfig(config);
 
   if (typeof jestArgv.maxWorkers === 'string') {
