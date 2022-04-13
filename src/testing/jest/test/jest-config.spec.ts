@@ -60,6 +60,28 @@ describe('jest-config', () => {
     expect(jestArgv.maxWorkers).toBe(2);
   });
 
+  it('--maxWorkers arg is set from config', () => {
+    const config = mockConfig();
+    config.testing = {};
+    config.maxConcurrentWorkers = 3;
+    config.flags = parseFlags(['test'], config.sys);
+
+    const jestArgv = buildJestArgv(config);
+    expect(jestArgv.maxWorkers).toBe(3);
+  });
+
+  it('--maxWorkers arg is not set from config when --runInBand is used', () => {
+    const config = mockConfig();
+    config.testing = {};
+    config.maxConcurrentWorkers = 3;
+
+    const args = ['test', '--runInBand'];
+    config.flags = parseFlags(args, config.sys);
+
+    const jestArgv = buildJestArgv(config);
+    expect(jestArgv.maxWorkers).toBeUndefined();
+  });
+
   it('pass --ci arg to jest', () => {
     const args = ['test', '--ci'];
     const config = mockConfig();
@@ -177,5 +199,33 @@ describe('jest-config', () => {
     const parsedConfig = JSON.parse(jestArgv.config) as d.JestConfig;
     expect(parsedConfig.collectCoverageFrom).toHaveLength(1);
     expect(parsedConfig.collectCoverageFrom[0]).toBe('**/*.+(ts|tsx)');
+  });
+
+  it('useESModules: true sets ESM jest config', () => {
+    const config = mockConfig();
+    config.testing = {
+      useESModules: true,
+    };
+    config.flags = parseFlags(['test'], config.sys);
+
+    const jestArgv = buildJestArgv(config);
+    const parsedConfig = JSON.parse(jestArgv.config) as d.JestConfig;
+
+    expect(parsedConfig.extensionsToTreatAsEsm).toEqual(['.ts', '.tsx', '.jsx']);
+    expect(parsedConfig.globals.stencil.testing.useESModules).toBe(true);
+  });
+
+  it('useESModules: false does not set ESM jest config', () => {
+    const config = mockConfig();
+    config.testing = {
+      useESModules: false,
+    };
+    config.flags = parseFlags(['test'], config.sys);
+
+    const jestArgv = buildJestArgv(config);
+    const parsedConfig = JSON.parse(jestArgv.config) as d.JestConfig;
+
+    expect(parsedConfig.extensionsToTreatAsEsm).toBeUndefined();
+    expect(parsedConfig.globals.stencil.testing.useESModules).toBe(false);
   });
 });

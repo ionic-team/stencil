@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "alwaysStrict": true,
+    "allowSyntheticDefaultImports": true,
+    "allowJs": true,
+    "allowUnreachableCode": false,
+    "declaration": true,
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "forceConsistentCasingInFileNames": true,
+    "jsx": "react",
+    "jsxFactory": "h",
+    "lib": ["dom", "es2017"],
+    "module": "esnext",
+    "moduleResolution": "node",
+    "pretty": true,
+    "target": "es2020",
+    "baseUrl": ".",
+    "paths": {
+      "@stencil/core": ["../../internal"],
+      "@stencil/core/internal": ["../../internal"],
+      "@stencil/core/testing": ["../../testing"]
+    }
+  },
+  "include": ["src"]
+}
