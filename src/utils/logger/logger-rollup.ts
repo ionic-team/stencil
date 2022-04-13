@@ -113,7 +113,7 @@ export const loadRollupDiagnostics = (
 export const createOnWarnFn = (diagnostics: d.Diagnostic[], bundleModulesFiles?: d.Module[]) => {
   const previousWarns = new Set<string>();
 
-  return function onWarningMessage(warning: { code: string; importer: string; message: string }) {
+  return function onWarningMessage(warning: { code?: string; importer?: string; message?: string }) {
     if (warning == null || ignoreWarnCodes.has(warning.code) || previousWarns.has(warning.message)) {
       return;
     }

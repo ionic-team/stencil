@@ -74,8 +74,10 @@ export const validateTesting = (config: d.ValidatedConfig, diagnostics: d.Diagno
     });
 
     (config.outputTargets ?? [])
-      .filter((o) => (isOutputTargetDist(o) || isOutputTargetWww(o)) && o.dir)
-      .forEach((outputTarget: d.OutputTargetWww) => {
+      .filter(
+        (o): o is d.OutputTargetWww | d.OutputTargetDist => (isOutputTargetDist(o) || isOutputTargetWww(o)) && !!o.dir
+      )
+      .forEach((outputTarget) => {
         testing.testPathIgnorePatterns?.push(outputTarget.dir!);
       });
   }

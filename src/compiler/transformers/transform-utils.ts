@@ -415,7 +415,7 @@ const getAllTypeReferences = (node: ts.Node): ReadonlyArray<string> => {
       if (node.typeArguments) {
         // a type may contain types itself (e.g. generics - Foo<Bar>)
         node.typeArguments
-          .filter((typeArg: ts.TypeNode) => ts.isTypeReferenceNode(typeArg))
+          .filter((typeArg: ts.TypeNode): typeArg is ts.TypeReferenceNode => ts.isTypeReferenceNode(typeArg))
           .forEach((typeRef: ts.TypeReferenceNode) => {
             const typeName = typeRef.typeName as ts.Identifier;
             if (typeName && typeName.escapedText) {
