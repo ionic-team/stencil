@@ -178,4 +178,18 @@ describe('jest-config', () => {
     expect(parsedConfig.collectCoverageFrom).toHaveLength(1);
     expect(parsedConfig.collectCoverageFrom[0]).toBe('**/*.+(ts|tsx)');
   });
+
+  it('passed flags should be respected over defaults', () => {
+    const args = ['test', '--spec', '--passWithNoTests'];
+    const config = mockConfig();
+    config.flags = parseFlags(args, config.sys);
+    config.testing = {};
+
+    expect(config.flags.args).toEqual(['--spec', '--passWithNoTests']);
+    expect(config.flags.unknownArgs).toEqual(['--passWithNoTests']);
+
+    const jestArgv = buildJestArgv(config);
+    expect(jestArgv.spec).toBe(true);
+    expect(jestArgv.passWithNoTests).toBe(true);
+  });
 });
