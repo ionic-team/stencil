@@ -150,7 +150,7 @@ describe('validateDevServer', () => {
   it('should set address, port null, protocol', () => {
     inputConfig.devServer.address = 'https://subdomain.stenciljs.com/';
     const { config } = validateConfig(inputConfig);
-    expect(config.devServer.port).toBe(null);
+    expect(config.devServer.port).toBe(undefined);
     expect(config.devServer.address).toBe('subdomain.stenciljs.com');
     expect(config.devServer.protocol).toBe('https');
   });

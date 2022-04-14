@@ -352,6 +352,40 @@ export interface Config extends StencilConfig {
   _isTesting?: boolean;
 }
 
+/**
+ * A 'loose' type useful for wrapping an incomplete / possible malformed
+ * object as we work on getting it comply with a particular Interface T.
+ *
+ * Example:
+ *
+ * ```ts
+ * interface Foo {
+ *   bar: string
+ * }
+ *
+ * function validateFoo(foo: Loose<Foo>): Foo {
+ *   let validatedFoo = {
+ *     ...foo,
+ *     bar: foo.bar || DEFAULT_BAR
+ *   }
+ *
+ *   return validatedFoo
+ * }
+ * ```
+ *
+ * Use this when you need to take user input or something from some other part
+ * of the world that we don't control and transform it into something
+ * conforming to a given interface. For best results, pair with a validation
+ * function as shown in the example.
+ */
+type Loose<T extends Object> = Record<string, any> & Partial<T>;
+
+/**
+ * A Loose version of the Config interface. This is intended to let us load a partial config
+ * and have type information carry though as we construct an object which is a valid `Config`.
+ */
+export type UnvalidatedConfig = Loose<Config>;
+
 export interface HydratedFlag {
   /**
    * Defaults to `hydrated`.
@@ -2104,7 +2138,7 @@ export interface LoadConfigInit {
    * User config object to merge into default config and
    * config loaded from a file path.
    */
-  config?: Config;
+  config?: UnvalidatedConfig;
   /**
    * Absolute path to a Stencil config file. This path cannot be
    * relative and it does not resolve config files within a directory.
@@ -2120,8 +2154,9 @@ export interface LoadConfigInit {
   initTsConfig?: boolean;
 }
 
+//
 export interface LoadConfigResults {
-  config: Config;
+  config: UnvalidatedConfig;
   diagnostics: Diagnostic[];
   tsconfig: {
     path: string;

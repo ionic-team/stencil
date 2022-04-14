@@ -1,12 +1,12 @@
 import type * as d from '../../declarations';
 import { isObject, pluck } from '@utils';
 
-export const validateRollupConfig = (config: d.Config) => {
+export const validateRollupConfig = (config: d.UnvalidatedConfig): void => {
   const cleanRollupConfig = getCleanRollupConfig(config.rollupConfig);
   config.rollupConfig = cleanRollupConfig;
 };
 
-const getCleanRollupConfig = (rollupConfig: d.RollupConfig): d.RollupConfig => {
+const getCleanRollupConfig = (rollupConfig: d.Config['rollupConfig']): d.RollupConfig => {
   let cleanRollupConfig = DEFAULT_ROLLUP_CONFIG;
 
   if (!rollupConfig || !isObject(rollupConfig)) {

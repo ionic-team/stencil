@@ -1,17 +1,40 @@
 import type * as d from '../../declarations';
 import { isAbsolute, join } from 'path';
+import { isBoolean } from '@utils';
 
-export const getAbsolutePath = (config: d.Config, dir: string) => {
+export const getAbsolutePath = (config: d.Config | d.UnvalidatedConfig, dir: string) => {
   if (!isAbsolute(dir)) {
     dir = join(config.rootDir, dir);
   }
   return dir;
 };
 
-export const setBooleanConfig = (config: any, configName: string, flagName: string, defaultValue: boolean) => {
+/**
+ * This function does two things:
+ *
+ * 1. If you pass a `flagName`, it will hoist that `flagName` out of the
+ *    `ConfigFlags` object and onto the 'root' level (if you will) of the
+ *    `config` under the `configName` (`keyof d.Config`) that you pass.
+ * 2. If you _don't_  pass a `flagName` it will just set the value you supply
+ *    on the config.
+ *
+ * @param config the config that we want to update
+ * @param configName the key we're setting on the config
+ * @param flagName either the name of a ConfigFlag prop we want to hoist up or null
+ * @param defaultValue the default value we should set!
+ */
+export const setBooleanConfig = <K extends keyof d.Config>(
+  config: d.UnvalidatedConfig,
+  configName: K,
+  flagName: keyof d.ConfigFlags | null,
+  defaultValue: d.Config[K]
+) => {
   if (flagName) {
-    if (typeof config.flags[flagName] === 'boolean') {
-      config[configName] = config.flags[flagName];
+    // I can't think of a great way to tell the compiler that `typeof Config[K]` is going
+    // to be equal to `typeof ConfigFlags[K]`, so we lean on a little assertion 🫤
+    let flagValue = config?.flags?.[flagName] as d.Config[K];
+    if (isBoolean(flagValue)) {
+      config[configName] = flagValue;
     }
   }
 
@@ -21,64 +44,31 @@ export const setBooleanConfig = (config: any, configName: string, flagName: stri
     config[userConfigName] = !!config[userConfigName]();
   }
 
-  if (typeof config[userConfigName] === 'boolean') {
+  if (isBoolean(config[userConfigName])) {
     config[configName] = config[userConfigName];
   } else {
     config[configName] = defaultValue;
   }
 };
 
-export const setNumberConfig = (config: any, configName: string, _flagName: string, defaultValue: number) => {
-  const userConfigName = getUserConfigName(config, configName);
-
-  if (typeof config[userConfigName] === 'function') {
-    config[userConfigName] = config[userConfigName]();
-  }
-
-  if (typeof config[userConfigName] === 'number') {
-    config[configName] = config[userConfigName];
-  } else {
-    config[configName] = defaultValue;
-  }
-};
-
-export const setStringConfig = (config: any, configName: string, defaultValue: string) => {
-  const userConfigName = getUserConfigName(config, configName);
-
-  if (typeof config[userConfigName] === 'function') {
-    config[userConfigName] = config[userConfigName]();
-  }
-
-  if (typeof config[userConfigName] === 'string') {
-    config[configName] = config[userConfigName];
-  } else {
-    config[configName] = defaultValue;
-  }
-};
-
-export const setArrayConfig = (config: any, configName: string, defaultValue?: any[]) => {
-  const userConfigName = getUserConfigName(config, configName);
-
-  if (typeof config[userConfigName] === 'function') {
-    config[userConfigName] = config[userConfigName]();
-  }
-
-  if (!Array.isArray(config[configName])) {
-    if (Array.isArray(defaultValue)) {
-      config[configName] = defaultValue.slice();
-    } else {
-      config[configName] = [];
-    }
-  }
-};
-
-const getUserConfigName = (config: d.Config, correctConfigName: string) => {
+/**
+ * Find any possibly mis-capitalized configuration names on the config, logging
+ * a little warning for the user to let them know. This lets us recover values
+ * set under (a subset of) improperly spelled configs and automatically hoist
+ * them into the config under the right key.
+ *
+ * @param config d.Config
+ * @param correctConfigName the configuration name that we're checking for right now
+ * @returns a string container a mis-capitalized config name found on the
+ * config object, if any.
+ */
+const getUserConfigName = (config: d.UnvalidatedConfig, correctConfigName: keyof d.Config): string => {
   const userConfigNames = Object.keys(config);
 
   for (const userConfigName of userConfigNames) {
     if (userConfigName.toLowerCase() === correctConfigName.toLowerCase()) {
       if (userConfigName !== correctConfigName) {
-        config.logger.warn(`config "${userConfigName}" should be "${correctConfigName}"`);
+        config.logger?.warn(`config "${userConfigName}" should be "${correctConfigName}"`);
         return userConfigName;
       }
       break;

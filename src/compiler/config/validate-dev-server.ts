@@ -3,21 +3,25 @@ import { buildError, isBoolean, isNumber, isString, normalizePath } from '@utils
 import { isAbsolute, join } from 'path';
 import { isOutputTargetWww } from '../output-targets/output-utils';
 
-export const validateDevServer = (config: d.Config, diagnostics: d.Diagnostic[]) => {
+export const validateDevServer = (
+  config: d.UnvalidatedConfig,
+  diagnostics: d.Diagnostic[]
+): d.DevServerConfig | undefined => {
   if ((config.devServer === null || (config.devServer as any)) === false) {
-    return null;
+    return undefined;
   }
 
   const flags = config.flags;
   const devServer = { ...config.devServer };
 
-  if (isString(flags.address)) {
+  if (flags && flags.address && isString(flags.address)) {
     devServer.address = flags.address;
   } else if (!isString(devServer.address)) {
     devServer.address = '0.0.0.0';
   }
 
-  let addressProtocol: 'http' | 'https';
+  // default to http for localdev
+  let addressProtocol: 'http' | 'https' = 'http';
   if (devServer.address.toLowerCase().startsWith('http://')) {
     devServer.address = devServer.address.substring(7);
     addressProtocol = 'http';
@@ -28,24 +32,23 @@ export const validateDevServer = (config: d.Config, diagnostics: d.Diagnostic[])
 
   devServer.address = devServer.address.split('/')[0];
 
-  let addressPort: number;
   const addressSplit = devServer.address.split(':');
   if (addressSplit.length > 1) {
     if (!isNaN(addressSplit[1] as any)) {
       devServer.address = addressSplit[0];
-      addressPort = parseInt(addressSplit[1], 10);
+      devServer.port = parseInt(addressSplit[1], 10);
     }
   }
 
-  if (isNumber(flags.port)) {
-    devServer.port = flags.port;
-  } else if (devServer.port !== null && !isNumber(devServer.port)) {
-    if (isNumber(addressPort)) {
-      devServer.port = addressPort;
-    } else if (devServer.address === 'localhost' || !isNaN(devServer.address.split('.')[0] as any)) {
+  if (isNumber(flags?.port)) {
+    devServer.port = flags?.port;
+  }
+
+  if (devServer.port !== null && !isNumber(devServer.port)) {
+    if (devServer.address === 'localhost' || !isNaN(devServer.address.split('.')[0] as any)) {
       devServer.port = 3333;
     } else {
-      devServer.port = null;
+      devServer.port = undefined;
     }
   }
 
@@ -79,7 +82,7 @@ export const validateDevServer = (config: d.Config, diagnostics: d.Diagnostic[])
   }
 
   if (devServer.ssr) {
-    const wwwOutput = config.outputTargets.find(isOutputTargetWww);
+    const wwwOutput = (config.outputTargets ?? []).find(isOutputTargetWww);
     devServer.prerenderConfig = wwwOutput?.prerenderConfig;
   }
 
@@ -103,22 +106,23 @@ export const validateDevServer = (config: d.Config, diagnostics: d.Diagnostic[])
     }
   }
 
-  if (flags.open === false) {
+  if (flags?.open === false) {
     devServer.openBrowser = false;
-  } else if (flags.prerender && !config.watch) {
+  } else if (flags?.prerender && !config.watch) {
     devServer.openBrowser = false;
   }
 
-  let serveDir: string = null;
-  let basePath: string = null;
-  const wwwOutputTarget = config.outputTargets.find(isOutputTargetWww);
+  let serveDir: string;
+  let basePath: string;
+  const wwwOutputTarget = (config.outputTargets ?? []).find(isOutputTargetWww);
 
   if (wwwOutputTarget) {
-    const baseUrl = new URL(wwwOutputTarget.baseUrl, 'http://config.stenciljs.com');
+    const baseUrl = new URL(wwwOutputTarget.baseUrl ?? '', 'http://config.stenciljs.com');
     basePath = baseUrl.pathname;
-    serveDir = wwwOutputTarget.appDir;
+    serveDir = wwwOutputTarget.appDir ?? '';
   } else {
-    serveDir = config.rootDir;
+    basePath = '';
+    serveDir = config.rootDir ?? '';
   }
 
   if (!isString(basePath) || basePath.trim() === '') {
@@ -153,7 +157,7 @@ export const validateDevServer = (config: d.Config, diagnostics: d.Diagnostic[])
   }
 
   if (!isAbsolute(devServer.root)) {
-    devServer.root = join(config.rootDir, devServer.root);
+    devServer.root = join(config.rootDir as string, devServer.root);
   }
   devServer.root = normalizePath(devServer.root);
 

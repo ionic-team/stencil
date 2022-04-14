@@ -13,7 +13,7 @@ import { validateStats } from './validate-stats';
 import { validateWww } from './validate-www';
 import { validateCustomElementBundle } from './validate-custom-element-bundle';
 
-export const validateOutputTargets = (config: d.Config, diagnostics: d.Diagnostic[]) => {
+export const validateOutputTargets = (config: d.UnvalidatedConfig, diagnostics: d.Diagnostic[]) => {
   const userOutputs = (config.outputTargets || []).slice();
 
   userOutputs.forEach((outputTarget) => {

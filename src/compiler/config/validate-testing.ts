@@ -4,20 +4,20 @@ import { isAbsolute, join, basename, dirname } from 'path';
 import { isLocalModule } from '../sys/resolve/resolve-utils';
 import { isOutputTargetDist, isOutputTargetWww } from '../output-targets/output-utils';
 
-export const validateTesting = (config: d.Config, diagnostics: d.Diagnostic[]) => {
+export const validateTesting = (config: d.UnvalidatedConfig, diagnostics: d.Diagnostic[]) => {
   const testing = (config.testing = Object.assign({}, config.testing || {}));
 
   if (!config.flags || (!config.flags.e2e && !config.flags.spec)) {
     return;
   }
 
-  let configPathDir = config.configPath;
+  let configPathDir = config.configPath!;
   if (isString(configPathDir)) {
     if (basename(configPathDir).includes('.')) {
       configPathDir = dirname(configPathDir);
     }
   } else {
-    configPathDir = config.rootDir;
+    configPathDir = config.rootDir!;
   }
 
   if (typeof config.flags.headless === 'boolean') {
@@ -43,7 +43,7 @@ export const validateTesting = (config: d.Config, diagnostics: d.Diagnostic[]) =
 
   if (typeof testing.rootDir === 'string') {
     if (!isAbsolute(testing.rootDir)) {
-      testing.rootDir = join(config.rootDir, testing.rootDir);
+      testing.rootDir = join(config.rootDir!, testing.rootDir);
     }
   } else {
     testing.rootDir = config.rootDir;
@@ -55,11 +55,11 @@ export const validateTesting = (config: d.Config, diagnostics: d.Diagnostic[]) =
 
   if (typeof testing.screenshotConnector === 'string') {
     if (!isAbsolute(testing.screenshotConnector)) {
-      testing.screenshotConnector = join(config.rootDir, testing.screenshotConnector);
+      testing.screenshotConnector = join(config.rootDir!, testing.screenshotConnector);
     }
   } else {
     testing.screenshotConnector = join(
-      config.sys.getCompilerExecutingPath(),
+      config.sys!.getCompilerExecutingPath(),
       '..',
       '..',
       'screenshot',
@@ -69,18 +69,18 @@ export const validateTesting = (config: d.Config, diagnostics: d.Diagnostic[]) =
 
   if (!Array.isArray(testing.testPathIgnorePatterns)) {
     testing.testPathIgnorePatterns = DEFAULT_IGNORE_PATTERNS.map((ignorePattern) => {
-      return join(testing.rootDir, ignorePattern);
+      return join(testing.rootDir!, ignorePattern);
     });
 
-    config.outputTargets
+    (config.outputTargets ?? [])
       .filter((o) => (isOutputTargetDist(o) || isOutputTargetWww(o)) && o.dir)
       .forEach((outputTarget: d.OutputTargetWww) => {
-        testing.testPathIgnorePatterns.push(outputTarget.dir);
+        testing.testPathIgnorePatterns?.push(outputTarget.dir!);
       });
   }
 
   if (typeof testing.preset !== 'string') {
-    testing.preset = join(config.sys.getCompilerExecutingPath(), '..', '..', 'testing');
+    testing.preset = join(config.sys!.getCompilerExecutingPath(), '..', '..', 'testing');
   } else if (!isAbsolute(testing.preset)) {
     testing.preset = join(configPathDir, testing.preset);
   }
@@ -90,7 +90,7 @@ export const validateTesting = (config: d.Config, diagnostics: d.Diagnostic[]) =
   }
 
   testing.setupFilesAfterEnv.unshift(
-    join(config.sys.getCompilerExecutingPath(), '..', '..', 'testing', 'jest-setuptestframework.js')
+    join(config.sys!.getCompilerExecutingPath(), '..', '..', 'testing', 'jest-setuptestframework.js')
   );
 
   if (isString(testing.testEnvironment)) {
@@ -146,7 +146,7 @@ export const validateTesting = (config: d.Config, diagnostics: d.Diagnostic[]) =
   }
 
   if (typeof testing.runner !== 'string') {
-    testing.runner = join(config.sys.getCompilerExecutingPath(), '..', '..', 'testing', 'jest-runner.js');
+    testing.runner = join(config.sys!.getCompilerExecutingPath(), '..', '..', 'testing', 'jest-runner.js');
   }
 
   if (typeof testing.waitBeforeScreenshot === 'number') {
