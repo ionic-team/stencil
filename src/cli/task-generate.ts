@@ -216,7 +216,7 @@ describe('${name}', () => {
  * Convert a dash case string to pascal case.
  */
 const toPascalCase = (str: string) =>
-  str.split('-').reduce((res, part) => res + part[0].toUpperCase() + part.substr(1), '');
+  str.split('-').reduce((res, part) => res + part[0].toUpperCase() + part.slice(1), '');
 
 /**
  * Extensions available to generate.

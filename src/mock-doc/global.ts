@@ -16,6 +16,7 @@ import {
 import { MockCustomEvent, MockEvent, MockKeyboardEvent, MockMouseEvent } from './event';
 import { MockHeaders } from './headers';
 import { MockRequest, MockResponse } from './request-response';
+import { MockDOMParser } from './parser';
 import { MockWindow } from './window';
 
 export function setupGlobal(gbl: any) {
@@ -159,6 +160,7 @@ const GLOBAL_CONSTRUCTORS: [string, any][] = [
   ['MouseEvent', MockMouseEvent],
   ['Request', MockRequest],
   ['Response', MockResponse],
+  ['DOMParser', MockDOMParser],
 
   ['HTMLAnchorElement', MockAnchorElement],
   ['HTMLBaseElement', MockBaseElement],
