@@ -13,7 +13,7 @@ export const createJsVarName = (fileName: string) => {
     fileName = dashToPascalCase(fileName);
 
     if (fileName.length > 1) {
-      fileName = fileName[0].toLowerCase() + fileName.substr(1);
+      fileName = fileName[0].toLowerCase() + fileName.slice(1);
     } else {
       fileName = fileName.toLowerCase();
     }

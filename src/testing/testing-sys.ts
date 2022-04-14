@@ -23,7 +23,7 @@ export const createTestingSystem = (): TestingSystem => {
     let hash = createHash('sha1').update(content).digest('hex').toLowerCase();
 
     if (typeof length === 'number') {
-      hash = hash.substr(0, length);
+      hash = hash.slice(0, length);
     }
     return Promise.resolve(hash);
   };

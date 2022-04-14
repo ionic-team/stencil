@@ -16,8 +16,8 @@ export const generateComponentTypes = (cmp: d.ComponentCompilerMeta, areTypesInt
   const htmlElementName = `HTML${tagNameAsPascal}Element`;
 
   const propAttributes = generatePropTypes(cmp);
-  const methodAttributes = generateMethodTypes(cmp.methods);
-  const eventAttributes = generateEventTypes(cmp.events);
+  const methodAttributes = generateMethodTypes(cmp);
+  const eventAttributes = generateEventTypes(cmp);
 
   const componentAttributes = attributesToMultiLineString(
     [...propAttributes, ...methodAttributes],
