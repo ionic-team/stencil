@@ -1817,7 +1817,6 @@ export interface OutputTargetDistCollection extends OutputTargetBase {
 
 export interface OutputTargetDistTypes extends OutputTargetBase {
   type: 'dist-types';
-  empty: boolean;
   dir: string;
   typesDir: string;
 }

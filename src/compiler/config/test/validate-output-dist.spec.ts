@@ -55,7 +55,6 @@ describe('validateDistOutputTarget', () => {
       },
       {
         dir: path.join(rootDir, 'my-dist'),
-        empty: false,
         type: 'dist-types',
         typesDir: path.join(rootDir, 'my-dist', 'types'),
       },

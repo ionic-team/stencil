@@ -11,7 +11,7 @@ import {
   isOutputTargetDist,
 } from '../../output-targets/output-utils';
 import { isAbsolute, join, resolve } from 'path';
-import { isBoolean } from '@utils';
+import { isBoolean, isString } from '@utils';
 import { validateCopy } from '../validate-copy';
 
 /**
@@ -58,7 +58,6 @@ export const validateDist = (config: d.Config, userOutputs: d.OutputTarget[]): d
       type: DIST_TYPES,
       dir: distOutputTarget.dir,
       typesDir: distOutputTarget.typesDir,
-      empty: distOutputTarget.empty,
     });
 
     if (config.buildDist) {
@@ -128,8 +127,8 @@ const validateOutputTargetDist = (config: d.Config, o: d.OutputTargetDist): Requ
   const outputTarget = {
     ...o,
     dir: getAbsolutePath(config, o.dir || DEFAULT_DIR),
-    buildDir: o.buildDir || DEFAULT_BUILD_DIR,
-    collectionDir: o.collectionDir || DEFAULT_COLLECTION_DIR,
+    buildDir: isString(o.buildDir) ? o.buildDir : DEFAULT_BUILD_DIR,
+    collectionDir: isString(o.collectionDir) ? o.collectionDir : DEFAULT_COLLECTION_DIR,
     typesDir: o.typesDir || DEFAULT_TYPES_DIR,
     esmLoaderPath: o.esmLoaderPath || DEFAULT_ESM_LOADER_DIR,
     copy: validateCopy(o.copy ?? [], []),
@@ -149,7 +148,7 @@ const validateOutputTargetDist = (config: d.Config, o: d.OutputTargetDist): Requ
     outputTarget.esmLoaderPath = resolve(outputTarget.dir, outputTarget.esmLoaderPath);
   }
 
-  if (!isAbsolute(outputTarget.typesDir) && outputTarget.dir !== undefined) {
+  if (!isAbsolute(outputTarget.typesDir)) {
     outputTarget.typesDir = join(outputTarget.dir, outputTarget.typesDir);
   }
 
