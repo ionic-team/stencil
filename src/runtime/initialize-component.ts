@@ -21,7 +21,7 @@ export const initializeComponent = async (
     (BUILD.lazyLoad || BUILD.hydrateServerSide || BUILD.style) &&
     (hostRef.$flags$ & HOST_FLAGS.hasInitializedComponent) === 0
   ) {
-    if (BUILD.lazyLoad || BUILD.hydrateClientSide) {
+    if ((BUILD.lazyLoad || BUILD.hydrateClientSide) && !cmpMeta.$customElement$) {
       // we haven't initialized this element yet
       hostRef.$flags$ |= HOST_FLAGS.hasInitializedComponent;
 

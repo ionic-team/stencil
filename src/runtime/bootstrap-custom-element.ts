@@ -17,6 +17,7 @@ export const proxyCustomElement = (Cstr: any, compactMeta: d.ComponentRuntimeMet
   const cmpMeta: d.ComponentRuntimeMeta = {
     $flags$: compactMeta[0],
     $tagName$: compactMeta[1],
+    $customElement$: true,
   };
   if (BUILD.member) {
     cmpMeta.$members$ = compactMeta[2];

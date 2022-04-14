@@ -14,6 +14,7 @@ export const registerHost = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta
     $flags$: 0,
     $hostElement$: elm,
     $cmpMeta$: cmpMeta,
+    $lazyInstance$: cmpMeta.$customElement$ ? elm : undefined,
     $instanceValues$: new Map(),
   };
   if (BUILD.isDev) {

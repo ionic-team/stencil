@@ -1660,6 +1660,7 @@ export interface ComponentRuntimeMeta {
   $attrsToReflect$?: [string, string][];
   $watchers$?: ComponentConstructorWatchers;
   $lazyBundleId$?: string;
+  $customElement$?: boolean;
 }
 
 export interface ComponentRuntimeMembers {
