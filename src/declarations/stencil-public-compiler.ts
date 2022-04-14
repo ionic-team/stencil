@@ -1810,14 +1810,14 @@ export interface OutputTargetDist extends OutputTargetBase {
 
 export interface OutputTargetDistCollection extends OutputTargetBase {
   type: 'dist-collection';
-
+  empty: boolean;
   dir: string;
   collectionDir: string;
 }
 
 export interface OutputTargetDistTypes extends OutputTargetBase {
   type: 'dist-types';
-
+  empty: boolean;
   dir: string;
   typesDir: string;
 }
@@ -1836,6 +1836,7 @@ export interface OutputTargetDistLazy extends OutputTargetBase {
   esmIndexFile?: string;
   cjsIndexFile?: string;
   systemLoaderFile?: string;
+  legacyLoaderFile?: string;
   empty?: boolean;
 }
 
@@ -1849,7 +1850,7 @@ export interface OutputTargetDistLazyLoader extends OutputTargetBase {
   dir: string;
 
   esmDir: string;
-  esmEs5Dir: string;
+  esmEs5Dir?: string;
   cjsDir: string;
   componentDts: string;
 
