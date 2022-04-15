@@ -1,0 +1,24 @@
+name: 'Get Core Dependencies'
+description: 'initializes core dependencies after repo has been pulled'
+runs:
+  using: composite
+  steps:
+    - name: Use Node 16
+      uses: actions/setup-node@56337c425554a6be30cdef71bf441f15be286854 # v3.1.1
+      with:
+        node-version: 16
+        cache: 'npm'
+
+    - name: Cache Root Node Modules
+      id: get-stencil-root-node-modules-cache
+      uses: actions/cache@48af2dc4a9e8278b89d7fa154b955c30c6aaab09 # v3.0.2
+      env:
+        cache-name: stencil-root-node-modules
+      with:
+        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('./package-lock.json') }}
+        path: ./node_modules
+
+    - name: Install Dependencies
+      if: ${{ !steps.get-stencil-root-node-modules-cache.outputs.cache-hit }}
+      run: npm ci
+      shell: bash

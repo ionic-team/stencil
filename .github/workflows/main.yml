@@ -1,4 +1,4 @@
-name: Build & Test
+name: CI
 
 on:
   push:
@@ -9,75 +9,63 @@ on:
     branches:
       - '**'
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  build_and_test:
-    strategy:
-      matrix:
-        node: ['12', '14', '16']
-        os: ['ubuntu-latest', 'windows-latest']
-
-    name: Node ${{ matrix.node }} on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-
+  build_core:
+    name: Build Stencil
+    runs-on: 'ubuntu-latest'
     steps:
       - uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # v2.4.0
+      - uses: ./.github/workflows/actions/build-core
 
-      - name: Use Node.js ${{ matrix.node }}
-        uses: actions/setup-node@56337c425554a6be30cdef71bf441f15be286854 # v3.1.1
-        with:
-          node-version: ${{ matrix.node }}
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build
-        run: npm run build -- --ci
-
-      - name: Test dist
-        run: npm run test.dist
-
-      - name: Test testing suite
-        run: npm run test.testing
-
-      - name: Test jest
-        run: npm run test.jest
-
-      - name: Test end-to-end
-        run: npm run test.end-to-end -- --ci
-
-      - name: Test sys-node
-        if: matrix.os != 'windows-latest'
-        run: npm run test.sys.node
-
-      - name: Test analysis
-        run: npm run test.analysis
-
-      - name: Pack build artifacts
-        if: matrix.os != 'windows-latest'
-        run: mv `npm pack` stencil-build.tgz
-
-      - name: Unload build artifacts
-        uses: actions/upload-artifact@v2
-        if: matrix.os == 'ubuntu-latest' && matrix.node == '12'
-        with:
-          name: stencil-build
-          path: stencil-build.tgz
-
-  prettier:
-    name: Prettier
-    runs-on: ubuntu-latest
-
+  format:
+    name: Format Check
+    runs-on: 'ubuntu-latest'
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # v2.4.0
+      - uses: ./.github/workflows/actions/format
 
-      - uses: actions/setup-node@v2
-        with:
-          node-version: '16'
-          cache: 'npm'
+  unit_test:
+    needs: [build_core]
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [ '12', '14', '16' ]
+        os: [ 'ubuntu-latest', 'windows-latest' ]
 
-      - name: Install dependencies
-        run: npm ci
+    name: Unit Tests (${{ matrix.os }}.${{ matrix.node }})
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # v2.4.0
+      - uses: ./.github/workflows/actions/test-jest
 
-      - name: Prettier dry-run
-        run: npm run prettier.dry-run
+  end_to_end_test:
+    needs: [ build_core ]
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [ '12', '14', '16' ]
+        os: [ 'ubuntu-latest', 'windows-latest' ]
+
+    name: E2E Tests (${{ matrix.os }}.${{ matrix.node }})
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # v2.4.0
+      - uses: ./.github/workflows/actions/test-e2e
+
+  analyze_test:
+    needs: [ build_core ]
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [ '12', '14', '16' ]
+        os: [ 'ubuntu-latest', 'windows-latest' ]
+
+    name: Analysis Tests (${{ matrix.os }}.${{ matrix.node }})
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # v2.4.0
+      - uses: ./.github/workflows/actions/test-analysis
