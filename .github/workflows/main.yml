@@ -33,8 +33,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node: [ '12', '14', '16' ]
-        os: [ 'ubuntu-latest', 'windows-latest' ]
+        node: ['12', '14', '16']
+        os: ['ubuntu-latest', 'windows-latest']
 
     name: Unit Tests (${{ matrix.os }}.${{ matrix.node }})
     runs-on: ${{ matrix.os }}
