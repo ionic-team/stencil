@@ -41,9 +41,9 @@ const setup = async () => {
  */
 async function silentGenerate(coreCompiler: CoreCompiler, config: d.Config) {
   const tmp = console.log;
-  console.log = jest.fn()
+  console.log = jest.fn();
   await taskGenerate(coreCompiler, config);
-  console.log = tmp
+  console.log = tmp;
 }
 
 describe('generate task', () => {
@@ -113,10 +113,7 @@ describe('generate task', () => {
     ];
 
     userChoices.forEach((file) => {
-      expect(writeFileSpy).toBeCalledWith(
-        file.path,
-        getBoilerplateByExtension('my-component', file.extension, true)
-      );
+      expect(writeFileSpy).toBeCalledWith(file.path, getBoilerplateByExtension('my-component', file.extension, true));
     });
   });
 
