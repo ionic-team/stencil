@@ -180,6 +180,11 @@ const isTest = (extension: GenerableExtension): boolean => {
 
 /**
  * Get the boilerplate for a file by its extension.
+ *
+ * @param tagName the name of the component we're generating
+ * @param extension the file extension we want boilerplate for (.css, tsx, etc)
+ * @param withCss a boolean indicating whether we're generating a CSS file
+ * @returns a string container the file boilerplate for the supplied extension
  */
 export const getBoilerplateByExtension = (tagName: string, extension: GenerableExtension, withCss: boolean): string => {
   switch (extension) {
