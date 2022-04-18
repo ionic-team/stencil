@@ -1,8 +1,8 @@
 # Stencil Continuous Integration (CI)
 
 Continuous integration (CI) is an important aspect of any project, and is used to verify and validate the changes to the
-codebase work as intended, do not introduce regressions (bugs), and adhere to coding standards (e.g. formatting rules).
-It provides a consistent means of performing a series of checks over the entire codebase on behalf of the team.
+codebase work as intended, to avoid introducing regressions (bugs), and to adhere to coding standards (e.g. formatting
+rules). It provides a consistent means of performing a series of checks over the entire codebase on behalf of the team.
 
 This document explains Stencil's CI setup. 
 
