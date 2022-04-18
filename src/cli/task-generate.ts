@@ -181,7 +181,7 @@ const checkForOverwrite = async (files: readonly BoilerplateFile[], config: Conf
 /**
  * Check if an extension is for a test
  *
- * @param extension the extension!
+ * @param extension the extension we want to check
  * @returns a boolean indicating whether or not its a test
  */
 const isTest = (extension: GenerableExtension): boolean => {
