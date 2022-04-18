@@ -80,6 +80,9 @@ export const taskGenerate = async (coreCompiler: CoreCompiler, config: Config): 
 
 /**
  * Show a checkbox prompt to select the files to be generated.
+ *
+ * @returns a read-only array of `GenerableExtension`, the extensions that the user has decided
+ * to generate
  */
 const chooseFilesToGenerate = async (): Promise<ReadonlyArray<GenerableExtension>> => {
   const { prompt } = await import('prompts');
@@ -103,10 +106,12 @@ const chooseFilesToGenerate = async (): Promise<ReadonlyArray<GenerableExtension
  * The filepath for a given file depends on the path, the user-supplied
  * component name, the extension, and whether we're inside of a test directory.
  *
- * @param coreCompiler  the compiler!
+ * @param coreCompiler  the compiler we're using, here to acces the `.path` module
  * @param path          path to where we're going to generate the component
  * @param componentName the user-supplied name for the generated component
  * @param extension     the file extension
+ * @returns the full filepath to the component (with a possible `test` directory
+ * added)
  */
 const getFilepathForFile = (
   coreCompiler: CoreCompiler,
