@@ -54,7 +54,7 @@ export const taskGenerate = async (coreCompiler: CoreCompiler, config: Config): 
   const outDir = path.join(absoluteSrcDir, 'components', dir, componentName);
   await config.sys.createDir(path.join(outDir, testFolder), { recursive: true });
 
-  const filesToGenerate: BoilerplateFile[] = extensionsToGenerate.map((extension) => ({
+  const filesToGenerate: readonly BoilerplateFile[] = extensionsToGenerate.map((extension) => ({
     extension,
     path: getFilepathForFile(coreCompiler, outDir, componentName, extension),
   }));
@@ -158,7 +158,7 @@ const getBoilerplateAndWriteFile = async (
  * @param files  the files we want to check
  * @param config the Config object, used here to get access to `sys.readFile`
  */
-const checkForOverwrite = async (files: BoilerplateFile[], config: Config): Promise<void> => {
+const checkForOverwrite = async (files: readonly BoilerplateFile[], config: Config): Promise<void> => {
   const alreadyPresent: string[] = [];
 
   await Promise.all(
