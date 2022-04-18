@@ -150,7 +150,7 @@ const getBoilerplateAndWriteFile = async (
  * @param config the Config object, used here to get access to `sys.readFile`
  */
 const checkForOverwrite = async (files: BoilerplateFile[], config: Config): Promise<void> => {
-  let alreadyPresent: string[] = [];
+  const alreadyPresent: string[] = [];
 
   await Promise.all(
     files.map(async ({ path }) => {
@@ -299,7 +299,10 @@ export type GenerableExtension = 'tsx' | 'css' | 'spec.tsx' | 'e2e.ts';
  * A little interface to wrap up the info we need to pass around for generating
  * and writing boilerplate.
  */
-interface BoilerplateFile {
+export interface BoilerplateFile {
   extension: GenerableExtension;
+  /**
+   * The full path to the file we want to generate.
+   */
   path: string;
 }

@@ -1,5 +1,5 @@
 import type * as d from '../../declarations';
-import { taskGenerate, getBoilerplateByExtension, GenerableExtension } from '../task-generate';
+import { taskGenerate, getBoilerplateByExtension, GenerableExtension, BoilerplateFile } from '../task-generate';
 import { mockConfig, mockStencilSystem } from '@stencil/core/testing';
 import * as utils from '../../utils/validation';
 
@@ -105,15 +105,17 @@ describe('generate task', () => {
     const { config } = await setup();
     const writeFileSpy = jest.spyOn(config.sys, 'writeFile');
     await silentGenerate(coreCompiler, config);
-    [
+    const userChoices: ReadonlyArray<BoilerplateFile> = [
       { extension: 'tsx', path: '/src/components/my-component/my-component.tsx' },
       { extension: 'css', path: '/src/components/my-component/my-component.css' },
       { extension: 'spec.tsx', path: '/src/components/my-component/test/my-component.spec.tsx' },
       { extension: 'e2e.ts', path: '/src/components/my-component/test/my-component.e2e.ts' },
-    ].forEach((file) => {
+    ];
+
+    userChoices.forEach((file) => {
       expect(writeFileSpy).toBeCalledWith(
         file.path,
-        getBoilerplateByExtension('my-component', file.extension as GenerableExtension, true)
+        getBoilerplateByExtension('my-component', file.extension, true)
       );
     });
   });
