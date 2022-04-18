@@ -20,10 +20,10 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # v2.4.0
 
       - name: Use Node.js ${{ matrix.node }}
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@56337c425554a6be30cdef71bf441f15be286854 # v3.1.1
         with:
           node-version: ${{ matrix.node }}
           cache: 'npm'
