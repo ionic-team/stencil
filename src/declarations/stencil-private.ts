@@ -858,9 +858,7 @@ export interface ComponentCompilerPropertyComplexType {
  *
  * Note any key can be a user defined type or a TypeScript standard type.
  */
-export interface ComponentCompilerTypeReferences {
-  [typeName: string]: ComponentCompilerTypeReference;
-}
+export type ComponentCompilerTypeReferences = Record<string, ComponentCompilerTypeReference>;
 
 /**
  * Describes a reference to a type used by a component.
