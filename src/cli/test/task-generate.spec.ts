@@ -41,11 +41,9 @@ const setup = async () => {
  */
 async function silentGenerate(coreCompiler: CoreCompiler, config: d.Config) {
   const tmp = console.log;
-  const log = jest.fn();
-  console.log = log;
+  console.log = jest.fn()
   await taskGenerate(coreCompiler, config);
-  console.log = tmp;
-  return log;
+  console.log = tmp
 }
 
 describe('generate task', () => {
