@@ -5,7 +5,6 @@ import * as utils from '../../utils/validation';
 
 import * as coreCompiler from '@stencil/core/compiler';
 import { CoreCompiler } from '../load-compiler';
-import { Config } from 'prettier';
 
 const promptMock = jest.fn().mockResolvedValue('my-component');
 
@@ -40,7 +39,7 @@ const setup = async () => {
  * Little test helper function which just temporarily silences
  * console.log calls so we can avoid spewing a bunch of stuff.
  */
-async function silentGenerate(coreCompiler: CoreCompiler, config: Config) {
+async function silentGenerate(coreCompiler: CoreCompiler, config: d.Config) {
   const tmp = console.log;
   const log = jest.fn();
   console.log = log;
