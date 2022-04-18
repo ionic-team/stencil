@@ -9,8 +9,9 @@ import { validateComponentTag } from '@utils';
  * being called in an inappropriate place, being asked to overwrite files that
  * already exist, etc.
  *
- * @param coreCompiler the CoreCompiler
- * @param config       the config!
+ * @param coreCompiler the CoreCompiler we're using currently, here we're
+ * mainly accessing the `path` module
+ * @param config the user-supplied config, which we need here to access `.sys`.
  */
 export const taskGenerate = async (coreCompiler: CoreCompiler, config: Config): Promise<void> => {
   if (!IS_NODE_ENV) {
@@ -130,6 +131,8 @@ const getFilepathForFile = (
  * @param componentName the component name (user-supplied)
  * @param withCss       are we generating CSS?
  * @param file          the file we want to write
+ * @returns a `Promise<string>` which holds the full filepath we've written to,
+ * used to print out a little summary of our activity to the user.
  */
 const getBoilerplateAndWriteFile = async (
   config: Config,
@@ -170,7 +173,7 @@ const checkForOverwrite = async (files: BoilerplateFile[], config: Config): Prom
       'Generating code would overwrite the following files:',
       ...alreadyPresent.map((path) => '\t' + path)
     );
-    config.sys.exit(1);
+    await config.sys.exit(1);
   }
 };
 
@@ -178,6 +181,7 @@ const checkForOverwrite = async (files: BoilerplateFile[], config: Config): Prom
  * Check if an extension is for a test
  *
  * @param extension the extension!
+ * @returns a boolean indicating whether or not its a test
  */
 const isTest = (extension: GenerableExtension): boolean => {
   return extension === 'e2e.ts' || extension === 'spec.tsx';
