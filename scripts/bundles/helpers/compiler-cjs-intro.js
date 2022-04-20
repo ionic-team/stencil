@@ -31,6 +31,6 @@ if (!process.platform) {
   process.platform = 'stencil';
 }
 if (!process.version) {
-  process.version = 'v12.0.0';
+  process.version = 'v14.0.0';
 }
 process.browser = !!globalThis.location;
