@@ -1,5 +1,5 @@
 import type * as d from '../../../declarations';
-import { augmentDiagnosticWithNode, buildError, validateComponentTag, isString, buildWarn } from '@utils';
+import { augmentDiagnosticWithNode, buildError, validateComponentTag, isString } from '@utils';
 import { getDeclarationParameters } from './decorator-utils';
 import { convertValueToLiteral, createStaticGetter } from '../transform-utils';
 import { styleToStatic } from './style-to-static';
