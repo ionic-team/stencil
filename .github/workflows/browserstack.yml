@@ -28,7 +28,7 @@ jobs:
 
       - uses: actions/setup-node@56337c425554a6be30cdef71bf441f15be286854 # v3.1.1
         with:
-          node-version: '14'
+          node-version: '12'
 
       - name: Install dependencies
         run: npm ci
