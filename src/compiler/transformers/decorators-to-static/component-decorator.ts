@@ -40,13 +40,6 @@ export const componentDecoratorToStatic = (
 
   const assetsDirs = componentOptions.assetsDirs || [];
 
-  if (isString((componentOptions as any).assetsDir)) {
-    assetsDirs.push((componentOptions as any).assetsDir);
-    const warn = buildWarn(diagnostics);
-    warn.messageText = `@Component option "assetsDir" should be renamed to "assetsDirs" and the value should be an array of strings.`;
-    augmentDiagnosticWithNode(warn, componentDecorator);
-  }
-
   if (assetsDirs.length > 0) {
     newMembers.push(createStaticGetter('assetsDirs', convertValueToLiteral(assetsDirs)));
   }
