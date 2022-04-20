@@ -40,6 +40,12 @@ export const componentDecoratorToStatic = (
 
   const assetsDirs = componentOptions.assetsDirs || [];
 
+  if (isString((componentOptions as any).assetsDirs)) {
+    const error = buildError(diagnostics);
+    error.messageText = `@Component option "assetsDir" is no longer supported. "assetsDirs" should be used instead.`
+    augmentDiagnosticWithNode(error, componentDecorator)
+  }
+
   if (assetsDirs.length > 0) {
     newMembers.push(createStaticGetter('assetsDirs', convertValueToLiteral(assetsDirs)));
   }
