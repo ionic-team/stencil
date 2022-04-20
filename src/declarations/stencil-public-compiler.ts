@@ -1810,7 +1810,7 @@ export interface OutputTargetDist extends OutputTargetBase {
 
 export interface OutputTargetDistCollection extends OutputTargetBase {
   type: 'dist-collection';
-  empty: boolean;
+  empty?: boolean;
   dir: string;
   collectionDir: string;
 }

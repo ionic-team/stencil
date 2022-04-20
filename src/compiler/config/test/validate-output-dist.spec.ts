@@ -30,7 +30,7 @@ describe('validateDistOutputTarget', () => {
         empty: false,
         esmLoaderPath: path.join(rootDir, 'my-dist', 'loader'),
         type: 'dist',
-        polyfills: false,
+        polyfills: undefined,
         typesDir: path.join(rootDir, 'my-dist', 'types'),
       },
       {
@@ -38,7 +38,7 @@ describe('validateDistOutputTarget', () => {
         empty: false,
         isBrowserBuild: true,
         legacyLoaderFile: path.join(rootDir, 'my-dist', 'my-build', 'testing.js'),
-        polyfills: false,
+        polyfills: true,
         systemDir: undefined,
         systemLoaderFile: undefined,
         type: 'dist-lazy',

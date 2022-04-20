@@ -132,7 +132,7 @@ const validateOutputTargetDist = (config: d.Config, o: d.OutputTargetDist): Requ
     typesDir: o.typesDir || DEFAULT_TYPES_DIR,
     esmLoaderPath: o.esmLoaderPath || DEFAULT_ESM_LOADER_DIR,
     copy: validateCopy(o.copy ?? [], []),
-    polyfills: isBoolean(o.polyfills) ? o.polyfills : false,
+    polyfills: isBoolean(o.polyfills) ? o.polyfills : undefined,
     empty: isBoolean(o.empty) ? o.empty : true,
   };
 
