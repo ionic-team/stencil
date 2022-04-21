@@ -128,7 +128,7 @@ const validateOutputTargetDist = (config: d.Config, o: d.OutputTargetDist): Requ
     ...o,
     dir: getAbsolutePath(config, o.dir || DEFAULT_DIR),
     buildDir: isString(o.buildDir) ? o.buildDir : DEFAULT_BUILD_DIR,
-    collectionDir: isString(o.collectionDir) ? o.collectionDir : DEFAULT_COLLECTION_DIR,
+    collectionDir: o.collectionDir !== undefined ? o.collectionDir : DEFAULT_COLLECTION_DIR,
     typesDir: o.typesDir || DEFAULT_TYPES_DIR,
     esmLoaderPath: o.esmLoaderPath || DEFAULT_ESM_LOADER_DIR,
     copy: validateCopy(o.copy ?? [], []),
