@@ -4,9 +4,16 @@ import { IS_NODE_ENV } from '../compiler/sys/environment';
 import { validateComponentTag } from '@utils';
 
 /**
- * Task to generate component boilerplate.
+ * Task to generate component boilerplate and write it to disk. This task can
+ * cause the program to exit with an error under various circumstances, such as
+ * being called in an inappropriate place, being asked to overwrite files that
+ * already exist, etc.
+ *
+ * @param coreCompiler the CoreCompiler we're using currently, here we're
+ * mainly accessing the `path` module
+ * @param config the user-supplied config, which we need here to access `.sys`.
  */
-export const taskGenerate = async (coreCompiler: CoreCompiler, config: Config) => {
+export const taskGenerate = async (coreCompiler: CoreCompiler, config: Config): Promise<void> => {
   if (!IS_NODE_ENV) {
     config.logger.error(`"generate" command is currently only implemented for a NodeJS environment`);
     return config.sys.exit(1);
@@ -40,16 +47,22 @@ export const taskGenerate = async (coreCompiler: CoreCompiler, config: Config) =
     return config.sys.exit(1);
   }
 
-  const extensionsToGenerate: GeneratableExtension[] = ['tsx', ...(await chooseFilesToGenerate())];
+  const extensionsToGenerate: GenerableExtension[] = ['tsx', ...(await chooseFilesToGenerate())];
 
   const testFolder = extensionsToGenerate.some(isTest) ? 'test' : '';
 
   const outDir = path.join(absoluteSrcDir, 'components', dir, componentName);
   await config.sys.createDir(path.join(outDir, testFolder), { recursive: true });
 
+  const filesToGenerate: readonly BoilerplateFile[] = extensionsToGenerate.map((extension) => ({
+    extension,
+    path: getFilepathForFile(coreCompiler, outDir, componentName, extension),
+  }));
+  await checkForOverwrite(filesToGenerate, config);
+
   const writtenFiles = await Promise.all(
-    extensionsToGenerate.map((extension) =>
-      writeFileByExtension(coreCompiler, config, outDir, componentName, extension, extensionsToGenerate.includes('css'))
+    filesToGenerate.map((file) =>
+      getBoilerplateAndWriteFile(config, componentName, extensionsToGenerate.includes('css'), file)
     )
   ).catch((error) => config.logger.error(error));
 
@@ -57,6 +70,7 @@ export const taskGenerate = async (coreCompiler: CoreCompiler, config: Config) =
     return config.sys.exit(1);
   }
 
+  // TODO(STENCIL-424): Investigate moving these console.log calls to config.logger.info
   console.log();
   console.log(`${config.logger.gray('$')} stencil generate ${input}`);
   console.log();
@@ -68,8 +82,11 @@ export const taskGenerate = async (coreCompiler: CoreCompiler, config: Config) =
 
 /**
  * Show a checkbox prompt to select the files to be generated.
+ *
+ * @returns a read-only array of `GenerableExtension`, the extensions that the user has decided
+ * to generate
  */
-const chooseFilesToGenerate = async () => {
+const chooseFilesToGenerate = async (): Promise<ReadonlyArray<GenerableExtension>> => {
   const { prompt } = await import('prompts');
   return (
     await prompt({
@@ -80,41 +97,106 @@ const chooseFilesToGenerate = async () => {
         { value: 'css', title: 'Stylesheet (.css)', selected: true },
         { value: 'spec.tsx', title: 'Spec Test  (.spec.tsx)', selected: true },
         { value: 'e2e.ts', title: 'E2E Test (.e2e.ts)', selected: true },
-      ] as any[],
+      ],
     })
-  ).filesToGenerate as GeneratableExtension[];
+  ).filesToGenerate;
 };
 
 /**
- * Get a file's boilerplate by its extension and write it to disk.
+ * Get a filepath for a file we want to generate!
+ *
+ * The filepath for a given file depends on the path, the user-supplied
+ * component name, the extension, and whether we're inside of a test directory.
+ *
+ * @param coreCompiler  the compiler we're using, here to acces the `.path` module
+ * @param path          path to where we're going to generate the component
+ * @param componentName the user-supplied name for the generated component
+ * @param extension     the file extension
+ * @returns the full filepath to the component (with a possible `test` directory
+ * added)
  */
-const writeFileByExtension = async (
+const getFilepathForFile = (
   coreCompiler: CoreCompiler,
-  config: Config,
   path: string,
-  name: string,
-  extension: GeneratableExtension,
-  withCss: boolean
-) => {
-  if (isTest(extension)) {
-    path = coreCompiler.path.join(path, 'test');
-  }
-  const outFile = coreCompiler.path.join(path, `${name}.${extension}`);
-  const boilerplate = getBoilerplateByExtension(name, extension, withCss);
+  componentName: string,
+  extension: GenerableExtension
+): string =>
+  isTest(extension)
+    ? coreCompiler.path.join(path, 'test', `${componentName}.${extension}`)
+    : coreCompiler.path.join(path, `${componentName}.${extension}`);
 
-  await config.sys.writeFile(outFile, boilerplate);
-
-  return outFile;
+/**
+ * Get the boilerplate for a file and write it to disk
+ *
+ * @param config        the current config, needed for file operations
+ * @param componentName the component name (user-supplied)
+ * @param withCss       are we generating CSS?
+ * @param file          the file we want to write
+ * @returns a `Promise<string>` which holds the full filepath we've written to,
+ * used to print out a little summary of our activity to the user.
+ */
+const getBoilerplateAndWriteFile = async (
+  config: Config,
+  componentName: string,
+  withCss: boolean,
+  file: BoilerplateFile
+): Promise<string> => {
+  const boilerplate = getBoilerplateByExtension(componentName, file.extension, withCss);
+  await config.sys.writeFile(file.path, boilerplate);
+  return file.path;
 };
 
-const isTest = (extension: string) => {
+/**
+ * Check to see if any of the files we plan to write already exist and would
+ * therefore be overwritten if we proceed, because we'd like to not overwrite
+ * people's code!
+ *
+ * This function will check all the filepaths and if it finds any files log an
+ * error and exit with an error code. If it doesn't find anything it will just
+ * peacefully return `Promise<void>`.
+ *
+ * @param files  the files we want to check
+ * @param config the Config object, used here to get access to `sys.readFile`
+ */
+const checkForOverwrite = async (files: readonly BoilerplateFile[], config: Config): Promise<void> => {
+  const alreadyPresent: string[] = [];
+
+  await Promise.all(
+    files.map(async ({ path }) => {
+      if ((await config.sys.readFile(path)) !== undefined) {
+        alreadyPresent.push(path);
+      }
+    })
+  );
+
+  if (alreadyPresent.length > 0) {
+    config.logger.error(
+      'Generating code would overwrite the following files:',
+      ...alreadyPresent.map((path) => '\t' + path)
+    );
+    await config.sys.exit(1);
+  }
+};
+
+/**
+ * Check if an extension is for a test
+ *
+ * @param extension the extension we want to check
+ * @returns a boolean indicating whether or not its a test
+ */
+const isTest = (extension: GenerableExtension): boolean => {
   return extension === 'e2e.ts' || extension === 'spec.tsx';
 };
 
 /**
  * Get the boilerplate for a file by its extension.
+ *
+ * @param tagName the name of the component we're generating
+ * @param extension the file extension we want boilerplate for (.css, tsx, etc)
+ * @param withCss a boolean indicating whether we're generating a CSS file
+ * @returns a string container the file boilerplate for the supplied extension
  */
-const getBoilerplateByExtension = (tagName: string, extension: GeneratableExtension, withCss: boolean) => {
+export const getBoilerplateByExtension = (tagName: string, extension: GenerableExtension, withCss: boolean): string => {
   switch (extension) {
     case 'tsx':
       return getComponentBoilerplate(tagName, withCss);
@@ -136,7 +218,7 @@ const getBoilerplateByExtension = (tagName: string, extension: GeneratableExtens
 /**
  * Get the boilerplate for a component.
  */
-const getComponentBoilerplate = (tagName: string, hasStyle: boolean) => {
+const getComponentBoilerplate = (tagName: string, hasStyle: boolean): string => {
   const decorator = [`{`];
   decorator.push(`  tag: '${tagName}',`);
   if (hasStyle) {
@@ -165,7 +247,7 @@ export class ${toPascalCase(tagName)} {
 /**
  * Get the boilerplate for style.
  */
-const getStyleUrlBoilerplate = () =>
+const getStyleUrlBoilerplate = (): string =>
   `:host {
   display: block;
 }
@@ -174,7 +256,7 @@ const getStyleUrlBoilerplate = () =>
 /**
  * Get the boilerplate for a spec test.
  */
-const getSpecTestBoilerplate = (tagName: string) =>
+const getSpecTestBoilerplate = (tagName: string): string =>
   `import { newSpecPage } from '@stencil/core/testing';
 import { ${toPascalCase(tagName)} } from '../${tagName}';
 
@@ -198,7 +280,7 @@ describe('${tagName}', () => {
 /**
  * Get the boilerplate for an E2E test.
  */
-const getE2eTestBoilerplate = (name: string) =>
+const getE2eTestBoilerplate = (name: string): string =>
   `import { newE2EPage } from '@stencil/core/testing';
 
 describe('${name}', () => {
@@ -215,10 +297,22 @@ describe('${name}', () => {
 /**
  * Convert a dash case string to pascal case.
  */
-const toPascalCase = (str: string) =>
+const toPascalCase = (str: string): string =>
   str.split('-').reduce((res, part) => res + part[0].toUpperCase() + part.slice(1), '');
 
 /**
  * Extensions available to generate.
  */
-type GeneratableExtension = 'tsx' | 'css' | 'spec.tsx' | 'e2e.ts';
+export type GenerableExtension = 'tsx' | 'css' | 'spec.tsx' | 'e2e.ts';
+
+/**
+ * A little interface to wrap up the info we need to pass around for generating
+ * and writing boilerplate.
+ */
+export interface BoilerplateFile {
+  extension: GenerableExtension;
+  /**
+   * The full path to the file we want to generate.
+   */
+  path: string;
+}
