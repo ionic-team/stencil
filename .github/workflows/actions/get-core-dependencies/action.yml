@@ -9,32 +9,6 @@ runs:
         node-version: 16
         cache: 'npm'
 
-    - name: NPM Cache (Unix)
-      if: ${{ runner.os != 'Windows' }}
-      uses: actions/cache@48af2dc4a9e8278b89d7fa154b955c30c6aaab09 # v3.0.2
-      env:
-        cache-name: stencil-root-node-modules-unix
-      with:
-        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('./package-lock.json') }}
-        path: ~/.npm
-
-    - name: Get NPM Cache Directory (Windows)
-      if: ${{ runner.os == 'Windows' }}
-      id: npm-cache-windows
-      shell: bash
-      run: |
-        echo "::set-output name=dir::$(npm config get cache)"
-
-    - name: Set NPM Cache Directory (Windows)
-      if: ${{ runner.os == 'Windows' }}
-      uses: actions/cache@48af2dc4a9e8278b89d7fa154b955c30c6aaab09 # v3.0.2
-      env:
-        cache-name: stencil-root-node-modules-windows
-      with:
-        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('./package-lock.json') }}
-        path: ${{ steps.npm-cache-windows.outputs.dir }}
-
     - name: Install Dependencies
-      if: ${{ !steps.get-stencil-root-node-modules-cache.outputs.cache-hit }}
       run: npm ci
       shell: bash
