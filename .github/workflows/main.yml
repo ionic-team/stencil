@@ -15,57 +15,24 @@ concurrency:
 
 jobs:
   build_core:
-    name: Build Stencil
-    runs-on: 'ubuntu-latest'
-    steps:
-      - uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # v2.4.0
-      - uses: ./.github/workflows/actions/build-core
+    name: Build
+    uses: ./.github/workflows/build.yml
 
   format:
-    name: Format Check
-    runs-on: 'ubuntu-latest'
-    steps:
-      - uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # v2.4.0
-      - uses: ./.github/workflows/actions/format
+    name: Format
+    uses: ./.github/workflows/format.yml
 
-  unit_test:
-    needs: [build_core]
-    strategy:
-      fail-fast: false
-      matrix:
-        node: ['12', '14', '16']
-        os: ['ubuntu-latest', 'windows-latest']
-
-    name: Unit Tests (${{ matrix.os }}.${{ matrix.node }})
-    runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # v2.4.0
-      - uses: ./.github/workflows/actions/test-jest
-
-  end_to_end_test:
+  analysis_tests:
+    name: Analysis Tests
     needs: [ build_core ]
-    strategy:
-      fail-fast: false
-      matrix:
-        node: [ '12', '14', '16' ]
-        os: [ 'ubuntu-latest', 'windows-latest' ]
+    uses: ./.github/workflows/test-analysis.yml
 
-    name: E2E Tests (${{ matrix.os }}.${{ matrix.node }})
-    runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # v2.4.0
-      - uses: ./.github/workflows/actions/test-e2e
-
-  analyze_test:
+  e2e_tests:
+    name: E2E Tests
     needs: [ build_core ]
-    strategy:
-      fail-fast: false
-      matrix:
-        node: [ '12', '14', '16' ]
-        os: [ 'ubuntu-latest', 'windows-latest' ]
+    uses: ./.github/workflows/test-e2e.yml
 
-    name: Analysis Tests (${{ matrix.os }}.${{ matrix.node }})
-    runs-on: ${{ matrix.os }}
-    steps:
-      - uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # v2.4.0
-      - uses: ./.github/workflows/actions/test-analysis
+  unit_tests:
+    name: Unit Tests
+    needs: [ build_core ]
+    uses: ./.github/workflows/test-unit.yml

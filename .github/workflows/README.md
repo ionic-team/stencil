@@ -19,44 +19,69 @@ Each workflow file is explained in greater depth in the [workflows section](#wor
 ## Workflows
 
 This section describes each of Stencil's GitHub Actions workflows.
+Each of these tasks below are codified as [reusable workflows](https://docs.github.com/en/actions/using-workflows/reusing-workflows).
+
 Generally speaking, workflows are designed to be declarative in nature.
-This section does not intend to duplicate the details of each workflow, but rather give a high level overview of each
-one and mention nuances of each.
+As such, this section does not intend to duplicate the details of each workflow, but rather give a high level overview
+of each one and mention nuances of each.
 
 ### Main (`main.yml`)
 
 The main workflow for Stencil can be found in `main.yml` in this directory.
-It is responsible for:
-- Building Stencil (and Validating the Build)
-- Running Unit, E2E, etc. Tests against the Build
-- Verifying that the Codebase is Properly Formatted
+This workflow is the entrypoint of Stencil's CI system, and initializes every workflow & job that runs.
 
-Each of these tasks are codified as _jobs_, and are listed in `main.yml`.
-Most of the jobs above are contingent on the 'build step' finishing (otherwise there would be nothing to test).
-The diagram below displays the dependencies between each job.
+### Build (`build.yml`)
+
+This workflow is responsible for building Stencil and validating the resultant artifact.
+
+### Format (`format.yml`)
+
+This workflow is responsible for validating that the code adheres to the Stencil team's formatting configuration before
+a pull request is merged.
+
+### Test Analysis (`test-analysis.yml`)
+
+This workflow is responsible for running the Stencil analysis testing suite.
+
+### Test End-to-End (`test-e2e.yml`)
+
+This workflow is responsible for running the Stencil end-to-end testing suite.
+This suite does _not_ run Stencil's BrowserStack tests.
+Those are handled by a [separate workflow](#browserstack-browserstackyml).
+
+### Test Unit (`test-unit.yml`)
+
+This workflow is responsible for running the Stencil unit testing suite.
+
+### Design
+
+#### Overview
+
+Most of the workflows above are contingent on the build finishing (otherwise there would be nothing to run against).
+The diagram below displays the dependencies between each workflow.
 
 ```mermaid
 graph LR;
     build-core-->test-analysis;
     build-core-->test-e2e;
-    build-core-->test-jest;
+    build-core-->test-unit;
     format;
 ```
 
-Each of the jobs in this workflow are _composite actions_.
-This allows CI to run more jobs in parallel, improving the throughput of a single workflow run.
-All composite actions can be found in the [actions directory](./actions).
-Each action is defined in an `action.yml` file defined in a subdirectory that matches its name.
-This is a GitHub Actions convention.
+Making each 'task' a reusable workflow allows CI to run more jobs in parallel, improving the throughput of Stencil's CI.
+All resusable workflows can be found in the [workflows directory](.).
+This is a GitHub Actions convention that cannot be overridden.
 
 #### Running Tests
 
 All test-related jobs require the build to finish first.
-Upon successful completion of the build job, each test job may start.
+Upon successful completion of the build workflow, each test workflow will start.
 
-The test jobs have been designed to run in parallel and may run against several operating systems & versions of node.
-For a test job that theoretically runs on Ubuntu and Windows operating systems and targets Node v14, v16 and v18, a
-single test job may spawn several jobs:
+The test-running workflows have been designed to run in parallel and are configured to run against several operating
+systems & versions of node.
+For a test workflow that theoretically runs on Ubuntu and Windows operating systems and targets Node v14, v16 and v18, a
+single test workflow may spawn several jobs:
+
 ```mermaid
 graph LR;
     test-analysis-->ubuntu-node14;
@@ -69,23 +94,16 @@ graph LR;
 
 These 'os-node jobs' (e.g. `ubuntu-node16`) are designed to _not_ prematurely stop their sibling jobs should one of
 them fail.
-This allows the opportunity for the sibling tests to potentially pass, and reduce the number of runners that need to
+This allows the opportunity for the sibling test jobs to potentially pass, and reduce the number of runners that need to
 be spun up again should a developer wish to 're-run failed jobs'.
 Should a developer feel that it is more appropriate to re-run all os-node jobs, they may do so using GitHub's 're-run
 all jobs' options in the GitHub Actions UI.
 
-#### Coding Standards Checks
-
-Verifying the format of the code is properly formatted is not reliant on any other job.
-It may run in parallel with the build job.
-This is beneficial in that it allows the workflow to 'fail-fast' for an easily fixable CI failure (as opposed to
-waiting for CI to pass every other step, only to find the formatter to fail the workflow at the very end).
-
 #### Concurrency
 
-When a `git push` is made to a branch, workflow is designed to stop existing job(s) associated with the workflow + 
+When a `git push` is made to a branch, Stencil's CI is designed to stop existing job(s) associated with the workflow + 
 branch.
-A new workflow run will begin upon stopping the existing job(s) using the new `HEAD` of the branch.
+A new CI run (of each workflow) will begin upon stopping the existing job(s) using the new `HEAD` of the branch.
 
 ### BrowserStack (`browserstack.yml`)
 
