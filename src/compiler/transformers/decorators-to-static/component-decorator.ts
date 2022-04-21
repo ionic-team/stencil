@@ -1,5 +1,5 @@
 import type * as d from '../../../declarations';
-import { augmentDiagnosticWithNode, buildError, validateComponentTag, isString } from '@utils';
+import { augmentDiagnosticWithNode, buildError, validateComponentTag } from '@utils';
 import { getDeclarationParameters } from './decorator-utils';
 import { convertValueToLiteral, createStaticGetter } from '../transform-utils';
 import { styleToStatic } from './style-to-static';
@@ -39,12 +39,6 @@ export const componentDecoratorToStatic = (
   styleToStatic(newMembers, componentOptions);
 
   const assetsDirs = componentOptions.assetsDirs || [];
-
-  if (isString((componentOptions as any).assetsDirs)) {
-    const error = buildError(diagnostics);
-    error.messageText = `@Component option "assetsDir" is no longer supported. "assetsDirs" should be used instead.`
-    augmentDiagnosticWithNode(error, componentDecorator)
-  }
 
   if (assetsDirs.length > 0) {
     newMembers.push(createStaticGetter('assetsDirs', convertValueToLiteral(assetsDirs)));
