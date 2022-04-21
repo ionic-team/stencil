@@ -1,4 +1,4 @@
-import { augmentDiagnosticWithNode, buildError, buildWarn, isString, validateComponentTag } from '@utils';
+import { augmentDiagnosticWithNode, buildError, validateComponentTag } from '@utils';
 import ts from 'typescript';
 
 import type * as d from '../../../declarations';
@@ -40,13 +40,6 @@ export const componentDecoratorToStatic = (
   styleToStatic(newMembers, componentOptions);
 
   const assetsDirs = componentOptions.assetsDirs || [];
-
-  if (isString((componentOptions as any).assetsDir)) {
-    assetsDirs.push((componentOptions as any).assetsDir);
-    const warn = buildWarn(diagnostics);
-    warn.messageText = `@Component option "assetsDir" should be renamed to "assetsDirs" and the value should be an array of strings.`;
-    augmentDiagnosticWithNode(warn, componentDecorator);
-  }
 
   if (assetsDirs.length > 0) {
     newMembers.push(createStaticGetter('assetsDirs', convertValueToLiteral(assetsDirs)));
