@@ -10,7 +10,8 @@ jobs:
     name: Core
     runs-on: 'ubuntu-latest'
     steps:
-      - uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # v2.4.0
+      - name: Checkout Code
+        uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # v2.4.0
 
       - name: Get Core Dependencies
         uses: ./.github/workflows/actions/get-core-dependencies
@@ -33,4 +34,3 @@ jobs:
           name: stencil-core
           output: stencil-core-build.zip
           paths: build cli compiler dependencies.json dev-server internal mock-doc scripts screenshot sys testing
-
