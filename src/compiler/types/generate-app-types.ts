@@ -77,7 +77,7 @@ const generateComponentTypesFile = (config: d.Config, buildCtx: d.BuildCtx, areT
      * grow as more components (with additional types) are processed.
      */
     typeImportData = updateReferenceTypeImports(typeImportData, allTypes, cmp, cmp.sourceFilePath);
-    return generateComponentTypes(cmp, areTypesInternal);
+    return generateComponentTypes(cmp, typeImportData, areTypesInternal);
   });
 
   c.push(COMPONENTS_DTS_HEADER);
