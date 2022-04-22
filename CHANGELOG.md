@@ -1,3 +1,13 @@
+## 🐼 [2.15.1](https://github.com/ionic-team/stencil/compare/v2.15.0...v2.15.1) (2022-04-18)
+
+
+### Bug Fixes
+
+* **mock-doc:** Add missing DOMParser stub to MockWindow ([#3279](https://github.com/ionic-team/stencil/issues/3279)) ([f88fb2e](https://github.com/ionic-team/stencil/commit/f88fb2e04ff4f30c926a5795549b2939dcc3b167))
+* **tests:** ensure jest respects passed flags ([#3329](https://github.com/ionic-team/stencil/issues/3329)) ([c6a1d42](https://github.com/ionic-team/stencil/commit/c6a1d424b31df9c2c3077612545256ce5dcf88e2))
+
+
+
 # ⛷ [2.15.0](https://github.com/ionic-team/stencil/compare/v2.14.2...v2.15.0) (2022-03-28)
 
 
