@@ -30,6 +30,7 @@ describe('validateDistOutputTarget', () => {
         empty: false,
         esmLoaderPath: path.join(rootDir, 'my-dist', 'loader'),
         type: 'dist',
+        polyfills: undefined,
         typesDir: path.join(rootDir, 'my-dist', 'types'),
       },
       {
@@ -54,7 +55,6 @@ describe('validateDistOutputTarget', () => {
       },
       {
         dir: path.join(rootDir, 'my-dist'),
-        empty: false,
         type: 'dist-types',
         typesDir: path.join(rootDir, 'my-dist', 'types'),
       },
