@@ -70,13 +70,20 @@ const generateComponentTypesFile = (config: d.Config, buildCtx: d.BuildCtx, areT
   const components = buildCtx.components.filter((m) => !m.isCollectionDependency);
 
   const modules: d.TypesModule[] = components.map((cmp) => {
+    /**
+     * Generate a key-value store that uses the path to the file where an import is defined as the key, and an object
+     * containing the import's original name and any 'new' name we give it to avoid collisions. We're generating this
+     * data structure for each Stencil component in series, therefore the memory footprint of this entity will likely
+     * grow as more components (with additional types) are processed.
+     */
     typeImportData = updateReferenceTypeImports(typeImportData, allTypes, cmp, cmp.sourceFilePath);
-    return generateComponentTypes(cmp, areTypesInternal);
+    return generateComponentTypes(cmp, typeImportData, areTypesInternal);
   });
 
   c.push(COMPONENTS_DTS_HEADER);
   c.push(`import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";`);
 
+  // write the import statements for our type declaration file
   c.push(
     ...Object.keys(typeImportData).map((filePath) => {
       const typeData = typeImportData[filePath];
