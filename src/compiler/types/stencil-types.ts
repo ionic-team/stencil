@@ -69,7 +69,7 @@ export const updateTypeIdentifierNames = (
  * @param sourceFilePath the component source file path to resolve against
  * @returns the path of the type import
  */
-const getTypeImportPath = (importResolvedFile: string, sourceFilePath: string): string => {
+const getTypeImportPath = (importResolvedFile: string | undefined, sourceFilePath: string): string => {
   const isPathRelative = importResolvedFile && importResolvedFile.startsWith('.');
   if (isPathRelative) {
     importResolvedFile = resolve(dirname(sourceFilePath), importResolvedFile);
