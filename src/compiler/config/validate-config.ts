@@ -145,11 +145,8 @@ export const validateConfig = (
     return arr;
   }, [] as RegExp[]);
 
-  // this is well justified I promise :)
-  let validatedConfig: Config = config as any;
-
   return {
-    config: validatedConfig,
+    config,
     diagnostics,
   };
 };
