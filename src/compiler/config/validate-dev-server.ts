@@ -11,10 +11,10 @@ export const validateDevServer = (
     return undefined;
   }
 
-  const flags = config.flags;
+  const flags = config.flags ?? {};
   const devServer = { ...config.devServer };
 
-  if (flags && flags.address && isString(flags.address)) {
+  if (flags.address && isString(flags.address)) {
     devServer.address = flags.address;
   } else if (!isString(devServer.address)) {
     devServer.address = '0.0.0.0';
