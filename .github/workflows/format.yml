@@ -1,0 +1,21 @@
+name: Format Stencil (Check)
+
+on:
+  workflow_call:
+    # Make this a reusable workflow, no value needed
+    # https://docs.github.com/en/actions/using-workflows/reusing-workflows
+
+jobs:
+  format:
+    name: Check
+    runs-on: 'ubuntu-latest'
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # v2.4.0
+
+      - name: Get Core Dependencies
+        uses: ./.github/workflows/actions/get-core-dependencies
+
+      - name: Prettier Check
+        run: npm run prettier.dry-run
+        shell: bash
