@@ -657,7 +657,7 @@ change. Further details on each of these items will be included prior to the rel
 
 ### backwards compatibility for `@Component.assetsDir` EOL
 
-The `assetsDir` component prop was [#componentassetsdir](previously deprecated)
+The `assetsDir` component prop was [previous deprecated](#componentassetsdir)
 but some backwards compatibility was retained with a warning message. In
 Stencil V3 this backwards compatibility is being removed and Stencil users will
 have to remove all usage of `assetsDir` in favor of `assetsDirs`.
