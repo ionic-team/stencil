@@ -652,3 +652,20 @@ Stencil v3.0.0 is in development at this time and has not been released. The lis
 change. Further details on each of these items will be included prior to the release.
 
 - [fix(testing): puppeteer v10 support #2934](https://github.com/ionic-team/stencil/pull/2934)
+
+## DEPRECATIONS
+
+### backwards compatibility for `@Component.assetsDir` EOL
+
+The `assetsDir` component prop was [previously deprecated](#componentassetsdir)
+but some backwards compatibility was retained with a warning message. In
+Stencil V3 this backwards compatibility is being removed and Stencil users will
+have to remove all usage of `assetsDir` in favor of `assetsDirs`.
+
+
+```diff
+@Component({
+-  assetsDir: 'resource',
++  assetsDirs: ['resource']
+})
+```
