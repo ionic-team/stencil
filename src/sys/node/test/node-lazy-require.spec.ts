@@ -11,23 +11,28 @@ const mockPackageJson = (version: string) =>
 describe('node-lazy-require', () => {
   describe('NodeLazyRequire', () => {
     describe('ensure', () => {
+      let readFSMock: jest.SpyInstance;
+
+      beforeEach(() => {
+        readFSMock = jest.spyOn(fs, 'readFileSync').mockReturnValue(mockPackageJson('10.10.10'));
+      });
+
+      afterEach(() => {
+        readFSMock.mockClear();
+      });
+
       function setup() {
         const resolveModule = new NodeResolveModule();
-        const readFSMock = jest.spyOn(fs, 'readFileSync').mockReturnValue(mockPackageJson('10.10.10'));
-
         const nodeLazyRequire = new NodeLazyRequire(resolveModule, {
           jest: ['2.0.7', '38.0.1'],
         });
-        return {
-          nodeLazyRequire,
-          readFSMock,
-        };
+        return nodeLazyRequire;
       }
 
       it.each(['2.0.7', '10.10.10', '38.0.1'])(
         'should not error if a package of suitable version (%p) is installed',
         async (testVersion) => {
-          const { nodeLazyRequire, readFSMock } = setup();
+          const nodeLazyRequire = setup();
           readFSMock.mockReturnValue(mockPackageJson(testVersion));
           let diagnostics = await nodeLazyRequire.ensure('.', ['jest']);
           expect(diagnostics.length).toBe(0);
@@ -35,7 +40,7 @@ describe('node-lazy-require', () => {
       );
 
       it('should error if the installed version of a package is too low', async () => {
-        const { nodeLazyRequire, readFSMock } = setup();
+        const nodeLazyRequire = setup();
         readFSMock.mockReturnValue(mockPackageJson('1.1.1'));
         let [error] = await nodeLazyRequire.ensure('.', ['jest']);
         expect(error).toEqual({
@@ -46,7 +51,7 @@ describe('node-lazy-require', () => {
       });
 
       it('should error if the installed version of a package is too high', async () => {
-        const { nodeLazyRequire, readFSMock } = setup();
+        const nodeLazyRequire = setup();
         readFSMock.mockReturnValue(mockPackageJson('100.1.1'));
         let [error] = await nodeLazyRequire.ensure('.', ['jest']);
         expect(error).toEqual({
