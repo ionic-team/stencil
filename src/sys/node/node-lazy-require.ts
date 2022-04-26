@@ -27,6 +27,12 @@ type LazyDependencies = Record<string, NodeVersionRange>;
 export class NodeLazyRequire implements d.LazyRequire {
   private ensured = new Set<string>();
 
+  /**
+   * Create a NodeLazyRequire instance
+   *
+   * @param nodeResolveModule an object which wraps up module resolution functionality
+   * @param lazyDependencies the dependency requirements we want to enforce here
+   */
   constructor(private nodeResolveModule: NodeResolveModule, private lazyDependencies: LazyDependencies) {}
 
   async ensure(fromDir: string, ensureModuleIds: string[]) {
