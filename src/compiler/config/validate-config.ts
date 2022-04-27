@@ -33,9 +33,9 @@ export const validateConfig = (
   config.flags = JSON.parse(JSON.stringify(config.flags || {}));
 
   // default devMode false
-  if (config?.flags?.prod) {
+  if (config.flags?.prod) {
     config.devMode = false;
-  } else if (config?.flags?.dev) {
+  } else if (config.flags?.dev) {
     config.devMode = true;
   } else if (!isBoolean(config.devMode)) {
     config.devMode = DEFAULT_DEV_MODE;
