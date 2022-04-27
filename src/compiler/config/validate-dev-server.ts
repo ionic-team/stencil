@@ -32,16 +32,16 @@ export const validateDevServer = (
 
   devServer.address = devServer.address.split('/')[0];
 
+  if (isNumber(flags?.port)) {
+    devServer.port = flags?.port;
+  }
+
   const addressSplit = devServer.address.split(':');
   if (addressSplit.length > 1) {
     if (!isNaN(addressSplit[1] as any)) {
       devServer.address = addressSplit[0];
       devServer.port = parseInt(addressSplit[1], 10);
     }
-  }
-
-  if (isNumber(flags?.port)) {
-    devServer.port = flags?.port;
   }
 
   if (devServer.port !== null && !isNumber(devServer.port)) {

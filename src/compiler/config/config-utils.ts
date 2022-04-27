@@ -66,7 +66,7 @@ const getUserConfigName = (config: d.UnvalidatedConfig, correctConfigName: keyof
   for (const userConfigName of userConfigNames) {
     if (userConfigName.toLowerCase() === correctConfigName.toLowerCase()) {
       if (userConfigName !== correctConfigName) {
-        config.logger?.warn(`config "${userConfigName}" should be "${correctConfigName}"`);
+        config.logger.warn(`config "${userConfigName}" should be "${correctConfigName}"`);
         return userConfigName;
       }
       break;
