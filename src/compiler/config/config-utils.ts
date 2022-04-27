@@ -25,14 +25,14 @@ export const getAbsolutePath = (config: d.Config | d.UnvalidatedConfig, dir: str
  */
 export const setBooleanConfig = <K extends keyof d.Config>(
   config: d.UnvalidatedConfig,
-  configName: K,
+  configName: (K & keyof d.ConfigFlags) | K,
   flagName: keyof d.ConfigFlags | null,
   defaultValue: d.Config[K]
 ) => {
   if (flagName) {
     // I can't think of a great way to tell the compiler that `typeof Config[K]` is going
     // to be equal to `typeof ConfigFlags[K]`, so we lean on a little assertion 🫤
-    let flagValue = config?.flags?.[flagName] as d.Config[K];
+    let flagValue = config?.flags?.[flagName];
     if (isBoolean(flagValue)) {
       config[configName] = flagValue;
     }
@@ -53,11 +53,9 @@ export const setBooleanConfig = <K extends keyof d.Config>(
 
 /**
  * Find any possibly mis-capitalized configuration names on the config, logging
- * a little warning for the user to let them know. This lets us recover values
- * set under (a subset of) improperly spelled configs and automatically hoist
- * them into the config under the right key.
+ * and warning if one is found.
  *
- * @param config d.Config
+ * @param config the user-supplied config that we're dealing with
  * @param correctConfigName the configuration name that we're checking for right now
  * @returns a string container a mis-capitalized config name found on the
  * config object, if any.

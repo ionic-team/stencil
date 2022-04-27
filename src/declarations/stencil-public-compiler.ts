@@ -2154,7 +2154,11 @@ export interface LoadConfigInit {
   initTsConfig?: boolean;
 }
 
-//
+/**
+ * Results from an attempt to load a config. The values on this interface
+ * have not yet been validated and are not ready to be used for arbitrary
+ * operations around the codebase.
+ */
 export interface LoadConfigResults {
   config: UnvalidatedConfig;
   diagnostics: Diagnostic[];
