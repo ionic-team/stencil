@@ -35,7 +35,18 @@ export class NodeLazyRequire implements d.LazyRequire {
    */
   constructor(private nodeResolveModule: NodeResolveModule, private lazyDependencies: LazyDependencies) {}
 
-  async ensure(fromDir: string, ensureModuleIds: string[]) {
+  /**
+   * Ensure that a dependency within our supported range is installed in the current
+   * environment. This function will check all the dependency requirements passed in when
+   * the class is instantiated and return diagnostics if there are any issues.
+   *
+   * @param fromDir the directory from which we'll attempt to resolve the dependencies, typically
+   * this will be project's root directory.
+   * @param ensureModuleIds an array of module names whose versions we're going to check
+   * @returns a Promise holding diagnostics if any of the dependencies either were not
+   * resolved _or_ did not meet our version requirements.
+   */
+  async ensure(fromDir: string, ensureModuleIds: string[]): Promise<d.Diagnostic[]> {
     const diagnostics: d.Diagnostic[] = [];
     const problemDeps: string[] = [];
 
