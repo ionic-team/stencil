@@ -11,7 +11,7 @@ const mockPackageJson = (version: string) =>
 describe('node-lazy-require', () => {
   describe('NodeLazyRequire', () => {
     describe('ensure', () => {
-      let readFSMock: jest.SpyInstance;
+      let readFSMock: jest.SpyInstance<ReturnType<typeof fs.readFileSync>, Parameters<typeof fs.readFileSync>>;
 
       beforeEach(() => {
         readFSMock = jest.spyOn(fs, 'readFileSync').mockReturnValue(mockPackageJson('10.10.10'));
