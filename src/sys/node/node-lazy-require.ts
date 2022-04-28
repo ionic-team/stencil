@@ -5,24 +5,34 @@ import fs from 'graceful-fs';
 import path from 'path';
 import satisfies from 'semver/functions/satisfies';
 import major from 'semver/functions/major';
+import semverLte from 'semver/functions/lte';
 
 /**
- * The version range that we support for a given package
- * [0] is the lower end, while [1] is the higher end.
- *
- * These strings should be standard semver strings.
+ * The version range that we support for a given package. The strings should be
+ * standard semver strings.
  */
-type NodeVersionRange = [string, string];
+interface DepVersionRange {
+  minVersion: string;
+  recommendedVersion: string;
+  /**
+   * Max version is optional because we aren't always worried about upgrades.
+   * This should be set for packages where major version upgrades have
+   * historically caused problems, or when we've identified a specific issue
+   * that requires us to stay at or below a certain version. Note that
+   * `NodeLazyRequire.ensure` only checks the major version.
+   */
+  maxVersion?: string;
+}
 
 /**
- * A manifest for lazily-loaded dependencies, mapping dependency names
- * to version ranges.
+ * A manifest for lazily-loaded dependencies, mapping dependency names to
+ * version ranges.
  */
-type LazyDependencies = Record<string, NodeVersionRange>;
+export type LazyDependencies = Record<string, DepVersionRange>;
 
 /**
- * Lazy requirer for Node, with functionality for specifying version ranges
- * and returning diagnostic errors if requirements aren't met.
+ * Lazy requirer for Node, with functionality for specifying version ranges and
+ * returning diagnostic errors if requirements aren't met.
  */
 export class NodeLazyRequire implements d.LazyRequire {
   private ensured = new Set<string>();
@@ -36,15 +46,17 @@ export class NodeLazyRequire implements d.LazyRequire {
   constructor(private nodeResolveModule: NodeResolveModule, private lazyDependencies: LazyDependencies) {}
 
   /**
-   * Ensure that a dependency within our supported range is installed in the current
-   * environment. This function will check all the dependency requirements passed in when
-   * the class is instantiated and return diagnostics if there are any issues.
+   * Ensure that a dependency within our supported range is installed in the
+   * current environment. This function will check all the dependency
+   * requirements passed in when the class is instantiated and return
+   * diagnostics if there are any issues.
    *
-   * @param fromDir the directory from which we'll attempt to resolve the dependencies, typically
-   * this will be project's root directory.
-   * @param ensureModuleIds an array of module names whose versions we're going to check
-   * @returns a Promise holding diagnostics if any of the dependencies either were not
-   * resolved _or_ did not meet our version requirements.
+   * @param fromDir the directory from which we'll attempt to resolve the
+   * dependencies, typically this will be project's root directory.
+   * @param ensureModuleIds an array of module names whose versions we're going
+   * to check
+   * @returns a Promise holding diagnostics if any of the dependencies either
+   * were not resolved _or_ did not meet our version requirements.
    */
   async ensure(fromDir: string, ensureModuleIds: string[]): Promise<d.Diagnostic[]> {
     const diagnostics: d.Diagnostic[] = [];
@@ -52,20 +64,26 @@ export class NodeLazyRequire implements d.LazyRequire {
 
     ensureModuleIds.forEach((ensureModuleId) => {
       if (!this.ensured.has(ensureModuleId)) {
-        const [minVersion, maxVersion] = this.lazyDependencies[ensureModuleId];
+        const { minVersion, recommendedVersion, maxVersion } = this.lazyDependencies[ensureModuleId];
 
         try {
           const pkgJsonPath = this.nodeResolveModule.resolveModule(fromDir, ensureModuleId);
           const installedPkgJson: d.PackageJsonData = JSON.parse(fs.readFileSync(pkgJsonPath, 'utf8'));
 
-          if (satisfies(installedPkgJson.version, `${minVersion} - ${major(maxVersion)}.x`)) {
+          const installedVersionIsGood = maxVersion
+            ? // if maxVersion, check that `minVersion <= installedVersion <= maxVersion`
+              satisfies(installedPkgJson.version, `${minVersion} - ${major(maxVersion)}.x`)
+            : // else, just heck that `minVersion <= installedVersion`
+              semverLte(minVersion, installedPkgJson.version);
+
+          if (installedVersionIsGood) {
             this.ensured.add(ensureModuleId);
             return;
           }
         } catch (e) {}
         // if we get here we didn't get to the `return` above, so either 1) there was some error
         // reading the package.json or 2) the version wasn't in our specified version range.
-        problemDeps.push(`${ensureModuleId}@${maxVersion}`);
+        problemDeps.push(`${ensureModuleId}@${recommendedVersion}`);
       }
     });
 
