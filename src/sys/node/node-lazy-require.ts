@@ -73,7 +73,7 @@ export class NodeLazyRequire implements d.LazyRequire {
           const installedVersionIsGood = maxVersion
             ? // if maxVersion, check that `minVersion <= installedVersion <= maxVersion`
               satisfies(installedPkgJson.version, `${minVersion} - ${major(maxVersion)}.x`)
-            : // else, just heck that `minVersion <= installedVersion`
+            : // else, just check that `minVersion <= installedVersion`
               semverLte(minVersion, installedPkgJson.version);
 
           if (installedVersionIsGood) {
