@@ -30,9 +30,7 @@ export const setBooleanConfig = <K extends keyof d.Config>(
   defaultValue: d.Config[K]
 ) => {
   if (flagName) {
-    // I can't think of a great way to tell the compiler that `typeof Config[K]` is going
-    // to be equal to `typeof ConfigFlags[K]`, so we lean on a little assertion 🫤
-    let flagValue = config?.flags?.[flagName];
+    let flagValue = config.flags?.[flagName];
     if (isBoolean(flagValue)) {
       config[configName] = flagValue;
     }
@@ -66,7 +64,7 @@ const getUserConfigName = (config: d.UnvalidatedConfig, correctConfigName: keyof
   for (const userConfigName of userConfigNames) {
     if (userConfigName.toLowerCase() === correctConfigName.toLowerCase()) {
       if (userConfigName !== correctConfigName) {
-        config.logger.warn(`config "${userConfigName}" should be "${correctConfigName}"`);
+        config.logger?.warn(`config "${userConfigName}" should be "${correctConfigName}"`);
         return userConfigName;
       }
       break;
