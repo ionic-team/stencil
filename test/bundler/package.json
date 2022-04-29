@@ -1,0 +1,10 @@
+{
+  "private": true,
+  "scripts": {
+    "build": "npm run build.component-lib",
+    "build.component-lib": "cd component-library && npm ci && npm run build && cd ..",
+    "clean": "npm run clean.component-lib",
+    "clean.component-lib": "cd component-library && npm run clean && cd ../",
+    "start": "npm run clean && npm run build"
+  }
+}
