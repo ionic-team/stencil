@@ -1,0 +1,18 @@
+{
+  "name": "parcel-bundle-test",
+  "private": true,
+  "version": "1.0.0",
+  "description": "test package to verify parcel can be used with stencil's lazy loaded bundle",
+  "scripts": {
+    "build": "parcel build src/index.html --no-source-maps && ./restructure.sh",
+    "clean": "rm -rf .parcel-cache dist",
+    "start": "parcel src/index.html"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "parcel": "^2.5.0"
+  },
+  "dependencies": {
+    "component-library": "file:../component-library"
+  }
+}

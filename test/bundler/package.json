@@ -1,11 +1,13 @@
 {
   "private": true,
   "scripts": {
-    "build": "npm run build.component-lib && npm run build.vite",
+    "build": "npm run build.component-lib && npm run build.parcel && npm run build.vite",
     "build.component-lib": "cd component-library && npm ci && npm run build && cd ..",
+    "build.parcel": "cd parcel-bundle-test && npm ci && npm run build && cd ..",
     "build.vite": "cd vite-bundle-test && npm ci && npm run build && cd ..",
-    "clean": "npm run clean.component-lib && npm run clean.vite",
+    "clean": "npm run clean.component-lib && npm run clean.parcel && npm run clean.vite",
     "clean.component-lib": "cd component-library && npm run clean && cd ../",
+    "clean.parcel": "cd parcel-bundle-test && npm run clean && cd ../",
     "clean.vite": "cd vite-bundle-test && npm run clean && cd ../",
     "karma": "karma start karma.config.ts",
     "start": "npm run clean && npm ci && npm run build && npm run karma"

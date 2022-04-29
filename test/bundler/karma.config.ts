@@ -34,6 +34,16 @@ module.exports = function (config: Config): void {
       // general utilities for running Stencil + Karma
       'karma-stencil-utils.ts',
 
+      // use the application built by parcel
+      { pattern: 'parcel-bundle-test/dist/index.html', nocache: true },
+      {
+        pattern: 'parcel-bundle-test/dist/**/*.js',
+        // don't include these files via <script> tags, or they'll be included more than once
+        included: false,
+        nocache: true,
+      },
+      'parcel-bundle-test/parcel-bundle.spec.ts',
+
       // use the application built by vite
       { pattern: 'vite-bundle-test/dist/index.html', nocache: true },
       {
@@ -65,6 +75,7 @@ module.exports = function (config: Config): void {
      */
     proxies: {
       '/assets/': '/base/vite-bundle-test/dist/assets/',
+      '/parcel-assets/': '/base/parcel-bundle-test/dist/parcel-assets/',
     },
     preprocessors: {
       '**/*.ts': 'karma-typescript',
