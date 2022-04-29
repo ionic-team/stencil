@@ -32,15 +32,16 @@ export const validateDevServer = (
 
   devServer.address = devServer.address.split('/')[0];
 
-  // if (isNumber(flags.port)) {
-  //   devServer.port = flags.port;
-  // }
-
-  // we default to 3333 for localhost if the port isn't set on flags.port or
-  // in devServer.address
-  // let addressPort: number = 3333;
-  let addressPort: number;
+  // split on `:` to get the domain and the (possibly present) port
+  // separately. we've already sliced off the protocol (if present) above
+  // so we can safely split on `:` here.
   const addressSplit = devServer.address.split(':');
+
+  const isLocalhost = addressSplit[0] === 'localhost' || !isNaN(addressSplit[0].split('.')[0] as any);
+
+  // if localhost we use 3333 as a default port
+  let addressPort: number | undefined = isLocalhost ? 3333 : undefined;
+
   if (addressSplit.length > 1) {
     if (!isNaN(addressSplit[1] as any)) {
       devServer.address = addressSplit[0];
@@ -53,20 +54,8 @@ export const validateDevServer = (
   } else if (devServer.port !== null && !isNumber(devServer.port)) {
     if (isNumber(addressPort)) {
       devServer.port = addressPort;
-    } else if (devServer.address === 'localhost' || !isNaN(devServer.address.split('.')[0] as any)) {
-      devServer.port = 3333;
-    } else {
-      devServer.port = null;
     }
   }
-
-  //   if (devServer.port !== null && !isNumber(devServer.port)) {
-  //     if (devServer.address === 'localhost' || !isNaN(devServer.address.split('.')[0] as any)) {
-  //       devServer.port = 3333;
-  //     } else {
-  //       devServer.port = undefined;
-  //     }
-  //   }
 
   if (devServer.reloadStrategy === undefined) {
     devServer.reloadStrategy = 'hmr';

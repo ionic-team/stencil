@@ -24,23 +24,14 @@ describe('validateDevServer', () => {
     expect(config.devServer.address).toBe('0.0.0.0');
   });
 
-  it('should remove http from address', () => {
-    inputConfig.devServer.address = 'http://localhost';
-    const { config } = validateConfig(inputConfig);
-    expect(config.devServer.address).toBe('localhost');
-  });
-
-  it('should remove https from address', () => {
-    inputConfig.devServer.address = 'https://localhost';
-    const { config } = validateConfig(inputConfig);
-    expect(config.devServer.address).toBe('localhost');
-  });
-
-  it('should remove trailing / from address', () => {
-    inputConfig.devServer.address = 'localhost/';
-    const { config } = validateConfig(inputConfig);
-    expect(config.devServer.address).toBe('localhost');
-  });
+  it.each(['https://localhost', 'http://localhost', 'https://localhost/', 'http://localhost/', 'localhost/'])(
+    'should remove extraneious stuff from addres %p',
+    (address) => {
+      inputConfig.devServer.address = address;
+      const { config } = validateConfig(inputConfig);
+      expect(config.devServer.address).toBe('localhost');
+    }
+  );
 
   it('should set address', () => {
     inputConfig.devServer.address = '123.123.123.123';
@@ -109,22 +100,20 @@ describe('validateDevServer', () => {
     expect(config.devServer.gzip).toBe(false);
   });
 
-  it('should default port', () => {
+  it.each(['localhost', '192.12.12.10', '127.0.0.1'])('should default port with address %p', () => {
     const { config } = validateConfig(inputConfig);
     expect(config.devServer.port).toBe(3333);
   });
 
-  it('should default port with ip address', () => {
-    inputConfig.devServer.address = '192.12.12.10';
-    const { config } = validateConfig(inputConfig);
-    expect(config.devServer.port).toBe(3333);
-  });
-
-  it('should default port with localhost', () => {
-    inputConfig.devServer.address = 'localhost';
-    const { config } = validateConfig(inputConfig);
-    expect(config.devServer.port).toBe(3333);
-  });
+  it.each(['https://subdomain.stenciljs.com:3000', 'localhost:3000/', 'localhost:3000'])(
+    'should override port in address with port property',
+    (address) => {
+      inputConfig.devServer.port = 1234;
+      inputConfig.devServer.address = address;
+      const { config } = validateConfig(inputConfig);
+      expect(config.devServer.port).toBe(1234);
+    }
+  );
 
   it('should not set default port if null', () => {
     inputConfig.devServer.port = null;
@@ -132,19 +121,11 @@ describe('validateDevServer', () => {
     expect(config.devServer.port).toBe(null);
   });
 
-  it('should set port if in address', () => {
-    inputConfig.devServer.address = 'localhost:88';
+  it.each(['localhost:20/', 'localhost:20'])('should set port from address %p if no port prop', (address) => {
+    inputConfig.devServer.address = address;
     const { config } = validateConfig(inputConfig);
-    expect(config.devServer.port).toBe(88);
+    expect(config.devServer.port).toBe(20);
     expect(config.devServer.address).toBe('localhost');
-  });
-
-  it('should set port if in address and has trailing slash', () => {
-    inputConfig.devServer.address = 'https://localhost:88/';
-    const { config } = validateConfig(inputConfig);
-    expect(config.devServer.port).toBe(88);
-    expect(config.devServer.address).toBe('localhost');
-    expect(config.devServer.protocol).toBe('https');
   });
 
   it('should set address, port null, protocol', () => {
