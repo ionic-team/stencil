@@ -27,6 +27,11 @@ jobs:
     needs: [ build_core ]
     uses: ./.github/workflows/test-analysis.yml
 
+  bundler_tests:
+    name: Bundler Tests
+    needs: [ build_core ]
+    uses: ./.github/workflows/test-bundlers.yml
+
   e2e_tests:
     name: E2E Tests
     needs: [ build_core ]

@@ -45,6 +45,7 @@
     "prettier.dry-run": "npm run prettier.base -- --list-different",
     "test": "jest --coverage",
     "test.analysis": "cd test && npm run analysis.build-and-analyze",
+    "test.bundlers": "cd test && npm run bundlers",
     "test.dist": "node scripts --validate-build",
     "test.end-to-end": "cd test/end-to-end && npm ci && npm test && npm run test.dist",
     "test.jest": "jest",
