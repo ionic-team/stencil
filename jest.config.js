@@ -3,6 +3,7 @@ module.exports = {
   moduleNameMapper: {
     '@app-data': '<rootDir>/internal/app-data/index.cjs',
     '@app-globals': '<rootDir>/internal/app-globals/index.cjs',
+    '@compiler-deps': '<rootDir>/src/compiler/sys/modules/compiler-deps.ts',
     '@platform': '<rootDir>/internal/testing/index.js',
     '@runtime': '<rootDir>/internal/testing/index.js',
     '@stencil/core/cli': '<rootDir>/cli/index.js',
