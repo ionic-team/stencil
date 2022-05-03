@@ -61,7 +61,7 @@ module.exports = function (config: Config): void {
     },
     frameworks: ['jasmine', 'karma-typescript'],
     // sets the log level of karma, increasing the verbosity is useful for debugging the karma itself
-    logLevel: config.LOG_INFO,
+    logLevel: config.LOG_DEBUG,
     plugins: ['karma-chrome-launcher', 'karma-jasmine', 'karma-typescript'],
     /**
      * each entry in the `proxies` object maps the value of the entry (the location on disk of 1+ file(s)) to a location
