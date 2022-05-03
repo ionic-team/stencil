@@ -3,10 +3,12 @@ import type { Config } from 'karma';
 // use the instance of chromium that is downloaded as a part of stencil's puppeteer dependency
 process.env.CHROME_BIN = require('puppeteer').executablePath();
 
+const CHROME_HEADLESS = "ChromeHeadless"
+
 // local browsers to run the tests against
 const localLaunchers = {
-  ChromeHeadless: {
-    base: 'ChromeHeadless',
+  [CHROME_HEADLESS]: {
+    base: CHROME_HEADLESS,
     flags: [
       // run in headless mode (https://chromium.googlesource.com/chromium/src/+/lkgr/headless/README.md)
       '--headless',
