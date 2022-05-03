@@ -152,10 +152,9 @@ export function setupDomTests(document: Document): DomTestUtilities {
         /**
          * Function that recursively traverses the DOM, looking for Stencil components. Any `componentOnReady`
          * functions found on Stencil components are pushed to a buffer to be run after traversing the entire DOM.
-         * @param promises the buffer of promises to add instances of `componentOnReady` to
          * @param elm the current element being inspected
          */
-        const waitForDidLoad = (promises: Promise<any>[], elm: Element): void => {
+        const waitForDidLoad = (elm: Element): void => {
           if (elm != null && elm.nodeType === 1) {
             // the element exists and is an `ELEMENT_NODE`
             for (let i = 0; i < elm.children.length; i++) {
@@ -163,13 +162,13 @@ export function setupDomTests(document: Document): DomTestUtilities {
               if (childElm.tagName.includes('-') && isHtmlStencilElement(childElm)) {
                 promises.push(childElm.componentOnReady());
               }
-              waitForDidLoad(promises, childElm);
+              waitForDidLoad(childElm);
             }
           }
         };
 
         // recursively walk the DOM to find all `onComponentReady` functions
-        waitForDidLoad(promises, window.document.documentElement);
+        waitForDidLoad(window.document.documentElement);
 
         return Promise.all(promises).catch((e) => console.error(e));
       };
