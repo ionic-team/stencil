@@ -24,7 +24,7 @@ jobs:
         uses: ./.github/workflows/actions/get-core-dependencies
 
       - name: Run Typescript compiler
-        run: npx tsc --noEmit --strictNullChecks --pretty false | npx tsc-output-parser > errors.json
+        run: npm run tsc.strictNullChecksReport
 
       - name: Set comment body
         id: set-comment-body
