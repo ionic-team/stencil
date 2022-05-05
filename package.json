@@ -56,6 +56,7 @@
     "test.watch-all": "jest --watchAll --coverage"
   },
   "devDependencies": {
+    "@aivenio/tsc-output-parser": "^2.1.1",
     "@ionic/prettier-config": "^2.0.0",
     "@rollup/plugin-commonjs": "15.1.0",
     "@rollup/plugin-json": "4.1.0",

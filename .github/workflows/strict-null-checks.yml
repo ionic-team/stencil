@@ -24,4 +24,29 @@ jobs:
         uses: ./.github/workflows/actions/get-core-dependencies
 
       - name: Run Typescript compiler
-        run: npx tsc --noEmit --strictNullChecks --pretty false
+        run: npx tsc --noEmit --strictNullChecks --pretty false | npx tsc-output-parser > errors.json
+
+      - name: Set comment body
+        id: set-comment-body
+        run: |
+          body=$(node scripts/strict-null-checks-ci.js)
+          body="${body//'%'/'%25'}"
+          body="${body//$'\n'/'%0A'}"
+          body="${body//$'\r'/'%0D'}"
+          echo ::set-output name=body::$body
+
+      - name: Find Comment
+        uses: peter-evans/find-comment@v2
+        id: fc
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: 'github-actions[bot]'
+          body-includes: '### `--strictNullChecks` error report"'
+
+      - name: Create or update comment
+        uses: peter-evans/create-or-update-comment@v2
+        with:
+          comment-id: ${{ steps.fc.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body: ${{ steps.set-comment-body.outputs.body }}
+          edit-mode: replace
