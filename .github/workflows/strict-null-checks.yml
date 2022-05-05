@@ -1,0 +1,27 @@
+name: Strict Null Checks Burndown
+# this is a temporary workflow while we burn down the errors
+# from typescript's strictNullChecks option. Once we get to 0
+# we can turn that option on all the time and delete this job!
+
+on:
+  workflow_call:
+    # Make this a reusable workflow, no value needed
+    # https://docs.github.com/en/actions/using-workflows/reusing-workflows
+
+jobs:
+  strict_null_checks:
+    name: Check and Report
+    runs-on: 'ubuntu-latest'
+    steps:
+      # first we need to checkout the main branch, run typescript
+      # there, save the result
+      - name: Checkout main
+        uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # v2.4.0
+        with:
+          ref: main
+
+      - name: Get Core Dependencies
+        uses: ./.github/workflows/actions/get-core-dependencies
+
+      - name: Run Typescript compiler
+        uses: npx tsc --noEmit --strictNullChecks --pretty false
