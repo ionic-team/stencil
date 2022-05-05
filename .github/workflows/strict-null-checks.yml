@@ -24,4 +24,4 @@ jobs:
         uses: ./.github/workflows/actions/get-core-dependencies
 
       - name: Run Typescript compiler
-        uses: npx tsc --noEmit --strictNullChecks --pretty false
+        run: npx tsc --noEmit --strictNullChecks --pretty false
