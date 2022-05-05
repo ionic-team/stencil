@@ -17,8 +17,6 @@ jobs:
       # there, save the result
       - name: Checkout main
         uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # v2.4.0
-        with:
-          ref: main
 
       - name: Get Core Dependencies
         uses: ./.github/workflows/actions/get-core-dependencies
