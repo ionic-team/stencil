@@ -18,6 +18,7 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "outDir": "build",
+    "strictNullChecks": true,
     "pretty": true,
     "resolveJsonModule": true,
     "sourceMap": true,
