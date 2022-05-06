@@ -37,7 +37,7 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys): Logger => {
         Math.floor((d.getMilliseconds() / 1000) * 10) +
         ']';
 
-      lines[0] = dim(prefix) + lines[0].substr(prefix.length);
+      lines[0] = dim(prefix) + lines[0].slice(prefix.length);
     }
   };
 
@@ -53,7 +53,7 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys): Logger => {
   const warnPrefix = (lines: string[]) => {
     if (lines.length) {
       const prefix = '[ WARN  ]';
-      lines[0] = bold(yellow(prefix)) + lines[0].substr(prefix.length);
+      lines[0] = bold(yellow(prefix)) + lines[0].slice(prefix.length);
     }
   };
 
@@ -79,7 +79,7 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys): Logger => {
   const errorPrefix = (lines: string[]) => {
     if (lines.length) {
       const prefix = '[ ERROR ]';
-      lines[0] = bold(red(prefix)) + lines[0].substr(prefix.length);
+      lines[0] = bold(red(prefix)) + lines[0].slice(prefix.length);
     }
   };
 
@@ -109,7 +109,7 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys): Logger => {
         Math.floor((d.getMilliseconds() / 1000) * 10) +
         ']';
 
-      lines[0] = cyan(prefix) + lines[0].substr(prefix.length);
+      lines[0] = cyan(prefix) + lines[0].slice(prefix.length);
     }
   };
 
@@ -409,11 +409,11 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys): Logger => {
     while (errorLine.length + INDENT.length > loggerSys.getColumns()) {
       if (errorCharStart > errorLine.length - errorCharStart + errorLength && errorCharStart > 5) {
         // larger on left side
-        errorLine = errorLine.substr(1);
+        errorLine = errorLine.slice(1);
         errorCharStart--;
       } else if (rightSideChars > 1) {
         // larger on right side
-        errorLine = errorLine.substr(0, errorLine.length - 1);
+        errorLine = errorLine.slice(0, -1);
         rightSideChars--;
       } else {
         break;
@@ -618,7 +618,7 @@ const removeLeadingWhitespace = (orgLines: PrintLine[]): ReadonlyArray<PrintLine
     }
     // each line has at least one line of whitespace. remove the leading character from each
     for (let i = 0; i < lines.length; i++) {
-      lines[i].text = lines[i].text.substr(1);
+      lines[i].text = lines[i].text.slice(1);
       lines[i].errorCharStart--;
       if (!lines[i].text.length) {
         return lines;

@@ -850,12 +850,30 @@ export interface ComponentCompilerPropertyComplexType {
   references: ComponentCompilerTypeReferences;
 }
 
-export interface ComponentCompilerTypeReferences {
-  [key: string]: ComponentCompilerTypeReference;
-}
+/**
+ * A record of `ComponentCompilerTypeReference` entities.
+ *
+ * Each key in this record is intended to be the names of the types used by a component. However, this is not enforced
+ * by the type system (I.E. any string can be used as a key).
+ *
+ * Note any key can be a user defined type or a TypeScript standard type.
+ */
+export type ComponentCompilerTypeReferences = Record<string, ComponentCompilerTypeReference>;
 
+/**
+ * Describes a reference to a type used by a component.
+ */
 export interface ComponentCompilerTypeReference {
+  /**
+   * A type may be defined:
+   * - locally (in the same file as the component that uses it)
+   * - globally
+   * - by importing it into a file (and is defined elsewhere)
+   */
   location: 'local' | 'global' | 'import';
+  /**
+   * The path to the type reference, if applicable (global types should not need a path associated with them)
+   */
   path?: string;
 }
 
@@ -2428,12 +2446,30 @@ export interface NewSpecPageOptions {
   strictBuild?: boolean;
 }
 
+/**
+ * A record of `TypesMemberNameData` entities.
+ *
+ * Each key in this record is intended to be the path to a file that declares one or more types used by a component.
+ * However, this is not enforced by the type system - users of this interface should not make any assumptions regarding
+ * the format of the path used as a key (relative vs. absolute)
+ */
 export interface TypesImportData {
   [key: string]: TypesMemberNameData[];
 }
 
+/**
+ * A type describing how Stencil may alias an imported type to avoid naming collisions when performing operations such
+ * as generating `components.d.ts` files.
+ */
 export interface TypesMemberNameData {
+  /**
+   * The name of the type as it's used within a file.
+   */
   localName: string;
+  /**
+   * An alias that Stencil may apply to the `localName` to avoid naming collisions. This name does not appear in the
+   * file that is using `localName`.
+   */
   importName?: string;
 }
 

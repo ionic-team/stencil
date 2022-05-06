@@ -7,17 +7,22 @@ import { generatePropTypes } from './generate-prop-types';
 /**
  * Generate a string based on the types that are defined within a component
  * @param cmp the metadata for the component that a type definition string is generated for
+ * @param typeImportData locally/imported/globally used type names, which may be used to prevent naming collisions
  * @param areTypesInternal `true` if types being generated are for a project's internal purposes, `false` otherwise
  * @returns the generated types string alongside additional metadata
  */
-export const generateComponentTypes = (cmp: d.ComponentCompilerMeta, areTypesInternal: boolean): d.TypesModule => {
+export const generateComponentTypes = (
+  cmp: d.ComponentCompilerMeta,
+  typeImportData: d.TypesImportData,
+  areTypesInternal: boolean
+): d.TypesModule => {
   const tagName = cmp.tagName.toLowerCase();
   const tagNameAsPascal = dashToPascalCase(tagName);
   const htmlElementName = `HTML${tagNameAsPascal}Element`;
 
-  const propAttributes = generatePropTypes(cmp);
-  const methodAttributes = generateMethodTypes(cmp.methods);
-  const eventAttributes = generateEventTypes(cmp.events, tagNameAsPascal);
+  const propAttributes = generatePropTypes(cmp, typeImportData);
+  const methodAttributes = generateMethodTypes(cmp, typeImportData);
+  const eventAttributes = generateEventTypes(cmp, typeImportData, tagNameAsPascal);
 
   const componentAttributes = attributesToMultiLineString(
     [...propAttributes, ...methodAttributes],

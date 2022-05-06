@@ -553,7 +553,7 @@ export function createNodeSys(c: { process?: any } = {}) {
     generateContentHash(content, length) {
       let hash = createHash('sha1').update(content).digest('hex').toLowerCase();
       if (typeof length === 'number') {
-        hash = hash.substr(0, length);
+        hash = hash.slice(0, length);
       }
       return Promise.resolve(hash);
     },
@@ -566,7 +566,7 @@ export function createNodeSys(c: { process?: any } = {}) {
           .on('end', () => {
             let hash = h.digest('hex').toLowerCase();
             if (typeof length === 'number') {
-              hash = hash.substr(0, length);
+              hash = hash.slice(0, length);
             }
             resolve(hash);
           });
@@ -588,14 +588,13 @@ export function createNodeSys(c: { process?: any } = {}) {
   const nodeResolve = new NodeResolveModule();
 
   sys.lazyRequire = new NodeLazyRequire(nodeResolve, {
-    // [minimumVersion, recommendedVersion]
-    '@types/jest': ['24.9.1', '27.0.3'],
-    jest: ['24.9.0', '27.4.5'],
-    'jest-cli': ['24.9.0', '27.4.5'],
-    pixelmatch: ['4.0.2', '4.0.2'],
-    puppeteer: ['1.19.0', '10.0.0'],
-    'puppeteer-core': ['1.19.0', '5.2.1'],
-    'workbox-build': ['4.3.1', '4.3.1'],
+    '@types/jest': { minVersion: '24.9.1', recommendedVersion: '27.0.3', maxVersion: '27.0.0' },
+    jest: { minVersion: '24.9.1', recommendedVersion: '27.0.3', maxVersion: '27.0.0' },
+    'jest-cli': { minVersion: '24.9.0', recommendedVersion: '27.4.5', maxVersion: '27.0.0' },
+    pixelmatch: { minVersion: '4.0.2', recommendedVersion: '4.0.2' },
+    puppeteer: { minVersion: '1.19.0', recommendedVersion: '10.0.0' },
+    'puppeteer-core': { minVersion: '1.19.0', recommendedVersion: '5.2.1' },
+    'workbox-build': { minVersion: '4.3.1', recommendedVersion: '4.3.1' },
   });
 
   prcs.on('SIGINT', runInterruptsCallbacks);

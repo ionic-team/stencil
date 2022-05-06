@@ -1,5 +1,5 @@
 import type * as d from '../../declarations';
-import { COMPONENTS_DTS_HEADER, COMPONENT_EVENTS_NAMESPACE, sortImportNames } from './types-utils';
+import { COMPONENTS_DTS_HEADER, sortImportNames } from './types-utils';
 import { generateComponentTypes } from './generate-component-types';
 import { generateEventDetailTypes } from './generate-event-detail-types';
 import { GENERATED_DTS, getComponentsDtsSrcFilePath } from '../output-targets/output-utils';
@@ -69,19 +69,29 @@ const generateComponentTypesFile = (config: d.Config, buildCtx: d.BuildCtx, areT
   const c: string[] = [];
   const allTypes = new Map<string, number>();
   const components = buildCtx.components.filter((m) => !m.isCollectionDependency);
-
-  const modules: d.TypesModule[] = [];
   const componentEventDetailTypes: d.TypesModule[] = [];
 
-  for (const cmp of components) {
+  const modules: d.TypesModule[] = components.map((cmp) => {
+    /**
+     * Generate a key-value store that uses the path to the file where an import is defined as the key, and an object
+     * containing the import's original name and any 'new' name we give it to avoid collisions. We're generating this
+     * data structure for each Stencil component in series, therefore the memory footprint of this entity will likely
+     * grow as more components (with additional types) are processed.
+     */
     typeImportData = updateReferenceTypeImports(typeImportData, allTypes, cmp, cmp.sourceFilePath);
-    modules.push(generateComponentTypes(cmp, areTypesInternal));
-    componentEventDetailTypes.push(generateEventDetailTypes(cmp));
-  }
+    if (cmp.events.length > 0) {
+      /**
+       * Only generate event detail types for components that have events.
+       */
+      componentEventDetailTypes.push(generateEventDetailTypes(cmp));
+    }
+    return generateComponentTypes(cmp, typeImportData, areTypesInternal);
+  });
 
   c.push(COMPONENTS_DTS_HEADER);
   c.push(`import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";`);
 
+  // write the import statements for our type declaration file
   c.push(
     ...Object.keys(typeImportData).map((filePath) => {
       const typeData = typeImportData[filePath];
@@ -109,9 +119,7 @@ const generateComponentTypesFile = (config: d.Config, buildCtx: d.BuildCtx, areT
   c.push(...modules.map((m) => `${m.component}`));
   c.push(`}`);
 
-  c.push(`export namespace ${COMPONENT_EVENTS_NAMESPACE} {`);
   c.push(...componentEventDetailTypes.map((m) => `${m.component}`));
-  c.push(`}`);
 
   c.push(`declare global {`);
 

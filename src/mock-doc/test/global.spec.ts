@@ -28,4 +28,13 @@ describe('global', () => {
     expect(KeyboardEvent).toBeDefined();
     expect(MouseEvent).toBeDefined();
   });
+
+  it('Fetch', () => {
+    expect(Request).toBeDefined();
+    expect(Response).toBeDefined();
+  });
+
+  it('Parse', () => {
+    expect(DOMParser).toBeDefined();
+  });
 });
