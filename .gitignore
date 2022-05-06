@@ -47,3 +47,5 @@ test/**/hydrate/*
 .stencil
 /dependencies.json
 coverage/**
+
+null_errors*.json
