@@ -99,17 +99,17 @@ const lines = []
 lines.push("### `--strictNullChecks` error report");
 lines.push("");
 
-lines.push(`typechecking with \`--strictNullChecks\` resulted in ${prData.length} errors on this branch`);
+lines.push(`Typechecking with \`--strictNullChecks\` resulted in ${prData.length} errors on this branch.`);
 lines.push("")
 
 // we can check the number of errors just to write a different message
 // out here
 if (errorsOnPR === errorsOnMain) {
-  lines.push("this is the same number of errors on main, so at least we're not creating new ones!")
+  lines.push("That's the same number of errors on main, so at least we're not creating new ones!")
 } else if (errorsOnPR < errorsOnMain) {
-  lines.push(`this is ${errorsOnMain - errorsOnPR} fewer than on \`main\`! 🎉🎉🎉`)
+  lines.push(`That's ${errorsOnMain - errorsOnPR} fewer than on \`main\`! 🎉🎉🎉`)
 } else {
-  lines.push(`unfortunately, it looks like that's an increase of ${errorsOnPR - errorsOnMain} over \`main\` 😞`
+  lines.push(`Unfortunately, it looks like that's an increase of ${errorsOnPR - errorsOnMain} over \`main\` 😞.`)
 }
 
 lines.push("");
