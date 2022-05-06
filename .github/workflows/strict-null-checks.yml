@@ -2,6 +2,7 @@ name: Strict Null Checks Burndown
 # this is a temporary workflow while we burn down the errors
 # from typescript's strictNullChecks option. Once we get to 0
 # we can turn that option on all the time and delete this job!
+
 on:
   pull_request:
     branches:
@@ -28,7 +29,7 @@ jobs:
       - name: Run Typescript compiler and generate JSON-formatted error file (main branch)
         run: npx tsc --strictNullChecks --noEmit --pretty false | npx tsc-output-parser > null_errors_main.json
 
-      - name: Upload error output build artifact
+      - name: Upload null_errors_main.json
         uses: actions/upload-artifact@v3
         with:
           name: null_errors_main
@@ -68,7 +69,7 @@ jobs:
         with:
           issue-number: ${{ github.event.pull_request.number }}
           comment-author: 'github-actions[bot]'
-          body-includes: '### `--strictNullChecks` error report"'
+          body-includes: '### `--strictNullChecks` error report'
 
       - name: Create or update comment
         uses: peter-evans/create-or-update-comment@v2
