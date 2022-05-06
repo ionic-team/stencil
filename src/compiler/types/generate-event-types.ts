@@ -9,11 +9,15 @@ import { updateTypeIdentifierNames } from './stencil-types';
  * @param cmpClassName The pascal cas name of the component class
  * @returns the generated type metadata
  */
-export const generateEventTypes = (cmpMeta: d.ComponentCompilerMeta, typeImportData: d.TypesImportData, cmpClassName: string): d.TypeInfo => {
+export const generateEventTypes = (
+  cmpMeta: d.ComponentCompilerMeta,
+  typeImportData: d.TypesImportData,
+  cmpClassName: string
+): d.TypeInfo => {
   return cmpMeta.events.map((cmpEvent) => {
     const name = `on${toTitleCase(cmpEvent.name)}`;
     const cmpEventDetailInterface = `${cmpClassName}CustomEvent`;
-    const type = getEventType(cmpEvent, cmpEventDetailInterface, typeImportData, cmpMeta.sourceFilePath,);
+    const type = getEventType(cmpEvent, cmpEventDetailInterface, typeImportData, cmpMeta.sourceFilePath);
 
     const typeInfo: d.TypeInfo[0] = {
       name,
@@ -22,7 +26,7 @@ export const generateEventTypes = (cmpMeta: d.ComponentCompilerMeta, typeImportD
       required: false,
       internal: cmpEvent.internal,
       jsdoc: getTextDocs(cmpEvent.docs),
-    }
+    };
     return typeInfo;
   });
 };
