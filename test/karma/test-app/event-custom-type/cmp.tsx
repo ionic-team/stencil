@@ -1,6 +1,6 @@
 import { Component, h, Event, EventEmitter, State, Listen } from '@stencil/core';
 
-import { ComponentEvents } from '../components';
+import { EventCustomTypeCustomEvent } from '../components';
 
 export interface TestEventDetail {
   value: string;
@@ -16,7 +16,7 @@ export class EventCustomType {
   @State() lastEventValue: TestEventDetail;
 
   @Listen('testEvent')
-  testEventHandler(newValue: ComponentEvents.EventCustomTypeCustomEvent<TestEventDetail>) {
+  testEventHandler(newValue: EventCustomTypeCustomEvent<TestEventDetail>) {
     this.counter++;
     this.lastEventValue = newValue.detail;
   }

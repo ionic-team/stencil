@@ -333,34 +333,34 @@ export namespace Components {
     interface Tag88 {
     }
 }
-    interface EsmImportCustomEvent<T> extends CustomEvent<T> {
-        detail: T;
-        target: HTMLEsmImportElement;
-    }
-    interface EventBasicCustomEvent<T> extends CustomEvent<T> {
-        detail: T;
-        target: HTMLEventBasicElement;
-    }
-    interface EventCustomTypeCustomEvent<T> extends CustomEvent<T> {
-        detail: T;
-        target: HTMLEventCustomTypeElement;
-    }
-    interface LifecycleAsyncBCustomEvent<T> extends CustomEvent<T> {
-        detail: T;
-        target: HTMLLifecycleAsyncBElement;
-    }
-    interface LifecycleAsyncCCustomEvent<T> extends CustomEvent<T> {
-        detail: T;
-        target: HTMLLifecycleAsyncCElement;
-    }
-    interface LifecycleBasicBCustomEvent<T> extends CustomEvent<T> {
-        detail: T;
-        target: HTMLLifecycleBasicBElement;
-    }
-    interface LifecycleBasicCCustomEvent<T> extends CustomEvent<T> {
-        detail: T;
-        target: HTMLLifecycleBasicCElement;
-    }
+export interface EsmImportCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLEsmImportElement;
+}
+export interface EventBasicCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLEventBasicElement;
+}
+export interface EventCustomTypeCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLEventCustomTypeElement;
+}
+export interface LifecycleAsyncBCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLLifecycleAsyncBElement;
+}
+export interface LifecycleAsyncCCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLLifecycleAsyncCElement;
+}
+export interface LifecycleBasicBCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLLifecycleBasicBElement;
+}
+export interface LifecycleBasicCCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLLifecycleBasicCElement;
+}
 declare global {
     interface HTMLAppendChildElement extends Components.AppendChild, HTMLStencilElement {
     }
