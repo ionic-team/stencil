@@ -152,7 +152,7 @@ export const readPackageJson = async (config: d.Config, compilerCtx: d.CompilerC
       }
     }
   } catch (e) {
-    if (!config.outputTargets.some((o) => o.type.includes('dist'))) {
+    if (!config.outputTargets!.some((o) => o.type.includes('dist'))) {
       const diagnostic = buildError(buildCtx.diagnostics);
       diagnostic.header = `Missing "package.json"`;
       diagnostic.messageText = `Valid "package.json" file is required for distribution: ${config.packageJsonFilePath}`;
