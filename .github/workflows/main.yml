@@ -22,10 +22,6 @@ jobs:
     name: Format
     uses: ./.github/workflows/format.yml
 
-  strict_null_checks:
-    name: Strict Null Checks Burndown
-    uses: ./.github/workflows/strict-null-checks.yml
-
   analysis_tests:
     name: Analysis Tests
     needs: [ build_core ]

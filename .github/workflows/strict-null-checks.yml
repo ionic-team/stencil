@@ -2,35 +2,56 @@ name: Strict Null Checks Burndown
 # this is a temporary workflow while we burn down the errors
 # from typescript's strictNullChecks option. Once we get to 0
 # we can turn that option on all the time and delete this job!
-
 on:
-  workflow_call:
-    # Make this a reusable workflow, no value needed
-    # https://docs.github.com/en/actions/using-workflows/reusing-workflows
+  pull_request:
+    branches:
+      - '**'
 
 jobs:
-  strict_null_checks:
-    name: Check and Report
+  strict_null_check_main:
+    name: Get strictNullChecks errors on main
     runs-on: 'ubuntu-latest'
     steps:
-      # first we need to checkout the main branch, run typescript
-      # there, save the result
+      - name: Checkout main branch
+        uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # v2.4.0
+        with:
+          ref: main
+
+      - name: Get Core Dependencies
+        uses: ./.github/workflows/actions/get-core-dependencies
+
+      # this is only necessary while tsc-output-parser isn't a dependency in main
+      # once it is, we can introduce a PR to remove this step
+      - name: Install tsc-output-parser
+        run: npm install @aivenio/tsc-output-parser
+
+      - name: Run Typescript compiler and generate JSON-formatted error file (main branch)
+        run: npx tsc --strictNullChecks --noEmit --pretty false | npx tsc-output-parser > null_errors_main.json
+
+      - name: Upload error output build artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: null_errors_main
+          path: 'null_errors_main.json'
+
+  strict_null_check_pr:
+    needs: [ "strict_null_check_main" ]
+    name: Check on PR Branch and Report
+    runs-on: 'ubuntu-latest'
+    steps:
       - name: Checkout current branch
         uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # v2.4.0
 
       - name: Get Core Dependencies
         uses: ./.github/workflows/actions/get-core-dependencies
 
-      - name: Run Typescript compiler (PR branch)
-        run: npx tsc --strictNullChecks --noEmit --pretty false | tsc-output-parser > null_errors_pr.json
+      - name: Run Typescript compiler and generate JSON-formatted error file (PR branch)
+        run: npx tsc --strictNullChecks --noEmit --pretty false | npx tsc-output-parser > null_errors_pr.json
 
-      - name: Checkout main
-        uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # v2.4.0
+      - name: Download error file for main branch
+        uses: actions/download-artifact@v3
         with:
-          ref: my-branch
-
-      - name: Run Typescript compiler (main branch)
-        run: npx tsc --strictNullChecks --noEmit --pretty false | tsc-output-parser > null_errors_main.json
+          name: null_errors_main
 
       - name: Set comment body
         id: set-comment-body
