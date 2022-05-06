@@ -173,7 +173,7 @@ export const parsePackageJson = (
 export const parseJson = (jsonStr: string, filePath?: string) => {
   const rtn = {
     diagnostic: null as d.Diagnostic,
-    data: null as d.Diagnostic,
+    data: null as any,
     filePath,
   };
 
