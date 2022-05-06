@@ -10,7 +10,7 @@ on:
 
 jobs:
   strict_null_check_main:
-    name: Get strictNullChecks errors on main
+    name: Get errors on main
     runs-on: 'ubuntu-latest'
     steps:
       - name: Checkout main branch
@@ -37,7 +37,7 @@ jobs:
 
   strict_null_check_pr:
     needs: [ "strict_null_check_main" ]
-    name: Check on PR Branch and Report
+    name: Get errors on PR and report
     runs-on: 'ubuntu-latest'
     steps:
       - name: Checkout current branch

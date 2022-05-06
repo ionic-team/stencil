@@ -48,4 +48,6 @@ test/**/hydrate/*
 /dependencies.json
 coverage/**
 
+# these are normally only generated on CI, but lets ignore them
+# just to be safe
 null_errors*.json
