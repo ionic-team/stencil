@@ -1,7 +1,9 @@
+/**
+ * A script for formatting a Markdown report for CI on the number of strictNullChecks errors we're
+ * seeing on the current branch vs on main. The report also includes some info about the most 
+ * error-filled files, as well as the errors we see most often.
+ */
 const fs = require("fs")
-
-const args = process.argv.slice(2);
-
 
 /**
  * Load JSON data, formatted by `tsc-output-parser`
@@ -132,7 +134,11 @@ lines.push(collapsible("Our most error-prone files", out => {
 lines.push("")
 
 lines.push(collapsible("Our most common errors", out => {
-  out.push(tableHeader("Error code", "Count", "Error messages"))
+  out.push(tableHeader(
+    "[Typescript Error Code](https://github.com/microsoft/TypeScript/blob/main/src/compiler/diagnosticMessages.json)",
+    "Count",
+    "Error messages"
+  ))
 
   sortEntries(errorCodeCounts).forEach(([tsErrorCode, errorCount]) => {
     let messages = errorCodeMessages[tsErrorCode]
