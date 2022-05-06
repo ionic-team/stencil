@@ -44,7 +44,9 @@ export const generateVscodeDocs = async (
             kind: 'markdown',
             value: cmp.docs,
           },
-          attributes: cmp.props.filter((p: d.JsonDocsProp) => p.attr).map(serializeAttribute),
+          attributes: cmp.props
+            .filter((p: d.JsonDocsProp): p is DocPropWithAttribute => p.attr !== undefined && p.attr.length > 0)
+            .map(serializeAttribute),
           references: getReferences(cmp, outputTarget.sourceCodeBaseUrl),
         })),
       };
@@ -72,14 +74,14 @@ type TagReference = {
  * @param repoBaseUrl an optional URL, that when provided, will add a reference to the source code for the component
  * @returns the generated references section, or undefined if no references could be generated
  */
-const getReferences = (cmp: d.JsonDocsComponent, repoBaseUrl: string): TagReference[] => {
+const getReferences = (cmp: d.JsonDocsComponent, repoBaseUrl: string | undefined): TagReference[] | undefined => {
   // collect any `@reference` JSDoc tags on the component
   const references = getNameText('reference', cmp.docsTags).map(([name, url]) => ({ name, url }));
 
   if (repoBaseUrl) {
     references.push({
       name: 'Source code',
-      url: join(repoBaseUrl, cmp.filePath),
+      url: join(repoBaseUrl, cmp.filePath ?? ''),
     });
   }
   if (references.length > 0) {
@@ -100,11 +102,25 @@ type AttributeData = {
 };
 
 /**
+ * Utility that provides a type-safe way of making a key K on a type T required.
+ *
+ * This is preferable than using an intersection of `T & {K: someType}` as it ensures that:
+ * - the type of K will always match the type T[K]
+ * - it should error should K not exist in `keyof T`
+ */
+type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] };
+
+/**
+ * A `@Prop` documentation type with a required 'attr' field
+ */
+type DocPropWithAttribute = WithRequired<d.JsonDocsProp, 'attr'>;
+
+/**
  * Serialize a component's class member decorated with `@Prop` to be written to disk
  * @param prop the intermediate representation of the documentation to serialize
  * @returns the serialized data
  */
-const serializeAttribute = (prop: d.JsonDocsProp): AttributeData => {
+const serializeAttribute = (prop: DocPropWithAttribute): AttributeData => {
   const attribute: AttributeData = {
     name: prop.attr,
     description: prop.docs,
