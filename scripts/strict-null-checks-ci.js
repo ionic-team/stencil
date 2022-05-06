@@ -1,9 +1,20 @@
 const fs = require("fs")
 
+const args = process.argv.slice(2);
+
+
 /**
  * Load JSON data, formatted by `tsc-output-parser`
+ * 
+ * In the GH Actions workflow we write two json files, one for the PR
+ * branch and one for main (so that we can compare them).
+ *
  */
-const data = JSON.parse(String(fs.readFileSync("./errors.json")))
+const prData = JSON.parse(String(fs.readFileSync('./null_errors_pr.json')))
+const mainData =JSON.parse(String(fs.readFileSync('./null_errors_main.json')))
+
+const errorsOnMain = mainData.length
+const errorsOnPR = prData.length
 
 /**
  * Build up an object which maps error codes (like `TS2339`) to
@@ -12,7 +23,7 @@ const data = JSON.parse(String(fs.readFileSync("./errors.json")))
 const getErrorCodeMessages = () => {
   let errorCodeMessageMap = {}
 
-  data.forEach((error) => {
+  prData.forEach((error) => {
     let errorCode = error.value.tsError.value.errorString
     let message = error.value.message.value
     errorCodeMessageMap[errorCode] = (errorCodeMessageMap[errorCode] ?? new Set).add(message)
@@ -36,11 +47,11 @@ const countArrayEntries = xs => {
   return counts
 }
 
-const fileErrorCounts = countArrayEntries(data.map(error =>
+const fileErrorCounts = countArrayEntries(prData.map(error =>
   error.value.path.value
 ))
 
-const errorCodeCounts = countArrayEntries(data.map(error =>
+const errorCodeCounts = countArrayEntries(prData.map(error =>
   error.value.tsError.value.errorString
 ))
 
@@ -87,7 +98,20 @@ const lines = []
 
 lines.push("### `--strictNullChecks` error report");
 lines.push("");
-lines.push(`typechecking with \`--strictNullChecks\` resulted in ${data.length} errors`);
+
+lines.push(`typechecking with \`--strictNullChecks\` resulted in ${prData.length} errors on this branch`);
+lines.push("")
+
+// we can check the number of errors just to write a different message
+// out here
+if (errorsOnPR === errorsOnMain) {
+  lines.push("this is the same number of errors on main, so at least we're not creating new ones!")
+} else if (errorsOnPR < errorsOnMain) {
+  lines.push(`this is ${errorsOnMain - errorsOnPR} fewer than on \`main\`! 🎉🎉🎉`)
+} else {
+  lines.push(`unfortunately, it looks like that's an increase of ${errorsOnPR - errorsOnMain} over \`main\` 😞`
+}
+
 lines.push("");
 
 // first we add details on the most error-prone files

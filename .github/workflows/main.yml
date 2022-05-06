@@ -23,7 +23,7 @@ jobs:
     uses: ./.github/workflows/format.yml
 
   strict_null_checks:
-    name: "Strict Null Checks Burndown"
+    name: Strict Null Checks Burndown
     uses: ./.github/workflows/strict-null-checks.yml
 
   analysis_tests:

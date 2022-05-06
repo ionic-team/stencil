@@ -54,7 +54,7 @@
     "test.prod": "npm run test.dist && npm run test.end-to-end && npm run test.jest && npm run test.karma && npm run test.sys.node && npm run test.testing && npm run test.analysis",
     "test.watch": "jest --watch",
     "test.watch-all": "jest --watchAll --coverage",
-    "tsc.strictNullChecksReport": "tsc --noEmit --strictNullChecks --pretty false | tsc-output-parser > errors.json"
+    "tsc.strictNullChecksReport": "tsc --noEmit --strictNullChecks --pretty false | tsc-output-parser"
   },
   "devDependencies": {
     "@aivenio/tsc-output-parser": "^2.1.1",

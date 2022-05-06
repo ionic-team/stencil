@@ -15,14 +15,22 @@ jobs:
     steps:
       # first we need to checkout the main branch, run typescript
       # there, save the result
-      - name: Checkout main
+      - name: Checkout current branch
         uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # v2.4.0
 
       - name: Get Core Dependencies
         uses: ./.github/workflows/actions/get-core-dependencies
 
-      - name: Run Typescript compiler
-        run: npm run tsc.strictNullChecksReport
+      - name: Run Typescript compiler (PR branch)
+        run: npx tsc --strictNullChecks --noEmit --pretty false | tsc-output-parser > null_errors_pr.json
+
+      - name: Checkout main
+        uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # v2.4.0
+        with:
+          ref: my-branch
+
+      - name: Run Typescript compiler (main branch)
+        run: npx tsc --strictNullChecks --noEmit --pretty false | tsc-output-parser > null_errors_main.json
 
       - name: Set comment body
         id: set-comment-body
