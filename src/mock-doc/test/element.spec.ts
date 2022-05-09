@@ -239,7 +239,7 @@ describe('element', () => {
   });
 
   describe('contains', () => {
-    it("returns true when a node is an direct child of a given node", () => {
+    it('returns true when a node is an direct child of a given node', () => {
       const root = document.createElement('div');
       const span = document.createElement('span');
 
@@ -248,7 +248,7 @@ describe('element', () => {
       expect(root.contains(span)).toEqual(true);
     });
 
-    it("returns true when a node is an indirect child of a given node", () => {
+    it('returns true when a node is an indirect child of a given node', () => {
       const root = document.createElement('div');
       const span = document.createElement('span');
       const h1 = document.createElement('h1');
@@ -259,12 +259,12 @@ describe('element', () => {
       expect(root.contains(h1)).toEqual(true);
     });
 
-    it("returns true when a node is the given node itself", () => {
+    it('returns true when a node is the given node itself', () => {
       const root = document.createElement('div');
       expect(root.contains(root)).toEqual(true);
     });
 
-    it("returns false when a node is not the given node itself or not a descendant of the given node ", () => {
+    it('returns false when a node is not the given node itself or not a descendant of the given node ', () => {
       const root = document.createElement('div');
       const span = document.createElement('span');
       expect(root.contains(span)).toEqual(false);
