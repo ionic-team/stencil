@@ -1,3 +1,15 @@
+## 🎢 [2.15.2](https://github.com/ionic-team/stencil/compare/v2.15.1...v2.15.2) (2022-05-09)
+
+
+### Bug Fixes
+
+* **cli:** don't generate files if they would overwrite existing code ([#3326](https://github.com/ionic-team/stencil/issues/3326)) ([9fc3a44](https://github.com/ionic-team/stencil/commit/9fc3a44a17f9b97e19ea62b6188d3611bcf2f9d4))
+* **sys:** make NodeLazyRequire complain if package versions aren't right ([#3346](https://github.com/ionic-team/stencil/issues/3346)) ([b7adc33](https://github.com/ionic-team/stencil/commit/b7adc33fc25956e9562b56edb3ce8a1b671eb53d))
+* **sys:** tweak NodeLazyRequire logic around too-high-versions errors ([#3347](https://github.com/ionic-team/stencil/issues/3347)) ([9bfef1a](https://github.com/ionic-team/stencil/commit/9bfef1ad4637fe82c349eadbd9153e04417b1337))
+* **types:** components.d.ts type resolution for duplicate types ([#3337](https://github.com/ionic-team/stencil/issues/3337)) ([31eae6e](https://github.com/ionic-team/stencil/commit/31eae6eb027904163cc52f73eb6811dc98006559))
+
+
+
 ## 🐼 [2.15.1](https://github.com/ionic-team/stencil/compare/v2.15.0...v2.15.1) (2022-04-18)
 
 
