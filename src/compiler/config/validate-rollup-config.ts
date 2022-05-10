@@ -6,7 +6,7 @@ export const validateRollupConfig = (config: d.UnvalidatedConfig): void => {
   config.rollupConfig = cleanRollupConfig;
 };
 
-const getCleanRollupConfig = (rollupConfig: d.Config['rollupConfig']): d.RollupConfig => {
+const getCleanRollupConfig = (rollupConfig: d.RollupConfig): d.RollupConfig => {
   let cleanRollupConfig = DEFAULT_ROLLUP_CONFIG;
 
   if (!rollupConfig || !isObject(rollupConfig)) {
