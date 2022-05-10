@@ -238,6 +238,39 @@ describe('element', () => {
     });
   });
 
+  describe('contains', () => {
+    it('returns true when a node is an direct child of a given node', () => {
+      const root = document.createElement('div');
+      const span = document.createElement('span');
+
+      root.appendChild(span);
+
+      expect(root.contains(span)).toEqual(true);
+    });
+
+    it('returns true when a node is an indirect child of a given node', () => {
+      const root = document.createElement('div');
+      const span = document.createElement('span');
+      const h1 = document.createElement('h1');
+
+      root.appendChild(span);
+      span.appendChild(h1);
+
+      expect(root.contains(h1)).toEqual(true);
+    });
+
+    it('returns true when a node is the given node itself', () => {
+      const root = document.createElement('div');
+      expect(root.contains(root)).toEqual(true);
+    });
+
+    it('returns false when a node is not the given node itself or not a descendant of the given node ', () => {
+      const root = document.createElement('div');
+      const span = document.createElement('span');
+      expect(root.contains(span)).toEqual(false);
+    });
+  });
+
   describe('isConnected', () => {
     it('nested true', () => {
       const elmParent = document.createElement('div');
