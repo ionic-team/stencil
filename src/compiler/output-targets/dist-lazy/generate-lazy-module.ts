@@ -30,39 +30,42 @@ export const generateLazyModules = async (
   const entryComponentsResults = rollupResults.filter((rollupResult) => rollupResult.isComponent);
   const chunkResults = rollupResults.filter((rollupResult) => !rollupResult.isComponent && !rollupResult.isEntry);
 
-  const [bundleModules] = await Promise.all([
-    Promise.all(
-      entryComponentsResults.map((rollupResult) => {
-        return generateLazyEntryModule(
-          config,
-          compilerCtx,
-          buildCtx,
-          rollupResult,
-          outputTargetType,
-          destinations,
-          sourceTarget,
-          shouldMinify,
-          isBrowserBuild,
-          sufix
-        );
-      })
-    ),
-    Promise.all(
-      chunkResults.map((rollupResult) => {
-        return writeLazyChunk(
-          config,
-          compilerCtx,
-          buildCtx,
-          rollupResult,
-          outputTargetType,
-          destinations,
-          sourceTarget,
-          shouldMinify,
-          isBrowserBuild
-        );
-      })
-    ),
-  ]);
+  const bundleModules = await Promise.all(
+    entryComponentsResults.map((rollupResult) => {
+      return generateLazyEntryModule(
+        config,
+        compilerCtx,
+        buildCtx,
+        rollupResult,
+        outputTargetType,
+        destinations,
+        sourceTarget,
+        shouldMinify,
+        isBrowserBuild,
+        sufix
+      );
+    })
+  );
+
+  if (!!config.extras?.experimentalImportInjection && !isBrowserBuild) {
+    addStaticImports(rollupResults, bundleModules);
+  }
+
+  await Promise.all(
+    chunkResults.map((rollupResult) => {
+      return writeLazyChunk(
+        config,
+        compilerCtx,
+        buildCtx,
+        rollupResult,
+        outputTargetType,
+        destinations,
+        sourceTarget,
+        shouldMinify,
+        isBrowserBuild
+      );
+    })
+  );
 
   const lazyRuntimeData = formatLazyBundlesRuntimeMeta(bundleModules);
   const entryResults = rollupResults.filter((rollupResult) => !rollupResult.isComponent && rollupResult.isEntry);
@@ -96,6 +99,84 @@ export const generateLazyModules = async (
   );
 
   return bundleModules;
+};
+
+/**
+ * Add imports for each bundle to Stencil's lazy loader. Some bundlers that are built atop of Rollup strictly impose
+ * the limitations that are laid out in https://github.com/rollup/plugins/tree/master/packages/dynamic-import-vars#limitations.
+ * This function injects an explicit import statement for each bundle that can be lazily loaded.
+ * @param rollupChunkResults the results of running Rollup across a Stencil project
+ * @param bundleModules lazy-loadable modules that can be resolved at runtime
+ */
+const addStaticImports = (rollupChunkResults: d.RollupChunkResult[], bundleModules: d.BundleModule[]): void => {
+  rollupChunkResults.filter(isStencilCoreResult).forEach((index: d.RollupChunkResult) => {
+    const generateCjs = isCjsFormat(index) ? generateCaseClauseCjs : generateCaseClause;
+    index.code = index.code.replace(
+      '/*!__STENCIL_STATIC_IMPORT_SWITCH__*/',
+      `
+        if (!hmrVersionId || !BUILD.hotModuleReplacement) {
+          const processMod = importedModule => {
+              cmpModules.set(bundleId, importedModule);
+              return importedModule[exportName];
+          }
+          switch(bundleId) {
+              ${bundleModules.map((mod) => generateCjs(mod.output.bundleId)).join('')}
+          }
+      }`
+    );
+  });
+};
+
+/**
+ * Determine if a Rollup output chunk contains Stencil runtime code
+ * @param rollupChunkResult the rollup chunk output to test
+ * @returns true if the output chunk contains Stencil runtime code, false otherwise
+ */
+const isStencilCoreResult = (rollupChunkResult: d.RollupChunkResult): boolean => {
+  return (
+    rollupChunkResult.isCore &&
+    rollupChunkResult.entryKey === 'index' &&
+    (rollupChunkResult.moduleFormat === 'es' ||
+      rollupChunkResult.moduleFormat === 'esm' ||
+      isCjsFormat(rollupChunkResult))
+  );
+};
+
+/**
+ * Helper function to determine if a Rollup chunk has a commonjs module format
+ * @param rollupChunkResult the Rollup result to test
+ * @returns true if the Rollup chunk has a commonjs module format, false otherwise
+ */
+const isCjsFormat = (rollupChunkResult: d.RollupChunkResult): boolean => {
+  return rollupChunkResult.moduleFormat === 'cjs' || rollupChunkResult.moduleFormat === 'commonjs';
+};
+
+/**
+ * Generate a 'case' clause to be used within a `switch` statement. The case clause generated will key-off the provided
+ * bundle ID for a component, and load a file (tied to that ID) at runtime.
+ * @param bundleId the name of the bundle to load
+ * @returns the case clause that will load the component's file at runtime
+ */
+const generateCaseClause = (bundleId: string): string => {
+  return `
+                case '${bundleId}':
+                    return import(
+                      /* webpackMode: "lazy" */
+                      './${bundleId}.entry.js').then(processMod, consoleError);`;
+};
+
+/**
+ * Generate a 'case' clause to be used within a `switch` statement. The case clause generated will key-off the provided
+ * bundle ID for a component, and load a CommonJS file (tied to that ID) at runtime.
+ * @param bundleId the name of the bundle to load
+ * @returns the case clause that will load the component's file at runtime
+ */
+const generateCaseClauseCjs = (bundleId: string): string => {
+  return `
+                case '${bundleId}':
+                    return Promise.resolve().then(function () { return /*#__PURE__*/_interopNamespace(require(
+                        /* webpackMode: "lazy" */
+                        './${bundleId}.entry.js')); }).then(processMod, consoleError);`;
 };
 
 const generateLazyEntryModule = async (
