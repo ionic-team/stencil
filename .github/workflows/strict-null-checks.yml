@@ -55,7 +55,7 @@ jobs:
           name: null_errors_main
 
       - name: Set action output
-        run: $GITHUB_STEP_SUMMARY=$(node scripts/strict-null-checks-ci.js)
+        run: GITHUB_STEP_SUMMARY=$(node scripts/strict-null-checks-ci.js)
 
       - name: Set comment body
         id: set-comment-body
