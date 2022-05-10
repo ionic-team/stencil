@@ -30,24 +30,22 @@ export const generateLazyModules = async (
   const entryComponentsResults = rollupResults.filter((rollupResult) => rollupResult.isComponent);
   const chunkResults = rollupResults.filter((rollupResult) => !rollupResult.isComponent && !rollupResult.isEntry);
 
-  const [bundleModules] = await Promise.all([
-    Promise.all(
-      entryComponentsResults.map((rollupResult) => {
-        return generateLazyEntryModule(
-          config,
-          compilerCtx,
-          buildCtx,
-          rollupResult,
-          outputTargetType,
-          destinations,
-          sourceTarget,
-          shouldMinify,
-          isBrowserBuild,
-          sufix
-        );
-      })
-    ),
-  ]);
+  const bundleModules = await Promise.all(
+    entryComponentsResults.map((rollupResult) => {
+      return generateLazyEntryModule(
+        config,
+        compilerCtx,
+        buildCtx,
+        rollupResult,
+        outputTargetType,
+        destinations,
+        sourceTarget,
+        shouldMinify,
+        isBrowserBuild,
+        sufix
+      );
+    })
+  );
 
   if (!!config.extras?.experimentalImportInjection && !isBrowserBuild) {
     addStaticImports(rollupResults, bundleModules);
