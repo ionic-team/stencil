@@ -141,7 +141,12 @@ export class MockNode {
     if (otherNode === this) {
       return true;
     }
-    return this.childNodes.includes(otherNode);
+    const childNodes = Array.from(this.childNodes);
+    if (childNodes.includes(otherNode)) {
+      return true;
+    }
+
+    return childNodes.some((node) => this.contains.bind(node)(otherNode));
   }
 
   removeChild(childNode: MockNode) {

@@ -12,10 +12,12 @@ export const stubComponentCompilerMeta = (
 ): d.ComponentCompilerMeta => {
   // TODO(STENCIL-378): Continue to build out default stub, remove the type assertion on `default`
   const defaults: d.ComponentCompilerMeta = {
+    isCollectionDependency: false,
     events: [],
     methods: [],
     properties: [],
     sourceFilePath: '/some/stubbed/path/my-component.tsx',
+    tagName: 'stub-cmp',
     virtualProperties: [],
   } as d.ComponentCompilerMeta;
 
