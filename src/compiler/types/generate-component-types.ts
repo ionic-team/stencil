@@ -22,7 +22,7 @@ export const generateComponentTypes = (
 
   const propAttributes = generatePropTypes(cmp, typeImportData);
   const methodAttributes = generateMethodTypes(cmp, typeImportData);
-  const eventAttributes = generateEventTypes(cmp, typeImportData);
+  const eventAttributes = generateEventTypes(cmp, typeImportData, tagNameAsPascal);
 
   const componentAttributes = attributesToMultiLineString(
     [...propAttributes, ...methodAttributes],

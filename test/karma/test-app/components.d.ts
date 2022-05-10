@@ -6,6 +6,7 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { SomeTypes } from "./util";
+import { TestEventDetail } from "./event-custom-type/cmp";
 export namespace Components {
     interface AppendChild {
     }
@@ -108,6 +109,10 @@ export namespace Components {
     interface EsmImport {
         "propVal": number;
         "someMethod": () => Promise<void>;
+    }
+    interface EventBasic {
+    }
+    interface EventCustomType {
     }
     interface ExternalImportA {
     }
@@ -327,6 +332,34 @@ export namespace Components {
     }
     interface Tag88 {
     }
+}
+export interface EsmImportCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLEsmImportElement;
+}
+export interface EventBasicCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLEventBasicElement;
+}
+export interface EventCustomTypeCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLEventCustomTypeElement;
+}
+export interface LifecycleAsyncBCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLLifecycleAsyncBElement;
+}
+export interface LifecycleAsyncCCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLLifecycleAsyncCElement;
+}
+export interface LifecycleBasicBCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLLifecycleBasicBElement;
+}
+export interface LifecycleBasicCCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLLifecycleBasicCElement;
 }
 declare global {
     interface HTMLAppendChildElement extends Components.AppendChild, HTMLStencilElement {
@@ -550,6 +583,18 @@ declare global {
     var HTMLEsmImportElement: {
         prototype: HTMLEsmImportElement;
         new (): HTMLEsmImportElement;
+    };
+    interface HTMLEventBasicElement extends Components.EventBasic, HTMLStencilElement {
+    }
+    var HTMLEventBasicElement: {
+        prototype: HTMLEventBasicElement;
+        new (): HTMLEventBasicElement;
+    };
+    interface HTMLEventCustomTypeElement extends Components.EventCustomType, HTMLStencilElement {
+    }
+    var HTMLEventCustomTypeElement: {
+        prototype: HTMLEventCustomTypeElement;
+        new (): HTMLEventCustomTypeElement;
     };
     interface HTMLExternalImportAElement extends Components.ExternalImportA, HTMLStencilElement {
     }
@@ -1141,6 +1186,8 @@ declare global {
         "dynamic-import": HTMLDynamicImportElement;
         "es5-addclass-svg": HTMLEs5AddclassSvgElement;
         "esm-import": HTMLEsmImportElement;
+        "event-basic": HTMLEventBasicElement;
+        "event-custom-type": HTMLEventCustomTypeElement;
         "external-import-a": HTMLExternalImportAElement;
         "external-import-b": HTMLExternalImportBElement;
         "external-import-c": HTMLExternalImportCElement;
@@ -1332,8 +1379,14 @@ declare namespace LocalJSX {
     interface Es5AddclassSvg {
     }
     interface EsmImport {
-        "onSomeEvent"?: (event: CustomEvent<any>) => void;
+        "onSomeEvent"?: (event: EsmImportCustomEvent<any>) => void;
         "propVal"?: number;
+    }
+    interface EventBasic {
+        "onTestEvent"?: (event: EventBasicCustomEvent<any>) => void;
+    }
+    interface EventCustomType {
+        "onTestEvent"?: (event: EventCustomTypeCustomEvent<TestEventDetail>) => void;
     }
     interface ExternalImportA {
     }
@@ -1362,25 +1415,25 @@ declare namespace LocalJSX {
     interface LifecycleAsyncA {
     }
     interface LifecycleAsyncB {
-        "onLifecycleLoad"?: (event: CustomEvent<any>) => void;
-        "onLifecycleUpdate"?: (event: CustomEvent<any>) => void;
+        "onLifecycleLoad"?: (event: LifecycleAsyncBCustomEvent<any>) => void;
+        "onLifecycleUpdate"?: (event: LifecycleAsyncBCustomEvent<any>) => void;
         "value"?: string;
     }
     interface LifecycleAsyncC {
-        "onLifecycleLoad"?: (event: CustomEvent<any>) => void;
-        "onLifecycleUpdate"?: (event: CustomEvent<any>) => void;
+        "onLifecycleLoad"?: (event: LifecycleAsyncCCustomEvent<any>) => void;
+        "onLifecycleUpdate"?: (event: LifecycleAsyncCCustomEvent<any>) => void;
         "value"?: string;
     }
     interface LifecycleBasicA {
     }
     interface LifecycleBasicB {
-        "onLifecycleLoad"?: (event: CustomEvent<any>) => void;
-        "onLifecycleUpdate"?: (event: CustomEvent<any>) => void;
+        "onLifecycleLoad"?: (event: LifecycleBasicBCustomEvent<any>) => void;
+        "onLifecycleUpdate"?: (event: LifecycleBasicBCustomEvent<any>) => void;
         "value"?: string;
     }
     interface LifecycleBasicC {
-        "onLifecycleLoad"?: (event: CustomEvent<any>) => void;
-        "onLifecycleUpdate"?: (event: CustomEvent<any>) => void;
+        "onLifecycleLoad"?: (event: LifecycleBasicCCustomEvent<any>) => void;
+        "onLifecycleUpdate"?: (event: LifecycleBasicCCustomEvent<any>) => void;
         "value"?: string;
     }
     interface LifecycleNestedA {
@@ -1599,6 +1652,8 @@ declare namespace LocalJSX {
         "dynamic-import": DynamicImport;
         "es5-addclass-svg": Es5AddclassSvg;
         "esm-import": EsmImport;
+        "event-basic": EventBasic;
+        "event-custom-type": EventCustomType;
         "external-import-a": ExternalImportA;
         "external-import-b": ExternalImportB;
         "external-import-c": ExternalImportC;
@@ -1734,6 +1789,8 @@ declare module "@stencil/core" {
             "dynamic-import": LocalJSX.DynamicImport & JSXBase.HTMLAttributes<HTMLDynamicImportElement>;
             "es5-addclass-svg": LocalJSX.Es5AddclassSvg & JSXBase.HTMLAttributes<HTMLEs5AddclassSvgElement>;
             "esm-import": LocalJSX.EsmImport & JSXBase.HTMLAttributes<HTMLEsmImportElement>;
+            "event-basic": LocalJSX.EventBasic & JSXBase.HTMLAttributes<HTMLEventBasicElement>;
+            "event-custom-type": LocalJSX.EventCustomType & JSXBase.HTMLAttributes<HTMLEventCustomTypeElement>;
             "external-import-a": LocalJSX.ExternalImportA & JSXBase.HTMLAttributes<HTMLExternalImportAElement>;
             "external-import-b": LocalJSX.ExternalImportB & JSXBase.HTMLAttributes<HTMLExternalImportBElement>;
             "external-import-c": LocalJSX.ExternalImportC & JSXBase.HTMLAttributes<HTMLExternalImportCElement>;
