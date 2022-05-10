@@ -71,7 +71,7 @@ noReproduction:
   dryRun: false
 
 stale:
-  days: 180
+  days: 30
   maxIssuesPerRun: 100
   exemptLabels:
     - "Bug: Validated"
