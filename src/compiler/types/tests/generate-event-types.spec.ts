@@ -24,10 +24,9 @@ describe('generate-event-types', () => {
       updateTypeIdentifierNamesSpy.mockImplementation(
         (
           _typeReferences: d.ComponentCompilerTypeReferences,
-          _cmpMeta: d.ComponentCompilerMeta,
           _typeImportData: d.TypesImportData,
-          initialType: string,
-          _updateTypeName: (currentTypeName: string, typeAlias: d.TypesMemberNameData) => string
+          _sourceFilePath: string,
+          initialType: string
         ) => initialType
       );
 
