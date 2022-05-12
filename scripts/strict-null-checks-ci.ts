@@ -3,7 +3,58 @@
  * seeing on the current branch vs on main. The report also includes some info about the most
  * error-filled files, as well as the errors we see most often.
  */
-const fs = require('fs');
+
+import fs from 'fs';
+
+/**
+ * This interface is copied (a bit) from here:
+ * https://github.com/aiven/tsc-output-parser/blob/master/src/parserTypes.ts
+ *
+ * and from manually inspecting the output of `tsc-output-parser`.
+ *
+ * Just so we have at least a little structure for TypeScript to grab on to
+ * for the files we're `JSON.parse`-ing!
+ */
+interface TSError {
+  type: 'Item',
+  value: {
+    path: {
+      type: 'Path',
+      /**
+       * The path where the error occured
+       */
+      value: string
+    },
+    cursor: {
+      type: 'Cursor',
+      value: {
+        line: number,
+        col: number
+      }
+    },
+    tsError: {
+      type: "TsError",
+      value: {
+        type: 'error',
+        /**
+         * These strings are TS error codes like `TS2339`
+         * see {@link https://github.com/microsoft/TypeScript/blob/main/src/compiler/diagnosticMessages.json}
+         */
+        errorString: string // t
+      }
+    },
+    message: {
+      type: 'Message',
+      /**
+       * this is the actual, concrete error message for a given error, so it includes
+       * concrete informationa about the actual type error encountered (for instance
+       * "string cannot be coerced to undefined" vs "number cannot be coerced to undefined")
+       */
+      value: string
+    }
+  }
+}
+
 
 /**
  * Load JSON data, formatted by `tsc-output-parser`
@@ -12,18 +63,18 @@ const fs = require('fs');
  * branch and one for main (so that we can compare them).
  *
  */
-const prData = JSON.parse(String(fs.readFileSync('./null_errors_pr.json')));
-const mainData = JSON.parse(String(fs.readFileSync('./null_errors_main.json')));
+const prData: TSError[] = JSON.parse(String(fs.readFileSync('./null_errors_pr.json')));
+const mainData: TSError[] = JSON.parse(String(fs.readFileSync('./null_errors_main.json')));
 
 const errorsOnMain = mainData.length;
 const errorsOnPR = prData.length;
 
 /**
  * Build up an object which maps error codes (like `TS2339`) to
- * a `Set` of all the messages we see for that code
+ * a `Set` of all the messages we see for that code.
  */
-const getErrorCodeMessages = () => {
-  let errorCodeMessageMap = {};
+const getErrorCodeMessages = (): Record<string, Set<string>> => {
+  const errorCodeMessageMap = {};
 
   prData.forEach((error) => {
     let errorCode = error.value.tsError.value.errorString;
@@ -34,13 +85,17 @@ const getErrorCodeMessages = () => {
   return errorCodeMessageMap;
 };
 
+/**
+ * Map of TS error codes to all of the unique, concrete error messages we see
+ * for that code.
+ */
 const errorCodeMessages = getErrorCodeMessages();
 
 /**
  * Build a map which just counts the entries in an array
  */
-const countArrayEntries = (xs) => {
-  let counts = new Map();
+const countArrayEntries = <T>(xs: Array<T>): Map<T, number> => {
+  let counts = new Map<T, number>();
 
   xs.forEach((x) => {
     counts.set(x, (counts.get(x) ?? 0) + 1);
@@ -59,7 +114,7 @@ const errorCodeCounts = countArrayEntries(prData.map((error) => error.value.tsEr
  * This makes it straightforward to create a collapsible section in GFM
  * Just pass in a callback which expects an array to push lines onto
  */
-const collapsible = (title, contentCb, lineBreak = '\n') => {
+const collapsible = (title: string, contentCb: (out: string[]) => void, lineBreak = '\n') => {
   let out = [`<details><summary>${title}</summary>`, ''];
   contentCb(out);
   out.push('');
@@ -70,20 +125,20 @@ const collapsible = (title, contentCb, lineBreak = '\n') => {
 /**
  * Format a basic table header for GFM
  */
-const tableHeader = (...colNames) => [tableRow(...colNames), tableRow(...colNames.map((_) => '---'))].join('\n');
+const tableHeader = (...colNames: string[]) => [tableRow(...colNames), tableRow(...colNames.map((_) => '---'))].join('\n');
 
 /**
  * Format a GFM table row
  *
  * this looks like `| cell | cell |`
  */
-const tableRow = (...entries) => '| ' + entries.join(' | ') + ' |';
+const tableRow = (...entries: string[]) => '| ' + entries.join(' | ') + ' |';
 
 /**
  * Helper function get a reverse-sort of the entries in our
  * 'count' maps (the return value of `countArrayEntries`)
  */
-const sortEntries = (countMap) =>
+const sortEntries = (countMap: Map<string, number>): [string, number][] =>
   [...countMap.entries()].sort((a, b) => {
     if (a[1] < b[1]) {
       return 1;
@@ -124,13 +179,13 @@ lines.push('');
 // files with the most errors and print a table showing the filepath and number
 // of errors
 lines.push(
-  collapsible('Our most error-prone files', (out) => {
+ collapsible('Our most error-prone files', (out: string[]) => {
     out.push(tableHeader('Path', 'Error Count'));
 
     sortEntries(fileErrorCounts)
       .slice(0, 20)
       .forEach(([path, errorCount]) => {
-        out.push(tableRow(path, errorCount));
+        out.push(tableRow(path, String(errorCount)));
       });
   })
 );
@@ -156,10 +211,10 @@ lines.push(
       out.push(
         tableRow(
           tsErrorCode,
-          errorCount,
+          String(errorCount),
           `<details><summary>Error messages</summary>${[...messages]
-            .map((msg) => msg.replaceAll('\n', '<br>'))
-            .map((msg) => msg.replaceAll('|', '\\|'))
+            .map((msg) => msg.replace(/\n/g, '<br>'))
+            .map((msg) => msg.replace('/\|/g', '\\|'))
             .join('<br>')}</details>`
         )
       );
