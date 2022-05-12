@@ -214,7 +214,7 @@ lines.push(
           String(errorCount),
           `<details><summary>Error messages</summary>${[...messages]
             .map((msg) => msg.replace(/\n/g, '<br>'))
-            .map((msg) => msg.replace('/\|/g', '\\|'))
+            .map((msg) => msg.replace(/\|/g, '\\|'))
             .join('<br>')}</details>`
         )
       );
