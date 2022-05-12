@@ -1,4 +1,8 @@
 /**
+ * TODO (STENCIL-446): Remove this script once `strictNullChecks` is enabled
+ */
+
+/**
  * A script for formatting a Markdown report for CI on the number of strictNullChecks errors we're
  * seeing on the current branch vs on main. The report also includes some info about the most
  * error-filled files, as well as the errors we see most often.

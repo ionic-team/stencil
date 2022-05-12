@@ -2,6 +2,7 @@ name: Strict Null Checks Burndown
 # this is a temporary workflow while we burn down the errors
 # from typescript's strictNullChecks option. Once we get to 0
 # we can turn that option on all the time and delete this job!
+# TODO (STENCIL-446): Remove this workflow
 
 on:
   pull_request:
