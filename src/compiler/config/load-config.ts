@@ -1,4 +1,10 @@
-import type { CompilerSystem, Config, Diagnostic, LoadConfigInit, LoadConfigResults } from '../../declarations';
+import type {
+  CompilerSystem,
+  Diagnostic,
+  LoadConfigInit,
+  LoadConfigResults,
+  UnvalidatedConfig,
+} from '../../declarations';
 import { buildError, catchError, hasError, isString, normalizePath } from '@utils';
 import { createLogger } from '../sys/logger/console-logger';
 import { createSystem } from '../sys/stencil-sys';
@@ -89,8 +95,12 @@ export const loadConfig = async (init: LoadConfigInit = {}) => {
   return results;
 };
 
-const loadConfigFile = async (sys: CompilerSystem, diagnostics: Diagnostic[], configPath: string) => {
-  let config: Config = null;
+const loadConfigFile = async (
+  sys: CompilerSystem,
+  diagnostics: Diagnostic[],
+  configPath: string
+): Promise<UnvalidatedConfig> => {
+  let config: UnvalidatedConfig = null;
 
   if (isString(configPath)) {
     // the passed in config was a string, so it's probably a path to the config we need to load
@@ -113,7 +123,7 @@ const loadConfigFile = async (sys: CompilerSystem, diagnostics: Diagnostic[], co
 };
 
 const evaluateConfigFile = async (sys: CompilerSystem, diagnostics: Diagnostic[], configFilePath: string) => {
-  let configFileData: { config?: Config } = null;
+  let configFileData: { config?: UnvalidatedConfig } = null;
 
   try {
     if (IS_NODE_ENV) {
