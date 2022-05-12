@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type * as d from '../../../declarations';
 import { NODE_TYPE } from '../../runtime-constants';
 import { updateElement } from '../update-element';

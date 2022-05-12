@@ -1,4 +1,4 @@
-import * as d from '@stencil/core/declarations';
+import * as d from '../../../declarations'
 import path from 'path';
 import { stubComponentCompilerMeta } from './ComponentCompilerMeta.stub';
 import { stubComponentCompilerTypeReference } from './ComponentCompilerTypeReference.stub';

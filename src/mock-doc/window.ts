@@ -1,7 +1,7 @@
 import { addGlobalsToWindowPrototype } from './global';
 import { createConsole } from './console';
 import { MockCustomElementRegistry } from './custom-element-registry';
-import { MockEvent, addEventListener, dispatchEvent, removeEventListener, resetEventListeners } from './event';
+import { MockEvent, addEventListener, dispatchEvent, removeEventListener, resetEventListeners, MockMouseEvent, MockCustomEvent, MockKeyboardEvent } from './event';
 import { MockDocument, resetDocument } from './document';
 import { MockDocumentFragment } from './document-fragment';
 import { MockElement, MockHTMLElement, MockNode, MockNodeList } from './node';
@@ -11,6 +11,7 @@ import { MockLocation } from './location';
 import { MockNavigator } from './navigator';
 import { MockPerformance, resetPerformance } from './performance';
 import { MockStorage } from './storage';
+import {MockHeaders} from '.';
 
 const nativeClearInterval = clearInterval;
 const nativeClearTimeout = clearTimeout;
@@ -59,6 +60,13 @@ export class MockWindow {
   screenY: number;
   scrollX: number;
   scrollY: number;
+
+  // event handlers
+  CustomEvent: typeof MockCustomEvent;
+  Event: typeof MockEvent;
+  Headers: typeof MockHeaders;
+  KeyboardEvent: typeof MockKeyboardEvent;
+  MouseEvent: typeof MockMouseEvent;
 
   constructor(html: string | boolean = null) {
     if (html !== false) {
@@ -301,13 +309,13 @@ export class MockWindow {
     this.__localStorage = locStorage;
   }
 
-  get location(): Location {
+  get location(): MockLocation {
     if (this.__location == null) {
       this.__location = new MockLocation();
     }
     return this.__location;
   }
-  set location(val: Location) {
+  set location(val: Location | string) {
     if (typeof val === 'string') {
       if (this.__location == null) {
         this.__location = new MockLocation();

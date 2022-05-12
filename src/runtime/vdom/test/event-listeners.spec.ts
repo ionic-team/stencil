@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type * as d from '../../../declarations';
 import { h, newVNode } from '../h';
 import { patch } from '../vdom-render';
