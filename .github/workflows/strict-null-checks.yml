@@ -55,13 +55,16 @@ jobs:
         with:
           name: null_errors_main
 
+      - name: Compile scripts
+        run: node scripts --prepare
+
       - name: Set action output
-        run: node scripts/strict-null-checks-ci.js > $GITHUB_STEP_SUMMARY
+        run: node scripts/build/strict-null-checks-ci.js > $GITHUB_STEP_SUMMARY
 
       - name: Set comment body
         id: set-comment-body
         run: |
-          body=$(node scripts/strict-null-checks-ci.js)
+          body=$(node scripts/build/strict-null-checks-ci.js)
           body="${body//'%'/'%25'}"
           body="${body//$'\n'/'%0A'}"
           body="${body//$'\r'/'%0D'}"
