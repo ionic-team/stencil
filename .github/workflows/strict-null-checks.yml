@@ -21,10 +21,8 @@ jobs:
       - name: Get Core Dependencies
         uses: ./.github/workflows/actions/get-core-dependencies
 
-      # this is only necessary while tsc-output-parser isn't a dependency in main
-      # once it is, we can introduce a PR to remove this step
       - name: Install tsc-output-parser
-        run: npm install @aivenio/tsc-output-parser
+        run: npm install @aivenio/tsc-output-parser@2.1.1
 
       - name: Run Typescript compiler and generate JSON-formatted error file (main branch)
         run: npx tsc --strictNullChecks --noEmit --pretty false | npx tsc-output-parser > null_errors_main.json
@@ -45,6 +43,9 @@ jobs:
 
       - name: Get Core Dependencies
         uses: ./.github/workflows/actions/get-core-dependencies
+
+      - name: Install tsc-output-parser
+        run: npm install @aivenio/tsc-output-parser@2.1.1
 
       - name: Run Typescript compiler and generate JSON-formatted error file (PR branch)
         run: npx tsc --strictNullChecks --noEmit --pretty false | npx tsc-output-parser > null_errors_pr.json
