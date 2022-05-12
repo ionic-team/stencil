@@ -74,7 +74,7 @@ jobs:
           echo ::set-output name=body::$body
 
       - name: Find Comment
-        uses: peter-evans/find-comment@v2
+        uses: peter-evans/find-comment@1769778a0c5bd330272d749d12c036d65e70d39d # v2.0.0
         id: fc
         with:
           issue-number: ${{ github.event.pull_request.number }}
@@ -82,7 +82,7 @@ jobs:
           body-includes: '### `--strictNullChecks` error report'
 
       - name: Create or update comment
-        uses: peter-evans/create-or-update-comment@v2
+        uses: peter-evans/create-or-update-comment@c9fcb64660bc90ec1cc535646af190c992007c32 # v2.0.0
         with:
           comment-id: ${{ steps.fc.outputs.comment-id }}
           issue-number: ${{ github.event.pull_request.number }}
