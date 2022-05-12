@@ -2,7 +2,8 @@ name: Strict Null Checks Burndown
 # this is a temporary workflow while we burn down the errors
 # from typescript's strictNullChecks option. Once we get to 0
 # we can turn that option on all the time and delete this job!
-# TODO (STENCIL-446): Remove this workflow
+#
+# TODO (STENCIL-446): Remove this workflow once `strictNullChecks` is enabled
 
 on:
   pull_request:
@@ -29,7 +30,7 @@ jobs:
         run: npx tsc --strictNullChecks --noEmit --pretty false | npx tsc-output-parser > null_errors_main.json
 
       - name: Upload null_errors_main.json
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@6673cd052c4cd6fcf4b4e6e60ea986c889389535 # v3.0.0
         with:
           name: null_errors_main
           path: 'null_errors_main.json'
@@ -52,7 +53,7 @@ jobs:
         run: npx tsc --strictNullChecks --noEmit --pretty false | npx tsc-output-parser > null_errors_pr.json
 
       - name: Download error file for main branch
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@fb598a63ae348fa914e94cd0ff38f362e927b741 # v3.0.0
         with:
           name: null_errors_main
 
@@ -62,6 +63,7 @@ jobs:
       - name: Set action output
         run: node scripts/build/strict-null-checks-ci.js > $GITHUB_STEP_SUMMARY
 
+       # for syntax information, see https://github.com/peter-evans/create-or-update-comment#setting-the-comment-body-from-a-file
       - name: Set comment body
         id: set-comment-body
         run: |

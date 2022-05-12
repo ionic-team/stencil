@@ -48,6 +48,5 @@ test/**/hydrate/*
 /dependencies.json
 coverage/**
 
-# these are normally only generated on CI, but lets ignore them
-# just to be safe
+# TODO (STENCIL-446): Remove these once `strictNullChecks` is enabled
 null_errors*.json
