@@ -1910,9 +1910,23 @@ export interface OutputTargetCustom extends OutputTargetBase {
   copy?: CopyTask[];
 }
 
+/**
+ * Output target for generating [custom data](https://github.com/microsoft/vscode-custom-data) for VS Code as a JSON
+ * file.
+ */
 export interface OutputTargetDocsVscode extends OutputTargetBase {
+  /**
+   * Designates this output target to be used for generating VS Code custom data.
+   * @see OutputTargetBase#type
+   */
   type: 'docs-vscode';
+  /**
+   * The location on disk to write the JSON file.
+   */
   file: string;
+  /**
+   * A base URL to find the source code of the component(s) described in the JSON file.
+   */
   sourceCodeBaseUrl?: string;
 }
 
@@ -1980,7 +1994,13 @@ export interface OutputTargetDistCustomElementsBundle extends OutputTargetBaseNe
   minify?: boolean;
 }
 
+/**
+ * The base type for output targets. All output targets should extend this base type.
+ */
 export interface OutputTargetBase {
+  /**
+   * A unique string to differentiate one output target from another
+   */
   type: string;
 }
 
