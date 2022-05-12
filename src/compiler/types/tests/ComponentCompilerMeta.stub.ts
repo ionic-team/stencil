@@ -11,7 +11,7 @@ export const stubComponentCompilerMeta = (
   overrides: Partial<d.ComponentCompilerMeta> = {}
 ): d.ComponentCompilerMeta => ({
   assetsDirs: [],
-  componentClassName: '',
+  componentClassName: 'StubCmp',
   dependencies: [],
   dependents: [],
   directDependencies: [],
