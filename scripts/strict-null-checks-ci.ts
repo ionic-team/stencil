@@ -20,45 +20,44 @@ import fs from 'fs';
  * for the files we're `JSON.parse`-ing!
  */
 interface TSError {
-  type: 'Item',
+  type: 'Item';
   value: {
     path: {
-      type: 'Path',
+      type: 'Path';
       /**
        * The path where the error occured
        */
-      value: string
-    },
+      value: string;
+    };
     cursor: {
-      type: 'Cursor',
+      type: 'Cursor';
       value: {
-        line: number,
-        col: number
-      }
-    },
+        line: number;
+        col: number;
+      };
+    };
     tsError: {
-      type: "TsError",
+      type: 'TsError';
       value: {
-        type: 'error',
+        type: 'error';
         /**
          * These strings are TS error codes like `TS2339`
          * see {@link https://github.com/microsoft/TypeScript/blob/main/src/compiler/diagnosticMessages.json}
          */
-        errorString: string // t
-      }
-    },
+        errorString: string; // t
+      };
+    };
     message: {
-      type: 'Message',
+      type: 'Message';
       /**
        * this is the actual, concrete error message for a given error, so it includes
        * concrete informationa about the actual type error encountered (for instance
        * "string cannot be coerced to undefined" vs "number cannot be coerced to undefined")
        */
-      value: string
-    }
-  }
+      value: string;
+    };
+  };
 }
-
 
 /**
  * Load JSON data, formatted by `tsc-output-parser`
@@ -141,7 +140,8 @@ const collapsible = (title: string, contentCb: (out: string[]) => void, lineBrea
  * @param colNames column names to be formatted into the table
  * @returns a formatted table header
  */
-const tableHeader = (...colNames: string[]) => [tableRow(...colNames), tableRow(...colNames.map((_) => '---'))].join('\n');
+const tableHeader = (...colNames: string[]) =>
+  [tableRow(...colNames), tableRow(...colNames.map((_) => '---'))].join('\n');
 
 /**
  * Format a GFM table row
@@ -201,7 +201,7 @@ lines.push('');
 // files with the most errors and print a table showing the filepath and number
 // of errors
 lines.push(
- collapsible('Our most error-prone files', (out: string[]) => {
+  collapsible('Our most error-prone files', (out: string[]) => {
     out.push(tableHeader('Path', 'Error Count'));
 
     sortEntries(fileErrorCounts)
