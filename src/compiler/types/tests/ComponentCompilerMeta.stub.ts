@@ -82,7 +82,7 @@ export const stubComponentCompilerMeta = (
   properties: [],
   shadowDelegatesFocus: false,
   sourceFilePath: '/some/stubbed/path/my-component.tsx',
-  sourceMapPath: '/some/stubbed/path/my-other-component.map.js',
+  sourceMapPath: '/some/stubbed/path/my-other-component.map',
   states: [],
   styleDocs: [],
   styles: [],
