@@ -73,7 +73,7 @@ export const stubComponentCompilerMeta = (
   isCollectionDependency: false,
   isPlain: false,
   isUpdateable: false,
-  jsFilePath: '/some/stubbed/path/my-other-component.js',
+  jsFilePath: '/some/stubbed/path/my-component.js',
   legacyConnect: [],
   legacyContext: [],
   listeners: [],
