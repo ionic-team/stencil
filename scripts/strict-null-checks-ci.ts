@@ -1,5 +1,5 @@
 /**
- * TODO (STENCIL-446): Remove this script once `strictNullChecks` is enabled
+ * TODO(STENCIL-446): Remove this script once `strictNullChecks` is enabled
  */
 
 /**

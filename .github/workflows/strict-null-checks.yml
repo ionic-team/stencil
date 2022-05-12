@@ -3,7 +3,7 @@ name: Strict Null Checks Burndown
 # from typescript's strictNullChecks option. Once we get to 0
 # we can turn that option on all the time and delete this job!
 #
-# TODO (STENCIL-446): Remove this workflow once `strictNullChecks` is enabled
+# TODO(STENCIL-446): Remove this workflow once `strictNullChecks` is enabled
 
 on:
   pull_request:

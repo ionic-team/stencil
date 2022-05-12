@@ -48,5 +48,5 @@ test/**/hydrate/*
 /dependencies.json
 coverage/**
 
-# TODO (STENCIL-446): Remove these once `strictNullChecks` is enabled
+# TODO(STENCIL-446): Remove these once `strictNullChecks` is enabled
 null_errors*.json
