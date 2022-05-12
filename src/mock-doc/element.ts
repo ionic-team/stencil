@@ -3,14 +3,15 @@ import { createCustomElement } from './custom-element-registry';
 import { MockCSSStyleSheet, getStyleElementText, setStyleElementText } from './css-style-sheet';
 import { MockDocumentFragment } from './document-fragment';
 import { MockElement, MockHTMLElement } from './node';
+import {createDocument, MockDocument} from '.';
 
-export function createElement(ownerDocument: any, tagName: string) {
+export function createElement(ownerDocument: any, tagName: any): any {
   if (typeof tagName !== 'string' || tagName === '' || !/^[a-z0-9-_:]+$/i.test(tagName)) {
     throw new Error(`The tag name provided (${tagName}) is not a valid name.`);
   }
-  tagName = tagName.toLowerCase();
+  let tagNametoUse = tagName.toLowerCase();
 
-  switch (tagName) {
+  switch (tagNametoUse) {
     case 'a':
       return new MockAnchorElement(ownerDocument);
 
@@ -51,14 +52,14 @@ export function createElement(ownerDocument: any, tagName: string) {
       return new MockTitleElement(ownerDocument);
   }
 
-  if (ownerDocument != null && tagName.includes('-')) {
+  if (ownerDocument != null && tagNametoUse.includes('-')) {
     const win = ownerDocument.defaultView;
     if (win != null && win.customElements != null) {
-      return createCustomElement(win.customElements, ownerDocument, tagName);
+      return createCustomElement(win.customElements, ownerDocument, tagNametoUse);
     }
   }
 
-  return new MockHTMLElement(ownerDocument, tagName);
+  return new MockHTMLElement(ownerDocument, tagNametoUse);
 }
 
 export function createElementNS(ownerDocument: any, namespaceURI: string, tagName: string) {
@@ -209,6 +210,8 @@ patchPropAttributes(MockLinkElement.prototype, {
 });
 
 export class MockMetaElement extends MockHTMLElement {
+  content: string
+
   constructor(ownerDocument: any) {
     super(ownerDocument, 'meta');
   }

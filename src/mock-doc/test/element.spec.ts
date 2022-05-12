@@ -1,7 +1,7 @@
 import { MockDocument } from '../document';
 import { MockWindow, cloneWindow } from '../window';
 import { MockElement, MockHTMLElement } from '../node';
-import { MockSVGElement } from '../element';
+import { MockAnchorElement, MockMetaElement, MockSVGElement } from '../element';
 
 describe('element', () => {
   let doc: MockDocument;
@@ -164,10 +164,11 @@ describe('element', () => {
     doc.head.appendChild(metaElm);
     expect(metaElm).toEqualHtml(`<meta content="value" id="test">`);
 
-    const elm = doc.getElementById('test');
+    const elm = doc.getElementById('test') as MockMetaElement;
     expect(elm).toEqualHtml(`<meta content="value" id="test">`);
 
     elm['content'] = 'updated';
+    elm.setAttribute('content', 'updated')
     expect(elm).toEqualHtml(`<meta content="updated" id="test">`);
   });
 
