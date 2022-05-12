@@ -25,7 +25,7 @@ interface TSError {
     path: {
       type: 'Path';
       /**
-       * The path where the error occured
+       * The path where the error occurred
        */
       value: string;
     };
@@ -44,14 +44,14 @@ interface TSError {
          * These strings are TS error codes like `TS2339`
          * see {@link https://github.com/microsoft/TypeScript/blob/main/src/compiler/diagnosticMessages.json}
          */
-        errorString: string; // t
+        errorString: string;
       };
     };
     message: {
       type: 'Message';
       /**
        * this is the actual, concrete error message for a given error, so it includes
-       * concrete informationa about the actual type error encountered (for instance
+       * concrete information about the actual type error encountered (for instance
        * "string cannot be coerced to undefined" vs "number cannot be coerced to undefined")
        */
       value: string;
@@ -62,7 +62,7 @@ interface TSError {
 /**
  * Load JSON data, formatted by `tsc-output-parser`
  *
- * In the GH Actions workflow we write two json files, one for the PR
+ * In the GH Actions workflow we write two JSON files, one for the PR
  * branch and one for main (so that we can compare them).
  *
  */
@@ -123,7 +123,7 @@ const errorCodeCounts = countArrayEntries(prData.map((error) => error.value.tsEr
  *
  * @param title the title for this collapsible section
  * @param contentCb a callback which is used by the caller to define the section's contents
- * @param lineBreak an (optional) param for setting the linebreak
+ * @param lineBreak an (optional) param for setting the line break delimiter
  * @returns the collapsible section, ready for inclusion in a larger markdown context
  */
 const collapsible = (title: string, contentCb: (out: string[]) => void, lineBreak = '\n'): string => {
