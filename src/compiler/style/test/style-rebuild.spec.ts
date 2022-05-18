@@ -1,8 +1,8 @@
 import type * as d from '@stencil/core/declarations';
-import { createCompiler, } from '@stencil/core/compiler';
+import { createCompiler } from '@stencil/core/compiler';
 import { mockStencilSystem } from '@stencil/core/testing';
 import path from 'path';
-import {validateConfig} from '../../config/validate-config';
+import { validateConfig } from '../../config/validate-config';
 
 xdescribe('component-styles', () => {
   jest.setTimeout(20000);
@@ -32,7 +32,7 @@ xdescribe('component-styles', () => {
     `
     );
 
-    const { config, } = validateConfig({
+    const { config } = validateConfig({
       rootDir: '/',
       tsconfig: '/tsconfig.json',
     });
