@@ -50,3 +50,4 @@ coverage/**
 
 # TODO(STENCIL-446): Remove these once `strictNullChecks` is enabled
 null_errors*.json
+unused-exports*.txt
