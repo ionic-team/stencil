@@ -1,5 +1,5 @@
 import type * as d from '../../declarations';
-import { taskGenerate, getBoilerplateByExtension, GenerableExtension, BoilerplateFile } from '../task-generate';
+import { taskGenerate, getBoilerplateByExtension, BoilerplateFile } from '../task-generate';
 import { mockConfig, mockStencilSystem } from '@stencil/core/testing';
 import * as utils from '../../utils/validation';
 

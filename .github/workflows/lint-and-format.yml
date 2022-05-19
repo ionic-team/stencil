@@ -1,4 +1,4 @@
-name: Format Stencil (Check)
+name: Lint and Format Stencil (Check)
 
 on:
   workflow_call:
@@ -19,3 +19,6 @@ jobs:
       - name: Prettier Check
         run: npm run prettier.dry-run
         shell: bash
+
+      - name: ESLint
+        run: npm run lint

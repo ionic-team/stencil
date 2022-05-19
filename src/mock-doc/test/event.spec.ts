@@ -1,5 +1,5 @@
 import { MockWindow } from '../window';
-import { EventTarget, MockEvent } from '../event';
+import { MockEvent } from '../event';
 import { MockElement } from '../node';
 import { MockDocument } from '../document';
 
