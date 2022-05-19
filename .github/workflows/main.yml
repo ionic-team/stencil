@@ -18,9 +18,9 @@ jobs:
     name: Build
     uses: ./.github/workflows/build.yml
 
-  format:
-    name: Format
-    uses: ./.github/workflows/format.yml
+  lint_and_format:
+    name: Lint and Format
+    uses: ./.github/workflows/lint-and-format.yml
 
   analysis_tests:
     name: Analysis Tests
