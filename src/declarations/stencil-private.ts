@@ -2124,7 +2124,9 @@ export interface Url {
 
 declare global {
   namespace jest {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    /* eslint-disable-next-line @typescript-eslint/no-unused-vars --
+     * these type params need to be here for compatibility with Jest, but we aren't using them for anything
+     */
     interface Matchers<R, T> {
       /**
        * Compares HTML, but first normalizes the HTML so all
