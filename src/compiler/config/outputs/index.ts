@@ -1,6 +1,10 @@
 import type * as d from '../../../declarations';
 import { buildError, buildWarn } from '@utils';
-import { DIST_CUSTOM_ELEMENTS_BUNDLE, VALID_TYPES } from '../../output-targets/output-utils';
+import {
+  DIST_CUSTOM_ELEMENTS_BUNDLE,
+  isValidConfigOutputTarget,
+  VALID_CONFIG_OUTPUT_TARGETS,
+} from '../../output-targets/output-utils';
 import { validateCollection } from './validate-collection';
 import { validateCustomElement } from './validate-custom-element';
 import { validateCustomOutput } from './validate-custom-output';
@@ -17,11 +21,11 @@ export const validateOutputTargets = (config: d.UnvalidatedConfig, diagnostics: 
   const userOutputs = (config.outputTargets || []).slice();
 
   userOutputs.forEach((outputTarget) => {
-    if (!VALID_TYPES.includes(outputTarget.type)) {
+    if (!isValidConfigOutputTarget(outputTarget.type)) {
       const err = buildError(diagnostics);
       err.messageText = `Invalid outputTarget type "${
         outputTarget.type
-      }". Valid outputTarget types include: ${VALID_TYPES.map((t) => `"${t}"`).join(', ')}`;
+      }". Valid outputTarget types include: ${VALID_CONFIG_OUTPUT_TARGETS.map((t) => `"${t}"`).join(', ')}`;
     } else if (outputTarget.type === DIST_CUSTOM_ELEMENTS_BUNDLE) {
       // TODO(STENCIL-260): Remove this check when the 'dist-custom-elements-bundle' is removed
       const warning = buildWarn(diagnostics);
