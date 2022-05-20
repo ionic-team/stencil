@@ -1,6 +1,6 @@
 /**
  * A script for formatting a Markdown report for CI on some quantities we're tracking as we work
- * on tech debt on the current branch vs on main. The report includes some info about scritNullChecks errors,
+ * on tech debt on the current branch vs on main. The report includes some info about strictNullChecks errors,
  * as well as tracking unused (dead) code.
  */
 import fs from 'fs';
@@ -120,7 +120,7 @@ const errorCodeCounts = countArrayEntries(prData.map((error) => error.value.tsEr
 
 /**
  * ts-prune includes this string on lines in its output corresponding to items
- * which are exported and not imported anywhere but which which *are* used in their
+ * which are exported and not imported anywhere but which *are* used in their
  * home modules. We want to exclude these and get only the truly dead code.
  */
 const USED_IN_MODULE = '(used in module)';
@@ -131,13 +131,27 @@ const USED_IN_MODULE = '(used in module)';
 const unusedExportsMain = String(fs.readFileSync('./unused-exports-main.txt'));
 const unusedExportsPR = String(fs.readFileSync('./unused-exports-pr.txt'));
 
-function processUnusedExports(rawFileContents: string) {
+/**
+ * A little record of a location of putative dead code
+ */
+interface DeadCodeLoc {
+  fileName: string
+  lineNumber: string
+  identifier: string
+}
+
+/**
+ * Process and format the raw output from ts-prune into a more coherent format.
+ * @param rawFileContents the unprocessed contents of the file
+ * @returns an array of dead code location records.
+ */
+function processUnusedExports(rawFileContents: string): DeadCodeLoc[] {
   const deadCodeLines = rawFileContents
     .trim()
     .split('\n')
     .filter((line) => !line.includes(USED_IN_MODULE));
 
-  const deadCode = deadCodeLines.map((line) => {
+  return deadCodeLines.map((line) => {
     // lines which are _not_ used in their home module are formatted like this:
     // path/to/module.ts:33 - identifierName
     const [fileAndLineNumber, identifier] = line.split(' - ');
@@ -149,8 +163,6 @@ function processUnusedExports(rawFileContents: string) {
       identifier,
     };
   });
-
-  return deadCode;
 }
 
 const deadCodeMain = processUnusedExports(unusedExportsMain);
