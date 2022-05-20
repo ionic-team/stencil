@@ -1,14 +1,14 @@
 /**
- * TODO(STENCIL-446): Remove this script once `strictNullChecks` is enabled
+ * A script for formatting a Markdown report for CI on some quantities we're tracking as we work
+ * on tech debt on the current branch vs on main. The report includes some info about strictNullChecks errors,
+ * as well as tracking unused (dead) code.
  */
-
-/**
- * A script for formatting a Markdown report for CI on the number of strictNullChecks errors we're
- * seeing on the current branch vs on main. The report also includes some info about the most
- * error-filled files, as well as the errors we see most often.
- */
-
 import fs from 'fs';
+
+//// StrictNullChecks error checking ////
+/**
+ * TODO(STENCIL-446): Remove this section once `strictNullChecks` is enabled
+ */
 
 /**
  * This interface is copied (a bit) from here:
@@ -114,6 +114,59 @@ const countArrayEntries = <T>(arr: Array<T>): Map<T, number> => {
 const fileErrorCounts = countArrayEntries(prData.map((error) => error.value.path.value));
 
 const errorCodeCounts = countArrayEntries(prData.map((error) => error.value.tsError.value.errorString));
+
+//// unused exports check ////
+// TODO(STENCIL-454): Remove or change up this report once we've eliminated unused exports
+
+/**
+ * ts-prune includes this string on lines in its output corresponding to items
+ * which are exported and not imported anywhere but which *are* used in their
+ * home modules. We want to exclude these and get only the truly dead code.
+ */
+const USED_IN_MODULE = '(used in module)';
+
+/**
+ * Load in data from the unused exports reports
+ */
+const unusedExportsMain = String(fs.readFileSync('./unused-exports-main.txt'));
+const unusedExportsPR = String(fs.readFileSync('./unused-exports-pr.txt'));
+
+/**
+ * A little record of a location of putative dead code
+ */
+interface DeadCodeLoc {
+  fileName: string;
+  lineNumber: string;
+  identifier: string;
+}
+
+/**
+ * Process and format the raw output from ts-prune into a more coherent format.
+ * @param rawFileContents the unprocessed contents of the file
+ * @returns an array of dead code location records.
+ */
+function processUnusedExports(rawFileContents: string): DeadCodeLoc[] {
+  const deadCodeLines = rawFileContents
+    .trim()
+    .split('\n')
+    .filter((line) => !line.includes(USED_IN_MODULE));
+
+  return deadCodeLines.map((line) => {
+    // lines which are _not_ used in their home module are formatted like this:
+    // path/to/module.ts:33 - identifierName
+    const [fileAndLineNumber, identifier] = line.split(' - ');
+    const [fileName, lineNumber] = fileAndLineNumber.split(':');
+
+    return {
+      fileName,
+      lineNumber,
+      identifier,
+    };
+  });
+}
+
+const deadCodeMain = processUnusedExports(unusedExportsMain);
+const deadCodePR = processUnusedExports(unusedExportsPR);
 
 // Markdown formatting helpers
 
@@ -240,6 +293,41 @@ lines.push(
             .join('<br>')}</details>`
         )
       );
+    });
+  })
+);
+
+lines.push('');
+
+const deadCodeCountPR = deadCodePR.length;
+const deadCodeCountMain = deadCodeMain.length;
+
+lines.push('### Unused exports report');
+lines.push('');
+
+const deadCodeLine = [];
+deadCodeLine.push(`There are ${deadCodePR.length} unused exports on this PR. `);
+
+// we can check the number of errors just to write a different message out here
+// depending on the delta between this branch and main
+if (deadCodeCountPR === deadCodeCountMain) {
+  deadCodeLine.push("That's the same number of errors on main, so at least we're not creating new ones!");
+} else if (deadCodeCountPR < deadCodeCountMain) {
+  deadCodeLine.push(`That's ${deadCodeCountMain - deadCodeCountPR} fewer than on \`main\`! 🎉🎉🎉`);
+} else {
+  deadCodeLine.push(
+    `Unfortunately, it looks like that's an increase of ${deadCodeCountPR - deadCodeCountMain} over \`main\` 😞.`
+  );
+}
+lines.push(deadCodeLine.join(''));
+
+lines.push('');
+lines.push(
+  collapsible('Unused exports', (out) => {
+    out.push(tableHeader('File', 'Line', 'Identifier'));
+
+    deadCodePR.forEach((deadCode) => {
+      out.push(tableRow(deadCode.fileName, deadCode.lineNumber, deadCode.identifier));
     });
   })
 );
