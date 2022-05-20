@@ -1,6 +1,5 @@
 import type * as d from '../../declarations';
 import { getTsOptionsToExtend } from './ts-config';
-import { GENERATED_DTS } from '../output-targets/output-utils';
 import ts from 'typescript';
 
 export const createTsBuildProgram = async (
@@ -15,10 +14,7 @@ export const createTsBuildProgram = async (
   const tsWatchSys: ts.System = {
     ...ts.sys,
 
-    watchFile(path, callback) {
-      if (path.endsWith(`/${GENERATED_DTS}`)) {
-        return ts.sys.watchFile(path, callback);
-      }
+    watchFile(_path, _callback) {
       return {
         close() {},
       };
