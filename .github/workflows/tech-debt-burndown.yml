@@ -97,11 +97,13 @@ jobs:
         with:
           name: null_errors_pr
 
+      # TODO(STENCIL-454): Remove or change this up once we've eliminated unused exports
       - name: Download unused exports for main
         uses: actions/download-artifact@fb598a63ae348fa914e94cd0ff38f362e927b741 # v3.0.0
         with:
           name: unused-exports-main
 
+      # TODO(STENCIL-454): Remove or change this up once we've eliminated unused exports
       - name: Download unused exports for PR
         uses: actions/download-artifact@fb598a63ae348fa914e94cd0ff38f362e927b741 # v3.0.0
         with:
