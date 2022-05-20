@@ -135,9 +135,9 @@ const unusedExportsPR = String(fs.readFileSync('./unused-exports-pr.txt'));
  * A little record of a location of putative dead code
  */
 interface DeadCodeLoc {
-  fileName: string
-  lineNumber: string
-  identifier: string
+  fileName: string;
+  lineNumber: string;
+  identifier: string;
 }
 
 /**
