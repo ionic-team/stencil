@@ -5,7 +5,6 @@ name: Tech Debt Burndown
 # there are any errors) once we've eliminated all the problems, but until that
 # point we run them here, separate from the main build, and write a report on our
 # progress on them to each PR.
-#
 
 on:
   pull_request:
