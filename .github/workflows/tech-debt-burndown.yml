@@ -65,7 +65,7 @@ jobs:
       - name: Install ts-prune
         run: npm install ts-prune@0.10.3
 
-      - name: Run ESLint and write output to disk
+      - name: Run ts-prune and write output to disk
         run: npx ts-prune > unused-exports-${{ matrix.branch }}.txt
 
       - name: Upload unused exports
@@ -85,11 +85,13 @@ jobs:
       - name: Get Core Dependencies
         uses: ./.github/workflows/actions/get-core-dependencies
 
+      # TODO(STENCIL-446): Remove this workflow once `strictNullChecks` is enabled
       - name: Download null errors file for main branch
         uses: actions/download-artifact@fb598a63ae348fa914e94cd0ff38f362e927b741 # v3.0.0
         with:
           name: null_errors_main
 
+      # TODO(STENCIL-446): Remove this workflow once `strictNullChecks` is enabled
       - name: Download null errors file for PR
         uses: actions/download-artifact@fb598a63ae348fa914e94cd0ff38f362e927b741 # v3.0.0
         with:
