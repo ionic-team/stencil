@@ -80,11 +80,6 @@ export const isJsFile = (filePath: string) => {
   return false;
 };
 
-export const hasFileExtension = (filePath: string, extensions: string[]) => {
-  filePath = filePath.toLowerCase();
-  return extensions.some((ext) => filePath.endsWith('.' + ext));
-};
-
 /**
  * Generate the preamble to be placed atop the main file of the build
  * @param config the Stencil configuration file
