@@ -8,6 +8,7 @@ xdescribe('outputTarget, www / dist / docs', () => {
   jest.setTimeout(20000);
   let compiler: Compiler;
   let config: Config;
+  let hey = 21;
   const root = path.resolve('/');
 
   it('dist, www and readme files w/ custom paths', async () => {
