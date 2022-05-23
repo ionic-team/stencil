@@ -2,25 +2,20 @@ import { isHtmlFile } from '../dev-server-utils';
 
 describe('dev-server-utils', () => {
   describe('isHtmlFile', () => {
-    it('should return true for .html and .htm files', () => {
-      expect(isHtmlFile('.html')).toEqual(true);
-      expect(isHtmlFile('foo.html')).toEqual(true);
-      expect(isHtmlFile('foo/bar.html')).toEqual(true);
-      expect(isHtmlFile('.htm')).toEqual(true);
-      expect(isHtmlFile('foo.htm')).toEqual(true);
-      expect(isHtmlFile('foo/bar.html')).toEqual(true);
+    it.each(['.html', 'foo.html', 'foo/bar.html'])('returns true for .html files (%s)', (filename) => {
+      expect(isHtmlFile(filename)).toEqual(true);
     });
 
-    it('should return false for other types of files', () => {
-      expect(isHtmlFile('.ht')).toEqual(false);
-      expect(isHtmlFile('foo.htmx')).toEqual(false);
-      expect(isHtmlFile('foo/bar.xaml')).toEqual(false);
+    it.each(['.htm', 'foo.htm', 'foo/bar.htm'])('returns true for .htm files (%s)', (filename) => {
+      expect(isHtmlFile(filename)).toEqual(true);
     });
 
-    it('should be case insensitive', () => {
-      expect(isHtmlFile('.hTMl')).toEqual(true);
-      expect(isHtmlFile('foo.HTM')).toEqual(true);
-      expect(isHtmlFile('foo/bar.htmL')).toEqual(true);
+    it.each(['.ht', 'foo.htmx', 'foo/bar.xaml'])('returns false for other types of files (%s)', (filename) => {
+      expect(isHtmlFile(filename)).toEqual(false);
+    });
+
+    it.each(['.hTMl', 'foo.HTML', 'foo/bar.htmL'])('is case insensitive for filename (%s)', (filename) => {
+      expect(isHtmlFile(filename)).toEqual(true);
     });
   });
-})
+});
