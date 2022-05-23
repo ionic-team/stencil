@@ -17,7 +17,6 @@ export const enum MEMBER_FLAGS {
   HasAttribute = String | Number | Boolean | Any,
   PropLike = Prop | State,
 }
-let unused = 43;
 
 export const enum EVENT_FLAGS {
   Cancellable = 1 << 0,

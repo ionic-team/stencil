@@ -17,5 +17,3 @@ export const versions = {
   terser: terserVersion,
   typescript: typescriptVersion,
 };
-
-let unused = 43;

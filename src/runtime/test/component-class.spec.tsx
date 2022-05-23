@@ -10,7 +10,7 @@ describe('component class only', () => {
         return a + b;
       }
     }
-    let unused = 34;
+
     const instance = new CmpA();
     expect(instance.sumb(67, 21)).toEqual(88);
   });
