@@ -20,22 +20,16 @@ describe('dev-server-utils', () => {
   });
 
   describe('isCssFile', () => {
-    it('should return true for .css', () => {
-      expect(isCssFile('.css')).toEqual(true);
-      expect(isCssFile('foo.css')).toEqual(true);
-      expect(isCssFile('bar/foo.css')).toEqual(true);
+    it.each(['.css', 'foo.css', 'foo/bar.css'])('returns true for .css files (%s)', (filename) => {
+      expect(isCssFile(filename)).toEqual(true);
     });
 
-    it('should return false for other types of files', () => {
-      expect(isCssFile('.txt')).toEqual(false);
-      expect(isCssFile('foo.sass')).toEqual(false);
-      expect(isCssFile('bar/foo.htm')).toEqual(false);
+    it.each(['.txt', 'foo.sass', 'foo/bar.htm'])('returns false for other types of files (%s)', (filename) => {
+      expect(isCssFile(filename)).toEqual(false);
     });
 
-    it('should be case insensitive', () => {
-      expect(isCssFile('.cSs')).toEqual(true);
-      expect(isCssFile('foo.cSS')).toEqual(true);
-      expect(isCssFile('bar/foo.CSS')).toEqual(true);
+    it.each(['.cSs', 'foo.cSS', 'foo/bar.CSS'])('is case insensitive for filename (%s)', (filename) => {
+      expect(isCssFile(filename)).toEqual(true);
     });
   });
 });
