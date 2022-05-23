@@ -1,4 +1,4 @@
-import { isHtmlFile } from '../dev-server-utils';
+import { isCssFile, isHtmlFile } from '../dev-server-utils';
 
 describe('dev-server-utils', () => {
   describe('isHtmlFile', () => {
@@ -16,6 +16,26 @@ describe('dev-server-utils', () => {
 
     it.each(['.hTMl', 'foo.HTML', 'foo/bar.htmL'])('is case insensitive for filename (%s)', (filename) => {
       expect(isHtmlFile(filename)).toEqual(true);
+    });
+  });
+
+  describe('isCssFile', () => {
+    it('should return true for .css', () => {
+      expect(isCssFile('.css')).toEqual(true);
+      expect(isCssFile('foo.css')).toEqual(true);
+      expect(isCssFile('bar/foo.css')).toEqual(true);
+    });
+
+    it('should return false for other types of files', () => {
+      expect(isCssFile('.txt')).toEqual(false);
+      expect(isCssFile('foo.sass')).toEqual(false);
+      expect(isCssFile('bar/foo.htm')).toEqual(false);
+    });
+
+    it('should be case insensitive', () => {
+      expect(isCssFile('.cSs')).toEqual(true);
+      expect(isCssFile('foo.cSS')).toEqual(true);
+      expect(isCssFile('bar/foo.CSS')).toEqual(true);
     });
   });
 });
