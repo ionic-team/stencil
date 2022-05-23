@@ -189,29 +189,6 @@ describe('util', () => {
     });
   });
 
-  describe('isHtmlFile', () => {
-    it('should return true for .html and .htm files', () => {
-      expect(util.isHtmlFile('.html')).toEqual(true);
-      expect(util.isHtmlFile('foo.html')).toEqual(true);
-      expect(util.isHtmlFile('foo/bar.html')).toEqual(true);
-      expect(util.isHtmlFile('.htm')).toEqual(true);
-      expect(util.isHtmlFile('foo.htm')).toEqual(true);
-      expect(util.isHtmlFile('foo/bar.html')).toEqual(true);
-    });
-
-    it('should return false for other types of files', () => {
-      expect(util.isHtmlFile('.ht')).toEqual(false);
-      expect(util.isHtmlFile('foo.htmx')).toEqual(false);
-      expect(util.isHtmlFile('foo/bar.xaml')).toEqual(false);
-    });
-
-    it('should be case insensitive', () => {
-      expect(util.isHtmlFile('.hTMl')).toEqual(true);
-      expect(util.isHtmlFile('foo.HTM')).toEqual(true);
-      expect(util.isHtmlFile('foo/bar.htmL')).toEqual(true);
-    });
-  });
-
   it('createJsVarName', () => {
     expect(util.createJsVarName('./scoped-style-import.css?tag=my-button&encapsulation=scoped')).toBe(
       'scopedStyleImportCss'

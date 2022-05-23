@@ -89,10 +89,6 @@ export const isCssFile = (filePath: string) => {
   return hasFileExtension(filePath, ['css']);
 };
 
-export const isHtmlFile = (filePath: string) => {
-  return hasFileExtension(filePath, ['html', 'htm']);
-};
-
 /**
  * Generate the preamble to be placed atop the main file of the build
  * @param config the Stencil configuration file
