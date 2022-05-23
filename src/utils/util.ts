@@ -26,24 +26,6 @@ export const createJsVarName = (fileName: string) => {
 };
 
 /**
- * Test if a file is a typescript source file, such as .ts or .tsx.
- * However, d.ts files and spec.ts files return false.
- * @param filePath
- */
-export const isTsFile = (filePath: string) => {
-  const parts = filePath.toLowerCase().split('.');
-  if (parts.length > 1) {
-    if (parts[parts.length - 1] === 'ts' || parts[parts.length - 1] === 'tsx') {
-      if (parts.length > 2 && (parts[parts.length - 2] === 'd' || parts[parts.length - 2] === 'spec')) {
-        return false;
-      }
-      return true;
-    }
-  }
-  return false;
-};
-
-/**
  * Determines if a given file path points to a type declaration file (ending in .d.ts) or not. This function is
  * case-insensitive in its heuristics.
  * @param filePath the path to check

@@ -2,40 +2,45 @@ import { isTsFile } from '../resolve-utils';
 
 describe('resolve-utils', () => {
   describe('isTsFile', () => {
-    it('should return true for .ts files', () => {
-      expect(isTsFile('.ts')).toEqual(true);
-      expect(isTsFile('foo.ts')).toEqual(true);
-      expect(isTsFile('foo.bar.ts')).toEqual(true);
-      expect(isTsFile('foo/bar.ts')).toEqual(true);
-    });
+    it.each(['.ts', 'foo.ts', 'foo.bar.ts', 'foo/bar.ts'])(
+      'returns true for a file ending with .ts (%s)',
+      (fileName) => {
+        expect(isTsFile(fileName)).toEqual(true);
+      }
+    );
 
-    it('returns false for .tsx files', () => {
-      expect(isTsFile('.tsx')).toEqual(false);
-      expect(isTsFile('foo.tsx')).toEqual(false);
-      expect(isTsFile('foo.bar.tsx')).toEqual(false);
-      expect(isTsFile('foo/bar.tsx')).toEqual(false);
-    });
+    it.each(['.tsx', 'foo.tsx', 'foo.bar.tsx', 'foo/bar.tsx'])(
+      'returns false for a file ending with .tsx (%s)',
+      (fileName) => {
+        expect(isTsFile(fileName)).toEqual(false);
+      }
+    );
 
-    it('should return false for other file extensions', () => {
-      expect(isTsFile('foo.js')).toEqual(false);
-      expect(isTsFile('foo.doc')).toEqual(false);
-      expect(isTsFile('foo.css')).toEqual(false);
-      expect(isTsFile('foo.html')).toEqual(false);
-    });
+    it.each(['foo.js', 'foo.doc', 'foo.css', 'foo.html'])(
+      'returns false for other a file with another extension (%s)',
+      (fileName) => {
+        expect(isTsFile(fileName)).toEqual(false);
+      }
+    );
 
-    it('should return false for .d.ts and .d.tsx files', () => {
+    it('returns false for .d.ts and .d.tsx files', () => {
       expect(isTsFile('foo/bar.d.ts')).toEqual(false);
       expect(isTsFile('foo/bar.d.tsx')).toEqual(false);
     });
 
-    it('should return true for spec.ts files', () => {
+    it('returns true for a file named "spec.ts"', () => {
       expect(isTsFile('spec.ts')).toEqual(true);
     });
 
-    it('is case-sensitive', () => {
-      expect(isTsFile('Foo.tS')).toEqual(false);
-      expect(isTsFile('Foo.Ts')).toEqual(false);
-      expect(isTsFile('Foo.TS')).toEqual(false);
+    it('returns true for a file named "d.ts"', () => {
+      expect(isTsFile('d.ts')).toEqual(true);
     });
+
+    it.each(['foo.tS', 'foo.Ts', 'foo.TS', 'foo.d.Ts', 'foo.d.tS', 'foo.d.TS', 'foo.D.TS'])(
+      'returns false for non-lowercase extensions (%s)',
+      (fileName) => {
+        expect(isTsFile(fileName)).toEqual(false);
+      }
+    );
   });
 });
