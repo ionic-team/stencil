@@ -169,49 +169,6 @@ describe('util', () => {
     });
   });
 
-  describe('isCssFile', () => {
-    it('should return true for .css', () => {
-      expect(util.isCssFile('.css')).toEqual(true);
-      expect(util.isCssFile('foo.css')).toEqual(true);
-      expect(util.isCssFile('bar/foo.css')).toEqual(true);
-    });
-
-    it('should return false for other types of files', () => {
-      expect(util.isCssFile('.txt')).toEqual(false);
-      expect(util.isCssFile('foo.sass')).toEqual(false);
-      expect(util.isCssFile('bar/foo.htm')).toEqual(false);
-    });
-
-    it('should be case insensitive', () => {
-      expect(util.isCssFile('.cSs')).toEqual(true);
-      expect(util.isCssFile('foo.cSS')).toEqual(true);
-      expect(util.isCssFile('bar/foo.CSS')).toEqual(true);
-    });
-  });
-
-  describe('isHtmlFile', () => {
-    it('should return true for .html and .htm files', () => {
-      expect(util.isHtmlFile('.html')).toEqual(true);
-      expect(util.isHtmlFile('foo.html')).toEqual(true);
-      expect(util.isHtmlFile('foo/bar.html')).toEqual(true);
-      expect(util.isHtmlFile('.htm')).toEqual(true);
-      expect(util.isHtmlFile('foo.htm')).toEqual(true);
-      expect(util.isHtmlFile('foo/bar.html')).toEqual(true);
-    });
-
-    it('should return false for other types of files', () => {
-      expect(util.isHtmlFile('.ht')).toEqual(false);
-      expect(util.isHtmlFile('foo.htmx')).toEqual(false);
-      expect(util.isHtmlFile('foo/bar.xaml')).toEqual(false);
-    });
-
-    it('should be case insensitive', () => {
-      expect(util.isHtmlFile('.hTMl')).toEqual(true);
-      expect(util.isHtmlFile('foo.HTM')).toEqual(true);
-      expect(util.isHtmlFile('foo/bar.htmL')).toEqual(true);
-    });
-  });
-
   it('createJsVarName', () => {
     expect(util.createJsVarName('./scoped-style-import.css?tag=my-button&encapsulation=scoped')).toBe(
       'scopedStyleImportCss'
