@@ -124,6 +124,9 @@ type ValidConfigOutputTarget = typeof VALID_CONFIG_OUTPUT_TARGETS[number];
 
 /**
  * Check whether a given output target is a valid one to be set in a Stencil config
+ *
+ * @param targetType the type which we want to check
+ * @returns whether or not the targetType is a valid, configurable output target.
  */
 export function isValidConfigOutputTarget(targetType: string): targetType is ValidConfigOutputTarget {
   // unfortunately `includes` is typed on `Array<T>` as `(el: T):
