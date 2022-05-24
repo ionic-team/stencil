@@ -1,4 +1,32 @@
 {
   "extends": "./tsconfig.json",
+  "files": [
+    "src/app-data/index.ts",
+    "src/app-globals/index.ts",
+    "src/cli/index.ts",
+    "src/cli/public.ts",
+    "src/client/index.ts",
+    "src/client/client-patch-browser.ts",
+    "src/client/client-patch-esm.ts",
+    "src/client/polyfills/css-shim/index.ts",
+    "src/compiler/index.ts",
+    "src/compiler/public.ts",
+    "src/compiler/sys/modules/index.ts",
+    "src/dev-server/index.ts",
+    "src/dev-server/client/index.ts",
+    "src/dev-server/dev-server-client/index.ts",
+    "src/hydrate/platform/index.ts",
+    "src/hydrate/runner/index.ts",
+    "src/internal/default.ts",
+    "src/internal/index.ts",
+    "src/mock-doc/index.ts",
+    "src/sys/node/index.ts",
+    "src/sys/node/worker.ts",
+    "src/sys/node/public.ts",
+    "src/screenshot/index.ts",
+    "src/screenshot/pixel-match.ts",
+    "src/testing/index.ts",
+    "src/testing/platform/index.ts"
+  ],
   "include": ["types/*.d.ts", "src/declarations/*.ts", "src/**/*.spec.ts"]
 }
