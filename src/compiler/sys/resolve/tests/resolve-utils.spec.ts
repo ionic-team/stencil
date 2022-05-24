@@ -1,4 +1,4 @@
-import { isTsFile } from '../resolve-utils';
+import { isJsFile, isTsFile } from '../resolve-utils';
 
 describe('resolve-utils', () => {
   describe('isTsFile', () => {
@@ -42,5 +42,32 @@ describe('resolve-utils', () => {
         expect(isTsFile(fileName)).toEqual(false);
       }
     );
+  });
+
+  describe('isJsFile', () => {
+    it('should return true for regular .js files', () => {
+      expect(isJsFile('.js')).toEqual(true);
+      expect(isJsFile('foo.js')).toEqual(true);
+      expect(isJsFile('foo/bar.js')).toEqual(true);
+      expect(isJsFile('spec.js')).toEqual(true);
+    });
+
+    it('should return false for other file extentions', () => {
+      expect(isJsFile('.jsx')).toEqual(false);
+      expect(isJsFile('foo.txt')).toEqual(false);
+      expect(isJsFile('foo/bar.css')).toEqual(false);
+    });
+
+    it('should return false for .spec.js and .spec.jsx files', () => {
+      expect(isJsFile('.spec.js')).toEqual(false);
+      expect(isJsFile('foo.spec.js')).toEqual(false);
+      expect(isJsFile('foo/bar.spec.js')).toEqual(false);
+    });
+
+    it('should be case insenitive', () => {
+      expect(isJsFile('.Js')).toEqual(true);
+      expect(isJsFile('foo.JS')).toEqual(true);
+      expect(isJsFile('foo/bar.jS')).toEqual(true);
+    });
   });
 });

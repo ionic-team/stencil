@@ -72,33 +72,6 @@ describe('util', () => {
     });
   });
 
-  describe('isJsFile', () => {
-    it('should return true for regular .js files', () => {
-      expect(util.isJsFile('.js')).toEqual(true);
-      expect(util.isJsFile('foo.js')).toEqual(true);
-      expect(util.isJsFile('foo/bar.js')).toEqual(true);
-      expect(util.isJsFile('spec.js')).toEqual(true);
-    });
-
-    it('should return false for other file extentions', () => {
-      expect(util.isJsFile('.jsx')).toEqual(false);
-      expect(util.isJsFile('foo.txt')).toEqual(false);
-      expect(util.isJsFile('foo/bar.css')).toEqual(false);
-    });
-
-    it('should return false for .spec.js and .spec.jsx files', () => {
-      expect(util.isJsFile('.spec.js')).toEqual(false);
-      expect(util.isJsFile('foo.spec.js')).toEqual(false);
-      expect(util.isJsFile('foo/bar.spec.js')).toEqual(false);
-    });
-
-    it('should be case insenitive', () => {
-      expect(util.isJsFile('.Js')).toEqual(true);
-      expect(util.isJsFile('foo.JS')).toEqual(true);
-      expect(util.isJsFile('foo/bar.jS')).toEqual(true);
-    });
-  });
-
   it('createJsVarName', () => {
     expect(util.createJsVarName('./scoped-style-import.css?tag=my-button&encapsulation=scoped')).toBe(
       'scopedStyleImportCss'

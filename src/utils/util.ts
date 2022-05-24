@@ -39,19 +39,6 @@ export const isDtsFile = (filePath: string): boolean => {
   return false;
 };
 
-export const isJsFile = (filePath: string) => {
-  const parts = filePath.toLowerCase().split('.');
-  if (parts.length > 1) {
-    if (parts[parts.length - 1] === 'js') {
-      if (parts.length > 2 && parts[parts.length - 2] === 'spec') {
-        return false;
-      }
-      return true;
-    }
-  }
-  return false;
-};
-
 /**
  * Generate the preamble to be placed atop the main file of the build
  * @param config the Stencil configuration file
