@@ -45,29 +45,26 @@ describe('resolve-utils', () => {
   });
 
   describe('isJsFile', () => {
-    it('should return true for regular .js files', () => {
-      expect(isJsFile('.js')).toEqual(true);
-      expect(isJsFile('foo.js')).toEqual(true);
-      expect(isJsFile('foo/bar.js')).toEqual(true);
+    it.each(['.js', 'foo.js', 'foo.bar.js', 'foo/bar.js'])(
+      'returns true for a file ending with .js (%s)',
+      (fileName) => {
+        expect(isJsFile(fileName)).toEqual(true);
+      }
+    );
+
+    it.each(['.jsx', 'foo.txt', 'foo/bar.css', 'foo.bar.html'])(
+      'returns false for other a file with another extension (%s)',
+      (fileName) => {
+        expect(isJsFile(fileName)).toEqual(false);
+      }
+    );
+
+    it('returns true for a file named "spec.js"', () => {
       expect(isJsFile('spec.js')).toEqual(true);
     });
 
-    it('should return false for other file extentions', () => {
-      expect(isJsFile('.jsx')).toEqual(false);
-      expect(isJsFile('foo.txt')).toEqual(false);
-      expect(isJsFile('foo/bar.css')).toEqual(false);
-    });
-
-    it('should return false for .spec.js and .spec.jsx files', () => {
-      expect(isJsFile('.spec.js')).toEqual(false);
-      expect(isJsFile('foo.spec.js')).toEqual(false);
-      expect(isJsFile('foo/bar.spec.js')).toEqual(false);
-    });
-
-    it('should be case insenitive', () => {
-      expect(isJsFile('.Js')).toEqual(true);
-      expect(isJsFile('foo.JS')).toEqual(true);
-      expect(isJsFile('foo/bar.jS')).toEqual(true);
+    it.each(['foo.jS', 'foo.Js', 'foo.JS'])('returns false for non-lowercase extensions (%s)', (fileName) => {
+      expect(isJsFile(fileName)).toEqual(false);
     });
   });
 });
