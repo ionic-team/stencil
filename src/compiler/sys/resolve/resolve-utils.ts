@@ -42,8 +42,6 @@ export const isJsxFile = (p: string) => p.endsWith('.jsx');
  */
 export const isJsFile = (p: string) => p.endsWith('.js');
 
-export const isMjsFile = (p: string) => p.endsWith('.mjs');
-
 export const isJsonFile = (p: string) => p.endsWith('.json');
 
 export const getCommonDirName = (dirPath: string, fileName: string) => dirPath + '/' + fileName;
