@@ -129,9 +129,11 @@ type ValidConfigOutputTarget = typeof VALID_CONFIG_OUTPUT_TARGETS[number];
  * @returns whether or not the targetType is a valid, configurable output target.
  */
 export function isValidConfigOutputTarget(targetType: string): targetType is ValidConfigOutputTarget {
-  // unfortunately `includes` is typed on `Array<T>` as `(el: T):
+  // unfortunately `includes` is typed on `ReadonlyArray<T>` as `(el: T):
   // boolean` so a `string` cannot be passed to `includes` on a
   // `ReadonlyArray` 😢 thus we `as any`
+  //
+  // see microsoft/TypeScript#31018 for some discussion of this
   return VALID_CONFIG_OUTPUT_TARGETS.includes(targetType as any);
 }
 
