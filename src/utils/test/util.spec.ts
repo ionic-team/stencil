@@ -53,52 +53,6 @@ describe('util', () => {
     });
   });
 
-  describe('isTsFile', () => {
-    it('should return true for regular .ts and .tsx files', () => {
-      expect(util.isTsFile('.ts')).toEqual(true);
-      expect(util.isTsFile('.tsx')).toEqual(true);
-      expect(util.isTsFile('foo.ts')).toEqual(true);
-      expect(util.isTsFile('foo.tsx')).toEqual(true);
-      expect(util.isTsFile('foo.bar.ts')).toEqual(true);
-      expect(util.isTsFile('foo.bar.tsx')).toEqual(true);
-      expect(util.isTsFile('foo/bar.ts')).toEqual(true);
-      expect(util.isTsFile('foo/bar.tsx')).toEqual(true);
-    });
-
-    it('should return false for other file extentions', () => {
-      expect(util.isTsFile('foo.js')).toEqual(false);
-      expect(util.isTsFile('foo.doc')).toEqual(false);
-      expect(util.isTsFile('foo.css')).toEqual(false);
-      expect(util.isTsFile('foo.html')).toEqual(false);
-    });
-
-    it('should return false for .d.ts and .d.tsx files', () => {
-      expect(util.isTsFile('foo/bar.d.ts')).toEqual(false);
-      expect(util.isTsFile('foo/bar.d.tsx')).toEqual(false);
-    });
-
-    it('should return false for .spec.ts and .spec.tsx files', () => {
-      expect(util.isTsFile('foo/bar.spec.ts')).toEqual(false);
-      expect(util.isTsFile('foo/bar.spec.tsx')).toEqual(false);
-    });
-
-    it('should return true for d.ts[x] and spec.ts[x] files', () => {
-      expect(util.isTsFile('d.ts')).toEqual(true);
-      expect(util.isTsFile('d.tsx')).toEqual(true);
-      expect(util.isTsFile('spec.ts')).toEqual(true);
-      expect(util.isTsFile('spec.tsx')).toEqual(true);
-    });
-
-    it('should be case insenitive', () => {
-      expect(util.isTsFile('Foo.TS')).toEqual(true);
-      expect(util.isTsFile('Foo.tSx')).toEqual(true);
-      expect(util.isTsFile('foo/bar.D.ts')).toEqual(false);
-      expect(util.isTsFile('foo/bar.D.tsx')).toEqual(false);
-      expect(util.isTsFile('foo/bar.SpEc.ts')).toEqual(false);
-      expect(util.isTsFile('foo/bar.sPEC.tsx')).toEqual(false);
-    });
-  });
-
   describe('isDtsFile', () => {
     it('should return true for .d.ts files', () => {
       expect(util.isDtsFile('.d.ts')).toEqual(true);
@@ -115,33 +69,6 @@ describe('util', () => {
 
     it('should be case insensitive', () => {
       expect(util.isDtsFile('foo/bar.D.tS')).toEqual(true);
-    });
-  });
-
-  describe('isJsFile', () => {
-    it('should return true for regular .js files', () => {
-      expect(util.isJsFile('.js')).toEqual(true);
-      expect(util.isJsFile('foo.js')).toEqual(true);
-      expect(util.isJsFile('foo/bar.js')).toEqual(true);
-      expect(util.isJsFile('spec.js')).toEqual(true);
-    });
-
-    it('should return false for other file extentions', () => {
-      expect(util.isJsFile('.jsx')).toEqual(false);
-      expect(util.isJsFile('foo.txt')).toEqual(false);
-      expect(util.isJsFile('foo/bar.css')).toEqual(false);
-    });
-
-    it('should return false for .spec.js and .spec.jsx files', () => {
-      expect(util.isJsFile('.spec.js')).toEqual(false);
-      expect(util.isJsFile('foo.spec.js')).toEqual(false);
-      expect(util.isJsFile('foo/bar.spec.js')).toEqual(false);
-    });
-
-    it('should be case insenitive', () => {
-      expect(util.isJsFile('.Js')).toEqual(true);
-      expect(util.isJsFile('foo.JS')).toEqual(true);
-      expect(util.isJsFile('foo/bar.jS')).toEqual(true);
     });
   });
 
