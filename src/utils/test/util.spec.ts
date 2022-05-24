@@ -145,30 +145,6 @@ describe('util', () => {
     });
   });
 
-  describe('hasFileExtension', () => {
-    it('should return true for .scss and .sass files', () => {
-      expect(util.hasFileExtension('.scss', ['scss', 'sass'])).toEqual(true);
-      expect(util.hasFileExtension('foo.scss', ['scss', 'sass'])).toEqual(true);
-      expect(util.hasFileExtension('foo/bar.scss', ['scss', 'sass'])).toEqual(true);
-      expect(util.hasFileExtension('.sass', ['scss', 'sass'])).toEqual(true);
-      expect(util.hasFileExtension('foo.sass', ['scss', 'sass'])).toEqual(true);
-      expect(util.hasFileExtension('foo/bar.sass', ['scss', 'sass'])).toEqual(true);
-    });
-
-    it('should return false for other types of files', () => {
-      expect(util.hasFileExtension('.stss', ['scss', 'sass'])).toEqual(false);
-      expect(util.hasFileExtension('foo.html', ['scss', 'sass'])).toEqual(false);
-      expect(util.hasFileExtension('foo/bar.css', ['scss', 'sass'])).toEqual(false);
-    });
-
-    it('should be case insensitive', () => {
-      expect(util.hasFileExtension('.sCss', ['scss', 'sass'])).toEqual(true);
-      expect(util.hasFileExtension('foo.SCSS', ['scss', 'sass'])).toEqual(true);
-      expect(util.hasFileExtension('.sAss', ['scss', 'sass'])).toEqual(true);
-      expect(util.hasFileExtension('foo/bar.saSS', ['scss', 'sass'])).toEqual(true);
-    });
-  });
-
   it('createJsVarName', () => {
     expect(util.createJsVarName('./scoped-style-import.css?tag=my-button&encapsulation=scoped')).toBe(
       'scopedStyleImportCss'
