@@ -846,6 +846,7 @@ export function cloneDocument(srcDoc: Document) {
 /**
  * Constrain setTimeout() to 1ms, but still async. Also
  * only allow setInterval() to fire once, also constrained to 1ms.
+ * @param win TODO
  */
 export function constrainTimeouts(win: any) {
   (win as MockWindow).__allowInterval = false;
