@@ -117,20 +117,38 @@ export const readPackageJson = async (config: d.Config, compilerCtx: d.CompilerC
   }
 };
 
-export const parsePackageJson = (
-  pkgJsonStr: string,
-  pkgJsonFilePath: string
-): { diagnostic: d.Diagnostic; data: d.PackageJsonData; filePath: string } => {
+/**
+ * A type that describes the result of parsing a `package.json` file's contents
+ */
+export type ParsePackageJsonResult = {
+  diagnostic: d.Diagnostic | null;
+  data: any | null;
+  filePath: string;
+};
+
+/**
+ * Parse a string read from a `package.json` file
+ * @param pkgJsonStr the string read from a `package.json` file
+ * @param pkgJsonFilePath the path to the already read `package.json` file
+ * @returns the results of parsing the provided contents of the `package.json` file
+ */
+export const parsePackageJson = (pkgJsonStr: string, pkgJsonFilePath: string): ParsePackageJsonResult | null => {
   if (isString(pkgJsonFilePath)) {
     return parseJson(pkgJsonStr, pkgJsonFilePath);
   }
   return null;
 };
 
-export const parseJson = (jsonStr: string, filePath?: string) => {
-  const rtn = {
-    diagnostic: null as d.Diagnostic,
-    data: null as any,
+/**
+ * Parse a string read from a `package.json` file
+ * @param jsonStr the string read from a `package.json` file
+ * @param filePath the path to the already read `package.json` file
+ * @returns the results of parsing the provided contents of the `package.json` file
+ */
+const parseJson = (jsonStr: string, filePath: string): ParsePackageJsonResult => {
+  const rtn: ParsePackageJsonResult = {
+    diagnostic: null,
+    data: null,
     filePath,
   };
 
