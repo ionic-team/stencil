@@ -8,45 +8,30 @@ export const filesChanged = (buildCtx: d.BuildCtx) => {
   return unique([...buildCtx.filesUpdated, ...buildCtx.filesAdded, ...buildCtx.filesDeleted]).sort();
 };
 
-export const scriptsAdded = (buildCtx: d.BuildCtx) => {
-  // collect all the scripts that were added
-  return buildCtx.filesAdded
-    .filter((f) => {
-      return SCRIPT_EXT.some((ext) => f.endsWith(ext.toLowerCase()));
-    })
-    .map((f) => basename(f));
-};
-
-export const scriptsDeleted = (buildCtx: d.BuildCtx) => {
-  // collect all the scripts that were deleted
-  return buildCtx.filesDeleted
-    .filter((f) => {
-      return SCRIPT_EXT.some((ext) => f.endsWith(ext.toLowerCase()));
-    })
-    .map((f) => basename(f));
-};
-
-export const hasScriptChanges = (buildCtx: d.BuildCtx) => {
-  return buildCtx.filesChanged.some((f) => {
-    const ext = getExt(f);
-    return SCRIPT_EXT.includes(ext);
-  });
-};
-
-export const hasStyleChanges = (buildCtx: d.BuildCtx) => {
-  return buildCtx.filesChanged.some((f) => {
-    const ext = getExt(f);
-    return STYLE_EXT.includes(ext);
-  });
-};
+const unaryBasename = (filePath: string) => basename(filePath);
 
 const getExt = (filePath: string) => filePath.split('.').pop().toLowerCase();
 
+/**
+ * Script extensions which we want to be able to recognize
+ */
 const SCRIPT_EXT = ['ts', 'tsx', 'js', 'jsx'];
-export const isScriptExt = (ext: string) => SCRIPT_EXT.includes(ext);
+
+export const hasScriptExt = (filePath: string) => SCRIPT_EXT.includes(getExt(filePath));
 
 const STYLE_EXT = ['css', 'scss', 'sass', 'pcss', 'styl', 'stylus', 'less'];
-export const isStyleExt = (ext: string) => STYLE_EXT.includes(ext);
+
+export const hasStyleExt = (filePath: string) => STYLE_EXT.includes(getExt(filePath));
+
+// collect all the scripts that were added
+export const scriptsAdded = (buildCtx: d.BuildCtx) => buildCtx.filesAdded.filter(hasScriptExt).map(unaryBasename);
+
+// collect all the scripts that were deleted
+export const scriptsDeleted = (buildCtx: d.BuildCtx) => buildCtx.filesDeleted.filter(hasScriptExt).map(unaryBasename);
+
+export const hasScriptChanges = (buildCtx: d.BuildCtx) => buildCtx.filesChanged.some(hasScriptExt);
+
+export const hasStyleChanges = (buildCtx: d.BuildCtx) => buildCtx.filesChanged.some(hasStyleExt);
 
 export const hasHtmlChanges = (config: d.Config, buildCtx: d.BuildCtx) => {
   const anyHtmlChanged = buildCtx.filesChanged.some((f) => f.toLowerCase().endsWith('.html'));
