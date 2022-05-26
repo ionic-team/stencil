@@ -4,13 +4,13 @@ import { MockCSSStyleSheet, getStyleElementText, setStyleElementText } from './c
 import { MockDocumentFragment } from './document-fragment';
 import { MockElement, MockHTMLElement } from './node';
 
-export function createElement(ownerDocument: any, tagName: any): any {
+export function createElement(ownerDocument: any, tagName: string): any {
   if (typeof tagName !== 'string' || tagName === '' || !/^[a-z0-9-_:]+$/i.test(tagName)) {
     throw new Error(`The tag name provided (${tagName}) is not a valid name.`);
   }
-  let tagNametoUse = tagName.toLowerCase();
+  tagName = tagName.toLowerCase();
 
-  switch (tagNametoUse) {
+  switch (tagName) {
     case 'a':
       return new MockAnchorElement(ownerDocument);
 
@@ -51,14 +51,14 @@ export function createElement(ownerDocument: any, tagName: any): any {
       return new MockTitleElement(ownerDocument);
   }
 
-  if (ownerDocument != null && tagNametoUse.includes('-')) {
+  if (ownerDocument != null && tagName.includes('-')) {
     const win = ownerDocument.defaultView;
     if (win != null && win.customElements != null) {
-      return createCustomElement(win.customElements, ownerDocument, tagNametoUse);
+      return createCustomElement(win.customElements, ownerDocument, tagName);
     }
   }
 
-  return new MockHTMLElement(ownerDocument, tagNametoUse);
+  return new MockHTMLElement(ownerDocument, tagName);
 }
 
 export function createElementNS(ownerDocument: any, namespaceURI: string, tagName: string) {
