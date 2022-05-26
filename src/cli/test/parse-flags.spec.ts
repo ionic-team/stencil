@@ -64,7 +64,7 @@ describe('parseFlags', () => {
           original: ['run', 'serve', '--port', '4444'],
         });
       }
-      return ""
+      return '';
     };
 
     const flags = parseFlags(args, sys);

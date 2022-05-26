@@ -3,14 +3,16 @@ import * as telemetry from '../telemetry';
 import * as shouldTrack from '../shouldTrack';
 import { createSystem } from '../../../compiler/sys/stencil-sys';
 import { mockLogger } from '@stencil/core/testing';
+import * as coreCompiler from '@stencil/core/compiler';
 
 describe('telemetryBuildFinishedAction', () => {
-  const config = {
+  const config: d.Config = {
     outputTargets: [],
     flags: {
       args: [],
     },
-  } as d.Config;
+  };
+
   const logger = mockLogger();
   const sys = createSystem();
 
@@ -27,7 +29,7 @@ describe('telemetryBuildFinishedAction', () => {
       duration: 100,
     } as d.CompilerBuildResults;
 
-    await telemetry.telemetryBuildFinishedAction(sys, config, logger, {}, results);
+    await telemetry.telemetryBuildFinishedAction(sys, config, logger, coreCompiler, results);
     expect(spyShouldTrack).toHaveBeenCalled();
 
     spyShouldTrack.mockRestore();
@@ -52,7 +54,7 @@ describe('telemetryAction', () => {
       })
     );
 
-    await telemetry.telemetryAction(sys, config, logger, {}, () => {});
+    await telemetry.telemetryAction(sys, config, logger, coreCompiler, () => {});
     expect(spyShouldTrack).toHaveBeenCalled();
 
     spyShouldTrack.mockRestore();
@@ -66,7 +68,7 @@ describe('telemetryAction', () => {
       })
     );
 
-    await telemetry.telemetryAction(sys, config, logger, {}, async () => {
+    await telemetry.telemetryAction(sys, config, logger, coreCompiler, async () => {
       new Promise((resolve) => {
         setTimeout(() => {
           resolve(true);
@@ -137,10 +139,10 @@ describe('prepareData', () => {
   const sys = createSystem();
 
   it('provides an object', async () => {
-    const data = await telemetry.prepareData({}, config, sys, 1000);
+    const data = await telemetry.prepareData(coreCompiler, config, sys, 1000);
     expect(data).toEqual({
       arguments: [],
-      build: 'unknown',
+      build: coreCompiler.buildId,
       component_count: undefined,
       cpu_model: '',
       duration_ms: 1000,
@@ -149,13 +151,13 @@ describe('prepareData', () => {
       os_version: '',
       packages: [],
       packages_no_versions: [],
-      rollup: 'unknown',
-      stencil: 'unknown',
+      rollup: coreCompiler.versions.rollup,
+      stencil: coreCompiler.versions.stencil,
       system: 'in-memory __VERSION:STENCIL__',
       system_major: 'in-memory __VERSION:STENCIL__',
       targets: [],
       task: undefined,
-      typescript: 'unknown',
+      typescript: coreCompiler.versions.typescript,
       yarn: false,
     });
   });
@@ -168,11 +170,11 @@ describe('prepareData', () => {
       outputTargets: [{ type: 'www', baseUrl: 'https://example.com', serviceWorker: { swDest: './tmp' } }],
     } as d.Config;
 
-    const data = await telemetry.prepareData({}, config, sys, 1000);
+    const data = await telemetry.prepareData(coreCompiler, config, sys, 1000);
 
     expect(data).toEqual({
       arguments: [],
-      build: 'unknown',
+      build: coreCompiler.buildId,
       component_count: undefined,
       cpu_model: '',
       duration_ms: 1000,
@@ -181,13 +183,13 @@ describe('prepareData', () => {
       os_version: '',
       packages: [],
       packages_no_versions: [],
-      rollup: 'unknown',
-      stencil: 'unknown',
+      rollup: coreCompiler.versions.rollup,
+      stencil: coreCompiler.versions.stencil,
       system: 'in-memory __VERSION:STENCIL__',
       system_major: 'in-memory __VERSION:STENCIL__',
       targets: ['www'],
       task: undefined,
-      typescript: 'unknown',
+      typescript: coreCompiler.versions.typescript,
       yarn: false,
     });
   });
@@ -200,11 +202,11 @@ describe('prepareData', () => {
       outputTargets: [{ type: 'www', baseUrl: 'https://example.com', serviceWorker: { swDest: './tmp' } }],
     } as d.Config;
 
-    const data = await telemetry.prepareData({}, config, sys, 1000, 12);
+    const data = await telemetry.prepareData(coreCompiler, config, sys, 1000, 12);
 
     expect(data).toEqual({
       arguments: [],
-      build: 'unknown',
+      build: coreCompiler.buildId,
       component_count: 12,
       cpu_model: '',
       duration_ms: 1000,
@@ -213,13 +215,13 @@ describe('prepareData', () => {
       os_version: '',
       packages: [],
       packages_no_versions: [],
-      rollup: 'unknown',
-      stencil: 'unknown',
+      rollup: coreCompiler.versions.rollup,
+      stencil: coreCompiler.versions.stencil,
       system: 'in-memory __VERSION:STENCIL__',
       system_major: 'in-memory __VERSION:STENCIL__',
       targets: ['www'],
       task: undefined,
-      typescript: 'unknown',
+      typescript: coreCompiler.versions.typescript,
       yarn: false,
     });
   });
