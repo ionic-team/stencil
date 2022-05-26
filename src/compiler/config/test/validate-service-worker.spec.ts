@@ -23,7 +23,6 @@ describe('validateServiceWorker', () => {
   function getServiceWorker(target: OutputTargetWww) {
     if (target.serviceWorker) {
       return target.serviceWorker;
-      // expect(outputTarget.serviceWorker.globIgnores).toContain(testString)
     } else {
       fail("shouldn't get here");
     }
