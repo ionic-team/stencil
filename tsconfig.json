@@ -42,6 +42,7 @@
       "@stencil/core/internal/testing": ["src/testing/platform/index.ts"],
       "@stencil/core/mock-doc": ["src/mock-doc/index.ts"],
       "@stencil/core/testing": ["src/testing/index.ts"],
+      "@stencil/core/declarations": ["src/declarations/index.ts"],
       "@utils": ["src/utils/index.ts"]
     }
   },
@@ -73,5 +74,5 @@
     "src/testing/index.ts",
     "src/testing/platform/index.ts"
   ],
-  "include": ["types/*.d.ts", "src/declarations/*.ts", "src/**/*.ts", "src/*.ts"]
+  "include": ["types/*.d.ts", "src/declarations/*.ts", "src/**/*.spec.ts"]
 }

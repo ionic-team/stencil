@@ -1,4 +1,4 @@
-import * as d from '../../../declarations'
+import * as d from '@stencil/core/declarations';
 import path from 'path';
 import { stubComponentCompilerMeta } from './ComponentCompilerMeta.stub';
 import { stubComponentCompilerTypeReference } from './ComponentCompilerTypeReference.stub';
@@ -6,7 +6,7 @@ import { stubTypesImportData } from './TypesImportData.stub';
 import { updateTypeIdentifierNames } from '../stencil-types';
 
 describe('stencil-types', () => {
-  describe('updateTypeMemberNames', () => {
+  describe('up, "src/**/*.spec.tsx"dateTypeMemberNames', () => {
     let dirnameSpy: jest.SpyInstance<ReturnType<typeof path.dirname>, Parameters<typeof path.dirname>>;
     let resolveSpy: jest.SpyInstance<ReturnType<typeof path.resolve>, Parameters<typeof path.resolve>>;
 

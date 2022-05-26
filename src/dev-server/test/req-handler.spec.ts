@@ -1,4 +1,4 @@
-import type * as d from '../../declarations'
+import type * as d from '@stencil/core/declarations';
 import { appendDevServerClientIframe } from '../serve-file';
 import { createRequestHandler } from '../request-handler';
 import { createServerContext } from '../server-context';

@@ -1,4 +1,4 @@
-import type * as d from '../../../declarations'
+import type * as d from '@stencil/core/declarations';
 import { buildJestArgv } from '../jest-config';
 import { mockConfig } from '@stencil/core/testing';
 import { parseFlags } from '../../../cli/parse-flags';
