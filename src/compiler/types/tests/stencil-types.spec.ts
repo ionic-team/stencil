@@ -6,7 +6,7 @@ import { stubTypesImportData } from './TypesImportData.stub';
 import { updateTypeIdentifierNames } from '../stencil-types';
 
 describe('stencil-types', () => {
-  describe('up, "src/**/*.spec.tsx"dateTypeMemberNames', () => {
+  describe('updateTypeMemberNames', () => {
     let dirnameSpy: jest.SpyInstance<ReturnType<typeof path.dirname>, Parameters<typeof path.dirname>>;
     let resolveSpy: jest.SpyInstance<ReturnType<typeof path.resolve>, Parameters<typeof path.resolve>>;
 
