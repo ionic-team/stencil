@@ -1,5 +1,5 @@
 import type * as d from '@stencil/core/declarations';
-import {OutputTargetWww} from '@stencil/core/declarations';
+import { OutputTargetWww } from '@stencil/core/declarations';
 import { mockStencilSystem } from '@stencil/core/testing';
 import { validateServiceWorker } from '../validate-service-worker';
 
@@ -17,15 +17,15 @@ describe('validateServiceWorker', () => {
    * A little util to work around a typescript annoyance. Because
    * `outputTarget.serviceWorker` is typed as
    * `serviceWorker?: ServiceWorkerConfig | null | false;` we get type errors
-   * all over if we try to just access it directly. So instead, do a little 
+   * all over if we try to just access it directly. So instead, do a little
    * check to see if it's falsy. If not, we return it, and if it is we fail the test.
    */
   function getServiceWorker(target: OutputTargetWww) {
     if (outputTarget.serviceWorker) {
-      return outputTarget.serviceWorker
+      return outputTarget.serviceWorker;
       // expect(outputTarget.serviceWorker.globIgnores).toContain(testString)
     } else {
-      fail("shouldn't get here")
+      fail("shouldn't get here");
     }
   }
 
@@ -59,7 +59,7 @@ describe('validateServiceWorker', () => {
       },
     };
     validateServiceWorker(config, outputTarget);
-    expect(getServiceWorker(outputTarget).globDirectory).toBe('/custom/www')
+    expect(getServiceWorker(outputTarget).globDirectory).toBe('/custom/www');
   });
 
   it('should set default globDirectory', () => {
