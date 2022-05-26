@@ -21,8 +21,8 @@ describe('validateServiceWorker', () => {
    * check to see if it's falsy. If not, we return it, and if it is we fail the test.
    */
   function getServiceWorker(target: OutputTargetWww) {
-    if (outputTarget.serviceWorker) {
-      return outputTarget.serviceWorker;
+    if (target.serviceWorker) {
+      return target.serviceWorker;
       // expect(outputTarget.serviceWorker.globIgnores).toContain(testString)
     } else {
       fail("shouldn't get here");

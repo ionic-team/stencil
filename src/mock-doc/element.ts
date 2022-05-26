@@ -209,7 +209,7 @@ patchPropAttributes(MockLinkElement.prototype, {
 });
 
 export class MockMetaElement extends MockHTMLElement {
-  content: string
+  content: string;
 
   constructor(ownerDocument: any) {
     super(ownerDocument, 'meta');

@@ -1,7 +1,16 @@
 import { addGlobalsToWindowPrototype } from './global';
 import { createConsole } from './console';
 import { MockCustomElementRegistry } from './custom-element-registry';
-import { MockEvent, addEventListener, dispatchEvent, removeEventListener, resetEventListeners, MockMouseEvent, MockCustomEvent, MockKeyboardEvent } from './event';
+import {
+  MockEvent,
+  addEventListener,
+  dispatchEvent,
+  removeEventListener,
+  resetEventListeners,
+  MockMouseEvent,
+  MockCustomEvent,
+  MockKeyboardEvent,
+} from './event';
 import { MockDocument, resetDocument } from './document';
 import { MockDocumentFragment } from './document-fragment';
 import { MockElement, MockHTMLElement, MockNode, MockNodeList } from './node';
@@ -11,7 +20,7 @@ import { MockLocation } from './location';
 import { MockNavigator } from './navigator';
 import { MockPerformance, resetPerformance } from './performance';
 import { MockStorage } from './storage';
-import {MockHeaders} from '.';
+import { MockHeaders } from '.';
 
 const nativeClearInterval = clearInterval;
 const nativeClearTimeout = clearTimeout;
