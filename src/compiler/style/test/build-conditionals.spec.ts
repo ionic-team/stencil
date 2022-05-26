@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Compiler, Config } from '@stencil/core/compiler';
 import { mockConfig } from '@stencil/core/testing';
 import path from 'path';
