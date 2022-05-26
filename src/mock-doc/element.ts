@@ -3,7 +3,6 @@ import { createCustomElement } from './custom-element-registry';
 import { MockCSSStyleSheet, getStyleElementText, setStyleElementText } from './css-style-sheet';
 import { MockDocumentFragment } from './document-fragment';
 import { MockElement, MockHTMLElement } from './node';
-import {createDocument, MockDocument} from '.';
 
 export function createElement(ownerDocument: any, tagName: any): any {
   if (typeof tagName !== 'string' || tagName === '' || !/^[a-z0-9-_:]+$/i.test(tagName)) {
