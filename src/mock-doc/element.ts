@@ -44,6 +44,15 @@ export function createElement(ownerDocument: any, tagName: string) {
     case 'style':
       return new MockStyleElement(ownerDocument);
 
+    case 'svg':
+      return new MockSVGElement(ownerDocument);
+
+    case 'text':
+      return new MockSVGTextElement(ownerDocument);
+
+    case 'tspan':
+      return new MockSVGTSpanElement(ownerDocument);
+
     case 'template':
       return new MockTemplateElement(ownerDocument);
 
@@ -265,7 +274,32 @@ export class MockStyleElement extends MockHTMLElement {
   }
 }
 
-export class MockSVGElement extends MockElement {
+//Based on deprecated SVGMatrix - http://html5index.org/SVG%20-%20SVGMatrix.html
+const matrix = {
+  a: 1,
+  b: 0,
+  c: 0,
+  d: 1,
+  e: 0,
+  f: 0,
+  flipX(){},
+  flipY()	{},
+  inverse(){},
+  multiply(){},
+  override(){},
+  rotate(){},
+  scale(){},
+  scaleNonUniform(){},
+  skewX(){},
+  skewY(){},
+  translate(){}
+};
+
+export class MockSVGElement extends MockHTMLElement {
+  constructor(ownerDocument: any, tagName: string = 'svg') {
+    super(ownerDocument, tagName);
+  }
+
   // SVGElement properties and methods
   get ownerSVGElement(): SVGSVGElement {
     return null;
@@ -273,7 +307,9 @@ export class MockSVGElement extends MockElement {
   get viewportElement(): SVGElement {
     return null;
   }
+  blur() {
 
+  }
   focus() {
     /**/
   }
@@ -294,6 +330,35 @@ export class MockSVGElement extends MockElement {
   }
   getTotalLength(): number {
     return 0;
+  }
+  getComputedTextLength(): number {
+    return 0;
+  }
+  createSVGPoint() {
+    return {
+      matrixTransform: matrix,
+      x: 0,
+      y: 0
+    }
+  }
+  getBBox() {
+    return { x: 0, y: 0, width: 10, height: 10 }
+  }
+  getCTM() {
+    return  matrix
+  }
+  getScreenCTM() {
+    return  matrix
+  }
+}
+export class MockSVGTextElement extends MockSVGElement {
+  constructor(ownerDocument: any, tagName: string = 'tspan') {
+    super(ownerDocument, tagName);
+  }
+}
+export class MockSVGTSpanElement extends MockSVGTextElement {
+  constructor(ownerDocument: any, tagName: string = 'tspan') {
+    super(ownerDocument, tagName);
   }
 }
 

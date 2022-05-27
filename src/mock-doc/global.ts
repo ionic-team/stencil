@@ -10,6 +10,7 @@ import {
   MockMetaElement,
   MockScriptElement,
   MockStyleElement,
+  MockSVGElement,
   MockTemplateElement,
   MockTitleElement,
 } from './element';
@@ -173,6 +174,7 @@ const GLOBAL_CONSTRUCTORS: [string, any][] = [
   ['HTMLMetaElement', MockMetaElement],
   ['HTMLScriptElement', MockScriptElement],
   ['HTMLStyleElement', MockStyleElement],
+  ['SVGElement', MockSVGElement],
   ['HTMLTemplateElement', MockTemplateElement],
   ['HTMLTitleElement', MockTitleElement],
 ];
