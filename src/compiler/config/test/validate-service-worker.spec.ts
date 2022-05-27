@@ -28,7 +28,7 @@ describe('validateServiceWorker', () => {
     if (target.serviceWorker) {
       return target.serviceWorker;
     } else {
-      fail("the serviceWorker on the provided target was unexpectedly falsy, so this test needs to fail!")
+      fail('the serviceWorker on the provided target was unexpectedly falsy, so this test needs to fail!');
     }
   }
 

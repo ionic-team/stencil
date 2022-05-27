@@ -168,7 +168,6 @@ describe('element', () => {
     expect(elm).toEqualHtml(`<meta content="value" id="test">`);
 
     elm['content'] = 'updated';
-    elm.setAttribute('content', 'updated');
     expect(elm).toEqualHtml(`<meta content="updated" id="test">`);
   });
 
