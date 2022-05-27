@@ -4,7 +4,7 @@ import { MockCSSStyleSheet, getStyleElementText, setStyleElementText } from './c
 import { MockDocumentFragment } from './document-fragment';
 import { MockElement, MockHTMLElement } from './node';
 
-export function createElement(ownerDocument: any, tagName: string) {
+export function createElement(ownerDocument: any, tagName: string): any {
   if (typeof tagName !== 'string' || tagName === '' || !/^[a-z0-9-_:]+$/i.test(tagName)) {
     throw new Error(`The tag name provided (${tagName}) is not a valid name.`);
   }
@@ -209,6 +209,8 @@ patchPropAttributes(MockLinkElement.prototype, {
 });
 
 export class MockMetaElement extends MockHTMLElement {
+  content: string;
+
   constructor(ownerDocument: any) {
     super(ownerDocument, 'meta');
   }

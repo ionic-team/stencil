@@ -1,6 +1,7 @@
 import type * as d from '@stencil/core/declarations';
 import { mockLogger, mockStencilSystem } from '@stencil/core/testing';
 import { isWatchIgnorePath } from '../../fs-watch/fs-watch-rebuild';
+import { DOCS_JSON, DOCS_CUSTOM, DOCS_README, DOCS_VSCODE } from '../../output-targets/output-utils';
 import { validateConfig } from '../validate-config';
 
 describe('validation', () => {
@@ -256,10 +257,13 @@ describe('validation', () => {
     expect(config.devMode).toBe(false);
   });
 
-  it('should set default generateDocs to false', () => {
-    const { config } = validateConfig(userConfig);
-    expect(config.outputTargets.some((o) => o.type === 'docs')).toBe(false);
-  });
+  it.each([DOCS_JSON, DOCS_CUSTOM, DOCS_README, DOCS_VSCODE])(
+    'should not add "%s" output target by default',
+    (targetType) => {
+      const { config } = validateConfig(userConfig);
+      expect(config.outputTargets.some((o) => o.type === targetType)).toBe(false);
+    }
+  );
 
   it('should default dist false and www true', () => {
     const { config } = validateConfig(userConfig);
@@ -289,11 +293,6 @@ describe('validation', () => {
     userConfig.devMode = true;
     const { config } = validateConfig(userConfig);
     expect(config.devInspector).toBe(true);
-  });
-
-  it('should set default generateDocs to false', () => {
-    const { config } = validateConfig(userConfig);
-    expect(config.outputTargets.some((o) => o.type === 'docs')).toBe(false);
   });
 
   it('should default dist false and www true', () => {

@@ -1,6 +1,6 @@
 import type * as d from '../../declarations';
 
-export function parseStyleDocs(styleDocs: d.StyleDoc[], styleText: string) {
+export function parseStyleDocs(styleDocs: d.StyleDoc[], styleText: string | null) {
   if (typeof styleText !== 'string') {
     return;
   }

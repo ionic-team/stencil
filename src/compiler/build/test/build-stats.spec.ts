@@ -16,7 +16,7 @@ describe('generateBuildStats', () => {
   it('should return a structured json object', async () => {
     buildCtx.buildResults = generateBuildResults(config, compilerCtx, buildCtx);
 
-    const result: d.CompilerBuildStats = generateBuildStats(config, buildCtx);
+    const result = generateBuildStats(config, buildCtx) as d.CompilerBuildStats;
 
     if (result.hasOwnProperty('timestamp')) {
       delete result.timestamp;
@@ -50,12 +50,16 @@ describe('generateBuildStats', () => {
     buildCtx.buildResults = generateBuildResults(config, compilerCtx, buildCtx);
 
     buildCtx.buildResults.hasError = true;
-    buildCtx.buildResults.diagnostics = ['Something bad happened'];
-
+    const diagnostic: d.Diagnostic = {
+      level: 'error',
+      type: 'horrible',
+      messageText: 'the worst error _possible_ has just occurred',
+    };
+    buildCtx.buildResults.diagnostics = [diagnostic];
     const result = generateBuildStats(config, buildCtx);
 
     expect(result).toStrictEqual({
-      diagnostics: ['Something bad happened'],
+      diagnostics: [diagnostic],
     });
   });
 });

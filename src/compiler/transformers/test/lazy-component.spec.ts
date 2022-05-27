@@ -13,6 +13,7 @@ describe('lazy-component', () => {
       currentDirectory: '/',
       proxy: null,
       style: 'static',
+      styleImportData: null,
     };
 
     const code = `

@@ -90,7 +90,7 @@ describe('validateTesting', () => {
     userConfig.outputTargets = [
       { type: 'dist', dir: 'dist-folder' },
       { type: 'www', dir: 'www-folder' },
-      { type: 'docs', dir: 'docs' },
+      { type: 'docs-readme', dir: 'docs' },
     ];
     const { config } = validateConfig(userConfig);
     expect(config.testing.testPathIgnorePatterns).toEqual([
