@@ -5,33 +5,40 @@ import * as setAccessor from '../set-accessor';
 import { newVNode } from '../h';
 
 describe('updateElement', () => {
+  const createTestNode = (overrides: Partial<d.VNode> = {}): d.VNode => ({
+    ...newVNode('div', ''),
+    ...overrides,
+  });
+
   it('should add/remove classes', () => {
     const elm = document.createElement('my-tag') as HTMLElement;
     elm.className = 'mr plutonium';
     const oldVNode: d.VNode = {
+      ...newVNode('div', ''),
       $flags$: 0,
       $attrs$: { class: 'mr plutonium' },
     };
-    const newVnode: d.VNode = {
+    const newNode: d.VNode = {
+      ...newVNode('div', ''),
       $flags$: 0,
       $elm$: elm,
       $attrs$: { class: 'mr fusion' },
     };
-    updateElement(oldVNode, newVnode, false);
+    updateElement(oldVNode, newNode, false);
     expect(elm.className).toBe('mr fusion');
   });
 
   it('should remove classes when oldVNode.vattrs but no newVNode.attrs', () => {
     const elm = document.createElement('my-tag') as HTMLElement;
     elm.className = 'mr fusion';
-    const oldVNode: d.VNode = {
+    const oldVNode = createTestNode({
       $flags$: 0,
       $attrs$: { class: 'mr fusion' },
-    };
-    const newVnode: d.VNode = {
+    });
+    const newVnode = createTestNode({
       $flags$: 0,
       $elm$: elm,
-    };
+    });
     updateElement(oldVNode, newVnode, false);
     expect(elm.className).toBe('');
   });
@@ -39,15 +46,15 @@ describe('updateElement', () => {
   it('should do nothing when class is unchanged', () => {
     const elm = document.createElement('my-tag') as HTMLElement;
     elm.className = 'mr fusion';
-    const oldVNode: d.VNode = {
+    const oldVNode = createTestNode({
       $flags$: 0,
       $attrs$: { class: 'mr fusion' },
-    };
-    const newVnode: d.VNode = {
+    });
+    const newVnode = createTestNode({
       $flags$: 0,
       $elm$: elm,
       $attrs$: { class: 'mr fusion' },
-    };
+    });
     updateElement(oldVNode, newVnode, false);
     expect(elm.className).toBe('mr fusion');
   });
@@ -65,11 +72,11 @@ describe('updateElement', () => {
   it('should add new class when no oldVNode', () => {
     const elm = document.createElement('my-tag') as HTMLElement;
     const oldVNode: d.VNode = null;
-    const newVnode: d.VNode = {
+    const newVnode = createTestNode({
       $flags$: 0,
       $elm$: elm,
       $attrs$: { class: 'mr fusion' },
-    };
+    });
     updateElement(oldVNode, newVnode, false);
     expect(elm.className).toBe('mr fusion');
   });
@@ -78,10 +85,10 @@ describe('updateElement', () => {
     expect(() => {
       const elm = document.createElement('my-tag') as HTMLElement;
       const oldVNode: d.VNode = null;
-      const newVnode: d.VNode = {
+      const newVnode = createTestNode({
         $flags$: 0,
         $elm$: elm,
-      };
+      });
       updateElement(oldVNode, newVnode, false);
     }).not.toThrow();
   });
@@ -92,14 +99,14 @@ describe('updateElement', () => {
       nodeType: NODE_TYPE.DocumentFragment,
     };
     const oldVNode: d.VNode = null;
-    const newVnode: d.VNode = {
+    const newVnode = createTestNode({
       $flags$: 0,
       $elm$: elm,
       $attrs$: {
         class: 'mr fusion',
         style: { color: 'gray' },
       },
-    };
+    });
     updateElement(oldVNode, newVnode, false);
     expect(elm.host.className).toBe('mr fusion');
     expect(elm.host.style.color).toBe('gray');
@@ -109,14 +116,14 @@ describe('updateElement', () => {
     const elm: any = document.createElement('a') as HTMLElement;
     elm.host = 'localhost:8888';
     const oldVNode: d.VNode = null;
-    const newVnode: d.VNode = {
+    const newVnode = createTestNode({
       $flags$: 0,
       $elm$: elm,
       $attrs$: {
         class: 'mr fusion',
         style: { color: 'gray' },
       },
-    };
+    });
     updateElement(oldVNode, newVnode, false);
     expect(elm.className).toBe('mr fusion');
     expect(elm.style.color).toBe('gray');
@@ -125,14 +132,14 @@ describe('updateElement', () => {
   it('should use host element when not shadow dom', () => {
     const elm = document.createElement('my-tag') as HTMLElement;
     const oldVNode: d.VNode = null;
-    const newVnode: d.VNode = {
+    const newVnode = createTestNode({
       $flags$: 0,
       $elm$: elm,
       $attrs$: {
         class: 'mr fusion',
         style: { color: 'gray' },
       },
-    };
+    });
     updateElement(oldVNode, newVnode, false);
     expect(elm.className).toBe('mr fusion');
     expect(elm.style.color).toBe('gray');
@@ -142,7 +149,7 @@ describe('updateElement', () => {
     const spy = jest.spyOn(setAccessor, 'setAccessor');
     const elm = document.createElement('section') as HTMLElement;
     const initialVNode: d.VNode = null;
-    const firstVNode: d.VNode = {
+    const firstVNode = createTestNode({
       $flags$: 0,
       $elm$: elm,
       $attrs$: {
@@ -151,8 +158,8 @@ describe('updateElement', () => {
         bold: 'false',
         'no-attr': null,
       },
-    };
-    const secondVNode: d.VNode = {
+    });
+    const secondVNode = createTestNode({
       $flags$: 0,
       $elm$: elm,
       $attrs$: {
@@ -163,7 +170,7 @@ describe('updateElement', () => {
         color: 'lime',
         'no-attr': null,
       },
-    };
+    });
     updateElement(initialVNode, firstVNode, false);
     expect(spy).toHaveBeenCalledTimes(4);
     expect(spy).toHaveBeenNthCalledWith(1, elm, 'content', undefined, 'attributes removed', false, 0);
