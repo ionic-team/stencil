@@ -40,5 +40,6 @@ module.exports = {
     "jsdoc/require-param-description": ["error"],
     'prefer-const': 'error',
     'no-var': 'error',
+    'prefer-rest-params': 'error',
   },
 };

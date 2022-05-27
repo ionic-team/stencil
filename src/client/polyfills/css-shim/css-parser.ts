@@ -140,7 +140,7 @@ function _expandUnicodeEscapes(s: string): string {
  * @param  text an optional string to append the stringified CSS to
  * @return the stringified CSS.
  */
-export function stringify(node: StyleNode, preserveProperties: boolean, text = '') {
+export function stringify(node: StyleNode, preserveProperties: boolean, text = ''): string {
   // calc rule cssText
   let cssText = '';
   if (node['cssText'] || node['rules']) {
@@ -185,7 +185,7 @@ function _hasMixinRules(rules: ReadonlyArray<StyleNode>): boolean {
  * @param cssText the stringified CSS to remove custom properties from
  * @return the sanitized CSS
  */
-function removeCustomProps(cssText: string) {
+function removeCustomProps(cssText: string): string {
   cssText = removeCustomPropAssignment(cssText);
   return removeCustomPropApply(cssText);
 }
@@ -204,7 +204,7 @@ export function removeCustomPropAssignment(cssText: string): string {
  * @param cssText the stringified CSS to remove custom properties from
  * @return the sanitized CSS
  */
-function removeCustomPropApply(cssText: string) {
+function removeCustomPropApply(cssText: string): string {
   return cssText.replace(RX.mixinApply, '').replace(RX.varApply, '');
 }
 
