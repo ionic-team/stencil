@@ -19,12 +19,16 @@ describe('validateServiceWorker', () => {
    * `serviceWorker?: ServiceWorkerConfig | null | false;` we get type errors
    * all over if we try to just access it directly. So instead, do a little
    * check to see if it's falsy. If not, we return it, and if it is we fail the test.
+   *
+   * @param target the output target from which we want to pull the serviceWorker
+   * @returns a serviceWorker object or `void`, with a `void` return being
+   * accompanied by a manually-triggered test failure.
    */
   function getServiceWorker(target: OutputTargetWww) {
     if (target.serviceWorker) {
       return target.serviceWorker;
     } else {
-      fail("shouldn't get here");
+      fail("the serviceWorker on the provided target was unexpectedly falsy, so this test needs to fail!")
     }
   }
 
