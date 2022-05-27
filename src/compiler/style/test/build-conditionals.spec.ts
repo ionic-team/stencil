@@ -1,8 +1,10 @@
 // @ts-nocheck
+// TODO(STENCIL-463): as part of getting these tests to pass, remove // @ts-nocheck
 import { Compiler, Config } from '@stencil/core/compiler';
 import { mockConfig } from '@stencil/core/testing';
 import path from 'path';
 
+// TODO(STENCIL-463): investigate getting these tests to pass again
 xdescribe('build-conditionals', () => {
   jest.setTimeout(20000);
   let compiler: Compiler;
