@@ -126,5 +126,5 @@ const getRelativeDts = (config: d.Config, srcPath: string, emitDtsPath: string) 
     emitDtsPath = join(emitDtsPath, '..');
     srcPath = normalizePath(join(srcPath, '..'));
   }
-  return join.apply(null, parts.reverse());
+  return join(...parts.reverse());
 };
