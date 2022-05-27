@@ -40,7 +40,7 @@ describe('node-lazy-require', () => {
         async (testVersion) => {
           const nodeLazyRequire = setup(jestTestRange());
           readFSMock.mockReturnValue(mockPackageJson(testVersion));
-          let diagnostics = await nodeLazyRequire.ensure('.', ['jest']);
+          const diagnostics = await nodeLazyRequire.ensure('.', ['jest']);
           expect(diagnostics.length).toBe(0);
         }
       );
@@ -50,7 +50,7 @@ describe('node-lazy-require', () => {
         async (testVersion) => {
           const nodeLazyRequire = setup(jestTestRange(undefined));
           readFSMock.mockReturnValue(mockPackageJson(testVersion));
-          let diagnostics = await nodeLazyRequire.ensure('.', ['jest']);
+          const diagnostics = await nodeLazyRequire.ensure('.', ['jest']);
           expect(diagnostics.length).toBe(0);
         }
       );
@@ -59,7 +59,7 @@ describe('node-lazy-require', () => {
         const range = jestTestRange(maxVersion);
         const nodeLazyRequire = setup(range);
         readFSMock.mockReturnValue(mockPackageJson('1.1.1'));
-        let [error] = await nodeLazyRequire.ensure('.', ['jest']);
+        const [error] = await nodeLazyRequire.ensure('.', ['jest']);
         expect(error).toEqual({
           ...buildError([]),
           header: 'Please install supported versions of dev dependencies with either npm or yarn.',
@@ -73,7 +73,7 @@ describe('node-lazy-require', () => {
           const range = jestTestRange();
           const nodeLazyRequire = setup(range);
           readFSMock.mockReturnValue(mockPackageJson(version));
-          let [error] = await nodeLazyRequire.ensure('.', ['jest']);
+          const [error] = await nodeLazyRequire.ensure('.', ['jest']);
           expect(error).toEqual({
             ...buildError([]),
             header: 'Please install supported versions of dev dependencies with either npm or yarn.',

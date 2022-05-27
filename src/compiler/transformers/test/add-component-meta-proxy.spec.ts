@@ -4,6 +4,7 @@ import * as TransformUtils from '../transform-utils';
 import * as FormatComponentRuntimeMeta from '../../../utils/format-component-runtime-meta';
 import ts from 'typescript';
 import { HTML_ELEMENT } from '../core-runtime-apis';
+import { stubComponentCompilerMeta } from '../../../compiler/types/tests/ComponentCompilerMeta.stub';
 
 describe('add-component-meta-proxy', () => {
   describe('createAnonymousClassMetadataProxy()', () => {
@@ -50,41 +51,25 @@ describe('add-component-meta-proxy', () => {
     });
 
     it('returns a call expression', () => {
-      const result: ts.CallExpression = createAnonymousClassMetadataProxy(
-        // TODO(STENCIL-378): Replace with a getMockComponentCompilerMeta() call
-        [] as unknown as d.ComponentCompilerMeta,
-        classExpr
-      );
+      const result: ts.CallExpression = createAnonymousClassMetadataProxy(stubComponentCompilerMeta(), classExpr);
 
       expect(ts.isCallExpression(result)).toBe(true);
     });
 
     it('wraps the initializer in PROXY_CUSTOM_ELEMENT', () => {
-      const result: ts.CallExpression = createAnonymousClassMetadataProxy(
-        // TODO(STENCIL-378): Replace with a getMockComponentCompilerMeta() call
-        [] as unknown as d.ComponentCompilerMeta,
-        classExpr
-      );
+      const result: ts.CallExpression = createAnonymousClassMetadataProxy(stubComponentCompilerMeta(), classExpr);
 
       expect((result.expression as ts.Identifier).escapedText).toBe('___stencil_proxyCustomElement');
     });
 
     it("doesn't add any type arguments to the call", () => {
-      const result: ts.CallExpression = createAnonymousClassMetadataProxy(
-        // TODO(STENCIL-378): Replace with a getMockComponentCompilerMeta() call
-        [] as unknown as d.ComponentCompilerMeta,
-        classExpr
-      );
+      const result: ts.CallExpression = createAnonymousClassMetadataProxy(stubComponentCompilerMeta(), classExpr);
 
       expect(result.typeArguments).toHaveLength(0);
     });
 
     it('adds the correct arguments to the PROXY_CUSTOM_ELEMENT call', () => {
-      const result: ts.CallExpression = createAnonymousClassMetadataProxy(
-        // TODO(STENCIL-378): Replace with a getMockComponentCompilerMeta() call
-        [] as unknown as d.ComponentCompilerMeta,
-        classExpr
-      );
+      const result: ts.CallExpression = createAnonymousClassMetadataProxy(stubComponentCompilerMeta(), classExpr);
 
       expect(result.arguments).toHaveLength(2);
       expect(result.arguments[0]).toBe(classExpr);
@@ -92,11 +77,7 @@ describe('add-component-meta-proxy', () => {
     });
 
     it('includes the heritage clause', () => {
-      const result: ts.CallExpression = createAnonymousClassMetadataProxy(
-        // TODO(STENCIL-378): Replace with a getMockComponentCompilerMeta() call
-        [] as unknown as d.ComponentCompilerMeta,
-        classExpr
-      );
+      const result: ts.CallExpression = createAnonymousClassMetadataProxy(stubComponentCompilerMeta(), classExpr);
 
       expect(result.arguments.length).toBeGreaterThanOrEqual(1);
       const createdClassExpression = result.arguments[0];

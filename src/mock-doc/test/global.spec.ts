@@ -1,9 +1,3 @@
-import { MockDocument } from '../document';
-import { MockWindow, cloneWindow } from '../window';
-import { MockElement, MockHTMLElement } from '../node';
-import { XLINK_NS } from '../../runtime/runtime-constants';
-import { MockSVGElement } from '../element';
-
 describe('global', () => {
   it('HTMLElement', () => {
     expect(HTMLElement).toBeDefined();

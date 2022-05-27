@@ -1,5 +1,4 @@
-import { isInteractive, TERMINAL_INFO, tryFn, uuidv4, hasDebug, hasVerbose } from '../helpers';
-import { mockLogger } from '@stencil/core/testing';
+import { isInteractive, tryFn, uuidv4, hasDebug, hasVerbose } from '../helpers';
 import { createSystem } from '../../../compiler/sys/stencil-sys';
 
 describe('hasDebug', () => {

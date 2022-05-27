@@ -58,7 +58,7 @@ export const generateAppTypes = async (
 };
 
 /**
- * Generates a `component.d.ts` file's contents, which contains the typings for all components in a Stencil project
+ * Generates a `components.d.ts` file's contents, which contains the typings for all components in a Stencil project
  * @param config the Stencil configuration associated with the project being compiled
  * @param buildCtx the context associated with the current build
  * @param areTypesInternal determines if non-exported type definitions are being generated or not

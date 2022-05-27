@@ -22,7 +22,7 @@ export const h = (nodeName: any, vnodeData: any, ...children: d.ChildType[]): d.
   let slotName: string = null;
   let simple = false;
   let lastSimple = false;
-  let vNodeChildren: d.VNode[] = [];
+  const vNodeChildren: d.VNode[] = [];
   const walk = (c: any[]) => {
     for (let i = 0; i < c.length; i++) {
       child = c[i];

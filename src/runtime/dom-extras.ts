@@ -15,7 +15,7 @@ export const patchCloneNode = (HostElementPrototype: any) => {
     if (BUILD.slot && !isShadowDom && deep) {
       let i = 0;
       let slotted, nonStencilNode;
-      let stencilPrivates = [
+      const stencilPrivates = [
         's-id',
         's-cr',
         's-lr',

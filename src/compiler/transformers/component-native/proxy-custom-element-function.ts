@@ -39,9 +39,9 @@ export const proxyCustomElement = (
 
       const principalComponent = moduleFile.cmps[0];
 
-      for (let [stmtIndex, stmt] of tsSourceFile.statements.entries()) {
+      for (const [stmtIndex, stmt] of tsSourceFile.statements.entries()) {
         if (ts.isVariableStatement(stmt)) {
-          for (let [declarationIndex, declaration] of stmt.declarationList.declarations.entries()) {
+          for (const [declarationIndex, declaration] of stmt.declarationList.declarations.entries()) {
             if (declaration.name.getText() !== principalComponent.componentClassName) {
               continue;
             }

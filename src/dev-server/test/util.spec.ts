@@ -171,7 +171,7 @@ describe('getDevServerClientUrl', () => {
       acceptHeader: '',
       searchParams: null,
     };
-    let r = getSsrStaticDataPath(req);
+    const r = getSsrStaticDataPath(req);
     expect(r.fileName).toBe('page.static.json');
     expect(r.hasQueryString).toBe(false);
     expect(r.ssrPath).toBe('http://stenciljs.com/');

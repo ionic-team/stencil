@@ -218,7 +218,7 @@ const parseDevModuleUrl = (config: d.Config, u: string) => {
     let reqPath = basename(url.pathname);
     reqPath = reqPath.substring(0, reqPath.length - 3);
 
-    let splt = reqPath.split('@');
+    const splt = reqPath.split('@');
     if (splt.length === 2) {
       parsedUrl.nodeModuleId = decodeURIComponent(splt[0]);
       parsedUrl.nodeModuleVersion = decodeURIComponent(splt[1]);
