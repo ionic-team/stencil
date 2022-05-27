@@ -366,8 +366,8 @@ describe('css-shim', () => {
     );
   });
 
-  var window: Window;
-  var document: Document;
+  let window: Window;
+  let document: Document;
 
   function style(text: string) {
     const elm = document.createElement('style');
