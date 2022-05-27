@@ -105,7 +105,7 @@ export const setAccessor = (
       if ((isProp || (isComplex && newValue !== null)) && !isSvg) {
         try {
           if (!elm.tagName.includes('-')) {
-            let n = newValue == null ? '' : newValue;
+            const n = newValue == null ? '' : newValue;
 
             // Workaround for Safari, moving the <input> caret when re-assigning the same valued
             if (memberName === 'list') {

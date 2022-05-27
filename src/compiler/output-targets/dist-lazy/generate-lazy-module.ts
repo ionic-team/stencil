@@ -277,7 +277,7 @@ const writeLazyEntry = async (
   if (isBrowserBuild && ['loader'].includes(rollupResult.entryKey)) {
     return;
   }
-  let inputCode = rollupResult.code.replace(`[/*!__STENCIL_LAZY_DATA__*/]`, `${lazyRuntimeData}`);
+  const inputCode = rollupResult.code.replace(`[/*!__STENCIL_LAZY_DATA__*/]`, `${lazyRuntimeData}`);
   const { code, sourceMap } = await convertChunk(
     config,
     compilerCtx,
@@ -310,7 +310,7 @@ const formatLazyBundlesRuntimeMeta = (bundleModules: d.BundleModule[]): string =
 };
 
 const formatLazyRuntimeBundle = (bundleModule: d.BundleModule): d.LazyBundleRuntimeData => {
-  let bundleId = bundleModule.output.bundleId;
+  const bundleId = bundleModule.output.bundleId;
   const bundleCmps = bundleModule.cmps.slice().sort(sortBundleComponents);
   return [bundleId, bundleCmps.map((cmp) => formatComponentRuntimeMeta(cmp, true))];
 };

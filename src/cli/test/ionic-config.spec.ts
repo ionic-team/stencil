@@ -64,7 +64,7 @@ describe('readConfig', () => {
   it('should read a file if it exists', async () => {
     await writeConfig(sys, { 'telemetry.stencil': true, 'tokens.telemetry': UUID1 });
 
-    let result = await sys.stat(defaultConfig(sys));
+    const result = await sys.stat(defaultConfig(sys));
 
     expect(result.isFile).toBe(true);
 
@@ -82,7 +82,7 @@ describe('updateConfig', () => {
   it('should edit a file', async () => {
     await writeConfig(sys, { 'telemetry.stencil': true, 'tokens.telemetry': UUID1 });
 
-    let result = await sys.stat(defaultConfig(sys));
+    const result = await sys.stat(defaultConfig(sys));
 
     expect(result.isFile).toBe(true);
 

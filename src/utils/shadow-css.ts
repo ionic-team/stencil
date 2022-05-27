@@ -13,7 +13,6 @@
 const safeSelector = (selector: string) => {
   const placeholders: string[] = [];
   let index = 0;
-  let content: string;
 
   // Replaces attribute selectors with placeholders.
   // The WS in [attr="va lue"] would otherwise be interpreted as a selector separator.
@@ -26,7 +25,7 @@ const safeSelector = (selector: string) => {
 
   // Replaces the expression in `:nth-child(2n + 1)` with a placeholder.
   // WS and "+" would otherwise be interpreted as selector separators.
-  content = selector.replace(/(:nth-[-\w]+)(\([^)]+\))/g, (_, pseudo, exp) => {
+  const content = selector.replace(/(:nth-[-\w]+)(\([^)]+\))/g, (_, pseudo, exp) => {
     const replaceBy = `__ph-${index}__`;
     placeholders.push(exp);
     index++;
