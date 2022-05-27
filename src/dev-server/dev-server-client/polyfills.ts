@@ -1,3 +1,4 @@
+/* eslint-disable no-var */
 export const applyPolyfills = (win: any) => {
   applyObjectAssign();
   applyCustomEvent(win);
@@ -24,12 +25,12 @@ const applyObjectAssign = () => {
   if (typeof Object.assign !== 'function') {
     Object.defineProperty(Object, 'assign', {
       value: function assign(target: any) {
-        const to = Object(target);
+        var to = Object(target);
 
-        for (let index = 1; index < arguments.length; index++) {
-          const nextSource = arguments[index];
+        for (var index = 1; index < arguments.length; index++) {
+          var nextSource = arguments[index];
           if (nextSource != null) {
-            for (const nextKey in nextSource) {
+            for (var nextKey in nextSource) {
               if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
                 to[nextKey] = nextSource[nextKey];
               }

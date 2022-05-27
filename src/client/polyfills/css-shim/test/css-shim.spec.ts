@@ -366,8 +366,8 @@ describe('css-shim', () => {
     );
   });
 
-  let window: Window;
-  let document: Document;
+  var window: Window; // eslint-disable-line no-var
+  var document: Document; // eslint-disable-line no-var
 
   function style(text: string) {
     const elm = document.createElement('style');
