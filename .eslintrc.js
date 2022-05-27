@@ -18,5 +18,6 @@ module.exports = {
     'no-var': 'error',
     'prefer-rest-params': 'error',
     'prefer-spread': 'error',
+    'valid-typeof': 'error',
   },
 };
