@@ -30,7 +30,7 @@ export const setBooleanConfig = <K extends keyof d.Config>(
   defaultValue: d.Config[K]
 ) => {
   if (flagName) {
-    let flagValue = config.flags?.[flagName];
+    const flagValue = config.flags?.[flagName];
     if (isBoolean(flagValue)) {
       config[configName] = flagValue;
     }
