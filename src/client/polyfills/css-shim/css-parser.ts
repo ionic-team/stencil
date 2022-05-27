@@ -21,12 +21,13 @@ export class StyleNode {
   parsedSelector = '';
 }
 
-// given a string of css, return a simple rule tree
 /**
+ * Given a string of css, return a simple rule tree
+ *
  * @param {string} text
  * @return {StyleNode}
  */
-export function parse(text: string) {
+export function parse(text: string): StyleNode {
   text = clean(text);
   return parseCss(lex(text), text);
 }
@@ -36,7 +37,7 @@ export function parse(text: string) {
  * @param {string} cssText
  * @return {string}
  */
-function clean(cssText: string) {
+function clean(cssText: string): string {
   return cssText.replace(RX.comments, '').replace(RX.port, '');
 }
 
@@ -45,7 +46,7 @@ function clean(cssText: string) {
  * @param {string} text
  * @return {StyleNode}
  */
-function lex(text: string) {
+function lex(text: string): StyleNode {
   const root = new StyleNode();
   root['start'] = 0;
   root['end'] = text.length;
@@ -76,7 +77,7 @@ function lex(text: string) {
  * @param {string} text
  * @return {StyleNode}
  */
-function parseCss(node: StyleNode, text: string) {
+function parseCss(node: StyleNode, text: string): StyleNode {
   let t = text.substring(node['start'], node['end'] - 1);
   node['parsedCssText'] = node['cssText'] = t.trim();
   if (node.parent) {
@@ -120,7 +121,7 @@ function parseCss(node: StyleNode, text: string) {
  * @param {string} s
  * @return {string}
  */
-function _expandUnicodeEscapes(s: string, ...rest: string[]) {
+function _expandUnicodeEscapes(s: string, ...rest: string[]): string {
   return s.replace(/\\([0-9a-f]{1,6})\s/gi, function () {
     let code = rest[1],
       repeat = 6 - code.length;
@@ -138,7 +139,7 @@ function _expandUnicodeEscapes(s: string, ...rest: string[]) {
  * @param {string=} text
  * @return {string}
  */
-export function stringify(node: StyleNode, preserveProperties: any, text = '') {
+export function stringify(node: StyleNode, preserveProperties: boolean, text: string = ''): string {
   // calc rule cssText
   let cssText = '';
   if (node['cssText'] || node['rules']) {
@@ -172,7 +173,7 @@ export function stringify(node: StyleNode, preserveProperties: any, text = '') {
  * @param {Array<StyleNode>} rules
  * @return {boolean}
  */
-function _hasMixinRules(rules: any) {
+function _hasMixinRules(rules: StyleNode[]): boolean {
   const r = rules[0];
   return Boolean(r) && Boolean(r['selector']) && r['selector'].indexOf(VAR_START) === 0;
 }
@@ -181,7 +182,7 @@ function _hasMixinRules(rules: any) {
  * @param {string} cssText
  * @return {string}
  */
-function removeCustomProps(cssText: string) {
+function removeCustomProps(cssText: string): string {
   cssText = removeCustomPropAssignment(cssText);
   return removeCustomPropApply(cssText);
 }
@@ -190,7 +191,7 @@ function removeCustomProps(cssText: string) {
  * @param {string} cssText
  * @return {string}
  */
-export function removeCustomPropAssignment(cssText: string) {
+export function removeCustomPropAssignment(cssText: string): string {
   return cssText.replace(RX.customProp, '').replace(RX.mixinProp, '');
 }
 
@@ -198,7 +199,7 @@ export function removeCustomPropAssignment(cssText: string) {
  * @param {string} cssText
  * @return {string}
  */
-function removeCustomPropApply(cssText: string) {
+function removeCustomPropApply(cssText: string): string {
   return cssText.replace(RX.mixinApply, '').replace(RX.varApply, '');
 }
 
