@@ -1,4 +1,5 @@
 /* eslint-disable no-var */
+// TODO(STENCIL-465): Investigate whether we can delete this file
 export const applyPolyfills = (win: any) => {
   applyObjectAssign();
   applyCustomEvent(win);
