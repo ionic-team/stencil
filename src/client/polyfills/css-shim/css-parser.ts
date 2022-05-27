@@ -120,9 +120,9 @@ function parseCss(node: StyleNode, text: string) {
  * @param {string} s
  * @return {string}
  */
-function _expandUnicodeEscapes(s: string) {
+function _expandUnicodeEscapes(s: string, ...rest: string[]) {
   return s.replace(/\\([0-9a-f]{1,6})\s/gi, function () {
-    let code = arguments[1],
+    let code = rest[1],
       repeat = 6 - code.length;
     while (repeat--) {
       code = '0' + code;
