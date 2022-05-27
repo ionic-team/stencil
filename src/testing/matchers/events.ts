@@ -140,9 +140,7 @@ const deepEqual = function equal(a: any, b: any) {
   if (a && b && typeof a == 'object' && typeof b == 'object') {
     const arrA = Array.isArray(a),
       arrB = Array.isArray(b);
-    let i,
-      length,
-      key;
+    let i, length, key;
 
     if (arrA && arrB) {
       length = a.length;
