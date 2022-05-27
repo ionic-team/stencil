@@ -16,5 +16,6 @@ module.exports = {
     }],
     'prefer-const': 'error',
     'no-var': 'error',
+    'prefer-rest-params': 'error',
   },
 };

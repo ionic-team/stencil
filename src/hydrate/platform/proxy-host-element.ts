@@ -55,9 +55,8 @@ export function proxyHostElement(elm: d.HostElement, cmpMeta: d.ComponentRuntime
         });
       } else if (memberFlags & MEMBER_FLAGS.Method) {
         Object.defineProperty(elm, memberName, {
-          value(this: d.HostElement) {
+          value(this: d.HostElement, ...args: any[]) {
             const ref = getHostRef(this);
-            const args = arguments;
             return ref.$onInstancePromise$
               .then(() => ref.$lazyInstance$[memberName].apply(ref.$lazyInstance$, args))
               .catch(consoleError);
