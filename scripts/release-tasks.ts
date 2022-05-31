@@ -1,4 +1,3 @@
-import fs from 'fs-extra';
 import color from 'ansi-colors';
 import execa from 'execa';
 import Listr, { ListrTask } from 'listr';
