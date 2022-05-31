@@ -16,7 +16,7 @@ export const consoleDevError = (...e: any[]) => {
 export const consoleDevWarn = (...args: any[]) => {
   // log warnings so we can spy on them when testing
   const params = args.filter((a) => typeof a === 'string' || typeof a === 'number' || typeof a === 'boolean');
-  console.warn.apply(console, params);
+  console.warn(...params);
 };
 
 export const consoleDevInfo = (..._: any[]) => {
