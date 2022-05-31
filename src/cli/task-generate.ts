@@ -216,7 +216,10 @@ export const getBoilerplateByExtension = (tagName: string, extension: GenerableE
 };
 
 /**
- * Get the boilerplate for a component.
+ * Get the boilerplate for a file containing the definition of a component
+ * @param tagName the name of the tag to give the component
+ * @param hasStyle designates if the component has an external stylesheet or not
+ * @returns the contents of a file that defines a component
  */
 const getComponentBoilerplate = (tagName: string, hasStyle: boolean): string => {
   const decorator = [`{`];
@@ -254,7 +257,9 @@ const getStyleUrlBoilerplate = (): string =>
 `;
 
 /**
- * Get the boilerplate for a spec test.
+ * Get the boilerplate for a file containing a spec (unit) test for a component
+ * @param tagName the name of the tag associated with the component under test
+ * @returns the contents of a file that unit tests a component
  */
 const getSpecTestBoilerplate = (tagName: string): string =>
   `import { newSpecPage } from '@stencil/core/testing';
@@ -278,17 +283,19 @@ describe('${tagName}', () => {
 `;
 
 /**
- * Get the boilerplate for an E2E test.
+ * Get the boilerplate for a file containing an end-to-end (E2E) test for a component
+ * @param tagName the name of the tag associated with the component under test
+ * @returns the contents of a file that E2E tests a component
  */
-const getE2eTestBoilerplate = (name: string): string =>
+const getE2eTestBoilerplate = (tagName: string): string =>
   `import { newE2EPage } from '@stencil/core/testing';
 
-describe('${name}', () => {
+describe('${tagName}', () => {
   it('renders', async () => {
     const page = await newE2EPage();
-    await page.setContent('<${name}></${name}>');
+    await page.setContent('<${tagName}></${tagName}>');
 
-    const element = await page.find('${name}');
+    const element = await page.find('${tagName}');
     expect(element).toHaveClass('hydrated');
   });
 });
@@ -296,6 +303,8 @@ describe('${name}', () => {
 
 /**
  * Convert a dash case string to pascal case.
+ * @param str the string to convert
+ * @returns the converted input as pascal case
  */
 const toPascalCase = (str: string): string =>
   str.split('-').reduce((res, part) => res + part[0].toUpperCase() + part.slice(1), '');

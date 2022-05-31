@@ -141,10 +141,12 @@ export const prepareData = async (
 };
 
 /**
- * Reads package-lock.json, yarn.lock, and package.json files in order to cross reference
+ * Reads package-lock.json, yarn.lock, and package.json files in order to cross-reference
  * the dependencies and devDependencies properties. Pulls up the current installed version
  * of each package under the @stencil, @ionic, and @capacitor scopes.
- * @returns string[]
+ * @param sys the system instance where telemetry is invoked
+ * @param config the Stencil configuration associated with the current task that triggered telemetry
+ * @returns an object listing all dev and production dependencies under the aforementioned scopes
  */
 async function getInstalledPackages(
   sys: d.CompilerSystem,
@@ -238,7 +240,12 @@ function sanitizeDeclaredVersion(version: string): string {
 }
 
 /**
- * If telemetry is enabled, send a metric via IPC to a forked process for uploading.
+ * If telemetry is enabled, send a metric to an external data store
+ * @param sys the system instance where telemetry is invoked
+ * @param config the Stencil configuration associated with the current task that triggered telemetry
+ * @param name the name of a trackable metric. Note this name is not necessarily a scalar value to track, like
+ * "Stencil Version". For example, "stencil_cli_command" is a name that is used to track all CLI command information.
+ * @param value the data to send to the external data store under the provided name argument
  */
 export async function sendMetric(
   sys: d.CompilerSystem,

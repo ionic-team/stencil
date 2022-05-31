@@ -37,9 +37,11 @@ const setup = async () => {
 
 /**
  * Little test helper function which just temporarily silences
- * console.log calls so we can avoid spewing a bunch of stuff.
+ * console.log calls, so we can avoid spewing a bunch of stuff.
+ * @param coreCompiler the core compiler instance to forward to `taskGenerate`
+ * @param config the user-supplied config to forward to `taskGenerate`
  */
-async function silentGenerate(coreCompiler: CoreCompiler, config: d.Config) {
+async function silentGenerate(coreCompiler: CoreCompiler, config: d.Config): Promise<void> {
   const tmp = console.log;
   console.log = jest.fn();
   await taskGenerate(coreCompiler, config);
