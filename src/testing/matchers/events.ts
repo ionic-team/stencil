@@ -138,11 +138,9 @@ const deepEqual = function equal(a: any, b: any) {
   if (a === b) return true;
 
   if (a && b && typeof a == 'object' && typeof b == 'object') {
-    var arrA = Array.isArray(a),
-      arrB = Array.isArray(b),
-      i,
-      length,
-      key;
+    const arrA = Array.isArray(a),
+      arrB = Array.isArray(b);
+    let i, length, key;
 
     if (arrA && arrB) {
       length = a.length;
@@ -153,17 +151,17 @@ const deepEqual = function equal(a: any, b: any) {
 
     if (arrA != arrB) return false;
 
-    var dateA = a instanceof Date,
+    const dateA = a instanceof Date,
       dateB = b instanceof Date;
     if (dateA != dateB) return false;
     if (dateA && dateB) return a.getTime() == b.getTime();
 
-    var regexpA = a instanceof RegExp,
+    const regexpA = a instanceof RegExp,
       regexpB = b instanceof RegExp;
     if (regexpA != regexpB) return false;
     if (regexpA && regexpB) return a.toString() == b.toString();
 
-    var keys = Object.keys(a);
+    const keys = Object.keys(a);
     length = keys.length;
 
     if (length !== Object.keys(b).length) return false;

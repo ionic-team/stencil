@@ -14,6 +14,7 @@ module.exports = {
       // TODO(STENCIL-452): Investigate using eslint-plugin-react to remove the need for varsIgnorePattern
       "varsIgnorePattern": "^(h|Fragment)$" 
     }],
-    'prefer-const': 'error'
+    'prefer-const': 'error',
+    'no-var': 'error',
   },
 };
