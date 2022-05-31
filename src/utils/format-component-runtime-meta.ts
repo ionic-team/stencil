@@ -186,7 +186,7 @@ const computeListenerFlags = (listener: d.ComponentCompilerListener) => {
 
 const trimFalsy = (data: any): any => {
   const arr = data as any[];
-  for (var i = arr.length - 1; i >= 0; i--) {
+  for (let i = arr.length - 1; i >= 0; i--) {
     if (arr[i]) {
       break;
     }

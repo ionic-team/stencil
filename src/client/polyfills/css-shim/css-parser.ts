@@ -21,31 +21,32 @@ export class StyleNode {
   parsedSelector = '';
 }
 
-// given a string of css, return a simple rule tree
 /**
- * @param {string} text
- * @return {StyleNode}
+ * Given a string of CSS, return a simple rule tree
+ * @param text the CSS to generate a tree from
+ * @returns the generated tree
  */
-export function parse(text: string) {
+export function parse(text: string): StyleNode {
   text = clean(text);
   return parseCss(lex(text), text);
 }
 
-// remove stuff we don't care about that may hinder parsing
 /**
- * @param {string} cssText
- * @return {string}
+ * Remove text that may hinder parsing, such as comments and `@import` statements
+ * @param cssText the CSS to remove unnecessary bit from
+ * @return the 'cleaned' css string
  */
-function clean(cssText: string) {
+function clean(cssText: string): string {
   return cssText.replace(RX.comments, '').replace(RX.port, '');
 }
 
-// super simple {...} lexer that returns a node tree
 /**
- * @param {string} text
- * @return {StyleNode}
+ * Create a `StyleNode` for the given text. This function is a super simple lexer against the provided text to capture
+ * CSS rules between curly braces.
+ * @param text the text to parse containing CSS rules
+ * @returns a new `StyleNode` with the parsed styles attached to it
  */
-function lex(text: string) {
+function lex(text: string): StyleNode {
   const root = new StyleNode();
   root['start'] = 0;
   root['end'] = text.length;
@@ -70,13 +71,13 @@ function lex(text: string) {
   return root;
 }
 
-// add selectors/cssText to node tree
 /**
- * @param {StyleNode} node
- * @param {string} text
- * @return {StyleNode}
+ * Add selectors/cssText to a style node
+ * @param node the CSS node to add styles to
+ * @param text the selectors to add to the style node
+ * @returns the updated style node
  */
-function parseCss(node: StyleNode, text: string) {
+function parseCss(node: StyleNode, text: string): StyleNode {
   let t = text.substring(node['start'], node['end'] - 1);
   node['parsedCssText'] = node['cssText'] = t.trim();
   if (node.parent) {
@@ -115,12 +116,12 @@ function parseCss(node: StyleNode, text: string) {
 }
 
 /**
- * conversion of sort unicode escapes with spaces like `\33 ` (and longer) into
- * expanded form that doesn't require trailing space `\000033`
- * @param {string} s
- * @return {string}
+ * Conversion of unicode escapes with spaces like `\33 ` (and longer) into
+ * expanded form that doesn't require trailing space -> `\000033`
+ * @param s the unicode escape sequence to expand
+ * @return the expanded escape sequence
  */
-function _expandUnicodeEscapes(s: string) {
+function _expandUnicodeEscapes(s: string): string {
   return s.replace(/\\([0-9a-f]{1,6})\s/gi, function () {
     let code = arguments[1],
       repeat = 6 - code.length;
@@ -132,13 +133,14 @@ function _expandUnicodeEscapes(s: string) {
 }
 
 /**
- * stringify parsed css.
- * @param {StyleNode} node
- * @param {boolean=} preserveProperties
- * @param {string=} text
- * @return {string}
+ * Stringify some parsed CSS.
+ * @param node the CSS root node to stringify
+ * @param  preserveProperties if `false`, custom CSS properties will be removed from the CSS. If `true`, they will be
+ * preserved.
+ * @param  text an optional string to append the stringified CSS to
+ * @return the stringified CSS.
  */
-export function stringify(node: StyleNode, preserveProperties: any, text = '') {
+export function stringify(node: StyleNode, preserveProperties: boolean, text = '') {
   // calc rule cssText
   let cssText = '';
   if (node['cssText'] || node['rules']) {
@@ -169,17 +171,19 @@ export function stringify(node: StyleNode, preserveProperties: any, text = '') {
 }
 
 /**
- * @param {Array<StyleNode>} rules
- * @return {boolean}
+ * Determines if a parsed CSS node has a selector that begins with '--' or not
+ * @param rules the rules to evaluate. only the first rule in the provided list will be tested.
+ * @return `true` if a selector that begins with '--' is found, `false` otherwise.
  */
-function _hasMixinRules(rules: any) {
+function _hasMixinRules(rules: ReadonlyArray<StyleNode>): boolean {
   const r = rules[0];
   return Boolean(r) && Boolean(r['selector']) && r['selector'].indexOf(VAR_START) === 0;
 }
 
 /**
- * @param {string} cssText
- * @return {string}
+ * Helper function to remove custom properties from CSS
+ * @param cssText the stringified CSS to remove custom properties from
+ * @return the sanitized CSS
  */
 function removeCustomProps(cssText: string) {
   cssText = removeCustomPropAssignment(cssText);
@@ -187,16 +191,18 @@ function removeCustomProps(cssText: string) {
 }
 
 /**
- * @param {string} cssText
- * @return {string}
+ *
+ * @param cssText the stringified CSS to remove custom properties from
+ * @return the sanitized CSS
  */
-export function removeCustomPropAssignment(cssText: string) {
+export function removeCustomPropAssignment(cssText: string): string {
   return cssText.replace(RX.customProp, '').replace(RX.mixinProp, '');
 }
 
 /**
- * @param {string} cssText
- * @return {string}
+ *
+ * @param cssText the stringified CSS to remove custom properties from
+ * @return the sanitized CSS
  */
 function removeCustomPropApply(cssText: string) {
   return cssText.replace(RX.mixinApply, '').replace(RX.varApply, '');
