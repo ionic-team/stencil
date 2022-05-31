@@ -49,14 +49,14 @@ export const updateTypeIdentifierNames = (
   let currentTypeName = initialType;
 
   // iterate over each of the type references, as there may be >1 reference to inspect
-  for (let typeReference of Object.values(typeReferences)) {
+  for (const typeReference of Object.values(typeReferences)) {
     const importResolvedFile = getTypeImportPath(typeReference.path, sourceFilePath);
 
     if (!typeImportData.hasOwnProperty(importResolvedFile)) {
       continue;
     }
 
-    for (let typesImportDatumElement of typeImportData[importResolvedFile]) {
+    for (const typesImportDatumElement of typeImportData[importResolvedFile]) {
       currentTypeName = updateTypeName(currentTypeName, typesImportDatumElement);
     }
   }

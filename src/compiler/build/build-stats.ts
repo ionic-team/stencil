@@ -12,6 +12,7 @@ export function generateBuildStats(
   config: d.Config,
   buildCtx: d.BuildCtx
 ): d.CompilerBuildStats | { diagnostics: d.Diagnostic[] } {
+  // TODO(STENCIL-461): Investigate making this return only a single type
   const buildResults = buildCtx.buildResults;
 
   let jsonData: d.CompilerBuildStats | { diagnostics: d.Diagnostic[] };
@@ -114,7 +115,7 @@ function sanitizeBundlesForStats(bundleArray: ReadonlyArray<d.BundleModule>): Re
 }
 
 function getSourceGraph(config: d.Config, buildCtx: d.BuildCtx) {
-  let sourceGraph: d.BuildSourceGraph = {};
+  const sourceGraph: d.BuildSourceGraph = {};
 
   sortBy(buildCtx.moduleFiles, (m) => m.sourceFilePath).forEach((moduleFile) => {
     const key = relativePath(config, moduleFile.sourceFilePath);

@@ -1,5 +1,3 @@
-import type * as d from '../../../declarations';
-
 export class MarkdownTable {
   private rows: RowData[] = [];
 
@@ -141,50 +139,3 @@ interface RowData {
   columns: ColumnData[];
   isHeader?: boolean;
 }
-
-export const getEventDetailType = (eventType: d.JsDoc) => {
-  if (eventType && eventType.type && typeof eventType.type === 'string' && eventType.type !== 'void') {
-    return eventType.type.trim();
-  }
-  return 'void';
-};
-
-export const getMemberDocumentation = (jsDoc: d.JsDoc) => {
-  if (jsDoc && typeof jsDoc.documentation === 'string') {
-    return jsDoc.documentation.trim();
-  }
-  return '';
-};
-
-export const getPlatform = (jsDoc: d.JsDoc) => {
-  const tag = jsDoc.tags.find((t) => t.name === 'platform');
-  return tag.text || 'all';
-};
-
-export const getMemberType = (jsDoc: d.JsDoc) => {
-  if (jsDoc && typeof jsDoc.type === 'string') {
-    return jsDoc.type.trim();
-  }
-  return '';
-};
-
-export const getMethodParameters = ({ parameters }: d.JsDoc): d.JsonDocMethodParameter[] => {
-  if (parameters) {
-    return parameters.map(({ name, type, documentation }) => ({
-      name,
-      type,
-      docs: documentation,
-    }));
-  }
-  return [];
-};
-
-export const getMethodReturns = ({ returns }: d.JsDoc): d.JsonDocsMethodReturn => {
-  if (returns) {
-    return {
-      type: returns.type,
-      docs: returns.documentation,
-    };
-  }
-  return null;
-};

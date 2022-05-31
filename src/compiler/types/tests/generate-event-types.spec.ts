@@ -24,10 +24,9 @@ describe('generate-event-types', () => {
       updateTypeIdentifierNamesSpy.mockImplementation(
         (
           _typeReferences: d.ComponentCompilerTypeReferences,
-          _cmpMeta: d.ComponentCompilerMeta,
           _typeImportData: d.TypesImportData,
-          initialType: string,
-          _updateTypeName: (currentTypeName: string, typeAlias: d.TypesMemberNameData) => string
+          _sourceFilePath: string,
+          initialType: string
         ) => initialType
       );
 
@@ -47,8 +46,9 @@ describe('generate-event-types', () => {
     it('returns an empty array when no events are provided', () => {
       const stubImportTypes = stubTypesImportData();
       const componentMeta = stubComponentCompilerMeta();
+      const cmpClassName = 'MyComponent';
 
-      expect(generateEventTypes(componentMeta, stubImportTypes)).toEqual([]);
+      expect(generateEventTypes(componentMeta, stubImportTypes, cmpClassName)).toEqual([]);
     });
 
     it('prefixes the event name with "on"', () => {
@@ -56,8 +56,9 @@ describe('generate-event-types', () => {
       const componentMeta = stubComponentCompilerMeta({
         events: [stubComponentCompilerEvent()],
       });
+      const cmpClassName = 'MyComponent';
 
-      const actualTypeInfo = generateEventTypes(componentMeta, stubImportTypes);
+      const actualTypeInfo = generateEventTypes(componentMeta, stubImportTypes, cmpClassName);
 
       expect(actualTypeInfo).toHaveLength(1);
       expect(actualTypeInfo[0].name).toBe('onMyEvent');
@@ -68,11 +69,12 @@ describe('generate-event-types', () => {
       const componentMeta = stubComponentCompilerMeta({
         events: [stubComponentCompilerEvent()],
       });
+      const cmpClassName = 'MyComponent';
 
-      const actualTypeInfo = generateEventTypes(componentMeta, stubImportTypes);
+      const actualTypeInfo = generateEventTypes(componentMeta, stubImportTypes, cmpClassName);
 
       expect(actualTypeInfo).toHaveLength(1);
-      expect(actualTypeInfo[0].type).toBe('(event: CustomEvent<UserImplementedEventType>) => void');
+      expect(actualTypeInfo[0].type).toBe('(event: MyComponentCustomEvent<UserImplementedEventType>) => void');
     });
 
     it('uses an updated type name to avoid naming collisions', () => {
@@ -83,11 +85,12 @@ describe('generate-event-types', () => {
       const componentMeta = stubComponentCompilerMeta({
         events: [stubComponentCompilerEvent()],
       });
+      const cmpClassName = 'MyComponent';
 
-      const actualTypeInfo = generateEventTypes(componentMeta, stubImportTypes);
+      const actualTypeInfo = generateEventTypes(componentMeta, stubImportTypes, cmpClassName);
 
       expect(actualTypeInfo).toHaveLength(1);
-      expect(actualTypeInfo[0].type).toBe(`(event: CustomEvent<${updatedTypeName}>) => void`);
+      expect(actualTypeInfo[0].type).toBe(`(event: MyComponentCustomEvent<${updatedTypeName}>) => void`);
     });
 
     it('derives CustomEvent type when there is no original typing field', () => {
@@ -102,8 +105,9 @@ describe('generate-event-types', () => {
       const componentMeta = stubComponentCompilerMeta({
         events: [componentEvent],
       });
+      const cmpClassName = 'MyComponent';
 
-      const actualTypeInfo = generateEventTypes(componentMeta, stubImportTypes);
+      const actualTypeInfo = generateEventTypes(componentMeta, stubImportTypes, cmpClassName);
 
       expect(actualTypeInfo).toHaveLength(1);
       expect(actualTypeInfo[0].type).toBe('CustomEvent');
@@ -122,11 +126,12 @@ describe('generate-event-types', () => {
           name: 'onMyEvent',
           optional: false,
           required: false,
-          type: '(event: CustomEvent<UserImplementedEventType>) => void',
+          type: '(event: MyComponentCustomEvent<UserImplementedEventType>) => void',
         },
       ];
+      const cmpClassName = 'MyComponent';
 
-      const actualTypeInfo = generateEventTypes(componentMeta, stubImportTypes);
+      const actualTypeInfo = generateEventTypes(componentMeta, stubImportTypes, cmpClassName);
 
       expect(actualTypeInfo).toEqual(expectedTypeInfo);
     });
@@ -150,6 +155,7 @@ describe('generate-event-types', () => {
         events: [componentEvent1, componentEvent2],
       });
       const stubImportTypes = stubTypesImportData();
+      const cmpClassName = 'MyComponent';
 
       const expectedTypeInfo: d.TypeInfo = [
         {
@@ -158,7 +164,7 @@ describe('generate-event-types', () => {
           name: 'onMyEvent',
           optional: false,
           required: false,
-          type: '(event: CustomEvent<UserImplementedEventType>) => void',
+          type: '(event: MyComponentCustomEvent<UserImplementedEventType>) => void',
         },
         {
           jsdoc: '',
@@ -170,7 +176,7 @@ describe('generate-event-types', () => {
         },
       ];
 
-      const actualTypeInfo = generateEventTypes(componentMeta, stubImportTypes);
+      const actualTypeInfo = generateEventTypes(componentMeta, stubImportTypes, cmpClassName);
 
       expect(actualTypeInfo).toEqual(expectedTypeInfo);
     });

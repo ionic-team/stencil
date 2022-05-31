@@ -1,6 +1,7 @@
 import type * as d from '../../declarations';
 import { COMPONENTS_DTS_HEADER, sortImportNames } from './types-utils';
 import { generateComponentTypes } from './generate-component-types';
+import { generateEventDetailTypes } from './generate-event-detail-types';
 import { GENERATED_DTS, getComponentsDtsSrcFilePath } from '../output-targets/output-utils';
 import { isAbsolute, relative, resolve } from 'path';
 import { normalizePath } from '@utils';
@@ -57,7 +58,7 @@ export const generateAppTypes = async (
 };
 
 /**
- * Generates a `component.d.ts` file's contents, which contains the typings for all components in a Stencil project
+ * Generates a `components.d.ts` file's contents, which contains the typings for all components in a Stencil project
  * @param config the Stencil configuration associated with the project being compiled
  * @param buildCtx the context associated with the current build
  * @param areTypesInternal determines if non-exported type definitions are being generated or not
@@ -68,6 +69,7 @@ const generateComponentTypesFile = (config: d.Config, buildCtx: d.BuildCtx, areT
   const c: string[] = [];
   const allTypes = new Map<string, number>();
   const components = buildCtx.components.filter((m) => !m.isCollectionDependency);
+  const componentEventDetailTypes: d.TypesModule[] = [];
 
   const modules: d.TypesModule[] = components.map((cmp) => {
     /**
@@ -77,6 +79,12 @@ const generateComponentTypesFile = (config: d.Config, buildCtx: d.BuildCtx, areT
      * grow as more components (with additional types) are processed.
      */
     typeImportData = updateReferenceTypeImports(typeImportData, allTypes, cmp, cmp.sourceFilePath);
+    if (cmp.events.length > 0) {
+      /**
+       * Only generate event detail types for components that have events.
+       */
+      componentEventDetailTypes.push(generateEventDetailTypes(cmp));
+    }
     return generateComponentTypes(cmp, typeImportData, areTypesInternal);
   });
 
@@ -107,7 +115,11 @@ const generateComponentTypesFile = (config: d.Config, buildCtx: d.BuildCtx, areT
     })
   );
 
-  c.push(`export namespace Components {\n${modules.map((m) => `${m.component}`).join('\n')}\n}`);
+  c.push(`export namespace Components {`);
+  c.push(...modules.map((m) => `${m.component}`));
+  c.push(`}`);
+
+  c.push(...componentEventDetailTypes.map((m) => `${m.component}`));
 
   c.push(`declare global {`);
 
