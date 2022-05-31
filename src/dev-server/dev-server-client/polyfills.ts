@@ -1,4 +1,4 @@
-/* eslint-disable no-var */
+/* eslint-disable no-var -- shims will continue to use var while we support older browsers */
 export const applyPolyfills = (win: any) => {
   applyObjectAssign();
   applyCustomEvent(win);
