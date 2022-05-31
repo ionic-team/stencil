@@ -28,5 +28,5 @@
     "src/testing/index.ts",
     "src/testing/platform/index.ts"
   ],
-  "include": ["types/*.d.ts", "src/declarations/*.ts", "src/**/*.spec.ts"]
+//  "include": ["types/*.d.ts", "src/declarations/*.ts", "src/**/*.spec.ts"]
 }
