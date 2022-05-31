@@ -19,7 +19,7 @@ export const createWorkerMessageHandler = (sys: d.CompilerSystem): d.WorkerMsgHa
     const fnArgs = msgToWorker.args.slice(1);
     const fn = (workerCtx as any)[fnName] as Function;
     if (typeof fn === 'function') {
-      return fn.apply(null, fnArgs);
+      return fn(...fnArgs);
     }
   };
 };
