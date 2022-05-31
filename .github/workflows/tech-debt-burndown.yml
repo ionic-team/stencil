@@ -70,7 +70,7 @@ jobs:
         if: ${{ matrix.branch == 'main' }}
 
       - name: Run ts-prune and write output to disk
-        run: npx ts-prune -p ./tsconfig-prune.json > unused-exports-${{ matrix.branch }}.txt
+        run: npx ts-prune -p ./tsconfig.json > unused-exports-${{ matrix.branch }}.txt
         if: ${{ matrix.branch == 'pr' }}
 
       - name: Upload unused exports
