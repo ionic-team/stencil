@@ -133,24 +133,24 @@ export type ParsePackageJsonResult = {
  * @returns the results of parsing the provided contents of the `package.json` file
  */
 export const parsePackageJson = (pkgJsonStr: string, pkgJsonFilePath: string): ParsePackageJsonResult => {
-  const rtn: ParsePackageJsonResult = {
+  const parseResult: ParsePackageJsonResult = {
     diagnostic: null,
     data: null,
     filePath: pkgJsonFilePath,
   };
 
   try {
-    rtn.data = JSON.parse(pkgJsonStr);
+    parseResult.data = JSON.parse(pkgJsonStr);
   } catch (e) {
-    rtn.diagnostic = buildError();
-    rtn.diagnostic.absFilePath = isString(pkgJsonFilePath) ? pkgJsonFilePath : undefined;
-    rtn.diagnostic.header = `Error Parsing JSON`;
+    parseResult.diagnostic = buildError();
+    parseResult.diagnostic.absFilePath = isString(pkgJsonFilePath) ? pkgJsonFilePath : undefined;
+    parseResult.diagnostic.header = `Error Parsing JSON`;
     if (e instanceof Error) {
-      rtn.diagnostic.messageText = e.message;
+      parseResult.diagnostic.messageText = e.message;
     }
   }
 
-  return rtn;
+  return parseResult;
 };
 
 const SKIP_DEPS = ['@stencil/core'];
