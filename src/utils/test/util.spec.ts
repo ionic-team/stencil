@@ -156,14 +156,6 @@ describe('util', () => {
   describe('parsePackageJson', () => {
     const mockPackageJsonPath = '/mock/path/package.json';
 
-    it('returns null if the path to package.json is not a string', () => {
-      // code paths exist where the path argument is provided by a Stencil config file. Because this is user-provided
-      // input, the path may not be a valid string, requiring a type assertion for the second argument
-      const diagnostic = util.parsePackageJson('{ "someJson": "value"}', null as unknown as string);
-
-      expect(diagnostic).toBeNull();
-    });
-
     it('returns a parse error if parsing cannot complete', () => {
       // improperly formatted JSON - note the lack of ':'
       const diagnostic = util.parsePackageJson('{ "someJson" "value"}', mockPackageJsonPath);
@@ -179,6 +171,24 @@ describe('util', () => {
         diagnostic: expectedDiagnostic,
         data: null,
         filePath: mockPackageJsonPath,
+      });
+    });
+
+    it('returns a parse error if parsing cannot complete for undefined package path', () => {
+      // improperly formatted JSON - note the lack of ':'
+      const diagnostic = util.parsePackageJson('{ "someJson" "value"}', undefined);
+
+      const expectedDiagnostic: d.Diagnostic = stubDiagnostic({
+        absFilePath: undefined,
+        header: 'Error Parsing JSON',
+        messageText: 'Unexpected string in JSON at position 13', // due to missing colon in input
+        type: 'build',
+      });
+
+      expect(diagnostic).toEqual<ParsePackageJsonResult>({
+        diagnostic: expectedDiagnostic,
+        data: null,
+        filePath: undefined,
       });
     });
 

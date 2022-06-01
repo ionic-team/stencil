@@ -132,11 +132,8 @@ export type ParsePackageJsonResult = {
  * @param pkgJsonFilePath the path to the already read `package.json` file
  * @returns the results of parsing the provided contents of the `package.json` file
  */
-export const parsePackageJson = (pkgJsonStr: string, pkgJsonFilePath: string): ParsePackageJsonResult | null => {
-  if (isString(pkgJsonFilePath)) {
-    return parseJson(pkgJsonStr, pkgJsonFilePath);
-  }
-  return null;
+export const parsePackageJson = (pkgJsonStr: string, pkgJsonFilePath: string): ParsePackageJsonResult => {
+  return parseJson(pkgJsonStr, pkgJsonFilePath);
 };
 
 /**
