@@ -72,14 +72,25 @@ ${docs.tags
   .join('\n')}`.trim();
 }
 
-export const getDependencies = (buildCtx: d.BuildCtx) => {
+/**
+ * Retrieve a project's dependencies from the current build context
+ * @param buildCtx the current build context to query for a specific package
+ * @returns a list of package names the project is dependent on
+ */
+const getDependencies = (buildCtx: d.BuildCtx): ReadonlyArray<string> => {
   if (buildCtx.packageJson != null && buildCtx.packageJson.dependencies != null) {
     return Object.keys(buildCtx.packageJson.dependencies).filter((pkgName) => !SKIP_DEPS.includes(pkgName));
   }
   return [];
 };
 
-export const hasDependency = (buildCtx: d.BuildCtx, depName: string) => {
+/**
+ * Utility to determine whether a project has a dependency on a package
+ * @param buildCtx the current build context to query for a specific package
+ * @param depName the name of the dependency/package
+ * @returns `true` if the project has a dependency a packaged with the provided name, `false` otherwise
+ */
+export const hasDependency = (buildCtx: d.BuildCtx, depName: string): boolean => {
   return getDependencies(buildCtx).includes(depName);
 };
 
