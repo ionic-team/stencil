@@ -99,6 +99,15 @@ export async function getActiveTargets(config: d.Config): Promise<string[]> {
   return Array.from(new Set(result));
 }
 
+/**
+ * Prepare data for telemetry
+ *
+ * @param coreCompiler the core compiler
+ * @param config the current Stencil config
+ * @param sys the compiler system instance in use
+ * @param duration_ms the duration of the action being tracked
+ * @param component_count the number of components being built (optional)
+ */
 export const prepareData = async (
   coreCompiler: CoreCompiler,
   config: d.Config,
@@ -117,6 +126,7 @@ export const prepareData = async (
   const cpu_model = sys.details.cpuModel;
   const build = coreCompiler.buildId || 'unknown';
   const has_app_pwa_config = hasAppTarget(config);
+  const anonymizedConfig = anonymizeConfigForTelemtry(config);
 
   return {
     yarn,
@@ -137,7 +147,74 @@ export const prepareData = async (
     typescript,
     rollup,
     has_app_pwa_config,
+    config: anonymizedConfig,
   };
+};
+
+// Get keys in `d.Config` which map to a value of type `string`
+//
+// Setting a key type to `never` excludes it from a mapped type, so we
+// can get only keys which map to a string value by excluding all keys `K`
+// where `d.Config[K]` does not extend `string`.
+type ConfigStringKeys = keyof { [K in keyof d.Config as d.Config[K] extends string ? K : never]: d.Config[K] };
+
+/**
+ * Anonymize the config for telemtry, replacing potentially revealing config props
+ * with a placeholder string if they are present (this lets us still track how frequently
+ * these config options are being used)
+ *
+ * @param config the config to anonymize
+ * @returns an anonymized copy of the same config
+ */
+export const anonymizeConfigForTelemtry = (config: d.Config): d.Config => {
+  const anonymizedConfig = { ...config };
+  const propsToAnonymize: ConfigStringKeys[] = [
+    'rootDir',
+    'fsNamespace',
+    'packageJsonFilePath',
+    'namespace',
+    'srcDir',
+    'srcIndexHtml',
+    'buildLogFilePath',
+    'cacheDir',
+    'configPath',
+    'tsconfig',
+  ];
+
+  for (const prop of propsToAnonymize) {
+    if (anonymizedConfig[prop] !== undefined) {
+      anonymizedConfig[prop] = 'omitted';
+    }
+  }
+
+  anonymizedConfig.outputTargets = config.outputTargets.map((target) => ({
+    ...target,
+    dir: `actual value for dir omitted`,
+    typesDir: 'omitted',
+  }));
+
+  const propsToDelete: Array<keyof d.Config> = ['sys', 'logger'];
+
+  for (const prop of propsToDelete) {
+    delete anonymizedConfig[prop];
+  }
+
+  if (config.devServer) {
+    anonymizedConfig.devServer = {
+      ...config.devServer,
+      srcIndexHtml: 'omitted',
+      root: 'omitted',
+    };
+  }
+
+  if (config.tsCompilerOptions) {
+    anonymizedConfig.tsCompilerOptions = {
+      ...config.tsCompilerOptions,
+      configFilePath: 'omitted',
+    };
+  }
+
+  return anonymizedConfig;
 };
 
 /**
@@ -263,7 +340,7 @@ export async function sendMetric(
     session_id,
   };
 
-  await sendTelemetry(sys, config, { type: 'telemetry', message });
+  await sendTelemetry(sys, config, message);
 }
 
 /**
@@ -286,12 +363,12 @@ async function getTelemetryToken(sys: d.CompilerSystem) {
  * @param config The config passed into the Stencil command
  * @param data Data to be tracked
  */
-async function sendTelemetry(sys: d.CompilerSystem, config: d.Config, data: any) {
+async function sendTelemetry(sys: d.CompilerSystem, config: d.Config, data: d.Metric): Promise<void> {
   try {
     const now = new Date().toISOString();
 
     const body = {
-      metrics: [data.message],
+      metrics: [data],
       sent_at: now,
     };
 
@@ -305,7 +382,7 @@ async function sendTelemetry(sys: d.CompilerSystem, config: d.Config, data: any)
     });
 
     hasVerbose(config) &&
-      console.debug('\nSent %O metric to events service (status: %O)', data.message.name, response.status, '\n');
+      console.debug('\nSent %O metric to events service (status: %O)', data.name, response.status, '\n');
 
     if (response.status !== 204) {
       hasVerbose(config) &&

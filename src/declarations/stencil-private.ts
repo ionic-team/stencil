@@ -2635,6 +2635,7 @@ export interface TrackableData {
   build: string;
   stencil: string;
   has_app_pwa_config: boolean;
+  config: Config;
 }
 
 /**
