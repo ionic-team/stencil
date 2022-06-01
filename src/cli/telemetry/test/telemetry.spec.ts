@@ -294,7 +294,7 @@ describe('anonymizeConfigForTelemtry', () => {
     const anonymizedConfig = anonymizeConfigForTelemtry({
       outputTargets: [],
       devServer: {
-        anotherOption: 'should see this!',
+        protocol: 'http',
         srcIndexHtml: "shouldn't see this!",
         root: "shouldn't see this!",
       },
@@ -302,7 +302,7 @@ describe('anonymizeConfigForTelemtry', () => {
     expect(anonymizedConfig).toEqual({
       outputTargets: [],
       devServer: {
-        anotherOption: 'should see this!',
+        protocol: 'http',
         srcIndexHtml: 'omitted',
         root: 'omitted',
       },
