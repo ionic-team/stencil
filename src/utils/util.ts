@@ -156,7 +156,7 @@ const parseJson = (jsonStr: string, filePath: string): ParsePackageJsonResult =>
     rtn.data = JSON.parse(jsonStr);
   } catch (e) {
     rtn.diagnostic = buildError();
-    rtn.diagnostic.absFilePath = filePath;
+    rtn.diagnostic.absFilePath = isString(filePath) ? filePath : undefined;
     rtn.diagnostic.header = `Error Parsing JSON`;
     if (e instanceof Error) {
       rtn.diagnostic.messageText = e.message;
