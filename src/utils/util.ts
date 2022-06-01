@@ -138,22 +138,22 @@ export const parsePackageJson = (pkgJsonStr: string, pkgJsonFilePath: string): P
 
 /**
  * Parse a string read from a `package.json` file
- * @param jsonStr the string read from a `package.json` file
- * @param filePath the path to the already read `package.json` file
+ * @param pkgJsonStr the string read from a `package.json` file
+ * @param pkgJsonFilePath the path to the already read `package.json` file
  * @returns the results of parsing the provided contents of the `package.json` file
  */
-const parseJson = (jsonStr: string, filePath: string): ParsePackageJsonResult => {
+const parseJson = (pkgJsonStr: string, pkgJsonFilePath: string): ParsePackageJsonResult => {
   const rtn: ParsePackageJsonResult = {
     diagnostic: null,
     data: null,
-    filePath,
+    filePath: pkgJsonFilePath,
   };
 
   try {
-    rtn.data = JSON.parse(jsonStr);
+    rtn.data = JSON.parse(pkgJsonStr);
   } catch (e) {
     rtn.diagnostic = buildError();
-    rtn.diagnostic.absFilePath = isString(filePath) ? filePath : undefined;
+    rtn.diagnostic.absFilePath = isString(pkgJsonFilePath) ? pkgJsonFilePath : undefined;
     rtn.diagnostic.header = `Error Parsing JSON`;
     if (e instanceof Error) {
       rtn.diagnostic.messageText = e.message;
