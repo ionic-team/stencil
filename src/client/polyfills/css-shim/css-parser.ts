@@ -123,7 +123,7 @@ function parseCss(node: StyleNode, text: string): StyleNode {
  */
 function _expandUnicodeEscapes(s: string): string {
   return s.replace(/\\([0-9a-f]{1,6})\s/gi, function () {
-    // eslint-eslint-disable-next-line prefer-rest-params -- We need to use this here for browser support
+    // eslint-disable-next-line prefer-rest-params -- We need to use this here for browser support
     let code = arguments[1],
       repeat = 6 - code.length;
     while (repeat--) {
