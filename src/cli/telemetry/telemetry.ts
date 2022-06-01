@@ -154,7 +154,7 @@ export const prepareData = async (
 // Setting a key type to `never` excludes it from a mapped type, so we
 // can get only keys which map to a string value by excluding all keys `K`
 // where `d.Config[K]` does not extend `string`.
-type ConfigStringKeys = keyof { [K in keyof d.Config as d.Config[K] extends string ? K : never]: d.Config[K] };
+type ConfigStringKeys = keyof { [K in keyof d.Config as Required<d.Config>[K] extends string ? K : never]: d.Config[K] };
 
 /**
  * Anonymize the config for telemtry, replacing potentially revealing config props
@@ -185,7 +185,7 @@ export const anonymizeConfigForTelemtry = (config: d.Config): d.Config => {
     }
   }
 
-  anonymizedConfig.outputTargets = config.outputTargets.map((target) => ({
+  anonymizedConfig.outputTargets = (config.outputTargets ?? []).map((target) => ({
     ...target,
     dir: 'omitted',
     typesDir: 'omitted',
