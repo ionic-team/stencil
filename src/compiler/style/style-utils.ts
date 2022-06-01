@@ -1,5 +1,3 @@
-import type * as d from '../../declarations';
-
 export const escapeCssForJs = (style: string) => {
   if (typeof style === 'string') {
     return style
