@@ -152,22 +152,15 @@ const parseJson = (jsonStr: string, filePath: string): ParsePackageJsonResult =>
     filePath,
   };
 
-  if (isString(jsonStr)) {
-    try {
-      rtn.data = JSON.parse(jsonStr);
-    } catch (e) {
-      rtn.diagnostic = buildError();
-      rtn.diagnostic.absFilePath = filePath;
-      rtn.diagnostic.header = `Error Parsing JSON`;
-      if (e instanceof Error) {
-        rtn.diagnostic.messageText = e.message;
-      }
-    }
-  } else {
+  try {
+    rtn.data = JSON.parse(jsonStr);
+  } catch (e) {
     rtn.diagnostic = buildError();
     rtn.diagnostic.absFilePath = filePath;
     rtn.diagnostic.header = `Error Parsing JSON`;
-    rtn.diagnostic.messageText = `Invalid JSON input to parse`;
+    if (e instanceof Error) {
+      rtn.diagnostic.messageText = e.message;
+    }
   }
 
   return rtn;

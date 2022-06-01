@@ -164,23 +164,6 @@ describe('util', () => {
       expect(diagnostic).toBeNull();
     });
 
-    it('returns a parse error if the json is not a string', () => {
-      const expectedDiagnostic: d.Diagnostic = stubDiagnostic({
-        absFilePath: mockPackageJsonPath,
-        header: 'Error Parsing JSON',
-        messageText: 'Invalid JSON input to parse',
-        type: 'build',
-      });
-
-      const diagnostic = util.parsePackageJson(null, mockPackageJsonPath);
-
-      expect(diagnostic).toEqual<ParsePackageJsonResult>({
-        diagnostic: expectedDiagnostic,
-        data: null,
-        filePath: mockPackageJsonPath,
-      });
-    });
-
     it('returns a parse error if parsing cannot complete', () => {
       // improperly formatted JSON - note the lack of ':'
       const diagnostic = util.parsePackageJson('{ "someJson" "value"}', mockPackageJsonPath);
