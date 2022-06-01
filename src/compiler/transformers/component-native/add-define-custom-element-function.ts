@@ -227,6 +227,7 @@ const addDefineCustomElementFunction = (
  * ```typescript
  * defineCustomElement(MyPrincipalComponent);
  * ```
+ * @param componentName the component's class name to use as the first argument to `defineCustomElement`
  * @returns the expression statement described above
  */
 function createAutoDefinitionExpression(componentName: string): ts.ExpressionStatement {
