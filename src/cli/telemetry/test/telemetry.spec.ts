@@ -4,6 +4,7 @@ import * as shouldTrack from '../shouldTrack';
 import { createSystem } from '../../../compiler/sys/stencil-sys';
 import { mockLogger } from '@stencil/core/testing';
 import * as coreCompiler from '@stencil/core/compiler';
+import { anonymizeConfigForTelemtry } from '../telemetry';
 
 describe('telemetryBuildFinishedAction', () => {
   const config: d.Config = {
@@ -144,6 +145,12 @@ describe('prepareData', () => {
       arguments: [],
       build: coreCompiler.buildId,
       component_count: undefined,
+      config: {
+        flags: {
+          args: [],
+        },
+        outputTargets: [],
+      },
       cpu_model: '',
       duration_ms: 1000,
       has_app_pwa_config: false,
@@ -176,6 +183,22 @@ describe('prepareData', () => {
       arguments: [],
       build: coreCompiler.buildId,
       component_count: undefined,
+      config: {
+        flags: {
+          args: [],
+        },
+        outputTargets: [
+          {
+            baseUrl: 'omitted',
+            dir: 'omitted',
+            serviceWorker: {
+              swDest: './tmp',
+            },
+            type: 'www',
+            typesDir: 'omitted',
+          },
+        ],
+      },
       cpu_model: '',
       duration_ms: 1000,
       has_app_pwa_config: true,
@@ -208,6 +231,22 @@ describe('prepareData', () => {
       arguments: [],
       build: coreCompiler.buildId,
       component_count: 12,
+      config: {
+        flags: {
+          args: [],
+        },
+        outputTargets: [
+          {
+            baseUrl: 'omitted',
+            dir: 'omitted',
+            serviceWorker: {
+              swDest: './tmp',
+            },
+            type: 'www',
+            typesDir: 'omitted',
+          },
+        ],
+      },
       cpu_model: '',
       duration_ms: 1000,
       has_app_pwa_config: true,
@@ -223,6 +262,67 @@ describe('prepareData', () => {
       task: undefined,
       typescript: coreCompiler.versions.typescript,
       yarn: false,
+    });
+  });
+});
+
+describe('anonymizeConfigForTelemtry', () => {
+  it.each([
+    'rootDir',
+    'fsNamespace',
+    'packageJsonFilePath',
+    'namespace',
+    'srcDir',
+    'srcIndexHtml',
+    'buildLogFilePath',
+    'cacheDir',
+    'configPath',
+    'tsconfig',
+  ])("should anonymize top-level string prop '%s'", (prop: string) => {
+    const anonymizedConfig = anonymizeConfigForTelemtry({ [prop]: "shouldn't see this!", outputTargets: [] });
+    expect(anonymizedConfig).toEqual({ [prop]: 'omitted', outputTargets: [] });
+  });
+
+  it.each(['sys', 'logger'])("should remove objects under prop '%s'", (prop: string) => {
+    const anonymizedConfig = anonymizeConfigForTelemtry({ [prop]: {}, outputTargets: [] });
+    expect(anonymizedConfig).toEqual({
+      outputTargets: [],
+    });
+  });
+
+  it('should anonymize the devServer config', () => {
+    const anonymizedConfig = anonymizeConfigForTelemtry({
+      outputTargets: [],
+      devServer: {
+        anotherOption: 'should see this!',
+        srcIndexHtml: "shouldn't see this!",
+        root: "shouldn't see this!",
+      },
+    });
+    expect(anonymizedConfig).toEqual({
+      outputTargets: [],
+      devServer: {
+        anotherOption: 'should see this!',
+        srcIndexHtml: 'omitted',
+        root: 'omitted',
+      },
+    });
+  });
+
+  it('should anonymize the typescript compiler options', () => {
+    const anonymizedConfig = anonymizeConfigForTelemtry({
+      outputTargets: [],
+      tsCompilerOptions: {
+        anotherOption: 'should see this!',
+        configFilePath: "shouldn't see this!",
+      },
+    });
+    expect(anonymizedConfig).toEqual({
+      outputTargets: [],
+      tsCompilerOptions: {
+        anotherOption: 'should see this!',
+        configFilePath: 'omitted',
+      },
     });
   });
 });

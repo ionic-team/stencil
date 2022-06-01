@@ -151,8 +151,6 @@ export const prepareData = async (
   };
 };
 
-// Get keys in `d.Config` which map to a value of type `string`
-//
 // Setting a key type to `never` excludes it from a mapped type, so we
 // can get only keys which map to a string value by excluding all keys `K`
 // where `d.Config[K]` does not extend `string`.
@@ -189,8 +187,9 @@ export const anonymizeConfigForTelemtry = (config: d.Config): d.Config => {
 
   anonymizedConfig.outputTargets = config.outputTargets.map((target) => ({
     ...target,
-    dir: `actual value for dir omitted`,
+    dir: 'omitted',
     typesDir: 'omitted',
+    baseUrl: 'omitted',
   }));
 
   const propsToDelete: Array<keyof d.Config> = ['sys', 'logger'];
