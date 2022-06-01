@@ -1,9 +1,5 @@
 import type * as d from '../../declarations';
 
-export const getStyleId = (cmp: d.ComponentCompilerMeta, modeName: string, isScopedStyles: boolean) => {
-  return `${cmp.tagName}${modeName}${isScopedStyles ? '.sc' : ''}`;
-};
-
 export const escapeCssForJs = (style: string) => {
   if (typeof style === 'string') {
     return style
@@ -15,33 +11,6 @@ export const escapeCssForJs = (style: string) => {
   }
   return style;
 };
-
-export const requiresScopedStyles = (encapsulation: d.Encapsulation, commentOriginalSelector: boolean) => {
-  return encapsulation === 'scoped' || (encapsulation === 'shadow' && commentOriginalSelector);
-};
-
-export const PLUGIN_HELPERS = [
-  {
-    pluginName: 'PostCSS',
-    pluginId: 'postcss',
-    pluginExts: ['pcss'],
-  },
-  {
-    pluginName: 'Sass',
-    pluginId: 'sass',
-    pluginExts: ['scss', 'sass'],
-  },
-  {
-    pluginName: 'Stylus',
-    pluginId: 'stylus',
-    pluginExts: ['styl', 'stylus'],
-  },
-  {
-    pluginName: 'Less',
-    pluginId: 'less',
-    pluginExts: ['less'],
-  },
-];
 
 export const stripCssComments = (input: string) => {
   let isInsideString = null;
