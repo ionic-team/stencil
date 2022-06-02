@@ -572,7 +572,7 @@ export interface ConfigFlags {
   headless?: boolean;
   help?: boolean;
   log?: boolean;
-  logLevel?: string;
+  logLevel?: LogLevel;
   verbose?: boolean;
   maxWorkers?: number;
   open?: boolean;

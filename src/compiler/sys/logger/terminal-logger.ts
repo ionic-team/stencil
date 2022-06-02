@@ -1,4 +1,4 @@
-import { Diagnostic, Logger, LogLevel, LoggerTimeSpan, PrintLine } from '../../../declarations';
+import { Diagnostic, Logger, LogLevel, LoggerTimeSpan, PrintLine, LoggerLineUpdater } from '../../../declarations';
 
 /**
  * Create a logger for outputting information to a terminal environment
@@ -8,18 +8,18 @@ import { Diagnostic, Logger, LogLevel, LoggerTimeSpan, PrintLine } from '../../.
 export const createTerminalLogger = (loggerSys: TerminalLoggerSys): Logger => {
   // The current log level setting
   // this can be modified at runtime
-  let logLevelSetting: LogLevel = 'info';
+  let currentLogLevel: LogLevel = 'info';
   let logFilePath: string = null;
   const writeLogQueue: string[] = [];
 
-  const setLevel = (l: LogLevel) => (logLevelSetting = l);
+  const setLevel = (l: LogLevel) => (currentLogLevel = l);
 
-  const getLevel = () => logLevelSetting;
+  const getLevel = () => currentLogLevel;
 
   const setLogFilePath = (p: string) => (logFilePath = p);
 
   const info = (...msg: any[]) => {
-    if (shouldLog(logLevelSetting, 'info')) {
+    if (shouldLog(currentLogLevel, 'info')) {
       const lines = wordWrap(msg, loggerSys.getColumns());
       infoPrefix(lines);
       console.log(lines.join('\n'));
@@ -44,7 +44,7 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys): Logger => {
   };
 
   const warn = (...msg: any[]) => {
-    if (shouldLog(logLevelSetting, 'warn')) {
+    if (shouldLog(currentLogLevel, 'warn')) {
       const lines = wordWrap(msg, loggerSys.getColumns());
       warnPrefix(lines);
       console.warn('\n' + lines.join('\n') + '\n');
@@ -70,7 +70,7 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys): Logger => {
       }
     }
 
-    if (shouldLog(logLevelSetting, 'error')) {
+    if (shouldLog(currentLogLevel, 'error')) {
       const lines = wordWrap(msg, loggerSys.getColumns());
       errorPrefix(lines);
       console.error('\n' + lines.join('\n') + '\n');
@@ -86,7 +86,7 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys): Logger => {
   };
 
   const debug = (...msg: any[]) => {
-    if (shouldLog(logLevelSetting, 'debug')) {
+    if (shouldLog(currentLogLevel, 'debug')) {
       const mem = loggerSys.memoryUsage();
       if (mem > 0) {
         msg.push(dim(` MEM: ${(loggerSys.memoryUsage() / 1000000).toFixed(1)}MB`));
@@ -119,7 +119,7 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys): Logger => {
     const msg = [`${startMsg} ${dim('...')}`];
 
     if (debug) {
-      if (shouldLog(logLevelSetting, 'debug')) {
+      if (shouldLog(currentLogLevel, 'debug')) {
         const mem = loggerSys.memoryUsage();
         if (mem > 0) {
           msg.push(dim(` MEM: ${(loggerSys.memoryUsage() / 1000000).toFixed(1)}MB`));
@@ -161,7 +161,7 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys): Logger => {
     msg += ' ' + dim(timeSuffix);
 
     if (debug) {
-      if (shouldLog(logLevelSetting, 'debug')) {
+      if (shouldLog(currentLogLevel, 'debug')) {
         const m = [msg];
         const mem = loggerSys.memoryUsage();
         if (mem > 0) {
@@ -387,7 +387,7 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys): Logger => {
       infoPrefix(outputLines);
     }
 
-    if (diagnostic.debugText != null && logLevelSetting === 'debug') {
+    if (diagnostic.debugText != null && currentLogLevel === 'debug') {
       outputLines.push(diagnostic.debugText);
       debugPrefix(wordWrap([diagnostic.debugText], loggerSys.getColumns()));
     }
@@ -505,6 +505,7 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys): Logger => {
     bgRed,
     setLogFilePath,
     writeLogs,
+    createLineUpdater: loggerSys.createLineUpdater,
   };
   return logger;
 };
@@ -518,6 +519,7 @@ export interface TerminalLoggerSys {
   memoryUsage: () => number;
   relativePath: (from: string, to: string) => string;
   writeLogs: (logFilePath: string, log: string, append: boolean) => void;
+  createLineUpdater: () => Promise<LoggerLineUpdater>;
 }
 
 export type ColorType = 'bgRed' | 'blue' | 'bold' | 'cyan' | 'dim' | 'gray' | 'green' | 'magenta' | 'red' | 'yellow';

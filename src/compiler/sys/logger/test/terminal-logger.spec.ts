@@ -7,4 +7,13 @@ describe('terminal-logger', () => {
       expect(shouldLog(currentLevel, 'error')).toBe(true);
     });
   });
+
+  describe('basic logging functionality', () => {
+    function setup() {
+      const logSpy = jest.spyOn(console, 'log');
+    }
+
+    it("supports info level", () => {
+    })
+  });
 });
