@@ -6,18 +6,20 @@ import { Diagnostic, Logger, LogLevel, LoggerTimeSpan, PrintLine } from '../../.
  * @returns the created logger
  */
 export const createTerminalLogger = (loggerSys: TerminalLoggerSys): Logger => {
-  let level: LogLevel = 'info';
+  // The current log level setting
+  // this can be modified at runtime
+  let logLevelSetting: LogLevel = 'info';
   let logFilePath: string = null;
   const writeLogQueue: string[] = [];
 
-  const setLevel = (l: LogLevel) => (level = l);
+  const setLevel = (l: LogLevel) => (logLevelSetting = l);
 
-  const getLevel = () => level;
+  const getLevel = () => logLevelSetting;
 
   const setLogFilePath = (p: string) => (logFilePath = p);
 
   const info = (...msg: any[]) => {
-    if (shouldLog('info')) {
+    if (shouldLog(logLevelSetting, 'info')) {
       const lines = wordWrap(msg, loggerSys.getColumns());
       infoPrefix(lines);
       console.log(lines.join('\n'));
@@ -42,7 +44,7 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys): Logger => {
   };
 
   const warn = (...msg: any[]) => {
-    if (shouldLog('warn')) {
+    if (shouldLog(logLevelSetting, 'warn')) {
       const lines = wordWrap(msg, loggerSys.getColumns());
       warnPrefix(lines);
       console.warn('\n' + lines.join('\n') + '\n');
@@ -68,7 +70,7 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys): Logger => {
       }
     }
 
-    if (shouldLog('error')) {
+    if (shouldLog(logLevelSetting, 'error')) {
       const lines = wordWrap(msg, loggerSys.getColumns());
       errorPrefix(lines);
       console.error('\n' + lines.join('\n') + '\n');
@@ -84,7 +86,7 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys): Logger => {
   };
 
   const debug = (...msg: any[]) => {
-    if (shouldLog('debug')) {
+    if (shouldLog(logLevelSetting, 'debug')) {
       const mem = loggerSys.memoryUsage();
       if (mem > 0) {
         msg.push(dim(` MEM: ${(loggerSys.memoryUsage() / 1000000).toFixed(1)}MB`));
@@ -117,7 +119,7 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys): Logger => {
     const msg = [`${startMsg} ${dim('...')}`];
 
     if (debug) {
-      if (shouldLog('debug')) {
+      if (shouldLog(logLevelSetting, 'debug')) {
         const mem = loggerSys.memoryUsage();
         if (mem > 0) {
           msg.push(dim(` MEM: ${(loggerSys.memoryUsage() / 1000000).toFixed(1)}MB`));
@@ -159,7 +161,7 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys): Logger => {
     msg += ' ' + dim(timeSuffix);
 
     if (debug) {
-      if (shouldLog('debug')) {
+      if (shouldLog(logLevelSetting, 'debug')) {
         const m = [msg];
         const mem = loggerSys.memoryUsage();
         if (mem > 0) {
@@ -261,10 +263,6 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys): Logger => {
   const bold = (msg: string) => loggerSys.color(msg, 'bold');
   const dim = (msg: string) => loggerSys.color(msg, 'dim');
   const bgRed = (msg: string) => loggerSys.color(msg, 'bgRed');
-
-  const shouldLog = (logLevel: string): boolean => {
-    return LOG_LEVELS.indexOf(logLevel) >= LOG_LEVELS.indexOf(level);
-  };
 
   /**
    * Print all diagnostics to the console
@@ -389,7 +387,7 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys): Logger => {
       infoPrefix(outputLines);
     }
 
-    if (diagnostic.debugText != null && level === 'debug') {
+    if (diagnostic.debugText != null && logLevelSetting === 'debug') {
       outputLines.push(diagnostic.debugText);
       debugPrefix(wordWrap([diagnostic.debugText], loggerSys.getColumns()));
     }
@@ -524,7 +522,35 @@ export interface TerminalLoggerSys {
 
 export type ColorType = 'bgRed' | 'blue' | 'bold' | 'cyan' | 'dim' | 'gray' | 'green' | 'magenta' | 'red' | 'yellow';
 
-const LOG_LEVELS = ['debug', 'info', 'warn', 'error'];
+/**
+ * This sets the log level hierarchy for our terminal logger, ranging from
+ * most to least verbose.
+ *
+ * Ordering the levels like this lets us easily check whether we should log a
+ * message at a given time. For instance, if the log level is set to `'warn'`,
+ * then anything passed to the logger with level `'warn'` or `'error'` should
+ * be logged, but we should _not_ log anything with level `'info'` or `'debug'`.
+ *
+ * If we have a current log level `currentLevel` and a message with level
+ * `msgLevel` is passed to the logger, we can determine whether or not we should
+ * log it by checking if the log level on the message is further up or at the
+ * same level in the hierarchy than `currentLevel`, like so:
+ *
+ * ```ts
+ * LOG_LEVELS.indexOf(msgLevel) >= LOG_LEVELS.indexOf(currentLevel)
+ * ```
+ */
+export const LOG_LEVELS: ReadonlyArray<LogLevel> = ['debug', 'info', 'warn', 'error'];
+
+/**
+ * Helper function to determine, based on the current log level setting, whether
+ * a message at a given log level should be logged or not.
+ *
+ * @param currentSetting the current log level setting
+ * @param messageLevel the log level to check
+ */
+export const shouldLog = (currentSetting: LogLevel, messageLevel: LogLevel) =>
+  LOG_LEVELS.indexOf(messageLevel) >= LOG_LEVELS.indexOf(currentSetting);
 
 /**
  * Helper function for word wrapping

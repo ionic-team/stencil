@@ -70,7 +70,6 @@ export const taskGenerate = async (coreCompiler: CoreCompiler, config: Config): 
     return config.sys.exit(1);
   }
 
-  // TODO(STENCIL-424): Investigate moving these console.log calls to config.logger.info
   console.log();
   console.log(`${config.logger.gray('$')} stencil generate ${input}`);
   console.log();
