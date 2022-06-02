@@ -1,16 +1,4 @@
-export const escapeCssForJs = (style: string) => {
-  if (typeof style === 'string') {
-    return style
-      .replace(/\\[\D0-7]/g, (v) => '\\' + v)
-      .replace(/\r\n|\r|\n/g, `\\n`)
-      .replace(/\"/g, `\\"`)
-      .replace(/\'/g, `\\'`)
-      .replace(/\@/g, `\\@`);
-  }
-  return style;
-};
-
-export const stripCssComments = (input: string) => {
+export const stripCssComments = (input: string): string => {
   let isInsideString = null;
   let currentCharacter = '';
   let returnValue = '';
