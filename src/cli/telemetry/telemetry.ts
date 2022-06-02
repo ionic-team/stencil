@@ -195,25 +195,10 @@ export const anonymizeConfigForTelemetry = (config: d.Config): d.Config => {
     baseUrl: 'omitted',
   }));
 
-  const propsToDelete: Array<keyof d.Config> = ['sys', 'logger'];
+  const propsToDelete: Array<keyof d.Config> = ['sys', 'logger', 'tsCompilerOptions', 'devServer'];
 
   for (const prop of propsToDelete) {
     delete anonymizedConfig[prop];
-  }
-
-  if (config.devServer) {
-    anonymizedConfig.devServer = {
-      ...config.devServer,
-      srcIndexHtml: 'omitted',
-      root: 'omitted',
-    };
-  }
-
-  if (config.tsCompilerOptions) {
-    anonymizedConfig.tsCompilerOptions = {
-      ...config.tsCompilerOptions,
-      configFilePath: 'omitted',
-    };
   }
 
   return anonymizedConfig;

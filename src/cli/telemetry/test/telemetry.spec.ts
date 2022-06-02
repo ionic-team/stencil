@@ -283,46 +283,13 @@ describe('anonymizeConfigForTelemetry', () => {
     expect(anonymizedConfig).toEqual({ [prop]: 'omitted', outputTargets: [] });
   });
 
-  it.each(['sys', 'logger'])("should remove objects under prop '%s'", (prop: string) => {
-    const anonymizedConfig = anonymizeConfigForTelemetry({ [prop]: {}, outputTargets: [] });
-    expect(anonymizedConfig).toEqual({
-      outputTargets: [],
-    });
-  });
-
-  it('should anonymize the devServer config', () => {
-    const anonymizedConfig = anonymizeConfigForTelemetry({
-      outputTargets: [],
-      devServer: {
-        protocol: 'http',
-        srcIndexHtml: "shouldn't see this!",
-        root: "shouldn't see this!",
-      },
-    });
-    expect(anonymizedConfig).toEqual({
-      outputTargets: [],
-      devServer: {
-        protocol: 'http',
-        srcIndexHtml: 'omitted',
-        root: 'omitted',
-      },
-    });
-  });
-
-  it('should anonymize the typescript compiler options', () => {
-    const anonymizedConfig = anonymizeConfigForTelemetry({
-      outputTargets: [],
-      tsCompilerOptions: {
-        anotherOption: 'should see this!',
-        configFilePath: "shouldn't see this!",
-      },
-    });
-    expect(anonymizedConfig).toEqual({
-      outputTargets: [],
-      tsCompilerOptions: {
-        anotherOption: 'should see this!',
-        configFilePath: 'omitted',
-      },
-    });
-  });
+  it.each(['sys', 'logger', 'devServer', 'tsCompilerOptions'])(
+    "should remove objects under prop '%s'",
+    (prop: string) => {
+      const anonymizedConfig = anonymizeConfigForTelemetry({ [prop]: {}, outputTargets: [] });
+      expect(anonymizedConfig).toEqual({
+        outputTargets: [],
+      });
+    }
+  );
 });
