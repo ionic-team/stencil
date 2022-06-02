@@ -127,7 +127,7 @@ export const prepareData = async (
   const cpu_model = sys.details.cpuModel;
   const build = coreCompiler.buildId || 'unknown';
   const has_app_pwa_config = hasAppTarget(config);
-  const anonymizedConfig = anonymizeConfigForTelemtry(config);
+  const anonymizedConfig = anonymizeConfigForTelemetry(config);
 
   return {
     yarn,
@@ -160,14 +160,14 @@ type ConfigStringKeys = keyof {
 };
 
 /**
- * Anonymize the config for telemtry, replacing potentially revealing config props
+ * Anonymize the config for telemetry, replacing potentially revealing config props
  * with a placeholder string if they are present (this lets us still track how frequently
  * these config options are being used)
  *
  * @param config the config to anonymize
  * @returns an anonymized copy of the same config
  */
-export const anonymizeConfigForTelemtry = (config: d.Config): d.Config => {
+export const anonymizeConfigForTelemetry = (config: d.Config): d.Config => {
   const anonymizedConfig = { ...config };
   const propsToAnonymize: ConfigStringKeys[] = [
     'rootDir',

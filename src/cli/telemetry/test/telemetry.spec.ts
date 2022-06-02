@@ -4,7 +4,7 @@ import * as shouldTrack from '../shouldTrack';
 import { createSystem } from '../../../compiler/sys/stencil-sys';
 import { mockLogger } from '@stencil/core/testing';
 import * as coreCompiler from '@stencil/core/compiler';
-import { anonymizeConfigForTelemtry } from '../telemetry';
+import { anonymizeConfigForTelemetry } from '../telemetry';
 
 describe('telemetryBuildFinishedAction', () => {
   const config: d.Config = {
@@ -266,7 +266,7 @@ describe('prepareData', () => {
   });
 });
 
-describe('anonymizeConfigForTelemtry', () => {
+describe('anonymizeConfigForTelemetry', () => {
   it.each([
     'rootDir',
     'fsNamespace',
@@ -279,19 +279,19 @@ describe('anonymizeConfigForTelemtry', () => {
     'configPath',
     'tsconfig',
   ])("should anonymize top-level string prop '%s'", (prop: string) => {
-    const anonymizedConfig = anonymizeConfigForTelemtry({ [prop]: "shouldn't see this!", outputTargets: [] });
+    const anonymizedConfig = anonymizeConfigForTelemetry({ [prop]: "shouldn't see this!", outputTargets: [] });
     expect(anonymizedConfig).toEqual({ [prop]: 'omitted', outputTargets: [] });
   });
 
   it.each(['sys', 'logger'])("should remove objects under prop '%s'", (prop: string) => {
-    const anonymizedConfig = anonymizeConfigForTelemtry({ [prop]: {}, outputTargets: [] });
+    const anonymizedConfig = anonymizeConfigForTelemetry({ [prop]: {}, outputTargets: [] });
     expect(anonymizedConfig).toEqual({
       outputTargets: [],
     });
   });
 
   it('should anonymize the devServer config', () => {
-    const anonymizedConfig = anonymizeConfigForTelemtry({
+    const anonymizedConfig = anonymizeConfigForTelemetry({
       outputTargets: [],
       devServer: {
         protocol: 'http',
@@ -310,7 +310,7 @@ describe('anonymizeConfigForTelemtry', () => {
   });
 
   it('should anonymize the typescript compiler options', () => {
-    const anonymizedConfig = anonymizeConfigForTelemtry({
+    const anonymizedConfig = anonymizeConfigForTelemetry({
       outputTargets: [],
       tsCompilerOptions: {
         anotherOption: 'should see this!',
