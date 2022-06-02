@@ -1,5 +1,6 @@
 import { LogLevel } from '@stencil/core/declarations';
-import { LOG_LEVELS, shouldLog } from '../terminal-logger';
+import {createNodeLoggerSys} from '../../../../sys/node/node-logger'
+import { createTerminalLogger, LOG_LEVELS, shouldLog } from '../terminal-logger';
 
 describe('terminal-logger', () => {
   describe('shouldLog helper', () => {
@@ -11,9 +12,17 @@ describe('terminal-logger', () => {
   describe('basic logging functionality', () => {
     function setup() {
       const logSpy = jest.spyOn(console, 'log');
+      const logger = createTerminalLogger(
+        createNodeLoggerSys(process)
+      )
+      return { logger, logSpy }
     }
 
-    it("supports info level", () => {
+    it.each(LOG_LEVELS)("supports %s level", (level) => {
+      const { logger, logSpy } = setup();
+      logger[level](`my ${level} message`)
+      console.log(logSpy.mock.calls);
+      expect(logSpy.mock.calls[0][0].includes("my ${level} message")).toBe(true)
     })
   });
 });
