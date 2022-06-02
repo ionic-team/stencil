@@ -107,6 +107,7 @@ export async function getActiveTargets(config: d.Config): Promise<string[]> {
  * @param sys the compiler system instance in use
  * @param duration_ms the duration of the action being tracked
  * @param component_count the number of components being built (optional)
+ * @returns a Promise wrapping data for the telemetry endpoint
  */
 export const prepareData = async (
   coreCompiler: CoreCompiler,
