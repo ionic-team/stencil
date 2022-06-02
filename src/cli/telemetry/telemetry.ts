@@ -195,6 +195,7 @@ export const anonymizeConfigForTelemetry = (config: d.Config): d.Config => {
     baseUrl: 'omitted',
   }));
 
+  // TODO(STENCIL-469): Investigate improving anonymization for tsCompilerOptions and devServer
   const propsToDelete: Array<keyof d.Config> = ['sys', 'logger', 'tsCompilerOptions', 'devServer'];
 
   for (const prop of propsToDelete) {
