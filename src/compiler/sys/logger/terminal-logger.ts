@@ -28,7 +28,7 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys): Logger => {
   };
 
   const infoPrefix = (lines: string[]) => {
-    if (lines.length) {
+    if (lines.length > 0) {
       const d = new Date();
       const prefix =
         '[' +
@@ -89,7 +89,7 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys): Logger => {
     if (shouldLog(currentLogLevel, 'debug')) {
       const mem = loggerSys.memoryUsage();
       if (mem > 0) {
-        msg.push(dim(` MEM: ${(loggerSys.memoryUsage() / 1000000).toFixed(1)}MB`));
+        msg.push(dim(` MEM: ${(loggerSys.memoryUsage() / 1_000_000).toFixed(1)}MB`));
       }
       const lines = wordWrap(msg, loggerSys.getColumns());
       debugPrefix(lines);
@@ -757,4 +757,8 @@ const JS_KEYWORDS = [
   'yield',
 ];
 
+/**
+ * This is used to prefix lines with whitespace which is then
+ * replaced by various prefixes like [ WARN ] and so on
+ */
 const INDENT = '           ';

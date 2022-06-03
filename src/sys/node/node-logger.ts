@@ -18,7 +18,7 @@ export const createNodeLogger = (context: { process: NodeJS.Process }): Logger =
 const MIN_COLUMNS = 60;
 const MAX_COLUMNS = 120;
 
-export function createNodeLoggerSys (prcs: NodeJS.Process): TerminalLoggerSys {
+export function createNodeLoggerSys(prcs: NodeJS.Process): TerminalLoggerSys {
   let useColors = true;
 
   const color = (msg: string, colorType: ColorType) => (useColors ? (ansiColor as any)[colorType](msg) : msg);
@@ -84,7 +84,7 @@ export function createNodeLoggerSys (prcs: NodeJS.Process): TerminalLoggerSys {
     };
   };
 
-  return  {
+  return {
     color,
     cwd,
     emoji,
@@ -93,6 +93,6 @@ export function createNodeLoggerSys (prcs: NodeJS.Process): TerminalLoggerSys {
     memoryUsage,
     relativePath,
     writeLogs,
-    createLineUpdater
+    createLineUpdater,
   };
 }
