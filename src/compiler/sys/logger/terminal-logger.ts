@@ -29,16 +29,7 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys): Logger => {
 
   const infoPrefix = (lines: string[]) => {
     if (lines.length > 0) {
-      const d = new Date();
-      const prefix =
-        '[' +
-        ('0' + d.getMinutes()).slice(-2) +
-        ':' +
-        ('0' + d.getSeconds()).slice(-2) +
-        '.' +
-        Math.floor((d.getMilliseconds() / 1000) * 10) +
-        ']';
-
+      const prefix = formatPrefixTimestamp();
       lines[0] = dim(prefix) + lines[0].slice(prefix.length);
     }
   };
@@ -97,17 +88,7 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys): Logger => {
 
   const debugPrefix = (lines: string[]) => {
     if (lines.length) {
-      const d = new Date();
-
-      const prefix =
-        '[' +
-        ('0' + d.getMinutes()).slice(-2) +
-        ':' +
-        ('0' + d.getSeconds()).slice(-2) +
-        '.' +
-        Math.floor((d.getMilliseconds() / 1000) * 10) +
-        ']';
-
+      const prefix = formatPrefixTimestamp();
       lines[0] = cyan(prefix) + lines[0].slice(prefix.length);
     }
   };
@@ -137,7 +118,7 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys): Logger => {
   /**
    * A little helper to (conditionally) format and add the current memory usage
    *
-   * @param a message array to which the memory usage will be added
+   * @param message an array to which the memory usage will be added
    */
   const formatMemoryUsage = (message: string[]) => {
     const mem = loggerSys.memoryUsage();
@@ -553,9 +534,39 @@ export const LOG_LEVELS: ReadonlyArray<LogLevel> = ['debug', 'info', 'warn', 'er
  *
  * @param currentSetting the current log level setting
  * @param messageLevel the log level to check
+ * @returns whether we should log or not!
  */
-export const shouldLog = (currentSetting: LogLevel, messageLevel: LogLevel) =>
+export const shouldLog = (currentSetting: LogLevel, messageLevel: LogLevel): boolean =>
   LOG_LEVELS.indexOf(messageLevel) >= LOG_LEVELS.indexOf(currentSetting);
+
+/**
+ * Format a simple timestamp string for log prefixes
+ *
+ * @returns a formatted timestamp
+ */
+const formatPrefixTimestamp = (): string => {
+  const currentTime = new Date();
+  const minutes = clampTwoDigits(currentTime.getMinutes());
+  const seconds = clampTwoDigits(currentTime.getSeconds());
+  const milliseconds = Math.floor((currentTime.getMilliseconds() / 1000) * 10);
+
+  return `[${minutes}:${seconds}.${milliseconds}]`;
+};
+
+/**
+ * Format a number as a string and clamp it to exactly
+ * two digits, e.g.
+ *
+ * ```ts
+ * clampTwoDigits(3) // '03'
+ * clampTwoDigits(14) // '14'
+ * clampTwoDigits(104) // '04'
+ * ```
+ *
+ * @param n the number to clamp
+ * @returns a formatted string
+ */
+const clampTwoDigits = (n: number): string => ('0' + n.toString()).slice(-2);
 
 /**
  * Helper function for word wrapping
