@@ -92,6 +92,54 @@ describe('terminal-logger', () => {
         expect(logMock).toHaveBeenNthCalledWith(2, `${dim('[32:42.0]')}  finish the timespan ${dim('in 10.00 s')}`);
       });
 
+      describe('debug timespan', function () {
+        it('supports passing a debug flag', function () {
+          const { logger, logMock } = setup();
+          logger.setLevel('debug');
+          const timespan = logger.createTimeSpan('start the timespan', true);
+          jest.advanceTimersByTime(10_000);
+          timespan.finish('finish the timespan');
+
+          expect(logMock).toHaveBeenNthCalledWith(
+            1,
+            `${cyan('[32:32.0]')}  start the timespan ${dim('...')} ${dim(' MEM: 10.0MB')}`
+          );
+          expect(logMock).toHaveBeenNthCalledWith(
+            2,
+            `${cyan('[32:42.0]')}  finish the timespan ${dim('in 10.00 s')} ${dim(' MEM: 10.0MB')}`
+          );
+        });
+
+        it('supports writing debug messages to the logfile', () => {
+          const { logger, writeLogsMock } = setup();
+          logger.setLogFilePath('testfile.txt');
+          logger.setLevel('debug');
+          const timespan = logger.createTimeSpan('start the timespan', true);
+          jest.advanceTimersByTime(10_000);
+          timespan.finish('finish the timespan');
+          logger.writeLogs(false);
+
+          const expectedLogfile = [
+            '09:32:32.00  0010.0MB  D  start the timespan ...',
+            '09:32:42.00  0010.0MB  D  finish the timespan in 10.00 s',
+            '09:32:42.00  0010.0MB  F  --------------------------------------',
+          ].join('\n');
+          expect(writeLogsMock).toBeCalledWith('testfile.txt', expectedLogfile, false);
+        });
+
+        it.each<LogLevel>(['info', 'error', 'warn'])(
+          "shouldn't write to the console when logLevel is '%s' (less verbose than 'debug')",
+          (level) => {
+            const { logger, logMock } = setup();
+            logger.setLevel(level);
+            const timespan = logger.createTimeSpan('start the timespan', true);
+            jest.advanceTimersByTime(10_000);
+            timespan.finish('finish the timespan');
+            expect(logMock).not.toHaveBeenCalled();
+          }
+        );
+      });
+
       it('reports the number of milliseconds if timespane takes under a second', () => {
         const { logger, logMock } = setup();
         const timespan = logger.createTimeSpan('start the timespan');
