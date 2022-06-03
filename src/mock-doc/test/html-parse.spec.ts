@@ -2,6 +2,7 @@ import { createFragment } from '../document';
 import { MockDocument } from '../document';
 import { NODE_TYPES } from '../constants';
 import { parseHtmlToDocument, parseHtmlToFragment } from '../parse-html';
+import { MockSVGElement } from '../element';
 
 describe('parseHtml', () => {
   let doc: MockDocument;
@@ -85,6 +86,20 @@ describe('parseHtml', () => {
     `);
 
     expect(doc.body.firstElementChild.attributes.item(0).name).toEqual('viewBox');
+  });
+
+  it('svg text child', () => {
+    doc = new MockDocument(`
+      <svg viewBox="0 0 100 100">
+      <text x="10" y="10">
+      Hello
+      <tspan>world</tspan>
+    </text>
+      </svg>
+    `);
+    const tspan: MockSVGElement = doc.body.firstElementChild.firstElementChild.firstElementChild as MockSVGElement;
+    expect(doc.body.firstElementChild.firstElementChild.attributes.item(0).name).toEqual('x');
+    expect(tspan.getComputedTextLength()).toEqual(0);
   });
 
   it('template', () => {

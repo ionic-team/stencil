@@ -267,6 +267,27 @@ export class MockStyleElement extends MockHTMLElement {
   }
 }
 
+//Based on deprecated SVGMatrix - http://html5index.org/SVG%20-%20SVGMatrix.html
+const matrix = {
+  a: 1,
+  b: 0,
+  c: 0,
+  d: 1,
+  e: 0,
+  f: 0,
+  flipX() {},
+  flipY() {},
+  inverse() {},
+  multiply() {},
+  override() {},
+  rotate() {},
+  scale() {},
+  scaleNonUniform() {},
+  skewX() {},
+  skewY() {},
+  translate() {},
+};
+
 export class MockSVGElement extends MockElement {
   // SVGElement properties and methods
   get ownerSVGElement(): SVGSVGElement {
@@ -296,6 +317,25 @@ export class MockSVGElement extends MockElement {
   }
   getTotalLength(): number {
     return 0;
+  }
+  getComputedTextLength(): number {
+    return 0;
+  }
+  createSVGPoint() {
+    return {
+      matrixTransform: matrix,
+      x: 0,
+      y: 0,
+    };
+  }
+  getBBox() {
+    return { x: 0, y: 0, width: 10, height: 10 };
+  }
+  getCTM() {
+    return matrix;
+  }
+  getScreenCTM() {
+    return matrix;
   }
 }
 
