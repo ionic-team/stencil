@@ -9,7 +9,7 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys): Logger => {
   // The current log level setting
   // this can be modified at runtime
   let currentLogLevel: LogLevel = 'info';
-  let logFilePath: string = null;
+  let logFilePath: string | null = null;
   const writeLogQueue: string[] = [];
 
   const setLevel = (l: LogLevel) => (currentLogLevel = l);
