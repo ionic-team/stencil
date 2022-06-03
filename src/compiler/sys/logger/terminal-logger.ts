@@ -87,10 +87,7 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys): Logger => {
 
   const debug = (...msg: any[]) => {
     if (shouldLog(currentLogLevel, 'debug')) {
-      const mem = loggerSys.memoryUsage();
-      if (mem > 0) {
-        msg.push(dim(` MEM: ${(loggerSys.memoryUsage() / 1_000_000).toFixed(1)}MB`));
-      }
+      formatMemoryUsage(msg);
       const lines = wordWrap(msg, loggerSys.getColumns());
       debugPrefix(lines);
       console.log(lines.join('\n'));
@@ -120,10 +117,7 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys): Logger => {
 
     if (debug) {
       if (shouldLog(currentLogLevel, 'debug')) {
-        const mem = loggerSys.memoryUsage();
-        if (mem > 0) {
-          msg.push(dim(` MEM: ${(loggerSys.memoryUsage() / 1000000).toFixed(1)}MB`));
-        }
+        formatMemoryUsage(msg);
         const lines = wordWrap(msg, loggerSys.getColumns());
         debugPrefix(lines);
         console.log(lines.join('\n'));
@@ -137,6 +131,18 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys): Logger => {
       if (appendTo) {
         appendTo.push(`${startMsg} ...`);
       }
+    }
+  };
+
+  /**
+   * A little helper to (conditionally) format and add the current memory usage
+   *
+   * @param a message array to which the memory usage will be added
+   */
+  const formatMemoryUsage = (message: string[]) => {
+    const mem = loggerSys.memoryUsage();
+    if (mem > 0) {
+      message.push(dim(` MEM: ${(mem / 1_000_000).toFixed(1)}MB`));
     }
   };
 
@@ -163,10 +169,7 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys): Logger => {
     if (debug) {
       if (shouldLog(currentLogLevel, 'debug')) {
         const m = [msg];
-        const mem = loggerSys.memoryUsage();
-        if (mem > 0) {
-          m.push(dim(` MEM: ${(mem / 1000000).toFixed(1)}MB`));
-        }
+        formatMemoryUsage(m);
 
         const lines = wordWrap(m, loggerSys.getColumns());
         debugPrefix(lines);
