@@ -401,4 +401,25 @@ describe('validation', () => {
       expect(config.sourceMap).toBe(false);
     });
   });
+
+  describe('buildDist', () => {
+    it.each([true, false])('should set the field based on the config flag (%p)', (flag) => {
+      userConfig.flags = { esm: flag };
+      const { config } = validateConfig(userConfig);
+      expect(config.buildDist).toBe(flag);
+    });
+
+    it.each([true, false])('should fallback to !devMode', (devMode) => {
+      userConfig.devMode = devMode;
+      const { config } = validateConfig(userConfig);
+      expect(config.buildDist).toBe(!devMode);
+    });
+
+    it.each([true, false])('should fallback to buildEs5 in devMode', (buildEs5) => {
+      userConfig.devMode = true;
+      userConfig.buildEs5 = buildEs5;
+      const { config } = validateConfig(userConfig);
+      expect(config.buildDist).toBe(config.buildEs5);
+    });
+  });
 });

@@ -1,4 +1,5 @@
-import { mockConfig } from '@stencil/core/testing';
+import type * as d from '../../declarations';
+import { mockConfig, mockBuildCtx } from '@stencil/core/testing';
 import * as util from '../util';
 
 describe('util', () => {
@@ -50,6 +51,58 @@ describe('util', () => {
       const result = util.generatePreamble(testConfig);
 
       expect(result).toBe('');
+    });
+  });
+
+  describe('hasDependency', () => {
+    let buildCtx: d.BuildCtx;
+
+    beforeEach(() => {
+      buildCtx = mockBuildCtx();
+    });
+
+    it("returns false when the packageJson field isn't set on the build context", () => {
+      buildCtx.packageJson = null;
+
+      expect(util.hasDependency(buildCtx, 'a-non-existent-pkg')).toBe(false);
+    });
+
+    it('returns false if a project has no dependencies', () => {
+      buildCtx.packageJson.dependencies = null;
+
+      expect(util.hasDependency(buildCtx, 'a-non-existent-pkg')).toBe(false);
+    });
+
+    it('returns false if a project has an empty list of dependencies', () => {
+      buildCtx.packageJson.dependencies = {};
+
+      expect(util.hasDependency(buildCtx, 'a-non-existent-pkg')).toBe(false);
+    });
+
+    it("returns false for '@stencil/core'", () => {
+      buildCtx.packageJson.dependencies = { '@stencil/core': '2.0.0' };
+
+      expect(util.hasDependency(buildCtx, '@stencil/core')).toBe(false);
+    });
+
+    it('returns true for a dependency match', () => {
+      buildCtx.packageJson.dependencies = {
+        'existent-pkg1': '1.0.0',
+        'existent-pkg2': '2.0.0',
+        'existent-pkg3': '3.0.0',
+      };
+
+      expect(util.hasDependency(buildCtx, 'existent-pkg2')).toBe(true);
+    });
+
+    it('is case sensitive in its lookup', () => {
+      buildCtx.packageJson.dependencies = {
+        'existent-pkg1': '1.0.0',
+        'existent-pkg2': '2.0.0',
+        'existent-pkg3': '3.0.0',
+      };
+
+      expect(util.hasDependency(buildCtx, 'EXISTENT-PKG2')).toBe(false);
     });
   });
 

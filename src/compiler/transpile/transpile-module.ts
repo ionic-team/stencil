@@ -13,8 +13,16 @@ import ts from 'typescript';
 
 /**
  * Stand-alone compiling of a single string
+ * @param config the Stencil configuration to use in the compilation process
+ * @param input the string to compile
+ * @param transformOpts a configuration object for how the string is compiled
+ * @returns the results of compiling the provided input string
  */
-export const transpileModule = (config: d.Config, input: string, transformOpts: d.TransformOptions) => {
+export const transpileModule = (
+  config: d.Config,
+  input: string,
+  transformOpts: d.TransformOptions
+): d.TranspileModuleResults => {
   if (!config.logger) {
     config = {
       ...config,
