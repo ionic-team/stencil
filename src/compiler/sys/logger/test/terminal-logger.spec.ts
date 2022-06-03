@@ -71,9 +71,9 @@ describe('terminal-logger', () => {
 
     it('supports shipping logs to a file', function () {
       const { logger, writeLogsMock } = setup();
-      logger.setLogFilePath('testfile.txt');
+      logger.setLogFilePath!('testfile.txt');
       logger.info('test message');
-      logger.writeLogs(false);
+      logger.writeLogs!(false);
       const expectedLogfile = [
         '09:32:32.00  0010.0MB  I  test message',
         '09:32:32.00  0010.0MB  F  --------------------------------------',
@@ -112,12 +112,12 @@ describe('terminal-logger', () => {
 
         it('supports writing debug messages to the logfile', () => {
           const { logger, writeLogsMock } = setup();
-          logger.setLogFilePath('testfile.txt');
+          logger.setLogFilePath!('testfile.txt');
           logger.setLevel('debug');
           const timespan = logger.createTimeSpan('start the timespan', true);
           jest.advanceTimersByTime(10_000);
           timespan.finish('finish the timespan');
-          logger.writeLogs(false);
+          logger.writeLogs!(false);
 
           const expectedLogfile = [
             '09:32:32.00  0010.0MB  D  start the timespan ...',
@@ -164,11 +164,11 @@ describe('terminal-logger', () => {
 
       it('writes timespanes to the log file, if configured', () => {
         const { logger, writeLogsMock } = setup();
-        logger.setLogFilePath('testfile.txt');
+        logger.setLogFilePath!('testfile.txt');
         const timespan = logger.createTimeSpan('start the timespan');
         jest.advanceTimersByTime(10_000);
         timespan.finish('finish the timespan');
-        logger.writeLogs(false);
+        logger.writeLogs!(false);
 
         const expectedLogfile = [
           '09:32:32.00  0010.0MB  I  start the timespan ...',
