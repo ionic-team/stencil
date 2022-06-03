@@ -8,6 +8,33 @@ describe('terminal-logger', () => {
     it.each(LOG_LEVELS)("should log errors at level '%s'", (currentLevel: LogLevel) => {
       expect(shouldLog(currentLevel, 'error')).toBe(true);
     });
+
+    it.each<[LogLevel, boolean]>([
+      ['debug', true],
+      ['info', true],
+      ['warn', true],
+      ['error', false],
+    ])("shouldLog for warnings at level '%s' should be '%p'", (currentLevel, expected) => {
+      expect(shouldLog(currentLevel, 'warn')).toBe(expected);
+    });
+
+    it.each<[LogLevel, boolean]>([
+      ['debug', true],
+      ['info', true],
+      ['warn', false],
+      ['error', false],
+    ])("shouldLog for info at level '%s' should be '%p'", (currentLevel, expected) => {
+      expect(shouldLog(currentLevel, 'info')).toBe(expected);
+    });
+
+    it.each<[LogLevel, boolean]>([
+      ['debug', true],
+      ['info', false],
+      ['warn', false],
+      ['error', false],
+    ])("shouldLog for debug messages at level '%s' should be '%p'", (currentLevel, expected) => {
+      expect(shouldLog(currentLevel, 'debug')).toBe(expected);
+    });
   });
 
   describe('basic logging functionality', () => {
