@@ -2,7 +2,7 @@ import { createFragment } from '../document';
 import { MockDocument } from '../document';
 import { NODE_TYPES } from '../constants';
 import { parseHtmlToDocument, parseHtmlToFragment } from '../parse-html';
-import { MockSVGElement } from '../element';
+import { defaultSVGMatrix, MockSVGElement } from '../element';
 
 describe('parseHtml', () => {
   let doc: MockDocument;
@@ -88,7 +88,26 @@ describe('parseHtml', () => {
     expect(doc.body.firstElementChild.attributes.item(0).name).toEqual('viewBox');
   });
 
-  it('svg text child', () => {
+  it('svg matrix members', () => {
+    doc = new MockDocument(`
+      <svg viewBox="0 0 100 100">
+        <svg>
+          <rect x="0" y="0" width="10" height="10"></rect>
+        </svg>
+      </svg>
+    `);
+    const svgElem: MockSVGElement = doc.body.firstElementChild.firstElementChild as MockSVGElement;
+    expect(svgElem.getBBox()).toEqual({ x: 0, y: 0, width: 10, height: 10 });
+    expect(svgElem.createSVGPoint()).toEqual({
+      matrixTransform: defaultSVGMatrix,
+      x: 0,
+      y: 0,
+    });
+    expect(svgElem.getScreenCTM()).toEqual(defaultSVGMatrix);
+    expect(svgElem.getCTM()).toEqual(defaultSVGMatrix);
+  });
+
+  it('svg text members', () => {
     doc = new MockDocument(`
       <svg viewBox="0 0 100 100">
       <text x="10" y="10">
@@ -98,7 +117,7 @@ describe('parseHtml', () => {
       </svg>
     `);
     const tspan: MockSVGElement = doc.body.firstElementChild.firstElementChild.firstElementChild as MockSVGElement;
-    expect(doc.body.firstElementChild.firstElementChild.attributes.item(0).name).toEqual('x');
+    expect(doc.body.firstElementChild.firstElementChild.tagName).toEqual('text');
     expect(tspan.getComputedTextLength()).toEqual(0);
   });
 
