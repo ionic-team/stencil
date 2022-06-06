@@ -235,6 +235,10 @@ export class MockElement extends MockNode {
     return shadowRoot;
   }
 
+  blur() {
+    /**/
+  }
+
   get shadowRoot() {
     return this.__shadowRoot || null;
   }
@@ -314,6 +318,10 @@ export class MockElement extends MockNode {
 
   get firstElementChild(): MockElement | null {
     return this.children[0] || null;
+  }
+
+  focus() {
+    /**/
   }
 
   getAttribute(attrName: string) {
