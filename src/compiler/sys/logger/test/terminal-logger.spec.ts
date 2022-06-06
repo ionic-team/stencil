@@ -96,16 +96,25 @@ describe('terminal-logger', () => {
       expect(errorMock).toBeCalledWith(`\n${bold(red('[ ERROR ]'))}  my error message\n`);
     });
 
-    it('supports shipping logs to a file', function () {
-      const { logger, writeLogsMock } = setup();
-      logger.setLogFilePath!('testfile.txt');
-      logger.info('test message');
-      logger.writeLogs!(false);
-      const expectedLogfile = [
-        '09:32:32.00  0010.0MB  I  test message',
-        '09:32:32.00  0010.0MB  F  --------------------------------------',
-      ].join('\n');
-      expect(writeLogsMock).toBeCalledWith('testfile.txt', expectedLogfile, false);
+    describe('logfile support', () => {
+      it('supports shipping logs to a file', () => {
+        const { logger, writeLogsMock } = setup();
+        logger.setLogFilePath!('testfile.txt');
+        logger.info('test message');
+        logger.writeLogs!(false);
+        const expectedLogfile = [
+          '09:32:32.00  0010.0MB  I  test message',
+          '09:32:32.00  0010.0MB  F  --------------------------------------',
+        ].join('\n');
+        expect(writeLogsMock).toBeCalledWith('testfile.txt', expectedLogfile, false);
+      });
+
+      it('should not write logs to file if filepath not set', function () {
+        const { logger, writeLogsMock } = setup();
+        logger.info('test message');
+        logger.writeLogs!(false);
+        expect(writeLogsMock).not.toBeCalled();
+      });
     });
 
     describe('timespans', () => {
