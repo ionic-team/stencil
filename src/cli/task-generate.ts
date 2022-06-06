@@ -70,6 +70,10 @@ export const taskGenerate = async (coreCompiler: CoreCompiler, config: Config): 
     return config.sys.exit(1);
   }
 
+  // We use `console.log` here rather than our `config.logger` because we don't want
+  // our TUI messages to be prefixed with timestamps and so on.
+  //
+  // See STENCIL-424 for details.
   console.log();
   console.log(`${config.logger.gray('$')} stencil generate ${input}`);
   console.log();
