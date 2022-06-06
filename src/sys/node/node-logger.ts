@@ -18,6 +18,16 @@ export const createNodeLogger = (context: { process: NodeJS.Process }): Logger =
 const MIN_COLUMNS = 60;
 const MAX_COLUMNS = 120;
 
+/**
+ * Create a logger sys object for use in a Node.js environment
+ *
+ * The `TerminalLoggerSys` interface basically abstracts away some
+ * environment-specific details so that the terminal logger can deal with
+ * things in a (potentially) platform-agnostic way.
+ *
+ * @param prcs the current node.js process object
+ * @returns a configured logger sys object
+ */
 export function createNodeLoggerSys(prcs: NodeJS.Process): TerminalLoggerSys {
   let useColors = true;
 
