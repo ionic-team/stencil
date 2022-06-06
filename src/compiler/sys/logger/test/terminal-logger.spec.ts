@@ -167,7 +167,7 @@ describe('terminal-logger', () => {
         );
       });
 
-      it('reports the number of milliseconds if timespane takes under a second', () => {
+      it('reports the number of milliseconds if timespan takes under a second', () => {
         const { logger, logMock } = setup();
         const timespan = logger.createTimeSpan('start the timespan');
         jest.advanceTimersByTime(10);
@@ -189,7 +189,7 @@ describe('terminal-logger', () => {
         );
       });
 
-      it('writes timespanes to the log file, if configured', () => {
+      it('writes timespans to the log file, if configured', () => {
         const { logger, writeLogsMock } = setup();
         logger.setLogFilePath!('testfile.txt');
         const timespan = logger.createTimeSpan('start the timespan');
