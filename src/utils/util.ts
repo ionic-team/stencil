@@ -117,42 +117,40 @@ export const readPackageJson = async (config: d.Config, compilerCtx: d.CompilerC
   }
 };
 
-export const parsePackageJson = (
-  pkgJsonStr: string,
-  pkgJsonFilePath: string
-): { diagnostic: d.Diagnostic; data: d.PackageJsonData; filePath: string } => {
-  if (isString(pkgJsonFilePath)) {
-    return parseJson(pkgJsonStr, pkgJsonFilePath);
-  }
-  return null;
+/**
+ * A type that describes the result of parsing a `package.json` file's contents
+ */
+export type ParsePackageJsonResult = {
+  diagnostic: d.Diagnostic | null;
+  data: any | null;
+  filePath: string;
 };
 
-export const parseJson = (jsonStr: string, filePath?: string) => {
-  const rtn = {
-    diagnostic: null as d.Diagnostic,
-    data: null as any,
-    filePath,
+/**
+ * Parse a string read from a `package.json` file
+ * @param pkgJsonStr the string read from a `package.json` file
+ * @param pkgJsonFilePath the path to the already read `package.json` file
+ * @returns the results of parsing the provided contents of the `package.json` file
+ */
+export const parsePackageJson = (pkgJsonStr: string, pkgJsonFilePath: string): ParsePackageJsonResult => {
+  const parseResult: ParsePackageJsonResult = {
+    diagnostic: null,
+    data: null,
+    filePath: pkgJsonFilePath,
   };
 
-  if (isString(jsonStr)) {
-    try {
-      rtn.data = JSON.parse(jsonStr);
-    } catch (e) {
-      rtn.diagnostic = buildError();
-      rtn.diagnostic.absFilePath = filePath;
-      rtn.diagnostic.header = `Error Parsing JSON`;
-      if (e instanceof Error) {
-        rtn.diagnostic.messageText = e.message;
-      }
+  try {
+    parseResult.data = JSON.parse(pkgJsonStr);
+  } catch (e) {
+    parseResult.diagnostic = buildError();
+    parseResult.diagnostic.absFilePath = isString(pkgJsonFilePath) ? pkgJsonFilePath : undefined;
+    parseResult.diagnostic.header = `Error Parsing JSON`;
+    if (e instanceof Error) {
+      parseResult.diagnostic.messageText = e.message;
     }
-  } else {
-    rtn.diagnostic = buildError();
-    rtn.diagnostic.absFilePath = filePath;
-    rtn.diagnostic.header = `Error Parsing JSON`;
-    rtn.diagnostic.messageText = `Invalid JSON input to parse`;
   }
 
-  return rtn;
+  return parseResult;
 };
 
 const SKIP_DEPS = ['@stencil/core'];
