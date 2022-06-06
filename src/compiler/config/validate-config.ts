@@ -61,7 +61,7 @@ export const validateConfig = (
   setBooleanConfig(config, 'sourceMap', null, typeof config.sourceMap === 'undefined' ? false : config.sourceMap);
   setBooleanConfig(config, 'watch', 'watch', false);
   setBooleanConfig(config, 'buildDocs', 'docs', !config.devMode);
-  setBooleanConfig(config, 'buildDist', null, !config.devMode || config.buildEs5);
+  setBooleanConfig(config, 'buildDist', 'esm', !config.devMode || config.buildEs5);
   setBooleanConfig(config, 'profile', 'profile', config.devMode);
   setBooleanConfig(config, 'writeLog', 'log', false);
   setBooleanConfig(config, 'buildAppCore', null, true);
