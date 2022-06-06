@@ -1,6 +1,5 @@
 import { Logger } from '../../declarations';
-import { createTerminalLogger, ColorType, TerminalLoggerSys } from '../../compiler/sys/logger/terminal-logger';
-import ansiColor from 'ansi-colors';
+import { createTerminalLogger, TerminalLoggerSys } from '../../compiler/sys/logger/terminal-logger';
 import fs from 'graceful-fs';
 import path from 'path';
 
@@ -29,15 +28,9 @@ const MAX_COLUMNS = 120;
  * @returns a configured logger sys object
  */
 export function createNodeLoggerSys(prcs: NodeJS.Process): TerminalLoggerSys {
-  let useColors = true;
-
-  const color = (msg: string, colorType: ColorType) => (useColors ? (ansiColor as any)[colorType](msg) : msg);
-
   const cwd = () => prcs.cwd();
 
   const emoji = (emoji: string) => (prcs.platform !== 'win32' ? emoji : '');
-
-  const enableColors = (uc: boolean) => (useColors = uc);
 
   /**
    * Get the number of columns for the terminal to use when printing
@@ -95,10 +88,8 @@ export function createNodeLoggerSys(prcs: NodeJS.Process): TerminalLoggerSys {
   };
 
   return {
-    color,
     cwd,
     emoji,
-    enableColors,
     getColumns,
     memoryUsage,
     relativePath,

@@ -1,4 +1,12 @@
 import { Diagnostic, Logger, LogLevel, LoggerTimeSpan, PrintLine, LoggerLineUpdater } from '../../../declarations';
+import ansiColor, { bgRed, blue, bold, cyan, dim, gray, green, magenta, red, yellow } from 'ansi-colors';
+
+/**
+ * A type to capture the range of functions exported by the ansi-colors module
+ * Unfortunately they don't make a type like this available directly, so we have
+ * to do a little DIY.
+ */
+type AnsiColorVariant = keyof ansiColor.StylesType<string>;
 
 /**
  * Create a logger for outputting information to a terminal environment
@@ -130,7 +138,7 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys): Logger => {
   const timespanFinish = (
     finishMsg: string,
     timeSuffix: string,
-    colorName: 'red',
+    colorName: AnsiColorVariant,
     textBold: boolean,
     newLineSuffix: boolean,
     debug: boolean,
@@ -139,7 +147,7 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys): Logger => {
     let msg = finishMsg;
 
     if (colorName) {
-      msg = loggerSys.color(finishMsg, colorName);
+      msg = ansiColor[colorName](finishMsg);
     }
     if (textBold) {
       msg = bold(msg);
@@ -178,7 +186,7 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys): Logger => {
     const duration = () => Date.now() - start;
     const timeSpan: LoggerTimeSpan = {
       duration,
-      finish: (finishMsg, colorName, textBold, newLineSuffix) => {
+      finish: (finishMsg, colorName: AnsiColorVariant, textBold, newLineSuffix) => {
         const dur = duration();
         let time: string;
 
@@ -193,7 +201,7 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys): Logger => {
           }
         }
 
-        timespanFinish(finishMsg, time, colorName as any, textBold, newLineSuffix, debug, appendTo);
+        timespanFinish(finishMsg, time, colorName, textBold, newLineSuffix, debug, appendTo);
 
         return dur;
       },
@@ -237,16 +245,13 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys): Logger => {
     writeLogQueue.length = 0;
   };
 
-  const red = (msg: string) => loggerSys.color(msg, 'red');
-  const green = (msg: string) => loggerSys.color(msg, 'green');
-  const yellow = (msg: string) => loggerSys.color(msg, 'yellow');
-  const blue = (msg: string) => loggerSys.color(msg, 'blue');
-  const magenta = (msg: string) => loggerSys.color(msg, 'magenta');
-  const cyan = (msg: string) => loggerSys.color(msg, 'cyan');
-  const gray = (msg: string) => loggerSys.color(msg, 'gray');
-  const bold = (msg: string) => loggerSys.color(msg, 'bold');
-  const dim = (msg: string) => loggerSys.color(msg, 'dim');
-  const bgRed = (msg: string) => loggerSys.color(msg, 'bgRed');
+  /**
+   * Callback to enable / disable colored output in logs
+   * @param useColors the new value for the `enabled` toggle on ansi-color
+   */
+  const enableColors = (useColors: boolean) => {
+    ansiColor.enabled = useColors;
+  };
 
   /**
    * Print all diagnostics to the console
@@ -467,37 +472,37 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys): Logger => {
   };
 
   const logger: Logger = {
-    enableColors: loggerSys.enableColors,
-    emoji: loggerSys.emoji,
-    getLevel,
-    setLevel,
-    debug,
-    info,
-    warn,
-    error,
-    createTimeSpan,
-    printDiagnostics,
-    red,
-    green,
-    yellow,
-    blue,
-    magenta,
-    cyan,
-    gray,
-    bold,
-    dim,
-    bgRed,
-    setLogFilePath,
-    writeLogs,
     createLineUpdater: loggerSys.createLineUpdater,
+    createTimeSpan,
+    debug,
+    emoji: loggerSys.emoji,
+    enableColors,
+    error,
+    getLevel,
+    info,
+    printDiagnostics,
+    setLevel,
+    setLogFilePath,
+    warn,
+    writeLogs,
+
+    // color functions
+    bgRed,
+    blue,
+    bold,
+    cyan,
+    dim,
+    gray,
+    green,
+    magenta,
+    red,
+    yellow,
   };
   return logger;
 };
 
 export interface TerminalLoggerSys {
-  color: (msg: string, colorName: ColorType) => string;
   emoji: (msg: string) => string;
-  enableColors: (useColors: boolean) => void;
   cwd: () => string;
   getColumns: () => number;
   memoryUsage: () => number;
@@ -505,8 +510,6 @@ export interface TerminalLoggerSys {
   writeLogs: (logFilePath: string, log: string, append: boolean) => void;
   createLineUpdater: () => Promise<LoggerLineUpdater>;
 }
-
-export type ColorType = 'bgRed' | 'blue' | 'bold' | 'cyan' | 'dim' | 'gray' | 'green' | 'magenta' | 'red' | 'yellow';
 
 /**
  * This sets the log level hierarchy for our terminal logger, ranging from
