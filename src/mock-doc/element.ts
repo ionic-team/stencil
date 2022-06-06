@@ -268,7 +268,7 @@ export class MockStyleElement extends MockHTMLElement {
 }
 
 //Based on deprecated SVGMatrix - http://html5index.org/SVG%20-%20SVGMatrix.html
-const matrix = {
+export const defaultSVGMatrix = {
   a: 1,
   b: 0,
   c: 0,
@@ -296,10 +296,6 @@ export class MockSVGElement extends MockElement {
   get viewportElement(): SVGElement {
     return null;
   }
-
-  focus() {
-    /**/
-  }
   onunload() {
     /**/
   }
@@ -323,7 +319,7 @@ export class MockSVGElement extends MockElement {
   }
   createSVGPoint() {
     return {
-      matrixTransform: matrix,
+      matrixTransform: defaultSVGMatrix,
       x: 0,
       y: 0,
     };
@@ -332,10 +328,10 @@ export class MockSVGElement extends MockElement {
     return { x: 0, y: 0, width: 10, height: 10 };
   }
   getCTM() {
-    return matrix;
+    return defaultSVGMatrix;
   }
   getScreenCTM() {
-    return matrix;
+    return defaultSVGMatrix;
   }
 }
 
