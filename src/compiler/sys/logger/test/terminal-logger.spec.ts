@@ -205,9 +205,5 @@ describe('terminal-logger', () => {
         expect(writeLogsMock).toBeCalledWith('testfile.txt', expectedLogfile, false);
       });
     });
-
-    it('supports printing diagnostics', function () {});
-
-    it('highlights CSS and JavaScript', function () {});
   });
 });
