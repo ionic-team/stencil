@@ -3,7 +3,7 @@ import { shouldTrack } from './shouldTrack';
 import type * as d from '../../declarations';
 import { readConfig, updateConfig, writeConfig } from '../ionic-config';
 import { CoreCompiler } from '../load-compiler';
-import { WWW } from '../../compiler/output-targets/output-utils';
+import { isOutputTargetHydrate, WWW } from '../../compiler/output-targets/output-utils';
 
 /**
  * Used to within taskBuild to provide the component_count property.
@@ -160,7 +160,35 @@ type ConfigStringKeys = keyof {
   [K in keyof d.Config as Required<d.Config>[K] extends string ? K : never]: d.Config[K];
 };
 
-const OUTPUT_TARGET_KEYS_TO_KEEP = ['type', 'typesDir', 'baseUrl'];
+// props in output targets for which we retain their original values when
+// preparing a config for telemetry
+//
+// we omit the values of all other fields on output targets.
+const OUTPUT_TARGET_KEYS_TO_KEEP = [
+  'type',
+  'external',
+  'autoDefineCustomElements',
+  'generateTypeDeclarations',
+] as const;
+
+// top-level config props that we anonymize for telemetry
+const CONFIG_PROPS_TO_ANONYMIZE: ReadonlyArray<ConfigStringKeys> = [
+  'rootDir',
+  'fsNamespace',
+  'packageJsonFilePath',
+  'namespace',
+  'srcDir',
+  'srcIndexHtml',
+  'buildLogFilePath',
+  'cacheDir',
+  'configPath',
+  'tsconfig',
+];
+
+// Props we delete entirely from the config for telemetry
+//
+// TODO(STENCIL-469): Investigate improving anonymization for tsCompilerOptions and devServer
+const CONFIG_PROPS_TO_DELETE: ReadonlyArray<keyof d.Config> = ['sys', 'logger', 'tsCompilerOptions', 'devServer'];
 
 /**
  * Anonymize the config for telemetry, replacing potentially revealing config props
@@ -172,46 +200,44 @@ const OUTPUT_TARGET_KEYS_TO_KEEP = ['type', 'typesDir', 'baseUrl'];
  */
 export const anonymizeConfigForTelemetry = (config: d.Config): d.Config => {
   const anonymizedConfig = { ...config };
-  const propsToAnonymize: ConfigStringKeys[] = [
-    'rootDir',
-    'fsNamespace',
-    'packageJsonFilePath',
-    'namespace',
-    'srcDir',
-    'srcIndexHtml',
-    'buildLogFilePath',
-    'cacheDir',
-    'configPath',
-    'tsconfig',
-  ];
 
-  for (const prop of propsToAnonymize) {
+  for (const prop of CONFIG_PROPS_TO_ANONYMIZE) {
     if (anonymizedConfig[prop] !== undefined) {
       anonymizedConfig[prop] = 'omitted';
     }
   }
 
-  // Anonymize the outputTargets on our configuration, taking advantage of the
-  // optional 2nd argument to `JSON.stringify`. If anything is not a string or number
-  // we retain it so that any nested properties are handled, else we check
-  // whether it's in our 'keep' list to decide whether to keep it or replace it
-  // with `"omitted"`.
-  anonymizedConfig.outputTargets = JSON.parse(
-    JSON.stringify(config.outputTargets ?? [], (key, value) => {
-      if (!['string', 'number'].includes(typeof value)) {
-        return value;
-      }
-      if (OUTPUT_TARGET_KEYS_TO_KEEP.includes(key)) {
-        return value;
-      }
-      return 'omitted';
-    })
-  );
+  anonymizedConfig.outputTargets = (config.outputTargets ?? []).map((target) => {
+    // Anonymize the outputTargets on our configuration, taking advantage of the
+    // optional 2nd argument to `JSON.stringify`. If anything is not a string or number
+    // we retain it so that any nested properties are handled, else we check
+    // whether it's in our 'keep' list to decide whether to keep it or replace it
+    // with `"omitted"`.
+    const anonymizedOT = JSON.parse(
+      JSON.stringify(target, (key, value) => {
+        if (!['string', 'number'].includes(typeof value)) {
+          return value;
+        }
+        if (OUTPUT_TARGET_KEYS_TO_KEEP.includes(key)) {
+          return value;
+        }
+        return 'omitted';
+      })
+    );
+
+    // this prop has to be handled separately because it is an array
+    // so the replace function above will be called with all of its
+    // members, giving us `["omitted", "omitted", ...]`.
+    //
+    // Instead, we check for its presence and manually copy over.
+    if (isOutputTargetHydrate(target) && target.external) {
+      anonymizedOT['external'] = target.external.concat();
+    }
+    return anonymizedOT;
+  });
 
   // TODO(STENCIL-469): Investigate improving anonymization for tsCompilerOptions and devServer
-  const propsToDelete: Array<keyof d.Config> = ['sys', 'logger', 'tsCompilerOptions', 'devServer'];
-
-  for (const prop of propsToDelete) {
+  for (const prop of CONFIG_PROPS_TO_DELETE) {
     delete anonymizedConfig[prop];
   }
 

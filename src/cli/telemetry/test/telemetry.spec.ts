@@ -189,7 +189,7 @@ describe('prepareData', () => {
         },
         outputTargets: [
           {
-            baseUrl: 'https://example.com',
+            baseUrl: 'omitted',
             serviceWorker: {
               swDest: 'omitted',
             },
@@ -235,7 +235,7 @@ describe('prepareData', () => {
         },
         outputTargets: [
           {
-            baseUrl: 'https://example.com',
+            baseUrl: 'omitted',
             serviceWorker: {
               swDest: 'omitted',
             },
@@ -293,14 +293,20 @@ describe('anonymizeConfigForTelemetry', () => {
     const anonymizedConfig = anonymizeConfigForTelemetry({
       outputTargets: [
         { type: 'www', baseUrl: 'https://example.com' },
+        { type: 'dist-hydrate-script', external: ['beep', 'boop'], dir: 'shoud/go/away' },
+        { type: 'dist-custom-elements', autoDefineCustomElements: false },
+        { type: 'dist-custom-elements', generateTypeDeclarations: true },
         { type: 'dist', typesDir: 'my-types' },
       ],
     });
 
     expect(anonymizedConfig).toEqual({
       outputTargets: [
-        { type: 'www', baseUrl: 'https://example.com' },
-        { type: 'dist', typesDir: 'my-types' },
+        { type: 'www', baseUrl: 'omitted' },
+        { type: 'dist-hydrate-script', external: ['beep', 'boop'], dir: 'omitted' },
+        { type: 'dist-custom-elements', autoDefineCustomElements: false },
+        { type: 'dist-custom-elements', generateTypeDeclarations: true },
+        { type: 'dist', typesDir: 'omitted' },
       ],
     });
   });
