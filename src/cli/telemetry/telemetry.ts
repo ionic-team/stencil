@@ -37,6 +37,7 @@ export async function telemetryBuildFinishedAction(
 
 /**
  * A function to wrap a compiler task function around. Will send telemetry if, and only if, the machine allows.
+ *
  * @param sys The system where the command is invoked
  * @param config The config passed into the Stencil command
  * @param logger The tool used to do logging
@@ -159,8 +160,10 @@ type ConfigStringKeys = keyof {
   [K in keyof d.Config as Required<d.Config>[K] extends string ? K : never]: d.Config[K];
 };
 
+const OUTPUT_TARGET_KEYS_TO_KEEP = ['type', 'typesDir', 'baseUrl'];
+
 /**
- * Anonymize the config for telemetry, replacing potentially revealing config props
+ * Anonymize the config for telemetry, replacing potentially revealing configprops
  * with a placeholder string if they are present (this lets us still track how frequently
  * these config options are being used)
  *
@@ -188,12 +191,22 @@ export const anonymizeConfigForTelemetry = (config: d.Config): d.Config => {
     }
   }
 
-  anonymizedConfig.outputTargets = (config.outputTargets ?? []).map((target) => ({
-    ...target,
-    dir: 'omitted',
-    typesDir: 'omitted',
-    baseUrl: 'omitted',
-  }));
+  // Anonymize the outputTargets on our configuration, taking advantage of the
+  // optional 2nd argument to JSON.parse. If anything is not a string or number
+  // we retain it so that any nested properties are handled, else we check
+  // whether it's in our 'keep' list to decide whether to keep it or replace it
+  // with `"omitted"`.
+  anonymizedConfig.outputTargets = JSON.parse(
+    JSON.stringify(config.outputTargets ?? [], (key, value) => {
+      if (!['string', 'number'].includes(typeof value)) {
+        return value;
+      }
+      if (OUTPUT_TARGET_KEYS_TO_KEEP.includes(key)) {
+        return value;
+      }
+      return 'omitted';
+    })
+  );
 
   // TODO(STENCIL-469): Investigate improving anonymization for tsCompilerOptions and devServer
   const propsToDelete: Array<keyof d.Config> = ['sys', 'logger', 'tsCompilerOptions', 'devServer'];
@@ -209,6 +222,7 @@ export const anonymizeConfigForTelemetry = (config: d.Config): d.Config => {
  * Reads package-lock.json, yarn.lock, and package.json files in order to cross-reference
  * the dependencies and devDependencies properties. Pulls up the current installed version
  * of each package under the @stencil, @ionic, and @capacitor scopes.
+ *
  * @param sys the system instance where telemetry is invoked
  * @param config the Stencil configuration associated with the current task that triggered telemetry
  * @returns an object listing all dev and production dependencies under the aforementioned scopes
@@ -306,6 +320,7 @@ function sanitizeDeclaredVersion(version: string): string {
 
 /**
  * If telemetry is enabled, send a metric to an external data store
+ *
  * @param sys the system instance where telemetry is invoked
  * @param config the Stencil configuration associated with the current task that triggered telemetry
  * @param name the name of a trackable metric. Note this name is not necessarily a scalar value to track, like
@@ -333,6 +348,7 @@ export async function sendMetric(
 
 /**
  * Used to read the config file's tokens.telemetry property.
+ *
  * @param sys The system where the command is invoked
  * @returns string
  */

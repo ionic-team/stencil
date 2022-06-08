@@ -189,13 +189,11 @@ describe('prepareData', () => {
         },
         outputTargets: [
           {
-            baseUrl: 'omitted',
-            dir: 'omitted',
+            baseUrl: 'https://example.com',
             serviceWorker: {
-              swDest: './tmp',
+              swDest: 'omitted',
             },
             type: 'www',
-            typesDir: 'omitted',
           },
         ],
       },
@@ -237,13 +235,11 @@ describe('prepareData', () => {
         },
         outputTargets: [
           {
-            baseUrl: 'omitted',
-            dir: 'omitted',
+            baseUrl: 'https://example.com',
             serviceWorker: {
-              swDest: './tmp',
+              swDest: 'omitted',
             },
             type: 'www',
-            typesDir: 'omitted',
           },
         ],
       },
@@ -292,4 +288,20 @@ describe('anonymizeConfigForTelemetry', () => {
       });
     }
   );
+
+  it('should retain outputTarget props on the keep list', () => {
+    const anonymizedConfig = anonymizeConfigForTelemetry({
+      outputTargets: [
+        { type: 'www', baseUrl: 'https://example.com' },
+        { type: 'dist', typesDir: 'my-types' },
+      ],
+    });
+
+    expect(anonymizedConfig).toEqual({
+      outputTargets: [
+        { type: 'www', baseUrl: 'https://example.com' },
+        { type: 'dist', typesDir: 'my-types' },
+      ],
+    });
+  });
 });
