@@ -267,7 +267,7 @@ export class MockStyleElement extends MockHTMLElement {
   }
 }
 
-//Based on deprecated SVGMatrix - http://html5index.org/SVG%20-%20SVGMatrix.html
+// Based on deprecated SVGMatrix - http://html5index.org/SVG%20-%20SVGMatrix.html
 export const defaultSVGMatrix = {
   a: 1,
   b: 0,
