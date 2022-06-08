@@ -163,7 +163,7 @@ type ConfigStringKeys = keyof {
 const OUTPUT_TARGET_KEYS_TO_KEEP = ['type', 'typesDir', 'baseUrl'];
 
 /**
- * Anonymize the config for telemetry, replacing potentially revealing configprops
+ * Anonymize the config for telemetry, replacing potentially revealing config props
  * with a placeholder string if they are present (this lets us still track how frequently
  * these config options are being used)
  *
