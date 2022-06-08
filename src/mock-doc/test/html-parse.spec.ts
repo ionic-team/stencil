@@ -110,10 +110,10 @@ describe('parseHtml', () => {
   it('svg text members', () => {
     doc = new MockDocument(`
       <svg viewBox="0 0 100 100">
-      <text x="10" y="10">
-      Hello
-      <tspan>world</tspan>
-    </text>
+        <text x="10" y="10">
+          Hello
+          <tspan>world</tspan>
+        </text>
       </svg>
     `);
     const tspan: MockSVGElement = doc.body.firstElementChild.firstElementChild.firstElementChild as MockSVGElement;
