@@ -204,7 +204,7 @@ export const anonymizeConfigForTelemetry = (config: d.Config): d.Config => {
 
   anonymizedConfig.outputTargets = (config.outputTargets ?? []).map((target) => {
     // Anonymize the outputTargets on our configuration, taking advantage of the
-    // optional 2nd argument to `JSON.stringify`. If anything is not a string or number
+    // optional 2nd argument to `JSON.stringify`. If anything is not a string
     // we retain it so that any nested properties are handled, else we check
     // whether it's in our 'keep' list to decide whether to keep it or replace it
     // with `"omitted"`.
