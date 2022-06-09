@@ -9,47 +9,57 @@ import { normalizePath, dashToPascalCase } from '@utils';
  * @param config the Stencil configuration associated with the project being compiled
  * @param compilerCtx the current compiler context
  * @param buildCtx the context associated with the current build
- * @param distDtsFilePath the path to a type declaration file (.d.ts) that is being generated for the output target.
- * This path is not necessarily the `components.d.ts` file that is found in the root of a project's `src` directory.
+ * @param typesDir the path to the directory where type declarations are saved
  */
 export const generateCustomElementsTypes = async (
   config: d.Config,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
-  distDtsFilePath: string
+  typesDir: string
 ): Promise<void> => {
-  const outputTargets = config.outputTargets.filter(isOutputTargetDistCustomElements);
+  const outputTargets = (config.outputTargets ?? []).filter(isOutputTargetDistCustomElements);
 
   await Promise.all(
     outputTargets.map((outputTarget) =>
-      generateCustomElementsTypesOutput(config, compilerCtx, buildCtx, distDtsFilePath, outputTarget)
+      generateCustomElementsTypesOutput(config, compilerCtx, buildCtx, typesDir, outputTarget)
     )
   );
 };
 
 /**
  * Generates types for a single `dist-custom-elements` output target definition in a Stencil project's configuration
+ *
  * @param config the Stencil configuration associated with the project being compiled
  * @param compilerCtx the current compiler context
  * @param buildCtx the context associated with the current build
- * @param distDtsFilePath the path to a type declaration file (.d.ts) that is being generated for the output target.
- * This path is not necessarily the `components.d.ts` file that is found in the root of a project's `src` directory.
+ * @param typesDir path to the directory where type declarations are saved
  * @param outputTarget the output target for which types are being currently generated
  */
-export const generateCustomElementsTypesOutput = async (
+const generateCustomElementsTypesOutput = async (
   config: d.Config,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
-  distDtsFilePath: string,
+  typesDir: string,
   outputTarget: d.OutputTargetDistCustomElements
 ) => {
-  const customElementsDtsPath = join(outputTarget.dir, 'index.d.ts');
-  const componentsDtsRelPath = relDts(outputTarget.dir, distDtsFilePath);
+  // the path where we're going to write the typedef for the whole dist-custom-elements output
+  const customElementsDtsPath = join(outputTarget.dir!, 'index.d.ts');
+  // the directory where types for the individual components are written
+  const componentsTypeDirectoryPath = relative(outputTarget.dir!, join(typesDir, 'components'));
+
+  const components = buildCtx.components.filter((m) => !m.isCollectionDependency);
 
   const code = [
     `/* ${config.namespace} custom elements */`,
-    ``,
-    `import type { Components, JSX } from "${componentsDtsRelPath}";`,
+    ...components.map((component) => {
+      const exportName = dashToPascalCase(component.tagName);
+      const importName = component.componentClassName;
+      // typedefs for individual components can be found under paths like
+      // $TYPES_DIR/components/my-component/my-component.d.ts
+      const componentDTSPath = join(componentsTypeDirectoryPath, component.tagName, component.tagName);
+
+      return `export { ${importName} as ${exportName} } from '${componentDTSPath}';`;
+    }),
     ``,
     `/**`,
     ` * Used to manually set the base path where assets can be found.`,
@@ -69,10 +79,9 @@ export const generateCustomElementsTypesOutput = async (
     `  rel?: (el: EventTarget, eventName: string, listener: EventListenerOrEventListenerObject, options: boolean | AddEventListenerOptions) => void;`,
     `}`,
     `export declare const setPlatformOptions: (opts: SetPlatformOptions) => void;`,
-    ``,
-    `export type { Components, JSX };`,
-    ``,
   ];
+
+  const componentsDtsRelPath = relDts(outputTarget.dir!, join(typesDir, 'components.d.ts'));
 
   const usersIndexJsPath = join(config.srcDir, 'index.ts');
   const hasUserIndex = await compilerCtx.fs.access(usersIndexJsPath);
@@ -87,12 +96,11 @@ export const generateCustomElementsTypesOutput = async (
     outputTargetType: outputTarget.type,
   });
 
-  const components = buildCtx.components.filter((m) => !m.isCollectionDependency);
   await Promise.all(
     components.map(async (cmp) => {
       const dtsCode = generateCustomElementType(componentsDtsRelPath, cmp);
       const fileName = `${cmp.tagName}.d.ts`;
-      const filePath = join(outputTarget.dir, fileName);
+      const filePath = join(outputTarget.dir!, fileName);
       await compilerCtx.fs.writeFile(filePath, dtsCode, { outputTargetType: outputTarget.type });
     })
   );
