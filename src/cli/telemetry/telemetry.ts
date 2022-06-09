@@ -215,7 +215,7 @@ export const anonymizeConfigForTelemetry = (config: d.Config): d.Config => {
     // with `"omitted"`.
     const anonymizedOT = JSON.parse(
       JSON.stringify(target, (key, value) => {
-        if (!['string', 'number'].includes(typeof value)) {
+        if (!(typeof value === "string")) {
           return value;
         }
         if (OUTPUT_TARGET_KEYS_TO_KEEP.includes(key)) {
