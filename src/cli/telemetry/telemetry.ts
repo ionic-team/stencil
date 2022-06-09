@@ -164,12 +164,7 @@ type ConfigStringKeys = keyof {
 // preparing a config for telemetry
 //
 // we omit the values of all other fields on output targets.
-const OUTPUT_TARGET_KEYS_TO_KEEP = [
-  'type',
-  'external',
-  'autoDefineCustomElements',
-  'generateTypeDeclarations',
-] as const;
+const OUTPUT_TARGET_KEYS_TO_KEEP = ['type'] as const;
 
 // top-level config props that we anonymize for telemetry
 const CONFIG_PROPS_TO_ANONYMIZE: ReadonlyArray<ConfigStringKeys> = [
