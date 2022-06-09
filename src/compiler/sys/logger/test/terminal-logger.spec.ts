@@ -1,7 +1,7 @@
 import { LogLevel } from '@stencil/core/declarations';
 import { createNodeLoggerSys } from '../../../../sys/node/node-logger';
 import { createTerminalLogger, LOG_LEVELS, shouldLog } from '../terminal-logger';
-import { bold, cyan, dim, red, yellow } from 'ansi-colors';
+import { bgRed, blue, bold, cyan, dim, gray, green, magenta, red, yellow } from 'ansi-colors';
 
 describe('terminal-logger', () => {
   describe('shouldLog helper', () => {
@@ -94,6 +94,40 @@ describe('terminal-logger', () => {
       const { logger, errorMock } = setup();
       logger.error('my error message');
       expect(errorMock).toBeCalledWith(`\n${bold(red('[ ERROR ]'))}  my error message\n`);
+    });
+
+    describe('color support', () => {
+      it('re-packages some ansi-colors functions', () => {
+        const { logger } = setup();
+        expect(logger.bgRed('test message')).toBe(bgRed('test message'));
+        expect(logger.blue('test message')).toBe(blue('test message'));
+        expect(logger.bold('test message')).toBe(bold('test message'));
+        expect(logger.cyan('test message')).toBe(cyan('test message'));
+        expect(logger.dim('test message')).toBe(dim('test message'));
+        expect(logger.gray('test message')).toBe(gray('test message'));
+        expect(logger.green('test message')).toBe(green('test message'));
+        expect(logger.magenta('test message')).toBe(magenta('test message'));
+        expect(logger.red('test message')).toBe(red('test message'));
+        expect(logger.yellow('test message')).toBe(yellow('test message'));
+      });
+
+      it('has a built-in disable which turns off colors', () => {
+        const { logger } = setup();
+        logger.enableColors(false);
+        expect(logger.bgRed('test message')).toBe('test message');
+        expect(logger.blue('test message')).toBe('test message');
+        expect(logger.bold('test message')).toBe('test message');
+        expect(logger.cyan('test message')).toBe('test message');
+        expect(logger.dim('test message')).toBe('test message');
+        expect(logger.gray('test message')).toBe('test message');
+        expect(logger.green('test message')).toBe('test message');
+        expect(logger.magenta('test message')).toBe('test message');
+        expect(logger.red('test message')).toBe('test message');
+        expect(logger.yellow('test message')).toBe('test message');
+        // This has to be re-enabled because this actually toggles
+        // a boolean declared inside of the ansi-colors module
+        logger.enableColors(true);
+      });
     });
 
     describe('logfile support', () => {
