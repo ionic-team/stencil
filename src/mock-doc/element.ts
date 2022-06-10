@@ -331,18 +331,20 @@ export class MockDOMMatrix {
 
 export class MockDOMPoint {
   w: number = 1;
-  x: number;
-  y: number;
-  z: number;
+  x: number = 0;
+  y: number = 0;
+  z: number = 0;
   toJSON() {}
-  matrixTransform: () => MockDOMPoint;
+  matrixTransform() {
+    return new MockDOMMatrix();
+  }
 }
 
 export class MockSVGRect {
   height: number = 10;
   width: number = 10;
-  x: number;
-  y: number;
+  x: number = 0;
+  y: number = 0;
 }
 
 export class MockStyleElement extends MockHTMLElement {
