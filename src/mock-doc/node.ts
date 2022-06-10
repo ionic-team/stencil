@@ -320,9 +320,7 @@ export class MockElement extends MockNode {
     return this.children[0] || null;
   }
 
-  focus() {
-    /**/
-  }
+  focus(_options?: { preventScroll?: boolean }) {}
 
   getAttribute(attrName: string) {
     if (attrName === 'style') {
