@@ -10,30 +10,47 @@ export const filesChanged = (buildCtx: d.BuildCtx) => {
 
 const unaryBasename = (filePath: string) => basename(filePath);
 
-const getExt = (filePath: string) => filePath.split('.').pop().toLowerCase();
+/**
+ * Get the file extension for a path
+ * @param filePath a path
+ * @returns the file extension (well, characters after the last `'.'`)
+ */
+const getExt = (filePath: string): string => filePath.split('.').pop().toLowerCase();
 
 /**
  * Script extensions which we want to be able to recognize
  */
 const SCRIPT_EXT = ['ts', 'tsx', 'js', 'jsx'];
 
-export const hasScriptExt = (filePath: string) => SCRIPT_EXT.includes(getExt(filePath));
+/**
+ * Helper to check if an extension is found in our list of script extensions
+ * @param ext a file extension
+ * @returns whether the extension is a script extension or not
+ */
+export const hasScriptExt = (filePath: string): boolean => SCRIPT_EXT.includes(getExt(filePath));
 
 const STYLE_EXT = ['css', 'scss', 'sass', 'pcss', 'styl', 'stylus', 'less'];
 
-export const hasStyleExt = (filePath: string) => STYLE_EXT.includes(getExt(filePath));
+/**
+ * Helper to check if an extension is found in our list of style extensions
+ * @param ext a file extension
+ * @returns whether the extension is a style extension or not
+ */
+export const hasStyleExt = (filePath: string): boolean => STYLE_EXT.includes(getExt(filePath));
 
 // collect all the scripts that were added
-export const scriptsAdded = (buildCtx: d.BuildCtx) => buildCtx.filesAdded.filter(hasScriptExt).map(unaryBasename);
+export const scriptsAdded = (buildCtx: d.BuildCtx): string[] =>
+  buildCtx.filesAdded.filter(hasScriptExt).map(unaryBasename);
 
 // collect all the scripts that were deleted
-export const scriptsDeleted = (buildCtx: d.BuildCtx) => buildCtx.filesDeleted.filter(hasScriptExt).map(unaryBasename);
+export const scriptsDeleted = (buildCtx: d.BuildCtx): string[] =>
+  buildCtx.filesDeleted.filter(hasScriptExt).map(unaryBasename);
 
-export const hasScriptChanges = (buildCtx: d.BuildCtx) => buildCtx.filesChanged.some(hasScriptExt);
+export const hasScriptChanges = (buildCtx: d.BuildCtx): boolean => buildCtx.filesChanged.some(hasScriptExt);
 
-export const hasStyleChanges = (buildCtx: d.BuildCtx) => buildCtx.filesChanged.some(hasStyleExt);
+export const hasStyleChanges = (buildCtx: d.BuildCtx): boolean => buildCtx.filesChanged.some(hasStyleExt);
 
-export const hasHtmlChanges = (config: d.Config, buildCtx: d.BuildCtx) => {
+export const hasHtmlChanges = (config: d.Config, buildCtx: d.BuildCtx): boolean => {
   const anyHtmlChanged = buildCtx.filesChanged.some((f) => f.toLowerCase().endsWith('.html'));
 
   if (anyHtmlChanged) {
