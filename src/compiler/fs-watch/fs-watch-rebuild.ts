@@ -9,13 +9,13 @@ export const filesChanged = (buildCtx: d.BuildCtx) => {
 };
 
 /**
- * Unary helper function mapping string to spring and wrapping `basename`,
+ * Unary helper function mapping string to string and wrapping `basename`,
  * which normally takes two string arguments. This means it cannot be passed
  * to `Array.prototype.map`, but this little helper can!
  * @param filePath a filepath to check out
  * @returns the basename for that filepath
  */ 
-const unaryBasename = (filePath: string) => basename(filePath);
+const unaryBasename = (filePath: string): string => basename(filePath);
 
 /**
  * Get the file extension for a path
