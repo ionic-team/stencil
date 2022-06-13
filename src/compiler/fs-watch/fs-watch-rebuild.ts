@@ -8,6 +8,13 @@ export const filesChanged = (buildCtx: d.BuildCtx) => {
   return unique([...buildCtx.filesUpdated, ...buildCtx.filesAdded, ...buildCtx.filesDeleted]).sort();
 };
 
+/**
+ * Unary helper function mapping string to spring and wrapping `basename`,
+ * which normally takes two string arguments. This means it cannot be passed
+ * to `Array.prototype.map`, but this little helper can!
+ * @param filePath a filepath to check out
+ * @returns the basename for that filepath
+ */ 
 const unaryBasename = (filePath: string) => basename(filePath);
 
 /**
@@ -38,18 +45,47 @@ const STYLE_EXT = ['css', 'scss', 'sass', 'pcss', 'styl', 'stylus', 'less'];
  */
 export const hasStyleExt = (filePath: string): boolean => STYLE_EXT.includes(getExt(filePath));
 
-// collect all the scripts that were added
+/**
+ * Get all scripts from a build context that were added
+ *
+ * @param buildCtx the build context
+ * @returns an array of filepaths that were added
+ */
 export const scriptsAdded = (buildCtx: d.BuildCtx): string[] =>
   buildCtx.filesAdded.filter(hasScriptExt).map(unaryBasename);
 
-// collect all the scripts that were deleted
+/**
+ * Get all scripts from a build context that were deleted
+ *
+ * @param buildCtx the build context
+ * @returns an array of deleted filepaths
+ */
 export const scriptsDeleted = (buildCtx: d.BuildCtx): string[] =>
   buildCtx.filesDeleted.filter(hasScriptExt).map(unaryBasename);
 
+/**
+ * Check whether a build has script changes
+ *
+ * @param buildCtx the build context
+ * @returns whether or not there are script changes
+ */
 export const hasScriptChanges = (buildCtx: d.BuildCtx): boolean => buildCtx.filesChanged.some(hasScriptExt);
 
+/**
+ * Check whether a build has style changes
+ *
+ * @param buildCtx the build context
+ * @returns whether or not there are style changes
+ */
 export const hasStyleChanges = (buildCtx: d.BuildCtx): boolean => buildCtx.filesChanged.some(hasStyleExt);
 
+/**
+ * Check whether a build has html changes
+ *
+ * @param config the current config
+ * @param buildCtx the build context
+ * @returns whether or not HTML files were changed
+ */
 export const hasHtmlChanges = (config: d.Config, buildCtx: d.BuildCtx): boolean => {
   const anyHtmlChanged = buildCtx.filesChanged.some((f) => f.toLowerCase().endsWith('.html'));
 
