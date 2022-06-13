@@ -8,9 +8,31 @@ export interface BundleOptions {
   externalRuntime?: boolean;
   platform: 'client' | 'hydrate' | 'worker';
   customTransformers?: TransformerFactory<SourceFile>[];
+  /**
+   * This is equivalent to the Rollup `input` configuration option. It's
+   * an object mapping names to entry points which tells Rollup to bundle
+   * each thing up as a separate output chunk.
+   *
+   * @see {@link https://rollupjs.org/guide/en/#input}
+   */
   inputs: { [entryKey: string]: string };
+  /**
+   * A map of strings which are passed to the Stencil-specific loader plugin
+   * which we use to resolve the imports of Stencil project files when building
+   * with Rollup.
+   *
+   * @see {@link loader-plugin:loaderPlugin}
+   */
   loader?: { [id: string]: string };
   inlineDynamicImports?: boolean;
   inlineWorkers?: boolean;
+  /**
+   * Duplicate of Rollup's `preserveEntrySignatures` option.
+   *
+   * "Controls if Rollup tries to ensure that entry chunks have the same
+   * exports as the underlying entry module."
+   *
+   * @see {@link https://rollupjs.org/guide/en/#preserveentrysignatures}
+   */
   preserveEntrySignatures?: PreserveEntrySignaturesOption;
 }

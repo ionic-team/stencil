@@ -7,6 +7,7 @@ import {
   generatePreamble,
   getSourceMappingUrlForEndOfFile,
   hasError,
+  isString,
   rollupToStencilSourceMap,
 } from '@utils';
 import { getCustomElementsBuildConditionals } from '../dist-custom-elements-bundle/custom-elements-build-conditionals';
@@ -21,6 +22,17 @@ import { proxyCustomElement } from '../../transformers/component-native/proxy-cu
 import { updateStencilCoreImports } from '../../transformers/update-stencil-core-import';
 import ts from 'typescript';
 
+/**
+ * Main output target function for `dist-custom-elements`. This function just
+ * does some organizational work to call the other functions in this module,
+ * which do actual work of generating the rollup configuration, creating an
+ * entry chunk, running, the build, etc.
+ *
+ * @param config the user-supplied compiler configuration we're using
+ * @param compilerCtx the current compiler context
+ * @param buildCtx the current build context
+ * @returns an empty Promise which won't resolve until the work is done!
+ */
 export const outputCustomElements = async (
   config: d.Config,
   compilerCtx: d.CompilerCtx,
@@ -30,7 +42,7 @@ export const outputCustomElements = async (
     return;
   }
 
-  const outputTargets = config.outputTargets.filter(isOutputTargetDistCustomElements);
+  const outputTargets = (config.outputTargets ?? []).filter(isOutputTargetDistCustomElements);
   if (outputTargets.length === 0) {
     return;
   }
@@ -38,38 +50,72 @@ export const outputCustomElements = async (
   const bundlingEventMessage = 'generate custom elements';
   const timespan = buildCtx.createTimeSpan(`${bundlingEventMessage} started`);
 
-  await Promise.all(outputTargets.map((o) => bundleCustomElements(config, compilerCtx, buildCtx, o)));
+  await Promise.all(outputTargets.map((target) => bundleCustomElements(config, compilerCtx, buildCtx, target)));
 
   timespan.finish(`${bundlingEventMessage} finished`);
 };
 
-const bundleCustomElements = async (
+/**
+ * Get bundle options for our current build and compiler context which we'll use
+ * to generate a Rollup build and so on.
+ *
+ * @param config user-supplied Stencil configuration
+ * @param buildCtx the current build context
+ * @param compilerCtx the current compiler context
+ * @param outputTarget the outputTarget we're currently dealing with
+ * @returns bundle options suitable for generating a rollup configuration
+ */
+export const getBundleOptions = (
+  config: d.Config,
+  buildCtx: d.BuildCtx,
+  compilerCtx: d.CompilerCtx,
+  outputTarget: d.OutputTargetDistCustomElements
+): BundleOptions => ({
+  id: 'customElements',
+  platform: 'client',
+  conditionals: getCustomElementsBuildConditionals(config, buildCtx.components),
+  customTransformers: getCustomElementCustomTransformer(config, compilerCtx, buildCtx.components, outputTarget),
+  externalRuntime: !!outputTarget.externalRuntime,
+  inlineWorkers: true,
+  inputs: {
+    // Here we prefix our index chunk with '\0' to tell Rollup that we're
+    // going to be using virtual modules with this module. A leading '\0'
+    // prevents other plugins from messing with the module. We generate a
+    // string for the index chunk below in the `loader` property.
+    //
+    // @see {@link https://rollupjs.org/guide/en/#conventions} for more info.
+    index: '\0core',
+  },
+  loader: {
+    '\0core': generateEntryPoint(outputTarget),
+  },
+  inlineDynamicImports: outputTarget.inlineDynamicImports,
+  preserveEntrySignatures: 'allow-extension',
+});
+
+/**
+ * Get bundle options for rollup, run the rollup build, optionally minify the
+ * output, and write files to disk.
+ * @param config user-supplied Stencil configuration
+ * @param buildCtx the current build context
+ * @param compilerCtx the current compiler context
+ * @param outputTarget the outputTarget we're currently dealing with
+ * @returns an empty promise
+ */
+
+export const bundleCustomElements = async (
   config: d.Config,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   outputTarget: d.OutputTargetDistCustomElements
 ) => {
   try {
-    const bundleOpts: BundleOptions = {
-      id: 'customElements',
-      platform: 'client',
-      conditionals: getCustomElementsBuildConditionals(config, buildCtx.components),
-      customTransformers: getCustomElementCustomTransformer(config, compilerCtx, buildCtx.components, outputTarget),
-      externalRuntime: !!outputTarget.externalRuntime,
-      inlineWorkers: true,
-      inputs: {
-        index: '\0core',
-      },
-      loader: {
-        '\0core': generateEntryPoint(outputTarget),
-      },
-      inlineDynamicImports: outputTarget.inlineDynamicImports,
-      preserveEntrySignatures: 'allow-extension',
-    };
+    const bundleOpts = getBundleOptions(config, buildCtx, compilerCtx, outputTarget);
 
     addCustomElementInputs(buildCtx, bundleOpts);
 
     const build = await bundleOutput(config, compilerCtx, buildCtx, bundleOpts);
+
     if (build) {
       const rollupOutput = await build.generate({
         banner: generatePreamble(config),
@@ -80,6 +126,20 @@ const bundleCustomElements = async (
         hoistTransitiveImports: false,
         preferConst: true,
       });
+
+      // the output target should have been validated at this point - as a result, we expect this field
+      // to have been backfilled if it wasn't provided
+      const outputTargetDir: string = outputTarget.dir!;
+
+      // besides, if it isn't here we do a diagnostic and an early return
+      if (!isString(outputTargetDir)) {
+        buildCtx.diagnostics.push({
+          level: 'error',
+          type: 'build',
+          messageText: 'dist-custom-elements output target provided with no output target directory!',
+        });
+        return;
+      }
 
       const minify = outputTarget.externalRuntime || outputTarget.minify !== true ? false : config.minifyJs;
       const files = rollupOutput.output.map(async (bundle) => {
@@ -96,19 +156,15 @@ const bundleCustomElements = async (
           buildCtx.diagnostics.push(...optimizeResults.diagnostics);
           if (!hasError(optimizeResults.diagnostics) && typeof optimizeResults.output === 'string') {
             code = optimizeResults.output;
+          }
+          if (optimizeResults.sourceMap) {
             sourceMap = optimizeResults.sourceMap;
-          }
-          if (sourceMap) {
             code = code + getSourceMappingUrlForEndOfFile(bundle.fileName);
-            await compilerCtx.fs.writeFile(
-              join(outputTarget.dir, bundle.fileName + '.map'),
-              JSON.stringify(sourceMap),
-              {
-                outputTargetType: outputTarget.type,
-              }
-            );
+            await compilerCtx.fs.writeFile(join(outputTargetDir, bundle.fileName + '.map'), JSON.stringify(sourceMap), {
+              outputTargetType: outputTarget.type,
+            });
           }
-          await compilerCtx.fs.writeFile(join(outputTarget.dir, bundle.fileName), code, {
+          await compilerCtx.fs.writeFile(join(outputTargetDir, bundle.fileName), code, {
             outputTargetType: outputTarget.type,
           });
         }
@@ -125,8 +181,11 @@ const bundleCustomElements = async (
  * @param buildCtx the context for the current build
  * @param bundleOpts the bundle options to store the virtual modules under. acts as an output parameter
  */
-const addCustomElementInputs = (buildCtx: d.BuildCtx, bundleOpts: BundleOptions): void => {
+export const addCustomElementInputs = (buildCtx: d.BuildCtx, bundleOpts: BundleOptions): void => {
   const components = buildCtx.components;
+  // an array to store the imports of these modules that we're going to add to our entry chunk
+  const indexImports: string[] = [];
+
   components.forEach((cmp) => {
     const exp: string[] = [];
     const exportName = dashToPascalCase(cmp.tagName);
@@ -136,6 +195,7 @@ const addCustomElementInputs = (buildCtx: d.BuildCtx, bundleOpts: BundleOptions)
 
     if (cmp.isPlain) {
       exp.push(`export { ${importName} as ${exportName} } from '${cmp.sourceFilePath}';`);
+      indexImports.push(`export { {${exportName} } from '${coreKey}';`);
     } else {
       // the `importName` may collide with the `exportName`, alias it just in case it does with `importAs`
       exp.push(
@@ -143,11 +203,23 @@ const addCustomElementInputs = (buildCtx: d.BuildCtx, bundleOpts: BundleOptions)
       );
       exp.push(`export const ${exportName} = ${importAs};`);
       exp.push(`export const defineCustomElement = cmpDefCustomEle;`);
+
+      // Here we push an export (with a rename for `defineCustomElement` for
+      // this component onto our array which references the `coreKey` (prefixed
+      // with `\0`). We have to do this so that our import is referencing the
+      // correct virtual module, if we instead referenced, for instance,
+      // `cmp.sourceFilePath`, we would end up with duplicated modules in our
+      // output.
+      indexImports.push(
+        `export { ${exportName}, defineCustomElement as defineCustomElement${exportName} } from '${coreKey}';`
+      );
     }
 
     bundleOpts.inputs[cmp.tagName] = coreKey;
-    bundleOpts.loader[coreKey] = exp.join('\n');
+    bundleOpts.loader![coreKey] = exp.join('\n');
   });
+
+  bundleOpts.loader!['\0core'] += indexImports.join('\n');
 };
 
 /**
@@ -155,7 +227,7 @@ const addCustomElementInputs = (buildCtx: d.BuildCtx, bundleOpts: BundleOptions)
  * @param outputTarget the output target's configuration
  * @returns the stringified contents to be placed in the entrypoint
  */
-const generateEntryPoint = (outputTarget: d.OutputTargetDistCustomElements): string => {
+export const generateEntryPoint = (outputTarget: d.OutputTargetDistCustomElements): string => {
   const imp: string[] = [];
 
   imp.push(
@@ -173,6 +245,7 @@ const generateEntryPoint = (outputTarget: d.OutputTargetDistCustomElements): str
 /**
  * Get the series of custom transformers that will be applied to a Stencil project's source code during the TypeScript
  * transpilation process
+ *
  * @param config the configuration for the Stencil project
  * @param compilerCtx the current compiler context
  * @param components the components that will be compiled as a part of the current build
