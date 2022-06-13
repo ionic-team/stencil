@@ -96,7 +96,8 @@ describe('parseHtml', () => {
         </svg>
       </svg>
     `);
-    const svgElem: MockSVGSVGElement = doc.body.firstElementChild.firstElementChild as MockSVGSVGElement;
+    const svgElem: MockSVGSVGElement = doc.body.firstElementChild?.firstElementChild as MockSVGSVGElement;
+    expect(svgElem).toBeDefined();
     expect(svgElem.getBBox()).toEqual(new MockSVGRect());
     expect(svgElem.createSVGPoint()).toEqual(new MockDOMPoint());
     expect(svgElem.getScreenCTM()).toEqual(new MockDOMMatrix());
@@ -112,9 +113,12 @@ describe('parseHtml', () => {
         </text>
       </svg>
     `);
-    const tspan: MockSVGTextContentElement = doc.body.firstElementChild.firstElementChild
-      .firstElementChild as MockSVGTextContentElement;
-    expect(doc.body.firstElementChild.firstElementChild.tagName).toEqual('text');
+    const text: MockSVGTextContentElement = doc.body.firstElementChild?.firstElementChild as MockSVGTextContentElement;
+    expect(text).toBeDefined();
+    expect(text.tagName).toEqual('text');
+
+    const tspan: MockSVGTextContentElement = text.firstElementChild as MockSVGTextContentElement;
+    expect(tspan).toBeDefined();
     expect(tspan.getComputedTextLength()).toEqual(0);
   });
 
