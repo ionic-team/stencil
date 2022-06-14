@@ -1,6 +1,6 @@
 import type * as d from '@stencil/core/declarations';
 import { createCompiler } from '@stencil/core/compiler';
-import { mockStencilSystem } from '@stencil/core/testing';
+import { mockCompilerSystem } from '@stencil/core/testing';
 import path from 'path';
 import { validateConfig } from '../../config/validate-config';
 
@@ -10,7 +10,7 @@ xdescribe('component-styles', () => {
   const root = path.resolve('/');
 
   beforeEach(async () => {
-    const sys: d.CompilerSystem = mockStencilSystem() as any;
+    const sys: d.CompilerSystem = mockCompilerSystem() as any;
     await sys.writeFile(
       '/tsconfig.json',
       `

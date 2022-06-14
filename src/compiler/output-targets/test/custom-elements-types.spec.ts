@@ -1,5 +1,5 @@
 import { path } from '@stencil/core/compiler';
-import { mockConfig, mockStencilSystem, mockBuildCtx, mockCompilerCtx, mockModule } from '@stencil/core/testing';
+import { mockConfig, mockCompilerSystem, mockBuildCtx, mockCompilerCtx, mockModule } from '@stencil/core/testing';
 import type * as d from '../../../declarations';
 import * as outputCustomElementsMod from '../dist-custom-elements';
 import { stubComponentCompilerMeta } from '../../types/tests/ComponentCompilerMeta.stub';
@@ -8,7 +8,7 @@ import { DIST_CUSTOM_ELEMENTS } from '../output-utils';
 import { join, relative } from 'path';
 
 const setup = () => {
-  const sys = mockStencilSystem();
+  const sys = mockCompilerSystem();
   const config: d.Config = mockConfig(sys);
   const compilerCtx = mockCompilerCtx(config);
   const buildCtx = mockBuildCtx(config, compilerCtx);
