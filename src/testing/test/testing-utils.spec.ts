@@ -21,13 +21,13 @@ describe('testing-utils', () => {
       expect(() => expectFiles(fs, [])).not.toThrow();
     });
 
-    it('returns the results of finding an expected file', async () => {
+    it('does not throw when a provided file path is found', async () => {
       await fs.writeFile(MOCK_FILE_PATH, MOCK_FILE_CONTENTS);
 
       expect(() => expectFiles(fs, [MOCK_FILE_PATH])).not.toThrow();
     });
 
-    it('returns the results of finding multiple files', async () => {
+    it('does not throw when the provided file paths are found', async () => {
       await fs.writeFile(MOCK_FILE_PATH, MOCK_FILE_CONTENTS);
 
       const anotherFilePath = path.join('another', 'mock', 'file', 'path', 'to', 'some-file.ts');
