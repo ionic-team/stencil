@@ -14,9 +14,6 @@ export const createNodeLogger = (context: { process: NodeJS.Process }): Logger =
   return logger;
 };
 
-const MIN_COLUMNS = 60;
-const MAX_COLUMNS = 120;
-
 /**
  * Create a logger sys object for use in a Node.js environment
  *
@@ -34,11 +31,15 @@ export function createNodeLoggerSys(prcs: NodeJS.Process): TerminalLoggerSys {
 
   /**
    * Get the number of columns for the terminal to use when printing
-   * This is basically clamped to between MIN_COLUMNS and MAX_COLUMNS
+   * @returns the number of columns to use
    */
   const getColumns = () => {
-    const terminalWidth = prcs?.stdout?.columns ?? 80;
-    return Math.max(Math.min(MAX_COLUMNS, terminalWidth), MIN_COLUMNS);
+    const min_columns = 60;
+    const max_columns = 120;
+    const defaultWidth = 80;
+
+    const terminalWidth = prcs?.stdout?.columns ?? defaultWidth;
+    return Math.max(Math.min(terminalWidth, max_columns), min_columns);
   };
 
   const memoryUsage = () => prcs.memoryUsage().rss;

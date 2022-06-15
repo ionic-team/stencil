@@ -38,6 +38,11 @@ module.exports = {
     // rely on TypeScript types to be the source of truth, minimize verbosity in comments
     "jsdoc/require-param-type": ["off"],
     "jsdoc/require-param-description": ["error"],
+    "jsdoc/require-returns-check": ["error"],
+    "jsdoc/require-returns-description": ["error"],
+    // rely on TypeScript types to be the source of truth, minimize verbosity in comments
+    "jsdoc/require-returns-type": ["off"],
+    "jsdoc/require-returns": ["error"],
     'prefer-const': 'error',
     'no-var': 'error',
     'prefer-rest-params': 'error',

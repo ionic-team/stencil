@@ -42,7 +42,7 @@ export const isDtsFile = (filePath: string): boolean => {
 /**
  * Generate the preamble to be placed atop the main file of the build
  * @param config the Stencil configuration file
- * @return the generated preamble
+ * @returns the generated preamble
  */
 export const generatePreamble = (config: d.Config): string => {
   const { preamble } = config;
