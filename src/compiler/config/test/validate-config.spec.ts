@@ -1,5 +1,5 @@
 import type * as d from '@stencil/core/declarations';
-import { mockLogger, mockStencilSystem } from '@stencil/core/testing';
+import { mockLogger, mockCompilerSystem } from '@stencil/core/testing';
 import { isWatchIgnorePath } from '../../fs-watch/fs-watch-rebuild';
 import { DOCS_JSON, DOCS_CUSTOM, DOCS_README, DOCS_VSCODE } from '../../output-targets/output-utils';
 import { validateConfig } from '../validate-config';
@@ -7,7 +7,7 @@ import { validateConfig } from '../validate-config';
 describe('validation', () => {
   let userConfig: d.Config;
   const logger = mockLogger();
-  const sys = mockStencilSystem();
+  const sys = mockCompilerSystem();
 
   beforeEach(() => {
     userConfig = {

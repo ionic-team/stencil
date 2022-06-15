@@ -1,6 +1,6 @@
 import type * as d from '../../declarations';
 import { taskGenerate, getBoilerplateByExtension, BoilerplateFile } from '../task-generate';
-import { mockConfig, mockStencilSystem } from '@stencil/core/testing';
+import { mockConfig, mockCompilerSystem } from '@stencil/core/testing';
 import * as utils from '../../utils/validation';
 
 import * as coreCompiler from '@stencil/core/compiler';
@@ -13,7 +13,7 @@ jest.mock('prompts', () => ({
 }));
 
 const setup = async () => {
-  const sys = mockStencilSystem();
+  const sys = mockCompilerSystem();
   const config: d.Config = mockConfig(sys);
   config.configPath = '/testing-path';
   config.srcDir = '/src';

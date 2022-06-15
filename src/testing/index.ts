@@ -9,7 +9,7 @@ export {
   mockCompilerCtx,
   mockDocument,
   mockLogger,
-  mockStencilSystem,
+  mockCompilerSystem,
   mockWindow,
   mockModule,
 } from './mocks';

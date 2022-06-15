@@ -2,7 +2,7 @@ import type { BuildCtx, Cache, CompilerCtx, CompilerSystem, Config, Module } fro
 import { BuildContext } from '../compiler/build/build-ctx';
 import { Cache as CompilerCache } from '../compiler/cache';
 import { createInMemoryFs } from '../compiler/sys/in-memory-fs';
-import { createTestingSystem } from './testing-sys';
+import { createTestingSystem, TestingSystem } from './testing-sys';
 import { createWorkerContext } from '@stencil/core/compiler';
 import { MockWindow } from '@stencil/core/mock-doc';
 import { TestingLogger } from './testing-logger';
@@ -142,7 +142,17 @@ export function mockLogger() {
   return new TestingLogger();
 }
 
-export function mockStencilSystem(): CompilerSystem {
+/**
+ * Create a {@link CompilerSystem} entity for testing the compiler.
+ *
+ * This function acts as a thin wrapper around a {@link TestingSystem} entity creation. It exists to provide a logical
+ * place in the codebase where we might expect Stencil engineers to reach for when attempting to mock a
+ * {@link CompilerSystem} base type. Should there prove to be usage of both this function and the one it wraps,
+ * reconsider if this wrapper is necessary.
+ *
+ * @returns a System instance for testing purposes.
+ */
+export function mockCompilerSystem(): TestingSystem {
   return createTestingSystem();
 }
 

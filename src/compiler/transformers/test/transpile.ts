@@ -1,16 +1,24 @@
 import type * as d from '@stencil/core/declarations';
 import { convertDecoratorsToStatic } from '../decorators-to-static/convert-decorators';
 import { convertStaticToMeta } from '../static-to-meta/visitor';
-import { mockBuildCtx, mockCompilerCtx, mockConfig, mockStencilSystem } from '@stencil/core/testing';
+import { mockBuildCtx, mockCompilerCtx, mockConfig } from '@stencil/core/testing';
 import ts from 'typescript';
 import { updateModule } from '../static-to-meta/parse-static';
 import { getScriptTarget } from '../transform-utils';
 
+/**
+ * Testing utility for transpiling provided string containing valid Stencil code
+ * @param input the code to transpile
+ * @param config a Stencil configuration to apply during the transpilation
+ * @param compilerCtx a compiler context to use in the transpilation process
+ * @param beforeTransformers TypeScript transformers that should be applied before the code is emitted
+ * @param afterTransformers TypeScript transformers that should be applied after the code is emitted
+ * @returns the result of the transpilation step
+ */
 export function transpileModule(
   input: string,
   config?: d.Config,
   compilerCtx?: d.CompilerCtx,
-  sys?: d.CompilerSystem,
   beforeTransformers: ts.TransformerFactory<ts.SourceFile>[] = [],
   afterTransformers: ts.TransformerFactory<ts.SourceFile>[] = []
 ) {
@@ -73,7 +81,6 @@ export function transpileModule(
 
   config = config || mockConfig();
   compilerCtx = compilerCtx || mockCompilerCtx(config);
-  sys = sys || config.sys || (mockStencilSystem() as any);
 
   const buildCtx = mockBuildCtx(config, compilerCtx);
 
