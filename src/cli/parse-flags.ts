@@ -1,6 +1,25 @@
-import type { CompilerSystem, ConfigFlags, TaskCommand } from '../declarations';
-import { dashToPascalCase } from '@utils';
+import type { CompilerSystem, LogLevel, TaskCommand } from '../declarations';
+import { dashToPascalCase, toDashCase } from '@utils';
+import {
+  CLI_ARG_ALIASES,
+  BooleanCLIArg,
+  BOOLEAN_CLI_ARGS,
+  ConfigFlags,
+  LogCLIArg,
+  LOG_LEVEL_CLI_ARGS,
+  NumberCLIArg,
+  NUMBER_CLI_ARGS,
+  StringCLIArg,
+  STRING_CLI_ARGS,
+} from './config-flags';
 
+/**
+ * Parse command line arguments into a structured `ConfigFlags` object
+ *
+ * @param args an array of config flags
+ * @sys an optional compiler system
+ * @returns a structured ConfigFlags object
+ */
 export const parseFlags = (args: string[], sys?: CompilerSystem): ConfigFlags => {
   const flags: ConfigFlags = {
     task: null,
@@ -14,11 +33,11 @@ export const parseFlags = (args: string[], sys?: CompilerSystem): ConfigFlags =>
   if (flags.args.length > 0 && flags.args[0] && !flags.args[0].startsWith('-')) {
     flags.task = flags.args[0] as TaskCommand;
   }
-  parseArgs(flags, flags.args, flags.knownArgs);
+  parseArgs(flags, flags.args);
 
   if (sys && sys.name === 'node') {
     const envArgs = getNpmConfigEnvArgs(sys);
-    parseArgs(flags, envArgs, flags.knownArgs);
+    parseArgs(flags, envArgs);
 
     envArgs.forEach((envArg) => {
       if (!flags.args.includes(envArg)) {
@@ -42,196 +61,191 @@ export const parseFlags = (args: string[], sys?: CompilerSystem): ConfigFlags =>
 };
 
 /**
- * Parse command line arguments that are whitelisted via the BOOLEAN_ARG_OPTS,
- * STRING_ARG_OPTS, and NUMBER_ARG_OPTS arrays in this file. Handles leading
- * dashes on arguments, aliases that are defined for a small number of argument
- * types, and parsing values for non-boolean arguments (e.g. port number).
+ * Parse command line arguments that are enumerated in the BOOLEAN_ARG_OPTS,
+ * STRING_ARG_OPTS, NUMBER_ARG_OPTS, and LOG_LEVEL_OPTS arrays in the
+ * `config-flags` module. Handles leading dashes on arguments, aliases that
+ * are defined for a small number of argument types, and parsing values for
+ * non-boolean arguments (e.g. port number).
  *
  * @param flags     a ConfigFlags object
  * @param args      an array of command-line arguments to parse
  * @param knownArgs an array to which all recognized, legal arguments are added
  */
-const parseArgs = (flags: any, args: string[], knownArgs: string[]) => {
-  BOOLEAN_ARG_OPTS.forEach((booleanName) => {
-    const alias = ARG_OPTS_ALIASES[booleanName];
-    const flagKey = configCase(booleanName);
+const parseArgs = (flags: ConfigFlags, args: string[]) => {
+  BOOLEAN_CLI_ARGS.forEach((argName) => parseBooleanArg(flags, args, argName));
+  STRING_CLI_ARGS.forEach((argName) => parseStringArg(flags, args, argName));
+  NUMBER_CLI_ARGS.forEach((argName) => parseNumberArg(flags, args, argName));
+  LOG_LEVEL_CLI_ARGS.forEach((argName) => parseLogLevelArg(flags, args, argName));
+};
 
-    if (typeof flags[flagKey] !== 'boolean') {
-      flags[flagKey] = null;
+/**
+ * Parse a boolean CLI argument. For these, we support the following formats:
+ *
+ * - `--booleanArg`
+ * - `--boolean-arg`
+ * - `--noBooleanArg`
+ * - `--no-boolean-arg`
+ *
+ * @param flags the config flags object, while we'll modify
+ * @param args our CLI arguments
+ * @param configCaseName the argument we want to look at right now
+ */
+const parseBooleanArg = (flags: ConfigFlags, args: string[], configCaseName: BooleanCLIArg) => {
+  // we support both dash-case and PascalCase versions of the parameter
+  // argName is 'configCase' version which can be found in BOOLEAN_ARG_OPTS
+  const alias = CLI_ARG_ALIASES[configCaseName];
+  const dashCaseName = toDashCase(configCaseName);
+
+  if (typeof flags[configCaseName] !== 'boolean') {
+    flags[configCaseName] = null;
+  }
+
+  args.forEach((cmdArg) => {
+    let value;
+
+    if (cmdArg === `--${configCaseName}` || cmdArg === `--${dashCaseName}`) {
+      value = true;
+    } else if (cmdArg === `--no-${dashCaseName}` || cmdArg === `--no${dashToPascalCase(dashCaseName)}`) {
+      value = false;
+    } else if (alias && cmdArg === `-${alias}`) {
+      value = true;
     }
 
-    args.forEach((cmdArg) => {
-      if (cmdArg === `--${booleanName}`) {
-        flags[flagKey] = true;
-        knownArgs.push(cmdArg);
-      } else if (cmdArg === `--${flagKey}`) {
-        flags[flagKey] = true;
-        knownArgs.push(cmdArg);
-      } else if (cmdArg === `--no-${booleanName}`) {
-        flags[flagKey] = false;
-        knownArgs.push(cmdArg);
-      } else if (cmdArg === `--no${dashToPascalCase(booleanName)}`) {
-        flags[flagKey] = false;
-        knownArgs.push(cmdArg);
-      } else if (alias && cmdArg === `-${alias}`) {
-        flags[flagKey] = true;
-        knownArgs.push(cmdArg);
-      }
-    });
-  });
-
-  STRING_ARG_OPTS.forEach((stringName) => {
-    const alias = ARG_OPTS_ALIASES[stringName];
-    const flagKey = configCase(stringName);
-
-    if (typeof flags[flagKey] !== 'string') {
-      flags[flagKey] = null;
-    }
-
-    for (let i = 0; i < args.length; i++) {
-      const cmdArg = args[i];
-
-      if (cmdArg.startsWith(`--${stringName}=`)) {
-        const values = cmdArg.split('=');
-        values.shift();
-        flags[flagKey] = values.join('=');
-        knownArgs.push(cmdArg);
-      } else if (cmdArg === `--${stringName}`) {
-        flags[flagKey] = args[i + 1];
-        knownArgs.push(cmdArg);
-        knownArgs.push(args[i + 1]);
-      } else if (cmdArg === `--${flagKey}`) {
-        flags[flagKey] = args[i + 1];
-        knownArgs.push(cmdArg);
-        knownArgs.push(args[i + 1]);
-      } else if (cmdArg.startsWith(`--${flagKey}=`)) {
-        const values = cmdArg.split('=');
-        values.shift();
-        flags[flagKey] = values.join('=');
-        knownArgs.push(cmdArg);
-      } else if (alias) {
-        if (cmdArg.startsWith(`-${alias}=`)) {
-          const values = cmdArg.split('=');
-          values.shift();
-          flags[flagKey] = values.join('=');
-          knownArgs.push(cmdArg);
-        } else if (cmdArg === `-${alias}`) {
-          flags[flagKey] = args[i + 1];
-          knownArgs.push(args[i + 1]);
-        }
-      }
-    }
-  });
-
-  NUMBER_ARG_OPTS.forEach((numberName) => {
-    const alias = ARG_OPTS_ALIASES[numberName];
-    const flagKey = configCase(numberName);
-
-    if (typeof flags[flagKey] !== 'number') {
-      flags[flagKey] = null;
-    }
-
-    for (let i = 0; i < args.length; i++) {
-      const cmdArg = args[i];
-
-      if (cmdArg.startsWith(`--${numberName}=`)) {
-        const values = cmdArg.split('=');
-        values.shift();
-        flags[flagKey] = parseInt(values.join(''), 10);
-        knownArgs.push(cmdArg);
-      } else if (cmdArg === `--${numberName}`) {
-        flags[flagKey] = parseInt(args[i + 1], 10);
-        knownArgs.push(args[i + 1]);
-      } else if (cmdArg.startsWith(`--${flagKey}=`)) {
-        const values = cmdArg.split('=');
-        values.shift();
-        flags[flagKey] = parseInt(values.join(''), 10);
-        knownArgs.push(cmdArg);
-      } else if (cmdArg === `--${flagKey}`) {
-        flags[flagKey] = parseInt(args[i + 1], 10);
-        knownArgs.push(args[i + 1]);
-      } else if (alias) {
-        if (cmdArg.startsWith(`-${alias}=`)) {
-          const values = cmdArg.split('=');
-          values.shift();
-          flags[flagKey] = parseInt(values.join(''), 10);
-          knownArgs.push(cmdArg);
-        } else if (cmdArg === `-${alias}`) {
-          flags[flagKey] = parseInt(args[i + 1], 10);
-          knownArgs.push(args[i + 1]);
-        }
-      }
+    if (value !== undefined) {
+      flags[configCaseName] = value;
+      flags.knownArgs.push(cmdArg);
     }
   });
 };
 
-const configCase = (prop: string) => {
-  prop = dashToPascalCase(prop);
-  return prop.charAt(0).toLowerCase() + prop.slice(1);
+/**
+ * Parse a string CLI argument
+ *
+ * @param flags the config flags object, while we'll modify
+ * @param args our CLI arguments
+ * @param configCaseName the argument we want to look at right now
+ */
+const parseStringArg = (flags: ConfigFlags, args: string[], configCaseName: StringCLIArg) => {
+  if (typeof flags[configCaseName] !== 'string') {
+    flags[configCaseName] = null;
+  }
+
+  const { value, matchingArg } = getValue(args, configCaseName);
+
+  if (value !== undefined) {
+    flags[configCaseName] = value;
+    flags.knownArgs.push(matchingArg);
+    flags.knownArgs.push(value);
+  }
 };
 
-type ArrayValuesAsUnion<T extends ReadonlyArray<string>> = T[number];
+/**
+ * Parse a number CLI argument
+ *
+ * @param flags the config flags object, while we'll modify
+ * @param args our CLI arguments
+ * @param configCaseName the argument we want to look at right now
+ */
+const parseNumberArg = (flags: ConfigFlags, args: string[], configCaseName: NumberCLIArg) => {
+  if (typeof flags[configCaseName] !== 'number') {
+    flags[configCaseName] = null;
+  }
 
-const BOOLEAN_ARG_OPTS = [
-  'build',
-  'cache',
-  'check-version',
-  'ci',
-  'compare',
-  'debug',
-  'dev',
-  'devtools',
-  'docs',
-  'e2e',
-  'es5',
-  'esm',
-  'headless',
-  'help',
-  'log',
-  'open',
-  'prerender',
-  'prerender-external',
-  'prod',
-  'profile',
-  'service-worker',
-  'screenshot',
-  'serve',
-  'skip-node-check',
-  'spec',
-  'ssr',
-  'stats',
-  'update-screenshot',
-  'verbose',
-  'version',
-  'watch',
-] as const;
+  const { value, matchingArg } = getValue(args, configCaseName);
 
-type BooleanArgOpt = ArrayValuesAsUnion<typeof BOOLEAN_ARG_OPTS>;
-
-const NUMBER_ARG_OPTS = ['max-workers', 'port'] as const;
-
-type NumberArgOpt = ArrayValuesAsUnion<typeof NUMBER_ARG_OPTS>;
-
-const STRING_ARG_OPTS = [
-  'address',
-  'config',
-  'docs-json',
-  'emulate',
-  'log-level',
-  'root',
-  'screenshot-connector',
-] as const;
-
-type StringArgOpt = ArrayValuesAsUnion<typeof STRING_ARG_OPTS>;
-
-type AliasMap = Partial<Record<BooleanArgOpt | NumberArgOpt | StringArgOpt, string>>;
-
-const ARG_OPTS_ALIASES: AliasMap = {
-  config: 'c',
-  help: 'h',
-  port: 'p',
-  version: 'v',
+  if (value) {
+    flags[configCaseName] = parseInt(value, 10);
+    flags.knownArgs.push(matchingArg);
+    flags.knownArgs.push(value);
+  }
 };
+
+/**
+ * Parse a LogLevel CLI argument. These can be only a specific
+ * set of strings, so this function takes care of validating that
+ * the value is correct.
+ *
+ * @param flags the config flags object, while we'll modify
+ * @param args our CLI arguments
+ * @param configCaseName the argument we want to look at right now
+ */
+const parseLogLevelArg = (flags: ConfigFlags, args: string[], configCaseName: LogCLIArg) => {
+  if (typeof flags[configCaseName] !== 'string') {
+    flags[configCaseName] = null;
+  }
+
+  const { value, matchingArg } = getValue(args, configCaseName);
+
+  if (isLogLevel(value)) {
+    flags[configCaseName] = value;
+    flags.knownArgs.push(matchingArg);
+    flags.knownArgs.push(value);
+  }
+};
+
+/**
+ * Helper for pulling values out from the raw array of CLI arguments. This logic
+ * is shared between a few different types of CLI args.
+ *
+ * We look for arguments in the following formats:
+ *
+ * - `--my-cli-argument value`
+ * - `--my-cli-argument=value`
+ * - `--myCliArgument value`
+ * - `--myCliArgument=value`
+ *
+ * We also check for shortened aliases, which we define for a few arguments.
+ *
+ * @param args the CLI args we're dealing with
+ * @configCaseName the ConfigFlag key which we're looking to pull out a value for
+ */
+const getValue = (args: string[], configCaseName: StringCLIArg | NumberCLIArg | LogCLIArg) => {
+  // for some CLI args we have a short alias, like 'c' for 'config'
+  const alias = CLI_ARG_ALIASES[configCaseName];
+  // we support supplying arguments in both dash-case and configCase
+  // for ease of use
+  const dashCaseName = toDashCase(configCaseName);
+
+  let value;
+  let matchingArg;
+  args.forEach((arg, i) => {
+    if (arg.startsWith(`--${dashCaseName}=`) || arg.startsWith(`--${configCaseName}=`)) {
+      value = getEqualsValue(arg);
+      matchingArg = arg;
+    } else if (arg === `--${dashCaseName}` || arg === `--${configCaseName}`) {
+      value = args[i + 1];
+      matchingArg = arg;
+    } else if (alias) {
+      if (arg.startsWith(`-${alias}=`)) {
+        value = getEqualsValue(arg);
+        matchingArg = arg;
+      } else if (arg === `-${alias}`) {
+        value = args[i + 1];
+        matchingArg = arg;
+      }
+    }
+  });
+  return { value, matchingArg };
+};
+
+/**
+ * When a parameter is set in the format `--foobar=12` at the CLI (as opposed to
+ * `--foobar 12`) we want to get the value after the `=` sign
+ *
+ * @param commandArgument the arg in question
+ * @returns the value after the `=`
+ */
+const getEqualsValue = (commandArgument: string) => commandArgument.split('=').slice(1).join('=');
+
+/**
+ * Small helper for getting type-system-level assurance that a `string` can be
+ * narrowed to a `LogLevel`
+ *
+ * @param maybeLogLevel the string to check
+ * @returns whether this is a `LogLevel`
+ */
+const isLogLevel = (maybeLogLevel: string): maybeLogLevel is LogLevel =>
+  ['info', 'warn', 'error', 'debug'].includes(maybeLogLevel);
 
 const getNpmConfigEnvArgs = (sys: CompilerSystem) => {
   // process.env.npm_config_argv

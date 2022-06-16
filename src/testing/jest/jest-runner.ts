@@ -2,6 +2,7 @@ import type * as d from '@stencil/core/internal';
 import { buildJestArgv, getProjectListFromCLIArgs } from './jest-config';
 import { setScreenshotEmulateData } from '../puppeteer/puppeteer-emulate';
 import type { AggregatedResult } from '@jest/test-result';
+import { ConfigFlags } from 'src/cli/config-flags';
 
 export async function runJest(config: d.Config, env: d.E2EProcessEnv) {
   let success = false;
@@ -103,7 +104,7 @@ export function includeTestFile(testPath: string, env: d.E2EProcessEnv) {
   return false;
 }
 
-export function getEmulateConfigs(testing: d.TestingConfig, flags: d.ConfigFlags) {
+export function getEmulateConfigs(testing: d.TestingConfig, flags: ConfigFlags) {
   let emulateConfigs = testing.emulate.slice();
 
   if (typeof flags.emulate === 'string') {

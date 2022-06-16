@@ -1,5 +1,6 @@
 import type { JsonDocs } from './stencil-public-docs';
 import type { PrerenderUrlResults } from '../internal';
+import { ConfigFlags } from 'src/cli/config-flags';
 export * from './stencil-public-docs';
 
 /**
@@ -546,52 +547,6 @@ export interface DevServerEditor {
   name?: string;
   supported?: boolean;
   priority?: number;
-}
-
-export interface ConfigFlags {
-  task?: TaskCommand;
-  args?: string[];
-  knownArgs?: string[];
-  unknownArgs?: string[];
-  address?: string;
-  build?: boolean;
-  cache?: boolean;
-  checkVersion?: boolean;
-  ci?: boolean;
-  compare?: boolean;
-  config?: string;
-  debug?: boolean;
-  dev?: boolean;
-  docs?: boolean;
-  docsApi?: string;
-  docsJson?: string;
-  e2e?: boolean;
-  emulate?: string;
-  es5?: boolean;
-  esm?: boolean;
-  headless?: boolean;
-  help?: boolean;
-  log?: boolean;
-  logLevel?: LogLevel;
-  verbose?: boolean;
-  maxWorkers?: number;
-  open?: boolean;
-  port?: number;
-  prerender?: boolean;
-  prod?: boolean;
-  profile?: boolean;
-  root?: string;
-  screenshot?: boolean;
-  screenshotConnector?: string;
-  serve?: boolean;
-  serviceWorker?: boolean;
-  spec?: boolean;
-  ssr?: boolean;
-  stats?: boolean;
-  updateScreenshot?: boolean;
-  version?: boolean;
-  watch?: boolean;
-  devtools?: boolean;
 }
 
 export type TaskCommand =
