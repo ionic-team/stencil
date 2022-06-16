@@ -17,15 +17,13 @@ export const defaultConfigDirectory = (sys: d.CompilerSystem) => sys.resolvePath
 export async function readConfig(sys: d.CompilerSystem): Promise<d.TelemetryConfig> {
   let config: d.TelemetryConfig = await readJson(sys, defaultConfig(sys));
 
-  let foo: d.TelemetryConfig | undefined;
-
   if (!config) {
     config = {
       'tokens.telemetry': uuidv4(),
       'telemetry.stencil': true,
     };
 
-    await writeConfig(sys, foo);
+    await writeConfig(sys, config);
   } else if (!UUID_REGEX.test(config['tokens.telemetry'])) {
     const newUuid = uuidv4();
     await writeConfig(sys, { ...config, 'tokens.telemetry': newUuid });
