@@ -28,36 +28,31 @@ describe('validateTesting', () => {
   });
 
   it('set headless false w/ flag', () => {
-    userConfig.flags.e2e = true;
-    userConfig.flags.headless = false;
+    userConfig.flags = { ...(userConfig.flags ?? {}), e2e: true, headless: false };
     const { config } = validateConfig(userConfig);
     expect(config.testing.browserHeadless).toBe(false);
   });
 
   it('set headless true w/ flag', () => {
-    userConfig.flags.e2e = true;
-    userConfig.flags.headless = true;
+    userConfig.flags = { ...(userConfig.flags ?? {}), e2e: true, headless: true };
     const { config } = validateConfig(userConfig);
     expect(config.testing.browserHeadless).toBe(true);
   });
 
   it('default headless true', () => {
-    userConfig.flags.e2e = true;
+    userConfig.flags = { ...(userConfig.flags ?? {}), e2e: true };
     const { config } = validateConfig(userConfig);
     expect(config.testing.browserHeadless).toBe(true);
   });
 
   it('force headless with ci flag', () => {
-    userConfig.flags.e2e = true;
-    userConfig.flags.headless = false;
-    userConfig.flags.ci = true;
+    userConfig.flags = { ...(userConfig.flags ?? {}), ci: true, e2e: true, headless: false };
     const { config } = validateConfig(userConfig);
     expect(config.testing.browserHeadless).toBe(true);
   });
 
   it('default to no-sandbox browser args with ci flag', () => {
-    userConfig.flags.e2e = true;
-    userConfig.flags.ci = true;
+    userConfig.flags = { ...(userConfig.flags ?? {}), ci: true, e2e: true };
     const { config } = validateConfig(userConfig);
     expect(config.testing.browserArgs).toEqual([
       '--font-render-hinting=medium',
@@ -69,13 +64,13 @@ describe('validateTesting', () => {
   });
 
   it('default browser args', () => {
-    userConfig.flags.e2e = true;
+    userConfig.flags = { ...(userConfig.flags ?? {}), e2e: true };
     const { config } = validateConfig(userConfig);
     expect(config.testing.browserArgs).toEqual(['--font-render-hinting=medium', '--incognito']);
   });
 
   it('set default testPathIgnorePatterns', () => {
-    userConfig.flags.e2e = true;
+    userConfig.flags = { ...(userConfig.flags ?? {}), e2e: true };
     const { config } = validateConfig(userConfig);
     expect(config.testing.testPathIgnorePatterns).toEqual([
       path.join(ROOT, 'User', 'some', 'path', '.vscode'),
@@ -86,7 +81,7 @@ describe('validateTesting', () => {
   });
 
   it('set default testPathIgnorePatterns with custom outputTargets', () => {
-    userConfig.flags.e2e = true;
+    userConfig.flags = { ...(userConfig.flags ?? {}), e2e: true };
     userConfig.outputTargets = [
       { type: 'dist', dir: 'dist-folder' },
       { type: 'www', dir: 'www-folder' },
@@ -103,7 +98,7 @@ describe('validateTesting', () => {
   });
 
   it('set relative testEnvironment to absolute', () => {
-    userConfig.flags.e2e = true;
+    userConfig.flags = { ...(userConfig.flags ?? {}), e2e: true };
     userConfig.testing = {
       testEnvironment: './rel-path.js',
     };
@@ -113,7 +108,7 @@ describe('validateTesting', () => {
   });
 
   it('set node module testEnvironment', () => {
-    userConfig.flags.e2e = true;
+    userConfig.flags = { ...(userConfig.flags ?? {}), e2e: true };
     userConfig.testing = {
       testEnvironment: 'jsdom',
     };
@@ -130,7 +125,7 @@ describe('validateTesting', () => {
     let testRegex: RegExp;
 
     beforeEach(() => {
-      userConfig.flags.spec = true;
+      userConfig.flags = { ...(userConfig.flags ?? {}), spec: true };
 
       const { testing: testConfig } = validateConfig(userConfig).config;
       const testRegexSetting = testConfig?.testRegex;

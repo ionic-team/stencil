@@ -8,7 +8,7 @@ import { anonymizeConfigForTelemetry } from '../telemetry';
 import { DIST, DIST_CUSTOM_ELEMENTS, DIST_HYDRATE_SCRIPT, WWW } from '../../../compiler/output-targets/output-utils';
 
 describe('telemetryBuildFinishedAction', () => {
-  const config: d.Config = {
+  const config: d.InternalStrictConfig = {
     outputTargets: [],
     flags: {
       args: [],
@@ -39,12 +39,12 @@ describe('telemetryBuildFinishedAction', () => {
 });
 
 describe('telemetryAction', () => {
-  const config = {
+  const config: d.InternalStrictConfig = {
     outputTargets: [],
     flags: {
       args: [],
     },
-  } as d.Config;
+  };
   const logger = mockLogger();
   const sys = createSystem();
 
@@ -132,12 +132,12 @@ describe('hasAppTarget', () => {
 });
 
 describe('prepareData', () => {
-  const config = {
+  const config: d.InternalStrictConfig = {
     flags: {
       args: [],
     },
     outputTargets: [],
-  } as d.Config;
+  };
   const sys = createSystem();
 
   it('provides an object', async () => {
@@ -171,12 +171,12 @@ describe('prepareData', () => {
   });
 
   it('updates when there is a PWA config', async () => {
-    const config = {
+    const config: d.InternalStrictConfig = {
       flags: {
         args: [],
       },
       outputTargets: [{ type: 'www', baseUrl: 'https://example.com', serviceWorker: { swDest: './tmp' } }],
-    } as d.Config;
+    };
 
     const data = await telemetry.prepareData(coreCompiler, config, sys, 1000);
 
@@ -217,12 +217,12 @@ describe('prepareData', () => {
   });
 
   it('updates when there is a component count passed in', async () => {
-    const config = {
+    const config: d.InternalStrictConfig = {
       flags: {
         args: [],
       },
       outputTargets: [{ type: 'www', baseUrl: 'https://example.com', serviceWorker: { swDest: './tmp' } }],
-    } as d.Config;
+    };
 
     const data = await telemetry.prepareData(coreCompiler, config, sys, 1000, 12);
 

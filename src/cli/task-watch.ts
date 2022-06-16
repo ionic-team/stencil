@@ -1,9 +1,9 @@
-import type { Config, DevServer } from '../declarations';
+import type { DevServer, InternalStrictConfig } from '../declarations';
 import type { CoreCompiler } from './load-compiler';
 import { startCheckVersion, printCheckVersionResults } from './check-version';
 import { startupCompilerLog } from './logs';
 
-export const taskWatch = async (coreCompiler: CoreCompiler, config: Config) => {
+export const taskWatch = async (coreCompiler: CoreCompiler, config: InternalStrictConfig) => {
   let devServer: DevServer = null;
   let exitCode = 0;
 

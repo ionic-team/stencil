@@ -1,7 +1,7 @@
 import type * as d from '../declarations';
 import { checkTelemetry, disableTelemetry, enableTelemetry } from './telemetry/telemetry';
 
-export const taskTelemetry = async (config: d.Config, sys: d.CompilerSystem, logger: d.Logger) => {
+export const taskTelemetry = async (config: d.InternalStrictConfig, sys: d.CompilerSystem, logger: d.Logger) => {
   const prompt = logger.dim(sys.details.platform === 'windows' ? '>' : '$');
   const isEnabling = config.flags.args.includes('on');
   const isDisabling = config.flags.args.includes('off');

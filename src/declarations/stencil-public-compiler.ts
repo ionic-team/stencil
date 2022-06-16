@@ -395,6 +395,10 @@ type Loose<T extends Object> = Record<string, any> & Partial<T>;
  */
 export type UnvalidatedConfig = Loose<Config>;
 
+type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] };
+type RequiredFields = 'flags';
+export type InternalStrictConfig = WithRequired<Config, RequiredFields>;
+
 export interface HydratedFlag {
   /**
    * Defaults to `hydrated`.
@@ -2167,7 +2171,7 @@ export interface LoadConfigInit {
  * operations around the codebase.
  */
 export interface LoadConfigResults {
-  config: UnvalidatedConfig;
+  config: InternalStrictConfig;
   diagnostics: Diagnostic[];
   tsconfig: {
     path: string;

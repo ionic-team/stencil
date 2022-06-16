@@ -12,7 +12,11 @@ export const tryFn = async <T extends (...args: any[]) => Promise<R>, R>(fn: T, 
 
 export declare const TERMINAL_INFO: d.TerminalInfo;
 
-export const isInteractive = (sys: d.CompilerSystem, config: d.Config, object?: d.TerminalInfo): boolean => {
+export const isInteractive = (
+  sys: d.CompilerSystem,
+  config: d.InternalStrictConfig,
+  object?: d.TerminalInfo
+): boolean => {
   const terminalInfo =
     object ||
     Object.freeze({
@@ -20,7 +24,7 @@ export const isInteractive = (sys: d.CompilerSystem, config: d.Config, object?: 
       ci:
         ['CI', 'BUILD_ID', 'BUILD_NUMBER', 'BITBUCKET_COMMIT', 'CODEBUILD_BUILD_ARN'].filter(
           (v) => !!sys.getEnvironmentVar(v)
-        ).length > 0 || !!config.flags?.ci,
+        ).length > 0 || !!config.flags.ci,
     });
 
   return terminalInfo.tty && !terminalInfo.ci;
@@ -54,7 +58,7 @@ export async function readJson(sys: d.CompilerSystem, path: string): Promise<any
  * @param config The config passed into the Stencil command
  * @returns true if --debug has been passed, otherwise false
  */
-export function hasDebug(config: d.Config) {
+export function hasDebug(config: d.InternalStrictConfig) {
   return config.flags.debug;
 }
 
@@ -63,6 +67,6 @@ export function hasDebug(config: d.Config) {
  * @param config The config passed into the Stencil command
  * @returns true if both --debug and --verbose have been passed, otherwise false
  */
-export function hasVerbose(config: d.Config) {
+export function hasVerbose(config: d.InternalStrictConfig) {
   return config.flags.verbose && hasDebug(config);
 }

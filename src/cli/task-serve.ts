@@ -1,7 +1,7 @@
-import type { Config } from '../declarations';
+import type { InternalStrictConfig } from '../declarations';
 import { isString } from '@utils';
 
-export const taskServe = async (config: Config) => {
+export const taskServe = async (config: InternalStrictConfig) => {
   config.suppressLogs = true;
 
   config.flags.serve = true;

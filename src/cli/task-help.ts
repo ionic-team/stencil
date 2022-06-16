@@ -1,7 +1,7 @@
 import type * as d from '../declarations';
 import { taskTelemetry } from './task-telemetry';
 
-export const taskHelp = async (config: d.Config, logger: d.Logger, sys?: d.CompilerSystem) => {
+export const taskHelp = async (config: d.InternalStrictConfig, logger: d.Logger, sys?: d.CompilerSystem) => {
   const prompt = logger.dim(sys.details.platform === 'windows' ? '>' : '$');
 
   console.log(`

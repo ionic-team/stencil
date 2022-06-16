@@ -1,4 +1,13 @@
-import type { BuildCtx, Cache, CompilerCtx, CompilerSystem, Config, Module } from '@stencil/core/internal';
+import type {
+  BuildCtx,
+  Cache,
+  CompilerCtx,
+  CompilerSystem,
+  Config,
+  InternalStrictConfig,
+  Module,
+  UnvalidatedConfig,
+} from '@stencil/core/internal';
 import { BuildContext } from '../compiler/build/build-ctx';
 import { Cache as CompilerCache } from '../compiler/cache';
 import { createInMemoryFs } from '../compiler/sys/in-memory-fs';
@@ -10,7 +19,13 @@ import path from 'path';
 import { noop } from '@utils';
 import { buildEvents } from '../compiler/events';
 
-export function mockConfig(sys?: CompilerSystem) {
+export function mockInternalStrictConfig(sys?: CompilerSystem): InternalStrictConfig {
+  const baseConfig = mockConfig(sys);
+
+  return { ...baseConfig, flags: {} };
+}
+
+export function mockConfig(sys?: CompilerSystem): UnvalidatedConfig {
   const rootDir = path.resolve('/');
 
   if (!sys) {
@@ -18,7 +33,7 @@ export function mockConfig(sys?: CompilerSystem) {
   }
   sys.getCurrentDirectory = () => rootDir;
 
-  const config: Config = {
+  return {
     _isTesting: true,
 
     namespace: 'Testing',
@@ -50,8 +65,6 @@ export function mockConfig(sys?: CompilerSystem) {
       after: [],
     },
   };
-
-  return config;
 }
 
 export function mockCompilerCtx(config?: Config) {
