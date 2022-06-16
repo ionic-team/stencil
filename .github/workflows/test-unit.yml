@@ -18,32 +18,14 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # v2.4.0
 
-      - name: Before Use Node ${{ matrix.node }}
-        uses: actions/setup-node@56337c425554a6be30cdef71bf441f15be286854 # v3.1.1
-        with:
-          node-version: ${{ matrix.node }}
-          cache: 'npm'
-
-      - name: Node Version
-        run: node --version
-        shell: bash
-
       - name: Get Core Dependencies
         uses: ./.github/workflows/actions/get-core-dependencies
 
-      - name: Node Version Changed
-        run: node --version
-        shell: bash
-
-      - name: After Use Node ${{ matrix.node }}
+      - name: Use Node ${{ matrix.node }}
         uses: actions/setup-node@56337c425554a6be30cdef71bf441f15be286854 # v3.1.1
         with:
           node-version: ${{ matrix.node }}
           cache: 'npm'
-
-      - name: Node Version
-        run: node --version
-        shell: bash
 
       - name: Download Build Archive
         uses: ./.github/workflows/actions/download-archive
