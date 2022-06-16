@@ -3,10 +3,10 @@ description: 'initializes core dependencies after repo has been pulled'
 runs:
   using: composite
   steps:
-    - name: Use Node 16
+    - name: Use Node 18
       uses: actions/setup-node@56337c425554a6be30cdef71bf441f15be286854 # v3.1.1
       with:
-        node-version: 16
+        node-version: 18
         cache: 'npm'
 
     - name: Install Dependencies
