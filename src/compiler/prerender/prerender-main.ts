@@ -173,7 +173,6 @@ const runPrerenderOutputTarget = async (
     };
 
     if (!config.flags.ci && !manager.isDebug) {
-      config.flags.esm;
       manager.progressLogger = await config.logger.createLineUpdater();
     }
 

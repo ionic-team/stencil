@@ -17,7 +17,7 @@ import {
  * Parse command line arguments into a structured `ConfigFlags` object
  *
  * @param args an array of config flags
- * @sys an optional compiler system
+ * @param sys an optional compiler system
  * @returns a structured ConfigFlags object
  */
 export const parseFlags = (args: string[], sys?: CompilerSystem): ConfigFlags => {
@@ -67,9 +67,8 @@ export const parseFlags = (args: string[], sys?: CompilerSystem): ConfigFlags =>
  * are defined for a small number of argument types, and parsing values for
  * non-boolean arguments (e.g. port number).
  *
- * @param flags     a ConfigFlags object
- * @param args      an array of command-line arguments to parse
- * @param knownArgs an array to which all recognized, legal arguments are added
+ * @param flags a ConfigFlags object to which parsed arguments will be added
+ * @param args  an array of command-line arguments to parse
  */
 const parseArgs = (flags: ConfigFlags, args: string[]) => {
   BOOLEAN_CLI_ARGS.forEach((argName) => parseBooleanArg(flags, args, argName));
@@ -197,7 +196,7 @@ const parseLogLevelArg = (flags: ConfigFlags, args: string[], configCaseName: Lo
  * We also check for shortened aliases, which we define for a few arguments.
  *
  * @param args the CLI args we're dealing with
- * @configCaseName the ConfigFlag key which we're looking to pull out a value for
+ * @param configCaseName the ConfigFlag key which we're looking to pull out a value for
  */
 const getValue = (args: string[], configCaseName: StringCLIArg | NumberCLIArg | LogCLIArg) => {
   // for some CLI args we have a short alias, like 'c' for 'config'

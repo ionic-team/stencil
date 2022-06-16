@@ -309,25 +309,25 @@ describe('parseFlags', () => {
   });
 
   it.each<LogLevel>(['info', 'warn', 'error', 'debug'])("should parse '--logLevel %s'", (level) => {
-    let args = ['--logLevel', level];
+    const args = ['--logLevel', level];
     const flags = parseFlags(args, sys);
     expect(flags.logLevel).toBe(level);
   });
 
   it.each<LogLevel>(['info', 'warn', 'error', 'debug'])('should parse --logLevel=%s', (level) => {
-    let args = [`--logLevel=${level}`];
+    const args = [`--logLevel=${level}`];
     const flags = parseFlags(args, sys);
     expect(flags.logLevel).toBe(level);
   });
 
   it.each<LogLevel>(['info', 'warn', 'error', 'debug'])("should parse '--log-level %s'", (level) => {
-    let args = ['--log-level', level];
+    const args = ['--log-level', level];
     const flags = parseFlags(args, sys);
     expect(flags.logLevel).toBe(level);
   });
 
   it.each<LogLevel>(['info', 'warn', 'error', 'debug'])('should parse --log-level=%s', (level) => {
-    let args = [`--log-level=${level}`];
+    const args = [`--log-level=${level}`];
     const flags = parseFlags(args, sys);
     expect(flags.logLevel).toBe(level);
   });
