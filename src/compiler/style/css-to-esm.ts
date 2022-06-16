@@ -260,7 +260,7 @@ const getCssToEsmImports = (
 
 /**
  * Check if a module URL is a css node module
-*
+ *
  * @param url to check
  * @returns whether or not it's a Css node module
  */
