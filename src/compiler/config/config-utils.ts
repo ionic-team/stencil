@@ -1,7 +1,7 @@
 import type * as d from '../../declarations';
 import { isAbsolute, join } from 'path';
 import { isBoolean } from '@utils';
-import { ConfigFlags } from 'src/cli/config-flags';
+import { ConfigFlags } from '../../cli/config-flags'
 
 export const getAbsolutePath = (config: d.Config | d.UnvalidatedConfig, dir: string) => {
   if (!isAbsolute(dir)) {
