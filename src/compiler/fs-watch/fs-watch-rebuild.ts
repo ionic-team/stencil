@@ -14,7 +14,7 @@ export const filesChanged = (buildCtx: d.BuildCtx) => {
  * to `Array.prototype.map`, but this little helper can!
  * @param filePath a filepath to check out
  * @returns the basename for that filepath
- */ 
+ */
 const unaryBasename = (filePath: string): string => basename(filePath);
 
 /**
