@@ -1,7 +1,7 @@
 import type { LogLevel, TaskCommand } from '@stencil/core/declarations';
 
 /**
- * All the boolean options supported by the Stencil CLI
+ * All the Boolean options supported by the Stencil CLI
  */
 export const BOOLEAN_CLI_ARGS = [
   'build',
@@ -38,17 +38,17 @@ export const BOOLEAN_CLI_ARGS = [
 ] as const;
 
 /**
- * All the number options supported by the Stencil CLI
+ * All the Number options supported by the Stencil CLI
  */
 export const NUMBER_CLI_ARGS = ['maxWorkers', 'port'] as const;
 
 /**
- * All the string options supported by the Stencil CLI
+ * All the String options supported by the Stencil CLI
  */
 export const STRING_CLI_ARGS = ['address', 'config', 'docsJson', 'emulate', 'root', 'screenshotConnector'] as const;
 
 /**
- * All the log level-type options supported by the Stencil CLI
+ * All the LogLevel-type options supported by the Stencil CLI
  *
  * This is a bit silly since there's only one such argument atm,
  * but this approach lets us make sure that we're handling all
@@ -86,9 +86,9 @@ export const CLI_ARG_ALIASES: AliasMap = {
  * Given two types `K` and `T` where `K` extends `ReadonlyArray<string>`,
  * construct a type which maps the strings in `K` as keys to values of type `T`.
  *
- * Becase we use this type to construct an interface (`ConfigFlags`) which has
- * mostly optional keys, we make all the properties optional (w/ `'?'`) and
- * possibly null.
+ * Because we use types derived this way to construct an interface (`ConfigFlags`)
+ * for which we want optional keys, we make all the properties optional (w/ `'?'`)
+ * and possibly null.
  */
 type ObjectFromKeys<K extends ReadonlyArray<string>, T> = {
   [key in K[number]]?: T | null;
