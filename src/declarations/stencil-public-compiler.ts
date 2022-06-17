@@ -1,6 +1,6 @@
 import type { JsonDocs } from './stencil-public-docs';
 import type { PrerenderUrlResults } from '../internal';
-import { ConfigFlags } from '../cli/config-flags';
+import type { BooleanCLIArg, StringCLIArg, NumberCLIArg, LogCLIArg } from '../cli/config-flags';
 export * from './stencil-public-docs';
 
 /**
@@ -2469,4 +2469,46 @@ export interface CliInitOptions {
   args: string[];
   logger: Logger;
   sys: CompilerSystem;
+}
+
+/**
+ * Type containing the possible Boolean configuration flags, to be
+ * included in ConfigFlags, below
+ */
+type BooleanConfigFlags = { [key in BooleanCLIArg]?: boolean | null };
+/**
+ * Type containing the possible String configuration flags, to be
+ * included in ConfigFlags, below
+ */
+type StringConfigFlags = { [key in StringCLIArg]?: string | null };
+/**
+ * Type containing the possible Number configuration flags, to be
+ * included in ConfigFlags, below
+ */
+type NumberConfigFlags = { [key in NumberCLIArg]?: number | null };
+/**
+ * Type containing the possible LogLevel configuration flags, to be
+ * included in ConfigFlags, below
+ */
+type LogLevelFlags = { [key in LogCLIArg]?: LogLevel | null };
+
+/**
+ * The configuration flags which can be set by the user on the command line.
+ * This interface captures both known arguments (which are enumerated and then
+ * parsed according to their types) and unknown arguments which the user may
+ * pass at the CLI.
+ *
+ * Note that this interface is constructed by extending `BooleanConfigFlags`,
+ * `StringConfigFlags`, etc. These types are in turn constructed from types
+ * extending `ReadonlyArray<string>` which we declare here in this file. This
+ * allows us to record our known CLI arguments in one place, using a
+ * `ReadonlyArray<string>` to get both a type-level representation of what CLI
+ * options we support and a runtime list of strings which can be used to match
+ * on actual flags passed by the user.
+ */
+export interface ConfigFlags extends BooleanConfigFlags, StringConfigFlags, NumberConfigFlags, LogLevelFlags {
+  task?: TaskCommand | null;
+  args?: string[];
+  knownArgs?: string[];
+  unknownArgs?: string[];
 }

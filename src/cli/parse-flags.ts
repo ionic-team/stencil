@@ -1,15 +1,14 @@
-import type { CompilerSystem, LogLevel, TaskCommand } from '../declarations';
+import type { CompilerSystem, LogLevel, TaskCommand, ConfigFlags } from '../declarations';
 import { dashToPascalCase, toDashCase } from '@utils';
 import {
-  CLI_ARG_ALIASES,
   BooleanCLIArg,
-  BOOLEAN_CLI_ARGS,
-  ConfigFlags,
   LogCLIArg,
-  LOG_LEVEL_CLI_ARGS,
   NumberCLIArg,
-  NUMBER_CLI_ARGS,
   StringCLIArg,
+  CLI_ARG_ALIASES,
+  BOOLEAN_CLI_ARGS,
+  LOG_LEVEL_CLI_ARGS,
+  NUMBER_CLI_ARGS,
   STRING_CLI_ARGS,
 } from './config-flags';
 
@@ -205,8 +204,8 @@ const getValue = (args: string[], configCaseName: StringCLIArg | NumberCLIArg | 
   // for ease of use
   const dashCaseName = toDashCase(configCaseName);
 
-  let value;
-  let matchingArg;
+  let value: string | undefined;
+  let matchingArg: string | undefined;
   args.forEach((arg, i) => {
     if (arg.startsWith(`--${dashCaseName}=`) || arg.startsWith(`--${configCaseName}=`)) {
       value = getEqualsValue(arg);
