@@ -25,7 +25,7 @@ export const parseFlags = (args: string[], sys?: CompilerSystem): ConfigFlags =>
     task: null,
     args: [],
     knownArgs: [],
-    unknownArgs: null,
+    unknownArgs: [],
   };
 
   // cmd line has more priority over npm scripts cmd
@@ -40,8 +40,8 @@ export const parseFlags = (args: string[], sys?: CompilerSystem): ConfigFlags =>
     parseArgs(flags, envArgs);
 
     envArgs.forEach((envArg) => {
-      if (!flags.args.includes(envArg)) {
-        flags.args.push(envArg);
+      if (!flags.args!.includes(envArg)) {
+        flags.args!.push(envArg);
       }
     });
   }
@@ -54,7 +54,7 @@ export const parseFlags = (args: string[], sys?: CompilerSystem): ConfigFlags =>
   }
 
   flags.unknownArgs = flags.args.filter((arg: string) => {
-    return !flags.knownArgs.includes(arg);
+    return !flags.knownArgs!.includes(arg);
   });
 
   return flags;
@@ -110,9 +110,9 @@ const parseBooleanArg = (flags: ConfigFlags, args: string[], configCaseName: Boo
       value = true;
     }
 
-    if (value !== undefined) {
+    if (value !== undefined && cmdArg !== undefined) {
       flags[configCaseName] = value;
-      flags.knownArgs.push(cmdArg);
+      flags.knownArgs!.push(cmdArg);
     }
   });
 };
@@ -131,10 +131,10 @@ const parseStringArg = (flags: ConfigFlags, args: string[], configCaseName: Stri
 
   const { value, matchingArg } = getValue(args, configCaseName);
 
-  if (value !== undefined) {
+  if (value !== undefined && matchingArg !== undefined) {
     flags[configCaseName] = value;
-    flags.knownArgs.push(matchingArg);
-    flags.knownArgs.push(value);
+    flags.knownArgs!.push(matchingArg);
+    flags.knownArgs!.push(value);
   }
 };
 
@@ -152,10 +152,10 @@ const parseNumberArg = (flags: ConfigFlags, args: string[], configCaseName: Numb
 
   const { value, matchingArg } = getValue(args, configCaseName);
 
-  if (value) {
+  if (value !== undefined && matchingArg !== undefined) {
     flags[configCaseName] = parseInt(value, 10);
-    flags.knownArgs.push(matchingArg);
-    flags.knownArgs.push(value);
+    flags.knownArgs!.push(matchingArg);
+    flags.knownArgs!.push(value);
   }
 };
 
@@ -175,10 +175,10 @@ const parseLogLevelArg = (flags: ConfigFlags, args: string[], configCaseName: Lo
 
   const { value, matchingArg } = getValue(args, configCaseName);
 
-  if (isLogLevel(value)) {
+  if (value !== undefined && matchingArg !== undefined && isLogLevel(value)) {
     flags[configCaseName] = value;
-    flags.knownArgs.push(matchingArg);
-    flags.knownArgs.push(value);
+    flags.knownArgs!.push(matchingArg);
+    flags.knownArgs!.push(value);
   }
 };
 

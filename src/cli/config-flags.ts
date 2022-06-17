@@ -90,7 +90,7 @@ export const CLI_ARG_ALIASES: AliasMap = {
  * mostly optional keys, we make all the properties option (w/ `'?'`)
  */
 type ObjectFromKeys<K extends ReadonlyArray<string>, T> = {
-  [key in K[number]]?: T;
+  [key in K[number]]?: T | null;
 };
 
 type BooleanConfigFlags = ObjectFromKeys<typeof BOOLEAN_CLI_ARGS, boolean>;
@@ -113,7 +113,7 @@ type LogLevelFlags = ObjectFromKeys<typeof LOG_LEVEL_CLI_ARGS, LogLevel>;
  * on actual flags passed by the user.
  */
 export interface ConfigFlags extends BooleanConfigFlags, StringConfigFlags, NumberConfigFlags, LogLevelFlags {
-  task?: TaskCommand;
+  task?: TaskCommand| null;
   args?: string[];
   knownArgs?: string[];
   unknownArgs?: string[];
