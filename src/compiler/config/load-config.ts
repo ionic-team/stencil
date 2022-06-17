@@ -124,7 +124,7 @@ const loadConfigFile = async (
   diagnostics: Diagnostic[],
   configPath: string
 ): Promise<UnvalidatedConfig | null> => {
-  let config: UnvalidatedConfig = null;
+  let config: UnvalidatedConfig | null = null;
 
   if (isString(configPath)) {
     // the passed in config was a string, so it's probably a path to the config we need to load
@@ -160,7 +160,7 @@ const evaluateConfigFile = async (
   diagnostics: Diagnostic[],
   configFilePath: string
 ): Promise<{ config?: UnvalidatedConfig } | null> => {
-  let configFileData: { config?: UnvalidatedConfig } = null;
+  let configFileData: { config?: UnvalidatedConfig } | null = null;
 
   try {
     if (IS_NODE_ENV) {
