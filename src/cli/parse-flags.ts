@@ -1,6 +1,7 @@
-import type { CompilerSystem, LogLevel, TaskCommand, ConfigFlags } from '../declarations';
+import type { CompilerSystem, LogLevel, TaskCommand } from '../declarations';
 import { dashToPascalCase, toDashCase } from '@utils';
 import {
+  ConfigFlags,
   BooleanCLIArg,
   LogCLIArg,
   NumberCLIArg,

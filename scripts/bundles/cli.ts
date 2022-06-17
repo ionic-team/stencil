@@ -48,15 +48,15 @@ export async function cli(opts: BuildOptions): Promise<ReadonlyArray<RollupOptio
   // copy config-flags.js
   const configFlags: OutputOptions = {
     format: 'es',
-    file: join(outputDir, "config-flags.js"),
+    file: join(outputDir, 'config-flags.js'),
     preferConst: true,
     sourcemap: true,
     banner: getBanner(opts, `Stencil CLI Config Flags`, true),
-  }
+  };
 
   // copy config-flags.d.ts
   let configDts = await fs.readFile(join(inputDir, 'config-flags.d.ts'), 'utf8');
-  configDts = configDts.replace('@stencil/core/internal', '../internal/index');
+  configDts = configDts.replace('@stencil/core/declarations', '../internal/index');
   await fs.writeFile(join(opts.output.cliDir, 'config-flags.d.ts'), configDts);
 
   // write @stencil/core/compiler/package.json

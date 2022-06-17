@@ -1,3 +1,5 @@
+import type { LogLevel, TaskCommand } from '@stencil/core/declarations';
+
 /**
  * All the boolean options supported by the Stencil CLI
  */
@@ -79,3 +81,57 @@ export const CLI_ARG_ALIASES: AliasMap = {
   port: 'p',
   version: 'v',
 };
+
+/**
+ * Given two types `K` and `T` where `K` extends `ReadonlyArray<string>`,
+ * construct a type which maps the strings in `K` as keys to values of type `T`.
+ *
+ * Becase we use this type to construct an interface (`ConfigFlags`) which has
+ * mostly optional keys, we make all the properties optional (w/ `'?'`) and
+ * possibly null.
+ */
+type ObjectFromKeys<K extends ReadonlyArray<string>, T> = {
+  [key in K[number]]?: T | null;
+};
+
+/**
+ * Type containing the possible Boolean configuration flags, to be included
+ * in ConfigFlags, below
+ */
+type BooleanConfigFlags = ObjectFromKeys<typeof BOOLEAN_CLI_ARGS, boolean>;
+/**
+ * Type containing the possible Boolean configuration flags, to be included
+ * in ConfigFlags, below
+ */
+type StringConfigFlags = ObjectFromKeys<typeof STRING_CLI_ARGS, string>;
+/**
+ * Type containing the possible Boolean configuration flags, to be included
+ * in ConfigFlags, below
+ */
+type NumberConfigFlags = ObjectFromKeys<typeof NUMBER_CLI_ARGS, number>;
+/**
+ * Type containing the possible Boolean configuration flags, to be included
+ * in ConfigFlags, below
+ */
+type LogLevelFlags = ObjectFromKeys<typeof LOG_LEVEL_CLI_ARGS, LogLevel>;
+
+/**
+ * The configuration flags which can be set by the user on the command line.
+ * This interface captures both known arguments (which are enumerated and then
+ * parsed according to their types) and unknown arguments which the user may
+ * pass at the CLI.
+ *
+ * Note that this interface is constructed by extending `BooleanConfigFlags`,
+ * `StringConfigFlags`, etc. These types are in turn constructed from types
+ * extending `ReadonlyArray<string>` which we declare in another module. This
+ * allows us to record our known CLI arguments in one place, using a
+ * `ReadonlyArray<string>` to get both a type-level representation of what CLI
+ * options we support and a runtime list of strings which can be used to match
+ * on actual flags passed by the user.
+ */
+export interface ConfigFlags extends BooleanConfigFlags, StringConfigFlags, NumberConfigFlags, LogLevelFlags {
+  task?: TaskCommand | null;
+  args?: string[];
+  knownArgs?: string[];
+  unknownArgs?: string[];
+}
