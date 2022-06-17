@@ -1,6 +1,6 @@
 import type { JsonDocs } from './stencil-public-docs';
 import type { PrerenderUrlResults } from '../internal';
-import { ConfigFlags } from 'src/cli/config-flags';
+import { ConfigFlags } from '../cli/config-flags';
 export * from './stencil-public-docs';
 
 /**
