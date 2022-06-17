@@ -12,6 +12,7 @@ export const filesChanged = (buildCtx: d.BuildCtx) => {
  * Unary helper function mapping string to string and wrapping `basename`,
  * which normally takes two string arguments. This means it cannot be passed
  * to `Array.prototype.map`, but this little helper can!
+ *
  * @param filePath a filepath to check out
  * @returns the basename for that filepath
  */
@@ -19,6 +20,7 @@ const unaryBasename = (filePath: string): string => basename(filePath);
 
 /**
  * Get the file extension for a path
+ *
  * @param filePath a path
  * @returns the file extension (well, characters after the last `'.'`)
  */
@@ -30,18 +32,20 @@ const getExt = (filePath: string): string => filePath.split('.').pop().toLowerCa
 const SCRIPT_EXT = ['ts', 'tsx', 'js', 'jsx'];
 
 /**
- * Helper to check if an extension is found in our list of script extensions
- * @param ext a file extension
- * @returns whether the extension is a script extension or not
+ * Helper to check if a filepath has a script extension
+ *
+ * @param filePath a file extension
+ * @returns whether the filepath has a script extension or not
  */
 export const hasScriptExt = (filePath: string): boolean => SCRIPT_EXT.includes(getExt(filePath));
 
 const STYLE_EXT = ['css', 'scss', 'sass', 'pcss', 'styl', 'stylus', 'less'];
 
 /**
- * Helper to check if an extension is found in our list of style extensions
- * @param ext a file extension
- * @returns whether the extension is a style extension or not
+ * Helper to check if a filepath has a style extension
+ *
+ * @param filePath a file extension to check
+ * @returns whether the filepath has a style extension or not
  */
 export const hasStyleExt = (filePath: string): boolean => STYLE_EXT.includes(getExt(filePath));
 
