@@ -1,8 +1,11 @@
 name: 'Get Core Dependencies'
-description: 'initializes core dependencies after repo has been pulled'
+description: 'sets the node version & initializes core dependencies'
 runs:
   using: composite
   steps:
+    # this overrides previous versions of the node runtime that was set.
+    # jobs that need a different version of the Node runtime should explicitly
+    # set their node version after running this step
     - name: Use Node 16
       uses: actions/setup-node@56337c425554a6be30cdef71bf441f15be286854 # v3.1.1
       with:

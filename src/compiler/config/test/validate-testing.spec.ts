@@ -1,12 +1,12 @@
 import type * as d from '@stencil/core/declarations';
-import { mockLogger, mockStencilSystem } from '@stencil/core/testing';
+import { mockLogger, mockCompilerSystem } from '@stencil/core/testing';
 import { validateConfig } from '../validate-config';
 import path from 'path';
 
 describe('validateTesting', () => {
   let userConfig: d.Config;
   const ROOT = path.resolve('/');
-  const sys = mockStencilSystem();
+  const sys = mockCompilerSystem();
   const logger = mockLogger();
 
   beforeEach(() => {

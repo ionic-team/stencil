@@ -1,5 +1,15 @@
 import type * as d from '../../declarations';
 
+/**
+ * Parse CSS docstrings that Stencil supports, as documented here:
+ * https://stenciljs.com/docs/docs-json#css-variables
+ *
+ * Docstrings found in the supplied style text will be added to the
+ * `styleDocs` param
+ *
+ * @param styleDocs the array to hold formatted CSS docstrings
+ * @param styleText the CSS text we're working with
+ */
 export function parseStyleDocs(styleDocs: d.StyleDoc[], styleText: string | null) {
   if (typeof styleText !== 'string') {
     return;
@@ -21,10 +31,18 @@ export function parseStyleDocs(styleDocs: d.StyleDoc[], styleText: string | null
   }
 }
 
-function parseCssComment(styleDocs: d.StyleDoc[], comment: string) {
+/**
+ * Parse a CSS comment string and insert it into the provided array of
+ * style docstrings.
+ *
+ * @param styleDocs an array which will be modified with the docstring
+ * @param comment the comment string
+ */
+function parseCssComment(styleDocs: d.StyleDoc[], comment: string): void {
   /**
    * @prop --max-width: Max width of the alert
    */
+  // (the above is an example of what these comments might look like)
 
   const lines = comment.split(/\r?\n/).map((line) => {
     line = line.trim();
@@ -62,10 +80,17 @@ function parseCssComment(styleDocs: d.StyleDoc[], comment: string) {
       styleDocs.push(cssDoc);
     }
   });
-
-  return styleDocs;
 }
 
-const CSS_DOC_START = `/**`;
-const CSS_DOC_END = `*/`;
-const CSS_PROP_ANNOTATION = `@prop`;
+/**
+ * Opening syntax for a CSS docstring
+ */
+const CSS_DOC_START = '/**';
+/**
+ * Closing syntax for a CSS docstring
+ */
+const CSS_DOC_END = '*/';
+/**
+ * The `@prop` annotation we support within CSS docstrings
+ */
+const CSS_PROP_ANNOTATION = '@prop';

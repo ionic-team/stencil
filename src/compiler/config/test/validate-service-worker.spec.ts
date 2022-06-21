@@ -1,12 +1,12 @@
 import type * as d from '@stencil/core/declarations';
 import { OutputTargetWww } from '@stencil/core/declarations';
-import { mockStencilSystem } from '@stencil/core/testing';
+import { mockCompilerSystem } from '@stencil/core/testing';
 import { validateServiceWorker } from '../validate-service-worker';
 
 describe('validateServiceWorker', () => {
   const config: d.Config = {
     fsNamespace: 'app',
-    sys: mockStencilSystem(),
+    sys: mockCompilerSystem(),
     devMode: false,
     flags: {},
   };

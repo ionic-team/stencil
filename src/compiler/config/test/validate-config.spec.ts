@@ -1,5 +1,5 @@
 import type * as d from '@stencil/core/declarations';
-import { mockLogger, mockStencilSystem } from '@stencil/core/testing';
+import { mockLogger, mockCompilerSystem } from '@stencil/core/testing';
 import { isWatchIgnorePath } from '../../fs-watch/fs-watch-rebuild';
 import { DOCS_JSON, DOCS_CUSTOM, DOCS_README, DOCS_VSCODE } from '../../output-targets/output-utils';
 import { validateConfig } from '../validate-config';
@@ -7,7 +7,7 @@ import { validateConfig } from '../validate-config';
 describe('validation', () => {
   let userConfig: d.Config;
   const logger = mockLogger();
-  const sys = mockStencilSystem();
+  const sys = mockCompilerSystem();
 
   beforeEach(() => {
     userConfig = {
@@ -16,6 +16,48 @@ describe('validation', () => {
       rootDir: '/User/some/path/',
       namespace: 'Testing',
     };
+  });
+
+  describe('flags', () => {
+    it('adds a default "flags" object if none is provided', () => {
+      userConfig.flags = undefined;
+      const { config } = validateConfig(userConfig);
+      expect(config.flags).toEqual({});
+    });
+
+    it('serializes a provided "flags" object', () => {
+      userConfig.flags = { dev: false };
+      const { config } = validateConfig(userConfig);
+      expect(config.flags).toEqual({ dev: false });
+    });
+
+    describe('devMode', () => {
+      it('defaults "devMode" to false when "flag.prod" is truthy', () => {
+        userConfig.flags = { prod: true };
+        const { config } = validateConfig(userConfig);
+        expect(config.devMode).toBe(false);
+      });
+
+      it('defaults "devMode" to true when "flag.dev" is truthy', () => {
+        userConfig.flags = { dev: true };
+        const { config } = validateConfig(userConfig);
+        expect(config.devMode).toBe(true);
+      });
+
+      it('defaults "devMode" to false when "flag.prod" & "flag.dev" are truthy', () => {
+        userConfig.flags = { dev: true, prod: true };
+        const { config } = validateConfig(userConfig);
+        expect(config.devMode).toBe(false);
+      });
+
+      it('sets "devMode" to false if the user provided flag isn\'t a boolean', () => {
+        // the branch under test explicitly requires a value whose type is not allowed by the type system
+        const devMode = 'not-a-bool' as unknown as boolean;
+        userConfig = { devMode };
+        const { config } = validateConfig(userConfig);
+        expect(config.devMode).toBe(false);
+      });
+    });
   });
 
   describe('allowInlineScripts', () => {

@@ -2040,6 +2040,9 @@ export interface CssToEsmImportData {
   filePath: string;
 }
 
+/**
+ * Input CSS to be transformed into ESM
+ */
 export interface TransformCssToEsmInput {
   input: string;
   module?: 'cjs' | 'esm' | string;
@@ -2635,6 +2638,7 @@ export interface TrackableData {
   build: string;
   stencil: string;
   has_app_pwa_config: boolean;
+  config: Config;
 }
 
 /**

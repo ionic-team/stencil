@@ -572,7 +572,7 @@ export interface ConfigFlags {
   headless?: boolean;
   help?: boolean;
   log?: boolean;
-  logLevel?: string;
+  logLevel?: LogLevel;
   verbose?: boolean;
   maxWorkers?: number;
   open?: boolean;
@@ -1793,7 +1793,7 @@ export interface EmulateViewport {
   isLandscape?: boolean;
 }
 
-export type LogLevel = 'debug' | 'info' | 'warn' | 'error' | string;
+export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
 /**
  * Common logger to be used by the compiler, dev-server and CLI. The CLI will use a

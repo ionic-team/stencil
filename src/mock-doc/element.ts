@@ -65,7 +65,28 @@ export function createElementNS(ownerDocument: any, namespaceURI: string, tagNam
   if (namespaceURI === 'http://www.w3.org/1999/xhtml') {
     return createElement(ownerDocument, tagName);
   } else if (namespaceURI === 'http://www.w3.org/2000/svg') {
-    return new MockSVGElement(ownerDocument, tagName);
+    switch (tagName.toLowerCase()) {
+      case 'text':
+      case 'tspan':
+      case 'tref':
+      case 'altglyph':
+      case 'textpath':
+        return new MockSVGTextContentElement(ownerDocument, tagName);
+      case 'circle':
+      case 'ellipse':
+      case 'image':
+      case 'line':
+      case 'path':
+      case 'polygon':
+      case 'polyline':
+      case 'rect':
+      case 'use':
+        return new MockSVGGraphicsElement(ownerDocument, tagName);
+      case 'svg':
+        return new MockSVGSVGElement(ownerDocument, tagName);
+      default:
+        return new MockSVGElement(ownerDocument, tagName);
+    }
   } else {
     return new MockElement(ownerDocument, tagName);
   }
@@ -237,6 +258,95 @@ patchPropAttributes(MockScriptElement.prototype, {
   type: String,
 });
 
+export class MockDOMMatrix {
+  static fromMatrix() {
+    return new MockDOMMatrix();
+  }
+  a: number = 1;
+  b: number = 0;
+  c: number = 0;
+  d: number = 1;
+  e: number = 0;
+  f: number = 0;
+  m11: number = 1;
+  m12: number = 0;
+  m13: number = 0;
+  m14: number = 0;
+  m21: number = 0;
+  m22: number = 1;
+  m23: number = 0;
+  m24: number = 0;
+  m31: number = 0;
+  m32: number = 0;
+  m33: number = 1;
+  m34: number = 0;
+  m41: number = 0;
+  m42: number = 0;
+  m43: number = 0;
+  m44: number = 1;
+  is2D: boolean = true;
+  isIdentity: boolean = true;
+  inverse() {
+    return new MockDOMMatrix();
+  }
+  flipX() {
+    return new MockDOMMatrix();
+  }
+  flipY() {
+    return new MockDOMMatrix();
+  }
+  multiply() {
+    return new MockDOMMatrix();
+  }
+  rotate() {
+    return new MockDOMMatrix();
+  }
+  rotateAxisAngle() {
+    return new MockDOMMatrix();
+  }
+  rotateFromVector() {
+    return new MockDOMMatrix();
+  }
+  scale() {
+    return new MockDOMMatrix();
+  }
+  scaleNonUniform() {
+    return new MockDOMMatrix();
+  }
+  skewX() {
+    return new MockDOMMatrix();
+  }
+  skewY() {
+    return new MockDOMMatrix();
+  }
+  toJSON() {}
+  toString() {}
+  transformPoint() {
+    return new MockDOMPoint();
+  }
+  translate() {
+    return new MockDOMMatrix();
+  }
+}
+
+export class MockDOMPoint {
+  w: number = 1;
+  x: number = 0;
+  y: number = 0;
+  z: number = 0;
+  toJSON() {}
+  matrixTransform() {
+    return new MockDOMMatrix();
+  }
+}
+
+export class MockSVGRect {
+  height: number = 10;
+  width: number = 10;
+  x: number = 0;
+  y: number = 0;
+}
+
 export class MockStyleElement extends MockHTMLElement {
   sheet: MockCSSStyleSheet;
 
@@ -266,7 +376,6 @@ export class MockStyleElement extends MockHTMLElement {
     setStyleElementText(this, value);
   }
 }
-
 export class MockSVGElement extends MockElement {
   // SVGElement properties and methods
   get ownerSVGElement(): SVGSVGElement {
@@ -274,10 +383,6 @@ export class MockSVGElement extends MockElement {
   }
   get viewportElement(): SVGElement {
     return null;
-  }
-
-  focus() {
-    /**/
   }
   onunload() {
     /**/
@@ -295,6 +400,30 @@ export class MockSVGElement extends MockElement {
     return false;
   }
   getTotalLength(): number {
+    return 0;
+  }
+}
+
+export class MockSVGGraphicsElement extends MockSVGElement {
+  getBBox(_options?: { clipped: boolean; fill: boolean; markers: boolean; stroke: boolean }): MockSVGRect {
+    return new MockSVGRect();
+  }
+  getCTM(): MockDOMMatrix {
+    return new MockDOMMatrix();
+  }
+  getScreenCTM(): MockDOMMatrix {
+    return new MockDOMMatrix();
+  }
+}
+
+export class MockSVGSVGElement extends MockSVGGraphicsElement {
+  createSVGPoint(): MockDOMPoint {
+    return new MockDOMPoint();
+  }
+}
+
+export class MockSVGTextContentElement extends MockSVGGraphicsElement {
+  getComputedTextLength(): number {
     return 0;
   }
 }
