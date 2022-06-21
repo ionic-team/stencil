@@ -50,7 +50,7 @@ describe('validation', () => {
         expect(config.devMode).toBe(false);
       });
 
-      it('sets "devMode" to false the user provided flag isn\'t a boolean', () => {
+      it('sets "devMode" to false if the user provided flag isn\'t a boolean', () => {
         // the branch under test explicitly requires a value whose type is not allowed by the type system
         const devMode = 'not-a-bool' as unknown as boolean;
         userConfig = { devMode };
