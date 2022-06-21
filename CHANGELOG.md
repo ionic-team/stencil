@@ -1,3 +1,15 @@
+# 🚂 [2.17.0](https://github.com/ionic-team/stencil/compare/v2.16.1...v2.17.0) (2022-06-21)
+
+
+### Features
+
+* **compiler:** export all built components from index.js w/ dist-custom-elements ([ff0e8cc](https://github.com/ionic-team/stencil/commit/ff0e8cc54e5e68631cd83302d59b19f2626d43cb)), closes [#3368](https://github.com/ionic-team/stencil/issues/3368)
+* **compiler:** update generation of type declaration file w/ dist-custom-elements ([9d3bf15](https://github.com/ionic-team/stencil/commit/9d3bf154f99abbb6228df5456f318a49f8333362)), closes [#3368](https://github.com/ionic-team/stencil/issues/3368)
+* **mock-doc:** add matrix and tspan props for svgelement ([#3408](https://github.com/ionic-team/stencil/issues/3408)) ([d3b93c1](https://github.com/ionic-team/stencil/commit/d3b93c15902215e550f01f8beadbd4b1a40d6244))
+* **telemetry:** add stencil config to telemetry object ([#3401](https://github.com/ionic-team/stencil/issues/3401)) ([9fe3f15](https://github.com/ionic-team/stencil/commit/9fe3f1589c51e7f7e93777fa8291cb58b75818d2))
+
+
+
 ## 🎻 [2.16.1](https://github.com/ionic-team/stencil/compare/v2.16.1-0...v2.16.1) (2022-06-03)
 
 ### Bug Fixes
