@@ -1,7 +1,14 @@
 import { Component, Element, Host, Method, Prop, Watch, h, forceUpdate } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
+import { setupConsoleMocker } from '../../testing/testing-utils';
 
 describe('lifecycle sync', () => {
+  const setupConsoleMocks = setupConsoleMocker();
+
+  beforeEach(() => {
+    setupConsoleMocks();
+  });
+
   it('should fire connected/disconnected when removed', async () => {
     let connectedCallback = 0;
     let disconnectedCallback = 0;

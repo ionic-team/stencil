@@ -1,7 +1,14 @@
 import { Component, Method, Prop, State, Watch } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
+import { setupConsoleMocker } from '../../testing/testing-utils';
 
 describe('watch', () => {
+  const setupConsoleMocks = setupConsoleMocker();
+
+  beforeEach(() => {
+    setupConsoleMocks();
+  });
+
   it('watch is called each time a prop changes', async () => {
     @Component({ tag: 'cmp-a' })
     class CmpA {

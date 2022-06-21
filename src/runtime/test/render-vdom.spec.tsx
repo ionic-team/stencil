@@ -1,7 +1,14 @@
 import { Component, Element, setErrorHandler, Host, Prop, State, forceUpdate, getRenderingRef, h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
+import { setupConsoleMocker } from '../../testing/testing-utils';
 
 describe('render-vdom', () => {
+  const setupConsoleMocks = setupConsoleMocker();
+
+  beforeEach(() => {
+    setupConsoleMocks();
+  });
+
   describe('build conditionals', () => {
     it('vdomText', async () => {
       @Component({ tag: 'cmp-a' })
