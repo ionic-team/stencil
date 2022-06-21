@@ -2040,6 +2040,9 @@ export interface CssToEsmImportData {
   filePath: string;
 }
 
+/**
+ * Input CSS to be transformed into ESM
+ */
 export interface TransformCssToEsmInput {
   input: string;
   module?: 'cjs' | 'esm' | string;
