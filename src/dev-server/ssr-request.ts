@@ -26,7 +26,7 @@ export async function ssrPageRequest(
         diagnostics.push(...ssrResults.diagnostics);
         status = ssrResults.httpStatus;
         content = ssrResults.html;
-      } catch (e) {
+      } catch (e: any) {
         catchError(diagnostics, e);
       }
     }
@@ -88,7 +88,7 @@ export async function ssrStaticDataRequest(
         });
         data.components = ssrResults.components.map((c) => c.tag).sort();
         httpCache = hasQueryString;
-      } catch (e) {
+      } catch (e: any) {
         catchError(diagnostics, e);
       }
     }

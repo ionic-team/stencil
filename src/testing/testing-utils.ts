@@ -23,10 +23,26 @@ export function shuffleArray(array: any[]) {
   return array;
 }
 
-export function expectFiles(fs: d.InMemoryFileSystem, filePaths: string[]) {
-  filePaths.forEach((filePath) => {
-    fs.sys.statSync(filePath);
-  });
+/**
+ * Testing utility to validate the existence of some provided file paths using a specific file system
+ *
+ * @param fs the file system to use to validate the existence of some files
+ * @param filePaths the paths to validate
+ * @throws when one or more of the provided file paths cannot be found
+ */
+export function expectFiles(fs: d.InMemoryFileSystem, filePaths: string[]): void {
+  const notFoundFiles: ReadonlyArray<string> = filePaths.filter(
+    (filePath: string) => !fs.statSync(filePath).exists,
+    []
+  );
+
+  if (notFoundFiles.length > 0) {
+    throw new Error(
+      `The following files were expected, but could not be found:\n${notFoundFiles
+        .map((result: string) => '-' + result)
+        .join('\n')}`
+    );
+  }
 }
 
 export function doNotExpectFiles(fs: d.InMemoryFileSystem, filePaths: string[]) {

@@ -117,7 +117,7 @@ export const connectedCallback = (elm: d.HostElement) => {
         const styleElm = plt.$cssShim$.createHostStyle(elm, scopeId, style, true) as d.RenderNode;
         const nId = styleElm['s-sc'];
         styleElm.setAttribute('sty-id', nId);
-        let doc = document.head;
+        const doc = document.head;
         doc.insertBefore(styleElm, doc.querySelector('link'));
 
         // clean up old ids / add new ids

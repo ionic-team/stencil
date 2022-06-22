@@ -12,7 +12,12 @@ import { resolveModuleIdAsync } from './sys/resolve/resolve-module-async';
 import { isFunction } from '@utils';
 import ts from 'typescript';
 
-export const createCompiler = async (config: Config) => {
+/**
+ * Generate a Stencil compiler instance
+ * @param config a Stencil configuration to apply to the compiler instance
+ * @returns a new instance of a Stencil compiler
+ */
+export const createCompiler = async (config: Config): Promise<Compiler> => {
   // actual compiler code
   // could be in a web worker on the browser
   // or the main thread in node

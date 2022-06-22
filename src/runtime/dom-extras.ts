@@ -2,6 +2,10 @@ import type * as d from '../declarations';
 import { BUILD } from '@app-data';
 import { updateFallbackSlotVisibility } from './vdom/render-slot-fallback';
 
+/**
+ * Polyfills `cloneNode()` for slot polyfilled components ()
+ * @param HostElementPrototype the host prototype to polyfill
+ */
 export const patchCloneNode = (HostElementPrototype: any) => {
   const orgCloneNode = HostElementPrototype.cloneNode;
 
@@ -11,7 +15,7 @@ export const patchCloneNode = (HostElementPrototype: any) => {
     if (BUILD.slot && deep) {
       let i = 0;
       let slotted, nonStencilNode;
-      let stencilPrivates = [
+      const stencilPrivates = [
         's-id',
         's-cr',
         's-lr',
@@ -159,7 +163,7 @@ const patchSlotInnerText = (HostElementPrototype: any) => {
 
 /**
  * Patches the text content accessors of a scoped component
- * @param hostElementPrototype the `Element` to be patched
+ * @param HostElementPrototype the host `Element` to be patched
  */
 const patchTextContent = (HostElementPrototype: any) => {
   const descriptor = Object.getOwnPropertyDescriptor(Node.prototype, 'textContent');

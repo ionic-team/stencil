@@ -1,18 +1,33 @@
-import { Diagnostic, Logger, LogLevel, LoggerTimeSpan, PrintLine } from '../../../declarations';
+import { Diagnostic, Logger, LogLevel, LoggerTimeSpan, PrintLine, LoggerLineUpdater } from '../../../declarations';
+import ansiColor, { bgRed, blue, bold, cyan, dim, gray, green, magenta, red, yellow } from 'ansi-colors';
 
-export const createTerminalLogger = (loggerSys: TerminalLoggerSys) => {
-  let level: LogLevel = 'info';
-  let logFilePath: string = null;
+/**
+ * A type to capture the range of functions exported by the ansi-colors module
+ * Unfortunately they don't make a type like this available directly, so we have
+ * to do a little DIY.
+ */
+type AnsiColorVariant = keyof ansiColor.StylesType<string>;
+
+/**
+ * Create a logger for outputting information to a terminal environment
+ * @param loggerSys an underlying logger system entity used to create the terminal logger
+ * @returns the created logger
+ */
+export const createTerminalLogger = (loggerSys: TerminalLoggerSys): Logger => {
+  // The current log level setting
+  // this can be modified at runtime
+  let currentLogLevel: LogLevel = 'info';
+  let logFilePath: string | null = null;
   const writeLogQueue: string[] = [];
 
-  const setLevel = (l: LogLevel) => (level = l);
+  const setLevel = (l: LogLevel) => (currentLogLevel = l);
 
-  const getLevel = () => level;
+  const getLevel = () => currentLogLevel;
 
   const setLogFilePath = (p: string) => (logFilePath = p);
 
   const info = (...msg: any[]) => {
-    if (shouldLog('info')) {
+    if (shouldLog(currentLogLevel, 'info')) {
       const lines = wordWrap(msg, loggerSys.getColumns());
       infoPrefix(lines);
       console.log(lines.join('\n'));
@@ -21,23 +36,14 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys) => {
   };
 
   const infoPrefix = (lines: string[]) => {
-    if (lines.length) {
-      const d = new Date();
-      const prefix =
-        '[' +
-        ('0' + d.getMinutes()).slice(-2) +
-        ':' +
-        ('0' + d.getSeconds()).slice(-2) +
-        '.' +
-        Math.floor((d.getMilliseconds() / 1000) * 10) +
-        ']';
-
-      lines[0] = dim(prefix) + lines[0].substr(prefix.length);
+    if (lines.length > 0) {
+      const prefix = formatPrefixTimestamp();
+      lines[0] = dim(prefix) + lines[0].slice(prefix.length);
     }
   };
 
   const warn = (...msg: any[]) => {
-    if (shouldLog('warn')) {
+    if (shouldLog(currentLogLevel, 'warn')) {
       const lines = wordWrap(msg, loggerSys.getColumns());
       warnPrefix(lines);
       console.warn('\n' + lines.join('\n') + '\n');
@@ -48,7 +54,7 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys) => {
   const warnPrefix = (lines: string[]) => {
     if (lines.length) {
       const prefix = '[ WARN  ]';
-      lines[0] = bold(yellow(prefix)) + lines[0].substr(prefix.length);
+      lines[0] = bold(yellow(prefix)) + lines[0].slice(prefix.length);
     }
   };
 
@@ -63,7 +69,7 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys) => {
       }
     }
 
-    if (shouldLog('error')) {
+    if (shouldLog(currentLogLevel, 'error')) {
       const lines = wordWrap(msg, loggerSys.getColumns());
       errorPrefix(lines);
       console.error('\n' + lines.join('\n') + '\n');
@@ -74,16 +80,13 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys) => {
   const errorPrefix = (lines: string[]) => {
     if (lines.length) {
       const prefix = '[ ERROR ]';
-      lines[0] = bold(red(prefix)) + lines[0].substr(prefix.length);
+      lines[0] = bold(red(prefix)) + lines[0].slice(prefix.length);
     }
   };
 
   const debug = (...msg: any[]) => {
-    if (shouldLog('debug')) {
-      const mem = loggerSys.memoryUsage();
-      if (mem > 0) {
-        msg.push(dim(` MEM: ${(loggerSys.memoryUsage() / 1000000).toFixed(1)}MB`));
-      }
+    if (shouldLog(currentLogLevel, 'debug')) {
+      formatMemoryUsage(msg);
       const lines = wordWrap(msg, loggerSys.getColumns());
       debugPrefix(lines);
       console.log(lines.join('\n'));
@@ -93,18 +96,8 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys) => {
 
   const debugPrefix = (lines: string[]) => {
     if (lines.length) {
-      const d = new Date();
-
-      const prefix =
-        '[' +
-        ('0' + d.getMinutes()).slice(-2) +
-        ':' +
-        ('0' + d.getSeconds()).slice(-2) +
-        '.' +
-        Math.floor((d.getMilliseconds() / 1000) * 10) +
-        ']';
-
-      lines[0] = cyan(prefix) + lines[0].substr(prefix.length);
+      const prefix = formatPrefixTimestamp();
+      lines[0] = cyan(prefix) + lines[0].slice(prefix.length);
     }
   };
 
@@ -112,11 +105,8 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys) => {
     const msg = [`${startMsg} ${dim('...')}`];
 
     if (debug) {
-      if (shouldLog('debug')) {
-        const mem = loggerSys.memoryUsage();
-        if (mem > 0) {
-          msg.push(dim(` MEM: ${(loggerSys.memoryUsage() / 1000000).toFixed(1)}MB`));
-        }
+      if (shouldLog(currentLogLevel, 'debug')) {
+        formatMemoryUsage(msg);
         const lines = wordWrap(msg, loggerSys.getColumns());
         debugPrefix(lines);
         console.log(lines.join('\n'));
@@ -133,10 +123,22 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys) => {
     }
   };
 
+  /**
+   * A little helper to (conditionally) format and add the current memory usage
+   *
+   * @param message an array to which the memory usage will be added
+   */
+  const formatMemoryUsage = (message: string[]) => {
+    const mem = loggerSys.memoryUsage();
+    if (mem > 0) {
+      message.push(dim(` MEM: ${(mem / 1_000_000).toFixed(1)}MB`));
+    }
+  };
+
   const timespanFinish = (
     finishMsg: string,
     timeSuffix: string,
-    colorName: 'red',
+    colorName: AnsiColorVariant,
     textBold: boolean,
     newLineSuffix: boolean,
     debug: boolean,
@@ -145,7 +147,7 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys) => {
     let msg = finishMsg;
 
     if (colorName) {
-      msg = loggerSys.color(finishMsg, colorName);
+      msg = ansiColor[colorName](finishMsg);
     }
     if (textBold) {
       msg = bold(msg);
@@ -154,12 +156,9 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys) => {
     msg += ' ' + dim(timeSuffix);
 
     if (debug) {
-      if (shouldLog('debug')) {
+      if (shouldLog(currentLogLevel, 'debug')) {
         const m = [msg];
-        const mem = loggerSys.memoryUsage();
-        if (mem > 0) {
-          m.push(dim(` MEM: ${(mem / 1000000).toFixed(1)}MB`));
-        }
+        formatMemoryUsage(m);
 
         const lines = wordWrap(m, loggerSys.getColumns());
         debugPrefix(lines);
@@ -187,7 +186,7 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys) => {
     const duration = () => Date.now() - start;
     const timeSpan: LoggerTimeSpan = {
       duration,
-      finish: (finishMsg, colorName, textBold, newLineSuffix) => {
+      finish: (finishMsg, colorName: AnsiColorVariant, textBold, newLineSuffix) => {
         const dur = duration();
         let time: string;
 
@@ -202,7 +201,7 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys) => {
           }
         }
 
-        timespanFinish(finishMsg, time, colorName as any, textBold, newLineSuffix, debug, appendTo);
+        timespanFinish(finishMsg, time, colorName, textBold, newLineSuffix, debug, appendTo);
 
         return dur;
       },
@@ -246,22 +245,20 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys) => {
     writeLogQueue.length = 0;
   };
 
-  const red = (msg: string) => loggerSys.color(msg, 'red');
-  const green = (msg: string) => loggerSys.color(msg, 'green');
-  const yellow = (msg: string) => loggerSys.color(msg, 'yellow');
-  const blue = (msg: string) => loggerSys.color(msg, 'blue');
-  const magenta = (msg: string) => loggerSys.color(msg, 'magenta');
-  const cyan = (msg: string) => loggerSys.color(msg, 'cyan');
-  const gray = (msg: string) => loggerSys.color(msg, 'gray');
-  const bold = (msg: string) => loggerSys.color(msg, 'bold');
-  const dim = (msg: string) => loggerSys.color(msg, 'dim');
-  const bgRed = (msg: string) => loggerSys.color(msg, 'bgRed');
-
-  const shouldLog = (logLevel: string): boolean => {
-    return LOG_LEVELS.indexOf(logLevel) >= LOG_LEVELS.indexOf(level);
+  /**
+   * Callback to enable / disable colored output in logs
+   * @param useColors the new value for the `enabled` toggle on ansi-color
+   */
+  const enableColors = (useColors: boolean) => {
+    ansiColor.enabled = useColors;
   };
 
-  const printDiagnostics = (diagnostics: Diagnostic[], cwd?: string) => {
+  /**
+   * Print all diagnostics to the console
+   * @param diagnostics the diagnostics to print
+   * @param cwd the current working directory
+   */
+  const printDiagnostics = (diagnostics: Diagnostic[], cwd?: string): void => {
     if (!diagnostics || diagnostics.length === 0) return;
 
     let outputLines: string[] = [''];
@@ -273,7 +270,13 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys) => {
     console.log(outputLines.join('\n'));
   };
 
-  const printDiagnostic = (diagnostic: Diagnostic, cwd?: string) => {
+  /**
+   * Formats a single diagnostic to be printed
+   * @param diagnostic the diagnostic to prepare for printing
+   * @param cwd the current working directory
+   * @returns the message from the diagnostic, formatted and split into multiple lines
+   */
+  const printDiagnostic = (diagnostic: Diagnostic, cwd?: string): ReadonlyArray<string> => {
     const outputLines = wordWrap([diagnostic.messageText], loggerSys.getColumns());
 
     let header = '';
@@ -321,12 +324,13 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys) => {
     }
 
     outputLines.push('');
-
+    // code associated with the error/warning
     if (diagnostic.lines && diagnostic.lines.length) {
-      const lines = prepareLines(diagnostic.lines);
+      const lines = removeLeadingWhitespace(diagnostic.lines);
 
       lines.forEach((l) => {
         if (!isMeaningfulLine(l.text)) {
+          // don't print lines just containing whitespace, skip those that do
           return;
         }
 
@@ -337,6 +341,7 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys) => {
         }
 
         while (msg.length < INDENT.length) {
+          // prepend spaces to the message to make sure everything is aligned
           msg = ' ' + msg;
         }
 
@@ -371,7 +376,7 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys) => {
       infoPrefix(outputLines);
     }
 
-    if (diagnostic.debugText != null && level === 'debug') {
+    if (diagnostic.debugText != null && currentLogLevel === 'debug') {
       outputLines.push(diagnostic.debugText);
       debugPrefix(wordWrap([diagnostic.debugText], loggerSys.getColumns()));
     }
@@ -379,16 +384,23 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys) => {
     return outputLines;
   };
 
-  const highlightError = (errorLine: string, errorCharStart: number, errorLength: number) => {
+  /**
+   * Highlights an error
+   * @param errorLine the line containing the error
+   * @param errorCharStart the character at which the error starts
+   * @param errorLength the length of the error, how many characters should be highlighted
+   * @returns the highlighted error
+   */
+  const highlightError = (errorLine: string, errorCharStart: number, errorLength: number): string => {
     let rightSideChars = errorLine.length - errorCharStart + errorLength - 1;
     while (errorLine.length + INDENT.length > loggerSys.getColumns()) {
       if (errorCharStart > errorLine.length - errorCharStart + errorLength && errorCharStart > 5) {
         // larger on left side
-        errorLine = errorLine.substr(1);
+        errorLine = errorLine.slice(1);
         errorCharStart--;
       } else if (rightSideChars > 1) {
         // larger on right side
-        errorLine = errorLine.substr(0, errorLine.length - 1);
+        errorLine = errorLine.slice(0, -1);
         rightSideChars--;
       } else {
         break;
@@ -397,8 +409,8 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys) => {
 
     const lineChars: string[] = [];
     const lineLength = Math.max(errorLine.length, errorCharStart + errorLength);
-    for (var i = 0; i < lineLength; i++) {
-      var chr = errorLine.charAt(i);
+    for (let i = 0; i < lineLength; i++) {
+      let chr = errorLine.charAt(i);
       if (i >= errorCharStart && i < errorCharStart + errorLength) {
         chr = bgRed(chr === '' ? ' ' : chr);
       }
@@ -408,12 +420,17 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys) => {
     return lineChars.join('');
   };
 
-  const javaScriptSyntaxHighlight = (text: string) => {
+  /**
+   * Highlights JavaScript/TypeScript syntax, taking in text and selectively highlighting keywords from the language
+   * @param text the text to highlight
+   * @returns the text with highlighted JS/TS
+   */
+  const javaScriptSyntaxHighlight = (text: string): string => {
     if (text.trim().startsWith('//')) {
       return dim(text);
     }
 
-    const words = text.split(' ').map((word) => {
+    const words = text.split(' ').map((word: string) => {
       if (JS_KEYWORDS.indexOf(word) > -1) {
         return cyan(word);
       }
@@ -423,14 +440,19 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys) => {
     return words.join(' ');
   };
 
-  const cssSyntaxHighlight = (text: string) => {
+  /**
+   * Highlights CSS syntax, taking in text and selectively highlighting keywords from the language
+   * @param text the text to highlight
+   * @returns the text with highlighted CSS
+   */
+  const cssSyntaxHighlight = (text: string): string => {
     let cssProp = true;
     const safeChars = 'abcdefghijklmnopqrstuvwxyz-_';
     const notProp = '.#,:}@$[]/*';
 
     const chars: string[] = [];
 
-    for (var i = 0; i < text.length; i++) {
+    for (let i = 0; i < text.length; i++) {
       const c = text.charAt(i);
 
       if (c === ';' || c === '{') {
@@ -450,48 +472,112 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys) => {
   };
 
   const logger: Logger = {
-    enableColors: loggerSys.enableColors,
-    emoji: loggerSys.emoji,
-    getLevel,
-    setLevel,
-    debug,
-    info,
-    warn,
-    error,
+    createLineUpdater: loggerSys.createLineUpdater,
     createTimeSpan,
+    debug,
+    emoji: loggerSys.emoji,
+    enableColors,
+    error,
+    getLevel,
+    info,
     printDiagnostics,
-    red,
-    green,
-    yellow,
-    blue,
-    magenta,
-    cyan,
-    gray,
-    bold,
-    dim,
-    bgRed,
+    setLevel,
     setLogFilePath,
+    warn,
     writeLogs,
+
+    // color functions
+    bgRed,
+    blue,
+    bold,
+    cyan,
+    dim,
+    gray,
+    green,
+    magenta,
+    red,
+    yellow,
   };
   return logger;
 };
 
 export interface TerminalLoggerSys {
-  color: (msg: string, colorName: ColorType) => string;
   emoji: (msg: string) => string;
-  enableColors: (useColors: boolean) => void;
   cwd: () => string;
   getColumns: () => number;
   memoryUsage: () => number;
   relativePath: (from: string, to: string) => string;
   writeLogs: (logFilePath: string, log: string, append: boolean) => void;
+  createLineUpdater: () => Promise<LoggerLineUpdater>;
 }
 
-export type ColorType = 'bgRed' | 'blue' | 'bold' | 'cyan' | 'dim' | 'gray' | 'green' | 'magenta' | 'red' | 'yellow';
+/**
+ * This sets the log level hierarchy for our terminal logger, ranging from
+ * most to least verbose.
+ *
+ * Ordering the levels like this lets us easily check whether we should log a
+ * message at a given time. For instance, if the log level is set to `'warn'`,
+ * then anything passed to the logger with level `'warn'` or `'error'` should
+ * be logged, but we should _not_ log anything with level `'info'` or `'debug'`.
+ *
+ * If we have a current log level `currentLevel` and a message with level
+ * `msgLevel` is passed to the logger, we can determine whether or not we should
+ * log it by checking if the log level on the message is further up or at the
+ * same level in the hierarchy than `currentLevel`, like so:
+ *
+ * ```ts
+ * LOG_LEVELS.indexOf(msgLevel) >= LOG_LEVELS.indexOf(currentLevel)
+ * ```
+ */
+export const LOG_LEVELS: ReadonlyArray<LogLevel> = ['debug', 'info', 'warn', 'error'];
 
-const LOG_LEVELS = ['debug', 'info', 'warn', 'error'];
+/**
+ * Helper function to determine, based on the current log level setting, whether
+ * a message at a given log level should be logged or not.
+ *
+ * @param currentSetting the current log level setting
+ * @param messageLevel the log level to check
+ * @returns whether we should log or not!
+ */
+export const shouldLog = (currentSetting: LogLevel, messageLevel: LogLevel): boolean =>
+  LOG_LEVELS.indexOf(messageLevel) >= LOG_LEVELS.indexOf(currentSetting);
 
-export const wordWrap = (msg: any[], columns: number) => {
+/**
+ * Format a simple timestamp string for log prefixes
+ *
+ * @returns a formatted timestamp
+ */
+const formatPrefixTimestamp = (): string => {
+  const currentTime = new Date();
+  const minutes = clampTwoDigits(currentTime.getMinutes());
+  const seconds = clampTwoDigits(currentTime.getSeconds());
+  const milliseconds = Math.floor((currentTime.getMilliseconds() / 1000) * 10);
+
+  return `[${minutes}:${seconds}.${milliseconds}]`;
+};
+
+/**
+ * Format a number as a string and clamp it to exactly
+ * two digits, e.g.
+ *
+ * ```ts
+ * clampTwoDigits(3) // '03'
+ * clampTwoDigits(14) // '14'
+ * clampTwoDigits(104) // '04'
+ * ```
+ *
+ * @param n the number to clamp
+ * @returns a formatted string
+ */
+const clampTwoDigits = (n: number): string => ('0' + n.toString()).slice(-2);
+
+/**
+ * Helper function for word wrapping
+ * @param msg the message to wrap
+ * @param columns the maximum number of columns to occupy per line
+ * @returns the wrapped message
+ */
+export const wordWrap = (msg: any[], columns: number): string[] => {
   const lines: string[] = [];
   const words: any[] = [];
 
@@ -561,15 +647,23 @@ export const wordWrap = (msg: any[], columns: number) => {
   });
 };
 
-const prepareLines = (orgLines: PrintLine[]) => {
+/**
+ * Prepare the code associated with the error/warning to be logged by stripping variable length, leading whitespace
+ * @param orgLines the lines of code to log
+ * @returns the code, with leading whitespace stripped
+ */
+const removeLeadingWhitespace = (orgLines: PrintLine[]): ReadonlyArray<PrintLine> => {
+  // The number of times an attempt to strip leading whitespace should occur
+  const numberOfTries = 100;
   const lines: PrintLine[] = JSON.parse(JSON.stringify(orgLines));
 
-  for (let i = 0; i < 100; i++) {
+  for (let i = 0; i < numberOfTries; i++) {
     if (!eachLineHasLeadingWhitespace(lines)) {
       return lines;
     }
+    // each line has at least one line of whitespace. remove the leading character from each
     for (let i = 0; i < lines.length; i++) {
-      lines[i].text = lines[i].text.substr(1);
+      lines[i].text = lines[i].text.slice(1);
       lines[i].errorCharStart--;
       if (!lines[i].text.length) {
         return lines;
@@ -580,12 +674,17 @@ const prepareLines = (orgLines: PrintLine[]) => {
   return lines;
 };
 
-const eachLineHasLeadingWhitespace = (lines: PrintLine[]) => {
+/**
+ * Determine if any of the provided lines begin with whitespace or not
+ * @param lines the lines to check for whitespace
+ * @returns true if each of the provided `lines` has some leading whitespace, false otherwise
+ */
+const eachLineHasLeadingWhitespace = (lines: PrintLine[]): boolean => {
   if (!lines.length) {
     return false;
   }
 
-  for (var i = 0; i < lines.length; i++) {
+  for (let i = 0; i < lines.length; i++) {
     if (!lines[i].text || lines[i].text.length < 1) {
       return false;
     }
@@ -598,7 +697,12 @@ const eachLineHasLeadingWhitespace = (lines: PrintLine[]) => {
   return true;
 };
 
-const isMeaningfulLine = (line: string) => {
+/**
+ * Verify that a given line has more than just whitespace
+ * @param line the line to check
+ * @returns true if a line has characters other than whitespace in it, false otherwise
+ */
+const isMeaningfulLine = (line: string): boolean => {
   if (line) {
     line = line.trim();
     return line.length > 0;
@@ -670,4 +774,8 @@ const JS_KEYWORDS = [
   'yield',
 ];
 
+/**
+ * This is used to prefix lines with whitespace which is then
+ * replaced by various prefixes like [ WARN ] and so on
+ */
 const INDENT = '           ';

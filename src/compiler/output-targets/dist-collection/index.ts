@@ -43,7 +43,7 @@ export const outputCollection = async (
     );
 
     await writeCollectionManifests(config, compilerCtx, buildCtx, outputTargets);
-  } catch (e) {
+  } catch (e: any) {
     catchError(buildCtx.diagnostics, e);
   }
 

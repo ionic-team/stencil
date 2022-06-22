@@ -167,7 +167,7 @@ async function getMismatchedPixels(pixelmatchModulePath: string, pixelMatchInput
 function getCacheKey(imageA: string, imageB: string, pixelmatchThreshold: number) {
   const hash = createHash('md5');
   hash.update(`${imageA}:${imageB}:${pixelmatchThreshold}`);
-  return hash.digest('hex').substr(0, 10);
+  return hash.digest('hex').slice(0, 10);
 }
 
 function getScreenshotId(emulateConfig: d.EmulateConfig, uniqueDescription: string) {
@@ -185,5 +185,5 @@ function getScreenshotId(emulateConfig: d.EmulateConfig, uniqueDescription: stri
   hash.update(emulateConfig.viewport.hasTouch + ':');
   hash.update(emulateConfig.viewport.isMobile + ':');
 
-  return hash.digest('hex').substr(0, 8).toLowerCase();
+  return hash.digest('hex').slice(0, 8).toLowerCase();
 }

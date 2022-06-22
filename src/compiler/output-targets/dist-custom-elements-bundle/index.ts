@@ -111,7 +111,7 @@ const bundleCustomElements = async (
       });
       await Promise.all(files);
     }
-  } catch (e) {
+  } catch (e: any) {
     catchError(buildCtx.diagnostics, e);
   }
 };

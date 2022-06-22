@@ -28,7 +28,7 @@ const renderSlotFallbackContent = (sr: d.RenderNode, hide: boolean) => {
 };
 
 export const updateFallbackSlotVisibility = (elm: d.RenderNode) => {
-  let childNodes: d.RenderNode[] = (elm as d.RenderNode).__childNodes || (elm.childNodes as any);
+  const childNodes: d.RenderNode[] = (elm as d.RenderNode).__childNodes || (elm.childNodes as any);
   let childNode: d.RenderNode;
   let i: number;
   let ilen: number;

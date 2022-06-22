@@ -129,7 +129,7 @@ describe('style-docs', () => {
   });
 
   it('null styleText', () => {
-    const styleText = null;
+    const styleText: null = null;
     parseStyleDocs(styleDocs, styleText);
     expect(styleDocs).toEqual([]);
   });

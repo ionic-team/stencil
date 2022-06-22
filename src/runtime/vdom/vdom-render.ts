@@ -25,7 +25,7 @@ let isSvgMode = false;
 
 const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex: number, parentElm: d.RenderNode) => {
   // tslint:disable-next-line: prefer-const
-  let newVNode = newParentVNode.$children$[childIndex];
+  const newVNode = newParentVNode.$children$[childIndex];
   let i = 0;
   let elm: d.RenderNode;
   let childNode: d.RenderNode;
@@ -227,10 +227,10 @@ const addVnodes = (
 const saveSlottedNodes = (elm: d.RenderNode) => {
   // by removing the hostname reference
   // any current slotted elements will be 'reset' and re-slotted
+  const childNodes = (elm as d.RenderNode).__childNodes || elm.childNodes;
   let childNode: d.RenderNode;
   let i: number;
   let ilen: number;
-  let childNodes = (elm as d.RenderNode).__childNodes || elm.childNodes;
 
   for (i = 0, ilen = childNodes.length; i < ilen; i++) {
     childNode = childNodes[i] as d.RenderNode;
@@ -271,6 +271,8 @@ const removeVnodes = (vnodes: d.VNode[], startIdx: number, endIdx: number, vnode
 };
 
 const updateChildren = (parentElm: d.RenderNode, oldCh: d.VNode[], newVNode: d.VNode, newCh: d.VNode[]) => {
+  const fbSlots: d.RenderNode[] = [];
+  const fbNodes: { [name: string]: d.RenderNode[] } = {};
   let oldStartIdx = 0;
   let newStartIdx = 0;
   let idxInOld = 0;
@@ -286,9 +288,7 @@ const updateChildren = (parentElm: d.RenderNode, oldCh: d.VNode[], newVNode: d.V
   let elmToMove: d.VNode;
   let fbParentNodes: NodeList;
   let fbParentNodesIdx: number;
-  let fbSlots: d.RenderNode[] = [];
   let fbSlotsIdx: number;
-  let fbNodes: { [name: string]: d.RenderNode[] } = {};
   let fbNodesIdx: number;
   let fbChildNode: d.RenderNode;
   let fbSlot: d.RenderNode;
@@ -512,8 +512,8 @@ const relocateSlotContent = (elm: d.RenderNode) => {
   let relocateNodeData: RelocateNodeData;
   let j;
   let i = 0;
-  let childNodes: d.RenderNode[] = (elm.__childNodes || elm.childNodes) as any;
-  let ilen = childNodes.length;
+  const childNodes: d.RenderNode[] = (elm.__childNodes || elm.childNodes) as any;
+  const ilen = childNodes.length;
 
   for (; i < ilen; i++) {
     childNode = childNodes[i];

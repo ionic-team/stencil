@@ -98,7 +98,7 @@ export const validateTsConfig = async (config: d.Config, sys: d.CompilerSystem, 
         }
       }
     }
-  } catch (e) {
+  } catch (e: any) {
     catchError(tsconfig.diagnostics, e);
   }
 

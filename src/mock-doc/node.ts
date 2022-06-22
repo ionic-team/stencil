@@ -141,7 +141,12 @@ export class MockNode {
     if (otherNode === this) {
       return true;
     }
-    return this.childNodes.includes(otherNode);
+    const childNodes = Array.from(this.childNodes);
+    if (childNodes.includes(otherNode)) {
+      return true;
+    }
+
+    return childNodes.some((node) => this.contains.bind(node)(otherNode));
   }
 
   removeChild(childNode: MockNode) {
@@ -230,6 +235,10 @@ export class MockElement extends MockNode {
     return shadowRoot;
   }
 
+  blur() {
+    /**/
+  }
+
   get shadowRoot() {
     return this.__shadowRoot || null;
   }
@@ -310,6 +319,8 @@ export class MockElement extends MockNode {
   get firstElementChild(): MockElement | null {
     return this.children[0] || null;
   }
+
+  focus(_options?: { preventScroll?: boolean }) {}
 
   getAttribute(attrName: string) {
     if (attrName === 'style') {

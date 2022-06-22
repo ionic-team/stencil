@@ -55,7 +55,7 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
     await this._page.waitForChanges();
   }
 
-  async focus() {
+  override async focus() {
     await this._elmHandle.focus();
     await this._page.waitForChanges();
   }

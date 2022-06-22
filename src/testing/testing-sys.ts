@@ -23,7 +23,7 @@ export const createTestingSystem = (): TestingSystem => {
     let hash = createHash('sha1').update(content).digest('hex').toLowerCase();
 
     if (typeof length === 'number') {
-      hash = hash.substr(0, length);
+      hash = hash.slice(0, length);
     }
     return Promise.resolve(hash);
   };
@@ -61,6 +61,8 @@ export const createTestingSystem = (): TestingSystem => {
   sys.removeFileSync = wrapWrite(sys.removeFileSync);
   sys.writeFile = wrapWrite(sys.writeFile);
   sys.writeFileSync = wrapWrite(sys.writeFileSync);
+
+  sys.getCompilerExecutingPath = () => 'bin/stencil.js';
 
   Object.defineProperties(sys, {
     diskReads: {

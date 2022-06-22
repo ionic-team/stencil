@@ -44,11 +44,18 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
   };
 
   /**
-   * Synchronous!!! Do not use!!!
+   * **Synchronous!!! Do not use!!!**
    * (Only typescript transpiling is allowed to use)
-   * @param filePath
+   *
+   * Synchronously get information about a file from a provided path. This function will attempt to use an in-memory
+   * cache before performing a blocking read.
+   *
+   * In the event of a cache hit, the content from the cache will be returned and skip the read.
+   *
+   * @param filePath the path to the file to read
+   * @returns `true` if the file exists, `false` otherwise
    */
-  const accessSync = (filePath: string) => {
+  const accessSync = (filePath: string): boolean => {
     const item = getItem(filePath);
     if (typeof item.exists !== 'boolean') {
       const s = statSync(filePath);
@@ -244,11 +251,21 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
   };
 
   /**
-   * Synchronous!!! Do not use!!!
+   * **Synchronous!!! Do not use!!!**
    * (Only typescript transpiling is allowed to use)
-   * @param filePath
+   *
+   * Synchronously read a file from a provided path. This function will attempt to use an in-memory cache before
+   * performing a blocking read in the following circumstances:
+   * - no `opts` are provided
+   * - the `useCache` member on `opts` is set to `true`, or is not set
+   *
+   * In the event of a cache hit, the content from the cache will be returned and skip the read.
+   *
+   * @param filePath the path to the file to read
+   * @param opts a configuration to use when reading a file
+   * @returns the contents of the file (read from either disk or the cache).
    */
-  const readFileSync = (filePath: string, opts?: d.FsReadOptions) => {
+  const readFileSync = (filePath: string, opts?: d.FsReadOptions): string => {
     if (opts == null || opts.useCache === true || opts.useCache === undefined) {
       const item = getItem(filePath);
       if (item.exists && typeof item.fileText === 'string') {
@@ -347,12 +364,15 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
   };
 
   /**
-   * Synchronous!!! Do not use!!!
-   * Always returns an object, does not throw errors.
+   * **Synchronous!!! Do not use!!!**
    * (Only typescript transpiling is allowed to use)
-   * @param itemPath
+   *
+   * Searches an in-memory cache for an item at the provided path. Always returns an object, **does not throw errors**.
+   *
+   * @param itemPath the path to the file to read
+   * @returns an object describing the item found at the provided `itemPath`
    */
-  const statSync = (itemPath: string) => {
+  const statSync = (itemPath: string): { isFile: boolean; isDirectory: boolean; exists: boolean } => {
     const item = getItem(itemPath);
     if (typeof item.isDirectory !== 'boolean' || typeof item.isFile !== 'boolean') {
       const stat = sys.statSync(itemPath);

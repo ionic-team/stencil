@@ -4,7 +4,7 @@ Date: 2021.10.28
 
 ## Status
 
-proposed
+accepted
 
 ## Context
 
@@ -68,8 +68,11 @@ should be used when developing for the project.
 
 ## Decision
 
-The team shall adopt Volta on an experimental/trial basis. Because it does not lock developers into any particular 
-ecosystem, we feel that a trial of the library has minimal long term risk to the project.
+Update: The team has found no major issues with using Volta in `@stencil/core`, and is designating it as an official
+part of our development stack for all Stencil projects they own.
+
+The team adopted Volta on an experimental/trial basis. Because it does not lock developers into any particular 
+ecosystem, we felt that a trial of the library has minimal long term risk to the project.
 
 Volta shall be added to Stencil core only at this time, as that is where the majority of development is occurring at
 the time of this writing. Only when the team is confident in proliferating its usage shall we add it to other

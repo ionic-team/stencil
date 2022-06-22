@@ -366,8 +366,8 @@ describe('css-shim', () => {
     );
   });
 
-  var window: Window;
-  var document: Document;
+  var window: Window; // eslint-disable-line no-var -- shims will continue to use var while we support older browsers
+  var document: Document; // eslint-disable-line no-var -- shims will continue to use var while we support older browsers
 
   function style(text: string) {
     const elm = document.createElement('style');
