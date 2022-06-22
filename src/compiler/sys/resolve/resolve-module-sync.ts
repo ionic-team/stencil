@@ -139,9 +139,11 @@ export const createCustomResolverSync = (
       const fsFilePath = normalizeFsPath(p);
       try {
         return sys.realpathSync(fsFilePath);
-      } catch (realpathErr) {
-        if (realpathErr.code !== 'ENOENT') {
-          throw realpathErr;
+      } catch (realpathErr: unknown) {
+        if (isErrnoException(realpathErr)) {
+          if (realpathErr.code !== 'ENOENT') {
+            throw realpathErr;
+          }
         }
       }
       return fsFilePath;
@@ -150,3 +152,15 @@ export const createCustomResolverSync = (
     extensions: exts,
   } as any;
 };
+
+/**
+ * Type guard to determine if an Error is an instance of `ErrnoException`. For the purposes of this type guard, we
+ * must ensure that the `code` field is present. This type guard was written with the `ErrnoException` definition from
+ * https://github.com/DefinitelyTyped/DefinitelyTyped/blob/d121716ed123957f6a86f8985eb013fcaddab345/types/node/globals.d.ts#L183-L188
+ * in mind.
+ * @param err the entity to check the type of
+ * @returns true if the provided value is an instance of `ErrnoException`, `false` otherwise
+ */
+function isErrnoException(err: unknown): err is NodeJS.ErrnoException {
+  return err instanceof Error && err.hasOwnProperty('code');
+}

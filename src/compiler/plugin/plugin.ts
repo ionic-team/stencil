@@ -21,7 +21,7 @@ export const runPluginResolveId = async (pluginCtx: PluginCtx, importee: string)
             return results;
           }
         }
-      } catch (e) {
+      } catch (e: any) {
         catchError(pluginCtx.diagnostics, e);
       }
     }
@@ -47,7 +47,7 @@ export const runPluginLoad = async (pluginCtx: PluginCtx, id: string) => {
             return results;
           }
         }
-      } catch (e) {
+      } catch (e: any) {
         catchError(pluginCtx.diagnostics, e);
       }
     }
@@ -139,7 +139,7 @@ export const runPluginTransforms = async (
             }
           }
         }
-      } catch (e) {
+      } catch (e: any) {
         catchError(buildCtx.diagnostics, e);
       }
     }
@@ -249,7 +249,7 @@ export const runPluginTransformsEsmImports = async (
             }
           }
         }
-      } catch (e) {
+      } catch (e: any) {
         catchError(transformResults.diagnostics, e);
       }
     }

@@ -3,7 +3,7 @@ import { consoleError, getHostRef } from '@platform';
 import { getValue, parsePropertyValue, setValue } from '@runtime';
 import { CMP_FLAGS, MEMBER_FLAGS } from '@utils';
 
-export function proxyHostElement(elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta) {
+export function proxyHostElement(elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta): void {
   if (typeof elm.componentOnReady !== 'function') {
     elm.componentOnReady = componentOnReady;
   }
@@ -55,11 +55,10 @@ export function proxyHostElement(elm: d.HostElement, cmpMeta: d.ComponentRuntime
         });
       } else if (memberFlags & MEMBER_FLAGS.Method) {
         Object.defineProperty(elm, memberName, {
-          value(this: d.HostElement) {
+          value(this: d.HostElement, ...args: any[]) {
             const ref = getHostRef(this);
-            const args = arguments;
             return ref.$onInstancePromise$
-              .then(() => ref.$lazyInstance$[memberName].apply(ref.$lazyInstance$, args))
+              .then(() => ref.$lazyInstance$[memberName](...args))
               .catch((e) => consoleError(e, elm));
           },
         });

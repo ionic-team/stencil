@@ -65,7 +65,7 @@ const appUpdate = (win: d.DevClientWindow, config: d.DevClientConfig, buildResul
       // then let's refresh the page from the root of the server
       appReset(win, config, () => {
         logReload(`Initial load`);
-        win.location.reload(true);
+        win.location.reload();
       });
       return;
     }
@@ -111,7 +111,7 @@ const appHmr = (win: Window, hmr: d.HotModuleReplacement) => {
   }
 
   if (shouldWindowReload) {
-    win.location.reload(true);
+    win.location.reload();
     return;
   }
 

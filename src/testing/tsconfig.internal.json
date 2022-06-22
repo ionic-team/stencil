@@ -21,6 +21,7 @@
     "noUnusedParameters": true,
     "pretty": true,
     "target": "es2017",
+    "useUnknownInCatchVariables": true,
     "baseUrl": ".",
     "paths": {
       "@stencil/core/cli": [

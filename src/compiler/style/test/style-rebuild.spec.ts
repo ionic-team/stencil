@@ -1,16 +1,16 @@
 import type * as d from '@stencil/core/declarations';
-import { createCompiler, validateConfig } from '@stencil/core/compiler';
-import { mockConfig, mockLogger, mockStencilSystem } from '@stencil/core/testing';
+import { createCompiler } from '@stencil/core/compiler';
+import { mockCompilerSystem } from '@stencil/core/testing';
 import path from 'path';
+import { validateConfig } from '../../config/validate-config';
 
 xdescribe('component-styles', () => {
   jest.setTimeout(20000);
   let compiler: d.Compiler;
   const root = path.resolve('/');
-  const logger = mockLogger();
 
   beforeEach(async () => {
-    const sys: d.CompilerSystem = mockStencilSystem() as any;
+    const sys: d.CompilerSystem = mockCompilerSystem() as any;
     await sys.writeFile(
       '/tsconfig.json',
       `
@@ -32,12 +32,11 @@ xdescribe('component-styles', () => {
     `
     );
 
-    const { config, diagnostics } = validateConfig({
+    const { config } = validateConfig({
       rootDir: '/',
       tsconfig: '/tsconfig.json',
     });
     config.sys = sys;
-    console.log(diagnostics);
     compiler = await createCompiler(config);
 
     // const testingConfig = mockConfig(sys);

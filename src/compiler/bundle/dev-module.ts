@@ -111,9 +111,9 @@ export const compilerRequest = async (config: d.Config, compilerCtx: d.CompilerC
       results.status = 400;
       return results;
     }
-  } catch (e) {
+  } catch (e: unknown) {
     if (e) {
-      if (e.stack) {
+      if (e instanceof Error && e.stack) {
         results.content = `/*\n${e.stack}\n*/`;
       } else {
         results.content = `/*\n${e}\n*/`;
@@ -165,7 +165,8 @@ const bundleDevModule = async (
     }
   } catch (e) {
     results.status = 500;
-    results.content = `console.error(${JSON.stringify((e.stack || e) + '')})`;
+    const errorMsg = e instanceof Error ? e.stack : e + '';
+    results.content = `console.error(${JSON.stringify(errorMsg)})`;
   }
 };
 
@@ -217,7 +218,7 @@ const parseDevModuleUrl = (config: d.Config, u: string) => {
     let reqPath = basename(url.pathname);
     reqPath = reqPath.substring(0, reqPath.length - 3);
 
-    let splt = reqPath.split('@');
+    const splt = reqPath.split('@');
     if (splt.length === 2) {
       parsedUrl.nodeModuleId = decodeURIComponent(splt[0]);
       parsedUrl.nodeModuleVersion = decodeURIComponent(splt[1]);

@@ -75,7 +75,7 @@ async function bundleTypeScriptSource(tsPath: string, opts: BuildOptions): Promi
     throw new Error(`"${tsEnding}" not found`);
   }
   const lastEnding = code.lastIndexOf(tsEnding);
-  code = code.substr(0, lastEnding + tsEnding.length);
+  code = code.slice(0, lastEnding + tsEnding.length);
 
   // there's a billion unnecessary "var ts;" for namespaces
   // but we'll be using the top level "const ts" instead

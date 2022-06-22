@@ -535,7 +535,7 @@ export const createSystem = (c?: { logger?: Logger }) => {
     const hashArray = Array.from(new Uint8Array(arrayBuffer)); // convert buffer to byte array
     let hashHex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join(''); // convert bytes to hex string
     if (typeof hashLength === 'number') {
-      hashHex = hashHex.substr(0, hashLength);
+      hashHex = hashHex.slice(0, hashLength);
     }
     return hashHex;
   };

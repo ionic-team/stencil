@@ -1,10 +1,10 @@
-name: BrowserStack
+name: BrowserStack Tests
 
 on:
   pull_request_target:
     branches:
-      - main
-      - v3.0.0-dev
+      - 'main'
+      - 'v3.0.0-dev'
   push:
     branches:
       - 'main'
@@ -17,16 +17,16 @@ env:
   BROWSERSTACK_USERNAME: ${{ secrets.BROWSER_STACK_USERNAME }}
 
 jobs:
-  browserstack:
+  browser-tests:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # v2.4.0
         with:
           ref: ${{ github.event_name == 'pull_request_target' && format('refs/pull/{0}/merge', github.event.number) || '' }}
           persist-credentials: false
 
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@56337c425554a6be30cdef71bf441f15be286854 # v3.1.1
         with:
           node-version: '12'
 

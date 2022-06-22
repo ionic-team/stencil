@@ -1,16 +1,36 @@
 import type * as d from '@stencil/core/declarations';
-import { mockStencilSystem } from '@stencil/core/testing';
+import { OutputTargetWww } from '@stencil/core/declarations';
+import { mockCompilerSystem } from '@stencil/core/testing';
 import { validateServiceWorker } from '../validate-service-worker';
 
 describe('validateServiceWorker', () => {
   const config: d.Config = {
     fsNamespace: 'app',
-    sys: mockStencilSystem(),
+    sys: mockCompilerSystem(),
     devMode: false,
     flags: {},
   };
 
   let outputTarget: d.OutputTargetWww;
+
+  /**
+   * A little util to work around a typescript annoyance. Because
+   * `outputTarget.serviceWorker` is typed as
+   * `serviceWorker?: ServiceWorkerConfig | null | false;` we get type errors
+   * all over if we try to just access it directly. So instead, do a little
+   * check to see if it's falsy. If not, we return it, and if it is we fail the test.
+   *
+   * @param target the output target from which we want to pull the serviceWorker
+   * @returns a serviceWorker object or `void`, with a `void` return being
+   * accompanied by a manually-triggered test failure.
+   */
+  function getServiceWorker(target: OutputTargetWww) {
+    if (target.serviceWorker) {
+      return target.serviceWorker;
+    } else {
+      fail('the serviceWorker on the provided target was unexpectedly falsy, so this test needs to fail!');
+    }
+  }
 
   it('should add host.config.json to globIgnores', () => {
     outputTarget = {
@@ -18,7 +38,7 @@ describe('validateServiceWorker', () => {
       appDir: '/User/me/app/www/',
     };
     validateServiceWorker(config, outputTarget);
-    expect(outputTarget.serviceWorker.globIgnores).toContain('**/host.config.json');
+    expect(getServiceWorker(outputTarget).globIgnores).toContain('**/host.config.json');
   });
 
   it('should set globIgnores from string', () => {
@@ -30,7 +50,7 @@ describe('validateServiceWorker', () => {
       },
     };
     validateServiceWorker(config, outputTarget);
-    expect(outputTarget.serviceWorker.globIgnores).toContain('**/some-file.js');
+    expect(getServiceWorker(outputTarget).globIgnores).toContain('**/some-file.js');
   });
 
   it('should set globDirectory', () => {
@@ -42,7 +62,7 @@ describe('validateServiceWorker', () => {
       },
     };
     validateServiceWorker(config, outputTarget);
-    expect(outputTarget.serviceWorker.globDirectory).toBe('/custom/www');
+    expect(getServiceWorker(outputTarget).globDirectory).toBe('/custom/www');
   });
 
   it('should set default globDirectory', () => {
@@ -51,7 +71,7 @@ describe('validateServiceWorker', () => {
       appDir: '/User/me/app/www/',
     };
     validateServiceWorker(config, outputTarget);
-    expect(outputTarget.serviceWorker.globDirectory).toBe('/User/me/app/www/');
+    expect(getServiceWorker(outputTarget).globDirectory).toBe('/User/me/app/www/');
   });
 
   it('should set globPatterns array', () => {
@@ -63,7 +83,7 @@ describe('validateServiceWorker', () => {
       },
     };
     validateServiceWorker(config, outputTarget);
-    expect(outputTarget.serviceWorker.globPatterns).toEqual(['**/*.{png,svg}']);
+    expect(getServiceWorker(outputTarget).globPatterns).toEqual(['**/*.{png,svg}']);
   });
 
   it('should set globPatterns string', () => {
@@ -75,7 +95,7 @@ describe('validateServiceWorker', () => {
       },
     };
     validateServiceWorker(config, outputTarget);
-    expect(outputTarget.serviceWorker.globPatterns).toEqual(['**/*.{png,svg}']);
+    expect(getServiceWorker(outputTarget).globPatterns).toEqual(['**/*.{png,svg}']);
   });
 
   it('should create default globPatterns', () => {
@@ -84,7 +104,7 @@ describe('validateServiceWorker', () => {
       appDir: '/www',
     };
     validateServiceWorker(config, outputTarget);
-    expect(outputTarget.serviceWorker.globPatterns).toEqual(['*.html', '**/*.{js,css,json}']);
+    expect(getServiceWorker(outputTarget).globPatterns).toEqual(['*.html', '**/*.{js,css,json}']);
   });
 
   it('should create default sw config when www type and prod mode', () => {

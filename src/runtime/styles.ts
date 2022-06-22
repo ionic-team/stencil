@@ -25,7 +25,7 @@ export const addStyle = (
   hostElm?: HTMLElement
 ) => {
   let scopeId = getScopeId(cmpMeta, mode);
-  let style = styles.get(scopeId);
+  const style = styles.get(scopeId);
 
   if (!BUILD.attachStyles) {
     return scopeId;

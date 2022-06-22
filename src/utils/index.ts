@@ -3,7 +3,6 @@ export * from './format-component-runtime-meta';
 export * from './helpers';
 export * from './is-glob';
 export * from './is-root-path';
-export * from './logger/logger-minify-js';
 export * from './logger/logger-rollup';
 export * from './logger/logger-typescript';
 export * from './logger/logger-utils';

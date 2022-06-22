@@ -65,7 +65,7 @@ export const generateSitemapXml = async (manager: d.PrerenderManager) => {
     await manager.config.sys.writeFile(results.filePath, results.content);
 
     return results;
-  } catch (e) {
+  } catch (e: any) {
     catchError(manager.diagnostics, e);
     return null;
   }

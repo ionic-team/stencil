@@ -22,7 +22,9 @@ export const loadModule = (
   if (module) {
     return module[exportName];
   }
+  /*!__STENCIL_STATIC_IMPORT_SWITCH__*/
   return import(
+    /* @vite-ignore */
     /* webpackInclude: /\.entry\.js$/ */
     /* webpackExclude: /\.system\.entry\.js$/ */
     /* webpackMode: "lazy" */

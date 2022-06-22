@@ -22,11 +22,13 @@ describe('attributes', () => {
     element.setAttribute('attr-0', 'value-0');
     element.setAttribute('attr-1', 'value-1');
 
-    expect(element.attributes[0].name).toBe('attr-0');
-    expect(element.attributes[0].value).toBe('value-0');
-    expect(element.attributes[1].name).toBe('attr-1');
-    expect(element.attributes[1].value).toBe('value-1');
-    expect(element.attributes[2]).toBe(undefined);
+    const attributes = Array.from(element.attributes);
+
+    expect(attributes[0].name).toBe('attr-0');
+    expect(attributes[0].value).toBe('value-0');
+    expect(attributes[1].name).toBe('attr-1');
+    expect(attributes[1].value).toBe('value-1');
+    expect(attributes[2]).toBe(undefined);
   });
 
   it('attributes are case sensitive in Element', () => {
@@ -163,7 +165,7 @@ describe('attributes', () => {
     expect(img.draggable).toEqual(false);
   });
 
-  function testNsAttributes(element) {
+  function testNsAttributes(element: MockHTMLElement) {
     element.setAttributeNS('tEst', 'viewBox', '1');
     element.setAttributeNS('tEst', 'viewbox', '2');
 

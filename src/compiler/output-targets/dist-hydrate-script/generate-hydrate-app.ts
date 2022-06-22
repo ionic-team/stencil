@@ -63,8 +63,10 @@ export const generateHydrateApp = async (
     });
 
     await writeHydrateOutputs(config, compilerCtx, buildCtx, outputTargets, rollupOutput);
-  } catch (e) {
+  } catch (e: any) {
     if (!buildCtx.hasError) {
+      // TODO(STENCIL-353): Implement a type guard that balances using our own copy of Rollup types (which are
+      // breakable) and type safety (so that the error variable may be something other than `any`)
       loadRollupDiagnostics(config, compilerCtx, buildCtx, e);
     }
   }
@@ -93,7 +95,7 @@ const generateHydrateFactory = async (config: d.Config, compilerCtx: d.CompilerC
           return rollupOutput.output[0].code;
         }
       }
-    } catch (e) {
+    } catch (e: any) {
       catchError(buildCtx.diagnostics, e);
     }
   }

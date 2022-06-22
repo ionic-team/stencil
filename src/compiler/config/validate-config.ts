@@ -1,4 +1,4 @@
-import { Config, ConfigBundle, Diagnostic } from '../../declarations';
+import { Config, ConfigBundle, Diagnostic, UnvalidatedConfig } from '../../declarations';
 import { buildError, isBoolean, isNumber, isString, sortBy } from '@utils';
 import { setBooleanConfig } from './config-utils';
 import { validateDevServer } from './validate-dev-server';
@@ -12,7 +12,20 @@ import { validateRollupConfig } from './validate-rollup-config';
 import { validateTesting } from './validate-testing';
 import { validateWorkers } from './validate-workers';
 
-export const validateConfig = (userConfig?: Config) => {
+/**
+ * Validate a Config object, ensuring that all its field are present and
+ * consistent with our expectations. This function transforms an
+ * `UnvalidatedConfig` to a `Config`.
+ *
+ * @param userConfig an unvalidated config that we've gotten from a user
+ * @returns an object with config and diagnostics props
+ */
+export const validateConfig = (
+  userConfig: UnvalidatedConfig = {}
+): {
+  config: Config;
+  diagnostics: Diagnostic[];
+} => {
   const config = Object.assign({}, userConfig || {}); // not positive it's json safe
   const diagnostics: Diagnostic[] = [];
 
