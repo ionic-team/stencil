@@ -251,7 +251,8 @@ export class ${toPascalCase(tagName)} {
 };
 
 /**
- * Get the boilerplate for style.
+ * Get the boilerplate for style for a generated component
+ * @returns a boilerplate CSS block
  */
 const getStyleUrlBoilerplate = (): string =>
   `:host {

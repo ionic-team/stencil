@@ -34,7 +34,7 @@ export function parse(text: string): StyleNode {
 /**
  * Remove text that may hinder parsing, such as comments and `@import` statements
  * @param cssText the CSS to remove unnecessary bit from
- * @return the 'cleaned' css string
+ * @returns the 'cleaned' css string
  */
 function clean(cssText: string): string {
   return cssText.replace(RX.comments, '').replace(RX.port, '');
@@ -119,7 +119,7 @@ function parseCss(node: StyleNode, text: string): StyleNode {
  * Conversion of unicode escapes with spaces like `\33 ` (and longer) into
  * expanded form that doesn't require trailing space -> `\000033`
  * @param s the unicode escape sequence to expand
- * @return the expanded escape sequence
+ * @returns the expanded escape sequence
  */
 function _expandUnicodeEscapes(s: string): string {
   return s.replace(/\\([0-9a-f]{1,6})\s/gi, function () {
@@ -136,10 +136,10 @@ function _expandUnicodeEscapes(s: string): string {
 /**
  * Stringify some parsed CSS.
  * @param node the CSS root node to stringify
- * @param  preserveProperties if `false`, custom CSS properties will be removed from the CSS. If `true`, they will be
+ * @param preserveProperties if `false`, custom CSS properties will be removed from the CSS. If `true`, they will be
  * preserved.
- * @param  text an optional string to append the stringified CSS to
- * @return the stringified CSS.
+ * @param text an optional string to append the stringified CSS to
+ * @returns the stringified CSS.
  */
 export function stringify(node: StyleNode, preserveProperties: boolean, text = ''): string {
   // calc rule cssText
@@ -174,7 +174,7 @@ export function stringify(node: StyleNode, preserveProperties: boolean, text = '
 /**
  * Determines if a parsed CSS node has a selector that begins with '--' or not
  * @param rules the rules to evaluate. only the first rule in the provided list will be tested.
- * @return `true` if a selector that begins with '--' is found, `false` otherwise.
+ * @returns `true` if a selector that begins with '--' is found, `false` otherwise.
  */
 function _hasMixinRules(rules: ReadonlyArray<StyleNode>): boolean {
   const r = rules[0];
@@ -184,7 +184,7 @@ function _hasMixinRules(rules: ReadonlyArray<StyleNode>): boolean {
 /**
  * Helper function to remove custom properties from CSS
  * @param cssText the stringified CSS to remove custom properties from
- * @return the sanitized CSS
+ * @returns the sanitized CSS
  */
 function removeCustomProps(cssText: string): string {
   cssText = removeCustomPropAssignment(cssText);
@@ -194,7 +194,7 @@ function removeCustomProps(cssText: string): string {
 /**
  *
  * @param cssText the stringified CSS to remove custom properties from
- * @return the sanitized CSS
+ * @returns the sanitized CSS
  */
 export function removeCustomPropAssignment(cssText: string): string {
   return cssText.replace(RX.customProp, '').replace(RX.mixinProp, '');
@@ -203,7 +203,7 @@ export function removeCustomPropAssignment(cssText: string): string {
 /**
  *
  * @param cssText the stringified CSS to remove custom properties from
- * @return the sanitized CSS
+ * @returns the sanitized CSS
  */
 function removeCustomPropApply(cssText: string): string {
   return cssText.replace(RX.mixinApply, '').replace(RX.varApply, '');

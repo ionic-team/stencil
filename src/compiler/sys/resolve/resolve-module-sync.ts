@@ -159,7 +159,7 @@ export const createCustomResolverSync = (
  * https://github.com/DefinitelyTyped/DefinitelyTyped/blob/d121716ed123957f6a86f8985eb013fcaddab345/types/node/globals.d.ts#L183-L188
  * in mind.
  * @param err the entity to check the type of
- * @return true if the provided value is an instance of `ErrnoException`, `false` otherwise
+ * @returns true if the provided value is an instance of `ErrnoException`, `false` otherwise
  */
 function isErrnoException(err: unknown): err is NodeJS.ErrnoException {
   return err instanceof Error && err.hasOwnProperty('code');
