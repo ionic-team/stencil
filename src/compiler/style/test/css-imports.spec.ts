@@ -15,7 +15,7 @@ describe('css-imports', () => {
   let compilerCtx: d.CompilerCtx;
   let buildCtx: d.BuildCtx;
   let config: d.Config;
-  let readFileMock: jest.SpyInstance<Promise<string>, [string, d.FsReadOptions?]>
+  let readFileMock: jest.SpyInstance<Promise<string>, [string, d.FsReadOptions?]>;
 
   beforeEach(() => {
     compilerCtx = mockCompilerCtx(config);
