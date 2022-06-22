@@ -55,7 +55,7 @@ describe('component error handling', () => {
       html: ``,
     });
 
-    let handler = jest.fn();
+    const handler = jest.fn();
     doc.addEventListener('componentError', handler);
     const cmpA = document.createElement('cmp-a') as any;
     doc.body.appendChild(cmpA);
