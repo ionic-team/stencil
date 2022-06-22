@@ -2260,7 +2260,7 @@ export interface OptimizeCssInput {
 /**
  * This is not a real interface describing the options which can
  * be passed to autoprefixer, for that see the docs, here:
- * https://github.com/postcss/autoprefixer#options 
+ * https://github.com/postcss/autoprefixer#options
  *
  * Instead, this basically just serves as a label type to track
  * that arguments are being passed consistently.
