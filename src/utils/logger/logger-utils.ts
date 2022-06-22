@@ -7,6 +7,7 @@ import type * as d from '../../declarations';
  * @returns the normalize documents
  */
 export const normalizeDiagnostics = (compilerCtx: d.CompilerCtx, diagnostics: d.Diagnostic[]): d.Diagnostic[] => {
+  const maxErrorsToNormalize = 25;
   const normalizedErrors: d.Diagnostic[] = [];
   const normalizedOthers: d.Diagnostic[] = [];
   const dups = new Set<string>();
@@ -23,7 +24,7 @@ export const normalizeDiagnostics = (compilerCtx: d.CompilerCtx, diagnostics: d.
     const total = normalizedErrors.length + normalizedOthers.length;
     if (d.level === 'error') {
       normalizedErrors.push(d);
-    } else if (total < MAX_ERRORS) {
+    } else if (total < maxErrorsToNormalize) {
       normalizedOthers.push(d);
     }
   }
@@ -43,7 +44,7 @@ const normalizeDiagnostic = (compilerCtx: d.CompilerCtx, diagnostic: d.Diagnosti
     if (typeof (<any>diagnostic.messageText).message === 'string') {
       diagnostic.messageText = (<any>diagnostic.messageText).message;
     } else if (typeof diagnostic.messageText === 'string' && diagnostic.messageText.indexOf('Error: ') === 0) {
-      diagnostic.messageText = diagnostic.messageText.substr(7);
+      diagnostic.messageText = diagnostic.messageText.slice(7);
     }
   }
 
@@ -132,5 +133,3 @@ export const escapeHtml = (unsafe: any) => {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
 };
-
-export const MAX_ERRORS = 25;

@@ -40,11 +40,21 @@ export class MockPerformance implements Performance {
     return [] as any;
   }
 
-  mark() {
+  // Stencil's implementation of `mark` is non-compliant with the `Performance` interface. Because Stencil will
+  // instantiate an instance of this class and may attempt to assign it to a variable of type `Performance`, the return
+  // type must match the `Performance` interface (rather than typing this function as returning `void` and ignoring the
+  // associated errors returned by the type checker)
+  // @ts-ignore
+  mark(): PerformanceMark {
     //
   }
 
-  measure() {
+  // Stencil's implementation of `measure` is non-compliant with the `Performance` interface. Because Stencil will
+  // instantiate an instance of this class and may attempt to assign it to a variable of type `Performance`, the return
+  // type must match the `Performance` interface (rather than typing this function as returning `void` and ignoring the
+  // associated errors returned by the type checker)
+  // @ts-ignore
+  measure(): PerformanceMeasure {
     //
   }
 

@@ -67,6 +67,14 @@ export namespace Components {
     interface StateCmp {
     }
 }
+export interface CarListCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLCarListElement;
+}
+export interface EventCmpCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLEventCmpElement;
+}
 declare global {
     interface HTMLAppRootElement extends Components.AppRoot, HTMLStencilElement {
     }
@@ -221,7 +229,7 @@ declare namespace LocalJSX {
     }
     interface CarList {
         "cars"?: CarData[];
-        "onCarSelected"?: (event: CustomEvent<CarData>) => void;
+        "onCarSelected"?: (event: CarListCustomEvent<CarData>) => void;
         "selected"?: CarData;
     }
     interface DomApi {
@@ -235,9 +243,9 @@ declare namespace LocalJSX {
     interface EnvData {
     }
     interface EventCmp {
-        "onMy-event-with-options"?: (event: CustomEvent<{ mph: number }>) => void;
-        "onMyDocumentEvent"?: (event: CustomEvent<any>) => void;
-        "onMyWindowEvent"?: (event: CustomEvent<number>) => void;
+        "onMy-event-with-options"?: (event: EventCmpCustomEvent<{ mph: number }>) => void;
+        "onMyDocumentEvent"?: (event: EventCmpCustomEvent<any>) => void;
+        "onMyWindowEvent"?: (event: EventCmpCustomEvent<number>) => void;
     }
     interface ImportAssets {
     }

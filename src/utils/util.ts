@@ -13,7 +13,7 @@ export const createJsVarName = (fileName: string) => {
     fileName = dashToPascalCase(fileName);
 
     if (fileName.length > 1) {
-      fileName = fileName[0].toLowerCase() + fileName.substr(1);
+      fileName = fileName[0].toLowerCase() + fileName.slice(1);
     } else {
       fileName = fileName.toLowerCase();
     }
@@ -25,35 +25,13 @@ export const createJsVarName = (fileName: string) => {
   return fileName;
 };
 
-export const getFileExt = (fileName: string) => {
-  if (typeof fileName === 'string') {
-    const parts = fileName.split('.');
-    if (parts.length > 1) {
-      return parts[parts.length - 1].toLowerCase();
-    }
-  }
-  return null;
-};
-
 /**
- * Test if a file is a typescript source file, such as .ts or .tsx.
- * However, d.ts files and spec.ts files return false.
- * @param filePath
+ * Determines if a given file path points to a type declaration file (ending in .d.ts) or not. This function is
+ * case-insensitive in its heuristics.
+ * @param filePath the path to check
+ * @returns `true` if the given `filePath` points to a type declaration file, `false` otherwise
  */
-export const isTsFile = (filePath: string) => {
-  const parts = filePath.toLowerCase().split('.');
-  if (parts.length > 1) {
-    if (parts[parts.length - 1] === 'ts' || parts[parts.length - 1] === 'tsx') {
-      if (parts.length > 2 && (parts[parts.length - 2] === 'd' || parts[parts.length - 2] === 'spec')) {
-        return false;
-      }
-      return true;
-    }
-  }
-  return false;
-};
-
-export const isDtsFile = (filePath: string) => {
+export const isDtsFile = (filePath: string): boolean => {
   const parts = filePath.toLowerCase().split('.');
   if (parts.length > 2) {
     return parts[parts.length - 2] === 'd' && parts[parts.length - 1] === 'ts';
@@ -61,36 +39,10 @@ export const isDtsFile = (filePath: string) => {
   return false;
 };
 
-export const isJsFile = (filePath: string) => {
-  const parts = filePath.toLowerCase().split('.');
-  if (parts.length > 1) {
-    if (parts[parts.length - 1] === 'js') {
-      if (parts.length > 2 && parts[parts.length - 2] === 'spec') {
-        return false;
-      }
-      return true;
-    }
-  }
-  return false;
-};
-
-export const hasFileExtension = (filePath: string, extensions: string[]) => {
-  filePath = filePath.toLowerCase();
-  return extensions.some((ext) => filePath.endsWith('.' + ext));
-};
-
-export const isCssFile = (filePath: string) => {
-  return hasFileExtension(filePath, ['css']);
-};
-
-export const isHtmlFile = (filePath: string) => {
-  return hasFileExtension(filePath, ['html', 'htm']);
-};
-
 /**
  * Generate the preamble to be placed atop the main file of the build
  * @param config the Stencil configuration file
- * @return the generated preamble
+ * @returns the generated preamble
  */
 export const generatePreamble = (config: d.Config): string => {
   const { preamble } = config;
@@ -120,14 +72,25 @@ ${docs.tags
   .join('\n')}`.trim();
 }
 
-export const getDependencies = (buildCtx: d.BuildCtx) => {
+/**
+ * Retrieve a project's dependencies from the current build context
+ * @param buildCtx the current build context to query for a specific package
+ * @returns a list of package names the project is dependent on
+ */
+const getDependencies = (buildCtx: d.BuildCtx): ReadonlyArray<string> => {
   if (buildCtx.packageJson != null && buildCtx.packageJson.dependencies != null) {
     return Object.keys(buildCtx.packageJson.dependencies).filter((pkgName) => !SKIP_DEPS.includes(pkgName));
   }
   return [];
 };
 
-export const hasDependency = (buildCtx: d.BuildCtx, depName: string) => {
+/**
+ * Utility to determine whether a project has a dependency on a package
+ * @param buildCtx the current build context to query for a specific package
+ * @param depName the name of the dependency/package
+ * @returns `true` if the project has a dependency a packaged with the provided name, `false` otherwise
+ */
+export const hasDependency = (buildCtx: d.BuildCtx, depName: string): boolean => {
   return getDependencies(buildCtx).includes(depName);
 };
 
@@ -154,41 +117,40 @@ export const readPackageJson = async (config: d.Config, compilerCtx: d.CompilerC
   }
 };
 
-export const parsePackageJson = (
-  pkgJsonStr: string,
-  pkgJsonFilePath: string
-): { diagnostic: d.Diagnostic; data: d.PackageJsonData; filePath: string } => {
-  if (isString(pkgJsonFilePath)) {
-    return parseJson(pkgJsonStr, pkgJsonFilePath);
-  }
-  return null;
+/**
+ * A type that describes the result of parsing a `package.json` file's contents
+ */
+export type ParsePackageJsonResult = {
+  diagnostic: d.Diagnostic | null;
+  data: any | null;
+  filePath: string;
 };
 
-export const parseJson = (jsonStr: string, filePath?: string) => {
-  const rtn = {
-    diagnostic: null as d.Diagnostic,
-    data: null as any,
-    filePath,
+/**
+ * Parse a string read from a `package.json` file
+ * @param pkgJsonStr the string read from a `package.json` file
+ * @param pkgJsonFilePath the path to the already read `package.json` file
+ * @returns the results of parsing the provided contents of the `package.json` file
+ */
+export const parsePackageJson = (pkgJsonStr: string, pkgJsonFilePath: string): ParsePackageJsonResult => {
+  const parseResult: ParsePackageJsonResult = {
+    diagnostic: null,
+    data: null,
+    filePath: pkgJsonFilePath,
   };
 
-  if (isString(jsonStr)) {
-    try {
-      rtn.data = JSON.parse(jsonStr);
-    } catch (e) {
-      const msg = e.message;
-      rtn.diagnostic = buildError();
-      rtn.diagnostic.absFilePath = filePath;
-      rtn.diagnostic.header = `Error Parsing JSON`;
-      rtn.diagnostic.messageText = msg;
+  try {
+    parseResult.data = JSON.parse(pkgJsonStr);
+  } catch (e) {
+    parseResult.diagnostic = buildError();
+    parseResult.diagnostic.absFilePath = isString(pkgJsonFilePath) ? pkgJsonFilePath : undefined;
+    parseResult.diagnostic.header = `Error Parsing JSON`;
+    if (e instanceof Error) {
+      parseResult.diagnostic.messageText = e.message;
     }
-  } else {
-    rtn.diagnostic = buildError();
-    rtn.diagnostic.absFilePath = filePath;
-    rtn.diagnostic.header = `Error Parsing JSON`;
-    rtn.diagnostic.messageText = `Invalid JSON input to parse`;
   }
 
-  return rtn;
+  return parseResult;
 };
 
 const SKIP_DEPS = ['@stencil/core'];

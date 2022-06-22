@@ -60,7 +60,7 @@ const validateManifestJsonIcon = async (
   }
 
   if (iconSrc.startsWith('/')) {
-    iconSrc = iconSrc.substr(1);
+    iconSrc = iconSrc.slice(1);
   }
 
   const manifestDir = dirname(manifestFilePath);

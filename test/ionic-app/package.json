@@ -16,6 +16,6 @@
     "generate": "node ../../bin/stencil generate"
   },
   "dependencies": {
-    "@ionic/core": "^5.0.0"
+    "@ionic/core": "^6.0.10"
   }
 }

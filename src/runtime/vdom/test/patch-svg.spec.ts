@@ -29,8 +29,8 @@ describe('renderer', () => {
       );
 
       expect(svgElm.namespaceURI).toEqual(SVG_NS);
-      expect(svgElm.firstChild.namespaceURI).toEqual(SVG_NS);
-      expect(svgElm.children[0].firstChild.namespaceURI).not.toEqual(SVG_NS);
+      expect((svgElm.firstChild as SVGSVGElement).namespaceURI).toEqual(SVG_NS);
+      expect((svgElm.children[0].firstChild as SVGSVGElement).namespaceURI).not.toEqual(SVG_NS);
       expect(svgElm.children[1].namespaceURI).toEqual(SVG_NS);
       expect(svgElm).toEqualHtml(`
         <svg>
@@ -53,8 +53,8 @@ describe('renderer', () => {
       expect(hostElm.namespaceURI).not.toEqual(SVG_NS);
       expect(hostElm.firstElementChild.tagName).toEqual('svg');
       expect(hostElm.firstElementChild.namespaceURI).toEqual(SVG_NS);
-      expect(hostElm.firstElementChild.firstChild.namespaceURI).toEqual(SVG_NS);
-      expect(hostElm.firstElementChild.lastChild.namespaceURI).toEqual(SVG_NS);
+      expect((hostElm.firstElementChild.firstChild as SVGSVGElement).namespaceURI).toEqual(SVG_NS);
+      expect((hostElm.firstElementChild.lastChild as SVGSVGElement).namespaceURI).toEqual(SVG_NS);
       expect(hostElm.lastElementChild.namespaceURI).not.toEqual(SVG_NS);
     });
   });

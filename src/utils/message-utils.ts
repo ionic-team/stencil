@@ -118,7 +118,14 @@ export const buildJsonFileError = (
   return err;
 };
 
-export const catchError = (diagnostics: d.Diagnostic[], err: Error, msg?: string) => {
+/**
+ * Builds a diagnostic from an `Error`, appends it to the `diagnostics` parameter, and returns the created diagnostic
+ * @param diagnostics the series of diagnostics the newly created diagnostics should be added to
+ * @param err the error to derive information from in generating the diagnostic
+ * @param msg an optional message to use in place of `err` to generate the diagnostic
+ * @returns the generated diagnostic
+ */
+export const catchError = (diagnostics: d.Diagnostic[], err: Error | null | undefined, msg?: string): d.Diagnostic => {
   const diagnostic: d.Diagnostic = {
     level: 'error',
     type: 'build',
@@ -130,13 +137,13 @@ export const catchError = (diagnostics: d.Diagnostic[], err: Error, msg?: string
   };
 
   if (isString(msg)) {
-    diagnostic.messageText = msg;
+    diagnostic.messageText = msg.length ? msg : 'UNKNOWN ERROR';
   } else if (err != null) {
     if (err.stack != null) {
       diagnostic.messageText = err.stack.toString();
     } else {
       if (err.message != null) {
-        diagnostic.messageText = err.message.toString();
+        diagnostic.messageText = err.message.length ? err.message : 'UNKNOWN ERROR';
       } else {
         diagnostic.messageText = err.toString();
       }

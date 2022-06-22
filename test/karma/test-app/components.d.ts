@@ -6,6 +6,7 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { SomeTypes } from "./util";
+import { TestEventDetail } from "./event-custom-type/cmp";
 export namespace Components {
     interface AppendChild {
     }
@@ -48,6 +49,9 @@ export namespace Components {
     interface BadSharedJsx {
     }
     interface BuildData {
+    }
+    interface ChildReflectNanAttribute {
+        "val": number;
     }
     interface ChildWithReflection {
         "val": number | any;
@@ -107,6 +111,10 @@ export namespace Components {
     interface EsmImport {
         "propVal": number;
         "someMethod": () => Promise<void>;
+    }
+    interface EventBasic {
+    }
+    interface EventCustomType {
     }
     interface ExternalImportA {
     }
@@ -182,7 +190,15 @@ export namespace Components {
     }
     interface NodeResolution {
     }
+    interface ParentReflectNanAttribute {
+    }
     interface ParentWithReflectChild {
+    }
+    interface ReflectNanAttribute {
+        "val": number;
+    }
+    interface ReflectNanAttributeHyphen {
+        "valNum": number;
     }
     interface ReflectToAttr {
         "bool": boolean;
@@ -319,6 +335,34 @@ export namespace Components {
     interface Tag88 {
     }
 }
+export interface EsmImportCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLEsmImportElement;
+}
+export interface EventBasicCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLEventBasicElement;
+}
+export interface EventCustomTypeCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLEventCustomTypeElement;
+}
+export interface LifecycleAsyncBCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLLifecycleAsyncBElement;
+}
+export interface LifecycleAsyncCCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLLifecycleAsyncCElement;
+}
+export interface LifecycleBasicBCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLLifecycleBasicBElement;
+}
+export interface LifecycleBasicCCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLLifecycleBasicCElement;
+}
 declare global {
     interface HTMLAppendChildElement extends Components.AppendChild, HTMLStencilElement {
     }
@@ -379,6 +423,12 @@ declare global {
     var HTMLBuildDataElement: {
         prototype: HTMLBuildDataElement;
         new (): HTMLBuildDataElement;
+    };
+    interface HTMLChildReflectNanAttributeElement extends Components.ChildReflectNanAttribute, HTMLStencilElement {
+    }
+    var HTMLChildReflectNanAttributeElement: {
+        prototype: HTMLChildReflectNanAttributeElement;
+        new (): HTMLChildReflectNanAttributeElement;
     };
     interface HTMLChildWithReflectionElement extends Components.ChildWithReflection, HTMLStencilElement {
     }
@@ -535,6 +585,18 @@ declare global {
     var HTMLEsmImportElement: {
         prototype: HTMLEsmImportElement;
         new (): HTMLEsmImportElement;
+    };
+    interface HTMLEventBasicElement extends Components.EventBasic, HTMLStencilElement {
+    }
+    var HTMLEventBasicElement: {
+        prototype: HTMLEventBasicElement;
+        new (): HTMLEventBasicElement;
+    };
+    interface HTMLEventCustomTypeElement extends Components.EventCustomType, HTMLStencilElement {
+    }
+    var HTMLEventCustomTypeElement: {
+        prototype: HTMLEventCustomTypeElement;
+        new (): HTMLEventCustomTypeElement;
     };
     interface HTMLExternalImportAElement extends Components.ExternalImportA, HTMLStencilElement {
     }
@@ -734,11 +796,29 @@ declare global {
         prototype: HTMLNodeResolutionElement;
         new (): HTMLNodeResolutionElement;
     };
+    interface HTMLParentReflectNanAttributeElement extends Components.ParentReflectNanAttribute, HTMLStencilElement {
+    }
+    var HTMLParentReflectNanAttributeElement: {
+        prototype: HTMLParentReflectNanAttributeElement;
+        new (): HTMLParentReflectNanAttributeElement;
+    };
     interface HTMLParentWithReflectChildElement extends Components.ParentWithReflectChild, HTMLStencilElement {
     }
     var HTMLParentWithReflectChildElement: {
         prototype: HTMLParentWithReflectChildElement;
         new (): HTMLParentWithReflectChildElement;
+    };
+    interface HTMLReflectNanAttributeElement extends Components.ReflectNanAttribute, HTMLStencilElement {
+    }
+    var HTMLReflectNanAttributeElement: {
+        prototype: HTMLReflectNanAttributeElement;
+        new (): HTMLReflectNanAttributeElement;
+    };
+    interface HTMLReflectNanAttributeHyphenElement extends Components.ReflectNanAttributeHyphen, HTMLStencilElement {
+    }
+    var HTMLReflectNanAttributeHyphenElement: {
+        prototype: HTMLReflectNanAttributeHyphenElement;
+        new (): HTMLReflectNanAttributeHyphenElement;
     };
     interface HTMLReflectToAttrElement extends Components.ReflectToAttr, HTMLStencilElement {
     }
@@ -1081,6 +1161,7 @@ declare global {
         "attribute-html-root": HTMLAttributeHtmlRootElement;
         "bad-shared-jsx": HTMLBadSharedJsxElement;
         "build-data": HTMLBuildDataElement;
+        "child-reflect-nan-attribute": HTMLChildReflectNanAttributeElement;
         "child-with-reflection": HTMLChildWithReflectionElement;
         "cmp-label": HTMLCmpLabelElement;
         "cmp-label-with-slot-sibling": HTMLCmpLabelWithSlotSiblingElement;
@@ -1107,6 +1188,8 @@ declare global {
         "dynamic-import": HTMLDynamicImportElement;
         "es5-addclass-svg": HTMLEs5AddclassSvgElement;
         "esm-import": HTMLEsmImportElement;
+        "event-basic": HTMLEventBasicElement;
+        "event-custom-type": HTMLEventCustomTypeElement;
         "external-import-a": HTMLExternalImportAElement;
         "external-import-b": HTMLExternalImportBElement;
         "external-import-c": HTMLExternalImportCElement;
@@ -1140,7 +1223,10 @@ declare global {
         "no-delegates-focus": HTMLNoDelegatesFocusElement;
         "node-globals": HTMLNodeGlobalsElement;
         "node-resolution": HTMLNodeResolutionElement;
+        "parent-reflect-nan-attribute": HTMLParentReflectNanAttributeElement;
         "parent-with-reflect-child": HTMLParentWithReflectChildElement;
+        "reflect-nan-attribute": HTMLReflectNanAttributeElement;
+        "reflect-nan-attribute-hyphen": HTMLReflectNanAttributeHyphenElement;
         "reflect-to-attr": HTMLReflectToAttrElement;
         "reparent-style-no-vars": HTMLReparentStyleNoVarsElement;
         "reparent-style-with-vars": HTMLReparentStyleWithVarsElement;
@@ -1239,6 +1325,9 @@ declare namespace LocalJSX {
     }
     interface BuildData {
     }
+    interface ChildReflectNanAttribute {
+        "val"?: number;
+    }
     interface ChildWithReflection {
         "val"?: number | any;
     }
@@ -1294,8 +1383,14 @@ declare namespace LocalJSX {
     interface Es5AddclassSvg {
     }
     interface EsmImport {
-        "onSomeEvent"?: (event: CustomEvent<any>) => void;
+        "onSomeEvent"?: (event: EsmImportCustomEvent<any>) => void;
         "propVal"?: number;
+    }
+    interface EventBasic {
+        "onTestEvent"?: (event: EventBasicCustomEvent<any>) => void;
+    }
+    interface EventCustomType {
+        "onTestEvent"?: (event: EventCustomTypeCustomEvent<TestEventDetail>) => void;
     }
     interface ExternalImportA {
     }
@@ -1324,25 +1419,25 @@ declare namespace LocalJSX {
     interface LifecycleAsyncA {
     }
     interface LifecycleAsyncB {
-        "onLifecycleLoad"?: (event: CustomEvent<any>) => void;
-        "onLifecycleUpdate"?: (event: CustomEvent<any>) => void;
+        "onLifecycleLoad"?: (event: LifecycleAsyncBCustomEvent<any>) => void;
+        "onLifecycleUpdate"?: (event: LifecycleAsyncBCustomEvent<any>) => void;
         "value"?: string;
     }
     interface LifecycleAsyncC {
-        "onLifecycleLoad"?: (event: CustomEvent<any>) => void;
-        "onLifecycleUpdate"?: (event: CustomEvent<any>) => void;
+        "onLifecycleLoad"?: (event: LifecycleAsyncCCustomEvent<any>) => void;
+        "onLifecycleUpdate"?: (event: LifecycleAsyncCCustomEvent<any>) => void;
         "value"?: string;
     }
     interface LifecycleBasicA {
     }
     interface LifecycleBasicB {
-        "onLifecycleLoad"?: (event: CustomEvent<any>) => void;
-        "onLifecycleUpdate"?: (event: CustomEvent<any>) => void;
+        "onLifecycleLoad"?: (event: LifecycleBasicBCustomEvent<any>) => void;
+        "onLifecycleUpdate"?: (event: LifecycleBasicBCustomEvent<any>) => void;
         "value"?: string;
     }
     interface LifecycleBasicC {
-        "onLifecycleLoad"?: (event: CustomEvent<any>) => void;
-        "onLifecycleUpdate"?: (event: CustomEvent<any>) => void;
+        "onLifecycleLoad"?: (event: LifecycleBasicCCustomEvent<any>) => void;
+        "onLifecycleUpdate"?: (event: LifecycleBasicCCustomEvent<any>) => void;
         "value"?: string;
     }
     interface LifecycleNestedA {
@@ -1379,7 +1474,15 @@ declare namespace LocalJSX {
     }
     interface NodeResolution {
     }
+    interface ParentReflectNanAttribute {
+    }
     interface ParentWithReflectChild {
+    }
+    interface ReflectNanAttribute {
+        "val"?: number;
+    }
+    interface ReflectNanAttributeHyphen {
+        "valNum"?: number;
     }
     interface ReflectToAttr {
         "bool"?: boolean;
@@ -1526,6 +1629,7 @@ declare namespace LocalJSX {
         "attribute-html-root": AttributeHtmlRoot;
         "bad-shared-jsx": BadSharedJsx;
         "build-data": BuildData;
+        "child-reflect-nan-attribute": ChildReflectNanAttribute;
         "child-with-reflection": ChildWithReflection;
         "cmp-label": CmpLabel;
         "cmp-label-with-slot-sibling": CmpLabelWithSlotSibling;
@@ -1552,6 +1656,8 @@ declare namespace LocalJSX {
         "dynamic-import": DynamicImport;
         "es5-addclass-svg": Es5AddclassSvg;
         "esm-import": EsmImport;
+        "event-basic": EventBasic;
+        "event-custom-type": EventCustomType;
         "external-import-a": ExternalImportA;
         "external-import-b": ExternalImportB;
         "external-import-c": ExternalImportC;
@@ -1585,7 +1691,10 @@ declare namespace LocalJSX {
         "no-delegates-focus": NoDelegatesFocus;
         "node-globals": NodeGlobals;
         "node-resolution": NodeResolution;
+        "parent-reflect-nan-attribute": ParentReflectNanAttribute;
         "parent-with-reflect-child": ParentWithReflectChild;
+        "reflect-nan-attribute": ReflectNanAttribute;
+        "reflect-nan-attribute-hyphen": ReflectNanAttributeHyphen;
         "reflect-to-attr": ReflectToAttr;
         "reparent-style-no-vars": ReparentStyleNoVars;
         "reparent-style-with-vars": ReparentStyleWithVars;
@@ -1657,6 +1766,7 @@ declare module "@stencil/core" {
             "attribute-html-root": LocalJSX.AttributeHtmlRoot & JSXBase.HTMLAttributes<HTMLAttributeHtmlRootElement>;
             "bad-shared-jsx": LocalJSX.BadSharedJsx & JSXBase.HTMLAttributes<HTMLBadSharedJsxElement>;
             "build-data": LocalJSX.BuildData & JSXBase.HTMLAttributes<HTMLBuildDataElement>;
+            "child-reflect-nan-attribute": LocalJSX.ChildReflectNanAttribute & JSXBase.HTMLAttributes<HTMLChildReflectNanAttributeElement>;
             "child-with-reflection": LocalJSX.ChildWithReflection & JSXBase.HTMLAttributes<HTMLChildWithReflectionElement>;
             "cmp-label": LocalJSX.CmpLabel & JSXBase.HTMLAttributes<HTMLCmpLabelElement>;
             "cmp-label-with-slot-sibling": LocalJSX.CmpLabelWithSlotSibling & JSXBase.HTMLAttributes<HTMLCmpLabelWithSlotSiblingElement>;
@@ -1683,6 +1793,8 @@ declare module "@stencil/core" {
             "dynamic-import": LocalJSX.DynamicImport & JSXBase.HTMLAttributes<HTMLDynamicImportElement>;
             "es5-addclass-svg": LocalJSX.Es5AddclassSvg & JSXBase.HTMLAttributes<HTMLEs5AddclassSvgElement>;
             "esm-import": LocalJSX.EsmImport & JSXBase.HTMLAttributes<HTMLEsmImportElement>;
+            "event-basic": LocalJSX.EventBasic & JSXBase.HTMLAttributes<HTMLEventBasicElement>;
+            "event-custom-type": LocalJSX.EventCustomType & JSXBase.HTMLAttributes<HTMLEventCustomTypeElement>;
             "external-import-a": LocalJSX.ExternalImportA & JSXBase.HTMLAttributes<HTMLExternalImportAElement>;
             "external-import-b": LocalJSX.ExternalImportB & JSXBase.HTMLAttributes<HTMLExternalImportBElement>;
             "external-import-c": LocalJSX.ExternalImportC & JSXBase.HTMLAttributes<HTMLExternalImportCElement>;
@@ -1716,7 +1828,10 @@ declare module "@stencil/core" {
             "no-delegates-focus": LocalJSX.NoDelegatesFocus & JSXBase.HTMLAttributes<HTMLNoDelegatesFocusElement>;
             "node-globals": LocalJSX.NodeGlobals & JSXBase.HTMLAttributes<HTMLNodeGlobalsElement>;
             "node-resolution": LocalJSX.NodeResolution & JSXBase.HTMLAttributes<HTMLNodeResolutionElement>;
+            "parent-reflect-nan-attribute": LocalJSX.ParentReflectNanAttribute & JSXBase.HTMLAttributes<HTMLParentReflectNanAttributeElement>;
             "parent-with-reflect-child": LocalJSX.ParentWithReflectChild & JSXBase.HTMLAttributes<HTMLParentWithReflectChildElement>;
+            "reflect-nan-attribute": LocalJSX.ReflectNanAttribute & JSXBase.HTMLAttributes<HTMLReflectNanAttributeElement>;
+            "reflect-nan-attribute-hyphen": LocalJSX.ReflectNanAttributeHyphen & JSXBase.HTMLAttributes<HTMLReflectNanAttributeHyphenElement>;
             "reflect-to-attr": LocalJSX.ReflectToAttr & JSXBase.HTMLAttributes<HTMLReflectToAttrElement>;
             "reparent-style-no-vars": LocalJSX.ReparentStyleNoVars & JSXBase.HTMLAttributes<HTMLReparentStyleNoVarsElement>;
             "reparent-style-with-vars": LocalJSX.ReparentStyleWithVars & JSXBase.HTMLAttributes<HTMLReparentStyleWithVarsElement>;

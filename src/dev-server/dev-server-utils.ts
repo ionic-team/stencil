@@ -90,7 +90,7 @@ export function isSsrStaticDataPath(pathname: string) {
 
 export function getSsrStaticDataPath(req: d.HttpRequest) {
   const parts = req.url.href.split('/');
-  let fileName = parts[parts.length - 1];
+  const fileName = parts[parts.length - 1];
   const fileNameParts = fileName.split('?');
 
   parts.pop();

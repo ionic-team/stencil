@@ -40,7 +40,7 @@ const getAttributeField = (prop: d.JsonDocsProp) => {
 };
 
 const getDocsField = (prop: d.JsonDocsProp) => {
-  let docField = `${
+  const docField = `${
     prop.deprecation !== undefined
       ? `<span style="color:red">**[DEPRECATED]**</span> ${prop.deprecation}<br/><br/>`
       : ''

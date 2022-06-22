@@ -162,8 +162,8 @@ function validatePackage(opts: BuildOptions, testPkg: TestPackage, dtsEntries: s
         throw new Error(testPkg.packageJson + ' missing "files" property');
       }
       pkgJson.files.forEach((f) => {
-        if (f === '!**/*.map') {
-          // skip sourcemaps
+        if (f === '!**/*.map' || f === '!**/*.stub.ts' || f === '!**/*.stub.tsx') {
+          // skip sourcemaps, stub files
           return;
         }
         const pkgFile = join(pkgDir, f);

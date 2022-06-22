@@ -178,7 +178,7 @@ describe('parse props', () => {
               location: 'global',
             },
           },
-          resolved: 'any',
+          resolved: 'Object',
           original: 'Object',
         },
         docs: {

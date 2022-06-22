@@ -86,7 +86,7 @@ export const outputLazy = async (config: d.Config, compilerCtx: d.CompilerCtx, b
         buildCtx.componentGraph = generateModuleGraph(buildCtx.components, buildCtx.esmBrowserComponentBundle);
       }
     }
-  } catch (e) {
+  } catch (e: any) {
     catchError(buildCtx.diagnostics, e);
   }
 
@@ -120,7 +120,7 @@ function generateEntryModules(config: d.Config, buildCtx: d.BuildCtx): void {
   try {
     const bundles = generateComponentBundles(config, buildCtx);
     buildCtx.entryModules = bundles.map(createEntryModule);
-  } catch (e) {
+  } catch (e: any) {
     catchError(buildCtx.diagnostics, e);
   }
 

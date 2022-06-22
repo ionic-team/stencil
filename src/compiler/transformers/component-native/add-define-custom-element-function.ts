@@ -2,8 +2,6 @@ import type * as d from '../../../declarations';
 import { createImportStatement, getModuleFromSourceFile } from '../transform-utils';
 import { dashToPascalCase } from '@utils';
 import ts from 'typescript';
-import { createComponentMetadataProxy } from '../add-component-meta-proxy';
-import { addCoreRuntimeApi, RUNTIME_APIS } from '../core-runtime-apis';
 
 /**
  * Import and define components along with any component dependents within the `dist-custom-elements` output.
@@ -25,24 +23,9 @@ export const addDefineCustomElementFunctions = (
       const caseStatements: ts.CaseClause[] = [];
       const tagNames: string[] = [];
 
-      addCoreRuntimeApi(moduleFile, RUNTIME_APIS.proxyCustomElement);
-
       if (moduleFile.cmps.length) {
         const principalComponent = moduleFile.cmps[0];
         tagNames.push(principalComponent.tagName);
-
-        // wraps the initial component class in a `proxyCustomElement` wrapper.
-        // This is what will be exported and called from the `defineCustomElement` call.
-        const proxyDefinition = createComponentMetadataProxy(principalComponent);
-        const metaExpression = ts.factory.createExpressionStatement(
-          ts.factory.createBinaryExpression(
-            ts.factory.createIdentifier(principalComponent.componentClassName),
-            ts.factory.createToken(ts.SyntaxKind.EqualsToken),
-            proxyDefinition
-          )
-        );
-        newStatements.push(metaExpression);
-        ts.addSyntheticLeadingComment(proxyDefinition, ts.SyntaxKind.MultiLineCommentTrivia, '@__PURE__', false);
 
         // define the current component - `customElements.define(tagName, MyProxiedComponent);`
         const customElementsDefineCallExpression = ts.factory.createCallExpression(
@@ -244,6 +227,7 @@ const addDefineCustomElementFunction = (
  * ```typescript
  * defineCustomElement(MyPrincipalComponent);
  * ```
+ * @param componentName the component's class name to use as the first argument to `defineCustomElement`
  * @returns the expression statement described above
  */
 function createAutoDefinitionExpression(componentName: string): ts.ExpressionStatement {
