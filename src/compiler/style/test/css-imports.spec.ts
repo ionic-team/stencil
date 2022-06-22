@@ -1,5 +1,4 @@
 import type * as d from '@stencil/core/declarations';
-import fs from 'graceful-fs';
 import {
   getCssImports,
   isCssNodeModule,
@@ -16,13 +15,12 @@ describe('css-imports', () => {
   let compilerCtx: d.CompilerCtx;
   let buildCtx: d.BuildCtx;
   let config: d.Config;
-  let readFileMock: jest.SpyInstance<ReturnType<d.InMemoryFileSystem['readFile']>, Parameters<typeof fs.readFileSync>>;
+  let readFileMock: jest.SpyInstance<Promise<string>, [string, d.FsReadOptions?]>
 
   beforeEach(() => {
     compilerCtx = mockCompilerCtx(config);
     buildCtx = mockBuildCtx(config, compilerCtx);
     config = mockConfig();
-    // @ts-ignore
     readFileMock = jest.spyOn(compilerCtx.fs, 'readFile');
   });
 
