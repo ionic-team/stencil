@@ -2,34 +2,64 @@ import type * as d from '../../declarations';
 import type { BundleOptions } from './bundle-interface';
 import { getModule } from '../transpile/transpiled-module';
 import { isString, normalizeFsPath } from '@utils';
-import type { Plugin } from 'rollup';
+import type { LoadResult, Plugin, TransformResult } from 'rollup';
 import { tsResolveModuleName } from '../sys/typescript/typescript-resolve-module';
-import { isAbsolute } from 'path';
+import { isAbsolute, basename } from 'path';
 import ts from 'typescript';
 
-export const typescriptPlugin = (compilerCtx: d.CompilerCtx, bundleOpts: BundleOptions): Plugin => {
-  const tsPrinter = ts.createPrinter();
-
+/**
+ * Rollup plugin that aids in resolving the TypeScript files and performing the transpilation step.
+ * @param compilerCtx the current compiler context
+ * @param bundleOpts Rollup bundling options to apply during TypeScript compilation
+ * @param config the Stencil configuration for the project
+ * @returns the rollup plugin for handling TypeScript files.
+ */
+export const typescriptPlugin = (compilerCtx: d.CompilerCtx, bundleOpts: BundleOptions, config: d.Config): Plugin => {
   return {
     name: `${bundleOpts.id}TypescriptPlugin`,
 
-    load(id) {
+    /**
+     * A rollup build hook for loading TypeScript files and their associated source maps (if they exist).
+     * [Source](https://rollupjs.org/guide/en/#load)
+     * @param id the path of the file to load
+     * @returns the module matched (with its sourcemap if it exists), null otherwise
+     */
+    load(id: string): LoadResult {
       if (isAbsolute(id)) {
         const fsFilePath = normalizeFsPath(id);
-        const mod = getModule(compilerCtx, fsFilePath);
-        if (mod) {
-          return mod.staticSourceFileText;
+        const module = getModule(compilerCtx, fsFilePath);
+
+        if (module) {
+          if (!module.sourceMapFileText) {
+            return { code: module.staticSourceFileText, map: null };
+          }
+
+          const sourceMap: d.SourceMap = JSON.parse(module.sourceMapFileText);
+          sourceMap.sources = sourceMap.sources.map((src) => basename(src));
+          return { code: module.staticSourceFileText, map: sourceMap };
         }
       }
       return null;
     },
-    transform(_, id) {
+    /**
+     * Performs TypeScript compilation/transpilation, including applying any transformations against the Abstract Syntax
+     * Tree (AST) specific to stencil
+     * @param _code the code to modify, unused
+     * @param id module's identifier
+     * @returns the transpiled code, with its associated sourcemap. null otherwise
+     */
+    transform(_code: string, id: string): TransformResult {
       if (isAbsolute(id)) {
         const fsFilePath = normalizeFsPath(id);
         const mod = getModule(compilerCtx, fsFilePath);
         if (mod && mod.cmps.length > 0) {
-          const transformed = ts.transform(mod.staticSourceFile, bundleOpts.customTransformers).transformed[0];
-          return tsPrinter.printFile(transformed);
+          const tsResult = ts.transpileModule(mod.staticSourceFileText, {
+            compilerOptions: config.tsCompilerOptions,
+            fileName: mod.sourceFilePath,
+            transformers: { before: bundleOpts.customTransformers },
+          });
+          const sourceMap: d.SourceMap = tsResult.sourceMapText ? JSON.parse(tsResult.sourceMapText) : null;
+          return { code: tsResult.outputText, map: sourceMap };
         }
       }
       return null;

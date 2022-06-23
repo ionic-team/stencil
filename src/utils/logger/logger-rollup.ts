@@ -57,7 +57,7 @@ export const loadRollupDiagnostics = (
             diagnostic.lineNumber = errorLine.lineNumber;
             diagnostic.columnNumber = errorLine.errorCharStart;
 
-            const highlightLine = errorLine.text.substr(loc.column);
+            const highlightLine = errorLine.text.slice(loc.column);
             for (let i = 0; i < highlightLine.length; i++) {
               if (charBreak.has(highlightLine.charAt(i))) {
                 break;

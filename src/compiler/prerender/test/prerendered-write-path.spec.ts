@@ -33,6 +33,7 @@ describe('prerender-utils', () => {
         resolve: null,
         templateId: null,
         componentGraphPath: null,
+        staticSite: false,
       };
     });
 

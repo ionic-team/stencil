@@ -73,7 +73,7 @@ If you're using the `dist` output target, update the `package.json` in the root 
 
 Additionally the `dist/loader` output directory has renamed its extensions too, but since its `dist/loader/package.json` file is auto-generated, the entries were renamed too. So unless you were referencing the loader files directly you will not have to do external updates.
 
-See the [Output Folder Structure Defaults](https://github.com/ionic-team/stencil/blob/master/src/compiler/output-targets/readme.md) for more info.
+See the [Output Folder Structure Defaults](https://github.com/ionic-team/stencil/blob/main/src/compiler/output-targets/readme.md) for more info.
 
 ### NodeJS Update
 

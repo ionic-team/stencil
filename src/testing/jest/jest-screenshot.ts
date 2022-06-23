@@ -82,7 +82,11 @@ export async function runJestScreenshot(config: d.Config, env: d.E2EProcessEnv) 
       }
     }
   } catch (e) {
-    config.logger.error(e, e.stack);
+    if (e instanceof Error) {
+      config.logger.error(e, e.stack);
+    } else {
+      config.logger.error(e);
+    }
   }
 
   return passed;

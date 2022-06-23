@@ -224,7 +224,7 @@ const escapeHtml = (unsafe: string) => {
   return '';
 };
 
-const titleCase = (str: string) => str.charAt(0).toUpperCase() + str.substr(1);
+const titleCase = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
 const highlightError = (text: string, errorCharStart: number, errorLength: number) => {
   if (typeof text !== 'string') {
@@ -269,7 +269,7 @@ const prepareLines = (orgLines: PrintLine[]) => {
       return lines;
     }
     for (let i = 0; i < lines.length; i++) {
-      lines[i].text = lines[i].text.substr(1);
+      lines[i].text = lines[i].text.slice(1);
       lines[i].errorCharStart--;
       if (!lines[i].text.length) {
         return lines;

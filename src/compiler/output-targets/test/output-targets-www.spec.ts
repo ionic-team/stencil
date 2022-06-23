@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { doNotExpectFiles, expectFiles } from '../../../testing/testing-utils';
 import { Compiler, Config } from '@stencil/core/compiler';
 import { mockConfig } from '@stencil/core/testing';
@@ -37,8 +38,10 @@ xdescribe('outputTarget, www', () => {
       path.join(root, 'User', 'testing', 'www'),
       path.join(root, 'User', 'testing', 'www', 'build'),
       path.join(root, 'User', 'testing', 'www', 'build', 'app.js'),
+      path.join(root, 'User', 'testing', 'www', 'build', 'app.js.map'),
       path.join(root, 'User', 'testing', 'www', 'build', 'app.esm.js'),
       path.join(root, 'User', 'testing', 'www', 'build', 'cmp-a.entry.js'),
+      path.join(root, 'User', 'testing', 'www', 'build', 'cmp-a.entry.js.map'),
 
       path.join(root, 'User', 'testing', 'www', 'index.html'),
 

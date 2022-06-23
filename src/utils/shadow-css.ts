@@ -13,7 +13,6 @@
 const safeSelector = (selector: string) => {
   const placeholders: string[] = [];
   let index = 0;
-  let content: string;
 
   // Replaces attribute selectors with placeholders.
   // The WS in [attr="va lue"] would otherwise be interpreted as a selector separator.
@@ -26,7 +25,7 @@ const safeSelector = (selector: string) => {
 
   // Replaces the expression in `:nth-child(2n + 1)` with a placeholder.
   // WS and "+" would otherwise be interpreted as selector separators.
-  content = selector.replace(/(:nth-[-\w]+)(\([^)]+\))/g, (_, pseudo, exp) => {
+  const content = selector.replace(/(:nth-[-\w]+)(\([^)]+\))/g, (_, pseudo, exp) => {
     const replaceBy = `__ph-${index}__`;
     placeholders.push(exp);
     index++;
@@ -91,6 +90,7 @@ const extractCommentsWithHash = (input: string): string[] => {
 
 const _ruleRe = /(\s*)([^;\{\}]+?)(\s*)((?:{%BLOCK%}?\s*;?)|(?:\s*;))/g;
 const _curlyRe = /([{}])/g;
+const _selectorPartsRe = /(^.*?[^\\])??((:+)(.*)|$)/;
 const OPEN_CURLY = '{';
 const CLOSE_CURLY = '}';
 const BLOCK_PLACEHOLDER = '%BLOCK%';
@@ -256,17 +256,19 @@ const selectorNeedsScoping = (selector: string, scopeSelector: string) => {
   return !re.test(selector);
 };
 
+const injectScopingSelector = (selector: string, scopingSelector: string) => {
+  return selector.replace(_selectorPartsRe, (_: string, before = '', _colonGroup: string, colon = '', after = '') => {
+    return before + scopingSelector + colon + after;
+  });
+};
+
 const applySimpleSelectorScope = (selector: string, scopeSelector: string, hostSelector: string) => {
   // In Android browser, the lastIndex is not reset when the regex is used in String.replace()
   _polyfillHostRe.lastIndex = 0;
   if (_polyfillHostRe.test(selector)) {
     const replaceBy = `.${hostSelector}`;
     return selector
-      .replace(_polyfillHostNoCombinatorRe, (_, selector) => {
-        return selector.replace(/([^:]*)(:*)(.*)/, (_: string, before: string, colon: string, after: string) => {
-          return before + replaceBy + colon + after;
-        });
-      })
+      .replace(_polyfillHostNoCombinatorRe, (_, selector) => injectScopingSelector(selector, replaceBy))
       .replace(_polyfillHostRe, replaceBy + ' ');
   }
 
@@ -292,10 +294,7 @@ const applyStrictSelectorScope = (selector: string, scopeSelector: string, hostS
       // remove :host since it should be unnecessary
       const t = p.replace(_polyfillHostRe, '');
       if (t.length > 0) {
-        const matches = t.match(/([^:]*)(:*)(.*)/);
-        if (matches) {
-          scopedP = matches[1] + className + matches[2] + matches[3];
-        }
+        scopedP = injectScopingSelector(t, className);
       }
     }
 

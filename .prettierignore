@@ -37,10 +37,12 @@ node_modules/
 coverage/
 
 # output from compiling Stencil projects for testing purposes
+test/karma/test-sibling/
+test/karma/tmp-compiled-tests/
 test/**/dist/
 test/**/dist-react/
 test/**/hydrate/
-test/**/test-dist/
+test/**/test-output/
 test/**/www/
 test/**/components.d.ts
 test/end-to-end/screenshot/

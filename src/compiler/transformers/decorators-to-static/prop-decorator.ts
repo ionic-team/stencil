@@ -14,13 +14,24 @@ import { isDecoratorNamed, getDeclarationParameters } from './decorator-utils';
 import { validatePublicName } from '../reserved-public-members';
 import ts from 'typescript';
 
+/**
+ * Parse a collection of class members decorated with `@Prop()`
+ * @param diagnostics a collection of compiler diagnostics. During the parsing process, any errors detected must be
+ * added to this collection
+ * @param decoratedProps a collection of class elements that may or may not my class members decorated with `@Prop`.
+ * Only those decorated with `@Prop()` will be parsed.
+ * @param typeChecker a reference to the TypeScript type checker
+ * @param watchable a collection of class members that can be watched for changes using Stencil's `@Watch` decorator
+ * @param newMembers a collection that parsed `@Prop` annotated class members should be pushed to as a side effect of
+ * calling this function
+ */
 export const propDecoratorsToStatic = (
   diagnostics: d.Diagnostic[],
   decoratedProps: ts.ClassElement[],
   typeChecker: ts.TypeChecker,
   watchable: Set<string>,
   newMembers: ts.ClassElement[]
-) => {
+): void => {
   const properties = decoratedProps
     .filter(ts.isPropertyDeclaration)
     .map((prop) => parsePropDecorator(diagnostics, typeChecker, prop, watchable))
@@ -31,19 +42,28 @@ export const propDecoratorsToStatic = (
   }
 };
 
+/**
+ * Parse a single `@Prop` decorator annotated class member
+ * @param diagnostics a collection of compiler diagnostics. During the parsing process, any errors detected must be
+ * added to this collection
+ * @param typeChecker a reference to the TypeScript type checker
+ * @param prop the TypeScript `PropertyDeclaration` to parse
+ * @param watchable a collection of class members that can be watched for changes using Stencil's `@Watch` decorator
+ * @returns a property assignment expression to be added to the Stencil component's class
+ */
 const parsePropDecorator = (
   diagnostics: d.Diagnostic[],
   typeChecker: ts.TypeChecker,
   prop: ts.PropertyDeclaration,
   watchable: Set<string>
-) => {
+): ts.PropertyAssignment => {
   const propDecorator = prop.decorators.find(isDecoratorNamed('Prop'));
   if (propDecorator == null) {
     return null;
   }
 
-  const decoratorParms = getDeclarationParameters<d.PropOptions>(propDecorator);
-  const propOptions: d.PropOptions = decoratorParms[0] || {};
+  const decoratorParams = getDeclarationParameters<d.PropOptions>(propDecorator);
+  const propOptions: d.PropOptions = decoratorParams[0] || {};
 
   const propName = prop.name.getText();
 
@@ -93,7 +113,13 @@ const parsePropDecorator = (
   return staticProp;
 };
 
-const getAttributeName = (propName: string, propOptions: d.PropOptions) => {
+/**
+ * Format the attribute name provided as an argument to `@Prop({attribute: ''}`
+ * @param propName the prop's name, used as a fallback value
+ * @param propOptions the options passed in to the `@Prop` call expression
+ * @returns the formatted attribute name
+ */
+const getAttributeName = (propName: string, propOptions: d.PropOptions): string | undefined => {
   if (propOptions.attribute === null) {
     return undefined;
   }
@@ -105,7 +131,15 @@ const getAttributeName = (propName: string, propOptions: d.PropOptions) => {
   return toDashCase(propName);
 };
 
-const getReflect = (diagnostics: d.Diagnostic[], propDecorator: ts.Decorator, propOptions: d.PropOptions) => {
+/**
+ * Determines if the 'reflect' property should be applied to the class member decorated with `@Prop`
+ * @param diagnostics a collection of compiler diagnostics. Any errors detected with setting 'reflect' must be added to
+ * this collection
+ * @param propDecorator the AST containing the Prop decorator
+ * @param propOptions the options passed in to the `@Prop` call expression
+ * @returns `true` if the prop should be reflected in the DOM, `false` otherwise
+ */
+const getReflect = (diagnostics: d.Diagnostic[], propDecorator: ts.Decorator, propOptions: d.PropOptions): boolean => {
   if (typeof propOptions.reflect === 'boolean') {
     return propOptions.reflect;
   }
@@ -132,7 +166,14 @@ const getComplexType = (
   };
 };
 
-export const propTypeFromTSType = (type: ts.Type) => {
+/**
+ * Derives a Stencil-permitted prop type from the TypeScript compiler's output. This function may narrow the type of a
+ * prop, as the types that can be returned from the TypeScript compiler may be more complex than what Stencil can/should
+ * handle for props.
+ * @param type the prop type to narrow
+ * @returns a valid Stencil prop type
+ */
+export const propTypeFromTSType = (type: ts.Type): 'any' | 'boolean' | 'number' | 'string' | 'unknown' => {
   const isAnyType = checkType(type, isAny);
 
   if (isAnyType) {
@@ -161,8 +202,18 @@ export const propTypeFromTSType = (type: ts.Type) => {
   return 'unknown';
 };
 
-const checkType = (type: ts.Type, check: (type: ts.Type) => boolean) => {
+/**
+ * Determines if a TypeScript compiler given `Type` is of a particular type according to the provided `check` parameter.
+ * Union types (e.g. `boolean | number | string`) will be evaluated one type at a time.
+ * @param type the TypeScript `Type` entity to evaluate
+ * @param check a function that takes a TypeScript `Type` as its only argument and returns `true` if the `Type` conforms
+ * to a particular type
+ * @returns the result of the `check` argument. The result of `check` is `true` for one or more types in a union type,
+ * return `true`.
+ */
+const checkType = (type: ts.Type, check: (type: ts.Type) => boolean): boolean => {
   if (type.flags & ts.TypeFlags.Union) {
+    // if the type is a union, check each type in the union
     const union = type as ts.UnionType;
     if (union.types.some((type) => checkType(type, check))) {
       return true;
@@ -171,28 +222,48 @@ const checkType = (type: ts.Type, check: (type: ts.Type) => boolean) => {
   return check(type);
 };
 
-const isBoolean = (t: ts.Type) => {
+/**
+ * Determine if a TypeScript compiler `Type` is a boolean
+ * @param t the `Type` to evaluate
+ * @returns `true` if the `Type` has any boolean-similar flags, `false` otherwise
+ */
+const isBoolean = (t: ts.Type): boolean => {
   if (t) {
-    return !!(t.flags & (ts.TypeFlags.Boolean | ts.TypeFlags.BooleanLike | ts.TypeFlags.BooleanLike));
+    return !!(t.flags & (ts.TypeFlags.Boolean | ts.TypeFlags.BooleanLike));
   }
   return false;
 };
 
-const isNumber = (t: ts.Type) => {
+/**
+ * Determine if a TypeScript compiler `Type` is a number
+ * @param t the `Type` to evaluate
+ * @returns `true` if the `Type` has any number-similar flags, `false` otherwise
+ */
+const isNumber = (t: ts.Type): boolean => {
   if (t) {
     return !!(t.flags & (ts.TypeFlags.Number | ts.TypeFlags.NumberLike | ts.TypeFlags.NumberLiteral));
   }
   return false;
 };
 
-const isString = (t: ts.Type) => {
+/**
+ * Determine if a TypeScript compiler `Type` is a string
+ * @param t the `Type` to evaluate
+ * @returns `true` if the `Type` has any string-similar flags, `false` otherwise
+ */
+const isString = (t: ts.Type): boolean => {
   if (t) {
     return !!(t.flags & (ts.TypeFlags.String | ts.TypeFlags.StringLike | ts.TypeFlags.StringLiteral));
   }
   return false;
 };
 
-const isAny = (t: ts.Type) => {
+/**
+ * Determine if a TypeScript compiler `Type` is of type any
+ * @param t the `Type` to evaluate
+ * @returns `true` if the `Type` has the `Any` flag set on it, `false` otherwise
+ */
+const isAny = (t: ts.Type): boolean => {
   if (t) {
     return !!(t.flags & ts.TypeFlags.Any);
   }

@@ -1,3 +1,4 @@
+import { BuildResultsComponentGraph } from '.';
 import type {
   BuildEvents,
   BuildLog,
@@ -22,6 +23,7 @@ import type {
   PrerenderConfig,
   StyleDoc,
   LoggerLineUpdater,
+  TaskCommand,
 } from './stencil-public-compiler';
 
 import type {
@@ -31,6 +33,16 @@ import type {
   VNode,
   VNodeData,
 } from './stencil-public-runtime';
+
+export interface SourceMap {
+  file: string;
+  mappings: string;
+  names: string[];
+  sourceRoot?: string;
+  sources: string[];
+  sourcesContent?: string[];
+  version: number;
+}
 
 export interface PrintLine {
   lineIndex: number;
@@ -196,13 +208,24 @@ export interface RollupResults {
   modules: RollupResultModule[];
 }
 
+export interface UpdatedLazyBuildCtx {
+  name: 'esm-browser' | 'esm' | 'cjs' | 'system';
+  buildCtx: BuildCtx;
+}
+
 export interface BuildCtx {
   buildId: number;
   buildResults: CompilerBuildResults;
+  buildStats?: CompilerBuildStats | { diagnostics: Diagnostic[] };
   buildMessages: string[];
   bundleBuildCount: number;
   collections: Collection[];
   compilerCtx: CompilerCtx;
+  esmBrowserComponentBundle: ReadonlyArray<BundleModule>;
+  esmComponentBundle: ReadonlyArray<BundleModule>;
+  es5ComponentBundle: ReadonlyArray<BundleModule>;
+  systemComponentBundle: ReadonlyArray<BundleModule>;
+  commonJsComponentBundle: ReadonlyArray<BundleModule>;
   components: ComponentCompilerMeta[];
   componentGraph: Map<string, string[]>;
   config: Config;
@@ -262,7 +285,8 @@ export type BuildTask = any;
 
 export type BuildStatus = 'pending' | 'error' | 'disabled' | 'default';
 
-export interface BuildStats {
+export interface CompilerBuildStats {
+  timestamp: string;
   compiler: {
     name: string;
     version: string;
@@ -273,23 +297,41 @@ export interface BuildStats {
     components: number;
     entries: number;
     bundles: number;
+    outputs: any;
   };
   options: {
     minifyJs: boolean;
     minifyCss: boolean;
     hashFileNames: boolean;
     hashedFileNameLength: number;
-    buildEs5: boolean;
+    buildEs5: boolean | 'prod';
+  };
+  formats: {
+    esmBrowser: ReadonlyArray<CompilerBuildStatBundle>;
+    esm: ReadonlyArray<CompilerBuildStatBundle>;
+    es5: ReadonlyArray<CompilerBuildStatBundle>;
+    system: ReadonlyArray<CompilerBuildStatBundle>;
+    commonjs: ReadonlyArray<CompilerBuildStatBundle>;
   };
   components: BuildComponent[];
-  entries: BuildEntry[];
+  entries: EntryModule[];
   rollupResults: RollupResults;
-  sourceGraph: BuildSourceGraph;
+  sourceGraph?: BuildSourceGraph;
+  componentGraph: BuildResultsComponentGraph;
   collections: {
     name: string;
     source: string;
     tags: string[];
   }[];
+}
+
+export interface CompilerBuildStatBundle {
+  key: string;
+  components: string[];
+  bundleId: string;
+  fileName: string;
+  imports: string[];
+  originalByteSize: number;
 }
 
 export interface BuildEntry {
@@ -346,6 +388,13 @@ export interface BundleEntryInputs {
   [entryKey: string]: string;
 }
 
+/**
+ * A note regarding Rollup types:
+ * As of this writing, there is no great way to import external types for packages that are directly embedded in the
+ * Stencil source. As a result, some types are duplicated here for Rollup that will be used within the codebase.
+ * Updates to rollup may require these typings to be updated.
+ */
+
 export type RollupResult = RollupChunkResult | RollupAssetResult;
 
 export interface RollupAssetResult {
@@ -366,7 +415,28 @@ export interface RollupChunkResult {
   isBrowserLoader: boolean;
   imports: string[];
   moduleFormat: ModuleFormat;
+  map?: RollupSourceMap;
 }
+
+export interface RollupSourceMap {
+  file: string;
+  mappings: string;
+  names: string[];
+  sources: string[];
+  sourcesContent: string[];
+  version: number;
+  toString(): string;
+  toUrl(): string;
+}
+
+/**
+ * Result of Stencil compressing, mangling, and otherwise 'minifying' JavaScript
+ */
+export type OptimizeJsResult = {
+  output: string;
+  diagnostics: Diagnostic[];
+  sourceMap?: SourceMap;
+};
 
 export interface BundleModule {
   entryKey: string;
@@ -715,6 +785,7 @@ export interface ComponentCompilerMeta extends ComponentCompilerFeatures {
   isCollectionDependency: boolean;
   docs: CompilerJsDoc;
   jsFilePath: string;
+  sourceMapPath: string;
   listeners: ComponentCompilerListener[];
   events: ComponentCompilerEvent[];
   methods: ComponentCompilerMethod[];
@@ -779,12 +850,30 @@ export interface ComponentCompilerPropertyComplexType {
   references: ComponentCompilerTypeReferences;
 }
 
-export interface ComponentCompilerTypeReferences {
-  [key: string]: ComponentCompilerTypeReference;
-}
+/**
+ * A record of `ComponentCompilerTypeReference` entities.
+ *
+ * Each key in this record is intended to be the names of the types used by a component. However, this is not enforced
+ * by the type system (I.E. any string can be used as a key).
+ *
+ * Note any key can be a user defined type or a TypeScript standard type.
+ */
+export type ComponentCompilerTypeReferences = Record<string, ComponentCompilerTypeReference>;
 
+/**
+ * Describes a reference to a type used by a component.
+ */
 export interface ComponentCompilerTypeReference {
+  /**
+   * A type may be defined:
+   * - locally (in the same file as the component that uses it)
+   * - globally
+   * - by importing it into a file (and is defined elsewhere)
+   */
   location: 'local' | 'global' | 'import';
+  /**
+   * The path to the type reference, if applicable (global types should not need a path associated with them)
+   */
   path?: string;
 }
 
@@ -1399,6 +1488,8 @@ export interface Module {
   sourceFilePath: string;
   staticSourceFile: any;
   staticSourceFileText: string;
+  sourceMapPath: string;
+  sourceMapFileText: string;
 
   // build features
   hasVdomAttribute: boolean;
@@ -1949,6 +2040,9 @@ export interface CssToEsmImportData {
   filePath: string;
 }
 
+/**
+ * Input CSS to be transformed into ESM
+ */
 export interface TransformCssToEsmInput {
   input: string;
   module?: 'cjs' | 'esm' | string;
@@ -2033,6 +2127,9 @@ export interface Url {
 
 declare global {
   namespace jest {
+    /* eslint-disable-next-line @typescript-eslint/no-unused-vars --
+     * these type params need to be here for compatibility with Jest, but we aren't using them for anything
+     */
     interface Matchers<R, T> {
       /**
        * Compares HTML, but first normalizes the HTML so all
@@ -2355,12 +2452,30 @@ export interface NewSpecPageOptions {
   strictBuild?: boolean;
 }
 
+/**
+ * A record of `TypesMemberNameData` entities.
+ *
+ * Each key in this record is intended to be the path to a file that declares one or more types used by a component.
+ * However, this is not enforced by the type system - users of this interface should not make any assumptions regarding
+ * the format of the path used as a key (relative vs. absolute)
+ */
 export interface TypesImportData {
   [key: string]: TypesMemberNameData[];
 }
 
+/**
+ * A type describing how Stencil may alias an imported type to avoid naming collisions when performing operations such
+ * as generating `components.d.ts` files.
+ */
 export interface TypesMemberNameData {
+  /**
+   * The name of the type as it's used within a file.
+   */
   localName: string;
+  /**
+   * An alias that Stencil may apply to the `localName` to avoid naming collisions. This name does not appear in the
+   * file that is using `localName`.
+   */
   importName?: string;
 }
 
@@ -2413,7 +2528,7 @@ export interface CompilerWorkerContext {
     minifyOpts: any,
     transpile: boolean,
     inlineHelpers: boolean
-  ): Promise<{ output: string; diagnostics: Diagnostic[] }>;
+  ): Promise<{ output: string; diagnostics: Diagnostic[]; sourceMap?: SourceMap }>;
   prerenderWorker(prerenderRequest: PrerenderUrlRequest): Promise<PrerenderUrlResults>;
   transformCssToEsm(input: TransformCssToEsmInput): Promise<TransformCssToEsmOutput>;
 }
@@ -2483,4 +2598,60 @@ export interface ValidateTypesResults {
   diagnostics: Diagnostic[];
   dirPaths: string[];
   filePaths: string[];
+}
+
+export interface TerminalInfo {
+  /**
+   * Whether this is in CI or not.
+   */
+  readonly ci: boolean;
+  /**
+   * Whether the terminal is an interactive TTY or not.
+   */
+  readonly tty: boolean;
+}
+
+/**
+ * The task to run in order to collect the duration data point.
+ */
+export type TelemetryCallback = (...args: any[]) => void | Promise<void>;
+
+/**
+ * The model for the data that's tracked.
+ */
+export interface TrackableData {
+  yarn: boolean;
+  component_count?: number;
+  arguments: string[];
+  targets: string[];
+  task: TaskCommand;
+  duration_ms: number;
+  packages: string[];
+  packages_no_versions?: string[];
+  os_name: string;
+  os_version: string;
+  cpu_model: string;
+  typescript: string;
+  rollup: string;
+  system: string;
+  system_major?: string;
+  build: string;
+  stencil: string;
+  has_app_pwa_config: boolean;
+  config: Config;
+}
+
+/**
+ * Used as the object sent to the server. Value is the data tracked.
+ */
+export interface Metric {
+  name: string;
+  timestamp: string;
+  source: 'stencil_cli';
+  value: TrackableData;
+  session_id: string;
+}
+export interface TelemetryConfig {
+  'telemetry.stencil'?: boolean;
+  'tokens.telemetry'?: string;
 }

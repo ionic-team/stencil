@@ -1,7 +1,7 @@
 import { MockDocument } from '../document';
 import { MockWindow, cloneWindow } from '../window';
 import { MockElement, MockHTMLElement } from '../node';
-import { MockSVGElement } from '../element';
+import { MockAnchorElement, MockMetaElement, MockSVGElement } from '../element';
 
 describe('element', () => {
   let doc: MockDocument;
@@ -164,7 +164,7 @@ describe('element', () => {
     doc.head.appendChild(metaElm);
     expect(metaElm).toEqualHtml(`<meta content="value" id="test">`);
 
-    const elm = doc.getElementById('test');
+    const elm = doc.getElementById('test') as MockMetaElement;
     expect(elm).toEqualHtml(`<meta content="value" id="test">`);
 
     elm['content'] = 'updated';
@@ -235,6 +235,39 @@ describe('element', () => {
       expect(win.document.baseURI).toBe('http://stenciljs.com/path/to/page');
       expect(win.document.URL).toBe('http://stenciljs.com/path/to/page');
       expect(win.document.location.href).toBe('http://stenciljs.com/path/to/page');
+    });
+  });
+
+  describe('contains', () => {
+    it('returns true when a node is an direct child of a given node', () => {
+      const root = document.createElement('div');
+      const span = document.createElement('span');
+
+      root.appendChild(span);
+
+      expect(root.contains(span)).toEqual(true);
+    });
+
+    it('returns true when a node is an indirect child of a given node', () => {
+      const root = document.createElement('div');
+      const span = document.createElement('span');
+      const h1 = document.createElement('h1');
+
+      root.appendChild(span);
+      span.appendChild(h1);
+
+      expect(root.contains(h1)).toEqual(true);
+    });
+
+    it('returns true when a node is the given node itself', () => {
+      const root = document.createElement('div');
+      expect(root.contains(root)).toEqual(true);
+    });
+
+    it('returns false when a node is not the given node itself or not a descendant of the given node ', () => {
+      const root = document.createElement('div');
+      const span = document.createElement('span');
+      expect(root.contains(span)).toEqual(false);
     });
   });
 
@@ -430,6 +463,20 @@ describe('element', () => {
       // unknown id
       input.setAttribute('list', 'unknown');
       expect(input.list).toEqual(null);
+    });
+  });
+
+  describe('link', () => {
+    it('href', () => {
+      const elm: MockAnchorElement = doc.createElement('a');
+      elm.href = 'http://stenciljs.com/path/to/page';
+      expect(elm.href).toBe('http://stenciljs.com/path/to/page');
+    });
+
+    it('pathname', () => {
+      const elm: MockAnchorElement = doc.createElement('a');
+      elm.href = 'http://stenciljs.com/path/to/page';
+      expect(elm.pathname).toBe('/path/to/page');
     });
   });
 });

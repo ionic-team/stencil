@@ -189,12 +189,24 @@ async function publishRelease(opts: BuildOptions, args: ReadonlyArray<string>): 
         return `Will publish ${opts.vermoji}  ${color.yellow(opts.version)}${tagPart}. Continue?`;
       },
     },
+    {
+      type: 'input',
+      name: 'otp',
+      message: 'Enter OTP:',
+      validate: (input: any) => {
+        if (input.length !== 6) {
+          return 'Please enter a valid one-time password.';
+        }
+        return true;
+      },
+    },
   ];
 
   await inquirer
     .prompt(prompts)
     .then((answers) => {
       if (answers.confirm) {
+        opts.otp = answers.otp;
         runReleaseTasks(opts, args);
       }
     })

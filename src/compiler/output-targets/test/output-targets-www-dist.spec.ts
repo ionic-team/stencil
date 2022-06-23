@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type * as d from '@stencil/core/declarations';
 import { doNotExpectFiles, expectFiles } from '../../../testing/testing-utils';
 import { Compiler, Config } from '@stencil/core/compiler';
@@ -63,6 +64,7 @@ xdescribe('outputTarget, www / dist / docs', () => {
     expectFiles(compiler.fs, [
       path.join(root, 'User', 'testing', 'custom-dist', 'cjs'),
       path.join(root, 'User', 'testing', 'custom-dist', 'esm', 'polyfills', 'index.js'),
+      path.join(root, 'User', 'testing', 'custom-dist', 'esm', 'polyfills', 'index.js.map'),
     ]);
 
     doNotExpectFiles(compiler.fs, [

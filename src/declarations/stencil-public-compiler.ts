@@ -47,7 +47,7 @@ export interface StencilConfig {
    * However, it's still common to have styles which should be "global" across all components and the website.
    * A global CSS file is often useful to set CSS Variables.
    *
-   * Additonally, the globalStyle config is can be used to precompile styles with Sass, PostCss, etc.
+   * Additionally, the globalStyle config can be used to precompile styles with Sass, PostCss, etc.
    * Below is an example folder structure containing a webapp's global sass file, named app.css.
    */
   globalStyle?: string;
@@ -93,6 +93,11 @@ export interface StencilConfig {
   plugins?: any[];
 
   /**
+   * Generate js source map files for all bundles
+   */
+  sourceMap?: boolean;
+
+  /**
    * The srcDir config specifies the directory which should contain the source typescript files
    * for each component. The standard for Stencil apps is to use src, which is the default.
    */
@@ -111,7 +116,7 @@ export interface StencilConfig {
   nodeResolve?: NodeResolveConfig;
 
   /**
-   * Passes custom configuration down to rollup itself, not all rollup options can be overriden.
+   * Passes custom configuration down to rollup itself, not all rollup options can be overridden.
    */
   rollupConfig?: RollupConfig;
 
@@ -161,7 +166,7 @@ export interface StencilConfig {
    * The hydrated flag identifies if a component and all of its child components
    * have finished hydrating. This helps prevent any flash of unstyled content (FOUC)
    * as various components are asynchronously downloaded and rendered. By default it
-   * will add the `hydrated` CSS class to the element. The `hydratedFlag` confg can be used
+   * will add the `hydrated` CSS class to the element. The `hydratedFlag` config can be used
    * to change the name of the CSS class, change it to an attribute, or change which
    * type of CSS properties and values are assigned before and after hydrating. This config
    * can also be used to not include the hydrated flag at all by setting it to `null`.
@@ -169,7 +174,7 @@ export interface StencilConfig {
   hydratedFlag?: HydratedFlag;
 
   /**
-   * Ionic perfers to hide all components prior to hydration with a style tag appended
+   * Ionic prefers to hide all components prior to hydration with a style tag appended
    * to the head of the document containing some `visibility: hidden;` css rules.
    *
    * Disabling this will remove the style tag that sets `visibility: hidden;` on all
@@ -196,11 +201,11 @@ export interface StencilConfig {
    * - `congestionAsync`: DOM reads and writes are scheduled in the next frame to prevent layout
    *   thrashing. When the app is heavily tasked and the queue becomes congested it will then
    *   split the work across multiple frames to prevent blocking the main thread. However, it can
-   *   also introduce unnecesary reflows in some cases, especially during startup. `congestionAsync`
-   *   is ideal for apps running animations while also simultaniously executing intesive tasks
+   *   also introduce unnecessary reflows in some cases, especially during startup. `congestionAsync`
+   *   is ideal for apps running animations while also simultaneously executing intensive tasks
    *   which may lock-up the main thread.
    *
-   * - `immediate`: Makes writeTask() and readTask() callbacks to be executed syncronously. Tasks
+   * - `immediate`: Makes writeTask() and readTask() callbacks to be executed synchronously. Tasks
    *   are not scheduled to run in the next frame, but do note there is at least one microtask.
    *   The `immediate` setting is ideal for apps that do not provide long running and smooth
    *   animations. Like the async setting, if the app has intensive tasks causing the main thread
@@ -246,7 +251,7 @@ export interface ConfigExtras {
    * By default, the slot polyfill does not update `appendChild()` so that it appends
    * new child nodes into the correct child slot like how shadow dom works. This is an opt-in
    * polyfill for those who need it when using `element.appendChild(node)` and expecting the
-   * child to be appended in the same location shadom dom would. This is not required for
+   * child to be appended in the same location shadow dom would. This is not required for
    * IE11 or Edge 18, but can be enabled if the app is using `appendChild()`. Defaults to `false`.
    */
   appendChildSlotFix?: boolean;
@@ -271,6 +276,14 @@ export interface ConfigExtras {
    * and below. Defaults to `false`.
    */
   dynamicImportShim?: boolean;
+
+  /**
+   * Experimental flag. Projects that use a Stencil library built using the `dist` output target may have trouble lazily
+   * loading components when using a bundler such as Vite or Parcel. Setting this flag to `true` will change how Stencil
+   * lazily loads components in a way that works with additional bundlers. Setting this flag to `true` will increase
+   * the size of the compiled output. Defaults to `false`.
+   */
+  experimentalImportInjection?: boolean;
 
   /**
    * Dispatches component lifecycle events. Mainly used for testing. Defaults to `false`.
@@ -340,13 +353,46 @@ export interface Config extends StencilConfig {
   logLevel?: LogLevel;
   rootDir?: string;
   packageJsonFilePath?: string;
-  sourceMap?: boolean;
   suppressLogs?: boolean;
   profile?: boolean;
   tsCompilerOptions?: any;
   _isValidated?: boolean;
   _isTesting?: boolean;
 }
+
+/**
+ * A 'loose' type useful for wrapping an incomplete / possible malformed
+ * object as we work on getting it comply with a particular Interface T.
+ *
+ * Example:
+ *
+ * ```ts
+ * interface Foo {
+ *   bar: string
+ * }
+ *
+ * function validateFoo(foo: Loose<Foo>): Foo {
+ *   let validatedFoo = {
+ *     ...foo,
+ *     bar: foo.bar || DEFAULT_BAR
+ *   }
+ *
+ *   return validatedFoo
+ * }
+ * ```
+ *
+ * Use this when you need to take user input or something from some other part
+ * of the world that we don't control and transform it into something
+ * conforming to a given interface. For best results, pair with a validation
+ * function as shown in the example.
+ */
+type Loose<T extends Object> = Record<string, any> & Partial<T>;
+
+/**
+ * A Loose version of the Config interface. This is intended to let us load a partial config
+ * and have type information carry though as we construct an object which is a valid `Config`.
+ */
+export type UnvalidatedConfig = Loose<Config>;
 
 export interface HydratedFlag {
   /**
@@ -464,7 +510,7 @@ export interface StencilDevServerConfig {
    */
   ssr?: boolean;
   /**
-   * If the dev server fails to start up within the given timout (in milliseconds), the startup will
+   * If the dev server fails to start up within the given timeout (in milliseconds), the startup will
    * be canceled. Set to zero to disable the timeout. Defaults to `15000`.
    */
   startupTimeout?: number;
@@ -522,10 +568,11 @@ export interface ConfigFlags {
   e2e?: boolean;
   emulate?: string;
   es5?: boolean;
+  esm?: boolean;
   headless?: boolean;
   help?: boolean;
   log?: boolean;
-  logLevel?: string;
+  logLevel?: LogLevel;
   verbose?: boolean;
   maxWorkers?: number;
   open?: boolean;
@@ -772,7 +819,7 @@ export interface SerializeDocumentOptions extends HydrateDocumentOptions {
    * Sets an approximate line width the HTML should attempt to stay within.
    * Note that this is "approximate", in that HTML may often not be able
    * to be split at an exact line width. Additionally, new lines created
-   * is where HTML naturally already has whitespce, such as before an
+   * is where HTML naturally already has whitespace, such as before an
    * attribute or spaces between words. Defaults to `100`.
    */
   approximateLineWidth?: number;
@@ -880,10 +927,10 @@ export interface SitemapXmpResults {
  * build all actions the in-memory fs performed will be written to disk using this system.
  * A NodeJS based system will use APIs such as `fs` and `crypto`, and a web-based system
  * will use in-memory Maps and browser APIs. Either way, the compiler itself is unaware
- * of the actual platform it's being ran ontop of.
+ * of the actual platform it's being ran on top of.
  */
 export interface CompilerSystem {
-  name: 'deno' | 'node' | 'in-memory';
+  name: 'node' | 'in-memory';
   version: string;
   events?: BuildEvents;
   details?: SystemDetails;
@@ -926,7 +973,7 @@ export interface CompilerSystem {
    */
   isTTY(): boolean;
   /**
-   * Each plaform as a different way to dynamically import modules.
+   * Each platform as a different way to dynamically import modules.
    */
   dynamicImport?(p: string): Promise<any>;
   /**
@@ -998,6 +1045,10 @@ export interface CompilerSystem {
    */
   normalizePath(p: string): string;
   onProcessInterrupt?(cb: () => void): void;
+  parseYarnLockFile?: (content: string) => {
+    type: 'success' | 'merge' | 'conflict';
+    object: any;
+  };
   platformPath: PlatformPath;
   /**
    * All return paths are full normalized paths, not just the basenames. Always returns an array, does not throw.
@@ -1668,7 +1719,7 @@ export interface TestingConfig extends JestConfig {
 
   /**
    * By default, all E2E pages wait until the "load" event, this global setting can be used
-   * to change the default `waitUntil` behaviour.
+   * to change the default `waitUntil` behavior.
    */
   browserWaitUntil?: 'load' | 'domcontentloaded' | 'networkidle0' | 'networkidle2';
 
@@ -1742,7 +1793,7 @@ export interface EmulateViewport {
   isLandscape?: boolean;
 }
 
-export type LogLevel = 'debug' | 'info' | 'warn' | 'error' | string;
+export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
 /**
  * Common logger to be used by the compiler, dev-server and CLI. The CLI will use a
@@ -1802,14 +1853,13 @@ export interface OutputTargetDist extends OutputTargetBase {
 
 export interface OutputTargetDistCollection extends OutputTargetBase {
   type: 'dist-collection';
-
+  empty?: boolean;
   dir: string;
   collectionDir: string;
 }
 
 export interface OutputTargetDistTypes extends OutputTargetBase {
   type: 'dist-types';
-
   dir: string;
   typesDir: string;
 }
@@ -1828,6 +1878,7 @@ export interface OutputTargetDistLazy extends OutputTargetBase {
   esmIndexFile?: string;
   cjsIndexFile?: string;
   systemLoaderFile?: string;
+  legacyLoaderFile?: string;
   empty?: boolean;
 }
 
@@ -1841,7 +1892,7 @@ export interface OutputTargetDistLazyLoader extends OutputTargetBase {
   dir: string;
 
   esmDir: string;
-  esmEs5Dir: string;
+  esmEs5Dir?: string;
   cjsDir: string;
   componentDts: string;
 
@@ -1868,9 +1919,23 @@ export interface OutputTargetCustom extends OutputTargetBase {
   copy?: CopyTask[];
 }
 
+/**
+ * Output target for generating [custom data](https://github.com/microsoft/vscode-custom-data) for VS Code as a JSON
+ * file.
+ */
 export interface OutputTargetDocsVscode extends OutputTargetBase {
+  /**
+   * Designates this output target to be used for generating VS Code custom data.
+   * @see OutputTargetBase#type
+   */
   type: 'docs-vscode';
+  /**
+   * The location on disk to write the JSON file.
+   */
   file: string;
+  /**
+   * A base URL to find the source code of the component(s) described in the JSON file.
+   */
   sourceCodeBaseUrl?: string;
 }
 
@@ -1916,6 +1981,16 @@ export interface OutputTargetDistCustomElements extends OutputTargetBaseNext {
   inlineDynamicImports?: boolean;
   includeGlobalScripts?: boolean;
   minify?: boolean;
+  /**
+   * Enables the auto-definition of a component and its children (recursively) in the custom elements registry. This
+   * functionality allows consumers to bypass the explicit call to define a component, its children, its children's
+   * children, etc. Users of this flag should be aware that enabling this functionality may increase bundle size.
+   */
+  autoDefineCustomElements?: boolean;
+  /**
+   * Enables the generation of type definition files for the output target.
+   */
+  generateTypeDeclarations?: boolean;
 }
 
 export interface OutputTargetDistCustomElementsBundle extends OutputTargetBaseNext {
@@ -1928,7 +2003,13 @@ export interface OutputTargetDistCustomElementsBundle extends OutputTargetBaseNe
   minify?: boolean;
 }
 
+/**
+ * The base type for output targets. All output targets should extend this base type.
+ */
 export interface OutputTargetBase {
+  /**
+   * A unique string to differentiate one output target from another
+   */
   type: string;
 }
 
@@ -2008,7 +2089,7 @@ export interface OutputTargetWww extends OutputTargetBase {
 
   /**
    * By default, stencil will include all the polyfills required by legacy browsers in the ES5 build.
-   * If it's `false`, stencil will not emit this polyfills anymore and it's your responsability to provide them before
+   * If it's `false`, stencil will not emit this polyfills anymore and it's your responsibility to provide them before
    * stencil initializes.
    */
   polyfills?: boolean;
@@ -2086,7 +2167,7 @@ export interface LoadConfigInit {
    * User config object to merge into default config and
    * config loaded from a file path.
    */
-  config?: Config;
+  config?: UnvalidatedConfig;
   /**
    * Absolute path to a Stencil config file. This path cannot be
    * relative and it does not resolve config files within a directory.
@@ -2102,8 +2183,13 @@ export interface LoadConfigInit {
   initTsConfig?: boolean;
 }
 
+/**
+ * Results from an attempt to load a config. The values on this interface
+ * have not yet been validated and are not ready to be used for arbitrary
+ * operations around the codebase.
+ */
 export interface LoadConfigResults {
-  config: Config;
+  config: UnvalidatedConfig;
   diagnostics: Diagnostic[];
   tsconfig: {
     path: string;

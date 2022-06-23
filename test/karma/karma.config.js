@@ -1,19 +1,23 @@
+const path = require('path');
+
+const { WWW_OUT_DIR } = require('./constants');
+
 const browserStack = !!process.env.CI;
 process.env.CHROME_BIN = require('puppeteer').executablePath();
 
-var browserStackLaunchers = {
+const browserStackLaunchers = {
   bs_chrome: {
     base: 'BrowserStack',
     browser: 'chrome',
     os: 'Windows',
     os_version: '10',
   },
-  // bs_firefox: {
-  //   base: 'BrowserStack',
-  //   browser: 'firefox',
-  //   os: 'Windows',
-  //   os_version: '10',
-  // },
+  bs_firefox: {
+    base: 'BrowserStack',
+    browser: 'firefox',
+    os: 'Windows',
+    os_version: '10',
+  },
   bs_edge: {
     base: 'BrowserStack',
     browser: 'edge',
@@ -66,6 +70,7 @@ module.exports = function (config) {
     plugins: [
       'karma-chrome-launcher',
       'karma-browserstack-launcher',
+      'karma-firefox-launcher',
       'karma-ie-launcher',
       'karma-edge-launcher',
       'karma-jasmine',
@@ -94,16 +99,21 @@ module.exports = function (config) {
     urlRoot: '/__karma__/',
     files: [
       // 'test-app/prerender-test/karma.spec.ts',
-      'test-app/**/*.spec.ts',
-      'test-app/util.ts',
-      'test-app/assets/angular.min.js',
-      { pattern: 'www/**/*', watched: false, included: false, served: true, nocache: true, type: 'module' },
+      'test-app/**/*.spec.ts', // tells karma these are tests we need to serve & run
+      'test-app/util.ts', // used by 'www' output target tests to load components
+      'test-app/assets/angular.min.js', // used by a 'www' output target test
+      {
+        pattern: path.join(WWW_OUT_DIR, '/**/*'),
+        watched: false,
+        included: false,
+        served: true,
+        nocache: true,
+        type: 'module',
+      },
     ],
 
     proxies: {
-      '/': '/base/www/',
-      // '/build/testsibling.js': '/base/www/noscript.js',
-      // '/esm-webpack/main.js': '/base/www/noscript.js',
+      '/': `/base/${WWW_OUT_DIR}/`,
     },
 
     colors: true,

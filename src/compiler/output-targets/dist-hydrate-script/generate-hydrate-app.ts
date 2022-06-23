@@ -1,6 +1,6 @@
 import type * as d from '../../../declarations';
 import { bundleHydrateFactory } from './bundle-hydrate-factory';
-import { catchError, createOnWarnFn, loadRollupDiagnostics } from '@utils';
+import { catchError, createOnWarnFn, generatePreamble, loadRollupDiagnostics } from '@utils';
 import { getBuildFeatures, updateBuildConditionals } from '../../app-core/app-data';
 import { HYDRATE_FACTORY_INTRO, HYDRATE_FACTORY_OUTRO } from './hydrate-factory-closure';
 import { updateToHydrateComponents } from './update-to-hydrate-components';
@@ -57,13 +57,16 @@ export const generateHydrateApp = async (
 
     const rollupAppBuild = await rollup(rollupOptions);
     const rollupOutput = await rollupAppBuild.generate({
+      banner: generatePreamble(config),
       format: 'cjs',
       file: 'index.js',
     });
 
     await writeHydrateOutputs(config, compilerCtx, buildCtx, outputTargets, rollupOutput);
-  } catch (e) {
+  } catch (e: any) {
     if (!buildCtx.hasError) {
+      // TODO(STENCIL-353): Implement a type guard that balances using our own copy of Rollup types (which are
+      // breakable) and type safety (so that the error variable may be something other than `any`)
       loadRollupDiagnostics(config, compilerCtx, buildCtx, e);
     }
   }
@@ -92,7 +95,7 @@ const generateHydrateFactory = async (config: d.Config, compilerCtx: d.CompilerC
           return rollupOutput.output[0].code;
         }
       }
-    } catch (e) {
+    } catch (e: any) {
       catchError(buildCtx.diagnostics, e);
     }
   }

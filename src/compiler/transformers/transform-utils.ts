@@ -8,7 +8,12 @@ export const getScriptTarget = () => {
   return ts.ScriptTarget.ES2017;
 };
 
-export const isMemberPrivate = (member: ts.ClassElement) => {
+/**
+ * Determine if a class member is private or not
+ * @param member the class member to evaluate
+ * @returns `true` if the member has the `private` or `protected` modifier attached to it. `false` otherwise
+ */
+export const isMemberPrivate = (member: ts.ClassElement): boolean => {
   if (
     member.modifiers &&
     member.modifiers.some((m) => m.kind === ts.SyntaxKind.PrivateKeyword || m.kind === ts.SyntaxKind.ProtectedKeyword)
@@ -297,33 +302,60 @@ export class ObjectMap {
   [key: string]: ts.Expression | ObjectMap;
 }
 
-export const getAttributeTypeInfo = (baseNode: ts.Node, sourceFile: ts.SourceFile) => {
+/**
+ * Generate a series of type references for a given AST node
+ * @param baseNode the AST node to pull type references from
+ * @param sourceFile the source file in which the provided `baseNode` exists
+ * @returns the generated series of type references
+ */
+export const getAttributeTypeInfo = (
+  baseNode: ts.Node,
+  sourceFile: ts.SourceFile
+): d.ComponentCompilerTypeReferences => {
   const allReferences: d.ComponentCompilerTypeReferences = {};
-  getAllTypeReferences(baseNode).forEach((rt) => {
-    allReferences[rt] = getTypeReferenceLocation(rt, sourceFile);
+  getAllTypeReferences(baseNode).forEach((typeName: string) => {
+    allReferences[typeName] = getTypeReferenceLocation(typeName, sourceFile);
   });
   return allReferences;
 };
 
+/**
+ * Get the text-based name from a TypeScript `EntityName`, which is an identifier of some form
+ * @param entity a TypeScript `EntityName` to retrieve the name of an entity from
+ * @returns the entity's name
+ */
 const getEntityName = (entity: ts.EntityName): string => {
   if (ts.isIdentifier(entity)) {
     return entity.escapedText.toString();
   } else {
+    // We have qualified name - e.g. const x: Foo.Bar.Baz;
+    // Recurse until we find the 'base' of the qualified name
     return getEntityName(entity.left);
   }
 };
 
-const getAllTypeReferences = (node: ts.Node) => {
+/**
+ * Recursively walks the provided AST to collect all TypeScript type references that are found
+ * @param node the node to walk to retrieve type information
+ * @returns the collected type references
+ */
+const getAllTypeReferences = (node: ts.Node): ReadonlyArray<string> => {
   const referencedTypes: string[] = [];
 
   const visit = (node: ts.Node): ts.VisitResult<ts.Node> => {
+    /**
+     * A type reference node will refer to some type T.
+     * e.g: In `const foo: Bar = {...}` the reference node will contain semantic information about `Bar`.
+     * In TypeScript, types that are also keywords (e.g. `number` in `const foo: number`) are not `TypeReferenceNode`s.
+     */
     if (ts.isTypeReferenceNode(node)) {
       referencedTypes.push(getEntityName(node.typeName));
       if (node.typeArguments) {
+        // a type may contain types itself (e.g. generics - Foo<Bar>)
         node.typeArguments
-          .filter((ta) => ts.isTypeReferenceNode(ta))
-          .forEach((tr: ts.TypeReferenceNode) => {
-            const typeName = tr.typeName as ts.Identifier;
+          .filter((typeArg: ts.TypeNode) => ts.isTypeReferenceNode(typeArg))
+          .forEach((typeRef: ts.TypeReferenceNode) => {
+            const typeName = typeRef.typeName as ts.Identifier;
             if (typeName && typeName.escapedText) {
               referencedTypes.push(typeName.escapedText.toString());
             }
@@ -352,6 +384,22 @@ export const validateReferences = (
   });
 };
 
+/**
+ * Determine where a TypeScript type reference originates from. This is accomplished by interrogating the AST node in
+ * which the type's name appears
+ *
+ * A type may originate:
+ * - from the same file where it is used (a type is declared in some file, `foo.ts`, and later used in the same file)
+ * - from another file (I.E. it is imported and should have an import statement somewhere in the file)
+ * - from a global context
+ * - etc.
+ *
+ * The type may be declared using the `type` or `interface` keywords.
+ *
+ * @param typeName the name of the type to find the origination of
+ * @param tsNode the TypeScript AST node being searched for the provided `typeName`
+ * @returns the context stating where the type originates from
+ */
 const getTypeReferenceLocation = (typeName: string, tsNode: ts.Node): d.ComponentCompilerTypeReference => {
   const sourceFileObj = tsNode.getSourceFile();
 
@@ -427,6 +475,7 @@ export const resolveType = (checker: ts.TypeChecker, type: ts.Type) => {
   }
 
   let parts = Array.from(set.keys()).sort();
+  // TODO(STENCIL-366): Get this section of code under tests that directly exercises this behavior
   if (parts.length > 1) {
     parts = parts.map((p) => (p.indexOf('=>') >= 0 ? `(${p})` : p));
   }
@@ -437,14 +486,20 @@ export const resolveType = (checker: ts.TypeChecker, type: ts.Type) => {
   }
 };
 
-export const typeToString = (checker: ts.TypeChecker, type: ts.Type) => {
+/**
+ * Formats a TypeScript `Type` entity as a string
+ * @param checker a reference to the TypeScript type checker
+ * @param type a TypeScript `Type` entity to format
+ * @returns the formatted string
+ */
+export const typeToString = (checker: ts.TypeChecker, type: ts.Type): string => {
   const TYPE_FORMAT_FLAGS =
     ts.TypeFormatFlags.NoTruncation | ts.TypeFormatFlags.InTypeAlias | ts.TypeFormatFlags.InElementType;
 
   return checker.typeToString(type, undefined, TYPE_FORMAT_FLAGS);
 };
 
-export const parseDocsType = (checker: ts.TypeChecker, type: ts.Type, parts: Set<string>) => {
+export const parseDocsType = (checker: ts.TypeChecker, type: ts.Type, parts: Set<string>): void => {
   if (type.isUnion()) {
     (type as ts.UnionType).types.forEach((t) => {
       parseDocsType(checker, t, parts);
@@ -507,6 +562,13 @@ export const isStaticGetter = (member: ts.ClassElement) => {
   );
 };
 
+/**
+ * Create a serialized representation of a TypeScript `Symbol` entity to expose the Symbol's text and attached JSDoc.
+ * Note that the `Symbol` being serialized is not the same as the JavaScript primitive 'symbol'.
+ * @param checker a reference to the TypeScript type checker
+ * @param symbol the `Symbol` to serialize
+ * @returns the serialized `Symbol` data
+ */
 export const serializeSymbol = (checker: ts.TypeChecker, symbol: ts.Symbol): d.CompilerJsDoc => {
   if (!checker || !symbol) {
     return {
@@ -515,13 +577,26 @@ export const serializeSymbol = (checker: ts.TypeChecker, symbol: ts.Symbol): d.C
     };
   }
   return {
-    tags: symbol.getJsDocTags().map((tag) => ({ text: tag.text, name: tag.name })),
+    tags: mapJSDocTagInfo(symbol.getJsDocTags()),
     text: ts.displayPartsToString(symbol.getDocumentationComment(checker)),
   };
 };
 
+/**
+ * Maps a TypeScript 4.3+ JSDocTagInfo to a flattened Stencil CompilerJsDocTagInfo.
+ * @param tags A readonly array of JSDocTagInfo objects.
+ * @returns An array of CompilerJsDocTagInfo objects.
+ */
+export const mapJSDocTagInfo = (tags: readonly ts.JSDocTagInfo[]): d.CompilerJsDocTagInfo[] => {
+  // The text following a tag is split semantically by TS 4.3+, e.g. '@param foo the first parameter' ->
+  // [{text: 'foo', kind: 'parameterName'}, {text: ' ', kind: 'space'}, {text: 'the first parameter', kind: 'text'}], so
+  // we join the elements to reconstruct the text.
+  return tags.map((tag) => ({ ...tag, text: tag.text?.map((part) => part.text).join('') }));
+};
+
 export const serializeDocsSymbol = (checker: ts.TypeChecker, symbol: ts.Symbol) => {
   const type = checker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration);
+  // TODO(STENCIL-365): Replace this with `return resolveType()`;
   const set = new Set<string>();
   parseDocsType(checker, type, set);
 
@@ -567,6 +642,70 @@ export const isAsyncFn = (typeChecker: ts.TypeChecker, methodDeclaration: ts.Met
   );
 
   return typeStr.includes('Promise<');
+};
+
+export const createImportStatement = (importFnNames: string[], importPath: string) => {
+  // ESM Imports
+  // import { importNames } from 'importPath';
+
+  const importSpecifiers = importFnNames.map((importKey) => {
+    const splt = importKey.split(' as ');
+    let importAs = importKey;
+    let importFnName = importKey;
+
+    if (splt.length > 1) {
+      importAs = splt[1];
+      importFnName = splt[0];
+    }
+
+    return ts.factory.createImportSpecifier(
+      false,
+      typeof importFnName === 'string' && importFnName !== importAs
+        ? ts.factory.createIdentifier(importFnName)
+        : undefined,
+      ts.factory.createIdentifier(importAs)
+    );
+  });
+
+  return ts.createImportDeclaration(
+    undefined,
+    undefined,
+    ts.createImportClause(undefined, ts.createNamedImports(importSpecifiers)),
+    ts.createLiteral(importPath)
+  );
+};
+
+export const createRequireStatement = (importFnNames: string[], importPath: string) => {
+  // CommonJS require()
+  // const { a, b, c } = require(importPath);
+
+  const importBinding = ts.createObjectBindingPattern(
+    importFnNames.map((importKey) => {
+      const splt = importKey.split(' as ');
+      let importAs = importKey;
+      let importFnName = importKey;
+
+      if (splt.length > 1) {
+        importAs = splt[1];
+        importFnName = splt[0];
+      }
+      return ts.createBindingElement(undefined, importFnName, importAs);
+    })
+  );
+
+  return ts.createVariableStatement(
+    undefined,
+    ts.createVariableDeclarationList(
+      [
+        ts.createVariableDeclaration(
+          importBinding,
+          undefined,
+          ts.createCall(ts.createIdentifier('require'), [], [ts.createLiteral(importPath)])
+        ),
+      ],
+      ts.NodeFlags.Const
+    )
+  );
 };
 
 export interface ConvertIdentifier {

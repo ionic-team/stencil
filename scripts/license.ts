@@ -10,6 +10,7 @@ const entryDeps = [
   '@rollup/plugin-commonjs',
   '@rollup/plugin-json',
   '@rollup/plugin-node-resolve',
+  '@yarnpkg/lockfile',
   'ansi-colors',
   'autoprefixer',
   'css',
@@ -18,6 +19,7 @@ const entryDeps = [
   'graceful-fs',
   'fast-deep-equal',
   'is-extglob',
+  'merge-source-map',
   'minimatch',
   'node-fetch',
   'open',
@@ -27,7 +29,7 @@ const entryDeps = [
   'postcss',
   'prompts',
   'rollup',
-  'semiver',
+  'semver',
   'sizzle',
   'source-map',
   'terser',
@@ -114,6 +116,7 @@ ${bundledDeps.map((l) => l.content).join('\n')}
 
 /**
  * Generate license metadata for a series of dependencies
+ * @param opts metadata used during the generation of a license
  * @param bundledDeps the current list of dependencies to bundle
  * @param deps the dependencies to generate metadata for
  */

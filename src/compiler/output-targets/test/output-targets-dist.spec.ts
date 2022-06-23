@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { doNotExpectFiles, expectFiles } from '../../../testing/testing-utils';
 import { Compiler, Config } from '@stencil/core/compiler';
 import { mockConfig } from '@stencil/core/testing';
@@ -55,18 +56,24 @@ xdescribe('outputTarget, dist', () => {
     expectFiles(compiler.fs, [
       path.join(root, 'User', 'testing', 'dist', 'index.js'),
       path.join(root, 'User', 'testing', 'dist', 'index.mjs'),
+      path.join(root, 'User', 'testing', 'dist', 'index.js.map'),
 
       path.join(root, 'User', 'testing', 'dist', 'collection', 'collection-manifest.json'),
       path.join(root, 'User', 'testing', 'dist', 'collection', 'components', 'cmp-a.js'),
+      path.join(root, 'User', 'testing', 'dist', 'collection', 'components', 'cmp-a.js.map'),
       path.join(root, 'User', 'testing', 'dist', 'collection', 'components', 'cmp-a.ios.css'),
       path.join(root, 'User', 'testing', 'dist', 'collection', 'components', 'cmp-a.md.css'),
       path.join(root, 'User', 'testing', 'dist', 'collection', 'global.js'),
+      path.join(root, 'User', 'testing', 'dist', 'collection', 'global.js.map'),
 
       path.join(root, 'User', 'testing', 'dist', 'esm', 'index.mjs'),
+      path.join(root, 'User', 'testing', 'dist', 'esm', 'index.js.map'),
       path.join(root, 'User', 'testing', 'dist', 'esm', 'loader.mjs'),
       path.join(root, 'User', 'testing', 'dist', 'esm-es5', 'index.mjs'),
+      path.join(root, 'User', 'testing', 'dist', 'esm-es5', 'index.js.map'),
       path.join(root, 'User', 'testing', 'dist', 'esm-es5', 'loader.mjs'),
       path.join(root, 'User', 'testing', 'dist', 'esm', 'polyfills', 'index.js'),
+      path.join(root, 'User', 'testing', 'dist', 'esm', 'polyfills', 'index.js.map'),
 
       path.join(root, 'User', 'testing', 'dist', 'loader'),
 

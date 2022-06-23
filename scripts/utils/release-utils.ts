@@ -91,7 +91,7 @@ export function prettyVersionDiff(oldVersion: string, inc: any): string {
 }
 
 /**
- * Write CHANGELOG.md to disk. Stencil uses the Angular-variant of convential commits; commits must be formatted
+ * Write CHANGELOG.md to disk. Stencil uses the Angular-variant of conventional commits; commits must be formatted
  * accordingly in order to be added to the changelog properly.
  * @param opts build options to be used to update the changelog
  */
@@ -116,16 +116,31 @@ export async function postGithubRelease(opts: BuildOptions): Promise<void> {
 
   let body = '';
   for (let i = 1; i < 500; i++) {
-    if (lines[i].startsWith('## ')) {
+    const currentLine = lines[i];
+
+    if (currentLine == undefined) {
+      // we don't test this as `!currentLine`, as an empty string is permitted in the changelog
       break;
     }
-    body += lines[i] + '\n';
+
+    const isMajorOrMinorVersionHeader = currentLine.startsWith('# ');
+    const isPatchVersionHeader = currentLine.startsWith('## ');
+    if (isMajorOrMinorVersionHeader || isPatchVersionHeader) {
+      break;
+    }
+    body += currentLine + '\n';
   }
 
   // https://docs.github.com/en/github/administering-a-repository/automation-for-release-forms-with-query-parameters
   const url = new URL(`https://github.com/${opts.ghRepoOrg}/${opts.ghRepoName}/releases/new`);
   url.searchParams.set('tag', versionTag);
-  url.searchParams.set('title', title);
+
+  const timestamp = new Date().toISOString().substring(0, 10);
+
+  // this will be automatically encoded for us, no need to call `encodeURIComponent` here. doing so will result in a
+  // double encoding, which does not render properly in GitHub
+  url.searchParams.set('title', `${title} (${timestamp})`);
+
   url.searchParams.set('body', body.trim());
   if (opts.tag === 'next' || opts.tag === 'test') {
     url.searchParams.set('prerelease', '1');

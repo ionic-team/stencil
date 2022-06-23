@@ -1,7 +1,17 @@
 import type * as d from '../declarations';
 import { isString } from './helpers';
 
-export const buildError = (diagnostics?: d.Diagnostic[]) => {
+/**
+ * Builds a template `Diagnostic` entity for a build error. The created `Diagnostic` is returned, and have little
+ * detail attached to it regarding the specifics of the error - it is the responsibility of the caller of this method
+ * to attach the specifics of the error message.
+ *
+ * The created `Diagnostic` is pushed to the `diagnostics` argument as a side effect of calling this method.
+ *
+ * @param diagnostics the existing diagnostics that the created template `Diagnostic` should be added to
+ * @returns the created `Diagnostic`
+ */
+export const buildError = (diagnostics?: d.Diagnostic[]): d.Diagnostic => {
   const diagnostic: d.Diagnostic = {
     level: 'error',
     type: 'build',
@@ -19,7 +29,17 @@ export const buildError = (diagnostics?: d.Diagnostic[]) => {
   return diagnostic;
 };
 
-export const buildWarn = (diagnostics: d.Diagnostic[]) => {
+/**
+ * Builds a template `Diagnostic` entity for a build warning. The created `Diagnostic` is returned, and have little
+ * detail attached to it regarding the specifics of the warning - it is the responsibility of the caller of this method
+ * to attach the specifics of the warning message.
+ *
+ * The created `Diagnostic` is pushed to the `diagnostics` argument as a side effect of calling this method.
+ *
+ * @param diagnostics the existing diagnostics that the created template `Diagnostic` should be added to
+ * @returns the created `Diagnostic`
+ */
+export const buildWarn = (diagnostics: d.Diagnostic[]): d.Diagnostic => {
   const diagnostic: d.Diagnostic = {
     level: 'warn',
     type: 'build',
@@ -98,7 +118,14 @@ export const buildJsonFileError = (
   return err;
 };
 
-export const catchError = (diagnostics: d.Diagnostic[], err: Error, msg?: string) => {
+/**
+ * Builds a diagnostic from an `Error`, appends it to the `diagnostics` parameter, and returns the created diagnostic
+ * @param diagnostics the series of diagnostics the newly created diagnostics should be added to
+ * @param err the error to derive information from in generating the diagnostic
+ * @param msg an optional message to use in place of `err` to generate the diagnostic
+ * @returns the generated diagnostic
+ */
+export const catchError = (diagnostics: d.Diagnostic[], err: Error | null | undefined, msg?: string): d.Diagnostic => {
   const diagnostic: d.Diagnostic = {
     level: 'error',
     type: 'build',
@@ -110,13 +137,13 @@ export const catchError = (diagnostics: d.Diagnostic[], err: Error, msg?: string
   };
 
   if (isString(msg)) {
-    diagnostic.messageText = msg;
+    diagnostic.messageText = msg.length ? msg : 'UNKNOWN ERROR';
   } else if (err != null) {
     if (err.stack != null) {
       diagnostic.messageText = err.stack.toString();
     } else {
       if (err.message != null) {
-        diagnostic.messageText = err.message.toString();
+        diagnostic.messageText = err.message.length ? err.message : 'UNKNOWN ERROR';
       } else {
         diagnostic.messageText = err.toString();
       }
@@ -130,6 +157,12 @@ export const catchError = (diagnostics: d.Diagnostic[], err: Error, msg?: string
   return diagnostic;
 };
 
+/**
+ * Determine if the provided diagnostics have any build errors
+ * @param diagnostics the diagnostics to inspect
+ * @returns true if any of the diagnostics in the list provided are errors that did not occur at runtime. false
+ * otherwise.
+ */
 export const hasError = (diagnostics: d.Diagnostic[]): boolean => {
   if (diagnostics == null || diagnostics.length === 0) {
     return false;
@@ -137,6 +170,11 @@ export const hasError = (diagnostics: d.Diagnostic[]): boolean => {
   return diagnostics.some((d) => d.level === 'error' && d.type !== 'runtime');
 };
 
+/**
+ * Determine if the provided diagnostics have any warnings
+ * @param diagnostics the diagnostics to inspect
+ * @returns true if any of the diagnostics in the list provided are warnings. false otherwise.
+ */
 export const hasWarning = (diagnostics: d.Diagnostic[]): boolean => {
   if (diagnostics == null || diagnostics.length === 0) {
     return false;

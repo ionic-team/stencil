@@ -14,9 +14,13 @@
     "outDir": "build/",
     "pretty": true,
     "target": "es2017",
-    "incremental": true
+    "incremental": false,
+    "useUnknownInCatchVariables": true
   },
   "include": [
     "**/*.ts"
+  ],
+  "exclude": [
+    "**/*.spec.ts",
   ]
 }

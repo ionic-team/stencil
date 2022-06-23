@@ -16,7 +16,10 @@ export const setValue = (ref: d.RuntimeRef, propName: string, newVal: any, cmpMe
   const instance = BUILD.lazyLoad ? hostRef.$lazyInstance$ : (elm as any);
   newVal = parsePropertyValue(newVal, cmpMeta.$members$[propName][0]);
 
-  if ((!BUILD.lazyLoad || !(flags & HOST_FLAGS.isConstructingInstance) || oldVal === undefined) && newVal !== oldVal) {
+  // explicitly check for NaN on both sides, as `NaN === NaN` is always false
+  const areBothNaN = Number.isNaN(oldVal) && Number.isNaN(newVal);
+  const didValueChange = newVal !== oldVal && !areBothNaN;
+  if ((!BUILD.lazyLoad || !(flags & HOST_FLAGS.isConstructingInstance) || oldVal === undefined) && didValueChange) {
     // gadzooks! the property's value has changed!!
     // set our new value!
     hostRef.$instanceValues$.set(propName, newVal);
