@@ -1,13 +1,14 @@
 import * as d from '@stencil/core/declarations';
 import { createTestingSystem } from '../testing-sys';
 import { createInMemoryFs } from '../../compiler/sys/in-memory-fs';
-import { expectFiles } from '../testing-utils';
+import { doNotExpectFiles, expectFiles } from '../testing-utils';
 import path from 'path';
 
 describe('testing-utils', () => {
+  const MOCK_FILE_PATH = path.join('mock', 'file', 'path', 'to', 'file.ts');
+  const MOCK_FILE_CONTENTS = "console.log('hello world!');";
+
   describe('expectFiles', () => {
-    const MOCK_FILE_PATH = path.join('mock', 'file', 'path', 'to', 'file.ts');
-    const MOCK_FILE_CONTENTS = "console.log('hello world!');";
     let fs: d.InMemoryFileSystem;
 
     beforeEach(() => {
@@ -51,6 +52,50 @@ describe('testing-utils', () => {
 -${anotherFilePath}`;
 
       expect(() => expectFiles(fs, [MOCK_FILE_PATH, anotherFilePath])).toThrow(expectedErrorMessage);
+    });
+  });
+
+  describe('doNotExpectFiles', () => {
+    let fs: d.InMemoryFileSystem;
+
+    beforeEach(() => {
+      const sys = createTestingSystem();
+      fs = createInMemoryFs(sys);
+    });
+
+    it('does not throw when no file paths are provided', async () => {
+      await fs.writeFile(MOCK_FILE_PATH, MOCK_FILE_CONTENTS);
+
+      expect(() => doNotExpectFiles(fs, [])).not.toThrow();
+    });
+
+    it('does not throw when a provided file path is not found on the file system', () => {
+      expect(() => doNotExpectFiles(fs, [MOCK_FILE_PATH])).not.toThrow();
+    });
+
+    it('does not throw when the provided file paths are not found on the file system', () => {
+      expect(() => doNotExpectFiles(fs, [MOCK_FILE_PATH, 'mock/file/path/to/nowhere.ts'])).not.toThrow();
+    });
+
+    it('throws an error when a file is found on the file system', async () => {
+      await fs.writeFile(MOCK_FILE_PATH, MOCK_FILE_CONTENTS);
+
+      const expectedErrorMessage = `The following files were expected to not exist, but do:
+-${MOCK_FILE_PATH}`;
+
+      expect(() => doNotExpectFiles(fs, [MOCK_FILE_PATH])).toThrow(expectedErrorMessage);
+    });
+
+    it('throws an error when multiple files are found on the file system', async () => {
+      await fs.writeFile(MOCK_FILE_PATH, MOCK_FILE_CONTENTS);
+      const anotherFilePath = path.join('another', 'mock', 'file', 'path', 'to', 'some-file.ts');
+      await fs.writeFile(anotherFilePath, MOCK_FILE_CONTENTS);
+
+      const expectedErrorMessage = `The following files were expected to not exist, but do:
+-${MOCK_FILE_PATH}
+-${anotherFilePath}`;
+
+      expect(() => doNotExpectFiles(fs, [MOCK_FILE_PATH, anotherFilePath])).toThrow(expectedErrorMessage);
     });
   });
 });
