@@ -8,7 +8,7 @@ export const validateCustomOutput = (config: d.Config, diagnostics: d.Diagnostic
       const localDiagnostics: d.Diagnostic[] = [];
       try {
         o.validate(config, diagnostics);
-      } catch (e) {
+      } catch (e: any) {
         catchError(localDiagnostics, e);
       }
       if (o.copy && o.copy.length > 0) {

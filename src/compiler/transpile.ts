@@ -23,7 +23,7 @@ export const transpile = async (code: string, opts: TranspileOptions = {}) => {
     } else if (results.inputFileExtension === 'json') {
       transpileJson(results);
     }
-  } catch (e) {
+  } catch (e: any) {
     catchError(results.diagnostics, e);
   }
 
@@ -46,7 +46,7 @@ export const transpileSync = (code: string, opts: TranspileOptions = {}) => {
     } else if (results.inputFileExtension === 'json') {
       transpileJson(results);
     }
-  } catch (e) {
+  } catch (e: any) {
     catchError(results.diagnostics, e);
   }
 

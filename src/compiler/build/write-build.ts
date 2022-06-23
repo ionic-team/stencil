@@ -26,7 +26,7 @@ export const writeBuild = async (config: d.Config, compilerCtx: d.CompilerCtx, b
     // buildCtx.debug(`cache: ${compilerCtx.cache.getMemoryStats()}`);
 
     await outputServiceWorkers(config, buildCtx), await validateBuildFiles(config, compilerCtx, buildCtx);
-  } catch (e) {
+  } catch (e: any) {
     catchError(buildCtx.diagnostics, e);
   }
 

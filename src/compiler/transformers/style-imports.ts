@@ -70,12 +70,13 @@ const updateEsmStyleImportPath = (
         const orgImportPath = n.moduleSpecifier.text;
         const importPath = getStyleImportPath(transformOpts, tsSourceFile, cmp, style, orgImportPath);
 
-        statements[i] = ts.updateImportDeclaration(
+        statements[i] = ts.factory.updateImportDeclaration(
           n,
           n.decorators,
           n.modifiers,
           n.importClause,
-          ts.createStringLiteral(importPath)
+          ts.factory.createStringLiteral(importPath),
+          undefined
         );
         break;
       }

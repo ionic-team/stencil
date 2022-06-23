@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type * as d from '@stencil/core/declarations';
 import { doNotExpectFiles, expectFiles } from '../../../testing/testing-utils';
 import { mockCreateCompiler, MockCompiler, mockCompilerRoot } from '../../../testing/mock-compiler';
@@ -9,12 +10,13 @@ describe('outputTarget, www / dist / docs', () => {
   let config: d.Config = {};
 
   it('dist, www and readme files w/ custom paths', async () => {
-    config.flags = {};
-    config.flags.docs = true;
-    config.buildAppCore = true;
+    config.flags = {
+      docs: true,
+    };
     config.outputTargets = [
       {
         type: 'www',
+        serviceWorker: null,
         dir: 'custom-www',
         buildDir: 'www-build',
         indexHtml: 'custom-index.htm',
@@ -37,13 +39,12 @@ describe('outputTarget, www / dist / docs', () => {
     await compiler.sys.writeFile(
       config.packageJsonFilePath,
       `{
-      "module": "custom-dist/index.js",
-      "main": "custom-dist/index.cjs.js",
-      "collection": "custom-dist/dist-collection/collection-manifest.json",
-      "types": "custom-dist/custom-types/components.d.ts"
-    }`
+        "module": "custom-dist/index.js",
+        "main": "custom-dist/index.cjs.js",
+        "collection": "custom-dist/dist-collection/collection-manifest.json",
+        "types": "custom-dist/custom-types/components.d.ts"
+      }`
     );
-    await compiler.sys.writeFile(path.join(mockCompilerRoot, 'polyfills', 'index.js'), `/* polyfills */`);
     await config.sys.writeFile(
       path.join(config.srcDir, 'components', 'cmp-a.tsx'),
       `
@@ -59,8 +60,10 @@ describe('outputTarget, www / dist / docs', () => {
 
     expectFiles(compiler.compilerCtx.fs, [
       path.join(mockCompilerRoot, 'custom-dist', 'cjs'),
-      path.join(mockCompilerRoot, 'custom-dist', 'esm', 'polyfills', 'index.js'),
-      path.join(mockCompilerRoot, 'custom-dist', 'esm', 'polyfills', 'index.js.map'),
+      path.join(mockCompilerRoot, 'custom-dist', 'cjs', 'cmp-a.cjs.entry.js'),
+      path.join(mockCompilerRoot, 'custom-dist', 'esm', 'polyfills'),
+      path.join(mockCompilerRoot, 'custom-dist', 'dist-collection'),
+      path.join(mockCompilerRoot, 'custom-dist', 'custom-types'),
     ]);
 
     doNotExpectFiles(compiler.compilerCtx.fs, [

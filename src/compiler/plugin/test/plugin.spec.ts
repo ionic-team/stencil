@@ -1,3 +1,4 @@
+// @ts-nocheck
 import type * as d from '../../../declarations';
 import path from 'path';
 import { mockCreateCompiler, MockCompiler, mockCompilerRoot } from '../../../testing/mock-compiler';
@@ -6,7 +7,7 @@ import { normalizePath } from '@utils';
 describe('plugin', () => {
   jest.setTimeout(25000);
 
-  let initConfig: d.Config = {};
+  const initConfig: d.Config = {};
   initConfig.outputTargets = [{ type: 'www' }];
 
   let compiler: MockCompiler;

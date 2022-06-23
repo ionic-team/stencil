@@ -26,6 +26,5 @@ release.
    1. Mark this version of Stencil as 'released' in JIRA
    2. Move the task card in this current sprint to the 'Done' swimlane
    3. Stub out the next release and task for the release in JIRA
-9. Ensure all GitHub Issues associated with stories/tasks that shipped in this version of Stencil are closed and
-   labeled as 'Resolution: Shipped'
+9. Ensure all GitHub Issues associated with stories/tasks that shipped in this version of Stencil are closed
 10. :tada:

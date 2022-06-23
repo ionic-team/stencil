@@ -34,7 +34,7 @@ describe('nativeComponentTransform', () => {
 
       const transformer = nativeComponentTransform(compilerCtx, transformOpts);
 
-      const transpiledModule = transpileModule(code, null, compilerCtx, null, [], [transformer]);
+      const transpiledModule = transpileModule(code, null, compilerCtx, [], [transformer]);
 
       expect(transpiledModule.outputText).toContain(
         `import { HTMLElement, attachShadow as __stencil_attachShadow, defineCustomElement as __stencil_defineCustomElement } from "@stencil/core";`
@@ -59,7 +59,7 @@ describe('nativeComponentTransform', () => {
 
       const transformer = nativeComponentTransform(compilerCtx, transformOpts);
 
-      const transpiledModule = transpileModule(code, null, compilerCtx, null, [], [transformer]);
+      const transpiledModule = transpileModule(code, null, compilerCtx, [], [transformer]);
 
       expect(transpiledModule.outputText).toContain(
         `import { HTMLElement, attachShadow as __stencil_attachShadow, defineCustomElement as __stencil_defineCustomElement } from "@stencil/core";`

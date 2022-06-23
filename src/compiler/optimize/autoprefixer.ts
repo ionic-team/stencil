@@ -28,7 +28,7 @@ export const autoprefixCss = async (cssText: string, opts: any) => {
     });
 
     output.output = result.css;
-  } catch (e) {
+  } catch (e: any) {
     const diagnostic: d.Diagnostic = {
       header: `Autoprefix CSS`,
       messageText: `CSS Error` + e,

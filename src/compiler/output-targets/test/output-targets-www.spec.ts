@@ -11,6 +11,7 @@ describe('outputTarget, www', () => {
   it('default www files', async () => {
     config.namespace = 'App';
     config.buildAppCore = true;
+    config.sourceMap = true;
 
     compiler = await mockCreateCompiler(config);
     config = compiler.config;
@@ -32,13 +33,10 @@ describe('outputTarget, www', () => {
       path.join(mockCompilerRoot, 'www'),
       path.join(mockCompilerRoot, 'www', 'build'),
       path.join(mockCompilerRoot, 'www', 'build', 'app.js'),
-      path.join(mockCompilerRoot, 'www', 'build', 'app.js.map'),
       path.join(mockCompilerRoot, 'www', 'build', 'app.esm.js'),
       path.join(mockCompilerRoot, 'www', 'build', 'cmp-a.entry.js'),
       path.join(mockCompilerRoot, 'www', 'build', 'cmp-a.entry.js.map'),
-
       path.join(mockCompilerRoot, 'www', 'index.html'),
-
       path.join(mockCompilerRoot, 'src', 'components.d.ts'),
     ]);
 

@@ -62,7 +62,7 @@ const createConstClass = (
           ts.createClassExpression(classModifiers, undefined, classNode.typeParameters, heritageClauses, members)
         ),
       ],
-      ts.NodeFlags.Let
+      ts.NodeFlags.Const
     )
   );
 };

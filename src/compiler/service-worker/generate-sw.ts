@@ -38,7 +38,7 @@ const generateSW = async (buildCtx: d.BuildCtx, serviceWorker: d.ServiceWorkerCo
   try {
     await workbox.generateSW(serviceWorker);
     timeSpan.finish(`generate service worker finished`);
-  } catch (e) {
+  } catch (e: any) {
     catchError(buildCtx.diagnostics, e);
   }
 };
@@ -49,7 +49,7 @@ const injectManifest = async (buildCtx: d.BuildCtx, serviceWorker: d.ServiceWork
   try {
     await workbox.injectManifest(serviceWorker);
     timeSpan.finish('inject manifest into service worker finished');
-  } catch (e) {
+  } catch (e: any) {
     catchError(buildCtx.diagnostics, e);
   }
 };

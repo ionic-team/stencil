@@ -10,6 +10,7 @@ describe('outputTarget, dist', () => {
 
   it('default dist files', async () => {
     config.buildAppCore = true;
+    config.sourceMap = true;
     config.buildEs5 = true;
     config.globalScript = path.join(mockCompilerRoot, 'src', 'global.ts');
     config.outputTargets = [{ type: 'dist' }];
@@ -17,15 +18,14 @@ describe('outputTarget, dist', () => {
     compiler = await mockCreateCompiler(config);
     config = compiler.config;
 
-    await config.sys.writeFile(path.join(mockCompilerRoot, 'polyfills', 'index.js'), `/* polyfills */`);
     await config.sys.writeFile(
       config.packageJsonFilePath,
       `{
-      "module": "dist/index.js",
-      "main": "dist/index.cjs.js",
-      "collection": "dist/collection/collection-manifest.json",
-      "types": "dist/types/components.d.ts"
-    }`
+        "module": "dist/index.js",
+        "main": "dist/index.cjs.js",
+        "collection": "dist/collection/collection-manifest.json",
+        "types": "dist/types/components.d.ts"
+      }`
     );
     await config.sys.writeFile(
       path.join(config.srcDir, 'components', 'cmp-a.tsx'),
@@ -52,8 +52,6 @@ describe('outputTarget, dist', () => {
 
     expectFiles(compiler.compilerCtx.fs, [
       path.join(mockCompilerRoot, 'dist', 'index.js'),
-      path.join(mockCompilerRoot, 'dist', 'index.mjs'),
-      path.join(mockCompilerRoot, 'dist', 'index.js.map'),
 
       path.join(mockCompilerRoot, 'dist', 'collection', 'collection-manifest.json'),
       path.join(mockCompilerRoot, 'dist', 'collection', 'components', 'cmp-a.js'),
@@ -63,19 +61,15 @@ describe('outputTarget, dist', () => {
       path.join(mockCompilerRoot, 'dist', 'collection', 'global.js'),
       path.join(mockCompilerRoot, 'dist', 'collection', 'global.js.map'),
 
-      path.join(mockCompilerRoot, 'dist', 'esm', 'index.mjs'),
+      path.join(mockCompilerRoot, 'dist', 'esm', 'index.js'),
       path.join(mockCompilerRoot, 'dist', 'esm', 'index.js.map'),
-      path.join(mockCompilerRoot, 'dist', 'esm', 'loader.mjs'),
-      path.join(mockCompilerRoot, 'dist', 'esm-es5', 'index.mjs'),
+      path.join(mockCompilerRoot, 'dist', 'esm', 'loader.js'),
+      path.join(mockCompilerRoot, 'dist', 'esm-es5', 'index.js'),
       path.join(mockCompilerRoot, 'dist', 'esm-es5', 'index.js.map'),
-      path.join(mockCompilerRoot, 'dist', 'esm-es5', 'loader.mjs'),
-      path.join(mockCompilerRoot, 'dist', 'esm', 'polyfills', 'index.js'),
-      path.join(mockCompilerRoot, 'dist', 'esm', 'polyfills', 'index.js.map'),
-
+      path.join(mockCompilerRoot, 'dist', 'esm-es5', 'loader.js'),
+      path.join(mockCompilerRoot, 'dist', 'esm', 'polyfills'),
       path.join(mockCompilerRoot, 'dist', 'loader'),
-
       path.join(mockCompilerRoot, 'dist', 'types'),
-
       path.join(mockCompilerRoot, 'src', 'components.d.ts'),
     ]);
 

@@ -121,7 +121,7 @@ describe('build-conditionals', () => {
     const r = await compiler.build();
     expect(r.diagnostics).toHaveLength(0);
 
-    let conditionals = getLazyBuildConditionals(config, r.components);
+    const conditionals = getLazyBuildConditionals(config, r.components);
     expect(conditionals).toEqual(
       expect.objectContaining({
         shadowDom: true,
@@ -147,7 +147,7 @@ describe('build-conditionals', () => {
     const r = await compiler.build();
     expect(r.diagnostics).toHaveLength(0);
 
-    let conditionals = getLazyBuildConditionals(config, r.components);
+    const conditionals = getLazyBuildConditionals(config, r.components);
     expect(conditionals).toEqual(
       expect.objectContaining({
         shadowDom: false,
@@ -173,7 +173,7 @@ describe('build-conditionals', () => {
     const r = await compiler.build();
     expect(r.diagnostics).toHaveLength(0);
 
-    let conditionals = getLazyBuildConditionals(config, r.components);
+    const conditionals = getLazyBuildConditionals(config, r.components);
     expect(conditionals).toEqual(
       expect.objectContaining({
         shadowDom: false,
@@ -199,7 +199,7 @@ describe('build-conditionals', () => {
     const r = await compiler.build();
     expect(r.diagnostics).toHaveLength(0);
 
-    let conditionals = getLazyBuildConditionals(config, r.components);
+    const conditionals = getLazyBuildConditionals(config, r.components);
     expect(conditionals).toEqual(
       expect.objectContaining({
         shadowDom: false,

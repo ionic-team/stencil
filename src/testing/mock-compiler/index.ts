@@ -42,6 +42,7 @@ export type mockCompilerRoot = string;
  * Setup sensible compiler config defaults which can then be
  * overwritten and used with `mockCreateCompiler()`. Also creates a hybrid fileSystem;
  * reads from disk - required for typescript - and write to memory (`config.sys`).
+ * @param setupFs - whether to the mocked, hybrid fileSystem
  * @returns a stencil Config object
  */
 export function initCompilerConfig(setupFs = true) {
@@ -115,7 +116,7 @@ export async function mockCreateCompiler(userConfig: d.Config = {}): Promise<Moc
     config.sys.writeFileSync(path.join(config.rootDir, 'stencil.config.js'), `exports.config = {};`);
   }
   if (!config.sys.readFileSync(path.join(config.rootDir, 'index.html'))) {
-    config.sys.writeFileSync(path.join(config.srcDir, 'index.html'), ``);
+    config.sys.writeFileSync(path.join(config.srcDir, 'index.html'), `<html><head></head><body></body></html>`);
   }
 
   // belts and brances config validation
@@ -196,7 +197,7 @@ function patchHybridFs() {
   sys.stat = async (p: string) => {
     // in-memory fs doesn't seem to normalize for query params
     if (p.includes('?')) {
-      let { dir, ext, name } = path.parse(p);
+      const { dir, ext, name } = path.parse(p);
       p = path.join(dir, name + ext.split('?')[0]);
     }
     const foundReadFile = await memSys.stat(p);
@@ -207,7 +208,7 @@ function patchHybridFs() {
   sys.statSync = (p: string) => {
     // in-memory fs doesn't seem to normalize query params
     if (p.includes('?')) {
-      let { dir, ext, name } = path.parse(p);
+      const { dir, ext, name } = path.parse(p);
       p = path.join(dir, name + ext.split('?')[0]);
     }
     const foundReadFile = memSys.statSync(p);

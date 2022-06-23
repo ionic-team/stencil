@@ -3,7 +3,7 @@ import { validateNamespace } from '../validate-namespace';
 
 describe('validateNamespace', () => {
   let config: d.Config;
-  let diagnostics: d.Diagnostic[] = [];
+  const diagnostics: d.Diagnostic[] = [];
   beforeEach(() => {
     config = {};
     diagnostics.length = 0;

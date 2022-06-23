@@ -9,8 +9,9 @@ export {
   mockCompilerCtx,
   mockDocument,
   mockLogger,
-  mockStencilSystem,
+  mockCompilerSystem,
   mockWindow,
+  mockModule,
 } from './mocks';
 export { MockCompiler, initCompilerConfig, mockCreateCompiler, mockCompilerRoot } from './mock-compiler';
 export {

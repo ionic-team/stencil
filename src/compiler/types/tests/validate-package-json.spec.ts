@@ -2,6 +2,7 @@ import type * as d from '@stencil/core/declarations';
 import { mockBuildCtx, mockCompilerCtx, mockConfig } from '@stencil/core/testing';
 import * as v from '../validate-build-package-json';
 import path from 'path';
+import { DIST_CUSTOM_ELEMENTS_BUNDLE } from '../../output-targets/output-utils';
 
 describe('validate-package-json', () => {
   let config: d.Config;
@@ -90,7 +91,7 @@ describe('validate-package-json', () => {
     it('validate custom elements module', async () => {
       config.outputTargets = [
         {
-          type: 'dist-custom-elements-bundle',
+          type: DIST_CUSTOM_ELEMENTS_BUNDLE,
           dir: path.join(root, 'custom-elements'),
         },
       ];
@@ -109,7 +110,7 @@ describe('validate-package-json', () => {
     it('missing dist module, but has custom elements output', async () => {
       config.outputTargets = [
         {
-          type: 'dist-custom-elements-bundle',
+          type: DIST_CUSTOM_ELEMENTS_BUNDLE,
           dir: path.join(root, 'custom-elements'),
         },
       ];

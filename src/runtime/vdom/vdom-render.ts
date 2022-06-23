@@ -24,7 +24,7 @@ let isSvgMode = false;
 
 const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex: number, parentElm: d.RenderNode) => {
   // tslint:disable-next-line: prefer-const
-  let newVNode = newParentVNode.$children$[childIndex];
+  const newVNode = newParentVNode.$children$[childIndex];
   let i = 0;
   let elm: d.RenderNode;
   let childNode: d.RenderNode;
@@ -421,7 +421,7 @@ export const patch = (oldVNode: d.VNode, newVNode: d.VNode) => {
 
 const updateFallbackSlotVisibility = (elm: d.RenderNode) => {
   // tslint:disable-next-line: prefer-const
-  let childNodes: d.RenderNode[] = elm.childNodes as any;
+  const childNodes: d.RenderNode[] = elm.childNodes as any;
   let childNode: d.RenderNode;
   let i: number;
   let ilen: number;
@@ -484,8 +484,8 @@ const relocateSlotContent = (elm: d.RenderNode) => {
   let relocateNodeData: RelocateNodeData;
   let j;
   let i = 0;
-  let childNodes: d.RenderNode[] = elm.childNodes as any;
-  let ilen = childNodes.length;
+  const childNodes: d.RenderNode[] = elm.childNodes as any;
+  const ilen = childNodes.length;
 
   for (; i < ilen; i++) {
     childNode = childNodes[i];

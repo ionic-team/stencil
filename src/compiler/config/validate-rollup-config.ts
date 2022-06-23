@@ -1,7 +1,7 @@
 import type * as d from '../../declarations';
 import { isObject, pluck } from '@utils';
 
-export const validateRollupConfig = (config: d.Config) => {
+export const validateRollupConfig = (config: d.UnvalidatedConfig): void => {
   const cleanRollupConfig = getCleanRollupConfig(config.rollupConfig);
   config.rollupConfig = cleanRollupConfig;
 };
