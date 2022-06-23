@@ -31,7 +31,7 @@ export const loadModule = (
     `./${bundleId}.entry.js${BUILD.hotModuleReplacement && hmrVersionId ? '?s-hmr=' + hmrVersionId : ''}`
   ).then(
     (importedModule) => {
-      if (!BUILD.hotModuleReplacement) {
+      if (!BUILD.hotModuleReplacement && bundleId) {
         cmpModules.set(bundleId, importedModule);
       }
       return importedModule[exportName];

@@ -303,7 +303,7 @@ export const appDidLoad = (who: string) => {
 };
 
 export const safeCall = (
-  instance: d.ComponentInterface,
+  instance: d.ComponentInterface | undefined,
   method: keyof d.ComponentInterface,
   arg?: any,
   elm?: HTMLElement
