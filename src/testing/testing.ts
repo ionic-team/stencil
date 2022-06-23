@@ -185,7 +185,7 @@ export const createTesting = async (config: InternalStrictConfig): Promise<Testi
 };
 
 function setupTestingConfig(config: Config): InternalStrictConfig {
-  const validatedConfig: InternalStrictConfig = { flags: { ...(config.flags ?? {}) } };
+  const validatedConfig: InternalStrictConfig = { ...config, flags: { ...config.flags } };
   validatedConfig.buildEs5 = false;
   validatedConfig.devMode = true;
   validatedConfig.minifyCss = false;
