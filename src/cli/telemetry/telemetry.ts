@@ -288,7 +288,7 @@ async function getInstalledPackages(
 
     return { packages, packagesNoVersions };
   } catch (err) {
-    hasDebug(config) && console.error(err);
+    hasDebug(config.flags) && console.error(err);
     return { packages, packagesNoVersions };
   }
 }
@@ -406,15 +406,15 @@ async function sendTelemetry(sys: d.CompilerSystem, config: d.InternalStrictConf
       body: JSON.stringify(body),
     });
 
-    hasVerbose(config) &&
+    hasVerbose(config.flags) &&
       console.debug('\nSent %O metric to events service (status: %O)', data.name, response.status, '\n');
 
     if (response.status !== 204) {
-      hasVerbose(config) &&
+      hasVerbose(config.flags) &&
         console.debug('\nBad response from events service. Request body: %O', response.body.toString(), '\n');
     }
   } catch (e) {
-    hasVerbose(config) && console.debug('Telemetry request failed:', e);
+    hasVerbose(config.flags) && console.debug('Telemetry request failed:', e);
   }
 }
 

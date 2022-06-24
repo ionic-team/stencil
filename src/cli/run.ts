@@ -37,8 +37,7 @@ export const run = async (init: d.CliInitOptions) => {
     }
 
     if (task === 'help' || flags.help) {
-      // TODO(NOW): As we expand this type with more strict values, this temp config will grow :-(
-      await taskHelp({ flags: { task: 'help', args }, outputTargets: [] }, logger, sys);
+      await taskHelp({ task: 'help', args }, logger, sys);
       return;
     }
 
@@ -120,7 +119,7 @@ export const runTask = async (
   sys?: d.CompilerSystem
 ) => {
   config.flags = config.flags || { task };
-  const strictConfig: InternalStrictConfig = {...config, flags: {...config.flags} ?? { task }};
+  const strictConfig: InternalStrictConfig = { ...config, flags: { ...config.flags } ?? { task } };
 
   config.outputTargets = config.outputTargets || [];
   strictConfig.outputTargets = strictConfig.outputTargets || [];
@@ -140,7 +139,7 @@ export const runTask = async (
       break;
 
     case 'help':
-      await taskHelp(strictConfig, config.logger, sys);
+      await taskHelp(strictConfig.flags, config.logger, sys);
       break;
 
     case 'prerender':
@@ -154,7 +153,7 @@ export const runTask = async (
     case 'telemetry':
       // TODO(STENCIL-148) make this parameter no longer optional, remove the surrounding if statement
       if (sys) {
-        await taskTelemetry(strictConfig, sys, config.logger);
+        await taskTelemetry(strictConfig.flags, sys, config.logger);
       }
       break;
 
@@ -168,7 +167,7 @@ export const runTask = async (
 
     default:
       config.logger.error(`${config.logger.emoji('❌ ')}Invalid stencil command, please see the options below:`);
-      await taskHelp(strictConfig, config.logger, sys);
+      await taskHelp(strictConfig.flags, config.logger, sys);
       return config.sys.exit(1);
   }
 };

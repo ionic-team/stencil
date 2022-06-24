@@ -10,5 +10,5 @@ import { checkTelemetry } from './telemetry';
  * @returns true if telemetry should be sent, false otherwise
  */
 export async function shouldTrack(config: d.InternalStrictConfig, sys: d.CompilerSystem, ci?: boolean) {
-  return !ci && isInteractive(sys, config) && (await checkTelemetry(sys));
+  return !ci && isInteractive(sys, config.flags) && (await checkTelemetry(sys));
 }
