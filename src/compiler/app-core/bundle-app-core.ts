@@ -3,7 +3,7 @@ import type { OutputAsset, OutputChunk, OutputOptions, RollupBuild } from 'rollu
 import { STENCIL_CORE_ID } from '../bundle/entry-alias-ids';
 
 /**
- * Generate rollup output based on a rollup build and a series of options. 
+ * Generate rollup output based on a rollup build and a series of options.
  *
  * @param build a rollup build
  * @param options output options for rollup
