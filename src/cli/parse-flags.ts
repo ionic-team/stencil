@@ -1,4 +1,4 @@
-import type { CompilerSystem, LogLevel, TaskCommand } from '../declarations';
+import { CompilerSystem, LogLevel, LOG_LEVELS, TaskCommand } from '../declarations';
 import { dashToPascalCase, toDashCase } from '@utils';
 import {
   ConfigFlags,
@@ -243,7 +243,12 @@ const getEqualsValue = (commandArgument: string) => commandArgument.split('=').s
  * @returns whether this is a `LogLevel`
  */
 const isLogLevel = (maybeLogLevel: string): maybeLogLevel is LogLevel =>
-  ['info', 'warn', 'error', 'debug'].includes(maybeLogLevel);
+  // unfortunately `includes` is typed on `ReadonlyArray<T>` as `(el: T):
+  // boolean` so a `string` cannot be passed to `includes` on a
+  // `ReadonlyArray` 😢 thus we `as any`
+  //
+  // see microsoft/TypeScript#31018 for some discussion of this
+  LOG_LEVELS.includes(maybeLogLevel as any);
 
 const getNpmConfigEnvArgs = (sys: CompilerSystem) => {
   // process.env.npm_config_argv
