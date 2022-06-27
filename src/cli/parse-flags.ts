@@ -61,11 +61,10 @@ export const parseFlags = (args: string[], sys?: CompilerSystem): ConfigFlags =>
 };
 
 /**
- * Parse command line arguments that are enumerated in the BOOLEAN_ARG_OPTS,
- * STRING_ARG_OPTS, NUMBER_ARG_OPTS, and LOG_LEVEL_OPTS arrays in the
- * `config-flags` module. Handles leading dashes on arguments, aliases that
- * are defined for a small number of argument types, and parsing values for
- * non-boolean arguments (e.g. port number).
+ * Parse command line arguments that are enumerated in the `config-flags`
+ * module. Handles leading dashes on arguments, aliases that are defined for a
+ * small number of arguments, and parsing values for non-boolean arguments
+ * (e.g. port number for the dev server).
  *
  * @param flags a ConfigFlags object to which parsed arguments will be added
  * @param args  an array of command-line arguments to parse
