@@ -233,9 +233,9 @@ const getValue = (args: string[], configCaseName: StringCLIArg | NumberCLIArg | 
 
 interface CLIArgValue {
   // the concrete value pulled from the CLI args
-  value: string,
+  value: string;
   // the matching argument key
-  matchingArg: string
+  matchingArg: string;
 }
 
 /**
