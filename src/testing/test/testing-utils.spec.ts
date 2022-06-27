@@ -97,5 +97,18 @@ describe('testing-utils', () => {
 
       expect(() => expectFilesDoNotExist(fs, [MOCK_FILE_PATH, anotherFilePath])).toThrow(expectedErrorMessage);
     });
+
+    it('throws an error only for file paths provided as an argument', async () => {
+      await fs.writeFile(MOCK_FILE_PATH, MOCK_FILE_CONTENTS);
+
+      // write this file to the filesystem, but don't check for it
+      const anotherFilePath = path.join('another', 'mock', 'file', 'path', 'to', 'some-file.ts');
+      await fs.writeFile(anotherFilePath, MOCK_FILE_CONTENTS);
+
+      const expectedErrorMessage = `The following files were expected to not exist, but do:
+-${MOCK_FILE_PATH}`;
+
+      expect(() => expectFilesDoNotExist(fs, [MOCK_FILE_PATH])).toThrow(expectedErrorMessage);
+    });
   });
 });
