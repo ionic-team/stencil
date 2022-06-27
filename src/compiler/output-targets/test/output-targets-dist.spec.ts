@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { doNotExpectFiles, expectFiles } from '../../../testing/testing-utils';
+import { expectFilesDoNotExist, expectFiles } from '../../../testing/testing-utils';
 import { Compiler, Config } from '@stencil/core/compiler';
 import { mockConfig } from '@stencil/core/testing';
 import path from 'path';
@@ -82,7 +82,7 @@ xdescribe('outputTarget, dist', () => {
       path.join(root, 'User', 'testing', 'src', 'components.d.ts'),
     ]);
 
-    doNotExpectFiles(compiler.fs, [
+    expectFilesDoNotExist(compiler.fs, [
       path.join(root, 'User', 'testing', 'build'),
       path.join(root, 'User', 'testing', 'esm'),
       path.join(root, 'User', 'testing', 'es5'),

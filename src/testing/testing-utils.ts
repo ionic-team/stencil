@@ -49,7 +49,7 @@ export function expectFiles(fs: d.InMemoryFileSystem, filePaths: string[]): void
  * @param filePaths the paths to validate
  * @throws when one or more of the provided file paths is found
  */
-export function doNotExpectFiles(fs: d.InMemoryFileSystem, filePaths: string[]): void {
+export function expectFilesDoNotExist(fs: d.InMemoryFileSystem, filePaths: string[]): void {
   const existentFiles: ReadonlyArray<string> = filePaths.filter((filePath: string) => fs.statSync(filePath).exists);
 
   if (existentFiles.length > 0) {

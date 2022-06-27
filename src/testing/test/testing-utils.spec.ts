@@ -1,7 +1,7 @@
 import * as d from '@stencil/core/declarations';
 import { createTestingSystem } from '../testing-sys';
 import { createInMemoryFs } from '../../compiler/sys/in-memory-fs';
-import { doNotExpectFiles, expectFiles } from '../testing-utils';
+import { expectFilesDoNotExist, expectFiles } from '../testing-utils';
 import path from 'path';
 
 describe('testing-utils', () => {
@@ -55,7 +55,7 @@ describe('testing-utils', () => {
     });
   });
 
-  describe('doNotExpectFiles', () => {
+  describe('expectFilesDoNotExist', () => {
     let fs: d.InMemoryFileSystem;
 
     beforeEach(() => {
@@ -66,15 +66,15 @@ describe('testing-utils', () => {
     it('does not throw when no file paths are provided', async () => {
       await fs.writeFile(MOCK_FILE_PATH, MOCK_FILE_CONTENTS);
 
-      expect(() => doNotExpectFiles(fs, [])).not.toThrow();
+      expect(() => expectFilesDoNotExist(fs, [])).not.toThrow();
     });
 
     it('does not throw when a provided file path is not found on the file system', () => {
-      expect(() => doNotExpectFiles(fs, [MOCK_FILE_PATH])).not.toThrow();
+      expect(() => expectFilesDoNotExist(fs, [MOCK_FILE_PATH])).not.toThrow();
     });
 
     it('does not throw when the provided file paths are not found on the file system', () => {
-      expect(() => doNotExpectFiles(fs, [MOCK_FILE_PATH, 'mock/file/path/to/nowhere.ts'])).not.toThrow();
+      expect(() => expectFilesDoNotExist(fs, [MOCK_FILE_PATH, 'mock/file/path/to/nowhere.ts'])).not.toThrow();
     });
 
     it('throws an error when a file is found on the file system', async () => {
@@ -83,7 +83,7 @@ describe('testing-utils', () => {
       const expectedErrorMessage = `The following files were expected to not exist, but do:
 -${MOCK_FILE_PATH}`;
 
-      expect(() => doNotExpectFiles(fs, [MOCK_FILE_PATH])).toThrow(expectedErrorMessage);
+      expect(() => expectFilesDoNotExist(fs, [MOCK_FILE_PATH])).toThrow(expectedErrorMessage);
     });
 
     it('throws an error when multiple files are found on the file system', async () => {
@@ -95,7 +95,7 @@ describe('testing-utils', () => {
 -${MOCK_FILE_PATH}
 -${anotherFilePath}`;
 
-      expect(() => doNotExpectFiles(fs, [MOCK_FILE_PATH, anotherFilePath])).toThrow(expectedErrorMessage);
+      expect(() => expectFilesDoNotExist(fs, [MOCK_FILE_PATH, anotherFilePath])).toThrow(expectedErrorMessage);
     });
   });
 });
