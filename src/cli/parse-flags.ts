@@ -199,8 +199,10 @@ const parseLogLevelArg = (flags: ConfigFlags, args: string[], configCaseName: Lo
  *
  * @param args the CLI args we're dealing with
  * @param configCaseName the ConfigFlag key which we're looking to pull out a value for
+ * @returns the value for the flag as well as the exact string which it matched from
+ * the user input.
  */
-const getValue = (args: string[], configCaseName: StringCLIArg | NumberCLIArg | LogCLIArg) => {
+const getValue = (args: string[], configCaseName: StringCLIArg | NumberCLIArg | LogCLIArg): CLIArgValue => {
   // for some CLI args we have a short alias, like 'c' for 'config'
   const alias = CLI_ARG_ALIASES[configCaseName];
   // we support supplying arguments in both dash-case and configCase
@@ -228,6 +230,13 @@ const getValue = (args: string[], configCaseName: StringCLIArg | NumberCLIArg | 
   });
   return { value, matchingArg };
 };
+
+interface CLIArgValue {
+  // the concrete value pulled from the CLI args
+  value: string,
+  // the matching argument key
+  matchingArg: string
+}
 
 /**
  * When a parameter is set in the format `--foobar=12` at the CLI (as opposed to
