@@ -29,7 +29,7 @@ export const parseFlags = (args: string[], sys?: CompilerSystem): ConfigFlags =>
   };
 
   // cmd line has more priority over npm scripts cmd
-  flags.args = args.slice();
+  flags.args = Array.isArray(args) ? args.slice() : [];
   if (flags.args.length > 0 && flags.args[0] && !flags.args[0].startsWith('-')) {
     flags.task = flags.args[0] as TaskCommand;
   }
