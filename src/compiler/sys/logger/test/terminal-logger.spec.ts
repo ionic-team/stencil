@@ -1,6 +1,6 @@
-import { LogLevel } from '@stencil/core/declarations';
+import { LogLevel, LOG_LEVELS } from '../../../../declarations';
 import { createNodeLoggerSys } from '../../../../sys/node/node-logger';
-import { createTerminalLogger, LOG_LEVELS, shouldLog } from '../terminal-logger';
+import { createTerminalLogger, shouldLog } from '../terminal-logger';
 import { bgRed, blue, bold, cyan, dim, gray, green, magenta, red, yellow } from 'ansi-colors';
 
 describe('terminal-logger', () => {

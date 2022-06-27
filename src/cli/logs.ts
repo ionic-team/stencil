@@ -1,4 +1,5 @@
-import type { Config, Logger, ConfigFlags, CompilerSystem, TaskCommand } from '../declarations';
+import type { Config, Logger, CompilerSystem, TaskCommand } from '../declarations';
+import type { ConfigFlags } from './config-flags';
 import type { CoreCompiler } from './load-compiler';
 
 export const startupLog = (logger: Logger, task: TaskCommand) => {

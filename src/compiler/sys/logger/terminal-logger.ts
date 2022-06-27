@@ -1,4 +1,12 @@
-import { Diagnostic, Logger, LogLevel, LoggerTimeSpan, PrintLine, LoggerLineUpdater } from '../../../declarations';
+import {
+  Diagnostic,
+  Logger,
+  LogLevel,
+  LOG_LEVELS,
+  LoggerTimeSpan,
+  PrintLine,
+  LoggerLineUpdater,
+} from '../../../declarations';
 import ansiColor, { bgRed, blue, bold, cyan, dim, gray, green, magenta, red, yellow } from 'ansi-colors';
 
 /**
@@ -510,26 +518,6 @@ export interface TerminalLoggerSys {
   writeLogs: (logFilePath: string, log: string, append: boolean) => void;
   createLineUpdater: () => Promise<LoggerLineUpdater>;
 }
-
-/**
- * This sets the log level hierarchy for our terminal logger, ranging from
- * most to least verbose.
- *
- * Ordering the levels like this lets us easily check whether we should log a
- * message at a given time. For instance, if the log level is set to `'warn'`,
- * then anything passed to the logger with level `'warn'` or `'error'` should
- * be logged, but we should _not_ log anything with level `'info'` or `'debug'`.
- *
- * If we have a current log level `currentLevel` and a message with level
- * `msgLevel` is passed to the logger, we can determine whether or not we should
- * log it by checking if the log level on the message is further up or at the
- * same level in the hierarchy than `currentLevel`, like so:
- *
- * ```ts
- * LOG_LEVELS.indexOf(msgLevel) >= LOG_LEVELS.indexOf(currentLevel)
- * ```
- */
-export const LOG_LEVELS: ReadonlyArray<LogLevel> = ['debug', 'info', 'warn', 'error'];
 
 /**
  * Helper function to determine, based on the current log level setting, whether

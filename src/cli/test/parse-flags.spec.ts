@@ -1,12 +1,13 @@
 import type * as d from '../../declarations';
+import { LogLevel } from '../../declarations';
 import { parseFlags } from '../parse-flags';
 
 describe('parseFlags', () => {
-  const args: string[] = [];
+  let args: string[] = [];
   let sys: d.CompilerSystem = {} as any;
 
   beforeEach(() => {
-    args.length = 0;
+    args = [];
     sys = {
       name: 'node',
     } as any;
@@ -41,6 +42,7 @@ describe('parseFlags', () => {
     expect(flags.task).toBe('serve');
     expect(flags.address).toBe('127.0.0.1');
     expect(flags.port).toBe(4444);
+    expect(flags.knownArgs).toEqual(['--address', '127.0.0.1', '--port', '4444']);
   });
 
   it('should use cli args first, then npm cmds', () => {
@@ -125,6 +127,11 @@ describe('parseFlags', () => {
     args[1] = '--no-build';
     const flags = parseFlags(args, sys);
     expect(flags.build).toBe(false);
+  });
+
+  it('should parse --no-prerender-external', () => {
+    const flags = parseFlags(['--no-prerender-external'], sys);
+    expect(flags.prerenderExternal).toBe(false);
   });
 
   it('should not parse build flag, default null', () => {
@@ -301,24 +308,28 @@ describe('parseFlags', () => {
     expect(flags.headless).toBe(true);
   });
 
-  it('should parse --logLevel', () => {
-    args[0] = '--logLevel';
-    args[1] = 'error';
+  it.each<LogLevel>(['info', 'warn', 'error', 'debug'])("should parse '--logLevel %s'", (level) => {
+    const args = ['--logLevel', level];
     const flags = parseFlags(args, sys);
-    expect(flags.logLevel).toBe('error');
+    expect(flags.logLevel).toBe(level);
   });
 
-  it('should parse --logLevel=error', () => {
-    args[0] = '--logLevel=error';
+  it.each<LogLevel>(['info', 'warn', 'error', 'debug'])('should parse --logLevel=%s', (level) => {
+    const args = [`--logLevel=${level}`];
     const flags = parseFlags(args, sys);
-    expect(flags.logLevel).toBe('error');
+    expect(flags.logLevel).toBe(level);
   });
 
-  it('should parse --log-level', () => {
-    args[0] = '--log-level';
-    args[1] = 'error';
+  it.each<LogLevel>(['info', 'warn', 'error', 'debug'])("should parse '--log-level %s'", (level) => {
+    const args = ['--log-level', level];
     const flags = parseFlags(args, sys);
-    expect(flags.logLevel).toBe('error');
+    expect(flags.logLevel).toBe(level);
+  });
+
+  it.each<LogLevel>(['info', 'warn', 'error', 'debug'])('should parse --log-level=%s', (level) => {
+    const args = [`--log-level=${level}`];
+    const flags = parseFlags(args, sys);
+    expect(flags.logLevel).toBe(level);
   });
 
   it('should parse --log', () => {
