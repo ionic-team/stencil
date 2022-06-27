@@ -45,7 +45,7 @@ export const NUMBER_CLI_ARGS = ['maxWorkers', 'port'] as const;
 /**
  * All the String options supported by the Stencil CLI
  */
-export const STRING_CLI_ARGS = ['address', 'config', 'docsJson', 'emulate', 'root', 'screenshotConnector'] as const;
+export const STRING_CLI_ARGS = ['address', 'config', 'docsJson', 'emulate', 'root', 'screenshotConnector', 'docsApi'] as const;
 
 /**
  * All the LogLevel-type options supported by the Stencil CLI
