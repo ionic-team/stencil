@@ -5,13 +5,12 @@ describe('hydrate prop types', () => {
   it('number', async () => {
     @Component({ tag: 'cmp-a' })
     class CmpA {
-      @Prop() num: number;
-
+      @Prop({ mutable: true }) num: number;
 
       render() {
-        const numToRender =  this.num + 100;
+        this.num += 100;
 
-        return <Host>{numToRender}</Host>;
+        return <Host>{this.num}</Host>;
       }
     }
     // @ts-ignore
