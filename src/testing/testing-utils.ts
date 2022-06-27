@@ -31,10 +31,7 @@ export function shuffleArray(array: any[]) {
  * @throws when one or more of the provided file paths cannot be found
  */
 export function expectFiles(fs: d.InMemoryFileSystem, filePaths: string[]): void {
-  const notFoundFiles: ReadonlyArray<string> = filePaths.filter(
-    (filePath: string) => !fs.statSync(filePath).exists,
-    []
-  );
+  const notFoundFiles: ReadonlyArray<string> = filePaths.filter((filePath: string) => !fs.statSync(filePath).exists);
 
   if (notFoundFiles.length > 0) {
     throw new Error(
@@ -53,7 +50,7 @@ export function expectFiles(fs: d.InMemoryFileSystem, filePaths: string[]): void
  * @throws when one or more of the provided file paths is found
  */
 export function doNotExpectFiles(fs: d.InMemoryFileSystem, filePaths: string[]): void {
-  const existentFiles: ReadonlyArray<string> = filePaths.filter((filePath: string) => fs.statSync(filePath).exists, []);
+  const existentFiles: ReadonlyArray<string> = filePaths.filter((filePath: string) => fs.statSync(filePath).exists);
 
   if (existentFiles.length > 0) {
     throw new Error(
