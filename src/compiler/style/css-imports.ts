@@ -166,7 +166,7 @@ export const getCssImports = async (
   styleText = stripCssComments(styleText);
 
   const dir = dirname(filePath);
-  const importeeExt = (filePath.split('.').pop() ?? "").toLowerCase();
+  const importeeExt = (filePath.split('.').pop() ?? '').toLowerCase();
 
   let r: RegExpExecArray | null;
   const IMPORT_RE = /(@import)\s+(url\()?\s?(.*?)\s?\)?([^;]*);?/gi;
@@ -174,7 +174,7 @@ export const getCssImports = async (
     const cssImportData: d.CssImportData = {
       srcImport: r[0],
       url: r[4].replace(/[\"\'\)]/g, ''),
-      filePath: ""
+      filePath: '',
     };
 
     if (!isLocalCssImport(cssImportData.srcImport)) {
