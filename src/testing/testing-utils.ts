@@ -30,7 +30,7 @@ export function shuffleArray(array: any[]) {
  * @param filePaths the paths to validate
  * @throws when one or more of the provided file paths cannot be found
  */
-export function expectFiles(fs: d.InMemoryFileSystem, filePaths: string[]): void {
+export function expectFilesExist(fs: d.InMemoryFileSystem, filePaths: string[]): void {
   const notFoundFiles: ReadonlyArray<string> = filePaths.filter((filePath: string) => !fs.statSync(filePath).exists);
 
   if (notFoundFiles.length > 0) {
