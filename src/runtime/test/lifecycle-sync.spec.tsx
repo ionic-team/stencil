@@ -1,14 +1,7 @@
 import { Component, Element, Host, Method, Prop, Watch, h, forceUpdate } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
-import { setupConsoleMocker } from '../../testing/testing-utils';
 
 describe('lifecycle sync', () => {
-  const setupConsoleMocks = setupConsoleMocker();
-
-  beforeEach(() => {
-    setupConsoleMocks();
-  });
-
   it('should fire connected/disconnected when removed', async () => {
     let connectedCallback = 0;
     let disconnectedCallback = 0;
@@ -306,8 +299,8 @@ describe('lifecycle sync', () => {
 
     @Component({ tag: 'cmp-root' })
     class CmpRoot {
-      @Prop() value = 100;
-      @Prop() value2 = 100;
+      @Prop({ mutable: true }) value = 100;
+      @Prop({ mutable: true }) value2 = 100;
 
       @Method()
       next() {
