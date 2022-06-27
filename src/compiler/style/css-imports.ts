@@ -125,7 +125,7 @@ interface ParseCSSReturn {
  * @returns the contents of the file, if it can be read without error
  */
 const loadStyleText = async (compilerCtx: d.CompilerCtx, cssImportData: d.CssImportData): Promise<string | null> => {
-  let styleText: string = null;
+  let styleText: string | null = null;
 
   try {
     styleText = await compilerCtx.fs.readFile(cssImportData.filePath);
@@ -166,14 +166,15 @@ export const getCssImports = async (
   styleText = stripCssComments(styleText);
 
   const dir = dirname(filePath);
-  const importeeExt = filePath.split('.').pop().toLowerCase();
+  const importeeExt = (filePath.split('.').pop() ?? "").toLowerCase();
 
-  let r: RegExpExecArray;
+  let r: RegExpExecArray | null;
   const IMPORT_RE = /(@import)\s+(url\()?\s?(.*?)\s?\)?([^;]*);?/gi;
   while ((r = IMPORT_RE.exec(styleText))) {
     const cssImportData: d.CssImportData = {
       srcImport: r[0],
       url: r[4].replace(/[\"\'\)]/g, ''),
+      filePath: ""
     };
 
     if (!isLocalCssImport(cssImportData.srcImport)) {
@@ -204,7 +205,10 @@ export const getCssImports = async (
       }
     }
 
-    if (typeof cssImportData.filePath === 'string') {
+    // we set `filePath` to `""` when the object is created above, so if it
+    // hasn't been changed in the intervening conditionals then we didn't resolve
+    // a filepath for it.
+    if (cssImportData.filePath !== '') {
       imports.push(cssImportData);
     }
   }

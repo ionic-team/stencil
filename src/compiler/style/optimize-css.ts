@@ -37,7 +37,7 @@ export const optimizeCss = async (
     return cachedContent;
   }
 
-  const minifyResults = await compilerCtx.worker.optimizeCss(opts);
+  const minifyResults = await compilerCtx.worker!.optimizeCss(opts);
   minifyResults.diagnostics.forEach((d) => {
     // collect up any diagnostics from minifying
     diagnostics.push(d);
