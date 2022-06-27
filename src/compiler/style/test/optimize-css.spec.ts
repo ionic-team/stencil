@@ -3,7 +3,6 @@ import { optimizeCss } from '../optimize-css';
 import { mockCompilerCtx, mockConfig } from '@stencil/core/testing';
 import path from 'path';
 import os from 'os';
-import { setupConsoleMocker } from '../../../testing/testing-utils';
 
 describe('optimizeCss', () => {
   let config: d.Config;
@@ -11,14 +10,11 @@ describe('optimizeCss', () => {
   let diagnostics: d.Diagnostic[];
   jasmine.DEFAULT_TIMEOUT_INTERVAL = 30000;
 
-  const setupConsoleMocks = setupConsoleMocker();
-
   beforeEach(() => {
     config = mockConfig();
     config.maxConcurrentWorkers = 0;
     compilerCtx = mockCompilerCtx(config);
     diagnostics = [];
-    setupConsoleMocks();
   });
 
   it('handles error', async () => {
