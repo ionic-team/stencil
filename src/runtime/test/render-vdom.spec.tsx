@@ -6,7 +6,7 @@ describe('render-vdom', () => {
   const setupConsoleMocks = setupConsoleMocker();
 
   beforeEach(() => {
-    setupConsoleMocks();
+    // setupConsoleMocks();
   });
 
   describe('build conditionals', () => {
@@ -390,7 +390,7 @@ describe('render-vdom', () => {
     });
   });
 
-  it('rerender on ref mutation', async () => {
+  it.only('rerender on ref mutation', async () => {
     @Component({ tag: 'cmp-a' })
     class CmpA {
       private nuRender = 0;
@@ -414,7 +414,7 @@ describe('render-vdom', () => {
     `);
   });
 
-  it('not rerender on render() mutation', async () => {
+  xit('not rerender on render() mutation', async () => {
     @Component({ tag: 'cmp-a' })
     class CmpA {
       private nuRender = 0;
