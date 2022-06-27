@@ -48,11 +48,11 @@ export const NUMBER_CLI_ARGS = ['maxWorkers', 'port'] as const;
 export const STRING_CLI_ARGS = [
   'address',
   'config',
+  'docsApi',
   'docsJson',
   'emulate',
   'root',
   'screenshotConnector',
-  'docsApi',
 ] as const;
 
 /**
