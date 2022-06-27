@@ -1,23 +1,17 @@
 import { Component, Host, Prop, h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
-import { setupConsoleMocker } from '../../testing/testing-utils';
 
 describe('hydrate prop types', () => {
-  const consoleMockSetup = setupConsoleMocker();
-
-  beforeEach(() => {
-    consoleMockSetup();
-  });
-
   it('number', async () => {
     @Component({ tag: 'cmp-a' })
     class CmpA {
       @Prop() num: number;
 
-      render() {
-        this.num += 100;
 
-        return <Host>{this.num}</Host>;
+      render() {
+        const numToRender =  this.num + 100;
+
+        return <Host>{numToRender}</Host>;
       }
     }
     // @ts-ignore
