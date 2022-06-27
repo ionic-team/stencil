@@ -84,6 +84,9 @@ const parseArgs = (flags: ConfigFlags, args: string[]) => {
  * - `--noBooleanArg`
  * - `--no-boolean-arg`
  *
+ * The final two variants should be parsed to a value of `false` on the config
+ * object.
+ *
  * @param flags the config flags object, while we'll modify
  * @param args our CLI arguments
  * @param configCaseName the argument we want to look at right now
