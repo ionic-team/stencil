@@ -45,23 +45,6 @@ export async function cli(opts: BuildOptions): Promise<ReadonlyArray<RollupOptio
   dts = dts.replace('@stencil/core/internal', '../internal/index');
   await fs.writeFile(join(opts.output.cliDir, dtsFilename), dts);
 
-  // bundle config-flags.js
-  const esConfigFlagsOutput: OutputOptions = {
-    format: 'es',
-    file: join(outputDir, 'config-flags.js'),
-    preferConst: true,
-    sourcemap: true,
-    banner: getBanner(opts, `Stencil CLI Config Flags`, true),
-  };
-
-  const cjsConfigFlagsOutput: OutputOptions = {
-    format: 'cjs',
-    file: join(outputDir, 'config-flags.cjs'),
-    preferConst: true,
-    sourcemap: true,
-    banner: getBanner(opts, `Stencil CLI Config Flags (CommonJS)`, true),
-  };
-
   // copy config-flags.d.ts
   let configDts = await fs.readFile(join(inputDir, 'config-flags.d.ts'), 'utf8');
   configDts = configDts.replace('@stencil/core/declarations', '../internal/index');
@@ -78,7 +61,7 @@ export async function cli(opts: BuildOptions): Promise<ReadonlyArray<RollupOptio
 
   const cliBundle: RollupOptions = {
     input: join(inputDir, 'index.js'),
-    output: [esOutput, cjsOutput, esConfigFlagsOutput, cjsConfigFlagsOutput],
+    output: [esOutput, cjsOutput],
     external: ['path'],
     plugins: [
       relativePathPlugin('@stencil/core/testing', '../testing/index.js'),
