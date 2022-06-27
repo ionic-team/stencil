@@ -108,17 +108,17 @@ type ObjectFromKeys<K extends ReadonlyArray<string>, T> = {
  */
 type BooleanConfigFlags = ObjectFromKeys<typeof BOOLEAN_CLI_ARGS, boolean>;
 /**
- * Type containing the possible Boolean configuration flags, to be included
+ * Type containing the possible String configuration flags, to be included
  * in ConfigFlags, below
  */
 type StringConfigFlags = ObjectFromKeys<typeof STRING_CLI_ARGS, string>;
 /**
- * Type containing the possible Boolean configuration flags, to be included
+ * Type containing the possible numeric configuration flags, to be included
  * in ConfigFlags, below
  */
 type NumberConfigFlags = ObjectFromKeys<typeof NUMBER_CLI_ARGS, number>;
 /**
- * Type containing the possible Boolean configuration flags, to be included
+ * Type containing the possible LogLevel configuration flags, to be included
  * in ConfigFlags, below
  */
 type LogLevelFlags = ObjectFromKeys<typeof LOG_LEVEL_CLI_ARGS, LogLevel>;
