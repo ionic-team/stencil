@@ -164,6 +164,13 @@ const parseNumberArg = (flags: ConfigFlags, args: string[], configCaseName: Numb
   }
 };
 
+/**
+ * Parse a CLI argument which may be either a string or a number
+ *
+ * @param flags the config flags object, while we'll modify
+ * @param args our CLI arguments
+ * @param configCaseName the argument we want to look at right now
+ */
 const parseStringNumberArg = (flags: ConfigFlags, args: string[], configCaseName: StringNumberCLIArg) => {
   if (!['number', 'string'].includes(typeof flags[configCaseName])) {
     flags[configCaseName] = null;
@@ -172,19 +179,32 @@ const parseStringNumberArg = (flags: ConfigFlags, args: string[], configCaseName
   const { value, matchingArg } = getValue(args, configCaseName);
 
   if (value !== undefined && matchingArg !== undefined) {
-    const maybeNumber = parseInt(value, 10);
-    if (maybeNumber !== NaN) {
+
+    if (CLI_ARG_STRING_REGEX.test(value)) {
+      // if it matches the regex we treat it like a string
+      flags[configCaseName] = value;
+    } else {
       // it was a number, great!
       flags[configCaseName] = parseInt(value, 10);
-    } else {
-      // assume it was a string
-      flags[configCaseName] = value;
     }
     flags.knownArgs!.push(matchingArg);
     flags.knownArgs!.push(value);
   }
 }
 
+/**
+ * We use this regular expression to detect CLI parameters which
+ * should be parsed as string values (as opposed to numbers) for
+ * the argument types for which we support both a string and a
+ * number value.
+ *
+ * The regex tests for the presence of at least one character which is
+ * _not_ a digit (`\d`) or a period (`\.`). Thus we'll match a string
+ * like `"50%"`, but not a string like `"50"` or `"5.0"`. If it matches
+ * a given string we conclude that the string should be parsed as a
+ * string literal, rather than using `parseInt` to convert it to a number.
+ */
+const CLI_ARG_STRING_REGEX = /[^\d\.]+/g
 
 /**
  * Parse a LogLevel CLI argument. These can be only a specific

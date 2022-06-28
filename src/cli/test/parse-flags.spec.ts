@@ -321,20 +321,21 @@ describe('parseFlags', () => {
   });
 
   it.each<LogLevel>(['info', 'warn', 'error', 'debug'])("should parse '--log-level %s'", (level) => {
-    const args = ['--log-level', level];
-    const flags = parseFlags(args, sys);
+    const flags = parseFlags(
+['--log-level', level]
+    , sys);
     expect(flags.logLevel).toBe(level);
   });
 
   it.each<LogLevel>(['info', 'warn', 'error', 'debug'])('should parse --log-level=%s', (level) => {
-    const args = [`--log-level=${level}`];
-    const flags = parseFlags(args, sys);
+    const flags = parseFlags(
+[`--log-level=${level}`]
+    , sys);
     expect(flags.logLevel).toBe(level);
   });
 
   it('should parse --log', () => {
-    args[0] = '--log';
-    const flags = parseFlags(args, sys);
+    const flags = parseFlags(['--log'], sys);
     expect(flags.log).toBe(true);
   });
 
@@ -356,6 +357,12 @@ describe('parseFlags', () => {
     args[1] = '4';
     const flags = parseFlags(args, sys);
     expect(flags.maxWorkers).toBe(4);
+  });
+
+  it('should parse --maxWorkers=50%', function() {
+    // see https://jestjs.io/docs/27.x/cli#--maxworkersnumstring
+    const flags = parseFlags(['--maxWorkers=50%']);
+    expect(flags.maxWorkers).toBe("50%");
   });
 
   it('should parse --max-workers=1', () => {
