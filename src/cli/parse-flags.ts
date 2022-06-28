@@ -1,16 +1,18 @@
 import { CompilerSystem, LogLevel, LOG_LEVELS, TaskCommand } from '../declarations';
 import { dashToPascalCase, toDashCase } from '@utils';
 import {
-  ConfigFlags,
-  BooleanCLIArg,
-  LogCLIArg,
-  NumberCLIArg,
-  StringCLIArg,
-  CLI_ARG_ALIASES,
   BOOLEAN_CLI_ARGS,
+  BooleanCLIArg,
+  CLI_ARG_ALIASES,
+  ConfigFlags,
   LOG_LEVEL_CLI_ARGS,
+  LogCLIArg,
   NUMBER_CLI_ARGS,
+  NumberCLIArg,
   STRING_CLI_ARGS,
+  STRING_NUMBER_CLI_ARGS,
+  StringCLIArg,
+  StringNumberCLIArg,
 } from './config-flags';
 
 /**
@@ -73,6 +75,7 @@ const parseArgs = (flags: ConfigFlags, args: string[]) => {
   BOOLEAN_CLI_ARGS.forEach((argName) => parseBooleanArg(flags, args, argName));
   STRING_CLI_ARGS.forEach((argName) => parseStringArg(flags, args, argName));
   NUMBER_CLI_ARGS.forEach((argName) => parseNumberArg(flags, args, argName));
+  STRING_NUMBER_CLI_ARGS.forEach((argName) => parseStringNumberArg(flags, args, argName));
   LOG_LEVEL_CLI_ARGS.forEach((argName) => parseLogLevelArg(flags, args, argName));
 };
 
@@ -162,6 +165,52 @@ const parseNumberArg = (flags: ConfigFlags, args: string[], configCaseName: Numb
 };
 
 /**
+ * Parse a CLI argument which may be either a string or a number
+ *
+ * @param flags the config flags object, while we'll modify
+ * @param args our CLI arguments
+ * @param configCaseName the argument we want to look at right now
+ */
+const parseStringNumberArg = (flags: ConfigFlags, args: string[], configCaseName: StringNumberCLIArg) => {
+  if (!['number', 'string'].includes(typeof flags[configCaseName])) {
+    flags[configCaseName] = null;
+  }
+
+  const { value, matchingArg } = getValue(args, configCaseName);
+
+  if (value !== undefined && matchingArg !== undefined) {
+    if (CLI_ARG_STRING_REGEX.test(value)) {
+      // if it matches the regex we treat it like a string
+      flags[configCaseName] = value;
+    } else {
+      // it was a number, great!
+      flags[configCaseName] = Number(value);
+    }
+    flags.knownArgs!.push(matchingArg);
+    flags.knownArgs!.push(value);
+  }
+};
+
+/**
+ * We use this regular expression to detect CLI parameters which
+ * should be parsed as string values (as opposed to numbers) for
+ * the argument types for which we support both a string and a
+ * number value.
+ *
+ * The regex tests for the presence of at least one character which is
+ * _not_ a digit (`\d`), a period (`\.`), or one of the characters `"e"`,
+ * `"E"`, `"+"`, or `"-"` (the latter four characters are necessary to
+ * support the admittedly unlikely use of scientific notation, like `"4e+0"`
+ * for `4`).
+ *
+ * Thus we'll match a string like `"50%"`, but not a string like `"50"` or
+ * `"5.0"`. If it matches a given string we conclude that the string should
+ * be parsed as a string literal, rather than using `Number` to convert it
+ * to a number.
+ */
+const CLI_ARG_STRING_REGEX = /[^\d\.Ee\+\-]+/g;
+
+/**
  * Parse a LogLevel CLI argument. These can be only a specific
  * set of strings, so this function takes care of validating that
  * the value is correct.
@@ -202,7 +251,10 @@ const parseLogLevelArg = (flags: ConfigFlags, args: string[], configCaseName: Lo
  * @returns the value for the flag as well as the exact string which it matched from
  * the user input.
  */
-const getValue = (args: string[], configCaseName: StringCLIArg | NumberCLIArg | LogCLIArg): CLIArgValue => {
+const getValue = (
+  args: string[],
+  configCaseName: StringCLIArg | NumberCLIArg | StringNumberCLIArg | LogCLIArg
+): CLIArgValue => {
   // for some CLI args we have a short alias, like 'c' for 'config'
   const alias = CLI_ARG_ALIASES[configCaseName];
   // we support supplying arguments in both dash-case and configCase
