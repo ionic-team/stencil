@@ -1,6 +1,6 @@
 // @ts-nocheck
 import type * as d from '@stencil/core/declarations';
-import { doNotExpectFiles, expectFiles } from '../../../testing/testing-utils';
+import { expectFilesDoNotExist, expectFilesExist } from '../../../testing/testing-utils';
 import { mockCreateCompiler, MockCompiler, mockCompilerRoot } from '../../../testing/mock-compiler';
 import path from 'path';
 
@@ -58,7 +58,7 @@ describe('outputTarget, www / dist / docs', () => {
     const r = await compiler.build();
     expect(r.diagnostics).toHaveLength(0);
 
-    expectFiles(compiler.compilerCtx.fs, [
+    expectFilesExist(compiler.compilerCtx.fs, [
       path.join(mockCompilerRoot, 'custom-dist', 'cjs'),
       path.join(mockCompilerRoot, 'custom-dist', 'cjs', 'cmp-a.cjs.entry.js'),
       path.join(mockCompilerRoot, 'custom-dist', 'esm', 'polyfills'),
@@ -66,7 +66,7 @@ describe('outputTarget, www / dist / docs', () => {
       path.join(mockCompilerRoot, 'custom-dist', 'custom-types'),
     ]);
 
-    doNotExpectFiles(compiler.compilerCtx.fs, [
+    expectFilesDoNotExist(compiler.compilerCtx.fs, [
       path.join(mockCompilerRoot, 'www', '/'),
       path.join(mockCompilerRoot, 'www', 'index.html'),
       path.join(mockCompilerRoot, 'www', 'custom-index.htm'),

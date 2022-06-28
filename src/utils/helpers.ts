@@ -1,17 +1,29 @@
 export const isDef = (v: any) => v != null;
 
-export const toLowerCase = (str: string) => str.toLowerCase();
+/**
+ * Convert a string from PascalCase to dash-case
+ *
+ * @param str the string to convert
+ * @returns a converted string
+ */
+export const toDashCase = (str: string): string =>
+  str
+    .replace(/([A-Z0-9])/g, (match) => ` ${match[0]}`)
+    .trim()
+    .split(' ')
+    .join('-')
+    .toLowerCase();
 
-export const toDashCase = (str: string) =>
-  toLowerCase(
-    str
-      .replace(/([A-Z0-9])/g, (g) => ' ' + g[0])
-      .trim()
-      .replace(/ /g, '-')
-  );
-
-export const dashToPascalCase = (str: string) =>
-  toLowerCase(str)
+/**
+ * Convert a string from dash-case / kebab-case to PascalCase (or CamelCase,
+ * or whatever you call it!)
+ *
+ * @param str a string to convert
+ * @returns a converted string
+ */
+export const dashToPascalCase = (str: string): string =>
+  str
+    .toLowerCase()
     .split('-')
     .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
     .join('');

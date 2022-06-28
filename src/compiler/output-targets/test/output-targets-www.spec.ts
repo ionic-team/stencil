@@ -1,5 +1,5 @@
 import type * as d from '@stencil/core/declarations';
-import { doNotExpectFiles, expectFiles } from '../../../testing/testing-utils';
+import { expectFilesDoNotExist, expectFilesExist } from '../../../testing/testing-utils';
 import { mockCreateCompiler, MockCompiler, mockCompilerRoot } from '../../../testing/mock-compiler';
 import path from 'path';
 
@@ -29,7 +29,7 @@ describe('outputTarget, www', () => {
     const r = await compiler.build();
     expect(r.diagnostics).toHaveLength(0);
 
-    expectFiles(compiler.compilerCtx.fs, [
+    expectFilesExist(compiler.compilerCtx.fs, [
       path.join(mockCompilerRoot, 'www'),
       path.join(mockCompilerRoot, 'www', 'build'),
       path.join(mockCompilerRoot, 'www', 'build', 'app.js'),
@@ -40,7 +40,7 @@ describe('outputTarget, www', () => {
       path.join(mockCompilerRoot, 'src', 'components.d.ts'),
     ]);
 
-    doNotExpectFiles(compiler.compilerCtx.fs, [
+    expectFilesDoNotExist(compiler.compilerCtx.fs, [
       path.join(mockCompilerRoot, 'src', 'components', 'cmp-a.js'),
 
       path.join(mockCompilerRoot, 'dist', '/'),
