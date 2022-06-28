@@ -78,9 +78,9 @@ export const BOOLEAN_CLI_ARGS = [
   'testLocationInResults',
   'updateSnapshot',
   'useStderr',
-  // 'verbose', Stencil alrerady supports this argument
-  // 'version', Stencil alrerady supports this argument
-  // 'watch', Stencil alrerady supports this argument
+  // 'verbose', Stencil already supports this argument
+  // 'version', Stencil already supports this argument
+  // 'watch', Stencil already supports this argument
   'watchAll',
   'watchman',
 ] as const;

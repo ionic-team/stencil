@@ -203,7 +203,7 @@ const parseStringNumberArg = (flags: ConfigFlags, args: string[], configCaseName
  * a given string we conclude that the string should be parsed as a
  * string literal, rather than using `parseInt` to convert it to a number.
  */
-const CLI_ARG_STRING_REGEX = /[^\d\.]+/g;
+const CLI_ARG_STRING_REGEX = /[^\d\.(E|e)]+/g;
 
 /**
  * Parse a LogLevel CLI argument. These can be only a specific
