@@ -1,17 +1,17 @@
 import { CompilerSystem, LogLevel, LOG_LEVELS, TaskCommand } from '../declarations';
 import { dashToPascalCase, toDashCase } from '@utils';
 import {
-  ConfigFlags,
-  BooleanCLIArg,
-  LogCLIArg,
-  NumberCLIArg,
-  StringCLIArg,
-  CLI_ARG_ALIASES,
   BOOLEAN_CLI_ARGS,
+  BooleanCLIArg,
+  CLI_ARG_ALIASES,
+  ConfigFlags,
   LOG_LEVEL_CLI_ARGS,
+  LogCLIArg,
   NUMBER_CLI_ARGS,
+  NumberCLIArg,
   STRING_CLI_ARGS,
   STRING_NUMBER_CLI_ARGS,
+  StringCLIArg,
   StringNumberCLIArg,
 } from './config-flags';
 
