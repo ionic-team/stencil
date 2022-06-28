@@ -179,7 +179,6 @@ const parseStringNumberArg = (flags: ConfigFlags, args: string[], configCaseName
   const { value, matchingArg } = getValue(args, configCaseName);
 
   if (value !== undefined && matchingArg !== undefined) {
-
     if (CLI_ARG_STRING_REGEX.test(value)) {
       // if it matches the regex we treat it like a string
       flags[configCaseName] = value;
@@ -190,7 +189,7 @@ const parseStringNumberArg = (flags: ConfigFlags, args: string[], configCaseName
     flags.knownArgs!.push(matchingArg);
     flags.knownArgs!.push(value);
   }
-}
+};
 
 /**
  * We use this regular expression to detect CLI parameters which
@@ -204,7 +203,7 @@ const parseStringNumberArg = (flags: ConfigFlags, args: string[], configCaseName
  * a given string we conclude that the string should be parsed as a
  * string literal, rather than using `parseInt` to convert it to a number.
  */
-const CLI_ARG_STRING_REGEX = /[^\d\.]+/g
+const CLI_ARG_STRING_REGEX = /[^\d\.]+/g;
 
 /**
  * Parse a LogLevel CLI argument. These can be only a specific
@@ -247,7 +246,10 @@ const parseLogLevelArg = (flags: ConfigFlags, args: string[], configCaseName: Lo
  * @returns the value for the flag as well as the exact string which it matched from
  * the user input.
  */
-const getValue = (args: string[], configCaseName: StringCLIArg | NumberCLIArg | StringNumberCLIArg | LogCLIArg): CLIArgValue => {
+const getValue = (
+  args: string[],
+  configCaseName: StringCLIArg | NumberCLIArg | StringNumberCLIArg | LogCLIArg
+): CLIArgValue => {
   // for some CLI args we have a short alias, like 'c' for 'config'
   const alias = CLI_ARG_ALIASES[configCaseName];
   // we support supplying arguments in both dash-case and configCase

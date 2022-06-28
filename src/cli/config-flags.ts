@@ -263,7 +263,12 @@ type LogLevelFlags = ObjectFromKeys<typeof LOG_LEVEL_CLI_ARGS, LogLevel>;
  * options we support and a runtime list of strings which can be used to match
  * on actual flags passed by the user.
  */
-export interface ConfigFlags extends BooleanConfigFlags, StringConfigFlags, NumberConfigFlags, StringNumberConfigFlags, LogLevelFlags {
+export interface ConfigFlags
+  extends BooleanConfigFlags,
+    StringConfigFlags,
+    NumberConfigFlags,
+    StringNumberConfigFlags,
+    LogLevelFlags {
   task?: TaskCommand | null;
   args?: string[];
   knownArgs?: string[];
