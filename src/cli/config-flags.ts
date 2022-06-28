@@ -89,7 +89,6 @@ export const BOOLEAN_CLI_ARGS = [
  * All the Number options supported by the Stencil CLI
  */
 export const NUMBER_CLI_ARGS = [
-  'maxWorkers',
   'port',
   // JEST CLI ARGS
   'maxConcurrency',
@@ -121,7 +120,6 @@ export const STRING_CLI_ARGS = [
   'globalTeardown',
   'globals',
   'haste',
-  'maxWorkers',
   'moduleNameMapper',
   'notifyMode',
   'outputFile',
@@ -142,7 +140,6 @@ export const STRING_CLI_ARGS = [
   'transform',
 
   // ARRAY ARGS
-  //
   'collectCoverageOnlyFrom',
   'coveragePathIgnorePatterns',
   'coverageReporters',
@@ -167,6 +164,14 @@ export const STRING_CLI_ARGS = [
 ] as const;
 
 /**
+ * All the CLI arguments which may have string or number values
+ *
+ * `maxWorkers` is an argument which is used both by Stencil _and_ by Jest,
+ * which means that we need to support parsing both string and number values.
+ */
+export const STRING_NUMBER_CLI_ARGS = ['maxWorkers'] as const;
+
+/**
  * All the LogLevel-type options supported by the Stencil CLI
  *
  * This is a bit silly since there's only one such argument atm,
@@ -185,9 +190,10 @@ type ArrayValuesAsUnion<T extends ReadonlyArray<string>> = T[number];
 export type BooleanCLIArg = ArrayValuesAsUnion<typeof BOOLEAN_CLI_ARGS>;
 export type StringCLIArg = ArrayValuesAsUnion<typeof STRING_CLI_ARGS>;
 export type NumberCLIArg = ArrayValuesAsUnion<typeof NUMBER_CLI_ARGS>;
+export type StringNumberCLIArg = ArrayValuesAsUnion<typeof STRING_NUMBER_CLI_ARGS>;
 export type LogCLIArg = ArrayValuesAsUnion<typeof LOG_LEVEL_CLI_ARGS>;
 
-type KnownCLIArg = BooleanCLIArg | StringCLIArg | NumberCLIArg | LogCLIArg;
+type KnownCLIArg = BooleanCLIArg | StringCLIArg | NumberCLIArg | StringNumberCLIArg | LogCLIArg;
 
 type AliasMap = Partial<Record<KnownCLIArg, string>>;
 
@@ -218,16 +224,25 @@ type ObjectFromKeys<K extends ReadonlyArray<string>, T> = {
  * in ConfigFlags, below
  */
 type BooleanConfigFlags = ObjectFromKeys<typeof BOOLEAN_CLI_ARGS, boolean>;
+
 /**
  * Type containing the possible String configuration flags, to be included
  * in ConfigFlags, below
  */
 type StringConfigFlags = ObjectFromKeys<typeof STRING_CLI_ARGS, string>;
+
 /**
  * Type containing the possible numeric configuration flags, to be included
  * in ConfigFlags, below
  */
 type NumberConfigFlags = ObjectFromKeys<typeof NUMBER_CLI_ARGS, number>;
+
+/**
+ * Type containing the configuration flags which may be set to either string
+ * or number values.
+ */
+type StringNumberConfigFlags = ObjectFromKeys<typeof STRING_NUMBER_CLI_ARGS, string | number>;
+
 /**
  * Type containing the possible LogLevel configuration flags, to be included
  * in ConfigFlags, below
@@ -248,7 +263,7 @@ type LogLevelFlags = ObjectFromKeys<typeof LOG_LEVEL_CLI_ARGS, LogLevel>;
  * options we support and a runtime list of strings which can be used to match
  * on actual flags passed by the user.
  */
-export interface ConfigFlags extends BooleanConfigFlags, StringConfigFlags, NumberConfigFlags, LogLevelFlags {
+export interface ConfigFlags extends BooleanConfigFlags, StringConfigFlags, NumberConfigFlags, StringNumberConfigFlags, LogLevelFlags {
   task?: TaskCommand | null;
   args?: string[];
   knownArgs?: string[];
