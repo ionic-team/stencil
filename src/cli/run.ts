@@ -118,10 +118,7 @@ export const runTask = async (
   task: d.TaskCommand,
   sys?: d.CompilerSystem
 ) => {
-  config.flags = config.flags || { task };
   const strictConfig: InternalStrictConfig = { ...config, flags: { ...config.flags } ?? { task } };
-
-  config.outputTargets = config.outputTargets || [];
   strictConfig.outputTargets = strictConfig.outputTargets || [];
 
   switch (task) {
