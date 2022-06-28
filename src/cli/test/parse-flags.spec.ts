@@ -165,6 +165,13 @@ describe('parseFlags', () => {
     expect(flags.ci).toBe(true);
   });
 
+  /**
+   * these comprehensive tests of all the supported args serve as regression
+   * tests against duplicating any of the arguments in the arrays. Because of
+   * the way that the arg parsing algorithm works having a dupe will result in a
+   * value like `[true, true]` being set on ConfigFlags, which will cause these
+   * tests to start failing.
+   */
   describe.each(BOOLEAN_CLI_ARGS)('should parse boolean flag %s', (cliArg) => {
     it('should parse arg', () => {
       const flags = parseFlags([`--${cliArg}`], sys);
