@@ -184,7 +184,7 @@ const parseStringNumberArg = (flags: ConfigFlags, args: string[], configCaseName
       flags[configCaseName] = value;
     } else {
       // it was a number, great!
-      flags[configCaseName] = parseInt(value, 10);
+      flags[configCaseName] = Number(value);
     }
     flags.knownArgs!.push(matchingArg);
     flags.knownArgs!.push(value);
@@ -198,12 +198,17 @@ const parseStringNumberArg = (flags: ConfigFlags, args: string[], configCaseName
  * number value.
  *
  * The regex tests for the presence of at least one character which is
- * _not_ a digit (`\d`) or a period (`\.`). Thus we'll match a string
- * like `"50%"`, but not a string like `"50"` or `"5.0"`. If it matches
- * a given string we conclude that the string should be parsed as a
- * string literal, rather than using `parseInt` to convert it to a number.
+ * _not_ a digit (`\d`), a period (`\.`), or one of the characters `"e"`,
+ * `"E"`, `"+"`, or `"-"` (the latter four characters are necessary to 
+ * support the admittedly unlikely use of scientific notation, like `"4e+0"`
+ * for `4`).
+ *
+ * Thus we'll match a string like `"50%"`, but not a string like `"50"` or
+ * `"5.0"`. If it matches a given string we conclude that the string should
+ * be parsed as a string literal, rather than using `Number` to convert it
+ * to a number.
  */
-const CLI_ARG_STRING_REGEX = /[^\d\.(E|e)]+/g;
+const CLI_ARG_STRING_REGEX = /[^\d\.Ee\+\-]+/g;
 
 /**
  * Parse a LogLevel CLI argument. These can be only a specific
