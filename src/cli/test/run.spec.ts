@@ -30,6 +30,8 @@ describe('run', () => {
 
       parseFlagsSpy = jest.spyOn(ParseFlags, 'parseFlags');
       parseFlagsSpy.mockReturnValue({
+        // use the 'help' task as a reasonable default for all calls to this function.
+        // code paths that require a different task can always override this value as needed.
         task: 'help',
       });
     });
