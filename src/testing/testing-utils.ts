@@ -30,11 +30,8 @@ export function shuffleArray(array: any[]) {
  * @param filePaths the paths to validate
  * @throws when one or more of the provided file paths cannot be found
  */
-export function expectFiles(fs: d.InMemoryFileSystem, filePaths: string[]): void {
-  const notFoundFiles: ReadonlyArray<string> = filePaths.filter(
-    (filePath: string) => !fs.statSync(filePath).exists,
-    []
-  );
+export function expectFilesExist(fs: d.InMemoryFileSystem, filePaths: string[]): void {
+  const notFoundFiles: ReadonlyArray<string> = filePaths.filter((filePath: string) => !fs.statSync(filePath).exists);
 
   if (notFoundFiles.length > 0) {
     throw new Error(
@@ -45,18 +42,23 @@ export function expectFiles(fs: d.InMemoryFileSystem, filePaths: string[]): void
   }
 }
 
-export function doNotExpectFiles(fs: d.InMemoryFileSystem, filePaths: string[]) {
-  filePaths.forEach((filePath) => {
-    try {
-      fs.sys.statSync(filePath);
-    } catch (e) {
-      return;
-    }
+/**
+ * Testing utility to validate the non-existence of some provided file paths using a specific file system
+ *
+ * @param fs the file system to use to validate the non-existence of some files
+ * @param filePaths the paths to validate
+ * @throws when one or more of the provided file paths is found
+ */
+export function expectFilesDoNotExist(fs: d.InMemoryFileSystem, filePaths: string[]): void {
+  const existentFiles: ReadonlyArray<string> = filePaths.filter((filePath: string) => fs.statSync(filePath).exists);
 
-    if (fs.accessSync(filePath)) {
-      throw new Error(`did not expect access: ${filePath}`);
-    }
-  });
+  if (existentFiles.length > 0) {
+    throw new Error(
+      `The following files were expected to not exist, but do:\n${existentFiles
+        .map((result: string) => '-' + result)
+        .join('\n')}`
+    );
+  }
 }
 
 export function getAppScriptUrl(config: d.Config, browserUrl: string) {
