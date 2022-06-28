@@ -199,7 +199,7 @@ const parseStringNumberArg = (flags: ConfigFlags, args: string[], configCaseName
  *
  * The regex tests for the presence of at least one character which is
  * _not_ a digit (`\d`), a period (`\.`), or one of the characters `"e"`,
- * `"E"`, `"+"`, or `"-"` (the latter four characters are necessary to 
+ * `"E"`, `"+"`, or `"-"` (the latter four characters are necessary to
  * support the admittedly unlikely use of scientific notation, like `"4e+0"`
  * for `4`).
  *

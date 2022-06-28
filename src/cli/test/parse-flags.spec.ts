@@ -379,9 +379,9 @@ describe('parseFlags', () => {
     ['--maxWorkers', '4e+0'],
     ['--maxWorkers', '40e-1'],
   ])('should parse %p, %p', (...args) => {
-    const flags = parseFlags(args, sys)
-    expect(flags.maxWorkers).toBe(4)
-  })
+    const flags = parseFlags(args, sys);
+    expect(flags.maxWorkers).toBe(4);
+  });
 
   it('should parse --maxWorkers 4', () => {
     args[0] = '--maxWorkers';
