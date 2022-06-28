@@ -40,16 +40,16 @@ export const BOOLEAN_CLI_ARGS = [
   'all',
   'automock',
   'bail',
-  'cache',
+  // 'cache', Stencil already supports this argument
   'changedFilesWithAncestor',
-  'ci',
+  // 'ci', Stencil already supports this argument
   'clearCache',
   'clearMocks',
   'collectCoverage',
   'color',
   'colors',
   'coverage',
-  'debug',
+  // 'debug', Stencil already supports this argument
   'detectLeaks',
   'detectOpenHandles',
   'errorOnDeprecated',
@@ -78,9 +78,9 @@ export const BOOLEAN_CLI_ARGS = [
   'testLocationInResults',
   'updateSnapshot',
   'useStderr',
-  'verbose',
-  'version',
-  'watch',
+  // 'verbose', Stencil alrerady supports this argument
+  // 'version', Stencil alrerady supports this argument
+  // 'watch', Stencil alrerady supports this argument
   'watchAll',
   'watchman',
 ] as const;
@@ -111,7 +111,7 @@ export const STRING_CLI_ARGS = [
   'cacheDirectory',
   'changedSince',
   'collectCoverageFrom',
-  'config',
+  // 'config', Stencil already supports this argument
   'coverageDirectory',
   'coverageThreshold',
   'env',

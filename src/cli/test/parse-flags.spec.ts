@@ -1,5 +1,6 @@
 import type * as d from '../../declarations';
 import { LogLevel } from '../../declarations';
+import { BOOLEAN_CLI_ARGS, STRING_CLI_ARGS, NUMBER_CLI_ARGS } from '../config-flags';
 import { parseFlags } from '../parse-flags';
 
 describe('parseFlags', () => {
@@ -160,12 +161,41 @@ describe('parseFlags', () => {
   it('should parse --ci', () => {
     args[0] = '--ci';
     const flags = parseFlags(args, sys);
+    expect(flags.knownArgs).toEqual(['--ci']);
     expect(flags.ci).toBe(true);
+  });
+
+  describe.each(BOOLEAN_CLI_ARGS)('should parse boolean flag %s', (cliArg) => {
+    it('should parse arg', () => {
+      const flags = parseFlags([`--${cliArg}`], sys);
+      expect(flags.knownArgs).toEqual([`--${cliArg}`]);
+      expect(flags[cliArg]).toBe(true);
+    });
+
+    it(`should parse --no${cliArg}`, () => {
+      const negativeFlag = '--no' + cliArg.charAt(0).toUpperCase() + cliArg.slice(1);
+      const flags = parseFlags([negativeFlag], sys);
+      expect(flags.knownArgs).toEqual([negativeFlag]);
+      expect(flags[cliArg]).toBe(false);
+    });
+  });
+
+  it.each(STRING_CLI_ARGS)('should parse string flag %s', (cliArg) => {
+    const flags = parseFlags([`--${cliArg}`, 'test-value'], sys);
+    expect(flags.knownArgs).toEqual([`--${cliArg}`, 'test-value']);
+    expect(flags[cliArg]).toBe('test-value');
+  });
+
+  it.each(NUMBER_CLI_ARGS)('should parse number flag %s', (cliArg) => {
+    const flags = parseFlags([`--${cliArg}`, '42'], sys);
+    expect(flags.knownArgs).toEqual([`--${cliArg}`, '42']);
+    expect(flags[cliArg]).toBe(42);
   });
 
   it('should parse --compare', () => {
     args[0] = '--compare';
     const flags = parseFlags(args, sys);
+    expect(flags.knownArgs).toEqual(['--compare']);
     expect(flags.compare).toBe(true);
   });
 
