@@ -14,18 +14,18 @@ describe('parseFlags', () => {
   });
 
   it('should get known and unknown args', () => {
-    args.push('serve', '--address', '127.0.0.1', '--coverage', '--reporters', 'test.spec.ts');
+    args.push('serve', '--address', '127.0.0.1', '--potatoArgument', '--flimflammery', 'test.spec.ts');
 
     const flags = parseFlags(args, sys);
     expect(flags.task).toBe('serve');
     expect(flags.args[0]).toBe('--address');
     expect(flags.args[1]).toBe('127.0.0.1');
-    expect(flags.args[2]).toBe('--coverage');
-    expect(flags.args[3]).toBe('--reporters');
+    expect(flags.args[2]).toBe('--potatoArgument');
+    expect(flags.args[3]).toBe('--flimflammery');
     expect(flags.args[4]).toBe('test.spec.ts');
     expect(flags.knownArgs).toEqual(['--address', '127.0.0.1']);
-    expect(flags.unknownArgs[0]).toBe('--coverage');
-    expect(flags.unknownArgs[1]).toBe('--reporters');
+    expect(flags.unknownArgs[0]).toBe('--potatoArgument');
+    expect(flags.unknownArgs[1]).toBe('--flimflammery');
     expect(flags.unknownArgs[2]).toBe('test.spec.ts');
   });
 
