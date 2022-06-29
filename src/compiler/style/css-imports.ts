@@ -31,7 +31,7 @@ export const parseCssImports = async (
   const isCssEntry = resolvedFilePath.toLowerCase().endsWith('.css');
   const allCssImports: string[] = [];
 
-  // a Set of reviously-resolved file paths that we add to as we traverse the
+  // a Set of previously-resolved file paths that we add to as we traverse the
   // import tree (to avoid a possible circular dependency and infinite loop)
   const resolvedFilePaths = new Set();
 
@@ -286,9 +286,9 @@ export const replaceNodeModuleUrl = (
  * tree of stylesheets.
  *
  * @param styleText the text within which we want to replace @import statements
- * @param cssImports informaiton about imported modules
+ * @param cssImports information about imported modules
  * @param isCssEntry whether we're dealing with a CSS file
- * @returns an updated string with the requisite substitions
+ * @returns an updated string with the requisite substitutions
  */
 export const replaceImportDeclarations = (styleText: string, cssImports: d.CssImportData[], isCssEntry: boolean) => {
   for (const cssImport of cssImports) {
