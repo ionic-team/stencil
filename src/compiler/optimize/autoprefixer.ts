@@ -2,8 +2,8 @@ import type * as d from '../../declarations';
 import { IS_NODE_ENV, requireFunc } from '../sys/environment';
 import { Postcss } from 'postcss';
 
-// TODO can we do this in a better way?
-let cssProcessor: ReturnType<Postcss>;
+type CssProcessor = ReturnType<Postcss>;
+let cssProcessor: CssProcessor;
 
 /**
  * Autoprefix a CSS string, adding vendor prefixes to make sure that what
@@ -98,7 +98,7 @@ export const autoprefixCss = async (cssText: string, opts: boolean | null | d.Au
  * @param autoprefixerOpts Options for Autoprefixer
  * @returns postCSS with the Autoprefixer plugin applied
  */
-const getProcessor = (autoprefixerOpts: d.AutoprefixerOptions) => {
+const getProcessor = (autoprefixerOpts: d.AutoprefixerOptions): CssProcessor => {
   const { postcss, autoprefixer } = requireFunc('../sys/node/autoprefixer.js');
   if (!cssProcessor) {
     cssProcessor = postcss([autoprefixer(autoprefixerOpts)]);
