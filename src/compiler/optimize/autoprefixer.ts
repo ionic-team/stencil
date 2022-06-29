@@ -1,8 +1,9 @@
 import type * as d from '../../declarations';
 import { IS_NODE_ENV, requireFunc } from '../sys/environment';
+import { Postcss } from 'postcss';
 
 // TODO can we do this in a better way?
-let cssProcessor: any;
+let cssProcessor: ReturnType<Postcss>;
 
 /**
  * Autoprefix a CSS string, adding vendor prefixes to make sure that what
