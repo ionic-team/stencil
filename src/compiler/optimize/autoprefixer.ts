@@ -26,7 +26,7 @@ export const autoprefixCss = async (cssText: string, opts: boolean | null | d.Au
   }
 
   try {
-    const autoprefixerOpts = opts !== null && typeof opts === 'object' ? opts : DEFAULT_AUTOPREFIX_OPTIONS;
+    const autoprefixerOpts = opts != null && typeof opts === 'object' ? opts : DEFAULT_AUTOPREFIX_OPTIONS;
 
     const processor = getProcessor(autoprefixerOpts);
     const result = await processor.process(cssText, { map: null });
