@@ -112,7 +112,13 @@ export const parseCssImports = async (
  * Interface describing the return value of `parseCSSImports`
  */
 interface ParseCSSReturn {
+  /**
+   * An array of filepaths to the imported CSS files
+   */
   imports: string[];
+  /**
+   * The actual CSS text itself
+   */
   styleText: string;
 }
 
