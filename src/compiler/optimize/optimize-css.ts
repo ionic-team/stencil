@@ -5,7 +5,7 @@ import { minifyCss } from './minify-css';
 
 /**
  * Optimize a CSS file, optionally running an autoprefixer and a minifier
- * depending on the options set on the input object.
+ * depending on the options set on the input options argument.
  *
  * @param inputOpts input CSS options
  * @returns a promise wrapping the optimized output
