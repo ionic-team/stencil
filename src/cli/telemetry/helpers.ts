@@ -1,4 +1,5 @@
 import type * as d from '../../declarations';
+import { ConfigFlags } from '../config-flags';
 
 export const tryFn = async <T extends (...args: any[]) => Promise<R>, R>(fn: T, ...args: any[]): Promise<R | null> => {
   try {
@@ -12,7 +13,7 @@ export const tryFn = async <T extends (...args: any[]) => Promise<R>, R>(fn: T, 
 
 export declare const TERMINAL_INFO: d.TerminalInfo;
 
-export const isInteractive = (sys: d.CompilerSystem, flags: d.ConfigFlags, object?: d.TerminalInfo): boolean => {
+export const isInteractive = (sys: d.CompilerSystem, flags: ConfigFlags, object?: d.TerminalInfo): boolean => {
   const terminalInfo =
     object ||
     Object.freeze({
@@ -54,7 +55,7 @@ export async function readJson(sys: d.CompilerSystem, path: string): Promise<any
  * @param flags The configuration flags passed into the Stencil command
  * @returns true if --debug has been passed, otherwise false
  */
-export function hasDebug(flags: d.ConfigFlags) {
+export function hasDebug(flags: ConfigFlags) {
   return flags.debug;
 }
 
@@ -63,6 +64,6 @@ export function hasDebug(flags: d.ConfigFlags) {
  * @param flags The configuration flags passed into the Stencil command
  * @returns true if both --debug and --verbose have been passed, otherwise false
  */
-export function hasVerbose(flags: d.ConfigFlags) {
+export function hasVerbose(flags: ConfigFlags) {
   return flags.verbose && hasDebug(flags);
 }
