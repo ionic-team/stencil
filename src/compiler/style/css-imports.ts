@@ -1,5 +1,5 @@
 import type * as d from '../../declarations';
-import { basename, dirname, isAbsolute, join, relative } from 'path';
+import { basename, dirname, isAbsolute, join } from 'path';
 import { buildError, normalizePath } from '@utils';
 import { getModuleId } from '../sys/resolve/resolve-utils';
 import { parseStyleDocs } from '../docs/style-docs';
@@ -267,23 +267,6 @@ export const isLocalCssImport = (srcImport: string) => {
   }
 
   return true;
-};
-
-export const replaceNodeModuleUrl = (
-  baseCssFilePath: string,
-  moduleId: string,
-  nodeModulePath: string,
-  url: string
-) => {
-  nodeModulePath = normalizePath(dirname(nodeModulePath));
-  url = normalizePath(url);
-
-  const absPathToNodeModuleCss = normalizePath(url.replace(`~${moduleId}`, nodeModulePath));
-
-  const baseCssDir = normalizePath(dirname(baseCssFilePath));
-
-  const relToRoot = normalizePath(relative(baseCssDir, absPathToNodeModuleCss));
-  return relToRoot;
 };
 
 /**
