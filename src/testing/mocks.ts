@@ -19,12 +19,27 @@ import path from 'path';
 import { noop } from '@utils';
 import { buildEvents } from '../compiler/events';
 
+// TODO(STENCIL-486): Update `mockInternalStrictConfig` to accept any property found on `InternalStrictConfig`
+/**
+ * Creates a mock instance of an internal, validated Stencil configuration object
+ * @param sys an optional compiler system to associate with the config. If one is not provided, one will be created for
+ * the caller
+ * @returns the mock Stencil configuration
+ */
 export function mockInternalStrictConfig(sys?: CompilerSystem): InternalStrictConfig {
   const baseConfig = mockConfig(sys);
 
   return { ...baseConfig, flags: {} };
 }
 
+// TODO(STENCIL-486): Update `mockInternalStrictConfig` to accept any property found on `InternalStrictConfig`
+/**
+ * Creates a mock instance of a Stencil configuration entity. The mocked configuration has no guarantees around the
+ * types/validity of its data.
+ * @param sys an optional compiler system to associate with the config. If one is not provided, one will be created for
+ * the caller
+ * @returns the mock Stencil configuration
+ */
 export function mockConfig(sys?: CompilerSystem): UnvalidatedConfig {
   const rootDir = path.resolve('/');
 
