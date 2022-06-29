@@ -8,15 +8,21 @@ import { anonymizeConfigForTelemetry } from '../telemetry';
 import { DIST, DIST_CUSTOM_ELEMENTS, DIST_HYDRATE_SCRIPT, WWW } from '../../../compiler/output-targets/output-utils';
 
 describe('telemetryBuildFinishedAction', () => {
-  const config: d.InternalStrictConfig = {
-    outputTargets: [],
-    flags: {
-      args: [],
-    },
-  };
+  let config: d.InternalStrictConfig;
+  let logger: d.Logger;
+  let sys: d.CompilerSystem;
 
-  const logger = mockLogger();
-  const sys = createSystem();
+  beforeEach(() => {
+    config = {
+      outputTargets: [],
+      flags: {
+        args: [],
+      },
+    };
+
+    logger = mockLogger();
+    sys = createSystem();
+  });
 
   it('issues a network request when complete', async () => {
     const spyShouldTrack = jest.spyOn(shouldTrack, 'shouldTrack');
@@ -39,14 +45,21 @@ describe('telemetryBuildFinishedAction', () => {
 });
 
 describe('telemetryAction', () => {
-  const config: d.InternalStrictConfig = {
-    outputTargets: [],
-    flags: {
-      args: [],
-    },
-  };
-  const logger = mockLogger();
-  const sys = createSystem();
+  let config: d.InternalStrictConfig;
+  let logger: d.Logger;
+  let sys: d.CompilerSystem;
+
+  beforeEach(() => {
+    config = {
+      outputTargets: [],
+      flags: {
+        args: [],
+      },
+    };
+
+    logger = mockLogger();
+    sys = createSystem();
+  });
 
   it('issues a network request when no async function is passed', async () => {
     const spyShouldTrack = jest.spyOn(shouldTrack, 'shouldTrack');
@@ -132,13 +145,19 @@ describe('hasAppTarget', () => {
 });
 
 describe('prepareData', () => {
-  const config: d.InternalStrictConfig = {
-    flags: {
-      args: [],
-    },
-    outputTargets: [],
-  };
-  const sys = createSystem();
+  let config: d.InternalStrictConfig;
+  let sys: d.CompilerSystem;
+
+  beforeEach(() => {
+    config = {
+      outputTargets: [],
+      flags: {
+        args: [],
+      },
+    };
+
+    sys = createSystem();
+  });
 
   it('provides an object', async () => {
     const data = await telemetry.prepareData(coreCompiler, config, sys, 1000);
