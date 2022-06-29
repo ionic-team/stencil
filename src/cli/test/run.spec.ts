@@ -58,8 +58,8 @@ describe('run', () => {
         taskHelpSpy.mockRestore();
       });
 
-      it("calls the help task when the 'task' field is set to 'help'", () => {
-        run(cliInitOptions);
+      it("calls the help task when the 'task' field is set to 'help'", async () => {
+        await run(cliInitOptions);
 
         expect(taskHelpSpy).toHaveBeenCalledTimes(1);
         expect(taskHelpSpy).toHaveBeenCalledWith(
@@ -74,12 +74,12 @@ describe('run', () => {
         taskHelpSpy.mockRestore();
       });
 
-      it("calls the help task when the 'help' field is set on flags", () => {
+      it("calls the help task when the 'help' field is set on flags", async () => {
         parseFlagsSpy.mockReturnValue({
           help: true,
         });
 
-        run(cliInitOptions);
+        await run(cliInitOptions);
 
         expect(taskHelpSpy).toHaveBeenCalledTimes(1);
         expect(taskHelpSpy).toHaveBeenCalledWith(
