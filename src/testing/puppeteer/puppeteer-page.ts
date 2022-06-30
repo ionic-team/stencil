@@ -124,6 +124,7 @@ export async function newE2EPage(opts: NewE2EPageOptions = {}): Promise<E2EPage>
           location: ev.location().url,
         });
         if (failOnConsoleError) {
+          // eslint-disable-next-line jest/no-jasmine-globals -- we want to use this here
           fail(new Error(serializeConsoleMessage(ev)));
         }
       }
@@ -135,6 +136,7 @@ export async function newE2EPage(opts: NewE2EPageOptions = {}): Promise<E2EPage>
         message: err.message,
         location: err.stack,
       });
+      // eslint-disable-next-line jest/no-jasmine-globals -- we want to use this here
       fail(err);
     });
     page.on('requestfailed', (req) => {
@@ -144,6 +146,7 @@ export async function newE2EPage(opts: NewE2EPageOptions = {}): Promise<E2EPage>
         location: req.url(),
       });
       if (failOnNetworkError) {
+        // eslint-disable-next-line jest/no-jasmine-globals -- we want to use this here
         fail(new Error(req.failure().errorText));
       } else {
         console.error('requestfailed', req.url());
