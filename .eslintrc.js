@@ -58,6 +58,10 @@ module.exports = {
     "jest/no-test-prefixes": ["off"],
     // we...have a number of things disabled :)
     "jest/no-disabled-tests": ["off"],
+    // we use this in enough places that we don't want to do per-line disables
+    "jest/no-jasmine-globals": ["off"],
+    // we use this in enough places that we don't want to do per-line disables
+    "jest/no-conditional-expect": ["off"],
   },
   "env": {
     "jest/globals": true

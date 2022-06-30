@@ -8,7 +8,6 @@ describe('optimizeCss', () => {
   let config: d.Config;
   let compilerCtx: d.CompilerCtx;
   let diagnostics: d.Diagnostic[];
-  // eslint-disable-next-line jest/no-jasmine-globals -- we want to up the timeout here
   jasmine.DEFAULT_TIMEOUT_INTERVAL = 30000;
 
   beforeEach(() => {

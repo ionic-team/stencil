@@ -229,7 +229,7 @@ describe('validateDevServer', () => {
     expect(config.devServer.ssr).toBe(false);
   });
 
-  it('should set srcIndexHtml from config', () => {
+  it('should set default srcIndexHtml from config', () => {
     const { config } = validateConfig(inputConfig);
     expect(config.devServer.srcIndexHtml).toBe(normalizePath(path.join(root, 'some', 'path', 'src', 'index.html')));
   });
