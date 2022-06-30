@@ -102,7 +102,7 @@ Empty objects can also be the cause, look for JSX comments that became objects.`
   return vnode;
 };
 
-export const newVNode = (tag: string, text: string) => {
+export const newVNode = (tag: string | null, text: string | null) => {
   const vnode: d.VNode = {
     $flags$: 0,
     $tag$: tag,

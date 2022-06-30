@@ -2,6 +2,22 @@ import type * as d from '../declarations';
 import { BUILD } from '@app-data';
 import { updateFallbackSlotVisibility } from './vdom/render-slot-fallback';
 
+interface PolyfilledNode extends d.HostElement {
+  readonly __childNodes: NodeListOf<ChildNode>;
+  readonly __children: HTMLCollectionOf<Element>;
+  readonly __childElementCount: number;
+  __innerHTML: string;
+  __innerText: string;
+  __textContent: string;
+  __append: (...nodes: (Node | string)[]) => void;
+  __prepend: (...nodes: (Node | string)[]) => void;
+  __appendChild: <T extends Node>(newChild: T) => T;
+  __replaceChildren: (...nodes: (Node | string)[]) => void;
+  __insertAdjacentElement: (position: InsertPosition, insertedElement: Element) => Element | null;
+  __insertAdjacentHTML: (where: InsertPosition, html: string) => void;
+  __insertAdjacentText: (where: InsertPosition, text: string) => void;
+}
+
 /**
  * Polyfills `cloneNode()` for slot polyfilled components ()
  * @param HostElementPrototype the host prototype to polyfill
@@ -10,8 +26,8 @@ export const patchCloneNode = (HostElementPrototype: any) => {
   const orgCloneNode = HostElementPrototype.cloneNode;
 
   HostElementPrototype.cloneNode = function (deep?: boolean) {
-    const srcNode: d.HostElement = this;
-    const clonedNode: d.HostElement = orgCloneNode.call(srcNode, false) as d.HostElement;
+    const srcNode: PolyfilledNode = this;
+    const clonedNode: PolyfilledNode = orgCloneNode.call(srcNode, false);
     if (BUILD.slot && deep) {
       let i = 0;
       let slotted, nonStencilNode;
@@ -148,7 +164,10 @@ const patchSlotInnerText = (HostElementPrototype: any) => {
   Object.defineProperty(HostElementPrototype, 'innerText', {
     get: function () {
       let text = '';
-      this.childNodes.forEach((node: d.RenderNode) => (text += node.innerText || node.textContent.trimEnd()));
+      this.childNodes.forEach((node: d.RenderNode) => {
+        if (node.innerText) text += node.innerText;
+        else if (node.textContent) text += node.textContent.trimEnd();
+      });
       return text;
     },
     set: function (value) {
@@ -188,6 +207,7 @@ const patchTextContent = (HostElementPrototype: any) => {
 
 export const patchNodeRemove = (ElementPrototype: any) => {
   if (!ElementPrototype || ElementPrototype.__remove) return;
+
   ElementPrototype.__remove = ElementPrototype.remove || true;
   patchNodeRemoveChild(ElementPrototype.parentNode);
 
@@ -201,12 +221,16 @@ export const patchNodeRemove = (ElementPrototype: any) => {
 
 const patchNodeRemoveChild = (ElementPrototype: any) => {
   if (!ElementPrototype || ElementPrototype.__removeChild) return;
+
   ElementPrototype.__removeChild = ElementPrototype.removeChild;
   ElementPrototype.removeChild = function (this: d.RenderNode, toRemove: d.RenderNode) {
     if (toRemove['s-sn']) {
       const slotNode = getHostSlotNode(this.__childNodes || this.childNodes, toRemove['s-sn']);
       (this as any).__removeChild(toRemove);
-      if (slotNode && slotNode['s-hsf']) updateFallbackSlotVisibility(this);
+
+      if (slotNode && slotNode['s-hsf']) {
+        updateFallbackSlotVisibility(this);
+      }
       return;
     }
     return (this as any).__removeChild(toRemove);
@@ -215,14 +239,16 @@ const patchNodeRemoveChild = (ElementPrototype: any) => {
 
 const patchSlotAppendChild = (HostElementPrototype: any) => {
   if (HostElementPrototype.__appendChild) return;
+
   HostElementPrototype.__appendChild = HostElementPrototype.appendChild;
-  HostElementPrototype.appendChild = function (this: d.HostElement, newChild: d.RenderNode) {
+  HostElementPrototype.appendChild = function (this: PolyfilledNode, newChild: d.RenderNode) {
     const slotName = (newChild['s-sn'] = getSlotName(newChild));
     const slotNode = getHostSlotNode(this.__childNodes, slotName);
+
     if (slotNode) {
       const slotPlaceholder: d.RenderNode = document.createTextNode('') as any;
       slotPlaceholder['s-nr'] = newChild;
-      if (slotNode['s-cr'].parentNode) {
+      if (slotNode['s-cr'] && slotNode['s-cr'].parentNode) {
         (slotNode['s-cr'].parentNode as any).__appendChild(slotPlaceholder);
       }
       newChild['s-ol'] = slotPlaceholder;
@@ -230,10 +256,15 @@ const patchSlotAppendChild = (HostElementPrototype: any) => {
 
       const slotChildNodes = getHostSlotChildNodes(slotNode, slotName);
       const appendAfter = slotChildNodes[slotChildNodes.length - 1];
-      appendAfter.parentNode.insertBefore(newChild, appendAfter.nextSibling);
+
+      if (appendAfter.parentNode) {
+        appendAfter.parentNode.insertBefore(newChild, appendAfter.nextSibling);
+      }
       patchNodeRemoveChild(newChild.parentNode);
 
-      if (slotNode['s-hsf']) updateFallbackSlotVisibility(slotNode.parentNode as d.RenderNode);
+      if (slotNode['s-hsf']) {
+        updateFallbackSlotVisibility(slotNode.parentNode as d.RenderNode);
+      }
       return;
     }
     if (newChild.nodeType === 1 && !!newChild.getAttribute('slot') && this.__childNodes) newChild.hidden = true;
@@ -243,18 +274,23 @@ const patchSlotAppendChild = (HostElementPrototype: any) => {
 
 const patchSlotPrepend = (HostElementPrototype: any) => {
   if (HostElementPrototype.__prepend) return;
+
   HostElementPrototype.__prepend = HostElementPrototype.prepend;
-  HostElementPrototype.prepend = function (this: d.HostElement, ...newChildren: (d.RenderNode | string)[]) {
+  HostElementPrototype.prepend = function (this: PolyfilledNode, ...newChildren: (d.RenderNode | string)[]) {
     newChildren.forEach((newChild: d.RenderNode | string) => {
+
       if (typeof newChild === 'string') {
         newChild = this.ownerDocument.createTextNode(newChild) as unknown as d.RenderNode;
       }
+
       const slotName = (newChild['s-sn'] = getSlotName(newChild));
       const slotNode = getHostSlotNode(this.__childNodes, slotName);
+
       if (slotNode) {
         const slotPlaceholder: d.RenderNode = document.createTextNode('') as any;
         slotPlaceholder['s-nr'] = newChild;
-        if (slotNode['s-cr'].parentNode) {
+
+        if (slotNode['s-cr'] && slotNode['s-cr'].parentNode) {
           (slotNode['s-cr'].parentNode as any).__appendChild(slotPlaceholder);
         }
         newChild['s-ol'] = slotPlaceholder;
@@ -262,10 +298,15 @@ const patchSlotPrepend = (HostElementPrototype: any) => {
 
         const slotChildNodes = getHostSlotChildNodes(slotNode, slotName);
         const appendAfter = slotChildNodes[0];
-        appendAfter.parentNode.insertBefore(newChild, appendAfter.nextSibling);
+
+        if (appendAfter.parentNode) {
+          appendAfter.parentNode.insertBefore(newChild, appendAfter.nextSibling);
+        }
         patchNodeRemoveChild(newChild.parentNode);
 
-        if (slotNode['s-hsf']) updateFallbackSlotVisibility(slotNode.parentNode as d.RenderNode);
+        if (slotNode['s-hsf']) {
+          updateFallbackSlotVisibility(slotNode.parentNode as d.RenderNode);
+        }
         return;
       }
       if (newChild.nodeType === 1 && !!newChild.getAttribute('slot') && this.__childNodes) newChild.hidden = true;
@@ -276,6 +317,7 @@ const patchSlotPrepend = (HostElementPrototype: any) => {
 
 const patchSlotAppend = (HostElementPrototype: any) => {
   if (HostElementPrototype.__append) return;
+
   HostElementPrototype.__append = HostElementPrototype.append;
   HostElementPrototype.append = function (this: d.HostElement, ...newChildren: (d.RenderNode | string)[]) {
     newChildren.forEach((newChild: d.RenderNode | string) => {
@@ -289,8 +331,9 @@ const patchSlotAppend = (HostElementPrototype: any) => {
 
 const patchSlotReplaceChildren = (HostElementPrototype: any) => {
   if (HostElementPrototype.__replaceChildren) return;
+
   HostElementPrototype.__replaceChildren = HostElementPrototype.replaceChildren;
-  HostElementPrototype.replaceChildren = function (this: d.HostElement, ...newChildren: (Node | string)[]) {
+  HostElementPrototype.replaceChildren = function (this: PolyfilledNode, ...newChildren: (Node | string)[]) {
     const slotNode = getHostSlotNode(this.__childNodes, '');
     if (slotNode) {
       const slotChildNodes = getHostSlotChildNodes(slotNode, '');
@@ -306,11 +349,14 @@ const patchSlotReplaceChildren = (HostElementPrototype: any) => {
 
 const patchSlotInsertAdjacentHTML = (HostElementPrototype: any) => {
   if (HostElementPrototype.__insertAdjacentHTML) return;
+
   HostElementPrototype.__insertAdjacentHTML = HostElementPrototype.insertAdjacentHTML;
-  HostElementPrototype.insertAdjacentHTML = function (this: d.HostElement, position: InsertPosition, text: string) {
+  HostElementPrototype.insertAdjacentHTML = function (this: PolyfilledNode, position: InsertPosition, text: string) {
+
     if (position !== 'afterbegin' && position !== 'beforeend') {
       return (this as any).__insertAdjacentHTML(position, text);
     }
+
     const container = this.ownerDocument.createElement('_');
     let node: d.RenderNode;
     container.innerHTML = text;
@@ -330,7 +376,7 @@ const patchSlotInsertAdjacentHTML = (HostElementPrototype: any) => {
 const patchSlotInsertAdjacentText = (HostElementPrototype: any) => {
   if (HostElementPrototype.__insertAdjacentText) return;
   HostElementPrototype.__insertAdjacentText = HostElementPrototype.insertAdjacentText;
-  HostElementPrototype.insertAdjacentText = function (this: d.HostElement, position: InsertPosition, text: string) {
+  HostElementPrototype.insertAdjacentText = function (this: PolyfilledNode, position: InsertPosition, text: string) {
     this.insertAdjacentHTML(position, text);
   };
 };
@@ -339,7 +385,7 @@ const patchSlotInsertAdjacentElement = (HostElementPrototype: any) => {
   if (HostElementPrototype.__insertAdjacentElement) return;
   HostElementPrototype.__insertAdjacentElement = HostElementPrototype.insertAdjacentElement;
   HostElementPrototype.insertAdjacentElement = function (
-    this: d.HostElement,
+    this: PolyfilledNode,
     position: InsertPosition,
     element: d.RenderNode
   ) {
@@ -363,9 +409,9 @@ const getSlotName = (node: d.RenderNode) =>
  * @param slotName the name of the slot to match on.
  * @returns a reference to the slot node that matches the provided name, `null` otherwise
  */
-const getHostSlotNode = (childNodes: NodeListOf<ChildNode>, slotName: string) => {
+const getHostSlotNode = (childNodes: NodeListOf<ChildNode>, slotName: string): d.RenderNode | null => {
   let i = 0;
-  let childNode: d.RenderNode;
+  let childNode: d.RenderNode | null;
   if (!childNodes) return null;
 
   for (; i < childNodes.length; i++) {

@@ -557,9 +557,9 @@ export declare function h(sel: any, data: VNodeData | null, children: VNode): VN
 
 export interface VNode {
   $flags$: number;
-  $tag$: string | number | Function;
+  $tag$: string | number | Function | null;
   $elm$: any;
-  $text$: string;
+  $text$: string | null;
   $children$: VNode[];
   $attrs$?: any;
   $name$?: string;

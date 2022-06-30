@@ -96,7 +96,7 @@ export const connectedCallback = (elm: d.HostElement) => {
       } else {
         initializeComponent(elm, hostRef, cmpMeta);
       }
-    } else {
+    } else if (hostRef) {
       // not the first time this has connected
 
       // reattach any event listeners to the host
@@ -116,20 +116,23 @@ export const connectedCallback = (elm: d.HostElement) => {
         // construct and insert new <style>
         const styleElm = plt.$cssShim$.createHostStyle(elm, scopeId, style, true) as d.RenderNode;
         const nId = styleElm['s-sc'];
-        styleElm.setAttribute('sty-id', nId);
-        const doc = document.head;
-        doc.insertBefore(styleElm, doc.querySelector('link'));
 
-        // clean up old ids / add new ids
-        elm['s-sc'] = nId;
-        elm.classList.remove(oId + '-h', oId + '-s');
-        elm.classList.add(nId + '-h', nId + '-s');
+        if (nId) {
+          styleElm.setAttribute('sty-id', nId);
+          const doc = document.head;
+          doc.insertBefore(styleElm, doc.querySelector('link'));
 
-        Array.from(elm.querySelectorAll('.' + oId)).forEach((c) => {
-          c.classList.remove(oId, oId + '-s');
-          c.classList.add(nId, nId + '-s');
-        });
-        plt.$cssShim$.updateHost(elm);
+          // clean up old ids / add new ids
+          elm['s-sc'] = nId;
+          elm.classList.remove(oId + '-h', oId + '-s');
+          elm.classList.add(nId + '-h', nId + '-s');
+
+          Array.from(elm.querySelectorAll('.' + oId)).forEach((c) => {
+            c.classList.remove(oId, oId + '-s');
+            c.classList.add(nId, nId + '-s');
+          });
+          plt.$cssShim$.updateHost(elm);
+        }
       }
     }
 

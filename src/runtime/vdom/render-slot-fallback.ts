@@ -18,9 +18,9 @@ const renderSlotFallbackContent = (sr: d.RenderNode, hide: boolean) => {
       n.style.display = hide ? 'none' : '';
     } else if (!!n['s-sfc']) {
       if (hide) {
-        n['s-sfc'] = n.textContent;
+        n['s-sfc'] = n.textContent || undefined;
         n.textContent = '';
-      } else if (n.textContent.trim() === '') {
+      } else if (!n.textContent || n.textContent.trim() === '') {
         n.textContent = n['s-sfc'];
       }
     }
@@ -33,7 +33,7 @@ export const updateFallbackSlotVisibility = (elm: d.RenderNode) => {
   let i: number;
   let ilen: number;
   let j: number;
-  let slotNameAttr: string;
+  let slotNameAttr: string | undefined;
   let nodeType: number;
 
   for (i = 0, ilen = childNodes.length; i < ilen; i++) {
@@ -67,7 +67,7 @@ export const updateFallbackSlotVisibility = (elm: d.RenderNode) => {
           // should hide the default fallback slot node
           if (
             nodeType === NODE_TYPE.ElementNode ||
-            (nodeType === NODE_TYPE.TextNode && childNodes[j].textContent.trim() !== '')
+            (nodeType === NODE_TYPE.TextNode && childNodes[j] && (childNodes[j].textContent && (childNodes[j].textContent as string).trim() !== ''))
           ) {
             renderSlotFallbackContent(childNode, true);
             patchNodeRemove(childNodes[j]);

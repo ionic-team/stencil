@@ -88,7 +88,7 @@ export const forceModeUpdate = (elm: d.RenderNode) => {
     const mode = computeMode(elm);
     const hostRef = getHostRef(elm);
 
-    if (hostRef.$modeName$ !== mode) {
+    if (hostRef && hostRef.$modeName$ !== mode) {
       const cmpMeta = hostRef.$cmpMeta$;
       const oldScopeId = elm['s-sc'];
       const scopeId = getScopeId(cmpMeta, mode);

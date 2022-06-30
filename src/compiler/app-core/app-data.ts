@@ -146,12 +146,12 @@ export const updateBuildConditionals = (config: Config, b: BuildConditionals) =>
   b.constructableCSS = !b.hotModuleReplacement || !!config._isTesting;
   b.asyncLoading = !!(b.asyncLoading || b.lazyLoad || b.taskQueue || b.initializeNextTick);
   b.cssAnnotations = true;
-  b.cloneNodeFix = config.extras.cloneNodeFix;
-  b.dynamicImportShim = config.extras.dynamicImportShim;
-  b.lifecycleDOMEvents = !!(b.isDebug || config._isTesting || config.extras.lifecycleDOMEvents);
-  b.safari10 = config.extras.safari10;
-  b.scriptDataOpts = config.extras.scriptDataOpts;
-  b.shadowDomShim = config.extras.shadowDomShim;
+  b.cloneNodeFix = config.extras?.cloneNodeFix;
+  b.dynamicImportShim = config.extras?.dynamicImportShim;
+  b.lifecycleDOMEvents = !!(b.isDebug || config._isTesting || config.extras?.lifecycleDOMEvents);
+  b.safari10 = config.extras?.safari10;
+  b.scriptDataOpts = config.extras?.scriptDataOpts;
+  b.shadowDomShim = config.extras?.shadowDomShim;
   b.attachStyles = true;
   b.invisiblePrehydration = typeof config.invisiblePrehydration === 'undefined' ? true : config.invisiblePrehydration;
   if (b.shadowDomShim) {
