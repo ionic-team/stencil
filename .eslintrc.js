@@ -51,6 +51,8 @@ module.exports = {
     "jest/expect-expect": [
       "error",
       {
+        // we set this to `expect*` so that any function whose name starts with expect will be counter
+        // as an assertion function, allowing us to use functions to DRY up test suites.
         "assertFunctionNames": ["expect*"],
       }
     ],
@@ -62,7 +64,10 @@ module.exports = {
     "jest/no-jasmine-globals": ["off"],
     // we use this in enough places that we don't want to do per-line disables
     "jest/no-conditional-expect": ["off"],
+    // this enforces that Jest hooks (e.g. `beforeEach`) are declared in test files in their execution order
+    // see here for details: https://github.com/jest-community/eslint-plugin-jest/blob/main/docs/rules/prefer-hooks-in-order.md
     "jest/prefer-hooks-in-order": ["warn"],
+    // this enforces that Jest hooks (e.g. `beforeEach`) are declared at the top of `describe` blocks
     "jest/prefer-hooks-on-top": ["warn"],
   },
   "env": {
