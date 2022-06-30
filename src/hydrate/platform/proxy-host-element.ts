@@ -60,7 +60,7 @@ export function proxyHostElement(elm: d.HostElement, cmpMeta: d.ComponentRuntime
           Object.defineProperty(elm, memberName, {
             get(this: d.RuntimeRef) {
               const ref = getHostRef(this);
-              return ref.$lazyInstance$[memberName];
+              return ref?.$lazyInstance$ ? ref.$lazyInstance$[memberName] : undefined;
             },
             configurable: true,
             enumerable: true,
@@ -70,14 +70,16 @@ export function proxyHostElement(elm: d.HostElement, cmpMeta: d.ComponentRuntime
             Object.defineProperty(elm, memberName, {
               set(this: d.RuntimeRef, newValue) {
                 const ref = getHostRef(this);
+                if (!ref) return;
+
                 const setVal = (init = false) => {
-                  ref.$lazyInstance$[memberName] = newValue;
-                  setValue(this, memberName, ref.$lazyInstance$[memberName], cmpMeta, !init);
+                  if (ref.$lazyInstance$) ref.$lazyInstance$[memberName] = newValue;
+                  setValue(this, memberName, newValue, cmpMeta, !init);
                 };
                 // If there's a value from an attribute, (before the class is defined), queue & set async
                 if (ref.$lazyInstance$) {
                   setVal();
-                } else {
+                } else if (ref.$onInstancePromise$) {
                   ref.$onInstancePromise$.then(() => setVal(true));
                 }
               },

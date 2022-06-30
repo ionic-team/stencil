@@ -95,7 +95,7 @@ describe('parse comments', () => {
       method: 'event',
       name: 'event',
     });
-    expect(t.cmp.docs).toEqual({
+    expect(t.cmp?.docs).toEqual({
       tags: [
         {
           name: 'usage',

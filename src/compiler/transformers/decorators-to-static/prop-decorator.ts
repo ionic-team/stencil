@@ -43,7 +43,7 @@ export const propDecoratorsToStatic = (
         newMembers
       )
     )
-    .filter((prop) => prop != null);
+    .filter((prop) => prop != null) as ts.PropertyAssignment[];
 
   if (properties.length > 0) {
     newMembers.push(createStaticGetter('properties', ts.createObjectLiteral(properties, true)));
@@ -66,11 +66,11 @@ const parsePropDecorator = (
   prop: ts.PropertyDeclaration | ts.GetAccessorDeclaration,
   watchable: Set<string>,
   newMembers: ts.ClassElement[]
-): ts.PropertyAssignment => {
+): ts.PropertyAssignment | null => {
+  if (!prop.decorators) return null;
+
   const propDecorator = prop.decorators.find(isDecoratorNamed('Prop'));
-  if (propDecorator == null) {
-    return null;
-  }
+  if (propDecorator == null) return null;
 
   const decoratorParams = getDeclarationParameters<d.PropOptions>(propDecorator);
   const propOptions: d.PropOptions = decoratorParams[0] || {};
@@ -81,7 +81,7 @@ const parsePropDecorator = (
     const err = buildError(diagnostics);
     err.messageText =
       'Properties decorated with the @Prop() decorator cannot be "private" nor "protected". More info: https://stenciljs.com/docs/properties';
-    augmentDiagnosticWithNode(err, prop.modifiers[0]);
+    augmentDiagnosticWithNode(err, prop.modifiers ? prop.modifiers[0] : prop);
   }
 
   if (/^on(-|[A-Z])/.test(propName)) {
@@ -107,7 +107,7 @@ const parsePropDecorator = (
     getter: ts.isGetAccessor(prop),
     setter: !!foundSetter,
   };
-  validateReferences(diagnostics, propMeta.complexType.references, prop.type);
+  if (prop.type) validateReferences(diagnostics, propMeta.complexType.references, prop.type);
 
   // prop can have an attribute if type is NOT "unknown"
   if (typeStr !== 'unknown') {
@@ -120,12 +120,12 @@ const parsePropDecorator = (
     propMeta.defaultValue = prop.initializer.getText();
   } else if (ts.isGetAccessorDeclaration(prop)) {
     // shallow comb to find default value for a getter
-    const returnSt = prop.body.statements.find((st) => ts.isReturnStatement(st)) as ts.ReturnStatement;
+    const returnSt = prop.body?.statements.find((st) => ts.isReturnStatement(st)) as ts.ReturnStatement;
     const retExp = returnSt.expression;
 
-    if (ts.isLiteralExpression(retExp)) {
+    if (retExp && ts.isLiteralExpression(retExp)) {
       propMeta.defaultValue = retExp.getText();
-    } else if (ts.isPropertyAccessExpression(retExp)) {
+    } else if (retExp && ts.isPropertyAccessExpression(retExp)) {
       const nameToFind = retExp.name.getText();
       const foundProp = findGetProp(nameToFind, newMembers);
       if (foundProp && foundProp.initializer) propMeta.defaultValue = foundProp.initializer.getText();

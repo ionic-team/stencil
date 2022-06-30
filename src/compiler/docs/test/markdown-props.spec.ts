@@ -15,8 +15,8 @@ describe('markdown props', () => {
         reflectToAttr: false,
         docsTags: [],
         values: [],
-        getter: undefined,
-        setter: undefined,
+        getter: false,
+        setter: false,
       },
       {
         name: 'hello',
@@ -30,8 +30,8 @@ describe('markdown props', () => {
         reflectToAttr: false,
         docsTags: [],
         values: [],
-        getter: undefined,
-        setter: undefined,
+        getter: false,
+        setter: false,
       },
     ]).join('\n');
     expect(markdown).toEqual(`## Properties
