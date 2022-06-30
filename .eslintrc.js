@@ -62,6 +62,8 @@ module.exports = {
     "jest/no-jasmine-globals": ["off"],
     // we use this in enough places that we don't want to do per-line disables
     "jest/no-conditional-expect": ["off"],
+    "jest/prefer-hooks-in-order": ["warn"],
+    "jest/prefer-hooks-on-top": ["warn"],
   },
   "env": {
     "jest/globals": true
