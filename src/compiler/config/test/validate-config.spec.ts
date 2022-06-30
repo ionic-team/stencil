@@ -214,17 +214,11 @@ describe('validation', () => {
       expect(config.hashFileNames).toBe(false);
     });
 
-    it('should set hashFileNames from hashFilenames', () => {
-      userConfig.hashFileNames = false;
+    it.each([true, false])('should set hashFileNames when hashFileNames===%b', (hashFileNames) => {
+      userConfig.hashFileNames = hashFileNames
       const { config } = validateConfig(userConfig);
-      expect(config.hashFileNames).toBe(false);
-    });
-
-    it('should set hashFileNames from hashFilenames', () => {
-      userConfig.hashFileNames = true;
-      const { config } = validateConfig(userConfig);
-      expect(config.hashFileNames).toBe(true);
-    });
+      expect(config.hashFileNames).toBe(hashFileNames);
+    })
 
     it('should set hashFileNames from function', () => {
       (userConfig as any).hashFileNames = () => {
@@ -319,7 +313,7 @@ describe('validation', () => {
     expect(config.devInspector).toBe(false);
   });
 
-  it('should set devInspector true ', () => {
+  it('should set devInspector true', () => {
     userConfig.devInspector = true;
     const { config } = validateConfig(userConfig);
     expect(config.devInspector).toBe(true);

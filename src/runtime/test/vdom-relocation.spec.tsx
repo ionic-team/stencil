@@ -2,7 +2,7 @@ import { Component, Listen, State, h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
 describe('vdom-relocation', () => {
-  it('', async () => {
+  it('vdom-relocation', async () => {
     @Component({
       tag: 'my-root',
     })

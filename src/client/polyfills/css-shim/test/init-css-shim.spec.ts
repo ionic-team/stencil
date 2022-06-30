@@ -148,7 +148,7 @@ describe('fixRelativeUrls', () => {
     `);
   });
 
-  it('should keep absolute urls', () => {
+  it('should keep external urls', () => {
     const text = `
       div {
         background-image: url('http://www.example.com/assets/images/mytestimage.jpg');

@@ -59,7 +59,7 @@ describe('ShadowCss', function () {
     expect(s(css, 'a')).toEqual(expected);
   });
 
-  it('should support newlines in the selector and content ', () => {
+  it('should support newlines in the selector and content', () => {
     const css = 'one, \ntwo {\ncolor: red;}';
     const expected = 'one.a, two.a {color:red;}';
     expect(s(css, 'a')).toEqual(expected);

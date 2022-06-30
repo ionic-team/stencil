@@ -7,6 +7,7 @@ describe('globals', () => {
   })
   class CmpA {}
 
+  // eslint-disable-next-line jest/expect-expect
   it('should resolve raf and setTimeout', async () => {
     const page = await newSpecPage({
       components: [CmpA],

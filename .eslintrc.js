@@ -7,6 +7,7 @@ module.exports = {
     // with Prettier's formatting. Keep it last in the list so that nothing else messes
     // with it!
     'prettier',
+    'plugin:jest/recommended'
   ],
   rules: {
     '@typescript-eslint/no-unused-vars': ['error', {
@@ -47,6 +48,12 @@ module.exports = {
     'no-var': 'error',
     'prefer-rest-params': 'error',
     'prefer-spread': 'error',
+    "jest/expect-expect": [
+      "error",
+      {
+        "assertFunctionNames": ["expect*"],
+      }
+    ]
   },
   "env": {
     "jest/globals": true
