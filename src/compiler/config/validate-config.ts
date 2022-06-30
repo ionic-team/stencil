@@ -38,9 +38,9 @@ export const validateConfig = (userConfig: UnvalidatedConfig = {}): ConfigValida
   const config = Object.assign({}, userConfig || {}); // not positive it's json safe
   const diagnostics: Diagnostic[] = [];
 
-  // TODO: Not convinced this is the best thing to do
   const validatedConfig: InternalStrictConfig = {
     ...config,
+    // flags _should_ be JSON safe
     flags: JSON.parse(JSON.stringify(config.flags || {})),
   };
 
