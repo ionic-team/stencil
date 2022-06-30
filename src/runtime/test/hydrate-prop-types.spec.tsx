@@ -8,8 +8,8 @@ describe('hydrate prop types', () => {
       @Prop({ mutable: true }) num: number;
 
       componentWillRender() {
-        if ( this.num < 100) {
-          this.num += 100
+        if (this.num < 100) {
+          this.num += 100;
         }
       }
 

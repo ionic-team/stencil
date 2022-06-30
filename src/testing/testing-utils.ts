@@ -164,3 +164,30 @@ interface ConsoleMocker {
     errorMock: jest.Mock<typeof console.error>;
   };
 }
+
+// export function withSilentWarn<T extends () => Promise<any>>(
+
+/**
+ * the callback that `withSilentWarn` expects to receive. Basically receives a mock
+ * as its argument and returns a `Promise`, the value of which is returns by `withSilentWarn`
+ * as well.
+ */
+type SilentWarnFunc<T> = (mock: jest.Mock<typeof console.warn>) => Promise<T>;
+
+/**
+ * Wrap a single callback with a silent `console.warn`. The callback passed in
+ * receives the mocking function as an argument, so you can easily make assertions
+ * that it is called if necessary.
+ *
+ * @param cb a callback which `withSilentWarn` will call after replacing `console.warn`
+ * with a mock.
+ * @returns a Promise wrapping the return value of the callback
+ */
+export async function withSilentWarn<T>(cb: SilentWarnFunc<T>): Promise<T> {
+  const realWarn = console.warn;
+  const warnMock = jest.fn();
+  console.warn = warnMock;
+  const retval = await cb(warnMock);
+  console.warn = realWarn;
+  return retval;
+}
