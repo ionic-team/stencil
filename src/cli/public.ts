@@ -1,4 +1,5 @@
-import type { CliInitOptions, CompilerSystem, Config, ConfigFlags, Logger, TaskCommand } from '@stencil/core/internal';
+import type { CliInitOptions, CompilerSystem, Config, Logger, TaskCommand } from '@stencil/core/internal';
+import type { ConfigFlags } from './config-flags';
 
 /**
  * Runs the CLI with the given options. This is used by Stencil's default `bin/stencil` file,

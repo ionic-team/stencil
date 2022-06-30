@@ -1,5 +1,6 @@
 import type { JsonDocs } from './stencil-public-docs';
 import type { PrerenderUrlResults } from '../internal';
+import type { ConfigFlags } from '../cli/config-flags';
 export * from './stencil-public-docs';
 
 /**
@@ -552,52 +553,6 @@ export interface DevServerEditor {
   name?: string;
   supported?: boolean;
   priority?: number;
-}
-
-export interface ConfigFlags {
-  task?: TaskCommand;
-  args?: string[];
-  knownArgs?: string[];
-  unknownArgs?: string[];
-  address?: string;
-  build?: boolean;
-  cache?: boolean;
-  checkVersion?: boolean;
-  ci?: boolean;
-  compare?: boolean;
-  config?: string;
-  debug?: boolean;
-  dev?: boolean;
-  docs?: boolean;
-  docsApi?: string;
-  docsJson?: string;
-  e2e?: boolean;
-  emulate?: string;
-  es5?: boolean;
-  esm?: boolean;
-  headless?: boolean;
-  help?: boolean;
-  log?: boolean;
-  logLevel?: LogLevel;
-  verbose?: boolean;
-  maxWorkers?: number;
-  open?: boolean;
-  port?: number;
-  prerender?: boolean;
-  prod?: boolean;
-  profile?: boolean;
-  root?: string;
-  screenshot?: boolean;
-  screenshotConnector?: string;
-  serve?: boolean;
-  serviceWorker?: boolean;
-  spec?: boolean;
-  ssr?: boolean;
-  stats?: boolean;
-  updateScreenshot?: boolean;
-  version?: boolean;
-  watch?: boolean;
-  devtools?: boolean;
 }
 
 export type TaskCommand =
@@ -1799,7 +1754,30 @@ export interface EmulateViewport {
   isLandscape?: boolean;
 }
 
-export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
+/**
+ * This sets the log level hierarchy for our terminal logger, ranging from
+ * most to least verbose.
+ *
+ * Ordering the levels like this lets us easily check whether we should log a
+ * message at a given time. For instance, if the log level is set to `'warn'`,
+ * then anything passed to the logger with level `'warn'` or `'error'` should
+ * be logged, but we should _not_ log anything with level `'info'` or `'debug'`.
+ *
+ * If we have a current log level `currentLevel` and a message with level
+ * `msgLevel` is passed to the logger, we can determine whether or not we should
+ * log it by checking if the log level on the message is further up or at the
+ * same level in the hierarchy than `currentLevel`, like so:
+ *
+ * ```ts
+ * LOG_LEVELS.indexOf(msgLevel) >= LOG_LEVELS.indexOf(currentLevel)
+ * ```
+ *
+ * NOTE: for the reasons described above, do not change the order of the entries
+ * in this array without good reason!
+ */
+export const LOG_LEVELS = ['debug', 'info', 'warn', 'error'] as const;
+
+export type LogLevel = typeof LOG_LEVELS[number];
 
 /**
  * Common logger to be used by the compiler, dev-server and CLI. The CLI will use a

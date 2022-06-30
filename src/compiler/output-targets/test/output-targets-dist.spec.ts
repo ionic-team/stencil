@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { doNotExpectFiles, expectFiles } from '../../../testing/testing-utils';
+import { expectFilesDoNotExist, expectFilesExist } from '../../../testing/testing-utils';
 import { Compiler, Config } from '@stencil/core/compiler';
 import { mockConfig } from '@stencil/core/testing';
 import path from 'path';
@@ -53,7 +53,7 @@ xdescribe('outputTarget, dist', () => {
     const r = await compiler.build();
     expect(r.diagnostics).toHaveLength(0);
 
-    expectFiles(compiler.fs, [
+    expectFilesExist(compiler.fs, [
       path.join(root, 'User', 'testing', 'dist', 'index.js'),
       path.join(root, 'User', 'testing', 'dist', 'index.mjs'),
       path.join(root, 'User', 'testing', 'dist', 'index.js.map'),
@@ -82,7 +82,7 @@ xdescribe('outputTarget, dist', () => {
       path.join(root, 'User', 'testing', 'src', 'components.d.ts'),
     ]);
 
-    doNotExpectFiles(compiler.fs, [
+    expectFilesDoNotExist(compiler.fs, [
       path.join(root, 'User', 'testing', 'build'),
       path.join(root, 'User', 'testing', 'esm'),
       path.join(root, 'User', 'testing', 'es5'),
