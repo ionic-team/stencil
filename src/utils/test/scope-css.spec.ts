@@ -197,10 +197,6 @@ describe('ShadowCss', function () {
       expect(s(':host([a="b"],[c=d]) {}', 'a', true)).toEqual('/*!@:host([a="b"],[c=d])*/[a="b"].a-h, [c="d"].a-h {}');
     });
 
-    it('should handle multiple attribute selectors, commentOriginalSelector', () => {
-      expect(s(':host([a="b"],[c=d]) {}', 'a', true)).toEqual('/*!@:host([a="b"],[c=d])*/[a="b"].a-h, [c="d"].a-h {}');
-    });
-
     it('should handle pseudo selectors', () => {
       expect(s(':host(:before) {}', 'a')).toEqual('.a-h:before {}');
       expect(s(':host:before {}', 'a')).toEqual('.a-h:before {}');
