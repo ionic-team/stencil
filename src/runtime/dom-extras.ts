@@ -278,7 +278,6 @@ const patchSlotPrepend = (HostElementPrototype: any) => {
   HostElementPrototype.__prepend = HostElementPrototype.prepend;
   HostElementPrototype.prepend = function (this: PolyfilledNode, ...newChildren: (d.RenderNode | string)[]) {
     newChildren.forEach((newChild: d.RenderNode | string) => {
-
       if (typeof newChild === 'string') {
         newChild = this.ownerDocument.createTextNode(newChild) as unknown as d.RenderNode;
       }
@@ -352,7 +351,6 @@ const patchSlotInsertAdjacentHTML = (HostElementPrototype: any) => {
 
   HostElementPrototype.__insertAdjacentHTML = HostElementPrototype.insertAdjacentHTML;
   HostElementPrototype.insertAdjacentHTML = function (this: PolyfilledNode, position: InsertPosition, text: string) {
-
     if (position !== 'afterbegin' && position !== 'beforeend') {
       return (this as any).__insertAdjacentHTML(position, text);
     }

@@ -67,7 +67,10 @@ export const updateFallbackSlotVisibility = (elm: d.RenderNode) => {
           // should hide the default fallback slot node
           if (
             nodeType === NODE_TYPE.ElementNode ||
-            (nodeType === NODE_TYPE.TextNode && childNodes[j] && (childNodes[j].textContent && (childNodes[j].textContent as string).trim() !== ''))
+            (nodeType === NODE_TYPE.TextNode &&
+              childNodes[j] &&
+              childNodes[j].textContent &&
+              (childNodes[j].textContent as string).trim() !== '')
           ) {
             renderSlotFallbackContent(childNode, true);
             patchNodeRemove(childNodes[j]);
