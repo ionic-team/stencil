@@ -7,9 +7,13 @@ describe('hydrate prop types', () => {
     class CmpA {
       @Prop({ mutable: true }) num: number;
 
-      render() {
-        this.num += 100;
+      componentWillRender() {
+        if ( this.num < 100) {
+          this.num += 100
+        }
+      }
 
+      render() {
         return <Host>{this.num}</Host>;
       }
     }
