@@ -215,10 +215,10 @@ describe('validation', () => {
     });
 
     it.each([true, false])('should set hashFileNames when hashFileNames===%b', (hashFileNames) => {
-      userConfig.hashFileNames = hashFileNames
+      userConfig.hashFileNames = hashFileNames;
       const { config } = validateConfig(userConfig);
       expect(config.hashFileNames).toBe(hashFileNames);
-    })
+    });
 
     it('should set hashFileNames from function', () => {
       (userConfig as any).hashFileNames = () => {

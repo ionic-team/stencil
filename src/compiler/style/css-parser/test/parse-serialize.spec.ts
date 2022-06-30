@@ -294,8 +294,8 @@ describe('css parse/serialize', () => {
       `abbr[title],abbr [title="hello   world"]{cursor:help;border-bottom:1px dotted  #777}`,
     ],
   ])('%s', (_testName, cssString, expectedOutput) => {
-      const results = parseCss(cssString)
-      const output = serializeCss(results.stylesheet, {});
-      expect(output).toBe(expectedOutput)
-    });
+    const results = parseCss(cssString);
+    const output = serializeCss(results.stylesheet, {});
+    expect(output).toBe(expectedOutput);
+  });
 });
