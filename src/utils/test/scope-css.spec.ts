@@ -174,7 +174,7 @@ describe('ShadowCss', function () {
       expect(s(':host([a=b]) {}', 'a')).toEqual('[a="b"].a-h {}');
     });
 
-    it('should handle multiple tag selectors', () => {
+    it('should handle multiple tag selectors, commenting the original selector', () => {
       expect(s(':host(ul,li) {}', 'a', true)).toEqual('/*!@:host(ul,li)*/ul.a-h, li.a-h {}');
       expect(s(':host(ul,li) > .z {}', 'a', true)).toEqual('/*!@:host(ul,li) > .z*/ul.a-h > .z.a, li.a-h > .z.a {}');
     });

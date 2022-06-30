@@ -9,7 +9,7 @@ describe('setAccessor for custom elements', () => {
 
   describe('event listener', () => {
     it('should allow public method starting with "on" and capital 3rd character', () => {
-      const addEventSpy = spyOn(elm, 'addEventListener');
+      const addEventSpy = jest.spyOn(elm, 'addEventListener');
 
       elm.onMyMethod = () => {
         /**/
@@ -24,8 +24,8 @@ describe('setAccessor for custom elements', () => {
     });
 
     it('should remove standardized event listener when has old value, but no new', () => {
-      const addEventSpy = spyOn(elm, 'addEventListener');
-      const removeEventSpy = spyOn(elm, 'removeEventListener');
+      const addEventSpy = jest.spyOn(elm, 'addEventListener');
+      const removeEventSpy = jest.spyOn(elm, 'removeEventListener');
 
       const orgValue = () => {
         /**/
@@ -40,8 +40,8 @@ describe('setAccessor for custom elements', () => {
     });
 
     it('should remove standardized multiple-word then add event listener w/ different value', () => {
-      const addEventSpy = spyOn(elm, 'addEventListener');
-      const removeEventSpy = spyOn(elm, 'removeEventListener');
+      const addEventSpy = jest.spyOn(elm, 'addEventListener');
+      const removeEventSpy = jest.spyOn(elm, 'removeEventListener');
 
       const orgValue = () => {
         /**/
@@ -55,8 +55,8 @@ describe('setAccessor for custom elements', () => {
     });
 
     it('should remove standardized then add event listener w/ different value', () => {
-      const addEventSpy = spyOn(elm, 'addEventListener');
-      const removeEventSpy = spyOn(elm, 'removeEventListener');
+      const addEventSpy = jest.spyOn(elm, 'addEventListener');
+      const removeEventSpy = jest.spyOn(elm, 'removeEventListener');
 
       const orgValue = () => {
         /**/
@@ -73,8 +73,8 @@ describe('setAccessor for custom elements', () => {
     });
 
     it('should add custom event listener when no old value', () => {
-      const addEventSpy = spyOn(elm, 'addEventListener');
-      const removeEventSpy = spyOn(elm, 'removeEventListener');
+      const addEventSpy = jest.spyOn(elm, 'addEventListener');
+      const removeEventSpy = jest.spyOn(elm, 'removeEventListener');
 
       const newValue = () => {
         /**/
@@ -87,8 +87,8 @@ describe('setAccessor for custom elements', () => {
     });
 
     it('should add standardized multiple-word event listener when no old value', () => {
-      const addEventSpy = spyOn(elm, 'addEventListener');
-      const removeEventSpy = spyOn(elm, 'removeEventListener');
+      const addEventSpy = jest.spyOn(elm, 'addEventListener');
+      const removeEventSpy = jest.spyOn(elm, 'removeEventListener');
 
       const newValue = () => {
         /**/
@@ -101,8 +101,8 @@ describe('setAccessor for custom elements', () => {
     });
 
     it('should add standardized event listener when no old value', () => {
-      const addEventSpy = spyOn(elm, 'addEventListener');
-      const removeEventSpy = spyOn(elm, 'removeEventListener');
+      const addEventSpy = jest.spyOn(elm, 'addEventListener');
+      const removeEventSpy = jest.spyOn(elm, 'removeEventListener');
 
       const newValue = () => {
         /**/
