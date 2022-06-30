@@ -217,19 +217,6 @@ describe('optimizeCss', () => {
     expect(output).toBe(`h1{width:calc(10px -  ( 100px / var(--test)  ))}`);
   });
 
-  it('normalize-whitespace', async () => {
-    config.minifyCss = true;
-    const styleText = `
-      h1 {
-        width: calc(10px -  ( 100px / var(--test)  )) ;
-      }
-    `;
-    const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null);
-
-    expect(diagnostics).toHaveLength(0);
-    expect(output).toBe(`h1{width:calc(10px -  ( 100px / var(--test)  ))}`);
-  });
-
   // it('discard-duplicates', async () => {
   //   config.minifyCss = true;
   //   const styleText = `
