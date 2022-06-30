@@ -122,6 +122,7 @@ describe('render-vdom', () => {
         vdomText: false,
       });
     });
+
     it('vdomStyle', async () => {
       @Component({ tag: 'cmp-a' })
       class CmpA {
