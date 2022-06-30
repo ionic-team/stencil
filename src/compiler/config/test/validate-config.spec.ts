@@ -301,12 +301,6 @@ describe('validation', () => {
     }
   );
 
-  it('should default dist false and www true', () => {
-    const { config } = validateConfig(userConfig);
-    expect(config.outputTargets.some((o) => o.type === 'dist')).toBe(false);
-    expect(config.outputTargets.some((o) => o.type === 'www')).toBe(true);
-  });
-
   it('should set devInspector false', () => {
     userConfig.devInspector = false;
     const { config } = validateConfig(userConfig);
