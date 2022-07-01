@@ -51,7 +51,7 @@ module.exports = {
     "jest/expect-expect": [
       "error",
       {
-        // we set this to `expect*` so that any function whose name starts with expect will be counter
+        // we set this to `expect*` so that any function whose name starts with expect will be counted
         // as an assertion function, allowing us to use functions to DRY up test suites.
         "assertFunctionNames": ["expect*"],
       }
