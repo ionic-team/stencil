@@ -6,7 +6,7 @@ import { mockConfig } from '@stencil/core/testing';
 import path from 'path';
 
 // TODO(STENCIL-462): investigate getting this file to pass
-xdescribe('service worker', () => {
+describe.skip('service worker', () => {
   jest.setTimeout(20000);
   let compiler: Compiler;
   let config: Config;

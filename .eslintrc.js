@@ -27,8 +27,6 @@ module.exports = {
         "assertFunctionNames": ["expect*"],
       }
     ],
-    // we have a number of things disabled w/ `xdescribe`, `xit`, etc
-    "jest/no-test-prefixes": ["off"],
     // we...have a number of things disabled :)
     "jest/no-disabled-tests": ["off"],
     // we use this in enough places that we don't want to do per-line disables
