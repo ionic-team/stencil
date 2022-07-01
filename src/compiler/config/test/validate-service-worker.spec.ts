@@ -4,7 +4,7 @@ import { mockCompilerSystem } from '@stencil/core/testing';
 import { validateServiceWorker } from '../validate-service-worker';
 
 describe('validateServiceWorker', () => {
-  const config: d.InternalStrictConfig = {
+  const config: d.ValidatedConfig = {
     fsNamespace: 'app',
     sys: mockCompilerSystem(),
     devMode: false,

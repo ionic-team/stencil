@@ -9,7 +9,7 @@ import { isBoolean, isString } from '@utils';
 import { isAbsolute, join } from 'path';
 import { NODE_BUILTINS } from '../../sys/modules';
 
-export const validateHydrateScript = (config: d.InternalStrictConfig, userOutputs: d.OutputTarget[]) => {
+export const validateHydrateScript = (config: d.ValidatedConfig, userOutputs: d.OutputTarget[]) => {
   const output: d.OutputTargetHydrate[] = [];
 
   const hasHydrateOutputTarget = userOutputs.some(isOutputTargetHydrate);

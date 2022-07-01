@@ -10,7 +10,7 @@ import { writeBuild } from './write-build';
 import ts from 'typescript';
 
 export const build = async (
-  config: d.InternalStrictConfig,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   tsBuilder: ts.BuilderProgram

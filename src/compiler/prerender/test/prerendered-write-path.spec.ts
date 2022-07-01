@@ -1,6 +1,6 @@
 import type * as d from '../../../declarations';
 import { getWriteFilePathFromUrlPath } from '../prerendered-write-path';
-import { mockInternalStrictConfig } from '@stencil/core/testing';
+import { mockValidatedConfig } from '@stencil/core/testing';
 import { validateWww } from '../../config/outputs/validate-www';
 import { join, resolve } from 'path';
 
@@ -9,10 +9,10 @@ describe('prerender-utils', () => {
 
   describe('getWriteFilePathFromUrlPath', () => {
     let manager: d.PrerenderManager;
-    let config: d.InternalStrictConfig;
+    let config: d.ValidatedConfig;
 
     beforeEach(() => {
-      config = mockInternalStrictConfig();
+      config = mockValidatedConfig();
       const outputTargets = validateWww(config, [], []);
 
       manager = {

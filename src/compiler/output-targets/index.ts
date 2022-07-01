@@ -13,7 +13,7 @@ import { outputTypes } from './output-types';
 import type { RollupCache } from 'rollup';
 
 export const generateOutputTargets = async (
-  config: d.InternalStrictConfig,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx
 ) => {

@@ -1,6 +1,6 @@
 import type * as d from '../../declarations';
 import { taskGenerate, getBoilerplateByExtension, BoilerplateFile } from '../task-generate';
-import { mockInternalStrictConfig, mockCompilerSystem } from '@stencil/core/testing';
+import { mockValidatedConfig, mockCompilerSystem } from '@stencil/core/testing';
 import * as utils from '../../utils/validation';
 
 import * as coreCompiler from '@stencil/core/compiler';
@@ -14,7 +14,7 @@ jest.mock('prompts', () => ({
 
 const setup = async () => {
   const sys = mockCompilerSystem();
-  const config: d.InternalStrictConfig = mockInternalStrictConfig(sys);
+  const config: d.ValidatedConfig = mockValidatedConfig(sys);
   config.configPath = '/testing-path';
   config.srcDir = '/src';
 
@@ -41,7 +41,7 @@ const setup = async () => {
  * @param coreCompiler the core compiler instance to forward to `taskGenerate`
  * @param config the user-supplied config to forward to `taskGenerate`
  */
-async function silentGenerate(coreCompiler: CoreCompiler, config: d.InternalStrictConfig): Promise<void> {
+async function silentGenerate(coreCompiler: CoreCompiler, config: d.ValidatedConfig): Promise<void> {
   const tmp = console.log;
   console.log = jest.fn();
   await taskGenerate(coreCompiler, config);

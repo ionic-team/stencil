@@ -18,7 +18,7 @@ import { isString } from '@utils';
 import type ts from 'typescript';
 
 export const createWatchBuild = async (
-  config: d.InternalStrictConfig,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx
 ): Promise<d.CompilerWatcher> => {
   let isRebuild = false;

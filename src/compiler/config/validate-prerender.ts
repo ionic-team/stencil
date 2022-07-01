@@ -3,7 +3,7 @@ import { buildError, isString, normalizePath } from '@utils';
 import { isAbsolute, join } from 'path';
 
 export const validatePrerender = (
-  config: d.InternalStrictConfig,
+  config: d.ValidatedConfig,
   diagnostics: d.Diagnostic[],
   outputTarget: d.OutputTargetWww
 ) => {

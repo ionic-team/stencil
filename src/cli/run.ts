@@ -15,7 +15,7 @@ import { taskServe } from './task-serve';
 import { taskTest } from './task-test';
 import { taskTelemetry } from './task-telemetry';
 import { telemetryAction } from './telemetry/telemetry';
-import { InternalStrictConfig } from '../declarations';
+import { ValidatedConfig } from '../declarations';
 
 export const run = async (init: d.CliInitOptions) => {
   const { args, logger, sys } = init;
@@ -118,7 +118,7 @@ export const runTask = async (
   task: d.TaskCommand,
   sys?: d.CompilerSystem
 ) => {
-  const strictConfig: InternalStrictConfig = { ...config, flags: { ...config.flags } ?? { task } };
+  const strictConfig: ValidatedConfig = { ...config, flags: { ...config.flags } ?? { task } };
   strictConfig.outputTargets = strictConfig.outputTargets || [];
 
   switch (task) {

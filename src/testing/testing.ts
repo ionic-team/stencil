@@ -5,7 +5,7 @@ import type {
   Config,
   DevServer,
   E2EProcessEnv,
-  InternalStrictConfig,
+  ValidatedConfig,
   OutputTargetWww,
   Testing,
   TestingRunOptions,
@@ -18,7 +18,7 @@ import { startPuppeteerBrowser } from './puppeteer/puppeteer-browser';
 import { start } from '@stencil/core/dev-server';
 import type * as puppeteer from 'puppeteer';
 
-export const createTesting = async (config: InternalStrictConfig): Promise<Testing> => {
+export const createTesting = async (config: ValidatedConfig): Promise<Testing> => {
   config = setupTestingConfig(config);
 
   const { createCompiler } = require('../compiler/stencil.js');
@@ -184,8 +184,8 @@ export const createTesting = async (config: InternalStrictConfig): Promise<Testi
   };
 };
 
-function setupTestingConfig(config: Config): InternalStrictConfig {
-  const validatedConfig: InternalStrictConfig = { ...config, flags: { ...config.flags } };
+function setupTestingConfig(config: Config): ValidatedConfig {
+  const validatedConfig: ValidatedConfig = { ...config, flags: { ...config.flags } };
   validatedConfig.buildEs5 = false;
   validatedConfig.devMode = true;
   validatedConfig.minifyCss = false;

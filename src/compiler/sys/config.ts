@@ -3,8 +3,8 @@ import { createLogger } from './logger/console-logger';
 import { createSystem } from './stencil-sys';
 import { setPlatformPath } from '../sys/modules/path';
 
-export const getConfig = (userConfig: d.Config): d.InternalStrictConfig => {
-  const config: d.InternalStrictConfig = { ...userConfig, flags: { ...(userConfig.flags ?? {}) } };
+export const getConfig = (userConfig: d.Config): d.ValidatedConfig => {
+  const config: d.ValidatedConfig = { ...userConfig, flags: { ...(userConfig.flags ?? {}) } };
 
   if (!config.logger) {
     config.logger = createLogger();

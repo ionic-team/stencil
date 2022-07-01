@@ -14,11 +14,7 @@ import { validateCopy } from '../validate-copy';
 import { validatePrerender } from '../validate-prerender';
 import { validateServiceWorker } from '../validate-service-worker';
 
-export const validateWww = (
-  config: d.InternalStrictConfig,
-  diagnostics: d.Diagnostic[],
-  userOutputs: d.OutputTarget[]
-) => {
+export const validateWww = (config: d.ValidatedConfig, diagnostics: d.Diagnostic[], userOutputs: d.OutputTarget[]) => {
   const hasOutputTargets = userOutputs.length > 0;
   const hasE2eTests = !!config.flags.e2e;
   const userWwwOutputs = userOutputs.filter(isOutputTargetWww);
@@ -79,7 +75,7 @@ export const validateWww = (
 };
 
 const validateWwwOutputTarget = (
-  config: d.InternalStrictConfig,
+  config: d.ValidatedConfig,
   outputTarget: d.OutputTargetWww,
   diagnostics: d.Diagnostic[]
 ) => {

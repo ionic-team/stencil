@@ -407,7 +407,7 @@ export type UnvalidatedConfig = Loose<Config>;
 type RequireFields<T, K extends keyof T> = T & { [P in K]-?: T[P] };
 
 /**
- * Fields in {@link Config} to make required for {@link InternalStrictConfig}
+ * Fields in {@link Config} to make required for {@link ValidatedConfig}
  */
 type StrictConfigFields = 'flags';
 
@@ -417,7 +417,7 @@ type StrictConfigFields = 'flags';
  * about the data from a type-safety perspective, this type is intended to be used throughout the codebase once
  * validations have occurred at runtime.
  */
-export type InternalStrictConfig = RequireFields<Config, StrictConfigFields>;
+export type ValidatedConfig = RequireFields<Config, StrictConfigFields>;
 
 export interface HydratedFlag {
   /**
@@ -2191,7 +2191,7 @@ export interface LoadConfigInit {
  * operations around the codebase.
  */
 export interface LoadConfigResults {
-  config: InternalStrictConfig;
+  config: ValidatedConfig;
   diagnostics: Diagnostic[];
   tsconfig: {
     path: string;

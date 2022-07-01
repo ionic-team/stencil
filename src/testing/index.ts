@@ -8,7 +8,7 @@ export {
   mockConfig,
   mockCompilerCtx,
   mockDocument,
-  mockInternalStrictConfig,
+  mockValidatedConfig,
   mockLogger,
   mockCompilerSystem,
   mockWindow,

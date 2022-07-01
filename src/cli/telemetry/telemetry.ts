@@ -16,7 +16,7 @@ import { isOutputTargetHydrate, WWW } from '../../compiler/output-targets/output
  */
 export async function telemetryBuildFinishedAction(
   sys: d.CompilerSystem,
-  config: d.InternalStrictConfig,
+  config: d.ValidatedConfig,
   logger: d.Logger,
   coreCompiler: CoreCompiler,
   result: d.CompilerBuildResults
@@ -47,7 +47,7 @@ export async function telemetryBuildFinishedAction(
  */
 export async function telemetryAction(
   sys: d.CompilerSystem,
-  config: d.InternalStrictConfig,
+  config: d.ValidatedConfig,
   logger: d.Logger,
   coreCompiler: CoreCompiler,
   action?: d.TelemetryCallback
@@ -112,7 +112,7 @@ export async function getActiveTargets(config: d.Config): Promise<string[]> {
  */
 export const prepareData = async (
   coreCompiler: CoreCompiler,
-  config: d.InternalStrictConfig,
+  config: d.ValidatedConfig,
   sys: d.CompilerSystem,
   duration_ms: number,
   component_count: number = undefined
@@ -250,7 +250,7 @@ export const anonymizeConfigForTelemetry = (config: d.Config): d.Config => {
  */
 async function getInstalledPackages(
   sys: d.CompilerSystem,
-  config: d.InternalStrictConfig
+  config: d.ValidatedConfig
 ): Promise<{ packages: string[]; packagesNoVersions: string[] }> {
   let packages: string[] = [];
   let packagesNoVersions: string[] = [];
@@ -350,7 +350,7 @@ function sanitizeDeclaredVersion(version: string): string {
  */
 export async function sendMetric(
   sys: d.CompilerSystem,
-  config: d.InternalStrictConfig,
+  config: d.ValidatedConfig,
   name: string,
   value: d.TrackableData
 ): Promise<void> {
@@ -388,7 +388,7 @@ async function getTelemetryToken(sys: d.CompilerSystem) {
  * @param config The config passed into the Stencil command
  * @param data Data to be tracked
  */
-async function sendTelemetry(sys: d.CompilerSystem, config: d.InternalStrictConfig, data: d.Metric): Promise<void> {
+async function sendTelemetry(sys: d.CompilerSystem, config: d.ValidatedConfig, data: d.Metric): Promise<void> {
   try {
     const now = new Date().toISOString();
 

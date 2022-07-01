@@ -2,18 +2,18 @@ import type * as d from '../../../declarations';
 import * as telemetry from '../telemetry';
 import * as shouldTrack from '../shouldTrack';
 import { createSystem } from '../../../compiler/sys/stencil-sys';
-import { mockInternalStrictConfig } from '@stencil/core/testing';
+import { mockValidatedConfig } from '@stencil/core/testing';
 import * as coreCompiler from '@stencil/core/compiler';
 import { anonymizeConfigForTelemetry } from '../telemetry';
 import { DIST, DIST_CUSTOM_ELEMENTS, DIST_HYDRATE_SCRIPT, WWW } from '../../../compiler/output-targets/output-utils';
 
 describe('telemetryBuildFinishedAction', () => {
-  let config: d.InternalStrictConfig;
+  let config: d.ValidatedConfig;
   let sys: d.CompilerSystem;
 
   beforeEach(() => {
     sys = createSystem();
-    config = mockInternalStrictConfig(sys);
+    config = mockValidatedConfig(sys);
     config.outputTargets = [];
     config.flags.args = [];
   });
@@ -39,12 +39,12 @@ describe('telemetryBuildFinishedAction', () => {
 });
 
 describe('telemetryAction', () => {
-  let config: d.InternalStrictConfig;
+  let config: d.ValidatedConfig;
   let sys: d.CompilerSystem;
 
   beforeEach(() => {
     sys = createSystem();
-    config = mockInternalStrictConfig(sys);
+    config = mockValidatedConfig(sys);
     config.outputTargets = [];
     config.flags.args = [];
   });
@@ -133,7 +133,7 @@ describe('hasAppTarget', () => {
 });
 
 describe('prepareData', () => {
-  let config: d.InternalStrictConfig;
+  let config: d.ValidatedConfig;
   let sys: d.CompilerSystem;
 
   beforeEach(() => {
@@ -178,7 +178,7 @@ describe('prepareData', () => {
   });
 
   it('updates when there is a PWA config', async () => {
-    const config: d.InternalStrictConfig = {
+    const config: d.ValidatedConfig = {
       flags: {
         args: [],
       },
@@ -224,7 +224,7 @@ describe('prepareData', () => {
   });
 
   it('updates when there is a component count passed in', async () => {
-    const config: d.InternalStrictConfig = {
+    const config: d.ValidatedConfig = {
       flags: {
         args: [],
       },

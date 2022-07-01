@@ -1,4 +1,4 @@
-import { ConfigBundle, Diagnostic, InternalStrictConfig, UnvalidatedConfig } from '../../declarations';
+import { ConfigBundle, Diagnostic, ValidatedConfig, UnvalidatedConfig } from '../../declarations';
 import { buildError, isBoolean, isNumber, isString, sortBy } from '@utils';
 import { setBooleanConfig } from './config-utils';
 import { validateDevServer } from './validate-dev-server';
@@ -19,7 +19,7 @@ type ConfigValidationResults = {
   /**
    * The validated configuration, with well-known default values set if they weren't previously provided
    */
-  config: InternalStrictConfig;
+  config: ValidatedConfig;
   /**
    * A collection of errors and warnings that occurred during the configuration validation process
    */
@@ -38,7 +38,7 @@ export const validateConfig = (userConfig: UnvalidatedConfig = {}): ConfigValida
   const config = Object.assign({}, userConfig || {}); // not positive it's json safe
   const diagnostics: Diagnostic[] = [];
 
-  const validatedConfig: InternalStrictConfig = {
+  const validatedConfig: ValidatedConfig = {
     ...config,
     // flags _should_ be JSON safe
     flags: JSON.parse(JSON.stringify(config.flags || {})),

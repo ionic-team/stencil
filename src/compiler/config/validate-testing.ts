@@ -4,7 +4,7 @@ import { isAbsolute, join, basename, dirname } from 'path';
 import { isLocalModule } from '../sys/resolve/resolve-utils';
 import { isOutputTargetDist, isOutputTargetWww } from '../output-targets/output-utils';
 
-export const validateTesting = (config: d.InternalStrictConfig, diagnostics: d.Diagnostic[]) => {
+export const validateTesting = (config: d.ValidatedConfig, diagnostics: d.Diagnostic[]) => {
   const testing = (config.testing = Object.assign({}, config.testing || {}));
 
   if (!config.flags.e2e && !config.flags.spec) {

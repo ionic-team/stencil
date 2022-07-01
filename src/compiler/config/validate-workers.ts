@@ -1,6 +1,6 @@
 import type * as d from '../../declarations';
 
-export const validateWorkers = (config: d.InternalStrictConfig) => {
+export const validateWorkers = (config: d.ValidatedConfig) => {
   if (typeof config.maxConcurrentWorkers !== 'number') {
     config.maxConcurrentWorkers = 8;
   }

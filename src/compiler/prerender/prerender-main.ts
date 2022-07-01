@@ -13,7 +13,7 @@ import { getPrerenderConfig } from './prerender-config';
 import { isAbsolute, join } from 'path';
 import { isOutputTargetWww } from '../output-targets/output-utils';
 
-export const createPrerenderer = async (config: d.InternalStrictConfig) => {
+export const createPrerenderer = async (config: d.ValidatedConfig) => {
   const start = (opts: d.PrerenderStartOptions) => {
     return runPrerender(config, opts.hydrateAppFilePath, opts.componentGraph, opts.srcIndexHtmlPath, opts.buildId);
   };
@@ -23,7 +23,7 @@ export const createPrerenderer = async (config: d.InternalStrictConfig) => {
 };
 
 const runPrerender = async (
-  config: d.InternalStrictConfig,
+  config: d.ValidatedConfig,
   hydrateAppFilePath: string,
   componentGraph: d.BuildResultsComponentGraph,
   srcIndexHtmlPath: string,
@@ -126,7 +126,7 @@ const runPrerenderOutputTarget = async (
   workerCtx: d.CompilerWorkerContext,
   results: d.PrerenderResults,
   diagnostics: d.Diagnostic[],
-  config: d.InternalStrictConfig,
+  config: d.ValidatedConfig,
   devServer: d.DevServer,
   hydrateAppFilePath: string,
   componentGraph: d.BuildResultsComponentGraph,

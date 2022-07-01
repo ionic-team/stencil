@@ -4,7 +4,7 @@ import { isAbsolute, join } from 'path';
 import { isOutputTargetWww } from '../output-targets/output-utils';
 
 export const validateDevServer = (
-  config: d.InternalStrictConfig,
+  config: d.ValidatedConfig,
   diagnostics: d.Diagnostic[]
 ): d.DevServerConfig | undefined => {
   if ((config.devServer === null || (config.devServer as any)) === false) {

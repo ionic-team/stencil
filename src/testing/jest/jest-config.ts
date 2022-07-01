@@ -43,7 +43,7 @@ function getLegacyJestOptions(): Record<string, boolean | number | string> {
  * @param config the Stencil config to use while generating Jest CLI arguments
  * @returns the arguments to pass to the Jest CLI, wrapped in an object
  */
-export function buildJestArgv(config: d.InternalStrictConfig): Config.Argv {
+export function buildJestArgv(config: d.ValidatedConfig): Config.Argv {
   const yargs = require('yargs');
 
   const args = [...config.flags.unknownArgs.slice(), ...config.flags.knownArgs.slice()];

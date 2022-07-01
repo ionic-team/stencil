@@ -4,7 +4,7 @@ import type {
   CompilerCtx,
   CompilerSystem,
   Config,
-  InternalStrictConfig,
+  ValidatedConfig,
   Module,
   UnvalidatedConfig,
 } from '@stencil/core/internal';
@@ -19,20 +19,20 @@ import path from 'path';
 import { noop } from '@utils';
 import { buildEvents } from '../compiler/events';
 
-// TODO(STENCIL-486): Update `mockInternalStrictConfig` to accept any property found on `InternalStrictConfig`
+// TODO(STENCIL-486): Update `mockValidatedConfig` to accept any property found on `ValidatedConfig`
 /**
  * Creates a mock instance of an internal, validated Stencil configuration object
  * @param sys an optional compiler system to associate with the config. If one is not provided, one will be created for
  * the caller
  * @returns the mock Stencil configuration
  */
-export function mockInternalStrictConfig(sys?: CompilerSystem): InternalStrictConfig {
+export function mockValidatedConfig(sys?: CompilerSystem): ValidatedConfig {
   const baseConfig = mockConfig(sys);
 
   return { ...baseConfig, flags: {} };
 }
 
-// TODO(STENCIL-486): Update `mockInternalStrictConfig` to accept any property found on `InternalStrictConfig`
+// TODO(STENCIL-486): Update `mockConfig` to accept any property found on `UnvalidatedConfig`
 /**
  * Creates a mock instance of a Stencil configuration entity. The mocked configuration has no guarantees around the
  * types/validity of its data.
