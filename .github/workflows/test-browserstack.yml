@@ -31,8 +31,8 @@ jobs:
       - name: 'BrowserStack Env Setup'  # Invokes the setup-env action
         uses: browserstack/github-actions/setup-env@master
         with:
-          username:  ${{ secrets.BROWSER_STACK_USERNAME }}
-          access-key: ${{ secrets.BROWSER_STACK_ACCESS_KEY }}
+          username:  ${{ env.BROWSERSTACK_USERNAME }}
+          access-key: ${{ env.BROWSERSTACK_ACCESS_KEY }}
 
       - name: Start BrowserStack
         uses: browserstack/github-actions/setup-local@master
