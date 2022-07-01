@@ -90,6 +90,48 @@ describe('event', () => {
     expect(ev.detail).toBe(88);
   });
 
+  it('FocusEvent() requires type', () => {
+    expect(() => {
+      // @ts-ignore checking that it throws when not supplied required arguments
+      new win.FocusEvent();
+    }).toThrow();
+  });
+
+  it('FocusEvent(type)', () => {
+    const ev = new win.FocusEvent('focus');
+    expect(ev.bubbles).toBe(false);
+    expect(ev.cancelBubble).toBe(false);
+    expect(ev.cancelable).toBe(false);
+    expect(ev.composed).toBe(false);
+    expect(ev.currentTarget).toBe(null);
+    expect(ev.defaultPrevented).toBe(false);
+    expect(ev.srcElement).toBe(null);
+    expect(ev.target).toBe(null);
+    expect(typeof ev.timeStamp).toBe('number');
+    expect(ev.type).toBe('focus');
+    expect(ev.relatedTarget).toBe(null);
+  });
+
+  it('FocusEvent(type, eventInitDict)', () => {
+    const eventInitDict = {
+      bubbles: true,
+      composed: true,
+      relatedTarget: null as EventTarget | null,
+    };
+    const ev = new win.FocusEvent('blur', eventInitDict);
+    expect(ev.bubbles).toBe(true);
+    expect(ev.cancelBubble).toBe(false);
+    expect(ev.cancelable).toBe(false);
+    expect(ev.composed).toBe(true);
+    expect(ev.currentTarget).toBe(null);
+    expect(ev.defaultPrevented).toBe(false);
+    expect(ev.srcElement).toBe(null);
+    expect(ev.target).toBe(null);
+    expect(typeof ev.timeStamp).toBe('number');
+    expect(ev.type).toBe('blur');
+    expect(ev.relatedTarget).toBe(null);
+  });
+
   it('KeyboardEvent() requires type', () => {
     expect(() => {
       // @ts-ignore checking that it throws when not supplied required arguments
