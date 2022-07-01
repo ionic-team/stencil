@@ -165,8 +165,6 @@ interface ConsoleMocker {
   };
 }
 
-// export function withSilentWarn<T extends () => Promise<any>>(
-
 /**
  * the callback that `withSilentWarn` expects to receive. Basically receives a mock
  * as its argument and returns a `Promise`, the value of which is returns by `withSilentWarn`
