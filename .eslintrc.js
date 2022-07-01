@@ -73,6 +73,8 @@ module.exports = {
     'prefer-rest-params': 'error',
     'prefer-spread': 'error',
   },
+  // inform ESLint about the global variables defined in a Jest context
+  // see https://github.com/jest-community/eslint-plugin-jest/#usage
   "env": {
     "jest/globals": true
   }
