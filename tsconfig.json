@@ -51,6 +51,7 @@
     "src/app-globals/index.ts",
     "src/cli/index.ts",
     "src/cli/public.ts",
+    "src/cli/config-flags.ts",
     "src/client/index.ts",
     "src/client/client-patch-browser.ts",
     "src/client/client-patch-esm.ts",
