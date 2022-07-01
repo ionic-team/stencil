@@ -35,12 +35,65 @@ export const BOOLEAN_CLI_ARGS = [
   'verbose',
   'version',
   'watch',
+
+  // JEST CLI OPTIONS
+  'all',
+  'automock',
+  'bail',
+  // 'cache', Stencil already supports this argument
+  'changedFilesWithAncestor',
+  // 'ci', Stencil already supports this argument
+  'clearCache',
+  'clearMocks',
+  'collectCoverage',
+  'color',
+  'colors',
+  'coverage',
+  // 'debug', Stencil already supports this argument
+  'detectLeaks',
+  'detectOpenHandles',
+  'errorOnDeprecated',
+  'expand',
+  'findRelatedTests',
+  'forceExit',
+  'init',
+  'injectGlobals',
+  'json',
+  'lastCommit',
+  'listTests',
+  'logHeapUsage',
+  'noStackTrace',
+  'notify',
+  'onlyChanged',
+  'onlyFailures',
+  'passWithNoTests',
+  'resetMocks',
+  'resetModules',
+  'restoreMocks',
+  'runInBand',
+  'runTestsByPath',
+  'showConfig',
+  'silent',
+  'skipFilter',
+  'testLocationInResults',
+  'updateSnapshot',
+  'useStderr',
+  // 'verbose', Stencil already supports this argument
+  // 'version', Stencil already supports this argument
+  // 'watch', Stencil already supports this argument
+  'watchAll',
+  'watchman',
 ] as const;
 
 /**
  * All the Number options supported by the Stencil CLI
  */
-export const NUMBER_CLI_ARGS = ['maxWorkers', 'port'] as const;
+export const NUMBER_CLI_ARGS = [
+  'port',
+  // JEST CLI ARGS
+  'maxConcurrency',
+  'testTimeout',
+] as const;
 
 /**
  * All the String options supported by the Stencil CLI
@@ -53,7 +106,70 @@ export const STRING_CLI_ARGS = [
   'emulate',
   'root',
   'screenshotConnector',
+
+  // JEST CLI ARGS
+  'cacheDirectory',
+  'changedSince',
+  'collectCoverageFrom',
+  // 'config', Stencil already supports this argument
+  'coverageDirectory',
+  'coverageThreshold',
+  'env',
+  'filter',
+  'globalSetup',
+  'globalTeardown',
+  'globals',
+  'haste',
+  'moduleNameMapper',
+  'notifyMode',
+  'outputFile',
+  'preset',
+  'prettierPath',
+  'resolver',
+  'rootDir',
+  'runner',
+  'testEnvironment',
+  'testEnvironmentOptions',
+  'testFailureExitCode',
+  'testNamePattern',
+  'testResultsProcessor',
+  'testRunner',
+  'testSequencer',
+  'testURL',
+  'timers',
+  'transform',
+
+  // ARRAY ARGS
+  'collectCoverageOnlyFrom',
+  'coveragePathIgnorePatterns',
+  'coverageReporters',
+  'moduleDirectories',
+  'moduleFileExtensions',
+  'modulePathIgnorePatterns',
+  'modulePaths',
+  'projects',
+  'reporters',
+  'roots',
+  'selectProjects',
+  'setupFiles',
+  'setupFilesAfterEnv',
+  'snapshotSerializers',
+  'testMatch',
+  'testPathIgnorePatterns',
+  'testPathPattern',
+  'testRegex',
+  'transformIgnorePatterns',
+  'unmockedModulePathPatterns',
+  'watchPathIgnorePatterns',
 ] as const;
+
+/**
+ * All the CLI arguments which may have string or number values
+ *
+ * `maxWorkers` is an argument which is used both by Stencil _and_ by Jest,
+ * which means that we need to support parsing both string and number values.
+ */
+export const STRING_NUMBER_CLI_ARGS = ['maxWorkers'] as const;
 
 /**
  * All the LogLevel-type options supported by the Stencil CLI
@@ -74,9 +190,10 @@ type ArrayValuesAsUnion<T extends ReadonlyArray<string>> = T[number];
 export type BooleanCLIArg = ArrayValuesAsUnion<typeof BOOLEAN_CLI_ARGS>;
 export type StringCLIArg = ArrayValuesAsUnion<typeof STRING_CLI_ARGS>;
 export type NumberCLIArg = ArrayValuesAsUnion<typeof NUMBER_CLI_ARGS>;
+export type StringNumberCLIArg = ArrayValuesAsUnion<typeof STRING_NUMBER_CLI_ARGS>;
 export type LogCLIArg = ArrayValuesAsUnion<typeof LOG_LEVEL_CLI_ARGS>;
 
-type KnownCLIArg = BooleanCLIArg | StringCLIArg | NumberCLIArg | LogCLIArg;
+type KnownCLIArg = BooleanCLIArg | StringCLIArg | NumberCLIArg | StringNumberCLIArg | LogCLIArg;
 
 type AliasMap = Partial<Record<KnownCLIArg, string>>;
 
@@ -107,16 +224,25 @@ type ObjectFromKeys<K extends ReadonlyArray<string>, T> = {
  * in ConfigFlags, below
  */
 type BooleanConfigFlags = ObjectFromKeys<typeof BOOLEAN_CLI_ARGS, boolean>;
+
 /**
  * Type containing the possible String configuration flags, to be included
  * in ConfigFlags, below
  */
 type StringConfigFlags = ObjectFromKeys<typeof STRING_CLI_ARGS, string>;
+
 /**
  * Type containing the possible numeric configuration flags, to be included
  * in ConfigFlags, below
  */
 type NumberConfigFlags = ObjectFromKeys<typeof NUMBER_CLI_ARGS, number>;
+
+/**
+ * Type containing the configuration flags which may be set to either string
+ * or number values.
+ */
+type StringNumberConfigFlags = ObjectFromKeys<typeof STRING_NUMBER_CLI_ARGS, string | number>;
+
 /**
  * Type containing the possible LogLevel configuration flags, to be included
  * in ConfigFlags, below
@@ -137,7 +263,12 @@ type LogLevelFlags = ObjectFromKeys<typeof LOG_LEVEL_CLI_ARGS, LogLevel>;
  * options we support and a runtime list of strings which can be used to match
  * on actual flags passed by the user.
  */
-export interface ConfigFlags extends BooleanConfigFlags, StringConfigFlags, NumberConfigFlags, LogLevelFlags {
+export interface ConfigFlags
+  extends BooleanConfigFlags,
+    StringConfigFlags,
+    NumberConfigFlags,
+    StringNumberConfigFlags,
+    LogLevelFlags {
   task?: TaskCommand | null;
   args?: string[];
   knownArgs?: string[];

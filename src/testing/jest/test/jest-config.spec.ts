@@ -186,7 +186,7 @@ describe('jest-config', () => {
     config.testing = {};
 
     expect(config.flags.args).toEqual(['--spec', '--passWithNoTests']);
-    expect(config.flags.unknownArgs).toEqual(['--passWithNoTests']);
+    expect(config.flags.unknownArgs).toEqual([]);
 
     const jestArgv = buildJestArgv(config);
     expect(jestArgv.spec).toBe(true);

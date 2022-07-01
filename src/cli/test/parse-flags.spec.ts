@@ -1,5 +1,6 @@
 import type * as d from '../../declarations';
 import { LogLevel } from '../../declarations';
+import { BOOLEAN_CLI_ARGS, STRING_CLI_ARGS, NUMBER_CLI_ARGS } from '../config-flags';
 import { parseFlags } from '../parse-flags';
 
 describe('parseFlags', () => {
@@ -14,18 +15,18 @@ describe('parseFlags', () => {
   });
 
   it('should get known and unknown args', () => {
-    args.push('serve', '--address', '127.0.0.1', '--coverage', '--reporters', 'test.spec.ts');
+    args.push('serve', '--address', '127.0.0.1', '--potatoArgument', '--flimflammery', 'test.spec.ts');
 
     const flags = parseFlags(args, sys);
     expect(flags.task).toBe('serve');
     expect(flags.args[0]).toBe('--address');
     expect(flags.args[1]).toBe('127.0.0.1');
-    expect(flags.args[2]).toBe('--coverage');
-    expect(flags.args[3]).toBe('--reporters');
+    expect(flags.args[2]).toBe('--potatoArgument');
+    expect(flags.args[3]).toBe('--flimflammery');
     expect(flags.args[4]).toBe('test.spec.ts');
     expect(flags.knownArgs).toEqual(['--address', '127.0.0.1']);
-    expect(flags.unknownArgs[0]).toBe('--coverage');
-    expect(flags.unknownArgs[1]).toBe('--reporters');
+    expect(flags.unknownArgs[0]).toBe('--potatoArgument');
+    expect(flags.unknownArgs[1]).toBe('--flimflammery');
     expect(flags.unknownArgs[2]).toBe('test.spec.ts');
   });
 
@@ -160,12 +161,48 @@ describe('parseFlags', () => {
   it('should parse --ci', () => {
     args[0] = '--ci';
     const flags = parseFlags(args, sys);
+    expect(flags.knownArgs).toEqual(['--ci']);
     expect(flags.ci).toBe(true);
+  });
+
+  /**
+   * these comprehensive tests of all the supported args serve as regression
+   * tests against duplicating any of the arguments in the arrays. Because of
+   * the way that the arg parsing algorithm works having a dupe will result in a
+   * value like `[true, true]` being set on ConfigFlags, which will cause these
+   * tests to start failing.
+   */
+  describe.each(BOOLEAN_CLI_ARGS)('should parse boolean flag %s', (cliArg) => {
+    it('should parse arg', () => {
+      const flags = parseFlags([`--${cliArg}`], sys);
+      expect(flags.knownArgs).toEqual([`--${cliArg}`]);
+      expect(flags[cliArg]).toBe(true);
+    });
+
+    it(`should parse --no${cliArg}`, () => {
+      const negativeFlag = '--no' + cliArg.charAt(0).toUpperCase() + cliArg.slice(1);
+      const flags = parseFlags([negativeFlag], sys);
+      expect(flags.knownArgs).toEqual([negativeFlag]);
+      expect(flags[cliArg]).toBe(false);
+    });
+  });
+
+  it.each(STRING_CLI_ARGS)('should parse string flag %s', (cliArg) => {
+    const flags = parseFlags([`--${cliArg}`, 'test-value'], sys);
+    expect(flags.knownArgs).toEqual([`--${cliArg}`, 'test-value']);
+    expect(flags[cliArg]).toBe('test-value');
+  });
+
+  it.each(NUMBER_CLI_ARGS)('should parse number flag %s', (cliArg) => {
+    const flags = parseFlags([`--${cliArg}`, '42'], sys);
+    expect(flags.knownArgs).toEqual([`--${cliArg}`, '42']);
+    expect(flags[cliArg]).toBe(42);
   });
 
   it('should parse --compare', () => {
     args[0] = '--compare';
     const flags = parseFlags(args, sys);
+    expect(flags.knownArgs).toEqual(['--compare']);
     expect(flags.compare).toBe(true);
   });
 
@@ -321,21 +358,29 @@ describe('parseFlags', () => {
   });
 
   it.each<LogLevel>(['info', 'warn', 'error', 'debug'])("should parse '--log-level %s'", (level) => {
-    const args = ['--log-level', level];
-    const flags = parseFlags(args, sys);
+    const flags = parseFlags(['--log-level', level], sys);
     expect(flags.logLevel).toBe(level);
   });
 
   it.each<LogLevel>(['info', 'warn', 'error', 'debug'])('should parse --log-level=%s', (level) => {
-    const args = [`--log-level=${level}`];
-    const flags = parseFlags(args, sys);
+    const flags = parseFlags([`--log-level=${level}`], sys);
     expect(flags.logLevel).toBe(level);
   });
 
   it('should parse --log', () => {
-    args[0] = '--log';
-    const flags = parseFlags(args, sys);
+    const flags = parseFlags(['--log'], sys);
     expect(flags.log).toBe(true);
+  });
+
+  it.each([
+    ['--maxWorkers', '4'],
+    ['--maxWorkers=4'],
+    ['--max-workers', '4'],
+    ['--maxWorkers', '4e+0'],
+    ['--maxWorkers', '40e-1'],
+  ])('should parse %p, %p', (...args) => {
+    const flags = parseFlags(args, sys);
+    expect(flags.maxWorkers).toBe(4);
   });
 
   it('should parse --maxWorkers 4', () => {
@@ -356,6 +401,12 @@ describe('parseFlags', () => {
     args[1] = '4';
     const flags = parseFlags(args, sys);
     expect(flags.maxWorkers).toBe(4);
+  });
+
+  it('should parse --maxWorkers=50%', function () {
+    // see https://jestjs.io/docs/27.x/cli#--maxworkersnumstring
+    const flags = parseFlags(['--maxWorkers=50%']);
+    expect(flags.maxWorkers).toBe('50%');
   });
 
   it('should parse --max-workers=1', () => {
