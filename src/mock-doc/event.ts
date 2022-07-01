@@ -113,6 +113,22 @@ export class MockMouseEvent extends MockEvent {
   }
 }
 
+export class MockUIEvent extends MockEvent {
+  detail: number | null = null;
+}
+
+export class MockFocusEvent extends MockUIEvent {
+  relatedTarget: EventTarget | null = null;
+
+  constructor(type: string, focusEventInitDic?: FocusEventInit) {
+    super(type);
+
+    if (focusEventInitDic != null) {
+      Object.assign(this, focusEventInitDic);
+    }
+  }
+}
+
 export class MockEventListener {
   type: string;
   handler: (ev?: any) => void;
