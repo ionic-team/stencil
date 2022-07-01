@@ -8,6 +8,9 @@ describe('optimizeCss', () => {
   let config: d.Config;
   let compilerCtx: d.CompilerCtx;
   let diagnostics: d.Diagnostic[];
+
+  // TODO(STENCIL-307): Remove usage of the Jasmine global
+  // eslint-disable-next-line jest/no-jasmine-globals -- these will be removed when we migrate to jest-circus
   jasmine.DEFAULT_TIMEOUT_INTERVAL = 30000;
 
   beforeEach(() => {

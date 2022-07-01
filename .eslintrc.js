@@ -31,8 +31,6 @@ module.exports = {
     // TODO(STENCIL-488): Turn this rule back on once there are no violations of it remaining
     "jest/no-disabled-tests": ["off"],
     // we use this in enough places that we don't want to do per-line disables
-    "jest/no-jasmine-globals": ["off"],
-    // we use this in enough places that we don't want to do per-line disables
     "jest/no-conditional-expect": ["off"],
     // this enforces that Jest hooks (e.g. `beforeEach`) are declared in test files in their execution order
     // see here for details: https://github.com/jest-community/eslint-plugin-jest/blob/main/docs/rules/prefer-hooks-in-order.md
