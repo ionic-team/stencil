@@ -16,6 +16,31 @@ module.exports = {
       "varsIgnorePattern": "^(h|Fragment)$"
     }],
     /**
+     * Configuration for Jest rules can be found here: 
+     * https://github.com/jest-community/eslint-plugin-jest/tree/main/docs/rules
+     */
+    "jest/expect-expect": [
+      "error",
+      {
+        // we set this to `expect*` so that any function whose name starts with expect will be counted
+        // as an assertion function, allowing us to use functions to DRY up test suites.
+        "assertFunctionNames": ["expect*"],
+      }
+    ],
+    // we have a number of things disabled w/ `xdescribe`, `xit`, etc
+    "jest/no-test-prefixes": ["off"],
+    // we...have a number of things disabled :)
+    "jest/no-disabled-tests": ["off"],
+    // we use this in enough places that we don't want to do per-line disables
+    "jest/no-jasmine-globals": ["off"],
+    // we use this in enough places that we don't want to do per-line disables
+    "jest/no-conditional-expect": ["off"],
+    // this enforces that Jest hooks (e.g. `beforeEach`) are declared in test files in their execution order
+    // see here for details: https://github.com/jest-community/eslint-plugin-jest/blob/main/docs/rules/prefer-hooks-in-order.md
+    "jest/prefer-hooks-in-order": ["warn"],
+    // this enforces that Jest hooks (e.g. `beforeEach`) are declared at the top of `describe` blocks
+    "jest/prefer-hooks-on-top": ["warn"],
+    /**
      * Configuration for the JSDoc plugin rules can be found at:
      * https://github.com/gajus/eslint-plugin-jsdoc
      */
@@ -48,27 +73,6 @@ module.exports = {
     'no-var': 'error',
     'prefer-rest-params': 'error',
     'prefer-spread': 'error',
-    "jest/expect-expect": [
-      "error",
-      {
-        // we set this to `expect*` so that any function whose name starts with expect will be counted
-        // as an assertion function, allowing us to use functions to DRY up test suites.
-        "assertFunctionNames": ["expect*"],
-      }
-    ],
-    // we have a number of things disabled w/ `xdescribe`, `xit`, etc
-    "jest/no-test-prefixes": ["off"],
-    // we...have a number of things disabled :)
-    "jest/no-disabled-tests": ["off"],
-    // we use this in enough places that we don't want to do per-line disables
-    "jest/no-jasmine-globals": ["off"],
-    // we use this in enough places that we don't want to do per-line disables
-    "jest/no-conditional-expect": ["off"],
-    // this enforces that Jest hooks (e.g. `beforeEach`) are declared in test files in their execution order
-    // see here for details: https://github.com/jest-community/eslint-plugin-jest/blob/main/docs/rules/prefer-hooks-in-order.md
-    "jest/prefer-hooks-in-order": ["warn"],
-    // this enforces that Jest hooks (e.g. `beforeEach`) are declared at the top of `describe` blocks
-    "jest/prefer-hooks-on-top": ["warn"],
   },
   "env": {
     "jest/globals": true
