@@ -4,7 +4,7 @@ on: [push, pull_request]
 
 
 jobs:
-  browser-tests:
+  browser-tests-2:
     runs-on: ubuntu-latest
 
     steps:
