@@ -1,6 +1,7 @@
 import { MockDocument } from './document';
 import { MockElement } from './node';
 import { NODE_NAMES } from './constants';
+import { MockWindow } from './window';
 
 export class MockEvent {
   bubbles = false;
@@ -115,6 +116,15 @@ export class MockMouseEvent extends MockEvent {
 
 export class MockUIEvent extends MockEvent {
   detail: number | null = null;
+  view: MockWindow | null = null;
+
+  constructor(type: string, focusEventInitDic?: UIEventInit) {
+    super(type);
+
+    if (focusEventInitDic != null) {
+      Object.assign(this, focusEventInitDic);
+    }
+  }
 }
 
 export class MockFocusEvent extends MockUIEvent {
