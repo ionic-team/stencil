@@ -2,19 +2,20 @@ import type * as d from '../../../declarations';
 import { normalizePath } from '../../../utils';
 import { validateConfig } from '../validate-config';
 import path from 'path';
+import { ConfigFlags } from '../../../cli/config-flags';
 
 describe('validateDevServer', () => {
-  let inputConfig: d.UnvalidatedConfig;
   const root = path.resolve('/');
+  let inputConfig: d.UnvalidatedConfig;
+  let flags: ConfigFlags;
 
   beforeEach(() => {
+    flags = { serve: true };
     inputConfig = {
       sys: {} as any,
       rootDir: normalizePath(path.join(root, 'some', 'path')),
       devServer: {},
-      flags: {
-        serve: true,
-      },
+      flags,
       namespace: 'Testing',
     };
   });
@@ -25,7 +26,7 @@ describe('validateDevServer', () => {
   });
 
   it.each(['https://localhost', 'http://localhost', 'https://localhost/', 'http://localhost/', 'localhost/'])(
-    'should remove extraneious stuff from addres %p',
+    'should remove extraneous stuff from address %p',
     (address) => {
       inputConfig.devServer.address = address;
       const { config } = validateConfig(inputConfig);
@@ -40,7 +41,7 @@ describe('validateDevServer', () => {
   });
 
   it('should set address from flags', () => {
-    inputConfig.flags = { ...(inputConfig.flags ?? {}), address: '123.123.123.123' };
+    inputConfig.flags = { ...flags, address: '123.123.123.123' };
     const { config } = validateConfig(inputConfig);
     expect(config.devServer.address).toBe('123.123.123.123');
   });
@@ -143,7 +144,7 @@ describe('validateDevServer', () => {
   });
 
   it('should set port from flags', () => {
-    inputConfig.flags = { ...(inputConfig.flags ?? {}), port: 4444 };
+    inputConfig.flags = { ...flags, port: 4444 };
     const { config } = validateConfig(inputConfig);
     expect(config.devServer.port).toBe(4444);
   });
@@ -219,7 +220,7 @@ describe('validateDevServer', () => {
   });
 
   it('should set ssr from flag', () => {
-    inputConfig.flags = { ...(inputConfig.flags ?? {}), ssr: true };
+    inputConfig.flags = { ...flags, ssr: true };
     const { config } = validateConfig(inputConfig);
     expect(config.devServer.ssr).toBe(true);
   });
@@ -240,7 +241,7 @@ describe('validateDevServer', () => {
       prerenderConfig: normalizePath(path.join(root, 'some', 'path', 'prerender.config.ts')),
     };
     inputConfig.outputTargets = [wwwOutputTarget];
-    inputConfig.flags = { ...(inputConfig.flags ?? {}), ssr: true };
+    inputConfig.flags = { ...flags, ssr: true };
     const { config } = validateConfig(inputConfig);
     expect(config.devServer.prerenderConfig).toBe(wwwOutputTarget.prerenderConfig);
   });
