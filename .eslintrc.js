@@ -28,6 +28,7 @@ module.exports = {
       }
     ],
     // we...have a number of things disabled :)
+    // TODO(STENCIL-488): Turn this rule back on once there are no violations of it remaining
     "jest/no-disabled-tests": ["off"],
     // we use this in enough places that we don't want to do per-line disables
     "jest/no-jasmine-globals": ["off"],
