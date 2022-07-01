@@ -8,7 +8,7 @@ on:
 jobs:
   build_core:
     name: Core
-    runs-on: 'ubuntu-latest'
+    runs-on: macos-latest
     steps:
       - name: Checkout Code
         uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # v2.4.0
