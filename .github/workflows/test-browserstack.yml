@@ -2,7 +2,11 @@ name: BrowserStack Tests
 
 on: [push, pull_request]
 
+permissions: read-all
 
+env:
+  BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSER_STACK_ACCESS_KEY }}
+  BROWSERSTACK_USERNAME: ${{ secrets.BROWSER_STACK_USERNAME }}
 jobs:
   browser-tests-2:
     runs-on: ubuntu-latest
