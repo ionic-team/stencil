@@ -7,6 +7,7 @@ permissions: read-all
 env:
   BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSER_STACK_ACCESS_KEY }}
   BROWSERSTACK_USERNAME: ${{ secrets.BROWSER_STACK_USERNAME }}
+
 jobs:
   browser-tests-2:
     runs-on: ubuntu-latest
@@ -30,8 +31,8 @@ jobs:
       - name: 'BrowserStack Env Setup'  # Invokes the setup-env action
         uses: browserstack/github-actions/setup-env@master
         with:
-          username:  ${{ secrets.BROWSERSTACK_USERNAME }}
-          access-key: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
+          username:  ${{ secrets.BROWSER_STACK_USERNAME }}
+          access-key: ${{ secrets.BROWSER_STACK_ACCESS_KEY }}
 
       - name: Start BrowserStack
         uses: browserstack/github-actions/setup-local@master
