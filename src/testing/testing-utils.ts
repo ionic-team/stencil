@@ -185,7 +185,7 @@ export async function withSilentWarn<T>(cb: SilentWarnFunc<T>): Promise<T> {
   const realWarn = console.warn;
   const warnMock = jest.fn();
   console.warn = warnMock;
-  const retval = await cb(warnMock);
+  const retVal = await cb(warnMock);
   console.warn = realWarn;
-  return retval;
+  return retVal;
 }
