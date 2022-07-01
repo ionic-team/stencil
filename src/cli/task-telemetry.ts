@@ -4,7 +4,7 @@ import { checkTelemetry, disableTelemetry, enableTelemetry } from './telemetry/t
 
 /**
  * Entrypoint for the Telemetry task
- * @param flags configuration flags provided to Stencil when a task was call (either this task or a task that invokes
+ * @param flags configuration flags provided to Stencil when a task was called (either this task or a task that invokes
  * telemetry)
  * @param sys the abstraction for interfacing with the operating system
  * @param logger a logging implementation to log the results out to the user
