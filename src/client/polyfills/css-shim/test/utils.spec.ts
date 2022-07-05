@@ -109,13 +109,13 @@ describe('utils', () => {
         --ion-color:calc(12px)
         `);
 
-      testDeclaration(declarations[0], {
+      expectDeclaration(declarations[0], {
         prop: '--var',
         value: '12px',
         important: false,
       });
 
-      testDeclaration(
+      expectDeclaration(
         declarations[1],
         {
           prop: '--var',
@@ -125,19 +125,19 @@ describe('utils', () => {
         { '--variable': 'value' }
       );
 
-      testDeclaration(declarations[2], {
+      expectDeclaration(declarations[2], {
         prop: '--color',
         value: '12',
         important: false,
       });
 
-      testDeclaration(declarations[3], {
+      expectDeclaration(declarations[3], {
         prop: '--padding',
         value: '12 12 12 12',
         important: false,
       });
 
-      testDeclaration(declarations[4], {
+      expectDeclaration(declarations[4], {
         prop: '--ion-color',
         value: 'calc(12px)',
         important: false,
@@ -145,18 +145,18 @@ describe('utils', () => {
     });
   });
 
-  function testDeclaration(dec: Declaration, exp: any, props: any = {}) {
+  function expectDeclaration(dec: Declaration, exp: any, props: any = {}) {
     expect(dec.prop).toBe(exp.prop);
     expect(executeTemplate(dec.value, props)).toBe(exp.value);
     expect(dec.important).toBe(exp.important);
   }
 
-  function testSelector(selector: CSSSelector, expected: any) {
+  function expectSelector(selector: CSSSelector, expected: any) {
     expect(selector.selector).toBe(expected.selector);
     expect(selector.nu).toBe(expected.nu);
     expect(selector.specificity).toBe(expected.specificity);
     for (let i = 0; i < expected.declarations.length; i++) {
-      testDeclaration(selector.declarations[i], expected.declarations[i]);
+      expectDeclaration(selector.declarations[i], expected.declarations[i]);
     }
   }
 
@@ -181,13 +181,13 @@ describe('utils', () => {
 
       expect(selectors.length).toBe(5);
 
-      testSelector(selectors[0], {
+      expectSelector(selectors[0], {
         selector: 'ion-button',
         declarations: [{ prop: '--value', value: 'transparent', important: false }],
         specificity: 1,
         nu: 0,
       });
-      testSelector(selectors[1], {
+      expectSelector(selectors[1], {
         selector: 'ion-button.color',
         declarations: [
           { prop: '--value', value: 'black', important: false },
@@ -197,7 +197,7 @@ describe('utils', () => {
         nu: 1,
       });
 
-      testSelector(selectors[2], {
+      expectSelector(selectors[2], {
         selector: '.color-background',
         declarations: [
           { prop: '--stuff', value: '0 0 10x ', important: false },
@@ -207,7 +207,7 @@ describe('utils', () => {
         nu: 2,
       });
 
-      testSelector(selectors[3], {
+      expectSelector(selectors[3], {
         selector: '.color-active',
         declarations: [
           { prop: '--stuff', value: '0 0 10x ', important: false },
@@ -217,7 +217,7 @@ describe('utils', () => {
         nu: 2,
       });
 
-      testSelector(selectors[4], {
+      expectSelector(selectors[4], {
         selector: ':host(.toolbar) .color-focused',
         declarations: [
           { prop: '--stuff', value: '0 0 10x ', important: false },

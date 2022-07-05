@@ -132,7 +132,7 @@ describe('validateOutputTargetWww', () => {
   });
 
   describe('baseUrl', () => {
-    it('baseUrl does not end with /', () => {
+    it('baseUrl does not end with / with dir set', () => {
       const outputTarget: d.OutputTargetWww = {
         type: 'www',
         dir: 'my-www',
