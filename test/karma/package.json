@@ -42,6 +42,7 @@
     "karma-typescript": "^5.5.3",
     "normalize.css": "^8.0.1",
     "rollup-plugin-node-polyfills": "^0.1.2",
+    "uuid": "^8.3.2",
     "webpack-cli": "^4.9.1",
     "workbox-build": "4.3.1"
   },

@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from 'uuid'
 const path = require('path');
 
 const { WWW_OUT_DIR } = require('./constants');
@@ -87,8 +88,8 @@ module.exports = function (config) {
 
     browserStack: {
       project: 'stencil_core',
-      startTunnel: false,
-      localIdentifier: process.env.BROWSERSTACK_LOCAL_IDENTIFIER, // set by browserstack/github-actions/setup-local
+      startTunnel: true,
+      localIdentifier: uuidv4(),
     },
 
     preprocessors: {
