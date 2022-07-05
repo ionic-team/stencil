@@ -4,7 +4,7 @@ import { Compiler, Config } from '@stencil/core/compiler';
 import { mockConfig } from '@stencil/core/testing';
 import path from 'path';
 
-xdescribe('outputTarget, www', () => {
+describe.skip('outputTarget, www', () => {
   jest.setTimeout(20000);
   let compiler: Compiler;
   let config: Config;

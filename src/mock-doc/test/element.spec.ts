@@ -264,7 +264,7 @@ describe('element', () => {
       expect(root.contains(root)).toEqual(true);
     });
 
-    it('returns false when a node is not the given node itself or not a descendant of the given node ', () => {
+    it('returns false when a node is not the given node itself or not a descendant of the given node', () => {
       const root = document.createElement('div');
       const span = document.createElement('span');
       expect(root.contains(span)).toEqual(false);

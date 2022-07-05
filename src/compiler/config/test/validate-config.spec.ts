@@ -5,7 +5,7 @@ import { DOCS_JSON, DOCS_CUSTOM, DOCS_README, DOCS_VSCODE } from '../../output-t
 import { validateConfig } from '../validate-config';
 
 describe('validation', () => {
-  let userConfig: d.Config;
+  let userConfig: d.UnvalidatedConfig;
   const logger = mockLogger();
   const sys = mockCompilerSystem();
 
@@ -214,16 +214,10 @@ describe('validation', () => {
       expect(config.hashFileNames).toBe(false);
     });
 
-    it('should set hashFileNames from hashFilenames', () => {
-      userConfig.hashFileNames = false;
+    it.each([true, false])('should set hashFileNames when hashFileNames===%b', (hashFileNames) => {
+      userConfig.hashFileNames = hashFileNames;
       const { config } = validateConfig(userConfig);
-      expect(config.hashFileNames).toBe(false);
-    });
-
-    it('should set hashFileNames from hashFilenames', () => {
-      userConfig.hashFileNames = true;
-      const { config } = validateConfig(userConfig);
-      expect(config.hashFileNames).toBe(true);
+      expect(config.hashFileNames).toBe(hashFileNames);
     });
 
     it('should set hashFileNames from function', () => {
@@ -307,19 +301,13 @@ describe('validation', () => {
     }
   );
 
-  it('should default dist false and www true', () => {
-    const { config } = validateConfig(userConfig);
-    expect(config.outputTargets.some((o) => o.type === 'dist')).toBe(false);
-    expect(config.outputTargets.some((o) => o.type === 'www')).toBe(true);
-  });
-
   it('should set devInspector false', () => {
     userConfig.devInspector = false;
     const { config } = validateConfig(userConfig);
     expect(config.devInspector).toBe(false);
   });
 
-  it('should set devInspector true ', () => {
+  it('should set devInspector true', () => {
     userConfig.devInspector = true;
     const { config } = validateConfig(userConfig);
     expect(config.devInspector).toBe(true);

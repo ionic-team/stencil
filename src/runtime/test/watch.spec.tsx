@@ -35,8 +35,8 @@ describe('watch', () => {
       components: [CmpA],
       html: `<cmp-a></cmp-a>`,
     });
-    spyOn(rootInstance, 'method1');
-    spyOn(rootInstance, 'method2');
+    jest.spyOn(rootInstance, 'method1');
+    jest.spyOn(rootInstance, 'method2');
 
     // set same values, watch should not be called
     root.prop1 = 1;
@@ -103,7 +103,7 @@ describe('watch', () => {
     );
 
     expect(rootInstance.watchCalled).toBe(6);
-    spyOn(rootInstance, 'method');
+    jest.spyOn(rootInstance, 'method');
 
     // trigger updates in element
     root.prop = 1000;

@@ -2028,9 +2028,9 @@ export interface CssImportData {
   srcImport: string;
   updatedImport?: string;
   url: string;
-  filePath?: string;
+  filePath: string;
   altFilePath?: string;
-  styleText?: string;
+  styleText?: string | null;
 }
 
 export interface CssToEsmImportData {

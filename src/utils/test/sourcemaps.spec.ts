@@ -217,10 +217,6 @@ describe('sourcemaps', () => {
       expect(getSourceMappingUrlForEndOfFile('some-pkg')).toBe('\n//# sourceMappingURL=some-pkg.map');
     });
 
-    it('returns a correctly formatted url', () => {
-      expect(getSourceMappingUrlForEndOfFile('some-pkg')).toBe('\n//# sourceMappingURL=some-pkg.map');
-    });
-
     it('handles question marks in URLs', () => {
       expect(getSourceMappingUrlForEndOfFile('some-pkg?')).toBe('\n//# sourceMappingURL=some-pkg%3F.map');
     });

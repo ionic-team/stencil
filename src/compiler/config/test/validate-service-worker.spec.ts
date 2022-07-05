@@ -4,7 +4,7 @@ import { mockCompilerSystem } from '@stencil/core/testing';
 import { validateServiceWorker } from '../validate-service-worker';
 
 describe('validateServiceWorker', () => {
-  const config: d.Config = {
+  const config: d.ValidatedConfig = {
     fsNamespace: 'app',
     sys: mockCompilerSystem(),
     devMode: false,
@@ -28,7 +28,7 @@ describe('validateServiceWorker', () => {
     if (target.serviceWorker) {
       return target.serviceWorker;
     } else {
-      fail('the serviceWorker on the provided target was unexpectedly falsy, so this test needs to fail!');
+      throw new Error('the serviceWorker on the provided target was unexpectedly falsy, so this test needs to fail!');
     }
   }
 

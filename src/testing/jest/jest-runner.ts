@@ -4,7 +4,7 @@ import { setScreenshotEmulateData } from '../puppeteer/puppeteer-emulate';
 import type { AggregatedResult } from '@jest/test-result';
 import type { ConfigFlags } from '../../cli/config-flags';
 
-export async function runJest(config: d.Config, env: d.E2EProcessEnv) {
+export async function runJest(config: d.ValidatedConfig, env: d.E2EProcessEnv) {
   let success = false;
 
   try {

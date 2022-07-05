@@ -667,7 +667,7 @@ describe('render-vdom', () => {
     `);
   });
 
-  it('should not render booleans ', async () => {
+  it('should not render booleans', async () => {
     @Component({ tag: 'cmp-a' })
     class CmpA {
       @Prop() excitement = '';

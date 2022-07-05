@@ -58,7 +58,7 @@ describe('newSpecPage, spec testing', () => {
     expect(div.textContent).toEqual(`Hello, World! I'm Doc Emmett Brown`);
   });
 
-  it('should emit "initevent" on init ', async () => {
+  it('should emit "initevent" on init', async () => {
     root.addEventListener(
       'initevent',
       (ev: CustomEvent) => {
@@ -70,7 +70,7 @@ describe('newSpecPage, spec testing', () => {
     await page.waitForChanges();
   });
 
-  it('should respond to "testevent" ', async () => {
+  it('should respond to "testevent"', async () => {
     const myevent = new CustomEvent('testevent', {
       detail: {
         last: 'Jeep',
