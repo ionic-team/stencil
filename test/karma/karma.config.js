@@ -105,7 +105,7 @@ module.exports = function (config) {
     browserStack: {
       // identifier for all browser runs in BrowserStack
       project: 'stencil_core',
-      ...(isCI ? ciBrowserstackConfig : localBrowserstackConfig)
+      ...(isCI ? ciBrowserstackConfig : localBrowserstackConfig),
     },
 
     preprocessors: {
