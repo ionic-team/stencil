@@ -1,5 +1,6 @@
 import { Component, Method, Prop, State, Watch } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
+import { withSilentWarn } from '../../testing/testing-utils';
 
 describe('watch', () => {
   it('watch is called each time a prop changes', async () => {
@@ -60,9 +61,9 @@ describe('watch', () => {
     class CmpA {
       watchCalled = 0;
 
-      @Prop() prop = 10;
-      @Prop() value = 10;
-      @State() someState = 'default';
+      @Prop({ mutable: true }) prop = 10;
+      @Prop({ mutable: true }) value = 10;
+      @State({ mutable: true }) someState = 'default';
 
       @Watch('prop')
       @Watch('value')
@@ -94,10 +95,13 @@ describe('watch', () => {
       }
     }
 
-    const { root, rootInstance } = await newSpecPage({
-      components: [CmpA],
-      html: `<cmp-a prop="123"></cmp-a>`,
-    });
+    const { root, rootInstance } = await withSilentWarn(() =>
+      newSpecPage({
+        components: [CmpA],
+        html: `<cmp-a prop="123"></cmp-a>`,
+      })
+    );
+
     expect(rootInstance.watchCalled).toBe(6);
     jest.spyOn(rootInstance, 'method');
 
@@ -153,10 +157,12 @@ describe('watch', () => {
       }
     }
 
-    const { root, waitForChanges } = await newSpecPage({
-      components: [CmpA],
-      html: `<cmp-a></cmp-a>`,
-    });
+    const { root, waitForChanges } = await withSilentWarn(() =>
+      newSpecPage({
+        components: [CmpA],
+        html: `<cmp-a></cmp-a>`,
+      })
+    );
 
     expect(root).toEqualHtml(`<cmp-a>2 4 4</cmp-a>`);
     await waitForChanges();
