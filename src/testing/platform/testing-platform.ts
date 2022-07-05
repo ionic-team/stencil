@@ -27,7 +27,7 @@ export const setPlatformHelpers = (helpers: {
 
 export const cssVarShim: d.CssVarShim = false as any;
 export const supportsListenerOptions = true;
-export const supportsConstructibleStylesheets = false;
+export const supportsConstructableStylesheets = false;
 export const Context: any = {};
 
 export const setSupportsShadowDom = (supports: boolean) => {
