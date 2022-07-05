@@ -168,7 +168,7 @@ describe('parseHtml', () => {
     expect(sectionElms[1].tagName).toBe('SECTION');
   });
 
-  it('getElementsByTagName', () => {
+  it('getElementsByName', () => {
     doc = new MockDocument(`
       <form name="form-name">
         <input name="a">

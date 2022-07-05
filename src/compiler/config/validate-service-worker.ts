@@ -3,7 +3,7 @@ import { HOST_CONFIG_FILENAME } from '../prerender/host-config';
 import { isAbsolute, join } from 'path';
 import { isString } from '@utils';
 
-export const validateServiceWorker = (config: d.Config, outputTarget: d.OutputTargetWww) => {
+export const validateServiceWorker = (config: d.ValidatedConfig, outputTarget: d.OutputTargetWww) => {
   if (outputTarget.serviceWorker === false) {
     return;
   }

@@ -9,7 +9,7 @@ import {
 } from '../../output-targets/output-utils';
 import { NOTE } from '../../docs/constants';
 
-export const validateDocs = (config: d.Config, diagnostics: d.Diagnostic[], userOutputs: d.OutputTarget[]) => {
+export const validateDocs = (config: d.ValidatedConfig, diagnostics: d.Diagnostic[], userOutputs: d.OutputTarget[]) => {
   const docsOutputs: d.OutputTarget[] = [];
 
   // json docs flag

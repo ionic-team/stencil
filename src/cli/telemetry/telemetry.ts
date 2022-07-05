@@ -16,7 +16,7 @@ import { isOutputTargetHydrate, WWW } from '../../compiler/output-targets/output
  */
 export async function telemetryBuildFinishedAction(
   sys: d.CompilerSystem,
-  config: d.Config,
+  config: d.ValidatedConfig,
   logger: d.Logger,
   coreCompiler: CoreCompiler,
   result: d.CompilerBuildResults
@@ -47,12 +47,12 @@ export async function telemetryBuildFinishedAction(
  */
 export async function telemetryAction(
   sys: d.CompilerSystem,
-  config: d.Config,
+  config: d.ValidatedConfig,
   logger: d.Logger,
   coreCompiler: CoreCompiler,
   action?: d.TelemetryCallback
 ) {
-  const tracking = await shouldTrack(config, sys, !!config?.flags?.ci);
+  const tracking = await shouldTrack(config, sys, !!config.flags.ci);
 
   let duration = undefined;
   let error: any;
@@ -112,7 +112,7 @@ export async function getActiveTargets(config: d.Config): Promise<string[]> {
  */
 export const prepareData = async (
   coreCompiler: CoreCompiler,
-  config: d.Config,
+  config: d.ValidatedConfig,
   sys: d.CompilerSystem,
   duration_ms: number,
   component_count: number = undefined
@@ -250,7 +250,7 @@ export const anonymizeConfigForTelemetry = (config: d.Config): d.Config => {
  */
 async function getInstalledPackages(
   sys: d.CompilerSystem,
-  config: d.Config
+  config: d.ValidatedConfig
 ): Promise<{ packages: string[]; packagesNoVersions: string[] }> {
   let packages: string[] = [];
   let packagesNoVersions: string[] = [];
@@ -288,7 +288,7 @@ async function getInstalledPackages(
 
     return { packages, packagesNoVersions };
   } catch (err) {
-    hasDebug(config) && console.error(err);
+    hasDebug(config.flags) && console.error(err);
     return { packages, packagesNoVersions };
   }
 }
@@ -350,7 +350,7 @@ function sanitizeDeclaredVersion(version: string): string {
  */
 export async function sendMetric(
   sys: d.CompilerSystem,
-  config: d.Config,
+  config: d.ValidatedConfig,
   name: string,
   value: d.TrackableData
 ): Promise<void> {
@@ -388,7 +388,7 @@ async function getTelemetryToken(sys: d.CompilerSystem) {
  * @param config The config passed into the Stencil command
  * @param data Data to be tracked
  */
-async function sendTelemetry(sys: d.CompilerSystem, config: d.Config, data: d.Metric): Promise<void> {
+async function sendTelemetry(sys: d.CompilerSystem, config: d.ValidatedConfig, data: d.Metric): Promise<void> {
   try {
     const now = new Date().toISOString();
 
@@ -406,15 +406,15 @@ async function sendTelemetry(sys: d.CompilerSystem, config: d.Config, data: d.Me
       body: JSON.stringify(body),
     });
 
-    hasVerbose(config) &&
+    hasVerbose(config.flags) &&
       console.debug('\nSent %O metric to events service (status: %O)', data.name, response.status, '\n');
 
     if (response.status !== 204) {
-      hasVerbose(config) &&
+      hasVerbose(config.flags) &&
         console.debug('\nBad response from events service. Request body: %O', response.body.toString(), '\n');
     }
   } catch (e) {
-    hasVerbose(config) && console.debug('Telemetry request failed:', e);
+    hasVerbose(config.flags) && console.debug('Telemetry request failed:', e);
   }
 }
 

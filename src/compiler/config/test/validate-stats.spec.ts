@@ -10,7 +10,7 @@ describe('validateStats', () => {
   });
 
   it('adds stats from flags, w/ no outputTargets', () => {
-    userConfig.flags.stats = true;
+    userConfig.flags = { ...(userConfig.flags ?? {}), stats: true };
 
     const { config } = validateConfig(userConfig);
     const o = config.outputTargets.find((o) => o.type === 'stats') as d.OutputTargetStats;

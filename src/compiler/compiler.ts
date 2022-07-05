@@ -14,14 +14,15 @@ import ts from 'typescript';
 
 /**
  * Generate a Stencil compiler instance
- * @param config a Stencil configuration to apply to the compiler instance
+ * @param userConfig a user-provided Stencil configuration to apply to the compiler instance
  * @returns a new instance of a Stencil compiler
+ * @public
  */
-export const createCompiler = async (config: Config): Promise<Compiler> => {
+export const createCompiler = async (userConfig: Config): Promise<Compiler> => {
   // actual compiler code
   // could be in a web worker on the browser
   // or the main thread in node
-  config = getConfig(config);
+  const config = getConfig(userConfig);
   const diagnostics: Diagnostic[] = [];
   const sys = config.sys;
   const compilerCtx = new CompilerContext();

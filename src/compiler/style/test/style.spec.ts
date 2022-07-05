@@ -1,4 +1,5 @@
 // @ts-nocheck
+/* eslint-disable jest/no-test-prefixes, jest/no-commented-out-tests -- this file needs to be brought up to date at some point */
 // TODO(STENCIL-464): remove // @ts-nocheck as part of getting these tests to pass
 import { Compiler, Config } from '@stencil/core/compiler';
 import { mockConfig } from '@stencil/core/testing';

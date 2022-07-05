@@ -395,6 +395,30 @@ type Loose<T extends Object> = Record<string, any> & Partial<T>;
  */
 export type UnvalidatedConfig = Loose<Config>;
 
+/**
+ * Helper type to strip optional markers from keys in a type, while preserving other type information for the key.
+ * This type takes a union of keys, K, in type T to allow for the type T to be gradually updated.
+ *
+ * ```typescript
+ * type Foo { bar?: number, baz?: string }
+ * type ReqFieldFoo = RequireFields<Foo, 'bar'>; // { bar: number, baz?: string }
+ * ```
+ */
+type RequireFields<T, K extends keyof T> = T & { [P in K]-?: T[P] };
+
+/**
+ * Fields in {@link Config} to make required for {@link ValidatedConfig}
+ */
+type StrictConfigFields = 'flags';
+
+/**
+ * A version of {@link Config} that makes certain fields required. This type represents a valid configuration entity.
+ * When a configuration is received by the user, it is a bag of unverified data. In order to make stricter guarantees
+ * about the data from a type-safety perspective, this type is intended to be used throughout the codebase once
+ * validations have occurred at runtime.
+ */
+export type ValidatedConfig = RequireFields<Config, StrictConfigFields>;
+
 export interface HydratedFlag {
   /**
    * Defaults to `hydrated`.
@@ -2167,7 +2191,7 @@ export interface LoadConfigInit {
  * operations around the codebase.
  */
 export interface LoadConfigResults {
-  config: UnvalidatedConfig;
+  config: ValidatedConfig;
   diagnostics: Diagnostic[];
   tsconfig: {
     path: string;
