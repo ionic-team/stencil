@@ -18,6 +18,19 @@ The tests in this directory can be run three different ways:
 ### Running Entirely Locally
 
 Running the tests in a local environment is the quickest way to receive feedback as a part of daily development.
+Tests are run against pre-compiled applications in this directory, but the tests themselves are compiled when a test 
+command is invoked.
+This allows for developers to quickly iterate on tests, while still targeting applications built with Stencil. 
+
+To build all applications used for testing and to run all tests from this directory:
+```
+npm run karma.prod
+```
+Alternatively, if one does not need to rebuild the applications (e.g. only tests were modified), from this directory:
+```
+npm run karma
+```
+
 By default, locally running tests will start a headless Chrome instance and run the tests against that instance.
 For additional browsers to test against, please see the [Tunnelling into BrowserStack](#tunnelling-into-browserstack) section.
 
@@ -36,6 +49,15 @@ If you are a member of the Stencil team and do not have access to Browserstack, 
 
 Once an access key and username have been acquired, tunneling into Browserstack requires invoking the tests with the
 following environment variables:
+- `LOCAL_BROWSERSTACK=1` tells the test runner to tunnel into Browserstack from your local machine
+- `BROWSERSTACK_ACCESS_KEY=[KEY]` provides your personal access key to Browserstack for authentication purposes
+- `BROWSERSTACK_USERNAME=USERNAMEKEY]` provides your personal uesr name to Browserstack for authentication purposes
+
+To build all applications used for testing and to run all tests from this directory:
+```
+LOCAL_BROWSERSTACK=1 BROWSERSTACK_ACCESS_KEY=[KEY] BROWSERSTACK_USERNAME=[USERNAME] npm run karma.prod
+```
+Alternatively, if one does not need to rebuild the applications (e.g. only tests were modified), from this directory:
 ```
 LOCAL_BROWSERSTACK=1 BROWSERSTACK_ACCESS_KEY=[KEY] BROWSERSTACK_USERNAME=[USERNAME] npm run karma
 ```
