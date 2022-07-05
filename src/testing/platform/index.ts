@@ -13,7 +13,7 @@ export {
   resetPlatform,
   startAutoApplyChanges,
   stopAutoApplyChanges,
-  supportsConstructibleStylesheets,
+  supportsConstructableStylesheets,
   supportsListenerOptions,
   setSupportsShadowDom,
 } from './testing-platform';
