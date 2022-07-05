@@ -136,7 +136,7 @@ describe('validateTesting', () => {
       const testRegexSetting = testConfig?.testRegex;
 
       if (!testRegexSetting) {
-        fail('No testRegex was found in the Stencil TestingConfig. Failing test.');
+        throw new Error('No testRegex was found in the Stencil TestingConfig. Failing test.');
       }
 
       testRegex = new RegExp(testRegexSetting);
