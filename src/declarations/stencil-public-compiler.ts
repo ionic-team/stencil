@@ -2267,15 +2267,34 @@ export interface PrerenderResults {
   average: number;
 }
 
+/**
+ * Input for CSS optimization functions, including the input CSS
+ * string and a few boolean options which turn on or off various
+ * optimizations.
+ */
 export interface OptimizeCssInput {
   input: string;
   filePath?: string;
-  autoprefixer?: any;
+  autoprefixer?: boolean | null | AutoprefixerOptions;
   minify?: boolean;
   sourceMap?: boolean;
   resolveUrl?: (url: string) => Promise<string> | string;
 }
 
+/**
+ * This is not a real interface describing the options which can
+ * be passed to autoprefixer, for that see the docs, here:
+ * https://github.com/postcss/autoprefixer#options
+ *
+ * Instead, this basically just serves as a label type to track
+ * that arguments are being passed consistently.
+ */
+export type AutoprefixerOptions = Object;
+
+/**
+ * Output from CSS optimization functions, wrapping up optimized
+ * CSS and any diagnostics produced during optimization.
+ */
 export interface OptimizeCssOutput {
   output: string;
   diagnostics: Diagnostic[];
