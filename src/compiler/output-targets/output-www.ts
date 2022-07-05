@@ -16,7 +16,7 @@ import { optimizeEsmImport } from '../html/inline-esm-import';
 import { updateGlobalStylesLink } from '../html/update-global-styles-link';
 import { updateIndexHtmlServiceWorker } from '../html/inject-sw-script';
 
-export const outputWww = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
+export const outputWww = async (config: d.ValidatedConfig, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   const outputTargets = config.outputTargets.filter(isOutputTargetWww);
   if (outputTargets.length === 0) {
     return;
@@ -47,7 +47,7 @@ const getCriticalPath = (buildCtx: d.BuildCtx) => {
 };
 
 const generateWww = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   criticalPath: string[],
@@ -92,7 +92,7 @@ const generateHostConfig = (compilerCtx: d.CompilerCtx, outputTarget: d.OutputTa
 };
 
 const generateIndexHtml = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   criticalPath: string[],

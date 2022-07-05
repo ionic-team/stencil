@@ -5,7 +5,7 @@ import { DOCS_JSON, DOCS_CUSTOM, DOCS_README, DOCS_VSCODE } from '../../output-t
 import { validateConfig } from '../validate-config';
 
 describe('validation', () => {
-  let userConfig: d.Config;
+  let userConfig: d.UnvalidatedConfig;
   const logger = mockLogger();
   const sys = mockCompilerSystem();
 
