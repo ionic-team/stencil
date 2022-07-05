@@ -1,0 +1,114 @@
+name: BrowserStack Tests
+
+on:
+  pull_request:
+    branches:
+      - 'main'
+      - 'v3.0.0-dev'
+  push:
+    branches:
+      - 'main'
+      - 'v3.0.0-dev'
+
+env:
+  BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSER_STACK_ACCESS_KEY }}
+  BROWSERSTACK_USERNAME: ${{ secrets.BROWSER_STACK_USERNAME }}
+
+permissions: read-all
+
+# this workflow splits running Browserstack tests into two jobs:
+# - one to build stencil for Browserstack
+# - one to build the test applications & invoke Browserstack
+#
+# doing so allows us to balance a few different considerations when running against Browserstack:
+# 1. Rerunning Failed Jobs
+#    Creating a separate job for running Browserstack on its own allows us to 'rerun failed jobs' in the GitHub UI,
+#    only for the Browserstack tests themselves.
+#    This allows for a quicker feedback loop in the event of flaky jobs
+# 2. Secret Security
+#    In order to authenticate against Browserstack, an access key and username are required
+#    In order to minimize their access/usage elsewhere, we contain them to the workflow that is this file
+#
+# These items do come at a cost of some repeated steps in the jobs below (checking out code, installing dependencies,
+# etc.)
+
+jobs:
+  build_for_browserstack:
+    name: Build for Browserstack
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # v2.4.0
+        with:
+          ref: ${{ github.event_name == 'pull_request_target' && format('refs/pull/{0}/merge', github.event.number) || '' }}
+          persist-credentials: false
+
+      - uses: actions/setup-node@56337c425554a6be30cdef71bf441f15be286854 # v3.1.1
+        with:
+          node-version: '12'
+          cache : 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build -- --ci
+
+      - name: Upload Build Artifacts
+        uses: ./.github/workflows/actions/upload-archive
+        with:
+          name: stencil-core
+          output: stencil-core-browserstack-build.zip
+          paths: build cli compiler dependencies.json dev-server internal mock-doc scripts screenshot sys testing
+
+  run_browserstack:
+    name: Run Browserstack
+    runs-on: ubuntu-latest
+    needs: [ build_for_browserstack ]
+    steps:
+      - uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # v2.4.0
+        with:
+          ref: ${{ github.event_name == 'pull_request_target' && format('refs/pull/{0}/merge', github.event.number) || '' }}
+          persist-credentials: false
+
+      - name: Use Node 12
+        uses: actions/setup-node@56337c425554a6be30cdef71bf441f15be286854 # v3.1.1
+        with:
+          node-version: 12
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Download Build Archive
+        uses: ./.github/workflows/actions/download-archive
+        with:
+          name: stencil-core
+          path: .
+          filename: stencil-core-browserstack-build.zip
+
+      - name: BrowserStack Env Setup
+        uses: 'browserstack/github-actions/setup-env@master'
+        with:
+          username: ${{ env.BROWSERSTACK_USERNAME }}
+          access-key: ${{ env.BROWSERSTACK_ACCESS_KEY }}
+          project-name: 'stencil_core'
+
+      - name: Start BrowserStack
+        uses: browserstack/github-actions/setup-local@master
+        with:
+          # local-testing must be one of two values: 'start' or 'stop' to start/stop Browserstack
+          local-testing: start
+          # generates a random identifier for the Browserstack connection.
+          # otherwise, an identifier collision could cause connections to fail.
+          local-identifier: random
+
+      - name: Run Karma Tests
+        run: npm run test.karma.prod
+
+      - name: Stop BrowserStack
+        uses: browserstack/github-actions/setup-local@master
+        with:
+          # local-testing must be one of two values: 'start' or 'stop' to start/stop Browserstack
+          local-testing: stop
+
