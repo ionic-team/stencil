@@ -4,14 +4,14 @@ import { isAbsolute, join } from 'path';
 import { isOutputTargetWww } from '../output-targets/output-utils';
 
 export const validateDevServer = (
-  config: d.UnvalidatedConfig,
+  config: d.ValidatedConfig,
   diagnostics: d.Diagnostic[]
 ): d.DevServerConfig | undefined => {
   if ((config.devServer === null || (config.devServer as any)) === false) {
     return undefined;
   }
 
-  const flags = config.flags ?? {};
+  const { flags } = config;
   const devServer = { ...config.devServer };
 
   if (flags.address && isString(flags.address)) {
@@ -80,7 +80,7 @@ export const validateDevServer = (
     devServer.websocket = true;
   }
 
-  if (config?.flags?.ssr) {
+  if (flags.ssr) {
     devServer.ssr = true;
   } else {
     devServer.ssr = !!devServer.ssr;

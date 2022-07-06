@@ -2,15 +2,19 @@ import type * as d from '@stencil/core/declarations';
 import { isOutputTargetCopy, isOutputTargetHydrate, isOutputTargetWww } from '../../output-targets/output-utils';
 import { validateConfig } from '../validate-config';
 import path from 'path';
+import { ConfigFlags } from '../../../cli/config-flags';
 
 describe('validateOutputTargetWww', () => {
   const rootDir = path.resolve('/');
   let userConfig: d.Config;
+  let flags: ConfigFlags;
+
   beforeEach(() => {
+    flags = {};
     userConfig = {
       rootDir: rootDir,
-      flags: {},
-    } as any;
+      flags,
+    };
   });
 
   it('should have default value', () => {
@@ -128,7 +132,7 @@ describe('validateOutputTargetWww', () => {
   });
 
   describe('baseUrl', () => {
-    it('baseUrl does not end with /', () => {
+    it('baseUrl does not end with / with dir set', () => {
       const outputTarget: d.OutputTargetWww = {
         type: 'www',
         dir: 'my-www',
@@ -321,14 +325,14 @@ describe('validateOutputTargetWww', () => {
     });
 
     it('should add hydrate with --prerender flag', () => {
-      userConfig.flags.prerender = true;
+      userConfig.flags = { ...flags, prerender: true };
       const { config } = validateConfig(userConfig);
       expect(config.outputTargets.some((o) => o.type === 'dist-hydrate-script')).toBe(true);
       expect(config.outputTargets.some((o) => o.type === 'www')).toBe(true);
     });
 
     it('should add hydrate with --ssr flag', () => {
-      userConfig.flags.ssr = true;
+      userConfig.flags = { ...flags, ssr: true };
       const { config } = validateConfig(userConfig);
       expect(config.outputTargets.some((o) => o.type === 'dist-hydrate-script')).toBe(true);
       expect(config.outputTargets.some((o) => o.type === 'www')).toBe(true);
@@ -350,7 +354,8 @@ describe('validateOutputTargetWww', () => {
     });
 
     it('should add node builtins to external by default', () => {
-      userConfig.flags.prerender = true;
+      userConfig.flags = { ...flags, prerender: true };
+
       const { config } = validateConfig(userConfig);
       const o = config.outputTargets.find(isOutputTargetHydrate);
       expect(o.external).toContain('fs');

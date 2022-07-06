@@ -2,21 +2,21 @@ import type * as d from '../../../declarations';
 import * as telemetry from '../telemetry';
 import * as shouldTrack from '../shouldTrack';
 import { createSystem } from '../../../compiler/sys/stencil-sys';
-import { mockLogger } from '@stencil/core/testing';
+import { mockValidatedConfig } from '@stencil/core/testing';
 import * as coreCompiler from '@stencil/core/compiler';
 import { anonymizeConfigForTelemetry } from '../telemetry';
 import { DIST, DIST_CUSTOM_ELEMENTS, DIST_HYDRATE_SCRIPT, WWW } from '../../../compiler/output-targets/output-utils';
 
 describe('telemetryBuildFinishedAction', () => {
-  const config: d.Config = {
-    outputTargets: [],
-    flags: {
-      args: [],
-    },
-  };
+  let config: d.ValidatedConfig;
+  let sys: d.CompilerSystem;
 
-  const logger = mockLogger();
-  const sys = createSystem();
+  beforeEach(() => {
+    sys = createSystem();
+    config = mockValidatedConfig(sys);
+    config.outputTargets = [];
+    config.flags.args = [];
+  });
 
   it('issues a network request when complete', async () => {
     const spyShouldTrack = jest.spyOn(shouldTrack, 'shouldTrack');
@@ -31,7 +31,7 @@ describe('telemetryBuildFinishedAction', () => {
       duration: 100,
     } as d.CompilerBuildResults;
 
-    await telemetry.telemetryBuildFinishedAction(sys, config, logger, coreCompiler, results);
+    await telemetry.telemetryBuildFinishedAction(sys, config, config.logger, coreCompiler, results);
     expect(spyShouldTrack).toHaveBeenCalled();
 
     spyShouldTrack.mockRestore();
@@ -39,14 +39,15 @@ describe('telemetryBuildFinishedAction', () => {
 });
 
 describe('telemetryAction', () => {
-  const config = {
-    outputTargets: [],
-    flags: {
-      args: [],
-    },
-  } as d.Config;
-  const logger = mockLogger();
-  const sys = createSystem();
+  let config: d.ValidatedConfig;
+  let sys: d.CompilerSystem;
+
+  beforeEach(() => {
+    sys = createSystem();
+    config = mockValidatedConfig(sys);
+    config.outputTargets = [];
+    config.flags.args = [];
+  });
 
   it('issues a network request when no async function is passed', async () => {
     const spyShouldTrack = jest.spyOn(shouldTrack, 'shouldTrack');
@@ -56,7 +57,7 @@ describe('telemetryAction', () => {
       })
     );
 
-    await telemetry.telemetryAction(sys, config, logger, coreCompiler, () => {});
+    await telemetry.telemetryAction(sys, config, config.logger, coreCompiler, () => {});
     expect(spyShouldTrack).toHaveBeenCalled();
 
     spyShouldTrack.mockRestore();
@@ -70,7 +71,7 @@ describe('telemetryAction', () => {
       })
     );
 
-    await telemetry.telemetryAction(sys, config, logger, coreCompiler, async () => {
+    await telemetry.telemetryAction(sys, config, config.logger, coreCompiler, async () => {
       new Promise((resolve) => {
         setTimeout(() => {
           resolve(true);
@@ -132,13 +133,19 @@ describe('hasAppTarget', () => {
 });
 
 describe('prepareData', () => {
-  const config = {
-    flags: {
-      args: [],
-    },
-    outputTargets: [],
-  } as d.Config;
-  const sys = createSystem();
+  let config: d.ValidatedConfig;
+  let sys: d.CompilerSystem;
+
+  beforeEach(() => {
+    config = {
+      outputTargets: [],
+      flags: {
+        args: [],
+      },
+    };
+
+    sys = createSystem();
+  });
 
   it('provides an object', async () => {
     const data = await telemetry.prepareData(coreCompiler, config, sys, 1000);
@@ -171,12 +178,12 @@ describe('prepareData', () => {
   });
 
   it('updates when there is a PWA config', async () => {
-    const config = {
+    const config: d.ValidatedConfig = {
       flags: {
         args: [],
       },
       outputTargets: [{ type: 'www', baseUrl: 'https://example.com', serviceWorker: { swDest: './tmp' } }],
-    } as d.Config;
+    };
 
     const data = await telemetry.prepareData(coreCompiler, config, sys, 1000);
 
@@ -217,12 +224,12 @@ describe('prepareData', () => {
   });
 
   it('updates when there is a component count passed in', async () => {
-    const config = {
+    const config: d.ValidatedConfig = {
       flags: {
         args: [],
       },
       outputTargets: [{ type: 'www', baseUrl: 'https://example.com', serviceWorker: { swDest: './tmp' } }],
-    } as d.Config;
+    };
 
     const data = await telemetry.prepareData(coreCompiler, config, sys, 1000, 12);
 

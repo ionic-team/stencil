@@ -6,7 +6,7 @@ import { startupCompilerLog } from './logs';
 import { taskWatch } from './task-watch';
 import { telemetryBuildFinishedAction } from './telemetry/telemetry';
 
-export const taskBuild = async (coreCompiler: CoreCompiler, config: d.Config, sys?: d.CompilerSystem) => {
+export const taskBuild = async (coreCompiler: CoreCompiler, config: d.ValidatedConfig, sys?: d.CompilerSystem) => {
   if (config.flags.watch) {
     // watch build
     await taskWatch(coreCompiler, config);

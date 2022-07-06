@@ -1,4 +1,4 @@
-import { Config, ConfigBundle, Diagnostic, UnvalidatedConfig } from '../../declarations';
+import { ConfigBundle, Diagnostic, ValidatedConfig, UnvalidatedConfig } from '../../declarations';
 import { buildError, isBoolean, isNumber, isString, sortBy } from '@utils';
 import { setBooleanConfig } from './config-utils';
 import { validateDevServer } from './validate-dev-server';
@@ -13,6 +13,20 @@ import { validateTesting } from './validate-testing';
 import { validateWorkers } from './validate-workers';
 
 /**
+ * Represents the results of validating a previously unvalidated configuration
+ */
+type ConfigValidationResults = {
+  /**
+   * The validated configuration, with well-known default values set if they weren't previously provided
+   */
+  config: ValidatedConfig;
+  /**
+   * A collection of errors and warnings that occurred during the configuration validation process
+   */
+  diagnostics: Diagnostic[];
+};
+
+/**
  * Validate a Config object, ensuring that all its field are present and
  * consistent with our expectations. This function transforms an
  * `UnvalidatedConfig` to a `Config`.
@@ -20,125 +34,129 @@ import { validateWorkers } from './validate-workers';
  * @param userConfig an unvalidated config that we've gotten from a user
  * @returns an object with config and diagnostics props
  */
-export const validateConfig = (
-  userConfig: UnvalidatedConfig = {}
-): {
-  config: Config;
-  diagnostics: Diagnostic[];
-} => {
+export const validateConfig = (userConfig: UnvalidatedConfig = {}): ConfigValidationResults => {
   const config = Object.assign({}, userConfig || {}); // not positive it's json safe
   const diagnostics: Diagnostic[] = [];
 
-  // copy flags (we know it'll be json safe)
-  config.flags = JSON.parse(JSON.stringify(config.flags || {}));
+  const validatedConfig: ValidatedConfig = {
+    ...config,
+    // flags _should_ be JSON safe
+    flags: JSON.parse(JSON.stringify(config.flags || {})),
+  };
 
   // default devMode false
-  if (config.flags.prod) {
-    config.devMode = false;
-  } else if (config.flags.dev) {
-    config.devMode = true;
-  } else if (!isBoolean(config.devMode)) {
-    config.devMode = DEFAULT_DEV_MODE;
+  if (validatedConfig.flags.prod) {
+    validatedConfig.devMode = false;
+  } else if (validatedConfig.flags.dev) {
+    validatedConfig.devMode = true;
+  } else if (!isBoolean(validatedConfig.devMode)) {
+    validatedConfig.devMode = DEFAULT_DEV_MODE;
   }
 
-  config.extras = config.extras || {};
-  config.extras.appendChildSlotFix = !!config.extras.appendChildSlotFix;
-  config.extras.cloneNodeFix = !!config.extras.cloneNodeFix;
-  config.extras.cssVarsShim = !!config.extras.cssVarsShim;
-  config.extras.dynamicImportShim = !!config.extras.dynamicImportShim;
-  config.extras.lifecycleDOMEvents = !!config.extras.lifecycleDOMEvents;
-  config.extras.safari10 = !!config.extras.safari10;
-  config.extras.scriptDataOpts = !!config.extras.scriptDataOpts;
-  config.extras.shadowDomShim = !!config.extras.shadowDomShim;
-  config.extras.slotChildNodesFix = !!config.extras.slotChildNodesFix;
-  config.extras.initializeNextTick = !!config.extras.initializeNextTick;
-  config.extras.tagNameTransform = !!config.extras.tagNameTransform;
+  validatedConfig.extras = validatedConfig.extras || {};
+  validatedConfig.extras.appendChildSlotFix = !!validatedConfig.extras.appendChildSlotFix;
+  validatedConfig.extras.cloneNodeFix = !!validatedConfig.extras.cloneNodeFix;
+  validatedConfig.extras.cssVarsShim = !!validatedConfig.extras.cssVarsShim;
+  validatedConfig.extras.dynamicImportShim = !!validatedConfig.extras.dynamicImportShim;
+  validatedConfig.extras.lifecycleDOMEvents = !!validatedConfig.extras.lifecycleDOMEvents;
+  validatedConfig.extras.safari10 = !!validatedConfig.extras.safari10;
+  validatedConfig.extras.scriptDataOpts = !!validatedConfig.extras.scriptDataOpts;
+  validatedConfig.extras.shadowDomShim = !!validatedConfig.extras.shadowDomShim;
+  validatedConfig.extras.slotChildNodesFix = !!validatedConfig.extras.slotChildNodesFix;
+  validatedConfig.extras.initializeNextTick = !!validatedConfig.extras.initializeNextTick;
+  validatedConfig.extras.tagNameTransform = !!validatedConfig.extras.tagNameTransform;
 
-  config.buildEs5 = config.buildEs5 === true || (!config.devMode && config.buildEs5 === 'prod');
+  validatedConfig.buildEs5 =
+    validatedConfig.buildEs5 === true || (!validatedConfig.devMode && validatedConfig.buildEs5 === 'prod');
 
-  setBooleanConfig(config, 'minifyCss', null, !config.devMode);
-  setBooleanConfig(config, 'minifyJs', null, !config.devMode);
-  setBooleanConfig(config, 'sourceMap', null, typeof config.sourceMap === 'undefined' ? false : config.sourceMap);
-  setBooleanConfig(config, 'watch', 'watch', false);
-  setBooleanConfig(config, 'buildDocs', 'docs', !config.devMode);
-  setBooleanConfig(config, 'buildDist', 'esm', !config.devMode || config.buildEs5);
-  setBooleanConfig(config, 'profile', 'profile', config.devMode);
-  setBooleanConfig(config, 'writeLog', 'log', false);
-  setBooleanConfig(config, 'buildAppCore', null, true);
-  setBooleanConfig(config, 'autoprefixCss', null, config.buildEs5);
-  setBooleanConfig(config, 'validateTypes', null, !config._isTesting);
-  setBooleanConfig(config, 'allowInlineScripts', null, true);
+  setBooleanConfig(validatedConfig, 'minifyCss', null, !validatedConfig.devMode);
+  setBooleanConfig(validatedConfig, 'minifyJs', null, !validatedConfig.devMode);
+  setBooleanConfig(
+    validatedConfig,
+    'sourceMap',
+    null,
+    typeof validatedConfig.sourceMap === 'undefined' ? false : validatedConfig.sourceMap
+  );
+  setBooleanConfig(validatedConfig, 'watch', 'watch', false);
+  setBooleanConfig(validatedConfig, 'buildDocs', 'docs', !validatedConfig.devMode);
+  setBooleanConfig(validatedConfig, 'buildDist', 'esm', !validatedConfig.devMode || validatedConfig.buildEs5);
+  setBooleanConfig(validatedConfig, 'profile', 'profile', validatedConfig.devMode);
+  setBooleanConfig(validatedConfig, 'writeLog', 'log', false);
+  setBooleanConfig(validatedConfig, 'buildAppCore', null, true);
+  setBooleanConfig(validatedConfig, 'autoprefixCss', null, validatedConfig.buildEs5);
+  setBooleanConfig(validatedConfig, 'validateTypes', null, !validatedConfig._isTesting);
+  setBooleanConfig(validatedConfig, 'allowInlineScripts', null, true);
 
-  if (!isString(config.taskQueue)) {
-    config.taskQueue = 'async';
+  if (!isString(validatedConfig.taskQueue)) {
+    validatedConfig.taskQueue = 'async';
   }
 
   // hash file names
-  if (!isBoolean(config.hashFileNames)) {
-    config.hashFileNames = !config.devMode;
+  if (!isBoolean(validatedConfig.hashFileNames)) {
+    validatedConfig.hashFileNames = !validatedConfig.devMode;
   }
-  if (!isNumber(config.hashedFileNameLength)) {
-    config.hashedFileNameLength = DEFAULT_HASHED_FILENAME_LENTH;
+  if (!isNumber(validatedConfig.hashedFileNameLength)) {
+    validatedConfig.hashedFileNameLength = DEFAULT_HASHED_FILENAME_LENTH;
   }
-  if (config.hashedFileNameLength < MIN_HASHED_FILENAME_LENTH) {
+  if (validatedConfig.hashedFileNameLength < MIN_HASHED_FILENAME_LENTH) {
     const err = buildError(diagnostics);
-    err.messageText = `config.hashedFileNameLength must be at least ${MIN_HASHED_FILENAME_LENTH} characters`;
+    err.messageText = `validatedConfig.hashedFileNameLength must be at least ${MIN_HASHED_FILENAME_LENTH} characters`;
   }
-  if (config.hashedFileNameLength > MAX_HASHED_FILENAME_LENTH) {
+  if (validatedConfig.hashedFileNameLength > MAX_HASHED_FILENAME_LENTH) {
     const err = buildError(diagnostics);
-    err.messageText = `config.hashedFileNameLength cannot be more than ${MAX_HASHED_FILENAME_LENTH} characters`;
+    err.messageText = `validatedConfig.hashedFileNameLength cannot be more than ${MAX_HASHED_FILENAME_LENTH} characters`;
   }
-  if (!config.env) {
-    config.env = {};
+  if (!validatedConfig.env) {
+    validatedConfig.env = {};
   }
 
   // get a good namespace
-  validateNamespace(config, diagnostics);
+  validateNamespace(validatedConfig, diagnostics);
 
   // figure out all of the config paths and absolute paths
-  validatePaths(config);
+  validatePaths(validatedConfig);
 
   // outputTargets
-  validateOutputTargets(config, diagnostics);
+  validateOutputTargets(validatedConfig, diagnostics);
 
   // plugins
-  validatePlugins(config, diagnostics);
+  validatePlugins(validatedConfig, diagnostics);
 
   // rollup config
-  validateRollupConfig(config);
+  validateRollupConfig(validatedConfig);
 
   // dev server
-  config.devServer = validateDevServer(config, diagnostics);
+  validatedConfig.devServer = validateDevServer(validatedConfig, diagnostics);
 
   // testing
-  validateTesting(config, diagnostics);
+  validateTesting(validatedConfig, diagnostics);
 
   // hydrate flag
-  config.hydratedFlag = validateHydrated(config);
+  validatedConfig.hydratedFlag = validateHydrated(validatedConfig);
 
   // bundles
-  if (Array.isArray(config.bundles)) {
-    config.bundles = sortBy(config.bundles, (a: ConfigBundle) => a.components.length);
+  if (Array.isArray(validatedConfig.bundles)) {
+    validatedConfig.bundles = sortBy(validatedConfig.bundles, (a: ConfigBundle) => a.components.length);
   } else {
-    config.bundles = [];
+    validatedConfig.bundles = [];
   }
 
   // validate how many workers we can use
-  validateWorkers(config);
+  validateWorkers(validatedConfig);
 
   // default devInspector to whatever devMode is
-  setBooleanConfig(config, 'devInspector', null, config.devMode);
+  setBooleanConfig(validatedConfig, 'devInspector', null, validatedConfig.devMode);
 
-  if (!config._isTesting) {
-    validateDistNamespace(config, diagnostics);
+  if (!validatedConfig._isTesting) {
+    validateDistNamespace(validatedConfig, diagnostics);
   }
 
-  setBooleanConfig(config, 'enableCache', 'cache', true);
+  setBooleanConfig(validatedConfig, 'enableCache', 'cache', true);
 
-  if (!Array.isArray(config.watchIgnoredRegex) && config.watchIgnoredRegex != null) {
-    config.watchIgnoredRegex = [config.watchIgnoredRegex];
+  if (!Array.isArray(validatedConfig.watchIgnoredRegex) && validatedConfig.watchIgnoredRegex != null) {
+    validatedConfig.watchIgnoredRegex = [validatedConfig.watchIgnoredRegex];
   }
-  config.watchIgnoredRegex = ((config.watchIgnoredRegex as RegExp[]) || []).reduce((arr, reg) => {
+  validatedConfig.watchIgnoredRegex = ((validatedConfig.watchIgnoredRegex as RegExp[]) || []).reduce((arr, reg) => {
     if (reg instanceof RegExp) {
       arr.push(reg);
     }
@@ -146,7 +164,7 @@ export const validateConfig = (
   }, [] as RegExp[]);
 
   return {
-    config,
+    config: validatedConfig,
     diagnostics,
   };
 };
