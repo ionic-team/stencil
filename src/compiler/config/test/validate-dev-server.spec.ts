@@ -8,14 +8,16 @@ import { mockLoadConfigInit } from '@stencil/core/testing';
 describe('validateDevServer', () => {
   const root = path.resolve('/');
   let inputConfig: d.UnvalidatedConfig;
+  let inputDevServerConfig: d.DevServerConfig;
   let flags: ConfigFlags;
 
   beforeEach(() => {
+    inputDevServerConfig = {};
     flags = { serve: true };
     inputConfig = {
       sys: {} as any,
       rootDir: normalizePath(path.join(root, 'some', 'path')),
-      devServer: {},
+      devServer: inputDevServerConfig,
       flags,
       namespace: 'Testing',
     };
@@ -29,14 +31,14 @@ describe('validateDevServer', () => {
   it.each(['https://localhost', 'http://localhost', 'https://localhost/', 'http://localhost/', 'localhost/'])(
     'should remove extraneous stuff from address %p',
     (address) => {
-      inputConfig.devServer.address = address;
+      inputConfig.devServer = { ...inputDevServerConfig, address };
       const { config } = validateConfig(inputConfig, mockLoadConfigInit());
       expect(config.devServer.address).toBe('localhost');
     }
   );
 
   it('should set address', () => {
-    inputConfig.devServer.address = '123.123.123.123';
+    inputConfig.devServer = { ...inputDevServerConfig, address: '123.123.123.123' };
     const { config } = validateConfig(inputConfig, mockLoadConfigInit());
     expect(config.devServer.address).toBe('123.123.123.123');
   });
@@ -80,13 +82,16 @@ describe('validateDevServer', () => {
   });
 
   it('should set relative root', () => {
-    inputConfig.devServer.root = 'my-rel-root';
+    inputConfig.devServer = { ...inputDevServerConfig, root: 'my-rel-root' };
     const { config } = validateConfig(inputConfig, mockLoadConfigInit());
     expect(config.devServer.root).toBe(normalizePath(path.join(root, 'some', 'path', 'my-rel-root')));
   });
 
   it('should set absolute root', () => {
-    inputConfig.devServer.root = normalizePath(path.join(root, 'some', 'path', 'my-abs-root'));
+    inputConfig.devServer = {
+      ...inputDevServerConfig,
+      root: normalizePath(path.join(root, 'some', 'path', 'my-abs-root')),
+    };
     const { config } = validateConfig(inputConfig, mockLoadConfigInit());
     expect(config.devServer.root).toBe(normalizePath(path.join(root, 'some', 'path', 'my-abs-root')));
   });
@@ -97,7 +102,7 @@ describe('validateDevServer', () => {
   });
 
   it('should set gzip', () => {
-    inputConfig.devServer.gzip = false;
+    inputConfig.devServer = { ...inputDevServerConfig, gzip: false };
     const { config } = validateConfig(inputConfig, mockLoadConfigInit());
     expect(config.devServer.gzip).toBe(false);
   });
@@ -110,28 +115,27 @@ describe('validateDevServer', () => {
   it.each(['https://subdomain.stenciljs.com:3000', 'localhost:3000/', 'localhost:3000'])(
     'should override port in address with port property',
     (address) => {
-      inputConfig.devServer.port = 1234;
-      inputConfig.devServer.address = address;
+      inputConfig.devServer = { ...inputDevServerConfig, address, port: 1234 };
       const { config } = validateConfig(inputConfig, mockLoadConfigInit());
       expect(config.devServer.port).toBe(1234);
     }
   );
 
   it('should not set default port if null', () => {
-    inputConfig.devServer.port = null;
+    inputConfig.devServer = { ...inputDevServerConfig, port: null };
     const { config } = validateConfig(inputConfig, mockLoadConfigInit());
     expect(config.devServer.port).toBe(null);
   });
 
   it.each(['localhost:20/', 'localhost:20'])('should set port from address %p if no port prop', (address) => {
-    inputConfig.devServer.address = address;
+    inputConfig.devServer = { ...inputDevServerConfig, address };
     const { config } = validateConfig(inputConfig, mockLoadConfigInit());
     expect(config.devServer.port).toBe(20);
     expect(config.devServer.address).toBe('localhost');
   });
 
   it('should set address, port null, protocol', () => {
-    inputConfig.devServer.address = 'https://subdomain.stenciljs.com/';
+    inputConfig.devServer = { ...inputDevServerConfig, address: 'https://subdomain.stenciljs.com/' };
     const { config } = validateConfig(inputConfig, mockLoadConfigInit());
     expect(config.devServer.port).toBe(undefined);
     expect(config.devServer.address).toBe('subdomain.stenciljs.com');
@@ -139,7 +143,7 @@ describe('validateDevServer', () => {
   });
 
   it('should set port', () => {
-    inputConfig.devServer.port = 4444;
+    inputConfig.devServer = { ...inputDevServerConfig, port: 4444 };
     const { config } = validateConfig(inputConfig, mockLoadConfigInit());
     expect(config.devServer.port).toBe(4444);
   });
@@ -157,14 +161,14 @@ describe('validateDevServer', () => {
   });
 
   it('should set historyApiFallback', () => {
-    inputConfig.devServer.historyApiFallback = {};
+    inputConfig.devServer = { ...inputDevServerConfig, historyApiFallback: {} };
     const { config } = validateConfig(inputConfig, mockLoadConfigInit());
     expect(config.devServer.historyApiFallback).toBeDefined();
     expect(config.devServer.historyApiFallback.index).toBe('index.html');
   });
 
   it('should disable historyApiFallback', () => {
-    inputConfig.devServer.historyApiFallback = null;
+    inputConfig.devServer = { ...inputDevServerConfig, historyApiFallback: null };
     const { config } = validateConfig(inputConfig, mockLoadConfigInit());
     expect(config.devServer.historyApiFallback).toBe(null);
   });
@@ -175,7 +179,7 @@ describe('validateDevServer', () => {
   });
 
   it('should set reloadStrategy pageReload', () => {
-    inputConfig.devServer.reloadStrategy = 'pageReload';
+    inputConfig.devServer = { ...inputDevServerConfig, reloadStrategy: 'pageReload' };
     const { config } = validateConfig(inputConfig, mockLoadConfigInit());
     expect(config.devServer.reloadStrategy).toBe('pageReload');
   });
@@ -186,7 +190,7 @@ describe('validateDevServer', () => {
   });
 
   it('should set openBrowser', () => {
-    inputConfig.devServer.openBrowser = false;
+    inputConfig.devServer = { ...inputDevServerConfig, openBrowser: false };
     const { config } = validateConfig(inputConfig, mockLoadConfigInit());
     expect(config.devServer.openBrowser).toBe(false);
   });
@@ -203,19 +207,19 @@ describe('validateDevServer', () => {
   });
 
   it('should set https protocol if credentials are set', () => {
-    inputConfig.devServer.https = { key: 'fake-key', cert: 'fake-cert' };
+    inputConfig.devServer = { ...inputDevServerConfig, https: { key: 'fake-key', cert: 'fake-cert' } };
     const { config } = validateConfig(inputConfig, mockLoadConfigInit());
     expect(config.devServer.protocol).toBe('https');
   });
 
   it('should set ssr true', () => {
-    inputConfig.devServer.ssr = true;
+    inputConfig.devServer = { ssr: true };
     const { config } = validateConfig(inputConfig, mockLoadConfigInit());
     expect(config.devServer.ssr).toBe(true);
   });
 
   it('should set ssr false', () => {
-    inputConfig.devServer.ssr = false;
+    inputConfig.devServer = { ssr: false };
     const { config } = validateConfig(inputConfig, mockLoadConfigInit());
     expect(config.devServer.ssr).toBe(false);
   });
