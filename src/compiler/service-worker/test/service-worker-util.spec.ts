@@ -1,7 +1,7 @@
 import type * as d from '@stencil/core/declarations';
 import { generateServiceWorkerUrl } from '../service-worker-util';
 import { validateConfig } from '../../config/validate-config';
-import { mockConfig } from '@stencil/core/testing';
+import { mockConfig, mockLoadConfigInit } from '@stencil/core/testing';
 
 describe('generateServiceWorkerUrl', () => {
   let userConfig: d.Config;
@@ -16,7 +16,7 @@ describe('generateServiceWorkerUrl', () => {
         baseUrl: '/docs',
       } as d.OutputTargetWww,
     ];
-    const { config } = validateConfig(userConfig);
+    const { config } = validateConfig(userConfig, mockLoadConfigInit());
     outputTarget = config.outputTargets[0] as d.OutputTargetWww;
     const swUrl = generateServiceWorkerUrl(outputTarget, outputTarget.serviceWorker as d.ServiceWorkerConfig);
     expect(swUrl).toBe('/docs/sw.js');
@@ -25,7 +25,7 @@ describe('generateServiceWorkerUrl', () => {
   it('default sw url', () => {
     userConfig = mockConfig();
     userConfig.devMode = false;
-    const { config } = validateConfig(userConfig);
+    const { config } = validateConfig(userConfig, mockLoadConfigInit());
     outputTarget = config.outputTargets[0] as d.OutputTargetWww;
     const swUrl = generateServiceWorkerUrl(outputTarget, outputTarget.serviceWorker as d.ServiceWorkerConfig);
     expect(swUrl).toBe('/sw.js');

@@ -1,5 +1,5 @@
 import type * as d from '@stencil/core/declarations';
-import { mockConfig } from '@stencil/core/testing';
+import { mockConfig, mockLoadConfigInit } from '@stencil/core/testing';
 import { COPY, DIST_CUSTOM_ELEMENTS, DIST_TYPES } from '../../output-targets/output-utils';
 import { validateConfig } from '../validate-config';
 import path from 'path';
@@ -21,7 +21,7 @@ describe('validate-output-dist-custom-element', () => {
       };
       userConfig.outputTargets = [outputTarget];
 
-      const { config } = validateConfig(userConfig);
+      const { config } = validateConfig(userConfig, mockLoadConfigInit());
       expect(config.outputTargets).toEqual([
         {
           type: DIST_CUSTOM_ELEMENTS,
@@ -40,7 +40,7 @@ describe('validate-output-dist-custom-element', () => {
       };
       userConfig.outputTargets = [outputTarget];
 
-      const { config } = validateConfig(userConfig);
+      const { config } = validateConfig(userConfig, mockLoadConfigInit());
       expect(config.outputTargets).toEqual([
         {
           type: DIST_CUSTOM_ELEMENTS,
@@ -60,7 +60,7 @@ describe('validate-output-dist-custom-element', () => {
         };
         userConfig.outputTargets = [outputTarget];
 
-        const { config } = validateConfig(userConfig);
+        const { config } = validateConfig(userConfig, mockLoadConfigInit());
         expect(config.outputTargets).toEqual([
           {
             type: DIST_CUSTOM_ELEMENTS,
@@ -80,7 +80,7 @@ describe('validate-output-dist-custom-element', () => {
         };
         userConfig.outputTargets = [outputTarget];
 
-        const { config } = validateConfig(userConfig);
+        const { config } = validateConfig(userConfig, mockLoadConfigInit());
         expect(config.outputTargets).toEqual([
           {
             type: DIST_CUSTOM_ELEMENTS,
@@ -101,7 +101,7 @@ describe('validate-output-dist-custom-element', () => {
         };
         userConfig.outputTargets = [outputTarget];
 
-        const { config } = validateConfig(userConfig);
+        const { config } = validateConfig(userConfig, mockLoadConfigInit());
         expect(config.outputTargets).toEqual([
           {
             type: DIST_CUSTOM_ELEMENTS,
@@ -121,7 +121,7 @@ describe('validate-output-dist-custom-element', () => {
         };
         userConfig.outputTargets = [outputTarget];
 
-        const { config } = validateConfig(userConfig);
+        const { config } = validateConfig(userConfig, mockLoadConfigInit());
         expect(config.outputTargets).toEqual([
           {
             type: DIST_CUSTOM_ELEMENTS,
@@ -144,7 +144,7 @@ describe('validate-output-dist-custom-element', () => {
         };
         userConfig.outputTargets = [outputTarget];
 
-        const { config } = validateConfig(userConfig);
+        const { config } = validateConfig(userConfig, mockLoadConfigInit());
         expect(config.outputTargets).toEqual([
           {
             type: DIST_TYPES,
@@ -172,7 +172,7 @@ describe('validate-output-dist-custom-element', () => {
         };
         userConfig.outputTargets = [outputTarget];
 
-        const { config } = validateConfig(userConfig);
+        const { config } = validateConfig(userConfig, mockLoadConfigInit());
         expect(config.outputTargets).toEqual([
           {
             type: DIST_TYPES,
@@ -199,7 +199,7 @@ describe('validate-output-dist-custom-element', () => {
         };
         userConfig.outputTargets = [outputTarget];
 
-        const { config } = validateConfig(userConfig);
+        const { config } = validateConfig(userConfig, mockLoadConfigInit());
         expect(config.outputTargets).toEqual([
           {
             type: DIST_CUSTOM_ELEMENTS,
@@ -233,7 +233,7 @@ describe('validate-output-dist-custom-element', () => {
         };
         userConfig.outputTargets = [outputTarget];
 
-        const { config } = validateConfig(userConfig);
+        const { config } = validateConfig(userConfig, mockLoadConfigInit());
         expect(config.outputTargets).toEqual([
           {
             type: COPY,

@@ -1,7 +1,7 @@
 import type * as d from '../../../declarations';
 import { getLazyBuildConditionals } from '../dist-lazy/lazy-build-conditionals';
 import { getCustomElementsBuildConditionals } from '../dist-custom-elements-bundle/custom-elements-build-conditionals';
-import { mockConfig } from '@stencil/core/testing';
+import { mockConfig, mockLoadConfigInit } from '@stencil/core/testing';
 import { validateConfig } from '../../config/validate-config';
 
 describe('build-conditionals', () => {
@@ -16,7 +16,7 @@ describe('build-conditionals', () => {
   describe('getCustomElementsBuildConditionals', () => {
     it('taskQueue async', () => {
       userConfig.taskQueue = 'async';
-      const { config } = validateConfig(userConfig);
+      const { config } = validateConfig(userConfig, mockLoadConfigInit());
       const bc = getCustomElementsBuildConditionals(config, cmps);
       expect(bc.asyncQueue).toBe(false);
       expect(bc.taskQueue).toBe(true);
@@ -25,7 +25,7 @@ describe('build-conditionals', () => {
 
     it('taskQueue immediate', () => {
       userConfig.taskQueue = 'immediate';
-      const { config } = validateConfig(userConfig);
+      const { config } = validateConfig(userConfig, mockLoadConfigInit());
       const bc = getCustomElementsBuildConditionals(config, cmps);
       expect(bc.asyncQueue).toBe(false);
       expect(bc.taskQueue).toBe(false);
@@ -34,7 +34,7 @@ describe('build-conditionals', () => {
 
     it('taskQueue congestionAsync', () => {
       userConfig.taskQueue = 'congestionAsync';
-      const { config } = validateConfig(userConfig);
+      const { config } = validateConfig(userConfig, mockLoadConfigInit());
       const bc = getCustomElementsBuildConditionals(config, cmps);
       expect(bc.asyncQueue).toBe(true);
       expect(bc.taskQueue).toBe(true);
@@ -42,7 +42,7 @@ describe('build-conditionals', () => {
     });
 
     it('taskQueue defaults', () => {
-      const { config } = validateConfig(userConfig);
+      const { config } = validateConfig(userConfig, mockLoadConfigInit());
       const bc = getCustomElementsBuildConditionals(config, cmps);
       expect(bc.asyncQueue).toBe(false);
       expect(bc.taskQueue).toBe(true);
@@ -53,7 +53,7 @@ describe('build-conditionals', () => {
   describe('getLazyBuildConditionals', () => {
     it('taskQueue async', () => {
       userConfig.taskQueue = 'async';
-      const { config } = validateConfig(userConfig);
+      const { config } = validateConfig(userConfig, mockLoadConfigInit());
       const bc = getLazyBuildConditionals(config, cmps);
       expect(bc.asyncQueue).toBe(false);
       expect(bc.taskQueue).toBe(true);
@@ -62,7 +62,7 @@ describe('build-conditionals', () => {
 
     it('taskQueue immediate', () => {
       userConfig.taskQueue = 'immediate';
-      const { config } = validateConfig(userConfig);
+      const { config } = validateConfig(userConfig, mockLoadConfigInit());
       const bc = getLazyBuildConditionals(config, cmps);
       expect(bc.asyncQueue).toBe(false);
       expect(bc.taskQueue).toBe(false);
@@ -71,7 +71,7 @@ describe('build-conditionals', () => {
 
     it('taskQueue congestionAsync', () => {
       userConfig.taskQueue = 'congestionAsync';
-      const { config } = validateConfig(userConfig);
+      const { config } = validateConfig(userConfig, mockLoadConfigInit());
       const bc = getLazyBuildConditionals(config, cmps);
       expect(bc.asyncQueue).toBe(true);
       expect(bc.taskQueue).toBe(true);
@@ -79,7 +79,7 @@ describe('build-conditionals', () => {
     });
 
     it('taskQueue defaults', () => {
-      const { config } = validateConfig(userConfig);
+      const { config } = validateConfig(userConfig, mockLoadConfigInit());
       const bc = getLazyBuildConditionals(config, cmps);
       expect(bc.asyncQueue).toBe(false);
       expect(bc.taskQueue).toBe(true);
@@ -87,14 +87,14 @@ describe('build-conditionals', () => {
     });
 
     it('tagNameTransform default', () => {
-      const { config } = validateConfig(userConfig);
+      const { config } = validateConfig(userConfig, mockLoadConfigInit());
       const bc = getLazyBuildConditionals(config, cmps);
       expect(bc.transformTagName).toBe(false);
     });
 
     it('tagNameTransform true', () => {
       userConfig.extras = { tagNameTransform: true };
-      const { config } = validateConfig(userConfig);
+      const { config } = validateConfig(userConfig, mockLoadConfigInit());
       const bc = getLazyBuildConditionals(config, cmps);
       expect(bc.transformTagName).toBe(true);
     });

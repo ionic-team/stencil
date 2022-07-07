@@ -2,6 +2,7 @@ import type * as d from '../../../declarations';
 import { createSystem } from '../../../compiler/sys/stencil-sys';
 import { loadConfig } from '../load-config';
 import path from 'path';
+import { mockLoadConfigInit } from '@stencil/core/testing';
 
 describe('stencil config - sourceMap option', () => {
   const configPath = require.resolve('./fixtures/stencil.config.ts');
@@ -11,7 +12,7 @@ describe('stencil config - sourceMap option', () => {
   /**
    * Test helper for generating default `d.LoadConfigInit` objects.
    *
-   * This function assumes the fields in the enclosing scope have ben initialized.
+   * This function assumes the fields in the enclosing scope have been initialized.
    * @param overrides the properties on the default `d.LoadConfigInit` entity to manually override
    * @returns the default configuration initialization object, with any overrides applied
    */
@@ -22,7 +23,8 @@ describe('stencil config - sourceMap option', () => {
       config: {},
       initTsConfig: true,
     };
-    return { ...defaults, ...overrides };
+
+    return mockLoadConfigInit({ ...defaults, ...overrides });
   };
 
   beforeEach(() => {

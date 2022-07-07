@@ -1,6 +1,6 @@
 import type * as d from '@stencil/core/declarations';
 import { validateConfig } from '../validate-config';
-import { mockLogger } from '@stencil/core/testing';
+import { mockLoadConfigInit, mockLogger } from '@stencil/core/testing';
 import path from 'path';
 
 describe('validate-workers', () => {
@@ -20,7 +20,7 @@ describe('validate-workers', () => {
 
   it('set maxConcurrentWorkers, but dont let it go under 0', () => {
     userConfig.maxConcurrentWorkers = -1;
-    const { config } = validateConfig(userConfig);
+    const { config } = validateConfig(userConfig, mockLoadConfigInit());
     expect(config.maxConcurrentWorkers).toBe(0);
   });
 
@@ -29,7 +29,7 @@ describe('validate-workers', () => {
       ci: true,
     };
     userConfig.maxConcurrentWorkers = 2;
-    const { config } = validateConfig(userConfig);
+    const { config } = validateConfig(userConfig, mockLoadConfigInit());
     expect(config.maxConcurrentWorkers).toBe(4);
   });
 
@@ -38,13 +38,13 @@ describe('validate-workers', () => {
       maxWorkers: 1,
     };
     userConfig.maxConcurrentWorkers = 4;
-    const { config } = validateConfig(userConfig);
+    const { config } = validateConfig(userConfig, mockLoadConfigInit());
     expect(config.maxConcurrentWorkers).toBe(1);
   });
 
   it('set maxConcurrentWorkers', () => {
     userConfig.maxConcurrentWorkers = 4;
-    const { config } = validateConfig(userConfig);
+    const { config } = validateConfig(userConfig, mockLoadConfigInit());
     expect(config.maxConcurrentWorkers).toBe(4);
   });
 });

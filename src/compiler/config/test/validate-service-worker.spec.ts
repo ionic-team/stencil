@@ -1,17 +1,21 @@
 import type * as d from '@stencil/core/declarations';
 import { OutputTargetWww } from '@stencil/core/declarations';
-import { mockCompilerSystem } from '@stencil/core/testing';
+import { mockCompilerSystem, mockLogger } from '@stencil/core/testing';
 import { validateServiceWorker } from '../validate-service-worker';
 
 describe('validateServiceWorker', () => {
-  const config: d.ValidatedConfig = {
-    fsNamespace: 'app',
-    sys: mockCompilerSystem(),
-    devMode: false,
-    flags: {},
-  };
-
+  let config: d.ValidatedConfig;
   let outputTarget: d.OutputTargetWww;
+
+  beforeEach(() => {
+    config = {
+      fsNamespace: 'app',
+      sys: mockCompilerSystem(),
+      devMode: false,
+      flags: {},
+      logger: mockLogger(),
+    };
+  });
 
   /**
    * A little util to work around a typescript annoyance. Because
