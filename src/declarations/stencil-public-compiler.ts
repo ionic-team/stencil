@@ -231,6 +231,7 @@ export interface StencilConfig {
   buildDist?: boolean;
   buildLogFilePath?: string;
   cacheDir?: string;
+  buildCacheDirName?: string;
   devInspector?: boolean;
   devServer?: StencilDevServerConfig;
   enableCacheStats?: boolean;

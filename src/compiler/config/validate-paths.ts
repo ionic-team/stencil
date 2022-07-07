@@ -20,6 +20,10 @@ export const validatePaths = (config: d.UnvalidatedConfig) => {
     config.cacheDir = join(config.rootDir, config.cacheDir);
   }
 
+  if (typeof config.buildCacheDirName !== 'string') {
+    config.buildCacheDirName = DEFAULT_BUILD_CACHE_DIR_NAME;
+  }
+
   if (typeof config.srcIndexHtml !== 'string') {
     config.srcIndexHtml = join(config.srcDir, DEFAULT_INDEX_HTML);
   }
@@ -53,5 +57,6 @@ export const validatePaths = (config: d.UnvalidatedConfig) => {
 
 const DEFAULT_BUILD_LOG_FILE_NAME = 'stencil-build.log';
 const DEFAULT_CACHE_DIR = '.stencil';
+const DEFAULT_BUILD_CACHE_DIR_NAME = 'build';
 const DEFAULT_INDEX_HTML = 'index.html';
 const DEFAULT_SRC_DIR = 'src';
