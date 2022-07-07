@@ -2,7 +2,7 @@ import type * as d from '../../../declarations';
 import { normalizePath } from '../../../utils';
 import { validateConfig } from '../validate-config';
 import path from 'path';
-import { ConfigFlags } from '../../../cli/config-flags';
+import { ConfigFlags, createConfigFlags } from '../../../cli/config-flags';
 import { mockLoadConfigInit } from '@stencil/core/testing';
 
 describe('validateDevServer', () => {
@@ -13,7 +13,7 @@ describe('validateDevServer', () => {
 
   beforeEach(() => {
     inputDevServerConfig = {};
-    flags = { serve: true };
+    flags = createConfigFlags({ serve: true });
     inputConfig = {
       sys: {} as any,
       rootDir: normalizePath(path.join(root, 'some', 'path')),
@@ -196,7 +196,7 @@ describe('validateDevServer', () => {
   });
 
   it('should set openBrowser from flag', () => {
-    inputConfig.flags = { open: false };
+    inputConfig.flags.open = false;
     const { config } = validateConfig(inputConfig, mockLoadConfigInit());
     expect(config.devServer.openBrowser).toBe(false);
   });

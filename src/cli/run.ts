@@ -16,6 +16,8 @@ import { taskTest } from './task-test';
 import { taskTelemetry } from './task-telemetry';
 import { telemetryAction } from './telemetry/telemetry';
 import { createLogger } from '../compiler/sys/logger/console-logger';
+import { ValidatedConfig } from '../declarations';
+import { createConfigFlags } from './config-flags';
 
 export const run = async (init: d.CliInitOptions) => {
   const { args, logger, sys } = init;
@@ -37,7 +39,8 @@ export const run = async (init: d.CliInitOptions) => {
     }
 
     if (task === 'help' || flags.help) {
-      await taskHelp({ task: 'help', args }, logger, sys);
+      await taskHelp(createConfigFlags({ task: 'help', args }), logger, sys);
+
       return;
     }
 
@@ -72,9 +75,14 @@ export const run = async (init: d.CliInitOptions) => {
     loadedCompilerLog(sys, logger, flags, coreCompiler);
 
     if (task === 'info') {
-      await telemetryAction(sys, { flags: { task: 'info' }, logger }, coreCompiler, async () => {
-        await taskInfo(coreCompiler, sys, logger);
-      });
+      await telemetryAction(
+        sys,
+        { flags: createConfigFlags({ task: 'info' }), logger },
+        coreCompiler,
+        async () => {
+          await taskInfo(coreCompiler, sys, logger);
+        }
+      );
       return;
     }
 
@@ -119,8 +127,8 @@ export const runTask = async (
   sys?: d.CompilerSystem
 ) => {
   const logger = config.logger ?? createLogger();
-  const strictConfig: d.ValidatedConfig = { ...config, flags: { ...config.flags } ?? { task }, logger };
 
+  const strictConfig: ValidatedConfig = { ...config, flags: createConfigFlags(config.flags ?? { task }), logger };
   strictConfig.outputTargets = strictConfig.outputTargets || [];
 
   switch (task) {

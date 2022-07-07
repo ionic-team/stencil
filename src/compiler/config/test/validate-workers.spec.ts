@@ -2,6 +2,7 @@ import type * as d from '@stencil/core/declarations';
 import { validateConfig } from '../validate-config';
 import { mockLoadConfigInit, mockLogger } from '@stencil/core/testing';
 import path from 'path';
+import { createConfigFlags } from '../../../cli/config-flags';
 
 describe('validate-workers', () => {
   let userConfig: d.Config;
@@ -25,18 +26,18 @@ describe('validate-workers', () => {
   });
 
   it('set maxConcurrentWorkers from ci flags', () => {
-    userConfig.flags = {
+    userConfig.flags = createConfigFlags({
       ci: true,
-    };
+    });
     userConfig.maxConcurrentWorkers = 2;
     const { config } = validateConfig(userConfig, mockLoadConfigInit());
     expect(config.maxConcurrentWorkers).toBe(4);
   });
 
   it('set maxConcurrentWorkers from flags', () => {
-    userConfig.flags = {
+    userConfig.flags = createConfigFlags({
       maxWorkers: 1,
-    };
+    });
     userConfig.maxConcurrentWorkers = 4;
     const { config } = validateConfig(userConfig, mockLoadConfigInit());
     expect(config.maxConcurrentWorkers).toBe(1);

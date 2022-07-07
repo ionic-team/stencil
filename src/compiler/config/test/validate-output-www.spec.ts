@@ -2,7 +2,7 @@ import type * as d from '@stencil/core/declarations';
 import { isOutputTargetCopy, isOutputTargetHydrate, isOutputTargetWww } from '../../output-targets/output-utils';
 import { validateConfig } from '../validate-config';
 import path from 'path';
-import { ConfigFlags } from '../../../cli/config-flags';
+import { ConfigFlags, createConfigFlags } from '../../../cli/config-flags';
 import { mockLoadConfigInit } from '@stencil/core/testing';
 
 describe('validateOutputTargetWww', () => {
@@ -11,7 +11,7 @@ describe('validateOutputTargetWww', () => {
   let flags: ConfigFlags;
 
   beforeEach(() => {
-    flags = {};
+    flags = createConfigFlags();
     userConfig = {
       rootDir: rootDir,
       flags,

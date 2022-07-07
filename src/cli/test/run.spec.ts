@@ -12,6 +12,7 @@ import * as ServeTask from '../task-serve';
 import * as TelemetryTask from '../task-telemetry';
 import * as TestTask from '../task-test';
 import { createTestingSystem } from '../../testing/testing-sys';
+import { createConfigFlags } from '../config-flags';
 
 describe('run', () => {
   describe('run()', () => {
@@ -35,11 +36,13 @@ describe('run', () => {
       };
 
       parseFlagsSpy = jest.spyOn(ParseFlags, 'parseFlags');
-      parseFlagsSpy.mockReturnValue({
-        // use the 'help' task as a reasonable default for all calls to this function.
-        // code paths that require a different task can always override this value as needed.
-        task: 'help',
-      });
+      parseFlagsSpy.mockReturnValue(
+        createConfigFlags({
+          // use the 'help' task as a reasonable default for all calls to this function.
+          // code paths that require a different task can always override this value as needed.
+          task: 'help',
+        })
+      );
     });
 
     afterEach(() => {
@@ -66,6 +69,8 @@ describe('run', () => {
           {
             task: 'help',
             args: [],
+            knownArgs: [],
+            unknownArgs: [],
           },
           mockLogger,
           mockSystem
@@ -75,9 +80,11 @@ describe('run', () => {
       });
 
       it("calls the help task when the 'help' field is set on flags", async () => {
-        parseFlagsSpy.mockReturnValue({
-          help: true,
-        });
+        parseFlagsSpy.mockReturnValue(
+          createConfigFlags({
+            help: true,
+          })
+        );
 
         await run(cliInitOptions);
 
@@ -86,6 +93,8 @@ describe('run', () => {
           {
             task: 'help',
             args: [],
+            unknownArgs: [],
+            knownArgs: [],
           },
           mockLogger,
           mockSystem
@@ -128,6 +137,9 @@ describe('run', () => {
 
       validatedConfig = mockConfig(sys);
       validatedConfig.outputTargets = [];
+
+      console.log('run.spec::beforeEach');
+      console.log(validatedConfig.flags);
 
       taskBuildSpy = jest.spyOn(BuildTask, 'taskBuild');
       taskBuildSpy.mockResolvedValue();
@@ -253,7 +265,7 @@ describe('run', () => {
       await runTask(coreCompiler, unvalidatedConfig, 'help', sys);
 
       expect(taskHelpSpy).toHaveBeenCalledTimes(1);
-      expect(taskHelpSpy).toHaveBeenCalledWith(validatedConfig.flags, validatedConfig.logger, sys);
+      expect(taskHelpSpy).toHaveBeenCalledWith(createConfigFlags({ task: 'help' }), validatedConfig.logger, sys);
     });
   });
 });

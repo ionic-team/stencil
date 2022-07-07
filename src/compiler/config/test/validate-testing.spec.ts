@@ -2,7 +2,7 @@ import type * as d from '@stencil/core/declarations';
 import { mockLogger, mockCompilerSystem, mockLoadConfigInit } from '@stencil/core/testing';
 import { validateConfig } from '../validate-config';
 import path from 'path';
-import { ConfigFlags } from '../../../cli/config-flags';
+import { ConfigFlags, createConfigFlags } from '../../../cli/config-flags';
 
 describe('validateTesting', () => {
   const ROOT = path.resolve('/');
@@ -12,7 +12,7 @@ describe('validateTesting', () => {
   let flags: ConfigFlags;
 
   beforeEach(() => {
-    flags = {};
+    flags = createConfigFlags();
     userConfig = {
       sys: sys as any,
       logger: logger,

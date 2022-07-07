@@ -19,6 +19,7 @@ import { TestingLogger } from './testing-logger';
 import path from 'path';
 import { noop } from '@utils';
 import { buildEvents } from '../compiler/events';
+import { createConfigFlags } from '../cli/config-flags';
 
 // TODO(STENCIL-486): Update `mockValidatedConfig` to accept any property found on `ValidatedConfig`
 /**
@@ -30,7 +31,7 @@ import { buildEvents } from '../compiler/events';
 export function mockValidatedConfig(sys?: CompilerSystem): ValidatedConfig {
   const baseConfig = mockConfig(sys);
 
-  return { ...baseConfig, flags: {}, logger: mockLogger() };
+  return { ...baseConfig, flags: createConfigFlags(), logger: mockLogger() };
 }
 
 // TODO(STENCIL-486): Update `mockConfig` to accept any property found on `UnvalidatedConfig`
@@ -59,7 +60,7 @@ export function mockConfig(sys?: CompilerSystem): UnvalidatedConfig {
     enableCache: false,
     buildAppCore: false,
     buildDist: true,
-    flags: {},
+    flags: createConfigFlags(),
     bundles: null,
     outputTargets: null,
     buildEs5: false,

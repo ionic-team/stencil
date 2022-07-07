@@ -1,4 +1,4 @@
-import type { Compiler, Config, Diagnostic } from '../declarations';
+import type { Compiler, Diagnostic, ValidatedConfig } from '../declarations';
 import { Cache } from './cache';
 import { CompilerContext } from './build/compiler-ctx';
 import { createFullBuild } from './build/full-build';
@@ -18,7 +18,7 @@ import ts from 'typescript';
  * @returns a new instance of a Stencil compiler
  * @public
  */
-export const createCompiler = async (userConfig: Config): Promise<Compiler> => {
+export const createCompiler = async (userConfig: ValidatedConfig): Promise<Compiler> => {
   // actual compiler code
   // could be in a web worker on the browser
   // or the main thread in node
