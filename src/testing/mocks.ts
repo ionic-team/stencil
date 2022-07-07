@@ -29,7 +29,7 @@ import { buildEvents } from '../compiler/events';
 export function mockValidatedConfig(sys?: CompilerSystem): ValidatedConfig {
   const baseConfig = mockConfig(sys);
 
-  return { ...baseConfig, flags: {} };
+  return { ...baseConfig, flags: {}, logger: mockLogger() };
 }
 
 // TODO(STENCIL-486): Update `mockConfig` to accept any property found on `UnvalidatedConfig`

@@ -15,7 +15,7 @@ import { taskServe } from './task-serve';
 import { taskTest } from './task-test';
 import { taskTelemetry } from './task-telemetry';
 import { telemetryAction } from './telemetry/telemetry';
-import { ValidatedConfig } from '../declarations';
+import { createLogger } from '../compiler/sys/logger/console-logger';
 
 export const run = async (init: d.CliInitOptions) => {
   const { args, logger, sys } = init;
@@ -118,7 +118,9 @@ export const runTask = async (
   task: d.TaskCommand,
   sys?: d.CompilerSystem
 ) => {
-  const strictConfig: ValidatedConfig = { ...config, flags: { ...config.flags } ?? { task } };
+  const logger = config.logger ?? createLogger();
+  const strictConfig: d.ValidatedConfig = { ...config, flags: { ...config.flags } ?? { task }, logger };
+
   strictConfig.outputTargets = strictConfig.outputTargets || [];
 
   switch (task) {
@@ -136,7 +138,7 @@ export const runTask = async (
       break;
 
     case 'help':
-      await taskHelp(strictConfig.flags, config.logger, sys);
+      await taskHelp(strictConfig.flags, strictConfig.logger, sys);
       break;
 
     case 'prerender':
@@ -150,7 +152,7 @@ export const runTask = async (
     case 'telemetry':
       // TODO(STENCIL-148) make this parameter no longer optional, remove the surrounding if statement
       if (sys) {
-        await taskTelemetry(strictConfig.flags, sys, config.logger);
+        await taskTelemetry(strictConfig.flags, sys, strictConfig.logger);
       }
       break;
 
@@ -163,8 +165,10 @@ export const runTask = async (
       break;
 
     default:
-      config.logger.error(`${config.logger.emoji('❌ ')}Invalid stencil command, please see the options below:`);
-      await taskHelp(strictConfig.flags, config.logger, sys);
+      strictConfig.logger.error(
+        `${strictConfig.logger.emoji('❌ ')}Invalid stencil command, please see the options below:`
+      );
+      await taskHelp(strictConfig.flags, strictConfig.logger, sys);
       return config.sys.exit(1);
   }
 };
