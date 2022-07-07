@@ -72,7 +72,7 @@ export const run = async (init: d.CliInitOptions) => {
     loadedCompilerLog(sys, logger, flags, coreCompiler);
 
     if (task === 'info') {
-      await telemetryAction(sys, { flags: { task: 'info' }, outputTargets: [] }, logger, coreCompiler, async () => {
+      await telemetryAction(sys, { flags: { task: 'info' }, logger: logger }, coreCompiler, async () => {
         await taskInfo(coreCompiler, sys, logger);
       });
       return;
@@ -100,7 +100,7 @@ export const run = async (init: d.CliInitOptions) => {
 
     await sys.ensureResources({ rootDir: validated.config.rootDir, logger, dependencies: dependencies as any });
 
-    await telemetryAction(sys, validated.config, logger, coreCompiler, async () => {
+    await telemetryAction(sys, validated.config, coreCompiler, async () => {
       await runTask(coreCompiler, validated.config, task, sys);
     });
   } catch (e) {

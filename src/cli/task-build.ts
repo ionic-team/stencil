@@ -26,7 +26,7 @@ export const taskBuild = async (coreCompiler: CoreCompiler, config: d.ValidatedC
 
     // TODO(STENCIL-148) make this parameter no longer optional, remove the surrounding if statement
     if (sys) {
-      await telemetryBuildFinishedAction(sys, config, config.logger, coreCompiler, results);
+      await telemetryBuildFinishedAction(sys, config, coreCompiler, results);
     }
 
     await compiler.destroy();

@@ -2,7 +2,7 @@ import type * as d from '../../../declarations';
 import * as telemetry from '../telemetry';
 import * as shouldTrack from '../shouldTrack';
 import { createSystem } from '../../../compiler/sys/stencil-sys';
-import { mockValidatedConfig } from '@stencil/core/testing';
+import { mockLogger, mockValidatedConfig } from '@stencil/core/testing';
 import * as coreCompiler from '@stencil/core/compiler';
 import { anonymizeConfigForTelemetry } from '../telemetry';
 import { DIST, DIST_CUSTOM_ELEMENTS, DIST_HYDRATE_SCRIPT, WWW } from '../../../compiler/output-targets/output-utils';
@@ -31,7 +31,7 @@ describe('telemetryBuildFinishedAction', () => {
       duration: 100,
     } as d.CompilerBuildResults;
 
-    await telemetry.telemetryBuildFinishedAction(sys, config, config.logger, coreCompiler, results);
+    await telemetry.telemetryBuildFinishedAction(sys, config, coreCompiler, results);
     expect(spyShouldTrack).toHaveBeenCalled();
 
     spyShouldTrack.mockRestore();
@@ -57,7 +57,7 @@ describe('telemetryAction', () => {
       })
     );
 
-    await telemetry.telemetryAction(sys, config, config.logger, coreCompiler, () => {});
+    await telemetry.telemetryAction(sys, config, coreCompiler, () => {});
     expect(spyShouldTrack).toHaveBeenCalled();
 
     spyShouldTrack.mockRestore();
@@ -71,7 +71,7 @@ describe('telemetryAction', () => {
       })
     );
 
-    await telemetry.telemetryAction(sys, config, config.logger, coreCompiler, async () => {
+    await telemetry.telemetryAction(sys, config, coreCompiler, async () => {
       new Promise((resolve) => {
         setTimeout(() => {
           resolve(true);
@@ -142,6 +142,7 @@ describe('prepareData', () => {
       flags: {
         args: [],
       },
+      logger: mockLogger(),
     };
 
     sys = createSystem();
@@ -182,6 +183,7 @@ describe('prepareData', () => {
       flags: {
         args: [],
       },
+      logger: mockLogger(),
       outputTargets: [{ type: 'www', baseUrl: 'https://example.com', serviceWorker: { swDest: './tmp' } }],
     };
 
@@ -228,6 +230,7 @@ describe('prepareData', () => {
       flags: {
         args: [],
       },
+      logger: mockLogger(),
       outputTargets: [{ type: 'www', baseUrl: 'https://example.com', serviceWorker: { swDest: './tmp' } }],
     };
 
