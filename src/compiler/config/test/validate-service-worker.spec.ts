@@ -130,15 +130,6 @@ describe('validateServiceWorker', () => {
     expect(outputTarget.serviceWorker).toBe(null);
   });
 
-  it('should not create default sw config when not www type', () => {
-    outputTarget = {
-      type: 'www',
-      appDir: '/www',
-    };
-    validateServiceWorker(config, outputTarget);
-    expect(outputTarget.serviceWorker).toBe(null);
-  });
-
   it('should create default sw config when true boolean, even if devMode', () => {
     outputTarget = {
       type: 'www',
