@@ -138,9 +138,6 @@ describe('run', () => {
       validatedConfig = mockConfig(sys);
       validatedConfig.outputTargets = [];
 
-      console.log('run.spec::beforeEach');
-      console.log(validatedConfig.flags);
-
       taskBuildSpy = jest.spyOn(BuildTask, 'taskBuild');
       taskBuildSpy.mockResolvedValue();
 
