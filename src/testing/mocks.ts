@@ -4,6 +4,7 @@ import type {
   CompilerCtx,
   CompilerSystem,
   Config,
+  LoadConfigInit,
   ValidatedConfig,
   Module,
   UnvalidatedConfig,
@@ -29,7 +30,7 @@ import { buildEvents } from '../compiler/events';
 export function mockValidatedConfig(sys?: CompilerSystem): ValidatedConfig {
   const baseConfig = mockConfig(sys);
 
-  return { ...baseConfig, flags: {} };
+  return { ...baseConfig, flags: {}, logger: mockLogger() };
 }
 
 // TODO(STENCIL-486): Update `mockConfig` to accept any property found on `UnvalidatedConfig`
@@ -81,6 +82,28 @@ export function mockConfig(sys?: CompilerSystem): UnvalidatedConfig {
     },
   };
 }
+
+/**
+ * Creates a configuration object used to bootstrap a Stencil task invocation
+ *
+ * Several fields are intentionally undefined for this entity. While it would be trivial to stub them out, this mock
+ * generation function operates under the assumption that entities like loggers and compiler system abstractions will
+ * be shared by multiple entities in a test suite, who should provide those entities to this function
+ *
+ * @param overrides the properties on the default entity to manually override
+ * @returns the default configuration initialization object, with any overrides applied
+ */
+export const mockLoadConfigInit = (overrides?: Partial<LoadConfigInit>): LoadConfigInit => {
+  const defaults: LoadConfigInit = {
+    config: {},
+    configPath: undefined,
+    initTsConfig: true,
+    logger: undefined,
+    sys: undefined,
+  };
+
+  return { ...defaults, ...overrides };
+};
 
 export function mockCompilerCtx(config?: Config) {
   if (!config) {
