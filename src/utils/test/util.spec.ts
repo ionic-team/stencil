@@ -1,8 +1,7 @@
 import type * as d from '../../declarations';
 import { mockConfig, mockBuildCtx } from '@stencil/core/testing';
-import * as util from '../util';
+import * as util from '@utils';
 import { stubDiagnostic } from '../../dev-server/test/Diagnostic.stub';
-import { ParsePackageJsonResult } from '../util';
 
 describe('util', () => {
   describe('generatePreamble', () => {
@@ -167,7 +166,7 @@ describe('util', () => {
         type: 'build',
       });
 
-      expect(diagnostic).toEqual<ParsePackageJsonResult>({
+      expect(diagnostic).toEqual<util.ParsePackageJsonResult>({
         diagnostic: expectedDiagnostic,
         data: null,
         filePath: mockPackageJsonPath,
@@ -185,7 +184,7 @@ describe('util', () => {
         type: 'build',
       });
 
-      expect(diagnostic).toEqual<ParsePackageJsonResult>({
+      expect(diagnostic).toEqual<util.ParsePackageJsonResult>({
         diagnostic: expectedDiagnostic,
         data: null,
         filePath: undefined,
@@ -195,7 +194,7 @@ describe('util', () => {
     it('returns the parsed data from the provided json', () => {
       const diagnostic = util.parsePackageJson('{ "someJson": "value"}', mockPackageJsonPath);
 
-      expect(diagnostic).toEqual<ParsePackageJsonResult>({
+      expect(diagnostic).toEqual<util.ParsePackageJsonResult>({
         diagnostic: null,
         data: {
           someJson: 'value',
