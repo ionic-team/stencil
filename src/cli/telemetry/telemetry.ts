@@ -31,8 +31,7 @@ export async function telemetryBuildFinishedAction(
 
   await sendMetric(sys, config, 'stencil_cli_command', data);
 
-  const logger = config.logger;
-  logger.debug(`${logger.blue('Telemetry')}: ${logger.gray(JSON.stringify(data))}`);
+  config.logger.debug(`${config.logger.blue('Telemetry')}: ${config.logger.gray(JSON.stringify(data))}`);
 }
 
 /**
@@ -76,8 +75,7 @@ export async function telemetryAction(
   const data = await prepareData(coreCompiler, config, sys, duration);
 
   await sendMetric(sys, config, 'stencil_cli_command', data);
-  const logger = config.logger;
-  logger.debug(`${logger.blue('Telemetry')}: ${logger.gray(JSON.stringify(data))}`);
+  config.logger.debug(`${config.logger.blue('Telemetry')}: ${config.logger.gray(JSON.stringify(data))}`);
 
   if (error) {
     throw error;
