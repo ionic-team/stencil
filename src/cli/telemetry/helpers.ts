@@ -11,8 +11,6 @@ export const tryFn = async <T extends (...args: any[]) => Promise<R>, R>(fn: T, 
   return null;
 };
 
-export declare const TERMINAL_INFO: d.TerminalInfo;
-
 export const isInteractive = (sys: d.CompilerSystem, flags: ConfigFlags, object?: d.TerminalInfo): boolean => {
   const terminalInfo =
     object ||
