@@ -6,7 +6,6 @@ import type {
   UnvalidatedConfig,
 } from '../../declarations';
 import { buildError, catchError, hasError, isString, normalizePath } from '@utils';
-import { createLogger } from '../sys/logger/console-logger';
 import { createSystem } from '../sys/stencil-sys';
 import { dirname } from 'path';
 import { IS_NODE_ENV } from '../sys/environment';
@@ -44,6 +43,8 @@ export const loadConfig = async (init: LoadConfigInit = {}): Promise<LoadConfigR
     },
   };
 
+  const unknownConfig: UnvalidatedConfig = {};
+
   try {
     const sys = init.sys || createSystem();
     const config = init.config || {};
@@ -54,23 +55,22 @@ export const loadConfig = async (init: LoadConfigInit = {}): Promise<LoadConfigR
       return results;
     }
 
-    if (loadedConfigFile != null) {
+    if (loadedConfigFile !== null) {
       // merge the user's config object into their loaded config file
       configPath = loadedConfigFile.configPath;
-      results.config = { ...loadedConfigFile, ...config };
-      results.config.configPath = configPath;
-      results.config.rootDir = normalizePath(dirname(configPath));
+      unknownConfig.config = { ...loadedConfigFile, ...config };
+      unknownConfig.config.configPath = configPath;
+      unknownConfig.config.rootDir = normalizePath(dirname(configPath));
     } else {
       // no stencil.config.ts or .js file, which is fine
-      // #0CJS ¯\_(ツ)_/¯
-      results.config = { ...config };
-      results.config.configPath = null;
-      results.config.rootDir = normalizePath(sys.getCurrentDirectory());
+      unknownConfig.config = { ...config };
+      unknownConfig.config.configPath = null;
+      unknownConfig.config.rootDir = normalizePath(sys.getCurrentDirectory());
     }
 
-    results.config.sys = sys;
+    unknownConfig.config.sys = sys;
 
-    const validated = validateConfig(results.config);
+    const validated = validateConfig(unknownConfig.config, init);
     results.diagnostics.push(...validated.diagnostics);
     if (hasError(results.diagnostics)) {
       return results;
@@ -86,7 +86,6 @@ export const loadConfig = async (init: LoadConfigInit = {}): Promise<LoadConfigR
       results.config.logLevel = 'info';
     }
 
-    results.config.logger = init.logger || results.config.logger || createLogger();
     results.config.logger.setLevel(results.config.logLevel);
 
     if (!hasError(results.diagnostics)) {

@@ -73,9 +73,6 @@ export class CmpA {
   // * Method Definitions *
   // **********************
 
-  /**
-   * Method initialize
-   */
   @Method()
   init(): Promise<void> {
     return Promise.resolve(this._init());

@@ -120,6 +120,9 @@ export const VALID_CONFIG_OUTPUT_TARGETS = [
   STATS,
 ] as const;
 
+// Given a ReadonlyArray of strings we can derive a union type from them
+// by getting `typeof ARRAY[number]`, i.e. the type of all values returns
+// by number keys.
 type ValidConfigOutputTarget = typeof VALID_CONFIG_OUTPUT_TARGETS[number];
 
 /**

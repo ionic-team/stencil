@@ -5,7 +5,7 @@ import { mockConfig } from '@stencil/core/testing';
 import path from 'path';
 
 // TODO(STENCIL-463): investigate getting these tests to pass again
-xdescribe('build-conditionals', () => {
+describe.skip('build-conditionals', () => {
   jest.setTimeout(20000);
   let compiler: Compiler;
   let config: Config;

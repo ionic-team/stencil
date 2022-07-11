@@ -3,7 +3,7 @@ import { appendDevServerClientIframe } from '../serve-file';
 import { createRequestHandler } from '../request-handler';
 import { createServerContext } from '../server-context';
 import { createSystem } from '../../compiler/sys/stencil-sys';
-import { mockConfig } from '@stencil/core/testing';
+import { mockConfig, mockLoadConfigInit } from '@stencil/core/testing';
 import { normalizePath } from '@utils';
 import { validateConfig } from '../../compiler/config/validate-config';
 import { validateDevServer } from '../../compiler/config/validate-dev-server';
@@ -25,7 +25,7 @@ describe('request-handler', () => {
   beforeEach(async () => {
     sys = createSystem();
 
-    const validated = validateConfig(mockConfig());
+    const validated = validateConfig(mockConfig(), mockLoadConfigInit());
     const stencilConfig = validated.config;
     stencilConfig.flags.serve = true;
 

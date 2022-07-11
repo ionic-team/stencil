@@ -1,10 +1,10 @@
 // @ts-nocheck
-import { doNotExpectFiles, expectFiles } from '../../../testing/testing-utils';
+import { expectFilesDoNotExist, expectFilesExist } from '../../../testing/testing-utils';
 import { Compiler, Config } from '@stencil/core/compiler';
 import { mockConfig } from '@stencil/core/testing';
 import path from 'path';
 
-xdescribe('outputTarget, www', () => {
+describe.skip('outputTarget, www', () => {
   jest.setTimeout(20000);
   let compiler: Compiler;
   let config: Config;
@@ -34,7 +34,7 @@ xdescribe('outputTarget, www', () => {
     const r = await compiler.build();
     expect(r.diagnostics).toHaveLength(0);
 
-    expectFiles(compiler.fs, [
+    expectFilesExist(compiler.fs, [
       path.join(root, 'User', 'testing', 'www'),
       path.join(root, 'User', 'testing', 'www', 'build'),
       path.join(root, 'User', 'testing', 'www', 'build', 'app.js'),
@@ -48,7 +48,7 @@ xdescribe('outputTarget, www', () => {
       path.join(root, 'User', 'testing', 'src', 'components.d.ts'),
     ]);
 
-    doNotExpectFiles(compiler.fs, [
+    expectFilesDoNotExist(compiler.fs, [
       path.join(root, 'User', 'testing', 'src', 'components', 'cmp-a.js'),
 
       path.join(root, 'User', 'testing', 'dist', '/'),

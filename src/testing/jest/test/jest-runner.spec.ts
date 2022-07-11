@@ -1,4 +1,5 @@
 import type * as d from '@stencil/core/declarations';
+import { ConfigFlags } from '../../../cli/config-flags';
 import { getEmulateConfigs, includeTestFile } from '../jest-runner';
 
 describe('jest-runner', () => {
@@ -74,7 +75,7 @@ describe('jest-runner', () => {
     const testing: d.TestingConfig = {
       emulate: [{ device: 'anDroiD' }, { device: 'iphone' }],
     };
-    const flags: d.ConfigFlags = {
+    const flags: ConfigFlags = {
       emulate: 'Android',
     };
     const emulateConfigs = getEmulateConfigs(testing, flags);
@@ -86,7 +87,7 @@ describe('jest-runner', () => {
     const testing: d.TestingConfig = {
       emulate: [{ userAgent: 'Mozilla/Android' }, { userAgent: 'SomeUserAgent/iPhone X' }],
     };
-    const flags: d.ConfigFlags = {
+    const flags: ConfigFlags = {
       emulate: 'android',
     };
     const emulateConfigs = getEmulateConfigs(testing, flags);
@@ -98,7 +99,7 @@ describe('jest-runner', () => {
     const testing: d.TestingConfig = {
       emulate: [{ device: 'android' }, { device: 'iphone' }],
     };
-    const flags: d.ConfigFlags = {};
+    const flags: ConfigFlags = {};
     const emulateConfigs = getEmulateConfigs(testing, flags);
     expect(emulateConfigs).toHaveLength(2);
   });

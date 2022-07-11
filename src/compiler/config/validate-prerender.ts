@@ -2,8 +2,12 @@ import type * as d from '../../declarations';
 import { buildError, isString, normalizePath } from '@utils';
 import { isAbsolute, join } from 'path';
 
-export const validatePrerender = (config: d.Config, diagnostics: d.Diagnostic[], outputTarget: d.OutputTargetWww) => {
-  if (!config.flags || (!config.flags.ssr && !config.flags.prerender && config.flags.task !== 'prerender')) {
+export const validatePrerender = (
+  config: d.ValidatedConfig,
+  diagnostics: d.Diagnostic[],
+  outputTarget: d.OutputTargetWww
+) => {
+  if (!config.flags.ssr && !config.flags.prerender && config.flags.task !== 'prerender') {
     return;
   }
 
