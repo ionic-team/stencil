@@ -121,7 +121,9 @@ export const runTask = async (
   task: d.TaskCommand,
   sys?: d.CompilerSystem
 ) => {
+  const logger = config.logger ?? createLogger();
   const strictConfig: ValidatedConfig = { ...config, flags: createConfigFlags(config.flags ?? { task }), logger };
+
   strictConfig.outputTargets = strictConfig.outputTargets || [];
 
   switch (task) {
