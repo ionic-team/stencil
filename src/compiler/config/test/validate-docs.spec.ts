@@ -10,7 +10,7 @@ describe('validateDocs', () => {
   });
 
   it('readme docs dir', () => {
-    userConfig.flags = { ...(userConfig.flags ?? {}), docs: true };
+    userConfig.flags.docs = true;
     userConfig.outputTargets = [
       {
         type: 'docs-readme',

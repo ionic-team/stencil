@@ -1,5 +1,6 @@
 import type * as d from '@stencil/core/declarations';
 import { mockLogger, mockCompilerSystem, mockLoadConfigInit } from '@stencil/core/testing';
+import { createConfigFlags } from '../../../cli/config-flags';
 import { isWatchIgnorePath } from '../../fs-watch/fs-watch-rebuild';
 import { DOCS_JSON, DOCS_CUSTOM, DOCS_README, DOCS_VSCODE } from '../../output-targets/output-utils';
 import { validateConfig } from '../validate-config';
@@ -28,26 +29,26 @@ describe('validation', () => {
     });
 
     it('serializes a provided "flags" object', () => {
-      userConfig.flags = { dev: false };
+      userConfig.flags = createConfigFlags({ dev: false });
       const { config } = validateConfig(userConfig, bootstrapConfig);
-      expect(config.flags).toEqual({ dev: false });
+      expect(config.flags).toEqual(createConfigFlags({ dev: false }));
     });
 
     describe('devMode', () => {
       it('defaults "devMode" to false when "flag.prod" is truthy', () => {
-        userConfig.flags = { prod: true };
+        userConfig.flags = createConfigFlags({ prod: true });
         const { config } = validateConfig(userConfig, bootstrapConfig);
         expect(config.devMode).toBe(false);
       });
 
       it('defaults "devMode" to true when "flag.dev" is truthy', () => {
-        userConfig.flags = { dev: true };
+        userConfig.flags = createConfigFlags({ dev: true });
         const { config } = validateConfig(userConfig, bootstrapConfig);
         expect(config.devMode).toBe(true);
       });
 
       it('defaults "devMode" to false when "flag.prod" & "flag.dev" are truthy', () => {
-        userConfig.flags = { dev: true, prod: true };
+        userConfig.flags = createConfigFlags({ dev: true, prod: true });
         const { config } = validateConfig(userConfig, bootstrapConfig);
         expect(config.devMode).toBe(false);
       });
@@ -436,7 +437,7 @@ describe('validation', () => {
 
   describe('buildDist', () => {
     it.each([true, false])('should set the field based on the config flag (%p)', (flag) => {
-      userConfig.flags = { esm: flag };
+      userConfig.flags = createConfigFlags({ esm: flag });
       const { config } = validateConfig(userConfig, bootstrapConfig);
       expect(config.buildDist).toBe(flag);
     });
