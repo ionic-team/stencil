@@ -1,3 +1,14 @@
+## 😊 [2.17.1](https://github.com/ionic-team/stencil/compare/v2.17.0...v2.17.1) (2022-07-11)
+
+
+### Bug Fixes
+
+* **cli:** add explicit support for Jest CLI arguments  ([#3444](https://github.com/ionic-team/stencil/issues/3444)) ([700b3a9](https://github.com/ionic-team/stencil/commit/700b3a9e010072db293a385eb90e30afc746cbef))
+* **compiler:** handle null window.location.origin ([#2813](https://github.com/ionic-team/stencil/issues/2813)) ([255cd66](https://github.com/ionic-team/stencil/commit/255cd6619e30e1af738f0690edb9e758871ed950))
+* **styles:** ensure styles are applied before paint ([#3452](https://github.com/ionic-team/stencil/issues/3452)) ([c47cec6](https://github.com/ionic-team/stencil/commit/c47cec6581d4409e8261b3516b78532b5c49d079))
+
+
+
 # 🚂 [2.17.0](https://github.com/ionic-team/stencil/compare/v2.16.1...v2.17.0) (2022-06-21)
 
 
