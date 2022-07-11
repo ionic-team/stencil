@@ -118,10 +118,10 @@ export class MockUIEvent extends MockEvent {
   detail: number | null = null;
   view: MockWindow | null = null;
 
-  constructor(type: string, focusEventInitDic?: UIEventInit) {
+  constructor(type: string, uiEventInitDic?: UIEventInit) {
     super(type);
 
-    if (focusEventInitDic != null) {
+    if (uiEventInitDic != null) {
       Object.assign(this, focusEventInitDic);
     }
   }
