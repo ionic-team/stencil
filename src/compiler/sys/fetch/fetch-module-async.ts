@@ -1,11 +1,12 @@
 import type * as d from '../../../declarations';
+import { InMemoryFileSystem } from '../in-memory-fs';
 import { known404Urls, httpFetch } from './fetch-utils';
 import { skipFilePathFetch, skipUrlFetch } from './fetch-utils';
 import { writeFetchSuccessAsync } from './write-fetch-success';
 
 export const fetchModuleAsync = async (
   sys: d.CompilerSystem,
-  inMemoryFs: d.InMemoryFileSystem,
+  inMemoryFs: InMemoryFileSystem,
   pkgVersions: Map<string, string>,
   url: string,
   filePath: string

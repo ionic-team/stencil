@@ -2,6 +2,7 @@ import type * as d from '../../declarations';
 import { dirname, join, relative, resolve } from 'path';
 import { isOutputTargetDistTypes } from '../output-targets/output-utils';
 import { normalizePath } from '@utils';
+import { FsWriteResults } from '@stencil/core/compiler';
 
 /**
  * Update a type declaration file's import declarations using the module `@stencil/core`
@@ -114,7 +115,7 @@ const updateTypeName = (currentTypeName: string, typeAlias: d.TypesMemberNameDat
 export const copyStencilCoreDts = async (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx
-): Promise<ReadonlyArray<d.FsWriteResults>> => {
+): Promise<ReadonlyArray<FsWriteResults>> => {
   const typesOutputTargets = config.outputTargets.filter(isOutputTargetDistTypes).filter((o) => o.typesDir);
 
   const srcStencilDtsPath = join(config.sys.getCompilerExecutingPath(), '..', '..', 'internal', CORE_DTS);

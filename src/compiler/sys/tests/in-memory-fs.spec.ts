@@ -1,17 +1,17 @@
-import type * as d from '../../../declarations';
 import { createTestingSystem } from '../../../testing/testing-sys';
 import { getCommitInstructions, createInMemoryFs, shouldIgnore, InMemoryFileSystem } from '../in-memory-fs';
 import { normalizePath } from '../../../utils';
+import { FsItems, FsItem } from '../in-memory-fs';
 
 describe(`in-memory-fs, getCommitInstructions`, () => {
-  let items: d.FsItems;
+  let items: FsItems;
 
   beforeEach(() => {
     items = new Map();
   });
 
-  function fsItem(item: any): d.FsItem {
-    const defaultItem: d.FsItem = {
+  function fsItem(item: any): FsItem {
+    const defaultItem: FsItem = {
       exists: null,
       fileText: null,
       size: null,

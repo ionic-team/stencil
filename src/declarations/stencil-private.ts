@@ -2,7 +2,6 @@ import { BuildResultsComponentGraph } from '.';
 import type {
   BuildEvents,
   BuildLog,
-  BuildOutput,
   CompilerBuildResults,
   CompilerBuildStart,
   CompilerFsStats,
@@ -13,7 +12,6 @@ import type {
   DevServerConfig,
   DevServerEditor,
   Diagnostic,
-  FsWriteOptions,
   Logger,
   LoggerTimeSpan,
   OptimizeCssInput,
@@ -33,6 +31,7 @@ import type {
   VNode,
   VNodeData,
 } from './stencil-public-runtime';
+import type { InMemoryFileSystem } from '../compiler/sys/in-memory-fs';
 
 export interface SourceMap {
   file: string;

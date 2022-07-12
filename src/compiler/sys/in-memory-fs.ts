@@ -96,9 +96,8 @@ export interface FsReadOptions {
 
 /**
  * Options supported by the readdir option on the in-memory filesystem.
- *
  */
-export interface FsReaddirOptions {
+interface FsReaddirOptions {
   inMemoryOnly?: boolean;
   recursive?: boolean;
   /**
@@ -116,7 +115,7 @@ export interface FsReaddirOptions {
   excludeExtensions?: string[];
 }
 
-export interface FsReaddirItem {
+interface FsReaddirItem {
   absPath: string;
   relPath: string;
   isDirectory: boolean;
@@ -157,56 +156,22 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
   const items: FsItems = new Map();
   const outputTargetTypes = new Map<string, string>();
 
-  const accessData = async (
-    filePath: string
-  ): Promise<{
-    exists: boolean;
-    isDirectory: boolean;
-    isFile: boolean;
-  }> => {
-    const item = getItem(filePath);
-    if (typeof item.exists === 'boolean') {
-      return {
-        exists: item.exists,
-        isDirectory: item.isDirectory,
-        isFile: item.isFile,
-      };
-    }
-
-    const data = {
-      exists: false,
-      isDirectory: false,
-      isFile: false,
-    };
-
-    const s = await stat(filePath);
-    if (s) {
-      item.exists = s.exists;
-      item.isDirectory = s.isDirectory;
-      item.isFile = s.isFile;
-
-      data.exists = item.exists;
-      data.isDirectory = item.isDirectory;
-      data.isFile = item.isFile;
-    } else {
-      item.exists = false;
-    }
-
-    return data;
-  };
-
   /**
-   * Get information about a file from a provided path. This function will
-   * attempt to use the in-memory cache before performing a blocking read.
-   * In the event of a cache hit, the content from the cache will be returned
-   * and skip the read.
+   * Check if a file exists at a provided path. This function will attempt to
+   * use the in-memory cache before performing a blocking read. In the event of
+   * a cache hit, the content from the cache will be returned and the read skipped.
    *
    * @param filePath the path to the file to read
    * @returns `true` if the file exists, `false` otherwise
    */
   const access = async (filePath: string): Promise<boolean> => {
-    const data = await accessData(filePath);
-    return data.exists;
+    const item = getItem(filePath);
+
+    if (typeof item.exists !== 'boolean') {
+      const stats = await stat(filePath);
+      return stats.exists;
+    }
+    return item.exists;
   };
 
   /**
@@ -226,10 +191,8 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
   const accessSync = (filePath: string): boolean => {
     const item = getItem(filePath);
     if (typeof item.exists !== 'boolean') {
-      const s = statSync(filePath);
-      item.exists = s.exists;
-      item.isDirectory = s.isDirectory;
-      item.isFile = s.isFile;
+      const stats = statSync(filePath);
+      return stats.exists;
     }
     return item.exists;
   };
@@ -248,7 +211,7 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
     item.queueCopyFileToDest = dest;
   };
 
-  const emptyDirs = async (dirs: string[]) => {
+  const emptyDirs = async (dirs: string[]): Promise<void> => {
     dirs = dirs
       .filter(isString)
       .map(normalizePath)
@@ -289,7 +252,14 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
     });
   };
 
-  const readdir = async (dirPath: string, opts: FsReaddirOptions = {}) => {
+  /**
+   * Get the contents of a directory on the in-memory filesystem
+   *
+   * @param dirPath the path to the directory of interest
+   * @param opts an optional object containg configuration options
+   * @returns a Promise wrapping a list of directory contents
+   */
+  const readdir = async (dirPath: string, opts: FsReaddirOptions = {}): Promise<FsReaddirItem[]> => {
     dirPath = normalizePath(dirPath);
 
     const collectedPaths: FsReaddirItem[] = [];
@@ -302,7 +272,7 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
 
       const inMemoryDirs = dirPath.split('/');
 
-      items.forEach((d, filePath) => {
+      items.forEach((dir, filePath) => {
         if (!filePath.startsWith(dirPath)) {
           return;
         }
@@ -310,12 +280,12 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
         const parts = filePath.split('/');
 
         if (parts.length === inMemoryDirs.length + 1 || (opts.recursive && parts.length > inMemoryDirs.length)) {
-          if (d.exists) {
+          if (dir.exists) {
             const item: FsReaddirItem = {
               absPath: filePath,
               relPath: parts[inMemoryDirs.length],
-              isDirectory: d.isDirectory,
-              isFile: d.isFile,
+              isDirectory: dir.isDirectory,
+              isFile: dir.isFile,
             };
             if (!shouldExcludeFromReaddir(opts, item)) {
               collectedPaths.push(item);
@@ -335,6 +305,16 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
     });
   };
 
+  /**
+   * A directory read function which _always_ reads from the disk and so is
+   * only used internally.
+   *
+   * @param initPath an initial path used for computing relative paths
+   * @param dirPath the path of the directory to look at
+   * @param opts options for read operations
+   * @param collectedPaths an out param to which directory entries will be
+   * added
+   */
   const readDirectory = async (
     initPath: string,
     dirPath: string,
@@ -489,7 +469,7 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
    * until the queued changes are committed. This function handles both files
    * and directories.
    *
-   * @param filePath the path to the item to be deleted
+   * @param itemPath the path to the item to be deleted
    * @returns an empty promise
    */
   const remove = async (itemPath: string): Promise<void> => {
@@ -505,7 +485,7 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
   /**
    * Remove an item form the in-memory FS by marking it to be deleted
    *
-   * @param filePath the path to the item to be deleted
+   * @param dirPath the path to the item to be deleted
    * @returns an empty promise
    */
   const removeDir = async (dirPath: string): Promise<void> => {
@@ -631,6 +611,28 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
     };
   };
 
+  /**
+   * Write a file to the in-memory filesystem. The behavior of this function
+   * can be modified in several ways by passing different parameters in the
+   * options object.
+   *
+   * Supported options and their effects:
+   *
+   * - `useCache`: specify that the cache should be used
+   * - `inMemoryOnly`: only use the in-memory cache and do not write the file
+   *   to disk
+   * - `immediateWrite`: flush the write to disk immediately, skipping the
+   *   in-memory cache
+   *
+   * This function will additionally check before it writes anything to disk
+   * to see if the content to be written is different than what already exists
+   * on disk.
+   *
+   * @param filePath the filePath to write to
+   * @param content what to write!
+   * @param opts an optional object which controls how the file is written
+   * @return a Promise wrapping a write result object
+   */
   const writeFile = async (filePath: string, content: string, opts?: FsWriteOptions): Promise<FsWriteResults> => {
     if (typeof filePath !== 'string') {
       throw new Error(`writeFile, invalid filePath: ${filePath}`);
@@ -723,6 +725,13 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
     return results;
   };
 
+  /**
+   * Write a series of files to the in-memory filesystem
+   *
+   * @param files a data structure mapping filepath -> content
+   * @param opts an optional set of options passed to `writeFile`
+   * @returns a Promise wrapping all write result objects for all the files
+   */
   const writeFiles = (files: { [filePath: string]: string } | Map<string, string>, opts?: FsWriteOptions) => {
     const writes: Promise<FsWriteResults>[] = [];
 
@@ -747,6 +756,7 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
    * method takes all of the deferred FS actions and commits them to the FS,
    * writing and copying files, creating directories, etc.
    *
+   * @returns a Promise wrapping a summary of what was done
    */
   const commit = async (): Promise<FsCommitResults> => {
     const instructions = getCommitInstructions(items);
@@ -803,7 +813,19 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
     await commitEnsureDirs(allDirs, inMemoryOnly);
   };
 
-  const commitEnsureDirs = async (dirsToEnsure: string[], inMemoryOnly: boolean) => {
+  /**
+   * Ensure that a series of directories are created.
+   *
+   * If `inMemoryOnly` is true this wil not touch the disk but will only
+   * modify the in-memory filesystem cache. Otherwise it will create directories
+   * in the real FS.
+   *
+   * @param dirsToEnsure directories we want to ensure exist
+   * @param inMemoryOnly whether directory creation should be confined to the
+   * in-memory cache
+   * @returns a Promise wrapping a list of directories created
+   */
+  const commitEnsureDirs = async (dirsToEnsure: string[], inMemoryOnly: boolean): Promise<string[]> => {
     const dirsAdded: string[] = [];
 
     for (const dirPath of dirsToEnsure) {
@@ -1004,7 +1026,6 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
   return {
     access,
     accessSync,
-    accessData,
     cancelDeleteDirectoriesFromDisk,
     cancelDeleteFilesFromDisk,
     clearCache,
@@ -1213,7 +1234,7 @@ export const getCommitInstructions = (items: FsItems): FsCommitInstructions => {
  */
 export const shouldIgnore = (filePath: string): boolean => {
   filePath = filePath.trim().toLowerCase();
-  return IGNORE.some(filePath.endsWith);
+  return IGNORE.some((ignoreFile) => filePath.endsWith(ignoreFile));
 };
 
 /**
