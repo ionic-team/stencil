@@ -211,6 +211,12 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
     item.queueCopyFileToDest = dest;
   };
 
+  /**
+   * Empty a series of directories of their contents
+   *
+   * @param dirs a set of directories to empty
+   * @returns an empty Promise
+   */
   const emptyDirs = async (dirs: string[]): Promise<void> => {
     dirs = dirs
       .filter(isString)
@@ -365,6 +371,13 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
     }
   };
 
+  /**
+   * Check whether a given item should be excluded from readdir results
+   *
+   * @param opts options for fs read operations
+   * @param item the item in question
+   * @returns whether the item should be excluded or not
+   */
   const shouldExcludeFromReaddir = (opts: FsReaddirOptions, item: FsReaddirItem) => {
     if (item.isDirectory) {
       if (Array.isArray(opts.excludeDirNames)) {
@@ -427,12 +440,15 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
    * **Synchronous!!! Do not use!!!**
    * (Only typescript transpiling is allowed to use)
    *
-   * Synchronously read a file from a provided path. This function will attempt to use an in-memory cache before
-   * performing a blocking read in the following circumstances:
+   * Synchronously read a file from a provided path. This function will attempt
+   * to use an in-memory cache before performing a blocking read in the
+   * following circumstances:
+   *
    * - no `opts` are provided
    * - the `useCache` member on `opts` is set to `true`, or is not set
    *
-   * In the event of a cache hit, the content from the cache will be returned and skip the read.
+   * In the event of a cache hit, the content from the cache will be returned
+   * and skip the read.
    *
    * @param filePath the path to the file to read
    * @param opts a configuration to use when reading a file
@@ -790,19 +806,26 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
     };
   };
 
-  const ensureDir = async (p: string, inMemoryOnly: boolean) => {
+  /**
+   * Ensure that a directory exists
+   *
+   * @param path the path to ensure exists
+   * @param inMemoryOnly don't commit any changes to the filesystem, instead
+   * only change the in-memory cache
+   */
+  const ensureDir = async (path: string, inMemoryOnly: boolean) => {
     const allDirs: string[] = [];
 
     while (true) {
-      p = dirname(p);
+      path = dirname(path);
       if (
-        typeof p === 'string' &&
-        p.length > 0 &&
-        p !== '/' &&
-        p.endsWith(':/') === false &&
-        p.endsWith(':\\') === false
+        typeof path === 'string' &&
+        path.length > 0 &&
+        path !== '/' &&
+        path.endsWith(':/') === false &&
+        path.endsWith(':\\') === false
       ) {
-        allDirs.push(p);
+        allDirs.push(path);
       } else {
         break;
       }
@@ -853,9 +876,15 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
     return dirsAdded;
   };
 
-  const commitCopyFiles = (filesToCopy: [string, string][]): Promise<[string, string][]> => {
+  /**
+   * Commit copy file operations to disk
+   *
+   * @param filesToCopy a list of [src, dest] tuples
+   * @returns an array of copied file types
+   */
+  const commitCopyFiles = (filesToCopy: FileCopyTuple[]): Promise<FileCopyTuple[]> => {
     const copiedFiles = Promise.all(
-      filesToCopy.map(async (data): Promise<[string, string]> => {
+      filesToCopy.map(async (data): Promise<FileCopyTuple> => {
         const [src, dest] = data;
         await sys.copyFile(src, dest);
         return [src, dest];
@@ -864,7 +893,14 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
     return copiedFiles;
   };
 
-  const commitWriteFiles = (filesToWrite: string[]) => {
+  /**
+   * Commit file write operations to disk
+   *
+   * @param filesToWrite a list of files to write
+   * @returns a Promise wrapping the files written
+   *
+   */
+  const commitWriteFiles = (filesToWrite: string[]): Promise<string[]> => {
     const writtenFiles = Promise.all(
       filesToWrite.map(async (filePath) => {
         if (typeof filePath !== 'string') {
@@ -876,7 +912,13 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
     return writtenFiles;
   };
 
-  const commitWriteFile = async (filePath: string) => {
+  /**
+   * Commit a file write operation to disk
+   *
+   * @param filePath the filepath to write
+   * @returns a Promise wrapping the written path
+   */
+  const commitWriteFile = async (filePath: string): Promise<string> => {
     const item = getItem(filePath);
 
     if (item.fileText == null) {
@@ -891,7 +933,13 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
     return filePath;
   };
 
-  const commitDeleteFiles = async (filesToDelete: string[]) => {
+  /**
+   * Commit file delete operations to disk
+   *
+   * @param filesToDelete a set of files to delete
+   * @returns a Promise wrapping the set of files deleted
+   */
+  const commitDeleteFiles = async (filesToDelete: string[]): Promise<string[]> => {
     const deletedFiles = await Promise.all(
       filesToDelete.map(async (filePath) => {
         if (typeof filePath !== 'string') {
@@ -904,7 +952,13 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
     return deletedFiles;
   };
 
-  const commitDeleteDirs = async (dirsToDelete: string[]) => {
+  /**
+   * Commit directory delete operations to disk
+   *
+   * @param dirsToDelete a set of directories to delete
+   * @returns a Promise wrapping the set of directories deleted
+   */
+  const commitDeleteDirs = async (dirsToDelete: string[]): Promise<string[]> => {
     const dirsDeleted: string[] = [];
 
     for (const dirPath of dirsToDelete) {
@@ -915,6 +969,11 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
     return dirsDeleted;
   };
 
+  /**
+   * Clear all items within a given dir from the in-memory FS cache
+   *
+   * @param dirPath the path for the item to remove
+   */
   const clearDirCache = (dirPath: string) => {
     dirPath = normalizePath(dirPath);
 
@@ -926,6 +985,12 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
     });
   };
 
+  /**
+   * Remove an item from the in-memory FS cache, checking first that it is
+   * not currently queued for a write operation.
+   *
+   * @param filePath the path for the item to remove
+   */
   const clearFileCache = (filePath: string) => {
     filePath = normalizePath(filePath);
     const item = items.get(filePath);
