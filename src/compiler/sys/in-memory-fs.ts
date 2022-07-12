@@ -54,8 +54,17 @@ export interface FsItem {
   useCache: boolean;
 }
 
+/**
+ * Storage format for the in-memory cache used to proxy the OS filesystem.
+ *
+ * Filesystem paths (of type `string`) are mapped to objects satisfying the
+ * `FsItem` interface.
+ */
 export type FsItems = Map<string, FsItem>;
 
+/**
+ * Options supported by write methods on the in-memory filesystem.
+ */
 export interface FsWriteOptions {
   inMemoryOnly?: boolean;
   clearFileCache?: boolean;
@@ -64,6 +73,9 @@ export interface FsWriteOptions {
   outputTargetType?: string;
 }
 
+/**
+ * Results from a write operation on the in-memory filesystem.
+ */
 export interface FsWriteResults {
   changedContent: boolean;
   queuedWrite: boolean;
@@ -71,19 +83,23 @@ export interface FsWriteResults {
 }
 
 /**
- * Options for in-memory FS methods dealing with reading files
+ * Options supported by read methods on the in-memory filesystem.
  */
 export interface FsReadOptions {
   useCache?: boolean;
   setHash?: boolean;
 }
 
+/**
+ * Options supported by the readdir option on the in-memory filesystem.
+ *
+ */
 export interface FsReaddirOptions {
   inMemoryOnly?: boolean;
   recursive?: boolean;
   /**
    * Directory names to exclude. Just the basename,
-   * not the entire path. Basically for "node_moduels".
+   * not the entire path. Basically for "node_modules".
    */
   excludeDirNames?: string[];
   /**
@@ -104,7 +120,7 @@ export interface FsReaddirItem {
 }
 
 /**
- * TODO descriptions
+ * Information about a file in the in-memory filesystem.
  */
 interface FsStat {
   exists: boolean;
@@ -130,7 +146,10 @@ interface FsStat {
  * @returns an in-memory filesystem interface
  */
 export const createInMemoryFs = (sys: d.CompilerSystem) => {
-  // This map holds the nodes in the in-memory filesystem
+  /**
+   * Map to hold the items in the in-memory cache which proxies the underlying
+   * OS filesystem.
+   */
   const items: FsItems = new Map();
   const outputTargetTypes = new Map<string, string>();
 
@@ -174,7 +193,7 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
 
   /**
    * Get information about a file from a provided path. This function will
-   * attempt to use an in-memory cache before performing a blocking read.
+   * attempt to use the in-memory cache before performing a blocking read.
    * In the event of a cache hit, the content from the cache will be returned
    * and skip the read.
    *
