@@ -2361,14 +2361,6 @@ export interface FsStats {
   birthtime: Date;
 }
 
-export interface FsWriteOptions {
-  inMemoryOnly?: boolean;
-  clearFileCache?: boolean;
-  immediateWrite?: boolean;
-  useCache?: boolean;
-  outputTargetType?: string;
-}
-
 export interface Compiler {
   build(): Promise<CompilerBuildResults>;
   createWatcher(): Promise<CompilerWatcher>;
