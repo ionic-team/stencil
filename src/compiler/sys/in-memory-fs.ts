@@ -3,7 +3,7 @@ import { basename, dirname, relative } from 'path';
 import { isIterable, normalizePath, isString } from '@utils';
 
 /**
- * An in-memory FS which proxies the underlying OS filesystem using an
+ * An in-memory FS which proxies the underlying OS filesystem using a simple
  * in-memory cache. FS writes can accumulate on the in-memory system, using an
  * API similar to Node.js' `"fs"` module, and then be committed to disk as a
  * unit.
@@ -70,6 +70,10 @@ export interface FsWriteOptions {
   clearFileCache?: boolean;
   immediateWrite?: boolean;
   useCache?: boolean;
+  /**
+   * An optional tag for the current output target for which this file is being
+   * written.
+   */
   outputTargetType?: string;
 }
 
@@ -735,7 +739,16 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
     return Promise.all(writes);
   };
 
-  const commit = async () => {
+  /**
+   * Commit all pending FS operations to disk
+   *
+   * FS operations like writes, copies, and deletes which are done to the
+   * in-memory FS are deferred and only recorded in the in-memory cache. This
+   * method takes all of the deferred FS actions and commits them to the FS,
+   * writing and copying files, creating directories, etc.
+   *
+   */
+  const commit = async (): Promise<FsCommitResults> => {
     const instructions = getCommitInstructions(items);
 
     // ensure directories we need exist
@@ -818,11 +831,10 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
     return dirsAdded;
   };
 
-  const commitCopyFiles = (filesToCopy: string[][]) => {
+  const commitCopyFiles = (filesToCopy: [string, string][]): Promise<[string, string][]> => {
     const copiedFiles = Promise.all(
-      filesToCopy.map(async (data) => {
-        const src = data[0];
-        const dest = data[1];
+      filesToCopy.map(async (data): Promise<[string, string]> => {
+        const [src, dest] = data;
         await sys.copyFile(src, dest);
         return [src, dest];
       })
@@ -919,8 +931,13 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
   };
 
   /**
-   * description
+   * Getter method for the in-memory FS cache / proxy.
    *
+   * This will return an item if found or, if it's not present in the cache,
+   * will create an 'empty' filesystem item and set it in the cache.
+   *
+   * @param itemPath the filepath for the item in question
+   * @returns an object with information about the item in question
    */
   const getItem = (itemPath: string): FsItem => {
     itemPath = normalizePath(itemPath);
@@ -1012,13 +1029,55 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
   };
 };
 
-export const getCommitInstructions = (items: FsItems) => {
-  const instructions = {
-    filesToDelete: [] as string[],
-    filesToWrite: [] as string[],
-    filesToCopy: [] as string[][],
-    dirsToDelete: [] as string[],
-    dirsToEnsure: [] as string[],
+/**
+ * The information needed to carry out a file copy operation.
+ *
+ * `[ source, destination ]`
+ */
+type FileCopyTuple = [string, string];
+
+/**
+ * Collected instructions for all pending filesystem operations saved
+ * to the in-memory filesystem.
+ */
+interface FsCommitInstructions {
+  filesToDelete: string[];
+  filesToWrite: string[];
+  /**
+   * Files queued for copy operations are stored as an array of `[source, dest]`
+   * tuples.
+   */
+  filesToCopy: FileCopyTuple[];
+  dirsToDelete: string[];
+  dirsToEnsure: string[];
+}
+
+/**
+ * Results from commiting pending filesystem operations
+ */
+interface FsCommitResults {
+  filesCopied: FileCopyTuple[];
+  filesWritten: string[];
+  filesDeleted: string[];
+  dirsDeleted: string[];
+  dirsAdded: string[];
+}
+
+/**
+ * Given the current state of the in-memory proxy filesystem, collect all of
+ * the changes that need to be made in order to commit the currently-pending
+ * operations (e.g. write, copy, delete) to the OS filesystem.
+ *
+ * @param items the storage data structure for the in-memory FS cache
+ * @returns a collection of all the operations that need to be done
+ */
+export const getCommitInstructions = (items: FsItems): FsCommitInstructions => {
+  const instructions: FsCommitInstructions = {
+    filesToDelete: [],
+    filesToWrite: [],
+    filesToCopy: [],
+    dirsToDelete: [],
+    dirsToEnsure: [],
   };
 
   items.forEach((item, itemPath) => {
@@ -1154,7 +1213,10 @@ export const getCommitInstructions = (items: FsItems) => {
  */
 export const shouldIgnore = (filePath: string): boolean => {
   filePath = filePath.trim().toLowerCase();
-  return IGNORE.some((ignoreFile) => filePath.endsWith(ignoreFile));
+  return IGNORE.some(filePath.endsWith);
 };
 
+/**
+ * Ignore list for files which we don't want to write.
+ */
 const IGNORE = ['.ds_store', '.gitignore', 'desktop.ini', 'thumbs.db'];
