@@ -1,4 +1,4 @@
-import type { Config } from '../declarations';
+import type { Config, ValidatedConfig } from '../declarations';
 import type { CoreCompiler } from './load-compiler';
 import { IS_NODE_ENV } from '../compiler/sys/environment';
 import { validateComponentTag } from '@utils';
@@ -13,7 +13,7 @@ import { validateComponentTag } from '@utils';
  * mainly accessing the `path` module
  * @param config the user-supplied config, which we need here to access `.sys`.
  */
-export const taskGenerate = async (coreCompiler: CoreCompiler, config: Config): Promise<void> => {
+export const taskGenerate = async (coreCompiler: CoreCompiler, config: ValidatedConfig): Promise<void> => {
   if (!IS_NODE_ENV) {
     config.logger.error(`"generate" command is currently only implemented for a NodeJS environment`);
     return config.sys.exit(1);

@@ -1,4 +1,14 @@
-import type { BuildCtx, Cache, CompilerCtx, CompilerSystem, Config, Module } from '@stencil/core/internal';
+import type {
+  BuildCtx,
+  Cache,
+  CompilerCtx,
+  CompilerSystem,
+  Config,
+  LoadConfigInit,
+  ValidatedConfig,
+  Module,
+  UnvalidatedConfig,
+} from '@stencil/core/internal';
 import { BuildContext } from '../compiler/build/build-ctx';
 import { Cache as CompilerCache } from '../compiler/cache';
 import { createInMemoryFs } from '../compiler/sys/in-memory-fs';
@@ -9,8 +19,30 @@ import { TestingLogger } from './testing-logger';
 import path from 'path';
 import { noop } from '@utils';
 import { buildEvents } from '../compiler/events';
+import { createConfigFlags } from '../cli/config-flags';
 
-export function mockConfig(sys?: CompilerSystem) {
+// TODO(STENCIL-486): Update `mockValidatedConfig` to accept any property found on `ValidatedConfig`
+/**
+ * Creates a mock instance of an internal, validated Stencil configuration object
+ * @param sys an optional compiler system to associate with the config. If one is not provided, one will be created for
+ * the caller
+ * @returns the mock Stencil configuration
+ */
+export function mockValidatedConfig(sys?: CompilerSystem): ValidatedConfig {
+  const baseConfig = mockConfig(sys);
+
+  return { ...baseConfig, flags: createConfigFlags(), logger: mockLogger() };
+}
+
+// TODO(STENCIL-486): Update `mockConfig` to accept any property found on `UnvalidatedConfig`
+/**
+ * Creates a mock instance of a Stencil configuration entity. The mocked configuration has no guarantees around the
+ * types/validity of its data.
+ * @param sys an optional compiler system to associate with the config. If one is not provided, one will be created for
+ * the caller
+ * @returns the mock Stencil configuration
+ */
+export function mockConfig(sys?: CompilerSystem): UnvalidatedConfig {
   const rootDir = path.resolve('/');
 
   if (!sys) {
@@ -18,7 +50,7 @@ export function mockConfig(sys?: CompilerSystem) {
   }
   sys.getCurrentDirectory = () => rootDir;
 
-  const config: Config = {
+  return {
     _isTesting: true,
 
     namespace: 'Testing',
@@ -28,7 +60,7 @@ export function mockConfig(sys?: CompilerSystem) {
     enableCache: false,
     buildAppCore: false,
     buildDist: true,
-    flags: {},
+    flags: createConfigFlags(),
     bundles: null,
     outputTargets: null,
     buildEs5: false,
@@ -50,9 +82,29 @@ export function mockConfig(sys?: CompilerSystem) {
       after: [],
     },
   };
-
-  return config;
 }
+
+/**
+ * Creates a configuration object used to bootstrap a Stencil task invocation
+ *
+ * Several fields are intentionally undefined for this entity. While it would be trivial to stub them out, this mock
+ * generation function operates under the assumption that entities like loggers and compiler system abstractions will
+ * be shared by multiple entities in a test suite, who should provide those entities to this function
+ *
+ * @param overrides the properties on the default entity to manually override
+ * @returns the default configuration initialization object, with any overrides applied
+ */
+export const mockLoadConfigInit = (overrides?: Partial<LoadConfigInit>): LoadConfigInit => {
+  const defaults: LoadConfigInit = {
+    config: {},
+    configPath: undefined,
+    initTsConfig: true,
+    logger: undefined,
+    sys: undefined,
+  };
+
+  return { ...defaults, ...overrides };
+};
 
 export function mockCompilerCtx(config?: Config) {
   if (!config) {

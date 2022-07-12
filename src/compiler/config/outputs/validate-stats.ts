@@ -2,7 +2,7 @@ import type * as d from '../../../declarations';
 import { isAbsolute, join } from 'path';
 import { STATS, isOutputTargetStats } from '../../output-targets/output-utils';
 
-export const validateStats = (userConfig: d.Config, userOutputs: d.OutputTarget[]) => {
+export const validateStats = (userConfig: d.ValidatedConfig, userOutputs: d.OutputTarget[]) => {
   const outputTargets: d.OutputTargetStats[] = [];
 
   if (userConfig.flags.stats) {

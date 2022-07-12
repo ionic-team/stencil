@@ -8,6 +8,9 @@ describe('optimizeCss', () => {
   let config: d.Config;
   let compilerCtx: d.CompilerCtx;
   let diagnostics: d.Diagnostic[];
+
+  // TODO(STENCIL-307): Remove usage of the Jasmine global
+  // eslint-disable-next-line jest/no-jasmine-globals -- these will be removed when we migrate to jest-circus
   jasmine.DEFAULT_TIMEOUT_INTERVAL = 30000;
 
   beforeEach(() => {
@@ -215,69 +218,6 @@ describe('optimizeCss', () => {
     expect(diagnostics).toHaveLength(0);
     expect(output).toBe(`h1{width:calc(10px -  ( 100px / var(--test)  ))}`);
   });
-
-  it('normalize-whitespace', async () => {
-    config.minifyCss = true;
-    const styleText = `
-      h1 {
-        width: calc(10px -  ( 100px / var(--test)  )) ;
-      }
-    `;
-    const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null);
-
-    expect(diagnostics).toHaveLength(0);
-    expect(output).toBe(`h1{width:calc(10px -  ( 100px / var(--test)  ))}`);
-  });
-
-  // it('discard-duplicates', async () => {
-  //   config.minifyCss = true;
-  //   const styleText = `
-  //     h1 {
-  //       margin: 0 auto;
-  //       margin: 0 auto
-  //     }
-  //     h1 {
-  //       margin: 0 auto;
-  //     }
-  //   `;
-  //   const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null);
-
-  //   expect(diagnostics).toHaveLength(0);
-  //   expect(output).toBe(`h1{margin:0 auto}`);
-  // });
-
-  // it('merge-rules', async () => {
-  //   config.minifyCss = true;
-  //   const styleText = `
-  //     a {
-  //       color: red;
-  //       font-weight: bold
-  //     }
-  //     p {
-  //       color: red;
-  //       font-weight: bold
-  //     }
-  //   `;
-  //   const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null);
-
-  //   expect(diagnostics).toHaveLength(0);
-  //   expect(output).toBe(`a,p{color:red;font-weight:700}`);
-  // });
-
-  // it('discard-empty', async () => {
-  //   config.minifyCss = true;
-  //   const styleText = `
-  //     @font-face;
-  //     h1 {}
-  //     {color:blue}
-  //     h3 {color:red}
-  //     h2 {color:}
-  //   `;
-  //   const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null);
-
-  //   expect(diagnostics).toHaveLength(0);
-  //   expect(output).toBe(`h3{color:red}`);
-  // });
 
   it('unique-selectors', async () => {
     config.minifyCss = true;

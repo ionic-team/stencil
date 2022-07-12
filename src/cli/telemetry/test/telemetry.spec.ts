@@ -2,21 +2,22 @@ import type * as d from '../../../declarations';
 import * as telemetry from '../telemetry';
 import * as shouldTrack from '../shouldTrack';
 import { createSystem } from '../../../compiler/sys/stencil-sys';
-import { mockLogger } from '@stencil/core/testing';
+import { mockLogger, mockValidatedConfig } from '@stencil/core/testing';
 import * as coreCompiler from '@stencil/core/compiler';
 import { anonymizeConfigForTelemetry } from '../telemetry';
 import { DIST, DIST_CUSTOM_ELEMENTS, DIST_HYDRATE_SCRIPT, WWW } from '../../../compiler/output-targets/output-utils';
+import { createConfigFlags } from '../../../cli/config-flags';
 
 describe('telemetryBuildFinishedAction', () => {
-  const config: d.Config = {
-    outputTargets: [],
-    flags: {
-      args: [],
-    },
-  };
+  let config: d.ValidatedConfig;
+  let sys: d.CompilerSystem;
 
-  const logger = mockLogger();
-  const sys = createSystem();
+  beforeEach(() => {
+    sys = createSystem();
+    config = mockValidatedConfig(sys);
+    config.outputTargets = [];
+    config.flags.args = [];
+  });
 
   it('issues a network request when complete', async () => {
     const spyShouldTrack = jest.spyOn(shouldTrack, 'shouldTrack');
@@ -31,7 +32,7 @@ describe('telemetryBuildFinishedAction', () => {
       duration: 100,
     } as d.CompilerBuildResults;
 
-    await telemetry.telemetryBuildFinishedAction(sys, config, logger, coreCompiler, results);
+    await telemetry.telemetryBuildFinishedAction(sys, config, coreCompiler, results);
     expect(spyShouldTrack).toHaveBeenCalled();
 
     spyShouldTrack.mockRestore();
@@ -39,14 +40,15 @@ describe('telemetryBuildFinishedAction', () => {
 });
 
 describe('telemetryAction', () => {
-  const config = {
-    outputTargets: [],
-    flags: {
-      args: [],
-    },
-  } as d.Config;
-  const logger = mockLogger();
-  const sys = createSystem();
+  let config: d.ValidatedConfig;
+  let sys: d.CompilerSystem;
+
+  beforeEach(() => {
+    sys = createSystem();
+    config = mockValidatedConfig(sys);
+    config.outputTargets = [];
+    config.flags.args = [];
+  });
 
   it('issues a network request when no async function is passed', async () => {
     const spyShouldTrack = jest.spyOn(shouldTrack, 'shouldTrack');
@@ -56,7 +58,7 @@ describe('telemetryAction', () => {
       })
     );
 
-    await telemetry.telemetryAction(sys, config, logger, coreCompiler, () => {});
+    await telemetry.telemetryAction(sys, config, coreCompiler, () => {});
     expect(spyShouldTrack).toHaveBeenCalled();
 
     spyShouldTrack.mockRestore();
@@ -70,7 +72,7 @@ describe('telemetryAction', () => {
       })
     );
 
-    await telemetry.telemetryAction(sys, config, logger, coreCompiler, async () => {
+    await telemetry.telemetryAction(sys, config, coreCompiler, async () => {
       new Promise((resolve) => {
         setTimeout(() => {
           resolve(true);
@@ -132,13 +134,18 @@ describe('hasAppTarget', () => {
 });
 
 describe('prepareData', () => {
-  const config = {
-    flags: {
-      args: [],
-    },
-    outputTargets: [],
-  } as d.Config;
-  const sys = createSystem();
+  let config: d.ValidatedConfig;
+  let sys: d.CompilerSystem;
+
+  beforeEach(() => {
+    config = {
+      outputTargets: [],
+      flags: createConfigFlags(),
+      logger: mockLogger(),
+    };
+
+    sys = createSystem();
+  });
 
   it('provides an object', async () => {
     const data = await telemetry.prepareData(coreCompiler, config, sys, 1000);
@@ -147,9 +154,7 @@ describe('prepareData', () => {
       build: coreCompiler.buildId,
       component_count: undefined,
       config: {
-        flags: {
-          args: [],
-        },
+        flags: createConfigFlags(),
         outputTargets: [],
       },
       cpu_model: '',
@@ -164,19 +169,18 @@ describe('prepareData', () => {
       system: 'in-memory __VERSION:STENCIL__',
       system_major: 'in-memory __VERSION:STENCIL__',
       targets: [],
-      task: undefined,
+      task: null,
       typescript: coreCompiler.versions.typescript,
       yarn: false,
     });
   });
 
   it('updates when there is a PWA config', async () => {
-    const config = {
-      flags: {
-        args: [],
-      },
+    const config: d.ValidatedConfig = {
+      flags: createConfigFlags(),
+      logger: mockLogger(),
       outputTargets: [{ type: 'www', baseUrl: 'https://example.com', serviceWorker: { swDest: './tmp' } }],
-    } as d.Config;
+    };
 
     const data = await telemetry.prepareData(coreCompiler, config, sys, 1000);
 
@@ -187,6 +191,9 @@ describe('prepareData', () => {
       config: {
         flags: {
           args: [],
+          knownArgs: [],
+          task: null,
+          unknownArgs: [],
         },
         outputTargets: [
           {
@@ -210,19 +217,18 @@ describe('prepareData', () => {
       system: 'in-memory __VERSION:STENCIL__',
       system_major: 'in-memory __VERSION:STENCIL__',
       targets: ['www'],
-      task: undefined,
+      task: null,
       typescript: coreCompiler.versions.typescript,
       yarn: false,
     });
   });
 
   it('updates when there is a component count passed in', async () => {
-    const config = {
-      flags: {
-        args: [],
-      },
+    const config: d.ValidatedConfig = {
+      flags: createConfigFlags(),
+      logger: mockLogger(),
       outputTargets: [{ type: 'www', baseUrl: 'https://example.com', serviceWorker: { swDest: './tmp' } }],
-    } as d.Config;
+    };
 
     const data = await telemetry.prepareData(coreCompiler, config, sys, 1000, 12);
 
@@ -233,6 +239,9 @@ describe('prepareData', () => {
       config: {
         flags: {
           args: [],
+          knownArgs: [],
+          task: null,
+          unknownArgs: [],
         },
         outputTargets: [
           {
@@ -256,7 +265,7 @@ describe('prepareData', () => {
       system: 'in-memory __VERSION:STENCIL__',
       system_major: 'in-memory __VERSION:STENCIL__',
       targets: ['www'],
-      task: undefined,
+      task: null,
       typescript: coreCompiler.versions.typescript,
       yarn: false,
     });
