@@ -122,7 +122,7 @@ export class MockUIEvent extends MockEvent {
     super(type);
 
     if (uiEventInitDic != null) {
-      Object.assign(this, focusEventInitDic);
+      Object.assign(this, uiEventInitDic);
     }
   }
 }

@@ -97,8 +97,9 @@ describe('event', () => {
     }).toThrow();
   });
 
-  it('FocusEvent(type)', () => {
-    const ev = new win.FocusEvent('focus');
+  const focusEventTypes: ('blur' | 'focus')[] = ['blur', 'focus'];
+  it.each(focusEventTypes)('creates a %s-type MockFocusEvent', (focusType) => {
+    const ev = new win.FocusEvent(focusType);
     expect(ev.bubbles).toBe(false);
     expect(ev.cancelBubble).toBe(false);
     expect(ev.cancelable).toBe(false);
@@ -108,17 +109,17 @@ describe('event', () => {
     expect(ev.srcElement).toBe(null);
     expect(ev.target).toBe(null);
     expect(typeof ev.timeStamp).toBe('number');
-    expect(ev.type).toBe('focus');
+    expect(ev.type).toBe(focusType);
     expect(ev.relatedTarget).toBe(null);
   });
 
-  it('FocusEvent(type, eventInitDict)', () => {
-    const eventInitDict = {
+  it('FocusEvent(type, focusEventInitDic)', () => {
+    const focusEventInitDic = {
       bubbles: true,
       composed: true,
       relatedTarget: null as EventTarget | null,
     };
-    const ev = new win.FocusEvent('blur', eventInitDict);
+    const ev = new win.FocusEvent('blur', focusEventInitDic);
     expect(ev.bubbles).toBe(true);
     expect(ev.cancelBubble).toBe(false);
     expect(ev.cancelable).toBe(false);
