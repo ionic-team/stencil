@@ -6,7 +6,7 @@ import { isString, normalizeFsPath, normalizePath } from '@utils';
 import { IS_WEB_WORKER_ENV } from '../environment';
 import { basename, dirname } from 'path';
 import resolve, { SyncOpts } from 'resolve';
-import { InMemoryFileSystem } from '@stencil/core/compiler';
+import { InMemoryFileSystem } from '../in-memory-fs';
 
 export const resolveRemoteModuleIdSync = (
   config: d.Config,

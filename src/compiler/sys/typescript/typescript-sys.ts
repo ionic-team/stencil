@@ -5,7 +5,7 @@ import { fetchUrlSync } from '../fetch/fetch-module-sync';
 import { getCurrentDirectory, IS_CASE_SENSITIVE_FILE_NAMES, IS_WEB_WORKER_ENV } from '../environment';
 import { patchTypeScriptResolveModule } from './typescript-resolve-module';
 import ts from 'typescript';
-import { InMemoryFileSystem } from '@stencil/core/compiler';
+import { InMemoryFileSystem } from '../in-memory-fs';
 
 export const patchTsSystemFileSystem = (
   config: d.Config,
