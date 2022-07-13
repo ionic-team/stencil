@@ -1,11 +1,15 @@
 import type * as d from '../../../declarations';
 import { IS_BROWSER_ENV } from '../environment';
 
-export const createLogger = () => {
+/**
+ * Creates an instance of a logger
+ * @returns the new logger instance
+ */
+export const createLogger = (): d.Logger => {
   let useColors = IS_BROWSER_ENV;
   let level: d.LogLevel = 'info';
 
-  const logger: d.Logger = {
+  return {
     enableColors: (uc) => (useColors = uc),
     getLevel: () => level,
     setLevel: (l) => (level = l),
@@ -32,7 +36,6 @@ export const createLogger = () => {
       diagnostics.forEach((diagnostic) => logDiagnostic(diagnostic, useColors));
     },
   };
-  return logger;
 };
 
 const logDiagnostic = (diagnostic: d.Diagnostic, useColors: boolean) => {

@@ -92,9 +92,8 @@ export const pluck = (obj: { [key: string]: any }, keys: string[]) => {
   }, {} as { [key: string]: any });
 };
 
+const isDefined = (v: any): v is NonNullable<typeof v> => v !== null && v !== undefined;
 export const isBoolean = (v: any): v is boolean => typeof v === 'boolean';
-export const isDefined = (v: any): v is NonNullable<typeof v> => v !== null && v !== undefined;
-export const isUndefined = (v: any): v is null | undefined => v === null || v === undefined;
 export const isFunction = (v: any): v is Function => typeof v === 'function';
 export const isNumber = (v: any): v is number => typeof v === 'number';
 export const isObject = (val: Object): val is Object =>

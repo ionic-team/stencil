@@ -2,8 +2,16 @@ import type * as d from '../../../declarations';
 import { isCommonDirModuleFile, isTsFile, isTsxFile } from '../resolve/resolve-utils';
 import { isFunction, normalizePath } from '@utils';
 
+/**
+ * A fetch wrapper which dispatches to `sys.fetch` if present, and otherwise
+ * uses `global.fetch`.
+ *
+ * @param sys a compiler system object
+ * @param input a `RequestInfo` object
+ * @param init an optional `RequestInit` object
+ * @returns a Promise wrapping a response
+ */
 export const httpFetch = (sys: d.CompilerSystem, input: RequestInfo, init?: RequestInit): Promise<Response> => {
-  console.trace(input);
   if (sys && isFunction(sys.fetch)) {
     return sys.fetch(input, init);
   }
@@ -13,11 +21,16 @@ export const httpFetch = (sys: d.CompilerSystem, input: RequestInfo, init?: Requ
 export const packageVersions = new Map<string, string>();
 export const known404Urls = new Set<string>();
 
-export const getStencilRootUrl = (compilerExe: string) => new URL('../', compilerExe).href;
-
-export const getStencilModuleUrl = (compilerExe: string, p: string) => {
-  p = normalizePath(p);
-  let parts = p.split('/');
+/**
+ * Get the URL for a Stencil module given the path to the compiler
+ *
+ * @param compilerExe the path to the compiler executable
+ * @param path the path to the module or file in question
+ * @returns a URL for the file of interest
+ */
+export const getStencilModuleUrl = (compilerExe: string, path: string): string => {
+  path = normalizePath(path);
+  let parts = path.split('/');
   const nmIndex = parts.lastIndexOf('node_modules');
   if (nmIndex > -1 && nmIndex < parts.length - 1) {
     parts = parts.slice(nmIndex + 1);
@@ -26,13 +39,11 @@ export const getStencilModuleUrl = (compilerExe: string, p: string) => {
     } else {
       parts = parts.slice(1);
     }
-    p = parts.join('/');
+    path = parts.join('/');
   }
-  return new URL('./' + p, getStencilRootUrl(compilerExe)).href;
+  const stencilRootUrl = new URL('../', compilerExe).href;
+  return new URL('./' + path, stencilRootUrl).href;
 };
-
-export const getStencilInternalDtsUrl = (compilerExe: string) =>
-  getStencilModuleUrl(compilerExe, 'internal/index.d.ts');
 
 export const getCommonDirUrl = (
   sys: d.CompilerSystem,

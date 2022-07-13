@@ -2,7 +2,6 @@ import type {
   CompilerBuildResults,
   Compiler,
   CompilerWatcher,
-  Config,
   DevServer,
   E2EProcessEnv,
   ValidatedConfig,
@@ -184,8 +183,16 @@ export const createTesting = async (config: ValidatedConfig): Promise<Testing> =
   };
 };
 
-function setupTestingConfig(config: Config): ValidatedConfig {
-  const validatedConfig: ValidatedConfig = { ...config, flags: { ...config.flags } };
+/**
+ * Create a Stencil configuration for testing purposes.
+ *
+ * This function accepts an internal, validated configuration entity and modifies fields on the object to be more
+ * conducive to testing.
+ *
+ * @param validatedConfig the configuration to modify
+ * @returns the modified testing configuration
+ */
+function setupTestingConfig(validatedConfig: ValidatedConfig): ValidatedConfig {
   validatedConfig.buildEs5 = false;
   validatedConfig.devMode = true;
   validatedConfig.minifyCss = false;

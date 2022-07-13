@@ -2,13 +2,12 @@ import type * as d from '../../declarations';
 import { createLogger } from './logger/console-logger';
 import { createSystem } from './stencil-sys';
 import { setPlatformPath } from '../sys/modules/path';
+import { createConfigFlags } from '../../cli/config-flags';
 
 export const getConfig = (userConfig: d.Config): d.ValidatedConfig => {
-  const config: d.ValidatedConfig = { ...userConfig, flags: { ...(userConfig.flags ?? {}) } };
+  const logger = userConfig.logger ?? createLogger();
+  const config: d.ValidatedConfig = { ...userConfig, flags: createConfigFlags(userConfig.flags ?? {}), logger };
 
-  if (!config.logger) {
-    config.logger = createLogger();
-  }
   if (!config.sys) {
     config.sys = createSystem({ logger: config.logger });
   }

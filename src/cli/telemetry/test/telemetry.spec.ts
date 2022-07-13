@@ -2,10 +2,11 @@ import type * as d from '../../../declarations';
 import * as telemetry from '../telemetry';
 import * as shouldTrack from '../shouldTrack';
 import { createSystem } from '../../../compiler/sys/stencil-sys';
-import { mockValidatedConfig } from '@stencil/core/testing';
+import { mockLogger, mockValidatedConfig } from '@stencil/core/testing';
 import * as coreCompiler from '@stencil/core/compiler';
 import { anonymizeConfigForTelemetry } from '../telemetry';
 import { DIST, DIST_CUSTOM_ELEMENTS, DIST_HYDRATE_SCRIPT, WWW } from '../../../compiler/output-targets/output-utils';
+import { createConfigFlags } from '../../../cli/config-flags';
 
 describe('telemetryBuildFinishedAction', () => {
   let config: d.ValidatedConfig;
@@ -31,7 +32,7 @@ describe('telemetryBuildFinishedAction', () => {
       duration: 100,
     } as d.CompilerBuildResults;
 
-    await telemetry.telemetryBuildFinishedAction(sys, config, config.logger, coreCompiler, results);
+    await telemetry.telemetryBuildFinishedAction(sys, config, coreCompiler, results);
     expect(spyShouldTrack).toHaveBeenCalled();
 
     spyShouldTrack.mockRestore();
@@ -57,7 +58,7 @@ describe('telemetryAction', () => {
       })
     );
 
-    await telemetry.telemetryAction(sys, config, config.logger, coreCompiler, () => {});
+    await telemetry.telemetryAction(sys, config, coreCompiler, () => {});
     expect(spyShouldTrack).toHaveBeenCalled();
 
     spyShouldTrack.mockRestore();
@@ -71,7 +72,7 @@ describe('telemetryAction', () => {
       })
     );
 
-    await telemetry.telemetryAction(sys, config, config.logger, coreCompiler, async () => {
+    await telemetry.telemetryAction(sys, config, coreCompiler, async () => {
       new Promise((resolve) => {
         setTimeout(() => {
           resolve(true);
@@ -139,9 +140,8 @@ describe('prepareData', () => {
   beforeEach(() => {
     config = {
       outputTargets: [],
-      flags: {
-        args: [],
-      },
+      flags: createConfigFlags(),
+      logger: mockLogger(),
     };
 
     sys = createSystem();
@@ -154,9 +154,7 @@ describe('prepareData', () => {
       build: coreCompiler.buildId,
       component_count: undefined,
       config: {
-        flags: {
-          args: [],
-        },
+        flags: createConfigFlags(),
         outputTargets: [],
       },
       cpu_model: '',
@@ -171,7 +169,7 @@ describe('prepareData', () => {
       system: 'in-memory __VERSION:STENCIL__',
       system_major: 'in-memory __VERSION:STENCIL__',
       targets: [],
-      task: undefined,
+      task: null,
       typescript: coreCompiler.versions.typescript,
       yarn: false,
     });
@@ -179,9 +177,8 @@ describe('prepareData', () => {
 
   it('updates when there is a PWA config', async () => {
     const config: d.ValidatedConfig = {
-      flags: {
-        args: [],
-      },
+      flags: createConfigFlags(),
+      logger: mockLogger(),
       outputTargets: [{ type: 'www', baseUrl: 'https://example.com', serviceWorker: { swDest: './tmp' } }],
     };
 
@@ -194,6 +191,9 @@ describe('prepareData', () => {
       config: {
         flags: {
           args: [],
+          knownArgs: [],
+          task: null,
+          unknownArgs: [],
         },
         outputTargets: [
           {
@@ -217,7 +217,7 @@ describe('prepareData', () => {
       system: 'in-memory __VERSION:STENCIL__',
       system_major: 'in-memory __VERSION:STENCIL__',
       targets: ['www'],
-      task: undefined,
+      task: null,
       typescript: coreCompiler.versions.typescript,
       yarn: false,
     });
@@ -225,9 +225,8 @@ describe('prepareData', () => {
 
   it('updates when there is a component count passed in', async () => {
     const config: d.ValidatedConfig = {
-      flags: {
-        args: [],
-      },
+      flags: createConfigFlags(),
+      logger: mockLogger(),
       outputTargets: [{ type: 'www', baseUrl: 'https://example.com', serviceWorker: { swDest: './tmp' } }],
     };
 
@@ -240,6 +239,9 @@ describe('prepareData', () => {
       config: {
         flags: {
           args: [],
+          knownArgs: [],
+          task: null,
+          unknownArgs: [],
         },
         outputTargets: [
           {
@@ -263,7 +265,7 @@ describe('prepareData', () => {
       system: 'in-memory __VERSION:STENCIL__',
       system_major: 'in-memory __VERSION:STENCIL__',
       targets: ['www'],
-      task: undefined,
+      task: null,
       typescript: coreCompiler.versions.typescript,
       yarn: false,
     });

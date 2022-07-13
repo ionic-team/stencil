@@ -10,14 +10,12 @@ import { isOutputTargetHydrate, WWW } from '../../compiler/output-targets/output
  *
  * @param sys The system where the command is invoked
  * @param config The config passed into the Stencil command
- * @param logger The tool used to do logging
  * @param coreCompiler The compiler used to do builds
  * @param result The results of a compiler build.
  */
 export async function telemetryBuildFinishedAction(
   sys: d.CompilerSystem,
   config: d.ValidatedConfig,
-  logger: d.Logger,
   coreCompiler: CoreCompiler,
   result: d.CompilerBuildResults
 ) {
@@ -32,7 +30,8 @@ export async function telemetryBuildFinishedAction(
   const data = await prepareData(coreCompiler, config, sys, result.duration, component_count);
 
   await sendMetric(sys, config, 'stencil_cli_command', data);
-  logger.debug(`${logger.blue('Telemetry')}: ${logger.gray(JSON.stringify(data))}`);
+
+  config.logger.debug(`${config.logger.blue('Telemetry')}: ${config.logger.gray(JSON.stringify(data))}`);
 }
 
 /**
@@ -40,7 +39,6 @@ export async function telemetryBuildFinishedAction(
  *
  * @param sys The system where the command is invoked
  * @param config The config passed into the Stencil command
- * @param logger The tool used to do logging
  * @param coreCompiler The compiler used to do builds
  * @param action A Promise-based function to call in order to get the duration of any given command.
  * @returns void
@@ -48,7 +46,6 @@ export async function telemetryBuildFinishedAction(
 export async function telemetryAction(
   sys: d.CompilerSystem,
   config: d.ValidatedConfig,
-  logger: d.Logger,
   coreCompiler: CoreCompiler,
   action?: d.TelemetryCallback
 ) {
@@ -78,7 +75,7 @@ export async function telemetryAction(
   const data = await prepareData(coreCompiler, config, sys, duration);
 
   await sendMetric(sys, config, 'stencil_cli_command', data);
-  logger.debug(`${logger.blue('Telemetry')}: ${logger.gray(JSON.stringify(data))}`);
+  config.logger.debug(`${config.logger.blue('Telemetry')}: ${config.logger.gray(JSON.stringify(data))}`);
 
   if (error) {
     throw error;

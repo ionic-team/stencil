@@ -1,21 +1,22 @@
 import { isInteractive, tryFn, uuidv4, hasDebug, hasVerbose } from '../helpers';
 import { createSystem } from '../../../compiler/sys/stencil-sys';
+import { createConfigFlags } from '../../config-flags';
 
 describe('hasDebug', () => {
   it('Returns true when a flag is passed', () => {
-    const flags = {
+    const flags = createConfigFlags({
       debug: true,
       verbose: false,
-    };
+    });
 
     expect(hasDebug(flags)).toBe(true);
   });
 
   it('Returns false when a flag is not passed', () => {
-    const flags = {
+    const flags = createConfigFlags({
       debug: false,
       verbose: false,
-    };
+    });
 
     expect(hasDebug(flags)).toBe(false);
   });
@@ -23,28 +24,28 @@ describe('hasDebug', () => {
 
 describe('hasVerbose', () => {
   it('Returns true when both flags are passed', () => {
-    const flags = {
+    const flags = createConfigFlags({
       debug: true,
       verbose: true,
-    };
+    });
 
     expect(hasVerbose(flags)).toBe(true);
   });
 
   it('Returns false when the verbose flag is passed, and debug is not', () => {
-    const flags = {
+    const flags = createConfigFlags({
       debug: false,
       verbose: true,
-    };
+    });
 
     expect(hasVerbose(flags)).toBe(false);
   });
 
   it('Returns false when the flag is not passed', () => {
-    const flags = {
+    const flags = createConfigFlags({
       debug: false,
       verbose: false,
-    };
+    });
 
     expect(hasVerbose(flags)).toBe(false);
   });
@@ -62,22 +63,22 @@ describe('isInteractive', () => {
   const sys = createSystem();
 
   it('returns false by default', () => {
-    const result = isInteractive(sys, { ci: false }, { ci: false, tty: false });
+    const result = isInteractive(sys, createConfigFlags({ ci: false }), { ci: false, tty: false });
     expect(result).toBe(false);
   });
 
   it('returns false when tty is false', () => {
-    const result = isInteractive(sys, { ci: true }, { ci: true, tty: false });
+    const result = isInteractive(sys, createConfigFlags({ ci: true }), { ci: true, tty: false });
     expect(result).toBe(false);
   });
 
   it('returns false when ci is true', () => {
-    const result = isInteractive(sys, { ci: true }, { ci: true, tty: true });
+    const result = isInteractive(sys, createConfigFlags({ ci: true }), { ci: true, tty: true });
     expect(result).toBe(false);
   });
 
   it('returns true when tty is true and ci is false', () => {
-    const result = isInteractive(sys, { ci: false }, { ci: false, tty: true });
+    const result = isInteractive(sys, createConfigFlags({ ci: false }), { ci: false, tty: true });
     expect(result).toBe(true);
   });
 });

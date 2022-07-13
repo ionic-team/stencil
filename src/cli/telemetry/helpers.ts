@@ -11,8 +11,6 @@ export const tryFn = async <T extends (...args: any[]) => Promise<R>, R>(fn: T, 
   return null;
 };
 
-export declare const TERMINAL_INFO: d.TerminalInfo;
-
 export const isInteractive = (sys: d.CompilerSystem, flags: ConfigFlags, object?: d.TerminalInfo): boolean => {
   const terminalInfo =
     object ||
@@ -55,7 +53,7 @@ export async function readJson(sys: d.CompilerSystem, path: string): Promise<any
  * @param flags The configuration flags passed into the Stencil command
  * @returns true if --debug has been passed, otherwise false
  */
-export function hasDebug(flags: ConfigFlags) {
+export function hasDebug(flags: ConfigFlags): boolean {
   return flags.debug;
 }
 
@@ -64,6 +62,6 @@ export function hasDebug(flags: ConfigFlags) {
  * @param flags The configuration flags passed into the Stencil command
  * @returns true if both --debug and --verbose have been passed, otherwise false
  */
-export function hasVerbose(flags: ConfigFlags) {
+export function hasVerbose(flags: ConfigFlags): boolean {
   return flags.verbose && hasDebug(flags);
 }
