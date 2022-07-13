@@ -130,7 +130,7 @@ export class MockUIEvent extends MockEvent {
 export class MockFocusEvent extends MockUIEvent {
   relatedTarget: EventTarget | null = null;
 
-  constructor(type: string, focusEventInitDic?: FocusEventInit) {
+  constructor(type: 'blur' | 'focus', focusEventInitDic?: FocusEventInit) {
     super(type);
 
     if (focusEventInitDic != null) {
