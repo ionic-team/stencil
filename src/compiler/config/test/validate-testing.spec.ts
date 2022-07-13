@@ -1,8 +1,8 @@
 import type * as d from '@stencil/core/declarations';
-import { mockLogger, mockCompilerSystem } from '@stencil/core/testing';
+import { mockLogger, mockCompilerSystem, mockLoadConfigInit } from '@stencil/core/testing';
 import { validateConfig } from '../validate-config';
 import path from 'path';
-import { ConfigFlags } from '../../../cli/config-flags';
+import { ConfigFlags, createConfigFlags } from '../../../cli/config-flags';
 
 describe('validateTesting', () => {
   const ROOT = path.resolve('/');
@@ -12,7 +12,7 @@ describe('validateTesting', () => {
   let flags: ConfigFlags;
 
   beforeEach(() => {
-    flags = {};
+    flags = createConfigFlags();
     userConfig = {
       sys: sys as any,
       logger: logger,
@@ -32,31 +32,31 @@ describe('validateTesting', () => {
 
   it('set headless false w/ flag', () => {
     userConfig.flags = { ...flags, e2e: true, headless: false };
-    const { config } = validateConfig(userConfig);
+    const { config } = validateConfig(userConfig, mockLoadConfigInit());
     expect(config.testing.browserHeadless).toBe(false);
   });
 
   it('set headless true w/ flag', () => {
     userConfig.flags = { ...flags, e2e: true, headless: true };
-    const { config } = validateConfig(userConfig);
+    const { config } = validateConfig(userConfig, mockLoadConfigInit());
     expect(config.testing.browserHeadless).toBe(true);
   });
 
   it('default headless true', () => {
     userConfig.flags = { ...flags, e2e: true };
-    const { config } = validateConfig(userConfig);
+    const { config } = validateConfig(userConfig, mockLoadConfigInit());
     expect(config.testing.browserHeadless).toBe(true);
   });
 
   it('force headless with ci flag', () => {
     userConfig.flags = { ...flags, ci: true, e2e: true, headless: false };
-    const { config } = validateConfig(userConfig);
+    const { config } = validateConfig(userConfig, mockLoadConfigInit());
     expect(config.testing.browserHeadless).toBe(true);
   });
 
   it('default to no-sandbox browser args with ci flag', () => {
     userConfig.flags = { ...flags, ci: true, e2e: true };
-    const { config } = validateConfig(userConfig);
+    const { config } = validateConfig(userConfig, mockLoadConfigInit());
     expect(config.testing.browserArgs).toEqual([
       '--font-render-hinting=medium',
       '--incognito',
@@ -68,13 +68,13 @@ describe('validateTesting', () => {
 
   it('default browser args', () => {
     userConfig.flags = { ...flags, e2e: true };
-    const { config } = validateConfig(userConfig);
+    const { config } = validateConfig(userConfig, mockLoadConfigInit());
     expect(config.testing.browserArgs).toEqual(['--font-render-hinting=medium', '--incognito']);
   });
 
   it('set default testPathIgnorePatterns', () => {
     userConfig.flags = { ...flags, e2e: true };
-    const { config } = validateConfig(userConfig);
+    const { config } = validateConfig(userConfig, mockLoadConfigInit());
     expect(config.testing.testPathIgnorePatterns).toEqual([
       path.join(ROOT, 'User', 'some', 'path', '.vscode'),
       path.join(ROOT, 'User', 'some', 'path', '.stencil'),
@@ -90,7 +90,7 @@ describe('validateTesting', () => {
       { type: 'www', dir: 'www-folder' },
       { type: 'docs-readme', dir: 'docs' },
     ];
-    const { config } = validateConfig(userConfig);
+    const { config } = validateConfig(userConfig, mockLoadConfigInit());
     expect(config.testing.testPathIgnorePatterns).toEqual([
       path.join(ROOT, 'User', 'some', 'path', '.vscode'),
       path.join(ROOT, 'User', 'some', 'path', '.stencil'),
@@ -105,7 +105,7 @@ describe('validateTesting', () => {
     userConfig.testing = {
       testEnvironment: './rel-path.js',
     };
-    const { config } = validateConfig(userConfig);
+    const { config } = validateConfig(userConfig, mockLoadConfigInit());
     expect(path.isAbsolute(config.testing.testEnvironment)).toBe(true);
     expect(path.basename(config.testing.testEnvironment)).toEqual('rel-path.js');
   });
@@ -115,12 +115,12 @@ describe('validateTesting', () => {
     userConfig.testing = {
       testEnvironment: 'jsdom',
     };
-    const { config } = validateConfig(userConfig);
+    const { config } = validateConfig(userConfig, mockLoadConfigInit());
     expect(config.testing.testEnvironment).toEqual('jsdom');
   });
 
   it('do nothing for empty testEnvironment', () => {
-    const { config } = validateConfig(userConfig);
+    const { config } = validateConfig(userConfig, mockLoadConfigInit());
     expect(config.testing.testEnvironment).toBeUndefined();
   });
 
@@ -130,7 +130,7 @@ describe('validateTesting', () => {
     beforeEach(() => {
       userConfig.flags = { ...flags, spec: true };
 
-      const { testing: testConfig } = validateConfig(userConfig).config;
+      const { testing: testConfig } = validateConfig(userConfig, mockLoadConfigInit()).config;
       const testRegexSetting = testConfig?.testRegex;
 
       if (!testRegexSetting) {
