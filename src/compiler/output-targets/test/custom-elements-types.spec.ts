@@ -31,8 +31,16 @@ const setup = () => {
 
 describe('Custom Elements Typedef generation', () => {
   it('should generate an index.d.ts file corresponding to the index.js file', async () => {
-    const componentOne = stubComponentCompilerMeta();
+    // this component tests the 'happy path' of a component's filename coinciding with its
+    // tag name
+    const componentOne = stubComponentCompilerMeta({
+      tagName: 'my-component',
+      sourceFilePath: "/src/components/my-component/my-component.tsx"
+    });
+    // this component tests that we correctly resolve its path when the component tag does
+    // not match its filename
     const componentTwo = stubComponentCompilerMeta({
+      sourceFilePath: "/src/components/the-other-component/my-real-best-component.tsx",
       componentClassName: 'MyBestComponent',
       tagName: 'my-best-component',
     });
@@ -47,12 +55,8 @@ describe('Custom Elements Typedef generation', () => {
 
     const expectedTypedefOutput = [
       '/* TestApp custom elements */',
-      `export { StubCmp as StubCmp } from '${join(componentsTypeDirectoryPath, 'stub-cmp', 'stub-cmp')}';`,
-      `export { MyBestComponent as MyBestComponent } from '${join(
-        componentsTypeDirectoryPath,
-        'my-best-component',
-        'my-best-component'
-      )}';`,
+      `export { StubCmp as MyComponent } from '${join(componentsTypeDirectoryPath, 'my-component', 'my-component')}';`,
+      `export { MyBestComponent as MyBestComponent } from '${join(componentsTypeDirectoryPath, 'the-other-component', 'my-real-best-component')}';`,
       '',
       '/**',
       ' * Used to manually set the base path where assets can be found.',
