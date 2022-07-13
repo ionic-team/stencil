@@ -1,7 +1,7 @@
 name: BrowserStack Tests
 
 on:
-  pull_request_target:
+  pull_request:
     branches:
       - 'main'
       - 'v3.0.0-dev'
