@@ -62,7 +62,7 @@ const generateCustomElementsTypesOutput = async (
       // - get the relative path to the component's source file from the source directory
       // - join that relative path to the relative path from the `index.d.ts` file to the
       //   directory where typedefs are saved
-      const componentSourceRelPath = relative(config.srcDir, component.sourceFilePath).replace(".tsx", "");
+      const componentSourceRelPath = relative(config.srcDir, component.sourceFilePath).replace('.tsx', '');
       const componentDTSPath = join(componentsTypeDirectoryRelPath, componentSourceRelPath);
 
       return `export { ${importName} as ${exportName} } from '${componentDTSPath}';`;
