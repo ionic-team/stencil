@@ -204,7 +204,7 @@ export const addCustomElementInputs = (buildCtx: d.BuildCtx, bundleOpts: BundleO
       exp.push(`export const ${exportName} = ${importAs};`);
       exp.push(`export const defineCustomElement = cmpDefCustomEle;`);
 
-      // Here we push an export (with a rename for `defineCustomElement` for
+      // Here we push an export (with a rename for `defineCustomElement`) for
       // this component onto our array which references the `coreKey` (prefixed
       // with `\0`). We have to do this so that our import is referencing the
       // correct virtual module, if we instead referenced, for instance,
