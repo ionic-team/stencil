@@ -115,6 +115,9 @@ interface FsReaddirOptions {
   excludeExtensions?: string[];
 }
 
+/**
+ * A result from a directory read operation
+ */
 interface FsReaddirItem {
   absPath: string;
   relPath: string;
@@ -262,7 +265,7 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
    * Get the contents of a directory on the in-memory filesystem
    *
    * @param dirPath the path to the directory of interest
-   * @param opts an optional object containg configuration options
+   * @param opts an optional object containing configuration options
    * @returns a Promise wrapping a list of directory contents
    */
   const readdir = async (dirPath: string, opts: FsReaddirOptions = {}): Promise<FsReaddirItem[]> => {
@@ -839,7 +842,7 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
   /**
    * Ensure that a series of directories are created.
    *
-   * If `inMemoryOnly` is true this wil not touch the disk but will only
+   * If `inMemoryOnly` is true this will not touch the disk but will only
    * modify the in-memory filesystem cache. Otherwise it will create directories
    * in the real FS.
    *
@@ -999,6 +1002,16 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
     }
   };
 
+  /**
+   * Cancel pending delete operations on files cached in the in-memory FS.
+   * This will not reverse a delete operation if it has already been committed
+   * to disk, but will cancel any pending delete operations that have not yet
+   * been committed.
+   *
+   * Note that this will silently **not cancel delete operations on directories**!
+   *
+   * @param filePaths a list of filepaths which should not be deleted
+   */
   const cancelDeleteFilesFromDisk = (filePaths: string[]) => {
     for (const filePath of filePaths) {
       const item = getItem(filePath);
@@ -1008,6 +1021,14 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
     }
   };
 
+  /**
+   * Cancel a pending delete operations on directories cached in the in-memory
+   * FS. This will not reverse a delete operation if it has already been
+   * committed to disk, but will cancel any pending delete operations that
+   * have not yet been committed.
+   *
+   * @param dirPaths a list of filepaths whose delete ops should be canceled
+   */
   const cancelDeleteDirectoriesFromDisk = (dirPaths: string[]) => {
     for (const dirPath of dirPaths) {
       const item = getItem(dirPath);
@@ -1051,13 +1072,26 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
     return item;
   };
 
-  const clearCache = () => items.clear();
+  /**
+   * Clear all items out of the in-memory cache
+   */
+  const clearCache = () => {
+    items.clear();
+  };
 
-  const keys = () => Array.from(items.keys()).sort();
-
+  /**
+   * Get some very basic usage statistics for the in-memory cache
+   *
+   * @returns a formatted description of cache usage
+   */
   const getMemoryStats = () => `data length: ${items.size}`;
 
-  const getBuildOutputs = () => {
+  /**
+   * Get information about the files built for output type
+   *
+   * @returns a list of build output records
+   */
+  const getBuildOutputs = (): d.BuildOutput[] => {
     const outputs: d.BuildOutput[] = [];
 
     outputTargetTypes.forEach((outputTargetType, filePath) => {
@@ -1102,7 +1136,6 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
     getBuildOutputs,
     getItem,
     getMemoryStats,
-    keys,
     readFile,
     readFileSync,
     readdir,
@@ -1139,7 +1172,7 @@ interface FsCommitInstructions {
 }
 
 /**
- * Results from commiting pending filesystem operations
+ * Results from committing pending filesystem operations
  */
 interface FsCommitResults {
   filesCopied: FileCopyTuple[];
