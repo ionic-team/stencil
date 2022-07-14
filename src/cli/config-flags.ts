@@ -66,6 +66,7 @@ export const BOOLEAN_CLI_ARGS = [
   'notify',
   'onlyChanged',
   'onlyFailures',
+  'outputFile',
   'passWithNoTests',
   'resetMocks',
   'resetModules',
