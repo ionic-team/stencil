@@ -1,4 +1,4 @@
-import { normalizePath } from '@utils';
+import { addDocBlock, normalizePath } from '@utils';
 import { isAbsolute, relative, resolve } from 'path';
 
 import type * as d from '../../declarations';
@@ -133,7 +133,12 @@ const generateComponentTypesFile = (config: d.Config, buildCtx: d.BuildCtx, areT
   c.push(`}`);
 
   c.push(`declare namespace LocalJSX {`);
-  c.push(...modules.map((m) => `  ${m.jsx}`));
+  c.push(
+    ...modules.map((m) => {
+      const docs = components.find((c) => c.tagName === m.tagName).docs;
+      return addDocBlock(`  ${m.jsx}`, docs, 4);
+    })
+  );
 
   c.push(`        interface IntrinsicElements {`);
   c.push(...modules.map((m) => `              "${m.tagName}": ${m.tagNameAsPascal};`));
@@ -147,10 +152,15 @@ const generateComponentTypesFile = (config: d.Config, buildCtx: d.BuildCtx, areT
   c.push(`        export namespace JSX {`);
   c.push(`                interface IntrinsicElements {`);
   c.push(
-    ...modules.map(
-      (m) =>
-        `                        "${m.tagName}": LocalJSX.${m.tagNameAsPascal} & JSXBase.HTMLAttributes<${m.htmlElementName}>;`
-    )
+    ...modules.map((m) => {
+      const docs = components.find((c) => c.tagName === m.tagName).docs;
+
+      return addDocBlock(
+        `                        "${m.tagName}": LocalJSX.${m.tagNameAsPascal} & JSXBase.HTMLAttributes<${m.htmlElementName}>;`,
+        docs,
+        12
+      );
+    })
   );
   c.push(`                }`);
   c.push(`        }`);
