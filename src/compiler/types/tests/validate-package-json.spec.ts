@@ -2,7 +2,7 @@ import type * as d from '@stencil/core/declarations';
 import { mockBuildCtx, mockCompilerCtx, mockConfig } from '@stencil/core/testing';
 import * as v from '../validate-build-package-json';
 import path from 'path';
-import { DIST_CUSTOM_ELEMENTS_BUNDLE } from '../../output-targets/output-utils';
+import { DIST_CUSTOM_ELEMENTS, DIST_CUSTOM_ELEMENTS_BUNDLE } from '../../output-targets/output-utils';
 
 describe('validate-package-json', () => {
   let config: d.Config;
@@ -84,11 +84,11 @@ describe('validate-package-json', () => {
       config.outputTargets = [];
       compilerCtx.fs.writeFile(path.join(root, 'dist', 'index.js'), '');
       buildCtx.packageJson.module = 'dist/index.js';
-      v.validateModule(config, compilerCtx, buildCtx, collectionOutputTarget);
+      await v.validateModule(config, compilerCtx, buildCtx);
       expect(buildCtx.diagnostics).toHaveLength(0);
     });
 
-    it('validate custom elements module', async () => {
+    it('validate custom elements bundle module', async () => {
       config.outputTargets = [
         {
           type: DIST_CUSTOM_ELEMENTS_BUNDLE,
@@ -97,13 +97,37 @@ describe('validate-package-json', () => {
       ];
       compilerCtx.fs.writeFile(path.join(root, 'dist', 'index.js'), '');
       buildCtx.packageJson.module = 'custom-elements/index.js';
-      v.validateModule(config, compilerCtx, buildCtx, collectionOutputTarget);
+      await v.validateModule(config, compilerCtx, buildCtx);
       expect(buildCtx.diagnostics).toHaveLength(0);
+    });
+
+    it('validates a valid custom elements module', async () => {
+      config.outputTargets = [
+        {
+          type: DIST_CUSTOM_ELEMENTS,
+          dir: path.join(root, 'dist'),
+        },
+      ];
+      buildCtx.packageJson.module = 'dist/components/index.js';
+      await v.validateModule(config, compilerCtx, buildCtx);
+      expect(buildCtx.diagnostics).toHaveLength(0);
+    });
+
+    it('errors on an invalid custom elements module', async () => {
+      config.outputTargets = [
+        {
+          type: DIST_CUSTOM_ELEMENTS,
+          dir: path.join(root, 'dist'),
+        },
+      ];
+      buildCtx.packageJson.module = 'dist/index.js';
+      await v.validateModule(config, compilerCtx, buildCtx);
+      expect(buildCtx.diagnostics).toHaveLength(1);
     });
 
     it('missing dist module', async () => {
       config.outputTargets = [];
-      v.validateModule(config, compilerCtx, buildCtx, collectionOutputTarget);
+      await v.validateModule(config, compilerCtx, buildCtx);
       expect(buildCtx.diagnostics).toHaveLength(1);
     });
 
@@ -114,7 +138,7 @@ describe('validate-package-json', () => {
           dir: path.join(root, 'custom-elements'),
         },
       ];
-      v.validateModule(config, compilerCtx, buildCtx, collectionOutputTarget);
+      await v.validateModule(config, compilerCtx, buildCtx);
       expect(buildCtx.diagnostics).toHaveLength(1);
     });
   });
