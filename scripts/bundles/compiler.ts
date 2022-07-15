@@ -45,15 +45,10 @@ export async function compiler(opts: BuildOptions) {
   });
 
   // copy and edit compiler/sys/in-memory-fs.d.ts
-  let inMemoryFsDts = await fs.readFile(
-    join(inputDir, 'sys', 'in-memory-fs.d.ts'),
-    'utf8'
-  );
+  let inMemoryFsDts = await fs.readFile(join(inputDir, 'sys', 'in-memory-fs.d.ts'), 'utf8');
   inMemoryFsDts = inMemoryFsDts.replace('@stencil/core/internal', '../../internal/index');
   await fs.mkdir(join(opts.output.compilerDir, 'sys'));
-  await fs.writeFile(join(
-    opts.output.compilerDir, 'sys', 'in-memory-fs.d.ts'
-  ), inMemoryFsDts);
+  await fs.writeFile(join(opts.output.compilerDir, 'sys', 'in-memory-fs.d.ts'), inMemoryFsDts);
 
   /**
    * These files are wrap the compiler in an Immediately-Invoked Function Expression (IIFE). The intro contains the

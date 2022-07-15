@@ -1,7 +1,7 @@
 import type * as d from '@stencil/core/internal';
 import { isOutputTargetDistLazy, isOutputTargetWww } from '../compiler/output-targets/output-utils';
 import { join, relative } from 'path';
-import { InMemoryFileSystem } from '../compiler/sys/in-memory-fs'
+import { InMemoryFileSystem } from '../compiler/sys/in-memory-fs';
 
 export function shuffleArray(array: any[]) {
   // http://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
