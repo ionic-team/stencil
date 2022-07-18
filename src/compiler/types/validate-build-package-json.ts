@@ -14,7 +14,7 @@ import {
  *
  * @param config the user-supplied Stencil config
  * @param compilerCtx the compiler context
- * @paran the build context
+ * @param buildCtx the build context
  * @returns an empty Promise
  */
 export const validateBuildPackageJson = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
@@ -189,8 +189,6 @@ function recommendedModulePath(config: d.Config): string | null {
   }
 
   if (customElementsBundleOutput) {
-    const distAbs = join(customElementsBundleOutput.dir, 'index.js');
-    const distRel = relative(config.rootDir, distAbs);
     const customElementsAbs = join(customElementsBundleOutput.dir, 'index.js');
     return relative(config.rootDir, customElementsAbs);
   }
@@ -268,7 +266,6 @@ export const validateCollection = (
  * @param config the stencil config
  * @param compilerCtx the current compiler context
  * @param buildCtx the current build context
- * @param outputTarget a DIST_COLLECTION output target
  */
 export const validateBrowser = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   if (isString(buildCtx.packageJson.browser)) {
