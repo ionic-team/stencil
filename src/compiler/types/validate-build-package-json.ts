@@ -158,7 +158,7 @@ export const validateModule = async (config: d.Config, compilerCtx: d.CompilerCt
     return;
   }
 
-  if (recommendedRelPath !== null && recommendedRelPath !== currentModule) {
+  if (recommendedRelPath !== null && normalizePath(recommendedRelPath) !== normalizePath(currentModule)) {
     const msg = `package.json "module" property is set to "${currentModule}". It's recommended to set the "module" property to: ${recommendedRelPath}`;
     packageJsonWarn(config, compilerCtx, buildCtx, msg, `"module"`);
   }
