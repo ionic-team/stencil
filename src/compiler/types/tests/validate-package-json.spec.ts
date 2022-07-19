@@ -3,7 +3,7 @@ import { mockBuildCtx, mockCompilerCtx, mockConfig } from '@stencil/core/testing
 import * as v from '../validate-build-package-json';
 import path from 'path';
 import { DIST_COLLECTION, DIST_CUSTOM_ELEMENTS, DIST_CUSTOM_ELEMENTS_BUNDLE } from '../../output-targets/output-utils';
-import {normalizePath} from '../../../utils/normalize-path';
+import { normalizePath } from '../../../utils/normalize-path';
 
 describe('validate-package-json', () => {
   let config: d.Config;
@@ -174,7 +174,9 @@ describe('validate-package-json', () => {
       const [diagnostic] = buildCtx.diagnostics;
       expect(diagnostic.level).toBe('warn');
       expect(diagnostic.messageText).toBe(
-        `package.json "module" property is required when generating a distribution. It's recommended to set the "module" property to: ${normalizePath(path)}`
+        `package.json "module" property is required when generating a distribution. It's recommended to set the "module" property to: ${normalizePath(
+          path
+        )}`
       );
     });
   });
