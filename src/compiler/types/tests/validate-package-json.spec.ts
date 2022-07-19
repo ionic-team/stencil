@@ -123,7 +123,7 @@ describe('validate-package-json', () => {
       buildCtx.packageJson.module = 'dist/index.js';
       await v.validateModule(config, compilerCtx, buildCtx);
       expect(buildCtx.diagnostics).toHaveLength(1);
-      const [diagnostic] = buildCtx.diagnostics
+      const [diagnostic] = buildCtx.diagnostics;
       expect(diagnostic.level).toBe('warn');
       expect(diagnostic.messageText).toBe(
         `package.json "module" property is set to "dist/index.js". It's recommended to set the "module" property to: dist/components/index.js`
@@ -134,11 +134,9 @@ describe('validate-package-json', () => {
       config.outputTargets = [];
       await v.validateModule(config, compilerCtx, buildCtx);
       expect(buildCtx.diagnostics).toHaveLength(1);
-      const [diagnostic] = buildCtx.diagnostics
+      const [diagnostic] = buildCtx.diagnostics;
       expect(diagnostic.level).toBe('warn');
-      expect(diagnostic.messageText).toBe(
-        'package.json "module" property is required when generating a distribution.'
-      );      
+      expect(diagnostic.messageText).toBe('package.json "module" property is required when generating a distribution.');
     });
 
     it.each<{
