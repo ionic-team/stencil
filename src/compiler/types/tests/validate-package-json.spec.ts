@@ -2,7 +2,7 @@ import type * as d from '@stencil/core/declarations';
 import { mockBuildCtx, mockCompilerCtx, mockConfig } from '@stencil/core/testing';
 import * as v from '../validate-build-package-json';
 import path from 'path';
-import { DIST_CUSTOM_ELEMENTS, DIST_CUSTOM_ELEMENTS_BUNDLE } from '../../output-targets/output-utils';
+import { DIST_COLLECTION, DIST_CUSTOM_ELEMENTS, DIST_CUSTOM_ELEMENTS_BUNDLE } from '../../output-targets/output-utils';
 
 describe('validate-package-json', () => {
   let config: d.Config;
@@ -131,15 +131,42 @@ describe('validate-package-json', () => {
       expect(buildCtx.diagnostics).toHaveLength(1);
     });
 
-    it('missing dist module, but has custom elements output', async () => {
-      config.outputTargets = [
-        {
+    it.each<{
+      ot: d.OutputTarget;
+      path: string;
+    }>([
+      {
+        ot: {
           type: DIST_CUSTOM_ELEMENTS_BUNDLE,
           dir: path.join(root, 'custom-elements'),
         },
-      ];
+        path: 'custom-elements/index.js',
+      },
+      {
+        ot: {
+          type: DIST_CUSTOM_ELEMENTS,
+          dir: path.join(root, 'dist'),
+        },
+        path: 'dist/components/index.js',
+      },
+      {
+        ot: {
+          type: DIST_COLLECTION,
+          dir: path.join(root, 'dist'),
+          collectionDir: 'dist/collection',
+        },
+        path: 'dist/index.js',
+      },
+    ])('errors on missing module w/ $ot.type, suggests $path', async ({ ot, path }) => {
+      config.outputTargets = [ot];
+      buildCtx.packageJson.module = undefined;
       await v.validateModule(config, compilerCtx, buildCtx);
       expect(buildCtx.diagnostics).toHaveLength(1);
+      const [diagnostic] = buildCtx.diagnostics;
+      expect(diagnostic.level).toBe('warn');
+      expect(diagnostic.messageText).toBe(
+        `package.json "module" property is required when generating a distribution. It's recommended to set the "module" property to: ${path}`
+      );
     });
   });
 

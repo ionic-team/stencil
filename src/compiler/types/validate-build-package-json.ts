@@ -10,7 +10,8 @@ import {
 } from '../output-targets/output-utils';
 
 /**
- * Validate that various fields are set correctly in `package.json`
+ * Validate the package.json file for a project, checking that various fields
+ * are set correctly for the currently-configured output targets.
  *
  * @param config the user-supplied Stencil config
  * @param compilerCtx the compiler context
@@ -29,7 +30,7 @@ export const validateBuildPackageJson = async (config: d.Config, compilerCtx: d.
   const typesOutputTargets = config.outputTargets.filter(isOutputTargetDistTypes);
   await Promise.all([
     ...distCollectionOutputTargets.map((distCollectionOT) =>
-      validatePackageJsonOutput(config, compilerCtx, buildCtx, distCollectionOT)
+      validateDistCollectionPkgJson(config, compilerCtx, buildCtx, distCollectionOT)
     ),
     ...typesOutputTargets.map((typesOT) => validateTypes(config, compilerCtx, buildCtx, typesOT)),
     validateModule(config, compilerCtx, buildCtx),
@@ -37,14 +38,16 @@ export const validateBuildPackageJson = async (config: d.Config, compilerCtx: d.
 };
 
 /**
- * Validate package.json contents for the `DIST_COLLECTION` output target
+ * Validate package.json contents for the `DIST_COLLECTION` output target,
+ * checking that various fields like `files`, `main`, and so on are set
+ * correctly.
  *
  * @param config the stencil config
  * @param compilerCtx the current compiler context
  * @param buildCtx the current build context
  * @param outputTarget a DIST_COLLECTION output target
  */
-const validatePackageJsonOutput = async (
+const validateDistCollectionPkgJson = async (
   config: d.Config,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
@@ -134,14 +137,15 @@ export const validateMain = (
 
 /**
  * Validate the package.json 'module' field, taking into account output targets
- * and other configuration details. This will look for both
- * DIST_CUSTOM_ELEMENTS_BUNDLE and DIST_CUSTOM_ELEMENTS output targets and try
- * to provide error messages which are relevant to the user's configuration.
+ * and other configuration details. This will look for a value for the `module`
+ * field. If not present it will set a relevant warning message with an
+ * output-target specific recommended value. If it is present and is not equal
+ * to that recommended value it will set a different warning message.
  *
  * @param config the current user-supplied configuration
  * @param compilerCtx the compiler context
  * @param buildCtx the build context
- * @outputTarget a relevant output target
+ * @returns an empty Promise
  */
 export const validateModule = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   const currentModule = buildCtx.packageJson.module;
@@ -149,6 +153,7 @@ export const validateModule = async (config: d.Config, compilerCtx: d.CompilerCt
   const recommendedRelPath = recommendedModulePath(config);
 
   if (!isString(currentModule)) {
+    // TODO should this change?
     let msg = 'package.json "module" property is required when generating a distribution.';
 
     if (recommendedRelPath !== null) {
@@ -166,31 +171,35 @@ export const validateModule = async (config: d.Config, compilerCtx: d.CompilerCt
 
 /**
  * Get the recommended `"module"` path for `package.json` given the output
- * targets that a user has set on their config. `DIST_CUSTOM_ELEMENTS` will
- * override other output targets.
+ * targets that a user has set on their config.
  *
  * @param config the user-supplied Stencil configuration
  * @returns a recommended module path or a null value to indicate no default
  * value is supplied
  */
 function recommendedModulePath(config: d.Config): string | null {
-  const customElementsBundleOutput = config.outputTargets.find(isOutputTargetDistCustomElementsBundle);
-  const customElementsOutput = config.outputTargets.find(isOutputTargetDistCustomElements);
+  const customElementsBundleOT = config.outputTargets.find(isOutputTargetDistCustomElementsBundle);
+  const customElementsOT = config.outputTargets.find(isOutputTargetDistCustomElements);
+  const distCollectionOT = config.outputTargets.find(isOutputTargetDistCollection);
 
   // If we're using `dist-custom-elements` then the preferred "module" field
   // value is `$OUTPUT_DIR/components/index.js`
   //
   // Additionally, the `DIST_CUSTOM_ELEMENTS` output target should override
-  // `DIST_CUSTOM_ELEMENTS_BUNDLE` if both are set, so we return first with
-  // this one.
-  if (customElementsOutput) {
-    const componentsIndexAbs = join(customElementsOutput.dir, 'components', 'index.js');
+  // `DIST_CUSTOM_ELEMENTS_BUNDLE` and `DIST_COLLECTION` output targets if
+  // they're also set, so we return first with this one.
+  if (customElementsOT) {
+    const componentsIndexAbs = join(customElementsOT.dir, 'components', 'index.js');
     return relative(config.rootDir, componentsIndexAbs);
   }
 
-  if (customElementsBundleOutput) {
-    const customElementsAbs = join(customElementsBundleOutput.dir, 'index.js');
+  if (customElementsBundleOT) {
+    const customElementsAbs = join(customElementsBundleOT.dir, 'index.js');
     return relative(config.rootDir, customElementsAbs);
+  }
+
+  if (distCollectionOT) {
+    return relative(config.rootDir, join(distCollectionOT.dir, 'index.js'));
   }
 
   // if no output target for which we define a recommended output target is set
@@ -275,13 +284,15 @@ export const validateBrowser = (config: d.Config, compilerCtx: d.CompilerCtx, bu
 };
 
 /**
- * Build a package.json error message with a special header and so on.
+ * Build a diagnostic for an error resulting from a particular field in a
+ * package.json file
  *
  * @param config the stencil config
  * @param compilerCtx the current compiler context
  * @param buildCtx the current build context
  * @param msg an error string
- * @param warnKey a warning key
+ * @param jsonField the key for the field which caused the error, used for
+ * finding the error line in the original JSON file
  * @returns a diagnostic object
  */
 const packageJsonError = (
@@ -289,21 +300,23 @@ const packageJsonError = (
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   msg: string,
-  warnKey: string
+  jsonField: string
 ): d.Diagnostic => {
-  const err = buildJsonFileError(compilerCtx, buildCtx.diagnostics, config.packageJsonFilePath, msg, warnKey);
+  const err = buildJsonFileError(compilerCtx, buildCtx.diagnostics, config.packageJsonFilePath, msg, jsonField);
   err.header = `Package Json`;
   return err;
 };
 
 /**
- * Build a package.json warning diagnostic
+ * Build a diagnostic for a warning resulting from a particular field in a
+ * package.json file
  *
  * @param config the stencil config
  * @param compilerCtx the current compiler context
  * @param buildCtx the current build context
  * @param msg an error string
- * @param warnKey a warning key
+ * @param jsonField the key for the field which caused the error, used for
+ * finding the error line in the original JSON file
  * @returns a diagnostic object
  */
 const packageJsonWarn = (
@@ -311,9 +324,9 @@ const packageJsonWarn = (
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   msg: string,
-  warnKey: string
-) => {
-  const warn = buildJsonFileError(compilerCtx, buildCtx.diagnostics, config.packageJsonFilePath, msg, warnKey);
+  jsonField: string
+): d.Diagnostic => {
+  const warn = buildJsonFileError(compilerCtx, buildCtx.diagnostics, config.packageJsonFilePath, msg, jsonField);
   warn.header = `Package Json`;
   warn.level = 'warn';
   return warn;
