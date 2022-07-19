@@ -157,14 +157,14 @@ export const validateModule = async (config: d.Config, compilerCtx: d.CompilerCt
     let msg = 'package.json "module" property is required when generating a distribution.';
 
     if (recommendedRelPath !== null) {
-      msg += ` It's recommended to set the "module" property to: ${recommendedRelPath}`;
+      msg += ` It's recommended to set the "module" property to: ${normalizePath(recommendedRelPath)}`;
     }
     packageJsonWarn(config, compilerCtx, buildCtx, msg, `"module"`);
     return;
   }
 
   if (recommendedRelPath !== null && normalizePath(recommendedRelPath) !== normalizePath(currentModule)) {
-    const msg = `package.json "module" property is set to "${currentModule}". It's recommended to set the "module" property to: ${recommendedRelPath}`;
+    const msg = `package.json "module" property is set to "${currentModule}". It's recommended to set the "module" property to: ${normalizePath(recommendedRelPath)}`;
     packageJsonWarn(config, compilerCtx, buildCtx, msg, `"module"`);
   }
 };
