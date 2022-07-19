@@ -269,8 +269,27 @@ export interface ConfigFlags
     NumberConfigFlags,
     StringNumberConfigFlags,
     LogLevelFlags {
-  task?: TaskCommand | null;
-  args?: string[];
-  knownArgs?: string[];
-  unknownArgs?: string[];
+  task: TaskCommand | null;
+  args: string[];
+  knownArgs: string[];
+  unknownArgs: string[];
 }
+
+/**
+ * Helper function for initializing a `ConfigFlags` object. Provide any overrides
+ * for default values and off you go!
+ *
+ * @param init an object with any overrides for default values
+ * @returns a complete CLI flag object
+ */
+export const createConfigFlags = (init: Partial<ConfigFlags> = {}): ConfigFlags => {
+  const flags: ConfigFlags = {
+    task: null,
+    args: [],
+    knownArgs: [],
+    unknownArgs: [],
+    ...init,
+  };
+
+  return flags;
+};

@@ -4,7 +4,14 @@ import { matches, selectAll, selectOne } from './selector';
 import { MockAttr, MockAttributeMap, createAttributeProxy } from './attribute';
 import { MockClassList } from './class-list';
 import { MockCSSStyleDeclaration, createCSSStyleDeclaration } from './css-style-declaration';
-import { MockEvent, addEventListener, dispatchEvent, removeEventListener, resetEventListeners } from './event';
+import {
+  MockEvent,
+  addEventListener,
+  dispatchEvent,
+  removeEventListener,
+  resetEventListeners,
+  MockFocusEvent,
+} from './event';
 import { NODE_NAMES, NODE_TYPES } from './constants';
 import { NON_ESCAPABLE_CONTENT, SerializeNodeToHtmlOptions, serializeNodeToHtml } from './serialize-node';
 import { parseFragmentUtil } from './parse-util';
@@ -236,7 +243,10 @@ export class MockElement extends MockNode {
   }
 
   blur() {
-    /**/
+    dispatchEvent(
+      this,
+      new MockFocusEvent('blur', { relatedTarget: null, bubbles: true, cancelable: true, composed: true })
+    );
   }
 
   get shadowRoot() {
@@ -320,7 +330,12 @@ export class MockElement extends MockNode {
     return this.children[0] || null;
   }
 
-  focus(_options?: { preventScroll?: boolean }) {}
+  focus(_options?: { preventScroll?: boolean }) {
+    dispatchEvent(
+      this,
+      new MockFocusEvent('focus', { relatedTarget: null, bubbles: true, cancelable: true, composed: true })
+    );
+  }
 
   getAttribute(attrName: string) {
     if (attrName === 'style') {
