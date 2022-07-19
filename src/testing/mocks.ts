@@ -31,7 +31,12 @@ import { createConfigFlags } from '../cli/config-flags';
 export function mockValidatedConfig(sys?: CompilerSystem): ValidatedConfig {
   const baseConfig = mockConfig(sys);
 
-  return { ...baseConfig, flags: createConfigFlags(), logger: mockLogger(), outputTargets: baseConfig.outputTargets ?? [] };
+  return {
+    ...baseConfig,
+    flags: createConfigFlags(),
+    logger: mockLogger(),
+    outputTargets: baseConfig.outputTargets ?? [],
+  };
 }
 
 // TODO(STENCIL-486): Update `mockConfig` to accept any property found on `UnvalidatedConfig`

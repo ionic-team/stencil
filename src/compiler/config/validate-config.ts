@@ -51,7 +51,7 @@ export const validateConfig = (
     // flags _should_ be JSON safe
     flags: JSON.parse(JSON.stringify(config.flags || {})),
     logger,
-    outputTargets: config.outputTargets ?? []
+    outputTargets: config.outputTargets ?? [],
   };
 
   // default devMode false

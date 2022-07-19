@@ -75,9 +75,14 @@ export const run = async (init: d.CliInitOptions) => {
     loadedCompilerLog(sys, logger, flags, coreCompiler);
 
     if (task === 'info') {
-      await telemetryAction(sys, { flags: createConfigFlags({ task: 'info' }), logger, outputTargets: [] }, coreCompiler, async () => {
-        await taskInfo(coreCompiler, sys, logger);
-      });
+      await telemetryAction(
+        sys,
+        { flags: createConfigFlags({ task: 'info' }), logger, outputTargets: [] },
+        coreCompiler,
+        async () => {
+          await taskInfo(coreCompiler, sys, logger);
+        }
+      );
       return;
     }
 
@@ -122,7 +127,12 @@ export const runTask = async (
   sys?: d.CompilerSystem
 ) => {
   const logger = config.logger ?? createLogger();
-  const strictConfig: ValidatedConfig = { ...config, flags: createConfigFlags(config.flags ?? { task }), logger, outputTargets: config.outputTargets ?? [] };
+  const strictConfig: ValidatedConfig = {
+    ...config,
+    flags: createConfigFlags(config.flags ?? { task }),
+    logger,
+    outputTargets: config.outputTargets ?? [],
+  };
 
   switch (task) {
     case 'build':
