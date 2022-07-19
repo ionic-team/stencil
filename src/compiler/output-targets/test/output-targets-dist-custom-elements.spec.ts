@@ -1,5 +1,11 @@
 import { path } from '@stencil/core/compiler';
-import { mockCompilerSystem, mockBuildCtx, mockCompilerCtx, mockModule, mockValidatedConfig } from '@stencil/core/testing';
+import {
+  mockCompilerSystem,
+  mockBuildCtx,
+  mockCompilerCtx,
+  mockModule,
+  mockValidatedConfig,
+} from '@stencil/core/testing';
 import type * as d from '../../../declarations';
 import {
   addCustomElementInputs,
