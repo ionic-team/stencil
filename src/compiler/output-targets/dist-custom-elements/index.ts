@@ -34,7 +34,7 @@ import ts from 'typescript';
  * @returns an empty Promise which won't resolve until the work is done!
  */
 export const outputCustomElements = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx
 ): Promise<void> => {
@@ -42,7 +42,7 @@ export const outputCustomElements = async (
     return;
   }
 
-  const outputTargets = (config.outputTargets ?? []).filter(isOutputTargetDistCustomElements);
+  const outputTargets = config.outputTargets.filter(isOutputTargetDistCustomElements);
   if (outputTargets.length === 0) {
     return;
   }
@@ -66,7 +66,7 @@ export const outputCustomElements = async (
  * @returns bundle options suitable for generating a rollup configuration
  */
 export const getBundleOptions = (
-  config: d.Config,
+  config: d.ValidatedConfig,
   buildCtx: d.BuildCtx,
   compilerCtx: d.CompilerCtx,
   outputTarget: d.OutputTargetDistCustomElements
@@ -104,7 +104,7 @@ export const getBundleOptions = (
  */
 
 export const bundleCustomElements = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   outputTarget: d.OutputTargetDistCustomElements
