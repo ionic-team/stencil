@@ -61,7 +61,7 @@ export const buildWarn = (diagnostics: d.Diagnostic[]): d.Diagnostic => {
  * caused the error and the path to the file.
  *
  * @param compilerCtx the current compiler context
- * @param diagnostics a list of diagnostics used as an return param
+ * @param diagnostics a list of diagnostics used as a return param
  * @param jsonFilePath the path to the JSON file where the error occurred
  * @param msg the error message
  * @param jsonField the key for the field which caused the error, used for finding
