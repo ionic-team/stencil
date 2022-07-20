@@ -1,5 +1,11 @@
 import { path } from '@stencil/core/compiler';
-import { mockConfig, mockCompilerSystem, mockBuildCtx, mockCompilerCtx, mockModule } from '@stencil/core/testing';
+import {
+  mockCompilerSystem,
+  mockBuildCtx,
+  mockCompilerCtx,
+  mockModule,
+  mockValidatedConfig,
+} from '@stencil/core/testing';
 import type * as d from '../../../declarations';
 import {
   addCustomElementInputs,
@@ -16,7 +22,7 @@ import { DIST_CUSTOM_ELEMENTS, DIST_CUSTOM_ELEMENTS_BUNDLE } from '../output-uti
 
 const setup = () => {
   const sys = mockCompilerSystem();
-  const config: d.Config = mockConfig(sys);
+  const config: d.ValidatedConfig = mockValidatedConfig(sys);
   const compilerCtx = mockCompilerCtx(config);
   const buildCtx = mockBuildCtx(config, compilerCtx);
   const root = config.rootDir;

@@ -12,12 +12,12 @@ import { normalizePath, dashToPascalCase } from '@utils';
  * @param typesDir the path to the directory where type declarations are saved
  */
 export const generateCustomElementsTypes = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   typesDir: string
 ): Promise<void> => {
-  const outputTargets = (config.outputTargets ?? []).filter(isOutputTargetDistCustomElements);
+  const outputTargets = config.outputTargets.filter(isOutputTargetDistCustomElements);
 
   await Promise.all(
     outputTargets.map((outputTarget) =>
@@ -36,7 +36,7 @@ export const generateCustomElementsTypes = async (
  * @param outputTarget the output target for which types are being currently generated
  */
 const generateCustomElementsTypesOutput = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   typesDir: string,

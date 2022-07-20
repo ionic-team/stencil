@@ -28,13 +28,13 @@ import ts from 'typescript';
  * which do actual work of generating the rollup configuration, creating an
  * entry chunk, running, the build, etc.
  *
- * @param config the user-supplied compiler configuration we're using
+ * @param config the validated compiler configuration we're using
  * @param compilerCtx the current compiler context
  * @param buildCtx the current build context
  * @returns an empty Promise which won't resolve until the work is done!
  */
 export const outputCustomElements = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx
 ): Promise<void> => {
@@ -42,7 +42,7 @@ export const outputCustomElements = async (
     return;
   }
 
-  const outputTargets = (config.outputTargets ?? []).filter(isOutputTargetDistCustomElements);
+  const outputTargets = config.outputTargets.filter(isOutputTargetDistCustomElements);
   if (outputTargets.length === 0) {
     return;
   }
@@ -59,14 +59,14 @@ export const outputCustomElements = async (
  * Get bundle options for our current build and compiler context which we'll use
  * to generate a Rollup build and so on.
  *
- * @param config user-supplied Stencil configuration
+ * @param config a validated Stencil configuration object
  * @param buildCtx the current build context
  * @param compilerCtx the current compiler context
  * @param outputTarget the outputTarget we're currently dealing with
  * @returns bundle options suitable for generating a rollup configuration
  */
 export const getBundleOptions = (
-  config: d.Config,
+  config: d.ValidatedConfig,
   buildCtx: d.BuildCtx,
   compilerCtx: d.CompilerCtx,
   outputTarget: d.OutputTargetDistCustomElements
@@ -96,15 +96,15 @@ export const getBundleOptions = (
 /**
  * Get bundle options for rollup, run the rollup build, optionally minify the
  * output, and write files to disk.
- * @param config user-supplied Stencil configuration
- * @param buildCtx the current build context
+ *
+ * @param config the validated Stencil configuration we're using
  * @param compilerCtx the current compiler context
+ * @param buildCtx the current build context
  * @param outputTarget the outputTarget we're currently dealing with
  * @returns an empty promise
  */
-
 export const bundleCustomElements = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   outputTarget: d.OutputTargetDistCustomElements
