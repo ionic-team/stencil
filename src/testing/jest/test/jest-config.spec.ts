@@ -19,6 +19,17 @@ describe('jest-config', () => {
     expect(jestArgv.maxWorkers).toBe(2);
   });
 
+  it('should pass --outputFile=path/to/file', () => {
+    const args = ['test', '--ci', '--outputFile=path/to/my-file'];
+    const config = mockValidatedConfig();
+    config.flags = parseFlags(args, config.sys);
+    expect(config.flags.args).toEqual(['--ci', '--outputFile=path/to/my-file']);
+    expect(config.flags.unknownArgs).toEqual([]);
+    config.testing = {};
+    const jestArgv = buildJestArgv(config);
+    expect(jestArgv.outputFile).toBe('path/to/my-file');
+  });
+
   it('pass --maxWorkers=2 arg when e2e test and --ci', () => {
     const args = ['test', '--ci', '--e2e', '--max-workers=2'];
     const config = mockValidatedConfig();
