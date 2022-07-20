@@ -56,10 +56,10 @@ jobs:
           ref: ${{ github.event_name == 'pull_request_target' && format('refs/pull/{0}/merge', github.event.number) || '' }}
           persist-credentials: false
 
-      - name: Use Node 12
+      - name: Use Node 14
         uses: actions/setup-node@56337c425554a6be30cdef71bf441f15be286854 # v3.1.1
         with:
-          node-version: 12
+          node-version: 14
           cache: 'npm'
 
       - name: Install dependencies
