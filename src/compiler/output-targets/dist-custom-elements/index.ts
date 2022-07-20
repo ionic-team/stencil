@@ -97,9 +97,9 @@ export const getBundleOptions = (
  * Get bundle options for rollup, run the rollup build, optionally minify the
  * output, and write files to disk.
  *
- * @param the validated Stencil configuration we're using
- * @param buildCtx the current build context
+ * @param config the validated Stencil configuration we're using
  * @param compilerCtx the current compiler context
+ * @param buildCtx the current build context
  * @param outputTarget the outputTarget we're currently dealing with
  * @returns an empty promise
  */
