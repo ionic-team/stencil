@@ -1,7 +1,7 @@
 import type * as d from '../../declarations';
 import { LogLevel } from '../../declarations';
 import { BOOLEAN_CLI_ARGS, STRING_CLI_ARGS, NUMBER_CLI_ARGS } from '../config-flags';
-import { parseFlags } from '../parse-flags';
+import { parseEqualsArg, parseFlags } from '../parse-flags';
 
 describe('parseFlags', () => {
   let args: string[] = [];
@@ -190,12 +190,21 @@ describe('parseFlags', () => {
   it.each(STRING_CLI_ARGS)('should parse string flag %s', (cliArg) => {
     const flags = parseFlags([`--${cliArg}`, 'test-value'], sys);
     expect(flags.knownArgs).toEqual([`--${cliArg}`, 'test-value']);
+    expect(flags.unknownArgs).toEqual([]);
     expect(flags[cliArg]).toBe('test-value');
+  });
+
+  it.each(STRING_CLI_ARGS)('should parse string flag --%s=value', (cliArg) => {
+    const flags = parseFlags([`--${cliArg}=path/to/file.js`], sys);
+    expect(flags.knownArgs).toEqual([`--${cliArg}`, 'path/to/file.js']);
+    expect(flags.unknownArgs).toEqual([]);
+    expect(flags[cliArg]).toBe('path/to/file.js');
   });
 
   it.each(NUMBER_CLI_ARGS)('should parse number flag %s', (cliArg) => {
     const flags = parseFlags([`--${cliArg}`, '42'], sys);
     expect(flags.knownArgs).toEqual([`--${cliArg}`, '42']);
+    expect(flags.unknownArgs).toEqual([]);
     expect(flags[cliArg]).toBe(42);
   });
 
@@ -203,6 +212,7 @@ describe('parseFlags', () => {
     args[0] = '--compare';
     const flags = parseFlags(args, sys);
     expect(flags.knownArgs).toEqual(['--compare']);
+    expect(flags.unknownArgs).toEqual([]);
     expect(flags.compare).toBe(true);
   });
 
@@ -573,5 +583,19 @@ describe('parseFlags', () => {
     expect(flags.version).toBe(true);
     expect(flags.help).toBe(true);
     expect(flags.config).toBe('./myconfig.json');
+  });
+
+  describe('parseEqualsArg', () => {
+    it.each([
+      ['--fooBar=baz', '--fooBar', 'baz'],
+      ['--foo-bar=4', '--foo-bar', '4'],
+      ['--fooBar=twenty=3*4', '--fooBar', 'twenty=3*4'],
+      ['--fooBar', '--fooBar', ''],
+      ['--foo-bar', '--foo-bar', ''],
+    ])('should parse %s correctly', (testArg, expectedArg, expectedValue) => {
+      const [arg, value] = parseEqualsArg(testArg);
+      expect(arg).toBe(expectedArg);
+      expect(value).toBe(expectedValue);
+    });
   });
 });

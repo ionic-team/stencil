@@ -51,9 +51,13 @@ export const parseFlags = (args: string[], sys?: CompilerSystem): ConfigFlags =>
     }
   }
 
-  flags.unknownArgs = flags.args.filter((arg: string) => {
-    return !flags.knownArgs.includes(arg);
-  });
+  // to find unknown / unrecognized arguments we filter `args`, including only
+  // arguments whose normalized form is not found in `knownArgs`. `knownArgs`
+  // is populated during the call to `parseArgs` above. For arguments like
+  // `--foobar` the string `"--foobar"` will be added, while for more
+  // complicated arguments like `--bizBoz=bop` or `--bizBoz bop` just the
+  // string `"--bizBoz"` will be added.
+  flags.unknownArgs = flags.args.filter((arg: string) => !flags.knownArgs.includes(parseEqualsArg(arg)[0]));
 
   return flags;
 };
@@ -259,17 +263,18 @@ const getValue = (
 
   let value: string | undefined;
   let matchingArg: string | undefined;
+
   args.forEach((arg, i) => {
     if (arg.startsWith(`--${dashCaseName}=`) || arg.startsWith(`--${configCaseName}=`)) {
-      value = getEqualsValue(arg);
-      matchingArg = arg;
+      // our argument was passed at the command-line in the format --argName=arg-value
+      [matchingArg, value] = parseEqualsArg(arg);
     } else if (arg === `--${dashCaseName}` || arg === `--${configCaseName}`) {
+      // the next value in the array is assumed to be a value for this argument
       value = args[i + 1];
       matchingArg = arg;
     } else if (alias) {
       if (arg.startsWith(`-${alias}=`)) {
-        value = getEqualsValue(arg);
-        matchingArg = arg;
+        [matchingArg, value] = parseEqualsArg(arg);
       } else if (arg === `-${alias}`) {
         value = args[i + 1];
         matchingArg = arg;
@@ -287,13 +292,43 @@ interface CLIArgValue {
 }
 
 /**
- * When a parameter is set in the format `--foobar=12` at the CLI (as opposed to
- * `--foobar 12`) we want to get the value after the `=` sign
+ * Parse an 'equals' argument, which is a CLI argument-value pair in the
+ * format `--foobar=12` (as opposed to a space-separated format like
+ * `--foobar 12`).
  *
- * @param commandArgument the arg in question
- * @returns the value after the `=`
+ * To parse this we split on the `=`, returning the first part as the argument
+ * name and the second part as the value. We join the value on `"="` in case
+ * there is another `"="` in the argument.
+ *
+ * This function is safe to call with any arg, and can therefore be used as
+ * an argument 'normalizer'. If CLI argument is not an 'equals' argument then
+ * the return value will be a tuple of the original argument and an empty
+ * string `""` for the value.
+ *
+ * In code terms, if you do:
+ *
+ * ```ts
+ * const [arg, value] = parseEqualsArg("--myArgument")
+ * ```
+ *
+ * Then `arg` will be `"--myArgument"` and `value` will be `""`, whereas if
+ * you do:
+ *
+ *
+ * ```ts
+ * const [arg, value] = parseEqualsArg("--myArgument=myValue")
+ * ```
+ *
+ * Then `arg` will be `"--myArgument"` and `value` will be `"myValue"`.
+ *
+ * @param arg the arg in question
+ * @returns a tuple containing the arg name and the value (if present)
  */
-const getEqualsValue = (commandArgument: string) => commandArgument.split('=').slice(1).join('=');
+export const parseEqualsArg = (arg: string): [string, string] => {
+  const [originalArg, ...value] = arg.split('=');
+
+  return [originalArg, value.join('=')];
+};
 
 /**
  * Small helper for getting type-system-level assurance that a `string` can be
