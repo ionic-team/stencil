@@ -190,21 +190,21 @@ describe('parseFlags', () => {
   it.each(STRING_CLI_ARGS)('should parse string flag %s', (cliArg) => {
     const flags = parseFlags([`--${cliArg}`, 'test-value'], sys);
     expect(flags.knownArgs).toEqual([`--${cliArg}`, 'test-value']);
-    expect(flags.unknownArgs).toEqual([])
+    expect(flags.unknownArgs).toEqual([]);
     expect(flags[cliArg]).toBe('test-value');
   });
 
   it.each(STRING_CLI_ARGS)('should parse string flag --%s=value', (cliArg) => {
     const flags = parseFlags([`--${cliArg}=path/to/file.js`], sys);
     expect(flags.knownArgs).toEqual([`--${cliArg}`, 'path/to/file.js']);
-    expect(flags.unknownArgs).toEqual([])
+    expect(flags.unknownArgs).toEqual([]);
     expect(flags[cliArg]).toBe('path/to/file.js');
   });
 
   it.each(NUMBER_CLI_ARGS)('should parse number flag %s', (cliArg) => {
     const flags = parseFlags([`--${cliArg}`, '42'], sys);
     expect(flags.knownArgs).toEqual([`--${cliArg}`, '42']);
-    expect(flags.unknownArgs).toEqual([])
+    expect(flags.unknownArgs).toEqual([]);
     expect(flags[cliArg]).toBe(42);
   });
 
@@ -212,7 +212,7 @@ describe('parseFlags', () => {
     args[0] = '--compare';
     const flags = parseFlags(args, sys);
     expect(flags.knownArgs).toEqual(['--compare']);
-    expect(flags.unknownArgs).toEqual([])
+    expect(flags.unknownArgs).toEqual([]);
     expect(flags.compare).toBe(true);
   });
 

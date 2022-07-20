@@ -293,8 +293,8 @@ interface CLIArgValue {
 
 /**
  * Parse an 'equals' argument, which is a CLI argument-value pair in the
- * format `--foobar=12` (as opposed to the space-separated format `--foobar
- * 12`).
+ * format `--foobar=12` (as opposed to a space-separated format like
+ * `--foobar 12`).
  *
  * To parse this we split on the `=`, returning the first part as the argument
  * name and the second part as the value. We join the value on `"="` in case
