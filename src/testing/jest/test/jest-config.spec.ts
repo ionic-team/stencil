@@ -19,13 +19,13 @@ describe('jest-config', () => {
     expect(jestArgv.maxWorkers).toBe(2);
   });
 
-  it('should pass --outputFile=path/to/file', () => {
+  it('marks outputFile as a Jest argument', () => {
     const args = ['test', '--ci', '--outputFile=path/to/my-file'];
     const config = mockValidatedConfig();
+    config.testing = {};
     config.flags = parseFlags(args, config.sys);
     expect(config.flags.args).toEqual(['--ci', '--outputFile=path/to/my-file']);
     expect(config.flags.unknownArgs).toEqual([]);
-    config.testing = {};
     const jestArgv = buildJestArgv(config);
     expect(jestArgv.outputFile).toBe('path/to/my-file');
   });
