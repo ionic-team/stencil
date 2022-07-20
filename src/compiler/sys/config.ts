@@ -6,7 +6,12 @@ import { createConfigFlags } from '../../cli/config-flags';
 
 export const getConfig = (userConfig: d.Config): d.ValidatedConfig => {
   const logger = userConfig.logger ?? createLogger();
-  const config: d.ValidatedConfig = { ...userConfig, flags: createConfigFlags(userConfig.flags ?? {}), logger };
+  const config: d.ValidatedConfig = {
+    ...userConfig,
+    flags: createConfigFlags(userConfig.flags ?? {}),
+    logger,
+    outputTargets: userConfig.outputTargets ?? [],
+  };
 
   if (!config.sys) {
     config.sys = createSystem({ logger: config.logger });

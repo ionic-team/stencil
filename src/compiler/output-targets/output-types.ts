@@ -9,7 +9,7 @@ import { isOutputTargetDistTypes } from './output-utils';
  * @param buildCtx the context associated with the current build
  */
 export const outputTypes = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx
 ): Promise<void> => {
