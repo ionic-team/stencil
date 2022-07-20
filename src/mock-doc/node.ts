@@ -715,6 +715,9 @@ export class MockElement extends MockNode {
     this.setAttributeNS(null, 'title', value);
   }
 
+  animate() {
+    /**/
+  }
   onanimationstart() {
     /**/
   }
@@ -977,6 +980,18 @@ export class MockElement extends MockNode {
     /**/
   }
   onwheel() {
+    /**/
+  }
+  requestFullscreen() {
+    /**/
+  }
+  scrollBy() {
+    /**/
+  }
+  scrollTo() {
+    /**/
+  }
+  scrollIntoView() {
     /**/
   }
 
