@@ -153,7 +153,6 @@ export const validateModule = async (config: d.Config, compilerCtx: d.CompilerCt
   const recommendedRelPath = recommendedModulePath(config);
 
   if (!isString(currentModule)) {
-    // TODO should this change?
     let msg = 'package.json "module" property is required when generating a distribution.';
 
     if (recommendedRelPath !== null) {
