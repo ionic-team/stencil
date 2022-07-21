@@ -47,9 +47,11 @@ export function mockValidatedConfig(overrides: Partial<ValidatedConfig> = {}): V
  * types/validity of its data.
  * @param sys an optional compiler system to associate with the config. If one is not provided, one will be created for
  * the caller
+ * @param overrides a partial implementation of `UnvalidatedConfig`. Any provided fields will override the defaults
+ * provided by this function.
  * @returns the mock Stencil configuration
  */
-export function mockConfig(sys?: CompilerSystem): UnvalidatedConfig {
+export function mockConfig(sys?: CompilerSystem, overrides: Partial<UnvalidatedConfig> = {}): UnvalidatedConfig {
   const rootDir = path.resolve('/');
 
   if (!sys) {
@@ -87,6 +89,7 @@ export function mockConfig(sys?: CompilerSystem): UnvalidatedConfig {
     sys,
     testing: null,
     validateTypes: false,
+    ...overrides,
   };
 }
 
