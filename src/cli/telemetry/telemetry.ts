@@ -207,8 +207,8 @@ const CONFIG_PROPS_TO_DELETE: ReadonlyArray<keyof d.Config> = ['sys', 'logger', 
  * @param config the config to anonymize
  * @returns an anonymized copy of the same config
  */
-export const anonymizeConfigForTelemetry = (config: d.Config): d.Config => {
-  const anonymizedConfig = { ...config };
+export const anonymizeConfigForTelemetry = (config: d.ValidatedConfig): d.Config => {
+  const anonymizedConfig: d.Config = { ...config };
 
   for (const prop of CONFIG_PROPS_TO_ANONYMIZE) {
     if (anonymizedConfig[prop] !== undefined) {
@@ -216,7 +216,7 @@ export const anonymizeConfigForTelemetry = (config: d.Config): d.Config => {
     }
   }
 
-  anonymizedConfig.outputTargets = (config.outputTargets ?? []).map((target) => {
+  anonymizedConfig.outputTargets = config.outputTargets.map((target) => {
     // Anonymize the outputTargets on our configuration, taking advantage of the
     // optional 2nd argument to `JSON.stringify`. If anything is not a string
     // we retain it so that any nested properties are handled, else we check
