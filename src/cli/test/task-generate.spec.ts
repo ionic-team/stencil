@@ -14,13 +14,15 @@ jest.mock('prompts', () => ({
 
 const setup = async () => {
   const sys = mockCompilerSystem();
-  const config: d.ValidatedConfig = mockValidatedConfig({ sys });
-  config.configPath = '/testing-path';
-  config.srcDir = '/src';
+  const config: d.ValidatedConfig = mockValidatedConfig({
+    configPath: '/testing-path',
+    flags: { args: [], knownArgs: [], task: 'generate', unknownArgs: [] },
+    srcDir: '/src',
+    sys,
+  });
 
   // set up some mocks / spies
   config.sys.exit = jest.fn();
-  config.flags.unknownArgs = [];
   const errorSpy = jest.spyOn(config.logger, 'error');
   const validateTagSpy = jest.spyOn(utils, 'validateComponentTag').mockReturnValue(undefined);
 

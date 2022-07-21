@@ -15,18 +15,21 @@ import { join, relative } from 'path';
 
 const setup = () => {
   const sys = mockCompilerSystem();
-  const config: d.ValidatedConfig = mockValidatedConfig({ sys });
+  const config: d.ValidatedConfig = mockValidatedConfig({
+    configPath: '/testing-path',
+    buildAppCore: true,
+    buildEs5: true,
+    namespace: 'TestApp',
+    outputTargets: [{ type: DIST_CUSTOM_ELEMENTS, dir: 'my-best-dir' }],
+    srcDir: '/src',
+    sys,
+  });
   const compilerCtx = mockCompilerCtx(config);
   const buildCtx = mockBuildCtx(config, compilerCtx);
+
   const root = config.rootDir;
-  config.configPath = '/testing-path';
-  config.srcDir = '/src';
-  config.buildAppCore = true;
   config.rootDir = path.join(root, 'User', 'testing', '/');
-  config.namespace = 'TestApp';
-  config.buildEs5 = true;
   config.globalScript = path.join(root, 'User', 'testing', 'src', 'global.ts');
-  config.outputTargets = [{ type: DIST_CUSTOM_ELEMENTS, dir: 'my-best-dir' }];
 
   const bundleCustomElementsSpy = jest.spyOn(outputCustomElementsMod, 'bundleCustomElements');
 

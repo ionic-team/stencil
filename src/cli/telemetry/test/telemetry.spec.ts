@@ -14,9 +14,11 @@ describe('telemetryBuildFinishedAction', () => {
 
   beforeEach(() => {
     sys = createSystem();
-    config = mockValidatedConfig({ sys });
-    config.outputTargets = [];
-    config.flags.args = [];
+    config = mockValidatedConfig({
+      flags: { args: [], knownArgs: [], task: 'build', unknownArgs: [] },
+      outputTargets: [],
+      sys,
+    });
   });
 
   it('issues a network request when complete', async () => {
@@ -45,9 +47,11 @@ describe('telemetryAction', () => {
 
   beforeEach(() => {
     sys = createSystem();
-    config = mockValidatedConfig({ sys });
-    config.outputTargets = [];
-    config.flags.args = [];
+    config = mockValidatedConfig({
+      flags: { args: [], knownArgs: [], task: 'build', unknownArgs: [] },
+      outputTargets: [],
+      sys,
+    });
   });
 
   it('issues a network request when no async function is passed', async () => {
