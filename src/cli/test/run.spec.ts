@@ -137,8 +137,7 @@ describe('run', () => {
       sys = mockCompilerSystem();
       sys.exit = jest.fn();
 
-      unvalidatedConfig = mockConfig({ sys });
-      unvalidatedConfig.outputTargets = null;
+      unvalidatedConfig = mockConfig({ outputTargets: null, sys });
 
       validatedConfig = mockValidatedConfig({ sys });
 
@@ -260,8 +259,7 @@ describe('run', () => {
     });
 
     it('defaults to the provided task if no flags exist on the provided config', async () => {
-      unvalidatedConfig = mockConfig({ sys });
-      unvalidatedConfig.flags = undefined;
+      unvalidatedConfig = mockConfig({ flags: undefined, sys });
 
       await runTask(coreCompiler, unvalidatedConfig, 'help', sys);
 
