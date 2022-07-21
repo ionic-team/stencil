@@ -82,7 +82,16 @@ export async function telemetryAction(
   }
 }
 
-export function hasAppTarget(config: d.Config): boolean {
+/**
+ * Helper function to determine if a Stencil configuration builds an application.
+ *
+ * This function is a rough approximation whether an application is generated as a part of a Stencil build, based on
+ * contents of the project's `stencil.config.ts` file.
+ *
+ * @param config the configuration used by the Stencil project
+ * @returns true if we believe the project generates an application, false otherwise
+ */
+export function hasAppTarget(config: d.ValidatedConfig): boolean {
   return config.outputTargets.some(
     (target) => target.type === WWW && (!!target.serviceWorker || (!!target.baseUrl && target.baseUrl !== '/'))
   );
