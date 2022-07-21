@@ -57,35 +57,34 @@ export function mockConfig(sys?: CompilerSystem): UnvalidatedConfig {
 
   return {
     _isTesting: true,
-
-    namespace: 'Testing',
-    rootDir: rootDir,
-    globalScript: null,
-    devMode: true,
-    enableCache: false,
     buildAppCore: false,
     buildDist: true,
-    flags: createConfigFlags(),
-    bundles: null,
-    outputTargets: null,
     buildEs5: false,
+    bundles: null,
+    devMode: true,
+    enableCache: false,
+    extras: {},
+    flags: createConfigFlags(),
+    globalScript: null,
     hashFileNames: false,
     logger: new TestingLogger(),
     maxConcurrentWorkers: 0,
     minifyCss: false,
     minifyJs: false,
-    sys,
-    testing: null,
-    validateTypes: false,
-    extras: {},
+    namespace: 'Testing',
     nodeResolve: {
       customResolveOptions: {},
     },
-    sourceMap: true,
+    outputTargets: null,
     rollupPlugins: {
       before: [],
       after: [],
     },
+    rootDir,
+    sourceMap: true,
+    sys,
+    testing: null,
+    validateTypes: false,
   };
 }
 
