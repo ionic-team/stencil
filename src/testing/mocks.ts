@@ -20,7 +20,6 @@ import { noop } from '@utils';
 import { buildEvents } from '../compiler/events';
 import { createConfigFlags } from '../cli/config-flags';
 
-// TODO(STENCIL-486): Update `mockValidatedConfig` to accept any property found on `ValidatedConfig`
 /**
  * Creates a mock instance of an internal, validated Stencil configuration object
  * the caller
@@ -40,7 +39,6 @@ export function mockValidatedConfig(overrides: Partial<ValidatedConfig> = {}): V
   };
 }
 
-// TODO(STENCIL-486): Update `mockConfig` to accept any property found on `UnvalidatedConfig`
 /**
  * Creates a mock instance of a Stencil configuration entity. The mocked configuration has no guarantees around the
  * types/validity of its data.
