@@ -2,7 +2,6 @@ import type {
   BuildCtx,
   Cache,
   CompilerCtx,
-  CompilerSystem,
   Config,
   LoadConfigInit,
   ValidatedConfig,
@@ -30,7 +29,7 @@ import { createConfigFlags } from '../cli/config-flags';
  * @returns the mock Stencil configuration
  */
 export function mockValidatedConfig(overrides: Partial<ValidatedConfig> = {}): ValidatedConfig {
-  const baseConfig = mockConfig(overrides.sys);
+  const baseConfig = mockConfig(overrides);
 
   return {
     ...baseConfig,
@@ -45,15 +44,14 @@ export function mockValidatedConfig(overrides: Partial<ValidatedConfig> = {}): V
 /**
  * Creates a mock instance of a Stencil configuration entity. The mocked configuration has no guarantees around the
  * types/validity of its data.
- * @param sys an optional compiler system to associate with the config. If one is not provided, one will be created for
- * the caller
  * @param overrides a partial implementation of `UnvalidatedConfig`. Any provided fields will override the defaults
  * provided by this function.
  * @returns the mock Stencil configuration
  */
-export function mockConfig(sys?: CompilerSystem, overrides: Partial<UnvalidatedConfig> = {}): UnvalidatedConfig {
+export function mockConfig(overrides: Partial<UnvalidatedConfig> = {}): UnvalidatedConfig {
   const rootDir = path.resolve('/');
 
+  let { sys } = overrides;
   if (!sys) {
     sys = createTestingSystem();
   }
