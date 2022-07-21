@@ -14,7 +14,7 @@ jest.mock('prompts', () => ({
 
 const setup = async () => {
   const sys = mockCompilerSystem();
-  const config: d.ValidatedConfig = mockValidatedConfig(sys);
+  const config: d.ValidatedConfig = mockValidatedConfig({ sys });
   config.configPath = '/testing-path';
   config.srcDir = '/src';
 

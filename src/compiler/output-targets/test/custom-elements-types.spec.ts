@@ -15,7 +15,7 @@ import { join, relative } from 'path';
 
 const setup = () => {
   const sys = mockCompilerSystem();
-  const config: d.ValidatedConfig = mockValidatedConfig(sys);
+  const config: d.ValidatedConfig = mockValidatedConfig({ sys });
   const compilerCtx = mockCompilerCtx(config);
   const buildCtx = mockBuildCtx(config, compilerCtx);
   const root = config.rootDir;

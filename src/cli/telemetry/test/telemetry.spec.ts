@@ -14,7 +14,7 @@ describe('telemetryBuildFinishedAction', () => {
 
   beforeEach(() => {
     sys = createSystem();
-    config = mockValidatedConfig(sys);
+    config = mockValidatedConfig({ sys });
     config.outputTargets = [];
     config.flags.args = [];
   });
@@ -45,7 +45,7 @@ describe('telemetryAction', () => {
 
   beforeEach(() => {
     sys = createSystem();
-    config = mockValidatedConfig(sys);
+    config = mockValidatedConfig({ sys });
     config.outputTargets = [];
     config.flags.args = [];
   });
