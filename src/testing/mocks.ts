@@ -26,9 +26,11 @@ import { createConfigFlags } from '../cli/config-flags';
  * Creates a mock instance of an internal, validated Stencil configuration object
  * @param sys an optional compiler system to associate with the config. If one is not provided, one will be created for
  * the caller
+ * @param overrides a partial implementation of `ValidatedConfig`. Any provided fields will override the defaults
+ * provided by this function.
  * @returns the mock Stencil configuration
  */
-export function mockValidatedConfig(sys?: CompilerSystem): ValidatedConfig {
+export function mockValidatedConfig(sys?: CompilerSystem, overrides: Partial<ValidatedConfig> = {}): ValidatedConfig {
   const baseConfig = mockConfig(sys);
 
   return {
@@ -36,6 +38,7 @@ export function mockValidatedConfig(sys?: CompilerSystem): ValidatedConfig {
     flags: createConfigFlags(),
     logger: mockLogger(),
     outputTargets: baseConfig.outputTargets ?? [],
+    ...overrides,
   };
 }
 
