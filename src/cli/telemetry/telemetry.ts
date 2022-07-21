@@ -101,7 +101,15 @@ export function isUsingYarn(sys: d.CompilerSystem) {
   return sys.getEnvironmentVar('npm_execpath')?.includes('yarn') || false;
 }
 
-export async function getActiveTargets(config: d.Config): Promise<string[]> {
+/**
+ * Build a list of the different types of output targets used in a Stencil configuration.
+ *
+ * Duplicate entries will not be returned from the list
+ *
+ * @param config the configuration used by the Stencil project
+ * @returns a unique list of output target types found in the Stencil configuration
+ */
+export async function getActiveTargets(config: d.ValidatedConfig): Promise<string[]> {
   const result = config.outputTargets.map((t) => t.type);
   return Array.from(new Set(result));
 }
