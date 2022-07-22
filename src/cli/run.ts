@@ -138,7 +138,7 @@ export const runTask = async (
 
   switch (task) {
     case 'build':
-      await taskBuild(coreCompiler, strictConfig, sys);
+      await taskBuild(coreCompiler, strictConfig);
       break;
 
     case 'docs':
