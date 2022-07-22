@@ -19,11 +19,12 @@ import {
 /**
  * Parse command line arguments into a structured `ConfigFlags` object
  *
- * @param args an array of config flags
- * @param sys an optional compiler system
+ * @param args an array of CLI flags
+ * @param _sys an optional compiler system
  * @returns a structured ConfigFlags object
  */
-export const parseFlags = (args: string[], sys?: CompilerSystem): ConfigFlags => {
+export const parseFlags = (args: string[], _sys?: CompilerSystem): ConfigFlags => {
+  // TODO(STENCIL-509): remove the _sys parameter here ^^ (for v3)
   const flags: ConfigFlags = createConfigFlags();
 
   // cmd line has more priority over npm scripts cmd
@@ -32,17 +33,6 @@ export const parseFlags = (args: string[], sys?: CompilerSystem): ConfigFlags =>
     flags.task = flags.args[0] as TaskCommand;
   }
   parseArgs(flags, flags.args);
-
-  if (sys && sys.name === 'node') {
-    const envArgs = getNpmConfigEnvArgs(sys);
-    parseArgs(flags, envArgs);
-
-    envArgs.forEach((envArg) => {
-      if (!flags.args.includes(envArg)) {
-        flags.args.push(envArg);
-      }
-    });
-  }
 
   if (flags.task != null) {
     const i = flags.args.indexOf(flags.task);
@@ -344,19 +334,3 @@ const isLogLevel = (maybeLogLevel: string): maybeLogLevel is LogLevel =>
   //
   // see microsoft/TypeScript#31018 for some discussion of this
   LOG_LEVELS.includes(maybeLogLevel as any);
-
-const getNpmConfigEnvArgs = (sys: CompilerSystem) => {
-  // process.env.npm_config_argv
-  // {"remain":["4444"],"cooked":["run","serve","--port","4444"],"original":["run","serve","--port","4444"]}
-  let args: string[] = [];
-  try {
-    const npmConfigArgs = sys.getEnvironmentVar('npm_config_argv');
-    if (npmConfigArgs) {
-      args = JSON.parse(npmConfigArgs).original as string[];
-      if (args[0] === 'run') {
-        args = args.slice(2);
-      }
-    }
-  } catch (e) {}
-  return args;
-};

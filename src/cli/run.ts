@@ -23,7 +23,7 @@ export const run = async (init: d.CliInitOptions) => {
   const { args, logger, sys } = init;
 
   try {
-    const flags = parseFlags(args, sys);
+    const flags = parseFlags(args);
     const task = flags.task;
 
     if (flags.debug || flags.verbose) {
