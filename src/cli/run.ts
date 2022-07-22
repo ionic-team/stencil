@@ -75,7 +75,7 @@ export const run = async (init: d.CliInitOptions) => {
     loadedCompilerLog(sys, logger, flags, coreCompiler);
 
     if (task === 'info') {
-      await taskInfo(coreCompiler, sys, logger);
+      taskInfo(coreCompiler, sys, logger);
       return;
     }
 
