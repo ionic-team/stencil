@@ -82,7 +82,16 @@ export async function telemetryAction(
   }
 }
 
-export function hasAppTarget(config: d.Config): boolean {
+/**
+ * Helper function to determine if a Stencil configuration builds an application.
+ *
+ * This function is a rough approximation whether an application is generated as a part of a Stencil build, based on
+ * contents of the project's `stencil.config.ts` file.
+ *
+ * @param config the configuration used by the Stencil project
+ * @returns true if we believe the project generates an application, false otherwise
+ */
+export function hasAppTarget(config: d.ValidatedConfig): boolean {
   return config.outputTargets.some(
     (target) => target.type === WWW && (!!target.serviceWorker || (!!target.baseUrl && target.baseUrl !== '/'))
   );
@@ -92,7 +101,15 @@ export function isUsingYarn(sys: d.CompilerSystem) {
   return sys.getEnvironmentVar('npm_execpath')?.includes('yarn') || false;
 }
 
-export async function getActiveTargets(config: d.Config): Promise<string[]> {
+/**
+ * Build a list of the different types of output targets used in a Stencil configuration.
+ *
+ * Duplicate entries will not be returned from the list
+ *
+ * @param config the configuration used by the Stencil project
+ * @returns a unique list of output target types found in the Stencil configuration
+ */
+export function getActiveTargets(config: d.ValidatedConfig): string[] {
   const result = config.outputTargets.map((t) => t.type);
   return Array.from(new Set(result));
 }
@@ -116,7 +133,7 @@ export const prepareData = async (
 ): Promise<d.TrackableData> => {
   const { typescript, rollup } = coreCompiler.versions || { typescript: 'unknown', rollup: 'unknown' };
   const { packages, packagesNoVersions } = await getInstalledPackages(sys, config);
-  const targets = await getActiveTargets(config);
+  const targets = getActiveTargets(config);
   const yarn = isUsingYarn(sys);
   const stencil = coreCompiler.version || 'unknown';
   const system = `${sys.name} ${sys.version}`;
@@ -190,8 +207,8 @@ const CONFIG_PROPS_TO_DELETE: ReadonlyArray<keyof d.Config> = ['sys', 'logger', 
  * @param config the config to anonymize
  * @returns an anonymized copy of the same config
  */
-export const anonymizeConfigForTelemetry = (config: d.Config): d.Config => {
-  const anonymizedConfig = { ...config };
+export const anonymizeConfigForTelemetry = (config: d.ValidatedConfig): d.Config => {
+  const anonymizedConfig: d.Config = { ...config };
 
   for (const prop of CONFIG_PROPS_TO_ANONYMIZE) {
     if (anonymizedConfig[prop] !== undefined) {
@@ -199,7 +216,7 @@ export const anonymizeConfigForTelemetry = (config: d.Config): d.Config => {
     }
   }
 
-  anonymizedConfig.outputTargets = (config.outputTargets ?? []).map((target) => {
+  anonymizedConfig.outputTargets = config.outputTargets.map((target) => {
     // Anonymize the outputTargets on our configuration, taking advantage of the
     // optional 2nd argument to `JSON.stringify`. If anything is not a string
     // we retain it so that any nested properties are handled, else we check
