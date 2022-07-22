@@ -109,7 +109,7 @@ describe('hasAppTarget()', () => {
 
   beforeEach(() => {
     sys = createSystem();
-    config = mockValidatedConfig(sys);
+    config = mockValidatedConfig({ sys });
   });
 
   it("returns 'false' when `outputTargets` is empty", () => {
@@ -288,7 +288,7 @@ describe('anonymizeConfigForTelemetry', () => {
 
   beforeEach(() => {
     sys = createSystem();
-    config = mockValidatedConfig(sys);
+    config = mockValidatedConfig({ sys });
   });
 
   it.each([
