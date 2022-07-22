@@ -2,7 +2,6 @@ import type {
   BuildCtx,
   Cache,
   CompilerCtx,
-  CompilerSystem,
   Config,
   LoadConfigInit,
   ValidatedConfig,
@@ -21,35 +20,36 @@ import { noop } from '@utils';
 import { buildEvents } from '../compiler/events';
 import { createConfigFlags } from '../cli/config-flags';
 
-// TODO(STENCIL-486): Update `mockValidatedConfig` to accept any property found on `ValidatedConfig`
 /**
  * Creates a mock instance of an internal, validated Stencil configuration object
- * @param sys an optional compiler system to associate with the config. If one is not provided, one will be created for
  * the caller
+ * @param overrides a partial implementation of `ValidatedConfig`. Any provided fields will override the defaults
+ * provided by this function.
  * @returns the mock Stencil configuration
  */
-export function mockValidatedConfig(sys?: CompilerSystem): ValidatedConfig {
-  const baseConfig = mockConfig(sys);
+export function mockValidatedConfig(overrides: Partial<ValidatedConfig> = {}): ValidatedConfig {
+  const baseConfig = mockConfig(overrides);
 
   return {
     ...baseConfig,
     flags: createConfigFlags(),
     logger: mockLogger(),
     outputTargets: baseConfig.outputTargets ?? [],
+    ...overrides,
   };
 }
 
-// TODO(STENCIL-486): Update `mockConfig` to accept any property found on `UnvalidatedConfig`
 /**
  * Creates a mock instance of a Stencil configuration entity. The mocked configuration has no guarantees around the
  * types/validity of its data.
- * @param sys an optional compiler system to associate with the config. If one is not provided, one will be created for
- * the caller
+ * @param overrides a partial implementation of `UnvalidatedConfig`. Any provided fields will override the defaults
+ * provided by this function.
  * @returns the mock Stencil configuration
  */
-export function mockConfig(sys?: CompilerSystem): UnvalidatedConfig {
+export function mockConfig(overrides: Partial<UnvalidatedConfig> = {}): UnvalidatedConfig {
   const rootDir = path.resolve('/');
 
+  let { sys } = overrides;
   if (!sys) {
     sys = createTestingSystem();
   }
@@ -57,35 +57,35 @@ export function mockConfig(sys?: CompilerSystem): UnvalidatedConfig {
 
   return {
     _isTesting: true,
-
-    namespace: 'Testing',
-    rootDir: rootDir,
-    globalScript: null,
-    devMode: true,
-    enableCache: false,
     buildAppCore: false,
     buildDist: true,
-    flags: createConfigFlags(),
-    bundles: null,
-    outputTargets: null,
     buildEs5: false,
+    bundles: null,
+    devMode: true,
+    enableCache: false,
+    extras: {},
+    flags: createConfigFlags(),
+    globalScript: null,
     hashFileNames: false,
     logger: new TestingLogger(),
     maxConcurrentWorkers: 0,
     minifyCss: false,
     minifyJs: false,
-    sys,
-    testing: null,
-    validateTypes: false,
-    extras: {},
+    namespace: 'Testing',
     nodeResolve: {
       customResolveOptions: {},
     },
-    sourceMap: true,
+    outputTargets: null,
     rollupPlugins: {
       before: [],
       after: [],
     },
+    rootDir,
+    sourceMap: true,
+    sys,
+    testing: null,
+    validateTypes: false,
+    ...overrides,
   };
 }
 
