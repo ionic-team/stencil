@@ -109,7 +109,7 @@ export function isUsingYarn(sys: d.CompilerSystem) {
  * @param config the configuration used by the Stencil project
  * @returns a unique list of output target types found in the Stencil configuration
  */
-export async function getActiveTargets(config: d.ValidatedConfig): Promise<string[]> {
+export function getActiveTargets(config: d.ValidatedConfig): string[] {
   const result = config.outputTargets.map((t) => t.type);
   return Array.from(new Set(result));
 }
@@ -133,7 +133,7 @@ export const prepareData = async (
 ): Promise<d.TrackableData> => {
   const { typescript, rollup } = coreCompiler.versions || { typescript: 'unknown', rollup: 'unknown' };
   const { packages, packagesNoVersions } = await getInstalledPackages(sys, config);
-  const targets = await getActiveTargets(config);
+  const targets = getActiveTargets(config);
   const yarn = isUsingYarn(sys);
   const stencil = coreCompiler.version || 'unknown';
   const system = `${sys.name} ${sys.version}`;
