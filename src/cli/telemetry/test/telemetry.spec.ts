@@ -15,7 +15,7 @@ describe('telemetryBuildFinishedAction', () => {
   beforeEach(() => {
     sys = createSystem();
     config = mockValidatedConfig({
-      flags: { args: [], knownArgs: [], task: 'build', unknownArgs: [] },
+      flags: createConfigFlags({ task: 'build' }),
       outputTargets: [],
       sys,
     });
@@ -48,7 +48,7 @@ describe('telemetryAction', () => {
   beforeEach(() => {
     sys = createSystem();
     config = mockValidatedConfig({
-      flags: { args: [], knownArgs: [], task: 'build', unknownArgs: [] },
+      flags: createConfigFlags({ task: 'build' }),
       outputTargets: [],
       sys,
     });

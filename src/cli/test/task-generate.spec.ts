@@ -5,6 +5,7 @@ import * as utils from '../../utils/validation';
 
 import * as coreCompiler from '@stencil/core/compiler';
 import { CoreCompiler } from '../load-compiler';
+import { createConfigFlags } from '../config-flags';
 
 const promptMock = jest.fn().mockResolvedValue('my-component');
 
@@ -16,7 +17,7 @@ const setup = async () => {
   const sys = mockCompilerSystem();
   const config: d.ValidatedConfig = mockValidatedConfig({
     configPath: '/testing-path',
-    flags: { args: [], knownArgs: [], task: 'generate', unknownArgs: [] },
+    flags: createConfigFlags({ task: 'generate' }),
     srcDir: '/src',
     sys,
   });
