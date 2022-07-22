@@ -12,29 +12,30 @@ describe.skip('outputTarget, www / dist / docs', () => {
   const root = path.resolve('/');
 
   it('dist, www and readme files w/ custom paths', async () => {
-    config = mockConfig();
-    config.flags.docs = true;
-    config.buildAppCore = true;
-    config.rootDir = path.join(root, 'User', 'testing', '/');
-    config.namespace = 'TestApp';
-    config.outputTargets = [
-      {
-        type: 'www',
-        dir: 'custom-www',
-        buildDir: 'www-build',
-        indexHtml: 'custom-index.htm',
-      } as any as d.OutputTargetDist,
-      {
-        type: 'dist',
-        dir: 'custom-dist',
-        buildDir: 'dist-build',
-        collectionDir: 'dist-collection',
-        typesDir: 'custom-types',
-      },
-      {
-        type: 'docs',
-      } as d.OutputTargetDocsReadme,
-    ];
+    config = mockConfig({
+      buildAppCore: true,
+      flags: { docs: true },
+      namespace: 'TestApp',
+      outputTargets: [
+        {
+          type: 'www',
+          dir: 'custom-www',
+          buildDir: 'www-build',
+          indexHtml: 'custom-index.htm',
+        } as any as d.OutputTargetDist,
+        {
+          type: 'dist',
+          dir: 'custom-dist',
+          buildDir: 'dist-build',
+          collectionDir: 'dist-collection',
+          typesDir: 'custom-types',
+        },
+        {
+          type: 'docs',
+        } as d.OutputTargetDocsReadme,
+      ],
+      rootDir: path.join(root, 'User', 'testing', '/'),
+    });
 
     compiler = new Compiler(config);
 

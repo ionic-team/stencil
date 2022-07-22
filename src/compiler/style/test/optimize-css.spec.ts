@@ -14,15 +14,13 @@ describe('optimizeCss', () => {
   jasmine.DEFAULT_TIMEOUT_INTERVAL = 30000;
 
   beforeEach(() => {
-    config = mockConfig();
-    config.maxConcurrentWorkers = 0;
+    config = mockConfig({ maxConcurrentWorkers: 0, minifyCss: true });
     compilerCtx = mockCompilerCtx(config);
     diagnostics = [];
   });
 
   it('handles error', async () => {
     const filePath = path.join(os.tmpdir(), 'my.css');
-    config.minifyCss = true;
     const styleText = `/* css */ body color: #ff0000; }`;
     await optimizeCss(config, compilerCtx, diagnostics, styleText, filePath);
 
@@ -30,7 +28,6 @@ describe('optimizeCss', () => {
   });
 
   it('discard-comments', async () => {
-    config.minifyCss = true;
     const styleText = `/* css */ body { color: #ff0000; }`;
     const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null);
 
@@ -40,7 +37,6 @@ describe('optimizeCss', () => {
 
   it('minify-gradients', async () => {
     config.autoprefixCss = false;
-    config.minifyCss = true;
     const styleText = `
       h1 {
         background: linear-gradient(to bottom, #ffe500 0%, #ffe500 50%, #121 50%, #121 100%);
@@ -53,7 +49,6 @@ describe('optimizeCss', () => {
   });
 
   it('reduce-initial', async () => {
-    config.minifyCss = true;
     const styleText = `
       h1 {
         min-width: initial;
@@ -66,7 +61,6 @@ describe('optimizeCss', () => {
   });
 
   it('normalize-display-values', async () => {
-    config.minifyCss = true;
     const styleText = `
       h1 {
         display: inline flow-root;
@@ -80,7 +74,6 @@ describe('optimizeCss', () => {
 
   it('reduce-transforms', async () => {
     config.autoprefixCss = false;
-    config.minifyCss = true;
     const styleText = `
       h1 {
         transform: rotate3d(0, 0, 1, 20deg);
@@ -93,7 +86,6 @@ describe('optimizeCss', () => {
   });
 
   it('colormin', async () => {
-    config.minifyCss = true;
     const styleText = `body { color: #ff0000; }`;
     const output = await optimizeCss(config, compilerCtx, diagnostics, styleText, null);
 
@@ -102,7 +94,6 @@ describe('optimizeCss', () => {
   });
 
   it('convert-values', async () => {
-    config.minifyCss = true;
     const styleText = `
       h1 {
         width: 0em;
@@ -115,7 +106,6 @@ describe('optimizeCss', () => {
   });
 
   it('ordered-values', async () => {
-    config.minifyCss = true;
     const styleText = `
       h1 {
         border: red solid .5em;
@@ -128,7 +118,6 @@ describe('optimizeCss', () => {
   });
 
   it('minify-selectors', async () => {
-    config.minifyCss = true;
     const styleText = `
       h1 + p, h2, h3, h2{color:red}
     `;
@@ -139,7 +128,6 @@ describe('optimizeCss', () => {
   });
 
   it('minify-params', async () => {
-    config.minifyCss = true;
     const styleText = `
       @media only screen   and ( min-width: 400px, min-height: 500px ) {
         h2 {
@@ -154,7 +142,6 @@ describe('optimizeCss', () => {
   });
 
   it('normalize-string', async () => {
-    config.minifyCss = true;
     const styleText = `
       p:after {
         content: '\\'string\\' is intact';
@@ -167,7 +154,6 @@ describe('optimizeCss', () => {
   });
 
   it('minify-font-values', async () => {
-    config.minifyCss = true;
     const styleText = `
       p {
         font-family: "Helvetica Neue", Arial, sans-serif, Helvetica;
@@ -181,7 +167,6 @@ describe('optimizeCss', () => {
   });
 
   it('normalize-repeat-style', async () => {
-    config.minifyCss = true;
     const styleText = `
       h1 {
         background: url(image.jpg) repeat no-repeat;
@@ -194,7 +179,6 @@ describe('optimizeCss', () => {
   });
 
   it('normalize-positions', async () => {
-    config.minifyCss = true;
     const styleText = `
       h1 {
         background-position: bottom left;
@@ -207,7 +191,6 @@ describe('optimizeCss', () => {
   });
 
   it('normalize-whitespace', async () => {
-    config.minifyCss = true;
     const styleText = `
       h1 {
         width: calc(10px -  ( 100px / var(--test)  )) ;
@@ -220,7 +203,6 @@ describe('optimizeCss', () => {
   });
 
   it('unique-selectors', async () => {
-    config.minifyCss = true;
     const styleText = `
       h1, h3, h2, h1 {
         color: red;
@@ -234,7 +216,6 @@ describe('optimizeCss', () => {
 
   it('prevent autoprefix with null', async () => {
     config.autoprefixCss = null;
-    config.minifyCss = true;
     const styleText = `
       h1 {
         box-shadow: 1px;
@@ -248,7 +229,6 @@ describe('optimizeCss', () => {
 
   it('prevent autoprefix with false', async () => {
     config.autoprefixCss = false;
-    config.minifyCss = true;
     const styleText = `
       h1 {
         box-shadow: 1px;
@@ -261,7 +241,6 @@ describe('optimizeCss', () => {
   });
 
   it('autoprefix by default', async () => {
-    config.minifyCss = true;
     const styleText = `
       h1 {
         box-shadow: 1px;
@@ -275,7 +254,6 @@ describe('optimizeCss', () => {
 
   it('runs autoprefixerCss true config', async () => {
     config.autoprefixCss = true;
-    config.minifyCss = true;
     const styleText = `
       h1 {
         box-shadow: 1px;

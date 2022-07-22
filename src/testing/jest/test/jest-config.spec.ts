@@ -7,9 +7,8 @@ import path from 'path';
 describe('jest-config', () => {
   it('pass --maxWorkers=2 arg when --max-workers=2', () => {
     const args = ['test', '--ci', '--max-workers=2'];
-    const config = mockValidatedConfig();
+    const config = mockValidatedConfig({ testing: {} });
     config.flags = parseFlags(args, config.sys);
-    config.testing = {};
 
     expect(config.flags.args).toEqual(['--ci', '--max-workers=2']);
     expect(config.flags.unknownArgs).toEqual([]);
@@ -21,8 +20,7 @@ describe('jest-config', () => {
 
   it('marks outputFile as a Jest argument', () => {
     const args = ['test', '--ci', '--outputFile=path/to/my-file'];
-    const config = mockValidatedConfig();
-    config.testing = {};
+    const config = mockValidatedConfig({ testing: {} });
     config.flags = parseFlags(args, config.sys);
     expect(config.flags.args).toEqual(['--ci', '--outputFile=path/to/my-file']);
     expect(config.flags.unknownArgs).toEqual([]);
@@ -32,9 +30,8 @@ describe('jest-config', () => {
 
   it('pass --maxWorkers=2 arg when e2e test and --ci', () => {
     const args = ['test', '--ci', '--e2e', '--max-workers=2'];
-    const config = mockValidatedConfig();
+    const config = mockValidatedConfig({ testing: {} });
     config.flags = parseFlags(args, config.sys);
-    config.testing = {};
 
     expect(config.flags.args).toEqual(['--ci', '--e2e', '--max-workers=2']);
     expect(config.flags.unknownArgs).toEqual([]);
@@ -46,9 +43,8 @@ describe('jest-config', () => {
 
   it('forces --maxWorkers=4 arg when e2e test and --ci', () => {
     const args = ['test', '--ci', '--e2e'];
-    const config = mockValidatedConfig();
+    const config = mockValidatedConfig({ testing: {} });
     config.flags = parseFlags(args, config.sys);
-    config.testing = {};
 
     expect(config.flags.args).toEqual(['--ci', '--e2e']);
     expect(config.flags.unknownArgs).toEqual([]);
@@ -60,9 +56,8 @@ describe('jest-config', () => {
 
   it('pass --maxWorkers=2 arg to jest', () => {
     const args = ['test', '--maxWorkers=2'];
-    const config = mockValidatedConfig();
+    const config = mockValidatedConfig({ testing: {} });
     config.flags = parseFlags(args, config.sys);
-    config.testing = {};
 
     expect(config.flags.args).toEqual(['--maxWorkers=2']);
     expect(config.flags.unknownArgs).toEqual([]);
@@ -73,9 +68,8 @@ describe('jest-config', () => {
 
   it('pass --ci arg to jest', () => {
     const args = ['test', '--ci'];
-    const config = mockValidatedConfig();
+    const config = mockValidatedConfig({ testing: {} });
     config.flags = parseFlags(args, config.sys);
-    config.testing = {};
 
     expect(config.flags.args).toEqual(['--ci']);
     expect(config.flags.unknownArgs).toEqual([]);
@@ -87,9 +81,8 @@ describe('jest-config', () => {
 
   it('sets legacy jest options', () => {
     const args = ['test'];
-    const config = mockValidatedConfig();
+    const config = mockValidatedConfig({ testing: {} });
     config.flags = parseFlags(args, config.sys);
-    config.testing = {};
 
     const jestArgv = buildJestArgv(config);
 
@@ -117,9 +110,8 @@ describe('jest-config', () => {
 
   it('pass test spec arg to jest', () => {
     const args = ['test', 'hello.spec.ts'];
-    const config = mockValidatedConfig();
+    const config = mockValidatedConfig({ testing: {} });
     config.flags = parseFlags(args, config.sys);
-    config.testing = {};
 
     expect(config.flags.args).toEqual(['hello.spec.ts']);
     expect(config.flags.unknownArgs).toEqual(['hello.spec.ts']);
@@ -130,11 +122,12 @@ describe('jest-config', () => {
 
   it('pass test config to jest', () => {
     const args = ['test'];
-    const config = mockValidatedConfig();
+    const config = mockValidatedConfig({
+      testing: {
+        testMatch: ['hello.spec.ts'],
+      },
+    });
     config.flags = parseFlags(args, config.sys);
-    config.testing = {
-      testMatch: ['hello.spec.ts'],
-    };
 
     expect(config.flags.task).toBe('test');
 
@@ -146,12 +139,11 @@ describe('jest-config', () => {
   it('set jestArgv config reporters', () => {
     const rootDir = path.resolve('/');
     const args = ['test'];
-    const config = mockValidatedConfig();
-    config.rootDir = rootDir;
+    const config = mockValidatedConfig({
+      rootDir,
+      testing: { reporters: ['default', ['jest-junit', { suiteName: 'jest tests' }]] },
+    });
     config.flags = parseFlags(args, config.sys);
-    config.testing = {
-      reporters: ['default', ['jest-junit', { suiteName: 'jest tests' }]],
-    };
 
     const jestArgv = buildJestArgv(config);
     const parsedConfig = JSON.parse(jestArgv.config) as d.JestConfig;
@@ -164,10 +156,8 @@ describe('jest-config', () => {
   it('set jestArgv config rootDir', () => {
     const rootDir = path.resolve('/');
     const args = ['test'];
-    const config = mockValidatedConfig();
-    config.rootDir = rootDir;
+    const config = mockValidatedConfig({ rootDir, testing: {} });
     config.flags = parseFlags(args, config.sys);
-    config.testing = {};
 
     const jestArgv = buildJestArgv(config);
     const parsedConfig = JSON.parse(jestArgv.config) as d.JestConfig;
@@ -177,12 +167,8 @@ describe('jest-config', () => {
   it('set jestArgv config collectCoverageFrom', () => {
     const rootDir = path.resolve('/');
     const args = ['test'];
-    const config = mockValidatedConfig();
-    config.rootDir = rootDir;
+    const config = mockValidatedConfig({ rootDir, testing: { collectCoverageFrom: ['**/*.+(ts|tsx)'] } });
     config.flags = parseFlags(args, config.sys);
-    config.testing = {
-      collectCoverageFrom: ['**/*.+(ts|tsx)'],
-    };
 
     const jestArgv = buildJestArgv(config);
     const parsedConfig = JSON.parse(jestArgv.config) as d.JestConfig;
@@ -192,9 +178,8 @@ describe('jest-config', () => {
 
   it('passed flags should be respected over defaults', () => {
     const args = ['test', '--spec', '--passWithNoTests'];
-    const config = mockValidatedConfig();
+    const config = mockValidatedConfig({ testing: {} });
     config.flags = parseFlags(args, config.sys);
-    config.testing = {};
 
     expect(config.flags.args).toEqual(['--spec', '--passWithNoTests']);
     expect(config.flags.unknownArgs).toEqual([]);

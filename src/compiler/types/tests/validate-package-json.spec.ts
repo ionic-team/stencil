@@ -24,14 +24,17 @@ describe('validate-package-json', () => {
       dir: '/dist',
       typesDir: '/dist/types',
     };
-    config = mockConfig();
-    config.devMode = false;
-    config.namespace = 'SomeNamespace';
-    config.fsNamespace = config.namespace.toLowerCase();
+
+    const namespace = 'SomeNamespace';
+    config = mockConfig({
+      devMode: false,
+      fsNamespace: namespace.toLowerCase(),
+      namespace,
+      packageJsonFilePath: path.join(root, 'package.json'),
+    });
     compilerCtx = mockCompilerCtx(config);
     buildCtx = mockBuildCtx(config, compilerCtx);
     buildCtx.packageJson = {};
-    config.packageJsonFilePath = path.join(root, 'package.json');
     await compilerCtx.fs.writeFile(config.packageJsonFilePath, JSON.stringify(buildCtx.packageJson));
   });
 

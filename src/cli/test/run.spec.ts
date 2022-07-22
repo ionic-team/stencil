@@ -1,6 +1,11 @@
 import type * as d from '../../declarations';
 import * as coreCompiler from '@stencil/core/compiler';
-import { mockCompilerSystem, mockConfig, mockLogger as createMockLogger } from '@stencil/core/testing';
+import {
+  mockCompilerSystem,
+  mockConfig,
+  mockLogger as createMockLogger,
+  mockValidatedConfig,
+} from '@stencil/core/testing';
 import * as ParseFlags from '../parse-flags';
 import { run, runTask } from '../run';
 import * as BuildTask from '../task-build';
@@ -132,11 +137,9 @@ describe('run', () => {
       sys = mockCompilerSystem();
       sys.exit = jest.fn();
 
-      unvalidatedConfig = mockConfig(sys);
-      unvalidatedConfig.outputTargets = null;
+      unvalidatedConfig = mockConfig({ outputTargets: null, sys });
 
-      validatedConfig = mockConfig(sys);
-      validatedConfig.outputTargets = [];
+      validatedConfig = mockValidatedConfig({ sys });
 
       taskBuildSpy = jest.spyOn(BuildTask, 'taskBuild');
       taskBuildSpy.mockResolvedValue();
@@ -256,8 +259,7 @@ describe('run', () => {
     });
 
     it('defaults to the provided task if no flags exist on the provided config', async () => {
-      unvalidatedConfig = mockConfig(sys);
-      unvalidatedConfig.flags = undefined;
+      unvalidatedConfig = mockConfig({ flags: undefined, sys });
 
       await runTask(coreCompiler, unvalidatedConfig, 'help', sys);
 
