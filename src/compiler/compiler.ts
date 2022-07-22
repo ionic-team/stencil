@@ -1,4 +1,4 @@
-import type { Compiler, Config, Diagnostic } from '../declarations';
+import type { Compiler, Config, Diagnostic, ValidatedConfig } from '../declarations';
 import { Cache } from './cache';
 import { CompilerContext } from './build/compiler-ctx';
 import { createFullBuild } from './build/full-build';
@@ -22,7 +22,7 @@ export const createCompiler = async (userConfig: Config): Promise<Compiler> => {
   // actual compiler code
   // could be in a web worker on the browser
   // or the main thread in node
-  const config = getConfig(userConfig);
+  const config: ValidatedConfig = getConfig(userConfig);
   const diagnostics: Diagnostic[] = [];
   const sys = config.sys;
   const compilerCtx = new CompilerContext();
