@@ -163,10 +163,7 @@ export const runTask = async (
       break;
 
     case 'telemetry':
-      // TODO(STENCIL-148) make this parameter no longer optional, remove the surrounding if statement
-      if (sys) {
-        await taskTelemetry(strictConfig.flags, sys, strictConfig.logger);
-      }
+      await taskTelemetry(strictConfig.flags, sys, strictConfig.logger);
       break;
 
     case 'test':
