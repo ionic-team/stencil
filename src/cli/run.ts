@@ -75,14 +75,7 @@ export const run = async (init: d.CliInitOptions) => {
     loadedCompilerLog(sys, logger, flags, coreCompiler);
 
     if (task === 'info') {
-      await telemetryAction(
-        sys,
-        { flags: createConfigFlags({ task: 'info' }), logger, outputTargets: [] },
-        coreCompiler,
-        async () => {
-          await taskInfo(coreCompiler, sys, logger);
-        }
-      );
+      taskInfo(coreCompiler, sys, logger);
       return;
     }
 
