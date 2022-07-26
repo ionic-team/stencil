@@ -778,6 +778,7 @@ export interface ComponentCompilerFeatures {
 export interface ComponentCompilerMeta extends ComponentCompilerFeatures {
   assetsDirs: CompilerAssetDir[];
   componentClassName: string;
+  componentClassTypeParameters: string[];
   elementRef: string;
   encapsulation: Encapsulation;
   shadowDelegatesFocus: boolean;

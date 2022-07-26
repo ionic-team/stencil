@@ -32,71 +32,60 @@ export namespace Components {
 }
 declare global {
     interface HTMLAppRootElement extends Components.AppRoot, HTMLStencilElement {
-    }
-    var HTMLAppRootElement: {
         prototype: HTMLAppRootElement;
         new (): HTMLAppRootElement;
-    };
-    interface HTMLCmpAElement extends Components.CmpA, HTMLStencilElement {
     }
-    var HTMLCmpAElement: {
+    var HTMLAppRootElement: HTMLAppRootElement;
+    interface HTMLCmpAElement extends Components.CmpA, HTMLStencilElement {
         prototype: HTMLCmpAElement;
         new (): HTMLCmpAElement;
-    };
-    interface HTMLCmpBElement extends Components.CmpB, HTMLStencilElement {
     }
-    var HTMLCmpBElement: {
+    var HTMLCmpAElement: HTMLCmpAElement;
+    interface HTMLCmpBElement extends Components.CmpB, HTMLStencilElement {
         prototype: HTMLCmpBElement;
         new (): HTMLCmpBElement;
-    };
-    interface HTMLCmpCElement extends Components.CmpC, HTMLStencilElement {
     }
-    var HTMLCmpCElement: {
+    var HTMLCmpBElement: HTMLCmpBElement;
+    interface HTMLCmpCElement extends Components.CmpC, HTMLStencilElement {
         prototype: HTMLCmpCElement;
         new (): HTMLCmpCElement;
-    };
-    interface HTMLCmpClientScopedElement extends Components.CmpClientScoped, HTMLStencilElement {
     }
-    var HTMLCmpClientScopedElement: {
+    var HTMLCmpCElement: HTMLCmpCElement;
+    interface HTMLCmpClientScopedElement extends Components.CmpClientScoped, HTMLStencilElement {
         prototype: HTMLCmpClientScopedElement;
         new (): HTMLCmpClientScopedElement;
-    };
-    interface HTMLCmpClientShadowElement extends Components.CmpClientShadow, HTMLStencilElement {
     }
-    var HTMLCmpClientShadowElement: {
+    var HTMLCmpClientScopedElement: HTMLCmpClientScopedElement;
+    interface HTMLCmpClientShadowElement extends Components.CmpClientShadow, HTMLStencilElement {
         prototype: HTMLCmpClientShadowElement;
         new (): HTMLCmpClientShadowElement;
-    };
-    interface HTMLCmpDElement extends Components.CmpD, HTMLStencilElement {
     }
-    var HTMLCmpDElement: {
+    var HTMLCmpClientShadowElement: HTMLCmpClientShadowElement;
+    interface HTMLCmpDElement extends Components.CmpD, HTMLStencilElement {
         prototype: HTMLCmpDElement;
         new (): HTMLCmpDElement;
-    };
-    interface HTMLCmpScopedAElement extends Components.CmpScopedA, HTMLStencilElement {
     }
-    var HTMLCmpScopedAElement: {
+    var HTMLCmpDElement: HTMLCmpDElement;
+    interface HTMLCmpScopedAElement extends Components.CmpScopedA, HTMLStencilElement {
         prototype: HTMLCmpScopedAElement;
         new (): HTMLCmpScopedAElement;
-    };
-    interface HTMLCmpScopedBElement extends Components.CmpScopedB, HTMLStencilElement {
     }
-    var HTMLCmpScopedBElement: {
+    var HTMLCmpScopedAElement: HTMLCmpScopedAElement;
+    interface HTMLCmpScopedBElement extends Components.CmpScopedB, HTMLStencilElement {
         prototype: HTMLCmpScopedBElement;
         new (): HTMLCmpScopedBElement;
-    };
-    interface HTMLCmpTextBlueElement extends Components.CmpTextBlue, HTMLStencilElement {
     }
-    var HTMLCmpTextBlueElement: {
+    var HTMLCmpScopedBElement: HTMLCmpScopedBElement;
+    interface HTMLCmpTextBlueElement extends Components.CmpTextBlue, HTMLStencilElement {
         prototype: HTMLCmpTextBlueElement;
         new (): HTMLCmpTextBlueElement;
-    };
-    interface HTMLCmpTextGreenElement extends Components.CmpTextGreen, HTMLStencilElement {
     }
-    var HTMLCmpTextGreenElement: {
+    var HTMLCmpTextBlueElement: HTMLCmpTextBlueElement;
+    interface HTMLCmpTextGreenElement extends Components.CmpTextGreen, HTMLStencilElement {
         prototype: HTMLCmpTextGreenElement;
         new (): HTMLCmpTextGreenElement;
-    };
+    }
+    var HTMLCmpTextGreenElement: HTMLCmpTextGreenElement;
     interface HTMLElementTagNameMap {
         "app-root": HTMLAppRootElement;
         "cmp-a": HTMLCmpAElement;
