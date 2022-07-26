@@ -14,9 +14,11 @@ describe('telemetryBuildFinishedAction', () => {
 
   beforeEach(() => {
     sys = createSystem();
-    config = mockValidatedConfig(sys);
-    config.outputTargets = [];
-    config.flags.args = [];
+    config = mockValidatedConfig({
+      flags: createConfigFlags({ task: 'build' }),
+      outputTargets: [],
+      sys,
+    });
   });
 
   it('issues a network request when complete', async () => {
@@ -45,9 +47,11 @@ describe('telemetryAction', () => {
 
   beforeEach(() => {
     sys = createSystem();
-    config = mockValidatedConfig(sys);
-    config.outputTargets = [];
-    config.flags.args = [];
+    config = mockValidatedConfig({
+      flags: createConfigFlags({ task: 'build' }),
+      outputTargets: [],
+      sys,
+    });
   });
 
   it('issues a network request when no async function is passed', async () => {
@@ -99,36 +103,42 @@ describe('checkTelemetry', () => {
   });
 });
 
-describe('hasAppTarget', () => {
-  it('Result is correct when outputTargets are empty', () => {
-    const config = { outputTargets: [] } as d.Config;
+describe('hasAppTarget()', () => {
+  let config: d.ValidatedConfig;
+  let sys: d.CompilerSystem;
+
+  beforeEach(() => {
+    sys = createSystem();
+    config = mockValidatedConfig({ sys });
+  });
+
+  it("returns 'false' when `outputTargets` is empty", () => {
+    config.outputTargets = [];
     expect(telemetry.hasAppTarget(config)).toBe(false);
   });
 
-  it('Result is correct when outputTargets contains www with no baseUrl or serviceWorker', () => {
-    const config = { outputTargets: [{ type: WWW }] } as d.Config;
+  it("returns 'false' when `outputTargets` contains `www` with no `baseUrl` and no service worker", () => {
+    config.outputTargets = [{ type: WWW }];
     expect(telemetry.hasAppTarget(config)).toBe(false);
   });
 
-  it('Result is correct when outputTargets contains www with default baseUrl value', () => {
-    const config = { outputTargets: [{ type: WWW, baseUrl: '/' }] } as d.Config;
+  it("returns 'false' when `outputTargets` contains `www` with '/' baseUrl value", () => {
+    config.outputTargets = [{ type: WWW, baseUrl: '/' }];
     expect(telemetry.hasAppTarget(config)).toBe(false);
   });
 
-  it('Result is correct when outputTargets contains www with serviceWorker', () => {
-    const config = { outputTargets: [{ type: WWW, serviceWorker: { swDest: './tmp' } }] } as d.Config;
+  it("returns 'true' when `outputTargets` contains `www` with a service worker", () => {
+    config.outputTargets = [{ type: WWW, serviceWorker: { swDest: './tmp' } }];
     expect(telemetry.hasAppTarget(config)).toBe(true);
   });
 
-  it('Result is correct when outputTargets contains www with baseUrl', () => {
-    const config = { outputTargets: [{ type: WWW, baseUrl: 'https://example.com' }] } as d.Config;
+  it("returns 'true' when `outputTargets` contains `www` with baseUrl", () => {
+    config.outputTargets = [{ type: WWW, baseUrl: 'https://example.com' }];
     expect(telemetry.hasAppTarget(config)).toBe(true);
   });
 
-  it('Result is correct when outputTargets contains www with serviceWorker and baseUrl', () => {
-    const config = {
-      outputTargets: [{ type: WWW, baseUrl: 'https://example.com', serviceWorker: { swDest: './tmp' } }],
-    } as d.Config;
+  it("returns 'true' when `outputTargets` contains `www` with serviceWorker and baseUrl", () => {
+    config.outputTargets = [{ type: WWW, baseUrl: 'https://example.com', serviceWorker: { swDest: './tmp' } }];
     expect(telemetry.hasAppTarget(config)).toBe(true);
   });
 });
@@ -273,6 +283,14 @@ describe('prepareData', () => {
 });
 
 describe('anonymizeConfigForTelemetry', () => {
+  let config: d.ValidatedConfig;
+  let sys: d.CompilerSystem;
+
+  beforeEach(() => {
+    sys = createSystem();
+    config = mockValidatedConfig({ sys });
+  });
+
   it.each([
     'rootDir',
     'fsNamespace',
@@ -284,23 +302,28 @@ describe('anonymizeConfigForTelemetry', () => {
     'cacheDir',
     'configPath',
     'tsconfig',
-  ])("should anonymize top-level string prop '%s'", (prop: string) => {
-    const anonymizedConfig = anonymizeConfigForTelemetry({ [prop]: "shouldn't see this!", outputTargets: [] });
-    expect(anonymizedConfig).toEqual({ [prop]: 'omitted', outputTargets: [] });
+  ])("should anonymize top-level string prop '%s'", (prop: keyof d.ValidatedConfig) => {
+    const anonymizedConfig = anonymizeConfigForTelemetry({
+      ...config,
+      [prop]: "shouldn't see this!",
+      outputTargets: [],
+    });
+    expect(anonymizedConfig[prop]).toBe('omitted');
+    expect(anonymizedConfig.outputTargets).toEqual([]);
   });
 
   it.each(['sys', 'logger', 'devServer', 'tsCompilerOptions'])(
     "should remove objects under prop '%s'",
-    (prop: string) => {
-      const anonymizedConfig = anonymizeConfigForTelemetry({ [prop]: {}, outputTargets: [] });
-      expect(anonymizedConfig).toEqual({
-        outputTargets: [],
-      });
+    (prop: keyof d.ValidatedConfig) => {
+      const anonymizedConfig = anonymizeConfigForTelemetry({ ...config, [prop]: {}, outputTargets: [] });
+      expect(anonymizedConfig.hasOwnProperty(prop)).toBe(false);
+      expect(anonymizedConfig.outputTargets).toEqual([]);
     }
   );
 
   it('should retain outputTarget props on the keep list', () => {
     const anonymizedConfig = anonymizeConfigForTelemetry({
+      ...config,
       outputTargets: [
         { type: WWW, baseUrl: 'https://example.com' },
         { type: DIST_HYDRATE_SCRIPT, external: ['beep', 'boop'], dir: 'shoud/go/away' },
@@ -310,14 +333,12 @@ describe('anonymizeConfigForTelemetry', () => {
       ],
     });
 
-    expect(anonymizedConfig).toEqual({
-      outputTargets: [
-        { type: WWW, baseUrl: 'omitted' },
-        { type: DIST_HYDRATE_SCRIPT, external: ['beep', 'boop'], dir: 'omitted' },
-        { type: DIST_CUSTOM_ELEMENTS, autoDefineCustomElements: false },
-        { type: DIST_CUSTOM_ELEMENTS, generateTypeDeclarations: true },
-        { type: DIST, typesDir: 'omitted' },
-      ],
-    });
+    expect(anonymizedConfig.outputTargets).toEqual([
+      { type: WWW, baseUrl: 'omitted' },
+      { type: DIST_HYDRATE_SCRIPT, external: ['beep', 'boop'], dir: 'omitted' },
+      { type: DIST_CUSTOM_ELEMENTS, autoDefineCustomElements: false },
+      { type: DIST_CUSTOM_ELEMENTS, generateTypeDeclarations: true },
+      { type: DIST, typesDir: 'omitted' },
+    ]);
   });
 });

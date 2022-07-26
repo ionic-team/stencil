@@ -13,16 +13,17 @@ xdescribe('component-styles', () => {
   const root = path.resolve('/');
 
   beforeEach(async () => {
-    config = mockConfig();
+    config = mockConfig({
+      minifyCss: true,
+      minifyJs: true,
+      hashFileNames: true,
+    });
     compiler = new Compiler(config);
     await compiler.fs.writeFile(path.join(root, 'src', 'index.html'), `<cmp-a></cmp-a>`);
     await compiler.fs.commit();
   });
 
   it('should add mode styles to hashed filename/minified builds', async () => {
-    compiler.config.minifyJs = true;
-    compiler.config.minifyCss = true;
-    compiler.config.hashFileNames = true;
     compiler.config.hashedFileNameLength = 2;
     await compiler.fs.writeFiles({
       [path.join(root, 'src', 'cmp-a.tsx')]: `@Component({
@@ -59,9 +60,6 @@ xdescribe('component-styles', () => {
   });
 
   it('should add default styles to hashed filename/minified builds', async () => {
-    compiler.config.minifyJs = true;
-    compiler.config.minifyCss = true;
-    compiler.config.hashFileNames = true;
     compiler.config.sys.generateContentHash = function () {
       return 'hashed';
     };

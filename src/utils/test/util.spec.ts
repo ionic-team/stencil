@@ -6,8 +6,7 @@ import { stubDiagnostic } from '../../dev-server/test/Diagnostic.stub';
 describe('util', () => {
   describe('generatePreamble', () => {
     it('generates a comment with a single line preamble', () => {
-      const testConfig = mockConfig();
-      testConfig.preamble = 'I am Stencil';
+      const testConfig = mockConfig({ preamble: 'I am Stencil' });
 
       const result = util.generatePreamble(testConfig);
 
@@ -17,8 +16,7 @@ describe('util', () => {
     });
 
     it('generates a comment with a multi-line preamble', () => {
-      const testConfig = mockConfig();
-      testConfig.preamble = 'I am Stencil\nHear me roar';
+      const testConfig = mockConfig({ preamble: 'I am Stencil\nHear me roar' });
 
       const result = util.generatePreamble(testConfig);
 
@@ -37,8 +35,7 @@ describe('util', () => {
     });
 
     it('returns an empty string a null preamble is provided', () => {
-      const testConfig = mockConfig();
-      testConfig.preamble = null;
+      const testConfig = mockConfig({ preamble: null });
 
       const result = util.generatePreamble(testConfig);
 
@@ -46,8 +43,7 @@ describe('util', () => {
     });
 
     it('returns an empty string if an empty preamble is provided', () => {
-      const testConfig = mockConfig();
-      testConfig.preamble = '';
+      const testConfig = mockConfig({ preamble: '' });
 
       const result = util.generatePreamble(testConfig);
 

@@ -11,10 +11,11 @@ describe.skip('outputTarget, www', () => {
   const root = path.resolve('/');
 
   it('default www files', async () => {
-    config = mockConfig();
-    config.namespace = 'App';
-    config.buildAppCore = true;
-    config.rootDir = path.join(root, 'User', 'testing', '/');
+    config = mockConfig({
+      buildAppCore: true,
+      namespace: 'App',
+      rootDir: path.join(root, 'User', 'testing', '/'),
+    });
 
     compiler = new Compiler(config);
 
