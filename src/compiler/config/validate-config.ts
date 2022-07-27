@@ -57,7 +57,7 @@ export const validateConfig = (
     rootDir: typeof config.rootDir === 'string' ? config.rootDir : '/',
     sys: config.sys ?? bootstrapConfig.sys ?? createSystem({ logger }),
     testing: config.testing ?? {},
-    devServer: validateDevServer(
+    // devServer: validateDevServer(
   };
 
   // default devMode false
