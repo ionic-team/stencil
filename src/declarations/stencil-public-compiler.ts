@@ -419,7 +419,7 @@ type StrictConfigFields = 'flags' | 'logger' | 'outputTargets' | 'rootDir' | 'sy
  * validations have occurred at runtime.
  */
 export type ValidatedConfig = RequireFields<Config, StrictConfigFields> & {
-  devServer?: ValidatedDevServerConfig | undefined
+  devServer?: ValidatedDevServerConfig | undefined;
 };
 
 export interface HydratedFlag {
