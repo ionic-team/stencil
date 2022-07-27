@@ -1,5 +1,4 @@
 import type * as d from '../../declarations';
-import { outputAngular } from './output-angular';
 import { outputCopy } from './copy/output-copy';
 import { outputCustomElements } from './dist-custom-elements';
 import { outputCustomElementsBundle } from './dist-custom-elements-bundle';
@@ -28,7 +27,6 @@ export const generateOutputTargets = async (
   invalidateRollupCaches(compilerCtx);
 
   await Promise.all([
-    outputAngular(config, compilerCtx, buildCtx),
     outputCopy(config, compilerCtx, buildCtx),
     outputCollection(config, compilerCtx, buildCtx, changedModuleFiles),
     outputCustomElements(config, compilerCtx, buildCtx),

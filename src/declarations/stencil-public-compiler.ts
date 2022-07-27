@@ -2017,16 +2017,6 @@ export interface OutputTargetBase {
 
 export type OutputTargetBuild = OutputTargetDistCollection | OutputTargetDistLazy;
 
-export interface OutputTargetAngular extends OutputTargetBase {
-  type: 'angular';
-
-  componentCorePackage: string;
-  directivesProxyFile?: string;
-  directivesArrayFile?: string;
-  directivesUtilsFile?: string;
-  excludeComponents?: string[];
-}
-
 export interface OutputTargetCopy extends OutputTargetBase {
   type: 'copy';
 
@@ -2119,7 +2109,6 @@ export interface OutputTargetWww extends OutputTargetBase {
 }
 
 export type OutputTarget =
-  | OutputTargetAngular
   | OutputTargetCopy
   | OutputTargetCustom
   | OutputTargetDist

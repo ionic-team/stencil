@@ -10,7 +10,6 @@ import { validateCustomElement } from './validate-custom-element';
 import { validateCustomOutput } from './validate-custom-output';
 import { validateDist } from './validate-dist';
 import { validateDocs } from './validate-docs';
-import { validateAngular } from './validate-angular';
 import { validateHydrateScript } from './validate-hydrate-script';
 import { validateLazy } from './validate-lazy';
 import { validateStats } from './validate-stats';
@@ -42,7 +41,6 @@ export const validateOutputTargets = (config: d.ValidatedConfig, diagnostics: d.
     ...validateWww(config, diagnostics, userOutputs),
     ...validateDist(config, userOutputs),
     ...validateDocs(config, diagnostics, userOutputs),
-    ...validateAngular(config, userOutputs),
     ...validateStats(config, userOutputs),
   ];
 
