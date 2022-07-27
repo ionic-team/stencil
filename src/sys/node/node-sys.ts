@@ -66,10 +66,10 @@ export function createNodeSys(c: { process?: any } = {}) {
       } catch (e) {}
       return hasAccess;
     },
-    addDestory(cb) {
+    addDestroy(cb) {
       destroys.add(cb);
     },
-    removeDestory(cb) {
+    removeDestroy(cb) {
       destroys.delete(cb);
     },
     applyPrerenderGlobalPatch(opts) {
@@ -344,6 +344,9 @@ export function createNodeSys(c: { process?: any } = {}) {
       return new Promise((resolve) => {
         const recursive = !!(opts && opts.recursive);
         if (recursive) {
+          // TODO(STENCIL-410): In a future version of Node, `force: true` will be required in the options argument. At
+          // the time of this writing, Stencil's Node typings do not support this option.
+          // https://nodejs.org/docs/latest-v16.x/api/deprecations.html#dep0147-fsrmdirpath--recursive-true-
           fs.rmdir(p, { recursive: true }, (err) => {
             resolve({
               basename: path.basename(p),
@@ -372,6 +375,9 @@ export function createNodeSys(c: { process?: any } = {}) {
       try {
         const recursive = !!(opts && opts.recursive);
         if (recursive) {
+          // TODO(STENCIL-410): In a future version of Node, `force: true` will be required in the options argument. At
+          // the time of this writing, Stencil's Node typings do not support this option.
+          // https://nodejs.org/docs/latest-v16.x/api/deprecations.html#dep0147-fsrmdirpath--recursive-true-
           fs.rmdirSync(p, { recursive: true });
         } else {
           fs.rmdirSync(p);
@@ -443,11 +449,11 @@ export function createNodeSys(c: { process?: any } = {}) {
           tsFileWatcher.close();
         };
 
-        sys.addDestory(close);
+        sys.addDestroy(close);
 
         return {
           close() {
-            sys.removeDestory(close);
+            sys.removeDestroy(close);
             tsFileWatcher.close();
           },
         };
@@ -471,11 +477,11 @@ export function createNodeSys(c: { process?: any } = {}) {
         const close = () => {
           tsFileWatcher.close();
         };
-        sys.addDestory(close);
+        sys.addDestroy(close);
 
         return {
           close() {
-            sys.removeDestory(close);
+            sys.removeDestroy(close);
             tsFileWatcher.close();
           },
         };
@@ -592,8 +598,8 @@ export function createNodeSys(c: { process?: any } = {}) {
     jest: { minVersion: '24.9.1', recommendedVersion: '27.0.3', maxVersion: '27.0.0' },
     'jest-cli': { minVersion: '24.9.0', recommendedVersion: '27.4.5', maxVersion: '27.0.0' },
     pixelmatch: { minVersion: '4.0.2', recommendedVersion: '4.0.2' },
-    puppeteer: { minVersion: '1.19.0', recommendedVersion: '10.0.0' },
-    'puppeteer-core': { minVersion: '1.19.0', recommendedVersion: '5.2.1' },
+    puppeteer: { minVersion: '10.0.0', recommendedVersion: '13.5.2' },
+    'puppeteer-core': { minVersion: '10.0.0', recommendedVersion: '13.5.2' },
     'workbox-build': { minVersion: '4.3.1', recommendedVersion: '4.3.1' },
   });
 
