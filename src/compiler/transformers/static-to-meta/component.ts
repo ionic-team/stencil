@@ -20,7 +20,7 @@ import ts from 'typescript';
 
 /**
  * Given an instance of TypeScript's Intermediate Representation (IR) for a
- * class decoration ({@see ts.ClassDeclaration}) which represents a Stencil
+ * class declaration ({@see ts.ClassDeclaration}) which represents a Stencil
  * component class declaration, parse and format various pieces of data about
  * static class members which we use in the compilation process
  *
