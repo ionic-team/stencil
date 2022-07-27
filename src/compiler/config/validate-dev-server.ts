@@ -5,9 +5,9 @@ import type * as d from '../../declarations';
 import { isOutputTargetWww } from '../output-targets/output-utils';
 
 export const validateDevServer = (
-  config: d.ValidatedConfig,
+  config: d.Config,
   diagnostics: d.Diagnostic[]
-): d.DevServerConfig | undefined => {
+): d.ValidatedDevServerConfig | undefined => {
   if ((config.devServer === null || (config.devServer as any)) === false) {
     return undefined;
   }

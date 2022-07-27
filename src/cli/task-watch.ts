@@ -3,8 +3,14 @@ import { printCheckVersionResults, startCheckVersion } from './check-version';
 import type { CoreCompiler } from './load-compiler';
 import { startupCompilerLog } from './logs';
 
+/**
+ * Start the watch task, used for running the development watch-mode server
+ *
+ * @param coreCompiler the core compiler module for Stencil
+ * @param config a validated Stencil configuration
+ */
 export const taskWatch = async (coreCompiler: CoreCompiler, config: ValidatedConfig) => {
-  let devServer: DevServer = null;
+  let devServer: DevServer | null = null;
   let exitCode = 0;
 
   try {
@@ -15,7 +21,7 @@ export const taskWatch = async (coreCompiler: CoreCompiler, config: ValidatedCon
     const compiler = await coreCompiler.createCompiler(config);
     const watcher = await compiler.createWatcher();
 
-    if (config.flags.serve) {
+    if (config.flags.serve && config.devServer) {
       const devServerPath = config.sys.getDevServerExecutingPath();
       const { start }: typeof import('@stencil/core/dev-server') = await config.sys.dynamicImport(devServerPath);
       devServer = await start(config.devServer, config.logger, watcher);

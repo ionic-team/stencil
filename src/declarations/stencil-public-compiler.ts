@@ -418,7 +418,9 @@ type StrictConfigFields = 'flags' | 'logger' | 'outputTargets' | 'rootDir' | 'sy
  * about the data from a type-safety perspective, this type is intended to be used throughout the codebase once
  * validations have occurred at runtime.
  */
-export type ValidatedConfig = RequireFields<Config, StrictConfigFields>;
+export type ValidatedConfig = RequireFields<Config, StrictConfigFields> & {
+  devServer?: ValidatedDevServerConfig | undefined
+};
 
 export interface HydratedFlag {
   /**
@@ -565,6 +567,10 @@ export interface DevServerConfig extends StencilDevServerConfig {
   protocol?: 'http' | 'https';
   srcIndexHtml?: string;
 }
+
+type StrictDevServerConfigFields = 'address' | 'root'
+
+export type ValidatedDevServerConfig = RequireFields<DevServerConfig, StrictDevServerConfigFields>;
 
 export interface HistoryApiFallback {
   index?: string;
