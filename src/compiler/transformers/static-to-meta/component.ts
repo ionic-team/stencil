@@ -18,14 +18,28 @@ import { parseStringLiteral } from './string-literal';
 import { setComponentBuildConditionals } from '../component-build-conditionals';
 import ts from 'typescript';
 
+/**
+ * Given an instance of typescript's IR for a class decoration ({@see ts.ClassDeclaration})
+ * which represents a Stencil component class declaration, parse and format
+ * various pieces of data about static class members which we use in the
+ * compilation process
+ *
+ * @param compilerCtx the current compiler context
+ * @param typeChecker a typescript typechecker instance
+ * @param cmpNode the typescript class declaration for the component
+ * @param moduleFile stencil's IR for a module, used here as an out param
+ * @param transformOpts options which control various aspects of the
+ * transformation
+ * @returns the TypeScript class declaration instance with which the function
+ * was called
+ */
 export const parseStaticComponentMeta = (
   compilerCtx: d.CompilerCtx,
   typeChecker: ts.TypeChecker,
   cmpNode: ts.ClassDeclaration,
   moduleFile: d.Module,
-  nodeMap: d.NodeMap,
   transformOpts?: d.TransformOptions
-) => {
+): ts.ClassDeclaration => {
   if (cmpNode.members == null) {
     return cmpNode;
   }
@@ -150,7 +164,7 @@ export const parseStaticComponentMeta = (
   moduleFile.cmps.push(cmp);
 
   // add to node map
-  nodeMap.set(cmpNode, cmp);
+  compilerCtx.nodeMap.set(cmpNode, cmp);
 
   return cmpNode;
 };
