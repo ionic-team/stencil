@@ -820,7 +820,7 @@ export interface ComponentCompilerLegacyContext {
 export type Encapsulation = 'shadow' | 'scoped' | 'none';
 
 /**
- * Internal representation of a static property on a Stencil component
+ * Intermediate Representation (IR) of a static property on a Stencil component
  */
 export interface ComponentCompilerStaticProperty {
   mutable: boolean;
@@ -835,7 +835,7 @@ export interface ComponentCompilerStaticProperty {
 }
 
 /**
- * Internal representation of a property on a Stencil component
+ * Intermediate Representation (IR) of a property on a Stencil component
  */
 export interface ComponentCompilerProperty extends ComponentCompilerStaticProperty {
   name: string;
@@ -1471,9 +1471,9 @@ export interface MinifyJsResult {
 export type ModuleMap = Map<string, Module>;
 
 /**
- * Stencil's internal representation of a module, bundling together various
- * pieces of information like the classes declared within it, the path to the
- * original source file, HTML tag names defined in the file, and so on.
+ * Stencil's Intermediate Representation (IR) of a module, bundling together
+ * various pieces of information like the classes declared within it, the path
+ * to the original source file, HTML tag names defined in the file, and so on.
  *
  * Note that this gets serialized/parsed as JSON and therefore cannot be a
  * `Map` or a `Set`.

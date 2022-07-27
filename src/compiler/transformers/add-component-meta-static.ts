@@ -3,9 +3,9 @@ import { convertValueToLiteral, createStaticGetter } from './transform-utils';
 import ts from 'typescript';
 
 /**
- * Update an instance of TypeScript's IR for a class declaration
- * ({@link ts.ClassDeclaration}) with a static getter for the compiler metadata that we
- * produce as part of the compilation process.
+ * Update an instance of TypeScript's Intermediate Representation (IR) for a
+ * class declaration ({@link ts.ClassDeclaration}) with a static getter for the
+ * compiler metadata that we produce as part of the compilation process.
  *
  * @param cmpNode an instance of the TypeScript IR for a class declaration (i.e.
  * a stencil component) to be updated

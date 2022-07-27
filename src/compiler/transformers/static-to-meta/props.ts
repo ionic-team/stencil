@@ -4,11 +4,11 @@ import ts from 'typescript';
 
 /**
  * Parse a list of {@link ts.ClassElement} objects representing static props
- * into a list of our own internal representation of properties on components.
+ * into a list of our own Intermediate Representation (IR) of properties on
+ * components.
  *
- * @param staticMembers typescripts internal representation of the properties
- * on our component
- * @returns a manifest of compiler properties in our own internal representation
+ * @param staticMembers TypeScript IR for the properties on our component
+ * @returns a manifest of compiler properties in our own Stencil IR
  */
 export const parseStaticProps = (staticMembers: ts.ClassElement[]): d.ComponentCompilerProperty[] => {
   const parsedProps: { [key: string]: d.ComponentCompilerStaticProperty } = getStaticValue(staticMembers, 'properties');

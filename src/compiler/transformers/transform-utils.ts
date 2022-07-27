@@ -24,10 +24,10 @@ export const isMemberPrivate = (member: ts.ClassElement): boolean => {
 };
 
 /**
- * Convert a JavaScript value to the TypeScript internal representation for a
- * literal AST node with that same value. The value to convert may be a
- * primitive type like `string`, `boolean`, etc or may be an `Object`, `Array`,
- * etc.
+ * Convert a JavaScript value to the TypeScript Intermediate Representation
+ * (IR) for a literal Abstract Syntax Tree (AST) node with that same value. The
+ * value to convert may be a primitive type like `string`, `boolean`, etc or
+ * may be an `Object`, `Array`, etc.
  *
  * Note that this function takes a param (`refs`) with a default value,
  * normally a value should _not_ be passed for this parameter since it is
@@ -37,8 +37,8 @@ export const isMemberPrivate = (member: ts.ClassElement): boolean => {
  * @param refs a set of references, used in recursive calls to avoid
  * circular references when creating object literal IR instances. **note that
  * you shouldn't pass this parameter unless you know what you're doing!**
- * @returns typescript internal representation for a literal corresponding to
- * the JavaScript value with which the function was called
+ * @returns TypeScript IR for a literal corresponding to the JavaScript value
+ * with which the function was called
  */
 export const convertValueToLiteral = (
   val: any,
@@ -75,15 +75,16 @@ export const convertValueToLiteral = (
 };
 
 /**
- * Convert a JavaScript Array instance to TypeScript's IR for an array literal.
- * This is done by recursively using {@link convertValueToLiteral} to create a
- * new array consisting of the TypeScript IR of each element in the array to be
- * converted, and then creating the TypeScript IR for _that_ array.
+ * Convert a JavaScript Array instance to TypeScript's Intermediate
+ * Representation (IR) for an array literal. This is done by recursively using
+ * {@link convertValueToLiteral} to create a new array consisting of the
+ * TypeScript IR of each element in the array to be converted, and then creating
+ * the TypeScript IR for _that_ array.
  *
  * @param list the array instance to convert
  * @param refs a set of references to objects, used when converting objects to
  * avoid circular references
- * @returns TypeScript internal representation for the array we want to convert
+ * @returns TypeScript IR for the array we want to convert
  */
 const arrayToArrayLiteral = (list: any[], refs: WeakSet<any>): ts.ArrayLiteralExpression => {
   const newList: any[] = list.map((l) => {
@@ -93,14 +94,15 @@ const arrayToArrayLiteral = (list: any[], refs: WeakSet<any>): ts.ArrayLiteralEx
 };
 
 /**
- * Convert a JavaScript object (i.e. an object existing at runtime) to its
- * corresponding TypeScript internal representation ({@see ts.ObjectLiteralExpression})
- * as an object literal. This function takes an argument holding a `WeakSet` of
- * references to objects which is used to avoid circular references. Objects
- * that are converted in this function are added to the the set, and if an
- * object is already present then an `undefined` literal (in TypeScript IR) is
- * returned instead of another object literal, as continuing to convert a
- * circular reference would, well, never end!
+ * Convert a JavaScript object (i.e. an object existing at runtime) to the
+ * corresponding TypeScript Intermediate Representation (IR)
+ * ({@see ts.ObjectLiteralExpression}) for an object literal. This function
+ * takes an argument holding a `WeakSet` of references to objects which is
+ * used to avoid circular references. Objects that are converted in this
+ * function are added to the set, and if an object is already present then an
+ * `undefined` literal (in TypeScript IR) is returned instead of another
+ * object literal, as continuing to convert a circular reference would, well,
+ * never end!
  *
  * @param obj the JavaScript object to convert to TypeScript IR
  * @param refs a set of references to objects, used to avoid circular references

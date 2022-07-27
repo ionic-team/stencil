@@ -19,19 +19,19 @@ import { setComponentBuildConditionals } from '../component-build-conditionals';
 import ts from 'typescript';
 
 /**
- * Given an instance of typescript's IR for a class decoration ({@see ts.ClassDeclaration})
- * which represents a Stencil component class declaration, parse and format
- * various pieces of data about static class members which we use in the
- * compilation process
+ * Given an instance of TypeScript's Intermediate Representation (IR) for a
+ * class decoration ({@see ts.ClassDeclaration}) which represents a Stencil
+ * component class declaration, parse and format various pieces of data about
+ * static class members which we use in the compilation process
  *
  * @param compilerCtx the current compiler context
- * @param typeChecker a typescript typechecker instance
- * @param cmpNode the typescript class declaration for the component
- * @param moduleFile stencil's IR for a module, used here as an out param
+ * @param typeChecker a TypeScript type checker instance
+ * @param cmpNode the TypeScript class declaration for the component
+ * @param moduleFile Stencil's IR for a module, used here as an out param
  * @param transformOpts options which control various aspects of the
  * transformation
- * @returns the TypeScript class declaration instance with which the function
- * was called
+ * @returns the TypeScript class declaration IR instance with which the
+ * function was called
  */
 export const parseStaticComponentMeta = (
   compilerCtx: d.CompilerCtx,
