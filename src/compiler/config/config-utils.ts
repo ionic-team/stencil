@@ -3,7 +3,7 @@ import { isAbsolute, join } from 'path';
 import { isBoolean } from '@utils';
 import type { ConfigFlags } from '../../cli/config-flags';
 
-export const getAbsolutePath = (config: d.Config | d.UnvalidatedConfig, dir: string) => {
+export const getAbsolutePath = (config: d.ValidatedConfig, dir: string) => {
   if (!isAbsolute(dir)) {
     dir = join(config.rootDir, dir);
   }
