@@ -12,7 +12,7 @@ import { join } from 'path';
 import type { SourceMap as RollupSourceMap } from 'rollup';
 
 export const generateLazyModules = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   outputTargetType: string,
@@ -180,7 +180,7 @@ const generateCaseClauseCjs = (bundleId: string): string => {
 };
 
 const generateLazyEntryModule = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   rollupResult: d.RollupChunkResult,
@@ -227,7 +227,7 @@ const generateLazyEntryModule = async (
 };
 
 const writeLazyChunk = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   rollupResult: d.RollupChunkResult,
@@ -263,7 +263,7 @@ const writeLazyChunk = async (
 };
 
 const writeLazyEntry = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   rollupResult: d.RollupChunkResult,
@@ -398,7 +398,7 @@ export const sortBundleComponents = (a: d.ComponentCompilerMeta, b: d.ComponentC
 };
 
 const convertChunk = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   sourceTarget: d.SourceTarget,
