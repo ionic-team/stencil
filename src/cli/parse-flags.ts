@@ -1,4 +1,4 @@
-import { CompilerSystem, LogLevel, LOG_LEVELS, TaskCommand } from '../declarations';
+import { LogLevel, LOG_LEVELS, TaskCommand } from '../declarations';
 import { dashToPascalCase, toDashCase } from '@utils';
 import {
   BOOLEAN_CLI_ARGS,
@@ -20,11 +20,9 @@ import {
  * Parse command line arguments into a structured `ConfigFlags` object
  *
  * @param args an array of CLI flags
- * @param _sys an optional compiler system
  * @returns a structured ConfigFlags object
  */
-export const parseFlags = (args: string[], _sys?: CompilerSystem): ConfigFlags => {
-  // TODO(STENCIL-509): remove the _sys parameter here ^^ (for v3)
+export const parseFlags = (args: string[]): ConfigFlags => {
   const flags: ConfigFlags = createConfigFlags();
 
   // cmd line has more priority over npm scripts cmd
