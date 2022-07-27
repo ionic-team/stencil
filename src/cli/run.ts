@@ -113,18 +113,27 @@ export const run = async (init: d.CliInitOptions) => {
   }
 };
 
+/**
+ * Run a specified task
+ * @param coreCompiler an instance of a minimal, bootstrap compiler for running the specified task
+ * @param config a configuration for the Stencil project to apply to the task run
+ * @param task the task to run
+ * @param sys the {@link CompilerSystem} for interacting with the operating system
+ * @public
+ */
 export const runTask = async (
   coreCompiler: CoreCompiler,
   config: d.Config,
   task: d.TaskCommand,
   sys?: d.CompilerSystem
-) => {
+): Promise<void> => {
   const logger = config.logger ?? createLogger();
   const strictConfig: ValidatedConfig = {
     ...config,
     flags: createConfigFlags(config.flags ?? { task }),
     logger,
     outputTargets: config.outputTargets ?? [],
+    sys: sys ?? coreCompiler.createSystem({ logger }),
   };
 
   switch (task) {

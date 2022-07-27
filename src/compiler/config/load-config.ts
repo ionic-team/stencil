@@ -46,9 +46,13 @@ export const loadConfig = async (init: LoadConfigInit = {}): Promise<LoadConfigR
   const unknownConfig: UnvalidatedConfig = {};
 
   try {
-    const sys = init.sys || createSystem();
     const config = init.config || {};
     let configPath = init.configPath || config.configPath;
+
+    // Pull the {@link CompilerSystem} out of the initialization object, or create one if it does not exist.
+    // This entity is needed to load the project's configuration (and therefore needs to be created before it can be
+    // attached to a configuration entity, validated or otherwise)
+    const sys = init.sys ?? createSystem();
 
     const loadedConfigFile = await loadConfigFile(sys, results.diagnostics, configPath);
     if (hasError(results.diagnostics)) {
