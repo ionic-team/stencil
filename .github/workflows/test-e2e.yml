@@ -37,3 +37,10 @@ jobs:
       - name: End-to-End Tests
         run: npm run test.end-to-end -- --ci
         shell: bash
+
+      - name: Git status check
+        # here we check that there are no changed / new files from our test
+        # run. we use `git status`, grep out the build zip (downloaded above),
+        # and check if there are more than 0 lines in the output.
+        run: if [[ $(git status --short | grep -v stencil-core-build.zip | wc -l) -ne 0 ]]; then exit 1; fi
+        shell: bash
