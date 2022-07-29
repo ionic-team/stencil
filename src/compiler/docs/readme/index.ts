@@ -3,7 +3,7 @@ import { generateReadme } from './output-docs';
 import { isOutputTargetDocsReadme } from '../../output-targets/output-utils';
 
 export const generateReadmeDocs = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   docsData: d.JsonDocs,
   outputTargets: d.OutputTarget[]
@@ -14,7 +14,7 @@ export const generateReadmeDocs = async (
   }
   const strictCheck = readmeOutputTargets.some((o) => o.strict);
   if (strictCheck) {
-    strickCheckDocs(config, docsData);
+    strictCheckDocs(config, docsData);
   }
 
   await Promise.all(
@@ -24,7 +24,7 @@ export const generateReadmeDocs = async (
   );
 };
 
-export const strickCheckDocs = (config: d.Config, docsData: d.JsonDocs) => {
+export const strictCheckDocs = (config: d.ValidatedConfig, docsData: d.JsonDocs) => {
   docsData.components.forEach((component) => {
     component.props.forEach((prop) => {
       if (!prop.docs && prop.deprecation === undefined) {
