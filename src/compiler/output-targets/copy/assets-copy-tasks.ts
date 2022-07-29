@@ -3,7 +3,7 @@ import { dirname, join, relative } from 'path';
 import { normalizePath } from '@utils';
 
 export const getComponentAssetsCopyTasks = (
-  config: d.Config,
+  config: d.ValidatedConfig,
   buildCtx: d.BuildCtx,
   dest: string,
   collectionsPath: boolean
