@@ -253,7 +253,7 @@ export const generateEntryPoint = (outputTarget: d.OutputTargetDistCustomElement
  * @returns a list of transformers to use in the transpilation process
  */
 const getCustomElementCustomTransformer = (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   components: d.ComponentCompilerMeta[],
   outputTarget: d.OutputTargetDistCustomElements
