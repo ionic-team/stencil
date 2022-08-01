@@ -90,7 +90,7 @@ export const validateConfig = (
     validatedConfig,
     'sourceMap',
     null,
-    typeof validatedConfig.sourceMap === 'undefined' ? false : validatedConfig.sourceMap
+    typeof validatedConfig.sourceMap === 'undefined' ? true : validatedConfig.sourceMap
   );
   setBooleanConfig(validatedConfig, 'watch', 'watch', false);
   setBooleanConfig(validatedConfig, 'buildDocs', 'docs', !validatedConfig.devMode);
