@@ -53,13 +53,13 @@ describe('stencil config - sourceMap option', () => {
     expect(inlineSources).toBe(false);
   });
 
-  it('sets the sourceMap options to false in tsconfig by default', async () => {
+  it('sets the sourceMap options to true in tsconfig by default', async () => {
     const testConfig = getLoadConfigForTests();
 
     const loadConfigResults = await loadConfig(testConfig);
 
     const { sourceMap, inlineSources } = loadConfigResults.config.tsCompilerOptions;
-    expect(sourceMap).toBe(false);
-    expect(inlineSources).toBe(false);
+    expect(sourceMap).toBe(true);
+    expect(inlineSources).toBe(true);
   });
 });

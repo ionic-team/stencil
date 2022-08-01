@@ -36,6 +36,9 @@ export const validateCustomElement = (
     if (!isBoolean(outputTarget.externalRuntime)) {
       outputTarget.externalRuntime = true;
     }
+    if (!isBoolean(outputTarget.generateTypeDeclarations)) {
+      outputTarget.generateTypeDeclarations = true;
+    }
 
     // unlike other output targets, Stencil does not allow users to define the output location of types at this time
     if (outputTarget.generateTypeDeclarations) {
