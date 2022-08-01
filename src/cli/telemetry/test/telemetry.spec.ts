@@ -2,7 +2,7 @@ import type * as d from '../../../declarations';
 import * as telemetry from '../telemetry';
 import * as shouldTrack from '../shouldTrack';
 import { createSystem } from '../../../compiler/sys/stencil-sys';
-import { mockLogger, mockValidatedConfig } from '@stencil/core/testing';
+import { mockValidatedConfig } from '@stencil/core/testing';
 import * as coreCompiler from '@stencil/core/compiler';
 import { anonymizeConfigForTelemetry } from '../telemetry';
 import { DIST, DIST_CUSTOM_ELEMENTS, DIST_HYDRATE_SCRIPT, WWW } from '../../../compiler/output-targets/output-utils';
@@ -148,25 +148,21 @@ describe('prepareData', () => {
   let sys: d.CompilerSystem;
 
   beforeEach(() => {
-    config = {
-      outputTargets: [],
-      flags: createConfigFlags(),
-      logger: mockLogger(),
-    };
-
-    sys = createSystem();
+    config = mockValidatedConfig();
+    sys = config.sys;
+    // set static name + versions, otherwise tests will pull in the dev build's data (which changes per build)
+    sys.name = 'in-memory';
+    sys.version = '__VERSION:STENCIL__';
   });
 
-  it('provides an object', async () => {
+  it('prepares an object to send to ionic', async () => {
     const data = await telemetry.prepareData(coreCompiler, config, sys, 1000);
     expect(data).toEqual({
       arguments: [],
       build: coreCompiler.buildId,
       component_count: undefined,
-      config: {
-        flags: createConfigFlags(),
-        outputTargets: [],
-      },
+      // the configuration generation is tested elsewhere, just verify we're sending something under this flag
+      config: expect.any(Object),
       cpu_model: '',
       duration_ms: 1000,
       has_app_pwa_config: false,
@@ -185,100 +181,38 @@ describe('prepareData', () => {
     });
   });
 
-  it('updates when there is a PWA config', async () => {
-    const config: d.ValidatedConfig = {
-      flags: createConfigFlags(),
-      logger: mockLogger(),
-      outputTargets: [{ type: 'www', baseUrl: 'https://example.com', serviceWorker: { swDest: './tmp' } }],
-    };
+  describe('has_app_pwa_config property', () => {
+    it('sets `has_app_pwa_config` to true when there is a service worker', async () => {
+      const config = mockValidatedConfig({
+        outputTargets: [{ type: 'www', baseUrl: 'https://example.com' }],
+      });
 
-    const data = await telemetry.prepareData(coreCompiler, config, sys, 1000);
+      const data = await telemetry.prepareData(coreCompiler, config, sys, 1000);
 
-    expect(data).toEqual({
-      arguments: [],
-      build: coreCompiler.buildId,
-      component_count: undefined,
-      config: {
-        flags: {
-          args: [],
-          knownArgs: [],
-          task: null,
-          unknownArgs: [],
-        },
-        outputTargets: [
-          {
-            baseUrl: 'omitted',
-            serviceWorker: {
-              swDest: 'omitted',
-            },
-            type: 'www',
-          },
-        ],
-      },
-      cpu_model: '',
-      duration_ms: 1000,
-      has_app_pwa_config: true,
-      os_name: '',
-      os_version: '',
-      packages: [],
-      packages_no_versions: [],
-      rollup: coreCompiler.versions.rollup,
-      stencil: coreCompiler.versions.stencil,
-      system: 'in-memory __VERSION:STENCIL__',
-      system_major: 'in-memory __VERSION:STENCIL__',
-      targets: ['www'],
-      task: null,
-      typescript: coreCompiler.versions.typescript,
-      yarn: false,
+      expect(data.has_app_pwa_config).toBe(true);
+    });
+
+    it("sets `has_app_pwa_config` to true for a non '/' baseUrl", async () => {
+      const config = mockValidatedConfig({
+        outputTargets: [{ type: 'www', serviceWorker: { swDest: './tmp' } }],
+      });
+
+      const data = await telemetry.prepareData(coreCompiler, config, sys, 1000);
+
+      expect(data.has_app_pwa_config).toBe(true);
     });
   });
 
-  it('updates when there is a component count passed in', async () => {
-    const config: d.ValidatedConfig = {
-      flags: createConfigFlags(),
-      logger: mockLogger(),
-      outputTargets: [{ type: 'www', baseUrl: 'https://example.com', serviceWorker: { swDest: './tmp' } }],
-    };
+  it('sends a component count when one is provided', async () => {
+    const COMPONENT_COUNT = 12;
 
-    const data = await telemetry.prepareData(coreCompiler, config, sys, 1000, 12);
-
-    expect(data).toEqual({
-      arguments: [],
-      build: coreCompiler.buildId,
-      component_count: 12,
-      config: {
-        flags: {
-          args: [],
-          knownArgs: [],
-          task: null,
-          unknownArgs: [],
-        },
-        outputTargets: [
-          {
-            baseUrl: 'omitted',
-            serviceWorker: {
-              swDest: 'omitted',
-            },
-            type: WWW,
-          },
-        ],
-      },
-      cpu_model: '',
-      duration_ms: 1000,
-      has_app_pwa_config: true,
-      os_name: '',
-      os_version: '',
-      packages: [],
-      packages_no_versions: [],
-      rollup: coreCompiler.versions.rollup,
-      stencil: coreCompiler.versions.stencil,
-      system: 'in-memory __VERSION:STENCIL__',
-      system_major: 'in-memory __VERSION:STENCIL__',
-      targets: ['www'],
-      task: null,
-      typescript: coreCompiler.versions.typescript,
-      yarn: false,
+    const config = mockValidatedConfig({
+      outputTargets: [{ type: 'www' }],
     });
+
+    const data = await telemetry.prepareData(coreCompiler, config, sys, 1000, COMPONENT_COUNT);
+
+    expect(data.component_count).toEqual(COMPONENT_COUNT);
   });
 });
 

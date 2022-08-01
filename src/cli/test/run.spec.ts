@@ -181,7 +181,7 @@ describe('run', () => {
       await runTask(coreCompiler, unvalidatedConfig, 'build', sys);
 
       expect(taskBuildSpy).toHaveBeenCalledTimes(1);
-      expect(taskBuildSpy).toHaveBeenCalledWith(coreCompiler, validatedConfig, sys);
+      expect(taskBuildSpy).toHaveBeenCalledWith(coreCompiler, validatedConfig);
     });
 
     it('calls the docs task', async () => {
@@ -234,12 +234,6 @@ describe('run', () => {
 
         expect(taskTelemetrySpy).toHaveBeenCalledTimes(1);
         expect(taskTelemetrySpy).toHaveBeenCalledWith(validatedConfig.flags, sys, validatedConfig.logger);
-      });
-
-      it("does not call the telemetry task when a compiler system isn't present", async () => {
-        await runTask(coreCompiler, unvalidatedConfig, 'telemetry');
-
-        expect(taskTelemetrySpy).not.toHaveBeenCalled();
       });
     });
 

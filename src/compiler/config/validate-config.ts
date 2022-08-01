@@ -12,6 +12,7 @@ import { validateRollupConfig } from './validate-rollup-config';
 import { validateTesting } from './validate-testing';
 import { validateWorkers } from './validate-workers';
 import { createLogger } from '../sys/logger/console-logger';
+import { createSystem } from '../sys/stencil-sys';
 
 /**
  * Represents the results of validating a previously unvalidated configuration
@@ -41,7 +42,7 @@ export const validateConfig = (
   userConfig: UnvalidatedConfig = {},
   bootstrapConfig: LoadConfigInit
 ): ConfigValidationResults => {
-  const config = Object.assign({}, userConfig || {}); // not positive it's json safe
+  const config = Object.assign({}, userConfig); // not positive it's json safe
   const diagnostics: Diagnostic[] = [];
 
   const logger = bootstrapConfig.logger || config.logger || createLogger();
@@ -52,6 +53,7 @@ export const validateConfig = (
     flags: JSON.parse(JSON.stringify(config.flags || {})),
     logger,
     outputTargets: config.outputTargets ?? [],
+    sys: config.sys ?? bootstrapConfig.sys ?? createSystem({ logger }),
   };
 
   // default devMode false

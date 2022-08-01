@@ -35,8 +35,6 @@ export const isOutputTargetCopy = (o: d.OutputTarget): o is d.OutputTargetCopy =
 
 export const isOutputTargetDistLazy = (o: d.OutputTarget): o is d.OutputTargetDistLazy => o.type === DIST_LAZY;
 
-export const isOutputTargetAngular = (o: d.OutputTarget): o is d.OutputTargetAngular => o.type === ANGULAR;
-
 export const isOutputTargetDistLazyLoader = (o: d.OutputTarget): o is d.OutputTargetDistLazyLoader =>
   o.type === DIST_LAZY_LOADER;
 
@@ -69,7 +67,6 @@ export const isOutputTargetDistTypes = (o: d.OutputTarget): o is d.OutputTargetD
 export const getComponentsFromModules = (moduleFiles: d.Module[]) =>
   sortBy(flatOne(moduleFiles.map((m) => m.cmps)), (c: d.ComponentCompilerMeta) => c.tagName);
 
-export const ANGULAR = 'angular';
 export const COPY = 'copy';
 export const CUSTOM = 'custom';
 export const DIST = 'dist';
@@ -114,7 +111,6 @@ export const VALID_CONFIG_OUTPUT_TARGETS = [
   DOCS_CUSTOM,
 
   // MISC
-  ANGULAR,
   COPY,
   CUSTOM,
   STATS,
