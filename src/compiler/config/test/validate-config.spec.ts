@@ -429,9 +429,9 @@ describe('validation', () => {
       expect(config.sourceMap).toBe(false);
     });
 
-    it('defaults the field to false when not set in the config', () => {
+    it('defaults the field to true when not set in the config', () => {
       const { config } = validateConfig(userConfig, bootstrapConfig);
-      expect(config.sourceMap).toBe(false);
+      expect(config.sourceMap).toBe(true);
     });
   });
 
