@@ -44,7 +44,7 @@ export const updateModule = (
 
   const visitNode = (node: ts.Node) => {
     if (ts.isClassDeclaration(node)) {
-      parseStaticComponentMeta(compilerCtx, typeChecker, node, moduleFile, compilerCtx.nodeMap);
+      parseStaticComponentMeta(compilerCtx, typeChecker, node, moduleFile);
       return;
     } else if (ts.isImportDeclaration(node)) {
       parseModuleImport(config, compilerCtx, buildCtx, moduleFile, srcDirPath, node, true);
