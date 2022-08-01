@@ -652,6 +652,7 @@ Stencil v3.0.0 is in development at this time and has not been released. The lis
 change. Further details on each of these items will be included prior to the release.
 
 - [fix(testing): puppeteer v10 support #2934](https://github.com/ionic-team/stencil/pull/2934)
+- [feat(cli): update flag defaults for V3 #3502](https://github.com/ionic-team/stencil/pull/3502)
 
 ## DEPRECATIONS
 
