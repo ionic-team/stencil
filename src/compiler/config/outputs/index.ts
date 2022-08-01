@@ -6,7 +6,6 @@ import {
   isValidConfigOutputTarget,
   VALID_CONFIG_OUTPUT_TARGETS,
 } from '../../output-targets/output-utils';
-import { validateAngular } from './validate-angular';
 import { validateCollection } from './validate-collection';
 import { validateCustomElement } from './validate-custom-element';
 import { validateCustomElementBundle } from './validate-custom-element-bundle';
@@ -43,7 +42,6 @@ export const validateOutputTargets = (config: d.ValidatedConfig, diagnostics: d.
     ...validateWww(config, diagnostics, userOutputs),
     ...validateDist(config, userOutputs),
     ...validateDocs(config, diagnostics, userOutputs),
-    ...validateAngular(config, userOutputs),
     ...validateStats(config, userOutputs),
   ];
 
