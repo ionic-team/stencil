@@ -183,14 +183,8 @@ function recommendedModulePath(config: d.Config): string | null {
   const customElementsOT = config.outputTargets.find(isOutputTargetDistCustomElements);
   const distCollectionOT = config.outputTargets.find(isOutputTargetDistCollection);
 
-  // If we're using `dist-custom-elements` then the preferred "module" field
-  // value is `$OUTPUT_DIR/components/index.js`
-  //
-  // Additionally, the `DIST_CUSTOM_ELEMENTS` output target should override
-  // `DIST_CUSTOM_ELEMENTS_BUNDLE` and `DIST_COLLECTION` output targets if
-  // they're also set, so we return first with this one.
   if (customElementsOT) {
-    const componentsIndexAbs = join(customElementsOT.dir, 'components', 'index.js');
+    const componentsIndexAbs = join(customElementsOT.dir, 'index.js');
     return relative(config.rootDir, componentsIndexAbs);
   }
 
