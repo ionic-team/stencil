@@ -35,6 +35,7 @@ export function mockValidatedConfig(overrides: Partial<ValidatedConfig> = {}): V
     flags: createConfigFlags(),
     logger: mockLogger(),
     outputTargets: baseConfig.outputTargets ?? [],
+    sys: createTestingSystem(),
     ...overrides,
   };
 }
