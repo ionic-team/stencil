@@ -170,6 +170,7 @@ export const validateModule = async (config: d.Config, compilerCtx: d.CompilerCt
   }
 };
 
+// TODO(STENCIL-516): Investigate the hierarchy of these output targets
 /**
  * Get the recommended `"module"` path for `package.json` given the output
  * targets that a user has set on their config.
@@ -183,6 +184,10 @@ function recommendedModulePath(config: d.Config): string | null {
   const customElementsOT = config.outputTargets.find(isOutputTargetDistCustomElements);
   const distCollectionOT = config.outputTargets.find(isOutputTargetDistCollection);
 
+  if (distCollectionOT) {
+    return relative(config.rootDir, join(distCollectionOT.dir, 'index.js'));
+  }
+
   if (customElementsOT) {
     const componentsIndexAbs = join(customElementsOT.dir, 'index.js');
     return relative(config.rootDir, componentsIndexAbs);
@@ -191,10 +196,6 @@ function recommendedModulePath(config: d.Config): string | null {
   if (customElementsBundleOT) {
     const customElementsAbs = join(customElementsBundleOT.dir, 'index.js');
     return relative(config.rootDir, customElementsAbs);
-  }
-
-  if (distCollectionOT) {
-    return relative(config.rootDir, join(distCollectionOT.dir, 'index.js'));
   }
 
   // if no output target for which we define a recommended output target is set
