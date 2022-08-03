@@ -109,7 +109,7 @@ describe('validate-package-json', () => {
       config.outputTargets = [
         {
           type: DIST_CUSTOM_ELEMENTS,
-          dir: path.join(root, 'dist'),
+          dir: path.join(root, 'dist', 'components'),
         },
       ];
       buildCtx.packageJson.module = 'dist/components/index.js';
@@ -121,7 +121,7 @@ describe('validate-package-json', () => {
       config.outputTargets = [
         {
           type: DIST_CUSTOM_ELEMENTS,
-          dir: path.join(root, 'dist'),
+          dir: path.join(root, 'dist', 'components'),
         },
       ];
       buildCtx.packageJson.module = 'dist/index.js';
@@ -157,7 +157,7 @@ describe('validate-package-json', () => {
       {
         ot: {
           type: DIST_CUSTOM_ELEMENTS,
-          dir: path.join(root, 'dist'),
+          dir: path.join(root, 'dist', 'components'),
         },
         path: 'dist/components/index.js',
       },

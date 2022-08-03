@@ -1,3 +1,12 @@
+## 🌭 [2.17.3](https://github.com/ionic-team/stencil/compare/v2.17.2...v2.17.3) (2022-08-02)
+
+
+### Bug Fixes
+
+* **validation:** update module location suggestion ([#3508](https://github.com/ionic-team/stencil/issues/3508)) ([9ccde5e](https://github.com/ionic-team/stencil/commit/9ccde5e5b693e564326f6c3f1104a7e3ebf1d1b1)), closes [#3507](https://github.com/ionic-team/stencil/issues/3507)
+
+
+
 ## 🍤 [2.17.2](https://github.com/ionic-team/stencil/compare/v2.17.2-0...v2.17.2) (2022-08-01)
 
 
