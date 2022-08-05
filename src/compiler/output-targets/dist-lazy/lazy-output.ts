@@ -24,7 +24,11 @@ import { updateStencilCoreImports } from '../../transformers/update-stencil-core
 import MagicString from 'magic-string';
 import { generateComponentBundles } from '../../entries/component-bundles';
 
-export const outputLazy = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx): Promise<void> => {
+export const outputLazy = async (
+  config: d.ValidatedConfig,
+  compilerCtx: d.CompilerCtx,
+  buildCtx: d.BuildCtx
+): Promise<void> => {
   const outputTargets = config.outputTargets.filter(isOutputTargetDistLazy);
   if (outputTargets.length === 0) {
     return;
@@ -93,7 +97,7 @@ export const outputLazy = async (config: d.Config, compilerCtx: d.CompilerCtx, b
   timespan.finish(`${bundleEventMessage} finished`);
 };
 
-const getLazyCustomTransformer = (config: d.Config, compilerCtx: d.CompilerCtx) => {
+const getLazyCustomTransformer = (config: d.ValidatedConfig, compilerCtx: d.CompilerCtx) => {
   const transformOpts: d.TransformOptions = {
     coreImportPath: STENCIL_CORE_ID,
     componentExport: 'lazy',
@@ -115,7 +119,7 @@ const getLazyCustomTransformer = (config: d.Config, compilerCtx: d.CompilerCtx) 
  * @param config the Stencil configuration file that was provided as a part of the build step
  * @param buildCtx the current build context
  */
-function generateEntryModules(config: d.Config, buildCtx: d.BuildCtx): void {
+function generateEntryModules(config: d.ValidatedConfig, buildCtx: d.BuildCtx): void {
   // figure out how modules and components connect
   try {
     const bundles = generateComponentBundles(config, buildCtx);
