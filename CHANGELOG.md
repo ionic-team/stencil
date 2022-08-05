@@ -1,3 +1,27 @@
+## 🌭 [2.17.3](https://github.com/ionic-team/stencil/compare/v2.17.2...v2.17.3) (2022-08-02)
+
+
+### Bug Fixes
+
+* **validation:** update module location suggestion ([#3508](https://github.com/ionic-team/stencil/issues/3508)) ([9ccde5e](https://github.com/ionic-team/stencil/commit/9ccde5e5b693e564326f6c3f1104a7e3ebf1d1b1)), closes [#3507](https://github.com/ionic-team/stencil/issues/3507)
+
+
+
+## 🍤 [2.17.2](https://github.com/ionic-team/stencil/compare/v2.17.2-0...v2.17.2) (2022-08-01)
+
+
+### Bug Fixes
+
+* **cli:** fix bug with parsing --fooBar=baz type CLI flags  ([#3483](https://github.com/ionic-team/stencil/issues/3483)) ([65f5275](https://github.com/ionic-team/stencil/commit/65f5275ea64ba8c733eb959b5cf0c83a271877dc)), closes [#3471](https://github.com/ionic-team/stencil/issues/3471) [#3481](https://github.com/ionic-team/stencil/issues/3481)
+* **cli:** remove usage of deprecated npm env var from arg parser ([#3486](https://github.com/ionic-team/stencil/issues/3486)) ([22d9858](https://github.com/ionic-team/stencil/commit/22d985807587f500124af06a6436985b203fbc42)), closes [#3482](https://github.com/ionic-team/stencil/issues/3482)
+* **compiler:** fix typedef file generated for dist-custom-elements ([#3468](https://github.com/ionic-team/stencil/issues/3468)) ([854d498](https://github.com/ionic-team/stencil/commit/854d498840c15c152b003f0ea3e96d98c97a991d))
+* **compiler:** update package.json validation for the 'module' field ([#3475](https://github.com/ionic-team/stencil/issues/3475)) ([47c4ccb](https://github.com/ionic-team/stencil/commit/47c4ccb032fd0be8927a23187ba6d560a1832b1e))
+* **mock-doc:** add missing methods to the element mock ([#3480](https://github.com/ionic-team/stencil/issues/3480)) ([835e00f](https://github.com/ionic-team/stencil/commit/835e00fb16073616a07a9d59e9696d4cfec4277b))
+
+### Features
+
+* **mock-doc:** dispatch blur and focus events ([#3449](https://github.com/ionic-team/stencil/issues/3449)) ([15520b7](https://github.com/ionic-team/stencil/commit/15520b7066b366078f79be95ccc59d33aeff40d9))
+
 ## 🏜 [2.17.2-0](https://github.com/ionic-team/stencil/compare/v2.17.1...v2.17.2-0) (2022-07-19)
 
 
