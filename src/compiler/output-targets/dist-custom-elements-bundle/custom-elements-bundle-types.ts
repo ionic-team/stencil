@@ -4,7 +4,7 @@ import { dirname, join, relative } from 'path';
 import { normalizePath, dashToPascalCase } from '@utils';
 
 export const generateCustomElementsBundleTypes = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   distDtsFilePath: string
@@ -19,7 +19,7 @@ export const generateCustomElementsBundleTypes = async (
 };
 
 const generateCustomElementsTypesOutput = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   distDtsFilePath: string,
