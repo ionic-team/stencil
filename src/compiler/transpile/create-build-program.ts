@@ -10,7 +10,7 @@ import ts from 'typescript';
  * @returns a Program that marries the TypeScript and Stencil compilers together.
  */
 export const createTsBuildProgram = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   buildCallback: (tsBuilder: ts.BuilderProgram) => Promise<void>
 ): Promise<ts.WatchOfConfigFile<ts.EmitAndSemanticDiagnosticsBuilderProgram>> => {
   let isBuildRunning = false;

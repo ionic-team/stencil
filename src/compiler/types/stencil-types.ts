@@ -112,7 +112,7 @@ const updateTypeName = (currentTypeName: string, typeAlias: d.TypesMemberNameDat
  * @returns the results of writing one or more type declaration files to disk
  */
 export const copyStencilCoreDts = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx
 ): Promise<ReadonlyArray<d.FsWriteResults>> => {
   const typesOutputTargets = config.outputTargets.filter(isOutputTargetDistTypes).filter((o) => o.typesDir);
