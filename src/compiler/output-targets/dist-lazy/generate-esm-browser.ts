@@ -5,7 +5,7 @@ import type { OutputOptions, RollupBuild } from 'rollup';
 import { generatePreamble, getDynamicImportFunction } from '@utils';
 
 export const generateEsmBrowser = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   rollupBuild: RollupBuild,

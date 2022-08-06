@@ -56,7 +56,7 @@ export const validateDocs = (config: d.ValidatedConfig, diagnostics: d.Diagnosti
   return docsOutputs;
 };
 
-const validateReadmeOutputTarget = (config: d.Config, outputTarget: d.OutputTargetDocsReadme) => {
+const validateReadmeOutputTarget = (config: d.ValidatedConfig, outputTarget: d.OutputTargetDocsReadme) => {
   if (!isString(outputTarget.dir)) {
     outputTarget.dir = config.srcDir;
   }
@@ -73,7 +73,7 @@ const validateReadmeOutputTarget = (config: d.Config, outputTarget: d.OutputTarg
 };
 
 const validateJsonDocsOutputTarget = (
-  config: d.Config,
+  config: d.ValidatedConfig,
   diagnostics: d.Diagnostic[],
   outputTarget: d.OutputTargetDocsJson
 ) => {

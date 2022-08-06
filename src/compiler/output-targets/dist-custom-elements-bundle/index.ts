@@ -21,7 +21,7 @@ import { STENCIL_INTERNAL_CLIENT_ID, USER_INDEX_ENTRY_ID, STENCIL_APP_GLOBALS_ID
 import { updateStencilCoreImports } from '../../transformers/update-stencil-core-import';
 
 export const outputCustomElementsBundle = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx
 ): Promise<void> => {
@@ -43,7 +43,7 @@ export const outputCustomElementsBundle = async (
 };
 
 const bundleCustomElements = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   outputTarget: d.OutputTargetDistCustomElementsBundle
@@ -162,7 +162,7 @@ const generateEntryPoint = (outputTarget: d.OutputTargetDistCustomElementsBundle
   return [...imp, ...exp].join('\n') + '\n';
 };
 
-const getCustomElementBundleCustomTransformer = (config: d.Config, compilerCtx: d.CompilerCtx) => {
+const getCustomElementBundleCustomTransformer = (config: d.ValidatedConfig, compilerCtx: d.CompilerCtx) => {
   const transformOpts: d.TransformOptions = {
     coreImportPath: STENCIL_INTERNAL_CLIENT_ID,
     componentExport: null,

@@ -23,7 +23,7 @@ import { validateCopy } from '../validate-copy';
  * @param userOutputs a user-supplied list of output targets.
  * @returns a list of OutputTargets which have been validated for us.
  */
-export const validateDist = (config: d.Config, userOutputs: d.OutputTarget[]): d.OutputTarget[] => {
+export const validateDist = (config: d.ValidatedConfig, userOutputs: d.OutputTarget[]): d.OutputTarget[] => {
   const distOutputTargets = userOutputs.filter(isOutputTargetDist);
   return distOutputTargets.reduce((outputs: d.OutputTarget[], o: d.OutputTargetDist) => {
     const distOutputTarget = validateOutputTargetDist(config, o);
@@ -121,7 +121,7 @@ export const validateDist = (config: d.Config, userOutputs: d.OutputTarget[]): d
  * @returns `Required<d.OutputTargetDist>`, i.e. `d.OutputTargetDist` with all
  * optional properties rendered un-optional.
  */
-const validateOutputTargetDist = (config: d.Config, o: d.OutputTargetDist): Required<d.OutputTargetDist> => {
+const validateOutputTargetDist = (config: d.ValidatedConfig, o: d.OutputTargetDist): Required<d.OutputTargetDist> => {
   // we need to create an object with a bunch of default values here so that
   // the typescript compiler can infer their types correctly
   const outputTarget = {
