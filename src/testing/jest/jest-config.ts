@@ -81,7 +81,7 @@ export function buildJestArgv(config: d.ValidatedConfig): Config.Argv {
  * @param config the Stencil config to use while generating Jest CLI arguments
  * @returns the Jest Config to attach to the `argv` argument
  */
-export function buildJestConfig(config: d.Config): string {
+export function buildJestConfig(config: d.ValidatedConfig): string {
   const stencilConfigTesting = config.testing;
   const jestDefaults: Config.DefaultOptions = require('jest-config').defaults;
 

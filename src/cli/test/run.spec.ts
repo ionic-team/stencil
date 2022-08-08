@@ -112,8 +112,8 @@ describe('run', () => {
 
   describe('runTask()', () => {
     let sys: d.CompilerSystem;
-    let unvalidatedConfig: d.Config;
-    let validatedConfig: d.Config;
+    let unvalidatedConfig: d.UnvalidatedConfig;
+    let validatedConfig: d.ValidatedConfig;
 
     let taskBuildSpy: jest.SpyInstance<ReturnType<typeof BuildTask.taskBuild>, Parameters<typeof BuildTask.taskBuild>>;
     let taskDocsSpy: jest.SpyInstance<ReturnType<typeof DocsTask.taskDocs>, Parameters<typeof DocsTask.taskDocs>>;

@@ -17,6 +17,7 @@ describe('validateServiceWorker', () => {
       flags: createConfigFlags(),
       logger: mockLogger(),
       outputTargets: [],
+      testing: {},
     };
   });
 
