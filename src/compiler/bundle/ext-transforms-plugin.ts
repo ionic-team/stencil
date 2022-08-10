@@ -7,6 +7,17 @@ import { parseImportPath } from '../transformers/stencil-import-path';
 import type { Plugin } from 'rollup';
 import { runPluginTransformsEsmImports } from '../plugin/plugin';
 
+/**
+ * A Rollup plugin which bundles up some transformation of CSS imports as well
+ * as writing CSS files for components to disk for the `DIST_COLLECTION` output
+ * target.
+ *
+ * @param config a user-supplied configuration
+ * @param compilerCtx the current compiler context
+ * @param buildCtx the current build context
+ * @param bundleOpts bundle options for Rollup
+ * @returns a Rollup plugin which carries out the necessary work
+ */
 export const extTransformsPlugin = (
   config: d.Config,
   compilerCtx: d.CompilerCtx,
@@ -16,12 +27,45 @@ export const extTransformsPlugin = (
   return {
     name: 'extTransformsPlugin',
 
+    /**
+     * A custom function targeting the `transform` build hook in Rollup. See here for details:
+     * https://rollupjs.org/guide/en/#transform
+     *
+     * This Rollup build hook has a signature like:
+     *
+     * ```
+     * (code: string, id: string) =>
+     *   | string
+     *   | null
+     *   | {
+     *       code?: string,
+     *       map?: string | SourceMap,
+     *       ast? : ESTree.Program,
+     *       moduleSideEffects?: boolean | "no-treeshake" | null,
+     *       syntheticNamedExports?: boolean | string | null,
+     *       meta?: {[plugin: string]: any} | null
+     *     }
+     * ```
+     *
+     * Here we are ignoring the `code` argument and only looking at the `id` argument.
+     * We use that `id` to get information about the module in question from disk
+     * ourselves so that we can then do some transformations on it.
+     *
+     * @param _ an unused parameter (normally the code for a given module)
+     * @param id the id of a module
+     * @returns metadata for Rollup or null if no transformation should be done
+     */
     async transform(_, id) {
       if (/\0/.test(id)) {
         return null;
       }
 
+      // The `id` here was possibly previously updated using
+      // `serializeImportPath` to annotate the filepath with various metadata
+      // serialized to query-params. If that was done for this particular `id`
+      // then the `data` prop will not be null.
       const { data } = parseImportPath(id);
+
       if (data != null) {
         let cmp: d.ComponentCompilerMeta;
         const filePath = normalizeFsPath(id);
@@ -31,7 +75,7 @@ export const extTransformsPlugin = (
         }
 
         const pluginTransforms = await runPluginTransformsEsmImports(config, compilerCtx, buildCtx, code, filePath);
-        const commentOriginalSelector = bundleOpts.platform === 'hydrate' && data.encapsulation === 'shadow';
+        const commentOriginalSelector = bundleOpts.platform === 'hydrate' && data.encapsulation === 'scoped';
 
         if (data.tag) {
           cmp = buildCtx.components.find((c) => c.tagName === data.tag);
@@ -39,9 +83,11 @@ export const extTransformsPlugin = (
 
           if (moduleFile) {
             const collectionDirs = config.outputTargets.filter(isOutputTargetDistCollection);
-
             const relPath = relative(config.srcDir, pluginTransforms.id);
 
+            // If we found a `moduleFile` in the module map above then we
+            // should write the transformed CSS file (found in the return value
+            // of `runPluginTransformsEsmImports`, above) to disk.
             await Promise.all(
               collectionDirs.map(async (outputTarget) => {
                 const collectionPath = join(outputTarget.collectionDir, relPath);
