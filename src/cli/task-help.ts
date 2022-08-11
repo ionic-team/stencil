@@ -34,6 +34,7 @@ export const taskHelp = async (flags: ConfigFlags, logger: d.Logger, sys: d.Comp
 
       ${logger.cyan('--spec')} ${logger.dim('............')} Run unit tests with Jest
       ${logger.cyan('--e2e')} ${logger.dim('.............')} Run e2e tests with Puppeteer
+      ${logger.cyan('--skipBuild')} ${logger.dim('.......')} Run tests without new build
 
 
   ${logger.bold('Generate:')} ${logger.dim('Bootstrap components.')}
