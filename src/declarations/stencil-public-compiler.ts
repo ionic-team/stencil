@@ -1502,6 +1502,7 @@ export interface Testing {
 export interface TestingRunOptions {
   e2e?: boolean;
   screenshot?: boolean;
+  skipBuild?: boolean;
   spec?: boolean;
   updateScreenshot?: boolean;
 }

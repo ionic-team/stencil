@@ -76,7 +76,7 @@ export const createTesting = async (config: ValidatedConfig): Promise<Testing> =
           outputTarget.empty = false;
         });
 
-        const doBuild = !(config.flags && config.flags.build === false);
+        const doBuild = !(config.flags && config.flags.build === false) && !(config.flags && config.flags.skipBuild === true);
         if (doBuild && config.watch) {
           compilerWatcher = await compiler.createWatcher();
         }
@@ -93,6 +93,8 @@ export const createTesting = async (config: ValidatedConfig): Promise<Testing> =
           } else {
             buildTask = compiler.build();
           }
+        } else {
+          config.logger.info(config.logger.magenta(`build step skipped`));
         }
 
         config.devServer.openBrowser = false;

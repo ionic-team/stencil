@@ -16,6 +16,7 @@ export const taskTest = async (config: ValidatedConfig): Promise<void> => {
     const testingRunOpts: TestingRunOptions = {
       e2e: !!config.flags.e2e,
       screenshot: !!config.flags.screenshot,
+      skipBuild: !!config.flags.skipBuild,
       spec: !!config.flags.spec,
       updateScreenshot: !!config.flags.updateScreenshot,
     };

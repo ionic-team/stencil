@@ -27,6 +27,7 @@ export const BOOLEAN_CLI_ARGS = [
   'serviceWorker',
   'screenshot',
   'serve',
+  'skipBuild',
   'skipNodeCheck',
   'spec',
   'ssr',
