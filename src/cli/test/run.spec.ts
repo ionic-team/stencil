@@ -177,6 +177,38 @@ describe('run', () => {
       taskTestSpy.mockRestore();
     });
 
+    describe('default configuration', () => {
+      describe('sys property', () => {
+        it('uses the sys argument if one is provided', async () => {
+          // remove the `CompilerSystem` on the config, just to be sure we don't accidentally use it
+          unvalidatedConfig.sys = undefined;
+
+          validatedConfig = mockValidatedConfig({ sys });
+
+          await runTask(coreCompiler, unvalidatedConfig, 'build', sys);
+
+          // first validate there was one call, and that call had two arguments
+          expect(taskBuildSpy).toHaveBeenCalledTimes(1);
+          expect(taskBuildSpy).toHaveBeenCalledWith(coreCompiler, validatedConfig);
+
+          const compilerSystemUsed: d.CompilerSystem = taskBuildSpy.mock.calls[0][1].sys;
+          expect(compilerSystemUsed).toBe(sys);
+        });
+
+        it('uses the sys field on the config if no sys argument is provided', async () => {
+          // if the optional `sys` argument isn't provided, attempt to default to the one on the config
+          await runTask(coreCompiler, unvalidatedConfig, 'build');
+
+          // first validate there was one call, and that call had two arguments
+          expect(taskBuildSpy).toHaveBeenCalledTimes(1);
+          expect(taskBuildSpy).toHaveBeenCalledWith(coreCompiler, validatedConfig);
+
+          const compilerSystemUsed: d.CompilerSystem = taskBuildSpy.mock.calls[0][1].sys;
+          expect(compilerSystemUsed).toBe(unvalidatedConfig.sys);
+        });
+      });
+    });
+
     it('calls the build task', async () => {
       await runTask(coreCompiler, unvalidatedConfig, 'build', sys);
 
