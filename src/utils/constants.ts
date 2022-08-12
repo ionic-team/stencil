@@ -62,6 +62,7 @@ export const enum CMP_FLAGS {
   needsShadowDomShim = 1 << 3,
   shadowDelegatesFocus = 1 << 4,
   hasMode = 1 << 5,
+  isFormAssociated = 1 << 6,
   needsScopedEncapsulation = scopedCssEncapsulation | needsShadowDomShim,
 }
 

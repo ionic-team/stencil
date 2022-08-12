@@ -27,6 +27,9 @@ export const formatComponentRuntimeMeta = (
   if (compilerMeta.hasMode) {
     flags |= CMP_FLAGS.hasMode;
   }
+  if (compilerMeta.isFormAssociated) {
+    flags |= CMP_FLAGS.isFormAssociated;
+  }
 
   const members = formatComponentRuntimeMembers(compilerMeta, includeMethods);
   const hostListeners = formatHostListeners(compilerMeta);

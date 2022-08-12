@@ -15,6 +15,7 @@ import { parseStaticWatchers } from './watchers';
 import { parseStaticStyles } from './styles';
 import { parseCallExpression } from './call-expression';
 import { parseStringLiteral } from './string-literal';
+import { hasFormAssociated } from './formassociated';
 import { setComponentBuildConditionals } from '../component-build-conditionals';
 import ts from 'typescript';
 
@@ -26,7 +27,7 @@ import ts from 'typescript';
  *
  * @param compilerCtx the current compiler context
  * @param typeChecker a TypeScript type checker instance
- * @param cmpNode the TypeScript class declaration for the component
+ * @param srcNode the TypeScript sourceFile for the component
  * @param moduleFile Stencil's IR for a module, used here as an out param
  * @param transformOpts options which control various aspects of the
  * transformation
@@ -36,17 +37,22 @@ import ts from 'typescript';
 export const parseStaticComponentMeta = (
   compilerCtx: d.CompilerCtx,
   typeChecker: ts.TypeChecker,
-  cmpNode: ts.ClassDeclaration,
+  srcNode: ts.SourceFile,
   moduleFile: d.Module,
   transformOpts?: d.TransformOptions
-): ts.ClassDeclaration => {
-  if (cmpNode.members == null) {
-    return cmpNode;
+): ts.SourceFile => {
+  if (!srcNode.statements) {
+    return srcNode;
+  }
+  let cmpNode = srcNode.statements.find(st => ts.isClassDeclaration(st)) as ts.ClassDeclaration;
+
+  if (!cmpNode || cmpNode.members == null) {
+    return srcNode;
   }
   const staticMembers = cmpNode.members.filter(isStaticGetter);
   const tagName = getComponentTagName(staticMembers);
   if (tagName == null) {
-    return cmpNode;
+    return srcNode;
   }
 
   const symbol = typeChecker ? typeChecker.getSymbolAtLocation(cmpNode.name) : undefined;
@@ -73,6 +79,7 @@ export const parseStaticComponentMeta = (
     legacyConnect: getStaticValue(staticMembers, 'connectProps') || [],
     legacyContext: getStaticValue(staticMembers, 'contextProps') || [],
     internal: isInternal(docs),
+    isFormAssociated: hasFormAssociated(srcNode.statements),
     assetsDirs: parseAssetsDirs(staticMembers, moduleFile.jsFilePath),
     styleDocs: [],
     docs,
@@ -158,6 +165,12 @@ export const parseStaticComponentMeta = (
 
   if (transformOpts && transformOpts.componentMetadata === 'compilerstatic') {
     cmpNode = addComponentMetaStatic(cmpNode, cmp);
+    srcNode = ts.factory.updateSourceFile(srcNode, ts.factory.createNodeArray([
+      ...srcNode.statements.map(st => {
+        if (ts.isClassDeclaration(st)) return cmpNode;
+        return st;
+      })
+    ]))
   }
 
   // add to module map
@@ -166,7 +179,7 @@ export const parseStaticComponentMeta = (
   // add to node map
   compilerCtx.nodeMap.set(cmpNode, cmp);
 
-  return cmpNode;
+  return srcNode;
 };
 
 const parseVirtualProps = (docs: d.CompilerJsDoc) => {

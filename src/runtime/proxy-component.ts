@@ -2,7 +2,7 @@ import type * as d from '../declarations';
 import { BUILD } from '@app-data';
 import { consoleDevWarn, getHostRef, plt } from '@platform';
 import { getValue, setValue } from './set-value';
-import { HOST_FLAGS, MEMBER_FLAGS } from '../utils/constants';
+import { HOST_FLAGS, MEMBER_FLAGS, CMP_FLAGS } from '../utils/constants';
 import { PROXY_FLAGS } from './runtime-constants';
 
 export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.ComponentRuntimeMeta, flags: number) => {
@@ -138,6 +138,10 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
           return attrName;
         });
     }
+  }
+
+  if (BUILD.lazyLoad && (cmpMeta.$flags$ & CMP_FLAGS.isFormAssociated)) {
+    Cstr.formAssociated = true;
   }
 
   return Cstr;

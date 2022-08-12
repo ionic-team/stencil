@@ -71,6 +71,7 @@ export const stubComponentCompilerMeta = (
   htmlTagNames: [],
   internal: false,
   isCollectionDependency: false,
+  isFormAssociated: false,
   isPlain: false,
   isUpdateable: false,
   jsFilePath: '/some/stubbed/path/my-component.js',

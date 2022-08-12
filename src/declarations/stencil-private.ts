@@ -798,6 +798,7 @@ export interface ComponentCompilerMeta extends ComponentCompilerFeatures {
   styles: StyleCompiler[];
   tagName: string;
   internal: boolean;
+  isFormAssociated: boolean;
   legacyConnect: ComponentCompilerLegacyConnect[];
   legacyContext: ComponentCompilerLegacyContext[];
 
@@ -980,6 +981,7 @@ export interface ComponentConstructor {
   cmpMeta?: ComponentRuntimeMeta;
   isProxied?: boolean;
   isStyleRegistered?: boolean;
+  formAssociated?: boolean;
 }
 
 export interface ComponentConstructorWatchers {
