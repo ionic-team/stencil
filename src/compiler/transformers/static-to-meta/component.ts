@@ -79,7 +79,7 @@ export const parseStaticComponentMeta = (
     legacyConnect: getStaticValue(staticMembers, 'connectProps') || [],
     legacyContext: getStaticValue(staticMembers, 'contextProps') || [],
     internal: isInternal(docs),
-    isFormAssociated: hasFormAssociated(srcNode.statements),
+    isFormAssociated: hasFormAssociated(srcNode.statements, cmpNode),
     assetsDirs: parseAssetsDirs(staticMembers, moduleFile.jsFilePath),
     styleDocs: [],
     docs,
