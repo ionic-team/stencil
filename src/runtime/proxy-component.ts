@@ -140,7 +140,7 @@ export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.Componen
     }
   }
 
-  if (BUILD.lazyLoad && (cmpMeta.$flags$ & CMP_FLAGS.isFormAssociated)) {
+  if (cmpMeta.$flags$ & CMP_FLAGS.isFormAssociated) {
     Cstr.formAssociated = true;
   }
 

@@ -44,7 +44,7 @@ export const parseStaticComponentMeta = (
   if (!srcNode.statements) {
     return srcNode;
   }
-  let cmpNode = srcNode.statements.find(st => ts.isClassDeclaration(st)) as ts.ClassDeclaration;
+  let cmpNode = srcNode.statements.find((st) => ts.isClassDeclaration(st)) as ts.ClassDeclaration;
 
   if (!cmpNode || cmpNode.members == null) {
     return srcNode;
@@ -165,12 +165,15 @@ export const parseStaticComponentMeta = (
 
   if (transformOpts && transformOpts.componentMetadata === 'compilerstatic') {
     cmpNode = addComponentMetaStatic(cmpNode, cmp);
-    srcNode = ts.factory.updateSourceFile(srcNode, ts.factory.createNodeArray([
-      ...srcNode.statements.map(st => {
-        if (ts.isClassDeclaration(st)) return cmpNode;
-        return st;
-      })
-    ]))
+    srcNode = ts.factory.updateSourceFile(
+      srcNode,
+      ts.factory.createNodeArray([
+        ...srcNode.statements.map((st) => {
+          if (ts.isClassDeclaration(st)) return cmpNode;
+          return st;
+        }),
+      ])
+    );
   }
 
   // add to module map
