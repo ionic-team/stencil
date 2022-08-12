@@ -8,6 +8,7 @@ import { validateManifestJson } from '../html/validate-manifest-json';
  * @param config the Stencil configuration used for the build
  * @param compilerCtx the compiler context associated with the build
  * @param buildCtx the build context associated with the current build
+ * @returns an array containing empty-Promise results
  */
 export const validateBuildFiles = (
   config: d.ValidatedConfig,
