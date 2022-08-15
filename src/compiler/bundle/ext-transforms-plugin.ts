@@ -9,8 +9,7 @@ import { runPluginTransformsEsmImports } from '../plugin/plugin';
 
 /**
  * A Rollup plugin which bundles up some transformation of CSS imports as well
- * as writing CSS files for components to disk for the `DIST_COLLECTION` output
- * target.
+* as writing some files to disk for the `DIST_COLLECTION` output target.
  *
  * @param config a user-supplied configuration
  * @param compilerCtx the current compiler context

@@ -56,7 +56,11 @@ const getPackageJsonPath = (resolvedPath: string, importee: string): string => {
   return null;
 };
 
-export const compilerRequest = async (config: d.ValidatedConfig, compilerCtx: d.CompilerCtx, data: d.CompilerRequest) => {
+export const compilerRequest = async (
+  config: d.ValidatedConfig,
+  compilerCtx: d.CompilerCtx,
+  data: d.CompilerRequest
+) => {
   const results: d.CompilerRequestResponse = {
     path: data.path,
     nodeModuleId: null,
