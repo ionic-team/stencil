@@ -54,7 +54,7 @@ export const serializeImportPath = (data: SerializeImportData, styleImportData: 
  * Parse import paths (filepaths possibly annotated w/ component metadata,
  * formatted as URL queryparams) into a structured format.
  *
- * @param importPath an ann otated import path to examine
+ * @param importPath an annotated import path to examine
  * @returns formatted information about the import
  */
 export const parseImportPath = (importPath: string) => {

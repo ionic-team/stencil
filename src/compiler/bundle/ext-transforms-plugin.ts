@@ -30,25 +30,9 @@ export const extTransformsPlugin = (
      * A custom function targeting the `transform` build hook in Rollup. See here for details:
      * https://rollupjs.org/guide/en/#transform
      *
-     * This Rollup build hook has a signature like:
-     *
-     * ```
-     * (code: string, id: string) =>
-     *   | string
-     *   | null
-     *   | {
-     *       code?: string,
-     *       map?: string | SourceMap,
-     *       ast? : ESTree.Program,
-     *       moduleSideEffects?: boolean | "no-treeshake" | null,
-     *       syntheticNamedExports?: boolean | string | null,
-     *       meta?: {[plugin: string]: any} | null
-     *     }
-     * ```
-     *
-     * Here we are ignoring the `code` argument and only looking at the `id` argument.
-     * We use that `id` to get information about the module in question from disk
-     * ourselves so that we can then do some transformations on it.
+     * Here we are ignoring the first argument (which contains the module's source code) and
+     * only looking at the `id` argument. We use that `id` to get information about the module
+     * in question from disk ourselves so that we can then do some transformations on it.
      *
      * @param _ an unused parameter (normally the code for a given module)
      * @param id the id of a module
@@ -74,7 +58,24 @@ export const extTransformsPlugin = (
         }
 
         const pluginTransforms = await runPluginTransformsEsmImports(config, compilerCtx, buildCtx, code, filePath);
-        const commentOriginalSelector = bundleOpts.platform === 'hydrate' && data.encapsulation === 'scoped';
+
+        // We need to check whether the current build is a dev-mode watch build w/ HMR enabled in
+        // order to know how we'll want to set `commentOriginalSelector` (below). If we are doing
+        // a hydrate build we need to set this to `true` because commenting-out selectors is what
+        // gives us support for scoped CSS w/ hydrated components (we don't support shadow DOM and 
+        // styling via that route for them). However, we don't want to comment selectors in dev 
+        // mode when using HMR in the browser, since there we _do_ support putting stylesheets into
+        // the shadow DOM and commenting out e.g. the `:host` selector in those stylesheets will 
+        // break components' CSS when an HMR update is sent to the browser.
+        //
+        // See https://github.com/ionic-team/stencil/issues/3461 for details
+        const isDevWatchHMRBuild =
+          config.flags.watch &&
+          config.flags.dev &&
+          config.flags.serve &&
+          (config.devServer?.reloadStrategy ?? null) === 'hmr';
+        const commentOriginalSelector =
+          bundleOpts.platform === 'hydrate' && data.encapsulation === 'shadow' && !isDevWatchHMRBuild;
 
         if (data.tag) {
           cmp = buildCtx.components.find((c) => c.tagName === data.tag);
