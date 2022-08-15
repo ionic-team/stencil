@@ -2,27 +2,32 @@ import { dirname, relative } from 'path';
 import ts from 'typescript';
 import type * as d from '../../declarations';
 
-export const mapImportsToPathAliases = ({ tsCompilerOptions }: d.Config): ts.TransformerFactory<ts.SourceFile> => {
+/**
+ * This method is responsible for replacing user-defined import path aliases ({@link https://www.typescriptlang.org/docs/handbook/module-resolution.html#path-mapping})
+ * with generated relative import paths during the transformation step of the TS compilation process.
+ * This action is taken to prevent issues with import paths not being transpiled at build time resulting in
+ * unknown imports in output code for some output targets (`dist-collection` for instance). Output targets that do not run through a bundler
+ * are unable to resolve imports using the aliased path names and TS intentionally does not replace resolved paths as a part of
+ * their compiler ({@link https://github.com/microsoft/TypeScript/issues/10866})
+ *
+ * @param config The Stencil configuration object.
+ * @returns A factory for creating a {@link ts.Transformer}.
+ */
+export const mapImportsToPathAliases = (config: d.Config): ts.TransformerFactory<ts.SourceFile> => {
   return (transformCtx) => {
     let dirPath: string;
     let sourceFile: string;
 
-    const compilerHost = ts.createCompilerHost(tsCompilerOptions);
+    const compilerHost = ts.createCompilerHost(config.tsCompilerOptions);
 
     const visit = (node: ts.Node): ts.VisitResult<ts.Node> => {
       if (ts.isImportDeclaration(node) && ts.isStringLiteral(node.moduleSpecifier)) {
         let importPath = node.moduleSpecifier.text;
 
+        // We will ignore transforming any paths that are already relative paths or
+        // imports from external modules/packages
         if (!importPath.startsWith('.')) {
-          /**
-           * When running unit tests, the `resolvedModule` property on the returned object is always undefined.
-           * In an actual build, the modules are resolved as expected.
-           *
-           * Not sure what is causing this to fail in tests. My guess is that the `transpileModule` helper method
-           * is somehow not giving context to paths for the options supplied on a `config.tsCompilerOptions`, but I am confused
-           * as to how this differs between tests and a build.
-           */
-          const module = ts.resolveModuleName(importPath, sourceFile, tsCompilerOptions, compilerHost);
+          const module = ts.resolveModuleName(importPath, sourceFile, config.tsCompilerOptions, compilerHost);
 
           if (
             module.resolvedModule?.isExternalLibraryImport === false &&

@@ -5,7 +5,7 @@ import { generateAppTypes } from '../types/generate-app-types';
 import { getComponentsFromModules, isOutputTargetDistTypes } from '../output-targets/output-utils';
 import { loadTypeScriptDiagnostics, normalizePath } from '@utils';
 import { resolveComponentDependencies } from '../entries/resolve-component-dependencies';
-import ts from 'typescript';
+import type ts from 'typescript';
 import { updateComponentBuildConditionals } from '../app-core/app-data';
 import { updateModule } from '../transformers/static-to-meta/parse-static';
 import { updateStencilTypesImports } from '../types/stencil-types';

@@ -5,7 +5,6 @@ import { mockBuildCtx, mockCompilerCtx, mockConfig } from '@stencil/core/testing
 import ts from 'typescript';
 import { updateModule } from '../static-to-meta/parse-static';
 import { getScriptTarget } from '../transform-utils';
-import { mapImportsToPathAliases } from '../map-imports-to-path-aliases';
 
 /**
  * Testing utility for transpiling provided string containing valid Stencil code
@@ -23,7 +22,7 @@ export function transpileModule(
   beforeTransformers: ts.TransformerFactory<ts.SourceFile>[] = [],
   afterTransformers: ts.TransformerFactory<ts.SourceFile>[] = []
 ) {
-  let options = ts.getDefaultCompilerOptions();
+  const options = ts.getDefaultCompilerOptions();
   options.isolatedModules = true;
   options.suppressOutputPathCheck = true;
   options.allowNonTsExtensions = true;
@@ -41,7 +40,7 @@ export function transpileModule(
   options.declarationDir = undefined;
   options.out = undefined;
   options.outFile = undefined;
-  options.noResolve = false;
+  options.noResolve = true;
 
   options.module = ts.ModuleKind.ESNext;
   options.target = getScriptTarget();
@@ -51,23 +50,8 @@ export function transpileModule(
   options.jsxFactory = 'h';
   options.jsxFragmentFactory = 'Fragment';
 
-  /**
-   * Override the options with the supplied compiler options on the config.
-   * This ensures that the path and baseUrl attributes are passed to the transformer correctly.
-   */
-  options = {
-    ...options,
-    ...config?.tsCompilerOptions,
-  };
-
-  /**
-   * Updating the method to transpile multiple source files just to try to mock
-   * how the TS compiler would work in a real build.
-   */
-  const sourceFiles = [
-    ts.createSourceFile('utils.tsx', 'export function test() {}', options.target, true),
-    ts.createSourceFile('module.tsx', input, options.target, true),
-  ];
+  const inputFileName = 'module.tsx';
+  const sourceFile = ts.createSourceFile(inputFileName, input, options.target);
 
   let outputText: string;
 
@@ -79,24 +63,20 @@ export function transpileModule(
   };
 
   const compilerHost: ts.CompilerHost = {
-    getSourceFile: (fileName) => sourceFiles.find((ref) => ref.fileName === fileName),
+    getSourceFile: (fileName) => (fileName === inputFileName ? sourceFile : undefined),
     writeFile: emitCallback,
     getDefaultLibFileName: () => 'lib.d.ts',
     useCaseSensitiveFileNames: () => false,
     getCanonicalFileName: (fileName) => fileName,
     getCurrentDirectory: () => '',
     getNewLine: () => '',
-    fileExists: (fileName) => !!sourceFiles.find((ref) => ref.fileName === fileName),
+    fileExists: (fileName) => fileName === inputFileName,
     readFile: () => '',
     directoryExists: () => true,
     getDirectories: () => [],
   };
 
-  const tsProgram = ts.createProgram(
-    sourceFiles.map((ref) => ref.fileName),
-    options,
-    compilerHost
-  );
+  const tsProgram = ts.createProgram([inputFileName], options, compilerHost);
   const tsTypeChecker = tsProgram.getTypeChecker();
 
   config = config || mockConfig();
@@ -114,15 +94,10 @@ export function transpileModule(
     styleImportData: 'queryparams',
   };
 
-  tsProgram.emit(undefined, emitCallback, undefined, undefined, {
+  tsProgram.emit(undefined, undefined, undefined, undefined, {
     before: [convertDecoratorsToStatic(config, buildCtx.diagnostics, tsTypeChecker), ...beforeTransformers],
     after: [
       convertStaticToMeta(config, compilerCtx, buildCtx, tsTypeChecker, null, transformOpts),
-      // Hard-coding this here until failures are resolved.
-      mapImportsToPathAliases({
-        ...config,
-        tsCompilerOptions: options,
-      }),
       ...afterTransformers,
     ],
   });
