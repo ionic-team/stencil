@@ -19,7 +19,7 @@ import { runPluginTransformsEsmImports } from '../plugin/plugin';
  * @returns a Rollup plugin which carries out the necessary work
  */
 export const extTransformsPlugin = (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   bundleOpts: BundleOptions
@@ -67,7 +67,7 @@ export const extTransformsPlugin = (
       const { data } = parseImportPath(id);
 
       if (data != null) {
-        let cmp: d.ComponentCompilerMeta;
+        let cmp: d.ComponentCompilerMeta | undefined = undefined;
         const filePath = normalizeFsPath(id);
         const code = await compilerCtx.fs.readFile(filePath);
         if (typeof code !== 'string') {

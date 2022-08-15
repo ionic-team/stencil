@@ -19,7 +19,7 @@ import { userIndexPlugin } from './user-index-plugin';
 import { workerPlugin } from './worker-plugin';
 
 export const bundleOutput = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   bundleOpts: BundleOptions
@@ -49,7 +49,7 @@ export const bundleOutput = async (
  * @returns the rollup options to be used
  */
 export const getRollupOptions = (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   bundleOpts: BundleOptions
