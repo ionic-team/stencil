@@ -3,6 +3,7 @@ import { stubComponentCompilerMeta } from '../../types/tests/ComponentCompilerMe
 import { BundleOptions } from '../bundle-interface';
 import { extTransformsPlugin } from '../ext-transforms-plugin';
 import * as importPathLib from '../../transformers/stencil-import-path';
+import { normalizePath } from '@utils';
 
 describe('extTransformsPlugin', () => {
   function setup(bundleOptsOverrides: Partial<BundleOptions> = {}) {
@@ -93,7 +94,11 @@ describe('extTransformsPlugin', () => {
       // @ts-ignore the Rollup plugins expect to be called in a Rollup context
       await plugin.transform('asdf', '/some/stubbed/path/foo.css?tag=my-component');
 
-      expect(writeFileSpy).toBeCalledWith('dist/collectionDir/foo.css', ':host { text: pink; }');
+      const [path, css] = writeFileSpy.mock.calls[0];
+
+      expect(normalizePath(path)).toBe('./dist/collectionDir/foo.css');
+
+      expect(css).toBe(':host { text: pink; }');
     });
 
     describe('passing `commentOriginalSelector` to `transformCssToEsm`', () => {
