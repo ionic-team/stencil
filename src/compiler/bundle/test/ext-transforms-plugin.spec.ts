@@ -116,16 +116,16 @@ describe('extTransformsPlugin', () => {
       it('should pass false if shadow, hydrate, but using HMR in dev watch mode', async () => {
         const { plugin, transformCssToEsmSpy, config } = setup({ platform: 'hydrate' });
 
-        config.flags.watch = true
-        config.flags.dev = true
-        config.flags.serve = true
-        config.devServer = { reloadStrategy: "hmr" };
+        config.flags.watch = true;
+        config.flags.dev = true;
+        config.flags.serve = true;
+        config.devServer = { reloadStrategy: 'hmr' };
 
         // @ts-ignore the Rollup plugins expect to be called in a Rollup context
-        await plugin.transform('asdf', '/some/stubbed/path/foo.css?tag=my-component&encapsulation=shadow')
+        await plugin.transform('asdf', '/some/stubbed/path/foo.css?tag=my-component&encapsulation=shadow');
         expect(transformCssToEsmSpy.mock.calls[0][0].commentOriginalSelector).toBe(false);
       });
-        
+
       it.each(['tag=my-component&encapsulation=scoped', 'tag=my-component&encapsulation=shadow', 'tag=my-component'])(
         'should pass false if %p without hydrate',
         async (queryParams) => {
