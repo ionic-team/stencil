@@ -62,10 +62,10 @@ export const extTransformsPlugin = (
         // We need to check whether the current build is a dev-mode watch build w/ HMR enabled in
         // order to know how we'll want to set `commentOriginalSelector` (below). If we are doing
         // a hydrate build we need to set this to `true` because commenting-out selectors is what
-        // gives us support for scoped CSS w/ hydrated components (we don't support shadow DOM and 
-        // styling via that route for them). However, we don't want to comment selectors in dev 
+        // gives us support for scoped CSS w/ hydrated components (we don't support shadow DOM and
+        // styling via that route for them). However, we don't want to comment selectors in dev
         // mode when using HMR in the browser, since there we _do_ support putting stylesheets into
-        // the shadow DOM and commenting out e.g. the `:host` selector in those stylesheets will 
+        // the shadow DOM and commenting out e.g. the `:host` selector in those stylesheets will
         // break components' CSS when an HMR update is sent to the browser.
         //
         // See https://github.com/ionic-team/stencil/issues/3461 for details
