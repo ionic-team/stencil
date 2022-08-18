@@ -212,7 +212,7 @@ export function disconnectNode(node: MockNode) {
   }
 }
 
-export function attributeChanged(node: MockNode, attrName: string, oldValue: string, newValue: string) {
+export function attributeChanged(node: MockNode, attrName: string, oldValue: string | null, newValue: string | null) {
   attrName = attrName.toLowerCase();
 
   const observedAttributes = (node as any).constructor.observedAttributes as string[];

@@ -17,14 +17,14 @@ import { NON_ESCAPABLE_CONTENT, SerializeNodeToHtmlOptions, serializeNodeToHtml 
 import { parseFragmentUtil } from './parse-util';
 
 export class MockNode {
-  private _nodeValue: string;
-  nodeName: string;
+  private _nodeValue: string | null;
+  nodeName: string | null;
   nodeType: number;
   ownerDocument: any;
-  parentNode: MockNode;
+  parentNode: MockNode | null;
   childNodes: MockNode[];
 
-  constructor(ownerDocument: any, nodeType: number, nodeName: string, nodeValue: string) {
+  constructor(ownerDocument: any, nodeType: number, nodeName: string | null, nodeValue: string | null) {
     this.ownerDocument = ownerDocument;
     this.nodeType = nodeType;
     this.nodeName = nodeName;
@@ -59,7 +59,9 @@ export class MockNode {
     const firstChild = this.firstChild;
     items.forEach((item) => {
       const isNode = typeof item === 'object' && item !== null && 'nodeType' in item;
-      this.insertBefore(isNode ? item : this.ownerDocument.createTextNode(String(item)), firstChild);
+      if (firstChild) {
+        this.insertBefore(isNode ? item : this.ownerDocument.createTextNode(String(item)), firstChild);
+      }
     });
   }
 
@@ -123,7 +125,7 @@ export class MockNode {
   }
 
   get nodeValue() {
-    return this._nodeValue;
+    return this._nodeValue ?? "";
   }
   set nodeValue(value: string) {
     this._nodeValue = value;
@@ -144,7 +146,7 @@ export class MockNode {
     return null;
   }
 
-  contains(otherNode: MockNode) {
+  contains(otherNode: MockNode): boolean {
     if (otherNode === this) {
       return true;
     }
@@ -222,14 +224,16 @@ export class MockNodeList {
 }
 
 export class MockElement extends MockNode {
-  namespaceURI: string;
-  __attributeMap: MockAttributeMap;
-  __shadowRoot: ShadowRoot;
-  __style: MockCSSStyleDeclaration;
+  namespaceURI: string | null;
+  __attributeMap: MockAttributeMap | null;
+  __shadowRoot: ShadowRoot | null | undefined;
+  __style: MockCSSStyleDeclaration | null | undefined;
 
-  constructor(ownerDocument: any, nodeName: string) {
+  constructor(ownerDocument: any, nodeName: string | null) {
     super(ownerDocument, NODE_TYPES.ELEMENT_NODE, typeof nodeName === 'string' ? nodeName : null, null);
     this.namespaceURI = null;
+    this.__shadowRoot = null;
+    this.__attributeMap = null;
   }
 
   addEventListener(type: string, handler: (ev?: any) => void) {
@@ -252,6 +256,7 @@ export class MockElement extends MockNode {
   get shadowRoot() {
     return this.__shadowRoot || null;
   }
+
   set shadowRoot(shadowRoot: any) {
     if (shadowRoot != null) {
       shadowRoot.host = this;
@@ -262,10 +267,12 @@ export class MockElement extends MockNode {
   }
 
   get attributes() {
-    if (this.__attributeMap == null) {
-      this.__attributeMap = createAttributeProxy(false);
+    if (this.__attributeMap === null) {
+      const attrMap = createAttributeProxy(false)
+      this.__attributeMap = attrMap
+      return attrMap
     }
-    return this.__attributeMap;
+    return this.__attributeMap
   }
 
   set attributes(attrs: MockAttributeMap) {
@@ -351,7 +358,7 @@ export class MockElement extends MockNode {
     return null;
   }
 
-  getAttributeNS(namespaceURI: string, attrName: string) {
+  getAttributeNS(namespaceURI: string | null, attrName: string) {
     const attr = this.attributes.getNamedItemNS(namespaceURI, attrName);
     if (attr != null) {
       return attr.value;
@@ -408,7 +415,7 @@ export class MockElement extends MockNode {
   }
 
   set innerHTML(html: string) {
-    if (NON_ESCAPABLE_CONTENT.has(this.nodeName) === true) {
+    if (NON_ESCAPABLE_CONTENT.has(this.nodeName ?? "") === true) {
       setTextContent(this, html);
     } else {
       for (let i = this.childNodes.length - 1; i >= 0; i--) {
@@ -642,7 +649,7 @@ export class MockElement extends MockNode {
     }
   }
 
-  setAttributeNS(namespaceURI: string, attrName: string, value: any) {
+  setAttributeNS(namespaceURI: string | null, attrName: string, value: any) {
     const attributes = this.attributes;
     let attr = attributes.getNamedItemNS(namespaceURI, attrName);
     const checkAttrChanged = checkAttributeChanged(this);
@@ -1062,7 +1069,7 @@ export class MockHTMLElement extends MockElement {
   }
 
   override get tagName() {
-    return this.nodeName;
+    return this.nodeName ?? "";
   }
   override set tagName(value: string) {
     this.nodeName = value;
@@ -1072,6 +1079,7 @@ export class MockHTMLElement extends MockElement {
     if (this.__attributeMap == null) {
       this.__attributeMap = createAttributeProxy(true);
     }
+    // @ts-ignore
     return this.__attributeMap;
   }
   override set attributes(attrs: MockAttributeMap) {
