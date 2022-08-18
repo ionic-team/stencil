@@ -125,7 +125,7 @@ export class MockNode {
   }
 
   get nodeValue() {
-    return this._nodeValue ?? "";
+    return this._nodeValue ?? '';
   }
   set nodeValue(value: string) {
     this._nodeValue = value;
@@ -196,7 +196,7 @@ export class MockNode {
   }
 
   get textContent() {
-    return this._nodeValue ?? "";
+    return this._nodeValue ?? '';
   }
   set textContent(value: string) {
     this._nodeValue = String(value);
@@ -268,11 +268,11 @@ export class MockElement extends MockNode {
 
   get attributes(): MockAttributeMap {
     if (this.__attributeMap == null) {
-      const attrMap = createAttributeProxy(false)
-      this.__attributeMap = attrMap
-      return attrMap
+      const attrMap = createAttributeProxy(false);
+      this.__attributeMap = attrMap;
+      return attrMap;
     }
-    return this.__attributeMap
+    return this.__attributeMap;
   }
 
   set attributes(attrs: MockAttributeMap) {
@@ -304,7 +304,7 @@ export class MockElement extends MockNode {
 
   override cloneNode(_deep?: boolean): MockElement {
     // implemented on MockElement.prototype from within element.ts
-    return null;
+    return this;
   }
 
   closest(selector: string) {
@@ -415,7 +415,7 @@ export class MockElement extends MockNode {
   }
 
   set innerHTML(html: string) {
-    if (NON_ESCAPABLE_CONTENT.has(this.nodeName ?? "") === true) {
+    if (NON_ESCAPABLE_CONTENT.has(this.nodeName ?? '') === true) {
       setTextContent(this, html);
     } else {
       for (let i = this.childNodes.length - 1; i >= 0; i--) {
@@ -700,7 +700,7 @@ export class MockElement extends MockNode {
   }
 
   get tagName() {
-    return this.nodeName ?? "";
+    return this.nodeName ?? '';
   }
   set tagName(value: string) {
     this.nodeName = value;
@@ -1024,7 +1024,7 @@ function getElementsByTagName(elm: MockElement, tagName: string, foundElms: Mock
   const children = elm.children;
   for (let i = 0, ii = children.length; i < ii; i++) {
     const childElm = children[i];
-    if (tagName === '*' || (childElm.nodeName ?? "").toLowerCase() === tagName) {
+    if (tagName === '*' || (childElm.nodeName ?? '').toLowerCase() === tagName) {
       foundElms.push(childElm);
     }
     getElementsByTagName(childElm, tagName, foundElms);
@@ -1069,19 +1069,21 @@ export class MockHTMLElement extends MockElement {
   }
 
   override get tagName() {
-    return this.nodeName ?? "";
+    return this.nodeName ?? '';
   }
   override set tagName(value: string) {
     this.nodeName = value;
   }
 
-  override get attributes() {
+  override get attributes(): MockAttributeMap {
     if (this.__attributeMap == null) {
+      const attrMap = createAttributeProxy(true);
       this.__attributeMap = createAttributeProxy(true);
+      return attrMap;
     }
-    // @ts-ignore
     return this.__attributeMap;
   }
+
   override set attributes(attrs: MockAttributeMap) {
     this.__attributeMap = attrs;
   }
