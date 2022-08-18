@@ -130,7 +130,7 @@
     "semver": "7.3.4",
     "sizzle": "^2.3.6",
     "terser": "5.6.1",
-    "typescript": "4.5.4",
+    "typescript": "4.6.4",
     "webpack": "^4.46.0",
     "ws": "7.4.6"
   },
