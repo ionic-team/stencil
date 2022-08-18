@@ -1078,7 +1078,7 @@ export class MockHTMLElement extends MockElement {
   override get attributes(): MockAttributeMap {
     if (this.__attributeMap == null) {
       const attrMap = createAttributeProxy(true);
-      this.__attributeMap = createAttributeProxy(true);
+      this.__attributeMap = attrMap;
       return attrMap;
     }
     return this.__attributeMap;
