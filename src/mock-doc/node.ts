@@ -700,7 +700,7 @@ export class MockElement extends MockNode {
   }
 
   get tagName() {
-    return this.nodeName;
+    return this.nodeName ?? "";
   }
   set tagName(value: string) {
     this.nodeName = value;
