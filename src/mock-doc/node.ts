@@ -196,7 +196,7 @@ export class MockNode {
   }
 
   get textContent() {
-    return this._nodeValue;
+    return this._nodeValue ?? "";
   }
   set textContent(value: string) {
     this._nodeValue = String(value);
@@ -225,7 +225,7 @@ export class MockNodeList {
 
 export class MockElement extends MockNode {
   namespaceURI: string | null;
-  __attributeMap: MockAttributeMap | null;
+  __attributeMap: MockAttributeMap | null | undefined;
   __shadowRoot: ShadowRoot | null | undefined;
   __style: MockCSSStyleDeclaration | null | undefined;
 
@@ -266,8 +266,8 @@ export class MockElement extends MockNode {
     }
   }
 
-  get attributes() {
-    if (this.__attributeMap === null) {
+  get attributes(): MockAttributeMap {
+    if (this.__attributeMap == null) {
       const attrMap = createAttributeProxy(false)
       this.__attributeMap = attrMap
       return attrMap
@@ -495,7 +495,7 @@ export class MockElement extends MockNode {
     return this.getAttribute(attrName) !== null;
   }
 
-  hasAttributeNS(namespaceURI: string, name: string) {
+  hasAttributeNS(namespaceURI: string | null, name: string) {
     return this.getAttributeNS(namespaceURI, name) !== null;
   }
 
@@ -602,7 +602,7 @@ export class MockElement extends MockNode {
     }
   }
 
-  removeAttributeNS(namespaceURI: string, attrName: string) {
+  removeAttributeNS(namespaceURI: string | null, attrName: string) {
     const attr = this.attributes.getNamedItemNS(namespaceURI, attrName);
     if (attr != null) {
       this.attributes.removeNamedItemNS(attr);
@@ -1024,7 +1024,7 @@ function getElementsByTagName(elm: MockElement, tagName: string, foundElms: Mock
   const children = elm.children;
   for (let i = 0, ii = children.length; i < ii; i++) {
     const childElm = children[i];
-    if (tagName === '*' || childElm.nodeName.toLowerCase() === tagName) {
+    if (tagName === '*' || (childElm.nodeName ?? "").toLowerCase() === tagName) {
       foundElms.push(childElm);
     }
     getElementsByTagName(childElm, tagName, foundElms);
