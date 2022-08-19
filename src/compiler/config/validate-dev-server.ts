@@ -4,23 +4,33 @@ import { isAbsolute, join } from 'path';
 import type * as d from '../../declarations';
 import { isOutputTargetWww } from '../output-targets/output-utils';
 
+/**
+ * Produce a new, fully-validated dev server configuration based on the dev
+ * server configuration found on a Stencil config object. If no dev server
+ * config is supplied, this will return `undefined` instead.
+ * 
+ * @param validatedConfig a validated config to use
+ * @originalConfig the original config supplied by the user
+ * @diagnostics an out param for setting diagnostic information
+ * @returns a new, validated dev server configuration
+ */
 export const validateDevServer = (
-  config: d.ValidatedConfig,
-  userConfig: d.UnvalidatedConfig,
+  validatedConfig: d.ValidatedConfig,
+  originalConfig: d.UnvalidatedConfig,
   diagnostics: d.Diagnostic[]
 ): d.ValidatedDevServerConfig | undefined => {
-  if ((config.devServer === null || (config.devServer as any)) === false) {
+  if ((validatedConfig.devServer === null || (validatedConfig.devServer as any)) === false) {
     return undefined;
   }
 
-  const { flags } = config;
-  const { address, addressProtocol, addressPort } = getDevServerAddress(flags.address ?? config.devServer?.address);
+  const { flags } = validatedConfig;
+  const { address, addressProtocol, addressPort } = getDevServerAddress(flags.address ?? validatedConfig.devServer?.address);
 
   // @ts-ignore
   const devServer: d.ValidatedDevServerConfig = {
-    ...(config.devServer ?? {}),
+    ...(validatedConfig.devServer ?? {}),
     address,
-    root: config.devServer?.root ?? config.rootDir ?? '/',
+    root: validatedConfig.devServer?.root ?? validatedConfig.rootDir ?? '/',
   };
 
   if (isNumber(flags.port)) {
@@ -61,12 +71,12 @@ export const validateDevServer = (
   }
 
   if (devServer.ssr) {
-    const wwwOutput = (config.outputTargets ?? []).find(isOutputTargetWww);
+    const wwwOutput = (validatedConfig.outputTargets ?? []).find(isOutputTargetWww);
     devServer.prerenderConfig = wwwOutput?.prerenderConfig;
   }
 
-  if (isString(config.srcIndexHtml)) {
-    devServer.srcIndexHtml = normalizePath(config.srcIndexHtml);
+  if (isString(validatedConfig.srcIndexHtml)) {
+    devServer.srcIndexHtml = normalizePath(validatedConfig.srcIndexHtml);
   }
 
   if (devServer.protocol !== 'http' && devServer.protocol !== 'https') {
@@ -87,13 +97,13 @@ export const validateDevServer = (
 
   if (flags.open === false) {
     devServer.openBrowser = false;
-  } else if (flags.prerender && !config.watch) {
+  } else if (flags.prerender && !validatedConfig.watch) {
     devServer.openBrowser = false;
   }
 
   let serveDir: string;
   let basePath: string;
-  const wwwOutputTarget = (config.outputTargets ?? []).find(isOutputTargetWww);
+  const wwwOutputTarget = (validatedConfig.outputTargets ?? []).find(isOutputTargetWww);
 
   if (wwwOutputTarget) {
     const baseUrl = new URL(wwwOutputTarget.baseUrl ?? '', 'http://config.stenciljs.com');
@@ -101,7 +111,7 @@ export const validateDevServer = (
     serveDir = wwwOutputTarget.appDir ?? '';
   } else {
     basePath = '';
-    serveDir = config.rootDir ?? '';
+    serveDir = validatedConfig.rootDir ?? '';
   }
 
   if (!isString(basePath) || basePath.trim() === '') {
@@ -119,10 +129,10 @@ export const validateDevServer = (
   }
 
   if (!isBoolean(devServer.logRequests)) {
-    devServer.logRequests = config.logLevel === 'debug';
+    devServer.logRequests = validatedConfig.logLevel === 'debug';
   }
 
-  if (!isString(userConfig.devServer?.root)) {
+  if (!isString(originalConfig.devServer?.root)) {
     devServer.root = serveDir;
   }
 
@@ -136,7 +146,7 @@ export const validateDevServer = (
   }
 
   if (!isAbsolute(devServer.root)) {
-    devServer.root = join(config.rootDir as string, devServer.root);
+    devServer.root = join(validatedConfig.rootDir as string, devServer.root);
   }
   devServer.root = normalizePath(devServer.root);
 
@@ -149,7 +159,7 @@ export const validateDevServer = (
     devServer.excludeHmr = [];
   }
 
-  if (!config.devMode || config.buildEs5) {
+  if (!validatedConfig.devMode || validatedConfig.buildEs5) {
     devServer.experimentalDevModules = false;
   } else {
     devServer.experimentalDevModules = !!devServer.experimentalDevModules;
