@@ -26,7 +26,7 @@ describe('validation', () => {
     it('adds a default "flags" object if none is provided', () => {
       userConfig.flags = undefined;
       const { config } = validateConfig(userConfig, bootstrapConfig);
-      expect(config.flags).toEqual({});
+      expect(config.flags).toEqual(createConfigFlags())
     });
 
     it('serializes a provided "flags" object', () => {

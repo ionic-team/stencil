@@ -137,6 +137,12 @@ export const runTask = async (
     rootDir: config.rootDir ?? '/',
     sys: sys ?? config.sys ?? coreCompiler.createSystem({ logger }),
     testing: config.testing ?? {},
+    devServer: {
+      // TODO are these good defaults?
+      root: config.devServer?.root ?? "/",
+      address: config.devServer?.address ?? "0.0.0.0",
+
+    }
   };
 
   switch (task) {

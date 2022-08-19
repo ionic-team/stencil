@@ -59,7 +59,10 @@ export const validateConfig = (
     rootDir: typeof config.rootDir === 'string' ? config.rootDir : '/',
     sys: config.sys ?? bootstrapConfig.sys ?? createSystem({ logger }),
     testing: config.testing ?? {},
-    devServer: validateDevServer(config, diagnostics, flags)
+    devServer: {
+      address: config.devServer?.address ?? "0.0.0.0",
+      root: config.devServer?.root ?? config.rootDir ?? "/"
+    }
   };
 
   // default devMode false
@@ -142,6 +145,9 @@ export const validateConfig = (
 
   // rollup config
   validateRollupConfig(validatedConfig);
+
+  // dev server
+  validatedConfig.devServer = validateDevServer(validatedConfig, diagnostics)
 
   // testing
   validateTesting(validatedConfig, diagnostics);

@@ -5,7 +5,7 @@ import type * as d from '../../declarations';
 import { isOutputTargetWww } from '../output-targets/output-utils';
 
 export const validateDevServer = (
-  config: d.Config,
+  config: d.ValidatedConfig,
   diagnostics: d.Diagnostic[]
 ): d.ValidatedDevServerConfig | undefined => {
   if ((config.devServer === null || (config.devServer as any)) === false) {
@@ -13,42 +13,16 @@ export const validateDevServer = (
   }
 
   const { flags } = config;
-  const devServer = { ...config.devServer };
+  const {address, addressProtocol, addressPort} = getDevServerAddress(
+    flags.address ?? config.devServer?.address
+  )
 
-  if (flags.address && isString(flags.address)) {
-    devServer.address = flags.address;
-  } else if (!isString(devServer.address)) {
-    devServer.address = '0.0.0.0';
-  }
-
-  // default to http for localdev
-  let addressProtocol: 'http' | 'https' = 'http';
-  if (devServer.address.toLowerCase().startsWith('http://')) {
-    devServer.address = devServer.address.substring(7);
-    addressProtocol = 'http';
-  } else if (devServer.address.toLowerCase().startsWith('https://')) {
-    devServer.address = devServer.address.substring(8);
-    addressProtocol = 'https';
-  }
-
-  devServer.address = devServer.address.split('/')[0];
-
-  // split on `:` to get the domain and the (possibly present) port
-  // separately. we've already sliced off the protocol (if present) above
-  // so we can safely split on `:` here.
-  const addressSplit = devServer.address.split(':');
-
-  const isLocalhost = addressSplit[0] === 'localhost' || !isNaN(addressSplit[0].split('.')[0] as any);
-
-  // if localhost we use 3333 as a default port
-  let addressPort: number | undefined = isLocalhost ? 3333 : undefined;
-
-  if (addressSplit.length > 1) {
-    if (!isNaN(addressSplit[1] as any)) {
-      devServer.address = addressSplit[0];
-      addressPort = parseInt(addressSplit[1], 10);
-    }
-  }
+  // @ts-ignore
+  const devServer: d.ValidatedDevServerConfig = {
+    ...(config.devServer ?? {}),
+    address,
+    root: config.devServer?.root ?? config.rootDir ?? "/"
+  };
 
   if (isNumber(flags.port)) {
     devServer.port = flags.port;
@@ -149,7 +123,7 @@ export const validateDevServer = (
     devServer.logRequests = config.logLevel === 'debug';
   }
 
-  if (!isString(devServer.root)) {
+  if (!isString(config.devServer?.root)) {
     devServer.root = serveDir;
   }
 
@@ -184,3 +158,48 @@ export const validateDevServer = (
 
   return devServer;
 };
+
+/**
+ * Given an address string format an address, a port, and a protocol for the
+ * dev server configuration.
+ * 
+ * @param address the address to start with (defaults to "0.0.0.0")
+ * @returns an object holding a formatted address, a suitable port number, and
+ * the protocol to use ("http" | "https")
+ */
+function getDevServerAddress(address: string = "0.0.0.0") {
+  // default to http for localdev
+  let addressProtocol: 'http' | 'https' = 'http';
+  if (address.toLowerCase().startsWith('http://')) {
+    address = address.substring(7);
+    addressProtocol = 'http';
+  } else if (address.toLowerCase().startsWith('https://')) {
+    address = address.substring(8);
+    addressProtocol = 'https';
+  }
+
+  address = address.split('/')[0];
+
+  // split on `:` to get the domain and the (possibly present) port
+  // separately. we've already sliced off the protocol (if present) above
+  // so we can safely split on `:` here.
+  const addressSplit = address.split(':');
+
+  const isLocalhost = addressSplit[0] === 'localhost' || !isNaN(addressSplit[0].split('.')[0] as any);
+
+  // if localhost we use 3333 as a default port
+  let addressPort: number | undefined = isLocalhost ? 3333 : undefined;
+
+  if (addressSplit.length > 1) {
+    if (!isNaN(addressSplit[1] as any)) {
+      address = addressSplit[0];
+      addressPort = parseInt(addressSplit[1], 10);
+    }
+  }
+
+  return {
+    address,
+    addressProtocol,
+    addressPort
+  }
+}

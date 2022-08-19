@@ -6,7 +6,7 @@ import type * as d from '../../../declarations';
 import { normalizePath } from '../../../utils';
 import { validateConfig } from '../validate-config';
 
-describe('validateDevServer', () => {
+describe.only('validateDevServer', () => {
   const root = path.resolve('/');
   let inputConfig: d.UnvalidatedConfig;
   let inputDevServerConfig: d.DevServerConfig;

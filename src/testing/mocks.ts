@@ -39,6 +39,10 @@ export function mockValidatedConfig(overrides: Partial<ValidatedConfig> = {}): V
     rootDir: path.resolve('/'),
     sys: createTestingSystem(),
     testing: {},
+    devServer: {
+      root: "/",
+      address: "0.0.0.0"
+    },
     ...overrides,
   };
 }

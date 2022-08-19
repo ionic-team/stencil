@@ -14,6 +14,12 @@ export const getConfig = (userConfig: d.Config): d.ValidatedConfig => {
     rootDir: userConfig.rootDir ?? '/',
     sys: userConfig.sys ?? createSystem({ logger }),
     testing: userConfig ?? {},
+    devServer: {
+      // TODO are these good defaults?
+      root: userConfig.devServer.root ?? "/",
+      address: userConfig.devServer.address ?? "0.0.0.0",
+
+    }
   };
 
   setPlatformPath(config.sys.platformPath);
