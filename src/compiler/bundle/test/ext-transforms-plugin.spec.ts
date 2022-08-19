@@ -120,10 +120,7 @@ describe('extTransformsPlugin', () => {
         config.flags.watch = true;
         config.flags.dev = true;
         config.flags.serve = true;
-        config.devServer = { reloadStrategy: 'hmr',
-          root: "/",
-        address:"0.0.0.0",
-        };
+        config.devServer = { reloadStrategy: 'hmr', root: '/', address: '0.0.0.0' };
 
         // @ts-ignore the Rollup plugins expect to be called in a Rollup context
         await plugin.transform('asdf', '/some/stubbed/path/foo.css?tag=my-component&encapsulation=shadow');

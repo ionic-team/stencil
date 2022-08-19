@@ -79,6 +79,7 @@ describe.only('validateDevServer', () => {
 
   it('should default root', () => {
     const { config } = validateConfig(inputConfig, mockLoadConfigInit());
+    console.log(config);
     expect(config.devServer.root).toBe(normalizePath(path.join(root, 'some', 'path', 'www')));
   });
 

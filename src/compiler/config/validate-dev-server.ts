@@ -6,6 +6,7 @@ import { isOutputTargetWww } from '../output-targets/output-utils';
 
 export const validateDevServer = (
   config: d.ValidatedConfig,
+  userConfig: d.UnvalidatedConfig,
   diagnostics: d.Diagnostic[]
 ): d.ValidatedDevServerConfig | undefined => {
   if ((config.devServer === null || (config.devServer as any)) === false) {
@@ -13,15 +14,13 @@ export const validateDevServer = (
   }
 
   const { flags } = config;
-  const {address, addressProtocol, addressPort} = getDevServerAddress(
-    flags.address ?? config.devServer?.address
-  )
+  const { address, addressProtocol, addressPort } = getDevServerAddress(flags.address ?? config.devServer?.address);
 
   // @ts-ignore
   const devServer: d.ValidatedDevServerConfig = {
     ...(config.devServer ?? {}),
     address,
-    root: config.devServer?.root ?? config.rootDir ?? "/"
+    root: config.devServer?.root ?? config.rootDir ?? '/',
   };
 
   if (isNumber(flags.port)) {
@@ -123,7 +122,7 @@ export const validateDevServer = (
     devServer.logRequests = config.logLevel === 'debug';
   }
 
-  if (!isString(config.devServer?.root)) {
+  if (!isString(userConfig.devServer?.root)) {
     devServer.root = serveDir;
   }
 
@@ -162,12 +161,12 @@ export const validateDevServer = (
 /**
  * Given an address string format an address, a port, and a protocol for the
  * dev server configuration.
- * 
+ *
  * @param address the address to start with (defaults to "0.0.0.0")
  * @returns an object holding a formatted address, a suitable port number, and
  * the protocol to use ("http" | "https")
  */
-function getDevServerAddress(address: string = "0.0.0.0") {
+function getDevServerAddress(address: string = '0.0.0.0') {
   // default to http for localdev
   let addressProtocol: 'http' | 'https' = 'http';
   if (address.toLowerCase().startsWith('http://')) {
@@ -200,6 +199,6 @@ function getDevServerAddress(address: string = "0.0.0.0") {
   return {
     address,
     addressProtocol,
-    addressPort
-  }
+    addressPort,
+  };
 }

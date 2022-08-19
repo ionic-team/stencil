@@ -14,7 +14,7 @@ import { validatePlugins } from './validate-plugins';
 import { validateRollupConfig } from './validate-rollup-config';
 import { validateTesting } from './validate-testing';
 import { validateWorkers } from './validate-workers';
-import { createConfigFlags } from '../../cli/config-flags'
+import { createConfigFlags } from '../../cli/config-flags';
 
 /**
  * Represents the results of validating a previously unvalidated configuration
@@ -49,7 +49,7 @@ export const validateConfig = (
 
   const logger = bootstrapConfig.logger || config.logger || createLogger();
 
-  const flags = createConfigFlags(config.flags ?? {})
+  const flags = createConfigFlags(config.flags ?? {});
 
   const validatedConfig: ValidatedConfig = {
     ...config,
@@ -59,10 +59,13 @@ export const validateConfig = (
     rootDir: typeof config.rootDir === 'string' ? config.rootDir : '/',
     sys: config.sys ?? bootstrapConfig.sys ?? createSystem({ logger }),
     testing: config.testing ?? {},
-    devServer: {
-      address: config.devServer?.address ?? "0.0.0.0",
-      root: config.devServer?.root ?? config.rootDir ?? "/"
-    }
+    devServer: config.devServer
+      ? {
+          ...config.devServer,
+          address: config.devServer?.address ?? '0.0.0.0',
+          root: config.devServer?.root ?? config.rootDir ?? '/',
+        }
+      : undefined,
   };
 
   // default devMode false
@@ -147,7 +150,7 @@ export const validateConfig = (
   validateRollupConfig(validatedConfig);
 
   // dev server
-  validatedConfig.devServer = validateDevServer(validatedConfig, diagnostics)
+  validatedConfig.devServer = validateDevServer(validatedConfig, config, diagnostics);
 
   // testing
   validateTesting(validatedConfig, diagnostics);

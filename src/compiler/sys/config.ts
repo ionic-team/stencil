@@ -16,10 +16,9 @@ export const getConfig = (userConfig: d.Config): d.ValidatedConfig => {
     testing: userConfig ?? {},
     devServer: {
       // TODO are these good defaults?
-      root: userConfig.devServer.root ?? "/",
-      address: userConfig.devServer.address ?? "0.0.0.0",
-
-    }
+      root: userConfig.devServer.root ?? '/',
+      address: userConfig.devServer.address ?? '0.0.0.0',
+    },
   };
 
   setPlatformPath(config.sys.platformPath);
