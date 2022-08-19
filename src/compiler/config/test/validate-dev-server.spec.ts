@@ -6,7 +6,7 @@ import type * as d from '../../../declarations';
 import { normalizePath } from '../../../utils';
 import { validateConfig } from '../validate-config';
 
-describe.only('validateDevServer', () => {
+describe('validateDevServer', () => {
   const root = path.resolve('/');
   let inputConfig: d.UnvalidatedConfig;
   let inputDevServerConfig: d.DevServerConfig;
@@ -79,7 +79,6 @@ describe.only('validateDevServer', () => {
 
   it('should default root', () => {
     const { config } = validateConfig(inputConfig, mockLoadConfigInit());
-    console.log(config);
     expect(config.devServer.root).toBe(normalizePath(path.join(root, 'some', 'path', 'www')));
   });
 

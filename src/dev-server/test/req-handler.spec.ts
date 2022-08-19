@@ -42,7 +42,7 @@ describe('request-handler', () => {
     await sys.createDir(stencilConfig.devServer.root);
     await sys.writeFile(path.join(stencilConfig.devServer.devServerDir, 'templates', 'directory-index.html'), tmplDir);
 
-    devServerConfig = validateDevServer(stencilConfig, []);
+    devServerConfig = validateDevServer(stencilConfig, tmpConfig, []);
     req = {} as any;
     res = {} as any;
 

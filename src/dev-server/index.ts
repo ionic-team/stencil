@@ -8,15 +8,20 @@ import type {
   DevServerConfig,
   DevServerMessage,
   InitServerProcess,
+  ValidatedDevServerConfig,
   Logger,
   StencilDevServerConfig,
+  DevServer,
+  CompilerBuildResults,
+  InitServerProcess,
+  DevServerMessage,
 } from '../declarations';
 import { initServerProcessWorkerProxy } from './server-worker-main';
 
-export function start(stencilDevServerConfig: StencilDevServerConfig, logger: Logger, watcher?: CompilerWatcher) {
+export function start(stencilDevServerConfig: ValidatedDevServerConfig, logger: Logger, watcher?: CompilerWatcher) {
   return new Promise<DevServer>(async (resolve, reject) => {
     try {
-      const devServerConfig: DevServerConfig = {
+      const devServerConfig: ValidatedDevServerConfig = {
         devServerDir: __dirname,
         ...stencilDevServerConfig,
       };
@@ -44,7 +49,7 @@ export function start(stencilDevServerConfig: StencilDevServerConfig, logger: Lo
 }
 
 function startServer(
-  devServerConfig: DevServerConfig,
+  devServerConfig: ValidatedDevServerConfig,
   logger: Logger,
   watcher: CompilerWatcher,
   initServerProcess: InitServerProcess,
@@ -224,4 +229,4 @@ function startServer(
   }
 }
 
-export { DevServer, StencilDevServerConfig as DevServerConfig, Logger };
+export { DevServer, ValidatedDevServerConfig as DevServerConfig, Logger };
