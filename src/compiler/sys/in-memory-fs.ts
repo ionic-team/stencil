@@ -482,7 +482,7 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
   /**
    * Remove an item from the in-memory FS
    *
-   * This is done by marking if for deletion. The item will remain in memory
+   * This is done by marking it for deletion. The item will remain in memory
    * until the queued changes are committed. This function handles both files
    * and directories.
    *
@@ -500,7 +500,7 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
   };
 
   /**
-   * Remove an item form the in-memory FS by marking it to be deleted
+   * Remove an item from the in-memory FS by marking it to be deleted
    *
    * @param dirPath the path to the item to be deleted
    * @returns an empty promise
@@ -530,7 +530,7 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
   };
 
   /**
-   * Remove an item form the in-memory FS by marking it to be deleted
+   * Remove an item from the in-memory FS by marking it to be deleted
    *
    * @param filePath the path to the item to be deleted
    * @returns an empty promise

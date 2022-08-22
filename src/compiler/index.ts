@@ -22,4 +22,3 @@ export { path } from './sys/modules/path';
 export { transpile, transpileSync } from './transpile';
 export { version, versions, vermoji, buildId } from '../version';
 export { ts };
-export { InMemoryFileSystem, FsWriteResults } from './sys/in-memory-fs';
