@@ -1,9 +1,9 @@
 import type {
-  Config,
   OutputTarget,
   OutputTargetDistCustomElements,
   OutputTargetDistTypes,
   OutputTargetCopy,
+  ValidatedConfig,
 } from '../../../declarations';
 import { getAbsolutePath } from '../config-utils';
 import { COPY, DIST_TYPES, isOutputTargetDistCustomElements } from '../../output-targets/output-utils';
@@ -20,7 +20,7 @@ import { join } from 'path';
  * @returns the validated output target(s)
  */
 export const validateCustomElement = (
-  config: Config,
+  config: ValidatedConfig,
   userOutputs: ReadonlyArray<OutputTarget>
 ): ReadonlyArray<OutputTargetDistCustomElements | OutputTargetDistTypes | OutputTargetCopy> => {
   const defaultDir = 'dist';

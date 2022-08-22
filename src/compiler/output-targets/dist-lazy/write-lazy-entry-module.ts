@@ -3,7 +3,7 @@ import { join } from 'path';
 import { getSourceMappingUrlForEndOfFile } from '@utils';
 
 export const writeLazyModule = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   outputTargetType: string,
   destinations: string[],
@@ -39,7 +39,7 @@ export const writeLazyModule = async (
 };
 
 const getBundleId = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   entryKey: string,
   shouldHash: boolean,
   code: string,

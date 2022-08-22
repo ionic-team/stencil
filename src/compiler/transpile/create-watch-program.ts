@@ -3,7 +3,7 @@ import { getTsOptionsToExtend } from './ts-config';
 import ts from 'typescript';
 
 export const createTsWatchProgram = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   buildCallback: (tsBuilder: ts.BuilderProgram) => Promise<void>
 ) => {
   let isRunning = false;

@@ -54,6 +54,7 @@ export const validateConfig = (
     logger,
     outputTargets: config.outputTargets ?? [],
     sys: config.sys ?? bootstrapConfig.sys ?? createSystem({ logger }),
+    testing: config.testing ?? {},
   };
 
   // default devMode false

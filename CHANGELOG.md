@@ -1,3 +1,13 @@
+## 🐞 [2.17.4](https://github.com/ionic-team/stencil/compare/v2.17.3...v2.17.4) (2022-08-22)
+
+
+### Bug Fixes
+
+* **compiler:** don't break HMR by mangling CSS ([#3517](https://github.com/ionic-team/stencil/issues/3517)) ([f5b2b69](https://github.com/ionic-team/stencil/commit/f5b2b69c23de044825fccb054610a52a345415e4)), closes [#3461](https://github.com/ionic-team/stencil/issues/3461)
+* **task:** consider config sys in task runner ([#3518](https://github.com/ionic-team/stencil/issues/3518)) ([103ec60](https://github.com/ionic-team/stencil/commit/103ec6098a5367d0de26450e1010bddb7ae8e890)), closes [#3510](https://github.com/ionic-team/stencil/issues/3510)
+
+
+
 ## 🌭 [2.17.3](https://github.com/ionic-team/stencil/compare/v2.17.2...v2.17.3) (2022-08-02)
 
 

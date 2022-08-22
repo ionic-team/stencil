@@ -12,6 +12,7 @@ export const getConfig = (userConfig: d.Config): d.ValidatedConfig => {
     logger,
     outputTargets: userConfig.outputTargets ?? [],
     sys: userConfig.sys ?? createSystem({ logger }),
+    testing: userConfig ?? {},
   };
 
   setPlatformPath(config.sys.platformPath);

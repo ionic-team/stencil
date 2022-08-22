@@ -10,7 +10,7 @@ import { getUsedComponents } from '../html/used-components';
  * @returns the component bundling data
  */
 export function getDefaultBundles(
-  config: d.Config,
+  config: d.ValidatedConfig,
   buildCtx: d.BuildCtx,
   cmps: d.ComponentCompilerMeta[]
 ): readonly d.ComponentCompilerMeta[][] {
@@ -50,7 +50,7 @@ export function getDefaultBundles(
  * @returns a three dimensional array with the compiler metadata for each component used
  */
 export function getUserConfigBundles(
-  config: d.Config,
+  config: d.ValidatedConfig,
   buildCtx: d.BuildCtx,
   cmps: d.ComponentCompilerMeta[]
 ): readonly d.ComponentCompilerMeta[][] {

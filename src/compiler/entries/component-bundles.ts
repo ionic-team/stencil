@@ -10,7 +10,7 @@ import { getDefaultBundles } from './default-bundles';
  * @returns a set of all component tags that are used
  */
 export function computeUsedComponents(
-  config: d.Config,
+  config: d.ValidatedConfig,
   defaultBundles: readonly d.ComponentCompilerMeta[][],
   allCmps: readonly d.ComponentCompilerMeta[]
 ): Set<string> {
@@ -47,7 +47,10 @@ export function computeUsedComponents(
  * @param buildCtx the current build context
  * @returns the bundles to be used during the bundling process
  */
-export function generateComponentBundles(config: d.Config, buildCtx: d.BuildCtx): readonly d.ComponentCompilerMeta[][] {
+export function generateComponentBundles(
+  config: d.ValidatedConfig,
+  buildCtx: d.BuildCtx
+): readonly d.ComponentCompilerMeta[][] {
   const cmps = sortBy(buildCtx.components, (cmp: d.ComponentCompilerMeta) => cmp.dependents.length);
 
   const defaultBundles = getDefaultBundles(config, buildCtx, cmps);
