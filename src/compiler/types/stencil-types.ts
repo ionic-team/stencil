@@ -2,7 +2,7 @@ import type * as d from '../../declarations';
 import { dirname, join, relative, resolve } from 'path';
 import { isOutputTargetDistTypes } from '../output-targets/output-utils';
 import { normalizePath } from '@utils';
-import { FsWriteResults } from '@stencil/core/compiler';
+import { FsWriteResults } from '../sys/in-memory-fs';
 
 /**
  * Update a type declaration file's import declarations using the module `@stencil/core`
