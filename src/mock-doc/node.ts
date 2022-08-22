@@ -304,7 +304,8 @@ export class MockElement extends MockNode {
 
   override cloneNode(_deep?: boolean): MockElement {
     // implemented on MockElement.prototype from within element.ts
-    return this;
+    // @ts-ignore - implemented on MockElement.prototype from within element.ts
+    return null;
   }
 
   closest(selector: string) {
