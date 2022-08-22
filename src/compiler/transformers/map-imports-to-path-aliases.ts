@@ -1,4 +1,4 @@
-import { relative } from 'path';
+import { normalize, relative } from 'path';
 import ts from 'typescript';
 import type * as d from '../../declarations';
 
@@ -32,9 +32,8 @@ export const mapImportsToPathAliases = (config: d.Config): ts.TransformerFactory
             module.resolvedModule?.isExternalLibraryImport === false &&
             module.resolvedModule?.resolvedFileName != null
           ) {
-            importPath = relative(sourceFile, module.resolvedModule.resolvedFileName).replace(
-              module.resolvedModule.extension,
-              ''
+            importPath = normalize(
+              relative(sourceFile, module.resolvedModule.resolvedFileName).replace(module.resolvedModule.extension, '')
             );
           }
         }
