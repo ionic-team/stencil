@@ -1,4 +1,4 @@
-import { dirname, relative } from 'path';
+import { relative } from 'path';
 import ts from 'typescript';
 import type * as d from '../../declarations';
 
@@ -15,7 +15,6 @@ import type * as d from '../../declarations';
  */
 export const mapImportsToPathAliases = (config: d.Config): ts.TransformerFactory<ts.SourceFile> => {
   return (transformCtx) => {
-    let dirPath: string;
     let sourceFile: string;
 
     const compilerHost = ts.createCompilerHost(config.tsCompilerOptions);
@@ -33,7 +32,7 @@ export const mapImportsToPathAliases = (config: d.Config): ts.TransformerFactory
             module.resolvedModule?.isExternalLibraryImport === false &&
             module.resolvedModule?.resolvedFileName != null
           ) {
-            importPath = relative(dirPath, module.resolvedModule.resolvedFileName).replace(
+            importPath = relative(sourceFile, module.resolvedModule.resolvedFileName).replace(
               module.resolvedModule.extension,
               ''
             );
@@ -54,7 +53,6 @@ export const mapImportsToPathAliases = (config: d.Config): ts.TransformerFactory
     };
 
     return (tsSourceFile) => {
-      dirPath = dirname(tsSourceFile.fileName);
       sourceFile = tsSourceFile.fileName;
 
       return ts.visitEachChild(tsSourceFile, visit, transformCtx);

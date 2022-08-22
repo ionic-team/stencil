@@ -10,7 +10,6 @@ import { updateComponentBuildConditionals } from '../app-core/app-data';
 import { updateModule } from '../transformers/static-to-meta/parse-static';
 import { updateStencilTypesImports } from '../types/stencil-types';
 import { validateTranspiledComponents } from './validate-components';
-import { mapImportsToPathAliases } from '../transformers/map-imports-to-path-aliases';
 
 export const runTsProgram = async (
   config: d.Config,
@@ -53,7 +52,6 @@ export const runTsProgram = async (
   // Emit files that changed
   tsBuilder.emit(undefined, emitCallback, undefined, false, {
     before: [convertDecoratorsToStatic(config, buildCtx.diagnostics, tsTypeChecker)],
-    after: [mapImportsToPathAliases(config)],
   });
 
   const changedmodules = Array.from(compilerCtx.changedModules.keys());

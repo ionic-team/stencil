@@ -3,6 +3,8 @@ import { catchError, COLLECTION_MANIFEST_FILE_NAME, flatOne, generatePreamble, n
 import { isOutputTargetDistCollection } from '../output-utils';
 import { join, relative } from 'path';
 import { typescriptVersion, version } from '../../../version';
+import ts from 'typescript';
+import { mapImportsToPathAliases } from '../../transformers/map-imports-to-path-aliases';
 
 export const outputCollection = async (
   config: d.ValidatedConfig,
@@ -30,7 +32,22 @@ export const outputCollection = async (
           outputTargets.map(async (o) => {
             const relPath = relative(config.srcDir, mod.jsFilePath);
             const filePath = join(o.collectionDir, relPath);
-            await compilerCtx.fs.writeFile(filePath, code, { outputTargetType: o.type });
+
+            // Transpile the already transpiled modules to apply
+            // a transformer to convert aliased import paths to relative paths
+            const { outputText } = ts.transpileModule(code, {
+              // Need to use the output file location to the generated relative path
+              // is relative to the output, not the source
+              fileName: mod.jsFilePath,
+              compilerOptions: {
+                target: ts.ScriptTarget.Latest,
+              },
+              transformers: {
+                after: [mapImportsToPathAliases(config)],
+              },
+            });
+
+            await compilerCtx.fs.writeFile(filePath, outputText, { outputTargetType: o.type });
 
             if (mod.sourceMapPath) {
               const relativeSourceMapPath = relative(config.srcDir, mod.sourceMapPath);

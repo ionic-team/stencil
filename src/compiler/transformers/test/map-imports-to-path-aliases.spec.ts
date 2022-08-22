@@ -92,6 +92,6 @@ describe('mapImportsToPathAliases', () => {
 
     module = transpileModule(inputText, config, null, [], [mapImportsToPathAliases(config)]);
 
-    expect(module.outputText).toContain('import { utils } from "utils";');
+    expect(module.outputText).toContain('import { utils } from "../utils";');
   });
 });
