@@ -206,8 +206,6 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
    *
    * @param src the path to the source file
    * @param dest the destination the source file should be copied to
-   * @returns a promise
-   *
    */
   const copyFile = async (src: string, dest: string): Promise<void> => {
     const item = getItem(src);
