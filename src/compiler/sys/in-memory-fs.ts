@@ -31,13 +31,13 @@ import { isIterable, normalizePath, isString } from '@utils';
  * ```
  *
  * In the above example the write operation and the delete operation (w/
- * `.remove`) are both queue in the in-memory proxy but not committed to
+ * `.remove`) are both queued in the in-memory proxy but not committed to
  * disk until the `.commit` method is called.
  */
 export type InMemoryFileSystem = ReturnType<typeof createInMemoryFs>;
 
 /**
- * An node in the in-memory file system. This may represent a file or
+ * A node in the in-memory file system. This may represent a file or
  * a directory, and pending copy, write, and delete operations may be stored
  * on it.
  */
