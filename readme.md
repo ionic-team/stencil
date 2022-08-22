@@ -43,11 +43,13 @@
   <a href="https://twitter.com/stenciljs">Twitter</a>
 </h2>
 
-[Stencil](https://stenciljs.com/) is a simple compiler for generating Web Components and static site generated progressive web apps (PWA). Stencil was built by the [Ionic](https://ionic.io/) team for its next generation of performant mobile and desktop Web Components.
+[Stencil](https://stenciljs.com/) is a simple compiler for generating Web Components, built by the [Ionic](https://ionic.io/) team.
 
-Stencil combines the best concepts of the most popular frontend frameworks into a compile-time rather than run-time tool. It combines TypeScript, JSX, an asynchronous rendering pipeline to ensure smooth running animations and lazy-loading, to generate 100% standards-based Web Components that run on both [modern browsers and legacy browsers](https://stenciljs.com/docs/browser-support).
+Stencil combines the best concepts of the most popular frontend frameworks into a compile-time rather than run-time tool.
+It combines TypeScript, JSX, an asynchronous rendering pipeline to ensure smooth running animations and lazy-loading, to generate 100% standards-based Web Components that run on both [modern browsers and legacy browsers](https://stenciljs.com/docs/browser-support).
 
-Stencil components are just Web Components, so they work in any major framework or with no framework at all. In many cases, Stencil can be used as a drop in replacement for traditional frontend frameworks given the capabilities now available in the browser, though using it as such is certainly not required.
+Stencil components are just Web Components, so they work in any major framework or with no framework at all.
+In many cases, Stencil can be used as a drop in replacement for traditional frontend frameworks given the capabilities now available in the browser, though using it as such is certainly not required.
 
 Stencil also enables a number of key capabilities on top of Web Components, in particular Server Side Rendering (SSR) without the need to run a headless browser, pre-rendering, and objects-as-properties (instead of just strings).
 
