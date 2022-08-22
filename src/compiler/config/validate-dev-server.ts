@@ -10,8 +10,8 @@ import { isOutputTargetWww } from '../output-targets/output-utils';
  * config is supplied, this will return `undefined` instead.
  *
  * @param validatedConfig a validated config to use
- * @originalConfig the original config supplied by the user
- * @diagnostics an out param for setting diagnostic information
+ * @param originalConfig the original config supplied by the user
+ * @param diagnostics an out param for setting diagnostic information
  * @returns a new, validated dev server configuration
  */
 export const validateDevServer = (
