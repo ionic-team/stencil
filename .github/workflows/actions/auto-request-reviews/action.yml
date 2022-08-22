@@ -1,0 +1,17 @@
+name: Auto Request Review
+
+on:
+  pull_request:
+    types: [opened, ready_for_review, reopened]
+
+jobs:
+  auto-request-review:
+    name: Auto Request Review
+    runs-on: ubuntu-latest
+    steps:
+      - name: Request review for team members
+        runs:
+          using: 'node16'
+          main: '.github/workflows/actions/auto-request-reviews/index.js'
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
