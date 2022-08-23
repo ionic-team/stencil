@@ -1,7 +1,7 @@
 name: BrowserStack Tests
 
 on:
-  pull_request_target:
+  pull_request:
     branches:
       - 'main'
       - 'v3.0.0-dev'
@@ -62,8 +62,22 @@ jobs:
           node-version: 12
           cache: 'npm'
 
+      - name: Git status check 1
+        # here we check that there are no changed / new files from our test
+        # run. we use `git status`, grep out the build zip (downloaded above),
+        # and check if there are more than 0 lines in the output.
+        run: if [[ $(git status --short | grep -c -v stencil-core-build.zip) -ne 0 ]]; then STATUS=$(git status --verbose); printf "%s" "$STATUS"; git diff | cat; exit 1; fi
+        shell: bash
+
       - name: Install dependencies
         run: npm ci
+
+      - name: Git status check 2
+        # here we check that there are no changed / new files from our test
+        # run. we use `git status`, grep out the build zip (downloaded above),
+        # and check if there are more than 0 lines in the output.
+        run: if [[ $(git status --short | grep -c -v stencil-core-build.zip) -ne 0 ]]; then STATUS=$(git status --verbose); printf "%s" "$STATUS"; git diff | cat; exit 1; fi
+        shell: bash
 
       - name: Download Build Archive
         uses: ./.github/workflows/actions/download-archive
@@ -72,12 +86,26 @@ jobs:
           path: .
           filename: stencil-core-build.zip
 
+      - name: Git status check 3
+        # here we check that there are no changed / new files from our test
+        # run. we use `git status`, grep out the build zip (downloaded above),
+        # and check if there are more than 0 lines in the output.
+        run: if [[ $(git status --short | grep -c -v stencil-core-build.zip) -ne 0 ]]; then STATUS=$(git status --verbose); printf "%s" "$STATUS"; git diff | cat; exit 1; fi
+        shell: bash
+
       - name: BrowserStack Env Setup
         uses: 'browserstack/github-actions/setup-env@master'
         with:
           username: ${{ env.BROWSERSTACK_USERNAME }}
           access-key: ${{ env.BROWSERSTACK_ACCESS_KEY }}
           project-name: 'stencil_core'
+
+      - name: Git status check 4
+        # here we check that there are no changed / new files from our test
+        # run. we use `git status`, grep out the build zip (downloaded above),
+        # and check if there are more than 0 lines in the output.
+        run: if [[ $(git status --short | grep -c -v stencil-core-build.zip) -ne 0 ]]; then STATUS=$(git status --verbose); printf "%s" "$STATUS"; git diff | cat; exit 1; fi
+        shell: bash
 
       - name: Start BrowserStack
         uses: browserstack/github-actions/setup-local@master
@@ -88,8 +116,22 @@ jobs:
           # otherwise, an identifier collision could cause connections to fail.
           local-identifier: random
 
+      - name: Git status check 5
+        # here we check that there are no changed / new files from our test
+        # run. we use `git status`, grep out the build zip (downloaded above),
+        # and check if there are more than 0 lines in the output.
+        run: if [[ $(git status --short | grep -c -v stencil-core-build.zip) -ne 0 ]]; then STATUS=$(git status --verbose); printf "%s" "$STATUS"; git diff | cat; exit 1; fi
+        shell: bash
+
       - name: Run Karma Tests
         run: npm run test.karma.prod
+
+      - name: Git status check 6
+        # here we check that there are no changed / new files from our test
+        # run. we use `git status`, grep out the build zip (downloaded above),
+        # and check if there are more than 0 lines in the output.
+        run: if [[ $(git status --short | grep -c -v stencil-core-build.zip) -ne 0 ]]; then STATUS=$(git status --verbose); printf "%s" "$STATUS"; git diff | cat; exit 1; fi
+        shell: bash
 
       - name: Stop BrowserStack
         uses: browserstack/github-actions/setup-local@master
