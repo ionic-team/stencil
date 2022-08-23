@@ -133,7 +133,7 @@ export const runTask = async (
     flags: createConfigFlags(config.flags ?? { task }),
     logger,
     outputTargets: config.outputTargets ?? [],
-    sys: sys ?? coreCompiler.createSystem({ logger }),
+    sys: sys ?? config.sys ?? coreCompiler.createSystem({ logger }),
     testing: config.testing ?? {},
   };
 
