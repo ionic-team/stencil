@@ -8,7 +8,7 @@ export const generateServiceWorker = async (
   buildCtx: d.BuildCtx,
   workbox: d.Workbox,
   outputTarget: d.OutputTargetWww
-): Promise<Awaited<void[]> | void> => {
+): Promise<void[] | void> => {
   const serviceWorker = await getServiceWorker(outputTarget);
   if (serviceWorker.unregister) {
     await config.sys.writeFile(serviceWorker.swDest, SELF_UNREGISTER_SW);
