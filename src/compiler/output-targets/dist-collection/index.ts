@@ -6,6 +6,17 @@ import { typescriptVersion, version } from '../../../version';
 import ts from 'typescript';
 import { mapImportsToPathAliases } from '../../transformers/map-imports-to-path-aliases';
 
+/**
+ * Main output target function for `dist-collection`. This function takes the compiled output from a
+ * {@link ts.Program}, runs each file through a transformer to transpile import path aliases, and then writes
+ * the output code and source maps to disk in the specified collection directory.
+ *
+ * @param config The validated Stencil config.
+ * @param compilerCtx The current compiler context.
+ * @param buildCtx The current build context.
+ * @param changedModuleFiles The changed modules returned from the TS compiler.
+ * @returns An empty promise. Resolved once all functions finish.
+ */
 export const outputCollection = async (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
@@ -36,14 +47,12 @@ export const outputCollection = async (
             // Transpile the already transpiled modules to apply
             // a transformer to convert aliased import paths to relative paths
             const { outputText } = ts.transpileModule(code, {
-              // Need to use the output file location to the generated relative path
-              // is relative to the output, not the source
-              fileName: mod.jsFilePath,
+              fileName: mod.sourceFilePath,
               compilerOptions: {
                 target: ts.ScriptTarget.Latest,
               },
               transformers: {
-                after: [mapImportsToPathAliases(config)],
+                after: [mapImportsToPathAliases(config, filePath, o.collectionDir)],
               },
             });
 

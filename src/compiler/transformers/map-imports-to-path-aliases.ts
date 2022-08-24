@@ -1,4 +1,4 @@
-import { normalize, relative } from 'path';
+import { dirname, normalize, relative } from 'path';
 import ts from 'typescript';
 import type * as d from '../../declarations';
 
@@ -11,15 +11,28 @@ import type * as d from '../../declarations';
  * their compiler ({@link https://github.com/microsoft/TypeScript/issues/10866})
  *
  * @param config The Stencil configuration object.
+ * @param destinationFilePath The location on disk the file will be written to.
+ * @param destinationDirectory The destination on disk of the collection directory.
  * @returns A factory for creating a {@link ts.Transformer}.
  */
-export const mapImportsToPathAliases = (config: d.Config): ts.TransformerFactory<ts.SourceFile> => {
+export const mapImportsToPathAliases = (
+  config: d.ValidatedConfig,
+  destinationFilePath: string,
+  destinationDirectory: string
+): ts.TransformerFactory<ts.SourceFile> => {
   return (transformCtx) => {
     let sourceFile: string;
 
     const compilerHost = ts.createCompilerHost(config.tsCompilerOptions);
 
     const visit = (node: ts.Node): ts.VisitResult<ts.Node> => {
+      // We should only attempt to transpile standard module imports:
+      // - import * as ts from 'typescript';
+      // - import { Foo, Bar } from 'baz';
+      // - import { Foo as Bar } from 'baz';
+      // - import Foo from 'bar';
+      // We should NOT transpile other import declaration types:
+      // - import a = Foo.Bar
       if (ts.isImportDeclaration(node) && ts.isStringLiteral(node.moduleSpecifier)) {
         let importPath = node.moduleSpecifier.text;
 
@@ -28,12 +41,24 @@ export const mapImportsToPathAliases = (config: d.Config): ts.TransformerFactory
         if (!importPath.startsWith('.')) {
           const module = ts.resolveModuleName(importPath, sourceFile, config.tsCompilerOptions, compilerHost);
 
-          if (
-            module.resolvedModule?.isExternalLibraryImport === false &&
-            module.resolvedModule?.resolvedFileName != null
-          ) {
+          const hasResolvedFileName = module.resolvedModule?.resolvedFileName != null;
+          const isModuleFromNodeModules = module.resolvedModule?.isExternalLibraryImport === true;
+          const shouldTranspileImportPath = hasResolvedFileName && !isModuleFromNodeModules;
+
+          if (shouldTranspileImportPath) {
+            // Create a global extension matching regular expression
+            // This can be used to strip all file extensions off the generated import path string
+            const extensionRegex = new RegExp(Object.values(ts.Extension).join('|'), 'g');
+
+            // In order to make sure the relative path works when the destination depth is different than the source
+            // file structure depth, we need to determine where the resolved file exists relative to the destination directory
+            const resolvePathInDestination = module.resolvedModule.resolvedFileName.replace(
+              config.srcDir,
+              destinationDirectory
+            );
+
             importPath = normalize(
-              relative(sourceFile, module.resolvedModule.resolvedFileName).replace(module.resolvedModule.extension, '')
+              relative(dirname(destinationFilePath), resolvePathInDestination).replace(extensionRegex, '')
             );
           }
         }

@@ -22,7 +22,7 @@ describe('mapImportsToPathAliases', () => {
     resolveModuleNameSpy.mockReset();
   });
 
-  it('should ignore relative imports', () => {
+  it('ignores relative imports', () => {
     resolveModuleNameSpy.mockReturnValue({
       resolvedModule: {
         isExternalLibraryImport: false,
@@ -36,12 +36,12 @@ describe('mapImportsToPathAliases', () => {
         dateUtils.test();
     `;
 
-    module = transpileModule(inputText, config, null, [], [mapImportsToPathAliases(config)]);
+    module = transpileModule(inputText, config, null, [], [mapImportsToPathAliases(config, '', '')]);
 
     expect(module.outputText).toContain('import * as dateUtils from "../utils";');
   });
 
-  it('should ignore external imports', () => {
+  it('ignores external imports', () => {
     resolveModuleNameSpy.mockReturnValue({
       resolvedModule: {
         isExternalLibraryImport: true,
@@ -55,12 +55,12 @@ describe('mapImportsToPathAliases', () => {
         utils.test();
     `;
 
-    module = transpileModule(inputText, config, null, [], [mapImportsToPathAliases(config)]);
+    module = transpileModule(inputText, config, null, [], [mapImportsToPathAliases(config, '', '')]);
 
     expect(module.outputText).toContain('import { utils } from "@stencil/core";');
   });
 
-  it('should do nothing if there is no resolved module', () => {
+  it('does nothing if there is no resolved module', () => {
     resolveModuleNameSpy.mockReturnValue({
       resolvedModule: undefined,
     });
@@ -70,13 +70,13 @@ describe('mapImportsToPathAliases', () => {
         utils.test();
     `;
 
-    module = transpileModule(inputText, config, null, [], [mapImportsToPathAliases(config)]);
+    module = transpileModule(inputText, config, null, [], [mapImportsToPathAliases(config, '', '')]);
 
     expect(module.outputText).toContain('import { utils } from "@utils";');
   });
 
   // TODO(STENCIL-223): remove spy to test actual resolution behavior
-  it('should replace the path alias with the generated relative path', () => {
+  it('replaces the path alias with the generated relative path', () => {
     resolveModuleNameSpy.mockReturnValue({
       resolvedModule: {
         isExternalLibraryImport: false,
@@ -90,8 +90,8 @@ describe('mapImportsToPathAliases', () => {
         utils.test();
     `;
 
-    module = transpileModule(inputText, config, null, [], [mapImportsToPathAliases(config)]);
+    module = transpileModule(inputText, config, null, [], [mapImportsToPathAliases(config, '', '')]);
 
-    expect(module.outputText).toContain('import { utils } from "../utils";');
+    expect(module.outputText).toContain('import { utils } from "utils";');
   });
 });
