@@ -123,7 +123,7 @@
     "path-browserify": "^1.0.1",
     "pixelmatch": "4.0.2",
     "postcss": "^8.2.8",
-    "prettier": "2.5.1",
+    "prettier": "2.7.1",
     "prompts": "2.4.0",
     "puppeteer": "~10.0.0",
     "rollup": "2.42.3",
