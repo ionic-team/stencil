@@ -1,12 +1,12 @@
 import type * as d from '@stencil/core/declarations';
-import { mockBuildCtx, mockCompilerCtx, mockConfig } from '@stencil/core/testing';
+import { mockBuildCtx, mockCompilerCtx, mockValidatedConfig } from '@stencil/core/testing';
 import * as v from '../validate-build-package-json';
 import path from 'path';
 import { DIST_COLLECTION, DIST_CUSTOM_ELEMENTS, DIST_CUSTOM_ELEMENTS_BUNDLE } from '../../output-targets/output-utils';
 import { normalizePath } from '../../../utils/normalize-path';
 
 describe('validate-package-json', () => {
-  let config: d.Config;
+  let config: d.ValidatedConfig;
   let compilerCtx: d.CompilerCtx;
   let buildCtx: d.BuildCtx;
   let collectionOutputTarget: d.OutputTargetDistCollection;
@@ -26,7 +26,7 @@ describe('validate-package-json', () => {
     };
 
     const namespace = 'SomeNamespace';
-    config = mockConfig({
+    config = mockValidatedConfig({
       devMode: false,
       fsNamespace: namespace.toLowerCase(),
       namespace,
