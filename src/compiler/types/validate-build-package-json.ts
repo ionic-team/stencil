@@ -13,12 +13,16 @@ import {
  * Validate the package.json file for a project, checking that various fields
  * are set correctly for the currently-configured output targets.
  *
- * @param config the user-supplied Stencil config
+ * @param config the project's Stencil config
  * @param compilerCtx the compiler context
  * @param buildCtx the build context
  * @returns an empty Promise
  */
-export const validateBuildPackageJson = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
+export const validateBuildPackageJson = async (
+  config: d.ValidatedConfig,
+  compilerCtx: d.CompilerCtx,
+  buildCtx: d.BuildCtx
+): Promise<void> => {
   if (config.watch) {
     return;
   }
@@ -48,7 +52,7 @@ export const validateBuildPackageJson = async (config: d.Config, compilerCtx: d.
  * @param outputTarget a DIST_COLLECTION output target
  */
 const validateDistCollectionPkgJson = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   outputTarget: d.OutputTargetDistCollection
@@ -71,7 +75,7 @@ const validateDistCollectionPkgJson = async (
  * @param outputTarget a DIST_COLLECTION output target
  */
 export const validatePackageFiles = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   outputTarget: d.OutputTargetDistCollection
@@ -118,7 +122,7 @@ export const validatePackageFiles = async (
  * @param outputTarget a DIST_COLLECTION output target
  */
 export const validateMain = (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   outputTarget: d.OutputTargetDistCollection
@@ -142,12 +146,12 @@ export const validateMain = (
  * output-target specific recommended value. If it is present and is not equal
  * to that recommended value it will set a different warning message.
  *
- * @param config the current user-supplied configuration
+ * @param config the project's Stencil config
  * @param compilerCtx the compiler context
  * @param buildCtx the build context
  * @returns an empty Promise
  */
-export const validateModule = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
+export const validateModule = async (config: d.ValidatedConfig, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   const currentModule = buildCtx.packageJson.module;
 
   const recommendedRelPath = recommendedModulePath(config);
@@ -175,11 +179,11 @@ export const validateModule = async (config: d.Config, compilerCtx: d.CompilerCt
  * Get the recommended `"module"` path for `package.json` given the output
  * targets that a user has set on their config.
  *
- * @param config the user-supplied Stencil configuration
+ * @param config the project's Stencil config
  * @returns a recommended module path or a null value to indicate no default
  * value is supplied
  */
-function recommendedModulePath(config: d.Config): string | null {
+function recommendedModulePath(config: d.ValidatedConfig): string | null {
   const customElementsBundleOT = config.outputTargets.find(isOutputTargetDistCustomElementsBundle);
   const customElementsOT = config.outputTargets.find(isOutputTargetDistCustomElements);
   const distCollectionOT = config.outputTargets.find(isOutputTargetDistCollection);
@@ -213,7 +217,7 @@ function recommendedModulePath(config: d.Config): string | null {
  * @param outputTarget a DIST_COLLECTION output target
  */
 export const validateTypes = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   outputTarget: d.OutputTargetDistTypes
@@ -250,7 +254,7 @@ export const validateTypes = async (
  * @param outputTarget a DIST_COLLECTION output target
  */
 export const validateCollection = (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   outputTarget: d.OutputTargetDistCollection
@@ -272,7 +276,7 @@ export const validateCollection = (
  * @param compilerCtx the current compiler context
  * @param buildCtx the current build context
  */
-export const validateBrowser = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
+export const validateBrowser = (config: d.ValidatedConfig, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   if (isString(buildCtx.packageJson.browser)) {
     const msg = `package.json "browser" property is set to "${buildCtx.packageJson.browser}". However, for maximum compatibility with all bundlers it's recommended to not set the "browser" property and instead ensure both "module" and "main" properties are set.`;
     packageJsonWarn(config, compilerCtx, buildCtx, msg, `"browser"`);
@@ -292,7 +296,7 @@ export const validateBrowser = (config: d.Config, compilerCtx: d.CompilerCtx, bu
  * @returns a diagnostic object
  */
 const packageJsonError = (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   msg: string,
@@ -316,7 +320,7 @@ const packageJsonError = (
  * @returns a diagnostic object
  */
 const packageJsonWarn = (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   msg: string,
