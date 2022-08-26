@@ -48,7 +48,11 @@ export const mapImportsToPathAliases = (
             if (shouldTranspileImportPath) {
               // Create a regular expression that will be used to remove the last file extension
               // from the import path
-              const extensionRegex = new RegExp(Object.values(ts.Extension).join('$|'));
+              const extensionRegex = new RegExp(
+                Object.values(ts.Extension)
+                  .map((extension) => `${extension}$`)
+                  .join('|')
+              );
 
               // In order to make sure the relative path works when the destination depth is different than the source
               // file structure depth, we need to determine where the resolved file exists relative to the destination directory
