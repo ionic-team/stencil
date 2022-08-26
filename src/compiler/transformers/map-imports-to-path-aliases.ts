@@ -21,65 +21,63 @@ export const mapImportsToPathAliases = (
   destinationDirectory: string
 ): ts.TransformerFactory<ts.SourceFile> => {
   return (transformCtx) => {
-    let sourceFile: string;
-
     const compilerHost = ts.createCompilerHost(config.tsCompilerOptions);
 
-    const visit = (node: ts.Node): ts.VisitResult<ts.Node> => {
-      // We should only attempt to transpile standard module imports:
-      // - import * as ts from 'typescript';
-      // - import { Foo, Bar } from 'baz';
-      // - import { Foo as Bar } from 'baz';
-      // - import Foo from 'bar';
-      // We should NOT transpile other import declaration types:
-      // - import a = Foo.Bar
-      if (ts.isImportDeclaration(node) && ts.isStringLiteral(node.moduleSpecifier)) {
-        let importPath = node.moduleSpecifier.text;
+    const visit =
+      (sourceFile: string) =>
+      (node: ts.Node): ts.VisitResult<ts.Node> => {
+        // We should only attempt to transpile standard module imports:
+        // - import * as ts from 'typescript';
+        // - import { Foo, Bar } from 'baz';
+        // - import { Foo as Bar } from 'baz';
+        // - import Foo from 'bar';
+        // We should NOT transpile other import declaration types:
+        // - import a = Foo.Bar
+        if (ts.isImportDeclaration(node) && ts.isStringLiteral(node.moduleSpecifier)) {
+          let importPath = node.moduleSpecifier.text;
 
-        // We will ignore transforming any paths that are already relative paths or
-        // imports from external modules/packages
-        if (!importPath.startsWith('.')) {
-          const module = ts.resolveModuleName(importPath, sourceFile, config.tsCompilerOptions, compilerHost);
+          // We will ignore transforming any paths that are already relative paths or
+          // imports from external modules/packages
+          if (!importPath.startsWith('.')) {
+            const module = ts.resolveModuleName(importPath, sourceFile, config.tsCompilerOptions, compilerHost);
 
-          const hasResolvedFileName = module.resolvedModule?.resolvedFileName != null;
-          const isModuleFromNodeModules = module.resolvedModule?.isExternalLibraryImport === true;
-          const shouldTranspileImportPath = hasResolvedFileName && !isModuleFromNodeModules;
+            const hasResolvedFileName = module.resolvedModule?.resolvedFileName != null;
+            const isModuleFromNodeModules = module.resolvedModule?.isExternalLibraryImport === true;
+            const shouldTranspileImportPath = hasResolvedFileName && !isModuleFromNodeModules;
 
-          if (shouldTranspileImportPath) {
-            // Create a global extension matching regular expression
-            // This can be used to strip all file extensions off the generated import path string
-            const extensionRegex = new RegExp(Object.values(ts.Extension).join('|'), 'g');
+            if (shouldTranspileImportPath) {
+              // Create a regular expression that will be used to remove the last file extension
+              // from the import path
+              const extensionRegex = new RegExp(Object.values(ts.Extension).join('$|'));
 
-            // In order to make sure the relative path works when the destination depth is different than the source
-            // file structure depth, we need to determine where the resolved file exists relative to the destination directory
-            const resolvePathInDestination = module.resolvedModule.resolvedFileName.replace(
-              config.srcDir,
-              destinationDirectory
-            );
+              // In order to make sure the relative path works when the destination depth is different than the source
+              // file structure depth, we need to determine where the resolved file exists relative to the destination directory
+              const resolvePathInDestination = module.resolvedModule.resolvedFileName.replace(
+                config.srcDir,
+                destinationDirectory
+              );
 
-            importPath = normalize(
-              relative(dirname(destinationFilePath), resolvePathInDestination).replace(extensionRegex, '')
-            );
+              importPath = normalize(
+                relative(dirname(destinationFilePath), resolvePathInDestination).replace(extensionRegex, '')
+              );
+            }
           }
+
+          return transformCtx.factory.updateImportDeclaration(
+            node,
+            node.decorators,
+            node.modifiers,
+            node.importClause,
+            transformCtx.factory.createStringLiteral(importPath),
+            node.assertClause
+          );
         }
 
-        return transformCtx.factory.updateImportDeclaration(
-          node,
-          node.decorators,
-          node.modifiers,
-          node.importClause,
-          transformCtx.factory.createStringLiteral(importPath),
-          node.assertClause
-        );
-      }
-
-      return ts.visitEachChild(node, visit, transformCtx);
-    };
+        return ts.visitEachChild(node, visit(sourceFile), transformCtx);
+      };
 
     return (tsSourceFile) => {
-      sourceFile = tsSourceFile.fileName;
-
-      return ts.visitEachChild(tsSourceFile, visit, transformCtx);
+      return ts.visitEachChild(tsSourceFile, visit(tsSourceFile.fileName), transformCtx);
     };
   };
 };

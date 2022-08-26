@@ -13,7 +13,7 @@ describe('mapImportsToPathAliases', () => {
   >;
 
   beforeEach(() => {
-    config = mockValidatedConfig({ tsconfig: './tsconfig.json', tsCompilerOptions: {} });
+    config = mockValidatedConfig({ tsCompilerOptions: {} });
 
     resolveModuleNameSpy = jest.spyOn(ts, 'resolveModuleName');
   });
@@ -93,5 +93,59 @@ describe('mapImportsToPathAliases', () => {
     module = transpileModule(inputText, config, null, [], [mapImportsToPathAliases(config, '', '')]);
 
     expect(module.outputText).toContain('import { utils } from "utils";');
+  });
+
+  // The resolved module is not part of the output directory
+  it('generates the correct relative path when the resolved module is outside the transpiled project', () => {
+    config.srcDir = '/test-dir';
+    resolveModuleNameSpy.mockReturnValue({
+      resolvedModule: {
+        isExternalLibraryImport: false,
+        extension: Extension.Ts,
+        resolvedFileName: '/some-compiled-dir/utils/utils.ts',
+      },
+    });
+    const inputText = `
+        import { utils } from "@utils";
+
+        utils.test();
+    `;
+
+    module = transpileModule(
+      inputText,
+      config,
+      null,
+      [],
+      [mapImportsToPathAliases(config, '/dist/collection/test.js', '/dist/collection')]
+    );
+
+    expect(module.outputText).toContain('import { utils } from "../../some-compiled-dir/utils/utils";');
+  });
+
+  // Source module and resolved module are in the same output directory
+  it('generates the correct relative path when the resolved module is within the transpiled project', () => {
+    config.srcDir = '/test-dir';
+    resolveModuleNameSpy.mockReturnValue({
+      resolvedModule: {
+        isExternalLibraryImport: false,
+        extension: Extension.Ts,
+        resolvedFileName: '/test-dir/utils/utils.ts',
+      },
+    });
+    const inputText = `
+        import { utils } from "@utils";
+
+        utils.test();
+    `;
+
+    module = transpileModule(
+      inputText,
+      config,
+      null,
+      [],
+      [mapImportsToPathAliases(config, 'dist/collection/test.js', 'dist/collection')]
+    );
+
+    expect(module.outputText).toContain('import { utils } from "utils/utils";');
   });
 });
