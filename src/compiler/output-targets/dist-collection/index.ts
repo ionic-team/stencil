@@ -44,17 +44,21 @@ export const outputCollection = async (
             const relPath = relative(config.srcDir, mod.jsFilePath);
             const filePath = join(o.collectionDir, relPath);
 
-            // Transpile the already transpiled modules to apply
-            // a transformer to convert aliased import paths to relative paths
-            const { outputText } = ts.transpileModule(code, {
-              fileName: mod.sourceFilePath,
-              compilerOptions: {
-                target: ts.ScriptTarget.Latest,
-              },
-              transformers: {
-                after: [mapImportsToPathAliases(config, filePath, o.collectionDir)],
-              },
-            });
+            let outputText = code;
+            if (o.transpileAliasedImportPaths) {
+              // Transpile the already transpiled modules to apply
+              // a transformer to convert aliased import paths to relative paths
+              const transpiledOutput = ts.transpileModule(code, {
+                fileName: mod.sourceFilePath,
+                compilerOptions: {
+                  target: ts.ScriptTarget.Latest,
+                },
+                transformers: {
+                  after: [mapImportsToPathAliases(config, filePath, o.collectionDir)],
+                },
+              });
+              outputText = transpiledOutput.outputText;
+            }
 
             await compilerCtx.fs.writeFile(filePath, outputText, { outputTargetType: o.type });
 
