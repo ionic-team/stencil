@@ -1975,6 +1975,18 @@ export interface OutputTargetBaseNext {
   dir?: string;
 }
 
+/**
+ * This enum defines all behavioral options available for
+ * exporting elements from the `dist-custom-elements` output target.
+ */
+export enum CustomElementsExportBehavior {
+  /**
+   * All components will be re-exported from the specified directories
+   * root `index.js` barrel file.
+   */
+  BARREL = 'barrel',
+}
+
 export interface OutputTargetDistCustomElements extends OutputTargetBaseNext {
   type: 'dist-custom-elements';
   empty?: boolean;
@@ -1993,6 +2005,12 @@ export interface OutputTargetDistCustomElements extends OutputTargetBaseNext {
    * Enables the generation of type definition files for the output target.
    */
   generateTypeDeclarations?: boolean;
+  /**
+   * Define the export/definition behavior for the output target's generated output.
+   * This controls if/how custom elements will be defined or where components will be exported from.
+   * If omitted, no auto-definition behavior or re-exporting will happen.
+   */
+  customElementsExportBehavior?: CustomElementsExportBehavior | null;
 }
 
 export interface OutputTargetDistCustomElementsBundle extends OutputTargetBaseNext {

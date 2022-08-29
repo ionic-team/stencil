@@ -50,3 +50,5 @@ export {
 } from '../stencil-public-runtime';
 
 export type { StencilConfig as Config, PrerenderConfig } from '../stencil-public-compiler';
+
+export { CustomElementsExportBehavior } from '../stencil-public-compiler';
