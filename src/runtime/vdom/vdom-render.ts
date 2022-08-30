@@ -33,13 +33,18 @@ let isSvgMode = false;
  * @param parentElm the parent DOM node which our new node will be a child of
  * @returns the newly created node
  */
-const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex: number, parentElm: d.RenderNode) => {
+const createElm = (
+  oldParentVNode: d.VNode | null,
+  newParentVNode: d.VNode,
+  childIndex: number,
+  parentElm: d.RenderNode
+) => {
   // tslint:disable-next-line: prefer-const
   const newVNode = newParentVNode.$children$[childIndex];
   let i = 0;
   let elm: d.RenderNode;
   let childNode: d.RenderNode;
-  let oldVNode: d.VNode;
+  let oldVNode: d.VNode | null;
 
   if (BUILD.slotRelocation && !useNativeShadowDom) {
     // remember for later we need to check to relocate nodes
@@ -150,7 +155,7 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
 
       // check if we've got an old vnode for this slot
       oldVNode = oldParentVNode && oldParentVNode.$children$ && oldParentVNode.$children$[childIndex];
-      if (oldVNode && oldVNode.$tag$ === newVNode.$tag$ && oldParentVNode.$elm$) {
+      if (oldVNode && oldVNode.$tag$ === newVNode.$tag$ && oldParentVNode && oldParentVNode.$elm$) {
         // we've got an old slot vnode and the wrapper is being replaced
         // so let's move the old slot content back to it's original location
         putBackInOriginalLocation(oldParentVNode.$elm$, false);
@@ -192,54 +197,82 @@ const putBackInOriginalLocation = (parentElm: Node, recursive: boolean) => {
   plt.$flags$ &= ~PLATFORM_FLAGS.isTmpDisconnected;
 };
 
+/**
+ * Create DOM nodes corresponding to a list of {@link d.Vnode} objects and
+ * add them to the DOM in the appropriate place.
+ *
+ * @param parentElm the DOM node which should be used as a parent for the new
+ * DOM nodes
+ * @param before a child of the `parentElm` which the new children should be
+ * inserted before (optional)
+ * @param parentVNode the parent virtual DOM node
+ * @param vnodes the new child virtual DOM nodes to produce DOM nodes for
+ * @param startIdx the index in the child virtual DOM nodes at which to start
+ * creating DOM nodes (inclusive)
+ * @param endIdx the index in the child virtual DOM nodes at which to stop
+ * creating DOM nodes (inclusive)
+ */
 const addVnodes = (
   parentElm: d.RenderNode,
-  before: d.RenderNode,
+  before: d.RenderNode | null,
   parentVNode: d.VNode,
   vnodes: d.VNode[],
   startIdx: number,
   endIdx: number
 ) => {
   let containerElm = ((BUILD.slotRelocation && parentElm['s-cr'] && parentElm['s-cr'].parentNode) || parentElm) as any;
-  let childNode: Node;
   if (BUILD.shadowDom && (containerElm as any).shadowRoot && containerElm.tagName === hostTagName) {
     containerElm = (containerElm as any).shadowRoot;
   }
 
   for (; startIdx <= endIdx; ++startIdx) {
     if (vnodes[startIdx]) {
-      childNode = createElm(null, parentVNode, startIdx, parentElm);
+      const childNode = createElm(null, parentVNode, startIdx, parentElm);
       if (childNode) {
-        vnodes[startIdx].$elm$ = childNode as any;
+        vnodes[startIdx].$elm$ = childNode;
         containerElm.insertBefore(childNode, BUILD.slotRelocation ? referenceNode(before) : before);
       }
     }
   }
 };
 
-const removeVnodes = (vnodes: d.VNode[], startIdx: number, endIdx: number, vnode?: d.VNode, elm?: d.RenderNode) => {
+/**
+ * Remove the DOM elements corresponding to a list of {@link d.VNode} objects.
+ * This can be used to, for instance, clean up after a list of children which
+ * should no longer be shown.
+ *
+ * This function also handles some of Stencil's slot relocation logic.
+ *
+ * @param vnodes a list of virtual DOM nodes to remove
+ * @param startIdx the index at which to start removing nodes (inclusive)
+ * @param endIdx the index at which to stop removing nodes (inclusive)
+ */
+const removeVnodes = (vnodes: d.VNode[], startIdx: number, endIdx: number) => {
   for (; startIdx <= endIdx; ++startIdx) {
-    if ((vnode = vnodes[startIdx])) {
-      elm = vnode.$elm$;
+    const vnode = vnodes[startIdx];
+    if (vnode) {
+      const elm = vnode.$elm$;
       callNodeRefs(vnode);
 
-      if (BUILD.slotRelocation) {
-        // we're removing this element
-        // so it's possible we need to show slot fallback content now
-        checkSlotFallbackVisibility = true;
+      if (elm) {
+        if (BUILD.slotRelocation) {
+          // we're removing this element
+          // so it's possible we need to show slot fallback content now
+          checkSlotFallbackVisibility = true;
 
-        if (elm['s-ol']) {
-          // remove the original location comment
-          elm['s-ol'].remove();
-        } else {
-          // it's possible that child nodes of the node
-          // that's being removed are slot nodes
-          putBackInOriginalLocation(elm, true);
+          if (elm && elm['s-ol']) {
+            // remove the original location comment
+            elm['s-ol'].remove();
+          } else {
+            // it's possible that child nodes of the node
+            // that's being removed are slot nodes
+            putBackInOriginalLocation(elm, true);
+          }
         }
-      }
 
-      // remove the vnode's element from the dom
-      elm.remove();
+        // remove the vnode's element from the dom
+        elm.remove();
+      }
     }
   }
 };
@@ -503,7 +536,8 @@ const updateChildren = (parentElm: d.RenderNode, oldCh: d.VNode[], newVNode: d.V
  *
  * So, in other words, if `key` attrs are not set on VNodes which may be
  * changing order within a `children` array or something along those lines then
- * we could obtain a false positive and then have to do needless re-rendering.
+ * we could obtain a false negative and then have to do needless re-rendering
+ * (i.e. we'd say two VNodes aren't equal when in fact they should be).
  *
  * @param leftVNode the first VNode to check
  * @param rightVNode the second VNode to check
@@ -525,7 +559,7 @@ export const isSameVnode = (leftVNode: d.VNode, rightVNode: d.VNode) => {
   return false;
 };
 
-const referenceNode = (node: d.RenderNode) => {
+const referenceNode = (node: d.RenderNode | null): d.RenderNode | null => {
   // this node was relocated to a new location in the dom
   // because of some other component's slot
   // but we still have an html comment in place of where
@@ -761,11 +795,26 @@ interface RelocateNodeData {
   $nodeToRelocate$: d.RenderNode;
 }
 
+/**
+ * The main entry point for Stencil's virtual DOM-based rendering engine
+ *
+ * Given a {@link d.HostRef} container and some virtual DOM nodes, this
+ * function will handle creating a virtual DOM tree with a single root, patching
+ * the current virtual DOM tree onto an old one (if any), dealing with slot
+ * relocation, and reflecting attributes.
+ *
+ * @param hostRef data needed to root and render the virtual DOM tree, such as
+ * the DOM node into which it should be rendered.
+ * @param renderFnResults the virtual DOM nodes to be rendered
+ */
 export const renderVdom = (hostRef: d.HostRef, renderFnResults: d.VNode | d.VNode[]) => {
   const hostElm = hostRef.$hostElement$;
   const cmpMeta = hostRef.$cmpMeta$;
   const oldVNode: d.VNode = hostRef.$vnode$ || newVNode(null, null);
-  const rootVnode = isHost(renderFnResults) ? renderFnResults : h(null, null, renderFnResults as any);
+  const rootVnode: d.VNode =
+    !Array.isArray(renderFnResults) && isHost(renderFnResults)
+      ? renderFnResults
+      : h(null, null, renderFnResults as any);
 
   hostTagName = hostElm.tagName;
 
