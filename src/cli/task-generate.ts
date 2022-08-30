@@ -1,4 +1,4 @@
-import type { Config } from '../declarations';
+import type { ValidatedConfig } from '../declarations';
 import type { CoreCompiler } from './load-compiler';
 import { IS_NODE_ENV } from '../compiler/sys/environment';
 import { validateComponentTag } from '@utils';
@@ -13,7 +13,7 @@ import { validateComponentTag } from '@utils';
  * mainly accessing the `path` module
  * @param config the user-supplied config, which we need here to access `.sys`.
  */
-export const taskGenerate = async (coreCompiler: CoreCompiler, config: Config): Promise<void> => {
+export const taskGenerate = async (coreCompiler: CoreCompiler, config: ValidatedConfig): Promise<void> => {
   if (!IS_NODE_ENV) {
     config.logger.error(`"generate" command is currently only implemented for a NodeJS environment`);
     return config.sys.exit(1);
@@ -139,7 +139,7 @@ const getFilepathForFile = (
  * used to print out a little summary of our activity to the user.
  */
 const getBoilerplateAndWriteFile = async (
-  config: Config,
+  config: ValidatedConfig,
   componentName: string,
   withCss: boolean,
   file: BoilerplateFile
@@ -161,7 +161,7 @@ const getBoilerplateAndWriteFile = async (
  * @param files  the files we want to check
  * @param config the Config object, used here to get access to `sys.readFile`
  */
-const checkForOverwrite = async (files: readonly BoilerplateFile[], config: Config): Promise<void> => {
+const checkForOverwrite = async (files: readonly BoilerplateFile[], config: ValidatedConfig): Promise<void> => {
   const alreadyPresent: string[] = [];
 
   await Promise.all(

@@ -1,9 +1,9 @@
-import type { Config } from '../../../declarations';
+import type { ValidatedConfig } from '../../../declarations';
 import { createWorkerContext } from '../../worker/worker-thread';
 import { createWorkerMainContext } from '../../worker/main-thread';
 import { isFunction } from '@utils';
 
-export const createSysWorker = (config: Config) => {
+export const createSysWorker = (config: ValidatedConfig) => {
   if (
     isFunction(config.sys.createWorkerController) &&
     config.maxConcurrentWorkers > 0 &&

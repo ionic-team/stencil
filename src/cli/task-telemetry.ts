@@ -1,10 +1,18 @@
 import type * as d from '../declarations';
+import { ConfigFlags } from './config-flags';
 import { checkTelemetry, disableTelemetry, enableTelemetry } from './telemetry/telemetry';
 
-export const taskTelemetry = async (config: d.Config, sys: d.CompilerSystem, logger: d.Logger) => {
+/**
+ * Entrypoint for the Telemetry task
+ * @param flags configuration flags provided to Stencil when a task was called (either this task or a task that invokes
+ * telemetry)
+ * @param sys the abstraction for interfacing with the operating system
+ * @param logger a logging implementation to log the results out to the user
+ */
+export const taskTelemetry = async (flags: ConfigFlags, sys: d.CompilerSystem, logger: d.Logger): Promise<void> => {
   const prompt = logger.dim(sys.details.platform === 'windows' ? '>' : '$');
-  const isEnabling = config.flags.args.includes('on');
-  const isDisabling = config.flags.args.includes('off');
+  const isEnabling = flags.args.includes('on');
+  const isDisabling = flags.args.includes('off');
   const INFORMATION = `Opt in or our of telemetry. Information about the data we collect is available on our website: ${logger.bold(
     'https://stenciljs.com/telemetry'
   )}`;

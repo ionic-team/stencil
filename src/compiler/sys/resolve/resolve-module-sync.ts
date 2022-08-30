@@ -6,10 +6,11 @@ import { isString, normalizeFsPath, normalizePath } from '@utils';
 import { IS_WEB_WORKER_ENV } from '../environment';
 import { basename, dirname } from 'path';
 import resolve, { SyncOpts } from 'resolve';
+import { InMemoryFileSystem } from '../in-memory-fs';
 
 export const resolveRemoteModuleIdSync = (
   config: d.Config,
-  inMemoryFs: d.InMemoryFileSystem,
+  inMemoryFs: InMemoryFileSystem,
   opts: d.ResolveModuleIdOptions
 ) => {
   const packageJson = resolveRemotePackageJsonSync(config, inMemoryFs, opts.moduleId);
@@ -29,7 +30,7 @@ export const resolveRemoteModuleIdSync = (
   return null;
 };
 
-const resolveRemotePackageJsonSync = (config: d.Config, inMemoryFs: d.InMemoryFileSystem, moduleId: string) => {
+const resolveRemotePackageJsonSync = (config: d.Config, inMemoryFs: InMemoryFileSystem, moduleId: string) => {
   if (inMemoryFs) {
     const filePath = normalizePath(
       config.sys.getLocalModulePath({ rootDir: config.rootDir, moduleId, path: 'package.json' })
@@ -50,7 +51,7 @@ const resolveRemotePackageJsonSync = (config: d.Config, inMemoryFs: d.InMemoryFi
 
 export const resolveModuleIdSync = (
   sys: d.CompilerSystem,
-  inMemoryFs: d.InMemoryFileSystem,
+  inMemoryFs: InMemoryFileSystem,
   opts: d.ResolveModuleIdOptions
 ) => {
   if (inMemoryFs) {
@@ -66,7 +67,7 @@ export const resolveModuleIdSync = (
 
 export const createCustomResolverSync = (
   sys: d.CompilerSystem,
-  inMemoryFs: d.InMemoryFileSystem,
+  inMemoryFs: InMemoryFileSystem,
   exts: string[]
 ): SyncOpts => {
   return {

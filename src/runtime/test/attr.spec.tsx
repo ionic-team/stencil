@@ -291,7 +291,8 @@ describe('attribute', () => {
         <cmp-a str="second" nu="-12.2" undef="no undef" null="no null" bool dynamic-str="value" dynamic-nu="123"></cmp-a>
       `);
     });
-    it('should reflect properties as attributes', async () => {
+
+    it('should reflect properties as attributes with strict build', async () => {
       @Component({ tag: 'cmp-a', shadow: true })
       class CmpA {
         @Prop({ reflect: true }) foo = 'bar';

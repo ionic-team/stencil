@@ -3,6 +3,7 @@ import { createWorkerMessageHandler } from './worker/worker-thread';
 import { initWebWorkerThread } from './sys/worker/web-worker-thread';
 import { IS_WEB_WORKER_ENV } from './sys/environment';
 import ts from 'typescript';
+export { FsWriteResults } from './sys/in-memory-fs';
 
 if (IS_WEB_WORKER_ENV) {
   initWebWorkerThread(createWorkerMessageHandler(createSystem()));

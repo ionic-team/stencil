@@ -4,10 +4,11 @@ import { BuildContext } from '../build/build-ctx';
 import { getRollupOptions } from './bundle-output';
 import { OutputOptions, PartialResolvedId, rollup } from 'rollup';
 import { generatePreamble } from '@utils';
+import { InMemoryFileSystem } from '../sys/in-memory-fs';
 
 export const devNodeModuleResolveId = async (
   config: d.Config,
-  inMemoryFs: d.InMemoryFileSystem,
+  inMemoryFs: InMemoryFileSystem,
   resolvedId: PartialResolvedId,
   importee: string
 ) => {
@@ -56,7 +57,11 @@ const getPackageJsonPath = (resolvedPath: string, importee: string): string => {
   return null;
 };
 
-export const compilerRequest = async (config: d.Config, compilerCtx: d.CompilerCtx, data: d.CompilerRequest) => {
+export const compilerRequest = async (
+  config: d.ValidatedConfig,
+  compilerCtx: d.CompilerCtx,
+  data: d.CompilerRequest
+) => {
   const results: d.CompilerRequestResponse = {
     path: data.path,
     nodeModuleId: null,
@@ -126,7 +131,7 @@ export const compilerRequest = async (config: d.Config, compilerCtx: d.CompilerC
 };
 
 const bundleDevModule = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   parsedUrl: ParsedDevModuleUrl,
   results: d.CompilerRequestResponse

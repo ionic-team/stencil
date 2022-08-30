@@ -52,11 +52,11 @@ export const supportsListenerOptions = /*@__PURE__*/ (() => {
 
 export const promiseResolve = (v?: any) => Promise.resolve(v);
 
-export const supportsConstructibleStylesheets = BUILD.constructableCSS
+export const supportsConstructableStylesheets = BUILD.constructableCSS
   ? /*@__PURE__*/ (() => {
       try {
         new CSSStyleSheet();
-        return typeof new CSSStyleSheet().replace === 'function';
+        return typeof new CSSStyleSheet().replaceSync === 'function';
       } catch (e) {}
       return false;
     })()

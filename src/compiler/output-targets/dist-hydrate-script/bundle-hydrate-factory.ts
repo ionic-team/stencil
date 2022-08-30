@@ -9,7 +9,7 @@ import { STENCIL_INTERNAL_HYDRATE_ID } from '../../bundle/entry-alias-ids';
 import { updateStencilCoreImports } from '../../transformers/update-stencil-core-import';
 
 export const bundleHydrateFactory = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   _build: d.BuildConditionals,
@@ -42,7 +42,7 @@ export const bundleHydrateFactory = async (
   return undefined;
 };
 
-const getHydrateCustomTransformer = (config: d.Config, compilerCtx: d.CompilerCtx) => {
+const getHydrateCustomTransformer = (config: d.ValidatedConfig, compilerCtx: d.CompilerCtx) => {
   const transformOpts: d.TransformOptions = {
     coreImportPath: STENCIL_INTERNAL_HYDRATE_ID,
     componentExport: null,

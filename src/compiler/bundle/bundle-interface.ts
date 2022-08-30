@@ -2,6 +2,12 @@ import type { BuildConditionals } from '../../declarations';
 import type { SourceFile, TransformerFactory } from 'typescript';
 import type { PreserveEntrySignaturesOption } from 'rollup';
 
+/**
+ * Options for bundled output passed on Rollup
+ *
+ * This covers the ID for the bundle, the platform it runs on, input modules,
+ * and more
+ */
 export interface BundleOptions {
   id: string;
   conditionals?: BuildConditionals;

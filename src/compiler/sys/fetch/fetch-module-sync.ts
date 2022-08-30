@@ -3,10 +3,11 @@ import { known404Urls } from './fetch-utils';
 import { isString } from '@utils';
 import { skipFilePathFetch, skipUrlFetch } from './fetch-utils';
 import { writeFetchSuccessSync } from './write-fetch-success';
+import { InMemoryFileSystem } from '../in-memory-fs';
 
 export const fetchModuleSync = (
   sys: d.CompilerSystem,
-  inMemoryFs: d.InMemoryFileSystem,
+  inMemoryFs: InMemoryFileSystem,
   pkgVersions: Map<string, string>,
   url: string,
   filePath: string

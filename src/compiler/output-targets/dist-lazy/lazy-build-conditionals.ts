@@ -2,7 +2,10 @@ import type * as d from '../../../declarations';
 import { getBuildFeatures, updateBuildConditionals } from '../../app-core/app-data';
 import { isOutputTargetHydrate } from '../output-utils';
 
-export const getLazyBuildConditionals = (config: d.Config, cmps: d.ComponentCompilerMeta[]): d.BuildConditionals => {
+export const getLazyBuildConditionals = (
+  config: d.ValidatedConfig,
+  cmps: d.ComponentCompilerMeta[]
+): d.BuildConditionals => {
   const build = getBuildFeatures(cmps) as d.BuildConditionals;
 
   build.lazyLoad = true;
