@@ -45,7 +45,7 @@ export const outputCollection = async (
             const filePath = join(o.collectionDir, relPath);
 
             let outputText = code;
-            if (o.transpileAliasedImportPaths) {
+            if (o.transformAliasedImportPaths) {
               // Transpile the already transpiled modules to apply
               // a transformer to convert aliased import paths to relative paths
               const transpiledOutput = ts.transpileModule(code, {

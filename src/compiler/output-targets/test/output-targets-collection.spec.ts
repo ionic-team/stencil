@@ -43,12 +43,12 @@ describe('Dist Collection output target', () => {
     jest.restoreAllMocks();
   });
 
-  describe('transpile aliased import paths', () => {
-    it('transpiles aliased import paths when the output target config flag is `true`', async () => {
+  describe('transform aliased import paths', () => {
+    it('transforms aliased import paths when the output target config flag is `true`', async () => {
       mockConfig.outputTargets = [
         {
           ...target,
-          transpileAliasedImportPaths: true,
+          transformAliasedImportPaths: true,
         },
       ];
 
@@ -58,11 +58,11 @@ describe('Dist Collection output target', () => {
       expect(mapImportPathSpy).toHaveBeenCalledTimes(1);
     });
 
-    it('does not transpile aliased import paths when the output target config flag is `false`', async () => {
+    it('does not transform aliased import paths when the output target config flag is `false`', async () => {
       mockConfig.outputTargets = [
         {
           ...target,
-          transpileAliasedImportPaths: false,
+          transformAliasedImportPaths: false,
         },
       ];
 
@@ -71,7 +71,7 @@ describe('Dist Collection output target', () => {
       expect(mapImportPathSpy).toHaveBeenCalledTimes(0);
     });
 
-    it('does not transpile aliased import paths when the output target config flag is `undefined`', async () => {
+    it('does not transform aliased import paths when the output target config flag is `undefined`', async () => {
       mockConfig.outputTargets = [target];
 
       await outputCollection(mockConfig, mockedCompilerCtx, mockedBuildCtx, changedModules);

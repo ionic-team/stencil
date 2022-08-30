@@ -1846,7 +1846,7 @@ export interface OutputTargetDist extends OutputTargetBase {
 
   collectionDir?: string | null;
   /**
-   * When `true` this flag will transpile aliased import paths defined in
+   * When `true` this flag will transform aliased import paths defined in
    * a project's `tsconfig.json` to relative import paths in the compiled output's
    * `dist-collection` bundle if it is generated (i.e. `collectionDir` is set).
    *
@@ -1862,9 +1862,9 @@ export interface OutputTargetDist extends OutputTargetBase {
    * // Source file
    * import * as dateUtils from '@utils/date-utils';
    * // Output file
-   * import { dateUtils } from '../utils/date-utils';
+   * import * as dateUtils from '../utils/date-utils';
    */
-  transpileAliasedImportPathsInCollection?: boolean | null;
+  transformAliasedImportPathsInCollection?: boolean | null;
 
   typesDir?: string;
   esmLoaderPath?: string;
@@ -1880,7 +1880,7 @@ export interface OutputTargetDistCollection extends OutputTargetBase {
   dir: string;
   collectionDir: string;
   /**
-   * When `true` this flag will transpile aliased import paths defined in
+   * When `true` this flag will transform aliased import paths defined in
    * a project's `tsconfig.json` to relative import paths in the compiled output.
    *
    * Paths will be left in aliased format if `false` or `undefined`.
@@ -1895,9 +1895,9 @@ export interface OutputTargetDistCollection extends OutputTargetBase {
    * // Source file
    * import * as dateUtils from '@utils/date-utils';
    * // Output file
-   * import { dateUtils } from '../utils/date-utils';
+   * import * as dateUtils from '../utils/date-utils';
    */
-  transpileAliasedImportPaths?: boolean | null;
+  transformAliasedImportPaths?: boolean | null;
 }
 
 export interface OutputTargetDistTypes extends OutputTargetBase {
