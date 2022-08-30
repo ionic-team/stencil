@@ -1,9 +1,9 @@
-import type { BuildResultsComponentGraph, Config, Diagnostic } from '../declarations';
+import type { BuildResultsComponentGraph, Diagnostic, ValidatedConfig } from '../declarations';
 import type { CoreCompiler } from './load-compiler';
 import { catchError } from '@utils';
 import { startupCompilerLog } from './logs';
 
-export const taskPrerender = async (coreCompiler: CoreCompiler, config: Config) => {
+export const taskPrerender = async (coreCompiler: CoreCompiler, config: ValidatedConfig) => {
   startupCompilerLog(coreCompiler, config);
 
   const hydrateAppFilePath = config.flags.unknownArgs[0];
@@ -25,7 +25,7 @@ export const taskPrerender = async (coreCompiler: CoreCompiler, config: Config) 
 
 export const runPrerenderTask = async (
   coreCompiler: CoreCompiler,
-  config: Config,
+  config: ValidatedConfig,
   hydrateAppFilePath: string,
   componentGraph: BuildResultsComponentGraph,
   srcIndexHtmlPath: string

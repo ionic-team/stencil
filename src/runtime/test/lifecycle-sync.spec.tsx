@@ -299,8 +299,8 @@ describe('lifecycle sync', () => {
 
     @Component({ tag: 'cmp-root' })
     class CmpRoot {
-      @Prop() value = 100;
-      @Prop() value2 = 100;
+      @Prop({ mutable: true }) value = 100;
+      @Prop({ mutable: true }) value2 = 100;
 
       @Method()
       next() {

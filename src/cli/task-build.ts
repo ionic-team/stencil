@@ -6,7 +6,7 @@ import { startupCompilerLog } from './logs';
 import { taskWatch } from './task-watch';
 import { telemetryBuildFinishedAction } from './telemetry/telemetry';
 
-export const taskBuild = async (coreCompiler: CoreCompiler, config: d.Config, sys?: d.CompilerSystem) => {
+export const taskBuild = async (coreCompiler: CoreCompiler, config: d.ValidatedConfig) => {
   if (config.flags.watch) {
     // watch build
     await taskWatch(coreCompiler, config);
@@ -24,10 +24,7 @@ export const taskBuild = async (coreCompiler: CoreCompiler, config: d.Config, sy
     const compiler = await coreCompiler.createCompiler(config);
     const results = await compiler.build();
 
-    // TODO(STENCIL-148) make this parameter no longer optional, remove the surrounding if statement
-    if (sys) {
-      await telemetryBuildFinishedAction(sys, config, config.logger, coreCompiler, results);
-    }
+    await telemetryBuildFinishedAction(config.sys, config, coreCompiler, results);
 
     await compiler.destroy();
 

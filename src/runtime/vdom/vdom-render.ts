@@ -23,6 +23,16 @@ let checkSlotFallbackVisibility = false;
 let checkSlotRelocate = false;
 let isSvgMode = false;
 
+/**
+ * Create a DOM Node corresponding to one of the children of a given VNode.
+ *
+ * @param oldParentVNode the parent VNode from the previous render
+ * @param newParentVNode the parent VNode from the current render
+ * @param childIndex the index of the VNode, in the _new_ parent node's
+ * children, for which we will create a new DOM node
+ * @param parentElm the parent DOM node which our new node will be a child of
+ * @returns the newly created node
+ */
 const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex: number, parentElm: d.RenderNode) => {
   // tslint:disable-next-line: prefer-const
   const newVNode = newParentVNode.$children$[childIndex];
@@ -270,6 +280,74 @@ const removeVnodes = (vnodes: d.VNode[], startIdx: number, endIdx: number, vnode
   }
 };
 
+/**
+ * Reconcile the children of a new VNode with the children of an old VNode by
+ * traversing the two collections of children, identifying nodes that are
+ * conserved or changed, calling out to `patch` to make any necessary
+ * updates to the DOM, and rearranging DOM nodes as needed.
+ *
+ * The algorithm for reconciling children works by analyzing two 'windows' onto
+ * the two arrays of children (`oldCh` and `newCh`). We keep track of the
+ * 'windows' by storing start and end indices and references to the
+ * corresponding array entries. Initially the two 'windows' are basically equal
+ * to the entire array, but we progressively narrow the windows until there are
+ * no children left to update by doing the following:
+ *
+ * 1. Skip any `null` entries at the beginning or end of the two arrays, so
+ *    that if we have an initial array like the following we'll end up dealing
+ *    only with a window bounded by the highlighted elements:
+ *
+ *    [null, null, VNode1 , ... , VNode2, null, null]
+ *                 ^^^^^^         ^^^^^^
+ *
+ * 2. Check to see if the elements at the head and tail positions are equal
+ *    across the windows. This will basically detect elements which haven't
+ *    been added, removed, or changed position, i.e. if you had the following
+ *    VNode elements (represented as HTML):
+ *
+ *    oldVNode: `<div><p><span>HEY</span></p></div>`
+ *    newVNode: `<div><p><span>THERE</span></p></div>`
+ *
+ *    Then when comparing the children of the `<div>` tag we check the equality
+ *    of the VNodes corresponding to the `<p>` tags and, since they are the
+ *    same tag in the same position, we'd be able to avoid completely
+ *    re-rendering the subtree under them with a new DOM element and would just
+ *    call out to `patch` to handle reconciling their children and so on.
+ *
+ * 3. Check, for both windows, to see if the element at the beginning of the
+ *    window corresponds to the element at the end of the other window. This is
+ *    a heuristic which will let us identify _some_ situations in which
+ *    elements have changed position, for instance it _should_ detect that the
+ *    children nodes themselves have not changed but merely moved in the
+ *    following example:
+ *
+ *    oldVNode: `<div><element-one /><element-two /></div>`
+ *    newVNode: `<div><element-two /><element-one /></div>`
+ *
+ *    If we find cases like this then we also need to move the concrete DOM
+ *    elements corresponding to the moved children to write the re-order to the
+ *    DOM.
+ *
+ * 4. Finally, if VNodes have the `key` attribute set on them we check for any
+ *    nodes in the old children which have the same key as the first element in
+ *    our window on the new children. If we find such a node we handle calling
+ *    out to `patch`, moving relevant DOM nodes, and so on, in accordance with
+ *    what we find.
+ *
+ * Finally, once we've narrowed our 'windows' to the point that either of them
+ * collapse (i.e. they have length 0) we then handle any remaining VNode
+ * insertion or deletion that needs to happen to get a DOM state that correctly
+ * reflects the new child VNodes. If, for instance, after our window on the old
+ * children has collapsed we still have more nodes on the new children that
+ * we haven't dealt with yet then we need to add them, or if the new children
+ * collapse but we still have unhandled _old_ children then we need to make
+ * sure the corresponding DOM nodes are removed.
+ *
+ * @param parentElm the node into which the parent VNode is rendered
+ * @param oldCh the old children of the parent node
+ * @param newVNode the new VNode which will replace the parent
+ * @param newCh the new children of the parent node
+ */
 const updateChildren = (parentElm: d.RenderNode, oldCh: d.VNode[], newVNode: d.VNode, newCh: d.VNode[]) => {
   const fbSlots: d.RenderNode[] = [];
   const fbNodes: { [name: string]: d.RenderNode[] } = {};
@@ -296,7 +374,7 @@ const updateChildren = (parentElm: d.RenderNode, oldCh: d.VNode[], newVNode: d.V
 
   while (oldStartIdx <= oldEndIdx && newStartIdx <= newEndIdx) {
     if (oldStartVnode == null) {
-      // Vnode might have been moved left
+      // VNode might have been moved left
       oldStartVnode = oldCh[++oldStartIdx];
     } else if (oldEndVnode == null) {
       oldEndVnode = oldCh[--oldEndIdx];
@@ -305,33 +383,96 @@ const updateChildren = (parentElm: d.RenderNode, oldCh: d.VNode[], newVNode: d.V
     } else if (newEndVnode == null) {
       newEndVnode = newCh[--newEndIdx];
     } else if (isSameVnode(oldStartVnode, newStartVnode)) {
+      // if the start nodes are the same then we should patch the new VNode
+      // onto the old one, and increment our `newStartIdx` and `oldStartIdx`
+      // indices to reflect that. We don't need to move any DOM Nodes around
+      // since things are matched up in order.
       patch(oldStartVnode, newStartVnode);
       oldStartVnode = oldCh[++oldStartIdx];
       newStartVnode = newCh[++newStartIdx];
     } else if (isSameVnode(oldEndVnode, newEndVnode)) {
+      // likewise, if the end nodes are the same we patch new onto old and
+      // decrement our end indices, and also likewise in this case we don't
+      // need to move any DOM Nodes.
       patch(oldEndVnode, newEndVnode);
       oldEndVnode = oldCh[--oldEndIdx];
       newEndVnode = newCh[--newEndIdx];
     } else if (isSameVnode(oldStartVnode, newEndVnode)) {
-      // Vnode moved right
+      // case: "Vnode moved right"
+      //
+      // We've found that the last node in our window on the new children is
+      // the same VNode as the _first_ node in our window on the old children
+      // we're dealing with now. Visually, this is the layout of these two
+      // nodes:
+      //
+      // newCh: [..., newStartVnode , ... , newEndVnode , ...]
+      //                                    ^^^^^^^^^^^
+      // oldCh: [..., oldStartVnode , ... , oldEndVnode , ...]
+      //              ^^^^^^^^^^^^^
+      //
+      // In this situation we need to patch `newEndVnode` onto `oldStartVnode`
+      // and move the DOM element for `oldStartVnode`.
       if (BUILD.slotRelocation && (oldStartVnode.$tag$ === 'slot' || newEndVnode.$tag$ === 'slot')) {
         putBackInOriginalLocation(oldStartVnode.$elm$.parentNode, false);
       }
       patch(oldStartVnode, newEndVnode);
+      // We need to move the element for `oldStartVnode` into a position which
+      // will be appropriate for `newEndVnode`. For this we can use
+      // `.insertBefore` and `oldEndVnode.$elm$.nextSibling`. If there is a
+      // sibling for `oldEndVnode.$elm$` then we want to move the DOM node for
+      // `oldStartVnode` between `oldEndVnode` and it's sibling, like so:
+      //
+      // <old-start-node />
+      // <some-intervening-node />
+      // <old-end-node />
+      // <!-- ->              <-- `oldStartVnode.$elm$` should be inserted here
+      // <next-sibling />
+      //
+      // If instead `oldEndVnode.$elm$` has no sibling then we just want to put
+      // the node for `oldStartVnode` at the end of the children of
+      // `parentElm`. Luckily, `Node.nextSibling` will return `null` if there
+      // aren't any siblings, and passing `null` to `Node.insertBefore` will
+      // append it to the children of the parent element.
       parentElm.insertBefore(oldStartVnode.$elm$, oldEndVnode.$elm$.nextSibling as any);
       oldStartVnode = oldCh[++oldStartIdx];
       newEndVnode = newCh[--newEndIdx];
     } else if (isSameVnode(oldEndVnode, newStartVnode)) {
-      // Vnode moved left
+      // case: "Vnode moved left"
+      //
+      // We've found that the first node in our window on the new children is
+      // the same VNode as the _last_ node in our window on the old children.
+      // Visually, this is the layout of these two nodes:
+      //
+      // newCh: [..., newStartVnode , ... , newEndVnode , ...]
+      //              ^^^^^^^^^^^^^
+      // oldCh: [..., oldStartVnode , ... , oldEndVnode , ...]
+      //                                    ^^^^^^^^^^^
+      //
+      // In this situation we need to patch `newStartVnode` onto `oldEndVnode`
+      // (which will handle updating any changed attributes, reconciling their
+      // children etc) but we also need to move the DOM node to which
+      // `oldEndVnode` corresponds.
       if (BUILD.slotRelocation && (oldStartVnode.$tag$ === 'slot' || newEndVnode.$tag$ === 'slot')) {
         putBackInOriginalLocation(oldEndVnode.$elm$.parentNode, false);
       }
       patch(oldEndVnode, newStartVnode);
+      // We've already checked above if `oldStartVnode` and `newStartVnode` are
+      // the same node, so since we're here we know that they are not. Thus we
+      // can move the element for `oldEndVnode` _before_ the element for
+      // `oldStartVnode`, leaving `oldStartVnode` to be reconciled in the
+      // future.
       parentElm.insertBefore(oldEndVnode.$elm$, oldStartVnode.$elm$);
       oldEndVnode = oldCh[--oldEndIdx];
       newStartVnode = newCh[++newStartIdx];
     } else {
-      // createKeyToOldIdx
+      // Here we do some checks to match up old and new nodes based on the
+      // `$key$` attribute, which is set by putting a `key="my-key"` attribute
+      // in the JSX for a DOM element in the implementation of a Stencil
+      // component.
+      //
+      // First we check to see if there are any nodes in the array of old
+      // children which have the same key as the first node in the new
+      // children.
       idxInOld = -1;
       if (BUILD.vdomKey) {
         for (i = oldStartIdx; i <= oldEndIdx; ++i) {
@@ -343,24 +484,33 @@ const updateChildren = (parentElm: d.RenderNode, oldCh: d.VNode[], newVNode: d.V
       }
 
       if (BUILD.vdomKey && idxInOld >= 0) {
+        // We found a node in the old children which matches up with the first
+        // node in the new children! So let's deal with that
         elmToMove = oldCh[idxInOld];
 
         if (elmToMove.$tag$ !== newStartVnode.$tag$) {
+          // the tag doesn't match so we'll need a new DOM element
           node = createElm(oldCh && oldCh[newStartIdx], newVNode, idxInOld, parentElm);
         } else {
           patch(elmToMove, newStartVnode);
+          // invalidate the matching old node so that we won't try to update it
+          // again later on
           oldCh[idxInOld] = undefined;
           node = elmToMove.$elm$;
         }
 
         newStartVnode = newCh[++newStartIdx];
       } else {
-        // new element
+        // We either didn't find an element in the old children that matches
+        // the key of the first new child OR the build is not using `key`
+        // attributes at all. In either case we need to create a new element
+        // for the new node.
         node = createElm(oldCh && oldCh[newStartIdx], newVNode, newStartIdx, parentElm);
         newStartVnode = newCh[++newStartIdx];
       }
 
       if (node) {
+        // if we created a new node then handle inserting it to the DOM
         if (BUILD.slotRelocation) {
           parentReferenceNode(oldStartVnode.$elm$).insertBefore(node, referenceNode(oldStartVnode.$elm$));
         } else {
@@ -371,6 +521,7 @@ const updateChildren = (parentElm: d.RenderNode, oldCh: d.VNode[], newVNode: d.V
   }
 
   if (oldStartIdx > oldEndIdx) {
+    // we have some more new nodes to add which don't match up with old nodes
     addVnodes(
       parentElm,
       newCh[newEndIdx + 1] == null ? null : newCh[newEndIdx + 1].$elm$,
@@ -380,6 +531,9 @@ const updateChildren = (parentElm: d.RenderNode, oldCh: d.VNode[], newVNode: d.V
       newEndIdx
     );
   } else if (BUILD.updatable && newStartIdx > newEndIdx) {
+    // there are nodes in the `oldCh` array which no longer correspond to nodes
+    // in the new array, so lets remove them (which entails cleaning up the
+    // relevant DOM nodes)
     removeVnodes(oldCh, oldStartIdx, oldEndIdx);
   }
 
@@ -415,15 +569,33 @@ const updateChildren = (parentElm: d.RenderNode, oldCh: d.VNode[], newVNode: d.V
   }
 };
 
-export const isSameVnode = (vnode1: d.VNode, vnode2: d.VNode) => {
+/**
+ * Compare two VNodes to determine if they are the same
+ *
+ * **NB**: This function is an equality _heuristic_ based on the available
+ * information set on the two VNodes and can be misleading under certain
+ * circumstances. In particular, if the two nodes do not have `key` attrs
+ * (available under `$key$` on VNodes) then the function falls back on merely
+ * checking that they have the same tag.
+ *
+ * So, in other words, if `key` attrs are not set on VNodes which may be
+ * changing order within a `children` array or something along those lines then
+ * we could obtain a false positive and then have to do needless re-rendering.
+ *
+ * @param leftVNode the first VNode to check
+ * @param rightVNode the second VNode to check
+ * @returns whether they're equal or not
+ */
+export const isSameVnode = (leftVNode: d.VNode, rightVNode: d.VNode) => {
   // compare if two vnode to see if they're "technically" the same
   // need to have the same element tag, and same key to be the same
-  if (vnode1.$tag$ === vnode2.$tag$) {
-    if (BUILD.slotRelocation && vnode1.$tag$ === 'slot') {
-      return vnode1.$name$ === vnode2.$name$;
+  if (leftVNode.$tag$ === rightVNode.$tag$) {
+    if (BUILD.slotRelocation && leftVNode.$tag$ === 'slot') {
+      return leftVNode.$name$ === rightVNode.$name$;
     }
+    // this will be set if components in the build have `key` attrs set on them
     if (BUILD.vdomKey) {
-      return vnode1.$key$ === vnode2.$key$;
+      return leftVNode.$key$ === rightVNode.$key$;
     }
     return true;
   }
@@ -440,6 +612,14 @@ const referenceNode = (node: d.RenderNode) => {
 
 const parentReferenceNode = (node: d.RenderNode) => (node['s-ol'] ? node['s-ol'] : node).parentNode;
 
+/**
+ * Handle reconciling an outdated VNode with a new one which corresponds to
+ * it. This function handles flushing updates to the DOM and reconciling the
+ * children of the two nodes (if any).
+ *
+ * @param oldVNode an old VNode whose DOM element and children we want to update
+ * @param newVNode a new VNode representing an updated version of the old one
+ */
 export const patch = (oldVNode: d.VNode, newVNode: d.VNode) => {
   const elm: d.RenderNode = (newVNode.$elm$ = oldVNode.$elm$);
   const oldChildren = oldVNode.$children$;
@@ -455,8 +635,6 @@ export const patch = (oldVNode: d.VNode, newVNode: d.VNode) => {
       isSvgMode = tag === 'svg' ? true : tag === 'foreignObject' ? false : isSvgMode;
     }
 
-    // element node
-
     if (BUILD.vdomAttribute || BUILD.reflect) {
       if (BUILD.slot && tag === 'slot') {
         // minifier will clean this up
@@ -470,6 +648,7 @@ export const patch = (oldVNode: d.VNode, newVNode: d.VNode) => {
 
     if (BUILD.updatable && oldChildren !== null && newChildren !== null) {
       // looks like there's child vnodes for both the old and new vnodes
+      // so we need to call `updateChildren` to reconcile them
       updateChildren(elm, oldChildren, newVNode, newChildren);
     } else if (newChildren !== null) {
       // no old child vnodes, but there are new child vnodes to add

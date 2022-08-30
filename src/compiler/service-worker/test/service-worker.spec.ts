@@ -6,24 +6,25 @@ import { mockConfig } from '@stencil/core/testing';
 import path from 'path';
 
 // TODO(STENCIL-462): investigate getting this file to pass
-xdescribe('service worker', () => {
+describe.skip('service worker', () => {
   jest.setTimeout(20000);
   let compiler: Compiler;
   let config: Config;
   const root = path.resolve('/');
 
   it('dev service worker', async () => {
-    config = mockConfig();
-    config.devMode = true;
-    config.outputTargets = [
-      {
-        type: 'www',
-        serviceWorker: {
-          swSrc: path.join('src', 'sw.js'),
-          globPatterns: ['**/*.{html,js,css,json,ico,png}'],
-        },
-      } as d.OutputTargetWww,
-    ];
+    config = mockConfig({
+      devMode: true,
+      outputTargets: [
+        {
+          type: 'www',
+          serviceWorker: {
+            swSrc: path.join('src', 'sw.js'),
+            globPatterns: ['**/*.{html,js,css,json,ico,png}'],
+          },
+        } as d.OutputTargetWww,
+      ],
+    });
 
     compiler = new Compiler(config);
     await compiler.fs.writeFile(path.join(root, 'www', 'script.js'), `/**/`);

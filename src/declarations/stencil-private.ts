@@ -2,7 +2,6 @@ import { BuildResultsComponentGraph } from '.';
 import type {
   BuildEvents,
   BuildLog,
-  BuildOutput,
   CompilerBuildResults,
   CompilerBuildStart,
   CompilerFsStats,
@@ -13,7 +12,6 @@ import type {
   DevServerConfig,
   DevServerEditor,
   Diagnostic,
-  FsWriteOptions,
   Logger,
   LoggerTimeSpan,
   OptimizeCssInput,
@@ -33,6 +31,7 @@ import type {
   VNode,
   VNodeData,
 } from './stencil-public-runtime';
+import type { InMemoryFileSystem } from '../compiler/sys/in-memory-fs';
 
 export interface SourceMap {
   file: string;
@@ -816,6 +815,9 @@ export interface ComponentCompilerLegacyContext {
 
 export type Encapsulation = 'shadow' | 'scoped' | 'none';
 
+/**
+ * Intermediate Representation (IR) of a static property on a Stencil component
+ */
 export interface ComponentCompilerStaticProperty {
   mutable: boolean;
   optional: boolean;
@@ -828,6 +830,9 @@ export interface ComponentCompilerStaticProperty {
   defaultValue?: string;
 }
 
+/**
+ * Intermediate Representation (IR) of a property on a Stencil component
+ */
 export interface ComponentCompilerProperty extends ComponentCompilerStaticProperty {
   name: string;
   internal: boolean;
@@ -1195,57 +1200,6 @@ export interface EventEmitterData<T = any> {
   composed?: boolean;
 }
 
-export interface FsReadOptions {
-  useCache?: boolean;
-  setHash?: boolean;
-}
-
-export interface FsReaddirOptions {
-  inMemoryOnly?: boolean;
-  recursive?: boolean;
-  /**
-   * Directory names to exclude. Just the basename,
-   * not the entire path. Basically for "node_moduels".
-   */
-  excludeDirNames?: string[];
-  /**
-   * Extensions we know we can avoid. Each extension
-   * should include the `.` so that we can test for both
-   * `.d.ts.` and `.ts`. If `excludeExtensions` isn't provided it
-   * doesn't try to exclude anything. This only checks against
-   * the filename, not directory names when recursive.
-   */
-  excludeExtensions?: string[];
-}
-
-export interface FsReaddirItem {
-  absPath: string;
-  relPath: string;
-  isDirectory: boolean;
-  isFile: boolean;
-}
-
-export interface FsWriteResults {
-  changedContent: boolean;
-  queuedWrite: boolean;
-  ignored: boolean;
-}
-
-export type FsItems = Map<string, FsItem>;
-
-export interface FsItem {
-  fileText: string;
-  isFile: boolean;
-  isDirectory: boolean;
-  size: number;
-  mtimeMs: number;
-  exists: boolean;
-  queueCopyFileToDest: string;
-  queueWriteToDisk: boolean;
-  queueDeleteFromDisk?: boolean;
-  useCache: boolean;
-}
-
 export interface HostElement extends HTMLElement {
   // web component APIs
   connectedCallback?: () => void;
@@ -1314,74 +1268,6 @@ export interface HostElement extends HTMLElement {
   ['s-p']?: Promise<void>[];
 
   componentOnReady?: () => Promise<this>;
-}
-
-export interface InMemoryFileSystem {
-  /* new compiler */
-  sys?: CompilerSystem;
-
-  accessData(filePath: string): Promise<{
-    exists: boolean;
-    isDirectory: boolean;
-    isFile: boolean;
-  }>;
-  access(filePath: string): Promise<boolean>;
-  /**
-   * Synchronous!!! Do not use!!!
-   * (Only typescript transpiling is allowed to use)
-   * @param filePath
-   */
-  accessSync(filePath: string): boolean;
-  copyFile(srcFile: string, dest: string): Promise<void>;
-  emptyDirs(dirPaths: string[]): Promise<void>;
-  readdir(dirPath: string, opts?: FsReaddirOptions): Promise<FsReaddirItem[]>;
-  readFile(filePath: string, opts?: FsReadOptions): Promise<string>;
-  /**
-   * Synchronous!!! Do not use!!!
-   * (Only typescript transpiling is allowed to use)
-   * @param filePath
-   */
-  readFileSync(filePath: string, opts?: FsReadOptions): string;
-  remove(itemPath: string): Promise<void>;
-  stat(itemPath: string): Promise<{
-    isFile: boolean;
-    isDirectory: boolean;
-  }>;
-  /**
-   * Synchronous!!! Do not use!!!
-   * (Only typescript transpiling is allowed to use)
-   * @param itemPath
-   */
-  statSync(itemPath: string): {
-    exists: boolean;
-    isFile: boolean;
-    isDirectory: boolean;
-  };
-  writeFile(filePath: string, content: string, opts?: FsWriteOptions): Promise<FsWriteResults>;
-  writeFiles(
-    files:
-      | {
-          [filePath: string]: string;
-        }
-      | Map<string, String>,
-    opts?: FsWriteOptions
-  ): Promise<FsWriteResults[]>;
-  commit(): Promise<{
-    filesWritten: string[];
-    filesDeleted: string[];
-    filesCopied: string[][];
-    dirsDeleted: string[];
-    dirsAdded: string[];
-  }>;
-  cancelDeleteFilesFromDisk(filePaths: string[]): void;
-  cancelDeleteDirectoriesFromDisk(filePaths: string[]): void;
-  clearDirCache(dirPath: string): void;
-  clearFileCache(filePath: string): void;
-  getItem(itemPath: string): FsItem;
-  getBuildOutputs(): BuildOutput[];
-  clearCache(): void;
-  keys(): string[];
-  getMemoryStats(): string;
 }
 
 export interface HydrateResults {
@@ -1475,8 +1361,12 @@ export interface MinifyJsResult {
 export type ModuleMap = Map<string, Module>;
 
 /**
- * Module gets serialized/parsed as JSON
- * cannot use Map or Set
+ * Stencil's Intermediate Representation (IR) of a module, bundling together
+ * various pieces of information like the classes declared within it, the path
+ * to the original source file, HTML tag names defined in the file, and so on.
+ *
+ * Note that this gets serialized/parsed as JSON and therefore cannot be a
+ * `Map` or a `Set`.
  */
 export interface Module {
   cmps: ComponentCompilerMeta[];
@@ -2058,9 +1948,9 @@ export interface CssImportData {
   srcImport: string;
   updatedImport?: string;
   url: string;
-  filePath?: string;
+  filePath: string;
   altFilePath?: string;
-  styleText?: string;
+  styleText?: string | null;
 }
 
 export interface CssToEsmImportData {

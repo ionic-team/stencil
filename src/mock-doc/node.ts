@@ -4,20 +4,27 @@ import { matches, selectAll, selectOne } from './selector';
 import { MockAttr, MockAttributeMap, createAttributeProxy } from './attribute';
 import { MockClassList } from './class-list';
 import { MockCSSStyleDeclaration, createCSSStyleDeclaration } from './css-style-declaration';
-import { MockEvent, addEventListener, dispatchEvent, removeEventListener, resetEventListeners } from './event';
+import {
+  MockEvent,
+  addEventListener,
+  dispatchEvent,
+  removeEventListener,
+  resetEventListeners,
+  MockFocusEvent,
+} from './event';
 import { NODE_NAMES, NODE_TYPES } from './constants';
 import { NON_ESCAPABLE_CONTENT, SerializeNodeToHtmlOptions, serializeNodeToHtml } from './serialize-node';
 import { parseFragmentUtil } from './parse-util';
 
 export class MockNode {
-  private _nodeValue: string;
-  nodeName: string;
+  private _nodeValue: string | null;
+  nodeName: string | null;
   nodeType: number;
   ownerDocument: any;
-  parentNode: MockNode;
+  parentNode: MockNode | null;
   childNodes: MockNode[];
 
-  constructor(ownerDocument: any, nodeType: number, nodeName: string, nodeValue: string) {
+  constructor(ownerDocument: any, nodeType: number, nodeName: string | null, nodeValue: string | null) {
     this.ownerDocument = ownerDocument;
     this.nodeType = nodeType;
     this.nodeName = nodeName;
@@ -52,7 +59,9 @@ export class MockNode {
     const firstChild = this.firstChild;
     items.forEach((item) => {
       const isNode = typeof item === 'object' && item !== null && 'nodeType' in item;
-      this.insertBefore(isNode ? item : this.ownerDocument.createTextNode(String(item)), firstChild);
+      if (firstChild) {
+        this.insertBefore(isNode ? item : this.ownerDocument.createTextNode(String(item)), firstChild);
+      }
     });
   }
 
@@ -116,7 +125,7 @@ export class MockNode {
   }
 
   get nodeValue() {
-    return this._nodeValue;
+    return this._nodeValue ?? '';
   }
   set nodeValue(value: string) {
     this._nodeValue = value;
@@ -137,7 +146,7 @@ export class MockNode {
     return null;
   }
 
-  contains(otherNode: MockNode) {
+  contains(otherNode: MockNode): boolean {
     if (otherNode === this) {
       return true;
     }
@@ -187,7 +196,7 @@ export class MockNode {
   }
 
   get textContent() {
-    return this._nodeValue;
+    return this._nodeValue ?? '';
   }
   set textContent(value: string) {
     this._nodeValue = String(value);
@@ -215,14 +224,16 @@ export class MockNodeList {
 }
 
 export class MockElement extends MockNode {
-  namespaceURI: string;
-  __attributeMap: MockAttributeMap;
-  __shadowRoot: ShadowRoot;
-  __style: MockCSSStyleDeclaration;
+  namespaceURI: string | null;
+  __attributeMap: MockAttributeMap | null | undefined;
+  __shadowRoot: ShadowRoot | null | undefined;
+  __style: MockCSSStyleDeclaration | null | undefined;
 
-  constructor(ownerDocument: any, nodeName: string) {
+  constructor(ownerDocument: any, nodeName: string | null) {
     super(ownerDocument, NODE_TYPES.ELEMENT_NODE, typeof nodeName === 'string' ? nodeName : null, null);
     this.namespaceURI = null;
+    this.__shadowRoot = null;
+    this.__attributeMap = null;
   }
 
   addEventListener(type: string, handler: (ev?: any) => void) {
@@ -236,12 +247,16 @@ export class MockElement extends MockNode {
   }
 
   blur() {
-    /**/
+    dispatchEvent(
+      this,
+      new MockFocusEvent('blur', { relatedTarget: null, bubbles: true, cancelable: true, composed: true })
+    );
   }
 
   get shadowRoot() {
     return this.__shadowRoot || null;
   }
+
   set shadowRoot(shadowRoot: any) {
     if (shadowRoot != null) {
       shadowRoot.host = this;
@@ -251,9 +266,11 @@ export class MockElement extends MockNode {
     }
   }
 
-  get attributes() {
+  get attributes(): MockAttributeMap {
     if (this.__attributeMap == null) {
-      this.__attributeMap = createAttributeProxy(false);
+      const attrMap = createAttributeProxy(false);
+      this.__attributeMap = attrMap;
+      return attrMap;
     }
     return this.__attributeMap;
   }
@@ -287,6 +304,7 @@ export class MockElement extends MockNode {
 
   override cloneNode(_deep?: boolean): MockElement {
     // implemented on MockElement.prototype from within element.ts
+    // @ts-ignore - implemented on MockElement.prototype from within element.ts
     return null;
   }
 
@@ -320,7 +338,12 @@ export class MockElement extends MockNode {
     return this.children[0] || null;
   }
 
-  focus(_options?: { preventScroll?: boolean }) {}
+  focus(_options?: { preventScroll?: boolean }) {
+    dispatchEvent(
+      this,
+      new MockFocusEvent('focus', { relatedTarget: null, bubbles: true, cancelable: true, composed: true })
+    );
+  }
 
   getAttribute(attrName: string) {
     if (attrName === 'style') {
@@ -336,7 +359,7 @@ export class MockElement extends MockNode {
     return null;
   }
 
-  getAttributeNS(namespaceURI: string, attrName: string) {
+  getAttributeNS(namespaceURI: string | null, attrName: string) {
     const attr = this.attributes.getNamedItemNS(namespaceURI, attrName);
     if (attr != null) {
       return attr.value;
@@ -393,7 +416,7 @@ export class MockElement extends MockNode {
   }
 
   set innerHTML(html: string) {
-    if (NON_ESCAPABLE_CONTENT.has(this.nodeName) === true) {
+    if (NON_ESCAPABLE_CONTENT.has(this.nodeName ?? '') === true) {
       setTextContent(this, html);
     } else {
       for (let i = this.childNodes.length - 1; i >= 0; i--) {
@@ -473,7 +496,7 @@ export class MockElement extends MockNode {
     return this.getAttribute(attrName) !== null;
   }
 
-  hasAttributeNS(namespaceURI: string, name: string) {
+  hasAttributeNS(namespaceURI: string | null, name: string) {
     return this.getAttributeNS(namespaceURI, name) !== null;
   }
 
@@ -580,7 +603,7 @@ export class MockElement extends MockNode {
     }
   }
 
-  removeAttributeNS(namespaceURI: string, attrName: string) {
+  removeAttributeNS(namespaceURI: string | null, attrName: string) {
     const attr = this.attributes.getNamedItemNS(namespaceURI, attrName);
     if (attr != null) {
       this.attributes.removeNamedItemNS(attr);
@@ -627,7 +650,7 @@ export class MockElement extends MockNode {
     }
   }
 
-  setAttributeNS(namespaceURI: string, attrName: string, value: any) {
+  setAttributeNS(namespaceURI: string | null, attrName: string, value: any) {
     const attributes = this.attributes;
     let attr = attributes.getNamedItemNS(namespaceURI, attrName);
     const checkAttrChanged = checkAttributeChanged(this);
@@ -678,7 +701,7 @@ export class MockElement extends MockNode {
   }
 
   get tagName() {
-    return this.nodeName;
+    return this.nodeName ?? '';
   }
   set tagName(value: string) {
     this.nodeName = value;
@@ -700,6 +723,9 @@ export class MockElement extends MockNode {
     this.setAttributeNS(null, 'title', value);
   }
 
+  animate() {
+    /**/
+  }
   onanimationstart() {
     /**/
   }
@@ -964,6 +990,18 @@ export class MockElement extends MockNode {
   onwheel() {
     /**/
   }
+  requestFullscreen() {
+    /**/
+  }
+  scrollBy() {
+    /**/
+  }
+  scrollTo() {
+    /**/
+  }
+  scrollIntoView() {
+    /**/
+  }
 
   override toString(opts?: SerializeNodeToHtmlOptions) {
     return serializeNodeToHtml(this as any, opts);
@@ -987,7 +1025,7 @@ function getElementsByTagName(elm: MockElement, tagName: string, foundElms: Mock
   const children = elm.children;
   for (let i = 0, ii = children.length; i < ii; i++) {
     const childElm = children[i];
-    if (tagName === '*' || childElm.nodeName.toLowerCase() === tagName) {
+    if (tagName === '*' || (childElm.nodeName ?? '').toLowerCase() === tagName) {
       foundElms.push(childElm);
     }
     getElementsByTagName(childElm, tagName, foundElms);
@@ -1032,18 +1070,21 @@ export class MockHTMLElement extends MockElement {
   }
 
   override get tagName() {
-    return this.nodeName;
+    return this.nodeName ?? '';
   }
   override set tagName(value: string) {
     this.nodeName = value;
   }
 
-  override get attributes() {
+  override get attributes(): MockAttributeMap {
     if (this.__attributeMap == null) {
-      this.__attributeMap = createAttributeProxy(true);
+      const attrMap = createAttributeProxy(true);
+      this.__attributeMap = attrMap;
+      return attrMap;
     }
     return this.__attributeMap;
   }
+
   override set attributes(attrs: MockAttributeMap) {
     this.__attributeMap = attrs;
   }

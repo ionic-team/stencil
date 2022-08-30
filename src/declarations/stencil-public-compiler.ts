@@ -1,6 +1,7 @@
 import type { JsonDocs } from './stencil-public-docs';
 import type { PrerenderUrlResults } from '../internal';
 import type { ConfigFlags } from '../cli/config-flags';
+
 export * from './stencil-public-docs';
 
 /**
@@ -400,6 +401,30 @@ type Loose<T extends Object> = Record<string, any> & Partial<T>;
  * and have type information carry though as we construct an object which is a valid `Config`.
  */
 export type UnvalidatedConfig = Loose<Config>;
+
+/**
+ * Helper type to strip optional markers from keys in a type, while preserving other type information for the key.
+ * This type takes a union of keys, K, in type T to allow for the type T to be gradually updated.
+ *
+ * ```typescript
+ * type Foo { bar?: number, baz?: string }
+ * type ReqFieldFoo = RequireFields<Foo, 'bar'>; // { bar: number, baz?: string }
+ * ```
+ */
+type RequireFields<T, K extends keyof T> = T & { [P in K]-?: T[P] };
+
+/**
+ * Fields in {@link Config} to make required for {@link ValidatedConfig}
+ */
+type StrictConfigFields = 'flags' | 'logger' | 'outputTargets' | 'sys' | 'testing';
+
+/**
+ * A version of {@link Config} that makes certain fields required. This type represents a valid configuration entity.
+ * When a configuration is received by the user, it is a bag of unverified data. In order to make stricter guarantees
+ * about the data from a type-safety perspective, this type is intended to be used throughout the codebase once
+ * validations have occurred at runtime.
+ */
+export type ValidatedConfig = RequireFields<Config, StrictConfigFields>;
 
 export interface HydratedFlag {
   /**
@@ -2173,7 +2198,7 @@ export interface LoadConfigInit {
  * operations around the codebase.
  */
 export interface LoadConfigResults {
-  config: UnvalidatedConfig;
+  config: ValidatedConfig;
   diagnostics: Diagnostic[];
   tsconfig: {
     path: string;
@@ -2249,15 +2274,34 @@ export interface PrerenderResults {
   average: number;
 }
 
+/**
+ * Input for CSS optimization functions, including the input CSS
+ * string and a few boolean options which turn on or off various
+ * optimizations.
+ */
 export interface OptimizeCssInput {
   input: string;
   filePath?: string;
-  autoprefixer?: any;
+  autoprefixer?: boolean | null | AutoprefixerOptions;
   minify?: boolean;
   sourceMap?: boolean;
   resolveUrl?: (url: string) => Promise<string> | string;
 }
 
+/**
+ * This is not a real interface describing the options which can
+ * be passed to autoprefixer, for that see the docs, here:
+ * https://github.com/postcss/autoprefixer#options
+ *
+ * Instead, this basically just serves as a label type to track
+ * that arguments are being passed consistently.
+ */
+export type AutoprefixerOptions = Object;
+
+/**
+ * Output from CSS optimization functions, wrapping up optimized
+ * CSS and any diagnostics produced during optimization.
+ */
 export interface OptimizeCssOutput {
   output: string;
   diagnostics: Diagnostic[];
@@ -2322,14 +2366,6 @@ export interface FsStats {
   mtime: Date;
   ctime: Date;
   birthtime: Date;
-}
-
-export interface FsWriteOptions {
-  inMemoryOnly?: boolean;
-  clearFileCache?: boolean;
-  immediateWrite?: boolean;
-  useCache?: boolean;
-  outputTargetType?: string;
 }
 
 export interface Compiler {

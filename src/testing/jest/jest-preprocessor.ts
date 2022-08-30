@@ -14,7 +14,7 @@ type Jest27TransformOptions = { config: Jest26Config };
  * @returns `true` if the `obj` is a `Jest27TransformOptions`, false otherwise
  */
 const isJest27TransformOptions = (obj: unknown): obj is Jest27TransformOptions => {
-  return typeof obj === 'object' && obj.hasOwnProperty('config');
+  return obj != null && typeof obj === 'object' && obj.hasOwnProperty('config');
 };
 
 /**
@@ -59,7 +59,7 @@ export const jestPreprocessor = {
   ): string {
     // TODO(STENCIL-306): Drop support for versions of Jest <27
     /**
-     * As of Jest 27, `jestConfig` changes it's shape (as it's been moved into `transformOptions`). To preserve
+     * As of Jest 27, `jestConfig` changes its shape (as it's been moved into `transformOptions`). To preserve
      * backwards compatability, we allow Jest to pass 4 arguments and check the shape of the third and fourth arguments
      * to run Jest properly (in lieu of a global Jest version available to us). Support for this functionality will be
      * removed in a future major version of Stencil.
@@ -69,13 +69,22 @@ export const jestPreprocessor = {
       transformOptions = jestConfig.config;
     }
 
+    /**
+     * At this point, `transformOptions` should be a truthy value:
+     * - if we're running Jest 27, it should have been assigned in the previous conditional
+     * - if we're running Jest 26 and under, it should have been provided to us
+     */
+    if (!transformOptions) {
+      throw 'Unable to find Jest transformation options.';
+    }
+
     if (shouldTransform(sourcePath, sourceText)) {
       const opts: TranspileOptions = {
         file: sourcePath,
         currentDirectory: transformOptions.rootDir,
       };
 
-      const tsCompilerOptions: ts.CompilerOptions = getCompilerOptions(transformOptions.rootDir);
+      const tsCompilerOptions: ts.CompilerOptions | null = getCompilerOptions(transformOptions.rootDir);
       if (tsCompilerOptions) {
         if (tsCompilerOptions.baseUrl) {
           opts.baseUrl = tsCompilerOptions.baseUrl;
@@ -134,6 +143,15 @@ export const jestPreprocessor = {
     if (isJest27TransformOptions(jestConfigStr)) {
       // being called from Jest 27+, backfill `transformOptions`
       transformOptions = jestConfigStr.config;
+    }
+
+    /**
+     * At this point, `transformOptions` should be a truthy value:
+     * - if we're running Jest 27, it should have been assigned in the previous conditional
+     * - if we're running Jest 26 and under, it should have been provided to us
+     */
+    if (!transformOptions) {
+      throw 'Unable to find Jest transformation options.';
     }
 
     if (!_tsCompilerOptionsKey) {
@@ -220,7 +238,7 @@ function getCompilerOptions(rootDir: string): ts.CompilerOptions | null {
  * @returns `true` if the file should be transformed, `false` otherwise
  */
 export function shouldTransform(filePath: string, sourceText: string): boolean {
-  const ext = filePath.split('.').pop().toLowerCase().split('?')[0];
+  const ext = (filePath.split('.').pop() ?? '').toLowerCase().split('?')[0];
 
   if (ext === 'ts' || ext === 'tsx' || ext === 'jsx') {
     // typescript extensions (to include .d.ts)
