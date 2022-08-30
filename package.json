@@ -125,7 +125,7 @@
     "prettier": "2.7.1",
     "prompts": "2.4.0",
     "puppeteer": "~10.0.0",
-    "rollup": "2.42.3",
+    "rollup": "2.78.1",
     "rollup-plugin-sourcemaps": "^0.6.3",
     "semver": "7.3.4",
     "sizzle": "^2.3.6",
