@@ -33,7 +33,7 @@ describe('telemetryBuildFinishedAction', () => {
       buildResults: {
         componentGraph: {},
         duration: 100,
-      }
+      },
     } as d.BuildCtx;
 
     await telemetry.telemetryBuildFinishedAction(sys, config, coreCompiler, results);

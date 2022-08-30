@@ -47,7 +47,6 @@ export function mockValidatedConfig(overrides: Partial<ValidatedConfig> = {}): V
  * types/validity of its data.
  * @param overrides a partial implementation of `UnvalidatedConfig`. Any provided fields will override the defaults
  * provided by this function.
- * @param rootDir an optional root directory to compile from. Uses '/' by default.
  * @returns the mock Stencil configuration
  */
 export function mockConfig(overrides: Partial<UnvalidatedConfig> = {}): UnvalidatedConfig {

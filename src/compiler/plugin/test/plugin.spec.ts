@@ -4,7 +4,7 @@ import { mockCreateCompiler, MockCompiler, mockCompilerRoot } from '../../../tes
 import { mockConfig } from '@stencil/core/testing';
 import { normalizePath } from '@utils';
 
-xdescribe('plugin', () => {
+describe.skip('plugin', () => {
   jest.setTimeout(25000);
 
   const initConfig: d.Config = mockConfig();

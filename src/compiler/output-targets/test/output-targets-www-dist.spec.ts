@@ -10,7 +10,7 @@ describe('outputTarget, www / dist / docs', () => {
 
   it('dist, www and readme files w/ custom paths', async () => {
     config = {
-      flags: {docs: true, task: null, args: null, knownArgs: null, unknownArgs: null},
+      flags: { docs: true, task: null, args: null, knownArgs: null, unknownArgs: null },
       buildAppCore: true,
       namespace: 'TestApp',
       outputTargets: [
@@ -31,8 +31,8 @@ describe('outputTarget, www / dist / docs', () => {
         {
           type: 'docs-readme',
         } as d.OutputTargetDocsReadme,
-      ]
-    };;
+      ],
+    };
 
     compiler = await mockCreateCompiler(config);
     config = compiler.config;

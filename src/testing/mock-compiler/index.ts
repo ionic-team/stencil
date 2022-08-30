@@ -49,7 +49,7 @@ export function initCompilerConfig(setupFs = true) {
   let config: d.Config = {};
   const root = mockCompilerRoot;
 
-  config = mockConfig({sys: setupFs ? patchHybridFs() : null, rootDir: root});
+  config = mockConfig({ sys: setupFs ? patchHybridFs() : null, rootDir: root });
   config._internalTesting = true;
   config.namespace = `TestApp`;
   config.rootDir = root;
