@@ -15,12 +15,15 @@ import { taskServe } from './task-serve';
 import { taskTest } from './task-test';
 import { taskTelemetry } from './task-telemetry';
 import { telemetryAction } from './telemetry/telemetry';
+import { createLogger } from '../compiler/sys/logger/console-logger';
+import { ValidatedConfig } from '../declarations';
+import { createConfigFlags } from './config-flags';
 
 export const run = async (init: d.CliInitOptions) => {
   const { args, logger, sys } = init;
 
   try {
-    const flags = parseFlags(args, sys);
+    const flags = parseFlags(args);
     const task = flags.task;
 
     if (flags.debug || flags.verbose) {
@@ -36,7 +39,8 @@ export const run = async (init: d.CliInitOptions) => {
     }
 
     if (task === 'help' || flags.help) {
-      await taskHelp({ flags: { task: 'help', args }, outputTargets: [] }, logger, sys);
+      await taskHelp(createConfigFlags({ task: 'help', args }), logger, sys);
+
       return;
     }
 
@@ -71,9 +75,7 @@ export const run = async (init: d.CliInitOptions) => {
     loadedCompilerLog(sys, logger, flags, coreCompiler);
 
     if (task === 'info') {
-      await telemetryAction(sys, { flags: { task: 'info' }, outputTargets: [] }, logger, coreCompiler, async () => {
-        await taskInfo(coreCompiler, sys, logger);
-      });
+      taskInfo(coreCompiler, sys, logger);
       return;
     }
 
@@ -99,7 +101,7 @@ export const run = async (init: d.CliInitOptions) => {
 
     await sys.ensureResources({ rootDir: validated.config.rootDir, logger, dependencies: dependencies as any });
 
-    await telemetryAction(sys, validated.config, logger, coreCompiler, async () => {
+    await telemetryAction(sys, validated.config, coreCompiler, async () => {
       await runTask(coreCompiler, validated.config, task, sys);
     });
   } catch (e) {
@@ -111,50 +113,62 @@ export const run = async (init: d.CliInitOptions) => {
   }
 };
 
+/**
+ * Run a specified task
+ * @param coreCompiler an instance of a minimal, bootstrap compiler for running the specified task
+ * @param config a configuration for the Stencil project to apply to the task run
+ * @param task the task to run
+ * @param sys the {@link CompilerSystem} for interacting with the operating system
+ * @public
+ */
 export const runTask = async (
   coreCompiler: CoreCompiler,
   config: d.Config,
   task: d.TaskCommand,
   sys?: d.CompilerSystem
-) => {
-  config.flags = config.flags || { task };
-  config.outputTargets = config.outputTargets || [];
+): Promise<void> => {
+  const logger = config.logger ?? createLogger();
+  const strictConfig: ValidatedConfig = {
+    ...config,
+    flags: createConfigFlags(config.flags ?? { task }),
+    logger,
+    outputTargets: config.outputTargets ?? [],
+    sys: sys ?? config.sys ?? coreCompiler.createSystem({ logger }),
+    testing: config.testing ?? {},
+  };
 
   switch (task) {
     case 'build':
-      await taskBuild(coreCompiler, config, sys);
+      await taskBuild(coreCompiler, strictConfig);
       break;
 
     case 'docs':
-      await taskDocs(coreCompiler, config);
+      await taskDocs(coreCompiler, strictConfig);
       break;
 
     case 'generate':
     case 'g':
-      await taskGenerate(coreCompiler, config);
+      await taskGenerate(coreCompiler, strictConfig);
       break;
 
     case 'help':
-      await taskHelp(config, config.logger, sys);
+      await taskHelp(strictConfig.flags, strictConfig.logger, sys);
       break;
 
     case 'prerender':
-      await taskPrerender(coreCompiler, config);
+      await taskPrerender(coreCompiler, strictConfig);
       break;
 
     case 'serve':
-      await taskServe(config);
+      await taskServe(strictConfig);
       break;
 
     case 'telemetry':
-      // TODO(STENCIL-148) make this parameter no longer optional, remove the surrounding if statement
-      if (sys) {
-        await taskTelemetry(config, sys, config.logger);
-      }
+      await taskTelemetry(strictConfig.flags, sys, strictConfig.logger);
       break;
 
     case 'test':
-      await taskTest(config);
+      await taskTest(strictConfig);
       break;
 
     case 'version':
@@ -162,8 +176,10 @@ export const runTask = async (
       break;
 
     default:
-      config.logger.error(`${config.logger.emoji('❌ ')}Invalid stencil command, please see the options below:`);
-      await taskHelp(config, config.logger, sys);
+      strictConfig.logger.error(
+        `${strictConfig.logger.emoji('❌ ')}Invalid stencil command, please see the options below:`
+      );
+      await taskHelp(strictConfig.flags, strictConfig.logger, sys);
       return config.sys.exit(1);
   }
 };

@@ -11,7 +11,7 @@ import ts from 'typescript';
  * @returns the results of a full build of Stencil
  */
 export const createFullBuild = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx
 ): Promise<d.CompilerBuildResults> => {
   return new Promise<d.CompilerBuildResults>((resolve) => {

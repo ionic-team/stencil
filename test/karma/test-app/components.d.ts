@@ -138,8 +138,6 @@ export namespace Components {
     }
     interface KeyReorderRoot {
     }
-    interface LessCmp {
-    }
     interface LifecycleAsyncA {
     }
     interface LifecycleAsyncB {
@@ -323,8 +321,6 @@ export namespace Components {
     interface StaticStyles {
     }
     interface StencilSibling {
-    }
-    interface StylusCmp {
     }
     interface SvgAttr {
     }
@@ -657,12 +653,6 @@ declare global {
     var HTMLKeyReorderRootElement: {
         prototype: HTMLKeyReorderRootElement;
         new (): HTMLKeyReorderRootElement;
-    };
-    interface HTMLLessCmpElement extends Components.LessCmp, HTMLStencilElement {
-    }
-    var HTMLLessCmpElement: {
-        prototype: HTMLLessCmpElement;
-        new (): HTMLLessCmpElement;
     };
     interface HTMLLifecycleAsyncAElement extends Components.LifecycleAsyncA, HTMLStencilElement {
     }
@@ -1120,12 +1110,6 @@ declare global {
         prototype: HTMLStencilSiblingElement;
         new (): HTMLStencilSiblingElement;
     };
-    interface HTMLStylusCmpElement extends Components.StylusCmp, HTMLStencilElement {
-    }
-    var HTMLStylusCmpElement: {
-        prototype: HTMLStylusCmpElement;
-        new (): HTMLStylusCmpElement;
-    };
     interface HTMLSvgAttrElement extends Components.SvgAttr, HTMLStencilElement {
     }
     var HTMLSvgAttrElement: {
@@ -1200,7 +1184,6 @@ declare global {
         "json-basic": HTMLJsonBasicElement;
         "key-reorder": HTMLKeyReorderElement;
         "key-reorder-root": HTMLKeyReorderRootElement;
-        "less-cmp": HTMLLessCmpElement;
         "lifecycle-async-a": HTMLLifecycleAsyncAElement;
         "lifecycle-async-b": HTMLLifecycleAsyncBElement;
         "lifecycle-async-c": HTMLLifecycleAsyncCElement;
@@ -1277,7 +1260,6 @@ declare global {
         "slotted-css": HTMLSlottedCssElement;
         "static-styles": HTMLStaticStylesElement;
         "stencil-sibling": HTMLStencilSiblingElement;
-        "stylus-cmp": HTMLStylusCmpElement;
         "svg-attr": HTMLSvgAttrElement;
         "svg-class": HTMLSvgClassElement;
         "tag-3d-component": HTMLTag3dComponentElement;
@@ -1413,8 +1395,6 @@ declare namespace LocalJSX {
         "num"?: number;
     }
     interface KeyReorderRoot {
-    }
-    interface LessCmp {
     }
     interface LifecycleAsyncA {
     }
@@ -1608,8 +1588,6 @@ declare namespace LocalJSX {
     }
     interface StencilSibling {
     }
-    interface StylusCmp {
-    }
     interface SvgAttr {
     }
     interface SvgClass {
@@ -1668,7 +1646,6 @@ declare namespace LocalJSX {
         "json-basic": JsonBasic;
         "key-reorder": KeyReorder;
         "key-reorder-root": KeyReorderRoot;
-        "less-cmp": LessCmp;
         "lifecycle-async-a": LifecycleAsyncA;
         "lifecycle-async-b": LifecycleAsyncB;
         "lifecycle-async-c": LifecycleAsyncC;
@@ -1745,7 +1722,6 @@ declare namespace LocalJSX {
         "slotted-css": SlottedCss;
         "static-styles": StaticStyles;
         "stencil-sibling": StencilSibling;
-        "stylus-cmp": StylusCmp;
         "svg-attr": SvgAttr;
         "svg-class": SvgClass;
         "tag-3d-component": Tag3dComponent;
@@ -1805,7 +1781,6 @@ declare module "@stencil/core" {
             "json-basic": LocalJSX.JsonBasic & JSXBase.HTMLAttributes<HTMLJsonBasicElement>;
             "key-reorder": LocalJSX.KeyReorder & JSXBase.HTMLAttributes<HTMLKeyReorderElement>;
             "key-reorder-root": LocalJSX.KeyReorderRoot & JSXBase.HTMLAttributes<HTMLKeyReorderRootElement>;
-            "less-cmp": LocalJSX.LessCmp & JSXBase.HTMLAttributes<HTMLLessCmpElement>;
             "lifecycle-async-a": LocalJSX.LifecycleAsyncA & JSXBase.HTMLAttributes<HTMLLifecycleAsyncAElement>;
             "lifecycle-async-b": LocalJSX.LifecycleAsyncB & JSXBase.HTMLAttributes<HTMLLifecycleAsyncBElement>;
             "lifecycle-async-c": LocalJSX.LifecycleAsyncC & JSXBase.HTMLAttributes<HTMLLifecycleAsyncCElement>;
@@ -1882,7 +1857,6 @@ declare module "@stencil/core" {
             "slotted-css": LocalJSX.SlottedCss & JSXBase.HTMLAttributes<HTMLSlottedCssElement>;
             "static-styles": LocalJSX.StaticStyles & JSXBase.HTMLAttributes<HTMLStaticStylesElement>;
             "stencil-sibling": LocalJSX.StencilSibling & JSXBase.HTMLAttributes<HTMLStencilSiblingElement>;
-            "stylus-cmp": LocalJSX.StylusCmp & JSXBase.HTMLAttributes<HTMLStylusCmpElement>;
             "svg-attr": LocalJSX.SvgAttr & JSXBase.HTMLAttributes<HTMLSvgAttrElement>;
             "svg-class": LocalJSX.SvgClass & JSXBase.HTMLAttributes<HTMLSvgClassElement>;
             "tag-3d-component": LocalJSX.Tag3dComponent & JSXBase.HTMLAttributes<HTMLTag3dComponentElement>;

@@ -12,12 +12,12 @@ import { normalizePath, dashToPascalCase } from '@utils';
  * @param typesDir the path to the directory where type declarations are saved
  */
 export const generateCustomElementsTypes = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   typesDir: string
 ): Promise<void> => {
-  const outputTargets = (config.outputTargets ?? []).filter(isOutputTargetDistCustomElements);
+  const outputTargets = config.outputTargets.filter(isOutputTargetDistCustomElements);
 
   await Promise.all(
     outputTargets.map((outputTarget) =>
@@ -36,7 +36,7 @@ export const generateCustomElementsTypes = async (
  * @param outputTarget the output target for which types are being currently generated
  */
 const generateCustomElementsTypesOutput = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   typesDir: string,
@@ -45,7 +45,7 @@ const generateCustomElementsTypesOutput = async (
   // the path where we're going to write the typedef for the whole dist-custom-elements output
   const customElementsDtsPath = join(outputTarget.dir!, 'index.d.ts');
   // the directory where types for the individual components are written
-  const componentsTypeDirectoryPath = relative(outputTarget.dir!, join(typesDir, 'components'));
+  const componentsTypeDirectoryRelPath = relative(outputTarget.dir!, typesDir);
 
   const components = buildCtx.components.filter((m) => !m.isCollectionDependency);
 
@@ -56,7 +56,14 @@ const generateCustomElementsTypesOutput = async (
       const importName = component.componentClassName;
       // typedefs for individual components can be found under paths like
       // $TYPES_DIR/components/my-component/my-component.d.ts
-      const componentDTSPath = join(componentsTypeDirectoryPath, component.tagName, component.tagName);
+      //
+      // To construct this path we:
+      //
+      // - get the relative path to the component's source file from the source directory
+      // - join that relative path to the relative path from the `index.d.ts` file to the
+      //   directory where typedefs are saved
+      const componentSourceRelPath = relative(config.srcDir, component.sourceFilePath).replace('.tsx', '');
+      const componentDTSPath = join(componentsTypeDirectoryRelPath, componentSourceRelPath);
 
       return `export { ${importName} as ${exportName} } from '${componentDTSPath}';`;
     }),

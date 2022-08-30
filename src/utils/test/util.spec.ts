@@ -1,14 +1,12 @@
 import type * as d from '../../declarations';
 import { mockConfig, mockBuildCtx } from '@stencil/core/testing';
-import * as util from '../util';
+import * as util from '@utils';
 import { stubDiagnostic } from '../../dev-server/test/Diagnostic.stub';
-import { ParsePackageJsonResult } from '../util';
 
 describe('util', () => {
   describe('generatePreamble', () => {
     it('generates a comment with a single line preamble', () => {
-      const testConfig = mockConfig();
-      testConfig.preamble = 'I am Stencil';
+      const testConfig = mockConfig({ preamble: 'I am Stencil' });
 
       const result = util.generatePreamble(testConfig);
 
@@ -18,8 +16,7 @@ describe('util', () => {
     });
 
     it('generates a comment with a multi-line preamble', () => {
-      const testConfig = mockConfig();
-      testConfig.preamble = 'I am Stencil\nHear me roar';
+      const testConfig = mockConfig({ preamble: 'I am Stencil\nHear me roar' });
 
       const result = util.generatePreamble(testConfig);
 
@@ -38,8 +35,7 @@ describe('util', () => {
     });
 
     it('returns an empty string a null preamble is provided', () => {
-      const testConfig = mockConfig();
-      testConfig.preamble = null;
+      const testConfig = mockConfig({ preamble: null });
 
       const result = util.generatePreamble(testConfig);
 
@@ -47,8 +43,7 @@ describe('util', () => {
     });
 
     it('returns an empty string if an empty preamble is provided', () => {
-      const testConfig = mockConfig();
-      testConfig.preamble = '';
+      const testConfig = mockConfig({ preamble: '' });
 
       const result = util.generatePreamble(testConfig);
 
@@ -167,7 +162,7 @@ describe('util', () => {
         type: 'build',
       });
 
-      expect(diagnostic).toEqual<ParsePackageJsonResult>({
+      expect(diagnostic).toEqual<util.ParsePackageJsonResult>({
         diagnostic: expectedDiagnostic,
         data: null,
         filePath: mockPackageJsonPath,
@@ -185,7 +180,7 @@ describe('util', () => {
         type: 'build',
       });
 
-      expect(diagnostic).toEqual<ParsePackageJsonResult>({
+      expect(diagnostic).toEqual<util.ParsePackageJsonResult>({
         diagnostic: expectedDiagnostic,
         data: null,
         filePath: undefined,
@@ -195,7 +190,7 @@ describe('util', () => {
     it('returns the parsed data from the provided json', () => {
       const diagnostic = util.parsePackageJson('{ "someJson": "value"}', mockPackageJsonPath);
 
-      expect(diagnostic).toEqual<ParsePackageJsonResult>({
+      expect(diagnostic).toEqual<util.ParsePackageJsonResult>({
         diagnostic: null,
         data: {
           someJson: 'value',

@@ -4,11 +4,11 @@ import { buildWarn, catchError } from '@utils';
 import { isOutputTargetWww } from '../output-targets/output-utils';
 
 export const generateServiceWorker = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   buildCtx: d.BuildCtx,
   workbox: d.Workbox,
   outputTarget: d.OutputTargetWww
-) => {
+): Promise<void[] | void> => {
   const serviceWorker = await getServiceWorker(outputTarget);
   if (serviceWorker.unregister) {
     await config.sys.writeFile(serviceWorker.swDest, SELF_UNREGISTER_SW);
@@ -54,7 +54,7 @@ const injectManifest = async (buildCtx: d.BuildCtx, serviceWorker: d.ServiceWork
   }
 };
 
-export const hasServiceWorkerChanges = (config: d.Config, buildCtx: d.BuildCtx) => {
+export const hasServiceWorkerChanges = (config: d.ValidatedConfig, buildCtx: d.BuildCtx) => {
   if (config.devMode && !config.flags.serviceWorker) {
     return false;
   }

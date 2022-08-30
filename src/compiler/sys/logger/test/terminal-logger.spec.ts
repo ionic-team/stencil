@@ -2,6 +2,7 @@ import { LogLevel, LOG_LEVELS } from '../../../../declarations';
 import { createNodeLoggerSys } from '../../../../sys/node/node-logger';
 import { createTerminalLogger, shouldLog } from '../terminal-logger';
 import { bgRed, blue, bold, cyan, dim, gray, green, magenta, red, yellow } from 'ansi-colors';
+import { setupConsoleMocker } from '../../../../testing/testing-utils';
 
 describe('terminal-logger', () => {
   describe('shouldLog helper', () => {
@@ -38,24 +39,10 @@ describe('terminal-logger', () => {
   });
 
   describe('basic logging functionality', () => {
-    const originalLog = console.log;
-    const originalWarn = console.warn;
-    const originalError = console.error;
-
-    afterAll(() => {
-      console.log = originalLog;
-      console.warn = originalWarn;
-      console.error = originalError;
-    });
+    const setupConsoleMocks = setupConsoleMocker();
 
     function setup() {
-      const logMock = jest.fn();
-      const warnMock = jest.fn();
-      const errorMock = jest.fn();
-
-      console.log = logMock;
-      console.warn = warnMock;
-      console.error = errorMock;
+      const { logMock, warnMock, errorMock } = setupConsoleMocks();
 
       const loggerSys = createNodeLoggerSys(process);
 

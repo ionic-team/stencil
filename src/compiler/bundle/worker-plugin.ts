@@ -6,7 +6,7 @@ import { optimizeModule } from '../optimize/optimize-module';
 import { STENCIL_INTERNAL_ID } from './entry-alias-ids';
 
 export const workerPlugin = (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   platform: string,
@@ -138,7 +138,7 @@ interface WorkerMeta {
 }
 
 const getWorker = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   ctx: PluginContext,
@@ -160,7 +160,7 @@ const getWorkerName = (id: string) => {
 };
 
 const buildWorker = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   ctx: PluginContext,

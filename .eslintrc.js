@@ -1,8 +1,9 @@
 module.exports = {
   root: true,
   parser: '@typescript-eslint/parser',
-  plugins: ['@typescript-eslint', 'jsdoc'],
+  plugins: ['@typescript-eslint', 'jsdoc', 'jest'],
   extends: [
+    'plugin:jest/recommended',
     // including prettier here ensures that we don't set any rules which will conflict
     // with Prettier's formatting. Keep it last in the list so that nothing else messes
     // with it!
@@ -14,6 +15,28 @@ module.exports = {
       // TODO(STENCIL-452): Investigate using eslint-plugin-react to remove the need for varsIgnorePattern
       "varsIgnorePattern": "^(h|Fragment)$"
     }],
+    /**
+     * Configuration for Jest rules can be found here: 
+     * https://github.com/jest-community/eslint-plugin-jest/tree/main/docs/rules
+     */
+    "jest/expect-expect": [
+      "error",
+      {
+        // we set this to `expect*` so that any function whose name starts with expect will be counted
+        // as an assertion function, allowing us to use functions to DRY up test suites.
+        "assertFunctionNames": ["expect*"],
+      }
+    ],
+    // we...have a number of things disabled :)
+    // TODO(STENCIL-488): Turn this rule back on once there are no violations of it remaining
+    "jest/no-disabled-tests": ["off"],
+    // we use this in enough places that we don't want to do per-line disables
+    "jest/no-conditional-expect": ["off"],
+    // this enforces that Jest hooks (e.g. `beforeEach`) are declared in test files in their execution order
+    // see here for details: https://github.com/jest-community/eslint-plugin-jest/blob/main/docs/rules/prefer-hooks-in-order.md
+    "jest/prefer-hooks-in-order": ["warn"],
+    // this enforces that Jest hooks (e.g. `beforeEach`) are declared at the top of `describe` blocks
+    "jest/prefer-hooks-on-top": ["warn"],
     /**
      * Configuration for the JSDoc plugin rules can be found at:
      * https://github.com/gajus/eslint-plugin-jsdoc
@@ -48,4 +71,9 @@ module.exports = {
     'prefer-rest-params': 'error',
     'prefer-spread': 'error',
   },
+  // inform ESLint about the global variables defined in a Jest context
+  // see https://github.com/jest-community/eslint-plugin-jest/#usage
+  "env": {
+    "jest/globals": true
+  }
 };

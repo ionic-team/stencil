@@ -4,7 +4,7 @@ import { dirname, join } from 'path';
 import ts from 'typescript';
 import { isOutputTargetAngular, relativeImport } from './output-utils';
 
-export const outputAngular = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
+export const outputAngular = async (config: d.ValidatedConfig, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   if (!config.buildDist) {
     return;
   }
@@ -22,7 +22,7 @@ export const outputAngular = async (config: d.Config, compilerCtx: d.CompilerCtx
 };
 
 export const angularDirectiveProxyOutput = (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   outputTarget: d.OutputTargetAngular
@@ -41,7 +41,7 @@ const getFilteredComponents = (excludeComponents: string[] = [], cmps: d.Compone
 };
 
 const generateProxies = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   components: d.ComponentCompilerMeta[],

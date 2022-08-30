@@ -4,20 +4,21 @@ import { Compiler, Config } from '@stencil/core/compiler';
 import { mockConfig } from '@stencil/core/testing';
 import path from 'path';
 
-xdescribe('outputTarget, dist', () => {
+describe.skip('outputTarget, dist', () => {
   jest.setTimeout(20000);
   let compiler: Compiler;
   let config: Config;
   const root = path.resolve('/');
 
   it('default dist files', async () => {
-    config = mockConfig();
-    config.buildAppCore = true;
-    config.rootDir = path.join(root, 'User', 'testing', '/');
-    config.namespace = 'TestApp';
-    config.buildEs5 = true;
-    config.globalScript = path.join(root, 'User', 'testing', 'src', 'global.ts');
-    config.outputTargets = [{ type: 'dist' }];
+    config = mockConfig({
+      buildAppCore: true,
+      buildEs5: true,
+      globalScript: path.join(root, 'User', 'testing', 'src', 'global.ts'),
+      namespace: 'TestApp',
+      outputTargets: [{ type: 'dist' }],
+      rootDir: path.join(root, 'User', 'testing', '/'),
+    });
 
     compiler = new Compiler(config);
 

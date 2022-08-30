@@ -7,7 +7,7 @@ import { JsonDocsValue } from '../../declarations';
 import { typescriptVersion, version } from '../../version';
 
 export const generateDocData = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx
 ): Promise<d.JsonDocs> => {
@@ -23,7 +23,7 @@ export const generateDocData = async (
 };
 
 const getDocsComponents = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx
 ): Promise<d.JsonDocsComponent[]> => {

@@ -1,5 +1,11 @@
 import { path } from '@stencil/core/compiler';
-import { mockConfig, mockCompilerSystem, mockBuildCtx, mockCompilerCtx, mockModule } from '@stencil/core/testing';
+import {
+  mockCompilerSystem,
+  mockBuildCtx,
+  mockCompilerCtx,
+  mockModule,
+  mockValidatedConfig,
+} from '@stencil/core/testing';
 import type * as d from '../../../declarations';
 import * as outputCustomElementsMod from '../dist-custom-elements';
 import { stubComponentCompilerMeta } from '../../types/tests/ComponentCompilerMeta.stub';
@@ -9,18 +15,21 @@ import { join, relative } from 'path';
 
 const setup = () => {
   const sys = mockCompilerSystem();
-  const config: d.Config = mockConfig(sys);
+  const config: d.ValidatedConfig = mockValidatedConfig({
+    configPath: '/testing-path',
+    buildAppCore: true,
+    buildEs5: true,
+    namespace: 'TestApp',
+    outputTargets: [{ type: DIST_CUSTOM_ELEMENTS, dir: 'my-best-dir' }],
+    srcDir: '/src',
+    sys,
+  });
   const compilerCtx = mockCompilerCtx(config);
   const buildCtx = mockBuildCtx(config, compilerCtx);
+
   const root = config.rootDir;
-  config.configPath = '/testing-path';
-  config.srcDir = '/src';
-  config.buildAppCore = true;
   config.rootDir = path.join(root, 'User', 'testing', '/');
-  config.namespace = 'TestApp';
-  config.buildEs5 = true;
   config.globalScript = path.join(root, 'User', 'testing', 'src', 'global.ts');
-  config.outputTargets = [{ type: DIST_CUSTOM_ELEMENTS, dir: 'my-best-dir' }];
 
   const bundleCustomElementsSpy = jest.spyOn(outputCustomElementsMod, 'bundleCustomElements');
 
@@ -31,8 +40,16 @@ const setup = () => {
 
 describe('Custom Elements Typedef generation', () => {
   it('should generate an index.d.ts file corresponding to the index.js file', async () => {
-    const componentOne = stubComponentCompilerMeta();
+    // this component tests the 'happy path' of a component's filename coinciding with its
+    // tag name
+    const componentOne = stubComponentCompilerMeta({
+      tagName: 'my-component',
+      sourceFilePath: '/src/components/my-component/my-component.tsx',
+    });
+    // this component tests that we correctly resolve its path when the component tag does
+    // not match its filename
     const componentTwo = stubComponentCompilerMeta({
+      sourceFilePath: '/src/components/the-other-component/my-real-best-component.tsx',
       componentClassName: 'MyBestComponent',
       tagName: 'my-best-component',
     });
@@ -47,11 +64,11 @@ describe('Custom Elements Typedef generation', () => {
 
     const expectedTypedefOutput = [
       '/* TestApp custom elements */',
-      `export { StubCmp as StubCmp } from '${join(componentsTypeDirectoryPath, 'stub-cmp', 'stub-cmp')}';`,
+      `export { StubCmp as MyComponent } from '${join(componentsTypeDirectoryPath, 'my-component', 'my-component')}';`,
       `export { MyBestComponent as MyBestComponent } from '${join(
         componentsTypeDirectoryPath,
-        'my-best-component',
-        'my-best-component'
+        'the-other-component',
+        'my-real-best-component'
       )}';`,
       '',
       '/**',

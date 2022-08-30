@@ -1,6 +1,6 @@
 import type * as d from '@stencil/core/declarations';
 import { validateConfig } from '../validate-config';
-import { mockConfig } from '@stencil/core/testing';
+import { mockConfig, mockLoadConfigInit } from '@stencil/core/testing';
 import path from 'path';
 
 describe('validateDistOutputTarget', () => {
@@ -20,7 +20,7 @@ describe('validateDistOutputTarget', () => {
     };
     userConfig.outputTargets = [outputTarget];
     userConfig.buildDist = true;
-    const { config } = validateConfig(userConfig);
+    const { config } = validateConfig(userConfig, mockLoadConfigInit());
     expect(config.outputTargets).toEqual([
       {
         buildDir: path.join(rootDir, 'my-dist', 'my-build'),
@@ -94,7 +94,7 @@ describe('validateDistOutputTarget', () => {
 
   it('should set defaults when outputTargets dist is empty', () => {
     userConfig.outputTargets = [{ type: 'dist' }];
-    const { config } = validateConfig(userConfig);
+    const { config } = validateConfig(userConfig, mockLoadConfigInit());
     const outputTarget = config.outputTargets.find((o) => o.type === 'dist') as d.OutputTargetDist;
     expect(outputTarget).toBeDefined();
     expect(outputTarget.dir).toBe(path.join(rootDir, 'dist'));
@@ -104,7 +104,7 @@ describe('validateDistOutputTarget', () => {
 
   it('should default to not add dist when outputTargets exists, but without dist', () => {
     userConfig.outputTargets = [];
-    const { config } = validateConfig(userConfig);
+    const { config } = validateConfig(userConfig, mockLoadConfigInit());
     expect(config.outputTargets.some((o) => o.type === 'dist')).toBe(false);
   });
 });

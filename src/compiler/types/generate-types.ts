@@ -14,7 +14,7 @@ import { isDtsFile } from '@utils';
  * @param outputTarget the output target to generate types for
  */
 export const generateTypes = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   outputTarget: d.OutputTargetDistTypes
@@ -33,7 +33,7 @@ export const generateTypes = async (
  * @param outputTarget the output target to generate types for
  */
 const generateTypesOutput = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   outputTarget: d.OutputTargetDistTypes

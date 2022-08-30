@@ -10,14 +10,12 @@ import { isOutputTargetHydrate, WWW } from '../../compiler/output-targets/output
  *
  * @param sys The system where the command is invoked
  * @param config The config passed into the Stencil command
- * @param logger The tool used to do logging
  * @param coreCompiler The compiler used to do builds
  * @param result The results of a compiler build.
  */
 export async function telemetryBuildFinishedAction(
   sys: d.CompilerSystem,
-  config: d.Config,
-  logger: d.Logger,
+  config: d.ValidatedConfig,
   coreCompiler: CoreCompiler,
   result: d.CompilerBuildResults
 ) {
@@ -32,7 +30,8 @@ export async function telemetryBuildFinishedAction(
   const data = await prepareData(coreCompiler, config, sys, result.duration, component_count);
 
   await sendMetric(sys, config, 'stencil_cli_command', data);
-  logger.debug(`${logger.blue('Telemetry')}: ${logger.gray(JSON.stringify(data))}`);
+
+  config.logger.debug(`${config.logger.blue('Telemetry')}: ${config.logger.gray(JSON.stringify(data))}`);
 }
 
 /**
@@ -40,19 +39,17 @@ export async function telemetryBuildFinishedAction(
  *
  * @param sys The system where the command is invoked
  * @param config The config passed into the Stencil command
- * @param logger The tool used to do logging
  * @param coreCompiler The compiler used to do builds
  * @param action A Promise-based function to call in order to get the duration of any given command.
  * @returns void
  */
 export async function telemetryAction(
   sys: d.CompilerSystem,
-  config: d.Config,
-  logger: d.Logger,
+  config: d.ValidatedConfig,
   coreCompiler: CoreCompiler,
   action?: d.TelemetryCallback
 ) {
-  const tracking = await shouldTrack(config, sys, !!config?.flags?.ci);
+  const tracking = await shouldTrack(config, sys, !!config.flags.ci);
 
   let duration = undefined;
   let error: any;
@@ -78,14 +75,23 @@ export async function telemetryAction(
   const data = await prepareData(coreCompiler, config, sys, duration);
 
   await sendMetric(sys, config, 'stencil_cli_command', data);
-  logger.debug(`${logger.blue('Telemetry')}: ${logger.gray(JSON.stringify(data))}`);
+  config.logger.debug(`${config.logger.blue('Telemetry')}: ${config.logger.gray(JSON.stringify(data))}`);
 
   if (error) {
     throw error;
   }
 }
 
-export function hasAppTarget(config: d.Config): boolean {
+/**
+ * Helper function to determine if a Stencil configuration builds an application.
+ *
+ * This function is a rough approximation whether an application is generated as a part of a Stencil build, based on
+ * contents of the project's `stencil.config.ts` file.
+ *
+ * @param config the configuration used by the Stencil project
+ * @returns true if we believe the project generates an application, false otherwise
+ */
+export function hasAppTarget(config: d.ValidatedConfig): boolean {
   return config.outputTargets.some(
     (target) => target.type === WWW && (!!target.serviceWorker || (!!target.baseUrl && target.baseUrl !== '/'))
   );
@@ -95,7 +101,15 @@ export function isUsingYarn(sys: d.CompilerSystem) {
   return sys.getEnvironmentVar('npm_execpath')?.includes('yarn') || false;
 }
 
-export async function getActiveTargets(config: d.Config): Promise<string[]> {
+/**
+ * Build a list of the different types of output targets used in a Stencil configuration.
+ *
+ * Duplicate entries will not be returned from the list
+ *
+ * @param config the configuration used by the Stencil project
+ * @returns a unique list of output target types found in the Stencil configuration
+ */
+export function getActiveTargets(config: d.ValidatedConfig): string[] {
   const result = config.outputTargets.map((t) => t.type);
   return Array.from(new Set(result));
 }
@@ -112,14 +126,14 @@ export async function getActiveTargets(config: d.Config): Promise<string[]> {
  */
 export const prepareData = async (
   coreCompiler: CoreCompiler,
-  config: d.Config,
+  config: d.ValidatedConfig,
   sys: d.CompilerSystem,
   duration_ms: number,
   component_count: number = undefined
 ): Promise<d.TrackableData> => {
   const { typescript, rollup } = coreCompiler.versions || { typescript: 'unknown', rollup: 'unknown' };
   const { packages, packagesNoVersions } = await getInstalledPackages(sys, config);
-  const targets = await getActiveTargets(config);
+  const targets = getActiveTargets(config);
   const yarn = isUsingYarn(sys);
   const stencil = coreCompiler.version || 'unknown';
   const system = `${sys.name} ${sys.version}`;
@@ -193,8 +207,8 @@ const CONFIG_PROPS_TO_DELETE: ReadonlyArray<keyof d.Config> = ['sys', 'logger', 
  * @param config the config to anonymize
  * @returns an anonymized copy of the same config
  */
-export const anonymizeConfigForTelemetry = (config: d.Config): d.Config => {
-  const anonymizedConfig = { ...config };
+export const anonymizeConfigForTelemetry = (config: d.ValidatedConfig): d.Config => {
+  const anonymizedConfig: d.Config = { ...config };
 
   for (const prop of CONFIG_PROPS_TO_ANONYMIZE) {
     if (anonymizedConfig[prop] !== undefined) {
@@ -202,7 +216,7 @@ export const anonymizeConfigForTelemetry = (config: d.Config): d.Config => {
     }
   }
 
-  anonymizedConfig.outputTargets = (config.outputTargets ?? []).map((target) => {
+  anonymizedConfig.outputTargets = config.outputTargets.map((target) => {
     // Anonymize the outputTargets on our configuration, taking advantage of the
     // optional 2nd argument to `JSON.stringify`. If anything is not a string
     // we retain it so that any nested properties are handled, else we check
@@ -250,7 +264,7 @@ export const anonymizeConfigForTelemetry = (config: d.Config): d.Config => {
  */
 async function getInstalledPackages(
   sys: d.CompilerSystem,
-  config: d.Config
+  config: d.ValidatedConfig
 ): Promise<{ packages: string[]; packagesNoVersions: string[] }> {
   let packages: string[] = [];
   let packagesNoVersions: string[] = [];
@@ -288,7 +302,7 @@ async function getInstalledPackages(
 
     return { packages, packagesNoVersions };
   } catch (err) {
-    hasDebug(config) && console.error(err);
+    hasDebug(config.flags) && console.error(err);
     return { packages, packagesNoVersions };
   }
 }
@@ -350,7 +364,7 @@ function sanitizeDeclaredVersion(version: string): string {
  */
 export async function sendMetric(
   sys: d.CompilerSystem,
-  config: d.Config,
+  config: d.ValidatedConfig,
   name: string,
   value: d.TrackableData
 ): Promise<void> {
@@ -388,7 +402,7 @@ async function getTelemetryToken(sys: d.CompilerSystem) {
  * @param config The config passed into the Stencil command
  * @param data Data to be tracked
  */
-async function sendTelemetry(sys: d.CompilerSystem, config: d.Config, data: d.Metric): Promise<void> {
+async function sendTelemetry(sys: d.CompilerSystem, config: d.ValidatedConfig, data: d.Metric): Promise<void> {
   try {
     const now = new Date().toISOString();
 
@@ -406,15 +420,15 @@ async function sendTelemetry(sys: d.CompilerSystem, config: d.Config, data: d.Me
       body: JSON.stringify(body),
     });
 
-    hasVerbose(config) &&
+    hasVerbose(config.flags) &&
       console.debug('\nSent %O metric to events service (status: %O)', data.name, response.status, '\n');
 
     if (response.status !== 204) {
-      hasVerbose(config) &&
+      hasVerbose(config.flags) &&
         console.debug('\nBad response from events service. Request body: %O', response.body.toString(), '\n');
     }
   } catch (e) {
-    hasVerbose(config) && console.debug('Telemetry request failed:', e);
+    hasVerbose(config.flags) && console.debug('Telemetry request failed:', e);
   }
 }
 

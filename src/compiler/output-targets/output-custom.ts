@@ -3,7 +3,7 @@ import { catchError } from '@utils';
 import { isOutputTargetCustom } from './output-utils';
 
 export const outputCustom = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   docs: d.JsonDocs,
