@@ -7,7 +7,7 @@ import { relativeImport } from '../output-utils';
 import { generatePreamble } from '@utils';
 
 export const generateCjs = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   rollupBuild: RollupBuild,

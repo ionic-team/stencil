@@ -13,7 +13,7 @@ import {
 } from './output-utils';
 import { outputCustom } from './output-custom';
 
-export const outputDocs = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
+export const outputDocs = async (config: d.ValidatedConfig, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   if (!config.buildDocs) {
     return;
   }

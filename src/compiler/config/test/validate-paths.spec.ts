@@ -1,5 +1,5 @@
 import type * as d from '@stencil/core/declarations';
-import { mockLogger, mockCompilerSystem } from '@stencil/core/testing';
+import { mockLogger, mockCompilerSystem, mockLoadConfigInit } from '@stencil/core/testing';
 import { validateConfig } from '../validate-config';
 import path from 'path';
 
@@ -21,23 +21,23 @@ describe('validatePaths', () => {
 
   it('should set absolute cacheDir', () => {
     userConfig.cacheDir = path.join(ROOT, 'some', 'custom', 'cache');
-    const { config } = validateConfig(userConfig);
+    const { config } = validateConfig(userConfig, mockLoadConfigInit());
     expect(config.cacheDir).toBe(path.join(ROOT, 'some', 'custom', 'cache'));
   });
 
   it('should set relative cacheDir', () => {
     userConfig.cacheDir = 'custom-cache';
-    const { config } = validateConfig(userConfig);
+    const { config } = validateConfig(userConfig, mockLoadConfigInit());
     expect(config.cacheDir).toBe(path.join(ROOT, 'User', 'my-app', 'custom-cache'));
   });
 
   it('should set default cacheDir', () => {
-    const { config } = validateConfig(userConfig);
+    const { config } = validateConfig(userConfig, mockLoadConfigInit());
     expect(config.cacheDir).toBe(path.join(ROOT, 'User', 'my-app', '.stencil'));
   });
 
   it('should set default wwwIndexHtml and convert to absolute path', () => {
-    const { config } = validateConfig(userConfig);
+    const { config } = validateConfig(userConfig, mockLoadConfigInit());
     expect(path.basename((config.outputTargets as d.OutputTargetWww[])[0].indexHtml)).toBe('index.html');
     expect(path.isAbsolute((config.outputTargets as d.OutputTargetWww[])[0].indexHtml)).toBe(true);
   });
@@ -49,13 +49,13 @@ describe('validatePaths', () => {
         indexHtml: path.join('assets', 'custom-index.html'),
       },
     ] as d.OutputTargetWww[];
-    const { config } = validateConfig(userConfig);
+    const { config } = validateConfig(userConfig, mockLoadConfigInit());
     expect(path.basename((config.outputTargets as d.OutputTargetWww[])[0].indexHtml)).toBe('custom-index.html');
     expect(path.isAbsolute((config.outputTargets as d.OutputTargetWww[])[0].indexHtml)).toBe(true);
   });
 
   it('should set default indexHtmlSrc and convert to absolute path', () => {
-    const { config } = validateConfig(userConfig);
+    const { config } = validateConfig(userConfig, mockLoadConfigInit());
     expect(path.basename(config.srcIndexHtml)).toBe('index.html');
     expect(path.isAbsolute(config.srcIndexHtml)).toBe(true);
   });
@@ -67,12 +67,12 @@ describe('validatePaths', () => {
         empty: false,
       },
     ] as d.OutputTargetWww[];
-    const { config } = validateConfig(userConfig);
+    const { config } = validateConfig(userConfig, mockLoadConfigInit());
     expect((config.outputTargets as d.OutputTargetWww[])[0].empty).toBe(false);
   });
 
   it('should set default emptyWWW to true', () => {
-    const { config } = validateConfig(userConfig);
+    const { config } = validateConfig(userConfig, mockLoadConfigInit());
     expect((config.outputTargets as d.OutputTargetWww[])[0].empty).toBe(true);
   });
 
@@ -83,7 +83,7 @@ describe('validatePaths', () => {
         empty: false,
       },
     ] as d.OutputTargetWww[];
-    const { config } = validateConfig(userConfig);
+    const { config } = validateConfig(userConfig, mockLoadConfigInit());
     expect((config.outputTargets as d.OutputTargetWww[])[0].empty).toBe(false);
   });
 
@@ -93,7 +93,7 @@ describe('validatePaths', () => {
         type: 'dist',
       },
     ];
-    const { config } = validateConfig(userConfig);
+    const { config } = validateConfig(userConfig, mockLoadConfigInit());
     expect(path.basename((config.outputTargets as d.OutputTargetDist[])[0].collectionDir)).toBe('collection');
     expect(path.isAbsolute((config.outputTargets as d.OutputTargetDist[])[0].collectionDir)).toBe(true);
   });
@@ -104,13 +104,13 @@ describe('validatePaths', () => {
         type: 'dist',
       },
     ];
-    const { config } = validateConfig(userConfig);
+    const { config } = validateConfig(userConfig, mockLoadConfigInit());
     expect(path.basename((config.outputTargets as d.OutputTargetDist[])[0].typesDir)).toBe('types');
     expect(path.isAbsolute((config.outputTargets as d.OutputTargetDist[])[0].typesDir)).toBe(true);
   });
 
   it('should set default build dir and convert to absolute path', () => {
-    const { config } = validateConfig(userConfig);
+    const { config } = validateConfig(userConfig, mockLoadConfigInit());
     const normalizedPathSep = path.sep;
     const parts = (config.outputTargets as d.OutputTargetDist[])[0].buildDir.split(normalizedPathSep);
     expect(parts[parts.length - 1]).toBe('build');
@@ -125,7 +125,7 @@ describe('validatePaths', () => {
         dir: 'custom-www',
       },
     ] as d.OutputTargetWww[];
-    const { config } = validateConfig(userConfig);
+    const { config } = validateConfig(userConfig, mockLoadConfigInit());
     const normalizedPathSep = path.sep;
     const parts = (config.outputTargets as d.OutputTargetDist[])[0].buildDir.split(normalizedPathSep);
     expect(parts[parts.length - 1]).toBe('build');
@@ -134,28 +134,28 @@ describe('validatePaths', () => {
   });
 
   it('should set default src dir and convert to absolute path', () => {
-    const { config } = validateConfig(userConfig);
+    const { config } = validateConfig(userConfig, mockLoadConfigInit());
     expect(path.basename(config.srcDir)).toBe('src');
     expect(path.isAbsolute(config.srcDir)).toBe(true);
   });
 
   it('should set src dir and convert to absolute path', () => {
     userConfig.srcDir = 'app';
-    const { config } = validateConfig(userConfig);
+    const { config } = validateConfig(userConfig, mockLoadConfigInit());
     expect(path.basename(config.srcDir)).toBe('app');
     expect(path.isAbsolute(config.srcDir)).toBe(true);
   });
 
   it('should convert globalScript to absolute path, if a globalScript property was provided', () => {
     userConfig.globalScript = path.join('src', 'global', 'index.ts');
-    const { config } = validateConfig(userConfig);
+    const { config } = validateConfig(userConfig, mockLoadConfigInit());
     expect(path.basename(config.globalScript)).toBe('index.ts');
     expect(path.isAbsolute(config.globalScript)).toBe(true);
   });
 
   it('should convert globalStyle string to absolute path array, if a globalStyle property was provided', () => {
     userConfig.globalStyle = path.join('src', 'global', 'styles.css');
-    const { config } = validateConfig(userConfig);
+    const { config } = validateConfig(userConfig, mockLoadConfigInit());
     expect(path.basename(config.globalStyle)).toBe('styles.css');
     expect(path.isAbsolute(config.globalStyle)).toBe(true);
   });

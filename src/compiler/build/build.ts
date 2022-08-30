@@ -10,11 +10,11 @@ import { writeBuild } from './write-build';
 import ts from 'typescript';
 
 export const build = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   tsBuilder: ts.BuilderProgram
-) => {
+): Promise<d.BuildCtx> => {
   try {
     // reset process.cwd() for 3rd-party plugins
     process.chdir(config.rootDir);

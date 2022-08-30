@@ -1,5 +1,6 @@
 import { Component, Element, setErrorHandler, Host, Prop, State, forceUpdate, getRenderingRef, h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
+import { withSilentWarn } from '../../testing/testing-utils';
 
 describe('render-vdom', () => {
   describe('build conditionals', () => {
@@ -115,6 +116,7 @@ describe('render-vdom', () => {
         vdomText: false,
       });
     });
+
     it('vdomStyle', async () => {
       @Component({ tag: 'cmp-a' })
       class CmpA {
@@ -388,6 +390,7 @@ describe('render-vdom', () => {
     class CmpA {
       private nuRender = 0;
       @State() valid = false;
+
       render() {
         this.nuRender++;
         return (
@@ -397,10 +400,13 @@ describe('render-vdom', () => {
         );
       }
     }
-    const { root } = await newSpecPage({
-      components: [CmpA],
-      html: `<cmp-a></cmp-a>`,
-    });
+
+    const { root } = await withSilentWarn(() =>
+      newSpecPage({
+        components: [CmpA],
+        html: `<cmp-a></cmp-a>`,
+      })
+    );
 
     expect(root).toEqualHtml(`
       <cmp-a><div>true - 2</div></cmp-a>
@@ -422,10 +428,13 @@ describe('render-vdom', () => {
         );
       }
     }
-    const { root } = await newSpecPage({
-      components: [CmpA],
-      html: `<cmp-a></cmp-a>`,
-    });
+
+    const { root } = await withSilentWarn(() =>
+      newSpecPage({
+        components: [CmpA],
+        html: `<cmp-a></cmp-a>`,
+      })
+    );
 
     expect(root).toEqualHtml(`
       <cmp-a><div>true - 1</div></cmp-a>
@@ -658,7 +667,7 @@ describe('render-vdom', () => {
     `);
   });
 
-  it('should not render booleans ', async () => {
+  it('should not render booleans', async () => {
     @Component({ tag: 'cmp-a' })
     class CmpA {
       @Prop() excitement = '';

@@ -11,7 +11,7 @@ import { depsToMarkdown } from './markdown-dependencies';
 import { AUTO_GENERATE_COMMENT } from '../constants';
 
 export const generateReadme = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   readmeOutputs: d.OutputTargetDocsReadme[],
   docsData: d.JsonDocsComponent,

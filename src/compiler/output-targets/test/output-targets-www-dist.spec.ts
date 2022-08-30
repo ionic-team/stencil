@@ -1,4 +1,3 @@
-// @ts-nocheck
 import type * as d from '@stencil/core/declarations';
 import { expectFilesDoNotExist, expectFilesExist } from '../../../testing/testing-utils';
 import { mockCreateCompiler, MockCompiler, mockCompilerRoot } from '../../../testing/mock-compiler';
@@ -10,28 +9,30 @@ describe('outputTarget, www / dist / docs', () => {
   let config: d.Config = {};
 
   it('dist, www and readme files w/ custom paths', async () => {
-    config.flags = {
-      docs: true,
-    };
-    config.outputTargets = [
-      {
-        type: 'www',
-        serviceWorker: null,
-        dir: 'custom-www',
-        buildDir: 'www-build',
-        indexHtml: 'custom-index.htm',
-      } as any as d.OutputTargetDist,
-      {
-        type: 'dist',
-        dir: 'custom-dist',
-        buildDir: 'dist-build',
-        collectionDir: 'dist-collection',
-        typesDir: 'custom-types',
-      },
-      {
-        type: 'docs-readme',
-      } as d.OutputTargetDocsReadme,
-    ];
+    config = {
+      flags: {docs: true, task: null, args: null, knownArgs: null, unknownArgs: null},
+      buildAppCore: true,
+      namespace: 'TestApp',
+      outputTargets: [
+        {
+          type: 'www',
+          serviceWorker: null,
+          dir: 'custom-www',
+          buildDir: 'www-build',
+          indexHtml: 'custom-index.htm',
+        } as any as d.OutputTargetDist,
+        {
+          type: 'dist',
+          dir: 'custom-dist',
+          buildDir: 'dist-build',
+          collectionDir: 'dist-collection',
+          typesDir: 'custom-types',
+        },
+        {
+          type: 'docs-readme',
+        } as d.OutputTargetDocsReadme,
+      ]
+    };;
 
     compiler = await mockCreateCompiler(config);
     config = compiler.config;

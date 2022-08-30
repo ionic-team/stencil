@@ -8,6 +8,8 @@ export {
   mockConfig,
   mockCompilerCtx,
   mockDocument,
+  mockLoadConfigInit,
+  mockValidatedConfig,
   mockLogger,
   mockCompilerSystem,
   mockWindow,

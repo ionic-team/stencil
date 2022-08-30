@@ -6,7 +6,7 @@ import { getLazyBuildConditionals } from '../../output-targets/dist-lazy/lazy-bu
 describe('build-conditionals', () => {
   jest.setTimeout(25000);
   let compiler: MockCompiler;
-  let config: d.Config = {};
+  let config: d.ValidatedConfig;
 
   beforeEach(async () => {
     compiler = await mockCreateCompiler();

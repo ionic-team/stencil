@@ -1,13 +1,13 @@
-// @ts-nocheck
 import type * as d from '../../../declarations';
 import path from 'path';
 import { mockCreateCompiler, MockCompiler, mockCompilerRoot } from '../../../testing/mock-compiler';
+import { mockConfig } from '@stencil/core/testing';
 import { normalizePath } from '@utils';
 
-describe('plugin', () => {
+xdescribe('plugin', () => {
   jest.setTimeout(25000);
 
-  const initConfig: d.Config = {};
+  const initConfig: d.Config = mockConfig();
   initConfig.outputTargets = [{ type: 'www' }];
 
   let compiler: MockCompiler;
@@ -193,7 +193,8 @@ describe('plugin', () => {
       path.join(config.srcDir, 'components', 'cmp-a.tsx'),
       `
       import { Component, h } from '@stencil/core';
-      @Component({ tag: 'cmp-a', styleUrl: './style.css' }) export class CmpA {
+      import { mockConfig } from 'mocks';
+@Component({ tag: 'cmp-a', styleUrl: './style.css' }) export class CmpA {
         constructor() { }
       }
     `

@@ -5,7 +5,7 @@ import { join, relative } from 'path';
 import { typescriptVersion, version } from '../../../version';
 
 export const outputCollection = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   changedModuleFiles: d.Module[]
@@ -51,7 +51,7 @@ export const outputCollection = async (
 };
 
 const writeCollectionManifests = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   outputTargets: d.OutputTargetDistCollection[]
@@ -80,7 +80,7 @@ const writeCollectionManifest = async (
   await compilerCtx.fs.writeFile(collectionFilePath, collectionData);
 };
 
-const serializeCollectionManifest = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
+const serializeCollectionManifest = (config: d.ValidatedConfig, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   // create the single collection we're going to fill up with data
   const collectionManifest: d.CollectionManifest = {
     entries: buildCtx.moduleFiles

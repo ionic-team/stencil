@@ -10,6 +10,7 @@ import {
   MockMouseEvent,
   MockCustomEvent,
   MockKeyboardEvent,
+  MockFocusEvent,
 } from './event';
 import { MockDocument, resetDocument } from './document';
 import { MockDocumentFragment } from './document-fragment';
@@ -74,6 +75,7 @@ export class MockWindow {
   CustomEvent: typeof MockCustomEvent;
   Event: typeof MockEvent;
   Headers: typeof MockHeaders;
+  FocusEvent: typeof MockFocusEvent;
   KeyboardEvent: typeof MockKeyboardEvent;
   MouseEvent: typeof MockMouseEvent;
 

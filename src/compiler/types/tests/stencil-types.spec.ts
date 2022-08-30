@@ -106,7 +106,7 @@ describe('stencil-types', () => {
         const expectedType = 'NonCollisionType';
         const basePath = './some/stubbed/path';
 
-        testTypeTransformForPath(basePath, initialType, expectedType);
+        expectTypeTransformForPath(basePath, initialType, expectedType);
       });
 
       it('replaces a simple type for a relative path beginning with ".."', () => {
@@ -114,7 +114,7 @@ describe('stencil-types', () => {
         const expectedType = 'NonCollisionType';
         const basePath = '../some/stubbed/path';
 
-        testTypeTransformForPath(basePath, initialType, expectedType);
+        expectTypeTransformForPath(basePath, initialType, expectedType);
       });
 
       it('replaces a simple type for an absolute path', () => {
@@ -122,7 +122,7 @@ describe('stencil-types', () => {
         const expectedType = 'NonCollisionType';
         const basePath = '~/some/stubbed/path';
 
-        testTypeTransformForPath(basePath, initialType, expectedType);
+        expectTypeTransformForPath(basePath, initialType, expectedType);
       });
 
       /**
@@ -136,7 +136,7 @@ describe('stencil-types', () => {
        * @param initialType the original type found in a class member
        * @param expectedType the type that is expected to be generated
        */
-      const testTypeTransformForPath = (basePath: string, initialType: string, expectedType: string): void => {
+      const expectTypeTransformForPath = (basePath: string, initialType: string, expectedType: string): void => {
         const typePath = `${basePath}/my-types`;
 
         const componentCompilerMeta = stubComponentCompilerMeta({
@@ -176,7 +176,7 @@ describe('stencil-types', () => {
         },
       ];
 
-      testTypeIsTransformed(initialType, expectedType, typeMemberNames);
+      expectTypeIsTransformed(initialType, expectedType, typeMemberNames);
     });
 
     it('replaces duplicate types', () => {
@@ -189,7 +189,7 @@ describe('stencil-types', () => {
         },
       ];
 
-      testTypeIsTransformed(initialType, expectedType, typeMemberNames);
+      expectTypeIsTransformed(initialType, expectedType, typeMemberNames);
     });
 
     it('replaces types that are substrings safely', () => {
@@ -202,7 +202,7 @@ describe('stencil-types', () => {
         },
       ];
 
-      testTypeIsTransformed(initialType, expectedType, typeMemberNames);
+      expectTypeIsTransformed(initialType, expectedType, typeMemberNames);
     });
 
     it('replaces union types', () => {
@@ -219,7 +219,7 @@ describe('stencil-types', () => {
         },
       ];
 
-      testTypeIsTransformed(initialType, expectedType, typeMemberNames);
+      expectTypeIsTransformed(initialType, expectedType, typeMemberNames);
     });
 
     it("doesn't replace string literals in types", () => {
@@ -232,11 +232,11 @@ describe('stencil-types', () => {
         },
       ];
 
-      testTypeIsTransformed(initialType, expectedType, typeMemberNames);
+      expectTypeIsTransformed(initialType, expectedType, typeMemberNames);
     });
 
     // TODO(STENCIL-419): Re-enable this test
-    xit("doesn't replace resolved types", () => {
+    it.skip("doesn't replace resolved types", () => {
       /**
        * Edge case, consider the following scenario:
        * ```ts
@@ -257,7 +257,7 @@ describe('stencil-types', () => {
         },
       ];
 
-      testTypeIsTransformed(initialType, expectedType, typeMemberNames);
+      expectTypeIsTransformed(initialType, expectedType, typeMemberNames);
     });
 
     /**
@@ -267,7 +267,7 @@ describe('stencil-types', () => {
      * @param expectedType the type that is expected to be generated
      * @param typeMemberNames a series of aliases that map a locally used type T to some other type T2
      */
-    const testTypeIsTransformed = (
+    const expectTypeIsTransformed = (
       initialType: string,
       expectedType: string,
       typeMemberNames: d.TypesMemberNameData[]

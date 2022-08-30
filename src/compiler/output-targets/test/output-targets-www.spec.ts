@@ -9,9 +9,11 @@ describe('outputTarget, www', () => {
   let config: d.Config = {};
 
   it('default www files', async () => {
-    config.namespace = 'App';
-    config.buildAppCore = true;
-    config.sourceMap = true;
+    config = {
+      buildAppCore: true,
+      namespace: 'App',
+      sourceMap: true,
+    };
 
     compiler = await mockCreateCompiler(config);
     config = compiler.config;

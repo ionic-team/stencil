@@ -11,7 +11,7 @@ import { createSystem } from '../../compiler/sys/stencil-sys';
 import { hasError } from '@utils';
 
 export interface MockCompiler extends d.Compiler {
-  config: d.Config;
+  config: d.ValidatedConfig;
 }
 
 // jest will run tests in parallel by default but
@@ -49,7 +49,7 @@ export function initCompilerConfig(setupFs = true) {
   let config: d.Config = {};
   const root = mockCompilerRoot;
 
-  config = mockConfig(setupFs ? patchHybridFs() : null, root);
+  config = mockConfig({sys: setupFs ? patchHybridFs() : null, rootDir: root});
   config._internalTesting = true;
   config.namespace = `TestApp`;
   config.rootDir = root;
@@ -131,22 +131,22 @@ export async function mockCreateCompiler(userConfig: d.Config = {}): Promise<Moc
     config = loadedConfig.config;
   }
 
-  config = validateConfig(config).config;
+  const validatedConfig = validateConfig(config, loadedConfig).config;
 
   // Ready to create the compiler instance. Config is baked-in at this point.
-  const compiler = await createCompiler(config);
+  const compiler = await createCompiler(validatedConfig);
 
   // augment destroy to clean-up our in-memory files
   const ogDestroy = compiler.destroy;
   compiler.destroy = async () => {
-    config.sys.removeDirSync(config.rootDir, { recursive: true });
+    validatedConfig.sys.removeDirSync(validatedConfig.rootDir, { recursive: true });
     await ogDestroy();
     currentCompilerResolve();
   };
 
   // this helps consumers read files easily from our virtual root
   // config.rootDir = path.join(config.rootDir, config.namespace);
-  return { config, ...compiler };
+  return { config: validatedConfig, ...compiler };
 }
 
 /**

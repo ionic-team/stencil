@@ -8,16 +8,18 @@ describe('service worker', () => {
   let config: d.Config = {};
 
   it('dev service worker', async () => {
-    config.devMode = true;
-    config.outputTargets = [
-      {
-        type: 'www',
-        serviceWorker: {
-          swSrc: path.join('src', 'sw.js'),
-          globPatterns: ['**/*.{html,js,css,json,ico,png}'],
-        },
-      } as d.OutputTargetWww,
-    ];
+    config = {
+      devMode: true,
+      outputTargets: [
+        {
+          type: 'www',
+          serviceWorker: {
+            swSrc: path.join('src', 'sw.js'),
+            globPatterns: ['**/*.{html,js,css,json,ico,png}'],
+          },
+        } as d.OutputTargetWww,
+      ],
+    };
 
     compiler = await mockCreateCompiler(config);
     config = compiler.config;

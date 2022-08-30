@@ -9,11 +9,14 @@ describe('outputTarget, dist', () => {
   let config: d.Config = {};
 
   it('default dist files', async () => {
-    config.buildAppCore = true;
-    config.sourceMap = true;
-    config.buildEs5 = true;
-    config.globalScript = path.join(mockCompilerRoot, 'src', 'global.ts');
-    config.outputTargets = [{ type: 'dist' }];
+    config = {
+      buildAppCore: true,
+      buildEs5: true,
+      globalScript: path.join(mockCompilerRoot, 'src', 'global.ts'),
+      namespace: 'TestApp',
+      outputTargets: [{ type: 'dist' }],
+      sourceMap: true,
+    };
 
     compiler = await mockCreateCompiler(config);
     config = compiler.config;

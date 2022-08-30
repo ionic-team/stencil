@@ -17,7 +17,10 @@ import { hasServiceWorkerChanges } from '../service-worker/generate-sw';
 import { isString } from '@utils';
 import type ts from 'typescript';
 
-export const createWatchBuild = async (config: d.Config, compilerCtx: d.CompilerCtx): Promise<d.CompilerWatcher> => {
+export const createWatchBuild = async (
+  config: d.ValidatedConfig,
+  compilerCtx: d.CompilerCtx
+): Promise<d.CompilerWatcher> => {
   let isRebuild = false;
   let tsWatchProgram: {
     program: ts.WatchOfConfigFile<ts.EmitAndSemanticDiagnosticsBuilderProgram>;

@@ -1,10 +1,11 @@
 import type * as d from '../../declarations';
 import { taskGenerate, getBoilerplateByExtension, BoilerplateFile } from '../task-generate';
-import { mockConfig, mockCompilerSystem } from '@stencil/core/testing';
+import { mockValidatedConfig, mockCompilerSystem } from '@stencil/core/testing';
 import * as utils from '../../utils/validation';
 
 import * as coreCompiler from '@stencil/core/compiler';
 import { CoreCompiler } from '../load-compiler';
+import { createConfigFlags } from '../config-flags';
 
 const promptMock = jest.fn().mockResolvedValue('my-component');
 
@@ -14,13 +15,15 @@ jest.mock('prompts', () => ({
 
 const setup = async () => {
   const sys = mockCompilerSystem();
-  const config: d.Config = mockConfig(sys);
-  config.configPath = '/testing-path';
-  config.srcDir = '/src';
+  const config: d.ValidatedConfig = mockValidatedConfig({
+    configPath: '/testing-path',
+    flags: createConfigFlags({ task: 'generate' }),
+    srcDir: '/src',
+    sys,
+  });
 
   // set up some mocks / spies
   config.sys.exit = jest.fn();
-  config.flags.unknownArgs = [];
   const errorSpy = jest.spyOn(config.logger, 'error');
   const validateTagSpy = jest.spyOn(utils, 'validateComponentTag').mockReturnValue(undefined);
 
@@ -41,7 +44,7 @@ const setup = async () => {
  * @param coreCompiler the core compiler instance to forward to `taskGenerate`
  * @param config the user-supplied config to forward to `taskGenerate`
  */
-async function silentGenerate(coreCompiler: CoreCompiler, config: d.Config): Promise<void> {
+async function silentGenerate(coreCompiler: CoreCompiler, config: d.ValidatedConfig): Promise<void> {
   const tmp = console.log;
   console.log = jest.fn();
   await taskGenerate(coreCompiler, config);

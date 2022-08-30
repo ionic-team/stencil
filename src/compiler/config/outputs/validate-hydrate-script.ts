@@ -9,7 +9,7 @@ import { isBoolean, isString } from '@utils';
 import { isAbsolute, join } from 'path';
 import { NODE_BUILTINS } from '../../sys/modules';
 
-export const validateHydrateScript = (config: d.Config, userOutputs: d.OutputTarget[]) => {
+export const validateHydrateScript = (config: d.ValidatedConfig, userOutputs: d.OutputTarget[]) => {
   const output: d.OutputTargetHydrate[] = [];
 
   const hasHydrateOutputTarget = userOutputs.some(isOutputTargetHydrate);
@@ -19,7 +19,7 @@ export const validateHydrateScript = (config: d.Config, userOutputs: d.OutputTar
     // let's still see if we require one because of other output targets
 
     const hasWwwOutput = userOutputs.filter(isOutputTargetWww).some((o) => isString(o.indexHtml));
-    const shouldBuildHydrate = config?.flags.prerender || config?.flags.ssr;
+    const shouldBuildHydrate = config.flags.prerender || config.flags.ssr;
 
     if (hasWwwOutput && shouldBuildHydrate) {
       // we're prerendering a www output target, so we'll need a hydrate app

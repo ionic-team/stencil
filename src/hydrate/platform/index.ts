@@ -121,7 +121,7 @@ export const supportsShadow = false;
 
 export const supportsListenerOptions = false;
 
-export const supportsConstructibleStylesheets = false;
+export const supportsConstructableStylesheets = false;
 
 const hostRefs: WeakMap<d.RuntimeRef, d.HostRef> = new WeakMap();
 

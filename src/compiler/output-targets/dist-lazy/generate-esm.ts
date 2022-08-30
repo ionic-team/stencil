@@ -8,7 +8,7 @@ import type { RollupResult } from '../../../declarations';
 import { generatePreamble } from '@utils';
 
 export const generateEsm = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   rollupBuild: RollupBuild,
@@ -64,7 +64,7 @@ export const generateEsm = async (
 };
 
 const copyPolyfills = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   outputTargets: d.OutputTargetDistLazy[]
 ): Promise<void> => {
@@ -88,7 +88,7 @@ const copyPolyfills = async (
 };
 
 const generateShortcuts = (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   outputTargets: d.OutputTargetDistLazy[],
   rollupResult: RollupResult[]
