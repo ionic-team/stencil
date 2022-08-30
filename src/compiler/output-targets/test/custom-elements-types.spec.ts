@@ -55,7 +55,7 @@ describe('Custom Elements Typedef generation', () => {
     });
     const { config, compilerCtx, buildCtx } = setup();
     (config.outputTargets[0] as d.OutputTargetDistCustomElements).customElementsExportBehavior =
-      d.CustomElementsExportBehavior.BARREL;
+      d.CustomElementsExportBehavior.SINGLE_EXPORT_MODULE;
     buildCtx.components = [componentOne, componentTwo];
 
     const writeFileSpy = jest.spyOn(compilerCtx.fs, 'writeFile');

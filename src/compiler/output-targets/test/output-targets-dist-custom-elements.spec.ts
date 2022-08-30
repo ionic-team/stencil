@@ -162,10 +162,10 @@ describe('Custom Elements output target', () => {
       });
     });
 
-    describe('CustomElementsExportBehavior.BARREL', () => {
+    describe('CustomElementsExportBehavior.SINGLE_EXPORT_MODULE', () => {
       beforeEach(() => {
         (config.outputTargets[0] as OutputTargetDistCustomElements).customElementsExportBehavior =
-          d.CustomElementsExportBehavior.BARREL;
+          d.CustomElementsExportBehavior.SINGLE_EXPORT_MODULE;
       });
 
       it('should add imports to index.js for all included components', () => {

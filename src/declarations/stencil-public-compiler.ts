@@ -1981,10 +1981,14 @@ export interface OutputTargetBaseNext {
  */
 export enum CustomElementsExportBehavior {
   /**
-   * All components will be re-exported from the specified directories
-   * root `index.js` barrel file.
+   * No additional export or definition behavior will happen.
    */
-  BARREL = 'barrel',
+  DEFAULT = 'default',
+  /**
+   * All components will be re-exported from the specified directory's
+   * root `index.js` file.
+   */
+  SINGLE_EXPORT_MODULE = 'single-export-module',
 }
 
 export interface OutputTargetDistCustomElements extends OutputTargetBaseNext {

@@ -42,7 +42,8 @@ const generateCustomElementsTypesOutput = async (
   typesDir: string,
   outputTarget: d.OutputTargetDistCustomElements
 ) => {
-  const isBarrelExport = outputTarget.customElementsExportBehavior === d.CustomElementsExportBehavior.BARREL;
+  const isBarrelExport =
+    outputTarget.customElementsExportBehavior === d.CustomElementsExportBehavior.SINGLE_EXPORT_MODULE;
 
   // the path where we're going to write the typedef for the whole dist-custom-elements output
   const customElementsDtsPath = join(outputTarget.dir!, 'index.d.ts');

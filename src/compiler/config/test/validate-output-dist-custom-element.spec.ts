@@ -1,4 +1,5 @@
 import type * as d from '@stencil/core/declarations';
+import { CustomElementsExportBehavior } from '../../../declarations';
 import { mockConfig, mockLoadConfigInit } from '@stencil/core/testing';
 import { COPY, DIST_CUSTOM_ELEMENTS, DIST_TYPES } from '../../output-targets/output-utils';
 import { validateConfig } from '../validate-config';
@@ -35,6 +36,59 @@ describe('validate-output-dist-custom-element', () => {
           empty: true,
           externalRuntime: true,
           generateTypeDeclarations: true,
+          customElementsExportBehavior: 'default',
+        },
+      ]);
+    });
+
+    it('uses a provided export behavior over the default value', () => {
+      const outputTarget: d.OutputTargetDistCustomElements = {
+        type: DIST_CUSTOM_ELEMENTS,
+        customElementsExportBehavior: CustomElementsExportBehavior.SINGLE_EXPORT_MODULE,
+      };
+      userConfig.outputTargets = [outputTarget];
+
+      const { config } = validateConfig(userConfig, mockLoadConfigInit());
+      expect(config.outputTargets).toEqual([
+        {
+          type: DIST_TYPES,
+          dir: defaultDistDir,
+          typesDir: path.join(rootDir, 'dist', 'types'),
+        },
+        {
+          type: DIST_CUSTOM_ELEMENTS,
+          copy: [],
+          dir: defaultDistDir,
+          empty: true,
+          externalRuntime: true,
+          generateTypeDeclarations: true,
+          customElementsExportBehavior: 'single-export-module',
+        },
+      ]);
+    });
+
+    it('uses the default export behavior if the specified value is invalid', () => {
+      const outputTarget: any = {
+        type: DIST_CUSTOM_ELEMENTS,
+        customElementsExportBehavior: 'not-a-valid-option',
+      };
+      userConfig.outputTargets = [outputTarget];
+
+      const { config } = validateConfig(userConfig, mockLoadConfigInit());
+      expect(config.outputTargets).toEqual([
+        {
+          type: DIST_TYPES,
+          dir: defaultDistDir,
+          typesDir: path.join(rootDir, 'dist', 'types'),
+        },
+        {
+          type: DIST_CUSTOM_ELEMENTS,
+          copy: [],
+          dir: defaultDistDir,
+          empty: true,
+          externalRuntime: true,
+          generateTypeDeclarations: true,
+          customElementsExportBehavior: 'default',
         },
       ]);
     });

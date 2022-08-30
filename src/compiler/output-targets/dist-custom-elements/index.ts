@@ -225,7 +225,7 @@ export const addCustomElementInputs = (
   });
 
   // Only re-export component definitions if the barrel export behavior is set
-  if (outputTarget.customElementsExportBehavior === d.CustomElementsExportBehavior.BARREL) {
+  if (outputTarget.customElementsExportBehavior === d.CustomElementsExportBehavior.SINGLE_EXPORT_MODULE) {
     bundleOpts.loader!['\0core'] += indexImports.join('\n');
   }
 };
