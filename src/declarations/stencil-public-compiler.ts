@@ -1852,6 +1852,7 @@ export interface OutputTargetDist extends OutputTargetBase {
    *
    * Paths will be left in aliased format if `false` or `undefined`.
    *
+   * @example
    * // tsconfig.json
    * {
    *   paths: {
@@ -1885,6 +1886,7 @@ export interface OutputTargetDistCollection extends OutputTargetBase {
    *
    * Paths will be left in aliased format if `false` or `undefined`.
    *
+   * @example
    * // tsconfig.json
    * {
    *   paths: {
