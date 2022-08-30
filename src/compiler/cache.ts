@@ -1,5 +1,6 @@
 import type * as d from '../declarations';
 import { join } from 'path';
+import { InMemoryFileSystem } from './sys/in-memory-fs';
 
 export class Cache implements d.Cache {
   private failed = 0;
@@ -7,7 +8,7 @@ export class Cache implements d.Cache {
   private sys: d.CompilerSystem;
   private logger: d.Logger;
 
-  constructor(private config: d.Config, private cacheFs: d.InMemoryFileSystem) {
+  constructor(private config: d.Config, private cacheFs: InMemoryFileSystem) {
     this.sys = config.sys;
     this.logger = config.logger;
   }
