@@ -11,10 +11,11 @@ import { fetchModuleAsync } from '../fetch/fetch-module-async';
 import { getCommonDirUrl, getNodeModuleFetchUrl, packageVersions } from '../fetch/fetch-utils';
 import { isString, normalizeFsPath, normalizePath } from '@utils';
 import resolve, { AsyncOpts } from 'resolve';
+import { InMemoryFileSystem } from '../in-memory-fs';
 
 export const resolveModuleIdAsync = (
   sys: d.CompilerSystem,
-  inMemoryFs: d.InMemoryFileSystem,
+  inMemoryFs: InMemoryFileSystem,
   opts: d.ResolveModuleIdOptions
 ) => {
   const resolverOpts: AsyncOpts = createCustomResolverAsync(sys, inMemoryFs, opts.exts);
@@ -51,7 +52,7 @@ export const resolveModuleIdAsync = (
 
 export const createCustomResolverAsync = (
   sys: d.CompilerSystem,
-  inMemoryFs: d.InMemoryFileSystem,
+  inMemoryFs: InMemoryFileSystem,
   exts: string[]
 ): any => {
   return {
