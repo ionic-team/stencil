@@ -4,7 +4,7 @@ import path from 'path';
 import { getLazyBuildConditionals } from '../../output-targets/dist-lazy/lazy-build-conditionals';
 
 describe('build-conditionals', () => {
-  jest.setTimeout(25000);
+  jest.setTimeout(30000);
   let compiler: MockCompiler;
   let config: d.ValidatedConfig;
 

@@ -4,7 +4,7 @@ import { mockCreateCompiler, MockCompiler, mockCompilerRoot } from '../../../tes
 import path from 'path';
 
 describe('outputTarget, dist', () => {
-  jest.setTimeout(20000);
+  jest.setTimeout(25000);
   let compiler: MockCompiler;
   let config: d.Config = {};
 
