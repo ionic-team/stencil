@@ -30,9 +30,11 @@ describe('telemetryBuildFinishedAction', () => {
     );
 
     const results = {
-      componentGraph: {},
-      duration: 100,
-    } as d.CompilerBuildResults;
+      buildResults: {
+        componentGraph: {},
+        duration: 100,
+      },
+    } as d.BuildCtx;
 
     await telemetry.telemetryBuildFinishedAction(sys, config, coreCompiler, results);
     expect(spyShouldTrack).toHaveBeenCalled();

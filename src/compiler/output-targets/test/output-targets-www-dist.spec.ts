@@ -1,24 +1,22 @@
-// @ts-nocheck
 import type * as d from '@stencil/core/declarations';
 import { expectFilesDoNotExist, expectFilesExist } from '../../../testing/testing-utils';
-import { Compiler, Config } from '@stencil/core/compiler';
-import { mockConfig } from '@stencil/core/testing';
+import { mockCreateCompiler, MockCompiler, mockCompilerRoot } from '../../../testing/mock-compiler';
 import path from 'path';
 
-describe.skip('outputTarget, www / dist / docs', () => {
+describe('outputTarget, www / dist / docs', () => {
   jest.setTimeout(20000);
-  let compiler: Compiler;
-  let config: Config;
-  const root = path.resolve('/');
+  let compiler: MockCompiler;
+  let config: d.Config = {};
 
   it('dist, www and readme files w/ custom paths', async () => {
-    config = mockConfig({
+    config = {
+      flags: { docs: true, task: null, args: null, knownArgs: null, unknownArgs: null },
       buildAppCore: true,
-      flags: { docs: true },
       namespace: 'TestApp',
       outputTargets: [
         {
           type: 'www',
+          serviceWorker: null,
           dir: 'custom-www',
           buildDir: 'www-build',
           indexHtml: 'custom-index.htm',
@@ -31,48 +29,51 @@ describe.skip('outputTarget, www / dist / docs', () => {
           typesDir: 'custom-types',
         },
         {
-          type: 'docs',
+          type: 'docs-readme',
         } as d.OutputTargetDocsReadme,
       ],
-      rootDir: path.join(root, 'User', 'testing', '/'),
-    });
+    };
 
-    compiler = new Compiler(config);
+    compiler = await mockCreateCompiler(config);
+    config = compiler.config;
 
-    await compiler.fs.writeFiles({
-      [path.join(root, 'User', 'testing', 'package.json')]: `{
-        "module": "custom-dist/index.mjs",
-        "main": "custom-dist/index.js",
+    await compiler.sys.writeFile(
+      config.packageJsonFilePath,
+      `{
+        "module": "custom-dist/index.js",
+        "main": "custom-dist/index.cjs.js",
         "collection": "custom-dist/dist-collection/collection-manifest.json",
         "types": "custom-dist/custom-types/components.d.ts"
-      }`,
-      [path.join(root, 'User', 'testing', 'src', 'index.html')]: `<cmp-a></cmp-a>`,
-      [path.join(config.sys.getClientPath('polyfills/index.js'))]: `/* polyfills */`,
-      [path.join(
-        root,
-        'User',
-        'testing',
-        'src',
-        'components',
-        'cmp-a.tsx'
-      )]: `@Component({ tag: 'cmp-a' }) export class CmpA {}`,
-    });
-    await compiler.fs.commit();
+      }`
+    );
+    await config.sys.writeFile(
+      path.join(config.srcDir, 'components', 'cmp-a.tsx'),
+      `
+      import { Component, h } from '@stencil/core';
+      @Component({ tag: 'cmp-a' }) export class CmpA {
+        constructor() { }
+      }
+    `
+    );
 
     const r = await compiler.build();
     expect(r.diagnostics).toHaveLength(0);
 
-    expectFilesExist(compiler.fs, [
-      path.join(root, 'User', 'testing', 'custom-dist', 'cjs'),
-      path.join(root, 'User', 'testing', 'custom-dist', 'esm', 'polyfills', 'index.js'),
-      path.join(root, 'User', 'testing', 'custom-dist', 'esm', 'polyfills', 'index.js.map'),
+    expectFilesExist(compiler.compilerCtx.fs, [
+      path.join(mockCompilerRoot, 'custom-dist', 'cjs'),
+      path.join(mockCompilerRoot, 'custom-dist', 'cjs', 'cmp-a.cjs.entry.js'),
+      path.join(mockCompilerRoot, 'custom-dist', 'esm', 'polyfills'),
+      path.join(mockCompilerRoot, 'custom-dist', 'dist-collection'),
+      path.join(mockCompilerRoot, 'custom-dist', 'custom-types'),
     ]);
 
-    expectFilesDoNotExist(compiler.fs, [
-      path.join(root, 'User', 'testing', 'www', '/'),
-      path.join(root, 'User', 'testing', 'www', 'index.html'),
-      path.join(root, 'User', 'testing', 'www', 'custom-index.htm'),
-      path.join(root, 'User', 'testing', 'custom-www', 'index.html'),
+    expectFilesDoNotExist(compiler.compilerCtx.fs, [
+      path.join(mockCompilerRoot, 'www', '/'),
+      path.join(mockCompilerRoot, 'www', 'index.html'),
+      path.join(mockCompilerRoot, 'www', 'custom-index.htm'),
+      path.join(mockCompilerRoot, 'custom-www', 'index.html'),
     ]);
+
+    compiler.destroy();
   });
 });

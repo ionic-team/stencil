@@ -42,6 +42,7 @@ export function mockValidatedConfig(overrides: Partial<ValidatedConfig> = {}): V
 }
 
 /**
+ * /**
  * Creates a mock instance of a Stencil configuration entity. The mocked configuration has no guarantees around the
  * types/validity of its data.
  * @param overrides a partial implementation of `UnvalidatedConfig`. Any provided fields will override the defaults
@@ -49,11 +50,12 @@ export function mockValidatedConfig(overrides: Partial<ValidatedConfig> = {}): V
  * @returns the mock Stencil configuration
  */
 export function mockConfig(overrides: Partial<UnvalidatedConfig> = {}): UnvalidatedConfig {
-  const rootDir = path.resolve('/');
-
-  let { sys } = overrides;
+  let { sys, rootDir } = overrides;
   if (!sys) {
     sys = createTestingSystem();
+  }
+  if (!rootDir) {
+    rootDir = path.resolve('/');
   }
   sys.getCurrentDirectory = () => rootDir;
 

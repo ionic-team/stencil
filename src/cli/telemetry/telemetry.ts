@@ -17,7 +17,7 @@ export async function telemetryBuildFinishedAction(
   sys: d.CompilerSystem,
   config: d.ValidatedConfig,
   coreCompiler: CoreCompiler,
-  result: d.CompilerBuildResults
+  result: d.BuildCtx
 ) {
   const tracking = await shouldTrack(config, sys, config.flags.ci);
 
@@ -25,9 +25,9 @@ export async function telemetryBuildFinishedAction(
     return;
   }
 
-  const component_count = Object.keys(result.componentGraph).length;
+  const component_count = Object.keys(result.buildResults.componentGraph).length;
 
-  const data = await prepareData(coreCompiler, config, sys, result.duration, component_count);
+  const data = await prepareData(coreCompiler, config, sys, result.buildResults.duration, component_count);
 
   await sendMetric(sys, config, 'stencil_cli_command', data);
 

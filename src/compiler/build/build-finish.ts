@@ -10,7 +10,7 @@ import { relative } from 'path';
  * @param buildCtx the build context for the build being aborted
  * @returns the build results
  */
-export const buildFinish = async (buildCtx: d.BuildCtx): Promise<d.CompilerBuildResults> => {
+export const buildFinish = async (buildCtx: d.BuildCtx): Promise<d.BuildCtx> => {
   const results = await buildDone(buildCtx.config, buildCtx.compilerCtx, buildCtx, false);
 
   const buildLog: d.BuildLog = {
@@ -28,9 +28,9 @@ export const buildFinish = async (buildCtx: d.BuildCtx): Promise<d.CompilerBuild
  * Finish a build early due to failure. During the build process, a fatal error has occurred where the compiler cannot
  * continue further
  * @param buildCtx the build context for the build being aborted
- * @returns the build results
+ * @returns the build context
  */
-export const buildAbort = (buildCtx: d.BuildCtx): Promise<d.CompilerBuildResults> => {
+export const buildAbort = (buildCtx: d.BuildCtx): Promise<d.BuildCtx> => {
   return buildDone(buildCtx.config, buildCtx.compilerCtx, buildCtx, true);
 };
 
@@ -40,18 +40,18 @@ export const buildAbort = (buildCtx: d.BuildCtx): Promise<d.CompilerBuildResults
  * @param compilerCtx the compiler context associated with the build
  * @param buildCtx the build context associated with the build to mark as done
  * @param aborted true if the build ended early due to failure, false otherwise
- * @returns the build results
+ * @returns the build context
  */
 const buildDone = async (
   config: d.Config,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   aborted: boolean
-): Promise<d.CompilerBuildResults> => {
+): Promise<d.BuildCtx> => {
   if (buildCtx.hasFinished && buildCtx.buildResults) {
     // we've already marked this build as finished and
     // already created the build results, just return these
-    return buildCtx.buildResults;
+    return buildCtx;
   }
 
   // create the build results data
@@ -107,7 +107,7 @@ const buildDone = async (
     }
 
     // emit a buildFinish event for anyone who cares
-    compilerCtx.events.emit('buildFinish', buildCtx.buildResults);
+    compilerCtx.events.emit('buildFinish', buildCtx);
 
     // write all of our logs to disk if config'd to do so
     // do this even if there are errors or not the active build
@@ -128,7 +128,7 @@ const buildDone = async (
     }
   }
 
-  return buildCtx.buildResults;
+  return buildCtx;
 };
 
 const logHmr = (logger: d.Logger, buildCtx: d.BuildCtx) => {

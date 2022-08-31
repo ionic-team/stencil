@@ -8,6 +8,7 @@ import type {
   CompilerBuildResults,
   InitServerProcess,
   DevServerMessage,
+  BuildCtx,
 } from '../declarations';
 import { initServerProcessWorkerProxy } from './server-worker-main';
 import path from 'path';
@@ -94,7 +95,7 @@ function startServer(
     if (sendToWorker) {
       if (eventName === 'buildFinish') {
         isActivelyBuilding = false;
-        lastBuildResults = { ...data };
+        lastBuildResults = { ...(data as BuildCtx).buildResults };
         sendToWorker({ buildResults: { ...lastBuildResults }, isActivelyBuilding });
       } else if (eventName === 'buildLog') {
         sendToWorker({

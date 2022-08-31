@@ -10,11 +10,8 @@ import ts from 'typescript';
  * @param compilerCtx the current Stencil compiler context
  * @returns the results of a full build of Stencil
  */
-export const createFullBuild = async (
-  config: d.ValidatedConfig,
-  compilerCtx: d.CompilerCtx
-): Promise<d.CompilerBuildResults> => {
-  return new Promise<d.CompilerBuildResults>((resolve) => {
+export const createFullBuild = async (config: d.ValidatedConfig, compilerCtx: d.CompilerCtx): Promise<d.BuildCtx> => {
+  return new Promise<d.BuildCtx>((resolve) => {
     let tsWatchProgram: ts.WatchOfConfigFile<ts.BuilderProgram> = null;
 
     compilerCtx.events.on('fileUpdate', (p) => {

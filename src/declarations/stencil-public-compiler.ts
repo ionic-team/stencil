@@ -1,5 +1,5 @@
 import type { JsonDocs } from './stencil-public-docs';
-import type { PrerenderUrlResults } from '../internal';
+import type { BuildCtx, CompilerCtx, PrerenderUrlResults } from '../internal';
 import type { ConfigFlags } from '../cli/config-flags';
 
 export * from './stencil-public-docs';
@@ -360,6 +360,7 @@ export interface Config extends StencilConfig {
   tsCompilerOptions?: any;
   _isValidated?: boolean;
   _isTesting?: boolean;
+  _internalTesting?: boolean;
 }
 
 /**
@@ -1192,7 +1193,7 @@ export interface BuildOnEvents {
   on(eventName: CompilerEventDirDelete, cb: (path: string) => void): BuildOnEventRemove;
 
   on(eventName: CompilerEventBuildStart, cb: (buildStart: CompilerBuildStart) => void): BuildOnEventRemove;
-  on(eventName: CompilerEventBuildFinish, cb: (buildResults: CompilerBuildResults) => void): BuildOnEventRemove;
+  on(eventName: CompilerEventBuildFinish, cb: (buildResults: BuildCtx) => void): BuildOnEventRemove;
   on(eventName: CompilerEventBuildLog, cb: (buildLog: BuildLog) => void): BuildOnEventRemove;
   on(eventName: CompilerEventBuildNoChange, cb: () => void): BuildOnEventRemove;
 }
@@ -1206,7 +1207,7 @@ export interface BuildEmitEvents {
   emit(eventName: CompilerEventDirDelete, path: string): void;
 
   emit(eventName: CompilerEventBuildStart, buildStart: CompilerBuildStart): void;
-  emit(eventName: CompilerEventBuildFinish, buildResults: CompilerBuildResults): void;
+  emit(eventName: CompilerEventBuildFinish, buildResults: BuildCtx): void;
   emit(eventName: CompilerEventBuildNoChange, buildNoChange: BuildNoChangeResults): void;
   emit(eventName: CompilerEventBuildLog, buildLog: BuildLog): void;
 
@@ -2363,10 +2364,11 @@ export interface FsStats {
 }
 
 export interface Compiler {
-  build(): Promise<CompilerBuildResults>;
+  build(): Promise<BuildCtx>;
   createWatcher(): Promise<CompilerWatcher>;
   destroy(): Promise<void>;
   sys: CompilerSystem;
+  compilerCtx: CompilerCtx;
 }
 
 export interface CompilerWatcher extends BuildOnEvents {

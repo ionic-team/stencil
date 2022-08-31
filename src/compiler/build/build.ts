@@ -14,7 +14,7 @@ export const build = async (
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   tsBuilder: ts.BuilderProgram
-) => {
+): Promise<d.BuildCtx> => {
   try {
     // reset process.cwd() for 3rd-party plugins
     process.chdir(config.rootDir);

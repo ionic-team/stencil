@@ -15,6 +15,7 @@ export {
   mockWindow,
   mockModule,
 } from './mocks';
+export { MockCompiler, initCompilerConfig, mockCreateCompiler, mockCompilerRoot } from './mock-compiler';
 export {
   MockHeaders,
   MockRequest,

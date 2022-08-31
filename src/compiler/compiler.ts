@@ -61,6 +61,7 @@ export const createCompiler = async (userConfig: Config): Promise<Compiler> => {
     createWatcher,
     destroy,
     sys,
+    compilerCtx,
   };
 
   config.logger.printDiagnostics(diagnostics);
