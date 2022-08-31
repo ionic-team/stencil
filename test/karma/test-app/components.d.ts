@@ -601,15 +601,8 @@ declare global {
     interface HTMLKeyReorderRootElement extends Components.KeyReorderRoot, HTMLStencilElement {
         prototype: HTMLKeyReorderRootElement;
         new (): HTMLKeyReorderRootElement;
-    };
-    interface HTMLLifecycleAsyncAElement extends Components.LifecycleAsyncA, HTMLStencilElement {
     }
     var HTMLKeyReorderRootElement: HTMLKeyReorderRootElement;
-    interface HTMLLessCmpElement extends Components.LessCmp, HTMLStencilElement {
-        prototype: HTMLLessCmpElement;
-        new (): HTMLLessCmpElement;
-    }
-    var HTMLLessCmpElement: HTMLLessCmpElement;
     interface HTMLLifecycleAsyncAElement extends Components.LifecycleAsyncA, HTMLStencilElement {
         prototype: HTMLLifecycleAsyncAElement;
         new (): HTMLLifecycleAsyncAElement;
@@ -988,15 +981,8 @@ declare global {
     interface HTMLStencilSiblingElement extends Components.StencilSibling, HTMLStencilElement {
         prototype: HTMLStencilSiblingElement;
         new (): HTMLStencilSiblingElement;
-    };
-    interface HTMLSvgAttrElement extends Components.SvgAttr, HTMLStencilElement {
     }
     var HTMLStencilSiblingElement: HTMLStencilSiblingElement;
-    interface HTMLStylusCmpElement extends Components.StylusCmp, HTMLStencilElement {
-        prototype: HTMLStylusCmpElement;
-        new (): HTMLStylusCmpElement;
-    }
-    var HTMLStylusCmpElement: HTMLStylusCmpElement;
     interface HTMLSvgAttrElement extends Components.SvgAttr, HTMLStencilElement {
         prototype: HTMLSvgAttrElement;
         new (): HTMLSvgAttrElement;
