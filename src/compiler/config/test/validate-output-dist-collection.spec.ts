@@ -54,50 +54,30 @@ describe('validateDistCollectionOutputTarget', () => {
   });
 
   describe('transformAliasedImportPaths', () => {
-    it('sets option false when explicitly false in config', () => {
-      const target: d.OutputTargetDistCollection = {
-        type: 'dist-collection',
-        empty: false,
-        dir: null,
-        collectionDir: null,
-        transformAliasedImportPaths: false,
-      };
-      config.outputTargets = [target];
-
-      const { config: validatedConfig } = validateConfig(config, mockLoadConfigInit());
-
-      expect(validatedConfig.outputTargets).toEqual([
-        {
+    it.each([false, true])(
+      "sets option '%s' when explicitly '%s' in config",
+      (transformAliasedImportPaths: boolean) => {
+        const target: d.OutputTargetDistCollection = {
           type: 'dist-collection',
           empty: false,
-          dir: '/dist/collection',
+          dir: null,
           collectionDir: null,
-          transformAliasedImportPaths: false,
-        },
-      ]);
-    });
+          transformAliasedImportPaths,
+        };
+        config.outputTargets = [target];
 
-    it('sets option true when explicity true in config', () => {
-      const target: d.OutputTargetDistCollection = {
-        type: 'dist-collection',
-        empty: false,
-        dir: null,
-        collectionDir: null,
-        transformAliasedImportPaths: true,
-      };
-      config.outputTargets = [target];
+        const { config: validatedConfig } = validateConfig(config, mockLoadConfigInit());
 
-      const { config: validatedConfig } = validateConfig(config, mockLoadConfigInit());
-
-      expect(validatedConfig.outputTargets).toEqual([
-        {
-          type: 'dist-collection',
-          empty: false,
-          dir: '/dist/collection',
-          collectionDir: null,
-          transformAliasedImportPaths: true,
-        },
-      ]);
-    });
+        expect(validatedConfig.outputTargets).toEqual([
+          {
+            type: 'dist-collection',
+            empty: false,
+            dir: '/dist/collection',
+            collectionDir: null,
+            transformAliasedImportPaths,
+          },
+        ]);
+      }
+    );
   });
 });
