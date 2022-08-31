@@ -16,8 +16,9 @@ import { patchTsSystemFileSystem } from './typescript-sys';
 import { resolveRemoteModuleIdSync } from '../resolve/resolve-module-sync';
 import { version } from '../../../version';
 import ts from 'typescript';
+import { InMemoryFileSystem } from '../in-memory-fs';
 
-export const patchTypeScriptResolveModule = (config: d.Config, inMemoryFs: d.InMemoryFileSystem) => {
+export const patchTypeScriptResolveModule = (config: d.Config, inMemoryFs: InMemoryFileSystem) => {
   let compilerExe: string;
   if (config.sys) {
     compilerExe = config.sys.getCompilerExecutingPath();
@@ -89,7 +90,7 @@ export const tsResolveModuleNamePackageJsonPath = (
 
 export const patchedTsResolveModule = (
   config: d.Config,
-  inMemoryFs: d.InMemoryFileSystem,
+  inMemoryFs: InMemoryFileSystem,
   moduleName: string,
   containingFile: string
 ): ts.ResolvedModuleWithFailedLookupLocations => {
@@ -128,7 +129,7 @@ export const patchedTsResolveModule = (
 
 export const tsResolveNodeModule = (
   config: d.Config,
-  inMemoryFs: d.InMemoryFileSystem,
+  inMemoryFs: InMemoryFileSystem,
   moduleId: string,
   containingFile: string
 ): ts.ResolvedModuleWithFailedLookupLocations => {

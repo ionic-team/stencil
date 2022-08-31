@@ -5,11 +5,12 @@ import { fetchUrlSync } from '../fetch/fetch-module-sync';
 import { getCurrentDirectory, IS_CASE_SENSITIVE_FILE_NAMES, IS_WEB_WORKER_ENV } from '../environment';
 import { patchTypeScriptResolveModule } from './typescript-resolve-module';
 import ts from 'typescript';
+import { InMemoryFileSystem } from '../in-memory-fs';
 
 export const patchTsSystemFileSystem = (
   config: d.Config,
   compilerSys: d.CompilerSystem,
-  inMemoryFs: d.InMemoryFileSystem,
+  inMemoryFs: InMemoryFileSystem,
   tsSys: ts.System
 ): ts.System => {
   const realpath = (path: string) => {
@@ -160,7 +161,7 @@ const patchTsSystemWatch = (compilerSystem: d.CompilerSystem, tsSys: ts.System) 
   };
 };
 
-export const patchTypescript = (config: d.Config, inMemoryFs: d.InMemoryFileSystem) => {
+export const patchTypescript = (config: d.Config, inMemoryFs: InMemoryFileSystem) => {
   if (!(ts as any).__patched) {
     if (config.sys) {
       patchTsSystemFileSystem(config, config.sys, inMemoryFs, ts.sys);
