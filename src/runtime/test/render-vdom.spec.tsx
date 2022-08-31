@@ -1097,5 +1097,93 @@ describe('render-vdom', () => {
       await waitForChanges();
       expect(rootInstance.counter).toEqual(2);
     });
+
+    it('should not call ref cb w/ null when children are reordered', async () => {
+      @Component({ tag: 'cmp-a' })
+      class CmpA {
+        counter = 0;
+        divRef: HTMLElement;
+        @Prop() state = true;
+
+        renderA() {
+          return (
+            <div class="a" ref={(el) => (this.divRef = el)}>
+              A
+            </div>
+          );
+        }
+
+        renderB() {
+          return <div>B</div>;
+        }
+
+        render() {
+          return this.state
+            ? [this.renderB(), <div>middle</div>, this.renderA()]
+            : [this.renderA(), <div>middle</div>, this.renderB()];
+        }
+      }
+
+      const { root, rootInstance, waitForChanges } = await newSpecPage({
+        components: [CmpA],
+        html: `<cmp-a></cmp-a>`,
+      });
+
+      root.state = false;
+      await waitForChanges();
+      // We've changed the state and forced a re-render. This tests one of the
+      // ways in which children can be re-ordered that the `updateChildren` algo
+      // can handle without having `key` attrs set.
+      expect(rootInstance.divRef).toEqual(root.querySelector('.a'));
+    });
+
+    it('should not call ref cb w/ null when children w/ keys are reordered', async () => {
+      @Component({ tag: 'cmp-a' })
+      class CmpA {
+        counter = 0;
+        divRef: HTMLElement;
+        @Prop() state = true;
+
+        renderA() {
+          return (
+            <div key="a" class="a" ref={(el) => (this.divRef = el)}>
+              A
+            </div>
+          );
+        }
+
+        renderB() {
+          return <div>B</div>;
+        }
+
+        render() {
+          return this.state
+            ? [this.renderB(), this.renderA(), this.renderB(), this.renderB()]
+            : [this.renderA(), this.renderB(), this.renderB()];
+        }
+      }
+
+      const { root, rootInstance, waitForChanges } = await newSpecPage({
+        components: [CmpA],
+        html: `<cmp-a></cmp-a>`,
+      });
+
+      root.state = false;
+      await waitForChanges();
+      // We've changed the state and forced a re-render where the algorithm for
+      // reconciling children will have to use the `key` attribute to find the
+      // equivalent VNode on the re-render. So if that is all working correctly
+      // then the value of our `divRef` property should be set correctly after
+      // the rerender.
+      //
+      // The reordering that is conditionally done in the `render` method of the
+      // test component above is specifically the type of edge case that the
+      // parts of the `updateChildren` algorithm which _don't_ use the `key` attr
+      // have trouble with.
+      //
+      // This is essentially a regression test for the issue described in
+      // https://github.com/ionic-team/stencil/issues/3253
+      expect(rootInstance.divRef).toEqual(root.querySelector('.a'));
+    });
   });
 });
