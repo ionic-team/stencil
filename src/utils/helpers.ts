@@ -1,17 +1,29 @@
 export const isDef = (v: any) => v != null;
 
-export const toLowerCase = (str: string) => str.toLowerCase();
+/**
+ * Convert a string from PascalCase to dash-case
+ *
+ * @param str the string to convert
+ * @returns a converted string
+ */
+export const toDashCase = (str: string): string =>
+  str
+    .replace(/([A-Z0-9])/g, (match) => ` ${match[0]}`)
+    .trim()
+    .split(' ')
+    .join('-')
+    .toLowerCase();
 
-export const toDashCase = (str: string) =>
-  toLowerCase(
-    str
-      .replace(/([A-Z0-9])/g, (g) => ' ' + g[0])
-      .trim()
-      .replace(/ /g, '-')
-  );
-
-export const dashToPascalCase = (str: string) =>
-  toLowerCase(str)
+/**
+ * Convert a string from dash-case / kebab-case to PascalCase (or CamelCase,
+ * or whatever you call it!)
+ *
+ * @param str a string to convert
+ * @returns a converted string
+ */
+export const dashToPascalCase = (str: string): string =>
+  str
+    .toLowerCase()
     .split('-')
     .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
     .join('');
@@ -80,13 +92,13 @@ export const pluck = (obj: { [key: string]: any }, keys: string[]) => {
   }, {} as { [key: string]: any });
 };
 
+const isDefined = (v: any): v is NonNullable<typeof v> => v !== null && v !== undefined;
 export const isBoolean = (v: any): v is boolean => typeof v === 'boolean';
-export const isDefined = (v: any) => v !== null && v !== undefined;
-export const isUndefined = (v: any) => v === null || v === undefined;
 export const isFunction = (v: any): v is Function => typeof v === 'function';
-export const isNumber = (v: any): v is boolean => typeof v === 'number';
-export const isObject = (val: Object) => val != null && typeof val === 'object' && Array.isArray(val) === false;
+export const isNumber = (v: any): v is number => typeof v === 'number';
+export const isObject = (val: Object): val is Object =>
+  val != null && typeof val === 'object' && Array.isArray(val) === false;
 export const isString = (v: any): v is string => typeof v === 'string';
-export const isIterable = (v: any): v is Iterable<any> => isDefined(v) && isFunction(v[Symbol.iterator]);
+export const isIterable = <T>(v: any): v is Iterable<T> => isDefined(v) && isFunction(v[Symbol.iterator]);
 export const isPromise = <T = any>(v: any): v is Promise<T> =>
   !!v && (typeof v === 'object' || typeof v === 'function') && typeof v.then === 'function';

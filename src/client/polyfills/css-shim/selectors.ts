@@ -83,7 +83,7 @@ export function normalizeValue(value: string) {
   value = value.replace(regex, ' ').trim();
   const important = value.endsWith(IMPORTANT);
   if (important) {
-    value = value.substr(0, value.length - IMPORTANT.length).trim();
+    value = value.slice(0, value.length - IMPORTANT.length).trim();
   }
   return {
     value,

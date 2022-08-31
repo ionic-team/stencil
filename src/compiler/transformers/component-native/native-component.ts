@@ -27,12 +27,12 @@ const updateNativeHostComponentHeritageClauses = (classNode: ts.ClassDeclaration
     return classNode.heritageClauses;
   }
 
-  if (moduleFile.cmps.length > 1) {
+  if (moduleFile.cmps.length >= 1) {
     addCoreRuntimeApi(moduleFile, RUNTIME_APIS.HTMLElement);
   }
 
-  const heritageClause = ts.createHeritageClause(ts.SyntaxKind.ExtendsKeyword, [
-    ts.createExpressionWithTypeArguments([], ts.createIdentifier(HTML_ELEMENT)),
+  const heritageClause = ts.factory.createHeritageClause(ts.SyntaxKind.ExtendsKeyword, [
+    ts.factory.createExpressionWithTypeArguments(ts.factory.createIdentifier(HTML_ELEMENT), []),
   ]);
 
   return [heritageClause];

@@ -2,6 +2,11 @@ import { CustomStyle } from '../custom-style';
 import { mockWindow } from '@stencil/core/testing';
 
 describe('css-shim', () => {
+  beforeEach(() => {
+    window = mockWindow();
+    document = window.document;
+  });
+
   it('should set value in second addCustomStyle with async tick', async () => {
     const customStyle = new CustomStyle(window, document);
 
@@ -366,8 +371,8 @@ describe('css-shim', () => {
     );
   });
 
-  var window: Window;
-  var document: Document;
+  var window: Window; // eslint-disable-line no-var -- shims will continue to use var while we support older browsers
+  var document: Document; // eslint-disable-line no-var -- shims will continue to use var while we support older browsers
 
   function style(text: string) {
     const elm = document.createElement('style');
@@ -378,9 +383,4 @@ describe('css-shim', () => {
   function css(c: string) {
     return c.replace(/\s/g, '').toLowerCase();
   }
-
-  beforeEach(() => {
-    window = mockWindow();
-    document = window.document;
-  });
 });

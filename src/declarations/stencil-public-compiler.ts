@@ -1,5 +1,7 @@
 import type { JsonDocs } from './stencil-public-docs';
 import type { PrerenderUrlResults } from '../internal';
+import type { ConfigFlags } from '../cli/config-flags';
+
 export * from './stencil-public-docs';
 
 /**
@@ -47,7 +49,7 @@ export interface StencilConfig {
    * However, it's still common to have styles which should be "global" across all components and the website.
    * A global CSS file is often useful to set CSS Variables.
    *
-   * Additonally, the globalStyle config is can be used to precompile styles with Sass, PostCss, etc.
+   * Additionally, the globalStyle config can be used to precompile styles with Sass, PostCss, etc.
    * Below is an example folder structure containing a webapp's global sass file, named app.css.
    */
   globalStyle?: string;
@@ -116,7 +118,7 @@ export interface StencilConfig {
   nodeResolve?: NodeResolveConfig;
 
   /**
-   * Passes custom configuration down to rollup itself, not all rollup options can be overriden.
+   * Passes custom configuration down to rollup itself, not all rollup options can be overridden.
    */
   rollupConfig?: RollupConfig;
 
@@ -166,7 +168,7 @@ export interface StencilConfig {
    * The hydrated flag identifies if a component and all of its child components
    * have finished hydrating. This helps prevent any flash of unstyled content (FOUC)
    * as various components are asynchronously downloaded and rendered. By default it
-   * will add the `hydrated` CSS class to the element. The `hydratedFlag` confg can be used
+   * will add the `hydrated` CSS class to the element. The `hydratedFlag` config can be used
    * to change the name of the CSS class, change it to an attribute, or change which
    * type of CSS properties and values are assigned before and after hydrating. This config
    * can also be used to not include the hydrated flag at all by setting it to `null`.
@@ -174,7 +176,7 @@ export interface StencilConfig {
   hydratedFlag?: HydratedFlag;
 
   /**
-   * Ionic perfers to hide all components prior to hydration with a style tag appended
+   * Ionic prefers to hide all components prior to hydration with a style tag appended
    * to the head of the document containing some `visibility: hidden;` css rules.
    *
    * Disabling this will remove the style tag that sets `visibility: hidden;` on all
@@ -201,11 +203,11 @@ export interface StencilConfig {
    * - `congestionAsync`: DOM reads and writes are scheduled in the next frame to prevent layout
    *   thrashing. When the app is heavily tasked and the queue becomes congested it will then
    *   split the work across multiple frames to prevent blocking the main thread. However, it can
-   *   also introduce unnecesary reflows in some cases, especially during startup. `congestionAsync`
-   *   is ideal for apps running animations while also simultaniously executing intesive tasks
+   *   also introduce unnecessary reflows in some cases, especially during startup. `congestionAsync`
+   *   is ideal for apps running animations while also simultaneously executing intensive tasks
    *   which may lock-up the main thread.
    *
-   * - `immediate`: Makes writeTask() and readTask() callbacks to be executed syncronously. Tasks
+   * - `immediate`: Makes writeTask() and readTask() callbacks to be executed synchronously. Tasks
    *   are not scheduled to run in the next frame, but do note there is at least one microtask.
    *   The `immediate` setting is ideal for apps that do not provide long running and smooth
    *   animations. Like the async setting, if the app has intensive tasks causing the main thread
@@ -251,7 +253,7 @@ export interface ConfigExtras {
    * By default, the slot polyfill does not update `appendChild()` so that it appends
    * new child nodes into the correct child slot like how shadow dom works. This is an opt-in
    * polyfill for those who need it when using `element.appendChild(node)` and expecting the
-   * child to be appended in the same location shadom dom would. This is not required for
+   * child to be appended in the same location shadow dom would. This is not required for
    * IE11 or Edge 18, but can be enabled if the app is using `appendChild()`. Defaults to `false`.
    */
   appendChildSlotFix?: boolean;
@@ -276,6 +278,14 @@ export interface ConfigExtras {
    * and below. Defaults to `false`.
    */
   dynamicImportShim?: boolean;
+
+  /**
+   * Experimental flag. Projects that use a Stencil library built using the `dist` output target may have trouble lazily
+   * loading components when using a bundler such as Vite or Parcel. Setting this flag to `true` will change how Stencil
+   * lazily loads components in a way that works with additional bundlers. Setting this flag to `true` will increase
+   * the size of the compiled output. Defaults to `false`.
+   */
+  experimentalImportInjection?: boolean;
 
   /**
    * Dispatches component lifecycle events. Mainly used for testing. Defaults to `false`.
@@ -351,6 +361,64 @@ export interface Config extends StencilConfig {
   _isValidated?: boolean;
   _isTesting?: boolean;
 }
+
+/**
+ * A 'loose' type useful for wrapping an incomplete / possible malformed
+ * object as we work on getting it comply with a particular Interface T.
+ *
+ * Example:
+ *
+ * ```ts
+ * interface Foo {
+ *   bar: string
+ * }
+ *
+ * function validateFoo(foo: Loose<Foo>): Foo {
+ *   let validatedFoo = {
+ *     ...foo,
+ *     bar: foo.bar || DEFAULT_BAR
+ *   }
+ *
+ *   return validatedFoo
+ * }
+ * ```
+ *
+ * Use this when you need to take user input or something from some other part
+ * of the world that we don't control and transform it into something
+ * conforming to a given interface. For best results, pair with a validation
+ * function as shown in the example.
+ */
+type Loose<T extends Object> = Record<string, any> & Partial<T>;
+
+/**
+ * A Loose version of the Config interface. This is intended to let us load a partial config
+ * and have type information carry though as we construct an object which is a valid `Config`.
+ */
+export type UnvalidatedConfig = Loose<Config>;
+
+/**
+ * Helper type to strip optional markers from keys in a type, while preserving other type information for the key.
+ * This type takes a union of keys, K, in type T to allow for the type T to be gradually updated.
+ *
+ * ```typescript
+ * type Foo { bar?: number, baz?: string }
+ * type ReqFieldFoo = RequireFields<Foo, 'bar'>; // { bar: number, baz?: string }
+ * ```
+ */
+type RequireFields<T, K extends keyof T> = T & { [P in K]-?: T[P] };
+
+/**
+ * Fields in {@link Config} to make required for {@link ValidatedConfig}
+ */
+type StrictConfigFields = 'flags' | 'logger' | 'outputTargets' | 'sys' | 'testing';
+
+/**
+ * A version of {@link Config} that makes certain fields required. This type represents a valid configuration entity.
+ * When a configuration is received by the user, it is a bag of unverified data. In order to make stricter guarantees
+ * about the data from a type-safety perspective, this type is intended to be used throughout the codebase once
+ * validations have occurred at runtime.
+ */
+export type ValidatedConfig = RequireFields<Config, StrictConfigFields>;
 
 export interface HydratedFlag {
   /**
@@ -468,7 +536,7 @@ export interface StencilDevServerConfig {
    */
   ssr?: boolean;
   /**
-   * If the dev server fails to start up within the given timout (in milliseconds), the startup will
+   * If the dev server fails to start up within the given timeout (in milliseconds), the startup will
    * be canceled. Set to zero to disable the timeout. Defaults to `15000`.
    */
   startupTimeout?: number;
@@ -504,51 +572,6 @@ export interface DevServerEditor {
   name?: string;
   supported?: boolean;
   priority?: number;
-}
-
-export interface ConfigFlags {
-  task?: TaskCommand;
-  args?: string[];
-  knownArgs?: string[];
-  unknownArgs?: string[];
-  address?: string;
-  build?: boolean;
-  cache?: boolean;
-  checkVersion?: boolean;
-  ci?: boolean;
-  compare?: boolean;
-  config?: string;
-  debug?: boolean;
-  dev?: boolean;
-  docs?: boolean;
-  docsApi?: string;
-  docsJson?: string;
-  e2e?: boolean;
-  emulate?: string;
-  es5?: boolean;
-  headless?: boolean;
-  help?: boolean;
-  log?: boolean;
-  logLevel?: string;
-  verbose?: boolean;
-  maxWorkers?: number;
-  open?: boolean;
-  port?: number;
-  prerender?: boolean;
-  prod?: boolean;
-  profile?: boolean;
-  root?: string;
-  screenshot?: boolean;
-  screenshotConnector?: string;
-  serve?: boolean;
-  serviceWorker?: boolean;
-  spec?: boolean;
-  ssr?: boolean;
-  stats?: boolean;
-  updateScreenshot?: boolean;
-  version?: boolean;
-  watch?: boolean;
-  devtools?: boolean;
 }
 
 export type TaskCommand =
@@ -776,7 +799,7 @@ export interface SerializeDocumentOptions extends HydrateDocumentOptions {
    * Sets an approximate line width the HTML should attempt to stay within.
    * Note that this is "approximate", in that HTML may often not be able
    * to be split at an exact line width. Additionally, new lines created
-   * is where HTML naturally already has whitespce, such as before an
+   * is where HTML naturally already has whitespace, such as before an
    * attribute or spaces between words. Defaults to `100`.
    */
   approximateLineWidth?: number;
@@ -884,7 +907,7 @@ export interface SitemapXmpResults {
  * build all actions the in-memory fs performed will be written to disk using this system.
  * A NodeJS based system will use APIs such as `fs` and `crypto`, and a web-based system
  * will use in-memory Maps and browser APIs. Either way, the compiler itself is unaware
- * of the actual platform it's being ran ontop of.
+ * of the actual platform it's being ran on top of.
  */
 export interface CompilerSystem {
   name: 'node' | 'in-memory';
@@ -930,7 +953,7 @@ export interface CompilerSystem {
    */
   isTTY(): boolean;
   /**
-   * Each plaform as a different way to dynamically import modules.
+   * Each platform as a different way to dynamically import modules.
    */
   dynamicImport?(p: string): Promise<any>;
   /**
@@ -1676,7 +1699,7 @@ export interface TestingConfig extends JestConfig {
 
   /**
    * By default, all E2E pages wait until the "load" event, this global setting can be used
-   * to change the default `waitUntil` behaviour.
+   * to change the default `waitUntil` behavior.
    */
   browserWaitUntil?: 'load' | 'domcontentloaded' | 'networkidle0' | 'networkidle2';
 
@@ -1750,7 +1773,30 @@ export interface EmulateViewport {
   isLandscape?: boolean;
 }
 
-export type LogLevel = 'debug' | 'info' | 'warn' | 'error' | string;
+/**
+ * This sets the log level hierarchy for our terminal logger, ranging from
+ * most to least verbose.
+ *
+ * Ordering the levels like this lets us easily check whether we should log a
+ * message at a given time. For instance, if the log level is set to `'warn'`,
+ * then anything passed to the logger with level `'warn'` or `'error'` should
+ * be logged, but we should _not_ log anything with level `'info'` or `'debug'`.
+ *
+ * If we have a current log level `currentLevel` and a message with level
+ * `msgLevel` is passed to the logger, we can determine whether or not we should
+ * log it by checking if the log level on the message is further up or at the
+ * same level in the hierarchy than `currentLevel`, like so:
+ *
+ * ```ts
+ * LOG_LEVELS.indexOf(msgLevel) >= LOG_LEVELS.indexOf(currentLevel)
+ * ```
+ *
+ * NOTE: for the reasons described above, do not change the order of the entries
+ * in this array without good reason!
+ */
+export const LOG_LEVELS = ['debug', 'info', 'warn', 'error'] as const;
+
+export type LogLevel = typeof LOG_LEVELS[number];
 
 /**
  * Common logger to be used by the compiler, dev-server and CLI. The CLI will use a
@@ -1810,14 +1856,13 @@ export interface OutputTargetDist extends OutputTargetBase {
 
 export interface OutputTargetDistCollection extends OutputTargetBase {
   type: 'dist-collection';
-
+  empty?: boolean;
   dir: string;
   collectionDir: string;
 }
 
 export interface OutputTargetDistTypes extends OutputTargetBase {
   type: 'dist-types';
-
   dir: string;
   typesDir: string;
 }
@@ -1836,6 +1881,7 @@ export interface OutputTargetDistLazy extends OutputTargetBase {
   esmIndexFile?: string;
   cjsIndexFile?: string;
   systemLoaderFile?: string;
+  legacyLoaderFile?: string;
   empty?: boolean;
 }
 
@@ -1849,7 +1895,7 @@ export interface OutputTargetDistLazyLoader extends OutputTargetBase {
   dir: string;
 
   esmDir: string;
-  esmEs5Dir: string;
+  esmEs5Dir?: string;
   cjsDir: string;
   componentDts: string;
 
@@ -1876,9 +1922,23 @@ export interface OutputTargetCustom extends OutputTargetBase {
   copy?: CopyTask[];
 }
 
+/**
+ * Output target for generating [custom data](https://github.com/microsoft/vscode-custom-data) for VS Code as a JSON
+ * file.
+ */
 export interface OutputTargetDocsVscode extends OutputTargetBase {
+  /**
+   * Designates this output target to be used for generating VS Code custom data.
+   * @see OutputTargetBase#type
+   */
   type: 'docs-vscode';
+  /**
+   * The location on disk to write the JSON file.
+   */
   file: string;
+  /**
+   * A base URL to find the source code of the component(s) described in the JSON file.
+   */
   sourceCodeBaseUrl?: string;
 }
 
@@ -1930,6 +1990,10 @@ export interface OutputTargetDistCustomElements extends OutputTargetBaseNext {
    * children, etc. Users of this flag should be aware that enabling this functionality may increase bundle size.
    */
   autoDefineCustomElements?: boolean;
+  /**
+   * Enables the generation of type definition files for the output target.
+   */
+  generateTypeDeclarations?: boolean;
 }
 
 export interface OutputTargetDistCustomElementsBundle extends OutputTargetBaseNext {
@@ -1942,7 +2006,13 @@ export interface OutputTargetDistCustomElementsBundle extends OutputTargetBaseNe
   minify?: boolean;
 }
 
+/**
+ * The base type for output targets. All output targets should extend this base type.
+ */
 export interface OutputTargetBase {
+  /**
+   * A unique string to differentiate one output target from another
+   */
   type: string;
 }
 
@@ -2022,7 +2092,7 @@ export interface OutputTargetWww extends OutputTargetBase {
 
   /**
    * By default, stencil will include all the polyfills required by legacy browsers in the ES5 build.
-   * If it's `false`, stencil will not emit this polyfills anymore and it's your responsability to provide them before
+   * If it's `false`, stencil will not emit this polyfills anymore and it's your responsibility to provide them before
    * stencil initializes.
    */
   polyfills?: boolean;
@@ -2100,7 +2170,7 @@ export interface LoadConfigInit {
    * User config object to merge into default config and
    * config loaded from a file path.
    */
-  config?: Config;
+  config?: UnvalidatedConfig;
   /**
    * Absolute path to a Stencil config file. This path cannot be
    * relative and it does not resolve config files within a directory.
@@ -2116,8 +2186,13 @@ export interface LoadConfigInit {
   initTsConfig?: boolean;
 }
 
+/**
+ * Results from an attempt to load a config. The values on this interface
+ * have not yet been validated and are not ready to be used for arbitrary
+ * operations around the codebase.
+ */
 export interface LoadConfigResults {
-  config: Config;
+  config: ValidatedConfig;
   diagnostics: Diagnostic[];
   tsconfig: {
     path: string;
@@ -2193,15 +2268,34 @@ export interface PrerenderResults {
   average: number;
 }
 
+/**
+ * Input for CSS optimization functions, including the input CSS
+ * string and a few boolean options which turn on or off various
+ * optimizations.
+ */
 export interface OptimizeCssInput {
   input: string;
   filePath?: string;
-  autoprefixer?: any;
+  autoprefixer?: boolean | null | AutoprefixerOptions;
   minify?: boolean;
   sourceMap?: boolean;
   resolveUrl?: (url: string) => Promise<string> | string;
 }
 
+/**
+ * This is not a real interface describing the options which can
+ * be passed to autoprefixer, for that see the docs, here:
+ * https://github.com/postcss/autoprefixer#options
+ *
+ * Instead, this basically just serves as a label type to track
+ * that arguments are being passed consistently.
+ */
+export type AutoprefixerOptions = Object;
+
+/**
+ * Output from CSS optimization functions, wrapping up optimized
+ * CSS and any diagnostics produced during optimization.
+ */
 export interface OptimizeCssOutput {
   output: string;
   diagnostics: Diagnostic[];
@@ -2266,14 +2360,6 @@ export interface FsStats {
   mtime: Date;
   ctime: Date;
   birthtime: Date;
-}
-
-export interface FsWriteOptions {
-  inMemoryOnly?: boolean;
-  clearFileCache?: boolean;
-  immediateWrite?: boolean;
-  useCache?: boolean;
-  outputTargetType?: string;
 }
 
 export interface Compiler {

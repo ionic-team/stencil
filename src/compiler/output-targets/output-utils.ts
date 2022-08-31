@@ -14,36 +14,6 @@ export const relativeImport = (pathFrom: string, pathTo: string, ext?: string, a
   return normalizePath(`${relativePath}/${basename(pathTo, ext)}`);
 };
 
-export const getDistEsmDir = (outputTarget: d.OutputTargetDist, sourceTarget?: d.SourceTarget) =>
-  join(outputTarget.buildDir, 'esm', sourceTarget || '');
-
-export const getDistEsmComponentsDir = (outputTarget: d.OutputTargetDist, sourceTarget: d.SourceTarget) =>
-  join(getDistEsmDir(outputTarget, sourceTarget), 'build');
-
-export const getDistEsmIndexPath = (outputTarget: d.OutputTargetDist, sourceTarget?: d.SourceTarget) =>
-  join(getDistEsmDir(outputTarget, sourceTarget), 'index.js');
-
-export const getDefineCustomElementsPath = (
-  config: d.Config,
-  outputTarget: d.OutputTargetDist,
-  sourceTarget: d.SourceTarget
-) => join(getDistEsmDir(outputTarget, sourceTarget), getDefineEsmFilename(config));
-
-export const getComponentsEsmBuildPath = (
-  config: d.Config,
-  outputTarget: d.OutputTargetDist,
-  sourceTarget: d.SourceTarget
-) => join(getDistEsmDir(outputTarget, sourceTarget), getComponentsEsmFileName(config));
-
-export const getCoreEsmFileName = (config: d.Config) => `${config.fsNamespace}.core.js`;
-
-export const getDefineEsmFilename = (config: d.Config) => `${config.fsNamespace}.define.js`;
-
-export const getComponentsEsmFileName = (config: d.Config) => `${config.fsNamespace}.components.js`;
-
-export const getLoaderEsmPath = (outputTarget: d.OutputTargetDist) =>
-  join(outputTarget.buildDir, outputTarget.esmLoaderPath);
-
 export const getComponentsDtsSrcFilePath = (config: d.Config) => join(config.srcDir, GENERATED_DTS);
 
 export const getComponentsDtsTypesFilePath = (outputTarget: d.OutputTargetDist | d.OutputTargetDistTypes) =>
@@ -99,40 +69,35 @@ export const isOutputTargetDistTypes = (o: d.OutputTarget): o is d.OutputTargetD
 export const getComponentsFromModules = (moduleFiles: d.Module[]) =>
   sortBy(flatOne(moduleFiles.map((m) => m.cmps)), (c: d.ComponentCompilerMeta) => c.tagName);
 
-export const canSkipOutputTargets = (buildCtx: d.BuildCtx) => {
-  if (buildCtx.components.length === 0) {
-    return true;
-  }
-  if (buildCtx.requiresFullBuild) {
-    return false;
-  }
-  if (buildCtx.isRebuild && (buildCtx.hasScriptChanges || buildCtx.hasStyleChanges || buildCtx.hasHtmlChanges)) {
-    return false;
-  }
-  return true;
-};
-
-export const ANGULAR = `angular`;
+export const ANGULAR = 'angular';
 export const COPY = 'copy';
-export const CUSTOM = `custom`;
-export const DIST = `dist`;
-export const DIST_COLLECTION = `dist-collection`;
-export const DIST_CUSTOM_ELEMENTS = `dist-custom-elements`;
-export const DIST_CUSTOM_ELEMENTS_BUNDLE = `dist-custom-elements-bundle`;
+export const CUSTOM = 'custom';
+export const DIST = 'dist';
+export const DIST_COLLECTION = 'dist-collection';
+export const DIST_CUSTOM_ELEMENTS = 'dist-custom-elements';
+export const DIST_CUSTOM_ELEMENTS_BUNDLE = 'dist-custom-elements-bundle';
 
-export const DIST_TYPES = `dist-types`;
-export const DIST_HYDRATE_SCRIPT = `dist-hydrate-script`;
-export const DIST_LAZY = `dist-lazy`;
-export const DIST_LAZY_LOADER = `dist-lazy-loader`;
+export const DIST_TYPES = 'dist-types';
+export const DIST_HYDRATE_SCRIPT = 'dist-hydrate-script';
+export const DIST_LAZY = 'dist-lazy';
+export const DIST_LAZY_LOADER = 'dist-lazy-loader';
 export const DIST_GLOBAL_STYLES = 'dist-global-styles';
 export const DOCS_CUSTOM = 'docs-custom';
-export const DOCS_JSON = `docs-json`;
-export const DOCS_README = `docs-readme`;
-export const DOCS_VSCODE = `docs-vscode`;
-export const STATS = `stats`;
-export const WWW = `www`;
+export const DOCS_JSON = 'docs-json';
+export const DOCS_README = 'docs-readme';
+export const DOCS_VSCODE = 'docs-vscode';
+export const STATS = 'stats';
+export const WWW = 'www';
 
-export const VALID_TYPES = [
+/**
+ * Valid output targets to specify in a Stencil config.
+ *
+ * Note that there are some output targets (e.g. `DIST_TYPES`) which are
+ * programmatically set as output targets by the compiler when other output
+ * targets (in that case `DIST`) are set, but which are _not_ supported in a
+ * Stencil config. This is enforced in the output target validation code.
+ */
+export const VALID_CONFIG_OUTPUT_TARGETS = [
   // DIST
   WWW,
   DIST,
@@ -153,6 +118,26 @@ export const VALID_TYPES = [
   COPY,
   CUSTOM,
   STATS,
-];
+] as const;
+
+// Given a ReadonlyArray of strings we can derive a union type from them
+// by getting `typeof ARRAY[number]`, i.e. the type of all values returns
+// by number keys.
+type ValidConfigOutputTarget = typeof VALID_CONFIG_OUTPUT_TARGETS[number];
+
+/**
+ * Check whether a given output target is a valid one to be set in a Stencil config
+ *
+ * @param targetType the type which we want to check
+ * @returns whether or not the targetType is a valid, configurable output target.
+ */
+export function isValidConfigOutputTarget(targetType: string): targetType is ValidConfigOutputTarget {
+  // unfortunately `includes` is typed on `ReadonlyArray<T>` as `(el: T):
+  // boolean` so a `string` cannot be passed to `includes` on a
+  // `ReadonlyArray` 😢 thus we `as any`
+  //
+  // see microsoft/TypeScript#31018 for some discussion of this
+  return VALID_CONFIG_OUTPUT_TARGETS.includes(targetType as any);
+}
 
 export const GENERATED_DTS = 'components.d.ts';

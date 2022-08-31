@@ -66,7 +66,7 @@ describe('removeUnusedStyles', () => {
     expectNoSelector(css, '[dir="ltr"] h1+h3');
   });
 
-  it('should remove unused nested selectors', () => {
+  it('should remove all unused nested selectors', () => {
     const doc = mockDocument(`
       <html>
         <head>

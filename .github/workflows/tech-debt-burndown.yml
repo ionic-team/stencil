@@ -1,0 +1,157 @@
+name: Tech Debt Burndown
+# this workflow is for reporting on various metrics for the codebase that
+# we want to pay attention to. Generally these are checks of some sort that we'll
+# want to eventually 'graduate' to full CI checks (which cause builds to fail if
+# there are any errors) once we've eliminated all the problems, but until that
+# point we run them here, separate from the main build, and write a report on our
+# progress on them to each PR.
+
+on:
+  pull_request_target:
+    branches:
+      - '**'
+
+jobs:
+  strict_null_check: # TODO(STENCIL-446): Remove this workflow once `strictNullChecks` is enabled
+    strategy:
+      matrix:
+        branch: [ 'main', 'pr' ]
+    name: 'Get strictNullChecks errors on ${{ matrix.branch }}'
+    runs-on: 'ubuntu-latest'
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # v2.4.0
+        with:
+          ref: main
+        if: ${{ matrix.branch == 'main' }}
+
+      - name: Checkout PR branch
+        uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # v2.4.0
+        with:
+          # the pull_request_target event will consider the HEAD of `main` to be the SHA to use.
+          # attempt to use the SHA associated with a pull request and fallback to HEAD of `main`
+          ref: ${{ github.event_name == 'pull_request_target' && format('refs/pull/{0}/merge', github.event.number) || '' }}
+          persist-credentials: false
+        if: ${{ matrix.branch == 'pr' }}
+
+      - name: Get Core Dependencies
+        uses: ./.github/workflows/actions/get-core-dependencies
+
+      - name: Install tsc-output-parser
+        run: npm install @aivenio/tsc-output-parser@2.1.1
+
+      - name: Run Typescript compiler and generate JSON-formatted error file
+        run: npx tsc --strictNullChecks --noEmit --pretty false | npx tsc-output-parser > null_errors_${{ matrix.branch }}.json
+
+      - name: Upload null_errors_${{ matrix.branch }}.json
+        uses: actions/upload-artifact@6673cd052c4cd6fcf4b4e6e60ea986c889389535 # v3.0.0
+        with:
+          name: null_errors_${{ matrix.branch }}
+          path: 'null_errors_${{ matrix.branch }}.json'
+
+  # TODO(STENCIL-454): Remove or change this up once we've eliminated unused exports
+  unused_exports_check:
+    strategy:
+      matrix:
+        branch: [ 'main', 'pr' ]
+    name: Find unused variables on ${{ matrix.branch }}
+    runs-on: 'ubuntu-latest'
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # v2.4.0
+        with:
+          ref: main
+        if: ${{ matrix.branch == 'main' }}
+
+      - name: Checkout PR branch
+        uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # v2.4.0
+        with:
+          # the pull_request_target event will consider the HEAD of `main` to be the SHA to use.
+          # attempt to use the SHA associated with a pull request and fallback to HEAD of `main`
+          ref: ${{ github.event_name == 'pull_request_target' && format('refs/pull/{0}/merge', github.event.number) || '' }}
+          persist-credentials: false
+        if: ${{ matrix.branch == 'pr' }}
+
+      - name: Install ts-prune
+        run: npm install ts-prune@0.10.3
+
+      - name: Run ts-prune and write output to disk
+        run: npx ts-prune > unused-exports-${{ matrix.branch }}.txt
+
+      - name: Upload unused exports
+        uses: actions/upload-artifact@6673cd052c4cd6fcf4b4e6e60ea986c889389535 # v3.0.0
+        with:
+          name: unused-exports-${{ matrix.branch }}
+          path: 'unused-exports-${{ matrix.branch }}.txt'
+
+  format_report:
+    needs: [ "strict_null_check", "unused_exports_check" ]
+    name: Download error files and report
+    runs-on: 'ubuntu-latest'
+    steps:
+      - name: Checkout current branch
+        uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # v2.4.0
+        with:
+          # the pull_request_target event will consider the HEAD of `main` to be the SHA to use.
+          # attempt to use the SHA associated with a pull request and fallback to HEAD of `main`
+          ref: ${{ github.event_name == 'pull_request_target' && format('refs/pull/{0}/merge', github.event.number) || '' }}
+          persist-credentials: false
+
+      - name: Get Core Dependencies
+        uses: ./.github/workflows/actions/get-core-dependencies
+
+      # TODO(STENCIL-446): Remove this workflow once `strictNullChecks` is enabled
+      - name: Download null errors file for main branch
+        uses: actions/download-artifact@fb598a63ae348fa914e94cd0ff38f362e927b741 # v3.0.0
+        with:
+          name: null_errors_main
+
+      # TODO(STENCIL-446): Remove this workflow once `strictNullChecks` is enabled
+      - name: Download null errors file for PR
+        uses: actions/download-artifact@fb598a63ae348fa914e94cd0ff38f362e927b741 # v3.0.0
+        with:
+          name: null_errors_pr
+
+      # TODO(STENCIL-454): Remove or change this up once we've eliminated unused exports
+      - name: Download unused exports for main
+        uses: actions/download-artifact@fb598a63ae348fa914e94cd0ff38f362e927b741 # v3.0.0
+        with:
+          name: unused-exports-main
+
+      # TODO(STENCIL-454): Remove or change this up once we've eliminated unused exports
+      - name: Download unused exports for PR
+        uses: actions/download-artifact@fb598a63ae348fa914e94cd0ff38f362e927b741 # v3.0.0
+        with:
+          name: unused-exports-pr
+
+      - name: Compile scripts
+        run: node scripts --prepare
+
+      - name: Set action output
+        run: node scripts/build/tech-debt-burndown-report.js > $GITHUB_STEP_SUMMARY
+
+       # for syntax information, see https://github.com/peter-evans/create-or-update-comment#setting-the-comment-body-from-a-file
+      - name: Set comment body
+        id: set-comment-body
+        run: |
+          body=$(node scripts/build/tech-debt-burndown-report.js)
+          body="${body//'%'/'%25'}"
+          body="${body//$'\n'/'%0A'}"
+          body="${body//$'\r'/'%0D'}"
+          echo ::set-output name=body::$body
+
+      - name: Find Comment
+        uses: peter-evans/find-comment@1769778a0c5bd330272d749d12c036d65e70d39d # v2.0.0
+        id: fc
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: 'github-actions[bot]'
+          body-includes: '### `--strictNullChecks` error report'
+
+      - name: Create or update comment
+        uses: peter-evans/create-or-update-comment@c9fcb64660bc90ec1cc535646af190c992007c32 # v2.0.0
+        with:
+          comment-id: ${{ steps.fc.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body: ${{ steps.set-comment-body.outputs.body }}
+          edit-mode: replace

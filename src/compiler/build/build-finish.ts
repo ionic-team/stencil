@@ -5,7 +5,12 @@ import { isFunction, isRemoteUrl } from '@utils';
 import { IS_NODE_ENV } from '../sys/environment';
 import { relative } from 'path';
 
-export const buildFinish = async (buildCtx: d.BuildCtx) => {
+/**
+ * Finish a build as having completed successfully
+ * @param buildCtx the build context for the build being aborted
+ * @returns the build results
+ */
+export const buildFinish = async (buildCtx: d.BuildCtx): Promise<d.CompilerBuildResults> => {
   const results = await buildDone(buildCtx.config, buildCtx.compilerCtx, buildCtx, false);
 
   const buildLog: d.BuildLog = {
@@ -19,11 +24,30 @@ export const buildFinish = async (buildCtx: d.BuildCtx) => {
   return results;
 };
 
-export const buildAbort = (buildCtx: d.BuildCtx) => {
+/**
+ * Finish a build early due to failure. During the build process, a fatal error has occurred where the compiler cannot
+ * continue further
+ * @param buildCtx the build context for the build being aborted
+ * @returns the build results
+ */
+export const buildAbort = (buildCtx: d.BuildCtx): Promise<d.CompilerBuildResults> => {
   return buildDone(buildCtx.config, buildCtx.compilerCtx, buildCtx, true);
 };
 
-const buildDone = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, aborted: boolean) => {
+/**
+ * Mark a build as done
+ * @param config the Stencil configuration used for the build
+ * @param compilerCtx the compiler context associated with the build
+ * @param buildCtx the build context associated with the build to mark as done
+ * @param aborted true if the build ended early due to failure, false otherwise
+ * @returns the build results
+ */
+const buildDone = async (
+  config: d.Config,
+  compilerCtx: d.CompilerCtx,
+  buildCtx: d.BuildCtx,
+  aborted: boolean
+): Promise<d.CompilerBuildResults> => {
   if (buildCtx.hasFinished && buildCtx.buildResults) {
     // we've already marked this build as finished and
     // already created the build results, just return these
@@ -45,7 +69,7 @@ const buildDone = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx:
   if (!buildCtx.hasFinished) {
     // haven't set this build as finished yet
     if (!buildCtx.hasPrintedResults) {
-      cleanDiagnostics(config, buildCtx.buildResults.diagnostics);
+      cleanDiagnosticsRelativePath(config, buildCtx.buildResults.diagnostics);
       config.logger.printDiagnostics(buildCtx.buildResults.diagnostics);
     }
 
@@ -56,7 +80,7 @@ const buildDone = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx:
       logHmr(config.logger, buildCtx);
     }
 
-    // create a nice pretty message stating what happend
+    // create a nice pretty message stating what happened
     const buildText = buildCtx.isRebuild ? 'rebuild' : 'build';
     const watchText = config.watch ? ', watching for changes...' : '';
     let buildStatus = 'finished';
@@ -156,7 +180,12 @@ const cleanupUpdateMsg = (logger: d.Logger, msg: string, fileNames: string[]) =>
   }
 };
 
-const cleanDiagnostics = (config: d.Config, diagnostics: d.Diagnostic[]) => {
+/**
+ * Update the relative file path for diagnostics. The updates are done in place.
+ * @param config the Stencil configuration associated with the current build
+ * @param diagnostics the diagnostics to update
+ */
+const cleanDiagnosticsRelativePath = (config: d.Config, diagnostics: ReadonlyArray<d.Diagnostic>): void => {
   diagnostics.forEach((diagnostic) => {
     if (!diagnostic.relFilePath && !isRemoteUrl(diagnostic.absFilePath) && diagnostic.absFilePath && config.rootDir) {
       diagnostic.relFilePath = relative(config.rootDir, diagnostic.absFilePath);

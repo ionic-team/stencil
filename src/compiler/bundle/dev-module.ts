@@ -4,10 +4,11 @@ import { BuildContext } from '../build/build-ctx';
 import { getRollupOptions } from './bundle-output';
 import { OutputOptions, PartialResolvedId, rollup } from 'rollup';
 import { generatePreamble } from '@utils';
+import { InMemoryFileSystem } from '../sys/in-memory-fs';
 
 export const devNodeModuleResolveId = async (
   config: d.Config,
-  inMemoryFs: d.InMemoryFileSystem,
+  inMemoryFs: InMemoryFileSystem,
   resolvedId: PartialResolvedId,
   importee: string
 ) => {
@@ -56,7 +57,11 @@ const getPackageJsonPath = (resolvedPath: string, importee: string): string => {
   return null;
 };
 
-export const compilerRequest = async (config: d.Config, compilerCtx: d.CompilerCtx, data: d.CompilerRequest) => {
+export const compilerRequest = async (
+  config: d.ValidatedConfig,
+  compilerCtx: d.CompilerCtx,
+  data: d.CompilerRequest
+) => {
   const results: d.CompilerRequestResponse = {
     path: data.path,
     nodeModuleId: null,
@@ -111,9 +116,9 @@ export const compilerRequest = async (config: d.Config, compilerCtx: d.CompilerC
       results.status = 400;
       return results;
     }
-  } catch (e) {
+  } catch (e: unknown) {
     if (e) {
-      if (e.stack) {
+      if (e instanceof Error && e.stack) {
         results.content = `/*\n${e.stack}\n*/`;
       } else {
         results.content = `/*\n${e}\n*/`;
@@ -126,7 +131,7 @@ export const compilerRequest = async (config: d.Config, compilerCtx: d.CompilerC
 };
 
 const bundleDevModule = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   parsedUrl: ParsedDevModuleUrl,
   results: d.CompilerRequestResponse
@@ -165,7 +170,8 @@ const bundleDevModule = async (
     }
   } catch (e) {
     results.status = 500;
-    results.content = `console.error(${JSON.stringify((e.stack || e) + '')})`;
+    const errorMsg = e instanceof Error ? e.stack : e + '';
+    results.content = `console.error(${JSON.stringify(errorMsg)})`;
   }
 };
 
@@ -217,7 +223,7 @@ const parseDevModuleUrl = (config: d.Config, u: string) => {
     let reqPath = basename(url.pathname);
     reqPath = reqPath.substring(0, reqPath.length - 3);
 
-    let splt = reqPath.split('@');
+    const splt = reqPath.split('@');
     if (splt.length === 2) {
       parsedUrl.nodeModuleId = decodeURIComponent(splt[0]);
       parsedUrl.nodeModuleVersion = decodeURIComponent(splt[1]);

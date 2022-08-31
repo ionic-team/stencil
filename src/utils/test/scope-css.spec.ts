@@ -59,7 +59,7 @@ describe('ShadowCss', function () {
     expect(s(css, 'a')).toEqual(expected);
   });
 
-  it('should support newlines in the selector and content ', () => {
+  it('should support newlines in the selector and content', () => {
     const css = 'one, \ntwo {\ncolor: red;}';
     const expected = 'one.a, two.a {color:red;}';
     expect(s(css, 'a')).toEqual(expected);
@@ -143,6 +143,15 @@ describe('ShadowCss', function () {
     expect(s('[is="one"] {}', 'a')).toEqual('[is="one"].a {}');
   });
 
+  it('should handle escaped ":" in selector', () => {
+    expect(s('\\:one {}', 'a')).toEqual('\\:one.a {}');
+    expect(s('one\\:two {}', 'a')).toEqual('one\\:two.a {}');
+    expect(s('one\\:two:hover {}', 'a')).toEqual('one\\:two.a:hover {}');
+    expect(s('one\\:two::before {}', 'a')).toEqual('one\\:two.a::before {}');
+    expect(s('one\\:two::before:hover {}', 'a')).toEqual('one\\:two.a::before:hover {}');
+    expect(s('one\\:two:not(.three\\:four) {}', 'a')).toEqual('one\\:two.a:not(.three\\:four) {}');
+  });
+
   describe(':host', () => {
     it('should handle no context, commentOriginalSelector', () => {
       expect(s(':host {}', 'a', true)).toEqual('/*!@:host*/.a-h {}');
@@ -165,7 +174,7 @@ describe('ShadowCss', function () {
       expect(s(':host([a=b]) {}', 'a')).toEqual('[a="b"].a-h {}');
     });
 
-    it('should handle multiple tag selectors', () => {
+    it('should handle multiple tag selectors, commenting the original selector', () => {
       expect(s(':host(ul,li) {}', 'a', true)).toEqual('/*!@:host(ul,li)*/ul.a-h, li.a-h {}');
       expect(s(':host(ul,li) > .z {}', 'a', true)).toEqual('/*!@:host(ul,li) > .z*/ul.a-h > .z.a, li.a-h > .z.a {}');
     });
@@ -182,10 +191,6 @@ describe('ShadowCss', function () {
 
     it('should handle multiple attribute selectors', () => {
       expect(s(':host([a="b"],[c=d]) {}', 'a')).toEqual('[a="b"].a-h, [c="d"].a-h {}');
-    });
-
-    it('should handle multiple attribute selectors, commentOriginalSelector', () => {
-      expect(s(':host([a="b"],[c=d]) {}', 'a', true)).toEqual('/*!@:host([a="b"],[c=d])*/[a="b"].a-h, [c="d"].a-h {}');
     });
 
     it('should handle multiple attribute selectors, commentOriginalSelector', () => {

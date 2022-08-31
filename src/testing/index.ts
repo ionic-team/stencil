@@ -8,9 +8,12 @@ export {
   mockConfig,
   mockCompilerCtx,
   mockDocument,
+  mockLoadConfigInit,
+  mockValidatedConfig,
   mockLogger,
-  mockStencilSystem,
+  mockCompilerSystem,
   mockWindow,
+  mockModule,
 } from './mocks';
 export {
   MockHeaders,

@@ -124,7 +124,7 @@ export async function newE2EPage(opts: NewE2EPageOptions = {}): Promise<E2EPage>
           location: ev.location().url,
         });
         if (failOnConsoleError) {
-          fail(new Error(serializeConsoleMessage(ev)));
+          throw new Error(serializeConsoleMessage(ev));
         }
       }
       consoleMessage(ev);
@@ -135,7 +135,7 @@ export async function newE2EPage(opts: NewE2EPageOptions = {}): Promise<E2EPage>
         message: err.message,
         location: err.stack,
       });
-      fail(err);
+      throw err;
     });
     page.on('requestfailed', (req) => {
       diagnostics.push({
@@ -144,7 +144,7 @@ export async function newE2EPage(opts: NewE2EPageOptions = {}): Promise<E2EPage>
         location: req.url(),
       });
       if (failOnNetworkError) {
-        fail(new Error(req.failure().errorText));
+        throw new Error(req.failure().errorText);
       } else {
         console.error('requestfailed', req.url());
       }

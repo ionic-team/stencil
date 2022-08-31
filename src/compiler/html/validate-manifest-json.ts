@@ -3,7 +3,7 @@ import { buildError, buildJsonFileError } from '@utils';
 import { dirname, join } from 'path';
 import { isOutputTargetWww } from '../output-targets/output-utils';
 
-export const validateManifestJson = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
+export const validateManifestJson = (config: d.ValidatedConfig, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   if (config.devMode) {
     return null;
   }
@@ -60,7 +60,7 @@ const validateManifestJsonIcon = async (
   }
 
   if (iconSrc.startsWith('/')) {
-    iconSrc = iconSrc.substr(1);
+    iconSrc = iconSrc.slice(1);
   }
 
   const manifestDir = dirname(manifestFilePath);

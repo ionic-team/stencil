@@ -3,6 +3,7 @@ import { createSystem } from '../../../compiler/sys/stencil-sys';
 import { loadConfig } from '../load-config';
 import { normalizePath } from '../../../utils';
 import path from 'path';
+import { ConfigFlags } from '../../../cli/config-flags';
 
 describe('load config', () => {
   const configPath = require.resolve('./fixtures/stencil.config.ts');
@@ -21,8 +22,8 @@ describe('load config', () => {
     sys.writeFileSync(indexPath, `console.log('fixture');`);
   });
 
-  it('merge users config', async () => {
-    const c = await loadConfig({
+  it("merges a user's configuration with a stencil.config file on disk", async () => {
+    const loadedConfig = await loadConfig({
       configPath: configPath2,
       sys,
       config: {
@@ -30,40 +31,97 @@ describe('load config', () => {
       },
       initTsConfig: true,
     });
-    expect(c.diagnostics).toHaveLength(0);
-    expect(c.config).toBeDefined();
-    expect(c.config.hashedFileNameLength).toBe(9);
+
+    expect(loadedConfig.diagnostics).toHaveLength(0);
+
+    const actualConfig = loadedConfig.config;
+    // this field is defined on the `init` argument, and should override the value found in the config on disk
+    expect(actualConfig).toBeDefined();
+    expect(actualConfig.hashedFileNameLength).toEqual(9);
+    // these fields are defined in the config file on disk, and should be present
+    expect<ConfigFlags>(actualConfig.flags).toEqual({ dev: true });
+    expect(actualConfig.extras).toBeDefined();
+    expect(actualConfig.extras!.experimentalImportInjection).toBe(true);
   });
 
-  it('read fixture configPath', async () => {
-    const c = await loadConfig({
+  it('uses the provided config path when no initial config provided', async () => {
+    const loadedConfig = await loadConfig({
       configPath,
       sys,
       initTsConfig: true,
     });
-    expect(c.diagnostics).toHaveLength(0);
-    expect(c.config.configPath).toBe(normalizePath(configPath));
-    expect(c.config).toBeDefined();
-    expect(c.config.hashedFileNameLength).toBe(13);
+
+    expect(loadedConfig.diagnostics).toHaveLength(0);
+
+    const actualConfig = loadedConfig.config;
+    expect(actualConfig).toBeDefined();
+    // set the config path based on the one provided in the init object
+    expect(actualConfig.configPath).toBe(normalizePath(configPath));
+    // this field is defined in the config file on disk, and should be present
+    expect(actualConfig.hashedFileNameLength).toBe(13);
+    // this field should default to an empty object literal, since it wasn't present in the config file
+    expect<ConfigFlags>(actualConfig.flags).toEqual({});
   });
 
-  it('empty init, no error cuz created tsconfig, warn no files', async () => {
-    const c = await loadConfig({ initTsConfig: true });
-    expect(c.diagnostics.filter((d) => d.level === 'error')).toHaveLength(0);
-    expect(c.diagnostics.filter((d) => d.level === 'warn')).toHaveLength(1);
-    expect(c.config).toBeDefined();
-    expect(c.config.sys).toBeDefined();
-    expect(c.config.logger).toBeDefined();
-    expect(c.config.configPath).toBe(null);
+  describe('empty initialization argument', () => {
+    it('provides sensible default values with no config', async () => {
+      const loadedConfig = await loadConfig({ initTsConfig: true });
+
+      const actualConfig = loadedConfig.config;
+      expect(actualConfig).toBeDefined();
+      expect(actualConfig.sys).toBeDefined();
+      expect(actualConfig.logger).toBeDefined();
+      expect(actualConfig.configPath).toBe(null);
+    });
+
+    it('warns that a tsconfig file could not be found when "initTsConfig" set', async () => {
+      const loadedConfig = await loadConfig({ initTsConfig: true });
+
+      expect(loadedConfig.diagnostics).toHaveLength(1);
+      expect<d.Diagnostic>(loadedConfig.diagnostics[0]).toEqual({
+        absFilePath: '/tsconfig.json',
+        code: '18003',
+        header: 'TypeScript',
+        language: 'typescript',
+        level: 'warn',
+        lines: [],
+        messageText:
+          "No inputs were found in config file '/tsconfig.json'. Specified 'include' paths were '[\"src\"]' and 'exclude' paths were '[]'.",
+        relFilePath: null,
+        type: 'typescript',
+      });
+    });
+
+    it('errors that a tsconfig file could not be created when "initTsConfig" isn\'t present', async () => {
+      const loadedConfig = await loadConfig({});
+      expect(loadedConfig.diagnostics).toHaveLength(1);
+      expect<d.Diagnostic>(loadedConfig.diagnostics[0]).toEqual({
+        absFilePath: null,
+        header: 'Missing tsconfig.json',
+        level: 'error',
+        lines: [],
+        messageText:
+          'Unable to load TypeScript config file. Please create a "tsconfig.json" file within the "/" directory.',
+        relFilePath: null,
+        type: 'build',
+      });
+    });
   });
 
-  it('empty init, error cuz didnt auto create tsconfig', async () => {
-    const c = await loadConfig({});
-    expect(c.diagnostics).toHaveLength(1);
-  });
-
-  it('no init', async () => {
-    const c = await loadConfig();
-    expect(c.diagnostics).toHaveLength(1);
+  describe('no initialization argument', () => {
+    it('errors that a tsconfig file could not be created', async () => {
+      const loadConfigResults = await loadConfig();
+      expect(loadConfigResults.diagnostics).toHaveLength(1);
+      expect<d.Diagnostic>(loadConfigResults.diagnostics[0]).toEqual({
+        absFilePath: null,
+        header: 'Missing tsconfig.json',
+        level: 'error',
+        lines: [],
+        messageText:
+          'Unable to load TypeScript config file. Please create a "tsconfig.json" file within the "/" directory.',
+        relFilePath: null,
+        type: 'build',
+      });
+    });
   });
 });

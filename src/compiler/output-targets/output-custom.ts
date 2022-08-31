@@ -3,7 +3,7 @@ import { catchError } from '@utils';
 import { isOutputTargetCustom } from './output-utils';
 
 export const outputCustom = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   docs: d.JsonDocs,
@@ -19,7 +19,7 @@ export const outputCustom = async (
       const timespan = buildCtx.createTimeSpan(`generating ${o.name} started`);
       try {
         await o.generator(config, compilerCtx, buildCtx, docs);
-      } catch (e) {
+      } catch (e: any) {
         catchError(buildCtx.diagnostics, e);
       }
       timespan.finish(`generate ${o.name} finished`);

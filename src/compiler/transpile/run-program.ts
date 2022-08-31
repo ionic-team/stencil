@@ -16,7 +16,7 @@ export const runTsProgram = async (
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   tsBuilder: ts.BuilderProgram
-) => {
+): Promise<boolean> => {
   const tsSyntactic = loadTypeScriptDiagnostics(tsBuilder.getSyntacticDiagnostics());
   const tsGlobal = loadTypeScriptDiagnostics(tsBuilder.getGlobalDiagnostics());
   const tsOptions = loadTypeScriptDiagnostics(tsBuilder.getOptionsDiagnostics());
@@ -114,7 +114,7 @@ export const runTsProgram = async (
   return false;
 };
 
-const getRelativeDts = (config: d.Config, srcPath: string, emitDtsPath: string) => {
+const getRelativeDts = (config: d.Config, srcPath: string, emitDtsPath: string): string => {
   const parts: string[] = [];
   for (let i = 0; i < 30; i++) {
     if (config.srcDir === srcPath) {
@@ -126,5 +126,5 @@ const getRelativeDts = (config: d.Config, srcPath: string, emitDtsPath: string) 
     emitDtsPath = join(emitDtsPath, '..');
     srcPath = normalizePath(join(srcPath, '..'));
   }
-  return join.apply(null, parts.reverse());
+  return join(...parts.reverse());
 };

@@ -16,7 +16,7 @@ import { rollup } from 'rollup';
 import { join } from 'path';
 
 export const generateHydrateApp = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   outputTargets: d.OutputTargetHydrate[]
@@ -63,14 +63,16 @@ export const generateHydrateApp = async (
     });
 
     await writeHydrateOutputs(config, compilerCtx, buildCtx, outputTargets, rollupOutput);
-  } catch (e) {
+  } catch (e: any) {
     if (!buildCtx.hasError) {
+      // TODO(STENCIL-353): Implement a type guard that balances using our own copy of Rollup types (which are
+      // breakable) and type safety (so that the error variable may be something other than `any`)
       loadRollupDiagnostics(config, compilerCtx, buildCtx, e);
     }
   }
 };
 
-const generateHydrateFactory = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
+const generateHydrateFactory = async (config: d.ValidatedConfig, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   if (!buildCtx.hasError) {
     try {
       const cmps = buildCtx.components;
@@ -93,7 +95,7 @@ const generateHydrateFactory = async (config: d.Config, compilerCtx: d.CompilerC
           return rollupOutput.output[0].code;
         }
       }
-    } catch (e) {
+    } catch (e: any) {
       catchError(buildCtx.diagnostics, e);
     }
   }
@@ -119,7 +121,7 @@ const generateHydrateFactoryEntry = async (buildCtx: d.BuildCtx) => {
   return s.toString();
 };
 
-const getHydrateBuildConditionals = (config: d.Config, cmps: d.ComponentCompilerMeta[]) => {
+const getHydrateBuildConditionals = (config: d.ValidatedConfig, cmps: d.ComponentCompilerMeta[]) => {
   const build = getBuildFeatures(cmps) as d.BuildConditionals;
 
   build.lazyLoad = true;

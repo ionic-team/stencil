@@ -1,16 +1,18 @@
+/* eslint-disable jest/no-test-prefixes, jest/no-commented-out-tests, jest/expect-expect -- this file needs to be brought up to date at some point */
+// TODO(STENCIL-487): Investigate reviving this test file
 import type * as d from '@stencil/core/declarations';
-import { createCompiler, validateConfig } from '@stencil/core/compiler';
-import { mockConfig, mockLogger, mockStencilSystem } from '@stencil/core/testing';
+import { createCompiler } from '@stencil/core/compiler';
+import { mockCompilerSystem, mockLoadConfigInit } from '@stencil/core/testing';
 import path from 'path';
+import { validateConfig } from '../../config/validate-config';
 
 xdescribe('component-styles', () => {
   jest.setTimeout(20000);
   let compiler: d.Compiler;
   const root = path.resolve('/');
-  const logger = mockLogger();
 
   beforeEach(async () => {
-    const sys: d.CompilerSystem = mockStencilSystem() as any;
+    const sys: d.CompilerSystem = mockCompilerSystem() as any;
     await sys.writeFile(
       '/tsconfig.json',
       `
@@ -32,12 +34,14 @@ xdescribe('component-styles', () => {
     `
     );
 
-    const { config, diagnostics } = validateConfig({
-      rootDir: '/',
-      tsconfig: '/tsconfig.json',
-    });
+    const { config } = validateConfig(
+      {
+        rootDir: '/',
+        tsconfig: '/tsconfig.json',
+      },
+      mockLoadConfigInit()
+    );
     config.sys = sys;
-    console.log(diagnostics);
     compiler = await createCompiler(config);
 
     // const testingConfig = mockConfig(sys);

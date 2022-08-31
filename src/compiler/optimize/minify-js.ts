@@ -45,7 +45,9 @@ export const minifyJs = async (input: string, opts?: MinifyOptions): Promise<d.O
       results.output = results.output.substring(0, results.output.length - 1);
     }
   } catch (e) {
-    console.log(e.stack);
+    if (e instanceof Error) {
+      console.log(e.stack);
+    }
     loadMinifyJsDiagnostics(input, results.diagnostics, e);
   }
 
@@ -89,7 +91,7 @@ const loadMinifyJsDiagnostics = (sourceText: string, diagnostics: d.Diagnostic[]
     d.lineNumber = errorLine.lineNumber;
     d.columnNumber = errorLine.errorCharStart;
 
-    const highlightLine = errorLine.text.substr(d.columnNumber);
+    const highlightLine = errorLine.text.slice(d.columnNumber);
     for (let i = 0; i < highlightLine.length; i++) {
       if (MINIFY_CHAR_BREAK.has(highlightLine.charAt(i))) {
         break;

@@ -34,7 +34,7 @@ const updateLazyComponentMembers = (
   transformHostData(classMembers, moduleFile);
 
   if (transformOpts.style === 'static') {
-    addStaticStylePropertyToClass(styleStatements, cmp, false);
+    addStaticStylePropertyToClass(styleStatements, cmp);
   }
 
   return classMembers;

@@ -10,7 +10,7 @@ import { writeBuild } from './write-build';
 import ts from 'typescript';
 
 export const build = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   tsBuilder: ts.BuilderProgram
@@ -55,7 +55,7 @@ export const build = async (
     // write outputs
     await buildCtx.stylesPromise;
     await writeBuild(config, compilerCtx, buildCtx);
-  } catch (e) {
+  } catch (e: any) {
     // ¯\_(ツ)_/¯
     catchError(buildCtx.diagnostics, e);
   }

@@ -1,6 +1,7 @@
 import { MockDocument } from './document';
 import { MockElement } from './node';
 import { NODE_NAMES } from './constants';
+import { MockWindow } from './window';
 
 export class MockEvent {
   bubbles = false;
@@ -36,6 +37,27 @@ export class MockEvent {
 
   stopImmediatePropagation() {
     this.cancelBubble = true;
+  }
+
+  composedPath(): MockElement[] {
+    const composedPath: MockElement[] = [];
+
+    let currentElement = this.target;
+
+    while (currentElement) {
+      composedPath.push(currentElement);
+
+      if (!currentElement.parentElement && currentElement.nodeName === NODE_NAMES.DOCUMENT_NODE) {
+        // the current element doesn't have a parent, but we've detected it's our root document node. push the window
+        // object associated with the document onto the path
+        composedPath.push((currentElement as MockDocument).defaultView);
+        break;
+      }
+
+      currentElement = currentElement.parentElement;
+    }
+
+    return composedPath;
   }
 }
 
@@ -88,6 +110,31 @@ export class MockMouseEvent extends MockEvent {
 
     if (mouseEventInitDic != null) {
       Object.assign(this, mouseEventInitDic);
+    }
+  }
+}
+
+export class MockUIEvent extends MockEvent {
+  detail: number | null = null;
+  view: MockWindow | null = null;
+
+  constructor(type: string, uiEventInitDic?: UIEventInit) {
+    super(type);
+
+    if (uiEventInitDic != null) {
+      Object.assign(this, uiEventInitDic);
+    }
+  }
+}
+
+export class MockFocusEvent extends MockUIEvent {
+  relatedTarget: EventTarget | null = null;
+
+  constructor(type: 'blur' | 'focus', focusEventInitDic?: FocusEventInit) {
+    super(type);
+
+    if (focusEventInitDic != null) {
+      Object.assign(this, focusEventInitDic);
     }
   }
 }

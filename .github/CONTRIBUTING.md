@@ -5,7 +5,7 @@ Thanks for your interest in contributing to Stencil! :tada:
 
 ## Contributing Etiquette
 
-Please see our [Contributor Code of Conduct](https://github.com/ionic-team/stencil/blob/master/CODE_OF_CONDUCT.md) for information on our rules of conduct.
+Please see our [Contributor Code of Conduct](https://github.com/ionic-team/stencil/blob/main/CODE_OF_CONDUCT.md) for information on our rules of conduct.
 
 
 ## Creating an Issue
@@ -16,7 +16,7 @@ Please see our [Contributor Code of Conduct](https://github.com/ionic-team/stenc
 
 * The issue list of this repository is exclusively for bug reports and feature requests. Non-conforming issues will be closed immediately.
 
-* Issues with no clear steps to reproduce will not be triaged. If an issue is labeled with "needs reply" and receives no further replies from the author of the issue for more than 5 days, it will be closed.
+* Issues with no clear steps to reproduce will not be triaged. If an issue is labeled with "Awaiting Reply" and receives no further replies from the author of the issue for more than 5 days, it will be closed.
 
 * If you think you have found a bug, or have a new feature idea, please start by making sure it hasn't already been [reported](https://github.com/ionic-team/stencil/issues?utf8=%E2%9C%93&q=is%3Aissue). You can search through existing issues to see if there is a similar one reported. Include closed issues as it may have been closed with a solution.
 
@@ -27,14 +27,16 @@ Please see our [Contributor Code of Conduct](https://github.com/ionic-team/stenc
 
 * We appreciate you taking the time to contribute! Before submitting a pull request, we ask that you please [create an issue](#creating-an-issue) that explains the bug or feature request and let us know that you plan on creating a pull request for it. If an issue already exists, please comment on that issue letting us know you would like to submit a pull request for it. This helps us to keep track of the pull request and make sure there isn't duplicated effort.
 
-* Looking for an issue to fix? Make sure to look through our issues with the [help wanted](https://github.com/ionic-team/stencil/issues?q=is%3Aopen+is%3Aissue+label%3A%22help+wanted%22) label!
-
 ### Setup
 
 1. Fork the repo.
 2. Clone your fork.
 3. Make a branch for your change.
-4. Run `npm install` (make sure you have [node](https://nodejs.org/en/) and [npm](http://blog.npmjs.org/post/85484771375/how-to-install-npm) installed first)
+4. Stencil uses [volta](volta.sh) to manage its npm and Node versions. 
+   [Install it](https://docs.volta.sh/guide/getting-started) before proceeding.
+   1. There's no need to install a specific version of npm or Node right now, it shall be done automatically for you in
+      the next step
+5. Run `npm install`
 
 
 ### Updates
@@ -93,6 +95,54 @@ Note that this method of testing is far more laborious than using `npm link`, an
 Afterwards, to clean up:
 
 1. In the directory of your stencil project, run `npm install --save-dev stencil@<VERSION>` for the `<VERSION>` of Stencil core that was installed in your project prior to testing. 
+
+### Debugging the Stencil Compiler
+
+The Stencil compiler itself can be run through a debugger, as opposed to running a Stencil project through a debugger.
+This allows individuals working on the compiler itself to inspect fields, trace execution, and more during the
+execution of a Stencil task (`build`, `test`, etc.).
+
+Support for this style of debugging is currently a work in progress and may not work for every aspect of the compiler.
+It is considered experimental and should not be relied on for any production means.
+
+At this time, it's recommended that the compiler be debugged by opening this project in your editor of choice. Please
+keep in mind that due to the number of possible development environment's that exist today, this guide may not include
+directions for every possible debugging environment.
+
+It is required that Stencil be built to run it through the debugger.
+
+Note that Stencil transpiles source code using multiple worker processes. If your debugger appears to 'hang' or get
+stuck, your debugger may not have switched to a worker process that has halted on a breakpoint. You may be able to
+avoid this altogether by setting `--max-workers=1` when you launch Stencil (with the possibility of not being able to
+reproduce timing issues between workers as a side effect).
+
+#### Debugging the Compiler in VSCode
+
+Two launch configurations for debugging the compiler can be found in the `.vscode/launch.json` configuration found in
+this repository:
+
+1. `debug stencil compiler (default config)` will run the compiler with the default Stencil configuration file
+(generated at runtime).
+2. `debug stencil compiler with stencil.config.ts` will run the compiler with a specific Stencil configuration file. 
+You will be prompted for the location of the Stencil project containing the configuration file to debug with before the
+debugger starts.
+
+#### Debugging the Compiler in JetBrains IDEs
+
+JetBrains does not provide means to store and reuse configuration templates at this time. By default, templates are
+created of a specific 'type', such as 'NodeJS'. JetBrains does not allow for greater than one template of a specific
+type to co-exist. In other words, creating a Stencil-debugger template would override other NodeJS templates in the IDE
+for the project.
+
+As a workaround, it is suggested that individuals create their own Run/Debug configurations. The following settings
+are recommended:
+
+Working directory: `~/workspaces/stencil`
+JavaScript file: `bin/stencil`
+Application parameters: `build --config=PATH_TO_STENCIL_PROJECT_TO_DEBUG`
+
+The `build` application parameter can be swapped with any of the supported Stencil CLI commands. If `--config` is
+omitted, Stencil will generate a default configuration file for you.
 
 ### Commit Message Format
 

@@ -1,4 +1,3 @@
-import fs from 'fs-extra';
 import color from 'ansi-colors';
 import execa from 'execa';
 import Listr, { ListrTask } from 'listr';
@@ -91,8 +90,8 @@ export function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<string>)
       title: 'Check current branch',
       task: () =>
         execa('git', ['symbolic-ref', '--short', 'HEAD']).then(({ stdout }) => {
-          if (stdout !== 'master' && !isAnyBranch) {
-            throw new Error('Not on `master` branch. Use --any-branch to publish anyway.');
+          if (stdout !== 'main' && !isAnyBranch) {
+            throw new Error('Not on `main` branch. Use --any-branch to publish anyway.');
           }
         }),
       skip: () => isDryRun,
@@ -171,7 +170,7 @@ export function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<string>)
         title: 'Publish @stencil/core to npm',
         task: () => {
           const cmd = 'npm';
-          const cmdArgs = ['publish'].concat(opts.tag ? ['--tag', opts.tag] : []);
+          const cmdArgs = ['publish', '--otp', opts.otp].concat(opts.tag ? ['--tag', opts.tag] : []);
 
           if (isDryRun) {
             return console.log(`[dry-run] ${cmd} ${cmdArgs.join(' ')}`);
@@ -216,21 +215,6 @@ export function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<string>)
         },
       }
     );
-
-    if (opts.tag !== 'next' && opts.tag !== 'test') {
-      tasks.push({
-        title: 'Also set "next" npm tag on @stencil/core',
-        task: () => {
-          const cmd = 'npm';
-          const cmdArgs = ['dist-tag', 'add', '@stencil/core@' + opts.version, 'next'];
-
-          if (isDryRun) {
-            return console.log(`[dry-run] ${cmd} ${cmdArgs.join(' ')}`);
-          }
-          return execa(cmd, cmdArgs, { cwd: rootDir });
-        },
-      });
-    }
   }
 
   if (opts.isPublishRelease) {

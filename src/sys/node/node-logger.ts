@@ -1,25 +1,45 @@
-import { createTerminalLogger, ColorType, TerminalLoggerSys } from '../../compiler/sys/logger/terminal-logger';
-import ansiColor from 'ansi-colors';
+import { Logger } from '../../declarations';
+import { createTerminalLogger, TerminalLoggerSys } from '../../compiler/sys/logger/terminal-logger';
 import fs from 'graceful-fs';
 import path from 'path';
 
-export const createNodeLogger = (c: { process: any }) => {
-  let useColors = true;
-  const prcs: NodeJS.Process = c.process;
-  const minColumns = 60;
-  const maxColumns = 120;
+/**
+ * Create a logger to run in a Node environment
+ * @param context a context with NodeJS specific details used to create the logger
+ * @returns the created logger
+ */
+export const createNodeLogger = (context: { process: NodeJS.Process }): Logger => {
+  const loggerSys = createNodeLoggerSys(context.process);
+  const logger = createTerminalLogger(loggerSys);
+  return logger;
+};
 
-  const color = (msg: string, colorType: ColorType) => (useColors ? (ansiColor as any)[colorType](msg) : msg);
-
+/**
+ * Create a logger sys object for use in a Node.js environment
+ *
+ * The `TerminalLoggerSys` interface basically abstracts away some
+ * environment-specific details so that the terminal logger can deal with
+ * things in a (potentially) platform-agnostic way.
+ *
+ * @param prcs the current node.js process object
+ * @returns a configured logger sys object
+ */
+export function createNodeLoggerSys(prcs: NodeJS.Process): TerminalLoggerSys {
   const cwd = () => prcs.cwd();
 
-  const emoji = (e: string) => (prcs.platform !== 'win32' ? e : '');
+  const emoji = (emoji: string) => (prcs.platform !== 'win32' ? emoji : '');
 
-  const enableColors = (uc: boolean) => (useColors = uc);
-
+  /**
+   * Get the number of columns for the terminal to use when printing
+   * @returns the number of columns to use
+   */
   const getColumns = () => {
-    const terminalWidth = (prcs.stdout && (prcs.stdout as any).columns) || 80;
-    return Math.max(Math.min(maxColumns, terminalWidth), minColumns);
+    const min_columns = 60;
+    const max_columns = 120;
+    const defaultWidth = 80;
+
+    const terminalWidth = prcs?.stdout?.columns ?? defaultWidth;
+    return Math.max(Math.min(terminalWidth, max_columns), min_columns);
   };
 
   const memoryUsage = () => prcs.memoryUsage().rss;
@@ -42,24 +62,11 @@ export const createNodeLogger = (c: { process: any }) => {
     }
   };
 
-  const loggerSys: TerminalLoggerSys = {
-    color,
-    cwd,
-    emoji,
-    enableColors,
-    getColumns,
-    memoryUsage,
-    relativePath,
-    writeLogs,
-  };
-
-  const logger = createTerminalLogger(loggerSys);
-
-  logger.createLineUpdater = async () => {
+  const createLineUpdater = async () => {
     const readline = await import('readline');
     let promise = Promise.resolve();
     const update = (text: string) => {
-      text = text.substr(0, prcs.stdout.columns - 5) + '\x1b[0m';
+      text = text.substring(0, prcs.stdout.columns - 5) + '\x1b[0m';
       return (promise = promise.then(() => {
         return new Promise<any>((resolve) => {
           readline.clearLine(prcs.stdout, 0);
@@ -81,5 +88,13 @@ export const createNodeLogger = (c: { process: any }) => {
     };
   };
 
-  return logger;
-};
+  return {
+    cwd,
+    emoji,
+    getColumns,
+    memoryUsage,
+    relativePath,
+    writeLogs,
+    createLineUpdater,
+  };
+}

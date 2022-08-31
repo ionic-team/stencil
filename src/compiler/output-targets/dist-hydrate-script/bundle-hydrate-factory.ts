@@ -9,7 +9,7 @@ import { STENCIL_INTERNAL_HYDRATE_ID } from '../../bundle/entry-alias-ids';
 import { updateStencilCoreImports } from '../../transformers/update-stencil-core-import';
 
 export const bundleHydrateFactory = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   _build: d.BuildConditionals,
@@ -32,15 +32,17 @@ export const bundleHydrateFactory = async (
 
     const rollupBuild = await bundleOutput(config, compilerCtx, buildCtx, bundleOpts);
     return rollupBuild;
-  } catch (e) {
+  } catch (e: any) {
     if (!buildCtx.hasError) {
+      // TODO(STENCIL-353): Implement a type guard that balances using our own copy of Rollup types (which are
+      // breakable) and type safety (so that the error variable may be something other than `any`)
       loadRollupDiagnostics(config, compilerCtx, buildCtx, e);
     }
   }
   return undefined;
 };
 
-const getHydrateCustomTransformer = (config: d.Config, compilerCtx: d.CompilerCtx) => {
+const getHydrateCustomTransformer = (config: d.ValidatedConfig, compilerCtx: d.CompilerCtx) => {
   const transformOpts: d.TransformOptions = {
     coreImportPath: STENCIL_INTERNAL_HYDRATE_ID,
     componentExport: null,

@@ -4,17 +4,33 @@ import { join } from 'path';
 import type { BuildOptions } from '../../utils/options';
 import { minify } from 'terser';
 
+/**
+ * Creates a rollup plugin to embed an optimized version of the TypeScript compiler into the Stencil compiler.
+ * @param opts the options being used during a build of the Stencil compiler
+ * @returns the plugin that adds a modified version of the TypeScript compiler into the generated output
+ */
 export function typescriptSourcePlugin(opts: BuildOptions): Plugin {
   const tsPath = require.resolve('typescript');
   return {
     name: 'typescriptSourcePlugin',
-    resolveId(id) {
+    /**
+     * A rollup build hook for resolving TypeScript relative to this project
+     * [Source](https://rollupjs.org/guide/en/#resolveid)
+     * @param id the importee exactly as it is written in an import statement in the source code
+     * @returns an object that resolves an import to a different id
+     */
+    resolveId(id: string): string | null {
       if (id === 'typescript') {
         return tsPath;
       }
       return null;
     },
-    load(id) {
+    /**
+     * A rollup build hook for loading the TypeScript compiler. [Source](https://rollupjs.org/guide/en/#load)
+     * @param id the path of the module to load
+     * @returns the TypeScript compiler source
+     */
+    load(id: string): Promise<string> | null {
       if (id === tsPath) {
         return bundleTypeScriptSource(tsPath, opts);
       }
@@ -23,7 +39,14 @@ export function typescriptSourcePlugin(opts: BuildOptions): Plugin {
   };
 }
 
-async function bundleTypeScriptSource(tsPath: string, opts: BuildOptions) {
+/**
+ * Bundles the TypeScript compiler in the Stencil output. This function also performs several optimizations and
+ * modifications to the TypeScript source.
+ * @param tsPath a path to the TypeScript compiler
+ * @param opts the options being used during a build of the Stencil compiler
+ * @returns the modified TypeScript source
+ */
+async function bundleTypeScriptSource(tsPath: string, opts: BuildOptions): Promise<string> {
   const fileName = `typescript-${opts.typescriptVersion.replace(/\./g, '_')}-bundle-cache${
     opts.isProd ? '.min' : ''
   }.js`;
@@ -38,7 +61,7 @@ async function bundleTypeScriptSource(tsPath: string, opts: BuildOptions) {
   let code = await fs.readFile(tsPath, 'utf8');
 
   // remove the default ts.getDefaultLibFilePath because it uses some
-  // node apis and we'll be replacing it withour own anyways and
+  // node apis and we'll be replacing it with our own anyways
   code = removeFromSource(code, `ts.getDefaultLibFilePath = getDefaultLibFilePath;`);
 
   // remove the CPUProfiler since it uses node apis
@@ -52,7 +75,7 @@ async function bundleTypeScriptSource(tsPath: string, opts: BuildOptions) {
     throw new Error(`"${tsEnding}" not found`);
   }
   const lastEnding = code.lastIndexOf(tsEnding);
-  code = code.substr(0, lastEnding + tsEnding.length);
+  code = code.slice(0, lastEnding + tsEnding.length);
 
   // there's a billion unnecessary "var ts;" for namespaces
   // but we'll be using the top level "const ts" instead
@@ -94,7 +117,13 @@ async function bundleTypeScriptSource(tsPath: string, opts: BuildOptions) {
   return code;
 }
 
-function removeFromSource(srcCode: string, removeCode: string) {
+/**
+ * Removes a specific section from the provided source code via commenting the offending code out
+ * @param srcCode the source code to modify
+ * @param removeCode the code to remove from the source
+ * @return the updated source code
+ */
+function removeFromSource(srcCode: string, removeCode: string): string {
   if (!srcCode.includes(removeCode)) {
     throw new Error(`"${removeCode}" not found`);
   }

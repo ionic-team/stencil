@@ -42,10 +42,10 @@ export class MockDocument extends MockHTMLElement {
     }
   }
 
-  get dir() {
+  override get dir() {
     return this.documentElement.dir;
   }
-  set dir(value: string) {
+  override set dir(value: string) {
     this.documentElement.dir = value;
   }
 
@@ -166,7 +166,7 @@ export class MockDocument extends MockHTMLElement {
     }
   }
 
-  appendChild(newNode: MockElement) {
+  override appendChild(newNode: MockElement) {
     newNode.remove();
     newNode.parentNode = this;
     this.childNodes.push(newNode);
@@ -222,14 +222,14 @@ export class MockDocument extends MockHTMLElement {
     return getElementsByName(this, elmName.toLowerCase());
   }
 
-  get title() {
+  override get title() {
     const title = this.head.childNodes.find((elm) => elm.nodeName === 'TITLE') as MockElement;
     if (title != null && typeof title.textContent === 'string') {
       return title.textContent.trim();
     }
     return '';
   }
-  set title(value: string) {
+  override set title(value: string) {
     const head = this.head;
     let title = head.childNodes.find((elm) => elm.nodeName === 'TITLE') as MockElement;
     if (title == null) {

@@ -1,4 +1,5 @@
-import type { CliInitOptions, CompilerSystem, Config, ConfigFlags, Logger, TaskCommand } from '@stencil/core/internal';
+import type { CliInitOptions, CompilerSystem, Config, Logger, TaskCommand } from '@stencil/core/internal';
+import type { ConfigFlags } from './config-flags';
 
 /**
  * Runs the CLI with the given options. This is used by Stencil's default `bin/stencil` file,
@@ -14,6 +15,7 @@ export declare function run(init: CliInitOptions): Promise<void>;
  */
 export declare function runTask(coreCompiler: any, config: Config, task: TaskCommand): Promise<void>;
 
-export declare function parseFlags(args: string[], sys?: CompilerSystem): ConfigFlags;
+// TODO(STENCIL-509): remove the _sys parameter here (for v3)
+export declare function parseFlags(args: string[], _sys?: CompilerSystem): ConfigFlags;
 
 export { CompilerSystem, Config, ConfigFlags, Logger, TaskCommand };

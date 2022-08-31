@@ -2,7 +2,7 @@ import type * as d from '@stencil/core/internal';
 import { runJest } from './jest-runner';
 import { join } from 'path';
 
-export async function runJestScreenshot(config: d.Config, env: d.E2EProcessEnv) {
+export async function runJestScreenshot(config: d.ValidatedConfig, env: d.E2EProcessEnv) {
   config.logger.debug(`screenshot connector: ${config.testing.screenshotConnector}`);
 
   const ScreenshotConnector = require(config.testing.screenshotConnector) as any;
@@ -82,7 +82,11 @@ export async function runJestScreenshot(config: d.Config, env: d.E2EProcessEnv) 
       }
     }
   } catch (e) {
-    config.logger.error(e, e.stack);
+    if (e instanceof Error) {
+      config.logger.error(e, e.stack);
+    } else {
+      config.logger.error(e);
+    }
   }
 
   return passed;

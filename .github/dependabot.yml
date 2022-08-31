@@ -1,0 +1,18 @@
+# Please see the documentation for all configuration options:
+# https://docs.github.com/github/administering-a-repository/configuration-options-for-dependency-updates
+
+version: 2
+updates:
+  - package-ecosystem: "npm" # See documentation for possible values
+    directory: "/" # Location of package manifests
+    schedule:
+      interval: "daily"
+    open-pull-requests-limit: 5
+    # Disable rebasing for pull requests, as having several open pull requests all get simultaneously rebased gets
+    # noisy from a notification standpoint
+    rebase-strategy: "disabled"
+    ignore:
+      - dependency-name: "@types/node"
+        versions: ["17", "18"]
+      - dependency-name: "typescript"
+        versions: ["4.8"]

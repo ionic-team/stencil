@@ -90,7 +90,12 @@ export function getOptions(rootDir: string, inputOpts: BuildOptions = {}): Build
   return opts;
 }
 
-export function createReplaceData(opts: BuildOptions) {
+/**
+ * Generates an object containing versioning information of various packages installed at build time
+ * @param opts the options being used during a build
+ * @returns an object that contains package names/versions installed at the time a build was invoked
+ */
+export function createReplaceData(opts: BuildOptions): Record<string, any> {
   const CACHE_BUSTER = 7;
 
   const typescriptPkg = require(join(opts.typescriptDir, 'package.json'));
@@ -135,6 +140,12 @@ export function createReplaceData(opts: BuildOptions) {
   };
 }
 
+/**
+ * Retrieves a package from the `node_modules` directory in the given `opts` parameter
+ * @param opts the options being used during a build
+ * @param pkgName the name of the NPM package to retrieve
+ * @returns information about the retrieved package
+ */
 function getPkg(opts: BuildOptions, pkgName: string): PackageData {
   return require(join(opts.nodeModulesDir, pkgName, 'package.json'));
 }
@@ -180,6 +191,7 @@ export interface BuildOptions {
   parse5Verion?: string;
   sizzleVersion?: string;
   terserVersion?: string;
+  otp?: '';
 }
 
 export interface CmdLineArgs {

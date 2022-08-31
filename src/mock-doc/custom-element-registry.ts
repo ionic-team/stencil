@@ -81,14 +81,14 @@ export class MockCustomElementRegistry implements CustomElementRegistry {
     }
   }
 
-  whenDefined(tagName: string) {
+  whenDefined(tagName: string): Promise<CustomElementConstructor> {
     tagName = tagName.toLowerCase();
 
     if (this.__registry != null && this.__registry.has(tagName) === true) {
-      return Promise.resolve();
+      return Promise.resolve<CustomElementConstructor>(this.__registry.get(tagName).cstr);
     }
 
-    return new Promise<void>((resolve) => {
+    return new Promise<CustomElementConstructor>((resolve) => {
       if (this.__whenDefined == null) {
         this.__whenDefined = new Map();
       }
@@ -212,7 +212,7 @@ export function disconnectNode(node: MockNode) {
   }
 }
 
-export function attributeChanged(node: MockNode, attrName: string, oldValue: string, newValue: string) {
+export function attributeChanged(node: MockNode, attrName: string, oldValue: string | null, newValue: string | null) {
   attrName = attrName.toLowerCase();
 
   const observedAttributes = (node as any).constructor.observedAttributes as string[];

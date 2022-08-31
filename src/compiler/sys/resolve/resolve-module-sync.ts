@@ -6,10 +6,11 @@ import { isString, normalizeFsPath, normalizePath } from '@utils';
 import { IS_WEB_WORKER_ENV } from '../environment';
 import { basename, dirname } from 'path';
 import resolve, { SyncOpts } from 'resolve';
+import { InMemoryFileSystem } from '../in-memory-fs';
 
 export const resolveRemoteModuleIdSync = (
   config: d.Config,
-  inMemoryFs: d.InMemoryFileSystem,
+  inMemoryFs: InMemoryFileSystem,
   opts: d.ResolveModuleIdOptions
 ) => {
   const packageJson = resolveRemotePackageJsonSync(config, inMemoryFs, opts.moduleId);
@@ -29,7 +30,7 @@ export const resolveRemoteModuleIdSync = (
   return null;
 };
 
-const resolveRemotePackageJsonSync = (config: d.Config, inMemoryFs: d.InMemoryFileSystem, moduleId: string) => {
+const resolveRemotePackageJsonSync = (config: d.Config, inMemoryFs: InMemoryFileSystem, moduleId: string) => {
   if (inMemoryFs) {
     const filePath = normalizePath(
       config.sys.getLocalModulePath({ rootDir: config.rootDir, moduleId, path: 'package.json' })
@@ -50,7 +51,7 @@ const resolveRemotePackageJsonSync = (config: d.Config, inMemoryFs: d.InMemoryFi
 
 export const resolveModuleIdSync = (
   sys: d.CompilerSystem,
-  inMemoryFs: d.InMemoryFileSystem,
+  inMemoryFs: InMemoryFileSystem,
   opts: d.ResolveModuleIdOptions
 ) => {
   if (inMemoryFs) {
@@ -66,7 +67,7 @@ export const resolveModuleIdSync = (
 
 export const createCustomResolverSync = (
   sys: d.CompilerSystem,
-  inMemoryFs: d.InMemoryFileSystem,
+  inMemoryFs: InMemoryFileSystem,
   exts: string[]
 ): SyncOpts => {
   return {
@@ -139,9 +140,11 @@ export const createCustomResolverSync = (
       const fsFilePath = normalizeFsPath(p);
       try {
         return sys.realpathSync(fsFilePath);
-      } catch (realpathErr) {
-        if (realpathErr.code !== 'ENOENT') {
-          throw realpathErr;
+      } catch (realpathErr: unknown) {
+        if (isErrnoException(realpathErr)) {
+          if (realpathErr.code !== 'ENOENT') {
+            throw realpathErr;
+          }
         }
       }
       return fsFilePath;
@@ -150,3 +153,15 @@ export const createCustomResolverSync = (
     extensions: exts,
   } as any;
 };
+
+/**
+ * Type guard to determine if an Error is an instance of `ErrnoException`. For the purposes of this type guard, we
+ * must ensure that the `code` field is present. This type guard was written with the `ErrnoException` definition from
+ * https://github.com/DefinitelyTyped/DefinitelyTyped/blob/d121716ed123957f6a86f8985eb013fcaddab345/types/node/globals.d.ts#L183-L188
+ * in mind.
+ * @param err the entity to check the type of
+ * @returns true if the provided value is an instance of `ErrnoException`, `false` otherwise
+ */
+function isErrnoException(err: unknown): err is NodeJS.ErrnoException {
+  return err instanceof Error && err.hasOwnProperty('code');
+}

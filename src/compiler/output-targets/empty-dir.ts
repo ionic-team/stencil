@@ -25,7 +25,11 @@ const isEmptable = (o: d.OutputTarget): o is OutputTargetEmptiable =>
   isOutputTargetDistLazyLoader(o) ||
   isOutputTargetHydrate(o);
 
-export const emptyOutputTargets = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
+export const emptyOutputTargets = async (
+  config: d.ValidatedConfig,
+  compilerCtx: d.CompilerCtx,
+  buildCtx: d.BuildCtx
+) => {
   if (buildCtx.isRebuild) {
     return;
   }

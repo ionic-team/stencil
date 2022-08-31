@@ -8,47 +8,89 @@ export const filesChanged = (buildCtx: d.BuildCtx) => {
   return unique([...buildCtx.filesUpdated, ...buildCtx.filesAdded, ...buildCtx.filesDeleted]).sort();
 };
 
-export const scriptsAdded = (buildCtx: d.BuildCtx) => {
-  // collect all the scripts that were added
-  return buildCtx.filesAdded
-    .filter((f) => {
-      return SCRIPT_EXT.some((ext) => f.endsWith(ext.toLowerCase()));
-    })
-    .map((f) => basename(f));
-};
+/**
+ * Unary helper function mapping string to string and wrapping `basename`,
+ * which normally takes two string arguments. This means it cannot be passed
+ * to `Array.prototype.map`, but this little helper can!
+ *
+ * @param filePath a filepath to check out
+ * @returns the basename for that filepath
+ */
+const unaryBasename = (filePath: string): string => basename(filePath);
 
-export const scriptsDeleted = (buildCtx: d.BuildCtx) => {
-  // collect all the scripts that were deleted
-  return buildCtx.filesDeleted
-    .filter((f) => {
-      return SCRIPT_EXT.some((ext) => f.endsWith(ext.toLowerCase()));
-    })
-    .map((f) => basename(f));
-};
+/**
+ * Get the file extension for a path
+ *
+ * @param filePath a path
+ * @returns the file extension (well, characters after the last `'.'`)
+ */
+const getExt = (filePath: string): string => filePath.split('.').pop().toLowerCase();
 
-export const hasScriptChanges = (buildCtx: d.BuildCtx) => {
-  return buildCtx.filesChanged.some((f) => {
-    const ext = getExt(f);
-    return SCRIPT_EXT.includes(ext);
-  });
-};
-
-export const hasStyleChanges = (buildCtx: d.BuildCtx) => {
-  return buildCtx.filesChanged.some((f) => {
-    const ext = getExt(f);
-    return STYLE_EXT.includes(ext);
-  });
-};
-
-const getExt = (filePath: string) => filePath.split('.').pop().toLowerCase();
-
+/**
+ * Script extensions which we want to be able to recognize
+ */
 const SCRIPT_EXT = ['ts', 'tsx', 'js', 'jsx'];
-export const isScriptExt = (ext: string) => SCRIPT_EXT.includes(ext);
+
+/**
+ * Helper to check if a filepath has a script extension
+ *
+ * @param filePath a file extension
+ * @returns whether the filepath has a script extension or not
+ */
+export const hasScriptExt = (filePath: string): boolean => SCRIPT_EXT.includes(getExt(filePath));
 
 const STYLE_EXT = ['css', 'scss', 'sass', 'pcss', 'styl', 'stylus', 'less'];
-export const isStyleExt = (ext: string) => STYLE_EXT.includes(ext);
 
-export const hasHtmlChanges = (config: d.Config, buildCtx: d.BuildCtx) => {
+/**
+ * Helper to check if a filepath has a style extension
+ *
+ * @param filePath a file extension to check
+ * @returns whether the filepath has a style extension or not
+ */
+export const hasStyleExt = (filePath: string): boolean => STYLE_EXT.includes(getExt(filePath));
+
+/**
+ * Get all scripts from a build context that were added
+ *
+ * @param buildCtx the build context
+ * @returns an array of filepaths that were added
+ */
+export const scriptsAdded = (buildCtx: d.BuildCtx): string[] =>
+  buildCtx.filesAdded.filter(hasScriptExt).map(unaryBasename);
+
+/**
+ * Get all scripts from a build context that were deleted
+ *
+ * @param buildCtx the build context
+ * @returns an array of deleted filepaths
+ */
+export const scriptsDeleted = (buildCtx: d.BuildCtx): string[] =>
+  buildCtx.filesDeleted.filter(hasScriptExt).map(unaryBasename);
+
+/**
+ * Check whether a build has script changes
+ *
+ * @param buildCtx the build context
+ * @returns whether or not there are script changes
+ */
+export const hasScriptChanges = (buildCtx: d.BuildCtx): boolean => buildCtx.filesChanged.some(hasScriptExt);
+
+/**
+ * Check whether a build has style changes
+ *
+ * @param buildCtx the build context
+ * @returns whether or not there are style changes
+ */
+export const hasStyleChanges = (buildCtx: d.BuildCtx): boolean => buildCtx.filesChanged.some(hasStyleExt);
+
+/**
+ * Check whether a build has html changes
+ *
+ * @param config the current config
+ * @param buildCtx the build context
+ * @returns whether or not HTML files were changed
+ */
+export const hasHtmlChanges = (config: d.Config, buildCtx: d.BuildCtx): boolean => {
   const anyHtmlChanged = buildCtx.filesChanged.some((f) => f.toLowerCase().endsWith('.html'));
 
   if (anyHtmlChanged) {

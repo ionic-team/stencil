@@ -19,7 +19,7 @@ import { userIndexPlugin } from './user-index-plugin';
 import { workerPlugin } from './worker-plugin';
 
 export const bundleOutput = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   bundleOpts: BundleOptions
@@ -30,20 +30,30 @@ export const bundleOutput = async (
 
     compilerCtx.rollupCache.set(bundleOpts.id, rollupBuild.cache);
     return rollupBuild;
-  } catch (e) {
+  } catch (e: any) {
     if (!buildCtx.hasError) {
+      // TODO(STENCIL-353): Implement a type guard that balances using our own copy of Rollup types (which are
+      // breakable) and type safety (so that the error variable may be something other than `any`)
       loadRollupDiagnostics(config, compilerCtx, buildCtx, e);
     }
   }
   return undefined;
 };
 
+/**
+ * Build the rollup options that will be used to transpile, minify, and otherwise transform a Stencil project
+ * @param config the Stencil configuration for the project
+ * @param compilerCtx the current compiler context
+ * @param buildCtx a context object containing information about the current build
+ * @param bundleOpts Rollup bundling options to apply to the base configuration setup by this function
+ * @returns the rollup options to be used
+ */
 export const getRollupOptions = (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   bundleOpts: BundleOptions
-) => {
+): RollupOptions => {
   const customResolveOptions = createCustomResolverAsync(config.sys, compilerCtx.fs, [
     '.tsx',
     '.ts',

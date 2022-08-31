@@ -2,8 +2,9 @@ import type * as d from '@stencil/core/internal';
 import { buildJestArgv, getProjectListFromCLIArgs } from './jest-config';
 import { setScreenshotEmulateData } from '../puppeteer/puppeteer-emulate';
 import type { AggregatedResult } from '@jest/test-result';
+import type { ConfigFlags } from '../../cli/config-flags';
 
-export async function runJest(config: d.Config, env: d.E2EProcessEnv) {
+export async function runJest(config: d.ValidatedConfig, env: d.E2EProcessEnv) {
   let success = false;
 
   try {
@@ -24,7 +25,6 @@ export async function runJest(config: d.Config, env: d.E2EProcessEnv) {
 
     // build up our args from our already know list of args in the config
     const jestArgv = buildJestArgv(config);
-
     // build up the project paths, which is basically the app's root dir
     const projects = getProjectListFromCLIArgs(config, jestArgv);
 
@@ -43,8 +43,14 @@ export async function runJest(config: d.Config, env: d.E2EProcessEnv) {
   return success;
 }
 
+/**
+ * Creates a Stencil test runner
+ * @returns the test runner
+ */
 export function createTestRunner(): any {
-  const TestRunner = require('jest-runner');
+  // TODO(STENCIL-306): Remove support for earlier versions of Jest
+  // The left hand side of the '??' is needed for Jest v27, the right hand side for Jest 26 and below
+  const TestRunner = require('jest-runner').default ?? require('jest-runner');
 
   class StencilTestRunner extends TestRunner {
     async runTests(tests: { path: string }[], watcher: any, onStart: any, onResult: any, onFailure: any, options: any) {
@@ -98,7 +104,7 @@ export function includeTestFile(testPath: string, env: d.E2EProcessEnv) {
   return false;
 }
 
-export function getEmulateConfigs(testing: d.TestingConfig, flags: d.ConfigFlags) {
+export function getEmulateConfigs(testing: d.TestingConfig, flags: ConfigFlags) {
   let emulateConfigs = testing.emulate.slice();
 
   if (typeof flags.emulate === 'string') {

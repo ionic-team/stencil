@@ -10,8 +10,14 @@ import { BuildOptions } from '../utils/options';
 import { RollupOptions, OutputOptions } from 'rollup';
 import { writePkgJson } from '../utils/write-pkg-json';
 import { getBanner } from '../utils/banner';
+import sourcemaps from 'rollup-plugin-sourcemaps';
 
-export async function cli(opts: BuildOptions) {
+/**
+ * Generates a rollup configuration for the `cli` submodule
+ * @param opts build options needed to generate the rollup configuration
+ * @returns an array containing the generated rollup options
+ */
+export async function cli(opts: BuildOptions): Promise<ReadonlyArray<RollupOptions>> {
   const inputDir = join(opts.buildDir, 'cli');
   const outputDir = opts.output.cliDir;
   const esmFilename = 'index.js';
@@ -22,6 +28,7 @@ export async function cli(opts: BuildOptions) {
     format: 'es',
     file: join(outputDir, esmFilename),
     preferConst: true,
+    sourcemap: true,
     banner: getBanner(opts, `Stencil CLI`, true),
   };
 
@@ -29,6 +36,7 @@ export async function cli(opts: BuildOptions) {
     format: 'cjs',
     file: join(outputDir, cjsFilename),
     preferConst: true,
+    sourcemap: true,
     banner: getBanner(opts, `Stencil CLI (CommonJS)`, true),
   };
 
@@ -36,6 +44,11 @@ export async function cli(opts: BuildOptions) {
   let dts = await fs.readFile(join(inputDir, 'public.d.ts'), 'utf8');
   dts = dts.replace('@stencil/core/internal', '../internal/index');
   await fs.writeFile(join(opts.output.cliDir, dtsFilename), dts);
+
+  // copy config-flags.d.ts
+  let configDts = await fs.readFile(join(inputDir, 'config-flags.d.ts'), 'utf8');
+  configDts = configDts.replace('@stencil/core/declarations', '../internal/index');
+  await fs.writeFile(join(opts.output.cliDir, 'config-flags.d.ts'), configDts);
 
   // write @stencil/core/compiler/package.json
   writePkgJson(opts, opts.output.cliDir, {
@@ -62,6 +75,7 @@ export async function cli(opts: BuildOptions) {
         preferConst: true,
       }),
       replacePlugin(opts),
+      sourcemaps(),
     ],
     treeshake: {
       moduleSideEffects: false,

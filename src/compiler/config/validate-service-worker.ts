@@ -1,9 +1,8 @@
 import type * as d from '../../declarations';
-import { HOST_CONFIG_FILENAME } from '../prerender/host-config';
 import { isAbsolute, join } from 'path';
 import { isString } from '@utils';
 
-export const validateServiceWorker = (config: d.Config, outputTarget: d.OutputTargetWww) => {
+export const validateServiceWorker = (config: d.ValidatedConfig, outputTarget: d.OutputTargetWww) => {
   if (outputTarget.serviceWorker === false) {
     return;
   }
@@ -67,7 +66,7 @@ export const validateServiceWorker = (config: d.Config, outputTarget: d.OutputTa
 
 const addGlobIgnores = (config: d.Config, globIgnores: string[]) => {
   globIgnores.push(
-    `**/${HOST_CONFIG_FILENAME}`,
+    `**/host.config.json`, // the filename of the host configuration
     `**/*.system.entry.js`,
     `**/*.system.js`,
     `**/${config.fsNamespace}.js`,

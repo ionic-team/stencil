@@ -6,17 +6,20 @@
     "forceConsistentCasingInFileNames": true,
     "lib": [
       "dom",
-      "es2017",
-      "esnext.array"
+      "es2019",
     ],
     "module": "commonjs",
     "moduleResolution": "node",
     "outDir": "build/",
     "pretty": true,
     "target": "es2017",
-    "incremental": true
+    "incremental": false,
+    "useUnknownInCatchVariables": true
   },
   "include": [
     "**/*.ts"
+  ],
+  "exclude": [
+    "**/*.spec.ts",
   ]
 }

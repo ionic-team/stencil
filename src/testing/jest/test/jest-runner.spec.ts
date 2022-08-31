@@ -1,4 +1,5 @@
 import type * as d from '@stencil/core/declarations';
+import { ConfigFlags, createConfigFlags } from '../../../cli/config-flags';
 import { getEmulateConfigs, includeTestFile } from '../jest-runner';
 
 describe('jest-runner', () => {
@@ -74,9 +75,9 @@ describe('jest-runner', () => {
     const testing: d.TestingConfig = {
       emulate: [{ device: 'anDroiD' }, { device: 'iphone' }],
     };
-    const flags: d.ConfigFlags = {
+    const flags: ConfigFlags = createConfigFlags({
       emulate: 'Android',
-    };
+    });
     const emulateConfigs = getEmulateConfigs(testing, flags);
     expect(emulateConfigs).toHaveLength(1);
     expect(emulateConfigs[0].device).toBe('anDroiD');
@@ -86,9 +87,9 @@ describe('jest-runner', () => {
     const testing: d.TestingConfig = {
       emulate: [{ userAgent: 'Mozilla/Android' }, { userAgent: 'SomeUserAgent/iPhone X' }],
     };
-    const flags: d.ConfigFlags = {
+    const flags: ConfigFlags = createConfigFlags({
       emulate: 'android',
-    };
+    });
     const emulateConfigs = getEmulateConfigs(testing, flags);
     expect(emulateConfigs).toHaveLength(1);
     expect(emulateConfigs[0].userAgent).toBe('Mozilla/Android');
@@ -98,7 +99,7 @@ describe('jest-runner', () => {
     const testing: d.TestingConfig = {
       emulate: [{ device: 'android' }, { device: 'iphone' }],
     };
-    const flags: d.ConfigFlags = {};
+    const flags: ConfigFlags = createConfigFlags();
     const emulateConfigs = getEmulateConfigs(testing, flags);
     expect(emulateConfigs).toHaveLength(2);
   });

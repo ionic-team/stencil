@@ -3,6 +3,7 @@ module.exports = {
   moduleNameMapper: {
     '@app-data': '<rootDir>/internal/app-data/index.cjs',
     '@app-globals': '<rootDir>/internal/app-globals/index.cjs',
+    '@compiler-deps': '<rootDir>/src/compiler/sys/modules/compiler-deps.ts',
     '@platform': '<rootDir>/internal/testing/index.js',
     '@runtime': '<rootDir>/internal/testing/index.js',
     '@stencil/core/cli': '<rootDir>/cli/index.js',
@@ -13,7 +14,12 @@ module.exports = {
   },
   coverageDirectory: './coverage/',
   coverageReporters: ['json', 'lcov', 'text', 'clover'],
+  coveragePathIgnorePatterns: ['^.*\\.stub\\.tsx?$'],
   collectCoverageFrom: [
+    '<rootDir>/scripts/**/*.{js,jsx,ts,tsx}',
+    '!<rootDir>/scripts/build/**/*.{js,jsx,ts,tsx}',
+    '!<rootDir>/scripts/bundles/helpers/compiler-cjs-intro.js',
+    '!<rootDir>/scripts/bundles/helpers/compiler-cjs-outro.js',
     '<rootDir>/src/app-data/**/*.{js,jsx,ts,tsx}',
     '<rootDir>/src/app-globals/**/*.{js,jsx,ts,tsx}',
     '<rootDir>/src/cli/**/*.{js,jsx,ts,tsx}',
@@ -29,7 +35,7 @@ module.exports = {
     '<rootDir>/src/testing/**/*.{js,jsx,ts,tsx}',
     '<rootDir>/src/utils/**/*.{js,jsx,ts,tsx}',
   ],
-  modulePathIgnorePatterns: ['/bin', '/scripts', '/www'],
+  modulePathIgnorePatterns: ['/bin', '/www'],
   testPathIgnorePatterns: [
     '<rootDir>/.cache/',
     '<rootDir>/.github/',
@@ -45,10 +51,12 @@ module.exports = {
     '<rootDir>/mock-doc/',
     '<rootDir>/node_modules/',
     '<rootDir>/screenshot/',
-    '<rootDir>/scripts/',
     '<rootDir>/sys/',
     '<rootDir>/test/',
     '<rootDir>/testing/',
   ],
-  testRegex: '/src/.*\\.spec\\.(ts|tsx|js)$',
+  testRegex: '/(src|scripts)/.*\\.spec\\.(ts|tsx|js)$',
+  // TODO(STENCIL-307): Move away from Jasmine runner for internal Stencil tests, which involves re-working environment
+  // setup
+  testRunner: 'jest-jasmine2'
 };

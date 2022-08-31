@@ -116,8 +116,12 @@ export function initServerProcess(sendMsg: d.DevServerSendMessage) {
         }
       }
     } catch (e) {
+      let stack: string | null = null;
+      if (e instanceof Error) {
+        stack = e.stack;
+      }
       sendMsg({
-        error: { message: e + '', stack: e?.stack ? e.stack : null },
+        error: { message: e + '', stack },
       });
     }
   };

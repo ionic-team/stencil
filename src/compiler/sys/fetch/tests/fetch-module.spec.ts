@@ -1,5 +1,5 @@
 import type * as d from '../../../../declarations';
-import { getNodeModuleFetchUrl, getStencilModuleUrl, getStencilRootUrl, skipFilePathFetch } from '../fetch-utils';
+import { getNodeModuleFetchUrl, getStencilModuleUrl, skipFilePathFetch } from '../fetch-utils';
 import { createSystem } from '../../stencil-sys';
 
 describe('fetch module', () => {
@@ -7,13 +7,6 @@ describe('fetch module', () => {
 
   beforeEach(() => {
     compilerExe = 'http://localhost:3333/@stencil/core/compiler/stencil.js';
-  });
-
-  it('getStencilRootUrl', () => {
-    expect(getStencilRootUrl(compilerExe)).toBe('http://localhost:3333/@stencil/core/');
-
-    compilerExe = 'https://cdn.stenciljs.com/npm/@stencil/core@1.2.3/compiler/stencil.js';
-    expect(getStencilRootUrl(compilerExe)).toBe('https://cdn.stenciljs.com/npm/@stencil/core@1.2.3/');
   });
 
   describe('getStencilModulePath', () => {
