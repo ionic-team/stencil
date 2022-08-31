@@ -6,7 +6,7 @@ import {
   mockModule,
   mockValidatedConfig,
 } from '@stencil/core/testing';
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import * as outputCustomElementsMod from '../dist-custom-elements';
 import { stubComponentCompilerMeta } from '../../types/tests/ComponentCompilerMeta.stub';
 import { generateCustomElementsTypes } from '../dist-custom-elements/custom-elements-types';
@@ -54,8 +54,7 @@ describe('Custom Elements Typedef generation', () => {
       tagName: 'my-best-component',
     });
     const { config, compilerCtx, buildCtx } = setup();
-    (config.outputTargets[0] as d.OutputTargetDistCustomElements).customElementsExportBehavior =
-      d.CustomElementsExportBehavior.SINGLE_EXPORT_MODULE;
+    (config.outputTargets[0] as d.OutputTargetDistCustomElements).customElementsExportBehavior = 'single-export-module';
     buildCtx.components = [componentOne, componentTwo];
 
     const writeFileSpy = jest.spyOn(compilerCtx.fs, 'writeFile');

@@ -1,5 +1,4 @@
 import type * as d from '@stencil/core/declarations';
-import { CustomElementsExportBehavior } from '../../../declarations';
 import { mockConfig, mockLoadConfigInit } from '@stencil/core/testing';
 import { COPY, DIST_CUSTOM_ELEMENTS, DIST_TYPES } from '../../output-targets/output-utils';
 import { validateConfig } from '../validate-config';
@@ -44,7 +43,7 @@ describe('validate-output-dist-custom-element', () => {
     it('uses a provided export behavior over the default value', () => {
       const outputTarget: d.OutputTargetDistCustomElements = {
         type: DIST_CUSTOM_ELEMENTS,
-        customElementsExportBehavior: CustomElementsExportBehavior.SINGLE_EXPORT_MODULE,
+        customElementsExportBehavior: 'single-export-module',
       };
       userConfig.outputTargets = [outputTarget];
 
@@ -110,6 +109,7 @@ describe('validate-output-dist-custom-element', () => {
           empty: true,
           externalRuntime: true,
           generateTypeDeclarations: false,
+          customElementsExportBehavior: 'default',
         },
       ]);
     });
@@ -132,6 +132,7 @@ describe('validate-output-dist-custom-element', () => {
             empty: true,
             externalRuntime: false,
             generateTypeDeclarations: false,
+            customElementsExportBehavior: 'default',
           },
         ]);
       });
@@ -154,6 +155,7 @@ describe('validate-output-dist-custom-element', () => {
             empty: true,
             externalRuntime: false,
             generateTypeDeclarations: false,
+            customElementsExportBehavior: 'default',
           },
         ]);
       });
@@ -177,6 +179,7 @@ describe('validate-output-dist-custom-element', () => {
             empty: false,
             externalRuntime: true,
             generateTypeDeclarations: false,
+            customElementsExportBehavior: 'default',
           },
         ]);
       });
@@ -199,6 +202,7 @@ describe('validate-output-dist-custom-element', () => {
             empty: false,
             externalRuntime: true,
             generateTypeDeclarations: false,
+            customElementsExportBehavior: 'default',
           },
         ]);
       });
@@ -226,6 +230,7 @@ describe('validate-output-dist-custom-element', () => {
             empty: false,
             externalRuntime: true,
             generateTypeDeclarations: true,
+            customElementsExportBehavior: 'default',
           },
         ]);
       });
@@ -252,6 +257,7 @@ describe('validate-output-dist-custom-element', () => {
             empty: false,
             externalRuntime: true,
             generateTypeDeclarations: true,
+            customElementsExportBehavior: 'default',
           },
         ]);
       });
@@ -279,6 +285,7 @@ describe('validate-output-dist-custom-element', () => {
             empty: false,
             externalRuntime: false,
             generateTypeDeclarations: true,
+            customElementsExportBehavior: 'default',
           },
         ]);
       });
@@ -307,6 +314,7 @@ describe('validate-output-dist-custom-element', () => {
             empty: false,
             externalRuntime: false,
             generateTypeDeclarations: true,
+            customElementsExportBehavior: 'default',
           },
         ]);
       });
@@ -329,6 +337,7 @@ describe('validate-output-dist-custom-element', () => {
             empty: false,
             externalRuntime: false,
             generateTypeDeclarations: false,
+            customElementsExportBehavior: 'default',
           },
         ]);
       });
@@ -369,6 +378,7 @@ describe('validate-output-dist-custom-element', () => {
             empty: false,
             externalRuntime: false,
             generateTypeDeclarations: false,
+            customElementsExportBehavior: 'default',
           },
         ]);
       });

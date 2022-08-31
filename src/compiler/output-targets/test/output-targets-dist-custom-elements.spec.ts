@@ -6,7 +6,7 @@ import {
   mockModule,
   mockValidatedConfig,
 } from '@stencil/core/testing';
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import {
   addCustomElementInputs,
   bundleCustomElements,
@@ -130,7 +130,9 @@ describe('Custom Elements output target', () => {
   });
 
   describe('addCustomElementInputs', () => {
-    let config: d.ValidatedConfig, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx;
+    let config: d.ValidatedConfig;
+    let compilerCtx: d.CompilerCtx;
+    let buildCtx: d.BuildCtx;
 
     beforeEach(() => {
       ({ config, compilerCtx, buildCtx } = setup());
@@ -153,11 +155,12 @@ describe('Custom Elements output target', () => {
           config.outputTargets[0] as OutputTargetDistCustomElements
         );
         addCustomElementInputs(buildCtx, bundleOptions, config.outputTargets[0] as OutputTargetDistCustomElements);
-        expect(bundleOptions.loader['\0core'].replace(/\s/g, '')).toEqual(
+        expect(bundleOptions.loader['\0core']).toEqual(
           `export { setAssetPath, setPlatformOptions } from '${STENCIL_INTERNAL_CLIENT_ID}';
-  export * from '${USER_INDEX_ENTRY_ID}';
-  import { globalScripts } from '${STENCIL_APP_GLOBALS_ID}';
-  globalScripts();`.replace(/\s/g, '')
+export * from '${USER_INDEX_ENTRY_ID}';
+import { globalScripts } from '${STENCIL_APP_GLOBALS_ID}';
+globalScripts();
+`
         );
       });
     });
@@ -165,7 +168,7 @@ describe('Custom Elements output target', () => {
     describe('CustomElementsExportBehavior.SINGLE_EXPORT_MODULE', () => {
       beforeEach(() => {
         (config.outputTargets[0] as OutputTargetDistCustomElements).customElementsExportBehavior =
-          d.CustomElementsExportBehavior.SINGLE_EXPORT_MODULE;
+          'single-export-module';
       });
 
       it('should add imports to index.js for all included components', () => {
@@ -184,16 +187,13 @@ describe('Custom Elements output target', () => {
           config.outputTargets[0] as OutputTargetDistCustomElements
         );
         addCustomElementInputs(buildCtx, bundleOptions, config.outputTargets[0] as OutputTargetDistCustomElements);
-        expect(bundleOptions.loader['\0core'].replace(/\s/g, '')).toEqual(
+        expect(bundleOptions.loader['\0core']).toEqual(
           `export { setAssetPath, setPlatformOptions } from '${STENCIL_INTERNAL_CLIENT_ID}';
-  export * from '${USER_INDEX_ENTRY_ID}';
-  import { globalScripts } from '${STENCIL_APP_GLOBALS_ID}';
-  globalScripts();
-  export { StubCmp, defineCustomElement as defineCustomElementStubCmp } from '\0StubCmp';
-  export { MyBestComponent, defineCustomElement as defineCustomElementMyBestComponent } from '\0MyBestComponent';`.replace(
-            /\s/g,
-            ''
-          )
+export * from '${USER_INDEX_ENTRY_ID}';
+import { globalScripts } from '${STENCIL_APP_GLOBALS_ID}';
+globalScripts();
+export { StubCmp, defineCustomElement as defineCustomElementStubCmp } from '\0StubCmp';
+export { MyBestComponent, defineCustomElement as defineCustomElementMyBestComponent } from '\0MyBestComponent';`
         );
       });
 
@@ -212,15 +212,12 @@ describe('Custom Elements output target', () => {
           config.outputTargets[0] as OutputTargetDistCustomElements
         );
         addCustomElementInputs(buildCtx, bundleOptions, config.outputTargets[0] as OutputTargetDistCustomElements);
-        expect(bundleOptions.loader['\0core'].replace(/\s/g, '')).toEqual(
+        expect(bundleOptions.loader['\0core']).toEqual(
           `export { setAssetPath, setPlatformOptions } from '${STENCIL_INTERNAL_CLIENT_ID}';
-  export * from '${USER_INDEX_ENTRY_ID}';
-  import { globalScripts } from '${STENCIL_APP_GLOBALS_ID}';
-  globalScripts();
-  export { ComponentWithJsx, defineCustomElement as defineCustomElementComponentWithJsx } from '\0ComponentWithJsx';`.replace(
-            /\s/g,
-            ''
-          )
+export * from '${USER_INDEX_ENTRY_ID}';
+import { globalScripts } from '${STENCIL_APP_GLOBALS_ID}';
+globalScripts();
+export { ComponentWithJsx, defineCustomElement as defineCustomElementComponentWithJsx } from '\0ComponentWithJsx';`
         );
       });
     });

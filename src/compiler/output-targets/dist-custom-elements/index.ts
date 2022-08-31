@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import type { BundleOptions } from '../../bundle/bundle-interface';
 import { bundleOutput } from '../../bundle/bundle-output';
 import {
@@ -225,7 +225,7 @@ export const addCustomElementInputs = (
   });
 
   // Only re-export component definitions if the barrel export behavior is set
-  if (outputTarget.customElementsExportBehavior === d.CustomElementsExportBehavior.SINGLE_EXPORT_MODULE) {
+  if (outputTarget.customElementsExportBehavior === 'single-export-module') {
     bundleOpts.loader!['\0core'] += indexImports.join('\n');
   }
 };

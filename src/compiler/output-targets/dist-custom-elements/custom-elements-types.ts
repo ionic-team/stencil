@@ -1,4 +1,4 @@
-import * as d from '../../../declarations';
+import type * as d from '../../../declarations';
 import { isOutputTargetDistCustomElements } from '../output-utils';
 import { dirname, join, relative } from 'path';
 import { normalizePath, dashToPascalCase } from '@utils';
@@ -42,8 +42,7 @@ const generateCustomElementsTypesOutput = async (
   typesDir: string,
   outputTarget: d.OutputTargetDistCustomElements
 ) => {
-  const isBarrelExport =
-    outputTarget.customElementsExportBehavior === d.CustomElementsExportBehavior.SINGLE_EXPORT_MODULE;
+  const isBarrelExport = outputTarget.customElementsExportBehavior === 'single-export-module';
 
   // the path where we're going to write the typedef for the whole dist-custom-elements output
   const customElementsDtsPath = join(outputTarget.dir!, 'index.d.ts');

@@ -1976,20 +1976,23 @@ export interface OutputTargetBaseNext {
 }
 
 /**
- * This enum defines all behavioral options available for
- * exporting elements from the `dist-custom-elements` output target.
+ * The collection of valid export behaviors.
+ * Used to generate a type for typed configs as well as output target validation
+ * for the `dist-custom-elements` output target.
+ *
+ * Adding an value to this const array will automatically add it as a valid option on the
+ * output target configuration for `customElementsExportBehavior`.
+ *
+ * - `default`: No additional export or definition behavior will happen.
+ * - `single-export-module`: All components will be re-exported from the specified directory's root `index.js` file.
  */
-export enum CustomElementsExportBehavior {
-  /**
-   * No additional export or definition behavior will happen.
-   */
-  DEFAULT = 'default',
-  /**
-   * All components will be re-exported from the specified directory's
-   * root `index.js` file.
-   */
-  SINGLE_EXPORT_MODULE = 'single-export-module',
-}
+export const CustomElementsExportBehaviorOptions = ['default', 'single-export-module'] as const;
+
+/**
+ * This type is auto-generated based on the values in `CustomElementsExportBehaviorOptions` array.
+ * This is used on the output target config for intellisense in typed configs.
+ */
+export type CustomElementsExportBehavior = typeof CustomElementsExportBehaviorOptions[number];
 
 export interface OutputTargetDistCustomElements extends OutputTargetBaseNext {
   type: 'dist-custom-elements';
@@ -2014,7 +2017,7 @@ export interface OutputTargetDistCustomElements extends OutputTargetBaseNext {
    * This controls if/how custom elements will be defined or where components will be exported from.
    * If omitted, no auto-definition behavior or re-exporting will happen.
    */
-  customElementsExportBehavior?: CustomElementsExportBehavior | null;
+  customElementsExportBehavior?: CustomElementsExportBehavior;
 }
 
 export interface OutputTargetDistCustomElementsBundle extends OutputTargetBaseNext {
