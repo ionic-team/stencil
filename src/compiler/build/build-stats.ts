@@ -146,6 +146,7 @@ function getComponentsFileMap(config: d.Config, buildCtx: d.BuildCtx) {
       source: relativePath(config, component.sourceFilePath),
       elementRef: component.elementRef,
       componentClassName: component.componentClassName,
+      componentClassTypeParameters: component.componentClassTypeParameters,
       assetsDirs: component.assetsDirs,
       dependencies: component.dependencies,
       dependents: component.dependents,

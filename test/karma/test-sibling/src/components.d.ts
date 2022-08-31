@@ -11,11 +11,10 @@ export namespace Components {
 }
 declare global {
     interface HTMLSiblingRootElement extends Components.SiblingRoot, HTMLStencilElement {
-    }
-    var HTMLSiblingRootElement: {
         prototype: HTMLSiblingRootElement;
         new (): HTMLSiblingRootElement;
-    };
+    }
+    var HTMLSiblingRootElement: HTMLSiblingRootElement;
     interface HTMLElementTagNameMap {
         "sibling-root": HTMLSiblingRootElement;
     }
