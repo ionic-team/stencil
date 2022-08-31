@@ -1,5 +1,5 @@
 import type * as d from '../../../../declarations';
-import { createInMemoryFs } from '../../../sys/in-memory-fs';
+import { createInMemoryFs, InMemoryFileSystem } from '../../../sys/in-memory-fs';
 import { createSystem } from '../../../sys/stencil-sys';
 import { ensureExtension } from '../typescript-resolve-module';
 import { normalizePath } from '../../../../utils';
@@ -8,7 +8,7 @@ import ts from 'typescript';
 
 describe('typescript resolve module', () => {
   const config: d.Config = { rootDir: '/some/path' };
-  let inMemoryFs: d.InMemoryFileSystem;
+  let inMemoryFs: InMemoryFileSystem;
   let sys: d.CompilerSystem;
 
   beforeEach(() => {

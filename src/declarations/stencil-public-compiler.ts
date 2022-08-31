@@ -1,6 +1,7 @@
 import type { JsonDocs } from './stencil-public-docs';
 import type { PrerenderUrlResults } from '../internal';
 import type { ConfigFlags } from '../cli/config-flags';
+
 export * from './stencil-public-docs';
 
 /**
@@ -2348,14 +2349,6 @@ export interface FsStats {
   mtime: Date;
   ctime: Date;
   birthtime: Date;
-}
-
-export interface FsWriteOptions {
-  inMemoryOnly?: boolean;
-  clearFileCache?: boolean;
-  immediateWrite?: boolean;
-  useCache?: boolean;
-  outputTargetType?: string;
 }
 
 export interface Compiler {
