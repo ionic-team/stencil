@@ -44,39 +44,29 @@ describe('Dist Collection output target', () => {
   });
 
   describe('transform aliased import paths', () => {
-    it('transforms aliased import paths when the output target config flag is `true`', async () => {
-      mockConfig.outputTargets = [
-        {
-          ...target,
-          transformAliasedImportPaths: true,
-        },
-      ];
+    // These tests ensure that the transformer for import paths is called regardless
+    // of the config value (the function will decided whether or not to actually do anything) to avoid
+    // a race condition with duplicate file writes
+    it.each([true, false])(
+      'calls function to transform aliased import paths when the output target config flag is `%s`',
+      async (transformAliasedImportPaths: boolean) => {
+        mockConfig.outputTargets = [
+          {
+            ...target,
+            transformAliasedImportPaths,
+          },
+        ];
 
-      await outputCollection(mockConfig, mockedCompilerCtx, mockedBuildCtx, changedModules);
+        await outputCollection(mockConfig, mockedCompilerCtx, mockedBuildCtx, changedModules);
 
-      expect(mapImportPathSpy).toHaveBeenCalledWith(mockConfig, '/dist/collection/main.js', '/dist/collection');
-      expect(mapImportPathSpy).toHaveBeenCalledTimes(1);
-    });
-
-    it('does not transform aliased import paths when the output target config flag is `false`', async () => {
-      mockConfig.outputTargets = [
-        {
-          ...target,
-          transformAliasedImportPaths: false,
-        },
-      ];
-
-      await outputCollection(mockConfig, mockedCompilerCtx, mockedBuildCtx, changedModules);
-
-      expect(mapImportPathSpy).toHaveBeenCalledTimes(0);
-    });
-
-    it('does not transform aliased import paths when the output target config flag is `undefined`', async () => {
-      mockConfig.outputTargets = [target];
-
-      await outputCollection(mockConfig, mockedCompilerCtx, mockedBuildCtx, changedModules);
-
-      expect(mapImportPathSpy).toHaveBeenCalledTimes(0);
-    });
+        expect(mapImportPathSpy).toHaveBeenCalledWith(mockConfig, '/dist/collection/main.js', {
+          collectionDir: '/dist/collection',
+          dir: '',
+          transformAliasedImportPaths,
+          type: 'dist-collection',
+        });
+        expect(mapImportPathSpy).toHaveBeenCalledTimes(1);
+      }
+    );
   });
 });

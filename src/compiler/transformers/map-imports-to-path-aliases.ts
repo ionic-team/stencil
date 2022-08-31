@@ -12,13 +12,13 @@ import type * as d from '../../declarations';
  *
  * @param config The Stencil configuration object.
  * @param destinationFilePath The location on disk the file will be written to.
- * @param destinationDirectory The destination on disk of the collection directory.
+ * @param outputTarget The configuration for the collection output target.
  * @returns A factory for creating a {@link ts.Transformer}.
  */
 export const mapImportsToPathAliases = (
   config: d.ValidatedConfig,
   destinationFilePath: string,
-  destinationDirectory: string
+  outputTarget: d.OutputTargetDistCollection
 ): ts.TransformerFactory<ts.SourceFile> => {
   return (transformCtx) => {
     const compilerHost = ts.createCompilerHost(config.tsCompilerOptions);
@@ -26,14 +26,21 @@ export const mapImportsToPathAliases = (
     const visit =
       (sourceFile: string) =>
       (node: ts.Node): ts.VisitResult<ts.Node> => {
-        // We should only attempt to transpile standard module imports:
+        // Only transform paths when the `transformAliasedImportPaths` flag is
+        // set on the output target config
+        //
+        // We should only attempt to transform standard module imports:
         // - import * as ts from 'typescript';
         // - import { Foo, Bar } from 'baz';
         // - import { Foo as Bar } from 'baz';
         // - import Foo from 'bar';
-        // We should NOT transpile other import declaration types:
+        // We should NOT transform other import declaration types:
         // - import a = Foo.Bar
-        if (ts.isImportDeclaration(node) && ts.isStringLiteral(node.moduleSpecifier)) {
+        if (
+          outputTarget.transformAliasedImportPaths &&
+          ts.isImportDeclaration(node) &&
+          ts.isStringLiteral(node.moduleSpecifier)
+        ) {
           let importPath = node.moduleSpecifier.text;
 
           // We will ignore transforming any paths that are already relative paths or
@@ -54,7 +61,7 @@ export const mapImportsToPathAliases = (
               // file structure depth, we need to determine where the resolved file exists relative to the destination directory
               const resolvePathInDestination = module.resolvedModule.resolvedFileName.replace(
                 config.srcDir,
-                destinationDirectory
+                outputTarget.collectionDir
               );
 
               importPath = normalize(

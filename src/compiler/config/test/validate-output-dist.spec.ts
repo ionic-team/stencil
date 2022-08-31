@@ -2,7 +2,6 @@ import type * as d from '@stencil/core/declarations';
 import { validateConfig } from '../validate-config';
 import { mockConfig, mockLoadConfigInit } from '@stencil/core/testing';
 import path from 'path';
-import { isOutputTargetDist, isOutputTargetDistCollection } from '../../output-targets/output-utils';
 
 describe('validateDistOutputTarget', () => {
   const rootDir = path.resolve('/');
@@ -124,12 +123,7 @@ describe('validateDistOutputTarget', () => {
 
     const { config } = validateConfig(userConfig, mockLoadConfigInit());
 
-    // The `transformAliasedImportPathsInCollection` option only affect the
-    // `dist` and `dist-collection` output targets so we'll just look at those
-    const distTargets = config.outputTargets.filter(
-      (ref) => isOutputTargetDistCollection(ref) || isOutputTargetDist(ref)
-    );
-    expect(distTargets).toEqual([
+    expect(config.outputTargets).toEqual([
       {
         buildDir: path.join(rootDir, 'my-dist', 'my-build'),
         collectionDir: path.join(rootDir, 'my-dist', 'collection'),
@@ -143,11 +137,61 @@ describe('validateDistOutputTarget', () => {
         transformAliasedImportPathsInCollection: true,
       },
       {
+        esmDir: path.join(rootDir, 'my-dist', 'my-build', 'testing'),
+        empty: false,
+        isBrowserBuild: true,
+        legacyLoaderFile: path.join(rootDir, 'my-dist', 'my-build', 'testing.js'),
+        polyfills: true,
+        systemDir: undefined,
+        systemLoaderFile: undefined,
+        type: 'dist-lazy',
+      },
+      {
+        copyAssets: 'dist',
+        copy: [],
+        dir: path.join(rootDir, 'my-dist', 'my-build', 'testing'),
+        type: 'copy',
+      },
+      {
+        file: path.join(rootDir, 'my-dist', 'my-build', 'testing', 'testing.css'),
+        type: 'dist-global-styles',
+      },
+      {
+        dir: path.join(rootDir, 'my-dist'),
+        type: 'dist-types',
+        typesDir: path.join(rootDir, 'my-dist', 'types'),
+      },
+      {
         collectionDir: path.join(rootDir, 'my-dist', 'collection'),
         dir: path.join(rootDir, '/my-dist'),
         empty: false,
         transformAliasedImportPaths: true,
         type: 'dist-collection',
+      },
+      {
+        copy: [{ src: '**/*.svg' }, { src: '**/*.js' }],
+        copyAssets: 'collection',
+        dir: path.join(rootDir, 'my-dist', 'collection'),
+        type: 'copy',
+      },
+      {
+        type: 'dist-lazy',
+        cjsDir: path.join(rootDir, 'my-dist', 'cjs'),
+        cjsIndexFile: path.join(rootDir, 'my-dist', 'index.cjs.js'),
+        empty: false,
+        esmDir: path.join(rootDir, 'my-dist', 'esm'),
+        esmEs5Dir: undefined,
+        esmIndexFile: path.join(rootDir, 'my-dist', 'index.js'),
+        polyfills: true,
+      },
+      {
+        cjsDir: path.join(rootDir, 'my-dist', 'cjs'),
+        componentDts: path.join(rootDir, 'my-dist', 'types', 'components.d.ts'),
+        dir: path.join(rootDir, 'my-dist', 'loader'),
+        empty: false,
+        esmDir: path.join(rootDir, 'my-dist', 'esm'),
+        esmEs5Dir: undefined,
+        type: 'dist-lazy-loader',
       },
     ]);
   });
