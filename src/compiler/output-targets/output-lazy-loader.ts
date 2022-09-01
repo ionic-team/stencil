@@ -32,6 +32,7 @@ const generateLoader = async (
   const packageJsonContent = JSON.stringify(
     {
       name: config.fsNamespace + '-loader',
+      private: true,
       typings: './index.d.ts',
       module: './index.js',
       main: './index.cjs.js',
