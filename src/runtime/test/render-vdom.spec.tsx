@@ -1101,7 +1101,6 @@ describe('render-vdom', () => {
     it('should not call ref cb w/ null when children are reordered', async () => {
       @Component({ tag: 'cmp-a' })
       class CmpA {
-        counter = 0;
         divRef: HTMLElement;
         @Prop() state = true;
 
@@ -1128,7 +1127,8 @@ describe('render-vdom', () => {
         components: [CmpA],
         html: `<cmp-a></cmp-a>`,
       });
-
+      // ref should be set correctly after the first render
+      expect(rootInstance.divRef).toEqual(root.querySelector('.a'));
       root.state = false;
       await waitForChanges();
       // We've changed the state and forced a re-render. This tests one of the
@@ -1140,7 +1140,6 @@ describe('render-vdom', () => {
     it('should not call ref cb w/ null when children w/ keys are reordered', async () => {
       @Component({ tag: 'cmp-a' })
       class CmpA {
-        counter = 0;
         divRef: HTMLElement;
         @Prop() state = true;
 
@@ -1168,6 +1167,8 @@ describe('render-vdom', () => {
         html: `<cmp-a></cmp-a>`,
       });
 
+      // ref should be set correctly after the first render
+      expect(rootInstance.divRef).toEqual(root.querySelector('.a'));
       root.state = false;
       await waitForChanges();
       // We've changed the state and forced a re-render where the algorithm for
