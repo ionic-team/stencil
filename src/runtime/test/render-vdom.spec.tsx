@@ -1157,8 +1157,8 @@ describe('render-vdom', () => {
 
         render() {
           return this.state
-            ? [this.renderB(), this.renderA(), this.renderB(), this.renderB()]
-            : [this.renderA(), this.renderB(), this.renderB()];
+            ? [this.renderB(), this.renderA()]
+            : [this.renderA(), ];
         }
       }
 
