@@ -122,17 +122,7 @@ describe('Custom Elements Typedef generation', () => {
 
     await generateCustomElementsTypes(config, compilerCtx, buildCtx, 'types_dir');
 
-    const componentsTypeDirectoryPath = relative('my-best-dir', join('types_dir', 'components'));
-
     const expectedTypedefOutput = [
-      '/* TestApp custom elements */',
-      `export { StubCmp as MyComponent } from '${join(componentsTypeDirectoryPath, 'my-component', 'my-component')}';`,
-      `export { MyBestComponent as MyBestComponent } from '${join(
-        componentsTypeDirectoryPath,
-        'my-best-component',
-        'my-best-component'
-      )}';`,
-      '',
       '/**',
       ' * Used to manually set the base path where assets can be found.',
       ' * If the script is used as "module", it\'s recommended to use "import.meta.url",',
@@ -151,7 +141,6 @@ describe('Custom Elements Typedef generation', () => {
       '  rel?: (el: EventTarget, eventName: string, listener: EventListenerOrEventListenerObject, options: boolean | AddEventListenerOptions) => void;',
       '}',
       'export declare const setPlatformOptions: (opts: SetPlatformOptions) => void;',
-      "export * from '../types_dir/components';",
       '',
     ].join('\n');
 

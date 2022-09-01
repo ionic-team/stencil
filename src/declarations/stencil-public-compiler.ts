@@ -1980,7 +1980,7 @@ export interface OutputTargetBaseNext {
  * Used to generate a type for typed configs as well as output target validation
  * for the `dist-custom-elements` output target.
  *
- * Adding an value to this const array will automatically add it as a valid option on the
+ * Adding a value to this const array will automatically add it as a valid option on the
  * output target configuration for `customElementsExportBehavior`.
  *
  * - `default`: No additional export or definition behavior will happen.
