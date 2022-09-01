@@ -10,7 +10,6 @@ import type {
   CompilerSystem,
   Config,
   CopyResults,
-  DevServerConfig,
   DevServerEditor,
   Diagnostic,
   Logger,
@@ -23,6 +22,7 @@ import type {
   PrerenderConfig,
   StyleDoc,
   TaskCommand,
+  ValidatedDevServerConfig,
 } from './stencil-public-compiler';
 import type {
   ComponentInterface,
@@ -1118,9 +1118,9 @@ export interface HttpRequest {
 }
 
 export interface DevServerMessage {
-  startServer?: DevServerConfig;
+  startServer?: ValidatedDevServerConfig;
   closeServer?: boolean;
-  serverStarted?: DevServerConfig;
+  serverStarted?: ValidatedDevServerConfig;
   serverClosed?: boolean;
   buildStart?: boolean;
   buildLog?: BuildLog;

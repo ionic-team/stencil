@@ -28,7 +28,6 @@ export const validateDevServer = (
     flags.address ?? validatedConfig.devServer?.address
   );
 
-  // @ts-ignore
   const devServer: d.ValidatedDevServerConfig = {
     ...(validatedConfig.devServer ?? {}),
     address,
