@@ -37,6 +37,7 @@ export function mockValidatedConfig(overrides: Partial<ValidatedConfig> = {}): V
     outputTargets: baseConfig.outputTargets ?? [],
     sys: createTestingSystem(),
     testing: {},
+    rootDir: path.resolve('/'),
     ...overrides,
   };
 }

@@ -13,6 +13,7 @@ export const getConfig = (userConfig: d.Config): d.ValidatedConfig => {
     outputTargets: userConfig.outputTargets ?? [],
     sys: userConfig.sys ?? createSystem({ logger }),
     testing: userConfig ?? {},
+    rootDir: userConfig.rootDir ?? '/',
   };
 
   setPlatformPath(config.sys.platformPath);

@@ -135,6 +135,7 @@ export const runTask = async (
     outputTargets: config.outputTargets ?? [],
     sys: sys ?? config.sys ?? coreCompiler.createSystem({ logger }),
     testing: config.testing ?? {},
+    rootDir: config.rootDir ?? '/',
   };
 
   switch (task) {
