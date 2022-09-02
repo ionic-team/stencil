@@ -1,3 +1,4 @@
+// TODO(STENCIL-561): fully delete dist-custom-elements-bundle code
 import type * as d from '../../../declarations';
 import { COPY, isOutputTargetDistCustomElementsBundle } from '../../output-targets/output-utils';
 import { getAbsolutePath } from '../config-utils';

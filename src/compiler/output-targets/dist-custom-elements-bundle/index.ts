@@ -1,3 +1,4 @@
+// TODO(STENCIL-561): fully delete dist-custom-elements-bundle code
 import type * as d from '../../../declarations';
 import type { BundleOptions } from '../../bundle/bundle-interface';
 import { bundleOutput } from '../../bundle/bundle-output';
