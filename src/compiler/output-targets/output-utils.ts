@@ -28,6 +28,7 @@ export const isOutputTargetDistCollection = (o: d.OutputTarget): o is d.OutputTa
 export const isOutputTargetDistCustomElements = (o: d.OutputTarget): o is d.OutputTargetDistCustomElements =>
   o.type === DIST_CUSTOM_ELEMENTS;
 
+// TODO(STENCIL-561): fully delete dist-custom-elements-bundle code
 export const isOutputTargetDistCustomElementsBundle = (
   o: d.OutputTarget
 ): o is d.OutputTargetDistCustomElementsBundle => o.type === DIST_CUSTOM_ELEMENTS_BUNDLE;
@@ -73,6 +74,7 @@ export const CUSTOM = 'custom';
 export const DIST = 'dist';
 export const DIST_COLLECTION = 'dist-collection';
 export const DIST_CUSTOM_ELEMENTS = 'dist-custom-elements';
+// TODO(STENCIL-561): fully delete dist-custom-elements-bundle code
 export const DIST_CUSTOM_ELEMENTS_BUNDLE = 'dist-custom-elements-bundle';
 
 export const DIST_TYPES = 'dist-types';
@@ -101,7 +103,6 @@ export const VALID_CONFIG_OUTPUT_TARGETS = [
   DIST,
   DIST_COLLECTION,
   DIST_CUSTOM_ELEMENTS,
-  DIST_CUSTOM_ELEMENTS_BUNDLE,
   DIST_LAZY,
   DIST_HYDRATE_SCRIPT,
 
