@@ -15,14 +15,6 @@ export namespace Components {
         "text": string;
     }
 }
-export interface TodoInputCustomEvent<T> extends CustomEvent<T> {
-    detail: T;
-    target: HTMLTodoInputElement;
-}
-export interface TodoItemCustomEvent<T> extends CustomEvent<T> {
-    detail: T;
-    target: HTMLTodoItemElement;
-}
 declare global {
     interface HTMLAppRootElement extends Components.AppRoot, HTMLStencilElement {
     }
@@ -52,12 +44,12 @@ declare namespace LocalJSX {
     interface AppRoot {
     }
     interface TodoInput {
-        "onInputSubmit"?: (event: TodoInputCustomEvent<any>) => void;
+        "onInputSubmit"?: (event: CustomEvent<any>) => void;
     }
     interface TodoItem {
         "checked"?: boolean;
-        "onItemCheck"?: (event: TodoItemCustomEvent<any>) => void;
-        "onItemRemove"?: (event: TodoItemCustomEvent<any>) => void;
+        "onItemCheck"?: (event: CustomEvent<any>) => void;
+        "onItemRemove"?: (event: CustomEvent<any>) => void;
         "text"?: string;
     }
     interface IntrinsicElements {
