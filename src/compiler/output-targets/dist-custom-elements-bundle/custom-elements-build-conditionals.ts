@@ -1,4 +1,4 @@
-// TODO(STENCIL-561): fully delete dist-custom-elements-bundle code
+// TODO(STENCIL-561): move this into ../dist-custom-elements and rename things accordingly
 import type * as d from '../../../declarations';
 import { getBuildFeatures, updateBuildConditionals } from '../../app-core/app-data';
 
