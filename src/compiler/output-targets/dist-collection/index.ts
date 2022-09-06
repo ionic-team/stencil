@@ -40,28 +40,31 @@ export const outputCollection = async (
         const mapCode = mod.sourceMapFileText;
 
         await Promise.all(
-          outputTargets.map(async (o) => {
+          outputTargets.map(async (target) => {
             const relPath = relative(config.srcDir, mod.jsFilePath);
-            const filePath = join(o.collectionDir, relPath);
+            const filePath = join(target.collectionDir, relPath);
 
             // Transpile the already transpiled modules to apply
             // a transformer to convert aliased import paths to relative paths
+            // We run this even if the transformer will perform no action
+            // to avoid race conditions between multiple output targets that
+            // may be writing to the same location
             const { outputText } = ts.transpileModule(code, {
               fileName: mod.sourceFilePath,
               compilerOptions: {
                 target: ts.ScriptTarget.Latest,
               },
               transformers: {
-                after: [mapImportsToPathAliases(config, filePath, o.collectionDir)],
+                after: [mapImportsToPathAliases(config, filePath, target)],
               },
             });
 
-            await compilerCtx.fs.writeFile(filePath, outputText, { outputTargetType: o.type });
+            await compilerCtx.fs.writeFile(filePath, outputText, { outputTargetType: target.type });
 
             if (mod.sourceMapPath) {
               const relativeSourceMapPath = relative(config.srcDir, mod.sourceMapPath);
-              const sourceMapOutputFilePath = join(o.collectionDir, relativeSourceMapPath);
-              await compilerCtx.fs.writeFile(sourceMapOutputFilePath, mapCode, { outputTargetType: o.type });
+              const sourceMapOutputFilePath = join(target.collectionDir, relativeSourceMapPath);
+              await compilerCtx.fs.writeFile(sourceMapOutputFilePath, mapCode, { outputTargetType: target.type });
             }
           })
         );

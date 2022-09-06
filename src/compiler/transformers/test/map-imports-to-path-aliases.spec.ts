@@ -1,4 +1,5 @@
 import { mockValidatedConfig } from '@stencil/core/testing';
+import type { OutputTargetDistCollection } from '@stencil/core/declarations';
 import { ValidatedConfig } from '../../../internal';
 import { transpileModule } from './transpile';
 import ts, { Extension } from 'typescript';
@@ -11,15 +12,43 @@ describe('mapImportsToPathAliases', () => {
     ReturnType<typeof ts.resolveModuleName>,
     Parameters<typeof ts.resolveModuleName>
   >;
+  let outputTarget: OutputTargetDistCollection;
 
   beforeEach(() => {
     config = mockValidatedConfig({ tsCompilerOptions: {} });
 
     resolveModuleNameSpy = jest.spyOn(ts, 'resolveModuleName');
+
+    outputTarget = {
+      type: 'dist-collection',
+      dir: 'dist',
+      collectionDir: 'dist/collection',
+      transformAliasedImportPaths: true,
+    };
   });
 
   afterEach(() => {
     resolveModuleNameSpy.mockReset();
+  });
+
+  it('does nothing if the config flag is `false`', () => {
+    outputTarget.transformAliasedImportPaths = false;
+    resolveModuleNameSpy.mockReturnValue({
+      resolvedModule: {
+        isExternalLibraryImport: false,
+        extension: Extension.Ts,
+        resolvedFileName: 'utils.js',
+      },
+    });
+    const inputText = `
+        import { utils } from "@utils/utils";
+
+        utils.test();
+    `;
+
+    module = transpileModule(inputText, config, null, [], [mapImportsToPathAliases(config, '', outputTarget)]);
+
+    expect(module.outputText).toContain('import { utils } from "@utils/utils";');
   });
 
   it('ignores relative imports', () => {
@@ -36,7 +65,7 @@ describe('mapImportsToPathAliases', () => {
         dateUtils.test();
     `;
 
-    module = transpileModule(inputText, config, null, [], [mapImportsToPathAliases(config, '', '')]);
+    module = transpileModule(inputText, config, null, [], [mapImportsToPathAliases(config, '', outputTarget)]);
 
     expect(module.outputText).toContain('import * as dateUtils from "../utils";');
   });
@@ -55,7 +84,7 @@ describe('mapImportsToPathAliases', () => {
         utils.test();
     `;
 
-    module = transpileModule(inputText, config, null, [], [mapImportsToPathAliases(config, '', '')]);
+    module = transpileModule(inputText, config, null, [], [mapImportsToPathAliases(config, '', outputTarget)]);
 
     expect(module.outputText).toContain('import { utils } from "@stencil/core";');
   });
@@ -70,7 +99,7 @@ describe('mapImportsToPathAliases', () => {
         utils.test();
     `;
 
-    module = transpileModule(inputText, config, null, [], [mapImportsToPathAliases(config, '', '')]);
+    module = transpileModule(inputText, config, null, [], [mapImportsToPathAliases(config, '', outputTarget)]);
 
     expect(module.outputText).toContain('import { utils } from "@utils";');
   });
@@ -90,7 +119,7 @@ describe('mapImportsToPathAliases', () => {
         utils.test();
     `;
 
-    module = transpileModule(inputText, config, null, [], [mapImportsToPathAliases(config, '', '')]);
+    module = transpileModule(inputText, config, null, [], [mapImportsToPathAliases(config, '', outputTarget)]);
 
     expect(module.outputText).toContain('import { utils } from "utils";');
   });
@@ -116,10 +145,10 @@ describe('mapImportsToPathAliases', () => {
       config,
       null,
       [],
-      [mapImportsToPathAliases(config, '/dist/collection/test.js', '/dist/collection')]
+      [mapImportsToPathAliases(config, '/dist/collection/test.js', outputTarget)]
     );
 
-    expect(module.outputText).toContain('import { utils } from "../../some-compiled-dir/utils/utils";');
+    expect(module.outputText).toContain(`import { utils } from "../../some-compiled-dir/utils/utils";`);
   });
 
   // Source module and resolved module are in the same output directory
@@ -143,9 +172,9 @@ describe('mapImportsToPathAliases', () => {
       config,
       null,
       [],
-      [mapImportsToPathAliases(config, 'dist/collection/test.js', 'dist/collection')]
+      [mapImportsToPathAliases(config, 'dist/collection/test.js', outputTarget)]
     );
 
-    expect(module.outputText).toContain('import { utils } from "utils/utils";');
+    expect(module.outputText).toContain(`import { utils } from "./utils/utils";`);
   });
 });
