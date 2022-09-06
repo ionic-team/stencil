@@ -1,7 +1,7 @@
 module.exports = {
   root: true,
   parser: '@typescript-eslint/parser',
-  plugins: ['@typescript-eslint', 'jsdoc', 'jest'],
+  plugins: ['@typescript-eslint', 'jsdoc', 'jest', 'simple-import-sort'],
   extends: [
     'plugin:jest/recommended',
     // including prettier here ensures that we don't set any rules which will conflict
@@ -70,6 +70,8 @@ module.exports = {
     'no-var': 'error',
     'prefer-rest-params': 'error',
     'prefer-spread': 'error',
+    'simple-import-sort/imports': 'error',
+    'simple-import-sort/exports': 'error',
   },
   // inform ESLint about the global variables defined in a Jest context
   // see https://github.com/jest-community/eslint-plugin-jest/#usage
