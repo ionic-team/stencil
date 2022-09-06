@@ -1,4 +1,5 @@
-import { dirname, normalize, relative } from 'path';
+import { normalizePath } from '@utils';
+import { dirname, relative } from 'path';
 import ts from 'typescript';
 import type * as d from '../../declarations';
 
@@ -64,7 +65,7 @@ export const mapImportsToPathAliases = (
                 outputTarget.collectionDir
               );
 
-              importPath = normalize(
+              importPath = normalizePath(
                 relative(dirname(destinationFilePath), resolvePathInDestination).replace(extensionRegex, '')
               );
             }

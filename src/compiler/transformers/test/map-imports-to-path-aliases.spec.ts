@@ -4,7 +4,6 @@ import { ValidatedConfig } from '../../../internal';
 import { transpileModule } from './transpile';
 import ts, { Extension } from 'typescript';
 import { mapImportsToPathAliases } from '../map-imports-to-path-aliases';
-import { normalize } from 'path';
 
 describe('mapImportsToPathAliases', () => {
   let module: ReturnType<typeof transpileModule>;
@@ -149,7 +148,7 @@ describe('mapImportsToPathAliases', () => {
       [mapImportsToPathAliases(config, '/dist/collection/test.js', outputTarget)]
     );
 
-    expect(module.outputText).toContain(`import { utils } from "${normalize('../../some-compiled-dir/utils/utils')}";`);
+    expect(module.outputText).toContain(`import { utils } from "../../some-compiled-dir/utils/utils";`);
   });
 
   // Source module and resolved module are in the same output directory
@@ -176,6 +175,6 @@ describe('mapImportsToPathAliases', () => {
       [mapImportsToPathAliases(config, 'dist/collection/test.js', outputTarget)]
     );
 
-    expect(module.outputText).toContain(`import { utils } from "${normalize('utils/utils')}";`);
+    expect(module.outputText).toContain(`import { utils } from "./utils/utils";`);
   });
 });
