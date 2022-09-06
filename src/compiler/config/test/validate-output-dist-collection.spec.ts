@@ -1,9 +1,13 @@
 import type * as d from '@stencil/core/declarations';
 import { validateConfig } from '../validate-config';
 import { mockConfig, mockLoadConfigInit } from '@stencil/core/testing';
+import { resolve, join } from 'path';
 
 describe('validateDistCollectionOutputTarget', () => {
   let config: d.Config;
+
+  const rootDir = resolve('/');
+  const defaultDir = join(rootDir, 'dist', 'collection');
 
   beforeEach(() => {
     config = mockConfig();
@@ -24,7 +28,7 @@ describe('validateDistCollectionOutputTarget', () => {
       {
         type: 'dist-collection',
         empty: false,
-        dir: '/dist/collection',
+        dir: defaultDir,
         collectionDir: null,
         transformAliasedImportPaths: false,
       },
@@ -72,7 +76,7 @@ describe('validateDistCollectionOutputTarget', () => {
           {
             type: 'dist-collection',
             empty: false,
-            dir: '/dist/collection',
+            dir: defaultDir,
             collectionDir: null,
             transformAliasedImportPaths,
           },
