@@ -18,6 +18,7 @@ import * as outputCustomElementsMod from '../dist-custom-elements';
 import { OutputTargetDistCustomElements } from '../../../declarations';
 import { stubComponentCompilerMeta } from '../../types/tests/ComponentCompilerMeta.stub';
 import { STENCIL_APP_GLOBALS_ID, STENCIL_INTERNAL_CLIENT_ID, USER_INDEX_ENTRY_ID } from '../../bundle/entry-alias-ids';
+// TODO(STENCIL-561): fully delete dist-custom-elements-bundle code
 import { DIST_CUSTOM_ELEMENTS, DIST_CUSTOM_ELEMENTS_BUNDLE } from '../output-utils';
 
 const setup = () => {

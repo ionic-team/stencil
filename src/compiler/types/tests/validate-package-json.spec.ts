@@ -2,6 +2,7 @@ import type * as d from '@stencil/core/declarations';
 import { mockBuildCtx, mockCompilerCtx, mockValidatedConfig } from '@stencil/core/testing';
 import * as v from '../validate-build-package-json';
 import path from 'path';
+// TODO(STENCIL-561): fully delete dist-custom-elements-bundle code
 import { DIST_COLLECTION, DIST_CUSTOM_ELEMENTS, DIST_CUSTOM_ELEMENTS_BUNDLE } from '../../output-targets/output-utils';
 import { normalizePath } from '../../../utils/normalize-path';
 
@@ -92,6 +93,7 @@ describe('validate-package-json', () => {
       expect(buildCtx.diagnostics).toHaveLength(0);
     });
 
+    // TODO(STENCIL-561): fully delete dist-custom-elements-bundle code
     it('validate custom elements bundle module', async () => {
       config.outputTargets = [
         {
