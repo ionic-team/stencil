@@ -4,7 +4,7 @@ import { isOutputTargetDistLazyLoader, relativeImport } from './output-utils';
 import { join, relative } from 'path';
 import { generatePreamble, normalizePath } from '@utils';
 
-export const outputLazyLoader = async (config: d.Config, compilerCtx: d.CompilerCtx) => {
+export const outputLazyLoader = async (config: d.ValidatedConfig, compilerCtx: d.CompilerCtx) => {
   const outputTargets = config.outputTargets.filter(isOutputTargetDistLazyLoader);
   if (outputTargets.length === 0) {
     return;
@@ -14,7 +14,7 @@ export const outputLazyLoader = async (config: d.Config, compilerCtx: d.Compiler
 };
 
 const generateLoader = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   outputTarget: d.OutputTargetDistLazyLoader
 ) => {

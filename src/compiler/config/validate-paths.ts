@@ -1,7 +1,14 @@
 import type * as d from '../../declarations';
 import { isAbsolute, join } from 'path';
 
-export const validatePaths = (config: d.UnvalidatedConfig) => {
+/**
+ * Do logical-level validation (as opposed to type-level validation)
+ * for various properties in the user-supplied config which represent
+ * filesystem paths.
+ *
+ * @param config a validated user-supplied configuration
+ */
+export const validatePaths = (config: d.ValidatedConfig) => {
   if (typeof config.rootDir !== 'string') {
     config.rootDir = '/';
   }
