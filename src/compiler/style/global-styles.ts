@@ -5,7 +5,11 @@ import { isOutputTargetDistGlobalStyles } from '../output-targets/output-utils';
 import { optimizeCss } from './optimize-css';
 import { runPluginTransforms } from '../plugin/plugin';
 
-export const generateGlobalStyles = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
+export const generateGlobalStyles = async (
+  config: d.ValidatedConfig,
+  compilerCtx: d.CompilerCtx,
+  buildCtx: d.BuildCtx
+) => {
   const outputTargets = config.outputTargets.filter(isOutputTargetDistGlobalStyles);
   if (outputTargets.length === 0) {
     return;
@@ -17,7 +21,7 @@ export const generateGlobalStyles = async (config: d.Config, compilerCtx: d.Comp
   }
 };
 
-const buildGlobalStyles = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
+const buildGlobalStyles = async (config: d.ValidatedConfig, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   let globalStylePath = config.globalStyle;
   if (!globalStylePath) {
     return null;
@@ -65,7 +69,7 @@ const buildGlobalStyles = async (config: d.Config, compilerCtx: d.CompilerCtx, b
   return null;
 };
 
-const canSkipGlobalStyles = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
+const canSkipGlobalStyles = async (config: d.ValidatedConfig, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   if (!compilerCtx.cachedGlobalStyle) {
     return false;
   }
@@ -104,7 +108,7 @@ const canSkipGlobalStyles = async (config: d.Config, compilerCtx: d.CompilerCtx,
 };
 
 const hasChangedImportFile = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   filePath: string,
@@ -120,7 +124,7 @@ const hasChangedImportFile = async (
 };
 
 const hasChangedImportContent = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   filePath: string,

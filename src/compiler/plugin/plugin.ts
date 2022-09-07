@@ -58,7 +58,7 @@ export const runPluginLoad = async (pluginCtx: PluginCtx, id: string) => {
 };
 
 export const runPluginTransforms = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   id: string,

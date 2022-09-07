@@ -4,7 +4,7 @@ import type { Plugin } from 'rollup';
 import { isOutputTargetHydrate } from '../output-targets/output-utils';
 import { isAbsolute } from 'path';
 
-export const serverPlugin = (config: d.Config, platform: string): Plugin => {
+export const serverPlugin = (config: d.ValidatedConfig, platform: string): Plugin => {
   const isHydrateBundle = platform === 'hydrate';
   const serverVarid = `@removed-server-code`;
 
