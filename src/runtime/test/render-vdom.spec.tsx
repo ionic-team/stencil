@@ -1099,6 +1099,9 @@ describe('render-vdom', () => {
     });
 
     it('should not call ref cb w/ null when children are reordered', async () => {
+      // this test is a regression test ensuring that the algorithm for matching
+      // up children across rerenders works correctly when a basic transposition is
+      // done (the elements at the ends of the children swap places).
       @Component({ tag: 'cmp-a' })
       class CmpA {
         divRef: HTMLElement;
@@ -1138,6 +1141,11 @@ describe('render-vdom', () => {
     });
 
     it('should not call ref cb w/ null when children w/ keys are reordered', async () => {
+      // this test is a regression test ensuring that the algorithm for matching
+      // up children across rerenders works correctly in a situation in which it
+      // needs to use the `key` attribute to disambiguate them. At present, if the
+      // `key` attribute is _not_ present in this case then this test will fail
+      // because without the `key` Stencil's child-identity heuristic falls over.
       @Component({ tag: 'cmp-a' })
       class CmpA {
         divRef: HTMLElement;
@@ -1156,9 +1164,7 @@ describe('render-vdom', () => {
         }
 
         render() {
-          return this.state
-            ? [this.renderB(), this.renderA()]
-            : [this.renderA(), ];
+          return this.state ? [this.renderB(), this.renderA()] : [this.renderA()];
         }
       }
 
