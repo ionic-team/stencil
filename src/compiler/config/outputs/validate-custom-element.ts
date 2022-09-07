@@ -41,7 +41,7 @@ export const validateCustomElement = (
       outputTarget.generateTypeDeclarations = true;
     }
     // Export behavior must be defined on the validated target config and must
-    // be one of the valid values on the enum
+    // be one of the export behavior valid values
     if (
       outputTarget.customElementsExportBehavior == null ||
       !CustomElementsExportBehaviorOptions.includes(outputTarget.customElementsExportBehavior)
