@@ -4,10 +4,11 @@ import { BuildContext } from '../build/build-ctx';
 import { getRollupOptions } from './bundle-output';
 import { OutputOptions, PartialResolvedId, rollup } from 'rollup';
 import { generatePreamble } from '@utils';
+import { InMemoryFileSystem } from '../sys/in-memory-fs';
 
 export const devNodeModuleResolveId = async (
   config: d.Config,
-  inMemoryFs: d.InMemoryFileSystem,
+  inMemoryFs: InMemoryFileSystem,
   resolvedId: PartialResolvedId,
   importee: string
 ) => {

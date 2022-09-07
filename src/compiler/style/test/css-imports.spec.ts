@@ -9,13 +9,14 @@ import {
 import { mockBuildCtx, mockConfig, mockCompilerCtx } from '@stencil/core/testing';
 import { buildError, normalizePath } from '@utils';
 import path from 'path';
+import { FsReadOptions } from '../../sys/in-memory-fs';
 
 describe('css-imports', () => {
   const root = path.resolve('/');
   let compilerCtx: d.CompilerCtx;
   let buildCtx: d.BuildCtx;
   let config: d.Config;
-  let readFileMock: jest.SpyInstance<Promise<string>, [string, d.FsReadOptions?]>;
+  let readFileMock: jest.SpyInstance<Promise<string>, [string, FsReadOptions?]>;
 
   beforeEach(() => {
     compilerCtx = mockCompilerCtx(config);

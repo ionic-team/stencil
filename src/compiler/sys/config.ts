@@ -11,6 +11,7 @@ export const getConfig = (userConfig: d.Config): d.ValidatedConfig => {
     flags: createConfigFlags(userConfig.flags ?? {}),
     logger,
     outputTargets: userConfig.outputTargets ?? [],
+    rootDir: userConfig.rootDir ?? '/',
     sys: userConfig.sys ?? createSystem({ logger }),
     testing: userConfig ?? {},
   };

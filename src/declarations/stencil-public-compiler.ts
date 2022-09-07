@@ -1,6 +1,7 @@
 import type { JsonDocs } from './stencil-public-docs';
 import type { PrerenderUrlResults } from '../internal';
 import type { ConfigFlags } from '../cli/config-flags';
+
 export * from './stencil-public-docs';
 
 /**
@@ -409,7 +410,7 @@ type RequireFields<T, K extends keyof T> = T & { [P in K]-?: T[P] };
 /**
  * Fields in {@link Config} to make required for {@link ValidatedConfig}
  */
-type StrictConfigFields = 'flags' | 'logger' | 'outputTargets' | 'sys' | 'testing';
+type StrictConfigFields = 'flags' | 'logger' | 'outputTargets' | 'rootDir' | 'sys' | 'testing';
 
 /**
  * A version of {@link Config} that makes certain fields required. This type represents a valid configuration entity.
@@ -2401,14 +2402,6 @@ export interface FsStats {
   mtime: Date;
   ctime: Date;
   birthtime: Date;
-}
-
-export interface FsWriteOptions {
-  inMemoryOnly?: boolean;
-  clearFileCache?: boolean;
-  immediateWrite?: boolean;
-  useCache?: boolean;
-  outputTargetType?: string;
 }
 
 export interface Compiler {
