@@ -1,15 +1,16 @@
+import ts from 'typescript';
+
 import type * as d from '../../../declarations';
-import { CLASS_DECORATORS_TO_REMOVE, MEMBER_DECORATORS_TO_REMOVE } from './decorators-constants';
 import { componentDecoratorToStatic } from './component-decorator';
+import { isDecoratorNamed } from './decorator-utils';
+import { CLASS_DECORATORS_TO_REMOVE, MEMBER_DECORATORS_TO_REMOVE } from './decorators-constants';
 import { elementDecoratorsToStatic } from './element-decorator';
 import { eventDecoratorsToStatic } from './event-decorator';
 import { listenDecoratorsToStatic } from './listen-decorator';
-import { isDecoratorNamed } from './decorator-utils';
 import { methodDecoratorsToStatic, validateMethods } from './method-decorator';
 import { propDecoratorsToStatic } from './prop-decorator';
 import { stateDecoratorsToStatic } from './state-decorator';
 import { watchDecoratorsToStatic } from './watch-decorator';
-import ts from 'typescript';
 
 export const convertDecoratorsToStatic = (
   config: d.Config,

@@ -1,6 +1,6 @@
+import { isOutputTargetDocs } from '../compiler/output-targets/output-utils';
 import type { ValidatedConfig } from '../declarations';
 import type { CoreCompiler } from './load-compiler';
-import { isOutputTargetDocs } from '../compiler/output-targets/output-utils';
 import { startupCompilerLog } from './logs';
 
 export const taskDocs = async (coreCompiler: CoreCompiler, config: ValidatedConfig) => {

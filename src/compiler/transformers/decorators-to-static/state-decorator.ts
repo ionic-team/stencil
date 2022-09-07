@@ -1,6 +1,7 @@
+import ts from 'typescript';
+
 import { createStaticGetter } from '../transform-utils';
 import { isDecoratorNamed } from './decorator-utils';
-import ts from 'typescript';
 
 export const stateDecoratorsToStatic = (
   decoratedProps: ts.ClassElement[],

@@ -1,15 +1,16 @@
-import type * as d from '../../../declarations';
-import { writeLazyModule } from './write-lazy-entry-module';
 import {
   formatComponentRuntimeMeta,
-  stringifyRuntimeData,
+  getSourceMappingUrlForEndOfFile,
   hasDependency,
   rollupToStencilSourceMap,
-  getSourceMappingUrlForEndOfFile,
+  stringifyRuntimeData,
 } from '@utils';
-import { optimizeModule } from '../../optimize/optimize-module';
 import { join } from 'path';
 import type { SourceMap as RollupSourceMap } from 'rollup';
+
+import type * as d from '../../../declarations';
+import { optimizeModule } from '../../optimize/optimize-module';
+import { writeLazyModule } from './write-lazy-entry-module';
 
 export const generateLazyModules = async (
   config: d.ValidatedConfig,

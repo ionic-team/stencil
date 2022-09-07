@@ -1,11 +1,12 @@
-import type * as d from '../../declarations';
 import { buildError } from '@utils';
-import { NodeResolveModule } from './node-resolve-module';
 import fs from 'graceful-fs';
 import path from 'path';
-import satisfies from 'semver/functions/satisfies';
-import major from 'semver/functions/major';
 import semverLte from 'semver/functions/lte';
+import major from 'semver/functions/major';
+import satisfies from 'semver/functions/satisfies';
+
+import type * as d from '../../declarations';
+import { NodeResolveModule } from './node-resolve-module';
 
 /**
  * The version range that we support for a given package. The strings should be

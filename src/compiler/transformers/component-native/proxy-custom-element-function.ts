@@ -1,4 +1,5 @@
 import ts from 'typescript';
+
 import type * as d from '../../../declarations';
 import { createAnonymousClassMetadataProxy } from '../add-component-meta-proxy';
 import { addImports } from '../add-imports';

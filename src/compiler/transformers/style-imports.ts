@@ -1,6 +1,7 @@
+import ts from 'typescript';
+
 import type * as d from '../../declarations';
 import { serializeImportPath } from './stencil-import-path';
-import ts from 'typescript';
 
 export const updateStyleImports = (
   transformOpts: d.TransformOptions,

@@ -1,9 +1,10 @@
-import type * as d from '../../declarations';
-import { createStaticGetter } from './transform-utils';
-import { DEFAULT_STYLE_MODE, dashToPascalCase } from '@utils';
-import { getScopeId } from '../style/scope-css';
-import { scopeCss } from '../../utils/shadow-css';
+import { dashToPascalCase,DEFAULT_STYLE_MODE } from '@utils';
 import ts from 'typescript';
+
+import type * as d from '../../declarations';
+import { scopeCss } from '../../utils/shadow-css';
+import { getScopeId } from '../style/scope-css';
+import { createStaticGetter } from './transform-utils';
 
 /**
  * Adds static "style" getter within the class

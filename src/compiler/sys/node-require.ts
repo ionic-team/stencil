@@ -1,7 +1,8 @@
+import { catchError,loadTypeScriptDiagnostic } from '@utils';
+import ts from 'typescript';
+
 import type { Diagnostic } from '../../declarations';
 import { IS_NODE_ENV } from './environment';
-import { loadTypeScriptDiagnostic, catchError } from '@utils';
-import ts from 'typescript';
 
 export const nodeRequire = (id: string) => {
   const results = {

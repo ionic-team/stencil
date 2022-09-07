@@ -1,3 +1,13 @@
+import { BUILD } from '@app-data';
+import type {
+  ComponentCompilerMeta,
+  ComponentRuntimeMeta,
+  ComponentTestingConstructor,
+  HostRef,
+  LazyBundlesRuntimeData,
+  NewSpecPageOptions,
+  SpecPage,
+} from '@stencil/core/internal';
 import {
   bootstrapLazy,
   flushAll,
@@ -9,23 +19,14 @@ import {
   registerModule,
   renderVdom,
   resetPlatform,
+  setSupportsShadowDom,
   startAutoApplyChanges,
   styles,
   win,
   writeTask,
-  setSupportsShadowDom,
 } from '@stencil/core/internal/testing';
-import { BUILD } from '@app-data';
-import type {
-  ComponentCompilerMeta,
-  ComponentRuntimeMeta,
-  ComponentTestingConstructor,
-  HostRef,
-  LazyBundlesRuntimeData,
-  NewSpecPageOptions,
-  SpecPage,
-} from '@stencil/core/internal';
 import { formatLazyBundleRuntimeMeta } from '@utils';
+
 import { getBuildFeatures } from '../compiler/app-core/app-data';
 import { resetBuildConditionals } from './reset-build-conditionals';
 

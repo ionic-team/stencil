@@ -1,11 +1,12 @@
-import type * as d from '../../declarations';
 import { catchError, flatOne, isString, unique } from '@utils';
-import { getScopeId } from '../style/scope-css';
+import { join } from 'path';
+
+import type * as d from '../../declarations';
 import { injectModulePreloads } from '../html/inject-module-preloads';
+import { minifyCss } from '../optimize/minify-css';
 import { optimizeCss } from '../optimize/optimize-css';
 import { optimizeJs } from '../optimize/optimize-js';
-import { join } from 'path';
-import { minifyCss } from '../optimize/minify-css';
+import { getScopeId } from '../style/scope-css';
 import { PrerenderContext } from './prerender-worker-ctx';
 
 export const inlineExternalStyleSheets = async (sys: d.CompilerSystem, appDir: string, doc: Document) => {

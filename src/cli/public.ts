@@ -1,4 +1,5 @@
 import type { CliInitOptions, CompilerSystem, Config, Logger, TaskCommand } from '@stencil/core/internal';
+
 import type { ConfigFlags } from './config-flags';
 
 /**

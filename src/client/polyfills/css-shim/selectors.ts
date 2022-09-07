@@ -1,6 +1,6 @@
-import { compileTemplate, executeTemplate } from './template';
-import { CSSScope, CSSSelector, CSSTemplate, Declaration } from './interfaces';
 import { StyleNode, types } from './css-parser';
+import { CSSScope, CSSSelector, CSSTemplate, Declaration } from './interfaces';
+import { compileTemplate, executeTemplate } from './template';
 
 export function resolveValues(selectors: CSSSelector[]) {
   const props: { [prop: string]: CSSTemplate } = {};

@@ -1,5 +1,8 @@
-import type * as d from '../../../declarations';
 import { augmentDiagnosticWithNode, buildError, buildWarn, toDashCase } from '@utils';
+import ts from 'typescript';
+
+import type * as d from '../../../declarations';
+import { validatePublicName } from '../reserved-public-members';
 import {
   convertValueToLiteral,
   createStaticGetter,
@@ -10,9 +13,7 @@ import {
   typeToString,
   validateReferences,
 } from '../transform-utils';
-import { isDecoratorNamed, getDeclarationParameters } from './decorator-utils';
-import { validatePublicName } from '../reserved-public-members';
-import ts from 'typescript';
+import { getDeclarationParameters,isDecoratorNamed } from './decorator-utils';
 
 /**
  * Parse a collection of class members decorated with `@Prop()`

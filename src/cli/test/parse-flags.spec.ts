@@ -1,7 +1,8 @@
-import { LogLevel } from '../../declarations';
-import { BOOLEAN_CLI_ARGS, STRING_CLI_ARGS, NUMBER_CLI_ARGS } from '../config-flags';
-import { parseEqualsArg, parseFlags } from '../parse-flags';
 import { toDashCase } from '@utils';
+
+import { LogLevel } from '../../declarations';
+import { BOOLEAN_CLI_ARGS, NUMBER_CLI_ARGS,STRING_CLI_ARGS } from '../config-flags';
+import { parseEqualsArg, parseFlags } from '../parse-flags';
 
 describe('parseFlags', () => {
   it('should get known and unknown args', () => {

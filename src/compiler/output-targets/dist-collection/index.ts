@@ -1,8 +1,9 @@
-import type * as d from '../../../declarations';
 import { catchError, COLLECTION_MANIFEST_FILE_NAME, flatOne, generatePreamble, normalizePath, sortBy } from '@utils';
-import { isOutputTargetDistCollection } from '../output-utils';
 import { join, relative } from 'path';
+
+import type * as d from '../../../declarations';
 import { typescriptVersion, version } from '../../../version';
+import { isOutputTargetDistCollection } from '../output-utils';
 
 export const outputCollection = async (
   config: d.ValidatedConfig,

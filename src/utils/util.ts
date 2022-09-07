@@ -1,6 +1,6 @@
 import type * as d from '../declarations';
-import { buildError } from './message-utils';
 import { dashToPascalCase, isString, toDashCase } from './helpers';
+import { buildError } from './message-utils';
 
 export const createJsVarName = (fileName: string) => {
   if (isString(fileName)) {

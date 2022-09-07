@@ -1,7 +1,8 @@
-import type * as d from '../../declarations';
-import { CREATE_EVENT, RUNTIME_APIS, addCoreRuntimeApi } from './core-runtime-apis';
 import { EVENT_FLAGS } from '@utils';
 import ts from 'typescript';
+
+import type * as d from '../../declarations';
+import { addCoreRuntimeApi,CREATE_EVENT, RUNTIME_APIS } from './core-runtime-apis';
 
 export const addCreateEvents = (moduleFile: d.Module, cmp: d.ComponentCompilerMeta) => {
   return cmp.events.map((ev) => {

@@ -1,6 +1,7 @@
 import type * as d from '@stencil/core/internal';
-import { isOutputTargetDistLazy, isOutputTargetWww } from '../compiler/output-targets/output-utils';
 import { join, relative } from 'path';
+
+import { isOutputTargetDistLazy, isOutputTargetWww } from '../compiler/output-targets/output-utils';
 import { InMemoryFileSystem } from '../compiler/sys/in-memory-fs';
 
 export function shuffleArray(array: any[]) {

@@ -1,5 +1,8 @@
-import type * as d from '../declarations';
 import { BUILD } from '@app-data';
+import { doc, plt, supportsShadow } from '@platform';
+
+import type * as d from '../declarations';
+import { createTime } from './profile';
 import {
   CONTENT_REF_ID,
   HYDRATE_CHILD_ID,
@@ -9,9 +12,7 @@ import {
   SLOT_NODE_ID,
   TEXT_NODE_ID,
 } from './runtime-constants';
-import { doc, plt, supportsShadow } from '@platform';
 import { newVNode } from './vdom/h';
-import { createTime } from './profile';
 
 export const initializeClientHydrate = (
   hostElm: d.HostElement,

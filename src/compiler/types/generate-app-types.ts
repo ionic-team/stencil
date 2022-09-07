@@ -1,12 +1,13 @@
+import { normalizePath } from '@utils';
+import { isAbsolute, relative, resolve } from 'path';
+
 import type * as d from '../../declarations';
-import { COMPONENTS_DTS_HEADER, sortImportNames } from './types-utils';
+import { GENERATED_DTS, getComponentsDtsSrcFilePath } from '../output-targets/output-utils';
 import { generateComponentTypes } from './generate-component-types';
 import { generateEventDetailTypes } from './generate-event-detail-types';
-import { GENERATED_DTS, getComponentsDtsSrcFilePath } from '../output-targets/output-utils';
-import { isAbsolute, relative, resolve } from 'path';
-import { normalizePath } from '@utils';
-import { updateReferenceTypeImports } from './update-import-refs';
 import { updateStencilTypesImports } from './stencil-types';
+import { COMPONENTS_DTS_HEADER, sortImportNames } from './types-utils';
+import { updateReferenceTypeImports } from './update-import-refs';
 
 /**
  * Generates and writes a `components.d.ts` file to disk. This file may be written to the `src` directory of a project,

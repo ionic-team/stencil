@@ -1,6 +1,7 @@
-import type * as d from '../declarations';
-import { addHostEventListeners } from '@runtime';
 import { BUILD } from '@app-data';
+import { addHostEventListeners } from '@runtime';
+
+import type * as d from '../declarations';
 
 const hostRefs: WeakMap<d.RuntimeRef, d.HostRef> = /*@__PURE__*/ new WeakMap();
 

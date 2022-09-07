@@ -1,3 +1,4 @@
+import type { InMemoryFileSystem } from '../compiler/sys/in-memory-fs';
 import { BuildResultsComponentGraph } from '.';
 import type {
   BuildEvents,
@@ -13,6 +14,7 @@ import type {
   DevServerEditor,
   Diagnostic,
   Logger,
+  LoggerLineUpdater,
   LoggerTimeSpan,
   OptimizeCssInput,
   OptimizeCssOutput,
@@ -20,10 +22,8 @@ import type {
   PageReloadStrategy,
   PrerenderConfig,
   StyleDoc,
-  LoggerLineUpdater,
   TaskCommand,
 } from './stencil-public-compiler';
-
 import type {
   ComponentInterface,
   ListenOptions,
@@ -31,7 +31,6 @@ import type {
   VNode,
   VNodeData,
 } from './stencil-public-runtime';
-import type { InMemoryFileSystem } from '../compiler/sys/in-memory-fs';
 
 export interface SourceMap {
   file: string;

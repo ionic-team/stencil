@@ -1,5 +1,8 @@
-import type * as d from '../../../declarations';
 import { augmentDiagnosticWithNode, buildError, buildWarn } from '@utils';
+import ts from 'typescript';
+
+import type * as d from '../../../declarations';
+import { validatePublicName } from '../reserved-public-members';
 import {
   convertValueToLiteral,
   createStaticGetter,
@@ -11,8 +14,6 @@ import {
   validateReferences,
 } from '../transform-utils';
 import { isDecoratorNamed } from './decorator-utils';
-import { validatePublicName } from '../reserved-public-members';
-import ts from 'typescript';
 
 export const methodDecoratorsToStatic = (
   config: d.Config,

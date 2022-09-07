@@ -1,5 +1,5 @@
-import type * as d from '@stencil/core/internal';
 import type { Config } from '@jest/types';
+import type * as d from '@stencil/core/internal';
 import { isString } from '@utils';
 
 // TODO(STENCIL-306): Remove support for earlier versions of Jest

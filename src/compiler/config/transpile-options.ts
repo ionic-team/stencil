@@ -1,18 +1,19 @@
+import { isString } from '@utils';
+import type { CompilerOptions } from 'typescript';
+
 import type {
+  CompilerSystem,
+  Config,
+  ImportData,
+  TransformCssToEsmInput,
+  TransformOptions,
   TranspileOptions,
   TranspileResults,
-  Config,
-  TransformOptions,
-  TransformCssToEsmInput,
-  ImportData,
-  CompilerSystem,
 } from '../../declarations';
-import { createSystem } from '../sys/stencil-sys';
-import { IS_NODE_ENV, requireFunc } from '../sys/environment';
-import { isString } from '@utils';
-import { parseImportPath } from '../transformers/stencil-import-path';
 import { STENCIL_INTERNAL_CLIENT_ID } from '../bundle/entry-alias-ids';
-import type { CompilerOptions } from 'typescript';
+import { IS_NODE_ENV, requireFunc } from '../sys/environment';
+import { createSystem } from '../sys/stencil-sys';
+import { parseImportPath } from '../transformers/stencil-import-path';
 
 export const getTranspileResults = (code: string, input: TranspileOptions) => {
   if (!isString(input.file)) {

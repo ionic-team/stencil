@@ -1,6 +1,6 @@
 import { cloneAttributes } from './attribute';
+import { getStyleElementText, MockCSSStyleSheet, setStyleElementText } from './css-style-sheet';
 import { createCustomElement } from './custom-element-registry';
-import { MockCSSStyleSheet, getStyleElementText, setStyleElementText } from './css-style-sheet';
 import { MockDocumentFragment } from './document-fragment';
 import { MockElement, MockHTMLElement } from './node';
 

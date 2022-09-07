@@ -1,9 +1,10 @@
 import type * as d from '@stencil/core/declarations';
-import { convertDecoratorsToStatic } from '../decorators-to-static/convert-decorators';
-import { convertStaticToMeta } from '../static-to-meta/visitor';
 import { mockBuildCtx, mockCompilerCtx, mockConfig } from '@stencil/core/testing';
 import ts from 'typescript';
+
+import { convertDecoratorsToStatic } from '../decorators-to-static/convert-decorators';
 import { updateModule } from '../static-to-meta/parse-static';
+import { convertStaticToMeta } from '../static-to-meta/visitor';
 import { getScriptTarget } from '../transform-utils';
 
 /**

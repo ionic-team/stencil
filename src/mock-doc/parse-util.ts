@@ -1,10 +1,11 @@
+import { Attribute, parse, parseFragment,ParserOptions, TreeAdapter } from 'parse5';
+
 import { MockComment } from './comment-node';
-import { MockDocument } from './document';
-import { MockElement, MockNode, MockTextNode } from './node';
-import { MockTemplateElement } from './element';
 import { NODE_NAMES, NODE_TYPES } from './constants';
-import { Attribute, ParserOptions, TreeAdapter, parse, parseFragment } from 'parse5';
+import { MockDocument } from './document';
 import { MockDocumentFragment } from './document-fragment';
+import { MockTemplateElement } from './element';
+import { MockElement, MockNode, MockTextNode } from './node';
 
 const docParser = new WeakMap<any, any>();
 

@@ -1,9 +1,10 @@
-import type * as d from '../../declarations';
-import { getScopeId } from '../style/scope-css';
-import { isOutputTargetWww } from '../output-targets/output-utils';
-import minimatch from 'minimatch';
 import { isGlob, normalizePath, sortBy } from '@utils';
+import minimatch from 'minimatch';
 import { basename } from 'path';
+
+import type * as d from '../../declarations';
+import { isOutputTargetWww } from '../output-targets/output-utils';
+import { getScopeId } from '../style/scope-css';
 
 export const generateHmr = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   if (config.devServer == null || config.devServer.reloadStrategy == null) {

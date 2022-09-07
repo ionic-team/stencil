@@ -1,8 +1,9 @@
+import { generatePreamble, normalizePath } from '@utils';
+import { join, relative } from 'path';
+
 import type * as d from '../../declarations';
 import { getClientPolyfill } from '../app-core/app-polyfills';
 import { isOutputTargetDistLazyLoader, relativeImport } from './output-utils';
-import { join, relative } from 'path';
-import { generatePreamble, normalizePath } from '@utils';
 
 export const outputLazyLoader = async (config: d.Config, compilerCtx: d.CompilerCtx) => {
   const outputTargets = config.outputTargets.filter(isOutputTargetDistLazyLoader);

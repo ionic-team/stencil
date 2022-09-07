@@ -1,5 +1,6 @@
-import type * as d from '../../declarations';
 import { isAbsolute, join } from 'path';
+
+import type * as d from '../../declarations';
 
 export const validatePaths = (config: d.UnvalidatedConfig) => {
   if (typeof config.rootDir !== 'string') {

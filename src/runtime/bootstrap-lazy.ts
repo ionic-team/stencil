@@ -1,16 +1,17 @@
-import type * as d from '../declarations';
-import { appDidLoad } from './update-component';
 import { BUILD } from '@app-data';
+import { doc, getHostRef, plt, registerHost, supportsShadow,win } from '@platform';
 import { CMP_FLAGS } from '@utils';
+
+import type * as d from '../declarations';
 import { connectedCallback } from './connected-callback';
-import { convertScopedToShadow, registerStyle } from './styles';
-import { createTime, installDevTools } from './profile';
 import { disconnectedCallback } from './disconnected-callback';
-import { doc, getHostRef, plt, registerHost, win, supportsShadow } from '@platform';
+import { patchChildSlotNodes, patchCloneNode, patchSlotAppendChild, patchTextContent } from './dom-extras';
 import { hmrStart } from './hmr-component';
-import { HYDRATED_CSS, HYDRATED_STYLE_ID, PLATFORM_FLAGS, PROXY_FLAGS } from './runtime-constants';
-import { patchCloneNode, patchSlotAppendChild, patchChildSlotNodes, patchTextContent } from './dom-extras';
+import { createTime, installDevTools } from './profile';
 import { proxyComponent } from './proxy-component';
+import { HYDRATED_CSS, HYDRATED_STYLE_ID, PLATFORM_FLAGS, PROXY_FLAGS } from './runtime-constants';
+import { convertScopedToShadow, registerStyle } from './styles';
+import { appDidLoad } from './update-component';
 
 export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.CustomElementsDefineOptions = {}) => {
   if (BUILD.profile && performance.mark) {

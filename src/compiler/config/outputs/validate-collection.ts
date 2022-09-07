@@ -1,6 +1,6 @@
 import type * as d from '../../../declarations';
-import { getAbsolutePath } from '../config-utils';
 import { isOutputTargetDistCollection } from '../../output-targets/output-utils';
+import { getAbsolutePath } from '../config-utils';
 
 /**
  * Validate and return DIST_COLLECTION output targets, ensuring that the `dir`
