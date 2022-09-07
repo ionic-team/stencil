@@ -67,9 +67,9 @@ describe('validate-output-dist-custom-element', () => {
     });
 
     it('uses the default export behavior if the specified value is invalid', () => {
-      const outputTarget: any = {
+      const outputTarget: d.OutputTargetDistCustomElements = {
         type: DIST_CUSTOM_ELEMENTS,
-        customElementsExportBehavior: 'not-a-valid-option',
+        customElementsExportBehavior: 'not-a-valid-option' as d.CustomElementsExportBehavior,
       };
       userConfig.outputTargets = [outputTarget];
 
