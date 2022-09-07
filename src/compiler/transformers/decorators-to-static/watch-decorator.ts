@@ -1,4 +1,4 @@
-import { augmentDiagnosticWithNode, buildError, buildWarn,flatOne } from '@utils';
+import { augmentDiagnosticWithNode, buildError, buildWarn, flatOne } from '@utils';
 import ts from 'typescript';
 
 import type * as d from '../../../declarations';

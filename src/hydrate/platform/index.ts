@@ -159,7 +159,7 @@ export const modeResolutionChain: d.ResolutionHandler[] = [];
 
 export { hAsync as h } from './h-async';
 export { hydrateApp } from './hydrate-app';
-export { BUILD, Env,NAMESPACE } from '@app-data';
+export { BUILD, Env, NAMESPACE } from '@app-data';
 export {
   addHostEventListeners,
   bootstrapLazy,

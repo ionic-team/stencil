@@ -1,4 +1,4 @@
-import { Component, Event, EventEmitter, h,Listen, Method, Prop, State, Watch } from '@stencil/core';
+import { Component, Event, EventEmitter, h, Listen, Method, Prop, State, Watch } from '@stencil/core';
 
 import { format } from './utils';
 

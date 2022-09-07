@@ -1,4 +1,4 @@
-import { normalizeFsPathQuery,normalizePath } from '../normalize-path';
+import { normalizeFsPathQuery, normalizePath } from '../normalize-path';
 
 describe('normalizePath', () => {
   it('node module', () => {

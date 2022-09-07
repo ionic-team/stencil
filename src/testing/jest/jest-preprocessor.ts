@@ -1,5 +1,5 @@
 import { ts } from '@stencil/core/compiler';
-import type { Diagnostic,TranspileOptions } from '@stencil/core/internal';
+import type { Diagnostic, TranspileOptions } from '@stencil/core/internal';
 import { loadTypeScriptDiagnostic, normalizePath } from '@utils';
 
 import { transpile } from '../test-transpile';

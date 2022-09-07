@@ -1,4 +1,4 @@
-import { buildError,isString, normalizePath } from '@utils';
+import { buildError, isString, normalizePath } from '@utils';
 
 import type { CompilerSystem, Diagnostic } from '../declarations';
 

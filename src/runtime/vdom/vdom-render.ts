@@ -8,7 +8,7 @@
  */
 import { BUILD } from '@app-data';
 import { consoleDevError, doc, plt, supportsShadow } from '@platform';
-import { CMP_FLAGS, HTML_NS, isDef,SVG_NS } from '@utils';
+import { CMP_FLAGS, HTML_NS, isDef, SVG_NS } from '@utils';
 
 import type * as d from '../../declarations';
 import { NODE_TYPE, PLATFORM_FLAGS, VNODE_FLAGS } from '../runtime-constants';

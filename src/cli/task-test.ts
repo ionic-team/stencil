@@ -1,5 +1,5 @@
 import { IS_NODE_ENV } from '../compiler/sys/environment';
-import type { TestingRunOptions,ValidatedConfig } from '../declarations';
+import type { TestingRunOptions, ValidatedConfig } from '../declarations';
 
 /**
  * Entrypoint for any Stencil tests

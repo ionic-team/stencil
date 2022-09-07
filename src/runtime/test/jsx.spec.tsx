@@ -1,4 +1,4 @@
-import { Component, Fragment,h, Host, Prop, State } from '@stencil/core';
+import { Component, Fragment, h, Host, Prop, State } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
 import { FunctionalComponent } from '../../declarations';

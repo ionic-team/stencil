@@ -1,6 +1,6 @@
 import { rollupCommonjsPlugin, rollupJsonPlugin, rollupNodeResolvePlugin, rollupReplacePlugin } from '@compiler-deps';
-import { createOnWarnFn, isString,loadRollupDiagnostics } from '@utils';
-import { rollup,RollupOptions, TreeshakingOptions } from 'rollup';
+import { createOnWarnFn, isString, loadRollupDiagnostics } from '@utils';
+import { rollup, RollupOptions, TreeshakingOptions } from 'rollup';
 
 import type * as d from '../../declarations';
 import { lazyComponentPlugin } from '../output-targets/dist-lazy/lazy-component-plugin';

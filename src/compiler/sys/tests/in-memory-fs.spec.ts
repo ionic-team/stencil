@@ -1,7 +1,7 @@
 import { createTestingSystem } from '../../../testing/testing-sys';
 import { normalizePath } from '../../../utils';
-import { createInMemoryFs, getCommitInstructions, InMemoryFileSystem,shouldIgnore } from '../in-memory-fs';
-import { FsItem,FsItems } from '../in-memory-fs';
+import { createInMemoryFs, getCommitInstructions, InMemoryFileSystem, shouldIgnore } from '../in-memory-fs';
+import { FsItem, FsItems } from '../in-memory-fs';
 
 describe(`in-memory-fs, getCommitInstructions`, () => {
   let items: FsItems;

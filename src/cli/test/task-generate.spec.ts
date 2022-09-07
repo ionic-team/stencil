@@ -1,11 +1,11 @@
 import * as coreCompiler from '@stencil/core/compiler';
-import { mockCompilerSystem,mockValidatedConfig } from '@stencil/core/testing';
+import { mockCompilerSystem, mockValidatedConfig } from '@stencil/core/testing';
 
 import type * as d from '../../declarations';
 import * as utils from '../../utils/validation';
 import { createConfigFlags } from '../config-flags';
 import { CoreCompiler } from '../load-compiler';
-import { BoilerplateFile,getBoilerplateByExtension, taskGenerate } from '../task-generate';
+import { BoilerplateFile, getBoilerplateByExtension, taskGenerate } from '../task-generate';
 
 const promptMock = jest.fn().mockResolvedValue('my-component');
 

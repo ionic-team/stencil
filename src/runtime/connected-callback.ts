@@ -4,7 +4,7 @@ import { CMP_FLAGS, HOST_FLAGS, MEMBER_FLAGS } from '@utils';
 
 import type * as d from '../declarations';
 import { initializeClientHydrate } from './client-hydrate';
-import { fireConnectedCallback,initializeComponent } from './initialize-component';
+import { fireConnectedCallback, initializeComponent } from './initialize-component';
 import { createTime } from './profile';
 import { HYDRATE_ID, NODE_TYPE, PLATFORM_FLAGS } from './runtime-constants';
 import { addStyle } from './styles';

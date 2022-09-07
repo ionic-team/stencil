@@ -1,5 +1,5 @@
 import { BUILD } from '@app-data';
-import { getHostRef,plt, supportsShadow } from '@platform';
+import { getHostRef, plt, supportsShadow } from '@platform';
 import { NODE_TYPES } from '@stencil/core/mock-doc';
 import { CMP_FLAGS, HOST_FLAGS } from '@utils';
 

@@ -1,7 +1,7 @@
 import { rollupPluginUtils } from '@compiler-deps';
 import { catchError, getInlineSourceMappingUrlLinker, isString } from '@utils';
 
-import { Config, TransformCssToEsmInput,TransformOptions, TranspileOptions, TranspileResults } from '../declarations';
+import { Config, TransformCssToEsmInput, TransformOptions, TranspileOptions, TranspileResults } from '../declarations';
 import { getTranspileConfig, getTranspileCssConfig, getTranspileResults } from './config/transpile-options';
 import { transformCssToEsm, transformCssToEsmSync } from './style/css-to-esm';
 import { patchTypescript } from './sys/typescript/typescript-sys';

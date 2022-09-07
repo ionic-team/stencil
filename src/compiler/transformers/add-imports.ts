@@ -1,7 +1,7 @@
 import ts from 'typescript';
 
 import type * as d from '../../declarations';
-import { createImportStatement,createRequireStatement } from './transform-utils';
+import { createImportStatement, createRequireStatement } from './transform-utils';
 
 export const addImports = (
   transformOpts: d.TransformOptions,

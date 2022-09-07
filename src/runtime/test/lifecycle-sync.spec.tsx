@@ -1,4 +1,4 @@
-import { Component, Element, forceUpdate,h, Host, Method, Prop, Watch } from '@stencil/core';
+import { Component, Element, forceUpdate, h, Host, Method, Prop, Watch } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
 describe('lifecycle sync', () => {

@@ -1,5 +1,5 @@
 import type * as d from '@stencil/core/declarations';
-import { mockCompilerSystem, mockLoadConfigInit,mockLogger } from '@stencil/core/testing';
+import { mockCompilerSystem, mockLoadConfigInit, mockLogger } from '@stencil/core/testing';
 
 import { createConfigFlags } from '../../../cli/config-flags';
 import { isWatchIgnorePath } from '../../fs-watch/fs-watch-rebuild';

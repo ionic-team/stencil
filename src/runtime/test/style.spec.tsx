@@ -1,4 +1,4 @@
-import { Component, getMode,setMode } from '@stencil/core';
+import { Component, getMode, setMode } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
 describe('style', () => {

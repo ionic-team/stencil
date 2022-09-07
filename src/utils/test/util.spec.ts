@@ -1,4 +1,4 @@
-import { mockBuildCtx,mockConfig } from '@stencil/core/testing';
+import { mockBuildCtx, mockConfig } from '@stencil/core/testing';
 import * as util from '@utils';
 
 import type * as d from '../../declarations';

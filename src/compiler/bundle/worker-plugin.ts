@@ -1,5 +1,5 @@
-import { generatePreamble,hasError, normalizeFsPath } from '@utils';
-import type { Plugin, PluginContext,TransformResult } from 'rollup';
+import { generatePreamble, hasError, normalizeFsPath } from '@utils';
+import type { Plugin, PluginContext, TransformResult } from 'rollup';
 
 import type * as d from '../../declarations';
 import { optimizeModule } from '../optimize/optimize-module';

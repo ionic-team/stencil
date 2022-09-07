@@ -2,7 +2,7 @@ import sourceMapMerge from 'merge-source-map';
 import type { CompressOptions, MangleOptions, MinifyOptions, SourceMapOptions } from 'terser';
 import ts from 'typescript';
 
-import type { CompilerCtx, Config, OptimizeJsResult, SourceMap,SourceTarget } from '../../declarations';
+import type { CompilerCtx, Config, OptimizeJsResult, SourceMap, SourceTarget } from '../../declarations';
 import { minfyJsId } from '../../version';
 import { minifyJs } from './minify-js';
 

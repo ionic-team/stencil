@@ -1,5 +1,5 @@
 import type * as d from '../declarations';
-import { printCheckVersionResults,startCheckVersion } from './check-version';
+import { printCheckVersionResults, startCheckVersion } from './check-version';
 import type { CoreCompiler } from './load-compiler';
 import { startupCompilerLog } from './logs';
 import { runPrerenderTask } from './task-prerender';

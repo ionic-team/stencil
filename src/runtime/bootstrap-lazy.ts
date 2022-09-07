@@ -1,5 +1,5 @@
 import { BUILD } from '@app-data';
-import { doc, getHostRef, plt, registerHost, supportsShadow,win } from '@platform';
+import { doc, getHostRef, plt, registerHost, supportsShadow, win } from '@platform';
 import { CMP_FLAGS } from '@utils';
 
 import type * as d from '../declarations';

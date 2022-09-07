@@ -1,7 +1,7 @@
 import { MockDocument } from '../document';
 import { MockAnchorElement, MockMetaElement, MockSVGElement } from '../element';
 import { MockElement, MockHTMLElement } from '../node';
-import { cloneWindow,MockWindow } from '../window';
+import { cloneWindow, MockWindow } from '../window';
 
 describe('element', () => {
   let doc: MockDocument;

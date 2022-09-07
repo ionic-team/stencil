@@ -1,6 +1,6 @@
 import { buildError, isBoolean, isNumber, isString, sortBy } from '@utils';
 
-import { ConfigBundle, Diagnostic, LoadConfigInit,UnvalidatedConfig, ValidatedConfig } from '../../declarations';
+import { ConfigBundle, Diagnostic, LoadConfigInit, UnvalidatedConfig, ValidatedConfig } from '../../declarations';
 import { createLogger } from '../sys/logger/console-logger';
 import { createSystem } from '../sys/stencil-sys';
 import { setBooleanConfig } from './config-utils';

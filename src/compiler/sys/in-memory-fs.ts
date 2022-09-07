@@ -1,5 +1,5 @@
 import type * as d from '@stencil/core/internal';
-import { isIterable, isString,normalizePath } from '@utils';
+import { isIterable, isString, normalizePath } from '@utils';
 import { basename, dirname, relative } from 'path';
 
 /**

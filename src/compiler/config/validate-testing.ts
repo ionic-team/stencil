@@ -1,5 +1,5 @@
 import { buildError, isString } from '@utils';
-import { basename, dirname,isAbsolute, join } from 'path';
+import { basename, dirname, isAbsolute, join } from 'path';
 
 import type * as d from '../../declarations';
 import { isOutputTargetDist, isOutputTargetWww } from '../output-targets/output-utils';

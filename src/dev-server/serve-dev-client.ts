@@ -4,7 +4,7 @@ import path from 'path';
 import type * as d from '../declarations';
 import { DEV_SERVER_URL } from './dev-server-constants';
 import { isDevServerClient, isInitialDevServerLoad, isOpenInEditor, responseHeaders } from './dev-server-utils';
-import { getEditors,serveOpenInEditor } from './open-in-editor';
+import { getEditors, serveOpenInEditor } from './open-in-editor';
 import { serveFile } from './serve-file';
 
 export async function serveDevClient(

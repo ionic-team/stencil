@@ -1,4 +1,4 @@
-import { isRemoteUrl, isString, noop,normalizePath } from '@utils';
+import { isRemoteUrl, isString, noop, normalizePath } from '@utils';
 import { basename, resolve } from 'path';
 import ts from 'typescript';
 

@@ -10,7 +10,7 @@ if (IS_WEB_WORKER_ENV) {
   initWebWorkerThread(createWorkerMessageHandler(createSystem()));
 }
 
-export { buildId,vermoji, version, versions } from '../version';
+export { buildId, vermoji, version, versions } from '../version';
 export { createCompiler } from './compiler';
 export { loadConfig } from './config/load-config';
 export { optimizeCss } from './optimize/optimize-css';

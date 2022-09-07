@@ -13,7 +13,7 @@ import {
   typeToString,
   validateReferences,
 } from '../transform-utils';
-import { getDeclarationParameters,isDecoratorNamed } from './decorator-utils';
+import { getDeclarationParameters, isDecoratorNamed } from './decorator-utils';
 
 /**
  * Parse a collection of class members decorated with `@Prop()`

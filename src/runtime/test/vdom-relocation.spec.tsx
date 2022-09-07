@@ -1,4 +1,4 @@
-import { Component, h,Listen, State } from '@stencil/core';
+import { Component, h, Listen, State } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
 describe('vdom-relocation', () => {

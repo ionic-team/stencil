@@ -3,7 +3,7 @@ import type { ServerResponse } from 'http';
 import path from 'path';
 
 import type * as d from '../declarations';
-import { getSsrStaticDataPath,responseHeaders } from './dev-server-utils';
+import { getSsrStaticDataPath, responseHeaders } from './dev-server-utils';
 import { appendDevServerClientScript } from './serve-file';
 
 export async function ssrPageRequest(

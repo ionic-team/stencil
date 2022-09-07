@@ -1,7 +1,7 @@
 import ts from 'typescript';
 
 import type * as d from '../../declarations';
-import { addCoreRuntimeApi,H, HOST, RUNTIME_APIS } from './core-runtime-apis';
+import { addCoreRuntimeApi, H, HOST, RUNTIME_APIS } from './core-runtime-apis';
 
 export const transformHostData = (classElements: ts.ClassElement[], moduleFile: d.Module) => {
   const hasHostData = classElements.some(

@@ -3,7 +3,7 @@ import { MockComment } from './comment-node';
 import { NODE_NAMES, NODE_TYPES } from './constants';
 import { MockDocumentFragment } from './document-fragment';
 import { MockDocumentTypeNode } from './document-type-node';
-import { createElement, createElementNS,MockBaseElement } from './element';
+import { createElement, createElementNS, MockBaseElement } from './element';
 import { resetEventListeners } from './event';
 import { MockElement, MockHTMLElement, MockTextNode, resetElement } from './node';
 import { parseHtmlToFragment } from './parse-html';

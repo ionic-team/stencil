@@ -1,4 +1,4 @@
-import { catchError, createJsVarName, DEFAULT_STYLE_MODE, hasError, isString,normalizePath } from '@utils';
+import { catchError, createJsVarName, DEFAULT_STYLE_MODE, hasError, isString, normalizePath } from '@utils';
 import MagicString from 'magic-string';
 import path from 'path';
 

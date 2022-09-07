@@ -6,7 +6,7 @@ import type * as d from '../declarations';
 import { ValidatedConfig } from '../declarations';
 import { createConfigFlags } from './config-flags';
 import { findConfig } from './find-config';
-import { CoreCompiler,loadCoreCompiler } from './load-compiler';
+import { CoreCompiler, loadCoreCompiler } from './load-compiler';
 import { loadedCompilerLog, startupLog, startupLogVersion } from './logs';
 import { parseFlags } from './parse-flags';
 import { taskBuild } from './task-build';

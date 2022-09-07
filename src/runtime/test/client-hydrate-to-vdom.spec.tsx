@@ -1,4 +1,4 @@
-import { Component, h,Host } from '@stencil/core';
+import { Component, h, Host } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
 import type * as d from '../../declarations';

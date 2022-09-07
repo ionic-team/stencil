@@ -1,4 +1,4 @@
-import { dashToPascalCase,DEFAULT_STYLE_MODE } from '@utils';
+import { dashToPascalCase, DEFAULT_STYLE_MODE } from '@utils';
 import ts from 'typescript';
 
 import type * as d from '../../declarations';

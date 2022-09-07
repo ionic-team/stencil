@@ -1,4 +1,4 @@
-import { Attribute, parse, parseFragment,ParserOptions, TreeAdapter } from 'parse5';
+import { Attribute, parse, parseFragment, ParserOptions, TreeAdapter } from 'parse5';
 
 import { MockComment } from './comment-node';
 import { NODE_NAMES, NODE_TYPES } from './constants';

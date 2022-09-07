@@ -1,7 +1,7 @@
 import ts from 'typescript';
 
 import type * as d from '../../../declarations';
-import { addCoreRuntimeApi,HTML_ELEMENT, RUNTIME_APIS } from '../core-runtime-apis';
+import { addCoreRuntimeApi, HTML_ELEMENT, RUNTIME_APIS } from '../core-runtime-apis';
 import { transformHostData } from '../host-data-transform';
 import { removeStaticMetaProperties } from '../remove-static-meta-properties';
 import { updateComponentClass } from '../update-component-class';

@@ -1,7 +1,7 @@
 import ts from 'typescript';
 
 import type * as d from '../../../declarations';
-import { addCoreRuntimeApi,GET_ELEMENT, RUNTIME_APIS } from '../core-runtime-apis';
+import { addCoreRuntimeApi, GET_ELEMENT, RUNTIME_APIS } from '../core-runtime-apis';
 
 export const addLazyElementGetter = (
   classMembers: ts.ClassElement[],

@@ -1,5 +1,5 @@
 import type { DevServer, ValidatedConfig } from '../declarations';
-import { printCheckVersionResults,startCheckVersion } from './check-version';
+import { printCheckVersionResults, startCheckVersion } from './check-version';
 import type { CoreCompiler } from './load-compiler';
 import { startupCompilerLog } from './logs';
 

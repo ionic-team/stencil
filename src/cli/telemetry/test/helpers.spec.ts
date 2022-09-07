@@ -1,6 +1,6 @@
 import { createSystem } from '../../../compiler/sys/stencil-sys';
 import { createConfigFlags } from '../../config-flags';
-import { hasDebug, hasVerbose,isInteractive, tryFn, uuidv4 } from '../helpers';
+import { hasDebug, hasVerbose, isInteractive, tryFn, uuidv4 } from '../helpers';
 
 describe('hasDebug', () => {
   it('Returns true when a flag is passed', () => {
