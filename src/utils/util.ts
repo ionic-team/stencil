@@ -96,7 +96,7 @@ export const hasDependency = (buildCtx: d.BuildCtx, depName: string): boolean =>
 
 export const getDynamicImportFunction = (namespace: string) => `__sc_import_${namespace.replace(/\s|-/g, '_')}`;
 
-export const readPackageJson = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
+export const readPackageJson = async (config: d.ValidatedConfig, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   try {
     const pkgJson = await compilerCtx.fs.readFile(config.packageJsonFilePath);
 
