@@ -53,9 +53,9 @@ export const validateConfig = (
     flags: JSON.parse(JSON.stringify(config.flags || {})),
     logger,
     outputTargets: config.outputTargets ?? [],
+    rootDir: typeof config.rootDir === 'string' ? config.rootDir : '/',
     sys: config.sys ?? bootstrapConfig.sys ?? createSystem({ logger }),
     testing: config.testing ?? {},
-    rootDir: typeof config.rootDir === 'string' ? config.rootDir : '/',
   };
 
   // default devMode false
