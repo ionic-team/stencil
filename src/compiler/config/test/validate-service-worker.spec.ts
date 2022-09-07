@@ -13,6 +13,7 @@ describe('validateServiceWorker', () => {
   beforeEach(() => {
     config = {
       fsNamespace: 'app',
+      rootDir: '/',
       sys: mockCompilerSystem(),
       devMode: false,
       flags: createConfigFlags(),
