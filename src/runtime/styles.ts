@@ -14,7 +14,7 @@ export const registerStyle = (scopeId: string, cssText: string, allowCS: boolean
     if (typeof style === 'string') {
       style = cssText;
     } else {
-      style.replaceSync(cssText);
+      style.replaceSync(cssText ?? '');
     }
   } else {
     style = cssText;
