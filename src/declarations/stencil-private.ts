@@ -1,7 +1,7 @@
+import { BuildResultsComponentGraph } from '.';
 import type {
   BuildEvents,
   BuildLog,
-  BuildResultsComponentGraph,
   CompilerBuildResults,
   CompilerBuildStart,
   CompilerFsStats,
@@ -19,7 +19,6 @@ import type {
   OutputTargetWww,
   PageReloadStrategy,
   PrerenderConfig,
-  PrerenderUrlResults,
   StyleDoc,
   LoggerLineUpdater,
   TaskCommand,
@@ -1424,6 +1423,11 @@ export interface PluginCtx {
   diagnostics: Diagnostic[];
 }
 
+export interface PrerenderUrlResults {
+  anchorUrls: string[];
+  diagnostics: Diagnostic[];
+  filePath: string;
+}
 
 export interface PrerenderUrlRequest {
   appDir: string;
