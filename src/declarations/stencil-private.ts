@@ -1,7 +1,7 @@
-import { BuildResultsComponentGraph } from '.';
 import type {
   BuildEvents,
   BuildLog,
+  BuildResultsComponentGraph,
   CompilerBuildResults,
   CompilerBuildStart,
   CompilerFsStats,
