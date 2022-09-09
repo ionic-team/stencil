@@ -11,8 +11,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node: [ '12', '14', '16' ]
-        os: [ 'ubuntu-latest', 'windows-latest' ]
+        node: ['12', '14', '16']
+        os: ['ubuntu-latest', 'windows-latest']
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout Code

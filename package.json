@@ -30,7 +30,7 @@
     "license": "node scripts --license",
     "lint": "eslint \"src/*.ts\" \"src/**/*.ts\" \"src/**/*.tsx\"",
     "prettier": "npm run prettier.base -- --write",
-    "prettier.base": "prettier \"./({bin,scripts,src,test}/**/*.{ts,tsx,js,jsx})|bin/stencil\"",
+    "prettier.base": "prettier \"./({bin,scripts,src,test}/**/*.{ts,tsx,js,jsx})|bin/stencil|.github/(**/)?*.(yml|yaml)\"",
     "prettier.dry-run": "npm run prettier.base -- --list-different",
     "release": "node scripts --release --publish",
     "release.prepare": "node scripts --release --prepare",
