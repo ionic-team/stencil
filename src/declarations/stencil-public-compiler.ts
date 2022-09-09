@@ -1,9 +1,13 @@
 import type { JsonDocs } from './stencil-public-docs';
-import type { PrerenderUrlResults } from '../internal';
 import type { ConfigFlags } from '../cli/config-flags';
 
 export * from './stencil-public-docs';
 
+export interface PrerenderUrlResults {
+  anchorUrls: string[];
+  diagnostics: Diagnostic[];
+  filePath: string;
+}
 /**
  * https://stenciljs.com/docs/config/
  */
