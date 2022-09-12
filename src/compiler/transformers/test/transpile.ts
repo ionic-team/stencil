@@ -17,8 +17,8 @@ import { getScriptTarget } from '../transform-utils';
  */
 export function transpileModule(
   input: string,
-  config?: d.Config,
-  compilerCtx?: d.CompilerCtx,
+  config?: d.Config | null,
+  compilerCtx?: d.CompilerCtx | null,
   beforeTransformers: ts.TransformerFactory<ts.SourceFile>[] = [],
   afterTransformers: ts.TransformerFactory<ts.SourceFile>[] = []
 ) {
@@ -154,12 +154,12 @@ export function transpileModule(
 }
 
 export function getStaticGetter(output: string, prop: string) {
-  const toEvaludate = `return ${output.replace('export', '')}`;
+  const toEvaluate = `return ${output.replace('export', '')}`;
   try {
-    const Obj = new Function(toEvaludate);
+    const Obj = new Function(toEvaluate);
     return Obj()[prop];
   } catch (e) {
     console.error(e);
-    console.error(toEvaludate);
+    console.error(toEvaluate);
   }
 }
