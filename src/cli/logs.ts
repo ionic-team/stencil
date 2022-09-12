@@ -94,7 +94,7 @@ export const loadedCompilerLog = (
 /**
  * Log various warnings to an output stream
  *
- * The output stream is determined by the {@link Logger} instances attached to the `config` argument to this function
+ * The output stream is determined by the {@link Logger} instance attached to the `config` argument to this function
  *
  * @param coreCompiler the compiler instance being used for this invocation of Stencil
  * @param config a validated configuration object to be used for this run of Stencil
