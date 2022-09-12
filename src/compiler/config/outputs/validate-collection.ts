@@ -17,7 +17,8 @@ export const validateCollection = (
   return userOutputs.filter(isOutputTargetDistCollection).map((outputTarget) => {
     return {
       ...outputTarget,
-      dir: getAbsolutePath(config, outputTarget.dir || 'dist/collection'),
+      transformAliasedImportPaths: outputTarget.transformAliasedImportPaths ?? false,
+      dir: getAbsolutePath(config, outputTarget.dir ?? 'dist/collection'),
     };
   });
 };

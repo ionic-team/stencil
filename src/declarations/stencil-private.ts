@@ -1,8 +1,8 @@
 import type { InMemoryFileSystem } from '../compiler/sys/in-memory-fs';
-import { BuildResultsComponentGraph } from '.';
 import type {
   BuildEvents,
   BuildLog,
+  BuildResultsComponentGraph,
   CompilerBuildResults,
   CompilerBuildStart,
   CompilerFsStats,
@@ -990,9 +990,9 @@ export interface ComponentTestingConstructor extends ComponentConstructor {
     componentWillLoad?: Function;
     componentWillUpdate?: Function;
     componentWillRender?: Function;
-    __componentWillLoad?: Function;
-    __componentWillUpdate?: Function;
-    __componentWillRender?: Function;
+    __componentWillLoad?: Function | null;
+    __componentWillUpdate?: Function | null;
+    __componentWillRender?: Function | null;
   };
 }
 
