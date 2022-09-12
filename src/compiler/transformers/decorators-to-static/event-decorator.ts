@@ -35,7 +35,7 @@ export const eventDecoratorsToStatic = (
  * @param typeChecker an instance of the TypeScript type checker, used to generate information about the `@Event()` and
  * its surrounding context in the AST
  * @param prop the property on the Stencil component class that is decorated with `@Event()`
- * @returns generated metadata for the class member decorated by `@Event()`
+ * @returns generated metadata for the class member decorated by `@Event()`, or `null` if none could be derived
  */
 const parseEventDecorator = (
   diagnostics: d.Diagnostic[],
