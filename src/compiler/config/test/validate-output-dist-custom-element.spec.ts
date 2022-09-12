@@ -36,6 +36,59 @@ describe('validate-output-dist-custom-element', () => {
           empty: true,
           externalRuntime: true,
           generateTypeDeclarations: true,
+          customElementsExportBehavior: 'default',
+        },
+      ]);
+    });
+
+    it('uses a provided export behavior over the default value', () => {
+      const outputTarget: d.OutputTargetDistCustomElements = {
+        type: DIST_CUSTOM_ELEMENTS,
+        customElementsExportBehavior: 'single-export-module',
+      };
+      userConfig.outputTargets = [outputTarget];
+
+      const { config } = validateConfig(userConfig, mockLoadConfigInit());
+      expect(config.outputTargets).toEqual([
+        {
+          type: DIST_TYPES,
+          dir: defaultDistDir,
+          typesDir: path.join(rootDir, 'dist', 'types'),
+        },
+        {
+          type: DIST_CUSTOM_ELEMENTS,
+          copy: [],
+          dir: defaultDistDir,
+          empty: true,
+          externalRuntime: true,
+          generateTypeDeclarations: true,
+          customElementsExportBehavior: 'single-export-module',
+        },
+      ]);
+    });
+
+    it('uses the default export behavior if the specified value is invalid', () => {
+      const outputTarget: d.OutputTargetDistCustomElements = {
+        type: DIST_CUSTOM_ELEMENTS,
+        customElementsExportBehavior: 'not-a-valid-option' as d.CustomElementsExportBehavior,
+      };
+      userConfig.outputTargets = [outputTarget];
+
+      const { config } = validateConfig(userConfig, mockLoadConfigInit());
+      expect(config.outputTargets).toEqual([
+        {
+          type: DIST_TYPES,
+          dir: defaultDistDir,
+          typesDir: path.join(rootDir, 'dist', 'types'),
+        },
+        {
+          type: DIST_CUSTOM_ELEMENTS,
+          copy: [],
+          dir: defaultDistDir,
+          empty: true,
+          externalRuntime: true,
+          generateTypeDeclarations: true,
+          customElementsExportBehavior: 'default',
         },
       ]);
     });
@@ -57,6 +110,7 @@ describe('validate-output-dist-custom-element', () => {
           empty: true,
           externalRuntime: true,
           generateTypeDeclarations: false,
+          customElementsExportBehavior: 'default',
         },
       ]);
     });
@@ -79,6 +133,7 @@ describe('validate-output-dist-custom-element', () => {
             empty: true,
             externalRuntime: false,
             generateTypeDeclarations: false,
+            customElementsExportBehavior: 'default',
           },
         ]);
       });
@@ -101,6 +156,7 @@ describe('validate-output-dist-custom-element', () => {
             empty: true,
             externalRuntime: false,
             generateTypeDeclarations: false,
+            customElementsExportBehavior: 'default',
           },
         ]);
       });
@@ -124,6 +180,7 @@ describe('validate-output-dist-custom-element', () => {
             empty: false,
             externalRuntime: true,
             generateTypeDeclarations: false,
+            customElementsExportBehavior: 'default',
           },
         ]);
       });
@@ -146,6 +203,7 @@ describe('validate-output-dist-custom-element', () => {
             empty: false,
             externalRuntime: true,
             generateTypeDeclarations: false,
+            customElementsExportBehavior: 'default',
           },
         ]);
       });
@@ -173,6 +231,7 @@ describe('validate-output-dist-custom-element', () => {
             empty: false,
             externalRuntime: true,
             generateTypeDeclarations: true,
+            customElementsExportBehavior: 'default',
           },
         ]);
       });
@@ -199,6 +258,7 @@ describe('validate-output-dist-custom-element', () => {
             empty: false,
             externalRuntime: true,
             generateTypeDeclarations: true,
+            customElementsExportBehavior: 'default',
           },
         ]);
       });
@@ -226,6 +286,7 @@ describe('validate-output-dist-custom-element', () => {
             empty: false,
             externalRuntime: false,
             generateTypeDeclarations: true,
+            customElementsExportBehavior: 'default',
           },
         ]);
       });
@@ -254,6 +315,7 @@ describe('validate-output-dist-custom-element', () => {
             empty: false,
             externalRuntime: false,
             generateTypeDeclarations: true,
+            customElementsExportBehavior: 'default',
           },
         ]);
       });
@@ -276,6 +338,7 @@ describe('validate-output-dist-custom-element', () => {
             empty: false,
             externalRuntime: false,
             generateTypeDeclarations: false,
+            customElementsExportBehavior: 'default',
           },
         ]);
       });
@@ -316,6 +379,7 @@ describe('validate-output-dist-custom-element', () => {
             empty: false,
             externalRuntime: false,
             generateTypeDeclarations: false,
+            customElementsExportBehavior: 'default',
           },
         ]);
       });
