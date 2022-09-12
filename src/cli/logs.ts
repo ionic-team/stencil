@@ -5,7 +5,7 @@ import type { CoreCompiler } from './load-compiler';
 /**
  * Log the name of this package (`@stencil/core`) to an output stream
  *
- * The output stream is determined by the {@link Logger} instances that is provided as an argument to this function
+ * The output stream is determined by the {@link Logger} instance that is provided as an argument to this function
  *
  * The name of the package may not be logged, by design, for certain `task` types and logging levels
  *
