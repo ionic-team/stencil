@@ -991,9 +991,9 @@ export interface ComponentTestingConstructor extends ComponentConstructor {
     componentWillLoad?: Function;
     componentWillUpdate?: Function;
     componentWillRender?: Function;
-    __componentWillLoad?: Function;
-    __componentWillUpdate?: Function;
-    __componentWillRender?: Function;
+    __componentWillLoad?: Function | null;
+    __componentWillUpdate?: Function | null;
+    __componentWillRender?: Function | null;
   };
 }
 
