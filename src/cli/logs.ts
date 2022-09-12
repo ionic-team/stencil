@@ -1,4 +1,4 @@
-import type { Logger, CompilerSystem, SystemDetails, TaskCommand, ValidatedConfig } from '../declarations';
+import type { Logger, CompilerSystem, TaskCommand, ValidatedConfig } from '../declarations';
 import type { ConfigFlags } from './config-flags';
 import type { CoreCompiler } from './load-compiler';
 
@@ -65,18 +65,17 @@ export const loadedCompilerLog = (
   flags: ConfigFlags,
   coreCompiler: CoreCompiler
 ): void => {
-  const sysDetails: SystemDetails = sys.details ?? {
-    platform: '',
-    cpuModel: 'UNKNOWN',
-    freemem: () => 0,
-    release: 'UNKNOWN',
-    totalmem: 0,
-  };
+  const sysDetails = sys.details;
   const runtimeInfo = `${sys.name} ${sys.version}`;
-  const platformInfo = `${sysDetails.platform}, ${sysDetails.cpuModel}`;
-  const statsInfo = `cpus: ${sys.hardwareConcurrency}, freemem: ${Math.round(
-    sysDetails.freemem() / 1000000
-  )}MB, totalmem: ${Math.round(sysDetails.totalmem / 1000000)}MB`;
+
+  const platformInfo = sysDetails
+    ? `${sysDetails.platform}, ${sysDetails.cpuModel}`
+    : `Unknown Platform, Unknown CPU Model`;
+  const statsInfo = sysDetails
+    ? `cpus: ${sys.hardwareConcurrency}, freemem: ${Math.round(
+        sysDetails.freemem() / 1000000
+      )}MB, totalmem: ${Math.round(sysDetails.totalmem / 1000000)}MB`
+    : 'Unknown CPU Core Count, Unknown Memory';
 
   if (logger.getLevel() === 'debug') {
     logger.debug(runtimeInfo);
