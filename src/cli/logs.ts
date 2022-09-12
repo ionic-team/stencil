@@ -52,7 +52,7 @@ export const startupLogVersion = (logger: Logger, task: TaskCommand, coreCompile
 /**
  * Log details from a {@link CompilerSystem} used by Stencil to an output stream
  *
- * The output stream is determined by the {@link Logger} instances that is provided as an argument to this function
+ * The output stream is determined by the {@link Logger} instance that is provided as an argument to this function
  *
  * @param sys the `CompilerSystem` to report details on
  * @param logger the logging entity to use for output
