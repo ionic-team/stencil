@@ -1,6 +1,7 @@
 import type { JsonDocs } from './stencil-public-docs';
 import type { PrerenderUrlResults } from '../internal';
 import type { ConfigFlags } from '../cli/config-flags';
+
 export * from './stencil-public-docs';
 
 /**
@@ -409,7 +410,7 @@ type RequireFields<T, K extends keyof T> = T & { [P in K]-?: T[P] };
 /**
  * Fields in {@link Config} to make required for {@link ValidatedConfig}
  */
-type StrictConfigFields = 'flags' | 'logger' | 'outputTargets' | 'sys' | 'testing';
+type StrictConfigFields = 'flags' | 'logger' | 'outputTargets' | 'rootDir' | 'sys' | 'testing';
 
 /**
  * A version of {@link Config} that makes certain fields required. This type represents a valid configuration entity.
@@ -1845,6 +1846,28 @@ export interface OutputTargetDist extends OutputTargetBase {
   dir?: string;
 
   collectionDir?: string | null;
+  /**
+   * When `true` this flag will transform aliased import paths defined in
+   * a project's `tsconfig.json` to relative import paths in the compiled output's
+   * `dist-collection` bundle if it is generated (i.e. `collectionDir` is set).
+   *
+   * Paths will be left in aliased format if `false` or `undefined`.
+   *
+   * @example
+   * // tsconfig.json
+   * {
+   *   paths: {
+   *     "@utils/*": ['/src/utils/*']
+   *   }
+   * }
+   *
+   * // Source file
+   * import * as dateUtils from '@utils/date-utils';
+   * // Output file
+   * import * as dateUtils from '../utils/date-utils';
+   */
+  transformAliasedImportPathsInCollection?: boolean | null;
+
   typesDir?: string;
   esmLoaderPath?: string;
   copy?: CopyTask[];
@@ -1858,6 +1881,26 @@ export interface OutputTargetDistCollection extends OutputTargetBase {
   empty?: boolean;
   dir: string;
   collectionDir: string;
+  /**
+   * When `true` this flag will transform aliased import paths defined in
+   * a project's `tsconfig.json` to relative import paths in the compiled output.
+   *
+   * Paths will be left in aliased format if `false` or `undefined`.
+   *
+   * @example
+   * // tsconfig.json
+   * {
+   *   paths: {
+   *     "@utils/*": ['/src/utils/*']
+   *   }
+   * }
+   *
+   * // Source file
+   * import * as dateUtils from '@utils/date-utils';
+   * // Output file
+   * import * as dateUtils from '../utils/date-utils';
+   */
+  transformAliasedImportPaths?: boolean | null;
 }
 
 export interface OutputTargetDistTypes extends OutputTargetBase {
@@ -2373,14 +2416,6 @@ export interface FsStats {
   mtime: Date;
   ctime: Date;
   birthtime: Date;
-}
-
-export interface FsWriteOptions {
-  inMemoryOnly?: boolean;
-  clearFileCache?: boolean;
-  immediateWrite?: boolean;
-  useCache?: boolean;
-  outputTargetType?: string;
 }
 
 export interface Compiler {

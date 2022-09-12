@@ -1,6 +1,7 @@
 import type * as d from '@stencil/core/internal';
 import { isOutputTargetDistLazy, isOutputTargetWww } from '../compiler/output-targets/output-utils';
 import { join, relative } from 'path';
+import { InMemoryFileSystem } from '../compiler/sys/in-memory-fs';
 
 export function shuffleArray(array: any[]) {
   // http://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
@@ -30,7 +31,7 @@ export function shuffleArray(array: any[]) {
  * @param filePaths the paths to validate
  * @throws when one or more of the provided file paths cannot be found
  */
-export function expectFilesExist(fs: d.InMemoryFileSystem, filePaths: string[]): void {
+export function expectFilesExist(fs: InMemoryFileSystem, filePaths: string[]): void {
   const notFoundFiles: ReadonlyArray<string> = filePaths.filter((filePath: string) => !fs.statSync(filePath).exists);
 
   if (notFoundFiles.length > 0) {
@@ -49,7 +50,7 @@ export function expectFilesExist(fs: d.InMemoryFileSystem, filePaths: string[]):
  * @param filePaths the paths to validate
  * @throws when one or more of the provided file paths is found
  */
-export function expectFilesDoNotExist(fs: d.InMemoryFileSystem, filePaths: string[]): void {
+export function expectFilesDoNotExist(fs: InMemoryFileSystem, filePaths: string[]): void {
   const existentFiles: ReadonlyArray<string> = filePaths.filter((filePath: string) => fs.statSync(filePath).exists);
 
   if (existentFiles.length > 0) {
@@ -61,12 +62,12 @@ export function expectFilesDoNotExist(fs: d.InMemoryFileSystem, filePaths: strin
   }
 }
 
-export function getAppScriptUrl(config: d.Config, browserUrl: string) {
+export function getAppScriptUrl(config: d.ValidatedConfig, browserUrl: string) {
   const appFileName = `${config.fsNamespace}.esm.js`;
   return getAppUrl(config, browserUrl, appFileName);
 }
 
-export function getAppStyleUrl(config: d.Config, browserUrl: string) {
+export function getAppStyleUrl(config: d.ValidatedConfig, browserUrl: string) {
   if (config.globalStyle) {
     const appFileName = `${config.fsNamespace}.css`;
     return getAppUrl(config, browserUrl, appFileName);
@@ -74,7 +75,7 @@ export function getAppStyleUrl(config: d.Config, browserUrl: string) {
   return null;
 }
 
-function getAppUrl(config: d.Config, browserUrl: string, appFileName: string) {
+function getAppUrl(config: d.ValidatedConfig, browserUrl: string, appFileName: string) {
   const wwwOutput = config.outputTargets.find(isOutputTargetWww);
   if (wwwOutput) {
     const appBuildDir = wwwOutput.buildDir;
