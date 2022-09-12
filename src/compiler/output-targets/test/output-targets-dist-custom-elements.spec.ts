@@ -131,55 +131,96 @@ describe('Custom Elements output target', () => {
   });
 
   describe('addCustomElementInputs', () => {
-    it('should add imports to index.js for all included components', () => {
-      const componentOne = stubComponentCompilerMeta();
-      const componentTwo = stubComponentCompilerMeta({
-        componentClassName: 'MyBestComponent',
-        tagName: 'my-best-component',
-      });
-      const { config, compilerCtx, buildCtx } = setup();
-      buildCtx.components = [componentOne, componentTwo];
+    let config: d.ValidatedConfig;
+    let compilerCtx: d.CompilerCtx;
+    let buildCtx: d.BuildCtx;
 
-      const bundleOptions = getBundleOptions(
-        config,
-        buildCtx,
-        compilerCtx,
-        config.outputTargets[0] as OutputTargetDistCustomElements
-      );
-      addCustomElementInputs(buildCtx, bundleOptions);
-      expect(bundleOptions.loader['\0core']).toEqual(
-        `export { setAssetPath, setPlatformOptions } from '${STENCIL_INTERNAL_CLIENT_ID}';
+    beforeEach(() => {
+      ({ config, compilerCtx, buildCtx } = setup());
+    });
+
+    describe('no defined CustomElementsExportBehavior', () => {
+      it("doesn't re-export components from the index.js barrel file", () => {
+        const componentOne = stubComponentCompilerMeta();
+        const componentTwo = stubComponentCompilerMeta({
+          componentClassName: 'MyBestComponent',
+          tagName: 'my-best-component',
+        });
+
+        buildCtx.components = [componentOne, componentTwo];
+
+        const bundleOptions = getBundleOptions(
+          config,
+          buildCtx,
+          compilerCtx,
+          config.outputTargets[0] as OutputTargetDistCustomElements
+        );
+        addCustomElementInputs(buildCtx, bundleOptions, config.outputTargets[0] as OutputTargetDistCustomElements);
+        expect(bundleOptions.loader['\0core']).toEqual(
+          `export { setAssetPath, setPlatformOptions } from '${STENCIL_INTERNAL_CLIENT_ID}';
+export * from '${USER_INDEX_ENTRY_ID}';
+import { globalScripts } from '${STENCIL_APP_GLOBALS_ID}';
+globalScripts();
+`
+        );
+      });
+    });
+
+    describe('CustomElementsExportBehavior.SINGLE_EXPORT_MODULE', () => {
+      beforeEach(() => {
+        (config.outputTargets[0] as OutputTargetDistCustomElements).customElementsExportBehavior =
+          'single-export-module';
+      });
+
+      it('should add imports to index.js for all included components', () => {
+        const componentOne = stubComponentCompilerMeta();
+        const componentTwo = stubComponentCompilerMeta({
+          componentClassName: 'MyBestComponent',
+          tagName: 'my-best-component',
+        });
+
+        buildCtx.components = [componentOne, componentTwo];
+
+        const bundleOptions = getBundleOptions(
+          config,
+          buildCtx,
+          compilerCtx,
+          config.outputTargets[0] as OutputTargetDistCustomElements
+        );
+        addCustomElementInputs(buildCtx, bundleOptions, config.outputTargets[0] as OutputTargetDistCustomElements);
+        expect(bundleOptions.loader['\0core']).toEqual(
+          `export { setAssetPath, setPlatformOptions } from '${STENCIL_INTERNAL_CLIENT_ID}';
 export * from '${USER_INDEX_ENTRY_ID}';
 import { globalScripts } from '${STENCIL_APP_GLOBALS_ID}';
 globalScripts();
 export { StubCmp, defineCustomElement as defineCustomElementStubCmp } from '\0StubCmp';
 export { MyBestComponent, defineCustomElement as defineCustomElementMyBestComponent } from '\0MyBestComponent';`
-      );
-    });
-
-    it('should correctly handle capitalization edge-cases', () => {
-      const component = stubComponentCompilerMeta({
-        componentClassName: 'ComponentWithJSX',
-        tagName: 'component-with-jsx',
+        );
       });
 
-      const { config, compilerCtx, buildCtx } = setup();
-      buildCtx.components = [component];
+      it('should correctly handle capitalization edge-cases', () => {
+        const component = stubComponentCompilerMeta({
+          componentClassName: 'ComponentWithJSX',
+          tagName: 'component-with-jsx',
+        });
 
-      const bundleOptions = getBundleOptions(
-        config,
-        buildCtx,
-        compilerCtx,
-        config.outputTargets[0] as OutputTargetDistCustomElements
-      );
-      addCustomElementInputs(buildCtx, bundleOptions);
-      expect(bundleOptions.loader['\0core']).toEqual(
-        `export { setAssetPath, setPlatformOptions } from '${STENCIL_INTERNAL_CLIENT_ID}';
+        buildCtx.components = [component];
+
+        const bundleOptions = getBundleOptions(
+          config,
+          buildCtx,
+          compilerCtx,
+          config.outputTargets[0] as OutputTargetDistCustomElements
+        );
+        addCustomElementInputs(buildCtx, bundleOptions, config.outputTargets[0] as OutputTargetDistCustomElements);
+        expect(bundleOptions.loader['\0core']).toEqual(
+          `export { setAssetPath, setPlatformOptions } from '${STENCIL_INTERNAL_CLIENT_ID}';
 export * from '${USER_INDEX_ENTRY_ID}';
 import { globalScripts } from '${STENCIL_APP_GLOBALS_ID}';
 globalScripts();
 export { ComponentWithJsx, defineCustomElement as defineCustomElementComponentWithJsx } from '\0ComponentWithJsx';`
-      );
+        );
+      });
     });
   });
 });
