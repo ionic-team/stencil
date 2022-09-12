@@ -15,7 +15,7 @@ jobs:
   strict_null_check: # TODO(STENCIL-446): Remove this workflow once `strictNullChecks` is enabled
     strategy:
       matrix:
-        branch: [ 'main', 'pr' ]
+        branch: ['main', 'pr']
     name: 'Get strictNullChecks errors on ${{ matrix.branch }}'
     runs-on: 'ubuntu-latest'
     steps:
@@ -53,7 +53,7 @@ jobs:
   unused_exports_check:
     strategy:
       matrix:
-        branch: [ 'main', 'pr' ]
+        branch: ['main', 'pr']
     name: Find unused variables on ${{ matrix.branch }}
     runs-on: 'ubuntu-latest'
     steps:
@@ -85,7 +85,7 @@ jobs:
           path: 'unused-exports-${{ matrix.branch }}.txt'
 
   format_report:
-    needs: [ "strict_null_check", "unused_exports_check" ]
+    needs: ['strict_null_check', 'unused_exports_check']
     name: Download error files and report
     runs-on: 'ubuntu-latest'
     steps:
@@ -130,7 +130,7 @@ jobs:
       - name: Set action output
         run: node scripts/build/tech-debt-burndown-report.js > $GITHUB_STEP_SUMMARY
 
-       # for syntax information, see https://github.com/peter-evans/create-or-update-comment#setting-the-comment-body-from-a-file
+        # for syntax information, see https://github.com/peter-evans/create-or-update-comment#setting-the-comment-body-from-a-file
       - name: Set comment body
         id: set-comment-body
         run: |
