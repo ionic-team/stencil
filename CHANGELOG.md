@@ -1,3 +1,18 @@
+# 🔥 [2.18.0](https://github.com/ionic-team/stencil/compare/v2.17.4...v2.18.0) (2022-09-12)
+
+
+### Bug Fixes
+
+* **collection:** properly transform imports ([#3523](https://github.com/ionic-team/stencil/issues/3523)) ([ac2c09e](https://github.com/ionic-team/stencil/commit/ac2c09e41ab1dee497a695e93b01ff434334883c))
+
+
+### Features
+
+* **loader:** add private field to loader's package.json ([#3566](https://github.com/ionic-team/stencil/issues/3566)) ([fc8efb3](https://github.com/ionic-team/stencil/commit/fc8efb3ae6f3aac50c2a7f6dc0d4283d37b27a2c))
+* **typescript:** add support for typescript v4.7 ([#3530](https://github.com/ionic-team/stencil/issues/3530)) ([1226e56](https://github.com/ionic-team/stencil/commit/1226e56169af916862e9f50e7fe35d6fac96d881))
+
+
+
 ## 🐞 [2.17.4](https://github.com/ionic-team/stencil/compare/v2.17.3...v2.17.4) (2022-08-22)
 
 
