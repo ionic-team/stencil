@@ -113,7 +113,7 @@ export const bundleCustomElements = async (
   try {
     const bundleOpts = getBundleOptions(config, buildCtx, compilerCtx, outputTarget);
 
-    addCustomElementInputs(buildCtx, bundleOpts);
+    addCustomElementInputs(buildCtx, bundleOpts, outputTarget);
 
     const build = await bundleOutput(config, compilerCtx, buildCtx, bundleOpts);
 
@@ -181,8 +181,13 @@ export const bundleCustomElements = async (
  * Create the virtual modules/input modules for the `dist-custom-elements` output target.
  * @param buildCtx the context for the current build
  * @param bundleOpts the bundle options to store the virtual modules under. acts as an output parameter
+ * @param outputTarget the configuration for the custom element output target
  */
-export const addCustomElementInputs = (buildCtx: d.BuildCtx, bundleOpts: BundleOptions): void => {
+export const addCustomElementInputs = (
+  buildCtx: d.BuildCtx,
+  bundleOpts: BundleOptions,
+  outputTarget: d.OutputTargetDistCustomElements
+): void => {
   const components = buildCtx.components;
   // an array to store the imports of these modules that we're going to add to our entry chunk
   const indexImports: string[] = [];
@@ -220,7 +225,10 @@ export const addCustomElementInputs = (buildCtx: d.BuildCtx, bundleOpts: BundleO
     bundleOpts.loader![coreKey] = exp.join('\n');
   });
 
-  bundleOpts.loader!['\0core'] += indexImports.join('\n');
+  // Only re-export component definitions if the barrel export behavior is set
+  if (outputTarget.customElementsExportBehavior === 'single-export-module') {
+    bundleOpts.loader!['\0core'] += indexImports.join('\n');
+  }
 };
 
 /**

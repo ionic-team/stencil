@@ -2023,6 +2023,25 @@ export interface OutputTargetBaseNext {
   dir?: string;
 }
 
+/**
+ * The collection of valid export behaviors.
+ * Used to generate a type for typed configs as well as output target validation
+ * for the `dist-custom-elements` output target.
+ *
+ * Adding a value to this const array will automatically add it as a valid option on the
+ * output target configuration for `customElementsExportBehavior`.
+ *
+ * - `default`: No additional export or definition behavior will happen.
+ * - `single-export-module`: All components will be re-exported from the specified directory's root `index.js` file.
+ */
+export const CustomElementsExportBehaviorOptions = ['default', 'single-export-module'] as const;
+
+/**
+ * This type is auto-generated based on the values in `CustomElementsExportBehaviorOptions` array.
+ * This is used on the output target config for intellisense in typed configs.
+ */
+export type CustomElementsExportBehavior = typeof CustomElementsExportBehaviorOptions[number];
+
 export interface OutputTargetDistCustomElements extends OutputTargetBaseNext {
   type: 'dist-custom-elements';
   empty?: boolean;
@@ -2047,6 +2066,12 @@ export interface OutputTargetDistCustomElements extends OutputTargetBaseNext {
    * Enables the generation of type definition files for the output target.
    */
   generateTypeDeclarations?: boolean;
+  /**
+   * Define the export/definition behavior for the output target's generated output.
+   * This controls if/how custom elements will be defined or where components will be exported from.
+   * If omitted, no auto-definition behavior or re-exporting will happen.
+   */
+  customElementsExportBehavior?: CustomElementsExportBehavior;
 }
 
 export interface OutputTargetDistCustomElementsBundle extends OutputTargetBaseNext {
