@@ -50,6 +50,11 @@ export const visitClassDeclaration = (
   const decoratedMembers = classMembers.filter(
     (member) => Array.isArray(member.decorators) && member.decorators.length > 0
   );
+
+  // create an array of all class members which do _not_ have a Stencil
+  // decorator on them. we do this so we can transform the decorated class
+  // fields into static getters while preserving other class members (like
+  // methods and so on).
   const newMembers = removeStencilDecorators(Array.from(classMembers));
 
   // parser component decorator (Component)
