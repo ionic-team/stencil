@@ -1,9 +1,10 @@
-import type * as d from '../../declarations';
 import { catchError, normalizePath } from '@utils';
-import { getCssImports } from './css-imports';
+
+import type * as d from '../../declarations';
 import { isOutputTargetDistGlobalStyles } from '../output-targets/output-utils';
-import { optimizeCss } from './optimize-css';
 import { runPluginTransforms } from '../plugin/plugin';
+import { getCssImports } from './css-imports';
+import { optimizeCss } from './optimize-css';
 
 export const generateGlobalStyles = async (
   config: d.ValidatedConfig,

@@ -1,8 +1,9 @@
-import type * as d from '../../../declarations';
 import { augmentDiagnosticWithNode, buildError, flatOne } from '@utils';
+import ts from 'typescript';
+
+import type * as d from '../../../declarations';
 import { convertValueToLiteral, createStaticGetter } from '../transform-utils';
 import { getDeclarationParameters, isDecoratorNamed } from './decorator-utils';
-import ts from 'typescript';
 
 export const listenDecoratorsToStatic = (
   diagnostics: d.Diagnostic[],

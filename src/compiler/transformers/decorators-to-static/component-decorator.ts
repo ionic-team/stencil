@@ -1,9 +1,10 @@
-import type * as d from '../../../declarations';
-import { augmentDiagnosticWithNode, buildError, validateComponentTag, isString, buildWarn } from '@utils';
-import { getDeclarationParameters } from './decorator-utils';
-import { convertValueToLiteral, createStaticGetter } from '../transform-utils';
-import { styleToStatic } from './style-to-static';
+import { augmentDiagnosticWithNode, buildError, buildWarn, isString, validateComponentTag } from '@utils';
 import ts from 'typescript';
+
+import type * as d from '../../../declarations';
+import { convertValueToLiteral, createStaticGetter } from '../transform-utils';
+import { getDeclarationParameters } from './decorator-utils';
+import { styleToStatic } from './style-to-static';
 
 export const componentDecoratorToStatic = (
   config: d.Config,

@@ -1,5 +1,6 @@
-import type { ValidatedConfig } from '../declarations';
 import { isFunction } from '@utils';
+
+import type { ValidatedConfig } from '../declarations';
 
 export const startCheckVersion = async (config: ValidatedConfig, currentVersion: string) => {
   if (config.devMode && !config.flags.ci && !currentVersion.includes('-dev.') && isFunction(config.sys.checkVersion)) {

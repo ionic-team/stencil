@@ -1,5 +1,6 @@
-import { Component, Element, setErrorHandler, Host, Prop, State, forceUpdate, getRenderingRef, h } from '@stencil/core';
+import { Component, Element, forceUpdate, getRenderingRef, h, Host, Prop, setErrorHandler, State } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
+
 import { withSilentWarn } from '../../testing/testing-utils';
 
 describe('render-vdom', () => {

@@ -1,11 +1,12 @@
-import type * as d from '../../../declarations';
-import { generateLazyModules } from './generate-lazy-module';
-import { generateRollupOutput } from '../../app-core/bundle-app-core';
+import { generatePreamble } from '@utils';
 import { join } from 'path';
 import type { OutputOptions, RollupBuild } from 'rollup';
-import { relativeImport } from '../output-utils';
+
+import type * as d from '../../../declarations';
 import type { RollupResult } from '../../../declarations';
-import { generatePreamble } from '@utils';
+import { generateRollupOutput } from '../../app-core/bundle-app-core';
+import { relativeImport } from '../output-utils';
+import { generateLazyModules } from './generate-lazy-module';
 
 export const generateEsm = async (
   config: d.ValidatedConfig,

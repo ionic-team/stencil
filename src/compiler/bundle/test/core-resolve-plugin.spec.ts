@@ -1,5 +1,5 @@
-import type * as d from '../../../declarations';
 import { createSystem } from '../../../compiler/sys/stencil-sys';
+import type * as d from '../../../declarations';
 import { getHydratedFlagHead, getStencilInternalModule } from '../core-resolve-plugin';
 
 describe('core resolve plugin', () => {

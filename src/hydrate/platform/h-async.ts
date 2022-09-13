@@ -1,7 +1,8 @@
-import type * as d from '../../declarations';
 import { consoleDevError } from '@platform';
 import { h } from '@runtime';
 import { isPromise } from '@utils';
+
+import type * as d from '../../declarations';
 
 export const hAsync = (nodeName: any, vnodeData: any, ...children: d.ChildType[]) => {
   if (Array.isArray(children) && children.length > 0) {

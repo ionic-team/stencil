@@ -1,6 +1,7 @@
-import type * as d from '../../declarations';
-import { basename, dirname, join, relative } from 'path';
 import { flatOne, normalizePath, sortBy } from '@utils';
+import { basename, dirname, join, relative } from 'path';
+
+import type * as d from '../../declarations';
 
 export const relativeImport = (pathFrom: string, pathTo: string, ext?: string, addPrefix = true) => {
   let relativePath = relative(dirname(pathFrom), dirname(pathTo));

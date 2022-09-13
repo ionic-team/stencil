@@ -6,9 +6,10 @@ import type {
   ScreenshotDiff,
   ScreenshotOptions,
 } from '@stencil/core/internal';
+import type * as puppeteer from 'puppeteer';
+
 import { compareScreenshot } from '../../screenshot/screenshot-compare';
 import type * as pd from './puppeteer-declarations';
-import type * as puppeteer from 'puppeteer';
 
 export function initPageScreenshot(page: pd.E2EPageInternal) {
   const env = process.env as E2EProcessEnv;

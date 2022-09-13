@@ -1,8 +1,9 @@
+import ts from 'typescript';
+
 import type * as d from '../../../declarations';
+import { addCoreRuntimeApi, RUNTIME_APIS } from '../core-runtime-apis';
 import { addCreateEvents } from '../create-event';
 import { addLegacyProps } from '../legacy-props';
-import { RUNTIME_APIS, addCoreRuntimeApi } from '../core-runtime-apis';
-import ts from 'typescript';
 
 export const updateNativeConstructor = (
   classMembers: ts.ClassElement[],

@@ -1,7 +1,7 @@
 import type * as d from '../../../declarations';
+import * as Util from '../../../utils/util';
 import { generateMethodTypes } from '../generate-method-types';
 import * as StencilTypes from '../stencil-types';
-import * as Util from '../../../utils/util';
 import { stubComponentCompilerMeta } from './ComponentCompilerMeta.stub';
 import { stubComponentCompilerMethod } from './ComponentCompilerMethod.stub';
 import { stubTypesImportData } from './TypesImportData.stub';

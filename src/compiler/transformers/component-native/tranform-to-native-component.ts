@@ -1,12 +1,13 @@
+import ts from 'typescript';
+
 import type * as d from '../../../declarations';
+import { addModuleMetadataProxies } from '../add-component-meta-proxy';
 import { addImports } from '../add-imports';
 import { addLegacyApis } from '../core-runtime-apis';
-import { addModuleMetadataProxies } from '../add-component-meta-proxy';
-import { getComponentMeta, getModuleFromSourceFile } from '../transform-utils';
 import { defineCustomElement } from '../define-custom-element';
-import { updateNativeComponentClass } from './native-component';
 import { updateStyleImports } from '../style-imports';
-import ts from 'typescript';
+import { getComponentMeta, getModuleFromSourceFile } from '../transform-utils';
+import { updateNativeComponentClass } from './native-component';
 
 export const nativeComponentTransform = (
   compilerCtx: d.CompilerCtx,

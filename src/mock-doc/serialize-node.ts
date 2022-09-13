@@ -1,7 +1,7 @@
-import { cloneAttributes } from './attribute';
 import { CONTENT_REF_ID, ORG_LOCATION_ID, SLOT_NODE_ID, TEXT_NODE_ID, XLINK_NS } from '../runtime/runtime-constants';
-import { MockNode } from './node';
+import { cloneAttributes } from './attribute';
 import { NODE_TYPES } from './constants';
+import { MockNode } from './node';
 
 export function serializeNodeToHtml(elm: Node | MockNode, opts: SerializeNodeToHtmlOptions = {}) {
   const output: SerializeOutput = {

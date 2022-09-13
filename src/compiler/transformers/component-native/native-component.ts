@@ -1,15 +1,16 @@
-import type * as d from '../../../declarations';
-import { addNativeComponentMeta } from './native-meta';
-import { addNativeConnectedCallback } from './native-connected-callback';
-import { addNativeElementGetter } from './native-element-getter';
-import { addNativeStaticStyle } from './native-static-style';
-import { addWatchers } from '../watcher-meta-transform';
-import { HTML_ELEMENT, RUNTIME_APIS, addCoreRuntimeApi } from '../core-runtime-apis';
-import { removeStaticMetaProperties } from '../remove-static-meta-properties';
-import { transformHostData } from '../host-data-transform';
-import { updateComponentClass } from '../update-component-class';
-import { updateNativeConstructor } from './native-constructor';
 import ts from 'typescript';
+
+import type * as d from '../../../declarations';
+import { addCoreRuntimeApi, HTML_ELEMENT, RUNTIME_APIS } from '../core-runtime-apis';
+import { transformHostData } from '../host-data-transform';
+import { removeStaticMetaProperties } from '../remove-static-meta-properties';
+import { updateComponentClass } from '../update-component-class';
+import { addWatchers } from '../watcher-meta-transform';
+import { addNativeConnectedCallback } from './native-connected-callback';
+import { updateNativeConstructor } from './native-constructor';
+import { addNativeElementGetter } from './native-element-getter';
+import { addNativeComponentMeta } from './native-meta';
+import { addNativeStaticStyle } from './native-static-style';
 
 export const updateNativeComponentClass = (
   transformOpts: d.TransformOptions,

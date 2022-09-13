@@ -1,5 +1,6 @@
-import type * as d from '../../../declarations';
 import ts from 'typescript';
+
+import type * as d from '../../../declarations';
 import { isMethod } from '../transform-utils';
 
 export const parseClassMethods = (cmpNode: ts.ClassDeclaration, cmpMeta: d.ComponentCompilerMeta) => {

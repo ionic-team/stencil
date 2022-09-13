@@ -1,7 +1,8 @@
-import type * as d from '../../declarations';
 import { dashToPascalCase, sortBy } from '@utils';
 import { dirname, join } from 'path';
 import ts from 'typescript';
+
+import type * as d from '../../declarations';
 import { isOutputTargetAngular, relativeImport } from './output-utils';
 
 export const outputAngular = async (config: d.ValidatedConfig, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {

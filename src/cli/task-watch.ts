@@ -1,6 +1,6 @@
 import type { DevServer, ValidatedConfig } from '../declarations';
+import { printCheckVersionResults, startCheckVersion } from './check-version';
 import type { CoreCompiler } from './load-compiler';
-import { startCheckVersion, printCheckVersionResults } from './check-version';
 import { startupCompilerLog } from './logs';
 
 export const taskWatch = async (coreCompiler: CoreCompiler, config: ValidatedConfig) => {

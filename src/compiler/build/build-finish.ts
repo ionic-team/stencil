@@ -1,9 +1,10 @@
+import { isFunction, isRemoteUrl } from '@utils';
+import { relative } from 'path';
+
 import type * as d from '../../declarations';
+import { IS_NODE_ENV } from '../sys/environment';
 import { generateBuildResults } from './build-results';
 import { generateBuildStats, writeBuildStats } from './build-stats';
-import { isFunction, isRemoteUrl } from '@utils';
-import { IS_NODE_ENV } from '../sys/environment';
-import { relative } from 'path';
 
 /**
  * Finish a build as having completed successfully

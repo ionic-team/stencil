@@ -1,5 +1,6 @@
-import type * as d from '../../declarations';
 import { dashToPascalCase } from '@utils';
+
+import type * as d from '../../declarations';
 
 /**
  * Generates the custom event interface for each component that combines the `CustomEvent` interface with

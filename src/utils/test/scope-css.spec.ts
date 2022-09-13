@@ -11,8 +11,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { scopeCss } from '../shadow-css';
 import { convertScopedToShadow } from '../../runtime/styles';
+import { scopeCss } from '../shadow-css';
 
 describe('ShadowCss', function () {
   function s(cssText: string, scopeId: string, commentOriginalSelector = false) {

@@ -1,5 +1,6 @@
 import type * as d from '@stencil/core/declarations';
 import { mockConfig, mockLoadConfigInit } from '@stencil/core/testing';
+
 import { validateConfig } from '../validate-config';
 
 describe('validateDocs', () => {

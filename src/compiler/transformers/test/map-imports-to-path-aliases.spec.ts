@@ -1,9 +1,10 @@
-import { mockValidatedConfig } from '@stencil/core/testing';
 import type { OutputTargetDistCollection } from '@stencil/core/declarations';
-import { ValidatedConfig } from '../../../internal';
-import { transpileModule } from './transpile';
+import { mockValidatedConfig } from '@stencil/core/testing';
 import ts, { Extension } from 'typescript';
+
+import { ValidatedConfig } from '../../../internal';
 import { mapImportsToPathAliases } from '../map-imports-to-path-aliases';
+import { transpileModule } from './transpile';
 
 describe('mapImportsToPathAliases', () => {
   let module: ReturnType<typeof transpileModule>;
