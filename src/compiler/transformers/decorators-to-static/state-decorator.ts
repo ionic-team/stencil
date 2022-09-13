@@ -13,7 +13,6 @@ import { isDecoratorNamed } from './decorator-utils';
  * @param decoratedProps TypeScript AST nodes representing class members
  * @param watchable set of names of fields which should be watched for changes
  * @param newMembers an out param containing new class members
- *
  */
 export const stateDecoratorsToStatic = (
   decoratedProps: ts.ClassElement[],
@@ -52,7 +51,7 @@ const stateDecoratorToStatic = (prop: ts.PropertyDeclaration, watchable: Set<str
   const stateName = prop.name.getText();
   watchable.add(stateName);
   return ts.factory.createPropertyAssignment(
-    ts.createLiteral(stateName),
+    ts.factory.createIdentifier(stateName),
     ts.factory.createObjectLiteralExpression([], true)
   );
 };
