@@ -137,24 +137,6 @@ export const createStaticGetter = (propName: string, returnExpression: ts.Expres
   );
 };
 
-export const removeDecorators = (node: ts.Node, decoratorNames: Set<string>) => {
-  if (node.decorators) {
-    const updatedDecoratorList = node.decorators.filter((dec) => {
-      const name =
-        ts.isCallExpression(dec.expression) &&
-        ts.isIdentifier(dec.expression.expression) &&
-        dec.expression.expression.text;
-      return !decoratorNames.has(name);
-    });
-    if (updatedDecoratorList.length === 0) {
-      return undefined;
-    } else if (updatedDecoratorList.length !== node.decorators.length) {
-      return ts.createNodeArray(updatedDecoratorList);
-    }
-  }
-  return node.decorators;
-};
-
 export const getStaticValue = (staticMembers: ts.ClassElement[], staticName: string): any => {
   const staticMember: ts.GetAccessorDeclaration = staticMembers.find(
     (member) => (member.name as any).escapedText === staticName

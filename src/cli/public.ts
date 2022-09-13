@@ -4,6 +4,7 @@ import type { ConfigFlags } from './config-flags';
 /**
  * Runs the CLI with the given options. This is used by Stencil's default `bin/stencil` file,
  * but can be used externally too.
+ * @param init a set of initialization options needed to run Stencil from its CLI
  */
 export declare function run(init: CliInitOptions): Promise<void>;
 
