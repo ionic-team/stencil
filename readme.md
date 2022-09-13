@@ -53,7 +53,7 @@ We would love to hear from you!
 If you have any feedback or run into issues using Stencil, please file an [issue](https://github.com/ionic-team/stencil/issues/new) on this repository.
 
 ### Examples
-A Stencil component looks a lot like a React component, with the addition of TypeScript decorators:
+A Stencil component looks a lot like a class-based React component, with the addition of TypeScript decorators:
 ```tsx
 import { Component, Prop, h } from '@stencil/core';
 
