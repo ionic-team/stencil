@@ -1,6 +1,7 @@
 import { normalizePath } from '@utils';
 import { dirname, relative } from 'path';
 import ts from 'typescript';
+
 import type * as d from '../../declarations';
 
 /**

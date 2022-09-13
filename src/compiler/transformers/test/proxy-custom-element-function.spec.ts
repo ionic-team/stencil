@@ -1,11 +1,12 @@
-import { mockCompilerCtx } from '@stencil/core/testing';
 import * as d from '@stencil/core/declarations';
-import { transpileModule } from './transpile';
-import { proxyCustomElement } from '../component-native/proxy-custom-element-function';
-import * as AddComponentMetaProxy from '../add-component-meta-proxy';
-import * as TransformUtils from '../transform-utils';
-import { PROXY_CUSTOM_ELEMENT } from '../core-runtime-apis';
+import { mockCompilerCtx } from '@stencil/core/testing';
 import * as ts from 'typescript';
+
+import * as AddComponentMetaProxy from '../add-component-meta-proxy';
+import { proxyCustomElement } from '../component-native/proxy-custom-element-function';
+import { PROXY_CUSTOM_ELEMENT } from '../core-runtime-apis';
+import * as TransformUtils from '../transform-utils';
+import { transpileModule } from './transpile';
 
 describe('proxy-custom-element-function', () => {
   const componentClassName = 'MyComponent';

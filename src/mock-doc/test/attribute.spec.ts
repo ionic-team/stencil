@@ -1,7 +1,7 @@
+import { XLINK_NS } from '../../runtime/runtime-constants';
 import { MockAttr, MockAttributeMap } from '../attribute';
 import { MockDocument } from '../document';
 import { MockElement, MockHTMLElement } from '../node';
-import { XLINK_NS } from '../../runtime/runtime-constants';
 
 describe('attributes', () => {
   let doc: MockDocument;

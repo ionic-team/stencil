@@ -1,4 +1,4 @@
-import { Component, Prop, h, forceUpdate } from '@stencil/core';
+import { Component, forceUpdate, h, Prop } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
 describe('scoped slot', () => {

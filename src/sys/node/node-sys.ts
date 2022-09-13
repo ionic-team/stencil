@@ -1,3 +1,14 @@
+import { isFunction, isPromise, normalizePath } from '@utils';
+import { parse as parseYarnLockFile } from '@yarnpkg/lockfile';
+import { createHash } from 'crypto';
+import exit from 'exit';
+import fs from 'graceful-fs';
+import { cpus, freemem, platform, release, tmpdir, totalmem } from 'os';
+import * as os from 'os';
+import path from 'path';
+import type TypeScript from 'typescript';
+
+import { buildEvents } from '../../compiler/events';
 import type {
   CompilerSystem,
   CompilerSystemCreateDirectoryResults,
@@ -6,20 +17,10 @@ import type {
   CompilerSystemWriteFileResults,
 } from '../../declarations';
 import { asyncGlob, nodeCopyTasks } from './node-copy-tasks';
-import { buildEvents } from '../../compiler/events';
-import { checkVersion } from './node-stencil-version-checker';
-import { cpus, freemem, platform, release, tmpdir, totalmem } from 'os';
-import { createHash } from 'crypto';
-import exit from 'exit';
-import fs from 'graceful-fs';
-import { parse as parseYarnLockFile } from '@yarnpkg/lockfile';
-import { isFunction, isPromise, normalizePath } from '@utils';
 import { NodeLazyRequire } from './node-lazy-require';
 import { NodeResolveModule } from './node-resolve-module';
+import { checkVersion } from './node-stencil-version-checker';
 import { NodeWorkerController } from './node-worker-controller';
-import path from 'path';
-import * as os from 'os';
-import type TypeScript from 'typescript';
 
 export function createNodeSys(c: { process?: any } = {}) {
   const prcs: NodeJS.Process = c.process || global.process;

@@ -1,4 +1,5 @@
 import type * as d from '@stencil/core/internal';
+
 import { QueuedLoadModule } from './testing-task-queue';
 
 export const styles: d.StyleMap = new Map();

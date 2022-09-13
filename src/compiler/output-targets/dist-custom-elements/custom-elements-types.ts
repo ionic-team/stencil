@@ -1,7 +1,8 @@
+import { dashToPascalCase, normalizePath } from '@utils';
+import { dirname, join, relative } from 'path';
+
 import type * as d from '../../../declarations';
 import { isOutputTargetDistCustomElements } from '../output-utils';
-import { dirname, join, relative } from 'path';
-import { normalizePath, dashToPascalCase } from '@utils';
 
 /**
  * Entrypoint for generating types for one or more `dist-custom-elements` output targets defined in a Stencil project's

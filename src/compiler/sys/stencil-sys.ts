@@ -1,3 +1,9 @@
+import { isRootPath, normalizePath } from '@utils';
+import * as os from 'os';
+import { basename, dirname, join } from 'path';
+import platformPath from 'path-browserify';
+import * as process from 'process';
+
 import type {
   CompilerFileWatcherCallback,
   CompilerFsStats,
@@ -14,17 +20,12 @@ import type {
   CopyTask,
   Logger,
 } from '../../declarations';
-import platformPath from 'path-browserify';
-import { basename, dirname, join } from 'path';
-import * as process from 'process';
-import * as os from 'os';
-import { buildEvents } from '../events';
-import { createLogger } from './logger/console-logger';
-import { createWebWorkerMainController } from './worker/web-worker-main';
-import { HAS_WEB_WORKER, IS_BROWSER_ENV, IS_WEB_WORKER_ENV } from './environment';
-import { isRootPath, normalizePath } from '@utils';
-import { resolveModuleIdAsync } from './resolve/resolve-module-async';
 import { version } from '../../version';
+import { buildEvents } from '../events';
+import { HAS_WEB_WORKER, IS_BROWSER_ENV, IS_WEB_WORKER_ENV } from './environment';
+import { createLogger } from './logger/console-logger';
+import { resolveModuleIdAsync } from './resolve/resolve-module-async';
+import { createWebWorkerMainController } from './worker/web-worker-main';
 
 export const createSystem = (c?: { logger?: Logger }) => {
   const logger = c && c.logger ? c.logger : createLogger();

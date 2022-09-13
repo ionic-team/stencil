@@ -1,6 +1,7 @@
-import type { BuildConditionals } from '../../declarations';
-import type { SourceFile, TransformerFactory } from 'typescript';
 import type { PreserveEntrySignaturesOption } from 'rollup';
+import type { SourceFile, TransformerFactory } from 'typescript';
+
+import type { BuildConditionals } from '../../declarations';
 
 /**
  * Options for bundled output passed on Rollup

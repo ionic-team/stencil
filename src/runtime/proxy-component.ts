@@ -1,9 +1,10 @@
-import type * as d from '../declarations';
 import { BUILD } from '@app-data';
 import { consoleDevWarn, getHostRef, plt } from '@platform';
-import { getValue, setValue } from './set-value';
+
+import type * as d from '../declarations';
 import { HOST_FLAGS, MEMBER_FLAGS } from '../utils/constants';
 import { PROXY_FLAGS } from './runtime-constants';
+import { getValue, setValue } from './set-value';
 
 export const proxyComponent = (Cstr: d.ComponentConstructor, cmpMeta: d.ComponentRuntimeMeta, flags: number) => {
   if (BUILD.member && cmpMeta.$members$) {

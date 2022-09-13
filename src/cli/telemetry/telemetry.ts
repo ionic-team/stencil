@@ -1,9 +1,9 @@
-import { tryFn, hasDebug, readJson, hasVerbose, uuidv4 } from './helpers';
-import { shouldTrack } from './shouldTrack';
+import { isOutputTargetHydrate, WWW } from '../../compiler/output-targets/output-utils';
 import type * as d from '../../declarations';
 import { readConfig, updateConfig, writeConfig } from '../ionic-config';
 import { CoreCompiler } from '../load-compiler';
-import { isOutputTargetHydrate, WWW } from '../../compiler/output-targets/output-utils';
+import { hasDebug, hasVerbose, readJson, tryFn, uuidv4 } from './helpers';
+import { shouldTrack } from './shouldTrack';
 
 /**
  * Used to within taskBuild to provide the component_count property.

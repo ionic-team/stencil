@@ -1,3 +1,5 @@
+import { getHostRef } from '@platform';
+
 import type * as d from '../../declarations';
 import {
   CONTENT_REF_ID,
@@ -8,7 +10,6 @@ import {
   SLOT_NODE_ID,
   TEXT_NODE_ID,
 } from '../runtime-constants';
-import { getHostRef } from '@platform';
 
 export const insertVdomAnnotations = (doc: Document, staticComponents: string[]) => {
   if (doc != null) {

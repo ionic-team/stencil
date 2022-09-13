@@ -1,6 +1,6 @@
+import { NODE_NAMES } from './constants';
 import { MockDocument } from './document';
 import { MockElement } from './node';
-import { NODE_NAMES } from './constants';
 import { MockWindow } from './window';
 
 export class MockEvent {

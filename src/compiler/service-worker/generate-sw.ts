@@ -1,6 +1,7 @@
-import type * as d from '../../declarations';
-import { basename } from 'path';
 import { buildWarn, catchError } from '@utils';
+import { basename } from 'path';
+
+import type * as d from '../../declarations';
 import { isOutputTargetWww } from '../output-targets/output-utils';
 
 export const generateServiceWorker = async (

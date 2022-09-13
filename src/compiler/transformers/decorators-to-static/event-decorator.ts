@@ -1,5 +1,7 @@
-import type * as d from '../../../declarations';
 import { augmentDiagnosticWithNode, buildWarn } from '@utils';
+import ts from 'typescript';
+
+import type * as d from '../../../declarations';
 import {
   convertValueToLiteral,
   createStaticGetter,
@@ -9,7 +11,6 @@ import {
   validateReferences,
 } from '../transform-utils';
 import { getDeclarationParameters, isDecoratorNamed } from './decorator-utils';
-import ts from 'typescript';
 
 export const eventDecoratorsToStatic = (
   diagnostics: d.Diagnostic[],

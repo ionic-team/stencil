@@ -1,8 +1,9 @@
-import { outputCollection } from '../dist-collection';
-import type * as d from '../../../declarations';
-import { mockValidatedConfig, mockBuildCtx, mockCompilerCtx, mockModule } from '@stencil/core/testing';
-import * as test from '../../transformers/map-imports-to-path-aliases';
+import { mockBuildCtx, mockCompilerCtx, mockModule, mockValidatedConfig } from '@stencil/core/testing';
 import { normalize } from 'path';
+
+import type * as d from '../../../declarations';
+import * as test from '../../transformers/map-imports-to-path-aliases';
+import { outputCollection } from '../dist-collection';
 
 describe('Dist Collection output target', () => {
   let mockConfig: d.ValidatedConfig;

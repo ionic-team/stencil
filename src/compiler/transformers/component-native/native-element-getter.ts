@@ -1,5 +1,6 @@
-import type * as d from '../../../declarations';
 import ts from 'typescript';
+
+import type * as d from '../../../declarations';
 
 export const addNativeElementGetter = (classMembers: ts.ClassElement[], cmp: d.ComponentCompilerMeta) => {
   // @Element() element;
