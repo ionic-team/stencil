@@ -1,9 +1,10 @@
+import sourceMapMerge from 'merge-source-map';
+import type { CompressOptions, MangleOptions, MinifyOptions, SourceMapOptions } from 'terser';
+import ts from 'typescript';
+
+import type { CompilerCtx, Config, OptimizeJsResult, SourceMap, SourceTarget } from '../../declarations';
 import { minfyJsId } from '../../version';
 import { minifyJs } from './minify-js';
-import type { CompilerCtx, Config, OptimizeJsResult, SourceTarget, SourceMap } from '../../declarations';
-import type { CompressOptions, MangleOptions, MinifyOptions, SourceMapOptions } from 'terser';
-import sourceMapMerge from 'merge-source-map';
-import ts from 'typescript';
 
 interface OptimizeModuleOptions {
   input: string;

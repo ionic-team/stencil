@@ -1,6 +1,7 @@
+import { Postcss } from 'postcss';
+
 import type * as d from '../../declarations';
 import { IS_NODE_ENV, requireFunc } from '../sys/environment';
-import { Postcss } from 'postcss';
 
 type CssProcessor = ReturnType<Postcss>;
 let cssProcessor: CssProcessor;

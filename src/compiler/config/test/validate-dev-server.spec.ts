@@ -1,9 +1,10 @@
+import { mockLoadConfigInit } from '@stencil/core/testing';
+import path from 'path';
+
+import { ConfigFlags, createConfigFlags } from '../../../cli/config-flags';
 import type * as d from '../../../declarations';
 import { normalizePath } from '../../../utils';
 import { validateConfig } from '../validate-config';
-import path from 'path';
-import { ConfigFlags, createConfigFlags } from '../../../cli/config-flags';
-import { mockLoadConfigInit } from '@stencil/core/testing';
 
 describe('validateDevServer', () => {
   const root = path.resolve('/');

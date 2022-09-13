@@ -1,6 +1,7 @@
-import type * as d from '../../declarations';
 import { buildError, isBoolean, isNumber, isString, normalizePath } from '@utils';
 import { isAbsolute, join } from 'path';
+
+import type * as d from '../../declarations';
 import { isOutputTargetWww } from '../output-targets/output-utils';
 
 export const validateDevServer = (

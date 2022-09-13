@@ -1,15 +1,15 @@
-import * as d from '@stencil/core/declarations';
-import { createTestingSystem } from '../testing-sys';
-import { createInMemoryFs } from '../../compiler/sys/in-memory-fs';
-import { expectFilesDoNotExist, expectFilesExist } from '../testing-utils';
 import path from 'path';
+
+import { createInMemoryFs, InMemoryFileSystem } from '../../compiler/sys/in-memory-fs';
+import { createTestingSystem } from '../testing-sys';
+import { expectFilesDoNotExist, expectFilesExist } from '../testing-utils';
 
 describe('testing-utils', () => {
   const MOCK_FILE_PATH = path.join('mock', 'file', 'path', 'to', 'file.ts');
   const MOCK_FILE_CONTENTS = "console.log('hello world!');";
 
   describe('expectFilesExist', () => {
-    let fs: d.InMemoryFileSystem;
+    let fs: InMemoryFileSystem;
 
     beforeEach(() => {
       const sys = createTestingSystem();
@@ -56,7 +56,7 @@ describe('testing-utils', () => {
   });
 
   describe('expectFilesDoNotExist', () => {
-    let fs: d.InMemoryFileSystem;
+    let fs: InMemoryFileSystem;
 
     beforeEach(() => {
       const sys = createTestingSystem();

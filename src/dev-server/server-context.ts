@@ -1,8 +1,9 @@
-import type * as d from '../declarations';
-import { responseHeaders } from './dev-server-utils';
 import fs from 'graceful-fs';
 import path from 'path';
 import util from 'util';
+
+import type * as d from '../declarations';
+import { responseHeaders } from './dev-server-utils';
 
 export function createServerContext(
   sys: d.CompilerSystem,

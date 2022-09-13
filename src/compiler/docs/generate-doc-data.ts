@@ -1,10 +1,11 @@
-import type * as d from '../../declarations';
-import { AUTO_GENERATE_COMMENT } from './constants';
-import { basename, dirname, join, relative } from 'path';
 import { flatOne, normalizePath, sortBy, unique } from '@utils';
-import { getBuildTimestamp } from '../build/build-ctx';
+import { basename, dirname, join, relative } from 'path';
+
+import type * as d from '../../declarations';
 import { JsonDocsValue } from '../../declarations';
 import { typescriptVersion, version } from '../../version';
+import { getBuildTimestamp } from '../build/build-ctx';
+import { AUTO_GENERATE_COMMENT } from './constants';
 
 export const generateDocData = async (
   config: d.ValidatedConfig,

@@ -1,9 +1,10 @@
-import type * as d from '../../declarations';
 import { buildError, buildJsonFileError } from '@utils';
 import { dirname, join } from 'path';
+
+import type * as d from '../../declarations';
 import { isOutputTargetWww } from '../output-targets/output-utils';
 
-export const validateManifestJson = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
+export const validateManifestJson = (config: d.ValidatedConfig, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   if (config.devMode) {
     return null;
   }

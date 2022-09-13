@@ -1,5 +1,6 @@
-import type * as d from '../../declarations';
 import { dashToPascalCase, sortBy } from '@utils';
+
+import type * as d from '../../declarations';
 import { generateEventTypes } from './generate-event-types';
 import { generateMethodTypes } from './generate-method-types';
 import { generatePropTypes } from './generate-prop-types';

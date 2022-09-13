@@ -1,9 +1,9 @@
 import {
-  CompileScriptMinifyOptions,
-  CompilerBuildResults,
   Compiler,
+  CompilerBuildResults,
   CompilerSystem,
   CompilerWatcher,
+  CompileScriptMinifyOptions,
   Config,
   Diagnostic,
   LoadConfigInit,
@@ -13,10 +13,10 @@ import {
   OptimizeJsInput,
   OptimizeJsOutput,
   PlatformPath,
+  PrerenderResults,
+  PrerenderStartOptions,
   TranspileOptions,
   TranspileResults,
-  PrerenderStartOptions,
-  PrerenderResults,
 } from '@stencil/core/internal';
 
 /**
@@ -127,11 +127,11 @@ export declare const vermoji: string;
 export declare const buildId: string;
 
 export {
-  CompileScriptMinifyOptions,
-  CompilerBuildResults,
-  CompilerWatcher,
   Compiler,
+  CompilerBuildResults,
   CompilerSystem,
+  CompilerWatcher,
+  CompileScriptMinifyOptions,
   Config,
   Diagnostic,
   LoadConfigInit,

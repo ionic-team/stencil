@@ -1,10 +1,11 @@
+import { generatePreamble, normalizePath } from '@utils';
+import { join, relative } from 'path';
+
 import type * as d from '../../declarations';
 import { getClientPolyfill } from '../app-core/app-polyfills';
 import { isOutputTargetDistLazyLoader, relativeImport } from './output-utils';
-import { join, relative } from 'path';
-import { generatePreamble, normalizePath } from '@utils';
 
-export const outputLazyLoader = async (config: d.Config, compilerCtx: d.CompilerCtx) => {
+export const outputLazyLoader = async (config: d.ValidatedConfig, compilerCtx: d.CompilerCtx) => {
   const outputTargets = config.outputTargets.filter(isOutputTargetDistLazyLoader);
   if (outputTargets.length === 0) {
     return;
@@ -14,7 +15,7 @@ export const outputLazyLoader = async (config: d.Config, compilerCtx: d.Compiler
 };
 
 const generateLoader = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   outputTarget: d.OutputTargetDistLazyLoader
 ) => {
@@ -32,6 +33,7 @@ const generateLoader = async (
   const packageJsonContent = JSON.stringify(
     {
       name: config.fsNamespace + '-loader',
+      private: true,
       typings: './index.d.ts',
       module: './index.js',
       main: './index.cjs.js',

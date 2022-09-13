@@ -1,8 +1,9 @@
+import type { Diagnostic, DiagnosticMessageChain, Node } from 'typescript';
+
 import type * as d from '../../declarations';
 import { isIterable } from '../helpers';
 import { normalizePath } from '../normalize-path';
 import { splitLineBreaks } from './logger-utils';
-import type { Diagnostic, DiagnosticMessageChain, Node } from 'typescript';
 
 /**
  * Augment a `Diagnostic` with information from a `Node` in the AST to provide richer error information

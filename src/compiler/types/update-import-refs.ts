@@ -1,5 +1,6 @@
-import type * as d from '../../declarations';
 import { dirname, resolve } from 'path';
+
+import type * as d from '../../declarations';
 
 /**
  * Find all referenced types by a component and add them to the `importDataObj` parameter

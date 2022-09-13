@@ -1,6 +1,7 @@
 import type * as d from '@stencil/core/declarations';
 import { OutputTargetWww } from '@stencil/core/declarations';
 import { mockCompilerSystem, mockLogger } from '@stencil/core/testing';
+
 import { createConfigFlags } from '../../../cli/config-flags';
 import { validateServiceWorker } from '../validate-service-worker';
 
@@ -12,6 +13,7 @@ describe('validateServiceWorker', () => {
   beforeEach(() => {
     config = {
       fsNamespace: 'app',
+      rootDir: '/',
       sys: mockCompilerSystem(),
       devMode: false,
       flags: createConfigFlags(),

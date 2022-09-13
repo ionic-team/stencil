@@ -7,7 +7,7 @@ name: Tech Debt Burndown
 # progress on them to each PR.
 
 on:
-  pull_request:
+  pull_request_target:
     branches:
       - '**'
 
@@ -15,7 +15,7 @@ jobs:
   strict_null_check: # TODO(STENCIL-446): Remove this workflow once `strictNullChecks` is enabled
     strategy:
       matrix:
-        branch: [ 'main', 'pr' ]
+        branch: ['main', 'pr']
     name: 'Get strictNullChecks errors on ${{ matrix.branch }}'
     runs-on: 'ubuntu-latest'
     steps:
@@ -27,6 +27,11 @@ jobs:
 
       - name: Checkout PR branch
         uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # v2.4.0
+        with:
+          # the pull_request_target event will consider the HEAD of `main` to be the SHA to use.
+          # attempt to use the SHA associated with a pull request and fallback to HEAD of `main`
+          ref: ${{ github.event_name == 'pull_request_target' && format('refs/pull/{0}/merge', github.event.number) || '' }}
+          persist-credentials: false
         if: ${{ matrix.branch == 'pr' }}
 
       - name: Get Core Dependencies
@@ -48,7 +53,7 @@ jobs:
   unused_exports_check:
     strategy:
       matrix:
-        branch: [ 'main', 'pr' ]
+        branch: ['main', 'pr']
     name: Find unused variables on ${{ matrix.branch }}
     runs-on: 'ubuntu-latest'
     steps:
@@ -60,6 +65,11 @@ jobs:
 
       - name: Checkout PR branch
         uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # v2.4.0
+        with:
+          # the pull_request_target event will consider the HEAD of `main` to be the SHA to use.
+          # attempt to use the SHA associated with a pull request and fallback to HEAD of `main`
+          ref: ${{ github.event_name == 'pull_request_target' && format('refs/pull/{0}/merge', github.event.number) || '' }}
+          persist-credentials: false
         if: ${{ matrix.branch == 'pr' }}
 
       - name: Install ts-prune
@@ -75,12 +85,17 @@ jobs:
           path: 'unused-exports-${{ matrix.branch }}.txt'
 
   format_report:
-    needs: [ "strict_null_check", "unused_exports_check" ]
+    needs: ['strict_null_check', 'unused_exports_check']
     name: Download error files and report
     runs-on: 'ubuntu-latest'
     steps:
       - name: Checkout current branch
         uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # v2.4.0
+        with:
+          # the pull_request_target event will consider the HEAD of `main` to be the SHA to use.
+          # attempt to use the SHA associated with a pull request and fallback to HEAD of `main`
+          ref: ${{ github.event_name == 'pull_request_target' && format('refs/pull/{0}/merge', github.event.number) || '' }}
+          persist-credentials: false
 
       - name: Get Core Dependencies
         uses: ./.github/workflows/actions/get-core-dependencies
@@ -115,7 +130,7 @@ jobs:
       - name: Set action output
         run: node scripts/build/tech-debt-burndown-report.js > $GITHUB_STEP_SUMMARY
 
-       # for syntax information, see https://github.com/peter-evans/create-or-update-comment#setting-the-comment-body-from-a-file
+        # for syntax information, see https://github.com/peter-evans/create-or-update-comment#setting-the-comment-body-from-a-file
       - name: Set comment body
         id: set-comment-body
         run: |

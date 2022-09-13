@@ -1,7 +1,8 @@
-import type { ValidatedConfig } from '../../../declarations';
-import { createWorkerContext } from '../../worker/worker-thread';
-import { createWorkerMainContext } from '../../worker/main-thread';
 import { isFunction } from '@utils';
+
+import type { ValidatedConfig } from '../../../declarations';
+import { createWorkerMainContext } from '../../worker/main-thread';
+import { createWorkerContext } from '../../worker/worker-thread';
 
 export const createSysWorker = (config: ValidatedConfig) => {
   if (

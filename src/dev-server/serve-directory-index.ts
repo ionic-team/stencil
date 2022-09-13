@@ -1,8 +1,9 @@
-import type * as d from '../declarations';
 import type { ServerResponse } from 'http';
+import path from 'path';
+
+import type * as d from '../declarations';
 import { responseHeaders } from './dev-server-utils';
 import { serveFile } from './serve-file';
-import path from 'path';
 
 export async function serveDirectoryIndex(
   devServerConfig: d.DevServerConfig,

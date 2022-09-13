@@ -1,7 +1,8 @@
-import type * as d from '../../declarations';
 import { augmentDiagnosticWithNode, buildError, normalizePath } from '@utils';
-import { MEMBER_DECORATORS_TO_REMOVE } from './decorators-to-static/decorators-constants';
 import ts from 'typescript';
+
+import type * as d from '../../declarations';
+import { MEMBER_DECORATORS_TO_REMOVE } from './decorators-to-static/decorators-constants';
 
 export const getScriptTarget = () => {
   // using a fn so the browser compiler doesn't require the global ts for startup
@@ -135,24 +136,6 @@ export const createStaticGetter = (propName: string, returnExpression: ts.Expres
     undefined,
     ts.createBlock([ts.createReturn(returnExpression)])
   );
-};
-
-export const removeDecorators = (node: ts.Node, decoratorNames: Set<string>) => {
-  if (node.decorators) {
-    const updatedDecoratorList = node.decorators.filter((dec) => {
-      const name =
-        ts.isCallExpression(dec.expression) &&
-        ts.isIdentifier(dec.expression.expression) &&
-        dec.expression.expression.text;
-      return !decoratorNames.has(name);
-    });
-    if (updatedDecoratorList.length === 0) {
-      return undefined;
-    } else if (updatedDecoratorList.length !== node.decorators.length) {
-      return ts.createNodeArray(updatedDecoratorList);
-    }
-  }
-  return node.decorators;
 };
 
 export const getStaticValue = (staticMembers: ts.ClassElement[], staticName: string): any => {

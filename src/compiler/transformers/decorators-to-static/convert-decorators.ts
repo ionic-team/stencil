@@ -1,15 +1,16 @@
+import ts from 'typescript';
+
 import type * as d from '../../../declarations';
-import { CLASS_DECORATORS_TO_REMOVE, MEMBER_DECORATORS_TO_REMOVE } from './decorators-constants';
 import { componentDecoratorToStatic } from './component-decorator';
+import { isDecoratorNamed } from './decorator-utils';
+import { CLASS_DECORATORS_TO_REMOVE, MEMBER_DECORATORS_TO_REMOVE } from './decorators-constants';
 import { elementDecoratorsToStatic } from './element-decorator';
 import { eventDecoratorsToStatic } from './event-decorator';
 import { listenDecoratorsToStatic } from './listen-decorator';
-import { isDecoratorNamed } from './decorator-utils';
 import { methodDecoratorsToStatic, validateMethods } from './method-decorator';
 import { propDecoratorsToStatic } from './prop-decorator';
 import { stateDecoratorsToStatic } from './state-decorator';
 import { watchDecoratorsToStatic } from './watch-decorator';
-import ts from 'typescript';
 
 export const convertDecoratorsToStatic = (
   config: d.Config,
@@ -71,7 +72,7 @@ export const visitClassDeclaration = (
 
   return ts.updateClassDeclaration(
     classNode,
-    removeDecorators(classNode, CLASS_DECORATORS_TO_REMOVE),
+    filterDecorators(classNode, CLASS_DECORATORS_TO_REMOVE),
     classNode.modifiers,
     classNode.name,
     classNode.typeParameters,
@@ -83,7 +84,7 @@ export const visitClassDeclaration = (
 const removeStencilDecorators = (classMembers: ts.ClassElement[]) => {
   return classMembers.map((m) => {
     const currentDecorators = m.decorators;
-    const newDecorators = removeDecorators(m, MEMBER_DECORATORS_TO_REMOVE);
+    const newDecorators = filterDecorators(m, MEMBER_DECORATORS_TO_REMOVE);
     if (currentDecorators !== newDecorators) {
       if (ts.isMethodDeclaration(m)) {
         return ts.updateMethod(
@@ -108,19 +109,28 @@ const removeStencilDecorators = (classMembers: ts.ClassElement[]) => {
   });
 };
 
-const removeDecorators = (node: ts.Node, decoratorNames: Set<string>) => {
+/**
+ * Generate a list of decorators from an AST node that are not in a provided list
+ *
+ * @param node the AST node whose decorators should be inspected
+ * @param decoratorNames the decorators that should _not_ be included in the returned list
+ * @returns a list of decorators on the AST node that are not in the provided list, or `undefined` if:
+ * - there are no decorators on the node
+ * - the node contains only decorators in the provided list
+ */
+const filterDecorators = (node: ts.Node, decoratorNames: Set<string>): ts.NodeArray<ts.Decorator> | undefined => {
   if (node.decorators) {
     const updatedDecoratorList = node.decorators.filter((dec) => {
       const name =
         ts.isCallExpression(dec.expression) &&
         ts.isIdentifier(dec.expression.expression) &&
         dec.expression.expression.text;
-      return !decoratorNames.has(name);
+      return typeof name === 'boolean' || !decoratorNames.has(name);
     });
     if (updatedDecoratorList.length === 0) {
       return undefined;
     } else if (updatedDecoratorList.length !== node.decorators.length) {
-      return ts.createNodeArray(updatedDecoratorList);
+      return ts.factory.createNodeArray(updatedDecoratorList);
     }
   }
   return node.decorators;

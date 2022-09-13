@@ -1,6 +1,7 @@
-import type * as d from '../../declarations';
 import { escapeHtml, generatePreamble } from '@utils';
 import { join } from 'path';
+
+import type * as d from '../../declarations';
 
 export const generateEs5DisabledMessage = async (
   config: d.Config,

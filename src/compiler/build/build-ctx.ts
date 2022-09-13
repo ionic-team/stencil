@@ -1,5 +1,6 @@
-import type * as d from '../../declarations';
 import { hasError, hasWarning } from '@utils';
+
+import type * as d from '../../declarations';
 
 /**
  * A new BuildCtx object is created for every build

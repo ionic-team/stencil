@@ -1,8 +1,9 @@
-import type * as d from '../../declarations';
 import { buildError, catchError, flatOne, isGlob, normalizePath } from '@utils';
-import { copyFile, mkdir, readdir, stat } from './node-fs-promisify';
-import path from 'path';
 import glob from 'glob';
+import path from 'path';
+
+import type * as d from '../../declarations';
+import { copyFile, mkdir, readdir, stat } from './node-fs-promisify';
 
 export async function nodeCopyTasks(copyTasks: Required<d.CopyTask>[], srcDir: string) {
   const results: d.CopyResults = {

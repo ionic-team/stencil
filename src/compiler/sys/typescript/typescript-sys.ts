@@ -1,15 +1,17 @@
-import type * as d from '../../../declarations';
+import { isRemoteUrl, isString, noop, normalizePath } from '@utils';
 import { basename, resolve } from 'path';
-import { isRemoteUrl, isString, normalizePath, noop } from '@utils';
-import { fetchUrlSync } from '../fetch/fetch-module-sync';
-import { getCurrentDirectory, IS_CASE_SENSITIVE_FILE_NAMES, IS_WEB_WORKER_ENV } from '../environment';
-import { patchTypeScriptResolveModule } from './typescript-resolve-module';
 import ts from 'typescript';
+
+import type * as d from '../../../declarations';
+import { getCurrentDirectory, IS_CASE_SENSITIVE_FILE_NAMES, IS_WEB_WORKER_ENV } from '../environment';
+import { fetchUrlSync } from '../fetch/fetch-module-sync';
+import { InMemoryFileSystem } from '../in-memory-fs';
+import { patchTypeScriptResolveModule } from './typescript-resolve-module';
 
 export const patchTsSystemFileSystem = (
   config: d.Config,
   compilerSys: d.CompilerSystem,
-  inMemoryFs: d.InMemoryFileSystem,
+  inMemoryFs: InMemoryFileSystem,
   tsSys: ts.System
 ): ts.System => {
   const realpath = (path: string) => {
@@ -160,7 +162,7 @@ const patchTsSystemWatch = (compilerSystem: d.CompilerSystem, tsSys: ts.System) 
   };
 };
 
-export const patchTypescript = (config: d.Config, inMemoryFs: d.InMemoryFileSystem) => {
+export const patchTypescript = (config: d.Config, inMemoryFs: InMemoryFileSystem) => {
   if (!(ts as any).__patched) {
     if (config.sys) {
       patchTsSystemFileSystem(config, config.sys, inMemoryFs, ts.sys);

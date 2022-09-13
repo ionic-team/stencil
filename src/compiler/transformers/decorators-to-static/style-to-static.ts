@@ -1,8 +1,9 @@
-import type * as d from '../../../declarations';
-import { basename, dirname, extname, join } from 'path';
-import { ConvertIdentifier, convertValueToLiteral, createStaticGetter } from '../transform-utils';
 import { DEFAULT_STYLE_MODE } from '@utils';
+import { basename, dirname, extname, join } from 'path';
 import ts from 'typescript';
+
+import type * as d from '../../../declarations';
+import { ConvertIdentifier, convertValueToLiteral, createStaticGetter } from '../transform-utils';
 
 export const styleToStatic = (newMembers: ts.ClassElement[], componentOptions: d.ComponentOptions) => {
   const defaultModeStyles = [];

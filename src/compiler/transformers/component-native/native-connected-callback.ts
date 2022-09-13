@@ -1,5 +1,6 @@
-import type * as d from '../../../declarations';
 import ts from 'typescript';
+
+import type * as d from '../../../declarations';
 
 export const addNativeConnectedCallback = (classMembers: ts.ClassElement[], cmp: d.ComponentCompilerMeta) => {
   // function call to stencil's exported connectedCallback(elm, plt)

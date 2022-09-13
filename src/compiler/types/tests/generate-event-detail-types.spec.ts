@@ -1,6 +1,6 @@
 import type * as d from '../../../declarations';
-import { stubComponentCompilerMeta } from './ComponentCompilerMeta.stub';
 import { generateEventDetailTypes } from '../generate-event-detail-types';
+import { stubComponentCompilerMeta } from './ComponentCompilerMeta.stub';
 
 describe('generate-event-detail-types', () => {
   describe('generateEventDetailTypes', () => {

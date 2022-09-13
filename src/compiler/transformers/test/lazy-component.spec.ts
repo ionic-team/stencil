@@ -1,7 +1,8 @@
-import type * as d from '../../../declarations';
-import { transpileModule } from './transpile';
-import { lazyComponentTransform } from '../component-lazy/transform-lazy-component';
 import { mockCompilerCtx } from '@stencil/core/testing';
+
+import type * as d from '../../../declarations';
+import { lazyComponentTransform } from '../component-lazy/transform-lazy-component';
+import { transpileModule } from './transpile';
 
 describe('lazy-component', () => {
   it('add registerInstance() to constructor w/ decorator on class', () => {

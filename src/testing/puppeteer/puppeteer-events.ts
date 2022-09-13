@@ -1,6 +1,7 @@
 import type { SerializedEvent } from '@stencil/core/internal';
-import type * as pd from './puppeteer-declarations';
 import type * as puppeteer from 'puppeteer';
+
+import type * as pd from './puppeteer-declarations';
 
 export async function initPageEvents(page: pd.E2EPageInternal) {
   page._e2eEvents = new Map();

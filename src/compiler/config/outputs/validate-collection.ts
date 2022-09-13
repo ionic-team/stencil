@@ -1,6 +1,6 @@
 import type * as d from '../../../declarations';
-import { getAbsolutePath } from '../config-utils';
 import { isOutputTargetDistCollection } from '../../output-targets/output-utils';
+import { getAbsolutePath } from '../config-utils';
 
 /**
  * Validate and return DIST_COLLECTION output targets, ensuring that the `dir`
@@ -17,7 +17,8 @@ export const validateCollection = (
   return userOutputs.filter(isOutputTargetDistCollection).map((outputTarget) => {
     return {
       ...outputTarget,
-      dir: getAbsolutePath(config, outputTarget.dir || 'dist/collection'),
+      transformAliasedImportPaths: outputTarget.transformAliasedImportPaths ?? false,
+      dir: getAbsolutePath(config, outputTarget.dir ?? 'dist/collection'),
     };
   });
 };

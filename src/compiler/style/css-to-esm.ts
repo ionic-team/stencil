@@ -1,12 +1,13 @@
-import type * as d from '../../declarations';
-import { DEFAULT_STYLE_MODE, catchError, createJsVarName, normalizePath, hasError, isString } from '@utils';
-import { getScopeId } from './scope-css';
+import { catchError, createJsVarName, DEFAULT_STYLE_MODE, hasError, isString, normalizePath } from '@utils';
 import MagicString from 'magic-string';
-import { optimizeCss } from '../optimize/optimize-css';
 import path from 'path';
-import { parseStyleDocs } from '../docs/style-docs';
+
+import type * as d from '../../declarations';
 import { scopeCss } from '../../utils/shadow-css';
+import { parseStyleDocs } from '../docs/style-docs';
+import { optimizeCss } from '../optimize/optimize-css';
 import { serializeImportPath } from '../transformers/stencil-import-path';
+import { getScopeId } from './scope-css';
 import { stripCssComments } from './style-utils';
 
 /**

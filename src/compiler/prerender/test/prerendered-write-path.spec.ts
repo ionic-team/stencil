@@ -1,8 +1,9 @@
-import type * as d from '../../../declarations';
-import { getWriteFilePathFromUrlPath } from '../prerendered-write-path';
 import { mockValidatedConfig } from '@stencil/core/testing';
-import { validateWww } from '../../config/outputs/validate-www';
 import { join, resolve } from 'path';
+
+import type * as d from '../../../declarations';
+import { validateWww } from '../../config/outputs/validate-www';
+import { getWriteFilePathFromUrlPath } from '../prerendered-write-path';
 
 describe('prerender-utils', () => {
   const rootDir = resolve('/');

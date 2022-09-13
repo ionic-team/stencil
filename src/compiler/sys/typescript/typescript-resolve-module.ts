@@ -1,23 +1,25 @@
-import type * as d from '../../../declarations';
+import { isRemoteUrl, isString, normalizePath } from '@utils';
 import { basename, dirname, isAbsolute, join, resolve } from 'path';
+import ts from 'typescript';
+
+import type * as d from '../../../declarations';
+import { version } from '../../../version';
+import { IS_BROWSER_ENV, IS_NODE_ENV } from '../environment';
+import { InMemoryFileSystem } from '../in-memory-fs';
+import { resolveRemoteModuleIdSync } from '../resolve/resolve-module-sync';
 import {
   isDtsFile,
   isJsFile,
+  isJsonFile,
   isJsxFile,
   isLocalModule,
   isStencilCoreImport,
-  isTsxFile,
   isTsFile,
-  isJsonFile,
+  isTsxFile,
 } from '../resolve/resolve-utils';
-import { IS_BROWSER_ENV, IS_NODE_ENV } from '../environment';
-import { isRemoteUrl, isString, normalizePath } from '@utils';
 import { patchTsSystemFileSystem } from './typescript-sys';
-import { resolveRemoteModuleIdSync } from '../resolve/resolve-module-sync';
-import { version } from '../../../version';
-import ts from 'typescript';
 
-export const patchTypeScriptResolveModule = (config: d.Config, inMemoryFs: d.InMemoryFileSystem) => {
+export const patchTypeScriptResolveModule = (config: d.Config, inMemoryFs: InMemoryFileSystem) => {
   let compilerExe: string;
   if (config.sys) {
     compilerExe = config.sys.getCompilerExecutingPath();
@@ -89,7 +91,7 @@ export const tsResolveModuleNamePackageJsonPath = (
 
 export const patchedTsResolveModule = (
   config: d.Config,
-  inMemoryFs: d.InMemoryFileSystem,
+  inMemoryFs: InMemoryFileSystem,
   moduleName: string,
   containingFile: string
 ): ts.ResolvedModuleWithFailedLookupLocations => {
@@ -128,7 +130,7 @@ export const patchedTsResolveModule = (
 
 export const tsResolveNodeModule = (
   config: d.Config,
-  inMemoryFs: d.InMemoryFileSystem,
+  inMemoryFs: InMemoryFileSystem,
   moduleId: string,
   containingFile: string
 ): ts.ResolvedModuleWithFailedLookupLocations => {
