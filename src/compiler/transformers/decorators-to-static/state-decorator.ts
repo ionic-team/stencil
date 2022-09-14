@@ -51,7 +51,7 @@ const stateDecoratorToStatic = (prop: ts.PropertyDeclaration, watchable: Set<str
   const stateName = prop.name.getText();
   watchable.add(stateName);
   return ts.factory.createPropertyAssignment(
-    ts.factory.createIdentifier(stateName),
+    ts.factory.createStringLiteral(stateName),
     ts.factory.createObjectLiteralExpression([], true)
   );
 };
