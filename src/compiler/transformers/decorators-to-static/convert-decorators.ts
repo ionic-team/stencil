@@ -31,7 +31,7 @@ export const convertDecoratorsToStatic = (
   };
 };
 
-export const visitClassDeclaration = (
+const visitClassDeclaration = (
   config: d.Config,
   diagnostics: d.Diagnostic[],
   typeChecker: ts.TypeChecker,
