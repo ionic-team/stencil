@@ -17,6 +17,7 @@ import { getDeclarationParameters, isDecoratorNamed } from './decorator-utils';
 
 /**
  * Parse a collection of class members decorated with `@Prop()`
+ *
  * @param diagnostics a collection of compiler diagnostics. During the parsing process, any errors detected must be
  * added to this collection
  * @param decoratedProps a collection of class elements that may or may not my class members decorated with `@Prop`.
