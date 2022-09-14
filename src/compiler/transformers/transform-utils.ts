@@ -127,14 +127,22 @@ const objectToObjectLiteral = (obj: { [key: string]: any }, refs: WeakSet<any>):
   return ts.createObjectLiteral(newProperties, true);
 };
 
-export const createStaticGetter = (propName: string, returnExpression: ts.Expression) => {
-  return ts.createGetAccessor(
+/**
+ * Create a TypeScript getter declaration AST node corresponding to a
+ * supplied prop name and return value
+ *
+ * @param propName the name of the prop to access
+ * @param returnExpression a TypeScript AST node to return from the getter
+ * @returns an AST node representing a getter
+ */
+export const createStaticGetter = (propName: string, returnExpression: ts.Expression): ts.GetAccessorDeclaration => {
+  return ts.factory.createGetAccessorDeclaration(
     undefined,
-    [ts.createToken(ts.SyntaxKind.StaticKeyword)],
+    [ts.factory.createToken(ts.SyntaxKind.StaticKeyword)],
     propName,
     undefined,
     undefined,
-    ts.createBlock([ts.createReturn(returnExpression)])
+    ts.factory.createBlock([ts.factory.createReturnStatement(returnExpression)])
   );
 };
 
