@@ -1,6 +1,14 @@
-export const CLASS_DECORATORS_TO_REMOVE = new Set(['Component']);
+/**
+ * Decorators on class declarations that we remove as part of the compilation
+ * process
+ */
+export const CLASS_DECORATORS_TO_REMOVE = ['Component'] as const;
 
-export const MEMBER_DECORATORS_TO_REMOVE = new Set([
+/**
+ * Decorators on class members that we remove as part of the compilation
+ * process
+ */
+export const MEMBER_DECORATORS_TO_REMOVE = [
   'Element',
   'Event',
   'Listen',
@@ -10,4 +18,4 @@ export const MEMBER_DECORATORS_TO_REMOVE = new Set([
   'PropWillChange',
   'State',
   'Watch',
-]);
+] as const;

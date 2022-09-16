@@ -415,7 +415,7 @@ export const validateReferences = (
 ) => {
   Object.keys(references).forEach((refName) => {
     const ref = references[refName];
-    if (ref.path === '@stencil/core' && MEMBER_DECORATORS_TO_REMOVE.has(refName)) {
+    if (ref.path === '@stencil/core' && MEMBER_DECORATORS_TO_REMOVE.includes(refName as any)) {
       const err = buildError(diagnostics);
       augmentDiagnosticWithNode(err, node);
     }

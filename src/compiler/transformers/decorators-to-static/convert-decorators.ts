@@ -123,14 +123,17 @@ const removeStencilDecorators = (classMembers: ts.ClassElement[]) => {
  * - there are no decorators on the node
  * - the node contains only decorators in the provided list
  */
-const filterDecorators = (node: ts.Node, decoratorNames: Set<string>): ts.NodeArray<ts.Decorator> | undefined => {
+const filterDecorators = (
+  node: ts.Node,
+  decoratorNames: ReadonlyArray<string>
+): ts.NodeArray<ts.Decorator> | undefined => {
   if (node.decorators) {
     const updatedDecoratorList = node.decorators.filter((dec) => {
       const name =
         ts.isCallExpression(dec.expression) &&
         ts.isIdentifier(dec.expression.expression) &&
         dec.expression.expression.text;
-      return typeof name === 'boolean' || !decoratorNames.has(name);
+      return typeof name === 'boolean' || !decoratorNames.includes(name);
     });
     if (updatedDecoratorList.length === 0) {
       return undefined;
