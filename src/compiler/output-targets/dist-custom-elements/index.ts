@@ -190,6 +190,8 @@ export const addCustomElementInputs = (
   const components = buildCtx.components;
   // an array to store the imports of these modules that we're going to add to our entry chunk
   const indexImports: string[] = [];
+  const indexExports: string[] = [];
+  const exportNames: string[] = [];
 
   components.forEach((cmp) => {
     const exp: string[] = [];
@@ -200,7 +202,7 @@ export const addCustomElementInputs = (
 
     if (cmp.isPlain) {
       exp.push(`export { ${importName} as ${exportName} } from '${cmp.sourceFilePath}';`);
-      indexImports.push(`export { {${exportName} } from '${coreKey}';`);
+      indexExports.push(`export { {${exportName} } from '${coreKey}';`);
     } else {
       // the `importName` may collide with the `exportName`, alias it just in case it does with `importAs`
       exp.push(
@@ -215,19 +217,37 @@ export const addCustomElementInputs = (
       // correct virtual module, if we instead referenced, for instance,
       // `cmp.sourceFilePath`, we would end up with duplicated modules in our
       // output.
-      indexImports.push(
+      indexExports.push(
         `export { ${exportName}, defineCustomElement as defineCustomElement${exportName} } from '${coreKey}';`
       );
     }
+
+    indexImports.push(`import { ${exportName} } from '${coreKey}';`);
+    exportNames.push(exportName);
 
     bundleOpts.inputs[cmp.tagName] = coreKey;
     bundleOpts.loader![coreKey] = exp.join('\n');
   });
 
+  bundleOpts.loader!['\0core'] += indexImports.join('\n');
+
   // Only re-export component definitions if the barrel export behavior is set
   if (outputTarget.customElementsExportBehavior === 'single-export-module') {
-    bundleOpts.loader!['\0core'] += indexImports.join('\n');
+    bundleOpts.loader!['\0core'] += indexExports.join('\n');
   }
+
+  bundleOpts.loader!['\0core'] += `
+export const defineCustomElements = (opts) => {
+    if (typeof customElements !== 'undefined') {
+        [
+            ${exportNames.join(',\n          ')}
+        ].forEach(cmp => {
+            if (!customElements.get(cmp.is)) {
+                customElements.define(cmp.is, cmp, opts);
+            }
+        });
+    }
+};`;
 };
 
 /**
