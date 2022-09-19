@@ -262,7 +262,7 @@ describe('anonymizeConfigForTelemetry', () => {
       outputTargets: [
         { type: WWW, baseUrl: 'https://example.com' },
         { type: DIST_HYDRATE_SCRIPT, external: ['beep', 'boop'], dir: 'shoud/go/away' },
-        { type: DIST_CUSTOM_ELEMENTS, autoDefineCustomElements: false },
+        { type: DIST_CUSTOM_ELEMENTS },
         { type: DIST_CUSTOM_ELEMENTS, generateTypeDeclarations: true },
         { type: DIST, typesDir: 'my-types' },
       ],
@@ -271,7 +271,7 @@ describe('anonymizeConfigForTelemetry', () => {
     expect(anonymizedConfig.outputTargets).toEqual([
       { type: WWW, baseUrl: 'omitted' },
       { type: DIST_HYDRATE_SCRIPT, external: ['beep', 'boop'], dir: 'omitted' },
-      { type: DIST_CUSTOM_ELEMENTS, autoDefineCustomElements: false },
+      { type: DIST_CUSTOM_ELEMENTS },
       { type: DIST_CUSTOM_ELEMENTS, generateTypeDeclarations: true },
       { type: DIST, typesDir: 'omitted' },
     ]);
