@@ -42,7 +42,7 @@ export const addDefineCustomElementFunctions = (
         setupComponentDependencies(moduleFile, components, newStatements, caseStatements, tagNames);
         addDefineCustomElementFunction(tagNames, newStatements, caseStatements);
 
-        if (outputTarget.autoDefineCustomElements) {
+        if (outputTarget.customElementsExportBehavior === 'auto-define-custom-elements') {
           const conditionalDefineCustomElementCall = createAutoDefinitionExpression(
             principalComponent.componentClassName
           );
