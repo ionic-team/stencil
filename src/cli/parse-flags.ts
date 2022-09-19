@@ -1,4 +1,4 @@
-import { dashToPascalCase, toDashCase, readOnlyArrayHasStringMember } from '@utils';
+import { dashToPascalCase, readOnlyArrayHasStringMember,toDashCase } from '@utils';
 
 import { CompilerSystem, LOG_LEVELS, LogLevel, TaskCommand } from '../declarations';
 import {
