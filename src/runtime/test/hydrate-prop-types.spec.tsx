@@ -1,4 +1,4 @@
-import { Component, Host, Prop, h } from '@stencil/core';
+import { Component, h, Host, Prop } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
 describe('hydrate prop types', () => {

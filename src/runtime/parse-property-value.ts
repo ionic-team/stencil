@@ -1,5 +1,5 @@
-import { MEMBER_FLAGS, isComplexType } from '@utils';
 import { BUILD } from '@app-data';
+import { isComplexType, MEMBER_FLAGS } from '@utils';
 
 /**
  * Parse a new property value for a given property type.

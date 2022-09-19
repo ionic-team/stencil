@@ -1,11 +1,12 @@
-import type * as d from '../../../declarations';
+import { isRemoteUrl, isString, noop, normalizePath } from '@utils';
 import { basename, resolve } from 'path';
-import { isRemoteUrl, isString, normalizePath, noop } from '@utils';
-import { fetchUrlSync } from '../fetch/fetch-module-sync';
-import { getCurrentDirectory, IS_CASE_SENSITIVE_FILE_NAMES, IS_WEB_WORKER_ENV } from '../environment';
-import { patchTypeScriptResolveModule } from './typescript-resolve-module';
 import ts from 'typescript';
+
+import type * as d from '../../../declarations';
+import { getCurrentDirectory, IS_CASE_SENSITIVE_FILE_NAMES, IS_WEB_WORKER_ENV } from '../environment';
+import { fetchUrlSync } from '../fetch/fetch-module-sync';
 import { InMemoryFileSystem } from '../in-memory-fs';
+import { patchTypeScriptResolveModule } from './typescript-resolve-module';
 
 export const patchTsSystemFileSystem = (
   config: d.Config,

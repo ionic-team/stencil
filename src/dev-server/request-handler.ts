@@ -1,13 +1,14 @@
-import type * as d from '../declarations';
-import type { IncomingMessage, ServerResponse } from 'http';
-import { isDevClient, isDevModule, isExtensionLessPath, isSsrStaticDataPath } from './dev-server-utils';
 import { normalizePath } from '@utils';
+import type { IncomingMessage, ServerResponse } from 'http';
+import path from 'path';
+
+import type * as d from '../declarations';
+import { isDevClient, isDevModule, isExtensionLessPath, isSsrStaticDataPath } from './dev-server-utils';
 import { serveDevClient } from './serve-dev-client';
 import { serveDevNodeModule } from './serve-dev-node-module';
 import { serveDirectoryIndex } from './serve-directory-index';
 import { serveFile } from './serve-file';
 import { ssrPageRequest, ssrStaticDataRequest } from './ssr-request';
-import path from 'path';
 
 export function createRequestHandler(devServerConfig: d.DevServerConfig, serverCtx: d.DevServerContext) {
   let userRequestHandler: (req: IncomingMessage, res: ServerResponse, next: () => void) => void = null;

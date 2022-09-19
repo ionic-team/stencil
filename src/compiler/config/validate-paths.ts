@@ -1,5 +1,6 @@
-import type * as d from '../../declarations';
 import { isAbsolute, join } from 'path';
+
+import type * as d from '../../declarations';
 
 /**
  * Do logical-level validation (as opposed to type-level validation)

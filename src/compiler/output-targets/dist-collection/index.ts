@@ -1,10 +1,11 @@
-import type * as d from '../../../declarations';
 import { catchError, COLLECTION_MANIFEST_FILE_NAME, flatOne, generatePreamble, normalizePath, sortBy } from '@utils';
-import { isOutputTargetDistCollection } from '../output-utils';
 import { join, relative } from 'path';
-import { typescriptVersion, version } from '../../../version';
 import ts from 'typescript';
+
+import type * as d from '../../../declarations';
+import { typescriptVersion, version } from '../../../version';
 import { mapImportsToPathAliases } from '../../transformers/map-imports-to-path-aliases';
+import { isOutputTargetDistCollection } from '../output-utils';
 
 /**
  * Main output target function for `dist-collection`. This function takes the compiled output from a
@@ -90,9 +91,9 @@ const writeCollectionManifests = async (
 };
 
 // this maps the json data to our internal data structure
-// apping is so that the internal data structure "could"
+// mapping is so that the internal data structure "could"
 // change, but the external user data will always use the same api
-// over the top lame mapping functions is basically so we can loosly
+// over the top lame mapping functions is basically so we can loosely
 // couple core component meta data between specific versions of the compiler
 const writeCollectionManifest = async (
   compilerCtx: d.CompilerCtx,

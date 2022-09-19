@@ -1,7 +1,8 @@
-import type * as d from '../../declarations';
-import { basename } from 'path';
 import { createJsVarName, normalizeFsPathQuery } from '@utils';
+import { basename } from 'path';
 import type { Plugin, TransformPluginContext, TransformResult } from 'rollup';
+
+import type * as d from '../../declarations';
 
 export const extFormatPlugin = (config: d.Config): Plugin => {
   return {

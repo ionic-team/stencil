@@ -1,11 +1,12 @@
-import type * as d from '../declarations';
-import type { ServerResponse } from 'http';
-import * as util from './dev-server-utils';
-import { version } from '../version';
-import path from 'path';
-import fs from 'graceful-fs';
-import * as zlib from 'zlib';
 import { Buffer } from 'buffer';
+import fs from 'graceful-fs';
+import type { ServerResponse } from 'http';
+import path from 'path';
+import * as zlib from 'zlib';
+
+import type * as d from '../declarations';
+import { version } from '../version';
+import * as util from './dev-server-utils';
 
 export async function serveFile(
   devServerConfig: d.DevServerConfig,

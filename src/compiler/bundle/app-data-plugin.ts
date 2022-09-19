@@ -1,7 +1,10 @@
-import type * as d from '../../declarations';
+import { createJsVarName, isString, loadTypeScriptDiagnostics, normalizePath } from '@utils';
 import MagicString from 'magic-string';
-import { createJsVarName, normalizePath, isString, loadTypeScriptDiagnostics } from '@utils';
+import { basename } from 'path';
 import type { LoadResult, Plugin, ResolveIdResult, TransformResult } from 'rollup';
+import ts from 'typescript';
+
+import type * as d from '../../declarations';
 import { removeCollectionImports } from '../transformers/remove-collection-imports';
 import {
   APP_DATA_CONDITIONAL,
@@ -10,8 +13,6 @@ import {
   STENCIL_CORE_ID,
   STENCIL_INTERNAL_HYDRATE_ID,
 } from './entry-alias-ids';
-import ts from 'typescript';
-import { basename } from 'path';
 
 export const appDataPlugin = (
   config: d.Config,

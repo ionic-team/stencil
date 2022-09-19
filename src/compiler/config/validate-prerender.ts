@@ -1,6 +1,7 @@
-import type * as d from '../../declarations';
 import { buildError, isString, normalizePath } from '@utils';
 import { isAbsolute, join } from 'path';
+
+import type * as d from '../../declarations';
 
 export const validatePrerender = (
   config: d.ValidatedConfig,

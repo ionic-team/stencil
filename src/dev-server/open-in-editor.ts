@@ -1,5 +1,6 @@
-import type * as d from '../declarations';
 import type { ServerResponse } from 'http';
+
+import type * as d from '../declarations';
 import { responseHeaders } from './dev-server-utils';
 import openInEditorApi from './open-in-editor-api';
 

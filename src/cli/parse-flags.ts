@@ -1,10 +1,12 @@
-import { LogLevel, LOG_LEVELS, TaskCommand } from '../declarations';
 import { dashToPascalCase, toDashCase } from '@utils';
+
+import { LOG_LEVELS, LogLevel, TaskCommand } from '../declarations';
 import {
   BOOLEAN_CLI_ARGS,
   BooleanCLIArg,
   CLI_ARG_ALIASES,
   ConfigFlags,
+  createConfigFlags,
   LOG_LEVEL_CLI_ARGS,
   LogCLIArg,
   NUMBER_CLI_ARGS,
@@ -13,7 +15,6 @@ import {
   STRING_NUMBER_CLI_ARGS,
   StringCLIArg,
   StringNumberCLIArg,
-  createConfigFlags,
 } from './config-flags';
 
 /**

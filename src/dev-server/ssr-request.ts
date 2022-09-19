@@ -1,9 +1,10 @@
-import type * as d from '../declarations';
-import type { ServerResponse } from 'http';
-import { responseHeaders, getSsrStaticDataPath } from './dev-server-utils';
-import { appendDevServerClientScript } from './serve-file';
 import { catchError, isFunction, isString } from '@utils';
+import type { ServerResponse } from 'http';
 import path from 'path';
+
+import type * as d from '../declarations';
+import { getSsrStaticDataPath, responseHeaders } from './dev-server-utils';
+import { appendDevServerClientScript } from './serve-file';
 
 export async function ssrPageRequest(
   devServerConfig: d.DevServerConfig,
