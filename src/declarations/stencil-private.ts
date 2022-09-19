@@ -981,8 +981,8 @@ export interface ComponentConstructor {
 }
 
 /**
- * A mapping from property names to a list of methods which are watching that
- * property.
+ * A mapping from class member names to a list of methods which are watching
+ * them.
  */
 export interface ComponentConstructorWatchers {
   [propName: string]: string[];
@@ -1570,7 +1570,7 @@ export interface ComponentRuntimeMeta {
   /**
    * This number is used to hold a series of bitflags for various features we
    * support on components. The flags which this value is intended to store are
-   * documented in the `CMP_FLAGS` enum.
+   * documented in the {@link module:../utils/constants:CMP_FLAGS} enum.
    */
   $flags$: number;
   /**
@@ -1589,12 +1589,12 @@ export interface ComponentRuntimeMeta {
   $listeners$?: ComponentRuntimeHostListener[];
   /**
    * Tuples containing information about `@Prop` fields on the component which
-   * are set to be reflected (i.e. kept in sycnc) as HTML attributes when
+   * are set to be reflected (i.e. kept in sync) as HTML attributes when
    * updated.
    */
   $attrsToReflect$?: ComponentRuntimeReflectingAttr[];
   /**
-   * Information about which props have watchers attached on the component.
+   * Information about which class members have watchers attached on the component.
    */
   $watchers$?: ComponentConstructorWatchers;
   /**
@@ -1616,7 +1616,8 @@ export interface ComponentRuntimeMembers {
  * The fields are:
  *
  * 1. A number used to hold bitflags for component members. The bit flags which
- * this is intended to store are documented in the `MEMBER_FLAGS` enum.
+ * this is intended to store are documented in the
+ * {@link module:../utils/constants:MEMBER_FLAGS} enum.
  * 2. The attribute name to observe.
  */
 export type ComponentRuntimeMember = [number, string?];
@@ -1625,8 +1626,9 @@ export type ComponentRuntimeMember = [number, string?];
  * A tuple holding information about a host listener which is relevant at
  * runtime. The field are:
  *
- * 1. A number used to hold bitflags for listeners. The big flags which this is
- * intended to store are documented in the `LISTENER_FLAGS` enum.
+ * 1. A number used to hold bitflags for listeners. The bit flags which this is
+ * intended to store are documented in the
+ * {@link module:../utils/constants:LISTENER_FLAGS} enum.
  * 2. The event name.
  * 3. The method name.
  */
