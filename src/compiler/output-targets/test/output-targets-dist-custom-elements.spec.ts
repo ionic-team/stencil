@@ -19,6 +19,7 @@ import {
   outputCustomElements,
 } from '../dist-custom-elements';
 import * as outputCustomElementsMod from '../dist-custom-elements';
+// TODO(STENCIL-561): fully delete dist-custom-elements-bundle code
 import { DIST_CUSTOM_ELEMENTS, DIST_CUSTOM_ELEMENTS_BUNDLE } from '../output-utils';
 
 const setup = () => {

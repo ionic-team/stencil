@@ -7,7 +7,6 @@ import { outputCustomElements } from './dist-custom-elements';
 import { outputCustomElementsBundle } from './dist-custom-elements-bundle';
 import { outputHydrateScript } from './dist-hydrate-script';
 import { outputLazy } from './dist-lazy/lazy-output';
-import { outputAngular } from './output-angular';
 import { outputDocs } from './output-docs';
 import { outputLazyLoader } from './output-lazy-loader';
 import { outputTypes } from './output-types';

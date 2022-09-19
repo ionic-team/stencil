@@ -8,6 +8,7 @@ import type {
   OutputTargetDistTypes,
   ValidatedConfig,
 } from '../../../declarations';
+import { CustomElementsExportBehaviorOptions } from '../../../declarations';
 import { COPY, DIST_TYPES, isOutputTargetDistCustomElements } from '../../output-targets/output-utils';
 import { getAbsolutePath } from '../config-utils';
 import { validateCopy } from '../validate-copy';
