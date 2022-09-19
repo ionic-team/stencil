@@ -2032,9 +2032,16 @@ export interface OutputTargetBaseNext {
  * output target configuration for `customElementsExportBehavior`.
  *
  * - `default`: No additional export or definition behavior will happen.
+ * - `auto-define-custom-elements`: Enables the auto-definition of a component and its children (recursively) in the custom elements registry. This
+ * functionality allows consumers to bypass the explicit call to define a component, its children, its children's
+ * children, etc. Users of this flag should be aware that enabling this functionality may increase bundle size.
  * - `single-export-module`: All components will be re-exported from the specified directory's root `index.js` file.
  */
-export const CustomElementsExportBehaviorOptions = ['default', 'single-export-module'] as const;
+export const CustomElementsExportBehaviorOptions = [
+  'default',
+  'auto-define-custom-elements',
+  'single-export-module',
+] as const;
 
 /**
  * This type is auto-generated based on the values in `CustomElementsExportBehaviorOptions` array.
@@ -2056,12 +2063,6 @@ export interface OutputTargetDistCustomElements extends OutputTargetBaseNext {
   inlineDynamicImports?: boolean;
   includeGlobalScripts?: boolean;
   minify?: boolean;
-  /**
-   * Enables the auto-definition of a component and its children (recursively) in the custom elements registry. This
-   * functionality allows consumers to bypass the explicit call to define a component, its children, its children's
-   * children, etc. Users of this flag should be aware that enabling this functionality may increase bundle size.
-   */
-  autoDefineCustomElements?: boolean;
   /**
    * Enables the generation of type definition files for the output target.
    */
