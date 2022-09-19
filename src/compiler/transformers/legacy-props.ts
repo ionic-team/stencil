@@ -1,6 +1,7 @@
-import type * as d from '../../declarations';
-import { GET_CONNECT, GET_CONTEXT, RUNTIME_APIS, addCoreRuntimeApi } from './core-runtime-apis';
 import ts from 'typescript';
+
+import type * as d from '../../declarations';
+import { addCoreRuntimeApi, GET_CONNECT, GET_CONTEXT, RUNTIME_APIS } from './core-runtime-apis';
 
 export const addLegacyProps = (moduleFile: d.Module, cmp: d.ComponentCompilerMeta) => {
   if (cmp.legacyConnect.length > 0) {

@@ -1,6 +1,6 @@
 import type * as d from '../../../declarations';
-import { generateReadme } from './output-docs';
 import { isOutputTargetDocsReadme } from '../../output-targets/output-utils';
+import { generateReadme } from './output-docs';
 
 export const generateReadmeDocs = async (
   config: d.ValidatedConfig,

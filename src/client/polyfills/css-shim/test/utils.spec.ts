@@ -1,7 +1,7 @@
-import { executeTemplate } from '../template';
+import { CSSSelector, Declaration } from '../interfaces';
 import { parseCSS } from '../scope';
 import { getDeclarations, normalizeValue, resolveValues } from '../selectors';
-import { CSSSelector, Declaration } from '../interfaces';
+import { executeTemplate } from '../template';
 
 describe('utils', () => {
   describe('resolveValues', () => {

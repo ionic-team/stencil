@@ -1,7 +1,8 @@
-import type * as d from '../../../declarations';
-import { IS_NODE_ENV, requireFunc } from '../environment';
 import { normalizePath } from '@utils';
 import pathBrowserify from 'path-browserify';
+
+import type * as d from '../../../declarations';
+import { IS_NODE_ENV, requireFunc } from '../environment';
 
 export let basename: any;
 export let dirname: any;

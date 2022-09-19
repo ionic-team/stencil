@@ -1,7 +1,7 @@
 import type * as d from '../../../declarations';
+import * as Util from '../../../utils/util';
 import { generatePropTypes } from '../generate-prop-types';
 import * as StencilTypes from '../stencil-types';
-import * as Util from '../../../utils/util';
 import { stubComponentCompilerMeta } from './ComponentCompilerMeta.stub';
 import { stubComponentCompilerProperty } from './ComponentCompilerProperty.stub';
 import { stubComponentCompilerVirtualProperty } from './ComponentCompilerVirtualProperty.stub';

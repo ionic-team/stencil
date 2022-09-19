@@ -1,14 +1,14 @@
+import { MockAttr } from './attribute';
 import { MockComment } from './comment-node';
 import { NODE_NAMES, NODE_TYPES } from './constants';
 import { MockDocumentFragment } from './document-fragment';
 import { MockDocumentTypeNode } from './document-type-node';
-import { MockElement, MockHTMLElement, MockTextNode, resetElement } from './node';
-import { MockBaseElement, createElement, createElementNS } from './element';
-import { parseDocumentUtil } from './parse-util';
-import { parseHtmlToFragment } from './parse-html';
+import { createElement, createElementNS, MockBaseElement } from './element';
 import { resetEventListeners } from './event';
+import { MockElement, MockHTMLElement, MockTextNode, resetElement } from './node';
+import { parseHtmlToFragment } from './parse-html';
+import { parseDocumentUtil } from './parse-util';
 import { MockWindow } from './window';
-import { MockAttr } from './attribute';
 
 export class MockDocument extends MockHTMLElement {
   defaultView: any;

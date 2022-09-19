@@ -1,10 +1,11 @@
+import ts from 'typescript';
+
 import type * as d from '../../../../declarations';
+import { normalizePath } from '../../../../utils';
 import { createInMemoryFs, InMemoryFileSystem } from '../../../sys/in-memory-fs';
 import { createSystem } from '../../../sys/stencil-sys';
 import { ensureExtension } from '../typescript-resolve-module';
-import { normalizePath } from '../../../../utils';
 import { patchedTsResolveModule } from '../typescript-resolve-module';
-import ts from 'typescript';
 
 describe('typescript resolve module', () => {
   const config: d.Config = { rootDir: '/some/path' };

@@ -1,5 +1,6 @@
-import type { ValidatedConfig } from '../declarations';
 import { isString } from '@utils';
+
+import type { ValidatedConfig } from '../declarations';
 
 export const taskServe = async (config: ValidatedConfig) => {
   config.suppressLogs = true;

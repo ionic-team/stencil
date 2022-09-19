@@ -1,6 +1,7 @@
-import type * as d from '../../../declarations';
-import { dirname, join, relative } from 'path';
 import { normalizePath } from '@utils';
+import { dirname, join, relative } from 'path';
+
+import type * as d from '../../../declarations';
 
 export const getComponentAssetsCopyTasks = (
   config: d.ValidatedConfig,

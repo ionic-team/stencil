@@ -1,8 +1,10 @@
-import type * as d from '../../../declarations';
 import { buildError } from '@utils';
+
+import type * as d from '../../../declarations';
 import { isValidConfigOutputTarget, VALID_CONFIG_OUTPUT_TARGETS } from '../../output-targets/output-utils';
 import { validateCollection } from './validate-collection';
 import { validateCustomElement } from './validate-custom-element';
+import { validateCustomElementBundle } from './validate-custom-element-bundle';
 import { validateCustomOutput } from './validate-custom-output';
 import { validateDist } from './validate-dist';
 import { validateDocs } from './validate-docs';
@@ -10,7 +12,6 @@ import { validateHydrateScript } from './validate-hydrate-script';
 import { validateLazy } from './validate-lazy';
 import { validateStats } from './validate-stats';
 import { validateWww } from './validate-www';
-import { validateCustomElementBundle } from './validate-custom-element-bundle';
 
 export const validateOutputTargets = (config: d.ValidatedConfig, diagnostics: d.Diagnostic[]) => {
   const userOutputs = (config.outputTargets || []).slice();

@@ -1,7 +1,8 @@
-import { readConfig, writeConfig, updateConfig, defaultConfig } from '../ionic-config';
-import { createSystem } from '../../compiler/sys/stencil-sys';
-import { UUID_REGEX } from '../telemetry/helpers';
 import { mockCompilerSystem } from '@stencil/core/testing';
+
+import { createSystem } from '../../compiler/sys/stencil-sys';
+import { defaultConfig, readConfig, updateConfig, writeConfig } from '../ionic-config';
+import { UUID_REGEX } from '../telemetry/helpers';
 
 const UUID1 = '5588e0f0-02b5-4afa-8194-5d8f78683b36';
 const UUID2 = 'e5609819-5c24-4fa2-8817-e05ca10b8cae';

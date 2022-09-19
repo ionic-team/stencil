@@ -1,5 +1,5 @@
-import type * as d from '../../../../declarations';
 import { createSystem } from '../../../../compiler/sys/stencil-sys';
+import type * as d from '../../../../declarations';
 import { getTypescriptPathFromUrl } from '../typescript-sys';
 
 describe('getTypescriptPathFromUrl', () => {

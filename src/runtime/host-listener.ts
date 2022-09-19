@@ -1,7 +1,8 @@
-import type * as d from '../declarations';
 import { BUILD } from '@app-data';
-import { doc, plt, consoleError, supportsListenerOptions, win } from '@platform';
+import { consoleError, doc, plt, supportsListenerOptions, win } from '@platform';
 import { HOST_FLAGS, LISTENER_FLAGS } from '@utils';
+
+import type * as d from '../declarations';
 
 export const addHostEventListeners = (
   elm: d.HostElement,

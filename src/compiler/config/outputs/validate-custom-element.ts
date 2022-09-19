@@ -1,16 +1,17 @@
+import { isBoolean } from '@utils';
+import { join } from 'path';
+
 import type {
   OutputTarget,
+  OutputTargetCopy,
   OutputTargetDistCustomElements,
   OutputTargetDistTypes,
-  OutputTargetCopy,
   ValidatedConfig,
 } from '../../../declarations';
 import { CustomElementsExportBehaviorOptions } from '../../../declarations';
-import { getAbsolutePath } from '../config-utils';
 import { COPY, DIST_TYPES, isOutputTargetDistCustomElements } from '../../output-targets/output-utils';
+import { getAbsolutePath } from '../config-utils';
 import { validateCopy } from '../validate-copy';
-import { isBoolean } from '@utils';
-import { join } from 'path';
 
 /**
  * Validate one or more `dist-custom-elements` output targets. Validation of an output target may involve back-filling

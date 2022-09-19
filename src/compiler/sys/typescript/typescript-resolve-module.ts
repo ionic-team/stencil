@@ -1,22 +1,23 @@
-import type * as d from '../../../declarations';
+import { isRemoteUrl, isString, normalizePath } from '@utils';
 import { basename, dirname, isAbsolute, join, resolve } from 'path';
+import ts from 'typescript';
+
+import type * as d from '../../../declarations';
+import { version } from '../../../version';
+import { IS_BROWSER_ENV, IS_NODE_ENV } from '../environment';
+import { InMemoryFileSystem } from '../in-memory-fs';
+import { resolveRemoteModuleIdSync } from '../resolve/resolve-module-sync';
 import {
   isDtsFile,
   isJsFile,
+  isJsonFile,
   isJsxFile,
   isLocalModule,
   isStencilCoreImport,
-  isTsxFile,
   isTsFile,
-  isJsonFile,
+  isTsxFile,
 } from '../resolve/resolve-utils';
-import { IS_BROWSER_ENV, IS_NODE_ENV } from '../environment';
-import { isRemoteUrl, isString, normalizePath } from '@utils';
 import { patchTsSystemFileSystem } from './typescript-sys';
-import { resolveRemoteModuleIdSync } from '../resolve/resolve-module-sync';
-import { version } from '../../../version';
-import ts from 'typescript';
-import { InMemoryFileSystem } from '../in-memory-fs';
 
 export const patchTypeScriptResolveModule = (config: d.Config, inMemoryFs: InMemoryFileSystem) => {
   let compilerExe: string;

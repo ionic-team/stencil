@@ -1,5 +1,6 @@
-import type * as d from '../../declarations';
 import { buildError, dashToPascalCase, isString } from '@utils';
+
+import type * as d from '../../declarations';
 import { isOutputTargetDist } from '../output-targets/output-utils';
 
 export const validateNamespace = (c: d.UnvalidatedConfig, diagnostics: d.Diagnostic[]) => {

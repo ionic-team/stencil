@@ -1,7 +1,8 @@
 import type * as d from '@stencil/core/declarations';
-import { validateConfig } from '../validate-config';
 import { mockConfig, mockLoadConfigInit } from '@stencil/core/testing';
 import path from 'path';
+
+import { validateConfig } from '../validate-config';
 
 describe('validateDistOutputTarget', () => {
   const rootDir = path.resolve('/');

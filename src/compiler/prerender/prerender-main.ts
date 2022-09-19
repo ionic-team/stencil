@@ -1,17 +1,18 @@
-import type * as d from '../../declarations';
 import { buildError, catchError, hasError, isString } from '@utils';
+import { isAbsolute, join } from 'path';
+
+import type * as d from '../../declarations';
 import { createHydrateBuildId } from '../../hydrate/runner/render-utils';
-import { createWorkerContext } from '../worker/worker-thread';
+import { getAbsoluteBuildDir } from '../html/html-utils';
+import { isOutputTargetWww } from '../output-targets/output-utils';
 import { createWorkerMainContext } from '../worker/main-thread';
+import { createWorkerContext } from '../worker/worker-thread';
+import { getPrerenderConfig } from './prerender-config';
+import { getHydrateOptions } from './prerender-hydrate-options';
 import { drainPrerenderQueue, initializePrerenderEntryUrls } from './prerender-queue';
+import { generateTemplateHtml } from './prerender-template-html';
 import { generateRobotsTxt } from './robots-txt';
 import { generateSitemapXml } from './sitemap-xml';
-import { generateTemplateHtml } from './prerender-template-html';
-import { getAbsoluteBuildDir } from '../html/html-utils';
-import { getHydrateOptions } from './prerender-hydrate-options';
-import { getPrerenderConfig } from './prerender-config';
-import { isAbsolute, join } from 'path';
-import { isOutputTargetWww } from '../output-targets/output-utils';
 
 export const createPrerenderer = async (config: d.ValidatedConfig) => {
   const start = (opts: d.PrerenderStartOptions) => {

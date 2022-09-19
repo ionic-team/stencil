@@ -1,5 +1,6 @@
-import type * as d from '../../declarations';
 import ts from 'typescript';
+
+import type * as d from '../../declarations';
 
 export const updateComponentClass = (
   transformOpts: d.TransformOptions,
