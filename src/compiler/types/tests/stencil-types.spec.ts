@@ -1,9 +1,10 @@
 import * as d from '@stencil/core/declarations';
 import path from 'path';
+
+import { updateTypeIdentifierNames } from '../stencil-types';
 import { stubComponentCompilerMeta } from './ComponentCompilerMeta.stub';
 import { stubComponentCompilerTypeReference } from './ComponentCompilerTypeReference.stub';
 import { stubTypesImportData } from './TypesImportData.stub';
-import { updateTypeIdentifierNames } from '../stencil-types';
 
 describe('stencil-types', () => {
   describe('updateTypeMemberNames', () => {

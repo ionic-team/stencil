@@ -1,6 +1,7 @@
+import { isFunction, normalizePath } from '@utils';
+
 import type * as d from '../../../declarations';
 import { isCommonDirModuleFile, isTsFile, isTsxFile } from '../resolve/resolve-utils';
-import { isFunction, normalizePath } from '@utils';
 
 /**
  * A fetch wrapper which dispatches to `sys.fetch` if present, and otherwise

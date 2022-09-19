@@ -1,7 +1,8 @@
-import { BuildResultsComponentGraph } from '.';
+import type { InMemoryFileSystem } from '../compiler/sys/in-memory-fs';
 import type {
   BuildEvents,
   BuildLog,
+  BuildResultsComponentGraph,
   CompilerBuildResults,
   CompilerBuildStart,
   CompilerFsStats,
@@ -13,6 +14,7 @@ import type {
   DevServerEditor,
   Diagnostic,
   Logger,
+  LoggerLineUpdater,
   LoggerTimeSpan,
   OptimizeCssInput,
   OptimizeCssOutput,
@@ -20,10 +22,8 @@ import type {
   PageReloadStrategy,
   PrerenderConfig,
   StyleDoc,
-  LoggerLineUpdater,
   TaskCommand,
 } from './stencil-public-compiler';
-
 import type {
   ComponentInterface,
   ListenOptions,
@@ -31,7 +31,6 @@ import type {
   VNode,
   VNodeData,
 } from './stencil-public-runtime';
-import type { InMemoryFileSystem } from '../compiler/sys/in-memory-fs';
 
 export interface SourceMap {
   file: string;
@@ -991,9 +990,9 @@ export interface ComponentTestingConstructor extends ComponentConstructor {
     componentWillLoad?: Function;
     componentWillUpdate?: Function;
     componentWillRender?: Function;
-    __componentWillLoad?: Function;
-    __componentWillUpdate?: Function;
-    __componentWillRender?: Function;
+    __componentWillLoad?: Function | null;
+    __componentWillUpdate?: Function | null;
+    __componentWillRender?: Function | null;
   };
 }
 

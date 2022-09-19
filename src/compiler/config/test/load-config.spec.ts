@@ -1,9 +1,10 @@
-import type * as d from '../../../declarations';
-import { createSystem } from '../../../compiler/sys/stencil-sys';
-import { loadConfig } from '../load-config';
-import { normalizePath } from '../../../utils';
 import path from 'path';
+
 import { ConfigFlags } from '../../../cli/config-flags';
+import { createSystem } from '../../../compiler/sys/stencil-sys';
+import type * as d from '../../../declarations';
+import { normalizePath } from '../../../utils';
+import { loadConfig } from '../load-config';
 
 describe('load config', () => {
   const configPath = require.resolve('./fixtures/stencil.config.ts');

@@ -1,6 +1,7 @@
+import ts from 'typescript';
+
 import type * as d from '../../declarations';
 import { getTsOptionsToExtend } from './ts-config';
-import ts from 'typescript';
 
 export const createTsWatchProgram = async (
   config: d.ValidatedConfig,

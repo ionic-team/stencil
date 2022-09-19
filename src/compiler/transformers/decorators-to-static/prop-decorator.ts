@@ -1,5 +1,8 @@
-import type * as d from '../../../declarations';
 import { augmentDiagnosticWithNode, buildError, buildWarn, toDashCase } from '@utils';
+import ts from 'typescript';
+
+import type * as d from '../../../declarations';
+import { validatePublicName } from '../reserved-public-members';
 import {
   convertValueToLiteral,
   createStaticGetter,
@@ -10,12 +13,11 @@ import {
   typeToString,
   validateReferences,
 } from '../transform-utils';
-import { isDecoratorNamed, getDeclarationParameters } from './decorator-utils';
-import { validatePublicName } from '../reserved-public-members';
-import ts from 'typescript';
+import { getDeclarationParameters, isDecoratorNamed } from './decorator-utils';
 
 /**
  * Parse a collection of class members decorated with `@Prop()`
+ *
  * @param diagnostics a collection of compiler diagnostics. During the parsing process, any errors detected must be
  * added to this collection
  * @param decoratedProps a collection of class elements that may or may not my class members decorated with `@Prop`.

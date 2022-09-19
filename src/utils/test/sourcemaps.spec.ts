@@ -1,10 +1,11 @@
 import {
-  getSourceMappingUrlLinker,
-  getSourceMappingUrlForEndOfFile,
-  rollupToStencilSourceMap,
   getInlineSourceMappingUrlLinker,
+  getSourceMappingUrlForEndOfFile,
+  getSourceMappingUrlLinker,
+  rollupToStencilSourceMap,
 } from '@utils';
 import { SourceMap as RollupSourceMap } from 'rollup';
+
 import type * as d from '../../declarations';
 
 describe('sourcemaps', () => {

@@ -1,5 +1,6 @@
-import type * as d from '../../../declarations';
 import { catchError } from '@utils';
+
+import type * as d from '../../../declarations';
 import { COPY, isOutputTargetCustom } from '../../output-targets/output-utils';
 
 export const validateCustomOutput = (

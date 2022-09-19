@@ -1,5 +1,6 @@
-import { CustomStyle } from '../custom-style';
 import { mockWindow } from '@stencil/core/testing';
+
+import { CustomStyle } from '../custom-style';
 
 describe('css-shim', () => {
   beforeEach(() => {

@@ -1,9 +1,10 @@
 import type * as d from '@stencil/core/declarations';
+import { mockLoadConfigInit } from '@stencil/core/testing';
+import path from 'path';
+
+import { ConfigFlags, createConfigFlags } from '../../../cli/config-flags';
 import { isOutputTargetCopy, isOutputTargetHydrate, isOutputTargetWww } from '../../output-targets/output-utils';
 import { validateConfig } from '../validate-config';
-import path from 'path';
-import { ConfigFlags, createConfigFlags } from '../../../cli/config-flags';
-import { mockLoadConfigInit } from '@stencil/core/testing';
 
 describe('validateOutputTargetWww', () => {
   const rootDir = path.resolve('/');

@@ -1,6 +1,7 @@
+import ts from 'typescript';
+
 import type * as d from '../../declarations';
 import { getTsOptionsToExtend } from './ts-config';
-import ts from 'typescript';
 
 /**
  * Create a TypeScript Program ({@link ts.Program}) to perform builds of a Stencil project using the provided

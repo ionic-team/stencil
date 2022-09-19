@@ -1,7 +1,8 @@
+import { SVG_NS } from '@utils';
+
 import type * as d from '../../../declarations';
 import { h, newVNode } from '../h';
 import { patch } from '../vdom-render';
-import { SVG_NS } from '@utils';
 import { toVNode } from './to-vnode';
 
 describe('renderer', () => {

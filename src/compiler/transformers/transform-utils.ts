@@ -1,7 +1,8 @@
-import type * as d from '../../declarations';
 import { augmentDiagnosticWithNode, buildError, normalizePath } from '@utils';
-import { MEMBER_DECORATORS_TO_REMOVE } from './decorators-to-static/decorators-constants';
 import ts from 'typescript';
+
+import type * as d from '../../declarations';
+import { MEMBER_DECORATORS_TO_REMOVE } from './decorators-to-static/decorators-constants';
 
 export const getScriptTarget = () => {
   // using a fn so the browser compiler doesn't require the global ts for startup
@@ -126,33 +127,23 @@ const objectToObjectLiteral = (obj: { [key: string]: any }, refs: WeakSet<any>):
   return ts.createObjectLiteral(newProperties, true);
 };
 
-export const createStaticGetter = (propName: string, returnExpression: ts.Expression) => {
-  return ts.createGetAccessor(
+/**
+ * Create a TypeScript getter declaration AST node corresponding to a
+ * supplied prop name and return value
+ *
+ * @param propName the name of the prop to access
+ * @param returnExpression a TypeScript AST node to return from the getter
+ * @returns an AST node representing a getter
+ */
+export const createStaticGetter = (propName: string, returnExpression: ts.Expression): ts.GetAccessorDeclaration => {
+  return ts.factory.createGetAccessorDeclaration(
     undefined,
-    [ts.createToken(ts.SyntaxKind.StaticKeyword)],
+    [ts.factory.createToken(ts.SyntaxKind.StaticKeyword)],
     propName,
     undefined,
     undefined,
-    ts.createBlock([ts.createReturn(returnExpression)])
+    ts.factory.createBlock([ts.factory.createReturnStatement(returnExpression)])
   );
-};
-
-export const removeDecorators = (node: ts.Node, decoratorNames: Set<string>) => {
-  if (node.decorators) {
-    const updatedDecoratorList = node.decorators.filter((dec) => {
-      const name =
-        ts.isCallExpression(dec.expression) &&
-        ts.isIdentifier(dec.expression.expression) &&
-        dec.expression.expression.text;
-      return !decoratorNames.has(name);
-    });
-    if (updatedDecoratorList.length === 0) {
-      return undefined;
-    } else if (updatedDecoratorList.length !== node.decorators.length) {
-      return ts.createNodeArray(updatedDecoratorList);
-    }
-  }
-  return node.decorators;
 };
 
 export const getStaticValue = (staticMembers: ts.ClassElement[], staticName: string): any => {

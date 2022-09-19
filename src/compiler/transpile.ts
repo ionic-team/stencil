@@ -1,10 +1,11 @@
-import { TranspileOptions, TranspileResults, Config, TransformOptions, TransformCssToEsmInput } from '../declarations';
-import { catchError, getInlineSourceMappingUrlLinker, isString } from '@utils';
-import { getPublicCompilerMeta } from './transformers/add-component-meta-static';
-import { getTranspileCssConfig, getTranspileConfig, getTranspileResults } from './config/transpile-options';
-import { patchTypescript } from './sys/typescript/typescript-sys';
 import { rollupPluginUtils } from '@compiler-deps';
+import { catchError, getInlineSourceMappingUrlLinker, isString } from '@utils';
+
+import { Config, TransformCssToEsmInput, TransformOptions, TranspileOptions, TranspileResults } from '../declarations';
+import { getTranspileConfig, getTranspileCssConfig, getTranspileResults } from './config/transpile-options';
 import { transformCssToEsm, transformCssToEsmSync } from './style/css-to-esm';
+import { patchTypescript } from './sys/typescript/typescript-sys';
+import { getPublicCompilerMeta } from './transformers/add-component-meta-static';
 import { transpileModule } from './transpile/transpile-module';
 
 export const transpile = async (code: string, opts: TranspileOptions = {}) => {

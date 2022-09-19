@@ -1,11 +1,12 @@
-import type * as d from '../../declarations';
-import type { BundleOptions } from './bundle-interface';
-import { getModule } from '../transpile/transpiled-module';
 import { isString, normalizeFsPath } from '@utils';
+import { basename, isAbsolute } from 'path';
 import type { LoadResult, Plugin, TransformResult } from 'rollup';
-import { tsResolveModuleName } from '../sys/typescript/typescript-resolve-module';
-import { isAbsolute, basename } from 'path';
 import ts from 'typescript';
+
+import type * as d from '../../declarations';
+import { tsResolveModuleName } from '../sys/typescript/typescript-resolve-module';
+import { getModule } from '../transpile/transpiled-module';
+import type { BundleOptions } from './bundle-interface';
 
 /**
  * Rollup plugin that aids in resolving the TypeScript files and performing the transpilation step.

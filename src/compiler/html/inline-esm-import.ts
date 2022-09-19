@@ -1,10 +1,11 @@
-import type * as d from '../../declarations';
-import { getAbsoluteBuildDir } from './html-utils';
-import { generateHashedCopy } from '../output-targets/copy/hashed-copy';
-import { injectModulePreloads } from './inject-module-preloads';
 import { isString } from '@utils';
 import { join } from 'path';
 import ts from 'typescript';
+
+import type * as d from '../../declarations';
+import { generateHashedCopy } from '../output-targets/copy/hashed-copy';
+import { getAbsoluteBuildDir } from './html-utils';
+import { injectModulePreloads } from './inject-module-preloads';
 
 export const optimizeEsmImport = async (
   config: d.Config,

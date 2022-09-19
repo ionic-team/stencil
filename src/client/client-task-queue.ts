@@ -1,8 +1,9 @@
+import { BUILD } from '@app-data';
+
 import type * as d from '../declarations';
+import { PLATFORM_FLAGS } from '../runtime/runtime-constants';
 import { consoleError } from './client-log';
 import { plt, promiseResolve } from './client-window';
-import { PLATFORM_FLAGS } from '../runtime/runtime-constants';
-import { BUILD } from '@app-data';
 
 let queueCongestion = 0;
 let queuePending = false;
