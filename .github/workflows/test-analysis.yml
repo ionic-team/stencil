@@ -37,3 +37,6 @@ jobs:
       - name: Analysis Tests
         run: npm run test.analysis
         shell: bash
+
+      - name: Check Git Context
+        uses: ./.github/workflows/actions/check-git-context
