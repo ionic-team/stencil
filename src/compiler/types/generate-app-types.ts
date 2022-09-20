@@ -44,7 +44,7 @@ export const generateAppTypes = async (
     );
   }
 
-  const writeResults = await compilerCtx.fs.writeFile(normalizePath(componentsDtsFilePath), componentTypesFileContent, {
+  const writeResults = await compilerCtx.fs.writeFile(componentsDtsFilePath, componentTypesFileContent, {
     immediateWrite: true,
   });
   const hasComponentsDtsChanged = writeResults.changedContent;

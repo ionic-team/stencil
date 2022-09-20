@@ -11,24 +11,20 @@ describe('generateAppTypes', () => {
   let buildCtx: d.BuildCtx;
 
   const mockFs = {
-    writeFile: jest.fn(),
+    writeFile: jest.fn().mockResolvedValue({ changedContent: true }),
   };
 
   beforeEach(() => {
     config = mockValidatedConfig({
-      srcDir: '/',
+      srcDir: 'src',
     });
+
     compilerCtx = {
       ...mockCompilerCtx(config),
       fs: mockFs as any,
     };
+
     buildCtx = mockBuildCtx(config, compilerCtx);
-
-    mockFs.writeFile.mockResolvedValueOnce({ changedContent: true });
-  });
-
-  afterEach(() => {
-    jest.resetAllMocks();
   });
 
   it('should generate a type declaration file without custom event types', async () => {
@@ -42,7 +38,7 @@ describe('generateAppTypes', () => {
     await generateAppTypes(config, compilerCtx, buildCtx, 'src');
 
     expect(mockFs.writeFile).toHaveBeenCalledWith(
-      '/components.d.ts',
+      'src/components.d.ts',
       `/* eslint-disable */
 /* tslint:disable */
 /**
@@ -99,7 +95,7 @@ declare module "@stencil/core" {
     await generateAppTypes(config, compilerCtx, buildCtx, 'src');
 
     expect(mockFs.writeFile).toHaveBeenCalledWith(
-      '/components.d.ts',
+      'src/components.d.ts',
       `/* eslint-disable */
 /* tslint:disable */
 /**
@@ -107,8 +103,8 @@ declare module "@stencil/core" {
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
-import { UserImplementedEventType } from "./some/stubbed/path/resources";
-export { UserImplementedEventType } from "./some/stubbed/path/resources";
+import { UserImplementedEventType } from "../../../../../../some/stubbed/path/resources";
+export { UserImplementedEventType } from "../../../../../../some/stubbed/path/resources";
 export namespace Components {
         interface MyComponent {
         }
