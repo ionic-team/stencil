@@ -1,5 +1,6 @@
-import type * as d from '../declarations';
 import { join } from 'path';
+
+import type * as d from '../declarations';
 import { InMemoryFileSystem } from './sys/in-memory-fs';
 
 export class Cache implements d.Cache {

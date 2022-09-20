@@ -1,7 +1,7 @@
-import { MockWindow } from '../window';
+import { MockDocument } from '../document';
 import { MockEvent } from '../event';
 import { MockElement } from '../node';
-import { MockDocument } from '../document';
+import { MockWindow } from '../window';
 
 describe('event', () => {
   let win: MockWindow;

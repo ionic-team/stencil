@@ -1,5 +1,7 @@
+import { createDocument, serializeNodeToHtml } from '@stencil/core/mock-doc';
+import { catchError, isFunction, isPromise, isString } from '@utils';
+
 import type * as d from '../../declarations';
-import { catchError, isPromise, isFunction, isString } from '@utils';
 import {
   hasStencilScript,
   inlineExternalStyleSheets,
@@ -7,7 +9,6 @@ import {
   minifyStyleElements,
   removeStencilScripts,
 } from './prerender-optimize';
-import { createDocument, serializeNodeToHtml } from '@stencil/core/mock-doc';
 
 export const generateTemplateHtml = async (
   config: d.Config,

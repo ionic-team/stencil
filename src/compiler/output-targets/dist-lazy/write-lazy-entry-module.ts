@@ -1,6 +1,7 @@
-import type * as d from '../../../declarations';
-import { join } from 'path';
 import { getSourceMappingUrlForEndOfFile } from '@utils';
+import { join } from 'path';
+
+import type * as d from '../../../declarations';
 
 export const writeLazyModule = async (
   config: d.ValidatedConfig,

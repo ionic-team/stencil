@@ -1,7 +1,8 @@
-import type * as d from '../declarations';
 import { BUILD } from '@app-data';
 import { consoleDevWarn, consoleError, getHostRef } from '@platform';
 import { HOST_FLAGS } from '@utils';
+
+import type * as d from '../declarations';
 import { parsePropertyValue } from './parse-property-value';
 import { scheduleUpdate } from './update-component';
 

@@ -1,8 +1,9 @@
-import type * as d from '../../../declarations';
-import { dirname } from 'path';
 import { isString, parsePackageJson } from '@utils';
-import { parseCollection } from './parse-collection-module';
+import { dirname } from 'path';
+
+import type * as d from '../../../declarations';
 import { tsResolveModuleNamePackageJsonPath } from '../../sys/typescript/typescript-resolve-module';
+import { parseCollection } from './parse-collection-module';
 
 export const addExternalImport = (
   config: d.Config,

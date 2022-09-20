@@ -161,8 +161,8 @@ const FETCH_DEFAULT_PATH = '/mock-fetch-data';
 export {
   MockHeaders,
   MockRequest,
-  MockRequestInit,
   MockRequestInfo,
+  MockRequestInit,
   MockResponse,
   MockResponseInit,
 } from '../mock-doc';

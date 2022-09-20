@@ -1,5 +1,5 @@
 import { HmrStyleUpdate } from '../../declarations';
-import { isTemplate, hasShadowRoot, isElement } from './hmr-util';
+import { hasShadowRoot, isElement, isTemplate } from './hmr-util';
 
 export const hmrInlineStyles = (elm: Element, versionId: string, stylesUpdatedData: any[]) => {
   const stylesUpdated: HmrStyleUpdate[] = stylesUpdatedData;

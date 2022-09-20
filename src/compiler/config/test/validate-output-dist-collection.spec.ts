@@ -1,7 +1,8 @@
 import type * as d from '@stencil/core/declarations';
-import { validateConfig } from '../validate-config';
 import { mockConfig, mockLoadConfigInit } from '@stencil/core/testing';
-import { resolve, join } from 'path';
+import { join, resolve } from 'path';
+
+import { validateConfig } from '../validate-config';
 
 describe('validateDistCollectionOutputTarget', () => {
   let config: d.Config;

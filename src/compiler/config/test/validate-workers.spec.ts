@@ -1,8 +1,9 @@
 import type * as d from '@stencil/core/declarations';
-import { validateConfig } from '../validate-config';
 import { mockLoadConfigInit, mockLogger } from '@stencil/core/testing';
 import path from 'path';
+
 import { createConfigFlags } from '../../../cli/config-flags';
+import { validateConfig } from '../validate-config';
 
 describe('validate-workers', () => {
   let userConfig: d.Config;

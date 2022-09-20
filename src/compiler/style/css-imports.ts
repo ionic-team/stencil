@@ -1,9 +1,10 @@
-import type * as d from '../../declarations';
-import { basename, dirname, isAbsolute, join } from 'path';
 import { buildError, normalizePath } from '@utils';
-import { getModuleId } from '../sys/resolve/resolve-utils';
+import { basename, dirname, isAbsolute, join } from 'path';
+
+import type * as d from '../../declarations';
 import { parseStyleDocs } from '../docs/style-docs';
 import { resolveModuleIdAsync } from '../sys/resolve/resolve-module-async';
+import { getModuleId } from '../sys/resolve/resolve-utils';
 import { stripCssComments } from './style-utils';
 
 /**

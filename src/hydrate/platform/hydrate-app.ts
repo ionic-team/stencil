@@ -1,8 +1,9 @@
-import type * as d from '../../declarations';
-import { connectedCallback, insertVdomAnnotations } from '@runtime';
-import { doc, getHostRef, loadModule, plt, registerHost } from '@platform';
-import { proxyHostElement } from './proxy-host-element';
 import { globalScripts } from '@app-globals';
+import { doc, getHostRef, loadModule, plt, registerHost } from '@platform';
+import { connectedCallback, insertVdomAnnotations } from '@runtime';
+
+import type * as d from '../../declarations';
+import { proxyHostElement } from './proxy-host-element';
 
 export function hydrateApp(
   win: Window & typeof globalThis,

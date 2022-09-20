@@ -1,3 +1,13 @@
+import { BUILD } from '@app-data';
+import type {
+  ComponentCompilerMeta,
+  ComponentRuntimeMeta,
+  ComponentTestingConstructor,
+  HostRef,
+  LazyBundlesRuntimeData,
+  NewSpecPageOptions,
+  SpecPage,
+} from '@stencil/core/internal';
 import {
   bootstrapLazy,
   flushAll,
@@ -9,23 +19,14 @@ import {
   registerModule,
   renderVdom,
   resetPlatform,
+  setSupportsShadowDom,
   startAutoApplyChanges,
   styles,
   win,
   writeTask,
-  setSupportsShadowDom,
 } from '@stencil/core/internal/testing';
-import { BUILD } from '@app-data';
-import type {
-  ComponentCompilerMeta,
-  ComponentRuntimeMeta,
-  ComponentTestingConstructor,
-  HostRef,
-  LazyBundlesRuntimeData,
-  NewSpecPageOptions,
-  SpecPage,
-} from '@stencil/core/internal';
 import { formatLazyBundleRuntimeMeta } from '@utils';
+
 import { getBuildFeatures } from '../compiler/app-core/app-data';
 import { resetBuildConditionals } from './reset-build-conditionals';
 
@@ -226,20 +227,20 @@ export async function newSpecPage(opts: NewSpecPageOptions): Promise<SpecPage> {
 }
 
 function proxyComponentLifeCycles(Cstr: ComponentTestingConstructor) {
-  if (typeof Cstr.prototype.__componentWillLoad === 'function') {
+  if (typeof Cstr.prototype?.__componentWillLoad === 'function') {
     Cstr.prototype.componentWillLoad = Cstr.prototype.__componentWillLoad;
     Cstr.prototype.__componentWillLoad = null;
   }
-  if (typeof Cstr.prototype.__componentWillUpdate === 'function') {
+  if (typeof Cstr.prototype?.__componentWillUpdate === 'function') {
     Cstr.prototype.componentWillUpdate = Cstr.prototype.__componentWillUpdate;
     Cstr.prototype.__componentWillUpdate = null;
   }
-  if (typeof Cstr.prototype.__componentWillRender === 'function') {
+  if (typeof Cstr.prototype?.__componentWillRender === 'function') {
     Cstr.prototype.componentWillRender = Cstr.prototype.__componentWillRender;
     Cstr.prototype.__componentWillRender = null;
   }
 
-  if (typeof Cstr.prototype.componentWillLoad === 'function') {
+  if (typeof Cstr.prototype?.componentWillLoad === 'function') {
     Cstr.prototype.__componentWillLoad = Cstr.prototype.componentWillLoad;
     Cstr.prototype.componentWillLoad = function () {
       const result = this.__componentWillLoad();
@@ -252,7 +253,7 @@ function proxyComponentLifeCycles(Cstr: ComponentTestingConstructor) {
     };
   }
 
-  if (typeof Cstr.prototype.componentWillUpdate === 'function') {
+  if (typeof Cstr.prototype?.componentWillUpdate === 'function') {
     Cstr.prototype.__componentWillUpdate = Cstr.prototype.componentWillUpdate;
     Cstr.prototype.componentWillUpdate = function () {
       const result = this.__componentWillUpdate();
@@ -265,7 +266,7 @@ function proxyComponentLifeCycles(Cstr: ComponentTestingConstructor) {
     };
   }
 
-  if (typeof Cstr.prototype.componentWillRender === 'function') {
+  if (typeof Cstr.prototype?.componentWillRender === 'function') {
     Cstr.prototype.__componentWillRender = Cstr.prototype.componentWillRender;
     Cstr.prototype.componentWillRender = function () {
       const result = this.__componentWillRender();

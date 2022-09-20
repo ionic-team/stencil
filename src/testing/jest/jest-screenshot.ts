@@ -1,6 +1,7 @@
 import type * as d from '@stencil/core/internal';
-import { runJest } from './jest-runner';
 import { join } from 'path';
+
+import { runJest } from './jest-runner';
 
 export async function runJestScreenshot(config: d.ValidatedConfig, env: d.E2EProcessEnv) {
   config.logger.debug(`screenshot connector: ${config.testing.screenshotConnector}`);

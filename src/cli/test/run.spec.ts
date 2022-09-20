@@ -1,4 +1,3 @@
-import type * as d from '../../declarations';
 import * as coreCompiler from '@stencil/core/compiler';
 import {
   mockCompilerSystem,
@@ -6,6 +5,10 @@ import {
   mockLogger as createMockLogger,
   mockValidatedConfig,
 } from '@stencil/core/testing';
+
+import type * as d from '../../declarations';
+import { createTestingSystem } from '../../testing/testing-sys';
+import { createConfigFlags } from '../config-flags';
 import * as ParseFlags from '../parse-flags';
 import { run, runTask } from '../run';
 import * as BuildTask from '../task-build';
@@ -16,8 +19,6 @@ import * as PrerenderTask from '../task-prerender';
 import * as ServeTask from '../task-serve';
 import * as TelemetryTask from '../task-telemetry';
 import * as TestTask from '../task-test';
-import { createTestingSystem } from '../../testing/testing-sys';
-import { createConfigFlags } from '../config-flags';
 
 describe('run', () => {
   describe('run()', () => {

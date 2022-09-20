@@ -1,6 +1,7 @@
-import type * as d from '../../declarations';
-import { mockConfig, mockBuildCtx } from '@stencil/core/testing';
+import { mockBuildCtx, mockConfig } from '@stencil/core/testing';
 import * as util from '@utils';
+
+import type * as d from '../../declarations';
 import { stubDiagnostic } from '../../dev-server/test/Diagnostic.stub';
 
 describe('util', () => {

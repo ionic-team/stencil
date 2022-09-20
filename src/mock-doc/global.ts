@@ -15,8 +15,8 @@ import {
 } from './element';
 import { MockCustomEvent, MockEvent, MockFocusEvent, MockKeyboardEvent, MockMouseEvent } from './event';
 import { MockHeaders } from './headers';
-import { MockRequest, MockResponse } from './request-response';
 import { MockDOMParser } from './parser';
+import { MockRequest, MockResponse } from './request-response';
 import { MockWindow } from './window';
 
 export function setupGlobal(gbl: any) {

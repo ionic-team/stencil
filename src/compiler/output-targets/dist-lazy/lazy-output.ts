@@ -1,9 +1,9 @@
+import { catchError, sortBy } from '@utils';
+import MagicString from 'magic-string';
+
 import type * as d from '../../../declarations';
 import type { BundleOptions } from '../../bundle/bundle-interface';
 import { bundleOutput } from '../../bundle/bundle-output';
-import { catchError, sortBy } from '@utils';
-import { getLazyBuildConditionals } from './lazy-build-conditionals';
-import { isOutputTargetDistLazy, isOutputTargetDist } from '../output-utils';
 import {
   LAZY_BROWSER_ENTRY_ID,
   LAZY_EXTERNAL_ENTRY_ID,
@@ -13,16 +13,17 @@ import {
   STENCIL_INTERNAL_CLIENT_PATCH_ESM_ID,
   USER_INDEX_ENTRY_ID,
 } from '../../bundle/entry-alias-ids';
-import { lazyComponentTransform } from '../../transformers/component-lazy/transform-lazy-component';
-import { generateCjs } from './generate-cjs';
-import { generateEsmBrowser } from './generate-esm-browser';
-import { generateEsm } from './generate-esm';
-import { generateSystem } from './generate-system';
+import { generateComponentBundles } from '../../entries/component-bundles';
 import { generateModuleGraph } from '../../entries/component-graph';
+import { lazyComponentTransform } from '../../transformers/component-lazy/transform-lazy-component';
 import { removeCollectionImports } from '../../transformers/remove-collection-imports';
 import { updateStencilCoreImports } from '../../transformers/update-stencil-core-import';
-import MagicString from 'magic-string';
-import { generateComponentBundles } from '../../entries/component-bundles';
+import { isOutputTargetDist, isOutputTargetDistLazy } from '../output-utils';
+import { generateCjs } from './generate-cjs';
+import { generateEsm } from './generate-esm';
+import { generateEsmBrowser } from './generate-esm-browser';
+import { generateSystem } from './generate-system';
+import { getLazyBuildConditionals } from './lazy-build-conditionals';
 
 export const outputLazy = async (
   config: d.ValidatedConfig,

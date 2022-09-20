@@ -1,9 +1,10 @@
 import type * as d from '@stencil/core/internal';
 import { normalizePath } from '@utils';
-import { writeScreenshotData, writeScreenshotImage } from './screenshot-fs';
+import { fork } from 'child_process';
 import { createHash } from 'crypto';
 import { join, relative } from 'path';
-import { fork } from 'child_process';
+
+import { writeScreenshotData, writeScreenshotImage } from './screenshot-fs';
 
 export async function compareScreenshot(
   emulateConfig: d.EmulateConfig,

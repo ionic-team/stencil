@@ -1,13 +1,14 @@
-import type * as d from '../declarations';
-import { addHostEventListeners, doc, getHostRef, nextTick, plt, supportsShadow } from '@platform';
-import { addStyle } from './styles';
-import { attachToAncestor } from './update-component';
 import { BUILD } from '@app-data';
+import { addHostEventListeners, doc, getHostRef, nextTick, plt, supportsShadow } from '@platform';
 import { CMP_FLAGS, HOST_FLAGS, MEMBER_FLAGS } from '@utils';
+
+import type * as d from '../declarations';
+import { initializeClientHydrate } from './client-hydrate';
+import { fireConnectedCallback, initializeComponent } from './initialize-component';
 import { createTime } from './profile';
 import { HYDRATE_ID, NODE_TYPE, PLATFORM_FLAGS } from './runtime-constants';
-import { initializeClientHydrate } from './client-hydrate';
-import { initializeComponent, fireConnectedCallback } from './initialize-component';
+import { addStyle } from './styles';
+import { attachToAncestor } from './update-component';
 
 export const connectedCallback = (elm: d.HostElement) => {
   if ((plt.$flags$ & PLATFORM_FLAGS.isTmpDisconnected) === 0) {

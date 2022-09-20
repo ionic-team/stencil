@@ -1,7 +1,8 @@
-import { mockCompilerCtx } from '@stencil/core/testing';
 import * as d from '@stencil/core/declarations';
-import { transpileModule } from './transpile';
+import { mockCompilerCtx } from '@stencil/core/testing';
+
 import { nativeComponentTransform } from '../component-native/tranform-to-native-component';
+import { transpileModule } from './transpile';
 
 describe('nativeComponentTransform', () => {
   let compilerCtx: d.CompilerCtx;

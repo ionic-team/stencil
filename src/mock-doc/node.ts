@@ -1,20 +1,20 @@
+import { createAttributeProxy, MockAttr, MockAttributeMap } from './attribute';
+import { MockClassList } from './class-list';
+import { NODE_NAMES, NODE_TYPES } from './constants';
+import { createCSSStyleDeclaration, MockCSSStyleDeclaration } from './css-style-declaration';
 import { attributeChanged, checkAttributeChanged, connectNode, disconnectNode } from './custom-element-registry';
 import { dataset } from './dataset';
-import { matches, selectAll, selectOne } from './selector';
-import { MockAttr, MockAttributeMap, createAttributeProxy } from './attribute';
-import { MockClassList } from './class-list';
-import { MockCSSStyleDeclaration, createCSSStyleDeclaration } from './css-style-declaration';
 import {
-  MockEvent,
   addEventListener,
   dispatchEvent,
+  MockEvent,
+  MockFocusEvent,
   removeEventListener,
   resetEventListeners,
-  MockFocusEvent,
 } from './event';
-import { NODE_NAMES, NODE_TYPES } from './constants';
-import { NON_ESCAPABLE_CONTENT, SerializeNodeToHtmlOptions, serializeNodeToHtml } from './serialize-node';
 import { parseFragmentUtil } from './parse-util';
+import { matches, selectAll, selectOne } from './selector';
+import { NON_ESCAPABLE_CONTENT, serializeNodeToHtml, SerializeNodeToHtmlOptions } from './serialize-node';
 
 export class MockNode {
   private _nodeValue: string | null;

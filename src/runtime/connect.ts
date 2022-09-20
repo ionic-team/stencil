@@ -1,5 +1,6 @@
-import type * as d from '../declarations';
 import { doc } from '@platform';
+
+import type * as d from '../declarations';
 
 export const getConnect = (_ref: d.HostRef, tagName: string) => {
   const componentOnReady = (): Promise<any> => {

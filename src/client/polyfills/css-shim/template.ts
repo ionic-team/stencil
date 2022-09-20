@@ -1,6 +1,6 @@
-import { findRegex } from './utils';
 import { CSSTemplate, CSSVariables } from './interfaces';
 import { COMMENTS, TRAILING_LINES, VAR_ASSIGN_START, VAR_USAGE_START } from './regex';
+import { findRegex } from './utils';
 
 export function resolveVar(props: CSSVariables, prop: string, fallback: CSSTemplate | undefined): string {
   if (props[prop]) {
