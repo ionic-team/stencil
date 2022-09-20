@@ -6,6 +6,7 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { CarData } from "./car-list/car-data";
+export { CarData } from "./car-list/car-data";
 export namespace Components {
     interface AppRoot {
     }

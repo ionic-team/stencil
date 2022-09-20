@@ -96,11 +96,10 @@ const generateComponentTypesFile = (config: d.Config, buildCtx: d.BuildCtx, areT
   // e.g. { TestEvent } from '../path/to/event/test-event.interface';
   const expressions = Object.keys(typeImportData).map((filePath) => {
     const typeData = typeImportData[filePath];
-    let importFilePath: string;
+
+    let importFilePath = filePath;
     if (isAbsolute(filePath)) {
       importFilePath = normalizePath('./' + relative(config.srcDir, filePath)).replace(/\.(tsx|ts)$/, '');
-    } else {
-      importFilePath = filePath;
     }
 
     return `{ ${typeData
