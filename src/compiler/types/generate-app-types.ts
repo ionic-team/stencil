@@ -19,7 +19,7 @@ import { updateReferenceTypeImports } from './update-import-refs';
  * @returns `true` if the type declaration file written to disk has changed, `false` otherwise
  */
 export const generateAppTypes = async (
-  config: d.ValidatedConfig,
+  config: d.Config,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   destination: string
@@ -92,31 +92,29 @@ const generateComponentTypesFile = (config: d.Config, buildCtx: d.BuildCtx, areT
   c.push(COMPONENTS_DTS_HEADER);
   c.push(`import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";`);
 
-  // Map event type metadata to partial expressions (omitting import/export keywords)
-  // e.g. { TestEvent } from '../path/to/event/test-event.interface';
-  const expressions = Object.keys(typeImportData).map((filePath) => {
-    const typeData = typeImportData[filePath];
-    let importFilePath: string;
-    if (isAbsolute(filePath)) {
-      importFilePath = normalizePath('./' + relative(config.srcDir, filePath)).replace(/\.(tsx|ts)$/, '');
-    } else {
-      importFilePath = filePath;
-    }
+  // write the import statements for our type declaration file
+  c.push(
+    ...Object.keys(typeImportData).map((filePath) => {
+      const typeData = typeImportData[filePath];
+      let importFilePath: string;
+      if (isAbsolute(filePath)) {
+        importFilePath = normalizePath('./' + relative(config.srcDir, filePath)).replace(/\.(tsx|ts)$/, '');
+      } else {
+        importFilePath = filePath;
+      }
 
-    return `{ ${typeData
-      .sort(sortImportNames)
-      .map((td) => {
-        if (td.localName === td.importName) {
-          return `${td.importName}`;
-        } else {
-          return `${td.localName} as ${td.importName}`;
-        }
-      })
-      .join(`, `)} } from "${importFilePath}";`;
-  });
-
-  // Write all import and export statements for event types
-  c.push(...expressions.map((ref) => `import ${ref}`), ...expressions.map((ref) => `export ${ref}`));
+      return `import { ${typeData
+        .sort(sortImportNames)
+        .map((td) => {
+          if (td.localName === td.importName) {
+            return `${td.importName}`;
+          } else {
+            return `${td.localName} as ${td.importName}`;
+          }
+        })
+        .join(`, `)} } from "${importFilePath}";`;
+    })
+  );
 
   c.push(`export namespace Components {`);
   c.push(...modules.map((m) => `${m.component}`));
