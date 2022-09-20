@@ -60,7 +60,34 @@ export const runTsProgram = async (
 
   // Finalize components metadata
   buildCtx.moduleFiles = Array.from(compilerCtx.moduleMap.values());
+
   buildCtx.components = getComponentsFromModules(buildCtx.moduleFiles);
+  // To fix an issue with custom event type name collisions
+  // when the types are defined in the same file as components,
+  // we need to "hack" adding the file path to the custom type reference so that our
+  // name collisions prevention logic in the type generation code can
+  // correctly identify when to use an aliased type name.
+  //
+  // We can not add this as a part of the actual TS transpilation
+  // process because that process analyzes the AST to generate static
+  // Stencil event metadata (i.e. this is not something we control).
+  //
+  // These mutations happen on the original component object references
+  // to prevent breaking logic down the pipeline that relies on these
+  // references to the original objects staying in tact.
+  buildCtx.components.forEach((component) => {
+    component.events.forEach((event) => {
+      Object.keys(event.complexType.references)?.forEach((key) => {
+        const reference = JSON.parse(JSON.stringify(event.complexType.references[key]));
+        if (reference.location === 'local') {
+          reference.path = component.sourceFilePath;
+        }
+
+        event.complexType.references[key] = reference;
+      });
+    });
+  });
+
   updateComponentBuildConditionals(compilerCtx.moduleMap, buildCtx.components);
   resolveComponentDependencies(buildCtx.components);
 
