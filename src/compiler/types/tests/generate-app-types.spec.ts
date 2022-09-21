@@ -489,7 +489,7 @@ declare module "@stencil/core" {
               references: {
                 UserImplementedEventType: {
                   location: 'local',
-                  path: './my-component.tsx',
+                  path: '/some/stubbed/path/a/my-component.tsx',
                 },
               },
             },
@@ -511,7 +511,7 @@ declare module "@stencil/core" {
               references: {
                 UserImplementedEventType: {
                   location: 'local',
-                  path: './my-new-component.tsx',
+                  path: '/some/stubbed/path/b/my-new-component.tsx',
                 },
               },
             },
@@ -1010,7 +1010,7 @@ declare module "@stencil/core" {
               references: {
                 UserImplementedPropType: {
                   location: 'local',
-                  path: './my-component.tsx',
+                  path: '/some/stubbed/path/a/my-component.tsx',
                 },
               },
             },
@@ -1033,7 +1033,7 @@ declare module "@stencil/core" {
               references: {
                 UserImplementedPropType: {
                   location: 'local',
-                  path: './my-new-component.tsx',
+                  path: '/some/stubbed/path/b/my-new-component.tsx',
                 },
               },
             },
