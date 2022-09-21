@@ -191,7 +191,7 @@ const flattenDiagnosticMessageText = (
 
   const ignoreCodes: number[] = [];
   // `tsDiagnostic.file` can be `undefined`, so we need to be a little careful here
-  const isStencilConfig = (tsDiagnostic?.file?.fileName ?? '').includes('stencil.config');
+  const isStencilConfig = (tsDiagnostic.file?.fileName ?? '').includes('stencil.config');
   if (isStencilConfig) {
     ignoreCodes.push(2322);
   }
