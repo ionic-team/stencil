@@ -37,3 +37,6 @@ jobs:
       - name: Unit Tests
         run: npm run test.jest
         shell: bash
+
+      - name: Check Git Context
+        uses: ./.github/workflows/actions/check-git-context
