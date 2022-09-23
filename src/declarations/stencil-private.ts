@@ -981,6 +981,10 @@ export interface ComponentConstructor {
   isStyleRegistered?: boolean;
 }
 
+/**
+ * A mapping from class member names to a list of methods which are watching
+ * them.
+ */
 export interface ComponentConstructorWatchers {
   [propName: string]: string[];
 }
@@ -1560,48 +1564,86 @@ export type ComponentRuntimeMetaCompact = [
   ComponentRuntimeHostListener[]?
 ];
 
+/**
+ * Runtime metadata for a Stencil component
+ */
 export interface ComponentRuntimeMeta {
+  /**
+   * This number is used to hold a series of bitflags for various features we
+   * support on components. The flags which this value is intended to store are
+   * documented in the {@link CMP_FLAGS} enum.
+   */
   $flags$: number;
+  /**
+   * Just what it says on the tin - the tag name for the component, as set in
+   * the `@Component` decorator.
+   */
   $tagName$: string;
+  /**
+   * A map of the component's members, which could include fields decorated
+   * with `@Prop`, `@State`, etc as well as methods.
+   */
   $members$?: ComponentRuntimeMembers;
+  /**
+   * Information about listeners on the component.
+   */
   $listeners$?: ComponentRuntimeHostListener[];
-  $attrsToReflect$?: [string, string][];
+  /**
+   * Tuples containing information about `@Prop` fields on the component which
+   * are set to be reflected (i.e. kept in sync) as HTML attributes when
+   * updated.
+   */
+  $attrsToReflect$?: ComponentRuntimeReflectingAttr[];
+  /**
+   * Information about which class members have watchers attached on the component.
+   */
   $watchers$?: ComponentConstructorWatchers;
+  /**
+   * A bundle ID used for lazy loading.
+   */
   $lazyBundleId$?: string;
 }
 
+/**
+ * A mapping of the names of members on the component to some runtime-specific
+ * information about them.
+ */
 export interface ComponentRuntimeMembers {
   [memberName: string]: ComponentRuntimeMember;
 }
 
-export type ComponentRuntimeMember = [
-  /**
-   * flags data
-   */
-  number,
+/**
+ * A tuple with information about a class member that's relevant at runtime.
+ * The fields are:
+ *
+ * 1. A number used to hold bitflags for component members. The bit flags which
+ * this is intended to store are documented in the {@link MEMBER_FLAGS} enum.
+ * 2. The attribute name to observe.
+ */
+export type ComponentRuntimeMember = [number, string?];
 
-  /**
-   * attribute name to observe
-   */
-  string?
-];
+/**
+ * A tuple holding information about a host listener which is relevant at
+ * runtime. The field are:
+ *
+ * 1. A number used to hold bitflags for listeners. The bit flags which this is
+ * intended to store are documented in the {@link LISTENER_FLAGS} enum.
+ * 2. The event name.
+ * 3. The method name.
+ */
+export type ComponentRuntimeHostListener = [number, string, string];
 
-export type ComponentRuntimeHostListener = [
-  /**
-   * event flags
-   */
-  number,
-
-  /**
-   * event name,
-   */
-  string,
-
-  /**
-   * event method,
-   */
-  string
-];
+/**
+ * A tuple containing information about props which are "reflected" at runtime,
+ * meaning that HTML attributes on the component instance are kept in sync with
+ * the prop value.
+ *
+ * The fields are:
+ *
+ * 1. the prop name
+ * 2. the prop attribute.
+ */
+export type ComponentRuntimeReflectingAttr = [string, string | undefined];
 
 export type ModeBundleId = ModeBundleIds | string;
 
