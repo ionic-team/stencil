@@ -19,13 +19,13 @@ export async function telemetryBuildFinishedAction(
   coreCompiler: CoreCompiler,
   result: d.CompilerBuildResults
 ) {
-  const tracking = await shouldTrack(config, sys, config.flags.ci);
+  const tracking = await shouldTrack(config, sys, !!config.flags.ci);
 
   if (!tracking) {
     return;
   }
 
-  const component_count = Object.keys(result.componentGraph).length;
+  const component_count = result.componentGraph ? Object.keys(result.componentGraph).length : undefined;
 
   const data = await prepareData(coreCompiler, config, sys, result.duration, component_count);
 
@@ -128,8 +128,8 @@ export const prepareData = async (
   coreCompiler: CoreCompiler,
   config: d.ValidatedConfig,
   sys: d.CompilerSystem,
-  duration_ms: number,
-  component_count: number = undefined
+  duration_ms: number | undefined,
+  component_count: number | undefined = undefined
 ): Promise<d.TrackableData> => {
   const { typescript, rollup } = coreCompiler.versions || { typescript: 'unknown', rollup: 'unknown' };
   const { packages, packagesNoVersions } = await getInstalledPackages(sys, config);
@@ -137,9 +137,9 @@ export const prepareData = async (
   const yarn = isUsingYarn(sys);
   const stencil = coreCompiler.version || 'unknown';
   const system = `${sys.name} ${sys.version}`;
-  const os_name = sys.details.platform;
-  const os_version = sys.details.release;
-  const cpu_model = sys.details.cpuModel;
+  const os_name = sys.details?.platform;
+  const os_version = sys.details?.release;
+  const cpu_model = sys.details?.cpuModel;
   const build = coreCompiler.buildId || 'unknown';
   const has_app_pwa_config = hasAppTarget(config);
   const anonymizedConfig = anonymizeConfigForTelemetry(config);
@@ -274,7 +274,11 @@ async function getInstalledPackages(
     // Read package.json and package-lock.json
     const appRootDir = sys.getCurrentDirectory();
 
-    const packageJson: d.PackageJsonData = await tryFn(readJson, sys, sys.resolvePath(appRootDir + '/package.json'));
+    const packageJson: d.PackageJsonData | null = await tryFn(
+      readJson,
+      sys,
+      sys.resolvePath(appRootDir + '/package.json')
+    );
 
     // They don't have a package.json for some reason? Eject button.
     if (!packageJson) {

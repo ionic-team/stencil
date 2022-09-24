@@ -2555,13 +2555,13 @@ export interface TrackableData {
   component_count?: number;
   arguments: string[];
   targets: string[];
-  task: TaskCommand;
-  duration_ms: number;
+  task: TaskCommand | null;
+  duration_ms: number | undefined;
   packages: string[];
   packages_no_versions?: string[];
-  os_name: string;
-  os_version: string;
-  cpu_model: string;
+  os_name: string | undefined;
+  os_version: string | undefined;
+  cpu_model: string | undefined;
   typescript: string;
   rollup: string;
   system: string;
