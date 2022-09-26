@@ -230,14 +230,17 @@ export const addCustomElementInputs = (
     bundleOpts.loader![coreKey] = exp.join('\n');
   });
 
-  bundleOpts.loader!['\0core'] += indexImports.join('\n');
+  if (outputTarget.customElementsExportBehavior === 'bundle') {
+    bundleOpts.loader!['\0core'] += indexImports.join('\n');
+  }
 
   // Only re-export component definitions if the barrel export behavior is set
   if (outputTarget.customElementsExportBehavior === 'single-export-module') {
     bundleOpts.loader!['\0core'] += indexExports.join('\n');
   }
 
-  bundleOpts.loader!['\0core'] += `
+  if (outputTarget.customElementsExportBehavior === 'bundle') {
+    bundleOpts.loader!['\0core'] += `
 export const defineCustomElements = (opts) => {
     if (typeof customElements !== 'undefined') {
         [
@@ -249,6 +252,7 @@ export const defineCustomElements = (opts) => {
         });
     }
 };`;
+  }
 };
 
 /**

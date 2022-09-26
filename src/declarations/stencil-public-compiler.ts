@@ -2035,6 +2035,9 @@ export interface OutputTargetBaseNext {
 export const CustomElementsExportBehaviorOptions = [
   'default',
   'auto-define-custom-elements',
+  // TODO evaluate if this should be an export behavior, or just a flag
+  // on the output target config
+  'bundle',
   'single-export-module',
 ] as const;
 

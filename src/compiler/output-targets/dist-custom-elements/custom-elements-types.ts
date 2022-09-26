@@ -44,6 +44,7 @@ const generateCustomElementsTypesOutput = async (
   outputTarget: d.OutputTargetDistCustomElements
 ) => {
   const isBarrelExport = outputTarget.customElementsExportBehavior === 'single-export-module';
+  const isBundleExport = outputTarget.customElementsExportBehavior === 'bundle';
 
   // the path where we're going to write the typedef for the whole dist-custom-elements output
   const customElementsDtsPath = join(outputTarget.dir!, 'index.d.ts');
@@ -97,18 +98,22 @@ const generateCustomElementsTypesOutput = async (
     `  rel?: (el: EventTarget, eventName: string, listener: EventListenerOrEventListenerObject, options: boolean | AddEventListenerOptions) => void;`,
     `}`,
     `export declare const setPlatformOptions: (opts: SetPlatformOptions) => void;`,
-    ``,
-    `/**`,
-    ` * Utility to define all custom elements within this package using the tag name provided in the component's source. `,
-    ` * When defining each custom element, it will also check it's safe to define by:`,
-    ` *`,
-    ` * 1. Ensuring the "customElements" registry is available in the global context (window).`,
-    ` * 2. The component tag name is not already defined.`,
-    ` *`,
-    ` * Use the standard [customElements.define()](https://developer.mozilla.org/en-US/docs/Web/API/CustomElementRegistry/define) `,
-    ` * method instead to define custom elements individually, or to provide a different tag name.`,
-    ` */`,
-    `export declare const defineCustomElements: (opts?: any) => void;`,
+    ...(isBundleExport
+      ? [
+          ``,
+          `/**`,
+          ` * Utility to define all custom elements within this package using the tag name provided in the component's source. `,
+          ` * When defining each custom element, it will also check it's safe to define by:`,
+          ` *`,
+          ` * 1. Ensuring the "customElements" registry is available in the global context (window).`,
+          ` * 2. The component tag name is not already defined.`,
+          ` *`,
+          ` * Use the standard [customElements.define()](https://developer.mozilla.org/en-US/docs/Web/API/CustomElementRegistry/define) `,
+          ` * method instead to define custom elements individually, or to provide a different tag name.`,
+          ` */`,
+          `export declare const defineCustomElements: (opts?: any) => void;`,
+        ]
+      : []),
   ];
 
   const componentsDtsRelPath = relDts(outputTarget.dir!, join(typesDir, 'components.d.ts'));
