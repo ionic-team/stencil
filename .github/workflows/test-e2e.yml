@@ -37,3 +37,6 @@ jobs:
       - name: End-to-End Tests
         run: npm run test.end-to-end -- --ci
         shell: bash
+
+      - name: Check Git Context
+        uses: ./.github/workflows/actions/check-git-context
