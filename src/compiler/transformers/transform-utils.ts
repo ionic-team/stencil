@@ -1,4 +1,4 @@
-import { augmentDiagnosticWithNode, buildError, normalizePath } from '@utils';
+import { augmentDiagnosticWithNode, buildError, normalizePath, readOnlyArrayHasStringMember } from '@utils';
 import ts from 'typescript';
 
 import type * as d from '../../declarations';
@@ -127,14 +127,22 @@ const objectToObjectLiteral = (obj: { [key: string]: any }, refs: WeakSet<any>):
   return ts.createObjectLiteral(newProperties, true);
 };
 
-export const createStaticGetter = (propName: string, returnExpression: ts.Expression) => {
-  return ts.createGetAccessor(
+/**
+ * Create a TypeScript getter declaration AST node corresponding to a
+ * supplied prop name and return value
+ *
+ * @param propName the name of the prop to access
+ * @param returnExpression a TypeScript AST node to return from the getter
+ * @returns an AST node representing a getter
+ */
+export const createStaticGetter = (propName: string, returnExpression: ts.Expression): ts.GetAccessorDeclaration => {
+  return ts.factory.createGetAccessorDeclaration(
     undefined,
-    [ts.createToken(ts.SyntaxKind.StaticKeyword)],
+    [ts.factory.createToken(ts.SyntaxKind.StaticKeyword)],
     propName,
     undefined,
     undefined,
-    ts.createBlock([ts.createReturn(returnExpression)])
+    ts.factory.createBlock([ts.factory.createReturnStatement(returnExpression)])
   );
 };
 
@@ -407,7 +415,7 @@ export const validateReferences = (
 ) => {
   Object.keys(references).forEach((refName) => {
     const ref = references[refName];
-    if (ref.path === '@stencil/core' && MEMBER_DECORATORS_TO_REMOVE.has(refName)) {
+    if (ref.path === '@stencil/core' && readOnlyArrayHasStringMember(MEMBER_DECORATORS_TO_REMOVE, refName)) {
       const err = buildError(diagnostics);
       augmentDiagnosticWithNode(err, node);
     }
