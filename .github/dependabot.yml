@@ -7,7 +7,7 @@ updates:
     directory: '/' # Location of package manifests
     schedule:
       interval: 'daily'
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 50
     # Disable rebasing for pull requests, as having several open pull requests all get simultaneously rebased gets
     # noisy from a notification standpoint
     rebase-strategy: 'disabled'
