@@ -11,7 +11,7 @@ describe('hasDebug', () => {
     expect(hasDebug(flags)).toBe(true);
   });
 
-  it('returns false when the flag "debug" flag is false', () => {
+  it('returns false when the "debug" flag is false', () => {
     const flags = createConfigFlags({
       debug: false,
     });
