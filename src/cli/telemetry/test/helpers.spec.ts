@@ -3,7 +3,7 @@ import { ConfigFlags, createConfigFlags } from '../../config-flags';
 import { hasDebug, hasVerbose, isInteractive, tryFn, uuidv4 } from '../helpers';
 
 describe('hasDebug', () => {
-  it('returns true when the flag "true" flag is false', () => {
+  it('returns true when the "debug" flag is true', () => {
     const flags = createConfigFlags({
       debug: true,
     });
