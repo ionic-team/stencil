@@ -97,9 +97,5 @@ jobs:
           # local-testing must be one of two values: 'start' or 'stop' to start/stop Browserstack
           local-testing: stop
 
-      - name: Git status check
-        # here we check that there are no changed / new files from our test
-        # run. we use `git status`, grep out the build zip (downloaded above),
-        # and check if there are more than 0 lines in the output.
-        run: if [[ $(git status --short | grep -c -v stencil-core-build.zip) -ne 0 ]]; then STATUS=$(git status --verbose); printf "%s" "$STATUS"; git diff | cat; exit 1; fi
-        shell: bash
+      - name: Check Git Context
+        uses: ./.github/workflows/actions/check-git-context

@@ -28,11 +28,8 @@ export type FindConfigResults = {
 export const findConfig = async (opts: FindConfigOptions): Promise<FindConfigResults> => {
   const sys = opts.sys;
   const cwd = sys.getCurrentDirectory();
-  const results: FindConfigResults = {
-    configPath: null as string,
-    rootDir: normalizePath(cwd),
-    diagnostics: [],
-  };
+  const rootDir = normalizePath(cwd);
+
   let configPath = opts.configPath;
 
   if (isString(configPath)) {
@@ -46,8 +43,14 @@ export const findConfig = async (opts: FindConfigOptions): Promise<FindConfigRes
     }
   } else {
     // nothing was passed in, use the current working directory
-    configPath = results.rootDir;
+    configPath = rootDir;
   }
+
+  const results: FindConfigResults = {
+    configPath,
+    rootDir: normalizePath(cwd),
+    diagnostics: [],
+  };
 
   const stat = await sys.stat(configPath);
   if (stat.error) {
