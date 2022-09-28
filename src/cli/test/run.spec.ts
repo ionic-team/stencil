@@ -85,6 +85,30 @@ describe('run', () => {
         taskHelpSpy.mockRestore();
       });
 
+      it("calls the help task when the 'task' field is set to null", async () => {
+        parseFlagsSpy.mockReturnValue(
+          createConfigFlags({
+            task: null,
+          })
+        );
+
+        await run(cliInitOptions);
+
+        expect(taskHelpSpy).toHaveBeenCalledTimes(1);
+        expect(taskHelpSpy).toHaveBeenCalledWith(
+          {
+            task: 'help',
+            args: [],
+            knownArgs: [],
+            unknownArgs: [],
+          },
+          mockLogger,
+          mockSystem
+        );
+
+        taskHelpSpy.mockRestore();
+      });
+
       it("calls the help task when the 'help' field is set on flags", async () => {
         parseFlagsSpy.mockReturnValue(
           createConfigFlags({
@@ -138,7 +162,7 @@ describe('run', () => {
       sys = mockCompilerSystem();
       sys.exit = jest.fn();
 
-      unvalidatedConfig = mockConfig({ outputTargets: null, sys });
+      unvalidatedConfig = mockConfig({ outputTargets: [], sys });
 
       validatedConfig = mockValidatedConfig({ sys });
 

@@ -154,3 +154,22 @@ export const parsePackageJson = (pkgJsonStr: string, pkgJsonFilePath: string): P
 };
 
 const SKIP_DEPS = ['@stencil/core'];
+
+/**
+ * Check whether a string is a member of a ReadonlyArray<string>
+ *
+ * We need a little helper for this because unfortunately `includes` is typed
+ * on `ReadonlyArray<T>` as `(el: T): boolean` so a `string` cannot be passed
+ * to `includes` on a `ReadonlyArray` 😢 thus we have a little helper function
+ * where we do the type coercion just once.
+ *
+ * see microsoft/TypeScript#31018 for some discussion of this
+ *
+ * @param readOnlyArray the array we're checking
+ * @param maybeMember a value which is possibly a member of the array
+ * @returns whether the array contains the member or not
+ */
+export const readOnlyArrayHasStringMember = <T extends string>(
+  readOnlyArray: ReadonlyArray<T>,
+  maybeMember: T | string
+): boolean => readOnlyArray.includes(maybeMember as typeof readOnlyArray[number]);
