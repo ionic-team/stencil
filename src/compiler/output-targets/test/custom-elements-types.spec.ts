@@ -145,7 +145,7 @@ describe('Custom Elements Typedef generation', () => {
       '',
     ].join('\n');
 
-    expect(compilerCtx.fs.writeFile).toBeCalledWith(join('my-best-dir', 'index.d.ts'), expectedTypedefOutput, {
+    expect(compilerCtx.fs.writeFile).toHaveBeenCalledWith(join('my-best-dir', 'index.d.ts'), expectedTypedefOutput, {
       outputTargetType: DIST_CUSTOM_ELEMENTS,
     });
 
@@ -204,7 +204,7 @@ describe('Custom Elements Typedef generation', () => {
       '',
     ].join('\n');
 
-    expect(compilerCtx.fs.writeFile).toBeCalledWith(join('my-best-dir', 'index.d.ts'), expectedTypedefOutput, {
+    expect(compilerCtx.fs.writeFile).toHaveBeenCalledWith(join('my-best-dir', 'index.d.ts'), expectedTypedefOutput, {
       outputTargetType: DIST_CUSTOM_ELEMENTS,
     });
 
