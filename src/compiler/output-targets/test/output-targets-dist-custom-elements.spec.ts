@@ -11,6 +11,7 @@ import type * as d from '../../../declarations';
 import { OutputTargetDistCustomElements } from '../../../declarations';
 import { STENCIL_APP_GLOBALS_ID, STENCIL_INTERNAL_CLIENT_ID, USER_INDEX_ENTRY_ID } from '../../bundle/entry-alias-ids';
 import { stubComponentCompilerMeta } from '../../types/tests/ComponentCompilerMeta.stub';
+import * as outputCustomElementsMod from '../dist-custom-elements';
 import {
   addCustomElementInputs,
   bundleCustomElements,
@@ -18,7 +19,6 @@ import {
   getBundleOptions,
   outputCustomElements,
 } from '../dist-custom-elements';
-import * as outputCustomElementsMod from '../dist-custom-elements';
 // TODO(STENCIL-561): fully delete dist-custom-elements-bundle code
 import { DIST_CUSTOM_ELEMENTS, DIST_CUSTOM_ELEMENTS_BUNDLE } from '../output-utils';
 
@@ -220,6 +220,50 @@ export * from '${USER_INDEX_ENTRY_ID}';
 import { globalScripts } from '${STENCIL_APP_GLOBALS_ID}';
 globalScripts();
 export { ComponentWithJsx, defineCustomElement as defineCustomElementComponentWithJsx } from '\0ComponentWithJsx';`
+        );
+      });
+    });
+
+    describe('CustomElementsExportBehavior.BUNDLE', () => {
+      beforeEach(() => {
+        (config.outputTargets[0] as OutputTargetDistCustomElements).customElementsExportBehavior = 'bundle';
+      });
+
+      it('should add a `defineCustomElements` function to the index.js file', () => {
+        const componentOne = stubComponentCompilerMeta();
+        const componentTwo = stubComponentCompilerMeta({
+          componentClassName: 'MyBestComponent',
+          tagName: 'my-best-component',
+        });
+
+        buildCtx.components = [componentOne, componentTwo];
+
+        const bundleOptions = getBundleOptions(
+          config,
+          buildCtx,
+          compilerCtx,
+          config.outputTargets[0] as OutputTargetDistCustomElements
+        );
+        addCustomElementInputs(buildCtx, bundleOptions, config.outputTargets[0] as OutputTargetDistCustomElements);
+        expect(bundleOptions.loader['\0core']).toEqual(
+          `export { setAssetPath, setPlatformOptions } from '${STENCIL_INTERNAL_CLIENT_ID}';
+export * from '${USER_INDEX_ENTRY_ID}';
+import { globalScripts } from '${STENCIL_APP_GLOBALS_ID}';
+globalScripts();
+import { StubCmp } from '\0StubCmp';
+import { MyBestComponent } from '\0MyBestComponent';
+export const defineCustomElements = (opts) => {
+    if (typeof customElements !== 'undefined') {
+        [
+            StubCmp,
+          MyBestComponent
+        ].forEach(cmp => {
+            if (!customElements.get(cmp.is)) {
+                customElements.define(cmp.is, cmp, opts);
+            }
+        });
+    }
+};`
         );
       });
     });
