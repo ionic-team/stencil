@@ -39,7 +39,7 @@ export const run = async (init: d.CliInitOptions) => {
       sys.applyGlobalPatch(sys.getCurrentDirectory());
     }
 
-    if (task === 'help' || flags.help) {
+    if (!task || task === 'help' || flags.help) {
       await taskHelp(createConfigFlags({ task: 'help', args }), logger, sys);
 
       return;
