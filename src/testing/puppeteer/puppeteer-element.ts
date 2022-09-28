@@ -402,7 +402,7 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
 
     const executionContext = this._elmHandle.executionContext();
 
-    const rtn = await executionContext.evaluate<unknown>(
+    const rtn = (await executionContext.evaluate(
       (elm: HTMLElement, queuedActions: ElementAction[]) => {
         // BROWSER CONTEXT
         // cannot use async/await in here cuz typescript transpiles it in the node context
@@ -461,7 +461,9 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
       },
       this._elmHandle,
       this._queuedActions as any
-    );
+    )) as unknown; // starting with puppeteer v15, the return type of `evaluate` has expanded to `any`
+    // per https://github.com/puppeteer/puppeteer/pull/8547, we use a type assertion to keep the original
+    // typings (and is backwards compatible with older versions of Stencil/Puppeteer)
 
     this._queuedActions.length = 0;
 
@@ -669,7 +671,7 @@ export async function findAll(
       await shadowJsHandle.dispose();
 
       for (const shadowJsProperty of shadowJsProperties.values()) {
-        const shadowElmHandle = shadowJsProperty.asElement();
+        const shadowElmHandle: Element = shadowJsProperty.asElement();
         if (shadowElmHandle) {
           const elm = new E2EElement(page, shadowElmHandle);
           await elm.e2eSync();

@@ -352,10 +352,10 @@ async function waitForChanges(page: E2EPageInternal) {
     }
 
     if (typeof (page as any).waitForTimeout === 'function') {
-      // https://github.com/puppeteer/puppeteer/issues/6214
-      await (page as any).waitForTimeout(100);
+      await page.waitForTimeout(100);
     } else {
-      await page.waitFor(100);
+      // in puppeteer v15, `waitFor` has been removed. this is kept only for puppeteer v14 and below support
+      await (page as any).waitFor(100);
     }
 
     await Promise.all(page._e2eElements.map((elm) => elm.e2eSync()));
