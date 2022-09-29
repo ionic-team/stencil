@@ -5,6 +5,10 @@
 <!-- Auto Generated Below -->
 
 
+## Overview
+
+Component that helps display a list of cars
+
 ## Properties
 
 | Property   | Attribute | Description | Type        | Default     |

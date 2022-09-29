@@ -6,6 +6,7 @@ import { stylesToMarkdown } from './markdown-css-props';
 import { depsToMarkdown } from './markdown-dependencies';
 import { eventsToMarkdown } from './markdown-events';
 import { methodsToMarkdown } from './markdown-methods';
+import { overviewToMarkdown } from './markdown-overview';
 import { partsToMarkdown } from './markdown-parts';
 import { propsToMarkdown } from './markdown-props';
 import { slotsToMarkdown } from './markdown-slots';
@@ -54,6 +55,7 @@ export const generateMarkdown = (
     '',
     '',
     ...getDocsDeprecation(cmp),
+    ...overviewToMarkdown(cmp.docs),
     ...usageToMarkdown(cmp.usage),
     ...propsToMarkdown(cmp.props),
     ...eventsToMarkdown(cmp.events),
