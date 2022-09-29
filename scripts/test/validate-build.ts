@@ -1,9 +1,9 @@
-import {dirname, join, relative} from 'path';
+import { dirname, join, relative } from 'path';
 import fs from 'fs-extra';
-import {BuildOptions, getOptions} from '../utils/options';
-import {PackageData} from '../utils/write-pkg-json';
-import {rollup} from 'rollup';
-import ts, {ModuleResolutionKind, ScriptTarget} from 'typescript';
+import { BuildOptions, getOptions } from '../utils/options';
+import { PackageData } from '../utils/write-pkg-json';
+import { rollup } from 'rollup';
+import ts, { ModuleResolutionKind, ScriptTarget } from 'typescript';
 
 /**
  * Used to triple check that the final build files
@@ -206,7 +206,7 @@ function validatePackage(opts: BuildOptions, testPkg: TestPackage, dtsEntries: s
     if (pkgJson.types) {
       const pkgTypes = join(pkgDir, pkgJson.types);
       fs.accessSync(pkgTypes);
-      console.log(`pushing ${pkgTypes}`)
+      console.log(`pushing ${pkgTypes}`);
       dtsEntries.push(pkgTypes);
     }
   }
@@ -233,7 +233,7 @@ function validateDts(opts: BuildOptions, dtsEntries: string[]): void {
       '@stencil/core/internal/testing': [join(opts.rootDir, 'internal', 'testing', 'index.d.ts')],
     },
     moduleResolution: ModuleResolutionKind.NodeJs,
-    target: ScriptTarget.ES2016
+    target: ScriptTarget.ES2016,
   });
 
   const tsDiagnostics = program.getSemanticDiagnostics().concat(program.getSyntacticDiagnostics());
