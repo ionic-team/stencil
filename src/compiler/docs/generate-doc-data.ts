@@ -127,6 +127,11 @@ const getDocsEncapsulation = (cmp: d.ComponentCompilerMeta): 'shadow' | 'scoped'
   }
 };
 
+/**
+ * Generate a collection of JSDoc metadata for both real and virtual props
+ * @param cmpMeta the component metadata to derive JSDoc metadata from
+ * @returns the derived metadata
+ */
 const getDocsProperties = (cmpMeta: d.ComponentCompilerMeta): d.JsonDocsProp[] => {
   return sortBy(
     [...getRealProperties(cmpMeta.properties), ...getVirtualProperties(cmpMeta.virtualProperties)],
@@ -134,6 +139,11 @@ const getDocsProperties = (cmpMeta: d.ComponentCompilerMeta): d.JsonDocsProp[] =
   );
 };
 
+/**
+ * Generate a collection of JSDoc metadata for props on a component
+ * @param properties the component's property metadata to derive JSDoc metadata from
+ * @returns the derived metadata
+ */
 const getRealProperties = (properties: d.ComponentCompilerProperty[]): d.JsonDocsProp[] => {
   return properties
     .filter((member) => !member.internal)
@@ -154,6 +164,11 @@ const getRealProperties = (properties: d.ComponentCompilerProperty[]): d.JsonDoc
     }));
 };
 
+/**
+ * Generate a collection of JSDoc metadata for props on a component
+ * @param virtualProps the component's virtual property metadata to derive JSDoc metadata from
+ * @returns the derived metadata
+ */
 const getVirtualProperties = (virtualProps: d.ComponentCompilerVirtualProperty[]): d.JsonDocsProp[] => {
   return virtualProps.map((member) => ({
     name: member.name,
@@ -172,7 +187,7 @@ const getVirtualProperties = (virtualProps: d.ComponentCompilerVirtualProperty[]
   }));
 };
 
-const parseTypeIntoValues = (type: string) => {
+const parseTypeIntoValues = (type: string): d.JsonDocsValue[] => {
   if (typeof type === 'string') {
     const unions = type.split('|').map((u) => u.trim());
     const parsedUnions: JsonDocsValue[] = [];
