@@ -90,7 +90,7 @@
     "@yarnpkg/lockfile": "^1.1.0",
     "ansi-colors": "4.1.1",
     "autoprefixer": "10.2.5",
-    "concurrently": "^6.0.0",
+    "concurrently": "^7.4.0",
     "conventional-changelog-cli": "^2.2.2",
     "core-js-builder": "~3.6.5",
     "css": "^3.0.0",
