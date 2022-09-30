@@ -42,7 +42,8 @@ export const createTesting = async (config: ValidatedConfig): Promise<Testing> =
         return false;
       }
 
-      env = process.env;
+      // during E2E tests, we can safely assume that the current environment is a `E2EProcessEnv`
+      env = (process.env as E2EProcessEnv);
 
       if (opts.e2e) {
         msg.push('e2e');

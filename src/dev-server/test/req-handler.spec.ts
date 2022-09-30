@@ -56,6 +56,7 @@ describe('request-handler', () => {
 
     res.end = () => {
       res.$content = res.$contentWrite;
+      return this;
     };
 
     sendMsg = () => {};
