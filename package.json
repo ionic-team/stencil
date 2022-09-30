@@ -110,7 +110,7 @@
     "inquirer": "^7.3.3",
     "jest": "^27.4.5",
     "jest-cli": "^27.4.5",
-    "jest-environment-node": "^27.4.4",
+    "jest-environment-node": "^29.1.2",
     "listr": "^0.14.3",
     "magic-string": "^0.26.3",
     "merge-source-map": "^1.1.0",
