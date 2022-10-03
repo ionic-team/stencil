@@ -189,9 +189,12 @@ export const addCustomElementInputs = (
   outputTarget: d.OutputTargetDistCustomElements
 ): void => {
   const components = buildCtx.components;
-  // an array to store the imports of these modules that we're going to add to our entry chunk
+  // An array to store the imports of these modules that we're going to add to our entry chunk
   const indexImports: string[] = [];
+  // An array to store the export declarations that we're going to add to our entry chunk
   const indexExports: string[] = [];
+  // An array to store the exported component names that will be used for the `defineCustomElements`
+  // function on the `bundle` export behavior option
   const exportNames: string[] = [];
 
   components.forEach((cmp) => {

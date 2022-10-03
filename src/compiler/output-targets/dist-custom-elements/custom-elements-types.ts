@@ -106,7 +106,7 @@ const generateCustomElementsTypesOutput = async (
           ` * When defining each custom element, it will also check it's safe to define by:`,
           ` *`,
           ` * 1. Ensuring the "customElements" registry is available in the global context (window).`,
-          ` * 2. The component tag name is not already defined.`,
+          ` * 2. Ensuring that the component tag name is not already defined.`,
           ` *`,
           ` * Use the standard [customElements.define()](https://developer.mozilla.org/en-US/docs/Web/API/CustomElementRegistry/define)`,
           ` * method instead to define custom elements individually, or to provide a different tag name.`,
