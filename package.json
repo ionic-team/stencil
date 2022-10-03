@@ -54,8 +54,7 @@
     "tsc": "tsc --incremental",
     "tsc.prod": "tsc",
     "tsc.scripts": "tsc -p scripts/tsconfig.json",
-    "tsc.watch": "tsc --incremental --watch",
-    "watch": "node scripts && npm run tsc && concurrently \"npm run rollup.watch\" \"npm run tsc.watch\""
+    "tsc.watch": "tsc --incremental --watch"
   },
   "devDependencies": {
     "@ionic/prettier-config": "^2.0.0",
@@ -87,7 +86,6 @@
     "@yarnpkg/lockfile": "^1.1.0",
     "ansi-colors": "4.1.1",
     "autoprefixer": "10.2.5",
-    "concurrently": "^6.0.0",
     "conventional-changelog-cli": "^2.2.2",
     "dts-bundle-generator": "~6.12.0",
     "eslint": "^8.23.1",
