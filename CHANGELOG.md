@@ -1,3 +1,13 @@
+## 😛 [2.18.1](https://github.com/ionic-team/stencil/compare/v2.18.0...v2.18.1) (2022-10-03)
+
+
+### Bug Fixes
+
+* **cli:** typo in telemetry command ([#3602](https://github.com/ionic-team/stencil/issues/3602)) ([3013f5e](https://github.com/ionic-team/stencil/commit/3013f5e9b03bf48db5c70472e7b4a3f89c444bfc))
+* **logger:** fix possibly-null property access in logger-typescript.ts ([#3627](https://github.com/ionic-team/stencil/issues/3627)) ([49ead11](https://github.com/ionic-team/stencil/commit/49ead1172b60385868a61ba958bb8bc8cb2fb15c)), partially fixes [#3443](https://github.com/ionic-team/stencil/issues/3443)
+
+
+
 # 🔥 [2.18.0](https://github.com/ionic-team/stencil/compare/v2.17.4...v2.18.0) (2022-09-12)
 
 
