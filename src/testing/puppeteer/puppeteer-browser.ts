@@ -7,7 +7,7 @@ export async function startPuppeteerBrowser(config: ValidatedConfig) {
   }
 
   // during E2E tests, we can safely assume that the current environment is a `E2EProcessEnv`
-  const env: E2EProcessEnv = (process.env as E2EProcessEnv);
+  const env: E2EProcessEnv = process.env as E2EProcessEnv;
   const puppeteerDep = config.testing.browserExecutablePath ? 'puppeteer-core' : 'puppeteer';
 
   const puppeteerModulePath = config.sys.lazyRequire.getModulePath(config.rootDir, puppeteerDep);
@@ -76,7 +76,7 @@ export async function connectBrowser() {
   // uses process.env for data
   //
   // during E2E tests, we can safely assume that the current environment is a `E2EProcessEnv`
-  const env: E2EProcessEnv = (process.env as E2EProcessEnv);
+  const env: E2EProcessEnv = process.env as E2EProcessEnv;
 
   const wsEndpoint = env.__STENCIL_BROWSER_WS_ENDPOINT__;
   if (!wsEndpoint) {

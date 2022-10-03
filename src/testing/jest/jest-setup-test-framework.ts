@@ -1,5 +1,6 @@
 import { BUILD, Env } from '@app-data';
 import type * as d from '@stencil/core/internal';
+import { E2EProcessEnv } from '@stencil/core/internal';
 import {
   modeResolutionChain,
   resetPlatform,
@@ -12,7 +13,6 @@ import { expectExtend } from '../matchers';
 import { setupMockFetch } from '../mock-fetch';
 import { resetBuildConditionals } from '../reset-build-conditionals';
 import { HtmlSerializer } from './jest-serializer';
-import {E2EProcessEnv} from "@stencil/core/internal";
 
 declare const global: d.JestEnvironmentGlobal;
 
@@ -58,7 +58,7 @@ export function jestSetupTestFramework() {
   global.screenshotDescriptions = new Set();
 
   // during E2E tests, we can safely assume that the current environment is a `E2EProcessEnv`
-  const env: E2EProcessEnv = (process.env as E2EProcessEnv);
+  const env: E2EProcessEnv = process.env as E2EProcessEnv;
 
   if (typeof env.__STENCIL_DEFAULT_TIMEOUT__ === 'string') {
     const time = parseInt(env.__STENCIL_DEFAULT_TIMEOUT__, 10);

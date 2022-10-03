@@ -29,7 +29,7 @@ export function createJestPuppeteerEnvironment() {
       const page = await newBrowserPage(this.browser);
       this.pages.push(page);
       // during E2E tests, we can safely assume that the current environment is a `E2EProcessEnv`
-      const env: E2EProcessEnv = (process.env as E2EProcessEnv);
+      const env: E2EProcessEnv = process.env as E2EProcessEnv;
       if (typeof env.__STENCIL_DEFAULT_TIMEOUT__ === 'string') {
         page.setDefaultTimeout(parseInt(env.__STENCIL_DEFAULT_TIMEOUT__, 10));
       }
