@@ -554,6 +554,10 @@ export interface StencilDevServerConfig {
 export interface DevServerConfig extends StencilDevServerConfig {
   browserUrl?: string;
   devServerDir?: string;
+  /**
+   * A list of glob patterns like `subdir/*.js`  to exclude from hot-module
+   * reloading updates.
+   */
   excludeHmr?: string[];
   historyApiFallback?: HistoryApiFallback;
   openBrowser?: boolean;
