@@ -67,13 +67,28 @@ describe('Custom Elements output target', () => {
   });
 
   describe('generateEntryPoint', () => {
-    it.each([true, false])('should include globalScripts if the right option is set', (includeGlobalScripts) => {
+    it('should include global scripts when flag is `true`', () => {
       const entryPoint = generateEntryPoint({
         type: DIST_CUSTOM_ELEMENTS,
-        includeGlobalScripts,
+        includeGlobalScripts: true,
       });
-      const globalScriptsBoilerplate = `import { globalScripts } from '${STENCIL_APP_GLOBALS_ID}';\nglobalScripts();`;
-      expect(entryPoint.includes(globalScriptsBoilerplate)).toBe(includeGlobalScripts);
+
+      expect(entryPoint).toEqual(`import { globalScripts } from '${STENCIL_APP_GLOBALS_ID}';
+export { setAssetPath, setPlatformOptions } from '${STENCIL_INTERNAL_CLIENT_ID}';
+export * from '${USER_INDEX_ENTRY_ID}';
+globalScripts();
+`);
+    });
+
+    it('should not include global scripts when flag is `false`', () => {
+      const entryPoint = generateEntryPoint({
+        type: DIST_CUSTOM_ELEMENTS,
+        includeGlobalScripts: false,
+      });
+
+      expect(entryPoint).toEqual(`export { setAssetPath, setPlatformOptions } from '${STENCIL_INTERNAL_CLIENT_ID}';
+export * from '${USER_INDEX_ENTRY_ID}';
+`);
     });
   });
 
@@ -87,9 +102,7 @@ describe('Custom Elements output target', () => {
       expect(options.inputs).toEqual({
         index: '\0core',
       });
-      expect(options.loader).toEqual({
-        '\0core': generateEntryPoint({ type: DIST_CUSTOM_ELEMENTS }),
-      });
+      expect(options.loader).toEqual({});
       expect(options.preserveEntrySignatures).toEqual('allow-extension');
     });
 
@@ -158,9 +171,9 @@ describe('Custom Elements output target', () => {
         );
         addCustomElementInputs(buildCtx, bundleOptions, config.outputTargets[0] as OutputTargetDistCustomElements);
         expect(bundleOptions.loader['\0core']).toEqual(
-          `export { setAssetPath, setPlatformOptions } from '${STENCIL_INTERNAL_CLIENT_ID}';
+          `import { globalScripts } from '${STENCIL_APP_GLOBALS_ID}';
+export { setAssetPath, setPlatformOptions } from '${STENCIL_INTERNAL_CLIENT_ID}';
 export * from '${USER_INDEX_ENTRY_ID}';
-import { globalScripts } from '${STENCIL_APP_GLOBALS_ID}';
 globalScripts();
 `
         );
@@ -190,12 +203,13 @@ globalScripts();
         );
         addCustomElementInputs(buildCtx, bundleOptions, config.outputTargets[0] as OutputTargetDistCustomElements);
         expect(bundleOptions.loader['\0core']).toEqual(
-          `export { setAssetPath, setPlatformOptions } from '${STENCIL_INTERNAL_CLIENT_ID}';
+          `import { globalScripts } from '${STENCIL_APP_GLOBALS_ID}';
+export { setAssetPath, setPlatformOptions } from '${STENCIL_INTERNAL_CLIENT_ID}';
 export * from '${USER_INDEX_ENTRY_ID}';
-import { globalScripts } from '${STENCIL_APP_GLOBALS_ID}';
-globalScripts();
 export { StubCmp, defineCustomElement as defineCustomElementStubCmp } from '\0StubCmp';
-export { MyBestComponent, defineCustomElement as defineCustomElementMyBestComponent } from '\0MyBestComponent';`
+export { MyBestComponent, defineCustomElement as defineCustomElementMyBestComponent } from '\0MyBestComponent';
+globalScripts();
+`
         );
       });
 
@@ -215,11 +229,12 @@ export { MyBestComponent, defineCustomElement as defineCustomElementMyBestCompon
         );
         addCustomElementInputs(buildCtx, bundleOptions, config.outputTargets[0] as OutputTargetDistCustomElements);
         expect(bundleOptions.loader['\0core']).toEqual(
-          `export { setAssetPath, setPlatformOptions } from '${STENCIL_INTERNAL_CLIENT_ID}';
+          `import { globalScripts } from '${STENCIL_APP_GLOBALS_ID}';
+export { setAssetPath, setPlatformOptions } from '${STENCIL_INTERNAL_CLIENT_ID}';
 export * from '${USER_INDEX_ENTRY_ID}';
-import { globalScripts } from '${STENCIL_APP_GLOBALS_ID}';
+export { ComponentWithJsx, defineCustomElement as defineCustomElementComponentWithJsx } from '\0ComponentWithJsx';
 globalScripts();
-export { ComponentWithJsx, defineCustomElement as defineCustomElementComponentWithJsx } from '\0ComponentWithJsx';`
+`
         );
       });
     });
@@ -246,24 +261,25 @@ export { ComponentWithJsx, defineCustomElement as defineCustomElementComponentWi
         );
         addCustomElementInputs(buildCtx, bundleOptions, config.outputTargets[0] as OutputTargetDistCustomElements);
         expect(bundleOptions.loader['\0core']).toEqual(
-          `export { setAssetPath, setPlatformOptions } from '${STENCIL_INTERNAL_CLIENT_ID}';
-export * from '${USER_INDEX_ENTRY_ID}';
-import { globalScripts } from '${STENCIL_APP_GLOBALS_ID}';
-globalScripts();
+          `import { globalScripts } from '${STENCIL_APP_GLOBALS_ID}';
 import { StubCmp } from '\0StubCmp';
 import { MyBestComponent } from '\0MyBestComponent';
+export { setAssetPath, setPlatformOptions } from '${STENCIL_INTERNAL_CLIENT_ID}';
+export * from '${USER_INDEX_ENTRY_ID}';
+globalScripts();
 export const defineCustomElements = (opts) => {
     if (typeof customElements !== 'undefined') {
         [
             StubCmp,
-          MyBestComponent
+            MyBestComponent,
         ].forEach(cmp => {
             if (!customElements.get(cmp.is)) {
                 customElements.define(cmp.is, cmp, opts);
             }
         });
     }
-};`
+};
+`
         );
       });
     });
