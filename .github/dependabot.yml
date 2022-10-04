@@ -25,3 +25,9 @@ updates:
         versions: ['>=28']
       - dependency-name: 'jest-environment-node'
         versions: ['>=28']
+      # Disable dependency updates used in release scripts
+      # TODO(STENCIL-590): remove these once deps are removed
+      - dependency-name: 'inquirer'
+        versions: ['>7.3.3']
+      - dependency-name: '@types/inquirer'
+        versions: ['>7.3.1']
