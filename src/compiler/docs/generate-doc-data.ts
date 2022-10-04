@@ -386,7 +386,7 @@ const generateDocs = (readme: string, jsdoc: d.CompilerJsDoc): string => {
  * This function is responsible for reading the contents of all markdown files in a provided `usage` directory and
  * returning their contents
  * @param compilerCtx the current compiler context
- * @param usagesDir the directory to read usages markdown files from
+ * @param usagesDir the directory to read usage markdown files from
  * @returns an object that maps the filename containing the usage example, to the file's contents. If an error occurs,
  * an empty object is returned.
  */
