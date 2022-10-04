@@ -2,7 +2,7 @@ import { overviewToMarkdown } from '../readme/markdown-overview';
 
 describe('markdown-overview', () => {
   describe('overviewToMarkdown', () => {
-    it('returns an empty string if no docs exist on the component', () => {
+    it('returns no overview if no docs exist', () => {
       const generatedOverview = overviewToMarkdown('').join('\n');
 
       expect(generatedOverview).toBe('');
