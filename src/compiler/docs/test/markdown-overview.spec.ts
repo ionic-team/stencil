@@ -21,7 +21,7 @@ This is a custom button component
       const description = `This is a custom button component.
 It is to be used throughout the design system.
 
-This is a comment followed by an extra newline.
+This is a comment followed by a newline.
 `;
       const generatedOverview = overviewToMarkdown(description).join('\n');
 
@@ -30,11 +30,11 @@ This is a comment followed by an extra newline.
 This is a custom button component.
 It is to be used throughout the design system.
 
-This is a comment followed by an extra newline.
+This is a comment followed by a newline.
 `);
     });
 
-    it('trims leading & trailing newlines single lines', () => {
+    it('trims all leading newlines & leaves one at the end', () => {
       const description = `
 This is a custom button component.
 
