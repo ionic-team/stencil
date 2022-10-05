@@ -935,13 +935,31 @@ export interface ComponentCompilerState {
   name: string;
 }
 
+/**
+ * Representation of JSDoc that is pulled off a node in the AST
+ */
 export interface CompilerJsDoc {
+  /**
+   * The text associated with the JSDoc
+   */
   text: string;
+  /**
+   * Tags included in the JSDoc
+   */
   tags: CompilerJsDocTagInfo[];
 }
 
+/**
+ * Representation of a tag that exists in a JSDoc
+ */
 export interface CompilerJsDocTagInfo {
+  /**
+   * The name of the tag - e.g. `@deprecated`
+   */
   name: string;
+  /**
+   * Additional text that is associated with the tag - e.g. `@deprecated use v2 of this API`
+   */
   text?: string;
 }
 
