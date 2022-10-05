@@ -9,6 +9,7 @@ import { getScriptTarget } from '../transform-utils';
 
 /**
  * Testing utility for transpiling provided string containing valid Stencil code
+ *
  * @param input the code to transpile
  * @param config a Stencil configuration to apply during the transpilation
  * @param compilerCtx a compiler context to use in the transpilation process

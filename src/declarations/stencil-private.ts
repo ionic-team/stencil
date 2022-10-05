@@ -935,13 +935,31 @@ export interface ComponentCompilerState {
   name: string;
 }
 
+/**
+ * Representation of JSDoc that is pulled off a node in the AST
+ */
 export interface CompilerJsDoc {
+  /**
+   * The text associated with the JSDoc
+   */
   text: string;
+  /**
+   * Tags included in the JSDoc
+   */
   tags: CompilerJsDocTagInfo[];
 }
 
+/**
+ * Representation of a tag that exists in a JSDoc
+ */
 export interface CompilerJsDocTagInfo {
+  /**
+   * The name of the tag - e.g. `@deprecated`
+   */
   name: string;
+  /**
+   * Additional text that is associated with the tag - e.g. `@deprecated use v2 of this API`
+   */
   text?: string;
 }
 
@@ -2555,13 +2573,13 @@ export interface TrackableData {
   component_count?: number;
   arguments: string[];
   targets: string[];
-  task: TaskCommand;
-  duration_ms: number;
+  task: TaskCommand | null;
+  duration_ms: number | undefined;
   packages: string[];
   packages_no_versions?: string[];
-  os_name: string;
-  os_version: string;
-  cpu_model: string;
+  os_name: string | undefined;
+  os_version: string | undefined;
+  cpu_model: string | undefined;
   typescript: string;
   rollup: string;
   system: string;

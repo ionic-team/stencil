@@ -196,6 +196,11 @@ export class BuildContext implements d.BuildCtx {
   }
 }
 
+/**
+ * Generate a timestamp of the format `YYYY-MM-DDThh:mm:ss`, using the number of seconds that have elapsed since
+ * January 01, 1970, and the time this function was called
+ * @returns the generated timestamp
+ */
 export const getBuildTimestamp = () => {
   const d = new Date();
 

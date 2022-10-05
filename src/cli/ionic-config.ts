@@ -24,7 +24,7 @@ export async function readConfig(sys: d.CompilerSystem): Promise<d.TelemetryConf
     };
 
     await writeConfig(sys, config);
-  } else if (!UUID_REGEX.test(config['tokens.telemetry'])) {
+  } else if (!config['tokens.telemetry'] || !UUID_REGEX.test(config['tokens.telemetry'])) {
     const newUuid = uuidv4();
     await writeConfig(sys, { ...config, 'tokens.telemetry': newUuid });
     config['tokens.telemetry'] = newUuid;
