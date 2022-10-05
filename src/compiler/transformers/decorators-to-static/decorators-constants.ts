@@ -14,8 +14,16 @@ export const MEMBER_DECORATORS_TO_REMOVE = [
   'Listen',
   'Method',
   'Prop',
+  // TODO(STENCIL-591): Remove Deprecated Decorator Names
   'PropDidChange',
+  // TODO(STENCIL-591): Remove Deprecated Decorator Names
   'PropWillChange',
   'State',
   'Watch',
 ] as const;
+
+/**
+ * Decorators whose 'decorees' we need to rewrite during compilation from
+ * class fields to instead initialize them in a constructor.
+ */
+export const CONSTRUCTOR_DEFINED_MEMBER_DECORATORS = ['State', 'Prop'] as const;
