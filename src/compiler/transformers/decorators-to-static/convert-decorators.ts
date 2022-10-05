@@ -414,8 +414,20 @@ export const updateConstructor = (
  * @param classDeclaration a class declaration AST node
  * @returns whether this class has parents or not
  */
-const needsSuper = (classDeclaration: ts.ClassDeclaration): boolean =>
-  classDeclaration.heritageClauses && classDeclaration.heritageClauses.length > 0;
+const needsSuper = (classDeclaration: ts.ClassDeclaration): boolean => {
+  const hasHeritageClauses = classDeclaration.heritageClauses && classDeclaration.heritageClauses.length > 0;
+
+  if (hasHeritageClauses) {
+    // A {@link ts.SyntaxKind.HeritageClause} node may be for extending a
+    // superclass _or_ for implementing an interface. We only want to add a
+    // `super()` call to our synthetic constructor here in the case that there
+    // is a superclass, so we can check for that situation by checking for the
+    // presence of a heritage clause with the `.token` property set to
+    // `ts.SyntaxKind.ExtendsKeyword`.
+    return classDeclaration.heritageClauses.some((clause) => clause.token === ts.SyntaxKind.ExtendsKeyword);
+  }
+  return false;
+};
 
 /**
  * Create a statement with a call to `super()` suitable for including in the body of a constructor.
