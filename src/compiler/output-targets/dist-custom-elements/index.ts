@@ -298,7 +298,7 @@ export const generateEntryPoint = (
   // Add exports to file content
   content += exports.length ? exports.join('\n') + '\n' : '';
   // Add body to file content
-  content += body.length ? body.join('\n') + '\n' : '';
+  content += body.length ? '\n' + body.join('\n') + '\n' : '';
 
   return content;
 };
