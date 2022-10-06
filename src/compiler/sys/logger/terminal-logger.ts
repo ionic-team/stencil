@@ -15,7 +15,7 @@ import {
  * Unfortunately they don't make a type like this available directly, so we have
  * to do a little DIY.
  */
-type AnsiColorVariant = keyof ansiColor.StylesType<string>;
+type AnsiColorVariant = keyof typeof ansiColor.styles;
 
 /**
  * Create a logger for outputting information to a terminal environment
