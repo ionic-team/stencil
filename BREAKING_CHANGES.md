@@ -28,10 +28,10 @@ change. Further details on each of these items will be included prior to the rel
     * [Add `customElementsExportBehavior` to Control Export Behavior](#add-customelementsexportbehavior-to-control-export-behavior)
     * [Move `autoDefineCustomElements` Configuration](#move-autodefinecustomelements-configuration)
   * [`dist-custom-elements-bundle` Output Target](#dist-custom-elements-bundle-output-target)
-* [Legacy Angular Output Target (`angular`)](#legacy-angular-output-target--angular-)
+* [Legacy Angular Output Target (`angular`)](#legacy-angular-output-target-angular)
 * [Stencil APIs](#stencil-apis)
   * [Flag Parsing, `parseFlags()`](#flag-parsing-parseflags)
-  * [Destroy Callback, `addDestroy()`, `removeDestroy()`](#destroy-callback-adddestroy--removedestroy)
+  * [Destroy Callback, `addDestroy()`, `removeDestroy()`](#destroy-callback-adddestroy-removedestroy)
 * [End-to-End Testing](#end-to-end-testing)
   * [Puppeteer v10 Required](#puppeteer-v10-required)
 
@@ -198,6 +198,8 @@ Ensure that Puppeteer v10 is installed, and that its typings are not:
 $ npm install puppeteer@10
 $ npm uninstall @types/puppeteer
 ```
+
+*****
 
 ## Stencil Two
 
