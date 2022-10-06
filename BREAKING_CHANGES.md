@@ -10,12 +10,6 @@ This is a comprehensive list of the breaking changes introduced in the major ver
 
 ## Stencil v3.0.0
 
-`[//]: # (&#40;TODO: Remove this&#41;)
-`Stencil v3.0.0 is in development at this time and has not been released. The list below is not final and is subject to
-change. Further details on each of these items will be included prior to the release.
-
-[//]: # (&#40;TODO: Regenerate this&#41;)
-[//]: # (&#40;TODO: Shame Ryan if he doesn't do TODO1&#41;)
 * [General](#general)
   * [New Configuration Defaults](#new-configuration-defaults)
     * [SourceMaps](#sourcemaps)
