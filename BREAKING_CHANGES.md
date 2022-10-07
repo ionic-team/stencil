@@ -17,6 +17,7 @@ This is a comprehensive list of the breaking changes introduced in the major ver
   * [Deprecated `assetsDir` Removed from `@Component()` decorator](#deprecated-assetsdir-removed-from-component-decorator)
   * [Drop Node 12 Support](#drop-node-12-support)
   * [Strongly Typed Inputs](#strongly-typed-inputs)
+  * [Narrowed Typing for `autocapitalize` Attribute](#narrowed-typing-for-autocapitalize-attribute)
 * [Output Targets](#output-targets)
   * [`dist-custom-elements` Output Target](#dist-custom-elements-output-target)
     * [Add `customElementsExportBehavior` to Control Export Behavior](#add-customelementsexportbehavior-to-control-export-behavior)
@@ -92,6 +93,11 @@ Please upgrade local development machines, continuous integration pipelines, etc
 + onInputCapture?: (event: InputEvent) => void;
 ```
 `event` arguments to either callback should be updated to take this narrower typing into account
+
+#### Narrowed Typing for `autocapitalize` Attribute
+The [`autocaptialize` attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/autocapitalize) has been narrowed from type `any` to type `string`.
+This changes brings Stencil into closer alignment with TypeScript's typings for the attribute.
+No explicit changes are needed, unless a project was passing non-strings to the attribute.
 
 ### Output Targets
 
