@@ -8,19 +8,7 @@ export const CLASS_DECORATORS_TO_REMOVE = ['Component'] as const;
  * Decorators on class members that we remove as part of the compilation
  * process
  */
-export const MEMBER_DECORATORS_TO_REMOVE = [
-  'Element',
-  'Event',
-  'Listen',
-  'Method',
-  'Prop',
-  // TODO(STENCIL-591): Remove Deprecated Decorator Names
-  'PropDidChange',
-  // TODO(STENCIL-591): Remove Deprecated Decorator Names
-  'PropWillChange',
-  'State',
-  'Watch',
-] as const;
+export const MEMBER_DECORATORS_TO_REMOVE = ['Element', 'Event', 'Listen', 'Method', 'Prop', 'State', 'Watch'] as const;
 
 /**
  * Decorators whose 'decorees' we need to rewrite during compilation from
