@@ -148,6 +148,33 @@ describe('convert-decorators', () => {
         }}`
     );
   });
+
+  it('should not add a super call to the constructor if necessary', () => {
+    const t = transpileModule(`
+    @Component({tag: 'cmp-a'})
+      export class CmpA implements Foobar {
+        @State() count: number = 0;
+      }
+    `);
+
+    expect(t.outputText).toBe(
+      c`export class CmpA {
+        constructor() {
+          this.count = 0;
+        }
+
+        static get is() {
+          return "cmp-a";
+        }
+
+        static get states() {
+          return {
+            "count": {}
+          };
+        }}`
+    );
+  });
+
   it('should not convert `@Event` fields to constructor-initialization', () => {
     const t = transpileModule(`
     @Component({tag: 'cmp-a'})
