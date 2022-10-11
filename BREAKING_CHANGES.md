@@ -13,11 +13,12 @@ This is a comprehensive list of the breaking changes introduced in the major ver
 * [General](#general)
   * [New Configuration Defaults](#new-configuration-defaults)
     * [SourceMaps](#sourcemaps)
-    * [`dist-custom-elements` Types](#dist-custom-elements-types)
+    * [`dist-custom-elements` Type Declarations](#dist-custom-elements-type-declarations)
   * [Deprecated `assetsDir` Removed from `@Component()` decorator](#deprecated-assetsdir-removed-from-component-decorator)
   * [Drop Node 12 Support](#drop-node-12-support)
   * [Strongly Typed Inputs](#strongly-typed-inputs)
   * [Narrowed Typing for `autocapitalize` Attribute](#narrowed-typing-for-autocapitalize-attribute)
+  * [Custom Types for Props and Events are now Exported from `components.d.ts`](#custom-types-for-props-and-events-are-now-exported-from-componentsdts)
 * [Output Targets](#output-targets)
   * [`dist-custom-elements` Output Target](#dist-custom-elements-output-target)
     * [Add `customElementsExportBehavior` to Control Export Behavior](#add-customelementsexportbehavior-to-control-export-behavior)
@@ -98,6 +99,68 @@ Please upgrade local development machines, continuous integration pipelines, etc
 The [`autocaptialize` attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/autocapitalize) has been narrowed from type `any` to type `string`.
 This changes brings Stencil into closer alignment with TypeScript's typings for the attribute.
 No explicit changes are needed, unless a project was passing non-strings to the attribute.
+
+### Custom Types for Props and Events are now Exported from `components.d.ts`
+
+Custom types for props and custom events are now re-exported from a project's `components.d.ts` file.
+
+For the following Stencil component
+```tsx
+import { Component, Event, EventEmitter, Prop, h } from '@stencil/core';
+
+export type NameType = string;
+export type Todo = Event;
+
+@Component({
+  tag: 'my-component',
+  styleUrl: 'my-component.css',
+  shadow: true,
+})
+export class MyComponent {
+  @Prop() first: NameType;
+
+  @Event() todoCompleted: EventEmitter<Todo>
+
+  render() {
+    return <div>Hello, World! I'm {this.first}</div>;
+  }
+}
+```
+
+The following data will now be included automatically in `components.d.ts`:
+```diff
+ import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
++import { NameType } from "./components/my-component/my-component";
++export { NameType } from "./components/my-component/my-component";
+ export namespace Components {
+     interface MyComponent {
+-        "first": string;
++        "first": NameType;
+     }
+ }
++export interface MyComponentCustomEvent<T> extends CustomEvent<T> {
++    detail: T;
++    target: HTMLMyComponentElement;
++}
+ declare global {
+     interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
+}
+```
+
+This allows those types to be easily accessed from the root of the type distribution:
+```ts
+import { MyComponentCustomEvent, NameType } from '@my-lib/types';
+```
+
+When using `dist-custom-elements`, these types can now be accessed from the custom element output:
+```ts
+import { MyComponentCustomEvent, NameType } from '@my-custom-elements-output';
+```
+
+This _may_ clash with any manually created types in existing Stencil projects.
+Projects that manually create type definitions from `components.d.ts` will either need to:
+- remove the manually created type (if the types generated in `components.d.ts` suffice)
+- update their type creation logic to account for potential naming collisions with the newly generated types
 
 ### Output Targets
 
