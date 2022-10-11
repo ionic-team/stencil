@@ -289,12 +289,12 @@ export const createSystem = (c?: { logger?: Logger }) => {
       error: null,
     };
 
-    removeDirSyncRecursive(p, opts, results);
+    remoreDirSyncRecursive(p, opts, results);
 
     return results;
   };
 
-  const removeDirSyncRecursive = (
+  const remoreDirSyncRecursive = (
     p: string,
     opts: CompilerSystemRemoveDirectoryOptions,
     results: CompilerSystemRemoveDirectoryResults
@@ -309,7 +309,7 @@ export const createSystem = (c?: { logger?: Logger }) => {
           const item = items.get(dirItemPath);
           if (item) {
             if (item.isDirectory) {
-              removeDirSyncRecursive(dirItemPath, opts, results);
+              remoreDirSyncRecursive(dirItemPath, opts, results);
             } else if (item.isFile) {
               const removeFileResults = removeFileSync(dirItemPath);
               if (removeFileResults.error) {
