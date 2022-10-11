@@ -101,17 +101,18 @@ const generateCustomElementsTypesOutput = async (
 
   const componentsDtsRelPath = relDts(outputTarget.dir!, join(typesDir, 'components.d.ts'));
 
-  // If there is an `index.ts` file in the src directory, we'll re-export anything
-  // exported from that file
-  // Otherwise, we'll export everything from the auto-generated `components.d.ts`
-  // file in the output directory
-  const usersIndexJsPath = join(config.srcDir, 'index.ts');
-  const hasUserIndex = await compilerCtx.fs.access(usersIndexJsPath);
-  if (hasUserIndex) {
-    const userIndexRelPath = normalizePath(dirname(componentsDtsRelPath));
-    code.push(`export * from '${userIndexRelPath}';`);
-  } else {
-    code.push(`export * from '${componentsDtsRelPath}';`);
+  // To mirror the index.js file and only export the typedefs for the
+  // entities exported there, we will re-export the typedefs iff
+  // the `customElementsExportBehavior` is set to barrel component exports
+  if (isBarrelExport) {
+    const usersIndexJsPath = join(config.srcDir, 'index.ts');
+    const hasUserIndex = await compilerCtx.fs.access(usersIndexJsPath);
+    if (hasUserIndex) {
+      const userIndexRelPath = normalizePath(dirname(componentsDtsRelPath));
+      code.push(`export * from '${userIndexRelPath}';`);
+    } else {
+      code.push(`export * from '${componentsDtsRelPath}';`);
+    }
   }
 
   await compilerCtx.fs.writeFile(customElementsDtsPath, code.join('\n') + `\n`, {
