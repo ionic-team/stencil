@@ -61,6 +61,7 @@ export const runTsProgram = async (
   // Finalize components metadata
   buildCtx.moduleFiles = Array.from(compilerCtx.moduleMap.values());
   buildCtx.components = getComponentsFromModules(buildCtx.moduleFiles);
+
   updateComponentBuildConditionals(compilerCtx.moduleMap, buildCtx.components);
   resolveComponentDependencies(buildCtx.components);
 
