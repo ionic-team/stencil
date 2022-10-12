@@ -54,7 +54,7 @@ export const styleToStatic = (newMembers: ts.ClassElement[], componentOptions: d
       //   styles
       // })
       const stylesIdentifier = convertIdentifier.__escapedText;
-      newMembers.push(createStaticGetter('styles', ts.createIdentifier(stylesIdentifier)));
+      newMembers.push(createStaticGetter('styles', ts.factory.createIdentifier(stylesIdentifier)));
     } else if (typeof convertIdentifier === 'object') {
       // import ios from './ios.css';
       // import md from './md.css';

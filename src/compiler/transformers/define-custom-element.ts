@@ -31,9 +31,9 @@ const addDefineCustomElement = (moduleFile: d.Module, compilerMeta: d.ComponentC
     // add customElements.define('cmp-a', CmpClass);
     return ts.createStatement(
       ts.createCall(
-        ts.createPropertyAccess(ts.createIdentifier('customElements'), ts.createIdentifier('define')),
+        ts.createPropertyAccess(ts.factory.createIdentifier('customElements'), ts.factory.createIdentifier('define')),
         [],
-        [ts.createLiteral(compilerMeta.tagName), ts.createIdentifier(compilerMeta.componentClassName)]
+        [ts.createLiteral(compilerMeta.tagName), ts.factory.createIdentifier(compilerMeta.componentClassName)]
       )
     );
   }
@@ -41,11 +41,11 @@ const addDefineCustomElement = (moduleFile: d.Module, compilerMeta: d.ComponentC
   addCoreRuntimeApi(moduleFile, RUNTIME_APIS.defineCustomElement);
   const compactMeta: d.ComponentRuntimeMetaCompact = formatComponentRuntimeMeta(compilerMeta, true);
 
-  const liternalCmpClassName = ts.createIdentifier(compilerMeta.componentClassName);
+  const liternalCmpClassName = ts.factory.createIdentifier(compilerMeta.componentClassName);
   const liternalMeta = convertValueToLiteral(compactMeta);
 
   return ts.createStatement(
-    ts.createCall(ts.createIdentifier(DEFINE_CUSTOM_ELEMENT), [], [liternalCmpClassName, liternalMeta])
+    ts.createCall(ts.factory.createIdentifier(DEFINE_CUSTOM_ELEMENT), [], [liternalCmpClassName, liternalMeta])
   );
 };
 
