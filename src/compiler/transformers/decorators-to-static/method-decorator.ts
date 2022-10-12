@@ -30,7 +30,7 @@ export const methodDecoratorsToStatic = (
     .filter((method) => !!method);
 
   if (methods.length > 0) {
-    newMembers.push(createStaticGetter('methods', ts.createObjectLiteral(methods, true)));
+    newMembers.push(createStaticGetter('methods', ts.factory.createObjectLiteralExpression(methods, true)));
   }
 };
 
@@ -102,7 +102,10 @@ const parseMethodDecorator = (
   };
   validateReferences(diagnostics, methodMeta.complexType.references, method.type || method.name);
 
-  const staticProp = ts.createPropertyAssignment(ts.createLiteral(methodName), convertValueToLiteral(methodMeta));
+  const staticProp = ts.factory.createPropertyAssignment(
+    ts.createLiteral(methodName),
+    convertValueToLiteral(methodMeta)
+  );
 
   return staticProp;
 };

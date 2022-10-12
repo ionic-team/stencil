@@ -74,7 +74,11 @@ const nativeInit = (moduleFile: d.Module, cmp: d.ComponentCompilerMeta): Readonl
 
 const nativeRegisterHostStatement = () => {
   return ts.createStatement(
-    ts.createCall(ts.createPropertyAccess(ts.createThis(), ts.createIdentifier('__registerHost')), undefined, undefined)
+    ts.createCall(
+      ts.createPropertyAccess(ts.createThis(), ts.factory.createIdentifier('__registerHost')),
+      undefined,
+      undefined
+    )
   );
 };
 
@@ -96,5 +100,5 @@ const nativeAttachShadowStatement = (moduleFile: d.Module): ts.ExpressionStateme
 };
 
 const createNativeConstructorSuper = () => {
-  return ts.createExpressionStatement(ts.createCall(ts.createIdentifier('super'), undefined, undefined));
+  return ts.createExpressionStatement(ts.createCall(ts.factory.createIdentifier('super'), undefined, undefined));
 };

@@ -18,7 +18,7 @@ export const transformHostData = (classElements: ts.ClassElement[], moduleFile: 
         renderMethod.decorators,
         renderMethod.modifiers,
         renderMethod.asteriskToken,
-        ts.createIdentifier(INTERNAL_RENDER),
+        ts.factory.createIdentifier(INTERNAL_RENDER),
         renderMethod.questionToken,
         renderMethod.typeParameters,
         renderMethod.parameters,
@@ -36,7 +36,7 @@ const syntheticRender = (moduleFile: d.Module, hasRender: boolean) => {
 
   const hArguments = [
     // __stencil_Host
-    ts.createIdentifier(HOST),
+    ts.factory.createIdentifier(HOST),
     // this.hostData()
     ts.createCall(ts.createPropertyAccess(ts.createThis(), 'hostData'), undefined, undefined),
   ];
@@ -61,7 +61,7 @@ const syntheticRender = (moduleFile: d.Module, hasRender: boolean) => {
     undefined,
     undefined,
     undefined,
-    ts.createBlock([ts.createReturn(ts.createCall(ts.createIdentifier(H), undefined, hArguments))])
+    ts.createBlock([ts.createReturn(ts.createCall(ts.factory.createIdentifier(H), undefined, hArguments))])
   );
 };
 
