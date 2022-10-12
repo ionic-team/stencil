@@ -7,8 +7,6 @@
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { SomeTypes } from "./util";
 import { TestEventDetail } from "./event-custom-type/cmp";
-export { SomeTypes } from "./util";
-export { TestEventDetail } from "./event-custom-type/cmp";
 export namespace Components {
     interface AppendChild {
     }
