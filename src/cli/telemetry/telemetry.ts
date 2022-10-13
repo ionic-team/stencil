@@ -1,4 +1,5 @@
 import { isOutputTargetHydrate, WWW } from '../../compiler/output-targets/output-utils';
+import { IS_BROWSER_ENV } from '../../compiler/sys/environment';
 import type * as d from '../../declarations';
 import { readConfig, updateConfig, writeConfig } from '../ionic-config';
 import { CoreCompiler } from '../load-compiler';
@@ -143,27 +144,29 @@ export const prepareData = async (
   const build = coreCompiler.buildId || 'unknown';
   const has_app_pwa_config = hasAppTarget(config);
   const anonymizedConfig = anonymizeConfigForTelemetry(config);
+  const is_browser_env = IS_BROWSER_ENV;
 
   return {
-    yarn,
-    duration_ms,
+    arguments: config.flags.args,
+    build,
     component_count,
-    targets,
+    config: anonymizedConfig,
+    cpu_model,
+    duration_ms,
+    has_app_pwa_config,
+    is_browser_env,
+    os_name,
+    os_version,
     packages,
     packages_no_versions: packagesNoVersions,
-    arguments: config.flags.args,
-    task: config.flags.task,
+    rollup,
     stencil,
     system,
     system_major: getMajorVersion(system),
-    os_name,
-    os_version,
-    cpu_model,
-    build,
+    targets,
+    task: config.flags.task,
     typescript,
-    rollup,
-    has_app_pwa_config,
-    config: anonymizedConfig,
+    yarn,
   };
 };
 
