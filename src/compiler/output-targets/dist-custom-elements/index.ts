@@ -87,9 +87,7 @@ export const getBundleOptions = (
     // @see {@link https://rollupjs.org/guide/en/#conventions} for more info.
     index: '\0core',
   },
-  loader: {
-    '\0core': generateEntryPoint(outputTarget),
-  },
+  loader: {},
   inlineDynamicImports: outputTarget.inlineDynamicImports,
   preserveEntrySignatures: 'allow-extension',
 });
@@ -189,8 +187,13 @@ export const addCustomElementInputs = (
   outputTarget: d.OutputTargetDistCustomElements
 ): void => {
   const components = buildCtx.components;
-  // an array to store the imports of these modules that we're going to add to our entry chunk
+  // An array to store the imports of these modules that we're going to add to our entry chunk
   const indexImports: string[] = [];
+  // An array to store the export declarations that we're going to add to our entry chunk
+  const indexExports: string[] = [];
+  // An array to store the exported component names that will be used for the `defineCustomElements`
+  // function on the `bundle` export behavior option
+  const exportNames: string[] = [];
 
   components.forEach((cmp) => {
     const exp: string[] = [];
@@ -201,7 +204,7 @@ export const addCustomElementInputs = (
 
     if (cmp.isPlain) {
       exp.push(`export { ${importName} as ${exportName} } from '${cmp.sourceFilePath}';`);
-      indexImports.push(`export { {${exportName} } from '${coreKey}';`);
+      indexExports.push(`export { {${exportName} } from '${coreKey}';`);
     } else {
       // the `importName` may collide with the `exportName`, alias it just in case it does with `importAs`
       exp.push(
@@ -216,39 +219,88 @@ export const addCustomElementInputs = (
       // correct virtual module, if we instead referenced, for instance,
       // `cmp.sourceFilePath`, we would end up with duplicated modules in our
       // output.
-      indexImports.push(
+      indexExports.push(
         `export { ${exportName}, defineCustomElement as defineCustomElement${exportName} } from '${coreKey}';`
       );
     }
+
+    indexImports.push(`import { ${exportName} } from '${coreKey}';`);
+    exportNames.push(exportName);
 
     bundleOpts.inputs[cmp.tagName] = coreKey;
     bundleOpts.loader![coreKey] = exp.join('\n');
   });
 
-  // Only re-export component definitions if the barrel export behavior is set
-  if (outputTarget.customElementsExportBehavior === 'single-export-module') {
-    bundleOpts.loader!['\0core'] += indexImports.join('\n');
-  }
+  // Generate the contents of the entry file to be created by the bundler
+  bundleOpts.loader!['\0core'] = generateEntryPoint(outputTarget, indexImports, indexExports, exportNames);
 };
 
 /**
  * Generate the entrypoint (`index.ts` file) contents for the `dist-custom-elements` output target
  * @param outputTarget the output target's configuration
+ * @param cmpImports The import declarations for local component modules.
+ * @param cmpExports The export declarations for local component modules.
+ * @param cmpNames The exported component names (could be aliased) from local component modules.
  * @returns the stringified contents to be placed in the entrypoint
  */
-export const generateEntryPoint = (outputTarget: d.OutputTargetDistCustomElements): string => {
-  const imp: string[] = [];
+export const generateEntryPoint = (
+  outputTarget: d.OutputTargetDistCustomElements,
+  cmpImports: string[] = [],
+  cmpExports: string[] = [],
+  cmpNames: string[] = []
+): string => {
+  const body: string[] = [];
+  const imports: string[] = [];
+  const exports: string[] = [];
 
-  imp.push(
+  // Exports that are always present
+  exports.push(
     `export { setAssetPath, setNonce, setPlatformOptions } from '${STENCIL_INTERNAL_CLIENT_ID}';`,
     `export * from '${USER_INDEX_ENTRY_ID}';`
   );
 
+  // Content related to global scripts
   if (outputTarget.includeGlobalScripts !== false) {
-    imp.push(`import { globalScripts } from '${STENCIL_APP_GLOBALS_ID}';`, `globalScripts();`);
+    imports.push(`import { globalScripts } from '${STENCIL_APP_GLOBALS_ID}';`);
+    body.push(`globalScripts();`);
   }
 
-  return imp.join('\n') + '\n';
+  // Content related to the `bundle` export behavior
+  if (outputTarget.customElementsExportBehavior === 'bundle') {
+    imports.push(...cmpImports);
+    body.push(
+      'export const defineCustomElements = (opts) => {',
+      "    if (typeof customElements !== 'undefined') {",
+      '        [',
+      ...cmpNames.map((cmp) => `            ${cmp},`),
+      '        ].forEach(cmp => {',
+      '            if (!customElements.get(cmp.is)) {',
+      '                customElements.define(cmp.is, cmp, opts);',
+      '            }',
+      '        });',
+      '    }',
+      '};'
+    );
+  }
+
+  // Content related to the `single-export-module` export behavior
+  if (outputTarget.customElementsExportBehavior === 'single-export-module') {
+    exports.push(...cmpExports);
+  }
+
+  // Generate the contents of the file based on the parts
+  // defined above. This keeps the file structure consistent as
+  // new export behaviors may be added
+  let content = '';
+
+  // Add imports to file content
+  content += imports.length ? imports.join('\n') + '\n' : '';
+  // Add exports to file content
+  content += exports.length ? exports.join('\n') + '\n' : '';
+  // Add body to file content
+  content += body.length ? '\n' + body.join('\n') + '\n' : '';
+
+  return content;
 };
 
 /**
