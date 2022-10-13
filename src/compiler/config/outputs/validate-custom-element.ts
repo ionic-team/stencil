@@ -48,7 +48,7 @@ export const validateCustomElement = (
       });
     }
 
-    outputTarget.copy = validateCopy(outputTarget.copy ?? false, []);
+    outputTarget.copy = validateCopy(outputTarget.copy, []);
 
     if (outputTarget.copy.length > 0) {
       outputs.push({

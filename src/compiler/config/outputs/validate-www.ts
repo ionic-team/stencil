@@ -63,7 +63,7 @@ export const validateWww = (config: d.ValidatedConfig, diagnostics: d.Diagnostic
       outputs.push({
         type: COPY,
         dir: outputTarget.appDir,
-        copy: validateCopy(outputTarget.copy ?? [], [
+        copy: validateCopy(outputTarget.copy, [
           { src: 'assets', warn: false },
           { src: 'manifest.json', warn: false },
         ]),
