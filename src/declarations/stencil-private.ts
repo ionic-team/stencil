@@ -2569,25 +2569,26 @@ export type TelemetryCallback = (...args: any[]) => void | Promise<void>;
  * The model for the data that's tracked.
  */
 export interface TrackableData {
-  yarn: boolean;
-  component_count?: number;
   arguments: string[];
-  targets: string[];
-  task: TaskCommand | null;
+  build: string;
+  component_count?: number;
+  config: Config;
+  cpu_model: string | undefined;
   duration_ms: number | undefined;
-  packages: string[];
-  packages_no_versions?: string[];
+  has_app_pwa_config: boolean;
+  is_browser_env: boolean;
   os_name: string | undefined;
   os_version: string | undefined;
-  cpu_model: string | undefined;
-  typescript: string;
+  packages: string[];
+  packages_no_versions?: string[];
   rollup: string;
+  stencil: string;
   system: string;
   system_major?: string;
-  build: string;
-  stencil: string;
-  has_app_pwa_config: boolean;
-  config: Config;
+  targets: string[];
+  task: TaskCommand | null;
+  typescript: string;
+  yarn: boolean;
 }
 
 /**
