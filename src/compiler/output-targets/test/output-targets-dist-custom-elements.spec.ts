@@ -76,6 +76,7 @@ describe('Custom Elements output target', () => {
       expect(entryPoint).toEqual(`import { globalScripts } from '${STENCIL_APP_GLOBALS_ID}';
 export { setAssetPath, setPlatformOptions } from '${STENCIL_INTERNAL_CLIENT_ID}';
 export * from '${USER_INDEX_ENTRY_ID}';
+
 globalScripts();
 `);
     });
@@ -174,6 +175,7 @@ export * from '${USER_INDEX_ENTRY_ID}';
           `import { globalScripts } from '${STENCIL_APP_GLOBALS_ID}';
 export { setAssetPath, setPlatformOptions } from '${STENCIL_INTERNAL_CLIENT_ID}';
 export * from '${USER_INDEX_ENTRY_ID}';
+
 globalScripts();
 `
         );
@@ -208,6 +210,7 @@ export { setAssetPath, setPlatformOptions } from '${STENCIL_INTERNAL_CLIENT_ID}'
 export * from '${USER_INDEX_ENTRY_ID}';
 export { StubCmp, defineCustomElement as defineCustomElementStubCmp } from '\0StubCmp';
 export { MyBestComponent, defineCustomElement as defineCustomElementMyBestComponent } from '\0MyBestComponent';
+
 globalScripts();
 `
         );
@@ -233,6 +236,7 @@ globalScripts();
 export { setAssetPath, setPlatformOptions } from '${STENCIL_INTERNAL_CLIENT_ID}';
 export * from '${USER_INDEX_ENTRY_ID}';
 export { ComponentWithJsx, defineCustomElement as defineCustomElementComponentWithJsx } from '\0ComponentWithJsx';
+
 globalScripts();
 `
         );
@@ -266,6 +270,7 @@ import { StubCmp } from '\0StubCmp';
 import { MyBestComponent } from '\0MyBestComponent';
 export { setAssetPath, setPlatformOptions } from '${STENCIL_INTERNAL_CLIENT_ID}';
 export * from '${USER_INDEX_ENTRY_ID}';
+
 globalScripts();
 export const defineCustomElements = (opts) => {
     if (typeof customElements !== 'undefined') {
