@@ -10,7 +10,9 @@ export const updateLazyComponentConstructor = (
   moduleFile: d.Module,
   cmp: d.ComponentCompilerMeta
 ) => {
-  const cstrMethodArgs = [ts.createParameter(undefined, undefined, undefined, ts.createIdentifier(HOST_REF_ARG))];
+  const cstrMethodArgs = [
+    ts.createParameter(undefined, undefined, undefined, ts.factory.createIdentifier(HOST_REF_ARG)),
+  ];
 
   const cstrMethodIndex = classMembers.findIndex((m) => m.kind === ts.SyntaxKind.Constructor);
   if (cstrMethodIndex >= 0) {
@@ -54,9 +56,9 @@ const registerInstanceStatement = (moduleFile: d.Module) => {
   addCoreRuntimeApi(moduleFile, RUNTIME_APIS.registerInstance);
 
   return ts.createStatement(
-    ts.createCall(ts.createIdentifier(REGISTER_INSTANCE), undefined, [
+    ts.createCall(ts.factory.createIdentifier(REGISTER_INSTANCE), undefined, [
       ts.createThis(),
-      ts.createIdentifier(HOST_REF_ARG),
+      ts.factory.createIdentifier(HOST_REF_ARG),
     ])
   );
 };

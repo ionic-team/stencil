@@ -22,7 +22,7 @@ const getStatement = (propName: string, method: string, arg: string) => {
   return ts.createExpressionStatement(
     ts.createAssignment(
       ts.createPropertyAccess(ts.createThis(), propName),
-      ts.createCall(ts.createIdentifier(method), undefined, [ts.createThis(), ts.createLiteral(arg)])
+      ts.createCall(ts.factory.createIdentifier(method), undefined, [ts.createThis(), ts.createLiteral(arg)])
     )
   );
 };

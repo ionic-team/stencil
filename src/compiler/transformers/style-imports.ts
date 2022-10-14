@@ -92,7 +92,7 @@ const createEsmStyleImport = (
   cmp: d.ComponentCompilerMeta,
   style: d.StyleCompiler
 ) => {
-  const importName = ts.createIdentifier(style.styleIdentifier);
+  const importName = ts.factory.createIdentifier(style.styleIdentifier);
   const importPath = getStyleImportPath(transformOpts, tsSourceFile, cmp, style, style.externalStyles[0].absolutePath);
 
   return ts.createImportDeclaration(
@@ -132,7 +132,7 @@ const createCjsStyleRequire = (
   cmp: d.ComponentCompilerMeta,
   style: d.StyleCompiler
 ) => {
-  const importName = ts.createIdentifier(style.styleIdentifier);
+  const importName = ts.factory.createIdentifier(style.styleIdentifier);
   const importPath = getStyleImportPath(transformOpts, tsSourceFile, cmp, style, style.externalStyles[0].absolutePath);
 
   return ts.createVariableStatement(
@@ -142,7 +142,7 @@ const createCjsStyleRequire = (
         ts.createVariableDeclaration(
           importName,
           undefined,
-          ts.createCall(ts.createIdentifier('require'), [], [ts.createLiteral(importPath)])
+          ts.createCall(ts.factory.createIdentifier('require'), [], [ts.createLiteral(importPath)])
         ),
       ],
       ts.NodeFlags.Const
