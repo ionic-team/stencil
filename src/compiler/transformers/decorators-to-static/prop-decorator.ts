@@ -40,7 +40,7 @@ export const propDecoratorsToStatic = (
     .filter((prop) => prop != null);
 
   if (properties.length > 0) {
-    newMembers.push(createStaticGetter('properties', ts.createObjectLiteral(properties, true)));
+    newMembers.push(createStaticGetter('properties', ts.factory.createObjectLiteralExpression(properties, true)));
   }
 };
 
@@ -110,7 +110,7 @@ const parsePropDecorator = (
     propMeta.defaultValue = initializer.getText();
   }
 
-  const staticProp = ts.createPropertyAssignment(ts.createLiteral(propName), convertValueToLiteral(propMeta));
+  const staticProp = ts.factory.createPropertyAssignment(ts.createLiteral(propName), convertValueToLiteral(propMeta));
   watchable.add(propName);
   return staticProp;
 };
