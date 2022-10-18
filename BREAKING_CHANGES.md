@@ -27,7 +27,7 @@ This is a comprehensive list of the breaking changes introduced in the major ver
 * [Legacy Angular Output Target](#legacy-angular-output-target)
 * [Stencil APIs](#stencil-apis)
   * [Flag Parsing, `parseFlags()`](#flag-parsing-parseflags)
-  * [Destroy Callback, `addDestroy()`, `removeDestroy()`](#destroy-callback-adddestroy--removedestroy)
+  * [Destroy Callback, `addDestroy()`, `removeDestroy()`](#destroy-callback-adddestroy-removedestroy)
 * [End-to-End Testing](#end-to-end-testing)
   * [Puppeteer v10 Required](#puppeteer-v10-required)
 
