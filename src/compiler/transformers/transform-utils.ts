@@ -49,26 +49,26 @@ export const convertValueToLiteral = (
     refs = new WeakSet();
   }
   if (val === String) {
-    return ts.createIdentifier('String');
+    return ts.factory.createIdentifier('String');
   }
   if (val === Number) {
-    return ts.createIdentifier('Number');
+    return ts.factory.createIdentifier('Number');
   }
   if (val === Boolean) {
-    return ts.createIdentifier('Boolean');
+    return ts.factory.createIdentifier('Boolean');
   }
   if (val === undefined) {
-    return ts.createIdentifier('undefined');
+    return ts.factory.createIdentifier('undefined');
   }
   if (val === null) {
-    return ts.createIdentifier('null');
+    return ts.factory.createIdentifier('null');
   }
   if (Array.isArray(val)) {
     return arrayToArrayLiteral(val, refs);
   }
   if (typeof val === 'object') {
     if ((val as ConvertIdentifier).__identifier && (val as ConvertIdentifier).__escapedText) {
-      return ts.createIdentifier((val as ConvertIdentifier).__escapedText);
+      return ts.factory.createIdentifier((val as ConvertIdentifier).__escapedText);
     }
     return objectToObjectLiteral(val, refs);
   }
@@ -111,20 +111,20 @@ const arrayToArrayLiteral = (list: any[], refs: WeakSet<any>): ts.ArrayLiteralEx
  */
 const objectToObjectLiteral = (obj: { [key: string]: any }, refs: WeakSet<any>): ts.ObjectLiteralExpression => {
   if (refs.has(obj)) {
-    return ts.createIdentifier('undefined') as any;
+    return ts.factory.createIdentifier('undefined') as any;
   }
 
   refs.add(obj);
 
   const newProperties: ts.ObjectLiteralElementLike[] = Object.keys(obj).map((key) => {
-    const prop = ts.createPropertyAssignment(
+    const prop = ts.factory.createPropertyAssignment(
       ts.createLiteral(key),
       convertValueToLiteral(obj[key], refs) as ts.Expression
     );
     return prop;
   });
 
-  return ts.createObjectLiteral(newProperties, true);
+  return ts.factory.createObjectLiteralExpression(newProperties, true);
 };
 
 /**
@@ -747,7 +747,7 @@ export const createRequireStatement = (importFnNames: string[], importPath: stri
         ts.createVariableDeclaration(
           importBinding,
           undefined,
-          ts.createCall(ts.createIdentifier('require'), [], [ts.createLiteral(importPath)])
+          ts.createCall(ts.factory.createIdentifier('require'), [], [ts.createLiteral(importPath)])
         ),
       ],
       ts.NodeFlags.Const
