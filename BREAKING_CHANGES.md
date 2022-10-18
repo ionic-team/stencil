@@ -12,8 +12,8 @@ This is a comprehensive list of the breaking changes introduced in the major ver
 
 * [General](#general)
   * [New Configuration Defaults](#new-configuration-defaults)
-    * [SourceMaps](#sourcemaps)
-    * [`dist-custom-elements` Type Declarations](#dist-custom-elements-type-declarations)
+  * [SourceMaps](#sourcemaps)
+  * [`dist-custom-elements` Type Declarations](#dist-custom-elements-type-declarations)
   * [Deprecated `assetsDir` Removed from `@Component()` decorator](#deprecated-assetsdir-removed-from-component-decorator)
   * [Drop Node 12 Support](#drop-node-12-support)
   * [Strongly Typed Inputs](#strongly-typed-inputs)
@@ -27,7 +27,7 @@ This is a comprehensive list of the breaking changes introduced in the major ver
 * [Legacy Angular Output Target](#legacy-angular-output-target)
 * [Stencil APIs](#stencil-apis)
   * [Flag Parsing, `parseFlags()`](#flag-parsing-parseflags)
-  * [Destroy Callback, `addDestroy()`, `removeDestroy()`](#destroy-callback-adddestroy-removedestroy)
+  * [Destroy Callback, `addDestroy()`, `removeDestroy()`](#destroy-callback-adddestroy--removedestroy)
 * [End-to-End Testing](#end-to-end-testing)
   * [Puppeteer v10 Required](#puppeteer-v10-required)
 
