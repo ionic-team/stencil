@@ -97,7 +97,7 @@ Please upgrade local development machines, continuous integration pipelines, etc
 
 #### Narrowed Typing for `autocapitalize` Attribute
 The [`autocaptialize` attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/autocapitalize) has been narrowed from type `any` to type `string`.
-This changes brings Stencil into closer alignment with TypeScript's typings for the attribute.
+This change brings Stencil into closer alignment with TypeScript's typings for the attribute.
 No explicit changes are needed, unless a project was passing non-strings to the attribute.
 
 ### Custom Types for Props and Events are now Exported from `components.d.ts`
@@ -127,34 +127,33 @@ export class MyComponent {
 }
 ```
 
+
 The following data will now be included automatically in `components.d.ts`:
 ```diff
- import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
-+import { NameType } from "./components/my-component/my-component";
-+export { NameType } from "./components/my-component/my-component";
- export namespace Components {
-     interface MyComponent {
--        "first": string;
-+        "first": NameType;
-     }
- }
-+export interface MyComponentCustomEvent<T> extends CustomEvent<T> {
-+    detail: T;
-+    target: HTMLMyComponentElement;
-+}
- declare global {
-     interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
-}
+  import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
+  import { NameType, Todo } from "./components/my-component/my-component";
++ export { NameType, Todo } from "./components/my-component/my-component";
+  export namespace Components {
+      interface MyComponent {
+        "first": NameType;
+      }
+  }
+  export interface MyComponentCustomEvent<T> extends CustomEvent<T> {
+      detail: T;
+      target: HTMLMyComponentElement;
+  }
+  declare global {
+      interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
+  }
 ```
-
 This allows those types to be easily accessed from the root of the type distribution:
 ```ts
-import { MyComponentCustomEvent, NameType } from '@my-lib/types';
+import { NameType, Todo } from '@my-lib/types';
 ```
 
 When using `dist-custom-elements`, these types can now be accessed from the custom element output:
 ```ts
-import { MyComponentCustomEvent, NameType } from '@my-custom-elements-output';
+import { NameType, Todo } from '@my-custom-elements-output';
 ```
 
 This _may_ clash with any manually created types in existing Stencil projects.
