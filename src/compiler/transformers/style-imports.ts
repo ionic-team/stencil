@@ -142,7 +142,7 @@ const createCjsStyleRequire = (
         ts.createVariableDeclaration(
           importName,
           undefined,
-          ts.createCall(ts.factory.createIdentifier('require'), [], [ts.createLiteral(importPath)])
+          ts.factory.createCallExpression(ts.factory.createIdentifier('require'), [], [ts.createLiteral(importPath)])
         ),
       ],
       ts.NodeFlags.Const

@@ -38,12 +38,20 @@ const syntheticRender = (moduleFile: d.Module, hasRender: boolean) => {
     // __stencil_Host
     ts.factory.createIdentifier(HOST),
     // this.hostData()
-    ts.createCall(ts.createPropertyAccess(ts.createThis(), 'hostData'), undefined, undefined),
+    ts.factory.createCallExpression(
+      ts.factory.createPropertyAccessExpression(ts.factory.createThis(), 'hostData'),
+      undefined,
+      undefined
+    ),
   ];
   if (hasRender) {
     hArguments.push(
       // this.render()
-      ts.createCall(ts.createPropertyAccess(ts.createThis(), INTERNAL_RENDER), undefined, undefined)
+      ts.factory.createCallExpression(
+        ts.factory.createPropertyAccessExpression(ts.factory.createThis(), INTERNAL_RENDER),
+        undefined,
+        undefined
+      )
     );
   }
 
@@ -52,7 +60,7 @@ const syntheticRender = (moduleFile: d.Module, hasRender: boolean) => {
    *   return h(arguments);
    * }
    */
-  return ts.createMethod(
+  return ts.factory.createMethodDeclaration(
     undefined,
     undefined,
     undefined,
@@ -61,7 +69,9 @@ const syntheticRender = (moduleFile: d.Module, hasRender: boolean) => {
     undefined,
     undefined,
     undefined,
-    ts.createBlock([ts.createReturn(ts.createCall(ts.factory.createIdentifier(H), undefined, hArguments))])
+    ts.factory.createBlock([
+      ts.createReturn(ts.factory.createCallExpression(ts.factory.createIdentifier(H), undefined, hArguments)),
+    ])
   );
 };
 
