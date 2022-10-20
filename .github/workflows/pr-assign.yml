@@ -3,14 +3,10 @@ name: Auto Request Review
 on:
   pull_request:
     types: [opened, ready_for_review, reopened]
-    branches:
-      - '**'
 
 jobs:
   auto-request-review:
-    name: Auto Request Review
-    runs:
-      using: 'node16'
-      main: 'pr-assign.js'
-    with:
-      token: ${{ secrets.GITHUB_TOKEN }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579
+      - uses: ./.github/workflows/actions/auto-request-reviews/action.yml

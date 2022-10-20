@@ -1,22 +1,27 @@
 name: Auto Request Review
 
+runs:
+  using: 'node16'
+  main: '.github/workflows/actions/auto-request-reviews/index.js'
+with:
+  token: ${{ secrets.GITHUB_TOKEN }}
 # on:
 #   pull_request:
 #     types: [opened, ready_for_review, reopened]
 #     branches:
 #       - '**'
 
-on:
-  workflow_call:
+# on:
+#   workflow_call:
 
-jobs:
-  auto-request-review:
-    name: Auto Request Review
-    runs-on: ubuntu-latest
-    steps:
-      - name: Request review for team members
-        runs:
-          using: 'node16'
-          main: '.github/workflows/actions/auto-request-reviews/index.js'
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+# jobs:
+#   auto-request-review:
+#     name: Auto Request Review
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Request review for team members
+#         runs:
+#           using: 'node16'
+#           main: '.github/workflows/actions/auto-request-reviews/index.js'
+#         with:
+#           token: ${{ secrets.GITHUB_TOKEN }}
