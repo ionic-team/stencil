@@ -11,6 +11,6 @@ jobs:
     name: Auto Request Review
     runs:
       using: 'node16'
-      main: '.github/workflows/actions/auto-request-reviews/index.js'
+      main: 'pr-assign.js'
     with:
       token: ${{ secrets.GITHUB_TOKEN }}
