@@ -14,17 +14,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  auto-request-review:
-    name: Auto Request Review
-    runs-on: ubuntu-latest
-    steps:
-      - name: Request review for team members
-        runs:
-          using: 'node16'
-          main: '.github/workflows/actions/auto-request-reviews/index.js'
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-
   build_core:
     name: Build
     uses: ./.github/workflows/build.yml
