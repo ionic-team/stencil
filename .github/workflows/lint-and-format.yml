@@ -16,9 +16,9 @@ jobs:
       - name: Get Core Dependencies
         uses: ./.github/workflows/actions/get-core-dependencies
 
+      - name: ESLint
+        run: npm run lint
+
       - name: Prettier Check
         run: npm run prettier.dry-run
         shell: bash
-
-      - name: ESLint
-        run: npm run lint

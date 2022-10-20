@@ -1,7 +1,8 @@
+import { validateComponentTag } from '@utils';
+
+import { IS_NODE_ENV } from '../compiler/sys/environment';
 import type { ValidatedConfig } from '../declarations';
 import type { CoreCompiler } from './load-compiler';
-import { IS_NODE_ENV } from '../compiler/sys/environment';
-import { validateComponentTag } from '@utils';
 
 /**
  * Task to generate component boilerplate and write it to disk. This task can

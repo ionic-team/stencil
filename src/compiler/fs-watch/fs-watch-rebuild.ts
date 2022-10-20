@@ -1,7 +1,8 @@
-import type * as d from '../../declarations';
-import { basename } from 'path';
 import { isString, unique } from '@utils';
-import { isOutputTargetDocsJson, isOutputTargetStats, isOutputTargetDocsVscode } from '../output-targets/output-utils';
+import { basename } from 'path';
+
+import type * as d from '../../declarations';
+import { isOutputTargetDocsJson, isOutputTargetDocsVscode, isOutputTargetStats } from '../output-targets/output-utils';
 
 export const filesChanged = (buildCtx: d.BuildCtx) => {
   // files changed include updated, added and deleted

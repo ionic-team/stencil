@@ -1,4 +1,5 @@
 import { isNumber, isString } from '@utils';
+
 import { MsgFromWorker, MsgToWorker, WorkerMsgHandler } from '../../../declarations';
 
 export const initWebWorkerThread = (msgHandler: WorkerMsgHandler) => {

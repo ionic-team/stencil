@@ -1,15 +1,21 @@
+import { augmentDiagnosticWithNode, buildError } from '@utils';
+import ts from 'typescript';
+
 import type * as d from '../../../declarations';
-import { CLASS_DECORATORS_TO_REMOVE, MEMBER_DECORATORS_TO_REMOVE } from './decorators-constants';
 import { componentDecoratorToStatic } from './component-decorator';
+import { isDecoratorNamed } from './decorator-utils';
+import {
+  CLASS_DECORATORS_TO_REMOVE,
+  CONSTRUCTOR_DEFINED_MEMBER_DECORATORS,
+  MEMBER_DECORATORS_TO_REMOVE,
+} from './decorators-constants';
 import { elementDecoratorsToStatic } from './element-decorator';
 import { eventDecoratorsToStatic } from './event-decorator';
 import { listenDecoratorsToStatic } from './listen-decorator';
-import { isDecoratorNamed } from './decorator-utils';
 import { methodDecoratorsToStatic, validateMethods } from './method-decorator';
 import { propDecoratorsToStatic } from './prop-decorator';
 import { stateDecoratorsToStatic } from './state-decorator';
 import { watchDecoratorsToStatic } from './watch-decorator';
-import ts from 'typescript';
 
 export const convertDecoratorsToStatic = (
   config: d.Config,
@@ -30,7 +36,7 @@ export const convertDecoratorsToStatic = (
   };
 };
 
-export const visitClassDeclaration = (
+const visitClassDeclaration = (
   config: d.Config,
   diagnostics: d.Diagnostic[],
   typeChecker: ts.TypeChecker,
@@ -49,79 +55,405 @@ export const visitClassDeclaration = (
   const decoratedMembers = classMembers.filter(
     (member) => Array.isArray(member.decorators) && member.decorators.length > 0
   );
-  const newMembers = removeStencilDecorators(Array.from(classMembers));
+
+  // create an array of all class members which are _not_ methods decorated
+  // with a Stencil decorator. We do this here because we'll implement the
+  // behavior specified for those decorated methods later on.
+  const filteredMethodsAndFields = removeStencilMethodDecorators(Array.from(classMembers), diagnostics);
 
   // parser component decorator (Component)
-  componentDecoratorToStatic(config, typeChecker, diagnostics, classNode, newMembers, componentDecorator);
+  componentDecoratorToStatic(config, typeChecker, diagnostics, classNode, filteredMethodsAndFields, componentDecorator);
 
   // stores a reference to fields that should be watched for changes
   const watchable = new Set<string>();
   // parse member decorators (Prop, State, Listen, Event, Method, Element and Watch)
   if (decoratedMembers.length > 0) {
-    propDecoratorsToStatic(diagnostics, decoratedMembers, typeChecker, watchable, newMembers);
-    stateDecoratorsToStatic(decoratedMembers, watchable, newMembers);
-    eventDecoratorsToStatic(diagnostics, decoratedMembers, typeChecker, newMembers);
-    methodDecoratorsToStatic(config, diagnostics, classNode, decoratedMembers, typeChecker, newMembers);
-    elementDecoratorsToStatic(diagnostics, decoratedMembers, typeChecker, newMembers);
-    watchDecoratorsToStatic(config, diagnostics, decoratedMembers, watchable, newMembers);
-    listenDecoratorsToStatic(diagnostics, decoratedMembers, newMembers);
+    propDecoratorsToStatic(diagnostics, decoratedMembers, typeChecker, watchable, filteredMethodsAndFields);
+    stateDecoratorsToStatic(decoratedMembers, watchable, filteredMethodsAndFields);
+    eventDecoratorsToStatic(diagnostics, decoratedMembers, typeChecker, filteredMethodsAndFields);
+    methodDecoratorsToStatic(config, diagnostics, classNode, decoratedMembers, typeChecker, filteredMethodsAndFields);
+    elementDecoratorsToStatic(diagnostics, decoratedMembers, typeChecker, filteredMethodsAndFields);
+    watchDecoratorsToStatic(config, diagnostics, decoratedMembers, watchable, filteredMethodsAndFields);
+    listenDecoratorsToStatic(diagnostics, decoratedMembers, filteredMethodsAndFields);
   }
+
+  // We call the `handleClassFields` method which handles transforming any
+  // class fields, removing them from the class and adding statements to the
+  // class' constructor which instantiate them there instead.
+  const updatedClassFields = handleClassFields(classNode, filteredMethodsAndFields);
 
   validateMethods(diagnostics, classMembers);
 
   return ts.updateClassDeclaration(
     classNode,
-    removeDecorators(classNode, CLASS_DECORATORS_TO_REMOVE),
+    filterDecorators(classNode, CLASS_DECORATORS_TO_REMOVE),
     classNode.modifiers,
     classNode.name,
     classNode.typeParameters,
     classNode.heritageClauses,
-    newMembers
+    updatedClassFields
   );
 };
 
-const removeStencilDecorators = (classMembers: ts.ClassElement[]) => {
-  return classMembers.map((m) => {
-    const currentDecorators = m.decorators;
-    const newDecorators = removeDecorators(m, MEMBER_DECORATORS_TO_REMOVE);
+/**
+ * Take a list of `ClassElement` AST nodes and remove any decorators from
+ * method elements which are Stencil-specific decorators. We implement the
+ * intended behavior for these Stencil-specific decorators (things like
+ * `@Watch`, `@State`, etc) through a combination of compile- and
+ * run-time changes, scaffolding, etc.
+ *
+ * This utility modifies these class elements to remove any Stencil-specific
+ * decorators.
+ *
+ * @param classMembers a list of ClassElement AST nodes
+ * @param diagnostics a collection of compiler diagnostics, to which an error
+ * may be added
+ * @returns a new list of the same ClassElement nodes, with any nodes which have
+ * Stencil-specific decorators modified to remove them
+ */
+const removeStencilMethodDecorators = (
+  classMembers: ts.ClassElement[],
+  diagnostics: d.Diagnostic[]
+): ts.ClassElement[] => {
+  return classMembers.map((member) => {
+    const currentDecorators = member.decorators;
+    const newDecorators = filterDecorators(member, MEMBER_DECORATORS_TO_REMOVE);
+
     if (currentDecorators !== newDecorators) {
-      if (ts.isMethodDeclaration(m)) {
+      if (ts.isMethodDeclaration(member)) {
         return ts.updateMethod(
-          m,
+          member,
           newDecorators,
-          m.modifiers,
-          m.asteriskToken,
-          m.name,
-          m.questionToken,
-          m.typeParameters,
-          m.parameters,
-          m.type,
-          m.body
+          member.modifiers,
+          member.asteriskToken,
+          member.name,
+          member.questionToken,
+          member.typeParameters,
+          member.parameters,
+          member.type,
+          member.body
         );
-      } else if (ts.isPropertyDeclaration(m)) {
-        return ts.updateProperty(m, newDecorators, m.modifiers, m.name, m.questionToken, m.type, m.initializer);
+      } else if (ts.isPropertyDeclaration(member)) {
+        if (shouldInitializeInConstructor(member)) {
+          // if the current class member is decorated with either 'State' or
+          // 'Prop' we need to modify the property declaration to transform it
+          // from a class field but we handle this in the `handleClassFields`
+          // method below, so we just want to return the class member here
+          // untouched.
+          return member;
+        } else {
+          // update the property to remove decorators
+          return ts.updateProperty(
+            member,
+            newDecorators,
+            member.modifiers,
+            member.name,
+            member.questionToken,
+            member.type,
+            member.initializer
+          );
+        }
       } else {
-        console.log('unknown class node');
+        const err = buildError(diagnostics);
+        err.messageText = 'Unknown class member encountered!';
+        augmentDiagnosticWithNode(err, member);
       }
     }
-    return m;
+    return member;
   });
 };
 
-const removeDecorators = (node: ts.Node, decoratorNames: Set<string>) => {
+/**
+ * Generate a list of decorators from an AST node that are not in a provided list
+ *
+ * @param node the AST node whose decorators should be inspected
+ * @param decoratorNames the decorators that should _not_ be included in the returned list
+ * @returns a list of decorators on the AST node that are not in the provided list, or `undefined` if:
+ * - there are no decorators on the node
+ * - the node contains only decorators in the provided list
+ */
+const filterDecorators = (
+  node: ts.Node,
+  decoratorNames: ReadonlyArray<string>
+): ts.NodeArray<ts.Decorator> | undefined => {
   if (node.decorators) {
     const updatedDecoratorList = node.decorators.filter((dec) => {
       const name =
         ts.isCallExpression(dec.expression) &&
         ts.isIdentifier(dec.expression.expression) &&
         dec.expression.expression.text;
-      return !decoratorNames.has(name);
+      return typeof name === 'boolean' || !decoratorNames.includes(name);
     });
     if (updatedDecoratorList.length === 0) {
       return undefined;
     } else if (updatedDecoratorList.length !== node.decorators.length) {
-      return ts.createNodeArray(updatedDecoratorList);
+      return ts.factory.createNodeArray(updatedDecoratorList);
     }
   }
   return node.decorators;
+};
+
+/**
+ * This updates a Stencil component class declaration AST node to handle any
+ * class fields with Stencil-specific decorators (`@State`, `@Prop`, etc). For
+ * reasons explained below, we need to remove these fields from the class and
+ * add code to the class's constructor to instantiate them manually.
+ *
+ * When a class field is decorated with a Stencil-defined decorator, we rely on
+ * defining our own setters and getters (using `Object.defineProperty`) to
+ * implement the behavior we want. Unfortunately, in ES2022 and newer versions
+ * of the EcmaScript standard the behavior for class fields like the following
+ * is incompatible with using manually-defined getters and setters:
+ *
+ * ```ts
+ * class MyClass {
+ *   foo = "bar"
+ * }
+ * ```
+ *
+ * In ES2022+ if we try to use `Object.defineProperty` on this class's
+ * prototype in order to define a `set` and `get` function for the
+ * property `foo` it will not override the default behavior of the
+ * instance field `foo`, so doing something like the following:
+ *
+ * ```ts
+ * Object.defineProperty(MyClass.prototype, "foo", {
+ *   get() {
+ *     return "Foo is: " + this.foo
+ *   }
+ * });
+ * ```
+ *
+ * and then calling `myClassInstance.foo` will _not_ return `"Foo is: bar"` but
+ * just `"bar"`. This is because the standard ECMAScript behavior is now to use
+ * the internals of `Object.defineProperty` on a class instance to instantiate
+ * fields, and that call at instantiation-time overrides what's set on the
+ * prototype. For details, see the accepted ECMAScript proposal for this
+ * behavior:
+ *
+ * https://github.com/tc39/proposal-class-fields#public-fields-created-with-objectdefineproperty
+ *
+ * Why is this important? With `target` set to an ECMAScript version prior to
+ * ES2022 TypeScript by default would emit a class which instantiated the field
+ * in its constructor, something like this:
+ *
+ * ```ts
+ * class CompiledMyClass {
+ *   constructor() {
+ *     this.foo = "bar"
+ *   }
+ * }
+ * ```
+ *
+ * This plays nicely with later using `Object.defineProperty` on the prototype
+ * to define getters and setters, or simply with defining them right on the
+ * class (see the code in `proxyComponent`, `proxyCustomElement`, and friends).
+ *
+ * However, with a `target` of ES2022 or higher (e.g. `ESNext`) default
+ * behavior for TypeScript is instead to emit code like this:
+ *
+ * ```ts
+ * class CompiledMyClass {
+ *   foo = "bar"
+ * }
+ * ```
+ *
+ * This output is more correct because the compiled code 1) more closely
+ * resembles the TypeScript source and 2) is using standard JS syntax instead
+ * of desugaring it. There is an announcement in the release notes for
+ * TypeScript v3.7 which explains some helpful background about the change,
+ * and about the `useDefineForClassFields` TypeScript option which lets you
+ * opt-in to the old output:
+ *
+ * https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-7.html#the-usedefineforclassfields-flag-and-the-declare-property-modifier
+ *
+ * For our use-case, however, the ES2022+ behavior doesn't work, since we need
+ * to be able to define getters and setters on these fields. We could require
+ * that the TypeScript configuration used for Stencil have the
+ * `useDefineForClassFields` setting set to `false`, but that would have the
+ * undesirable side-effect that class fields which are _not_
+ * decorated with a Stencil decorator would also be instantiated in the
+ * constructor.
+ *
+ * So instead, we take matters into our own hands. When we encounter a class
+ * field which is decorated with a Stencil decorator we remove it from the
+ * class and add a statement to the constructor to instantiate it with the
+ * correct default value.
+ *
+ * **Note**: this function will modify a constructor if one is already present on
+ * the class or define a new one otherwise.
+ *
+ * @param classNode a TypeScript AST node for a Stencil component class
+ * @param classMembers the class members that we need to update
+ * @returns a list of updated class elements which can be inserted into the class
+ */
+function handleClassFields(classNode: ts.ClassDeclaration, classMembers: ts.ClassElement[]): ts.ClassElement[] {
+  const statements: ts.ExpressionStatement[] = [];
+  const updatedClassMembers: ts.ClassElement[] = [];
+
+  for (const member of classMembers) {
+    if (shouldInitializeInConstructor(member) && ts.isPropertyDeclaration(member)) {
+      const declarationName: ts.DeclarationName = ts.getNameOfDeclaration(member);
+
+      // The name of a class field declaration can be a computed property name,
+      // like so:
+      //
+      // ```ts
+      // const argName = "arghhh"
+      //
+      // class MyClass {
+      //   [argName] = "best property around";
+      // }
+      // ```
+      //
+      // In this case we need to get the expression which evaluates to some
+      // valid property name and call `.getText` on it. In the case that it's
+      // _not_ a computed property name, like
+      //
+      // ```ts
+      // class MyClass {
+      //   argName = "best property around";
+      // }
+      // ```
+      //
+      // we can just call `.getText` on the name itself.
+      const memberName =
+        declarationName.kind === ts.SyntaxKind.ComputedPropertyName
+          ? declarationName.expression.getText()
+          : declarationName.getText();
+
+      // this is a class field that we'll need to handle, so lets push a statement for
+      // initializing the value onto our statements list
+      statements.push(
+        ts.factory.createExpressionStatement(
+          ts.factory.createBinaryExpression(
+            ts.factory.createPropertyAccessExpression(ts.factory.createThis(), ts.factory.createIdentifier(memberName)),
+            ts.factory.createToken(ts.SyntaxKind.EqualsToken),
+            // if the member has no initializer we should default to setting it to
+            // just 'undefined'
+            member.initializer ?? ts.factory.createIdentifier('undefined')
+          )
+        )
+      );
+    } else {
+      // if it's not a class field that is decorated with a Stencil decorator then
+      // we just push it onto our class member list
+      updatedClassMembers.push(member);
+    }
+  }
+
+  if (statements.length === 0) {
+    // we didn't encounter any class fields we need to update, so we can
+    // just return the list of class members (no need to create an empty
+    // constructor)
+    return updatedClassMembers;
+  } else {
+    // create or update a constructor which contains the initializing statements
+    // we created above
+    return updateConstructor(classNode, updatedClassMembers, statements);
+  }
+}
+
+/**
+ * Helper util for updating the constructor on a class declaration AST node.
+ *
+ * @param classNode the class node whose constructor will be updated
+ * @param classMembers a list of class members for that class
+ * @param statements a list of statements which should be added to the
+ * constructor
+ * @returns a list of updated class elements
+ */
+export const updateConstructor = (
+  classNode: ts.ClassDeclaration,
+  classMembers: ts.ClassElement[],
+  statements: ts.Statement[]
+): ts.ClassElement[] => {
+  const constructorIndex = classMembers.findIndex((m) => m.kind === ts.SyntaxKind.Constructor);
+  const constructorMethod = classMembers[constructorIndex];
+
+  if (constructorIndex >= 0 && ts.isConstructorDeclaration(constructorMethod)) {
+    const hasSuper = constructorMethod.body.statements.some((s) => s.kind === ts.SyntaxKind.SuperKeyword);
+
+    if (!hasSuper && needsSuper(classNode)) {
+      statements = [createConstructorBodyWithSuper(), ...statements];
+    }
+
+    classMembers[constructorIndex] = ts.factory.updateConstructorDeclaration(
+      constructorMethod,
+      constructorMethod.decorators,
+      constructorMethod.modifiers,
+      constructorMethod.parameters,
+      ts.factory.updateBlock(constructorMethod.body, statements)
+    );
+  } else {
+    // we don't seem to have a constructor, so let's create one and stick it
+    // into the array of class elements
+    if (needsSuper(classNode)) {
+      statements = [createConstructorBodyWithSuper(), ...statements];
+    }
+
+    classMembers = [
+      ts.factory.createConstructorDeclaration(
+        undefined,
+        undefined,
+        undefined,
+        ts.factory.createBlock(statements, true)
+      ),
+      ...classMembers,
+    ];
+  }
+
+  return classMembers;
+};
+
+/**
+ * Check that a given class declaration should have a `super()` call in its
+ * constructor. This is something we can check by looking for a
+ * {@link ts.HeritageClause} on the class's AST node.
+ *
+ * @param classDeclaration a class declaration AST node
+ * @returns whether this class has parents or not
+ */
+const needsSuper = (classDeclaration: ts.ClassDeclaration): boolean => {
+  const hasHeritageClauses = classDeclaration.heritageClauses && classDeclaration.heritageClauses.length > 0;
+
+  if (hasHeritageClauses) {
+    // A {@link ts.SyntaxKind.HeritageClause} node may be for extending a
+    // superclass _or_ for implementing an interface. We only want to add a
+    // `super()` call to our synthetic constructor here in the case that there
+    // is a superclass, so we can check for that situation by checking for the
+    // presence of a heritage clause with the `.token` property set to
+    // `ts.SyntaxKind.ExtendsKeyword`.
+    return classDeclaration.heritageClauses.some((clause) => clause.token === ts.SyntaxKind.ExtendsKeyword);
+  }
+  return false;
+};
+
+/**
+ * Create a statement with a call to `super()` suitable for including in the body of a constructor.
+ * @returns a {@link ts.ExpressionStatement} node equivalent to `super()`
+ */
+const createConstructorBodyWithSuper = (): ts.ExpressionStatement => {
+  return ts.factory.createExpressionStatement(
+    ts.factory.createCallExpression(ts.factory.createIdentifier('super'), undefined, undefined)
+  );
+};
+
+/**
+ * Check whether a given class element should be rewritten from a class field
+ * to a constructor-initialized value. This is basically the case for fields
+ * decorated with `@Prop` and `@State`. See {@link handleClassFields} for more
+ * details.
+ *
+ * @param member the member to check
+ * @returns whether this should be rewritten or not
+ */
+const shouldInitializeInConstructor = (member: ts.ClassElement): boolean => {
+  const filteredDecorators = filterDecorators(member, CONSTRUCTOR_DEFINED_MEMBER_DECORATORS);
+  if (member.decorators === undefined) {
+    // decorators have already been removed from this element, indicating that
+    // we don't need to do anything
+    return false;
+  }
+  return member.decorators !== filteredDecorators;
 };

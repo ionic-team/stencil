@@ -1,8 +1,9 @@
+import ts from 'typescript';
+
 import type * as d from '../../../declarations';
+import { addCoreRuntimeApi, RUNTIME_APIS } from '../core-runtime-apis';
 import { addCreateEvents } from '../create-event';
 import { addLegacyProps } from '../legacy-props';
-import { RUNTIME_APIS, addCoreRuntimeApi } from '../core-runtime-apis';
-import ts from 'typescript';
 
 export const updateNativeConstructor = (
   classMembers: ts.ClassElement[],
@@ -52,7 +53,7 @@ export const updateNativeConstructor = (
       statements = [createNativeConstructorSuper(), ...statements];
     }
 
-    const cstrMethod = ts.createConstructor(undefined, undefined, undefined, ts.createBlock(statements, true));
+    const cstrMethod = ts.createConstructor(undefined, undefined, undefined, ts.factory.createBlock(statements, true));
     classMembers.unshift(cstrMethod);
   }
 };
@@ -73,7 +74,11 @@ const nativeInit = (moduleFile: d.Module, cmp: d.ComponentCompilerMeta): Readonl
 
 const nativeRegisterHostStatement = () => {
   return ts.createStatement(
-    ts.createCall(ts.createPropertyAccess(ts.createThis(), ts.createIdentifier('__registerHost')), undefined, undefined)
+    ts.factory.createCallExpression(
+      ts.factory.createPropertyAccessExpression(ts.factory.createThis(), ts.factory.createIdentifier('__registerHost')),
+      undefined,
+      undefined
+    )
   );
 };
 
@@ -95,5 +100,7 @@ const nativeAttachShadowStatement = (moduleFile: d.Module): ts.ExpressionStateme
 };
 
 const createNativeConstructorSuper = () => {
-  return ts.createExpressionStatement(ts.createCall(ts.createIdentifier('super'), undefined, undefined));
+  return ts.factory.createExpressionStatement(
+    ts.factory.createCallExpression(ts.factory.createIdentifier('super'), undefined, undefined)
+  );
 };

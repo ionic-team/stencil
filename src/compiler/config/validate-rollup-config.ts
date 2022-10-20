@@ -1,5 +1,6 @@
-import type * as d from '../../declarations';
 import { isObject, pluck } from '@utils';
+
+import type * as d from '../../declarations';
 
 export const validateRollupConfig = (config: d.UnvalidatedConfig): void => {
   const cleanRollupConfig = getCleanRollupConfig(config.rollupConfig);

@@ -1,12 +1,13 @@
-import type * as d from '../declarations';
-import { attachStyles } from './styles';
 import { BUILD, NAMESPACE } from '@app-data';
+import { consoleError, doc, getHostRef, nextTick, plt, win, writeTask } from '@platform';
 import { CMP_FLAGS, HOST_FLAGS } from '@utils';
-import { consoleError, doc, getHostRef, nextTick, plt, writeTask, win } from '@platform';
-import { PLATFORM_FLAGS } from './runtime-constants';
-import { renderVdom } from './vdom/vdom-render';
-import { createTime } from './profile';
+
+import type * as d from '../declarations';
 import { emitEvent } from './event-emitter';
+import { createTime } from './profile';
+import { PLATFORM_FLAGS } from './runtime-constants';
+import { attachStyles } from './styles';
+import { renderVdom } from './vdom/vdom-render';
 
 export const attachToAncestor = (hostRef: d.HostRef, ancestorComponent: d.HostElement) => {
   if (BUILD.asyncLoading && ancestorComponent && !hostRef.$onRenderResolve$ && ancestorComponent['s-p']) {

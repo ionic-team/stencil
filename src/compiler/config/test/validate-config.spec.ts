@@ -1,8 +1,9 @@
 import type * as d from '@stencil/core/declarations';
-import { mockLogger, mockCompilerSystem, mockLoadConfigInit } from '@stencil/core/testing';
+import { mockCompilerSystem, mockLoadConfigInit, mockLogger } from '@stencil/core/testing';
+
 import { createConfigFlags } from '../../../cli/config-flags';
 import { isWatchIgnorePath } from '../../fs-watch/fs-watch-rebuild';
-import { DOCS_JSON, DOCS_CUSTOM, DOCS_README, DOCS_VSCODE } from '../../output-targets/output-utils';
+import { DOCS_CUSTOM, DOCS_JSON, DOCS_README, DOCS_VSCODE } from '../../output-targets/output-utils';
 import { validateConfig } from '../validate-config';
 
 describe('validation', () => {

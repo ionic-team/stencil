@@ -1,8 +1,9 @@
 import type * as d from '@stencil/core/declarations';
 import { mockConfig, mockLoadConfigInit } from '@stencil/core/testing';
+import path from 'path';
+
 import { COPY, DIST_CUSTOM_ELEMENTS, DIST_TYPES } from '../../output-targets/output-utils';
 import { validateConfig } from '../validate-config';
-import path from 'path';
 
 describe('validate-output-dist-custom-element', () => {
   describe('validateCustomElement', () => {

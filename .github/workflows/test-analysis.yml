@@ -11,8 +11,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node: [ '12', '14', '16' ]
-        os: [ 'ubuntu-latest', 'windows-latest' ]
+        node: ['12', '14', '16']
+        os: ['ubuntu-latest', 'windows-latest']
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout Code
@@ -37,3 +37,6 @@ jobs:
       - name: Analysis Tests
         run: npm run test.analysis
         shell: bash
+
+      - name: Check Git Context
+        uses: ./.github/workflows/actions/check-git-context

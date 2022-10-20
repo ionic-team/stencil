@@ -1,5 +1,6 @@
-import type * as d from '../../declarations';
 import { catchError } from '@utils';
+
+import type * as d from '../../declarations';
 import { isOutputTargetCustom } from './output-utils';
 
 export const outputCustom = async (

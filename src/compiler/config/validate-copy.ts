@@ -1,5 +1,6 @@
-import type * as d from '../../declarations';
 import { unique } from '@utils';
+
+import type * as d from '../../declarations';
 
 export const validateCopy = (copy: d.CopyTask[] | boolean, defaultCopy: d.CopyTask[] = []): d.CopyTask[] => {
   if (copy === null || copy === false) {

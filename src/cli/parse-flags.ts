@@ -1,10 +1,12 @@
-import { CompilerSystem, LogLevel, LOG_LEVELS, TaskCommand } from '../declarations';
-import { dashToPascalCase, toDashCase } from '@utils';
+import { dashToPascalCase, readOnlyArrayHasStringMember, toDashCase } from '@utils';
+
+import { CompilerSystem, LOG_LEVELS, LogLevel, TaskCommand } from '../declarations';
 import {
   BOOLEAN_CLI_ARGS,
   BooleanCLIArg,
   CLI_ARG_ALIASES,
   ConfigFlags,
+  createConfigFlags,
   LOG_LEVEL_CLI_ARGS,
   LogCLIArg,
   NUMBER_CLI_ARGS,
@@ -13,7 +15,6 @@ import {
   STRING_NUMBER_CLI_ARGS,
   StringCLIArg,
   StringNumberCLIArg,
-  createConfigFlags,
 } from './config-flags';
 
 /**
@@ -328,9 +329,4 @@ export const parseEqualsArg = (arg: string): [string, string] => {
  * @returns whether this is a `LogLevel`
  */
 const isLogLevel = (maybeLogLevel: string): maybeLogLevel is LogLevel =>
-  // unfortunately `includes` is typed on `ReadonlyArray<T>` as `(el: T):
-  // boolean` so a `string` cannot be passed to `includes` on a
-  // `ReadonlyArray` 😢 thus we `as any`
-  //
-  // see microsoft/TypeScript#31018 for some discussion of this
-  LOG_LEVELS.includes(maybeLogLevel as any);
+  readOnlyArrayHasStringMember(LOG_LEVELS, maybeLogLevel);

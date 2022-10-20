@@ -1,13 +1,13 @@
 import {
-  setQueryString,
-  updateCssUrlValue,
   getHmrHref,
-  isLinkStylesheet,
-  setHmrAttr,
-  isTemplate,
   hasShadowRoot,
   isElement,
+  isLinkStylesheet,
+  isTemplate,
+  setHmrAttr,
   setHmrQueryString,
+  setQueryString,
+  updateCssUrlValue,
 } from './hmr-util';
 
 export const hmrImages = (win: Window, doc: Document, versionId: string, imageFileNames: string[]) => {

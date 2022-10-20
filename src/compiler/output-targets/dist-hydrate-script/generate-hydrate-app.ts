@@ -1,19 +1,20 @@
-import type * as d from '../../../declarations';
-import { bundleHydrateFactory } from './bundle-hydrate-factory';
 import { catchError, createOnWarnFn, generatePreamble, loadRollupDiagnostics } from '@utils';
-import { getBuildFeatures, updateBuildConditionals } from '../../app-core/app-data';
-import { HYDRATE_FACTORY_INTRO, HYDRATE_FACTORY_OUTRO } from './hydrate-factory-closure';
-import { updateToHydrateComponents } from './update-to-hydrate-components';
-import { writeHydrateOutputs } from './write-hydrate-outputs';
+import MagicString from 'magic-string';
+import { join } from 'path';
 import { RollupOptions } from 'rollup';
+import { rollup } from 'rollup';
+
+import type * as d from '../../../declarations';
+import { getBuildFeatures, updateBuildConditionals } from '../../app-core/app-data';
 import {
   STENCIL_HYDRATE_FACTORY_ID,
   STENCIL_INTERNAL_HYDRATE_ID,
   STENCIL_MOCK_DOC_ID,
 } from '../../bundle/entry-alias-ids';
-import MagicString from 'magic-string';
-import { rollup } from 'rollup';
-import { join } from 'path';
+import { bundleHydrateFactory } from './bundle-hydrate-factory';
+import { HYDRATE_FACTORY_INTRO, HYDRATE_FACTORY_OUTRO } from './hydrate-factory-closure';
+import { updateToHydrateComponents } from './update-to-hydrate-components';
+import { writeHydrateOutputs } from './write-hydrate-outputs';
 
 export const generateHydrateApp = async (
   config: d.ValidatedConfig,

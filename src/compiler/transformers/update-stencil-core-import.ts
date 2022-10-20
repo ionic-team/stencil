@@ -1,4 +1,5 @@
 import ts from 'typescript';
+
 import { STENCIL_CORE_ID } from '../bundle/entry-alias-ids';
 
 export const updateStencilCoreImports = (updatedCoreImportPath: string): ts.TransformerFactory<ts.SourceFile> => {

@@ -1,5 +1,6 @@
-import type * as d from '../../../declarations';
 import ts from 'typescript';
+
+import type * as d from '../../../declarations';
 
 export const addNativeElementGetter = (classMembers: ts.ClassElement[], cmp: d.ComponentCompilerMeta) => {
   // @Element() element;
@@ -13,7 +14,7 @@ export const addNativeElementGetter = (classMembers: ts.ClassElement[], cmp: d.C
         cmp.elementRef,
         [],
         undefined,
-        ts.createBlock([ts.createReturn(ts.createThis())])
+        ts.factory.createBlock([ts.createReturn(ts.factory.createThis())])
       )
     );
   }

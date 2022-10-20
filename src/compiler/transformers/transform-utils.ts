@@ -1,7 +1,8 @@
-import type * as d from '../../declarations';
-import { augmentDiagnosticWithNode, buildError, normalizePath } from '@utils';
-import { MEMBER_DECORATORS_TO_REMOVE } from './decorators-to-static/decorators-constants';
+import { augmentDiagnosticWithNode, buildError, normalizePath, readOnlyArrayHasStringMember } from '@utils';
 import ts from 'typescript';
+
+import type * as d from '../../declarations';
+import { MEMBER_DECORATORS_TO_REMOVE } from './decorators-to-static/decorators-constants';
 
 export const getScriptTarget = () => {
   // using a fn so the browser compiler doesn't require the global ts for startup
@@ -48,26 +49,26 @@ export const convertValueToLiteral = (
     refs = new WeakSet();
   }
   if (val === String) {
-    return ts.createIdentifier('String');
+    return ts.factory.createIdentifier('String');
   }
   if (val === Number) {
-    return ts.createIdentifier('Number');
+    return ts.factory.createIdentifier('Number');
   }
   if (val === Boolean) {
-    return ts.createIdentifier('Boolean');
+    return ts.factory.createIdentifier('Boolean');
   }
   if (val === undefined) {
-    return ts.createIdentifier('undefined');
+    return ts.factory.createIdentifier('undefined');
   }
   if (val === null) {
-    return ts.createIdentifier('null');
+    return ts.factory.createIdentifier('null');
   }
   if (Array.isArray(val)) {
     return arrayToArrayLiteral(val, refs);
   }
   if (typeof val === 'object') {
     if ((val as ConvertIdentifier).__identifier && (val as ConvertIdentifier).__escapedText) {
-      return ts.createIdentifier((val as ConvertIdentifier).__escapedText);
+      return ts.factory.createIdentifier((val as ConvertIdentifier).__escapedText);
     }
     return objectToObjectLiteral(val, refs);
   }
@@ -110,49 +111,39 @@ const arrayToArrayLiteral = (list: any[], refs: WeakSet<any>): ts.ArrayLiteralEx
  */
 const objectToObjectLiteral = (obj: { [key: string]: any }, refs: WeakSet<any>): ts.ObjectLiteralExpression => {
   if (refs.has(obj)) {
-    return ts.createIdentifier('undefined') as any;
+    return ts.factory.createIdentifier('undefined') as any;
   }
 
   refs.add(obj);
 
   const newProperties: ts.ObjectLiteralElementLike[] = Object.keys(obj).map((key) => {
-    const prop = ts.createPropertyAssignment(
+    const prop = ts.factory.createPropertyAssignment(
       ts.createLiteral(key),
       convertValueToLiteral(obj[key], refs) as ts.Expression
     );
     return prop;
   });
 
-  return ts.createObjectLiteral(newProperties, true);
+  return ts.factory.createObjectLiteralExpression(newProperties, true);
 };
 
-export const createStaticGetter = (propName: string, returnExpression: ts.Expression) => {
-  return ts.createGetAccessor(
+/**
+ * Create a TypeScript getter declaration AST node corresponding to a
+ * supplied prop name and return value
+ *
+ * @param propName the name of the prop to access
+ * @param returnExpression a TypeScript AST node to return from the getter
+ * @returns an AST node representing a getter
+ */
+export const createStaticGetter = (propName: string, returnExpression: ts.Expression): ts.GetAccessorDeclaration => {
+  return ts.factory.createGetAccessorDeclaration(
     undefined,
-    [ts.createToken(ts.SyntaxKind.StaticKeyword)],
+    [ts.factory.createToken(ts.SyntaxKind.StaticKeyword)],
     propName,
     undefined,
     undefined,
-    ts.createBlock([ts.createReturn(returnExpression)])
+    ts.factory.createBlock([ts.factory.createReturnStatement(returnExpression)])
   );
-};
-
-export const removeDecorators = (node: ts.Node, decoratorNames: Set<string>) => {
-  if (node.decorators) {
-    const updatedDecoratorList = node.decorators.filter((dec) => {
-      const name =
-        ts.isCallExpression(dec.expression) &&
-        ts.isIdentifier(dec.expression.expression) &&
-        dec.expression.expression.text;
-      return !decoratorNames.has(name);
-    });
-    if (updatedDecoratorList.length === 0) {
-      return undefined;
-    } else if (updatedDecoratorList.length !== node.decorators.length) {
-      return ts.createNodeArray(updatedDecoratorList);
-    }
-  }
-  return node.decorators;
 };
 
 export const getStaticValue = (staticMembers: ts.ClassElement[], staticName: string): any => {
@@ -424,7 +415,7 @@ export const validateReferences = (
 ) => {
   Object.keys(references).forEach((refName) => {
     const ref = references[refName];
-    if (ref.path === '@stencil/core' && MEMBER_DECORATORS_TO_REMOVE.has(refName)) {
+    if (ref.path === '@stencil/core' && readOnlyArrayHasStringMember(MEMBER_DECORATORS_TO_REMOVE, refName)) {
       const err = buildError(diagnostics);
       augmentDiagnosticWithNode(err, node);
     }
@@ -747,7 +738,7 @@ export const createRequireStatement = (importFnNames: string[], importPath: stri
         ts.createVariableDeclaration(
           importBinding,
           undefined,
-          ts.createCall(ts.createIdentifier('require'), [], [ts.createLiteral(importPath)])
+          ts.factory.createCallExpression(ts.factory.createIdentifier('require'), [], [ts.createLiteral(importPath)])
         ),
       ],
       ts.NodeFlags.Const

@@ -1,7 +1,8 @@
-import type * as d from '../declarations';
+import { noop } from '@utils';
 import type { Server } from 'http';
 import * as ws from 'ws';
-import { noop } from '@utils';
+
+import type * as d from '../declarations';
 
 export function createWebSocket(
   httpServer: Server,

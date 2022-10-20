@@ -1,10 +1,12 @@
-import type * as d from '../../../declarations';
 import { dirname } from 'path';
+
+import type * as d from '../../../declarations';
+import { InMemoryFileSystem } from '../in-memory-fs';
 import { setPackageVersionByContent } from '../resolve/resolve-utils';
 
 export const writeFetchSuccessSync = (
   sys: d.CompilerSystem,
-  inMemoryFs: d.InMemoryFileSystem,
+  inMemoryFs: InMemoryFileSystem,
   url: string,
   filePath: string,
   content: string,
@@ -36,7 +38,7 @@ export const writeFetchSuccessSync = (
 
 export const writeFetchSuccessAsync = async (
   sys: d.CompilerSystem,
-  inMemoryFs: d.InMemoryFileSystem,
+  inMemoryFs: InMemoryFileSystem,
   url: string,
   filePath: string,
   content: string,

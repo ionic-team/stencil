@@ -44,6 +44,12 @@ export async function compiler(opts: BuildOptions) {
     types: compilerDtsName,
   });
 
+  // copy and edit compiler/sys/in-memory-fs.d.ts
+  let inMemoryFsDts = await fs.readFile(join(inputDir, 'sys', 'in-memory-fs.d.ts'), 'utf8');
+  inMemoryFsDts = inMemoryFsDts.replace('@stencil/core/internal', '../../internal/index');
+  await fs.mkdir(join(opts.output.compilerDir, 'sys'));
+  await fs.writeFile(join(opts.output.compilerDir, 'sys', 'in-memory-fs.d.ts'), inMemoryFsDts);
+
   /**
    * These files are wrap the compiler in an Immediately-Invoked Function Expression (IIFE). The intro contains the
    * first half of the IIFE, and the outro contains the second half. Those files are not valid JavaScript on their own,

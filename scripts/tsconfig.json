@@ -6,8 +6,7 @@
     "forceConsistentCasingInFileNames": true,
     "lib": [
       "dom",
-      "es2017",
-      "esnext.array"
+      "es2019",
     ],
     "module": "commonjs",
     "moduleResolution": "node",

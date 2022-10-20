@@ -1,8 +1,9 @@
-import type * as d from '../../../declarations';
 import { buildError } from '@utils';
+import ts from 'typescript';
+
+import type * as d from '../../../declarations';
 import { createStaticGetter } from '../transform-utils';
 import { isDecoratorNamed } from './decorator-utils';
-import ts from 'typescript';
 
 export const elementDecoratorsToStatic = (
   diagnostics: d.Diagnostic[],

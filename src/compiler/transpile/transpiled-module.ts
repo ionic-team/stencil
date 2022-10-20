@@ -1,6 +1,7 @@
-import type * as d from '../../declarations';
 import { normalizePath } from '@utils';
 import ts from 'typescript';
+
+import type * as d from '../../declarations';
 
 export const getModule = (compilerCtx: d.CompilerCtx, filePath: string) =>
   compilerCtx.moduleMap.get(normalizePath(filePath));

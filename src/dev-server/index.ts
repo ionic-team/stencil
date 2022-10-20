@@ -1,16 +1,17 @@
+import path from 'path';
+
 import type {
   BuildOnEventRemove,
+  CompilerBuildResults,
   CompilerWatcher,
+  DevServer,
   DevServerConfig,
+  DevServerMessage,
+  InitServerProcess,
   Logger,
   StencilDevServerConfig,
-  DevServer,
-  CompilerBuildResults,
-  InitServerProcess,
-  DevServerMessage,
 } from '../declarations';
 import { initServerProcessWorkerProxy } from './server-worker-main';
-import path from 'path';
 
 export function start(stencilDevServerConfig: StencilDevServerConfig, logger: Logger, watcher?: CompilerWatcher) {
   return new Promise<DevServer>(async (resolve, reject) => {

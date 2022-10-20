@@ -1,8 +1,9 @@
-import type * as d from '../../declarations';
-import { buildWarn } from '../message-utils';
-import { isString, toTitleCase } from '../helpers';
-import { splitLineBreaks } from './logger-utils';
 import type { RollupError } from 'rollup';
+
+import type * as d from '../../declarations';
+import { isString, toTitleCase } from '../helpers';
+import { buildWarn } from '../message-utils';
+import { splitLineBreaks } from './logger-utils';
 
 export const loadRollupDiagnostics = (
   config: d.Config,

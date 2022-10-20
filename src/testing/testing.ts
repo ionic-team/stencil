@@ -1,21 +1,22 @@
+import { start } from '@stencil/core/dev-server';
 import type {
-  CompilerBuildResults,
   Compiler,
+  CompilerBuildResults,
   CompilerWatcher,
   DevServer,
   E2EProcessEnv,
-  ValidatedConfig,
   OutputTargetWww,
   Testing,
   TestingRunOptions,
+  ValidatedConfig,
 } from '@stencil/core/internal';
-import { getAppScriptUrl, getAppStyleUrl } from './testing-utils';
 import { hasError } from '@utils';
+import type * as puppeteer from 'puppeteer';
+
 import { runJest } from './jest/jest-runner';
 import { runJestScreenshot } from './jest/jest-screenshot';
 import { startPuppeteerBrowser } from './puppeteer/puppeteer-browser';
-import { start } from '@stencil/core/dev-server';
-import type * as puppeteer from 'puppeteer';
+import { getAppScriptUrl, getAppStyleUrl } from './testing-utils';
 
 export const createTesting = async (config: ValidatedConfig): Promise<Testing> => {
   config = setupTestingConfig(config);
@@ -41,7 +42,8 @@ export const createTesting = async (config: ValidatedConfig): Promise<Testing> =
         return false;
       }
 
-      env = process.env;
+      // during E2E tests, we can safely assume that the current environment is a `E2EProcessEnv`
+      env = process.env as E2EProcessEnv;
 
       if (opts.e2e) {
         msg.push('e2e');

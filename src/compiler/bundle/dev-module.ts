@@ -1,13 +1,15 @@
-import type * as d from '../../declarations';
-import { basename, dirname, join, relative } from 'path';
-import { BuildContext } from '../build/build-ctx';
-import { getRollupOptions } from './bundle-output';
-import { OutputOptions, PartialResolvedId, rollup } from 'rollup';
 import { generatePreamble } from '@utils';
+import { basename, dirname, join, relative } from 'path';
+import { OutputOptions, PartialResolvedId, rollup } from 'rollup';
+
+import type * as d from '../../declarations';
+import { BuildContext } from '../build/build-ctx';
+import { InMemoryFileSystem } from '../sys/in-memory-fs';
+import { getRollupOptions } from './bundle-output';
 
 export const devNodeModuleResolveId = async (
   config: d.Config,
-  inMemoryFs: d.InMemoryFileSystem,
+  inMemoryFs: InMemoryFileSystem,
   resolvedId: PartialResolvedId,
   importee: string
 ) => {

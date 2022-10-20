@@ -1,19 +1,20 @@
-import type * as d from '../../declarations';
+import { isRemoteUrl, normalizeFsPath, normalizePath } from '@utils';
 import { dirname, join } from 'path';
+import type { Plugin } from 'rollup';
+
+import type * as d from '../../declarations';
+import { HYDRATED_CSS } from '../../runtime/runtime-constants';
 import { fetchModuleAsync } from '../sys/fetch/fetch-module-async';
 import { getStencilModuleUrl, packageVersions } from '../sys/fetch/fetch-utils';
-import { HYDRATED_CSS } from '../../runtime/runtime-constants';
-import { isRemoteUrl, normalizePath, normalizeFsPath } from '@utils';
 import {
   APP_DATA_CONDITIONAL,
   STENCIL_CORE_ID,
-  STENCIL_INTERNAL_ID,
   STENCIL_INTERNAL_CLIENT_ID,
   STENCIL_INTERNAL_CLIENT_PATCH_BROWSER_ID,
   STENCIL_INTERNAL_CLIENT_PATCH_ESM_ID,
   STENCIL_INTERNAL_HYDRATE_ID,
+  STENCIL_INTERNAL_ID,
 } from './entry-alias-ids';
-import type { Plugin } from 'rollup';
 
 export const coreResolvePlugin = (
   config: d.Config,
@@ -49,7 +50,7 @@ export const coreResolvePlugin = (
       }
       if (id === STENCIL_INTERNAL_CLIENT_ID) {
         if (externalRuntime) {
-          // not bunding the client runtime and the user's component together this
+          // not bundling the client runtime and the user's component together this
           // must be the custom elements build, where @stencil/core/internal/client
           // is an import, rather than bundling
           return {

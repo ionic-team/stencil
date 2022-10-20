@@ -1,17 +1,18 @@
 import { path } from '@stencil/core/compiler';
 import {
-  mockCompilerSystem,
   mockBuildCtx,
   mockCompilerCtx,
+  mockCompilerSystem,
   mockModule,
   mockValidatedConfig,
 } from '@stencil/core/testing';
+import { join, relative } from 'path';
+
 import type * as d from '../../../declarations';
-import * as outputCustomElementsMod from '../dist-custom-elements';
 import { stubComponentCompilerMeta } from '../../types/tests/ComponentCompilerMeta.stub';
+import * as outputCustomElementsMod from '../dist-custom-elements';
 import { generateCustomElementsTypes } from '../dist-custom-elements/custom-elements-types';
 import { DIST_CUSTOM_ELEMENTS } from '../output-utils';
-import { join, relative } from 'path';
 
 const setup = () => {
   const sys = mockCompilerSystem();
@@ -93,7 +94,7 @@ describe('Custom Elements Typedef generation', () => {
       '',
     ].join('\n');
 
-    expect(compilerCtx.fs.writeFile).toBeCalledWith(join('my-best-dir', 'index.d.ts'), expectedTypedefOutput, {
+    expect(compilerCtx.fs.writeFile).toHaveBeenCalledWith(join('my-best-dir', 'index.d.ts'), expectedTypedefOutput, {
       outputTargetType: DIST_CUSTOM_ELEMENTS,
     });
 

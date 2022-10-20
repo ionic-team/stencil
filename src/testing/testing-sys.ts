@@ -1,7 +1,8 @@
 import type { CompilerSystem } from '@stencil/core/internal';
-import { createSystem } from '../compiler/sys/stencil-sys';
 import { createHash } from 'crypto';
 import path from 'path';
+
+import { createSystem } from '../compiler/sys/stencil-sys';
 
 export interface TestingSystem extends CompilerSystem {
   diskReads: number;

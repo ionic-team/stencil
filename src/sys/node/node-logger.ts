@@ -1,7 +1,8 @@
-import { Logger } from '../../declarations';
-import { createTerminalLogger, TerminalLoggerSys } from '../../compiler/sys/logger/terminal-logger';
 import fs from 'graceful-fs';
 import path from 'path';
+
+import { createTerminalLogger, TerminalLoggerSys } from '../../compiler/sys/logger/terminal-logger';
+import { Logger } from '../../declarations';
 
 /**
  * Create a logger to run in a Node environment

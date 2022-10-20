@@ -1,8 +1,9 @@
-import type * as d from '../../../declarations';
-import { createSystem } from '../../../compiler/sys/stencil-sys';
-import { loadConfig } from '../load-config';
-import path from 'path';
 import { mockLoadConfigInit } from '@stencil/core/testing';
+import path from 'path';
+
+import { createSystem } from '../../../compiler/sys/stencil-sys';
+import type * as d from '../../../declarations';
+import { loadConfig } from '../load-config';
 
 describe('stencil config - sourceMap option', () => {
   const configPath = require.resolve('./fixtures/stencil.config.ts');

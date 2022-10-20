@@ -1,9 +1,10 @@
-import type { Logger, PackageJsonData } from '../../declarations';
 import { isString, noop } from '@utils';
 import fs from 'graceful-fs';
+import { tmpdir } from 'os';
 import path from 'path';
 import semverLt from 'semver/functions/lt';
-import { tmpdir } from 'os';
+
+import type { Logger, PackageJsonData } from '../../declarations';
 
 const REGISTRY_URL = `https://registry.npmjs.org/@stencil/core`;
 const CHECK_INTERVAL = 1000 * 60 * 60 * 24 * 7;

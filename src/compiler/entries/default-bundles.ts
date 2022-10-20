@@ -1,5 +1,6 @@
-import type * as d from '../../declarations';
 import { buildError, buildWarn, flatOne, unique, validateComponentTag } from '@utils';
+
+import type * as d from '../../declarations';
 import { getUsedComponents } from '../html/used-components';
 
 /**

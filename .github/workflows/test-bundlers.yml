@@ -26,3 +26,6 @@ jobs:
       - name: Bundler Tests
         run: npm run test.bundlers
         shell: bash
+
+      - name: Check Git Context
+        uses: ./.github/workflows/actions/check-git-context

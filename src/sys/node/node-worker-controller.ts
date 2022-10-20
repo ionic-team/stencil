@@ -1,8 +1,9 @@
-import type * as d from '../../declarations';
-import { EventEmitter } from 'events';
 import { TASK_CANCELED_MSG } from '@utils';
-import { NodeWorkerMain } from './node-worker-main';
+import { EventEmitter } from 'events';
 import { cpus } from 'os';
+
+import type * as d from '../../declarations';
+import { NodeWorkerMain } from './node-worker-main';
 
 export class NodeWorkerController extends EventEmitter implements d.WorkerMainController {
   workerIds = 0;

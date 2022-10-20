@@ -1,6 +1,7 @@
-import type * as d from '../../../declarations';
-import { GET_ELEMENT, RUNTIME_APIS, addCoreRuntimeApi } from '../core-runtime-apis';
 import ts from 'typescript';
+
+import type * as d from '../../../declarations';
+import { addCoreRuntimeApi, GET_ELEMENT, RUNTIME_APIS } from '../core-runtime-apis';
 
 export const addLazyElementGetter = (
   classMembers: ts.ClassElement[],
@@ -20,7 +21,13 @@ export const addLazyElementGetter = (
         cmp.elementRef,
         [],
         undefined,
-        ts.createBlock([ts.createReturn(ts.createCall(ts.createIdentifier(GET_ELEMENT), undefined, [ts.createThis()]))])
+        ts.factory.createBlock([
+          ts.createReturn(
+            ts.factory.createCallExpression(ts.factory.createIdentifier(GET_ELEMENT), undefined, [
+              ts.factory.createThis(),
+            ])
+          ),
+        ])
       )
     );
   }
