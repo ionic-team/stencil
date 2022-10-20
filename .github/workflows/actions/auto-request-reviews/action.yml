@@ -2,7 +2,7 @@ name: Auto Request Review
 
 runs:
   using: 'node16'
-  main: '.github/workflows/actions/auto-request-reviews/index.js'
+  main: './.github/workflows/actions/auto-request-reviews/index.js'
 with:
   token: ${{ secrets.GITHUB_TOKEN }}
 # on:
