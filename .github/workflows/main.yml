@@ -14,6 +14,10 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  assign_job:
+    name: PR assign
+    uses: ./.github/workflows/actions/auto-request-reviews/action.yml
+
   build_core:
     name: Build
     uses: ./.github/workflows/build.yml

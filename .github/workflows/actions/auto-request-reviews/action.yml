@@ -1,8 +1,13 @@
 name: Auto Request Review
 
+# on:
+#   pull_request:
+#     types: [opened, ready_for_review, reopened]
+#     branches:
+#       - '**'
+
 on:
-  pull_request:
-    types: [opened, ready_for_review, reopened]
+  workflow_call:
 
 jobs:
   auto-request-review:
