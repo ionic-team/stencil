@@ -1,8 +1,13 @@
 name: Auto Request Review
 
+inputs:
+  token:
+    description: 'GitHub token'
+    required: true
+
 runs:
   using: 'node16'
-  main: './.github/workflows/actions/auto-request-reviews/index.js'
+  main: 'index.js'
 # on:
 #   pull_request:
 #     types: [opened, ready_for_review, reopened]
