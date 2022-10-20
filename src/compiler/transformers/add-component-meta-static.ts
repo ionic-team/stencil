@@ -1,7 +1,7 @@
 import ts from 'typescript';
 
 import type * as d from '../../declarations';
-import { convertValueToLiteral, createStaticGetter } from './transform-utils';
+import { convertValueToLiteral, createStaticGetter, retrieveModifierLike } from './transform-utils';
 
 /**
  * Update an instance of TypeScript's Intermediate Representation (IR) for a
@@ -24,8 +24,7 @@ export const addComponentMetaStatic = (
 
   return ts.factory.updateClassDeclaration(
     cmpNode,
-    cmpNode.decorators,
-    cmpNode.modifiers,
+    retrieveModifierLike(cmpNode),
     cmpNode.name,
     cmpNode.typeParameters,
     cmpNode.heritageClauses,

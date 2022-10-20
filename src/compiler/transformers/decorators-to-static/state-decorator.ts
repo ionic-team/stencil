@@ -1,6 +1,6 @@
 import ts from 'typescript';
 
-import { createStaticGetter } from '../transform-utils';
+import { createStaticGetter, retrieveTsDecorators } from '../transform-utils';
 import { isDecoratorNamed } from './decorator-utils';
 
 /**
@@ -22,7 +22,7 @@ export const stateDecoratorsToStatic = (
   const states = decoratedProps
     .filter(ts.isPropertyDeclaration)
     .map((prop) => stateDecoratorToStatic(prop, watchable))
-    .filter((state) => !!state);
+    .filter((state): state is ts.PropertyAssignment => !!state);
 
   if (states.length > 0) {
     newMembers.push(createStaticGetter('states', ts.factory.createObjectLiteralExpression(states, true)));
@@ -43,7 +43,7 @@ export const stateDecoratorsToStatic = (
  * prop to an empty object
  */
 const stateDecoratorToStatic = (prop: ts.PropertyDeclaration, watchable: Set<string>): ts.PropertyAssignment | null => {
-  const stateDecorator = prop.decorators.find(isDecoratorNamed('State'));
+  const stateDecorator = retrieveTsDecorators(prop)?.find(isDecoratorNamed('State'));
   if (stateDecorator == null) {
     return null;
   }

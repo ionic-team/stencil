@@ -2,6 +2,7 @@ import { augmentDiagnosticWithNode, buildError } from '@utils';
 import ts from 'typescript';
 
 import type * as d from '../../../declarations';
+import { retrieveTsDecorators, retrieveTsModifiers } from '../transform-utils';
 import { componentDecoratorToStatic } from './component-decorator';
 import { isDecoratorNamed } from './decorator-utils';
 import {
@@ -42,19 +43,13 @@ const visitClassDeclaration = (
   typeChecker: ts.TypeChecker,
   classNode: ts.ClassDeclaration
 ) => {
-  if (!classNode.decorators) {
-    return classNode;
-  }
-
-  const componentDecorator = classNode.decorators.find(isDecoratorNamed('Component'));
+  const componentDecorator = retrieveTsDecorators(classNode)?.find(isDecoratorNamed('Component'));
   if (!componentDecorator) {
     return classNode;
   }
 
   const classMembers = classNode.members;
-  const decoratedMembers = classMembers.filter(
-    (member) => Array.isArray(member.decorators) && member.decorators.length > 0
-  );
+  const decoratedMembers = classMembers.filter((member) => (retrieveTsDecorators(member)?.length ?? 0) > 0);
 
   // create an array of all class members which are _not_ methods decorated
   // with a Stencil decorator. We do this here because we'll implement the
@@ -84,10 +79,13 @@ const visitClassDeclaration = (
 
   validateMethods(diagnostics, classMembers);
 
+  const currentDecorators = retrieveTsDecorators(classNode);
   return ts.factory.updateClassDeclaration(
     classNode,
-    filterDecorators(classNode.decorators, CLASS_DECORATORS_TO_REMOVE),
-    classNode.modifiers,
+    [
+      ...(filterDecorators(currentDecorators, CLASS_DECORATORS_TO_REMOVE) ?? []),
+      ...(retrieveTsModifiers(classNode) ?? []),
+    ],
     classNode.name,
     classNode.typeParameters,
     classNode.heritageClauses,
@@ -116,15 +114,14 @@ const removeStencilMethodDecorators = (
   diagnostics: d.Diagnostic[]
 ): ts.ClassElement[] => {
   return classMembers.map((member) => {
-    const currentDecorators = member.decorators;
-    const newDecorators = filterDecorators(member.decorators, MEMBER_DECORATORS_TO_REMOVE);
+    const currentDecorators = retrieveTsDecorators(member);
+    const newDecorators = filterDecorators(currentDecorators, MEMBER_DECORATORS_TO_REMOVE);
 
     if (currentDecorators !== newDecorators) {
       if (ts.isMethodDeclaration(member)) {
         return ts.factory.updateMethodDeclaration(
           member,
-          newDecorators,
-          member.modifiers,
+          [...(newDecorators ?? []), ...(retrieveTsModifiers(member) ?? [])],
           member.asteriskToken,
           member.name,
           member.questionToken,
@@ -143,10 +140,10 @@ const removeStencilMethodDecorators = (
           return member;
         } else {
           // update the property to remove decorators
+          const modifiers = retrieveTsModifiers(member);
           return ts.factory.updatePropertyDeclaration(
             member,
-            newDecorators,
-            member.modifiers,
+            [...(newDecorators ?? []), ...(modifiers ?? [])],
             member.name,
             member.questionToken,
             member.type,
@@ -173,9 +170,9 @@ const removeStencilMethodDecorators = (
  * - the node contains only decorators in the provided list
  */
 export const filterDecorators = (
-  decorators: ts.NodeArray<ts.Decorator>,
+  decorators: ReadonlyArray<ts.Decorator> | undefined,
   excludeList: ReadonlyArray<string>
-): ts.NodeArray<ts.Decorator> | undefined => {
+): ReadonlyArray<ts.Decorator> | undefined => {
   if (decorators) {
     const updatedDecoratorList = decorators.filter((dec) => {
       // narrow the type of the syntax tree node, while retrieving the text of the identifier
@@ -196,6 +193,7 @@ export const filterDecorators = (
       return ts.factory.createNodeArray(updatedDecoratorList);
     }
   }
+
   // return the node's original decorators, or undefined
   return decorators;
 };
@@ -401,8 +399,7 @@ export const updateConstructor = (
 
     classMembers[constructorIndex] = ts.factory.updateConstructorDeclaration(
       constructorMethod,
-      constructorMethod.decorators,
-      constructorMethod.modifiers,
+      retrieveTsModifiers(constructorMethod),
       constructorMethod.parameters,
       ts.factory.updateBlock(constructorMethod?.body ?? ts.factory.createBlock([]), statements)
     );
@@ -414,7 +411,7 @@ export const updateConstructor = (
     }
 
     classMembers = [
-      ts.factory.createConstructorDeclaration(undefined, undefined, [], ts.factory.createBlock(statements, true)),
+      ts.factory.createConstructorDeclaration(undefined, [], ts.factory.createBlock(statements, true)),
       ...classMembers,
     ];
   }
@@ -465,11 +462,12 @@ const createConstructorBodyWithSuper = (): ts.ExpressionStatement => {
  * @returns whether this should be rewritten or not
  */
 const shouldInitializeInConstructor = (member: ts.ClassElement): boolean => {
-  const filteredDecorators = filterDecorators(member.decorators, CONSTRUCTOR_DEFINED_MEMBER_DECORATORS);
-  if (member.decorators === undefined) {
+  const currentDecorators = retrieveTsDecorators(member);
+  if (currentDecorators === undefined) {
     // decorators have already been removed from this element, indicating that
     // we don't need to do anything
     return false;
   }
-  return member.decorators !== filteredDecorators;
+  const filteredDecorators = filterDecorators(currentDecorators, CONSTRUCTOR_DEFINED_MEMBER_DECORATORS);
+  return currentDecorators !== filteredDecorators;
 };
