@@ -5,7 +5,6 @@ const ORG = 'ionic-team';
 const STENCIL_TEAM_SLUG = 'stencil';
 
 try {
-  core.get;
   const token = core.getInput('token');
   const octokit = github.getOctokit(token);
 
