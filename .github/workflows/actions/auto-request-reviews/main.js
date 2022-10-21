@@ -6,11 +6,12 @@ async function run() {
   const octokit = github.getOctokit(token);
 
   const organization = core.getInput('org');
+  const teamSlug = core.getInput('team');
 
   // PR author
   const username = github.context.payload.pull_request.user.login;
 
-  const { data } = await octokit.rest.orgs.getMembershipForUser({
+  const { data } = await octokit.rest.orgs.listMembers({
     org: organization,
   });
 
@@ -32,12 +33,10 @@ async function run() {
     console.log('STENCIL MEMBERS', stencilTeamMembers);
     const reviewers = stencilTeamMembers.filter((ref) => ref.login !== username);
 
-    // Assign reviewers
     await octokit.rest.pulls.requestReviewers({
       owner: github.context.repo.owner,
       repo: github.context.repo.repo,
       pull_number: github.context.payload.number,
-      team_reviewers: teamReviewers,
       reviewers,
     });
   }
