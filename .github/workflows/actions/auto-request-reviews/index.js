@@ -9730,6 +9730,8 @@ async function run() {
     org: organization,
   });
 
+  console.log('USERS', data);
+
   const member = data.find((member) => member.login === username);
 
   console.log('member', member);
