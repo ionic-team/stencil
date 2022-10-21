@@ -1,6 +1,7 @@
 {
   "extends": "./tsconfig-base.json",
   "references": [
+    { "path": "src/compiler/sys/environment" }
   ],
   "files": [
     "src/cli/public.ts",

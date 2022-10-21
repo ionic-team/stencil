@@ -51,7 +51,7 @@ export function aliasPlugin(opts: BuildOptions): Plugin {
         return join(opts.buildDir, 'utils', 'index.js');
       }
       if (id === '@environment') {
-        return join(opts.buildDir, 'compiler', 'sys', 'environment.js');
+        return join(opts.buildDir, 'compiler', 'sys', 'environment', 'index.js');
       }
       if (helperResolvers.has(id)) {
         return join(opts.bundleHelpersDir, `${id}.js`);

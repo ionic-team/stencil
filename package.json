@@ -52,9 +52,9 @@
     "test.watch": "jest --watch",
     "test.watch-all": "jest --watchAll --coverage",
     "tsc": "tsc --incremental",
-    "tsc.prod": "tsc",
+    "tsc.prod": "tsc --build --force",
     "tsc.scripts": "tsc -p scripts/tsconfig.json",
-    "tsc.watch": "tsc --incremental --watch"
+    "tsc.watch": "tsc --incremental --watch --build"
   },
   "devDependencies": {
     "@ionic/prettier-config": "^2.0.0",
