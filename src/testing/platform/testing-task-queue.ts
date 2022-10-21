@@ -1,6 +1,6 @@
 import type * as d from '@stencil/core/internal';
-import { QueuedLoadModule } from './load-module'
 
+import { QueuedLoadModule } from './load-module'
 import {
   caughtErrors,
   moduleLoaded,
