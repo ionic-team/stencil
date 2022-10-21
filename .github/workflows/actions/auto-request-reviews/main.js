@@ -14,7 +14,7 @@ async function run() {
   console.log('PAYLOAD', github.context.payload);
 
   // PR author
-  const username = github.context.payload.user.login;
+  const username = github.context.payload.pull_request.user.login;
 
   // Determine if the author is an organization member
   const isInternalMember = await octokit.rest.teams.getMembershipForUserInOrg({
