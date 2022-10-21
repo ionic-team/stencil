@@ -14,23 +14,15 @@ async function run() {
   // PR author
   const username = github.context.payload.pull_request.user.login;
 
-  const res = await octokit.rest.orgs.listMembers({
+  const { data } = await octokit.rest.orgs.listMembers({
     org: organization,
   });
 
-  console.log('TEMP', res);
-
-  // Determine if the author is an organization member
-  const isInternalMember = await octokit.rest.orgs.getMembershipForUser({
-    org: organization,
-    username,
-  });
-
-  console.log('IS INTERNAL', isInternalMember);
+  const member = data.find((member) => member.login === username);
 
   // If the user is a member of the org, we will directly assign the members of the Stencil team
   // Otherwise, we will assign the team itself as a reviewer
-  if (!!isInternalMember && isInternalMember.data.state === 'active') {
+  if (!!member) {
     const stencilTeamMembers = await octokit.rest.teams.listMembersInOrg({
       org: organization,
       // Adding the team will only return the members in the org
