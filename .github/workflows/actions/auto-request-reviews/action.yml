@@ -13,7 +13,7 @@ inputs:
 
 runs:
   using: 'node16'
-  main: 'action/index.js'
+  main: 'index.js'
 # on:
 #   pull_request:
 #     types: [opened, ready_for_review, reopened]

@@ -55,7 +55,7 @@
     "tsc.prod": "tsc",
     "tsc.scripts": "tsc -p scripts/tsconfig.json",
     "tsc.watch": "tsc --incremental --watch",
-    "build.action": "ncc build ./.github/workflows/actions/auto-request-reviews/index.js -o action"
+    "build.action": "ncc build ./.github/workflows/actions/auto-request-reviews/main.js -o .github/workflows/actions/auto-request-reviews"
   },
   "devDependencies": {
     "@ionic/prettier-config": "^2.0.0",
