@@ -17,7 +17,6 @@ const entryDeps = [
   'glob',
   'graceful-fs',
   'is-extglob',
-  'merge-source-map',
   'minimatch',
   'node-fetch',
   'open',

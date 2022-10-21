@@ -1,5 +1,6 @@
 import { getSourceMappingUrlForEndOfFile } from '@utils';
 import { join } from 'path';
+import { RawSourceMap } from 'source-map';
 
 import type * as d from '../../../declarations';
 
@@ -11,7 +12,7 @@ export const writeLazyModule = async (
   entryModule: d.EntryModule,
   shouldHash: boolean,
   code: string,
-  sourceMap: d.SourceMap,
+  sourceMap: RawSourceMap,
   sufix: string
 ): Promise<d.BundleModuleOutput> => {
   // code = replaceStylePlaceholders(entryModule.cmps, modeName, code);

@@ -1,13 +1,12 @@
 import type { SourceMap as RollupSourceMap } from 'rollup';
-
-import type * as d from '../declarations';
+import type { RawSourceMap } from 'source-map';
 
 /**
  * Converts a rollup provided source map to one that Stencil can easily understand
  * @param rollupSourceMap the sourcemap to transform
  * @returns the transformed sourcemap
  */
-export const rollupToStencilSourceMap = (rollupSourceMap: RollupSourceMap | undefined): d.SourceMap => {
+export const rollupToStencilSourceMap = (rollupSourceMap: RollupSourceMap | undefined): RawSourceMap => {
   if (!rollupSourceMap) {
     return null;
   }

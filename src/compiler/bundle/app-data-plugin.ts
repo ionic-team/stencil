@@ -2,6 +2,7 @@ import { createJsVarName, isString, loadTypeScriptDiagnostics, normalizePath } f
 import MagicString from 'magic-string';
 import { basename } from 'path';
 import type { LoadResult, Plugin, ResolveIdResult, TransformResult } from 'rollup';
+import { RawSourceMap } from 'source-map';
 import ts from 'typescript';
 
 import type * as d from '../../declarations';
@@ -82,7 +83,7 @@ export const appDataPlugin = (
         };
       }
 
-      const sourceMap: d.SourceMap = JSON.parse(module.sourceMapFileText);
+      const sourceMap: RawSourceMap = JSON.parse(module.sourceMapFileText);
       sourceMap.sources = sourceMap.sources.map((src) => basename(src));
       return { code: module.staticSourceFileText, map: sourceMap };
     },

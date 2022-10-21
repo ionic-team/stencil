@@ -1,3 +1,5 @@
+import { RawSourceMap } from 'source-map';
+
 import type { InMemoryFileSystem } from '../compiler/sys/in-memory-fs';
 import type {
   BuildEvents,
@@ -31,16 +33,6 @@ import type {
   VNode,
   VNodeData,
 } from './stencil-public-runtime';
-
-export interface SourceMap {
-  file: string;
-  mappings: string;
-  names: string[];
-  sourceRoot?: string;
-  sources: string[];
-  sourcesContent?: string[];
-  version: number;
-}
 
 export interface PrintLine {
   lineIndex: number;
@@ -433,7 +425,7 @@ export interface RollupSourceMap {
 export type OptimizeJsResult = {
   output: string;
   diagnostics: Diagnostic[];
-  sourceMap?: SourceMap;
+  sourceMap?: RawSourceMap;
 };
 
 export interface BundleModule {
@@ -2477,7 +2469,7 @@ export interface CompilerWorkerContext {
     minifyOpts: any,
     transpile: boolean,
     inlineHelpers: boolean
-  ): Promise<{ output: string; diagnostics: Diagnostic[]; sourceMap?: SourceMap }>;
+  ): Promise<{ output: string; diagnostics: Diagnostic[]; sourceMap?: RawSourceMap }>;
   prerenderWorker(prerenderRequest: PrerenderUrlRequest): Promise<PrerenderUrlResults>;
   transformCssToEsm(input: TransformCssToEsmInput): Promise<TransformCssToEsmOutput>;
 }

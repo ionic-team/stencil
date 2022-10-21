@@ -1,6 +1,7 @@
 import { isString, normalizeFsPath } from '@utils';
 import { basename, isAbsolute } from 'path';
 import type { LoadResult, Plugin, TransformResult } from 'rollup';
+import { RawSourceMap } from 'source-map';
 import ts from 'typescript';
 
 import type * as d from '../../declarations';
@@ -35,7 +36,7 @@ export const typescriptPlugin = (compilerCtx: d.CompilerCtx, bundleOpts: BundleO
             return { code: module.staticSourceFileText, map: null };
           }
 
-          const sourceMap: d.SourceMap = JSON.parse(module.sourceMapFileText);
+          const sourceMap: RawSourceMap = JSON.parse(module.sourceMapFileText);
           sourceMap.sources = sourceMap.sources.map((src) => basename(src));
           return { code: module.staticSourceFileText, map: sourceMap };
         }
@@ -59,7 +60,7 @@ export const typescriptPlugin = (compilerCtx: d.CompilerCtx, bundleOpts: BundleO
             fileName: mod.sourceFilePath,
             transformers: { before: bundleOpts.customTransformers },
           });
-          const sourceMap: d.SourceMap = tsResult.sourceMapText ? JSON.parse(tsResult.sourceMapText) : null;
+          const sourceMap: RawSourceMap = tsResult.sourceMapText ? JSON.parse(tsResult.sourceMapText) : null;
           return { code: tsResult.outputText, map: sourceMap };
         }
       }

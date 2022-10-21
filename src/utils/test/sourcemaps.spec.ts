@@ -5,8 +5,7 @@ import {
   rollupToStencilSourceMap,
 } from '@utils';
 import { SourceMap as RollupSourceMap } from 'rollup';
-
-import type * as d from '../../declarations';
+import { RawSourceMap } from 'source-map';
 
 describe('sourcemaps', () => {
   describe('rollupToStencilSourceMap', () => {
@@ -32,9 +31,9 @@ describe('sourcemaps', () => {
         toUrl: () => 'stub',
       };
 
-      const stencilSourceMap: d.SourceMap = rollupToStencilSourceMap(rollupSourceMap);
+      const stencilSourceMap: RawSourceMap = rollupToStencilSourceMap(rollupSourceMap);
 
-      const expectedSourceMap: d.SourceMap = {
+      const expectedSourceMap: RawSourceMap = {
         file: 'index.js',
         mappings: ';;AAAA;AAC9D,GAAG,CAAC,CAAC;AACL;;;;',
         names: ['bootstrapLazy'],

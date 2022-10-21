@@ -1,14 +1,14 @@
-import sourceMapMerge from 'merge-source-map';
+import { RawSourceMap, SourceMapConsumer, SourceMapGenerator } from 'source-map';
 import type { CompressOptions, MangleOptions, MinifyOptions, SourceMapOptions } from 'terser';
 import ts from 'typescript';
 
-import type { CompilerCtx, Config, OptimizeJsResult, SourceMap, SourceTarget } from '../../declarations';
+import type { CompilerCtx, Config, OptimizeJsResult, SourceTarget } from '../../declarations';
 import { minfyJsId } from '../../version';
 import { minifyJs } from './minify-js';
 
 interface OptimizeModuleOptions {
   input: string;
-  sourceMap?: SourceMap;
+  sourceMap?: RawSourceMap;
   sourceTarget?: SourceTarget;
   isCore?: boolean;
   minify?: boolean;
@@ -202,8 +202,8 @@ export const prepareModule = async (
 
     if (tsResults.sourceMapText) {
       // need to merge sourcemaps at this point
-      const mergeMap = sourceMapMerge(
-        (minifyOpts.sourceMap as SourceMapOptions)?.content as SourceMap,
+      const mergeMap = await mergeSourceMaps(
+        (minifyOpts.sourceMap as SourceMapOptions)?.content as RawSourceMap,
         JSON.parse(tsResults.sourceMapText)
       );
       minifyOpts.sourceMap = { content: mergeMap };
@@ -216,3 +216,64 @@ export const prepareModule = async (
 
   return results;
 };
+
+/**
+ * Merge old and new source maps into one new one.
+ *
+ * If old or new source map value is falsy, return the other as-is.
+ *
+ * Based on the implementation of `merge-source-map`, see:
+ * https://github.com/keik/merge-source-map/blob/master/index.js
+ *
+ * @param oldMap old source map object
+ * @param newMap new source map object
+ * @returns a source map with the new merged into the old
+ */
+async function mergeSourceMaps(oldMap?: RawSourceMap, newMap?: RawSourceMap): Promise<RawSourceMap> {
+  if (!oldMap) return newMap;
+  if (!newMap) return oldMap;
+
+  const oldMapConsumer = await new SourceMapConsumer(oldMap);
+  const newMapConsumer = await new SourceMapConsumer(newMap);
+  const mergedMapGenerator = new SourceMapGenerator();
+
+  // iterate on new map and overwrite original position of new map with one of old map
+  newMapConsumer.eachMapping((mappingItem) => {
+    // pass when `originalLine` is null.
+    // It occurs in case that the node does not have origin in original code.
+    if (mappingItem.originalLine == null) return;
+
+    const origPosInOldMap = oldMapConsumer.originalPositionFor({
+      line: mappingItem.originalLine,
+      column: mappingItem.originalColumn,
+    });
+
+    if (origPosInOldMap.source == null) return;
+
+    mergedMapGenerator.addMapping({
+      original: {
+        line: origPosInOldMap.line,
+        column: origPosInOldMap.column,
+      },
+      generated: {
+        line: mappingItem.generatedLine,
+        column: mappingItem.generatedColumn,
+      },
+      source: origPosInOldMap.source,
+      name: origPosInOldMap.name,
+    });
+  });
+
+  const consumers = [oldMapConsumer, newMapConsumer];
+
+  consumers.forEach(function (consumer) {
+    consumer.sources.forEach(function (sourceFile) {
+      const sourceContent = consumer.sourceContentFor(sourceFile);
+      if (sourceContent != null) {
+        mergedMapGenerator.setSourceContent(sourceFile, sourceContent);
+      }
+    });
+  });
+
+  return JSON.parse(mergedMapGenerator.toString());
+}
