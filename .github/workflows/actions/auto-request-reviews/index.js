@@ -9726,9 +9726,8 @@ async function run() {
   // PR author
   const username = github.context.payload.pull_request.user.login;
 
-  const res = await octokit.rest.orgs.checkMembershipForUser({
+  const res = await octokit.rest.orgs.listMembers({
     org: organization,
-    username,
   });
 
   console.log('TEMP', res);
