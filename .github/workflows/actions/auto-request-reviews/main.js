@@ -20,9 +20,11 @@ async function run() {
 
   const member = data.find((member) => member.login === username);
 
+  console.log('member', member);
+
   // If the user is a member of the org, we will directly assign the members of the Stencil team
   // Otherwise, we will assign the team itself as a reviewer
-  if (!!member) {
+  if (member != null) {
     const stencilTeamMembers = await octokit.rest.teams.listMembersInOrg({
       org: organization,
       // Adding the team will only return the members in the org
