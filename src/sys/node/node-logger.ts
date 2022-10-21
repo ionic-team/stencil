@@ -1,8 +1,8 @@
 import fs from 'graceful-fs';
 import path from 'path';
 
+import { Logger } from '../../compiler/sys/logger';
 import { createTerminalLogger, TerminalLoggerSys } from '../../compiler/sys/logger/terminal-logger';
-import { Logger } from '../../declarations';
 
 /**
  * Create a logger to run in a Node environment

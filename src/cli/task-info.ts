@@ -1,4 +1,5 @@
-import type { CompilerSystem, Logger } from '../declarations';
+import { Logger } from '../compiler/sys/logger';
+import type { CompilerSystem } from '../declarations';
 import type { CoreCompiler } from './load-compiler';
 
 export const taskInfo = (coreCompiler: CoreCompiler, sys: CompilerSystem, logger: Logger) => {

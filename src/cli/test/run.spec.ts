@@ -6,6 +6,7 @@ import {
   mockValidatedConfig,
 } from '@stencil/core/testing';
 
+import { Logger } from '../../compiler/sys/logger';
 import type * as d from '../../declarations';
 import { createTestingSystem } from '../../testing/testing-sys';
 import { createConfigFlags } from '../config-flags';
@@ -23,7 +24,7 @@ import * as TestTask from '../task-test';
 describe('run', () => {
   describe('run()', () => {
     let cliInitOptions: d.CliInitOptions;
-    let mockLogger: d.Logger;
+    let mockLogger: Logger;
     let mockSystem: d.CompilerSystem;
 
     let parseFlagsSpy: jest.SpyInstance<

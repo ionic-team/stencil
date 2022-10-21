@@ -1,4 +1,5 @@
-import type { CompilerSystem, Logger, TaskCommand, ValidatedConfig } from '../declarations';
+import { Logger } from '../compiler/sys/logger';
+import type { CompilerSystem, TaskCommand, ValidatedConfig } from '../declarations';
 import type { ConfigFlags } from './config-flags';
 import type { CoreCompiler } from './load-compiler';
 

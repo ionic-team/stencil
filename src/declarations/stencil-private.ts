@@ -1,5 +1,6 @@
 import type { Diagnostic } from '../compiler/diagnostic';
 import type { InMemoryFileSystem } from '../compiler/sys/in-memory-fs';
+import type { Logger, LoggerLineUpdater, LoggerTimeSpan } from '../compiler/sys/logger/logger';
 import type {
   BuildEvents,
   BuildLog,
@@ -13,9 +14,6 @@ import type {
   CopyResults,
   DevServerConfig,
   DevServerEditor,
-  Logger,
-  LoggerLineUpdater,
-  LoggerTimeSpan,
   OptimizeCssInput,
   OptimizeCssOutput,
   OutputTargetWww,

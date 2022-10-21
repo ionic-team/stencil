@@ -1,5 +1,6 @@
 import path from 'path';
 
+import { Logger } from '../compiler/sys/logger';
 import type {
   BuildOnEventRemove,
   CompilerBuildResults,
@@ -8,7 +9,6 @@ import type {
   DevServerConfig,
   DevServerMessage,
   InitServerProcess,
-  Logger,
   StencilDevServerConfig,
 } from '../declarations';
 import { initServerProcessWorkerProxy } from './server-worker-main';

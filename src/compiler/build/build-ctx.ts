@@ -2,6 +2,7 @@ import { hasError, hasWarning } from '@utils';
 
 import type * as d from '../../declarations';
 import { Diagnostic } from '../diagnostic';
+import { LoggerTimeSpan } from '../sys/logger';
 
 /**
  * A new BuildCtx object is created for every build
@@ -58,7 +59,7 @@ export class BuildContext implements d.BuildCtx {
   styleBuildCount = 0;
   stylesPromise: Promise<void> = null;
   stylesUpdated: d.BuildStyleUpdate[] = [];
-  timeSpan: d.LoggerTimeSpan = null;
+  timeSpan: LoggerTimeSpan = null;
   timestamp: string;
   transpileBuildCount = 0;
   validateTypesPromise: Promise<d.ValidateTypesResults>;

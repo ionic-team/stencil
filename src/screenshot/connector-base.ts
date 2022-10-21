@@ -2,6 +2,7 @@ import type * as d from '@stencil/core/internal';
 import { tmpdir } from 'os';
 import { join } from 'path';
 
+import { Logger } from '../compiler/sys/logger';
 import { emptyDir, fileExists, mkDir, readDir, readFile, readFileBuffer, rmDir, writeFile } from './screenshot-fs';
 
 export class ScreenshotConnector implements d.ScreenshotConnector {
@@ -13,7 +14,7 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
   buildsDirName = 'builds';
   masterBuildFileName = 'master.json';
   screenshotCacheFileName = 'screenshot-cache.json';
-  logger: d.Logger;
+  logger: Logger;
   buildId: string;
   buildMessage: string;
   buildAuthor: string;

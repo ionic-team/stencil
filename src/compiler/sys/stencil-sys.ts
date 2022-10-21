@@ -18,11 +18,11 @@ import type {
   CompilerSystemWriteFileResults,
   CopyResults,
   CopyTask,
-  Logger,
 } from '../../declarations';
 import { version } from '../../version';
 import { buildEvents } from '../events';
 import { HAS_WEB_WORKER, IS_BROWSER_ENV, IS_WEB_WORKER_ENV } from './environment';
+import { Logger } from './logger';
 import { createLogger } from './logger/console-logger';
 import { resolveModuleIdAsync } from './resolve/resolve-module-async';
 import { createWebWorkerMainController } from './worker/web-worker-main';

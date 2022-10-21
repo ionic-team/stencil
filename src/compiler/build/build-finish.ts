@@ -4,6 +4,7 @@ import { relative } from 'path';
 import type * as d from '../../declarations';
 import { Diagnostic } from '../diagnostic';
 import { IS_NODE_ENV } from '../sys/environment';
+import { Logger } from '../sys/logger';
 import { generateBuildResults } from './build-results';
 import { generateBuildStats, writeBuildStats } from './build-stats';
 
@@ -133,7 +134,7 @@ const buildDone = async (
   return buildCtx.buildResults;
 };
 
-const logHmr = (logger: d.Logger, buildCtx: d.BuildCtx) => {
+const logHmr = (logger: Logger, buildCtx: d.BuildCtx) => {
   // this is a rebuild, and we've got hmr data
   // and this build hasn't been aborted
   const hmr = buildCtx.buildResults.hmr;
@@ -162,7 +163,7 @@ const logHmr = (logger: d.Logger, buildCtx: d.BuildCtx) => {
   }
 };
 
-const cleanupUpdateMsg = (logger: d.Logger, msg: string, fileNames: string[]) => {
+const cleanupUpdateMsg = (logger: Logger, msg: string, fileNames: string[]) => {
   if (fileNames.length > 0) {
     let fileMsg = '';
 

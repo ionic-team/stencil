@@ -2,6 +2,7 @@ import { buildError, catchError, isFunction, isString } from '@utils';
 import { relative } from 'path';
 
 import type * as d from '../../declarations';
+import { LoggerTimeSpan } from '../sys/logger';
 import { crawlAnchorsForNextUrls } from './crawl-urls';
 import { getWriteFilePathFromUrlPath } from './prerendered-write-path';
 
@@ -108,7 +109,7 @@ const prerenderUrl = async (results: d.PrerenderResults, manager: d.PrerenderMan
   let previewUrl = url;
   try {
     previewUrl = new URL(url).pathname;
-    let timespan: d.LoggerTimeSpan;
+    let timespan: LoggerTimeSpan;
     if (manager.isDebug) {
       timespan = manager.config.logger.createTimeSpan(`prerender start: ${previewUrl}`, true);
     }

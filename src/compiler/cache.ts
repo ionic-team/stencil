@@ -2,12 +2,13 @@ import { join } from 'path';
 
 import type * as d from '../declarations';
 import { InMemoryFileSystem } from './sys/in-memory-fs';
+import { Logger } from './sys/logger';
 
 export class Cache implements d.Cache {
   private failed = 0;
   private skip = false;
   private sys: d.CompilerSystem;
-  private logger: d.Logger;
+  private logger: Logger;
 
   constructor(private config: d.Config, private cacheFs: InMemoryFileSystem) {
     this.sys = config.sys;

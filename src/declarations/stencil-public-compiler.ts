@@ -5,7 +5,7 @@ import type { PrerenderUrlResults } from '../internal';
 import type { JsonDocs } from './stencil-public-docs';
 
 export { Diagnostic } from '../compiler/diagnostic';
-export { LOG_LEVELS, Logger, LoggerLineUpdater, LoggerTimeSpan, LogLevel } from '../compiler/sys/logger/logger';
+export { LOG_LEVELS, Logger, LoggerLineUpdater, LoggerTimeSpan, LogLevel } from '../compiler/sys/logger';
 export * from './stencil-public-docs';
 
 /**

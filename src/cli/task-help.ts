@@ -1,3 +1,4 @@
+import { Logger } from '../compiler/sys/logger';
 import type * as d from '../declarations';
 import { ConfigFlags } from './config-flags';
 import { taskTelemetry } from './task-telemetry';
@@ -9,7 +10,7 @@ import { taskTelemetry } from './task-telemetry';
  * @param logger a logging implementation to log the results out to the user
  * @param sys the abstraction for interfacing with the operating system
  */
-export const taskHelp = async (flags: ConfigFlags, logger: d.Logger, sys: d.CompilerSystem): Promise<void> => {
+export const taskHelp = async (flags: ConfigFlags, logger: Logger, sys: d.CompilerSystem): Promise<void> => {
   const prompt = logger.dim(sys.details.platform === 'windows' ? '>' : '$');
 
   console.log(`
