@@ -9718,15 +9718,11 @@ async function run() {
   const octokit = github.getOctokit(token);
 
   const organization = core.getInput('org');
-  const teamSlug = core.getInput('team');
-
-  let teamReviewers = [];
-  let reviewers = [];
 
   // PR author
   const username = github.context.payload.pull_request.user.login;
 
-  const { data } = await octokit.rest.orgs.listMembers({
+  const { data } = await octokit.rest.orgs.getMembershipForUser({
     org: organization,
   });
 
@@ -9746,19 +9742,17 @@ async function run() {
       team_slug: teamSlug,
     });
     console.log('STENCIL MEMBERS', stencilTeamMembers);
-    reviewers = stencilTeamMembers.filter((ref) => ref.login !== username);
-  } else {
-    teamReviewers = [teamSlug];
-  }
+    const reviewers = stencilTeamMembers.filter((ref) => ref.login !== username);
 
-  // Assign reviewers
-  await octokit.rest.pulls.requestReviewers({
-    owner: github.context.repo.owner,
-    repo: github.context.repo.repo,
-    pull_number: github.context.payload.number,
-    team_reviewers: teamReviewers,
-    reviewers,
-  });
+    // Assign reviewers
+    await octokit.rest.pulls.requestReviewers({
+      owner: github.context.repo.owner,
+      repo: github.context.repo.repo,
+      pull_number: github.context.payload.number,
+      team_reviewers: teamReviewers,
+      reviewers,
+    });
+  }
 }
 
 try {
