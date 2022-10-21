@@ -11,10 +11,8 @@ async function run() {
   let teamReviewers = [];
   let reviewers = [];
 
-  console.log('PAYLOAD', github.context.payload);
-
   // PR author
-  const username = github.context.payload.pull_request.payload.user.login;
+  const username = github.context.payload.user.login;
 
   // Determine if the author is an organization member
   const isInternalMember = await octokit.rest.teams.getMembershipForUserInOrg({
@@ -40,7 +38,7 @@ async function run() {
   await octokit.rest.pulls.requestReviewers({
     owner: github.context.repo.owner,
     repo: github.context.repo.repo,
-    pull_number: github.context.payload.pull_request.number,
+    pull_number: github.context.payload.number,
     team_reviewers: teamReviewers,
     reviewers,
   });
