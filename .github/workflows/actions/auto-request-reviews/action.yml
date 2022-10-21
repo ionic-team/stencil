@@ -4,10 +4,16 @@ inputs:
   token:
     description: 'GitHub token'
     required: true
+  org:
+    description: 'The organization name'
+    required: true
+  team:
+    description: 'The team slug'
+    required: true
 
 runs:
   using: 'node16'
-  main: 'index.js'
+  main: '/action/index.js'
 # on:
 #   pull_request:
 #     types: [opened, ready_for_review, reopened]

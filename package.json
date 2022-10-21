@@ -54,7 +54,8 @@
     "tsc": "tsc --incremental",
     "tsc.prod": "tsc",
     "tsc.scripts": "tsc -p scripts/tsconfig.json",
-    "tsc.watch": "tsc --incremental --watch"
+    "tsc.watch": "tsc --incremental --watch",
+    "build.action": "ncc build ./.github/workflows/actions/auto-request-reviews/index.js -o action"
   },
   "devDependencies": {
     "@ionic/prettier-config": "^2.0.0",
@@ -154,6 +155,7 @@
   },
   "dependencies": {
     "@actions/core": "^1.9.1",
-    "@actions/github": "^5.0.3"
+    "@actions/github": "^5.0.3",
+    "@vercel/ncc": "^0.34.0"
   }
 }
