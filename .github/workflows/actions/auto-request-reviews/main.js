@@ -11,8 +11,6 @@ async function run() {
   let teamReviewers = [];
   let reviewers = [];
 
-  console.log('PAYLOAD', github.context.payload);
-
   // PR author
   const username = github.context.payload.pull_request.user.login;
 
