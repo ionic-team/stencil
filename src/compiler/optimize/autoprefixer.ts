@@ -2,6 +2,7 @@ import { Postcss } from 'postcss';
 
 import type * as d from '../../declarations';
 import { IS_NODE_ENV, requireFunc } from '../sys/environment';
+import { PrintLine } from '../sys/logger';
 
 type CssProcessor = ReturnType<Postcss>;
 let cssProcessor: CssProcessor;
@@ -65,7 +66,7 @@ export const autoprefixCss = async (cssText: string, opts: boolean | null | d.Au
         const addLine = (lineNumber: number) => {
           const line = lines[lineNumber];
           if (typeof line === 'string') {
-            const printLine: d.PrintLine = {
+            const printLine: PrintLine = {
               lineIndex: -1,
               lineNumber: -1,
               text: line,

@@ -1,7 +1,9 @@
 {
   "extends": "./tsconfig-base.json",
   "references": [
-    { "path": "src/compiler/sys/environment" }
+    { "path": "src/compiler/sys/environment" },
+    { "path": "src/compiler/diagnostic" },
+    { "path": "src/compiler/sys/logger" }
   ],
   "files": [
     "src/cli/public.ts",

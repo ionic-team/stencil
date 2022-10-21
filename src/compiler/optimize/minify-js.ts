@@ -2,6 +2,7 @@ import { splitLineBreaks } from '@utils';
 import { CompressOptions, MangleOptions, ManglePropertiesOptions, minify, MinifyOptions } from 'terser';
 
 import type * as d from '../../declarations';
+import { PrintLine } from '../sys/logger/logger';
 
 /**
  * Performs the minification of JavaScript source
@@ -81,7 +82,7 @@ const loadMinifyJsDiagnostics = (sourceText: string, diagnostics: d.Diagnostic[]
   if (typeof err.line === 'number' && err.line > -1) {
     const srcLines = splitLineBreaks(sourceText);
 
-    const errorLine: d.PrintLine = {
+    const errorLine: PrintLine = {
       lineIndex: err.line - 1,
       lineNumber: err.line,
       text: srcLines[err.line - 1],
@@ -108,7 +109,7 @@ const loadMinifyJsDiagnostics = (sourceText: string, diagnostics: d.Diagnostic[]
     }
 
     if (errorLine.lineIndex > 0) {
-      const previousLine: d.PrintLine = {
+      const previousLine: PrintLine = {
         lineIndex: errorLine.lineIndex - 1,
         lineNumber: errorLine.lineNumber - 1,
         text: srcLines[errorLine.lineIndex - 1],
@@ -120,7 +121,7 @@ const loadMinifyJsDiagnostics = (sourceText: string, diagnostics: d.Diagnostic[]
     }
 
     if (errorLine.lineIndex + 1 < srcLines.length) {
-      const nextLine: d.PrintLine = {
+      const nextLine: PrintLine = {
         lineIndex: errorLine.lineIndex + 1,
         lineNumber: errorLine.lineNumber + 1,
         text: srcLines[errorLine.lineIndex + 1],

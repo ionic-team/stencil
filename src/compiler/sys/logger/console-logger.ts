@@ -1,13 +1,14 @@
-import type * as d from '../../../declarations';
+import { Diagnostic } from '../../diagnostic';
 import { IS_BROWSER_ENV } from '../environment';
+import { Logger, LoggerTimeSpan, LogLevel } from './logger';
 
 /**
  * Creates an instance of a logger
  * @returns the new logger instance
  */
-export const createLogger = (): d.Logger => {
+export const createLogger = (): Logger => {
   let useColors = IS_BROWSER_ENV;
-  let level: d.LogLevel = 'info';
+  let level: LogLevel = 'info';
 
   return {
     enableColors: (uc) => (useColors = uc),
@@ -28,17 +29,17 @@ export const createLogger = (): d.Logger => {
     bold: (msg) => msg,
     dim: (msg) => msg,
     bgRed: (msg) => msg,
-    createTimeSpan: (_startMsg: string, _debug = false): d.LoggerTimeSpan => ({
+    createTimeSpan: (_startMsg: string, _debug = false): LoggerTimeSpan => ({
       duration: () => 0,
       finish: () => 0,
     }),
-    printDiagnostics(diagnostics: d.Diagnostic[]) {
+    printDiagnostics(diagnostics: Diagnostic[]) {
       diagnostics.forEach((diagnostic) => logDiagnostic(diagnostic, useColors));
     },
   };
 };
 
-const logDiagnostic = (diagnostic: d.Diagnostic, useColors: boolean) => {
+const logDiagnostic = (diagnostic: Diagnostic, useColors: boolean) => {
   let color = BLUE;
   let prefix = 'Build';
   let msg = '';

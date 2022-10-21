@@ -1,3 +1,4 @@
+import { PrintLine } from '../../../compiler/sys/logger';
 import type * as d from '../../../declarations';
 import { CssNode, CssNodeType, CssParsePosition, ParseCssResults } from './css-parse-declarations';
 
@@ -45,7 +46,7 @@ export const parseCss = (css: string, filePath?: string): ParseCssResults => {
     };
 
     if (lineno > 1) {
-      const previousLine: d.PrintLine = {
+      const previousLine: PrintLine = {
         lineIndex: lineno - 1,
         lineNumber: lineno - 1,
         text: css[lineno - 2],
@@ -56,7 +57,7 @@ export const parseCss = (css: string, filePath?: string): ParseCssResults => {
     }
 
     if (lineno + 2 < srcLines.length) {
-      const nextLine: d.PrintLine = {
+      const nextLine: PrintLine = {
         lineIndex: lineno,
         lineNumber: lineno + 1,
         text: srcLines[lineno],

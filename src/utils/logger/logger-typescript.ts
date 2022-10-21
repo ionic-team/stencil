@@ -1,5 +1,6 @@
 import type { Diagnostic, DiagnosticMessageChain, Node } from 'typescript';
 
+import { PrintLine } from '../../compiler/sys/logger';
 import type * as d from '../../declarations';
 import { isIterable } from '../helpers';
 import { normalizePath } from '../normalize-path';
@@ -30,7 +31,7 @@ export const augmentDiagnosticWithNode = (d: d.Diagnostic, node: Node): d.Diagno
   const end = node.getEnd();
   const posStart = sourceFile.getLineAndCharacterOfPosition(start);
 
-  const errorLine: d.PrintLine = {
+  const errorLine: PrintLine = {
     lineIndex: posStart.line,
     lineNumber: posStart.line + 1,
     text: srcLines[posStart.line],
@@ -49,7 +50,7 @@ export const augmentDiagnosticWithNode = (d: d.Diagnostic, node: Node): d.Diagno
   // if the error did not occur on the first line of the file, add metadata for the line of code preceding the line
   // where the error was detected to provide the user with additional context
   if (errorLine.lineIndex > 0) {
-    const previousLine: d.PrintLine = {
+    const previousLine: PrintLine = {
       lineIndex: errorLine.lineIndex - 1,
       lineNumber: errorLine.lineNumber - 1,
       text: srcLines[errorLine.lineIndex - 1],
@@ -63,7 +64,7 @@ export const augmentDiagnosticWithNode = (d: d.Diagnostic, node: Node): d.Diagno
   // if the error did not occur on the last line of the file, add metadata for the line of code following the line
   // where the error was detected to provide the user with additional context
   if (errorLine.lineIndex + 1 < srcLines.length) {
-    const nextLine: d.PrintLine = {
+    const nextLine: PrintLine = {
       lineIndex: errorLine.lineIndex + 1,
       lineNumber: errorLine.lineNumber + 1,
       text: srcLines[errorLine.lineIndex + 1],
@@ -125,7 +126,7 @@ export const loadTypeScriptDiagnostic = (tsDiagnostic: Diagnostic): d.Diagnostic
 
     const posData = tsDiagnostic.file.getLineAndCharacterOfPosition(tsDiagnostic.start);
 
-    const errorLine: d.PrintLine = {
+    const errorLine: PrintLine = {
       lineIndex: posData.line,
       lineNumber: posData.line + 1,
       text: srcLines[posData.line],
@@ -144,7 +145,7 @@ export const loadTypeScriptDiagnostic = (tsDiagnostic: Diagnostic): d.Diagnostic
     }
 
     if (errorLine.lineIndex > 0) {
-      const previousLine: d.PrintLine = {
+      const previousLine: PrintLine = {
         lineIndex: errorLine.lineIndex - 1,
         lineNumber: errorLine.lineNumber - 1,
         text: srcLines[errorLine.lineIndex - 1],
@@ -156,7 +157,7 @@ export const loadTypeScriptDiagnostic = (tsDiagnostic: Diagnostic): d.Diagnostic
     }
 
     if (errorLine.lineIndex + 1 < srcLines.length) {
-      const nextLine: d.PrintLine = {
+      const nextLine: PrintLine = {
         lineIndex: errorLine.lineIndex + 1,
         lineNumber: errorLine.lineNumber + 1,
         text: srcLines[errorLine.lineIndex + 1],

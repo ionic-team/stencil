@@ -1,3 +1,4 @@
+import { PrintLine } from '../../compiler/sys/logger';
 import type * as d from '../../declarations';
 
 /**
@@ -59,11 +60,11 @@ const normalizeDiagnostic = (compilerCtx: d.CompilerCtx, diagnostic: d.Diagnosti
         for (let i = 0; i < srcLines.length; i++) {
           const srcLine = srcLines[i];
           if (srcLine.includes('@stencil/core')) {
-            const msgLines: d.PrintLine[] = [];
+            const msgLines: PrintLine[] = [];
 
             const beforeLineIndex = i - 1;
             if (beforeLineIndex > -1) {
-              const beforeLine: d.PrintLine = {
+              const beforeLine: PrintLine = {
                 lineIndex: beforeLineIndex,
                 lineNumber: beforeLineIndex + 1,
                 text: srcLines[beforeLineIndex],
@@ -73,7 +74,7 @@ const normalizeDiagnostic = (compilerCtx: d.CompilerCtx, diagnostic: d.Diagnosti
               msgLines.push(beforeLine);
             }
 
-            const errorLine: d.PrintLine = {
+            const errorLine: PrintLine = {
               lineIndex: i,
               lineNumber: i + 1,
               text: srcLine,
@@ -86,7 +87,7 @@ const normalizeDiagnostic = (compilerCtx: d.CompilerCtx, diagnostic: d.Diagnosti
 
             const afterLineIndex = i + 1;
             if (afterLineIndex < srcLines.length) {
-              const afterLine: d.PrintLine = {
+              const afterLine: PrintLine = {
                 lineIndex: afterLineIndex,
                 lineNumber: afterLineIndex + 1,
                 text: srcLines[afterLineIndex],

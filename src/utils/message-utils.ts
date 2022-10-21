@@ -1,3 +1,4 @@
+import { PrintLine } from '../compiler/sys/logger';
 import type * as d from '../declarations';
 import { isString } from './helpers';
 
@@ -89,7 +90,7 @@ export const buildJsonFileError = (
         const txtIndex = txtLine.indexOf(jsonField);
 
         if (txtIndex > -1) {
-          const warnLine: d.PrintLine = {
+          const warnLine: PrintLine = {
             lineIndex: i,
             lineNumber: i + 1,
             text: txtLine,
@@ -101,7 +102,7 @@ export const buildJsonFileError = (
           err.lines.push(warnLine);
 
           if (i >= 0) {
-            const beforeWarnLine: d.PrintLine = {
+            const beforeWarnLine: PrintLine = {
               lineIndex: warnLine.lineIndex - 1,
               lineNumber: warnLine.lineNumber - 1,
               text: lines[i - 1],
@@ -112,7 +113,7 @@ export const buildJsonFileError = (
           }
 
           if (i < lines.length) {
-            const afterWarnLine: d.PrintLine = {
+            const afterWarnLine: PrintLine = {
               lineIndex: warnLine.lineIndex + 1,
               lineNumber: warnLine.lineNumber + 1,
               text: lines[i + 1],

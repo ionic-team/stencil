@@ -1,4 +1,5 @@
-import type { CompilerBuildResults, Diagnostic, PrintLine } from '../../declarations';
+import { PrintLine } from '../../compiler/sys/logger';
+import type { CompilerBuildResults, Diagnostic } from '../../declarations';
 import appErrorCss from './app-error.css';
 
 interface AppErrorData {

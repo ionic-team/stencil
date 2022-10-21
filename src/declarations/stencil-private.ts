@@ -42,14 +42,6 @@ export interface SourceMap {
   version: number;
 }
 
-export interface PrintLine {
-  lineIndex: number;
-  lineNumber: number;
-  text?: string;
-  errorCharStart: number;
-  errorLength?: number;
-}
-
 export interface AssetsMeta {
   absolutePath: string;
   cmpRelativePath: string;

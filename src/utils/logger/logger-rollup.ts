@@ -1,5 +1,6 @@
 import type { RollupError } from 'rollup';
 
+import { PrintLine } from '../../compiler/sys/logger';
 import type * as d from '../../declarations';
 import { isString, toTitleCase } from '../helpers';
 import { buildWarn } from '../message-utils';
@@ -47,7 +48,7 @@ export const loadRollupDiagnostics = (
           try {
             const srcLines = splitLineBreaks(sourceText);
 
-            const errorLine: d.PrintLine = {
+            const errorLine: PrintLine = {
               lineIndex: loc.line - 1,
               lineNumber: loc.line,
               text: srcLines[loc.line - 1],
@@ -74,7 +75,7 @@ export const loadRollupDiagnostics = (
             }
 
             if (errorLine.lineIndex > 0) {
-              const previousLine: d.PrintLine = {
+              const previousLine: PrintLine = {
                 lineIndex: errorLine.lineIndex - 1,
                 lineNumber: errorLine.lineNumber - 1,
                 text: srcLines[errorLine.lineIndex - 1],
@@ -86,7 +87,7 @@ export const loadRollupDiagnostics = (
             }
 
             if (errorLine.lineIndex + 1 < srcLines.length) {
-              const nextLine: d.PrintLine = {
+              const nextLine: PrintLine = {
                 lineIndex: errorLine.lineIndex + 1,
                 lineNumber: errorLine.lineNumber + 1,
                 text: srcLines[errorLine.lineIndex + 1],
