@@ -5,6 +5,7 @@ import semverLte from 'semver/functions/lte';
 import major from 'semver/functions/major';
 import satisfies from 'semver/functions/satisfies';
 
+import { Diagnostic } from '../../compiler/diagnostic';
 import type * as d from '../../declarations';
 import { NodeResolveModule } from './node-resolve-module';
 
@@ -59,8 +60,8 @@ export class NodeLazyRequire implements d.LazyRequire {
    * @returns a Promise holding diagnostics if any of the dependencies either
    * were not resolved _or_ did not meet our version requirements.
    */
-  async ensure(fromDir: string, ensureModuleIds: string[]): Promise<d.Diagnostic[]> {
-    const diagnostics: d.Diagnostic[] = [];
+  async ensure(fromDir: string, ensureModuleIds: string[]): Promise<Diagnostic[]> {
+    const diagnostics: Diagnostic[] = [];
     const problemDeps: string[] = [];
 
     ensureModuleIds.forEach((ensureModuleId) => {

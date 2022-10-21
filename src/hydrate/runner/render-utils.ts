@@ -1,3 +1,4 @@
+import { Diagnostic } from '../../compiler/diagnostic';
 import type * as d from '../../declarations';
 
 export function normalizeHydrateOptions(inputOpts: d.HydrateDocumentOptions) {
@@ -122,7 +123,7 @@ export function renderBuildDiagnostic(
   header: string,
   msg: string
 ) {
-  const diagnostic: d.Diagnostic = {
+  const diagnostic: Diagnostic = {
     level: level,
     type: 'build',
     header: header,

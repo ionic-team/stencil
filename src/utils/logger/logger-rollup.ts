@@ -1,5 +1,6 @@
 import type { RollupError } from 'rollup';
 
+import { Diagnostic } from '../../compiler/diagnostic';
 import { PrintLine } from '../../compiler/sys/logger';
 import type * as d from '../../declarations';
 import { isString, toTitleCase } from '../helpers';
@@ -14,7 +15,7 @@ export const loadRollupDiagnostics = (
 ) => {
   const formattedCode = formatErrorCode(rollupError.code);
 
-  const diagnostic: d.Diagnostic = {
+  const diagnostic: Diagnostic = {
     level: 'error',
     type: 'bundling',
     language: 'javascript',
@@ -111,7 +112,7 @@ export const loadRollupDiagnostics = (
   buildCtx.diagnostics.push(diagnostic);
 };
 
-export const createOnWarnFn = (diagnostics: d.Diagnostic[], bundleModulesFiles?: d.Module[]) => {
+export const createOnWarnFn = (diagnostics: Diagnostic[], bundleModulesFiles?: d.Module[]) => {
   const previousWarns = new Set<string>();
 
   return function onWarningMessage(warning: { code?: string; importer?: string; message?: string }) {

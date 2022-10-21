@@ -2,13 +2,8 @@ import { buildError, catchError, hasError, isString, normalizePath } from '@util
 import { dirname } from 'path';
 import ts from 'typescript';
 
-import type {
-  CompilerSystem,
-  Diagnostic,
-  LoadConfigInit,
-  LoadConfigResults,
-  UnvalidatedConfig,
-} from '../../declarations';
+import type { CompilerSystem, LoadConfigInit, LoadConfigResults, UnvalidatedConfig } from '../../declarations';
+import { Diagnostic } from '../diagnostic';
 import { IS_NODE_ENV } from '../sys/environment';
 import { nodeRequire } from '../sys/node-require';
 import { createSystem } from '../sys/stencil-sys';

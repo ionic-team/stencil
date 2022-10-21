@@ -2,6 +2,7 @@ import { augmentDiagnosticWithNode, buildWarn } from '@utils';
 import ts from 'typescript';
 
 import type * as d from '../../../declarations';
+import { Diagnostic } from '../../diagnostic';
 import {
   convertValueToLiteral,
   createStaticGetter,
@@ -13,7 +14,7 @@ import {
 import { getDeclarationParameters, isDecoratorNamed } from './decorator-utils';
 
 export const eventDecoratorsToStatic = (
-  diagnostics: d.Diagnostic[],
+  diagnostics: Diagnostic[],
   decoratedProps: ts.ClassElement[],
   typeChecker: ts.TypeChecker,
   newMembers: ts.ClassElement[]
@@ -39,7 +40,7 @@ export const eventDecoratorsToStatic = (
  * @returns generated metadata for the class member decorated by `@Event()`, or `null` if none could be derived
  */
 const parseEventDecorator = (
-  diagnostics: d.Diagnostic[],
+  diagnostics: Diagnostic[],
   typeChecker: ts.TypeChecker,
   prop: ts.PropertyDeclaration
 ): d.ComponentCompilerStaticEvent | null => {
@@ -128,7 +129,7 @@ const getEventType = (type: ts.TypeNode): ts.TypeNode | null => {
  * @param node the node in the AT containing the class member decorated with `@Event()`
  * @param eventName the name of the event
  */
-const validateEventName = (diagnostics: d.Diagnostic[], node: ts.Node, eventName: string): void => {
+const validateEventName = (diagnostics: Diagnostic[], node: ts.Node, eventName: string): void => {
   // this regex checks for a string that begins with a capital letter - e.g. 'AskJeeves', 'Zoo', 'Spotify'
   if (/^[A-Z]/.test(eventName)) {
     const diagnostic = buildWarn(diagnostics);

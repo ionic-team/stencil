@@ -1,3 +1,4 @@
+import { Diagnostic } from '../../compiler/diagnostic';
 import { PrintLine } from '../../compiler/sys/logger';
 import type * as d from '../../declarations';
 
@@ -7,10 +8,10 @@ import type * as d from '../../declarations';
  * @param diagnostics the diagnostics to normalize
  * @returns the normalize documents
  */
-export const normalizeDiagnostics = (compilerCtx: d.CompilerCtx, diagnostics: d.Diagnostic[]): d.Diagnostic[] => {
+export const normalizeDiagnostics = (compilerCtx: d.CompilerCtx, diagnostics: Diagnostic[]): Diagnostic[] => {
   const maxErrorsToNormalize = 25;
-  const normalizedErrors: d.Diagnostic[] = [];
-  const normalizedOthers: d.Diagnostic[] = [];
+  const normalizedErrors: Diagnostic[] = [];
+  const normalizedOthers: Diagnostic[] = [];
   const dups = new Set<string>();
 
   for (let i = 0; i < diagnostics.length; i++) {
@@ -40,7 +41,7 @@ export const normalizeDiagnostics = (compilerCtx: d.CompilerCtx, diagnostics: d.
  * @param diagnostic the diagnostic to normalize
  * @returns the altered diagnostic
  */
-const normalizeDiagnostic = (compilerCtx: d.CompilerCtx, diagnostic: d.Diagnostic): d.Diagnostic => {
+const normalizeDiagnostic = (compilerCtx: d.CompilerCtx, diagnostic: Diagnostic): Diagnostic => {
   if (diagnostic.messageText) {
     if (typeof (<any>diagnostic.messageText).message === 'string') {
       diagnostic.messageText = (<any>diagnostic.messageText).message;

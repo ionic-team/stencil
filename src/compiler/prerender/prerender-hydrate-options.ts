@@ -1,8 +1,9 @@
 import { catchError } from '@utils';
 
 import type * as d from '../../declarations';
+import { Diagnostic } from '../diagnostic';
 
-export const getHydrateOptions = (prerenderConfig: d.PrerenderConfig, url: URL, diagnostics: d.Diagnostic[]) => {
+export const getHydrateOptions = (prerenderConfig: d.PrerenderConfig, url: URL, diagnostics: Diagnostic[]) => {
   const prerenderUrl = url.href;
 
   const opts: d.PrerenderHydrateOptions = {

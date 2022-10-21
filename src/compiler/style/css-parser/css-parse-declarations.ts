@@ -1,8 +1,8 @@
-import type * as d from '../../../declarations';
+import { Diagnostic } from '../../diagnostic';
 import { UsedSelectors } from './used-selectors';
 
 export interface ParseCssResults {
-  diagnostics: d.Diagnostic[];
+  diagnostics: Diagnostic[];
   stylesheet: CssNode;
 }
 

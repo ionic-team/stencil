@@ -2,6 +2,7 @@ import { isFunction, isRemoteUrl } from '@utils';
 import { relative } from 'path';
 
 import type * as d from '../../declarations';
+import { Diagnostic } from '../diagnostic';
 import { IS_NODE_ENV } from '../sys/environment';
 import { generateBuildResults } from './build-results';
 import { generateBuildStats, writeBuildStats } from './build-stats';
@@ -186,7 +187,7 @@ const cleanupUpdateMsg = (logger: d.Logger, msg: string, fileNames: string[]) =>
  * @param config the Stencil configuration associated with the current build
  * @param diagnostics the diagnostics to update
  */
-const cleanDiagnosticsRelativePath = (config: d.Config, diagnostics: ReadonlyArray<d.Diagnostic>): void => {
+const cleanDiagnosticsRelativePath = (config: d.Config, diagnostics: ReadonlyArray<Diagnostic>): void => {
   diagnostics.forEach((diagnostic) => {
     if (!diagnostic.relFilePath && !isRemoteUrl(diagnostic.absFilePath) && diagnostic.absFilePath && config.rootDir) {
       diagnostic.relFilePath = relative(config.rootDir, diagnostic.absFilePath);

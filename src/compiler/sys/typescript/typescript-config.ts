@@ -3,6 +3,7 @@ import { isAbsolute, join, relative } from 'path';
 import ts from 'typescript';
 
 import type * as d from '../../../declarations';
+import { Diagnostic } from '../../diagnostic';
 
 export const validateTsConfig = async (config: d.Config, sys: d.CompilerSystem, init: d.LoadConfigInit) => {
   const tsconfig = {
@@ -12,7 +13,7 @@ export const validateTsConfig = async (config: d.Config, sys: d.CompilerSystem, 
     include: null as string[],
     exclude: null as string[],
     extends: null as string,
-    diagnostics: [] as d.Diagnostic[],
+    diagnostics: [] as Diagnostic[],
   };
 
   try {

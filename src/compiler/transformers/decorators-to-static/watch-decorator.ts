@@ -2,12 +2,13 @@ import { augmentDiagnosticWithNode, buildError, buildWarn, flatOne } from '@util
 import ts from 'typescript';
 
 import type * as d from '../../../declarations';
+import { Diagnostic } from '../../diagnostic';
 import { convertValueToLiteral, createStaticGetter } from '../transform-utils';
 import { getDeclarationParameters, isDecoratorNamed } from './decorator-utils';
 
 export const watchDecoratorsToStatic = (
   config: d.Config,
-  diagnostics: d.Diagnostic[],
+  diagnostics: Diagnostic[],
   decoratedProps: ts.ClassElement[],
   watchable: Set<string>,
   newMembers: ts.ClassElement[]
@@ -25,7 +26,7 @@ export const watchDecoratorsToStatic = (
 
 const parseWatchDecorator = (
   config: d.Config,
-  diagnostics: d.Diagnostic[],
+  diagnostics: Diagnostic[],
   watchable: Set<string>,
   method: ts.MethodDeclaration
 ): d.ComponentCompilerWatch[] => {

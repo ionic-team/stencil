@@ -1,7 +1,8 @@
 import { ts } from '@stencil/core/compiler';
-import type { Diagnostic, TranspileOptions } from '@stencil/core/internal';
+import type { TranspileOptions } from '@stencil/core/internal';
 import { loadTypeScriptDiagnostic, normalizePath } from '@utils';
 
+import { Diagnostic } from '../../compiler/diagnostic';
 import { transpile } from '../test-transpile';
 
 // TODO(STENCIL-306): Remove support for earlier versions of Jest

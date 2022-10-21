@@ -2,6 +2,7 @@ import { catchError, isFunction, isString } from '@utils';
 import type { ServerResponse } from 'http';
 import path from 'path';
 
+import { Diagnostic } from '../compiler/diagnostic';
 import type * as d from '../declarations';
 import { getSsrStaticDataPath, responseHeaders } from './dev-server-utils';
 import { appendDevServerClientScript } from './serve-file';
@@ -124,7 +125,7 @@ async function setupHydrateApp(devServerConfig: d.DevServerConfig, serverCtx: d.
   let hydrateApp: HydrateApp = null;
 
   const buildResults = await serverCtx.getBuildResults();
-  const diagnostics: d.Diagnostic[] = [];
+  const diagnostics: Diagnostic[] = [];
 
   if (serverCtx.prerenderConfig == null && isString(devServerConfig.prerenderConfig)) {
     const compilerPath = path.join(devServerConfig.devServerDir, '..', 'compiler', 'stencil.js');
@@ -213,7 +214,7 @@ function getSsrHydrateOptions(devServerConfig: d.DevServerConfig, serverCtx: d.D
   return opts;
 }
 
-function getSsrErrorContent(diagnostics: d.Diagnostic[]) {
+function getSsrErrorContent(diagnostics: Diagnostic[]) {
   return `<!doctype html>
 <html>
 <head>

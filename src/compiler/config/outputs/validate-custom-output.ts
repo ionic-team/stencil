@@ -1,16 +1,17 @@
 import { catchError } from '@utils';
 
 import type * as d from '../../../declarations';
+import { Diagnostic } from '../../diagnostic';
 import { COPY, isOutputTargetCustom } from '../../output-targets/output-utils';
 
 export const validateCustomOutput = (
   config: d.ValidatedConfig,
-  diagnostics: d.Diagnostic[],
+  diagnostics: Diagnostic[],
   userOutputs: d.OutputTarget[]
 ) => {
   return userOutputs.filter(isOutputTargetCustom).map((o) => {
     if (o.validate) {
-      const localDiagnostics: d.Diagnostic[] = [];
+      const localDiagnostics: Diagnostic[] = [];
       try {
         o.validate(config, diagnostics);
       } catch (e: any) {

@@ -1,10 +1,11 @@
 import type * as d from '@stencil/core/declarations';
 
+import { Diagnostic } from '../../diagnostic';
 import { validateNamespace } from '../validate-namespace';
 
 describe('validateNamespace', () => {
   let config: d.Config;
-  const diagnostics: d.Diagnostic[] = [];
+  const diagnostics: Diagnostic[] = [];
   beforeEach(() => {
     config = {};
     diagnostics.length = 0;

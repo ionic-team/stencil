@@ -1,11 +1,12 @@
 import { isFunction } from '@utils';
 import ts from 'typescript';
 
-import type { Compiler, Config, Diagnostic, ValidatedConfig } from '../declarations';
+import type { Compiler, Config, ValidatedConfig } from '../declarations';
 import { CompilerContext } from './build/compiler-ctx';
 import { createFullBuild } from './build/full-build';
 import { createWatchBuild } from './build/watch-build';
 import { Cache } from './cache';
+import { Diagnostic } from './diagnostic';
 import { getConfig } from './sys/config';
 import { patchFs } from './sys/fs-patch';
 import { createInMemoryFs } from './sys/in-memory-fs';

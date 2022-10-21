@@ -1,6 +1,7 @@
 import type * as d from '@stencil/core/declarations';
 import { mockBuildCtx, mockCompilerCtx, mockConfig } from '@stencil/core/testing';
 
+import { Diagnostic } from '../../diagnostic';
 import { generateBuildResults } from '../build-results';
 import { generateBuildStats } from '../build-stats';
 
@@ -51,7 +52,7 @@ describe('generateBuildStats', () => {
     buildCtx.buildResults = generateBuildResults(config, compilerCtx, buildCtx);
 
     buildCtx.buildResults.hasError = true;
-    const diagnostic: d.Diagnostic = {
+    const diagnostic: Diagnostic = {
       level: 'error',
       type: 'horrible',
       messageText: 'the worst error _possible_ has just occurred',

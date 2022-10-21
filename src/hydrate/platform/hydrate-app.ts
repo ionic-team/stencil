@@ -2,6 +2,7 @@ import { globalScripts } from '@app-globals';
 import { doc, getHostRef, loadModule, plt, registerHost } from '@platform';
 import { connectedCallback, insertVdomAnnotations } from '@runtime';
 
+import { Diagnostic } from '../../compiler/diagnostic';
 import type * as d from '../../declarations';
 import { proxyHostElement } from './proxy-host-element';
 
@@ -258,7 +259,7 @@ const NO_HYDRATE_TAGS = new Set([
 ]);
 
 function renderCatchError(opts: d.HydrateFactoryOptions, results: d.HydrateResults, err: any) {
-  const diagnostic: d.Diagnostic = {
+  const diagnostic: Diagnostic = {
     level: 'error',
     type: 'build',
     header: 'Hydrate Error',

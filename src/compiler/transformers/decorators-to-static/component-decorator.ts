@@ -2,6 +2,7 @@ import { augmentDiagnosticWithNode, buildError, buildWarn, isString, validateCom
 import ts from 'typescript';
 
 import type * as d from '../../../declarations';
+import { Diagnostic } from '../../diagnostic';
 import { convertValueToLiteral, createStaticGetter } from '../transform-utils';
 import { getDeclarationParameters } from './decorator-utils';
 import { styleToStatic } from './style-to-static';
@@ -9,7 +10,7 @@ import { styleToStatic } from './style-to-static';
 export const componentDecoratorToStatic = (
   config: d.Config,
   typeChecker: ts.TypeChecker,
-  diagnostics: d.Diagnostic[],
+  diagnostics: Diagnostic[],
   cmpNode: ts.ClassDeclaration,
   newMembers: ts.ClassElement[],
   componentDecorator: ts.Decorator
@@ -55,7 +56,7 @@ export const componentDecoratorToStatic = (
 
 const validateComponent = (
   config: d.Config,
-  diagnostics: d.Diagnostic[],
+  diagnostics: Diagnostic[],
   typeChecker: ts.TypeChecker,
   componentOptions: d.ComponentOptions,
   cmpNode: ts.ClassDeclaration,

@@ -1,9 +1,10 @@
 import { buildError, dashToPascalCase, isString } from '@utils';
 
 import type * as d from '../../declarations';
+import { Diagnostic } from '../diagnostic';
 import { isOutputTargetDist } from '../output-targets/output-utils';
 
-export const validateNamespace = (c: d.UnvalidatedConfig, diagnostics: d.Diagnostic[]) => {
+export const validateNamespace = (c: d.UnvalidatedConfig, diagnostics: Diagnostic[]) => {
   c.namespace = isString(c.namespace) ? c.namespace : DEFAULT_NAMESPACE;
   c.namespace = c.namespace.trim();
 
@@ -41,7 +42,7 @@ export const validateNamespace = (c: d.UnvalidatedConfig, diagnostics: d.Diagnos
   }
 };
 
-export const validateDistNamespace = (config: d.UnvalidatedConfig, diagnostics: d.Diagnostic[]) => {
+export const validateDistNamespace = (config: d.UnvalidatedConfig, diagnostics: Diagnostic[]) => {
   const hasDist = (config.outputTargets ?? []).some(isOutputTargetDist);
   if (hasDist) {
     if (!isString(config.namespace) || config.namespace.toLowerCase() === 'app') {

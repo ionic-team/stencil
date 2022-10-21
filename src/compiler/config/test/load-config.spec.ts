@@ -4,6 +4,7 @@ import { ConfigFlags } from '../../../cli/config-flags';
 import { createSystem } from '../../../compiler/sys/stencil-sys';
 import type * as d from '../../../declarations';
 import { normalizePath } from '../../../utils';
+import { Diagnostic } from '../../diagnostic';
 import { loadConfig } from '../load-config';
 
 describe('load config', () => {
@@ -79,7 +80,7 @@ describe('load config', () => {
       const loadedConfig = await loadConfig({ initTsConfig: true });
 
       expect(loadedConfig.diagnostics).toHaveLength(1);
-      expect<d.Diagnostic>(loadedConfig.diagnostics[0]).toEqual({
+      expect<Diagnostic>(loadedConfig.diagnostics[0]).toEqual({
         absFilePath: '/tsconfig.json',
         code: '18003',
         header: 'TypeScript',
@@ -96,7 +97,7 @@ describe('load config', () => {
     it('errors that a tsconfig file could not be created when "initTsConfig" isn\'t present', async () => {
       const loadedConfig = await loadConfig({});
       expect(loadedConfig.diagnostics).toHaveLength(1);
-      expect<d.Diagnostic>(loadedConfig.diagnostics[0]).toEqual({
+      expect<Diagnostic>(loadedConfig.diagnostics[0]).toEqual({
         absFilePath: null,
         header: 'Missing tsconfig.json',
         level: 'error',
@@ -113,7 +114,7 @@ describe('load config', () => {
     it('errors that a tsconfig file could not be created', async () => {
       const loadConfigResults = await loadConfig();
       expect(loadConfigResults.diagnostics).toHaveLength(1);
-      expect<d.Diagnostic>(loadConfigResults.diagnostics[0]).toEqual({
+      expect<Diagnostic>(loadConfigResults.diagnostics[0]).toEqual({
         absFilePath: null,
         header: 'Missing tsconfig.json',
         level: 'error',

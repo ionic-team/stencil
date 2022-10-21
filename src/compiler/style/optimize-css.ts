@@ -2,11 +2,12 @@ import { hasError, normalizePath } from '@utils';
 
 import type * as d from '../../declarations';
 import { optimizeCssId } from '../../version';
+import { Diagnostic } from '../diagnostic';
 
 export const optimizeCss = async (
   config: d.Config,
   compilerCtx: d.CompilerCtx,
-  diagnostics: d.Diagnostic[],
+  diagnostics: Diagnostic[],
   styleText: string,
   filePath: string
 ) => {

@@ -1,7 +1,7 @@
 import { augmentDiagnosticWithNode, buildWarn } from '@utils';
 import ts from 'typescript';
 
-import type * as d from '../../declarations';
+import { Diagnostic } from '../diagnostic';
 
 /**
  * Determine if a public class member collides with a reserved name for HTML elements, nodes, or JSX
@@ -14,7 +14,7 @@ import type * as d from '../../declarations';
  * @param node the TypeScript AST node at which the class member is defined
  */
 export const validatePublicName = (
-  diagnostics: d.Diagnostic[],
+  diagnostics: Diagnostic[],
   memberName: string,
   decorator: string,
   memberType: string,

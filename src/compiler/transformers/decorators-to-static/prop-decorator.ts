@@ -2,6 +2,7 @@ import { augmentDiagnosticWithNode, buildError, buildWarn, toDashCase } from '@u
 import ts from 'typescript';
 
 import type * as d from '../../../declarations';
+import { Diagnostic } from '../../diagnostic';
 import { validatePublicName } from '../reserved-public-members';
 import {
   convertValueToLiteral,
@@ -28,7 +29,7 @@ import { getDeclarationParameters, isDecoratorNamed } from './decorator-utils';
  * calling this function
  */
 export const propDecoratorsToStatic = (
-  diagnostics: d.Diagnostic[],
+  diagnostics: Diagnostic[],
   decoratedProps: ts.ClassElement[],
   typeChecker: ts.TypeChecker,
   watchable: Set<string>,
@@ -54,7 +55,7 @@ export const propDecoratorsToStatic = (
  * @returns a property assignment expression to be added to the Stencil component's class
  */
 const parsePropDecorator = (
-  diagnostics: d.Diagnostic[],
+  diagnostics: Diagnostic[],
   typeChecker: ts.TypeChecker,
   prop: ts.PropertyDeclaration,
   watchable: Set<string>
@@ -144,7 +145,7 @@ const getAttributeName = (propName: string, propOptions: d.PropOptions): string 
  * @param propOptions the options passed in to the `@Prop` call expression
  * @returns `true` if the prop should be reflected in the DOM, `false` otherwise
  */
-const getReflect = (diagnostics: d.Diagnostic[], propDecorator: ts.Decorator, propOptions: d.PropOptions): boolean => {
+const getReflect = (diagnostics: Diagnostic[], propDecorator: ts.Decorator, propOptions: d.PropOptions): boolean => {
   if (typeof propOptions.reflect === 'boolean') {
     return propOptions.reflect;
   }

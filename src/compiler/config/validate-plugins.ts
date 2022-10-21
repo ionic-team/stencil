@@ -1,8 +1,9 @@
 import { buildWarn } from '@utils';
 
 import type * as d from '../../declarations';
+import { Diagnostic } from '../diagnostic';
 
-export const validatePlugins = (config: d.UnvalidatedConfig, diagnostics: d.Diagnostic[]) => {
+export const validatePlugins = (config: d.UnvalidatedConfig, diagnostics: Diagnostic[]) => {
   const userPlugins = config.plugins;
 
   if (!config.rollupPlugins) {

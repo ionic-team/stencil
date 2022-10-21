@@ -1,6 +1,7 @@
 import { buildError, isString, normalizePath } from '@utils';
 
-import type { CompilerSystem, Diagnostic } from '../declarations';
+import { Diagnostic } from '../compiler/diagnostic';
+import type { CompilerSystem } from '../declarations';
 
 /**
  * An object containing the {@link CompilerSystem} used to find the configuration file, as well as the location on disk

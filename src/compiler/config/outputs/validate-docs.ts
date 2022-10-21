@@ -2,6 +2,7 @@ import { buildError, isFunction, isString } from '@utils';
 import { isAbsolute, join } from 'path';
 
 import type * as d from '../../../declarations';
+import { Diagnostic } from '../../diagnostic';
 import { NOTE } from '../../docs/constants';
 import {
   isOutputTargetDocsCustom,
@@ -10,7 +11,7 @@ import {
   isOutputTargetDocsVscode,
 } from '../../output-targets/output-utils';
 
-export const validateDocs = (config: d.ValidatedConfig, diagnostics: d.Diagnostic[], userOutputs: d.OutputTarget[]) => {
+export const validateDocs = (config: d.ValidatedConfig, diagnostics: Diagnostic[], userOutputs: d.OutputTarget[]) => {
   const docsOutputs: d.OutputTarget[] = [];
 
   // json docs flag
@@ -75,7 +76,7 @@ const validateReadmeOutputTarget = (config: d.ValidatedConfig, outputTarget: d.O
 
 const validateJsonDocsOutputTarget = (
   config: d.ValidatedConfig,
-  diagnostics: d.Diagnostic[],
+  diagnostics: Diagnostic[],
   outputTarget: d.OutputTargetDocsJson
 ) => {
   if (!isString(outputTarget.file)) {
@@ -93,7 +94,7 @@ const validateJsonDocsOutputTarget = (
   return outputTarget;
 };
 
-const validateCustomDocsOutputTarget = (diagnostics: d.Diagnostic[], outputTarget: d.OutputTargetDocsCustom) => {
+const validateCustomDocsOutputTarget = (diagnostics: Diagnostic[], outputTarget: d.OutputTargetDocsCustom) => {
   if (!isFunction(outputTarget.generator)) {
     const err = buildError(diagnostics);
     err.messageText = `docs-custom outputTarget missing the "generator" function`;
@@ -103,7 +104,7 @@ const validateCustomDocsOutputTarget = (diagnostics: d.Diagnostic[], outputTarge
   return outputTarget;
 };
 
-const validateVScodeDocsOutputTarget = (diagnostics: d.Diagnostic[], outputTarget: d.OutputTargetDocsVscode) => {
+const validateVScodeDocsOutputTarget = (diagnostics: Diagnostic[], outputTarget: d.OutputTargetDocsVscode) => {
   if (!isString(outputTarget.file)) {
     const err = buildError(diagnostics);
     err.messageText = `docs-vscode outputTarget missing the "file" path`;

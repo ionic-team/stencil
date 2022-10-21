@@ -1,6 +1,7 @@
 import { mockBuildCtx, mockConfig } from '@stencil/core/testing';
 import * as util from '@utils';
 
+import { Diagnostic } from '../../compiler/diagnostic';
 import type * as d from '../../declarations';
 import { stubDiagnostic } from '../../dev-server/test/Diagnostic.stub';
 
@@ -156,7 +157,7 @@ describe('util', () => {
       // improperly formatted JSON - note the lack of ':'
       const diagnostic = util.parsePackageJson('{ "someJson" "value"}', mockPackageJsonPath);
 
-      const expectedDiagnostic: d.Diagnostic = stubDiagnostic({
+      const expectedDiagnostic: Diagnostic = stubDiagnostic({
         absFilePath: mockPackageJsonPath,
         header: 'Error Parsing JSON',
         messageText: 'Unexpected string in JSON at position 13', // due to missing colon in input
@@ -174,7 +175,7 @@ describe('util', () => {
       // improperly formatted JSON - note the lack of ':'
       const diagnostic = util.parsePackageJson('{ "someJson" "value"}', undefined);
 
-      const expectedDiagnostic: d.Diagnostic = stubDiagnostic({
+      const expectedDiagnostic: Diagnostic = stubDiagnostic({
         absFilePath: undefined,
         header: 'Error Parsing JSON',
         messageText: 'Unexpected string in JSON at position 13', // due to missing colon in input

@@ -1,12 +1,12 @@
 import { buildError } from '@utils';
 import ts from 'typescript';
 
-import type * as d from '../../../declarations';
+import { Diagnostic } from '../../diagnostic';
 import { createStaticGetter } from '../transform-utils';
 import { isDecoratorNamed } from './decorator-utils';
 
 export const elementDecoratorsToStatic = (
-  diagnostics: d.Diagnostic[],
+  diagnostics: Diagnostic[],
   decoratedMembers: ts.ClassElement[],
   typeChecker: ts.TypeChecker,
   newMembers: ts.ClassElement[]
@@ -26,7 +26,7 @@ export const elementDecoratorsToStatic = (
 };
 
 const parseElementDecorator = (
-  _diagnostics: d.Diagnostic[],
+  _diagnostics: Diagnostic[],
   _typeChecker: ts.TypeChecker,
   prop: ts.PropertyDeclaration
 ) => {

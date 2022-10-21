@@ -2,6 +2,7 @@ import { buildJsonFileError, COLLECTION_MANIFEST_FILE_NAME, isGlob, isString, no
 import { dirname, join, relative } from 'path';
 
 import type * as d from '../../declarations';
+import { Diagnostic } from '../diagnostic';
 import {
   getComponentsDtsTypesFilePath,
   isOutputTargetDistCollection,
@@ -302,7 +303,7 @@ const packageJsonError = (
   buildCtx: d.BuildCtx,
   msg: string,
   jsonField: string
-): d.Diagnostic => {
+): Diagnostic => {
   const err = buildJsonFileError(compilerCtx, buildCtx.diagnostics, config.packageJsonFilePath, msg, jsonField);
   err.header = `Package Json`;
   return err;
@@ -326,7 +327,7 @@ const packageJsonWarn = (
   buildCtx: d.BuildCtx,
   msg: string,
   jsonField: string
-): d.Diagnostic => {
+): Diagnostic => {
   const warn = buildJsonFileError(compilerCtx, buildCtx.diagnostics, config.packageJsonFilePath, msg, jsonField);
   warn.header = `Package Json`;
   warn.level = 'warn';

@@ -1,7 +1,7 @@
 import type { Diagnostic, DiagnosticMessageChain, Node } from 'typescript';
 
+import { Diagnostic as StencilDiagnostic } from '../../compiler/diagnostic';
 import { PrintLine } from '../../compiler/sys/logger';
-import type * as d from '../../declarations';
 import { isIterable } from '../helpers';
 import { normalizePath } from '../normalize-path';
 import { splitLineBreaks } from './logger-utils';
@@ -12,7 +12,7 @@ import { splitLineBreaks } from './logger-utils';
  * @param node the node to augment with additional information
  * @returns the augmented diagnostic
  */
-export const augmentDiagnosticWithNode = (d: d.Diagnostic, node: Node): d.Diagnostic => {
+export const augmentDiagnosticWithNode = (d: StencilDiagnostic, node: Node): StencilDiagnostic => {
   if (!node) {
     return d;
   }
@@ -84,7 +84,7 @@ export const augmentDiagnosticWithNode = (d: d.Diagnostic, node: Node): d.Diagno
  */
 
 export const loadTypeScriptDiagnostics = (tsDiagnostics: readonly Diagnostic[]) => {
-  const diagnostics: d.Diagnostic[] = [];
+  const diagnostics: StencilDiagnostic[] = [];
   const maxErrors = Math.min(tsDiagnostics.length, 50);
 
   for (let i = 0; i < maxErrors; i++) {
@@ -101,8 +101,8 @@ export const loadTypeScriptDiagnostics = (tsDiagnostics: readonly Diagnostic[]) 
  * @param tsDiagnostic a TypeScript diagnostic message record
  * @returns a Stencil diagnostic, suitable for showing an error to the user
  */
-export const loadTypeScriptDiagnostic = (tsDiagnostic: Diagnostic): d.Diagnostic => {
-  const d: d.Diagnostic = {
+export const loadTypeScriptDiagnostic = (tsDiagnostic: Diagnostic): StencilDiagnostic => {
+  const d: StencilDiagnostic = {
     level: 'warn',
     type: 'typescript',
     language: 'typescript',

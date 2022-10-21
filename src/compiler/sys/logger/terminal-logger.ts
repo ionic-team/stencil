@@ -331,7 +331,7 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys): Logger => {
       const lines = removeLeadingWhitespace(diagnostic.lines);
 
       lines.forEach((l) => {
-        if (!isMeaningfulLine(l.text ?? "")) {
+        if (!isMeaningfulLine(l.text ?? '')) {
           // don't print lines just containing whitespace, skip those that do
           return;
         }
@@ -348,16 +348,16 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys): Logger => {
         }
 
         let text = l.text;
-        if (l.errorCharStart > -1 && typeof text === "string") {
+        if (l.errorCharStart > -1 && typeof text === 'string') {
           text = highlightError(text, l.errorCharStart, l.errorLength ?? 0);
         }
 
         msg = dim(msg);
 
         if (diagnostic.language === 'typescript' || diagnostic.language === 'javascript') {
-          msg += javaScriptSyntaxHighlight(text ?? "");
+          msg += javaScriptSyntaxHighlight(text ?? '');
         } else if (diagnostic.language === 'scss' || diagnostic.language === 'css') {
-          msg += cssSyntaxHighlight(text ?? "");
+          msg += cssSyntaxHighlight(text ?? '');
         } else {
           msg += text;
         }
@@ -645,9 +645,9 @@ const removeLeadingWhitespace = (orgLines: PrintLine[]): ReadonlyArray<PrintLine
     }
     // each line has at least one line of whitespace. remove the leading character from each
     for (let i = 0; i < lines.length; i++) {
-      lines[i].text = (lines[i].text ?? "").slice(1);
+      lines[i].text = (lines[i].text ?? '').slice(1);
       lines[i].errorCharStart--;
-      if (!(lines[i].text ?? "").length) {
+      if (!(lines[i].text ?? '').length) {
         return lines;
       }
     }
@@ -667,10 +667,10 @@ const eachLineHasLeadingWhitespace = (lines: PrintLine[]): boolean => {
   }
 
   for (let i = 0; i < lines.length; i++) {
-    if (!lines[i].text || (lines[i].text ?? "").length < 1) {
+    if (!lines[i].text || (lines[i].text ?? '').length < 1) {
       return false;
     }
-    const firstChar = (lines[i].text ?? "").charAt(0);
+    const firstChar = (lines[i].text ?? '').charAt(0);
     if (firstChar !== ' ' && firstChar !== '\t') {
       return false;
     }

@@ -1,9 +1,10 @@
 import type * as d from '../../../declarations';
+import { Diagnostic } from '../../diagnostic';
 import { crawlAnchorsForNextUrls } from '../crawl-urls';
 
 describe('crawlAnchorsForNextUrls', () => {
   let prerenderConfig: d.PrerenderConfig;
-  let diagnostics: d.Diagnostic[];
+  let diagnostics: Diagnostic[];
   let baseUrl: URL;
   let currentUrl: URL;
   let parsedAnchors: d.HydrateAnchorElement[];

@@ -2,6 +2,7 @@ import { catchError, flatOne, isString, unique } from '@utils';
 import { join } from 'path';
 
 import type * as d from '../../declarations';
+import { Diagnostic } from '../diagnostic';
 import { injectModulePreloads } from '../html/inject-module-preloads';
 import { minifyCss } from '../optimize/minify-css';
 import { optimizeCss } from '../optimize/optimize-css';
@@ -217,7 +218,7 @@ export const hasStencilScript = (doc: Document) => {
 export const hashAssets = async (
   sys: d.CompilerSystem,
   prerenderCtx: PrerenderContext,
-  diagnostics: d.Diagnostic[],
+  diagnostics: Diagnostic[],
   hydrateOpts: d.PrerenderHydrateOptions,
   appDir: string,
   doc: Document,

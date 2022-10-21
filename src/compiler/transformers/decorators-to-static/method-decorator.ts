@@ -2,6 +2,7 @@ import { augmentDiagnosticWithNode, buildError, buildWarn } from '@utils';
 import ts from 'typescript';
 
 import type * as d from '../../../declarations';
+import { Diagnostic } from '../../diagnostic';
 import { validatePublicName } from '../reserved-public-members';
 import {
   convertValueToLiteral,
@@ -17,7 +18,7 @@ import { isDecoratorNamed } from './decorator-utils';
 
 export const methodDecoratorsToStatic = (
   config: d.Config,
-  diagnostics: d.Diagnostic[],
+  diagnostics: Diagnostic[],
   cmpNode: ts.ClassDeclaration,
   decoratedProps: ts.ClassElement[],
   typeChecker: ts.TypeChecker,
@@ -36,7 +37,7 @@ export const methodDecoratorsToStatic = (
 
 const parseMethodDecorator = (
   config: d.Config,
-  diagnostics: d.Diagnostic[],
+  diagnostics: Diagnostic[],
   tsSourceFile: ts.SourceFile,
   typeChecker: ts.TypeChecker,
   method: ts.MethodDeclaration
@@ -114,7 +115,7 @@ const isTypePromise = (typeStr: string) => {
   return /^Promise<.+>$/.test(typeStr);
 };
 
-export const validateMethods = (diagnostics: d.Diagnostic[], members: ts.NodeArray<ts.ClassElement>) => {
+export const validateMethods = (diagnostics: Diagnostic[], members: ts.NodeArray<ts.ClassElement>) => {
   members.filter(ts.isMethodDeclaration).map((method) => {
     if (method.name.getText() === 'componentDidUnload') {
       const err = buildError(diagnostics);

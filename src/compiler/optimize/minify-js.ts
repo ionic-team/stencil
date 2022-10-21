@@ -2,7 +2,8 @@ import { splitLineBreaks } from '@utils';
 import { CompressOptions, MangleOptions, ManglePropertiesOptions, minify, MinifyOptions } from 'terser';
 
 import type * as d from '../../declarations';
-import { PrintLine } from '../sys/logger/logger';
+import { Diagnostic } from '../diagnostic';
+import { PrintLine } from '../sys/logger';
 
 /**
  * Performs the minification of JavaScript source
@@ -56,8 +57,8 @@ export const minifyJs = async (input: string, opts?: MinifyOptions): Promise<d.O
   return results;
 };
 
-const loadMinifyJsDiagnostics = (sourceText: string, diagnostics: d.Diagnostic[], error: any) => {
-  const d: d.Diagnostic = {
+const loadMinifyJsDiagnostics = (sourceText: string, diagnostics: Diagnostic[], error: any) => {
+  const d: Diagnostic = {
     level: 'error',
     type: 'build',
     language: 'javascript',

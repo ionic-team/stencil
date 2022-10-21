@@ -1,6 +1,7 @@
 import { hasError, hasWarning } from '@utils';
 
 import type * as d from '../../declarations';
+import { Diagnostic } from '../diagnostic';
 
 /**
  * A new BuildCtx object is created for every build
@@ -24,7 +25,7 @@ export class BuildContext implements d.BuildCtx {
   es5ComponentBundle: d.BundleModule[];
   systemComponentBundle: d.BundleModule[];
   commonJsComponentBundle: d.BundleModule[];
-  diagnostics: d.Diagnostic[] = [];
+  diagnostics: Diagnostic[] = [];
   dirsAdded: string[] = [];
   dirsDeleted: string[] = [];
   entryModules: d.EntryModule[] = [];

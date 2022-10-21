@@ -3,6 +3,7 @@ import { isAbsolute, join } from 'path';
 
 import type * as d from '../../declarations';
 import { createHydrateBuildId } from '../../hydrate/runner/render-utils';
+import { Diagnostic } from '../diagnostic';
 import { getAbsoluteBuildDir } from '../html/html-utils';
 import { isOutputTargetWww } from '../output-targets/output-utils';
 import { createWorkerMainContext } from '../worker/main-thread';
@@ -31,7 +32,7 @@ const runPrerender = async (
   buildId: string
 ) => {
   const startTime = Date.now();
-  const diagnostics: d.Diagnostic[] = [];
+  const diagnostics: Diagnostic[] = [];
   const results: d.PrerenderResults = {
     buildId,
     diagnostics,
@@ -126,7 +127,7 @@ const runPrerender = async (
 const runPrerenderOutputTarget = async (
   workerCtx: d.CompilerWorkerContext,
   results: d.PrerenderResults,
-  diagnostics: d.Diagnostic[],
+  diagnostics: Diagnostic[],
   config: d.ValidatedConfig,
   devServer: d.DevServer,
   hydrateAppFilePath: string,
@@ -151,7 +152,7 @@ const runPrerenderOutputTarget = async (
     }
 
     // get the prerender urls to queue up
-    const prerenderDiagnostics: d.Diagnostic[] = [];
+    const prerenderDiagnostics: Diagnostic[] = [];
     const manager: d.PrerenderManager = {
       prerenderUrlWorker: (prerenderRequest: d.PrerenderUrlRequest) => workerCtx.prerenderWorker(prerenderRequest),
       componentGraphPath: null,

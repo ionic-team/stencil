@@ -2,11 +2,12 @@ import { buildError, isBoolean, isNumber, isString, normalizePath } from '@utils
 import { isAbsolute, join } from 'path';
 
 import type * as d from '../../declarations';
+import { Diagnostic } from '../diagnostic';
 import { isOutputTargetWww } from '../output-targets/output-utils';
 
 export const validateDevServer = (
   config: d.ValidatedConfig,
-  diagnostics: d.Diagnostic[]
+  diagnostics: Diagnostic[]
 ): d.DevServerConfig | undefined => {
   if ((config.devServer === null || (config.devServer as any)) === false) {
     return undefined;

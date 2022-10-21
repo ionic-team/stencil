@@ -1,12 +1,12 @@
 import { PrintLine } from '../../../compiler/sys/logger';
-import type * as d from '../../../declarations';
+import { Diagnostic } from '../../diagnostic';
 import { CssNode, CssNodeType, CssParsePosition, ParseCssResults } from './css-parse-declarations';
 
 export const parseCss = (css: string, filePath?: string): ParseCssResults => {
   let lineno = 1;
   let column = 1;
 
-  const diagnostics: d.Diagnostic[] = [];
+  const diagnostics: Diagnostic[] = [];
 
   const updatePosition = (str: string) => {
     const lines = str.match(/\n/g);
@@ -28,7 +28,7 @@ export const parseCss = (css: string, filePath?: string): ParseCssResults => {
   const error = (msg: string): null => {
     const srcLines = css.split('\n');
 
-    const d: d.Diagnostic = {
+    const d: Diagnostic = {
       level: 'error',
       type: 'css',
       language: 'css',

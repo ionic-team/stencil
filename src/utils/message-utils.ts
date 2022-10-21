@@ -1,3 +1,4 @@
+import { Diagnostic } from '../compiler/diagnostic';
 import { PrintLine } from '../compiler/sys/logger';
 import type * as d from '../declarations';
 import { isString } from './helpers';
@@ -12,8 +13,8 @@ import { isString } from './helpers';
  * @param diagnostics the existing diagnostics that the created template `Diagnostic` should be added to
  * @returns the created `Diagnostic`
  */
-export const buildError = (diagnostics?: d.Diagnostic[]): d.Diagnostic => {
-  const diagnostic: d.Diagnostic = {
+export const buildError = (diagnostics?: Diagnostic[]): Diagnostic => {
+  const diagnostic: Diagnostic = {
     level: 'error',
     type: 'build',
     header: 'Build Error',
@@ -40,8 +41,8 @@ export const buildError = (diagnostics?: d.Diagnostic[]): d.Diagnostic => {
  * @param diagnostics the existing diagnostics that the created template `Diagnostic` should be added to
  * @returns the created `Diagnostic`
  */
-export const buildWarn = (diagnostics: d.Diagnostic[]): d.Diagnostic => {
-  const diagnostic: d.Diagnostic = {
+export const buildWarn = (diagnostics: Diagnostic[]): Diagnostic => {
+  const diagnostic: Diagnostic = {
     level: 'warn',
     type: 'build',
     header: 'Build Warn',
@@ -71,7 +72,7 @@ export const buildWarn = (diagnostics: d.Diagnostic[]): d.Diagnostic => {
  */
 export const buildJsonFileError = (
   compilerCtx: d.CompilerCtx,
-  diagnostics: d.Diagnostic[],
+  diagnostics: Diagnostic[],
   jsonFilePath: string,
   msg: string,
   jsonField: string
@@ -139,8 +140,8 @@ export const buildJsonFileError = (
  * @param msg an optional message to use in place of `err` to generate the diagnostic
  * @returns the generated diagnostic
  */
-export const catchError = (diagnostics: d.Diagnostic[], err: Error | null | undefined, msg?: string): d.Diagnostic => {
-  const diagnostic: d.Diagnostic = {
+export const catchError = (diagnostics: Diagnostic[], err: Error | null | undefined, msg?: string): Diagnostic => {
+  const diagnostic: Diagnostic = {
     level: 'error',
     type: 'build',
     header: 'Build Error',
@@ -177,7 +178,7 @@ export const catchError = (diagnostics: d.Diagnostic[], err: Error | null | unde
  * @returns true if any of the diagnostics in the list provided are errors that did not occur at runtime. false
  * otherwise.
  */
-export const hasError = (diagnostics: d.Diagnostic[]): boolean => {
+export const hasError = (diagnostics: Diagnostic[]): boolean => {
   if (diagnostics == null || diagnostics.length === 0) {
     return false;
   }
@@ -189,7 +190,7 @@ export const hasError = (diagnostics: d.Diagnostic[]): boolean => {
  * @param diagnostics the diagnostics to inspect
  * @returns true if any of the diagnostics in the list provided are warnings. false otherwise.
  */
-export const hasWarning = (diagnostics: d.Diagnostic[]): boolean => {
+export const hasWarning = (diagnostics: Diagnostic[]): boolean => {
   if (diagnostics == null || diagnostics.length === 0) {
     return false;
   }

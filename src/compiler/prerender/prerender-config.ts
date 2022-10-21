@@ -1,9 +1,10 @@
 import { isString } from '@utils';
 
 import type * as d from '../../declarations';
+import { Diagnostic } from '../diagnostic';
 import { nodeRequire } from '../sys/node-require';
 
-export const getPrerenderConfig = (diagnostics: d.Diagnostic[], prerenderConfigPath: string) => {
+export const getPrerenderConfig = (diagnostics: Diagnostic[], prerenderConfigPath: string) => {
   const prerenderConfig: d.PrerenderConfig = {};
 
   if (isString(prerenderConfigPath)) {

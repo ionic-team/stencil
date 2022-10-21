@@ -1,10 +1,11 @@
 import { catchError } from '@utils';
 
 import type * as d from '../../declarations';
+import { Diagnostic } from '../diagnostic';
 
 export const crawlAnchorsForNextUrls = (
   prerenderConfig: d.PrerenderConfig,
-  diagnostics: d.Diagnostic[],
+  diagnostics: Diagnostic[],
   baseUrl: URL,
   currentUrl: URL,
   parsedAnchors: d.HydrateAnchorElement[]
@@ -107,7 +108,7 @@ export const crawlAnchorsForNextUrls = (
     });
 };
 
-const standardFilterAnchor = (diagnostics: d.Diagnostic[], attrs: { [attrName: string]: string }, _base: URL) => {
+const standardFilterAnchor = (diagnostics: Diagnostic[], attrs: { [attrName: string]: string }, _base: URL) => {
   try {
     let href = attrs.href;
     if (typeof attrs.download === 'string') {
@@ -131,7 +132,7 @@ const standardFilterAnchor = (diagnostics: d.Diagnostic[], attrs: { [attrName: s
   return false;
 };
 
-const standardNormalizeUrl = (diagnostics: d.Diagnostic[], href: string, currentUrl: URL) => {
+const standardNormalizeUrl = (diagnostics: Diagnostic[], href: string, currentUrl: URL) => {
   if (typeof href === 'string') {
     try {
       const outputUrl = new URL(href, currentUrl.href);
@@ -154,7 +155,7 @@ const standardNormalizeUrl = (diagnostics: d.Diagnostic[], href: string, current
   return null;
 };
 
-const standardFilterUrl = (diagnostics: d.Diagnostic[], url: URL, currentUrl: URL, basePathParts: string[]) => {
+const standardFilterUrl = (diagnostics: Diagnostic[], url: URL, currentUrl: URL, basePathParts: string[]) => {
   try {
     if (url.hostname != null && currentUrl.hostname != null && url.hostname !== currentUrl.hostname) {
       return false;
@@ -190,7 +191,7 @@ const standardFilterUrl = (diagnostics: d.Diagnostic[], url: URL, currentUrl: UR
   return false;
 };
 
-export const standardNormalizeHref = (prerenderConfig: d.PrerenderConfig, diagnostics: d.Diagnostic[], url: URL) => {
+export const standardNormalizeHref = (prerenderConfig: d.PrerenderConfig, diagnostics: Diagnostic[], url: URL) => {
   try {
     if (url != null && typeof url.href === 'string') {
       let href = url.href.trim();

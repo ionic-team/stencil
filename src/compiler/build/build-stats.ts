@@ -1,6 +1,7 @@
 import { byteSize, sortBy } from '@utils';
 
 import type * as d from '../../declarations';
+import { Diagnostic } from '../diagnostic';
 import { isOutputTargetStats } from '../output-targets/output-utils';
 
 /**
@@ -12,11 +13,11 @@ import { isOutputTargetStats } from '../output-targets/output-utils';
 export function generateBuildStats(
   config: d.Config,
   buildCtx: d.BuildCtx
-): d.CompilerBuildStats | { diagnostics: d.Diagnostic[] } {
+): d.CompilerBuildStats | { diagnostics: Diagnostic[] } {
   // TODO(STENCIL-461): Investigate making this return only a single type
   const buildResults = buildCtx.buildResults;
 
-  let jsonData: d.CompilerBuildStats | { diagnostics: d.Diagnostic[] };
+  let jsonData: d.CompilerBuildStats | { diagnostics: Diagnostic[] };
 
   try {
     if (buildResults.hasError) {
@@ -63,7 +64,7 @@ export function generateBuildStats(
       jsonData = stats;
     }
   } catch (e: unknown) {
-    const diagnostic: d.Diagnostic = {
+    const diagnostic: Diagnostic = {
       messageText: `Generate Build Stats Error: ` + e,
       level: `error`,
       type: `build`,
@@ -84,7 +85,7 @@ export function generateBuildStats(
  */
 export async function writeBuildStats(
   config: d.Config,
-  data: d.CompilerBuildStats | { diagnostics: d.Diagnostic[] }
+  data: d.CompilerBuildStats | { diagnostics: Diagnostic[] }
 ): Promise<void> {
   const statsTargets = config.outputTargets.filter(isOutputTargetStats);
 

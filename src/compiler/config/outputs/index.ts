@@ -1,6 +1,7 @@
 import { buildError, buildWarn } from '@utils';
 
 import type * as d from '../../../declarations';
+import { Diagnostic } from '../../diagnostic';
 import {
   DIST_CUSTOM_ELEMENTS_BUNDLE,
   isValidConfigOutputTarget,
@@ -18,7 +19,7 @@ import { validateLazy } from './validate-lazy';
 import { validateStats } from './validate-stats';
 import { validateWww } from './validate-www';
 
-export const validateOutputTargets = (config: d.ValidatedConfig, diagnostics: d.Diagnostic[]) => {
+export const validateOutputTargets = (config: d.ValidatedConfig, diagnostics: Diagnostic[]) => {
   const userOutputs = (config.outputTargets || []).slice();
 
   userOutputs.forEach((outputTarget) => {

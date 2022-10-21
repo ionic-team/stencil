@@ -1,4 +1,4 @@
-import type * as d from '../../declarations';
+import { Diagnostic } from '../../compiler/diagnostic';
 import { catchError } from '../message-utils';
 
 describe('message-utils', () => {
@@ -7,7 +7,7 @@ describe('message-utils', () => {
       it('returns a template diagnostic', () => {
         const diagnostic = catchError([], null);
 
-        expect(diagnostic).toEqual<d.Diagnostic>({
+        expect(diagnostic).toEqual<Diagnostic>({
           level: 'error',
           type: 'build',
           header: 'Build Error',
@@ -19,7 +19,7 @@ describe('message-utils', () => {
       });
 
       it('pushes a template diagnostic onto a collection of diagnostics', () => {
-        const diagnostics: d.Diagnostic[] = [];
+        const diagnostics: Diagnostic[] = [];
 
         const diagnostic = catchError(diagnostics, null);
 
@@ -41,7 +41,7 @@ describe('message-utils', () => {
         it('returns a diagnostic', () => {
           const diagnostic = catchError([], err);
 
-          expect(diagnostic).toEqual<d.Diagnostic>({
+          expect(diagnostic).toEqual<Diagnostic>({
             level: 'error',
             type: 'build',
             header: 'Build Error',
@@ -53,7 +53,7 @@ describe('message-utils', () => {
         });
 
         it('pushes a template diagnostic onto a collection of diagnostics', () => {
-          const diagnostics: d.Diagnostic[] = [];
+          const diagnostics: Diagnostic[] = [];
 
           const diagnostic = catchError(diagnostics, err);
 
@@ -71,7 +71,7 @@ describe('message-utils', () => {
           it('returns a diagnostic', () => {
             const diagnostic = catchError([], err);
 
-            expect(diagnostic).toEqual<d.Diagnostic>({
+            expect(diagnostic).toEqual<Diagnostic>({
               level: 'error',
               type: 'build',
               header: 'Build Error',
@@ -83,7 +83,7 @@ describe('message-utils', () => {
           });
 
           it("doesn't push a template diagnostic", () => {
-            const diagnostics: d.Diagnostic[] = [];
+            const diagnostics: Diagnostic[] = [];
 
             catchError(diagnostics, err);
 
@@ -105,7 +105,7 @@ describe('message-utils', () => {
         it('returns a diagnostic', () => {
           const diagnostic = catchError([], err);
 
-          expect(diagnostic).toEqual<d.Diagnostic>({
+          expect(diagnostic).toEqual<Diagnostic>({
             level: 'error',
             type: 'build',
             header: 'Build Error',
@@ -117,7 +117,7 @@ describe('message-utils', () => {
         });
 
         it('pushes a template diagnostic onto a collection of diagnostics', () => {
-          const diagnostics: d.Diagnostic[] = [];
+          const diagnostics: Diagnostic[] = [];
 
           const diagnostic = catchError(diagnostics, err);
 
@@ -129,7 +129,7 @@ describe('message-utils', () => {
           err.message = '';
           const diagnostic = catchError([], err);
 
-          expect(diagnostic).toEqual<d.Diagnostic>({
+          expect(diagnostic).toEqual<Diagnostic>({
             level: 'error',
             type: 'build',
             header: 'Build Error',
@@ -150,7 +150,7 @@ describe('message-utils', () => {
           it('returns a diagnostic', () => {
             const diagnostic = catchError([], err);
 
-            expect(diagnostic).toEqual<d.Diagnostic>({
+            expect(diagnostic).toEqual<Diagnostic>({
               level: 'error',
               type: 'build',
               header: 'Build Error',
@@ -162,7 +162,7 @@ describe('message-utils', () => {
           });
 
           it("doesn't push a template diagnostic", () => {
-            const diagnostics: d.Diagnostic[] = [];
+            const diagnostics: Diagnostic[] = [];
 
             catchError(diagnostics, err);
 
@@ -183,7 +183,7 @@ describe('message-utils', () => {
         it('returns a diagnostic', () => {
           const diagnostic = catchError([], err);
 
-          expect(diagnostic).toEqual<d.Diagnostic>({
+          expect(diagnostic).toEqual<Diagnostic>({
             level: 'error',
             type: 'build',
             header: 'Build Error',
@@ -195,7 +195,7 @@ describe('message-utils', () => {
         });
 
         it('pushes a template diagnostic onto a collection of diagnostics', () => {
-          const diagnostics: d.Diagnostic[] = [];
+          const diagnostics: Diagnostic[] = [];
 
           const diagnostic = catchError(diagnostics, err);
 
@@ -211,7 +211,7 @@ describe('message-utils', () => {
       it('returns a diagnostic with the message', () => {
         const diagnostic = catchError([], null, message);
 
-        expect(diagnostic).toEqual<d.Diagnostic>({
+        expect(diagnostic).toEqual<Diagnostic>({
           level: 'error',
           type: 'build',
           header: 'Build Error',
@@ -223,7 +223,7 @@ describe('message-utils', () => {
       });
 
       it('pushes the diagnostic onto a collection of diagnostics', () => {
-        const diagnostics: d.Diagnostic[] = [];
+        const diagnostics: Diagnostic[] = [];
 
         const diagnostic = catchError(diagnostics, null, message);
 
@@ -234,7 +234,7 @@ describe('message-utils', () => {
       it('prints "UNKNOWN ERROR" when the message text is empty', () => {
         const diagnostic = catchError([], null, '');
 
-        expect(diagnostic).toEqual<d.Diagnostic>({
+        expect(diagnostic).toEqual<Diagnostic>({
           level: 'error',
           type: 'build',
           header: 'Build Error',
@@ -251,7 +251,7 @@ describe('message-utils', () => {
         it('returns a diagnostic', () => {
           const diagnostic = catchError([], null, taskCanceledMessage);
 
-          expect(diagnostic).toEqual<d.Diagnostic>({
+          expect(diagnostic).toEqual<Diagnostic>({
             level: 'error',
             type: 'build',
             header: 'Build Error',
@@ -263,7 +263,7 @@ describe('message-utils', () => {
         });
 
         it("doesn't push a template diagnostic", () => {
-          const diagnostics: d.Diagnostic[] = [];
+          const diagnostics: Diagnostic[] = [];
 
           catchError([], null, taskCanceledMessage);
 

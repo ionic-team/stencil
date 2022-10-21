@@ -2,6 +2,7 @@ import { augmentDiagnosticWithNode, buildError, normalizePath, readOnlyArrayHasS
 import ts from 'typescript';
 
 import type * as d from '../../declarations';
+import { Diagnostic } from '../diagnostic';
 import { MEMBER_DECORATORS_TO_REMOVE } from './decorators-to-static/decorators-constants';
 
 export const getScriptTarget = () => {
@@ -433,7 +434,7 @@ const getAllTypeReferences = (node: ts.Node): ReadonlyArray<string> => {
 };
 
 export const validateReferences = (
-  diagnostics: d.Diagnostic[],
+  diagnostics: Diagnostic[],
   references: d.ComponentCompilerTypeReferences,
   node: ts.Node
 ) => {

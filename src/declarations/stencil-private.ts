@@ -1,3 +1,4 @@
+import type { Diagnostic } from '../compiler/diagnostic';
 import type { InMemoryFileSystem } from '../compiler/sys/in-memory-fs';
 import type {
   BuildEvents,
@@ -12,7 +13,6 @@ import type {
   CopyResults,
   DevServerConfig,
   DevServerEditor,
-  Diagnostic,
   Logger,
   LoggerLineUpdater,
   LoggerTimeSpan,

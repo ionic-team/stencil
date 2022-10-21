@@ -2,6 +2,7 @@ import { buildError, normalizePath } from '@utils';
 import { basename, dirname, isAbsolute, join } from 'path';
 
 import type * as d from '../../declarations';
+import { Diagnostic } from '../diagnostic';
 import { parseStyleDocs } from '../docs/style-docs';
 import { resolveModuleIdAsync } from '../sys/resolve/resolve-module-async';
 import { getModuleId } from '../sys/resolve/resolve-utils';
@@ -228,7 +229,7 @@ export const isCssNodeModule = (url: string) => url.startsWith('~');
 export const resolveCssNodeModule = async (
   config: d.Config,
   compilerCtx: d.CompilerCtx,
-  diagnostics: d.Diagnostic[],
+  diagnostics: Diagnostic[],
   filePath: string,
   cssImportData: d.CssImportData
 ) => {

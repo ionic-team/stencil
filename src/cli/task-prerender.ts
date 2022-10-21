@@ -1,6 +1,7 @@
 import { catchError } from '@utils';
 
-import type { BuildResultsComponentGraph, Diagnostic, ValidatedConfig } from '../declarations';
+import { Diagnostic } from '../compiler/diagnostic';
+import type { BuildResultsComponentGraph, ValidatedConfig } from '../declarations';
 import type { CoreCompiler } from './load-compiler';
 import { startupCompilerLog } from './logs';
 

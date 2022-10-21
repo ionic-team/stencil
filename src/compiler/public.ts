@@ -5,7 +5,6 @@ import {
   CompilerWatcher,
   CompileScriptMinifyOptions,
   Config,
-  Diagnostic,
   LoadConfigInit,
   LoadConfigResults,
   OptimizeCssInput,
@@ -18,6 +17,8 @@ import {
   TranspileOptions,
   TranspileResults,
 } from '@stencil/core/internal';
+
+import { Diagnostic } from './diagnostic';
 
 /**
  * The `transpile()` function inputs source code as a string, with various options

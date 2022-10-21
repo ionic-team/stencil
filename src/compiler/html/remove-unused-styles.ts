@@ -1,11 +1,11 @@
 import { catchError, hasError } from '@utils';
 
-import type * as d from '../../declarations';
+import { Diagnostic } from '../diagnostic';
 import { parseCss } from '../style/css-parser/parse-css';
 import { serializeCss } from '../style/css-parser/serialize-css';
 import { getUsedSelectors, UsedSelectors } from '../style/css-parser/used-selectors';
 
-export const removeUnusedStyles = (doc: Document, diagnostics: d.Diagnostic[]) => {
+export const removeUnusedStyles = (doc: Document, diagnostics: Diagnostic[]) => {
   try {
     const styleElms = doc.head.querySelectorAll<HTMLStyleElement>(`style[data-styles]`);
     const styleLen = styleElms.length;
@@ -24,11 +24,7 @@ export const removeUnusedStyles = (doc: Document, diagnostics: d.Diagnostic[]) =
   }
 };
 
-const removeUnusedStyleText = (
-  usedSelectors: UsedSelectors,
-  diagnostics: d.Diagnostic[],
-  styleElm: HTMLStyleElement
-) => {
+const removeUnusedStyleText = (usedSelectors: UsedSelectors, diagnostics: Diagnostic[], styleElm: HTMLStyleElement) => {
   try {
     // parse the css from being applied to the document
     const parseResults = parseCss(styleElm.innerHTML);

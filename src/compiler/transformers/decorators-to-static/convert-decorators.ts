@@ -1,6 +1,7 @@
 import { augmentDiagnosticWithNode, buildError } from '@utils';
 import ts from 'typescript';
 
+import { Diagnostic } from '../../../compiler/diagnostic';
 import type * as d from '../../../declarations';
 import { componentDecoratorToStatic } from './component-decorator';
 import { isDecoratorNamed } from './decorator-utils';
@@ -19,7 +20,7 @@ import { watchDecoratorsToStatic } from './watch-decorator';
 
 export const convertDecoratorsToStatic = (
   config: d.Config,
-  diagnostics: d.Diagnostic[],
+  diagnostics: Diagnostic[],
   typeChecker: ts.TypeChecker
 ): ts.TransformerFactory<ts.SourceFile> => {
   return (transformCtx) => {
@@ -38,7 +39,7 @@ export const convertDecoratorsToStatic = (
 
 const visitClassDeclaration = (
   config: d.Config,
-  diagnostics: d.Diagnostic[],
+  diagnostics: Diagnostic[],
   typeChecker: ts.TypeChecker,
   classNode: ts.ClassDeclaration
 ) => {
@@ -113,7 +114,7 @@ const visitClassDeclaration = (
  */
 const removeStencilMethodDecorators = (
   classMembers: ts.ClassElement[],
-  diagnostics: d.Diagnostic[]
+  diagnostics: Diagnostic[]
 ): ts.ClassElement[] => {
   return classMembers.map((member) => {
     const currentDecorators = member.decorators;

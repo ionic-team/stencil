@@ -1,4 +1,4 @@
-import { Diagnostic } from '../../declarations';
+import { Diagnostic } from '../../compiler/diagnostic';
 
 export const logBuild = (msg: string) => log(BLUE, 'Build', msg);
 

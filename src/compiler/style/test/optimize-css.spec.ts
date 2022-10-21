@@ -3,12 +3,13 @@ import { mockCompilerCtx, mockConfig } from '@stencil/core/testing';
 import os from 'os';
 import path from 'path';
 
+import { Diagnostic } from '../../diagnostic';
 import { optimizeCss } from '../optimize-css';
 
 describe('optimizeCss', () => {
   let config: d.Config;
   let compilerCtx: d.CompilerCtx;
-  let diagnostics: d.Diagnostic[];
+  let diagnostics: Diagnostic[];
 
   // TODO(STENCIL-307): Remove usage of the Jasmine global
   // eslint-disable-next-line jest/no-jasmine-globals -- these will be removed when we migrate to jest-circus

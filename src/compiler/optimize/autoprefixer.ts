@@ -1,6 +1,7 @@
 import { Postcss } from 'postcss';
 
 import type * as d from '../../declarations';
+import { Diagnostic } from '../diagnostic';
 import { IS_NODE_ENV, requireFunc } from '../sys/environment';
 import { PrintLine } from '../sys/logger';
 
@@ -44,7 +45,7 @@ export const autoprefixCss = async (cssText: string, opts: boolean | null | d.Au
 
     output.output = result.css;
   } catch (e: any) {
-    const diagnostic: d.Diagnostic = {
+    const diagnostic: Diagnostic = {
       header: `Autoprefix CSS`,
       messageText: `CSS Error` + e,
       level: `error`,
