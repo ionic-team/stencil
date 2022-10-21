@@ -9732,6 +9732,8 @@ async function run() {
     username,
   });
 
+  console.log('IS INTERNAL', isInternalMember);
+
   // If the user is a member of the org, we will directly assign the members of the Stencil team
   // Otherwise, we will assign the team itself as a reviewer
   if (!!isInternalMember && isInternalMember.data.state === 'active') {
@@ -9741,6 +9743,7 @@ async function run() {
       // that are in the team
       team_slug: teamSlug,
     });
+    console.log('STENCIL MEMBERS', stencilTeamMembers);
     reviewers = stencilTeamMembers.filter((ref) => ref.login !== username);
   } else {
     teamReviewers = [teamSlug];
