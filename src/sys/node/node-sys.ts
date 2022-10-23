@@ -22,8 +22,17 @@ import { NodeResolveModule } from './node-resolve-module';
 import { checkVersion } from './node-stencil-version-checker';
 import { NodeWorkerController } from './node-worker-controller';
 
-export function createNodeSys(c: { process?: any } = {}) {
-  const prcs: NodeJS.Process = c.process || global.process;
+/**
+ * Create a node.js-specific {@link CompilerSystem} to be used when Stencil is
+ * run from the CLI or via the public API in a node context.
+ *
+ * This takes an optional param supplying a `process` object to be used.
+ *
+ * @param c an optional object wrapping a `process` object
+ * @returns a node.js `CompilerSystem` object
+ */
+export function createNodeSys(c: { process?: any } = {}): CompilerSystem {
+  const prcs: NodeJS.Process = c?.process ?? global.process;
   const destroys = new Set<() => Promise<void> | void>();
   const onInterruptsCallbacks: (() => void)[] = [];
 

@@ -30,8 +30,11 @@ const addDefineCustomElement = (moduleFile: d.Module, compilerMeta: d.ComponentC
   if (compilerMeta.isPlain) {
     // add customElements.define('cmp-a', CmpClass);
     return ts.createStatement(
-      ts.createCall(
-        ts.createPropertyAccess(ts.factory.createIdentifier('customElements'), ts.factory.createIdentifier('define')),
+      ts.factory.createCallExpression(
+        ts.factory.createPropertyAccessExpression(
+          ts.factory.createIdentifier('customElements'),
+          ts.factory.createIdentifier('define')
+        ),
         [],
         [ts.createLiteral(compilerMeta.tagName), ts.factory.createIdentifier(compilerMeta.componentClassName)]
       )
@@ -45,7 +48,11 @@ const addDefineCustomElement = (moduleFile: d.Module, compilerMeta: d.ComponentC
   const liternalMeta = convertValueToLiteral(compactMeta);
 
   return ts.createStatement(
-    ts.createCall(ts.factory.createIdentifier(DEFINE_CUSTOM_ELEMENT), [], [liternalCmpClassName, liternalMeta])
+    ts.factory.createCallExpression(
+      ts.factory.createIdentifier(DEFINE_CUSTOM_ELEMENT),
+      [],
+      [liternalCmpClassName, liternalMeta]
+    )
   );
 };
 

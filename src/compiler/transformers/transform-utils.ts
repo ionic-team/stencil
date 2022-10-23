@@ -738,7 +738,7 @@ export const createRequireStatement = (importFnNames: string[], importPath: stri
         ts.createVariableDeclaration(
           importBinding,
           undefined,
-          ts.createCall(ts.factory.createIdentifier('require'), [], [ts.createLiteral(importPath)])
+          ts.factory.createCallExpression(ts.factory.createIdentifier('require'), [], [ts.createLiteral(importPath)])
         ),
       ],
       ts.NodeFlags.Const

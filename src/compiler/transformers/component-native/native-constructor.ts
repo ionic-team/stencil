@@ -53,7 +53,7 @@ export const updateNativeConstructor = (
       statements = [createNativeConstructorSuper(), ...statements];
     }
 
-    const cstrMethod = ts.createConstructor(undefined, undefined, undefined, ts.createBlock(statements, true));
+    const cstrMethod = ts.createConstructor(undefined, undefined, undefined, ts.factory.createBlock(statements, true));
     classMembers.unshift(cstrMethod);
   }
 };
@@ -74,8 +74,8 @@ const nativeInit = (moduleFile: d.Module, cmp: d.ComponentCompilerMeta): Readonl
 
 const nativeRegisterHostStatement = () => {
   return ts.createStatement(
-    ts.createCall(
-      ts.createPropertyAccess(ts.createThis(), ts.factory.createIdentifier('__registerHost')),
+    ts.factory.createCallExpression(
+      ts.factory.createPropertyAccessExpression(ts.factory.createThis(), ts.factory.createIdentifier('__registerHost')),
       undefined,
       undefined
     )
@@ -100,5 +100,7 @@ const nativeAttachShadowStatement = (moduleFile: d.Module): ts.ExpressionStateme
 };
 
 const createNativeConstructorSuper = () => {
-  return ts.createExpressionStatement(ts.createCall(ts.factory.createIdentifier('super'), undefined, undefined));
+  return ts.factory.createExpressionStatement(
+    ts.factory.createCallExpression(ts.factory.createIdentifier('super'), undefined, undefined)
+  );
 };

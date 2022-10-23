@@ -39,7 +39,7 @@ export const updateLazyComponentConstructor = (
       undefined,
       undefined,
       cstrMethodArgs,
-      ts.createBlock(
+      ts.factory.createBlock(
         [
           registerInstanceStatement(moduleFile),
           ...addCreateEvents(moduleFile, cmp),
@@ -56,8 +56,8 @@ const registerInstanceStatement = (moduleFile: d.Module) => {
   addCoreRuntimeApi(moduleFile, RUNTIME_APIS.registerInstance);
 
   return ts.createStatement(
-    ts.createCall(ts.factory.createIdentifier(REGISTER_INSTANCE), undefined, [
-      ts.createThis(),
+    ts.factory.createCallExpression(ts.factory.createIdentifier(REGISTER_INSTANCE), undefined, [
+      ts.factory.createThis(),
       ts.factory.createIdentifier(HOST_REF_ARG),
     ])
   );
