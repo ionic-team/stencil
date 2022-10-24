@@ -52,3 +52,5 @@ coverage/**
 null_errors*.json
 # TODO(STENCIL-454): Remove or change this up once we've eliminated unused exports
 unused-exports*.txt
+
+tsconfig.tsbuildinfo

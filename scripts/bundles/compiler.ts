@@ -50,6 +50,18 @@ export async function compiler(opts: BuildOptions) {
   await fs.mkdir(join(opts.output.compilerDir, 'sys'));
   await fs.writeFile(join(opts.output.compilerDir, 'sys', 'in-memory-fs.d.ts'), inMemoryFsDts);
 
+  // copy .dts files for the 'logger' sub-project
+  await fs.mkdir(join(opts.output.compilerDir, 'sys', 'logger'));
+  for (const dtsFileName of ['index.d.ts', 'logger.d.ts', 'console-logger.d.ts', 'terminal-logger.d.ts']) {
+    const loggerDtsContents = await fs.readFile(join(inputDir, 'sys', 'logger', dtsFileName), 'utf8');
+    await fs.writeFile(join(opts.output.compilerDir, 'sys', 'logger', dtsFileName), loggerDtsContents);
+  }
+
+  // copy .dts file for the 'diagnostic' sub-project
+  const diagnosticDts = await fs.readFile(join(inputDir, 'diagnostic', 'index.d.ts'));
+  await fs.mkdir(join(opts.output.compilerDir, 'diagnostic'));
+  await fs.writeFile(join(opts.output.compilerDir, 'diagnostic', 'index.d.ts'), diagnosticDts);
+
   /**
    * These files are wrap the compiler in an Immediately-Invoked Function Expression (IIFE). The intro contains the
    * first half of the IIFE, and the outro contains the second half. Those files are not valid JavaScript on their own,

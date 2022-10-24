@@ -1,6 +1,6 @@
 import ansiColor, { bgRed, blue, bold, cyan, dim, gray, green, magenta, red, yellow } from 'ansi-colors';
-import { Diagnostic } from 'src/compiler/diagnostic';
 
+import { Diagnostic } from '../../diagnostic';
 import { LOG_LEVELS, Logger, LoggerLineUpdater, LoggerTimeSpan, LogLevel, PrintLine } from './logger';
 
 /**
