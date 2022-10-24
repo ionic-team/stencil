@@ -28,6 +28,17 @@ export const dashToPascalCase = (str: string): string =>
     .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
     .join('');
 
+/**
+ * Convert a string to 'camelCase'
+ *
+ * @param str the string to convert
+ * @returns the converted string
+ */
+export const toCamelCase = (str: string) => {
+  const pascalCase = dashToPascalCase(str);
+  return pascalCase.charAt(0).toLowerCase() + pascalCase.slice(1);
+};
+
 export const toTitleCase = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
 export const noop = (): any => {
