@@ -50,7 +50,7 @@ export const coreResolvePlugin = (
       }
       if (id === STENCIL_INTERNAL_CLIENT_ID) {
         if (externalRuntime) {
-          // not bunding the client runtime and the user's component together this
+          // not bundling the client runtime and the user's component together this
           // must be the custom elements build, where @stencil/core/internal/client
           // is an import, rather than bundling
           return {

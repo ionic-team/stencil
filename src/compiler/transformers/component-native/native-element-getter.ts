@@ -14,7 +14,7 @@ export const addNativeElementGetter = (classMembers: ts.ClassElement[], cmp: d.C
         cmp.elementRef,
         [],
         undefined,
-        ts.createBlock([ts.createReturn(ts.createThis())])
+        ts.factory.createBlock([ts.createReturn(ts.factory.createThis())])
       )
     );
   }

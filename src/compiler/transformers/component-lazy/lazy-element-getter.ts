@@ -21,8 +21,12 @@ export const addLazyElementGetter = (
         cmp.elementRef,
         [],
         undefined,
-        ts.createBlock([
-          ts.createReturn(ts.createCall(ts.factory.createIdentifier(GET_ELEMENT), undefined, [ts.createThis()])),
+        ts.factory.createBlock([
+          ts.createReturn(
+            ts.factory.createCallExpression(ts.factory.createIdentifier(GET_ELEMENT), undefined, [
+              ts.factory.createThis(),
+            ])
+          ),
         ])
       )
     );

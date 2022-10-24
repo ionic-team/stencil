@@ -19,10 +19,13 @@ export const addLegacyProps = (moduleFile: d.Module, cmp: d.ComponentCompilerMet
 };
 
 const getStatement = (propName: string, method: string, arg: string) => {
-  return ts.createExpressionStatement(
-    ts.createAssignment(
-      ts.createPropertyAccess(ts.createThis(), propName),
-      ts.createCall(ts.factory.createIdentifier(method), undefined, [ts.createThis(), ts.createLiteral(arg)])
+  return ts.factory.createExpressionStatement(
+    ts.factory.createAssignment(
+      ts.factory.createPropertyAccessExpression(ts.factory.createThis(), propName),
+      ts.factory.createCallExpression(ts.factory.createIdentifier(method), undefined, [
+        ts.factory.createThis(),
+        ts.createLiteral(arg),
+      ])
     )
   );
 };

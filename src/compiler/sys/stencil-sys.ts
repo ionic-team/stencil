@@ -27,8 +27,20 @@ import { createLogger } from './logger/console-logger';
 import { resolveModuleIdAsync } from './resolve/resolve-module-async';
 import { createWebWorkerMainController } from './worker/web-worker-main';
 
-export const createSystem = (c?: { logger?: Logger }) => {
-  const logger = c && c.logger ? c.logger : createLogger();
+/**
+ * Create an in-memory `CompilerSystem` object, optionally using a supplied
+ * logger instance
+ *
+ * This particular system being an 'in-memory' `CompilerSystem` is intended for
+ * use in the browser. In most cases, for instance when using Stencil through
+ * the CLI, a Node.js-specific `CompilerSystem` will be used instead. See
+ * {@link CompilerSystem} for more details.
+ *
+ * @param c an object wrapping a logger instance
+ * @returns a complete CompilerSystem, ready for use!
+ */
+export const createSystem = (c?: { logger?: Logger }): CompilerSystem => {
+  const logger = c?.logger ?? createLogger();
   const items = new Map<string, FsItem>();
   const destroys = new Set<() => Promise<void> | void>();
 

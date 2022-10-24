@@ -12,6 +12,10 @@ import type { BuildConditionals } from '../../declarations';
 export interface BundleOptions {
   id: string;
   conditionals?: BuildConditionals;
+  /**
+   * When `true`, all `@stencil/core/*` packages will be treated as external
+   * and omitted from the generated bundle.
+   */
   externalRuntime?: boolean;
   platform: 'client' | 'hydrate' | 'worker';
   customTransformers?: TransformerFactory<SourceFile>[];

@@ -2054,6 +2054,12 @@ export type CustomElementsExportBehavior = typeof CustomElementsExportBehaviorOp
 export interface OutputTargetDistCustomElements extends OutputTargetBaseNext {
   type: 'dist-custom-elements';
   empty?: boolean;
+  /**
+   * Triggers the following behaviors when enabled:
+   * 1. All `@stencil/core/*` module references are treated as external during bundling.
+   * 2. File names are not hashed.
+   * 3. File minification will follow the behavior defined at the root of the Stencil config.
+   */
   externalRuntime?: boolean;
   copy?: CopyTask[];
   inlineDynamicImports?: boolean;
