@@ -103,7 +103,7 @@ const parseMethodDecorator = (
   validateReferences(diagnostics, methodMeta.complexType.references, method.type || method.name);
 
   const staticProp = ts.factory.createPropertyAssignment(
-    ts.createLiteral(methodName),
+    ts.factory.createStringLiteral(methodName),
     convertValueToLiteral(methodMeta)
   );
 

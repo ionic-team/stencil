@@ -15,14 +15,14 @@ export const addLazyElementGetter = (
     addCoreRuntimeApi(moduleFile, RUNTIME_APIS.getElement);
 
     classMembers.push(
-      ts.createGetAccessor(
+      ts.factory.createGetAccessorDeclaration(
         undefined,
         undefined,
         cmp.elementRef,
         [],
         undefined,
         ts.factory.createBlock([
-          ts.createReturn(
+          ts.factory.createReturnStatement(
             ts.factory.createCallExpression(ts.factory.createIdentifier(GET_ELEMENT), undefined, [
               ts.factory.createThis(),
             ])

@@ -12,11 +12,11 @@ export const addModuleMetadataProxies = (tsSourceFile: ts.SourceFile, moduleFile
 
   statements.push(...moduleFile.cmps.map(addComponentMetadataProxy));
 
-  return ts.updateSourceFileNode(tsSourceFile, statements);
+  return ts.factory.updateSourceFile(tsSourceFile, statements);
 };
 
 const addComponentMetadataProxy = (compilerMeta: d.ComponentCompilerMeta) => {
-  return ts.createStatement(createComponentMetadataProxy(compilerMeta));
+  return ts.factory.createExpressionStatement(createComponentMetadataProxy(compilerMeta));
 };
 
 /**
