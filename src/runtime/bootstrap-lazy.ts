@@ -185,7 +185,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
     });
   });
 
-  if (BUILD.invisiblePrehydration && (BUILD.hydratedClass || BUILD.hydratedAttribute)) {
+  if (cmpTags.length > 0 && BUILD.invisiblePrehydration && (BUILD.hydratedClass || BUILD.hydratedAttribute)) {
     visibilityStyle.innerHTML = cmpTags + HYDRATED_CSS;
     visibilityStyle.setAttribute('data-styles', '');
 
