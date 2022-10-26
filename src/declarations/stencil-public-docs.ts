@@ -20,7 +20,7 @@ export interface JsonDocsComponent {
   docs: string;
   docsTags: JsonDocsTag[];
   /**
-   * The comment found at in a class-level JSDoc for a Stencil component.
+   * The text from the class-level JSDoc for a Stencil component, if present.
    */
   overview?: string;
   usage: JsonDocsUsage;
