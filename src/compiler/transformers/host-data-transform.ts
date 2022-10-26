@@ -13,7 +13,7 @@ export const transformHostData = (classElements: ts.ClassElement[], moduleFile: 
     );
     if (renderIndex >= 0) {
       const renderMethod = classElements[renderIndex] as ts.MethodDeclaration;
-      classElements[renderIndex] = ts.updateMethod(
+      classElements[renderIndex] = ts.factory.updateMethodDeclaration(
         renderMethod,
         renderMethod.decorators,
         renderMethod.modifiers,
@@ -70,7 +70,9 @@ const syntheticRender = (moduleFile: d.Module, hasRender: boolean) => {
     undefined,
     undefined,
     ts.factory.createBlock([
-      ts.createReturn(ts.factory.createCallExpression(ts.factory.createIdentifier(H), undefined, hArguments)),
+      ts.factory.createReturnStatement(
+        ts.factory.createCallExpression(ts.factory.createIdentifier(H), undefined, hArguments)
+      ),
     ])
   );
 };

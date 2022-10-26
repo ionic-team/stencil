@@ -84,7 +84,7 @@ const visitClassDeclaration = (
 
   validateMethods(diagnostics, classMembers);
 
-  return ts.updateClassDeclaration(
+  return ts.factory.updateClassDeclaration(
     classNode,
     filterDecorators(classNode, CLASS_DECORATORS_TO_REMOVE),
     classNode.modifiers,
@@ -121,7 +121,7 @@ const removeStencilMethodDecorators = (
 
     if (currentDecorators !== newDecorators) {
       if (ts.isMethodDeclaration(member)) {
-        return ts.updateMethod(
+        return ts.factory.updateMethodDeclaration(
           member,
           newDecorators,
           member.modifiers,
@@ -143,7 +143,7 @@ const removeStencilMethodDecorators = (
           return member;
         } else {
           // update the property to remove decorators
-          return ts.updateProperty(
+          return ts.factory.updatePropertyDeclaration(
             member,
             newDecorators,
             member.modifiers,

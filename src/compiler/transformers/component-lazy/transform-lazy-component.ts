@@ -38,7 +38,7 @@ export const lazyComponentTransform = (
       tsSourceFile = addImports(transformOpts, tsSourceFile, moduleFile.coreRuntimeApis, transformOpts.coreImportPath);
 
       if (styleStatements.length > 0) {
-        tsSourceFile = ts.updateSourceFileNode(tsSourceFile, [...tsSourceFile.statements, ...styleStatements]);
+        tsSourceFile = ts.factory.updateSourceFile(tsSourceFile, [...tsSourceFile.statements, ...styleStatements]);
       }
 
       return tsSourceFile;

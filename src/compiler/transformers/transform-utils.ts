@@ -44,7 +44,15 @@ export const isMemberPrivate = (member: ts.ClassElement): boolean => {
 export const convertValueToLiteral = (
   val: any,
   refs: WeakSet<any> = null
-): ts.Identifier | ts.StringLiteral | ts.ObjectLiteralExpression | ts.ArrayLiteralExpression => {
+):
+  | ts.Identifier
+  | ts.StringLiteral
+  | ts.ObjectLiteralExpression
+  | ts.ArrayLiteralExpression
+  | ts.TrueLiteral
+  | ts.FalseLiteral
+  | ts.BigIntLiteral
+  | ts.NumericLiteral => {
   if (refs == null) {
     refs = new WeakSet();
   }
@@ -72,7 +80,23 @@ export const convertValueToLiteral = (
     }
     return objectToObjectLiteral(val, refs);
   }
-  return ts.createLiteral(val);
+
+  // the remainder of the implementation of this function was derived from the deprecated `createLiteral` function
+  // found in typescript@4.8.4
+  if (typeof val === 'number') {
+    return ts.factory.createNumericLiteral(val);
+  }
+  if (typeof val === 'object' && 'base10Value' in val) {
+    return ts.factory.createBigIntLiteral(val);
+  }
+  if (typeof val === 'boolean') {
+    return val ? ts.factory.createTrue() : ts.factory.createFalse();
+  }
+  if (typeof val === 'string') {
+    return ts.factory.createStringLiteral(val, undefined);
+  }
+
+  return ts.factory.createStringLiteralFromNode(val);
 };
 
 /**
@@ -91,7 +115,7 @@ const arrayToArrayLiteral = (list: any[], refs: WeakSet<any>): ts.ArrayLiteralEx
   const newList: any[] = list.map((l) => {
     return convertValueToLiteral(l, refs);
   });
-  return ts.createArrayLiteral(newList);
+  return ts.factory.createArrayLiteralExpression(newList);
 };
 
 /**
@@ -118,7 +142,7 @@ const objectToObjectLiteral = (obj: { [key: string]: any }, refs: WeakSet<any>):
 
   const newProperties: ts.ObjectLiteralElementLike[] = Object.keys(obj).map((key) => {
     const prop = ts.factory.createPropertyAssignment(
-      ts.createLiteral(key),
+      ts.factory.createStringLiteral(key),
       convertValueToLiteral(obj[key], refs) as ts.Expression
     );
     return prop;
@@ -664,24 +688,6 @@ export const isMethod = (member: ts.ClassElement, methodName: string): member is
   return ts.isMethodDeclaration(member) && member.name && (member.name as any).escapedText === methodName;
 };
 
-export const isAsyncFn = (typeChecker: ts.TypeChecker, methodDeclaration: ts.MethodDeclaration) => {
-  if (methodDeclaration.modifiers) {
-    if (methodDeclaration.modifiers.some((m) => m.kind === ts.SyntaxKind.AsyncKeyword)) {
-      return true;
-    }
-  }
-
-  const methodSignature = typeChecker.getSignatureFromDeclaration(methodDeclaration);
-  const returnType = methodSignature.getReturnType();
-  const typeStr = typeChecker.typeToString(
-    returnType,
-    undefined,
-    ts.TypeFormatFlags.NoTruncation | ts.TypeFormatFlags.InTypeAlias | ts.TypeFormatFlags.InElementType
-  );
-
-  return typeStr.includes('Promise<');
-};
-
 export const createImportStatement = (importFnNames: string[], importPath: string) => {
   // ESM Imports
   // import { importNames } from 'importPath';
@@ -705,11 +711,11 @@ export const createImportStatement = (importFnNames: string[], importPath: strin
     );
   });
 
-  return ts.createImportDeclaration(
+  return ts.factory.createImportDeclaration(
     undefined,
     undefined,
-    ts.createImportClause(undefined, ts.createNamedImports(importSpecifiers)),
-    ts.createLiteral(importPath)
+    ts.factory.createImportClause(false, undefined, ts.factory.createNamedImports(importSpecifiers)),
+    ts.factory.createStringLiteral(importPath)
   );
 };
 
@@ -717,7 +723,7 @@ export const createRequireStatement = (importFnNames: string[], importPath: stri
   // CommonJS require()
   // const { a, b, c } = require(importPath);
 
-  const importBinding = ts.createObjectBindingPattern(
+  const importBinding = ts.factory.createObjectBindingPattern(
     importFnNames.map((importKey) => {
       const splt = importKey.split(' as ');
       let importAs = importKey;
@@ -727,18 +733,23 @@ export const createRequireStatement = (importFnNames: string[], importPath: stri
         importAs = splt[1];
         importFnName = splt[0];
       }
-      return ts.createBindingElement(undefined, importFnName, importAs);
+      return ts.factory.createBindingElement(undefined, importFnName, importAs);
     })
   );
 
-  return ts.createVariableStatement(
+  return ts.factory.createVariableStatement(
     undefined,
-    ts.createVariableDeclarationList(
+    ts.factory.createVariableDeclarationList(
       [
-        ts.createVariableDeclaration(
+        ts.factory.createVariableDeclaration(
           importBinding,
           undefined,
-          ts.factory.createCallExpression(ts.factory.createIdentifier('require'), [], [ts.createLiteral(importPath)])
+          undefined,
+          ts.factory.createCallExpression(
+            ts.factory.createIdentifier('require'),
+            [],
+            [ts.factory.createStringLiteral(importPath)]
+          )
         ),
       ],
       ts.NodeFlags.Const

@@ -34,12 +34,12 @@ export const updateNativeConstructor = (
       }
     }
 
-    classMembers[cstrMethodIndex] = ts.updateConstructor(
+    classMembers[cstrMethodIndex] = ts.factory.updateConstructorDeclaration(
       cstrMethod,
       cstrMethod.decorators,
       cstrMethod.modifiers,
       cstrMethod.parameters,
-      ts.updateBlock(cstrMethod.body, statements)
+      ts.factory.updateBlock(cstrMethod.body, statements)
     );
   } else {
     // create a constructor()
@@ -53,7 +53,12 @@ export const updateNativeConstructor = (
       statements = [createNativeConstructorSuper(), ...statements];
     }
 
-    const cstrMethod = ts.createConstructor(undefined, undefined, undefined, ts.factory.createBlock(statements, true));
+    const cstrMethod = ts.factory.createConstructorDeclaration(
+      undefined,
+      undefined,
+      undefined,
+      ts.factory.createBlock(statements, true)
+    );
     classMembers.unshift(cstrMethod);
   }
 };
@@ -73,7 +78,7 @@ const nativeInit = (moduleFile: d.Module, cmp: d.ComponentCompilerMeta): Readonl
 };
 
 const nativeRegisterHostStatement = () => {
-  return ts.createStatement(
+  return ts.factory.createExpressionStatement(
     ts.factory.createCallExpression(
       ts.factory.createPropertyAccessExpression(ts.factory.createThis(), ts.factory.createIdentifier('__registerHost')),
       undefined,
