@@ -1,3 +1,36 @@
+## 📻 [2.19.1](https://github.com/ionic-team/stencil/compare/v2.19.1-0...v2.19.1) (2022-10-26)
+
+
+### Bug Fixes
+
+* **docs:** avoid duplicating manual documentation ([#3766](https://github.com/ionic-team/stencil/issues/3766)) ([82d3596](https://github.com/ionic-team/stencil/commit/82d359673f65c87ff89980beb2f118b6169698ff)), closes [#3762](https://github.com/ionic-team/stencil/issues/3762)
+
+
+
+## 🐺 [2.19.1-0](https://github.com/ionic-team/stencil/compare/v2.19.0...v2.19.1-0) (2022-10-25)
+
+
+### Bug Fixes
+
+* **docs:** avoid duplicating manual documentation ([#3766](https://github.com/ionic-team/stencil/issues/3766)) ([82d3596](https://github.com/ionic-team/stencil/commit/82d359673f65c87ff89980beb2f118b6169698ff)), closes [#3762](https://github.com/ionic-team/stencil/issues/3762)
+
+
+
+# 💾 [2.19.0](https://github.com/ionic-team/stencil/compare/v2.18.1...v2.19.0) (2022-10-24)
+
+
+### Bug Fixes
+
+* **cli:** "Browserslist: caniuse-lite is outdated" spams output when buildEs5 is truthy ([#3649](https://github.com/ionic-team/stencil/issues/3649)) ([d30cf58](https://github.com/ionic-team/stencil/commit/d30cf5800c22d77d93bd68d9139877f89d524263))
+* **compiler:** update handling of decorators to support emitting ES2022+ ([#3614](https://github.com/ionic-team/stencil/issues/3614)) ([f977830](https://github.com/ionic-team/stencil/commit/f97783029274f9ee5ea58ba74ab15905c5113c93))
+* **jest:** adjust conversion of CLI args to Jest args ([#3730](https://github.com/ionic-team/stencil/issues/3730)) ([5b76a0a](https://github.com/ionic-team/stencil/commit/5b76a0a90527b290420506036efbbb7c8e8451a4)), closes [#3724](https://github.com/ionic-team/stencil/issues/3724)
+
+
+### Features
+
+* **docs-readme:** add overview to readme ([#3635](https://github.com/ionic-team/stencil/issues/3635)) ([2db4f4d](https://github.com/ionic-team/stencil/commit/2db4f4de62c9547ccafb1d382130fcf82fd9ebf4))
+
+
 ## 😛 [2.18.1](https://github.com/ionic-team/stencil/compare/v2.18.0...v2.18.1) (2022-10-03)
 
 
