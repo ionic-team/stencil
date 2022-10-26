@@ -1,6 +1,6 @@
 import fs from 'fs-extra';
 import { join } from 'path';
-import webpack from 'webpack';
+import webpack, {Configuration} from 'webpack';
 import { minify } from 'terser';
 import rollupCommonjs from '@rollup/plugin-commonjs';
 import rollupResolve from '@rollup/plugin-node-resolve';
@@ -133,53 +133,69 @@ function bundleExternal(opts: BuildOptions, outputDir: string, cachedDir: string
 
     const whitelist = new Set(['child_process', 'os', 'typescript']);
 
-    webpack(
-      {
-        entry: join(opts.srcDir, 'sys', 'node', 'bundles', entryFileName),
-        output: {
-          path: outputDir,
-          filename: entryFileName,
-          libraryTarget: 'commonjs',
-        },
-        target: 'node',
-        node: {
-          __dirname: false,
-          __filename: false,
-          process: false,
-          Buffer: false,
-        },
-        externals(_context, request, callback) {
-          if (request.match(/^(\.{0,2})\//)) {
-            // absolute and relative paths are not externals
-            return callback(null, undefined);
-          }
-
-          if (request === '@stencil/core/mock-doc') {
-            return callback(null, '../../mock-doc');
-          }
-
-          if (whitelist.has(request)) {
-            // we specifically do not want to bundle these imports
-            require.resolve(request);
-            return callback(null, request);
-          }
-
-          // bundle this import
-          callback(undefined, undefined);
-        },
-        resolve: {
-          alias: {
-            '@utils': join(opts.buildDir, 'utils', 'index.js'),
-            postcss: join(opts.nodeModulesDir, 'postcss'),
-            'source-map': join(opts.nodeModulesDir, 'source-map'),
-            chalk: join(opts.bundleHelpersDir, 'empty.js'),
-          },
-        },
-        optimization: {
-          minimize: false,
-        },
-        mode: 'production',
+    const c: Configuration = {
+      entry: join(opts.srcDir, 'sys', 'node', 'bundles', entryFileName),
+      output: {
+        path: outputDir,
+        filename: entryFileName,
+        libraryTarget: 'commonjs',
       },
+      target: 'node',
+      node: {
+        __dirname: false,
+        __filename: false,
+        // process: false,
+        // Buffer: false,
+      },
+      // was `any`, `any`, and
+      /**
+       * interface ExternalsFunctionCallback {
+       *          * Invoke with no arguments to not externalize
+        *         (): void;
+         *          * Callback with an Error
+          *         (error: {}): void; /* tslint:disable-line:unified-signatures
+         *          * Externalize the dependency
+          *         (error: null, result: string | string[] | ExternalsObjectElement, type?: string): void;
+        *
+      }z
+       */
+      externals(data, callback) {
+        const { request } = data;
+
+        if (request?.match(/^(\.{0,2})\//)) {
+          // absolute and relative paths are not externals
+          return callback(null, undefined);
+        }
+
+        if (request === '@stencil/core/mock-doc') {
+          return callback(null, '../../mock-doc');
+        }
+
+        if (whitelist.has(request)) {
+          // we specifically do not want to bundle these imports
+          require.resolve(request);
+          return callback(null, request);
+        }
+
+        // bundle this import
+        callback(undefined, undefined);
+      },
+      resolve: {
+        alias: {
+          '@utils': join(opts.buildDir, 'utils', 'index.js'),
+          postcss: join(opts.nodeModulesDir, 'postcss'),
+          'source-map': join(opts.nodeModulesDir, 'source-map'),
+          chalk: join(opts.bundleHelpersDir, 'empty.js'),
+        },
+      },
+      optimization: {
+        minimize: false,
+      },
+      mode: 'production',
+    };
+
+    webpack(
+     c,
       async (err, stats) => {
         if (err && err.message) {
           rejectBundle(err);
