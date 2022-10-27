@@ -12,6 +12,7 @@ import { proxyComponent } from './proxy-component';
 import { HYDRATED_CSS, HYDRATED_STYLE_ID, PLATFORM_FLAGS, PROXY_FLAGS } from './runtime-constants';
 import { convertScopedToShadow, registerStyle } from './styles';
 import { appDidLoad } from './update-component';
+export { setNonce } from '@platform';
 
 export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.CustomElementsDefineOptions = {}) => {
   if (BUILD.profile && performance.mark) {
@@ -166,6 +167,9 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
   if (BUILD.invisiblePrehydration && (BUILD.hydratedClass || BUILD.hydratedAttribute)) {
     visibilityStyle.innerHTML = cmpTags + HYDRATED_CSS;
     visibilityStyle.setAttribute('data-styles', '');
+    if (plt.$nonce$) {
+      visibilityStyle.setAttribute('nonce', plt.$nonce$);
+    }
     head.insertBefore(visibilityStyle, metaCharset ? metaCharset.nextSibling : head.firstChild);
   }
 

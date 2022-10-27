@@ -89,5 +89,6 @@ export interface CustomElementsDefineOptions {
 }
 export declare function defineCustomElements(win?: Window, opts?: CustomElementsDefineOptions): Promise<void>;
 export declare function applyPolyfills(): Promise<void>;
+export declare function setNonce(nonce: string): void;
 `;
 };
