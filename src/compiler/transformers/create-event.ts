@@ -8,13 +8,13 @@ export const addCreateEvents = (moduleFile: d.Module, cmp: d.ComponentCompilerMe
   return cmp.events.map((ev) => {
     addCoreRuntimeApi(moduleFile, RUNTIME_APIS.createEvent);
 
-    return ts.createStatement(
+    return ts.factory.createExpressionStatement(
       ts.factory.createAssignment(
         ts.factory.createPropertyAccessExpression(ts.factory.createThis(), ts.factory.createIdentifier(ev.method)),
         ts.factory.createCallExpression(ts.factory.createIdentifier(CREATE_EVENT), undefined, [
           ts.factory.createThis(),
-          ts.createLiteral(ev.name),
-          ts.createLiteral(computeFlags(ev)),
+          ts.factory.createStringLiteral(ev.name),
+          ts.factory.createNumericLiteral(computeFlags(ev)),
         ])
       )
     );

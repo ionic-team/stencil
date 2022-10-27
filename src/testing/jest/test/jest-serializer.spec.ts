@@ -4,6 +4,7 @@ import { HtmlSerializer } from '../jest-serializer';
 
 describe('serialize node', () => {
   let doc: MockDocument;
+
   beforeEach(() => {
     doc = new MockDocument();
     const div = doc.createElement('div');

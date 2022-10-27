@@ -110,7 +110,10 @@ const parsePropDecorator = (
     propMeta.defaultValue = initializer.getText();
   }
 
-  const staticProp = ts.factory.createPropertyAssignment(ts.createLiteral(propName), convertValueToLiteral(propMeta));
+  const staticProp = ts.factory.createPropertyAssignment(
+    ts.factory.createStringLiteral(propName),
+    convertValueToLiteral(propMeta)
+  );
   watchable.add(propName);
   return staticProp;
 };

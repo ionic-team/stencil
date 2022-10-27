@@ -51,7 +51,7 @@ const updateEsmStyleImports = (
 
     statements.splice(lastImportIndex + 1, 0, ...styleImports);
 
-    return ts.updateSourceFileNode(tsSourceFile, statements);
+    return ts.factory.updateSourceFile(tsSourceFile, statements);
   }
 
   return tsSourceFile;
@@ -95,11 +95,11 @@ const createEsmStyleImport = (
   const importName = ts.factory.createIdentifier(style.styleIdentifier);
   const importPath = getStyleImportPath(transformOpts, tsSourceFile, cmp, style, style.externalStyles[0].absolutePath);
 
-  return ts.createImportDeclaration(
+  return ts.factory.createImportDeclaration(
     undefined,
     undefined,
-    ts.createImportClause(importName, undefined),
-    ts.createLiteral(importPath)
+    ts.factory.createImportClause(false, importName, undefined),
+    ts.factory.createStringLiteral(importPath)
   );
 };
 
@@ -120,7 +120,7 @@ const updateCjsStyleRequires = (
   });
 
   if (styleRequires.length > 0) {
-    return ts.updateSourceFileNode(tsSourceFile, [...styleRequires, ...tsSourceFile.statements]);
+    return ts.factory.updateSourceFile(tsSourceFile, [...styleRequires, ...tsSourceFile.statements]);
   }
 
   return tsSourceFile;
@@ -135,14 +135,19 @@ const createCjsStyleRequire = (
   const importName = ts.factory.createIdentifier(style.styleIdentifier);
   const importPath = getStyleImportPath(transformOpts, tsSourceFile, cmp, style, style.externalStyles[0].absolutePath);
 
-  return ts.createVariableStatement(
+  return ts.factory.createVariableStatement(
     undefined,
-    ts.createVariableDeclarationList(
+    ts.factory.createVariableDeclarationList(
       [
-        ts.createVariableDeclaration(
+        ts.factory.createVariableDeclaration(
           importName,
           undefined,
-          ts.factory.createCallExpression(ts.factory.createIdentifier('require'), [], [ts.createLiteral(importPath)])
+          undefined,
+          ts.factory.createCallExpression(
+            ts.factory.createIdentifier('require'),
+            [],
+            [ts.factory.createStringLiteral(importPath)]
+          )
         ),
       ],
       ts.NodeFlags.Const

@@ -244,7 +244,7 @@ describe('anonymizeConfigForTelemetry', () => {
     config = mockValidatedConfig({ sys });
   });
 
-  it.each([
+  it.each<keyof d.ValidatedConfig>([
     'rootDir',
     'fsNamespace',
     'packageJsonFilePath',
@@ -265,7 +265,7 @@ describe('anonymizeConfigForTelemetry', () => {
     expect(anonymizedConfig.outputTargets).toEqual([]);
   });
 
-  it.each(['sys', 'logger', 'devServer', 'tsCompilerOptions'])(
+  it.each<keyof d.ValidatedConfig>(['sys', 'logger', 'devServer', 'tsCompilerOptions'])(
     "should remove objects under prop '%s'",
     (prop: keyof d.ValidatedConfig) => {
       const anonymizedConfig = anonymizeConfigForTelemetry({ ...config, [prop]: {}, outputTargets: [] });
