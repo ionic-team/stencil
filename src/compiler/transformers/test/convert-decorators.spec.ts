@@ -222,7 +222,7 @@ describe('convert-decorators', () => {
     @Component({
       tag: 'example',
     })
-    export class Example implements RhclComponent {
+    export class Example implements FooBar {
       private classProps: Array<string>;
 
       constructor() {
@@ -235,6 +235,28 @@ describe('convert-decorators', () => {
         constructor() {
           this.classProps = ["variant", "theme"];
         }}`
+    );
+  });
+
+  it('should preserve statements in an existing constructor super, decorated field', () => {
+    const t = transpileModule(`
+    @Component({
+      tag: 'example',
+    })
+    export class Example extends Parent {
+      @Prop() foo: string = "bar";
+
+      constructor() {
+        console.log("hello!")
+      }
+    }`);
+
+    expect(t.outputText).toContain(
+      c`constructor() {
+        super();
+        this.foo = "bar";
+        console.log("hello!");
+      }`
     );
   });
 

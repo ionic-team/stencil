@@ -372,7 +372,9 @@ export const updateConstructor = (
   const constructorMethod = classMembers[constructorIndex];
 
   if (constructorIndex >= 0 && ts.isConstructorDeclaration(constructorMethod)) {
-    const hasSuper = (constructorMethod.body?.statements ?? []).some((s) => s.kind === ts.SyntaxKind.SuperKeyword);
+    const constructorBodyStatements: ts.NodeArray<ts.Statement> =
+      constructorMethod.body?.statements ?? ts.factory.createNodeArray();
+    const hasSuper = constructorBodyStatements.some((s) => s.kind === ts.SyntaxKind.SuperKeyword);
 
     if (!hasSuper && needsSuper(classNode)) {
       // if there is no super and it needs one the statements comprising the
@@ -381,13 +383,13 @@ export const updateConstructor = (
       // 1. the `super()` call
       // 2. the new statements we've created to initialize fields
       // 3. the statements currently comprising the body of the constructor
-      statements = [createConstructorBodyWithSuper(), ...statements, ...(constructorMethod.body?.statements ?? [])];
+      statements = [createConstructorBodyWithSuper(), ...statements, ...constructorBodyStatements];
     } else {
       // if no super is needed then the body of the constructor should be:
       //
       // 1. the new statements we've created to initialize fields
       // 2. the statements currently comprising the body of the constructor
-      statements = [...statements, ...(constructorMethod.body?.statements ?? [])];
+      statements = [...statements, ...constructorBodyStatements];
     }
 
     classMembers[constructorIndex] = ts.factory.updateConstructorDeclaration(
