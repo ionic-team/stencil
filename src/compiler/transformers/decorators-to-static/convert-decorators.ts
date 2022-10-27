@@ -372,10 +372,22 @@ export const updateConstructor = (
   const constructorMethod = classMembers[constructorIndex];
 
   if (constructorIndex >= 0 && ts.isConstructorDeclaration(constructorMethod)) {
-    const hasSuper = constructorMethod.body.statements.some((s) => s.kind === ts.SyntaxKind.SuperKeyword);
+    const hasSuper = (constructorMethod.body?.statements ?? []).some((s) => s.kind === ts.SyntaxKind.SuperKeyword);
 
     if (!hasSuper && needsSuper(classNode)) {
-      statements = [createConstructorBodyWithSuper(), ...statements];
+      // if there is no super and it needs one the statements comprising the
+      // body of the constructor should be:
+      //
+      // 1. the `super()` call
+      // 2. the new statements we've created to initialize fields
+      // 3. the statements currently comprising the body of the constructor
+      statements = [createConstructorBodyWithSuper(), ...statements, ...constructorMethod.body?.statements ?? []];
+    } else {
+      // if no super is needed then the body of the constructor should be:
+      //
+      // 1. the new statements we've created to initialize fields
+      // 2. the statements currently comprising the body of the constructor
+      statements = [...statements, ...constructorMethod.body?.statements ?? []];
     }
 
     classMembers[constructorIndex] = ts.factory.updateConstructorDeclaration(
@@ -383,7 +395,7 @@ export const updateConstructor = (
       constructorMethod.decorators,
       constructorMethod.modifiers,
       constructorMethod.parameters,
-      ts.factory.updateBlock(constructorMethod.body, statements)
+      ts.factory.updateBlock(constructorMethod?.body ?? ts.factory.createBlock([]), statements)
     );
   } else {
     // we don't seem to have a constructor, so let's create one and stick it
@@ -396,7 +408,7 @@ export const updateConstructor = (
       ts.factory.createConstructorDeclaration(
         undefined,
         undefined,
-        undefined,
+        [],
         ts.factory.createBlock(statements, true)
       ),
       ...classMembers,
