@@ -75,6 +75,10 @@ export const addStyle = (
           } else {
             styleElm = doc.createElement('style');
             styleElm.innerHTML = style;
+
+            if (plt.$nonce$) {
+              styleElm.setAttribute('nonce', plt.$nonce$);
+            }
           }
 
           if (BUILD.hydrateServerSide || BUILD.hotModuleReplacement) {

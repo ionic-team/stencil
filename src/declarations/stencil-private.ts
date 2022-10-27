@@ -1697,6 +1697,7 @@ export interface PlatformRuntime {
   $flags$: number;
   $orgLocNodes$?: Map<string, RenderNode>;
   $resourcesUrl$: string;
+  $nonce$?: string;
   jmp: (c: Function) => any;
   raf: (c: FrameRequestCallback) => number;
   ael: (

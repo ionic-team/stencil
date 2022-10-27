@@ -186,5 +186,6 @@ export {
   renderVdom,
   setAssetPath,
   setMode,
+  setNonce,
   setValue,
 } from '@runtime';

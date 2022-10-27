@@ -298,6 +298,8 @@ export declare function getAssetPath(path: string): string;
  */
 export declare function setAssetPath(path: string): string;
 
+export declare function setNonce(nonce: string): void;
+
 /**
  * Retrieve a Stencil element for a given reference
  * @param ref the ref to get the Stencil element for

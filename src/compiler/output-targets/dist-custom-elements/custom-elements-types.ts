@@ -81,6 +81,8 @@ const generateCustomElementsTypesOutput = async (
     ` */`,
     `export declare const setAssetPath: (path: string) => void;`,
     ``,
+    `export declare const setNonce: (nonce: string) => void`,
+    ``,
     `export interface SetPlatformOptions {`,
     `  raf?: (c: FrameRequestCallback) => number;`,
     `  ael?: (el: EventTarget, eventName: string, listener: EventListenerOrEventListenerObject, options: boolean | AddEventListenerOptions) => void;`,
