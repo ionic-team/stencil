@@ -15,12 +15,12 @@ export const inherits = (ctor: any, superCtor: any) => {
 export const inspect = (...args: any[]) => args.forEach((arg) => console.log(arg));
 
 export const promisify = (fn: Function): (() => Promise<any>) => {
-  // if (typeof (fn as any)[promisify.custom] === 'function') {
-  //   // https://nodejs.org/api/util.html#util_custom_promisified_functions
-  //   return function (...args: any[]) {
-  //     return (fn as any)[promisify.custom].apply(this, args);
-  //   };
-  // }
+  if (typeof (fn as any)[promisify.custom] === 'function') {
+    // https://nodejs.org/api/util.html#util_custom_promisified_functions
+    return function (...args: any[]) {
+      return (fn as any)[promisify.custom].apply(this, args);
+    };
+  }
 
   return function (...args: any[]) {
     return new Promise((resolve, reject) => {
@@ -36,7 +36,7 @@ export const promisify = (fn: Function): (() => Promise<any>) => {
   };
 };
 
-// promisify.custom = Symbol('promisify.custom');
+promisify.custom = Symbol('promisify.custom');
 
 export default {
   inherits,
