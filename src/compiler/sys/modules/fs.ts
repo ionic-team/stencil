@@ -27,7 +27,7 @@ export const exists = (fs.exists = (p: string, cb: any) => {
 });
 
 // https://nodejs.org/api/util.html#util_custom_promisified_functions
-(exists as any)[promisify.custom] = (p: string) => fs.__sys.access(p);
+// (exists as any)[promisify.custom] = (p: string) => fs.__sys.access(p);
 
 export const existsSync = (fs.existsSync = (p: string) => {
   // https://nodejs.org/api/fs.html#fs_fs_existssync_path
@@ -179,3 +179,10 @@ export const writeFile = (fs.writeFile = (p: string, data: string, opts: any, cb
 });
 
 export default fs;
+
+// this is a hacky hack if ever I saw one
+export const promises = {
+  ...Object.fromEntries(
+    Object.entries(fs).map(([k,v]) => ([k, promisify(v)]))
+  )
+}

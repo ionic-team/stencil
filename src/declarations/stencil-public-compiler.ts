@@ -1154,7 +1154,8 @@ export interface ResolveModuleIdOptions {
   moduleId: string;
   containingFile?: string;
   exts?: string[];
-  packageFilter?: (pkg: any) => void;
+  // TODO put the actual type in here
+  packageFilter?: any;
 }
 
 export interface ResolveModuleIdResults {

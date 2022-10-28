@@ -238,7 +238,8 @@ export const resolveCssNodeModule = async (
       moduleId: m.moduleId,
       containingFile: filePath,
       exts: [],
-      packageFilter: (pkg) => {
+      // TODO put the actual type here
+      packageFilter: (pkg: any) => {
         if (m.filePath !== '') {
           pkg.main = m.filePath;
         }

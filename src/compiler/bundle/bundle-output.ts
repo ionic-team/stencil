@@ -68,11 +68,12 @@ export const getRollupOptions = (
     customResolveOptions,
     browser: true,
     rootDir: config.rootDir,
-    ...(config.nodeResolve as any),
+    ...Object.fromEntries(Object.entries(config.nodeResolve as any).filter(([k,_v]) => k !== "extensions" )) as any
   });
   const orgNodeResolveId = nodeResolvePlugin.resolveId;
   const orgNodeResolveId2 = (nodeResolvePlugin.resolveId = async function (importee: string, importer: string) {
     const [realImportee, query] = importee.split('?');
+    // @ts-ignore
     const resolved = await orgNodeResolveId.call(nodeResolvePlugin, realImportee, importer);
     if (resolved) {
       if (isString(resolved)) {
