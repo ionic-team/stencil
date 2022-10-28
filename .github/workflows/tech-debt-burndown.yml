@@ -40,6 +40,9 @@ jobs:
       - name: Install tsc-output-parser
         run: npm install @aivenio/tsc-output-parser@2.1.1
 
+      - name: Compile all the typescript projects
+        run: npx tsc --build
+
       - name: Run Typescript compiler and generate JSON-formatted error file
         run: npx tsc --strictNullChecks --noEmit --pretty false | npx tsc-output-parser > null_errors_${{ matrix.branch }}.json
 
