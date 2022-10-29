@@ -44,7 +44,7 @@ export const styleToStatic = (newMembers: ts.ClassElement[], componentOptions: d
       // @Component({
       //   styles: ":host {...}"
       // })
-      newMembers.push(createStaticGetter('styles', ts.createLiteral(styles)));
+      newMembers.push(createStaticGetter('styles', ts.factory.createStringLiteral(styles)));
     }
   } else if (componentOptions.styles) {
     const convertIdentifier = componentOptions.styles as any as ConvertIdentifier;

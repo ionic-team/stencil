@@ -22,7 +22,7 @@ export const addComponentMetaStatic = (
   const cmpMetaStaticProp = createStaticGetter('COMPILER_META', convertValueToLiteral(publicCompilerMeta));
   const classMembers = [...cmpNode.members, cmpMetaStaticProp];
 
-  return ts.updateClassDeclaration(
+  return ts.factory.updateClassDeclaration(
     cmpNode,
     cmpNode.decorators,
     cmpNode.modifiers,

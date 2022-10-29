@@ -149,7 +149,118 @@ describe('convert-decorators', () => {
     );
   });
 
-  it('should not add a super call to the constructor if necessary', () => {
+  it('should preserve statements in an existing constructor', () => {
+    const t = transpileModule(`
+    @Component({
+      tag: 'my-component',
+    })
+    export class MyComponent {
+      constructor() {
+        console.log('boop');
+      }
+    }`);
+
+    expect(t.outputText).toBe(
+      c`export class MyComponent {
+        constructor() {
+          console.log('boop');
+        }
+
+        static get is() {
+          return "my-component";
+      }}`
+    );
+  });
+
+  it('should preserve statements in an existing constructor w/ @Prop', () => {
+    const t = transpileModule(`
+    @Component({
+      tag: 'my-component',
+    })
+    export class MyComponent {
+      @Prop() count: number;
+
+      constructor() {
+        console.log('boop');
+      }
+    }`);
+
+    expect(t.outputText).toContain(
+      c`constructor() {
+          this.count = undefined;
+          console.log('boop');
+        }`
+    );
+  });
+
+  it('should allow user to initialize field in an existing constructor w/ @Prop', () => {
+    const t = transpileModule(`
+    @Component({
+      tag: 'my-component',
+    })
+    export class MyComponent {
+      @Prop() count: number;
+
+      constructor() {
+        this.count = 3;
+      }
+    }`);
+
+    // the initialization we do to `undefined` (since no value is present)
+    // should be before the user's `this.count = 3` to ensure that their code
+    // wins.
+    expect(t.outputText).toContain(
+      c`constructor() {
+          this.count = undefined;
+          this.count = 3;
+        }`
+    );
+  });
+
+  it('should preserve statements in an existing constructor w/ non-decorated field', () => {
+    const t = transpileModule(`
+    @Component({
+      tag: 'example',
+    })
+    export class Example implements FooBar {
+      private classProps: Array<string>;
+
+      constructor() {
+        this.classProps = ["variant", "theme"];
+      }
+    }`);
+
+    expect(t.outputText).toBe(
+      c`export class Example {
+        constructor() {
+          this.classProps = ["variant", "theme"];
+        }}`
+    );
+  });
+
+  it('should preserve statements in an existing constructor super, decorated field', () => {
+    const t = transpileModule(`
+    @Component({
+      tag: 'example',
+    })
+    export class Example extends Parent {
+      @Prop() foo: string = "bar";
+
+      constructor() {
+        console.log("hello!")
+      }
+    }`);
+
+    expect(t.outputText).toContain(
+      c`constructor() {
+        super();
+        this.foo = "bar";
+        console.log("hello!");
+      }`
+    );
+  });
+
+  it('should not add a super call to the constructor if not necessary', () => {
     const t = transpileModule(`
     @Component({tag: 'cmp-a'})
       export class CmpA implements Foobar {

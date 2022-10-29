@@ -1,6 +1,6 @@
 {
   "name": "@stencil/core",
-  "version": "2.19.0",
+  "version": "2.19.2",
   "license": "MIT",
   "main": "./internal/stencil-core/index.cjs",
   "module": "./internal/stencil-core/index.js",
@@ -59,10 +59,10 @@
   "devDependencies": {
     "@ionic/prettier-config": "^2.0.0",
     "@rollup/plugin-commonjs": "15.1.0",
-    "@rollup/plugin-json": "5.0.0",
+    "@rollup/plugin-json": "5.0.1",
     "@rollup/plugin-node-resolve": "9.0.0",
     "@rollup/plugin-replace": "2.3.4",
-    "@rollup/pluginutils": "5.0.1",
+    "@rollup/pluginutils": "5.0.2",
     "@types/eslint": "^8.4.6",
     "@types/exit": "^0.1.31",
     "@types/fs-extra": "^9.0.8",

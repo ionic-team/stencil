@@ -1146,7 +1146,7 @@ export interface DevServerContext {
   getBuildResults: () => Promise<CompilerBuildResults>;
   getCompilerRequest: (path: string) => Promise<CompilerRequestResponse>;
   isServerListening: boolean;
-  logRequest: (req: { method: string; pathname?: string }, status: number) => void;
+  logRequest: (req: HttpRequest, status: number) => void;
   prerenderConfig: PrerenderConfig;
   serve302: (req: any, res: any, pathname?: string) => void;
   serve404: (req: any, res: any, xSource: string, content?: string) => void;

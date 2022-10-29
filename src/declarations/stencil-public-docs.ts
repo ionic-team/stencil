@@ -19,6 +19,10 @@ export interface JsonDocsComponent {
   readme: string;
   docs: string;
   docsTags: JsonDocsTag[];
+  /**
+   * The text from the class-level JSDoc for a Stencil component, if present.
+   */
+  overview?: string;
   usage: JsonDocsUsage;
   props: JsonDocsProp[];
   methods: JsonDocsMethod[];

@@ -34,7 +34,7 @@ function reorderStatements(code: string) {
 
         const otherStatements = s.filter((n) => !isLet(n) && !ts.isImportDeclaration(n) && !ts.isExportDeclaration(n));
 
-        return ts.updateSourceFileNode(tsSourceFile, [
+        return ts.factory.updateSourceFile(tsSourceFile, [
           ...letNoInitializerStatements,
           ...letWithInitializer,
           ...importStatements,
