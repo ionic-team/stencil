@@ -19,7 +19,7 @@ This is a comprehensive list of the breaking changes introduced in the major ver
   * [Strongly Typed Inputs](#strongly-typed-inputs)
   * [Narrowed Typing for `autocapitalize` Attribute](#narrowed-typing-for-autocapitalize-attribute)
   * [Custom Types for Props and Events are now Exported from `components.d.ts`](#custom-types-for-props-and-events-are-now-exported-from-componentsdts)
-  * [Event Handlers for Composition Events Renamed](#event-handlers-for-composition-events-renamed)
+  * [Composition Event Handlers Renamed](#composition-event-handlers-renamed)
 * [Output Targets](#output-targets)
   * [`dist-custom-elements` Output Target](#dist-custom-elements-output-target)
     * [Add `customElementsExportBehavior` to Control Export Behavior](#add-customelementsexportbehavior-to-control-export-behavior)
@@ -162,11 +162,11 @@ Projects that manually create type definitions from `components.d.ts` will eithe
 - remove the manually created type (if the types generated in `components.d.ts` suffice)
 - update their type creation logic to account for potential naming collisions with the newly generated types
 
-#### Event Handlers for Composition Events Renamed
+#### Composition Event Handlers Renamed
 
-The names of Stencil's supported event handlers for composition events have
-been changed in order to correct a casing issue which prevented handlers from
-being called when events fired. The changes are as follows:
+The names of Stencil's composition event handlers have been changed in order to
+correct a casing issue which prevented handlers from being called when events
+fired. The changes are as follows:
 
 | previous name                | new name                     |
 | ---------------------------- | ---------------------------- |
