@@ -19,7 +19,7 @@ This is a comprehensive list of the breaking changes introduced in the major ver
   * [Strongly Typed Inputs](#strongly-typed-inputs)
   * [Narrowed Typing for `autocapitalize` Attribute](#narrowed-typing-for-autocapitalize-attribute)
   * [Custom Types for Props and Events are now Exported from `components.d.ts`](#custom-types-for-props-and-events-are-now-exported-from-componentsdts)
-  * [Event Handlers for Composition Events Renamed)(#event-handlers-for-composition-events-renamed)
+  * [Event Handlers for Composition Events Renamed](#event-handlers-for-composition-events-renamed)
 * [Output Targets](#output-targets)
   * [`dist-custom-elements` Output Target](#dist-custom-elements-output-target)
     * [Add `customElementsExportBehavior` to Control Export Behavior](#add-customelementsexportbehavior-to-control-export-behavior)
