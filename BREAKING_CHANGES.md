@@ -19,6 +19,7 @@ This is a comprehensive list of the breaking changes introduced in the major ver
   * [Strongly Typed Inputs](#strongly-typed-inputs)
   * [Narrowed Typing for `autocapitalize` Attribute](#narrowed-typing-for-autocapitalize-attribute)
   * [Custom Types for Props and Events are now Exported from `components.d.ts`](#custom-types-for-props-and-events-are-now-exported-from-componentsdts)
+  * [Composition Event Handlers Renamed](#composition-event-handlers-renamed)
 * [Output Targets](#output-targets)
   * [`dist-custom-elements` Output Target](#dist-custom-elements-output-target)
     * [Add `customElementsExportBehavior` to Control Export Behavior](#add-customelementsexportbehavior-to-control-export-behavior)
@@ -100,7 +101,7 @@ The [`autocaptialize` attribute](https://developer.mozilla.org/en-US/docs/Web/HT
 This change brings Stencil into closer alignment with TypeScript's typings for the attribute.
 No explicit changes are needed, unless a project was passing non-strings to the attribute.
 
-### Custom Types for Props and Events are now Exported from `components.d.ts`
+#### Custom Types for Props and Events are now Exported from `components.d.ts`
 
 Custom types for props and custom events are now re-exported from a project's `components.d.ts` file.
 
@@ -160,6 +161,21 @@ This _may_ clash with any manually created types in existing Stencil projects.
 Projects that manually create type definitions from `components.d.ts` will either need to:
 - remove the manually created type (if the types generated in `components.d.ts` suffice)
 - update their type creation logic to account for potential naming collisions with the newly generated types
+
+#### Composition Event Handlers Renamed
+
+The names of Stencil's composition event handlers have been changed in order to
+correct a casing issue which prevented handlers from being called when events
+fired. The changes are as follows:
+
+| previous name                | new name                     |
+| ---------------------------- | ---------------------------- |
+| `onCompositionEnd`           | `onCompositionend`           |
+| `onCompositionEndCapture`    | `onCompositionendCapture`    |
+| `onCompositionStart`         | `onCompositionstart`         |
+| `onCompositionStartCapture`  | `onCompositionstartCapture`  |
+| `onCompositionUpdate`        | `onCompositionupdate`        |
+| `onCompositionUpdateCapture` | `onCompositionupdateCapture` |
 
 ### Output Targets
 
