@@ -1669,12 +1669,12 @@ export namespace JSXBase {
     onPasteCapture?: (event: ClipboardEvent) => void;
 
     // Composition Events
-    onCompositionEnd?: (event: CompositionEvent) => void;
-    onCompositionEndCapture?: (event: CompositionEvent) => void;
-    onCompositionStart?: (event: CompositionEvent) => void;
-    onCompositionStartCapture?: (event: CompositionEvent) => void;
-    onCompositionUpdate?: (event: CompositionEvent) => void;
-    onCompositionUpdateCapture?: (event: CompositionEvent) => void;
+    onCompositionend?: (event: CompositionEvent) => void;
+    onCompositionendCapture?: (event: CompositionEvent) => void;
+    onCompositionstart?: (event: CompositionEvent) => void;
+    onCompositionstartCapture?: (event: CompositionEvent) => void;
+    onCompositionupdate?: (event: CompositionEvent) => void;
+    onCompositionupdateCapture?: (event: CompositionEvent) => void;
 
     // Focus Events
     onFocus?: (event: FocusEvent) => void;
