@@ -72,9 +72,8 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
     let isVisible = false;
 
     try {
-      const executionContext = this._elmHandle.executionContext();
-
-      isVisible = await executionContext.evaluate((elm) => {
+      const executionContext = getPuppeteerExecution(this._elmHandle);
+      isVisible = await executionContext.evaluate((elm: Element) => {
         return new Promise<boolean>((resolve) => {
           window.requestAnimationFrame(() => {
             if (elm.isConnected) {
@@ -167,8 +166,7 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
   async getProperty(propertyName: string) {
     this._validate();
 
-    const executionContext = this._elmHandle.executionContext();
-
+    const executionContext = getPuppeteerExecution(this._elmHandle);
     const propValue = await executionContext.evaluate(
       (elm: any, propertyName: string) => {
         return elm[propertyName];
@@ -401,8 +399,7 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
       return;
     }
 
-    const executionContext = this._elmHandle.executionContext();
-
+    const executionContext = getPuppeteerExecution(this._elmHandle);
     const rtn = await executionContext.evaluate(
       (elm: Element, queuedActions: ElementAction[]) => {
         // BROWSER CONTEXT
@@ -470,9 +467,8 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
   }
 
   async e2eSync() {
-    const executionContext = this._elmHandle.executionContext();
-
-    const { outerHTML, shadowRootHTML } = await executionContext.evaluate((elm) => {
+    const executionContext = getPuppeteerExecution(this._elmHandle);
+    const { outerHTML, shadowRootHTML } = await executionContext.evaluate((elm: Element) => {
       return {
         outerHTML: elm.outerHTML,
         shadowRootHTML: elm.shadowRoot ? elm.shadowRoot.innerHTML : null,
@@ -650,10 +646,9 @@ export async function findAll(
   if (shadowSelector) {
     // light dom selected, then shadow dom selected inside of light dom elements
     for (let i = 0; i < lightElmHandles.length; i++) {
-      const executionContext = lightElmHandles[i].executionContext();
-
+      const executionContext = getPuppeteerExecution(lightElmHandles[i]);
       const shadowJsHandle = await executionContext.evaluateHandle(
-        (elm, shadowSelector) => {
+        (elm: Element, shadowSelector: string) => {
           if (!elm.shadowRoot) {
             throw new Error(`shadow root does not exist for element: ${elm.tagName.toLowerCase()}`);
           }
@@ -712,6 +707,32 @@ function getSelector(selector: pd.FindSelector) {
   }
 
   return rtn;
+}
+
+/**
+ * A helper function for retrieving an execution context from a Puppeteer handle entity. The way that these objects can
+ * be retrieved changed in Puppeteer v17, requiring a check of the version of the library that is installed at runtime.
+ *
+ * This function expects that the {@link E2EProcessEnv#__STENCIL_PUPPETEER_VERSION__} be set prior to invocation. If
+ * it is not set, the function assumes an older version of Puppeteer is used.
+ *
+ * @param elmHandle the Puppeteer handle to an element
+ * @returns the execution context from the handle
+ */
+function getPuppeteerExecution(elmHandle: puppeteer.ElementHandle) {
+  const puppeteerMajorVersion = parseInt(process.env.__STENCIL_PUPPETEER_VERSION__, 10);
+  if (puppeteerMajorVersion >= 17) {
+    // in puppeteer v17, a context for executing JS can be retrieved from a frame
+    // the `any` type assertion is necessary for backwards compatability with the type checker
+    return (elmHandle as any).frame;
+  } else {
+    // in puppeteer v16 and lower, an execution context could be retrieved from a handle to execute JS
+    // the `any` type assertion is necessary for backwards compatability with the type checker
+    //
+    // if the result of `parseInt` on the puppeteer version is NaN, assume that the user is on a lower version of
+    // puppeteer
+    return (elmHandle as any).executionContext();
+  }
 }
 
 interface ElementAction {
