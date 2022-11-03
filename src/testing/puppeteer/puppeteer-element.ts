@@ -1,4 +1,4 @@
-import type { EventInitDict, HostElement, SerializedEvent } from '@stencil/core/internal';
+import type { EventInitDict, SerializedEvent } from '@stencil/core/internal';
 import { cloneAttributes, MockHTMLElement, parseHtmlToFragment } from '@stencil/core/mock-doc';
 import type * as puppeteer from 'puppeteer';
 
@@ -74,7 +74,7 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
     try {
       const executionContext = this._elmHandle.executionContext();
 
-      isVisible = await executionContext.evaluate((elm: HostElement) => {
+      isVisible = await executionContext.evaluate((elm) => {
         return new Promise<boolean>((resolve) => {
           window.requestAnimationFrame(() => {
             if (elm.isConnected) {
@@ -359,7 +359,7 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
 
   async getComputedStyle(pseudoElt?: string | null) {
     const style = await this._page.evaluate(
-      (elm: HTMLElement, pseudoElt: string) => {
+      (elm: Element, pseudoElt: string) => {
         const rtn: any = {};
 
         const computedStyle = window.getComputedStyle(elm, pseudoElt);
@@ -403,8 +403,8 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
 
     const executionContext = this._elmHandle.executionContext();
 
-    const rtn = await executionContext.evaluate<unknown>(
-      (elm: HTMLElement, queuedActions: ElementAction[]) => {
+    const rtn = await executionContext.evaluate(
+      (elm: Element, queuedActions: ElementAction[]) => {
         // BROWSER CONTEXT
         // cannot use async/await in here cuz typescript transpiles it in the node context
         return (elm as any).componentOnReady().then(() => {
@@ -472,7 +472,7 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
   async e2eSync() {
     const executionContext = this._elmHandle.executionContext();
 
-    const { outerHTML, shadowRootHTML } = await executionContext.evaluate((elm: HTMLElement) => {
+    const { outerHTML, shadowRootHTML } = await executionContext.evaluate((elm) => {
       return {
         outerHTML: elm.outerHTML,
         shadowRootHTML: elm.shadowRoot ? elm.shadowRoot.innerHTML : null,
@@ -557,7 +557,7 @@ async function findWithCssSelector(
 
   if (shadowSelector) {
     const shadowHandle = await page.evaluateHandle(
-      (elm: HTMLElement, shadowSelector: string) => {
+      (elm: Element, shadowSelector: string) => {
         if (!elm.shadowRoot) {
           throw new Error(`shadow root does not exist for element: ${elm.tagName.toLowerCase()}`);
         }
@@ -587,7 +587,7 @@ async function findWithText(
   contains: string
 ) {
   const jsHandle = await page.evaluateHandle(
-    (rootElm: HTMLElement, text: string, contains: string) => {
+    (rootElm: Element, text: string, contains: string) => {
       let foundElm: any = null;
 
       function checkContent(elm: Node) {
@@ -670,7 +670,7 @@ export async function findAll(
       await shadowJsHandle.dispose();
 
       for (const shadowJsProperty of shadowJsProperties.values()) {
-        const shadowElmHandle = shadowJsProperty.asElement();
+        const shadowElmHandle = shadowJsProperty.asElement() as puppeteer.ElementHandle;
         if (shadowElmHandle) {
           const elm = new E2EElement(page, shadowElmHandle);
           await elm.e2eSync();
