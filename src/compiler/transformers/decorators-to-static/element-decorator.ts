@@ -17,7 +17,7 @@ export const elementDecoratorsToStatic = (
     .filter((element) => !!element);
 
   if (elementRefs.length > 0) {
-    newMembers.push(createStaticGetter('elementRef', ts.createLiteral(elementRefs[0])));
+    newMembers.push(createStaticGetter('elementRef', ts.factory.createStringLiteral(elementRefs[0])));
     if (elementRefs.length > 1) {
       const error = buildError(diagnostics);
       error.messageText = `It's not valid to add more than one Element() decorator`;

@@ -13,7 +13,7 @@ export const updateHydrateComponentClass = (
   moduleFile: d.Module,
   cmp: d.ComponentCompilerMeta
 ) => {
-  return ts.updateClassDeclaration(
+  return ts.factory.updateClassDeclaration(
     classNode,
     classNode.decorators,
     classNode.modifiers,
