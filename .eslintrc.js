@@ -80,6 +80,15 @@ module.exports = {
     'simple-import-sort/imports': 'error',
     'simple-import-sort/exports': 'error',
   },
+  overrides: [
+    {
+      // the stencil entry point still uses `var`, ignore errors related to it
+      files: 'bin/**',
+      rules: {
+        'no-var': 'off',
+      },
+    },
+  ],
   // inform ESLint about the global variables defined in a Jest context
   // see https://github.com/jest-community/eslint-plugin-jest/#usage
   env: {
