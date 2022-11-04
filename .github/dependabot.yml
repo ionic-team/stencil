@@ -32,6 +32,6 @@ updates:
       - dependency-name: '@types/inquirer'
         versions: ['>7.3.1']
   - package-ecosystem: 'github-actions'
-    directory: /
+    directory: '/'
     schedule:
       interval: 'daily'
