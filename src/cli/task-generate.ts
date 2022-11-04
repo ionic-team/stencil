@@ -53,7 +53,11 @@ export const taskGenerate = async (coreCompiler: CoreCompiler, config: Validated
     return config.sys.exit(1);
   }
   const filesToGenerateExt = await chooseFilesToGenerate();
-  if (undefined === filesToGenerateExt) return;
+  if (undefined === filesToGenerateExt) {
+    // in some shells (e.g. Windows PowerShell), hitting Ctrl+C results in a TypeError printed to the console.
+    // explicitly return here to avoid printing the error message.
+    return;
+  }
   const extensionsToGenerate: GenerableExtension[] = ['tsx', ...filesToGenerateExt];
 
   const testFolder = extensionsToGenerate.some(isTest) ? 'test' : '';
