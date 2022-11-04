@@ -80,12 +80,14 @@ module.exports = {
     'simple-import-sort/imports': 'error',
     'simple-import-sort/exports': 'error',
   },
-  overrides: [{
-    files: 'bin/**',
-    rules: {
-      'no-var': '0',
-    }
-  }],
+  overrides: [
+    {
+      files: 'bin/**',
+      rules: {
+        'no-var': '0',
+      },
+    },
+  ],
   // inform ESLint about the global variables defined in a Jest context
   // see https://github.com/jest-community/eslint-plugin-jest/#usage
   env: {
