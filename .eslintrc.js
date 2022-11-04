@@ -85,7 +85,7 @@ module.exports = {
       // the stencil entry point still uses `var`, ignore errors related to it
       files: 'bin/**',
       rules: {
-        'no-var': '0',
+        'no-var': 'off',
       },
     },
   ],
