@@ -40,7 +40,7 @@ export const taskGenerate = async (coreCompiler: CoreCompiler, config: Validated
     config.flags.unknownArgs.find((arg) => !arg.startsWith('-')) ||
     ((await prompt({ name: 'tagName', type: 'text', message: 'Component tag name (dash-case):' })).tagName as string);
 
-  if(undefined === input) return ;
+  if (undefined === input) return;
   const { dir, base: componentName } = path.parse(input);
 
   const tagError = validateComponentTag(componentName);
@@ -49,7 +49,7 @@ export const taskGenerate = async (coreCompiler: CoreCompiler, config: Validated
     return config.sys.exit(1);
   }
   const filesToGenerateExt = await chooseFilesToGenerate();
-  if(undefined === filesToGenerateExt) return
+  if (undefined === filesToGenerateExt) return;
   const extensionsToGenerate: GenerableExtension[] = ['tsx', ...filesToGenerateExt];
 
   const testFolder = extensionsToGenerate.some(isTest) ? 'test' : '';
