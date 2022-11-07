@@ -1,4 +1,4 @@
-import { dashToPascalCase, sortBy } from '@utils';
+import { dashToPascalCase, getTextDocs, sortBy } from '@utils';
 
 import type * as d from '../../declarations';
 import { generateEventTypes } from './generate-event-types';
@@ -21,6 +21,10 @@ export const generateComponentTypes = (
   const tagNameAsPascal = dashToPascalCase(tagName);
   const htmlElementName = `HTML${tagNameAsPascal}Element`;
 
+  const componentDocs = getTextDocs(cmp.docs);
+  const componentComment = indentDocComment(componentDocs, 8);
+  const jsxComment = indentDocComment(componentDocs, 4);
+
   const propAttributes = generatePropTypes(cmp, typeImportData);
   const methodAttributes = generateMethodTypes(cmp, typeImportData);
   const eventAttributes = generateEventTypes(cmp, typeImportData, tagNameAsPascal);
@@ -33,21 +37,32 @@ export const generateComponentTypes = (
   const isDep = cmp.isCollectionDependency;
   const jsxAttributes = attributesToMultiLineString([...propAttributes, ...eventAttributes], true, areTypesInternal);
 
+  const component = [
+    componentComment,
+    `        interface ${tagNameAsPascal} {`,
+    `${componentAttributes}        }`,
+  ].filter(Boolean);
+
+  const jsx = [jsxComment, `    interface ${tagNameAsPascal} {`, `${jsxAttributes}        }`].filter(Boolean);
+
   const element = [
+    componentComment,
     `        interface ${htmlElementName} extends Components.${tagNameAsPascal}, HTMLStencilElement {`,
     `        }`,
+    componentComment,
     `        var ${htmlElementName}: {`,
     `                prototype: ${htmlElementName};`,
     `                new (): ${htmlElementName};`,
     `        };`,
-  ];
+  ].filter(Boolean);
+
   return {
     isDep,
     tagName,
     tagNameAsPascal,
     htmlElementName,
-    component: `        interface ${tagNameAsPascal} {\n${componentAttributes}        }`,
-    jsx: `    interface ${tagNameAsPascal} {\n${jsxAttributes}        }`,
+    component: component.join(`\n`),
+    jsx: jsx.join(`\n`),
     element: element.join(`\n`),
   };
 };
@@ -62,9 +77,7 @@ const attributesToMultiLineString = (attributes: d.TypeInfo, jsxAttributes: bool
     })
     .reduce((fullList, type) => {
       if (type.jsdoc) {
-        fullList.push(`                /**`);
-        fullList.push(...type.jsdoc.split('\n').map((line) => '                  * ' + line));
-        fullList.push(`                 */`);
+        fullList.push(indentDocComment(type.jsdoc, 16));
       }
       const optional = jsxAttributes ? !type.required : type.optional;
       fullList.push(`                "${type.name}"${optional ? '?' : ''}: ${type.type};`);
@@ -73,4 +86,11 @@ const attributesToMultiLineString = (attributes: d.TypeInfo, jsxAttributes: bool
     .join(`\n`);
 
   return attributesStr !== '' ? `${attributesStr}\n` : '';
+};
+
+const indentDocComment = (text: string, indent: number): string => {
+  if (!text) return '';
+
+  const spaces = ' '.repeat(indent);
+  return [`${spaces}/**`, ...text.split('\n').map((line) => `${spaces}  * ${line}`), `${spaces} */`].join('\n');
 };

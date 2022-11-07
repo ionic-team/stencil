@@ -226,6 +226,9 @@ export namespace Components {
     }
     interface ShadowDomBasicRoot {
     }
+    /**
+      * @virtualProp {string} colormode - The mode determines which platform styles to use.
+     */
     interface ShadowDomMode {
         /**
           * The mode determines which platform styles to use.
@@ -868,8 +871,14 @@ declare global {
         prototype: HTMLShadowDomBasicRootElement;
         new (): HTMLShadowDomBasicRootElement;
     };
+    /**
+      * @virtualProp {string} colormode - The mode determines which platform styles to use.
+     */
     interface HTMLShadowDomModeElement extends Components.ShadowDomMode, HTMLStencilElement {
     }
+    /**
+      * @virtualProp {string} colormode - The mode determines which platform styles to use.
+     */
     var HTMLShadowDomModeElement: {
         prototype: HTMLShadowDomModeElement;
         new (): HTMLShadowDomModeElement;
@@ -1490,7 +1499,10 @@ declare namespace LocalJSX {
     }
     interface ShadowDomBasicRoot {
     }
-    interface ShadowDomMode {
+    /**
+    * @virtualProp {string} colormode - The mode determines which platform styles to use.
+   */
+  interface ShadowDomMode {
         /**
           * The mode determines which platform styles to use.
          */
