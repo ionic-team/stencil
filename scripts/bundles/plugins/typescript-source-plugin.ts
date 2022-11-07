@@ -122,7 +122,7 @@ async function bundleTypeScriptSource(tsPath: string, opts: BuildOptions): Promi
  * Removes a specific section from the provided source code via commenting the offending code out
  * @param srcCode the source code to modify
  * @param removeCode the code to remove from the source
- * @return the updated source code
+ * @returns {string}the updated source code
  */
 function removeFromSource(srcCode: string, removeCode: string): string {
   if (!srcCode.includes(removeCode)) {

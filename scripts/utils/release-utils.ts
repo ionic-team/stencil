@@ -40,7 +40,7 @@ export const isValidVersionInput = (input: string): boolean =>
 /**
  * Determines if the provided `version` is a semver pre-release or not
  * @param version the version string to evaluate
- * @retuns true if the `version` is a pre-release, false otherwise
+ * @returns {boolean} true if the `version` is a pre-release, false otherwise
  */
 export const isPrereleaseVersion = (version: string): boolean =>
   PRERELEASE_VERSIONS.indexOf(version) !== -1 || Boolean(semver.prerelease(version));

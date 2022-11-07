@@ -213,9 +213,10 @@ interface BundledDep {
 /**
  * Format the list of contributors for a dependency
  * @param contributors the contributors, as read from a `package.json` file
- * @returns the contributors list, formatted
+ * @returns {string | undefined} the contributors list, formatted
  */
-function getContributors(contributors: unknown): typeof contributors {
+function getContributors(contributors: unknown): string | undefined {
+  if (!contributors) return
   if (typeof contributors === 'string') {
     return contributors;
   }
@@ -235,7 +236,7 @@ function getContributors(contributors: unknown): typeof contributors {
 /**
  * Formats an individual contributor's information
  * @param contributor the contributor information
- * @returns the formatted contributor information
+ * @returns {string | undefined} the formatted contributor information
  */
 function getAuthor(contributor: any): string {
   if (typeof contributor === 'string') {
@@ -259,7 +260,7 @@ function getAuthor(contributor: any): string {
  * alter Stencil's generated LICENSE.md file between releases.
  * @param opts build options to be used to determine where to look for a license
  * @param moduleId the name of the dependency to check
- * @returns the license for a dependency, undefined if none was found
+ * @returns {string | undefined} the license for a dependency, undefined if none was found
  */
 function getBundledDepLicenseContent(opts: BuildOptions, moduleId: string): string | undefined {
   const licenseFiles = ['LICENSE', 'LICENSE.md', 'LICENSE-MIT', 'LICENSE.txt'];

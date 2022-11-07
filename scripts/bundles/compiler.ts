@@ -102,7 +102,7 @@ export async function compiler(opts: BuildOptions) {
         /**
          * A rollup build hook for resolving the fsevents. [Source](https://rollupjs.org/guide/en/#resolveid)
          * @param id the importee exactly as it is written in an import statement in the source code
-         * @returns an object that resolves an import to some id
+         * @returns {string | undefined} an object that resolves an import to some id
          */
         resolveId(id: string): string | undefined {
           if (id === 'fsevents') {
