@@ -29,7 +29,6 @@
     "clean-scripts": "rm -rf scripts/build",
     "license": "node scripts --license",
     "lint": "eslint 'src/*.ts' 'src/**/*.ts' 'src/**/*.tsx'",
-    "lint.scripts": "eslint 'scripts/**' --ignore-pattern 'scripts/build/*' --ignore-pattern 'scripts/test/*' --fix ",
     "prettier": "npm run prettier.base -- --write",
     "prettier.base": "prettier \"./({bin,scripts,src,test}/**/*.{ts,tsx,js,jsx})|bin/stencil|.github/(**/)?*.(yml|yaml)|*.js\"",
     "prettier.dry-run": "npm run prettier.base -- --list-different",
