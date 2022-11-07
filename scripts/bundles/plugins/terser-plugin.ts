@@ -1,6 +1,6 @@
 import fs from 'fs-extra';
 import { join } from 'path';
-import { Plugin,rollup } from 'rollup';
+import { Plugin, rollup } from 'rollup';
 import { minify } from 'terser';
 
 import type { BuildOptions } from '../../utils/options';

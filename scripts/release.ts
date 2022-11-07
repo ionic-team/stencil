@@ -5,7 +5,7 @@ import inquirer from 'inquirer';
 import { join } from 'path';
 
 import { runReleaseTasks } from './release-tasks';
-import { BuildOptions,getOptions } from './utils/options';
+import { BuildOptions, getOptions } from './utils/options';
 import {
   getNewVersion,
   isPrereleaseVersion,

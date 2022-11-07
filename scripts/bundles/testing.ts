@@ -3,7 +3,7 @@ import rollupJson from '@rollup/plugin-json';
 import rollupResolve from '@rollup/plugin-node-resolve';
 import fs from 'fs-extra';
 import { join } from 'path';
-import { OutputOptions,RollupOptions } from 'rollup';
+import { OutputOptions, RollupOptions } from 'rollup';
 
 import { getBanner } from '../utils/banner';
 import { BuildOptions } from '../utils/options';

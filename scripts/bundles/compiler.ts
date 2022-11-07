@@ -4,9 +4,9 @@ import rollupNodeResolve from '@rollup/plugin-node-resolve';
 import fs from 'fs-extra';
 import MagicString from 'magic-string';
 import { join } from 'path';
-import type { OutputChunk, RollupOptions, RollupWarning,TransformResult } from 'rollup';
+import type { OutputChunk, RollupOptions, RollupWarning, TransformResult } from 'rollup';
 import sourcemaps from 'rollup-plugin-sourcemaps';
-import { minify,MinifyOptions } from 'terser';
+import { minify, MinifyOptions } from 'terser';
 
 import { getBanner } from '../utils/banner';
 import { getTypeScriptDefaultLibNames } from '../utils/dependencies-json';

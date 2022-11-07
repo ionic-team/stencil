@@ -3,7 +3,7 @@ import rollupResolve from '@rollup/plugin-node-resolve';
 import { dataToEsm } from '@rollup/pluginutils';
 import fs from 'fs-extra';
 import { join } from 'path';
-import type { OutputChunk, Plugin,RollupOptions } from 'rollup';
+import type { OutputChunk, Plugin, RollupOptions } from 'rollup';
 import { minify } from 'terser';
 import ts from 'typescript';
 

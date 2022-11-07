@@ -216,7 +216,7 @@ interface BundledDep {
  * @returns {string | undefined} the contributors list, formatted
  */
 function getContributors(contributors: unknown): string | undefined {
-  if (!contributors) return
+  if (!contributors) return;
   if (typeof contributors === 'string') {
     return contributors;
   }

@@ -1,4 +1,4 @@
-import type { OutputChunk,Plugin } from 'rollup';
+import type { OutputChunk, Plugin } from 'rollup';
 import { minify } from 'terser';
 
 import type { BuildOptions } from '../../utils/options';

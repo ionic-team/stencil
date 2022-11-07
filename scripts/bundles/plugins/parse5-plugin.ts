@@ -3,7 +3,7 @@ import rollupResolve from '@rollup/plugin-node-resolve';
 import fs from 'fs-extra';
 import { join } from 'path';
 import type { NormalizedOutputOptions, OutputBundle } from 'rollup';
-import { OutputChunk, Plugin,rollup } from 'rollup';
+import { OutputChunk, Plugin, rollup } from 'rollup';
 import { minify } from 'terser';
 
 import type { BuildOptions } from '../../utils/options';

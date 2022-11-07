@@ -1,6 +1,6 @@
 import fs from 'fs-extra';
 import path from 'path';
-import type { OutputChunk,Plugin } from 'rollup';
+import type { OutputChunk, Plugin } from 'rollup';
 
 import type { BuildOptions } from '../../utils/options';
 
