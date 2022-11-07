@@ -1,8 +1,9 @@
 import fs from 'fs-extra';
-import type { Plugin } from 'rollup';
 import { join } from 'path';
-import type { BuildOptions } from '../../utils/options';
+import type { Plugin } from 'rollup';
 import { minify } from 'terser';
+
+import type { BuildOptions } from '../../utils/options';
 
 /**
  * Creates a rollup plugin to embed an optimized version of the TypeScript compiler into the Stencil compiler.

@@ -1,10 +1,11 @@
-import fs from 'fs-extra';
-import execa from 'execa';
 import color from 'ansi-colors';
-import semver from 'semver';
+import execa from 'execa';
+import fs from 'fs-extra';
 import open from 'open';
-import { BuildOptions } from './options';
 import { join } from 'path';
+import semver from 'semver';
+
+import { BuildOptions } from './options';
 
 export const SEMVER_INCREMENTS: ReadonlyArray<string> = [
   'patch',

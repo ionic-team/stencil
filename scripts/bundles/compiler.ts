@@ -1,24 +1,25 @@
-import fs from 'fs-extra';
-import { join } from 'path';
 import rollupCommonjs from '@rollup/plugin-commonjs';
 import rollupJson from '@rollup/plugin-json';
 import rollupNodeResolve from '@rollup/plugin-node-resolve';
-import { aliasPlugin } from './plugins/alias-plugin';
+import fs from 'fs-extra';
+import MagicString from 'magic-string';
+import { join } from 'path';
+import type { OutputChunk, RollupOptions, RollupWarning,TransformResult } from 'rollup';
+import sourcemaps from 'rollup-plugin-sourcemaps';
+import { minify,MinifyOptions } from 'terser';
+
 import { getBanner } from '../utils/banner';
 import { getTypeScriptDefaultLibNames } from '../utils/dependencies-json';
+import type { BuildOptions } from '../utils/options';
+import { writePkgJson } from '../utils/write-pkg-json';
+import { aliasPlugin } from './plugins/alias-plugin';
 import { inlinedCompilerDepsPlugin } from './plugins/inlined-compiler-deps-plugin';
 import { parse5Plugin } from './plugins/parse5-plugin';
 import { replacePlugin } from './plugins/replace-plugin';
 import { sizzlePlugin } from './plugins/sizzle-plugin';
 import { sysModulesPlugin } from './plugins/sys-modules-plugin';
-import { writePkgJson } from '../utils/write-pkg-json';
-import type { BuildOptions } from '../utils/options';
-import type { RollupOptions, OutputChunk, TransformResult, RollupWarning } from 'rollup';
-import { typescriptSourcePlugin } from './plugins/typescript-source-plugin';
-import sourcemaps from 'rollup-plugin-sourcemaps';
-import { MinifyOptions, minify } from 'terser';
 import { terserPlugin } from './plugins/terser-plugin';
-import MagicString from 'magic-string';
+import { typescriptSourcePlugin } from './plugins/typescript-source-plugin';
 
 /**
  * Generates a rollup configuration for the `compiler` submodule of the project
