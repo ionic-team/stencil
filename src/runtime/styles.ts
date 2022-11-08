@@ -75,10 +75,12 @@ export const addStyle = (
           } else {
             styleElm = doc.createElement('style');
             styleElm.innerHTML = style;
+          }
 
-            if (plt.$nonce$) {
-              styleElm.setAttribute('nonce', plt.$nonce$);
-            }
+          // Apply CSP nonce to the style tag if it exists
+          const nonce = plt.$nonce$ ?? (window as any).nonce;
+          if (nonce != null) {
+            styleElm.setAttribute('nonce', nonce);
           }
 
           if (BUILD.hydrateServerSide || BUILD.hotModuleReplacement) {

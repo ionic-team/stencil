@@ -104,6 +104,13 @@ const patchDynamicImport = (base: string, orgScriptElm: HTMLScriptElement) => {
             type: 'application/javascript',
           })
         );
+
+        // Apply CSP nonce to the script tag if it exists
+        const nonce = plt.$nonce$ ?? (window as any).nonce;
+        if (nonce != null) {
+          script.setAttribute('nonce', nonce);
+        }
+
         mod = new Promise((resolve) => {
           script.onload = () => {
             resolve((win as any)[importFunctionName].m);

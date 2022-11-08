@@ -167,8 +167,11 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
   if (BUILD.invisiblePrehydration && (BUILD.hydratedClass || BUILD.hydratedAttribute)) {
     visibilityStyle.innerHTML = cmpTags + HYDRATED_CSS;
     visibilityStyle.setAttribute('data-styles', '');
-    if (plt.$nonce$) {
-      visibilityStyle.setAttribute('nonce', plt.$nonce$);
+
+    // Apply CSP nonce to the style tag if it exists
+    const nonce = plt.$nonce$ ?? (window as any).nonce;
+    if (nonce != null) {
+      visibilityStyle.setAttribute('nonce', nonce);
     }
     head.insertBefore(visibilityStyle, metaCharset ? metaCharset.nextSibling : head.firstChild);
   }

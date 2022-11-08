@@ -1,3 +1,4 @@
+import { plt } from '../../client-window';
 import { CSSScope } from './interfaces';
 import { addGlobalStyle, updateGlobalScopes } from './scope';
 
@@ -49,6 +50,12 @@ export function addGlobalLink(doc: Document, globalScopes: CSSScope[], linkElm: 
         const styleEl = doc.createElement('style');
         styleEl.setAttribute('data-styles', '');
         styleEl.textContent = text;
+
+        // Apply CSP nonce to the style tag if it exists
+        const nonce = plt.$nonce$ ?? (window as any).nonce;
+        if (nonce != null) {
+          styleEl.setAttribute('nonce', nonce);
+        }
 
         addGlobalStyle(globalScopes, styleEl);
         linkElm.parentNode.insertBefore(styleEl, linkElm);

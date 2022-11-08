@@ -1,4 +1,5 @@
 import { CssVarShim } from '../../../declarations';
+import { plt } from '../../client-window';
 import { CSSScope } from './interfaces';
 import { addGlobalLink, loadDocument, startWatcher } from './load-link-styles';
 import { addGlobalStyle, parseCSS, reScope, updateGlobalScopes } from './scope';
@@ -49,6 +50,12 @@ export class CustomStyle implements CssVarShim {
     const baseScope = this.registerHostTemplate(cssText, cssScopeId, isScoped);
     const styleEl = this.doc.createElement('style');
     styleEl.setAttribute('data-no-shim', '');
+
+    // Apply CSP nonce to the style tag if it exists
+    const nonce = plt.$nonce$ ?? (window as any).nonce;
+    if (nonce != null) {
+      styleEl.setAttribute('nonce', nonce);
+    }
 
     if (!baseScope.usesCssVars) {
       // This component does not use (read) css variables
