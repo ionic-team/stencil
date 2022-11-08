@@ -200,7 +200,7 @@ const CONFIG_PROPS_TO_ANONYMIZE: ReadonlyArray<ConfigStringKeys> = [
 // Props we delete entirely from the config for telemetry
 //
 // TODO(STENCIL-469): Investigate improving anonymization for tsCompilerOptions and devServer
-const CONFIG_PROPS_TO_DELETE: ReadonlyArray<keyof d.Config> = ['sys', 'logger', 'tsCompilerOptions', 'devServer'];
+const CONFIG_PROPS_TO_DELETE: ReadonlyArray<keyof d.Config> = ['commonjs', 'env', 'rollupConfig', 'sys', 'testing', 'logger', 'tsCompilerOptions', 'devServer'];
 
 /**
  * Anonymize the config for telemetry, replacing potentially revealing config props
