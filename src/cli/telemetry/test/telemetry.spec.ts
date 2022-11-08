@@ -265,14 +265,20 @@ describe('anonymizeConfigForTelemetry', () => {
     expect(anonymizedConfig.outputTargets).toEqual([]);
   });
 
-  it.each<keyof d.ValidatedConfig>(['commonjs','devServer', 'env', 'logger', 'rollupConfig', 'sys', 'testing', 'tsCompilerOptions'])(
-    "should remove objects under prop '%s'",
-    (prop: keyof d.ValidatedConfig) => {
-      const anonymizedConfig = anonymizeConfigForTelemetry({ ...config, [prop]: {}, outputTargets: [] });
-      expect(anonymizedConfig.hasOwnProperty(prop)).toBe(false);
-      expect(anonymizedConfig.outputTargets).toEqual([]);
-    }
-  );
+  it.each<keyof d.ValidatedConfig>([
+    'commonjs',
+    'devServer',
+    'env',
+    'logger',
+    'rollupConfig',
+    'sys',
+    'testing',
+    'tsCompilerOptions',
+  ])("should remove objects under prop '%s'", (prop: keyof d.ValidatedConfig) => {
+    const anonymizedConfig = anonymizeConfigForTelemetry({ ...config, [prop]: {}, outputTargets: [] });
+    expect(anonymizedConfig.hasOwnProperty(prop)).toBe(false);
+    expect(anonymizedConfig.outputTargets).toEqual([]);
+  });
 
   it('should retain outputTarget props on the keep list', () => {
     const anonymizedConfig = anonymizeConfigForTelemetry({
