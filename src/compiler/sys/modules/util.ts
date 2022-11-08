@@ -15,6 +15,11 @@ export const inherits = (ctor: any, superCtor: any) => {
 export const inspect = (...args: any[]) => args.forEach((arg) => console.log(arg));
 
 export const promisify = (fn: Function): (() => Promise<any>) => {
+  console.log('in the promisify func');
+
+  if (fn === undefined) {
+    console.trace();
+  }
   if (typeof (fn as any)[promisify.custom] === 'function') {
     // https://nodejs.org/api/util.html#util_custom_promisified_functions
     return function (...args: any[]) {

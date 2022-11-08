@@ -925,7 +925,7 @@ export interface CompilerSystem {
   /**
    * Always returns a boolean, does not throw.
    */
-  access(p: string): Promise<boolean>;
+  access: (p: string) => Promise<boolean>;
   /**
    * SYNC! Always returns a boolean, does not throw.
    */

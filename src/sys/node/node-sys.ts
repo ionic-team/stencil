@@ -193,6 +193,8 @@ export function createNodeSys(c: { process?: any } = {}): CompilerSystem {
       destroys.clear();
     },
     dynamicImport(p) {
+      console.log('sys::dynamicImport::1');
+      console.log(`sys::dynamicImport::${p}`);
       return Promise.resolve(require(p));
     },
     encodeToBase64(str) {

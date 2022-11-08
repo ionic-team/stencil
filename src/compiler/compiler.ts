@@ -7,8 +7,8 @@ import { createFullBuild } from './build/full-build';
 import { createWatchBuild } from './build/watch-build';
 import { Cache } from './cache';
 import { getConfig } from './sys/config';
-import { patchFs } from './sys/fs-patch';
 import { createInMemoryFs } from './sys/in-memory-fs';
+import {patchFs} from './sys/modules/fs';
 import { resolveModuleIdAsync } from './sys/resolve/resolve-module-async';
 import { patchTypescript } from './sys/typescript/typescript-sys';
 import { createSysWorker } from './sys/worker/sys-worker';
@@ -32,7 +32,9 @@ export const createCompiler = async (userConfig: Config): Promise<Compiler> => {
     config.sys.setupCompiler({ ts });
   }
 
+  console.log('going to patch FS');
   patchFs(sys);
+  console.log('huh');
 
   compilerCtx.fs = createInMemoryFs(sys);
   compilerCtx.cache = new Cache(config, createInMemoryFs(sys));

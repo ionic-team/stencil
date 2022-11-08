@@ -19,6 +19,16 @@ const fs: FsObj = {
   __sys: {} as any,
 };
 
+export const patchFs = (userSys: d.CompilerSystem) => {
+  console.log('patchFs::about to patch');
+  if (fs.__sys == undefined) {
+    // @ts-ignore
+    fs.__sys = {}
+  }
+  Object.assign(fs.__sys, userSys);
+  console.log('patchFs::patched');
+};
+
 export const exists = (fs.exists = (p: string, cb: any) => {
   fs.__sys
     .access(p)
@@ -26,8 +36,22 @@ export const exists = (fs.exists = (p: string, cb: any) => {
     .catch(() => cb(false));
 });
 
+// @ts-ignore
+export const access = (fs.access = (p: string, mode: any, cb: any): Promise<any> => {
+  console.log('access::about to call `__sys.access`');
+  console.log(fs.__sys);
+  console.log(fs.__sys.access);
+  // @ts-ignore
+  const access = fs.__sys?.access;
+  if (access) {
+    return access(p).then(cb);
+  } else {
+    cb(true)
+  }
+});
+
 // https://nodejs.org/api/util.html#util_custom_promisified_functions
-// (exists as any)[promisify.custom] = (p: string) => fs.__sys.access(p);
+(exists as any)[promisify.custom] = (p: string) => fs.__sys.access(p);
 
 export const existsSync = (fs.existsSync = (p: string) => {
   // https://nodejs.org/api/fs.html#fs_fs_existssync_path
@@ -180,9 +204,9 @@ export const writeFile = (fs.writeFile = (p: string, data: string, opts: any, cb
 
 export default fs;
 
-// this is a hacky hack if ever I saw one
-export const promises = {
-  ...Object.fromEntries(
-    Object.entries(fs).map(([k,v]) => ([k, promisify(v)]))
-  )
-}
+// // this is a hacky hack if ever I saw one
+// export const promises = {
+//   ...Object.fromEntries(
+//     Object.entries(fs).map(([k,v]) => ([k, promisify(v)]))
+//   )
+// }

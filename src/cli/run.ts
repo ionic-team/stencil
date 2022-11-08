@@ -1,4 +1,5 @@
 import { hasError, isFunction, shouldIgnoreError } from '@utils';
+import {patchFs} from '../compiler/sys/modules/fs';
 
 import { dependencies } from '../compiler/sys/dependencies.json';
 import { createLogger } from '../compiler/sys/logger/console-logger';
@@ -21,9 +22,11 @@ import { taskTest } from './task-test';
 import { telemetryAction } from './telemetry/telemetry';
 
 export const run = async (init: d.CliInitOptions) => {
+  console.log('cli::run::1')
   const { args, logger, sys } = init;
 
   try {
+    console.log('cli::run::1')
     const flags = parseFlags(args);
     const task = flags.task;
 
@@ -31,6 +34,7 @@ export const run = async (init: d.CliInitOptions) => {
       logger.setLevel('debug');
     }
 
+    console.log('cli::run::2')
     if (flags.ci) {
       logger.enableColors(false);
     }
@@ -45,6 +49,7 @@ export const run = async (init: d.CliInitOptions) => {
       return;
     }
 
+    console.log('cli::run::3')
     startupLog(logger, task);
 
     const findConfigResults = await findConfig({ sys, configPath: flags.config });
@@ -64,7 +69,12 @@ export const run = async (init: d.CliInitOptions) => {
       return sys.exit(1);
     }
 
+    console.log('cli::run::about to patch');
+    patchFs(sys);
+
+    console.log('cli::run::4')
     const coreCompiler = await loadCoreCompiler(sys);
+    console.log('cli::run::5')
 
     if (task === 'version' || flags.version) {
       console.log(coreCompiler.version);
@@ -109,6 +119,8 @@ export const run = async (init: d.CliInitOptions) => {
     if (!shouldIgnoreError(e)) {
       const details = `${logger.getLevel() === 'debug' && e instanceof Error ? e.stack : ''}`;
       logger.error(`uncaught cli error: ${e}${details}`);
+      console.log(e);
+      console.trace()
       return sys.exit(1);
     }
   }
@@ -139,6 +151,7 @@ export const runTask = async (
     testing: config.testing ?? {},
   };
 
+  console.log('cli::run::runTask');
   switch (task) {
     case 'build':
       await taskBuild(coreCompiler, strictConfig);

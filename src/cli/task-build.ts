@@ -7,6 +7,7 @@ import { taskWatch } from './task-watch';
 import { telemetryBuildFinishedAction } from './telemetry/telemetry';
 
 export const taskBuild = async (coreCompiler: CoreCompiler, config: d.ValidatedConfig) => {
+    console.log('taskBuild::1');
   if (config.flags.watch) {
     // watch build
     await taskWatch(coreCompiler, config);
@@ -16,13 +17,16 @@ export const taskBuild = async (coreCompiler: CoreCompiler, config: d.ValidatedC
   // one-time build
   let exitCode = 0;
 
+    console.log('taskBuild::2');
   try {
     startupCompilerLog(coreCompiler, config);
 
     const versionChecker = startCheckVersion(config, coreCompiler.version);
 
+
     const compiler = await coreCompiler.createCompiler(config);
     const results = await compiler.build();
+    console.log('taskBuild::3');
 
     await telemetryBuildFinishedAction(config.sys, config, coreCompiler, results);
 
