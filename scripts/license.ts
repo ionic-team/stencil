@@ -238,7 +238,7 @@ function getContributors(contributors: unknown): string | ReadonlyArray<string> 
  * @param contributor the contributor information
  * @returns the formatted contributor information
  */
-function getAuthor(contributor: any): string {
+function getAuthor(contributor: any): string | null {
   if (typeof contributor === 'string') {
     return contributor;
   }
