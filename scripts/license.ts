@@ -213,10 +213,9 @@ interface BundledDep {
 /**
  * Format the list of contributors for a dependency
  * @param contributors the contributors, as read from a `package.json` file
- * @returns {string | undefined} the contributors list, formatted
+ * @returns the contributors list, formatted
  */
-function getContributors(contributors: unknown): string | undefined {
-  if (!contributors) return;
+function getContributors(contributors: unknown): string | ReadonlyArray<string> | null {
   if (typeof contributors === 'string') {
     return contributors;
   }
@@ -231,6 +230,7 @@ function getContributors(contributors: unknown): string | undefined {
   if (contributors) {
     return getAuthor(contributors);
   }
+  return null;
 }
 
 /**
@@ -260,9 +260,9 @@ function getAuthor(contributor: any): string {
  * alter Stencil's generated LICENSE.md file between releases.
  * @param opts build options to be used to determine where to look for a license
  * @param moduleId the name of the dependency to check
- * @returns {string | undefined} the license for a dependency, undefined if none was found
+ * @returns the license for a dependency, undefined if none was found
  */
-function getBundledDepLicenseContent(opts: BuildOptions, moduleId: string): string | undefined {
+function getBundledDepLicenseContent(opts: BuildOptions, moduleId: string): string | null {
   const licenseFiles = ['LICENSE', 'LICENSE.md', 'LICENSE-MIT', 'LICENSE.txt'];
   for (const licenseFile of licenseFiles) {
     try {
@@ -270,6 +270,7 @@ function getBundledDepLicenseContent(opts: BuildOptions, moduleId: string): stri
       return fs.readFileSync(licensePath, 'utf8');
     } catch (e) {}
   }
+  return null
 }
 
 /**

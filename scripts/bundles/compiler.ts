@@ -102,12 +102,13 @@ export async function compiler(opts: BuildOptions) {
         /**
          * A rollup build hook for resolving the fsevents. [Source](https://rollupjs.org/guide/en/#resolveid)
          * @param id the importee exactly as it is written in an import statement in the source code
-         * @returns {string | undefined} an object that resolves an import to some id
+         * @returns an object that resolves an import to some id
          */
-        resolveId(id: string): string | undefined {
+        resolveId(id: string): string | null {
           if (id === 'fsevents') {
             return id;
           }
+          return null
         },
         /**
          * A rollup build hook for loading the Stencil mock-doc module, Microsoft's TypeScript event tracer, the V8
