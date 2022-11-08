@@ -108,7 +108,7 @@ export async function compiler(opts: BuildOptions) {
           if (id === 'fsevents') {
             return id;
           }
-          return null
+          return null;
         },
         /**
          * A rollup build hook for loading the Stencil mock-doc module, Microsoft's TypeScript event tracer, the V8

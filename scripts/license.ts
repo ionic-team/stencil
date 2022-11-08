@@ -270,7 +270,7 @@ function getBundledDepLicenseContent(opts: BuildOptions, moduleId: string): stri
       return fs.readFileSync(licensePath, 'utf8');
     } catch (e) {}
   }
-  return null
+  return null;
 }
 
 /**
