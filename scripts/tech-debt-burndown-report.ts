@@ -81,8 +81,8 @@ const getErrorCodeMessages = (): Record<string, Set<string>> => {
   const errorCodeMessageMap = {};
 
   prData.forEach((error) => {
-    let errorCode = error.value.tsError.value.errorString;
-    let message = error.value.message.value;
+    const errorCode = error.value.tsError.value.errorString;
+    const message = error.value.message.value;
     errorCodeMessageMap[errorCode] = (errorCodeMessageMap[errorCode] ?? new Set()).add(message);
   });
 
@@ -102,7 +102,7 @@ const errorCodeMessages = getErrorCodeMessages();
  * @returns a map of counts for `arr`
  */
 const countArrayEntries = <T>(arr: Array<T>): Map<T, number> => {
-  let counts = new Map<T, number>();
+  const counts = new Map<T, number>();
 
   arr.forEach((entry) => {
     counts.set(entry, (counts.get(entry) ?? 0) + 1);
@@ -180,7 +180,7 @@ const deadCodePR = processUnusedExports(unusedExportsPR);
  * @returns the collapsible section, ready for inclusion in a larger markdown context
  */
 const collapsible = (title: string, contentCb: (out: string[]) => void, lineBreak = '\n'): string => {
-  let out = [`<details><summary>${title}</summary>`, ''];
+  const out = [`<details><summary>${title}</summary>`, ''];
   contentCb(out);
   out.push('');
   out.push('</details>');
@@ -315,7 +315,7 @@ lines.push(
     );
 
     sortEntries(errorCodeCounts).forEach(([tsErrorCode, errorCount]) => {
-      let messages = errorCodeMessages[tsErrorCode];
+      const messages = errorCodeMessages[tsErrorCode];
 
       out.push(
         tableRow(

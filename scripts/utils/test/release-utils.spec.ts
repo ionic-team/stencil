@@ -1,4 +1,5 @@
 import fs from 'fs-extra';
+
 import { BuildOptions } from '../options';
 
 // `open` must be mocked before importing the module under test

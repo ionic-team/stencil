@@ -1,8 +1,9 @@
 import fs from 'fs-extra';
 import { join } from 'path';
-import type { BuildOptions } from '../../utils/options';
-import { rollup, Plugin } from 'rollup';
+import { Plugin, rollup } from 'rollup';
 import { minify } from 'terser';
+
+import type { BuildOptions } from '../../utils/options';
 
 /**
  * Creates a rollup plugin to embed Terser into the Stencil compiler

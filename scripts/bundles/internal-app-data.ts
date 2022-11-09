@@ -1,8 +1,9 @@
 import fs from 'fs-extra';
 import { join } from 'path';
+import { RollupOptions } from 'rollup';
+
 import { BuildOptions } from '../utils/options';
 import { writePkgJson } from '../utils/write-pkg-json';
-import { RollupOptions } from 'rollup';
 
 export async function internalAppData(opts: BuildOptions) {
   const inputAppDataDir = join(opts.buildDir, 'app-data');

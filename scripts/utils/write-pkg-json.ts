@@ -1,5 +1,6 @@
 import fs from 'fs-extra';
 import path from 'path';
+
 import { BuildOptions } from './options';
 
 export function writePkgJson(opts: BuildOptions, pkgDir: string, pkgData: PackageData) {
