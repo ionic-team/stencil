@@ -16,6 +16,7 @@ export const build = async (
   buildCtx: d.BuildCtx,
   tsBuilder: ts.BuilderProgram
 ) => {
+  console.log('build function::1');
   try {
     // reset process.cwd() for 3rd-party plugins
     process.chdir(config.rootDir);
@@ -45,18 +46,25 @@ export const build = async (
       return null;
     }
 
+  console.log('build function::2');
     // preprocess and generate styles before any outputTarget starts
     buildCtx.stylesPromise = generateGlobalStyles(config, compilerCtx, buildCtx);
     if (buildCtx.hasError) return buildAbort(buildCtx);
 
+  console.log('build function::3');
     // create outputs
     await generateOutputTargets(config, compilerCtx, buildCtx);
     if (buildCtx.hasError) return buildAbort(buildCtx);
 
+  console.log('build function::4');
     // write outputs
     await buildCtx.stylesPromise;
     await writeBuild(config, compilerCtx, buildCtx);
+  console.log('build function::5');
   } catch (e: any) {
+  console.log('build function::6');
+    console.log('caught error in the build');
+    console.log(e);
     // ¯\_(ツ)_/¯
     catchError(buildCtx.diagnostics, e);
   }
@@ -66,5 +74,6 @@ export const build = async (
   compilerCtx.changedFiles.clear();
 
   // return what we've learned today
+  console.log('build function::4');
   return buildFinish(buildCtx);
 };

@@ -74,6 +74,8 @@ export const outputCollection = async (
 
     await writeCollectionManifests(config, compilerCtx, buildCtx, outputTargets);
   } catch (e: any) {
+    console.log('outputCollectionError');
+    console.log(e);
     catchError(buildCtx.diagnostics, e);
   }
 

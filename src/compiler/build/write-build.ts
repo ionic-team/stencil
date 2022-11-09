@@ -37,6 +37,8 @@ export const writeBuild = async (
     await outputServiceWorkers(config, buildCtx);
     await validateBuildFiles(config, compilerCtx, buildCtx);
   } catch (e: any) {
+    console.log('caught error in `writeBuild`');
+    console.log(e);
     catchError(buildCtx.diagnostics, e);
   }
 

@@ -110,6 +110,8 @@ export const bundleCustomElements = async (
   buildCtx: d.BuildCtx,
   outputTarget: d.OutputTargetDistCustomElements
 ) => {
+  console.log('bundleCustomElements::1');
+  console.log(buildCtx.diagnostics);
   try {
     const bundleOpts = getBundleOptions(config, buildCtx, compilerCtx, outputTarget);
 
@@ -128,6 +130,8 @@ export const bundleCustomElements = async (
         preferConst: true,
       });
 
+  console.log('bundleCustomElements::2');
+  console.log(buildCtx.diagnostics);
       // the output target should have been validated at this point - as a result, we expect this field
       // to have been backfilled if it wasn't provided
       const outputTargetDir: string = outputTarget.dir!;
@@ -142,6 +146,8 @@ export const bundleCustomElements = async (
         return;
       }
 
+  console.log('bundleCustomElements::3');
+  console.log(buildCtx.diagnostics);
       const minify = outputTarget.externalRuntime || outputTarget.minify !== true ? false : config.minifyJs;
       const files = rollupOutput.output.map(async (bundle) => {
         if (bundle.type === 'chunk') {
@@ -158,6 +164,9 @@ export const bundleCustomElements = async (
           if (!hasError(optimizeResults.diagnostics) && typeof optimizeResults.output === 'string') {
             code = optimizeResults.output;
           }
+
+  console.log('bundleCustomElements::4');
+  console.log(buildCtx.diagnostics);
           if (optimizeResults.sourceMap) {
             sourceMap = optimizeResults.sourceMap;
             code = code + getSourceMappingUrlForEndOfFile(bundle.fileName);
@@ -170,9 +179,14 @@ export const bundleCustomElements = async (
           });
         }
       });
+
+  console.log('bundleCustomElements::5');
+  console.log(buildCtx.diagnostics);
       await Promise.all(files);
     }
   } catch (e: any) {
+    console.log('customElements');
+    console.log(e);
     catchError(buildCtx.diagnostics, e);
   }
 };

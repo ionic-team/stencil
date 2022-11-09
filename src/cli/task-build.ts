@@ -33,6 +33,7 @@ export const taskBuild = async (coreCompiler: CoreCompiler, config: d.ValidatedC
     await compiler.destroy();
 
     if (results.hasError) {
+      console.log('taskBuild::build had error');
       exitCode = 1;
     } else if (config.flags.prerender) {
       const prerenderDiagnostics = await runPrerenderTask(
@@ -44,6 +45,8 @@ export const taskBuild = async (coreCompiler: CoreCompiler, config: d.ValidatedC
       );
       config.logger.printDiagnostics(prerenderDiagnostics);
 
+      
+
       if (prerenderDiagnostics.some((d) => d.level === 'error')) {
         exitCode = 1;
       }
@@ -52,6 +55,8 @@ export const taskBuild = async (coreCompiler: CoreCompiler, config: d.ValidatedC
     await printCheckVersionResults(versionChecker);
   } catch (e) {
     exitCode = 1;
+    console.log(e);
+    console.trace();
     config.logger.error(e);
   }
 

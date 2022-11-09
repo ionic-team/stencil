@@ -136,6 +136,8 @@ const generateIndexHtml = async (
 
     buildCtx.debug(`generateIndexHtml, write: ${relative(config.rootDir, outputTarget.indexHtml)}`);
   } catch (e: any) {
+    console.log('www');
+    console.log(e);
     catchError(buildCtx.diagnostics, e);
   }
 };

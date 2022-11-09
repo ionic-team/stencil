@@ -57,28 +57,28 @@ export const createCustomResolverAsync = (
   exts: string[]
 ): any => {
   return {
-    async isFile(filePath: string, cb: (err: any, isFile: boolean) => void) {
-      const fsFilePath = normalizeFsPath(filePath);
+    // async isFile(filePath: string, cb: (err: any, isFile: boolean) => void) {
+    //   const fsFilePath = normalizeFsPath(filePath);
 
-      const stat = await inMemoryFs.stat(fsFilePath);
-      if (stat.isFile) {
-        cb(null, true);
-        return;
-      }
+    //   const stat = await inMemoryFs.stat(fsFilePath);
+    //   if (stat.isFile) {
+    //     cb(null, true);
+    //     return;
+    //   }
 
-      if (shouldFetchModule(fsFilePath)) {
-        const endsWithExt = exts.some((ext) => fsFilePath.endsWith(ext));
-        if (endsWithExt) {
-          const url = getNodeModuleFetchUrl(sys, packageVersions, fsFilePath);
-          const content = await fetchModuleAsync(sys, inMemoryFs, packageVersions, url, fsFilePath);
-          const checkFileExists = typeof content === 'string';
-          cb(null, checkFileExists);
-          return;
-        }
-      }
+    //   if (shouldFetchModule(fsFilePath)) {
+    //     const endsWithExt = exts.some((ext) => fsFilePath.endsWith(ext));
+    //     if (endsWithExt) {
+    //       const url = getNodeModuleFetchUrl(sys, packageVersions, fsFilePath);
+    //       const content = await fetchModuleAsync(sys, inMemoryFs, packageVersions, url, fsFilePath);
+    //       const checkFileExists = typeof content === 'string';
+    //       cb(null, checkFileExists);
+    //       return;
+    //     }
+    //   }
 
-      cb(null, false);
-    },
+    //   cb(null, false);
+    // },
 
     async isDirectory(dirPath: string, cb: (err: any, isDirectory: boolean) => void) {
       const fsDirPath = normalizeFsPath(dirPath);
@@ -118,16 +118,16 @@ export const createCustomResolverAsync = (
       cb(null, false);
     },
 
-    async readFile(p: string, cb: (err: any, data?: any) => void) {
-      const fsFilePath = normalizeFsPath(p);
+    // async readFile(p: string, cb: (err: any, data?: any) => void) {
+    //   const fsFilePath = normalizeFsPath(p);
 
-      const data = await inMemoryFs.readFile(fsFilePath);
-      if (isString(data)) {
-        return cb(null, data);
-      }
+    //   const data = await inMemoryFs.readFile(fsFilePath);
+    //   if (isString(data)) {
+    //     return cb(null, data);
+    //   }
 
-      return cb(`readFile not found: ${p}`);
-    },
+    //   return cb(`readFile not found: ${p}`);
+    // },
 
     async realpath(p: string, cb: (err: any, data?: any) => void) {
       const fsFilePath = normalizeFsPath(p);
@@ -140,6 +140,6 @@ export const createCustomResolverAsync = (
       }
     },
 
-    extensions: exts,
+    // extensions: exts,
   };
 };

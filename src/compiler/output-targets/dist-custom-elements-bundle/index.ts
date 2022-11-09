@@ -113,6 +113,8 @@ const bundleCustomElements = async (
       await Promise.all(files);
     }
   } catch (e: any) {
+    console.log('customElementsBundle');
+    console.log(e);
     catchError(buildCtx.diagnostics, e);
   }
 };

@@ -32,6 +32,8 @@ export const bundleOutput = async (
     compilerCtx.rollupCache.set(bundleOpts.id, rollupBuild.cache);
     return rollupBuild;
   } catch (e: any) {
+    console.log('AHA');
+    console.log(e);
     if (!buildCtx.hasError) {
       // TODO(STENCIL-353): Implement a type guard that balances using our own copy of Rollup types (which are
       // breakable) and type safety (so that the error variable may be something other than `any`)
@@ -68,7 +70,7 @@ export const getRollupOptions = (
     customResolveOptions,
     browser: true,
     rootDir: config.rootDir,
-    ...Object.fromEntries(Object.entries(config.nodeResolve as any).filter(([k,_v]) => k !== "extensions" )) as any
+    ...Object.fromEntries(Object.entries(config.nodeResolve as any ?? {}).filter(([k,_v]) => k !== "extensions" )) as any
   });
   const orgNodeResolveId = nodeResolvePlugin.resolveId;
   const orgNodeResolveId2 = (nodeResolvePlugin.resolveId = async function (importee: string, importer: string) {

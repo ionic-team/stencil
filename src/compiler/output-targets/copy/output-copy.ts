@@ -35,6 +35,8 @@ export const outputCopy = async (config: d.ValidatedConfig, compilerCtx: d.Compi
         copiedFiles = copyResults.filePaths.length;
       }
     } catch (e) {
+      console.log('outputCopyError');
+      console.log(e);
       const err = buildError(buildCtx.diagnostics);
       if (e instanceof Error) {
         err.messageText = e.message;

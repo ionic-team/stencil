@@ -18,6 +18,7 @@ export const generateOutputTargets = async (
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx
 ) => {
+  console.log('generateOutputTargets::1');
   const timeSpan = buildCtx.createTimeSpan('generate outputs started', true);
 
   const changedModuleFiles = Array.from(compilerCtx.changedModules)
@@ -28,22 +29,26 @@ export const generateOutputTargets = async (
 
   invalidateRollupCaches(compilerCtx);
 
-  await Promise.all([
-    outputAngular(config, compilerCtx, buildCtx),
-    outputCopy(config, compilerCtx, buildCtx),
-    outputCollection(config, compilerCtx, buildCtx, changedModuleFiles),
-    outputCustomElements(config, compilerCtx, buildCtx),
-    outputCustomElementsBundle(config, compilerCtx, buildCtx),
-    outputHydrateScript(config, compilerCtx, buildCtx),
-    outputLazyLoader(config, compilerCtx),
-    outputLazy(config, compilerCtx, buildCtx),
-    outputWww(config, compilerCtx, buildCtx),
-  ]);
+    await outputAngular(config, compilerCtx, buildCtx)
+    await outputCopy(config, compilerCtx, buildCtx)
+    await outputCollection(config, compilerCtx, buildCtx, changedModuleFiles)
+  console.log('generateOutputTargets::5');
+  console.log(buildCtx.diagnostics);
+    await outputCustomElements(config, compilerCtx, buildCtx)
+  console.log('generateOutputTargets::6');
+  console.log(buildCtx.diagnostics);
+    await outputCustomElementsBundle(config, compilerCtx, buildCtx)
+    await outputHydrateScript(config, compilerCtx, buildCtx)
+    await outputLazyLoader(config, compilerCtx)
+    await outputLazy(config, compilerCtx, buildCtx)
+    await outputWww(config, compilerCtx, buildCtx)
 
   // must run after all the other outputs
   // since it validates files were created
   await outputDocs(config, compilerCtx, buildCtx);
+  console.log('generateOutputTargets::12');
   await outputTypes(config, compilerCtx, buildCtx);
+  console.log('generateOutputTargets::13');
 
   timeSpan.finish('generate outputs finished');
 };

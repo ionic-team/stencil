@@ -92,6 +92,8 @@ export const outputLazy = async (
       }
     }
   } catch (e: any) {
+    console.log('outputLazy');
+    console.log(e);
     catchError(buildCtx.diagnostics, e);
   }
 

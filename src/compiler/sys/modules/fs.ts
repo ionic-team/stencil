@@ -204,9 +204,9 @@ export const writeFile = (fs.writeFile = (p: string, data: string, opts: any, cb
 
 export default fs;
 
-// // this is a hacky hack if ever I saw one
-// export const promises = {
-//   ...Object.fromEntries(
-//     Object.entries(fs).map(([k,v]) => ([k, promisify(v)]))
-//   )
-// }
+// this is a hacky hack if ever I saw one
+export const promises = {
+  ...Object.fromEntries(
+    Object.entries(fs).map(([k,v]) => ([k, promisify(v)]))
+  )
+}
