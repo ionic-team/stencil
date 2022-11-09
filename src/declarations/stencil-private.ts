@@ -1697,7 +1697,11 @@ export interface PlatformRuntime {
   $flags$: number;
   $orgLocNodes$?: Map<string, RenderNode>;
   $resourcesUrl$: string;
-  $nonce$?: string;
+  /**
+   * The nonce value to be applied to all script/style tags at runtime.
+   * If `null`, the nonce attribute will not be applied.
+   */
+  $nonce$?: string | null;
   jmp: (c: Function) => any;
   raf: (c: FrameRequestCallback) => number;
   ael: (

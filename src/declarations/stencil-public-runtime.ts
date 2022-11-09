@@ -298,6 +298,13 @@ export declare function getAssetPath(path: string): string;
  */
 export declare function setAssetPath(path: string): string;
 
+/**
+ * Used to specify a nonce value that corresponds with an application's CSP.
+ * When set, the nonce will be added to all dynamically created script and style tags at runtime.
+ * Alternatively, the nonce value can be set on the window object (window.nonce) and
+ * will result in the same behavior.
+ * @param nonce The value to be used for the nonce attribute.
+ */
 export declare function setNonce(nonce: string): void;
 
 /**
