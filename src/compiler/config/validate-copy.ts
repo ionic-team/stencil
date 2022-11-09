@@ -11,7 +11,10 @@ import type * as d from '../../declarations';
  * - `false`
  * - a non-array
  */
-export const validateCopy = (copy: d.CopyTask[] | boolean, defaultCopy: d.CopyTask[] = []): d.CopyTask[] => {
+export const validateCopy = (
+  copy: d.CopyTask[] | boolean | null | undefined,
+  defaultCopy: d.CopyTask[] = []
+): d.CopyTask[] => {
   if (copy === null || copy === false) {
     return [];
   }
