@@ -40,11 +40,13 @@ describe('generateBuildStats', () => {
       options: {
         buildEs5: false,
         hashFileNames: false,
-        hashedFileNameLength: undefined,
+        hashedFileNameLength: 8,
         minifyCss: false,
         minifyJs: false,
       },
-      rollupResults: undefined,
+      rollupResults: {
+        modules: [],
+      },
       sourceGraph: {},
     });
   });

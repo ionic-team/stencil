@@ -9,7 +9,7 @@ import type * as d from '../../declarations';
  * @returns CompilerBuildStats or an Object including diagnostics.
  */
 export function generateBuildStats(
-  config: d.Config,
+  config: d.ValidatedConfig,
   buildCtx: d.BuildCtx,
 ): result.Result<d.CompilerBuildStats, { diagnostics: d.Diagnostic[] }> {
   // TODO(STENCIL-461): Investigate making this return only a single type
@@ -30,8 +30,8 @@ export function generateBuildStats(
         app: {
           namespace: config.namespace,
           fsNamespace: config.fsNamespace,
-          components: Object.keys(buildResults.componentGraph).length,
-          entries: Object.keys(buildResults.componentGraph).length,
+          components: Object.keys(buildResults.componentGraph ?? {}).length,
+          entries: Object.keys(buildResults.componentGraph ?? {}).length,
           bundles: buildResults.outputs.reduce((total, en) => total + en.files.length, 0),
           outputs: getAppOutputs(config, buildResults),
         },
@@ -51,9 +51,9 @@ export function generateBuildStats(
         },
         components: getComponentsFileMap(config, buildCtx),
         entries: buildCtx.entryModules,
-        componentGraph: buildResults.componentGraph,
+        componentGraph: buildResults.componentGraph ?? {},
         sourceGraph: getSourceGraph(config, buildCtx),
-        rollupResults: buildCtx.rollupResults,
+        rollupResults: buildCtx.rollupResults ?? { modules: [] },
         collections: getCollections(config, buildCtx),
       };
       return result.ok(stats);
@@ -78,7 +78,7 @@ export function generateBuildStats(
  * config)
  */
 export async function writeBuildStats(
-  config: d.Config,
+  config: d.ValidatedConfig,
   data: result.Result<d.CompilerBuildStats, { diagnostics: d.Diagnostic[] }>,
 ): Promise<void> {
   const statsTargets = config.outputTargets.filter(isOutputTargetStats);
@@ -86,10 +86,12 @@ export async function writeBuildStats(
   await result.map(data, async (compilerBuildStats) => {
     await Promise.all(
       statsTargets.map(async (outputTarget) => {
-        const result = await config.sys.writeFile(outputTarget.file, JSON.stringify(compilerBuildStats, null, 2));
+        if (outputTarget.file) {
+          const result = await config.sys.writeFile(outputTarget.file, JSON.stringify(compilerBuildStats, null, 2));
 
-        if (result.error) {
-          config.logger.warn([`Stats failed to write file to ${outputTarget.file}`]);
+          if (result.error) {
+            config.logger.warn([`Stats failed to write file to ${outputTarget.file}`]);
+          }
         }
       }),
     );
@@ -115,7 +117,7 @@ function sanitizeBundlesForStats(bundleArray: ReadonlyArray<d.BundleModule>): Re
   });
 }
 
-function getSourceGraph(config: d.Config, buildCtx: d.BuildCtx) {
+function getSourceGraph(config: d.ValidatedConfig, buildCtx: d.BuildCtx) {
   const sourceGraph: d.BuildSourceGraph = {};
 
   sortBy(buildCtx.moduleFiles, (m) => m.sourceFilePath).forEach((moduleFile) => {
@@ -126,7 +128,7 @@ function getSourceGraph(config: d.Config, buildCtx: d.BuildCtx) {
   return sourceGraph;
 }
 
-function getAppOutputs(config: d.Config, buildResults: d.CompilerBuildResults) {
+function getAppOutputs(config: d.ValidatedConfig, buildResults: d.CompilerBuildResults) {
   return buildResults.outputs.map((output) => {
     return {
       name: output.type,
@@ -136,7 +138,7 @@ function getAppOutputs(config: d.Config, buildResults: d.CompilerBuildResults) {
   });
 }
 
-function getComponentsFileMap(config: d.Config, buildCtx: d.BuildCtx) {
+function getComponentsFileMap(config: d.ValidatedConfig, buildCtx: d.BuildCtx) {
   return buildCtx.components.map((component) => {
     return {
       tag: component.tagName,
@@ -164,7 +166,7 @@ function getComponentsFileMap(config: d.Config, buildCtx: d.BuildCtx) {
   });
 }
 
-function getCollections(config: d.Config, buildCtx: d.BuildCtx) {
+function getCollections(config: d.ValidatedConfig, buildCtx: d.BuildCtx): d.CompilerBuildStatCollection[] {
   return buildCtx.collections
     .map((c) => {
       return {
@@ -180,6 +182,6 @@ function getCollections(config: d.Config, buildCtx: d.BuildCtx) {
     });
 }
 
-function relativePath(config: d.Config, file: string) {
+function relativePath(config: d.ValidatedConfig, file: string) {
   return config.sys.normalizePath(config.sys.platformPath.relative(config.rootDir, file));
 }

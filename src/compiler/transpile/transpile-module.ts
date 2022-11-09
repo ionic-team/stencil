@@ -17,6 +17,7 @@ import { updateStencilCoreImports } from '../transformers/update-stencil-core-im
 
 /**
  * Stand-alone compiling of a single string
+ *
  * @param config the Stencil configuration to use in the compilation process
  * @param input the string to compile
  * @param transformOpts a configuration object for how the string is compiled
