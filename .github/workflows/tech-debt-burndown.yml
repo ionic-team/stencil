@@ -125,7 +125,7 @@ jobs:
           name: unused-exports-pr
 
       - name: Compile scripts
-        run: node scripts --prepare
+        run: npm run tsc.scripts
 
       - name: Set action output
         run: node scripts/build/tech-debt-burndown-report.js > $GITHUB_STEP_SUMMARY
