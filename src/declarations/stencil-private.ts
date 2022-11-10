@@ -2404,6 +2404,8 @@ export interface NewSpecPageOptions {
   attachStyles?: boolean;
 
   strictBuild?: boolean;
+
+  platform?: Partial<PlatformRuntime>;
 }
 
 /**
