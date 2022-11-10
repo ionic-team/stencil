@@ -1,12 +1,13 @@
-import fs from 'fs-extra';
-import { aliasPlugin } from './alias-plugin';
-import { join } from 'path';
-import type { BuildOptions } from '../../utils/options';
 import rollupCommonjs from '@rollup/plugin-commonjs';
 import rollupResolve from '@rollup/plugin-node-resolve';
-import { rollup, OutputChunk, Plugin } from 'rollup';
+import fs from 'fs-extra';
+import { join } from 'path';
 import type { NormalizedOutputOptions, OutputBundle } from 'rollup';
+import { OutputChunk, Plugin, rollup } from 'rollup';
 import { minify } from 'terser';
+
+import type { BuildOptions } from '../../utils/options';
+import { aliasPlugin } from './alias-plugin';
 
 /**
  * Bundles parse5, an HTML serializer & parser, into the compiler

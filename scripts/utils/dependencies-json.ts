@@ -1,5 +1,6 @@
-import { join } from 'path';
 import { readdir, readFile, writeFile } from 'fs-extra';
+import { join } from 'path';
+
 import type { BuildOptions } from './options';
 
 export async function updateDependenciesJson(opts: BuildOptions) {

@@ -1,5 +1,5 @@
-import ts from 'typescript';
 import type { NormalizedOutputOptions, OutputBundle, OutputChunk, Plugin } from 'rollup';
+import ts from 'typescript';
 
 export function reorderCoreStatementsPlugin(): Plugin {
   return {

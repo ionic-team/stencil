@@ -1,5 +1,6 @@
-import fs from 'fs-extra';
 import { generateDtsBundle } from 'dts-bundle-generator/dist/bundle-generator.js';
+import fs from 'fs-extra';
+
 import { BuildOptions } from './options';
 
 export async function bundleDts(opts: BuildOptions, inputFile: string) {
