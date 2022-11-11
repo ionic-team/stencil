@@ -30,6 +30,7 @@
       "@app-globals": ["src/app-globals/index.ts"],
       "@compiler-deps": ["src/compiler/sys/modules/compiler-deps.ts"],
       "@dev-server-process": ["src/dev-server/server-process.ts"],
+      "@environment": ["src/compiler/sys/environment.ts"],
       "@hydrate-factory": ["src/hydrate/runner/hydrate-factory.ts"],
       "@platform": ["src/client/index.ts"],
       "@runtime": ["src/runtime/index.ts"],
