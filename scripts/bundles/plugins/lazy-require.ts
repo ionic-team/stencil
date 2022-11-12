@@ -1,6 +1,7 @@
-import type { Plugin, OutputChunk } from 'rollup';
 import fs from 'fs-extra';
 import path from 'path';
+import type { OutputChunk, Plugin } from 'rollup';
+
 import type { BuildOptions } from '../../utils/options';
 
 export function lazyRequirePlugin(opts: BuildOptions, moduleIds: string[], resolveToPath: string): Plugin {

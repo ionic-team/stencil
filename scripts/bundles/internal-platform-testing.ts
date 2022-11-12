@@ -1,13 +1,14 @@
 import fs from 'fs-extra';
 import { join } from 'path';
-import { aliasPlugin } from './plugins/alias-plugin';
-import { replacePlugin } from './plugins/replace-plugin';
-import { reorderCoreStatementsPlugin } from './plugins/reorder-statements';
+import { OutputOptions, RollupOptions } from 'rollup';
+
 import { getBanner } from '../utils/banner';
 import { BuildOptions } from '../utils/options';
 import { writePkgJson } from '../utils/write-pkg-json';
-import { RollupOptions, OutputOptions } from 'rollup';
+import { aliasPlugin } from './plugins/alias-plugin';
 import { prettyMinifyPlugin } from './plugins/pretty-minify';
+import { reorderCoreStatementsPlugin } from './plugins/reorder-statements';
+import { replacePlugin } from './plugins/replace-plugin';
 
 export async function internalTesting(opts: BuildOptions) {
   const inputTestingPlatform = join(opts.buildDir, 'testing', 'platform', 'index.js');

@@ -1,9 +1,10 @@
-import { dirname, join, relative, resolve } from 'path';
 import fs from 'fs-extra';
-import { BuildOptions, getOptions } from '../utils/options';
-import { PackageData } from '../utils/write-pkg-json';
+import { dirname, join, relative } from 'path';
 import { rollup } from 'rollup';
 import ts from 'typescript';
+
+import { BuildOptions, getOptions } from '../utils/options';
+import { PackageData } from '../utils/write-pkg-json';
 
 /**
  * Used to triple check that the final build files
