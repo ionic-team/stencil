@@ -19,7 +19,7 @@ import {
   TranspileResults,
 } from '@stencil/core/internal';
 
-export { transpile, transpileSync } from './transpile'
+export { transpile, transpileSync } from './transpile';
 
 /**
  * The compiler is the utility that brings together many tools to build optimized components,

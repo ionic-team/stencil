@@ -1,7 +1,13 @@
 import { rollupPluginUtils } from '@compiler-deps';
+import type {
+  Config,
+  TransformCssToEsmInput,
+  TransformOptions,
+  TranspileOptions,
+  TranspileResults,
+} from '@stencil/core/internal';
 import { catchError, getInlineSourceMappingUrlLinker, isString } from '@utils';
 
-import { Config, TransformCssToEsmInput, TransformOptions, TranspileOptions, TranspileResults } from '@stencil/core/internal'
 import { getTranspileConfig, getTranspileCssConfig, getTranspileResults } from './config/transpile-options';
 import { transformCssToEsm, transformCssToEsmSync } from './style/css-to-esm';
 import { patchTypescript } from './sys/typescript/typescript-sys';
@@ -23,10 +29,10 @@ import { transpileModule } from './transpile/transpile-module';
  * array of all the import paths found in the source file. The transpile options can be
  * used to set the `module` format, such as `cjs`, and JavaScript `target` version, such
  * as `es2017`.
-   *
-   * @param code the code to transpile
+ *
+ * @param code the code to transpile
  * @param opts options for the transpilation process
-   * @returns a Promise wrapping the results of the transpilation
+ * @returns a Promise wrapping the results of the transpilation
  */
 export const transpile = async (code: string, opts: TranspileOptions = {}): Promise<TranspileResults> => {
   const { importData, results } = getTranspileResults(code, opts);
@@ -55,10 +61,10 @@ export const transpile = async (code: string, opts: TranspileOptions = {}): Prom
  * Synchronous equivalent of the `transpile()` function. When used in a browser
  * environment, TypeScript must already be available globally, where as the async
  * `transpile()` function will load TypeScript automatically.
-   *
-   * @param code the code to transpile
+ *
+ * @param code the code to transpile
  * @param opts options for the transpilation process
-   * @returns the results of the transpilation
+ * @returns the results of the transpilation
  */
 export const transpileSync = (code: string, opts: TranspileOptions = {}): TranspileResults => {
   const { importData, results } = getTranspileResults(code, opts);

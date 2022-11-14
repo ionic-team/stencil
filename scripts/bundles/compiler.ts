@@ -228,9 +228,3 @@ async function minifyStencilCompiler(code: string, opts: BuildOptions) {
 
   return code;
 }
-
-async function copyDts(opts: BuildOptions, inputPath: string, outputPath: string) {
-  let dts = await fs.readFile(inputPath, 'utf8');
-  dts = dts.replace('@stencil/core/internal', '../internal/index');
-  await fs.writeFile(join(opts.output.compilerDir, outputPath), dts);
-}
