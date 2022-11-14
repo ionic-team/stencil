@@ -65,13 +65,18 @@ export const getRollupOptions = (
     '.json',
     '.d.ts',
   ]);
+  console.log('getRollupOptions::customResolveOptions');
+  console.log(customResolveOptions);
   const nodeResolvePlugin = rollupNodeResolvePlugin({
     mainFields: ['collection:main', 'jsnext:main', 'es2017', 'es2015', 'module', 'main'],
     customResolveOptions,
     browser: true,
     rootDir: config.rootDir,
-    ...Object.fromEntries(Object.entries(config.nodeResolve as any ?? {}).filter(([k,_v]) => k !== "extensions" )) as any
+    ...(config.nodeResolve as any)
+    // ...Object.fromEntries(Object.entries(config.nodeResolve as any ?? {}).filter(([k,_v]) => k !== "extensions" )) as any
   });
+
+  console.log(nodeResolvePlugin.resolveId);
   const orgNodeResolveId = nodeResolvePlugin.resolveId;
   const orgNodeResolveId2 = (nodeResolvePlugin.resolveId = async function (importee: string, importer: string) {
     const [realImportee, query] = importee.split('?');
@@ -90,7 +95,8 @@ export const getRollupOptions = (
   });
   if (config.devServer && config.devServer.experimentalDevModules) {
     nodeResolvePlugin.resolveId = async function (importee: string, importer: string) {
-      const resolvedId = await orgNodeResolveId2.call(nodeResolvePlugin, importee, importer);
+      // @ts-ignore
+      const resolvedId = await orgNodeResolveId2.handler.call(nodeResolvePlugin, importee, importer);
       return devNodeModuleResolveId(config, compilerCtx.fs, resolvedId, importee);
     };
   }
