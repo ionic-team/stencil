@@ -45,7 +45,7 @@ export const validateServiceWorker = (config: d.ValidatedConfig, outputTarget: d
   outputTarget.serviceWorker = {
     ...outputTarget.serviceWorker,
     globDirectory: outputTarget.serviceWorker?.globDirectory ?? outputTarget.appDir,
-    swDest: outputTarget.serviceWorker?.swDest ?? join(outputTarget.appDir, DEFAULT_FILENAME),
+    swDest: outputTarget.serviceWorker?.swDest ?? join(outputTarget.appDir ?? '', DEFAULT_FILENAME),
   };
 
   if (!Array.isArray(outputTarget.serviceWorker.globPatterns)) {
@@ -70,8 +70,8 @@ export const validateServiceWorker = (config: d.ValidatedConfig, outputTarget: d
     outputTarget.serviceWorker.swSrc = join(config.rootDir, outputTarget.serviceWorker.swSrc);
   }
 
-  if (!isAbsolute(outputTarget.serviceWorker.swDest)) {
-    outputTarget.serviceWorker.swDest = join(outputTarget.appDir, outputTarget.serviceWorker.swDest);
+  if (isString(outputTarget.serviceWorker.swDest) && !isAbsolute(outputTarget.serviceWorker.swDest)) {
+    outputTarget.serviceWorker.swDest = join(outputTarget.appDir ?? '', outputTarget.serviceWorker.swDest);
   }
 };
 
