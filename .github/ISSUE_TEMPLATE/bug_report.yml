@@ -33,6 +33,12 @@ body:
       required: true
   - type: textarea
     attributes:
+      label: System Info
+      description: Output of npx envinfo --system --npmPackages @stencil/core --binaries --browsers
+      render: shell
+      placeholder: System, Binaries, Browsers
+  - type: textarea
+    attributes:
       label: Steps to Reproduce
       description: Please explain the steps required to duplicate this issue.
     validations:
