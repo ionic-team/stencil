@@ -2,13 +2,13 @@ name: Auto Request Review
 
 inputs:
   token:
-    description: 'GitHub token'
+    description: 'The GitHub token with permissions for executing the action API calls'
     required: true
   org:
-    description: 'The organization name'
+    description: 'The Github organization name (i.e "ionic-team")'
     required: true
   team:
-    description: 'The team slug'
+    description: 'The Github team name (i.e. "stencil") that will be used to assign individual reviewers when the PR author is within the specified organization.'
     required: true
 
 runs:
