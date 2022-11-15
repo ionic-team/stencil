@@ -81,7 +81,7 @@ export const getRollupOptions = (
   const orgNodeResolveId2 = (nodeResolvePlugin.resolveId = async function (importee: string, importer: string) {
     const [realImportee, query] = importee.split('?');
     // @ts-ignore
-    const resolved = await orgNodeResolveId.call(nodeResolvePlugin, realImportee, importer);
+    const resolved = await orgNodeResolveId.handler.call(nodeResolvePlugin, realImportee, importer);
     if (resolved) {
       if (isString(resolved)) {
         return query ? resolved + '?' + query : resolved;
