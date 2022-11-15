@@ -1,3 +1,17 @@
+## 🌏 [2.19.3](https://github.com/ionic-team/stencil/compare/v2.19.2...v2.19.3) (2022-11-15)
+
+
+### Bug Fixes
+
+* **cli:** refactor CLI argument parser ([#3765](https://github.com/ionic-team/stencil/issues/3765)) ([d34c4f2](https://github.com/ionic-team/stencil/commit/d34c4f24c27493197caeb2548a0652ef574f2be2)), closes [#3712](https://github.com/ionic-team/stencil/issues/3712)
+* **generate:** prevent type error when existing task ([#3793](https://github.com/ionic-team/stencil/issues/3793)) ([f553fde](https://github.com/ionic-team/stencil/commit/f553fdeaf256e02f084bd64b4329e77e634965a8))
+
+
+### Thanks
+
+🎉 Thanks for @PengBoUESTC and @boahc077 for their contributions! 🎉
+
+
 ## 🍋 [2.19.2](https://github.com/ionic-team/stencil/compare/v2.19.2-0...v2.19.2) (2022-10-27)
 
 
