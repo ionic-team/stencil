@@ -2330,7 +2330,7 @@ export interface ServiceWorkerConfig {
   cacheId?: string | undefined;
 
   /**
-   * Whether or not Workbox should attempt to identify an delete any precaches
+   * Whether or not Workbox should attempt to identify and delete any precaches
    * created by older, incompatible versions.
    *
    * @default false
