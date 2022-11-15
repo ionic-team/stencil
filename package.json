@@ -116,7 +116,7 @@
     "postcss": "^8.2.8",
     "prettier": "2.7.1",
     "prompts": "2.4.2",
-    "puppeteer": "~10.0.0",
+    "puppeteer": "~19.2.2",
     "rollup": "2.42.3",
     "rollup-plugin-sourcemaps": "^0.6.3",
     "semver": "^7.3.7",
