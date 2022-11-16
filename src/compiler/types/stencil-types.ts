@@ -1,7 +1,8 @@
-import type * as d from '../../declarations';
-import { dirname, join, relative, resolve } from 'path';
-import { isOutputTargetDistTypes } from '../output-targets/output-utils';
 import { normalizePath } from '@utils';
+import { dirname, join, relative, resolve } from 'path';
+
+import type * as d from '../../declarations';
+import { isOutputTargetDistTypes } from '../output-targets/output-utils';
 import { FsWriteResults } from '../sys/in-memory-fs';
 
 /**

@@ -1,8 +1,9 @@
 import type * as d from '@stencil/core/declarations';
-import { buildJestArgv } from '../jest-config';
 import { mockValidatedConfig } from '@stencil/core/testing';
-import { parseFlags } from '../../../cli/parse-flags';
 import path from 'path';
+
+import { parseFlags } from '../../../cli/parse-flags';
+import { buildJestArgv } from '../jest-config';
 
 describe('jest-config', () => {
   it('pass --maxWorkers=2 arg when --max-workers=2', () => {
@@ -187,5 +188,17 @@ describe('jest-config', () => {
     const jestArgv = buildJestArgv(config);
     expect(jestArgv.spec).toBe(true);
     expect(jestArgv.passWithNoTests).toBe(true);
+  });
+
+  it('should parse a setup with a filepath constraint', () => {
+    const args = ['test', '--spec', '--json', '--', 'my-component.spec.ts'];
+    const config = mockValidatedConfig();
+    config.flags = parseFlags(args);
+
+    expect(config.flags.args).toEqual(['--spec', '--json', '--', 'my-component.spec.ts']);
+    expect(config.flags.unknownArgs).toEqual(['--', 'my-component.spec.ts']);
+
+    const jestArgv = buildJestArgv(config);
+    expect(jestArgv.json).toBe(true);
   });
 });

@@ -258,7 +258,9 @@ export type ErrorHandler = (err: any, element?: HTMLElement) => void;
 export declare const setMode: (handler: ResolutionHandler) => void;
 
 /**
- * getMode
+ * `getMode()` is used for libraries which provide multiple "modes" for styles.
+ * @param ref a reference to the node to get styles for
+ * @returns the current mode or undefined, if not found
  */
 export declare function getMode<T = string | undefined>(ref: any): T;
 
@@ -273,6 +275,9 @@ export declare function setPlatformHelpers(helpers: {
 /**
  * Get the base path to where the assets can be found. Use `setAssetPath(path)`
  * if the path needs to be customized.
+ * @param path the path to use in calculating the asset path. this value will be
+ * used in conjunction with the base asset path
+ * @returns the base path
  */
 export declare function getAssetPath(path: string): string;
 
@@ -286,25 +291,32 @@ export declare function getAssetPath(path: string): string;
  * `setAssetPath(document.currentScript.src)`, or using a bundler's replace plugin to
  * dynamically set the path at build time, such as `setAssetPath(process.env.ASSET_PATH)`.
  * But do note that this configuration depends on how your script is bundled, or lack of
- * bunding, and where your assets can be loaded from. Additionally custom bundling
+ * bundling, and where your assets can be loaded from. Additionally custom bundling
  * will have to ensure the static assets are copied to its build directory.
+ * @param path the asset path to set
+ * @returns the set path
  */
 export declare function setAssetPath(path: string): string;
 
 /**
- * getElement
+ * Retrieve a Stencil element for a given reference
+ * @param ref the ref to get the Stencil element for
+ * @returns a reference to the element
  */
 export declare function getElement(ref: any): HTMLStencilElement;
 
 /**
  * Schedules a new render of the given instance or element even if no state changed.
  *
- * Notice `forceUpdate()` is not syncronous and might perform the DOM render in the next frame.
+ * Notice `forceUpdate()` is not synchronous and might perform the DOM render in the next frame.
+ *
+ * @param ref the node/element to force the re-render of
  */
 export declare function forceUpdate(ref: any): void;
 
 /**
  * getRenderingRef
+ * @returns the rendering ref
  */
 export declare function getRenderingRef(): any;
 
@@ -317,6 +329,8 @@ export interface HTMLStencilElement extends HTMLElement {
  * in the best moment to perform DOM mutation without causing layout thrashing.
  *
  * For further information: https://developers.google.com/web/fundamentals/performance/rendering/avoid-large-complex-layouts-and-layout-thrashing
+ *
+ * @param task the DOM-write to schedule
  */
 export declare function writeTask(task: RafCallback): void;
 
@@ -325,6 +339,8 @@ export declare function writeTask(task: RafCallback): void;
  * in the best moment to perform DOM reads without causing layout thrashing.
  *
  * For further information: https://developers.google.com/web/fundamentals/performance/rendering/avoid-large-complex-layouts-and-layout-thrashing
+ *
+ * @param task the DOM-read to schedule
  */
 export declare function readTask(task: RafCallback): void;
 
@@ -512,6 +528,7 @@ export declare const Host: FunctionalComponent<HostAttributes>;
  */
 export declare const Fragment: FunctionalComponent<{}>;
 
+/* eslint-disable jsdoc/require-param, jsdoc/require-returns -- we don't want to JSDoc these overloads at this time */
 /**
  * The "h" namespace is used to import JSX types for elements and attributes.
  * It is imported in order to avoid conflicting global JSX issues.
@@ -532,6 +549,8 @@ export declare namespace h {
     }
   }
 }
+
+/* eslint-enable jsdoc/require-param, jsdoc/require-returns -- we don't want to JSDoc these overloads at this time */
 
 export declare function h(sel: any): VNode;
 export declare function h(sel: Node, data: VNodeData | null): VNode;

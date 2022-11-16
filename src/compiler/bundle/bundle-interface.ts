@@ -1,6 +1,7 @@
-import type { BuildConditionals } from '../../declarations';
-import type { SourceFile, TransformerFactory } from 'typescript';
 import type { PreserveEntrySignaturesOption } from 'rollup';
+import type { SourceFile, TransformerFactory } from 'typescript';
+
+import type { BuildConditionals } from '../../declarations';
 
 /**
  * Options for bundled output passed on Rollup
@@ -11,6 +12,10 @@ import type { PreserveEntrySignaturesOption } from 'rollup';
 export interface BundleOptions {
   id: string;
   conditionals?: BuildConditionals;
+  /**
+   * When `true`, all `@stencil/core/*` packages will be treated as external
+   * and omitted from the generated bundle.
+   */
   externalRuntime?: boolean;
   platform: 'client' | 'hydrate' | 'worker';
   customTransformers?: TransformerFactory<SourceFile>[];

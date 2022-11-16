@@ -1,4 +1,4 @@
-import { Component, Build, Env } from '@stencil/core';
+import { Build, Component, Env } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
 describe('globals', () => {

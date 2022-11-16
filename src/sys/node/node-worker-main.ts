@@ -1,7 +1,8 @@
-import type * as d from '../../declarations';
+import { TASK_CANCELED_MSG } from '@utils';
 import * as cp from 'child_process';
 import { EventEmitter } from 'events';
-import { TASK_CANCELED_MSG } from '@utils';
+
+import type * as d from '../../declarations';
 
 export class NodeWorkerMain extends EventEmitter {
   childProcess: cp.ChildProcess;

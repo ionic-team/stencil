@@ -1,20 +1,21 @@
+import ansiColor, { bgRed, blue, bold, cyan, dim, gray, green, magenta, red, yellow } from 'ansi-colors';
+
 import {
   Diagnostic,
-  Logger,
-  LogLevel,
   LOG_LEVELS,
-  LoggerTimeSpan,
-  PrintLine,
+  Logger,
   LoggerLineUpdater,
+  LoggerTimeSpan,
+  LogLevel,
+  PrintLine,
 } from '../../../declarations';
-import ansiColor, { bgRed, blue, bold, cyan, dim, gray, green, magenta, red, yellow } from 'ansi-colors';
 
 /**
  * A type to capture the range of functions exported by the ansi-colors module
  * Unfortunately they don't make a type like this available directly, so we have
  * to do a little DIY.
  */
-type AnsiColorVariant = keyof ansiColor.StylesType<string>;
+type AnsiColorVariant = keyof typeof ansiColor.styles;
 
 /**
  * Create a logger for outputting information to a terminal environment

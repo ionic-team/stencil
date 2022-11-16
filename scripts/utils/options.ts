@@ -1,7 +1,8 @@
+import { readFileSync } from 'fs-extra';
 import { join } from 'path';
+
 import { getVermoji } from './vermoji';
 import { PackageData } from './write-pkg-json';
-import { readFileSync } from 'fs-extra';
 
 /**
  * Retrieves information used during a 'process' that requires knowledge of various project file paths, Stencil version

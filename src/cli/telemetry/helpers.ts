@@ -18,7 +18,7 @@ export const isInteractive = (sys: d.CompilerSystem, flags: ConfigFlags, object?
       tty: sys.isTTY() ? true : false,
       ci:
         ['CI', 'BUILD_ID', 'BUILD_NUMBER', 'BITBUCKET_COMMIT', 'CODEBUILD_BUILD_ARN'].filter(
-          (v) => !!sys.getEnvironmentVar(v)
+          (v) => !!sys.getEnvironmentVar?.(v)
         ).length > 0 || !!flags.ci,
     });
 
@@ -54,7 +54,7 @@ export async function readJson(sys: d.CompilerSystem, path: string): Promise<any
  * @returns true if --debug has been passed, otherwise false
  */
 export function hasDebug(flags: ConfigFlags): boolean {
-  return flags.debug;
+  return !!flags.debug;
 }
 
 /**
@@ -63,5 +63,5 @@ export function hasDebug(flags: ConfigFlags): boolean {
  * @returns true if both --debug and --verbose have been passed, otherwise false
  */
 export function hasVerbose(flags: ConfigFlags): boolean {
-  return flags.verbose && hasDebug(flags);
+  return !!flags.verbose && hasDebug(flags);
 }

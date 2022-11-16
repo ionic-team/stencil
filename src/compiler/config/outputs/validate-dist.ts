@@ -1,5 +1,7 @@
+import { isBoolean, isString } from '@utils';
+import { isAbsolute, join, resolve } from 'path';
+
 import type * as d from '../../../declarations';
-import { getAbsolutePath } from '../config-utils';
 import {
   COPY,
   DIST_COLLECTION,
@@ -10,8 +12,7 @@ import {
   getComponentsDtsTypesFilePath,
   isOutputTargetDist,
 } from '../../output-targets/output-utils';
-import { isAbsolute, join, resolve } from 'path';
-import { isBoolean, isString } from '@utils';
+import { getAbsolutePath } from '../config-utils';
 import { validateCopy } from '../validate-copy';
 
 /**
@@ -67,6 +68,7 @@ export const validateDist = (config: d.ValidatedConfig, userOutputs: d.OutputTar
           dir: distOutputTarget.dir,
           collectionDir: distOutputTarget.collectionDir,
           empty: distOutputTarget.empty,
+          transformAliasedImportPaths: distOutputTarget.transformAliasedImportPathsInCollection,
         });
         outputs.push({
           type: COPY,
@@ -134,6 +136,7 @@ const validateOutputTargetDist = (config: d.ValidatedConfig, o: d.OutputTargetDi
     copy: validateCopy(o.copy ?? [], []),
     polyfills: isBoolean(o.polyfills) ? o.polyfills : undefined,
     empty: isBoolean(o.empty) ? o.empty : true,
+    transformAliasedImportPathsInCollection: o.transformAliasedImportPathsInCollection ?? false,
   };
 
   if (!isAbsolute(outputTarget.buildDir)) {

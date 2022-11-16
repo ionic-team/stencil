@@ -1,7 +1,8 @@
-import { Config, OptimizeJsInput, OptimizeJsOutput } from '../../declarations';
 import { catchError } from '@utils';
-import { getTerserOptions } from './optimize-module';
+
+import { Config, OptimizeJsInput, OptimizeJsOutput } from '../../declarations';
 import { minifyJs } from './minify-js';
+import { getTerserOptions } from './optimize-module';
 
 export const optimizeJs = async (inputOpts: OptimizeJsInput) => {
   const result: OptimizeJsOutput = {

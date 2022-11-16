@@ -1,8 +1,9 @@
+import { augmentDiagnosticWithNode, buildError, buildWarn, flatOne } from '@utils';
+import ts from 'typescript';
+
 import type * as d from '../../../declarations';
 import { convertValueToLiteral, createStaticGetter } from '../transform-utils';
-import { flatOne, buildError, augmentDiagnosticWithNode, buildWarn } from '@utils';
 import { getDeclarationParameters, isDecoratorNamed } from './decorator-utils';
-import ts from 'typescript';
 
 export const watchDecoratorsToStatic = (
   config: d.Config,

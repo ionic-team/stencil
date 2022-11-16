@@ -1,8 +1,9 @@
+import { catchError, hasError } from '@utils';
+
 import type * as d from '../../declarations';
-import { getUsedSelectors, UsedSelectors } from '../style/css-parser/used-selectors';
-import { hasError, catchError } from '@utils';
 import { parseCss } from '../style/css-parser/parse-css';
 import { serializeCss } from '../style/css-parser/serialize-css';
+import { getUsedSelectors, UsedSelectors } from '../style/css-parser/used-selectors';
 
 export const removeUnusedStyles = (doc: Document, diagnostics: d.Diagnostic[]) => {
   try {

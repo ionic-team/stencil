@@ -1,5 +1,5 @@
-import { MockHTMLElement, MockNode } from './node';
 import { NODE_TYPES } from './constants';
+import { MockHTMLElement, MockNode } from './node';
 
 export class MockCustomElementRegistry implements CustomElementRegistry {
   private __registry: Map<string, { cstr: any; options: any }>;

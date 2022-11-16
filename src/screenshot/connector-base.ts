@@ -1,7 +1,8 @@
 import type * as d from '@stencil/core/internal';
-import { emptyDir, fileExists, mkDir, readDir, readFile, readFileBuffer, rmDir, writeFile } from './screenshot-fs';
-import { join } from 'path';
 import { tmpdir } from 'os';
+import { join } from 'path';
+
+import { emptyDir, fileExists, mkDir, readDir, readFile, readFileBuffer, rmDir, writeFile } from './screenshot-fs';
 
 export class ScreenshotConnector implements d.ScreenshotConnector {
   rootDir: string;

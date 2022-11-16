@@ -1,6 +1,7 @@
 import type * as d from '@stencil/core/internal';
-import { isOutputTargetDistLazy, isOutputTargetWww } from '../compiler/output-targets/output-utils';
 import { join, relative } from 'path';
+
+import { isOutputTargetDistLazy, isOutputTargetWww } from '../compiler/output-targets/output-utils';
 import { InMemoryFileSystem } from '../compiler/sys/in-memory-fs';
 
 export function shuffleArray(array: any[]) {
@@ -62,12 +63,12 @@ export function expectFilesDoNotExist(fs: InMemoryFileSystem, filePaths: string[
   }
 }
 
-export function getAppScriptUrl(config: d.Config, browserUrl: string) {
+export function getAppScriptUrl(config: d.ValidatedConfig, browserUrl: string) {
   const appFileName = `${config.fsNamespace}.esm.js`;
   return getAppUrl(config, browserUrl, appFileName);
 }
 
-export function getAppStyleUrl(config: d.Config, browserUrl: string) {
+export function getAppStyleUrl(config: d.ValidatedConfig, browserUrl: string) {
   if (config.globalStyle) {
     const appFileName = `${config.fsNamespace}.css`;
     return getAppUrl(config, browserUrl, appFileName);
@@ -75,7 +76,7 @@ export function getAppStyleUrl(config: d.Config, browserUrl: string) {
   return null;
 }
 
-function getAppUrl(config: d.Config, browserUrl: string, appFileName: string) {
+function getAppUrl(config: d.ValidatedConfig, browserUrl: string, appFileName: string) {
   const wwwOutput = config.outputTargets.find(isOutputTargetWww);
   if (wwwOutput) {
     const appBuildDir = wwwOutput.buildDir;

@@ -1,6 +1,6 @@
 import type * as d from '../../../declarations';
 import { InMemoryFileSystem } from '../in-memory-fs';
-import { known404Urls, httpFetch } from './fetch-utils';
+import { httpFetch, known404Urls } from './fetch-utils';
 import { skipFilePathFetch, skipUrlFetch } from './fetch-utils';
 import { writeFetchSuccessAsync } from './write-fetch-success';
 

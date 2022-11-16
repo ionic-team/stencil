@@ -1,6 +1,7 @@
-import type * as d from '../../declarations';
 import { catchError } from '@utils';
 import { join } from 'path';
+
+import type * as d from '../../declarations';
 
 export const generateSitemapXml = async (manager: d.PrerenderManager) => {
   if (manager.prerenderConfig.sitemapXml === null) {

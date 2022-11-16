@@ -1,5 +1,6 @@
-import type * as d from '../../declarations';
 import { flatOne, unique } from '@utils';
+
+import type * as d from '../../declarations';
 
 export function resolveComponentDependencies(cmps: d.ComponentCompilerMeta[]) {
   computeDependencies(cmps);

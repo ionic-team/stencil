@@ -1,15 +1,16 @@
-import fs from 'fs-extra';
-import { BuildOptions } from '../utils/options';
-import { join } from 'path';
 import rollupCommonjs from '@rollup/plugin-commonjs';
 import rollupResolve from '@rollup/plugin-node-resolve';
+import fs from 'fs-extra';
+import { join } from 'path';
+import { OutputOptions, RollupOptions } from 'rollup';
+
+import { getBanner } from '../utils/banner';
+import { BuildOptions } from '../utils/options';
+import { writePkgJson } from '../utils/write-pkg-json';
 import { aliasPlugin } from './plugins/alias-plugin';
 import { parse5Plugin } from './plugins/parse5-plugin';
 import { replacePlugin } from './plugins/replace-plugin';
-import { RollupOptions, OutputOptions } from 'rollup';
 import { sizzlePlugin } from './plugins/sizzle-plugin';
-import { writePkgJson } from '../utils/write-pkg-json';
-import { getBanner } from '../utils/banner';
 
 export async function mockDoc(opts: BuildOptions) {
   const inputDir = join(opts.buildDir, 'mock-doc');

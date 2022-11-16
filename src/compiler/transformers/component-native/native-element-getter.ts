@@ -1,5 +1,6 @@
-import type * as d from '../../../declarations';
 import ts from 'typescript';
+
+import type * as d from '../../../declarations';
 
 export const addNativeElementGetter = (classMembers: ts.ClassElement[], cmp: d.ComponentCompilerMeta) => {
   // @Element() element;
@@ -7,13 +8,13 @@ export const addNativeElementGetter = (classMembers: ts.ClassElement[], cmp: d.C
   // get element() { return this; }
   if (cmp.elementRef) {
     classMembers.push(
-      ts.createGetAccessor(
+      ts.factory.createGetAccessorDeclaration(
         undefined,
         undefined,
         cmp.elementRef,
         [],
         undefined,
-        ts.createBlock([ts.createReturn(ts.createThis())])
+        ts.factory.createBlock([ts.factory.createReturnStatement(ts.factory.createThis())])
       )
     );
   }

@@ -1,5 +1,6 @@
 import { Component, Method, Prop, State, Watch } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
+
 import { withSilentWarn } from '../../testing/testing-utils';
 
 describe('watch', () => {

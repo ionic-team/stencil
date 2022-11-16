@@ -1,15 +1,16 @@
-import fs from 'fs-extra';
-import { join } from 'path';
-import { bundleDts } from '../utils/bundle-dts';
-import { aliasPlugin } from './plugins/alias-plugin';
-import { replacePlugin } from './plugins/replace-plugin';
-import { getBanner } from '../utils/banner';
-import { BuildOptions } from '../utils/options';
 import rollupCommonjs from '@rollup/plugin-commonjs';
 import rollupResolve from '@rollup/plugin-node-resolve';
-import { writePkgJson } from '../utils/write-pkg-json';
+import fs from 'fs-extra';
+import { join } from 'path';
 import { RollupOptions } from 'rollup';
+
+import { getBanner } from '../utils/banner';
+import { bundleDts } from '../utils/bundle-dts';
+import { BuildOptions } from '../utils/options';
+import { writePkgJson } from '../utils/write-pkg-json';
+import { aliasPlugin } from './plugins/alias-plugin';
 import { prettyMinifyPlugin } from './plugins/pretty-minify';
+import { replacePlugin } from './plugins/replace-plugin';
 
 export async function internalHydrate(opts: BuildOptions) {
   const inputHydrateDir = join(opts.buildDir, 'hydrate');

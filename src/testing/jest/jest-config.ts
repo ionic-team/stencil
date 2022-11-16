@@ -1,5 +1,5 @@
-import type * as d from '@stencil/core/internal';
 import type { Config } from '@jest/types';
+import type * as d from '@stencil/core/internal';
 import { isString } from '@utils';
 
 // TODO(STENCIL-306): Remove support for earlier versions of Jest
@@ -46,7 +46,7 @@ function getLegacyJestOptions(): Record<string, boolean | number | string> {
 export function buildJestArgv(config: d.ValidatedConfig): Config.Argv {
   const yargs = require('yargs');
 
-  const args = [...config.flags.unknownArgs.slice(), ...config.flags.knownArgs.slice()];
+  const args = [...config.flags.knownArgs.slice(), ...config.flags.unknownArgs.slice()];
 
   if (!args.some((a) => a.startsWith('--max-workers') || a.startsWith('--maxWorkers'))) {
     args.push(`--max-workers=${config.maxConcurrentWorkers}`);

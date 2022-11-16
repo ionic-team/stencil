@@ -19,6 +19,10 @@ export interface JsonDocsComponent {
   readme: string;
   docs: string;
   docsTags: JsonDocsTag[];
+  /**
+   * The text from the class-level JSDoc for a Stencil component, if present.
+   */
+  overview?: string;
   usage: JsonDocsUsage;
   props: JsonDocsProp[];
   methods: JsonDocsMethod[];
@@ -47,6 +51,26 @@ export interface JsonDocsValue {
   type: string;
 }
 
+/**
+ * A mapping of file names to their contents.
+ *
+ * This type is meant to be used when reading one or more usage markdown files associated with a component. For the
+ * given directory structure:
+ * ```
+ * src/components/my-component
+ * ├── my-component.tsx
+ * └── usage
+ *     ├── bar.md
+ *     └── foo.md
+ * ```
+ * an instance of this type would include the name of the markdown file, mapped to its contents:
+ * ```ts
+ * {
+ *   'bar': STRING_CONTENTS_OF_BAR.MD
+ *   'foo': STRING_CONTENTS_OF_FOO.MD
+ * }
+ * ```
+ */
 export interface JsonDocsUsage {
   [key: string]: string;
 }

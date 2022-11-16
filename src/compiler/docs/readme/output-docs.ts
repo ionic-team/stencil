@@ -1,14 +1,16 @@
-import type * as d from '../../../declarations';
-import { propsToMarkdown } from './markdown-props';
-import { eventsToMarkdown } from './markdown-events';
 import { join, relative } from 'path';
-import { methodsToMarkdown } from './markdown-methods';
-import { usageToMarkdown } from './markdown-usage';
-import { stylesToMarkdown } from './markdown-css-props';
-import { slotsToMarkdown } from './markdown-slots';
-import { partsToMarkdown } from './markdown-parts';
-import { depsToMarkdown } from './markdown-dependencies';
+
+import type * as d from '../../../declarations';
 import { AUTO_GENERATE_COMMENT } from '../constants';
+import { stylesToMarkdown } from './markdown-css-props';
+import { depsToMarkdown } from './markdown-dependencies';
+import { eventsToMarkdown } from './markdown-events';
+import { methodsToMarkdown } from './markdown-methods';
+import { overviewToMarkdown } from './markdown-overview';
+import { partsToMarkdown } from './markdown-parts';
+import { propsToMarkdown } from './markdown-props';
+import { slotsToMarkdown } from './markdown-slots';
+import { usageToMarkdown } from './markdown-usage';
 
 export const generateReadme = async (
   config: d.ValidatedConfig,
@@ -53,6 +55,7 @@ export const generateMarkdown = (
     '',
     '',
     ...getDocsDeprecation(cmp),
+    ...overviewToMarkdown(cmp.overview),
     ...usageToMarkdown(cmp.usage),
     ...propsToMarkdown(cmp.props),
     ...eventsToMarkdown(cmp.events),

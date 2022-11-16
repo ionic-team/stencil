@@ -1,9 +1,10 @@
 /* eslint-disable jest/no-test-prefixes, jest/no-commented-out-tests, jest/expect-expect -- this file needs to be brought up to date at some point */
 // TODO(STENCIL-487): Investigate reviving this test file
-import type * as d from '@stencil/core/declarations';
 import { createCompiler } from '@stencil/core/compiler';
+import type * as d from '@stencil/core/declarations';
 import { mockCompilerSystem, mockLoadConfigInit } from '@stencil/core/testing';
 import path from 'path';
+
 import { validateConfig } from '../../config/validate-config';
 
 xdescribe('component-styles', () => {

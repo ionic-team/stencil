@@ -40,7 +40,7 @@ jobs:
   run_browserstack:
     name: Run Browserstack
     runs-on: ubuntu-latest
-    needs: [ build_core ]
+    needs: [build_core]
 
     # The concurrency field allows us to block multiple invocations of this job across multiple workflow runs.
     # Stencil is only able to run 5 parallel tests in Browserstack, which is exceeded when more than one run of this
@@ -51,15 +51,16 @@ jobs:
     # GitHub Actions 'concurrency' field as means to block the job until no other tests are running.
     concurrency: run_browserstack_queue
     steps:
-      - uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # v2.4.0
+      - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
         with:
           ref: ${{ github.event_name == 'pull_request_target' && format('refs/pull/{0}/merge', github.event.number) || '' }}
           persist-credentials: false
 
-      - name: Use Node 12
-        uses: actions/setup-node@56337c425554a6be30cdef71bf441f15be286854 # v3.1.1
+      - name: Use Node Version from Volta (Karma)
+        uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
         with:
-          node-version: 12
+          # pull the version to use from the volta key in package.json
+          node-version-file: './test/karma/package.json'
           cache: 'npm'
 
       - name: Install dependencies
@@ -97,9 +98,5 @@ jobs:
           # local-testing must be one of two values: 'start' or 'stop' to start/stop Browserstack
           local-testing: stop
 
-      - name: Git status check
-        # here we check that there are no changed / new files from our test
-        # run. we use `git status`, grep out the build zip (downloaded above),
-        # and check if there are more than 0 lines in the output.
-        run: if [[ $(git status --short | grep -c -v stencil-core-build.zip) -ne 0 ]]; then STATUS=$(git status --verbose); printf "%s" "$STATUS"; git diff | cat; exit 1; fi
-        shell: bash
+      - name: Check Git Context
+        uses: ./.github/workflows/actions/check-git-context

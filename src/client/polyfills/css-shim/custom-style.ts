@@ -1,9 +1,9 @@
-import { addGlobalLink, loadDocument, startWatcher } from './load-link-styles';
-import { executeTemplate } from './template';
+import { CssVarShim } from '../../../declarations';
 import { CSSScope } from './interfaces';
+import { addGlobalLink, loadDocument, startWatcher } from './load-link-styles';
 import { addGlobalStyle, parseCSS, reScope, updateGlobalScopes } from './scope';
 import { getActiveSelectors, resolveValues } from './selectors';
-import { CssVarShim } from '../../../declarations';
+import { executeTemplate } from './template';
 
 export class CustomStyle implements CssVarShim {
   private count = 0;

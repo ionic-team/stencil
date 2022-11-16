@@ -1,6 +1,7 @@
+import { join } from 'path';
+
 import type * as d from '../../../declarations';
 import { isOutputTargetDocsJson } from '../../output-targets/output-utils';
-import { join } from 'path';
 
 export const generateJsonDocs = async (
   config: d.ValidatedConfig,

@@ -3,7 +3,7 @@ import type { LogLevel, TaskCommand } from '@stencil/core/declarations';
 /**
  * All the Boolean options supported by the Stencil CLI
  */
-export const BOOLEAN_CLI_ARGS = [
+export const BOOLEAN_CLI_FLAGS = [
   'build',
   'cache',
   'checkVersion',
@@ -88,7 +88,7 @@ export const BOOLEAN_CLI_ARGS = [
 /**
  * All the Number options supported by the Stencil CLI
  */
-export const NUMBER_CLI_ARGS = [
+export const NUMBER_CLI_FLAGS = [
   'port',
   // JEST CLI ARGS
   'maxConcurrency',
@@ -98,7 +98,7 @@ export const NUMBER_CLI_ARGS = [
 /**
  * All the String options supported by the Stencil CLI
  */
-export const STRING_CLI_ARGS = [
+export const STRING_CLI_FLAGS = [
   'address',
   'config',
   'docsApi',
@@ -138,8 +138,9 @@ export const STRING_CLI_ARGS = [
   'testURL',
   'timers',
   'transform',
+] as const;
 
-  // ARRAY ARGS
+export const STRING_ARRAY_CLI_FLAGS = [
   'collectCoverageOnlyFrom',
   'coveragePathIgnorePatterns',
   'coverageReporters',
@@ -169,7 +170,7 @@ export const STRING_CLI_ARGS = [
  * `maxWorkers` is an argument which is used both by Stencil _and_ by Jest,
  * which means that we need to support parsing both string and number values.
  */
-export const STRING_NUMBER_CLI_ARGS = ['maxWorkers'] as const;
+export const STRING_NUMBER_CLI_FLAGS = ['maxWorkers'] as const;
 
 /**
  * All the LogLevel-type options supported by the Stencil CLI
@@ -178,7 +179,7 @@ export const STRING_NUMBER_CLI_ARGS = ['maxWorkers'] as const;
  * but this approach lets us make sure that we're handling all
  * our arguments in a type-safe way.
  */
-export const LOG_LEVEL_CLI_ARGS = ['logLevel'] as const;
+export const LOG_LEVEL_CLI_FLAGS = ['logLevel'] as const;
 
 /**
  * A type which gives the members of a `ReadonlyArray<string>` as
@@ -187,25 +188,38 @@ export const LOG_LEVEL_CLI_ARGS = ['logLevel'] as const;
  */
 type ArrayValuesAsUnion<T extends ReadonlyArray<string>> = T[number];
 
-export type BooleanCLIArg = ArrayValuesAsUnion<typeof BOOLEAN_CLI_ARGS>;
-export type StringCLIArg = ArrayValuesAsUnion<typeof STRING_CLI_ARGS>;
-export type NumberCLIArg = ArrayValuesAsUnion<typeof NUMBER_CLI_ARGS>;
-export type StringNumberCLIArg = ArrayValuesAsUnion<typeof STRING_NUMBER_CLI_ARGS>;
-export type LogCLIArg = ArrayValuesAsUnion<typeof LOG_LEVEL_CLI_ARGS>;
+export type BooleanCLIFlag = ArrayValuesAsUnion<typeof BOOLEAN_CLI_FLAGS>;
+export type StringCLIFlag = ArrayValuesAsUnion<typeof STRING_CLI_FLAGS>;
+export type StringArrayCLIFlag = ArrayValuesAsUnion<typeof STRING_ARRAY_CLI_FLAGS>;
+export type NumberCLIFlag = ArrayValuesAsUnion<typeof NUMBER_CLI_FLAGS>;
+export type StringNumberCLIFlag = ArrayValuesAsUnion<typeof STRING_NUMBER_CLI_FLAGS>;
+export type LogCLIFlag = ArrayValuesAsUnion<typeof LOG_LEVEL_CLI_FLAGS>;
 
-type KnownCLIArg = BooleanCLIArg | StringCLIArg | NumberCLIArg | StringNumberCLIArg | LogCLIArg;
+export type KnownCLIFlag =
+  | BooleanCLIFlag
+  | StringCLIFlag
+  | StringArrayCLIFlag
+  | NumberCLIFlag
+  | StringNumberCLIFlag
+  | LogCLIFlag;
 
-type AliasMap = Partial<Record<KnownCLIArg, string>>;
+type AliasMap = Partial<Record<string, KnownCLIFlag>>;
 
 /**
  * For a small subset of CLI options we support a short alias e.g. `'h'` for `'help'`
  */
-export const CLI_ARG_ALIASES: AliasMap = {
-  config: 'c',
-  help: 'h',
-  port: 'p',
-  version: 'v',
+export const CLI_FLAG_ALIASES: AliasMap = {
+  c: 'config',
+  h: 'help',
+  p: 'port',
+  v: 'version',
 };
+
+/**
+ * A regular expression which can be used to match a CLI flag for one of our
+ * short aliases.
+ */
+export const CLI_FLAG_REGEX = new RegExp(`^-[chpv]{1}$`);
 
 /**
  * Given two types `K` and `T` where `K` extends `ReadonlyArray<string>`,
@@ -223,31 +237,37 @@ type ObjectFromKeys<K extends ReadonlyArray<string>, T> = {
  * Type containing the possible Boolean configuration flags, to be included
  * in ConfigFlags, below
  */
-type BooleanConfigFlags = ObjectFromKeys<typeof BOOLEAN_CLI_ARGS, boolean>;
+type BooleanConfigFlags = ObjectFromKeys<typeof BOOLEAN_CLI_FLAGS, boolean>;
 
 /**
  * Type containing the possible String configuration flags, to be included
  * in ConfigFlags, below
  */
-type StringConfigFlags = ObjectFromKeys<typeof STRING_CLI_ARGS, string>;
+type StringConfigFlags = ObjectFromKeys<typeof STRING_CLI_FLAGS, string>;
+
+/**
+ * Type containing the possible String Array configuration flags. This is
+ * one of the 'constituent types' for `ConfigFlags`.
+ */
+type StringArrayConfigFlags = ObjectFromKeys<typeof STRING_ARRAY_CLI_FLAGS, string[]>;
 
 /**
  * Type containing the possible numeric configuration flags, to be included
  * in ConfigFlags, below
  */
-type NumberConfigFlags = ObjectFromKeys<typeof NUMBER_CLI_ARGS, number>;
+type NumberConfigFlags = ObjectFromKeys<typeof NUMBER_CLI_FLAGS, number>;
 
 /**
  * Type containing the configuration flags which may be set to either string
  * or number values.
  */
-type StringNumberConfigFlags = ObjectFromKeys<typeof STRING_NUMBER_CLI_ARGS, string | number>;
+type StringNumberConfigFlags = ObjectFromKeys<typeof STRING_NUMBER_CLI_FLAGS, string | number>;
 
 /**
  * Type containing the possible LogLevel configuration flags, to be included
  * in ConfigFlags, below
  */
-type LogLevelFlags = ObjectFromKeys<typeof LOG_LEVEL_CLI_ARGS, LogLevel>;
+type LogLevelFlags = ObjectFromKeys<typeof LOG_LEVEL_CLI_FLAGS, LogLevel>;
 
 /**
  * The configuration flags which can be set by the user on the command line.
@@ -266,6 +286,7 @@ type LogLevelFlags = ObjectFromKeys<typeof LOG_LEVEL_CLI_ARGS, LogLevel>;
 export interface ConfigFlags
   extends BooleanConfigFlags,
     StringConfigFlags,
+    StringArrayConfigFlags,
     NumberConfigFlags,
     StringNumberConfigFlags,
     LogLevelFlags {

@@ -1,7 +1,8 @@
-import type * as d from '../../declarations';
 import { consoleError, getHostRef } from '@platform';
 import { getValue, parsePropertyValue, setValue } from '@runtime';
 import { CMP_FLAGS, MEMBER_FLAGS } from '@utils';
+
+import type * as d from '../../declarations';
 
 export function proxyHostElement(elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta): void {
   if (typeof elm.componentOnReady !== 'function') {

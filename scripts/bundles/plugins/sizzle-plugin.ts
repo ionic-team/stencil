@@ -1,7 +1,8 @@
 import fs from 'fs-extra';
-import type { BuildOptions } from '../../utils/options';
 import { join } from 'path';
 import type { Plugin } from 'rollup';
+
+import type { BuildOptions } from '../../utils/options';
 
 /**
  * Bundles sizzle, a CSS selector engine, into the Stencil compiler
@@ -25,7 +26,7 @@ export function sizzlePlugin(opts: BuildOptions): Plugin {
     /**
      * A rollup build hook for loading sizzle. [Source](https://rollupjs.org/guide/en/#load)
      * @param id the path of the module to load
-     * @returns parse5, pre-bundled
+     * @returns sizzle, pre-bundled
      */
     async load(id: string): Promise<string> {
       if (id !== 'sizzle') {

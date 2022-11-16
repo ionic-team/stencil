@@ -1,13 +1,14 @@
-import fs from 'fs-extra';
-import { join } from 'path';
 import rollupCommonjs from '@rollup/plugin-commonjs';
 import rollupNodeResolve from '@rollup/plugin-node-resolve';
+import fs from 'fs-extra';
+import { join } from 'path';
+import { RollupOptions } from 'rollup';
+
+import { BuildOptions } from '../utils/options';
+import { writePkgJson } from '../utils/write-pkg-json';
 import { aliasPlugin } from './plugins/alias-plugin';
 import { relativePathPlugin } from './plugins/relative-path-plugin';
 import { replacePlugin } from './plugins/replace-plugin';
-import { BuildOptions } from '../utils/options';
-import { writePkgJson } from '../utils/write-pkg-json';
-import { RollupOptions } from 'rollup';
 
 export async function screenshot(opts: BuildOptions) {
   const inputScreenshotDir = join(opts.buildDir, 'screenshot');

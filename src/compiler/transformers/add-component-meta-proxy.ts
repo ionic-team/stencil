@@ -1,8 +1,9 @@
-import type * as d from '../../declarations';
-import { convertValueToLiteral } from './transform-utils';
 import { formatComponentRuntimeMeta } from '@utils';
-import { PROXY_CUSTOM_ELEMENT, RUNTIME_APIS, addCoreRuntimeApi } from './core-runtime-apis';
 import ts from 'typescript';
+
+import type * as d from '../../declarations';
+import { addCoreRuntimeApi, PROXY_CUSTOM_ELEMENT, RUNTIME_APIS } from './core-runtime-apis';
+import { convertValueToLiteral } from './transform-utils';
 
 export const addModuleMetadataProxies = (tsSourceFile: ts.SourceFile, moduleFile: d.Module) => {
   const statements = tsSourceFile.statements.slice();
@@ -11,11 +12,11 @@ export const addModuleMetadataProxies = (tsSourceFile: ts.SourceFile, moduleFile
 
   statements.push(...moduleFile.cmps.map(addComponentMetadataProxy));
 
-  return ts.updateSourceFileNode(tsSourceFile, statements);
+  return ts.factory.updateSourceFile(tsSourceFile, statements);
 };
 
 const addComponentMetadataProxy = (compilerMeta: d.ComponentCompilerMeta) => {
-  return ts.createStatement(createComponentMetadataProxy(compilerMeta));
+  return ts.factory.createExpressionStatement(createComponentMetadataProxy(compilerMeta));
 };
 
 /**

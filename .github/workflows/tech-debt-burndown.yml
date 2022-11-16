@@ -15,18 +15,18 @@ jobs:
   strict_null_check: # TODO(STENCIL-446): Remove this workflow once `strictNullChecks` is enabled
     strategy:
       matrix:
-        branch: [ 'main', 'pr' ]
+        branch: ['main', 'pr']
     name: 'Get strictNullChecks errors on ${{ matrix.branch }}'
     runs-on: 'ubuntu-latest'
     steps:
       - name: Checkout main
-        uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # v2.4.0
+        uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
         with:
           ref: main
         if: ${{ matrix.branch == 'main' }}
 
       - name: Checkout PR branch
-        uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # v2.4.0
+        uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
         with:
           # the pull_request_target event will consider the HEAD of `main` to be the SHA to use.
           # attempt to use the SHA associated with a pull request and fallback to HEAD of `main`
@@ -44,7 +44,7 @@ jobs:
         run: npx tsc --strictNullChecks --noEmit --pretty false | npx tsc-output-parser > null_errors_${{ matrix.branch }}.json
 
       - name: Upload null_errors_${{ matrix.branch }}.json
-        uses: actions/upload-artifact@6673cd052c4cd6fcf4b4e6e60ea986c889389535 # v3.0.0
+        uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # v3.1.1
         with:
           name: null_errors_${{ matrix.branch }}
           path: 'null_errors_${{ matrix.branch }}.json'
@@ -53,18 +53,18 @@ jobs:
   unused_exports_check:
     strategy:
       matrix:
-        branch: [ 'main', 'pr' ]
+        branch: ['main', 'pr']
     name: Find unused variables on ${{ matrix.branch }}
     runs-on: 'ubuntu-latest'
     steps:
       - name: Checkout main
-        uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # v2.4.0
+        uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
         with:
           ref: main
         if: ${{ matrix.branch == 'main' }}
 
       - name: Checkout PR branch
-        uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # v2.4.0
+        uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
         with:
           # the pull_request_target event will consider the HEAD of `main` to be the SHA to use.
           # attempt to use the SHA associated with a pull request and fallback to HEAD of `main`
@@ -79,18 +79,18 @@ jobs:
         run: npx ts-prune > unused-exports-${{ matrix.branch }}.txt
 
       - name: Upload unused exports
-        uses: actions/upload-artifact@6673cd052c4cd6fcf4b4e6e60ea986c889389535 # v3.0.0
+        uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # v3.1.1
         with:
           name: unused-exports-${{ matrix.branch }}
           path: 'unused-exports-${{ matrix.branch }}.txt'
 
   format_report:
-    needs: [ "strict_null_check", "unused_exports_check" ]
+    needs: ['strict_null_check', 'unused_exports_check']
     name: Download error files and report
     runs-on: 'ubuntu-latest'
     steps:
       - name: Checkout current branch
-        uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # v2.4.0
+        uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
         with:
           # the pull_request_target event will consider the HEAD of `main` to be the SHA to use.
           # attempt to use the SHA associated with a pull request and fallback to HEAD of `main`
@@ -102,35 +102,35 @@ jobs:
 
       # TODO(STENCIL-446): Remove this workflow once `strictNullChecks` is enabled
       - name: Download null errors file for main branch
-        uses: actions/download-artifact@fb598a63ae348fa914e94cd0ff38f362e927b741 # v3.0.0
+        uses: actions/download-artifact@9782bd6a9848b53b110e712e20e42d89988822b7 # v3.0.1
         with:
           name: null_errors_main
 
       # TODO(STENCIL-446): Remove this workflow once `strictNullChecks` is enabled
       - name: Download null errors file for PR
-        uses: actions/download-artifact@fb598a63ae348fa914e94cd0ff38f362e927b741 # v3.0.0
+        uses: actions/download-artifact@9782bd6a9848b53b110e712e20e42d89988822b7 # v3.0.1
         with:
           name: null_errors_pr
 
       # TODO(STENCIL-454): Remove or change this up once we've eliminated unused exports
       - name: Download unused exports for main
-        uses: actions/download-artifact@fb598a63ae348fa914e94cd0ff38f362e927b741 # v3.0.0
+        uses: actions/download-artifact@9782bd6a9848b53b110e712e20e42d89988822b7 # v3.0.1
         with:
           name: unused-exports-main
 
       # TODO(STENCIL-454): Remove or change this up once we've eliminated unused exports
       - name: Download unused exports for PR
-        uses: actions/download-artifact@fb598a63ae348fa914e94cd0ff38f362e927b741 # v3.0.0
+        uses: actions/download-artifact@9782bd6a9848b53b110e712e20e42d89988822b7 # v3.0.1
         with:
           name: unused-exports-pr
 
       - name: Compile scripts
-        run: node scripts --prepare
+        run: npm run tsc.scripts
 
       - name: Set action output
         run: node scripts/build/tech-debt-burndown-report.js > $GITHUB_STEP_SUMMARY
 
-       # for syntax information, see https://github.com/peter-evans/create-or-update-comment#setting-the-comment-body-from-a-file
+        # for syntax information, see https://github.com/peter-evans/create-or-update-comment#setting-the-comment-body-from-a-file
       - name: Set comment body
         id: set-comment-body
         run: |
@@ -141,7 +141,7 @@ jobs:
           echo ::set-output name=body::$body
 
       - name: Find Comment
-        uses: peter-evans/find-comment@1769778a0c5bd330272d749d12c036d65e70d39d # v2.0.0
+        uses: peter-evans/find-comment@b657a70ff16d17651703a84bee1cb9ad9d2be2ea # v2.0.1
         id: fc
         with:
           issue-number: ${{ github.event.pull_request.number }}
@@ -149,7 +149,7 @@ jobs:
           body-includes: '### `--strictNullChecks` error report'
 
       - name: Create or update comment
-        uses: peter-evans/create-or-update-comment@c9fcb64660bc90ec1cc535646af190c992007c32 # v2.0.0
+        uses: peter-evans/create-or-update-comment@5adcb0bb0f9fb3f95ef05400558bdb3f329ee808 # v2.1.0
         with:
           comment-id: ${{ steps.fc.outputs.comment-id }}
           issue-number: ${{ github.event.pull_request.number }}

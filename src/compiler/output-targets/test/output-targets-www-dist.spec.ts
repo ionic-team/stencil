@@ -1,9 +1,10 @@
 // @ts-nocheck
-import type * as d from '@stencil/core/declarations';
-import { expectFilesDoNotExist, expectFilesExist } from '../../../testing/testing-utils';
 import { Compiler, Config } from '@stencil/core/compiler';
+import type * as d from '@stencil/core/declarations';
 import { mockConfig } from '@stencil/core/testing';
 import path from 'path';
+
+import { expectFilesDoNotExist, expectFilesExist } from '../../../testing/testing-utils';
 
 describe.skip('outputTarget, www / dist / docs', () => {
   jest.setTimeout(20000);

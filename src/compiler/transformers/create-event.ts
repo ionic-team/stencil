@@ -1,19 +1,20 @@
-import type * as d from '../../declarations';
-import { CREATE_EVENT, RUNTIME_APIS, addCoreRuntimeApi } from './core-runtime-apis';
 import { EVENT_FLAGS } from '@utils';
 import ts from 'typescript';
+
+import type * as d from '../../declarations';
+import { addCoreRuntimeApi, CREATE_EVENT, RUNTIME_APIS } from './core-runtime-apis';
 
 export const addCreateEvents = (moduleFile: d.Module, cmp: d.ComponentCompilerMeta) => {
   return cmp.events.map((ev) => {
     addCoreRuntimeApi(moduleFile, RUNTIME_APIS.createEvent);
 
-    return ts.createStatement(
-      ts.createAssignment(
-        ts.createPropertyAccess(ts.createThis(), ts.createIdentifier(ev.method)),
-        ts.createCall(ts.createIdentifier(CREATE_EVENT), undefined, [
-          ts.createThis(),
-          ts.createLiteral(ev.name),
-          ts.createLiteral(computeFlags(ev)),
+    return ts.factory.createExpressionStatement(
+      ts.factory.createAssignment(
+        ts.factory.createPropertyAccessExpression(ts.factory.createThis(), ts.factory.createIdentifier(ev.method)),
+        ts.factory.createCallExpression(ts.factory.createIdentifier(CREATE_EVENT), undefined, [
+          ts.factory.createThis(),
+          ts.factory.createStringLiteral(ev.name),
+          ts.factory.createNumericLiteral(computeFlags(ev)),
         ])
       )
     );

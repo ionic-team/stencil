@@ -1,6 +1,6 @@
 import type * as d from '../../declarations';
-import { validateBuildPackageJson } from '../types/validate-build-package-json';
 import { validateManifestJson } from '../html/validate-manifest-json';
+import { validateBuildPackageJson } from '../types/validate-build-package-json';
 
 /**
  * Validate the existence and contents of certain files that were generated after writing the results of the build to

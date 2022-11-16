@@ -1,9 +1,10 @@
-import type * as d from '../declarations';
 import { BUILD } from '@app-data';
-import { CMP_FLAGS } from '@utils';
 import { doc, plt, styles, supportsConstructableStylesheets, supportsShadow } from '@platform';
-import { HYDRATED_STYLE_ID, NODE_TYPE } from './runtime-constants';
+import { CMP_FLAGS } from '@utils';
+
+import type * as d from '../declarations';
 import { createTime } from './profile';
+import { HYDRATED_STYLE_ID, NODE_TYPE } from './runtime-constants';
 
 const rootAppliedStyles: d.RootAppliedStyleMap = /*@__PURE__*/ new WeakMap();
 
