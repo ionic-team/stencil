@@ -53,5 +53,6 @@ cli
   })
   .catch(function (err) {
     console.error('uncaught error', err);
+    console.log(err);
     process.exit(1);
   });

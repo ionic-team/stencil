@@ -1,10 +1,10 @@
 import { rollupCommonjsPlugin, rollupJsonPlugin, rollupNodeResolvePlugin, rollupReplacePlugin } from '@compiler-deps';
-import { createOnWarnFn, isString, loadRollupDiagnostics } from '@utils';
+import { createOnWarnFn, loadRollupDiagnostics } from '@utils';
 import { rollup, RollupOptions, TreeshakingOptions } from 'rollup';
 
 import type * as d from '../../declarations';
 import { lazyComponentPlugin } from '../output-targets/dist-lazy/lazy-component-plugin';
-import { createCustomResolverAsync } from '../sys/resolve/resolve-module-async';
+// import { createCustomResolverAsync } from '../sys/resolve/resolve-module-async';
 import { appDataPlugin } from './app-data-plugin';
 import type { BundleOptions } from './bundle-interface';
 import { coreResolvePlugin } from './core-resolve-plugin';
@@ -26,12 +26,17 @@ export const bundleOutput = async (
   bundleOpts: BundleOptions
 ) => {
   try {
+    console.log('bundleOutput::1');
     const rollupOptions = getRollupOptions(config, compilerCtx, buildCtx, bundleOpts);
+    console.log('bundleOutput::2');
     const rollupBuild = await rollup(rollupOptions);
-
+    console.log('bundleOutput::3');
     compilerCtx.rollupCache.set(bundleOpts.id, rollupBuild.cache);
     return rollupBuild;
   } catch (e: any) {
+    console.log('AHA');
+    console.log(e);
+    console.trace('ASDFASDFASDF');
     if (!buildCtx.hasError) {
       // TODO(STENCIL-353): Implement a type guard that balances using our own copy of Rollup types (which are
       // breakable) and type safety (so that the error variable may be something other than `any`)
@@ -55,45 +60,72 @@ export const getRollupOptions = (
   buildCtx: d.BuildCtx,
   bundleOpts: BundleOptions
 ): RollupOptions => {
-  const customResolveOptions = createCustomResolverAsync(config.sys, compilerCtx.fs, [
-    '.tsx',
-    '.ts',
-    '.js',
-    '.mjs',
-    '.json',
-    '.d.ts',
-  ]);
+  // const _customResolveOptions = createCustomResolverAsync(config.sys, compilerCtx.fs, [
+
+  // ]);
   const nodeResolvePlugin = rollupNodeResolvePlugin({
     mainFields: ['collection:main', 'jsnext:main', 'es2017', 'es2015', 'module', 'main'],
-    customResolveOptions,
+    // customResolveOptions,
+    // extensions: [
+    // '.tsx',
+    // '.ts',
+    // '.js',
+    // '.mjs',
+    // '.json',
+    // '.d.ts',
+    // ],
     browser: true,
+    moduleDirectories: [
+      "node_modules",
+      config.rootDir
+    ],
     rootDir: config.rootDir,
-    ...(config.nodeResolve as any),
+    // preferBuiltins: false,
+    // ...(config.nodeResolve as any),
   });
+  
   const orgNodeResolveId = nodeResolvePlugin.resolveId;
-  const orgNodeResolveId2 = (nodeResolvePlugin.resolveId = async function (importee: string, importer: string) {
-    const [realImportee, query] = importee.split('?');
-    const resolved = await orgNodeResolveId.call(nodeResolvePlugin, realImportee, importer);
-    if (resolved) {
-      if (isString(resolved)) {
-        return query ? resolved + '?' + query : resolved;
-      }
-      return {
-        ...resolved,
-        id: query ? resolved.id + '?' + query : resolved.id,
-      };
+
+  nodeResolvePlugin.resolveId = async function (importee: string, importer: string, opts: any) {
+    console.log('RESOLVE_ID_CALLED');
+    console.log('args: ', arguments);
+
+    try {
+      let result = await orgNodeResolveId.call(nodeResolvePlugin, importee, importer, opts)
+      console.log('going to return::', result);
+      return result;
+    } catch(e) {
+      console.log('ok threw here');
+      console.log('I was called with: ', arguments);
+      console.log(e);
     }
-    return resolved;
-  });
+  }
+  // const orgNodeResolveId2 = (nodeResolvePlugin.resolveId = async function (importee: string, importer: string) {
+  //   const [realImportee, query] = importee.split('?');
+  //   const resolved = await orgNodeResolveId.call(nodeResolvePlugin, realImportee, importer);
+  //   if (resolved) {
+  //     if (isString(resolved)) {
+  //       return query ? resolved + '?' + query : resolved;
+  //     }
+  //     return {
+  //       ...resolved,
+  //       id: query ? resolved.id + '?' + query : resolved.id,
+  //     };
+  //   }
+  //   return resolved;
+  // });
   if (config.devServer && config.devServer.experimentalDevModules) {
     nodeResolvePlugin.resolveId = async function (importee: string, importer: string) {
-      const resolvedId = await orgNodeResolveId2.call(nodeResolvePlugin, importee, importer);
+      const resolvedId = await orgNodeResolveId.call(nodeResolvePlugin, importee, importer);
       return devNodeModuleResolveId(config, compilerCtx.fs, resolvedId, importee);
     };
   }
 
   const beforePlugins = config.rollupPlugins.before || [];
   const afterPlugins = config.rollupPlugins.after || [];
+
+  console.log('about to add plugin');
+  console.log(nodeResolvePlugin);
   const rollupOptions: RollupOptions = {
     input: bundleOpts.inputs,
 

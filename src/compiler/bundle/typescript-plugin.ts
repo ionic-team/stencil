@@ -10,6 +10,7 @@ import type { BundleOptions } from './bundle-interface';
 
 /**
  * Rollup plugin that aids in resolving the TypeScript files and performing the transpilation step.
+ *
  * @param compilerCtx the current compiler context
  * @param bundleOpts Rollup bundling options to apply during TypeScript compilation
  * @param config the Stencil configuration for the project

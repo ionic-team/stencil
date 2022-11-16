@@ -34,6 +34,17 @@ export const existsSync = (fs.existsSync = (p: string) => {
   return fs.__sys.accessSync(p);
 });
 
+// @ts-ignore
+export const access = (fs.access = (p: string, mode: any, cb: any): Promise<any> => {
+  // @ts-ignore
+  const access = fs.__sys?.access;
+  if (access) {
+    return access(p).then(cb);
+  } else {
+    cb(true)
+  }
+});
+
 export const mkdir = (fs.mkdir = (p: string, opts: any, cb: any) => {
   cb = typeof cb === 'function' ? cb : typeof opts === 'function' ? opts : null;
   opts = typeof opts === 'function' ? undefined : opts;
@@ -177,5 +188,15 @@ export const writeFile = (fs.writeFile = (p: string, data: string, opts: any, cb
       cb && cb(e);
     });
 });
+
+export const patchFs = (userSys: d.CompilerSystem) => {
+  console.log('patchFs::about to patch');
+  if (fs.__sys == undefined) {
+    // @ts-ignore
+    fs.__sys = {}
+  }
+  Object.assign(fs.__sys, userSys);
+  console.log('patchFs::patched');
+};
 
 export default fs;

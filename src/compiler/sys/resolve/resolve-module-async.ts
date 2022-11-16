@@ -15,11 +15,12 @@ import {
 } from './resolve-utils';
 
 export const resolveModuleIdAsync = (
-  sys: d.CompilerSystem,
-  inMemoryFs: InMemoryFileSystem,
+  _sys: d.CompilerSystem,
+  _inMemoryFs: InMemoryFileSystem,
   opts: d.ResolveModuleIdOptions
 ) => {
-  const resolverOpts: AsyncOpts = createCustomResolverAsync(sys, inMemoryFs, opts.exts);
+  // const resolverOpts: AsyncOpts = createCustomResolverAsync(sys, inMemoryFs, opts.exts);
+  const resolverOpts: AsyncOpts = {}
   resolverOpts.basedir = dirname(normalizeFsPath(opts.containingFile));
 
   if (opts.packageFilter) {
@@ -56,6 +57,9 @@ export const createCustomResolverAsync = (
   inMemoryFs: InMemoryFileSystem,
   exts: string[]
 ): any => {
+  return {};
+
+  // @ts-ignore
   return {
     async isFile(filePath: string, cb: (err: any, isFile: boolean) => void) {
       const fsFilePath = normalizeFsPath(filePath);
@@ -118,16 +122,6 @@ export const createCustomResolverAsync = (
       cb(null, false);
     },
 
-    async readFile(p: string, cb: (err: any, data?: any) => void) {
-      const fsFilePath = normalizeFsPath(p);
-
-      const data = await inMemoryFs.readFile(fsFilePath);
-      if (isString(data)) {
-        return cb(null, data);
-      }
-
-      return cb(`readFile not found: ${p}`);
-    },
 
     async realpath(p: string, cb: (err: any, data?: any) => void) {
       const fsFilePath = normalizeFsPath(p);
@@ -140,6 +134,5 @@ export const createCustomResolverAsync = (
       }
     },
 
-    extensions: exts,
   };
 };
