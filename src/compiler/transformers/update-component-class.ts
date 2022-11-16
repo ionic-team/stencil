@@ -1,5 +1,6 @@
-import type * as d from '../../declarations';
 import ts from 'typescript';
+
+import type * as d from '../../declarations';
 
 export const updateComponentClass = (
   transformOpts: d.TransformOptions,
@@ -18,7 +19,7 @@ export const updateComponentClass = (
         return m.kind !== ts.SyntaxKind.ExportKeyword;
       });
     }
-    return ts.updateClassDeclaration(
+    return ts.factory.updateClassDeclaration(
       classNode,
       classNode.decorators,
       classModifiers,
@@ -49,17 +50,25 @@ const createConstClass = (
   const constModifiers: ts.Modifier[] = [];
 
   if (transformOpts.componentExport !== 'customelement') {
-    constModifiers.push(ts.createModifier(ts.SyntaxKind.ExportKeyword));
+    constModifiers.push(ts.factory.createModifier(ts.SyntaxKind.ExportKeyword));
   }
 
-  return ts.createVariableStatement(
+  return ts.factory.createVariableStatement(
     constModifiers,
-    ts.createVariableDeclarationList(
+    ts.factory.createVariableDeclarationList(
       [
-        ts.createVariableDeclaration(
+        ts.factory.createVariableDeclaration(
           className,
           undefined,
-          ts.createClassExpression(classModifiers, undefined, classNode.typeParameters, heritageClauses, members)
+          undefined,
+          ts.factory.createClassExpression(
+            undefined,
+            classModifiers,
+            undefined,
+            classNode.typeParameters,
+            heritageClauses,
+            members
+          )
         ),
       ],
       ts.NodeFlags.Const

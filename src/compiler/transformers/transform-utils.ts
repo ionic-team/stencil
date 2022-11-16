@@ -1,7 +1,8 @@
-import type * as d from '../../declarations';
-import { augmentDiagnosticWithNode, buildError, normalizePath } from '@utils';
-import { MEMBER_DECORATORS_TO_REMOVE } from './decorators-to-static/decorators-constants';
+import { augmentDiagnosticWithNode, buildError, normalizePath, readOnlyArrayHasStringMember } from '@utils';
 import ts from 'typescript';
+
+import type * as d from '../../declarations';
+import { MEMBER_DECORATORS_TO_REMOVE } from './decorators-to-static/decorators-constants';
 
 export const getScriptTarget = () => {
   // using a fn so the browser compiler doesn't require the global ts for startup
@@ -43,35 +44,59 @@ export const isMemberPrivate = (member: ts.ClassElement): boolean => {
 export const convertValueToLiteral = (
   val: any,
   refs: WeakSet<any> = null
-): ts.Identifier | ts.StringLiteral | ts.ObjectLiteralExpression | ts.ArrayLiteralExpression => {
+):
+  | ts.Identifier
+  | ts.StringLiteral
+  | ts.ObjectLiteralExpression
+  | ts.ArrayLiteralExpression
+  | ts.TrueLiteral
+  | ts.FalseLiteral
+  | ts.BigIntLiteral
+  | ts.NumericLiteral => {
   if (refs == null) {
     refs = new WeakSet();
   }
   if (val === String) {
-    return ts.createIdentifier('String');
+    return ts.factory.createIdentifier('String');
   }
   if (val === Number) {
-    return ts.createIdentifier('Number');
+    return ts.factory.createIdentifier('Number');
   }
   if (val === Boolean) {
-    return ts.createIdentifier('Boolean');
+    return ts.factory.createIdentifier('Boolean');
   }
   if (val === undefined) {
-    return ts.createIdentifier('undefined');
+    return ts.factory.createIdentifier('undefined');
   }
   if (val === null) {
-    return ts.createIdentifier('null');
+    return ts.factory.createIdentifier('null');
   }
   if (Array.isArray(val)) {
     return arrayToArrayLiteral(val, refs);
   }
   if (typeof val === 'object') {
     if ((val as ConvertIdentifier).__identifier && (val as ConvertIdentifier).__escapedText) {
-      return ts.createIdentifier((val as ConvertIdentifier).__escapedText);
+      return ts.factory.createIdentifier((val as ConvertIdentifier).__escapedText);
     }
     return objectToObjectLiteral(val, refs);
   }
-  return ts.createLiteral(val);
+
+  // the remainder of the implementation of this function was derived from the deprecated `createLiteral` function
+  // found in typescript@4.8.4
+  if (typeof val === 'number') {
+    return ts.factory.createNumericLiteral(val);
+  }
+  if (typeof val === 'object' && 'base10Value' in val) {
+    return ts.factory.createBigIntLiteral(val);
+  }
+  if (typeof val === 'boolean') {
+    return val ? ts.factory.createTrue() : ts.factory.createFalse();
+  }
+  if (typeof val === 'string') {
+    return ts.factory.createStringLiteral(val, undefined);
+  }
+
+  return ts.factory.createStringLiteralFromNode(val);
 };
 
 /**
@@ -90,7 +115,7 @@ const arrayToArrayLiteral = (list: any[], refs: WeakSet<any>): ts.ArrayLiteralEx
   const newList: any[] = list.map((l) => {
     return convertValueToLiteral(l, refs);
   });
-  return ts.createArrayLiteral(newList);
+  return ts.factory.createArrayLiteralExpression(newList);
 };
 
 /**
@@ -110,49 +135,39 @@ const arrayToArrayLiteral = (list: any[], refs: WeakSet<any>): ts.ArrayLiteralEx
  */
 const objectToObjectLiteral = (obj: { [key: string]: any }, refs: WeakSet<any>): ts.ObjectLiteralExpression => {
   if (refs.has(obj)) {
-    return ts.createIdentifier('undefined') as any;
+    return ts.factory.createIdentifier('undefined') as any;
   }
 
   refs.add(obj);
 
   const newProperties: ts.ObjectLiteralElementLike[] = Object.keys(obj).map((key) => {
-    const prop = ts.createPropertyAssignment(
-      ts.createLiteral(key),
+    const prop = ts.factory.createPropertyAssignment(
+      ts.factory.createStringLiteral(key),
       convertValueToLiteral(obj[key], refs) as ts.Expression
     );
     return prop;
   });
 
-  return ts.createObjectLiteral(newProperties, true);
+  return ts.factory.createObjectLiteralExpression(newProperties, true);
 };
 
-export const createStaticGetter = (propName: string, returnExpression: ts.Expression) => {
-  return ts.createGetAccessor(
+/**
+ * Create a TypeScript getter declaration AST node corresponding to a
+ * supplied prop name and return value
+ *
+ * @param propName the name of the prop to access
+ * @param returnExpression a TypeScript AST node to return from the getter
+ * @returns an AST node representing a getter
+ */
+export const createStaticGetter = (propName: string, returnExpression: ts.Expression): ts.GetAccessorDeclaration => {
+  return ts.factory.createGetAccessorDeclaration(
     undefined,
-    [ts.createToken(ts.SyntaxKind.StaticKeyword)],
+    [ts.factory.createToken(ts.SyntaxKind.StaticKeyword)],
     propName,
     undefined,
     undefined,
-    ts.createBlock([ts.createReturn(returnExpression)])
+    ts.factory.createBlock([ts.factory.createReturnStatement(returnExpression)])
   );
-};
-
-export const removeDecorators = (node: ts.Node, decoratorNames: Set<string>) => {
-  if (node.decorators) {
-    const updatedDecoratorList = node.decorators.filter((dec) => {
-      const name =
-        ts.isCallExpression(dec.expression) &&
-        ts.isIdentifier(dec.expression.expression) &&
-        dec.expression.expression.text;
-      return !decoratorNames.has(name);
-    });
-    if (updatedDecoratorList.length === 0) {
-      return undefined;
-    } else if (updatedDecoratorList.length !== node.decorators.length) {
-      return ts.createNodeArray(updatedDecoratorList);
-    }
-  }
-  return node.decorators;
 };
 
 export const getStaticValue = (staticMembers: ts.ClassElement[], staticName: string): any => {
@@ -400,7 +415,7 @@ const getAllTypeReferences = (node: ts.Node): ReadonlyArray<string> => {
       if (node.typeArguments) {
         // a type may contain types itself (e.g. generics - Foo<Bar>)
         node.typeArguments
-          .filter((typeArg: ts.TypeNode) => ts.isTypeReferenceNode(typeArg))
+          .filter((typeArg: ts.TypeNode): typeArg is ts.TypeReferenceNode => ts.isTypeReferenceNode(typeArg))
           .forEach((typeRef: ts.TypeReferenceNode) => {
             const typeName = typeRef.typeName as ts.Identifier;
             if (typeName && typeName.escapedText) {
@@ -424,7 +439,7 @@ export const validateReferences = (
 ) => {
   Object.keys(references).forEach((refName) => {
     const ref = references[refName];
-    if (ref.path === '@stencil/core' && MEMBER_DECORATORS_TO_REMOVE.has(refName)) {
+    if (ref.path === '@stencil/core' && readOnlyArrayHasStringMember(MEMBER_DECORATORS_TO_REMOVE, refName)) {
       const err = buildError(diagnostics);
       augmentDiagnosticWithNode(err, node);
     }
@@ -673,24 +688,6 @@ export const isMethod = (member: ts.ClassElement, methodName: string): member is
   return ts.isMethodDeclaration(member) && member.name && (member.name as any).escapedText === methodName;
 };
 
-export const isAsyncFn = (typeChecker: ts.TypeChecker, methodDeclaration: ts.MethodDeclaration) => {
-  if (methodDeclaration.modifiers) {
-    if (methodDeclaration.modifiers.some((m) => m.kind === ts.SyntaxKind.AsyncKeyword)) {
-      return true;
-    }
-  }
-
-  const methodSignature = typeChecker.getSignatureFromDeclaration(methodDeclaration);
-  const returnType = methodSignature.getReturnType();
-  const typeStr = typeChecker.typeToString(
-    returnType,
-    undefined,
-    ts.TypeFormatFlags.NoTruncation | ts.TypeFormatFlags.InTypeAlias | ts.TypeFormatFlags.InElementType
-  );
-
-  return typeStr.includes('Promise<');
-};
-
 export const createImportStatement = (importFnNames: string[], importPath: string) => {
   // ESM Imports
   // import { importNames } from 'importPath';
@@ -714,11 +711,11 @@ export const createImportStatement = (importFnNames: string[], importPath: strin
     );
   });
 
-  return ts.createImportDeclaration(
+  return ts.factory.createImportDeclaration(
     undefined,
     undefined,
-    ts.createImportClause(undefined, ts.createNamedImports(importSpecifiers)),
-    ts.createLiteral(importPath)
+    ts.factory.createImportClause(false, undefined, ts.factory.createNamedImports(importSpecifiers)),
+    ts.factory.createStringLiteral(importPath)
   );
 };
 
@@ -726,7 +723,7 @@ export const createRequireStatement = (importFnNames: string[], importPath: stri
   // CommonJS require()
   // const { a, b, c } = require(importPath);
 
-  const importBinding = ts.createObjectBindingPattern(
+  const importBinding = ts.factory.createObjectBindingPattern(
     importFnNames.map((importKey) => {
       const splt = importKey.split(' as ');
       let importAs = importKey;
@@ -736,18 +733,23 @@ export const createRequireStatement = (importFnNames: string[], importPath: stri
         importAs = splt[1];
         importFnName = splt[0];
       }
-      return ts.createBindingElement(undefined, importFnName, importAs);
+      return ts.factory.createBindingElement(undefined, importFnName, importAs);
     })
   );
 
-  return ts.createVariableStatement(
+  return ts.factory.createVariableStatement(
     undefined,
-    ts.createVariableDeclarationList(
+    ts.factory.createVariableDeclarationList(
       [
-        ts.createVariableDeclaration(
+        ts.factory.createVariableDeclaration(
           importBinding,
           undefined,
-          ts.createCall(ts.createIdentifier('require'), [], [ts.createLiteral(importPath)])
+          undefined,
+          ts.factory.createCallExpression(
+            ts.factory.createIdentifier('require'),
+            [],
+            [ts.factory.createStringLiteral(importPath)]
+          )
         ),
       ],
       ts.NodeFlags.Const

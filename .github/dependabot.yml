@@ -3,16 +3,35 @@
 
 version: 2
 updates:
-  - package-ecosystem: "npm" # See documentation for possible values
-    directory: "/" # Location of package manifests
+  - package-ecosystem: 'npm' # See documentation for possible values
+    directory: '/' # Location of package manifests
     schedule:
-      interval: "daily"
-    open-pull-requests-limit: 5
+      interval: 'daily'
+    open-pull-requests-limit: 50
     # Disable rebasing for pull requests, as having several open pull requests all get simultaneously rebased gets
     # noisy from a notification standpoint
-    rebase-strategy: "disabled"
+    rebase-strategy: 'disabled'
     ignore:
-      - dependency-name: "@types/node"
-        versions: ["17", "18"]
-      - dependency-name: "typescript"
-        versions: ["4.8"]
+      - dependency-name: '@types/node'
+        versions: ['17', '18']
+      - dependency-name: 'typescript'
+        versions: ['4.8']
+      # disable Jest updates until the new testing architecture is in place
+      - dependency-name: '@types/jest'
+        versions: ['>=28']
+      - dependency-name: 'jest'
+        versions: ['>=28']
+      - dependency-name: 'jest-cli'
+        versions: ['>=28']
+      - dependency-name: 'jest-environment-node'
+        versions: ['>=28']
+      # Disable dependency updates used in release scripts
+      # TODO(STENCIL-590): remove these once deps are removed
+      - dependency-name: 'inquirer'
+        versions: ['>7.3.3']
+      - dependency-name: '@types/inquirer'
+        versions: ['>7.3.1']
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+    schedule:
+      interval: 'daily'

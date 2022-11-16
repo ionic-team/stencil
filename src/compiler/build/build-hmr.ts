@@ -1,9 +1,10 @@
-import type * as d from '../../declarations';
-import { getScopeId } from '../style/scope-css';
-import { isOutputTargetWww } from '../output-targets/output-utils';
-import minimatch from 'minimatch';
 import { isGlob, normalizePath, sortBy } from '@utils';
+import minimatch from 'minimatch';
 import { basename } from 'path';
+
+import type * as d from '../../declarations';
+import { isOutputTargetWww } from '../output-targets/output-utils';
+import { getScopeId } from '../style/scope-css';
 
 export const generateHmr = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   if (config.devServer == null || config.devServer.reloadStrategy == null) {
@@ -204,7 +205,17 @@ const getImagesUpdated = (buildCtx: d.BuildCtx, outputTargetsWww: d.OutputTarget
   return imageFiles.sort();
 };
 
-const excludeHmrFiles = (config: d.Config, excludeHmr: string[], filesChanged: string[]) => {
+/**
+ * Determine a list of files (if any) which should be excluded from HMR updates.
+ *
+ * @param config a user-supplied config
+ * @param excludeHmr a list of glob patterns that should be used to determine
+ * whether to exclude a file or not (a file will be excluded if it matches one
+ * @param filesChanged an array of files which are changed in the HMR update
+ * currently under consideration
+ * @returns a sorted list of files to exclude
+ */
+const excludeHmrFiles = (config: d.Config, excludeHmr: string[], filesChanged: string[]): string[] => {
   const excludeFiles: string[] = [];
 
   if (!excludeHmr || excludeHmr.length === 0) {

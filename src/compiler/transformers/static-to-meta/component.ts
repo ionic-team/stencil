@@ -1,22 +1,23 @@
+import { normalizePath, unique } from '@utils';
+import { dirname, isAbsolute, join, relative } from 'path';
+import ts from 'typescript';
+
 import type * as d from '../../../declarations';
 import { addComponentMetaStatic } from '../add-component-meta-static';
-import { dirname, isAbsolute, join, relative } from 'path';
-import { normalizePath, unique } from '@utils';
-import { parseStaticMethods } from './methods';
-import { parseStaticListeners } from './listeners';
+import { setComponentBuildConditionals } from '../component-build-conditionals';
+import { getComponentTagName, getStaticValue, isInternal, isStaticGetter, serializeSymbol } from '../transform-utils';
+import { parseCallExpression } from './call-expression';
 import { parseClassMethods } from './class-methods';
 import { parseStaticElementRef } from './element-ref';
 import { parseStaticEncapsulation, parseStaticShadowDelegatesFocus } from './encapsulation';
 import { parseStaticEvents } from './events';
-import { getComponentTagName, getStaticValue, isInternal, isStaticGetter, serializeSymbol } from '../transform-utils';
+import { parseStaticListeners } from './listeners';
+import { parseStaticMethods } from './methods';
 import { parseStaticProps } from './props';
 import { parseStaticStates } from './states';
-import { parseStaticWatchers } from './watchers';
-import { parseStaticStyles } from './styles';
-import { parseCallExpression } from './call-expression';
 import { parseStringLiteral } from './string-literal';
-import { setComponentBuildConditionals } from '../component-build-conditionals';
-import ts from 'typescript';
+import { parseStaticStyles } from './styles';
+import { parseStaticWatchers } from './watchers';
 
 /**
  * Given an instance of TypeScript's Intermediate Representation (IR) for a

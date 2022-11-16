@@ -1,4 +1,4 @@
-import type { Diagnostic, Logger, LogLevel, LoggerTimeSpan } from '@stencil/core/internal';
+import type { Diagnostic, Logger, LoggerTimeSpan, LogLevel } from '@stencil/core/internal';
 
 export class TestingLogger implements Logger {
   private isEnabled = false;

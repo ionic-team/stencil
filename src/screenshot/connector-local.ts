@@ -1,8 +1,9 @@
 import type * as d from '@stencil/core/internal';
-import { fileExists, readFile, writeFile } from './screenshot-fs';
-import { join, relative } from 'path';
 import { normalizePath } from '@utils';
+import { join, relative } from 'path';
+
 import { ScreenshotConnector } from './connector-base';
+import { fileExists, readFile, writeFile } from './screenshot-fs';
 
 export class ScreenshotLocalConnector extends ScreenshotConnector {
   override async publishBuild(results: d.ScreenshotBuildResults) {

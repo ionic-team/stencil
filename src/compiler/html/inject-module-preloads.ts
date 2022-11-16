@@ -1,6 +1,7 @@
+import { join } from 'path';
+
 import type * as d from '../../declarations';
 import { getAbsoluteBuildDir } from './html-utils';
-import { join } from 'path';
 
 export const optimizeCriticalPath = (doc: Document, criticalBundlers: string[], outputTarget: d.OutputTargetWww) => {
   const buildDir = getAbsoluteBuildDir(outputTarget);

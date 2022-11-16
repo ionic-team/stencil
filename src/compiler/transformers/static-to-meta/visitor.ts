@@ -1,11 +1,12 @@
-import type * as d from '../../../declarations';
 import { dirname } from 'path';
+import ts from 'typescript';
+
+import type * as d from '../../../declarations';
 import { getModuleLegacy, resetModuleLegacy } from '../../build/compiler-ctx';
 import { parseCallExpression } from './call-expression';
-import { parseModuleImport } from './import';
 import { parseStaticComponentMeta } from './component';
+import { parseModuleImport } from './import';
 import { parseStringLiteral } from './string-literal';
-import ts from 'typescript';
 
 export const convertStaticToMeta = (
   config: d.Config,

@@ -1,5 +1,5 @@
 import type * as d from '../../../declarations';
-import { ParseCssResults, CssNode, CssParsePosition, CssNodeType } from './css-parse-declarations';
+import { CssNode, CssNodeType, CssParsePosition, ParseCssResults } from './css-parse-declarations';
 
 export const parseCss = (css: string, filePath?: string): ParseCssResults => {
   let lineno = 1;

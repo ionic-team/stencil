@@ -1,7 +1,8 @@
-import type * as d from '../declarations';
 import { BUILD, NAMESPACE } from '@app-data';
-import { consoleDevInfo, H, doc, plt, promiseResolve, win } from '@platform';
+import { consoleDevInfo, doc, H, plt, promiseResolve, win } from '@platform';
 import { getDynamicImportFunction } from '@utils';
+
+import type * as d from '../declarations';
 
 export const patchBrowser = (): Promise<d.CustomElementsDefineOptions> => {
   // NOTE!! This fn cannot use async/await!

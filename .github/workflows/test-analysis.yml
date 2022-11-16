@@ -11,18 +11,18 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node: [ '12', '14', '16' ]
-        os: [ 'ubuntu-latest', 'windows-latest' ]
+        node: ['12', '14', '16']
+        os: ['ubuntu-latest', 'windows-latest']
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout Code
-        uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # v2.4.0
+        uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
 
       - name: Get Core Dependencies
         uses: ./.github/workflows/actions/get-core-dependencies
 
       - name: Use Node ${{ matrix.node }}
-        uses: actions/setup-node@56337c425554a6be30cdef71bf441f15be286854 # v3.1.1
+        uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
         with:
           node-version: ${{ matrix.node }}
           cache: 'npm'
@@ -37,3 +37,6 @@ jobs:
       - name: Analysis Tests
         run: npm run test.analysis
         shell: bash
+
+      - name: Check Git Context
+        uses: ./.github/workflows/actions/check-git-context

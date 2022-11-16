@@ -1,10 +1,10 @@
 import type * as d from '../../../declarations';
-import { generateEventTypes } from '../generate-event-types';
-import * as StencilTypes from '../stencil-types';
 import * as UtilHelpers from '../../../utils/helpers';
 import * as Util from '../../../utils/util';
-import { stubComponentCompilerMeta } from './ComponentCompilerMeta.stub';
+import { generateEventTypes } from '../generate-event-types';
+import * as StencilTypes from '../stencil-types';
 import { stubComponentCompilerEvent } from './ComponentCompilerEvent.stub';
+import { stubComponentCompilerMeta } from './ComponentCompilerMeta.stub';
 import { stubTypesImportData } from './TypesImportData.stub';
 
 describe('generate-event-types', () => {

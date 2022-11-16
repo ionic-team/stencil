@@ -1,6 +1,7 @@
-import type * as d from '../declarations';
 import { BUILD } from '@app-data';
-import { consoleError, consoleDevError } from './client-log';
+
+import type * as d from '../declarations';
+import { consoleDevError, consoleError } from './client-log';
 
 export const cmpModules = /*@__PURE__*/ new Map<string, { [exportName: string]: d.ComponentConstructor }>();
 

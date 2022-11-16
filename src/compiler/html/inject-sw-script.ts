@@ -1,6 +1,6 @@
 import type * as d from '../../declarations';
+import { getRegisterSW, UNREGISTER_SW } from '../service-worker/generate-sw';
 import { generateServiceWorkerUrl } from '../service-worker/service-worker-util';
-import { UNREGISTER_SW, getRegisterSW } from '../service-worker/generate-sw';
 
 export const updateIndexHtmlServiceWorker = async (
   config: d.Config,

@@ -1,6 +1,7 @@
-import type * as d from '../../declarations';
-import { COLLECTION_MANIFEST_FILE_NAME, buildJsonFileError, isGlob, normalizePath, isString } from '@utils';
+import { buildJsonFileError, COLLECTION_MANIFEST_FILE_NAME, isGlob, isString, normalizePath } from '@utils';
 import { dirname, join, relative } from 'path';
+
+import type * as d from '../../declarations';
 import {
   getComponentsDtsTypesFilePath,
   isOutputTargetDistCollection,

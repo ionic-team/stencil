@@ -1,16 +1,17 @@
-import fs from 'fs-extra';
 import color from 'ansi-colors';
 import execa from 'execa';
+import fs from 'fs-extra';
 import inquirer from 'inquirer';
-import { getOptions, BuildOptions } from './utils/options';
-import { runReleaseTasks } from './release-tasks';
 import { join } from 'path';
+
+import { runReleaseTasks } from './release-tasks';
+import { BuildOptions, getOptions } from './utils/options';
 import {
-  SEMVER_INCREMENTS,
-  prettyVersionDiff,
-  isValidVersionInput,
   getNewVersion,
   isPrereleaseVersion,
+  isValidVersionInput,
+  prettyVersionDiff,
+  SEMVER_INCREMENTS,
 } from './utils/release-utils';
 
 /**

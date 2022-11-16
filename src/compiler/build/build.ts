@@ -1,13 +1,14 @@
-import type * as d from '../../declarations';
-import { buildAbort, buildFinish } from './build-finish';
-import { catchError, isString, readPackageJson } from '@utils';
 import { createDocument } from '@stencil/core/mock-doc';
+import { catchError, isString, readPackageJson } from '@utils';
+import ts from 'typescript';
+
+import type * as d from '../../declarations';
+import { generateOutputTargets } from '../output-targets';
 import { emptyOutputTargets } from '../output-targets/empty-dir';
 import { generateGlobalStyles } from '../style/global-styles';
-import { generateOutputTargets } from '../output-targets';
 import { runTsProgram } from '../transpile/run-program';
+import { buildAbort, buildFinish } from './build-finish';
 import { writeBuild } from './write-build';
-import ts from 'typescript';
 
 export const build = async (
   config: d.ValidatedConfig,

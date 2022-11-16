@@ -1,9 +1,23 @@
-import type * as d from '../../../declarations';
 import { catchError, COLLECTION_MANIFEST_FILE_NAME, flatOne, generatePreamble, normalizePath, sortBy } from '@utils';
-import { isOutputTargetDistCollection } from '../output-utils';
 import { join, relative } from 'path';
-import { typescriptVersion, version } from '../../../version';
+import ts from 'typescript';
 
+import type * as d from '../../../declarations';
+import { typescriptVersion, version } from '../../../version';
+import { mapImportsToPathAliases } from '../../transformers/map-imports-to-path-aliases';
+import { isOutputTargetDistCollection } from '../output-utils';
+
+/**
+ * Main output target function for `dist-collection`. This function takes the compiled output from a
+ * {@link ts.Program}, runs each file through a transformer to transpile import path aliases, and then writes
+ * the output code and source maps to disk in the specified collection directory.
+ *
+ * @param config The validated Stencil config.
+ * @param compilerCtx The current compiler context.
+ * @param buildCtx The current build context.
+ * @param changedModuleFiles The changed modules returned from the TS compiler.
+ * @returns An empty promise. Resolved once all functions finish.
+ */
 export const outputCollection = async (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
@@ -27,15 +41,31 @@ export const outputCollection = async (
         const mapCode = mod.sourceMapFileText;
 
         await Promise.all(
-          outputTargets.map(async (o) => {
+          outputTargets.map(async (target) => {
             const relPath = relative(config.srcDir, mod.jsFilePath);
-            const filePath = join(o.collectionDir, relPath);
-            await compilerCtx.fs.writeFile(filePath, code, { outputTargetType: o.type });
+            const filePath = join(target.collectionDir, relPath);
+
+            // Transpile the already transpiled modules to apply
+            // a transformer to convert aliased import paths to relative paths
+            // We run this even if the transformer will perform no action
+            // to avoid race conditions between multiple output targets that
+            // may be writing to the same location
+            const { outputText } = ts.transpileModule(code, {
+              fileName: mod.sourceFilePath,
+              compilerOptions: {
+                target: ts.ScriptTarget.Latest,
+              },
+              transformers: {
+                after: [mapImportsToPathAliases(config, filePath, target)],
+              },
+            });
+
+            await compilerCtx.fs.writeFile(filePath, outputText, { outputTargetType: target.type });
 
             if (mod.sourceMapPath) {
               const relativeSourceMapPath = relative(config.srcDir, mod.sourceMapPath);
-              const sourceMapOutputFilePath = join(o.collectionDir, relativeSourceMapPath);
-              await compilerCtx.fs.writeFile(sourceMapOutputFilePath, mapCode, { outputTargetType: o.type });
+              const sourceMapOutputFilePath = join(target.collectionDir, relativeSourceMapPath);
+              await compilerCtx.fs.writeFile(sourceMapOutputFilePath, mapCode, { outputTargetType: target.type });
             }
           })
         );
@@ -61,9 +91,9 @@ const writeCollectionManifests = async (
 };
 
 // this maps the json data to our internal data structure
-// apping is so that the internal data structure "could"
+// mapping is so that the internal data structure "could"
 // change, but the external user data will always use the same api
-// over the top lame mapping functions is basically so we can loosly
+// over the top lame mapping functions is basically so we can loosely
 // couple core component meta data between specific versions of the compiler
 const writeCollectionManifest = async (
   compilerCtx: d.CompilerCtx,

@@ -1,7 +1,8 @@
-import type * as d from '../../../declarations';
-import { getNameText } from '../generate-doc-data';
-import { isOutputTargetDocsVscode } from '../../output-targets/output-utils';
 import { join } from 'path';
+
+import type * as d from '../../../declarations';
+import { isOutputTargetDocsVscode } from '../../output-targets/output-utils';
+import { getNameText } from '../generate-doc-data';
 
 /**
  * Generate [custom data](https://github.com/microsoft/vscode-custom-data) to augment existing HTML types in VS Code.

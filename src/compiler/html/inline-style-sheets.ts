@@ -1,5 +1,6 @@
-import type * as d from '../../declarations';
 import { join } from 'path';
+
+import type * as d from '../../declarations';
 
 export const inlineStyleSheets = (
   compilerCtx: d.CompilerCtx,

@@ -1,9 +1,10 @@
 import { mockBuildCtx, mockCompilerCtx, mockModule, mockValidatedConfig } from '@stencil/core/testing';
+import { normalizePath } from '@utils';
+
+import * as importPathLib from '../../transformers/stencil-import-path';
 import { stubComponentCompilerMeta } from '../../types/tests/ComponentCompilerMeta.stub';
 import { BundleOptions } from '../bundle-interface';
 import { extTransformsPlugin } from '../ext-transforms-plugin';
-import * as importPathLib from '../../transformers/stencil-import-path';
-import { normalizePath } from '@utils';
 
 describe('extTransformsPlugin', () => {
   function setup(bundleOptsOverrides: Partial<BundleOptions> = {}) {

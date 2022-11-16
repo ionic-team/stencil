@@ -1,6 +1,7 @@
+import { normalizePath } from '@utils';
+
 import type * as d from '../../../declarations';
 import { IS_BROWSER_ENV, IS_FETCH_ENV } from '../environment';
-import { normalizePath } from '@utils';
 
 const COMMON_DIR_MODULE_EXTS = ['.tsx', '.ts', '.mjs', '.js', '.jsx', '.json', '.md'];
 

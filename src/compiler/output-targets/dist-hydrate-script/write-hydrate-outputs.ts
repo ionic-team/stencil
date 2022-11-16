@@ -1,7 +1,8 @@
-import type * as d from '../../../declarations';
 import { basename, join } from 'path';
-import { relocateHydrateContextConst } from './relocate-hydrate-context';
 import type { RollupOutput } from 'rollup';
+
+import type * as d from '../../../declarations';
+import { relocateHydrateContextConst } from './relocate-hydrate-context';
 
 export const writeHydrateOutputs = (
   config: d.ValidatedConfig,

@@ -1,4 +1,9 @@
 import type * as d from '@stencil/core/declarations';
+import { mockBuildCtx, mockCompilerCtx, mockConfig } from '@stencil/core/testing';
+import { buildError, normalizePath } from '@utils';
+import path from 'path';
+
+import { FsReadOptions } from '../../sys/in-memory-fs';
 import {
   getCssImports,
   isCssNodeModule,
@@ -6,10 +11,6 @@ import {
   parseCssImports,
   replaceImportDeclarations,
 } from '../css-imports';
-import { mockBuildCtx, mockConfig, mockCompilerCtx } from '@stencil/core/testing';
-import { buildError, normalizePath } from '@utils';
-import path from 'path';
-import { FsReadOptions } from '../../sys/in-memory-fs';
 
 describe('css-imports', () => {
   const root = path.resolve('/');

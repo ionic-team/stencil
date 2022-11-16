@@ -1,6 +1,7 @@
+import ts from 'typescript';
+
 import type * as d from '../../declarations';
 import { isOutputTargetDistTypes } from '../output-targets/output-utils';
-import ts from 'typescript';
 
 export const getTsOptionsToExtend = (config: d.ValidatedConfig) => {
   const tsOptions: ts.CompilerOptions = {

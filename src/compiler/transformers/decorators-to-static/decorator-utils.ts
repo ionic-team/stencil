@@ -1,5 +1,6 @@
-import { objectLiteralToObjectMap } from '../transform-utils';
 import ts from 'typescript';
+
+import { objectLiteralToObjectMap } from '../transform-utils';
 
 export const getDeclarationParameters: GetDeclarationParameters = (decorator: ts.Decorator): any => {
   if (!ts.isCallExpression(decorator.expression)) {

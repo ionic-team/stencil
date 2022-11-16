@@ -2,12 +2,12 @@ import type * as d from '../../declarations';
 import {
   appError,
   clearAppErrorModal,
+  emitBuildStatus,
   hmrWindow,
   logBuild,
   logDiagnostic,
   logReload,
   logWarn,
-  emitBuildStatus,
   onBuildResults,
 } from '../client';
 import { OPEN_IN_EDITOR_URL } from '../dev-server-constants';

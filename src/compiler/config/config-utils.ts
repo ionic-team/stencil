@@ -1,7 +1,8 @@
-import type * as d from '../../declarations';
-import { isAbsolute, join } from 'path';
 import { isBoolean } from '@utils';
+import { isAbsolute, join } from 'path';
+
 import type { ConfigFlags } from '../../cli/config-flags';
+import type * as d from '../../declarations';
 
 export const getAbsolutePath = (config: d.ValidatedConfig, dir: string) => {
   if (!isAbsolute(dir)) {

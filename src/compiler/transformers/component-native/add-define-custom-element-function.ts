@@ -1,7 +1,8 @@
-import type * as d from '../../../declarations';
-import { createImportStatement, getModuleFromSourceFile } from '../transform-utils';
 import { dashToPascalCase } from '@utils';
 import ts from 'typescript';
+
+import type * as d from '../../../declarations';
+import { createImportStatement, getModuleFromSourceFile } from '../transform-utils';
 
 /**
  * Import and define components along with any component dependents within the `dist-custom-elements` output.

@@ -1,9 +1,10 @@
-import { tryFn, hasDebug, readJson, hasVerbose, uuidv4 } from './helpers';
-import { shouldTrack } from './shouldTrack';
+import { isOutputTargetHydrate, WWW } from '../../compiler/output-targets/output-utils';
+import { IS_BROWSER_ENV } from '../../compiler/sys/environment';
 import type * as d from '../../declarations';
 import { readConfig, updateConfig, writeConfig } from '../ionic-config';
 import { CoreCompiler } from '../load-compiler';
-import { isOutputTargetHydrate, WWW } from '../../compiler/output-targets/output-utils';
+import { hasDebug, hasVerbose, readJson, tryFn, uuidv4 } from './helpers';
+import { shouldTrack } from './shouldTrack';
 
 /**
  * Used to within taskBuild to provide the component_count property.
@@ -19,13 +20,13 @@ export async function telemetryBuildFinishedAction(
   coreCompiler: CoreCompiler,
   result: d.CompilerBuildResults
 ) {
-  const tracking = await shouldTrack(config, sys, config.flags.ci);
+  const tracking = await shouldTrack(config, sys, !!config.flags.ci);
 
   if (!tracking) {
     return;
   }
 
-  const component_count = Object.keys(result.componentGraph).length;
+  const component_count = result.componentGraph ? Object.keys(result.componentGraph).length : undefined;
 
   const data = await prepareData(coreCompiler, config, sys, result.duration, component_count);
 
@@ -128,8 +129,8 @@ export const prepareData = async (
   coreCompiler: CoreCompiler,
   config: d.ValidatedConfig,
   sys: d.CompilerSystem,
-  duration_ms: number,
-  component_count: number = undefined
+  duration_ms: number | undefined,
+  component_count: number | undefined = undefined
 ): Promise<d.TrackableData> => {
   const { typescript, rollup } = coreCompiler.versions || { typescript: 'unknown', rollup: 'unknown' };
   const { packages, packagesNoVersions } = await getInstalledPackages(sys, config);
@@ -137,33 +138,35 @@ export const prepareData = async (
   const yarn = isUsingYarn(sys);
   const stencil = coreCompiler.version || 'unknown';
   const system = `${sys.name} ${sys.version}`;
-  const os_name = sys.details.platform;
-  const os_version = sys.details.release;
-  const cpu_model = sys.details.cpuModel;
+  const os_name = sys.details?.platform;
+  const os_version = sys.details?.release;
+  const cpu_model = sys.details?.cpuModel;
   const build = coreCompiler.buildId || 'unknown';
   const has_app_pwa_config = hasAppTarget(config);
   const anonymizedConfig = anonymizeConfigForTelemetry(config);
+  const is_browser_env = IS_BROWSER_ENV;
 
   return {
-    yarn,
-    duration_ms,
+    arguments: config.flags.args,
+    build,
     component_count,
-    targets,
+    config: anonymizedConfig,
+    cpu_model,
+    duration_ms,
+    has_app_pwa_config,
+    is_browser_env,
+    os_name,
+    os_version,
     packages,
     packages_no_versions: packagesNoVersions,
-    arguments: config.flags.args,
-    task: config.flags.task,
+    rollup,
     stencil,
     system,
     system_major: getMajorVersion(system),
-    os_name,
-    os_version,
-    cpu_model,
-    build,
+    targets,
+    task: config.flags.task,
     typescript,
-    rollup,
-    has_app_pwa_config,
-    config: anonymizedConfig,
+    yarn,
   };
 };
 
@@ -197,7 +200,16 @@ const CONFIG_PROPS_TO_ANONYMIZE: ReadonlyArray<ConfigStringKeys> = [
 // Props we delete entirely from the config for telemetry
 //
 // TODO(STENCIL-469): Investigate improving anonymization for tsCompilerOptions and devServer
-const CONFIG_PROPS_TO_DELETE: ReadonlyArray<keyof d.Config> = ['sys', 'logger', 'tsCompilerOptions', 'devServer'];
+const CONFIG_PROPS_TO_DELETE: ReadonlyArray<keyof d.Config> = [
+  'commonjs',
+  'devServer',
+  'env',
+  'logger',
+  'rollupConfig',
+  'sys',
+  'testing',
+  'tsCompilerOptions',
+];
 
 /**
  * Anonymize the config for telemetry, replacing potentially revealing config props
@@ -274,7 +286,11 @@ async function getInstalledPackages(
     // Read package.json and package-lock.json
     const appRootDir = sys.getCurrentDirectory();
 
-    const packageJson: d.PackageJsonData = await tryFn(readJson, sys, sys.resolvePath(appRootDir + '/package.json'));
+    const packageJson: d.PackageJsonData | null = await tryFn(
+      readJson,
+      sys,
+      sys.resolvePath(appRootDir + '/package.json')
+    );
 
     // They don't have a package.json for some reason? Eject button.
     if (!packageJson) {

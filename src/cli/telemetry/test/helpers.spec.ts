@@ -1,53 +1,49 @@
-import { isInteractive, tryFn, uuidv4, hasDebug, hasVerbose } from '../helpers';
 import { createSystem } from '../../../compiler/sys/stencil-sys';
-import { createConfigFlags } from '../../config-flags';
+import { ConfigFlags, createConfigFlags } from '../../config-flags';
+import { hasDebug, hasVerbose, isInteractive, tryFn, uuidv4 } from '../helpers';
 
 describe('hasDebug', () => {
-  it('Returns true when a flag is passed', () => {
+  it('returns true when the "debug" flag is true', () => {
     const flags = createConfigFlags({
       debug: true,
-      verbose: false,
     });
 
     expect(hasDebug(flags)).toBe(true);
   });
 
-  it('Returns false when a flag is not passed', () => {
+  it('returns false when the "debug" flag is false', () => {
     const flags = createConfigFlags({
       debug: false,
-      verbose: false,
     });
+
+    expect(hasDebug(flags)).toBe(false);
+  });
+
+  it('returns false when a flag is not passed', () => {
+    const flags = createConfigFlags({});
 
     expect(hasDebug(flags)).toBe(false);
   });
 });
 
 describe('hasVerbose', () => {
-  it('Returns true when both flags are passed', () => {
+  it.each<Partial<ConfigFlags>>([
+    { debug: true, verbose: false },
+    { debug: false, verbose: true },
+    { debug: false, verbose: false },
+  ])('returns false when debug=$debug and verbose=$verbose', (flagOverrides) => {
+    const flags = createConfigFlags(flagOverrides);
+
+    expect(hasVerbose(flags)).toBe(false);
+  });
+
+  it('returns true when debug=true and verbose=true', () => {
     const flags = createConfigFlags({
       debug: true,
       verbose: true,
     });
 
     expect(hasVerbose(flags)).toBe(true);
-  });
-
-  it('Returns false when the verbose flag is passed, and debug is not', () => {
-    const flags = createConfigFlags({
-      debug: false,
-      verbose: true,
-    });
-
-    expect(hasVerbose(flags)).toBe(false);
-  });
-
-  it('Returns false when the flag is not passed', () => {
-    const flags = createConfigFlags({
-      debug: false,
-      verbose: false,
-    });
-
-    expect(hasVerbose(flags)).toBe(false);
   });
 });
 

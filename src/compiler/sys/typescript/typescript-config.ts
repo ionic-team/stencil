@@ -1,7 +1,8 @@
-import type * as d from '../../../declarations';
 import { buildError, buildWarn, catchError, isString, loadTypeScriptDiagnostic, normalizePath } from '@utils';
 import { isAbsolute, join, relative } from 'path';
 import ts from 'typescript';
+
+import type * as d from '../../../declarations';
 
 export const validateTsConfig = async (config: d.Config, sys: d.CompilerSystem, init: d.LoadConfigInit) => {
   const tsconfig = {

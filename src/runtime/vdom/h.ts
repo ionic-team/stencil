@@ -7,10 +7,11 @@
  * Modified for Stencil's compiler and vdom
  */
 
-import type * as d from '../../declarations';
 import { BUILD } from '@app-data';
 import { consoleDevError, consoleDevWarn } from '@platform';
 import { isComplexType } from '@utils';
+
+import type * as d from '../../declarations';
 
 // const stack: any[] = [];
 

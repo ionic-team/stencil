@@ -1,6 +1,7 @@
-import type { ImportData, ParsedImport, SerializeImportData } from '../../declarations';
-import { basename, dirname, isAbsolute, relative } from 'path';
 import { DEFAULT_STYLE_MODE, isString, normalizePath } from '@utils';
+import { basename, dirname, isAbsolute, relative } from 'path';
+
+import type { ImportData, ParsedImport, SerializeImportData } from '../../declarations';
 
 /**
  * Serialize data about a style import to an annotated path, where

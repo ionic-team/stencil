@@ -1,6 +1,7 @@
+import { join } from 'path';
+
 import type * as d from '../../declarations';
 import { getAbsoluteBuildDir } from './html-utils';
-import { join } from 'path';
 
 export const updateGlobalStylesLink = (
   config: d.Config,

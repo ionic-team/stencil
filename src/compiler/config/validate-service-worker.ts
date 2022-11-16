@@ -1,6 +1,7 @@
-import type * as d from '../../declarations';
-import { isAbsolute, join } from 'path';
 import { isString } from '@utils';
+import { isAbsolute, join } from 'path';
+
+import type * as d from '../../declarations';
 
 export const validateServiceWorker = (config: d.ValidatedConfig, outputTarget: d.OutputTargetWww) => {
   if (outputTarget.serviceWorker === false) {

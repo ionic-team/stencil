@@ -4,7 +4,7 @@ triage:
 
 closeAndLock:
   labels:
-    - label: "ionitron: support"
+    - label: 'ionitron: support'
       message: >
         Thanks for the issue! This issue appears to be a support request. We use this issue tracker exclusively for
         bug reports and feature requests. Please use our [slack channel](https://stencil-worldwide.herokuapp.com/)
@@ -12,7 +12,7 @@ closeAndLock:
 
 
         Thank you for using Stencil!
-    - label: "ionitron: missing template"
+    - label: 'ionitron: missing template'
       message: >
         Thanks for the issue! It appears that you have not filled out the provided issue template. We use this issue
         template in order to gather more information and further assist you. Please create a new issue and ensure the
@@ -26,7 +26,7 @@ closeAndLock:
 
 comment:
   labels:
-    - label: "ionitron: needs reproduction"
+    - label: 'ionitron: needs reproduction'
       message: >
         Thanks for the issue! This issue has been labeled as `needs reproduction`. This label is added to issues that
         need a code reproduction.
@@ -56,7 +56,7 @@ noReply:
 noReproduction:
   days: 14
   maxIssuesPerRun: 100
-  label: "ionitron: needs reproduction"
+  label: 'ionitron: needs reproduction'
   responseLabel: triage
   exemptProjects: true
   exemptMilestones: true
@@ -74,18 +74,18 @@ stale:
   days: 30
   maxIssuesPerRun: 100
   exemptLabels:
-    - "Bug: Validated"
-    - "Feature: Want this? Upvote it!"
+    - 'Bug: Validated'
+    - 'Feature: Want this? Upvote it!'
     - good first issue
     - help wanted
     - Request For Comments
-    - "Resolution: Needs Investigation"
-    - "Resolution: Refine"
+    - 'Resolution: Needs Investigation'
+    - 'Resolution: Refine'
     - triage
   exemptAssigned: true
   exemptProjects: true
   exemptMilestones: true
-  label: "ionitron: stale issue"
+  label: 'ionitron: stale issue'
   message: >
     Thanks for the issue! This issue is being closed due to inactivity. If this is still
     an issue with the latest version of Stencil, please create a new issue and ensure the
@@ -99,7 +99,7 @@ stale:
 
 wrongRepo:
   repos:
-    - label: "ionitron: cli"
+    - label: 'ionitron: cli'
       repo: ionic-cli
       message: >
         Thanks for the issue! We use this issue tracker exclusively for bug reports and feature requests
@@ -108,7 +108,7 @@ wrongRepo:
 
 
         Thank you for using Stencil!
-    - label: "ionitron: ionic"
+    - label: 'ionitron: ionic'
       repo: ionic
       message: >
         Thanks for the issue! We use this issue tracker exclusively for bug reports and feature requests

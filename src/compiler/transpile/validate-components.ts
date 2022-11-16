@@ -1,6 +1,7 @@
-import type * as d from '../../declarations';
 import { buildError } from '@utils';
 import { relative } from 'path';
+
+import type * as d from '../../declarations';
 
 export const validateTranspiledComponents = (config: d.Config, buildCtx: d.BuildCtx) => {
   for (const cmp of buildCtx.components) {

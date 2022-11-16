@@ -1,6 +1,7 @@
-import type * as d from '../../declarations';
 import { splitLineBreaks } from '@utils';
-import { CompressOptions, MangleOptions, ManglePropertiesOptions, MinifyOptions, minify } from 'terser';
+import { CompressOptions, MangleOptions, ManglePropertiesOptions, minify, MinifyOptions } from 'terser';
+
+import type * as d from '../../declarations';
 
 /**
  * Performs the minification of JavaScript source

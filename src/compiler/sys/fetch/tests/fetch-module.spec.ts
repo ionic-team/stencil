@@ -1,6 +1,6 @@
 import type * as d from '../../../../declarations';
-import { getNodeModuleFetchUrl, getStencilModuleUrl, skipFilePathFetch } from '../fetch-utils';
 import { createSystem } from '../../stencil-sys';
+import { getNodeModuleFetchUrl, getStencilModuleUrl, skipFilePathFetch } from '../fetch-utils';
 
 describe('fetch module', () => {
   let compilerExe: string;

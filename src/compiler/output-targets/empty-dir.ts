@@ -1,14 +1,15 @@
+import { isString } from '@utils';
+
 import type * as d from '../../declarations';
 import {
   isOutputTargetDist,
-  isOutputTargetDistLazyLoader,
-  isOutputTargetHydrate,
-  isOutputTargetWww,
   isOutputTargetDistCustomElements,
   isOutputTargetDistCustomElementsBundle,
   isOutputTargetDistLazy,
+  isOutputTargetDistLazyLoader,
+  isOutputTargetHydrate,
+  isOutputTargetWww,
 } from './output-utils';
-import { isString } from '@utils';
 
 type OutputTargetEmptiable =
   | d.OutputTargetDist

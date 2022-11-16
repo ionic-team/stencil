@@ -1,16 +1,17 @@
+import rollupCommonjs from '@rollup/plugin-commonjs';
+import rollupJson from '@rollup/plugin-json';
+import rollupResolve from '@rollup/plugin-node-resolve';
 import fs from 'fs-extra';
 import { join } from 'path';
-import rollupJson from '@rollup/plugin-json';
-import rollupCommonjs from '@rollup/plugin-commonjs';
-import rollupResolve from '@rollup/plugin-node-resolve';
-import { aliasPlugin } from './plugins/alias-plugin';
-import { replacePlugin } from './plugins/replace-plugin';
-import { relativePathPlugin } from './plugins/relative-path-plugin';
-import { BuildOptions } from '../utils/options';
-import { RollupOptions, OutputOptions } from 'rollup';
-import { writePkgJson } from '../utils/write-pkg-json';
-import { getBanner } from '../utils/banner';
+import { OutputOptions, RollupOptions } from 'rollup';
 import sourcemaps from 'rollup-plugin-sourcemaps';
+
+import { getBanner } from '../utils/banner';
+import { BuildOptions } from '../utils/options';
+import { writePkgJson } from '../utils/write-pkg-json';
+import { aliasPlugin } from './plugins/alias-plugin';
+import { relativePathPlugin } from './plugins/relative-path-plugin';
+import { replacePlugin } from './plugins/replace-plugin';
 
 /**
  * Generates a rollup configuration for the `cli` submodule

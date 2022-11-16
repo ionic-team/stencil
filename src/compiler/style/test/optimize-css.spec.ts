@@ -1,8 +1,9 @@
 import type * as d from '@stencil/core/declarations';
-import { optimizeCss } from '../optimize-css';
 import { mockCompilerCtx, mockConfig } from '@stencil/core/testing';
-import path from 'path';
 import os from 'os';
+import path from 'path';
+
+import { optimizeCss } from '../optimize-css';
 
 describe('optimizeCss', () => {
   let config: d.Config;

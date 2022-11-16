@@ -1,16 +1,17 @@
-import fs from 'fs-extra';
-import { join } from 'path';
 import rollupCommonjs from '@rollup/plugin-commonjs';
 import rollupJson from '@rollup/plugin-json';
 import rollupResolve from '@rollup/plugin-node-resolve';
-import { aliasPlugin } from './plugins/alias-plugin';
-import { BuildOptions } from '../utils/options';
-import { lazyRequirePlugin } from './plugins/lazy-require';
-import { replacePlugin } from './plugins/replace-plugin';
-import { writePkgJson } from '../utils/write-pkg-json';
-import { RollupOptions, OutputOptions } from 'rollup';
-import { prettyMinifyPlugin } from './plugins/pretty-minify';
+import fs from 'fs-extra';
+import { join } from 'path';
+import { OutputOptions, RollupOptions } from 'rollup';
+
 import { getBanner } from '../utils/banner';
+import { BuildOptions } from '../utils/options';
+import { writePkgJson } from '../utils/write-pkg-json';
+import { aliasPlugin } from './plugins/alias-plugin';
+import { lazyRequirePlugin } from './plugins/lazy-require';
+import { prettyMinifyPlugin } from './plugins/pretty-minify';
+import { replacePlugin } from './plugins/replace-plugin';
 
 export async function testing(opts: BuildOptions) {
   const inputDir = join(opts.buildDir, 'testing');

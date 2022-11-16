@@ -1,15 +1,16 @@
+import { isNumber, isString, loadTypeScriptDiagnostics, normalizePath } from '@utils';
+import ts from 'typescript';
+
 import type * as d from '../../declarations';
 import { BuildContext } from '../build/build-ctx';
 import { CompilerContext } from '../build/compiler-ctx';
-import { convertDecoratorsToStatic } from '../transformers/decorators-to-static/convert-decorators';
-import { convertStaticToMeta } from '../transformers/static-to-meta/visitor';
-import { createLogger } from '../sys/logger/console-logger';
 import { getCurrentDirectory } from '../sys/environment';
-import { isNumber, isString, loadTypeScriptDiagnostics, normalizePath } from '@utils';
+import { createLogger } from '../sys/logger/console-logger';
 import { lazyComponentTransform } from '../transformers/component-lazy/transform-lazy-component';
 import { nativeComponentTransform } from '../transformers/component-native/tranform-to-native-component';
+import { convertDecoratorsToStatic } from '../transformers/decorators-to-static/convert-decorators';
+import { convertStaticToMeta } from '../transformers/static-to-meta/visitor';
 import { updateStencilCoreImports } from '../transformers/update-stencil-core-import';
-import ts from 'typescript';
 
 /**
  * Stand-alone compiling of a single string
