@@ -17,6 +17,7 @@ interface PolyfilledNode extends d.HostElement {
   __insertAdjacentElement: (position: InsertPosition, insertedElement: Element) => Element | null;
   __insertAdjacentHTML: (where: InsertPosition, html: string) => void;
   __insertAdjacentText: (where: InsertPosition, text: string) => void;
+  __removeChild: (node: ChildNode) => void;
 }
 
 /**
@@ -79,6 +80,7 @@ export const patchPseudoShadowDom = (HostElementPrototype: any) => {
   patchSlotInnerHTML(HostElementPrototype);
   patchSlotInnerText(HostElementPrototype);
   patchTextContent(HostElementPrototype);
+  patchNodeRemoveChild(HostElementPrototype);
 };
 
 const patchChildSlotNodes = (HostElementPrototype: any) => {
@@ -225,9 +227,9 @@ const patchNodeRemoveChild = (ElementPrototype: any) => {
 
   ElementPrototype.__removeChild = ElementPrototype.removeChild;
   ElementPrototype.removeChild = function (this: d.RenderNode, toRemove: d.RenderNode) {
-    if (toRemove['s-sn']) {
+    if (toRemove && typeof toRemove['s-sn'] !== 'undefined') {
       const slotNode = getHostSlotNode(this.__childNodes || this.childNodes, toRemove['s-sn']);
-      (this as any).__removeChild(toRemove);
+      (toRemove.parentElement as PolyfilledNode).__removeChild(toRemove);
 
       if (slotNode && slotNode['s-hsf']) {
         updateFallbackSlotVisibility(this);
