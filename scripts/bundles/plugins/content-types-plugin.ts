@@ -1,7 +1,8 @@
-import type { Plugin } from 'rollup';
-import type { BuildOptions } from '../../utils/options';
 import fs from 'fs-extra';
 import { join } from 'path';
+import type { Plugin } from 'rollup';
+
+import type { BuildOptions } from '../../utils/options';
 
 export function contentTypesPlugin(opts: BuildOptions): Plugin {
   return {

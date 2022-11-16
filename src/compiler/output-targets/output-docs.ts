@@ -1,9 +1,10 @@
 import type * as d from '../../declarations';
-import { generateDocData } from '../docs/generate-doc-data';
 import { generateCustomDocs } from '../docs/custom';
+import { generateDocData } from '../docs/generate-doc-data';
 import { generateJsonDocs } from '../docs/json';
 import { generateReadmeDocs } from '../docs/readme';
 import { generateVscodeDocs } from '../docs/vscode';
+import { outputCustom } from './output-custom';
 import {
   isOutputTargetCustom,
   isOutputTargetDocsCustom,
@@ -11,9 +12,18 @@ import {
   isOutputTargetDocsReadme,
   isOutputTargetDocsVscode,
 } from './output-utils';
-import { outputCustom } from './output-custom';
 
-export const outputDocs = async (config: d.ValidatedConfig, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
+/**
+ * Generate documentation-related output targets
+ * @param config the configuration associated with the current Stencil task run
+ * @param compilerCtx the current compiler context
+ * @param buildCtx the build context for the current Stencil task run
+ */
+export const outputDocs = async (
+  config: d.ValidatedConfig,
+  compilerCtx: d.CompilerCtx,
+  buildCtx: d.BuildCtx
+): Promise<void> => {
   if (!config.buildDocs) {
     return;
   }

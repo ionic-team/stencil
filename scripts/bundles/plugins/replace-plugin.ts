@@ -1,5 +1,6 @@
-import type { Plugin } from 'rollup';
 import rollupReplace from '@rollup/plugin-replace';
+import type { Plugin } from 'rollup';
+
 import { BuildOptions, createReplaceData } from '../../utils/options';
 
 /**

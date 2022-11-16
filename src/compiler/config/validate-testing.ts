@@ -1,8 +1,9 @@
-import type * as d from '../../declarations';
 import { buildError, isString } from '@utils';
-import { isAbsolute, join, basename, dirname } from 'path';
-import { isLocalModule } from '../sys/resolve/resolve-utils';
+import { basename, dirname, isAbsolute, join } from 'path';
+
+import type * as d from '../../declarations';
 import { isOutputTargetDist, isOutputTargetWww } from '../output-targets/output-utils';
+import { isLocalModule } from '../sys/resolve/resolve-utils';
 
 export const validateTesting = (config: d.ValidatedConfig, diagnostics: d.Diagnostic[]) => {
   const testing = (config.testing = Object.assign({}, config.testing || {}));
@@ -73,8 +74,10 @@ export const validateTesting = (config: d.ValidatedConfig, diagnostics: d.Diagno
     });
 
     (config.outputTargets ?? [])
-      .filter((o) => (isOutputTargetDist(o) || isOutputTargetWww(o)) && o.dir)
-      .forEach((outputTarget: d.OutputTargetWww) => {
+      .filter(
+        (o): o is d.OutputTargetWww | d.OutputTargetDist => (isOutputTargetDist(o) || isOutputTargetWww(o)) && !!o.dir
+      )
+      .forEach((outputTarget) => {
         testing.testPathIgnorePatterns?.push(outputTarget.dir!);
       });
   }

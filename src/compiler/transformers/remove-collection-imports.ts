@@ -1,5 +1,6 @@
-import type * as d from '../../declarations';
 import ts from 'typescript';
+
+import type * as d from '../../declarations';
 
 export const removeCollectionImports = (compilerCtx: d.CompilerCtx): ts.TransformerFactory<ts.SourceFile> => {
   /*
@@ -41,7 +42,7 @@ export const removeCollectionImports = (compilerCtx: d.CompilerCtx): ts.Transfor
       }
 
       if (madeUpdates) {
-        return ts.updateSourceFileNode(tsSourceFile, statements);
+        return ts.factory.updateSourceFile(tsSourceFile, statements);
       }
       return tsSourceFile;
     };

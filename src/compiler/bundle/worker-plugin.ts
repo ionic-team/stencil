@@ -1,8 +1,9 @@
+import { generatePreamble, hasError, normalizeFsPath } from '@utils';
+import type { Plugin, PluginContext, TransformResult } from 'rollup';
+
 import type * as d from '../../declarations';
-import type { Plugin, TransformResult, PluginContext } from 'rollup';
-import { bundleOutput } from './bundle-output';
-import { normalizeFsPath, hasError, generatePreamble } from '@utils';
 import { optimizeModule } from '../optimize/optimize-module';
+import { bundleOutput } from './bundle-output';
 import { STENCIL_INTERNAL_ID } from './entry-alias-ids';
 
 export const workerPlugin = (

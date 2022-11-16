@@ -1,4 +1,5 @@
 import ts from 'typescript';
+
 import { STENCIL_CORE_ID } from '../bundle/entry-alias-ids';
 
 export const updateStencilCoreImports = (updatedCoreImportPath: string): ts.TransformerFactory<ts.SourceFile> => {
@@ -53,7 +54,7 @@ export const updateStencilCoreImports = (updatedCoreImportPath: string): ts.Tran
       });
 
       if (madeChanges) {
-        return ts.updateSourceFileNode(
+        return ts.factory.updateSourceFile(
           tsSourceFile,
           newStatements,
           tsSourceFile.isDeclarationFile,

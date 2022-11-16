@@ -1,5 +1,6 @@
 import fs from 'fs-extra';
 import { join } from 'path';
+
 import { BuildOptions, getOptions } from './utils/options';
 import { PackageData } from './utils/write-pkg-json';
 
@@ -13,11 +14,9 @@ const entryDeps = [
   '@yarnpkg/lockfile',
   'ansi-colors',
   'autoprefixer',
-  'css',
   'exit',
   'glob',
   'graceful-fs',
-  'fast-deep-equal',
   'is-extglob',
   'merge-source-map',
   'minimatch',
@@ -216,7 +215,7 @@ interface BundledDep {
  * @param contributors the contributors, as read from a `package.json` file
  * @returns the contributors list, formatted
  */
-function getContributors(contributors: unknown): typeof contributors {
+function getContributors(contributors: unknown): string | ReadonlyArray<string> | null {
   if (typeof contributors === 'string') {
     return contributors;
   }
@@ -231,6 +230,7 @@ function getContributors(contributors: unknown): typeof contributors {
   if (contributors) {
     return getAuthor(contributors);
   }
+  return null;
 }
 
 /**
@@ -238,7 +238,7 @@ function getContributors(contributors: unknown): typeof contributors {
  * @param contributor the contributor information
  * @returns the formatted contributor information
  */
-function getAuthor(contributor: any): string {
+function getAuthor(contributor: any): string | null {
   if (typeof contributor === 'string') {
     return contributor;
   }
@@ -252,6 +252,7 @@ function getAuthor(contributor: any): string {
   if (typeof contributor.url === 'string') {
     return contributor.url;
   }
+  return null;
 }
 
 /**
@@ -262,7 +263,7 @@ function getAuthor(contributor: any): string {
  * @param moduleId the name of the dependency to check
  * @returns the license for a dependency, undefined if none was found
  */
-function getBundledDepLicenseContent(opts: BuildOptions, moduleId: string): string | undefined {
+function getBundledDepLicenseContent(opts: BuildOptions, moduleId: string): string | null {
   const licenseFiles = ['LICENSE', 'LICENSE.md', 'LICENSE-MIT', 'LICENSE.txt'];
   for (const licenseFile of licenseFiles) {
     try {
@@ -270,6 +271,7 @@ function getBundledDepLicenseContent(opts: BuildOptions, moduleId: string): stri
       return fs.readFileSync(licensePath, 'utf8');
     } catch (e) {}
   }
+  return null;
 }
 
 /**

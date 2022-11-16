@@ -1,5 +1,6 @@
-import type * as d from '../../declarations';
 import { dirname, resolve } from 'path';
+
+import type * as d from '../../declarations';
 
 /**
  * Find all referenced types by a component and add them to the `importDataObj` parameter
@@ -67,10 +68,10 @@ const updateImportReferenceFactory = (typeCounts: Map<string, number>, filePath:
     typeReferences: { [key: string]: d.ComponentCompilerTypeReference }
   ): d.TypesImportData => {
     Object.keys(typeReferences)
-      .map((typeName) => {
+      .map<[string, d.ComponentCompilerTypeReference]>((typeName) => {
         return [typeName, typeReferences[typeName]];
       })
-      .forEach(([typeName, typeReference]: [string, d.ComponentCompilerTypeReference]) => {
+      .forEach(([typeName, typeReference]) => {
         let importResolvedFile: string;
 
         // If global then there is no import statement needed

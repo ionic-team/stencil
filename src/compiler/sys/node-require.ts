@@ -1,7 +1,8 @@
+import { catchError, loadTypeScriptDiagnostic } from '@utils';
+import ts from 'typescript';
+
 import type { Diagnostic } from '../../declarations';
 import { IS_NODE_ENV } from './environment';
-import { loadTypeScriptDiagnostic, catchError } from '@utils';
-import ts from 'typescript';
 
 export const nodeRequire = (id: string) => {
   const results = {
@@ -22,7 +23,7 @@ export const nodeRequire = (id: string) => {
 
       // let's override node's require for a second
       // don't worry, we'll revert this when we're done
-      require.extensions['.ts'] = (module: NodeModuleWithCompile, fileName: string) => {
+      require.extensions['.ts'] = (module: NodeJS.Module, fileName: string) => {
         let sourceText = fs.readFileSync(fileName, 'utf8');
 
         if (fileName.endsWith('.ts')) {
@@ -48,7 +49,10 @@ export const nodeRequire = (id: string) => {
         }
 
         try {
-          module._compile(sourceText, fileName);
+          // we need to coerce because of the requirements for the arguments to
+          // this function. It's safe enough since it's already wrapped in a
+          // `try { } catch`.
+          (module as NodeModuleWithCompile)._compile(sourceText, fileName);
         } catch (e: any) {
           catchError(results.diagnostics, e);
         }

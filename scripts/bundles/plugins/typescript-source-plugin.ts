@@ -1,8 +1,9 @@
 import fs from 'fs-extra';
-import type { Plugin } from 'rollup';
 import { join } from 'path';
-import type { BuildOptions } from '../../utils/options';
+import type { Plugin } from 'rollup';
 import { minify } from 'terser';
+
+import type { BuildOptions } from '../../utils/options';
 
 /**
  * Creates a rollup plugin to embed an optimized version of the TypeScript compiler into the Stencil compiler.
@@ -121,7 +122,7 @@ async function bundleTypeScriptSource(tsPath: string, opts: BuildOptions): Promi
  * Removes a specific section from the provided source code via commenting the offending code out
  * @param srcCode the source code to modify
  * @param removeCode the code to remove from the source
- * @return the updated source code
+ * @returns the updated source code
  */
 function removeFromSource(srcCode: string, removeCode: string): string {
   if (!srcCode.includes(removeCode)) {

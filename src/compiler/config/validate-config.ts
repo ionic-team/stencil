@@ -1,18 +1,19 @@
-import { ConfigBundle, Diagnostic, ValidatedConfig, UnvalidatedConfig, LoadConfigInit } from '../../declarations';
 import { buildError, isBoolean, isNumber, isString, sortBy } from '@utils';
+
+import { ConfigBundle, Diagnostic, LoadConfigInit, UnvalidatedConfig, ValidatedConfig } from '../../declarations';
+import { createLogger } from '../sys/logger/console-logger';
+import { createSystem } from '../sys/stencil-sys';
 import { setBooleanConfig } from './config-utils';
-import { validateDevServer } from './validate-dev-server';
-import { validateDistNamespace } from './validate-namespace';
-import { validateHydrated } from './validate-hydrated';
-import { validateNamespace } from './validate-namespace';
 import { validateOutputTargets } from './outputs';
+import { validateDevServer } from './validate-dev-server';
+import { validateHydrated } from './validate-hydrated';
+import { validateDistNamespace } from './validate-namespace';
+import { validateNamespace } from './validate-namespace';
 import { validatePaths } from './validate-paths';
 import { validatePlugins } from './validate-plugins';
 import { validateRollupConfig } from './validate-rollup-config';
 import { validateTesting } from './validate-testing';
 import { validateWorkers } from './validate-workers';
-import { createLogger } from '../sys/logger/console-logger';
-import { createSystem } from '../sys/stencil-sys';
 
 /**
  * Represents the results of validating a previously unvalidated configuration
@@ -53,6 +54,7 @@ export const validateConfig = (
     flags: JSON.parse(JSON.stringify(config.flags || {})),
     logger,
     outputTargets: config.outputTargets ?? [],
+    rootDir: typeof config.rootDir === 'string' ? config.rootDir : '/',
     sys: config.sys ?? bootstrapConfig.sys ?? createSystem({ logger }),
     testing: config.testing ?? {},
   };

@@ -6,12 +6,13 @@
  *
  * Modified for Stencil's renderer and slot projection
  */
-import type * as d from '../../declarations';
 import { BUILD } from '@app-data';
-import { CMP_FLAGS, HTML_NS, SVG_NS, isDef } from '@utils';
 import { consoleDevError, doc, plt, supportsShadow } from '@platform';
-import { h, isHost, newVNode } from './h';
+import { CMP_FLAGS, HTML_NS, isDef, SVG_NS } from '@utils';
+
+import type * as d from '../../declarations';
 import { NODE_TYPE, PLATFORM_FLAGS, VNODE_FLAGS } from '../runtime-constants';
+import { h, isHost, newVNode } from './h';
 import { updateElement } from './update-element';
 import { updateFallbackSlotVisibility } from './render-slot-fallback';
 

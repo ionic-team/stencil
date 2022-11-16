@@ -1,5 +1,6 @@
-import type * as d from '../declarations';
 import { BUILD } from '@app-data';
+
+import type * as d from '../declarations';
 
 export const win = typeof window !== 'undefined' ? window : ({} as Window);
 

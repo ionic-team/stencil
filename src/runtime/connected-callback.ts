@@ -1,13 +1,14 @@
-import type * as d from '../declarations';
-import { addHostEventListeners, doc, getHostRef, nextTick, plt, styles, supportsShadow } from '@platform';
-import { addStyle } from './styles';
-import { attachToAncestor } from './update-component';
 import { BUILD } from '@app-data';
+import { addHostEventListeners, doc, getHostRef, nextTick, plt, supportsShadow } from '@platform';
 import { CMP_FLAGS, HOST_FLAGS, MEMBER_FLAGS } from '@utils';
+
+import type * as d from '../declarations';
+import { initializeClientHydrate } from './client-hydrate';
+import { fireConnectedCallback, initializeComponent } from './initialize-component';
 import { createTime } from './profile';
 import { HYDRATE_ID, NODE_TYPE, PLATFORM_FLAGS } from './runtime-constants';
-import { initializeClientHydrate } from './client-hydrate';
-import { initializeComponent, fireConnectedCallback } from './initialize-component';
+import { addStyle } from './styles';
+import { attachToAncestor } from './update-component';
 
 export const connectedCallback = (elm: d.HostElement) => {
   if ((plt.$flags$ & PLATFORM_FLAGS.isTmpDisconnected) === 0) {
@@ -105,35 +106,6 @@ export const connectedCallback = (elm: d.HostElement) => {
 
       // fire off connectedCallback() on component instance
       fireConnectedCallback(hostRef.$lazyInstance$);
-
-      // re-add css-shim because it gets removed on disconnect
-      if (plt.$cssShim$ && elm['s-sc']) {
-        // setup
-        const scopeId = 'sc-' + hostRef.$cmpMeta$.$tagName$;
-        const style = styles.get(scopeId) as string;
-        const oId = elm['s-sc'];
-
-        // construct and insert new <style>
-        const styleElm = plt.$cssShim$.createHostStyle(elm, scopeId, style, true) as d.RenderNode;
-        const nId = styleElm['s-sc'];
-
-        if (nId) {
-          styleElm.setAttribute('sty-id', nId);
-          const doc = document.head;
-          doc.insertBefore(styleElm, doc.querySelector('link'));
-
-          // clean up old ids / add new ids
-          elm['s-sc'] = nId;
-          elm.classList.remove(oId + '-h', oId + '-s');
-          elm.classList.add(nId + '-h', nId + '-s');
-
-          Array.from(elm.querySelectorAll('.' + oId)).forEach((c) => {
-            c.classList.remove(oId, oId + '-s');
-            c.classList.add(nId, nId + '-s');
-          });
-          plt.$cssShim$.updateHost(elm);
-        }
-      }
     }
 
     endConnected();

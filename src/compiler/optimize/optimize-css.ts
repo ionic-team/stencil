@@ -1,6 +1,7 @@
+import { hasError } from '@utils';
+
 import { OptimizeCssInput, OptimizeCssOutput } from '../../declarations';
 import { autoprefixCss } from './autoprefixer';
-import { hasError } from '@utils';
 import { minifyCss } from './minify-css';
 
 /**

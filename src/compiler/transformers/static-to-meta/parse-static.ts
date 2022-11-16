@@ -1,12 +1,13 @@
+import { normalizePath } from '@utils';
+import { basename, dirname, join } from 'path';
+import ts from 'typescript';
+
 import type * as d from '../../../declarations';
 import { createModule, getModule } from '../../transpile/transpiled-module';
-import { dirname, basename, join } from 'path';
-import { normalizePath } from '@utils';
 import { parseCallExpression } from './call-expression';
-import { parseModuleImport } from './import';
 import { parseStaticComponentMeta } from './component';
+import { parseModuleImport } from './import';
 import { parseStringLiteral } from './string-literal';
-import ts from 'typescript';
 
 export const updateModule = (
   config: d.Config,

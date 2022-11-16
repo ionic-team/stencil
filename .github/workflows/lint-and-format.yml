@@ -11,14 +11,14 @@ jobs:
     runs-on: 'ubuntu-latest'
     steps:
       - name: Checkout Code
-        uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # v2.4.0
+        uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
 
       - name: Get Core Dependencies
         uses: ./.github/workflows/actions/get-core-dependencies
 
+      - name: ESLint
+        run: npm run lint
+
       - name: Prettier Check
         run: npm run prettier.dry-run
         shell: bash
-
-      - name: ESLint
-        run: npm run lint

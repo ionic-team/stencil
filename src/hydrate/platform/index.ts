@@ -1,5 +1,6 @@
-import type * as d from '../../declarations';
 import { addHostEventListeners } from '@runtime';
+
+import type * as d from '../../declarations';
 
 let customError: d.ErrorHandler;
 
@@ -156,36 +157,34 @@ export const Build: d.UserBuildConditionals = {
 export const styles: d.StyleMap = new Map();
 export const modeResolutionChain: d.ResolutionHandler[] = [];
 
-export { BUILD, NAMESPACE, Env } from '@app-data';
+export { hAsync as h } from './h-async';
 export { hydrateApp } from './hydrate-app';
-
+export { BUILD, Env, NAMESPACE } from '@app-data';
 export {
   addHostEventListeners,
-  defineCustomElement,
-  forceModeUpdate,
-  proxyCustomElement,
   bootstrapLazy,
   connectedCallback,
   createEvent,
+  defineCustomElement,
   disconnectedCallback,
+  forceModeUpdate,
+  forceUpdate,
+  Fragment,
   getAssetPath,
-  setAssetPath,
   getConnect,
   getContext,
   getElement,
+  getMode,
+  getRenderingRef,
   getValue,
-  setValue,
-  Fragment,
   Host,
   insertVdomAnnotations,
   parsePropertyValue,
-  forceUpdate,
   postUpdateComponent,
-  getRenderingRef,
   proxyComponent,
+  proxyCustomElement,
   renderVdom,
+  setAssetPath,
   setMode,
-  getMode,
+  setValue,
 } from '@runtime';
-
-export { hAsync as h } from './h-async';

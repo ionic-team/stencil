@@ -1,18 +1,19 @@
-import fs from 'fs-extra';
-import { join } from 'path';
 import rollupCommonjs from '@rollup/plugin-commonjs';
 import rollupResolve from '@rollup/plugin-node-resolve';
 import { dataToEsm } from '@rollup/pluginutils';
-import { aliasPlugin } from './plugins/alias-plugin';
-import { relativePathPlugin } from './plugins/relative-path-plugin';
-import { replacePlugin } from './plugins/replace-plugin';
-import { writePkgJson } from '../utils/write-pkg-json';
-import type { BuildOptions } from '../utils/options';
-import type { RollupOptions, OutputChunk, Plugin } from 'rollup';
+import fs from 'fs-extra';
+import { join } from 'path';
+import type { OutputChunk, Plugin, RollupOptions } from 'rollup';
 import { minify } from 'terser';
 import ts from 'typescript';
+
 import { getBanner } from '../utils/banner';
+import type { BuildOptions } from '../utils/options';
+import { writePkgJson } from '../utils/write-pkg-json';
+import { aliasPlugin } from './plugins/alias-plugin';
 import { contentTypesPlugin } from './plugins/content-types-plugin';
+import { relativePathPlugin } from './plugins/relative-path-plugin';
+import { replacePlugin } from './plugins/replace-plugin';
 
 export async function devServer(opts: BuildOptions) {
   const inputDir = join(opts.buildDir, 'dev-server');

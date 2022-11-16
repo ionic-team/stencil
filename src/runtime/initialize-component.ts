@@ -1,13 +1,14 @@
-import type * as d from '../declarations';
 import { BUILD } from '@app-data';
 import { consoleError, loadModule, styles } from '@platform';
 import { CMP_FLAGS, HOST_FLAGS } from '@utils';
-import { proxyComponent } from './proxy-component';
-import { safeCall, scheduleUpdate } from './update-component';
+
+import type * as d from '../declarations';
 import { computeMode } from './mode';
-import { getScopeId, registerStyle } from './styles';
-import { PROXY_FLAGS } from './runtime-constants';
 import { createTime, uniqueTime } from './profile';
+import { proxyComponent } from './proxy-component';
+import { PROXY_FLAGS } from './runtime-constants';
+import { getScopeId, registerStyle } from './styles';
+import { safeCall, scheduleUpdate } from './update-component';
 
 export const initializeComponent = async (
   elm: d.HostElement,

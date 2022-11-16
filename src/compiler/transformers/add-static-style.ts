@@ -1,9 +1,10 @@
-import type * as d from '../../declarations';
-import { createStaticGetter } from './transform-utils';
-import { DEFAULT_STYLE_MODE, dashToPascalCase } from '@utils';
-import { getScopeId } from '../style/scope-css';
-import { scopeCss } from '../../utils/shadow-css';
+import { dashToPascalCase, DEFAULT_STYLE_MODE } from '@utils';
 import ts from 'typescript';
+
+import type * as d from '../../declarations';
+import { scopeCss } from '../../utils/shadow-css';
+import { getScopeId } from '../style/scope-css';
+import { createStaticGetter } from './transform-utils';
 
 /**
  * Adds static "style" getter within the class
@@ -30,18 +31,23 @@ export const addStaticStyleGetterWithinClass = (
 
 /**
  * Adds static "style" property to the class variable.
+ *
  * ```typescript
  * const MyComponent = class {}
  * MyComponent.style = "styles";
  * ```
+ *
  * @param styleStatements a list of statements containing style assignments to a class
  * @param cmp the metadata associated with the component being evaluated
  */
 export const addStaticStylePropertyToClass = (styleStatements: ts.Statement[], cmp: d.ComponentCompilerMeta): void => {
   const styleLiteral = getStyleLiteral(cmp, false);
   if (styleLiteral) {
-    const statement = ts.createStatement(
-      ts.createAssignment(ts.createPropertyAccess(ts.createIdentifier(cmp.componentClassName), 'style'), styleLiteral)
+    const statement = ts.factory.createExpressionStatement(
+      ts.factory.createAssignment(
+        ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier(cmp.componentClassName), 'style'),
+        styleLiteral
+      )
     );
     styleStatements.push(statement);
   }
@@ -72,31 +78,26 @@ const getMultipleModeStyle = (
       // inline the style string
       // static get style() { return { ios: "string" }; }
       const styleLiteral = createStyleLiteral(cmp, style, commentOriginalSelector);
-      const propStr = createPropertyAssignment(style.modeName, styleLiteral);
+      const propStr = ts.factory.createPropertyAssignment(style.modeName, styleLiteral);
       styleModes.push(propStr);
     } else if (typeof style.styleIdentifier === 'string') {
       // direct import already written in the source code
       // import myTagIosStyle from './import-path.css';
       // static get style() { return { ios: myTagIosStyle }; }
-      const styleIdentifier = ts.createIdentifier(style.styleIdentifier);
-      const propIdentifier = createPropertyAssignment(style.modeName, styleIdentifier);
+      const styleIdentifier = ts.factory.createIdentifier(style.styleIdentifier);
+      const propIdentifier = ts.factory.createPropertyAssignment(style.modeName, styleIdentifier);
       styleModes.push(propIdentifier);
     } else if (Array.isArray(style.externalStyles) && style.externalStyles.length > 0) {
       // import generated from @Component() styleUrls option
       // import myTagIosStyle from './import-path.css';
       // static get style() { return { ios: myTagIosStyle }; }
       const styleUrlIdentifier = createStyleIdentifierFromUrl(cmp, style);
-      const propUrlIdentifier = createPropertyAssignment(style.modeName, styleUrlIdentifier);
+      const propUrlIdentifier = ts.factory.createPropertyAssignment(style.modeName, styleUrlIdentifier);
       styleModes.push(propUrlIdentifier);
     }
   });
 
-  return ts.createObjectLiteral(styleModes, true);
-};
-
-const createPropertyAssignment = (mode: string, initializer: ts.Expression) => {
-  const node = ts.createPropertyAssignment(mode, initializer);
-  return node;
+  return ts.factory.createObjectLiteralExpression(styleModes, true);
 };
 
 const getSingleStyle = (cmp: d.ComponentCompilerMeta, style: d.StyleCompiler, commentOriginalSelector: boolean) => {
@@ -110,7 +111,7 @@ const getSingleStyle = (cmp: d.ComponentCompilerMeta, style: d.StyleCompiler, co
     // direct import already written in the source code
     // import myTagStyle from './import-path.css';
     // static get style() { return myTagStyle; }
-    return ts.createIdentifier(style.styleIdentifier);
+    return ts.factory.createIdentifier(style.styleIdentifier);
   }
 
   if (Array.isArray(style.externalStyles) && style.externalStyles.length > 0) {
@@ -127,10 +128,10 @@ const createStyleLiteral = (cmp: d.ComponentCompilerMeta, style: d.StyleCompiler
   if (cmp.encapsulation === 'scoped' || (commentOriginalSelector && cmp.encapsulation === 'shadow')) {
     // scope the css first
     const scopeId = getScopeId(cmp.tagName, style.modeName);
-    return ts.createStringLiteral(scopeCss(style.styleStr, scopeId, commentOriginalSelector));
+    return ts.factory.createStringLiteral(scopeCss(style.styleStr, scopeId, commentOriginalSelector));
   }
 
-  return ts.createStringLiteral(style.styleStr);
+  return ts.factory.createStringLiteral(style.styleStr);
 };
 
 const createStyleIdentifierFromUrl = (cmp: d.ComponentCompilerMeta, style: d.StyleCompiler) => {
@@ -144,5 +145,5 @@ const createStyleIdentifierFromUrl = (cmp: d.ComponentCompilerMeta, style: d.Sty
   style.styleIdentifier += 'Style';
   style.externalStyles = [style.externalStyles[0]];
 
-  return ts.createIdentifier(style.styleIdentifier);
+  return ts.factory.createIdentifier(style.styleIdentifier);
 };

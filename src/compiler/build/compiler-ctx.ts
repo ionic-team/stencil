@@ -1,7 +1,8 @@
-import type * as d from '../../declarations';
-import { basename, dirname, extname, join } from 'path';
-import { buildEvents } from '../events';
 import { noop, normalizePath } from '@utils';
+import { basename, dirname, extname, join } from 'path';
+
+import type * as d from '../../declarations';
+import { buildEvents } from '../events';
 import { InMemoryFileSystem } from '../sys/in-memory-fs';
 
 /**

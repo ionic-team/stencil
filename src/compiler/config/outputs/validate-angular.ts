@@ -1,7 +1,8 @@
-import type * as d from '../../../declarations';
-import { isOutputTargetAngular } from '../../output-targets/output-utils';
 import { isAbsolute, join } from 'path';
+
+import type * as d from '../../../declarations';
 import { OutputTargetAngular } from '../../../declarations';
+import { isOutputTargetAngular } from '../../output-targets/output-utils';
 
 export const validateAngular = (config: d.ValidatedConfig, userOutputs: d.OutputTarget[]): OutputTargetAngular[] => {
   const angularOutputTargets = userOutputs.filter(isOutputTargetAngular);

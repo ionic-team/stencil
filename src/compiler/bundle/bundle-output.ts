@@ -1,20 +1,21 @@
+import { rollupCommonjsPlugin, rollupJsonPlugin, rollupNodeResolvePlugin, rollupReplacePlugin } from '@compiler-deps';
+import { createOnWarnFn, isString, loadRollupDiagnostics } from '@utils';
+import { rollup, RollupOptions, TreeshakingOptions } from 'rollup';
+
 import type * as d from '../../declarations';
+import { lazyComponentPlugin } from '../output-targets/dist-lazy/lazy-component-plugin';
+import { createCustomResolverAsync } from '../sys/resolve/resolve-module-async';
 import { appDataPlugin } from './app-data-plugin';
 import type { BundleOptions } from './bundle-interface';
 import { coreResolvePlugin } from './core-resolve-plugin';
-import { createCustomResolverAsync } from '../sys/resolve/resolve-module-async';
-import { createOnWarnFn, loadRollupDiagnostics, isString } from '@utils';
-import { devNodeModuleResolveId } from './dev-module';
+import { devNodeModuleResolveId } from './dev-node-module-resolve';
 import { extFormatPlugin } from './ext-format-plugin';
 import { extTransformsPlugin } from './ext-transforms-plugin';
 import { fileLoadPlugin } from './file-load-plugin';
-import { lazyComponentPlugin } from '../output-targets/dist-lazy/lazy-component-plugin';
 import { loaderPlugin } from './loader-plugin';
 import { pluginHelper } from './plugin-helper';
-import { resolveIdWithTypeScript, typescriptPlugin } from './typescript-plugin';
-import { rollupCommonjsPlugin, rollupJsonPlugin, rollupNodeResolvePlugin, rollupReplacePlugin } from '@compiler-deps';
-import { RollupOptions, TreeshakingOptions, rollup } from 'rollup';
 import { serverPlugin } from './server-plugin';
+import { resolveIdWithTypeScript, typescriptPlugin } from './typescript-plugin';
 import { userIndexPlugin } from './user-index-plugin';
 import { workerPlugin } from './worker-plugin';
 

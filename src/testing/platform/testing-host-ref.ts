@@ -1,8 +1,9 @@
-import type * as d from '@stencil/core/internal';
 import { addHostEventListeners } from '@runtime';
+import type * as d from '@stencil/core/internal';
+
 import { hostRefs } from './testing-constants';
 
-export const getHostRef = (elm: d.RuntimeRef) => {
+export const getHostRef = (elm: d.RuntimeRef | undefined) => {
   return hostRefs.get(elm);
 };
 

@@ -1,15 +1,16 @@
 import type * as d from '@stencil/core/declarations';
-import { appendDevServerClientIframe } from '../serve-file';
-import { createRequestHandler } from '../request-handler';
-import { createServerContext } from '../server-context';
-import { createSystem } from '../../compiler/sys/stencil-sys';
 import { mockConfig, mockLoadConfigInit } from '@stencil/core/testing';
 import { normalizePath } from '@utils';
-import { validateConfig } from '../../compiler/config/validate-config';
-import { validateDevServer } from '../../compiler/config/validate-dev-server';
 import nodeFs from 'fs';
 import type { IncomingMessage, ServerResponse } from 'http';
 import path from 'path';
+
+import { validateConfig } from '../../compiler/config/validate-config';
+import { validateDevServer } from '../../compiler/config/validate-dev-server';
+import { createSystem } from '../../compiler/sys/stencil-sys';
+import { createRequestHandler } from '../request-handler';
+import { appendDevServerClientIframe } from '../serve-file';
+import { createServerContext } from '../server-context';
 
 describe('request-handler', () => {
   let devServerConfig: d.DevServerConfig;
@@ -55,6 +56,7 @@ describe('request-handler', () => {
 
     res.end = () => {
       res.$content = res.$contentWrite;
+      return this;
     };
 
     sendMsg = () => {};

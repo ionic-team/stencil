@@ -1,5 +1,6 @@
-import { HydratedFlag, UnvalidatedConfig } from '../../declarations';
 import { isString } from '@utils';
+
+import { HydratedFlag, UnvalidatedConfig } from '../../declarations';
 
 /**
  * Check the provided `.hydratedFlag` prop and return a properly-validated value.

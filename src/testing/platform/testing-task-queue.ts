@@ -1,4 +1,6 @@
 import type * as d from '@stencil/core/internal';
+
+import { QueuedLoadModule } from './load-module';
 import {
   caughtErrors,
   moduleLoaded,
@@ -157,9 +159,4 @@ export function flushLoadModule(bundleId?: string) {
       reject(`flushLoadModule: ${e}`);
     }
   });
-}
-
-export interface QueuedLoadModule {
-  bundleId: any;
-  resolve: Function;
 }

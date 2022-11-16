@@ -1,6 +1,7 @@
-import type * as d from '../../../declarations';
-import { join } from 'path';
 import { normalizePath } from '@utils';
+import { join } from 'path';
+
+import type * as d from '../../../declarations';
 import { parseCollectionComponents, transpileCollectionModule } from './parse-collection-components';
 
 export const parseCollectionManifest = (

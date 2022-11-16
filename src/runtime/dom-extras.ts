@@ -1,6 +1,7 @@
-import type * as d from '../declarations';
 import { BUILD } from '@app-data';
 import { updateFallbackSlotVisibility } from './vdom/render-slot-fallback';
+
+import type * as d from '../declarations';
 
 interface PolyfilledNode extends d.HostElement {
   readonly __childNodes: NodeListOf<ChildNode>;

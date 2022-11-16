@@ -1,7 +1,8 @@
-import type * as d from '../../../declarations';
 import { dirname } from 'path';
-import { setPackageVersionByContent } from '../resolve/resolve-utils';
+
+import type * as d from '../../../declarations';
 import { InMemoryFileSystem } from '../in-memory-fs';
+import { setPackageVersionByContent } from '../resolve/resolve-utils';
 
 export const writeFetchSuccessSync = (
   sys: d.CompilerSystem,

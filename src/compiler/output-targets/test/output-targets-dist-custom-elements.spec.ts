@@ -1,12 +1,16 @@
 import { path } from '@stencil/core/compiler';
 import {
-  mockCompilerSystem,
   mockBuildCtx,
   mockCompilerCtx,
+  mockCompilerSystem,
   mockModule,
   mockValidatedConfig,
 } from '@stencil/core/testing';
+
 import type * as d from '../../../declarations';
+import { OutputTargetDistCustomElements } from '../../../declarations';
+import { STENCIL_APP_GLOBALS_ID, STENCIL_INTERNAL_CLIENT_ID, USER_INDEX_ENTRY_ID } from '../../bundle/entry-alias-ids';
+import { stubComponentCompilerMeta } from '../../types/tests/ComponentCompilerMeta.stub';
 import {
   addCustomElementInputs,
   bundleCustomElements,
@@ -15,9 +19,6 @@ import {
   outputCustomElements,
 } from '../dist-custom-elements';
 import * as outputCustomElementsMod from '../dist-custom-elements';
-import { OutputTargetDistCustomElements } from '../../../declarations';
-import { stubComponentCompilerMeta } from '../../types/tests/ComponentCompilerMeta.stub';
-import { STENCIL_APP_GLOBALS_ID, STENCIL_INTERNAL_CLIENT_ID, USER_INDEX_ENTRY_ID } from '../../bundle/entry-alias-ids';
 import { DIST_CUSTOM_ELEMENTS, DIST_CUSTOM_ELEMENTS_BUNDLE } from '../output-utils';
 
 const setup = () => {

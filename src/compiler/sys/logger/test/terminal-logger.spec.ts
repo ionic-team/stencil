@@ -1,8 +1,9 @@
-import { LogLevel, LOG_LEVELS } from '../../../../declarations';
-import { createNodeLoggerSys } from '../../../../sys/node/node-logger';
-import { createTerminalLogger, shouldLog } from '../terminal-logger';
 import { bgRed, blue, bold, cyan, dim, gray, green, magenta, red, yellow } from 'ansi-colors';
+
+import { LOG_LEVELS, LogLevel } from '../../../../declarations';
+import { createNodeLoggerSys } from '../../../../sys/node/node-logger';
 import { setupConsoleMocker } from '../../../../testing/testing-utils';
+import { createTerminalLogger, shouldLog } from '../terminal-logger';
 
 describe('terminal-logger', () => {
   describe('shouldLog helper', () => {
@@ -62,25 +63,25 @@ describe('terminal-logger', () => {
       const { logger, logMock } = setup();
       logger.setLevel('debug');
       logger.debug('my debug message');
-      expect(logMock).toBeCalledWith(`${cyan('[32:32.0]')}  my debug message ${dim(' MEM: 10.0MB')}`);
+      expect(logMock).toHaveBeenCalledWith(`${cyan('[32:32.0]')}  my debug message ${dim(' MEM: 10.0MB')}`);
     });
 
     it("supports 'info' level", () => {
       const { logger, logMock } = setup();
       logger.info('my info message');
-      expect(logMock).toBeCalledWith(`${dim('[32:32.0]')}  my info message`);
+      expect(logMock).toHaveBeenCalledWith(`${dim('[32:32.0]')}  my info message`);
     });
 
     it("supports 'warn' level", () => {
       const { logger, warnMock } = setup();
       logger.warn('my warn message');
-      expect(warnMock).toBeCalledWith(`\n${bold(yellow('[ WARN  ]'))}  my warn message\n`);
+      expect(warnMock).toHaveBeenCalledWith(`\n${bold(yellow('[ WARN  ]'))}  my warn message\n`);
     });
 
     it("supports 'error' level", () => {
       const { logger, errorMock } = setup();
       logger.error('my error message');
-      expect(errorMock).toBeCalledWith(`\n${bold(red('[ ERROR ]'))}  my error message\n`);
+      expect(errorMock).toHaveBeenCalledWith(`\n${bold(red('[ ERROR ]'))}  my error message\n`);
     });
 
     describe('color support', () => {
@@ -127,14 +128,14 @@ describe('terminal-logger', () => {
           '09:32:32.00  0010.0MB  I  test message',
           '09:32:32.00  0010.0MB  F  --------------------------------------',
         ].join('\n');
-        expect(writeLogsMock).toBeCalledWith('testfile.txt', expectedLogfile, false);
+        expect(writeLogsMock).toHaveBeenCalledWith('testfile.txt', expectedLogfile, false);
       });
 
       it('should not write logs to file if filepath not set', function () {
         const { logger, writeLogsMock } = setup();
         logger.info('test message');
         logger.writeLogs!(false);
-        expect(writeLogsMock).not.toBeCalled();
+        expect(writeLogsMock).not.toHaveBeenCalled();
       });
     });
 
@@ -181,7 +182,7 @@ describe('terminal-logger', () => {
             '09:32:42.00  0010.0MB  D  finish the timespan in 10.00 s',
             '09:32:42.00  0010.0MB  F  --------------------------------------',
           ].join('\n');
-          expect(writeLogsMock).toBeCalledWith('testfile.txt', expectedLogfile, false);
+          expect(writeLogsMock).toHaveBeenCalledWith('testfile.txt', expectedLogfile, false);
         });
 
         it.each<LogLevel>(['info', 'error', 'warn'])(
@@ -232,7 +233,7 @@ describe('terminal-logger', () => {
           '09:32:42.00  0010.0MB  I  finish the timespan in 10.00 s',
           '09:32:42.00  0010.0MB  F  --------------------------------------',
         ].join('\n');
-        expect(writeLogsMock).toBeCalledWith('testfile.txt', expectedLogfile, false);
+        expect(writeLogsMock).toHaveBeenCalledWith('testfile.txt', expectedLogfile, false);
       });
     });
   });

@@ -1,13 +1,15 @@
 import type * as d from '@stencil/core/declarations';
-import { convertDecoratorsToStatic } from '../decorators-to-static/convert-decorators';
-import { convertStaticToMeta } from '../static-to-meta/visitor';
 import { mockBuildCtx, mockCompilerCtx, mockConfig } from '@stencil/core/testing';
 import ts from 'typescript';
+
+import { convertDecoratorsToStatic } from '../decorators-to-static/convert-decorators';
 import { updateModule } from '../static-to-meta/parse-static';
+import { convertStaticToMeta } from '../static-to-meta/visitor';
 import { getScriptTarget } from '../transform-utils';
 
 /**
  * Testing utility for transpiling provided string containing valid Stencil code
+ *
  * @param input the code to transpile
  * @param config a Stencil configuration to apply during the transpilation
  * @param compilerCtx a compiler context to use in the transpilation process
@@ -17,8 +19,8 @@ import { getScriptTarget } from '../transform-utils';
  */
 export function transpileModule(
   input: string,
-  config?: d.Config,
-  compilerCtx?: d.CompilerCtx,
+  config?: d.Config | null,
+  compilerCtx?: d.CompilerCtx | null,
   beforeTransformers: ts.TransformerFactory<ts.SourceFile>[] = [],
   afterTransformers: ts.TransformerFactory<ts.SourceFile>[] = []
 ) {
@@ -154,12 +156,12 @@ export function transpileModule(
 }
 
 export function getStaticGetter(output: string, prop: string) {
-  const toEvaludate = `return ${output.replace('export', '')}`;
+  const toEvaluate = `return ${output.replace('export', '')}`;
   try {
-    const Obj = new Function(toEvaludate);
+    const Obj = new Function(toEvaluate);
     return Obj()[prop];
   } catch (e) {
     console.error(e);
-    console.error(toEvaludate);
+    console.error(toEvaluate);
   }
 }

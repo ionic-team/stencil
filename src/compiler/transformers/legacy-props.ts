@@ -1,6 +1,7 @@
-import type * as d from '../../declarations';
-import { GET_CONNECT, GET_CONTEXT, RUNTIME_APIS, addCoreRuntimeApi } from './core-runtime-apis';
 import ts from 'typescript';
+
+import type * as d from '../../declarations';
+import { addCoreRuntimeApi, GET_CONNECT, GET_CONTEXT, RUNTIME_APIS } from './core-runtime-apis';
 
 export const addLegacyProps = (moduleFile: d.Module, cmp: d.ComponentCompilerMeta) => {
   if (cmp.legacyConnect.length > 0) {
@@ -18,10 +19,13 @@ export const addLegacyProps = (moduleFile: d.Module, cmp: d.ComponentCompilerMet
 };
 
 const getStatement = (propName: string, method: string, arg: string) => {
-  return ts.createExpressionStatement(
-    ts.createAssignment(
-      ts.createPropertyAccess(ts.createThis(), propName),
-      ts.createCall(ts.createIdentifier(method), undefined, [ts.createThis(), ts.createLiteral(arg)])
+  return ts.factory.createExpressionStatement(
+    ts.factory.createAssignment(
+      ts.factory.createPropertyAccessExpression(ts.factory.createThis(), propName),
+      ts.factory.createCallExpression(ts.factory.createIdentifier(method), undefined, [
+        ts.factory.createThis(),
+        ts.factory.createStringLiteral(arg),
+      ])
     )
   );
 };

@@ -1,9 +1,9 @@
-import type * as d from '../../declarations';
-import { build } from './build';
-import { BuildContext } from './build-ctx';
-import { compilerRequest } from '../bundle/dev-module';
-import { createTsWatchProgram } from '../transpile/create-watch-program';
+import { isString } from '@utils';
 import { dirname, resolve } from 'path';
+import type ts from 'typescript';
+
+import type * as d from '../../declarations';
+import { compilerRequest } from '../bundle/dev-module';
 import {
   filesChanged,
   hasHtmlChanges,
@@ -14,8 +14,9 @@ import {
   scriptsDeleted,
 } from '../fs-watch/fs-watch-rebuild';
 import { hasServiceWorkerChanges } from '../service-worker/generate-sw';
-import { isString } from '@utils';
-import type ts from 'typescript';
+import { createTsWatchProgram } from '../transpile/create-watch-program';
+import { build } from './build';
+import { BuildContext } from './build-ctx';
 
 export const createWatchBuild = async (
   config: d.ValidatedConfig,

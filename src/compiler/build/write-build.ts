@@ -1,5 +1,6 @@
-import type * as d from '../../declarations';
 import { catchError } from '@utils';
+
+import type * as d from '../../declarations';
 import { outputServiceWorkers } from '../output-targets/output-service-workers';
 import { validateBuildFiles } from './validate-files';
 

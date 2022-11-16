@@ -17,6 +17,7 @@
     "noImplicitReturns": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
+    "strictFunctionTypes": true,
     "outDir": "build",
     "pretty": true,
     "resolveJsonModule": true,

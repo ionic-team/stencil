@@ -8,8 +8,9 @@
  */
 
 import { BUILD } from '@app-data';
-import { isComplexType } from '@utils';
 import { isMemberInElement, plt, win } from '@platform';
+import { isComplexType } from '@utils';
+
 import { VNODE_FLAGS, XLINK_NS } from '../runtime-constants';
 
 export const setAccessor = (

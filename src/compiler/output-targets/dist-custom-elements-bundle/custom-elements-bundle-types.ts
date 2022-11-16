@@ -1,7 +1,8 @@
+import { dashToPascalCase, normalizePath } from '@utils';
+import { dirname, join, relative } from 'path';
+
 import type * as d from '../../../declarations';
 import { isOutputTargetDistCustomElementsBundle } from '../output-utils';
-import { dirname, join, relative } from 'path';
-import { normalizePath, dashToPascalCase } from '@utils';
 
 export const generateCustomElementsBundleTypes = async (
   config: d.ValidatedConfig,

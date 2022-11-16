@@ -1,6 +1,6 @@
-import type { JsonDocs } from './stencil-public-docs';
-import type { PrerenderUrlResults } from '../internal';
 import type { ConfigFlags } from '../cli/config-flags';
+import type { PrerenderUrlResults } from '../internal';
+import type { JsonDocs } from './stencil-public-docs';
 
 export * from './stencil-public-docs';
 
@@ -416,7 +416,7 @@ type RequireFields<T, K extends keyof T> = T & { [P in K]-?: T[P] };
 /**
  * Fields in {@link Config} to make required for {@link ValidatedConfig}
  */
-type StrictConfigFields = 'flags' | 'logger' | 'outputTargets' | 'sys' | 'testing';
+type StrictConfigFields = 'flags' | 'logger' | 'outputTargets' | 'rootDir' | 'sys' | 'testing';
 
 /**
  * A version of {@link Config} that makes certain fields required. This type represents a valid configuration entity.
@@ -560,6 +560,10 @@ export interface StencilDevServerConfig {
 export interface DevServerConfig extends StencilDevServerConfig {
   browserUrl?: string;
   devServerDir?: string;
+  /**
+   * A list of glob patterns like `subdir/*.js`  to exclude from hot-module
+   * reloading updates.
+   */
   excludeHmr?: string[];
   historyApiFallback?: HistoryApiFallback;
   openBrowser?: boolean;
@@ -1204,6 +1208,7 @@ export interface BuildOnEvents {
 }
 
 export interface BuildEmitEvents {
+  emit(eventName: CompilerEventName, path: string): void;
   emit(eventName: CompilerEventFileAdd, path: string): void;
   emit(eventName: CompilerEventFileDelete, path: string): void;
   emit(eventName: CompilerEventFileUpdate, path: string): void;
@@ -1852,6 +1857,28 @@ export interface OutputTargetDist extends OutputTargetBase {
   dir?: string;
 
   collectionDir?: string | null;
+  /**
+   * When `true` this flag will transform aliased import paths defined in
+   * a project's `tsconfig.json` to relative import paths in the compiled output's
+   * `dist-collection` bundle if it is generated (i.e. `collectionDir` is set).
+   *
+   * Paths will be left in aliased format if `false` or `undefined`.
+   *
+   * @example
+   * // tsconfig.json
+   * {
+   *   paths: {
+   *     "@utils/*": ['/src/utils/*']
+   *   }
+   * }
+   *
+   * // Source file
+   * import * as dateUtils from '@utils/date-utils';
+   * // Output file
+   * import * as dateUtils from '../utils/date-utils';
+   */
+  transformAliasedImportPathsInCollection?: boolean | null;
+
   typesDir?: string;
   esmLoaderPath?: string;
   copy?: CopyTask[];
@@ -1865,6 +1892,26 @@ export interface OutputTargetDistCollection extends OutputTargetBase {
   empty?: boolean;
   dir: string;
   collectionDir: string;
+  /**
+   * When `true` this flag will transform aliased import paths defined in
+   * a project's `tsconfig.json` to relative import paths in the compiled output.
+   *
+   * Paths will be left in aliased format if `false` or `undefined`.
+   *
+   * @example
+   * // tsconfig.json
+   * {
+   *   paths: {
+   *     "@utils/*": ['/src/utils/*']
+   *   }
+   * }
+   *
+   * // Source file
+   * import * as dateUtils from '@utils/date-utils';
+   * // Output file
+   * import * as dateUtils from '../utils/date-utils';
+   */
+  transformAliasedImportPaths?: boolean | null;
 }
 
 export interface OutputTargetDistTypes extends OutputTargetBase {
@@ -1985,6 +2032,12 @@ export interface OutputTargetBaseNext {
 export interface OutputTargetDistCustomElements extends OutputTargetBaseNext {
   type: 'dist-custom-elements';
   empty?: boolean;
+  /**
+   * Triggers the following behaviors when enabled:
+   * 1. All `@stencil/core/*` module references are treated as external during bundling.
+   * 2. File names are not hashed.
+   * 3. File minification will follow the behavior defined at the root of the Stencil config.
+   */
   externalRuntime?: boolean;
   copy?: CopyTask[];
   inlineDynamicImports?: boolean;

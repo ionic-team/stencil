@@ -1,8 +1,8 @@
 import type * as d from '../../../declarations';
 import { NODE_TYPE } from '../../runtime-constants';
-import { updateElement } from '../update-element';
-import * as setAccessor from '../set-accessor';
 import { newVNode } from '../h';
+import * as setAccessor from '../set-accessor';
+import { updateElement } from '../update-element';
 
 describe('updateElement', () => {
   const createTestNode = (overrides: Partial<d.VNode> = {}): d.VNode => ({
