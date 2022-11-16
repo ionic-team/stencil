@@ -1,12 +1,13 @@
-import type * as d from '../../../declarations';
-import { addLazyElementGetter } from './lazy-element-getter';
-import { addStaticStylePropertyToClass } from '../add-static-style';
-import { addWatchers } from '../watcher-meta-transform';
-import { removeStaticMetaProperties } from '../remove-static-meta-properties';
-import { transformHostData } from '../host-data-transform';
-import { updateComponentClass } from '../update-component-class';
-import { updateLazyComponentConstructor } from './lazy-constructor';
 import ts from 'typescript';
+
+import type * as d from '../../../declarations';
+import { addStaticStylePropertyToClass } from '../add-static-style';
+import { transformHostData } from '../host-data-transform';
+import { removeStaticMetaProperties } from '../remove-static-meta-properties';
+import { updateComponentClass } from '../update-component-class';
+import { addWatchers } from '../watcher-meta-transform';
+import { updateLazyComponentConstructor } from './lazy-constructor';
+import { addLazyElementGetter } from './lazy-element-getter';
 
 export const updateLazyComponentClass = (
   transformOpts: d.TransformOptions,
@@ -34,7 +35,7 @@ const updateLazyComponentMembers = (
   transformHostData(classMembers, moduleFile);
 
   if (transformOpts.style === 'static') {
-    addStaticStylePropertyToClass(styleStatements, cmp, false);
+    addStaticStylePropertyToClass(styleStatements, cmp);
   }
 
   return classMembers;

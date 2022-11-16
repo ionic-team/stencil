@@ -1,14 +1,15 @@
-import type * as d from '../../../declarations';
-import { generateRollupOutput } from '../../app-core/bundle-app-core';
-import { generateLazyModules } from './generate-lazy-module';
-import { getAppBrowserCorePolyfills } from '../../app-core/app-polyfills';
+import { generatePreamble } from '@utils';
 import { join } from 'path';
 import type { OutputOptions, RollupBuild } from 'rollup';
+
+import type * as d from '../../../declarations';
+import { getAppBrowserCorePolyfills } from '../../app-core/app-polyfills';
+import { generateRollupOutput } from '../../app-core/bundle-app-core';
 import { relativeImport } from '../output-utils';
-import { generatePreamble } from '@utils';
+import { generateLazyModules } from './generate-lazy-module';
 
 export const generateSystem = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   rollupBuild: RollupBuild,
@@ -49,7 +50,7 @@ export const generateSystem = async (
 };
 
 const generateSystemLoaders = (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   rollupResult: d.RollupResult[],
   systemOutputs: d.OutputTargetDistLazy[]
@@ -60,7 +61,7 @@ const generateSystemLoaders = (
 };
 
 const writeSystemLoader = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   loaderFilename: string,
   outputTarget: d.OutputTargetDistLazy
@@ -76,7 +77,7 @@ const writeSystemLoader = async (
 };
 
 const getSystemLoader = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   corePath: string,
   includePolyfills: boolean
@@ -102,7 +103,8 @@ const getSystemLoader = async (
 
     var resourcesUrl = scriptElm ? scriptElm.getAttribute('data-resources-url') || scriptElm.src : '';
     var start = function() {
-      var url = new URL('${corePath}', new URL(resourcesUrl, window.location.origin));
+      // if src is not present then origin is "null", and new URL() throws TypeError: Failed to construct 'URL': Invalid base URL
+      var url = new URL('${corePath}', new URL(resourcesUrl, window.location.origin !== 'null' ? window.location.origin : undefined));
       System.import(url.href);
     };
 

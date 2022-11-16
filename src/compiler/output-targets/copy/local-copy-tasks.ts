@@ -1,7 +1,8 @@
-import type * as d from '../../../declarations';
 import { isAbsolute, join } from 'path';
 
-export const getSrcAbsPath = (config: d.Config, src: string) => {
+import type * as d from '../../../declarations';
+
+export const getSrcAbsPath = (config: d.ValidatedConfig, src: string) => {
   if (isAbsolute(src)) {
     return src;
   }

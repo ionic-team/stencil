@@ -1,17 +1,22 @@
-import type * as d from '../declarations';
 import { BUILD } from '@app-data';
+import { doc, plt, styles, supportsConstructableStylesheets, supportsShadow } from '@platform';
 import { CMP_FLAGS } from '@utils';
-import { doc, plt, styles, supportsConstructibleStylesheets, supportsShadow } from '@platform';
-import { HYDRATED_STYLE_ID, NODE_TYPE } from './runtime-constants';
+
+import type * as d from '../declarations';
 import { createTime } from './profile';
+import { HYDRATED_STYLE_ID, NODE_TYPE } from './runtime-constants';
 
 const rootAppliedStyles: d.RootAppliedStyleMap = /*@__PURE__*/ new WeakMap();
 
 export const registerStyle = (scopeId: string, cssText: string, allowCS: boolean) => {
   let style = styles.get(scopeId);
-  if (supportsConstructibleStylesheets && allowCS) {
+  if (supportsConstructableStylesheets && allowCS) {
     style = (style || new CSSStyleSheet()) as CSSStyleSheet;
-    style.replace(cssText);
+    if (typeof style === 'string') {
+      style = cssText;
+    } else {
+      style.replaceSync(cssText);
+    }
   } else {
     style = cssText;
   }
@@ -25,7 +30,7 @@ export const addStyle = (
   hostElm?: HTMLElement
 ) => {
   let scopeId = getScopeId(cmpMeta, mode);
-  let style = styles.get(scopeId);
+  const style = styles.get(scopeId);
 
   if (!BUILD.attachStyles) {
     return scopeId;

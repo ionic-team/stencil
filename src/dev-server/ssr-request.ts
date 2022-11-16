@@ -1,9 +1,10 @@
-import type * as d from '../declarations';
-import type { ServerResponse } from 'http';
-import { responseHeaders, getSsrStaticDataPath } from './dev-server-utils';
-import { appendDevServerClientScript } from './serve-file';
 import { catchError, isFunction, isString } from '@utils';
+import type { ServerResponse } from 'http';
 import path from 'path';
+
+import type * as d from '../declarations';
+import { getSsrStaticDataPath, responseHeaders } from './dev-server-utils';
+import { appendDevServerClientScript } from './serve-file';
 
 export async function ssrPageRequest(
   devServerConfig: d.DevServerConfig,
@@ -26,7 +27,7 @@ export async function ssrPageRequest(
         diagnostics.push(...ssrResults.diagnostics);
         status = ssrResults.httpStatus;
         content = ssrResults.html;
-      } catch (e) {
+      } catch (e: any) {
         catchError(diagnostics, e);
       }
     }
@@ -88,7 +89,7 @@ export async function ssrStaticDataRequest(
         });
         data.components = ssrResults.components.map((c) => c.tag).sort();
         httpCache = hasQueryString;
-      } catch (e) {
+      } catch (e: any) {
         catchError(diagnostics, e);
       }
     }

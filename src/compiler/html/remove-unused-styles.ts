@@ -1,8 +1,9 @@
+import { catchError, hasError } from '@utils';
+
 import type * as d from '../../declarations';
-import { getUsedSelectors, UsedSelectors } from '../style/css-parser/used-selectors';
-import { hasError, catchError } from '@utils';
 import { parseCss } from '../style/css-parser/parse-css';
 import { serializeCss } from '../style/css-parser/serialize-css';
+import { getUsedSelectors, UsedSelectors } from '../style/css-parser/used-selectors';
 
 export const removeUnusedStyles = (doc: Document, diagnostics: d.Diagnostic[]) => {
   try {
@@ -18,7 +19,7 @@ export const removeUnusedStyles = (doc: Document, diagnostics: d.Diagnostic[]) =
         removeUnusedStyleText(usedSelectors, diagnostics, styleElms[i]);
       }
     }
-  } catch (e) {
+  } catch (e: any) {
     catchError(diagnostics, e);
   }
 };
@@ -43,7 +44,7 @@ const removeUnusedStyleText = (
       styleElm.innerHTML = serializeCss(parseResults.stylesheet, {
         usedSelectors,
       });
-    } catch (e) {
+    } catch (e: any) {
       diagnostics.push({
         level: 'warn',
         type: 'css',
@@ -51,7 +52,7 @@ const removeUnusedStyleText = (
         messageText: e,
       });
     }
-  } catch (e) {
+  } catch (e: any) {
     diagnostics.push({
       level: 'warn',
       type: 'css',

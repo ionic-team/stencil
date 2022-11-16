@@ -1,19 +1,20 @@
-import type * as d from '../../declarations';
 import { buildError, catchError, hasError, isString } from '@utils';
+import { isAbsolute, join } from 'path';
+
+import type * as d from '../../declarations';
 import { createHydrateBuildId } from '../../hydrate/runner/render-utils';
-import { createWorkerContext } from '../worker/worker-thread';
+import { getAbsoluteBuildDir } from '../html/html-utils';
+import { isOutputTargetWww } from '../output-targets/output-utils';
 import { createWorkerMainContext } from '../worker/main-thread';
+import { createWorkerContext } from '../worker/worker-thread';
+import { getPrerenderConfig } from './prerender-config';
+import { getHydrateOptions } from './prerender-hydrate-options';
 import { drainPrerenderQueue, initializePrerenderEntryUrls } from './prerender-queue';
+import { generateTemplateHtml } from './prerender-template-html';
 import { generateRobotsTxt } from './robots-txt';
 import { generateSitemapXml } from './sitemap-xml';
-import { generateTemplateHtml } from './prerender-template-html';
-import { getAbsoluteBuildDir } from '../html/html-utils';
-import { getHydrateOptions } from './prerender-hydrate-options';
-import { getPrerenderConfig } from './prerender-config';
-import { isAbsolute, join } from 'path';
-import { isOutputTargetWww } from '../output-targets/output-utils';
 
-export const createPrerenderer = async (config: d.Config) => {
+export const createPrerenderer = async (config: d.ValidatedConfig) => {
   const start = (opts: d.PrerenderStartOptions) => {
     return runPrerender(config, opts.hydrateAppFilePath, opts.componentGraph, opts.srcIndexHtmlPath, opts.buildId);
   };
@@ -23,7 +24,7 @@ export const createPrerenderer = async (config: d.Config) => {
 };
 
 const runPrerender = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   hydrateAppFilePath: string,
   componentGraph: d.BuildResultsComponentGraph,
   srcIndexHtmlPath: string,
@@ -102,7 +103,7 @@ const runPrerender = async (
           );
         })
       );
-    } catch (e) {
+    } catch (e: any) {
       catchError(diagnostics, e);
     }
 
@@ -126,7 +127,7 @@ const runPrerenderOutputTarget = async (
   workerCtx: d.CompilerWorkerContext,
   results: d.PrerenderResults,
   diagnostics: d.Diagnostic[],
-  config: d.Config,
+  config: d.ValidatedConfig,
   devServer: d.DevServer,
   hydrateAppFilePath: string,
   componentGraph: d.BuildResultsComponentGraph,
@@ -247,7 +248,7 @@ const runPrerenderOutputTarget = async (
     const statusColor = prerenderBuildErrors.length > 0 ? 'red' : 'green';
 
     timeSpan.finish(`prerendering ${statusMessage}`, statusColor, true);
-  } catch (e) {
+  } catch (e: any) {
     catchError(diagnostics, e);
   }
 };

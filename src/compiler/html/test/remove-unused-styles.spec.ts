@@ -1,5 +1,6 @@
 import type * as d from '@stencil/core/declarations';
 import { mockDocument } from '@stencil/core/testing';
+
 import { removeUnusedStyles } from '../remove-unused-styles';
 
 describe('removeUnusedStyles', () => {
@@ -66,7 +67,7 @@ describe('removeUnusedStyles', () => {
     expectNoSelector(css, '[dir="ltr"] h1+h3');
   });
 
-  it('should remove unused nested selectors', () => {
+  it('should remove all unused nested selectors', () => {
     const doc = mockDocument(`
       <html>
         <head>

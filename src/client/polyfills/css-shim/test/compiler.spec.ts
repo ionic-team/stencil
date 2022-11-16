@@ -169,7 +169,7 @@ describe('compiler', () => {
       expect(segments[5]({ '--font': 'sans' })).toBe('sans');
 
       // STEP 4
-      index = compileVar(css, segments, index);
+      compileVar(css, segments, index);
       expect(segments.length).toBe(7);
       expect(segments[6]).toBe(`;
 }`);

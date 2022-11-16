@@ -1,4 +1,4 @@
-import { setupDomTests } from '../util';
+import { setupDomTests, waitForChanges } from '../util';
 
 describe('prerender', () => {
   const { setupDom, tearDownDom } = setupDomTests(document);
@@ -42,7 +42,8 @@ describe('prerender', () => {
   });
 
   it('root slots', async () => {
-    app = await setupDom('/prerender/index.html', 1000);
+    app = await setupDom('/prerender/index.html');
+    await waitForChanges(500);
 
     const scoped = app.querySelector('cmp-client-scoped');
     const scopedStyle = getComputedStyle(scoped.querySelector('section'));

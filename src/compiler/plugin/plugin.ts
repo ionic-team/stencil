@@ -1,9 +1,10 @@
-import type * as d from '../../declarations';
-import { basename, relative } from 'path';
 import { buildError, catchError, isFunction, isString } from '@utils';
+import { basename, relative } from 'path';
+
+import type * as d from '../../declarations';
+import { PluginCtx, PluginTransformResults } from '../../declarations';
 import { isOutputTargetDocs } from '../output-targets/output-utils';
 import { parseCssImports } from '../style/css-imports';
-import { PluginCtx, PluginTransformResults } from '../../declarations';
 
 export const runPluginResolveId = async (pluginCtx: PluginCtx, importee: string) => {
   for (const plugin of pluginCtx.config.plugins) {
@@ -21,7 +22,7 @@ export const runPluginResolveId = async (pluginCtx: PluginCtx, importee: string)
             return results;
           }
         }
-      } catch (e) {
+      } catch (e: any) {
         catchError(pluginCtx.diagnostics, e);
       }
     }
@@ -47,7 +48,7 @@ export const runPluginLoad = async (pluginCtx: PluginCtx, id: string) => {
             return results;
           }
         }
-      } catch (e) {
+      } catch (e: any) {
         catchError(pluginCtx.diagnostics, e);
       }
     }
@@ -58,7 +59,7 @@ export const runPluginLoad = async (pluginCtx: PluginCtx, id: string) => {
 };
 
 export const runPluginTransforms = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   id: string,
@@ -146,7 +147,7 @@ export const runPluginTransforms = async (
             }
           }
         }
-      } catch (e) {
+      } catch (e: any) {
         catchError(buildCtx.diagnostics, e);
       }
     }
@@ -264,7 +265,7 @@ export const runPluginTransformsEsmImports = async (
             }
           }
         }
-      } catch (e) {
+      } catch (e: any) {
         catchError(transformResults.diagnostics, e);
       }
     }

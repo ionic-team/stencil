@@ -1,7 +1,8 @@
-import { mockCompilerCtx } from '@stencil/core/testing';
 import * as d from '@stencil/core/declarations';
-import { transpileModule } from './transpile';
+import { mockCompilerCtx } from '@stencil/core/testing';
+
 import { nativeComponentTransform } from '../component-native/tranform-to-native-component';
+import { transpileModule } from './transpile';
 
 describe('nativeComponentTransform', () => {
   let compilerCtx: d.CompilerCtx;
@@ -34,7 +35,7 @@ describe('nativeComponentTransform', () => {
 
       const transformer = nativeComponentTransform(compilerCtx, transformOpts);
 
-      const transpiledModule = transpileModule(code, null, compilerCtx, null, [], [transformer]);
+      const transpiledModule = transpileModule(code, null, compilerCtx, [], [transformer]);
 
       expect(transpiledModule.outputText).toContain(
         `import { HTMLElement, attachShadow as __stencil_attachShadow, defineCustomElement as __stencil_defineCustomElement } from "@stencil/core";`
@@ -59,7 +60,7 @@ describe('nativeComponentTransform', () => {
 
       const transformer = nativeComponentTransform(compilerCtx, transformOpts);
 
-      const transpiledModule = transpileModule(code, null, compilerCtx, null, [], [transformer]);
+      const transpiledModule = transpileModule(code, null, compilerCtx, [], [transformer]);
 
       expect(transpiledModule.outputText).toContain(
         `import { HTMLElement, attachShadow as __stencil_attachShadow, defineCustomElement as __stencil_defineCustomElement } from "@stencil/core";`

@@ -1,8 +1,9 @@
-import type * as d from '../../declarations';
 import { buildError, catchError, isFunction, isString } from '@utils';
+import { relative } from 'path';
+
+import type * as d from '../../declarations';
 import { crawlAnchorsForNextUrls } from './crawl-urls';
 import { getWriteFilePathFromUrlPath } from './prerendered-write-path';
-import { relative } from 'path';
 
 export const initializePrerenderEntryUrls = (results: d.PrerenderResults, manager: d.PrerenderManager) => {
   const entryAnchors: d.HydrateAnchorElement[] = [];
@@ -147,7 +148,7 @@ const prerenderUrl = async (results: d.PrerenderResults, manager: d.PrerenderMan
         addUrlToPendingQueue(manager, anchorUrl, url);
       }
     }
-  } catch (e) {
+  } catch (e: any) {
     // darn, idk, bad news
     catchError(manager.diagnostics, e);
   }

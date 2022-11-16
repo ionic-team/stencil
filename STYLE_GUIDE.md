@@ -37,7 +37,7 @@ Example from ionic-core:
 ### HTML tag
 
 #### Prefix
-The prefix has a major role when you are creating a collection of components intended to be used across diferent projects, like [@ionic/core](https://www.npmjs.com/package/@ionic/core). Web Components are not scoped because they are globally declared within the webpage, which means an "unique" prefix is needed to prevent collisions. The prefix is also able help to quickly indentify the collection of an component. Additionally, web components are required to contain a "-" dash within the tag name, so using the first section to namespace your components is a natural fit.
+The prefix has a major role when you are creating a collection of components intended to be used across diferent projects, like [@ionic/core](https://www.npmjs.com/package/@ionic/core). Web Components are not scoped because they are globally declared within the webpage, which means an "unique" prefix is needed to prevent collisions. The prefix is also able help to quickly indentify the collection of a component. Additionally, web components are required to contain a "-" dash within the tag name, so using the first section to namespace your components is a natural fit.
 
 We do not recommend using "stencil" as prefix, since Stencil DOES NOT emit stencil components, but rather the output is simply standards compliant web components.
 

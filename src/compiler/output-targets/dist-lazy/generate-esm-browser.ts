@@ -1,11 +1,12 @@
+import { generatePreamble, getDynamicImportFunction } from '@utils';
+import type { OutputOptions, RollupBuild } from 'rollup';
+
 import type * as d from '../../../declarations';
 import { generateRollupOutput } from '../../app-core/bundle-app-core';
 import { generateLazyModules } from './generate-lazy-module';
-import type { OutputOptions, RollupBuild } from 'rollup';
-import { generatePreamble, getDynamicImportFunction } from '@utils';
 
 export const generateEsmBrowser = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   rollupBuild: RollupBuild,

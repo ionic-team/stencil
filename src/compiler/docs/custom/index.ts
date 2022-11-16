@@ -1,7 +1,11 @@
 import type * as d from '../../../declarations';
 import { isOutputTargetDocsCustom } from '../../output-targets/output-utils';
 
-export const generateCustomDocs = async (config: d.Config, docsData: d.JsonDocs, outputTargets: d.OutputTarget[]) => {
+export const generateCustomDocs = async (
+  config: d.ValidatedConfig,
+  docsData: d.JsonDocs,
+  outputTargets: d.OutputTarget[]
+) => {
   const customOutputTargets = outputTargets.filter(isOutputTargetDocsCustom);
   if (customOutputTargets.length === 0) {
     return;

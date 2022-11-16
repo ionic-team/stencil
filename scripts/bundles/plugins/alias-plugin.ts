@@ -1,6 +1,7 @@
-import type { PartialResolvedId, Plugin } from 'rollup';
-import type { BuildOptions } from '../../utils/options';
 import { join } from 'path';
+import type { PartialResolvedId, Plugin } from 'rollup';
+
+import type { BuildOptions } from '../../utils/options';
 
 /**
  * Creates a rollup plugin for resolving identifiers while simultaneously externalizing them

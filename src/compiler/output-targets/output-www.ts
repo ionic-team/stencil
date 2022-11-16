@@ -1,22 +1,23 @@
-import type * as d from '../../declarations';
-import { addScriptDataAttribute } from '../html/add-script-attr';
-import { catchError, flatOne, unique } from '@utils';
 import { cloneDocument, serializeNodeToHtml } from '@stencil/core/mock-doc';
-import { generateEs5DisabledMessage } from '../app-core/app-es5-disabled';
-import { generateHashedCopy } from '../output-targets/copy/hashed-copy';
-import { getAbsoluteBuildDir } from '../html/html-utils';
-import { getScopeId } from '../style/scope-css';
-import { getUsedComponents } from '../html/used-components';
-import { INDEX_ORG } from '../service-worker/generate-sw';
-import { inlineStyleSheets } from '../html/inline-style-sheets';
-import { isOutputTargetWww } from './output-utils';
+import { catchError, flatOne, unique } from '@utils';
 import { join, relative } from 'path';
-import { optimizeCriticalPath } from '../html/inject-module-preloads';
-import { optimizeEsmImport } from '../html/inline-esm-import';
-import { updateGlobalStylesLink } from '../html/update-global-styles-link';
-import { updateIndexHtmlServiceWorker } from '../html/inject-sw-script';
 
-export const outputWww = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
+import type * as d from '../../declarations';
+import { generateEs5DisabledMessage } from '../app-core/app-es5-disabled';
+import { addScriptDataAttribute } from '../html/add-script-attr';
+import { getAbsoluteBuildDir } from '../html/html-utils';
+import { optimizeCriticalPath } from '../html/inject-module-preloads';
+import { updateIndexHtmlServiceWorker } from '../html/inject-sw-script';
+import { optimizeEsmImport } from '../html/inline-esm-import';
+import { inlineStyleSheets } from '../html/inline-style-sheets';
+import { updateGlobalStylesLink } from '../html/update-global-styles-link';
+import { getUsedComponents } from '../html/used-components';
+import { generateHashedCopy } from '../output-targets/copy/hashed-copy';
+import { INDEX_ORG } from '../service-worker/generate-sw';
+import { getScopeId } from '../style/scope-css';
+import { isOutputTargetWww } from './output-utils';
+
+export const outputWww = async (config: d.ValidatedConfig, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   const outputTargets = config.outputTargets.filter(isOutputTargetWww);
   if (outputTargets.length === 0) {
     return;
@@ -47,7 +48,7 @@ const getCriticalPath = (buildCtx: d.BuildCtx) => {
 };
 
 const generateWww = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   criticalPath: string[],
@@ -92,7 +93,7 @@ const generateHostConfig = (compilerCtx: d.CompilerCtx, outputTarget: d.OutputTa
 };
 
 const generateIndexHtml = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   criticalPath: string[],
@@ -134,7 +135,7 @@ const generateIndexHtml = async (
     }
 
     buildCtx.debug(`generateIndexHtml, write: ${relative(config.rootDir, outputTarget.indexHtml)}`);
-  } catch (e) {
+  } catch (e: any) {
     catchError(buildCtx.diagnostics, e);
   }
 };

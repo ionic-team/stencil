@@ -1,9 +1,10 @@
-import type * as d from '../declarations';
 import { BUILD } from '@app-data';
+import { getHostRef, plt, supportsShadow } from '@platform';
 import { NODE_TYPES } from '@stencil/core/mock-doc';
 import { CMP_FLAGS, HOST_FLAGS } from '@utils';
+
+import type * as d from '../declarations';
 import { PLATFORM_FLAGS } from './runtime-constants';
-import { plt, supportsShadow, getHostRef } from '@platform';
 
 export const patchCloneNode = (HostElementPrototype: any) => {
   const orgCloneNode = HostElementPrototype.cloneNode;
@@ -15,7 +16,7 @@ export const patchCloneNode = (HostElementPrototype: any) => {
     if (BUILD.slot && !isShadowDom && deep) {
       let i = 0;
       let slotted, nonStencilNode;
-      let stencilPrivates = [
+      const stencilPrivates = [
         's-id',
         's-cr',
         's-lr',

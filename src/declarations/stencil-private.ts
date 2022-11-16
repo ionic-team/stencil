@@ -1,8 +1,8 @@
-import { BuildResultsComponentGraph } from '.';
+import type { InMemoryFileSystem } from '../compiler/sys/in-memory-fs';
 import type {
   BuildEvents,
   BuildLog,
-  BuildOutput,
+  BuildResultsComponentGraph,
   CompilerBuildResults,
   CompilerBuildStart,
   CompilerFsStats,
@@ -13,8 +13,8 @@ import type {
   DevServerConfig,
   DevServerEditor,
   Diagnostic,
-  FsWriteOptions,
   Logger,
+  LoggerLineUpdater,
   LoggerTimeSpan,
   OptimizeCssInput,
   OptimizeCssOutput,
@@ -22,10 +22,8 @@ import type {
   PageReloadStrategy,
   PrerenderConfig,
   StyleDoc,
-  LoggerLineUpdater,
   TaskCommand,
 } from './stencil-public-compiler';
-
 import type {
   ComponentInterface,
   ListenOptions,
@@ -819,6 +817,9 @@ export interface ComponentCompilerLegacyContext {
 
 export type Encapsulation = 'shadow' | 'scoped' | 'none';
 
+/**
+ * Intermediate Representation (IR) of a static property on a Stencil component
+ */
 export interface ComponentCompilerStaticProperty {
   mutable: boolean;
   optional: boolean;
@@ -831,6 +832,9 @@ export interface ComponentCompilerStaticProperty {
   defaultValue?: string;
 }
 
+/**
+ * Intermediate Representation (IR) of a property on a Stencil component
+ */
 export interface ComponentCompilerProperty extends ComponentCompilerStaticProperty {
   name: string;
   internal: boolean;
@@ -850,12 +854,30 @@ export interface ComponentCompilerPropertyComplexType {
   references: ComponentCompilerTypeReferences;
 }
 
-export interface ComponentCompilerTypeReferences {
-  [key: string]: ComponentCompilerTypeReference;
-}
+/**
+ * A record of `ComponentCompilerTypeReference` entities.
+ *
+ * Each key in this record is intended to be the names of the types used by a component. However, this is not enforced
+ * by the type system (I.E. any string can be used as a key).
+ *
+ * Note any key can be a user defined type or a TypeScript standard type.
+ */
+export type ComponentCompilerTypeReferences = Record<string, ComponentCompilerTypeReference>;
 
+/**
+ * Describes a reference to a type used by a component.
+ */
 export interface ComponentCompilerTypeReference {
+  /**
+   * A type may be defined:
+   * - locally (in the same file as the component that uses it)
+   * - globally
+   * - by importing it into a file (and is defined elsewhere)
+   */
   location: 'local' | 'global' | 'import';
+  /**
+   * The path to the type reference, if applicable (global types should not need a path associated with them)
+   */
   path?: string;
 }
 
@@ -913,13 +935,31 @@ export interface ComponentCompilerState {
   name: string;
 }
 
+/**
+ * Representation of JSDoc that is pulled off a node in the AST
+ */
 export interface CompilerJsDoc {
+  /**
+   * The text associated with the JSDoc
+   */
   text: string;
+  /**
+   * Tags included in the JSDoc
+   */
   tags: CompilerJsDocTagInfo[];
 }
 
+/**
+ * Representation of a tag that exists in a JSDoc
+ */
 export interface CompilerJsDocTagInfo {
+  /**
+   * The name of the tag - e.g. `@deprecated`
+   */
   name: string;
+  /**
+   * Additional text that is associated with the tag - e.g. `@deprecated use v2 of this API`
+   */
   text?: string;
 }
 
@@ -958,6 +998,10 @@ export interface ComponentConstructor {
   isStyleRegistered?: boolean;
 }
 
+/**
+ * A mapping from class member names to a list of methods which are watching
+ * them.
+ */
 export interface ComponentConstructorWatchers {
   [propName: string]: string[];
 }
@@ -968,9 +1012,9 @@ export interface ComponentTestingConstructor extends ComponentConstructor {
     componentWillLoad?: Function;
     componentWillUpdate?: Function;
     componentWillRender?: Function;
-    __componentWillLoad?: Function;
-    __componentWillUpdate?: Function;
-    __componentWillRender?: Function;
+    __componentWillLoad?: Function | null;
+    __componentWillUpdate?: Function | null;
+    __componentWillRender?: Function | null;
   };
 }
 
@@ -1101,7 +1145,7 @@ export interface DevServerContext {
   getBuildResults: () => Promise<CompilerBuildResults>;
   getCompilerRequest: (path: string) => Promise<CompilerRequestResponse>;
   isServerListening: boolean;
-  logRequest: (req: { method: string; pathname?: string }, status: number) => void;
+  logRequest: (req: HttpRequest, status: number) => void;
   prerenderConfig: PrerenderConfig;
   serve302: (req: any, res: any, pathname?: string) => void;
   serve404: (req: any, res: any, xSource: string, content?: string) => void;
@@ -1180,57 +1224,6 @@ export interface EventEmitterData<T = any> {
   composed?: boolean;
 }
 
-export interface FsReadOptions {
-  useCache?: boolean;
-  setHash?: boolean;
-}
-
-export interface FsReaddirOptions {
-  inMemoryOnly?: boolean;
-  recursive?: boolean;
-  /**
-   * Directory names to exclude. Just the basename,
-   * not the entire path. Basically for "node_moduels".
-   */
-  excludeDirNames?: string[];
-  /**
-   * Extensions we know we can avoid. Each extension
-   * should include the `.` so that we can test for both
-   * `.d.ts.` and `.ts`. If `excludeExtensions` isn't provided it
-   * doesn't try to exclude anything. This only checks against
-   * the filename, not directory names when recursive.
-   */
-  excludeExtensions?: string[];
-}
-
-export interface FsReaddirItem {
-  absPath: string;
-  relPath: string;
-  isDirectory: boolean;
-  isFile: boolean;
-}
-
-export interface FsWriteResults {
-  changedContent: boolean;
-  queuedWrite: boolean;
-  ignored: boolean;
-}
-
-export type FsItems = Map<string, FsItem>;
-
-export interface FsItem {
-  fileText: string;
-  isFile: boolean;
-  isDirectory: boolean;
-  size: number;
-  mtimeMs: number;
-  exists: boolean;
-  queueCopyFileToDest: string;
-  queueWriteToDisk: boolean;
-  queueDeleteFromDisk?: boolean;
-  useCache: boolean;
-}
-
 export interface HostElement extends HTMLElement {
   // web component APIs
   connectedCallback?: () => void;
@@ -1286,74 +1279,6 @@ export interface HostElement extends HTMLElement {
   ['s-p']?: Promise<void>[];
 
   componentOnReady?: () => Promise<this>;
-}
-
-export interface InMemoryFileSystem {
-  /* new compiler */
-  sys?: CompilerSystem;
-
-  accessData(filePath: string): Promise<{
-    exists: boolean;
-    isDirectory: boolean;
-    isFile: boolean;
-  }>;
-  access(filePath: string): Promise<boolean>;
-  /**
-   * Synchronous!!! Do not use!!!
-   * (Only typescript transpiling is allowed to use)
-   * @param filePath
-   */
-  accessSync(filePath: string): boolean;
-  copyFile(srcFile: string, dest: string): Promise<void>;
-  emptyDirs(dirPaths: string[]): Promise<void>;
-  readdir(dirPath: string, opts?: FsReaddirOptions): Promise<FsReaddirItem[]>;
-  readFile(filePath: string, opts?: FsReadOptions): Promise<string>;
-  /**
-   * Synchronous!!! Do not use!!!
-   * (Only typescript transpiling is allowed to use)
-   * @param filePath
-   */
-  readFileSync(filePath: string, opts?: FsReadOptions): string;
-  remove(itemPath: string): Promise<void>;
-  stat(itemPath: string): Promise<{
-    isFile: boolean;
-    isDirectory: boolean;
-  }>;
-  /**
-   * Synchronous!!! Do not use!!!
-   * (Only typescript transpiling is allowed to use)
-   * @param itemPath
-   */
-  statSync(itemPath: string): {
-    exists: boolean;
-    isFile: boolean;
-    isDirectory: boolean;
-  };
-  writeFile(filePath: string, content: string, opts?: FsWriteOptions): Promise<FsWriteResults>;
-  writeFiles(
-    files:
-      | {
-          [filePath: string]: string;
-        }
-      | Map<string, String>,
-    opts?: FsWriteOptions
-  ): Promise<FsWriteResults[]>;
-  commit(): Promise<{
-    filesWritten: string[];
-    filesDeleted: string[];
-    filesCopied: string[][];
-    dirsDeleted: string[];
-    dirsAdded: string[];
-  }>;
-  cancelDeleteFilesFromDisk(filePaths: string[]): void;
-  cancelDeleteDirectoriesFromDisk(filePaths: string[]): void;
-  clearDirCache(dirPath: string): void;
-  clearFileCache(filePath: string): void;
-  getItem(itemPath: string): FsItem;
-  getBuildOutputs(): BuildOutput[];
-  clearCache(): void;
-  keys(): string[];
-  getMemoryStats(): string;
 }
 
 export interface HydrateResults {
@@ -1447,8 +1372,12 @@ export interface MinifyJsResult {
 export type ModuleMap = Map<string, Module>;
 
 /**
- * Module gets serialized/parsed as JSON
- * cannot use Map or Set
+ * Stencil's Intermediate Representation (IR) of a module, bundling together
+ * various pieces of information like the classes declared within it, the path
+ * to the original source file, HTML tag names defined in the file, and so on.
+ *
+ * Note that this gets serialized/parsed as JSON and therefore cannot be a
+ * `Map` or a `Set`.
  */
 export interface Module {
   cmps: ComponentCompilerMeta[];
@@ -1652,48 +1581,86 @@ export type ComponentRuntimeMetaCompact = [
   ComponentRuntimeHostListener[]?
 ];
 
+/**
+ * Runtime metadata for a Stencil component
+ */
 export interface ComponentRuntimeMeta {
+  /**
+   * This number is used to hold a series of bitflags for various features we
+   * support on components. The flags which this value is intended to store are
+   * documented in the {@link CMP_FLAGS} enum.
+   */
   $flags$: number;
+  /**
+   * Just what it says on the tin - the tag name for the component, as set in
+   * the `@Component` decorator.
+   */
   $tagName$: string;
+  /**
+   * A map of the component's members, which could include fields decorated
+   * with `@Prop`, `@State`, etc as well as methods.
+   */
   $members$?: ComponentRuntimeMembers;
+  /**
+   * Information about listeners on the component.
+   */
   $listeners$?: ComponentRuntimeHostListener[];
-  $attrsToReflect$?: [string, string][];
+  /**
+   * Tuples containing information about `@Prop` fields on the component which
+   * are set to be reflected (i.e. kept in sync) as HTML attributes when
+   * updated.
+   */
+  $attrsToReflect$?: ComponentRuntimeReflectingAttr[];
+  /**
+   * Information about which class members have watchers attached on the component.
+   */
   $watchers$?: ComponentConstructorWatchers;
+  /**
+   * A bundle ID used for lazy loading.
+   */
   $lazyBundleId$?: string;
 }
 
+/**
+ * A mapping of the names of members on the component to some runtime-specific
+ * information about them.
+ */
 export interface ComponentRuntimeMembers {
   [memberName: string]: ComponentRuntimeMember;
 }
 
-export type ComponentRuntimeMember = [
-  /**
-   * flags data
-   */
-  number,
+/**
+ * A tuple with information about a class member that's relevant at runtime.
+ * The fields are:
+ *
+ * 1. A number used to hold bitflags for component members. The bit flags which
+ * this is intended to store are documented in the {@link MEMBER_FLAGS} enum.
+ * 2. The attribute name to observe.
+ */
+export type ComponentRuntimeMember = [number, string?];
 
-  /**
-   * attribute name to observe
-   */
-  string?
-];
+/**
+ * A tuple holding information about a host listener which is relevant at
+ * runtime. The field are:
+ *
+ * 1. A number used to hold bitflags for listeners. The bit flags which this is
+ * intended to store are documented in the {@link LISTENER_FLAGS} enum.
+ * 2. The event name.
+ * 3. The method name.
+ */
+export type ComponentRuntimeHostListener = [number, string, string];
 
-export type ComponentRuntimeHostListener = [
-  /**
-   * event flags
-   */
-  number,
-
-  /**
-   * event name,
-   */
-  string,
-
-  /**
-   * event method,
-   */
-  string
-];
+/**
+ * A tuple containing information about props which are "reflected" at runtime,
+ * meaning that HTML attributes on the component instance are kept in sync with
+ * the prop value.
+ *
+ * The fields are:
+ *
+ * 1. the prop name
+ * 2. the prop attribute.
+ */
+export type ComponentRuntimeReflectingAttr = [string, string | undefined];
 
 export type ModeBundleId = ModeBundleIds | string;
 
@@ -2010,9 +1977,9 @@ export interface CssImportData {
   srcImport: string;
   updatedImport?: string;
   url: string;
-  filePath?: string;
+  filePath: string;
   altFilePath?: string;
-  styleText?: string;
+  styleText?: string | null;
 }
 
 export interface CssToEsmImportData {
@@ -2022,6 +1989,9 @@ export interface CssToEsmImportData {
   filePath: string;
 }
 
+/**
+ * Input CSS to be transformed into ESM
+ */
 export interface TransformCssToEsmInput {
   input: string;
   module?: 'cjs' | 'esm' | string;
@@ -2106,6 +2076,9 @@ export interface Url {
 
 declare global {
   namespace jest {
+    /* eslint-disable-next-line @typescript-eslint/no-unused-vars --
+     * these type params need to be here for compatibility with Jest, but we aren't using them for anything
+     */
     interface Matchers<R, T> {
       /**
        * Compares HTML, but first normalizes the HTML so all
@@ -2428,12 +2401,30 @@ export interface NewSpecPageOptions {
   strictBuild?: boolean;
 }
 
+/**
+ * A record of `TypesMemberNameData` entities.
+ *
+ * Each key in this record is intended to be the path to a file that declares one or more types used by a component.
+ * However, this is not enforced by the type system - users of this interface should not make any assumptions regarding
+ * the format of the path used as a key (relative vs. absolute)
+ */
 export interface TypesImportData {
   [key: string]: TypesMemberNameData[];
 }
 
+/**
+ * A type describing how Stencil may alias an imported type to avoid naming collisions when performing operations such
+ * as generating `components.d.ts` files.
+ */
 export interface TypesMemberNameData {
+  /**
+   * The name of the type as it's used within a file.
+   */
   localName: string;
+  /**
+   * An alias that Stencil may apply to the `localName` to avoid naming collisions. This name does not appear in the
+   * file that is using `localName`.
+   */
   importName?: string;
 }
 
@@ -2578,24 +2569,26 @@ export type TelemetryCallback = (...args: any[]) => void | Promise<void>;
  * The model for the data that's tracked.
  */
 export interface TrackableData {
-  yarn: boolean;
-  component_count?: number;
   arguments: string[];
-  targets: string[];
-  task: TaskCommand;
-  duration_ms: number;
+  build: string;
+  component_count?: number;
+  config: Config;
+  cpu_model: string | undefined;
+  duration_ms: number | undefined;
+  has_app_pwa_config: boolean;
+  is_browser_env: boolean;
+  os_name: string | undefined;
+  os_version: string | undefined;
   packages: string[];
   packages_no_versions?: string[];
-  os_name: string;
-  os_version: string;
-  cpu_model: string;
-  typescript: string;
   rollup: string;
+  stencil: string;
   system: string;
   system_major?: string;
-  build: string;
-  stencil: string;
-  has_app_pwa_config: boolean;
+  targets: string[];
+  task: TaskCommand | null;
+  typescript: string;
+  yarn: boolean;
 }
 
 /**

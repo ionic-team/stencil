@@ -1,4 +1,4 @@
-import { Component, Build, Env } from '@stencil/core';
+import { Build, Component, Env } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
 describe('globals', () => {
@@ -7,6 +7,7 @@ describe('globals', () => {
   })
   class CmpA {}
 
+  // eslint-disable-next-line jest/expect-expect -- there's not a great way to `expect()` that `raf()` and `setTimeout()` do not throw here
   it('should resolve raf and setTimeout', async () => {
     const page = await newSpecPage({
       components: [CmpA],

@@ -9,7 +9,7 @@ describe('shadow-dom-array', () => {
   });
   afterEach(tearDownDom);
 
-  it('renders children', async (done) => {
+  it('renders children', (done) => {
     let r = app.querySelector('shadow-dom-array');
     expect(r.shadowRoot.children.length).toBe(1);
     expect(r.shadowRoot.children[0].textContent.trim()).toBe('0');

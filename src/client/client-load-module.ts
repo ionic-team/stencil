@@ -1,6 +1,7 @@
-import type * as d from '../declarations';
 import { BUILD } from '@app-data';
-import { consoleError, consoleDevError } from './client-log';
+
+import type * as d from '../declarations';
+import { consoleDevError, consoleError } from './client-log';
 
 export const cmpModules = /*@__PURE__*/ new Map<string, { [exportName: string]: d.ComponentConstructor }>();
 
@@ -22,7 +23,9 @@ export const loadModule = (
   if (module) {
     return module[exportName];
   }
+  /*!__STENCIL_STATIC_IMPORT_SWITCH__*/
   return import(
+    /* @vite-ignore */
     /* webpackInclude: /\.entry\.js$/ */
     /* webpackExclude: /\.system\.entry\.js$/ */
     /* webpackMode: "lazy" */

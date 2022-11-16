@@ -1,19 +1,21 @@
-import type * as d from '../../../declarations';
+import { isRemoteUrl, isString, noop, normalizePath } from '@utils';
 import { basename, resolve } from 'path';
-import { isRemoteUrl, isString, normalizePath, noop } from '@utils';
-import { fetchUrlSync } from '../fetch/fetch-module-sync';
-import { getCurrentDirectory, IS_CASE_SENSITIVE_FILE_NAMES, IS_WEB_WORKER_ENV } from '../environment';
-import { patchTypeScriptResolveModule } from './typescript-resolve-module';
 import ts from 'typescript';
+
+import type * as d from '../../../declarations';
+import { getCurrentDirectory, IS_CASE_SENSITIVE_FILE_NAMES, IS_WEB_WORKER_ENV } from '../environment';
+import { fetchUrlSync } from '../fetch/fetch-module-sync';
+import { InMemoryFileSystem } from '../in-memory-fs';
+import { patchTypeScriptResolveModule } from './typescript-resolve-module';
 
 export const patchTsSystemFileSystem = (
   config: d.Config,
-  stencilSys: d.CompilerSystem,
-  inMemoryFs: d.InMemoryFileSystem,
+  compilerSys: d.CompilerSystem,
+  inMemoryFs: InMemoryFileSystem,
   tsSys: ts.System
-) => {
+): ts.System => {
   const realpath = (path: string) => {
-    const rp = stencilSys.realpathSync(path);
+    const rp = compilerSys.realpathSync(path);
     if (isString(rp)) {
       return rp;
     }
@@ -22,7 +24,7 @@ export const patchTsSystemFileSystem = (
 
   const getAccessibleFileSystemEntries = (path: string) => {
     try {
-      const entries = stencilSys.readDirSync(path || '.').sort();
+      const entries = compilerSys.readDirSync(path || '.').sort();
       const files: string[] = [];
       const directories: string[] = [];
 
@@ -48,7 +50,7 @@ export const patchTsSystemFileSystem = (
   };
 
   tsSys.createDirectory = (p) => {
-    stencilSys.createDirSync(p, { recursive: true });
+    compilerSys.createDirSync(p, { recursive: true });
   };
 
   tsSys.directoryExists = (p) => {
@@ -56,7 +58,7 @@ export const patchTsSystemFileSystem = (
     return s.isDirectory;
   };
 
-  tsSys.exit = stencilSys.exit;
+  tsSys.exit = compilerSys.exit;
 
   tsSys.fileExists = (p) => {
     let filePath = p;
@@ -69,12 +71,12 @@ export const patchTsSystemFileSystem = (
     return !!(s && s.isFile);
   };
 
-  tsSys.getCurrentDirectory = stencilSys.getCurrentDirectory;
+  tsSys.getCurrentDirectory = compilerSys.getCurrentDirectory;
 
-  tsSys.getExecutingFilePath = stencilSys.getCompilerExecutingPath;
+  tsSys.getExecutingFilePath = compilerSys.getCompilerExecutingPath;
 
   tsSys.getDirectories = (p) => {
-    const items = stencilSys.readDirSync(p);
+    const items = compilerSys.readDirSync(p);
     return items.filter((itemPath) => {
       const s = inMemoryFs.statSync(itemPath);
       return !!(s && s.exists && s.isDirectory);
@@ -82,7 +84,8 @@ export const patchTsSystemFileSystem = (
   };
 
   tsSys.readDirectory = (path, extensions, exclude, include, depth) => {
-    const cwd = stencilSys.getCurrentDirectory();
+    const cwd = compilerSys.getCurrentDirectory();
+    // TODO(STENCIL-344): Replace `matchFiles` with a function that is publicly exposed
     return (ts as any).matchFiles(
       path,
       extensions,
@@ -125,9 +128,9 @@ export const patchTsSystemFileSystem = (
   return tsSys;
 };
 
-const patchTsSystemWatch = (stencilSys: d.CompilerSystem, tsSys: ts.System) => {
+const patchTsSystemWatch = (compilerSystem: d.CompilerSystem, tsSys: ts.System) => {
   tsSys.watchDirectory = (p, cb, recursive) => {
-    const watcher = stencilSys.watchDirectory(
+    const watcher = compilerSystem.watchDirectory(
       p,
       (filePath) => {
         cb(filePath);
@@ -142,7 +145,7 @@ const patchTsSystemWatch = (stencilSys: d.CompilerSystem, tsSys: ts.System) => {
   };
 
   tsSys.watchFile = (p, cb) => {
-    const watcher = stencilSys.watchFile(p, (filePath, eventKind) => {
+    const watcher = compilerSystem.watchFile(p, (filePath, eventKind) => {
       if (eventKind === 'fileAdd') {
         cb(filePath, ts.FileWatcherEventKind.Created);
       } else if (eventKind === 'fileUpdate') {
@@ -159,7 +162,7 @@ const patchTsSystemWatch = (stencilSys: d.CompilerSystem, tsSys: ts.System) => {
   };
 };
 
-export const patchTypescript = (config: d.Config, inMemoryFs: d.InMemoryFileSystem) => {
+export const patchTypescript = (config: d.Config, inMemoryFs: InMemoryFileSystem) => {
   if (!(ts as any).__patched) {
     if (config.sys) {
       patchTsSystemFileSystem(config, config.sys, inMemoryFs, ts.sys);

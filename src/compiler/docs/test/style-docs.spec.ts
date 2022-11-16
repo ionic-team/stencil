@@ -1,4 +1,5 @@
 import type * as d from '@stencil/core/declarations';
+
 import { parseStyleDocs } from '../style-docs';
 
 describe('style-docs', () => {
@@ -129,7 +130,7 @@ describe('style-docs', () => {
   });
 
   it('null styleText', () => {
-    const styleText = null;
+    const styleText: null = null;
     parseStyleDocs(styleDocs, styleText);
     expect(styleDocs).toEqual([]);
   });

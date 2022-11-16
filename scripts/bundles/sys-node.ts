@@ -1,16 +1,17 @@
-import fs from 'fs-extra';
-import { join } from 'path';
-import webpack from 'webpack';
-import { minify } from 'terser';
 import rollupCommonjs from '@rollup/plugin-commonjs';
 import rollupResolve from '@rollup/plugin-node-resolve';
-import type { BuildOptions } from '../utils/options';
+import fs from 'fs-extra';
+import { join } from 'path';
 import type { RollupOptions } from 'rollup';
-import { relativePathPlugin } from './plugins/relative-path-plugin';
+import { minify } from 'terser';
+import webpack from 'webpack';
+
+import { getBanner } from '../utils/banner';
+import type { BuildOptions } from '../utils/options';
+import { writePkgJson } from '../utils/write-pkg-json';
 import { aliasPlugin } from './plugins/alias-plugin';
 import { prettyMinifyPlugin } from './plugins/pretty-minify';
-import { writePkgJson } from '../utils/write-pkg-json';
-import { getBanner } from '../utils/banner';
+import { relativePathPlugin } from './plugins/relative-path-plugin';
 
 export async function sysNode(opts: BuildOptions) {
   const inputDir = join(opts.buildDir, 'sys', 'node');

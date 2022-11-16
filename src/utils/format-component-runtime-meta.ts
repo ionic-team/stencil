@@ -8,6 +8,14 @@ export const formatLazyBundleRuntimeMeta = (
   return [bundleId, cmps.map((cmp) => formatComponentRuntimeMeta(cmp, true))];
 };
 
+/**
+ * Transform metadata about a component from the compiler to a compact form for
+ * use at runtime.
+ *
+ * @param compilerMeta component metadata gathered during compilation
+ * @param includeMethods include methods in the component's members or not
+ * @returns a compact format for component metadata, intended for runtime use
+ */
 export const formatComponentRuntimeMeta = (
   compilerMeta: d.ComponentCompilerMeta,
   includeMethods: boolean
@@ -186,7 +194,7 @@ const computeListenerFlags = (listener: d.ComponentCompilerListener) => {
 
 const trimFalsy = (data: any): any => {
   const arr = data as any[];
-  for (var i = arr.length - 1; i >= 0; i--) {
+  for (let i = arr.length - 1; i >= 0; i--) {
     if (arr[i]) {
       break;
     }

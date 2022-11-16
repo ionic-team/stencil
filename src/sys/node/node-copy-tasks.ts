@@ -1,8 +1,9 @@
-import type * as d from '../../declarations';
 import { buildError, catchError, flatOne, isGlob, normalizePath } from '@utils';
-import { copyFile, mkdir, readdir, stat } from './node-fs-promisify';
-import path from 'path';
 import glob from 'glob';
+import path from 'path';
+
+import type * as d from '../../declarations';
+import { copyFile, mkdir, readdir, stat } from './node-fs-promisify';
 
 export async function nodeCopyTasks(copyTasks: Required<d.CopyTask>[], srcDir: string) {
   const results: d.CopyResults = {
@@ -36,7 +37,7 @@ export async function nodeCopyTasks(copyTasks: Required<d.CopyTask>[], srcDir: s
 
       await Promise.all(tasks.map((copyTask) => copyFile(copyTask.src, copyTask.dest)));
     }
-  } catch (e) {
+  } catch (e: any) {
     catchError(results.diagnostics, e);
   }
 
@@ -106,7 +107,9 @@ async function processCopyTask(results: d.CopyResults, allCopyTasks: d.CopyTask[
   } catch (e) {
     if (copyTask.warn !== false) {
       const err = buildError(results.diagnostics);
-      err.messageText = e.message;
+      if (e instanceof Error) {
+        err.messageText = e.message;
+      }
     }
   }
 }
@@ -126,7 +129,7 @@ async function processCopyTaskDirectory(results: d.CopyResults, allCopyTasks: d.
         await processCopyTask(results, allCopyTasks, subCopyTask);
       })
     );
-  } catch (e) {
+  } catch (e: any) {
     catchError(results.diagnostics, e);
   }
 }

@@ -1,4 +1,4 @@
-import { Component, Element, Host, Method, Prop, Watch, h, forceUpdate } from '@stencil/core';
+import { Component, Element, forceUpdate, h, Host, Method, Prop, Watch } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
 describe('lifecycle sync', () => {
@@ -299,8 +299,8 @@ describe('lifecycle sync', () => {
 
     @Component({ tag: 'cmp-root' })
     class CmpRoot {
-      @Prop() value = 100;
-      @Prop() value2 = 100;
+      @Prop({ mutable: true }) value = 100;
+      @Prop({ mutable: true }) value2 = 100;
 
       @Method()
       next() {

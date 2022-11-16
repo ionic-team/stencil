@@ -1,31 +1,46 @@
+import { normalizePath, unique } from '@utils';
+import { dirname, isAbsolute, join, relative } from 'path';
+import ts from 'typescript';
+
 import type * as d from '../../../declarations';
 import { addComponentMetaStatic } from '../add-component-meta-static';
-import { dirname, isAbsolute, join, relative } from 'path';
-import { normalizePath, unique } from '@utils';
-import { parseStaticMethods } from './methods';
-import { parseStaticListeners } from './listeners';
+import { setComponentBuildConditionals } from '../component-build-conditionals';
+import { getComponentTagName, getStaticValue, isInternal, isStaticGetter, serializeSymbol } from '../transform-utils';
+import { parseCallExpression } from './call-expression';
 import { parseClassMethods } from './class-methods';
 import { parseStaticElementRef } from './element-ref';
 import { parseStaticEncapsulation, parseStaticShadowDelegatesFocus } from './encapsulation';
 import { parseStaticEvents } from './events';
-import { getComponentTagName, getStaticValue, isInternal, isStaticGetter, serializeSymbol } from '../transform-utils';
+import { parseStaticListeners } from './listeners';
+import { parseStaticMethods } from './methods';
 import { parseStaticProps } from './props';
 import { parseStaticStates } from './states';
-import { parseStaticWatchers } from './watchers';
-import { parseStaticStyles } from './styles';
-import { parseCallExpression } from './call-expression';
 import { parseStringLiteral } from './string-literal';
-import { setComponentBuildConditionals } from '../component-build-conditionals';
-import ts from 'typescript';
+import { parseStaticStyles } from './styles';
+import { parseStaticWatchers } from './watchers';
 
+/**
+ * Given an instance of TypeScript's Intermediate Representation (IR) for a
+ * class declaration ({@see ts.ClassDeclaration}) which represents a Stencil
+ * component class declaration, parse and format various pieces of data about
+ * static class members which we use in the compilation process
+ *
+ * @param compilerCtx the current compiler context
+ * @param typeChecker a TypeScript type checker instance
+ * @param cmpNode the TypeScript class declaration for the component
+ * @param moduleFile Stencil's IR for a module, used here as an out param
+ * @param transformOpts options which control various aspects of the
+ * transformation
+ * @returns the TypeScript class declaration IR instance with which the
+ * function was called
+ */
 export const parseStaticComponentMeta = (
   compilerCtx: d.CompilerCtx,
   typeChecker: ts.TypeChecker,
   cmpNode: ts.ClassDeclaration,
   moduleFile: d.Module,
-  nodeMap: d.NodeMap,
   transformOpts?: d.TransformOptions
-) => {
+): ts.ClassDeclaration => {
   if (cmpNode.members == null) {
     return cmpNode;
   }
@@ -150,7 +165,7 @@ export const parseStaticComponentMeta = (
   moduleFile.cmps.push(cmp);
 
   // add to node map
-  nodeMap.set(cmpNode, cmp);
+  compilerCtx.nodeMap.set(cmpNode, cmp);
 
   return cmpNode;
 };

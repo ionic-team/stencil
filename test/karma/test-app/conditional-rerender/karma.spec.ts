@@ -9,7 +9,9 @@ describe('conditional-rerender', function () {
   });
   afterEach(tearDownDom);
 
-  it('contains a button as a child', async (done) => {
+  it('contains a button as a child', (done) => {
+    // the component has its own `setTimeout` call, therefore we must wait for that to finish using
+    // our own `setTimeout` call with a larger timeout value
     setTimeout(() => {
       const main = app.querySelector('main');
 

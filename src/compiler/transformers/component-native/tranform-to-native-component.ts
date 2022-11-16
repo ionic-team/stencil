@@ -1,61 +1,13 @@
-import type * as d from '../../../declarations';
-import { addImports } from '../add-imports';
-import { addLegacyApis } from '../core-runtime-apis';
-import { addModuleMetadataProxies } from '../add-component-meta-proxy';
-import { getComponentMeta, getModuleFromSourceFile, getScriptTarget } from '../transform-utils';
-import { catchError, loadTypeScriptDiagnostics } from '@utils';
-import { defineCustomElement } from '../define-custom-element';
-import { STENCIL_CORE_ID } from '../../bundle/entry-alias-ids';
-import { updateNativeComponentClass } from './native-component';
-import { updateStyleImports } from '../style-imports';
 import ts from 'typescript';
 
-export const transformToNativeComponentText = (
-  config: d.Config,
-  compilerCtx: d.CompilerCtx,
-  buildCtx: d.BuildCtx,
-  cmp: d.ComponentCompilerMeta,
-  inputJsText: string
-) => {
-  let outputText: string = null;
-
-  try {
-    const tsCompilerOptions: ts.CompilerOptions = {
-      module: ts.ModuleKind.ESNext,
-      target: getScriptTarget(),
-    };
-
-    const transformOpts: d.TransformOptions = {
-      coreImportPath: STENCIL_CORE_ID,
-      componentExport: null,
-      componentMetadata: null,
-      currentDirectory: config.sys.getCurrentDirectory(),
-      proxy: null,
-      style: 'static',
-      styleImportData: 'queryparams',
-    };
-
-    const transpileOpts: ts.TranspileOptions = {
-      compilerOptions: tsCompilerOptions,
-      fileName: cmp.jsFilePath,
-      transformers: {
-        after: [nativeComponentTransform(compilerCtx, transformOpts)],
-      },
-    };
-
-    const transpileOutput = ts.transpileModule(inputJsText, transpileOpts);
-
-    buildCtx.diagnostics.push(...loadTypeScriptDiagnostics(transpileOutput.diagnostics));
-
-    if (!buildCtx.hasError && typeof transpileOutput.outputText === 'string') {
-      outputText = transpileOutput.outputText;
-    }
-  } catch (e) {
-    catchError(buildCtx.diagnostics, e);
-  }
-
-  return outputText;
-};
+import type * as d from '../../../declarations';
+import { addModuleMetadataProxies } from '../add-component-meta-proxy';
+import { addImports } from '../add-imports';
+import { addLegacyApis } from '../core-runtime-apis';
+import { defineCustomElement } from '../define-custom-element';
+import { updateStyleImports } from '../style-imports';
+import { getComponentMeta, getModuleFromSourceFile } from '../transform-utils';
+import { updateNativeComponentClass } from './native-component';
 
 export const nativeComponentTransform = (
   compilerCtx: d.CompilerCtx,

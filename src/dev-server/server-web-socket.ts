@@ -1,7 +1,8 @@
-import type * as d from '../declarations';
+import { noop } from '@utils';
 import type { Server } from 'http';
 import * as ws from 'ws';
-import { noop } from '@utils';
+
+import type * as d from '../declarations';
 
 export function createWebSocket(
   httpServer: Server,
@@ -13,8 +14,11 @@ export function createWebSocket(
 
   const wsServer: ws.Server = new ws.Server(wsConfig);
 
-  function heartbeat(this: DevWS) {
-    this.isAlive = true;
+  function heartbeat(this: ws) {
+    // we need to coerce the `ws` type to our custom `DevWS` type here, since
+    // this function is going to be passed in to `ws.on('pong'` which expects
+    // to be passed a functon where `this` is bound to `ws`.
+    (this as DevWS).isAlive = true;
   }
 
   wsServer.on('connection', (ws: DevWS) => {
@@ -37,7 +41,7 @@ export function createWebSocket(
   });
 
   const pingInternval = setInterval(() => {
-    wsServer.clients.forEach((ws: DevWS) => {
+    (wsServer.clients as Set<DevWS>).forEach((ws: DevWS) => {
       if (!ws.isAlive) {
         return ws.close(1000);
       }

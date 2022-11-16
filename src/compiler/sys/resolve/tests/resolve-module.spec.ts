@@ -2,8 +2,8 @@ import {
   getModuleId,
   getPackageDirPath,
   isLocalModule,
-  isStencilCoreImport,
   isNodeModulePath,
+  isStencilCoreImport,
   setPackageVersionByContent,
 } from '../resolve-utils';
 

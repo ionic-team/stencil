@@ -1,9 +1,10 @@
-import type * as d from '../../../declarations';
-import { isOutputTargetDocsJson } from '../../output-targets/output-utils';
 import { join } from 'path';
 
+import type * as d from '../../../declarations';
+import { isOutputTargetDocsJson } from '../../output-targets/output-utils';
+
 export const generateJsonDocs = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   docsData: d.JsonDocs,
   outputTargets: d.OutputTarget[]

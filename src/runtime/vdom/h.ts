@@ -7,10 +7,11 @@
  * Modified for Stencil's compiler and vdom
  */
 
-import type * as d from '../../declarations';
 import { BUILD } from '@app-data';
 import { consoleDevError, consoleDevWarn } from '@platform';
 import { isComplexType } from '@utils';
+
+import type * as d from '../../declarations';
 
 // const stack: any[] = [];
 
@@ -22,7 +23,7 @@ export const h = (nodeName: any, vnodeData: any, ...children: d.ChildType[]): d.
   let slotName: string = null;
   let simple = false;
   let lastSimple = false;
-  let vNodeChildren: d.VNode[] = [];
+  const vNodeChildren: d.VNode[] = [];
   const walk = (c: any[]) => {
     for (let i = 0; i < c.length; i++) {
       child = c[i];
@@ -163,16 +164,22 @@ const convertToPrivate = (node: d.ChildNode): d.VNode => {
   return vnode;
 };
 
-const validateInputProperties = (vnodeData: any) => {
-  const props = Object.keys(vnodeData);
-  const typeIndex = props.indexOf('type');
-  const minIndex = props.indexOf('min');
-  const maxIndex = props.indexOf('max');
-  const stepIndex = props.indexOf('min');
+/**
+ * Validates the ordering of attributes on an input element
+ * @param inputElm the element to validate
+ */
+const validateInputProperties = (inputElm: HTMLInputElement): void => {
+  const props = Object.keys(inputElm);
+
   const value = props.indexOf('value');
   if (value === -1) {
     return;
   }
+
+  const typeIndex = props.indexOf('type');
+  const minIndex = props.indexOf('min');
+  const maxIndex = props.indexOf('max');
+  const stepIndex = props.indexOf('step');
   if (value < typeIndex || value < minIndex || value < maxIndex || value < stepIndex) {
     consoleDevWarn(`The "value" prop of <input> should be set after "min", "max", "type" and "step"`);
   }

@@ -1,10 +1,11 @@
+import { isBoolean } from '@utils';
+
 import type * as d from '../../../declarations';
 import { COPY, isOutputTargetDistCustomElementsBundle } from '../../output-targets/output-utils';
 import { getAbsolutePath } from '../config-utils';
-import { isBoolean } from '@utils';
 import { validateCopy } from '../validate-copy';
 
-export const validateCustomElementBundle = (config: d.Config, userOutputs: d.OutputTarget[]) => {
+export const validateCustomElementBundle = (config: d.ValidatedConfig, userOutputs: d.OutputTarget[]) => {
   return userOutputs.filter(isOutputTargetDistCustomElementsBundle).reduce((arr, o) => {
     const outputTarget = {
       ...o,

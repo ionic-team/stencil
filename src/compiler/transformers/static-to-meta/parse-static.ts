@@ -1,12 +1,13 @@
+import { normalizePath } from '@utils';
+import { basename, dirname, join } from 'path';
+import ts from 'typescript';
+
 import type * as d from '../../../declarations';
 import { createModule, getModule } from '../../transpile/transpiled-module';
-import { dirname, basename, join } from 'path';
-import { normalizePath } from '@utils';
 import { parseCallExpression } from './call-expression';
-import { parseModuleImport } from './import';
 import { parseStaticComponentMeta } from './component';
+import { parseModuleImport } from './import';
 import { parseStringLiteral } from './string-literal';
-import ts from 'typescript';
 
 export const updateModule = (
   config: d.Config,
@@ -44,7 +45,7 @@ export const updateModule = (
 
   const visitNode = (node: ts.Node) => {
     if (ts.isClassDeclaration(node)) {
-      parseStaticComponentMeta(compilerCtx, typeChecker, node, moduleFile, compilerCtx.nodeMap);
+      parseStaticComponentMeta(compilerCtx, typeChecker, node, moduleFile);
       return;
     } else if (ts.isImportDeclaration(node)) {
       parseModuleImport(config, compilerCtx, buildCtx, moduleFile, srcDirPath, node, true);

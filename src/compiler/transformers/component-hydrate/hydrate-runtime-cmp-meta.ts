@@ -1,8 +1,9 @@
+import { CMP_FLAGS, formatComponentRuntimeMeta } from '@utils';
+import ts from 'typescript';
+
 import type * as d from '../../../declarations';
 import { addStaticStyleGetterWithinClass } from '../add-static-style';
-import { CMP_FLAGS, formatComponentRuntimeMeta } from '@utils';
 import { convertValueToLiteral, createStaticGetter } from '../transform-utils';
-import ts from 'typescript';
 
 export const addHydrateRuntimeCmpMeta = (classMembers: ts.ClassElement[], cmp: d.ComponentCompilerMeta) => {
   const compactMeta: d.ComponentRuntimeMetaCompact = formatComponentRuntimeMeta(cmp, true);
@@ -29,11 +30,11 @@ const fakeBundleIds = (_cmp: d.ComponentCompilerMeta) => {
   return '-';
 };
 
-const getHydrateAttrsToReflect = (cmp: d.ComponentCompilerMeta) => {
-  return cmp.properties.reduce((attrs, prop) => {
+const getHydrateAttrsToReflect = (cmp: d.ComponentCompilerMeta): d.ComponentRuntimeReflectingAttr[] => {
+  return cmp.properties.reduce((attrs: d.ComponentRuntimeReflectingAttr[], prop: d.ComponentCompilerProperty) => {
     if (prop.reflect) {
       attrs.push([prop.name, prop.attribute]);
     }
     return attrs;
-  }, [] as [string, string][]);
+  }, []);
 };

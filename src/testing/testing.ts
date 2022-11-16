@@ -1,23 +1,24 @@
+import { start } from '@stencil/core/dev-server';
 import type {
-  CompilerBuildResults,
   Compiler,
+  CompilerBuildResults,
   CompilerWatcher,
-  Config,
   DevServer,
   E2EProcessEnv,
   OutputTargetWww,
   Testing,
   TestingRunOptions,
+  ValidatedConfig,
 } from '@stencil/core/internal';
-import { getAppScriptUrl, getAppStyleUrl } from './testing-utils';
 import { hasError } from '@utils';
+import type * as puppeteer from 'puppeteer';
+
 import { runJest } from './jest/jest-runner';
 import { runJestScreenshot } from './jest/jest-screenshot';
 import { startPuppeteerBrowser } from './puppeteer/puppeteer-browser';
-import { start } from '@stencil/core/dev-server';
-import type * as puppeteer from 'puppeteer';
+import { getAppScriptUrl, getAppStyleUrl } from './testing-utils';
 
-export const createTesting = async (config: Config): Promise<Testing> => {
+export const createTesting = async (config: ValidatedConfig): Promise<Testing> => {
   config = setupTestingConfig(config);
 
   const { createCompiler } = require('../compiler/stencil.js');
@@ -41,7 +42,8 @@ export const createTesting = async (config: Config): Promise<Testing> => {
         return false;
       }
 
-      env = process.env;
+      // during E2E tests, we can safely assume that the current environment is a `E2EProcessEnv`
+      env = process.env as E2EProcessEnv;
 
       if (opts.e2e) {
         msg.push('e2e');
@@ -183,29 +185,37 @@ export const createTesting = async (config: Config): Promise<Testing> => {
   };
 };
 
-function setupTestingConfig(config: Config) {
-  config.buildEs5 = false;
-  config.devMode = true;
-  config.minifyCss = false;
-  config.minifyJs = false;
-  config.hashFileNames = false;
-  config.validateTypes = false;
-  config._isTesting = true;
-  config.buildDist = true;
+/**
+ * Create a Stencil configuration for testing purposes.
+ *
+ * This function accepts an internal, validated configuration entity and modifies fields on the object to be more
+ * conducive to testing.
+ *
+ * @param validatedConfig the configuration to modify
+ * @returns the modified testing configuration
+ */
+function setupTestingConfig(validatedConfig: ValidatedConfig): ValidatedConfig {
+  validatedConfig.buildEs5 = false;
+  validatedConfig.devMode = true;
+  validatedConfig.minifyCss = false;
+  validatedConfig.minifyJs = false;
+  validatedConfig.hashFileNames = false;
+  validatedConfig.validateTypes = false;
+  validatedConfig._isTesting = true;
+  validatedConfig.buildDist = true;
 
-  config.flags = config.flags || {};
-  config.flags.serve = false;
-  config.flags.open = false;
+  validatedConfig.flags.serve = false;
+  validatedConfig.flags.open = false;
 
-  config.outputTargets.forEach((o) => {
+  validatedConfig.outputTargets.forEach((o) => {
     if (o.type === 'www') {
       o.serviceWorker = null;
     }
   });
 
-  if (config.flags.args.includes('--watchAll')) {
-    config.watch = true;
+  if (validatedConfig.flags.args.includes('--watchAll')) {
+    validatedConfig.watch = true;
   }
 
-  return config;
+  return validatedConfig;
 }

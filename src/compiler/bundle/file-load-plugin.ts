@@ -1,8 +1,9 @@
-import type * as d from '../../declarations';
 import { normalizeFsPath } from '@utils';
 import type { Plugin } from 'rollup';
 
-export const fileLoadPlugin = (fs: d.InMemoryFileSystem): Plugin => {
+import { InMemoryFileSystem } from '../sys/in-memory-fs';
+
+export const fileLoadPlugin = (fs: InMemoryFileSystem): Plugin => {
   return {
     name: 'fileLoadPlugin',
 

@@ -1,4 +1,5 @@
 import type * as d from '@stencil/core/declarations';
+
 import { validateRollupConfig } from '../validate-rollup-config';
 
 describe('validateStats', () => {
@@ -17,7 +18,8 @@ describe('validateStats', () => {
       },
     });
   });
-  it('should use default if inputOptions is not provided but outputOptions is', () => {
+
+  it('should set based on inputOptions if provided', () => {
     config.rollupConfig = {
       inputOptions: {
         context: 'window',

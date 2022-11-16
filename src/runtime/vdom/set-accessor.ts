@@ -8,8 +8,9 @@
  */
 
 import { BUILD } from '@app-data';
-import { isComplexType } from '@utils';
 import { isMemberInElement, plt, win } from '@platform';
+import { isComplexType } from '@utils';
+
 import { VNODE_FLAGS, XLINK_NS } from '../runtime-constants';
 
 export const setAccessor = (
@@ -105,7 +106,7 @@ export const setAccessor = (
       if ((isProp || (isComplex && newValue !== null)) && !isSvg) {
         try {
           if (!elm.tagName.includes('-')) {
-            let n = newValue == null ? '' : newValue;
+            const n = newValue == null ? '' : newValue;
 
             // Workaround for Safari, moving the <input> caret when re-assigning the same valued
             if (memberName === 'list') {

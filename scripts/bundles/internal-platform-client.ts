@@ -1,15 +1,16 @@
 import fs from 'fs-extra';
-import { basename, join } from 'path';
-import type { BuildOptions } from '../utils/options';
-import { aliasPlugin } from './plugins/alias-plugin';
-import { replacePlugin } from './plugins/replace-plugin';
-import { reorderCoreStatementsPlugin } from './plugins/reorder-statements';
-import { getBanner } from '../utils/banner';
-import { writePkgJson } from '../utils/write-pkg-json';
-import { rollup, RollupOptions } from 'rollup';
 import glob from 'glob';
-import ts from 'typescript';
+import { basename, join } from 'path';
+import { rollup, RollupOptions } from 'rollup';
 import { minify } from 'terser';
+import ts from 'typescript';
+
+import { getBanner } from '../utils/banner';
+import type { BuildOptions } from '../utils/options';
+import { writePkgJson } from '../utils/write-pkg-json';
+import { aliasPlugin } from './plugins/alias-plugin';
+import { reorderCoreStatementsPlugin } from './plugins/reorder-statements';
+import { replacePlugin } from './plugins/replace-plugin';
 
 export async function internalClient(opts: BuildOptions) {
   const inputClientDir = join(opts.buildDir, 'client');

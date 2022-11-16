@@ -1,8 +1,9 @@
+import { normalizePath } from '@utils';
+import { isAbsolute, resolve } from 'path';
+import ts from 'typescript';
+
 import type * as d from '../../../declarations';
 import { addExternalImport } from '../collections/add-external-import';
-import { isAbsolute, resolve } from 'path';
-import { normalizePath } from '@utils';
-import ts from 'typescript';
 
 export const parseModuleImport = (
   config: d.Config,

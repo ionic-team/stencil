@@ -1,19 +1,20 @@
-import { BuildOptions } from './utils/options';
+import { emptyDir } from 'fs-extra';
+import type { RollupOptions } from 'rollup';
+import { rollup } from 'rollup';
+
 import { cli } from './bundles/cli';
 import { compiler } from './bundles/compiler';
-import { updateDependenciesJson } from './utils/dependencies-json';
-import { createLicense } from './license';
 import { devServer } from './bundles/dev-server';
-import { emptyDir } from 'fs-extra';
 import { internal } from './bundles/internal';
 import { mockDoc } from './bundles/mock-doc';
-import { release } from './release';
 import { screenshot } from './bundles/screenshot';
 import { sysNode, sysNodeExternalBundles } from './bundles/sys-node';
 import { testing } from './bundles/testing';
+import { createLicense } from './license';
+import { release } from './release';
 import { validateBuild } from './test/validate-build';
-import { rollup } from 'rollup';
-import type { RollupOptions } from 'rollup';
+import { updateDependenciesJson } from './utils/dependencies-json';
+import { BuildOptions } from './utils/options';
 
 /**
  * Runner for releasing a new version of Stencil

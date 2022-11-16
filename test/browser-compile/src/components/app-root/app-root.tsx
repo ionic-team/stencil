@@ -183,17 +183,44 @@ export class AppRoot {
       }
 
       this.preview();
-    } catch (e) {
-      this.bundledInput.value = e;
-      if (e.loc && e.loc.file) {
-        this.bundledInput.value += '\n\n\n' + e.loc.file;
-      }
-      if (e.frame) {
-        this.bundledInput.value += '\n\n\n' + e.frame;
+    } catch (e: unknown) {
+      this.bundledInput.value = e.toString();
+
+      if (this.isRollupLogProps(e)) {
+        if (e.loc?.file) {
+          this.bundledInput.value += '\n\n\n' + e.loc.file;
+        }
+
+        if (e.frame) {
+          this.bundledInput.value += '\n\n\n' + e.frame;
+        }
       }
       this.wrap = 'on';
       this.iframe.contentWindow.document.body.innerHTML = '';
     }
+  }
+
+  /**
+   * Type guard to verify the shape of some value that was caught during the bundling process is of type,
+   * `RollupLogProps`, the base type of both `RollupWarning` and `RollupError`.
+   *
+   * At the time of this writing, the only requirement for a `RollupLogProps` entity is for it to have a
+   * `message: string` property.
+   *
+   * @param entity the error that was caught
+   * @returns `true` if the `entity` parameter is of type `RollupLogProps`, `false` otherwise
+   */
+  private isRollupLogProps(entity: unknown): entity is RollupTypes.RollupLogProps {
+    return this.isObjectWithMessage(entity) && typeof entity.message === 'string';
+  }
+
+  /**
+   * Type guard to verify an object has a 'message' field
+   * @param entity the entity to test
+   * @returns `true` if the `entity` parameter matches the type declared in the method signature, `false` otherwise
+   */
+  private isObjectWithMessage(entity: unknown): entity is { message: unknown } {
+    return entity != null && typeof entity === 'object' && entity.hasOwnProperty('message');
   }
 
   preview() {

@@ -1,7 +1,8 @@
-import type * as d from '../declarations';
 import { BUILD, NAMESPACE } from '@app-data';
-import { consoleDevInfo, H, doc, plt, promiseResolve, win } from '@platform';
+import { consoleDevInfo, doc, H, plt, promiseResolve, win } from '@platform';
 import { getDynamicImportFunction } from '@utils';
+
+import type * as d from '../declarations';
 
 export const patchBrowser = (): Promise<d.CustomElementsDefineOptions> => {
   // NOTE!! This fn cannot use async/await!
@@ -21,6 +22,10 @@ export const patchBrowser = (): Promise<d.CustomElementsDefineOptions> => {
 
   if (BUILD.profile && !performance.mark) {
     // not all browsers support performance.mark/measure (Safari 10)
+    // because the mark/measure APIs are designed to write entries to a buffer in the browser that does not exist,
+    // simply stub the implementations out.
+    // TODO(STENCIL-323): Remove this patch when support for older browsers is removed (breaking)
+    // @ts-ignore
     performance.mark = performance.measure = () => {
       /*noop*/
     };

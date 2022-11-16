@@ -1,10 +1,11 @@
-import fs from 'fs-extra';
-import execa from 'execa';
 import color from 'ansi-colors';
-import semver from 'semver';
+import execa from 'execa';
+import fs from 'fs-extra';
 import open from 'open';
-import { BuildOptions } from './options';
 import { join } from 'path';
+import semver from 'semver';
+
+import { BuildOptions } from './options';
 
 export const SEMVER_INCREMENTS: ReadonlyArray<string> = [
   'patch',
@@ -39,7 +40,7 @@ export const isValidVersionInput = (input: string): boolean =>
 /**
  * Determines if the provided `version` is a semver pre-release or not
  * @param version the version string to evaluate
- * @retuns true if the `version` is a pre-release, false otherwise
+ * @returns true if the `version` is a pre-release, false otherwise
  */
 export const isPrereleaseVersion = (version: string): boolean =>
   PRERELEASE_VERSIONS.indexOf(version) !== -1 || Boolean(semver.prerelease(version));
@@ -116,10 +117,19 @@ export async function postGithubRelease(opts: BuildOptions): Promise<void> {
 
   let body = '';
   for (let i = 1; i < 500; i++) {
-    if (lines[i].startsWith('## ')) {
+    const currentLine = lines[i];
+
+    if (currentLine == undefined) {
+      // we don't test this as `!currentLine`, as an empty string is permitted in the changelog
       break;
     }
-    body += lines[i] + '\n';
+
+    const isMajorOrMinorVersionHeader = currentLine.startsWith('# ');
+    const isPatchVersionHeader = currentLine.startsWith('## ');
+    if (isMajorOrMinorVersionHeader || isPatchVersionHeader) {
+      break;
+    }
+    body += currentLine + '\n';
   }
 
   // https://docs.github.com/en/github/administering-a-repository/automation-for-release-forms-with-query-parameters

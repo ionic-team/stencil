@@ -1,7 +1,8 @@
-import type * as d from '../../declarations';
 import { catchError } from '@utils';
-import { getSitemapUrls } from './sitemap-xml';
 import { join } from 'path';
+
+import type * as d from '../../declarations';
+import { getSitemapUrls } from './sitemap-xml';
 
 export const generateRobotsTxt = async (manager: d.PrerenderManager, sitemapResults: d.SitemapXmpResults) => {
   if (manager.prerenderConfig.robotsTxt === null) {
@@ -65,7 +66,7 @@ export const generateRobotsTxt = async (manager: d.PrerenderManager, sitemapResu
     await manager.config.sys.writeFile(results.filePath, results.content);
 
     return results;
-  } catch (e) {
+  } catch (e: any) {
     catchError(manager.diagnostics, e);
     return null;
   }

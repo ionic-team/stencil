@@ -1,18 +1,18 @@
-import fs from 'fs-extra';
 import color from 'ansi-colors';
 import execa from 'execa';
 import Listr, { ListrTask } from 'listr';
+
+import { bundleBuild } from './build';
+import { createLicense } from './license';
+import { validateBuild } from './test/validate-build';
 import { BuildOptions } from './utils/options';
 import {
-  isValidVersionInput,
-  SEMVER_INCREMENTS,
   isPrereleaseVersion,
-  updateChangeLog,
+  isValidVersionInput,
   postGithubRelease,
+  SEMVER_INCREMENTS,
+  updateChangeLog,
 } from './utils/release-utils';
-import { validateBuild } from './test/validate-build';
-import { createLicense } from './license';
-import { bundleBuild } from './build';
 
 /**
  * Runs a litany of tasks used to ensure a safe release of a new version of Stencil
@@ -216,21 +216,6 @@ export function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<string>)
         },
       }
     );
-
-    if (opts.tag !== 'next' && opts.tag !== 'test') {
-      tasks.push({
-        title: 'Also set "next" npm tag on @stencil/core',
-        task: () => {
-          const cmd = 'npm';
-          const cmdArgs = ['dist-tag', 'add', '@stencil/core@' + opts.version, 'next'];
-
-          if (isDryRun) {
-            return console.log(`[dry-run] ${cmd} ${cmdArgs.join(' ')}`);
-          }
-          return execa(cmd, cmdArgs, { cwd: rootDir });
-        },
-      });
-    }
   }
 
   if (opts.isPublishRelease) {

@@ -1,4 +1,5 @@
 import type * as d from '@stencil/core/internal';
+
 import { cstrs, hostRefs, moduleLoaded, styles } from './testing-constants';
 import { flushAll, resetTaskQueue } from './testing-task-queue';
 import { win } from './testing-window';
@@ -27,7 +28,7 @@ export const setPlatformHelpers = (helpers: {
 
 export const cssVarShim: d.CssVarShim = false as any;
 export const supportsListenerOptions = true;
-export const supportsConstructibleStylesheets = false;
+export const supportsConstructableStylesheets = false;
 export const Context: any = {};
 
 export const setSupportsShadowDom = (supports: boolean) => {

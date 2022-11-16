@@ -1,5 +1,7 @@
+import { createDocument, serializeNodeToHtml } from '@stencil/core/mock-doc';
+import { catchError, isFunction, isPromise, isString } from '@utils';
+
 import type * as d from '../../declarations';
-import { catchError, isPromise, isFunction, isString } from '@utils';
 import {
   hasStencilScript,
   inlineExternalStyleSheets,
@@ -7,7 +9,6 @@ import {
   minifyStyleElements,
   removeStencilScripts,
 } from './prerender-optimize';
-import { createDocument, serializeNodeToHtml } from '@stencil/core/mock-doc';
 
 export const generateTemplateHtml = async (
   config: d.Config,
@@ -58,7 +59,7 @@ export const generateTemplateHtml = async (
     if (hydrateOpts.inlineExternalStyleSheets && !isDebug) {
       try {
         await inlineExternalStyleSheets(config.sys, outputTarget.appDir, doc);
-      } catch (e) {
+      } catch (e: any) {
         catchError(diagnostics, e);
       }
     }
@@ -66,7 +67,7 @@ export const generateTemplateHtml = async (
     if (hydrateOpts.minifyScriptElements && !isDebug) {
       try {
         await minifyScriptElements(doc, true);
-      } catch (e) {
+      } catch (e: any) {
         catchError(diagnostics, e);
       }
     }
@@ -75,7 +76,7 @@ export const generateTemplateHtml = async (
       try {
         const baseUrl = new URL(outputTarget.baseUrl, manager.devServerHostUrl);
         await minifyStyleElements(config.sys, outputTarget.appDir, doc, baseUrl, true);
-      } catch (e) {
+      } catch (e: any) {
         catchError(diagnostics, e);
       }
     }
@@ -104,7 +105,7 @@ export const generateTemplateHtml = async (
       html,
       staticSite,
     };
-  } catch (e) {
+  } catch (e: any) {
     catchError(diagnostics, e);
   }
   return undefined;

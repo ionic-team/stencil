@@ -1,5 +1,5 @@
 import type * as d from '../../declarations';
-import { renderCatchError, renderBuildDiagnostic } from './render-utils';
+import { renderBuildDiagnostic, renderCatchError } from './render-utils';
 
 export function runtimeLogging(
   win: Window & typeof globalThis,

@@ -5,7 +5,6 @@ export const parse5Version = '__VERSION:PARSE5__';
 export const rollupVersion = '__VERSION:ROLLUP__';
 export const sizzleVersion = '__VERSION:SIZZLE__';
 export const terserVersion = '__VERSION:TERSER__';
-export const transpilerId = '__BUILDID:TRANSPILE__';
 export const typescriptVersion = '__VERSION:TYPESCRIPT__';
 export const vermoji = '__VERMOJI__';
 export const version = '__VERSION:STENCIL__';

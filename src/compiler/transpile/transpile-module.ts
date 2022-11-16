@@ -1,20 +1,29 @@
+import { isNumber, isString, loadTypeScriptDiagnostics, normalizePath } from '@utils';
+import ts from 'typescript';
+
 import type * as d from '../../declarations';
 import { BuildContext } from '../build/build-ctx';
 import { CompilerContext } from '../build/compiler-ctx';
-import { convertDecoratorsToStatic } from '../transformers/decorators-to-static/convert-decorators';
-import { convertStaticToMeta } from '../transformers/static-to-meta/visitor';
-import { createLogger } from '../sys/logger/console-logger';
 import { getCurrentDirectory } from '../sys/environment';
-import { isNumber, isString, loadTypeScriptDiagnostics, normalizePath } from '@utils';
+import { createLogger } from '../sys/logger/console-logger';
 import { lazyComponentTransform } from '../transformers/component-lazy/transform-lazy-component';
 import { nativeComponentTransform } from '../transformers/component-native/tranform-to-native-component';
+import { convertDecoratorsToStatic } from '../transformers/decorators-to-static/convert-decorators';
+import { convertStaticToMeta } from '../transformers/static-to-meta/visitor';
 import { updateStencilCoreImports } from '../transformers/update-stencil-core-import';
-import ts from 'typescript';
 
 /**
  * Stand-alone compiling of a single string
+ * @param config the Stencil configuration to use in the compilation process
+ * @param input the string to compile
+ * @param transformOpts a configuration object for how the string is compiled
+ * @returns the results of compiling the provided input string
  */
-export const transpileModule = (config: d.Config, input: string, transformOpts: d.TransformOptions) => {
+export const transpileModule = (
+  config: d.Config,
+  input: string,
+  transformOpts: d.TransformOptions
+): d.TranspileModuleResults => {
   if (!config.logger) {
     config = {
       ...config,

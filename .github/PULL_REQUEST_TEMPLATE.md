@@ -47,7 +47,7 @@ GitHub Issue Number: N/A
 
 ## Testing
 
-<!-- Please describe the steps you took to test the changes in this PR. -->
+<!-- Please describe the steps you took to test the changes in this PR. These steps can be programmatic (e.g. unit tests) and/or manual. -->
 
 ## Other information
 

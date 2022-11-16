@@ -1,7 +1,8 @@
 import type * as d from '@stencil/core/declarations';
-import { mockConfig } from '@stencil/core/testing';
-import { validateConfig } from '../validate-config';
+import { mockConfig, mockLoadConfigInit } from '@stencil/core/testing';
 import { buildWarn } from '@utils';
+
+import { validateConfig } from '../validate-config';
 
 describe('validateCustom', () => {
   let userConfig: d.Config;
@@ -24,7 +25,7 @@ describe('validateCustom', () => {
         },
       },
     ];
-    const { diagnostics } = validateConfig(userConfig);
+    const { diagnostics } = validateConfig(userConfig, mockLoadConfigInit());
     expect(diagnostics.length).toBe(1);
   });
 });

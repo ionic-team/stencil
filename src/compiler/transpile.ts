@@ -1,10 +1,11 @@
-import { TranspileOptions, TranspileResults, Config, TransformOptions, TransformCssToEsmInput } from '../declarations';
-import { catchError, getSourceMappingUrlLinker, isString } from '@utils';
-import { getPublicCompilerMeta } from './transformers/add-component-meta-static';
-import { getTranspileCssConfig, getTranspileConfig, getTranspileResults } from './config/transpile-options';
-import { patchTypescript } from './sys/typescript/typescript-sys';
 import { rollupPluginUtils } from '@compiler-deps';
+import { catchError, getInlineSourceMappingUrlLinker, isString } from '@utils';
+
+import { Config, TransformCssToEsmInput, TransformOptions, TranspileOptions, TranspileResults } from '../declarations';
+import { getTranspileConfig, getTranspileCssConfig, getTranspileResults } from './config/transpile-options';
 import { transformCssToEsm, transformCssToEsmSync } from './style/css-to-esm';
+import { patchTypescript } from './sys/typescript/typescript-sys';
+import { getPublicCompilerMeta } from './transformers/add-component-meta-static';
 import { transpileModule } from './transpile/transpile-module';
 
 export const transpile = async (code: string, opts: TranspileOptions = {}) => {
@@ -23,7 +24,7 @@ export const transpile = async (code: string, opts: TranspileOptions = {}) => {
     } else if (results.inputFileExtension === 'json') {
       transpileJson(results);
     }
-  } catch (e) {
+  } catch (e: any) {
     catchError(results.diagnostics, e);
   }
 
@@ -46,7 +47,7 @@ export const transpileSync = (code: string, opts: TranspileOptions = {}) => {
     } else if (results.inputFileExtension === 'json') {
       transpileJson(results);
     }
-  } catch (e) {
+  } catch (e: any) {
     catchError(results.diagnostics, e);
   }
 
@@ -74,10 +75,9 @@ const transpileCode = (
         mapObject.sources = [transpileOpts.file];
         delete mapObject.sourceRoot;
 
-        const mapBase64 = Buffer.from(JSON.stringify(mapObject), 'utf8').toString('base64');
-        const sourceMapInlined = `data:application/json;charset=utf-8;base64,` + mapBase64;
         const sourceMapComment = results.code.lastIndexOf('//#');
-        results.code = results.code.slice(0, sourceMapComment) + getSourceMappingUrlLinker(sourceMapInlined);
+        results.code =
+          results.code.slice(0, sourceMapComment) + getInlineSourceMappingUrlLinker(JSON.stringify(mapObject));
       } catch (e) {
         console.error(e);
       }

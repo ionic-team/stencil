@@ -4,7 +4,7 @@ Date: 2021-07-30
 
 ## Status
 
-accepted
+historical - see [ADR 0015](./0015-jest-27-implementation.md) for updated information
 
 ## Context
 

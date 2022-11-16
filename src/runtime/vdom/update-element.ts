@@ -1,6 +1,7 @@
-import type * as d from '../../declarations';
 import { BUILD } from '@app-data';
 import { EMPTY_OBJ } from '@utils';
+
+import type * as d from '../../declarations';
 import { NODE_TYPE } from '../runtime-constants';
 import { setAccessor } from './set-accessor';
 

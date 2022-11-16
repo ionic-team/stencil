@@ -1,6 +1,7 @@
+import { hasError, normalizePath } from '@utils';
+
 import type * as d from '../../declarations';
 import { optimizeCssId } from '../../version';
-import { hasError, normalizePath } from '@utils';
 
 export const optimizeCss = async (
   config: d.Config,
@@ -37,7 +38,7 @@ export const optimizeCss = async (
     return cachedContent;
   }
 
-  const minifyResults = await compilerCtx.worker.optimizeCss(opts);
+  const minifyResults = await compilerCtx.worker!.optimizeCss(opts);
   minifyResults.diagnostics.forEach((d) => {
     // collect up any diagnostics from minifying
     diagnostics.push(d);

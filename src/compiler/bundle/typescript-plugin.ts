@@ -1,16 +1,30 @@
-import type * as d from '../../declarations';
-import type { BundleOptions } from './bundle-interface';
-import { getModule } from '../transpile/transpiled-module';
 import { isString, normalizeFsPath } from '@utils';
+import { basename, isAbsolute } from 'path';
 import type { LoadResult, Plugin, TransformResult } from 'rollup';
-import { tsResolveModuleName } from '../sys/typescript/typescript-resolve-module';
-import { isAbsolute, basename } from 'path';
 import ts from 'typescript';
 
+import type * as d from '../../declarations';
+import { tsResolveModuleName } from '../sys/typescript/typescript-resolve-module';
+import { getModule } from '../transpile/transpiled-module';
+import type { BundleOptions } from './bundle-interface';
+
+/**
+ * Rollup plugin that aids in resolving the TypeScript files and performing the transpilation step.
+ * @param compilerCtx the current compiler context
+ * @param bundleOpts Rollup bundling options to apply during TypeScript compilation
+ * @param config the Stencil configuration for the project
+ * @returns the rollup plugin for handling TypeScript files.
+ */
 export const typescriptPlugin = (compilerCtx: d.CompilerCtx, bundleOpts: BundleOptions, config: d.Config): Plugin => {
   return {
     name: `${bundleOpts.id}TypescriptPlugin`,
 
+    /**
+     * A rollup build hook for loading TypeScript files and their associated source maps (if they exist).
+     * [Source](https://rollupjs.org/guide/en/#load)
+     * @param id the path of the file to load
+     * @returns the module matched (with its sourcemap if it exists), null otherwise
+     */
     load(id: string): LoadResult {
       if (isAbsolute(id)) {
         const fsFilePath = normalizeFsPath(id);
@@ -28,6 +42,13 @@ export const typescriptPlugin = (compilerCtx: d.CompilerCtx, bundleOpts: BundleO
       }
       return null;
     },
+    /**
+     * Performs TypeScript compilation/transpilation, including applying any transformations against the Abstract Syntax
+     * Tree (AST) specific to stencil
+     * @param _code the code to modify, unused
+     * @param id module's identifier
+     * @returns the transpiled code, with its associated sourcemap. null otherwise
+     */
     transform(_code: string, id: string): TransformResult {
       if (isAbsolute(id)) {
         const fsFilePath = normalizeFsPath(id);

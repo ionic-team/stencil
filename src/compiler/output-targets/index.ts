@@ -1,18 +1,23 @@
-import type * as d from '../../declarations';
-import { outputAngular } from './output-angular';
-import { outputCopy } from './copy/output-copy';
-import { outputCustomElements } from './dist-custom-elements';
-import { outputCustomElementsBundle } from './dist-custom-elements-bundle';
-import { outputDocs } from './output-docs';
-import { outputHydrateScript } from './dist-hydrate-script';
-import { outputLazy } from './dist-lazy/lazy-output';
-import { outputLazyLoader } from './output-lazy-loader';
-import { outputWww } from './output-www';
-import { outputCollection } from './dist-collection';
-import { outputTypes } from './output-types';
 import type { RollupCache } from 'rollup';
 
-export const generateOutputTargets = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
+import type * as d from '../../declarations';
+import { outputCopy } from './copy/output-copy';
+import { outputCollection } from './dist-collection';
+import { outputCustomElements } from './dist-custom-elements';
+import { outputCustomElementsBundle } from './dist-custom-elements-bundle';
+import { outputHydrateScript } from './dist-hydrate-script';
+import { outputLazy } from './dist-lazy/lazy-output';
+import { outputAngular } from './output-angular';
+import { outputDocs } from './output-docs';
+import { outputLazyLoader } from './output-lazy-loader';
+import { outputTypes } from './output-types';
+import { outputWww } from './output-www';
+
+export const generateOutputTargets = async (
+  config: d.ValidatedConfig,
+  compilerCtx: d.CompilerCtx,
+  buildCtx: d.BuildCtx
+) => {
   const timeSpan = buildCtx.createTimeSpan('generate outputs started', true);
 
   const changedModuleFiles = Array.from(compilerCtx.changedModules)

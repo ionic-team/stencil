@@ -2,8 +2,12 @@ const path = require('path');
 
 const { WWW_OUT_DIR } = require('./constants');
 
-const browserStack = !!process.env.CI;
 process.env.CHROME_BIN = require('puppeteer').executablePath();
+
+// determine the environment to run in
+const isCI = !!process.env.CI;
+const localBrowserStackConnection = !isCI && !!process.env.LOCAL_BROWSERSTACK;
+const useBrowserStack = isCI || localBrowserStackConnection;
 
 const browserStackLaunchers = {
   bs_chrome: {
@@ -12,12 +16,12 @@ const browserStackLaunchers = {
     os: 'Windows',
     os_version: '10',
   },
-  // bs_firefox: {
-  //   base: 'BrowserStack',
-  //   browser: 'firefox',
-  //   os: 'Windows',
-  //   os_version: '10',
-  // },
+  bs_firefox: {
+    base: 'BrowserStack',
+    browser: 'firefox',
+    os: 'Windows',
+    os_version: '10',
+  },
   bs_edge: {
     base: 'BrowserStack',
     browser: 'edge',
@@ -65,18 +69,32 @@ if (process.platform === 'win32') {
   // };
 }
 
+// this configuration shall be used in a CI environment (specifically, GitHub Actions)
+const ciBrowserstackConfig = {
+  startTunnel: false,
+  // set by browserstack/github-actions/setup-local
+  localIdentifier: process.env.BROWSERSTACK_LOCAL_IDENTIFIER,
+};
+
+// this configuration shall be used locally, creating a tunnel to Browserstack from your machine.
+// See the README for instructions to connect to Browserstack from your local environment
+const localBrowserstackConfig = {
+  startTunnel: true,
+};
+
 module.exports = function (config) {
   config.set({
     plugins: [
       'karma-chrome-launcher',
       'karma-browserstack-launcher',
+      'karma-firefox-launcher',
       'karma-ie-launcher',
       'karma-edge-launcher',
       'karma-jasmine',
       'karma-typescript',
       'karma-polyfill',
     ],
-    browsers: browserStack ? Object.keys(browserStackLaunchers) : Object.keys(localLaunchers),
+    browsers: useBrowserStack ? Object.keys(browserStackLaunchers) : Object.keys(localLaunchers),
 
     singleRun: true, // set this to false to leave the browser open
 
@@ -85,16 +103,16 @@ module.exports = function (config) {
     polyfill: ['Promise'],
 
     browserStack: {
+      // identifier for all browser runs in BrowserStack
       project: 'stencil_core',
-      startTunnel: false,
-      localIdentifier: process.env.BROWSERSTACK_LOCAL_IDENTIFIER, // set by browserstack/github-actions/setup-local
+      ...(isCI ? ciBrowserstackConfig : localBrowserstackConfig),
     },
 
     preprocessors: {
       '**/*.ts': 'karma-typescript',
     },
 
-    customLaunchers: browserStack ? browserStackLaunchers : {},
+    customLaunchers: useBrowserStack ? browserStackLaunchers : {},
     urlRoot: '/__karma__/',
     files: [
       // 'test-app/prerender-test/karma.spec.ts',
@@ -119,7 +137,7 @@ module.exports = function (config) {
 
     logLevel: config.LOG_INFO,
 
-    reporters: ['progress'].concat(browserStack ? ['BrowserStack'] : []),
+    reporters: ['progress'].concat(useBrowserStack ? ['BrowserStack'] : []),
 
     karmaTypescriptConfig: {
       tsconfig: './tsconfig.json',

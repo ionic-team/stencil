@@ -1,5 +1,6 @@
-import type * as d from '../declarations';
 import { BUILD } from '@app-data';
+
+import type * as d from '../declarations';
 
 export const win = typeof window !== 'undefined' ? window : ({} as Window);
 
@@ -52,11 +53,11 @@ export const supportsListenerOptions = /*@__PURE__*/ (() => {
 
 export const promiseResolve = (v?: any) => Promise.resolve(v);
 
-export const supportsConstructibleStylesheets = BUILD.constructableCSS
+export const supportsConstructableStylesheets = BUILD.constructableCSS
   ? /*@__PURE__*/ (() => {
       try {
         new CSSStyleSheet();
-        return typeof new CSSStyleSheet().replace === 'function';
+        return typeof new CSSStyleSheet().replaceSync === 'function';
       } catch (e) {}
       return false;
     })()

@@ -1,22 +1,23 @@
-import type * as d from '../../declarations';
-import { basename, join, relative } from 'path';
-import { convertDecoratorsToStatic } from '../transformers/decorators-to-static/convert-decorators';
-import { generateAppTypes } from '../types/generate-app-types';
-import { getComponentsFromModules, isOutputTargetDistTypes } from '../output-targets/output-utils';
 import { loadTypeScriptDiagnostics, normalizePath } from '@utils';
-import { resolveComponentDependencies } from '../entries/resolve-component-dependencies';
+import { basename, join, relative } from 'path';
 import type ts from 'typescript';
+
+import type * as d from '../../declarations';
 import { updateComponentBuildConditionals } from '../app-core/app-data';
+import { resolveComponentDependencies } from '../entries/resolve-component-dependencies';
+import { getComponentsFromModules, isOutputTargetDistTypes } from '../output-targets/output-utils';
+import { convertDecoratorsToStatic } from '../transformers/decorators-to-static/convert-decorators';
 import { updateModule } from '../transformers/static-to-meta/parse-static';
+import { generateAppTypes } from '../types/generate-app-types';
 import { updateStencilTypesImports } from '../types/stencil-types';
 import { validateTranspiledComponents } from './validate-components';
 
 export const runTsProgram = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   tsBuilder: ts.BuilderProgram
-) => {
+): Promise<boolean> => {
   const tsSyntactic = loadTypeScriptDiagnostics(tsBuilder.getSyntacticDiagnostics());
   const tsGlobal = loadTypeScriptDiagnostics(tsBuilder.getGlobalDiagnostics());
   const tsOptions = loadTypeScriptDiagnostics(tsBuilder.getOptionsDiagnostics());
@@ -114,7 +115,7 @@ export const runTsProgram = async (
   return false;
 };
 
-const getRelativeDts = (config: d.Config, srcPath: string, emitDtsPath: string) => {
+const getRelativeDts = (config: d.Config, srcPath: string, emitDtsPath: string): string => {
   const parts: string[] = [];
   for (let i = 0; i < 30; i++) {
     if (config.srcDir === srcPath) {
@@ -126,5 +127,5 @@ const getRelativeDts = (config: d.Config, srcPath: string, emitDtsPath: string) 
     emitDtsPath = join(emitDtsPath, '..');
     srcPath = normalizePath(join(srcPath, '..'));
   }
-  return join.apply(null, parts.reverse());
+  return join(...parts.reverse());
 };

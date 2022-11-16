@@ -1,9 +1,10 @@
-import type { Logger, PackageJsonData } from '../../declarations';
 import { isString, noop } from '@utils';
 import fs from 'graceful-fs';
-import path from 'path';
-import semiver from 'semiver';
 import { tmpdir } from 'os';
+import path from 'path';
+import semverLt from 'semver/functions/lt';
+
+import type { Logger, PackageJsonData } from '../../declarations';
 
 const REGISTRY_URL = `https://registry.npmjs.org/@stencil/core`;
 const CHECK_INTERVAL = 1000 * 60 * 60 * 24 * 7;
@@ -14,7 +15,7 @@ export async function checkVersion(logger: Logger, currentVersion: string): Prom
     const latestVersion = await getLatestCompilerVersion(logger);
     if (latestVersion != null) {
       return () => {
-        if (semiver(currentVersion, latestVersion) < 0) {
+        if (semverLt(currentVersion, latestVersion)) {
           printUpdateMessage(logger, currentVersion, latestVersion);
         } else {
           console.debug(

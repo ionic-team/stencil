@@ -3,8 +3,10 @@
  * Forward-slash paths can be used in Windows as long as they're not
  * extended-length paths and don't contain any non-ascii characters.
  * This was created since the path methods in Node.js outputs \\ paths on Windows.
+ * @param path the Windows-based path to convert
+ * @returns the converted path
  */
-export const normalizePath = (path: string) => {
+export const normalizePath = (path: string): string => {
   if (typeof path !== 'string') {
     throw new Error(`invalid path to normalize`);
   }
@@ -149,8 +151,10 @@ const pathComponents = (path: string, rootLength: number) => {
 };
 
 /**
- * Same as normalizePath(), expect it'll also strip any querystrings
+ * Same as normalizePath(), expect it'll also strip any query strings
  * from the path name. So /dir/file.css?tag=cmp-a becomes /dir/file.css
+ * @param p the path to normalize
+ * @returns the normalized path, sans any query strings
  */
 export const normalizeFsPath = (p: string) => normalizePath(p.split('?')[0].replace(/\0/g, ''));
 
