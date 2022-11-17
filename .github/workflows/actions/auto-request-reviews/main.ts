@@ -1,25 +1,25 @@
-import * as core from '@actions/core';
-import * as github from '@actions/github';
+import { getInput, setFailed } from '@actions/core';
+import { context, getOctokit } from '@actions/github';
 
 async function run() {
-  const token = core.getInput('token');
+  const token = getInput('token');
   if (token == null || !token.length) {
     throw new Error('No Github token provided');
   }
-  const octokit = github.getOctokit(token);
+  const octokit = getOctokit(token);
 
-  const organization = core.getInput('org');
+  const organization = getInput('org');
   if (organization == null || !organization.length) {
     throw new Error('No Github organization specified');
   }
 
-  const teamSlug = core.getInput('team');
+  const teamSlug = getInput('team');
   if (teamSlug == null || !teamSlug.length) {
     throw new Error('No Github team specified');
   }
 
   // PR author
-  const username = github.context.payload.pull_request?.user.login as string;
+  const username = context.payload.pull_request?.user.login as string;
 
   // Check if the PR author is a member of the organization
   const { status } = await octokit.rest.orgs.checkMembershipForUser({
@@ -41,9 +41,9 @@ async function run() {
     const reviewers = teamMembers.filter((ref) => ref.login !== username).map((ref) => ref.login);
 
     await octokit.rest.pulls.requestReviewers({
-      owner: github.context.repo.owner,
-      repo: github.context.repo.repo,
-      pull_number: github.context.payload.number,
+      owner: context.repo.owner,
+      repo: context.repo.repo,
+      pull_number: context.payload.number,
       reviewers,
     });
   }
@@ -51,5 +51,5 @@ async function run() {
 
 run().catch((error) => {
   console.error(error);
-  core.setFailed(error.message);
+  setFailed(error.message);
 });
