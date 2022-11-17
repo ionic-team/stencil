@@ -24,7 +24,7 @@ const getStatement = (propName: string, method: string, arg: string) => {
       ts.factory.createPropertyAccessExpression(ts.factory.createThis(), propName),
       ts.factory.createCallExpression(ts.factory.createIdentifier(method), undefined, [
         ts.factory.createThis(),
-        ts.createLiteral(arg),
+        ts.factory.createStringLiteral(arg),
       ])
     )
   );

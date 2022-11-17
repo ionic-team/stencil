@@ -55,7 +55,7 @@ export const generateMarkdown = (
     '',
     '',
     ...getDocsDeprecation(cmp),
-    ...overviewToMarkdown(cmp.docs),
+    ...overviewToMarkdown(cmp.overview),
     ...usageToMarkdown(cmp.usage),
     ...propsToMarkdown(cmp.props),
     ...eventsToMarkdown(cmp.events),

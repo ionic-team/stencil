@@ -60,6 +60,7 @@ const getDocsComponents = async (
           usagesDir,
           tag: cmp.tagName,
           readme,
+          overview: cmp.docs.text,
           usage,
           docs: generateDocs(readme, cmp.docs),
           docsTags: cmp.docs.tags,

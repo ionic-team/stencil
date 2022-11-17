@@ -1,12 +1,13 @@
 import fs from 'fs-extra';
-import type { BuildOptions } from '../utils/options';
+import { join } from 'path';
+
 import { cleanDts } from '../utils/bundle-dts';
+import type { BuildOptions } from '../utils/options';
+import { writePkgJson } from '../utils/write-pkg-json';
 import { internalAppData } from './internal-app-data';
 import { internalClient } from './internal-platform-client';
 import { internalHydrate } from './internal-platform-hydrate';
 import { internalTesting } from './internal-platform-testing';
-import { join } from 'path';
-import { writePkgJson } from '../utils/write-pkg-json';
 
 export async function internal(opts: BuildOptions) {
   const inputInternalDir = join(opts.buildDir, 'internal');
