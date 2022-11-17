@@ -36,7 +36,7 @@ body:
       label: System Info
       description: Output of `npx envinfo --system --npmPackages @stencil/core --binaries --browsers`
       render: shell
-      placeholder: System, Binaries, Browsers
+      placeholder: System, Environment, Browsers
   - type: textarea
     attributes:
       label: Steps to Reproduce
