@@ -46,15 +46,27 @@ function getLegacyJestOptions(): Record<string, boolean | number | string> {
 export function buildJestArgv(config: d.ValidatedConfig): Config.Argv {
   const yargs = require('yargs');
 
-  const args = [...config.flags.knownArgs.slice(), ...config.flags.unknownArgs.slice()];
+  const knownArgs = config.flags.knownArgs.slice();
 
-  if (!args.some((a) => a.startsWith('--max-workers') || a.startsWith('--maxWorkers'))) {
-    args.push(`--max-workers=${config.maxConcurrentWorkers}`);
+  if (!knownArgs.some((a) => a.startsWith('--max-workers') || a.startsWith('--maxWorkers'))) {
+    knownArgs.push(`--max-workers=${config.maxConcurrentWorkers}`);
   }
 
   if (config.flags.devtools) {
-    args.push('--runInBand');
+    knownArgs.push('--runInBand');
   }
+
+  // we combine the modified args and the unknown args here and declare the
+  // result read only, providing some typesystem-level assurance that we won't
+  // mutate it after this point.
+  //
+  // We want that assurance because Jest likes to have any filepath match
+  // patterns at the end of the args it receives. Those args are going to be
+  // found in our `unknownArgs`, so while we want to do some stuff in this
+  // function that adds to `knownArgs` we need a guarantee that all of the
+  // `unknownArgs` are _after_ all the `knownArgs` in the array we end up
+  // generating the Jest configuration from.
+  const args: ReadonlyArray<string> = [...knownArgs, ...config.flags.unknownArgs];
 
   config.logger.info(config.logger.magenta(`jest args: ${args.join(' ')}`));
 
