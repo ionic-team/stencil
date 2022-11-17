@@ -55,9 +55,10 @@ describe('transform utils', () => {
      * @param modifier the modifier to apply to the method. Defaults to applying no modifier if none is provided
      * @returns a new empty method
      */
-    const createMemberWithModifier = (modifier: ts.ModifierLike = undefined): ts.MethodDeclaration => {
+    const createMemberWithModifier = (modifier: ts.Modifier | undefined = undefined): ts.MethodDeclaration => {
       const modifiers = modifier ? [modifier] : [];
       return ts.factory.createMethodDeclaration(
+        undefined,
         modifiers,
         undefined,
         ts.factory.createIdentifier('myMethod'),
