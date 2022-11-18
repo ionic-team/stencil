@@ -35,8 +35,7 @@ body:
     attributes:
       label: System Info
       description: |
-        Operating system & version, npm, node, and browser(s) & version(s) (if applicable), 
-        Maybe you can try to run `npx envinfo --system --npmPackages @stencil/core --binaries --browsers` to get the necessary information
+        Operating system & version, npm, node, and browser(s) & version(s) (if applicable)
       render: shell
       placeholder: System, Environment, Browsers
   - type: textarea
