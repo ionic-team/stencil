@@ -2,7 +2,16 @@ import { unique } from '@utils';
 
 import type * as d from '../../declarations';
 
-export const validateCopy = (copy: d.CopyTask[] | boolean, defaultCopy: d.CopyTask[] = []): d.CopyTask[] => {
+/**
+ * Validate a series of {@link d.CopyTask}s
+ * @param copy the copy tasks to validate, or a boolean to specify if copy tasks are enabled
+ * @param defaultCopy default copy tasks to add to the returned validated list if not present in the first argument
+ * @returns the validated copy tasks
+ */
+export const validateCopy = (
+  copy: d.CopyTask[] | boolean | null | undefined,
+  defaultCopy: d.CopyTask[] = []
+): d.CopyTask[] => {
   if (copy === null || copy === false) {
     return [];
   }
