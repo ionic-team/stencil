@@ -1,3 +1,6 @@
+import * as ts from 'typescript';
+
+import { filterDecorators } from '../decorators-to-static/convert-decorators';
 import { transpileModule } from './transpile';
 
 /**
@@ -50,7 +53,7 @@ describe('convert-decorators', () => {
               "optional": false,
               "docs": {
                 "tags": [],
-                "text": "" 
+                "text": ""
               },
               "attribute": "val",
               "reflect": false,
@@ -318,8 +321,8 @@ describe('convert-decorators', () => {
             "composed": true,
             "docs": {
               "tags": [],
-              "text": "" 
-            },            
+              "text": ""
+            },
             "complexType": {
               "original": "{ mph: number }",
               "resolved": "{ mph: number; }",
@@ -328,5 +331,101 @@ describe('convert-decorators', () => {
           }];
       }}`
     );
+  });
+
+  describe('filterDecorators', () => {
+    /**
+     * Create a decorated class member, 'classMemberVariable: string;', as it would exist in a class. No class
+     * declaration is created.
+     *
+     * The property declaration will have any decorators provided applied to it.
+     *
+     * @example
+     * // By default, no decorators will be applied, and the following will be returned:
+     * createClassMemberWithDecorators(); // Node representing 'classMemberVariable: string;'
+     *
+     * // Otherwise, the provided modifier will be applied to the method:
+     * const propDecorator = ts.factory.createDecorator(
+     *   ts.factory.createCallExpression(ts.factory.createIdentifier('Prop'), undefined, [])
+     * );
+     * createClassMemberWithDecorators([propDecorator]); // '@Prop() classMemberVariable: string;'
+     *
+     * @param decorators the decorators to apply to the property declaration
+     * @returns the created property declaration
+     */
+    const createClassMemberWithDecorators = (decorators?: ReadonlyArray<ts.Decorator>): ts.PropertyDeclaration => {
+      const decoratorsToUse = decorators ? [...decorators] : undefined;
+      return ts.factory.createPropertyDeclaration(
+        decoratorsToUse,
+        undefined,
+        ts.factory.createIdentifier('classMemberVariable'),
+        undefined,
+        ts.factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
+        undefined
+      );
+    };
+
+    it("returns undefined if a node doesn't have any decorators", () => {
+      // create a class member, 'classMemberVariable: string;', as it would exist in a class
+      const member = createClassMemberWithDecorators(undefined);
+
+      const filteredDecorators = filterDecorators(member, []);
+
+      expect(filteredDecorators).toBeUndefined();
+    });
+
+    it('returns undefined if a node has an empty list of decorators', () => {
+      // create a class member, 'classMemberVariable: string;', as it would exist in a class
+      const member = createClassMemberWithDecorators([]);
+
+      const filteredDecorators = filterDecorators(member, []);
+
+      expect(filteredDecorators).toBeUndefined();
+    });
+
+    it("returns a node's decorator if it is not a call expression", () => {
+      // create a decorated class member, '@Decorator classMemberVariable: string;', as it would exist in a class
+      // note the lack of '()' after the decorator, making it an identifier expression, rather than a class expression
+      const decorator = ts.factory.createDecorator(ts.factory.createIdentifier('Decorator'));
+      const member = createClassMemberWithDecorators([decorator]);
+
+      const filteredDecorators = filterDecorators(member, []);
+
+      expect(filteredDecorators).toHaveLength(1);
+      expect(filteredDecorators[0]).toBe(decorator);
+    });
+
+    it("doesn't return any decorators when all decorators on a node exist in the exclude list", () => {
+      // create a '@CustomProp()' decorator
+      const customDecorator = ts.factory.createDecorator(
+        ts.factory.createCallExpression(ts.factory.createIdentifier('CustomProp'), undefined, [])
+      );
+      // create '@Prop()' decorator
+      const decorator = ts.factory.createDecorator(
+        ts.factory.createCallExpression(ts.factory.createIdentifier('Prop'), undefined, [])
+      );
+      const member = createClassMemberWithDecorators([customDecorator, decorator]);
+
+      const filteredDecorators = filterDecorators(member, ['Prop', 'CustomProp']);
+
+      expect(filteredDecorators).toBeUndefined();
+    });
+
+    it('returns any decorators on a node, not in the exclude list', () => {
+      // create a '@CustomProp()' decorator
+      const customDecorator = ts.factory.createDecorator(
+        ts.factory.createCallExpression(ts.factory.createIdentifier('CustomProp'), undefined, [])
+      );
+      // create '@Prop()' decorator
+      const decorator = ts.factory.createDecorator(
+        ts.factory.createCallExpression(ts.factory.createIdentifier('Prop'), undefined, [])
+      );
+      const member = createClassMemberWithDecorators([customDecorator, decorator]);
+
+      const filteredDecorators = filterDecorators(member, ['Prop']);
+
+      expect(filteredDecorators).toHaveLength(1);
+      expect(filteredDecorators[0]).toBe(customDecorator);
+    });
   });
 });
