@@ -86,7 +86,7 @@ const visitClassDeclaration = (
 
   return ts.factory.updateClassDeclaration(
     classNode,
-    filterDecorators(classNode, CLASS_DECORATORS_TO_REMOVE),
+    filterDecorators(classNode.decorators, CLASS_DECORATORS_TO_REMOVE),
     classNode.modifiers,
     classNode.name,
     classNode.typeParameters,
@@ -117,7 +117,7 @@ const removeStencilMethodDecorators = (
 ): ts.ClassElement[] => {
   return classMembers.map((member) => {
     const currentDecorators = member.decorators;
-    const newDecorators = filterDecorators(member, MEMBER_DECORATORS_TO_REMOVE);
+    const newDecorators = filterDecorators(member.decorators, MEMBER_DECORATORS_TO_REMOVE);
 
     if (currentDecorators !== newDecorators) {
       if (ts.isMethodDeclaration(member)) {
@@ -166,18 +166,18 @@ const removeStencilMethodDecorators = (
 /**
  * Generate a list of decorators from a syntax tree node that are not in a provided exclude list
  *
- * @param node the syntax tree node whose decorators should be inspected
+ * @param decorators the syntax tree node's decorators should be inspected
  * @param excludeList the names of decorators that should _not_ be included in the returned list
  * @returns a list of decorators on the AST node that are not in the provided list, or `undefined` if:
  * - there are no decorators on the node
  * - the node contains only decorators in the provided list
  */
 export const filterDecorators = (
-  node: ts.Node,
+  decorators: ts.NodeArray<ts.Decorator>,
   excludeList: ReadonlyArray<string>
 ): ts.NodeArray<ts.Decorator> | undefined => {
-  if (node.decorators) {
-    const updatedDecoratorList = node.decorators.filter((dec) => {
+  if (decorators) {
+    const updatedDecoratorList = decorators.filter((dec) => {
       // narrow the type of the syntax tree node, while retrieving the text of the identifier
       const decoratorName =
         ts.isCallExpression(dec.expression) &&
@@ -190,14 +190,14 @@ export const filterDecorators = (
     if (updatedDecoratorList.length === 0) {
       // handle the case of a zero-length list first, so an empty array is not created
       return undefined;
-    } else if (updatedDecoratorList.length !== node.decorators.length) {
+    } else if (updatedDecoratorList.length !== decorators.length) {
       // the updated decorator list is non-zero, but has a different length than the original decorator list,
       // create a new array of nodes from it
       return ts.factory.createNodeArray(updatedDecoratorList);
     }
   }
   // return the node's original decorators, or undefined
-  return node.decorators;
+  return decorators;
 };
 
 /**
@@ -465,7 +465,7 @@ const createConstructorBodyWithSuper = (): ts.ExpressionStatement => {
  * @returns whether this should be rewritten or not
  */
 const shouldInitializeInConstructor = (member: ts.ClassElement): boolean => {
-  const filteredDecorators = filterDecorators(member, CONSTRUCTOR_DEFINED_MEMBER_DECORATORS);
+  const filteredDecorators = filterDecorators(member.decorators, CONSTRUCTOR_DEFINED_MEMBER_DECORATORS);
   if (member.decorators === undefined) {
     // decorators have already been removed from this element, indicating that
     // we don't need to do anything

@@ -369,7 +369,7 @@ describe('convert-decorators', () => {
       // create a class member, 'classMemberVariable: string;', as it would exist in a class
       const member = createClassMemberWithDecorators(undefined);
 
-      const filteredDecorators = filterDecorators(member, []);
+      const filteredDecorators = filterDecorators(member.decorators, []);
 
       expect(filteredDecorators).toBeUndefined();
     });
@@ -378,7 +378,7 @@ describe('convert-decorators', () => {
       // create a class member, 'classMemberVariable: string;', as it would exist in a class
       const member = createClassMemberWithDecorators([]);
 
-      const filteredDecorators = filterDecorators(member, []);
+      const filteredDecorators = filterDecorators(member.decorators, []);
 
       expect(filteredDecorators).toBeUndefined();
     });
@@ -389,7 +389,7 @@ describe('convert-decorators', () => {
       const decorator = ts.factory.createDecorator(ts.factory.createIdentifier('Decorator'));
       const member = createClassMemberWithDecorators([decorator]);
 
-      const filteredDecorators = filterDecorators(member, []);
+      const filteredDecorators = filterDecorators(member.decorators, []);
 
       expect(filteredDecorators).toHaveLength(1);
       expect(filteredDecorators[0]).toBe(decorator);
@@ -406,7 +406,7 @@ describe('convert-decorators', () => {
       );
       const member = createClassMemberWithDecorators([customDecorator, decorator]);
 
-      const filteredDecorators = filterDecorators(member, ['Prop', 'CustomProp']);
+      const filteredDecorators = filterDecorators(member.decorators, ['Prop', 'CustomProp']);
 
       expect(filteredDecorators).toBeUndefined();
     });
@@ -422,7 +422,7 @@ describe('convert-decorators', () => {
       );
       const member = createClassMemberWithDecorators([customDecorator, decorator]);
 
-      const filteredDecorators = filterDecorators(member, ['Prop']);
+      const filteredDecorators = filterDecorators(member.decorators, ['Prop']);
 
       expect(filteredDecorators).toHaveLength(1);
       expect(filteredDecorators[0]).toBe(customDecorator);
