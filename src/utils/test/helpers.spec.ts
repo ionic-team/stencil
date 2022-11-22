@@ -1,4 +1,4 @@
-import { dashToPascalCase, isDef, isPromise, toDashCase } from '../helpers';
+import { dashToPascalCase, isDef, isPromise, toCamelCase, toDashCase } from '../helpers';
 
 describe('util helpers', () => {
   describe('isPromise', () => {
@@ -42,6 +42,16 @@ describe('util helpers', () => {
 
     it('wisconsin => Wisconsin', () => {
       expect(dashToPascalCase('wisconsin')).toBe('Wisconsin');
+    });
+  });
+
+  describe('toCamelCase', () => {
+    it.each([
+      ['my-3d-component', 'my3dComponent'],
+      ['madison-wisconsin', 'madisonWisconsin'],
+      ['wisconsin', 'wisconsin'],
+    ])('%s => %s', (input: string, exp: string) => {
+      expect(toCamelCase(input)).toBe(exp);
     });
   });
 
