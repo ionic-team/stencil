@@ -33,6 +33,13 @@ body:
       required: true
   - type: textarea
     attributes:
+      label: System Info
+      description: |
+        Operating system & version, npm, node, and browser(s) & version(s) (if applicable)
+      render: shell
+      placeholder: System, Environment, Browsers
+  - type: textarea
+    attributes:
       label: Steps to Reproduce
       description: Please explain the steps required to duplicate this issue.
     validations:
