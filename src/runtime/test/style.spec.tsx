@@ -39,11 +39,13 @@ describe('style', () => {
       includeAnnotations: true,
       html: `<cmp-a></cmp-a>`,
       platform: {
-        $nonce$: '1234'
-      }
+        $nonce$: '1234',
+      },
     });
 
-    expect(doc.head.innerHTML).toEqual('<style data-styles nonce="1234">cmp-a{visibility:hidden}.hydrated{visibility:inherit}</style>')
+    expect(doc.head.innerHTML).toEqual(
+      '<style data-styles nonce="1234">cmp-a{visibility:hidden}.hydrated{visibility:inherit}</style>'
+    );
   });
 
   describe('mode', () => {
