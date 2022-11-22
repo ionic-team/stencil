@@ -45,6 +45,7 @@ export class BuildContext implements d.BuildCtx {
   indexBuildCount = 0;
   indexDoc: Document = undefined;
   isRebuild = false;
+  isExternal: (id: string, importer: string, isResolved: boolean) => boolean;
   moduleFiles: d.Module[] = [];
   outputs: d.BuildOutput[] = [];
   packageJson: d.PackageJsonData = {};
@@ -68,6 +69,7 @@ export class BuildContext implements d.BuildCtx {
     this.buildId = ++this.compilerCtx.activeBuildId;
 
     this.debug = config.logger.debug.bind(config.logger);
+    this.isExternal = getIdMatcher(config.rollupConfig?.inputOptions?.external);
   }
 
   start() {
@@ -213,6 +215,46 @@ export const getBuildTimestamp = () => {
   timestamp += ('0' + d.getUTCSeconds()).slice(-2);
 
   return timestamp;
+};
+
+export function ensureArray<T>(items: (T | false | null | undefined)[] | T | false | null | undefined): T[] {
+  if (Array.isArray(items)) {
+    return items.filter(Boolean) as T[];
+  }
+  if (items) {
+    return [items];
+  }
+  return [];
+}
+
+const getIdMatcher = <T extends Array<any>>(
+  option:
+    | undefined
+    | boolean
+    | string
+    | RegExp
+    | (string | RegExp)[]
+    | ((id: string, ...parameters: T) => boolean | null | void)
+): ((id: string, ...parameters: T) => boolean) => {
+  if (option === true) {
+    return () => true;
+  }
+  if (typeof option === 'function') {
+    return (id, ...parameters) => (!id.startsWith('\0') && option(id, ...parameters)) || false;
+  }
+  if (option) {
+    const ids = new Set<string>();
+    const matchers: RegExp[] = [];
+    for (const value of ensureArray(option)) {
+      if (value instanceof RegExp) {
+        matchers.push(value);
+      } else {
+        ids.add(value);
+      }
+    }
+    return (id: string, ..._arguments) => ids.has(id) || matchers.some((matcher) => matcher.test(id));
+  }
+  return () => false;
 };
 
 const getProgress = (completedTasks: d.BuildTask[]) => {

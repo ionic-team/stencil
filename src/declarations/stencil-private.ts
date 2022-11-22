@@ -253,6 +253,7 @@ export interface BuildCtx {
   indexBuildCount: number;
   indexDoc: Document;
   isRebuild: boolean;
+  isExternal: (id: string, importer: string, isResolved: boolean) => boolean;
   moduleFiles: Module[];
   packageJson: PackageJsonData;
   pendingCopyTasks: Promise<CopyResults>[];
@@ -474,6 +475,7 @@ export interface CollectionCompilerMeta {
   bundles?: {
     components: string[];
   }[];
+  isExternal?: boolean;
 }
 
 export interface CollectionCompilerVersion {

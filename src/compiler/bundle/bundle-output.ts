@@ -136,7 +136,7 @@ export const getRollupOptions = (
 
     cache: compilerCtx.rollupCache.get(bundleOpts.id),
 
-    external: config.rollupConfig.inputOptions.external,
+    external: config.rollupConfig?.inputOptions?.external,
   };
 
   return rollupOptions;
