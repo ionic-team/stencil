@@ -1,4 +1,3 @@
-import { plt } from '../../client-window';
 import { CSSScope } from './interfaces';
 import { addGlobalStyle, updateGlobalScopes } from './scope';
 
@@ -52,7 +51,9 @@ export function addGlobalLink(doc: Document, globalScopes: CSSScope[], linkElm: 
         styleEl.textContent = text;
 
         // Apply CSP nonce to the style tag if it exists
-        const nonce = plt.$nonce$ ?? (window as any).nonce;
+        // NOTE: we cannot use the "platform" object here because these files
+        // cannot resolve a reference to `@app-data` when running our e2e tests
+        const nonce = (window as any).nonce;
         if (nonce != null) {
           styleEl.setAttribute('nonce', nonce);
         }

@@ -1,5 +1,4 @@
 import { CssVarShim } from '../../../declarations';
-import { plt } from '../../client-window';
 import { CSSScope } from './interfaces';
 import { addGlobalLink, loadDocument, startWatcher } from './load-link-styles';
 import { addGlobalStyle, parseCSS, reScope, updateGlobalScopes } from './scope';
@@ -52,7 +51,9 @@ export class CustomStyle implements CssVarShim {
     styleEl.setAttribute('data-no-shim', '');
 
     // Apply CSP nonce to the style tag if it exists
-    const nonce = plt.$nonce$ ?? (window as any).nonce;
+    // NOTE: we cannot use the "platform" object here because these files
+    // cannot resolve a reference to `@app-data` when running our e2e tests
+    const nonce = (window as any).nonce;
     if (nonce != null) {
       styleEl.setAttribute('nonce', nonce);
     }
