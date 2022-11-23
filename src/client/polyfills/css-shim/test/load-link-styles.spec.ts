@@ -1,4 +1,4 @@
-import { plt } from '../../../client-window';
+import { win } from '../../../client-window';
 import { addGlobalLink } from '../load-link-styles';
 
 describe('loadLinkStyles', () => {
@@ -23,7 +23,7 @@ describe('loadLinkStyles', () => {
     });
 
     it('should create a style tag with a nonce attribute within the link element parent node', async () => {
-      plt.$nonce$ = 'abc123';
+      (win as any).nonce = 'abc123';
       const linkElm = document.createElement('link');
       linkElm.setAttribute('rel', 'stylesheet');
       linkElm.setAttribute('href', '');

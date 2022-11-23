@@ -1,6 +1,6 @@
 import { mockWindow } from '@stencil/core/testing';
 
-import { plt } from '../../../client-window';
+import { win } from '../../../client-window';
 import { CustomStyle } from '../custom-style';
 
 describe('css-shim', () => {
@@ -385,7 +385,7 @@ describe('css-shim', () => {
   it('should create a style element with a nonce attribute', () => {
     const customStyle = new CustomStyle(window, document);
     const hostEl = document.createElement('div');
-    plt.$nonce$ = 'abc123';
+    (win as any).nonce = 'abc123';
 
     const styleEl = customStyle.createHostStyle(hostEl, 'sc-div', 'color: red;', false);
 
