@@ -111,7 +111,7 @@ async function prepareRelease(opts: BuildOptions, args: ReadonlyArray<string>, r
     .prompt(prompts)
     .then((answers) => {
       if (answers.confirm) {
-        opts.version = answers.version || answers.specifiedVersion;
+        opts.version = answers.version ?? answers.specifiedVersion;
         // write `release-data.json`
         fs.writeJsonSync(releaseDataPath, opts, { spaces: 2 });
         runReleaseTasks(opts, args);
