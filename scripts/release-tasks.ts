@@ -166,65 +166,65 @@ export function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<string>)
   }
 
   if (opts.isPublishRelease) {
-    // tasks.push(
-    //   {
-    //     title: 'Publish @stencil/core to npm',
-    //     task: () => {
-    //       const cmd = 'npm';
-    //       const cmdArgs = ['publish', '--otp', opts.otp].concat(opts.tag ? ['--tag', opts.tag] : []);
-    //
-    //       if (isDryRun) {
-    //         return console.log(`[dry-run] ${cmd} ${cmdArgs.join(' ')}`);
-    //       }
-    //       return execa(cmd, cmdArgs, { cwd: rootDir });
-    //     },
-    //   },
-    //   {
-    //     title: 'Tagging the latest git commit',
-    //     task: () => {
-    //       const cmd = 'git';
-    //       const cmdArgs = ['tag', `v${opts.version}`];
-    //
-    //       if (isDryRun) {
-    //         return console.log(`[dry-run] ${cmd} ${cmdArgs.join(' ')}`);
-    //       }
-    //       return execa(cmd, cmdArgs, { cwd: rootDir });
-    //     },
-    //   },
-    //   {
-    //     title: 'Pushing git commits',
-    //     task: () => {
-    //       const cmd = 'git';
-    //       const cmdArgs = ['push'];
-    //
-    //       if (isDryRun) {
-    //         return console.log(`[dry-run] ${cmd} ${cmdArgs.join(' ')}`);
-    //       }
-    //       return execa(cmd, cmdArgs, { cwd: rootDir });
-    //     },
-    //   },
-    //   {
-    //     title: 'Pushing git tags',
-    //     task: () => {
-    //       const cmd = 'git';
-    //       const cmdArgs = ['push', '--tags'];
-    //
-    //       if (isDryRun) {
-    //         return console.log(`[dry-run] ${cmd} ${cmdArgs.join(' ')}`);
-    //       }
-    //       return execa(cmd, cmdArgs, { cwd: rootDir });
-    //     },
-    //   }
-    // );
+    tasks.push(
+      {
+        title: 'Publish @stencil/core to npm',
+        task: () => {
+          const cmd = 'npm';
+          const cmdArgs = ['publish', '--otp', opts.otp].concat(opts.tag ? ['--tag', opts.tag] : []);
+
+          if (isDryRun) {
+            return console.log(`[dry-run] ${cmd} ${cmdArgs.join(' ')}`);
+          }
+          return execa(cmd, cmdArgs, { cwd: rootDir });
+        },
+      },
+      {
+        title: 'Tagging the latest git commit',
+        task: () => {
+          const cmd = 'git';
+          const cmdArgs = ['tag', `v${opts.version}`];
+
+          if (isDryRun) {
+            return console.log(`[dry-run] ${cmd} ${cmdArgs.join(' ')}`);
+          }
+          return execa(cmd, cmdArgs, { cwd: rootDir });
+        },
+      },
+      {
+        title: 'Pushing git commits',
+        task: () => {
+          const cmd = 'git';
+          const cmdArgs = ['push'];
+
+          if (isDryRun) {
+            return console.log(`[dry-run] ${cmd} ${cmdArgs.join(' ')}`);
+          }
+          return execa(cmd, cmdArgs, { cwd: rootDir });
+        },
+      },
+      {
+        title: 'Pushing git tags',
+        task: () => {
+          const cmd = 'git';
+          const cmdArgs = ['push', '--tags'];
+
+          if (isDryRun) {
+            return console.log(`[dry-run] ${cmd} ${cmdArgs.join(' ')}`);
+          }
+          return execa(cmd, cmdArgs, { cwd: rootDir });
+        },
+      }
+    );
   }
 
   if (opts.isPublishRelease) {
-    // tasks.push({
-    //   title: 'Create Github Release',
-    //   task: () => {
-    //     return postGithubRelease(opts);
-    //   },
-    // });
+    tasks.push({
+      title: 'Create Github Release',
+      task: () => {
+        return postGithubRelease(opts);
+      },
+    });
   }
 
   const listr = new Listr(tasks);
@@ -233,11 +233,11 @@ export function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<string>)
     .run()
     .then(() => {
       if (opts.isPublishRelease) {
-        // console.log(
-        //   `\n ${opts.vermoji}  ${color.bold.magenta(pkg.name)} ${color.bold.yellow(newVersion)} published!! ${
-        //     opts.vermoji
-        //   }\n`
-        // );
+        console.log(
+          `\n ${opts.vermoji}  ${color.bold.magenta(pkg.name)} ${color.bold.yellow(newVersion)} published!! ${
+            opts.vermoji
+          }\n`
+        );
       } else {
         console.log(
           `\n ${opts.vermoji}  ${color.bold.magenta(pkg.name)} ${color.bold.yellow(
