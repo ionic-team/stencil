@@ -84,7 +84,8 @@ async function prepareRelease(opts: BuildOptions, args: ReadonlyArray<string>, r
     },
     {
       type: 'input',
-      // this name is intentionally different from 'version' above. if they collide, this input prompt will not run.
+      // this name is intentionally different from 'version' above to make the `when` check below work properly
+      // (this prompt should only run if `version` was not already input)
       name: 'specifiedVersion',
       message: 'Specify Version',
       when: (answers: any) => !answers.version,
