@@ -2779,7 +2779,7 @@ Author: [Terkel Gjervig](https://terkel.com)
 
 License: MIT
 
-Author: [JS Foundation and other contributors](https://github.com/jquery/sizzle/blob/2.3.7/AUTHORS.txt)
+Author: [JS Foundation and other contributors](https://github.com/jquery/sizzle/blob/2.3.8/AUTHORS.txt)
 
 Homepage: https://sizzlejs.com
 
