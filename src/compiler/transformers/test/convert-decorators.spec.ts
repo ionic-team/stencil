@@ -334,17 +334,23 @@ describe('convert-decorators', () => {
   });
 
   describe('filterDecorators', () => {
-    it('returns undefined when no decorators are provided', () => {
-      const filteredDecorators = filterDecorators(undefined, []);
+    it.each<ReadonlyArray<ReadonlyArray<string>>>([[[]], [['ExcludedDecorator']]])(
+      'returns undefined when no decorators are provided',
+      (excludeList: ReadonlyArray<string>) => {
+        const filteredDecorators = filterDecorators(undefined, excludeList);
 
-      expect(filteredDecorators).toBeUndefined();
-    });
+        expect(filteredDecorators).toBeUndefined();
+      }
+    );
 
-    it('returns undefined for an empty list of decorators', () => {
-      const filteredDecorators = filterDecorators([], []);
+    it.each<ReadonlyArray<ReadonlyArray<string>>>([[[]], [['ExcludedDecorator']]])(
+      'returns undefined for an empty list of decorators',
+      (excludeList: ReadonlyArray<string>) => {
+        const filteredDecorators = filterDecorators([], excludeList);
 
-      expect(filteredDecorators).toBeUndefined();
-    });
+        expect(filteredDecorators).toBeUndefined();
+      }
+    );
 
     it('returns a decorator if it is not a call expression', () => {
       // create a decorator, '@Decorator'. note the lack of '()' after the decorator, making it an identifier
