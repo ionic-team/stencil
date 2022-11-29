@@ -12,11 +12,11 @@ import type * as d from '../../declarations';
  * assets on the client. More here: https://developer.chrome.com/docs/workbox/
  *
  * This function first checks that the service worker config set on the
- * supplied `OutputTarget` is not any of it's possible empty values and that we
- * are not currently in development mode. In those cases it will early return.
+ * supplied `OutputTarget` is not empty and that we are not currently in
+ * development mode. In those cases it will early return.
  *
- * If we do find a service worker configuration then we do some validation to
- * ensure that things are set up correctly.
+ * If we do find a service worker configuration we do some validation to ensure
+ * that things are set up correctly.
  *
  * @param config the current, validated configuration
  * @param outputTarget the `www` outputTarget whose service worker
