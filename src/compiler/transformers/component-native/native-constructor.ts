@@ -4,6 +4,7 @@ import type * as d from '../../../declarations';
 import { addCoreRuntimeApi, RUNTIME_APIS } from '../core-runtime-apis';
 import { addCreateEvents } from '../create-event';
 import { addLegacyProps } from '../legacy-props';
+import { retrieveTsModifiers } from '../transform-utils';
 
 export const updateNativeConstructor = (
   classMembers: ts.ClassElement[],
@@ -36,8 +37,7 @@ export const updateNativeConstructor = (
 
     classMembers[cstrMethodIndex] = ts.factory.updateConstructorDeclaration(
       cstrMethod,
-      cstrMethod.decorators,
-      cstrMethod.modifiers,
+      retrieveTsModifiers(cstrMethod),
       cstrMethod.parameters,
       ts.factory.updateBlock(cstrMethod.body, statements)
     );
@@ -53,12 +53,7 @@ export const updateNativeConstructor = (
       statements = [createNativeConstructorSuper(), ...statements];
     }
 
-    const cstrMethod = ts.factory.createConstructorDeclaration(
-      undefined,
-      undefined,
-      undefined,
-      ts.factory.createBlock(statements, true)
-    );
+    const cstrMethod = ts.factory.createConstructorDeclaration(undefined, [], ts.factory.createBlock(statements, true));
     classMembers.unshift(cstrMethod);
   }
 };
