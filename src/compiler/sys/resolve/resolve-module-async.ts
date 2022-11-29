@@ -20,7 +20,7 @@ export const resolveModuleIdAsync = (
   opts: d.ResolveModuleIdOptions
 ) => {
   // const resolverOpts: AsyncOpts = createCustomResolverAsync(sys, inMemoryFs, opts.exts);
-  const resolverOpts: AsyncOpts = {}
+  const resolverOpts: AsyncOpts = {};
   resolverOpts.basedir = dirname(normalizeFsPath(opts.containingFile));
 
   if (opts.packageFilter) {
@@ -122,7 +122,6 @@ export const createCustomResolverAsync = (
       cb(null, false);
     },
 
-
     async realpath(p: string, cb: (err: any, data?: any) => void) {
       const fsFilePath = normalizeFsPath(p);
       const results = await sys.realpath(fsFilePath);
@@ -133,6 +132,5 @@ export const createCustomResolverAsync = (
         cb(null, results.error ? fsFilePath : results.path);
       }
     },
-
   };
 };

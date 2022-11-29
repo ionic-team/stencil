@@ -31,12 +31,12 @@ export const promisify = (fn: Function): (() => Promise<any>) => {
           console.log(err);
           console.log(arguments);
           console.log('weeeee');
-          reject(err)
+          reject(err);
         } else {
-          resolve(data)
+          resolve(data);
         }
-      })
-    })
+      });
+    });
   };
 
   // return function (...args: any[]) {

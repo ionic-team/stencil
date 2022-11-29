@@ -41,7 +41,7 @@ export const access = (fs.access = (p: string, mode: any, cb: any): Promise<any>
   if (access) {
     return access(p).then(cb);
   } else {
-    cb(true)
+    cb(true);
   }
 });
 
@@ -193,7 +193,7 @@ export const patchFs = (userSys: d.CompilerSystem) => {
   console.log('patchFs::about to patch');
   if (fs.__sys == undefined) {
     // @ts-ignore
-    fs.__sys = {}
+    fs.__sys = {};
   }
   Object.assign(fs.__sys, userSys);
   console.log('patchFs::patched');

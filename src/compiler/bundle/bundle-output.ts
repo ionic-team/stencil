@@ -75,15 +75,12 @@ export const getRollupOptions = (
     // '.d.ts',
     // ],
     browser: true,
-    moduleDirectories: [
-      "node_modules",
-      config.rootDir
-    ],
+    moduleDirectories: ['node_modules', config.rootDir],
     rootDir: config.rootDir,
     // preferBuiltins: false,
     // ...(config.nodeResolve as any),
   });
-  
+
   const orgNodeResolveId = nodeResolvePlugin.resolveId;
 
   nodeResolvePlugin.resolveId = async function (importee: string, importer: string, opts: any) {
@@ -91,15 +88,15 @@ export const getRollupOptions = (
     console.log('args: ', arguments);
 
     try {
-      let result = await orgNodeResolveId.call(nodeResolvePlugin, importee, importer, opts)
+      let result = await orgNodeResolveId.call(nodeResolvePlugin, importee, importer, opts);
       console.log('going to return::', result);
       return result;
-    } catch(e) {
+    } catch (e) {
       console.log('ok threw here');
       console.log('I was called with: ', arguments);
       console.log(e);
     }
-  }
+  };
   // const orgNodeResolveId2 = (nodeResolvePlugin.resolveId = async function (importee: string, importer: string) {
   //   const [realImportee, query] = importee.split('?');
   //   const resolved = await orgNodeResolveId.call(nodeResolvePlugin, realImportee, importer);

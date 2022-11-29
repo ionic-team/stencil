@@ -19,7 +19,7 @@ import { taskServe } from './task-serve';
 import { taskTelemetry } from './task-telemetry';
 import { taskTest } from './task-test';
 import { telemetryAction } from './telemetry/telemetry';
-import {patchFs} from '../compiler/sys/modules/fs';
+import { patchFs } from '../compiler/sys/modules/fs';
 
 export const run = async (init: d.CliInitOptions) => {
   const { args, logger, sys } = init;
@@ -74,7 +74,7 @@ export const run = async (init: d.CliInitOptions) => {
 
     console.log('cli::run::about to patch');
     patchFs(sys);
-    console.log('cli::run::4')
+    console.log('cli::run::4');
 
     startupLogVersion(logger, task, coreCompiler);
 

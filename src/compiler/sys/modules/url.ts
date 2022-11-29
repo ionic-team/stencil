@@ -7,4 +7,4 @@ export const fileURLToPath = (fileURL: string) => {
   console.log('fileURLToPath called::', fileURL);
   let result = serializePath(basicURLParse(fileURL));
   return result;
-}
+};
