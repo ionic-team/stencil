@@ -94,7 +94,7 @@
     "eslint-plugin-simple-import-sort": "^8.0.0",
     "execa": "4.1.0",
     "exit": "^0.1.2",
-    "fs-extra": "^10.1.0",
+    "fs-extra": "^11.0.0",
     "glob": "8.0.3",
     "graceful-fs": "~4.2.6",
     "hash.js": "^1.1.7",
