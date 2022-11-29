@@ -30,7 +30,7 @@ This is a comprehensive list of the breaking changes introduced in the major ver
   * [Flag Parsing, `parseFlags()`](#flag-parsing-parseflags)
   * [Destroy Callback, `addDestroy()`, `removeDestroy()`](#destroy-callback-adddestroy-removedestroy)
 * [End-to-End Testing](#end-to-end-testing)
-  * [Puppeteer v10 Required](#puppeteer-v10-required)
+  * [Puppeteer v10+ Required](#puppeteer-v10-required)
 
 ### General
 #### New Configuration Defaults
@@ -267,14 +267,17 @@ Replace all instances of `addDestory` with `addDestroy` and all instances of `re
 The functionality of these methods remains the same.
 
 ### End-to-End Testing
-#### Puppeteer v10 Required
+#### Puppeteer v10+ Required
 Versions of Puppeteer prior to Puppeteer version 10 are no longer supported.
 In newer versions of Puppeteer, the library provides its own types, making `@types/puppeteer` no longer necessary.
-Ensure that Puppeteer v10 is installed, and that its typings are not:
+Ensure that Puppeteer v10 or higher is installed, and that its typings are not:
 ```bash
-$ npm install puppeteer@10
+$ npm install puppeteer
 $ npm uninstall @types/puppeteer
 ```
+
+To see which versions of Puppeteer are supported by Stencil, please see our [support matrix](https://stenciljs.com/docs/support-policy#puppeteer)
+
 
 *****
 

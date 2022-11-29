@@ -607,8 +607,8 @@ export function createNodeSys(c: { process?: any } = {}): CompilerSystem {
     '@types/jest': { minVersion: '24.9.1', recommendedVersion: '27.0.3', maxVersion: '27.0.0' },
     jest: { minVersion: '24.9.1', recommendedVersion: '27.0.3', maxVersion: '27.0.0' },
     'jest-cli': { minVersion: '24.9.0', recommendedVersion: '27.4.5', maxVersion: '27.0.0' },
-    puppeteer: { minVersion: '1.19.0', recommendedVersion: '10.0.0' },
-    'puppeteer-core': { minVersion: '1.19.0', recommendedVersion: '5.2.1' },
+    puppeteer: { minVersion: '10.0.0', recommendedVersion: '19' },
+    'puppeteer-core': { minVersion: '10.0.0', recommendedVersion: '19' },
     'workbox-build': { minVersion: '4.3.1', recommendedVersion: '4.3.1' },
   });
 
