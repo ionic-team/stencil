@@ -2,6 +2,7 @@ import ts from 'typescript';
 
 import type * as d from '../../declarations';
 import { serializeImportPath } from './stencil-import-path';
+import { retrieveTsModifiers } from './transform-utils';
 
 export const updateStyleImports = (
   transformOpts: d.TransformOptions,
@@ -51,7 +52,7 @@ const updateEsmStyleImports = (
 
     statements.splice(lastImportIndex + 1, 0, ...styleImports);
 
-    return ts.updateSourceFileNode(tsSourceFile, statements);
+    return ts.factory.updateSourceFile(tsSourceFile, statements);
   }
 
   return tsSourceFile;
@@ -63,7 +64,7 @@ const updateEsmStyleImportPath = (
   statements: ts.Statement[],
   cmp: d.ComponentCompilerMeta,
   style: d.StyleCompiler
-) => {
+): ts.Statement[] => {
   for (let i = 0; i < statements.length; i++) {
     const n = statements[i];
     if (ts.isImportDeclaration(n) && n.importClause && n.moduleSpecifier && ts.isStringLiteral(n.moduleSpecifier)) {
@@ -73,8 +74,7 @@ const updateEsmStyleImportPath = (
 
         statements[i] = ts.factory.updateImportDeclaration(
           n,
-          n.decorators,
-          n.modifiers,
+          retrieveTsModifiers(n),
           n.importClause,
           ts.factory.createStringLiteral(importPath),
           undefined
@@ -95,11 +95,10 @@ const createEsmStyleImport = (
   const importName = ts.factory.createIdentifier(style.styleIdentifier);
   const importPath = getStyleImportPath(transformOpts, tsSourceFile, cmp, style, style.externalStyles[0].absolutePath);
 
-  return ts.createImportDeclaration(
+  return ts.factory.createImportDeclaration(
     undefined,
-    undefined,
-    ts.createImportClause(importName, undefined),
-    ts.createLiteral(importPath)
+    ts.factory.createImportClause(false, importName, undefined),
+    ts.factory.createStringLiteral(importPath)
   );
 };
 
@@ -120,7 +119,7 @@ const updateCjsStyleRequires = (
   });
 
   if (styleRequires.length > 0) {
-    return ts.updateSourceFileNode(tsSourceFile, [...styleRequires, ...tsSourceFile.statements]);
+    return ts.factory.updateSourceFile(tsSourceFile, [...styleRequires, ...tsSourceFile.statements]);
   }
 
   return tsSourceFile;
@@ -135,14 +134,19 @@ const createCjsStyleRequire = (
   const importName = ts.factory.createIdentifier(style.styleIdentifier);
   const importPath = getStyleImportPath(transformOpts, tsSourceFile, cmp, style, style.externalStyles[0].absolutePath);
 
-  return ts.createVariableStatement(
+  return ts.factory.createVariableStatement(
     undefined,
-    ts.createVariableDeclarationList(
+    ts.factory.createVariableDeclarationList(
       [
-        ts.createVariableDeclaration(
+        ts.factory.createVariableDeclaration(
           importName,
           undefined,
-          ts.factory.createCallExpression(ts.factory.createIdentifier('require'), [], [ts.createLiteral(importPath)])
+          undefined,
+          ts.factory.createCallExpression(
+            ts.factory.createIdentifier('require'),
+            [],
+            [ts.factory.createStringLiteral(importPath)]
+          )
         ),
       ],
       ts.NodeFlags.Const

@@ -29,7 +29,6 @@ export const updateStencilCoreImports = (updatedCoreImportPath: string): ts.Tran
                   const newImport = ts.factory.updateImportDeclaration(
                     s,
                     undefined,
-                    undefined,
                     ts.factory.createImportClause(
                       false,
                       undefined,
@@ -54,7 +53,7 @@ export const updateStencilCoreImports = (updatedCoreImportPath: string): ts.Tran
       });
 
       if (madeChanges) {
-        return ts.updateSourceFileNode(
+        return ts.factory.updateSourceFile(
           tsSourceFile,
           newStatements,
           tsSourceFile.isDeclarationFile,

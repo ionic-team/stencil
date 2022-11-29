@@ -2,6 +2,7 @@ import ts from 'typescript';
 
 import type * as d from '../../declarations';
 import { addCoreRuntimeApi, H, HOST, RUNTIME_APIS } from './core-runtime-apis';
+import { retrieveModifierLike } from './transform-utils';
 
 export const transformHostData = (classElements: ts.ClassElement[], moduleFile: d.Module) => {
   const hasHostData = classElements.some(
@@ -13,10 +14,9 @@ export const transformHostData = (classElements: ts.ClassElement[], moduleFile: 
     );
     if (renderIndex >= 0) {
       const renderMethod = classElements[renderIndex] as ts.MethodDeclaration;
-      classElements[renderIndex] = ts.updateMethod(
+      classElements[renderIndex] = ts.factory.updateMethodDeclaration(
         renderMethod,
-        renderMethod.decorators,
-        renderMethod.modifiers,
+        retrieveModifierLike(renderMethod),
         renderMethod.asteriskToken,
         ts.factory.createIdentifier(INTERNAL_RENDER),
         renderMethod.questionToken,
@@ -63,14 +63,15 @@ const syntheticRender = (moduleFile: d.Module, hasRender: boolean) => {
   return ts.factory.createMethodDeclaration(
     undefined,
     undefined,
-    undefined,
     'render',
     undefined,
     undefined,
-    undefined,
+    [],
     undefined,
     ts.factory.createBlock([
-      ts.createReturn(ts.factory.createCallExpression(ts.factory.createIdentifier(H), undefined, hArguments)),
+      ts.factory.createReturnStatement(
+        ts.factory.createCallExpression(ts.factory.createIdentifier(H), undefined, hArguments)
+      ),
     ])
   );
 };

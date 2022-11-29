@@ -1,16 +1,17 @@
-import fs from 'fs-extra';
 import color from 'ansi-colors';
 import execa from 'execa';
+import fs from 'fs-extra';
 import inquirer from 'inquirer';
-import { getOptions, BuildOptions } from './utils/options';
-import { runReleaseTasks } from './release-tasks';
 import { join } from 'path';
+
+import { runReleaseTasks } from './release-tasks';
+import { BuildOptions, getOptions } from './utils/options';
 import {
-  SEMVER_INCREMENTS,
-  prettyVersionDiff,
-  isValidVersionInput,
   getNewVersion,
   isPrereleaseVersion,
+  isValidVersionInput,
+  prettyVersionDiff,
+  SEMVER_INCREMENTS,
 } from './utils/release-utils';
 
 /**
@@ -83,13 +84,15 @@ async function prepareRelease(opts: BuildOptions, args: ReadonlyArray<string>, r
     },
     {
       type: 'input',
-      name: 'version',
-      message: 'Version',
+      // this name is intentionally different from 'version' above to make the `when` check below work properly
+      // (this prompt should only run if `version` was not already input)
+      name: 'specifiedVersion',
+      message: 'Specify Version',
       when: (answers: any) => !answers.version,
       filter: (input: string) => (isValidVersionInput(input) ? getNewVersion(pkg.version, input) : input),
       validate: (input: string) => {
         if (!isValidVersionInput(input)) {
-          return 'Please specify a valid semver, for example, `1.2.3`. See http://semver.org';
+          return 'Please specify a valid semver, for example, `1.2.3`, or `3.0.0-alpha.0`. See http://semver.org';
         }
         return true;
       },
@@ -98,7 +101,8 @@ async function prepareRelease(opts: BuildOptions, args: ReadonlyArray<string>, r
       type: 'confirm',
       name: 'confirm',
       message: (answers: any) => {
-        return `Prepare release ${opts.vermoji}  ${color.yellow(answers.version)} from ${oldVersion}. Continue?`;
+        const version = answers.version ?? answers.specifiedVersion;
+        return `Prepare release ${opts.vermoji}  ${color.yellow(version)} from ${oldVersion}. Continue?`;
       },
     },
   ];
@@ -107,7 +111,7 @@ async function prepareRelease(opts: BuildOptions, args: ReadonlyArray<string>, r
     .prompt(prompts)
     .then((answers) => {
       if (answers.confirm) {
-        opts.version = answers.version;
+        opts.version = answers.version ?? answers.specifiedVersion;
         // write `release-data.json`
         fs.writeJsonSync(releaseDataPath, opts, { spaces: 2 });
         runReleaseTasks(opts, args);
@@ -168,14 +172,15 @@ async function publishRelease(opts: BuildOptions, args: ReadonlyArray<string>): 
     },
     {
       type: 'input',
-      name: 'tag',
-      message: 'Tag',
+      // this name is intentionally different from 'tag' above. if they collide, this input prompt will not run.
+      name: 'specifiedTag',
+      message: 'Specify Tag',
       when: (answers: any) => !pkg.private && isPrereleaseVersion(opts.version) && !answers.tag,
       validate: (input: any) => {
         if (input.length === 0) {
-          return 'Please specify a tag, for example, `next`.';
+          return 'Please specify a tag, for example, `next` or `3.0.0-alpha.0`.';
         } else if (input.toLowerCase() === 'latest') {
-          return "It's not possible to publish pre-releases under the `latest` tag. Please specify something else, for example, `next`.";
+          return "It's not possible to publish pre-releases under the `latest` tag. Please specify something else, for example, `next` or `3.0.0-alpha.0`.";
         }
         return true;
       },
@@ -184,7 +189,7 @@ async function publishRelease(opts: BuildOptions, args: ReadonlyArray<string>): 
       type: 'confirm',
       name: 'confirm',
       message: (answers: any) => {
-        opts.tag = answers.tag;
+        opts.tag = answers.tag ?? answers.specifiedTag;
         const tagPart = opts.tag ? ` and tag this release in npm as ${color.yellow(opts.tag)}` : '';
         return `Will publish ${opts.vermoji}  ${color.yellow(opts.version)}${tagPart}. Continue?`;
       },

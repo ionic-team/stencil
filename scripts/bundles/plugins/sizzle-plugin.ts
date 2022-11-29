@@ -1,7 +1,8 @@
 import fs from 'fs-extra';
-import type { BuildOptions } from '../../utils/options';
 import { join } from 'path';
 import type { Plugin } from 'rollup';
+
+import type { BuildOptions } from '../../utils/options';
 
 /**
  * Bundles sizzle, a CSS selector engine, into the Stencil compiler

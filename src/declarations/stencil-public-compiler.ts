@@ -1202,6 +1202,7 @@ export interface BuildOnEvents {
 }
 
 export interface BuildEmitEvents {
+  emit(eventName: CompilerEventName, path: string): void;
   emit(eventName: CompilerEventFileAdd, path: string): void;
   emit(eventName: CompilerEventFileDelete, path: string): void;
   emit(eventName: CompilerEventFileUpdate, path: string): void;

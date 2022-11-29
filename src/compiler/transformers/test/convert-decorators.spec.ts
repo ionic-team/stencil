@@ -1,3 +1,6 @@
+import * as ts from 'typescript';
+
+import { filterDecorators } from '../decorators-to-static/convert-decorators';
 import { transpileModule } from './transpile';
 
 /**
@@ -50,7 +53,7 @@ describe('convert-decorators', () => {
               "optional": false,
               "docs": {
                 "tags": [],
-                "text": "" 
+                "text": ""
               },
               "attribute": "val",
               "reflect": false,
@@ -149,7 +152,118 @@ describe('convert-decorators', () => {
     );
   });
 
-  it('should not add a super call to the constructor if necessary', () => {
+  it('should preserve statements in an existing constructor', () => {
+    const t = transpileModule(`
+    @Component({
+      tag: 'my-component',
+    })
+    export class MyComponent {
+      constructor() {
+        console.log('boop');
+      }
+    }`);
+
+    expect(t.outputText).toBe(
+      c`export class MyComponent {
+        constructor() {
+          console.log('boop');
+        }
+
+        static get is() {
+          return "my-component";
+      }}`
+    );
+  });
+
+  it('should preserve statements in an existing constructor w/ @Prop', () => {
+    const t = transpileModule(`
+    @Component({
+      tag: 'my-component',
+    })
+    export class MyComponent {
+      @Prop() count: number;
+
+      constructor() {
+        console.log('boop');
+      }
+    }`);
+
+    expect(t.outputText).toContain(
+      c`constructor() {
+          this.count = undefined;
+          console.log('boop');
+        }`
+    );
+  });
+
+  it('should allow user to initialize field in an existing constructor w/ @Prop', () => {
+    const t = transpileModule(`
+    @Component({
+      tag: 'my-component',
+    })
+    export class MyComponent {
+      @Prop() count: number;
+
+      constructor() {
+        this.count = 3;
+      }
+    }`);
+
+    // the initialization we do to `undefined` (since no value is present)
+    // should be before the user's `this.count = 3` to ensure that their code
+    // wins.
+    expect(t.outputText).toContain(
+      c`constructor() {
+          this.count = undefined;
+          this.count = 3;
+        }`
+    );
+  });
+
+  it('should preserve statements in an existing constructor w/ non-decorated field', () => {
+    const t = transpileModule(`
+    @Component({
+      tag: 'example',
+    })
+    export class Example implements FooBar {
+      private classProps: Array<string>;
+
+      constructor() {
+        this.classProps = ["variant", "theme"];
+      }
+    }`);
+
+    expect(t.outputText).toBe(
+      c`export class Example {
+        constructor() {
+          this.classProps = ["variant", "theme"];
+        }}`
+    );
+  });
+
+  it('should preserve statements in an existing constructor super, decorated field', () => {
+    const t = transpileModule(`
+    @Component({
+      tag: 'example',
+    })
+    export class Example extends Parent {
+      @Prop() foo: string = "bar";
+
+      constructor() {
+        console.log("hello!")
+      }
+    }`);
+
+    expect(t.outputText).toContain(
+      c`constructor() {
+        super();
+        this.foo = "bar";
+        console.log("hello!");
+      }`
+    );
+  });
+
+  it('should not add a super call to the constructor if not necessary', () => {
     const t = transpileModule(`
     @Component({tag: 'cmp-a'})
       export class CmpA implements Foobar {
@@ -207,8 +321,8 @@ describe('convert-decorators', () => {
             "composed": true,
             "docs": {
               "tags": [],
-              "text": "" 
-            },            
+              "text": ""
+            },
             "complexType": {
               "original": "{ mph: number }",
               "resolved": "{ mph: number; }",
@@ -217,5 +331,67 @@ describe('convert-decorators', () => {
           }];
       }}`
     );
+  });
+
+  describe('filterDecorators', () => {
+    it.each<ReadonlyArray<ReadonlyArray<string>>>([[[]], [['ExcludedDecorator']]])(
+      'returns undefined when no decorators are provided',
+      (excludeList: ReadonlyArray<string>) => {
+        const filteredDecorators = filterDecorators(undefined, excludeList);
+
+        expect(filteredDecorators).toBeUndefined();
+      }
+    );
+
+    it.each<ReadonlyArray<ReadonlyArray<string>>>([[[]], [['ExcludedDecorator']]])(
+      'returns undefined for an empty list of decorators',
+      (excludeList: ReadonlyArray<string>) => {
+        const filteredDecorators = filterDecorators([], excludeList);
+
+        expect(filteredDecorators).toBeUndefined();
+      }
+    );
+
+    it('returns a decorator if it is not a call expression', () => {
+      // create a decorator, '@Decorator'. note the lack of '()' after the decorator, making it an identifier
+      // expression, rather than a call expression
+      const decorator = ts.factory.createDecorator(ts.factory.createIdentifier('Decorator'));
+
+      const filteredDecorators = filterDecorators([decorator], []);
+
+      expect(filteredDecorators).toHaveLength(1);
+      expect(filteredDecorators![0]).toBe(decorator);
+    });
+
+    it("doesn't return any decorators when all decorators in the exclude list", () => {
+      // create a '@CustomProp()' decorator
+      const customDecorator = ts.factory.createDecorator(
+        ts.factory.createCallExpression(ts.factory.createIdentifier('CustomProp'), undefined, [])
+      );
+      // create '@Prop()' decorator
+      const decorator = ts.factory.createDecorator(
+        ts.factory.createCallExpression(ts.factory.createIdentifier('Prop'), undefined, [])
+      );
+
+      const filteredDecorators = filterDecorators([customDecorator, decorator], ['Prop', 'CustomProp']);
+
+      expect(filteredDecorators).toBeUndefined();
+    });
+
+    it('returns any decorators not in the exclude list', () => {
+      // create a '@CustomProp()' decorator
+      const customDecorator = ts.factory.createDecorator(
+        ts.factory.createCallExpression(ts.factory.createIdentifier('CustomProp'), undefined, [])
+      );
+      // create '@Prop()' decorator
+      const decorator = ts.factory.createDecorator(
+        ts.factory.createCallExpression(ts.factory.createIdentifier('Prop'), undefined, [])
+      );
+
+      const filteredDecorators = filterDecorators([customDecorator, decorator], ['Prop']);
+
+      expect(filteredDecorators).toHaveLength(1);
+      expect(filteredDecorators![0]).toBe(customDecorator);
+    });
   });
 });

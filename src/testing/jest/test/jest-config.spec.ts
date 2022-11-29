@@ -42,7 +42,7 @@ describe('jest-config', () => {
     expect(jestArgv.maxWorkers).toBe(2);
   });
 
-  it('forces --maxWorkers=4 arg when e2e test and --ci', () => {
+  it('passes default --maxWorkers=0 arg when e2e test and --ci', () => {
     const args = ['test', '--ci', '--e2e'];
     const config = mockValidatedConfig();
     config.flags = parseFlags(args);
@@ -53,6 +53,20 @@ describe('jest-config', () => {
     const jestArgv = buildJestArgv(config);
     expect(jestArgv.ci).toBe(true);
     expect(jestArgv.maxWorkers).toBe(0);
+  });
+
+  it('passed default --maxWorkers=0 arg when e2e test and --ci with filepath', () => {
+    const args = ['test', '--ci', '--e2e', '--', 'my-specfile.spec.ts'];
+    const config = mockValidatedConfig();
+    config.flags = parseFlags(args);
+
+    expect(config.flags.args).toEqual(['--ci', '--e2e', '--', 'my-specfile.spec.ts']);
+    expect(config.flags.unknownArgs).toEqual(['--', 'my-specfile.spec.ts']);
+
+    const jestArgv = buildJestArgv(config);
+    expect(jestArgv.ci).toBe(true);
+    expect(jestArgv.maxWorkers).toBe(0);
+    expect(jestArgv._).toEqual(['my-specfile.spec.ts']);
   });
 
   it('pass --maxWorkers=2 arg to jest', () => {
@@ -200,5 +214,15 @@ describe('jest-config', () => {
 
     const jestArgv = buildJestArgv(config);
     expect(jestArgv.json).toBe(true);
+    // the `_` field holds any filename pattern matches
+    expect(jestArgv._).toEqual(['my-component.spec.ts']);
+  });
+
+  it('should parse multiple file patterns', () => {
+    const args = ['test', '--spec', '--json', '--', 'foobar/*', 'my-spec.ts'];
+    const jestArgv = buildJestArgv(mockValidatedConfig({ flags: parseFlags(args) }));
+    expect(jestArgv.json).toBe(true);
+    // the `_` field holds any filename pattern matches
+    expect(jestArgv._).toEqual(['foobar/*', 'my-spec.ts']);
   });
 });

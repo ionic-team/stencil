@@ -40,6 +40,11 @@ export const taskGenerate = async (coreCompiler: CoreCompiler, config: Validated
     config.flags.unknownArgs.find((arg) => !arg.startsWith('-')) ||
     ((await prompt({ name: 'tagName', type: 'text', message: 'Component tag name (dash-case):' })).tagName as string);
 
+  if (undefined === input) {
+    // in some shells (e.g. Windows PowerShell), hitting Ctrl+C results in a TypeError printed to the console.
+    // explicitly return here to avoid printing the error message.
+    return;
+  }
   const { dir, base: componentName } = path.parse(input);
 
   const tagError = validateComponentTag(componentName);
@@ -47,8 +52,13 @@ export const taskGenerate = async (coreCompiler: CoreCompiler, config: Validated
     config.logger.error(tagError);
     return config.sys.exit(1);
   }
-
-  const extensionsToGenerate: GenerableExtension[] = ['tsx', ...(await chooseFilesToGenerate())];
+  const filesToGenerateExt = await chooseFilesToGenerate();
+  if (undefined === filesToGenerateExt) {
+    // in some shells (e.g. Windows PowerShell), hitting Ctrl+C results in a TypeError printed to the console.
+    // explicitly return here to avoid printing the error message.
+    return;
+  }
+  const extensionsToGenerate: GenerableExtension[] = ['tsx', ...filesToGenerateExt];
 
   const testFolder = extensionsToGenerate.some(isTest) ? 'test' : '';
 

@@ -4,6 +4,7 @@ import type * as d from '../../../declarations';
 import { addCoreRuntimeApi, REGISTER_INSTANCE, RUNTIME_APIS } from '../core-runtime-apis';
 import { addCreateEvents } from '../create-event';
 import { addLegacyProps } from '../legacy-props';
+import { retrieveTsModifiers } from '../transform-utils';
 
 export const updateLazyComponentConstructor = (
   classMembers: ts.ClassElement[],
@@ -11,7 +12,7 @@ export const updateLazyComponentConstructor = (
   cmp: d.ComponentCompilerMeta
 ) => {
   const cstrMethodArgs = [
-    ts.createParameter(undefined, undefined, undefined, ts.factory.createIdentifier(HOST_REF_ARG)),
+    ts.factory.createParameterDeclaration(undefined, undefined, ts.factory.createIdentifier(HOST_REF_ARG)),
   ];
 
   const cstrMethodIndex = classMembers.findIndex((m) => m.kind === ts.SyntaxKind.Constructor);
@@ -19,24 +20,22 @@ export const updateLazyComponentConstructor = (
     // add to the existing constructor()
     const cstrMethod = classMembers[cstrMethodIndex] as ts.ConstructorDeclaration;
 
-    const body = ts.updateBlock(cstrMethod.body, [
+    const body = ts.factory.updateBlock(cstrMethod.body, [
       registerInstanceStatement(moduleFile),
       ...addCreateEvents(moduleFile, cmp),
       ...cstrMethod.body.statements,
       ...addLegacyProps(moduleFile, cmp),
     ]);
 
-    classMembers[cstrMethodIndex] = ts.updateConstructor(
+    classMembers[cstrMethodIndex] = ts.factory.updateConstructorDeclaration(
       cstrMethod,
-      cstrMethod.decorators,
-      cstrMethod.modifiers,
+      retrieveTsModifiers(cstrMethod),
       cstrMethodArgs,
       body
     );
   } else {
     // create a constructor()
-    const cstrMethod = ts.createConstructor(
-      undefined,
+    const cstrMethod = ts.factory.createConstructorDeclaration(
       undefined,
       cstrMethodArgs,
       ts.factory.createBlock(
@@ -55,7 +54,7 @@ export const updateLazyComponentConstructor = (
 const registerInstanceStatement = (moduleFile: d.Module) => {
   addCoreRuntimeApi(moduleFile, RUNTIME_APIS.registerInstance);
 
-  return ts.createStatement(
+  return ts.factory.createExpressionStatement(
     ts.factory.createCallExpression(ts.factory.createIdentifier(REGISTER_INSTANCE), undefined, [
       ts.factory.createThis(),
       ts.factory.createIdentifier(HOST_REF_ARG),

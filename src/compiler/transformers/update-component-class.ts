@@ -1,14 +1,15 @@
 import ts from 'typescript';
 
 import type * as d from '../../declarations';
+import { retrieveTsDecorators, retrieveTsModifiers } from './transform-utils';
 
 export const updateComponentClass = (
   transformOpts: d.TransformOptions,
   classNode: ts.ClassDeclaration,
   heritageClauses: ts.HeritageClause[] | ts.NodeArray<ts.HeritageClause>,
   members: ts.ClassElement[]
-) => {
-  let classModifiers = Array.isArray(classNode.modifiers) ? classNode.modifiers.slice() : [];
+): ts.ClassDeclaration | ts.VariableStatement => {
+  let classModifiers = retrieveTsModifiers(classNode)?.slice() ?? [];
 
   if (transformOpts.module === 'cjs') {
     // CommonJS, leave component class as is
@@ -19,10 +20,9 @@ export const updateComponentClass = (
         return m.kind !== ts.SyntaxKind.ExportKeyword;
       });
     }
-    return ts.updateClassDeclaration(
+    return ts.factory.updateClassDeclaration(
       classNode,
-      classNode.decorators,
-      classModifiers,
+      [...(retrieveTsDecorators(classNode) ?? []), ...classModifiers],
       classNode.name,
       classNode.typeParameters,
       heritageClauses,
@@ -42,7 +42,7 @@ const createConstClass = (
 ) => {
   const className = classNode.name;
 
-  const classModifiers = (Array.isArray(classNode.modifiers) ? classNode.modifiers : []).filter((m) => {
+  const classModifiers = (retrieveTsModifiers(classNode) ?? []).filter((m) => {
     // remove the export
     return m.kind !== ts.SyntaxKind.ExportKeyword;
   });
@@ -50,17 +50,24 @@ const createConstClass = (
   const constModifiers: ts.Modifier[] = [];
 
   if (transformOpts.componentExport !== 'customelement') {
-    constModifiers.push(ts.createModifier(ts.SyntaxKind.ExportKeyword));
+    constModifiers.push(ts.factory.createModifier(ts.SyntaxKind.ExportKeyword));
   }
 
-  return ts.createVariableStatement(
+  return ts.factory.createVariableStatement(
     constModifiers,
-    ts.createVariableDeclarationList(
+    ts.factory.createVariableDeclarationList(
       [
-        ts.createVariableDeclaration(
+        ts.factory.createVariableDeclaration(
           className,
           undefined,
-          ts.createClassExpression(classModifiers, undefined, classNode.typeParameters, heritageClauses, members)
+          undefined,
+          ts.factory.createClassExpression(
+            classModifiers,
+            undefined,
+            classNode.typeParameters,
+            heritageClauses,
+            members
+          )
         ),
       ],
       ts.NodeFlags.Const

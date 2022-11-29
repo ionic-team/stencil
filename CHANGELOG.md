@@ -1,3 +1,53 @@
+## 🌏 [2.19.3](https://github.com/ionic-team/stencil/compare/v2.19.2...v2.19.3) (2022-11-15)
+
+
+### Bug Fixes
+
+* **cli:** refactor CLI argument parser ([#3765](https://github.com/ionic-team/stencil/issues/3765)) ([d34c4f2](https://github.com/ionic-team/stencil/commit/d34c4f24c27493197caeb2548a0652ef574f2be2)), closes [#3712](https://github.com/ionic-team/stencil/issues/3712)
+* **generate:** prevent type error when existing task ([#3793](https://github.com/ionic-team/stencil/issues/3793)) ([f553fde](https://github.com/ionic-team/stencil/commit/f553fdeaf256e02f084bd64b4329e77e634965a8))
+
+
+### Thanks
+
+🎉 Thanks for @PengBoUESTC and @boahc077 for their contributions! 🎉
+
+
+## 🍋 [2.19.2](https://github.com/ionic-team/stencil/compare/v2.19.2-0...v2.19.2) (2022-10-27)
+
+
+### Bug Fixes
+
+* **compiler:** account for an existing constructor in convert-decorators ([#3776](https://github.com/ionic-team/stencil/issues/3776)) ([7c92dbf](https://github.com/ionic-team/stencil/commit/7c92dbfe5888529619898ff7ed42d690a54d6eb5)), closes [#3773](https://github.com/ionic-team/stencil/issues/3773)
+
+
+
+## 🌵 [2.19.2-0](https://github.com/ionic-team/stencil/compare/v2.19.1...v2.19.2-0) (2022-10-27)
+
+
+### Bug Fixes
+
+* **compiler:** account for an existing constructor in convert-decorators ([#3776](https://github.com/ionic-team/stencil/issues/3776)) ([7c92dbf](https://github.com/ionic-team/stencil/commit/7c92dbfe5888529619898ff7ed42d690a54d6eb5)), closes [#3773](https://github.com/ionic-team/stencil/issues/3773)
+
+
+
+## 📻 [2.19.1](https://github.com/ionic-team/stencil/compare/v2.19.1-0...v2.19.1) (2022-10-26)
+
+
+### Bug Fixes
+
+* **docs:** avoid duplicating manual documentation ([#3766](https://github.com/ionic-team/stencil/issues/3766)) ([82d3596](https://github.com/ionic-team/stencil/commit/82d359673f65c87ff89980beb2f118b6169698ff)), closes [#3762](https://github.com/ionic-team/stencil/issues/3762)
+
+
+
+## 🐺 [2.19.1-0](https://github.com/ionic-team/stencil/compare/v2.19.0...v2.19.1-0) (2022-10-25)
+
+
+### Bug Fixes
+
+* **docs:** avoid duplicating manual documentation ([#3766](https://github.com/ionic-team/stencil/issues/3766)) ([82d3596](https://github.com/ionic-team/stencil/commit/82d359673f65c87ff89980beb2f118b6169698ff)), closes [#3762](https://github.com/ionic-team/stencil/issues/3762)
+
+
+
 # 💾 [2.19.0](https://github.com/ionic-team/stencil/compare/v2.18.1...v2.19.0) (2022-10-24)
 
 

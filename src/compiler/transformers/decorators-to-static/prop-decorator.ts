@@ -9,6 +9,8 @@ import {
   getAttributeTypeInfo,
   isMemberPrivate,
   resolveType,
+  retrieveTsDecorators,
+  retrieveTsModifiers,
   serializeSymbol,
   typeToString,
   validateReferences,
@@ -37,7 +39,7 @@ export const propDecoratorsToStatic = (
   const properties = decoratedProps
     .filter(ts.isPropertyDeclaration)
     .map((prop) => parsePropDecorator(diagnostics, typeChecker, prop, watchable))
-    .filter((prop) => prop != null);
+    .filter((prop): prop is ts.PropertyAssignment => prop != null);
 
   if (properties.length > 0) {
     newMembers.push(createStaticGetter('properties', ts.factory.createObjectLiteralExpression(properties, true)));
@@ -58,8 +60,8 @@ const parsePropDecorator = (
   typeChecker: ts.TypeChecker,
   prop: ts.PropertyDeclaration,
   watchable: Set<string>
-): ts.PropertyAssignment => {
-  const propDecorator = prop.decorators.find(isDecoratorNamed('Prop'));
+): ts.PropertyAssignment | null => {
+  const propDecorator = retrieveTsDecorators(prop)?.find(isDecoratorNamed('Prop'));
   if (propDecorator == null) {
     return null;
   }
@@ -73,7 +75,7 @@ const parsePropDecorator = (
     const err = buildError(diagnostics);
     err.messageText =
       'Properties decorated with the @Prop() decorator cannot be "private" nor "protected". More info: https://stenciljs.com/docs/properties';
-    augmentDiagnosticWithNode(err, prop.modifiers[0]);
+    augmentDiagnosticWithNode(err, retrieveTsModifiers(prop)![0]);
   }
 
   if (/^on(-|[A-Z])/.test(propName)) {
@@ -110,7 +112,10 @@ const parsePropDecorator = (
     propMeta.defaultValue = initializer.getText();
   }
 
-  const staticProp = ts.factory.createPropertyAssignment(ts.createLiteral(propName), convertValueToLiteral(propMeta));
+  const staticProp = ts.factory.createPropertyAssignment(
+    ts.factory.createStringLiteral(propName),
+    convertValueToLiteral(propMeta)
+  );
   watchable.add(propName);
   return staticProp;
 };

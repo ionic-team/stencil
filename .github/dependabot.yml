@@ -15,7 +15,7 @@ updates:
       - dependency-name: '@types/node'
         versions: ['17', '18']
       - dependency-name: 'typescript'
-        versions: ['4.8']
+        versions: ['>=4.9']
       # disable Jest updates until the new testing architecture is in place
       - dependency-name: '@types/jest'
         versions: ['>=28']
@@ -31,3 +31,15 @@ updates:
         versions: ['>7.3.3']
       - dependency-name: '@types/inquirer'
         versions: ['>7.3.1']
+  - package-ecosystem: 'npm'
+    directory: './test/bundler' # Location of package manifests
+    schedule:
+      interval: 'daily'
+    open-pull-requests-limit: 50
+    # Disable rebasing for pull requests, as having several open pull requests all get simultaneously rebased gets
+    # noisy from a notification standpoint
+    rebase-strategy: 'disabled'
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+    schedule:
+      interval: 'daily'
