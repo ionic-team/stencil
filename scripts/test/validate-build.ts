@@ -1,7 +1,7 @@
 import fs from 'fs-extra';
 import { dirname, join, relative } from 'path';
 import { rollup } from 'rollup';
-import ts from 'typescript';
+import ts, { ModuleResolutionKind, ScriptTarget } from 'typescript';
 
 import { BuildOptions, getOptions } from '../utils/options';
 import { PackageData } from '../utils/write-pkg-json';
@@ -220,7 +220,7 @@ function validatePackage(opts: BuildOptions, testPkg: TestPackage, dtsEntries: s
 }
 
 /**
- * Validate the the .d.ts files used in the output are semantically and syntactically correct
+ * Validate the .d.ts files used in the output are semantically and syntactically correct
  * @param opts build options to be used to validate .d.ts files
  * @param dtsEntries the .d.ts files to validate
  */
@@ -232,6 +232,8 @@ function validateDts(opts: BuildOptions, dtsEntries: string[]): void {
       '@stencil/core/internal': [join(opts.rootDir, 'internal', 'index.d.ts')],
       '@stencil/core/internal/testing': [join(opts.rootDir, 'internal', 'testing', 'index.d.ts')],
     },
+    moduleResolution: ModuleResolutionKind.NodeJs,
+    target: ScriptTarget.ES2016,
   });
 
   const tsDiagnostics = program.getSemanticDiagnostics().concat(program.getSyntacticDiagnostics());
