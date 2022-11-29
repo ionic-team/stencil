@@ -31,6 +31,14 @@ updates:
         versions: ['>7.3.3']
       - dependency-name: '@types/inquirer'
         versions: ['>7.3.1']
+  - package-ecosystem: 'npm'
+    directory: './test/bundler' # Location of package manifests
+    schedule:
+      interval: 'daily'
+    open-pull-requests-limit: 50
+    # Disable rebasing for pull requests, as having several open pull requests all get simultaneously rebased gets
+    # noisy from a notification standpoint
+    rebase-strategy: 'disabled'
   - package-ecosystem: 'github-actions'
     directory: '/'
     schedule:
