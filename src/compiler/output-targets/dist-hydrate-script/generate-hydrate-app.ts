@@ -31,7 +31,9 @@ export const generateHydrateApp = async (
       ...config.rollupConfig.inputOptions,
 
       input,
-      inlineDynamicImports: true,
+      output: {
+        inlineDynamicImports: true,
+      },
       plugins: [
         {
           name: 'hydrateAppPlugin',
@@ -41,6 +43,9 @@ export const generateHydrateApp = async (
             }
             if (id === STENCIL_MOCK_DOC_ID) {
               return mockDoc;
+            }
+            if (id === input) {
+              return id
             }
             return null;
           },
