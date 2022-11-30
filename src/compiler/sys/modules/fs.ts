@@ -2,7 +2,7 @@ import { normalizePath } from '@utils';
 import { basename } from 'path';
 
 import type * as d from '../../../declarations';
-import { promisify } from './util';
+// import { promisify } from './util';
 
 export interface FsObj {
   __sys: d.CompilerSystem;
