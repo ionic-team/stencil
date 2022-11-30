@@ -182,16 +182,6 @@ export const writeFile = (fs.writeFile = (p: string, data: string, opts: any, cb
     });
 });
 
-export const patchFs = (userSys: d.CompilerSystem) => {
-  console.log('patchFs::about to patch');
-  if (fs.__sys == undefined) {
-    // @ts-ignore
-    fs.__sys = {};
-  }
-  Object.assign(fs.__sys, userSys);
-  console.log('patchFs::patched');
-};
-
 export default fs;
 
 // We need to export a mock of fs' 'promises' functions because Rollup depends
