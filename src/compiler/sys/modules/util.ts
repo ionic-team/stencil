@@ -15,7 +15,6 @@ export const inherits = (ctor: any, superCtor: any) => {
 export const inspect = (...args: any[]) => args.forEach((arg) => console.log(arg));
 
 export const promisify = (fn: Function): (() => Promise<any>) => {
-  console.log('GONNA PROMISIFY SOMETHING!');
   if (typeof (fn as any)[promisify.custom] === 'function') {
     // https://nodejs.org/api/util.html#util_custom_promisified_functions
     return function (...args: any[]) {
@@ -23,37 +22,18 @@ export const promisify = (fn: Function): (() => Promise<any>) => {
     };
   }
 
-  return function () {
+  return function (...args: any[]) {
     return new Promise((resolve, reject) => {
-      fn(...arguments, (err: any, data: any) => {
-        if (err !== null) {
-          console.log('promisified error');
-          console.log(err);
-          console.log(arguments);
-          console.log('weeeee');
+      args.push((err: any, result: any) => {
+        if (err != null) {
           reject(err);
         } else {
-          resolve(data);
+          resolve(result);
         }
       });
+      fn.apply(this, args);
     });
   };
-
-  // return function (...args: any[]) {
-  //   return new Promise((resolve, reject) => {
-  //     args.push((err: any, result: any) => {
-  //       if (err != null) {
-  //         console.log('promisified error');
-  //         console.log(err);
-  //         console.log(args);
-  //         reject(err);
-  //       } else {
-  //         resolve(result);
-  //       }
-  //     });
-  //     fn.apply(this, args);
-  //   });
-  // };
 };
 
 promisify.custom = Symbol('promisify.custom');

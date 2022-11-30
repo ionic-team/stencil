@@ -2,7 +2,7 @@ import { normalizePath } from '@utils';
 import { basename } from 'path';
 
 import type * as d from '../../../declarations';
-// import { promisify } from './util';
+import { promisify } from './util';
 
 export interface FsObj {
   __sys: d.CompilerSystem;
@@ -27,7 +27,7 @@ export const exists = (fs.exists = (p: string, cb: any) => {
 });
 
 // https://nodejs.org/api/util.html#util_custom_promisified_functions
-// (exists as any)[promisify.custom] = (p: string) => fs.__sys.access(p);
+(exists as any)[promisify.custom] = (p: string) => fs.__sys.access(p);
 
 export const existsSync = (fs.existsSync = (p: string) => {
   // https://nodejs.org/api/fs.html#fs_fs_existssync_path
