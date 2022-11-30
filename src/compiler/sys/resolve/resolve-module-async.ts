@@ -15,12 +15,12 @@ import {
 } from './resolve-utils';
 
 export const resolveModuleIdAsync = (
-  _sys: d.CompilerSystem,
-  _inMemoryFs: InMemoryFileSystem,
+  sys: d.CompilerSystem,
+  inMemoryFs: InMemoryFileSystem,
   opts: d.ResolveModuleIdOptions
 ) => {
-  // const resolverOpts: AsyncOpts = createCustomResolverAsync(sys, inMemoryFs, opts.exts);
-  const resolverOpts: AsyncOpts = {};
+  const resolverOpts: AsyncOpts = createCustomResolverAsync(sys, inMemoryFs, opts.exts);
+  // const resolverOpts: AsyncOpts = {};
   resolverOpts.basedir = dirname(normalizeFsPath(opts.containingFile));
 
   if (opts.packageFilter) {
@@ -57,7 +57,7 @@ export const createCustomResolverAsync = (
   inMemoryFs: InMemoryFileSystem,
   exts: string[]
 ): any => {
-  return {};
+  // return {};
 
   // @ts-ignore
   return {
@@ -120,6 +120,17 @@ export const createCustomResolverAsync = (
       }
 
       cb(null, false);
+    },
+
+    async readFile(p: string, cb: (err: any, data?: any) => void) {
+      const fsFilePath = normalizeFsPath(p);
+
+      const data = await inMemoryFs.readFile(fsFilePath);
+      if (isString(data)) {
+        return cb(null, data);
+      }
+
+      return cb(`readFile not found: ${p}`);
     },
 
     async realpath(p: string, cb: (err: any, data?: any) => void) {
