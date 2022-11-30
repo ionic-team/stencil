@@ -193,3 +193,11 @@ export const patchFs = (userSys: d.CompilerSystem) => {
 };
 
 export default fs;
+
+// We need to export a mock of fs' 'promises' functions because Rollup depends
+// on it.
+export const promises = {
+  ...Object.fromEntries(
+    Object.entries(fs).map(([k,v]) => ([k, promisify(v)]))
+  )
+}
