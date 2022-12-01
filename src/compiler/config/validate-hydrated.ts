@@ -16,7 +16,7 @@ export const validateHydrated = (config: UnvalidatedConfig): HydratedFlag | unde
    *
    * See {@link HydratedFlag} for more details.
    */
-  if (config.hydratedFlag === null || config.hydratedFlag === false) {
+  if (config.hydratedFlag === null) {
     return undefined;
   }
 
