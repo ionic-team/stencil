@@ -5,6 +5,7 @@ import { updateLazyComponentConstructor } from '../component-lazy/lazy-construct
 import { addLazyElementGetter } from '../component-lazy/lazy-element-getter';
 import { transformHostData } from '../host-data-transform';
 import { removeStaticMetaProperties } from '../remove-static-meta-properties';
+import { retrieveModifierLike } from '../transform-utils';
 import { addWatchers } from '../watcher-meta-transform';
 import { addHydrateRuntimeCmpMeta } from './hydrate-runtime-cmp-meta';
 
@@ -15,8 +16,7 @@ export const updateHydrateComponentClass = (
 ) => {
   return ts.factory.updateClassDeclaration(
     classNode,
-    classNode.decorators,
-    classNode.modifiers,
+    retrieveModifierLike(classNode),
     classNode.name,
     classNode.typeParameters,
     classNode.heritageClauses,

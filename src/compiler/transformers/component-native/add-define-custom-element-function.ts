@@ -154,12 +154,11 @@ const addDefineCustomElementFunction = (
   caseStatements: ts.CaseClause[]
 ) => {
   const newExpression = ts.factory.createFunctionDeclaration(
-    undefined,
     [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
     undefined,
     ts.factory.createIdentifier('defineCustomElement'),
     undefined,
-    undefined,
+    [],
     undefined,
     ts.factory.createBlock(
       [
@@ -196,7 +195,6 @@ const addDefineCustomElementFunction = (
                 undefined,
                 [
                   ts.factory.createParameterDeclaration(
-                    undefined,
                     undefined,
                     undefined,
                     ts.factory.createIdentifier('tagName'),

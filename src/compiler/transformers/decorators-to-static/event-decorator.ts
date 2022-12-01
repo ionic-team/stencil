@@ -7,6 +7,7 @@ import {
   createStaticGetter,
   getAttributeTypeInfo,
   resolveType,
+  retrieveTsDecorators,
   serializeSymbol,
   validateReferences,
 } from '../transform-utils';
@@ -43,7 +44,7 @@ const parseEventDecorator = (
   typeChecker: ts.TypeChecker,
   prop: ts.PropertyDeclaration
 ): d.ComponentCompilerStaticEvent | null => {
-  const eventDecorator = prop.decorators?.find(isDecoratorNamed('Event'));
+  const eventDecorator = retrieveTsDecorators(prop)?.find(isDecoratorNamed('Event'));
 
   if (eventDecorator == null) {
     return null;
