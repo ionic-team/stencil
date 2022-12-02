@@ -29,11 +29,10 @@ describe('add-component-meta-proxy', () => {
 
       classExpr = ts.factory.createClassExpression(
         undefined,
-        undefined,
         'MyComponent',
         undefined,
         [htmlElementHeritageClause],
-        undefined
+        []
       );
       literalMetadata = ts.factory.createStringLiteral('MyComponent');
 

@@ -15,7 +15,7 @@ updates:
       - dependency-name: '@types/node'
         versions: ['17', '18']
       - dependency-name: 'typescript'
-        versions: ['4.8']
+        versions: ['>=4.9']
       # disable Jest updates until the new testing architecture is in place
       - dependency-name: '@types/jest'
         versions: ['>=28']

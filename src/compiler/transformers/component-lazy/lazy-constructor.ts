@@ -4,6 +4,7 @@ import type * as d from '../../../declarations';
 import { addCoreRuntimeApi, REGISTER_INSTANCE, RUNTIME_APIS } from '../core-runtime-apis';
 import { addCreateEvents } from '../create-event';
 import { addLegacyProps } from '../legacy-props';
+import { retrieveTsModifiers } from '../transform-utils';
 
 export const updateLazyComponentConstructor = (
   classMembers: ts.ClassElement[],
@@ -11,7 +12,7 @@ export const updateLazyComponentConstructor = (
   cmp: d.ComponentCompilerMeta
 ) => {
   const cstrMethodArgs = [
-    ts.factory.createParameterDeclaration(undefined, undefined, undefined, ts.factory.createIdentifier(HOST_REF_ARG)),
+    ts.factory.createParameterDeclaration(undefined, undefined, ts.factory.createIdentifier(HOST_REF_ARG)),
   ];
 
   const cstrMethodIndex = classMembers.findIndex((m) => m.kind === ts.SyntaxKind.Constructor);
@@ -28,15 +29,13 @@ export const updateLazyComponentConstructor = (
 
     classMembers[cstrMethodIndex] = ts.factory.updateConstructorDeclaration(
       cstrMethod,
-      cstrMethod.decorators,
-      cstrMethod.modifiers,
+      retrieveTsModifiers(cstrMethod),
       cstrMethodArgs,
       body
     );
   } else {
     // create a constructor()
     const cstrMethod = ts.factory.createConstructorDeclaration(
-      undefined,
       undefined,
       cstrMethodArgs,
       ts.factory.createBlock(

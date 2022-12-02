@@ -26,11 +26,10 @@ export const addNativeConnectedCallback = (classMembers: ts.ClassElement[], cmp:
       const callbackMethod = ts.factory.createMethodDeclaration(
         undefined,
         undefined,
-        undefined,
         'connectedCallback',
         undefined,
         undefined,
-        undefined,
+        [],
         undefined,
         ts.factory.createBlock([fnCall, ...connectedCallback.body.statements], true)
       );
@@ -41,11 +40,10 @@ export const addNativeConnectedCallback = (classMembers: ts.ClassElement[], cmp:
       const callbackMethod = ts.factory.createMethodDeclaration(
         undefined,
         undefined,
-        undefined,
         'connectedCallback',
         undefined,
         undefined,
-        undefined,
+        [],
         undefined,
         ts.factory.createBlock([fnCall], true)
       );

@@ -64,6 +64,7 @@
         "compiler/lib.es2022.full.d.ts",
         "compiler/lib.es2022.intl.d.ts",
         "compiler/lib.es2022.object.d.ts",
+        "compiler/lib.es2022.sharedmemory.d.ts",
         "compiler/lib.es2022.string.d.ts",
         "compiler/lib.es5.d.ts",
         "compiler/lib.es6.d.ts",
