@@ -14,7 +14,7 @@
 * **api** remove `sys` parameter from `parseFlags` public API ([#3489](https://github.com/ionic-team/stencil/pull/3489) ([b5db83c](https://github.com/ionic-team/stencil/commit/b5db83cfe933c6bfbe47aa7d1bd2b131f14f5a23)))
 * **cli:** update configuration flag defaults for V3 ([#3502](https://github.com/ionic-team/stencil/issues/3502)) ([7241968](https://github.com/ionic-team/stencil/commit/72419685e993935380349be27e4ed1fd9fac9d8b))
 * **compiler:** export custom types in compiled output ([#3710](https://github.com/ionic-team/stencil/issues/3710)) ([e52489e](https://github.com/ionic-team/stencil/commit/e52489e5851f06d742bf243c553490313ccf1321))
-* **compiler** remove deprecated assetsDir field ([#3341](https://github.com/ionic-team/stencil/issues/3341)) ([eb61f89](https://github.com/ionic-team/stencil/commit/eb61f896baade0d22e04298624dd32d2886173a8)) 
+* **compiler** remove deprecated assetsDir field ([#3341](https://github.com/ionic-team/stencil/issues/3341)) ([eb61f89](https://github.com/ionic-team/stencil/commit/eb61f896baade0d22e04298624dd32d2886173a8))
 * **node:** drop node 12 support ([#3302](https://github.com/ionic-team/stencil/issues/3302)) ([72779d9](https://github.com/ionic-team/stencil/commit/72779d9c31318c70bce99cabb8aec14e0a088493))
 * **output_targets:** remove legacy angular target ([#3493](https://github.com/ionic-team/stencil/issues/3493)) ([62bacc8](https://github.com/ionic-team/stencil/commit/62bacc8733669b5305a81f2c4676af9df33afb77))
 * **output_targets:** remove `dist-custom-elements-bundle` ([#3579](https://github.com/ionic-team/stencil/pull/3579)) ([3c97c0f](https://github.com/ionic-team/stencil/commit/3c97c0f61142dcb4d2d0dcfa92766493a0f307d3))
@@ -30,6 +30,24 @@
 See [BREAKING_CHANGES.md - v3.0.0](./BREAKING_CHANGES.md#stencil-v300) for a comprehensive list of breaking changes.
 
 See [the v3.0.0 Migration Guide](https://stenciljs.com/docs/upgrading-to-stencil-3) for a guide to migrate to Stencil v3.0.0.
+
+
+# 🍁 [2.20.0](https://github.com/ionic-team/stencil/compare/v2.19.3...v2.20.0) (2022-12-05)
+
+
+### Bug Fixes
+
+* **cli:** ensure that argument order is correct for Jest ([#3827](https://github.com/ionic-team/stencil/issues/3827)) ([eb44060](https://github.com/ionic-team/stencil/commit/eb440602d79396eebbf3f8a509f60f3e03417440))
+
+
+### Features
+
+* **typescript:** support typescript 4.8 ([#3743](https://github.com/ionic-team/stencil/issues/3743)) ([8fa35f2](https://github.com/ionic-team/stencil/commit/8fa35f2e12a5da09cf28e7b92103675164957d08))
+
+
+### Thanks
+
+🎉 Thanks for @PengBoUESTC for their contributions! 🎉
 
 
 ## 🌏 [2.19.3](https://github.com/ionic-team/stencil/compare/v2.19.2...v2.19.3) (2022-11-15)
