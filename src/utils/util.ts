@@ -2,7 +2,7 @@ import type * as d from '../declarations';
 import { dashToPascalCase, isString, toDashCase } from './helpers';
 import { buildError } from './message-utils';
 
-const SUPPRESSED_JSDOC_TAGS: string[] = ['internal'];
+const SUPPRESSED_JSDOC_TAGS: ReadonlyArray<string> = ['virtualProp', 'slot', 'part', 'internal'];
 
 /**
  * Create a stylistically-appropriate JS variable name from a filename
