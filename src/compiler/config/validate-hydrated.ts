@@ -16,7 +16,7 @@ export const validateHydrated = (config: UnvalidatedConfig): HydratedFlag | unde
    *
    * See {@link HydratedFlag} for more details.
    */
-  if (config.hydratedFlag === null) {
+  if (config.hydratedFlag === null || Array.isArray(config.hydratedFlag) || typeof config.hydratedFlag !== 'object') {
     return undefined;
   }
 
