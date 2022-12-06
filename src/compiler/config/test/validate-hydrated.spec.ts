@@ -14,11 +14,24 @@ describe('validate-hydrated', () => {
       };
     });
 
-    it.each([null, [], true, false])('returns undefined for hydratedFlag=%s', (badValue) => {
+    it.each([null, false])('returns undefined for hydratedFlag=%s', (badValue) => {
       // this test explicitly checks for a bad value in the stencil.config file, hence the type assertion
       (inputConfig.hydratedFlag as any) = badValue;
       const actual = validateHydrated(inputConfig);
       expect(actual).toBeUndefined();
+    });
+
+    it.each([[], true])('returns a default value when hydratedFlag=%s', (badValue) => {
+      // this test explicitly checks for a bad value in the stencil.config file, hence the type assertion
+      (inputConfig.hydratedFlag as any) = badValue;
+      const actual = validateHydrated(inputConfig);
+      expect(actual).toEqual<d.HydratedFlag>({
+        hydratedValue: 'inherit',
+        initialValue: 'hidden',
+        name: 'hydrated',
+        property: 'visibility',
+        selector: 'class',
+      });
     });
   });
 });
