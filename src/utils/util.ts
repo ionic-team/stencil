@@ -2,6 +2,10 @@ import type * as d from '../declarations';
 import { dashToPascalCase, isString, toDashCase } from './helpers';
 import { buildError } from './message-utils';
 
+/**
+ * A set of JSDoc tags which should be excluded from JSDoc comments
+ * included in output typedefs.
+ */
 const SUPPRESSED_JSDOC_TAGS: ReadonlyArray<string> = ['virtualProp', 'slot', 'part', 'internal'];
 
 /**
@@ -117,7 +121,8 @@ function formatDocBlock(docs: d.CompilerJsDoc, indentation: number = 0): string 
 }
 
 /**
- * Get all lines part of the doc block
+ * Get all lines which are part of the doc block
+ *
  * @param docs the compiled JS docs
  * @returns list of lines part of the doc block
  */
