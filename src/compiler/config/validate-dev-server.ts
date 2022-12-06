@@ -101,7 +101,9 @@ export const validateDevServer = (
   }
 
   if (devServer.historyApiFallback !== null) {
-    devServer.historyApiFallback = devServer.historyApiFallback || {};
+    if (Array.isArray(devServer.historyApiFallback) || typeof devServer.historyApiFallback !== 'object') {
+      devServer.historyApiFallback = {};
+    }
 
     if (!isString(devServer.historyApiFallback.index)) {
       devServer.historyApiFallback.index = 'index.html';
