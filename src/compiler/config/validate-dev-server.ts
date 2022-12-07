@@ -100,8 +100,10 @@ export const validateDevServer = (
     devServer.protocol = devServer.https ? 'https' : addressProtocol ? addressProtocol : 'http';
   }
 
-  if (devServer.historyApiFallback !== null && devServer.historyApiFallback !== false) {
-    devServer.historyApiFallback = devServer.historyApiFallback || {};
+  if (devServer.historyApiFallback !== null) {
+    if (Array.isArray(devServer.historyApiFallback) || typeof devServer.historyApiFallback !== 'object') {
+      devServer.historyApiFallback = {};
+    }
 
     if (!isString(devServer.historyApiFallback.index)) {
       devServer.historyApiFallback.index = 'index.html';
