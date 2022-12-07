@@ -66,7 +66,7 @@ export const optimizeModule = async (
                 ...opts.sourceMap,
                 version: 3,
               }
-            : null,
+            : undefined,
       };
     }
 
@@ -214,13 +214,16 @@ export const prepareModule = async (
         (minifyOpts.sourceMap as SourceMapOptions)?.content as SourceMap,
         JSON.parse(tsResults.sourceMapText)
       );
-      minifyOpts.sourceMap = {
-        content: {
-          ...mergeMap,
-          sources: mergeMap.sources ?? [],
-          version: 3,
-        },
-      };
+
+      if (mergeMap != null) {
+        minifyOpts.sourceMap = {
+          content: {
+            ...mergeMap,
+            sources: mergeMap.sources ?? [],
+            version: 3,
+          },
+        };
+      }
     }
   }
 
