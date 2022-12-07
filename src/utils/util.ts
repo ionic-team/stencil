@@ -4,7 +4,17 @@ import { buildError } from './message-utils';
 
 const SUPPRESSED_JSDOC_TAGS: string[] = ['internal'];
 
-export const createJsVarName = (fileName: string) => {
+/**
+ * Create a stylistically-appropriate JS variable name from a filename
+ *
+ * If the filename has any of the special characters "?", "#", "&" and "=" it
+ * will take the string before the left-most instance of one of those
+ * characters.
+ *
+ * @param fileName the filename which serves as starting material
+ * @returns a JS variable name based on the filename
+ */
+export const createJsVarName = (fileName: string): string => {
   if (isString(fileName)) {
     fileName = fileName.split('?')[0];
     fileName = fileName.split('#')[0];
