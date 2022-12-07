@@ -59,7 +59,15 @@ export const optimizeModule = async (
   if (opts.sourceTarget === 'es5' || opts.minify) {
     minifyOpts = getTerserOptions(config, opts.sourceTarget, isDebug);
     if (config.sourceMap) {
-      minifyOpts.sourceMap = { content: opts.sourceMap };
+      minifyOpts.sourceMap = {
+        content:
+          opts.sourceMap != null
+            ? {
+                ...opts.sourceMap,
+                version: 3,
+              }
+            : null,
+      };
     }
 
     const compressOpts = minifyOpts.compress as CompressOptions;
@@ -206,7 +214,13 @@ export const prepareModule = async (
         (minifyOpts.sourceMap as SourceMapOptions)?.content as SourceMap,
         JSON.parse(tsResults.sourceMapText)
       );
-      minifyOpts.sourceMap = { content: mergeMap };
+      minifyOpts.sourceMap = {
+        content: {
+          ...mergeMap,
+          sources: mergeMap.sources ?? [],
+          version: 3,
+        },
+      };
     }
   }
 
