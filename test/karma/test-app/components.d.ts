@@ -226,6 +226,9 @@ export namespace Components {
     }
     interface ShadowDomBasicRoot {
     }
+    /**
+     * @virtualProp {string} colormode - The mode determines which platform styles to use.
+     */
     interface ShadowDomMode {
         /**
           * The mode determines which platform styles to use.
@@ -868,6 +871,9 @@ declare global {
         prototype: HTMLShadowDomBasicRootElement;
         new (): HTMLShadowDomBasicRootElement;
     };
+    /**
+     * @virtualProp {string} colormode - The mode determines which platform styles to use.
+     */
     interface HTMLShadowDomModeElement extends Components.ShadowDomMode, HTMLStencilElement {
     }
     var HTMLShadowDomModeElement: {
@@ -1490,6 +1496,9 @@ declare namespace LocalJSX {
     }
     interface ShadowDomBasicRoot {
     }
+    /**
+     * @virtualProp {string} colormode - The mode determines which platform styles to use.
+     */
     interface ShadowDomMode {
         /**
           * The mode determines which platform styles to use.
@@ -1813,6 +1822,9 @@ declare module "@stencil/core" {
             "shadow-dom-array-root": LocalJSX.ShadowDomArrayRoot & JSXBase.HTMLAttributes<HTMLShadowDomArrayRootElement>;
             "shadow-dom-basic": LocalJSX.ShadowDomBasic & JSXBase.HTMLAttributes<HTMLShadowDomBasicElement>;
             "shadow-dom-basic-root": LocalJSX.ShadowDomBasicRoot & JSXBase.HTMLAttributes<HTMLShadowDomBasicRootElement>;
+            /**
+             * @virtualProp {string} colormode - The mode determines which platform styles to use.
+             */
             "shadow-dom-mode": LocalJSX.ShadowDomMode & JSXBase.HTMLAttributes<HTMLShadowDomModeElement>;
             "shadow-dom-mode-root": LocalJSX.ShadowDomModeRoot & JSXBase.HTMLAttributes<HTMLShadowDomModeRootElement>;
             "shadow-dom-slot-basic": LocalJSX.ShadowDomSlotBasic & JSXBase.HTMLAttributes<HTMLShadowDomSlotBasicElement>;
