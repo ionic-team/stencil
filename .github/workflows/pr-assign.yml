@@ -2,7 +2,8 @@ name: Auto Request Review
 
 on:
   pull_request:
-    types: [opened, ready_for_review, reopened]
+    # TODO remove synchronize event
+    types: [opened, ready_for_review, reopened, synchronize]
 
 jobs:
   auto-request-review:
