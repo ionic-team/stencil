@@ -42,9 +42,10 @@ export const validateServiceWorker = (config: d.ValidatedConfig, outputTarget: d
     return;
   }
 
-  const globDirectory = typeof outputTarget.serviceWorker?.globDirectory === 'string'
-    ? outputTarget.serviceWorker.globDirectory
-    : outputTarget.appDir;
+  const globDirectory =
+    typeof outputTarget.serviceWorker?.globDirectory === 'string'
+      ? outputTarget.serviceWorker.globDirectory
+      : outputTarget.appDir;
 
   outputTarget.serviceWorker = {
     ...outputTarget.serviceWorker,
