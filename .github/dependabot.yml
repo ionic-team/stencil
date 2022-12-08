@@ -42,7 +42,7 @@ updates:
     ignore:
       # These values should match the values ignored by Dependabot for the project's root `package.json` (above)
       - dependency-name: '@types/node'
-        versions: [ '17', '18' ]
+        versions: ['17', '18']
   - package-ecosystem: 'github-actions'
     directory: '/'
     schedule:
