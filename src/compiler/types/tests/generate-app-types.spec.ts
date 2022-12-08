@@ -52,10 +52,16 @@ describe('generateAppTypes', () => {
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
+    /**
+     * docs
+     */
         interface MyComponent {
         }
 }
 declare global {
+    /**
+     * docs
+     */
         interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
         }
         var HTMLMyComponentElement: {
@@ -67,6 +73,9 @@ declare global {
         }
 }
 declare namespace LocalJSX {
+    /**
+     * docs
+     */
       interface MyComponent {
         }
         interface IntrinsicElements {
@@ -77,6 +86,9 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
         export namespace JSX {
                 interface IntrinsicElements {
+            /**
+             * docs
+             */
                         "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
                 }
         }
@@ -112,6 +124,9 @@ import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { UserImplementedEventType } from "./some/stubbed/path/resources";
 export { UserImplementedEventType } from "./some/stubbed/path/resources";
 export namespace Components {
+    /**
+     * docs
+     */
         interface MyComponent {
         }
 }
@@ -120,6 +135,9 @@ export interface MyComponentCustomEvent<T> extends CustomEvent<T> {
         target: HTMLMyComponentElement;
 }
 declare global {
+    /**
+     * docs
+     */
         interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
         }
         var HTMLMyComponentElement: {
@@ -131,6 +149,9 @@ declare global {
         }
 }
 declare namespace LocalJSX {
+    /**
+     * docs
+     */
       interface MyComponent {
                 "onMyEvent"?: (event: MyComponentCustomEvent<UserImplementedEventType>) => void;
         }
@@ -142,6 +163,9 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
         export namespace JSX {
                 interface IntrinsicElements {
+            /**
+             * docs
+             */
                         "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
                 }
         }
@@ -192,6 +216,9 @@ import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { SecondUserImplementedEventType, UserImplementedEventType } from "./some/stubbed/path/resources";
 export { SecondUserImplementedEventType, UserImplementedEventType } from "./some/stubbed/path/resources";
 export namespace Components {
+    /**
+     * docs
+     */
         interface MyComponent {
         }
 }
@@ -200,6 +227,9 @@ export interface MyComponentCustomEvent<T> extends CustomEvent<T> {
         target: HTMLMyComponentElement;
 }
 declare global {
+    /**
+     * docs
+     */
         interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
         }
         var HTMLMyComponentElement: {
@@ -211,6 +241,9 @@ declare global {
         }
 }
 declare namespace LocalJSX {
+    /**
+     * docs
+     */
       interface MyComponent {
                 "onMyEvent"?: (event: MyComponentCustomEvent<UserImplementedEventType>) => void;
                 "onMySecondEvent"?: (event: MyComponentCustomEvent<SecondUserImplementedEventType>) => void;
@@ -223,6 +256,9 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
         export namespace JSX {
                 interface IntrinsicElements {
+            /**
+             * docs
+             */
                         "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
                 }
         }
@@ -292,8 +328,14 @@ import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { UserImplementedEventType } from "./some/stubbed/path/resources";
 export { UserImplementedEventType } from "./some/stubbed/path/resources";
 export namespace Components {
+    /**
+     * docs
+     */
         interface MyComponent {
         }
+    /**
+     * docs
+     */
         interface MyNewComponent {
         }
 }
@@ -306,12 +348,18 @@ export interface MyNewComponentCustomEvent<T> extends CustomEvent<T> {
         target: HTMLMyNewComponentElement;
 }
 declare global {
+    /**
+     * docs
+     */
         interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
         }
         var HTMLMyComponentElement: {
                 prototype: HTMLMyComponentElement;
                 new (): HTMLMyComponentElement;
         };
+    /**
+     * docs
+     */
         interface HTMLMyNewComponentElement extends Components.MyNewComponent, HTMLStencilElement {
         }
         var HTMLMyNewComponentElement: {
@@ -324,9 +372,15 @@ declare global {
         }
 }
 declare namespace LocalJSX {
+    /**
+     * docs
+     */
       interface MyComponent {
                 "onMyEvent"?: (event: MyComponentCustomEvent<UserImplementedEventType>) => void;
         }
+    /**
+     * docs
+     */
       interface MyNewComponent {
                 "onMyEvent"?: (event: MyNewComponentCustomEvent<UserImplementedEventType>) => void;
         }
@@ -339,7 +393,13 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
         export namespace JSX {
                 interface IntrinsicElements {
+            /**
+             * docs
+             */
                         "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
+            /**
+             * docs
+             */
                         "my-new-component": LocalJSX.MyNewComponent & JSXBase.HTMLAttributes<HTMLMyNewComponentElement>;
                 }
         }
@@ -414,8 +474,14 @@ import { UserImplementedEventType as UserImplementedEventType1 } from "./some/st
 export { UserImplementedEventType } from "./some/stubbed/path/a/resources";
 export { UserImplementedEventType as UserImplementedEventType1 } from "./some/stubbed/path/b/resources";
 export namespace Components {
+    /**
+     * docs
+     */
         interface MyComponent {
         }
+    /**
+     * docs
+     */
         interface MyNewComponent {
         }
 }
@@ -428,12 +494,18 @@ export interface MyNewComponentCustomEvent<T> extends CustomEvent<T> {
         target: HTMLMyNewComponentElement;
 }
 declare global {
+    /**
+     * docs
+     */
         interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
         }
         var HTMLMyComponentElement: {
                 prototype: HTMLMyComponentElement;
                 new (): HTMLMyComponentElement;
         };
+    /**
+     * docs
+     */
         interface HTMLMyNewComponentElement extends Components.MyNewComponent, HTMLStencilElement {
         }
         var HTMLMyNewComponentElement: {
@@ -446,9 +518,15 @@ declare global {
         }
 }
 declare namespace LocalJSX {
+    /**
+     * docs
+     */
       interface MyComponent {
                 "onMyEvent"?: (event: MyComponentCustomEvent<UserImplementedEventType>) => void;
         }
+    /**
+     * docs
+     */
       interface MyNewComponent {
                 "onMyEvent"?: (event: MyNewComponentCustomEvent<UserImplementedEventType1>) => void;
         }
@@ -461,7 +539,13 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
         export namespace JSX {
                 interface IntrinsicElements {
+            /**
+             * docs
+             */
                         "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
+            /**
+             * docs
+             */
                         "my-new-component": LocalJSX.MyNewComponent & JSXBase.HTMLAttributes<HTMLMyNewComponentElement>;
                 }
         }
@@ -536,8 +620,14 @@ import { UserImplementedEventType as UserImplementedEventType1 } from "./some/st
 export { UserImplementedEventType } from "./some/stubbed/path/a/my-component";
 export { UserImplementedEventType as UserImplementedEventType1 } from "./some/stubbed/path/b/my-new-component";
 export namespace Components {
+    /**
+     * docs
+     */
         interface MyComponent {
         }
+    /**
+     * docs
+     */
         interface MyNewComponent {
         }
 }
@@ -550,12 +640,18 @@ export interface MyNewComponentCustomEvent<T> extends CustomEvent<T> {
         target: HTMLMyNewComponentElement;
 }
 declare global {
+    /**
+     * docs
+     */
         interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
         }
         var HTMLMyComponentElement: {
                 prototype: HTMLMyComponentElement;
                 new (): HTMLMyComponentElement;
         };
+    /**
+     * docs
+     */
         interface HTMLMyNewComponentElement extends Components.MyNewComponent, HTMLStencilElement {
         }
         var HTMLMyNewComponentElement: {
@@ -568,9 +664,15 @@ declare global {
         }
 }
 declare namespace LocalJSX {
+    /**
+     * docs
+     */
       interface MyComponent {
                 "onMyEvent"?: (event: MyComponentCustomEvent<UserImplementedEventType>) => void;
         }
+    /**
+     * docs
+     */
       interface MyNewComponent {
                 "onMyEvent"?: (event: MyNewComponentCustomEvent<UserImplementedEventType1>) => void;
         }
@@ -583,7 +685,13 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
         export namespace JSX {
                 interface IntrinsicElements {
+            /**
+             * docs
+             */
                         "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
+            /**
+             * docs
+             */
                         "my-new-component": LocalJSX.MyNewComponent & JSXBase.HTMLAttributes<HTMLMyNewComponentElement>;
                 }
         }
@@ -634,11 +742,17 @@ import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { UserImplementedPropType } from "./some/stubbed/path/resources";
 export { UserImplementedPropType } from "./some/stubbed/path/resources";
 export namespace Components {
+    /**
+     * docs
+     */
         interface MyComponent {
                 "name": UserImplementedPropType;
         }
 }
 declare global {
+    /**
+     * docs
+     */
         interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
         }
         var HTMLMyComponentElement: {
@@ -650,6 +764,9 @@ declare global {
         }
 }
 declare namespace LocalJSX {
+    /**
+     * docs
+     */
       interface MyComponent {
                 "name"?: UserImplementedPropType;
         }
@@ -661,6 +778,9 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
         export namespace JSX {
                 interface IntrinsicElements {
+            /**
+             * docs
+             */
                         "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
                 }
         }
@@ -722,12 +842,18 @@ import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { SecondUserImplementedPropType, UserImplementedPropType } from "./some/stubbed/path/resources";
 export { SecondUserImplementedPropType, UserImplementedPropType } from "./some/stubbed/path/resources";
 export namespace Components {
+    /**
+     * docs
+     */
         interface MyComponent {
                 "email": SecondUserImplementedPropType;
                 "name": UserImplementedPropType;
         }
 }
 declare global {
+    /**
+     * docs
+     */
         interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
         }
         var HTMLMyComponentElement: {
@@ -739,6 +865,9 @@ declare global {
         }
 }
 declare namespace LocalJSX {
+    /**
+     * docs
+     */
       interface MyComponent {
                 "email"?: SecondUserImplementedPropType;
                 "name"?: UserImplementedPropType;
@@ -751,6 +880,9 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
         export namespace JSX {
                 interface IntrinsicElements {
+            /**
+             * docs
+             */
                         "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
                 }
         }
@@ -822,20 +954,32 @@ import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { UserImplementedPropType } from "./some/stubbed/path/resources";
 export { UserImplementedPropType } from "./some/stubbed/path/resources";
 export namespace Components {
+    /**
+     * docs
+     */
         interface MyComponent {
                 "name": UserImplementedPropType;
         }
+    /**
+     * docs
+     */
         interface MyNewComponent {
                 "fullName": UserImplementedPropType;
         }
 }
 declare global {
+    /**
+     * docs
+     */
         interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
         }
         var HTMLMyComponentElement: {
                 prototype: HTMLMyComponentElement;
                 new (): HTMLMyComponentElement;
         };
+    /**
+     * docs
+     */
         interface HTMLMyNewComponentElement extends Components.MyNewComponent, HTMLStencilElement {
         }
         var HTMLMyNewComponentElement: {
@@ -848,9 +992,15 @@ declare global {
         }
 }
 declare namespace LocalJSX {
+    /**
+     * docs
+     */
       interface MyComponent {
                 "name"?: UserImplementedPropType;
         }
+    /**
+     * docs
+     */
       interface MyNewComponent {
                 "fullName"?: UserImplementedPropType;
         }
@@ -863,7 +1013,13 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
         export namespace JSX {
                 interface IntrinsicElements {
+            /**
+             * docs
+             */
                         "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
+            /**
+             * docs
+             */
                         "my-new-component": LocalJSX.MyNewComponent & JSXBase.HTMLAttributes<HTMLMyNewComponentElement>;
                 }
         }
@@ -940,20 +1096,32 @@ import { UserImplementedPropType as UserImplementedPropType1 } from "./some/stub
 export { UserImplementedPropType } from "./some/stubbed/path/a/resources";
 export { UserImplementedPropType as UserImplementedPropType1 } from "./some/stubbed/path/b/resources";
 export namespace Components {
+    /**
+     * docs
+     */
         interface MyComponent {
                 "name": UserImplementedPropType;
         }
+    /**
+     * docs
+     */
         interface MyNewComponent {
                 "newName": UserImplementedPropType1;
         }
 }
 declare global {
+    /**
+     * docs
+     */
         interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
         }
         var HTMLMyComponentElement: {
                 prototype: HTMLMyComponentElement;
                 new (): HTMLMyComponentElement;
         };
+    /**
+     * docs
+     */
         interface HTMLMyNewComponentElement extends Components.MyNewComponent, HTMLStencilElement {
         }
         var HTMLMyNewComponentElement: {
@@ -966,9 +1134,15 @@ declare global {
         }
 }
 declare namespace LocalJSX {
+    /**
+     * docs
+     */
       interface MyComponent {
                 "name"?: UserImplementedPropType;
         }
+    /**
+     * docs
+     */
       interface MyNewComponent {
                 "newName"?: UserImplementedPropType1;
         }
@@ -981,7 +1155,13 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
         export namespace JSX {
                 interface IntrinsicElements {
+            /**
+             * docs
+             */
                         "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
+            /**
+             * docs
+             */
                         "my-new-component": LocalJSX.MyNewComponent & JSXBase.HTMLAttributes<HTMLMyNewComponentElement>;
                 }
         }
@@ -1058,20 +1238,32 @@ import { UserImplementedPropType as UserImplementedPropType1 } from "./some/stub
 export { UserImplementedPropType } from "./some/stubbed/path/a/my-component";
 export { UserImplementedPropType as UserImplementedPropType1 } from "./some/stubbed/path/b/my-new-component";
 export namespace Components {
+    /**
+     * docs
+     */
         interface MyComponent {
                 "name": UserImplementedPropType;
         }
+    /**
+     * docs
+     */
         interface MyNewComponent {
                 "name": UserImplementedPropType1;
         }
 }
 declare global {
+    /**
+     * docs
+     */
         interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
         }
         var HTMLMyComponentElement: {
                 prototype: HTMLMyComponentElement;
                 new (): HTMLMyComponentElement;
         };
+    /**
+     * docs
+     */
         interface HTMLMyNewComponentElement extends Components.MyNewComponent, HTMLStencilElement {
         }
         var HTMLMyNewComponentElement: {
@@ -1084,9 +1276,15 @@ declare global {
         }
 }
 declare namespace LocalJSX {
+    /**
+     * docs
+     */
       interface MyComponent {
                 "name"?: UserImplementedPropType;
         }
+    /**
+     * docs
+     */
       interface MyNewComponent {
                 "name"?: UserImplementedPropType1;
         }
@@ -1099,7 +1297,13 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
         export namespace JSX {
                 interface IntrinsicElements {
+            /**
+             * docs
+             */
                         "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
+            /**
+             * docs
+             */
                         "my-new-component": LocalJSX.MyNewComponent & JSXBase.HTMLAttributes<HTMLMyNewComponentElement>;
                 }
         }
@@ -1154,6 +1358,9 @@ import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { UserImplementedEventType, UserImplementedPropType } from "./some/stubbed/path/a/resources";
 export { UserImplementedEventType, UserImplementedPropType } from "./some/stubbed/path/a/resources";
 export namespace Components {
+    /**
+     * docs
+     */
         interface MyComponent {
                 "name": UserImplementedPropType;
         }
@@ -1163,6 +1370,9 @@ export interface MyComponentCustomEvent<T> extends CustomEvent<T> {
         target: HTMLMyComponentElement;
 }
 declare global {
+    /**
+     * docs
+     */
         interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
         }
         var HTMLMyComponentElement: {
@@ -1174,6 +1384,9 @@ declare global {
         }
 }
 declare namespace LocalJSX {
+    /**
+     * docs
+     */
       interface MyComponent {
                 "name"?: UserImplementedPropType;
                 "onMyEvent"?: (event: MyComponentCustomEvent<UserImplementedEventType>) => void;
@@ -1186,6 +1399,9 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
         export namespace JSX {
                 interface IntrinsicElements {
+            /**
+             * docs
+             */
                         "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
                 }
         }
