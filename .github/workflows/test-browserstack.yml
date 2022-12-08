@@ -39,7 +39,7 @@ jobs:
 
   run_browserstack:
     name: Run Browserstack
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     needs: [build_core]
 
     # The concurrency field allows us to block multiple invocations of this job across multiple workflow runs.
