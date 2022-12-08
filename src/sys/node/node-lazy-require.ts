@@ -68,23 +68,35 @@ export class NodeLazyRequire implements d.LazyRequire {
         const { minVersion, recommendedVersion, maxVersion } = this.lazyDependencies[ensureModuleId];
 
         try {
+          console.log('HEY::1');
           const pkgJsonPath = this.nodeResolveModule.resolveModule(fromDir, ensureModuleId);
+          console.log('HEY::2');
           const installedPkgJson: d.PackageJsonData = JSON.parse(fs.readFileSync(pkgJsonPath, 'utf8'));
 
+          console.log('HEY::3');
           const installedVersionIsGood = maxVersion
             ? // if maxVersion, check that `minVersion <= installedVersion <= maxVersion`
               satisfies(installedPkgJson.version, `${minVersion} - ${major(maxVersion)}.x`)
             : // else, just check that `minVersion <= installedVersion`
               semverLte(minVersion, installedPkgJson.version);
+          debugger;
+          console.log('HEY::4');
 
           if (installedVersionIsGood) {
             this.ensured.add(ensureModuleId);
             return;
+          } else {
+          console.log('pkgJsonPath::',pkgJsonPath);
+          console.log('installedPkgJson::',installedPkgJson);
+          console.log('this is what we wanted');
+          console.log(minVersion, recommendedVersion, maxVersion);
           }
         } catch (e) {}
         // if we get here we didn't get to the `return` above, so either 1) there was some error
         // reading the package.json or 2) the version wasn't in our specified version range.
+        console.log('bout to push here');
         problemDeps.push(`${ensureModuleId}@${recommendedVersion}`);
+        console.log(problemDeps);
       }
     });
 
