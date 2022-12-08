@@ -273,11 +273,12 @@ export interface ConfigExtras {
    */
   cssVarsShim?: boolean;
 
+  // TODO(STENCIL-661): Remove code related to the dynamic import shim
   /**
    * Dynamic `import()` shim. This is only needed for Edge 18 and below, and Firefox 67
    * and below. Defaults to `false`.
    */
-  dynamicImportShim?: boolean;
+  __deprecated__dynamicImportShim?: boolean;
 
   /**
    * Experimental flag. Projects that use a Stencil library built using the `dist` output target may have trouble lazily

@@ -149,7 +149,8 @@ export const updateBuildConditionals = (config: Config, b: BuildConditionals) =>
   b.appendChildSlotFix = config.extras.appendChildSlotFix;
   b.slotChildNodesFix = config.extras.slotChildNodesFix;
   b.cloneNodeFix = config.extras.cloneNodeFix;
-  b.dynamicImportShim = config.extras.dynamicImportShim;
+  // TODO(STENCIL-661): Remove code related to the dynamic import shim
+  b.dynamicImportShim = config.extras.__deprecated__dynamicImportShim;
   b.lifecycleDOMEvents = !!(b.isDebug || config._isTesting || config.extras.lifecycleDOMEvents);
   b.safari10 = config.extras.safari10;
   b.scopedSlotTextContentFix = !!config.extras.scopedSlotTextContentFix;

@@ -132,7 +132,8 @@ export const Build = {
     },
 
     resolveImportMeta(prop, { format }) {
-      if (config.extras.dynamicImportShim && prop === 'url' && format === 'es') {
+      // TODO(STENCIL-661): Remove code related to the dynamic import shim
+      if (config.extras.__deprecated__dynamicImportShim && prop === 'url' && format === 'es') {
         return '""';
       }
       return null;

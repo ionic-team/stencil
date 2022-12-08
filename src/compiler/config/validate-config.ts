@@ -72,7 +72,8 @@ export const validateConfig = (
   validatedConfig.extras.appendChildSlotFix = !!validatedConfig.extras.appendChildSlotFix;
   validatedConfig.extras.cloneNodeFix = !!validatedConfig.extras.cloneNodeFix;
   validatedConfig.extras.cssVarsShim = !!validatedConfig.extras.cssVarsShim;
-  validatedConfig.extras.dynamicImportShim = !!validatedConfig.extras.dynamicImportShim;
+  // TODO(STENCIL-661): Remove code related to the dynamic import shim
+  validatedConfig.extras.__deprecated__dynamicImportShim = !!validatedConfig.extras.__deprecated__dynamicImportShim;
   validatedConfig.extras.lifecycleDOMEvents = !!validatedConfig.extras.lifecycleDOMEvents;
   validatedConfig.extras.safari10 = !!validatedConfig.extras.safari10;
   validatedConfig.extras.scriptDataOpts = !!validatedConfig.extras.scriptDataOpts;
