@@ -42,11 +42,15 @@ export const validateServiceWorker = (config: d.ValidatedConfig, outputTarget: d
     return;
   }
 
+  const globDirectory = typeof outputTarget.serviceWorker?.globDirectory === 'string'
+    ? outputTarget.serviceWorker.globDirectory
+    : outputTarget.appDir;
+
   outputTarget.serviceWorker = {
     ...outputTarget.serviceWorker,
-    globDirectory: outputTarget.serviceWorker?.globDirectory ?? outputTarget.appDir,
+    globDirectory,
     swDest: isString(outputTarget.serviceWorker?.swDest)
-      ? outputTarget.serviceWorker?.swDest
+      ? outputTarget.serviceWorker.swDest
       : join(outputTarget.appDir ?? '', DEFAULT_FILENAME),
   };
 
