@@ -78,6 +78,7 @@ export const validateConfig = (
   validatedConfig.extras.lifecycleDOMEvents = !!validatedConfig.extras.lifecycleDOMEvents;
   validatedConfig.extras.safari10 = !!validatedConfig.extras.safari10;
   validatedConfig.extras.scriptDataOpts = !!validatedConfig.extras.scriptDataOpts;
+  // TODO(STENCIL-662): Remove code related to deprecated shadowDomShim field
   validatedConfig.extras.__deprecated__shadowDomShim = !!validatedConfig.extras.__deprecated__shadowDomShim;
   validatedConfig.extras.slotChildNodesFix = !!validatedConfig.extras.slotChildNodesFix;
   validatedConfig.extras.initializeNextTick = !!validatedConfig.extras.initializeNextTick;

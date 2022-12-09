@@ -59,9 +59,11 @@ export const enum CMP_FLAGS {
   shadowDomEncapsulation = 1 << 0,
   scopedCssEncapsulation = 1 << 1,
   hasSlotRelocation = 1 << 2,
+  // TODO(STENCIL-662): Remove code related to deprecated shadowDomShim field
   needsShadowDomShim = 1 << 3,
   shadowDelegatesFocus = 1 << 4,
   hasMode = 1 << 5,
+  // TODO(STENCIL-662): Remove code related to deprecated shadowDomShim field
   needsScopedEncapsulation = scopedCssEncapsulation | needsShadowDomShim,
 }
 

@@ -320,6 +320,7 @@ export interface ConfigExtras {
    */
   scopedSlotTextContentFix?: boolean;
 
+  // TODO(STENCIL-662): Remove code related to deprecated shadowDomShim field
   /**
    * If enabled `true`, the runtime will check if the shadow dom shim is required. However,
    * if it's determined that shadow dom is already natively supported by the browser then

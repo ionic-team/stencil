@@ -361,6 +361,7 @@ describe('validation', () => {
     expect(config.extras.lifecycleDOMEvents).toBe(false);
     expect(config.extras.safari10).toBe(false);
     expect(config.extras.scriptDataOpts).toBe(false);
+    // TODO(STENCIL-662): Remove code related to deprecated shadowDomShim field
     expect(config.extras.__deprecated__shadowDomShim).toBe(false);
     expect(config.extras.slotChildNodesFix).toBe(false);
     expect(config.extras.initializeNextTick).toBe(false);
