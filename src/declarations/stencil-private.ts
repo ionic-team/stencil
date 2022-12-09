@@ -2404,7 +2404,10 @@ export interface NewSpecPageOptions {
   attachStyles?: boolean;
 
   strictBuild?: boolean;
-
+  /**
+   * Default values to be set on the platform runtime object (@see PlatformRuntime) when creating
+   * the spec page.
+   */
   platform?: Partial<PlatformRuntime>;
 }
 
