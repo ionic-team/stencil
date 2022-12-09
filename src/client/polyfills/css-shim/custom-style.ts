@@ -50,14 +50,6 @@ export class CustomStyle implements CssVarShim {
     const styleEl = this.doc.createElement('style');
     styleEl.setAttribute('data-no-shim', '');
 
-    // Apply CSP nonce to the style tag if it exists
-    // NOTE: we cannot use the "platform" object here because these files
-    // cannot resolve a reference to `@app-data` when running our e2e tests
-    const nonce = (window as any).nonce;
-    if (nonce != null) {
-      styleEl.setAttribute('nonce', nonce);
-    }
-
     if (!baseScope.usesCssVars) {
       // This component does not use (read) css variables
       styleEl.textContent = cssText;

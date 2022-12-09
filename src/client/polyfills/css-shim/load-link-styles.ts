@@ -50,14 +50,6 @@ export function addGlobalLink(doc: Document, globalScopes: CSSScope[], linkElm: 
         styleEl.setAttribute('data-styles', '');
         styleEl.textContent = text;
 
-        // Apply CSP nonce to the style tag if it exists
-        // NOTE: we cannot use the "platform" object here because these files
-        // cannot resolve a reference to `@app-data` when running our e2e tests
-        const nonce = (window as any).nonce;
-        if (nonce != null) {
-          styleEl.setAttribute('nonce', nonce);
-        }
-
         addGlobalStyle(globalScopes, styleEl);
         linkElm.parentNode.insertBefore(styleEl, linkElm);
         linkElm.remove();

@@ -1,6 +1,5 @@
 import { mockWindow } from '@stencil/core/testing';
 
-import { win } from '../../../client-window';
 import { CustomStyle } from '../custom-style';
 
 describe('css-shim', () => {
@@ -371,25 +370,6 @@ describe('css-shim', () => {
         }
       `)
     );
-  });
-
-  it('should create a style element without a nonce attribute', () => {
-    const customStyle = new CustomStyle(window, document);
-    const hostEl = document.createElement('div');
-
-    const styleEl = customStyle.createHostStyle(hostEl, 'sc-div', 'color: red;', false);
-
-    expect(styleEl.getAttribute('nonce')).toBe(null);
-  });
-
-  it('should create a style element with a nonce attribute', () => {
-    const customStyle = new CustomStyle(window, document);
-    const hostEl = document.createElement('div');
-    (win as any).nonce = 'abc123';
-
-    const styleEl = customStyle.createHostStyle(hostEl, 'sc-div', 'color: red;', false);
-
-    expect(styleEl.getAttribute('nonce')).toBe('abc123');
   });
 
   var window: Window; // eslint-disable-line no-var -- shims will continue to use var while we support older browsers
