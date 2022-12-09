@@ -36,6 +36,7 @@ export function resetBuildConditionals(b: d.BuildConditionals) {
   b.hydratedAttribute = false;
   b.hydratedClass = true;
   b.invisiblePrehydration = true;
+  // TODO(STENCIL-664): Remove code related to deprecated appendChildSlotFix field
   b.appendChildSlotFix = false;
   b.cloneNodeFix = false;
   b.dynamicImportShim = false;

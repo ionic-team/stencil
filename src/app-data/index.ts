@@ -59,6 +59,7 @@ export const BUILD: BuildConditionals = {
   lazyLoad: false,
   profile: false,
   slotRelocation: true,
+  // TODO(STENCIL-664): Remove code related to deprecated appendChildSlotFix field
   appendChildSlotFix: false,
   cloneNodeFix: false,
   hydratedAttribute: false,

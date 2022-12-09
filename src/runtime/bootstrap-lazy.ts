@@ -137,6 +137,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
         patchCloneNode(HostElement.prototype);
       }
 
+      // TODO(STENCIL-664): Remove code related to deprecated appendChildSlotFix field
       if (BUILD.appendChildSlotFix) {
         patchSlotAppendChild(HostElement.prototype);
       }

@@ -134,6 +134,7 @@ const getHydrateBuildConditionals = (config: d.ValidatedConfig, cmps: d.Componen
   build.devTools = false;
   build.hotModuleReplacement = false;
   build.cloneNodeFix = false;
+  // TODO(STENCIL-664): Remove code related to deprecated appendChildSlotFix field
   build.appendChildSlotFix = false;
   build.slotChildNodesFix = false;
   build.safari10 = false;

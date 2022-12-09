@@ -249,14 +249,17 @@ export interface StencilConfig {
 }
 
 export interface ConfigExtras {
+  // TODO(STENCIL-664): Remove code related to deprecated appendChildSlotFix field
   /**
    * By default, the slot polyfill does not update `appendChild()` so that it appends
    * new child nodes into the correct child slot like how shadow dom works. This is an opt-in
    * polyfill for those who need it when using `element.appendChild(node)` and expecting the
    * child to be appended in the same location shadow dom would. This is not required for
    * IE11 or Edge 18, but can be enabled if the app is using `appendChild()`. Defaults to `false`.
+   *
+   * @deprecated Since Stencil v3.0.0, browsers requiring this are longer supported.
    */
-  appendChildSlotFix?: boolean;
+  __deprecated__appendChildSlotFix?: boolean;
 
   /**
    * By default, the runtime does not polyfill `cloneNode()` when cloning a component

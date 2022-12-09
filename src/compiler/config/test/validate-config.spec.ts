@@ -352,7 +352,8 @@ describe('validation', () => {
 
   it('should set extras defaults', () => {
     const { config } = validateConfig(userConfig, bootstrapConfig);
-    expect(config.extras.appendChildSlotFix).toBe(false);
+    // TODO(STENCIL-664): Remove code related to deprecated appendChildSlotFix field
+    expect(config.extras.__deprecated__appendChildSlotFix).toBe(false);
     expect(config.extras.cloneNodeFix).toBe(false);
     expect(config.extras.cssVarsShim).toBe(false);
     expect(config.extras.dynamicImportShim).toBe(false);

@@ -36,6 +36,7 @@ export const patchCloneNode = (HostElementPrototype: any) => {
         slotted = (srcNode.childNodes[i] as any)['s-nr'];
         nonStencilNode = stencilPrivates.every((privateField) => !(srcNode.childNodes[i] as any)[privateField]);
         if (slotted) {
+          // TODO(STENCIL-664): Remove code related to deprecated appendChildSlotFix field
           if (BUILD.appendChildSlotFix && (clonedNode as any).__appendChild) {
             (clonedNode as any).__appendChild(slotted.cloneNode(true));
           } else {
@@ -51,6 +52,7 @@ export const patchCloneNode = (HostElementPrototype: any) => {
   };
 };
 
+// TODO(STENCIL-664): Remove code related to deprecated appendChildSlotFix field
 export const patchSlotAppendChild = (HostElementPrototype: any) => {
   HostElementPrototype.__appendChild = HostElementPrototype.appendChild;
   HostElementPrototype.appendChild = function (this: d.RenderNode, newChild: d.RenderNode) {

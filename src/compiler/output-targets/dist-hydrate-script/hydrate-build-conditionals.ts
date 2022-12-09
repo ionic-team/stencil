@@ -20,6 +20,7 @@ export const getHydrateBuildConditionals = (cmps: d.ComponentCompilerMeta[]) => 
   build.member = true;
   build.constructableCSS = false;
   build.asyncLoading = true;
+  // TODO(STENCIL-664): Remove code related to deprecated appendChildSlotFix field
   build.appendChildSlotFix = false;
   build.slotChildNodesFix = false;
   build.cloneNodeFix = false;

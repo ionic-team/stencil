@@ -146,7 +146,8 @@ export const updateBuildConditionals = (config: Config, b: BuildConditionals) =>
   b.constructableCSS = !b.hotModuleReplacement || !!config._isTesting;
   b.asyncLoading = !!(b.asyncLoading || b.lazyLoad || b.taskQueue || b.initializeNextTick);
   b.cssAnnotations = true;
-  b.appendChildSlotFix = config.extras.appendChildSlotFix;
+  // TODO(STENCIL-664): Remove code related to deprecated appendChildSlotFix field
+  b.appendChildSlotFix = config.extras.__deprecated__appendChildSlotFix;
   b.slotChildNodesFix = config.extras.slotChildNodesFix;
   b.cloneNodeFix = config.extras.cloneNodeFix;
   b.dynamicImportShim = config.extras.dynamicImportShim;

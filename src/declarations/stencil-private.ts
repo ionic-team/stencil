@@ -171,6 +171,7 @@ export interface BuildConditionals extends Partial<BuildFeatures> {
   profile?: boolean;
   cssVarShim?: boolean;
   constructableCSS?: boolean;
+  // TODO(STENCIL-664): Remove code related to deprecated appendChildSlotFix field
   appendChildSlotFix?: boolean;
   slotChildNodesFix?: boolean;
   scopedSlotTextContentFix?: boolean;

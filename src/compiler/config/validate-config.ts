@@ -69,7 +69,8 @@ export const validateConfig = (
   }
 
   validatedConfig.extras = validatedConfig.extras || {};
-  validatedConfig.extras.appendChildSlotFix = !!validatedConfig.extras.appendChildSlotFix;
+  // TODO(STENCIL-664): Remove code related to deprecated appendChildSlotFix field
+  validatedConfig.extras.__deprecated__appendChildSlotFix = !!validatedConfig.extras.__deprecated__appendChildSlotFix;
   validatedConfig.extras.cloneNodeFix = !!validatedConfig.extras.cloneNodeFix;
   validatedConfig.extras.cssVarsShim = !!validatedConfig.extras.cssVarsShim;
   validatedConfig.extras.dynamicImportShim = !!validatedConfig.extras.dynamicImportShim;
