@@ -2063,7 +2063,6 @@ export interface OutputTargetDistCustomElements extends OutputTargetBaseNext {
    */
   externalRuntime?: boolean;
   copy?: CopyTask[];
-  inlineDynamicImports?: boolean;
   includeGlobalScripts?: boolean;
   minify?: boolean;
   /**
@@ -2083,7 +2082,6 @@ export interface OutputTargetDistCustomElementsBundle extends OutputTargetBaseNe
   empty?: boolean;
   externalRuntime?: boolean;
   copy?: CopyTask[];
-  inlineDynamicImports?: boolean;
   includeGlobalScripts?: boolean;
   minify?: boolean;
 }
