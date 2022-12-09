@@ -271,6 +271,9 @@ export interface ConfigExtras {
   /**
    * Include the CSS Custom Property polyfill/shim for legacy browsers. ESM builds will
    * not include the css vars shim. Defaults to `false`
+   *
+   * @deprecated Since Stencil v3.0.0. IE 11, Edge <= 18, and old Safari
+   * versions are no longer supported.
    */
   __deprecated__cssVarsShim?: boolean;
 
