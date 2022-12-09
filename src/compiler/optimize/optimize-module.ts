@@ -61,6 +61,9 @@ export const optimizeModule = async (
     if (config.sourceMap) {
       minifyOpts.sourceMap = {
         content:
+          // We need to loosely check for a source map definition
+          // so we don't spread a `null`/`undefined` value into the object
+          // which results in invalid source maps during minification
           opts.sourceMap != null
             ? {
                 ...opts.sourceMap,
