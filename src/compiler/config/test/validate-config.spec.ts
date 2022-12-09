@@ -361,7 +361,7 @@ describe('validation', () => {
     expect(config.extras.lifecycleDOMEvents).toBe(false);
     expect(config.extras.safari10).toBe(false);
     expect(config.extras.scriptDataOpts).toBe(false);
-    expect(config.extras.shadowDomShim).toBe(false);
+    expect(config.extras.__deprecated__shadowDomShim).toBe(false);
     expect(config.extras.slotChildNodesFix).toBe(false);
     expect(config.extras.initializeNextTick).toBe(false);
     expect(config.extras.tagNameTransform).toBe(false);

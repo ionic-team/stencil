@@ -326,7 +326,7 @@ export interface ConfigExtras {
    * it does not request the shim. When set to `false` it will avoid all shadow dom tests.
    * Defaults to `false`.
    */
-  shadowDomShim?: boolean;
+  __deprecated__shadowDomShim?: boolean;
 
   /**
    * When a component is first attached to the DOM, this setting will wait a single tick before
