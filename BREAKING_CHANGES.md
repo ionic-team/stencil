@@ -18,6 +18,7 @@ This is a comprehensive list of the breaking changes introduced in the major ver
     * [`dynamicImportShim`](#dynamicimportshim)
     * [`cssVarShim`](#cssvarshim)
     * [`shadowDomShim`](#shadowdomshim)
+    * [`safari10`](#safari10)
   * [Deprecated `assetsDir` Removed from `@Component()` decorator](#deprecated-assetsdir-removed-from-component-decorator)
   * [Drop Node 12 Support](#drop-node-12-support)
   * [Strongly Typed Inputs](#strongly-typed-inputs)
@@ -135,6 +136,23 @@ import { Config } from '@stencil/core';
 export const config: Config = {
   extras: {
     __deprecated__shadowDomShim: true
+  }
+};
+```
+
+##### `safari10`
+
+The `extras.safari10` option actives a patch for ES module support in Safari10.
+In Stencil v3.0.0 the field is renamed to `__deprecated__safari10` to indicate
+deprecation. To retain the prior behavior the new option can be set in your
+project's `stencil.config.ts`:
+
+```ts
+// stencil.config.ts
+import { Config } from '@stencil/core';
+export const config: Config = {
+  extras: {
+    __deprecated__safari10: true
   }
 };
 ```
