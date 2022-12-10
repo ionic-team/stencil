@@ -81,7 +81,7 @@ export const addStyle = (
             styleElm.setAttribute(HYDRATED_STYLE_ID, scopeId);
           }
 
-          styleContainerNode.insertBefore(styleElm, styleContainerNode.querySelector('link'));
+          styleContainerNode.insertBefore(styleElm, null);
         }
 
         if (appliedStyles) {
