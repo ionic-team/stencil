@@ -82,7 +82,7 @@ version of Stencil.
 
 The `extras.dynamicImportShim` option causes Stencil to include a polyfill for
 the [dynamic `import()`
-function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import)
+function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import)
 for use at runtime. The field is renamed to `__deprecated__dynamicImportShim`
 to indicate deprecation. To retain the prior behavior the new option can be
 set in your project's `stencil.config.ts`:
