@@ -10,7 +10,6 @@ export const addNativeElementGetter = (classMembers: ts.ClassElement[], cmp: d.C
     classMembers.push(
       ts.factory.createGetAccessorDeclaration(
         undefined,
-        undefined,
         cmp.elementRef,
         [],
         undefined,

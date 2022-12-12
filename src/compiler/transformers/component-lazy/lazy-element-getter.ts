@@ -17,7 +17,6 @@ export const addLazyElementGetter = (
     classMembers.push(
       ts.factory.createGetAccessorDeclaration(
         undefined,
-        undefined,
         cmp.elementRef,
         [],
         undefined,

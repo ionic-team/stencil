@@ -1,14 +1,15 @@
 import ts from 'typescript';
 
 import type * as d from '../../declarations';
+import { retrieveTsDecorators, retrieveTsModifiers } from './transform-utils';
 
 export const updateComponentClass = (
   transformOpts: d.TransformOptions,
   classNode: ts.ClassDeclaration,
   heritageClauses: ts.HeritageClause[] | ts.NodeArray<ts.HeritageClause>,
   members: ts.ClassElement[]
-) => {
-  let classModifiers = Array.isArray(classNode.modifiers) ? classNode.modifiers.slice() : [];
+): ts.ClassDeclaration | ts.VariableStatement => {
+  let classModifiers = retrieveTsModifiers(classNode)?.slice() ?? [];
 
   if (transformOpts.module === 'cjs') {
     // CommonJS, leave component class as is
@@ -21,8 +22,7 @@ export const updateComponentClass = (
     }
     return ts.factory.updateClassDeclaration(
       classNode,
-      classNode.decorators,
-      classModifiers,
+      [...(retrieveTsDecorators(classNode) ?? []), ...classModifiers],
       classNode.name,
       classNode.typeParameters,
       heritageClauses,
@@ -42,7 +42,7 @@ const createConstClass = (
 ) => {
   const className = classNode.name;
 
-  const classModifiers = (Array.isArray(classNode.modifiers) ? classNode.modifiers : []).filter((m) => {
+  const classModifiers = (retrieveTsModifiers(classNode) ?? []).filter((m) => {
     // remove the export
     return m.kind !== ts.SyntaxKind.ExportKeyword;
   });
@@ -62,7 +62,6 @@ const createConstClass = (
           undefined,
           undefined,
           ts.factory.createClassExpression(
-            undefined,
             classModifiers,
             undefined,
             classNode.typeParameters,

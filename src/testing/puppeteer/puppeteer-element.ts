@@ -472,12 +472,15 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
   async e2eSync() {
     const executionContext = this._elmHandle.executionContext();
 
-    const { outerHTML, shadowRootHTML } = await executionContext.evaluate((elm: HTMLElement) => {
-      return {
-        outerHTML: elm.outerHTML,
-        shadowRootHTML: elm.shadowRoot ? elm.shadowRoot.innerHTML : null,
-      };
-    }, this._elmHandle);
+    const { outerHTML, shadowRootHTML } = await executionContext.evaluate<{ outerHTML: any; shadowRootHTML: any }>(
+      (elm: HTMLElement) => {
+        return {
+          outerHTML: elm.outerHTML,
+          shadowRootHTML: elm.shadowRoot ? elm.shadowRoot.innerHTML : null,
+        };
+      },
+      this._elmHandle
+    );
 
     if (typeof shadowRootHTML === 'string') {
       (this as any).shadowRoot = parseHtmlToFragment(shadowRootHTML) as any;
