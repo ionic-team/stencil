@@ -93,7 +93,7 @@ export declare function applyPolyfills(): Promise<void>;
 /** 
  * Used to specify a nonce value that corresponds with an application's CSP.
  * When set, the nonce will be added to all dynamically created script and style tags at runtime.
- * Alternatively, the nonce value can be set on the window object (window.nonce) and
+ * Alternatively, the nonce value can be set on the window object (window.nonce) which
  * will result in the same behavior.
  */
 export declare function setNonce(nonce: string): void;
