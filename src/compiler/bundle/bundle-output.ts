@@ -97,7 +97,7 @@ export const getRollupOptions = (
   const rollupOptions: RollupOptions = {
     input: bundleOpts.inputs,
     output: {
-      inlineDynamicImports: bundleOpts.inlineDynamicImports,
+      inlineDynamicImports: bundleOpts.inlineDynamicImports ?? false,
     },
 
     plugins: [
