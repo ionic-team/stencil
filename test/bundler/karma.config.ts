@@ -16,6 +16,7 @@ const localLaunchers = {
       '--disable-gpu',
       // without a remote debugging port, Chrome exits immediately.
       '--remote-debugging-port=9333',
+      '--no-sandbox',
     ],
   },
 };
