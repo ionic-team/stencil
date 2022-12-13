@@ -1,5 +1,6 @@
 import { IS_NODE_ENV } from '../compiler/sys/environment';
 import type { TestingRunOptions, ValidatedConfig } from '../declarations';
+import { createTesting } from '@stencil/core/testing'
 
 /**
  * Entrypoint for any Stencil tests
@@ -48,7 +49,7 @@ export const taskTest = async (config: ValidatedConfig): Promise<void> => {
 
   try {
     // let's test!
-    const { createTesting } = await import('@stencil/core/testing');
+    // const { createTesting } = await import('@stencil/core/testing');
     const testing = await createTesting(config);
     const passed = await testing.run(testingRunOpts);
     await testing.destroy();
