@@ -69,6 +69,7 @@ export async function testing(opts: BuildOptions) {
     esModule: false,
     preferConst: true,
     interop: 'auto',
+    inlineDynamicImports: true,
   };
 
   const testingBundle: RollupOptions = {
