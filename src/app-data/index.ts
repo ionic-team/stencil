@@ -72,6 +72,7 @@ export const BUILD: BuildConditionals = {
   propBoolean: true,
   propNumber: true,
   propString: true,
+  // TODO(STENCIL-659): Remove code implementing the CSS variable shim
   cssVarShim: false,
   constructableCSS: true,
   cmpShouldUpdate: true,

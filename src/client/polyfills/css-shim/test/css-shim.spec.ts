@@ -1,3 +1,4 @@
+// TODO(STENCIL-659): Remove code implementing the CSS variable shim
 import { mockWindow } from '@stencil/core/testing';
 
 import { CustomStyle } from '../custom-style';

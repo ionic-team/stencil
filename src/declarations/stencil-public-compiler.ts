@@ -267,11 +267,12 @@ export interface ConfigExtras {
    */
   cloneNodeFix?: boolean;
 
+  // TODO(STENCIL-659): Remove code implementing the CSS variable shim
   /**
    * Include the CSS Custom Property polyfill/shim for legacy browsers. ESM builds will
    * not include the css vars shim. Defaults to `false`
    */
-  cssVarsShim?: boolean;
+  __deprecated__cssVarsShim?: boolean;
 
   // TODO(STENCIL-661): Remove code related to the dynamic import shim
   /**

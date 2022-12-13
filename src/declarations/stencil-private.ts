@@ -169,6 +169,7 @@ export interface BuildConditionals extends Partial<BuildFeatures> {
   cssAnnotations?: boolean;
   lazyLoad?: boolean;
   profile?: boolean;
+  // TODO(STENCIL-659): Remove code implementing the CSS variable shim
   cssVarShim?: boolean;
   constructableCSS?: boolean;
   appendChildSlotFix?: boolean;

@@ -56,6 +56,7 @@ export const addStyle = (
           // This is only happening on native shadow-dom, do not needs CSS var shim
           styleElm.innerHTML = style;
         } else {
+          // TODO(STENCIL-659): Remove code implementing the CSS variable shim
           if (BUILD.cssVarShim && plt.$cssShim$) {
             styleElm = plt.$cssShim$.createHostStyle(
               hostElm,

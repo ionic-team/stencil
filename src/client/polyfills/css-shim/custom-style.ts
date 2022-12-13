@@ -1,3 +1,4 @@
+// TODO(STENCIL-659): Remove code implementing the CSS variable shim
 import { CssVarShim } from '../../../declarations';
 import { CSSScope } from './interfaces';
 import { addGlobalLink, loadDocument, startWatcher } from './load-link-styles';

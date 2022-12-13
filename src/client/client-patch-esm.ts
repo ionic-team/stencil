@@ -3,6 +3,7 @@ import { CSS, plt, promiseResolve, win } from '@platform';
 
 export const patchEsm = () => {
   // NOTE!! This fn cannot use async/await!
+  // TODO(STENCIL-659): Remove code implementing the CSS variable shim
   // @ts-ignore
   if (BUILD.cssVarShim && !(CSS && CSS.supports && CSS.supports('color', 'var(--c)'))) {
     // @ts-ignore

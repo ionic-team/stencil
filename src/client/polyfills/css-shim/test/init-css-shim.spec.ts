@@ -1,3 +1,4 @@
+// TODO(STENCIL-659): Remove code implementing the CSS variable shim
 import { fixRelativeUrls, hasCssVariables, hasRelativeUrls } from '../load-link-styles';
 
 describe('hasCssVariables', () => {
