@@ -39,9 +39,12 @@ export class NodeResolveModule {
     const root = normalizePath(path.parse(fromDir).root);
     let packageJsonFilePath: string;
 
+    console.log('resolveModule::root', root);
+
     while (dir !== root) {
       dir = normalizePath(path.dirname(dir));
       packageJsonFilePath = path.join(dir, 'package.json');
+      console.log('resolveModule::packageJsonFilePath', packageJsonFilePath);
 
       if (!fs.existsSync(packageJsonFilePath)) {
         continue;
@@ -52,6 +55,7 @@ export class NodeResolveModule {
       return packageJsonFilePath;
     }
 
+    console.log(`about to error with ${moduleId}, ${fromDir}`);
     throw new Error(`error loading "${moduleId}" from "${fromDir}"`);
   }
 
@@ -81,6 +85,7 @@ export class NodeResolveModule {
 
   resolveModuleManually(fromDir: string, moduleId: string, cacheKey: string) {
     const root = normalizePath(path.parse(fromDir).root);
+    console.log('resolveModuleManually::root::', root);
 
     let dir = normalizePath(path.join(fromDir, 'noop.js'));
     let packageJsonFilePath: string;
@@ -88,6 +93,7 @@ export class NodeResolveModule {
     while (dir !== root) {
       dir = normalizePath(path.dirname(dir));
       packageJsonFilePath = path.join(dir, 'node_modules', moduleId, 'package.json');
+      console.log('resolveModuleManually::packageJsonFilePath::', packageJsonFilePath);
 
       if (!fs.existsSync(packageJsonFilePath)) {
         continue;
@@ -97,6 +103,8 @@ export class NodeResolveModule {
 
       return packageJsonFilePath;
     }
+
+    console.log(`about to error with ${moduleId}, ${fromDir}`);
 
     throw new Error(`error loading "${moduleId}" from "${fromDir}"`);
   }

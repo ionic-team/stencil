@@ -2,7 +2,6 @@ import { buildError } from '@utils';
 import fs from 'graceful-fs';
 import path from 'path';
 import semverLte from 'semver/functions/lte';
-import major from 'semver/functions/major';
 import satisfies from 'semver/functions/satisfies';
 
 import type * as d from '../../declarations';
@@ -76,20 +75,16 @@ export class NodeLazyRequire implements d.LazyRequire {
           console.log('HEY::3');
           const installedVersionIsGood = maxVersion
             ? // if maxVersion, check that `minVersion <= installedVersion <= maxVersion`
-              satisfies(installedPkgJson.version, `${minVersion} - ${major(maxVersion)}.x`)
+              satisfies(installedPkgJson.version, `>=${minVersion} <${maxVersion}`)
             : // else, just check that `minVersion <= installedVersion`
               semverLte(minVersion, installedPkgJson.version);
+
           debugger;
           console.log('HEY::4');
 
           if (installedVersionIsGood) {
             this.ensured.add(ensureModuleId);
             return;
-          } else {
-          console.log('pkgJsonPath::',pkgJsonPath);
-          console.log('installedPkgJson::',installedPkgJson);
-          console.log('this is what we wanted');
-          console.log(minVersion, recommendedVersion, maxVersion);
           }
         } catch (e) {}
         // if we get here we didn't get to the `return` above, so either 1) there was some error
