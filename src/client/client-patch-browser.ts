@@ -34,6 +34,7 @@ export const patchBrowser = (): Promise<d.CustomElementsDefineOptions> => {
 
   // @ts-ignore
   const scriptElm =
+    // TODO(STENCIL-661): Remove code related to the dynamic import shim
     BUILD.scriptDataOpts || BUILD.safari10 || BUILD.dynamicImportShim
       ? Array.from(doc.querySelectorAll('script')).find(
           (s) =>
@@ -61,15 +62,18 @@ export const patchBrowser = (): Promise<d.CustomElementsDefineOptions> => {
 
   if (!BUILD.safari10 && importMeta !== '') {
     opts.resourcesUrl = new URL('.', importMeta).href;
+    // TODO(STENCIL-661): Remove code related to the dynamic import shim
   } else if (BUILD.dynamicImportShim || BUILD.safari10) {
     opts.resourcesUrl = new URL(
       '.',
       new URL(scriptElm.getAttribute('data-resources-url') || scriptElm.src, win.location.href)
     ).href;
+    // TODO(STENCIL-661): Remove code related to the dynamic import shim
     if (BUILD.dynamicImportShim) {
       patchDynamicImport(opts.resourcesUrl, scriptElm);
     }
 
+    // TODO(STENCIL-661): Remove code related to the dynamic import shim
     if (BUILD.dynamicImportShim && !win.customElements) {
       // module support, but no custom elements support (Old Edge)
       // @ts-ignore
@@ -79,6 +83,7 @@ export const patchBrowser = (): Promise<d.CustomElementsDefineOptions> => {
   return promiseResolve(opts);
 };
 
+// TODO(STENCIL-661): Remove code related to the dynamic import shim
 const patchDynamicImport = (base: string, orgScriptElm: HTMLScriptElement) => {
   const importFunctionName = getDynamicImportFunction(NAMESPACE);
   try {
