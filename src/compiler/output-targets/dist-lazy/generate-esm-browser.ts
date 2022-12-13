@@ -24,7 +24,8 @@ export const generateEsmBrowser = async (
       preferConst: true,
       sourcemap: config.sourceMap,
     };
-    if (config.extras.dynamicImportShim) {
+    // TODO(STENCIL-661): Remove code related to the dynamic import shim
+    if (config.extras.__deprecated__dynamicImportShim) {
       // for Edge 16-18
       esmOpts.dynamicImportFunction = getDynamicImportFunction(config.fsNamespace);
     }

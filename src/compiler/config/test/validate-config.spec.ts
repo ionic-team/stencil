@@ -355,7 +355,8 @@ describe('validation', () => {
     expect(config.extras.appendChildSlotFix).toBe(false);
     expect(config.extras.cloneNodeFix).toBe(false);
     expect(config.extras.cssVarsShim).toBe(false);
-    expect(config.extras.dynamicImportShim).toBe(false);
+    // TODO(STENCIL-661): Remove code related to the dynamic import shim
+    expect(config.extras.__deprecated__dynamicImportShim).toBe(false);
     expect(config.extras.lifecycleDOMEvents).toBe(false);
     expect(config.extras.safari10).toBe(false);
     expect(config.extras.scriptDataOpts).toBe(false);
