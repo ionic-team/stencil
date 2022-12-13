@@ -58,6 +58,7 @@ export const addStyle = (
         } else {
           // TODO(STENCIL-659): Remove code implementing the CSS variable shim
           if (BUILD.cssVarShim && plt.$cssShim$) {
+            // TODO(STENCIL-659): Remove code implementing the CSS variable shim
             styleElm = plt.$cssShim$.createHostStyle(
               hostElm,
               scopeId,

@@ -6,6 +6,7 @@ import { addGlobalStyle, parseCSS, reScope, updateGlobalScopes } from './scope';
 import { getActiveSelectors, resolveValues } from './selectors';
 import { executeTemplate } from './template';
 
+// TODO(STENCIL-659): Remove code implementing the CSS variable shim
 export class CustomStyle implements CssVarShim {
   private count = 0;
   private hostStyleMap = new WeakMap<HTMLElement, HTMLStyleElement>();

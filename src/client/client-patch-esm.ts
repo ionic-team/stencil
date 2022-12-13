@@ -9,6 +9,7 @@ export const patchEsm = () => {
     // @ts-ignore
     return import(/* webpackChunkName: "polyfills-css-shim" */ './polyfills/css-shim.js').then(() => {
       if ((plt.$cssShim$ = (win as any).__cssshim)) {
+        // TODO(STENCIL-659): Remove code implementing the CSS variable shim
         return plt.$cssShim$.i();
       } else {
         // for better minification

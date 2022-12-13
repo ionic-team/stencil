@@ -1080,6 +1080,7 @@ export interface HostRuleHeader {
   value?: string;
 }
 
+// TODO(STENCIL-659): Remove code implementing the CSS variable shim
 export interface CssVarShim {
   i(): Promise<any>;
   addLink(linkEl: HTMLLinkElement): Promise<any>;
@@ -1695,6 +1696,7 @@ export interface HostRef {
 }
 
 export interface PlatformRuntime {
+  // TODO(STENCIL-659): Remove code implementing the CSS variable shim
   $cssShim$?: CssVarShim;
   $flags$: number;
   $orgLocNodes$?: Map<string, RenderNode>;

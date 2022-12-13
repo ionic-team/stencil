@@ -20,6 +20,7 @@ export const disconnectedCallback = (elm: d.HostElement) => {
     // clear CSS var-shim tracking
     // TODO(STENCIL-659): Remove code implementing the CSS variable shim
     if (BUILD.cssVarShim && plt.$cssShim$) {
+      // TODO(STENCIL-659): Remove code implementing the CSS variable shim
       plt.$cssShim$.removeHost(elm);
     }
 
