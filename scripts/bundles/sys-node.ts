@@ -44,6 +44,7 @@ export async function sysNode(opts: BuildOptions) {
       relativePathPlugin('glob', './glob.js'),
       relativePathPlugin('graceful-fs', './graceful-fs.js'),
       relativePathPlugin('prompts', './prompts.js'),
+      relativePathPlugin('semver', './semver.js'),
       aliasPlugin(opts),
       rollupResolve({
         preferBuiltins: true,
@@ -54,9 +55,9 @@ export async function sysNode(opts: BuildOptions) {
       prettyMinifyPlugin(opts, getBanner(opts, `Stencil Node System`, true)),
     ],
     treeshake: {
-      moduleSideEffects: false,
-      propertyReadSideEffects: false,
-      unknownGlobalSideEffects: false,
+      moduleSideEffects: true,
+      propertyReadSideEffects: true,
+      unknownGlobalSideEffects: true,
     },
   };
 
@@ -105,6 +106,7 @@ export async function sysNodeExternalBundles(opts: BuildOptions) {
     bundleExternal(opts, opts.output.sysNodeDir, cachedDir, 'graceful-fs.js'),
     bundleExternal(opts, opts.output.sysNodeDir, cachedDir, 'node-fetch.js'),
     bundleExternal(opts, opts.output.sysNodeDir, cachedDir, 'prompts.js'),
+    bundleExternal(opts, opts.output.sysNodeDir, cachedDir, 'semver.js'),
     bundleExternal(opts, opts.output.devServerDir, cachedDir, 'open-in-editor-api.js'),
     bundleExternal(opts, opts.output.devServerDir, cachedDir, 'ws.js'),
   ]);

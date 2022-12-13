@@ -1,8 +1,7 @@
 import { buildError } from '@utils';
 import fs from 'graceful-fs';
 import path from 'path';
-import semverLte from 'semver/functions/lte';
-import satisfies from 'semver/functions/satisfies';
+import satisfies from 'semver/functions/satisfies'
 
 import type * as d from '../../declarations';
 import { NodeResolveModule } from './node-resolve-module';
@@ -77,7 +76,8 @@ export class NodeLazyRequire implements d.LazyRequire {
             ? // if maxVersion, check that `minVersion <= installedVersion <= maxVersion`
               satisfies(installedPkgJson.version, `>=${minVersion} <${maxVersion}`)
             : // else, just check that `minVersion <= installedVersion`
-              semverLte(minVersion, installedPkgJson.version);
+              satisfies(installedPkgJson.version, `>=${minVersion}`)
+              // lte(minVersion, installedPkgJson.version);
 
           debugger;
           console.log('HEY::4');
