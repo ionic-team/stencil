@@ -38,6 +38,7 @@ export function resetBuildConditionals(b: d.BuildConditionals) {
   b.invisiblePrehydration = true;
   b.appendChildSlotFix = false;
   b.cloneNodeFix = false;
+  // TODO(STENCIL-661): Remove code related to the dynamic import shim
   b.dynamicImportShim = false;
   b.hotModuleReplacement = false;
   b.safari10 = false;
