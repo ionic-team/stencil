@@ -14,7 +14,6 @@ This is a comprehensive list of the breaking changes introduced in the major ver
   * [New Configuration Defaults](#new-configuration-defaults)
     * [SourceMaps](#sourcemaps)
     * [`dist-custom-elements` Type Declarations](#dist-custom-elements-type-declarations)
-  * [Backwards-compat Configuration Fields Deprecated](#backwards-compat-configuration-fields-deprecated)
   * [Legacy Browser Support Fields Deprecated](#legacy-browser-support-fields-deprecated)
     * [`dynamicImportShim`](#dynamicimportshim)
   * [Deprecated `assetsDir` Removed from `@Component()` decorator](#deprecated-assetsdir-removed-from-component-decorator)
