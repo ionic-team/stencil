@@ -1,3 +1,14 @@
+# 🐙 [3.0.0-alpha.2](https://github.com/ionic-team/stencil/compare/v3.0.0-alpha.1...v3.0.0-alpha.2) (2022-12-12)
+
+
+This release includes all feature and bug fixes from all prior Stencil 3 pre-releases, as well as the following
+unreleased Stencil v2 features:
+
+* **compiler:** copy doc block from component to generated types ([#3525](https://github.com/ionic-team/stencil/issues/3525)) ([2e4b1fc](https://github.com/ionic-team/stencil/commit/2e4b1fcdc0b3fd41928d27cf9ee525a15b02d617))
+* **typescript:** add support for typescript 4.9 ([#3863](https://github.com/ionic-team/stencil/issues/3863)) ([542c46a](https://github.com/ionic-team/stencil/commit/542c46a94400246f1b995df0840c918e080a9e57))
+
+
+
 # 🎷 [3.0.0-alpha.1](https://github.com/ionic-team/stencil/compare/v2.20.0...v3.0.0-alpha.1) (2022-12-05)
 
 

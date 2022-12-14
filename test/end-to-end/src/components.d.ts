@@ -17,8 +17,6 @@ export namespace Components {
     }
     /**
      * Component that helps display a list of cars
-     * @slot header - The slot for the header content.
-     * @part car - The shadow part to target to style the car.
      */
     interface CarList {
         "cars": CarData[];
@@ -53,9 +51,6 @@ export namespace Components {
     }
     interface PrerenderCmp {
     }
-    /**
-     * @virtualProp mode - Mode
-     */
     interface PropCmp {
         "first": string;
         "lastName": string;
@@ -103,8 +98,6 @@ declare global {
     };
     /**
      * Component that helps display a list of cars
-     * @slot header - The slot for the header content.
-     * @part car - The shadow part to target to style the car.
      */
     interface HTMLCarListElement extends Components.CarList, HTMLStencilElement {
     }
@@ -178,9 +171,6 @@ declare global {
         prototype: HTMLPrerenderCmpElement;
         new (): HTMLPrerenderCmpElement;
     };
-    /**
-     * @virtualProp mode - Mode
-     */
     interface HTMLPropCmpElement extends Components.PropCmp, HTMLStencilElement {
     }
     var HTMLPropCmpElement: {
@@ -244,8 +234,6 @@ declare namespace LocalJSX {
     }
     /**
      * Component that helps display a list of cars
-     * @slot header - The slot for the header content.
-     * @part car - The shadow part to target to style the car.
      */
     interface CarList {
         "cars"?: CarData[];
@@ -279,9 +267,6 @@ declare namespace LocalJSX {
     }
     interface PrerenderCmp {
     }
-    /**
-     * @virtualProp mode - Mode
-     */
     interface PropCmp {
         "first"?: string;
         "lastName"?: string;
@@ -331,8 +316,6 @@ declare module "@stencil/core" {
             "car-detail": LocalJSX.CarDetail & JSXBase.HTMLAttributes<HTMLCarDetailElement>;
             /**
              * Component that helps display a list of cars
-             * @slot header - The slot for the header content.
-             * @part car - The shadow part to target to style the car.
              */
             "car-list": LocalJSX.CarList & JSXBase.HTMLAttributes<HTMLCarListElement>;
             "dom-api": LocalJSX.DomApi & JSXBase.HTMLAttributes<HTMLDomApiElement>;
@@ -346,9 +329,6 @@ declare module "@stencil/core" {
             "method-cmp": LocalJSX.MethodCmp & JSXBase.HTMLAttributes<HTMLMethodCmpElement>;
             "path-alias-cmp": LocalJSX.PathAliasCmp & JSXBase.HTMLAttributes<HTMLPathAliasCmpElement>;
             "prerender-cmp": LocalJSX.PrerenderCmp & JSXBase.HTMLAttributes<HTMLPrerenderCmpElement>;
-            /**
-             * @virtualProp mode - Mode
-             */
             "prop-cmp": LocalJSX.PropCmp & JSXBase.HTMLAttributes<HTMLPropCmpElement>;
             "slot-cmp": LocalJSX.SlotCmp & JSXBase.HTMLAttributes<HTMLSlotCmpElement>;
             "slot-cmp-container": LocalJSX.SlotCmpContainer & JSXBase.HTMLAttributes<HTMLSlotCmpContainerElement>;

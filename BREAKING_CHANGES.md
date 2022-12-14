@@ -12,8 +12,10 @@ This is a comprehensive list of the breaking changes introduced in the major ver
 
 * [General](#general)
   * [New Configuration Defaults](#new-configuration-defaults)
-  * [SourceMaps](#sourcemaps)
-  * [`dist-custom-elements` Type Declarations](#dist-custom-elements-type-declarations)
+    * [SourceMaps](#sourcemaps)
+    * [`dist-custom-elements` Type Declarations](#dist-custom-elements-type-declarations)
+  * [Legacy Browser Support Fields Deprecated](#legacy-browser-support-fields-deprecated)
+    * [`dynamicImportShim`](#dynamicimportshim)
   * [Deprecated `assetsDir` Removed from `@Component()` decorator](#deprecated-assetsdir-removed-from-component-decorator)
   * [Drop Node 12 Support](#drop-node-12-support)
   * [Strongly Typed Inputs](#strongly-typed-inputs)
@@ -67,6 +69,32 @@ export const config: Config = {
     // ...
   ],
   // ...
+};
+```
+
+#### Legacy Browser Support Fields Deprecated
+
+Several configuration options related to support for Safari <11, IE11, and Edge
+<19 have been marked as deprecated, and will be removed entirely in a future
+version of Stencil.
+
+##### `dynamicImportShim`
+
+The `extras.dynamicImportShim` option causes Stencil to include a polyfill for
+the [dynamic `import()`
+function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import)
+for use at runtime. The field is renamed to `__deprecated__dynamicImportShim`
+to indicate deprecation. To retain the prior behavior the new option can be
+set in your project's `stencil.config.ts`:
+
+```ts
+// stencil.config.ts
+import { Config } from '@stencil/core';
+
+export const config: Config = {
+  extras: {
+    __deprecated__dynamicImportShim: true
+  }
 };
 ```
 
