@@ -68,8 +68,7 @@ export async function testing(opts: BuildOptions) {
     dir: opts.output.testingDir,
     esModule: false,
     preferConst: true,
-    interop: 'auto',
-    inlineDynamicImports: true,
+    interop: false,
   };
 
   const testingBundle: RollupOptions = {

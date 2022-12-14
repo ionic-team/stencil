@@ -27,11 +27,15 @@ export const generateHydrateApp = async (
     const input = join(packageDir, 'internal', 'hydrate', 'runner.js');
     const mockDoc = join(packageDir, 'mock-doc', 'index.js');
 
+    console.log('generateHydrateApp::input::', input);
+
     const rollupOptions: RollupOptions = {
       ...config.rollupConfig.inputOptions,
 
       input,
-      inlineDynamicImports: true,
+      output: {
+        inlineDynamicImports: true,
+      },
       plugins: [
         {
           name: 'hydrateAppPlugin',
@@ -68,6 +72,8 @@ export const generateHydrateApp = async (
     if (!buildCtx.hasError) {
       // TODO(STENCIL-353): Implement a type guard that balances using our own copy of Rollup types (which are
       // breakable) and type safety (so that the error variable may be something other than `any`)
+      console.log('were here, were queer, there was an error :/');
+      console.log(e);
       loadRollupDiagnostics(config, compilerCtx, buildCtx, e);
     }
   }

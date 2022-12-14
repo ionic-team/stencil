@@ -52,6 +52,7 @@ cli
     checkVersion: nodeApi.checkVersion,
   })
   .catch(function (err) {
+    console.log(err);
     console.error('uncaught error', err);
     process.exit(1);
   });

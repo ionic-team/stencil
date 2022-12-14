@@ -1,14 +1,16 @@
 import { rollupCommonjsPlugin, rollupJsonPlugin, rollupNodeResolvePlugin, rollupReplacePlugin } from '@compiler-deps';
-import { createOnWarnFn, isString, loadRollupDiagnostics } from '@utils';
+import { createOnWarnFn, 
+  // isString, 
+  loadRollupDiagnostics } from '@utils';
 import { rollup, RollupOptions, TreeshakingOptions } from 'rollup';
 
 import type * as d from '../../declarations';
 import { lazyComponentPlugin } from '../output-targets/dist-lazy/lazy-component-plugin';
-import { createCustomResolverAsync } from '../sys/resolve/resolve-module-async';
+// import { createCustomResolverAsync } from '../sys/resolve/resolve-module-async';
 import { appDataPlugin } from './app-data-plugin';
 import type { BundleOptions } from './bundle-interface';
 import { coreResolvePlugin } from './core-resolve-plugin';
-import { devNodeModuleResolveId } from './dev-node-module-resolve';
+// import { devNodeModuleResolveId } from './dev-node-module-resolve';
 import { extFormatPlugin } from './ext-format-plugin';
 import { extTransformsPlugin } from './ext-transforms-plugin';
 import { fileLoadPlugin } from './file-load-plugin';
@@ -55,43 +57,46 @@ export const getRollupOptions = (
   buildCtx: d.BuildCtx,
   bundleOpts: BundleOptions
 ): RollupOptions => {
-  const customResolveOptions = createCustomResolverAsync(config.sys, compilerCtx.fs, [
-    '.tsx',
-    '.ts',
-    '.js',
-    '.mjs',
-    '.json',
-    '.d.ts',
-  ]);
+  // const customResolveOptions = createCustomResolverAsync(config.sys, compilerCtx.fs, [
+  //   '.tsx',
+  //   '.ts',
+  //   '.js',
+  //   '.mjs',
+  //   '.json',
+  //   '.d.ts',
+  // ]);
   const nodeResolvePlugin = rollupNodeResolvePlugin({
     mainFields: ['collection:main', 'jsnext:main', 'es2017', 'es2015', 'module', 'main'],
-    customResolveOptions,
+    // customResolveOptions,
     browser: true,
     rootDir: config.rootDir,
     ...(config.nodeResolve as any),
   });
-  const orgNodeResolveId = nodeResolvePlugin.resolveId;
-  const orgNodeResolveId2 = (nodeResolvePlugin.resolveId = async function (importee: string, importer: string) {
-    const [realImportee, query] = importee.split('?');
-    // @ts-ignore
-    const resolved = await orgNodeResolveId.call(nodeResolvePlugin, realImportee, importer);
-    if (resolved) {
-      if (isString(resolved)) {
-        return query ? resolved + '?' + query : resolved;
-      }
-      return {
-        ...resolved,
-        id: query ? resolved.id + '?' + query : resolved.id,
-      };
-    }
-    return resolved;
-  });
-  if (config.devServer && config.devServer.experimentalDevModules) {
-    nodeResolvePlugin.resolveId = async function (importee: string, importer: string) {
-      const resolvedId = await orgNodeResolveId2.call(nodeResolvePlugin, importee, importer);
-      return devNodeModuleResolveId(config, compilerCtx.fs, resolvedId, importee);
-    };
-  }
+  // const orgNodeResolveId = nodeResolvePlugin.resolveId;
+  // const orgNodeResolveId2 = (nodeResolvePlugin.resolveId = async function (importee: string, importer: string) {
+  //   const [realImportee, query] = importee.split('?');
+  //   // @ts-ignore
+  //   const resolved = await orgNodeResolveId.call(nodeResolvePlugin, realImportee, importer);
+  //   if (resolved) {
+  //     if (isString(resolved)) {
+  //       return query ? resolved + '?' + query : resolved;
+  //     }
+  //     return {
+  //       ...resolved,
+  //       id: query ? resolved.id + '?' + query : resolved.id,
+  //     };
+  //   }
+  //   return resolved;
+  // });
+  // if (config.devServer && config.devServer.experimentalDevModules) {
+  //   nodeResolvePlugin.resolveId = async function (importee: string, importer: string) {
+  //     const resolvedId = await orgNodeResolveId2.call(nodeResolvePlugin, importee, importer);
+  //     return devNodeModuleResolveId(config, compilerCtx.fs, resolvedId, importee);
+  //   };
+  // }
+
+  console.log('about to build the commonjs config');
+  console.log(config.commonjs);
 
   const beforePlugins = config.rollupPlugins.before || [];
   const afterPlugins = config.rollupPlugins.after || [];
@@ -115,7 +120,7 @@ export const getRollupOptions = (
       rollupCommonjsPlugin({
         include: /node_modules/,
         sourceMap: config.sourceMap,
-        transformMixedEsModules: false,
+        transformMixedEsModules: true,
         ...config.commonjs,
       }),
       ...afterPlugins,
