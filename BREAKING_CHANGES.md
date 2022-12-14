@@ -26,6 +26,7 @@ This is a comprehensive list of the breaking changes introduced in the major ver
   * [`dist-custom-elements` Output Target](#dist-custom-elements-output-target)
     * [Add `customElementsExportBehavior` to Control Export Behavior](#add-customelementsexportbehavior-to-control-export-behavior)
     * [Move `autoDefineCustomElements` Configuration](#move-autodefinecustomelements-configuration)
+    * [Remove `inlineDynamicImports` Configuration](#remove-inlinedynamicimports-configuration)
   * [`dist-custom-elements-bundle` Output Target](#dist-custom-elements-bundle-output-target)
 * [Legacy Angular Output Target](#legacy-angular-output-target)
 * [Stencil APIs](#stencil-apis)
@@ -235,6 +236,11 @@ export const config: Config = {
   // ...
 };
 ```
+
+#### Remove `inlineDynamicImports` Configuration
+
+The `inlineDynamicImports` configuration option on `dist-custom-elements` has been removed. Previously, this option would throw an error at build
+time during the Rollup bundling process if the build contained multiple "inputs" (components).
 
 #### `dist-custom-elements-bundle` Output Target
 The `dist-custom-elements-bundle` has been removed starting with Stencil v3.0.0, following the [RFC process](https://github.com/ionic-team/stencil/issues/3136).

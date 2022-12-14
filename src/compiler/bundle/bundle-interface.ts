@@ -35,6 +35,14 @@ export interface BundleOptions {
    * @see {@link loader-plugin:loaderPlugin}
    */
   loader?: { [id: string]: string };
+  /**
+   * Duplicate of Rollup's `inlineDynamicImports` output option.
+   *
+   * Creates dynamic imports (i.e. `import()` calls) as a part of the same
+   * chunk being bundled. Rather than being created as separate chunks.
+   *
+   * @see {@link https://rollupjs.org/guide/en/#outputinlinedynamicimports}
+   */
   inlineDynamicImports?: boolean;
   inlineWorkers?: boolean;
   /**
