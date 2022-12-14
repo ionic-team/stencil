@@ -120,15 +120,6 @@ export * from '${USER_INDEX_ENTRY_ID}';
         expect(options.externalRuntime).toBe(false);
       }
     });
-
-    it.each([true, false, undefined])('should pass through inlineDynamicImports=%p', (inlineDynamicImports) => {
-      const { config, buildCtx, compilerCtx } = setup();
-      const options = getBundleOptions(config, buildCtx, compilerCtx, {
-        type: DIST_CUSTOM_ELEMENTS,
-        inlineDynamicImports,
-      });
-      expect(options.inlineDynamicImports).toBe(inlineDynamicImports);
-    });
   });
 
   describe('bundleCustomElements', () => {

@@ -64,7 +64,6 @@ const bundleCustomElements = async (
       loader: {
         '\0core': generateEntryPoint(outputTarget, buildCtx),
       },
-      inlineDynamicImports: outputTarget.inlineDynamicImports,
       preserveEntrySignatures: 'allow-extension',
     };
 
