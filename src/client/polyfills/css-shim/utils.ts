@@ -1,3 +1,4 @@
+// TODO(STENCIL-659): Remove code implementing the CSS variable shim
 export const GLOBAL_SCOPE = ':root';
 
 export function findRegex(regex: RegExp, cssText: string, offset: number) {

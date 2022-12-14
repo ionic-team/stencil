@@ -1,3 +1,4 @@
+// TODO(STENCIL-659): Remove code implementing the CSS variable shim
 import { compileTemplate, compileVar, executeTemplate, findVarEndIndex, parseVar } from '../template';
 
 describe('compiler', () => {
