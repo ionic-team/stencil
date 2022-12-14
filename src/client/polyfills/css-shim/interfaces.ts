@@ -1,3 +1,4 @@
+// TODO(STENCIL-659): Remove code implementing the CSS variable shim
 export type CSSVariables = { [prop: string]: string };
 export type CSSEval = (p: CSSVariables) => string;
 export type CSSSegment = string | CSSEval;

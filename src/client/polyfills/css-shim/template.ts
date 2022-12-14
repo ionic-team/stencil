@@ -1,3 +1,4 @@
+// TODO(STENCIL-659): Remove code implementing the CSS variable shim
 import { CSSTemplate, CSSVariables } from './interfaces';
 import { COMMENTS, TRAILING_LINES, VAR_ASSIGN_START, VAR_USAGE_START } from './regex';
 import { findRegex } from './utils';
