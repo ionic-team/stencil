@@ -88,7 +88,6 @@ export const getBundleOptions = (
     index: '\0core',
   },
   loader: {},
-  inlineDynamicImports: outputTarget.inlineDynamicImports,
   preserveEntrySignatures: 'allow-extension',
 });
 
