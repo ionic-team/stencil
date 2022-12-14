@@ -1,3 +1,4 @@
+// TODO(STENCIL-659): Remove code implementing the CSS variable shim
 /*
 Extremely simple css parser. Intended to be not more than what we need
 and definitely not necessarily correct =).

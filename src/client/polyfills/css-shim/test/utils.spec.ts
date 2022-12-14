@@ -1,3 +1,4 @@
+// TODO(STENCIL-659): Remove code implementing the CSS variable shim
 import { CSSSelector, Declaration } from '../interfaces';
 import { parseCSS } from '../scope';
 import { getDeclarations, normalizeValue, resolveValues } from '../selectors';
