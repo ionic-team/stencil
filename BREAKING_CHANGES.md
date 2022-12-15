@@ -17,6 +17,7 @@ This is a comprehensive list of the breaking changes introduced in the major ver
   * [Legacy Browser Support Fields Deprecated](#legacy-browser-support-fields-deprecated)
     * [`dynamicImportShim`](#dynamicimportshim)
     * [`cssVarShim`](#cssvarshim)
+    * [`shadowDomShim`](#shadowdomshim)
   * [Deprecated `assetsDir` Removed from `@Component()` decorator](#deprecated-assetsdir-removed-from-component-decorator)
   * [Drop Node 12 Support](#drop-node-12-support)
   * [Strongly Typed Inputs](#strongly-typed-inputs)
@@ -114,6 +115,26 @@ import { Config } from '@stencil/core';
 export const config: Config = {
   extras: {
     __deprecated__cssVarsShim: true
+  }
+};
+```
+
+##### `shadowDomShim`
+
+If `extras.shadowDomShim` is set to `true` the Stencil runtime will check
+whether a shim for [shadow
+DOM](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_shadow_DOM)
+is needed in the current browser, and include one if so. For Stencil v3.0.0
+this field is renamed to `__deprecated__shadowDomShim`. To retain the previous
+behavior the new option can be set in your project's `stencil.config.ts`:
+
+```ts
+// stencil.config.ts
+import { Config } from '@stencil/core';
+
+export const config: Config = {
+  extras: {
+    __deprecated__shadowDomShim: true
   }
 };
 ```
