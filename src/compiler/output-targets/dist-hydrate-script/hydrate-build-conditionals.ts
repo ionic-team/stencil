@@ -30,6 +30,7 @@ export const getHydrateBuildConditionals = (cmps: d.ComponentCompilerMeta[]) => 
   build.safari10 = false;
   build.hydratedAttribute = false;
   build.hydratedClass = true;
+  // TODO(STENCIL-664): Remove code associated with deprecated scriptDataOpts flag
   build.scriptDataOpts = false;
   // TODO(STENCIL-661): Remove code related to the dynamic import shim
   build.dynamicImportShim = false;

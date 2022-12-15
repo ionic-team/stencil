@@ -42,6 +42,7 @@ export function resetBuildConditionals(b: d.BuildConditionals) {
   b.dynamicImportShim = false;
   b.hotModuleReplacement = false;
   b.safari10 = false;
+  // TODO(STENCIL-664): Remove code associated with deprecated scriptDataOpts flag
   b.scriptDataOpts = false;
   b.scopedSlotTextContentFix = false;
   b.slotChildNodesFix = false;

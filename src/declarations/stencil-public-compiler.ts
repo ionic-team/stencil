@@ -307,12 +307,15 @@ export interface ConfigExtras {
    */
   safari10?: boolean;
 
+  // TODO(STENCIL-664): Remove code associated with deprecated scriptDataOpts flag
   /**
    * It is possible to assign data to the actual `<script>` element's `data-opts` property,
    * which then gets passed to Stencil's initial bootstrap. This feature is only required
    * for very special cases and rarely needed. Defaults to `false`.
+   *
+   * @deprecated As of Stencil 3.0.0, this field is deprecated
    */
-  scriptDataOpts?: boolean;
+  __deprecated__scriptDataOpts?: boolean;
 
   /**
    * Experimental flag to align the behavior of invoking `textContent` on a scoped component to act more like a

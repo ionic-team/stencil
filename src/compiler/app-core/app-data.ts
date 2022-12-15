@@ -154,7 +154,8 @@ export const updateBuildConditionals = (config: Config, b: BuildConditionals) =>
   b.lifecycleDOMEvents = !!(b.isDebug || config._isTesting || config.extras.lifecycleDOMEvents);
   b.safari10 = config.extras.safari10;
   b.scopedSlotTextContentFix = !!config.extras.scopedSlotTextContentFix;
-  b.scriptDataOpts = config.extras.scriptDataOpts;
+  // TODO(STENCIL-664): Remove code associated with deprecated scriptDataOpts flag
+  b.scriptDataOpts = config.extras.__deprecated__scriptDataOpts;
   // TODO(STENCIL-662): Remove code related to deprecated shadowDomShim field
   b.shadowDomShim = config.extras.__deprecated__shadowDomShim;
   b.attachStyles = true;

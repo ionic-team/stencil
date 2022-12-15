@@ -37,6 +37,7 @@ export const patchBrowser = (): Promise<d.CustomElementsDefineOptions> => {
   // @ts-ignore
   const scriptElm =
     // TODO(STENCIL-661): Remove code related to the dynamic import shim
+    // TODO(STENCIL-664): Remove code associated with deprecated scriptDataOpts flag
     BUILD.scriptDataOpts || BUILD.safari10 || BUILD.dynamicImportShim
       ? Array.from(doc.querySelectorAll('script')).find(
           (s) =>
@@ -45,6 +46,7 @@ export const patchBrowser = (): Promise<d.CustomElementsDefineOptions> => {
         )
       : null;
   const importMeta = import.meta.url;
+  // TODO(STENCIL-664): Remove code associated with deprecated scriptDataOpts flag
   const opts = BUILD.scriptDataOpts ? (scriptElm as any)['data-opts'] || {} : {};
 
   if (BUILD.safari10 && 'onbeforeload' in scriptElm && !history.scrollRestoration /* IS_ESM_BUILD */) {

@@ -64,6 +64,7 @@ export const BUILD: BuildConditionals = {
   hydratedAttribute: false,
   hydratedClass: true,
   safari10: false,
+  // TODO(STENCIL-664): Remove code associated with deprecated scriptDataOpts flag
   scriptDataOpts: false,
   scopedSlotTextContentFix: false,
   // TODO(STENCIL-662): Remove code related to deprecated shadowDomShim field
