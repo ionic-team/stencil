@@ -60,6 +60,10 @@ export const enum CMP_FLAGS {
   scopedCssEncapsulation = 1 << 1,
   hasSlotRelocation = 1 << 2,
   // TODO(STENCIL-662): Remove code related to deprecated shadowDomShim field
+  // Note that when we remove this field we should consider whether we need to
+  // retain a placeholder here, since if we want to have compatability between
+  // different versions of the runtime then we'll need to not shift the values
+  // of the other higher flags down
   needsShadowDomShim = 1 << 3,
   shadowDelegatesFocus = 1 << 4,
   hasMode = 1 << 5,
