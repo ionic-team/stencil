@@ -137,6 +137,7 @@ const getHydrateBuildConditionals = (config: d.ValidatedConfig, cmps: d.Componen
   build.appendChildSlotFix = false;
   build.slotChildNodesFix = false;
   build.safari10 = false;
+  // TODO(STENCIL-662): Remove code related to deprecated shadowDomShim field
   build.shadowDomShim = false;
 
   return build;

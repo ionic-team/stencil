@@ -32,6 +32,7 @@ export const setPlatformHelpers = (helpers: {
 };
 
 export const supportsShadow =
+  // TODO(STENCIL-662): Remove code related to deprecated shadowDomShim field
   BUILD.shadowDomShim && BUILD.shadowDom
     ? /*@__PURE__*/ (() => (doc.head.attachShadow + '').indexOf('[native') > -1)()
     : true;
