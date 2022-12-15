@@ -320,13 +320,17 @@ export interface ConfigExtras {
    */
   scopedSlotTextContentFix?: boolean;
 
+  // TODO(STENCIL-662): Remove code related to deprecated shadowDomShim field
   /**
    * If enabled `true`, the runtime will check if the shadow dom shim is required. However,
    * if it's determined that shadow dom is already natively supported by the browser then
    * it does not request the shim. When set to `false` it will avoid all shadow dom tests.
    * Defaults to `false`.
+   *
+   * @deprecated Since Stencil v3.0.0. IE 11, Edge <= 18, and old Safari versions
+   * are no longer supported.
    */
-  shadowDomShim?: boolean;
+  __deprecated__shadowDomShim?: boolean;
 
   /**
    * When a component is first attached to the DOM, this setting will wait a single tick before

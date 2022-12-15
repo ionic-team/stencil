@@ -25,6 +25,7 @@ export const getHydrateBuildConditionals = (cmps: d.ComponentCompilerMeta[]) => 
   build.slotChildNodesFix = false;
   build.cloneNodeFix = false;
   build.cssAnnotations = true;
+  // TODO(STENCIL-662): Remove code related to deprecated shadowDomShim field
   build.shadowDomShim = true;
   build.safari10 = false;
   build.hydratedAttribute = false;

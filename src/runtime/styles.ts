@@ -63,6 +63,7 @@ export const addStyle = (
               hostElm,
               scopeId,
               style,
+              // TODO(STENCIL-662): Remove code related to deprecated shadowDomShim field
               !!(cmpMeta.$flags$ & CMP_FLAGS.needsScopedEncapsulation)
             );
             const newScopeId = (styleElm as any)['s-sc'];
@@ -115,6 +116,7 @@ export const attachStyles = (hostRef: d.HostRef) => {
     elm
   );
 
+  // TODO(STENCIL-662): Remove code related to deprecated shadowDomShim field
   if ((BUILD.shadowDom || BUILD.scoped) && BUILD.cssAnnotations && flags & CMP_FLAGS.needsScopedEncapsulation) {
     // only required when we're NOT using native shadow dom (slot)
     // or this browser doesn't support native shadow dom
