@@ -12,11 +12,12 @@ export const validateHydrated = (config: UnvalidatedConfig): HydratedFlag | unde
   /**
    * If `config.hydratedFlag` is set to `null` that is an explicit signal that we
    * should _not_ create a default configuration when validating and should instead
-   * just return `undefined`.
+   * just return `undefined`. It may also have been set to `false`; this is an invalid
+   * value as far as the type system is concerned, but users may ignore this.
    *
    * See {@link HydratedFlag} for more details.
    */
-  if (config.hydratedFlag === null || config.hydratedFlag === false) {
+  if (config.hydratedFlag === null || (config.hydratedFlag as unknown as boolean) === false) {
     return undefined;
   }
 

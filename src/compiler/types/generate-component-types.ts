@@ -1,4 +1,4 @@
-import { dashToPascalCase, sortBy } from '@utils';
+import { addDocBlock, dashToPascalCase, sortBy } from '@utils';
 
 import type * as d from '../../declarations';
 import { generateEventTypes } from './generate-event-types';
@@ -40,7 +40,11 @@ export const generateComponentTypes = (
   const jsxAttributes = attributesToMultiLineString([...propAttributes, ...eventAttributes], true, areTypesInternal);
 
   const element = [
-    `        interface ${htmlElementName}${classTypeParams} extends Components.${tagNameAsPascal}${classTypeParams}, HTMLStencilElement {`,
+    addDocBlock(
+      `        interface ${htmlElementName}${classTypeParams} extends Components.${tagNameAsPascal}${classTypeParams}, HTMLStencilElement {`,
+      cmp.docs,
+      4
+    ),
     `                prototype: ${htmlElementName}${classTypeParams};`,
     `                new (): ${htmlElementName}${classTypeParams};`,
     `        }`,
@@ -51,7 +55,11 @@ export const generateComponentTypes = (
     tagName,
     tagNameAsPascal: `${tagNameAsPascal}${classTypeParamsAny}`,
     htmlElementName: `${htmlElementName}${classTypeParamsAny}`,
-    component: `        interface ${tagNameAsPascal}${classTypeParams} {\n${componentAttributes}        }`,
+    component: addDocBlock(
+      `        interface ${tagNameAsPascal}${classTypeParams} {\n${componentAttributes}        }`,
+      cmp.docs,
+      4
+    ),
     jsx: `    interface ${tagNameAsPascal}${classTypeParams} {\n${jsxAttributes}        }`,
     element: element.join(`\n`),
   };

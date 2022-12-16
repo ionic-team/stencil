@@ -1,3 +1,21 @@
+# 🍁 [2.20.0](https://github.com/ionic-team/stencil/compare/v2.19.3...v2.20.0) (2022-12-05)
+
+
+### Bug Fixes
+
+* **cli:** ensure that argument order is correct for Jest ([#3827](https://github.com/ionic-team/stencil/issues/3827)) ([eb44060](https://github.com/ionic-team/stencil/commit/eb440602d79396eebbf3f8a509f60f3e03417440))
+
+
+### Features
+
+* **typescript:** support typescript 4.8 ([#3743](https://github.com/ionic-team/stencil/issues/3743)) ([8fa35f2](https://github.com/ionic-team/stencil/commit/8fa35f2e12a5da09cf28e7b92103675164957d08))
+
+
+### Thanks
+
+🎉 Thanks for @PengBoUESTC for their contributions! 🎉
+
+
 ## 🌏 [2.19.3](https://github.com/ionic-team/stencil/compare/v2.19.2...v2.19.3) (2022-11-15)
 
 

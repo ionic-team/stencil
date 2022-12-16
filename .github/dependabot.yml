@@ -15,7 +15,7 @@ updates:
       - dependency-name: '@types/node'
         versions: ['17', '18']
       - dependency-name: 'typescript'
-        versions: ['>=4.9']
+        versions: ['>=4.10', '>=5.0']
       # disable Jest updates until the new testing architecture is in place
       - dependency-name: '@types/jest'
         versions: ['>=28']
@@ -39,6 +39,10 @@ updates:
     # Disable rebasing for pull requests, as having several open pull requests all get simultaneously rebased gets
     # noisy from a notification standpoint
     rebase-strategy: 'disabled'
+    ignore:
+      # These values should match the values ignored by Dependabot for the project's root `package.json` (above)
+      - dependency-name: '@types/node'
+        versions: ['17', '18']
   - package-ecosystem: 'github-actions'
     directory: '/'
     schedule:
