@@ -142,10 +142,10 @@ export const config: Config = {
 
 ##### `safari10`
 
-The `extras.safari10` option actives a patch for ES module support in Safari10.
-In Stencil v3.0.0 the field is renamed to `__deprecated__safari10` to indicate
-deprecation. To retain the prior behavior the new option can be set in your
-project's `stencil.config.ts`:
+If `extras.safari10` is set to `true` the Stencil runtime will patch ES module
+support for Safari 10. In Stencil v3.0.0 the field is renamed to
+`__deprecated__safari10` to indicate deprecation. To retain the prior behavior
+the new option can be set in your project's `stencil.config.ts`:
 
 ```ts
 // stencil.config.ts
