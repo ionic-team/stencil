@@ -3,6 +3,7 @@ import { dirname, relative } from 'path';
 import ts from 'typescript';
 
 import type * as d from '../../declarations';
+import { retrieveTsModifiers } from './transform-utils';
 
 /**
  * This method is responsible for replacing user-defined import path aliases ({@link https://www.typescriptlang.org/docs/handbook/module-resolution.html#path-mapping})
@@ -78,8 +79,7 @@ export const mapImportsToPathAliases = (
 
           return transformCtx.factory.updateImportDeclaration(
             node,
-            node.decorators,
-            node.modifiers,
+            retrieveTsModifiers(node),
             node.importClause,
             transformCtx.factory.createStringLiteral(importPath),
             node.assertClause

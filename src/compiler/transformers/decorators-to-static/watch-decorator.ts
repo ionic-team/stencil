@@ -2,7 +2,7 @@ import { augmentDiagnosticWithNode, buildError, buildWarn, flatOne } from '@util
 import ts from 'typescript';
 
 import type * as d from '../../../declarations';
-import { convertValueToLiteral, createStaticGetter } from '../transform-utils';
+import { convertValueToLiteral, createStaticGetter, retrieveTsDecorators } from '../transform-utils';
 import { getDeclarationParameters, isDecoratorNamed } from './decorator-utils';
 
 export const watchDecoratorsToStatic = (
@@ -30,7 +30,8 @@ const parseWatchDecorator = (
   method: ts.MethodDeclaration
 ): d.ComponentCompilerWatch[] => {
   const methodName = method.name.getText();
-  return method.decorators.filter(isDecoratorNamed('Watch')).map((decorator) => {
+  const decorators = retrieveTsDecorators(method) ?? [];
+  return decorators.filter(isDecoratorNamed('Watch')).map((decorator) => {
     const [propName] = getDeclarationParameters<string>(decorator);
     if (!watchable.has(propName)) {
       const diagnostic = config.devMode ? buildWarn(diagnostics) : buildError(diagnostics);

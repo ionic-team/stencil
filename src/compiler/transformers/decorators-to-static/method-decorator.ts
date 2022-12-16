@@ -9,6 +9,8 @@ import {
   getAttributeTypeInfo,
   isMemberPrivate,
   mapJSDocTagInfo,
+  retrieveTsDecorators,
+  retrieveTsModifiers,
   serializeSymbol,
   typeToString,
   validateReferences,
@@ -40,8 +42,8 @@ const parseMethodDecorator = (
   tsSourceFile: ts.SourceFile,
   typeChecker: ts.TypeChecker,
   method: ts.MethodDeclaration
-) => {
-  const methodDecorator = method.decorators.find(isDecoratorNamed('Method'));
+): ts.PropertyAssignment | null => {
+  const methodDecorator = retrieveTsDecorators(method)?.find(isDecoratorNamed('Method'));
   if (methodDecorator == null) {
     return null;
   }
@@ -79,7 +81,7 @@ const parseMethodDecorator = (
     const err = buildError(diagnostics);
     err.messageText =
       'Methods decorated with the @Method() decorator cannot be "private" nor "protected". More info: https://stenciljs.com/docs/methods';
-    augmentDiagnosticWithNode(err, method.modifiers[0]);
+    augmentDiagnosticWithNode(err, retrieveTsModifiers(method)![0]);
   }
 
   // Validate if the method name does not conflict with existing public names

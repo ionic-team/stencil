@@ -17,16 +17,16 @@ jobs:
       matrix:
         branch: ['main', 'pr']
     name: 'Get strictNullChecks errors on ${{ matrix.branch }}'
-    runs-on: 'ubuntu-latest'
+    runs-on: 'ubuntu-20.04'
     steps:
       - name: Checkout main
-        uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+        uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
         with:
           ref: main
         if: ${{ matrix.branch == 'main' }}
 
       - name: Checkout PR branch
-        uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+        uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
         with:
           # the pull_request_target event will consider the HEAD of `main` to be the SHA to use.
           # attempt to use the SHA associated with a pull request and fallback to HEAD of `main`
@@ -55,16 +55,16 @@ jobs:
       matrix:
         branch: ['main', 'pr']
     name: Find unused variables on ${{ matrix.branch }}
-    runs-on: 'ubuntu-latest'
+    runs-on: 'ubuntu-20.04'
     steps:
       - name: Checkout main
-        uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+        uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
         with:
           ref: main
         if: ${{ matrix.branch == 'main' }}
 
       - name: Checkout PR branch
-        uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+        uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
         with:
           # the pull_request_target event will consider the HEAD of `main` to be the SHA to use.
           # attempt to use the SHA associated with a pull request and fallback to HEAD of `main`
@@ -87,10 +87,10 @@ jobs:
   format_report:
     needs: ['strict_null_check', 'unused_exports_check']
     name: Download error files and report
-    runs-on: 'ubuntu-latest'
+    runs-on: 'ubuntu-20.04'
     steps:
       - name: Checkout current branch
-        uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+        uses: actions/checkout@755da8c3cf115ac066823e79a1e1788f8940201b # v3.2.0
         with:
           # the pull_request_target event will consider the HEAD of `main` to be the SHA to use.
           # attempt to use the SHA associated with a pull request and fallback to HEAD of `main`
@@ -141,7 +141,7 @@ jobs:
           echo ::set-output name=body::$body
 
       - name: Find Comment
-        uses: peter-evans/find-comment@b657a70ff16d17651703a84bee1cb9ad9d2be2ea # v2.0.1
+        uses: peter-evans/find-comment@f4499a714d59013c74a08789b48abe4b704364a0 # v2.1.0
         id: fc
         with:
           issue-number: ${{ github.event.pull_request.number }}
