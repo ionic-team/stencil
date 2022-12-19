@@ -1,0 +1,19 @@
+name: Auto Request Review
+
+inputs:
+  org:
+    description: 'The Github organization name (i.e "ionic-team")'
+    required: true
+  team:
+    description: 'The Github team name (i.e. "stencil") that will be used to assign individual reviewers when the PR author is within the specified organization.'
+    required: true
+  orgReadToken:
+    description: 'The GitHub token with permissions for executing readonly API calls to fetch organization members'
+    required: true
+  writeToken:
+    description: 'The GitHub token with permissions for executing a write action on PRs'
+    required: true
+
+runs:
+  using: 'node16'
+  main: 'index.js'
