@@ -1,3 +1,23 @@
+# 👑 [3.0.0-beta.0](https://github.com/ionic-team/stencil/compare/v3.0.0-alpha.2...v3.0.0-beta.0) (2022-12-19)
+
+
+### Features
+
+* **compiler:** remove inlineDynamicImports from custom elements targets ([#3897](https://github.com/ionic-team/stencil/issues/3897)) ([90aa4f5](https://github.com/ionic-team/stencil/commit/90aa4f5a4b73ea12bf0fd527fd622c22d897217b))
+* **runtime:** Support for older browsers, including Internet Explorer 11 and Safari 10, has been marked as deprecated via:
+  * mark `dynamicImportShim` as deprecated ([#3895](https://github.com/ionic-team/stencil/pull/3895)) ([5fb32af](https://github.com/ionic-team/stencil/commit/5fb32afa253d43f48a01b077412f67682e282851))
+  * mark `cssVarsShim` as deprecated ([#3894](https://github.com/ionic-team/stencil/pull/3894)) ([d15972f](https://github.com/ionic-team/stencil/commit/d15972f0a7347d686262861ff6c0d726dfdb76ff))
+  * mark `shadowDomShim` as deprecated ([#3898](https://github.com/ionic-team/stencil/pull/3898)) ([cea184a](https://github.com/ionic-team/stencil/commit/cea184aa031a6e9a22c6a690c5824169d7295bce))
+  * mark `safari10` as deprecated ([#3899](https://github.com/ionic-team/stencil/pull/3899)) ([cd0a52d](https://github.com/ionic-team/stencil/commit/cd0a52d46d6a817eeee3c7fbcabbabcb9bb6ed52))
+
+This release includes all feature and bug fixes from all prior Stencil 3 pre-releases, as well as the following
+unreleased Stencil v2 features:
+
+* **compiler:** copy doc block from component to generated types ([#3525](https://github.com/ionic-team/stencil/issues/3525)) ([2e4b1fc](https://github.com/ionic-team/stencil/commit/2e4b1fcdc0b3fd41928d27cf9ee525a15b02d617))
+* **typescript:** add support for typescript 4.9 ([#3863](https://github.com/ionic-team/stencil/issues/3863)) ([542c46a](https://github.com/ionic-team/stencil/commit/542c46a94400246f1b995df0840c918e080a9e57))
+
+
+
 # 🐙 [3.0.0-alpha.2](https://github.com/ionic-team/stencil/compare/v3.0.0-alpha.1...v3.0.0-alpha.2) (2022-12-12)
 
 
