@@ -16,7 +16,7 @@ This is a comprehensive list of the breaking changes introduced in the major ver
     * [`dist-custom-elements` Type Declarations](#dist-custom-elements-type-declarations)
   * [Legacy Browser Support Fields Deprecated](#legacy-browser-support-fields-deprecated)
     * [`dynamicImportShim`](#dynamicimportshim)
-    * [`cssVarsShim`](#cssvarshim)
+    * [`cssVarsShim`](#cssvarsshim)
     * [`shadowDomShim`](#shadowdomshim)
     * [`safari10`](#safari10)
   * [Deprecated `assetsDir` Removed from `@Component()` decorator](#deprecated-assetsdir-removed-from-component-decorator)
@@ -103,7 +103,7 @@ export const config: Config = {
 
 ##### `cssVarsShim`
 
-`extras.cssVarShim` causes Stencil to include a polyfill for [CSS
+`extras.cssVarsShim` causes Stencil to include a polyfill for [CSS
 variables](https://developer.mozilla.org/en-US/docs/Web/CSS/--*). For Stencil
 v3.0.0 this field is renamed to `__deprecated__cssVarsShim`. To retain the
 previous behavior the new option can be set in your project's
