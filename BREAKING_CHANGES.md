@@ -16,8 +16,9 @@ This is a comprehensive list of the breaking changes introduced in the major ver
     * [`dist-custom-elements` Type Declarations](#dist-custom-elements-type-declarations)
   * [Legacy Browser Support Fields Deprecated](#legacy-browser-support-fields-deprecated)
     * [`dynamicImportShim`](#dynamicimportshim)
-    * [`cssVarShim`](#cssvarshim)
+    * [`cssVarsShim`](#cssvarsshim)
     * [`shadowDomShim`](#shadowdomshim)
+    * [`safari10`](#safari10)
   * [Deprecated `assetsDir` Removed from `@Component()` decorator](#deprecated-assetsdir-removed-from-component-decorator)
   * [Drop Node 12 Support](#drop-node-12-support)
   * [Strongly Typed Inputs](#strongly-typed-inputs)
@@ -100,9 +101,9 @@ export const config: Config = {
 };
 ```
 
-##### `cssVarShim`
+##### `cssVarsShim`
 
-`extras.cssVarShim` causes Stencil to include a polyfill for [CSS
+`extras.cssVarsShim` causes Stencil to include a polyfill for [CSS
 variables](https://developer.mozilla.org/en-US/docs/Web/CSS/--*). For Stencil
 v3.0.0 this field is renamed to `__deprecated__cssVarsShim`. To retain the
 previous behavior the new option can be set in your project's
@@ -135,6 +136,23 @@ import { Config } from '@stencil/core';
 export const config: Config = {
   extras: {
     __deprecated__shadowDomShim: true
+  }
+};
+```
+
+##### `safari10`
+
+If `extras.safari10` is set to `true` the Stencil runtime will patch ES module
+support for Safari 10. In Stencil v3.0.0 the field is renamed to
+`__deprecated__safari10` to indicate deprecation. To retain the prior behavior
+the new option can be set in your project's `stencil.config.ts`:
+
+```ts
+// stencil.config.ts
+import { Config } from '@stencil/core';
+export const config: Config = {
+  extras: {
+    __deprecated__safari10: true
   }
 };
 ```

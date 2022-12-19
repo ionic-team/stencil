@@ -359,7 +359,8 @@ describe('validation', () => {
     // TODO(STENCIL-661): Remove code related to the dynamic import shim
     expect(config.extras.__deprecated__dynamicImportShim).toBe(false);
     expect(config.extras.lifecycleDOMEvents).toBe(false);
-    expect(config.extras.safari10).toBe(false);
+    // TODO(STENCIL-663): Remove code related to deprecated `safari10` field.
+    expect(config.extras.__deprecated__safari10).toBe(false);
     expect(config.extras.scriptDataOpts).toBe(false);
     // TODO(STENCIL-662): Remove code related to deprecated shadowDomShim field
     expect(config.extras.__deprecated__shadowDomShim).toBe(false);

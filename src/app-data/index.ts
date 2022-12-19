@@ -63,6 +63,7 @@ export const BUILD: BuildConditionals = {
   cloneNodeFix: false,
   hydratedAttribute: false,
   hydratedClass: true,
+  // TODO(STENCIL-663): Remove code related to deprecated `safari10` field.
   safari10: false,
   scriptDataOpts: false,
   scopedSlotTextContentFix: false,

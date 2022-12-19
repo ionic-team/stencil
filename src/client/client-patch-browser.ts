@@ -37,6 +37,7 @@ export const patchBrowser = (): Promise<d.CustomElementsDefineOptions> => {
   // @ts-ignore
   const scriptElm =
     // TODO(STENCIL-661): Remove code related to the dynamic import shim
+    // TODO(STENCIL-663): Remove code related to deprecated `safari10` field.
     BUILD.scriptDataOpts || BUILD.safari10 || BUILD.dynamicImportShim
       ? Array.from(doc.querySelectorAll('script')).find(
           (s) =>
@@ -47,6 +48,7 @@ export const patchBrowser = (): Promise<d.CustomElementsDefineOptions> => {
   const importMeta = import.meta.url;
   const opts = BUILD.scriptDataOpts ? (scriptElm as any)['data-opts'] || {} : {};
 
+  // TODO(STENCIL-663): Remove code related to deprecated `safari10` field.
   if (BUILD.safari10 && 'onbeforeload' in scriptElm && !history.scrollRestoration /* IS_ESM_BUILD */) {
     // Safari < v11 support: This IF is true if it's Safari below v11.
     // This fn cannot use async/await since Safari didn't support it until v11,
@@ -62,9 +64,11 @@ export const patchBrowser = (): Promise<d.CustomElementsDefineOptions> => {
     } as any;
   }
 
+  // TODO(STENCIL-663): Remove code related to deprecated `safari10` field.
   if (!BUILD.safari10 && importMeta !== '') {
     opts.resourcesUrl = new URL('.', importMeta).href;
     // TODO(STENCIL-661): Remove code related to the dynamic import shim
+    // TODO(STENCIL-663): Remove code related to deprecated `safari10` field.
   } else if (BUILD.dynamicImportShim || BUILD.safari10) {
     opts.resourcesUrl = new URL(
       '.',
