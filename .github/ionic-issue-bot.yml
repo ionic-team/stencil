@@ -26,7 +26,7 @@ closeAndLock:
 
 comment:
   labels:
-    - label: "holiday triage"
+    - label: 'holiday triage'
       message: >
         Thanks for the issue! This issue has been labeled as `holiday triage`. With the winter holidays quickly approaching, much of the Stencil Team will soon be taking time off. During this time, issue triaging and PR review will be delayed until the team begins to return. After this period, we will work to ensure that all new issues & PRs are properly triaged.
 
