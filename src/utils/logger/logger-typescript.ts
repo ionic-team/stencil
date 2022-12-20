@@ -108,8 +108,10 @@ export const loadTypeScriptDiagnostic = (tsDiagnostic: Diagnostic): d.Diagnostic
     header: 'TypeScript',
     code: tsDiagnostic.code.toString(),
     messageText: flattenDiagnosticMessageText(tsDiagnostic, tsDiagnostic.messageText),
-    relFilePath: null,
-    absFilePath: null,
+    columnNumber: undefined,
+    lineNumber: undefined,
+    relFilePath: undefined,
+    absFilePath: undefined,
     lines: [],
   };
 
@@ -117,7 +119,7 @@ export const loadTypeScriptDiagnostic = (tsDiagnostic: Diagnostic): d.Diagnostic
     d.level = 'error';
   }
 
-  if (tsDiagnostic.file) {
+  if (tsDiagnostic.file && typeof tsDiagnostic.start === 'number') {
     d.absFilePath = tsDiagnostic.file.fileName;
 
     const sourceText = tsDiagnostic.file.text;
@@ -130,7 +132,7 @@ export const loadTypeScriptDiagnostic = (tsDiagnostic: Diagnostic): d.Diagnostic
       lineNumber: posData.line + 1,
       text: srcLines[posData.line],
       errorCharStart: posData.character,
-      errorLength: Math.max(tsDiagnostic.length, 1),
+      errorLength: Math.max(tsDiagnostic.length ?? 0, 1),
     };
 
     d.lineNumber = errorLine.lineNumber;

@@ -1,5 +1,5 @@
 import type { ConfigFlags } from '../cli/config-flags';
-import type { PrerenderUrlResults } from '../internal';
+import type { PrerenderUrlResults, PrintLine } from '../internal';
 import type { JsonDocs } from './stencil-public-docs';
 
 export * from './stencil-public-docs';
@@ -2295,17 +2295,11 @@ export interface Diagnostic {
   messageText: string;
   debugText?: string;
   code?: string;
-  absFilePath?: string;
-  relFilePath?: string;
-  lineNumber?: number;
-  columnNumber?: number;
-  lines?: {
-    lineIndex: number;
-    lineNumber: number;
-    text?: string;
-    errorCharStart: number;
-    errorLength?: number;
-  }[];
+  absFilePath?: string | undefined;
+  relFilePath?: string | undefined;
+  lineNumber?: number | undefined;
+  columnNumber?: number | undefined;
+  lines: PrintLine[];
 }
 
 export interface CacheStorage {

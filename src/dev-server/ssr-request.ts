@@ -137,9 +137,9 @@ async function setupHydrateApp(devServerConfig: d.DevServerConfig, serverCtx: d.
   }
 
   if (!isString(buildResults.hydrateAppFilePath)) {
-    diagnostics.push({ messageText: `Missing hydrateAppFilePath`, level: `error`, type: `ssr` });
+    diagnostics.push({ messageText: `Missing hydrateAppFilePath`, level: `error`, type: `ssr`, lines: [] });
   } else if (!isString(devServerConfig.srcIndexHtml)) {
-    diagnostics.push({ messageText: `Missing srcIndexHtml`, level: `error`, type: `ssr` });
+    diagnostics.push({ messageText: `Missing srcIndexHtml`, level: `error`, type: `ssr`, lines: [] });
   } else {
     srcIndexHtml = await serverCtx.sys.readFile(devServerConfig.srcIndexHtml);
     if (!isString(srcIndexHtml)) {
@@ -147,6 +147,7 @@ async function setupHydrateApp(devServerConfig: d.DevServerConfig, serverCtx: d.
         messageText: `Unable to load src index html: ${devServerConfig.srcIndexHtml}`,
         level: `error`,
         type: `ssr`,
+        lines: [],
       });
     } else {
       // ensure we cleared out node's internal require() cache for this file

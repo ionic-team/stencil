@@ -67,6 +67,7 @@ export function generateBuildStats(
       messageText: `Generate Build Stats Error: ` + e,
       level: `error`,
       type: `build`,
+      lines: [],
     };
     jsonData = {
       diagnostics: [diagnostic],
