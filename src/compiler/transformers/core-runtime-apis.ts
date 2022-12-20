@@ -29,7 +29,14 @@ export const RUNTIME_APIS = {
   registerInstance: `registerInstance as ${REGISTER_INSTANCE}`,
 };
 
-export const addCoreRuntimeApi = (moduleFile: d.Module, coreRuntimeApi: string) => {
+/**
+ * Update a Stencil Module entity to include a {@link RUNTIME_APIS} entry if it does not already exist.
+ * This allows Stencil to keep `moduleFile` easily serializable, where this helper function treats the data structure
+ * that stores {@link Module#coreRuntimeApis} similar to a JS `Set`.
+ * @param moduleFile the Module entity to update
+ * @param coreRuntimeApi the API to add to the provided module
+ */
+export const addCoreRuntimeApi = (moduleFile: d.Module, coreRuntimeApi: string): void => {
   if (!moduleFile.coreRuntimeApis.includes(coreRuntimeApi)) {
     moduleFile.coreRuntimeApis.push(coreRuntimeApi);
   }

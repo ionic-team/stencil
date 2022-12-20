@@ -114,7 +114,7 @@ export const createOnWarnFn = (diagnostics: d.Diagnostic[], bundleModulesFiles?:
   const previousWarns = new Set<string>();
 
   return function onWarningMessage(warning: { code?: string; importer?: string; message?: string }) {
-    if (warning == null || ignoreWarnCodes.has(warning.code) || previousWarns.has(warning.message)) {
+    if (warning == null || ignoreWarnCodes.has(warning.code) /*|| previousWarns.has(warning.message)*/) {
       return;
     }
 
@@ -136,8 +136,9 @@ export const createOnWarnFn = (diagnostics: d.Diagnostic[], bundleModulesFiles?:
     }
 
     const diagnostic = buildWarn(diagnostics);
-    diagnostic.header = `Bundling Warning ${warning.code}`;
+    diagnostic.header = `! Bundling Warning ${warning.code}`;
     diagnostic.messageText = label + (warning.message || warning);
+    diagnostic.messageText += JSON.stringify(warning) ?? '';
   };
 };
 

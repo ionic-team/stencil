@@ -3,6 +3,14 @@ import ts from 'typescript';
 import type * as d from '../../declarations';
 import { retrieveTsDecorators, retrieveTsModifiers } from './transform-utils';
 
+/**
+ *
+ * @param transformOpts
+ * @param classNode
+ * @param heritageClauses
+ * @param members
+ * @returns
+ */
 export const updateComponentClass = (
   transformOpts: d.TransformOptions,
   classNode: ts.ClassDeclaration,

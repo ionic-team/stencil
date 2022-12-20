@@ -3,24 +3,42 @@ import ts from 'typescript';
 import type * as d from '../../../declarations';
 import { addModuleMetadataProxies } from '../add-component-meta-proxy';
 import { addImports } from '../add-imports';
-import { addLegacyApis } from '../core-runtime-apis';
+import { addLegacyApis, RUNTIME_APIS } from '../core-runtime-apis';
 import { defineCustomElement } from '../define-custom-element';
 import { updateStyleImports } from '../style-imports';
 import { getComponentMeta, getModuleFromSourceFile } from '../transform-utils';
 import { updateNativeComponentClass } from './native-component';
 
+/**
+ *
+ * @param compilerCtx
+ * @param transformOpts
+ * @returns
+ */
 export const nativeComponentTransform = (
   compilerCtx: d.CompilerCtx,
   transformOpts: d.TransformOptions
 ): ts.TransformerFactory<ts.SourceFile> => {
-  return (transformCtx) => {
-    return (tsSourceFile) => {
+  return (transformCtx: ts.TransformationContext) => {
+    return (tsSourceFile: ts.SourceFile) => {
       const moduleFile = getModuleFromSourceFile(compilerCtx, tsSourceFile);
 
-      const visitNode = (node: ts.Node): any => {
+      const nativeComponentSpecificCoreApis: string[] = [];
+
+      /**
+       * Helper function that recursively walks the concrete syntax tree. Upon finding a class declaration that Stencil
+       * recognizes as a component, update the component class
+       * @param node the current node in the tree being inspected
+       * @returns the updated component class, or the unchanged node
+       */
+
+      const visitNode = (node: ts.Node): ts.Node => {
         if (ts.isClassDeclaration(node)) {
           const cmp = getComponentMeta(compilerCtx, tsSourceFile, node);
           if (cmp != null) {
+            if (cmp.encapsulation === 'shadow') {
+              nativeComponentSpecificCoreApis.push(RUNTIME_APIS.attachShadow);
+            }
             return updateNativeComponentClass(transformOpts, node, moduleFile, cmp);
           }
         }
@@ -45,7 +63,10 @@ export const nativeComponentTransform = (
       if (moduleFile.isLegacy) {
         addLegacyApis(moduleFile);
       }
-      tsSourceFile = addImports(transformOpts, tsSourceFile, moduleFile.coreRuntimeApis, transformOpts.coreImportPath);
+
+      const imports = [...moduleFile.coreRuntimeApis, ...nativeComponentSpecificCoreApis];
+
+      tsSourceFile = addImports(transformOpts, tsSourceFile, imports, transformOpts.coreImportPath);
 
       return tsSourceFile;
     };
