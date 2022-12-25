@@ -135,7 +135,7 @@ const HTML_ELEMENT_KEYS = [
   'onselectionchange',
   'nonce',
   'click',
-  'focus',
+  // 'focus', a11y: needed to make the interactive html elements inside of the web components focusable
   'blur',
 ];
 
