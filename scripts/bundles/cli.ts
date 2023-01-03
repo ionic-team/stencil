@@ -12,6 +12,7 @@ import { writePkgJson } from '../utils/write-pkg-json';
 import { aliasPlugin } from './plugins/alias-plugin';
 import { relativePathPlugin } from './plugins/relative-path-plugin';
 import { replacePlugin } from './plugins/replace-plugin';
+import { sysModulesPlugin } from './plugins/sys-modules-plugin';
 
 /**
  * Generates a rollup configuration for the `cli` submodule
@@ -68,6 +69,7 @@ export async function cli(opts: BuildOptions): Promise<ReadonlyArray<RollupOptio
       relativePathPlugin('@stencil/core/testing', '../testing/index.js'),
       relativePathPlugin('prompts', '../sys/node/prompts.js'),
       aliasPlugin(opts),
+      sysModulesPlugin(join(opts.buildDir, 'compiler')),
       rollupResolve({
         preferBuiltins: true,
       }),
