@@ -1,5 +1,4 @@
 import { hasError, isFunction, shouldIgnoreError } from '@utils';
-import { join } from 'path';
 
 import { dependencies } from '../compiler/sys/dependencies.json';
 import { createLogger } from '../compiler/sys/logger/console-logger';
@@ -131,15 +130,16 @@ export const runTask = async (
 ): Promise<void> => {
   const logger = config.logger ?? createLogger();
   const rootDir = config.rootDir ?? '/';
+  sys = sys ?? config.sys ?? coreCompiler.createSystem({ logger });
   const strictConfig: ValidatedConfig = {
     ...config,
     flags: createConfigFlags(config.flags ?? { task }),
     hydratedFlag: config.hydratedFlag ?? null,
     logger,
     outputTargets: config.outputTargets ?? [],
-    packageJsonFilePath: join(rootDir, 'package.json'),
+    packageJsonFilePath: sys.platformPath.join(rootDir, 'package.json'),
     rootDir,
-    sys: sys ?? config.sys ?? coreCompiler.createSystem({ logger }),
+    sys,
     testing: config.testing ?? {},
   };
 
