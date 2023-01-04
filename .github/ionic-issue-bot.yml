@@ -1,5 +1,5 @@
 triage:
-  label: 'holiday triage'
+  label: triage
   dryRun: false
 
 closeAndLock:
@@ -26,15 +26,6 @@ closeAndLock:
 
 comment:
   labels:
-    - label: 'holiday triage'
-      message: >
-        Thanks for the issue! This issue has been labeled as `holiday triage`. With the winter holidays quickly approaching, much of the Stencil Team will soon be taking time off. During this time, issue triaging and PR review will be delayed until the team begins to return. After this period, we will work to ensure that all new issues & PRs are properly triaged.
-
-
-        In the meantime, please read our [Winter Holiday Triage Guide](https://github.com/ionic-team/stencil/issues/3922) for information on how to ensure that your issue is triaged correctly.
-
-
-        Thank you!
     - label: 'ionitron: needs reproduction'
       message: >
         Thanks for the issue! This issue has been labeled as `needs reproduction`. This label is added to issues that
