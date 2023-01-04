@@ -500,12 +500,12 @@ interface HostAttributes {
 /**
  * Utilities for working with functional Stencil components. An object
  * conforming to this interface is passed by the Stencil runtime as the third
- * argument to a functional component, allowing component authors to use
+ * argument to a functional component, allowing component authors to work with
  * features like children.
  *
  * The children of a functional component will be passed as the second
- * argument, so a functional component which transforms its children might look
- * like the following:
+ * argument, so a functional component which uses these utils to transform its
+ * children might look like the following:
  *
  * ```ts
  * export const AddClass: FunctionalComponent = (_, children, utils) => (
@@ -519,13 +519,13 @@ interface HostAttributes {
  * );
  * ```
  *
-   * For more see the Stencil documentation, here:
-   * https://stenciljs.com/docs/functional-components
+ * For more see the Stencil documentation, here:
+ * https://stenciljs.com/docs/functional-components
  */
 export interface FunctionalUtilities {
   /**
    * Utility for reading the children of a functional component at runtime.
-   * Since the Stencil's runtime uses a different interface for children it is
+   * Since the Stencil runtime uses a different interface for children it is
    * not recommendeded to read the children directly, and is preferable to use
    * this utility to, for instance, perform a side effect for each child.
    */
