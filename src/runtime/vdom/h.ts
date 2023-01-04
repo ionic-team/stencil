@@ -13,8 +13,6 @@ import { isComplexType } from '@utils';
 
 import type * as d from '../../declarations';
 
-// const stack: any[] = [];
-
 // export function h(nodeName: string | d.FunctionalComponent, vnodeData: d.PropsType, child?: d.ChildType): d.VNode;
 // export function h(nodeName: string | d.FunctionalComponent, vnodeData: d.PropsType, ...children: d.ChildType[]): d.VNode;
 export const h = (nodeName: any, vnodeData: any, ...children: d.ChildType[]): d.VNode => {
@@ -127,6 +125,13 @@ export const Host = {};
 
 export const isHost = (node: any): node is d.VNode => node && node.$tag$ === Host;
 
+/**
+ * Implementation of {@link d.FunctionalUtilities} for Stencil's VDom.
+ *
+ * Note that these functions convert from {@link d.VNode} to
+ * {@link d.ChildNode} to give functional component developers a friendly
+ * interface.
+ */
 const vdomFnUtils: d.FunctionalUtilities = {
   forEach: (children, cb) => children.map(convertToPublic).forEach(cb),
   map: (children, cb) => children.map(convertToPublic).map(cb).map(convertToPrivate),
