@@ -115,7 +115,12 @@ const generateComponentTypesFile = (config: d.Config, buildCtx: d.BuildCtx, areT
   });
 
   // Write all import and export statements for event types
-  c.push(...expressions.map((ref) => `import ${ref}`), ...expressions.map((ref) => `export ${ref}`));
+  c.push(...expressions.map((ref) => `import ${ref}`));
+
+  // Only re-export the custom types if the option is set on the config
+  if (config.autoExportCustomTypes) {
+    c.push(...expressions.map((ref) => `export ${ref}`));
+  }
 
   c.push(`export namespace Components {`);
   c.push(...modules.map((m) => `${m.component}`));

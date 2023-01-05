@@ -20,6 +20,7 @@ describe('validateServiceWorker', () => {
       logger: mockLogger(),
       outputTargets: [],
       testing: {},
+      autoExportCustomTypes: true,
     };
   });
 

@@ -137,6 +137,7 @@ export const runTask = async (
     rootDir: config.rootDir ?? '/',
     sys: sys ?? config.sys ?? coreCompiler.createSystem({ logger }),
     testing: config.testing ?? {},
+    autoExportCustomTypes: config.autoExportCustomTypes ?? true,
   };
 
   switch (task) {

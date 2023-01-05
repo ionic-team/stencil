@@ -246,6 +246,17 @@ export interface StencilConfig {
   watchIgnoredRegex?: RegExp | RegExp[];
   excludeUnusedDependencies?: boolean;
   stencilCoreResolvedId?: string;
+
+  /**
+   * @deprecated will not be supported in a future version of Stencil.
+   *
+   * When `true`, any custom types used as a part of a component `@Prop` or
+   * `@Event` will be automatically exported from the generated `components.d.ts` file
+   * in the compiled output.
+   *
+   * @default true
+   */
+  autoExportCustomTypes?: boolean;
 }
 
 export interface ConfigExtras {
@@ -424,7 +435,14 @@ type RequireFields<T, K extends keyof T> = T & { [P in K]-?: T[P] };
 /**
  * Fields in {@link Config} to make required for {@link ValidatedConfig}
  */
-type StrictConfigFields = 'flags' | 'logger' | 'outputTargets' | 'rootDir' | 'sys' | 'testing';
+type StrictConfigFields =
+  | 'flags'
+  | 'logger'
+  | 'outputTargets'
+  | 'rootDir'
+  | 'sys'
+  | 'testing'
+  | 'autoExportCustomTypes';
 
 /**
  * A version of {@link Config} that makes certain fields required. This type represents a valid configuration entity.

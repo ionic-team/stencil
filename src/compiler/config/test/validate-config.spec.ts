@@ -447,4 +447,17 @@ describe('validation', () => {
       expect(config.buildDist).toBe(config.buildEs5);
     });
   });
+
+  describe('autoExportCustomTypes', () => {
+    it('should default to true', () => {
+      const { config } = validateConfig(userConfig, bootstrapConfig);
+      expect(config.autoExportCustomTypes).toBe(true);
+    });
+
+    it.each([true, false])('should respect the user input value when %s', (autoExportCustomTypes) => {
+      userConfig.autoExportCustomTypes = autoExportCustomTypes;
+      const { config } = validateConfig(userConfig, bootstrapConfig);
+      expect(config.autoExportCustomTypes).toBe(autoExportCustomTypes);
+    });
+  });
 });
