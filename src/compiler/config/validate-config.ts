@@ -57,6 +57,7 @@ export const validateConfig = (
     rootDir: typeof config.rootDir === 'string' ? config.rootDir : '/',
     sys: config.sys ?? bootstrapConfig.sys ?? createSystem({ logger }),
     testing: config.testing ?? {},
+    hydratedFlag: validateHydrated(config),
   };
 
   // default devMode false
@@ -149,9 +150,6 @@ export const validateConfig = (
 
   // testing
   validateTesting(validatedConfig, diagnostics);
-
-  // hydrate flag
-  validatedConfig.hydratedFlag = validateHydrated(validatedConfig);
 
   // bundles
   if (Array.isArray(validatedConfig.bundles)) {

@@ -14,6 +14,7 @@ export const getConfig = (userConfig: d.Config): d.ValidatedConfig => {
     rootDir: userConfig.rootDir ?? '/',
     sys: userConfig.sys ?? createSystem({ logger }),
     testing: userConfig ?? {},
+    hydratedFlag: undefined,
   };
 
   setPlatformPath(config.sys.platformPath);

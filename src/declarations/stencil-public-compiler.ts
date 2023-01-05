@@ -173,7 +173,7 @@ export interface StencilConfig {
    * type of CSS properties and values are assigned before and after hydrating. This config
    * can also be used to not include the hydrated flag at all by setting it to `null`.
    */
-  hydratedFlag?: HydratedFlag;
+  hydratedFlag?: HydratedFlag | undefined;
 
   /**
    * Ionic prefers to hide all components prior to hydration with a style tag appended
@@ -424,7 +424,7 @@ type RequireFields<T, K extends keyof T> = T & { [P in K]-?: T[P] };
 /**
  * Fields in {@link Config} to make required for {@link ValidatedConfig}
  */
-type StrictConfigFields = 'flags' | 'logger' | 'outputTargets' | 'rootDir' | 'sys' | 'testing';
+type StrictConfigFields = 'flags' | 'logger' | 'outputTargets' | 'rootDir' | 'sys' | 'testing' | 'hydratedFlag';
 
 /**
  * A version of {@link Config} that makes certain fields required. This type represents a valid configuration entity.

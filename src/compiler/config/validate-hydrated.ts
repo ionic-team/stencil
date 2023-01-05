@@ -3,7 +3,8 @@ import { isString } from '@utils';
 import { HydratedFlag, UnvalidatedConfig } from '../../declarations';
 
 /**
- * Check the provided `.hydratedFlag` prop and return a properly-validated value.
+ * Validate the `.hydratedFlag` property on the supplied config object and
+ * return a properly-validated value.
  *
  * @param config the configuration we're examining
  * @returns a suitable value for the hydratedFlag property
