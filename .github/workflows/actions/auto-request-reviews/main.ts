@@ -25,6 +25,8 @@ async function run() {
   const writeOctokit = getOctokit(writeToken);
   const readOctokit = getOctokit(readToken);
 
+  console.log('USER', context.payload.pull_request?.user);
+
   // PR author
   const username = context.payload.pull_request?.user.login as string;
 
