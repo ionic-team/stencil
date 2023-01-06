@@ -102,25 +102,25 @@ jobs:
 
       # TODO(STENCIL-446): Remove this workflow once `strictNullChecks` is enabled
       - name: Download null errors file for main branch
-        uses: actions/download-artifact@9782bd6a9848b53b110e712e20e42d89988822b7 # v3.0.1
+        uses: actions/download-artifact@9bc31d5ccc31df68ecc42ccf4149144866c47d8a # v3.0.2
         with:
           name: null_errors_main
 
       # TODO(STENCIL-446): Remove this workflow once `strictNullChecks` is enabled
       - name: Download null errors file for PR
-        uses: actions/download-artifact@9782bd6a9848b53b110e712e20e42d89988822b7 # v3.0.1
+        uses: actions/download-artifact@9bc31d5ccc31df68ecc42ccf4149144866c47d8a # v3.0.2
         with:
           name: null_errors_pr
 
       # TODO(STENCIL-454): Remove or change this up once we've eliminated unused exports
       - name: Download unused exports for main
-        uses: actions/download-artifact@9782bd6a9848b53b110e712e20e42d89988822b7 # v3.0.1
+        uses: actions/download-artifact@9bc31d5ccc31df68ecc42ccf4149144866c47d8a # v3.0.2
         with:
           name: unused-exports-main
 
       # TODO(STENCIL-454): Remove or change this up once we've eliminated unused exports
       - name: Download unused exports for PR
-        uses: actions/download-artifact@9782bd6a9848b53b110e712e20e42d89988822b7 # v3.0.1
+        uses: actions/download-artifact@9bc31d5ccc31df68ecc42ccf4149144866c47d8a # v3.0.2
         with:
           name: unused-exports-pr
 
