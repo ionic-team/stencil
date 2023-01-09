@@ -33,13 +33,13 @@ export function mockValidatedConfig(overrides: Partial<ValidatedConfig> = {}): V
 
   return {
     ...baseConfig,
+    autoExportCustomTypes: true,
     flags: createConfigFlags(),
     logger: mockLogger(),
     outputTargets: baseConfig.outputTargets ?? [],
     rootDir: path.resolve('/'),
     sys: createTestingSystem(),
     testing: {},
-    autoExportCustomTypes: true,
     ...overrides,
   };
 }

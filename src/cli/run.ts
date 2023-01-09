@@ -131,13 +131,13 @@ export const runTask = async (
   const logger = config.logger ?? createLogger();
   const strictConfig: ValidatedConfig = {
     ...config,
+    autoExportCustomTypes: config.autoExportCustomTypes ?? true,
     flags: createConfigFlags(config.flags ?? { task }),
     logger,
     outputTargets: config.outputTargets ?? [],
     rootDir: config.rootDir ?? '/',
     sys: sys ?? config.sys ?? coreCompiler.createSystem({ logger }),
     testing: config.testing ?? {},
-    autoExportCustomTypes: config.autoExportCustomTypes ?? true,
   };
 
   switch (task) {

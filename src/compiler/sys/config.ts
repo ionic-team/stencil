@@ -8,13 +8,13 @@ export const getConfig = (userConfig: d.Config): d.ValidatedConfig => {
   const logger = userConfig.logger ?? createLogger();
   const config: d.ValidatedConfig = {
     ...userConfig,
+    autoExportCustomTypes: userConfig.autoExportCustomTypes ?? true,
     flags: createConfigFlags(userConfig.flags ?? {}),
     logger,
     outputTargets: userConfig.outputTargets ?? [],
     rootDir: userConfig.rootDir ?? '/',
     sys: userConfig.sys ?? createSystem({ logger }),
     testing: userConfig ?? {},
-    autoExportCustomTypes: userConfig.autoExportCustomTypes ?? true,
   };
 
   setPlatformPath(config.sys.platformPath);

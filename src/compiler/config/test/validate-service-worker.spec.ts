@@ -12,15 +12,15 @@ describe('validateServiceWorker', () => {
 
   beforeEach(() => {
     config = {
-      fsNamespace: 'app',
-      rootDir: '/',
-      sys: mockCompilerSystem(),
+      autoExportCustomTypes: true,
       devMode: false,
       flags: createConfigFlags(),
+      fsNamespace: 'app',
       logger: mockLogger(),
       outputTargets: [],
+      rootDir: '/',
+      sys: mockCompilerSystem(),
       testing: {},
-      autoExportCustomTypes: true,
     };
   });
 
