@@ -2064,7 +2064,7 @@ export const CustomElementsExportBehaviorOptions = [
  * This type is auto-generated based on the values in `CustomElementsExportBehaviorOptions` array.
  * This is used on the output target config for intellisense in typed configs.
  */
-export type CustomElementsExportBehavior = typeof CustomElementsExportBehaviorOptions[number];
+export type CustomElementsExportBehavior = (typeof CustomElementsExportBehaviorOptions)[number];
 
 export interface OutputTargetDistCustomElements extends OutputTargetBaseNext {
   type: 'dist-custom-elements';
