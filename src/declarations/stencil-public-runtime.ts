@@ -507,8 +507,44 @@ interface HostAttributes {
   [prop: string]: any;
 }
 
+/**
+ * Utilities for working with functional Stencil components. An object
+ * conforming to this interface is passed by the Stencil runtime as the third
+ * argument to a functional component, allowing component authors to work with
+ * features like children.
+ *
+ * The children of a functional component will be passed as the second
+ * argument, so a functional component which uses these utils to transform its
+ * children might look like the following:
+ *
+ * ```ts
+ * export const AddClass: FunctionalComponent = (_, children, utils) => (
+ *  utils.map(children, child => ({
+ *    ...child,
+ *    vattrs: {
+ *      ...child.vattrs,
+ *      class: `${child.vattrs.class} add-class`
+ *    }
+ *  }))
+ * );
+ * ```
+ *
+ * For more see the Stencil documentation, here:
+ * https://stenciljs.com/docs/functional-components
+ */
 export interface FunctionalUtilities {
+  /**
+   * Utility for reading the children of a functional component at runtime.
+   * Since the Stencil runtime uses a different interface for children it is
+   * not recommendeded to read the children directly, and is preferable to use
+   * this utility to, for instance, perform a side effect for each child.
+   */
   forEach: (children: VNode[], cb: (vnode: ChildNode, index: number, array: ChildNode[]) => void) => void;
+  /**
+   * Utility for transforming the children of a functional component. Given an
+   * array of children and a callback this will return a list of the results of
+   * passing each child to the supplied callback.
+   */
   map: (children: VNode[], cb: (vnode: ChildNode, index: number, array: ChildNode[]) => ChildNode) => VNode[];
 }
 

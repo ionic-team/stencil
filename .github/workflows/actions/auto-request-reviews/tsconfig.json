@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "alwaysStrict": true,
+    "strict": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "lib": ["dom", "es2019"],
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "outDir": "build/",
+    "pretty": true,
+    "target": "es2015",
+    "incremental": false,
+    "useUnknownInCatchVariables": true
+  },
+  "include": ["**/*.ts"]
+}

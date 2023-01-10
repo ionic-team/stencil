@@ -47,3 +47,11 @@ updates:
     directory: '/'
     schedule:
       interval: 'daily'
+  - package-ecosystem: 'npm' # See documentation for possible values
+    directory: './.github/workflows/actions/auto-request-reviews'
+    schedule:
+      interval: 'daily'
+    open-pull-requests-limit: 50
+    # Disable rebasing for pull requests, as having several open pull requests all get simultaneously rebased gets
+    # noisy from a notification standpoint
+    rebase-strategy: 'disabled'
