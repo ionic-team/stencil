@@ -18,6 +18,15 @@ describe('queryNonceMetaTagContent', () => {
     expect(nonce).toEqual(undefined);
   });
 
+  it('should return `undefined` if the document does not have a head element', () => {
+    const head = document.querySelector('head');
+    head.remove();
+
+    const nonce = queryNonceMetaTagContent(document);
+
+    expect(nonce).toEqual(undefined);
+  });
+
   it('should return `null` if the tag has no content', () => {
     const meta = document.createElement('meta');
     meta.setAttribute('name', 'csp-nonce');
