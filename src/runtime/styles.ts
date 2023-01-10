@@ -1,6 +1,6 @@
 import { BUILD } from '@app-data';
 import { doc, plt, styles, supportsConstructableStylesheets, supportsShadow } from '@platform';
-import { CMP_FLAGS } from '@utils';
+import { CMP_FLAGS, queryNonceMetaTagContent } from '@utils';
 
 import type * as d from '../declarations';
 import { createTime } from './profile';
@@ -75,6 +75,12 @@ export const addStyle = (
           } else {
             styleElm = doc.createElement('style');
             styleElm.innerHTML = style;
+          }
+
+          // Apply CSP nonce to the style tag if it exists
+          const nonce = plt.$nonce$ ?? queryNonceMetaTagContent(doc);
+          if (nonce != null) {
+            styleElm.setAttribute('nonce', nonce);
           }
 
           if (BUILD.hydrateServerSide || BUILD.hotModuleReplacement) {

@@ -237,4 +237,4 @@ const SKIP_DEPS = ['@stencil/core'];
 export const readOnlyArrayHasStringMember = <T extends string>(
   readOnlyArray: ReadonlyArray<T>,
   maybeMember: T | string
-): maybeMember is T => readOnlyArray.includes(maybeMember as typeof readOnlyArray[number]);
+): maybeMember is T => readOnlyArray.includes(maybeMember as (typeof readOnlyArray)[number]);

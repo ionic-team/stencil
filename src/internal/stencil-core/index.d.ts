@@ -43,6 +43,7 @@ export {
   setAssetPath,
   setErrorHandler,
   setMode,
+  setNonce,
   setPlatformHelpers,
   State,
   Watch,
