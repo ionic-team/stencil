@@ -1,6 +1,6 @@
 import { BUILD } from '@app-data';
 import { doc, getHostRef, plt, registerHost, supportsShadow, win } from '@platform';
-import { CMP_FLAGS } from '@utils';
+import { CMP_FLAGS, queryNonceMetaTagContent } from '@utils';
 
 import type * as d from '../declarations';
 import { connectedCallback } from './connected-callback';
@@ -169,7 +169,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
     visibilityStyle.setAttribute('data-styles', '');
 
     // Apply CSP nonce to the style tag if it exists
-    const nonce = plt.$nonce$ ?? (window as any).nonce;
+    const nonce = plt.$nonce$ ?? queryNonceMetaTagContent(doc);
     if (nonce != null) {
       visibilityStyle.setAttribute('nonce', nonce);
     }
