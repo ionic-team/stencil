@@ -27,13 +27,13 @@ describe('queryNonceMetaTagContent', () => {
     expect(nonce).toEqual(undefined);
   });
 
-  it('should return `null` if the tag has no content', () => {
+  it('should return `undefined` if the tag has no content', () => {
     const meta = document.createElement('meta');
     meta.setAttribute('name', 'csp-nonce');
     document.head.appendChild(meta);
 
     const nonce = queryNonceMetaTagContent(document);
 
-    expect(nonce).toEqual(null);
+    expect(nonce).toEqual(undefined);
   });
 });
