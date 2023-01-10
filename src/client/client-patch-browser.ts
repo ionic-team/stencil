@@ -1,6 +1,6 @@
 import { BUILD, NAMESPACE } from '@app-data';
 import { consoleDevInfo, doc, H, plt, promiseResolve, win } from '@platform';
-import { getDynamicImportFunction } from '@utils';
+import { getDynamicImportFunction, queryNonceMetaTagContent } from '@utils';
 
 import type * as d from '../declarations';
 
@@ -104,6 +104,13 @@ const patchDynamicImport = (base: string, orgScriptElm: HTMLScriptElement) => {
             type: 'application/javascript',
           })
         );
+
+        // Apply CSP nonce to the script tag if it exists
+        const nonce = plt.$nonce$ ?? queryNonceMetaTagContent(doc);
+        if (nonce != null) {
+          script.setAttribute('nonce', nonce);
+        }
+
         mod = new Promise((resolve) => {
           script.onload = () => {
             resolve((win as any)[importFunctionName].m);

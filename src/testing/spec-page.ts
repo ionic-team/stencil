@@ -36,7 +36,7 @@ export async function newSpecPage(opts: NewSpecPageOptions): Promise<SpecPage> {
   }
 
   // reset the platform for this new test
-  resetPlatform();
+  resetPlatform(opts.platform ?? {});
   resetBuildConditionals(BUILD);
 
   if (Array.isArray(opts.components)) {
