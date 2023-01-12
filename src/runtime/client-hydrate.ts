@@ -126,14 +126,15 @@ const clientHydrate = (
     }
 
     // recursively drill down, end to start so we can remove nodes
-    for (i = node.childNodes.length - 1; i >= 0; i--) {
+    const nonShadowChildNodes = node.__childNodes || node.childNodes;
+    for (i = nonShadowChildNodes.length - 1; i >= 0; i--) {
       clientHydrate(
         parentVNode,
         childRenderNodes,
         slotNodes,
         shadowRootNodes,
         hostElm,
-        node.childNodes[i] as any,
+        nonShadowChildNodes[i] as any,
         hostId
       );
     }
@@ -257,8 +258,9 @@ const clientHydrate = (
 export const initializeDocumentHydrate = (node: d.RenderNode, orgLocNodes: Map<string, any>) => {
   if (node.nodeType === NODE_TYPE.ElementNode) {
     let i = 0;
-    for (; i < node.childNodes.length; i++) {
-      initializeDocumentHydrate(node.childNodes[i] as any, orgLocNodes);
+    const nonShadowChildNodes = node.__childNodes || node.childNodes;
+    for (; i < nonShadowChildNodes.length; i++) {
+      initializeDocumentHydrate(nonShadowChildNodes[i] as any, orgLocNodes);
     }
     if (node.shadowRoot) {
       for (i = 0; i < node.shadowRoot.childNodes.length; i++) {
