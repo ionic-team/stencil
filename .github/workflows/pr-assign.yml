@@ -1,0 +1,18 @@
+name: Auto Request Review
+
+on:
+  pull_request:
+    types: [opened, ready_for_review, reopened]
+
+jobs:
+  auto-request-review:
+    runs-on: ubuntu-latest
+    if: ${{ !github.event.pull_request.draft && github.event.pull_request.user.type != 'Bot'  }}
+    steps:
+      - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v2.4.0
+      - uses: ./.github/workflows/actions/auto-request-reviews
+        with:
+          orgReadToken: ${{ secrets.READORG_GITHUB_TOKEN }}
+          writeToken: ${{ secrets.GITHUB_TOKEN }}
+          org: 'ionic-team'
+          team: 'stencil'

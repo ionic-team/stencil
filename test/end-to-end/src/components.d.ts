@@ -14,6 +14,9 @@ export namespace Components {
     interface CarDetail {
         "car": CarData;
     }
+    /**
+     * Component that helps display a list of cars
+     */
     interface CarList {
         "cars": CarData[];
         "selected": CarData;
@@ -92,6 +95,9 @@ declare global {
         prototype: HTMLCarDetailElement;
         new (): HTMLCarDetailElement;
     };
+    /**
+     * Component that helps display a list of cars
+     */
     interface HTMLCarListElement extends Components.CarList, HTMLStencilElement {
     }
     var HTMLCarListElement: {
@@ -225,6 +231,9 @@ declare namespace LocalJSX {
     interface CarDetail {
         "car"?: CarData;
     }
+    /**
+     * Component that helps display a list of cars
+     */
     interface CarList {
         "cars"?: CarData[];
         "onCarSelected"?: (event: CarListCustomEvent<CarData>) => void;
@@ -304,6 +313,9 @@ declare module "@stencil/core" {
             "app-root": LocalJSX.AppRoot & JSXBase.HTMLAttributes<HTMLAppRootElement>;
             "build-data": LocalJSX.BuildData & JSXBase.HTMLAttributes<HTMLBuildDataElement>;
             "car-detail": LocalJSX.CarDetail & JSXBase.HTMLAttributes<HTMLCarDetailElement>;
+            /**
+             * Component that helps display a list of cars
+             */
             "car-list": LocalJSX.CarList & JSXBase.HTMLAttributes<HTMLCarListElement>;
             "dom-api": LocalJSX.DomApi & JSXBase.HTMLAttributes<HTMLDomApiElement>;
             "dom-interaction": LocalJSX.DomInteraction & JSXBase.HTMLAttributes<HTMLDomInteractionElement>;

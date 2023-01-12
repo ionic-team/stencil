@@ -200,4 +200,55 @@ describe('util', () => {
       });
     });
   });
+
+  describe('addDocBlock', () => {
+    let str: string;
+    let docs: d.CompilerJsDoc;
+
+    beforeEach(() => {
+      str = 'interface Foo extends Components.Foo, HTMLStencilElement {';
+      docs = {
+        tags: [{ name: 'deprecated', text: 'only for testing' }],
+        text: 'Lorem ipsum',
+      };
+    });
+
+    it('adds a doc block to the string', () => {
+      expect(util.addDocBlock(str, docs)).toEqual(`/**
+ * Lorem ipsum
+ * @deprecated only for testing
+ */
+interface Foo extends Components.Foo, HTMLStencilElement {`);
+    });
+
+    it('indents the doc block correctly', () => {
+      str = '    ' + str;
+      expect(util.addDocBlock(str, docs, 4)).toEqual(`    /**
+     * Lorem ipsum
+     * @deprecated only for testing
+     */
+    interface Foo extends Components.Foo, HTMLStencilElement {`);
+    });
+
+    it('excludes the @internal tag', () => {
+      docs.tags.push({ name: 'internal' });
+      expect(util.addDocBlock(str, docs).includes('@internal')).toBeFalsy();
+    });
+
+    it('excludes empty lines', () => {
+      docs.text = '';
+      str = '    ' + str;
+      expect(util.addDocBlock(str, docs, 4)).toEqual(`    /**
+     * @deprecated only for testing
+     */
+    interface Foo extends Components.Foo, HTMLStencilElement {`);
+    });
+
+    it.each([[null], [undefined], [{ tags: [], text: '' }]])(
+      'does not add a doc block when docs are empty (%j)',
+      (docs) => {
+        expect(util.addDocBlock(str, docs)).toEqual(str);
+      }
+    );
+  });
 });

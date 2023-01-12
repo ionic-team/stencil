@@ -15,13 +15,9 @@ export const getScriptTarget = () => {
  * @returns `true` if the member has the `private` or `protected` modifier attached to it. `false` otherwise
  */
 export const isMemberPrivate = (member: ts.ClassElement): boolean => {
-  if (
-    member.modifiers &&
-    member.modifiers.some((m) => m.kind === ts.SyntaxKind.PrivateKeyword || m.kind === ts.SyntaxKind.ProtectedKeyword)
-  ) {
-    return true;
-  }
-  return false;
+  return !!retrieveTsModifiers(member)?.some(
+    (m) => m.kind === ts.SyntaxKind.PrivateKeyword || m.kind === ts.SyntaxKind.ProtectedKeyword
+  );
 };
 
 /**
@@ -161,10 +157,9 @@ const objectToObjectLiteral = (obj: { [key: string]: any }, refs: WeakSet<any>):
  */
 export const createStaticGetter = (propName: string, returnExpression: ts.Expression): ts.GetAccessorDeclaration => {
   return ts.factory.createGetAccessorDeclaration(
-    undefined,
     [ts.factory.createToken(ts.SyntaxKind.StaticKeyword)],
     propName,
-    undefined,
+    [],
     undefined,
     ts.factory.createBlock([ts.factory.createReturnStatement(returnExpression)])
   );
@@ -491,18 +486,20 @@ const getTypeReferenceLocation = (typeName: string, tsNode: ts.Node): d.Componen
 
   // Loop through all top level exports to find if any reference to the type for 'local' reference location
   const isExported = sourceFileObj.statements.some((st) => {
+    const statementModifiers = retrieveTsModifiers(st);
+
     // Is the interface defined in the file and exported
     const isInterfaceDeclarationExported =
       ts.isInterfaceDeclaration(st) &&
       (<ts.Identifier>st.name).getText() === typeName &&
-      Array.isArray(st.modifiers) &&
-      st.modifiers.some((mod) => mod.kind === ts.SyntaxKind.ExportKeyword);
+      Array.isArray(statementModifiers) &&
+      statementModifiers.some((mod) => mod.kind === ts.SyntaxKind.ExportKeyword);
 
     const isTypeAliasDeclarationExported =
       ts.isTypeAliasDeclaration(st) &&
       (<ts.Identifier>st.name).getText() === typeName &&
-      Array.isArray(st.modifiers) &&
-      st.modifiers.some((mod) => mod.kind === ts.SyntaxKind.ExportKeyword);
+      Array.isArray(statementModifiers) &&
+      statementModifiers.some((mod) => mod.kind === ts.SyntaxKind.ExportKeyword);
 
     // Is the interface exported through a named export
     const isTypeInExportDeclaration =
@@ -616,11 +613,13 @@ export const getComponentTagName = (staticMembers: ts.ClassElement[]) => {
   return null;
 };
 
-export const isStaticGetter = (member: ts.ClassElement) => {
+export const isStaticGetter = (member: ts.ClassElement): boolean => {
+  const modifiers = retrieveTsModifiers(member);
   return (
-    member.kind === ts.SyntaxKind.GetAccessor &&
-    member.modifiers &&
-    member.modifiers.some(({ kind }) => kind === ts.SyntaxKind.StaticKeyword)
+    (member.kind === ts.SyntaxKind.GetAccessor &&
+      Array.isArray(modifiers) &&
+      modifiers.some(({ kind }) => kind === ts.SyntaxKind.StaticKeyword)) ??
+    false
   );
 };
 
@@ -713,7 +712,6 @@ export const createImportStatement = (importFnNames: string[], importPath: strin
 
   return ts.factory.createImportDeclaration(
     undefined,
-    undefined,
     ts.factory.createImportClause(false, undefined, ts.factory.createNamedImports(importSpecifiers)),
     ts.factory.createStringLiteral(importPath)
   );
@@ -761,3 +759,50 @@ export interface ConvertIdentifier {
   __identifier: boolean;
   __escapedText: string;
 }
+
+/**
+ * Helper method for retrieving all decorators & modifiers from a TypeScript {@link ts.Node} entity.
+ *
+ * Starting with TypeScript v4.8, decorators and modifiers have been coalesced into a single field, and retrieving
+ * decorators directly has been deprecated. This helper function pulls all decorators & modifiers out of said field.
+ *
+ * @see {@link https://devblogs.microsoft.com/typescript/announcing-typescript-4-8/#decorators-are-placed-on-modifiers-on-typescripts-syntax-trees|The TypeScript 4.8 Announcement}
+ *
+ * @param node the node to pull decorators & modifiers out of
+ * @returns a list containing decorators & modifiers on the node
+ */
+export const retrieveModifierLike = (node: ts.Node): ReadonlyArray<ts.ModifierLike> => {
+  return [...(retrieveTsDecorators(node) ?? []), ...(retrieveTsModifiers(node) ?? [])];
+};
+
+/**
+ * Helper method for retrieving decorators from a TypeScript {@link ts.Node} entity.
+ *
+ * Starting with TypeScript v4.8, decorators and modifiers have been coalesced into a single field, and retrieving
+ * decorators directly has been deprecated. This helper function is a utility that wraps various helper functions that
+ * the TypeScript compiler exposes for pulling decorators out of said field.
+ *
+ * @see {@link https://devblogs.microsoft.com/typescript/announcing-typescript-4-8/#decorators-are-placed-on-modifiers-on-typescripts-syntax-trees|The TypeScript 4.8 Announcement}
+ *
+ * @param node the node to pull decorators out of
+ * @returns a list containing 1+ decorators on the node, otherwise undefined
+ */
+export const retrieveTsDecorators = (node: ts.Node): ReadonlyArray<ts.Decorator> | undefined => {
+  return ts.canHaveDecorators(node) ? ts.getDecorators(node) : undefined;
+};
+
+/**
+ * Helper method for retrieving modifiers from a TypeScript {@link ts.Node} entity.
+ *
+ * Starting with TypeScript v4.8, decorators and modifiers have been coalesced into a single field, and retrieving
+ * modifiers directly has been deprecated. This helper function is a utility that wraps various helper functions that
+ * the TypeScript compiler exposes for pulling modifiers out of said field.
+ *
+ * @see {@link https://devblogs.microsoft.com/typescript/announcing-typescript-4-8/#decorators-are-placed-on-modifiers-on-typescripts-syntax-trees|The TypeScript 4.8 Announcement}
+ *
+ * @param node the node to pull modifiers out of
+ * @returns a list containing 1+ modifiers on the node, otherwise undefined
+ */
+export const retrieveTsModifiers = (node: ts.Node): ReadonlyArray<ts.Modifier> | undefined => {
+  return ts.canHaveModifiers(node) ? ts.getModifiers(node) : undefined;
+};

@@ -1,6 +1,6 @@
 import { BUILD } from '@app-data';
 import { doc, getHostRef, plt, registerHost, supportsShadow, win } from '@platform';
-import { CMP_FLAGS } from '@utils';
+import { CMP_FLAGS, queryNonceMetaTagContent } from '@utils';
 
 import type * as d from '../declarations';
 import { connectedCallback } from './connected-callback';
@@ -12,6 +12,7 @@ import { proxyComponent } from './proxy-component';
 import { HYDRATED_CSS, HYDRATED_STYLE_ID, PLATFORM_FLAGS, PROXY_FLAGS } from './runtime-constants';
 import { convertScopedToShadow, registerStyle } from './styles';
 import { appDidLoad } from './update-component';
+export { setNonce } from '@platform';
 
 export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.CustomElementsDefineOptions = {}) => {
   if (BUILD.profile && performance.mark) {
@@ -162,6 +163,12 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
   if (BUILD.invisiblePrehydration && (BUILD.hydratedClass || BUILD.hydratedAttribute)) {
     visibilityStyle.innerHTML = cmpTags + HYDRATED_CSS;
     visibilityStyle.setAttribute('data-styles', '');
+
+    // Apply CSP nonce to the style tag if it exists
+    const nonce = plt.$nonce$ ?? queryNonceMetaTagContent(doc);
+    if (nonce != null) {
+      visibilityStyle.setAttribute('nonce', nonce);
+    }
     head.insertBefore(visibilityStyle, metaCharset ? metaCharset.nextSibling : head.firstChild);
   }
 

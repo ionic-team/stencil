@@ -1807,7 +1807,7 @@ export interface EmulateViewport {
  */
 export const LOG_LEVELS = ['debug', 'info', 'warn', 'error'] as const;
 
-export type LogLevel = typeof LOG_LEVELS[number];
+export type LogLevel = (typeof LOG_LEVELS)[number];
 
 /**
  * Common logger to be used by the compiler, dev-server and CLI. The CLI will use a

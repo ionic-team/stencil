@@ -17,16 +17,16 @@ jobs:
       matrix:
         branch: ['main', 'pr']
     name: 'Get strictNullChecks errors on ${{ matrix.branch }}'
-    runs-on: 'ubuntu-latest'
+    runs-on: 'ubuntu-20.04'
     steps:
       - name: Checkout main
-        uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+        uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
         with:
           ref: main
         if: ${{ matrix.branch == 'main' }}
 
       - name: Checkout PR branch
-        uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+        uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
         with:
           # the pull_request_target event will consider the HEAD of `main` to be the SHA to use.
           # attempt to use the SHA associated with a pull request and fallback to HEAD of `main`
@@ -44,7 +44,7 @@ jobs:
         run: npx tsc --strictNullChecks --noEmit --pretty false | npx tsc-output-parser > null_errors_${{ matrix.branch }}.json
 
       - name: Upload null_errors_${{ matrix.branch }}.json
-        uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # v3.1.1
+        uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
         with:
           name: null_errors_${{ matrix.branch }}
           path: 'null_errors_${{ matrix.branch }}.json'
@@ -55,16 +55,16 @@ jobs:
       matrix:
         branch: ['main', 'pr']
     name: Find unused variables on ${{ matrix.branch }}
-    runs-on: 'ubuntu-latest'
+    runs-on: 'ubuntu-20.04'
     steps:
       - name: Checkout main
-        uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+        uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
         with:
           ref: main
         if: ${{ matrix.branch == 'main' }}
 
       - name: Checkout PR branch
-        uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+        uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
         with:
           # the pull_request_target event will consider the HEAD of `main` to be the SHA to use.
           # attempt to use the SHA associated with a pull request and fallback to HEAD of `main`
@@ -79,7 +79,7 @@ jobs:
         run: npx ts-prune > unused-exports-${{ matrix.branch }}.txt
 
       - name: Upload unused exports
-        uses: actions/upload-artifact@83fd05a356d7e2593de66fc9913b3002723633cb # v3.1.1
+        uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
         with:
           name: unused-exports-${{ matrix.branch }}
           path: 'unused-exports-${{ matrix.branch }}.txt'
@@ -87,10 +87,10 @@ jobs:
   format_report:
     needs: ['strict_null_check', 'unused_exports_check']
     name: Download error files and report
-    runs-on: 'ubuntu-latest'
+    runs-on: 'ubuntu-20.04'
     steps:
       - name: Checkout current branch
-        uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+        uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
         with:
           # the pull_request_target event will consider the HEAD of `main` to be the SHA to use.
           # attempt to use the SHA associated with a pull request and fallback to HEAD of `main`
@@ -102,25 +102,25 @@ jobs:
 
       # TODO(STENCIL-446): Remove this workflow once `strictNullChecks` is enabled
       - name: Download null errors file for main branch
-        uses: actions/download-artifact@9782bd6a9848b53b110e712e20e42d89988822b7 # v3.0.1
+        uses: actions/download-artifact@9bc31d5ccc31df68ecc42ccf4149144866c47d8a # v3.0.2
         with:
           name: null_errors_main
 
       # TODO(STENCIL-446): Remove this workflow once `strictNullChecks` is enabled
       - name: Download null errors file for PR
-        uses: actions/download-artifact@9782bd6a9848b53b110e712e20e42d89988822b7 # v3.0.1
+        uses: actions/download-artifact@9bc31d5ccc31df68ecc42ccf4149144866c47d8a # v3.0.2
         with:
           name: null_errors_pr
 
       # TODO(STENCIL-454): Remove or change this up once we've eliminated unused exports
       - name: Download unused exports for main
-        uses: actions/download-artifact@9782bd6a9848b53b110e712e20e42d89988822b7 # v3.0.1
+        uses: actions/download-artifact@9bc31d5ccc31df68ecc42ccf4149144866c47d8a # v3.0.2
         with:
           name: unused-exports-main
 
       # TODO(STENCIL-454): Remove or change this up once we've eliminated unused exports
       - name: Download unused exports for PR
-        uses: actions/download-artifact@9782bd6a9848b53b110e712e20e42d89988822b7 # v3.0.1
+        uses: actions/download-artifact@9bc31d5ccc31df68ecc42ccf4149144866c47d8a # v3.0.2
         with:
           name: unused-exports-pr
 
@@ -141,7 +141,7 @@ jobs:
           echo ::set-output name=body::$body
 
       - name: Find Comment
-        uses: peter-evans/find-comment@b657a70ff16d17651703a84bee1cb9ad9d2be2ea # v2.0.1
+        uses: peter-evans/find-comment@81e2da3af01c92f83cb927cf3ace0e085617c556 # v2.2.0
         id: fc
         with:
           issue-number: ${{ github.event.pull_request.number }}

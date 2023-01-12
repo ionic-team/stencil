@@ -2,7 +2,7 @@ import { buildError } from '@utils';
 import ts from 'typescript';
 
 import type * as d from '../../../declarations';
-import { createStaticGetter } from '../transform-utils';
+import { createStaticGetter, retrieveTsDecorators } from '../transform-utils';
 import { isDecoratorNamed } from './decorator-utils';
 
 export const elementDecoratorsToStatic = (
@@ -29,8 +29,8 @@ const parseElementDecorator = (
   _diagnostics: d.Diagnostic[],
   _typeChecker: ts.TypeChecker,
   prop: ts.PropertyDeclaration
-) => {
-  const elementDecorator = prop.decorators && prop.decorators.find(isDecoratorNamed('Element'));
+): string | null => {
+  const elementDecorator = retrieveTsDecorators(prop)?.find(isDecoratorNamed('Element'));
 
   if (elementDecorator == null) {
     return null;
