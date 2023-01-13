@@ -173,7 +173,7 @@ export interface StencilConfig {
    * type of CSS properties and values are assigned before and after hydrating. This config
    * can also be used to not include the hydrated flag at all by setting it to `null`.
    */
-  hydratedFlag?: HydratedFlag | undefined;
+  hydratedFlag?: HydratedFlag | null;
 
   /**
    * Ionic prefers to hide all components prior to hydration with a style tag appended

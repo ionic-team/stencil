@@ -18,7 +18,7 @@ describe('validate-hydrated', () => {
       // this test explicitly checks for a bad value in the stencil.config file, hence the type assertion
       (inputConfig.hydratedFlag as any) = badValue;
       const actual = validateHydrated(inputConfig);
-      expect(actual).toBeUndefined();
+      expect(actual).toBeNull();
     });
 
     it.each([[], true])('returns a default value when hydratedFlag=%s', (badValue) => {

@@ -39,7 +39,7 @@ export function mockValidatedConfig(overrides: Partial<ValidatedConfig> = {}): V
     rootDir: path.resolve('/'),
     sys: createTestingSystem(),
     testing: {},
-    hydratedFlag: undefined,
+    hydratedFlag: null,
     ...overrides,
   };
 }
