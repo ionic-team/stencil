@@ -1,3 +1,6 @@
+import * as ts from 'typescript';
+
+import { filterDecorators } from '../decorators-to-static/convert-decorators';
 import { transpileModule } from './transpile';
 
 /**
@@ -50,7 +53,7 @@ describe('convert-decorators', () => {
               "optional": false,
               "docs": {
                 "tags": [],
-                "text": "" 
+                "text": ""
               },
               "getter": false, 
               "setter": false,
@@ -320,8 +323,8 @@ describe('convert-decorators', () => {
             "composed": true,
             "docs": {
               "tags": [],
-              "text": "" 
-            },            
+              "text": ""
+            },
             "complexType": {
               "original": "{ mph: number }",
               "resolved": "{ mph: number; }",
@@ -330,5 +333,67 @@ describe('convert-decorators', () => {
           }];
       }}`
     );
+  });
+
+  describe('filterDecorators', () => {
+    it.each<ReadonlyArray<ReadonlyArray<string>>>([[[]], [['ExcludedDecorator']]])(
+      'returns undefined when no decorators are provided',
+      (excludeList: ReadonlyArray<string>) => {
+        const filteredDecorators = filterDecorators(undefined, excludeList);
+
+        expect(filteredDecorators).toBeUndefined();
+      }
+    );
+
+    it.each<ReadonlyArray<ReadonlyArray<string>>>([[[]], [['ExcludedDecorator']]])(
+      'returns undefined for an empty list of decorators',
+      (excludeList: ReadonlyArray<string>) => {
+        const filteredDecorators = filterDecorators([], excludeList);
+
+        expect(filteredDecorators).toBeUndefined();
+      }
+    );
+
+    it('returns a decorator if it is not a call expression', () => {
+      // create a decorator, '@Decorator'. note the lack of '()' after the decorator, making it an identifier
+      // expression, rather than a call expression
+      const decorator = ts.factory.createDecorator(ts.factory.createIdentifier('Decorator'));
+
+      const filteredDecorators = filterDecorators([decorator], []);
+
+      expect(filteredDecorators).toHaveLength(1);
+      expect(filteredDecorators![0]).toBe(decorator);
+    });
+
+    it("doesn't return any decorators when all decorators in the exclude list", () => {
+      // create a '@CustomProp()' decorator
+      const customDecorator = ts.factory.createDecorator(
+        ts.factory.createCallExpression(ts.factory.createIdentifier('CustomProp'), undefined, [])
+      );
+      // create '@Prop()' decorator
+      const decorator = ts.factory.createDecorator(
+        ts.factory.createCallExpression(ts.factory.createIdentifier('Prop'), undefined, [])
+      );
+
+      const filteredDecorators = filterDecorators([customDecorator, decorator], ['Prop', 'CustomProp']);
+
+      expect(filteredDecorators).toBeUndefined();
+    });
+
+    it('returns any decorators not in the exclude list', () => {
+      // create a '@CustomProp()' decorator
+      const customDecorator = ts.factory.createDecorator(
+        ts.factory.createCallExpression(ts.factory.createIdentifier('CustomProp'), undefined, [])
+      );
+      // create '@Prop()' decorator
+      const decorator = ts.factory.createDecorator(
+        ts.factory.createCallExpression(ts.factory.createIdentifier('Prop'), undefined, [])
+      );
+
+      const filteredDecorators = filterDecorators([customDecorator, decorator], ['Prop']);
+
+      expect(filteredDecorators).toHaveLength(1);
+      expect(filteredDecorators![0]).toBe(customDecorator);
+    });
   });
 });

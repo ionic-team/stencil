@@ -29,7 +29,6 @@ export const updateStencilCoreImports = (updatedCoreImportPath: string): ts.Tran
                   const newImport = ts.factory.updateImportDeclaration(
                     s,
                     undefined,
-                    undefined,
                     ts.factory.createImportClause(
                       false,
                       undefined,

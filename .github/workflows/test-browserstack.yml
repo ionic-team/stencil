@@ -39,7 +39,7 @@ jobs:
 
   run_browserstack:
     name: Run Browserstack
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     needs: [build_core]
 
     # The concurrency field allows us to block multiple invocations of this job across multiple workflow runs.
@@ -51,13 +51,13 @@ jobs:
     # GitHub Actions 'concurrency' field as means to block the job until no other tests are running.
     concurrency: run_browserstack_queue
     steps:
-      - uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
+      - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
         with:
           ref: ${{ github.event_name == 'pull_request_target' && format('refs/pull/{0}/merge', github.event.number) || '' }}
           persist-credentials: false
 
       - name: Use Node Version from Volta (Karma)
-        uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
+        uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
         with:
           # pull the version to use from the volta key in package.json
           node-version-file: './test/karma/package.json'

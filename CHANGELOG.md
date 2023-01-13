@@ -1,3 +1,35 @@
+# 🍟 [2.21.0](https://github.com/ionic-team/stencil/compare/v2.20.0...v2.21.0) (2023-01-04)
+
+
+### Features
+
+* **compiler:** copy doc block from component to generated types ([#3525](https://github.com/ionic-team/stencil/issues/3525)) ([2e4b1fc](https://github.com/ionic-team/stencil/commit/2e4b1fcdc0b3fd41928d27cf9ee525a15b02d617))
+* **typescript:** add support for typescript 4.9 ([#3863](https://github.com/ionic-team/stencil/issues/3863)) ([542c46a](https://github.com/ionic-team/stencil/commit/542c46a94400246f1b995df0840c918e080a9e57))
+
+
+### Thanks
+
+🎉 Thanks for @jgroth for their contributions! 🎉
+
+
+# 🍁 [2.20.0](https://github.com/ionic-team/stencil/compare/v2.19.3...v2.20.0) (2022-12-05)
+
+
+### Bug Fixes
+
+* **cli:** ensure that argument order is correct for Jest ([#3827](https://github.com/ionic-team/stencil/issues/3827)) ([eb44060](https://github.com/ionic-team/stencil/commit/eb440602d79396eebbf3f8a509f60f3e03417440))
+
+
+### Features
+
+* **typescript:** support typescript 4.8 ([#3743](https://github.com/ionic-team/stencil/issues/3743)) ([8fa35f2](https://github.com/ionic-team/stencil/commit/8fa35f2e12a5da09cf28e7b92103675164957d08))
+
+
+### Thanks
+
+🎉 Thanks for @PengBoUESTC for their contributions! 🎉
+
+
 ## 🌏 [2.19.3](https://github.com/ionic-team/stencil/compare/v2.19.2...v2.19.3) (2022-11-15)
 
 

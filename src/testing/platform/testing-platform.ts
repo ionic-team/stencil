@@ -35,7 +35,7 @@ export const setSupportsShadowDom = (supports: boolean) => {
   supportsShadow = supports;
 };
 
-export function resetPlatform() {
+export function resetPlatform(defaults: Partial<d.PlatformRuntime> = {}) {
   if (win && typeof win.close === 'function') {
     win.close();
   }
@@ -44,6 +44,7 @@ export function resetPlatform() {
   styles.clear();
   plt.$flags$ = 0;
   Object.keys(Context).forEach((key) => delete Context[key]);
+  Object.assign(plt, defaults);
 
   if (plt.$orgLocNodes$ != null) {
     plt.$orgLocNodes$.clear();

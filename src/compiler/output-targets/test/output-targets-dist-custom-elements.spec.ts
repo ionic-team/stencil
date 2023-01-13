@@ -148,7 +148,7 @@ describe('Custom Elements output target', () => {
       );
       addCustomElementInputs(buildCtx, bundleOptions);
       expect(bundleOptions.loader['\0core']).toEqual(
-        `export { setAssetPath, setPlatformOptions } from '${STENCIL_INTERNAL_CLIENT_ID}';
+        `export { setAssetPath, setNonce, setPlatformOptions } from '${STENCIL_INTERNAL_CLIENT_ID}';
 export * from '${USER_INDEX_ENTRY_ID}';
 import { globalScripts } from '${STENCIL_APP_GLOBALS_ID}';
 globalScripts();
@@ -174,7 +174,7 @@ export { MyBestComponent, defineCustomElement as defineCustomElementMyBestCompon
       );
       addCustomElementInputs(buildCtx, bundleOptions);
       expect(bundleOptions.loader['\0core']).toEqual(
-        `export { setAssetPath, setPlatformOptions } from '${STENCIL_INTERNAL_CLIENT_ID}';
+        `export { setAssetPath, setNonce, setPlatformOptions } from '${STENCIL_INTERNAL_CLIENT_ID}';
 export * from '${USER_INDEX_ENTRY_ID}';
 import { globalScripts } from '${STENCIL_APP_GLOBALS_ID}';
 globalScripts();

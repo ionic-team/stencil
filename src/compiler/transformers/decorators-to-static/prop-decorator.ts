@@ -9,6 +9,8 @@ import {
   getAttributeTypeInfo,
   isMemberPrivate,
   resolveType,
+  retrieveTsDecorators,
+  retrieveTsModifiers,
   serializeSymbol,
   typeToString,
   validateReferences,
@@ -45,7 +47,7 @@ export const propDecoratorsToStatic = (
         newMembers
       )
     )
-    .filter((prop) => prop != null) as ts.PropertyAssignment[];
+    .filter((prop): prop is ts.PropertyAssignment => prop != null);
 
   if (properties.length > 0) {
     newMembers.push(createStaticGetter('properties', ts.factory.createObjectLiteralExpression(properties, true)));
@@ -67,12 +69,12 @@ const parsePropDecorator = (
   typeChecker: ts.TypeChecker,
   prop: ts.PropertyDeclaration | ts.GetAccessorDeclaration,
   watchable: Set<string>,
-  newMembers: ts.ClassElement[]
+  newMembers: ts.ClassElement[],
 ): ts.PropertyAssignment | null => {
-  if (!prop.decorators) return null;
-
-  const propDecorator = prop.decorators.find(isDecoratorNamed('Prop'));
-  if (propDecorator == null) return null;
+  const propDecorator = retrieveTsDecorators(prop)?.find(isDecoratorNamed('Prop'));
+  if (propDecorator == null) {
+    return null;
+  }
 
   const decoratorParams = getDeclarationParameters<d.PropOptions>(propDecorator);
   const propOptions: d.PropOptions = decoratorParams[0] || {};
@@ -83,7 +85,7 @@ const parsePropDecorator = (
     const err = buildError(diagnostics);
     err.messageText =
       'Properties decorated with the @Prop() decorator cannot be "private" nor "protected". More info: https://stenciljs.com/docs/properties';
-    augmentDiagnosticWithNode(err, prop.modifiers ? prop.modifiers[0] : prop);
+    augmentDiagnosticWithNode(err, retrieveTsModifiers(prop)![0]);
   }
 
   if (/^on(-|[A-Z])/.test(propName)) {
