@@ -39,6 +39,7 @@ jobs:
         shell: bash
 
       - name: Move the Stencil Build Artifact
+        # TODO(STENCIL-688): revisit this logic
         # there isn't a great way to get the output of `npm pack`, just grab the most recent and hope for the best
         run: mv $(ls -t *.tgz | head -1) stencil-eval.tgz
         shell: bash
