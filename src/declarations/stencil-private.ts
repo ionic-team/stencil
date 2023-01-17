@@ -1703,6 +1703,11 @@ export interface PlatformRuntime {
   $flags$: number;
   $orgLocNodes$?: Map<string, RenderNode>;
   $resourcesUrl$: string;
+  /**
+   * The nonce value to be applied to all script/style tags at runtime.
+   * If `null`, the nonce attribute will not be applied.
+   */
+  $nonce$?: string | null;
   jmp: (c: Function) => any;
   raf: (c: FrameRequestCallback) => number;
   ael: (
@@ -2406,6 +2411,11 @@ export interface NewSpecPageOptions {
   attachStyles?: boolean;
 
   strictBuild?: boolean;
+  /**
+   * Default values to be set on the platform runtime object (@see PlatformRuntime) when creating
+   * the spec page.
+   */
+  platform?: Partial<PlatformRuntime>;
 }
 
 /**

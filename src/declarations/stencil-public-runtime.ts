@@ -299,6 +299,16 @@ export declare function getAssetPath(path: string): string;
 export declare function setAssetPath(path: string): string;
 
 /**
+ * Used to specify a nonce value that corresponds with an application's
+ * [Content Security Policy (CSP)](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP).
+ * When set, the nonce will be added to all dynamically created script and style tags at runtime.
+ * Alternatively, the nonce value can be set on a `meta` tag in the DOM head
+ * (<meta name="csp-nonce" content="{ nonce value here }" />) and will result in the same behavior.
+ * @param nonce The value to be used for the nonce attribute.
+ */
+export declare function setNonce(nonce: string): void;
+
+/**
  * Retrieve a Stencil element for a given reference
  * @param ref the ref to get the Stencil element for
  * @returns a reference to the element
