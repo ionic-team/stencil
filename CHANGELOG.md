@@ -84,6 +84,22 @@ See [BREAKING_CHANGES.md - v3.0.0](./BREAKING_CHANGES.md#stencil-v300) for a com
 
 See [the v3.0.0 Migration Guide](https://stenciljs.com/docs/upgrading-to-stencil-3) for a guide to migrate to Stencil v3.0.0.
 
+## ✈️ [2.22.1](https://github.com/ionic-team/stencil/compare/v2.21.0...v2.22.1) (2023-01-17)
+
+
+### Note
+
+v2.22.0 was never published to NPM, nor GitHub. The team had originally intended to release v2.22.0 on 2023.01.17.
+However, the publish attempt occurred during an NPM outage (unbeknown to the team). The result of this outage left the
+package 'marked' as published, although the publish did not succeed. v2.22.1 is identical to the version that the
+Stencil team originally intended to release as v2.22.0.
+
+
+### Features
+
+* **runtime:** support for CSP nonces ([#3823](https://github.com/ionic-team/stencil/issues/3823), [#3955](https://github.com/ionic-team/stencil/issues/3955)) ([c91ed48](https://github.com/ionic-team/stencil/commit/c91ed48ddef36e77b3e7f0c26a47e527ce6b9dd6))
+
+
 
 # 🍟 [2.21.0](https://github.com/ionic-team/stencil/compare/v2.20.0...v2.21.0) (2023-01-04)
 
