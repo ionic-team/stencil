@@ -74,7 +74,7 @@ describe('Custom Elements output target', () => {
       });
 
       expect(entryPoint).toEqual(`import { globalScripts } from '${STENCIL_APP_GLOBALS_ID}';
-export { setAssetPath, setPlatformOptions } from '${STENCIL_INTERNAL_CLIENT_ID}';
+export { setAssetPath, setNonce, setPlatformOptions } from '${STENCIL_INTERNAL_CLIENT_ID}';
 export * from '${USER_INDEX_ENTRY_ID}';
 
 globalScripts();
@@ -87,7 +87,8 @@ globalScripts();
         includeGlobalScripts: false,
       });
 
-      expect(entryPoint).toEqual(`export { setAssetPath, setPlatformOptions } from '${STENCIL_INTERNAL_CLIENT_ID}';
+      expect(entryPoint)
+        .toEqual(`export { setAssetPath, setNonce, setPlatformOptions } from '${STENCIL_INTERNAL_CLIENT_ID}';
 export * from '${USER_INDEX_ENTRY_ID}';
 `);
     });
@@ -197,7 +198,7 @@ globalScripts();
         addCustomElementInputs(buildCtx, bundleOptions, config.outputTargets[0] as OutputTargetDistCustomElements);
         expect(bundleOptions.loader['\0core']).toEqual(
           `import { globalScripts } from '${STENCIL_APP_GLOBALS_ID}';
-export { setAssetPath, setPlatformOptions } from '${STENCIL_INTERNAL_CLIENT_ID}';
+export { setAssetPath, setNonce, setPlatformOptions } from '${STENCIL_INTERNAL_CLIENT_ID}';
 export * from '${USER_INDEX_ENTRY_ID}';
 export { StubCmp, defineCustomElement as defineCustomElementStubCmp } from '\0StubCmp';
 export { MyBestComponent, defineCustomElement as defineCustomElementMyBestComponent } from '\0MyBestComponent';
@@ -224,7 +225,7 @@ globalScripts();
         addCustomElementInputs(buildCtx, bundleOptions, config.outputTargets[0] as OutputTargetDistCustomElements);
         expect(bundleOptions.loader['\0core']).toEqual(
           `import { globalScripts } from '${STENCIL_APP_GLOBALS_ID}';
-export { setAssetPath, setPlatformOptions } from '${STENCIL_INTERNAL_CLIENT_ID}';
+export { setAssetPath, setNonce, setPlatformOptions } from '${STENCIL_INTERNAL_CLIENT_ID}';
 export * from '${USER_INDEX_ENTRY_ID}';
 export { ComponentWithJsx, defineCustomElement as defineCustomElementComponentWithJsx } from '\0ComponentWithJsx';
 
