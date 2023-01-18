@@ -216,15 +216,16 @@ const addVnodes = (
   endIdx: number
 ) => {
   let containerElm = ((BUILD.slotRelocation && parentElm['s-cr'] && parentElm['s-cr'].parentNode) || parentElm) as any;
+  let childNode: Node;
   if (BUILD.shadowDom && (containerElm as any).shadowRoot && containerElm.tagName === hostTagName) {
     containerElm = (containerElm as any).shadowRoot;
   }
 
   for (; startIdx <= endIdx; ++startIdx) {
     if (vnodes[startIdx]) {
-      const childNode = createElm(null, parentVNode, startIdx, parentElm);
+      childNode = createElm(null, parentVNode, startIdx, parentElm);
       if (childNode) {
-        vnodes[startIdx].$elm$ = childNode;
+        vnodes[startIdx].$elm$ = childNode as any;
         containerElm.insertBefore(childNode, BUILD.slotRelocation ? referenceNode(before) : before);
       }
     }
