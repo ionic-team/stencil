@@ -243,32 +243,29 @@ const addVnodes = (
  * @param startIdx the index at which to start removing nodes (inclusive)
  * @param endIdx the index at which to stop removing nodes (inclusive)
  */
-const removeVnodes = (vnodes: d.VNode[], startIdx: number, endIdx: number) => {
+const removeVnodes = (vnodes: d.VNode[], startIdx: number, endIdx: number, vnode?: d.VNode, elm?: d.RenderNode) => {
   for (; startIdx <= endIdx; ++startIdx) {
-    const vnode = vnodes[startIdx];
-    if (vnode) {
-      const elm = vnode.$elm$;
+    if ((vnode = vnodes[startIdx])) {
+      elm = vnode.$elm$;
       callNodeRefs(vnode);
 
-      if (elm) {
-        if (BUILD.slotRelocation) {
-          // we're removing this element
-          // so it's possible we need to show slot fallback content now
-          checkSlotFallbackVisibility = true;
+      if (BUILD.slotRelocation) {
+        // we're removing this element
+        // so it's possible we need to show slot fallback content now
+        checkSlotFallbackVisibility = true;
 
-          if (elm && elm['s-ol']) {
-            // remove the original location comment
-            elm['s-ol'].remove();
-          } else {
-            // it's possible that child nodes of the node
-            // that's being removed are slot nodes
-            putBackInOriginalLocation(elm, true);
-          }
+        if (elm['s-ol']) {
+          // remove the original location comment
+          elm['s-ol'].remove();
+        } else {
+          // it's possible that child nodes of the node
+          // that's being removed are slot nodes
+          putBackInOriginalLocation(elm, true);
         }
-
-        // remove the vnode's element from the dom
-        elm.remove();
       }
+
+      // remove the vnode's element from the dom
+      elm.remove();
     }
   }
 };
