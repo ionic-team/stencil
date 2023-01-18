@@ -9,12 +9,12 @@ export const getConfig = (userConfig: d.Config): d.ValidatedConfig => {
   const config: d.ValidatedConfig = {
     ...userConfig,
     flags: createConfigFlags(userConfig.flags ?? {}),
+    hydratedFlag: userConfig.hydratedFlag ?? null,
     logger,
     outputTargets: userConfig.outputTargets ?? [],
     rootDir: userConfig.rootDir ?? '/',
     sys: userConfig.sys ?? createSystem({ logger }),
     testing: userConfig ?? {},
-    hydratedFlag: userConfig.hydratedFlag ?? null,
   };
 
   setPlatformPath(config.sys.platformPath);

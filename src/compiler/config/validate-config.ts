@@ -52,12 +52,12 @@ export const validateConfig = (
     ...config,
     // flags _should_ be JSON safe
     flags: JSON.parse(JSON.stringify(config.flags || {})),
+    hydratedFlag: validateHydrated(config),
     logger,
     outputTargets: config.outputTargets ?? [],
     rootDir: typeof config.rootDir === 'string' ? config.rootDir : '/',
     sys: config.sys ?? bootstrapConfig.sys ?? createSystem({ logger }),
     testing: config.testing ?? {},
-    hydratedFlag: validateHydrated(config),
   };
 
   // default devMode false
