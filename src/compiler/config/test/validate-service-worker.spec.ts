@@ -14,6 +14,7 @@ describe('validateServiceWorker', () => {
     config = {
       fsNamespace: 'app',
       rootDir: '/',
+      hydratedFlag: null,
       sys: mockCompilerSystem(),
       devMode: false,
       flags: createConfigFlags(),

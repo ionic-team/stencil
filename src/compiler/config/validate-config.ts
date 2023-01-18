@@ -52,6 +52,7 @@ export const validateConfig = (
     ...config,
     // flags _should_ be JSON safe
     flags: JSON.parse(JSON.stringify(config.flags || {})),
+    hydratedFlag: validateHydrated(config),
     logger,
     outputTargets: config.outputTargets ?? [],
     rootDir: typeof config.rootDir === 'string' ? config.rootDir : '/',
@@ -149,9 +150,6 @@ export const validateConfig = (
 
   // testing
   validateTesting(validatedConfig, diagnostics);
-
-  // hydrate flag
-  validatedConfig.hydratedFlag = validateHydrated(validatedConfig);
 
   // bundles
   if (Array.isArray(validatedConfig.bundles)) {
