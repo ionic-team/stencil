@@ -33,18 +33,13 @@ let isSvgMode = false;
  * @param parentElm the parent DOM node which our new node will be a child of
  * @returns the newly created node
  */
-const createElm = (
-  oldParentVNode: d.VNode | null,
-  newParentVNode: d.VNode,
-  childIndex: number,
-  parentElm: d.RenderNode
-) => {
+const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex: number, parentElm: d.RenderNode) => {
   // tslint:disable-next-line: prefer-const
   const newVNode = newParentVNode.$children$[childIndex];
   let i = 0;
   let elm: d.RenderNode;
   let childNode: d.RenderNode;
-  let oldVNode: d.VNode | null;
+  let oldVNode: d.VNode;
 
   if (BUILD.slotRelocation && !useNativeShadowDom) {
     // remember for later we need to check to relocate nodes
@@ -155,7 +150,7 @@ const createElm = (
 
       // check if we've got an old vnode for this slot
       oldVNode = oldParentVNode && oldParentVNode.$children$ && oldParentVNode.$children$[childIndex];
-      if (oldVNode && oldVNode.$tag$ === newVNode.$tag$ && oldParentVNode && oldParentVNode.$elm$) {
+      if (oldVNode && oldVNode.$tag$ === newVNode.$tag$ && oldParentVNode.$elm$) {
         // we've got an old slot vnode and the wrapper is being replaced
         // so let's move the old slot content back to it's original location
         putBackInOriginalLocation(oldParentVNode.$elm$, false);
@@ -214,7 +209,7 @@ const putBackInOriginalLocation = (parentElm: Node, recursive: boolean) => {
  */
 const addVnodes = (
   parentElm: d.RenderNode,
-  before: d.RenderNode | null,
+  before: d.RenderNode,
   parentVNode: d.VNode,
   vnodes: d.VNode[],
   startIdx: number,
