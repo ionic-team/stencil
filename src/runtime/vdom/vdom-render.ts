@@ -555,7 +555,7 @@ export const isSameVnode = (leftVNode: d.VNode, rightVNode: d.VNode) => {
   return false;
 };
 
-const referenceNode = (node: d.RenderNode | null): d.RenderNode | null => {
+const referenceNode = (node: d.RenderNode) => {
   // this node was relocated to a new location in the dom
   // because of some other component's slot
   // but we still have an html comment in place of where
@@ -807,10 +807,7 @@ export const renderVdom = (hostRef: d.HostRef, renderFnResults: d.VNode | d.VNod
   const hostElm = hostRef.$hostElement$;
   const cmpMeta = hostRef.$cmpMeta$;
   const oldVNode: d.VNode = hostRef.$vnode$ || newVNode(null, null);
-  const rootVnode: d.VNode =
-    !Array.isArray(renderFnResults) && isHost(renderFnResults)
-      ? renderFnResults
-      : h(null, null, renderFnResults as any);
+  const rootVnode = isHost(renderFnResults) ? renderFnResults : h(null, null, renderFnResults as any);
 
   hostTagName = hostElm.tagName;
 
