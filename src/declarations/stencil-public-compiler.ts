@@ -424,7 +424,15 @@ type RequireFields<T, K extends keyof T> = T & { [P in K]-?: T[P] };
 /**
  * Fields in {@link Config} to make required for {@link ValidatedConfig}
  */
-type StrictConfigFields = 'flags' | 'hydratedFlag' | 'logger' | 'outputTargets' | 'rootDir' | 'sys' | 'testing' | 'packageJsonFilePath';
+type StrictConfigFields =
+  | 'flags'
+  | 'hydratedFlag'
+  | 'logger'
+  | 'outputTargets'
+  | 'packageJsonFilePath'
+  | 'rootDir'
+  | 'sys'
+  | 'testing';
 
 /**
  * A version of {@link Config} that makes certain fields required. This type represents a valid configuration entity.
