@@ -144,10 +144,10 @@ async function setupHydrateApp(devServerConfig: d.DevServerConfig, serverCtx: d.
     srcIndexHtml = await serverCtx.sys.readFile(devServerConfig.srcIndexHtml);
     if (!isString(srcIndexHtml)) {
       diagnostics.push({
-        messageText: `Unable to load src index html: ${devServerConfig.srcIndexHtml}`,
         level: `error`,
-        type: `ssr`,
         lines: [],
+        messageText: `Unable to load src index html: ${devServerConfig.srcIndexHtml}`,
+        type: `ssr`,
       });
     } else {
       // ensure we cleared out node's internal require() cache for this file

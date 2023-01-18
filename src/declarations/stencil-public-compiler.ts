@@ -2288,18 +2288,18 @@ export interface LoadConfigResults {
 }
 
 export interface Diagnostic {
-  level: 'error' | 'warn' | 'info' | 'log' | 'debug';
-  type: string;
+  absFilePath?: string | undefined;
+  code?: string;
+  columnNumber?: number | undefined;
+  debugText?: string;
   header?: string;
   language?: string;
-  messageText: string;
-  debugText?: string;
-  code?: string;
-  absFilePath?: string | undefined;
-  relFilePath?: string | undefined;
+  level: 'error' | 'warn' | 'info' | 'log' | 'debug';
   lineNumber?: number | undefined;
-  columnNumber?: number | undefined;
   lines: PrintLine[];
+  messageText: string;
+  relFilePath?: string | undefined;
+  type: string;
 }
 
 export interface CacheStorage {

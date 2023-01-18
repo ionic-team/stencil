@@ -102,17 +102,17 @@ export const loadTypeScriptDiagnostics = (tsDiagnostics: readonly Diagnostic[]) 
  */
 export const loadTypeScriptDiagnostic = (tsDiagnostic: Diagnostic): d.Diagnostic => {
   const d: d.Diagnostic = {
-    level: 'warn',
-    type: 'typescript',
-    language: 'typescript',
-    header: 'TypeScript',
-    code: tsDiagnostic.code.toString(),
-    messageText: flattenDiagnosticMessageText(tsDiagnostic, tsDiagnostic.messageText),
-    columnNumber: undefined,
-    lineNumber: undefined,
-    relFilePath: undefined,
     absFilePath: undefined,
+    code: tsDiagnostic.code.toString(),
+    columnNumber: undefined,
+    header: 'TypeScript',
+    language: 'typescript',
+    level: 'warn',
+    lineNumber: undefined,
     lines: [],
+    messageText: flattenDiagnosticMessageText(tsDiagnostic, tsDiagnostic.messageText),
+    relFilePath: undefined,
+    type: 'typescript',
   };
 
   if (tsDiagnostic.category === 1) {
