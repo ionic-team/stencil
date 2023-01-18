@@ -9,6 +9,7 @@ export const getConfig = (userConfig: d.Config): d.ValidatedConfig => {
   const config: d.ValidatedConfig = {
     ...userConfig,
     flags: createConfigFlags(userConfig.flags ?? {}),
+    hydratedFlag: userConfig.hydratedFlag ?? null,
     logger,
     outputTargets: userConfig.outputTargets ?? [],
     rootDir: userConfig.rootDir ?? '/',

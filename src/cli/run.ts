@@ -132,6 +132,7 @@ export const runTask = async (
   const strictConfig: ValidatedConfig = {
     ...config,
     flags: createConfigFlags(config.flags ?? { task }),
+    hydratedFlag: config.hydratedFlag ?? null,
     logger,
     outputTargets: config.outputTargets ?? [],
     rootDir: config.rootDir ?? '/',
