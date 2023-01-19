@@ -78,7 +78,7 @@
     "@types/semver": "^7.3.12",
     "@types/sizzle": "^2.3.2",
     "@types/webpack": "^4.41.26",
-    "@types/ws": "^7.4.0",
+    "@types/ws": "^8.5.4",
     "@types/yarnpkg__lockfile": "^1.1.5",
     "@typescript-eslint/eslint-plugin": "^5.38.0",
     "@typescript-eslint/parser": "^5.38.0",
@@ -124,7 +124,7 @@
     "terser": "5.16.1",
     "typescript": "4.9.4",
     "webpack": "^4.46.0",
-    "ws": "7.4.6"
+    "ws": "8.12.0"
   },
   "engines": {
     "node": ">=12.10.0",
