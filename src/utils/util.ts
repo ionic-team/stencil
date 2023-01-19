@@ -189,7 +189,7 @@ export const readPackageJson = async (config: d.ValidatedConfig, compilerCtx: d.
 export type ParsePackageJsonResult = {
   diagnostic: d.Diagnostic | null;
   data: any | null;
-  filePath: string | undefined;
+  filePath: string;
 };
 
 /**
@@ -198,7 +198,7 @@ export type ParsePackageJsonResult = {
  * @param pkgJsonFilePath the path to the already read `package.json` file
  * @returns the results of parsing the provided contents of the `package.json` file
  */
-export const parsePackageJson = (pkgJsonStr: string, pkgJsonFilePath: string | undefined): ParsePackageJsonResult => {
+export const parsePackageJson = (pkgJsonStr: string, pkgJsonFilePath: string): ParsePackageJsonResult => {
   const parseResult: ParsePackageJsonResult = {
     diagnostic: null,
     data: null,
