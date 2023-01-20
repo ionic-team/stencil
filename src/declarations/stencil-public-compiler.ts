@@ -1,5 +1,5 @@
 import type { ConfigFlags } from '../cli/config-flags';
-import type { PrerenderUrlResults } from '../internal';
+import type { PrerenderUrlResults, PrintLine } from '../internal';
 import type { JsonDocs } from './stencil-public-docs';
 
 export * from './stencil-public-docs';
@@ -424,7 +424,15 @@ type RequireFields<T, K extends keyof T> = T & { [P in K]-?: T[P] };
 /**
  * Fields in {@link Config} to make required for {@link ValidatedConfig}
  */
-type StrictConfigFields = 'flags' | 'hydratedFlag' | 'logger' | 'outputTargets' | 'rootDir' | 'sys' | 'testing';
+type StrictConfigFields =
+  | 'flags'
+  | 'hydratedFlag'
+  | 'logger'
+  | 'outputTargets'
+  | 'packageJsonFilePath'
+  | 'rootDir'
+  | 'sys'
+  | 'testing';
 
 /**
  * A version of {@link Config} that makes certain fields required. This type represents a valid configuration entity.
@@ -2288,24 +2296,18 @@ export interface LoadConfigResults {
 }
 
 export interface Diagnostic {
-  level: 'error' | 'warn' | 'info' | 'log' | 'debug';
-  type: string;
+  absFilePath?: string | undefined;
+  code?: string;
+  columnNumber?: number | undefined;
+  debugText?: string;
   header?: string;
   language?: string;
+  level: 'error' | 'warn' | 'info' | 'log' | 'debug';
+  lineNumber?: number | undefined;
+  lines: PrintLine[];
   messageText: string;
-  debugText?: string;
-  code?: string;
-  absFilePath?: string;
-  relFilePath?: string;
-  lineNumber?: number;
-  columnNumber?: number;
-  lines?: {
-    lineIndex: number;
-    lineNumber: number;
-    text?: string;
-    errorCharStart: number;
-    errorLength?: number;
-  }[];
+  relFilePath?: string | undefined;
+  type: string;
 }
 
 export interface CacheStorage {

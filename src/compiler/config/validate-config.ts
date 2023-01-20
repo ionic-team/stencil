@@ -1,4 +1,5 @@
 import { buildError, isBoolean, isNumber, isString, sortBy } from '@utils';
+import { join } from 'path';
 
 import { ConfigBundle, Diagnostic, LoadConfigInit, UnvalidatedConfig, ValidatedConfig } from '../../declarations';
 import { createLogger } from '../sys/logger/console-logger';
@@ -47,6 +48,7 @@ export const validateConfig = (
   const diagnostics: Diagnostic[] = [];
 
   const logger = bootstrapConfig.logger || config.logger || createLogger();
+  const rootDir = typeof config.rootDir === 'string' ? config.rootDir : '/';
 
   const validatedConfig: ValidatedConfig = {
     ...config,
@@ -55,7 +57,8 @@ export const validateConfig = (
     hydratedFlag: validateHydrated(config),
     logger,
     outputTargets: config.outputTargets ?? [],
-    rootDir: typeof config.rootDir === 'string' ? config.rootDir : '/',
+    packageJsonFilePath: join(rootDir, 'package.json'),
+    rootDir,
     sys: config.sys ?? bootstrapConfig.sys ?? createSystem({ logger }),
     testing: config.testing ?? {},
   };

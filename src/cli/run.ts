@@ -129,14 +129,17 @@ export const runTask = async (
   sys?: d.CompilerSystem
 ): Promise<void> => {
   const logger = config.logger ?? createLogger();
+  const rootDir = config.rootDir ?? '/';
+  const configSys = sys ?? config.sys ?? coreCompiler.createSystem({ logger });
   const strictConfig: ValidatedConfig = {
     ...config,
     flags: createConfigFlags(config.flags ?? { task }),
     hydratedFlag: config.hydratedFlag ?? null,
     logger,
     outputTargets: config.outputTargets ?? [],
-    rootDir: config.rootDir ?? '/',
-    sys: sys ?? config.sys ?? coreCompiler.createSystem({ logger }),
+    packageJsonFilePath: configSys.platformPath.join(rootDir, 'package.json'),
+    rootDir,
+    sys: configSys,
     testing: config.testing ?? {},
   };
 
