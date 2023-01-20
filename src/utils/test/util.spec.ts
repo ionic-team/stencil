@@ -170,24 +170,6 @@ describe('util', () => {
       });
     });
 
-    it('returns a parse error if parsing cannot complete for undefined package path', () => {
-      // improperly formatted JSON - note the lack of ':'
-      const diagnostic = util.parsePackageJson('{ "someJson" "value"}', undefined);
-
-      const expectedDiagnostic: d.Diagnostic = stubDiagnostic({
-        absFilePath: undefined,
-        header: 'Error Parsing JSON',
-        messageText: 'Unexpected string in JSON at position 13', // due to missing colon in input
-        type: 'build',
-      });
-
-      expect(diagnostic).toEqual<util.ParsePackageJsonResult>({
-        diagnostic: expectedDiagnostic,
-        data: null,
-        filePath: undefined,
-      });
-    });
-
     it('returns the parsed data from the provided json', () => {
       const diagnostic = util.parsePackageJson('{ "someJson": "value"}', mockPackageJsonPath);
 

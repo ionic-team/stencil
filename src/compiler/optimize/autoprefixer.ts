@@ -38,6 +38,7 @@ export const autoprefixCss = async (cssText: string, opts: boolean | null | d.Au
         messageText: warning.text,
         level: 'warn',
         type: 'css',
+        lines: [],
       });
     });
 
@@ -48,6 +49,7 @@ export const autoprefixCss = async (cssText: string, opts: boolean | null | d.Au
       messageText: `CSS Error` + e,
       level: `error`,
       type: `css`,
+      lines: [],
     };
 
     if (typeof e.name === 'string') {

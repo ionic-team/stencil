@@ -130,6 +130,7 @@ export * from '${USER_INDEX_ENTRY_ID}';
       expect(buildCtx.diagnostics).toEqual([
         {
           level: 'error',
+          lines: [],
           type: 'build',
           messageText: 'dist-custom-elements output target provided with no output target directory!',
         },

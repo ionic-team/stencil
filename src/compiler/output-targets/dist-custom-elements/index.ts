@@ -135,6 +135,7 @@ export const bundleCustomElements = async (
           level: 'error',
           type: 'build',
           messageText: 'dist-custom-elements output target provided with no output target directory!',
+          lines: [],
         });
         return;
       }

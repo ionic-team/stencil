@@ -82,13 +82,15 @@ describe('load config', () => {
       expect<d.Diagnostic>(loadedConfig.diagnostics[0]).toEqual({
         absFilePath: '/tsconfig.json',
         code: '18003',
+        columnNumber: undefined,
         header: 'TypeScript',
         language: 'typescript',
         level: 'warn',
+        lineNumber: undefined,
         lines: [],
         messageText:
           "No inputs were found in config file '/tsconfig.json'. Specified 'include' paths were '[\"src\"]' and 'exclude' paths were '[]'.",
-        relFilePath: null,
+        relFilePath: undefined,
         type: 'typescript',
       });
     });
