@@ -50,6 +50,7 @@ const removeUnusedStyleText = (
         type: 'css',
         header: 'CSS Stringify',
         messageText: e,
+        lines: [],
       });
     }
   } catch (e: any) {
@@ -58,6 +59,7 @@ const removeUnusedStyleText = (
       type: 'css',
       header: 'CSS Parse',
       messageText: e,
+      lines: [],
     });
   }
 };

@@ -1,3 +1,5 @@
+import { join } from 'path';
+
 import { createConfigFlags } from '../../cli/config-flags';
 import type * as d from '../../declarations';
 import { setPlatformPath } from '../sys/modules/path';
@@ -6,13 +8,15 @@ import { createSystem } from './stencil-sys';
 
 export const getConfig = (userConfig: d.Config): d.ValidatedConfig => {
   const logger = userConfig.logger ?? createLogger();
+  const rootDir = userConfig.rootDir ?? '/';
   const config: d.ValidatedConfig = {
     ...userConfig,
     flags: createConfigFlags(userConfig.flags ?? {}),
     hydratedFlag: userConfig.hydratedFlag ?? null,
     logger,
     outputTargets: userConfig.outputTargets ?? [],
-    rootDir: userConfig.rootDir ?? '/',
+    packageJsonFilePath: join(rootDir, 'package.json'),
+    rootDir,
     sys: userConfig.sys ?? createSystem({ logger }),
     testing: userConfig ?? {},
   };

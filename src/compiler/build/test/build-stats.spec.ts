@@ -55,6 +55,7 @@ describe('generateBuildStats', () => {
       level: 'error',
       type: 'horrible',
       messageText: 'the worst error _possible_ has just occurred',
+      lines: [],
     };
     buildCtx.buildResults.diagnostics = [diagnostic];
     const result = generateBuildStats(config, buildCtx);

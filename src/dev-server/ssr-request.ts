@@ -137,15 +137,16 @@ async function setupHydrateApp(devServerConfig: d.DevServerConfig, serverCtx: d.
   }
 
   if (!isString(buildResults.hydrateAppFilePath)) {
-    diagnostics.push({ messageText: `Missing hydrateAppFilePath`, level: `error`, type: `ssr` });
+    diagnostics.push({ messageText: `Missing hydrateAppFilePath`, level: `error`, type: `ssr`, lines: [] });
   } else if (!isString(devServerConfig.srcIndexHtml)) {
-    diagnostics.push({ messageText: `Missing srcIndexHtml`, level: `error`, type: `ssr` });
+    diagnostics.push({ messageText: `Missing srcIndexHtml`, level: `error`, type: `ssr`, lines: [] });
   } else {
     srcIndexHtml = await serverCtx.sys.readFile(devServerConfig.srcIndexHtml);
     if (!isString(srcIndexHtml)) {
       diagnostics.push({
-        messageText: `Unable to load src index html: ${devServerConfig.srcIndexHtml}`,
         level: `error`,
+        lines: [],
+        messageText: `Unable to load src index html: ${devServerConfig.srcIndexHtml}`,
         type: `ssr`,
       });
     } else {
