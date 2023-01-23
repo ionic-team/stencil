@@ -552,6 +552,14 @@ export interface FunctionalComponent<T = {}> {
   (props: T, children: VNode[], utils: FunctionalUtilities): VNode | VNode[];
 }
 
+/**
+ * A Child VDOM node
+ *
+ * This has most of the same properties as {@link VNode} but friendlier names
+ * (i.e. `vtag` instead of `$tag$`, `vchildren` instead of `$children$`) in
+ * order to provide a friendlier public interface for users of the
+ * {@link FunctionalUtilities}).
+ */
 export interface ChildNode {
   vtag?: string | number | Function;
   vkey?: string | number;
@@ -607,6 +615,9 @@ export declare function h(sel: any, data: VNodeData | null, text: string): VNode
 export declare function h(sel: any, data: VNodeData | null, children: Array<VNode | undefined | null>): VNode;
 export declare function h(sel: any, data: VNodeData | null, children: VNode): VNode;
 
+/**
+ * A virtual DOM node
+ */
 export interface VNode {
   $flags$: number;
   $tag$: string | number | Function;
