@@ -1,3 +1,18 @@
+# 🎷 [3.0.0-alpha.1](https://github.com/ionic-team/stencil/compare/v2.20.0...v3.0.0-alpha.1) (2022-12-05)
+
+
+### Features
+
+* **e2e:** add support for puppeteer v19 ([#3810](https://github.com/ionic-team/stencil/issues/3810)) ([22c7424](https://github.com/ionic-team/stencil/commit/22c74241ebb471123680d6629d7fa9c17b86c897))
+
+
+### Miscellaneous
+
+This release includes all feature and bug fixes from
+- Prior Stencil 3 pre-releases
+- [Stencil v2.20.0](https://github.com/ionic-team/stencil/releases/tag/v2.20.0) and below
+
+
 # ☕️ [3.0.0-alpha.0](https://github.com/ionic-team/stencil/compare/v2.19.3...v3.0.0-alpha.0) (2022-11-28)
 
 
