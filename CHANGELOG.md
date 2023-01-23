@@ -1,3 +1,12 @@
+## 🎈 [2.22.2](https://github.com/ionic-team/stencil/compare/v2.22.1...v2.22.2) (2023-01-23)
+
+
+### Bug Fixes
+
+* **runtime:** workaround for performance slowing in Chrome 109 ([#3995](https://github.com/ionic-team/stencil/issues/3995)) ([6544422](https://github.com/ionic-team/stencil/commit/65444226303bf2ccb678576b4fb57b4df35e0a18))
+
+
+
 ## ✈️ [2.22.1](https://github.com/ionic-team/stencil/compare/v2.21.0...v2.22.1) (2023-01-17)
 
 
