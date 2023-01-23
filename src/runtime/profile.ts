@@ -23,11 +23,11 @@ export const createTime = (fnName: string, tagName = '') => {
 
 export const uniqueTime = (key: string, measureText: string) => {
   if (BUILD.profile && performance.mark) {
-    if (performance.getEntriesByName(key).length === 0) {
+    if (performance.getEntriesByName(key, 'mark').length === 0) {
       performance.mark(key);
     }
     return () => {
-      if (performance.getEntriesByName(measureText).length === 0) {
+      if (performance.getEntriesByName(measureText, 'measure').length === 0) {
         performance.measure(measureText, key);
       }
     };
