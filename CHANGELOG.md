@@ -1,3 +1,10 @@
+# 🍀 [3.0.0-rc.1](https://github.com/ionic-team/stencil/compare/v2.22.2...v3.0.0-rc.1) (2023-01-23)
+
+
+This release includes all feature and bug fixes from all prior Stencil 3 pre-releases, and syncs the Stencil
+`v3.0.0-dev` branch with `main`.
+
+
 # ⭐️ [3.0.0-rc.0](https://github.com/ionic-team/stencil/compare/v2.22.1...v3.0.0-rc.0) (2023-01-17)
 
 This release includes all feature and bug fixes from all prior Stencil 3 pre-releases, and as well as all features
