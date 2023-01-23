@@ -1,3 +1,38 @@
+# ☕️ [3.0.0-alpha.0](https://github.com/ionic-team/stencil/compare/v2.19.3...v3.0.0-alpha.0) (2022-11-28)
+
+
+### Bug Fixes
+
+* **compiler:** fix 'destroy' callback naming ([#3289](https://github.com/ionic-team/stencil/issues/3289)) ([b733e79](https://github.com/ionic-team/stencil/commit/b733e79743948a063275fe93bd49e02101cea532))
+* **declarations:** correct event handler names for composition events ([#3777](https://github.com/ionic-team/stencil/issues/3777)) ([4d6a842](https://github.com/ionic-team/stencil/commit/4d6a842bd1330d4b9857ab4bc77b82db92c77fe1))
+* **runtime:** type autocapitalize property as a string ([#3692](https://github.com/ionic-team/stencil/issues/3692)) ([2cec0a6](https://github.com/ionic-team/stencil/commit/2cec0a61c50f2831f9000059ab33968c235f7326))
+* **runtime:** narrow onInput & onCapture event type ([#3135](https://github.com/ionic-team/stencil/issues/3135)) ([8316a62](https://github.com/ionic-team/stencil/commit/8316a62f5767639e3b70661a0d6b902c9e6daf0b))
+
+
+### Features
+
+* **api** remove `sys` parameter from `parseFlags` public API ([#3489](https://github.com/ionic-team/stencil/pull/3489) ([b5db83c](https://github.com/ionic-team/stencil/commit/b5db83cfe933c6bfbe47aa7d1bd2b131f14f5a23)))
+* **cli:** update configuration flag defaults for V3 ([#3502](https://github.com/ionic-team/stencil/issues/3502)) ([7241968](https://github.com/ionic-team/stencil/commit/72419685e993935380349be27e4ed1fd9fac9d8b))
+* **compiler:** export custom types in compiled output ([#3710](https://github.com/ionic-team/stencil/issues/3710)) ([e52489e](https://github.com/ionic-team/stencil/commit/e52489e5851f06d742bf243c553490313ccf1321))
+* **compiler** remove deprecated assetsDir field ([#3341](https://github.com/ionic-team/stencil/issues/3341)) ([eb61f89](https://github.com/ionic-team/stencil/commit/eb61f896baade0d22e04298624dd32d2886173a8))
+* **node:** drop node 12 support ([#3302](https://github.com/ionic-team/stencil/issues/3302)) ([72779d9](https://github.com/ionic-team/stencil/commit/72779d9c31318c70bce99cabb8aec14e0a088493))
+* **output_targets:** remove legacy angular target ([#3493](https://github.com/ionic-team/stencil/issues/3493)) ([62bacc8](https://github.com/ionic-team/stencil/commit/62bacc8733669b5305a81f2c4676af9df33afb77))
+* **output_targets:** remove `dist-custom-elements-bundle` ([#3579](https://github.com/ionic-team/stencil/pull/3579)) ([3c97c0f](https://github.com/ionic-team/stencil/commit/3c97c0f61142dcb4d2d0dcfa92766493a0f307d3))
+* **output_targets:** add `CustomElementExportBehavior` to `dist-custom-elements` ([#3562](https://github.com/ionic-team/stencil/issues/3562)) ([c9a9366](https://github.com/ionic-team/stencil/commit/c9a936637acbf8a3244cd4266e1559f458bae19e))
+* **output_targets:** add `defineCustomElements` method & signature typedef to `dist-custom-elements` ([#3619](https://github.com/ionic-team/stencil/issues/3619)) ([7521e17](https://github.com/ionic-team/stencil/commit/7521e17c9b106dda60debfd02d80b9e90328e9ce))
+* **output_targets:** moves `autoDefineCustomElements` to an export behavior for `dist-custom-elements` ([#3615](https://github.com/ionic-team/stencil/issues/3615)) ([6b60ef3](https://github.com/ionic-team/stencil/commit/6b60ef34f0de17cf9328c30bd0cd004fb0ce0995))
+* **testing:** puppeteer v10 support ([#2934](https://github.com/ionic-team/stencil/issues/2934)) ([0c09aaa](https://github.com/ionic-team/stencil/commit/0c09aaacca8a1164e254edc58a7cc0357fb42fde))
+* **testing:** update puppeteer supported version ranges ([#3321](https://github.com/ionic-team/stencil/issues/3321)) ([81ab42f](https://github.com/ionic-team/stencil/commit/81ab42fb0152250c245fb7bde33b65ce875d9f8f))
+
+
+### BREAKING CHANGES
+
+See [BREAKING_CHANGES.md - v3.0.0](./BREAKING_CHANGES.md#stencil-v300) for a comprehensive list of breaking changes.
+
+See [the v3.0.0 Migration Guide](https://stenciljs.com/docs/upgrading-to-stencil-3) for a guide to migrate to Stencil v3.0.0.
+
+
+
 ## 🎈 [2.22.2](https://github.com/ionic-team/stencil/compare/v2.22.1...v2.22.2) (2023-01-23)
 
 
