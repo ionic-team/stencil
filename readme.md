@@ -25,7 +25,7 @@
     <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs welcome!" />
   </a>
   <a href="https://twitter.com/stenciljs">
-    <img src="https://img.shields.io/twitter/follow/stenciljs.svg?label=Follow%20@stenciljs" alt="Follow @stenciljs">
+    <img src="https://img.shields.io/badge/follow-%40stenciljs-1DA1F2?logo=twitter" alt="Follow @stenciljs">
   </a>
 </p>
 
