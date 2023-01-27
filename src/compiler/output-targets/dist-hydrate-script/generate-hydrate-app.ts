@@ -136,7 +136,9 @@ const getHydrateBuildConditionals = (config: d.ValidatedConfig, cmps: d.Componen
   build.cloneNodeFix = false;
   build.appendChildSlotFix = false;
   build.slotChildNodesFix = false;
+  // TODO(STENCIL-663): Remove code related to deprecated `safari10` field.
   build.safari10 = false;
+  // TODO(STENCIL-662): Remove code related to deprecated shadowDomShim field
   build.shadowDomShim = false;
 
   return build;

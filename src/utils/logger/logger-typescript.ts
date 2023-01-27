@@ -102,22 +102,24 @@ export const loadTypeScriptDiagnostics = (tsDiagnostics: readonly Diagnostic[]) 
  */
 export const loadTypeScriptDiagnostic = (tsDiagnostic: Diagnostic): d.Diagnostic => {
   const d: d.Diagnostic = {
-    level: 'warn',
-    type: 'typescript',
-    language: 'typescript',
-    header: 'TypeScript',
+    absFilePath: undefined,
     code: tsDiagnostic.code.toString(),
-    messageText: flattenDiagnosticMessageText(tsDiagnostic, tsDiagnostic.messageText),
-    relFilePath: null,
-    absFilePath: null,
+    columnNumber: undefined,
+    header: 'TypeScript',
+    language: 'typescript',
+    level: 'warn',
+    lineNumber: undefined,
     lines: [],
+    messageText: flattenDiagnosticMessageText(tsDiagnostic, tsDiagnostic.messageText),
+    relFilePath: undefined,
+    type: 'typescript',
   };
 
   if (tsDiagnostic.category === 1) {
     d.level = 'error';
   }
 
-  if (tsDiagnostic.file) {
+  if (tsDiagnostic.file && typeof tsDiagnostic.start === 'number') {
     d.absFilePath = tsDiagnostic.file.fileName;
 
     const sourceText = tsDiagnostic.file.text;
@@ -130,7 +132,7 @@ export const loadTypeScriptDiagnostic = (tsDiagnostic: Diagnostic): d.Diagnostic
       lineNumber: posData.line + 1,
       text: srcLines[posData.line],
       errorCharStart: posData.character,
-      errorLength: Math.max(tsDiagnostic.length, 1),
+      errorLength: Math.max(tsDiagnostic.length ?? 0, 1),
     };
 
     d.lineNumber = errorLine.lineNumber;

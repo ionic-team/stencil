@@ -345,19 +345,6 @@ describe('validation', () => {
     expect(validated.diagnostics).toHaveLength(1);
   });
 
-  it('should warn when dist-custom-elements-bundle is found', () => {
-    userConfig.outputTargets = [
-      {
-        type: 'dist-custom-elements-bundle',
-      },
-    ];
-    const validated = validateConfig(userConfig, bootstrapConfig);
-    expect(validated.diagnostics).toHaveLength(1);
-    expect(validated.diagnostics[0].messageText).toBe(
-      'dist-custom-elements-bundle is deprecated and will be removed in a future major version release. Use "dist-custom-elements" instead. If "dist-custom-elements" does not meet your needs, please add a comment to https://github.com/ionic-team/stencil/issues/3136.'
-    );
-  });
-
   it('should default outputTargets with www', () => {
     const { config } = validateConfig(userConfig, bootstrapConfig);
     expect(config.outputTargets.some((o) => o.type === 'www')).toBe(true);
@@ -367,12 +354,16 @@ describe('validation', () => {
     const { config } = validateConfig(userConfig, bootstrapConfig);
     expect(config.extras.appendChildSlotFix).toBe(false);
     expect(config.extras.cloneNodeFix).toBe(false);
-    expect(config.extras.cssVarsShim).toBe(false);
-    expect(config.extras.dynamicImportShim).toBe(false);
+    // TODO(STENCIL-659): Remove code implementing the CSS variable shim
+    expect(config.extras.__deprecated__cssVarsShim).toBe(false);
+    // TODO(STENCIL-661): Remove code related to the dynamic import shim
+    expect(config.extras.__deprecated__dynamicImportShim).toBe(false);
     expect(config.extras.lifecycleDOMEvents).toBe(false);
-    expect(config.extras.safari10).toBe(false);
+    // TODO(STENCIL-663): Remove code related to deprecated `safari10` field.
+    expect(config.extras.__deprecated__safari10).toBe(false);
     expect(config.extras.scriptDataOpts).toBe(false);
-    expect(config.extras.shadowDomShim).toBe(false);
+    // TODO(STENCIL-662): Remove code related to deprecated shadowDomShim field
+    expect(config.extras.__deprecated__shadowDomShim).toBe(false);
     expect(config.extras.slotChildNodesFix).toBe(false);
     expect(config.extras.initializeNextTick).toBe(false);
     expect(config.extras.tagNameTransform).toBe(false);
@@ -430,9 +421,9 @@ describe('validation', () => {
       expect(config.sourceMap).toBe(false);
     });
 
-    it('defaults the field to false when not set in the config', () => {
+    it('defaults the field to true when not set in the config', () => {
       const { config } = validateConfig(userConfig, bootstrapConfig);
-      expect(config.sourceMap).toBe(false);
+      expect(config.sourceMap).toBe(true);
     });
   });
 

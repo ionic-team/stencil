@@ -1,5 +1,5 @@
 import type { ConfigFlags } from '../cli/config-flags';
-import type { PrerenderUrlResults } from '../internal';
+import type { PrerenderUrlResults, PrintLine } from '../internal';
 import type { JsonDocs } from './stencil-public-docs';
 
 export * from './stencil-public-docs';
@@ -173,7 +173,7 @@ export interface StencilConfig {
    * type of CSS properties and values are assigned before and after hydrating. This config
    * can also be used to not include the hydrated flag at all by setting it to `null`.
    */
-  hydratedFlag?: HydratedFlag;
+  hydratedFlag?: HydratedFlag | null;
 
   /**
    * Ionic prefers to hide all components prior to hydration with a style tag appended
@@ -267,17 +267,24 @@ export interface ConfigExtras {
    */
   cloneNodeFix?: boolean;
 
+  // TODO(STENCIL-659): Remove code implementing the CSS variable shim
   /**
    * Include the CSS Custom Property polyfill/shim for legacy browsers. ESM builds will
    * not include the css vars shim. Defaults to `false`
+   *
+   * @deprecated Since Stencil v3.0.0. IE 11, Edge <= 18, and old Safari
+   * versions are no longer supported.
    */
-  cssVarsShim?: boolean;
+  __deprecated__cssVarsShim?: boolean;
 
+  // TODO(STENCIL-661): Remove code related to the dynamic import shim
   /**
-   * Dynamic `import()` shim. This is only needed for Edge 18 and below, and Firefox 67
-   * and below. Defaults to `false`.
+   * Dynamic `import()` shim. This is only needed for Edge 18 and below, and
+   * Firefox 67 and below. Defaults to `false`.
+   * @deprecated Since Stencil v3.0.0. IE 11, Edge <= 18, and old Safari
+   * versions are no longer supported.
    */
-  dynamicImportShim?: boolean;
+  __deprecated__dynamicImportShim?: boolean;
 
   /**
    * Experimental flag. Projects that use a Stencil library built using the `dist` output target may have trouble lazily
@@ -292,13 +299,16 @@ export interface ConfigExtras {
    */
   lifecycleDOMEvents?: boolean;
 
+  // TODO(STENCIL-663): Remove code related to deprecated `safari10` field.
   /**
    * Safari 10 supports ES modules with `<script type="module">`, however, it did not implement
    * `<script nomodule>`. When set to `true`, the runtime will patch support for Safari 10
    * due to its lack of `nomodule` support.
    * Defaults to `false`.
+   *
+   * @deprecated Since Stencil v3.0.0, Safari 10 is no longer supported.
    */
-  safari10?: boolean;
+  __deprecated__safari10?: boolean;
 
   /**
    * It is possible to assign data to the actual `<script>` element's `data-opts` property,
@@ -313,13 +323,17 @@ export interface ConfigExtras {
    */
   scopedSlotTextContentFix?: boolean;
 
+  // TODO(STENCIL-662): Remove code related to deprecated shadowDomShim field
   /**
    * If enabled `true`, the runtime will check if the shadow dom shim is required. However,
    * if it's determined that shadow dom is already natively supported by the browser then
    * it does not request the shim. When set to `false` it will avoid all shadow dom tests.
    * Defaults to `false`.
+   *
+   * @deprecated Since Stencil v3.0.0. IE 11, Edge <= 18, and old Safari versions
+   * are no longer supported.
    */
-  shadowDomShim?: boolean;
+  __deprecated__shadowDomShim?: boolean;
 
   /**
    * When a component is first attached to the DOM, this setting will wait a single tick before
@@ -410,7 +424,15 @@ type RequireFields<T, K extends keyof T> = T & { [P in K]-?: T[P] };
 /**
  * Fields in {@link Config} to make required for {@link ValidatedConfig}
  */
-type StrictConfigFields = 'flags' | 'logger' | 'outputTargets' | 'rootDir' | 'sys' | 'testing';
+type StrictConfigFields =
+  | 'flags'
+  | 'hydratedFlag'
+  | 'logger'
+  | 'outputTargets'
+  | 'packageJsonFilePath'
+  | 'rootDir'
+  | 'sys'
+  | 'testing';
 
 /**
  * A version of {@link Config} that makes certain fields required. This type represents a valid configuration entity.
@@ -921,7 +943,7 @@ export interface CompilerSystem {
   /**
    * Add a callback which will be ran when destroy() is called.
    */
-  addDestory(cb: () => void): void;
+  addDestroy(cb: () => void): void;
   /**
    * Always returns a boolean, does not throw.
    */
@@ -1063,7 +1085,7 @@ export interface CompilerSystem {
   /**
    * Remove a callback which will be ran when destroy() is called.
    */
-  removeDestory(cb: () => void): void;
+  removeDestroy(cb: () => void): void;
   /**
    * Rename old path to new path. Does not throw.
    */
@@ -2023,6 +2045,35 @@ export interface OutputTargetBaseNext {
   dir?: string;
 }
 
+/**
+ * The collection of valid export behaviors.
+ * Used to generate a type for typed configs as well as output target validation
+ * for the `dist-custom-elements` output target.
+ *
+ * Adding a value to this const array will automatically add it as a valid option on the
+ * output target configuration for `customElementsExportBehavior`.
+ *
+ * - `default`: No additional export or definition behavior will happen.
+ * - `auto-define-custom-elements`: Enables the auto-definition of a component and its children (recursively) in the custom elements registry. This
+ * functionality allows consumers to bypass the explicit call to define a component, its children, its children's
+ * children, etc. Users of this flag should be aware that enabling this functionality may increase bundle size.
+ * - `bundle`: A `defineCustomElements` function will be exported from the distribution directory. This behavior was added to allow easy migration
+ * from `dist-custom-elements-bundle` to `dist-custom-elements`.
+ * - `single-export-module`: All components will be re-exported from the specified directory's root `index.js` file.
+ */
+export const CustomElementsExportBehaviorOptions = [
+  'default',
+  'auto-define-custom-elements',
+  'bundle',
+  'single-export-module',
+] as const;
+
+/**
+ * This type is auto-generated based on the values in `CustomElementsExportBehaviorOptions` array.
+ * This is used on the output target config for intellisense in typed configs.
+ */
+export type CustomElementsExportBehavior = (typeof CustomElementsExportBehaviorOptions)[number];
+
 export interface OutputTargetDistCustomElements extends OutputTargetBaseNext {
   type: 'dist-custom-elements';
   empty?: boolean;
@@ -2034,19 +2085,18 @@ export interface OutputTargetDistCustomElements extends OutputTargetBaseNext {
    */
   externalRuntime?: boolean;
   copy?: CopyTask[];
-  inlineDynamicImports?: boolean;
   includeGlobalScripts?: boolean;
   minify?: boolean;
-  /**
-   * Enables the auto-definition of a component and its children (recursively) in the custom elements registry. This
-   * functionality allows consumers to bypass the explicit call to define a component, its children, its children's
-   * children, etc. Users of this flag should be aware that enabling this functionality may increase bundle size.
-   */
-  autoDefineCustomElements?: boolean;
   /**
    * Enables the generation of type definition files for the output target.
    */
   generateTypeDeclarations?: boolean;
+  /**
+   * Define the export/definition behavior for the output target's generated output.
+   * This controls if/how custom elements will be defined or where components will be exported from.
+   * If omitted, no auto-definition behavior or re-exporting will happen.
+   */
+  customElementsExportBehavior?: CustomElementsExportBehavior;
 }
 
 export interface OutputTargetDistCustomElementsBundle extends OutputTargetBaseNext {
@@ -2054,7 +2104,6 @@ export interface OutputTargetDistCustomElementsBundle extends OutputTargetBaseNe
   empty?: boolean;
   externalRuntime?: boolean;
   copy?: CopyTask[];
-  inlineDynamicImports?: boolean;
   includeGlobalScripts?: boolean;
   minify?: boolean;
 }
@@ -2070,16 +2119,6 @@ export interface OutputTargetBase {
 }
 
 export type OutputTargetBuild = OutputTargetDistCollection | OutputTargetDistLazy;
-
-export interface OutputTargetAngular extends OutputTargetBase {
-  type: 'angular';
-
-  componentCorePackage: string;
-  directivesProxyFile?: string;
-  directivesArrayFile?: string;
-  directivesUtilsFile?: string;
-  excludeComponents?: string[];
-}
 
 export interface OutputTargetCopy extends OutputTargetBase {
   type: 'copy';
@@ -2173,7 +2212,6 @@ export interface OutputTargetWww extends OutputTargetBase {
 }
 
 export type OutputTarget =
-  | OutputTargetAngular
   | OutputTargetCopy
   | OutputTargetCustom
   | OutputTargetDist
@@ -2258,24 +2296,18 @@ export interface LoadConfigResults {
 }
 
 export interface Diagnostic {
-  level: 'error' | 'warn' | 'info' | 'log' | 'debug';
-  type: string;
+  absFilePath?: string | undefined;
+  code?: string;
+  columnNumber?: number | undefined;
+  debugText?: string;
   header?: string;
   language?: string;
+  level: 'error' | 'warn' | 'info' | 'log' | 'debug';
+  lineNumber?: number | undefined;
+  lines: PrintLine[];
   messageText: string;
-  debugText?: string;
-  code?: string;
-  absFilePath?: string;
-  relFilePath?: string;
-  lineNumber?: number;
-  columnNumber?: number;
-  lines?: {
-    lineIndex: number;
-    lineNumber: number;
-    text?: string;
-    errorCharStart: number;
-    errorLength?: number;
-  }[];
+  relFilePath?: string | undefined;
+  type: string;
 }
 
 export interface CacheStorage {

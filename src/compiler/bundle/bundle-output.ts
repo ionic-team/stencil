@@ -96,6 +96,9 @@ export const getRollupOptions = (
   const afterPlugins = config.rollupPlugins.after || [];
   const rollupOptions: RollupOptions = {
     input: bundleOpts.inputs,
+    output: {
+      inlineDynamicImports: bundleOpts.inlineDynamicImports ?? false,
+    },
 
     plugins: [
       coreResolvePlugin(config, compilerCtx, bundleOpts.platform, bundleOpts.externalRuntime),
@@ -129,7 +132,6 @@ export const getRollupOptions = (
     ],
 
     treeshake: getTreeshakeOption(config, bundleOpts),
-    inlineDynamicImports: bundleOpts.inlineDynamicImports,
     preserveEntrySignatures: bundleOpts.preserveEntrySignatures ?? 'strict',
 
     onwarn: createOnWarnFn(buildCtx.diagnostics),

@@ -1,3 +1,4 @@
+// TODO(STENCIL-561): fully delete dist-custom-elements-bundle code
 import {
   catchError,
   dashToPascalCase,
@@ -63,7 +64,6 @@ const bundleCustomElements = async (
       loader: {
         '\0core': generateEntryPoint(outputTarget, buildCtx),
       },
-      inlineDynamicImports: outputTarget.inlineDynamicImports,
       preserveEntrySignatures: 'allow-extension',
     };
 

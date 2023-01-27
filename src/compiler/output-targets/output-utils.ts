@@ -28,6 +28,7 @@ export const isOutputTargetDistCollection = (o: d.OutputTarget): o is d.OutputTa
 export const isOutputTargetDistCustomElements = (o: d.OutputTarget): o is d.OutputTargetDistCustomElements =>
   o.type === DIST_CUSTOM_ELEMENTS;
 
+// TODO(STENCIL-561): fully delete dist-custom-elements-bundle code
 export const isOutputTargetDistCustomElementsBundle = (
   o: d.OutputTarget
 ): o is d.OutputTargetDistCustomElementsBundle => o.type === DIST_CUSTOM_ELEMENTS_BUNDLE;
@@ -35,8 +36,6 @@ export const isOutputTargetDistCustomElementsBundle = (
 export const isOutputTargetCopy = (o: d.OutputTarget): o is d.OutputTargetCopy => o.type === COPY;
 
 export const isOutputTargetDistLazy = (o: d.OutputTarget): o is d.OutputTargetDistLazy => o.type === DIST_LAZY;
-
-export const isOutputTargetAngular = (o: d.OutputTarget): o is d.OutputTargetAngular => o.type === ANGULAR;
 
 export const isOutputTargetDistLazyLoader = (o: d.OutputTarget): o is d.OutputTargetDistLazyLoader =>
   o.type === DIST_LAZY_LOADER;
@@ -70,12 +69,12 @@ export const isOutputTargetDistTypes = (o: d.OutputTarget): o is d.OutputTargetD
 export const getComponentsFromModules = (moduleFiles: d.Module[]) =>
   sortBy(flatOne(moduleFiles.map((m) => m.cmps)), (c: d.ComponentCompilerMeta) => c.tagName);
 
-export const ANGULAR = 'angular';
 export const COPY = 'copy';
 export const CUSTOM = 'custom';
 export const DIST = 'dist';
 export const DIST_COLLECTION = 'dist-collection';
 export const DIST_CUSTOM_ELEMENTS = 'dist-custom-elements';
+// TODO(STENCIL-561): fully delete dist-custom-elements-bundle code
 export const DIST_CUSTOM_ELEMENTS_BUNDLE = 'dist-custom-elements-bundle';
 
 export const DIST_TYPES = 'dist-types';
@@ -104,7 +103,6 @@ export const VALID_CONFIG_OUTPUT_TARGETS = [
   DIST,
   DIST_COLLECTION,
   DIST_CUSTOM_ELEMENTS,
-  DIST_CUSTOM_ELEMENTS_BUNDLE,
   DIST_LAZY,
   DIST_HYDRATE_SCRIPT,
 
@@ -115,7 +113,6 @@ export const VALID_CONFIG_OUTPUT_TARGETS = [
   DOCS_CUSTOM,
 
   // MISC
-  ANGULAR,
   COPY,
   CUSTOM,
   STATS,

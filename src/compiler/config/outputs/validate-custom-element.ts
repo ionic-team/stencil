@@ -8,6 +8,7 @@ import type {
   OutputTargetDistTypes,
   ValidatedConfig,
 } from '../../../declarations';
+import { CustomElementsExportBehaviorOptions } from '../../../declarations';
 import { COPY, DIST_TYPES, isOutputTargetDistCustomElements } from '../../output-targets/output-utils';
 import { getAbsolutePath } from '../config-utils';
 import { validateCopy } from '../validate-copy';
@@ -36,6 +37,17 @@ export const validateCustomElement = (
     }
     if (!isBoolean(outputTarget.externalRuntime)) {
       outputTarget.externalRuntime = true;
+    }
+    if (!isBoolean(outputTarget.generateTypeDeclarations)) {
+      outputTarget.generateTypeDeclarations = true;
+    }
+    // Export behavior must be defined on the validated target config and must
+    // be one of the export behavior valid values
+    if (
+      outputTarget.customElementsExportBehavior == null ||
+      !CustomElementsExportBehaviorOptions.includes(outputTarget.customElementsExportBehavior)
+    ) {
+      outputTarget.customElementsExportBehavior = 'default';
     }
 
     // unlike other output targets, Stencil does not allow users to define the output location of types at this time

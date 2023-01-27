@@ -71,7 +71,7 @@ export const createTsBuildProgram = async (
     },
   };
 
-  config.sys.addDestory(() => tsWatchSys.clearTimeout(currentBuildTimeoutId));
+  config.sys.addDestroy(() => tsWatchSys.clearTimeout(currentBuildTimeoutId));
 
   /**
    * Create a {@link ts.WatchCompilerHost}. A CompilerHost allows a {@link ts.Program} to interact with the

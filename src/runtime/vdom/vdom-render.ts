@@ -192,6 +192,21 @@ const putBackInOriginalLocation = (parentElm: Node, recursive: boolean) => {
   plt.$flags$ &= ~PLATFORM_FLAGS.isTmpDisconnected;
 };
 
+/**
+ * Create DOM nodes corresponding to a list of {@link d.Vnode} objects and
+ * add them to the DOM in the appropriate place.
+ *
+ * @param parentElm the DOM node which should be used as a parent for the new
+ * DOM nodes
+ * @param before a child of the `parentElm` which the new children should be
+ * inserted before (optional)
+ * @param parentVNode the parent virtual DOM node
+ * @param vnodes the new child virtual DOM nodes to produce DOM nodes for
+ * @param startIdx the index in the child virtual DOM nodes at which to start
+ * creating DOM nodes (inclusive)
+ * @param endIdx the index in the child virtual DOM nodes at which to stop
+ * creating DOM nodes (inclusive)
+ */
 const addVnodes = (
   parentElm: d.RenderNode,
   before: d.RenderNode,
@@ -217,6 +232,19 @@ const addVnodes = (
   }
 };
 
+/**
+ * Remove the DOM elements corresponding to a list of {@link d.VNode} objects.
+ * This can be used to, for instance, clean up after a list of children which
+ * should no longer be shown.
+ *
+ * This function also handles some of Stencil's slot relocation logic.
+ *
+ * @param vnodes a list of virtual DOM nodes to remove
+ * @param startIdx the index at which to start removing nodes (inclusive)
+ * @param endIdx the index at which to stop removing nodes (inclusive)
+ * @param vnode a VNode
+ * @param elm an element
+ */
 const removeVnodes = (vnodes: d.VNode[], startIdx: number, endIdx: number, vnode?: d.VNode, elm?: d.RenderNode) => {
   for (; startIdx <= endIdx; ++startIdx) {
     if ((vnode = vnodes[startIdx])) {
@@ -503,7 +531,8 @@ const updateChildren = (parentElm: d.RenderNode, oldCh: d.VNode[], newVNode: d.V
  *
  * So, in other words, if `key` attrs are not set on VNodes which may be
  * changing order within a `children` array or something along those lines then
- * we could obtain a false positive and then have to do needless re-rendering.
+ * we could obtain a false negative and then have to do needless re-rendering
+ * (i.e. we'd say two VNodes aren't equal when in fact they should be).
  *
  * @param leftVNode the first VNode to check
  * @param rightVNode the second VNode to check
@@ -761,6 +790,18 @@ interface RelocateNodeData {
   $nodeToRelocate$: d.RenderNode;
 }
 
+/**
+ * The main entry point for Stencil's virtual DOM-based rendering engine
+ *
+ * Given a {@link d.HostRef} container and some virtual DOM nodes, this
+ * function will handle creating a virtual DOM tree with a single root, patching
+ * the current virtual DOM tree onto an old one (if any), dealing with slot
+ * relocation, and reflecting attributes.
+ *
+ * @param hostRef data needed to root and render the virtual DOM tree, such as
+ * the DOM node into which it should be rendered.
+ * @param renderFnResults the virtual DOM nodes to be rendered
+ */
 export const renderVdom = (hostRef: d.HostRef, renderFnResults: d.VNode | d.VNode[]) => {
   const hostElm = hostRef.$hostElement$;
   const cmpMeta = hostRef.$cmpMeta$;

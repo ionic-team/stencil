@@ -128,7 +128,8 @@ export const optimizeModule = async (
 export const getTerserOptions = (config: Config, sourceTarget: SourceTarget, prettyOutput: boolean): MinifyOptions => {
   const opts: MinifyOptions = {
     ie8: false,
-    safari10: !!config.extras.safari10,
+    // TODO(STENCIL-663): Remove code related to deprecated `safari10` field.
+    safari10: !!config.extras.__deprecated__safari10,
     format: {},
     sourceMap: config.sourceMap,
   };

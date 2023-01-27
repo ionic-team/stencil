@@ -64,8 +64,9 @@ export function generateBuildStats(
     }
   } catch (e: unknown) {
     const diagnostic: d.Diagnostic = {
-      messageText: `Generate Build Stats Error: ` + e,
       level: `error`,
+      lines: [],
+      messageText: `Generate Build Stats Error: ` + e,
       type: `build`,
     };
     jsonData = {
