@@ -561,12 +561,12 @@ export interface FunctionalComponent<T = {}> {
  * {@link FunctionalUtilities}).
  */
 export interface ChildNode {
-  vtag?: string | number | Function;
-  vkey?: string | number;
-  vtext?: string;
-  vchildren?: VNode[];
+  vtag?: string | number | Function | null;
+  vkey?: string | number | null;
+  vtext?: string | null;
+  vchildren?: VNode[] | null;
   vattrs?: any;
-  vname?: string;
+  vname?: string | null;
 }
 
 /**
@@ -620,13 +620,13 @@ export declare function h(sel: any, data: VNodeData | null, children: VNode): VN
  */
 export interface VNode {
   $flags$: number;
-  $tag$: string | number | Function;
+  $tag$: string | number | Function | null;
   $elm$: any;
-  $text$: string;
-  $children$: VNode[];
+  $text$: string | null;
+  $children$: VNode[] | null;
   $attrs$?: any;
-  $name$?: string;
-  $key$?: string | number;
+  $name$?: string | null;
+  $key$?: string | number | null;
 }
 
 export interface VNodeData {

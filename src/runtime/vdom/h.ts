@@ -191,7 +191,7 @@ const convertToPrivate = (node: d.ChildNode): d.VNode => {
     return h(node.vtag, vnodeData, ...(node.vchildren || []));
   }
 
-  const vnode = newVNode(node.vtag as any, node.vtext);
+  const vnode = newVNode(node.vtag as any, node.vtext ?? null);
   vnode.$attrs$ = node.vattrs;
   vnode.$children$ = node.vchildren;
   vnode.$key$ = node.vkey;
