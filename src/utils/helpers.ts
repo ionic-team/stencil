@@ -42,8 +42,6 @@ export const toCamelCase = (str: string) => {
 /**
  * Capitalize the first letter of a string
  *
- * `toTitleCase('foo') => 'Foo'
- *
  * @param str the string to capitalize
  * @returns a capitalized string
  */
@@ -107,7 +105,7 @@ export const flatOne = <T>(array: T[][]): T[] => {
 };
 
 /**
- * De-duplicate an array, retaining items at the earliest position in which
+ * Deduplicate an array, retaining items at the earliest position in which
  * they appear.
  *
  * So `unique([1,3,2,1,1,4])` would be `[1,3,2,4]`.
@@ -133,7 +131,7 @@ export const unique = <T, K>(array: T[], predicate: (item: T) => K = (i) => i as
 };
 
 /**
- * A utility for building an object from an interable very similar to
+ * A utility for building an object from an iterable very similar to
  * `Object.fromEntries`
  *
  * @param entries an iterable object holding entries (key-value tuples) to
