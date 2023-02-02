@@ -74,8 +74,8 @@ export const isComplexType = (o: unknown): boolean => {
  * unfortunately does)
  *
  * @param array the array you'd like to sort
- * @prop a function for deriving sortable values (strings or numbers) from
- * array members
+ * @param prop a function for deriving sortable values (strings or numbers)
+ * from array members
  * @returns a new array of all items `x` in `array` ordered by `prop(x)`
  */
 export const sortBy = <T>(array: T[], prop: (item: T) => string | number): T[] => {
