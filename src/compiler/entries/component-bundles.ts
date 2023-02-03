@@ -72,7 +72,7 @@ export function generateComponentBundles(
   const usedComponents = computeUsedComponents(config, defaultBundles, components);
 
   if (config.devMode) {
-    // return only components used in the
+    // return only components used in the build
     return components
       .filter((c: d.ComponentCompilerMeta) => usedComponents.has(c.tagName))
       .map((cmp: d.ComponentCompilerMeta) => [cmp]);
