@@ -31,6 +31,9 @@ updates:
         versions: ['>7.3.3']
       - dependency-name: '@types/inquirer'
         versions: ['>7.3.1']
+      # TODO(STENCIL-716): remove this once Stencil drops support for Node 14
+      - dependency-name: '@types/fs-extra'
+        versions: ['>=10']
   - package-ecosystem: 'npm'
     directory: './test/bundler' # Location of package manifests
     schedule:
