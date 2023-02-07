@@ -244,6 +244,9 @@ export interface StencilConfig {
    * is updated, it will not trigger a re-run of tests.
    */
   watchIgnoredRegex?: RegExp | RegExp[];
+  /**
+   * Set whether unused dependencies should be excluded from the built output.
+   */
   excludeUnusedDependencies?: boolean;
   stencilCoreResolvedId?: string;
 }
