@@ -1234,6 +1234,7 @@ export interface HostElement extends HTMLElement {
   __innerHTML?: string;
   __innerText?: string;
   __textContent?: string;
+  __insertBefore?: <T extends Node>(node: T, child: Node | null) => T;
   __append?: (...nodes: (Node | string)[]) => void;
   __prepend?: (...nodes: (Node | string)[]) => void;
   __appendChild?: <T extends Node>(newChild: T) => T;

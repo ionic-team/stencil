@@ -150,7 +150,7 @@ export function createCustomElement(customElements: MockCustomElementRegistry, o
 
   proxyElements.set(host, elm);
 
-  return host;
+  return elm;
 }
 
 const proxyElements = new WeakMap();

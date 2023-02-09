@@ -7,7 +7,7 @@ import { initializeClientHydrate } from './client-hydrate';
 import { fireConnectedCallback, initializeComponent } from './initialize-component';
 import { createTime } from './profile';
 import { HYDRATE_ID, NODE_TYPE, PLATFORM_FLAGS } from './runtime-constants';
-import { addStyle } from './styles';
+import { addStyle, getScopeId } from './styles';
 import { attachToAncestor } from './update-component';
 
 export const connectedCallback = (elm: d.HostElement) => {
@@ -34,6 +34,9 @@ export const connectedCallback = (elm: d.HostElement) => {
               ? addStyle(elm.shadowRoot, cmpMeta, elm.getAttribute('s-mode'))
               : addStyle(elm.shadowRoot, cmpMeta);
             elm.classList.remove(scopeId + '-h', scopeId + '-s');
+          } else if (BUILD.scoped && cmpMeta.$flags$ & CMP_FLAGS.scopedCssEncapsulation) {
+            let scopeId = getScopeId(cmpMeta, BUILD.mode ? elm.getAttribute('s-mode') : undefined);
+            elm['s-sc'] = scopeId;
           }
           initializeClientHydrate(elm, cmpMeta.$tagName$, hostId, hostRef);
         }

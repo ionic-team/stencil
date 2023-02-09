@@ -1,35 +1,56 @@
 import type * as d from '../../declarations';
 import { NODE_TYPE } from '../runtime-constants';
-import { patchNodeRemove } from '../dom-extras';
+import { patchRemove } from '../dom-extras';
 
-const renderSlotFallbackContent = (sr: d.RenderNode, hide: boolean) => {
-  if (!sr['s-hsf']) return;
-  let n: d.RenderNode = sr;
+/**
+ * Show or hide a slot nodes children
+ * @param slotNode a slot node, the 'children' of which should be shown or hidden
+ * @param hide whether to hide the slot node 'children'
+ * @returns
+ */
+const renderSlotFallbackContent = (slotNode: d.RenderNode, hide: boolean) => {
+  // if this slot doesn't have fallback content, return
+  if (!slotNode['s-hsf']) return;
+  let childNode: d.RenderNode = slotNode;
 
-  while ((n = (n.previousSibling || n.parentNode) as d.RenderNode) && n.tagName !== sr['s-hn']) {
-    if (n['s-sr'] && hide && n['s-psn'] && n['s-psn'] === sr['s-sn']) {
-      renderSlotFallbackContent(n, true);
+  // in non-shadow component, slot nodes are just empty text nodes or comment nodes
+  // the 'children' nodes are therefore placed next to it.
+  // Let's keep find siblings that relate to this slot
+  while ((childNode = childNode.previousSibling as d.RenderNode) && childNode.tagName !== slotNode['s-hn']) {
+    if (childNode['s-sr'] && hide && childNode['s-psn'] && childNode['s-psn'] === slotNode['s-sn']) {
+      // if this child node is a nested slot
+      // drill into it's children to hide them in-turn
+      renderSlotFallbackContent(childNode, true);
       continue;
     }
-    if (n['s-sn'] !== sr['s-sn']) continue;
+    // this child node doesn't relate to this slot?
+    if (childNode['s-sn'] !== slotNode['s-sn']) continue;
 
-    if (n.nodeType === NODE_TYPE.ElementNode) {
-      n.hidden = hide;
-      n.style.display = hide ? 'none' : '';
-    } else if (!!n['s-sfc']) {
+    if (childNode.nodeType === NODE_TYPE.ElementNode) {
+      // we found an fallback element. Hide or show
+      childNode.hidden = hide;
+      childNode.style.display = hide ? 'none' : '';
+    } else if (!!childNode['s-sfc']) {
+      // this child has fallback text. Add or remove it
       if (hide) {
-        n['s-sfc'] = n.textContent || undefined;
-        n.textContent = '';
-      } else if (!n.textContent || n.textContent.trim() === '') {
-        n.textContent = n['s-sfc'];
+        childNode['s-sfc'] = childNode.textContent || undefined;
+        childNode.textContent = '';
+      } else if (!childNode.textContent || childNode.textContent.trim() === '') {
+        childNode.textContent = childNode['s-sfc'];
       }
     }
   }
 };
 
-export const updateFallbackSlotVisibility = (elm: d.RenderNode) => {
-  const childNodes: d.RenderNode[] = (elm as d.RenderNode).__childNodes || (elm.childNodes as any);
-  let childNode: d.RenderNode;
+/**
+ * Function applied to non-shadow component nodes to mimic native shadowDom behaviour:
+ * - When slotted node/s are not present, show `<slot>` node children
+ * - When slotted node/s *are* present, hide `<slot>` node children
+ * @param node an entry whose children to iterate over
+ */
+export const updateFallbackSlotVisibility = (node: d.RenderNode) => {
+  const childNodes: d.RenderNode[] = (node as d.RenderNode).__childNodes || (node.childNodes as any);
+  let slotNode: d.RenderNode;
   let i: number;
   let ilen: number;
   let j: number;
@@ -37,28 +58,41 @@ export const updateFallbackSlotVisibility = (elm: d.RenderNode) => {
   let nodeType: number;
 
   for (i = 0, ilen = childNodes.length; i < ilen; i++) {
-    childNode = childNodes[i];
-
-    if (childNode['s-sr']) {
-      // this is a slot fallback node
+    // slot reference node?
+    if (childNodes[i]['s-sr']) {
+      // ok, this component uses slots and we're on a slot node
+      // let's find all it's slotted children or lack thereof
+      // and show or hide fallback nodes (`<slot />` children)
 
       // get the slot name for this slot reference node
-      slotNameAttr = childNode['s-sn'];
+
+      slotNameAttr = childNodes[i]['s-sn'];
+      slotNode = childNodes[i];
 
       // by default always show a fallback slot node
-      // then hide it if there are other slots in the light dom
-      renderSlotFallbackContent(childNode, false);
+      // then hide it if there are other slotted nodes in the light dom
+      renderSlotFallbackContent(slotNode, false);
 
+      // because we found a slot fallback node let's loop over all
+      // the children again to
       for (j = 0; j < ilen; j++) {
         nodeType = childNodes[j].nodeType;
 
+        // ignore slot fallback nodes
         if (childNodes[j]['s-sf']) continue;
 
-        if (childNodes[j]['s-hn'] !== childNode['s-hn'] || slotNameAttr !== '') {
-          // this sibling node is from a different component OR is a named fallback slot node
+        // is sibling node is from a different component OR is a named fallback slot node?
+        if (childNodes[j]['s-hn'] !== slotNode['s-hn'] || slotNameAttr !== '') {
+          // you can't slot a textNode in a named slot
           if (nodeType === NODE_TYPE.ElementNode && slotNameAttr === childNodes[j]['s-sn']) {
-            renderSlotFallbackContent(childNode, true);
-            patchNodeRemove(childNodes[j]);
+            // we found a slotted element!
+            // let's hide all the fallback nodes
+            renderSlotFallbackContent(slotNode, true);
+
+            // patches this node's removal methods
+            // so if it gets removed in the future
+            // re-asses the fallback node status
+            patchRemove(childNodes[j]);
             break;
           }
         } else if (childNodes[j]['s-sn'] === slotNameAttr) {
@@ -72,14 +106,20 @@ export const updateFallbackSlotVisibility = (elm: d.RenderNode) => {
               childNodes[j].textContent &&
               (childNodes[j].textContent as string).trim() !== '')
           ) {
-            renderSlotFallbackContent(childNode, true);
-            patchNodeRemove(childNodes[j]);
+            // we found a slotted element!
+            // let's hide all the fallback nodes
+            renderSlotFallbackContent(slotNode, true);
+
+            // patches this node's removal methods
+            // so if it gets removed in the future
+            // re-asses the fallback node status
+            patchRemove(childNodes[j]);
             break;
           }
         }
       }
     }
     // keep drilling down
-    updateFallbackSlotVisibility(childNode);
+    updateFallbackSlotVisibility(childNodes[i]);
   }
 };

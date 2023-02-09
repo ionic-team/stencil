@@ -81,7 +81,7 @@ describe('hydrate, shadow child', () => {
         <cmp-b class="hydrated" c-id="1.0.0.0" s-id="2">
           <!--r.2-->
           <!--o.1.1.-->
-          <!--s.2.0.0.0.-->
+          <!--s.2.0.0.0..0.0-->
           <!--t.1.1.1.0-->
           light-dom
         </cmp-b>
@@ -102,7 +102,6 @@ describe('hydrate, shadow child', () => {
           <mock:shadow-root>
             <slot></slot>
           </mock:shadow-root>
-          <!---->
           light-dom
         </cmp-b>
       </cmp-a>
@@ -143,7 +142,7 @@ describe('hydrate, shadow child', () => {
         <cmp-b class="hydrated" c-id="1.0.0.0" s-id="2">
           <!--r.2-->
           <header c-id="2.0.0.0"></header>
-          <!--s.2.1.0.1.-->
+          <!--s.2.1.0.1..0.0-->
         </cmp-b>
       </cmp-a>
     `);
@@ -203,7 +202,7 @@ describe('hydrate, shadow child', () => {
           <!--r.2-->
           <!--t.2.0.0.0-->
           shadow-header
-          <!--s.2.1.0.1.-->
+          <!--s.2.1.0.1..0.0-->
         </cmp-b>
       </cmp-a>
     `);
@@ -263,7 +262,7 @@ describe('hydrate, shadow child', () => {
           <!--r.2-->
           <!--o.1.1.-->
           <header c-id="2.0.0.0"></header>
-          <!--s.2.1.0.1.-->
+          <!--s.2.1.0.1..0.0-->
           <!--t.1.1.1.0-->
           light-dom
         </cmp-b>
@@ -285,7 +284,6 @@ describe('hydrate, shadow child', () => {
             <header></header>
             <slot></slot>
           </mock:shadow-root>
-          <!---->
           light-dom
         </cmp-b>
       </cmp-a>
@@ -393,7 +391,7 @@ describe('hydrate, shadow child', () => {
           <!--r.2-->
           <!--o.1.1.-->
           <header c-id="2.0.0.0"></header>
-          <!--s.2.1.0.1.-->
+          <!--s.2.1.0.1..0.0-->
           <!--t.1.1.1.0-->
           light-dom
           <footer c-id="2.2.0.2"></footer>
@@ -417,7 +415,6 @@ describe('hydrate, shadow child', () => {
             <slot></slot>
             <footer></footer>
           </mock:shadow-root>
-          <!---->
           light-dom
         </cmp-b>
       </cmp-a>
@@ -474,10 +471,10 @@ describe('hydrate, shadow child', () => {
           <!--o.0.1.-->
           <!--o.0.2.-->
           <section c-id="2.0.0.0">
-            <!--s.2.1.1.0.-->
+            <!--s.2.1.1.0..0.0-->
             <!--t.0.1-->
             cmp-b-top-text
-            <cmp-c class="hydrated" c-id="0.2" s-id="3">
+            <cmp-c class="hydrated" c-id="0.2" s-id="3" s-sn="">
               <!--r.3-->
               <article c-id="3.0.0.0">
                 <!--t.3.1.1.0-->
@@ -505,9 +502,7 @@ describe('hydrate, shadow child', () => {
               <slot></slot>
             </section>
           </mock:shadow-root>
-          <!---->
           cmp-b-top-text
-          <!---->
           <cmp-c class="hydrated">
             <mock:shadow-root>
               <article>

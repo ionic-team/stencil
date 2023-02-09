@@ -43,5 +43,6 @@ export const HYDRATE_ID = 's-id';
 export const HYDRATED_STYLE_ID = 'sty-id';
 export const HYDRATE_CHILD_ID = 'c-id';
 export const HYDRATED_CSS = '{visibility:hidden}.hydrated{visibility:inherit}';
+export const HYDRATED_SLOT_FALLBACK_ID = 'sf-id';
 
 export const XLINK_NS = 'http://www.w3.org/1999/xlink';

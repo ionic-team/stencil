@@ -200,7 +200,7 @@ describe('hydrate no encapsulation', () => {
         <cmp-b class="hydrated" c-id="1.0.0.0" s-id="2">
           <!--r.2-->
           <!--o.1.1-->
-          <!--s.2.0.0.0.-->
+          <!--s.2.0.0.0..0.0-->
           <!--t.1.1.1.0-->
           light-dom
           <footer c-id="2.1.0.1"></footer>
@@ -220,8 +220,6 @@ describe('hydrate no encapsulation', () => {
         <!--r.1-->
         <cmp-b class="hydrated">
           <!--r.2-->
-          <!---->
-          <!--s.2.0.0.0.-->
           light-dom
           <footer></footer>
         </cmp-b>
@@ -265,7 +263,7 @@ describe('hydrate no encapsulation', () => {
           <!--r.2-->
           <!--o.1.1-->
           <header c-id="2.0.0.0"></header>
-          <!--s.2.1.0.1.-->
+          <!--s.2.1.0.1..0.0-->
           <!--t.1.1.1.0-->
           light-dom
         </cmp-b>
@@ -284,9 +282,7 @@ describe('hydrate no encapsulation', () => {
         <!--r.1-->
         <cmp-b class="hydrated">
           <!--r.2-->
-          <!---->
           <header></header>
-          <!--s.2.1.0.1.-->
           light-dom
         </cmp-b>
       </cmp-a>
@@ -329,7 +325,7 @@ describe('hydrate no encapsulation', () => {
           <!--r.2-->
           <!--o.1.1-->
           <header c-id="2.0.0.0"></header>
-          <!--s.2.1.0.1.-->
+          <!--s.2.1.0.1..0.0-->
           <!--t.1.1.1.0-->
           light-dom
           <footer c-id="2.2.0.2"></footer>
@@ -349,9 +345,7 @@ describe('hydrate no encapsulation', () => {
         <!--r.1-->
         <cmp-b class="hydrated">
           <!--r.2-->
-          <!---->
           <header></header>
-          <!--s.2.1.0.1.-->
           light-dom
           <footer></footer>
         </cmp-b>
@@ -403,16 +397,16 @@ describe('hydrate no encapsulation', () => {
           <!--o.1.3-->
           <!--o.1.5-->
           <header c-id="2.0.0.0"></header>
-          <!--s.2.1.0.1.top-->
-          <div c-id="1.3.1.1" slot="top">
+          <!--s.2.1.0.1.top.0.0-->
+          <div c-id="1.3.1.1" slot="top" s-sn="top">
             <!--t.1.4.2.0-->
             top light-dom
           </div>
-          <!--s.2.2.0.2.-->
+          <!--s.2.2.0.2..0.0-->
           <!--t.1.5.1.2-->
           middle light-dom
-          <!--s.2.3.0.3.bottom-->
-          <div c-id="1.1.1.0" slot="bottom">
+          <!--s.2.3.0.3.bottom.0.0-->
+          <div c-id="1.1.1.0" slot="bottom" s-sn="bottom">
             <!--t.1.2.2.0-->
             bottom light-dom
           </div>
@@ -433,17 +427,13 @@ describe('hydrate no encapsulation', () => {
         <!--r.1-->
         <cmp-b class="hydrated">
           <!--r.2-->
-          <!---->
-          <!---->
-          <!---->
           <header></header>
-          <!--s.2.1.0.1.top-->
+          <!--s.2.1.0.1.top.0.0-->
           <div slot="top">
             top light-dom
           </div>
-          <!--s.2.2.0.2.-->
           middle light-dom
-          <!--s.2.3.0.3.bottom-->
+          <!--s.2.3.0.3.bottom.0.0-->
           <div slot="bottom">
             bottom light-dom
           </div>

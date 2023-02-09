@@ -140,6 +140,7 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
       // remember the slot name, or empty string for default slot
       elm['s-sn'] = newVNode.$name$ || '';
 
+      // if this slot is nested within another, parent slot, add that slot's name
       if (newParentVNode.$name$) elm['s-psn'] = newParentVNode.$name$;
 
       if (newVNode.$flags$ & VNODE_FLAGS.isSlotFallback) {

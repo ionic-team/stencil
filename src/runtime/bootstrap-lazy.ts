@@ -10,8 +10,10 @@ import { patchCloneNode, patchPseudoShadowDom } from './dom-extras';
 import { createTime, installDevTools } from './profile';
 import { proxyComponent } from './proxy-component';
 import { HYDRATED_CSS, HYDRATED_STYLE_ID, PLATFORM_FLAGS, PROXY_FLAGS } from './runtime-constants';
-import { convertScopedToShadow, registerStyle } from './styles';
+import { convertScopedToShadow, getScopeId, registerStyle } from './styles';
 import { appDidLoad } from './update-component';
+import { computeMode } from './mode';
+
 export { setNonce } from '@platform';
 
 export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.CustomElementsDefineOptions = {}) => {
@@ -31,7 +33,6 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
   const styles = /*@__PURE__*/ doc.querySelectorAll(`[${HYDRATED_STYLE_ID}]`);
   let appLoadFallback: any;
   let isBootstrapping = true;
-  let i = 0;
 
   Object.assign(plt, options);
   plt.$resourcesUrl$ = new URL(options.resourcesUrl || './', doc.baseURI).href;
@@ -44,11 +45,6 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
     // If the app is already hydrated there is not point to disable the
     // async queue. This will improve the first input delay
     plt.$flags$ |= PLATFORM_FLAGS.appLoaded;
-  }
-  if (BUILD.hydrateClientSide && BUILD.shadowDom) {
-    for (; i < styles.length; i++) {
-      registerStyle(styles[i].getAttribute(HYDRATED_STYLE_ID), convertScopedToShadow(styles[i].innerHTML), true);
-    }
   }
 
   lazyBundles.map((lazyBundle) => {
@@ -87,6 +83,19 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
           // @ts-ignore
           super(self);
           self = this;
+
+          if (BUILD.hydrateClientSide && BUILD.shadowDom) {
+            const scopeId = getScopeId(cmpMeta, computeMode(self));
+            const style = Array.from(styles).find((style) => style.getAttribute(HYDRATED_STYLE_ID) === scopeId);
+
+            if (style) {
+              if (cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation) {
+                registerStyle(scopeId, convertScopedToShadow(style.innerHTML), true);
+              } else {
+                registerStyle(scopeId, style.innerHTML, false);
+              }
+            }
+          }
 
           registerHost(self, cmpMeta);
           if (BUILD.shadowDom && cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation) {

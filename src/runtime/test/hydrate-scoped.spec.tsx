@@ -26,7 +26,7 @@ describe('hydrate scoped', () => {
         <!--r.1-->
         <!--o.0.1.-->
         <article c-id="1.0.0.0">
-          <!--s.1.1.1.0.-->
+          <!--s.1.1.1.0..0.0-->
           <!--t.0.1-->
           88mph
         </article>
@@ -44,9 +44,7 @@ describe('hydrate scoped', () => {
     expect(clientHydrated.root).toEqualHtml(`
       <cmp-a class="hydrated">
         <!--r.1-->
-        <!---->
         <article>
-          <!--s.1.1.1.0.-->
           88mph
         </article>
       </cmp-a>
@@ -77,7 +75,7 @@ describe('hydrate scoped', () => {
         <!--r.1-->
         <!--o.0.1.c-->
         <article c-id="1.0.0.0">
-          <!--s.1.1.1.0.-->
+          <!--s.1.1.1.0..0.0-->
           <!--t.0.1-->
           88mph
         </article>
@@ -97,9 +95,7 @@ describe('hydrate scoped', () => {
     expect(clientHydrated.root).toEqualHtml(`
       <cmp-a class="hydrated">
         <!--r.1-->
-        <!---->
-        <article>
-          <!--s.1.1.1.0.-->
+        <article class="sc-cmp-a-s">
           88mph
         </article>
       </cmp-a>

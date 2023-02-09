@@ -1,5 +1,6 @@
 import { Component, forceUpdate, h, Prop } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
+import { MockNode } from '../../../mock-doc';
 
 describe('scoped slot', () => {
   it('should relocate nested default slot nodes', async () => {
@@ -464,10 +465,15 @@ describe('scoped slot', () => {
     root.msg = 'change 2';
     await waitForChanges();
 
-    expect(root.firstElementChild.nodeName).toBe('ION-CHILD');
-    expect(root.firstElementChild.firstElementChild.nodeName).toBe('BULL');
-    expect(root.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('WHALE');
-    expect(root.firstElementChild.firstElementChild.firstElementChild.textContent).toBe('change 2');
+    expect(root.firstElementChild.outerHTML).toEqualHtml(`
+    <ion-child>
+      <!---->
+      <bull>
+        <whale>
+          change 2
+        </whale>
+      </bull>
+    </ion-child>`);
   });
 
   it('should allow multiple slots with same name', async () => {
@@ -503,32 +509,50 @@ describe('scoped slot', () => {
       html: `<ion-parent></ion-parent>`,
     });
 
-    expect(root.firstElementChild.nodeName).toBe('ION-CHILD');
-    expect(root.firstElementChild.firstElementChild.nodeName).toBe('MOUSE');
-    expect(root.firstElementChild.firstElementChild.children[0].nodeName).toBe('FALCON');
-    expect(root.firstElementChild.firstElementChild.children[0].textContent).toBe('1');
-    expect(root.firstElementChild.firstElementChild.children[1].nodeName).toBe('EAGLE');
-    expect(root.firstElementChild.firstElementChild.children[1].textContent).toBe('2');
+    expect(root.firstElementChild.outerHTML).toEqualHtml(`
+    <ion-child>
+      <!---->
+      <mouse>
+        <falcon slot=\"start\">
+          1
+        </falcon>
+        <eagle slot=\"start\">
+          2
+        </eagle>
+      </mouse>
+    </ion-child>`);
 
     forceUpdate(root);
     await waitForChanges();
 
-    expect(root.firstElementChild.nodeName).toBe('ION-CHILD');
-    expect(root.firstElementChild.firstElementChild.nodeName).toBe('MOUSE');
-    expect(root.firstElementChild.firstElementChild.children[0].nodeName).toBe('FALCON');
-    expect(root.firstElementChild.firstElementChild.children[0].textContent).toBe('3');
-    expect(root.firstElementChild.firstElementChild.children[1].nodeName).toBe('EAGLE');
-    expect(root.firstElementChild.firstElementChild.children[1].textContent).toBe('4');
+    expect(root.firstElementChild.outerHTML).toEqualHtml(`
+    <ion-child>
+      <!---->
+      <mouse>
+        <falcon slot=\"start\">
+          3
+        </falcon>
+        <eagle slot=\"start\">
+          4
+        </eagle>
+      </mouse>
+    </ion-child>`);
 
     forceUpdate(root);
     await waitForChanges();
 
-    expect(root.firstElementChild.nodeName).toBe('ION-CHILD');
-    expect(root.firstElementChild.firstElementChild.nodeName).toBe('MOUSE');
-    expect(root.firstElementChild.firstElementChild.children[0].nodeName).toBe('FALCON');
-    expect(root.firstElementChild.firstElementChild.children[0].textContent).toBe('5');
-    expect(root.firstElementChild.firstElementChild.children[1].nodeName).toBe('EAGLE');
-    expect(root.firstElementChild.firstElementChild.children[1].textContent).toBe('6');
+    expect(root.firstElementChild.outerHTML).toEqualHtml(`
+    <ion-child>
+      <!---->
+      <mouse>
+        <falcon slot=\"start\">
+          5
+        </falcon>
+        <eagle slot=\"start\">
+          6
+        </eagle>
+      </mouse>
+    </ion-child>`);
   });
 
   it('should only render nested named slots and default slot', async () => {
@@ -569,44 +593,71 @@ describe('scoped slot', () => {
       html: `<ion-parent></ion-parent>`,
     });
 
-    expect(root.firstElementChild.nodeName).toBe('ION-CHILD');
-    expect(root.firstElementChild.firstElementChild.nodeName).toBe('FLAMINGO');
-    expect(root.firstElementChild.firstElementChild.children[0].nodeName).toBe('FERRET');
-    expect(root.firstElementChild.firstElementChild.children[0].textContent).toBe('3');
-    expect(root.firstElementChild.firstElementChild.children[1].nodeName).toBe('HORSE');
-    expect(root.firstElementChild.firstElementChild.children[1].children[0].nodeName).toBe('BUTTERFLY');
-    expect(root.firstElementChild.firstElementChild.children[1].children[0].textContent).toBe('1');
-    expect(root.firstElementChild.firstElementChild.children[1].children[1].nodeName).toBe('BULLFROG');
-    expect(root.firstElementChild.firstElementChild.children[1].children[1].children[0].nodeName).toBe('FOX');
-    expect(root.firstElementChild.firstElementChild.children[1].children[1].children[0].textContent).toBe('2');
+    expect(root.firstElementChild.outerHTML).toEqualHtml(`
+    <ion-child>
+      <!---->
+      <flamingo>
+        <ferret slot=\"start\">
+          3
+        </ferret>
+        <horse>
+          <butterfly>
+            1
+          </butterfly>
+          <bullfrog>
+            <fox slot=\"end\">
+              2
+            </fox>
+          </bullfrog>
+        </horse>
+      </flamingo>
+    </ion-child>`);
 
     forceUpdate(root);
     await waitForChanges();
 
-    expect(root.firstElementChild.nodeName).toBe('ION-CHILD');
-    expect(root.firstElementChild.firstElementChild.nodeName).toBe('FLAMINGO');
-    expect(root.firstElementChild.firstElementChild.children[0].nodeName).toBe('FERRET');
-    expect(root.firstElementChild.firstElementChild.children[0].textContent).toBe('6');
-    expect(root.firstElementChild.firstElementChild.children[1].nodeName).toBe('HORSE');
-    expect(root.firstElementChild.firstElementChild.children[1].children[0].nodeName).toBe('BUTTERFLY');
-    expect(root.firstElementChild.firstElementChild.children[1].children[0].textContent).toBe('4');
-    expect(root.firstElementChild.firstElementChild.children[1].children[1].nodeName).toBe('BULLFROG');
-    expect(root.firstElementChild.firstElementChild.children[1].children[1].children[0].nodeName).toBe('FOX');
-    expect(root.firstElementChild.firstElementChild.children[1].children[1].children[0].textContent).toBe('5');
+    expect(root.firstElementChild.outerHTML).toEqualHtml(`
+    <ion-child>
+      <!---->
+      <flamingo>
+        <ferret slot=\"start\">
+          6
+        </ferret>
+        <horse>
+          <butterfly>
+            4
+          </butterfly>
+          <bullfrog>
+            <fox slot=\"end\">
+              5
+            </fox>
+          </bullfrog>
+        </horse>
+      </flamingo>
+    </ion-child>`);
 
     forceUpdate(root);
     await waitForChanges();
 
-    expect(root.firstElementChild.nodeName).toBe('ION-CHILD');
-    expect(root.firstElementChild.firstElementChild.nodeName).toBe('FLAMINGO');
-    expect(root.firstElementChild.firstElementChild.children[0].nodeName).toBe('FERRET');
-    expect(root.firstElementChild.firstElementChild.children[0].textContent).toBe('9');
-    expect(root.firstElementChild.firstElementChild.children[1].nodeName).toBe('HORSE');
-    expect(root.firstElementChild.firstElementChild.children[1].children[0].nodeName).toBe('BUTTERFLY');
-    expect(root.firstElementChild.firstElementChild.children[1].children[0].textContent).toBe('7');
-    expect(root.firstElementChild.firstElementChild.children[1].children[1].nodeName).toBe('BULLFROG');
-    expect(root.firstElementChild.firstElementChild.children[1].children[1].children[0].nodeName).toBe('FOX');
-    expect(root.firstElementChild.firstElementChild.children[1].children[1].children[0].textContent).toBe('8');
+    expect(root.firstElementChild.outerHTML).toEqualHtml(`
+    <ion-child>
+      <!---->
+      <flamingo>
+        <ferret slot=\"start\">
+          9
+        </ferret>
+        <horse>
+          <butterfly>
+            7
+          </butterfly>
+          <bullfrog>
+            <fox slot=\"end\">
+              8
+            </fox>
+          </bullfrog>
+        </horse>
+      </flamingo>
+    </ion-child>`);
   });
 
   it('should allow nested default slots', async () => {
@@ -652,44 +703,56 @@ describe('scoped slot', () => {
       html: `<ion-parent></ion-parent>`,
     });
 
-    expect(root.firstElementChild.nodeName).toBe('TEST-1');
-    expect(root.firstElementChild.firstElementChild.nodeName).toBe('SEAL');
-    expect(root.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('TEST-2');
-    expect(root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('GOOSE');
-    expect(
-      root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.nodeName
-    ).toBe('GOAT');
-    expect(
-      root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.textContent
-    ).toBe('1');
+    expect(root.firstElementChild.outerHTML).toEqualHtml(`
+    <test-1>
+      <!---->
+      <seal>
+        <test-2>
+          <!---->
+          <goose>
+            <goat>
+              1
+            </goat>
+          </goose>
+        </test-2>
+      </seal>
+    </test-1>`);
 
     forceUpdate(root);
     await waitForChanges();
 
-    expect(root.firstElementChild.nodeName).toBe('TEST-1');
-    expect(root.firstElementChild.firstElementChild.nodeName).toBe('SEAL');
-    expect(root.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('TEST-2');
-    expect(root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('GOOSE');
-    expect(
-      root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.nodeName
-    ).toBe('GOAT');
-    expect(
-      root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.textContent
-    ).toBe('2');
+    expect(root.firstElementChild.outerHTML).toEqualHtml(`
+    <test-1>
+      <!---->
+      <seal>
+        <test-2>
+          <!---->
+          <goose>
+            <goat>
+              2
+            </goat>
+          </goose>
+        </test-2>
+      </seal>
+    </test-1>`);
 
     forceUpdate(root);
     await waitForChanges();
 
-    expect(root.firstElementChild.nodeName).toBe('TEST-1');
-    expect(root.firstElementChild.firstElementChild.nodeName).toBe('SEAL');
-    expect(root.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('TEST-2');
-    expect(root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('GOOSE');
-    expect(
-      root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.nodeName
-    ).toBe('GOAT');
-    expect(
-      root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.textContent
-    ).toBe('3');
+    expect(root.firstElementChild.outerHTML).toEqualHtml(`
+    <test-1>
+      <!---->
+      <seal>
+        <test-2>
+          <!---->
+          <goose>
+            <goat>
+              3
+            </goat>
+          </goose>
+        </test-2>
+      </seal>
+    </test-1>`);
   });
 
   it('should allow nested default slots w/ default slot content', async () => {
@@ -737,67 +800,28 @@ describe('scoped slot', () => {
       html: `<ion-parent></ion-parent>`,
     });
 
-    expect(root.firstElementChild.nodeName).toBe('TEST-1');
-    expect(root.firstElementChild.firstElementChild.nodeName).toBe('SEAL');
-    // expect(root.firstElementChild.firstElementChild.children[0].nodeName).toBe('SLOT-FB');
-    // expect(root.firstElementChild.firstElementChild.children[0].hasAttribute('hidden')).toBe(true);
-    // expect(root.firstElementChild.firstElementChild.children[1].nodeName).toBe('TEST-2');
-    // expect(root.firstElementChild.firstElementChild.children[1].firstElementChild.nodeName).toBe('GOOSE');
-    // expect(root.firstElementChild.firstElementChild.children[1].firstElementChild.children[0].nodeName).toBe('SLOT-FB');
-    // expect(root.firstElementChild.firstElementChild.children[1].firstElementChild.children[0].hasAttribute('hidden')).toBe(true);
-    // expect(root.firstElementChild.firstElementChild.children[1].firstElementChild.children[1].nodeName).toBe('GOAT');
-    // expect(root.firstElementChild.firstElementChild.children[1].firstElementChild.children[1].textContent).toBe('hey goat!');
-
-    // forceUpdate(root);
-    // await waitForChanges();
-
-    // expect(root.firstElementChild.nodeName).toBe('TEST-1');
-    // expect(root.firstElementChild.firstElementChild.nodeName).toBe('SEAL');
-    // expect(root.firstElementChild.firstElementChild.children[0].nodeName).toBe('SLOT-FB');
-    // expect(root.firstElementChild.firstElementChild.children[0].hasAttribute('hidden')).toBe(true);
-    // expect(root.firstElementChild.firstElementChild.children[1].nodeName).toBe('TEST-2');
-    // expect(root.firstElementChild.firstElementChild.children[1].firstElementChild.nodeName).toBe('GOOSE');
-    // expect(root.firstElementChild.firstElementChild.children[1].firstElementChild.children[0].nodeName).toBe('SLOT-FB');
-    // expect(root.firstElementChild.firstElementChild.children[1].firstElementChild.children[0].hasAttribute('hidden')).toBe(true);
-    // expect(root.firstElementChild.firstElementChild.children[1].firstElementChild.children[1].nodeName).toBe('GOAT');
-    // expect(root.firstElementChild.firstElementChild.children[1].firstElementChild.children[1].textContent).toBe('hey goat!');
-
-    // forceUpdate(root);
-    // await waitForChanges();
-
-    // expect(root.firstElementChild.nodeName).toBe('TEST-1');
-    // expect(root.firstElementChild.firstElementChild.nodeName).toBe('SEAL');
-    // expect(root.firstElementChild.firstElementChild.children[0].nodeName).toBe('SLOT-FB');
-    // expect(root.firstElementChild.firstElementChild.children[0].hasAttribute('hidden')).toBe(true);
-    // expect(root.firstElementChild.firstElementChild.children[1].nodeName).toBe('TEST-2');
-    // expect(root.firstElementChild.firstElementChild.children[1].firstElementChild.nodeName).toBe('GOOSE');
-    // expect(root.firstElementChild.firstElementChild.children[1].firstElementChild.children[0].nodeName).toBe('SLOT-FB');
-    // expect(root.firstElementChild.firstElementChild.children[1].firstElementChild.children[0].hasAttribute('hidden')).toBe(true);
-    // expect(root.firstElementChild.firstElementChild.children[1].firstElementChild.children[1].nodeName).toBe('GOAT');
-    // expect(root.firstElementChild.firstElementChild.children[1].firstElementChild.children[1].textContent).toBe('hey goat!');
-  });
-
-  it("should hide the slot's fallback content for a scoped component when slot content passed in", async () => {
-    @Component({ tag: 'fallback-test', scoped: true })
-    class ScopedFallbackSlotTest {
-      render() {
-        return (
-          <div>
-            <slot>
-              <p>Fallback Content</p>
-            </slot>
+    expect(root.outerHTML).toEqualHtml(`
+    <ion-parent>
+      <test-1>
+        <!---->
+        <seal>
+          <div hidden=\"\" style=\"display: none;\">
+            hey seal!
           </div>
-        );
-      }
-    }
-    const { root } = await newSpecPage({
-      components: [ScopedFallbackSlotTest],
-      html: `<fallback-test><span>Content</span></fallback-test>`,
-    });
-
-    expect(root.firstElementChild.children[0].nodeName).toBe('P');
-    expect(root.firstElementChild.children[0].getAttribute('hidden')).toBe('');
-    expect(root.firstElementChild.children[1].nodeName).toBe('SPAN');
+          <test-2>
+            <!---->
+            <goose>
+              <div hidden=\"\" style=\"display: none;\">
+                hey goose!
+              </div>
+              <goat>
+                hey goat!
+              </goat>
+            </goose>
+          </test-2>
+        </seal>
+      </test-1>
+    </ion-parent>`);
   });
 
   it("should hide the slot's fallback content for a non-shadow component when slot content passed in", async () => {
@@ -818,9 +842,18 @@ describe('scoped slot', () => {
       html: `<fallback-test><span>Content</span></fallback-test>`,
     });
 
-    expect(root.firstElementChild.children[0].nodeName).toBe('P');
-    expect(root.firstElementChild.children[0].getAttribute('hidden')).toBe('');
-    expect(root.firstElementChild.children[1].nodeName).toBe('SPAN');
+    expect(root.outerHTML).toEqualHtml(`
+    <fallback-test>
+      <!---->
+      <div>
+        <p hidden=\"\" style=\"display: none;\">
+          Fallback Content
+        </p>
+        <span>
+          Content
+        </span>
+      </div>
+    </fallback-test>`);
   });
 
   it('should deal appropriately with deeply nested slots', async () => {
@@ -835,7 +868,7 @@ describe('scoped slot', () => {
               <slot name="after">
                 DEFAULT AFTER
                 <p>
-                  <slot name="nested">NESTED</slot>
+                  <slot name="nested">DEFAULT NESTED</slot>
                 </p>
               </slot>
             </slot>
@@ -855,50 +888,161 @@ describe('scoped slot', () => {
       `,
     });
 
-    expect(body.children[0].firstElementChild.childNodes[0].textContent).toBe('DEFAULT BEFORE');
-    expect(body.children[0].firstElementChild.childNodes[2].textContent).toBe('DEFAULT CONTENT');
-    expect(body.children[0].firstElementChild.childNodes[4].textContent).toBe('DEFAULT AFTER');
-    expect(body.children[0].firstElementChild.childNodes[5].nodeName).toBe('P');
-    expect(body.children[0].firstElementChild.childNodes[5].getAttribute('hidden')).toBe(null);
-    expect(body.children[0].firstElementChild.childNodes[5].textContent).toBe('NESTED');
+    // nothing is slotted so all defaults should be visible
+    const fallbackTest = body.children[0];
+    expect(fallbackTest.outerHTML).toEqualHtml(`
+    <slots-in-slots-test>
+      <!---->
+      <div>
+        DEFAULT BEFORE DEFAULT CONTENT DEFAULT AFTER
+        <p>
+          DEFAULT NESTED
+        </p>
+      </div>
+    </slots-in-slots-test>`);
 
-    expect(body.children[1].firstElementChild.childNodes[0].textContent).toBe('');
-    expect(body.children[1].firstElementChild.childNodes[2].textContent).toBe('');
-    expect(body.children[1].firstElementChild.childNodes[4].textContent).toBe('');
-    expect(body.children[1].firstElementChild.childNodes[5].nodeName).toBe('P');
-    expect(body.children[1].firstElementChild.childNodes[5].getAttribute('hidden')).toBe('');
-    expect(body.children[1].firstElementChild.childNodes[8].nodeName).toBe('SPAN');
-    expect(body.children[1].firstElementChild.childNodes[8].textContent).toBe('hello');
+    // the root 'content' slot is used so all fallback slots should be empty
+    const parentSlotTest = body.children[1];
+    expect(parentSlotTest.outerHTML).toEqualHtml(`
+    <slots-in-slots-test>
+      <!---->
+      <div>
+        <p hidden=\"\" style=\"display: none;\">
+          DEFAULT NESTED
+        </p>
+        <span slot=\"content\">
+          hello
+        </span>
+      </div>
+    </slots-in-slots-test>`);
 
-    expect(body.children[2].firstElementChild.childNodes[0].textContent).toBe('');
-    expect(body.children[2].firstElementChild.childNodes[2].textContent).toBe('hello');
-    expect(body.children[2].firstElementChild.childNodes[3].textContent).toBe('DEFAULT CONTENT');
-    expect(body.children[2].firstElementChild.childNodes[5].textContent).toBe('DEFAULT AFTER');
-    expect(body.children[2].firstElementChild.childNodes[6].nodeName).toBe('P');
-    expect(body.children[2].firstElementChild.childNodes[6].getAttribute('hidden')).toBe(null);
-    expect(body.children[2].firstElementChild.childNodes[6].textContent).toBe('NESTED');
+    // just the before slot is used so fallback should be empty.
+    // the rest should have default content.
+    const beforeSlotTest = body.children[2];
+    expect(beforeSlotTest.outerHTML).toEqualHtml(`
+    <slots-in-slots-test>
+      <!---->
+      <div>
+        <span slot=\"before\">
+          hello
+        </span>
+        DEFAULT CONTENT DEFAULT AFTER
+        <p>
+          DEFAULT NESTED
+        </p>
+      </div>
+    </slots-in-slots-test>`);
 
-    expect(body.children[3].firstElementChild.childNodes[0].textContent).toBe('DEFAULT BEFORE');
-    expect(body.children[3].firstElementChild.childNodes[2].textContent).toBe('');
-    expect(body.children[3].firstElementChild.childNodes[4].textContent).toBe('hello');
-    expect(body.children[3].firstElementChild.childNodes[5].textContent).toBe('DEFAULT AFTER');
-    expect(body.children[3].firstElementChild.childNodes[6].nodeName).toBe('P');
-    expect(body.children[3].firstElementChild.childNodes[6].getAttribute('hidden')).toBe(null);
-    expect(body.children[3].firstElementChild.childNodes[6].textContent).toBe('NESTED');
+    // just the default slot is used so fallback should be empty.
+    // the rest should have default content.
+    const defaultSlotTest = body.children[3];
+    expect(defaultSlotTest.outerHTML).toEqualHtml(`
+    <slots-in-slots-test>
+      <!---->
+      <div>
+        DEFAULT BEFORE
+        <span>
+          hello
+        </span>
+        DEFAULT AFTER
+        <p>
+          DEFAULT NESTED
+        </p>
+      </div>
+    </slots-in-slots-test>`);
 
-    expect(body.children[4].firstElementChild.childNodes[0].textContent).toBe('DEFAULT BEFORE');
-    expect(body.children[4].firstElementChild.childNodes[2].textContent).toBe('DEFAULT CONTENT');
-    expect(body.children[4].firstElementChild.childNodes[4].textContent).toBe('');
-    expect(body.children[4].firstElementChild.childNodes[5].nodeName).toBe('P');
-    expect(body.children[4].firstElementChild.childNodes[5].getAttribute('hidden')).toBe('');
-    expect(body.children[4].firstElementChild.childNodes[5].textContent).toBe('NESTED');
-    expect(body.children[4].firstElementChild.childNodes[7].textContent).toBe('hello');
+    // just the after slot is used so fallback should be empty.
+    // the fallback includes the 'nested' slot whose fallback content should be hidden.
+    // the rest should show default content
+    const afterSlotTest = body.children[4];
+    expect(afterSlotTest.outerHTML).toEqualHtml(`
+    <slots-in-slots-test>
+      <!---->
+      <div>
+        DEFAULT BEFORE DEFAULT CONTENT
+        <p hidden=\"\" style=\"display: none;\">
+          DEFAULT NESTED
+        </p>
+        <span slot=\"after\">
+          hello
+        </span>
+      </div>
+    </slots-in-slots-test>`);
 
-    expect(body.children[5].firstElementChild.childNodes[0].textContent).toBe('DEFAULT BEFORE');
-    expect(body.children[5].firstElementChild.childNodes[2].textContent).toBe('DEFAULT CONTENT');
-    expect(body.children[5].firstElementChild.childNodes[4].textContent).toBe('DEFAULT AFTER');
-    expect(body.children[5].firstElementChild.childNodes[5].nodeName).toBe('P');
-    expect(body.children[5].firstElementChild.childNodes[5].getAttribute('hidden')).toBe(null);
-    expect(body.children[5].firstElementChild.childNodes[5].textContent).toBe('hello');
+    // just the nested slot is used so fallback should be empty.
+    // the rest should have default content.
+    const nestedSlotTest = body.children[5];
+    expect(nestedSlotTest.outerHTML).toEqualHtml(`
+    <slots-in-slots-test>
+      <!---->
+      <div>
+        DEFAULT BEFORE DEFAULT CONTENT DEFAULT AFTER
+        <p>
+          <span slot=\"nested\">
+            hello
+          </span>
+        </p>
+      </div>
+    </slots-in-slots-test>`);
+  });
+
+  it('Show or hide fallback content on node removal / addition', async () => {
+    @Component({ tag: 'fallback-test', shadow: false })
+    class NonShadowFallbackSlotTest {
+      render() {
+        return (
+          <div>
+            <slot>
+              <p>Fallback Content</p>
+            </slot>
+          </div>
+        );
+      }
+    }
+    const { root } = await newSpecPage({
+      components: [NonShadowFallbackSlotTest],
+      html: `<fallback-test><span>Content</span></fallback-test>`,
+    });
+
+    expect(root.outerHTML).toEqualHtml(`
+    <fallback-test>
+      <!---->
+      <div>
+        <p hidden=\"\" style=\"display: none;\">
+          Fallback Content
+        </p>
+        <span>
+          Content
+        </span>
+      </div>
+    </fallback-test>`);
+
+    const span = document.querySelector('span');
+    span.remove();
+
+    expect(root.outerHTML).toEqualHtml(`
+    <fallback-test>
+      <!---->
+      <div>
+        <p>
+          Fallback Content
+        </p>
+      </div>
+    </fallback-test>`);
+
+    document.querySelector('fallback-test').appendChild(span);
+
+    expect(root.outerHTML).toEqualHtml(`
+    <fallback-test>
+      <!---->
+      <div>
+        <p hidden=\"\" style=\"display: none;\">
+          Fallback Content
+        </p>
+        <span>
+          Content
+        </span>
+      </div>
+    </fallback-test>`);
   });
 });
