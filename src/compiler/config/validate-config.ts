@@ -1,4 +1,5 @@
 import { buildError, isBoolean, isNumber, isString, sortBy } from '@utils';
+import { join } from 'path';
 
 import { ConfigBundle, Diagnostic, LoadConfigInit, UnvalidatedConfig, ValidatedConfig } from '../../declarations';
 import { createLogger } from '../sys/logger/console-logger';
@@ -47,14 +48,17 @@ export const validateConfig = (
   const diagnostics: Diagnostic[] = [];
 
   const logger = bootstrapConfig.logger || config.logger || createLogger();
+  const rootDir = typeof config.rootDir === 'string' ? config.rootDir : '/';
 
   const validatedConfig: ValidatedConfig = {
     ...config,
     // flags _should_ be JSON safe
     flags: JSON.parse(JSON.stringify(config.flags || {})),
+    hydratedFlag: validateHydrated(config),
     logger,
     outputTargets: config.outputTargets ?? [],
-    rootDir: typeof config.rootDir === 'string' ? config.rootDir : '/',
+    packageJsonFilePath: join(rootDir, 'package.json'),
+    rootDir,
     sys: config.sys ?? bootstrapConfig.sys ?? createSystem({ logger }),
     testing: config.testing ?? {},
   };
@@ -70,12 +74,17 @@ export const validateConfig = (
 
   validatedConfig.extras = validatedConfig.extras || {};
   validatedConfig.extras.cloneNodeFix = !!validatedConfig.extras.cloneNodeFix;
-  validatedConfig.extras.cssVarsShim = !!validatedConfig.extras.cssVarsShim;
-  validatedConfig.extras.dynamicImportShim = !!validatedConfig.extras.dynamicImportShim;
+  // TODO(STENCIL-659): Remove code implementing the CSS variable shim
+  validatedConfig.extras.__deprecated__cssVarsShim = !!validatedConfig.extras.__deprecated__cssVarsShim;
+  // TODO(STENCIL-661): Remove code related to the dynamic import shim
+  validatedConfig.extras.__deprecated__dynamicImportShim = !!validatedConfig.extras.__deprecated__dynamicImportShim;
   validatedConfig.extras.lifecycleDOMEvents = !!validatedConfig.extras.lifecycleDOMEvents;
-  validatedConfig.extras.safari10 = !!validatedConfig.extras.safari10;
+  // TODO(STENCIL-663): Remove code related to deprecated `safari10` field.
+  validatedConfig.extras.__deprecated__safari10 = !!validatedConfig.extras.__deprecated__safari10;
   validatedConfig.extras.scriptDataOpts = !!validatedConfig.extras.scriptDataOpts;
-  validatedConfig.extras.shadowDomShim = !!validatedConfig.extras.shadowDomShim;
+  // TODO(STENCIL-662): Remove code related to deprecated shadowDomShim field
+  validatedConfig.extras.__deprecated__shadowDomShim = !!validatedConfig.extras.__deprecated__shadowDomShim;
+  validatedConfig.extras.slotChildNodesFix = !!validatedConfig.extras.slotChildNodesFix;
   validatedConfig.extras.initializeNextTick = !!validatedConfig.extras.initializeNextTick;
   validatedConfig.extras.tagNameTransform = !!validatedConfig.extras.tagNameTransform;
 
@@ -88,7 +97,7 @@ export const validateConfig = (
     validatedConfig,
     'sourceMap',
     null,
-    typeof validatedConfig.sourceMap === 'undefined' ? false : validatedConfig.sourceMap
+    typeof validatedConfig.sourceMap === 'undefined' ? true : validatedConfig.sourceMap
   );
   setBooleanConfig(validatedConfig, 'watch', 'watch', false);
   setBooleanConfig(validatedConfig, 'buildDocs', 'docs', !validatedConfig.devMode);
@@ -143,9 +152,6 @@ export const validateConfig = (
 
   // testing
   validateTesting(validatedConfig, diagnostics);
-
-  // hydrate flag
-  validatedConfig.hydratedFlag = validateHydrated(validatedConfig);
 
   // bundles
   if (Array.isArray(validatedConfig.bundles)) {

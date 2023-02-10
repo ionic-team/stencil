@@ -169,15 +169,19 @@ export interface BuildConditionals extends Partial<BuildFeatures> {
   cssAnnotations?: boolean;
   lazyLoad?: boolean;
   profile?: boolean;
+  // TODO(STENCIL-659): Remove code implementing the CSS variable shim
   cssVarShim?: boolean;
   constructableCSS?: boolean;
   cloneNodeFix?: boolean;
+  // TODO(STENCIL-661): Remove code related to the dynamic import shim
   dynamicImportShim?: boolean;
   hydratedAttribute?: boolean;
   hydratedClass?: boolean;
   initializeNextTick?: boolean;
+  // TODO(STENCIL-663): Remove code related to deprecated `safari10` field.
   safari10?: boolean;
   scriptDataOpts?: boolean;
+  // TODO(STENCIL-662): Remove code related to deprecated shadowDomShim field
   shadowDomShim?: boolean;
   asyncQueue?: boolean;
   transformTagName?: boolean;
@@ -1075,6 +1079,7 @@ export interface HostRuleHeader {
   value?: string;
 }
 
+// TODO(STENCIL-659): Remove code implementing the CSS variable shim
 export interface CssVarShim {
   i(): Promise<any>;
   addLink(linkEl: HTMLLinkElement): Promise<any>;
@@ -1724,6 +1729,7 @@ export interface HostRef {
 }
 
 export interface PlatformRuntime {
+  // TODO(STENCIL-659): Remove code implementing the CSS variable shim
   $cssShim$?: CssVarShim;
   $flags$: number;
   $orgLocNodes$?: Map<string, RenderNode>;
@@ -2322,6 +2328,7 @@ export interface E2EProcessEnv {
   __STENCIL_SPEC_TESTS__?: 'true';
 
   __STENCIL_PUPPETEER_MODULE__?: string;
+  __STENCIL_PUPPETEER_VERSION__?: number;
   __STENCIL_DEFAULT_TIMEOUT__?: string;
 }
 

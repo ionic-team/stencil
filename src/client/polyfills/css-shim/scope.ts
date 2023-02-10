@@ -1,3 +1,4 @@
+// TODO(STENCIL-659): Remove code implementing the CSS variable shim
 import { parse } from './css-parser';
 import { CSSScope } from './interfaces';
 import { getSelectors, getSelectorsForScopes, resolveValues } from './selectors';

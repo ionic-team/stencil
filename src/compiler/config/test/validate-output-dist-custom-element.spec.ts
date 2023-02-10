@@ -25,11 +25,70 @@ describe('validate-output-dist-custom-element', () => {
       const { config } = validateConfig(userConfig, mockLoadConfigInit());
       expect(config.outputTargets).toEqual([
         {
+          type: DIST_TYPES,
+          dir: defaultDistDir,
+          typesDir: path.join(rootDir, 'dist', 'types'),
+        },
+        {
           type: DIST_CUSTOM_ELEMENTS,
           copy: [],
           dir: defaultDistDir,
           empty: true,
           externalRuntime: true,
+          generateTypeDeclarations: true,
+          customElementsExportBehavior: 'default',
+        },
+      ]);
+    });
+
+    it('uses a provided export behavior over the default value', () => {
+      const outputTarget: d.OutputTargetDistCustomElements = {
+        type: DIST_CUSTOM_ELEMENTS,
+        customElementsExportBehavior: 'single-export-module',
+      };
+      userConfig.outputTargets = [outputTarget];
+
+      const { config } = validateConfig(userConfig, mockLoadConfigInit());
+      expect(config.outputTargets).toEqual([
+        {
+          type: DIST_TYPES,
+          dir: defaultDistDir,
+          typesDir: path.join(rootDir, 'dist', 'types'),
+        },
+        {
+          type: DIST_CUSTOM_ELEMENTS,
+          copy: [],
+          dir: defaultDistDir,
+          empty: true,
+          externalRuntime: true,
+          generateTypeDeclarations: true,
+          customElementsExportBehavior: 'single-export-module',
+        },
+      ]);
+    });
+
+    it('uses the default export behavior if the specified value is invalid', () => {
+      const outputTarget: d.OutputTargetDistCustomElements = {
+        type: DIST_CUSTOM_ELEMENTS,
+        customElementsExportBehavior: 'not-a-valid-option' as d.CustomElementsExportBehavior,
+      };
+      userConfig.outputTargets = [outputTarget];
+
+      const { config } = validateConfig(userConfig, mockLoadConfigInit());
+      expect(config.outputTargets).toEqual([
+        {
+          type: DIST_TYPES,
+          dir: defaultDistDir,
+          typesDir: path.join(rootDir, 'dist', 'types'),
+        },
+        {
+          type: DIST_CUSTOM_ELEMENTS,
+          copy: [],
+          dir: defaultDistDir,
+          empty: true,
+          externalRuntime: true,
+          generateTypeDeclarations: true,
+          customElementsExportBehavior: 'default',
         },
       ]);
     });
@@ -38,6 +97,7 @@ describe('validate-output-dist-custom-element', () => {
       const outputTarget: d.OutputTargetDistCustomElements = {
         type: DIST_CUSTOM_ELEMENTS,
         dir: distCustomElementsDir,
+        generateTypeDeclarations: false,
       };
       userConfig.outputTargets = [outputTarget];
 
@@ -49,6 +109,8 @@ describe('validate-output-dist-custom-element', () => {
           dir: path.join(rootDir, distCustomElementsDir),
           empty: true,
           externalRuntime: true,
+          generateTypeDeclarations: false,
+          customElementsExportBehavior: 'default',
         },
       ]);
     });
@@ -58,6 +120,7 @@ describe('validate-output-dist-custom-element', () => {
         const outputTarget: d.OutputTargetDistCustomElements = {
           type: DIST_CUSTOM_ELEMENTS,
           externalRuntime: false,
+          generateTypeDeclarations: false,
         };
         userConfig.outputTargets = [outputTarget];
 
@@ -69,6 +132,8 @@ describe('validate-output-dist-custom-element', () => {
             dir: defaultDistDir,
             empty: true,
             externalRuntime: false,
+            generateTypeDeclarations: false,
+            customElementsExportBehavior: 'default',
           },
         ]);
       });
@@ -78,6 +143,7 @@ describe('validate-output-dist-custom-element', () => {
           type: DIST_CUSTOM_ELEMENTS,
           empty: undefined,
           externalRuntime: false,
+          generateTypeDeclarations: false,
         };
         userConfig.outputTargets = [outputTarget];
 
@@ -89,6 +155,8 @@ describe('validate-output-dist-custom-element', () => {
             dir: defaultDistDir,
             empty: true,
             externalRuntime: false,
+            generateTypeDeclarations: false,
+            customElementsExportBehavior: 'default',
           },
         ]);
       });
@@ -99,6 +167,7 @@ describe('validate-output-dist-custom-element', () => {
         const outputTarget: d.OutputTargetDistCustomElements = {
           type: DIST_CUSTOM_ELEMENTS,
           empty: false,
+          generateTypeDeclarations: false,
         };
         userConfig.outputTargets = [outputTarget];
 
@@ -110,6 +179,8 @@ describe('validate-output-dist-custom-element', () => {
             dir: defaultDistDir,
             empty: false,
             externalRuntime: true,
+            generateTypeDeclarations: false,
+            customElementsExportBehavior: 'default',
           },
         ]);
       });
@@ -119,6 +190,7 @@ describe('validate-output-dist-custom-element', () => {
           type: DIST_CUSTOM_ELEMENTS,
           empty: false,
           externalRuntime: undefined,
+          generateTypeDeclarations: false,
         };
         userConfig.outputTargets = [outputTarget];
 
@@ -130,12 +202,67 @@ describe('validate-output-dist-custom-element', () => {
             dir: defaultDistDir,
             empty: false,
             externalRuntime: true,
+            generateTypeDeclarations: false,
+            customElementsExportBehavior: 'default',
           },
         ]);
       });
     });
 
     describe('"generateTypeDeclarations" field', () => {
+      it('defaults the "generateTypeDeclarations" field to true if not provided', () => {
+        const outputTarget: d.OutputTargetDistCustomElements = {
+          type: DIST_CUSTOM_ELEMENTS,
+          empty: false,
+        };
+        userConfig.outputTargets = [outputTarget];
+
+        const { config } = validateConfig(userConfig, mockLoadConfigInit());
+        expect(config.outputTargets).toEqual([
+          {
+            type: DIST_TYPES,
+            dir: defaultDistDir,
+            typesDir: path.join(rootDir, 'dist', 'types'),
+          },
+          {
+            type: DIST_CUSTOM_ELEMENTS,
+            copy: [],
+            dir: defaultDistDir,
+            empty: false,
+            externalRuntime: true,
+            generateTypeDeclarations: true,
+            customElementsExportBehavior: 'default',
+          },
+        ]);
+      });
+
+      it('defaults the "generateTypeDeclarations" field to true it\'s not a boolean', () => {
+        const outputTarget: d.OutputTargetDistCustomElements = {
+          type: DIST_CUSTOM_ELEMENTS,
+          empty: false,
+          generateTypeDeclarations: undefined,
+        };
+        userConfig.outputTargets = [outputTarget];
+
+        const { config } = validateConfig(userConfig, mockLoadConfigInit());
+        expect(config.outputTargets).toEqual([
+          {
+            type: DIST_TYPES,
+            dir: defaultDistDir,
+            typesDir: path.join(rootDir, 'dist', 'types'),
+          },
+          {
+            type: DIST_CUSTOM_ELEMENTS,
+            copy: [],
+            dir: defaultDistDir,
+            empty: false,
+            externalRuntime: true,
+            generateTypeDeclarations: true,
+            customElementsExportBehavior: 'default',
+          },
+        ]);
+      });
+
       it('creates a types directory when "generateTypeDeclarations" is true', () => {
         const outputTarget: d.OutputTargetDistCustomElements = {
           type: DIST_CUSTOM_ELEMENTS,
@@ -159,6 +286,7 @@ describe('validate-output-dist-custom-element', () => {
             empty: false,
             externalRuntime: false,
             generateTypeDeclarations: true,
+            customElementsExportBehavior: 'default',
           },
         ]);
       });
@@ -187,6 +315,7 @@ describe('validate-output-dist-custom-element', () => {
             empty: false,
             externalRuntime: false,
             generateTypeDeclarations: true,
+            customElementsExportBehavior: 'default',
           },
         ]);
       });
@@ -209,6 +338,7 @@ describe('validate-output-dist-custom-element', () => {
             empty: false,
             externalRuntime: false,
             generateTypeDeclarations: false,
+            customElementsExportBehavior: 'default',
           },
         ]);
       });
@@ -231,6 +361,7 @@ describe('validate-output-dist-custom-element', () => {
           dir: distCustomElementsDir,
           empty: false,
           externalRuntime: false,
+          generateTypeDeclarations: false,
         };
         userConfig.outputTargets = [outputTarget];
 
@@ -247,6 +378,8 @@ describe('validate-output-dist-custom-element', () => {
             dir: path.join(rootDir, distCustomElementsDir),
             empty: false,
             externalRuntime: false,
+            generateTypeDeclarations: false,
+            customElementsExportBehavior: 'default',
           },
         ]);
       });

@@ -30,13 +30,16 @@ import { createTestingSystem, TestingSystem } from './testing-sys';
  */
 export function mockValidatedConfig(overrides: Partial<ValidatedConfig> = {}): ValidatedConfig {
   const baseConfig = mockConfig(overrides);
+  const rootDir = path.resolve('/');
 
   return {
     ...baseConfig,
     flags: createConfigFlags(),
+    hydratedFlag: null,
     logger: mockLogger(),
     outputTargets: baseConfig.outputTargets ?? [],
-    rootDir: path.resolve('/'),
+    packageJsonFilePath: path.join(rootDir, 'package.json'),
+    rootDir,
     sys: createTestingSystem(),
     testing: {},
     ...overrides,

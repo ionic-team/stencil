@@ -10,7 +10,8 @@ export const getLazyBuildConditionals = (
 
   build.lazyLoad = true;
   build.hydrateServerSide = false;
-  build.cssVarShim = config.extras.cssVarsShim;
+  // TODO(STENCIL-659): Remove code implementing the CSS variable shim
+  build.cssVarShim = config.extras.__deprecated__cssVarsShim;
   build.transformTagName = config.extras.tagNameTransform;
   build.asyncQueue = config.taskQueue === 'congestionAsync';
   build.taskQueue = config.taskQueue !== 'immediate';

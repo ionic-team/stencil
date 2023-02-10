@@ -19,7 +19,8 @@ export const getAppBrowserCorePolyfills = async (config: d.Config, compilerCtx: 
   // read all the polyfill content, in this particular order
   const polyfills = INLINE_POLYFILLS.slice();
 
-  if (config.extras.cssVarsShim) {
+  // TODO(STENCIL-659): Remove code implementing the CSS variable shim
+  if (config.extras.__deprecated__cssVarsShim) {
     polyfills.push(INLINE_CSS_SHIM);
   }
 

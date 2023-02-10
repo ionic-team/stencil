@@ -1,11 +1,11 @@
 import {
   type html,
+  parse,
+  parseFragment,
   type ParserOptions,
   type Token,
   type TreeAdapter,
   type TreeAdapterTypeMap,
-  parse,
-  parseFragment,
 } from 'parse5';
 
 import { MockComment } from './comment-node';

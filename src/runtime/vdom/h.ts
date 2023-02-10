@@ -101,7 +101,15 @@ Empty objects can also be the cause, look for JSX comments that became objects.`
   return vnode;
 };
 
-export const newVNode = (tag: string | null, text: string | null) => {
+/**
+ * A utility function for creating a virtual DOM node from a tag and some
+ * possible text content.
+ *
+ * @param tag the tag for this element
+ * @param text possible text content for the node
+ * @returns a newly-minted virtual DOM node
+ */
+export const newVNode = (tag: string, text: string) => {
   const vnode: d.VNode = {
     $flags$: 0,
     $tag$: tag,
@@ -123,6 +131,12 @@ export const newVNode = (tag: string | null, text: string | null) => {
 
 export const Host = {};
 
+/**
+ * Check whether a given node is a Host node or not
+ *
+ * @param node the virtual DOM node to check
+ * @returns whether it's a Host node or not
+ */
 export const isHost = (node: any): node is d.VNode => node && node.$tag$ === Host;
 
 /**
@@ -137,6 +151,13 @@ const vdomFnUtils: d.FunctionalUtilities = {
   map: (children, cb) => children.map(convertToPublic).map(cb).map(convertToPrivate),
 };
 
+/**
+ * Convert a {@link d.VNode} to a {@link d.ChildNode} in order to present a
+ * friendlier public interface (hence, 'convertToPublic').
+ *
+ * @param node the virtual DOM node to convert
+ * @returns a converted child node
+ */
 const convertToPublic = (node: d.VNode): d.ChildNode => ({
   vattrs: node.$attrs$,
   vchildren: node.$children$,
@@ -146,6 +167,15 @@ const convertToPublic = (node: d.VNode): d.ChildNode => ({
   vtext: node.$text$,
 });
 
+/**
+ * Convert a {@link d.ChildNode} back to an equivalent {@link d.VNode} in
+ * order to use the resulting object in the virtual DOM. The initial object was
+ * likely created as part of presenting a public API, so converting it back
+ * involved making it 'private' again (hence, `convertToPrivate`).
+ *
+ * @param node the child node to convert
+ * @returns a converted virtual DOM node
+ */
 const convertToPrivate = (node: d.ChildNode): d.VNode => {
   if (typeof node.vtag === 'function') {
     const vnodeData = { ...node.vattrs };
@@ -171,6 +201,7 @@ const convertToPrivate = (node: d.ChildNode): d.VNode => {
 
 /**
  * Validates the ordering of attributes on an input element
+ *
  * @param inputElm the element to validate
  */
 const validateInputProperties = (inputElm: HTMLInputElement): void => {

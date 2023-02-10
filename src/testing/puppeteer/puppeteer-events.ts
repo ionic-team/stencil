@@ -122,10 +122,8 @@ export async function addE2EListener(
     callback,
   });
 
-  const executionContext = elmHandle.executionContext();
-
   // add element event listener
-  await executionContext.evaluate(
+  await elmHandle.evaluate(
     (elm: any, id: number, eventName: string) => {
       elm.addEventListener(eventName, (ev: any) => {
         (window as unknown as pd.BrowserWindow).stencilOnEvent(
@@ -134,7 +132,6 @@ export async function addE2EListener(
         );
       });
     },
-    elmHandle,
     id,
     eventName
   );

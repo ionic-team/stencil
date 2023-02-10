@@ -513,6 +513,15 @@ const getTypeReferenceLocation = (typeName: string, tsNode: ts.Node): d.Componen
   if (isExported) {
     return {
       location: 'local',
+      // If this is a local import, we know the path to the type
+      // is the same as the current source file path
+      //
+      // We need to explicitly include the path here because
+      // future logic for generating app types will use this resolved reference
+      // to ensure that type name collisions do no occur in the output type
+      // declaration file. If this path is omitted, the correct aliased type names
+      // will not be used for component event definitions
+      path: sourceFileObj.fileName,
     };
   }
 

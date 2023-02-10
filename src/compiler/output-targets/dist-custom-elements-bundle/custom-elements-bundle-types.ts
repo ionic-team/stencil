@@ -1,3 +1,4 @@
+// TODO(STENCIL-561): fully delete dist-custom-elements-bundle code
 import { dashToPascalCase, normalizePath } from '@utils';
 import { dirname, join, relative } from 'path';
 

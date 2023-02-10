@@ -90,6 +90,7 @@ const generateHydrateFactory = async (config: d.ValidatedConfig, compilerCtx: d.
           intro: HYDRATE_FACTORY_INTRO,
           outro: HYDRATE_FACTORY_OUTRO,
           preferConst: false,
+          inlineDynamicImports: true,
         });
 
         if (!buildCtx.hasError && rollupOutput != null && Array.isArray(rollupOutput.output)) {
@@ -135,6 +136,7 @@ const getHydrateBuildConditionals = (config: d.ValidatedConfig, cmps: d.Componen
   build.hotModuleReplacement = false;
   build.cloneNodeFix = false;
   build.safari10 = false;
+  // TODO(STENCIL-662): Remove code related to deprecated shadowDomShim field
   build.shadowDomShim = false;
 
   return build;

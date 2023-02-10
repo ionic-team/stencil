@@ -3,6 +3,7 @@ import { mockBuildCtx, mockCompilerCtx, mockValidatedConfig } from '@stencil/cor
 import path from 'path';
 
 import { normalizePath } from '../../../utils/normalize-path';
+// TODO(STENCIL-561): fully delete dist-custom-elements-bundle code
 import { DIST_COLLECTION, DIST_CUSTOM_ELEMENTS, DIST_CUSTOM_ELEMENTS_BUNDLE } from '../../output-targets/output-utils';
 import * as v from '../validate-build-package-json';
 
@@ -93,6 +94,7 @@ describe('validate-package-json', () => {
       expect(buildCtx.diagnostics).toHaveLength(0);
     });
 
+    // TODO(STENCIL-561): fully delete dist-custom-elements-bundle code
     it('validate custom elements bundle module', async () => {
       config.outputTargets = [
         {

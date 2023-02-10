@@ -37,8 +37,10 @@ export function resetBuildConditionals(b: d.BuildConditionals) {
   b.hydratedClass = true;
   b.invisiblePrehydration = true;
   b.cloneNodeFix = false;
+  // TODO(STENCIL-661): Remove code related to the dynamic import shim
   b.dynamicImportShim = false;
   b.hotModuleReplacement = false;
+  // TODO(STENCIL-663): Remove code related to deprecated `safari10` field.
   b.safari10 = false;
   b.scriptDataOpts = false;
 }

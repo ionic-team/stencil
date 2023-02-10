@@ -56,11 +56,14 @@ export const addStyle = (
           // This is only happening on native shadow-dom, do not needs CSS var shim
           styleElm.innerHTML = style;
         } else {
+          // TODO(STENCIL-659): Remove code implementing the CSS variable shim
           if (BUILD.cssVarShim && plt.$cssShim$) {
+            // TODO(STENCIL-659): Remove code implementing the CSS variable shim
             styleElm = plt.$cssShim$.createHostStyle(
               hostElm,
               scopeId,
               style,
+              // TODO(STENCIL-662): Remove code related to deprecated shadowDomShim field
               !!(cmpMeta.$flags$ & CMP_FLAGS.needsScopedEncapsulation)
             );
             const newScopeId = (styleElm as any)['s-sc'];
@@ -113,6 +116,7 @@ export const attachStyles = (hostRef: d.HostRef) => {
     elm
   );
 
+  // TODO(STENCIL-662): Remove code related to deprecated shadowDomShim field
   if ((BUILD.shadowDom || BUILD.scoped) && BUILD.cssAnnotations && flags & CMP_FLAGS.needsScopedEncapsulation) {
     // only required when we're NOT using native shadow dom (slot)
     // or this browser doesn't support native shadow dom

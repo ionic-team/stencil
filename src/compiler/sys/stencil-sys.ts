@@ -44,8 +44,8 @@ export const createSystem = (c?: { logger?: Logger }): CompilerSystem => {
   const items = new Map<string, FsItem>();
   const destroys = new Set<() => Promise<void> | void>();
 
-  const addDestory = (cb: () => void) => destroys.add(cb);
-  const removeDestory = (cb: () => void) => destroys.delete(cb);
+  const addDestroy = (cb: () => void) => destroys.add(cb);
+  const removeDestroy = (cb: () => void) => destroys.delete(cb);
   const events = buildEvents();
   const hardwareConcurrency = (IS_BROWSER_ENV && navigator.hardwareConcurrency) || 1;
 
@@ -301,12 +301,12 @@ export const createSystem = (c?: { logger?: Logger }): CompilerSystem => {
       error: null,
     };
 
-    remoreDirSyncRecursive(p, opts, results);
+    removeDirSyncRecursive(p, opts, results);
 
     return results;
   };
 
-  const remoreDirSyncRecursive = (
+  const removeDirSyncRecursive = (
     p: string,
     opts: CompilerSystemRemoveDirectoryOptions,
     results: CompilerSystemRemoveDirectoryResults
@@ -321,7 +321,7 @@ export const createSystem = (c?: { logger?: Logger }): CompilerSystem => {
           const item = items.get(dirItemPath);
           if (item) {
             if (item.isDirectory) {
-              remoreDirSyncRecursive(dirItemPath, opts, results);
+              removeDirSyncRecursive(dirItemPath, opts, results);
             } else if (item.isFile) {
               const removeFileResults = removeFileSync(dirItemPath);
               if (removeFileResults.error) {
@@ -407,7 +407,7 @@ export const createSystem = (c?: { logger?: Logger }): CompilerSystem => {
       }
     };
 
-    addDestory(close);
+    addDestroy(close);
 
     if (item) {
       item.isDirectory = true;
@@ -427,7 +427,7 @@ export const createSystem = (c?: { logger?: Logger }): CompilerSystem => {
 
     return {
       close() {
-        removeDestory(close);
+        removeDestroy(close);
         close();
       },
     };
@@ -447,7 +447,7 @@ export const createSystem = (c?: { logger?: Logger }): CompilerSystem => {
       }
     };
 
-    addDestory(close);
+    addDestroy(close);
 
     if (item) {
       item.isDirectory = false;
@@ -467,7 +467,7 @@ export const createSystem = (c?: { logger?: Logger }): CompilerSystem => {
 
     return {
       close() {
-        removeDestory(close);
+        removeDestroy(close);
         close();
       },
     };
@@ -586,7 +586,7 @@ export const createSystem = (c?: { logger?: Logger }): CompilerSystem => {
     events,
     access,
     accessSync,
-    addDestory,
+    addDestroy,
     copyFile,
     createDir,
     createDirSync,
@@ -611,7 +611,7 @@ export const createSystem = (c?: { logger?: Logger }): CompilerSystem => {
     readFileSync,
     realpath,
     realpathSync,
-    removeDestory,
+    removeDestroy,
     rename,
     fetch,
     resolvePath,

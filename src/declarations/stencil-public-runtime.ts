@@ -565,6 +565,14 @@ export interface FunctionalComponent<T = {}> {
   (props: T, children: VNode[], utils: FunctionalUtilities): VNode | VNode[];
 }
 
+/**
+ * A Child VDOM node
+ *
+ * This has most of the same properties as {@link VNode} but friendlier names
+ * (i.e. `vtag` instead of `$tag$`, `vchildren` instead of `$children$`) in
+ * order to provide a friendlier public interface for users of the
+ * {@link FunctionalUtilities}).
+ */
 export interface ChildNode {
   vtag?: string | number | Function;
   vkey?: string | number;
@@ -620,6 +628,9 @@ export declare function h(sel: any, data: VNodeData | null, text: string): VNode
 export declare function h(sel: any, data: VNodeData | null, children: Array<VNode | undefined | null>): VNode;
 export declare function h(sel: any, data: VNodeData | null, children: VNode): VNode;
 
+/**
+ * A virtual DOM node
+ */
 export interface VNode {
   $flags$: number;
   $tag$: string | number | Function | null;
@@ -995,8 +1006,8 @@ export namespace JSXBase {
     accept?: string;
     allowdirs?: boolean;
     alt?: string;
-    autoCapitalize?: any;
-    autocapitalize?: any;
+    autoCapitalize?: string;
+    autocapitalize?: string;
     autoComplete?: string;
     autocomplete?: string;
     autoFocus?: boolean;
@@ -1358,8 +1369,8 @@ export namespace JSXBase {
     vocab?: string;
 
     // Non-standard Attributes
-    autoCapitalize?: any;
-    autocapitalize?: any;
+    autoCapitalize?: string;
+    autocapitalize?: string;
     autoCorrect?: string;
     autocorrect?: string;
     autoSave?: string;
@@ -1671,12 +1682,12 @@ export namespace JSXBase {
     onPasteCapture?: (event: ClipboardEvent) => void;
 
     // Composition Events
-    onCompositionEnd?: (event: CompositionEvent) => void;
-    onCompositionEndCapture?: (event: CompositionEvent) => void;
-    onCompositionStart?: (event: CompositionEvent) => void;
-    onCompositionStartCapture?: (event: CompositionEvent) => void;
-    onCompositionUpdate?: (event: CompositionEvent) => void;
-    onCompositionUpdateCapture?: (event: CompositionEvent) => void;
+    onCompositionend?: (event: CompositionEvent) => void;
+    onCompositionendCapture?: (event: CompositionEvent) => void;
+    onCompositionstart?: (event: CompositionEvent) => void;
+    onCompositionstartCapture?: (event: CompositionEvent) => void;
+    onCompositionupdate?: (event: CompositionEvent) => void;
+    onCompositionupdateCapture?: (event: CompositionEvent) => void;
 
     // Focus Events
     onFocus?: (event: FocusEvent) => void;
@@ -1691,8 +1702,8 @@ export namespace JSXBase {
     // Form Events
     onChange?: (event: Event) => void;
     onChangeCapture?: (event: Event) => void;
-    onInput?: (event: Event) => void;
-    onInputCapture?: (event: Event) => void;
+    onInput?: (event: InputEvent) => void;
+    onInputCapture?: (event: InputEvent) => void;
     onReset?: (event: Event) => void;
     onResetCapture?: (event: Event) => void;
     onSubmit?: (event: Event) => void;

@@ -1,3 +1,4 @@
+// TODO(STENCIL-659): Remove code implementing the CSS variable shim
 import { CSSScope } from './interfaces';
 import { addGlobalStyle, updateGlobalScopes } from './scope';
 

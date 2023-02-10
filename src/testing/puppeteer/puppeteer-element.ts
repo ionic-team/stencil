@@ -1,4 +1,4 @@
-import type { EventInitDict, HostElement, SerializedEvent } from '@stencil/core/internal';
+import type { EventInitDict, SerializedEvent } from '@stencil/core/internal';
 import { cloneAttributes, MockHTMLElement, parseHtmlToFragment } from '@stencil/core/mock-doc';
 import type * as puppeteer from 'puppeteer';
 
@@ -72,9 +72,8 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
     let isVisible = false;
 
     try {
-      const executionContext = this._elmHandle.executionContext();
-
-      isVisible = await executionContext.evaluate((elm: HostElement) => {
+      const executionContext = getPuppeteerExecution(this._elmHandle);
+      isVisible = await executionContext.evaluate((elm: Element) => {
         return new Promise<boolean>((resolve) => {
           window.requestAnimationFrame(() => {
             if (elm.isConnected) {
@@ -167,8 +166,7 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
   async getProperty(propertyName: string) {
     this._validate();
 
-    const executionContext = this._elmHandle.executionContext();
-
+    const executionContext = getPuppeteerExecution(this._elmHandle);
     const propValue = await executionContext.evaluate(
       (elm: any, propertyName: string) => {
         return elm[propertyName];
@@ -359,7 +357,7 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
 
   async getComputedStyle(pseudoElt?: string | null) {
     const style = await this._page.evaluate(
-      (elm: HTMLElement, pseudoElt: string) => {
+      (elm: Element, pseudoElt: string) => {
         const rtn: any = {};
 
         const computedStyle = window.getComputedStyle(elm, pseudoElt);
@@ -401,10 +399,9 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
       return;
     }
 
-    const executionContext = this._elmHandle.executionContext();
-
-    const rtn = await executionContext.evaluate<unknown>(
-      (elm: HTMLElement, queuedActions: ElementAction[]) => {
+    const executionContext = getPuppeteerExecution(this._elmHandle);
+    const rtn = await executionContext.evaluate(
+      (elm: Element, queuedActions: ElementAction[]) => {
         // BROWSER CONTEXT
         // cannot use async/await in here cuz typescript transpiles it in the node context
         return (elm as any).componentOnReady().then(() => {
@@ -470,17 +467,13 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
   }
 
   async e2eSync() {
-    const executionContext = this._elmHandle.executionContext();
-
-    const { outerHTML, shadowRootHTML } = await executionContext.evaluate<{ outerHTML: any; shadowRootHTML: any }>(
-      (elm: HTMLElement) => {
-        return {
-          outerHTML: elm.outerHTML,
-          shadowRootHTML: elm.shadowRoot ? elm.shadowRoot.innerHTML : null,
-        };
-      },
-      this._elmHandle
-    );
+    const executionContext = getPuppeteerExecution(this._elmHandle);
+    const { outerHTML, shadowRootHTML } = await executionContext.evaluate((elm: Element) => {
+      return {
+        outerHTML: elm.outerHTML,
+        shadowRootHTML: elm.shadowRoot ? elm.shadowRoot.innerHTML : null,
+      };
+    }, this._elmHandle);
 
     if (typeof shadowRootHTML === 'string') {
       (this as any).shadowRoot = parseHtmlToFragment(shadowRootHTML) as any;
@@ -560,7 +553,7 @@ async function findWithCssSelector(
 
   if (shadowSelector) {
     const shadowHandle = await page.evaluateHandle(
-      (elm: HTMLElement, shadowSelector: string) => {
+      (elm: Element, shadowSelector: string) => {
         if (!elm.shadowRoot) {
           throw new Error(`shadow root does not exist for element: ${elm.tagName.toLowerCase()}`);
         }
@@ -590,7 +583,7 @@ async function findWithText(
   contains: string
 ) {
   const jsHandle = await page.evaluateHandle(
-    (rootElm: HTMLElement, text: string, contains: string) => {
+    (rootElm: Element, text: string, contains: string) => {
       let foundElm: any = null;
 
       function checkContent(elm: Node) {
@@ -653,10 +646,9 @@ export async function findAll(
   if (shadowSelector) {
     // light dom selected, then shadow dom selected inside of light dom elements
     for (let i = 0; i < lightElmHandles.length; i++) {
-      const executionContext = lightElmHandles[i].executionContext();
-
+      const executionContext = getPuppeteerExecution(lightElmHandles[i]);
       const shadowJsHandle = await executionContext.evaluateHandle(
-        (elm, shadowSelector) => {
+        (elm: Element, shadowSelector: string) => {
           if (!elm.shadowRoot) {
             throw new Error(`shadow root does not exist for element: ${elm.tagName.toLowerCase()}`);
           }
@@ -673,7 +665,7 @@ export async function findAll(
       await shadowJsHandle.dispose();
 
       for (const shadowJsProperty of shadowJsProperties.values()) {
-        const shadowElmHandle = shadowJsProperty.asElement();
+        const shadowElmHandle = shadowJsProperty.asElement() as puppeteer.ElementHandle;
         if (shadowElmHandle) {
           const elm = new E2EElement(page, shadowElmHandle);
           await elm.e2eSync();
@@ -715,6 +707,32 @@ function getSelector(selector: pd.FindSelector) {
   }
 
   return rtn;
+}
+
+/**
+ * A helper function for retrieving an execution context from a Puppeteer handle entity. The way that these objects can
+ * be retrieved changed in Puppeteer v17, requiring a check of the version of the library that is installed at runtime.
+ *
+ * This function expects that the {@link E2EProcessEnv#__STENCIL_PUPPETEER_VERSION__} be set prior to invocation. If
+ * it is not set, the function assumes an older version of Puppeteer is used.
+ *
+ * @param elmHandle the Puppeteer handle to an element
+ * @returns the execution context from the handle
+ */
+function getPuppeteerExecution(elmHandle: puppeteer.ElementHandle) {
+  const puppeteerMajorVersion = parseInt(process.env.__STENCIL_PUPPETEER_VERSION__, 10);
+  if (puppeteerMajorVersion >= 17) {
+    // in puppeteer v17, a context for executing JS can be retrieved from a frame
+    // the `any` type assertion is necessary for backwards compatability with the type checker
+    return (elmHandle as any).frame;
+  } else {
+    // in puppeteer v16 and lower, an execution context could be retrieved from a handle to execute JS
+    // the `any` type assertion is necessary for backwards compatability with the type checker
+    //
+    // if the result of `parseInt` on the puppeteer version is NaN, assume that the user is on a lower version of
+    // puppeteer
+    return (elmHandle as any).executionContext();
+  }
 }
 
 interface ElementAction {

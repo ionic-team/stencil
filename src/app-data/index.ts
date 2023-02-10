@@ -62,6 +62,7 @@ export const BUILD: BuildConditionals = {
   cloneNodeFix: false,
   hydratedAttribute: false,
   hydratedClass: true,
+  // TODO(STENCIL-663): Remove code related to deprecated `safari10` field.
   safari10: false,
   scriptDataOpts: false,
   shadowDomShim: false,
@@ -69,10 +70,12 @@ export const BUILD: BuildConditionals = {
   propBoolean: true,
   propNumber: true,
   propString: true,
+  // TODO(STENCIL-659): Remove code implementing the CSS variable shim
   cssVarShim: false,
   constructableCSS: true,
   cmpShouldUpdate: true,
   devTools: false,
+  // TODO(STENCIL-661): Remove code related to the dynamic import shim
   dynamicImportShim: false,
   shadowDelegatesFocus: true,
   initializeNextTick: false,
