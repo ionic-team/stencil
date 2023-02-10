@@ -255,7 +255,7 @@ const patchInsertBefore = (HostElementPrototype: any) => {
           found = true;
           addSlotRelocateNode(newChild, slotNode);
           if (curChild === null) {
-            this.append(newChild);
+            this.__append(newChild);
             return;
           }
 
@@ -268,7 +268,7 @@ const patchInsertBefore = (HostElementPrototype: any) => {
           } else {
             // current child is not in the same slot as 'slot before' node
             // so just toss the node in wherever
-            this.append(newChild);
+            this.__append(newChild);
           }
           return;
         }
@@ -300,7 +300,8 @@ const patchAppendChild = (HostElementPrototype: any) => {
       const appendAfter = slotChildNodes[slotChildNodes.length - 1];
 
       if (appendAfter.parentNode) {
-        appendAfter.parentNode.insertBefore(newChild, appendAfter.nextSibling);
+        const parent = appendAfter.parentNode as d.RenderNode;
+        parent.__insertBefore ? parent.__insertBefore(newChild, appendAfter.nextSibling) : parent.insertBefore(newChild, appendAfter.nextSibling);
         patchRemove(newChild);
       }
 
