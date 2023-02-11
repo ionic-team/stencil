@@ -301,7 +301,9 @@ const patchAppendChild = (HostElementPrototype: any) => {
 
       if (appendAfter.parentNode) {
         const parent = appendAfter.parentNode as d.RenderNode;
-        parent.__insertBefore ? parent.__insertBefore(newChild, appendAfter.nextSibling) : parent.insertBefore(newChild, appendAfter.nextSibling);
+        parent.__insertBefore
+          ? parent.__insertBefore(newChild, appendAfter.nextSibling)
+          : parent.insertBefore(newChild, appendAfter.nextSibling);
         patchRemove(newChild);
       }
 
@@ -479,8 +481,8 @@ export const patchNextPrev = (NodePrototype: any) => {
   NodePrototype.__nextSibling = NodePrototype.nextSibling || true;
   patchNextSibling(NodePrototype);
   patchPreviousSibling(NodePrototype);
-  patchNextSiblingElement(NodePrototype);
-  patchPreviousSiblingElement(NodePrototype);
+  patchNextElementSibling(NodePrototype);
+  patchPreviousElementSibling(NodePrototype);
 };
 
 /**
@@ -493,7 +495,7 @@ export const patchNextSibling = (NodePrototype: any) => {
   NodePrototype.__nextSibling = NodePrototype.nextSibling || true;
 
   const descriptor = Object.getOwnPropertyDescriptor(Node.prototype, 'nextSibling');
-  // MockNode won't have these
+  // MockNode might not have these
   if (descriptor) Object.defineProperty(NodePrototype, '__nextSibling', descriptor);
 
   Object.defineProperty(NodePrototype, 'nextSibling', {
@@ -509,26 +511,26 @@ export const patchNextSibling = (NodePrototype: any) => {
 };
 
 /**
- * Patches the `nextSiblingElement` accessor of a non-shadow slotted node
+ * Patches the `nextElementSibling` accessor of a non-shadow slotted node
  * @param NodePrototype the slotted node to be patched
  */
-export const patchNextSiblingElement = (NodePrototype: any) => {
-  if (!NodePrototype || NodePrototype.__nextSiblingElement) return;
+export const patchNextElementSibling = (ElementPrototype: any) => {
+  if (!ElementPrototype || ElementPrototype.__nextElementSibling) return;
 
-  NodePrototype.__nextSiblingElement = NodePrototype.nextSiblingElement || true;
+  ElementPrototype.__nextElementSibling = ElementPrototype.nextSiblingElement || true;
 
-  const descriptor = Object.getOwnPropertyDescriptor(Node.prototype, 'nextSiblingElement');
+  const descriptor = Object.getOwnPropertyDescriptor(Element.prototype, 'nextElementSibling');
   // MockNode won't have these
-  if (descriptor) Object.defineProperty(NodePrototype, '__nextSiblingElement', descriptor);
+  if (descriptor) Object.defineProperty(ElementPrototype, '__nextElementSibling', descriptor);
 
-  Object.defineProperty(NodePrototype, 'nextSiblingElement', {
+  Object.defineProperty(ElementPrototype, 'nextElementSibling', {
     get: function () {
       const parentEles = this['s-ol']?.parentNode.children;
       const index = parentEles?.indexOf(this);
       if (parentEles && index > -1) {
         return parentEles[index + 1];
       }
-      return this.__nextSiblingElement;
+      return this.__nextElementSibling;
     },
   });
 };
@@ -559,26 +561,26 @@ export const patchPreviousSibling = (NodePrototype: any) => {
 };
 
 /**
- * Patches the `previousSiblingElement` accessor of a non-shadow slotted node
- * @param NodePrototype the slotted node to be patched
+ * Patches the `previousElementSibling` accessor of a non-shadow slotted node
+ * @param ElementPrototype the slotted node to be patched
  */
-export const patchPreviousSiblingElement = (NodePrototype: any) => {
-  if (!NodePrototype || NodePrototype.__previousSiblingElement) return;
+export const patchPreviousElementSibling = (ElementPrototype: any) => {
+  if (!ElementPrototype || ElementPrototype.__previousElementSibling) return;
 
-  NodePrototype.__previousSiblingElement = NodePrototype.previousSiblingElement || true;
+  ElementPrototype.__previousElementSibling = ElementPrototype.previousSiblingElement || true;
 
-  const descriptor = Object.getOwnPropertyDescriptor(Node.prototype, 'previousSiblingElement');
+  const descriptor = Object.getOwnPropertyDescriptor(Element.prototype, 'previousElementSibling');
   // MockNode won't have these
-  if (descriptor) Object.defineProperty(NodePrototype, '__previousSiblingElement', descriptor);
-
-  Object.defineProperty(NodePrototype, 'previousSiblingElement', {
+  if (descriptor) Object.defineProperty(ElementPrototype, '__previousElementSibling', descriptor);
+  ElementPrototype;
+  Object.defineProperty(ElementPrototype, 'previousElementSibling', {
     get: function () {
       const parentNodes = this['s-ol']?.parentNode.children;
       const index = parentNodes?.indexOf(this);
       if (parentNodes && index > -1) {
         return parentNodes[index - 1];
       }
-      return this.__previousSiblingElement;
+      return this.__previousElementSibling;
     },
   });
 };

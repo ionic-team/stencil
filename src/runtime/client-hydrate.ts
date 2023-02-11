@@ -420,20 +420,42 @@ const clientHydrate = (
           if (childIdSplt[6] === '1') {
             node['s-hsf'] = true;
           }
-          // this slot node has fallback text?
-          // (if so, the previous node will be that text)
-          let textNode: d.RenderNode;
-          if (childIdSplt[7] === '1' && node.previousSibling.nodeType === NODE_TYPE.CommentNode) {
-            node['s-sfc'] = node.previousSibling.nodeValue;
 
-            // create a text node
-            textNode = doc.createTextNode(node['s-sfc']) as any as d.RenderNode;
-            textNode['s-sf'] = true;
-            textNode['s-hn'] = hostElm.tagName.toUpperCase();
+          if (childIdSplt[7] === '1') {
+            // this slot has fallback text
+            // it should be held in a comment node in the last few siblings
+            // (white-space depending)
+            let foundFallbackText = node.previousSibling;
+            while (!!foundFallbackText && foundFallbackText.nodeType !== NODE_TYPE.CommentNode) {
+              foundFallbackText = foundFallbackText.previousSibling as d.RenderNode;
+            }
 
-            // add node to our vdom tree
+            // this slot node has fallback text?
+            // (if so, the previous node comment will have that text)
+            node['s-sfc'] = foundFallbackText.nodeValue;
+
+            // if there's pre-rendered text node,
+            // remove now and let vdom-render take over creation & showing / hiding
+            let foundTextNode = foundFallbackText.previousSibling as d.RenderNode;
+            while (!!foundTextNode && foundTextNode.nodeType !== NODE_TYPE.TextNode) {
+              foundTextNode = foundTextNode.previousSibling as d.RenderNode;
+            }
+            if (
+              foundTextNode &&
+              foundTextNode.nodeType === NODE_TYPE.TextNode &&
+              foundTextNode.nodeValue.trim() === node['s-sfc']
+            ) {
+              foundTextNode.remove();
+              // foundTextNode['s-hn'] = hostElm.tagName;
+              // foundTextNode['s-sn'] = node['s-sn'];
+              // foundTextNode['s-sf'] = true;
+            }
+
+            // add to vdom tree
             const textVnode = createSimpleVNode({
-              $elm$: textNode,
+              $elm$: foundTextNode,
+              $text$: node['s-sfc'],
+              $hostId$: childIdSplt[1],
             });
             childVNode.$children$ = childVNode.$children$ || [];
             childVNode.$children$[textVnode.$index$ as any] = textVnode;

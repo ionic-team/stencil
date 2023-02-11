@@ -172,10 +172,6 @@ const insertChildVNodeAnnotations = (
     childElm.setAttribute(HYDRATE_CHILD_ID, childId);
     if (typeof childElm['s-sn'] === 'string') childElm.setAttribute('s-sn', childElm['s-sn']);
   } else if (childElm.nodeType === NODE_TYPE.TextNode) {
-    // if (!!childElm['s-sf']) {
-    //   childElm.remove();
-    //   return;
-    // }
     const parentNode = childElm.parentNode;
     const nodeName = parentNode.nodeName;
     if (nodeName !== 'STYLE' && nodeName !== 'SCRIPT') {
@@ -223,7 +219,13 @@ const insertChildVNodeAnnotations = (
   if (vnodeChild.$children$ != null) {
     const childDepth = depth + 1;
     vnodeChild.$children$.forEach((vnode, index) => {
-      insertChildVNodeAnnotations(doc, vnode, cmpData, hostId, childDepth, index);
+      // if the parent is a mock slot,
+      // we don't want to annotate it's children
+      // because position indices and depth will not match
+      // (the children are siblings to the slot / not nested within it)
+      if (vnodeChild.$tag$ !== 'slot' || vnodeChild.$elm$.nodeType === NODE_TYPE.ElementNode) {
+        insertChildVNodeAnnotations(doc, vnode, cmpData, hostId, childDepth, index);
+      }
     });
   }
 };

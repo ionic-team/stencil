@@ -140,20 +140,32 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
       // remember the slot name, or empty string for default slot
       elm['s-sn'] = newVNode.$name$ || '';
 
-      // if this slot is nested within another, parent slot, add that slot's name
-      if (newParentVNode.$name$) elm['s-psn'] = newParentVNode.$name$;
+      // if this slot is nested within another parent slot, add that slot's name.
+      // (used in 'renderSlotFallbackContent')
+      if (newParentVNode.$name$) {
+        elm['s-psn'] = newParentVNode.$name$;
+      }
 
       if (newVNode.$flags$ & VNODE_FLAGS.isSlotFallback) {
         if (newVNode.$children$) {
+          // this slot has fallback nodes
+
           for (i = 0; i < newVNode.$children$.length; ++i) {
             // create the node
-            let containerElm = elm.nodeType === 1 ? elm : parentElm;
-            while (containerElm.nodeType !== 1) {
+            let containerElm = elm.nodeType === NODE_TYPE.ElementNode ? elm : parentElm;
+            while (containerElm.nodeType !== NODE_TYPE.ElementNode) {
               containerElm = containerElm.parentNode as d.RenderNode;
             }
             childNode = createElm(oldParentVNode, newVNode, i, containerElm);
+
+            // add new node meta.
+            // slot has fallback and childnode is slot fallback
             childNode['s-sf'] = elm['s-hsf'] = true;
-            if (typeof childNode['s-sn'] === 'undefined') childNode['s-sn'] = newVNode.$name$ || '';
+
+            if (typeof childNode['s-sn'] === 'undefined') {
+              childNode['s-sn'] = newVNode.$name$ || '';
+            }
+
             if (childNode.nodeType === NODE_TYPE.TextNode) {
               childNode['s-sfc'] = childNode.textContent;
             }
@@ -161,7 +173,7 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
             // return node could have been null
             if (childNode) {
               // append our new node
-              containerElm.__appendChild ? containerElm.__appendChild(childNode) : containerElm.appendChild(childNode);
+              containerElm.appendChild(childNode);
             }
           }
         }
@@ -587,7 +599,7 @@ const updateChildren = (parentElm: d.RenderNode, oldCh: d.VNode[], newVNode: d.V
     fbSlotsIdx = fbSlots.length - 1;
     for (i = 0; i <= fbSlotsIdx; ++i) {
       fbSlot = fbSlots[i];
-      if (!fbNodes[fbSlot['s-sn']]) continue;
+      if (typeof fbNodes[fbSlot['s-sn']] === 'undefined') continue;
 
       fbNodesIdx = fbNodes[fbSlot['s-sn']].length - 1;
       for (j = 0; j <= fbNodesIdx; ++j) {
@@ -925,14 +937,17 @@ render() {
           // by default we're just going to insert it directly
           // after the slot reference node
           parentNodeRef = relocateData.$slotRefNode$.parentNode;
-          insertBeforeNode = relocateData.$slotRefNode$.nextSibling;
+          insertBeforeNode =
+            (relocateData.$slotRefNode$ as any).__nextSibling || relocateData.$slotRefNode$.nextSibling;
           orgLocationNode = nodeToRelocate['s-ol'] as any;
           ogInsertBeforeNode = insertBeforeNode;
 
-          while ((orgLocationNode = orgLocationNode.previousSibling as any)) {
+          while (
+            (orgLocationNode = ((orgLocationNode as any).__previousSibling || orgLocationNode.previousSibling) as any)
+          ) {
             refNode = orgLocationNode['s-nr'];
             if (refNode && refNode['s-sn'] === nodeToRelocate['s-sn'] && parentNodeRef === refNode.parentNode) {
-              refNode = refNode.nextSibling as any;
+              refNode = (refNode as any).__nextSibling || refNode.nextSibling;
               if (!refNode || !refNode['s-nr']) {
                 insertBeforeNode = refNode;
                 break;
@@ -942,7 +957,7 @@ render() {
 
           if (
             (!insertBeforeNode && parentNodeRef !== nodeToRelocate.parentNode) ||
-            nodeToRelocate.nextSibling !== insertBeforeNode
+            ((nodeToRelocate as any).__nextSibling || nodeToRelocate.nextSibling) !== insertBeforeNode
           ) {
             // we've checked that it's worth while to relocate
             // since that the node to relocate
