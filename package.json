@@ -103,7 +103,7 @@
     "jest-cli": "^27.4.5",
     "jest-environment-node": "^27.4.4",
     "listr": "^0.14.3",
-    "magic-string": "^0.27.0",
+    "magic-string": "^0.29.0",
     "merge-source-map": "^1.1.0",
     "mime-db": "^1.46.0",
     "minimatch": "5.1.2",
