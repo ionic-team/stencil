@@ -30,7 +30,7 @@ export function rewriteAliasedDTSImportPaths(): ts.TransformerFactory<ts.Bundle 
  *
  * @returns a TypeScript transformer factory
  */
-export const rewriteAliasedSourceFileImportPaths = (): ts.TransformerFactory<ts.SourceFile> => {
+export function rewriteAliasedSourceFileImportPaths(): ts.TransformerFactory<ts.SourceFile> {
   return (transformCtx: ts.TransformationContext) => {
     const compilerHost = ts.createCompilerHost(transformCtx.getCompilerOptions());
 
@@ -38,7 +38,7 @@ export const rewriteAliasedSourceFileImportPaths = (): ts.TransformerFactory<ts.
       return ts.visitEachChild(tsSourceFile, visit(compilerHost, transformCtx, tsSourceFile.fileName), transformCtx);
     };
   };
-};
+}
 
 /**
  * This visitor function will modify any {@link ts.ImportDeclaration} nodes to

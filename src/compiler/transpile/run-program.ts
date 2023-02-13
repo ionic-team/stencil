@@ -7,7 +7,10 @@ import { updateComponentBuildConditionals } from '../app-core/app-data';
 import { resolveComponentDependencies } from '../entries/resolve-component-dependencies';
 import { getComponentsFromModules, isOutputTargetDistTypes } from '../output-targets/output-utils';
 import { convertDecoratorsToStatic } from '../transformers/decorators-to-static/convert-decorators';
-import { rewriteAliasedDTSImportPaths, rewriteAliasedSourceFileImportPaths } from '../transformers/rewrite-aliased-paths';
+import {
+  rewriteAliasedDTSImportPaths,
+  rewriteAliasedSourceFileImportPaths,
+} from '../transformers/rewrite-aliased-paths';
 import { updateModule } from '../transformers/static-to-meta/parse-static';
 import { generateAppTypes } from '../types/generate-app-types';
 import { updateStencilTypesImports } from '../types/stencil-types';
