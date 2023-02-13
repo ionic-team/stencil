@@ -1,5 +1,4 @@
 import color from 'ansi-colors';
-import execa from 'execa';
 import Listr, { ListrTask } from 'listr';
 
 import { bundleBuild } from './build';
@@ -19,7 +18,7 @@ import {
  * @param opts build options containing the metadata needed to release a new version of Stencil
  * @param args stringified arguments used to influence the release steps that are taken
  */
-export function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<string>): void {
+export async function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<string>): Promise<void> {
   const rootDir = opts.rootDir;
   const pkg = opts.packageJson;
   const tasks: ListrTask[] = [];
@@ -27,6 +26,8 @@ export function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<string>)
   const isDryRun = args.includes('--dry-run') || opts.version.includes('dryrun');
   const isAnyBranch = args.includes('--any-branch');
   let tagPrefix: string;
+
+  const { execa } = await import('execa');
 
   if (isDryRun) {
     console.log(color.bold.yellow(`\n  🏃‍ Dry Run!\n`));
