@@ -123,6 +123,7 @@ export const getTranspileConfig = (input: TranspileOptions) => {
   const config: Config = {
     rootDir: compileOpts.currentDirectory,
     srcDir: compileOpts.currentDirectory,
+    transformAliasedImportPaths: true,
     devMode: true,
     minifyCss: true,
     minifyJs: false,

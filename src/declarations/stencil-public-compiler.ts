@@ -106,6 +106,14 @@ export interface StencilConfig {
   srcDir?: string;
 
   /**
+   * Sets whether or not Stencil should transform path aliases set in a project's
+   * `tsconfig.json` from the assigned module aliases to resolved relative paths.
+   *
+   * This behavior is opt-in and hence this flag defaults to `false`.
+   */
+  transformAliasedImportPaths?: boolean;
+
+  /**
    * Passes custom configuration down to the "@rollup/plugin-commonjs" that Stencil uses under the hood.
    * For further information: https://stenciljs.com/docs/module-bundling
    */
@@ -435,7 +443,8 @@ type StrictConfigFields =
   | 'packageJsonFilePath'
   | 'rootDir'
   | 'sys'
-  | 'testing';
+  | 'testing'
+  | 'transformAliasedImportPaths';
 
 /**
  * A version of {@link Config} that makes certain fields required. This type represents a valid configuration entity.

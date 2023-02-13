@@ -42,6 +42,7 @@ export function mockValidatedConfig(overrides: Partial<ValidatedConfig> = {}): V
     rootDir,
     sys: createTestingSystem(),
     testing: {},
+    transformAliasedImportPaths: false,
     ...overrides,
   };
 }
