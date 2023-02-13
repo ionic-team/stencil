@@ -123,7 +123,7 @@ describe('hydrate scoped', () => {
       <cmp-a class="hydrated" s-id="1">
         <!--r.1-->
         <p c-id="1.0.0.0" class="hi">
-          <!--t.1.1.1.0-->
+          <!--t.1.1.1.0.0.-->
           Hello
         </p>
       </cmp-a>

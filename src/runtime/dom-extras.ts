@@ -478,7 +478,6 @@ export const patchNextPrev = (NodePrototype: any) => {
 
   if (!NodePrototype || NodePrototype.__nextSibling || !globalThis.Node) return;
 
-  NodePrototype.__nextSibling = NodePrototype.nextSibling || true;
   patchNextSibling(NodePrototype);
   patchPreviousSibling(NodePrototype);
   patchNextElementSibling(NodePrototype);
@@ -492,11 +491,10 @@ export const patchNextPrev = (NodePrototype: any) => {
 export const patchNextSibling = (NodePrototype: any) => {
   if (!NodePrototype || NodePrototype.__nextSibling) return;
 
-  NodePrototype.__nextSibling = NodePrototype.nextSibling || true;
-
   const descriptor = Object.getOwnPropertyDescriptor(Node.prototype, 'nextSibling');
   // MockNode might not have these
   if (descriptor) Object.defineProperty(NodePrototype, '__nextSibling', descriptor);
+  else { NodePrototype.__nextSibling = NodePrototype.nextSibling || true; }
 
   Object.defineProperty(NodePrototype, 'nextSibling', {
     get: function () {
@@ -515,13 +513,12 @@ export const patchNextSibling = (NodePrototype: any) => {
  * @param NodePrototype the slotted node to be patched
  */
 export const patchNextElementSibling = (ElementPrototype: any) => {
-  if (!ElementPrototype || ElementPrototype.__nextElementSibling) return;
-
-  ElementPrototype.__nextElementSibling = ElementPrototype.nextSiblingElement || true;
+  if (!ElementPrototype || ElementPrototype.__nextElementSibling || !ElementPrototype.nextSiblingElement) return;
 
   const descriptor = Object.getOwnPropertyDescriptor(Element.prototype, 'nextElementSibling');
   // MockNode won't have these
   if (descriptor) Object.defineProperty(ElementPrototype, '__nextElementSibling', descriptor);
+  else {ElementPrototype.__nextElementSibling = ElementPrototype.nextSiblingElement || true; }
 
   Object.defineProperty(ElementPrototype, 'nextElementSibling', {
     get: function () {
@@ -542,11 +539,10 @@ export const patchNextElementSibling = (ElementPrototype: any) => {
 export const patchPreviousSibling = (NodePrototype: any) => {
   if (!NodePrototype || NodePrototype.__previousSibling) return;
 
-  NodePrototype.__previousSibling = NodePrototype.previousSibling || true;
-
   const descriptor = Object.getOwnPropertyDescriptor(Node.prototype, 'previousSibling');
   // MockNode won't have these
   if (descriptor) Object.defineProperty(NodePrototype, '__previousSibling', descriptor);
+  else { NodePrototype.__previousSibling = NodePrototype.previousSibling || true; }
 
   Object.defineProperty(NodePrototype, 'previousSibling', {
     get: function () {
@@ -565,13 +561,13 @@ export const patchPreviousSibling = (NodePrototype: any) => {
  * @param ElementPrototype the slotted node to be patched
  */
 export const patchPreviousElementSibling = (ElementPrototype: any) => {
-  if (!ElementPrototype || ElementPrototype.__previousElementSibling) return;
-
-  ElementPrototype.__previousElementSibling = ElementPrototype.previousSiblingElement || true;
+  if (!ElementPrototype || ElementPrototype.__previousElementSibling || !ElementPrototype.previousElementSibling) return;
 
   const descriptor = Object.getOwnPropertyDescriptor(Element.prototype, 'previousElementSibling');
   // MockNode won't have these
   if (descriptor) Object.defineProperty(ElementPrototype, '__previousElementSibling', descriptor);
+  else { ElementPrototype.__previousElementSibling = ElementPrototype.previousSiblingElement || true; }
+
   ElementPrototype;
   Object.defineProperty(ElementPrototype, 'previousElementSibling', {
     get: function () {

@@ -39,7 +39,7 @@ describe('hydrate, shadow', () => {
           <!--o.1.1.-->
           <article c-id="2.0.0.0">
             <!--s.2.1.1.0..0.0-->
-            <!--t.1.1.1.0-->
+            <!--t.1.1.1.0.0.-->
             CmpALightDom
           </article>
         </cmp-b>
@@ -112,7 +112,7 @@ describe('hydrate, shadow', () => {
         <article c-id="1.0.0.0">
           <section c-id="1.1.1.0">
             <header c-id="1.2.2.0">
-              <!--t.1.3.3.0-->
+              <!--t.1.3.3.0.0.-->
               ShadowDom
               <svg c-id="1.4.3.1"></svg>
             </header>

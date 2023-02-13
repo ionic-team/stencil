@@ -48,7 +48,7 @@ describe('hydrate no encapsulation', () => {
       <cmp-a class="hydrated" s-id="1">
         <!--r.1-->
         <p c-id="1.0.0.0" class="hi">
-          <!--t.1.1.1.0-->
+          <!--t.1.1.1.0.0.-->
           Hello
         </p>
       </cmp-a>
@@ -90,7 +90,7 @@ describe('hydrate no encapsulation', () => {
     expect(serverHydrated.root).toEqualHtml(`
       <cmp-a class="hydrated" s-id="1">
         <!--r.1-->
-        <!--t.1.0.0.0-->
+        <!--t.1.0.0.0.0.-->
         Hello
       </cmp-a>
     `);
@@ -135,13 +135,13 @@ describe('hydrate no encapsulation', () => {
     expect(serverHydrated.root).toEqualHtml(`
       <cmp-a class="hydrated" s-id="1">
         <!--r.1-->
-        <!--t.1.0.0.0-->
+        <!--t.1.0.0.0.0.-->
         top
         <p c-id="1.1.0.1">
-          <!--t.1.2.1.0-->
+          <!--t.1.2.1.0.0.-->
           middle
         </p>
-        <!--t.1.3.0.2-->
+        <!--t.1.3.0.2.0.-->
         bottom
       </cmp-a>
     `);
@@ -201,7 +201,7 @@ describe('hydrate no encapsulation', () => {
           <!--r.2-->
           <!--o.1.1-->
           <!--s.2.0.0.0..0.0-->
-          <!--t.1.1.1.0-->
+          <!--t.1.1.1.0.0.-->
           light-dom
           <footer c-id="2.1.0.1"></footer>
         </cmp-b>
@@ -264,7 +264,7 @@ describe('hydrate no encapsulation', () => {
           <!--o.1.1-->
           <header c-id="2.0.0.0"></header>
           <!--s.2.1.0.1..0.0-->
-          <!--t.1.1.1.0-->
+          <!--t.1.1.1.0.0.-->
           light-dom
         </cmp-b>
       </cmp-a>
@@ -326,7 +326,7 @@ describe('hydrate no encapsulation', () => {
           <!--o.1.1-->
           <header c-id="2.0.0.0"></header>
           <!--s.2.1.0.1..0.0-->
-          <!--t.1.1.1.0-->
+          <!--t.1.1.1.0.0.-->
           light-dom
           <footer c-id="2.2.0.2"></footer>
         </cmp-b>
@@ -399,15 +399,15 @@ describe('hydrate no encapsulation', () => {
           <header c-id="2.0.0.0"></header>
           <!--s.2.1.0.1.top.0.0-->
           <div c-id="1.3.1.1" slot="top" s-sn="top">
-            <!--t.1.4.2.0-->
+            <!--t.1.4.2.0.0.-->
             top light-dom
           </div>
           <!--s.2.2.0.2..0.0-->
-          <!--t.1.5.1.2-->
+          <!--t.1.5.1.2.0.-->
           middle light-dom
           <!--s.2.3.0.3.bottom.0.0-->
           <div c-id="1.1.1.0" slot="bottom" s-sn="bottom">
-            <!--t.1.2.2.0-->
+            <!--t.1.2.2.0.0.-->
             bottom light-dom
           </div>
           <footer c-id="2.4.0.4"></footer>

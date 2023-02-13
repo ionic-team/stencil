@@ -88,12 +88,12 @@ describe('hydrate, shadow parent', () => {
       <cmp-a class="hydrated" s-id="1">
         <!--r.1-->
         <!--o.0.1.-->
-        <!--t.1.0.0.0-->
+        <!--t.1.0.0.0.0.-->
         top
         <!--s.1.1.0.1..0.0-->
         <!--t.0.1-->
         middle
-        <!--t.1.2.0.2-->
+        <!--t.1.2.0.2.0.-->
         bottom
       </cmp-a>
     `);
@@ -140,7 +140,7 @@ describe('hydrate, shadow parent', () => {
     expect(serverHydrated.root).toEqualHtml(`
       <cmp-a class="hydrated" s-id="1">
         <!--r.1-->
-        <!--t.1.0.0.0-->
+        <!--t.1.0.0.0.0.-->
         shadow-text
       </cmp-a>
     `);
@@ -252,7 +252,7 @@ describe('hydrate, shadow parent', () => {
           <!--r.2-->
           <!--o.1.1-->
           <!--s.2.0.0.0..0.0-->
-          <!--t.1.1.1.0-->
+          <!--t.1.1.1.0.0.-->
           cmp-a-light-dom
         </cmp-b>
       </cmp-a>

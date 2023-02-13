@@ -175,7 +175,8 @@ const insertChildVNodeAnnotations = (
     const parentNode = childElm.parentNode;
     const nodeName = parentNode.nodeName;
     if (nodeName !== 'STYLE' && nodeName !== 'SCRIPT') {
-      const textNodeId = `${TEXT_NODE_ID}.${childId}`;
+      const slotName = childElm['s-sn'] || '';
+      const textNodeId = `${TEXT_NODE_ID}.${childId}.${childElm['s-sf'] ? '1' : '0'}.${slotName}`;
 
       const commentBeforeTextNode = doc.createComment(textNodeId);
       parentNode.insertBefore(commentBeforeTextNode, childElm);
@@ -219,13 +220,7 @@ const insertChildVNodeAnnotations = (
   if (vnodeChild.$children$ != null) {
     const childDepth = depth + 1;
     vnodeChild.$children$.forEach((vnode, index) => {
-      // if the parent is a mock slot,
-      // we don't want to annotate it's children
-      // because position indices and depth will not match
-      // (the children are siblings to the slot / not nested within it)
-      if (vnodeChild.$tag$ !== 'slot' || vnodeChild.$elm$.nodeType === NODE_TYPE.ElementNode) {
-        insertChildVNodeAnnotations(doc, vnode, cmpData, hostId, childDepth, index);
-      }
+      insertChildVNodeAnnotations(doc, vnode, cmpData, hostId, childDepth, index);
     });
   }
 };

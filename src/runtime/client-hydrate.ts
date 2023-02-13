@@ -71,7 +71,7 @@ export const initializeClientHydrate = (
     hostElm,
     hostElm,
     hostId,
-    slottedNodes
+    slottedNodes,
   );
 
   let crIndex = 0;
@@ -127,7 +127,6 @@ export const initializeClientHydrate = (
 
   // Loops through all the slotted nodes we found while
   // stepping through this component
-  //
   for (snIndex; snIndex < snLen; snIndex++) {
     slotGroup = slottedNodes[snIndex];
 
@@ -146,15 +145,6 @@ export const initializeClientHydrate = (
       // this shouldn't happen
       // as we collect all the custom elements first in `initializeDocumentHydrate`
       if (!hosts[slottedItem.hostId as any]) continue;
-
-      // if (slottedItem.node['s-ol']) {
-      //   // see if we've found this node's parent host before
-      //   // (within orgLocNodes)
-      //   hosts[slottedItem.hostId as any] = slottedItem.node['s-ol'].parentElement;
-      //   // remove it now, we'll recreate with a text node in a minute
-      //   // to tidy up the DOM
-      //   slottedItem.node['s-ol'].remove();
-      // }
 
       const hostEle = hosts[slottedItem.hostId as any];
 
@@ -239,7 +229,7 @@ const clientHydrate = (
   hostElm: d.HostElement,
   node: d.RenderNode,
   hostId: string,
-  slottedNodes: SlottedNodes[] = []
+  slottedNodes: SlottedNodes[] = [],
 ) => {
   let childNodeType: string;
   let childIdSplt: string[];
@@ -292,15 +282,21 @@ const clientHydrate = (
           childVNode.$elm$.removeAttribute(HYDRATED_SLOT_FALLBACK_ID);
           // find the relevant slot node
           const slotNode = slotNodes.find(
-            (slot) =>
-              (slot.$elm$.nodeType === NODE_TYPE.CommentNode && slot.$elm$.nodeValue === slotFbId) ||
-              (slot.$elm$.tagName === 'SLOT' && slot.$elm$.name === childVNode.$elm$['s-sn'])
+            (slot) => (slot.$elm$['s-sn']  === childVNode.$elm$['s-sn'] || slot.$name$ === childVNode.$elm$['s-sn'])
           );
           // add the relationship to the VDOM to stop re-renders
           if (slotNode) {
             childVNode.$elm$['s-sf'] = true;
+            childVNode.$elm$['s-hn'] = hostElm.tagName;
             slotNode.$children$ = slotNode.$children$ || [];
             slotNode.$children$[childVNode.$index$ as any] = childVNode;
+
+            // if the slot is an actual `<slot>`
+            // that's a newly created node (↓↓↓)
+            // move this element there now
+            if (slotNode.$elm$.nodeType === NODE_TYPE.ElementNode) {
+              slotNode.$elm$.appendChild(childVNode.$elm$);
+            }
           }
         } else if (childVNode.$index$ !== undefined) {
           // add our child vnode to a specific index of the vnode's children
@@ -358,7 +354,7 @@ const clientHydrate = (
       }
     }
   } else if (node.nodeType === NODE_TYPE.CommentNode) {
-    // `${COMMENT_TYPE}.${hostId}.${nodeId}.${depth}.${index}`
+    // `${COMMENT_TYPE}.${hostId}.${nodeId}.${depth}.${index}.${isSlotFallbackText}.${slotName}`
     childIdSplt = node.nodeValue.split('.');
 
     if (childIdSplt[1] === hostId || childIdSplt[1] === '0') {
@@ -374,7 +370,7 @@ const clientHydrate = (
       });
 
       if (childNodeType === TEXT_NODE_ID) {
-        childVNode.$elm$ = node.nextSibling as any;
+        let textNode = childVNode.$elm$ = node.nextSibling as any;
 
         if (childVNode.$elm$ && childVNode.$elm$.nodeType === NODE_TYPE.TextNode) {
           childVNode.$text$ = childVNode.$elm$.textContent;
@@ -383,19 +379,44 @@ const clientHydrate = (
           // remove the text comment since it's no longer needed
           node.remove();
 
-          // check to make sure this node actually belongs to this host.
-          // If it was slotted from another component, we don't want to add it
-          // to this host's vdom; it can be removed on render reconciliation.
-          // We want slotting logic to take care of it
-          if (hostId === childVNode.$hostId$) {
-            if (!parentVNode.$children$) {
-              parentVNode.$children$ = [];
-            }
-            parentVNode.$children$[childVNode.$index$ as any] = childVNode;
-          }
+          // test to see if this is slot fallback text
+          if (childIdSplt[5] === '1') {
+            textNode['s-sf'] = true;
+            textNode['s-sn'] = childIdSplt[6] || '';
+            textNode['s-sfc'] = textNode.textContent;
+            textNode['s-hn'] = hostElm.tagName;
 
-          if (shadowRootNodes && childVNode.$depth$ === '0') {
-            shadowRootNodes[childVNode.$index$ as any] = childVNode.$elm$;
+            // find the relevant slot node
+            const slotNode = slotNodes.find(
+              (slot) => (slot.$elm$['s-sn']  === textNode['s-sn'] || slot.$name$ === textNode['s-sn'])
+            );
+            // add the relationship to the VDOM to stop re-renders
+            if (slotNode) {
+              slotNode.$children$ = slotNode.$children$ || [];
+              slotNode.$children$[childVNode.$index$ as any] = childVNode;
+
+              // if the slot is an actual `<slot>`
+              // that's a newly created node (↓↓↓)
+              // move this text node there now
+              if (slotNode.$elm$.nodeType === NODE_TYPE.ElementNode) {
+                slotNode.$elm$.appendChild(textNode);
+              }
+            }
+          } else {
+            // check to make sure this node actually belongs to this host.
+            // If it was slotted from another component, we don't want to add it
+            // to this host's vdom; it can be removed on render reconciliation.
+            // We want slotting logic to take care of it
+            if (hostId === childVNode.$hostId$) {
+              if (!parentVNode.$children$) {
+                parentVNode.$children$ = [];
+              }
+              parentVNode.$children$[childVNode.$index$ as any] = childVNode;
+            }
+
+            if (shadowRootNodes && childVNode.$depth$ === '0') {
+              shadowRootNodes[childVNode.$index$ as any] = childVNode.$elm$;
+            }
           }
         }
       } else if (childVNode.$hostId$ === hostId) {
@@ -423,7 +444,7 @@ const clientHydrate = (
 
           if (childIdSplt[7] === '1') {
             // this slot has fallback text
-            // it should be held in a comment node in the last few siblings
+            // it should be held in the previous comment node
             // (white-space depending)
             let foundFallbackText = node.previousSibling;
             while (!!foundFallbackText && foundFallbackText.nodeType !== NODE_TYPE.CommentNode) {
@@ -433,32 +454,6 @@ const clientHydrate = (
             // this slot node has fallback text?
             // (if so, the previous node comment will have that text)
             node['s-sfc'] = foundFallbackText.nodeValue;
-
-            // if there's pre-rendered text node,
-            // remove now and let vdom-render take over creation & showing / hiding
-            let foundTextNode = foundFallbackText.previousSibling as d.RenderNode;
-            while (!!foundTextNode && foundTextNode.nodeType !== NODE_TYPE.TextNode) {
-              foundTextNode = foundTextNode.previousSibling as d.RenderNode;
-            }
-            if (
-              foundTextNode &&
-              foundTextNode.nodeType === NODE_TYPE.TextNode &&
-              foundTextNode.nodeValue.trim() === node['s-sfc']
-            ) {
-              foundTextNode.remove();
-              // foundTextNode['s-hn'] = hostElm.tagName;
-              // foundTextNode['s-sn'] = node['s-sn'];
-              // foundTextNode['s-sf'] = true;
-            }
-
-            // add to vdom tree
-            const textVnode = createSimpleVNode({
-              $elm$: foundTextNode,
-              $text$: node['s-sfc'],
-              $hostId$: childIdSplt[1],
-            });
-            childVNode.$children$ = childVNode.$children$ || [];
-            childVNode.$children$[textVnode.$index$ as any] = textVnode;
           }
 
           // find this slots' current host parent as dictated by the vdom tree.
@@ -490,28 +485,6 @@ const clientHydrate = (
               // insert the new slot element before the slot comment
               node.parentNode.insertBefore(childVNode.$elm$, node);
             }
-
-            let slottedNode = node as d.RenderNode;
-            const slotEle = childVNode.$elm$ as HTMLSlotElement;
-
-            // attempt to find any slotted fallback nodes;
-            // and move them into our new slot element
-            // in the correct order
-            if (
-              node['s-hsf'] &&
-              slottedNode?.nodeType === NODE_TYPE.ElementNode &&
-              slottedNode.getAttribute(HYDRATED_SLOT_FALLBACK_ID)
-            ) {
-              // move slot fallback elements into the slot
-              while (
-                slottedNode?.nodeType === NODE_TYPE.ElementNode &&
-                slottedNode?.getAttribute(HYDRATED_SLOT_FALLBACK_ID) === node.nodeValue
-              ) {
-                slotEle.insertBefore(slottedNode, slotEle.children[0]);
-                slottedNode = slottedNode.previousSibling as d.RenderNode;
-              }
-            }
-
             addSlottedNodes(slottedNodes, childIdSplt[2], slotName, node, childVNode.$hostId$);
 
             // remove the slot comment since it's not needed for shadow
@@ -660,13 +633,19 @@ const addSlottedNodes = (
   let slottedNode = slotNode.nextSibling as d.RenderNode;
   slottedNodes[slotNodeId as any] = slottedNodes[slotNodeId as any] || [];
 
+  // looking for nodes that match this slot's name,
+  // OR are text / comment nodes and the slot is a default slot (no name)
+  // (text / comments cannot be direct descendants of named slots)
+  // also ignore slot fallback nodes
   while (
     slottedNode &&
     (slottedNode['s-sn'] === slotName ||
       (slotName === '' &&
         !slottedNode['s-sn'] &&
         ((slottedNode.nodeType === NODE_TYPE.CommentNode && slottedNode.nodeValue.indexOf('.') !== 1) ||
-          slottedNode.nodeType === NODE_TYPE.TextNode)))
+          slottedNode.nodeType === NODE_TYPE.TextNode))
+    ) &&
+    !slottedNode['s-sf']
   ) {
     slottedNode['s-sn'] = slotName;
     slottedNodes[slotNodeId as any].push({ slot: slotNode, node: slottedNode, hostId });

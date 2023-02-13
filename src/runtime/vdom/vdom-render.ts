@@ -170,13 +170,16 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
               childNode['s-sfc'] = childNode.textContent;
             }
 
-            // return node could have been null
-            if (childNode) {
+            // make sure a node was created
+            // and we don't have a node already present
+            // (if a node is already attached, we'll just patch it)
+            if (childNode && (!oldParentVNode || !oldParentVNode.$children$[i])) {
               // append our new node
               containerElm.appendChild(childNode);
             }
           }
         }
+        if (oldParentVNode) patch(oldParentVNode, newVNode);
       }
 
       // check if we've got an old vnode for this slot

@@ -23,7 +23,7 @@ describe('hydrate, shadow child', () => {
       <cmp-a class="hydrated" s-id="1">
         <!--r.1-->
         <p c-id="1.0.0.0">
-          <!--t.1.1.1.0-->
+          <!--t.1.1.1.0.0.-->
           Hello
         </p>
       </cmp-a>
@@ -82,7 +82,7 @@ describe('hydrate, shadow child', () => {
           <!--r.2-->
           <!--o.1.1.-->
           <!--s.2.0.0.0..0.0-->
-          <!--t.1.1.1.0-->
+          <!--t.1.1.1.0.0.-->
           light-dom
         </cmp-b>
       </cmp-a>
@@ -200,7 +200,7 @@ describe('hydrate, shadow child', () => {
         <!--r.1-->
         <cmp-b class="hydrated" c-id="1.0.0.0" s-id="2">
           <!--r.2-->
-          <!--t.2.0.0.0-->
+          <!--t.2.0.0.0.0.-->
           shadow-header
           <!--s.2.1.0.1..0.0-->
         </cmp-b>
@@ -263,7 +263,7 @@ describe('hydrate, shadow child', () => {
           <!--o.1.1.-->
           <header c-id="2.0.0.0"></header>
           <!--s.2.1.0.1..0.0-->
-          <!--t.1.1.1.0-->
+          <!--t.1.1.1.0.0.-->
           light-dom
         </cmp-b>
       </cmp-a>
@@ -323,10 +323,10 @@ describe('hydrate, shadow child', () => {
         <!--r.1-->
         <cmp-b class="hydrated" c-id="1.0.0.0" s-id="2">
           <!--r.2-->
-          <!--t.2.0.0.0-->
+          <!--t.2.0.0.0.0.-->
           shadow-header
           <footer c-id="2.1.0.1">
-            <!--t.2.2.1.0-->
+            <!--t.2.2.1.0.0.-->
             shadow-footer
           </footer>
         </cmp-b>
@@ -392,7 +392,7 @@ describe('hydrate, shadow child', () => {
           <!--o.1.1.-->
           <header c-id="2.0.0.0"></header>
           <!--s.2.1.0.1..0.0-->
-          <!--t.1.1.1.0-->
+          <!--t.1.1.1.0.0.-->
           light-dom
           <footer c-id="2.2.0.2"></footer>
         </cmp-b>
@@ -477,7 +477,7 @@ describe('hydrate, shadow child', () => {
             <cmp-c class="hydrated" c-id="0.2" s-id="3" s-sn="">
               <!--r.3-->
               <article c-id="3.0.0.0">
-                <!--t.3.1.1.0-->
+                <!--t.3.1.1.0.0.-->
                 cmp-c
               </article>
             </cmp-c>

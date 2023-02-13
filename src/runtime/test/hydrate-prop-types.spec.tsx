@@ -26,7 +26,7 @@ describe('hydrate prop types', () => {
     expect(serverHydrated.root).toEqualHtml(`
       <cmp-a class="hydrated" num="1" s-id="1">
         <!--r.1-->
-        <!--t.1.0.0.0-->
+        <!--t.1.0.0.0.0.-->
         101
       </cmp-a>
     `);
