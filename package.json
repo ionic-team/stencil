@@ -65,7 +65,7 @@
     "@rollup/pluginutils": "5.0.2",
     "@types/eslint": "^8.4.6",
     "@types/exit": "^0.1.31",
-    "@types/fs-extra": "^9.0.8",
+    "@types/fs-extra": "^11.0.1",
     "@types/glob": "^8.0.0",
     "@types/graceful-fs": "^4.1.5",
     "@types/inquirer": "^7.3.1",
