@@ -71,7 +71,7 @@ export const initializeClientHydrate = (
     hostElm,
     hostElm,
     hostId,
-    slottedNodes,
+    slottedNodes
   );
 
   let crIndex = 0;
@@ -229,7 +229,7 @@ const clientHydrate = (
   hostElm: d.HostElement,
   node: d.RenderNode,
   hostId: string,
-  slottedNodes: SlottedNodes[] = [],
+  slottedNodes: SlottedNodes[] = []
 ) => {
   let childNodeType: string;
   let childIdSplt: string[];
@@ -282,7 +282,7 @@ const clientHydrate = (
           childVNode.$elm$.removeAttribute(HYDRATED_SLOT_FALLBACK_ID);
           // find the relevant slot node
           const slotNode = slotNodes.find(
-            (slot) => (slot.$elm$['s-sn']  === childVNode.$elm$['s-sn'] || slot.$name$ === childVNode.$elm$['s-sn'])
+            (slot) => slot.$elm$['s-sn'] === childVNode.$elm$['s-sn'] || slot.$name$ === childVNode.$elm$['s-sn']
           );
           // add the relationship to the VDOM to stop re-renders
           if (slotNode) {
@@ -370,7 +370,7 @@ const clientHydrate = (
       });
 
       if (childNodeType === TEXT_NODE_ID) {
-        let textNode = childVNode.$elm$ = node.nextSibling as any;
+        let textNode = (childVNode.$elm$ = node.nextSibling as any);
 
         if (childVNode.$elm$ && childVNode.$elm$.nodeType === NODE_TYPE.TextNode) {
           childVNode.$text$ = childVNode.$elm$.textContent;
@@ -388,7 +388,7 @@ const clientHydrate = (
 
             // find the relevant slot node
             const slotNode = slotNodes.find(
-              (slot) => (slot.$elm$['s-sn']  === textNode['s-sn'] || slot.$name$ === textNode['s-sn'])
+              (slot) => slot.$elm$['s-sn'] === textNode['s-sn'] || slot.$name$ === textNode['s-sn']
             );
             // add the relationship to the VDOM to stop re-renders
             if (slotNode) {
@@ -643,8 +643,7 @@ const addSlottedNodes = (
       (slotName === '' &&
         !slottedNode['s-sn'] &&
         ((slottedNode.nodeType === NODE_TYPE.CommentNode && slottedNode.nodeValue.indexOf('.') !== 1) ||
-          slottedNode.nodeType === NODE_TYPE.TextNode))
-    ) &&
+          slottedNode.nodeType === NODE_TYPE.TextNode))) &&
     !slottedNode['s-sf']
   ) {
     slottedNode['s-sn'] = slotName;

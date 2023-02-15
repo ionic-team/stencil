@@ -208,8 +208,6 @@ describe('hydrate, slot fallback', () => {
     </cmp-a>`);
   });
 
-
-
   it('shadow dom parent, slotted shadow dom child renders slot fallback text', async () => {
     @Component({
       tag: 'cmp-a',
