@@ -173,13 +173,13 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
             // make sure a node was created
             // and we don't have a node already present
             // (if a node is already attached, we'll just patch it)
-            if (childNode && (!oldParentVNode || !oldParentVNode.$children$[i])) {
+            if (childNode && (!oldParentVNode || !oldParentVNode.$children$)) {
               // append our new node
               containerElm.appendChild(childNode);
             }
           }
         }
-        if (oldParentVNode) patch(oldParentVNode, newVNode);
+        if (oldParentVNode && oldParentVNode.$children$) patch(oldParentVNode, newVNode);
       }
 
       // check if we've got an old vnode for this slot

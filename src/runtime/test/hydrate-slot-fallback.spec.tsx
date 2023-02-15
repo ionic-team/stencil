@@ -308,4 +308,87 @@ describe('hydrate, slot fallback', () => {
       </cmp-b>
     </cmp-a>`);
   });
+
+  it('non-shadow forwarded slot to nested shadow', async () => {
+    @Component({
+      tag: 'cmp-a',
+      shadow: false,
+    })
+    class CmpA {
+      render() {
+        return (
+          <article>
+            <cmp-b>
+              <slot>Fallback content parent</slot>
+            </cmp-b>
+          </article>
+        );
+      }
+    }
+
+    @Component({
+      tag: 'cmp-b',
+      shadow: true,
+    })
+    class CmpB {
+      render() {
+        return (
+          <section>
+            <slot>Fallback content child</slot>
+          </section>
+        );
+      }
+    }
+
+    const serverHydrated = await newSpecPage({
+      components: [CmpA, CmpB],
+      html: `
+      <cmp-a>
+        <p>slotted item 1</p>
+        <p>slotted item 2</p>
+        <p>slotted item 3</p>
+      </cmp-a>
+      `,
+      hydrateServerSide: true,
+    });
+    expect(serverHydrated.root).toEqualHtml(`
+    <cmp-a class=\"hydrated\" s-id=\"1\">
+      <!--r.1-->
+      <!--o.0.2-->
+      <!--o.0.4-->
+      <!--o.0.6-->
+      <article c-id=\"1.0.0.0\">
+        <cmp-b c-id=\"1.1.1.0\" class=\"hydrated\" s-id=\"2\">
+          <!--r.2-->
+          <!--o.1.3.-->
+          <!--o.1.2.-->
+          <section c-id=\"2.0.0.0\">
+            <!--t.2.2.2.0.1.-->
+            <!--Fallback content child-->
+            <!--s.2.1.1.0..1.1-->
+            <!--t.1.3.3.0.1.-->
+            <!--Fallback content parent-->
+            <!--s.1.2.2.0..1.1-->
+            <p c-id=\"0.2\" s-sn=\"\">
+              slotted item 1
+            </p>
+            <p c-id=\"0.4\" s-sn=\"\">
+              slotted item 2
+            </p>
+            <p c-id=\"0.6\" s-sn=\"\">
+              slotted item 3
+            </p>
+          </section>
+        </cmp-b>
+      </article>
+    </cmp-a>`);
+
+    const clientHydrated = await newSpecPage({
+      components: [CmpA, CmpB],
+      html: serverHydrated.root.outerHTML,
+      hydrateClientSide: true,
+    });
+
+    expect(clientHydrated.root).toEqualHtml(``);
+  });
 });

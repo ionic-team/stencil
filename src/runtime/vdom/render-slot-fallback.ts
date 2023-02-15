@@ -10,7 +10,7 @@ import { patchRemove } from '../dom-extras';
  */
 const renderSlotFallbackContent = (slotNode: d.RenderNode, hide: boolean) => {
   // if this slot doesn't have fallback content, return
-  if (!slotNode['s-hsf']) return;
+  if (!slotNode['s-hsf'] || !slotNode.parentNode) return;
 
   // in non-shadow component, slot nodes are just empty text nodes or comment nodes
   // the 'children' nodes are therefore placed next to it.
@@ -57,6 +57,8 @@ const renderSlotFallbackContent = (slotNode: d.RenderNode, hide: boolean) => {
  * @param node an entry whose children to iterate over
  */
 export const updateFallbackSlotVisibility = (node: d.RenderNode) => {
+  if (!node) return;
+
   const childNodes: d.RenderNode[] = (node as d.RenderNode).__childNodes || (node.childNodes as any);
   let slotNode: d.RenderNode;
   let i: number;
