@@ -5,8 +5,8 @@ import ts from 'typescript';
 import { retrieveTsModifiers } from './transform-utils';
 
 /**
- * Transform modules aliased with `paths` in `tsconfig.json` to relative
- * imported in `.d.ts` files.
+ * Transform module import paths aliased with `paths` in `tsconfig.json` to
+ * relative imported in `.d.ts` files.
  *
  * @returns a TypeScript transformer factory
  */
@@ -42,16 +42,16 @@ export function rewriteAliasedSourceFileImportPaths(): ts.TransformerFactory<ts.
 
 /**
  * This visitor function will modify any {@link ts.ImportDeclaration} nodes to
- * rewrite module identifiers which are configured using
- * the `paths` parameter in `tsconfig.json` from whatever name they are bound to
- * to a relative path from the importer to the importee.
+* rewrite module identifiers which are configured using the `paths` parameter
+* in `tsconfig.json` from whatever name they are bound to a relative path from
+* the importer to the importee.
  *
  * We need to handle this ourselves because while the TypeScript team supports
- * using the `paths` configuration to allow location-independent imports across
- * a project (i.e. importing a module without having to use its relative
- * path from the importing module) the TypeScript compiler has no built-in
- * support for resolving these identifiers to the actual modules they point to
- * in the `.js` and `.d.ts` files that it emits.
+* using the `paths` configuration to allow location-independent imports across
+ * a project (i.e. importing a module without having to use its relative path
+* from the importing module) the TypeScript compiler has no built-in support
+* for resolving these identifiers to the actual modules they point to in the
+  * `.js` and `.d.ts` files that it emits.
  *
  * So, for instance, if you have this set in `paths`:
  *
@@ -85,7 +85,7 @@ export function rewriteAliasedSourceFileImportPaths(): ts.TransformerFactory<ts.
  * The TypeScript team have stated pretty unequivocally that they will not
  * automatically resolve these identifiers to relative paths in output code
  * {@see https://github.com/microsoft/TypeScript/issues/10866} and have
- * said that resolving these module identifiers is the responsability of module
+ * said that resolving these module identifiers is the responsibility of module
  * bundling and build tools.
  *
  * So that means we've got to do it!
@@ -135,16 +135,16 @@ const visit = (compilerHost: ts.CompilerHost, transformCtx: ts.TransformationCon
           importPath = normalizePath(
             relative(dirname(sourceFilePath), resolvePathInDestination).replace(extensionRegex, '')
           );
+
+          return transformCtx.factory.updateImportDeclaration(
+            node,
+            retrieveTsModifiers(node),
+            node.importClause,
+            transformCtx.factory.createStringLiteral(importPath),
+            node.assertClause
+          );
         }
       }
-
-      return transformCtx.factory.updateImportDeclaration(
-        node,
-        retrieveTsModifiers(node),
-        node.importClause,
-        transformCtx.factory.createStringLiteral(importPath),
-        node.assertClause
-      );
     }
 
     return ts.visitEachChild(node, visit(compilerHost, transformCtx, sourceFilePath), transformCtx);
