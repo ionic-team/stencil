@@ -208,6 +208,8 @@ describe('hydrate, slot fallback', () => {
     </cmp-a>`);
   });
 
+
+
   it('shadow dom parent, slotted shadow dom child renders slot fallback text', async () => {
     @Component({
       tag: 'cmp-a',
@@ -387,6 +389,32 @@ describe('hydrate, slot fallback', () => {
       hydrateClientSide: true,
     });
 
-    expect(clientHydrated.root).toEqualHtml(``);
+    expect(clientHydrated.root).toEqualHtml(`
+    <cmp-a class=\"hydrated\">
+      <!--r.1-->
+      <article>
+        <cmp-b class=\"hydrated\">
+          <mock:shadow-root>
+            <section>
+              <!--Fallback content child-->
+              <slot>
+                Fallback content child
+              </slot>
+              Fallback content parent
+              <!--Fallback content parent-->
+            </section>
+          </mock:shadow-root>
+          <p>
+            slotted item 1
+          </p>
+          <p>
+            slotted item 2
+          </p>
+          <p>
+            slotted item 3
+          </p>
+        </cmp-b>
+      </article>
+    </cmp-a>`);
   });
 });
