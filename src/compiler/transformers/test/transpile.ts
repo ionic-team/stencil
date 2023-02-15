@@ -22,7 +22,8 @@ export function transpileModule(
   config?: d.Config | null,
   compilerCtx?: d.CompilerCtx | null,
   beforeTransformers: ts.TransformerFactory<ts.SourceFile>[] = [],
-  afterTransformers: ts.TransformerFactory<ts.SourceFile>[] = []
+  afterTransformers: ts.TransformerFactory<ts.SourceFile>[] = [],
+  tsConfig: ts.CompilerOptions = {},
 ) {
   const options = ts.getDefaultCompilerOptions();
   options.isolatedModules = true;
