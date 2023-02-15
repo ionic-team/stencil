@@ -9,6 +9,7 @@ import { createLogger } from '../sys/logger/console-logger';
 import { lazyComponentTransform } from '../transformers/component-lazy/transform-lazy-component';
 import { nativeComponentTransform } from '../transformers/component-native/tranform-to-native-component';
 import { convertDecoratorsToStatic } from '../transformers/decorators-to-static/convert-decorators';
+import {rewriteAliasedDTSImportPaths, rewriteAliasedSourceFileImportPaths} from '../transformers/rewrite-aliased-paths';
 import { convertStaticToMeta } from '../transformers/static-to-meta/visitor';
 import { updateStencilCoreImports } from '../transformers/update-stencil-core-import';
 
@@ -104,23 +105,42 @@ export const transpileModule = (
   const program = ts.createProgram([sourceFilePath], tsCompilerOptions, compilerHost);
   const typeChecker = program.getTypeChecker();
 
-  const after: ts.TransformerFactory<ts.SourceFile>[] = [
-    convertStaticToMeta(config, compilerCtx, buildCtx, typeChecker, null, transformOpts),
-  ];
-
-  if (transformOpts.componentExport === 'customelement' || transformOpts.componentExport === 'module') {
-    after.push(nativeComponentTransform(compilerCtx, transformOpts));
-  } else {
-    after.push(lazyComponentTransform(compilerCtx, transformOpts));
-  }
-
-  program.emit(undefined, undefined, undefined, false, {
+  const transformers: ts.CustomTransformers = {
     before: [
       convertDecoratorsToStatic(config, buildCtx.diagnostics, typeChecker),
       updateStencilCoreImports(transformOpts.coreImportPath),
     ],
-    after,
-  });
+    after: [
+      convertStaticToMeta(config, compilerCtx, buildCtx, typeChecker, null, transformOpts),
+    ],
+    afterDeclarations: []
+  };
+
+  if (config.transformAliasedImportPaths) {
+    transformers.before.push(rewriteAliasedSourceFileImportPaths());
+    // TypeScript handles the generation of JS and `.d.ts` files through
+    // different pipelines. One (possibly surprising) consequence of this is
+    // that if you modify a source file using a transforming it will not
+    // automatically result in changes to the corresponding `.d.ts` file.
+    // Instead, if you want to, for instance, rewrite some import specifiers in
+    // both the source file _and_ its typedef you'll need to run a transformer
+    // for both of them.
+    //
+    // See here: https://github.com/itsdouges/typescript-transformer-handbook#transforms
+    // and here: https://github.com/microsoft/TypeScript/pull/23946
+    //
+    // This quirk is not terribly well documented unfortunately.
+    transformers.afterDeclarations.push(rewriteAliasedDTSImportPaths());
+  }
+
+
+  if (transformOpts.componentExport === 'customelement' || transformOpts.componentExport === 'module') {
+    transformers.after.push(nativeComponentTransform(compilerCtx, transformOpts));
+  } else {
+    transformers.after.push(lazyComponentTransform(compilerCtx, transformOpts));
+  }
+
+  program.emit(undefined, undefined, undefined, false, transformers);
 
   const tsDiagnostics = [...program.getSyntacticDiagnostics()];
 
