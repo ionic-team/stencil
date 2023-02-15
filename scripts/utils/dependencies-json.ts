@@ -3,10 +3,18 @@ import { join } from 'path';
 
 import type { BuildOptions } from './options';
 
-export async function updateDependenciesJson(opts: BuildOptions) {
+/**
+ * This function updates/writes `dependencies.json` file(s) on disk, using a template file found in the Stencil source
+ * code.
+ * @param opts the build options for Stencil when building the compiler
+ */
+export async function updateDependenciesJson(opts: BuildOptions): Promise<void> {
+  // determine the location of the template file
   const srcPath = join(opts.srcDir, 'compiler', 'sys', 'dependencies.json');
+  // determine the destination path of `dependencies.json`
   const rootPath = join(opts.rootDir, 'dependencies.json');
 
+  // get a list of stencil files + typescript compiler type declarations to add to the bundle
   const stencilResources = await getStencilResources(opts);
 
   const data = JSON.parse(await readFile(srcPath, 'utf8'));
@@ -15,8 +23,10 @@ export async function updateDependenciesJson(opts: BuildOptions) {
       dep.resources = stencilResources;
     }
   }
-  // update the src file, which most of the times is no change
-  // but incase there is a change we'll then know to commit it
+  // update the src file, which most of the time is no change
+  // but! in case there _is_ a change we'll then know to commit it.
+  // Cases of updating this file often occur as a result of upgrading TypeScript.
+  // `git blame` in the file that `srcPath` resolves to demonstrate cases such as this.
   await writeFile(srcPath, JSON.stringify(data, null, 2));
 
   // now update the versions and write a copy for the root
@@ -40,7 +50,12 @@ export async function updateDependenciesJson(opts: BuildOptions) {
   await writeFile(rootPath, JSON.stringify(data, null, 2));
 }
 
-async function getStencilResources(opts: BuildOptions) {
+/**
+ * Generate a list of Stencil resources (and TypeScript files) to use in creating the compiler bundle
+ * @param opts the Stencil build options to use to generate this list
+ * @returns a sorted list of Stencil resources
+ */
+async function getStencilResources(opts: BuildOptions): Promise<string[]> {
   const tsLibPaths = (await getTypeScriptDefaultLibNames(opts)).map((f) => `compiler/${f}`);
 
   const resources: string[] = [
@@ -82,8 +97,13 @@ async function getStencilResources(opts: BuildOptions) {
   });
 }
 
-export async function getTypeScriptDefaultLibNames(opts: BuildOptions) {
-  const tsLibNames = (await readdir(opts.typescriptLibDir)).filter((f) => {
+/**
+ * Helper function that reads in the `lib.*.d.ts` files in the TypeScript lib/ directory on disk.
+ * @param opts the Stencil build options, which includes the location of the TypeScript lib/
+ * @returns all file names that match the `lib.*.d.ts` format
+ */
+export async function getTypeScriptDefaultLibNames(opts: BuildOptions): Promise<string[]> {
+  const tsLibNames: string[] = (await readdir(opts.typescriptLibDir)).filter((f) => {
     return f.startsWith('lib.') && f.endsWith('.d.ts');
   });
   return tsLibNames;
