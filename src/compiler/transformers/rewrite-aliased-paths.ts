@@ -8,19 +8,20 @@ import { retrieveTsModifiers } from './transform-utils';
  * Transform module import paths aliased with `paths` in `tsconfig.json` to
  * relative imported in `.d.ts` files.
  *
- * @returns a TypeScript transformer factory
+ * @param transformCtx a TypeScript transformation context
+ * @returns a TypeScript transformer
  */
-export function rewriteAliasedDTSImportPaths(): ts.TransformerFactory<ts.Bundle | ts.SourceFile> {
-  return (transformCtx: ts.TransformationContext) => {
-    const compilerHost = ts.createCompilerHost(transformCtx.getCompilerOptions());
+export function rewriteAliasedDTSImportPaths(
+  transformCtx: ts.TransformationContext
+): ts.Transformer<ts.Bundle | ts.SourceFile> {
+  const compilerHost = ts.createCompilerHost(transformCtx.getCompilerOptions());
 
-    return (tsBundleOrSourceFile) => {
-      const fileName = ts.isBundle(tsBundleOrSourceFile)
-        ? tsBundleOrSourceFile.getSourceFile().fileName
-        : tsBundleOrSourceFile.fileName;
+  return (tsBundleOrSourceFile) => {
+    const fileName = ts.isBundle(tsBundleOrSourceFile)
+      ? tsBundleOrSourceFile.getSourceFile().fileName
+      : tsBundleOrSourceFile.fileName;
 
-      return ts.visitEachChild(tsBundleOrSourceFile, visit(compilerHost, transformCtx, fileName), transformCtx);
-    };
+    return ts.visitEachChild(tsBundleOrSourceFile, visit(compilerHost, transformCtx, fileName), transformCtx);
   };
 }
 
@@ -28,23 +29,42 @@ export function rewriteAliasedDTSImportPaths(): ts.TransformerFactory<ts.Bundle 
  * Transform modules aliased with `paths` in `tsconfig.json` to relative
  * imported in source files.
  *
- * @returns a TypeScript transformer factory
+ * @param transformCtx a TypeScript transformation context
+ * @returns a TypeScript transformer
  */
-export function rewriteAliasedSourceFileImportPaths(): ts.TransformerFactory<ts.SourceFile> {
-  return (transformCtx: ts.TransformationContext) => {
-    const compilerHost = ts.createCompilerHost(transformCtx.getCompilerOptions());
+export function rewriteAliasedSourceFileImportPaths(
+  transformCtx: ts.TransformationContext
+): ts.Transformer<ts.SourceFile> {
+  const compilerHost = ts.createCompilerHost(transformCtx.getCompilerOptions());
 
-    return (tsSourceFile) => {
-      return ts.visitEachChild(tsSourceFile, visit(compilerHost, transformCtx, tsSourceFile.fileName), transformCtx);
-    };
+  return (tsSourceFile) => {
+    return ts.visitEachChild(tsSourceFile, visit(compilerHost, transformCtx, tsSourceFile.fileName), transformCtx);
   };
 }
 
 /**
- * This visitor function will modify any {@link ts.ImportDeclaration} nodes to
- * rewrite module identifiers which are configured using the `paths` parameter
- * in `tsconfig.json` from whatever name they are bound to a relative path from
- * the importer to the importee.
+ * Visitor function used when rewriting aliased paths in both source files and
+ * `.d.ts` output.
+ *
+ * @param compilerHost a TS compiler host
+ * @param transformCtx a TS transformation context
+ * @param sourceFilePath the path to the source file being visited
+ * @returns a visitor which takes a node and optionally transforms imports
+ */
+function visit(compilerHost: ts.CompilerHost, transformCtx: ts.TransformationContext, sourceFilePath: string) {
+  return (node: ts.Node): ts.VisitResult<ts.Node> => {
+    if (!ts.isImportDeclaration(node)) {
+      return node;
+    }
+    return rewriteAliasedImport(compilerHost, transformCtx, sourceFilePath, node);
+  };
+}
+
+/**
+ * This will rewrite the module identifier for a {@link ts.ImportDeclaration}
+ * node to turn identifiers which are configured using the `paths` parameter in
+ * `tsconfig.json` from whatever name they are bound to a relative path from the
+ * importer to the importee.
  *
  * We need to handle this ourselves because while the TypeScript team supports
  * using the `paths` configuration to allow location-independent imports across
@@ -90,112 +110,64 @@ export function rewriteAliasedSourceFileImportPaths(): ts.TransformerFactory<ts.
  *
  * So that means we've got to do it!
  *
- * This visitor function does so by getting the resolved file path to any
- * module which is not 1) not external (i.e. not a dependency) and 2) is not
- * already a relative, file-path based import. It then replaces the module
- * identifier with the relative path from the importer to the importee.
+ * This function does so by getting the resolved file path to any module which
+ * is not 1) not external (i.e. not a dependency) and 2) is not already a
+ * relative, file-path based import. It then replaces the module identifier
+ * with the relative path from the importer to the importee.
  *
  * @param compilerHost a TS compiler host
  * @param transformCtx a TS transformation context
  * @param sourceFilePath the path to the source file being visited
+ * @param node a TypeScript import declaration node
  * @returns a visitor which takes a node and optionally transforms imports
  */
-const visit = (compilerHost: ts.CompilerHost, transformCtx: ts.TransformationContext, sourceFilePath: string) => {
-  return (node: ts.Node): ts.VisitResult<ts.Node> => {
-    if (ts.isImportDeclaration(node) && ts.isStringLiteral(node.moduleSpecifier)) {
-      let importPath = node.moduleSpecifier.text;
+function rewriteAliasedImport(
+  compilerHost: ts.CompilerHost,
+  transformCtx: ts.TransformationContext,
+  sourceFilePath: string,
+  node: ts.ImportDeclaration
+): ts.ImportDeclaration {
+  // this most likely won't be the case, but we'll leave it to TypeScript to
+  // error in the case that the user does something like `import foo from 3;`
+  if (!ts.isStringLiteral(node.moduleSpecifier)) {
+    return node;
+  }
 
-      // We will ignore transforming any paths that are already relative paths or
-      // imports from external modules/packages
-      if (!importPath.startsWith('.')) {
-        const module = ts.resolveModuleName(
-          importPath,
-          sourceFilePath,
-          transformCtx.getCompilerOptions(),
-          compilerHost
-        );
+  let importPath = node.moduleSpecifier.text;
 
-        const hasResolvedFileName = module.resolvedModule?.resolvedFileName != null;
-        const isModuleFromNodeModules = module.resolvedModule?.isExternalLibraryImport === true;
-        const shouldTranspileImportPath = hasResolvedFileName && !isModuleFromNodeModules;
+  // We will ignore transforming any paths that are already relative paths or
+  // imports from external modules/packages
+  if (importPath.startsWith('.')) {
+    return node;
+  }
 
-        if (shouldTranspileImportPath) {
-          // Create a regular expression that will be used to remove the last file extension
-          // from the import path
-          const extensionRegex = new RegExp(
-            Object.values(ts.Extension)
-              .map((extension) => `${extension}$`)
-              .join('|')
-          );
+  const module = ts.resolveModuleName(importPath, sourceFilePath, transformCtx.getCompilerOptions(), compilerHost);
 
-          // In order to make sure the relative path works when the destination depth is different than the source
-          // file structure depth, we need to determine where the resolved file exists relative to the destination directory
-          const resolvePathInDestination = module.resolvedModule.resolvedFileName;
+  const hasResolvedFileName = module.resolvedModule?.resolvedFileName != null;
+  const isModuleFromNodeModules = module.resolvedModule?.isExternalLibraryImport === true;
+  const shouldTranspileImportPath = hasResolvedFileName && !isModuleFromNodeModules;
 
-          importPath = normalizePath(
-            relative(dirname(sourceFilePath), resolvePathInDestination).replace(extensionRegex, '')
-          );
+  if (!shouldTranspileImportPath) {
+    return node;
+  }
 
-          return transformCtx.factory.updateImportDeclaration(
-            node,
-            retrieveTsModifiers(node),
-            node.importClause,
-            transformCtx.factory.createStringLiteral(importPath),
-            node.assertClause
-          );
-        }
-      }
-    }
+  // Create a regular expression that will be used to remove the last file extension
+  // from the import path
+  const extensionRegex = new RegExp(
+    Object.values(ts.Extension)
+      .map((extension) => `${extension}$`)
+      .join('|')
+  );
 
-    return ts.visitEachChild(node, visit(compilerHost, transformCtx, sourceFilePath), transformCtx);
-  };
-};
+  const resolvePathInDestination = module.resolvedModule.resolvedFileName;
+  // get the normalized relative path from the importer to the importee
+  importPath = normalizePath(relative(dirname(sourceFilePath), resolvePathInDestination).replace(extensionRegex, ''));
 
-
-function rewriteAliasedImport(node: ts.ImportDeclaration, transformCtx: ts.TransformationContext): ts.ImportDeclaration {
-    if (ts.isImportDeclaration(node) && ts.isStringLiteral(node.moduleSpecifier)) {
-      let importPath = node.moduleSpecifier.text;
-
-      // We will ignore transforming any paths that are already relative paths or
-      // imports from external modules/packages
-      if (!importPath.startsWith('.')) {
-        const module = ts.resolveModuleName(
-          importPath,
-          sourceFilePath,
-          transformCtx.getCompilerOptions(),
-          compilerHost
-        );
-
-        const hasResolvedFileName = module.resolvedModule?.resolvedFileName != null;
-        const isModuleFromNodeModules = module.resolvedModule?.isExternalLibraryImport === true;
-        const shouldTranspileImportPath = hasResolvedFileName && !isModuleFromNodeModules;
-
-        if (shouldTranspileImportPath) {
-          // Create a regular expression that will be used to remove the last file extension
-          // from the import path
-          const extensionRegex = new RegExp(
-            Object.values(ts.Extension)
-              .map((extension) => `${extension}$`)
-              .join('|')
-          );
-
-          // In order to make sure the relative path works when the destination depth is different than the source
-          // file structure depth, we need to determine where the resolved file exists relative to the destination directory
-          const resolvePathInDestination = module.resolvedModule.resolvedFileName;
-
-          importPath = normalizePath(
-            relative(dirname(sourceFilePath), resolvePathInDestination).replace(extensionRegex, '')
-          );
-
-          return transformCtx.factory.updateImportDeclaration(
-            node,
-            retrieveTsModifiers(node),
-            node.importClause,
-            transformCtx.factory.createStringLiteral(importPath),
-            node.assertClause
-          );
-        }
-      }
-    }
-
-
+  return transformCtx.factory.updateImportDeclaration(
+    node,
+    retrieveTsModifiers(node),
+    node.importClause,
+    transformCtx.factory.createStringLiteral(importPath),
+    node.assertClause
+  );
+}

@@ -60,7 +60,7 @@ export const runTsProgram = async (
   };
 
   if (config.transformAliasedImportPaths) {
-    transformers.before.push(rewriteAliasedSourceFileImportPaths());
+    transformers.before.push(rewriteAliasedSourceFileImportPaths);
     // TypeScript handles the generation of JS and `.d.ts` files through
     // different pipelines. One (possibly surprising) consequence of this is
     // that if you modify a source file using a transforming it will not
@@ -73,7 +73,7 @@ export const runTsProgram = async (
     // and here: https://github.com/microsoft/TypeScript/pull/23946
     //
     // This quirk is not terribly well documented unfortunately.
-    transformers.afterDeclarations.push(rewriteAliasedDTSImportPaths());
+    transformers.afterDeclarations.push(rewriteAliasedDTSImportPaths);
   }
 
   // Emit files that changed

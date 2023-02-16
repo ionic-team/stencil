@@ -28,9 +28,9 @@ async function pathTransformTranspile(component: string) {
     component,
     null,
     compilerContext,
-    [rewriteAliasedSourceFileImportPaths()],
+    [rewriteAliasedSourceFileImportPaths],
     [],
-    [rewriteAliasedDTSImportPaths()],
+    [rewriteAliasedDTSImportPaths],
     mockPathsConfig
   );
 }
@@ -96,6 +96,36 @@ describe('rewrite alias module paths transform', () => {
 
     expect(t.declarationOutputText).toBe(
       'import { Foo } from "./name/space/subdir";export declare function fooUtil(foo: Foo): Foo;'
+    );
+  });
+
+  it('should rewrite multiple aliased paths in the same module', async () => {
+    const t = await pathTransformTranspile(`
+      import { Foo } from "@namespace/subdir";
+      import { Bar } from "@namespace";
+
+      export function fooUtil(foo: Foo): Bar {
+        return foo.toBar()
+      }
+    `);
+
+    expect(t.declarationOutputText).toBe(
+      'import { Foo } from "./name/space/subdir";import { Bar } from "./name/space";export declare function fooUtil(foo: Foo): Bar;'
+    );
+  });
+
+  it('should rewrite aliased paths while leaving non-aliased paths alone', async () => {
+    const t = await pathTransformTranspile(`
+      import { Foo } from "@namespace/subdir";
+      import { Bar } from "./name/space";
+
+      export function fooUtil(foo: Foo): Bar {
+        return foo.toBar()
+      }
+    `);
+
+    expect(t.declarationOutputText).toBe(
+      'import { Foo } from "./name/space/subdir";import { Bar } from "./name/space";export declare function fooUtil(foo: Foo): Bar;'
     );
   });
 });
