@@ -87,7 +87,7 @@ describe('rewrite alias module paths transform', () => {
 
   it('should rewrite a nested aliased modules identifier in a .d.ts', async () => {
     const t = await pathTransformTranspile(`
-      import { Foo } from "@namespace";
+      import { Foo } from "@namespace/subdir";
 
       export function fooUtil(foo: Foo): Foo {
         return foo
@@ -95,7 +95,7 @@ describe('rewrite alias module paths transform', () => {
     `);
 
     expect(t.declarationOutputText).toBe(
-      'import { Foo } from "./name/space";export declare function fooUtil(foo: Foo): Foo;'
+      'import { Foo } from "./name/space/subdir";export declare function fooUtil(foo: Foo): Foo;'
     );
   });
 });
