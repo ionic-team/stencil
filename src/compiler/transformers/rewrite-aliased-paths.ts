@@ -150,3 +150,52 @@ const visit = (compilerHost: ts.CompilerHost, transformCtx: ts.TransformationCon
     return ts.visitEachChild(node, visit(compilerHost, transformCtx, sourceFilePath), transformCtx);
   };
 };
+
+
+function rewriteAliasedImport(node: ts.ImportDeclaration, transformCtx: ts.TransformationContext): ts.ImportDeclaration {
+    if (ts.isImportDeclaration(node) && ts.isStringLiteral(node.moduleSpecifier)) {
+      let importPath = node.moduleSpecifier.text;
+
+      // We will ignore transforming any paths that are already relative paths or
+      // imports from external modules/packages
+      if (!importPath.startsWith('.')) {
+        const module = ts.resolveModuleName(
+          importPath,
+          sourceFilePath,
+          transformCtx.getCompilerOptions(),
+          compilerHost
+        );
+
+        const hasResolvedFileName = module.resolvedModule?.resolvedFileName != null;
+        const isModuleFromNodeModules = module.resolvedModule?.isExternalLibraryImport === true;
+        const shouldTranspileImportPath = hasResolvedFileName && !isModuleFromNodeModules;
+
+        if (shouldTranspileImportPath) {
+          // Create a regular expression that will be used to remove the last file extension
+          // from the import path
+          const extensionRegex = new RegExp(
+            Object.values(ts.Extension)
+              .map((extension) => `${extension}$`)
+              .join('|')
+          );
+
+          // In order to make sure the relative path works when the destination depth is different than the source
+          // file structure depth, we need to determine where the resolved file exists relative to the destination directory
+          const resolvePathInDestination = module.resolvedModule.resolvedFileName;
+
+          importPath = normalizePath(
+            relative(dirname(sourceFilePath), resolvePathInDestination).replace(extensionRegex, '')
+          );
+
+          return transformCtx.factory.updateImportDeclaration(
+            node,
+            retrieveTsModifiers(node),
+            node.importClause,
+            transformCtx.factory.createStringLiteral(importPath),
+            node.assertClause
+          );
+        }
+      }
+    }
+
+
