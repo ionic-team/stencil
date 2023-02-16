@@ -9,7 +9,10 @@ import { createLogger } from '../sys/logger/console-logger';
 import { lazyComponentTransform } from '../transformers/component-lazy/transform-lazy-component';
 import { nativeComponentTransform } from '../transformers/component-native/tranform-to-native-component';
 import { convertDecoratorsToStatic } from '../transformers/decorators-to-static/convert-decorators';
-import {rewriteAliasedDTSImportPaths, rewriteAliasedSourceFileImportPaths} from '../transformers/rewrite-aliased-paths';
+import {
+  rewriteAliasedDTSImportPaths,
+  rewriteAliasedSourceFileImportPaths,
+} from '../transformers/rewrite-aliased-paths';
 import { convertStaticToMeta } from '../transformers/static-to-meta/visitor';
 import { updateStencilCoreImports } from '../transformers/update-stencil-core-import';
 
@@ -110,10 +113,8 @@ export const transpileModule = (
       convertDecoratorsToStatic(config, buildCtx.diagnostics, typeChecker),
       updateStencilCoreImports(transformOpts.coreImportPath),
     ],
-    after: [
-      convertStaticToMeta(config, compilerCtx, buildCtx, typeChecker, null, transformOpts),
-    ],
-    afterDeclarations: []
+    after: [convertStaticToMeta(config, compilerCtx, buildCtx, typeChecker, null, transformOpts)],
+    afterDeclarations: [],
   };
 
   if (config.transformAliasedImportPaths) {
@@ -132,7 +133,6 @@ export const transpileModule = (
     // This quirk is not terribly well documented unfortunately.
     transformers.afterDeclarations.push(rewriteAliasedDTSImportPaths());
   }
-
 
   if (transformOpts.componentExport === 'customelement' || transformOpts.componentExport === 'module') {
     transformers.after.push(nativeComponentTransform(compilerCtx, transformOpts));

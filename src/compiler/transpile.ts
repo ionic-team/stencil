@@ -40,7 +40,7 @@ export const transpile = async (code: string, opts: TranspileOptions = {}): Prom
   try {
     if (shouldTranspileModule(results.inputFileExtension)) {
       const { config, compileOpts, transformOpts, inMemoryFs } = getTranspileConfig(opts);
-      config.sys
+      config.sys;
       patchTypescript(config, inMemoryFs);
       transpileCode(config, compileOpts, transformOpts, results);
     } else if (results.inputFileExtension === 'd.ts') {
