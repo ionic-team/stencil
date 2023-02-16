@@ -12,6 +12,7 @@ import type {
 } from '../../declarations';
 import { STENCIL_INTERNAL_CLIENT_ID } from '../bundle/entry-alias-ids';
 import { IS_NODE_ENV, requireFunc } from '../sys/environment';
+import {createInMemoryFs, InMemoryFileSystem} from '../sys/in-memory-fs';
 import { createSystem } from '../sys/stencil-sys';
 import { parseImportPath } from '../transformers/stencil-import-path';
 
@@ -40,7 +41,14 @@ export const getTranspileResults = (code: string, input: TranspileOptions) => {
 
 const transpileCtx = { sys: null as CompilerSystem };
 
-export const getTranspileConfig = (input: TranspileOptions) => {
+interface TranspileConfig {
+  config: Config,
+  inMemoryFs: InMemoryFileSystem,
+  compileOpts: TranspileOptions,
+  transformOpts: TransformOptions
+}
+
+export const getTranspileConfig = (input: TranspileOptions): TranspileConfig => {
   if (input.sys) {
     transpileCtx.sys = input.sys;
   } else if (!transpileCtx.sys) {
@@ -134,10 +142,13 @@ export const getTranspileConfig = (input: TranspileOptions) => {
     tsCompilerOptions,
   };
 
+  const inMemoryFs = createInMemoryFs(transpileCtx.sys);
+
   return {
     compileOpts,
     config,
     transformOpts,
+    inMemoryFs
   };
 };
 
