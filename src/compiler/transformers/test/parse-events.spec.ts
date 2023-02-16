@@ -105,7 +105,7 @@ describe('parse events', () => {
       references: {
         Mode: {
           location: 'local',
-          path: 'module.tsx',
+          path: '/module.tsx',
         },
       },
     });

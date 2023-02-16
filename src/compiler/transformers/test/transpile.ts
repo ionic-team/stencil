@@ -1,6 +1,8 @@
 import type * as d from '@stencil/core/declarations';
 import { mockBuildCtx, mockCompilerCtx, mockConfig } from '@stencil/core/testing';
+import path from 'path';
 import ts from 'typescript';
+import { patchTypescript } from '../../sys/typescript/typescript-sys';
 
 import { convertDecoratorsToStatic } from '../decorators-to-static/convert-decorators';
 import { updateModule } from '../static-to-meta/parse-static';
@@ -24,48 +26,55 @@ export function transpileModule(
   compilerCtx?: d.CompilerCtx | null,
   beforeTransformers: ts.TransformerFactory<ts.SourceFile>[] = [],
   afterTransformers: ts.TransformerFactory<ts.SourceFile>[] = [],
-  tsConfig: ts.CompilerOptions = {},
+  afterDeclarations: ts.TransformerFactory<ts.SourceFile | ts.Bundle>[] = [],
+  tsConfig: ts.CompilerOptions = {}
 ) {
   const options: ts.CompilerOptions = {
     ...ts.getDefaultCompilerOptions(),
-    ...tsConfig
+    allowNonTsExtensions: true,
+    composite: undefined,
+    declaration: undefined,
+    declarationDir: undefined,
+    experimentalDecorators: true,
+    isolatedModules: true,
+    jsx: ts.JsxEmit.React,
+    jsxFactory: 'h',
+    jsxFragmentFactory: 'Fragment',
+    lib: undefined,
+    module: ts.ModuleKind.ESNext,
+    noEmit: undefined,
+    noEmitHelpers: true,
+    noEmitOnError: undefined,
+    noLib: true,
+    noResolve: true,
+    out: undefined,
+    outFile: undefined,
+    paths: undefined,
+    removeComments: false,
+    rootDirs: undefined,
+    suppressOutputPathCheck: true,
+    target: getScriptTarget(),
+    types: undefined,
+    // add in possible default config overrides
+    ...tsConfig,
   };
-  options.isolatedModules = true;
-  options.suppressOutputPathCheck = true;
-  options.allowNonTsExtensions = true;
-  options.removeComments = false;
-  options.noLib = true;
-  options.lib = undefined;
-  options.types = undefined;
-  options.noEmit = undefined;
-  options.noEmitOnError = undefined;
-  options.noEmitHelpers = true;
-  options.paths = undefined;
-  options.rootDirs = undefined;
-  options.declaration = undefined;
-  options.composite = undefined;
-  options.declarationDir = undefined;
-  options.out = undefined;
-  options.outFile = undefined;
-  options.noResolve = true;
 
-  options.module = ts.ModuleKind.ESNext;
-  options.target = getScriptTarget();
-  options.experimentalDecorators = true;
+  config = config || mockConfig();
+  compilerCtx = compilerCtx || mockCompilerCtx(config);
 
-  options.jsx = ts.JsxEmit.React;
-  options.jsxFactory = 'h';
-  options.jsxFragmentFactory = 'Fragment';
-
-  const inputFileName = 'module.tsx';
+  const inputFileName = path.join(config.rootDir, 'module.tsx');
   const sourceFile = ts.createSourceFile(inputFileName, input, options.target);
 
   let outputText: string;
+  let declarationOutputText: string;
 
   const emitCallback: ts.WriteFileCallback = (emitFilePath, data, _w, _e, tsSourceFiles) => {
     if (emitFilePath.endsWith('.js')) {
-      outputText = data;
+      outputText = prettifyTSOutput(data);
       updateModule(config, compilerCtx, buildCtx, tsSourceFiles[0], data, emitFilePath, tsTypeChecker, null);
+    }
+    if (emitFilePath.endsWith('.d.ts')) {
+      declarationOutputText = prettifyTSOutput(data);
     }
   };
 
@@ -86,8 +95,7 @@ export function transpileModule(
   const tsProgram = ts.createProgram([inputFileName], options, compilerHost);
   const tsTypeChecker = tsProgram.getTypeChecker();
 
-  config = config || mockConfig();
-  compilerCtx = compilerCtx || mockCompilerCtx(config);
+  patchTypescript(config, compilerCtx.fs);
 
   const buildCtx = mockBuildCtx(config, compilerCtx);
 
@@ -107,11 +115,8 @@ export function transpileModule(
       convertStaticToMeta(config, compilerCtx, buildCtx, tsTypeChecker, null, transformOpts),
       ...afterTransformers,
     ],
+    afterDeclarations,
   });
-
-  while (outputText.includes('  ')) {
-    outputText = outputText.replace(/  /g, ' ');
-  }
 
   const moduleFile: d.Module = compilerCtx.moduleMap.values().next().value;
   const cmps = moduleFile ? moduleFile.cmps : null;
@@ -134,31 +139,42 @@ export function transpileModule(
   const legacyContext = cmp ? cmp.legacyContext : null;
 
   return {
-    outputText,
-    compilerCtx,
     buildCtx,
-    diagnostics: buildCtx.diagnostics,
-    moduleFile,
-    cmps,
     cmp,
+    cmps,
+    compilerCtx,
     componentClassName,
-    tagName,
-    properties,
-    virtualProperties,
-    property,
-    states,
-    state,
-    listeners,
-    listener,
-    events,
-    event,
-    methods,
-    method,
+    declarationOutputText,
+    diagnostics: buildCtx.diagnostics,
     elementRef,
-    legacyContext,
+    event,
+    events,
     legacyConnect,
+    legacyContext,
+    listener,
+    listeners,
+    method,
+    methods,
+    moduleFile,
+    outputText,
+    properties,
+    property,
+    state,
+    states,
+    tagName,
+    virtualProperties,
   };
 }
+
+/**
+ * Rewrites any stretches of whitespace in the TypeScript output to take up a
+ * single space instead. This makes it a little more readable to write out strings
+ * in spec files for comparison.
+ *
+ * @param tsOutput the string to process
+ * @returns that string with any stretches of whitespace shrunk down to one space
+ */
+const prettifyTSOutput = (tsOutput: string): string => tsOutput.replace(/\s+/gm, ' ');
 
 export function getStaticGetter(output: string, prop: string) {
   const toEvaluate = `return ${output.replace('export', '')}`;
