@@ -15,6 +15,7 @@ import { getScriptTarget } from '../transform-utils';
  * @param compilerCtx a compiler context to use in the transpilation process
  * @param beforeTransformers TypeScript transformers that should be applied before the code is emitted
  * @param afterTransformers TypeScript transformers that should be applied after the code is emitted
+ * @param tsConfig optional typescript compiler options to use
  * @returns the result of the transpilation step
  */
 export function transpileModule(
@@ -25,7 +26,10 @@ export function transpileModule(
   afterTransformers: ts.TransformerFactory<ts.SourceFile>[] = [],
   tsConfig: ts.CompilerOptions = {},
 ) {
-  const options = ts.getDefaultCompilerOptions();
+  const options: ts.CompilerOptions = {
+    ...ts.getDefaultCompilerOptions(),
+    ...tsConfig
+  };
   options.isolatedModules = true;
   options.suppressOutputPathCheck = true;
   options.allowNonTsExtensions = true;

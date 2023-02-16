@@ -2,6 +2,7 @@ import { transpileModule } from './transpile';
 import ts from 'typescript'
 import { mockValidatedConfig } from '@stencil/core/testing'
 import {ValidatedConfig} from '@stencil/core/declarations';
+import {rewriteAliasedSourceFileImportPaths} from '../rewrite-aliased-paths';
 
 function getConfig(): ValidatedConfig {
   const config = mockValidatedConfig();
@@ -22,7 +23,8 @@ function pathTransformTranspile (component: string) {
   return transpileModule(
     component,
     config,
-    [],
+    undefined,
+    [rewriteAliasedSourceFileImportPaths()],
     [],
     MOCK_PATHS,
   );
@@ -30,7 +32,7 @@ function pathTransformTranspile (component: string) {
 
 
 describe('rewrite alias module paths transform', () => {
-  
+
   it('should rewrite an aliased modules identifier', () => {
     const t = pathTransformTranspile(`
       import { foo } from "@namespace";
