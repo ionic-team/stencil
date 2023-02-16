@@ -2,8 +2,8 @@ import type * as d from '@stencil/core/declarations';
 import { mockBuildCtx, mockCompilerCtx, mockConfig } from '@stencil/core/testing';
 import path from 'path';
 import ts from 'typescript';
-import { patchTypescript } from '../../sys/typescript/typescript-sys';
 
+import { patchTypescript } from '../../sys/typescript/typescript-sys';
 import { convertDecoratorsToStatic } from '../decorators-to-static/convert-decorators';
 import { updateModule } from '../static-to-meta/parse-static';
 import { convertStaticToMeta } from '../static-to-meta/visitor';
@@ -17,6 +17,8 @@ import { getScriptTarget } from '../transform-utils';
  * @param compilerCtx a compiler context to use in the transpilation process
  * @param beforeTransformers TypeScript transformers that should be applied before the code is emitted
  * @param afterTransformers TypeScript transformers that should be applied after the code is emitted
+ * @param afterDeclarations TypeScript transformers that should be applied
+ * after declarations are generated
  * @param tsConfig optional typescript compiler options to use
  * @returns the result of the transpilation step
  */

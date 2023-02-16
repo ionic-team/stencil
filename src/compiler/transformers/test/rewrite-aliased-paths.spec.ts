@@ -1,9 +1,10 @@
-import { transpileModule } from './transpile';
-import { mockCompilerCtx, mockValidatedConfig } from '@stencil/core/testing';
-import ts from 'typescript';
-import { rewriteAliasedDTSImportPaths, rewriteAliasedSourceFileImportPaths } from '../rewrite-aliased-paths';
 import { CompilerCtx } from '@stencil/core/declarations';
+import { mockCompilerCtx, mockValidatedConfig } from '@stencil/core/testing';
 import path from 'path';
+import ts from 'typescript';
+
+import { rewriteAliasedDTSImportPaths, rewriteAliasedSourceFileImportPaths } from '../rewrite-aliased-paths';
+import { transpileModule } from './transpile';
 
 async function pathTransformTranspile(component: string) {
   const compilerContext: CompilerCtx = mockCompilerCtx();
