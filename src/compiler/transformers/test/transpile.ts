@@ -2,6 +2,7 @@ import type * as d from '@stencil/core/declarations';
 import { mockBuildCtx, mockCompilerCtx, mockConfig } from '@stencil/core/testing';
 import path from 'path';
 import ts from 'typescript';
+import { normalizePath } from '@utils';
 
 import { convertDecoratorsToStatic } from '../decorators-to-static/convert-decorators';
 import { updateModule } from '../static-to-meta/parse-static';
@@ -63,7 +64,7 @@ export function transpileModule(
   config = config || mockConfig();
   compilerCtx = compilerCtx || mockCompilerCtx(config);
 
-  const inputFileName = path.join(config.rootDir, 'module.tsx');
+  const inputFileName = normalizePath(path.join(config.rootDir, 'module.tsx'));
   const sourceFile = ts.createSourceFile(inputFileName, input, options.target);
 
   let outputText: string;
