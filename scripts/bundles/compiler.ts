@@ -9,7 +9,6 @@ import sourcemaps from 'rollup-plugin-sourcemaps';
 import { minify, MinifyOptions } from 'terser';
 
 import { getBanner } from '../utils/banner';
-import { getTypeScriptDefaultLibNames } from '../utils/dependencies-json';
 import type { BuildOptions } from '../utils/options';
 import { writePkgJson } from '../utils/write-pkg-json';
 import { aliasPlugin } from './plugins/alias-plugin';
@@ -227,4 +226,13 @@ async function minifyStencilCompiler(code: string, opts: BuildOptions) {
   code = getBanner(opts, `Stencil Compiler`, true) + '\n' + results.code;
 
   return code;
+}
+
+/**
+ * Helper function that reads in the `lib.*.d.ts` files in the TypeScript lib/ directory on disk.
+ * @param opts the Stencil build options, which includes the location of the TypeScript lib/
+ * @returns all file names that match the `lib.*.d.ts` format
+ */
+async function getTypeScriptDefaultLibNames(opts: BuildOptions): Promise<string[]> {
+  return (await fs.readdir(opts.typescriptLibDir)).filter((f) => f.startsWith('lib.') && f.endsWith('.d.ts'));
 }
