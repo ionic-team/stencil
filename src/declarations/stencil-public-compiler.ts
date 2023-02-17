@@ -2580,8 +2580,8 @@ export interface TranspileOptions {
    */
   sys?: CompilerSystem;
   /**
-    * This option enables the same behavior as {@link Config.transformAliasedImportPaths}, transforming paths aliased in
-      * `tsconfig.json` to relative paths.
+   * This option enables the same behavior as {@link Config.transformAliasedImportPaths}, transforming paths aliased in
+   * `tsconfig.json` to relative paths.
    */
   transformAliasedImportPaths?: boolean;
 }
