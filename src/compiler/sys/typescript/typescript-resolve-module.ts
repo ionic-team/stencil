@@ -100,7 +100,10 @@ export const patchedTsResolveModule = (
     let resolvedFileName = join(containingDir, moduleName);
     resolvedFileName = normalizePath(ensureExtension(resolvedFileName, containingFile));
 
-    if (isAbsolute(resolvedFileName) && !inMemoryFs.accessSync(resolvedFileName)) {
+    // in some cases `inMemoryFs` will not be defined here, so we should use
+    // `accessSync` on `config.sys` instead.
+    const accessSync = inMemoryFs?.accessSync ?? config.sys.accessSync;
+    if (isAbsolute(resolvedFileName) && !accessSync(resolvedFileName)) {
       return null;
     }
 
