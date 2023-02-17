@@ -39,8 +39,8 @@ export const transpile = async (code: string, opts: TranspileOptions = {}): Prom
 
   try {
     if (shouldTranspileModule(results.inputFileExtension)) {
-      const { config, compileOpts, transformOpts, inMemoryFs } = getTranspileConfig(opts);
-      patchTypescript(config, inMemoryFs);
+      const { config, compileOpts, transformOpts } = getTranspileConfig(opts);
+      patchTypescript(config, null);
       transpileCode(config, compileOpts, transformOpts, results);
     } else if (results.inputFileExtension === 'd.ts') {
       results.code = '';
@@ -71,8 +71,8 @@ export const transpileSync = (code: string, opts: TranspileOptions = {}): Transp
 
   try {
     if (shouldTranspileModule(results.inputFileExtension)) {
-      const { config, compileOpts, transformOpts, inMemoryFs } = getTranspileConfig(opts);
-      patchTypescript(config, inMemoryFs);
+      const { config, compileOpts, transformOpts } = getTranspileConfig(opts);
+      patchTypescript(config, null);
       transpileCode(config, compileOpts, transformOpts, results);
     } else if (results.inputFileExtension === 'd.ts') {
       results.code = '';

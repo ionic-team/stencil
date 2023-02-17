@@ -44,7 +44,6 @@ const transpileCtx = { sys: null as CompilerSystem };
 interface TranspileConfig {
   compileOpts: TranspileOptions;
   config: Config;
-  inMemoryFs: InMemoryFileSystem;
   transformOpts: TransformOptions;
 }
 
@@ -142,12 +141,9 @@ export const getTranspileConfig = (input: TranspileOptions): TranspileConfig => 
     tsCompilerOptions,
   };
 
-  const inMemoryFs = createInMemoryFs(transpileCtx.sys);
-
   return {
     compileOpts,
     config,
-    inMemoryFs,
     transformOpts,
   };
 };
