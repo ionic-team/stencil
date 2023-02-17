@@ -12,7 +12,6 @@ import type {
 } from '../../declarations';
 import { STENCIL_INTERNAL_CLIENT_ID } from '../bundle/entry-alias-ids';
 import { IS_NODE_ENV, requireFunc } from '../sys/environment';
-import { createInMemoryFs, InMemoryFileSystem } from '../sys/in-memory-fs';
 import { createSystem } from '../sys/stencil-sys';
 import { parseImportPath } from '../transformers/stencil-import-path';
 
@@ -128,17 +127,17 @@ export const getTranspileConfig = (input: TranspileOptions): TranspileConfig => 
   };
 
   const config: Config = {
-    rootDir: compileOpts.currentDirectory,
-    srcDir: compileOpts.currentDirectory,
-    transformAliasedImportPaths: true,
+    _isTesting: true,
     devMode: true,
+    enableCache: false,
     minifyCss: true,
     minifyJs: false,
-    _isTesting: true,
-    validateTypes: false,
-    enableCache: false,
+    rootDir: compileOpts.currentDirectory,
+    srcDir: compileOpts.currentDirectory,
     sys: transpileCtx.sys,
+    transformAliasedImportPaths: input.transformAliasedImportPaths,
     tsCompilerOptions,
+    validateTypes: false,
   };
 
   return {
