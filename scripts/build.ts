@@ -13,7 +13,6 @@ import { testing } from './bundles/testing';
 import { createLicense } from './license';
 import { release } from './release';
 import { validateBuild } from './test/validate-build';
-import { updateDependenciesJson } from './utils/dependencies-json';
 import { BuildOptions } from './utils/options';
 
 /**
@@ -54,7 +53,6 @@ export async function createBuild(opts: BuildOptions): Promise<readonly RollupOp
     emptyDir(opts.output.mockDocDir),
     emptyDir(opts.output.sysNodeDir),
     emptyDir(opts.output.testingDir),
-    updateDependenciesJson(opts),
   ]);
 
   await sysNodeExternalBundles(opts);

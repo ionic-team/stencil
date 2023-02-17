@@ -15,7 +15,6 @@
     "bin/",
     "cli/",
     "compiler/",
-    "dependencies.json",
     "dev-server/",
     "internal/",
     "mock-doc/",
