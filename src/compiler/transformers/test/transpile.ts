@@ -3,7 +3,6 @@ import { mockBuildCtx, mockCompilerCtx, mockConfig } from '@stencil/core/testing
 import path from 'path';
 import ts from 'typescript';
 
-import { patchTypescript } from '../../sys/typescript/typescript-sys';
 import { convertDecoratorsToStatic } from '../decorators-to-static/convert-decorators';
 import { updateModule } from '../static-to-meta/parse-static';
 import { convertStaticToMeta } from '../static-to-meta/visitor';
@@ -96,8 +95,6 @@ export function transpileModule(
 
   const tsProgram = ts.createProgram([inputFileName], options, compilerHost);
   const tsTypeChecker = tsProgram.getTypeChecker();
-
-  patchTypescript(config, compilerCtx.fs);
 
   const buildCtx = mockBuildCtx(config, compilerCtx);
 
