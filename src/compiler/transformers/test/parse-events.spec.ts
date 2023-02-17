@@ -1,3 +1,5 @@
+import { normalizePath } from '@utils';
+
 import { transpileModule } from './transpile';
 
 describe('parse events', () => {
@@ -105,7 +107,7 @@ describe('parse events', () => {
       references: {
         Mode: {
           location: 'local',
-          path: '/module.tsx',
+          path: normalizePath('/module.tsx'),
         },
       },
     });
