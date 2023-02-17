@@ -2,8 +2,8 @@ import { CompilerCtx } from '@stencil/core/declarations';
 import { mockCompilerCtx, mockValidatedConfig } from '@stencil/core/testing';
 import path from 'path';
 import ts from 'typescript';
-import {patchTypescript} from '../../sys/typescript/typescript-sys';
 
+import { patchTypescript } from '../../sys/typescript/typescript-sys';
 import { rewriteAliasedDTSImportPaths, rewriteAliasedSourceFileImportPaths } from '../rewrite-aliased-paths';
 import { transpileModule } from './transpile';
 
