@@ -348,13 +348,11 @@ describe('lifecycle sync', () => {
   });
 
   it('call disconnectedCallback even if the element is immediately removed', async () => {
-
     let connected = 0;
     let disconnected = 0;
 
     @Component({ tag: 'cmp-a' })
     class CmpA {
-
       connectedCallback() {
         connected++;
       }
@@ -369,7 +367,7 @@ describe('lifecycle sync', () => {
     }
 
     const { doc, waitForChanges } = await newSpecPage({
-      components: [CmpA]
+      components: [CmpA],
     });
 
     const a1 = doc.createElement('cmp-a');
@@ -388,7 +386,6 @@ describe('lifecycle sync', () => {
 
     @Component({ tag: 'cmp-a' })
     class CmpA {
-
       connectedCallback() {
         connected++;
       }
@@ -403,7 +400,7 @@ describe('lifecycle sync', () => {
     }
 
     const { doc, waitForChanges } = await newSpecPage({
-      components: [CmpA]
+      components: [CmpA],
     });
 
     const cmp = doc.createElement('cmp-a');
