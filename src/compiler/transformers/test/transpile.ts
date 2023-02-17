@@ -1,8 +1,8 @@
 import type * as d from '@stencil/core/declarations';
 import { mockBuildCtx, mockCompilerCtx, mockConfig } from '@stencil/core/testing';
+import { normalizePath } from '@utils';
 import path from 'path';
 import ts from 'typescript';
-import { normalizePath } from '@utils';
 
 import { convertDecoratorsToStatic } from '../decorators-to-static/convert-decorators';
 import { updateModule } from '../static-to-meta/parse-static';
