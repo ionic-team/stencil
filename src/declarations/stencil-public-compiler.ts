@@ -2500,6 +2500,9 @@ export interface CompilerRequestResponse {
   status: number;
 }
 
+/**
+ * Options for Stencil's string-to-string transpiler
+ */
 export interface TranspileOptions {
   /**
    * A component can be defined as a custom element by using `customelement`, or the
@@ -2576,6 +2579,11 @@ export interface TranspileOptions {
    * Passed in Stencil Compiler System, otherwise falls back to the internal in-memory only system.
    */
   sys?: CompilerSystem;
+  /**
+    * This option enables the same behavior as {@link Config.transformAliasedImportPaths}, transforming paths aliased in
+      * `tsconfig.json` to relative paths.
+   */
+  transformAliasedImportPaths?: boolean;
 }
 
 export type CompileTarget =
