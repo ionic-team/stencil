@@ -127,6 +127,7 @@ const setContentReference = (elm: d.HostElement) => {
     BUILD.isDebug ? `content-ref (host=${elm.localName})` : ''
   ) as any);
   contentRefElm['s-cn'] = true;
-  if (!!elm.firstChild) elm.insertBefore(contentRefElm, elm.firstChild);
-  else elm.appendChild(contentRefElm);
+  const firstChild = elm.__firstChild || elm.firstChild;
+  if (!!firstChild) elm.__insertBefore(contentRefElm, firstChild);
+  else elm.__appendChild(contentRefElm);
 };

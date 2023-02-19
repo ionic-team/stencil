@@ -1236,6 +1236,8 @@ export interface HostElement extends HTMLElement {
   readonly __childNodes?: NodeListOf<ChildNode>;
   readonly __children?: HTMLCollectionOf<Element>;
   readonly __childElementCount?: number;
+  readonly __firstChild?: ChildNode | null;
+  readonly __lastChild?: ChildNode | null;
   __innerHTML?: string;
   __innerText?: string;
   __textContent?: string;
