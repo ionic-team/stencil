@@ -128,6 +128,9 @@ const setContentReference = (elm: d.HostElement) => {
   ) as any);
   contentRefElm['s-cn'] = true;
   const firstChild = elm.__firstChild || elm.firstChild;
-  if (!!firstChild) elm.__insertBefore(contentRefElm, firstChild);
-  else elm.__appendChild(contentRefElm);
+  if (!!firstChild) {
+    elm.__insertBefore ? elm.__insertBefore(contentRefElm, firstChild) : elm.insertBefore(contentRefElm, firstChild);
+  } else {
+    elm.__appendChild ? elm.__appendChild(contentRefElm) : elm.appendChild(contentRefElm);
+  }
 };
