@@ -9,12 +9,12 @@ import { rewriteAliasedDTSImportPaths, rewriteAliasedSourceFileImportPaths } fro
 import { transpileModule } from './transpile';
 
 /**
-  * Helper function for running the transpilation for tests in this module.
-  * This sets up a config, patches typescript, declares a mock TypeScript
-* configuration, writes some files to the in-memory FS, and then finally
-* transpiles the provided code.
-  *
-  * @param component the string of a component
+ * Helper function for running the transpilation for tests in this module.
+ * This sets up a config, patches typescript, declares a mock TypeScript
+ * configuration, writes some files to the in-memory FS, and then finally
+ * transpiles the provided code.
+ *
+ * @param component the string of a component
  * @returns the tranpiled module
  */
 async function pathTransformTranspile(component: string) {
