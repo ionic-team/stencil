@@ -1,5 +1,6 @@
 import { CompilerCtx } from '@stencil/core/declarations';
 import { mockCompilerCtx, mockValidatedConfig } from '@stencil/core/testing';
+import { normalizePath } from '@utils';
 import path from 'path';
 import ts from 'typescript';
 
@@ -27,6 +28,8 @@ async function pathTransformTranspile(component: string) {
   await compilerContext.fs.writeFile(path.join(config.rootDir, 'name/space.ts'), 'export const foo = x => x');
   await compilerContext.fs.writeFile(path.join(config.rootDir, 'name/space/subdir.ts'), 'export const bar = x => x;');
 
+  const inputFileName = normalizePath(path.join(config.rootDir, 'module.tsx'));
+
   return transpileModule(
     component,
     null,
@@ -34,7 +37,8 @@ async function pathTransformTranspile(component: string) {
     [rewriteAliasedSourceFileImportPaths],
     [],
     [rewriteAliasedDTSImportPaths],
-    mockPathsConfig
+    mockPathsConfig,
+    inputFileName
   );
 }
 

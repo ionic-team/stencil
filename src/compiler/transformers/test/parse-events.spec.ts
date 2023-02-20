@@ -1,6 +1,3 @@
-import { normalizePath } from '@utils';
-
-import { IS_WINDOWS_ENV } from '../../sys/environment';
 import { transpileModule } from './transpile';
 
 describe('parse events', () => {
@@ -108,7 +105,7 @@ describe('parse events', () => {
       references: {
         Mode: {
           location: 'local',
-          path: IS_WINDOWS_ENV ? normalizePath('D:/module.tsx') : normalizePath('/module.tsx'),
+          path: 'module.tsx',
         },
       },
     });

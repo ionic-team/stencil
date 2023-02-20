@@ -1,7 +1,5 @@
 import type * as d from '@stencil/core/declarations';
 import { mockBuildCtx, mockCompilerCtx, mockConfig } from '@stencil/core/testing';
-import { normalizePath } from '@utils';
-import path from 'path';
 import ts from 'typescript';
 
 import { convertDecoratorsToStatic } from '../decorators-to-static/convert-decorators';
@@ -20,6 +18,7 @@ import { getScriptTarget } from '../transform-utils';
  * @param afterDeclarations TypeScript transformers that should be applied
  * after declarations are generated
  * @param tsConfig optional typescript compiler options to use
+ * @param inputFileName a dummy filename to use for the module (defaults to `module.tsx`)
  * @returns the result of the transpilation step
  */
 export function transpileModule(
@@ -29,7 +28,8 @@ export function transpileModule(
   beforeTransformers: ts.TransformerFactory<ts.SourceFile>[] = [],
   afterTransformers: ts.TransformerFactory<ts.SourceFile>[] = [],
   afterDeclarations: ts.TransformerFactory<ts.SourceFile | ts.Bundle>[] = [],
-  tsConfig: ts.CompilerOptions = {}
+  tsConfig: ts.CompilerOptions = {},
+  inputFileName = 'module.tsx'
 ) {
   const options: ts.CompilerOptions = {
     ...ts.getDefaultCompilerOptions(),
@@ -64,7 +64,6 @@ export function transpileModule(
   config = config || mockConfig();
   compilerCtx = compilerCtx || mockCompilerCtx(config);
 
-  const inputFileName = normalizePath(path.join(config.rootDir, 'module.tsx'));
   const sourceFile = ts.createSourceFile(inputFileName, input, options.target);
 
   let outputText: string;
