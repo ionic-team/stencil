@@ -2,7 +2,6 @@ import fs from 'fs-extra';
 import glob from 'glob';
 import { basename, join } from 'path';
 import { rollup, RollupOptions } from 'rollup';
-import { minify } from 'terser';
 import ts from 'typescript';
 
 import { getBanner } from '../utils/banner';
@@ -107,6 +106,8 @@ export async function internalClient(opts: BuildOptions) {
             });
 
             const { output } = await rollupBuild.generate({ format: 'es' });
+
+            const { minify } = await import('terser');
 
             const transpileToEs5 = ts.transpileModule(output[0].code, {
               compilerOptions: {

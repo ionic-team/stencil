@@ -1,7 +1,6 @@
 import fs from 'fs-extra';
 import { join } from 'path';
 import type { Plugin } from 'rollup';
-import { minify } from 'terser';
 
 import type { BuildOptions } from '../../utils/options';
 
@@ -96,6 +95,8 @@ async function bundleTypeScriptSource(tsPath: string, opts: BuildOptions): Promi
   o.push(code);
   o.push(`export default ts;`);
   code = o.join('\n');
+
+  const { minify } = await import('terser');
 
   if (opts.isProd) {
     const minified = await minify(code, {
