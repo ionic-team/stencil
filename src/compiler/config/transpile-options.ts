@@ -40,12 +40,22 @@ export const getTranspileResults = (code: string, input: TranspileOptions) => {
 
 const transpileCtx = { sys: null as CompilerSystem };
 
+/**
+ * Configuration necessary for transpilation
+ */
 interface TranspileConfig {
   compileOpts: TranspileOptions;
   config: Config;
   transformOpts: TransformOptions;
 }
 
+/**
+ * Get configuration necessary to carry out transpilation, including a Stencil
+ * configuration, transformation options, and transpilation options.
+ *
+ * @param input options for Stencil's transpiler (string-to-string compiler)
+ * @returns the options and configuration necessary for transpilation
+ */
 export const getTranspileConfig = (input: TranspileOptions): TranspileConfig => {
   if (input.sys) {
     transpileCtx.sys = input.sys;
