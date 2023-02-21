@@ -19,6 +19,7 @@ export const getConfig = (userConfig: d.Config): d.ValidatedConfig => {
     rootDir,
     sys: userConfig.sys ?? createSystem({ logger }),
     testing: userConfig ?? {},
+    transformAliasedImportPaths: userConfig.transformAliasedImportPaths ?? false,
   };
 
   setPlatformPath(config.sys.platformPath);
