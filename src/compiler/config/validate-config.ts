@@ -61,6 +61,7 @@ export const validateConfig = (
     rootDir,
     sys: config.sys ?? bootstrapConfig.sys ?? createSystem({ logger }),
     testing: config.testing ?? {},
+    transformAliasedImportPaths: userConfig.transformAliasedImportPaths ?? false,
   };
 
   // default devMode false

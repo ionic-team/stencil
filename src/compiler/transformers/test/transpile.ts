@@ -15,6 +15,10 @@ import { getScriptTarget } from '../transform-utils';
  * @param compilerCtx a compiler context to use in the transpilation process
  * @param beforeTransformers TypeScript transformers that should be applied before the code is emitted
  * @param afterTransformers TypeScript transformers that should be applied after the code is emitted
+ * @param afterDeclarations TypeScript transformers that should be applied
+ * after declarations are generated
+ * @param tsConfig optional typescript compiler options to use
+ * @param inputFileName a dummy filename to use for the module (defaults to `module.tsx`)
  * @returns the result of the transpilation step
  */
 export function transpileModule(
@@ -22,45 +26,56 @@ export function transpileModule(
   config?: d.Config | null,
   compilerCtx?: d.CompilerCtx | null,
   beforeTransformers: ts.TransformerFactory<ts.SourceFile>[] = [],
-  afterTransformers: ts.TransformerFactory<ts.SourceFile>[] = []
+  afterTransformers: ts.TransformerFactory<ts.SourceFile>[] = [],
+  afterDeclarations: ts.TransformerFactory<ts.SourceFile | ts.Bundle>[] = [],
+  tsConfig: ts.CompilerOptions = {},
+  inputFileName = 'module.tsx'
 ) {
-  const options = ts.getDefaultCompilerOptions();
-  options.isolatedModules = true;
-  options.suppressOutputPathCheck = true;
-  options.allowNonTsExtensions = true;
-  options.removeComments = false;
-  options.noLib = true;
-  options.lib = undefined;
-  options.types = undefined;
-  options.noEmit = undefined;
-  options.noEmitOnError = undefined;
-  options.noEmitHelpers = true;
-  options.paths = undefined;
-  options.rootDirs = undefined;
-  options.declaration = undefined;
-  options.composite = undefined;
-  options.declarationDir = undefined;
-  options.out = undefined;
-  options.outFile = undefined;
-  options.noResolve = true;
+  const options: ts.CompilerOptions = {
+    ...ts.getDefaultCompilerOptions(),
+    allowNonTsExtensions: true,
+    composite: undefined,
+    declaration: undefined,
+    declarationDir: undefined,
+    experimentalDecorators: true,
+    isolatedModules: true,
+    jsx: ts.JsxEmit.React,
+    jsxFactory: 'h',
+    jsxFragmentFactory: 'Fragment',
+    lib: undefined,
+    module: ts.ModuleKind.ESNext,
+    noEmit: undefined,
+    noEmitHelpers: true,
+    noEmitOnError: undefined,
+    noLib: true,
+    noResolve: true,
+    out: undefined,
+    outFile: undefined,
+    paths: undefined,
+    removeComments: false,
+    rootDirs: undefined,
+    suppressOutputPathCheck: true,
+    target: getScriptTarget(),
+    types: undefined,
+    // add in possible default config overrides
+    ...tsConfig,
+  };
 
-  options.module = ts.ModuleKind.ESNext;
-  options.target = getScriptTarget();
-  options.experimentalDecorators = true;
+  config = config || mockConfig();
+  compilerCtx = compilerCtx || mockCompilerCtx(config);
 
-  options.jsx = ts.JsxEmit.React;
-  options.jsxFactory = 'h';
-  options.jsxFragmentFactory = 'Fragment';
-
-  const inputFileName = 'module.tsx';
   const sourceFile = ts.createSourceFile(inputFileName, input, options.target);
 
   let outputText: string;
+  let declarationOutputText: string;
 
   const emitCallback: ts.WriteFileCallback = (emitFilePath, data, _w, _e, tsSourceFiles) => {
     if (emitFilePath.endsWith('.js')) {
-      outputText = data;
+      outputText = prettifyTSOutput(data);
       updateModule(config, compilerCtx, buildCtx, tsSourceFiles[0], data, emitFilePath, tsTypeChecker, null);
+    }
+    if (emitFilePath.endsWith('.d.ts')) {
+      declarationOutputText = prettifyTSOutput(data);
     }
   };
 
@@ -81,9 +96,6 @@ export function transpileModule(
   const tsProgram = ts.createProgram([inputFileName], options, compilerHost);
   const tsTypeChecker = tsProgram.getTypeChecker();
 
-  config = config || mockConfig();
-  compilerCtx = compilerCtx || mockCompilerCtx(config);
-
   const buildCtx = mockBuildCtx(config, compilerCtx);
 
   const transformOpts: d.TransformOptions = {
@@ -102,11 +114,8 @@ export function transpileModule(
       convertStaticToMeta(config, compilerCtx, buildCtx, tsTypeChecker, null, transformOpts),
       ...afterTransformers,
     ],
+    afterDeclarations,
   });
-
-  while (outputText.includes('  ')) {
-    outputText = outputText.replace(/  /g, ' ');
-  }
 
   const moduleFile: d.Module = compilerCtx.moduleMap.values().next().value;
   const cmps = moduleFile ? moduleFile.cmps : null;
@@ -129,31 +138,42 @@ export function transpileModule(
   const legacyContext = cmp ? cmp.legacyContext : null;
 
   return {
-    outputText,
-    compilerCtx,
     buildCtx,
-    diagnostics: buildCtx.diagnostics,
-    moduleFile,
-    cmps,
     cmp,
+    cmps,
+    compilerCtx,
     componentClassName,
-    tagName,
-    properties,
-    virtualProperties,
-    property,
-    states,
-    state,
-    listeners,
-    listener,
-    events,
-    event,
-    methods,
-    method,
+    declarationOutputText,
+    diagnostics: buildCtx.diagnostics,
     elementRef,
-    legacyContext,
+    event,
+    events,
     legacyConnect,
+    legacyContext,
+    listener,
+    listeners,
+    method,
+    methods,
+    moduleFile,
+    outputText,
+    properties,
+    property,
+    state,
+    states,
+    tagName,
+    virtualProperties,
   };
 }
+
+/**
+ * Rewrites any stretches of whitespace in the TypeScript output to take up a
+ * single space instead. This makes it a little more readable to write out strings
+ * in spec files for comparison.
+ *
+ * @param tsOutput the string to process
+ * @returns that string with any stretches of whitespace shrunk down to one space
+ */
+const prettifyTSOutput = (tsOutput: string): string => tsOutput.replace(/\s+/gm, ' ');
 
 export function getStaticGetter(output: string, prop: string) {
   const toEvaluate = `return ${output.replace('export', '')}`;

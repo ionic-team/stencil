@@ -83,6 +83,19 @@ describe('validation', () => {
     });
   });
 
+  describe('transformAliasedImportPaths', () => {
+    it.each([true, false])('set transformAliasedImportPaths %p', (bool) => {
+      userConfig.transformAliasedImportPaths = bool;
+      const { config } = validateConfig(userConfig, bootstrapConfig);
+      expect(config.transformAliasedImportPaths).toBe(bool);
+    });
+
+    it('default transformAliasedImportPaths false', () => {
+      const { config } = validateConfig(userConfig, bootstrapConfig);
+      expect(config.transformAliasedImportPaths).toBe(false);
+    });
+  });
+
   describe('enableCache', () => {
     it('set enableCache true', () => {
       userConfig.enableCache = true;

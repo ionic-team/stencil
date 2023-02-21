@@ -127,6 +127,7 @@ export const runTask = async (
     rootDir,
     sys: configSys,
     testing: config.testing ?? {},
+    transformAliasedImportPaths: config.transformAliasedImportPaths ?? false,
   };
 
   switch (task) {

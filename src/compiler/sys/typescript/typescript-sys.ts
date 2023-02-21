@@ -8,6 +8,7 @@ import { fetchUrlSync } from '../fetch/fetch-module-sync';
 import { InMemoryFileSystem } from '../in-memory-fs';
 import { patchTypeScriptResolveModule } from './typescript-resolve-module';
 
+// TODO(STENCIL-728): fix typing of `inMemoryFs` parameter in `patchTypescript`, related functions
 export const patchTsSystemFileSystem = (
   config: d.Config,
   compilerSys: d.CompilerSystem,
@@ -162,6 +163,7 @@ const patchTsSystemWatch = (compilerSystem: d.CompilerSystem, tsSys: ts.System) 
   };
 };
 
+// TODO(STENCIL-728): fix typing of `inMemoryFs` parameter in `patchTypescript`, related functions
 export const patchTypescript = (config: d.Config, inMemoryFs: InMemoryFileSystem) => {
   if (!(ts as any).__patched) {
     if (config.sys) {

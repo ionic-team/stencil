@@ -1,12 +1,16 @@
 import { loadTypeScriptDiagnostics, normalizePath } from '@utils';
 import { basename, join, relative } from 'path';
-import type ts from 'typescript';
+import ts from 'typescript';
 
 import type * as d from '../../declarations';
 import { updateComponentBuildConditionals } from '../app-core/app-data';
 import { resolveComponentDependencies } from '../entries/resolve-component-dependencies';
 import { getComponentsFromModules, isOutputTargetDistTypes } from '../output-targets/output-utils';
 import { convertDecoratorsToStatic } from '../transformers/decorators-to-static/convert-decorators';
+import {
+  rewriteAliasedDTSImportPaths,
+  rewriteAliasedSourceFileImportPaths,
+} from '../transformers/rewrite-aliased-paths';
 import { updateModule } from '../transformers/static-to-meta/parse-static';
 import { generateAppTypes } from '../types/generate-app-types';
 import { updateStencilTypesImports } from '../types/stencil-types';
@@ -50,10 +54,30 @@ export const runTsProgram = async (
     }
   };
 
-  // Emit files that changed
-  tsBuilder.emit(undefined, emitCallback, undefined, false, {
+  const transformers: ts.CustomTransformers = {
     before: [convertDecoratorsToStatic(config, buildCtx.diagnostics, tsTypeChecker)],
-  });
+    afterDeclarations: [],
+  };
+
+  if (config.transformAliasedImportPaths) {
+    transformers.before.push(rewriteAliasedSourceFileImportPaths);
+    // TypeScript handles the generation of JS and `.d.ts` files through
+    // different pipelines. One (possibly surprising) consequence of this is
+    // that if you modify a source file using a transforming it will not
+    // automatically result in changes to the corresponding `.d.ts` file.
+    // Instead, if you want to, for instance, rewrite some import specifiers in
+    // both the source file _and_ its typedef you'll need to run a transformer
+    // for both of them.
+    //
+    // See here: https://github.com/itsdouges/typescript-transformer-handbook#transforms
+    // and here: https://github.com/microsoft/TypeScript/pull/23946
+    //
+    // This quirk is not terribly well documented unfortunately.
+    transformers.afterDeclarations.push(rewriteAliasedDTSImportPaths);
+  }
+
+  // Emit files that changed
+  tsBuilder.emit(undefined, emitCallback, undefined, false, transformers);
 
   const changedmodules = Array.from(compilerCtx.changedModules.keys());
   buildCtx.debug('Transpiled modules: ' + JSON.stringify(changedmodules, null, '\n'));
