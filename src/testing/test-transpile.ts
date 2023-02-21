@@ -15,6 +15,7 @@ export function transpile(input: string, opts: TranspileOptions = {}): Transpile
     style: null,
     styleImportData: 'queryparams',
     target: 'es2015', // default to es2015
+    transformAliasedImportPaths: !!process.env.__STENCIL_TRANSPILE_PATHS__,
   };
 
   try {

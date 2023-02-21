@@ -12,7 +12,7 @@ import { patchTypeScriptResolveModule } from './typescript-resolve-module';
 export const patchTsSystemFileSystem = (
   config: d.Config,
   compilerSys: d.CompilerSystem,
-  inMemoryFs: InMemoryFileSystem,
+  inMemoryFs: InMemoryFileSystem | null,
   tsSys: ts.System
 ): ts.System => {
   const realpath = (path: string) => {
@@ -55,8 +55,13 @@ export const patchTsSystemFileSystem = (
   };
 
   tsSys.directoryExists = (p) => {
-    const s = inMemoryFs.statSync(p);
-    return s.isDirectory;
+    if (inMemoryFs) {
+      const s = inMemoryFs.statSync(p);
+      return s.isDirectory;
+    } else {
+      const s = compilerSys.statSync(p);
+      return s.isDirectory;
+    }
   };
 
   tsSys.exit = compilerSys.exit;
@@ -68,8 +73,13 @@ export const patchTsSystemFileSystem = (
       filePath = getTypescriptPathFromUrl(config, tsSys.getExecutingFilePath(), p);
     }
 
-    const s = inMemoryFs.statSync(filePath);
-    return !!(s && s.isFile);
+    if (inMemoryFs) {
+      const s = inMemoryFs.statSync(filePath);
+      return !!(s && s.isFile);
+    } else {
+      const s = compilerSys.statSync(filePath);
+      return !!(s && s.isFile);
+    }
   };
 
   tsSys.getCurrentDirectory = compilerSys.getCurrentDirectory;
@@ -79,8 +89,13 @@ export const patchTsSystemFileSystem = (
   tsSys.getDirectories = (p) => {
     const items = compilerSys.readDirSync(p);
     return items.filter((itemPath) => {
-      const s = inMemoryFs.statSync(itemPath);
-      return !!(s && s.exists && s.isDirectory);
+      if (inMemoryFs) {
+        const s = inMemoryFs.statSync(itemPath);
+        return !!(s && s.exists && s.isDirectory);
+      } else {
+        const s = compilerSys.statSync(itemPath);
+        return !!(s && s.isDirectory);
+      }
     });
   };
 
@@ -108,7 +123,9 @@ export const patchTsSystemFileSystem = (
       filePath = getTypescriptPathFromUrl(config, tsSys.getExecutingFilePath(), p);
     }
 
-    let content = inMemoryFs.readFileSync(filePath, { useCache: isUrl });
+    let content = inMemoryFs
+      ? inMemoryFs.readFileSync(filePath, { useCache: isUrl })
+      : compilerSys.readFileSync(filePath);
 
     if (typeof content !== 'string' && isUrl) {
       if (IS_WEB_WORKER_ENV) {
@@ -124,7 +141,7 @@ export const patchTsSystemFileSystem = (
     return content;
   };
 
-  tsSys.writeFile = (p, data) => inMemoryFs.writeFile(p, data);
+  tsSys.writeFile = (p, data) => (inMemoryFs ? inMemoryFs.writeFile(p, data) : compilerSys.writeFile(p, data));
 
   return tsSys;
 };

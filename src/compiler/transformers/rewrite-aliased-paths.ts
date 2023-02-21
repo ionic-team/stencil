@@ -167,7 +167,37 @@ function rewriteAliasedImport(
     node,
     retrieveTsModifiers(node),
     node.importClause,
-    transformCtx.factory.createStringLiteral(importPath),
+    transformCtx.factory.createStringLiteral(
+      // if the importeee is a sibling file of the importer then `relative`
+      // will produce a something confusing result. We use `dirname` to get the
+      // directory of the importer, so for example, assume we have two files
+      // `foo/bar.ts` and `foo/baz.ts` like so:
+      //
+      // ```
+      // foo
+      // ├── bar.ts
+      // └── baz.ts
+      // ```
+      //
+      // then if `baz.ts` imports a symbol from `bar.ts` we'll call
+      // `relative(fromdir, to)` like so:
+      //
+      // ```ts
+      // relative(dirname("foo/baz.ts"), "foo/bar.ts")
+      // // equivalently
+      // relative("foo", "foo/bar.ts")
+      // ```
+      //
+      // you'd think that in this case `relative` would return `'./bar.ts'` as
+      // a correct relative path to `bar.ts` from the `foo` directory, but
+      // actually in this case it returns just `bar.ts`. So since when updating
+      // import paths we're only concerned with `paths` aliases that should be
+      // transformed to relative imports anyway, we check to see if the new
+      // `importPath` starts with `'.'`, and add `'./'` if it doesn't, since
+      // otherwise nodejs will interpret `bar` as a module name, not a relative
+      // path.
+      importPath.startsWith('.') ? importPath : './' + importPath
+    ),
     node.assertClause
   );
 }
