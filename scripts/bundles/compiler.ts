@@ -6,10 +6,8 @@ import MagicString from 'magic-string';
 import { join } from 'path';
 import type { OutputChunk, RollupOptions, RollupWarning, TransformResult } from 'rollup';
 import sourcemaps from 'rollup-plugin-sourcemaps';
-import { minify, MinifyOptions } from 'terser';
 
 import { getBanner } from '../utils/banner';
-import { getTypeScriptDefaultLibNames } from '../utils/dependencies-json';
 import type { BuildOptions } from '../utils/options';
 import { writePkgJson } from '../utils/write-pkg-json';
 import { aliasPlugin } from './plugins/alias-plugin';
@@ -207,7 +205,7 @@ export async function compiler(opts: BuildOptions) {
 }
 
 async function minifyStencilCompiler(code: string, opts: BuildOptions) {
-  const minifyOpts: MinifyOptions = {
+  const minifyOpts = {
     ecma: 2018,
     compress: {
       ecma: 2018,
@@ -222,9 +220,24 @@ async function minifyStencilCompiler(code: string, opts: BuildOptions) {
     },
   };
 
-  const results = await minify(code, minifyOpts);
+  const { minify } = await import('terser');
+  // when `execa` changed to use only esm for distribution we also had to start
+  // importing esm for `terser`, but unfortunately we could not work out a way
+  // to also import the type while doing a dynamic import, hence the `any`
+  // here. See here: https://github.com/ionic-team/stencil/pull/4047 for more
+  // context
+  const results = await minify(code, minifyOpts as any);
 
   code = getBanner(opts, `Stencil Compiler`, true) + '\n' + results.code;
 
   return code;
+}
+
+/**
+ * Helper function that reads in the `lib.*.d.ts` files in the TypeScript lib/ directory on disk.
+ * @param opts the Stencil build options, which includes the location of the TypeScript lib/
+ * @returns all file names that match the `lib.*.d.ts` format
+ */
+async function getTypeScriptDefaultLibNames(opts: BuildOptions): Promise<string[]> {
+  return (await fs.readdir(opts.typescriptLibDir)).filter((f) => f.startsWith('lib.') && f.endsWith('.d.ts'));
 }

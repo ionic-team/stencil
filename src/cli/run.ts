@@ -1,6 +1,5 @@
 import { hasError, isFunction, shouldIgnoreError } from '@utils';
 
-import { dependencies } from '../compiler/sys/dependencies.json';
 import { createLogger } from '../compiler/sys/logger/console-logger';
 import type * as d from '../declarations';
 import { ValidatedConfig } from '../declarations';
@@ -53,17 +52,6 @@ export const run = async (init: d.CliInitOptions) => {
       return sys.exit(1);
     }
 
-    const ensureDepsResults = await sys.ensureDependencies({
-      rootDir: findConfigResults.rootDir,
-      logger,
-      dependencies: dependencies as any,
-    });
-
-    if (hasError(ensureDepsResults.diagnostics)) {
-      logger.printDiagnostics(ensureDepsResults.diagnostics);
-      return sys.exit(1);
-    }
-
     const coreCompiler = await loadCoreCompiler(sys);
 
     if (task === 'version' || flags.version) {
@@ -99,8 +87,6 @@ export const run = async (init: d.CliInitOptions) => {
     if (isFunction(sys.applyGlobalPatch)) {
       sys.applyGlobalPatch(validated.config.rootDir);
     }
-
-    await sys.ensureResources({ rootDir: validated.config.rootDir, logger, dependencies: dependencies as any });
 
     await telemetryAction(sys, validated.config, coreCompiler, async () => {
       await runTask(coreCompiler, validated.config, task, sys);

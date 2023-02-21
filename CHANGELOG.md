@@ -1,3 +1,16 @@
+## 🍒 [3.0.1](https://github.com/ionic-team/stencil/compare/v3.0.0...v3.0.1) (2023-02-13)
+
+
+### Bug Fixes
+
+* **compiler:** ensure rollup outputs a single file for hydrateFactory ([#4023](https://github.com/ionic-team/stencil/issues/4023)) ([91092ab](https://github.com/ionic-team/stencil/commit/91092abaac9e16f66b3fa3285549099462fb0cd0))
+
+
+### Thanks
+
+🎉 Thanks for @George-Payne for their contributions! 🎉
+
+
 # 🍇 [3.0.0](https://github.com/ionic-team/stencil/compare/v2.22.2...v3.0.0) (2023-01-25)
 
 

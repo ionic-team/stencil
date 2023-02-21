@@ -3,7 +3,6 @@ import rollupResolve from '@rollup/plugin-node-resolve';
 import fs from 'fs-extra';
 import { join } from 'path';
 import type { RollupOptions } from 'rollup';
-import { minify } from 'terser';
 import webpack from 'webpack';
 
 import { getBanner } from '../utils/banner';
@@ -182,6 +181,8 @@ function bundleExternal(opts: BuildOptions, outputDir: string, cachedDir: string
         mode: 'production',
       },
       async (err, stats) => {
+        const { minify } = await import('terser');
+
         if (err && err.message) {
           rejectBundle(err);
         } else {

@@ -4,11 +4,9 @@ on:
   pull_request_target:
     branches:
       - 'main'
-      - 'v3.0.0-dev'
   push:
     branches:
       - 'main'
-      - 'v3.0.0-dev'
 
 env:
   BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSER_STACK_ACCESS_KEY }}

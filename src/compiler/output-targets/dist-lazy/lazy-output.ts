@@ -116,7 +116,13 @@ const getLazyCustomTransformer = (config: d.ValidatedConfig, compilerCtx: d.Comp
 };
 
 /**
- * Generate entry modules to be used by the build process by determining how modules and components are connected
+ * Generate entry modules to be used by the build process by determining how
+ * modules and components are connected
+ *
+ * **Note**: this function mutates the {@link d.BuildCtx} object that is
+ * passed in to it, assigning the generated entry modules to the `entryModules`
+ * property
+ *
  * @param config the Stencil configuration file that was provided as a part of the build step
  * @param buildCtx the current build context
  */

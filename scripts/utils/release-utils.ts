@@ -1,5 +1,4 @@
 import color from 'ansi-colors';
-import execa from 'execa';
 import fs from 'fs-extra';
 import open from 'open';
 import { join } from 'path';
@@ -98,6 +97,7 @@ export function prettyVersionDiff(oldVersion: string, inc: any): string {
  */
 export async function updateChangeLog(opts: BuildOptions): Promise<void> {
   const ccPath = join(opts.nodeModulesDir, '.bin', 'conventional-changelog');
+  const { execa } = await import('execa');
   await execa('node', [ccPath, '-p', 'angular', '-o', '-i', opts.changelogPath, '-s'], { cwd: opts.rootDir });
 
   let changelog = await fs.readFile(opts.changelogPath, 'utf8');

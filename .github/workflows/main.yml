@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - 'main'
-      - 'v3.0.0-dev'
   pull_request:
     branches:
       - '**'

@@ -90,6 +90,7 @@ const generateHydrateFactory = async (config: d.ValidatedConfig, compilerCtx: d.
           intro: HYDRATE_FACTORY_INTRO,
           outro: HYDRATE_FACTORY_OUTRO,
           preferConst: false,
+          inlineDynamicImports: true,
         });
 
         if (!buildCtx.hasError && rollupOutput != null && Array.isArray(rollupOutput.output)) {
