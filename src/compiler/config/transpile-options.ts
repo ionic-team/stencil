@@ -40,7 +40,23 @@ export const getTranspileResults = (code: string, input: TranspileOptions) => {
 
 const transpileCtx = { sys: null as CompilerSystem };
 
-export const getTranspileConfig = (input: TranspileOptions) => {
+/**
+ * Configuration necessary for transpilation
+ */
+interface TranspileConfig {
+  compileOpts: TranspileOptions;
+  config: Config;
+  transformOpts: TransformOptions;
+}
+
+/**
+ * Get configuration necessary to carry out transpilation, including a Stencil
+ * configuration, transformation options, and transpilation options.
+ *
+ * @param input options for Stencil's transpiler (string-to-string compiler)
+ * @returns the options and configuration necessary for transpilation
+ */
+export const getTranspileConfig = (input: TranspileOptions): TranspileConfig => {
   if (input.sys) {
     transpileCtx.sys = input.sys;
   } else if (!transpileCtx.sys) {
@@ -121,16 +137,17 @@ export const getTranspileConfig = (input: TranspileOptions) => {
   };
 
   const config: Config = {
-    rootDir: compileOpts.currentDirectory,
-    srcDir: compileOpts.currentDirectory,
+    _isTesting: true,
     devMode: true,
+    enableCache: false,
     minifyCss: true,
     minifyJs: false,
-    _isTesting: true,
-    validateTypes: false,
-    enableCache: false,
+    rootDir: compileOpts.currentDirectory,
+    srcDir: compileOpts.currentDirectory,
     sys: transpileCtx.sys,
+    transformAliasedImportPaths: input.transformAliasedImportPaths,
     tsCompilerOptions,
+    validateTypes: false,
   };
 
   return {
