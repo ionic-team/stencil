@@ -22,6 +22,7 @@ describe('validateServiceWorker', () => {
       rootDir: '/',
       sys: mockCompilerSystem(),
       testing: {},
+      transformAliasedImportPaths: false,
     };
   });
 

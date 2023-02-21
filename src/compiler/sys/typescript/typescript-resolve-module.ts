@@ -19,6 +19,7 @@ import {
 } from '../resolve/resolve-utils';
 import { patchTsSystemFileSystem } from './typescript-sys';
 
+// TODO(STENCIL-728): fix typing of `inMemoryFs` parameter in `patchTypescript`, related functions
 export const patchTypeScriptResolveModule = (config: d.Config, inMemoryFs: InMemoryFileSystem) => {
   let compilerExe: string;
   if (config.sys) {
@@ -100,7 +101,25 @@ export const patchedTsResolveModule = (
     let resolvedFileName = join(containingDir, moduleName);
     resolvedFileName = normalizePath(ensureExtension(resolvedFileName, containingFile));
 
-    if (isAbsolute(resolvedFileName) && !inMemoryFs.accessSync(resolvedFileName)) {
+    // In some cases `inMemoryFs` will not be defined here, so we should use
+    // `accessSync` on `config.sys` instead. This is because this function is
+    // called by `patchTypeScriptResolveModule` which is then in turn called by
+    // `patchTypescript`. If you check out that function it takes an
+    // `InMemoryFileSystem` as its second parameter:
+    //
+    // https://github.com/ionic-team/stencil/blob/5b4bb06a4d0369c09aeb63b1a626ff8df9464117/src/compiler/sys/typescript/typescript-sys.ts#L165-L175
+    //
+    // but if you look at its call sites there are a few where we pass `null`
+    // instead, eg:
+    //
+    // https://github.com/ionic-team/stencil/blob/5b4bb06a4d0369c09aeb63b1a626ff8df9464117/src/compiler/transpile.ts#L42-L44
+    //
+    // so in short the type for `inMemoryFs` here is not accurate, so we need
+    // to add a runtime check here to avoid an error.
+    //
+    // TODO(STENCIL-728): fix typing of `inMemoryFs` parameter in `patchTypescript`, related functions
+    const accessSync = inMemoryFs?.accessSync ?? config.sys.accessSync;
+    if (isAbsolute(resolvedFileName) && !accessSync(resolvedFileName)) {
       return null;
     }
 
