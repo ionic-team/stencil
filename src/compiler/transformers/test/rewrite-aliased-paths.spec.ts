@@ -15,9 +15,10 @@ import { transpileModule } from './transpile';
  * transpiles the provided code.
  *
  * @param component the string of a component
+ * @param inputFileName an optional filename to use for the input file
  * @returns the tranpiled module
  */
-async function pathTransformTranspile(component: string) {
+async function pathTransformTranspile(component: string, inputFileName = 'module.tsx') {
   const compilerContext: CompilerCtx = mockCompilerCtx();
   const config = mockValidatedConfig();
 
@@ -37,8 +38,6 @@ async function pathTransformTranspile(component: string) {
   await compilerContext.fs.writeFile(path.join(config.rootDir, 'name/space.ts'), 'export const foo = x => x');
   await compilerContext.fs.writeFile(path.join(config.rootDir, 'name/space/subdir.ts'), 'export const bar = x => x;');
 
-  const inputFileName = normalizePath(path.join(config.rootDir, 'module.tsx'));
-
   return transpileModule(
     component,
     null,
@@ -47,7 +46,7 @@ async function pathTransformTranspile(component: string) {
     [],
     [rewriteAliasedDTSImportPaths],
     mockPathsConfig,
-    inputFileName
+    normalizePath(path.join(config.rootDir, inputFileName))
   );
 }
 
@@ -142,6 +141,65 @@ describe('rewrite alias module paths transform', () => {
 
     expect(t.declarationOutputText).toBe(
       'import { Foo } from "./name/space/subdir";import { Bar } from "./name/space";export declare function fooUtil(foo: Foo): Bar;'
+    );
+  });
+
+  it('should correctly rewrite sibling paths', async () => {
+    const t = await pathTransformTranspile(
+      `
+      import { foo } from "@namespace";
+      export class CmpA {
+        render() {
+          return <some-cmp>{ foo("bar") }</some-cmp>
+        }
+      }
+    `,
+      'name/component.tsx'
+    );
+
+    // with the import filename passed to `pathTransformTranspile` the file
+    // layout during this test looks like this:
+    //
+    // ```
+    // name
+    // ├── space.ts
+    // └── component.tsx
+    // ```
+    //
+    // we need to test that the relative path from `name/component.tsx` to
+    // `name/space.ts` is resolved correctly as `'./space'`.
+    expect(t.outputText).toBe(
+      'import { foo } from "./space";export class CmpA { render() { return h("some-cmp", null, foo("bar")); }}'
+    );
+  });
+
+  it('should correctly rewrite nested sibling paths', async () => {
+    const t = await pathTransformTranspile(
+      `
+      import { foo } from "@namespace/subdir";
+      export class CmpA {
+        render() {
+          return <some-cmp>{ foo("bar") }</some-cmp>
+        }
+      }
+    `,
+      'name/component.tsx'
+    );
+
+    // with the import filename passed to `pathTransformTranspile` the file
+    // layout during this test looks like this:
+    //
+    // ```
+    // name
+    // ├── component.tsx
+    // └── space
+    //     └── subdir.ts
+    // ```
+    //
+    // we need to test that the relative path from `name/component.tsx` to
+    // `name/space/subdir.ts` is resolved correctly as `'./space/subdir'`.
+    expect(t.outputText).toBe(
+      'import { foo } from "./space/subdir";export class CmpA { render() { return h("some-cmp", null, foo("bar")); }}'
     );
   });
 });
