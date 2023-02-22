@@ -12,7 +12,7 @@ import { patchTypeScriptResolveModule } from './typescript-resolve-module';
 export const patchTsSystemFileSystem = (
   config: d.Config,
   compilerSys: d.CompilerSystem,
-  inMemoryFs: InMemoryFileSystem | null,
+  inMemoryFs: InMemoryFileSystem,
   tsSys: ts.System
 ): ts.System => {
   const realpath = (path: string) => {
