@@ -168,8 +168,8 @@ function rewriteAliasedImport(
     retrieveTsModifiers(node),
     node.importClause,
     transformCtx.factory.createStringLiteral(
-      // if the importee is a sibling file of the importer then `relative`
-      // will produce a somewhat confusing result. We use `dirname` to get the
+      // if the importee is a sibling file of the importer then `relative` will
+      // produce a somewhat confusing result. We use `dirname` to get the
       // directory of the importer, so for example, assume we have two files
       // `foo/bar.ts` and `foo/baz.ts` like so:
       //
@@ -198,8 +198,8 @@ function rewriteAliasedImport(
       // path.
       //
       // Note also that any relative paths as module specifiers which _don't_
-      // need to be transformed (e.g. `'./foo'`) we've already handled on line
-      // 141, above.
+      // need to be transformed (e.g. `'./foo'`) have already been handled
+      // above.
       importPath.startsWith('.') ? importPath : './' + importPath
     ),
     node.assertClause
