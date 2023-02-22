@@ -1,5 +1,4 @@
 import type { OutputChunk, Plugin } from 'rollup';
-import { minify } from 'terser';
 
 import type { BuildOptions } from '../../utils/options';
 
@@ -8,6 +7,7 @@ export function prettyMinifyPlugin(opts: BuildOptions, preamble?: string): Plugi
     return {
       name: 'prettyMinifyPlugin',
       async generateBundle(_, bundles) {
+        const { minify } = await import('terser');
         await Promise.all(
           Object.keys(bundles).map(async (fileName) => {
             const b = bundles[fileName] as OutputChunk;

@@ -6,7 +6,6 @@ import MagicString from 'magic-string';
 import { join } from 'path';
 import type { OutputChunk, RollupOptions, RollupWarning, TransformResult } from 'rollup';
 import sourcemaps from 'rollup-plugin-sourcemaps';
-import { minify, MinifyOptions } from 'terser';
 
 import { getBanner } from '../utils/banner';
 import type { BuildOptions } from '../utils/options';
@@ -206,7 +205,7 @@ export async function compiler(opts: BuildOptions) {
 }
 
 async function minifyStencilCompiler(code: string, opts: BuildOptions) {
-  const minifyOpts: MinifyOptions = {
+  const minifyOpts = {
     ecma: 2018,
     compress: {
       ecma: 2018,
@@ -221,7 +220,13 @@ async function minifyStencilCompiler(code: string, opts: BuildOptions) {
     },
   };
 
-  const results = await minify(code, minifyOpts);
+  const { minify } = await import('terser');
+  // when `execa` changed to use only esm for distribution we also had to start
+  // importing esm for `terser`, but unfortunately we could not work out a way
+  // to also import the type while doing a dynamic import, hence the `any`
+  // here. See here: https://github.com/ionic-team/stencil/pull/4047 for more
+  // context
+  const results = await minify(code, minifyOpts as any);
 
   code = getBanner(opts, `Stencil Compiler`, true) + '\n' + results.code;
 

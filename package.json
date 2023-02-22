@@ -91,7 +91,7 @@
     "eslint-plugin-jest": "^27.0.4",
     "eslint-plugin-jsdoc": "^40.0.0",
     "eslint-plugin-simple-import-sort": "^10.0.0",
-    "execa": "4.1.0",
+    "execa": "7.0.0",
     "exit": "^0.1.2",
     "fs-extra": "^11.0.0",
     "glob": "8.1.0",
@@ -120,7 +120,7 @@
     "rollup-plugin-sourcemaps": "^0.6.3",
     "semver": "^7.3.7",
     "sizzle": "^2.3.6",
-    "terser": "5.16.2",
+    "terser": "5.16.4",
     "typescript": "4.9.5",
     "webpack": "^4.46.0",
     "ws": "8.12.1"
