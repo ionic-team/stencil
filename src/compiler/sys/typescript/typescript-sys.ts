@@ -55,6 +55,8 @@ export const patchTsSystemFileSystem = (
   };
 
   tsSys.directoryExists = (p) => {
+    // At present the typing for `inMemoryFs` in this function is not accurate
+    // TODO(STENCIL-728): fix typing of `inMemoryFs` parameter in `patchTypescript`, related functions
     if (inMemoryFs) {
       const s = inMemoryFs.statSync(p);
       return s.isDirectory;
@@ -73,6 +75,8 @@ export const patchTsSystemFileSystem = (
       filePath = getTypescriptPathFromUrl(config, tsSys.getExecutingFilePath(), p);
     }
 
+    // At present the typing for `inMemoryFs` in this function is not accurate
+    // TODO(STENCIL-728): fix typing of `inMemoryFs` parameter in `patchTypescript`, related functions
     if (inMemoryFs) {
       const s = inMemoryFs.statSync(filePath);
       return !!(s && s.isFile);
@@ -89,6 +93,8 @@ export const patchTsSystemFileSystem = (
   tsSys.getDirectories = (p) => {
     const items = compilerSys.readDirSync(p);
     return items.filter((itemPath) => {
+      // At present the typing for `inMemoryFs` in this function is not accurate
+      // TODO(STENCIL-728): fix typing of `inMemoryFs` parameter in `patchTypescript`, related functions
       if (inMemoryFs) {
         const s = inMemoryFs.statSync(itemPath);
         return !!(s && s.exists && s.isDirectory);
@@ -123,6 +129,8 @@ export const patchTsSystemFileSystem = (
       filePath = getTypescriptPathFromUrl(config, tsSys.getExecutingFilePath(), p);
     }
 
+    // At present the typing for `inMemoryFs` in this function is not accurate
+    // TODO(STENCIL-728): fix typing of `inMemoryFs` parameter in `patchTypescript`, related functions
     let content = inMemoryFs
       ? inMemoryFs.readFileSync(filePath, { useCache: isUrl })
       : compilerSys.readFileSync(filePath);
@@ -141,6 +149,8 @@ export const patchTsSystemFileSystem = (
     return content;
   };
 
+  // At present the typing for `inMemoryFs` in this function is not accurate
+  // TODO(STENCIL-728): fix typing of `inMemoryFs` parameter in `patchTypescript`, related functions
   tsSys.writeFile = (p, data) => (inMemoryFs ? inMemoryFs.writeFile(p, data) : compilerSys.writeFile(p, data));
 
   return tsSys;
