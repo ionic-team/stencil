@@ -36,5 +36,5 @@ export function transpile(input: string, opts: TranspileOptions = {}): Transpile
  * @returns a boolean
  */
 function parseStencilTranspilePaths(stencilTranspilePaths: string) {
-  return stencilTranspilePaths === "true" ? true : false
+  return stencilTranspilePaths === 'true' ? true : false;
 }
