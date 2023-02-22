@@ -196,6 +196,10 @@ function rewriteAliasedImport(
       // `importPath` starts with `'.'`, and add `'./'` if it doesn't, since
       // otherwise Node will interpret `bar` as a module name, not a relative
       // path.
+      //
+      // Note also that any relative paths as module specifiers which _don't_
+      // need to be transformed (e.g. `'./foo'`) we've already handled on line
+      // 141, above.
       importPath.startsWith('.') ? importPath : './' + importPath
     ),
     node.assertClause
