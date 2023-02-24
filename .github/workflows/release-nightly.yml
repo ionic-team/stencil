@@ -6,9 +6,7 @@ on:
     # This is done to have a nightly build ready for the Ionic Framework/Stencil Eval Workflow:
     # https://github.com/ionic-team/ionic-framework/blob/main/.github/workflows/stencil-eval.yml
     - cron: '00 05 * * 1-5'
-  push: # TODO(NOW): RM ME
-    branches:
-      - '**'
+
 jobs:
   build_core:
     name: Build
