@@ -44,6 +44,13 @@ a pull request is merged.
 This workflow initiates a developer build of Stencil from the `main` branch.
 It is intended to be manually invoked by a member of the Stencil team.
 
+### Nightly Release (`release-nightly.yml`)
+
+This workflow initiates a nightly build of Stencil from the `main` branch.
+A nightly build is similar to a 'Dev Release', except that:
+- it is run on a set cadence (and isn't expect for a developer to manually invoke)
+- it is published to the npm registry under the 'nightly' tag
+
 ### Test Analysis (`test-analysis.yml`)
 
 This workflow is responsible for running the Stencil analysis testing suite.
