@@ -4,9 +4,6 @@ on:
   workflow_dispatch:
     # Make this a reusable workflow, no value needed
     # https://docs.github.com/en/actions/using-workflows/reusing-workflows
-  push: # TODO(NOW): RM ME
-    branches:
-      - '**'
 
 jobs:
   build_core:
