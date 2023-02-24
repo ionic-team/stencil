@@ -1,3 +1,4 @@
+import { path } from '../../../compiler';
 import { BuildOptions, getOptions } from '../options';
 import * as Vermoji from '../vermoji';
 
@@ -8,11 +9,15 @@ describe('release options', () => {
     it('returns the correct default value', () => {
       const buildOpts = getOptions(ROOT_DIR);
 
+      // some paths exist in the expected object that are not normalized, so we store the OS-specific separator in a
+      // variable in order to call `join()` with it
+      const separator = path.sep;
+
       expect(buildOpts).toEqual<BuildOptions>({
         buildDir: 'build',
         // More focused tests for `buildId` can be found in another testing suite in this file
         buildId: expect.any(String),
-        bundleHelpersDir: 'scripts/bundles/helpers',
+        bundleHelpersDir: ['scripts', 'bundles', 'helpers'].join(separator),
         changelogPath: 'CHANGELOG.md',
         ghRepoName: 'stencil',
         ghRepoOrg: 'ionic-team',
@@ -27,7 +32,7 @@ describe('release options', () => {
           internalDir: 'internal',
           mockDocDir: 'mock-doc',
           screenshotDir: 'screenshot',
-          sysNodeDir: 'sys/node',
+          sysNodeDir: ['sys', 'node'].join(separator),
           testingDir: 'testing',
         },
         // reads in package.json, skip it verifying it
@@ -35,13 +40,13 @@ describe('release options', () => {
         packageJsonPath: 'package.json',
         packageLockJsonPath: 'package-lock.json',
         rootDir: ROOT_DIR,
-        scriptsBuildDir: 'scripts/build',
-        scriptsBundlesDir: 'scripts/bundles',
+        scriptsBuildDir: ['scripts', 'build'].join(separator),
+        scriptsBundlesDir: ['scripts', 'bundles'].join(separator),
         scriptsDir: 'scripts',
         srcDir: 'src',
         tag: 'dev',
-        typescriptDir: 'node_modules/typescript',
-        typescriptLibDir: 'node_modules/typescript/lib',
+        typescriptDir: ['node_modules', 'typescript'].join(separator),
+        typescriptLibDir: ['node_modules', 'typescript', 'lib'].join(separator),
         vermoji: '💎',
         // More focused tests for `version` can be found in another testing suite in this file
         version: expect.any(String),
