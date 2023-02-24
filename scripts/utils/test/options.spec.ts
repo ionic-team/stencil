@@ -43,7 +43,7 @@ describe('release options', () => {
         typescriptDir: 'node_modules/typescript',
         typescriptLibDir: 'node_modules/typescript/lib',
         vermoji: '💎',
-        // TODO(NOW)
+        // More focused tests for `version` can be found in another testing suite in this file
         version: expect.any(String),
       });
     });
