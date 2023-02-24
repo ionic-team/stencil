@@ -39,6 +39,11 @@ This workflow is responsible for building Stencil and validating the resultant a
 This workflow is responsible for validating that the code adheres to the Stencil team's formatting configuration before
 a pull request is merged.
 
+### Dev Release (`release-dev.yml`)
+
+This workflow initiates a developer build of Stencil from the `main` branch.
+It is intended to be manually invoked by a member of the Stencil team.
+
 ### Test Analysis (`test-analysis.yml`)
 
 This workflow is responsible for running the Stencil analysis testing suite.
