@@ -1,3 +1,4 @@
+import { execSync } from 'child_process';
 import { readFileSync } from 'fs-extra';
 import { join } from 'path';
 
@@ -71,7 +72,7 @@ export function getOptions(rootDir: string, inputOpts: BuildOptions = {}): Build
   }
 
   if (!opts.version) {
-    opts.version = '0.0.0-dev.' + opts.buildId;
+    opts.version = getDevVersionId({ buildId: opts.buildId, semverVersion: opts.packageJson?.version });
   }
 
   if (opts.isPublishRelease) {
@@ -195,20 +196,59 @@ export interface BuildOptions {
   otp?: '';
 }
 
-export interface CmdLineArgs {
-  'config-version'?: string;
-  'config-build-id'?: string;
-  'config-prod'?: string;
+/**
+ * Generate a build identifier, which is the Epoch Time in seconds
+ * @returns the generated build ID
+ */
+function getBuildId(): string {
+  return Date.now().toString(10).slice(0, -3);
 }
 
-function getBuildId() {
-  const d = new Date();
-  return [
-    d.getUTCFullYear() + '',
-    ('0' + (d.getUTCMonth() + 1)).slice(-2),
-    ('0' + d.getUTCDate()).slice(-2),
-    ('0' + d.getUTCHours()).slice(-2),
-    ('0' + d.getUTCMinutes()).slice(-2),
-    ('0' + d.getUTCSeconds()).slice(-2),
-  ].join('');
+/**
+ * Describes the contents of a version string for Stencil used in 'non-production' builds (e.g. a one-off dev build)
+ */
+interface DevVersionContents {
+  /**
+   * The build identifier string, used to uniquely identify when the build was generated
+   */
+  buildId: string;
+  /**
+   * A semver-compliant string to add to the one-off build version sting, used to identify a base version of Stencil
+   * that was used in the build.
+   */
+  semverVersion: string | undefined;
+}
+
+/**
+ * Helper function to return the first seven characters of a git SHA
+ *
+ * We use the first seven characters for two reasons:
+ * 1. Seven characters _should_ be enough to uniquely ID a commit in Stencil
+ * 2. It matches the number of characters used in our CHANGELOG.md
+ *
+ * @returns the seven character SHA
+ */
+function getSevenCharGitSha(): string {
+  return execSync('git rev-parse HEAD').toString().trim().slice(0, 7);
+}
+
+/**
+ * Helper function to generate a dev build version string of the format:
+ *
+ * [BASE_VERSION]-dev.[BUILD_IDENTIFIER].[GIT_SHA]
+ *
+ * where:
+ * - BASE_VERSION is the version of Stencil currently assigned in `package.json`
+ * - BUILD_IDENTIFIER is a unique identifier for this particular build
+ * - GIT_SHA is the SHA of the HEAD of the branch this build was created from
+ *
+ * @param devVersionContents an object containing the necessary arguments to build a dev-version identifier
+ * @returns the generated version string
+ */
+function getDevVersionId(devVersionContents: DevVersionContents): string {
+  const { buildId, semverVersion } = devVersionContents;
+  // if `package.json#package` is empty, default to a value that doesn't imply any particular version of Stencil
+  const version = semverVersion ?? '0.0.0';
+  // '-' and '-dev.' are a magic substrings that may get checked on startup of a Stencil process.
+  return version + '-dev.' + buildId + '.' + getSevenCharGitSha();
 }
