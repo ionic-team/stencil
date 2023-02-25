@@ -46,7 +46,7 @@ export const patchBrowser = (): Promise<d.CustomElementsDefineOptions> => {
         )
       : null;
   const importMeta = import.meta.url;
-  const opts = BUILD.scriptDataOpts ? (scriptElm as any)['data-opts'] || {} : {};
+  const opts = BUILD.scriptDataOpts ? ((scriptElm as any) || {})['data-opts'] || {} : {};
 
   // TODO(STENCIL-663): Remove code related to deprecated `safari10` field.
   if (BUILD.safari10 && 'onbeforeload' in scriptElm && !history.scrollRestoration /* IS_ESM_BUILD */) {
