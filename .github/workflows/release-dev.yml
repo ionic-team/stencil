@@ -33,7 +33,7 @@ jobs:
       - name: Get Version
         id: get-dev-version
         run: |
-          # A unique string to publish Stencil under, combining the values above
+          # A unique string to publish Stencil under
           # e.g. "3.0.1-dev.1677185104.7c87e34"
           #
           # Pull this value from the compiled artifacts
