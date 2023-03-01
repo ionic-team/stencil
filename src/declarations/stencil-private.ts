@@ -2300,6 +2300,11 @@ export interface E2EProcessEnv {
   __STENCIL_PUPPETEER_MODULE__?: string;
   __STENCIL_PUPPETEER_VERSION__?: number;
   __STENCIL_DEFAULT_TIMEOUT__?: string;
+
+  /**
+   * Property for injecting transformAliasedImportPaths into the Jest context
+   */
+  __STENCIL_TRANSPILE_PATHS__?: 'true' | 'false';
 }
 
 export interface AnyHTMLElement extends HTMLElement {

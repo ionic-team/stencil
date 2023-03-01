@@ -118,7 +118,17 @@ export const appDataPlugin = (
             hires: true,
           });
 
-          return { code: results.outputText, map: codeMap };
+          return {
+            code: results.outputText,
+            map: {
+              ...codeMap,
+              // MagicString changed their types in this PR: https://github.com/Rich-Harris/magic-string/pull/235
+              // so that their `sourcesContent` is of type `(string | null)[]`. But, it will only return `[null]` if
+              // `includeContent` is set to `false`. Since we explicitly set `includeContent: true`, we can override
+              // the type to satisfy Rollup's type expectation
+              sourcesContent: codeMap.sourcesContent as string[],
+            },
+          };
         }
 
         return { code: results.outputText };

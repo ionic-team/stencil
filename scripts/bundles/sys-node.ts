@@ -3,7 +3,7 @@ import rollupResolve from '@rollup/plugin-node-resolve';
 import fs from 'fs-extra';
 import { join } from 'path';
 import type { RollupOptions } from 'rollup';
-import webpack from 'webpack';
+import webpack, { Configuration } from 'webpack';
 
 import { getBanner } from '../utils/banner';
 import type { BuildOptions } from '../utils/options';
@@ -132,83 +132,84 @@ function bundleExternal(opts: BuildOptions, outputDir: string, cachedDir: string
     }
 
     const whitelist = new Set(['child_process', 'os', 'typescript']);
-
-    webpack(
-      {
-        entry: join(opts.srcDir, 'sys', 'node', 'bundles', entryFileName),
-        output: {
-          path: outputDir,
-          filename: entryFileName,
-          libraryTarget: 'commonjs',
-        },
-        target: 'node',
-        node: {
-          __dirname: false,
-          __filename: false,
-          process: false,
-          Buffer: false,
-        },
-        externals(_context, request, callback) {
-          if (request.match(/^(\.{0,2})\//)) {
-            // absolute and relative paths are not externals
-            return callback(null, undefined);
-          }
-
-          if (request === '@stencil/core/mock-doc') {
-            return callback(null, '../../mock-doc');
-          }
-
-          if (whitelist.has(request)) {
-            // we specifically do not want to bundle these imports
-            require.resolve(request);
-            return callback(null, request);
-          }
-
-          // bundle this import
-          callback(undefined, undefined);
-        },
-        resolve: {
-          alias: {
-            '@utils': join(opts.buildDir, 'utils', 'index.js'),
-            postcss: join(opts.nodeModulesDir, 'postcss'),
-            'source-map': join(opts.nodeModulesDir, 'source-map'),
-            chalk: join(opts.bundleHelpersDir, 'empty.js'),
-          },
-        },
-        optimization: {
-          minimize: false,
-        },
-        mode: 'production',
+    const webpackConfig: Configuration = {
+      entry: join(opts.srcDir, 'sys', 'node', 'bundles', entryFileName),
+      output: {
+        path: outputDir,
+        filename: entryFileName,
+        libraryTarget: 'commonjs',
       },
-      async (err, stats) => {
-        const { minify } = await import('terser');
+      target: 'node',
+      node: {
+        __dirname: false,
+        __filename: false,
+      },
+      externals(data, callback) {
+        const { request } = data;
 
-        if (err && err.message) {
-          rejectBundle(err);
+        if (request?.match(/^(\.{0,2})\//)) {
+          // absolute and relative paths are not externals
+          return callback(null, undefined);
+        }
+
+        if (request === '@stencil/core/mock-doc') {
+          return callback(null, '../../mock-doc');
+        }
+
+        if (whitelist.has(request)) {
+          // we specifically do not want to bundle these imports
+          require.resolve(request);
+          return callback(null, request);
+        }
+
+        // bundle this import
+        callback(undefined, undefined);
+      },
+      resolve: {
+        alias: {
+          '@utils': join(opts.buildDir, 'utils', 'index.js'),
+          postcss: join(opts.nodeModulesDir, 'postcss'),
+          'source-map': join(opts.nodeModulesDir, 'source-map'),
+          chalk: join(opts.bundleHelpersDir, 'empty.js'),
+        },
+        fallback: {
+          assert: require.resolve('assert'),
+          process: require.resolve('process/browser'),
+        },
+      },
+      optimization: {
+        minimize: false,
+      },
+      mode: 'production',
+    };
+
+    webpack(webpackConfig, async (err, stats) => {
+      const { minify } = await import('terser');
+      if (err && err.message) {
+        rejectBundle(err);
+      } else {
+        const info = stats.toJson({ errors: true });
+        if (stats.hasErrors()) {
+          const webpackError = info.errors.join('\n');
+          rejectBundle(webpackError);
         } else {
-          const info = stats.toJson({ errors: true });
-          if (stats.hasErrors()) {
-            const webpackError = info.errors.join('\n');
-            rejectBundle(webpackError);
-          } else {
-            let code = await fs.readFile(outputFile, 'utf8');
+          let code = await fs.readFile(outputFile, 'utf8');
 
-            if (opts.isProd) {
-              try {
-                const minifyResults = await minify(code);
-                code = minifyResults.code;
-              } catch (e) {
-                rejectBundle(e);
-                return;
-              }
+          if (opts.isProd) {
+            try {
+              const minifyResults = await minify(code);
+              code = minifyResults.code;
+            } catch (e) {
+              rejectBundle(e);
+              return;
             }
-            await fs.writeFile(cachedFile, code);
-            await fs.writeFile(outputFile, code);
-
-            resolveBundle();
           }
+          await fs.writeFile(cachedFile, code);
+          await fs.writeFile(outputFile, code);
+
+          resolveBundle();
         }
       }
-    );
+    });
   });
 }
