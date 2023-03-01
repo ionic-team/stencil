@@ -2044,6 +2044,12 @@ export interface OutputTargetDocsJson extends OutputTargetBase {
   type: 'docs-json';
 
   file: string;
+  /**
+   * Set an optional file path where Stencil should write a `d.ts` file to disk
+   * at build-time containing type declarations for {@link JsonDocs} and related
+   * interfaces. If this is omitted or set to `null` Stencil will not write such
+   * a file.
+   */
   typesFile?: string | null;
   strict?: boolean;
 }
