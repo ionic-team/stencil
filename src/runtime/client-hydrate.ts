@@ -15,6 +15,7 @@ import {
 } from './runtime-constants';
 import { newVNode } from './vdom/h';
 import { addSlotRelocateNode, patchNextPrev } from './dom-extras';
+import { COMMENT_NODE_ID } from './runtime-constants';
 
 interface RenderNodeData extends d.VNode {
   $hostId$: string;
@@ -107,11 +108,18 @@ export const initializeClientHydrate = (
         // we're safe to move it now
         orgLocationNode.parentNode.insertBefore(node, orgLocationNode.nextSibling);
       }
-      // Remove original location comment now regardless:
+      // Remove original location / slot reference comment now regardless:
       // 1) Stops SSR frameworks complaining about mismatches
       // 2) is un-required for non-shadow, slotted nodes as
       //    we'll add all the meta nodes we need when we deal with *all* slotted nodes ↓↓↓
       orgLocationNode.parentNode.removeChild(orgLocationNode);
+
+      if (!shadowRoot) {
+        // Add the original order of this node.
+        // we'll use it later to make sure slotted nodes
+        // get added in the right, original order
+        node['s-oo'] = parseInt(childRenderNode.$nodeId$);
+      }
     }
     // remove the original location from the map
     plt.$orgLocNodes$.delete(orgLocationId);
@@ -167,13 +175,13 @@ export const initializeClientHydrate = (
           slottedItem.slot['s-cr'] = hostChildren[0] as d.RenderNode;
         }
         // create our original location node
-        addSlotRelocateNode(slottedItem.node, slottedItem.slot);
+        addSlotRelocateNode(slottedItem.node, slottedItem.slot, slottedItem.node['s-oo']);
 
         // patch this node for accessors like `nextSibling` (et al)
         patchNextPrev(slottedItem.node);
       }
 
-      if (hostEle.shadowRoot) {
+      if (hostEle.shadowRoot && slottedItem.node.parentElement !== hostEle) {
         // shadowDOM - move the item to the element root for
         // native slotting
         hostEle.appendChild(slottedItem.node);
@@ -418,6 +426,15 @@ const clientHydrate = (
               shadowRootNodes[childVNode.$index$ as any] = childVNode.$elm$;
             }
           }
+        }
+      } else if (childNodeType === COMMENT_NODE_ID) {
+        childVNode.$elm$ = node.nextSibling as any;
+
+        if (childVNode.$elm$ && childVNode.$elm$.nodeType === NODE_TYPE.CommentNode) {
+          childRenderNodes.push(childVNode);
+
+          // remove the comment comment since it's no longer needed
+          node.remove();
         }
       } else if (childVNode.$hostId$ === hostId) {
         // this comment node is specifically for this host id

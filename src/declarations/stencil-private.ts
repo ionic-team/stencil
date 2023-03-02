@@ -1569,6 +1569,12 @@ export interface RenderNode extends HostElement {
   ['s-ol']?: RenderNode;
 
   /**
+   * Original Order:
+   * A number representing the order of a slotted node
+   */
+  ['s-oo']?: number;
+
+  /**
    * Node reference:
    * This is a reference for a original location node
    * back to the node that's been moved around.

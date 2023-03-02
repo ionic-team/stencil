@@ -2,6 +2,7 @@ import { getHostRef } from '@platform';
 
 import type * as d from '../../declarations';
 import {
+  COMMENT_NODE_ID,
   CONTENT_REF_ID,
   HYDRATED_SLOT_FALLBACK_ID,
   HYDRATE_CHILD_ID,
@@ -51,6 +52,10 @@ export const insertVdomAnnotations = (doc: Document, staticComponents: string[])
             }
             const commentBeforeTextNode = doc.createComment(childId);
             commentBeforeTextNode.nodeValue = `${TEXT_NODE_ID}.${childId}`;
+            nodeRef.parentNode.insertBefore(commentBeforeTextNode, nodeRef);
+          } else if (nodeRef.nodeType === NODE_TYPE.CommentNode) {
+            const commentBeforeTextNode = doc.createComment(childId);
+            commentBeforeTextNode.nodeValue = `${COMMENT_NODE_ID}.${childId}`;
             nodeRef.parentNode.insertBefore(commentBeforeTextNode, nodeRef);
           }
         }
