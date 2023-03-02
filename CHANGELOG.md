@@ -1,3 +1,19 @@
+# 🍕 [3.1.0](https://github.com/ionic-team/stencil/compare/v3.0.1...v3.1.0) (2023-02-28)
+
+
+### Bug Fixes
+
+* **browser:** polyfill assert, process ([#4066](https://github.com/ionic-team/stencil/issues/4066)) ([d493987](https://github.com/ionic-team/stencil/commit/d49398715fd1ff1fd7eca261c1dd0d778081948c))
+* **runtime:** prevent null data-opts access ([#4101](https://github.com/ionic-team/stencil/issues/4101)) ([9526633](https://github.com/ionic-team/stencil/commit/9526633f1630478cc6e4ea45ab62550b064996e3)), closes [#2431](https://github.com/ionic-team/stencil/issues/2431)
+
+
+### Features
+
+* **compiler:** transform module aliases in emitted js, typedefs ([#4042](https://github.com/ionic-team/stencil/issues/4042)) ([7bccf68](https://github.com/ionic-team/stencil/commit/7bccf68ef6c92b6e074924be7e5cf01a60963b4f))
+* **testing:** add support for transforming path aliases in spec tests ([#4090](https://github.com/ionic-team/stencil/issues/4090)) ([92fbd1c](https://github.com/ionic-team/stencil/commit/92fbd1c4345ed6b1071b4b8de930dc9ffddf77f3))
+
+
+
 ## 🍒 [3.0.1](https://github.com/ionic-team/stencil/compare/v3.0.0...v3.0.1) (2023-02-13)
 
 

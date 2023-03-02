@@ -1,5 +1,4 @@
 import color from 'ansi-colors';
-import execa from 'execa';
 import fs from 'fs-extra';
 import inquirer from 'inquirer';
 import { join } from 'path';
@@ -114,7 +113,7 @@ async function prepareRelease(opts: BuildOptions, args: ReadonlyArray<string>, r
         opts.version = answers.version ?? answers.specifiedVersion;
         // write `release-data.json`
         fs.writeJsonSync(releaseDataPath, opts, { spaces: 2 });
-        runReleaseTasks(opts, args);
+        return runReleaseTasks(opts, args);
       }
     })
     .catch((err) => {
@@ -136,6 +135,8 @@ async function publishRelease(opts: BuildOptions, args: ReadonlyArray<string>): 
   }
 
   console.log(`\nPublish ${opts.vermoji}  ${color.bold.magenta(pkg.name)} ${color.yellow(`${opts.version}`)}\n`);
+
+  const { execa } = await import('execa');
 
   const prompts = [
     {
@@ -212,7 +213,7 @@ async function publishRelease(opts: BuildOptions, args: ReadonlyArray<string>): 
     .then((answers) => {
       if (answers.confirm) {
         opts.otp = answers.otp;
-        runReleaseTasks(opts, args);
+        return runReleaseTasks(opts, args);
       }
     })
     .catch((err) => {

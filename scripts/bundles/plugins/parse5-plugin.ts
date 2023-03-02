@@ -4,7 +4,6 @@ import fs from 'fs-extra';
 import { join } from 'path';
 import type { NormalizedOutputOptions, OutputBundle } from 'rollup';
 import { OutputChunk, Plugin, rollup } from 'rollup';
-import { minify } from 'terser';
 
 import type { BuildOptions } from '../../utils/options';
 import { aliasPlugin } from './alias-plugin';
@@ -114,6 +113,8 @@ async function bundleParse5(opts: BuildOptions): Promise<string> {
   });
 
   let code = output[0].code;
+
+  const { minify } = await import('terser');
 
   if (opts.isProd) {
     const minified = await minify(code, {

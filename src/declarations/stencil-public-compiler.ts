@@ -106,6 +106,14 @@ export interface StencilConfig {
   srcDir?: string;
 
   /**
+   * Sets whether or not Stencil should transform path aliases set in a project's
+   * `tsconfig.json` from the assigned module aliases to resolved relative paths.
+   *
+   * This behavior is opt-in and hence this flag defaults to `false`.
+   */
+  transformAliasedImportPaths?: boolean;
+
+  /**
    * Passes custom configuration down to the "@rollup/plugin-commonjs" that Stencil uses under the hood.
    * For further information: https://stenciljs.com/docs/module-bundling
    */
@@ -441,7 +449,8 @@ type StrictConfigFields =
   | 'packageJsonFilePath'
   | 'rootDir'
   | 'sys'
-  | 'testing';
+  | 'testing'
+  | 'transformAliasedImportPaths';
 
 /**
  * A version of {@link Config} that makes certain fields required. This type represents a valid configuration entity.
@@ -996,11 +1005,20 @@ export interface CompilerSystem {
    */
   createWorkerController?(maxConcurrentWorkers: number): WorkerMainController;
   encodeToBase64(str: string): string;
+
+  // TODO(STENCIL-727): Remove this from the sys interface
+  /**
+   * @deprecated
+   */
   ensureDependencies?(opts: {
     rootDir: string;
     logger: Logger;
     dependencies: CompilerDependency[];
   }): Promise<{ stencilPath: string; diagnostics: Diagnostic[] }>;
+  // TODO(STENCIL-727): Remove this from the sys interface
+  /**
+   * @deprecated
+   */
   ensureResources?(opts: { rootDir: string; logger: Logger; dependencies: CompilerDependency[] }): Promise<void>;
   /**
    * process.exit()
@@ -2488,6 +2506,9 @@ export interface CompilerRequestResponse {
   status: number;
 }
 
+/**
+ * Options for Stencil's string-to-string transpiler
+ */
 export interface TranspileOptions {
   /**
    * A component can be defined as a custom element by using `customelement`, or the
@@ -2564,6 +2585,11 @@ export interface TranspileOptions {
    * Passed in Stencil Compiler System, otherwise falls back to the internal in-memory only system.
    */
   sys?: CompilerSystem;
+  /**
+   * This option enables the same behavior as {@link Config.transformAliasedImportPaths}, transforming paths aliased in
+   * `tsconfig.json` to relative paths.
+   */
+  transformAliasedImportPaths?: boolean;
 }
 
 export type CompileTarget =

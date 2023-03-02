@@ -13,7 +13,7 @@ updates:
     rebase-strategy: 'disabled'
     ignore:
       - dependency-name: '@types/node'
-        versions: ['17', '18']
+        versions: ['>=19']
       - dependency-name: 'typescript'
         versions: ['>=4.10', '>=5.0']
       # disable Jest updates until the new testing architecture is in place
