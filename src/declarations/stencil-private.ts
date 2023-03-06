@@ -865,7 +865,7 @@ export interface ComponentCompilerPropertyComplexType {
    * A 'resolved' type, where e.g. imported types have been resolved and inlined
    *
    * For instance, an annotation like `(foo: Foo) => string;` will be
-   * converted to `(foo: { foo: string}) => string;`.
+   * converted to `(foo: { foo: string }) => string;`.
    */
   resolved: string;
   /**
