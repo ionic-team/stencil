@@ -535,7 +535,7 @@ const getTypeReferenceLocation = (typeName: string, tsNode: ts.Node): d.Componen
  * Resolve a type annotation, using the TypeScript typechecker to convert a
  * {@link ts.Type} record to a string.
  *
- * For instance, assume there's a module `foot.ts` which exports a type `Foo`
+ * For instance, assume there's a module `foo.ts` which exports a type `Foo`
  * which looks like this:
  *
  * ```ts
