@@ -35,9 +35,10 @@ body:
     attributes:
       label: System Info
       description: |
-        Operating system & version, npm, node, and browser(s) & version(s) (if applicable)
+        Output of `npx stencil info`.
+        Please provide any additional information, such as npm version, browser(s) & version(s) as well
       render: shell
-      placeholder: System, Environment, Browsers
+      placeholder: System, Environment, Browsers. At minimum, please include `npx stencil info` output.
   - type: textarea
     attributes:
       label: Steps to Reproduce
