@@ -53,11 +53,12 @@ export const createWatchBuild = async (
     buildCtx.hasHtmlChanges = hasHtmlChanges(config, buildCtx);
     buildCtx.hasServiceWorkerChanges = hasServiceWorkerChanges(config, buildCtx);
 
+    console.log(`DEV_SERVER_DEBUG:watchBuild:onBuild isRebuild=${buildCtx.isRebuild}`);
     if (buildCtx.isRebuild) {
-      console.log('🔥:watchBuild:onBuild filesAdded', buildCtx.filesAdded);
-      console.log('🔥:watchBuild:onBuild filesDeleted', buildCtx.filesDeleted);
-      console.log('🔥:watchBuild:onBuild filesUpdated', buildCtx.filesUpdated);
-      console.log('🔥:watchBuild:onBuild filesWritten', buildCtx.filesWritten);
+      console.log('DEV_SERVER_DEBUG:watchBuild:onBuild filesAdded', buildCtx.filesAdded);
+      console.log('DEV_SERVER_DEBUG:watchBuild:onBuild filesDeleted', buildCtx.filesDeleted);
+      console.log('DEV_SERVER_DEBUG:watchBuild:onBuild filesUpdated', buildCtx.filesUpdated);
+      console.log('DEV_SERVER_DEBUG:watchBuild:onBuild filesWritten', buildCtx.filesWritten);
     }
 
     dirsAdded.clear();
@@ -111,8 +112,17 @@ export const createWatchBuild = async (
           break;
       }
 
-      console.log(`🔥:watchBuild:onFsChange type=${eventKind}, path=${p}, time=${new Date().getTime()}`);
+      console.log(
+        `DEV_SERVER_DEBUG:watchBuild:onFsChange:rebuild type=${eventKind}, path=${p}, time=${new Date().getTime()}`
+      );
       tsWatchProgram.rebuild();
+    } else {
+      console.log(
+        `\`DEV_SERVER_DEBUG:watchBuild:onFsChange:skipRebuild  type=${eventKind}, path=${p}, reasons: hasWatchProgram=${!!tsWatchProgram} isIgnoredPath=${!isWatchIgnorePath(
+          config,
+          p
+        )}`
+      );
     }
   };
 

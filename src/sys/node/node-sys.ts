@@ -441,9 +441,12 @@ export function createNodeSys(c: { process?: any } = {}): CompilerSystem {
       sys.events = buildEvents();
 
       sys.watchDirectory = (p, callback, recursive) => {
+        console.trace(`DEV_SERVER_DEBUG:nodeSys:setupCompiler:watchDir ${p}`);
+
         const tsFileWatcher = tsSysWatchDirectory(
           p,
           (fileName) => {
+            console.trace(`DEV_SERVER_DEBUG:nodeSys:setupCompiler:watchDir:callback dir=${p} changedPath=${fileName}`);
             callback(normalizePath(fileName), 'fileUpdate');
           },
           recursive
@@ -464,7 +467,12 @@ export function createNodeSys(c: { process?: any } = {}): CompilerSystem {
       };
 
       sys.watchFile = (p, callback) => {
+        console.trace(`DEV_SERVER_DEBUG:nodeSys:setupCompiler:watchFile ${p}`);
+
         const tsFileWatcher = tsSysWatchFile(p, (fileName, tsEventKind) => {
+          console.trace(
+            `DEV_SERVER_DEBUG:nodeSys:setupCompiler:watchFile:callback file=${fileName}, eventType=${ts.FileWatcherEventKind[tsEventKind]}`
+          );
           fileName = normalizePath(fileName);
           if (tsEventKind === ts.FileWatcherEventKind.Created) {
             callback(fileName, 'fileAdd');
