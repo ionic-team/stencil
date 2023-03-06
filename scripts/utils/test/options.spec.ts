@@ -5,6 +5,18 @@ import * as Vermoji from '../vermoji';
 describe('release options', () => {
   describe('getOptions', () => {
     const ROOT_DIR = './';
+    // Friday, February 24, 2023 2:42:09.123 PM, GMT
+    const FAKE_SYSTEM_TIME_MS = 1677249729123;
+    const FAKE_SYSTEM_TIME_S = FAKE_SYSTEM_TIME_MS.toString(10).slice(0, -3);
+
+    beforeEach(() => {
+      jest.useFakeTimers();
+      jest.setSystemTime(FAKE_SYSTEM_TIME_MS);
+    });
+
+    afterEach(() => {
+      jest.useRealTimers();
+    });
 
     it('returns the correct default value', () => {
       const buildOpts = getOptions(ROOT_DIR);
@@ -58,8 +70,7 @@ describe('release options', () => {
         const { buildId } = getOptions(ROOT_DIR);
 
         expect(buildId).toBeDefined();
-        // Expect a Date of the format yyyyMMddHHmmss
-        expect(buildId).toMatch(/\d{14}/);
+        expect(buildId).toBe(FAKE_SYSTEM_TIME_S);
       });
 
       it('uses the provided the buildId', () => {
@@ -76,8 +87,8 @@ describe('release options', () => {
         const { version } = getOptions(ROOT_DIR);
 
         expect(version).toBeDefined();
-        // Expect a version string with the format 0.0.0-dev-yyyyMMddHHmmss
-        expect(version).toMatch(/0\.0\.0-dev\.\d{14}/);
+        // Expect a version string with the format 0.0.0-dev-[EPOCH_TIME]-[GIT_SHA_7_CHARS]
+        expect(version).toMatch(new RegExp(`\\d+\\.\\d+\\.\\d+-dev.${FAKE_SYSTEM_TIME_S}.\\w{7}`));
       });
 
       it('uses the provided the version', () => {
