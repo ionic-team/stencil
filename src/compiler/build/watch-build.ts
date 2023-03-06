@@ -53,6 +53,13 @@ export const createWatchBuild = async (
     buildCtx.hasHtmlChanges = hasHtmlChanges(config, buildCtx);
     buildCtx.hasServiceWorkerChanges = hasServiceWorkerChanges(config, buildCtx);
 
+    if (buildCtx.isRebuild) {
+      console.log('🔥:watchBuild:onBuild filesAdded', buildCtx.filesAdded);
+      console.log('🔥:watchBuild:onBuild filesDeleted', buildCtx.filesDeleted);
+      console.log('🔥:watchBuild:onBuild filesUpdated', buildCtx.filesUpdated);
+      console.log('🔥:watchBuild:onBuild filesWritten', buildCtx.filesWritten);
+    }
+
     dirsAdded.clear();
     dirsDeleted.clear();
     filesAdded.clear();
@@ -104,7 +111,7 @@ export const createWatchBuild = async (
           break;
       }
 
-      config.logger.debug(`onFsChange ${eventKind}: ${p}`);
+      console.log(`🔥:watchBuild:onFsChange type=${eventKind}, path=${p}, time=${new Date().getTime()}`);
       tsWatchProgram.rebuild();
     }
   };

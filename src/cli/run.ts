@@ -141,6 +141,7 @@ export const runTask = async (
 
   switch (task) {
     case 'build':
+      taskInfo(coreCompiler, sys, logger);
       await taskBuild(coreCompiler, strictConfig);
       break;
 
