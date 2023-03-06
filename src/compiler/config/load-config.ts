@@ -60,7 +60,7 @@ export const loadConfig = async (init: LoadConfigInit = {}): Promise<LoadConfigR
       return results;
     }
 
-    console.log('🔥:loadConfig:rawConfig', loadedConfigFile);
+    console.log('DEV_SERVER_DEBUG:loadConfig:rawConfig', loadedConfigFile);
 
     if (loadedConfigFile !== null) {
       // merge the user's config object into their loaded config file
