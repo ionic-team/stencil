@@ -535,18 +535,21 @@ const getTypeReferenceLocation = (typeName: string, tsNode: ts.Node): d.Componen
  * Resolve a type annotation, using the TypeScript typechecker to convert a
  * {@link ts.Type} record to a string.
  *
- * For instance, if a module `bar.ts` imports a type `Foo` from another file
+ * For instance, assume there's a module `foot.ts` which exports a type `Foo`
  * which looks like this:
  *
  * ```ts
  * // foo.ts
- * type Foo = (b: bar) => boolean;
+ * type Foo = (b: string) => boolean;
  * ```
  *
- * and then declares a type:
+ * and then a module `bar.ts` which imports `Foo` and uses it to annotate a
+ * variable declaration like so:
  *
  * ```ts
  * // bar.ts
+ * import { Foo } from './foo';
+ *
  * let foo: Foo | undefined;
  * ```
  *
@@ -555,7 +558,7 @@ const getTypeReferenceLocation = (typeName: string, tsNode: ts.Node): d.Componen
  * like:
  *
  * ```ts
- * "(b: bar) => boolean | undefined";
+ * "(b: string) => boolean | undefined";
  * ```
  *
  * @param checker a typescript typechecker
