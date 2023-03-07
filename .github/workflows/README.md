@@ -48,7 +48,7 @@ It is intended to be manually invoked by a member of the Stencil team.
 
 This workflow initiates a nightly build of Stencil from the `main` branch.
 A nightly build is similar to a 'Dev Release', except that:
-- it is run on a set cadence (and isn't expect for a developer to manually invoke)
+- it is run on a set cadence (it is not expectedthat a developer to manually invoke it)
 - it is published to the npm registry under the 'nightly' tag
 
 ### Test Analysis (`test-analysis.yml`)
