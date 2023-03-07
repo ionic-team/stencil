@@ -531,7 +531,41 @@ const getTypeReferenceLocation = (typeName: string, tsNode: ts.Node): d.Componen
   };
 };
 
-export const resolveType = (checker: ts.TypeChecker, type: ts.Type) => {
+/**
+ * Resolve a type annotation, using the TypeScript typechecker to convert a
+ * {@link ts.Type} record to a string.
+ *
+ * For instance, assume there's a module `foo.ts` which exports a type `Foo`
+ * which looks like this:
+ *
+ * ```ts
+ * // foo.ts
+ * type Foo = (b: string) => boolean;
+ * ```
+ *
+ * and then a module `bar.ts` which imports `Foo` and uses it to annotate a
+ * variable declaration like so:
+ *
+ * ```ts
+ * // bar.ts
+ * import { Foo } from './foo';
+ *
+ * let foo: Foo | undefined;
+ * ```
+ *
+ * If this function is called with the {@link ts.Type} object corresponding to
+ * the {@link ts.Node} object for the `foo` variable, it will return something
+ * like:
+ *
+ * ```ts
+ * "(b: string) => boolean | undefined";
+ * ```
+ *
+ * @param checker a typescript typechecker
+ * @param type the type to resolve
+ * @returns a resolved, user-readable string
+ */
+export const resolveType = (checker: ts.TypeChecker, type: ts.Type): string => {
   const set = new Set<string>();
   parseDocsType(checker, type, set);
 
@@ -543,7 +577,7 @@ export const resolveType = (checker: ts.TypeChecker, type: ts.Type) => {
   }
 
   let parts = Array.from(set.keys()).sort();
-  // TODO(STENCIL-366): Get this section of code under tests that directly exercises this behavior
+  // TODO(STENCIL-366): Get this section of code under tests that directly exercise this behavior
   if (parts.length > 1) {
     parts = parts.map((p) => (p.indexOf('=>') >= 0 ? `(${p})` : p));
   }
@@ -556,6 +590,7 @@ export const resolveType = (checker: ts.TypeChecker, type: ts.Type) => {
 
 /**
  * Formats a TypeScript `Type` entity as a string
+ *
  * @param checker a reference to the TypeScript type checker
  * @param type a TypeScript `Type` entity to format
  * @returns the formatted string
@@ -567,6 +602,18 @@ export const typeToString = (checker: ts.TypeChecker, type: ts.Type): string => 
   return checker.typeToString(type, undefined, TYPE_FORMAT_FLAGS);
 };
 
+/**
+ * Parse a type into its component parts, recursively dealing with each variant
+ * if it is a union type.
+ *
+ * **Note**: this function will mutate the `parts` set, adding new strings for
+ * any types it finds.
+ *
+ * @param checker a TypeScript typechecker instance
+ * @param type a TypeScript type
+ * @param parts an out param that holds parts of the type annotation we're
+ * assembling
+ */
 export const parseDocsType = (checker: ts.TypeChecker, type: ts.Type, parts: Set<string>): void => {
   if (type.isUnion()) {
     (type as ts.UnionType).types.forEach((t) => {
