@@ -853,9 +853,26 @@ export interface ComponentCompilerVirtualProperty {
 
 export type ComponentCompilerPropertyType = 'any' | 'string' | 'boolean' | 'number' | 'unknown';
 
+/**
+ * Information about the type of a Stencil-implemented component property, in
+ * particular a `@Prop()` or `@Event()`.
+ */
 export interface ComponentCompilerPropertyComplexType {
+  /**
+   * The string of the original type annotation in the Stencil source code
+   */
   original: string;
+  /**
+   * A 'resolved' type, where e.g. imported types have been resolved and inlined
+   *
+   * For instance, an annotation like `(foo: Foo) => string;` will be
+   * converted to `(foo: { foo: string }) => string;`.
+   */
   resolved: string;
+  /**
+   * A record of the types which were referenced in the assorted type
+   * annotation in the original source file.
+   */
   references: ComponentCompilerTypeReferences;
 }
 
