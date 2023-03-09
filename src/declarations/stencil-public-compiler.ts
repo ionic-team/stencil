@@ -2433,10 +2433,18 @@ export interface LazyRequire {
   getModulePath(fromDir: string, moduleId: string): string;
 }
 
+/**
+ * @deprecated This interface is no longer used by Stencil
+ * TODO(STENCIL-743): Remove this interface
+ */
 export interface FsWatcherItem {
   close(): void;
 }
 
+/**
+ * @deprecated This interface is no longer used by Stencil
+ * TODO(STENCIL-743): Remove this interface
+ */
 export interface MakeDirectoryOptions {
   /**
    * Indicates whether parent folders should be created.
@@ -2450,6 +2458,10 @@ export interface MakeDirectoryOptions {
   mode?: number;
 }
 
+/**
+ * @deprecated This interface is no longer used by Stencil
+ * TODO(STENCIL-743): Remove this interface
+ */
 export interface FsStats {
   isFile(): boolean;
   isDirectory(): boolean;
