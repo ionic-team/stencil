@@ -42,7 +42,7 @@ describe('load config', () => {
     // these fields are defined in the config file on disk, and should be present
     expect<ConfigFlags>(actualConfig.flags).toEqual({ dev: true });
     expect(actualConfig.extras).toBeDefined();
-    expect(actualConfig.extras!.experimentalImportInjection).toBe(true);
+    expect(actualConfig.extras!.enableImportInjection).toBe(true);
   });
 
   it('uses the provided config path when no initial config provided', async () => {

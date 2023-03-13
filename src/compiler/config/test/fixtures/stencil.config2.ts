@@ -6,6 +6,6 @@ export const config: Config = {
     dev: true,
   },
   extras: {
-    experimentalImportInjection: true,
+    enableImportInjection: true,
   },
 };

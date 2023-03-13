@@ -48,7 +48,7 @@ export const generateLazyModules = async (
     })
   );
 
-  if (!!config.extras?.experimentalImportInjection && !isBrowserBuild) {
+  if ((!!config.extras?.experimentalImportInjection || !!config.extras?.enableImportInjection) && !isBrowserBuild) {
     addStaticImports(rollupResults, bundleModules);
   }
 
