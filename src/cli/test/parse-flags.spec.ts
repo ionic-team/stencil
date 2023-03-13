@@ -3,6 +3,7 @@ import { toDashCase } from '@utils';
 import { LogLevel } from '../../declarations';
 import {
   BOOLEAN_CLI_FLAGS,
+  ConfigFlags,
   NUMBER_CLI_FLAGS,
   STRING_ARRAY_CLI_FLAGS,
   STRING_CLI_FLAGS,
@@ -230,11 +231,47 @@ describe('parseFlags', () => {
       it('should parse -c /my-config.js', () => {
         const flags = parseFlags(['-c', '/my-config.js']);
         expect(flags.config).toBe('/my-config.js');
+        expect(flags.knownArgs).toEqual(['--config', '/my-config.js']);
       });
 
       it('should parse -c=/my-config.js', () => {
         const flags = parseFlags(['-c=/my-config.js']);
         expect(flags.config).toBe('/my-config.js');
+        expect(flags.knownArgs).toEqual(['--config', '/my-config.js']);
+      });
+    });
+
+    describe('Jest aliases', () => {
+      it.each([
+        ['w', 'maxWorkers', '4'],
+        ['t', 'testNamePattern', 'testname'],
+      ])('should support the string Jest alias %p for %p', (alias, fullArgument, value) => {
+        const flags = parseFlags([`-${alias}`, value]);
+        expect(flags.knownArgs).toEqual([`--${fullArgument}`, value]);
+        expect(flags.unknownArgs).toHaveLength(0);
+      });
+
+      it.each([
+        ['w', 'maxWorkers', '4'],
+        ['t', 'testNamePattern', 'testname'],
+      ])('should support the string Jest alias %p for %p in an AliasEqualsArg', (alias, fullArgument, value) => {
+        const flags = parseFlags([`-${alias}=${value}`]);
+        expect(flags.knownArgs).toEqual([`--${fullArgument}`, value]);
+        expect(flags.unknownArgs).toHaveLength(0);
+      });
+
+      it.each<[string, keyof ConfigFlags]>([
+        ['b', 'bail'],
+        ['e', 'expand'],
+        ['o', 'onlyChanged'],
+        ['f', 'onlyFailures'],
+        ['i', 'runInBand'],
+        ['u', 'updateSnapshot'],
+      ])('should support the boolean Jest alias %p for %p', (alias, fullArgument) => {
+        const flags = parseFlags([`-${alias}`]);
+        expect(flags.knownArgs).toEqual([`--${fullArgument}`]);
+        expect(flags[fullArgument]).toBe(true);
+        expect(flags.unknownArgs).toHaveLength(0);
       });
     });
   });

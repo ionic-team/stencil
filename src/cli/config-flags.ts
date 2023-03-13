@@ -213,13 +213,25 @@ export const CLI_FLAG_ALIASES: AliasMap = {
   h: 'help',
   p: 'port',
   v: 'version',
+
+  // JEST SPECIFIC CLI FLAGS
+  // these are defined in
+  // https://github.com/facebook/jest/blob/4156f86/packages/jest-cli/src/args.ts
+  b: 'bail',
+  e: 'expand',
+  f: 'onlyFailures',
+  i: 'runInBand',
+  o: 'onlyChanged',
+  t: 'testNamePattern',
+  u: 'updateSnapshot',
+  w: 'maxWorkers',
 };
 
 /**
  * A regular expression which can be used to match a CLI flag for one of our
  * short aliases.
  */
-export const CLI_FLAG_REGEX = new RegExp(`^-[chpv]{1}$`);
+export const CLI_FLAG_REGEX = new RegExp(`^-[chpvbewofitu]{1}$`);
 
 /**
  * Given two types `K` and `T` where `K` extends `ReadonlyArray<string>`,

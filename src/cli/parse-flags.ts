@@ -42,14 +42,6 @@ export const parseFlags = (args: string[]): ConfigFlags => {
     }
   }
 
-  // to find unknown / unrecognized arguments we filter `args`, including only
-  // arguments whose normalized form is not found in `knownArgs`. `knownArgs`
-  // is populated during the call to `parseArgs` above. For arguments like
-  // `--foobar` the string `"--foobar"` will be added, while for more
-  // complicated arguments like `--bizBoz=bop` or `--bizBoz bop` just the
-  // string `"--bizBoz"` will be added.
-  flags.unknownArgs = flags.args.filter((arg: string) => !flags.knownArgs.includes(parseEqualsArg(arg)[0]));
-
   return flags;
 };
 
@@ -131,13 +123,13 @@ const parseCLITerm = (flags: ConfigFlags, args: string[]) => {
   else if (arg.startsWith('-') && arg.includes('=')) {
     // we're dealing with an AliasEqualsArg, we have a special helper for that
     const [originalArg, value] = parseEqualsArg(arg);
-    setCLIArg(flags, arg.split('=')[0], normalizeFlagName(originalArg), value);
+    setCLIArg(flags, desugarRawAlias(originalArg), normalizeFlagName(originalArg), value);
   }
 
   // AliasArg → "-" AliasName ( " " CLIValue )? ;
   else if (CLI_FLAG_REGEX.test(arg)) {
     // this is a short alias, like `-c` for Config
-    setCLIArg(flags, arg, normalizeFlagName(arg), parseCLIValue(args));
+    setCLIArg(flags, desugarRawAlias(arg), normalizeFlagName(arg), parseCLIValue(args));
   }
 
   // NegativeDashArg → "--no-" ArgName ;
@@ -164,13 +156,14 @@ const parseCLITerm = (flags: ConfigFlags, args: string[]) => {
   // SimpleArg → "--" ArgName ( " " CLIValue )? ;
   else if (arg.startsWith('--') && arg.length > '--'.length) {
     setCLIArg(flags, arg, normalizeFlagName(arg), parseCLIValue(args));
+  } else {
+    // if we get here then `arg` is not an argument in our list of supported
+    // arguments. This doesn't necessarily mean we want to report an error or
+    // anything though! Instead, with unknown / unrecognized arguments we want
+    // to stick them into the `unknownArgs` array, which is used when we pass
+    // CLI args to Jest, for instance.
+    flags.unknownArgs.push(arg);
   }
-
-  // if we get here it is not an argument in our list of supported arguments.
-  // This doesn't necessarily mean we want to report an error or anything
-  // though! Instead, with unknown / unrecognized arguments we stick them into
-  // the `unknownArgs` array, which is used when we pass CLI args to Jest, for
-  // instance. So we just return void here.
 };
 
 /**
@@ -219,7 +212,7 @@ const normalizeFlagName = (flagName: string): string => {
  * @param value the raw value to be set onto the config flags object
  */
 const setCLIArg = (flags: ConfigFlags, rawArg: string, normalizedArg: string, value: CLIValueResult) => {
-  normalizedArg = dereferenceAlias(normalizedArg);
+  normalizedArg = desugarAlias(normalizedArg);
 
   // We're setting a boolean!
   if (readOnlyArrayHasStringMember(BOOLEAN_CLI_FLAGS, normalizedArg)) {
@@ -320,6 +313,14 @@ const setCLIArg = (flags: ConfigFlags, rawArg: string, normalizedArg: string, va
     } else {
       throwCLIParsingError(rawArg, 'expected to receive a valid log level but received nothing');
     }
+  } else {
+    // we haven't found this flag in any of our lists of arguments, so we
+    // should put it in our list of unknown arguments
+    flags.unknownArgs.push(rawArg);
+
+    if (typeof value === 'string') {
+      flags.unknownArgs.push(value);
+    }
   }
 };
 
@@ -355,9 +356,10 @@ type CLIValueResult = string | typeof Empty;
  * A little helper which tries to parse a CLI value (as opposed to a flag) off
  * of the argument array.
  *
- * We support a variety of different argument formats, but all of them start
- * with `-`, so we can check the first character to test whether the next token
- * in our array of CLI arguments is a flag name or a value.
+ * We support a variety of different argument formats for flags (as opposed to
+ * values), but all of them start with `-`, so we can check the first character
+ * to test whether the next token in our array of CLI arguments is a flag name
+ * or a value.
  *
  * @param args an array of CLI args
  * @returns either a string result or an Empty sentinel
@@ -454,22 +456,35 @@ const throwNumberParsingError = (flag: string, value: string) => {
 };
 
 /**
- * A little helper to 'dereference' a flag alias, which if you squint a little
- * you can think of like a pointer to a full flag name. Thus 'c' is like a
- * pointer to 'config', so here we're doing something like `*c`. Of course, this
- * being JS, this is just a metaphor!
+ * A little helper to 'desugar' a flag alias, meaning expand it to its full
+ * name. For instance, the alias `"c"` will desugar to `"config"`.
  *
- * If no 'dereference' is found for the possible alias we just return the
- * passed string unmodified.
+ * If no expansion is found for the possible alias we just return the passed
+ * string unmodified.
  *
  * @param maybeAlias a string which _could_ be an alias to a full flag name
  * @returns the full aliased flag name, if found, or the passed string if not
  */
-const dereferenceAlias = (maybeAlias: string): string => {
-  const possibleDereference = CLI_FLAG_ALIASES[maybeAlias];
+const desugarAlias = (maybeAlias: string): string => {
+  const possiblyDesugared = CLI_FLAG_ALIASES[maybeAlias];
 
-  if (typeof possibleDereference === 'string') {
-    return possibleDereference;
+  if (typeof possiblyDesugared === 'string') {
+    return possiblyDesugared;
   }
   return maybeAlias;
 };
+
+/**
+ * Desugar a 'raw' alias (with a leading dash) and return an equivalent,
+ * desugared argument.
+ *
+ * For instance, passing `"-c` will return `"--config"`.
+ *
+ * The reason we'd like to do this is not so much for our own code, but so that
+ * we can transform an alias like `"-u"` to `"--updateSnapshot"` in order to
+ * pass it along to Jest.
+ *
+ * @param rawAlias a CLI flag alias as found on the command line (like `"-c"`)
+ * @returns an equivalent full command (like `"--config"`)
+ */
+const desugarRawAlias = (rawAlias: string): string => '--' + desugarAlias(normalizeFlagName(rawAlias));
