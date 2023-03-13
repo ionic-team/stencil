@@ -5,10 +5,12 @@ on:
     branches:
       - 'main'
       - 'v3.0.0-dev'
+      - 'v2-maintenance'
   push:
     branches:
       - 'main'
       - 'v3.0.0-dev'
+      - 'v2-maintenance'
 
 env:
   BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSER_STACK_ACCESS_KEY }}
