@@ -3,7 +3,7 @@ import {
   getSourceMappingUrlForEndOfFile,
   hasDependency,
   rollupToStencilSourceMap,
-  stringifyRuntimeData
+  stringifyRuntimeData,
 } from '@utils';
 import { join } from 'path';
 import type { SourceMap as RollupSourceMap } from 'rollup';
