@@ -91,7 +91,7 @@
     "eslint-plugin-jest": "^27.0.4",
     "eslint-plugin-jsdoc": "^40.0.0",
     "eslint-plugin-simple-import-sort": "^10.0.0",
-    "execa": "7.1.0",
+    "execa": "7.1.1",
     "exit": "^0.1.2",
     "fs-extra": "^11.0.0",
     "glob": "8.1.0",
