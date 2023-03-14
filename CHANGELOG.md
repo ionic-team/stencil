@@ -1,3 +1,12 @@
+## 🎆 [2.22.3](https://github.com/ionic-team/stencil/compare/v2.22.2...v2.22.3) (2023-03-14)
+
+
+### Bug Fixes
+
+* **compiler:** use file system polling events in watch mode ([#4147](https://github.com/ionic-team/stencil/issues/4147)) ([7f3d514](https://github.com/ionic-team/stencil/commit/7f3d514c5a12e6563e315a834329da40026dd538)), fixes [#3952](https://github.com/ionic-team/stencil/issues/3952), [#4011](https://github.com/ionic-team/stencil/issues/4011), [#4044](https://github.com/ionic-team/stencil/issues/4044)
+
+
+
 ## 🎈 [2.22.2](https://github.com/ionic-team/stencil/compare/v2.22.1...v2.22.2) (2023-01-23)
 
 
