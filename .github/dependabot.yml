@@ -34,6 +34,9 @@ updates:
       # TODO(STENCIL-716): remove this once Stencil drops support for Node 14
       - dependency-name: '@types/fs-extra'
         versions: ['>=10']
+      # TODO(STENCIL-716): remove this once Stencil drops support for Node 14
+      - dependency-name: 'glob'
+        versions: ['>=9']
   - package-ecosystem: 'npm'
     directory: './test/bundler' # Location of package manifests
     schedule:
