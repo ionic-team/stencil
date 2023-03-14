@@ -1151,7 +1151,24 @@ export interface CompilerSystem {
   statSync(p: string): CompilerFsStats;
   tmpDirSync(): string;
   watchDirectory?(p: string, callback: CompilerFileWatcherCallback, recursive?: boolean): CompilerFileWatcher;
-  watchFile?(p: string, callback: CompilerFileWatcherCallback): CompilerFileWatcher;
+
+  /**
+   * A `watchFile` implementation in order to hook into the rest of the {@link CompilerSystem} implementation that is
+   * used when running Stencil's compiler in "watch mode".
+   *
+   * It is analogous to TypeScript's `watchFile`  implementation.
+   *
+   * Note, this function may be called for full builds of Stencil projects by the TypeScript compiler. It should not
+   * assume that it will only be called in watch mode.
+   *
+   * This function should not perform any file watcher registration itself. Each `path` provided to it when called
+   * should already have been registered as a file to watch.
+   *
+   * @param path the path to the file that is being watched
+   * @param callback a callback to invoke when a file that is being watched has changed in some way
+   * @returns an object with a method for unhooking the file watcher from the system
+   */
+  watchFile?(path: string, callback: CompilerFileWatcherCallback): CompilerFileWatcher;
   /**
    * How many milliseconds to wait after a change before calling watch callbacks.
    */
@@ -1353,8 +1370,17 @@ export interface CompilerBuildStart {
   timestamp: string;
 }
 
+/**
+ * A type describing a function to call when an event is emitted by a file watcher
+ * @param fileName the path of the file tied to event
+ * @param eventKind a variant describing the type of event that was emitter (added, edited, etc.)
+ */
 export type CompilerFileWatcherCallback = (fileName: string, eventKind: CompilerFileWatcherEvent) => void;
 
+/**
+ * A type describing the different types of events that Stencil expects may happen when a file being watched is altered
+ * in some way
+ */
 export type CompilerFileWatcherEvent =
   | CompilerEventFileAdd
   | CompilerEventFileDelete
