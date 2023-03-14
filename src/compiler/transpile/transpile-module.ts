@@ -88,9 +88,11 @@ export const transpileModule = (
       return normalizePath(fileName) === normalizePath(sourceFilePath) ? sourceFile : undefined;
     },
     writeFile: (name, text) => {
-      if (name.endsWith('.js.map')) {
+      if (name.endsWith('.js.map') || name.endsWith('.mjs.map')) {
         results.map = text;
-      } else if (name.endsWith('.js')) {
+      } else if (name.endsWith('.js') || name.endsWith('.mjs')) {
+        // if the source file is an ES module w/ `.mjs` extension then
+        // TypeScript will output a `.mjs` file
         results.code = text;
       }
     },

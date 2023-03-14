@@ -302,8 +302,18 @@ export interface ConfigExtras {
    * loading components when using a bundler such as Vite or Parcel. Setting this flag to `true` will change how Stencil
    * lazily loads components in a way that works with additional bundlers. Setting this flag to `true` will increase
    * the size of the compiled output. Defaults to `false`.
+   * @deprecated This flag has been deprecated in favor of `enableImportInjection`, which provides the same
+   * functionality. `experimentalImportInjection` will be removed in a future major version of Stencil.
    */
   experimentalImportInjection?: boolean;
+
+  /**
+   * Projects that use a Stencil library built using the `dist` output target may have trouble lazily
+   * loading components when using a bundler such as Vite or Parcel. Setting this flag to `true` will change how Stencil
+   * lazily loads components in a way that works with additional bundlers. Setting this flag to `true` will increase
+   * the size of the compiled output. Defaults to `false`.
+   */
+  enableImportInjection?: boolean;
 
   /**
    * Dispatches component lifecycle events. Mainly used for testing. Defaults to `false`.
@@ -2433,10 +2443,18 @@ export interface LazyRequire {
   getModulePath(fromDir: string, moduleId: string): string;
 }
 
+/**
+ * @deprecated This interface is no longer used by Stencil
+ * TODO(STENCIL-743): Remove this interface
+ */
 export interface FsWatcherItem {
   close(): void;
 }
 
+/**
+ * @deprecated This interface is no longer used by Stencil
+ * TODO(STENCIL-743): Remove this interface
+ */
 export interface MakeDirectoryOptions {
   /**
    * Indicates whether parent folders should be created.
@@ -2450,6 +2468,10 @@ export interface MakeDirectoryOptions {
   mode?: number;
 }
 
+/**
+ * @deprecated This interface is no longer used by Stencil
+ * TODO(STENCIL-743): Remove this interface
+ */
 export interface FsStats {
   isFile(): boolean;
   isDirectory(): boolean;
