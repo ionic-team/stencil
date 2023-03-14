@@ -1,3 +1,24 @@
+# 🌷 [3.2.0](https://github.com/ionic-team/stencil/compare/v3.1.0...v3.2.0) (2023-03-14)
+
+
+### Bug Fixes
+
+* **cli:** support Jest-specific CLI flag aliases ([#4124](https://github.com/ionic-team/stencil/issues/4124)) ([56389a4](https://github.com/ionic-team/stencil/commit/56389a452d9b072976112ca6339d60b1aea9f73d))
+* **compiler:** use file system polling events in watch mode ([#4146](https://github.com/ionic-team/stencil/issues/4146)) ([4a12b06](https://github.com/ionic-team/stencil/commit/4a12b067f5dcc1048eeabe21fb551c071a3e67b4)), fixes [#3952](https://github.com/ionic-team/stencil/issues/3952), [#4011](https://github.com/ionic-team/stencil/issues/4011), [#4044](https://github.com/ionic-team/stencil/issues/4044)
+* **test:** support importing from ES modules in spec tests ([#4136](https://github.com/ionic-team/stencil/issues/4136)) ([23a73f0](https://github.com/ionic-team/stencil/commit/23a73f0954db1cbc14f3c1d630cc7b5f81382128)), closes [#3251](https://github.com/ionic-team/stencil/issues/3251)
+* **typo:** fix info task output ([#4099](https://github.com/ionic-team/stencil/issues/4099)) ([d88bf30](https://github.com/ionic-team/stencil/commit/d88bf3055123953cff8417c06cd07fc79680c76e))
+
+
+### Features
+
+* **config:** add enableImportInjection flag ([#4156](https://github.com/ionic-team/stencil/issues/4156)) ([2f23a8a](https://github.com/ionic-team/stencil/commit/2f23a8af5b0516218f352b41f6241bea96b28774))
+
+
+## Thanks
+
+🎉 Thanks for @sandrooco for their contributions! 🎉
+
+
 # 🍕 [3.1.0](https://github.com/ionic-team/stencil/compare/v3.0.1...v3.1.0) (2023-02-28)
 
 
@@ -165,6 +186,14 @@ See [BREAKING_CHANGES.md - v3.0.0](./BREAKING_CHANGES.md#stencil-v300) for a com
 
 See [the v3.0.0 Migration Guide](https://stenciljs.com/docs/introduction/upgrading-to-stencil-three) for a guide to migrate to Stencil v3.0.0.
 
+
+
+## 🎆 [2.22.3](https://github.com/ionic-team/stencil/compare/v2.22.2...v2.22.3) (2023-03-14)
+
+
+### Bug Fixes
+
+* **compiler:** use file system polling events in watch mode ([#4147](https://github.com/ionic-team/stencil/issues/4147)) ([7f3d514](https://github.com/ionic-team/stencil/commit/7f3d514c5a12e6563e315a834329da40026dd538)), fixes [#3952](https://github.com/ionic-team/stencil/issues/3952), [#4011](https://github.com/ionic-team/stencil/issues/4011), [#4044](https://github.com/ionic-team/stencil/issues/4044)
 
 
 ## 🎈 [2.22.2](https://github.com/ionic-team/stencil/compare/v2.22.1...v2.22.2) (2023-01-23)
