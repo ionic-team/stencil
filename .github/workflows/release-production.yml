@@ -1,5 +1,5 @@
 name: 'Stencil Production Release (TEST)'
-
+# TODO(NOW): Fix the name of this test (then go back and delete the old entries in GH)
 on:
   workflow_dispatch:
     inputs:
@@ -27,10 +27,52 @@ jobs:
   release-stencil-production-build:
     name: Publish Production Build
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
     steps:
-      - name: Echo GH Input
+      - name: Checkout Code
+        uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v3.5.2
+
+      - name: Get Core Dependencies
+        uses: ./.github/workflows/actions/get-core-dependencies
+
+      # Log the input from GitHub Actions for easy traceability
+      - name: Log GitHub Input
         run: |
-          echo "I do not use these values yet!"
           echo "Version: ${{ inputs.version }}"
           echo "Tag: ${{ inputs.tag }}"
+        shell: bash
+
+      - name: Run Publish Preparation Script
+        # TODO(NOW): Remove hardcoded values (need for release check) and --any-branch. Replace with commented out code
+        run: npm run release.ci.prepare -- --version 2.22.2-dev.1678795942.e009e9 --tag dev --any-branch # --version ${{ inputs.version }} --tag ${{ inputs.tag }}
+        shell: bash
+
+      - name: Log Generated Changes
+        run: git --no-pager diff
+        shell: bash
+
+      # Commit the Changelog, NOTICE, License, package.json, etc.
+      # Note:
+      # - The version is pulled directly from the compiled Stencil binary, as the value from the action's input form
+      #   may be a word such as 'major'
+      # - The 'push' step is expected to be done by the existing Node code
+      - name: Commit Release Preparations
+        run: |
+          git config user.name "Stencil Release Bot"
+          git config user.email "stencil-release-bot@ionic.io"
+          git add .
+          git commit -m "v$(./bin/stencil version)"
+        shell: bash
+
+      # This must occur _after_ the commit, lest we check this in and compromise the secret
+      - name: Prepare NPM Token
+        run: echo //registry.npmjs.org/:_authToken=${NPM_TOKEN} > .npmrc
+        shell: bash
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Run Publish Script
+        # TODO(NOW): These values should feed in from the choices above. Replace with commented out code
+        run: npm run release.ci -- --dry-run --version 2.22.2-dev.1678795942.e009e9 --tag dev # --version ${{ inputs.version }} --tag ${{ inputs.tag }}
         shell: bash

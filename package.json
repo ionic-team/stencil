@@ -32,6 +32,8 @@
     "prettier.base": "prettier --cache \"./({bin,scripts,src,test}/**/*.{ts,tsx,js,jsx})|bin/stencil|.github/(**/)?*.(yml|yaml)|*.js\"",
     "prettier.dry-run": "npm run prettier.base -- --list-different",
     "release": "npm run tsc.scripts && node scripts/build --release --publish",
+    "release.ci.prepare": "npm run tsc.scripts && node scripts/build --release --ci-prepare",
+    "release.ci": "npm run tsc.scripts && node scripts/build --release --ci-publish",
     "release.prepare": "npm run tsc.scripts && node scripts/build --release --prepare",
     "rollup": "rollup --config",
     "rollup.prod": "rollup --config --config-prod",

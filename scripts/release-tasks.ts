@@ -141,6 +141,8 @@ export async function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<st
       {
         title: 'Run karma tests',
         task: () => execa('npm', ['run', 'test.karma.prod'], { cwd: rootDir }),
+        // TODO(NOW): Handle the fact that we need to pipe these creds in
+        // skip: () => true,
       },
       {
         title: 'Build license',
@@ -166,18 +168,22 @@ export async function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<st
     );
   }
 
+  console.log(`isCI ${opts.isCI}`);
   if (opts.isPublishRelease) {
     tasks.push(
       {
         title: 'Publish @stencil/core to npm',
         task: () => {
           const cmd = 'npm';
-          const cmdArgs = ['publish', '--otp', opts.otp].concat(opts.tag ? ['--tag', opts.tag] : []);
+          const cmdArgs = ['publish']
+            .concat(opts.tag ? ['--tag', opts.tag] : [])
+            .concat(opts.isCI ? ['--provenance'] : ['--otp', opts.otp]);
 
+          console.log(`${cmdArgs.join(' ')}`)
           if (isDryRun) {
             return console.log(`[dry-run] ${cmd} ${cmdArgs.join(' ')}`);
           }
-          return execa(cmd, cmdArgs, { cwd: rootDir });
+          return; // execa(cmd, cmdArgs, { cwd: rootDir });
         },
       },
       {
@@ -189,7 +195,7 @@ export async function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<st
           if (isDryRun) {
             return console.log(`[dry-run] ${cmd} ${cmdArgs.join(' ')}`);
           }
-          return execa(cmd, cmdArgs, { cwd: rootDir });
+          return; // execa(cmd, cmdArgs, { cwd: rootDir });
         },
       },
       {
@@ -201,7 +207,7 @@ export async function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<st
           if (isDryRun) {
             return console.log(`[dry-run] ${cmd} ${cmdArgs.join(' ')}`);
           }
-          return execa(cmd, cmdArgs, { cwd: rootDir });
+          return; // execa(cmd, cmdArgs, { cwd: rootDir });
         },
       },
       {
@@ -213,7 +219,7 @@ export async function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<st
           if (isDryRun) {
             return console.log(`[dry-run] ${cmd} ${cmdArgs.join(' ')}`);
           }
-          return execa(cmd, cmdArgs, { cwd: rootDir });
+          return; // execa(cmd, cmdArgs, { cwd: rootDir });
         },
       },
       {
@@ -230,26 +236,24 @@ export async function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<st
 
   const listr = new Listr(tasks);
 
-  listr
-    .run()
-    .then(() => {
-      if (opts.isPublishRelease) {
-        console.log(
-          `\n ${opts.vermoji}  ${color.bold.magenta(pkg.name)} ${color.bold.yellow(newVersion)} published!! ${
-            opts.vermoji
-          }\n`
-        );
-      } else {
-        console.log(
-          `\n ${opts.vermoji}  ${color.bold.magenta(pkg.name)} ${color.bold.yellow(
-            newVersion
-          )} prepared, check the diffs and commit ${opts.vermoji}\n`
-        );
-      }
-    })
-    .catch((err) => {
-      console.log(`\n🤒  ${color.red(err)}\n`);
-      console.log(err);
-      process.exit(1);
-    });
+  try {
+    await listr.run();
+  } catch (err: any) {
+    console.log(`\n🤒  ${color.red(err)}\n`);
+    console.log(err);
+    process.exit(1);
+  }
+  if (opts.isPublishRelease) {
+    console.log(
+      `\n ${opts.vermoji}  ${color.bold.magenta(pkg.name)} ${color.bold.yellow(newVersion)} published!! ${
+        opts.vermoji
+      }\n`
+    );
+  } else {
+    console.log(
+      `\n ${opts.vermoji}  ${color.bold.magenta(pkg.name)} ${color.bold.yellow(
+        newVersion
+      )} prepared, check the diffs and commit ${opts.vermoji}\n`
+    );
+  }
 }
