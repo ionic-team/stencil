@@ -37,7 +37,8 @@ export async function release(rootDir: string, args: ReadonlyArray<string>): Pro
       isPublishRelease: true,
       isProd: true,
     });
-    return publishRelease(opts, args);
+    const answers = await promptRelease(opts);
+    return publishRelease(opts, args, answers);
   }
 }
 
@@ -77,22 +78,37 @@ async function prepareRelease(
 }
 
 /**
- * Initiates the publish of a Stencil release.
- * @param opts build options containing the metadata needed to publish a new version of Stencil
- * @param args stringified arguments used to influence the publish steps that are taken
+ * A type describing the answers to prompts for performing a release
  */
-async function publishRelease(opts: BuildOptions, args: ReadonlyArray<string>): Promise<void> {
+export type ReleasePromptAnswers = {
+  /**
+   * If `true`, run release preparation steps
+   */
+  confirm: boolean;
+  /**
+   * A one-time password, provided by a developer's authenticator application
+   */
+  otp: string;
+  /**
+   * A user specified tag to push to the npm registry. If provided, this overrider {@link ReleasePromptAnswers#tag}
+   */
+  specifiedTag?: string;
+  /**
+   * The tag to push to the npm registry. This is _not_ the tag pushed to GitHub
+   */
+  tag?: string;
+};
+
+/**
+ * Prompts a developer to answer questions regarding how a release of Stencil should be performed
+ * @param opts build options containing the metadata needed to publish a new version of Stencil
+ */
+async function promptRelease(opts: BuildOptions): Promise<ReleasePromptAnswers> {
   const pkg = opts.packageJson;
-
-  if (opts.version !== pkg.version) {
-    throw new Error('Prepare release data and package.json versions do not match. Try re-running release prepare.');
-  }
-
-  console.log(`\nPublish ${opts.vermoji}  ${color.bold.magenta(pkg.name)} ${color.yellow(`${opts.version}`)}\n`);
 
   const { execa } = await import('execa');
 
-  const prompts = [
+  const prompts: inquirer.QuestionCollection<ReleasePromptAnswers> = [
     {
       type: 'list',
       name: 'tag',
@@ -162,16 +178,44 @@ async function publishRelease(opts: BuildOptions, args: ReadonlyArray<string>): 
     },
   ];
 
-  await inquirer
-    .prompt(prompts)
-    .then((answers) => {
-      if (answers.confirm) {
-        opts.otp = answers.otp;
-        return runReleaseTasks(opts, args);
-      }
-    })
-    .catch((err) => {
-      console.log('\n', color.red(err), '\n');
-      process.exit(0);
-    });
+  let answers: ReleasePromptAnswers;
+  try {
+    answers = await inquirer.prompt<ReleasePromptAnswers>(prompts);
+    opts.otp = answers.otp;
+  } catch (err: any) {
+    console.log('\n', color.red(err), '\n');
+    process.exit(0);
+  }
+  return answers;
+}
+
+/**
+ * Initiates publishing a Stencil release.
+ * @param opts build options containing the metadata needed to publish a new version of Stencil
+ * @param args stringified arguments used to influence the steps that are taken
+ * @param answers a collection of answers to previously answered prompts regarding details of the release
+ */
+async function publishRelease(
+  opts: BuildOptions,
+  args: ReadonlyArray<string>,
+  answers: ReleasePromptAnswers
+): Promise<void> {
+  if (!answers.confirm) {
+    // the dev said 'no' to the release, return
+    return;
+  }
+
+  const pkg = opts.packageJson;
+  if (opts.version !== pkg.version) {
+    throw new Error('Prepare release data and package.json versions do not match. Try re-running release prepare.');
+  }
+
+  console.log(`\nPublish ${opts.vermoji}  ${color.bold.magenta(pkg.name)} ${color.yellow(`${opts.version}`)}\n`);
+
+  try {
+    return runReleaseTasks(opts, args);
+  } catch (err: any) {
+    console.log('\n', color.red(err), '\n');
+    process.exit(0);
+  }
 }
