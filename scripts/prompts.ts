@@ -29,10 +29,24 @@ export type PrepareReleasePromptAnswers = {
 };
 
 /**
+ * A type describing the normalized responses of {@link PrepareReleasePromptAnswers}
+ */
+export type NormalizedPrepareResponses = {
+  /**
+   * If `true`, run release preparation steps
+   */
+  confirm: boolean;
+  /**
+   * The semver string to publish use Stencil under
+   */
+  versionToUse: string;
+};
+
+/**
  * Prompts a developer to answer questions regarding how a release of Stencil should be performed
  * @param opts build options containing the metadata needed to release a new version of Stencil
  */
-export async function promptPrepareRelease(opts: BuildOptions): Promise<PrepareReleasePromptAnswers> {
+export async function promptPrepareRelease(opts: BuildOptions): Promise<NormalizedPrepareResponses> {
   const pkg = opts.packageJson;
   const oldVersion = opts.packageJson.version;
 
@@ -78,20 +92,36 @@ export async function promptPrepareRelease(opts: BuildOptions): Promise<PrepareR
       type: 'confirm',
       name: 'confirm',
       message: (answers: any) => {
-        const version = answers.version ?? answers.specifiedVersion;
+        const version = determineAnsweredVersionToUse(answers);
         return `Prepare release ${opts.vermoji}  ${color.yellow(version)} from ${oldVersion}. Continue?`;
       },
     },
   ];
 
-  let answers: PrepareReleasePromptAnswers;
   try {
-    answers = await inquirer.prompt<PrepareReleasePromptAnswers>(prompts);
+    const answers = await inquirer.prompt<PrepareReleasePromptAnswers>(prompts);
+    return {
+      confirm: answers.confirm,
+      versionToUse: determineAnsweredVersionToUse(answers),
+    };
   } catch (err: any) {
     console.log('\n', color.red(err), '\n');
     process.exit(0);
   }
-  return answers;
+}
+
+/**
+ * Helper function to determine which version string to use.
+ *
+ * Due to a bug in Inquirer, the version to publish Stencil under needs to be specified under two different fields when
+ * the release preparation scripts diverge in questioning. This function ensures the logic for determining which of
+ * those two answers is to be used.
+ *
+ * @param answers user provided answers to pick from
+ * @returns the version string to use. defaults to 'UNKNOWN' if the version cannot be determined.
+ */
+export function determineAnsweredVersionToUse(answers: PrepareReleasePromptAnswers): string {
+  return answers.version ? answers.version : answers.specifiedVersion ? answers.specifiedVersion : 'UNKNOWN';
 }
 
 /**
@@ -99,7 +129,7 @@ export async function promptPrepareRelease(opts: BuildOptions): Promise<PrepareR
  */
 export type ReleasePromptAnswers = {
   /**
-   * If `true`, run release preparation steps
+   * If `true`, run release steps
    */
   confirm: boolean;
   /**
@@ -117,10 +147,28 @@ export type ReleasePromptAnswers = {
 };
 
 /**
+ * A type describing the normalized responses of {@link ReleasePromptAnswers}
+ */
+export type NormalizedReleaseResponses = {
+  /**
+   * If `true`, run release preparation steps
+   */
+  confirm: boolean;
+  /**
+   * A one-time password, provided by a developer's authenticator application
+   */
+  otp: string;
+  /**
+   * The tag to push to the npm registry. This is _not_ the tag pushed to GitHub
+   */
+  npmTag: string;
+};
+
+/**
  * Prompts a developer to answer questions regarding how a release of Stencil should be performed
  * @param opts build options containing the metadata needed to publish a new version of Stencil
  */
-export async function promptRelease(opts: BuildOptions): Promise<ReleasePromptAnswers> {
+export async function promptRelease(opts: BuildOptions): Promise<NormalizedReleaseResponses> {
   const pkg = opts.packageJson;
 
   const { execa } = await import('execa');
@@ -177,8 +225,8 @@ export async function promptRelease(opts: BuildOptions): Promise<ReleasePromptAn
       type: 'confirm',
       name: 'confirm',
       message: (answers: any) => {
-        opts.tag = answers.tag ?? answers.specifiedTag;
-        const tagPart = opts.tag ? ` and tag this release in npm as ${color.yellow(opts.tag)}` : '';
+        const tagToUse = determineAnsweredTagToUse(answers);
+        const tagPart = ` and tag this release in npm as ${color.yellow(tagToUse)}`;
         return `Will publish ${opts.vermoji}  ${color.yellow(opts.version)}${tagPart}. Continue?`;
       },
     },
@@ -195,13 +243,29 @@ export async function promptRelease(opts: BuildOptions): Promise<ReleasePromptAn
     },
   ];
 
-  let answers: ReleasePromptAnswers;
   try {
-    answers = await inquirer.prompt<ReleasePromptAnswers>(prompts);
-    opts.otp = answers.otp;
+    const answers = await inquirer.prompt<ReleasePromptAnswers>(prompts);
+    return {
+      confirm: answers.confirm,
+      otp: answers.otp,
+      npmTag: determineAnsweredTagToUse(answers),
+    };
   } catch (err: any) {
     console.log('\n', color.red(err), '\n');
     process.exit(0);
   }
-  return answers;
+}
+
+/**
+ * Helper function to determine which tag string to use.
+ *
+ * Due to a bug in Inquirer, the tag to publish Stencil under needs to be specified under two different fields when
+ * the release scripts diverge in questioning. This function ensures the logic for determining which of those two
+ * answers is to be used.
+ *
+ * @param answers user provided answers to pick from
+ * @returns the tag to use. defaults to 'UNKNOWN' if the tag cannot be determined.
+ */
+export function determineAnsweredTagToUse(answers: ReleasePromptAnswers): string {
+  return answers.tag ? answers.tag : answers.specifiedTag ? answers.specifiedTag : 'UNKNOWN';
 }
