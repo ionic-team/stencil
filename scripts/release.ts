@@ -6,6 +6,7 @@ import { promptPrepareRelease } from './release-prepare-prompts';
 import { promptRelease } from './release-prompts';
 import { runReleaseTasks } from './release-tasks';
 import { BuildOptions, getOptions } from './utils/options';
+import { getNewVersion } from './utils/release-utils';
 
 /**
  * Runner for creating a release of Stencil
@@ -58,6 +59,61 @@ export async function release(rootDir: string, args: ReadonlyArray<string>): Pro
 
     return publishRelease(opts, args);
   }
+
+  if (args.includes('--ci-prepare')) {
+    await fs.emptyDir(buildDir);
+    const prepareOpts = getOptions(rootDir, {
+      isCI: true,
+      isPublishRelease: false,
+      isProd: true,
+    });
+
+    const versionIdx = args.indexOf('--version');
+    if (versionIdx === -1 || versionIdx === args.length) {
+      console.log(`\n${color.bold.red('No `--version [VERSION]` argument was found. Exiting')}\n`);
+      process.exit(1);
+    }
+    prepareOpts.version = getNewVersion(prepareOpts.packageJson.version, args[versionIdx + 1]);
+
+    await prepareRelease(prepareOpts, args);
+    console.log(`${color.bold.blue('Release Prepared!')}`);
+  }
+
+  if (args.includes('--ci-publish')) {
+    const prepareOpts = getOptions(rootDir, {
+      isCI: true,
+      isPublishRelease: false,
+      isProd: true,
+    });
+
+    const versionIdx = args.indexOf('--version');
+    if (versionIdx === -1 || versionIdx === args.length) {
+      console.log(`\n${color.bold.red('No `--version [VERSION]` argument was found. Exiting')}\n`);
+      process.exit(1);
+    }
+    prepareOpts.version = getNewVersion(prepareOpts.packageJson.version, args[versionIdx + 1]);
+
+    const tagIdx = args.indexOf('--tag');
+    if (tagIdx === -1 || tagIdx === args.length) {
+      console.log(`\n${color.bold.red('No `--tag [TAG]` argument was found. Exiting')}\n`);
+      process.exit(1);
+    }
+    const newTag = args[tagIdx + 1];
+
+    console.log(`${color.bold.blue(`Version: ${prepareOpts.version}`)}`);
+    console.log(`${color.bold.blue(`Tag: ${newTag}`)}`);
+
+    const publishOpts = getOptions(rootDir, {
+      buildId: prepareOpts.buildId,
+      version: prepareOpts.version,
+      vermoji: prepareOpts.vermoji,
+      isCI: prepareOpts.isCI,
+      isPublishRelease: true,
+      isProd: true,
+      tag: newTag,
+    });
+    return await publishRelease(publishOpts, args);
+  }
 }
 
 /**
@@ -97,7 +153,7 @@ async function publishRelease(opts: BuildOptions, args: ReadonlyArray<string>): 
   console.log(`\nPublish ${opts.vermoji}  ${color.bold.magenta(pkg.name)} ${color.yellow(`${opts.version}`)}\n`);
 
   try {
-    return runReleaseTasks(opts, args);
+    await runReleaseTasks(opts, args);
   } catch (err: any) {
     console.log('\n', color.red(err), '\n');
     process.exit(0);
