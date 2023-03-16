@@ -29,9 +29,6 @@ export type PrepareReleasePromptAnswers = {
 export async function promptPrepareRelease(opts: BuildOptions): Promise<PrepareReleasePromptAnswers> {
   const pkg = opts.packageJson;
   const oldVersion = opts.packageJson.version;
-  console.log(
-    `\nPrepare to publish ${opts.vermoji}  ${color.bold.magenta(pkg.name)} ${color.dim(`(currently ${oldVersion})`)}\n`
-  );
 
   const NON_SERVER_INCREMENTS: ReadonlyArray<{ name: string; value: string }> = [
     {
