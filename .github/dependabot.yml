@@ -63,4 +63,4 @@ updates:
     rebase-strategy: 'disabled'
     ignore:
       - dependency-name: 'typescript'
-        versions: [ '>=4.10', '>=5.0' ]
+        versions: ['>=4.10', '>=5.0']
