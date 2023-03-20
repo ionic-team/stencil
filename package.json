@@ -107,7 +107,7 @@
     "mime-db": "^1.46.0",
     "minimatch": "5.1.2",
     "node-fetch": "3.3.1",
-    "open": "^8.4.0",
+    "open": "^9.0.0",
     "open-in-editor": "2.2.0",
     "parse5": "7.1.2",
     "path-browserify": "^1.0.1",

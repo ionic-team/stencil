@@ -1,6 +1,5 @@
 import color from 'ansi-colors';
 import fs from 'fs-extra';
-import open from 'open';
 import { join } from 'path';
 import semver from 'semver';
 
@@ -147,5 +146,6 @@ export async function postGithubRelease(opts: BuildOptions): Promise<void> {
     url.searchParams.set('prerelease', '1');
   }
 
+  const open = (await import('open')).default;
   await open(url.href);
 }
