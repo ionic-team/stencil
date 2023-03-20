@@ -2162,15 +2162,6 @@ export interface OutputTargetDistCustomElements extends OutputTargetBaseNext {
   customElementsExportBehavior?: CustomElementsExportBehavior;
 }
 
-export interface OutputTargetDistCustomElementsBundle extends OutputTargetBaseNext {
-  type: 'dist-custom-elements-bundle';
-  empty?: boolean;
-  externalRuntime?: boolean;
-  copy?: CopyTask[];
-  includeGlobalScripts?: boolean;
-  minify?: boolean;
-}
-
 /**
  * The base type for output targets. All output targets should extend this base type.
  */
@@ -2280,7 +2271,6 @@ export type OutputTarget =
   | OutputTargetDist
   | OutputTargetDistCollection
   | OutputTargetDistCustomElements
-  | OutputTargetDistCustomElementsBundle
   | OutputTargetDistLazy
   | OutputTargetDistGlobalStyles
   | OutputTargetDistLazyLoader
