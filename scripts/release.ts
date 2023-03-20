@@ -3,15 +3,10 @@ import fs from 'fs-extra';
 import inquirer from 'inquirer';
 import { join } from 'path';
 
+import { PrepareReleasePromptAnswers, promptPrepareRelease } from './prompts';
 import { runReleaseTasks } from './release-tasks';
 import { BuildOptions, getOptions } from './utils/options';
-import {
-  getNewVersion,
-  isPrereleaseVersion,
-  isValidVersionInput,
-  prettyVersionDiff,
-  SEMVER_INCREMENTS,
-} from './utils/release-utils';
+import { isPrereleaseVersion } from './utils/release-utils';
 
 /**
  * Runner for creating a release of Stencil
@@ -28,7 +23,8 @@ export async function release(rootDir: string, args: ReadonlyArray<string>): Pro
       isPublishRelease: false,
       isProd: true,
     });
-    return prepareRelease(opts, args, releaseDataPath);
+    const answers = await promptPrepareRelease(opts);
+    return prepareRelease(opts, args, releaseDataPath, answers);
   }
 
   if (args.includes('--publish')) {
@@ -50,76 +46,34 @@ export async function release(rootDir: string, args: ReadonlyArray<string>): Pro
  * @param opts build options containing the metadata needed to release a new version of Stencil
  * @param args stringified arguments used to influence the release steps that are taken
  * @param releaseDataPath the fully qualified path of `release-data.json` to write to disk during this step
+ * @param answers a collection of answers to previously answered prompts regarding details of the release
  */
-async function prepareRelease(opts: BuildOptions, args: ReadonlyArray<string>, releaseDataPath: string): Promise<void> {
+async function prepareRelease(
+  opts: BuildOptions,
+  args: ReadonlyArray<string>,
+  releaseDataPath: string,
+  answers: PrepareReleasePromptAnswers
+): Promise<void> {
+  if (!answers.confirm) {
+    // the dev said 'no' to the release, return
+    return;
+  }
+
   const pkg = opts.packageJson;
   const oldVersion = opts.packageJson.version;
   console.log(
     `\nPrepare to publish ${opts.vermoji}  ${color.bold.magenta(pkg.name)} ${color.dim(`(currently ${oldVersion})`)}\n`
   );
 
-  const NON_SERVER_INCREMENTS: ReadonlyArray<{ name: string; value: string }> = [
-    {
-      name: 'Dry Run',
-      value: getNewVersion(oldVersion, 'patch') + '-dryrun',
-    },
-    {
-      name: 'Other (specify)',
-      value: null,
-    },
-  ];
-
-  const prompts = [
-    {
-      type: 'list',
-      name: 'version',
-      message: 'Select semver increment or specify new version',
-      pageSize: SEMVER_INCREMENTS.length + NON_SERVER_INCREMENTS.length,
-      choices: SEMVER_INCREMENTS.map((inc) => ({
-        name: `${inc}   ${prettyVersionDiff(oldVersion, inc)}`,
-        value: inc,
-      })).concat([new inquirer.Separator() as any, ...NON_SERVER_INCREMENTS]),
-      filter: (input: string) => (isValidVersionInput(input) ? getNewVersion(oldVersion, input) : input),
-    },
-    {
-      type: 'input',
-      // this name is intentionally different from 'version' above to make the `when` check below work properly
-      // (this prompt should only run if `version` was not already input)
-      name: 'specifiedVersion',
-      message: 'Specify Version',
-      when: (answers: any) => !answers.version,
-      filter: (input: string) => (isValidVersionInput(input) ? getNewVersion(pkg.version, input) : input),
-      validate: (input: string) => {
-        if (!isValidVersionInput(input)) {
-          return 'Please specify a valid semver, for example, `1.2.3`, or `3.0.0-alpha.0`. See http://semver.org';
-        }
-        return true;
-      },
-    },
-    {
-      type: 'confirm',
-      name: 'confirm',
-      message: (answers: any) => {
-        const version = answers.version ?? answers.specifiedVersion;
-        return `Prepare release ${opts.vermoji}  ${color.yellow(version)} from ${oldVersion}. Continue?`;
-      },
-    },
-  ];
-
-  await inquirer
-    .prompt(prompts)
-    .then((answers) => {
-      if (answers.confirm) {
-        opts.version = answers.version ?? answers.specifiedVersion;
-        // write `release-data.json`
-        fs.writeJsonSync(releaseDataPath, opts, { spaces: 2 });
-        return runReleaseTasks(opts, args);
-      }
-    })
-    .catch((err) => {
-      console.log('\n', color.red(err), '\n');
-      process.exit(0);
-    });
+  opts.version = answers.version ?? answers.specifiedVersion;
+  try {
+    // write `release-data.json`
+    fs.writeJsonSync(releaseDataPath, opts, { spaces: 2 });
+    return runReleaseTasks(opts, args);
+  } catch (err: any) {
+    console.log('\n', color.red(err), '\n');
+    process.exit(0);
+  }
 }
 
 /**
