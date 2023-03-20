@@ -61,3 +61,6 @@ updates:
     # Disable rebasing for pull requests, as having several open pull requests all get simultaneously rebased gets
     # noisy from a notification standpoint
     rebase-strategy: 'disabled'
+    ignore:
+      - dependency-name: 'typescript'
+        versions: ['>=4.10', '>=5.0']
