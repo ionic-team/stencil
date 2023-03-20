@@ -36,13 +36,6 @@ Stencil is able to generate components into various formats so they can be best 
 - Generates a `collection` into the `dist/collection/` directory to be used by other projects.
 
 
-### `dist-custom-elements-bundle`
-
-- Generates a single, tree-shakable, bundle of all the components.
-- Does not define the custom elements.
-- Consumers importing individual components from the bundle must define each custom element.
-
-
 ### `angular`
 
 - Generates a wrapper Angular component proxy.

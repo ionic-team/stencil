@@ -4,7 +4,6 @@ import type * as d from '../../declarations';
 import {
   isOutputTargetDist,
   isOutputTargetDistCustomElements,
-  isOutputTargetDistCustomElementsBundle,
   isOutputTargetDistLazy,
   isOutputTargetDistLazyLoader,
   isOutputTargetHydrate,
@@ -20,7 +19,6 @@ type OutputTargetEmptiable =
 const isEmptable = (o: d.OutputTarget): o is OutputTargetEmptiable =>
   isOutputTargetDist(o) ||
   isOutputTargetDistCustomElements(o) ||
-  isOutputTargetDistCustomElementsBundle(o) ||
   isOutputTargetWww(o) ||
   isOutputTargetDistLazy(o) ||
   isOutputTargetDistLazyLoader(o) ||
