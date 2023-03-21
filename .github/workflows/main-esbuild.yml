@@ -1,11 +1,9 @@
-name: CI
+name: esbuild CI
 
 on:
-  merge_group:
   push:
     branches:
       - 'main'
-      - 'stencil/v4-dev'
   pull_request:
     branches:
       - '**'
@@ -17,43 +15,39 @@ concurrency:
 jobs:
   build_core:
     name: Build
-    uses: ./.github/workflows/build.yml
-
-  lint_and_format:
-    name: Lint and Format
-    uses: ./.github/workflows/lint-and-format.yml
+    uses: ./.github/workflows/build-esbuild.yml
 
   analysis_tests:
-    name: Analysis Tests
+    name: Analysis Tests (Esbuild)
     needs: [build_core]
     uses: ./.github/workflows/test-analysis.yml
     with:
-      build_name: stencil-core
+      build_name: stencil-core-esbuild
 
   bundler_tests:
-    name: Bundler Tests
+    name: Bundler Tests (Esbuild)
     needs: [build_core]
     uses: ./.github/workflows/test-bundlers.yml
     with:
-      build_name: stencil-core
+      build_name: stencil-core-esbuild
 
   component_starter_tests:
-    name: Component Starter Smoke Test
+    name: Component Starter Smoke Test (Esbuild)
     needs: [build_core]
     uses: ./.github/workflows/test-component-starter.yml
     with:
-      build_name: stencil-core
+      build_name: stencil-core-esbuild
 
   e2e_tests:
-    name: E2E Tests
+    name: E2E Tests (Esbuild)
     needs: [build_core]
     uses: ./.github/workflows/test-e2e.yml
     with:
-      build_name: stencil-core
+      build_name: stencil-core-esbuild
 
   unit_tests:
-    name: Unit Tests
+    name: Unit Tests (Esbuild)
     needs: [build_core]
     uses: ./.github/workflows/test-unit.yml
     with:
-      build_name: stencil-core
+      build_name: stencil-core-esbuild

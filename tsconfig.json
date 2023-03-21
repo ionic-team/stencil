@@ -22,6 +22,7 @@
     "paths": {
       "@app-data": ["src/app-data/index.ts"],
       "@app-globals": ["src/app-globals/index.ts"],
+      "@environment": ["src/compiler/sys/environment.ts"],
       "@dev-server-process": ["src/dev-server/server-process.ts"],
       "@hydrate-factory": ["src/hydrate/runner/hydrate-factory.ts"],
       "@platform": ["src/client/index.ts"],
