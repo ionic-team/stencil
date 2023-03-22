@@ -12,13 +12,11 @@ import { retrieveTsModifiers } from '../transform-utils';
  * @param classMembers the class elements to modify
  * @param moduleFile the Stencil module representation of the component class
  * @param cmp the component metadata generated for the component
- * @param ensureSuper an unused argument, as its always true
  */
 export const updateNativeConstructor = (
   classMembers: ts.ClassElement[],
   moduleFile: d.Module,
-  cmp: d.ComponentCompilerMeta,
-  ensureSuper: boolean
+  cmp: d.ComponentCompilerMeta
 ): void => {
   if (cmp.isPlain) {
     return;
@@ -36,11 +34,9 @@ export const updateNativeConstructor = (
       ...addLegacyProps(moduleFile, cmp),
     ];
 
-    if (ensureSuper) {
-      const hasSuper = cstrMethod.body.statements.some((s) => s.kind === ts.SyntaxKind.SuperKeyword);
-      if (!hasSuper) {
-        statements = [createNativeConstructorSuper(), ...statements];
-      }
+    const hasSuper = cstrMethod.body.statements.some((s) => s.kind === ts.SyntaxKind.SuperKeyword);
+    if (!hasSuper) {
+      statements = [createNativeConstructorSuper(), ...statements];
     }
 
     classMembers[cstrMethodIndex] = ts.factory.updateConstructorDeclaration(
@@ -57,9 +53,7 @@ export const updateNativeConstructor = (
       ...addLegacyProps(moduleFile, cmp),
     ];
 
-    if (ensureSuper) {
-      statements = [createNativeConstructorSuper(), ...statements];
-    }
+    statements = [createNativeConstructorSuper(), ...statements];
 
     const cstrMethod = ts.factory.createConstructorDeclaration(undefined, [], ts.factory.createBlock(statements, true));
     classMembers.unshift(cstrMethod);
