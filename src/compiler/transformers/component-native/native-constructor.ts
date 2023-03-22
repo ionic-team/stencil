@@ -6,12 +6,20 @@ import { addCreateEvents } from '../create-event';
 import { addLegacyProps } from '../legacy-props';
 import { retrieveTsModifiers } from '../transform-utils';
 
+/**
+ * Updates a constructor to include
+ * Modifies a list of provided {@link ts.ClassElement}s in place
+ * @param classMembers the class elements to modify
+ * @param moduleFile the Stencil module representation of the component class
+ * @param cmp the component metadata generated for the component
+ * @param ensureSuper an unused argument, as its always true
+ */
 export const updateNativeConstructor = (
   classMembers: ts.ClassElement[],
   moduleFile: d.Module,
   cmp: d.ComponentCompilerMeta,
   ensureSuper: boolean
-) => {
+): void => {
   if (cmp.isPlain) {
     return;
   }
@@ -72,7 +80,13 @@ const nativeInit = (moduleFile: d.Module, cmp: d.ComponentCompilerMeta): Readonl
   return initStatements;
 };
 
-const nativeRegisterHostStatement = () => {
+/**
+ * Generate an expression statement to register a host element with its VDOM equivalent in a global element-to-vdom
+ * mapping.
+ * @returns the generated expression statement
+ */
+const nativeRegisterHostStatement = (): ts.ExpressionStatement => {
+  // Create an expression statement, `this.__registerHost();`
   return ts.factory.createExpressionStatement(
     ts.factory.createCallExpression(
       ts.factory.createPropertyAccessExpression(ts.factory.createThis(), ts.factory.createIdentifier('__registerHost')),
@@ -99,7 +113,11 @@ const nativeAttachShadowStatement = (moduleFile: d.Module): ts.ExpressionStateme
   );
 };
 
-const createNativeConstructorSuper = () => {
+/**
+ * Create an expression statement for calling `super()` for a class.
+ * @returns the generated expression statement
+ */
+const createNativeConstructorSuper = (): ts.ExpressionStatement => {
   return ts.factory.createExpressionStatement(
     ts.factory.createCallExpression(ts.factory.createIdentifier('super'), undefined, undefined)
   );
