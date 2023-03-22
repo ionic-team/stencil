@@ -47,13 +47,12 @@ export const updateNativeConstructor = (
     );
   } else {
     // create a constructor()
-    let statements: ts.Statement[] = [
+    const statements: ts.Statement[] = [
+      createNativeConstructorSuper(),
       ...nativeInit(moduleFile, cmp),
       ...addCreateEvents(moduleFile, cmp),
       ...addLegacyProps(moduleFile, cmp),
     ];
-
-    statements = [createNativeConstructorSuper(), ...statements];
 
     const cstrMethod = ts.factory.createConstructorDeclaration(undefined, [], ts.factory.createBlock(statements, true));
     classMembers.unshift(cstrMethod);
