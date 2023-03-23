@@ -75,7 +75,16 @@ const generateCustomElementsTypesOutput = async (
             const componentSourceRelPath = relative(config.srcDir, component.sourceFilePath).replace('.tsx', '');
             const componentDTSPath = join(componentsTypeDirectoryRelPath, componentSourceRelPath);
 
-            return `export { ${importName} as ${exportName} } from '${componentDTSPath}';`;
+            const defineFunctionExportName = `defineCustomElement${exportName}`;
+            // Get the path to the sibling typedef file for the current component
+            const localComponentTypeDefFilePath = `./${component.sourceFilePath.split('/').pop().replace('.tsx', '')}`;
+
+            return [
+              `export { ${importName} as ${exportName} } from '${componentDTSPath}';`,
+              // We need to alias each `defineCustomElement` function typedef to match the aliased name given to the
+              // function in the `index.js`
+              `export { defineCustomElement as ${defineFunctionExportName} } from '${localComponentTypeDefFilePath}';`,
+            ].join('\n');
           }),
           ``,
         ]
