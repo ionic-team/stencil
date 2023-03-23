@@ -2,7 +2,7 @@ import { MockWindow } from '../window';
 
 describe('matchMedia', () => {
   let win: MockWindow;
-  let media;
+  let media: ReturnType<MockWindow['matchMedia']>;
   beforeEach(() => {
     win = new MockWindow(`
       <html>
