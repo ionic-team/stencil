@@ -344,7 +344,7 @@ export class MockWindow {
       addEventListener,
       dispatchEvent,
       removeEventListener,
-      onchange: null as (this: MediaQueryList, ev: MediaQueryListEvent) => any,
+      onchange: null as (this: MediaQueryList, ev: MediaQueryListEvent) => any | null,
     };
   }
 
