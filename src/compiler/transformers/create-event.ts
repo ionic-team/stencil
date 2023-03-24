@@ -30,9 +30,13 @@ export const addCreateEvents = (moduleFile: d.Module, cmp: d.ComponentCompilerMe
 };
 
 /**
- * Generate a bit number encoded with event behavior information
+ * Generate a bit flag encoded with event behavior information.
+ *
+ * This function uses the provided event metadata to determine which flags are set. {@link EVENT_FLAGS} acts as the
+ * backing data structure that sets the actual bits on the returned value.
+ *
  * @param eventMeta the metadata associated with the event
- * @returns the encoded behaviors
+ * @returns the encoded event behaviors
  */
 const computeFlags = (eventMeta: d.ComponentCompilerEvent): number => {
   let flags = 0;
