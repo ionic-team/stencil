@@ -118,6 +118,6 @@ const nativeAttachShadowStatement = (moduleFile: d.Module): ts.ExpressionStateme
  */
 const createNativeConstructorSuper = (): ts.ExpressionStatement => {
   return ts.factory.createExpressionStatement(
-    ts.factory.createCallExpression(ts.factory.createIdentifier('super'), undefined, undefined)
+    ts.factory.createCallExpression(ts.factory.createSuper(), undefined, undefined)
   );
 };
