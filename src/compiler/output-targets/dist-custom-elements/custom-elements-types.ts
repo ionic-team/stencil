@@ -77,7 +77,7 @@ const generateCustomElementsTypesOutput = async (
 
             const defineFunctionExportName = `defineCustomElement${exportName}`;
             // Get the path to the sibling typedef file for the current component
-            const localComponentTypeDefFilePath = `./${component.sourceFilePath.split('/').pop().replace('.tsx', '')}`;
+            const localComponentTypeDefFilePath = `./${component.sourceFilePath.split('/').pop()?.replace('.tsx', '')}`;
 
             return [
               `export { ${importName} as ${exportName} } from '${componentDTSPath}';`,
