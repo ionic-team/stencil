@@ -17,9 +17,9 @@ describe('proxy-custom-element-function', () => {
     ReturnType<typeof TransformUtils.getModuleFromSourceFile>,
     Parameters<typeof TransformUtils.getModuleFromSourceFile>
   >;
-  let createAnonymousClassMetadataProxySpy: jest.SpyInstance<
-    ReturnType<typeof AddComponentMetaProxy.createAnonymousClassMetadataProxy>,
-    Parameters<typeof AddComponentMetaProxy.createAnonymousClassMetadataProxy>
+  let createClassMetadataProxySpy: jest.SpyInstance<
+    ReturnType<typeof AddComponentMetaProxy.createClassMetadataProxy>,
+    Parameters<typeof AddComponentMetaProxy.createClassMetadataProxy>
   >;
 
   beforeEach(() => {
@@ -47,20 +47,19 @@ describe('proxy-custom-element-function', () => {
       } as d.Module;
     });
 
-    createAnonymousClassMetadataProxySpy = jest.spyOn(AddComponentMetaProxy, 'createAnonymousClassMetadataProxy');
-    createAnonymousClassMetadataProxySpy.mockImplementation(
-      (_compilerMeta: d.ComponentCompilerMeta, clazz: ts.Expression) =>
-        ts.factory.createCallExpression(
-          ts.factory.createIdentifier(PROXY_CUSTOM_ELEMENT),
-          [],
-          [clazz, ts.factory.createTrue()]
-        )
+    createClassMetadataProxySpy = jest.spyOn(AddComponentMetaProxy, 'createClassMetadataProxy');
+    createClassMetadataProxySpy.mockImplementation((_compilerMeta: d.ComponentCompilerMeta, clazz: ts.Expression) =>
+      ts.factory.createCallExpression(
+        ts.factory.createIdentifier(PROXY_CUSTOM_ELEMENT),
+        [],
+        [clazz, ts.factory.createTrue()]
+      )
     );
   });
 
   afterEach(() => {
     getModuleFromSourceFileSpy.mockRestore();
-    createAnonymousClassMetadataProxySpy.mockRestore();
+    createClassMetadataProxySpy.mockRestore();
   });
 
   describe('proxyCustomElement()', () => {
@@ -82,7 +81,7 @@ describe('proxy-custom-element-function', () => {
       const transpiledModule = transpileModule(code, null, compilerCtx, [], [transformer]);
 
       expect(transpiledModule.outputText).toContain(
-        `export const ${componentClassName} = /*@__PURE__*/ __stencil_proxyCustomElement(class extends HTMLElement {}, true);`
+        `export const ${componentClassName} = /*@__PURE__*/ __stencil_proxyCustomElement(class ${componentClassName} extends HTMLElement {}, true);`
       );
     });
 
@@ -94,7 +93,7 @@ describe('proxy-custom-element-function', () => {
         const transpiledModule = transpileModule(code, null, compilerCtx, [], [transformer]);
 
         expect(transpiledModule.outputText).toContain(
-          `export const foo = 'hello world!', ${componentClassName} = /*@__PURE__*/ __stencil_proxyCustomElement(class extends HTMLElement {}, true);`
+          `export const foo = 'hello world!', ${componentClassName} = /*@__PURE__*/ __stencil_proxyCustomElement(class ${componentClassName} extends HTMLElement {}, true);`
         );
       });
 
@@ -105,18 +104,18 @@ describe('proxy-custom-element-function', () => {
         const transpiledModule = transpileModule(code, null, compilerCtx, [], [transformer]);
 
         expect(transpiledModule.outputText).toContain(
-          `export const ${componentClassName} = /*@__PURE__*/ __stencil_proxyCustomElement(class extends HTMLElement {}, true), foo = 'hello world!';`
+          `export const ${componentClassName} = /*@__PURE__*/ __stencil_proxyCustomElement(class ${componentClassName} extends HTMLElement {}, true), foo = 'hello world!';`
         );
       });
 
       it('wraps a class initializer properly in the middle of multiple variable declarations', () => {
-        const code = `const foo = 'hello world!', ${componentClassName} = class extends HTMLElement {}, bar = 'goodbye?'`;
+        const code = `const foo = 'hello world!', ${componentClassName} = class ${componentClassName} extends HTMLElement {}, bar = 'goodbye?'`;
 
         const transformer = proxyCustomElement(compilerCtx, transformOpts);
         const transpiledModule = transpileModule(code, null, compilerCtx, [], [transformer]);
 
         expect(transpiledModule.outputText).toContain(
-          `export const foo = 'hello world!', ${componentClassName} = /*@__PURE__*/ __stencil_proxyCustomElement(class extends HTMLElement {}, true), bar = 'goodbye?';`
+          `export const foo = 'hello world!', ${componentClassName} = /*@__PURE__*/ __stencil_proxyCustomElement(class ${componentClassName} extends HTMLElement {}, true), bar = 'goodbye?';`
         );
       });
     });
