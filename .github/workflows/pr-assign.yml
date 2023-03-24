@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ !github.event.pull_request.draft && github.event.pull_request.user.type != 'Bot'  }}
     steps:
-      - uses: actions/checkout@24cb9080177205b6e8c946b17badbe402adc938f # v3.4.0
+      - uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
       - uses: ./.github/workflows/actions/auto-request-reviews
         with:
           orgReadToken: ${{ secrets.READORG_GITHUB_TOKEN }}
