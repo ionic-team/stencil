@@ -33,15 +33,17 @@ export const updateNativeConstructor = (
   if (cstrMethodIndex >= 0) {
     // add to the existing constructor()
     const cstrMethod = classMembers[cstrMethodIndex] as ts.ConstructorDeclaration;
+    // a constructor may not have a body (e.g. in the case of constructor overloads)
+    const cstrBodyStatements: ts.NodeArray<ts.Statement> = cstrMethod.body?.statements ?? ts.factory.createNodeArray();
 
     let statements: ts.Statement[] = [
       ...nativeInit(moduleFile, cmp),
       ...addCreateEvents(moduleFile, cmp),
-      ...cstrMethod.body.statements,
+      ...cstrBodyStatements,
       ...addLegacyProps(moduleFile, cmp),
     ];
 
-    const hasSuper = cstrMethod.body.statements.some((s) => s.kind === ts.SyntaxKind.SuperKeyword);
+    const hasSuper = cstrBodyStatements.some((s) => s.kind === ts.SyntaxKind.SuperKeyword);
     if (!hasSuper) {
       statements = [createNativeConstructorSuper(), ...statements];
     }
