@@ -6,7 +6,7 @@ import { addCoreRuntimeApi, CREATE_EVENT, RUNTIME_APIS } from './core-runtime-ap
 
 /**
  * For a Stencil component, generate the code to create custom emitted events, based on `@Event()` decorators
- * @param moduleFile the component class representation that code is being generated for
+ * @param moduleFile the 'home module' of the class for which code is being generated
  * @param cmp the component metadata associated with the provided module
  * @returns the generated event creation code
  */
