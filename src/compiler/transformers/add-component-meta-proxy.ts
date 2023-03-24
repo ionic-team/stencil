@@ -47,24 +47,27 @@ export const createComponentMetadataProxy = (compilerMeta: d.ComponentCompilerMe
 };
 
 /**
- * Create a call expression for wrapping a component represented as an anonymous class in a proxy. This call expression
- * takes a form:
+ * Create a call expression for wrapping a component represented as a class
+ * expression in a proxy. This call expression takes the form:
+ *
  * ```ts
  * PROXY_CUSTOM_ELEMENT(Clazz, Metadata);
  * ```
+ *
  * where
- * - `PROXY_CUSTOM_ELEMENT` is a Stencil internal identifier that will be replaced with the name of the actual function
- * name at compile name
- * - `Clazz` is an anonymous class to be proxied
+ * - `PROXY_CUSTOM_ELEMENT` is a Stencil internal identifier that will be
+ *   replaced with the name of the actual function name at compile name
+ * - `Clazz` is a class expression to be proxied
  * - `Metadata` is the compiler metadata associated with the Stencil component
  *
- * @param compilerMeta compiler metadata associated with the component to be wrapped in a proxy
- * @param clazz the anonymous class to proxy
+ * @param compilerMeta compiler metadata associated with the component to be
+ * wrapped in a proxy
+ * @param clazz the class expression to proxy
  * @returns the generated call expression
  */
-export const createAnonymousClassMetadataProxy = (
+export const createClassMetadataProxy = (
   compilerMeta: d.ComponentCompilerMeta,
-  clazz: ts.Expression
+  clazz: ts.ClassExpression
 ): ts.CallExpression => {
   const compactMeta: d.ComponentRuntimeMetaCompact = formatComponentRuntimeMeta(compilerMeta, true);
   const literalMeta = convertValueToLiteral(compactMeta);
