@@ -32,6 +32,7 @@ export const createModule = (
   staticSourceFileText,
   cmps: [],
   coreRuntimeApis: [],
+  outputTargetCoreRuntimeApis: {},
   collectionName: null,
   dtsFilePath: null,
   excludeFromCollection: false,

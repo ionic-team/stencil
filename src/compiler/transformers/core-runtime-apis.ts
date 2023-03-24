@@ -42,6 +42,19 @@ export const addCoreRuntimeApi = (moduleFile: d.Module, coreRuntimeApi: string):
   }
 };
 
+export const addOutputTargetCoreRuntimeApi = (
+  moduleFile: d.Module,
+  outputTarget: string,
+  coreRuntimeApi: string
+): void => {
+  if (!moduleFile.outputTargetCoreRuntimeApis[outputTarget]) {
+    moduleFile.outputTargetCoreRuntimeApis[outputTarget] = [];
+  }
+  if (!moduleFile.outputTargetCoreRuntimeApis[outputTarget].includes(coreRuntimeApi)) {
+    moduleFile.outputTargetCoreRuntimeApis[outputTarget].push(coreRuntimeApi);
+  }
+};
+
 export const addLegacyApis = (moduleFile: d.Module) => {
   addCoreRuntimeApi(moduleFile, RUNTIME_APIS.legacyH);
 };

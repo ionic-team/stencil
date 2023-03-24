@@ -79,6 +79,7 @@ export const getModuleLegacy = (_config: d.Config, compilerCtx: d.CompilerCtx, s
       jsFilePath: jsFilePath,
       cmps: [],
       coreRuntimeApis: [],
+      outputTargetCoreRuntimeApis: {},
       collectionName: null,
       dtsFilePath: null,
       excludeFromCollection: false,

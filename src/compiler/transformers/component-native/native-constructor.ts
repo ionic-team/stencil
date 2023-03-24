@@ -1,7 +1,8 @@
 import ts from 'typescript';
 
 import type * as d from '../../../declarations';
-// import {addCoreRuntimeApi, RUNTIME_APIS} from '../core-runtime-apis';
+import { DIST_CUSTOM_ELEMENTS } from '../../output-targets/output-utils';
+import { addOutputTargetCoreRuntimeApi, RUNTIME_APIS } from '../core-runtime-apis';
 import { addCreateEvents } from '../create-event';
 import { addLegacyProps } from '../legacy-props';
 import { retrieveTsModifiers } from '../transform-utils';
@@ -100,11 +101,8 @@ const nativeRegisterHostStatement = (): ts.ExpressionStatement => {
  * @param moduleFile the Stencil module that will use the generated expression statement
  * @returns the generated expression statement
  */
-// TODO(Hacked this out to test the fix)
-// @ts-ignore
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const nativeAttachShadowStatement = (moduleFile: d.Module): ts.ExpressionStatement => {
-  // addCoreRuntimeApi(moduleFile, RUNTIME_APIS.attachShadow);
+  addOutputTargetCoreRuntimeApi(moduleFile, DIST_CUSTOM_ELEMENTS, RUNTIME_APIS.attachShadow);
   // Create an expression statement, `this.__attachShadow();`
   return ts.factory.createExpressionStatement(
     ts.factory.createCallExpression(

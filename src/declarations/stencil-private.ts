@@ -1428,6 +1428,11 @@ export interface Module {
    * in order for the component to function.
    */
   coreRuntimeApis: string[];
+  /**
+   * A collection of modules that a component will need for a specific output target. The modules in this list must
+   * have import statements generated in order for the component to function, but only for a specific output target.
+   */
+  outputTargetCoreRuntimeApis: Record<string, string[]>;
   collectionName: string;
   dtsFilePath: string;
   excludeFromCollection: boolean;

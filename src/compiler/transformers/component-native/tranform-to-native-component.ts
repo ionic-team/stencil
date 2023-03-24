@@ -1,9 +1,10 @@
 import ts from 'typescript';
 
 import type * as d from '../../../declarations';
+import { DIST_CUSTOM_ELEMENTS } from '../../output-targets/output-utils';
 import { addModuleMetadataProxies } from '../add-component-meta-proxy';
 import { addImports } from '../add-imports';
-import { addLegacyApis, RUNTIME_APIS } from '../core-runtime-apis';
+import { addLegacyApis } from '../core-runtime-apis';
 import { defineCustomElement } from '../define-custom-element';
 import { updateStyleImports } from '../style-imports';
 import { getComponentMeta, getModuleFromSourceFile } from '../transform-utils';
@@ -23,8 +24,6 @@ export const nativeComponentTransform = (
     return (tsSourceFile: ts.SourceFile) => {
       const moduleFile = getModuleFromSourceFile(compilerCtx, tsSourceFile);
 
-      const nativeComponentSpecificCoreApis: string[] = [];
-
       /**
        * Helper function that recursively walks the concrete syntax tree. Upon finding a class declaration that Stencil
        * recognizes as a component, update the component class
@@ -36,9 +35,6 @@ export const nativeComponentTransform = (
         if (ts.isClassDeclaration(node)) {
           const cmp = getComponentMeta(compilerCtx, tsSourceFile, node);
           if (cmp != null) {
-            if (cmp.encapsulation === 'shadow') {
-              nativeComponentSpecificCoreApis.push(RUNTIME_APIS.attachShadow);
-            }
             return updateNativeComponentClass(transformOpts, node, moduleFile, cmp);
           }
         }
@@ -64,7 +60,10 @@ export const nativeComponentTransform = (
         addLegacyApis(moduleFile);
       }
 
-      const imports = [...moduleFile.coreRuntimeApis, ...nativeComponentSpecificCoreApis];
+      const imports = [
+        ...moduleFile.coreRuntimeApis,
+        ...(moduleFile.outputTargetCoreRuntimeApis[DIST_CUSTOM_ELEMENTS] ?? []),
+      ];
 
       tsSourceFile = addImports(transformOpts, tsSourceFile, imports, transformOpts.coreImportPath);
 
