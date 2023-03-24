@@ -257,9 +257,8 @@ export interface BuildCtx {
   indexBuildCount: number;
   indexDoc: Document;
   isRebuild: boolean;
-
   /**
-   *
+   * A collection of Stencil's intermediate representation of components, tied to the current build
    */
   moduleFiles: Module[];
   packageJson: PackageJsonData;

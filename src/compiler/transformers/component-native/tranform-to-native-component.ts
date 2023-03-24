@@ -10,12 +10,7 @@ import { updateStyleImports } from '../style-imports';
 import { getComponentMeta, getModuleFromSourceFile } from '../transform-utils';
 import { updateNativeComponentClass } from './native-component';
 
-/**
- *
- * @param compilerCtx
- * @param transformOpts
- * @returns
- */
+// TODO(NOW): Doc this
 export const nativeComponentTransform = (
   compilerCtx: d.CompilerCtx,
   transformOpts: d.TransformOptions
