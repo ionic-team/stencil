@@ -42,15 +42,27 @@ export const addCoreRuntimeApi = (moduleFile: d.Module, coreRuntimeApi: string):
   }
 };
 
+/**
+ * Update a Stencil Module entity to include a {@link RUNTIME_APIS} entry for a specific output target, if it does not
+ * already exist.
+ * This allows Stencil to keep `moduleFile` easily serializable, where this helper function treats the data structure
+ * that stores {@link Module#outputTargetCoreRuntimeApis} similar to a JS `Set`.
+ * @param moduleFile the Module entity to update
+ * @param outputTarget the output target to assign the provided runtime api under
+ * @param coreRuntimeApi the API to add to the provided module
+ */
 export const addOutputTargetCoreRuntimeApi = (
   moduleFile: d.Module,
   outputTarget: string,
   coreRuntimeApi: string
 ): void => {
   if (!moduleFile.outputTargetCoreRuntimeApis[outputTarget]) {
+    // no such output target-specific collection exists, create the empty collection
     moduleFile.outputTargetCoreRuntimeApis[outputTarget] = [];
   }
+
   if (!moduleFile.outputTargetCoreRuntimeApis[outputTarget].includes(coreRuntimeApi)) {
+    // add the api to the collection
     moduleFile.outputTargetCoreRuntimeApis[outputTarget].push(coreRuntimeApi);
   }
 };
