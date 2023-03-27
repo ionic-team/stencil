@@ -10,9 +10,13 @@ export const addModuleMetadataProxies = (tsSourceFile: ts.SourceFile, moduleFile
 
   addCoreRuntimeApi(moduleFile, RUNTIME_APIS.proxyCustomElement);
 
-  statements.push(...moduleFile.cmps.map(createComponentMetadataProxy));
+  statements.push(...moduleFile.cmps.map(addComponentMetadataProxy));
 
   return ts.factory.updateSourceFile(tsSourceFile, statements);
+};
+
+const addComponentMetadataProxy = (compilerMeta: d.ComponentCompilerMeta) => {
+  return ts.factory.createExpressionStatement(createComponentMetadataProxy(compilerMeta));
 };
 
 /**
@@ -22,25 +26,23 @@ export const addModuleMetadataProxies = (tsSourceFile: ts.SourceFile, moduleFile
  * ```
  * where
  * - `PROXY_CUSTOM_ELEMENT` is a Stencil internal identifier that will be replaced with the name of the actual function
- * name at compile time
+ * name at compile name
  * - `ComponentClassName` is the name Stencil component's class
  * - `Metadata` is the compiler metadata associated with the Stencil component
  *
  * @param compilerMeta compiler metadata associated with the component to be wrapped in a proxy
  * @returns the generated call expression
  */
-const createComponentMetadataProxy = (compilerMeta: d.ComponentCompilerMeta): ts.ExpressionStatement => {
+export const createComponentMetadataProxy = (compilerMeta: d.ComponentCompilerMeta): ts.CallExpression => {
   const compactMeta: d.ComponentRuntimeMetaCompact = formatComponentRuntimeMeta(compilerMeta, true);
 
   const literalCmpClassName = ts.factory.createIdentifier(compilerMeta.componentClassName);
   const literalMeta = convertValueToLiteral(compactMeta);
 
-  return ts.factory.createExpressionStatement(
-    ts.factory.createCallExpression(
-      ts.factory.createIdentifier(PROXY_CUSTOM_ELEMENT),
-      [],
-      [literalCmpClassName, literalMeta]
-    )
+  return ts.factory.createCallExpression(
+    ts.factory.createIdentifier(PROXY_CUSTOM_ELEMENT),
+    [],
+    [literalCmpClassName, literalMeta]
   );
 };
 
@@ -54,7 +56,7 @@ const createComponentMetadataProxy = (compilerMeta: d.ComponentCompilerMeta): ts
  *
  * where
  * - `PROXY_CUSTOM_ELEMENT` is a Stencil internal identifier that will be
- *   replaced with the name of the actual function name at compile time
+ *   replaced with the name of the actual function name at compile name
  * - `Clazz` is a class expression to be proxied
  * - `Metadata` is the compiler metadata associated with the Stencil component
  *
