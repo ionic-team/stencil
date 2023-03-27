@@ -4,14 +4,14 @@ import type * as d from '../../declarations';
 import { createImportStatement, createRequireStatement } from './transform-utils';
 
 /**
- * Create a new import statement, and update the provided source file with the statement.
+ * Create a new import statement, and update the provided source file with the newly created statement.
+ *
+ * The generated import statement will be placed at the beginning of the source file.
  *
  * The generated import statement will be either a commonjs require statement or esm import statement, based on the
  * provided transform options.
  *
  * The import statement may include more than one named imports (identifiers) for the provided import path.
- *
- * The generated import statement will be placed at the beginning of the source file.
  *
  * @param transformOpts transform options configured for the current output target transpilation
  * @param tsSourceFile the TypeScript source file that is being updated
