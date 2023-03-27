@@ -62,9 +62,9 @@ export const isOutputTargetStats = (o: d.OutputTarget): o is d.OutputTargetStats
 export const isOutputTargetDistTypes = (o: d.OutputTarget): o is d.OutputTargetDistTypes => o.type === DIST_TYPES;
 
 /**
- * Retrieve the Stencil component compiler metadata from a collection of Stencil {@link Module}
- * @param moduleFiles the collection of {@link Module}s to retrieve the metadata from
- * @returns the metadata, sorted by the tag names of the components
+ * Retrieve the Stencil component compiler metadata from a collection of Stencil {@link Module}s
+ * @param moduleFiles the collection of `Module`s to retrieve the metadata from
+ * @returns the metadata, lexicographically sorted by the tag names of the components
  */
 export const getComponentsFromModules = (moduleFiles: d.Module[]): d.ComponentCompilerMeta[] =>
   sortBy(flatOne(moduleFiles.map((m) => m.cmps)), (c: d.ComponentCompilerMeta) => c.tagName);
