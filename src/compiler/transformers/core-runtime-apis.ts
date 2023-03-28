@@ -53,7 +53,7 @@ export const addCoreRuntimeApi = (moduleFile: d.Module, coreRuntimeApi: string):
  */
 export const addOutputTargetCoreRuntimeApi = (
   moduleFile: d.Module,
-  outputTarget: string,
+  outputTarget: d.OutputTarget['type'],
   coreRuntimeApi: string
 ): void => {
   if (!moduleFile.outputTargetCoreRuntimeApis[outputTarget]) {
