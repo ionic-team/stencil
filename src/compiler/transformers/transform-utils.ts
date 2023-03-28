@@ -166,7 +166,8 @@ export const createStaticGetter = (propName: string, returnExpression: ts.Expres
 };
 
 /**
- * Retrieves a value represented by TypeScript's syntax tree by name of a static getter. The value is transformed to a TypeScript value.
+ * Retrieves a value represented by TypeScript's syntax tree by name of a static getter. The value is transformed to a
+ * runtime value.
  * @param staticMembers a collection of static getters to search
  * @param staticName the name of the static getter to pull a value from
  * @returns a TypeScript value, converted from its TypeScript syntax tree representation
