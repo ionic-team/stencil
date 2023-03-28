@@ -73,7 +73,7 @@ describe('Custom Elements Typedef generation', () => {
         'the-other-component',
         'my-real-best-component'
       )}';`,
-      `export { defineCustomElement as defineCustomElementMyBestComponent } from './my-real-best-component';`,
+      `export { defineCustomElement as defineCustomElementMyBestComponent } from './my-best-component';`,
       '',
       '/**',
       ' * Used to manually set the base path where assets can be found.',
