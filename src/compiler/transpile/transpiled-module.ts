@@ -22,7 +22,7 @@ export const getModule = (compilerCtx: d.CompilerCtx, filePath: string): d.Modul
  * @returns the created `Module`
  */
 export const createModule = (
-  staticSourceFile: ts.SourceFile, // this may NOT the original
+  staticSourceFile: ts.SourceFile, // this may NOT be the original
   staticSourceFileText: string,
   emitFilepath: string
 ): d.Module => ({
