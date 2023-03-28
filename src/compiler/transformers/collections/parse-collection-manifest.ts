@@ -16,6 +16,8 @@ export const parseCollectionManifest = (
 
   const compilerVersion: d.CollectionCompilerVersion = collectionManifest.compiler || ({} as any);
 
+  const isExternal = buildCtx.isExternal(collectionName, 'collection', true);
+
   const collection: d.CollectionCompilerMeta = {
     collectionName: collectionName,
     moduleId: collectionName,
@@ -27,10 +29,13 @@ export const parseCollectionManifest = (
       typescriptVersion: compilerVersion.typescriptVersion || '',
     },
     bundles: parseBundles(collectionManifest),
+    isExternal,
   };
 
-  parseGlobal(config, compilerCtx, buildCtx, collectionDir, collectionManifest, collection);
-  parseCollectionComponents(config, compilerCtx, buildCtx, collectionDir, collectionManifest, collection);
+  if (!isExternal) {
+    parseGlobal(config, compilerCtx, buildCtx, collectionDir, collectionManifest, collection);
+    parseCollectionComponents(config, compilerCtx, buildCtx, collectionDir, collectionManifest, collection);
+  }
 
   return collection;
 };
