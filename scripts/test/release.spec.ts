@@ -129,4 +129,109 @@ describe('release()', () => {
       );
     });
   });
+
+  describe('publishRelease', () => {
+    const publishFlag = '--publish';
+
+    // the return type is explicitly set for two reasons:
+    // 1. TypeScript infers `readJson` to have a return type of `void`, since it's the last function signature in a
+    // series of overloaded types
+    // 2. The most narrow return type `readJson` has is `any`. Since we're only using this function once for the
+    // express purpose of reading `BuildOptions` written to disk, we want _a_ return type. However, if we set this to
+    // `BuildOptions`, we run into type errors when instantiating it
+    let readJsonSyncSpy: jest.SpyInstance<any, Parameters<typeof fs.readJson>>;
+    let promptReleaseSpy: jest.SpyInstance<
+      ReturnType<typeof Prompts.promptRelease>,
+      Parameters<typeof Prompts.promptRelease>
+    >;
+
+    beforeEach(() => {
+      getOptionsSpy.mockReturnValue({
+        packageJson: stubPackageData({
+          version: '0.1.0',
+        }),
+        version: '0.1.0',
+      });
+
+      readJsonSyncSpy = jest.spyOn(fs, 'readJson');
+      readJsonSyncSpy.mockReturnValue({
+        buildId: 'mockBuildId',
+        version: '0.1.0',
+        vermoji: '🐢',
+        isCI: false,
+      });
+
+      promptReleaseSpy = jest.spyOn(Prompts, 'promptRelease');
+      promptReleaseSpy.mockResolvedValue({
+        confirm: true,
+        tag: 'testing',
+        // six characters long (correct length), but a very fake OTP
+        otp: 'abcOtp',
+      });
+    });
+
+    afterEach(() => {
+      readJsonSyncSpy.mockRestore();
+      promptReleaseSpy.mockRestore();
+    });
+
+    it('reads a release-data.json file from disk', async () => {
+      await release(rootDir, [publishFlag]);
+      expect(readJsonSyncSpy).toHaveBeenCalledTimes(1);
+      expect(readJsonSyncSpy).toHaveBeenCalledWith(path.join(rootDir, 'build', 'release-data.json'));
+    });
+
+    it('pipes data read from release-data.json into the provided options', async () => {
+      await release(rootDir, [publishFlag]);
+      expect(getOptionsSpy).toHaveBeenCalledTimes(1);
+      expect(getOptionsSpy).toHaveBeenCalledWith(rootDir, {
+        buildId: 'mockBuildId',
+        version: '0.1.0',
+        vermoji: '🐢',
+        isCI: false,
+        isPublishRelease: true,
+        isProd: true,
+      });
+    });
+
+    it('returns early when confirm is falsy', async () => {
+      promptReleaseSpy.mockResolvedValue({
+        confirm: false,
+        tag: 'testing',
+        // six characters long (correct length), but a very fake OTP
+        otp: 'abcOtp',
+      });
+
+      await release(rootDir, [publishFlag]);
+
+      expect(runReleaseTasksSpy).not.toHaveBeenCalled();
+    });
+
+    it('throws an error when package.json#version and the release data version do not match', async () => {
+      getOptionsSpy.mockReturnValue({
+        packageJson: stubPackageData({
+          version: '0.1.0',
+        }),
+        version: '0.1.1',
+      });
+
+      await expect(release(rootDir, [publishFlag])).rejects.toThrow(
+        'Prepare release data and package.json versions do not match. Try re-running release prepare.'
+      );
+    });
+
+    it('invokes runReleaseTasks', async () => {
+      await release(rootDir, [publishFlag]);
+      expect(runReleaseTasksSpy).toHaveBeenCalledTimes(1);
+      expect(runReleaseTasksSpy).toHaveBeenCalledWith(
+        {
+          packageJson: stubPackageData({
+            version: '0.1.0',
+          }),
+          version: '0.1.0',
+        },
+        [publishFlag]
+      );
+    });
+  });
 });
