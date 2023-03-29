@@ -18,6 +18,7 @@ import type {
   LoggerTimeSpan,
   OptimizeCssInput,
   OptimizeCssOutput,
+  OutputTarget,
   OutputTargetWww,
   PageReloadStrategy,
   PrerenderConfig,
@@ -1431,7 +1432,7 @@ export interface Module {
    * A collection of modules that a component will need for a specific output target. The modules in this list must
    * have import statements generated in order for the component to function, but only for a specific output target.
    */
-  outputTargetCoreRuntimeApis: Record<string, string[]>;
+  outputTargetCoreRuntimeApis: Partial<Record<OutputTarget['type'], string[]>>;
   collectionName: string;
   dtsFilePath: string;
   excludeFromCollection: boolean;
