@@ -72,10 +72,22 @@ const generateCustomElementsTypesOutput = async (
             // - get the relative path to the component's source file from the source directory
             // - join that relative path to the relative path from the `index.d.ts` file to the
             //   directory where typedefs are saved
-            const componentSourceRelPath = relative(config.srcDir, component.sourceFilePath).replace('.tsx', '');
+            const componentSourceRelPath = relative(config.srcDir, component.sourceFilePath).replace(/\.tsx$/, '');
             const componentDTSPath = join(componentsTypeDirectoryRelPath, componentSourceRelPath);
 
-            return `export { ${importName} as ${exportName} } from '${componentDTSPath}';`;
+            const defineFunctionExportName = `defineCustomElement${exportName}`;
+            // Get the path to the sibling typedef file for the current component
+            // When we bundle the code to generate the component JS files it generates
+            // the JS and typedef files based on the component tag name. So, we can
+            // just use the tagname to create the relative path
+            const localComponentTypeDefFilePath = `./${component.tagName}`;
+
+            return [
+              `export { ${importName} as ${exportName} } from '${componentDTSPath}';`,
+              // We need to alias each `defineCustomElement` function typedef to match the aliased name given to the
+              // function in the `index.js`
+              `export { defineCustomElement as ${defineFunctionExportName} } from '${localComponentTypeDefFilePath}';`,
+            ].join('\n');
           }),
           ``,
         ]
