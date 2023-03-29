@@ -6,12 +6,24 @@ import { addCreateEvents } from '../create-event';
 import { addLegacyProps } from '../legacy-props';
 import { retrieveTsModifiers } from '../transform-utils';
 
+/**
+ * Updates a constructor to include:
+ * - a `super()` call
+ * - function calls to initialize the component
+ * - function calls to create custom event emitters
+ * If a constructor does not exist, one will be created
+ *
+ * The constructor will be added to the provided list of {@link ts.ClassElement}s in place
+ *
+ * @param classMembers the class elements to modify
+ * @param moduleFile the Stencil module representation of the component class
+ * @param cmp the component metadata generated for the component
+ */
 export const updateNativeConstructor = (
   classMembers: ts.ClassElement[],
   moduleFile: d.Module,
-  cmp: d.ComponentCompilerMeta,
-  ensureSuper: boolean
-) => {
+  cmp: d.ComponentCompilerMeta
+): void => {
   if (cmp.isPlain) {
     return;
   }
@@ -28,11 +40,9 @@ export const updateNativeConstructor = (
       ...addLegacyProps(moduleFile, cmp),
     ];
 
-    if (ensureSuper) {
-      const hasSuper = cstrMethod.body.statements.some((s) => s.kind === ts.SyntaxKind.SuperKeyword);
-      if (!hasSuper) {
-        statements = [createNativeConstructorSuper(), ...statements];
-      }
+    const hasSuper = cstrMethod.body.statements.some((s) => s.kind === ts.SyntaxKind.SuperKeyword);
+    if (!hasSuper) {
+      statements = [createNativeConstructorSuper(), ...statements];
     }
 
     classMembers[cstrMethodIndex] = ts.factory.updateConstructorDeclaration(
@@ -43,15 +53,12 @@ export const updateNativeConstructor = (
     );
   } else {
     // create a constructor()
-    let statements: ts.Statement[] = [
+    const statements: ts.Statement[] = [
+      createNativeConstructorSuper(),
       ...nativeInit(moduleFile, cmp),
       ...addCreateEvents(moduleFile, cmp),
       ...addLegacyProps(moduleFile, cmp),
     ];
-
-    if (ensureSuper) {
-      statements = [createNativeConstructorSuper(), ...statements];
-    }
 
     const cstrMethod = ts.factory.createConstructorDeclaration(undefined, [], ts.factory.createBlock(statements, true));
     classMembers.unshift(cstrMethod);
@@ -72,7 +79,13 @@ const nativeInit = (moduleFile: d.Module, cmp: d.ComponentCompilerMeta): Readonl
   return initStatements;
 };
 
-const nativeRegisterHostStatement = () => {
+/**
+ * Generate an expression statement to register a host element with its VDOM equivalent in a global element-to-vdom
+ * mapping.
+ * @returns the generated expression statement
+ */
+const nativeRegisterHostStatement = (): ts.ExpressionStatement => {
+  // Create an expression statement, `this.__registerHost();`
   return ts.factory.createExpressionStatement(
     ts.factory.createCallExpression(
       ts.factory.createPropertyAccessExpression(ts.factory.createThis(), ts.factory.createIdentifier('__registerHost')),
@@ -99,8 +112,12 @@ const nativeAttachShadowStatement = (moduleFile: d.Module): ts.ExpressionStateme
   );
 };
 
-const createNativeConstructorSuper = () => {
+/**
+ * Create an expression statement for calling `super()` for a class.
+ * @returns the generated expression statement
+ */
+const createNativeConstructorSuper = (): ts.ExpressionStatement => {
   return ts.factory.createExpressionStatement(
-    ts.factory.createCallExpression(ts.factory.createIdentifier('super'), undefined, undefined)
+    ts.factory.createCallExpression(ts.factory.createSuper(), undefined, undefined)
   );
 };
