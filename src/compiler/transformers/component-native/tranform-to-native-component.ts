@@ -31,7 +31,6 @@ export const nativeComponentTransform = (
        * @param node the current node in the tree being inspected
        * @returns the updated component class, or the unchanged node
        */
-
       const visitNode = (node: ts.Node): ts.Node => {
         if (ts.isClassDeclaration(node)) {
           const cmp = getComponentMeta(compilerCtx, tsSourceFile, node);
