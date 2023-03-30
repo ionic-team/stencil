@@ -2093,6 +2093,19 @@ export interface OutputTargetDocsJson extends OutputTargetBase {
    */
   typesFile?: string | null;
   strict?: boolean;
+  /**
+   * An optional file path pointing to a public type library which should be
+   * included and documented in the same way as other types which are included
+   * in this output target.
+   *
+   * This could be useful if, for instance, there are some important interfaces
+   * used in a few places in a Stencil project which don't form part of the
+   * public API for any of the project's components. Such interfaces will not
+   * be included in the `docs-json` output by default, but if they're declared
+   * and exported from a 'supplemental' file designated with this property then
+   * they'll be included in the output, facilitating their documentation.
+   */
+  supplementalPublicTypes?: string;
 }
 
 export interface OutputTargetDocsCustom extends OutputTargetBase {

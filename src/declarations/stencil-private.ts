@@ -849,8 +849,8 @@ export interface ComponentCompilerVirtualProperty {
 export type ComponentCompilerPropertyType = 'any' | 'string' | 'boolean' | 'number' | 'unknown';
 
 /**
- * Information about the type of a Stencil-implemented component property, in
- * particular a `@Prop()` or `@Event()`.
+ * Information about a type used in a Stencil component or exported
+ * from a Stencil project.
  */
 export interface ComponentCompilerPropertyComplexType {
   /**
@@ -896,6 +896,30 @@ export interface ComponentCompilerTypeReference {
    * The path to the type reference, if applicable (global types should not need a path associated with them)
    */
   path?: string;
+  /**
+   * An ID for this type which is unique within a Stencil project.
+   */
+  id: string;
+}
+
+/**
+ * Information about a type which is referenced by another type on a Stencil
+ * component, for instance a {@link ComponentCompilerPropertyComplexType} or a
+ * {@link ComponentCompilerEventComplexType}.
+ */
+export interface ComponentCompilerReferencedType {
+  /**
+   * The path to the module where the type is declared.
+   */
+  path: string;
+  /**
+   * The string of the original type annotation in the Stencil source code
+   */
+  declaration: string;
+  /**
+   * An extracted docstring
+   */
+  docstring: string;
 }
 
 export interface ComponentCompilerStaticEvent {

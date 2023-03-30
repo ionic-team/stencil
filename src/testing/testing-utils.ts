@@ -118,12 +118,13 @@ function getAppUrl(config: d.ValidatedConfig, browserUrl: string, appFileName: s
  *
  * ```ts
  * describe("my-test-suite", () => {
- *   const setupConsoleMocks = setupConsoleMocker()
+ *   const { setupConsoleMocks, teardownConsoleMocks } = setupConsoleMocker()
  *
  *   it("should log a message", () => {
  *     const { logMock } = setupConsoleMocks();
  *     myFunctionWhichLogs(foo, bar);
  *     expect(logMock).toBeCalledWith('my log message');
+ *     teardownConsoleMocks();
  *   })
  * })
  * ```
@@ -135,10 +136,20 @@ export function setupConsoleMocker(): ConsoleMocker {
   const originalWarn = console.warn;
   const originalError = console.error;
 
-  afterAll(() => {
+  /**
+   * Function to tear down console mocks where you're done with them! Ideally
+   * this would be called right after the assertion you're looking to make in
+   * your test.
+   */
+  function teardownConsoleMocks() {
     console.log = originalLog;
     console.warn = originalWarn;
     console.error = originalError;
+  }
+
+  // this is insurance!
+  afterAll(() => {
+    teardownConsoleMocks();
   });
 
   function setupConsoleMocks() {
@@ -156,20 +167,21 @@ export function setupConsoleMocker(): ConsoleMocker {
       errorMock,
     };
   }
-  return setupConsoleMocks;
+  return { setupConsoleMocks, teardownConsoleMocks };
 }
 
 interface ConsoleMocker {
-  (): {
+  setupConsoleMocks: () => {
     logMock: jest.Mock<typeof console.log>;
     warnMock: jest.Mock<typeof console.warn>;
     errorMock: jest.Mock<typeof console.error>;
   };
+  teardownConsoleMocks: () => void;
 }
 
 /**
  * the callback that `withSilentWarn` expects to receive. Basically receives a mock
- * as its argument and returns a `Promise`, the value of which is returns by `withSilentWarn`
+ * as its argument and returns a `Promise`, the value of which is returned by `withSilentWarn`
  * as well.
  */
 type SilentWarnFunc<T> = (mock: jest.Mock<typeof console.warn>) => Promise<T>;

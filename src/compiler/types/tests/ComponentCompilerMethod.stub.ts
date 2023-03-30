@@ -15,7 +15,7 @@ export const stubComponentCompilerMethod = (
     internal: false,
     complexType: {
       parameters: [{ tags: [], text: '' }],
-      references: { Foo: { location: 'import', path: './resources' } },
+      references: { Foo: { location: 'import', path: './resources', id: 'placeholder' } },
       return: 'Promise<void>',
       signature: '(name: Foo) => Promise<void>',
     },

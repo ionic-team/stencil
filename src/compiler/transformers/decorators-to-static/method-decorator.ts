@@ -23,12 +23,13 @@ export const methodDecoratorsToStatic = (
   cmpNode: ts.ClassDeclaration,
   decoratedProps: ts.ClassElement[],
   typeChecker: ts.TypeChecker,
+  program: ts.Program,
   newMembers: ts.ClassElement[]
 ) => {
   const tsSourceFile = cmpNode.getSourceFile();
   const methods = decoratedProps
     .filter(ts.isMethodDeclaration)
-    .map((method) => parseMethodDecorator(config, diagnostics, tsSourceFile, typeChecker, method))
+    .map((method) => parseMethodDecorator(config, diagnostics, tsSourceFile, typeChecker, program, method))
     .filter((method) => !!method);
 
   if (methods.length > 0) {
@@ -41,6 +42,7 @@ const parseMethodDecorator = (
   diagnostics: d.Diagnostic[],
   tsSourceFile: ts.SourceFile,
   typeChecker: ts.TypeChecker,
+  program: ts.Program,
   method: ts.MethodDeclaration
 ): ts.PropertyAssignment | null => {
   const methodDecorator = retrieveTsDecorators(method)?.find(isDecoratorNamed('Method'));
@@ -92,8 +94,8 @@ const parseMethodDecorator = (
       signature: signatureString,
       parameters: signature.parameters.map((symbol) => serializeSymbol(typeChecker, symbol)),
       references: {
-        ...getAttributeTypeInfo(returnTypeNode, tsSourceFile),
-        ...getAttributeTypeInfo(method, tsSourceFile),
+        ...getAttributeTypeInfo(returnTypeNode, tsSourceFile, typeChecker, program),
+        ...getAttributeTypeInfo(method, tsSourceFile, typeChecker, program),
       },
       return: returnString,
     },

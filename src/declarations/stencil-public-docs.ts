@@ -1,3 +1,23 @@
+import {
+  ComponentCompilerEventComplexType,
+  ComponentCompilerMethodComplexType,
+  ComponentCompilerPropertyComplexType,
+  ComponentCompilerReferencedType,
+} from './stencil-private';
+
+/**
+ * The Type Library holds information about the types which are used in a
+ * Stencil project. During compilation, Stencil gathers information about the
+ * types which form part of a component's public API, such as properties
+ * decorated with `@Prop`, `@Event`, `@Watch`, etc. This type information is
+ * then added to the Type Library, where it can be accessed later on for
+ * generating documentation.
+ *
+ * This information is included in the file written by the `docs-json` output
+ * target (see {@link JsonDocs.typeLibrary}).
+ */
+export type JsonDocsTypeLibrary = Record<string, ComponentCompilerReferencedType>;
+
 export interface JsonDocs {
   components: JsonDocsComponent[];
   timestamp: string;
@@ -6,6 +26,7 @@ export interface JsonDocs {
     version: string;
     typescriptVersion: string;
   };
+  typeLibrary: JsonDocsTypeLibrary;
 }
 
 export interface JsonDocsComponent {
@@ -77,6 +98,7 @@ export interface JsonDocsUsage {
 
 export interface JsonDocsProp {
   name: string;
+  complexType?: ComponentCompilerPropertyComplexType;
   type: string;
   mutable: boolean;
   /**
@@ -86,7 +108,7 @@ export interface JsonDocsProp {
   reflectToAttr: boolean;
   docs: string;
   docsTags: JsonDocsTag[];
-  default: string;
+  default?: string;
   deprecation?: string;
   values: JsonDocsValue[];
   optional: boolean;
@@ -101,6 +123,7 @@ export interface JsonDocsMethod {
   signature: string;
   returns: JsonDocsMethodReturn;
   parameters: JsonDocMethodParameter[];
+  complexType: ComponentCompilerMethodComplexType;
 }
 
 export interface JsonDocsMethodReturn {
@@ -119,6 +142,7 @@ export interface JsonDocsEvent {
   bubbles: boolean;
   cancelable: boolean;
   composed: boolean;
+  complexType: ComponentCompilerEventComplexType;
   docs: string;
   docsTags: JsonDocsTag[];
   deprecation?: string;

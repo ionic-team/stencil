@@ -17,6 +17,7 @@ This is a comprehensive list of the breaking changes introduced in the major ver
   - [Legacy Browser Support Removed](#legacy-browser-support-removed)
   - [Legacy Cache Stats Config Flag Removed](#legacy-cache-stats-config-flag-removed)
   - [Drop Node 14 Support](#drop-node-14-support)
+  - [Information included in JSON documentation expanded](#information-included-in-docs-json-expanded)
 
 ### General
 
@@ -80,6 +81,86 @@ flag has been removed from Stencil's API and should be removed from a project's 
 Stencil no longer supports Node 14.
 Please upgrade local development machines, continuous integration pipelines, etc. to use Node v16 or higher.
 For the full list of supported runtimes, please see [our Support Policy](../reference/support-policy.md#javascript-runtime).
+
+#### Information included in `docs-json` expanded
+
+For Stencil v4 the information included in the output of the `docs-json` output
+target was expanded to include more information about the types of properties
+and methods on Stencil components.
+
+For more context on this change, see the [documentation for the new
+`supplementalPublicTypes`](https://stenciljs.com/docs/docs-json#supplementalpublictypes)
+option for the JSON documentation output target.
+
+##### `JsonDocsEvent`
+
+The JSON-formatted documentation for an `@Event` now includes a field called
+`complexType` which includes more information about the types referenced in the
+type declarations for that property.
+
+Here's an example of what this looks like for the [ionBreakpointDidChange
+event](https://github.com/ionic-team/ionic-framework/blob/1f0c8049a339e3a77c468ddba243041d08ead0be/core/src/components/modal/modal.tsx#L289-L292)
+on the `Modal` component in Ionic Framework:
+
+```json
+{
+  "complexType": {
+    "original": "ModalBreakpointChangeEventDetail",
+    "resolved": "ModalBreakpointChangeEventDetail",
+    "references": {
+      "ModalBreakpointChangeEventDetail": {
+        "location": "import",
+        "path": "./modal-interface",
+        "id": "src/components/modal/modal.tsx::ModalBreakpointChangeEventDetail"
+      }
+    }
+  }
+}
+```
+
+##### `JsonDocsMethod`
+
+The JSON-formatted documentation for a `@Method` now includes a field called
+`complexType` which includes more information about the types referenced in 
+the type declarations for that property.
+
+Here's an example of what this looks like for the [open
+method](https://github.com/ionic-team/ionic-framework/blob/1f0c8049a339e3a77c468ddba243041d08ead0be/core/src/components/select/select.tsx#L261-L313)
+on the `Select` component in Ionic Framework:
+
+```json
+{
+  "complexType": {
+    "signature": "(event?: UIEvent) => Promise<any>",
+    "parameters": [
+      {
+        "tags": [
+          {
+            "name": "param",
+            "text": "event The user interface event that called the open."
+          }
+        ],
+        "text": "The user interface event that called the open."
+      }
+    ],
+    "references": {
+      "Promise": {
+        "location": "global",
+        "id": "global::Promise"
+      },
+      "UIEvent": {
+        "location": "global",
+        "id": "global::UIEvent"
+      },
+      "HTMLElement": {
+        "location": "global",
+        "id": "global::HTMLElement"
+      }
+    },
+    "return": "Promise<any>"
+  }
+}
+```
 
 ## Stencil v3.0.0
 

@@ -221,7 +221,7 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
   const emptyDirs = async (dirs: string[]): Promise<void> => {
     dirs = dirs
       .filter(isString)
-      .map(normalizePath)
+      .map((s) => normalizePath(s))
       .reduce((dirs, dir) => {
         if (!dirs.includes(dir)) {
           dirs.push(dir);
