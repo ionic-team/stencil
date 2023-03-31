@@ -61,8 +61,8 @@ export const nativeComponentTransform = (
       }
 
       const imports = [
-        ...moduleFile.coreRuntimeApis,
-        ...(moduleFile.outputTargetCoreRuntimeApis[DIST_CUSTOM_ELEMENTS] ?? []),
+        ...(moduleFile?.coreRuntimeApis ?? []),
+        ...(moduleFile?.outputTargetCoreRuntimeApis[DIST_CUSTOM_ELEMENTS] ?? []),
       ];
 
       tsSourceFile = addImports(transformOpts, tsSourceFile, imports, transformOpts.coreImportPath);
