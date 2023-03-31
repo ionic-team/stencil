@@ -40,7 +40,7 @@ export const startupLogVersion = (logger: Logger, task: TaskCommand, coreCompile
   let startupMsg: string;
 
   if (isDevBuild) {
-    startupMsg = logger.yellow('[LOCAL DEV]');
+    startupMsg = logger.yellow(`[LOCAL DEV] v${coreCompiler.version}`);
   } else {
     startupMsg = logger.cyan(`v${coreCompiler.version}`);
   }

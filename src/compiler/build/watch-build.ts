@@ -53,6 +53,19 @@ export const createWatchBuild = async (
     buildCtx.hasHtmlChanges = hasHtmlChanges(config, buildCtx);
     buildCtx.hasServiceWorkerChanges = hasServiceWorkerChanges(config, buildCtx);
 
+    if (config.flags.debug) {
+      config.logger.debug(`WATCH_BUILD::watchBuild::onBuild filesAdded: ${formatFilesForDebug(buildCtx.filesAdded)}`);
+      config.logger.debug(
+        `WATCH_BUILD::watchBuild::onBuild filesDeleted: ${formatFilesForDebug(buildCtx.filesDeleted)}`
+      );
+      config.logger.debug(
+        `WATCH_BUILD::watchBuild::onBuild filesUpdated: ${formatFilesForDebug(buildCtx.filesUpdated)}`
+      );
+      config.logger.debug(
+        `WATCH_BUILD::watchBuild::onBuild filesWritten: ${formatFilesForDebug(buildCtx.filesWritten)}`
+      );
+    }
+
     dirsAdded.clear();
     dirsDeleted.clear();
     filesAdded.clear();
@@ -68,6 +81,22 @@ export const createWatchBuild = async (
     if (result && !result.hasError) {
       isRebuild = true;
     }
+  };
+
+  /**
+   * Utility method for formatting a debug message that must either list a number of files, or the word 'none' if the
+   * provided list is empty
+   * @param files a list of files, the list may be empty
+   * @returns the provided list if it is not empty. otherwise, return the word 'none'
+   */
+  const formatFilesForDebug = (files: ReadonlyArray<string>): string => {
+    /**
+     * In the created message, it's important that there's no whitespace prior to the file name.
+     * Stencil's logger will split messages by whitespace according to the width of the terminal window.
+     * Since file names can be fully qualified paths (and therefore quite long), putting whitespace between a '-' and
+     * the path can lead to formatted messages where the '-' is on its own line
+     */
+    return files.length > 0 ? files.map((filename: string) => `-${filename}`).join('\n') : 'none';
   };
 
   const start = async () => {
@@ -104,7 +133,7 @@ export const createWatchBuild = async (
           break;
       }
 
-      config.logger.debug(`onFsChange ${eventKind}: ${p}`);
+      config.logger.debug(`WATCH_BUILD::fs_event_change - type=${eventKind}, path=${p}, time=${new Date().getTime()}`);
       tsWatchProgram.rebuild();
     }
   };
