@@ -1,7 +1,8 @@
 import ts from 'typescript';
 
 import type * as d from '../../../declarations';
-import { addCoreRuntimeApi, RUNTIME_APIS } from '../core-runtime-apis';
+import { DIST_CUSTOM_ELEMENTS } from '../../output-targets/output-utils';
+import { addOutputTargetCoreRuntimeApi, RUNTIME_APIS } from '../core-runtime-apis';
 import { addCreateEvents } from '../create-event';
 import { addLegacyProps } from '../legacy-props';
 import { retrieveTsModifiers } from '../transform-utils';
@@ -32,15 +33,17 @@ export const updateNativeConstructor = (
   if (cstrMethodIndex >= 0) {
     // add to the existing constructor()
     const cstrMethod = classMembers[cstrMethodIndex] as ts.ConstructorDeclaration;
+    // a constructor may not have a body (e.g. in the case of constructor overloads)
+    const cstrBodyStatements: ts.NodeArray<ts.Statement> = cstrMethod.body?.statements ?? ts.factory.createNodeArray();
 
     let statements: ts.Statement[] = [
       ...nativeInit(moduleFile, cmp),
       ...addCreateEvents(moduleFile, cmp),
-      ...cstrMethod.body.statements,
+      ...cstrBodyStatements,
       ...addLegacyProps(moduleFile, cmp),
     ];
 
-    const hasSuper = cstrMethod.body.statements.some((s) => s.kind === ts.SyntaxKind.SuperKeyword);
+    const hasSuper = cstrBodyStatements.some((s) => s.kind === ts.SyntaxKind.SuperKeyword);
     if (!hasSuper) {
       statements = [createNativeConstructorSuper(), ...statements];
     }
@@ -101,7 +104,7 @@ const nativeRegisterHostStatement = (): ts.ExpressionStatement => {
  * @returns the generated expression statement
  */
 const nativeAttachShadowStatement = (moduleFile: d.Module): ts.ExpressionStatement => {
-  addCoreRuntimeApi(moduleFile, RUNTIME_APIS.attachShadow);
+  addOutputTargetCoreRuntimeApi(moduleFile, DIST_CUSTOM_ELEMENTS, RUNTIME_APIS.attachShadow);
   // Create an expression statement, `this.__attachShadow();`
   return ts.factory.createExpressionStatement(
     ts.factory.createCallExpression(

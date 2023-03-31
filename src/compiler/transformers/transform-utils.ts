@@ -165,6 +165,13 @@ export const createStaticGetter = (propName: string, returnExpression: ts.Expres
   );
 };
 
+/**
+ * Retrieves a value represented by TypeScript's syntax tree by name of a static getter. The value is transformed to a
+ * runtime value.
+ * @param staticMembers a collection of static getters to search
+ * @param staticName the name of the static getter to pull a value from
+ * @returns a TypeScript value, converted from its TypeScript syntax tree representation
+ */
 export const getStaticValue = (staticMembers: ts.ClassElement[], staticName: string): any => {
   const staticMember: ts.GetAccessorDeclaration = staticMembers.find(
     (member) => (member.name as any).escapedText === staticName
@@ -625,22 +632,42 @@ export const parseDocsType = (checker: ts.TypeChecker, type: ts.Type, parts: Set
   }
 };
 
-export const getModuleFromSourceFile = (compilerCtx: d.CompilerCtx, tsSourceFile: ts.SourceFile) => {
+/**
+ * Retrieves a Stencil `Module` entity from the compiler context for a given TypeScript `SourceFile`
+ * @param compilerCtx the current compiler context to retrieve the `Module` from
+ * @param tsSourceFile the TypeScript compiler `SourceFile` entity to use to retrieve the `Module`
+ * @returns the `Module`, or `undefined` if it cannot be found
+ */
+export const getModuleFromSourceFile = (
+  compilerCtx: d.CompilerCtx,
+  tsSourceFile: ts.SourceFile
+): d.Module | undefined => {
   const sourceFilePath = normalizePath(tsSourceFile.fileName);
   const moduleFile = compilerCtx.moduleMap.get(sourceFilePath);
   if (moduleFile != null) {
     return moduleFile;
   }
 
+  // a key with the `Module`'s filename could not be found, attempt to resolve it by iterating over all modules in the
+  // compiler context
   const moduleFiles = Array.from(compilerCtx.moduleMap.values());
   return moduleFiles.find((m) => m.jsFilePath === sourceFilePath);
 };
 
+/**
+ * Retrieve the Stencil metadata for a component from the current compiler context, based on the provided TypeScript
+ * syntax tree node. The TypeScript source file is used as a fallback in the event the metadata cannot be found based
+ * on the TypeScript node.
+ * @param compilerCtx the current compiler context
+ * @param tsSourceFile the TypeScript `SourceFile` entity
+ * @param node a TypeScript class representation of a Stencil component
+ * @returns the found metadata, or `undefined` if it cannot be found
+ */
 export const getComponentMeta = (
   compilerCtx: d.CompilerCtx,
   tsSourceFile: ts.SourceFile,
   node: ts.ClassDeclaration
-) => {
+): d.ComponentCompilerMeta | undefined => {
   const meta = compilerCtx.nodeMap.get(node);
   if (meta) {
     return meta;
@@ -657,7 +684,12 @@ export const getComponentMeta = (
   return undefined;
 };
 
-export const getComponentTagName = (staticMembers: ts.ClassElement[]) => {
+/**
+ * Retrieves the tag name associated with a Stencil component, based on the 'is' static getter assigned to the class at compile time
+ * @param staticMembers the static getters belonging to the Stencil component class
+ * @returns the tage name, or null if one cannot be found
+ */
+export const getComponentTagName = (staticMembers: ts.ClassElement[]): string | null => {
   if (staticMembers.length > 0) {
     const tagName = getStaticValue(staticMembers, 'is') as string;
 

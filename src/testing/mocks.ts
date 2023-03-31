@@ -242,6 +242,7 @@ export function mockWindow(html: string = null) {
 export const mockModule = (mod: Partial<Module> = {}): Module => ({
   cmps: [],
   coreRuntimeApis: [],
+  outputTargetCoreRuntimeApis: {},
   collectionName: '',
   dtsFilePath: '',
   excludeFromCollection: false,
