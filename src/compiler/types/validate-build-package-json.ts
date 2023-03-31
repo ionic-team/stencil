@@ -6,7 +6,6 @@ import {
   getComponentsDtsTypesFilePath,
   isOutputTargetDistCollection,
   isOutputTargetDistCustomElements,
-  isOutputTargetDistCustomElementsBundle,
   isOutputTargetDistTypes,
 } from '../output-targets/output-utils';
 
@@ -185,7 +184,6 @@ export const validateModule = async (config: d.ValidatedConfig, compilerCtx: d.C
  * value is supplied
  */
 function recommendedModulePath(config: d.ValidatedConfig): string | null {
-  const customElementsBundleOT = config.outputTargets.find(isOutputTargetDistCustomElementsBundle);
   const customElementsOT = config.outputTargets.find(isOutputTargetDistCustomElements);
   const distCollectionOT = config.outputTargets.find(isOutputTargetDistCollection);
 
@@ -196,11 +194,6 @@ function recommendedModulePath(config: d.ValidatedConfig): string | null {
   if (customElementsOT) {
     const componentsIndexAbs = join(customElementsOT.dir, 'index.js');
     return relative(config.rootDir, componentsIndexAbs);
-  }
-
-  if (customElementsBundleOT) {
-    const customElementsAbs = join(customElementsBundleOT.dir, 'index.js');
-    return relative(config.rootDir, customElementsAbs);
   }
 
   // if no output target for which we define a recommended output target is set

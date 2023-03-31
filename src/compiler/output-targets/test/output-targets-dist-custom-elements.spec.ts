@@ -19,8 +19,7 @@ import {
   getBundleOptions,
   outputCustomElements,
 } from '../dist-custom-elements';
-// TODO(STENCIL-561): fully delete dist-custom-elements-bundle code
-import { DIST_CUSTOM_ELEMENTS, DIST_CUSTOM_ELEMENTS_BUNDLE } from '../output-utils';
+import { DIST_CUSTOM_ELEMENTS } from '../output-utils';
 
 const setup = () => {
   const sys = mockCompilerSystem();
@@ -55,16 +54,15 @@ describe('Custom Elements output target', () => {
     expect(bundleCustomElementsSpy).not.toHaveBeenCalled();
   });
 
-  it.each<d.OutputTarget[][]>([
-    [[]],
-    [[{ type: 'dist' }]],
-    [[{ type: 'dist' }, { type: DIST_CUSTOM_ELEMENTS_BUNDLE }]],
-  ])('should return early if no appropriate output target (%j)', async (outputTargets) => {
-    const { config, compilerCtx, buildCtx, bundleCustomElementsSpy } = setup();
-    config.outputTargets = outputTargets;
-    await outputCustomElements(config, compilerCtx, buildCtx);
-    expect(bundleCustomElementsSpy).not.toHaveBeenCalled();
-  });
+  it.each<d.OutputTarget[][]>([[[]], [[{ type: 'dist' }]]])(
+    'should return early if no appropriate output target (%j)',
+    async (outputTargets) => {
+      const { config, compilerCtx, buildCtx, bundleCustomElementsSpy } = setup();
+      config.outputTargets = outputTargets;
+      await outputCustomElements(config, compilerCtx, buildCtx);
+      expect(bundleCustomElementsSpy).not.toHaveBeenCalled();
+    }
+  );
 
   describe('generateEntryPoint', () => {
     it('should include global scripts when flag is `true`', () => {

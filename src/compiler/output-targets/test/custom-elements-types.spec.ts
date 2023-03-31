@@ -67,11 +67,13 @@ describe('Custom Elements Typedef generation', () => {
     const expectedTypedefOutput = [
       '/* TestApp custom elements */',
       `export { StubCmp as MyComponent } from '${join(componentsTypeDirectoryPath, 'my-component', 'my-component')}';`,
+      `export { defineCustomElement as defineCustomElementMyComponent } from './my-component';`,
       `export { MyBestComponent as MyBestComponent } from '${join(
         componentsTypeDirectoryPath,
         'the-other-component',
         'my-real-best-component'
       )}';`,
+      `export { defineCustomElement as defineCustomElementMyBestComponent } from './my-best-component';`,
       '',
       '/**',
       ' * Used to manually set the base path where assets can be found.',

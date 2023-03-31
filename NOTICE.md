@@ -1063,6 +1063,17 @@ Author: [James Halliday](http://substack.net)
 
 --------
 
+## `data-uri-to-buffer`
+
+License: MIT
+
+Author: Nathan Rajlich <nathan@tootallnate.net> (http://n8.io/)
+
+Homepage: https://github.com/TooTallNate/node-data-uri-to-buffer
+
+
+--------
+
 ## `deepmerge`
 
 License: MIT
@@ -1275,6 +1286,38 @@ Homepage: https://github.com/cowboy/node-exit
 
 --------
 
+## `fetch-blob`
+
+License: MIT
+
+Author: Jimmy Wärting <jimmy@warting.se> (https://jimmy.warting.se)
+
+Homepage: https://github.com/node-fetch/fetch-blob#readme
+
+> MIT License
+> 
+> Copyright (c) 2019 David Frank
+> 
+> Permission is hereby granted, free of charge, to any person obtaining a copy
+> of this software and associated documentation files (the "Software"), to deal
+> in the Software without restriction, including without limitation the rights
+> to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+> copies of the Software, and to permit persons to whom the Software is
+> furnished to do so, subject to the following conditions:
+> 
+> The above copyright notice and this permission notice shall be included in all
+> copies or substantial portions of the Software.
+> 
+> THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+> IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+> FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+> AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+> LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+> OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+> SOFTWARE.
+
+--------
+
 ## `for-each`
 
 License: MIT
@@ -1290,6 +1333,38 @@ Homepage: https://github.com/Raynos/for-each
 > The MIT License (MIT)
 > 
 > Copyright (c) 2012 Raynos.
+> 
+> Permission is hereby granted, free of charge, to any person obtaining a copy
+> of this software and associated documentation files (the "Software"), to deal
+> in the Software without restriction, including without limitation the rights
+> to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+> copies of the Software, and to permit persons to whom the Software is
+> furnished to do so, subject to the following conditions:
+> 
+> The above copyright notice and this permission notice shall be included in all
+> copies or substantial portions of the Software.
+> 
+> THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+> IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+> FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+> AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+> LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+> OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+> SOFTWARE.
+
+--------
+
+## `formdata-polyfill`
+
+License: MIT
+
+Author: Jimmy Wärting
+
+Homepage: https://github.com/jimmywarting/FormData#readme
+
+> MIT License
+> 
+> Copyright (c) 2016 Jimmy Karl Roland Wärting
 > 
 > Permission is hereby granted, free of charge, to any person obtaining a copy
 > of this software and associated documentation files (the "Software"), to deal
@@ -2028,66 +2103,6 @@ Author: [Luke Edwards](lukeed.com)
 
 --------
 
-## `lodash`
-
-License: MIT
-
-Author: John-David Dalton <john.david.dalton@gmail.com>
-
-Contributors: John-David Dalton <john.david.dalton@gmail.com>, Mathias Bynens <mathias@qiwi.be>
-
-Homepage: https://lodash.com/
-
-> Copyright OpenJS Foundation and other contributors <https://openjsf.org/>
-> 
-> Based on Underscore.js, copyright Jeremy Ashkenas,
-> DocumentCloud and Investigative Reporters & Editors <http://underscorejs.org/>
-> 
-> This software consists of voluntary contributions made by many
-> individuals. For exact contribution history, see the revision history
-> available at https://github.com/lodash/lodash
-> 
-> The following license applies to all parts of this software except as
-> documented below:
-> 
-> ====
-> 
-> Permission is hereby granted, free of charge, to any person obtaining
-> a copy of this software and associated documentation files (the
-> "Software"), to deal in the Software without restriction, including
-> without limitation the rights to use, copy, modify, merge, publish,
-> distribute, sublicense, and/or sell copies of the Software, and to
-> permit persons to whom the Software is furnished to do so, subject to
-> the following conditions:
-> 
-> The above copyright notice and this permission notice shall be
-> included in all copies or substantial portions of the Software.
-> 
-> THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-> EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-> MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-> NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-> LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-> OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-> WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-> 
-> ====
-> 
-> Copyright and related rights for sample code are waived via CC0. Sample
-> code is defined as all source code displayed within the prose of the
-> documentation.
-> 
-> CC0: http://creativecommons.org/publicdomain/zero/1.0/
-> 
-> ====
-> 
-> Files located in the node_modules and vendor directories are externally
-> maintained libraries used by this software which have their own
-> licenses; we recommend you read them, as their terms may differ from the
-> terms above.
-
---------
-
 ## `lru-cache`
 
 License: ISC
@@ -2211,17 +2226,49 @@ Author: Andrey Sitnik <andrey@sitnik.ru>
 
 --------
 
+## `node-domexception`
+
+License: MIT
+
+Author: Jimmy Wärting
+
+Homepage: https://github.com/jimmywarting/node-domexception#readme
+
+> MIT License
+> 
+> Copyright (c) 2021 Jimmy Wärting
+> 
+> Permission is hereby granted, free of charge, to any person obtaining a copy
+> of this software and associated documentation files (the "Software"), to deal
+> in the Software without restriction, including without limitation the rights
+> to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+> copies of the Software, and to permit persons to whom the Software is
+> furnished to do so, subject to the following conditions:
+> 
+> The above copyright notice and this permission notice shall be included in all
+> copies or substantial portions of the Software.
+> 
+> THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+> IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+> FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+> AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+> LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+> OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+> SOFTWARE.
+
+--------
+
 ## `node-fetch`
 
 License: MIT
 
 Author: David Frank
 
-Homepage: https://github.com/bitinn/node-fetch
+Homepage: https://github.com/node-fetch/node-fetch
 
 > The MIT License (MIT)
 > 
-> Copyright (c) 2016 David Frank
+> Copyright (c) 2016 - 2020 Node Fetch Team
 > 
 > Permission is hereby granted, free of charge, to any person obtaining a copy
 > of this software and associated documentation files (the "Software"), to deal
@@ -2707,19 +2754,6 @@ Author: [Terkel Gjervig](https://terkel.com)
 > LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 > OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 > SOFTWARE.
-
---------
-
-## `punycode`
-
-License: MIT
-
-Author: [Mathias Bynens](https://mathiasbynens.be/)
-
-Contributors: [Mathias Bynens](https://mathiasbynens.be/)
-
-Homepage: https://mths.be/punycode
-
 
 --------
 
@@ -3775,38 +3809,6 @@ Homepage: https://terser.org
 
 --------
 
-## `tr46`
-
-License: MIT
-
-Author: Sebastian Mayr <npm@smayr.name>
-
-Contributors: Timothy Gu <timothygu99@gmail.com>
-
-> The MIT License (MIT)
-> 
-> Copyright (c) 2016 Sebastian Mayr
-> 
-> Permission is hereby granted, free of charge, to any person obtaining a copy
-> of this software and associated documentation files (the "Software"), to deal
-> in the Software without restriction, including without limitation the rights
-> to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-> copies of the Software, and to permit persons to whom the Software is
-> furnished to do so, subject to the following conditions:
-> 
-> The above copyright notice and this permission notice shall be included in all
-> copies or substantial portions of the Software.
-> 
-> THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-> IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-> FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-> AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-> LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-> OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-> SOFTWARE.
-
---------
-
 ## `typescript`
 
 License: Apache-2.0
@@ -3931,36 +3933,20 @@ Homepage: https://github.com/browserify/node-util
 
 --------
 
-## `webidl-conversions`
-
-License: BSD-2-Clause
-
-Author: Domenic Denicola <d@domenic.me> (https://domenic.me/)
-
-> # The BSD 2-Clause License
-> 
-> Copyright (c) 2014, Domenic Denicola
-> All rights reserved.
-> 
-> Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
-> 
-> 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
-> 
-> 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
-> 
-> THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
---------
-
-## `whatwg-url`
+## `web-streams-polyfill`
 
 License: MIT
 
-Author: Sebastian Mayr <github@smayr.name>
+Author: Mattias Buelens <mattias@buelens.com>
+
+Contributors: Diwank Singh <diwank.singh@gmail.com>
+
+Homepage: https://github.com/MattiasBuelens/web-streams-polyfill#readme
 
 > The MIT License (MIT)
 > 
-> Copyright (c) 2015–2016 Sebastian Mayr
+> Copyright (c) 2020 Mattias Buelens
+> Copyright (c) 2016 Diwank Singh Tomer
 > 
 > Permission is hereby granted, free of charge, to any person obtaining a copy
 > of this software and associated documentation files (the "Software"), to deal
@@ -3969,16 +3955,16 @@ Author: Sebastian Mayr <github@smayr.name>
 > copies of the Software, and to permit persons to whom the Software is
 > furnished to do so, subject to the following conditions:
 > 
-> The above copyright notice and this permission notice shall be included in
-> all copies or substantial portions of the Software.
+> The above copyright notice and this permission notice shall be included in all
+> copies or substantial portions of the Software.
 > 
 > THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 > IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 > FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
 > AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 > LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-> OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-> THE SOFTWARE.
+> OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+> SOFTWARE.
 
 --------
 

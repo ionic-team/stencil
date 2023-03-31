@@ -772,6 +772,13 @@ export interface ComponentCompilerFeatures {
   htmlTagNames: string[];
   htmlParts: string[];
   isUpdateable: boolean;
+  /**
+   * A plain component is one that doesn't have:
+   * - any members decorated with `@Prop()`, `@State()`, `@Element()`, `@Method()`
+   * - any methods decorated with `@Listen()`
+   * - any styles
+   * - any lifecycle methods, including `render()`
+   */
   isPlain: boolean;
   potentialCmpRefs: string[];
 }

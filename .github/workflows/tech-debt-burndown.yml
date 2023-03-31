@@ -20,13 +20,13 @@ jobs:
     runs-on: 'ubuntu-20.04'
     steps:
       - name: Checkout main
-        uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
+        uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
         with:
           ref: main
         if: ${{ matrix.branch == 'main' }}
 
       - name: Checkout PR branch
-        uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
+        uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
         with:
           # the pull_request_target event will consider the HEAD of `main` to be the SHA to use.
           # attempt to use the SHA associated with a pull request and fallback to HEAD of `main`
@@ -58,13 +58,13 @@ jobs:
     runs-on: 'ubuntu-20.04'
     steps:
       - name: Checkout main
-        uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
+        uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
         with:
           ref: main
         if: ${{ matrix.branch == 'main' }}
 
       - name: Checkout PR branch
-        uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
+        uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
         with:
           # the pull_request_target event will consider the HEAD of `main` to be the SHA to use.
           # attempt to use the SHA associated with a pull request and fallback to HEAD of `main`
@@ -90,7 +90,7 @@ jobs:
     runs-on: 'ubuntu-20.04'
     steps:
       - name: Checkout current branch
-        uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
+        uses: actions/checkout@8f4b7f84864484a7bf31766abe9204da3cbe65b3 # v3.5.0
         with:
           # the pull_request_target event will consider the HEAD of `main` to be the SHA to use.
           # attempt to use the SHA associated with a pull request and fallback to HEAD of `main`

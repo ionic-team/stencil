@@ -2,7 +2,7 @@ import { mockConfig, mockLoadConfigInit } from '@stencil/core/testing';
 
 import type * as d from '../../../declarations';
 import { validateConfig } from '../../config/validate-config';
-import { getCustomElementsBuildConditionals } from '../dist-custom-elements-bundle/custom-elements-build-conditionals';
+import { getCustomElementsBuildConditionals } from '../dist-custom-elements/custom-elements-build-conditionals';
 import { getLazyBuildConditionals } from '../dist-lazy/lazy-build-conditionals';
 
 describe('build-conditionals', () => {

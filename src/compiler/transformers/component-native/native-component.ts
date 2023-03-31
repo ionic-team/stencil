@@ -47,7 +47,7 @@ const updateNativeHostComponentMembers = (
 ) => {
   const classMembers = removeStaticMetaProperties(classNode);
 
-  updateNativeConstructor(classMembers, moduleFile, cmp, true);
+  updateNativeConstructor(classMembers, moduleFile, cmp);
   addNativeConnectedCallback(classMembers, cmp);
   addNativeElementGetter(classMembers, cmp);
   addWatchers(classMembers, cmp);

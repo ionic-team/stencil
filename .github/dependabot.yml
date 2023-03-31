@@ -34,6 +34,9 @@ updates:
       # TODO(STENCIL-716): remove this once Stencil drops support for Node 14
       - dependency-name: '@types/fs-extra'
         versions: ['>=10']
+      # TODO(STENCIL-716): remove this once Stencil drops support for Node 14
+      - dependency-name: 'glob'
+        versions: ['>=9']
   - package-ecosystem: 'npm'
     directory: './test/bundler' # Location of package manifests
     schedule:
@@ -58,3 +61,6 @@ updates:
     # Disable rebasing for pull requests, as having several open pull requests all get simultaneously rebased gets
     # noisy from a notification standpoint
     rebase-strategy: 'disabled'
+    ignore:
+      - dependency-name: 'typescript'
+        versions: ['>=4.10', '>=5.0']
