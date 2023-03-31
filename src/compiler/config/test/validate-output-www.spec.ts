@@ -1,9 +1,9 @@
 import type * as d from '@stencil/core/declarations';
 import { mockLoadConfigInit } from '@stencil/core/testing';
+import { isOutputTargetCopy, isOutputTargetHydrate, isOutputTargetWww } from '@utils';
 import path from 'path';
 
 import { ConfigFlags, createConfigFlags } from '../../../cli/config-flags';
-import { isOutputTargetCopy, isOutputTargetHydrate, isOutputTargetWww } from '../../output-targets/output-utils';
 import { validateConfig } from '../validate-config';
 
 describe('validateOutputTargetWww', () => {

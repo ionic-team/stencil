@@ -1,9 +1,9 @@
 import type * as d from '@stencil/core/declarations';
 import { mockBuildCtx, mockCompilerCtx, mockValidatedConfig } from '@stencil/core/testing';
+import { DIST_COLLECTION, DIST_CUSTOM_ELEMENTS } from '@utils';
 import path from 'path';
 
 import { normalizePath } from '../../../utils/normalize-path';
-import { DIST_COLLECTION, DIST_CUSTOM_ELEMENTS } from '../../output-targets/output-utils';
 import * as v from '../validate-build-package-json';
 
 describe('validate-package-json', () => {

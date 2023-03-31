@@ -1,7 +1,7 @@
+import { DIST_CUSTOM_ELEMENTS } from '@utils';
 import * as ts from 'typescript';
 
 import * as d from '../../../declarations';
-import { DIST_CUSTOM_ELEMENTS } from '../../output-targets/output-utils';
 import { createModule } from '../../transpile/transpiled-module';
 import { addCoreRuntimeApi, addLegacyApis, addOutputTargetCoreRuntimeApi, RUNTIME_APIS } from '../core-runtime-apis';
 

@@ -1,5 +1,6 @@
+import { isOutputTargetDocsReadme } from '@utils';
+
 import type * as d from '../../../declarations';
-import { isOutputTargetDocsReadme } from '../../output-targets/output-utils';
 import { generateReadme } from './output-docs';
 
 export const generateReadmeDocs = async (

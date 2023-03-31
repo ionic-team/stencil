@@ -1,6 +1,3 @@
-import { isString } from '@utils';
-
-import type * as d from '../../declarations';
 import {
   isOutputTargetDist,
   isOutputTargetDistCustomElements,
@@ -8,7 +5,10 @@ import {
   isOutputTargetDistLazyLoader,
   isOutputTargetHydrate,
   isOutputTargetWww,
-} from './output-utils';
+  isString,
+} from '@utils';
+
+import type * as d from '../../declarations';
 
 type OutputTargetEmptiable =
   | d.OutputTargetDist

@@ -1,6 +1,7 @@
+import { isOutputTargetHydrate } from '@utils';
+
 import type * as d from '../../../declarations';
 import { getBuildFeatures, updateBuildConditionals } from '../../app-core/app-data';
-import { isOutputTargetHydrate } from '../output-utils';
 
 export const getLazyBuildConditionals = (
   config: d.ValidatedConfig,

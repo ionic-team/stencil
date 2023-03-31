@@ -1,15 +1,17 @@
-import { buildError, isBoolean, isString } from '@utils';
-import { isAbsolute, join } from 'path';
-
-import type * as d from '../../../declarations';
 import {
+  buildError,
   COPY,
   DIST_GLOBAL_STYLES,
   DIST_LAZY,
+  isBoolean,
   isOutputTargetDist,
   isOutputTargetWww,
+  isString,
   WWW,
-} from '../../output-targets/output-utils';
+} from '@utils';
+import { isAbsolute, join } from 'path';
+
+import type * as d from '../../../declarations';
 import { getAbsolutePath } from '../config-utils';
 import { validateCopy } from '../validate-copy';
 import { validatePrerender } from '../validate-prerender';

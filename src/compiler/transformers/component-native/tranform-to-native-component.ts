@@ -1,7 +1,7 @@
+import { DIST_CUSTOM_ELEMENTS } from '@utils';
 import ts from 'typescript';
 
 import type * as d from '../../../declarations';
-import { DIST_CUSTOM_ELEMENTS } from '../../output-targets/output-utils';
 import { addModuleMetadataProxies } from '../add-component-meta-proxy';
 import { addImports } from '../add-imports';
 import { addLegacyApis } from '../core-runtime-apis';

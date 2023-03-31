@@ -39,6 +39,29 @@ export async function internalHydrate(opts: BuildOptions) {
       banner: getBanner(opts, 'Stencil Hydrate Platform'),
       preferConst: true,
     },
+    /**
+     * The `internal-platform-hydrate` bundle depends on functions which use
+     * the output-target utils which, in turn, imports `path`. However, none of
+     * the functions which it uses actually _use_ functioned exported by `path`,
+     * so when bundling it doesn't actually import anything from `path` but if
+     * you don't set this option Rollup will leave an unqualified import like
+     * so:
+     *
+     * ```ts
+     * import "path";
+     * ```
+     *
+     * If you say `moduleSideEffects: false` you're basically saying 'dont assume
+     * that imported a module has a desired side effect' which allows an import that
+     * doesn't result in any symbols being pulled into the importing module to be
+     * eliminated.
+     *
+     * Another way to say this is that without this change the treeshaking
+     * validation for `test.dist` doesn't pass for this bundle.
+     */
+    treeshake: {
+      moduleSideEffects: false,
+    },
     plugins: [
       {
         name: 'internalHydratePlugin',
@@ -65,6 +88,17 @@ export async function internalHydrate(opts: BuildOptions) {
       file: join(outputInternalHydrateDir, 'runner.js'),
       banner: getBanner(opts, 'Stencil Hydrate Runner'),
       preferConst: true,
+    },
+    /**
+     * See above for an explanation, this is necessary to eliminate an
+     * unqualified import of `"path"`, like so:
+     *
+     * ```ts
+     * import "path";
+     * ```
+     */
+    treeshake: {
+      moduleSideEffects: false,
     },
     plugins: [
       aliasPlugin(opts),

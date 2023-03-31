@@ -1,11 +1,10 @@
-import { generatePreamble } from '@utils';
+import { generatePreamble, relativeImport } from '@utils';
 import { join } from 'path';
 import type { OutputOptions, RollupBuild } from 'rollup';
 
 import type * as d from '../../../declarations';
 import { getAppBrowserCorePolyfills } from '../../app-core/app-polyfills';
 import { generateRollupOutput } from '../../app-core/bundle-app-core';
-import { relativeImport } from '../output-utils';
 import { generateLazyModules } from './generate-lazy-module';
 
 export const generateSystem = async (

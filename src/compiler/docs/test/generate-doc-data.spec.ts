@@ -1,7 +1,7 @@
 import { mockBuildCtx, mockCompilerCtx, mockModule, mockValidatedConfig } from '@stencil/core/testing';
+import { getComponentsFromModules } from '@utils';
 
 import type * as d from '../../../declarations';
-import { getComponentsFromModules } from '../../output-targets/output-utils';
 import { stubComponentCompilerMeta } from '../../types/tests/ComponentCompilerMeta.stub';
 import { AUTO_GENERATE_COMMENT } from '../constants';
 import { generateDocData } from '../generate-doc-data';
