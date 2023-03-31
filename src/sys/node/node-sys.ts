@@ -36,7 +36,7 @@ import { NodeWorkerController } from './node-worker-controller';
  */
 export function createNodeSys(c: { process?: any; logger?: Logger } = {}): CompilerSystem {
   const prcs: NodeJS.Process = c?.process ?? global.process;
-  const logger: Logger = c?.logger;
+  const logger: Logger | undefined = c?.logger;
   const destroys = new Set<() => Promise<void> | void>();
   const onInterruptsCallbacks: (() => void)[] = [];
 
