@@ -16,6 +16,9 @@ updates:
         versions: ['>=19']
       - dependency-name: 'typescript'
         versions: ['>=4.10', '>=5.0']
+      # TODO(STENCIL-771): Remove this entry + upgrade after the TypeScript 5.0 upgrade
+      - dependency-name: 'dts-bundle-generator'
+        versions: ['>=8']
       # disable Jest updates until the new testing architecture is in place
       - dependency-name: '@types/jest'
         versions: ['>=28']
