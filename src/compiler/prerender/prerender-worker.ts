@@ -1,4 +1,4 @@
-import { catchError, isFunction, isPromise, isRootPath, normalizePath } from '@utils';
+import { catchError, isFunction, isPromise, isRootPath, normalizePath, safeJSONStringify } from '@utils';
 import { dirname, join } from 'path';
 
 import type * as d from '../../declarations';
@@ -183,7 +183,7 @@ export const prerenderWorker = async (sys: d.CompilerSystem, prerenderRequest: d
             };
             const dataFileName = `${s.id}.json`;
             const dataFilePath = join(pageDir, dataFileName);
-            await sys.writeFile(dataFilePath, JSON.stringify(data));
+            await sys.writeFile(dataFilePath, safeJSONStringify(data));
           } else {
             const contentFileName = `${s.id}.txt`;
             const contentFilePath = join(pageDir, contentFileName);

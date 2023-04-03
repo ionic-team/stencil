@@ -1,4 +1,4 @@
-import { generatePreamble, hasError, normalizeFsPath } from '@utils';
+import { generatePreamble, hasError, normalizeFsPath, safeJSONStringify } from '@utils';
 import type { Plugin, PluginContext, TransformResult } from 'rollup';
 
 import type * as d from '../../declarations';
@@ -191,7 +191,7 @@ const buildWorker = async (
     });
     const entryPoint = output.output[0];
     if (entryPoint.imports.length > 0) {
-      ctx.error('Workers should not have any external imports: ' + JSON.stringify(entryPoint.imports));
+      ctx.error('Workers should not have any external imports: ' + safeJSONStringify(entryPoint.imports));
     }
 
     // Optimize code

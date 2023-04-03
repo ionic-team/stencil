@@ -1,4 +1,4 @@
-import { buildError, isBoolean, isNumber, isString, sortBy } from '@utils';
+import { buildError, isBoolean, isNumber, isString, safeJSONStringify, sortBy } from '@utils';
 import { join } from 'path';
 
 import { ConfigBundle, Diagnostic, LoadConfigInit, UnvalidatedConfig, ValidatedConfig } from '../../declarations';
@@ -53,7 +53,7 @@ export const validateConfig = (
   const validatedConfig: ValidatedConfig = {
     ...config,
     // flags _should_ be JSON safe
-    flags: JSON.parse(JSON.stringify(config.flags || {})),
+    flags: JSON.parse(safeJSONStringify(config.flags || {})),
     hydratedFlag: validateHydrated(config),
     logger,
     outputTargets: config.outputTargets ?? [],

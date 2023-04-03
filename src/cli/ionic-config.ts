@@ -1,3 +1,5 @@
+import { safeJSONStringify } from '@utils';
+
 import type * as d from '../declarations';
 import { readJson, UUID_REGEX, uuidv4 } from './telemetry/helpers';
 
@@ -43,7 +45,7 @@ export async function writeConfig(sys: d.CompilerSystem, config: d.TelemetryConf
   let result = false;
   try {
     await sys.createDir(defaultConfigDirectory(sys), { recursive: true });
-    await sys.writeFile(defaultConfig(sys), JSON.stringify(config, null, 2));
+    await sys.writeFile(defaultConfig(sys), safeJSONStringify(config, undefined, 2));
     result = true;
   } catch (error) {
     console.error(`Stencil Telemetry: couldn't write configuration file to ${defaultConfig(sys)} - ${error}.`);

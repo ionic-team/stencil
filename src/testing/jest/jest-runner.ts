@@ -1,5 +1,6 @@
 import type { AggregatedResult } from '@jest/test-result';
 import type * as d from '@stencil/core/internal';
+import { safeJSONStringify } from '@utils';
 
 import type { ConfigFlags } from '../../cli/config-flags';
 import { setScreenshotEmulateData } from '../puppeteer/puppeteer-emulate';
@@ -11,8 +12,8 @@ export async function runJest(config: d.ValidatedConfig, env: d.E2EProcessEnv) {
   try {
     // set all of the emulate configs to the process.env to be read later on
     const emulateConfigs = getEmulateConfigs(config.testing, config.flags);
-    env.__STENCIL_EMULATE_CONFIGS__ = JSON.stringify(emulateConfigs);
-    env.__STENCIL_ENV__ = JSON.stringify(config.env);
+    env.__STENCIL_EMULATE_CONFIGS__ = safeJSONStringify(emulateConfigs);
+    env.__STENCIL_ENV__ = safeJSONStringify(config.env);
     env.__STENCIL_TRANSPILE_PATHS__ = config.transformAliasedImportPaths ? 'true' : 'false';
 
     if (config.flags.ci || config.flags.e2e) {

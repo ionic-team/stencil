@@ -1,4 +1,4 @@
-import { createJsVarName, isString, loadTypeScriptDiagnostics, normalizePath } from '@utils';
+import { createJsVarName, isString, loadTypeScriptDiagnostics, normalizePath, safeJSONStringify } from '@utils';
 import MagicString from 'magic-string';
 import { basename } from 'path';
 import type { LoadResult, Plugin, ResolveIdResult, TransformResult } from 'rollup';
@@ -198,7 +198,7 @@ const appendBuildConditionals = (config: d.Config, build: d.BuildConditionals, s
 };
 
 const appendEnv = (config: d.Config, s: MagicString) => {
-  s.append(`export const Env = /* ${config.fsNamespace} */ ${JSON.stringify(config.env)};\n`);
+  s.append(`export const Env = /* ${config.fsNamespace} */ ${safeJSONStringify(config.env ?? {})};\n`);
 };
 
 const appendNamespace = (config: d.Config, s: MagicString) => {

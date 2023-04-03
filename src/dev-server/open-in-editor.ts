@@ -1,3 +1,4 @@
+import { safeJSONStringify } from '@utils';
 import type { ServerResponse } from 'http';
 
 import type * as d from '../declarations';
@@ -31,7 +32,7 @@ export async function serveOpenInEditor(serverCtx: d.DevServerContext, req: d.Ht
     })
   );
 
-  res.write(JSON.stringify(data, null, 2));
+  res.write(safeJSONStringify(data, null, 2));
   res.end();
 }
 

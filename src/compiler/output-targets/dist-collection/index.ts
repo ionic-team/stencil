@@ -6,6 +6,7 @@ import {
   isOutputTargetDistCollection,
   normalizePath,
   sortBy,
+  safeJSONStringify,
 } from '@utils';
 import { join, relative } from 'path';
 import ts from 'typescript';
@@ -93,7 +94,7 @@ const writeCollectionManifests = async (
   buildCtx: d.BuildCtx,
   outputTargets: d.OutputTargetDistCollection[]
 ) => {
-  const collectionData = JSON.stringify(serializeCollectionManifest(config, compilerCtx, buildCtx), null, 2);
+  const collectionData = safeJSONStringify(serializeCollectionManifest(config, compilerCtx, buildCtx), null, 2);
   return Promise.all(outputTargets.map((o) => writeCollectionManifest(compilerCtx, collectionData, o)));
 };
 
@@ -117,7 +118,11 @@ const writeCollectionManifest = async (
   await compilerCtx.fs.writeFile(collectionFilePath, collectionData);
 };
 
-const serializeCollectionManifest = (config: d.ValidatedConfig, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
+const serializeCollectionManifest = (
+  config: d.ValidatedConfig,
+  compilerCtx: d.CompilerCtx,
+  buildCtx: d.BuildCtx
+): d.CollectionManifest => {
   // create the single collection we're going to fill up with data
   const collectionManifest: d.CollectionManifest = {
     entries: buildCtx.moduleFiles

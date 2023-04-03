@@ -1,4 +1,4 @@
-import { getComponentsFromModules, isOutputTargetDistTypes, loadTypeScriptDiagnostics, normalizePath } from '@utils';
+import { getComponentsFromModules, isOutputTargetDistTypes, loadTypeScriptDiagnostics, normalizePath, safeJSONStringify } from '@utils';
 import { basename, join, relative } from 'path';
 import ts from 'typescript';
 
@@ -79,7 +79,7 @@ export const runTsProgram = async (
   tsBuilder.emit(undefined, emitCallback, undefined, false, transformers);
 
   const changedmodules = Array.from(compilerCtx.changedModules.keys());
-  buildCtx.debug('Transpiled modules: ' + JSON.stringify(changedmodules, null, '\n'));
+  buildCtx.debug('Transpiled modules: ' + safeJSONStringify(changedmodules, null, '\n'));
 
   // Finalize components metadata
   buildCtx.moduleFiles = Array.from(compilerCtx.moduleMap.values());

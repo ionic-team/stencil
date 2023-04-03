@@ -1,6 +1,6 @@
 import type { Config } from '@jest/types';
 import type * as d from '@stencil/core/internal';
-import { isString } from '@utils';
+import { isString, safeJSONStringify } from '@utils';
 
 // TODO(STENCIL-306): Remove support for earlier versions of Jest
 /**
@@ -149,7 +149,7 @@ export function buildJestConfig(config: d.ValidatedConfig): string {
   // TODO(STENCIL-307): Move away from Jasmine runner for Stencil tests, which involves a potentially breaking change
   jestConfig.testRunner = 'jest-jasmine2';
 
-  return JSON.stringify(jestConfig);
+  return safeJSONStringify(jestConfig);
 }
 
 export function getProjectListFromCLIArgs(config: d.Config, argv: Config.Argv): Config.Path[] {

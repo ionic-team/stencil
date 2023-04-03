@@ -3,6 +3,7 @@ import {
   getSourceMappingUrlForEndOfFile,
   hasDependency,
   rollupToStencilSourceMap,
+  safeJSONStringify,
   stringifyRuntimeData,
 } from '@utils';
 import { join } from 'path';
@@ -256,7 +257,7 @@ const writeLazyChunk = async (
       let fileCode = code;
       if (rollupResult.map) {
         fileCode = code + getSourceMappingUrlForEndOfFile(rollupResult.fileName);
-        compilerCtx.fs.writeFile(filePath + '.map', JSON.stringify(sourceMap), { outputTargetType });
+        compilerCtx.fs.writeFile(filePath + '.map', safeJSONStringify(sourceMap), { outputTargetType });
       }
       compilerCtx.fs.writeFile(filePath, fileCode, { outputTargetType });
     })
@@ -297,7 +298,7 @@ const writeLazyEntry = async (
       let fileCode = code;
       if (sourceMap) {
         fileCode = code + getSourceMappingUrlForEndOfFile(rollupResult.fileName);
-        compilerCtx.fs.writeFile(filePath + '.map', JSON.stringify(sourceMap), { outputTargetType });
+        compilerCtx.fs.writeFile(filePath + '.map', safeJSONStringify(sourceMap), { outputTargetType });
       }
       return compilerCtx.fs.writeFile(filePath, fileCode, { outputTargetType });
     })

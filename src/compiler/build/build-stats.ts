@@ -1,4 +1,4 @@
-import { byteSize, isOutputTargetStats, sortBy } from '@utils';
+import { byteSize, isOutputTargetStats, safeJSONStringify, sortBy } from '@utils';
 
 import type * as d from '../../declarations';
 
@@ -90,7 +90,7 @@ export async function writeBuildStats(
 
   await Promise.all(
     statsTargets.map(async (outputTarget) => {
-      const result = await config.sys.writeFile(outputTarget.file, JSON.stringify(data, null, 2));
+      const result = await config.sys.writeFile(outputTarget.file, safeJSONStringify(data, undefined, 2));
 
       if (result.error) {
         config.logger.warn([`Stats failed to write file to ${outputTarget.file}`]);

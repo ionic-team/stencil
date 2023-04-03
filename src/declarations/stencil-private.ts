@@ -2680,3 +2680,25 @@ export interface TelemetryConfig {
   'telemetry.stencil'?: boolean;
   'tokens.telemetry'?: string;
 }
+
+type JsonPrimitive = string | number | boolean | null;
+type JsonArray = (JsonPrimitive | JsonArray | JsonObject)[];
+type JsonObject = { [index: string]: JsonArray | JsonPrimitive | JsonObject };
+
+/**
+ * Wrap a type with `JsonSafe` to ensure that it can be safely serialized
+ * to/from JSON. In particular, this basically checks that every property of the
+ * type is a `JsonObject`, a `JsonArray`, or a `JsonPrimitive`.
+ *
+ * In particular this will exclude any type which contains a function, since
+ * functions don't have a valid representation in JSON.
+ */
+export type JsonSafe<T> = T extends JsonPrimitive
+  ? T
+  : T extends JsonArray
+  ? T
+  : T extends Function
+  ? never
+  : T extends object
+  ? { [k in keyof T]: JsonSafe<T[k]> }
+  : never;

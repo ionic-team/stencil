@@ -1,4 +1,12 @@
-import { catchError, createJsVarName, DEFAULT_STYLE_MODE, hasError, isString, normalizePath } from '@utils';
+import {
+  catchError,
+  createJsVarName,
+  DEFAULT_STYLE_MODE,
+  hasError,
+  isString,
+  normalizePath,
+  safeJSONStringify,
+} from '@utils';
 import MagicString from 'magic-string';
 import path from 'path';
 
@@ -175,7 +183,7 @@ const generateTransformCssToEsm = (
       s.append(`${cssImport.varName} + `);
     });
 
-    s.append(`${JSON.stringify(results.styleText)};\n`);
+    s.append(`${safeJSONStringify(results.styleText)};\n`);
     s.append(`module.exports = ${results.defaultVarName};`);
   } else {
     // ESM
@@ -189,7 +197,7 @@ const generateTransformCssToEsm = (
       s.append(`${cssImport.varName} + `);
     });
 
-    s.append(`${JSON.stringify(results.styleText)};\n`);
+    s.append(`${safeJSONStringify(results.styleText)};\n`);
     s.append(`export default ${results.defaultVarName};`);
   }
 

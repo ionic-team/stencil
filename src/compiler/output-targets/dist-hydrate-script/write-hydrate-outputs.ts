@@ -1,3 +1,4 @@
+import { safeJSONStringify } from '@utils';
 import { basename, join } from 'path';
 import type { RollupOutput } from 'rollup';
 
@@ -71,7 +72,7 @@ const getHydratePackageJson = (
     main: basename(hydrateAppFilePath),
     types: basename(hydrateDtsFilePath),
   };
-  return JSON.stringify(pkg, null, 2);
+  return safeJSONStringify(pkg, null, 2);
 };
 
 const getHydratePackageName = async (config: d.ValidatedConfig, compilerCtx: d.CompilerCtx) => {

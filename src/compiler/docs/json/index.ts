@@ -1,4 +1,4 @@
-import { isOutputTargetDocsJson } from '@utils';
+import { isOutputTargetDocsJson, safeJSONStringify } from '@utils';
 import { join } from 'path';
 
 import type * as d from '../../../declarations';
@@ -49,7 +49,7 @@ export default _default;
       deprecation: cmp.deprecation,
     })),
   };
-  const jsonContent = JSON.stringify(json, null, 2);
+  const jsonContent = safeJSONStringify(json, null, 2);
   await Promise.all(
     jsonOutputTargets.map((jsonOutput) => {
       return writeDocsOutput(compilerCtx, jsonOutput, jsonContent, typesContent);

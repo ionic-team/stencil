@@ -1,4 +1,5 @@
 import type * as d from '@stencil/core/internal';
+import { safeJSONStringify } from '@utils';
 import fs from 'fs';
 import path from 'path';
 
@@ -11,7 +12,7 @@ export async function writeScreenshotImage(imagePath: string, screenshotBuf: Buf
 
 export async function writeScreenshotData(dataDir: string, screenshotData: d.Screenshot) {
   const filePath = getDataFilePath(dataDir, screenshotData.id);
-  const content = JSON.stringify(screenshotData, null, 2);
+  const content = safeJSONStringify(screenshotData, null, 2);
   await writeFile(filePath, content);
 }
 

@@ -1,3 +1,4 @@
+import { safeJSONStringify } from '@utils';
 import { join } from 'path';
 
 import type * as d from '../declarations';
@@ -89,7 +90,7 @@ export class Cache implements d.Cache {
     if (!this.config.enableCache) {
       return domain + Math.random() * 9999999;
     }
-    const hash = await this.sys.generateContentHash(JSON.stringify(args), 32);
+    const hash = await this.sys.generateContentHash(safeJSONStringify(args), 32);
     return domain + '_' + hash;
   }
 

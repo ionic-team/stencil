@@ -1,3 +1,4 @@
+import { safeJSONStringify } from '@utils';
 import type { ServerResponse } from 'http';
 import path from 'path';
 
@@ -66,7 +67,7 @@ async function serveDevClientScript(
 
       serverCtx.connectorHtml = serverCtx.connectorHtml.replace(
         'window.__DEV_CLIENT_CONFIG__',
-        JSON.stringify(devClientConfig)
+        safeJSONStringify(devClientConfig)
       );
     }
 

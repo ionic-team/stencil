@@ -1,3 +1,4 @@
+import { safeJSONStringify } from '@utils';
 import sourceMapMerge from 'merge-source-map';
 import type { CompressOptions, MangleOptions, MinifyOptions, SourceMapOptions } from 'terser';
 import ts from 'typescript';
@@ -111,7 +112,7 @@ export const optimizeModule = async (
     }
     await compilerCtx.cache.put(cacheKey, results.output);
     if (results.sourceMap) {
-      await compilerCtx.cache.put(cacheKey + 'Map', JSON.stringify(results.sourceMap));
+      await compilerCtx.cache.put(cacheKey + 'Map', safeJSONStringify(results.sourceMap));
     }
   }
 

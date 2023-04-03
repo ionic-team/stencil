@@ -1,4 +1,5 @@
 import type * as d from '@stencil/core/internal';
+import { safeJSONStringify } from '@utils';
 import { tmpdir } from 'os';
 import { join } from 'path';
 
@@ -311,7 +312,7 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
       pixelmatchModulePath: this.pixelmatchModulePath,
     };
 
-    return JSON.stringify(screenshotBuild);
+    return safeJSONStringify(screenshotBuild);
   }
 
   sortScreenshots(screenshots: d.Screenshot[]) {

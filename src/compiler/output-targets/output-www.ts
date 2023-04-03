@@ -1,5 +1,5 @@
 import { cloneDocument, serializeNodeToHtml } from '@stencil/core/mock-doc';
-import { catchError, flatOne, isOutputTargetWww, unique } from '@utils';
+import { catchError, flatOne, isOutputTargetWww, unique, safeJSONStringify } from '@utils';
 import { join, relative } from 'path';
 
 import type * as d from '../../declarations';
@@ -68,7 +68,7 @@ const generateWww = async (
 const generateHostConfig = (compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetWww) => {
   const buildDir = getAbsoluteBuildDir(outputTarget);
   const hostConfigPath = join(outputTarget.appDir, 'host.config.json');
-  const hostConfigContent = JSON.stringify(
+  const hostConfigContent = safeJSONStringify(
     {
       hosting: {
         headers: [

@@ -1,4 +1,4 @@
-import { createJsVarName, normalizeFsPathQuery } from '@utils';
+import { createJsVarName, normalizeFsPathQuery, safeJSONStringify } from '@utils';
 import { basename } from 'path';
 import type { Plugin, TransformPluginContext, TransformResult } from 'rollup';
 
@@ -48,7 +48,7 @@ const DATAURL_MAX_IMAGE_SIZE = 4 * 1024; // 4KiB
 
 const formatText = (code: string, filePath: string) => {
   const varName = createJsVarName(basename(filePath));
-  return `const ${varName} = ${JSON.stringify(code)};export default ${varName};`;
+  return `const ${varName} = ${safeJSONStringify(code)};export default ${varName};`;
 };
 
 const formatUrl = (

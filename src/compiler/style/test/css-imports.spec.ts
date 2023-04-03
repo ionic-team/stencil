@@ -1,6 +1,6 @@
 import type * as d from '@stencil/core/declarations';
 import { mockBuildCtx, mockCompilerCtx, mockConfig } from '@stencil/core/testing';
-import { buildError, normalizePath } from '@utils';
+import { buildError, normalizePath, safeJSONStringify } from '@utils';
 import path from 'path';
 
 import { FsReadOptions } from '../../sys/in-memory-fs';
@@ -335,7 +335,7 @@ describe('css-imports', () => {
     it('node path @import w/ package.json, no main field', async () => {
       const files = new Map<string, string>();
       const nodeModulePkgPath = path.join(root, 'node_modules', '@ionic', 'core', 'package.json');
-      files.set(nodeModulePkgPath, JSON.stringify({ name: '@ionic/core' }));
+      files.set(nodeModulePkgPath, safeJSONStringify({ name: '@ionic/core' }));
 
       const nodeModuleMainPath = path.join(root, 'node_modules', '@ionic', 'core', 'index.js');
       files.set(nodeModuleMainPath, `// index.js`);
@@ -366,7 +366,7 @@ describe('css-imports', () => {
     it('node path @import w/ package.json, no path and main css field', async () => {
       const files = new Map<string, string>();
       const nodeModulePkgPath = path.join(root, 'node_modules', '@ionic', 'core', 'package.json');
-      files.set(nodeModulePkgPath, JSON.stringify({ name: '@ionic/core', main: 'index.css' }));
+      files.set(nodeModulePkgPath, safeJSONStringify({ name: '@ionic/core', main: 'index.css' }));
 
       const nodeModuleMainPath = path.join(root, 'node_modules', '@ionic', 'core', 'index.css');
       files.set(nodeModuleMainPath, `/*ionic.css*/`);
@@ -392,7 +392,7 @@ describe('css-imports', () => {
     it('node path @import w/ package.json and main JS field', async () => {
       const files = new Map<string, string>();
       const nodeModulePkgPath = path.join(root, 'node_modules', '@ionic', 'core', 'package.json');
-      files.set(nodeModulePkgPath, JSON.stringify({ name: '@ionic/core', main: 'index.js' }));
+      files.set(nodeModulePkgPath, safeJSONStringify({ name: '@ionic/core', main: 'index.js' }));
 
       const nodeModuleMainPath = path.join(root, 'node_modules', '@ionic', 'core', 'index.js');
       files.set(nodeModuleMainPath, `// index.js`);

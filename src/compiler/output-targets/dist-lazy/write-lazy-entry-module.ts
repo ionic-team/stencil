@@ -1,4 +1,4 @@
-import { getSourceMappingUrlForEndOfFile } from '@utils';
+import { getSourceMappingUrlForEndOfFile, safeJSONStringify } from '@utils';
 import { join } from 'path';
 
 import type * as d from '../../../declarations';
@@ -27,7 +27,7 @@ export const writeLazyModule = async (
     destinations.map((dst) => {
       compilerCtx.fs.writeFile(join(dst, fileName), code, { outputTargetType });
       if (!!sourceMap) {
-        compilerCtx.fs.writeFile(join(dst, fileName) + '.map', JSON.stringify(sourceMap), { outputTargetType });
+        compilerCtx.fs.writeFile(join(dst, fileName) + '.map', safeJSONStringify(sourceMap), { outputTargetType });
       }
     })
   );

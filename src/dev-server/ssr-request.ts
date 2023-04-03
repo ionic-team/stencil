@@ -1,4 +1,4 @@
-import { catchError, isFunction, isString } from '@utils';
+import { catchError, isFunction, isString, safeJSONStringify } from '@utils';
 import type { ServerResponse } from 'http';
 import path from 'path';
 
@@ -99,7 +99,7 @@ export async function ssrStaticDataRequest(
     }
 
     const status = diagnostics.some((diagnostic) => diagnostic.level === 'error') ? 500 : 200;
-    const content = JSON.stringify(data);
+    const content = safeJSONStringify(data);
     serverCtx.logRequest(req, status);
 
     res.writeHead(

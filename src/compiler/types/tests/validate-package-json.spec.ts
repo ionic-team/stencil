@@ -1,6 +1,6 @@
 import type * as d from '@stencil/core/declarations';
 import { mockBuildCtx, mockCompilerCtx, mockValidatedConfig } from '@stencil/core/testing';
-import { DIST_COLLECTION, DIST_CUSTOM_ELEMENTS } from '@utils';
+import { DIST_COLLECTION, DIST_CUSTOM_ELEMENTS, safeJSONStringify } from '@utils';
 import path from 'path';
 
 import { normalizePath } from '../../../utils/normalize-path';
@@ -36,7 +36,7 @@ describe('validate-package-json', () => {
     compilerCtx = mockCompilerCtx(config);
     buildCtx = mockBuildCtx(config, compilerCtx);
     buildCtx.packageJson = {};
-    await compilerCtx.fs.writeFile(config.packageJsonFilePath, JSON.stringify(buildCtx.packageJson));
+    await compilerCtx.fs.writeFile(config.packageJsonFilePath, safeJSONStringify(buildCtx.packageJson));
   });
 
   describe('files', () => {

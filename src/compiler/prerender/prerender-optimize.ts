@@ -1,4 +1,4 @@
-import { catchError, flatOne, isString, unique } from '@utils';
+import { catchError, flatOne, isString, safeJSONStringify, unique } from '@utils';
 import { join } from 'path';
 
 import type * as d from '../../declarations';
@@ -151,7 +151,7 @@ export const excludeStaticComponents = (
     if (stencilScriptElm) {
       const namespace = stencilScriptElm.getAttribute('data-stencil-namespace');
       let scriptContent = excludeComponentScript.replace('__NAMESPACE__', namespace);
-      scriptContent = scriptContent.replace('__EXCLUDE__', JSON.stringify(staticComponents));
+      scriptContent = scriptContent.replace('__EXCLUDE__', safeJSONStringify(staticComponents));
 
       const dataOptsScript = doc.createElement('script');
       dataOptsScript.innerHTML = scriptContent;
@@ -285,7 +285,7 @@ export const hashAssets = async (
               await hashPageStateAstAssets(sys, hydrateOpts, appDir, currentUrl, pageStateScript, node);
             }
           }
-          pageStateScript.textContent = JSON.stringify(pageState);
+          pageStateScript.textContent = safeJSONStringify(pageState);
         }
       })
     );

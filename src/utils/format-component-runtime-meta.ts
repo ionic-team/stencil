@@ -1,5 +1,6 @@
 import type * as d from '../declarations';
 import { CMP_FLAGS, LISTENER_FLAGS, MEMBER_FLAGS } from './constants';
+import { safeJSONStringify } from './json';
 
 export const formatLazyBundleRuntimeMeta = (
   bundleId: any,
@@ -46,12 +47,12 @@ export const formatComponentRuntimeMeta = (
   ]);
 };
 
-export const stringifyRuntimeData = (data: any) => {
-  const json = JSON.stringify(data);
+export const stringifyRuntimeData = (data: d.LazyBundleRuntimeData[]): string => {
+  const json = safeJSONStringify(data);
   if (json.length > 10000) {
     // JSON metadata is big, JSON.parse() is faster
     // https://twitter.com/mathias/status/1143551692732030979
-    return `JSON.parse(${JSON.stringify(json)})`;
+    return `JSON.parse(${safeJSONStringify(json)})`;
   }
   return json;
 };

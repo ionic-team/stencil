@@ -1,3 +1,5 @@
+import { safeJSONStringify } from '@utils';
+
 import { MockHeaders } from '../headers';
 import { MockRequest, MockResponse } from '../request-response';
 
@@ -131,7 +133,7 @@ describe('MockResponse', () => {
   });
 
   it('json body', async () => {
-    const response = new MockResponse(JSON.stringify({ data: 88 }));
+    const response = new MockResponse(safeJSONStringify({ data: 88 }));
     expect((await response.json()).data).toBe(88);
   });
 });

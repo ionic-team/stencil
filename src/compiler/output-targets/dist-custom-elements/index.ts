@@ -7,6 +7,7 @@ import {
   isOutputTargetDistCustomElements,
   isString,
   rollupToStencilSourceMap,
+  safeJSONStringify,
 } from '@utils';
 import { join } from 'path';
 import ts from 'typescript';
@@ -159,9 +160,13 @@ export const bundleCustomElements = async (
           if (optimizeResults.sourceMap) {
             sourceMap = optimizeResults.sourceMap;
             code = code + getSourceMappingUrlForEndOfFile(bundle.fileName);
-            await compilerCtx.fs.writeFile(join(outputTargetDir, bundle.fileName + '.map'), JSON.stringify(sourceMap), {
-              outputTargetType: outputTarget.type,
-            });
+            await compilerCtx.fs.writeFile(
+              join(outputTargetDir, bundle.fileName + '.map'),
+              safeJSONStringify(sourceMap),
+              {
+                outputTargetType: outputTarget.type,
+              }
+            );
           }
           await compilerCtx.fs.writeFile(join(outputTargetDir, bundle.fileName), code, {
             outputTargetType: outputTarget.type,

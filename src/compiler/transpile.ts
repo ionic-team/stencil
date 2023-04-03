@@ -6,7 +6,7 @@ import type {
   TranspileOptions,
   TranspileResults,
 } from '@stencil/core/internal';
-import { catchError, getInlineSourceMappingUrlLinker, isString } from '@utils';
+import { catchError, getInlineSourceMappingUrlLinker, isString, safeJSONStringify } from '@utils';
 
 import { getTranspileConfig, getTranspileCssConfig, getTranspileResults } from './config/transpile-options';
 import { transformCssToEsm, transformCssToEsmSync } from './style/css-to-esm';
@@ -112,7 +112,7 @@ const transpileCode = (
 
         const sourceMapComment = results.code.lastIndexOf('//#');
         results.code =
-          results.code.slice(0, sourceMapComment) + getInlineSourceMappingUrlLinker(JSON.stringify(mapObject));
+          results.code.slice(0, sourceMapComment) + getInlineSourceMappingUrlLinker(safeJSONStringify(mapObject));
       } catch (e) {
         console.error(e);
       }

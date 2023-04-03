@@ -1,4 +1,4 @@
-import { dashToPascalCase, isDef, isPromise, toCamelCase, toDashCase } from '../helpers';
+import { dashToPascalCase, isDef, isPromise, omit, toCamelCase, toDashCase } from '../helpers';
 
 describe('util helpers', () => {
   describe('isPromise', () => {
@@ -42,6 +42,18 @@ describe('util helpers', () => {
 
     it('wisconsin => Wisconsin', () => {
       expect(dashToPascalCase('wisconsin')).toBe('Wisconsin');
+    });
+  });
+
+  describe('omit', () => {
+    it('should omit a key', () => {
+      const obj = { a: 1, b: 2, c: 3 };
+      expect(omit(obj, ['a'])).toEqual({ b: 2, c: 3 });
+    });
+
+    it('should omit several keys', () => {
+      const obj = { a: 1, b: 2, c: 3 };
+      expect(omit(obj, ['a', 'b'])).toEqual({ c: 3 });
     });
   });
 

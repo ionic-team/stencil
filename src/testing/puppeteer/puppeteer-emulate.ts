@@ -1,4 +1,5 @@
 import type { E2EProcessEnv, EmulateConfig } from '@stencil/core/internal';
+import { safeJSONStringify } from '@utils';
 import type * as puppeteer from 'puppeteer';
 
 export function setScreenshotEmulateData(userEmulateConfig: EmulateConfig, env: E2EProcessEnv) {
@@ -66,5 +67,5 @@ export function setScreenshotEmulateData(userEmulateConfig: EmulateConfig, env: 
     }
   }
 
-  env.__STENCIL_EMULATE__ = JSON.stringify(screenshotEmulate);
+  env.__STENCIL_EMULATE__ = safeJSONStringify(screenshotEmulate);
 }

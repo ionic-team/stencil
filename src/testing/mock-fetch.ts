@@ -1,3 +1,5 @@
+import { safeJSONStringify } from '@utils';
+
 import { MockHeaders, MockRequestInfo, MockResponse } from '../mock-doc';
 
 const mockedResponses = new Map<string, MockedResponseData>();
@@ -104,7 +106,7 @@ export function mockFetchReset() {
 
 export const mockFetch = {
   json(data: any, url?: string) {
-    const rsp = new MockResponse(JSON.stringify(data, null, 2), {
+    const rsp = new MockResponse(safeJSONStringify(data, null, 2), {
       headers: new MockHeaders({
         'Content-Type': 'application/json',
       }),

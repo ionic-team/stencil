@@ -1,5 +1,5 @@
 import type * as d from '@stencil/core/internal';
-import { normalizePath } from '@utils';
+import { normalizePath, safeJSONStringify } from '@utils';
 import { join, relative } from 'path';
 
 import { ScreenshotConnector } from './connector-base';
@@ -29,7 +29,7 @@ export class ScreenshotLocalConnector extends ScreenshotConnector {
 
     this.sortScreenshots(results.masterBuild.screenshots);
 
-    await writeFile(this.masterBuildFilePath, JSON.stringify(results.masterBuild, null, 2));
+    await writeFile(this.masterBuildFilePath, safeJSONStringify(results.masterBuild, null, 2));
 
     await this.generateJsonpDataUris(results.currentBuild);
 
@@ -78,7 +78,7 @@ export class ScreenshotLocalConnector extends ScreenshotConnector {
   override async updateScreenshotCache(cache: d.ScreenshotCache, buildResults: d.ScreenshotBuildResults) {
     cache = await super.updateScreenshotCache(cache, buildResults);
 
-    await writeFile(this.screenshotCacheFilePath, JSON.stringify(cache, null, 2));
+    await writeFile(this.screenshotCacheFilePath, safeJSONStringify(cache, null, 2));
 
     return cache;
   }
@@ -111,8 +111,8 @@ function createLocalCompareApp(
       app.appSrcUrl = '${appSrcUrl}';
       app.imagesUrl = '${imagesUrl}/';
       app.jsonpUrl = '${jsonpUrl}/';
-      app.a = ${JSON.stringify(a)};
-      app.b = ${JSON.stringify(b)};
+      app.a = ${safeJSONStringify(a)};
+      app.b = ${safeJSONStringify(b)};
       document.body.appendChild(app);
     })();
   </script>

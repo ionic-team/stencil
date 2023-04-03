@@ -164,6 +164,23 @@ export const pluck = (obj: { [key: string]: any }, keys: string[]) => {
   }, {} as { [key: string]: any });
 };
 
+/**
+ * Exclude a list of keys from an object. Returns a new object, does not mutate
+ * the original.
+ *
+ * **NOTE** this does not do any recursion, and accordingly only operates on
+ * top-level properties
+ *
+ * @param obj the object from which to exclude keys
+ * @param keys the list of keys to exclude from the new clone
+ * @returns a new copy of the object, minus the exclude properties.
+ */
+export const omit = <T extends object, K extends Array<keyof T>>(obj: T, keys: K): Omit<T, K[number]> => {
+  const tmp = { ...obj };
+  keys.forEach((k) => delete tmp[k]);
+  return tmp;
+};
+
 const isDefined = (v: any): v is NonNullable<typeof v> => v !== null && v !== undefined;
 export const isBoolean = (v: any): v is boolean => typeof v === 'boolean';
 export const isFunction = (v: any): v is Function => typeof v === 'function';

@@ -1,4 +1,4 @@
-import { noop } from '@utils';
+import { noop, safeJSONStringify } from '@utils';
 import type { Server } from 'http';
 import * as ws from 'ws';
 
@@ -53,7 +53,7 @@ export function createWebSocket(
   return {
     sendToBrowser: (msg: d.DevServerMessage) => {
       if (msg && wsServer && wsServer.clients) {
-        const data = JSON.stringify(msg);
+        const data = safeJSONStringify(msg);
         wsServer.clients.forEach((ws) => {
           if (ws.readyState === ws.OPEN) {
             ws.send(data);

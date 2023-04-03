@@ -1,4 +1,4 @@
-import { buildError, catchError, hasError, isOutputTargetWww, isString } from '@utils';
+import { buildError, catchError, hasError, isOutputTargetWww, isString, safeJSONStringify } from '@utils';
 import { isAbsolute, join } from 'path';
 
 import type * as d from '../../declarations';
@@ -284,5 +284,5 @@ const getComponentPathContent = (componentGraph: { [scopeId: string]: string[] }
   for (const [key, chunks] of entries) {
     object[key] = chunks.map((filename) => join(buildDir, filename));
   }
-  return JSON.stringify(object);
+  return safeJSONStringify(object);
 };

@@ -1,4 +1,4 @@
-import { generatePreamble, isOutputTargetDistLazyLoader, normalizePath, relativeImport } from '@utils';
+import { generatePreamble, isOutputTargetDistLazyLoader, normalizePath, relativeImport, safeJSONStringify } from '@utils';
 import { join, relative } from 'path';
 
 import type * as d from '../../declarations';
@@ -29,7 +29,7 @@ const generateLoader = async (
 
   const es5HtmlElement = await getClientPolyfill(config, compilerCtx, 'es5-html-element.js');
 
-  const packageJsonContent = JSON.stringify(
+  const packageJsonContent = safeJSONStringify(
     {
       name: config.fsNamespace + '-loader',
       private: true,

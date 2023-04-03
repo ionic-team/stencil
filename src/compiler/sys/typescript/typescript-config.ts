@@ -1,4 +1,12 @@
-import { buildError, buildWarn, catchError, isString, loadTypeScriptDiagnostic, normalizePath } from '@utils';
+import {
+  buildError,
+  buildWarn,
+  catchError,
+  isString,
+  loadTypeScriptDiagnostic,
+  normalizePath,
+  safeJSONStringify,
+} from '@utils';
 import { isAbsolute, join, relative } from 'path';
 import ts from 'typescript';
 
@@ -141,7 +149,7 @@ const getTsConfigPath = async (config: d.Config, sys: d.CompilerSystem, init: d.
 };
 
 const createDefaultTsConfig = (config: d.Config) =>
-  JSON.stringify(
+  safeJSONStringify(
     {
       compilerOptions: {
         allowSyntheticDefaultImports: true,

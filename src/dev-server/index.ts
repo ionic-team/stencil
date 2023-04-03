@@ -1,3 +1,4 @@
+import { safeJSONStringify } from '@utils';
 import path from 'path';
 
 import type {
@@ -201,7 +202,7 @@ function startServer(
       } else if (msg.error) {
         serverError(msg);
       } else {
-        logger.debug(`server msg not handled: ${JSON.stringify(msg)}`);
+        logger.debug(`server msg not handled: ${safeJSONStringify(msg)}`);
       }
     } catch (e) {
       logger.error('receiveFromWorker: ' + e);

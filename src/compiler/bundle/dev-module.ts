@@ -1,4 +1,4 @@
-import { generatePreamble } from '@utils';
+import { generatePreamble, safeJSONStringify } from '@utils';
 import { basename, dirname, join, relative } from 'path';
 import { OutputOptions, rollup } from 'rollup';
 
@@ -113,7 +113,7 @@ const bundleDevModule = async (
 
     if (buildCtx.hasError) {
       results.status = 500;
-      results.content = `console.error(${JSON.stringify(buildCtx.diagnostics)})`;
+      results.content = `console.error(${safeJSONStringify(buildCtx.diagnostics)})`;
     } else if (r && r.output && r.output.length > 0) {
       results.content = r.output[0].code;
       results.status = 200;
@@ -121,7 +121,7 @@ const bundleDevModule = async (
   } catch (e) {
     results.status = 500;
     const errorMsg = e instanceof Error ? e.stack : e + '';
-    results.content = `console.error(${JSON.stringify(errorMsg)})`;
+    results.content = `console.error(${safeJSONStringify(errorMsg ?? "")})`;
   }
 };
 

@@ -1,4 +1,4 @@
-import { buildError, catchError, hasError, isString, normalizePath } from '@utils';
+import { buildError, catchError, hasError, isString, normalizePath, safeJSONStringify } from '@utils';
 import { dirname } from 'path';
 import ts from 'typescript';
 
@@ -101,7 +101,7 @@ export const loadConfig = async (init: LoadConfigInit = {}): Promise<LoadConfigR
       results.config.tsCompilerOptions = tsConfigResults.compilerOptions;
 
       results.tsconfig.path = tsConfigResults.path;
-      results.tsconfig.compilerOptions = JSON.parse(JSON.stringify(tsConfigResults.compilerOptions));
+      results.tsconfig.compilerOptions = JSON.parse(safeJSONStringify(tsConfigResults.compilerOptions));
       results.tsconfig.files = tsConfigResults.files;
       results.tsconfig.include = tsConfigResults.include;
       results.tsconfig.exclude = tsConfigResults.exclude;

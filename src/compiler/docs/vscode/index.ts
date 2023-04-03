@@ -1,4 +1,4 @@
-import { isOutputTargetDocsVscode } from '@utils';
+import { isOutputTargetDocsVscode, safeJSONStringify } from '@utils';
 import { join } from 'path';
 
 import type * as d from '../../../declarations';
@@ -53,7 +53,7 @@ export const generateVscodeDocs = async (
       };
 
       // fields in the custom data may have a value of `undefined`. calling `stringify` will remove such fields.
-      const jsonContent = JSON.stringify(json, null, 2);
+      const jsonContent = safeJSONStringify(json, null, 2);
       await compilerCtx.fs.writeFile(outputTarget.file, jsonContent);
     })
   );

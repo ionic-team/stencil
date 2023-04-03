@@ -1,4 +1,4 @@
-import { isString, noop } from '@utils';
+import { isString, noop, safeJSONStringify } from '@utils';
 import fs from 'graceful-fs';
 import { tmpdir } from 'os';
 import path from 'path';
@@ -107,7 +107,7 @@ function getLastCheck() {
 
 function setLastCheck() {
   return new Promise<void>((resolve) => {
-    const now = JSON.stringify(Date.now());
+    const now = safeJSONStringify(Date.now());
     fs.writeFile(getLastCheckStoragePath(), now, () => {
       resolve();
     });

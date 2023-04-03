@@ -1,3 +1,4 @@
+import { safeJSONStringify } from '@utils';
 import ansiColor, { bgRed, blue, bold, cyan, dim, gray, green, magenta, red, yellow } from 'ansi-colors';
 
 import {
@@ -644,7 +645,7 @@ export const wordWrap = (msg: any[], columns: number): string[] => {
 const removeLeadingWhitespace = (orgLines: PrintLine[]): ReadonlyArray<PrintLine> => {
   // The number of times an attempt to strip leading whitespace should occur
   const numberOfTries = 100;
-  const lines: PrintLine[] = JSON.parse(JSON.stringify(orgLines));
+  const lines: PrintLine[] = JSON.parse(safeJSONStringify(orgLines));
 
   for (let i = 0; i < numberOfTries; i++) {
     if (!eachLineHasLeadingWhitespace(lines)) {

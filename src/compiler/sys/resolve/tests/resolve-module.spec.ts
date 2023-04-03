@@ -1,3 +1,5 @@
+import { safeJSONStringify } from '@utils';
+
 import {
   getModuleId,
   getPackageDirPath,
@@ -102,7 +104,7 @@ describe('resolve modules', () => {
 
   describe('setPackageVersionByContent', () => {
     it('set scoped package', () => {
-      const pkgContent = JSON.stringify({
+      const pkgContent = safeJSONStringify({
         name: '@ionic/core',
         version: '1.2.3',
       });
@@ -111,7 +113,7 @@ describe('resolve modules', () => {
     });
 
     it('set package', () => {
-      const pkgContent = JSON.stringify({
+      const pkgContent = safeJSONStringify({
         name: 'lodash',
         version: '1.2.3',
       });

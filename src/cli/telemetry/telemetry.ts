@@ -1,4 +1,5 @@
-import { isOutputTargetHydrate, WWW } from '@utils';
+import { isOutputTargetHydrate, WWW,
+omit, safeJSONStringify } from '@utils';
 
 import { IS_BROWSER_ENV } from '../../compiler/sys/environment';
 import type * as d from '../../declarations';
@@ -33,7 +34,7 @@ export async function telemetryBuildFinishedAction(
 
   await sendMetric(sys, config, 'stencil_cli_command', data);
 
-  config.logger.debug(`${config.logger.blue('Telemetry')}: ${config.logger.gray(JSON.stringify(data))}`);
+  config.logger.debug(`${config.logger.blue('Telemetry')}: ${config.logger.gray(safeJSONStringify(data))}`);
 }
 
 /**
@@ -77,7 +78,7 @@ export async function telemetryAction(
   const data = await prepareData(coreCompiler, config, sys, duration);
 
   await sendMetric(sys, config, 'stencil_cli_command', data);
-  config.logger.debug(`${config.logger.blue('Telemetry')}: ${config.logger.gray(JSON.stringify(data))}`);
+  config.logger.debug(`${config.logger.blue('Telemetry')}: ${config.logger.gray(safeJSONStringify(data))}`);
 
   if (error) {
     throw error;
@@ -132,20 +133,21 @@ export const prepareData = async (
   sys: d.CompilerSystem,
   duration_ms: number | undefined,
   component_count: number | undefined = undefined
-): Promise<d.TrackableData> => {
+): Promise<d.JsonSafe<d.TrackableData>> => {
   const { typescript, rollup } = coreCompiler.versions || { typescript: 'unknown', rollup: 'unknown' };
   const { packages, packagesNoVersions } = await getInstalledPackages(sys, config);
   const targets = getActiveTargets(config);
   const yarn = isUsingYarn(sys);
   const stencil = coreCompiler.version || 'unknown';
   const system = `${sys.name} ${sys.version}`;
-  const os_name = sys.details?.platform;
-  const os_version = sys.details?.release;
-  const cpu_model = sys.details?.cpuModel;
+  const os_name = sys.details?.platform ?? "unknown";
+  const os_version = sys.details?.release ?? "unknown";
+  const cpu_model = sys.details?.cpuModel ?? "unknown";
   const build = coreCompiler.buildId || 'unknown';
   const has_app_pwa_config = hasAppTarget(config);
   const anonymizedConfig = anonymizeConfigForTelemetry(config);
   const is_browser_env = IS_BROWSER_ENV;
+  duration_ms = duration_ms ?? 0;
 
   return {
     arguments: config.flags.args,
@@ -185,7 +187,7 @@ type ConfigStringKeys = keyof {
 const OUTPUT_TARGET_KEYS_TO_KEEP: ReadonlyArray<string> = ['type'];
 
 // top-level config props that we anonymize for telemetry
-const CONFIG_PROPS_TO_ANONYMIZE: ReadonlyArray<ConfigStringKeys> = [
+const CONFIG_PROPS_TO_ANONYMIZE = [
   'rootDir',
   'fsNamespace',
   'packageJsonFilePath',
@@ -196,21 +198,31 @@ const CONFIG_PROPS_TO_ANONYMIZE: ReadonlyArray<ConfigStringKeys> = [
   'cacheDir',
   'configPath',
   'tsconfig',
-];
+] satisfies ReadonlyArray<ConfigStringKeys>;
 
 // Props we delete entirely from the config for telemetry
 //
 // TODO(STENCIL-469): Investigate improving anonymization for tsCompilerOptions and devServer
-const CONFIG_PROPS_TO_DELETE: ReadonlyArray<keyof d.Config> = [
+const CONFIG_PROPS_TO_DELETE = [
   'commonjs',
   'devServer',
   'env',
   'logger',
+  'nodeResolve', // this contains regexes which won't serialize to JSON
   'rollupConfig',
   'sys',
   'testing',
   'tsCompilerOptions',
-];
+  'watchIgnoredRegex', // this contains regexes which won't serialize to JSON
+] satisfies ReadonlyArray<keyof d.Config>;
+
+/**
+ * A Stencil config variant used only for the purposes of telemetry.
+ *
+ * Essentially this is just a normal {@link d.Config} with the keys we're going
+ * to delete for Telemetry purposes deleted.
+ */
+export type TelemetryConfig = Omit<d.Config, (typeof CONFIG_PROPS_TO_DELETE)[number]>;
 
 /**
  * Anonymize the config for telemetry, replacing potentially revealing config props
@@ -220,47 +232,43 @@ const CONFIG_PROPS_TO_DELETE: ReadonlyArray<keyof d.Config> = [
  * @param config the config to anonymize
  * @returns an anonymized copy of the same config
  */
-export const anonymizeConfigForTelemetry = (config: d.ValidatedConfig): d.Config => {
-  const anonymizedConfig: d.Config = { ...config };
+export const anonymizeConfigForTelemetry = (config: d.ValidatedConfig): d.JsonSafe<TelemetryConfig> => {
+  const anonymizedConfig: d.JsonSafe<TelemetryConfig> = {
+    ...omit(config, CONFIG_PROPS_TO_DELETE),
+    outputTargets: config.outputTargets.map((target): d.JsonSafe<d.OutputTarget> => {
+      // Anonymize the outputTargets on our configuration, taking advantage of the
+      // optional 2nd argument to `JSON.stringify`. If anything is not a string
+      // we retain it so that any nested properties are handled, else we check
+      // whether it's in our 'keep' list to decide whether to keep it or replace it
+      // with `"omitted"`.
+      const anonymizedOT = JSON.parse(
+        JSON.stringify(target, (key, value) => {
+          if (!(typeof value === 'string')) {
+            return value;
+          }
+          if (OUTPUT_TARGET_KEYS_TO_KEEP.includes(key)) {
+            return value;
+          }
+          return 'omitted';
+        })
+      );
+
+      // this prop has to be handled separately because it is an array
+      // so the replace function above will be called with all of its
+      // members, giving us `["omitted", "omitted", ...]`.
+      //
+      // Instead, we check for its presence and manually copy over.
+      if (isOutputTargetHydrate(target) && target.external) {
+        anonymizedOT['external'] = target.external.concat();
+      }
+      return anonymizedOT;
+    }),
+  };
 
   for (const prop of CONFIG_PROPS_TO_ANONYMIZE) {
     if (anonymizedConfig[prop] !== undefined) {
       anonymizedConfig[prop] = 'omitted';
     }
-  }
-
-  anonymizedConfig.outputTargets = config.outputTargets.map((target) => {
-    // Anonymize the outputTargets on our configuration, taking advantage of the
-    // optional 2nd argument to `JSON.stringify`. If anything is not a string
-    // we retain it so that any nested properties are handled, else we check
-    // whether it's in our 'keep' list to decide whether to keep it or replace it
-    // with `"omitted"`.
-    const anonymizedOT = JSON.parse(
-      JSON.stringify(target, (key, value) => {
-        if (!(typeof value === 'string')) {
-          return value;
-        }
-        if (OUTPUT_TARGET_KEYS_TO_KEEP.includes(key)) {
-          return value;
-        }
-        return 'omitted';
-      })
-    );
-
-    // this prop has to be handled separately because it is an array
-    // so the replace function above will be called with all of its
-    // members, giving us `["omitted", "omitted", ...]`.
-    //
-    // Instead, we check for its presence and manually copy over.
-    if (isOutputTargetHydrate(target) && target.external) {
-      anonymizedOT['external'] = target.external.concat();
-    }
-    return anonymizedOT;
-  });
-
-  // TODO(STENCIL-469): Investigate improving anonymization for tsCompilerOptions and devServer
-  for (const prop of CONFIG_PROPS_TO_DELETE) {
-    delete anonymizedConfig[prop];
   }
 
   return anonymizedConfig;
@@ -383,11 +391,11 @@ export async function sendMetric(
   sys: d.CompilerSystem,
   config: d.ValidatedConfig,
   name: string,
-  value: d.TrackableData
+  value: d.JsonSafe<d.TrackableData>
 ): Promise<void> {
   const session_id = await getTelemetryToken(sys);
 
-  const message: d.Metric = {
+  const message: d.JsonSafe<d.Metric> = {
     name,
     timestamp: new Date().toISOString(),
     source: 'stencil_cli',
@@ -419,7 +427,11 @@ async function getTelemetryToken(sys: d.CompilerSystem) {
  * @param config The config passed into the Stencil command
  * @param data Data to be tracked
  */
-async function sendTelemetry(sys: d.CompilerSystem, config: d.ValidatedConfig, data: d.Metric): Promise<void> {
+async function sendTelemetry(
+  sys: d.CompilerSystem,
+  config: d.ValidatedConfig,
+  data: d.JsonSafe<d.Metric>
+): Promise<void> {
   try {
     const now = new Date().toISOString();
 
@@ -434,7 +446,7 @@ async function sendTelemetry(sys: d.CompilerSystem, config: d.ValidatedConfig, d
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(body),
+      body: safeJSONStringify(body),
     });
 
     hasVerbose(config.flags) &&

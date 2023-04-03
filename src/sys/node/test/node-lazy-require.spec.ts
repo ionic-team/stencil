@@ -1,11 +1,11 @@
-import { buildError } from '@utils';
+import { buildError, safeJSONStringify } from '@utils';
 import fs from 'graceful-fs';
 
 import { LazyDependencies, NodeLazyRequire } from '../node-lazy-require';
 import { NodeResolveModule } from '../node-resolve-module';
 
 const mockPackageJson = (version: string) =>
-  JSON.stringify({
+  safeJSONStringify({
     version,
   });
 

@@ -7,6 +7,7 @@ import * as environment from '../../../compiler/sys/environment';
 import { createSystem } from '../../../compiler/sys/stencil-sys';
 import type * as d from '../../../declarations';
 import * as shouldTrack from '../shouldTrack';
+import type { TelemetryConfig } from '../telemetry';
 import * as telemetry from '../telemetry';
 import { anonymizeConfigForTelemetry } from '../telemetry';
 
@@ -244,7 +245,7 @@ describe('anonymizeConfigForTelemetry', () => {
     config = mockValidatedConfig({ sys });
   });
 
-  it.each<keyof d.ValidatedConfig>([
+  it.each<keyof TelemetryConfig>([
     'rootDir',
     'fsNamespace',
     'packageJsonFilePath',
@@ -255,7 +256,7 @@ describe('anonymizeConfigForTelemetry', () => {
     'cacheDir',
     'configPath',
     'tsconfig',
-  ])("should anonymize top-level string prop '%s'", (prop: keyof d.ValidatedConfig) => {
+  ])("should anonymize top-level string prop '%s'", (prop: keyof TelemetryConfig) => {
     const anonymizedConfig = anonymizeConfigForTelemetry({
       ...config,
       [prop]: "shouldn't see this!",
