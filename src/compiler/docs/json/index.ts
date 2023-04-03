@@ -28,7 +28,7 @@ export default _default;
   const json = {
     ...docsData,
     components: docsData.components.map((cmp) => ({
-      filePath: cmp.filePath,
+      filePath: cmp.filePath ?? "",
 
       encapsulation: cmp.encapsulation,
       tag: cmp.tag,
@@ -49,7 +49,7 @@ export default _default;
       deprecation: cmp.deprecation,
     })),
   };
-  const jsonContent = safeJSONStringify(json, null, 2);
+  const jsonContent = safeJSONStringify(json, undefined, 2);
   await Promise.all(
     jsonOutputTargets.map((jsonOutput) => {
       return writeDocsOutput(compilerCtx, jsonOutput, jsonContent, typesContent);
