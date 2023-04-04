@@ -21,7 +21,7 @@
   <a href="https://github.com/ionic-team/stencil/blob/main/LICENSE.md">
     <img src="https://img.shields.io/badge/license-MIT-yellow.svg" alt="StencilJS is released under the MIT license." />
   </a>
-  <a href="https://github.com/ionic-team/stencil/blob/main/.github/CONTRIBUTING.md">
+  <a href="https://github.com/ionic-team/stencil/blob/main/CONTRIBUTING.md">
     <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs welcome!" />
   </a>
   <a href="https://twitter.com/stenciljs">
@@ -34,7 +34,7 @@
   <span> · </span>
   <a href="https://stenciljs.com/docs/introduction">Documentation</a>
   <span> · </span>
-  <a href="https://github.com/ionic-team/stencil/blob/main/.github/CONTRIBUTING.md">Contribute</a>
+  <a href="https://github.com/ionic-team/stencil/blob/main/CONTRIBUTING.md">Contribute</a>
   <span> · </span>
   <a href="https://ionicframework.com/blog/tag/stencil/">Blog</a>
   <br />
@@ -90,7 +90,7 @@ In many cases, Stencil can be used as a drop in replacement for traditional fron
 ### Contributing
 
 Thanks for your interest in contributing!
-Please take a moment to read up on our guidelines for [contributing](https://github.com/ionic-team/stencil/blob/main/.github/CONTRIBUTING.md).
+Please take a moment to read up on our guidelines for [contributing](https://github.com/ionic-team/stencil/blob/main/CONTRIBUTING.md).
 Please note that this project is released with a [Contributor Code of Conduct](https://github.com/ionic-team/stencil/blob/main/CODE_OF_CONDUCT.md). By participating in this project you agree to abide by its terms.
 
 ### Thanks
