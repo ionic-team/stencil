@@ -1,7 +1,7 @@
 module.exports = {
   root: true,
   parser: '@typescript-eslint/parser',
-  plugins: ['@typescript-eslint', 'jsdoc', 'jest', 'simple-import-sort'],
+  plugins: ['@typescript-eslint', 'jsdoc', 'jest', 'simple-import-sort', 'import'],
   extends: [
     'plugin:jest/recommended',
     // including prettier here ensures that we don't set any rules which will conflict
@@ -79,6 +79,7 @@ module.exports = {
     'prefer-spread': 'error',
     'simple-import-sort/imports': 'error',
     'simple-import-sort/exports': 'error',
+    'import/no-duplicates': 'error',
   },
   overrides: [
     {
