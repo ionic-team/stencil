@@ -219,6 +219,9 @@ export async function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<st
       {
         title: 'Create Github Release',
         task: () => {
+          if (isDryRun) {
+            return console.log('[dry-run] Create GitHub Release skipped');
+          }
           return postGithubRelease(opts);
         },
       }
