@@ -2,7 +2,7 @@ import color from 'ansi-colors';
 import fs from 'fs-extra';
 import { join } from 'path';
 
-import { promptPrepareRelease, promptRelease } from './prompts';
+import { promptPrepareRelease, promptRelease } from './release-prepare-prompts';
 import { runReleaseTasks } from './release-tasks';
 import { BuildOptions, getOptions } from './utils/options';
 

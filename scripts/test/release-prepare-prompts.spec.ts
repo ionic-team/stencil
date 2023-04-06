@@ -3,7 +3,7 @@ import {
   determineAnsweredVersionToUse,
   PrepareReleasePromptAnswers,
   ReleasePromptAnswers,
-} from '../prompts';
+} from '../release-prepare-prompts';
 
 describe('determineAnsweredVersionToUse', () => {
   it.each<[PrepareReleasePromptAnswers, string]>([

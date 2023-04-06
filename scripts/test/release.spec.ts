@@ -1,8 +1,8 @@
 import fs from 'fs-extra';
 import path from 'path';
 
-import * as Prompts from '../prompts';
 import { release } from '../release';
+import * as Prompts from '../release-prepare-prompts';
 import * as ReleaseTasks from '../release-tasks';
 import * as Options from '../utils/options';
 import { stubPackageData } from './PackageData.stub';
