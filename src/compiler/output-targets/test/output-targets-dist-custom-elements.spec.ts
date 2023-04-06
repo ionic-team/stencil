@@ -6,6 +6,7 @@ import {
   mockModule,
   mockValidatedConfig,
 } from '@stencil/core/testing';
+import { DIST_CUSTOM_ELEMENTS } from '@utils';
 
 import type * as d from '../../../declarations';
 import { OutputTargetDistCustomElements } from '../../../declarations';
@@ -19,7 +20,6 @@ import {
   getBundleOptions,
   outputCustomElements,
 } from '../dist-custom-elements';
-import { DIST_CUSTOM_ELEMENTS } from '../output-utils';
 
 const setup = () => {
   const sys = mockCompilerSystem();

@@ -6,13 +6,13 @@ import {
   mockModule,
   mockValidatedConfig,
 } from '@stencil/core/testing';
+import { DIST_CUSTOM_ELEMENTS } from '@utils';
 import { join, relative } from 'path';
 
 import type * as d from '../../../declarations';
 import { stubComponentCompilerMeta } from '../../types/tests/ComponentCompilerMeta.stub';
 import * as outputCustomElementsMod from '../dist-custom-elements';
 import { generateCustomElementsTypes } from '../dist-custom-elements/custom-elements-types';
-import { DIST_CUSTOM_ELEMENTS } from '../output-utils';
 
 const setup = () => {
   const sys = mockCompilerSystem();

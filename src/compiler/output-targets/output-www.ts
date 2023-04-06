@@ -1,5 +1,5 @@
 import { cloneDocument, serializeNodeToHtml } from '@stencil/core/mock-doc';
-import { catchError, flatOne, unique } from '@utils';
+import { catchError, flatOne, isOutputTargetWww, unique } from '@utils';
 import { join, relative } from 'path';
 
 import type * as d from '../../declarations';
@@ -15,7 +15,6 @@ import { getUsedComponents } from '../html/used-components';
 import { generateHashedCopy } from '../output-targets/copy/hashed-copy';
 import { INDEX_ORG } from '../service-worker/generate-sw';
 import { getScopeId } from '../style/scope-css';
-import { isOutputTargetWww } from './output-utils';
 
 export const outputWww = async (config: d.ValidatedConfig, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   const outputTargets = config.outputTargets.filter(isOutputTargetWww);

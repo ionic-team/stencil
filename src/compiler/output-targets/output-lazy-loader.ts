@@ -1,9 +1,8 @@
-import { generatePreamble, normalizePath } from '@utils';
+import { generatePreamble, isOutputTargetDistLazyLoader, normalizePath, relativeImport } from '@utils';
 import { join, relative } from 'path';
 
 import type * as d from '../../declarations';
 import { getClientPolyfill } from '../app-core/app-polyfills';
-import { isOutputTargetDistLazyLoader, relativeImport } from './output-utils';
 
 export const outputLazyLoader = async (config: d.ValidatedConfig, compilerCtx: d.CompilerCtx) => {
   const outputTargets = config.outputTargets.filter(isOutputTargetDistLazyLoader);
@@ -90,7 +89,7 @@ export interface CustomElementsDefineOptions {
 export declare function defineCustomElements(win?: Window, opts?: CustomElementsDefineOptions): Promise<void>;
 export declare function applyPolyfills(): Promise<void>;
 
-/** 
+/**
  * Used to specify a nonce value that corresponds with an application's CSP.
  * When set, the nonce will be added to all dynamically created script and style tags at runtime.
  * Alternatively, the nonce value can be set on a meta tag in the DOM head

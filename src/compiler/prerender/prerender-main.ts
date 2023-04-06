@@ -1,10 +1,9 @@
-import { buildError, catchError, hasError, isString } from '@utils';
+import { buildError, catchError, hasError, isOutputTargetWww, isString } from '@utils';
 import { isAbsolute, join } from 'path';
 
 import type * as d from '../../declarations';
 import { createHydrateBuildId } from '../../hydrate/runner/render-utils';
 import { getAbsoluteBuildDir } from '../html/html-utils';
-import { isOutputTargetWww } from '../output-targets/output-utils';
 import { createWorkerMainContext } from '../worker/main-thread';
 import { createWorkerContext } from '../worker/worker-thread';
 import { getPrerenderConfig } from './prerender-config';

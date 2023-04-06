@@ -1,7 +1,6 @@
-import { byteSize, sortBy } from '@utils';
+import { byteSize, isOutputTargetStats, sortBy } from '@utils';
 
 import type * as d from '../../declarations';
-import { isOutputTargetStats } from '../output-targets/output-utils';
 
 /**
  * Generates the Build Stats from the buildCtx. Writes any files to the file system.

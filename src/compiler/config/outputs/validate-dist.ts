@@ -1,7 +1,3 @@
-import { isBoolean, isString } from '@utils';
-import { isAbsolute, join, resolve } from 'path';
-
-import type * as d from '../../../declarations';
 import {
   COPY,
   DIST_COLLECTION,
@@ -10,8 +6,13 @@ import {
   DIST_LAZY_LOADER,
   DIST_TYPES,
   getComponentsDtsTypesFilePath,
+  isBoolean,
   isOutputTargetDist,
-} from '../../output-targets/output-utils';
+  isString,
+} from '@utils';
+import { isAbsolute, join, resolve } from 'path';
+
+import type * as d from '../../../declarations';
 import { getAbsolutePath } from '../config-utils';
 import { validateCopy } from '../validate-copy';
 

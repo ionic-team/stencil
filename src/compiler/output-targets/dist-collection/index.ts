@@ -1,11 +1,18 @@
-import { catchError, COLLECTION_MANIFEST_FILE_NAME, flatOne, generatePreamble, normalizePath, sortBy } from '@utils';
+import {
+  catchError,
+  COLLECTION_MANIFEST_FILE_NAME,
+  flatOne,
+  generatePreamble,
+  isOutputTargetDistCollection,
+  normalizePath,
+  sortBy,
+} from '@utils';
 import { join, relative } from 'path';
 import ts from 'typescript';
 
 import type * as d from '../../../declarations';
 import { typescriptVersion, version } from '../../../version';
 import { mapImportsToPathAliases } from '../../transformers/map-imports-to-path-aliases';
-import { isOutputTargetDistCollection } from '../output-utils';
 
 /**
  * Main output target function for `dist-collection`. This function takes the compiled output from a

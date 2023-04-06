@@ -1,13 +1,17 @@
-import { buildJsonFileError, COLLECTION_MANIFEST_FILE_NAME, isGlob, isString, normalizePath } from '@utils';
-import { dirname, join, relative } from 'path';
-
-import type * as d from '../../declarations';
 import {
+  buildJsonFileError,
+  COLLECTION_MANIFEST_FILE_NAME,
   getComponentsDtsTypesFilePath,
+  isGlob,
   isOutputTargetDistCollection,
   isOutputTargetDistCustomElements,
   isOutputTargetDistTypes,
-} from '../output-targets/output-utils';
+  isString,
+  normalizePath,
+} from '@utils';
+import { dirname, join, relative } from 'path';
+
+import type * as d from '../../declarations';
 
 /**
  * Validate the package.json file for a project, checking that various fields

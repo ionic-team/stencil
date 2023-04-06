@@ -1,4 +1,4 @@
-import { catchError, sortBy } from '@utils';
+import { catchError, isOutputTargetDist, isOutputTargetDistLazy, sortBy } from '@utils';
 import MagicString from 'magic-string';
 
 import type * as d from '../../../declarations';
@@ -18,7 +18,6 @@ import { generateModuleGraph } from '../../entries/component-graph';
 import { lazyComponentTransform } from '../../transformers/component-lazy/transform-lazy-component';
 import { removeCollectionImports } from '../../transformers/remove-collection-imports';
 import { updateStencilCoreImports } from '../../transformers/update-stencil-core-import';
-import { isOutputTargetDist, isOutputTargetDistLazy } from '../output-utils';
 import { generateCjs } from './generate-cjs';
 import { generateEsm } from './generate-esm';
 import { generateEsmBrowser } from './generate-esm-browser';

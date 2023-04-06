@@ -1,7 +1,7 @@
+import { DIST_CUSTOM_ELEMENTS } from '@utils';
 import ts from 'typescript';
 
 import type * as d from '../../../declarations';
-import { DIST_CUSTOM_ELEMENTS } from '../../output-targets/output-utils';
 import { addOutputTargetCoreRuntimeApi, RUNTIME_APIS } from '../core-runtime-apis';
 import { addCreateEvents } from '../create-event';
 import { addLegacyProps } from '../legacy-props';

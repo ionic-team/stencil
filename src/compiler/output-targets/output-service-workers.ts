@@ -1,6 +1,7 @@
+import { isOutputTargetWww } from '@utils';
+
 import type * as d from '../../declarations';
 import { generateServiceWorker } from '../service-worker/generate-sw';
-import { isOutputTargetWww } from './output-utils';
 
 /**
  * Entrypoint to creating a service worker for every `www` output target

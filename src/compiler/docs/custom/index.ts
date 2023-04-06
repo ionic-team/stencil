@@ -1,5 +1,6 @@
+import { isOutputTargetDocsCustom } from '@utils';
+
 import type * as d from '../../../declarations';
-import { isOutputTargetDocsCustom } from '../../output-targets/output-utils';
 
 export const generateCustomDocs = async (
   config: d.ValidatedConfig,
