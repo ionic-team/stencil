@@ -3,7 +3,6 @@ import { join } from 'path';
 import type { OutputOptions, RollupBuild } from 'rollup';
 
 import type * as d from '../../../declarations';
-import type { RollupResult } from '../../../declarations';
 import { generateRollupOutput } from '../../app-core/bundle-app-core';
 import { relativeImport } from '../output-utils';
 import { generateLazyModules } from './generate-lazy-module';
@@ -92,7 +91,7 @@ const generateShortcuts = (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   outputTargets: d.OutputTargetDistLazy[],
-  rollupResult: RollupResult[]
+  rollupResult: d.RollupResult[]
 ): Promise<void[]> => {
   const indexFilename = rollupResult.find((r) => r.type === 'chunk' && r.isIndex).fileName;
 

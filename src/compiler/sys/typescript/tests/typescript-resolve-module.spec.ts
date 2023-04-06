@@ -4,8 +4,7 @@ import type * as d from '../../../../declarations';
 import { normalizePath } from '../../../../utils';
 import { createInMemoryFs, InMemoryFileSystem } from '../../../sys/in-memory-fs';
 import { createSystem } from '../../../sys/stencil-sys';
-import { ensureExtension } from '../typescript-resolve-module';
-import { patchedTsResolveModule } from '../typescript-resolve-module';
+import { ensureExtension, patchedTsResolveModule } from '../typescript-resolve-module';
 
 describe('typescript resolve module', () => {
   const config: d.Config = { rootDir: '/some/path' };

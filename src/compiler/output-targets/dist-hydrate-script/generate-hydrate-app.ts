@@ -1,8 +1,7 @@
 import { catchError, createOnWarnFn, generatePreamble, loadRollupDiagnostics } from '@utils';
 import MagicString from 'magic-string';
 import { join } from 'path';
-import { RollupOptions } from 'rollup';
-import { rollup } from 'rollup';
+import { rollup, RollupOptions } from 'rollup';
 
 import type * as d from '../../../declarations';
 import { getBuildFeatures, updateBuildConditionals } from '../../app-core/app-data';

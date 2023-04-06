@@ -2,8 +2,7 @@ import { isString } from '@utils';
 
 import type * as d from '../../../declarations';
 import { InMemoryFileSystem } from '../in-memory-fs';
-import { known404Urls } from './fetch-utils';
-import { skipFilePathFetch, skipUrlFetch } from './fetch-utils';
+import { known404Urls, skipFilePathFetch, skipUrlFetch } from './fetch-utils';
 import { writeFetchSuccessSync } from './write-fetch-success';
 
 export const fetchModuleSync = (

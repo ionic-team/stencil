@@ -1,7 +1,7 @@
 module.exports = {
   root: true,
   parser: '@typescript-eslint/parser',
-  plugins: ['@typescript-eslint', 'jsdoc', 'jest', 'simple-import-sort'],
+  plugins: ['@typescript-eslint', 'import', 'jest', 'jsdoc', 'simple-import-sort'],
   extends: [
     'plugin:jest/recommended',
     // including prettier here ensures that we don't set any rules which will conflict
@@ -18,6 +18,7 @@ module.exports = {
         varsIgnorePattern: '^(h|Fragment)$',
       },
     ],
+    'import/no-duplicates': 'error',
     /**
      * Configuration for Jest rules can be found here:
      * https://github.com/jest-community/eslint-plugin-jest/tree/main/docs/rules
@@ -71,14 +72,14 @@ module.exports = {
     'jsdoc/require-returns-check': ['error'],
     'jsdoc/require-returns-description': ['error'],
     // rely on TypeScript types to be the source of truth, minimize verbosity in comments
-    'jsdoc/require-returns-type': ['off'],
     'jsdoc/require-returns': ['error'],
-    'prefer-const': 'error',
+    'jsdoc/require-returns-type': ['off'],
     'no-var': 'error',
+    'prefer-const': 'error',
     'prefer-rest-params': 'error',
     'prefer-spread': 'error',
-    'simple-import-sort/imports': 'error',
     'simple-import-sort/exports': 'error',
+    'simple-import-sort/imports': 'error',
   },
   overrides: [
     {
