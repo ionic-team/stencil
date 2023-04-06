@@ -199,7 +199,7 @@ describe('release()', () => {
       });
 
       await expect(release(rootDir, [publishFlag])).rejects.toThrow(
-        'Prepare release data and package.json versions do not match. Try re-running release prepare.'
+        'Prepare release data (0.1.1) and package.json (0.1.0) versions do not match. Try re-running release prepare.'
       );
     });
 
