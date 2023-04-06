@@ -215,17 +215,14 @@ export async function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<st
           }
           return execa(cmd, cmdArgs, { cwd: rootDir });
         },
+      },
+      {
+        title: 'Create Github Release',
+        task: () => {
+          return postGithubRelease(opts);
+        },
       }
     );
-  }
-
-  if (opts.isPublishRelease) {
-    tasks.push({
-      title: 'Create Github Release',
-      task: () => {
-        return postGithubRelease(opts);
-      },
-    });
   }
 
   const listr = new Listr(tasks);
