@@ -2,7 +2,8 @@ import fs from 'fs-extra';
 import path from 'path';
 
 import { release } from '../release';
-import * as Prompts from '../release-prepare-prompts';
+import * as PreparePrompts from '../release-prepare-prompts';
+import * as ReleasePrompts from '../release-prompts';
 import * as ReleaseTasks from '../release-tasks';
 import * as Options from '../utils/options';
 import { stubPackageData } from './PackageData.stub';
@@ -45,8 +46,8 @@ describe('release()', () => {
     let emptyDirSpy: jest.SpyInstance<ReturnType<typeof fs.emptyDir>, Parameters<typeof fs.emptyDir>>;
     let writeJsonSyncSpy: jest.SpyInstance<ReturnType<typeof fs.writeJsonSync>, Parameters<typeof fs.writeJsonSync>>;
     let promptPrepareReleaseSpy: jest.SpyInstance<
-      ReturnType<typeof Prompts.promptPrepareRelease>,
-      Parameters<typeof Prompts.promptPrepareRelease>
+      ReturnType<typeof PreparePrompts.promptPrepareRelease>,
+      Parameters<typeof PreparePrompts.promptPrepareRelease>
     >;
 
     beforeEach(() => {
@@ -56,7 +57,7 @@ describe('release()', () => {
       writeJsonSyncSpy = jest.spyOn(fs, 'writeJsonSync');
       writeJsonSyncSpy.mockReturnValue();
 
-      promptPrepareReleaseSpy = jest.spyOn(Prompts, 'promptPrepareRelease');
+      promptPrepareReleaseSpy = jest.spyOn(PreparePrompts, 'promptPrepareRelease');
       promptPrepareReleaseSpy.mockResolvedValue({
         confirm: true,
         versionToUse: '0.0.1',
@@ -124,8 +125,8 @@ describe('release()', () => {
     // `BuildOptions`, we run into type errors when instantiating it
     let readJsonSyncSpy: jest.SpyInstance<any, Parameters<typeof fs.readJson>>;
     let promptReleaseSpy: jest.SpyInstance<
-      ReturnType<typeof Prompts.promptRelease>,
-      Parameters<typeof Prompts.promptRelease>
+      ReturnType<typeof ReleasePrompts.promptRelease>,
+      Parameters<typeof ReleasePrompts.promptRelease>
     >;
 
     beforeEach(() => {
@@ -144,7 +145,7 @@ describe('release()', () => {
         isCI: false,
       });
 
-      promptReleaseSpy = jest.spyOn(Prompts, 'promptRelease');
+      promptReleaseSpy = jest.spyOn(ReleasePrompts, 'promptRelease');
       promptReleaseSpy.mockResolvedValue({
         confirm: true,
         npmTag: 'testing',
