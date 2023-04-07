@@ -58,7 +58,14 @@ export function proxyHostElement(elm: d.HostElement, cmpMeta: d.ComponentRuntime
         Object.defineProperty(elm, memberName, {
           value(this: d.HostElement, ...args: any[]) {
             const ref = getHostRef(this);
-            return ref.$onInstancePromise$.then(() => ref.$lazyInstance$[memberName](...args)).catch(consoleError);
+            if (!ref) throw 'no hostRef found';
+
+            return ref.$onInstancePromise$
+              .then(() => {
+                if (!ref.$lazyInstance$) throw 'no $lazyInstance on hostRef';
+                ref.$lazyInstance$[memberName](...args);
+              })
+              .catch((e) => consoleError(e, elm));
           },
         });
       }
@@ -67,7 +74,7 @@ export function proxyHostElement(elm: d.HostElement, cmpMeta: d.ComponentRuntime
 }
 
 function componentOnReady(this: d.HostElement) {
-  return getHostRef(this).$onReadyPromise$;
+  return getHostRef(this)?.$onReadyPromise$;
 }
 
 function forceUpdate(this: d.HostElement) {
