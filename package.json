@@ -106,7 +106,7 @@
     "magic-string": "^0.30.0",
     "merge-source-map": "^1.1.0",
     "mime-db": "^1.46.0",
-    "minimatch": "5.1.2",
+    "minimatch": "8.0.3",
     "node-fetch": "3.3.1",
     "open": "^9.0.0",
     "open-in-editor": "2.2.0",
