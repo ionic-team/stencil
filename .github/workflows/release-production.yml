@@ -34,4 +34,3 @@ jobs:
           echo "Version: ${{ inputs.version }}"
           echo "Tag: ${{ inputs.tag }}"
         shell: bash
-
