@@ -1,4 +1,5 @@
 import type { CompilerSystem, Logger } from '../declarations';
+import { ConfigFlags } from './config-flags';
 import type { CoreCompiler } from './load-compiler';
 
 /**
@@ -7,11 +8,12 @@ import type { CoreCompiler } from './load-compiler';
  * @param sys the compiler system instance that provides details about the system Stencil is running on
  * @param logger the logger instance to use to log information out to
  */
-export const taskInfo = (coreCompiler: CoreCompiler, sys: CompilerSystem, logger: Logger): void => {
+export const taskInfo = (coreCompiler: CoreCompiler, sys: CompilerSystem, logger: Logger, flags: ConfigFlags): void => {
   const details = sys.details;
   const versions = coreCompiler.versions;
 
   console.log(``);
+  console.log(`${logger.cyan(`    Log Level:`)} ${logger.getLevel()}`);
   console.log(`${logger.cyan('      System:')} ${sys.name} ${sys.version}`);
   console.log(`${logger.cyan('    Platform:')} ${details.platform} (${details.release})`);
   console.log(
@@ -27,5 +29,6 @@ export const taskInfo = (coreCompiler: CoreCompiler, sys: CompilerSystem, logger
   console.log(`${logger.cyan('      Parse5:')} ${versions.parse5}`);
   console.log(`${logger.cyan('      Sizzle:')} ${versions.sizzle}`);
   console.log(`${logger.cyan('      Terser:')} ${versions.terser}`);
+  console.log(`${logger.cyan('      Log Level:')} ${logger.getLevel()}${flags.verbose ? ' (--verbose)' : ''}`);
   console.log(``);
 };

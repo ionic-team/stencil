@@ -26,6 +26,7 @@ export const taskHelp = async (flags: ConfigFlags, logger: d.Logger, sys: d.Comp
       ${logger.cyan('--stats')} ${logger.dim('...........')} Write stencil-stats.json file
       ${logger.cyan('--log')} ${logger.dim('.............')} Write stencil-build.log file
       ${logger.cyan('--debug')} ${logger.dim('...........')} Set the log level to debug
+      ${logger.cyan('--verbose')} ${logger.dim('...........')} Log additional build info to STDOUT
 
 
   ${logger.bold('Test:')} ${logger.dim('Run unit and end-to-end tests.')}
@@ -49,9 +50,10 @@ export const taskHelp = async (flags: ConfigFlags, logger: d.Logger, sys: d.Comp
 
   ${prompt} ${logger.green('stencil build --dev --watch --serve')}
   ${prompt} ${logger.green('stencil build --prerender')}
+  ${prompt} ${logger.green('stencil build --prerender --verbose')}
   ${prompt} ${logger.green('stencil test --spec --e2e')}
   ${prompt} ${logger.green('stencil telemetry on')}
   ${prompt} ${logger.green('stencil generate')}
   ${prompt} ${logger.green('stencil g my-component')}
-`);
+    `);
 };
