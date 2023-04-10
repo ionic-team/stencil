@@ -59,7 +59,7 @@ describe('release()', () => {
       promptPrepareReleaseSpy = jest.spyOn(Prompts, 'promptPrepareRelease');
       promptPrepareReleaseSpy.mockResolvedValue({
         confirm: true,
-        version: '0.0.1',
+        versionToUse: '0.0.1',
       });
     });
 
@@ -91,7 +91,7 @@ describe('release()', () => {
     it('returns early when confirm is falsy', async () => {
       promptPrepareReleaseSpy.mockResolvedValue({
         confirm: false,
-        version: '0.0.1',
+        versionToUse: '0.0.1',
       });
 
       await release(rootDir, [prepareFlag]);
@@ -107,23 +107,6 @@ describe('release()', () => {
         {
           packageJson: stubPackageData(),
           version: '0.0.1',
-        },
-        [prepareFlag]
-      );
-    });
-
-    it('invokes runReleaseTasks with a specified version when version is not set', async () => {
-      promptPrepareReleaseSpy.mockResolvedValue({
-        confirm: true,
-        specifiedVersion: '0.0.2',
-      });
-
-      await release(rootDir, [prepareFlag]);
-      expect(runReleaseTasksSpy).toHaveBeenCalledTimes(1);
-      expect(runReleaseTasksSpy).toHaveBeenCalledWith(
-        {
-          packageJson: stubPackageData(),
-          version: '0.0.2',
         },
         [prepareFlag]
       );
@@ -164,8 +147,8 @@ describe('release()', () => {
       promptReleaseSpy = jest.spyOn(Prompts, 'promptRelease');
       promptReleaseSpy.mockResolvedValue({
         confirm: true,
-        tag: 'testing',
-        // six characters long (correct length), but a very fake OTP
+        npmTag: 'testing',
+        // six characters long (i.e. correct length), but a very fake OTP
         otp: 'abcOtp',
       });
     });
@@ -197,8 +180,8 @@ describe('release()', () => {
     it('returns early when confirm is falsy', async () => {
       promptReleaseSpy.mockResolvedValue({
         confirm: false,
-        tag: 'testing',
-        // six characters long (correct length), but a very fake OTP
+        npmTag: 'testing',
+        // six characters long (i.e. correct length), but a very fake OTP
         otp: 'abcOtp',
       });
 
@@ -216,7 +199,7 @@ describe('release()', () => {
       });
 
       await expect(release(rootDir, [publishFlag])).rejects.toThrow(
-        'Prepare release data and package.json versions do not match. Try re-running release prepare.'
+        'Prepare release data (0.1.1) and package.json (0.1.0) versions do not match. Try re-running release prepare.'
       );
     });
 
@@ -225,9 +208,11 @@ describe('release()', () => {
       expect(runReleaseTasksSpy).toHaveBeenCalledTimes(1);
       expect(runReleaseTasksSpy).toHaveBeenCalledWith(
         {
+          otp: 'abcOtp',
           packageJson: stubPackageData({
             version: '0.1.0',
           }),
+          tag: 'testing',
           version: '0.1.0',
         },
         [publishFlag]
