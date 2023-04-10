@@ -1,5 +1,6 @@
 import { NODE_TYPES } from '../constants';
-import { createFragment, MockDocument } from '../document';
+import { createFragment } from '../document';
+import { MockDocument } from '../document';
 import { MockDOMMatrix, MockDOMPoint, MockSVGRect, MockSVGSVGElement, MockSVGTextContentElement } from '../element';
 import { parseHtmlToDocument, parseHtmlToFragment } from '../parse-html';
 
