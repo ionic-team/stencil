@@ -2,13 +2,15 @@ import { determineAnsweredTagToUse, ReleasePromptAnswers } from '../release-prom
 
 describe('determineAnsweredTagToUse', () => {
   it.each<[ReleasePromptAnswers, string]>([
-    [{ tag: '1.0.0', specifiedTag: '2.0.0', confirm: true, otp: '' }, '1.0.0'],
+    [{ tag: '1.0.0', specifiedTag: '2.0.0', confirm: true, otp: '' }, '2.0.0'],
     [{ tag: '1.0.0', confirm: true, otp: '' }, '1.0.0'],
     [{ specifiedTag: '2.0.0', confirm: true, otp: '' }, '2.0.0'],
-    [{ tag: '', specifiedTag: '', confirm: true, otp: '' }, 'UNKNOWN'],
-    [{ tag: '', confirm: true, otp: '' }, 'UNKNOWN'],
-    [{ specifiedTag: '', confirm: true, otp: '' }, 'UNKNOWN'],
-    [{ confirm: true, otp: '' }, 'UNKNOWN'],
+    [{ tag: undefined, specifiedTag: '2.0.0', confirm: true, otp: '' }, '2.0.0'],
+    [{ tag: null, specifiedTag: '2.0.0', confirm: true, otp: '' }, '2.0.0'],
+    [{ tag: '', specifiedTag: '', confirm: true, otp: '' }, null],
+    [{ tag: '', confirm: true, otp: '' }, null],
+    [{ specifiedTag: '', confirm: true, otp: '' }, null],
+    [{ confirm: true, otp: '' }, null],
   ])('%s returns "%s"', (answers, expected) => {
     expect(determineAnsweredTagToUse(answers)).toBe(expected);
   });
