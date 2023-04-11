@@ -117,13 +117,8 @@ const dispatchHooks = (hostRef: d.HostRef, isInitialLoad: boolean): Promise<void
  * @param fn a function to enqueue
  * @returns either a `Promise` or the return value of the provided function
  */
-function enqueue(maybePromise: Promise<void> | undefined, fn: () => Promise<void>): Promise<void> | undefined {
-  if (maybePromise instanceof Promise) {
-    return maybePromise.then(fn);
-  } else {
-    return fn();
-  }
-}
+const enqueue = (maybePromise: Promise<void> | undefined, fn: () => Promise<void>): Promise<void> | undefined =>
+  maybePromise instanceof Promise ? maybePromise.then(fn) : fn();
 
 const updateComponent = async (hostRef: d.HostRef, instance: any, isInitialLoad: boolean) => {
   const elm = hostRef.$hostElement$ as d.RenderNode;
