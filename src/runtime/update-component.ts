@@ -47,9 +47,9 @@ const dispatchHooks = (hostRef: d.HostRef, isInitialLoad: boolean): Promise<void
   const endSchedule = createTime('scheduleUpdate', hostRef.$cmpMeta$.$tagName$);
   const instance = BUILD.lazyLoad ? hostRef.$lazyInstance$ : elm;
 
-  // We're going to use this variable together with {@link enqueue} to implement a
+  // We're going to use this variable together with `enqueue` to implement a
   // little promise-based queue. We start out with it `undefined`. When we add
-  // the first function to the queue we'll set the this variable to be that
+  // the first function to the queue we'll set this variable to be that
   // function's return value. When we attempt to add subsequent values to the
   // queue we'll check that value and, if it was a `Promise`, we'll then chain
   // the new function off of that `Promise` using `.then()`. This will give our
