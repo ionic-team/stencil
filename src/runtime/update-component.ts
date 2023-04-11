@@ -106,12 +106,12 @@ const dispatchHooks = (hostRef: d.HostRef, isInitialLoad: boolean): Promise<void
  * of functions to be called.
  *
  * The queue is ordered on the basis of the first argument. If it's
- * `undefined`, then nothing is on the queue yet, so the provided funcion can be
- * called synchronously (although note that this function may return a `Promise`).
- * The idea is that then the return value of that enqueueing operation is kept
- * around, so that if it was a `Promise` then subsequent functions can be
- * enqueued by calling this function again with that `Promise` as the first
- * argument.
+ * `undefined`, then nothing is on the queue yet, so the provided function can
+ * be called synchronously (although note that this function may return a
+ * `Promise`). The idea is that then the return value of that enqueueing
+ * operation is kept around, so that if it was a `Promise` then subsequent
+ * functions can be enqueued by calling this function again with that `Promise`
+ * as the first argument.
  *
  * @param maybePromise either a `Promise` which should resolve before the next function is called or an 'empty' sentinel
  * @param fn a function to enqueue
