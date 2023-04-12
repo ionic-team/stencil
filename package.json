@@ -39,7 +39,7 @@
     "rollup.watch": "rollup --watch --config",
     "start": "npm run watch",
     "test": "jest --coverage",
-    "test.analysis": "cd test && npm run analysis.build-and-analyze",
+    "test.analysis": "cd test && npm i && npm run analysis.build-and-analyze",
     "test.bundlers": "cd test && npm run bundlers",
     "test.dist": "node scripts/build --validate-build",
     "test.end-to-end": "cd test/end-to-end && npm ci && npm test && npm run test.dist",
