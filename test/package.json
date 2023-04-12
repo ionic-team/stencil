@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "TODO-STENCIL-389": "echo Remove the exit call below",
-    "analysis": "exit 0 && node ./.scripts/analysis.js",
+    "analysis": "node ./.scripts/analysis.js",
     "analysis.build-and-analyze": "npm run build && npm run analysis",
     "build": "npm run build.browser-compile && npm run build.hello-world && npm run build.hello-vdom && npm run build.todo && npm run build.end-to-end && npm run build.ionic",
     "bundlers": "cd ./bundler && npm run start",

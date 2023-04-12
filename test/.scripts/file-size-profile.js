@@ -29,9 +29,13 @@ module.exports = function fileSizeProfile(appName, buildDir, output) {
     .filter((f) => f !== 'swiper');
 
   buildFiles.forEach((buildFile) => {
-    const o = getBuildFileSize(path.join(buildDir, buildFile));
-    if (o) {
-      output.push(o);
+    const entryPath = path.join(buildDir, buildFile);
+
+    if (!fs.statSync(entryPath).isDirectory()) {
+      const o = getBuildFileSize(path.join(buildDir, buildFile));
+      if (o) {
+        output.push(o);
+      }
     }
   });
 
