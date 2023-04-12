@@ -122,6 +122,6 @@ function roundToTensPlace(bytes) {
   if (tensPlace <= 5) {
     return bytes - tensPlace;
   } else {
-    return (bytes - tensPlace) + 10;
+    return bytes - tensPlace + 10;
   }
 }
