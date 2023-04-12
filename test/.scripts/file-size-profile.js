@@ -103,7 +103,25 @@ function getFileSize(bytes) {
     return '-';
   }
   if (bytes < 1024) {
-    return `${bytes}B`;
+    return `${roundToTensPlace(bytes)}B`;
   }
   return `${(bytes / 1024).toFixed(1)}KB`;
+}
+
+function roundToTensPlace(bytes) {
+  if (bytes <= 5) {
+    return '-';
+  }
+
+  if (bytes <= 10) {
+    return 10;
+  }
+
+  let tensPlace = bytes % 10;
+
+  if (tensPlace <= 5) {
+    return bytes - tensPlace;
+  } else {
+    return (bytes - tensPlace) + 10;
+  }
 }
