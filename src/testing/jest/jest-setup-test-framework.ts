@@ -7,7 +7,7 @@ import {
   setErrorHandler,
   stopAutoApplyChanges,
 } from '@stencil/core/internal/testing';
-import { setupGlobal, teardownGlobal } from '@stencil/core/mock-doc';
+import { MockDocument, MockNode, MockWindow, setupGlobal, teardownGlobal } from '@stencil/core/mock-doc';
 
 import { expectExtend } from '../matchers';
 import { setupMockFetch } from '../mock-fetch';
@@ -40,6 +40,20 @@ export function jestSetupTestFramework() {
     }
     stopAutoApplyChanges();
 
+    // Remove each node from the mocked DOM
+    // Without this step, a component's `disconnectedCallback`
+    // will not be called since this only happens when a node is removed,
+    // not if the window is destroyed.
+    //
+    // So, we do this outside the mocked window/DOM teardown
+    // because this operation is really only necessary in the testing
+    // context so any "cleanup" operations in the `disconnectedCallback`
+    // can happen to prevent testing errors with async code in the component
+    //
+    // We only care about removing all the nodes that are children of the `html` tag/node
+    // That will always be the second child of the document since the first is the `!DOCTYPE` node
+    removeDomNodes((((global as any).window as MockWindow).document as unknown as MockDocument).childNodes[1]);
+
     teardownGlobal(global);
     global.Context = {};
     global.resourcesUrl = '/build';
@@ -71,4 +85,18 @@ export function jestSetupTestFramework() {
     const stencilEnv = JSON.parse(env.__STENCIL_ENV__);
     Object.assign(Env, stencilEnv);
   }
+}
+
+/**
+ * Recursively removes all child nodes of a passed node starting with the
+ * furthest descendant and then moving back up the DOM tree.
+ *
+ * @param node The mocked DOM node that will be removed from the DOM
+ */
+function removeDomNodes(node: MockNode) {
+  if (!node.childNodes?.length) {
+    node.remove();
+  }
+
+  node.childNodes?.forEach(removeDomNodes);
 }
