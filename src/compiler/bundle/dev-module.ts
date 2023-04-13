@@ -121,7 +121,7 @@ const bundleDevModule = async (
   } catch (e) {
     results.status = 500;
     const errorMsg = e instanceof Error ? e.stack : e + '';
-    results.content = `console.error(${safeJSONStringify(errorMsg ?? "")})`;
+    results.content = `console.error(${safeJSONStringify(errorMsg ?? '')})`;
   }
 };
 

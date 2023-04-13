@@ -5,8 +5,8 @@ import {
   generatePreamble,
   isOutputTargetDistCollection,
   normalizePath,
-  sortBy,
   safeJSONStringify,
+  sortBy,
 } from '@utils';
 import { join, relative } from 'path';
 import ts from 'typescript';

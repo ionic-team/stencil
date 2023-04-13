@@ -1,4 +1,10 @@
-import { generatePreamble, isOutputTargetDistLazyLoader, normalizePath, relativeImport, safeJSONStringify } from '@utils';
+import {
+  generatePreamble,
+  isOutputTargetDistLazyLoader,
+  normalizePath,
+  relativeImport,
+  safeJSONStringify,
+} from '@utils';
 import { join, relative } from 'path';
 
 import type * as d from '../../declarations';

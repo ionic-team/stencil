@@ -1,5 +1,5 @@
 import { cloneDocument, serializeNodeToHtml } from '@stencil/core/mock-doc';
-import { catchError, flatOne, isOutputTargetWww, unique, safeJSONStringify } from '@utils';
+import { catchError, flatOne, isOutputTargetWww, safeJSONStringify, unique } from '@utils';
 import { join, relative } from 'path';
 
 import type * as d from '../../declarations';

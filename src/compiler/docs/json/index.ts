@@ -28,7 +28,7 @@ export default _default;
   const json = {
     ...docsData,
     components: docsData.components.map((cmp) => ({
-      filePath: cmp.filePath ?? "",
+      filePath: cmp.filePath ?? '',
 
       encapsulation: cmp.encapsulation,
       tag: cmp.tag,

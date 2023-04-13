@@ -1,5 +1,4 @@
-import { isOutputTargetHydrate, WWW,
-omit, safeJSONStringify } from '@utils';
+import { isOutputTargetHydrate, omit, safeJSONStringify, WWW } from '@utils';
 
 import { IS_BROWSER_ENV } from '../../compiler/sys/environment';
 import type * as d from '../../declarations';
@@ -140,9 +139,9 @@ export const prepareData = async (
   const yarn = isUsingYarn(sys);
   const stencil = coreCompiler.version || 'unknown';
   const system = `${sys.name} ${sys.version}`;
-  const os_name = sys.details?.platform ?? "unknown";
-  const os_version = sys.details?.release ?? "unknown";
-  const cpu_model = sys.details?.cpuModel ?? "unknown";
+  const os_name = sys.details?.platform ?? 'unknown';
+  const os_version = sys.details?.release ?? 'unknown';
+  const cpu_model = sys.details?.cpuModel ?? 'unknown';
   const build = coreCompiler.buildId || 'unknown';
   const has_app_pwa_config = hasAppTarget(config);
   const anonymizedConfig = anonymizeConfigForTelemetry(config);

@@ -1,4 +1,10 @@
-import { getComponentsFromModules, isOutputTargetDistTypes, loadTypeScriptDiagnostics, normalizePath, safeJSONStringify } from '@utils';
+import {
+  getComponentsFromModules,
+  isOutputTargetDistTypes,
+  loadTypeScriptDiagnostics,
+  normalizePath,
+  safeJSONStringify,
+} from '@utils';
 import { basename, join, relative } from 'path';
 import ts from 'typescript';
 
