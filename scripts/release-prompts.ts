@@ -147,5 +147,5 @@ export async function promptRelease(opts: BuildOptions): Promise<NormalizedRelea
  * @returns the tag to use. defaults to `null` if no tag was specified
  */
 export function determineAnsweredTagToUse(answers: ReleasePromptAnswers): string | null {
-  return answers.specifiedTag ? answers.specifiedTag : answers.tag ? answers.tag : null;
+  return answers.specifiedTag || answers.tag || null;
 }
