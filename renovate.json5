@@ -58,7 +58,7 @@
     },
     // TODO(STENCIL-716): remove this once Stencil drops support for Node 14
     {
-      matchPackageNames: ['@types/fs-extra'],
+      matchPackageNames: ['glob'],
       allowedVersions: '<9.0.0',
     },
   ],
