@@ -1,5 +1,17 @@
 {
-  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  $schema: 'https://docs.renovatebot.com/renovate-schema.json',
   // Documentation: https://docs.renovatebot.com/configuration-options
-  "schedule": ["every weekday at 7am"], // UTC
+  schedule: ['every weekday at 7am'], // UTC
+  /**
+   * Renovate will evaluate all packageRules and not stop once it gets a first match. You should order your
+   * packageRules in ascending order of importance so that more important rules come later and can override settings
+   * from earlier rules if needed.
+   */
+  packageRules: [
+    {
+      // TODO(STENCIL-AAA): Increment this value after upgrading TypeScript
+      matchPackageNames: ['typescript'],
+      allowedVersions: '<5.0',
+    },
+  ],
 }
