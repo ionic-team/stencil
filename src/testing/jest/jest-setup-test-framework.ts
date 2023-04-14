@@ -50,9 +50,11 @@ export function jestSetupTestFramework() {
     // context so any "cleanup" operations in the `disconnectedCallback`
     // can happen to prevent testing errors with async code in the component
     //
-    // We only care about removing all the nodes that are children of the `html` tag/node
-    // That will always be the second child of the document since the first is the `!DOCTYPE` node
-    removeDomNodes((((global as any).window as MockWindow).document as unknown as MockDocument).childNodes[1]);
+    // We only care about removing all the nodes that are children of the 'body' tag/node
+    const bodyNode = (
+      ((global as any).window as MockWindow).document as unknown as MockDocument
+    ).childNodes[1].childNodes.find((ref) => ref.nodeName === 'BODY');
+    bodyNode.childNodes?.forEach(removeDomNodes);
 
     teardownGlobal(global);
     global.Context = {};
