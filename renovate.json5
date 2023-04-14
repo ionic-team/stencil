@@ -26,27 +26,27 @@
         "@types/fs-extra",
         "glob"
       ],
-      "allowedVersions": {
-        "@types/node": "<19",
-        "typescript": "<4.10 || >=5.0",
-        "dts-bundle-generator": "<8",
-        "@types/jest": "<28",
-        "jest": "<28",
-        "jest-cli": "<28",
-        "jest-environment-node": "<28",
-        "inquirer": "<=7.3.3",
-        "@types/inquirer": "<=7.3.1",
-        "@types/fs-extra": "<10",
-        "glob": "<9"
-      }
+//      "allowedVersions": {
+//        "@types/node": "<19",
+//        "typescript": "<4.10 || >=5.0",
+//        "dts-bundle-generator": "<8",
+//        "@types/jest": "<28",
+//        "jest": "<28",
+//        "jest-cli": "<28",
+//        "jest-environment-node": "<28",
+//        "inquirer": "<=7.3.3",
+//        "@types/inquirer": "<=7.3.1",
+//        "@types/fs-extra": "<10",
+//        "glob": "<9"
+//      }
     },
     {
       "matchPaths": ["./test/bundler"],
       "matchManagers": ["npm"],
       "excludePackageNames": ["@types/node"],
-      "allowedVersions": {
-        "@types/node": "<17 || >=18"
-      }
+//      "allowedVersions": {
+//        "@types/node": "<17 || >=18"
+//      }
     },
     {
       "matchManagers": ["github-actions"],
@@ -56,9 +56,9 @@
       "matchPaths": ["./.github/workflows/actions/auto-request-reviews"],
       "matchManagers": ["npm"],
       "excludePackageNames": ["typescript"],
-      "allowedVersions": {
-        "typescript": "<4.10 || >=5.0"
-      }
+//      "allowedVersions": {
+//        "typescript": "<4.10 || >=5.0"
+//      }
     },
     {
       "packagePatterns": ["*jest*"],
