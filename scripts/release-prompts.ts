@@ -106,7 +106,7 @@ export async function promptRelease(opts: BuildOptions): Promise<NormalizedRelea
       name: 'confirm',
       message: (answers: any) => {
         const tagToUse = determineAnsweredTagToUse(answers);
-        const tagPart = ` and tag this release in npm as ${color.yellow(tagToUse)}`;
+        const tagPart = tagToUse ? ` and tag this release in npm as ${color.yellow(tagToUse)}` : '';
         return `Will publish ${opts.vermoji}  ${color.yellow(opts.version)}${tagPart}. Continue?`;
       },
     },
@@ -144,8 +144,8 @@ export async function promptRelease(opts: BuildOptions): Promise<NormalizedRelea
  * answers is to be used.
  *
  * @param answers user provided answers to pick from
- * @returns the tag to use. defaults to 'UNKNOWN' if the tag cannot be determined.
+ * @returns the tag to use. defaults to `null` if no tag was specified
  */
-export function determineAnsweredTagToUse(answers: ReleasePromptAnswers): string {
-  return answers.tag ? answers.tag : answers.specifiedTag ? answers.specifiedTag : 'UNKNOWN';
+export function determineAnsweredTagToUse(answers: ReleasePromptAnswers): string | null {
+  return answers.specifiedTag || answers.tag || null;
 }
