@@ -4,6 +4,7 @@
   schedule: ['every weekday at 7am'], // UTC
   ignorePaths: [
     'test/',
+    //    TODO(NOW): test/bundler is being excluded. Probably from 'test/' above
     'test/browser-compile',
     'test/end-to-end',
     'test/hello-vdom',
@@ -62,4 +63,6 @@
       allowedVersions: '<9.0.0',
     },
   ],
+  // Never rebase the branch or update it unless manually requested to avoid noisy PR emails
+  rebaseWhen: 'never',
 }
