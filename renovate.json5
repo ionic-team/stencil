@@ -23,7 +23,7 @@
     'test/performance',
     'test/prerender-shadow',
     'test/style-modes',
-    'test/todo-app'
+    'test/todo-app',
   ],
   /**
    * Renovate will evaluate all packageRules and not stop once it gets a first match. You should order your
