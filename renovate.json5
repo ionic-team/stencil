@@ -1,6 +1,76 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "config:base"
+  // Documentation: https://docs.renovatebot.com/configuration-options
+  "schedule": ["every weekday at 7am"], // UTC
+//  "prCreation": "not-pending",
+//  "prNotPendingHours": 72, // 3 days in hours
+  "packageRules": [
+    {
+      "packagePatterns": ["*"],
+      "groupName": "all dependencies",
+      "prConcurrentLimit": 50,
+      "rebaseWhen": "never",
+      "matchPaths": ["/"],
+      "matchManagers": ["npm"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "excludePackageNames": [
+        "@types/node",
+        "typescript",
+        "dts-bundle-generator",
+        "@types/jest",
+        "jest",
+        "jest-cli",
+        "jest-environment-node",
+        "inquirer",
+        "@types/inquirer",
+        "@types/fs-extra",
+        "glob"
+      ],
+      "allowedVersions": {
+        "@types/node": "<19",
+        "typescript": "<4.10 || >=5.0",
+        "dts-bundle-generator": "<8",
+        "@types/jest": "<28",
+        "jest": "<28",
+        "jest-cli": "<28",
+        "jest-environment-node": "<28",
+        "inquirer": "<=7.3.3",
+        "@types/inquirer": "<=7.3.1",
+        "@types/fs-extra": "<10",
+        "glob": "<9"
+      }
+    },
+    {
+      "matchPaths": ["./test/bundler"],
+      "matchManagers": ["npm"],
+      "excludePackageNames": ["@types/node"],
+      "allowedVersions": {
+        "@types/node": "<17 || >=18"
+      }
+    },
+    {
+      "matchManagers": ["github-actions"],
+      "matchPaths": ["/"]
+    },
+    {
+      "matchPaths": ["./.github/workflows/actions/auto-request-reviews"],
+      "matchManagers": ["npm"],
+      "excludePackageNames": ["typescript"],
+      "allowedVersions": {
+        "typescript": "<4.10 || >=5.0"
+      }
+    },
+    {
+      "packagePatterns": ["*jest*"],
+      "groupName": "jest dependencies",
+      "prConcurrentLimit": 50,
+      "rebaseWhen": "never"
+    },
+    {
+      "packagePatterns": ["*eslint*"],
+      "groupName": "eslint dependencies",
+      "prConcurrentLimit": 50,
+      "rebaseWhen": "never"
+    }
   ]
 }
