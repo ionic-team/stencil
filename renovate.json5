@@ -3,7 +3,7 @@
   // Documentation: https://docs.renovatebot.com/configuration-options
   schedule: ['every weekday at 7am'], // UTC
   ignorePaths: [
-    './test/(browser-compile|end-to-end|hello-vdom|hello-world|ionic-app|jest-spec-runner|karma|performance|prerender-shadow|style-modes|todo-app)?/**',
+    'test/(browser-compile|end-to-end|hello-vdom|hello-world|ionic-app|jest-spec-runner|karma|performance|prerender-shadow|style-modes|todo-app)/**',
   ],
   /**
    * Renovate will evaluate all packageRules and not stop once it gets a first match. You should order your
