@@ -5,9 +5,10 @@
   // TODO(STENCIL-BBB): Remove once rollup upgrade is unblocked
   ignoreDeps: [
     'rollup',
+    'rollup-plugin-sourcemaps',
     '@rollup/plugin-commonjs',
     '@rollup/plugin-node-resolve',
-    '@rollup/plugin-replace'
+    '@rollup/plugin-replace',
   ],
   ignorePaths: [
     'test/',
