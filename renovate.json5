@@ -2,9 +2,16 @@
   $schema: 'https://docs.renovatebot.com/renovate-schema.json',
   // Documentation: https://docs.renovatebot.com/configuration-options
   schedule: ['every weekday at 7am'], // UTC
+  // TODO(STENCIL-BBB): Remove once rollup upgrade is unblocked
+  ignoreDeps: [
+    'rollup',
+    '@rollup/plugin-commonjs',
+    '@rollup/plugin-node-resolve',
+    '@rollup/plugin-replace'
+  ],
   ignorePaths: [
     'test/',
-    //    TODO(NOW): test/bundler is being excluded. Probably from 'test/' above
+    // TODO(NOW): test/bundler is being excluded. Probably from 'test/' above
     'test/browser-compile',
     'test/end-to-end',
     'test/hello-vdom',
@@ -15,7 +22,7 @@
     'test/performance',
     'test/prerender-shadow',
     'test/style-modes',
-    'test/todo-app',
+    'test/todo-app'
   ],
   /**
    * Renovate will evaluate all packageRules and not stop once it gets a first match. You should order your
@@ -25,44 +32,44 @@
   packageRules: [
     {
       matchPackageNames: ['@types/node'],
-      allowedVersions: '<19.0.0',
+      allowedVersions: '<19.0.0'
     },
     {
       // TODO(STENCIL-AAA): Increment this value after upgrading TypeScript
       matchPackageNames: ['typescript'],
-      allowedVersions: '<5.0.0',
+      allowedVersions: '<5.0.0'
     },
     {
       // TODO(STENCIL-771): Remove this entry + upgrade after the TypeScript 5.0 upgrade
       matchPackageNames: ['dts-bundle-generator'],
-      allowedVersions: '<8.0.0',
+      allowedVersions: '<8.0.0'
     },
     {
       // disable Jest updates until the new testing architecture is in place
       matchPackageNames: ['@types/jest', 'jest', 'jest-cli', 'jest-environment-node'],
-      allowedVersions: '<28.0.0',
+      allowedVersions: '<28.0.0'
     },
     // TODO(STENCIL-590): remove these once deps are removed
     {
       matchPackageNames: ['@types/inquirer'],
-      allowedVersions: '<=7.3.1',
+      allowedVersions: '<=7.3.1'
     },
     // TODO(STENCIL-590): remove these once deps are removed
     {
       matchPackageNames: ['inquirer'],
-      allowedVersions: '<=7.3.3',
+      allowedVersions: '<=7.3.3'
     },
     // TODO(STENCIL-716): remove this once Stencil drops support for Node 14
     {
       matchPackageNames: ['@types/fs-extra'],
-      allowedVersions: '<10.0.0',
+      allowedVersions: '<10.0.0'
     },
     // TODO(STENCIL-716): remove this once Stencil drops support for Node 14
     {
       matchPackageNames: ['glob'],
-      allowedVersions: '<9.0.0',
-    },
+      allowedVersions: '<9.0.0'
+    }
   ],
   // Never rebase the branch or update it unless manually requested to avoid noisy PR emails
-  rebaseWhen: 'never',
+  rebaseWhen: 'never'
 }
