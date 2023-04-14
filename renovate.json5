@@ -68,8 +68,16 @@
     // TODO(STENCIL-716): remove this once Stencil drops support for Node 14
     {
       matchPackageNames: ['glob'],
-      allowedVersions: '<9.0.0'
-    }
+      allowedVersions: '<9.0.0',
+    },
+    {
+      matchPackagePrefixes: ['@typescript-eslint'],
+      groupName: 'TypeScript-ESLint',
+    },
+    {
+      matchPackageNames: ['@types/jest', 'jest', 'jest-cli', 'jest-environment-node'],
+      groupName: 'Jest',
+    },
   ],
   // Never rebase the branch or update it unless manually requested to avoid noisy PR emails
   rebaseWhen: 'never',
