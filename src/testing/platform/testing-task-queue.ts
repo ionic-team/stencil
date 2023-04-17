@@ -91,7 +91,7 @@ export function readTask(cb: d.RafCallback): void {
  * For each queue:
  * - Each task is processed in the order it is found in its respective data structure at the time `queuedReadTasks` and
  * `queuedWriteTasks` are read (note: these queues are not read at the same time).
- * - When a task queue is processes, it is marked as empty before acting on the entries in the queue.
+ * - When a task queue is processed, it is marked as empty before acting on the entries in the queue.
  * - Items added to either queue after it has been read for processing will be handled on the subsequent tick.
  * - Async items will be `awaited`ed
  */
