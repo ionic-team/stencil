@@ -30,6 +30,11 @@ import { formatLazyBundleRuntimeMeta } from '@utils';
 import { getBuildFeatures } from '../compiler/app-core/app-data';
 import { resetBuildConditionals } from './reset-build-conditionals';
 
+/**
+ * Creates a new spec page for unit testing
+ * @param opts the options to apply to the spec page that influence its configuration and operation
+ * @returns the created spec page
+ */
 export async function newSpecPage(opts: NewSpecPageOptions): Promise<SpecPage> {
   if (opts == null) {
     throw new Error(`NewSpecPageOptions required`);
@@ -228,7 +233,12 @@ export async function newSpecPage(opts: NewSpecPageOptions): Promise<SpecPage> {
   return page;
 }
 
-function proxyComponentLifeCycles(Cstr: ComponentTestingConstructor) {
+/**
+ * A helper method that proxies Stencil lifecycle methods by mutating the provided component class
+ * @param Cstr the component class whose lifecycle methods will be proxied
+ */
+function proxyComponentLifeCycles(Cstr: ComponentTestingConstructor): void {
+  // we may have called this function on the class before, reset the state of the class
   if (typeof Cstr.prototype?.__componentWillLoad === 'function') {
     Cstr.prototype.componentWillLoad = Cstr.prototype.__componentWillLoad;
     Cstr.prototype.__componentWillLoad = null;
@@ -242,6 +252,7 @@ function proxyComponentLifeCycles(Cstr: ComponentTestingConstructor) {
     Cstr.prototype.__componentWillRender = null;
   }
 
+  // the class should be in a known 'good' state to proxy functions
   if (typeof Cstr.prototype?.componentWillLoad === 'function') {
     Cstr.prototype.__componentWillLoad = Cstr.prototype.componentWillLoad;
     Cstr.prototype.componentWillLoad = function () {
@@ -282,7 +293,21 @@ function proxyComponentLifeCycles(Cstr: ComponentTestingConstructor) {
   }
 }
 
-function findRootComponent(cmpTags: Set<string>, node: Element): any {
+/**
+ * Return the first Element whose {@link Element#nodeName} property matches a tag found in the provided `cmpTags`
+ * argument.
+ *
+ * This function will inspect each child of the provided `node` argument. If no match is found, the children of the
+ * first child element will be inspected. This processes recurses until either:
+ * - an element is found (and execution ends)
+ * - no element is found after an exhaustive search
+ *
+ * @param cmpTags component tag names to use in the match criteria
+ * @param node the node whose children are to be inspected
+ * @returns An element whose name matches one of the strings in the provided `cmpTags`. If no match is found, `null` is
+ * returned
+ */
+function findRootComponent(cmpTags: Set<string>, node: Element): Element | null {
   if (node != null) {
     const children = node.children;
     const childrenLength = children.length;

@@ -2374,7 +2374,7 @@ export interface SpecPage {
    */
   rootInstance?: any;
   /**
-   * Convenience function to set `document.body.innerHTML` and `waitForChanges()`. Function argument should be an html string.
+   * Convenience function to set `document.body.innerHTML` and `waitForChanges()`. Function argument should be a HTML string.
    */
   setContent: (html: string) => Promise<any>;
   /**
@@ -2392,6 +2392,9 @@ export interface SpecPage {
   styles: Map<string, string>;
 }
 
+/**
+ * Options pertaining to the creation and functionality of a {@link SpecPage}
+ */
 export interface NewSpecPageOptions {
   /**
    * An array of components to test. Component classes can be imported into the spec file, then their reference should be added to the `component` array in order to be used throughout the test.
@@ -2405,19 +2408,20 @@ export interface NewSpecPageOptions {
    * Sets the mocked `dir` attribute on `<html>`.
    */
   direction?: string;
+  /**
+   * If `false`, do not flush the render queue on initial test setup.
+   */
   flushQueue?: boolean;
   /**
    * The initial HTML used to generate the test. This can be useful to construct a collection of components working together, and assign HTML attributes. This value sets the mocked `document.body.innerHTML`.
    */
   html?: string;
-
   /**
    * The initial JSX used to generate the test.
    * Use `template` when you want to initialize a component using their properties, instead of their HTML attributes.
    * It will render the specified template (JSX) into `document.body`.
    */
   template?: () => any;
-
   /**
    * Sets the mocked `lang` attribute on `<html>`.
    */
@@ -2439,7 +2443,7 @@ export interface NewSpecPageOptions {
    */
   supportsShadowDom?: boolean;
   /**
-   * When a component is prerendered it includes HTML annotations, such as `s-id` attributes and `<!-t.0->` comments. This information is used by clientside hydrating. Default is `false`.
+   * When a component is pre-rendered it includes HTML annotations, such as `s-id` attributes and `<!-t.0->` comments. This information is used by clientside hydrating. Default is `false`.
    */
   includeAnnotations?: boolean;
   /**
@@ -2454,16 +2458,19 @@ export interface NewSpecPageOptions {
    * By default, any changes to component properties and attributes must `page.waitForChanges()` in order to test the updates. As an option, `autoAppluChanges` continuously flushes the queue on the background. Default is `false`.
    */
   autoApplyChanges?: boolean;
-
   /**
    * By default, styles are not attached to the DOM and they are not reflected in the serialized HTML.
    * Setting this option to `true` will include the component's styles in the serializable output.
    */
   attachStyles?: boolean;
-
+  /**
+   * Set {@link BuildConditionals} for testing based off the metadata of the component under test.
+   * When `true` all `BuildConditionals` will be assigned to the global testing `BUILD` object, regardless of their
+   * value. When `false`, only `BuildConditionals` with a value of `true` will be assigned to the `BUILD` object.
+   */
   strictBuild?: boolean;
   /**
-   * Default values to be set on the platform runtime object (@see PlatformRuntime) when creating
+   * Default values to be set on the platform runtime object {@see PlatformRuntime} when creating
    * the spec page.
    */
   platform?: Partial<PlatformRuntime>;
