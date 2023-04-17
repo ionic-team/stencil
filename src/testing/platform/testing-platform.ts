@@ -114,7 +114,6 @@ export async function startAutoApplyChanges(): Promise<void> {
  * @deprecated
  */
 export function registerContext(context: any): void {
-  console.log(`registerContext::testing-platform`, Object.keys(context));
   if (context) {
     Object.assign(Context, context);
   }
