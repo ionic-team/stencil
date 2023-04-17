@@ -102,11 +102,13 @@ export const run = async (init: d.CliInitOptions) => {
 
 /**
  * Run a specified task
+ *
  * @param coreCompiler an instance of a minimal, bootstrap compiler for running the specified task
  * @param config a configuration for the Stencil project to apply to the task run
  * @param task the task to run
  * @param sys the {@link CompilerSystem} for interacting with the operating system
  * @public
+ * @returns a void promise
  */
 export const runTask = async (
   coreCompiler: CoreCompiler,
