@@ -297,8 +297,9 @@ function proxyComponentLifeCycles(Cstr: ComponentTestingConstructor): void {
  * Return the first Element whose {@link Element#nodeName} property matches a tag found in the provided `cmpTags`
  * argument.
  *
- * This function will inspect each child of the provided `node` argument. If no match is found, the children of the
- * first child element will be inspected. This processes recurses until either:
+ * If the `nodeName` property on the element matches any of the names found in the provided `cmpTags` argument, that
+ * element is returned. If no match is found on the current element, the children will be inspected in a depth-first
+ * search manner. This process continues until either:
  * - an element is found (and execution ends)
  * - no element is found after an exhaustive search
  *
