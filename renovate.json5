@@ -71,6 +71,7 @@
     {
       // disable Jest updates until the new testing architecture is in place
       matchPackageNames: ['@types/jest', 'jest', 'jest-cli', 'jest-environment-node'],
+      groupName: 'Jest',
       allowedVersions: '<28.0.0',
     },
     // TODO(STENCIL-590): remove these once deps are removed
@@ -100,9 +101,10 @@
       schedule: ["before 7am on monday"]
     },
     {
-      matchPackageNames: ['@types/jest', 'jest', 'jest-cli', 'jest-environment-node'],
-      groupName: 'Jest',
-    },
+      matchPackageNames: ['eslint-plugin-jsdoc'],
+      // this package can be released often, let's look at it every week
+      schedule: ["before 7am on monday"]
+    }
   ],
   // Never rebase the branch or update it unless manually requested to avoid noisy PR emails
   rebaseWhen: 'never',
