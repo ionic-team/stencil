@@ -109,7 +109,7 @@ Empty objects can also be the cause, look for JSX comments that became objects.`
  * @param text possible text content for the node
  * @returns a newly-minted virtual DOM node
  */
-export const newVNode = (tag: string, text: string) => {
+export const newVNode = (tag: string | null, text: string | null): d.VNode => {
   const vnode: d.VNode = {
     $flags$: 0,
     $tag$: tag,
@@ -137,7 +137,7 @@ export const Host = {};
  * @param node the virtual DOM node to check
  * @returns whether it's a Host node or not
  */
-export const isHost = (node: any): node is d.VNode => node && node.$tag$ === Host;
+export const isHost = (node: d.VNode): boolean => node && node.$tag$ === Host;
 
 /**
  * Implementation of {@link d.FunctionalUtilities} for Stencil's VDom.

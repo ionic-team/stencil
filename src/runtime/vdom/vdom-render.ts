@@ -33,13 +33,18 @@ let isSvgMode = false;
  * @param parentElm the parent DOM node which our new node will be a child of
  * @returns the newly created node
  */
-const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex: number, parentElm: d.RenderNode) => {
+const createElm = (
+  oldParentVNode: d.VNode | null,
+  newParentVNode: d.VNode,
+  childIndex: number,
+  parentElm: d.RenderNode
+) => {
   // tslint:disable-next-line: prefer-const
   const newVNode = newParentVNode.$children$[childIndex];
   let i = 0;
   let elm: d.RenderNode;
   let childNode: d.RenderNode;
-  let oldVNode: d.VNode;
+  let oldVNode: d.VNode | null;
 
   if (BUILD.slotRelocation && !useNativeShadowDom) {
     // remember for later we need to check to relocate nodes
@@ -150,7 +155,7 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
 
       // check if we've got an old vnode for this slot
       oldVNode = oldParentVNode && oldParentVNode.$children$ && oldParentVNode.$children$[childIndex];
-      if (oldVNode && oldVNode.$tag$ === newVNode.$tag$ && oldParentVNode.$elm$) {
+      if (oldVNode && oldVNode.$tag$ === newVNode.$tag$ && oldParentVNode && oldParentVNode.$elm$) {
         // we've got an old slot vnode and the wrapper is being replaced
         // so let's move the old slot content back to it's original location
         putBackInOriginalLocation(oldParentVNode.$elm$, false);
@@ -209,23 +214,22 @@ const putBackInOriginalLocation = (parentElm: Node, recursive: boolean) => {
  */
 const addVnodes = (
   parentElm: d.RenderNode,
-  before: d.RenderNode,
+  before: d.RenderNode | null,
   parentVNode: d.VNode,
   vnodes: d.VNode[],
   startIdx: number,
   endIdx: number
 ) => {
   let containerElm = ((BUILD.slotRelocation && parentElm['s-cr'] && parentElm['s-cr'].parentNode) || parentElm) as any;
-  let childNode: Node;
   if (BUILD.shadowDom && (containerElm as any).shadowRoot && containerElm.tagName === hostTagName) {
     containerElm = (containerElm as any).shadowRoot;
   }
 
   for (; startIdx <= endIdx; ++startIdx) {
     if (vnodes[startIdx]) {
-      childNode = createElm(null, parentVNode, startIdx, parentElm);
+      const childNode = createElm(null, parentVNode, startIdx, parentElm);
       if (childNode) {
-        vnodes[startIdx].$elm$ = childNode as any;
+        vnodes[startIdx].$elm$ = childNode;
         containerElm.insertBefore(childNode, BUILD.slotRelocation ? referenceNode(before) : before);
       }
     }
@@ -555,7 +559,7 @@ export const isSameVnode = (leftVNode: d.VNode, rightVNode: d.VNode) => {
   return false;
 };
 
-const referenceNode = (node: d.RenderNode) => {
+const referenceNode = (node: d.RenderNode | null): d.RenderNode | null => {
   // this node was relocated to a new location in the dom
   // because of some other component's slot
   // but we still have an html comment in place of where
@@ -814,7 +818,10 @@ export const renderVdom = (hostRef: d.HostRef, renderFnResults: d.VNode | d.VNod
   const hostElm = hostRef.$hostElement$;
   const cmpMeta = hostRef.$cmpMeta$;
   const oldVNode: d.VNode = hostRef.$vnode$ || newVNode(null, null);
-  const rootVnode = isHost(renderFnResults) ? renderFnResults : h(null, null, renderFnResults as any);
+  const rootVnode: d.VNode =
+    !Array.isArray(renderFnResults) && isHost(renderFnResults)
+      ? renderFnResults
+      : h(null, null, renderFnResults as any);
 
   hostTagName = hostElm.tagName;
 
