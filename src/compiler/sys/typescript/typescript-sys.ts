@@ -247,7 +247,12 @@ export const getTypescriptPathFromUrl = (config: d.Config, tsExecutingUrl: strin
 export const patchTypeScriptGetParsedCommandLineOfConfigFile = () => {
   const orgGetParsedCommandLineOfConfigFile = ts.getParsedCommandLineOfConfigFile;
 
-  ts.getParsedCommandLineOfConfigFile = (configFileName, optionsToExtend, host, extendedConfigCache) => {
+  const patchedFunc = (
+    configFileName: string,
+    optionsToExtend: ts.CompilerOptions,
+    host: ts.ParseConfigFileHost,
+    extendedConfigCache: Map<string, ts.ExtendedConfigCacheEntry>
+  ) => {
     const results = orgGetParsedCommandLineOfConfigFile(configFileName, optionsToExtend, host, extendedConfigCache);
 
     // manually filter out any .spec or .e2e files
@@ -265,4 +270,10 @@ export const patchTypeScriptGetParsedCommandLineOfConfigFile = () => {
 
     return results;
   };
+
+  Object.defineProperty(ts, 'getParsedCommandLineOfConfigFile', {
+    get: () => patchedFunc,
+    enumerable: true,
+    configurable: true,
+  });
 };
