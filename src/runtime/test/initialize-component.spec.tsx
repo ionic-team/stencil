@@ -1,4 +1,4 @@
-import { getHostRef } from '@platform'
+import { getHostRef } from '@platform';
 import { Component } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
@@ -16,7 +16,7 @@ describe('initialize component', () => {
       html: `<cmp-a><cmp-a>`,
     });
 
-    const hostFlags = getHostRef(page.root).$flags$
-    expect((hostFlags & HOST_FLAGS.hasInitializedComponent)).toBe(HOST_FLAGS.hasInitializedComponent)
+    const hostFlags = getHostRef(page.root).$flags$;
+    expect(hostFlags & HOST_FLAGS.hasInitializedComponent).toBe(HOST_FLAGS.hasInitializedComponent);
   });
 });
