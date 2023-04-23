@@ -50,11 +50,13 @@ export function jestSetupTestFramework() {
     // context so any "cleanup" operations in the `disconnectedCallback`
     // can happen to prevent testing errors with async code in the component
     //
-    // We only care about removing all the nodes that are children of the 'body' tag/node
+    // We only care about removing all the nodes that are children of the 'body' tag/node.
+    // This node is a child of the `html` tag which is the 2nd child of the document (hence
+    // the `1` index).
     const bodyNode = (
-      ((global as any).window as MockWindow).document as unknown as MockDocument
-    ).childNodes[1].childNodes.find((ref) => ref.nodeName === 'BODY');
-    bodyNode.childNodes?.forEach(removeDomNodes);
+      ((global as any).window as MockWindow)?.document as unknown as MockDocument
+    )?.childNodes?.[1]?.childNodes?.find((ref) => ref.nodeName === 'BODY');
+    bodyNode?.childNodes?.forEach(removeDomNodes);
 
     teardownGlobal(global);
     global.Context = {};
@@ -95,7 +97,11 @@ export function jestSetupTestFramework() {
  *
  * @param node The mocked DOM node that will be removed from the DOM
  */
-function removeDomNodes(node: MockNode) {
+export function removeDomNodes(node: MockNode) {
+  if (node == null) {
+    return;
+  }
+
   if (!node.childNodes?.length) {
     node.remove();
   }
