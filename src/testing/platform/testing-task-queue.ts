@@ -93,7 +93,7 @@ export function readTask(cb: d.RafCallback): void {
  * `queuedWriteTasks` are read (note: these queues are not read at the same time).
  * - When a task queue is processed, it is marked as empty before acting on the entries in the queue.
  * - Items added to either queue after it has been read for processing will be handled on the subsequent tick.
- * - Async items will be `awaited`ed
+ * - Async items will be `await`ed
  */
 export function flushQueue(): Promise<void> {
   return new Promise<void>((resolve, reject) => {
