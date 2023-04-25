@@ -22,13 +22,22 @@ describe('jest setup test framework', () => {
       expect(parentNode).toBeUndefined();
     });
 
-    it.each([null, []])('does nothing if the parent node has no children', (children: MockNode[]) => {
+    it('does nothing if the parent node child array is empty', () => {
       const parentNode = new MockHTMLElement(null, 'div');
-      parentNode.childNodes = children;
+      parentNode.childNodes = [];
 
       removeDomNodes(parentNode);
 
-      expect(parentNode.childNodes).toBe(children);
+      expect(parentNode.childNodes).toStrictEqual([]);
+    });
+
+    it('does nothing if the parent node child array is `null`', () => {
+      const parentNode = new MockHTMLElement(null, 'div');
+      parentNode.childNodes = null;
+
+      removeDomNodes(parentNode);
+
+      expect(parentNode.childNodes).toBe(null);
     });
   });
 });
