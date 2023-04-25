@@ -27,7 +27,7 @@ import { BuildContext } from './build-ctx';
  *
  * @param config The validated config for the Stencil project
  * @param compilerCtx The compiler context for the project
- * @returns {@link d.CompilerWatcher} An object containing helper methods for the dev-server's watch program
+ * @returns An object containing helper methods for the dev-server's watch program
  */
 export const createWatchBuild = async (
   config: d.ValidatedConfig,
@@ -186,7 +186,7 @@ export const createWatchBuild = async (
   };
 
   /**
-   * Callback method that will execute when TS alerts us that a directors modification has occurred.
+   * Callback method that will execute when TS alerts us that a directory modification has occurred.
    * This will just call the `onFsChange()` callback method with the same arguments.
    *
    * @param filePath The absolute path to the file in the Stencil project

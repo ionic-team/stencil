@@ -63,7 +63,8 @@ export const createTsWatchProgram = async (
   // Whenever the system teardown happens, we need to make sure there is no timeout running
   config.sys.addDestroy(() => tsWatchSys.clearTimeout(timeoutId));
 
-  // Use the TS API to create our own {@link }
+  // Use the TS API to create our own watch compiler host that will be
+  // used to instantiate our watch program
   const tsWatchHost = ts.createWatchCompilerHost(
     // Use the TS config from the Stencil project
     config.tsconfig,
