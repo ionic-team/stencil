@@ -13,6 +13,7 @@ import type { CoreCompiler } from './load-compiler';
  * @param coreCompiler the CoreCompiler we're using currently, here we're
  * mainly accessing the `path` module
  * @param config the user-supplied config, which we need here to access `.sys`.
+ * @returns a void promise
  */
 export const taskGenerate = async (coreCompiler: CoreCompiler, config: ValidatedConfig): Promise<void> => {
   if (!IS_NODE_ENV) {

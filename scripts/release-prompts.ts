@@ -47,6 +47,7 @@ export type NormalizedReleaseResponses = {
 /**
  * Prompts a developer to answer questions regarding how a release of Stencil should be performed
  * @param opts build options containing the metadata needed to publish a new version of Stencil
+ * @returns normalized responses to the prompts for the 'release' workflow
  */
 export async function promptRelease(opts: BuildOptions): Promise<NormalizedReleaseResponses> {
   const pkg = opts.packageJson;

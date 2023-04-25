@@ -2283,6 +2283,17 @@ export type OutputTarget =
   | OutputTargetStats
   | OutputTargetDistTypes;
 
+/**
+ * Our custom configuration interface for generated caching Service Workers
+ * using the Workbox library (see https://developer.chrome.com/docs/workbox/).
+ *
+ * Although we are using Workbox we are unfortunately unable to depend on the
+ * published types for the library because they must be compiled using the
+ * `webworker` lib for TypeScript, which cannot be used at the same time as
+ * the `dom` lib. So as a workaround we maintain our own interface here. See
+ * here to refer to the published version:
+ * https://github.com/DefinitelyTyped/DefinitelyTyped/blob/c7b4dadae5b320ad1311a8f82242b8f2f41b7b8c/types/workbox-build/generate-sw.d.ts#L3
+ */
 export interface ServiceWorkerConfig {
   // https://developers.google.com/web/tools/workbox/modules/workbox-build#full_generatesw_config
   unregister?: boolean;

@@ -34,5 +34,5 @@ runs:
         NPM_TOKEN: ${{ inputs.token }}
 
     - name: Publish to NPM
-      run: npm publish --tag ${{ inputs.tag }}
+      run: npm publish --tag ${{ inputs.tag }} --provenance
       shell: bash

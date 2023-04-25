@@ -4,6 +4,7 @@ import type { TestingRunOptions, ValidatedConfig } from '../declarations';
 /**
  * Entrypoint for any Stencil tests
  * @param config a validated Stencil configuration entity
+ * @returns a void promise
  */
 export const taskTest = async (config: ValidatedConfig): Promise<void> => {
   if (!IS_NODE_ENV) {
