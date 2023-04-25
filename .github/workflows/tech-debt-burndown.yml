@@ -141,7 +141,7 @@ jobs:
           echo ::set-output name=body::$body
 
       - name: Find Comment
-        uses: peter-evans/find-comment@034abe94d3191f9c89d870519735beae326f2bdb # v2.3.0
+        uses: peter-evans/find-comment@a54c31d7fa095754bfef525c0c8e5e5674c4b4b1 # v2.4.0
         id: fc
         with:
           issue-number: ${{ github.event.pull_request.number }}
