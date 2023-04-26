@@ -18,14 +18,11 @@ export const initializeComponent = async (
   Cstr?: any
 ) => {
   // initializeComponent
-  if (
-    (BUILD.lazyLoad || BUILD.hydrateServerSide || BUILD.style) &&
-    (hostRef.$flags$ & HOST_FLAGS.hasInitializedComponent) === 0
-  ) {
-    if (BUILD.lazyLoad || BUILD.hydrateClientSide) {
-      // we haven't initialized this element yet
-      hostRef.$flags$ |= HOST_FLAGS.hasInitializedComponent;
+  if ((hostRef.$flags$ & HOST_FLAGS.hasInitializedComponent) === 0) {
+    // Let the runtime know that the component has been initialized
+    hostRef.$flags$ |= HOST_FLAGS.hasInitializedComponent;
 
+    if (BUILD.lazyLoad || BUILD.hydrateClientSide) {
       // lazy loaded components
       // request the component's implementation to be
       // wired up with the host element
@@ -81,7 +78,7 @@ export const initializeComponent = async (
     } else {
       // sync constructor component
       Cstr = elm.constructor as any;
-      hostRef.$flags$ |= HOST_FLAGS.hasInitializedComponent;
+
       // wait for the CustomElementRegistry to mark the component as ready before setting `isWatchReady`. Otherwise,
       // watchers may fire prematurely if `customElements.get()`/`customElements.whenDefined()` resolves _before_
       // Stencil has completed instantiating the component.

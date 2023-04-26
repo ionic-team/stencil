@@ -32,7 +32,7 @@ Please see our [Contributor Code of Conduct](https://github.com/ionic-team/stenc
 1. Fork the repo.
 2. Clone your fork.
 3. Make a branch for your change.
-4. Stencil uses [volta](volta.sh) to manage its npm and Node versions. 
+4. Stencil uses [volta](https://volta.sh) to manage its npm and Node versions. 
    [Install it](https://docs.volta.sh/guide/getting-started) before proceeding.
    1. There's no need to install a specific version of npm or Node right now, it shall be done automatically for you in
       the next step
