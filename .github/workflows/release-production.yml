@@ -28,6 +28,7 @@ jobs:
     name: Publish Production Build
     runs-on: ubuntu-latest
     permissions:
+      content: write
       id-token: write
     steps:
       - name: Checkout Code
@@ -64,6 +65,8 @@ jobs:
           git add .
           git commit -m "v$(./bin/stencil version)"
           git push origin
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: bash
 
       # This must occur _after_ the commit, lest we check this in and compromise the secret
