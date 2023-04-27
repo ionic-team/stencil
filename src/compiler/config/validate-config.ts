@@ -91,6 +91,7 @@ export const validateConfig = (
     sys: config.sys ?? bootstrapConfig.sys ?? createSystem({ logger }),
     testing: config.testing ?? {},
     transformAliasedImportPaths: userConfig.transformAliasedImportPaths ?? false,
+    rollupConfig: validateRollupConfig(config),
   };
 
   // default devMode false
@@ -174,9 +175,6 @@ export const validateConfig = (
 
   // plugins
   validatePlugins(validatedConfig, diagnostics);
-
-  // rollup config
-  validateRollupConfig(validatedConfig);
 
   // dev server
   validatedConfig.devServer = validateDevServer(validatedConfig, diagnostics);

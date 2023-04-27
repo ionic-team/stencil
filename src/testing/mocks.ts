@@ -43,6 +43,10 @@ export function mockValidatedConfig(overrides: Partial<ValidatedConfig> = {}): V
     sys: createTestingSystem(),
     testing: {},
     transformAliasedImportPaths: false,
+    rollupConfig: {
+      inputOptions: {},
+      outputOptions: {},
+    },
     ...overrides,
   };
 }
