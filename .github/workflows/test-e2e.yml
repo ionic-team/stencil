@@ -39,7 +39,7 @@ jobs:
         with:
           timeout_minutes: 10
           max_attempts: 3
-          command: npm run test.end-to-end1 -- --ci
+          command: npm run test.end-to-end -- --ci
 
       - name: Check Git Context
         uses: ./.github/workflows/actions/check-git-context
