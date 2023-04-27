@@ -7,6 +7,7 @@
    * 1. `npm i -g renovate` will install the validator
    * 2. `renovate-config-validator` will run the validator
    */
+  dependencyDashboard: true,
   // TODO(STENCIL-596): Remove once rollup upgrade is unblocked
   ignoreDeps: [
     'rollup',
