@@ -106,7 +106,7 @@ export async function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<st
             throw new Error('Unclean working tree. Commit or stash changes first.');
           }
         }),
-      skip: () => isDryRun,
+      skip: () => true, // TODO(NOW)
     },
     {
       title: 'Check remote history',
@@ -196,18 +196,18 @@ export async function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<st
           return execa(cmd, cmdArgs, { cwd: rootDir });
         },
       },
-      {
-        title: 'Pushing git commits',
-        task: () => {
-          const cmd = 'git';
-          const cmdArgs = ['push'];
-
-          if (isDryRun) {
-            return console.log(`[dry-run] ${cmd} ${cmdArgs.join(' ')}`);
-          }
-          return execa(cmd, cmdArgs, { cwd: rootDir });
-        },
-      },
+      // {
+      //   title: 'Pushing git commits',
+      //   task: () => {
+      //     const cmd = 'git';
+      //     const cmdArgs = ['push'];
+      //
+      //     if (isDryRun) {
+      //       return console.log(`[dry-run] ${cmd} ${cmdArgs.join(' ')}`);
+      //     }
+      //     return execa(cmd, cmdArgs, { cwd: rootDir });
+      //   },
+      // },
       {
         title: 'Pushing git tags',
         task: () => {

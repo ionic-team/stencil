@@ -64,9 +64,12 @@ jobs:
           git config user.email "stencil-release-bot@ionic.io"
           git add .
           git commit -m "v$(./bin/stencil version)"
+          git push origin
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: bash
 
-      # This must occur _after_ the commit, lest we check this in and compromise the secret
+      # TODO(NOW): This needs figuring out - split npm publish out
       - name: Prepare NPM Token
         run: echo //registry.npmjs.org/:_authToken=${NPM_TOKEN} > .npmrc
         shell: bash
@@ -75,7 +78,5 @@ jobs:
 
       - name: Run Publish Scripts
         # TODO(NOW): These values should feed in from the choices above. Replace with commented out code
-#        run: npm run release.ci -- --version 2.22.2-dev.1678795942.e009e9 --tag dev --any-branch # --version ${{ inputs.version }} --tag ${{ inputs.tag }}
-#        env:
-#          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#        shell: bash
+        run: npm run release.ci -- --version 2.22.2-dev.1678795942.e009e9 --tag dev --any-branch # --version ${{ inputs.version }} --tag ${{ inputs.tag }}
+        shell: bash
