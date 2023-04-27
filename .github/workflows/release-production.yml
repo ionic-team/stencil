@@ -60,7 +60,7 @@ jobs:
       # - The 'push' step is expected to be done by the existing Node code
       - name: Commit Release Preparations
         run: |
-          git config user.name "Stencil Release Bot"
+          git config user.name "Stencil Release Bot (on behalf of ${{ github.actor }})"
           git config user.email "stencil-release-bot@ionic.io"
           git add .
           git commit -m "v$(./bin/stencil version)"
