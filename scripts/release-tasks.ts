@@ -141,8 +141,6 @@ export async function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<st
       {
         title: 'Run karma tests',
         task: () => execa('npm', ['run', 'test.karma.prod'], { cwd: rootDir }),
-        // TODO(NOW): Handle the fact that we need to pipe these creds in
-        // skip: () => true,
       },
       {
         title: 'Build license',

@@ -5,7 +5,7 @@ const { WWW_OUT_DIR } = require('./constants');
 process.env.CHROME_BIN = require('puppeteer').executablePath();
 
 // determine the environment to run in
-const isCI = false;
+const isCI = !!process.env.CI;
 const localBrowserStackConnection = !isCI && !!process.env.LOCAL_BROWSERSTACK;
 const useBrowserStack = isCI || localBrowserStackConnection;
 
