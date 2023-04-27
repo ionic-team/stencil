@@ -75,24 +75,12 @@ export async function release(rootDir: string, args: ReadonlyArray<string>): Pro
     }
     prepareOpts.version = getNewVersion(prepareOpts.packageJson.version, args[versionIdx + 1]);
 
-    const tagIdx = args.indexOf('--tag');
-    if (tagIdx === -1 || tagIdx === args.length) {
-      console.log(`\n${color.bold.red('No `--tag [TAG]` argument was found. Exiting')}\n`);
-      process.exit(1);
-    }
-    const newTag = args[tagIdx + 1];
-
-    // TODO(NOW): This may be superfluous - but it's nice for debugging for now
-    console.log(`${color.bold.blue(`Version: ${prepareOpts.version}`)}`);
-    console.log(`${color.bold.blue(`Tag: ${newTag}`)}`);
-
     await prepareRelease(prepareOpts, args);
     console.log(`${color.bold.blue('Release Prepared!')}`);
   }
 
   if (args.includes('--ci-publish')) {
     // TODO(NOW): Refactor this. I just want a proof of concept of end to end
-    await fs.emptyDir(buildDir);
     const prepareOpts = getOptions(rootDir, {
       isCI: true,
       isPublishRelease: false,
@@ -112,6 +100,10 @@ export async function release(rootDir: string, args: ReadonlyArray<string>): Pro
       process.exit(1);
     }
     const newTag = args[tagIdx + 1];
+
+    // TODO(NOW): This may be superfluous - but it's nice for debugging for now
+    console.log(`${color.bold.blue(`Version: ${prepareOpts.version}`)}`);
+    console.log(`${color.bold.blue(`Tag: ${newTag}`)}`);
 
     const publishOpts = getOptions(rootDir, {
       buildId: prepareOpts.buildId,
