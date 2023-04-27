@@ -181,7 +181,7 @@ export async function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<st
           if (isDryRun) {
             return console.log(`[dry-run] ${cmd} ${cmdArgs.join(' ')}`);
           }
-          return; // execa(cmd, cmdArgs, { cwd: rootDir });
+          return execa(cmd, cmdArgs, { cwd: rootDir });
         },
       },
       {
@@ -193,7 +193,7 @@ export async function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<st
           if (isDryRun) {
             return console.log(`[dry-run] ${cmd} ${cmdArgs.join(' ')}`);
           }
-          return; // execa(cmd, cmdArgs, { cwd: rootDir });
+          return execa(cmd, cmdArgs, { cwd: rootDir });
         },
       },
       {
@@ -205,7 +205,7 @@ export async function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<st
           if (isDryRun) {
             return console.log(`[dry-run] ${cmd} ${cmdArgs.join(' ')}`);
           }
-          return; // execa(cmd, cmdArgs, { cwd: rootDir });
+          return execa(cmd, cmdArgs, { cwd: rootDir });
         },
       },
       {
@@ -217,7 +217,7 @@ export async function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<st
           if (isDryRun) {
             return console.log(`[dry-run] ${cmd} ${cmdArgs.join(' ')}`);
           }
-          return; // execa(cmd, cmdArgs, { cwd: rootDir });
+          return execa(cmd, cmdArgs, { cwd: rootDir });
         },
       },
       {
