@@ -6,16 +6,12 @@ import { createLogger } from './logger/console-logger';
 
 export const getConfig = (userConfig: d.Config): d.ValidatedConfig => {
   const logger = userConfig.logger ?? createLogger();
-  const config: d.ValidatedConfig = validateConfig(
-    {
-      ...userConfig,
-      flags: createConfigFlags(userConfig.flags ?? {}),
-      logger,
-    },
-    {
-      logger,
-    }
-  ).config;
+  const flags = createConfigFlags(userConfig.flags ?? {});
+  userConfig.logger = logger;
+  userConfig.flags = flags;
+  const config: d.ValidatedConfig = validateConfig(userConfig, {
+    logger,
+  }).config;
 
   setPlatformPath(config.sys.platformPath);
 

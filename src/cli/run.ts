@@ -117,21 +117,14 @@ export const runTask = async (
   sys?: d.CompilerSystem
 ): Promise<void> => {
   const logger = config.logger ?? createLogger();
-  const rootDir = config.rootDir ?? '/';
-  const configSys = sys ?? config.sys ?? coreCompiler.createSystem({ logger });
-  const strictConfig: ValidatedConfig = coreCompiler.validateConfig(
-    {
-      ...config,
-      flags: createConfigFlags(config.flags ?? { task }),
-      logger,
-      rootDir,
-      sys: configSys,
-    },
-    {
-      logger,
-      sys: configSys,
-    }
-  ).config;
+  const flags = createConfigFlags(config.flags ?? { task });
+  config.logger = logger;
+  config.flags = flags;
+  config.sys = sys ?? config.sys ?? coreCompiler.createSystem({ logger });
+  const strictConfig: ValidatedConfig = coreCompiler.validateConfig(config, {
+    logger: config.logger,
+    sys: config.sys,
+  }).config;
 
   switch (task) {
     case 'build':
