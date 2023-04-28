@@ -1,9 +1,8 @@
-
 import { createConfigFlags } from '../../cli/config-flags';
 import type * as d from '../../declarations';
+import { validateConfig } from '../config/validate-config';
 import { setPlatformPath } from '../sys/modules/path';
 import { createLogger } from './logger/console-logger';
-import { validateConfig } from '../config/validate-config';
 
 export const getConfig = (userConfig: d.Config): d.ValidatedConfig => {
   const logger = userConfig.logger ?? createLogger();

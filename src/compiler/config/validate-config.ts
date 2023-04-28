@@ -31,6 +31,16 @@ type ConfigValidationResults = {
 };
 
 /**
+ * We never really want to re-run validation for a Stencil
+ * configuration. Besides the cost of doing so, our validation pipeline is
+ * unfortunately not idempotent, so we want to have a guarantee that even
+ * if we call `validateConfig` in a few places that the same configuration
+ * object won't be passed through multiple times. So we cache the result
+ * of our work here.
+ */
+let VALIDATED_CONFIG_CACHE: ValidatedConfig | null = null;
+
+/**
  * Validate a Config object, ensuring that all its field are present and
  * consistent with our expectations. This function transforms an
  * `UnvalidatedConfig` to a `Config`.
@@ -44,8 +54,23 @@ export const validateConfig = (
   userConfig: UnvalidatedConfig = {},
   bootstrapConfig: LoadConfigInit
 ): ConfigValidationResults => {
-  const config = Object.assign({}, userConfig); // not positive it's json safe
   const diagnostics: Diagnostic[] = [];
+
+  if (VALIDATED_CONFIG_CACHE !== null && VALIDATED_CONFIG_CACHE === userConfig) {
+    // We've previously done the work to validate a Stencil config. Since our
+    // overall validated pipeline is unfortunately not idempotent we do not
+    // want to simply validate again. leaving aside the performance
+    // implications of needlessly repeating the validation, we don't want to do
+    // certain operations multiple times.
+    //
+    // For the sake of correctness we check both that the cache is not null and
+    // that it's the same object as the one passed in.
+    return {
+      config: userConfig as ValidatedConfig,
+      diagnostics,
+    };
+  }
+  const config = Object.assign({}, userConfig); // not positive it's json safe
 
   const logger = bootstrapConfig.logger || config.logger || createLogger();
   const rootDir = typeof config.rootDir === 'string' ? config.rootDir : '/';
@@ -183,6 +208,8 @@ export const validateConfig = (
     }
     return arr;
   }, [] as RegExp[]);
+
+  VALIDATED_CONFIG_CACHE = validatedConfig;
 
   return {
     config: validatedConfig,
