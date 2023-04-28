@@ -4,6 +4,7 @@ import {
   generatePreamble,
   getSourceMappingUrlForEndOfFile,
   hasError,
+  isOutputTargetDistCustomElements,
   isString,
   rollupToStencilSourceMap,
 } from '@utils';
@@ -20,7 +21,6 @@ import { proxyCustomElement } from '../../transformers/component-native/proxy-cu
 import { nativeComponentTransform } from '../../transformers/component-native/tranform-to-native-component';
 import { removeCollectionImports } from '../../transformers/remove-collection-imports';
 import { updateStencilCoreImports } from '../../transformers/update-stencil-core-import';
-import { isOutputTargetDistCustomElements } from '../output-utils';
 import { getCustomElementsBuildConditionals } from './custom-elements-build-conditionals';
 
 /**
@@ -48,7 +48,7 @@ export const outputCustomElements = async (
     return;
   }
 
-  const bundlingEventMessage = 'generate custom elements';
+  const bundlingEventMessage = `generate custom elements${config.sourceMap ? ' + source maps' : ''}`;
   const timespan = buildCtx.createTimeSpan(`${bundlingEventMessage} started`);
 
   await Promise.all(outputTargets.map((target) => bundleCustomElements(config, compilerCtx, buildCtx, target)));

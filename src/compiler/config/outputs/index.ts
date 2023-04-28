@@ -1,7 +1,6 @@
-import { buildError } from '@utils';
+import { buildError, isValidConfigOutputTarget, VALID_CONFIG_OUTPUT_TARGETS } from '@utils';
 
 import type * as d from '../../../declarations';
-import { isValidConfigOutputTarget, VALID_CONFIG_OUTPUT_TARGETS } from '../../output-targets/output-utils';
 import { validateCollection } from './validate-collection';
 import { validateCustomElement } from './validate-custom-element';
 import { validateCustomOutput } from './validate-custom-output';

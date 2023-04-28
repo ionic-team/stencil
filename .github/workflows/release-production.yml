@@ -1,0 +1,36 @@
+name: 'Stencil Production Release (TEST)'
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        required: true
+        type: choice
+        description: Which version should be published?
+        options:
+          - prerelease
+          - prepatch
+          - preminor
+          - premajor
+          - patch
+          - minor
+          - major
+      tag:
+        required: true
+        type: choice
+        description: Which npm tag should this be published to?
+        options:
+          - dev
+          - latest
+
+jobs:
+  release-stencil-production-build:
+    name: Publish Production Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Echo GH Input
+        run: |
+          echo "I do not use these values yet!"
+          echo "Version: ${{ inputs.version }}"
+          echo "Tag: ${{ inputs.tag }}"
+        shell: bash

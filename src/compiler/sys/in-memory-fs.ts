@@ -648,7 +648,7 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
    * @param filePath the filePath to write to
    * @param content what to write!
    * @param opts an optional object which controls how the file is written
-   * @return a Promise wrapping a write result object
+   * @returns a Promise wrapping a write result object
    */
   const writeFile = async (filePath: string, content: string, opts?: FsWriteOptions): Promise<FsWriteResults> => {
     if (typeof filePath !== 'string') {

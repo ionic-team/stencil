@@ -1,9 +1,8 @@
-import { buildError, catchError, isFunction, isString } from '@utils';
+import { buildError, catchError, isFunction, isOutputTargetDocs, isString } from '@utils';
 import { basename, relative } from 'path';
 
 import type * as d from '../../declarations';
 import { PluginCtx, PluginTransformResults } from '../../declarations';
-import { isOutputTargetDocs } from '../output-targets/output-utils';
 import { parseCssImports } from '../style/css-imports';
 
 export const runPluginResolveId = async (pluginCtx: PluginCtx, importee: string) => {

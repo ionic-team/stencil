@@ -1,4 +1,5 @@
-import { isOutputTargetDocs } from '../compiler/output-targets/output-utils';
+import { isOutputTargetDocs } from '@utils';
+
 import type { ValidatedConfig } from '../declarations';
 import type { CoreCompiler } from './load-compiler';
 import { startupCompilerLog } from './logs';

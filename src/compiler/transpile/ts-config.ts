@@ -1,7 +1,7 @@
+import { isOutputTargetDistTypes } from '@utils';
 import ts from 'typescript';
 
 import type * as d from '../../declarations';
-import { isOutputTargetDistTypes } from '../output-targets/output-utils';
 
 /**
  * Derive a {@link ts.CompilerOptions} object from the options currently set

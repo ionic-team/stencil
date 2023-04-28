@@ -1,8 +1,7 @@
-import { addDocBlock, normalizePath } from '@utils';
+import { addDocBlock, GENERATED_DTS, getComponentsDtsSrcFilePath, normalizePath } from '@utils';
 import { isAbsolute, relative, resolve } from 'path';
 
 import type * as d from '../../declarations';
-import { GENERATED_DTS, getComponentsDtsSrcFilePath } from '../output-targets/output-utils';
 import { generateComponentTypes } from './generate-component-types';
 import { generateEventDetailTypes } from './generate-event-detail-types';
 import { updateStencilTypesImports } from './stencil-types';

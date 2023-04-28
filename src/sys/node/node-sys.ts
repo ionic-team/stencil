@@ -17,6 +17,7 @@ import type {
   CompilerSystemRealpathResults,
   CompilerSystemRemoveFileResults,
   CompilerSystemWriteFileResults,
+  Logger,
 } from '../../declarations';
 import { asyncGlob, nodeCopyTasks } from './node-copy-tasks';
 import { NodeLazyRequire } from './node-lazy-require';
@@ -30,11 +31,12 @@ import { NodeWorkerController } from './node-worker-controller';
  *
  * This takes an optional param supplying a `process` object to be used.
  *
- * @param c an optional object wrapping a `process` object
+ * @param c an optional object wrapping `process` and `logger` objects
  * @returns a node.js `CompilerSystem` object
  */
-export function createNodeSys(c: { process?: any } = {}): CompilerSystem {
+export function createNodeSys(c: { process?: any; logger?: Logger } = {}): CompilerSystem {
   const prcs: NodeJS.Process = c?.process ?? global.process;
+  const logger: Logger | undefined = c?.logger;
   const destroys = new Set<() => Promise<void> | void>();
   const onInterruptsCallbacks: (() => void)[] = [];
 
@@ -457,9 +459,12 @@ export function createNodeSys(c: { process?: any } = {}): CompilerSystem {
       sys.events = buildEvents();
 
       sys.watchDirectory = (p, callback, recursive) => {
+        logger?.debug(`NODE_SYS_DEBUG::watchDir ${p}`);
+
         const tsFileWatcher = tsSysWatchDirectory(
           p,
           (fileName) => {
+            logger?.debug(`NODE_SYS_DEBUG::watchDir:callback dir=${p} changedPath=${fileName}`);
             callback(normalizePath(fileName), 'fileUpdate');
           },
           recursive
@@ -496,6 +501,8 @@ export function createNodeSys(c: { process?: any } = {}): CompilerSystem {
        * @returns an object with a method for unhooking the file watcher from the system
        */
       sys.watchFile = (path: string, callback: CompilerFileWatcherCallback): CompilerFileWatcher => {
+        logger?.debug(`NODE_SYS_DEBUG::watchFile ${path}`);
+
         const tsFileWatcher = tsSysWatchFile(
           path,
           (fileName: string, tsEventKind: TypeScript.FileWatcherEventKind) => {

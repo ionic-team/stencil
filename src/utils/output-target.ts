@@ -1,7 +1,27 @@
 import { flatOne, normalizePath, sortBy } from '@utils';
 import { basename, dirname, join, relative } from 'path';
 
-import type * as d from '../../declarations';
+import type * as d from '../declarations';
+import {
+  COPY,
+  CUSTOM,
+  DIST,
+  DIST_COLLECTION,
+  DIST_CUSTOM_ELEMENTS,
+  DIST_GLOBAL_STYLES,
+  DIST_HYDRATE_SCRIPT,
+  DIST_LAZY,
+  DIST_LAZY_LOADER,
+  DIST_TYPES,
+  DOCS_CUSTOM,
+  DOCS_JSON,
+  DOCS_README,
+  DOCS_VSCODE,
+  GENERATED_DTS,
+  STATS,
+  VALID_CONFIG_OUTPUT_TARGETS,
+  WWW,
+} from './constants';
 
 export const relativeImport = (pathFrom: string, pathTo: string, ext?: string, addPrefix = true) => {
   let relativePath = relative(dirname(pathFrom), dirname(pathTo));
@@ -61,55 +81,13 @@ export const isOutputTargetStats = (o: d.OutputTarget): o is d.OutputTargetStats
 
 export const isOutputTargetDistTypes = (o: d.OutputTarget): o is d.OutputTargetDistTypes => o.type === DIST_TYPES;
 
-export const getComponentsFromModules = (moduleFiles: d.Module[]) =>
-  sortBy(flatOne(moduleFiles.map((m) => m.cmps)), (c: d.ComponentCompilerMeta) => c.tagName);
-
-export const COPY = 'copy';
-export const CUSTOM = 'custom';
-export const DIST = 'dist';
-export const DIST_COLLECTION = 'dist-collection';
-export const DIST_CUSTOM_ELEMENTS = 'dist-custom-elements';
-
-export const DIST_TYPES = 'dist-types';
-export const DIST_HYDRATE_SCRIPT = 'dist-hydrate-script';
-export const DIST_LAZY = 'dist-lazy';
-export const DIST_LAZY_LOADER = 'dist-lazy-loader';
-export const DIST_GLOBAL_STYLES = 'dist-global-styles';
-export const DOCS_CUSTOM = 'docs-custom';
-export const DOCS_JSON = 'docs-json';
-export const DOCS_README = 'docs-readme';
-export const DOCS_VSCODE = 'docs-vscode';
-export const STATS = 'stats';
-export const WWW = 'www';
-
 /**
- * Valid output targets to specify in a Stencil config.
- *
- * Note that there are some output targets (e.g. `DIST_TYPES`) which are
- * programmatically set as output targets by the compiler when other output
- * targets (in that case `DIST`) are set, but which are _not_ supported in a
- * Stencil config. This is enforced in the output target validation code.
+ * Retrieve the Stencil component compiler metadata from a collection of Stencil {@link Module}s
+ * @param moduleFiles the collection of `Module`s to retrieve the metadata from
+ * @returns the metadata, lexicographically sorted by the tag names of the components
  */
-export const VALID_CONFIG_OUTPUT_TARGETS = [
-  // DIST
-  WWW,
-  DIST,
-  DIST_COLLECTION,
-  DIST_CUSTOM_ELEMENTS,
-  DIST_LAZY,
-  DIST_HYDRATE_SCRIPT,
-
-  // DOCS
-  DOCS_JSON,
-  DOCS_README,
-  DOCS_VSCODE,
-  DOCS_CUSTOM,
-
-  // MISC
-  COPY,
-  CUSTOM,
-  STATS,
-] as const;
+export const getComponentsFromModules = (moduleFiles: d.Module[]): d.ComponentCompilerMeta[] =>
+  sortBy(flatOne(moduleFiles.map((m) => m.cmps)), (c: d.ComponentCompilerMeta) => c.tagName);
 
 // Given a ReadonlyArray of strings we can derive a union type from them
 // by getting `typeof ARRAY[number]`, i.e. the type of all values returns
@@ -130,5 +108,3 @@ export function isValidConfigOutputTarget(targetType: string): targetType is Val
   // see microsoft/TypeScript#31018 for some discussion of this
   return VALID_CONFIG_OUTPUT_TARGETS.includes(targetType as any);
 }
-
-export const GENERATED_DTS = 'components.d.ts';

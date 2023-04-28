@@ -1,9 +1,8 @@
-import { buildError, isGlob, normalizePath } from '@utils';
+import { buildError, isGlob, isOutputTargetCopy, normalizePath } from '@utils';
 import minimatch from 'minimatch';
 import { join } from 'path';
 
 import type * as d from '../../../declarations';
-import { isOutputTargetCopy } from '../output-utils';
 import { canSkipAssetsCopy, getComponentAssetsCopyTasks } from './assets-copy-tasks';
 import { getDestAbsPath, getSrcAbsPath } from './local-copy-tasks';
 

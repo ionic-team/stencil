@@ -1,7 +1,6 @@
-import { catchError } from '@utils';
+import { catchError, isOutputTargetCustom } from '@utils';
 
 import type * as d from '../../declarations';
-import { isOutputTargetCustom } from './output-utils';
 
 export const outputCustom = async (
   config: d.ValidatedConfig,

@@ -1,7 +1,7 @@
+import { isOutputTargetDocsVscode } from '@utils';
 import { join } from 'path';
 
 import type * as d from '../../../declarations';
-import { isOutputTargetDocsVscode } from '../../output-targets/output-utils';
 import { getNameText } from '../generate-doc-data';
 
 /**

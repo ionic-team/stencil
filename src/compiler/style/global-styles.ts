@@ -1,7 +1,6 @@
-import { catchError, normalizePath } from '@utils';
+import { catchError, isOutputTargetDistGlobalStyles, normalizePath } from '@utils';
 
 import type * as d from '../../declarations';
-import { isOutputTargetDistGlobalStyles } from '../output-targets/output-utils';
 import { runPluginTransforms } from '../plugin/plugin';
 import { getCssImports } from './css-imports';
 import { optimizeCss } from './optimize-css';

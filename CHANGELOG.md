@@ -1,3 +1,19 @@
+## 🎙 [3.2.1](https://github.com/ionic-team/stencil/compare/v3.2.0...v3.2.1) (2023-04-10)
+
+
+### Bug Fixes
+
+* **compiler:** sourcemap for dist-custom-elements generation ([#4200](https://github.com/ionic-team/stencil/issues/4200)) ([62ad269](https://github.com/ionic-team/stencil/commit/62ad269ca34f665e41bce825f54de9f81d5ed4a4))
+* **compiler:** write exports for defineCustomElement typedefs ([#4194](https://github.com/ionic-team/stencil/issues/4194)) ([89cd845](https://github.com/ionic-team/stencil/commit/89cd8456a6d274cb3e74e839c7fde228dcdcabc6))
+* **mock-doc:** add missing properties of object returned by matchMedia ([#2880](https://github.com/ionic-team/stencil/issues/2880)) ([69176f8](https://github.com/ionic-team/stencil/commit/69176f8290767c05206f324bccb5bea2cf780448))
+* **test:** fix infinite loops w/ react and @testing-library/dom ([#4188](https://github.com/ionic-team/stencil/issues/4188)) ([51750a2](https://github.com/ionic-team/stencil/commit/51750a28ece1638dae6bc5c02221d70f485bfb44)), closes [#3434](https://github.com/ionic-team/stencil/issues/3434)
+
+
+## Thanks
+
+🎉 Thanks for @cam-narzt for their contributions! 🎉
+
+
 # 🌷 [3.2.0](https://github.com/ionic-team/stencil/compare/v3.1.0...v3.2.0) (2023-03-14)
 
 

@@ -1,13 +1,14 @@
-import { isBoolean, isString } from '@utils';
-import { isAbsolute, join } from 'path';
-
-import type * as d from '../../../declarations';
 import {
   DIST_HYDRATE_SCRIPT,
+  isBoolean,
   isOutputTargetDist,
   isOutputTargetHydrate,
   isOutputTargetWww,
-} from '../../output-targets/output-utils';
+  isString,
+} from '@utils';
+import { isAbsolute, join } from 'path';
+
+import type * as d from '../../../declarations';
 import { NODE_BUILTINS } from '../../sys/modules';
 
 export const validateHydrateScript = (config: d.ValidatedConfig, userOutputs: d.OutputTarget[]) => {

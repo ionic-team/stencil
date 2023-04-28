@@ -9,6 +9,7 @@ export * from './logger/logger-typescript';
 export * from './logger/logger-utils';
 export * from './message-utils';
 export * from './normalize-path';
+export * from './output-target';
 export * from './query-nonce-meta-tag-content';
 export * from './sourcemaps';
 export * from './url-paths';
