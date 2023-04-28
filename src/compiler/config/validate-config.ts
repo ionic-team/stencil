@@ -59,7 +59,6 @@ export const validateConfig = (
 ): ConfigValidationResults => {
   const diagnostics: Diagnostic[] = [];
 
-  console.log('validateConfig::checking');
   if (VALIDATED_CONFIG_CACHE !== null && VALIDATED_CONFIG_CACHE === userConfig) {
     // We've previously done the work to validate a Stencil config. Since our
     // overall validated pipeline is unfortunately not idempotent we do not
@@ -69,7 +68,6 @@ export const validateConfig = (
     //
     // For the sake of correctness we check both that the cache is not null and
     // that it's the same object as the one passed in.
-    console.log('validatedConfig::returning cached config');
     return {
       config: userConfig as ValidatedConfig,
       diagnostics,
@@ -216,7 +214,6 @@ export const validateConfig = (
 
   VALIDATED_CONFIG_CACHE = validatedConfig;
 
-  console.log('validatedConfig::returning new config');
   return {
     config: validatedConfig,
     diagnostics,
