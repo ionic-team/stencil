@@ -22,6 +22,26 @@ describe('validation', () => {
     bootstrapConfig = mockLoadConfigInit();
   });
 
+  describe('caching', () => {
+    it('should cache the validated config between calls if the same config is passed back in', () => {
+      const { config } = validateConfig(userConfig, {});
+      const { config: secondRound } = validateConfig(config, {});
+      // we should have object identity
+      expect(config === secondRound).toBe(true);
+      // objects should be deepEqual as well
+      expect(config).toEqual(secondRound);
+    });
+
+    it('should bust the cache if a different config is supplied than the cached one', () => {
+      // validate once, caching that result
+      const { config } = validateConfig(userConfig, {});
+      // pass a new initial configuration
+      const { config: secondRound } = validateConfig({ ...userConfig }, {});
+      // shouldn't have object equality with the earlier one
+      expect(config === secondRound).toBe(false);
+    });
+  });
+
   describe('flags', () => {
     it('adds a default "flags" object if none is provided', () => {
       userConfig.flags = undefined;
