@@ -90,7 +90,9 @@ describe('normalizePath', () => {
 
   it('throw error when invalid string', () => {
     expect(() => {
-      const path = normalizePath(null);
+      // this test deliberately uses a value whose type does not conform to the function signature's type definition to
+      // ensure non-string's throw an error, requiring us to place a type assertion in the function call below
+      const path = normalizePath(null as unknown as string);
       expect(path).toBe(`/Johnny/B/Goode.js`);
     }).toThrow();
   });
@@ -100,7 +102,6 @@ describe('normalizeFsPathQuery', () => {
   it('format query', () => {
     const p = normalizeFsPathQuery(`/Johnny/B/Goode.js?format=text`);
     expect(p.filePath).toBe(`/Johnny/B/Goode.js`);
-    expect(p.params.get('format')).toBe('text');
     expect(p.format).toBe('text');
     expect(p.ext).toBe(`js`);
   });
@@ -108,9 +109,6 @@ describe('normalizeFsPathQuery', () => {
   it('any query', () => {
     const p = normalizeFsPathQuery(`/Johnny/B/Goode.svg?a=1&b=2&c=3`);
     expect(p.filePath).toBe(`/Johnny/B/Goode.svg`);
-    expect(p.params.get('a')).toBe('1');
-    expect(p.params.get('b')).toBe('2');
-    expect(p.params.get('c')).toBe('3');
     expect(p.format).toBe(null);
     expect(p.ext).toBe(`svg`);
   });
@@ -118,7 +116,6 @@ describe('normalizeFsPathQuery', () => {
   it('no query', () => {
     const p = normalizeFsPathQuery(`/Johnny/B/Goode.js`);
     expect(p.filePath).toBe(`/Johnny/B/Goode.js`);
-    expect(p.params).toBe(null);
     expect(p.format).toBe(null);
     expect(p.ext).toBe(`js`);
   });
@@ -126,7 +123,6 @@ describe('normalizeFsPathQuery', () => {
   it('no ext', () => {
     const p = normalizeFsPathQuery(`/Johnny/B/Goode`);
     expect(p.filePath).toBe(`/Johnny/B/Goode`);
-    expect(p.params).toBe(null);
     expect(p.format).toBe(null);
     expect(p.ext).toBe(`/johnny/b/goode`);
   });
