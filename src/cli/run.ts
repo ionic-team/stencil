@@ -121,10 +121,7 @@ export const runTask = async (
   config.logger = logger;
   config.flags = flags;
   config.sys = sys ?? config.sys ?? coreCompiler.createSystem({ logger });
-  const strictConfig: ValidatedConfig = coreCompiler.validateConfig(config, {
-    logger: config.logger,
-    sys: config.sys,
-  }).config;
+  const strictConfig: ValidatedConfig = coreCompiler.validateConfig(config, {}).config;
 
   switch (task) {
     case 'build':

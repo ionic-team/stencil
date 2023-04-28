@@ -9,9 +9,7 @@ export const getConfig = (userConfig: d.Config): d.ValidatedConfig => {
   const flags = createConfigFlags(userConfig.flags ?? {});
   userConfig.logger = logger;
   userConfig.flags = flags;
-  const config: d.ValidatedConfig = validateConfig(userConfig, {
-    logger,
-  }).config;
+  const config: d.ValidatedConfig = validateConfig(userConfig, {}).config;
 
   setPlatformPath(config.sys.platformPath);
 
