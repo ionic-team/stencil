@@ -106,8 +106,6 @@
   ],
   // Never rebase the branch or update it unless manually requested to avoid noisy PR emails
   rebaseWhen: 'never',
-  // Note: Timezone for the schedule is specified as UTC
-  schedule: ['every weekday at 7am'],
   /**
    * Ensure semantic commits are enabled for commits + PR titles.
    *
