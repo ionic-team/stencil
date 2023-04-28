@@ -119,18 +119,19 @@ export const runTask = async (
   const logger = config.logger ?? createLogger();
   const rootDir = config.rootDir ?? '/';
   const configSys = sys ?? config.sys ?? coreCompiler.createSystem({ logger });
-  const strictConfig: ValidatedConfig = {
-    ...config,
-    flags: createConfigFlags(config.flags ?? { task }),
-    hydratedFlag: config.hydratedFlag ?? null,
-    logger,
-    outputTargets: config.outputTargets ?? [],
-    packageJsonFilePath: configSys.platformPath.join(rootDir, 'package.json'),
-    rootDir,
-    sys: configSys,
-    testing: config.testing ?? {},
-    transformAliasedImportPaths: config.transformAliasedImportPaths ?? false,
-  };
+  const strictConfig: ValidatedConfig = coreCompiler.validateConfig(
+    {
+      ...config,
+      flags: createConfigFlags(config.flags ?? { task }),
+      logger,
+      rootDir,
+      sys: configSys,
+    },
+    {
+      logger,
+      sys: configSys,
+    }
+  ).config;
 
   switch (task) {
     case 'build':
