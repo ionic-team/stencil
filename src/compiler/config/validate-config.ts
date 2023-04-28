@@ -164,9 +164,6 @@ export const validateConfig = (
   // get a good namespace
   validateNamespace(validatedConfig, diagnostics);
 
-  // figure out all of the config paths and absolute paths
-  validatePaths(validatedConfig);
-
   // outputTargets
   validateOutputTargets(validatedConfig, diagnostics);
 
