@@ -102,7 +102,7 @@
     {
       matchPackageNames: ['eslint-plugin-jsdoc'],
       // this package can be released often, let's look at it every week
-//      schedule: ["before 11am on monday"]
+      schedule: ["before 11am on monday"]
     }
   ],
   // Never rebase the branch or update it unless manually requested to avoid noisy PR emails
