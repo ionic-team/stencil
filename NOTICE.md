@@ -2706,7 +2706,7 @@ Author: Isaac Z. Schlueter <i@izs.me> (http://blog.izs.me)
 
 > The ISC License
 > 
-> Copyright (c) 2011-2022 Isaac Z. Schlueter and Contributors
+> Copyright (c) 2011-2023 Isaac Z. Schlueter and Contributors
 > 
 > Permission to use, copy, modify, and/or distribute this software for any
 > purpose with or without fee is hereby granted, provided that the above
