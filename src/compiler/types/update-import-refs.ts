@@ -1,4 +1,5 @@
 import { dirname, resolve } from 'path';
+import ts from 'typescript';
 
 import type * as d from '../../declarations';
 
@@ -8,15 +9,17 @@ import type * as d from '../../declarations';
  * @param typeCounts a map of seen types and the number of times the type has been seen
  * @param cmp the metadata associated with the component whose types are being inspected
  * @param filePath the path of the component file
+ * @param tsOptions The TS compiler options to be used for resolving aliased module paths
  * @returns the updated import data
  */
 export const updateReferenceTypeImports = (
   importDataObj: d.TypesImportData,
   typeCounts: Map<string, number>,
   cmp: d.ComponentCompilerMeta,
-  filePath: string
+  filePath: string,
+  tsOptions: ts.CompilerOptions
 ): d.TypesImportData => {
-  const updateImportReferences = updateImportReferenceFactory(typeCounts, filePath);
+  const updateImportReferences = updateImportReferenceFactory(typeCounts, filePath, tsOptions);
 
   return [...cmp.properties, ...cmp.events, ...cmp.methods]
     .filter(
@@ -44,9 +47,14 @@ type ImportReferenceUpdater = (
  * Factory function to create an `ImportReferenceUpdater` instance
  * @param typeCounts a key-value store of seen type names and the number of times the type name has been seen
  * @param filePath the path of the file containing the component whose imports are being inspected
+ * @param tsOptions The TS compiler options to be used for resolving aliased module paths
  * @returns an `ImportReferenceUpdater` instance for updating import references in the provided `filePath`
  */
-const updateImportReferenceFactory = (typeCounts: Map<string, number>, filePath: string): ImportReferenceUpdater => {
+const updateImportReferenceFactory = (
+  typeCounts: Map<string, number>,
+  filePath: string,
+  tsOptions: ts.CompilerOptions
+): ImportReferenceUpdater => {
   /**
    * Determines the number of times that a type identifier (name) has been used. If an identifier has been used before,
    * append the number of times the identifier has been seen to its name to avoid future naming collisions
@@ -82,7 +90,16 @@ const updateImportReferenceFactory = (typeCounts: Map<string, number>, filePath:
         } else if (typeReference.location === 'local') {
           importResolvedFile = filePath;
         } else if (typeReference.location === 'import') {
-          importResolvedFile = typeReference.path;
+          const { resolvedModule } = ts.resolveModuleName(
+            typeReference.path,
+            filePath,
+            tsOptions,
+            ts.createCompilerHost(tsOptions)
+          );
+          importResolvedFile =
+            !resolvedModule.isExternalLibraryImport && resolvedModule.resolvedFileName
+              ? resolvedModule.resolvedFileName
+              : typeReference.path;
         }
 
         // If this is a relative path make it absolute
