@@ -451,6 +451,7 @@ type StrictConfigFields =
   | 'logger'
   | 'outputTargets'
   | 'packageJsonFilePath'
+  | 'rollupConfig'
   | 'rootDir'
   | 'sys'
   | 'testing'
