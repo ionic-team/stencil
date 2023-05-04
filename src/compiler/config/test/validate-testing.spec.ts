@@ -33,7 +33,7 @@ describe('validateTesting', () => {
 
   describe('browserHeadless', () => {
     describe("using 'headless' value from cli", () => {
-      it.each([[false], [true], ['new']])('sets browserHeadless to %s', (headless) => {
+      it.each([false, true, 'new'])('sets browserHeadless to %s', (headless) => {
         userConfig.flags = { ...flags, e2e: true, headless };
         const { config } = validateConfig(userConfig, mockLoadConfigInit());
         expect(config.testing.browserHeadless).toBe(headless);
@@ -65,23 +65,14 @@ describe('validateTesting', () => {
         userConfig.flags = { ...flags, e2e: true, headless: undefined };
       });
 
-      it('uses "new" headless mode from testing config', () => {
-        userConfig.testing = { browserHeadless: 'new' };
-        const { config } = validateConfig(userConfig, mockLoadConfigInit());
-        expect(config.testing.browserHeadless).toBe('new');
-      });
-
-      it('sets browserHeadless to true', () => {
-        userConfig.testing = { browserHeadless: true };
-        const { config } = validateConfig(userConfig, mockLoadConfigInit());
-        expect(config.testing.browserHeadless).toBe(true);
-      });
-
-      it('sets browserHeadless to false', () => {
-        userConfig.testing = { browserHeadless: false };
-        const { config } = validateConfig(userConfig, mockLoadConfigInit());
-        expect(config.testing.browserHeadless).toBe(false);
-      });
+      it.each<boolean | 'new'>([false, true, 'new'])(
+        'uses %s browserHeadless mode from testing config',
+        (browserHeadlessValue) => {
+          userConfig.testing = { browserHeadless: browserHeadlessValue };
+          const { config } = validateConfig(userConfig, mockLoadConfigInit());
+          expect(config.testing.browserHeadless).toBe(browserHeadlessValue);
+        }
+      );
 
       it('defaults the headless mode to true when browserHeadless is not provided', () => {
         userConfig.testing = {};
