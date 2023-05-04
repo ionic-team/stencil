@@ -51,7 +51,7 @@ describe('validateTesting', () => {
         expect(config.testing.browserHeadless).toBe('new');
       });
 
-      it("defaults to true outside of CI", () => {
+      it('defaults to true outside of CI', () => {
         userConfig.flags = { ...flags, e2e: true };
         const { config } = validateConfig(userConfig, mockLoadConfigInit());
         expect(config.testing.browserHeadless).toBe(true);
