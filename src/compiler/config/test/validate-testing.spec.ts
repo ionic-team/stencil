@@ -33,22 +33,10 @@ describe('validateTesting', () => {
 
   describe('browserHeadless', () => {
     describe("using 'headless' value from cli", () => {
-      it("sets browserHeadless to false from 'headless: false'", () => {
-        userConfig.flags = { ...flags, e2e: true, headless: false };
+      it.each([[false], [true], ['new']])('sets browserHeadless to %s', (headless) => {
+        userConfig.flags = { ...flags, e2e: true, headless };
         const { config } = validateConfig(userConfig, mockLoadConfigInit());
-        expect(config.testing.browserHeadless).toBe(false);
-      });
-
-      it("sets browserHeadless to true from 'headless: true'", () => {
-        userConfig.flags = { ...flags, e2e: true, headless: true };
-        const { config } = validateConfig(userConfig, mockLoadConfigInit());
-        expect(config.testing.browserHeadless).toBe(true);
-      });
-
-      it("sets browserHeadless to 'new' from 'headless: \"new\"'", () => {
-        userConfig.flags = { ...flags, e2e: true, headless: 'new' };
-        const { config } = validateConfig(userConfig, mockLoadConfigInit());
-        expect(config.testing.browserHeadless).toBe('new');
+        expect(config.testing.browserHeadless).toBe(headless);
       });
 
       it('defaults to true outside of CI', () => {
