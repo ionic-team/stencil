@@ -60,10 +60,8 @@ export const validatePaths = (config: d.Config): ConfigPaths => {
     validatedPaths.globalScript = join(rootDir, config.globalScript);
   }
 
-  if (typeof config.globalStyle === 'string') {
-    if (!isAbsolute(config.globalStyle)) {
-      validatedPaths.globalStyle = join(rootDir, config.globalStyle);
-    }
+  if (typeof config.globalStyle === 'string' && !isAbsolute(config.globalStyle)) {
+    validatedPaths.globalStyle = join(rootDir, config.globalStyle);
   }
 
   if (config.writeLog) {
