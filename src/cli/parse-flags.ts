@@ -113,6 +113,14 @@ const parseCLITerm = (flags: ConfigFlags, args: string[]) => {
   // array is empty, we're done!
   if (arg === undefined) return;
 
+  // capture whether this is a special case of a negated boolean or boolean-string before we start to test each case
+  const isNegatedBoolean =
+    !readOnlyArrayHasStringMember(BOOLEAN_CLI_FLAGS, normalizeFlagName(arg)) &&
+    readOnlyArrayHasStringMember(BOOLEAN_CLI_FLAGS, normalizeNegativeFlagName(arg));
+  const isNegatedBooleanOrString =
+    !readOnlyArrayHasStringMember(BOOLEAN_STRING_CLI_FLAGS, normalizeFlagName(arg)) &&
+    readOnlyArrayHasStringMember(BOOLEAN_STRING_CLI_FLAGS, normalizeNegativeFlagName(arg));
+
   // EqualsArg → "--" ArgName "=" CLIValue ;
   if (arg.startsWith('--') && arg.includes('=')) {
     // we're dealing with an EqualsArg, we have a special helper for that
@@ -142,13 +150,7 @@ const parseCLITerm = (flags: ConfigFlags, args: string[]) => {
   }
 
   // NegativeArg → "--no" ArgName ;
-  else if (
-    arg.startsWith('--no') &&
-    ((!readOnlyArrayHasStringMember(BOOLEAN_CLI_FLAGS, normalizeFlagName(arg)) &&
-      readOnlyArrayHasStringMember(BOOLEAN_CLI_FLAGS, normalizeNegativeFlagName(arg))) ||
-      (!readOnlyArrayHasStringMember(BOOLEAN_STRING_CLI_FLAGS, normalizeFlagName(arg)) &&
-        readOnlyArrayHasStringMember(BOOLEAN_STRING_CLI_FLAGS, normalizeNegativeFlagName(arg))))
-  ) {
+  else if (arg.startsWith('--no') && (isNegatedBoolean || isNegatedBooleanOrString)) {
     // possibly dealing with a `NegativeArg` here. There is a little ambiguity
     // here because we have arguments that already begin with `no` like
     // `notify`, so we need to test if a normalized form of the raw argument is
