@@ -16,7 +16,6 @@ export const BOOLEAN_CLI_FLAGS = [
   'e2e',
   'es5',
   'esm',
-  'headless',
   'help',
   'log',
   'open',
@@ -173,6 +172,17 @@ export const STRING_ARRAY_CLI_FLAGS = [
 export const STRING_NUMBER_CLI_FLAGS = ['maxWorkers'] as const;
 
 /**
+ * All the CLI arguments which may have boolean or string values.
+ */
+export const BOOLEAN_STRING_CLI_FLAGS = [
+  /**
+   * `headless` is an argument that prior to Chrome v112, only accepted boolean values. Starting with Chrome v112,
+   * Stencil will accept a value of 'new' to support the new headless mode.
+   */
+  'headless',
+] as const;
+
+/**
  * All the LogLevel-type options supported by the Stencil CLI
  *
  * This is a bit silly since there's only one such argument atm,
@@ -193,6 +203,7 @@ export type StringCLIFlag = ArrayValuesAsUnion<typeof STRING_CLI_FLAGS>;
 export type StringArrayCLIFlag = ArrayValuesAsUnion<typeof STRING_ARRAY_CLI_FLAGS>;
 export type NumberCLIFlag = ArrayValuesAsUnion<typeof NUMBER_CLI_FLAGS>;
 export type StringNumberCLIFlag = ArrayValuesAsUnion<typeof STRING_NUMBER_CLI_FLAGS>;
+type BooleanStringCLIFlag = ArrayValuesAsUnion<typeof BOOLEAN_STRING_CLI_FLAGS>;
 export type LogCLIFlag = ArrayValuesAsUnion<typeof LOG_LEVEL_CLI_FLAGS>;
 
 export type KnownCLIFlag =
@@ -201,6 +212,7 @@ export type KnownCLIFlag =
   | StringArrayCLIFlag
   | NumberCLIFlag
   | StringNumberCLIFlag
+  | BooleanStringCLIFlag
   | LogCLIFlag;
 
 type AliasMap = Partial<Record<string, KnownCLIFlag>>;
@@ -276,6 +288,12 @@ type NumberConfigFlags = ObjectFromKeys<typeof NUMBER_CLI_FLAGS, number>;
 type StringNumberConfigFlags = ObjectFromKeys<typeof STRING_NUMBER_CLI_FLAGS, string | number>;
 
 /**
+ * Type containing the configuration flags which may be set to either string
+ * or boolean values.
+ */
+type BooleanStringConfigFlags = ObjectFromKeys<typeof BOOLEAN_STRING_CLI_FLAGS, boolean | string>;
+
+/**
  * Type containing the possible LogLevel configuration flags, to be included
  * in ConfigFlags, below
  */
@@ -301,6 +319,7 @@ export interface ConfigFlags
     StringArrayConfigFlags,
     NumberConfigFlags,
     StringNumberConfigFlags,
+    BooleanStringConfigFlags,
     LogLevelFlags {
   task: TaskCommand | null;
   args: string[];
