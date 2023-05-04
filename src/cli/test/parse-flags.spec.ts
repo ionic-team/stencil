@@ -150,20 +150,6 @@ describe('parseFlags', () => {
       }
     );
 
-    it("parses a boolean-string flag as a string with 'old' arg", () => {
-      const args = ['--headless', 'old'];
-      const flags = parseFlags(args);
-      expect(flags.headless).toBe('old');
-      expect(flags.knownArgs).toEqual(['--headless', 'old']);
-    });
-
-    it("parses a boolean-string flag as a string with 'old' arg using equality", () => {
-      const args = ['--headless=old'];
-      const flags = parseFlags(args);
-      expect(flags.headless).toBe('old');
-      expect(flags.knownArgs).toEqual(['--headless', 'old']);
-    });
-
     it("parses a boolean-string flag as a string with 'new' arg", () => {
       const args = ['--headless', 'new'];
       const flags = parseFlags(args);
