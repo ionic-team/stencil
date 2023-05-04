@@ -97,16 +97,20 @@
       matchPackagePrefixes: ['@typescript-eslint'],
       groupName: 'TypeScript-ESLint',
       // these packages can be released often, let's look at them every week
-      schedule: ["before 7am on monday"]
+      // Note: Timezone for the schedule is specified as UTC
+      schedule: ["before 11am on monday"]
     },
     {
       matchPackageNames: ['eslint-plugin-jsdoc'],
       // this package can be released often, let's look at it every week
-      schedule: ["before 7am on monday"]
+      // Note: Timezone for the schedule is specified as UTC
+      schedule: ["before 11am on monday"]
     }
   ],
   // Never rebase the branch or update it unless manually requested to avoid noisy PR emails
   rebaseWhen: 'never',
+  // Note: Timezone for the schedule is specified as UTC
+  schedule: ['every weekday before 11am'],
   /**
    * Ensure semantic commits are enabled for commits + PR titles.
    *
