@@ -31,28 +31,76 @@ describe('validateTesting', () => {
     ];
   });
 
-  it('set headless false w/ flag', () => {
-    userConfig.flags = { ...flags, e2e: true, headless: false };
-    const { config } = validateConfig(userConfig, mockLoadConfigInit());
-    expect(config.testing.browserHeadless).toBe(false);
-  });
+  describe('browserHeadless', () => {
+    describe("using 'headless' value from cli", () => {
+      it("sets browserHeadless to false from 'headless: false'", () => {
+        userConfig.flags = { ...flags, e2e: true, headless: false };
+        const { config } = validateConfig(userConfig, mockLoadConfigInit());
+        expect(config.testing.browserHeadless).toBe(false);
+      });
 
-  it('set headless true w/ flag', () => {
-    userConfig.flags = { ...flags, e2e: true, headless: true };
-    const { config } = validateConfig(userConfig, mockLoadConfigInit());
-    expect(config.testing.browserHeadless).toBe(true);
-  });
+      it("sets browserHeadless to true from 'headless: true'", () => {
+        userConfig.flags = { ...flags, e2e: true, headless: true };
+        const { config } = validateConfig(userConfig, mockLoadConfigInit());
+        expect(config.testing.browserHeadless).toBe(true);
+      });
 
-  it('default headless true', () => {
-    userConfig.flags = { ...flags, e2e: true };
-    const { config } = validateConfig(userConfig, mockLoadConfigInit());
-    expect(config.testing.browserHeadless).toBe(true);
-  });
+      it("sets browserHeadless to 'new' from 'headless: \"new\"'", () => {
+        userConfig.flags = { ...flags, e2e: true, headless: 'new' };
+        const { config } = validateConfig(userConfig, mockLoadConfigInit());
+        expect(config.testing.browserHeadless).toBe('new');
+      });
 
-  it('force headless with ci flag', () => {
-    userConfig.flags = { ...flags, ci: true, e2e: true, headless: false };
-    const { config } = validateConfig(userConfig, mockLoadConfigInit());
-    expect(config.testing.browserHeadless).toBe(true);
+      it("defaults to true outside of CI", () => {
+        userConfig.flags = { ...flags, e2e: true };
+        const { config } = validateConfig(userConfig, mockLoadConfigInit());
+        expect(config.testing.browserHeadless).toBe(true);
+      });
+    });
+
+    describe('with ci enabled', () => {
+      it("forces using the old headless mode when 'headless: false'", () => {
+        userConfig.flags = { ...flags, ci: true, e2e: true, headless: false };
+        const { config } = validateConfig(userConfig, mockLoadConfigInit());
+        expect(config.testing.browserHeadless).toBe(true);
+      });
+
+      it('allows the new headless mode to be used', () => {
+        userConfig.flags = { ...flags, ci: true, e2e: true, headless: 'new' };
+        const { config } = validateConfig(userConfig, mockLoadConfigInit());
+        expect(config.testing.browserHeadless).toBe('new');
+      });
+    });
+
+    describe('`testing` configuration', () => {
+      beforeEach(() => {
+        userConfig.flags = { ...flags, e2e: true, headless: undefined };
+      });
+
+      it('uses "new" headless mode from testing config', () => {
+        userConfig.testing = { browserHeadless: 'new' };
+        const { config } = validateConfig(userConfig, mockLoadConfigInit());
+        expect(config.testing.browserHeadless).toBe('new');
+      });
+
+      it('sets browserHeadless to true', () => {
+        userConfig.testing = { browserHeadless: true };
+        const { config } = validateConfig(userConfig, mockLoadConfigInit());
+        expect(config.testing.browserHeadless).toBe(true);
+      });
+
+      it('sets browserHeadless to false', () => {
+        userConfig.testing = { browserHeadless: false };
+        const { config } = validateConfig(userConfig, mockLoadConfigInit());
+        expect(config.testing.browserHeadless).toBe(false);
+      });
+
+      it('defaults the headless mode to true when browserHeadless is not provided', () => {
+        userConfig.testing = {};
+        const { config } = validateConfig(userConfig, mockLoadConfigInit());
+        expect(config.testing.browserHeadless).toBe(true);
+      });
+    });
   });
 
   it('default to no-sandbox browser args with ci flag', () => {
