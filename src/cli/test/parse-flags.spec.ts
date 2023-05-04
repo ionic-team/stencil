@@ -132,6 +132,53 @@ describe('parseFlags', () => {
     expect(flags.config).toBe('/config-2.js');
   });
 
+  describe('boolean-string flag', () => {
+    it('parses a boolean-string flag as a boolean with no arg', () => {
+      const args = ['--headless'];
+      const flags = parseFlags(args);
+      expect(flags.headless).toBe(true);
+      expect(flags.knownArgs).toEqual(['--headless']);
+    });
+
+    it.each([['--noHeadless'], ['--no-headless']])(
+      'parses a boolean-string flag as a falsy boolean with "no" arg - \'%s\'',
+      (noVariant) => {
+        const args = [noVariant];
+        const flags = parseFlags(args);
+        expect(flags.headless).toBe(false);
+        expect(flags.knownArgs).toEqual([noVariant]);
+      }
+    );
+
+    it("parses a boolean-string flag as a string with 'old' arg", () => {
+      const args = ['--headless', 'old'];
+      const flags = parseFlags(args);
+      expect(flags.headless).toBe('old');
+      expect(flags.knownArgs).toEqual(['--headless', 'old']);
+    });
+
+    it("parses a boolean-string flag as a string with 'old' arg using equality", () => {
+      const args = ['--headless=old'];
+      const flags = parseFlags(args);
+      expect(flags.headless).toBe('old');
+      expect(flags.knownArgs).toEqual(['--headless', 'old']);
+    });
+
+    it("parses a boolean-string flag as a string with 'new' arg", () => {
+      const args = ['--headless', 'new'];
+      const flags = parseFlags(args);
+      expect(flags.headless).toBe('new');
+      expect(flags.knownArgs).toEqual(['--headless', 'new']);
+    });
+
+    it("parses a boolean-string flag as a string with 'new' arg using equality", () => {
+      const args = ['--headless=new'];
+      const flags = parseFlags(args);
+      expect(flags.headless).toBe('new');
+      expect(flags.knownArgs).toEqual(['--headless', 'new']);
+    });
+  });
+
   describe.each<LogLevel>(['info', 'warn', 'error', 'debug'])('logLevel %s', (level) => {
     it("should parse '--logLevel %s'", () => {
       const args = ['--logLevel', level];

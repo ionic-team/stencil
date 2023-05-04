@@ -3,6 +3,7 @@ import { readOnlyArrayHasStringMember, toCamelCase } from '@utils';
 import { LOG_LEVELS, LogLevel, TaskCommand } from '../declarations';
 import {
   BOOLEAN_CLI_FLAGS,
+  BOOLEAN_STRING_CLI_FLAGS,
   CLI_FLAG_ALIASES,
   CLI_FLAG_REGEX,
   ConfigFlags,
@@ -143,8 +144,10 @@ const parseCLITerm = (flags: ConfigFlags, args: string[]) => {
   // NegativeArg → "--no" ArgName ;
   else if (
     arg.startsWith('--no') &&
-    !readOnlyArrayHasStringMember(BOOLEAN_CLI_FLAGS, normalizeFlagName(arg)) &&
-    readOnlyArrayHasStringMember(BOOLEAN_CLI_FLAGS, normalizeNegativeFlagName(arg))
+    ((!readOnlyArrayHasStringMember(BOOLEAN_CLI_FLAGS, normalizeFlagName(arg)) &&
+      readOnlyArrayHasStringMember(BOOLEAN_CLI_FLAGS, normalizeNegativeFlagName(arg))) ||
+      (!readOnlyArrayHasStringMember(BOOLEAN_STRING_CLI_FLAGS, normalizeFlagName(arg)) &&
+        readOnlyArrayHasStringMember(BOOLEAN_STRING_CLI_FLAGS, normalizeNegativeFlagName(arg))))
   ) {
     // possibly dealing with a `NegativeArg` here. There is a little ambiguity
     // here because we have arguments that already begin with `no` like
@@ -297,6 +300,21 @@ const setCLIArg = (flags: ConfigFlags, rawArg: string, normalizedArg: string, va
       flags.knownArgs.push(value);
     } else {
       throwCLIParsingError(rawArg, 'expected a string or a number but received nothing');
+    }
+  }
+
+  // We're setting a value which could be either a boolean _or_ a string
+  else if (readOnlyArrayHasStringMember(BOOLEAN_STRING_CLI_FLAGS, normalizedArg)) {
+    const derivedValue =
+      typeof value === 'string'
+        ? value
+          ? value // use the supplied value if it's a non-empty string
+          : false // otherwise, default to false for the empty string
+        : true; // no value was supplied, default to true
+    flags[normalizedArg] = derivedValue;
+    flags.knownArgs.push(rawArg);
+    if (typeof derivedValue === 'string' && derivedValue) {
+      flags.knownArgs.push(derivedValue);
     }
   }
 
