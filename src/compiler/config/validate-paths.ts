@@ -26,7 +26,7 @@ interface ConfigPaths {
  * @returns an object holding the validated paths
  */
 export const validatePaths = (config: d.Config): ConfigPaths => {
-  const rootDir = typeof config.rootDir !== 'string' ? (config.rootDir = '/') : config.rootDir;
+  const rootDir = typeof config.rootDir !== 'string' ? '/' : config.rootDir;
 
   let srcDir = typeof config.srcDir !== 'string' ? DEFAULT_SRC_DIR : config.srcDir;
 
