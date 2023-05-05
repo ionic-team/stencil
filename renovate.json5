@@ -93,6 +93,11 @@
       matchPackageNames: ['glob'],
       allowedVersions: '<9.0.0',
     },
+    // TODO(STENCIL-716): remove this once Stencil drops support for Node 14
+    {
+      matchPackageNames: ['minimatch'],
+      allowedVersions: '<6.0.0',
+    },
     {
       matchPackagePrefixes: ['@typescript-eslint'],
       groupName: 'TypeScript-ESLint',
