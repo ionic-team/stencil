@@ -65,11 +65,11 @@ export const validatePaths = (config: d.Config): ConfigPaths => {
   }
 
   if (config.writeLog) {
-    if (typeof config.buildLogFilePath !== 'string') {
-      config.buildLogFilePath = DEFAULT_BUILD_LOG_FILE_NAME;
-    }
-    if (!isAbsolute(config.buildLogFilePath)) {
-      config.buildLogFilePath = join(config.rootDir, config.buildLogFilePath);
+    validatedPaths.buildLogFilePath =
+      typeof config.buildLogFilePath === 'string' ? config.buildLogFilePath : DEFAULT_BUILD_LOG_FILE_NAME;
+
+    if (!isAbsolute(validatedPaths.buildLogFilePath)) {
+      validatedPaths.buildLogFilePath = join(rootDir, config.buildLogFilePath);
     }
   }
 
