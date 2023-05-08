@@ -4,14 +4,14 @@ import ts from 'typescript';
 
 import type * as d from '../../../declarations';
 
-export const validateTsConfig = async (config: d.Config, sys: d.CompilerSystem, init: d.LoadConfigInit) => {
+export const validateTsConfig = async (config: d.ValidatedConfig, sys: d.CompilerSystem, init: d.LoadConfigInit) => {
   const tsconfig = {
-    path: null as string,
-    compilerOptions: null as any,
-    files: null as string[],
-    include: null as string[],
-    exclude: null as string[],
-    extends: null as string,
+    path: '',
+    compilerOptions: {} as ts.CompilerOptions,
+    files: [] as string[],
+    include: [] as string[],
+    exclude: [] as string[],
+    extends: '',
     diagnostics: [] as d.Diagnostic[],
   };
 
@@ -37,6 +37,10 @@ export const validateTsConfig = async (config: d.Config, sys: d.CompilerSystem, 
       };
 
       const results = ts.getParsedCommandLineOfConfigFile(tsconfig.path, {}, host);
+
+      if (results === undefined) {
+        throw 'Encountered an error reading tsconfig!';
+      }
 
       if (results.errors && results.errors.length > 0) {
         results.errors.forEach((configErr) => {

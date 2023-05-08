@@ -40,9 +40,16 @@ export function mockValidatedConfig(overrides: Partial<ValidatedConfig> = {}): V
     outputTargets: baseConfig.outputTargets ?? [],
     packageJsonFilePath: path.join(rootDir, 'package.json'),
     rootDir,
+    cacheDir: '.stencil',
+    srcIndexHtml: 'src/index.html',
+    srcDir: '/src',
     sys: createTestingSystem(),
     testing: {},
     transformAliasedImportPaths: false,
+    rollupConfig: {
+      inputOptions: {},
+      outputOptions: {},
+    },
     ...overrides,
   };
 }

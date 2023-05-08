@@ -2,13 +2,22 @@ import { isObject, pluck } from '@utils';
 
 import type * as d from '../../declarations';
 
-export const validateRollupConfig = (config: d.UnvalidatedConfig): void => {
-  const cleanRollupConfig = getCleanRollupConfig(config.rollupConfig);
-  config.rollupConfig = cleanRollupConfig;
-};
+/**
+ * Ensure that a valid baseline rollup configuration is set on the validated
+ * config.
+ *
+ * If a config is present this will return a new config based on the user
+ * supplied one.
+ *
+ * If no config is present, this will return a default config.
+ *
+ * @param config a validated user-supplied configuration object
+ * @returns a validated rollup configuration
+ */
+export const validateRollupConfig = (config: d.Config): d.RollupConfig => {
+  let cleanRollupConfig = { ...DEFAULT_ROLLUP_CONFIG };
 
-const getCleanRollupConfig = (rollupConfig: d.RollupConfig): d.RollupConfig => {
-  let cleanRollupConfig = DEFAULT_ROLLUP_CONFIG;
+  const rollupConfig = config.rollupConfig;
 
   if (!rollupConfig || !isObject(rollupConfig)) {
     return cleanRollupConfig;
