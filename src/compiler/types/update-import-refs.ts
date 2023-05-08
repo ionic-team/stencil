@@ -90,16 +90,22 @@ const updateImportReferenceFactory = (
         } else if (typeReference.location === 'local') {
           importResolvedFile = filePath;
         } else if (typeReference.location === 'import') {
-          const { resolvedModule } = ts.resolveModuleName(
-            typeReference.path,
-            filePath,
-            tsOptions,
-            ts.createCompilerHost(tsOptions)
-          );
-          importResolvedFile =
-            !resolvedModule.isExternalLibraryImport && resolvedModule.resolvedFileName
-              ? resolvedModule.resolvedFileName
-              : typeReference.path;
+          importResolvedFile = typeReference.path;
+
+          // We only care to resolve any _potential_ aliased
+          // modules if we're not already certain the path isn't an alias
+          if (!importResolvedFile.startsWith('.')) {
+            const { resolvedModule } = ts.resolveModuleName(
+              typeReference.path,
+              filePath,
+              tsOptions,
+              ts.createCompilerHost(tsOptions)
+            );
+
+            if (!resolvedModule.isExternalLibraryImport && resolvedModule.resolvedFileName) {
+              importResolvedFile = resolvedModule.resolvedFileName;
+            }
+          }
         }
 
         // If this is a relative path make it absolute
