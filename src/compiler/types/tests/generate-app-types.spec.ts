@@ -1415,6 +1415,7 @@ declare module "@stencil/core" {
   });
 
   it('should transform aliased paths', async () => {
+    // TODO(STENCIL-223): remove spy to test actual resolution behavior
     jest.spyOn(ts, 'resolveModuleName').mockReturnValue({
       resolvedModule: {
         isExternalLibraryImport: false,
