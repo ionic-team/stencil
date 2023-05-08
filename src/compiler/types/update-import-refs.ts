@@ -9,7 +9,7 @@ import type * as d from '../../declarations';
  * @param typeCounts a map of seen types and the number of times the type has been seen
  * @param cmp the metadata associated with the component whose types are being inspected
  * @param filePath the path of the component file
- * @param tsOptions The TS compiler options to be used for resolving aliased module paths
+ * @param config The Stencil config for the project
  * @returns the updated import data
  */
 export const updateReferenceTypeImports = (
@@ -17,9 +17,9 @@ export const updateReferenceTypeImports = (
   typeCounts: Map<string, number>,
   cmp: d.ComponentCompilerMeta,
   filePath: string,
-  tsOptions: ts.CompilerOptions
+  config: d.Config
 ): d.TypesImportData => {
-  const updateImportReferences = updateImportReferenceFactory(typeCounts, filePath, tsOptions);
+  const updateImportReferences = updateImportReferenceFactory(typeCounts, filePath, config);
 
   return [...cmp.properties, ...cmp.events, ...cmp.methods]
     .filter(
@@ -47,13 +47,13 @@ type ImportReferenceUpdater = (
  * Factory function to create an `ImportReferenceUpdater` instance
  * @param typeCounts a key-value store of seen type names and the number of times the type name has been seen
  * @param filePath the path of the file containing the component whose imports are being inspected
- * @param tsOptions The TS compiler options to be used for resolving aliased module paths
+ * @param config The Stencil config for the project
  * @returns an `ImportReferenceUpdater` instance for updating import references in the provided `filePath`
  */
 const updateImportReferenceFactory = (
   typeCounts: Map<string, number>,
   filePath: string,
-  tsOptions: ts.CompilerOptions
+  config: d.Config
 ): ImportReferenceUpdater => {
   /**
    * Determines the number of times that a type identifier (name) has been used. If an identifier has been used before,
@@ -93,13 +93,15 @@ const updateImportReferenceFactory = (
           importResolvedFile = typeReference.path!;
 
           // We only care to resolve any _potential_ aliased
-          // modules if we're not already certain the path isn't an alias
-          if (!importResolvedFile.startsWith('.')) {
+          // modules if we're not already certain the path isn't an alias.
+          // We also don't want to transform aliases unless the user has enabled the behavior
+          // in their Stencil config
+          if (config.transformAliasedImportPaths && !importResolvedFile.startsWith('.')) {
             const { resolvedModule } = ts.resolveModuleName(
               typeReference.path!,
               filePath,
-              tsOptions,
-              ts.createCompilerHost(tsOptions)
+              config.tsCompilerOptions,
+              ts.createCompilerHost(config.tsCompilerOptions)
             );
 
             if (resolvedModule && !resolvedModule.isExternalLibraryImport && resolvedModule.resolvedFileName) {
