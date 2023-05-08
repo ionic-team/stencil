@@ -142,7 +142,7 @@ export const getRollupOptions = (
   return rollupOptions;
 };
 
-const getTreeshakeOption = (config: d.Config, bundleOpts: BundleOptions): TreeshakingOptions | boolean => {
+const getTreeshakeOption = (config: d.ValidatedConfig, bundleOpts: BundleOptions): TreeshakingOptions | boolean => {
   if (bundleOpts.platform === 'hydrate') {
     return {
       propertyReadSideEffects: false,

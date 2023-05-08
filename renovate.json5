@@ -7,6 +7,7 @@
    * 1. `npm i -g renovate` will install the validator
    * 2. `renovate-config-validator` will run the validator
    */
+  dependencyDashboard: true,
   // TODO(STENCIL-596): Remove once rollup upgrade is unblocked
   ignoreDeps: [
     'rollup',
@@ -92,20 +93,29 @@
       matchPackageNames: ['glob'],
       allowedVersions: '<9.0.0',
     },
+    // TODO(STENCIL-716): remove this once Stencil drops support for Node 14
+    {
+      matchPackageNames: ['minimatch'],
+      allowedVersions: '<6.0.0',
+    },
     {
       matchPackagePrefixes: ['@typescript-eslint'],
       groupName: 'TypeScript-ESLint',
       // these packages can be released often, let's look at them every week
-      schedule: ["before 7am on monday"]
+      // Note: Timezone for the schedule is specified as UTC
+      schedule: ["before 11am on monday"]
     },
     {
       matchPackageNames: ['eslint-plugin-jsdoc'],
       // this package can be released often, let's look at it every week
-      schedule: ["before 7am on monday"]
+      // Note: Timezone for the schedule is specified as UTC
+      schedule: ["before 11am on monday"]
     }
   ],
   // Never rebase the branch or update it unless manually requested to avoid noisy PR emails
   rebaseWhen: 'never',
+  // Note: Timezone for the schedule is specified as UTC
+  schedule: ['every weekday before 11am'],
   /**
    * Ensure semantic commits are enabled for commits + PR titles.
    *

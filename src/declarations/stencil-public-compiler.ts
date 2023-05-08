@@ -446,12 +446,16 @@ type RequireFields<T, K extends keyof T> = T & { [P in K]-?: T[P] };
  * Fields in {@link Config} to make required for {@link ValidatedConfig}
  */
 type StrictConfigFields =
+  | 'cacheDir'
   | 'flags'
   | 'hydratedFlag'
   | 'logger'
   | 'outputTargets'
   | 'packageJsonFilePath'
+  | 'rollupConfig'
   | 'rootDir'
+  | 'srcDir'
+  | 'srcIndexHtml'
   | 'sys'
   | 'testing'
   | 'transformAliasedImportPaths';
