@@ -116,7 +116,7 @@
     "prettier": "2.8.8",
     "process": "^0.11.10",
     "prompts": "2.4.2",
-    "puppeteer": "^19.5.0",
+    "puppeteer": "^20.0.0",
     "rollup": "2.42.3",
     "rollup-plugin-sourcemaps": "^0.6.3",
     "semver": "^7.3.7",
