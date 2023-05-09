@@ -70,7 +70,7 @@
     "@types/inquirer": "^7.3.1",
     "@types/jest": "^27.0.3",
     "@types/listr": "^0.14.4",
-    "@types/node": "^18.14.0",
+    "@types/node": "^20.1.1",
     "@types/pixelmatch": "^5.2.4",
     "@types/pngjs": "^6.0.1",
     "@types/prompts": "^2.0.9",
@@ -149,7 +149,7 @@
   ],
   "prettier": "@ionic/prettier-config",
   "volta": {
-    "node": "18.16.0",
+    "node": "20.1.0",
     "npm": "9.6.6"
   }
 }
