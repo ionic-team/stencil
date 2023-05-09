@@ -207,7 +207,7 @@ export type StringCLIFlag = ArrayValuesAsUnion<typeof STRING_CLI_FLAGS>;
 export type StringArrayCLIFlag = ArrayValuesAsUnion<typeof STRING_ARRAY_CLI_FLAGS>;
 export type NumberCLIFlag = ArrayValuesAsUnion<typeof NUMBER_CLI_FLAGS>;
 export type StringNumberCLIFlag = ArrayValuesAsUnion<typeof STRING_NUMBER_CLI_FLAGS>;
-type BooleanStringCLIFlag = ArrayValuesAsUnion<typeof BOOLEAN_STRING_CLI_FLAGS>;
+export type BooleanStringCLIFlag = ArrayValuesAsUnion<typeof BOOLEAN_STRING_CLI_FLAGS>;
 export type LogCLIFlag = ArrayValuesAsUnion<typeof LOG_LEVEL_CLI_FLAGS>;
 
 export type KnownCLIFlag =
