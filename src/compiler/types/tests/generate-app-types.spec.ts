@@ -1416,7 +1416,7 @@ declare module "@stencil/core" {
     );
   });
 
-  it('should transform aliased paths if the config option is true', async () => {
+  it('should transform aliased paths if transformAliasedImportPaths is true', async () => {
     const compilerComponentMeta = stubComponentCompilerMeta({
       tagName: 'my-component',
       componentClassName: 'MyComponent',
@@ -1449,7 +1449,7 @@ declare module "@stencil/core" {
     };
     config.transformAliasedImportPaths = true;
     // We need to have a file in the in-memory fs for the TS module resolution to succeed
-    originalWriteFile(path.join(config.rootDir, 'some/stubbed/path/utils/utils.ts'), '');
+    await originalWriteFile(path.join(config.rootDir, 'some/stubbed/path/utils/utils.ts'), '');
 
     patchTypescript(config, compilerCtx.fs);
 
@@ -1517,7 +1517,7 @@ declare module "@stencil/core" {
     );
   });
 
-  it('should not transform aliased paths if the config option is false', async () => {
+  it('should not transform aliased paths if transformAliasedImportPaths is false', async () => {
     const compilerComponentMeta = stubComponentCompilerMeta({
       tagName: 'my-component',
       componentClassName: 'MyComponent',
