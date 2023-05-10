@@ -1,7 +1,8 @@
 import { mockBuildCtx, mockCompilerCtx, mockValidatedConfig } from '@stencil/core/testing';
-import ts, { Extension } from 'typescript';
+import path from 'path';
 
 import type * as d from '../../../declarations';
+import { patchTypescript } from '../../sys/typescript/typescript-sys';
 import { generateAppTypes } from '../generate-app-types';
 import { stubComponentCompilerEvent } from './ComponentCompilerEvent.stub';
 import { stubComponentCompilerMeta } from './ComponentCompilerMeta.stub';
@@ -11,22 +12,23 @@ describe('generateAppTypes', () => {
   let config: d.ValidatedConfig;
   let compilerCtx: d.CompilerCtx;
   let buildCtx: d.BuildCtx;
+  let originalWriteFile: typeof compilerCtx.fs.writeFile;
 
-  const mockFs = {
-    writeFile: jest.fn(),
-  };
+  const mockWriteFile = jest.fn();
 
   beforeEach(() => {
     config = mockValidatedConfig({
-      srcDir: '/',
+      srcDir: path.resolve('/'),
     });
-    compilerCtx = {
-      ...mockCompilerCtx(config),
-      fs: mockFs as any,
-    };
+    compilerCtx = mockCompilerCtx(config);
     buildCtx = mockBuildCtx(config, compilerCtx);
 
-    mockFs.writeFile.mockResolvedValueOnce({ changedContent: true });
+    // Save the original write function to we can create a file in the
+    // in-memory fs if needed
+    originalWriteFile = compilerCtx.fs.writeFile;
+    compilerCtx.fs.writeFile = mockWriteFile;
+
+    mockWriteFile.mockResolvedValueOnce({ changedContent: true });
   });
 
   afterEach(() => {
@@ -43,7 +45,7 @@ describe('generateAppTypes', () => {
 
     await generateAppTypes(config, compilerCtx, buildCtx, 'src');
 
-    expect(mockFs.writeFile).toHaveBeenCalledWith(
+    expect(mockWriteFile).toHaveBeenCalledWith(
       '/components.d.ts',
       `/* eslint-disable */
 /* tslint:disable */
@@ -113,7 +115,7 @@ declare module "@stencil/core" {
 
       await generateAppTypes(config, compilerCtx, buildCtx, 'src');
 
-      expect(mockFs.writeFile).toHaveBeenCalledWith(
+      expect(mockWriteFile).toHaveBeenCalledWith(
         '/components.d.ts',
         `/* eslint-disable */
 /* tslint:disable */
@@ -205,7 +207,7 @@ declare module "@stencil/core" {
 
       await generateAppTypes(config, compilerCtx, buildCtx, 'src');
 
-      expect(mockFs.writeFile).toHaveBeenCalledWith(
+      expect(mockWriteFile).toHaveBeenCalledWith(
         '/components.d.ts',
         `/* eslint-disable */
 /* tslint:disable */
@@ -317,7 +319,7 @@ declare module "@stencil/core" {
 
       await generateAppTypes(config, compilerCtx, buildCtx, 'src');
 
-      expect(mockFs.writeFile).toHaveBeenCalledWith(
+      expect(mockWriteFile).toHaveBeenCalledWith(
         '/components.d.ts',
         `/* eslint-disable */
 /* tslint:disable */
@@ -461,7 +463,7 @@ declare module "@stencil/core" {
 
       await generateAppTypes(config, compilerCtx, buildCtx, 'src');
 
-      expect(mockFs.writeFile).toHaveBeenCalledWith(
+      expect(mockWriteFile).toHaveBeenCalledWith(
         '/components.d.ts',
         `/* eslint-disable */
 /* tslint:disable */
@@ -607,7 +609,7 @@ declare module "@stencil/core" {
 
       await generateAppTypes(config, compilerCtx, buildCtx, 'src');
 
-      expect(mockFs.writeFile).toHaveBeenCalledWith(
+      expect(mockWriteFile).toHaveBeenCalledWith(
         '/components.d.ts',
         `/* eslint-disable */
 /* tslint:disable */
@@ -731,7 +733,7 @@ declare module "@stencil/core" {
 
       await generateAppTypes(config, compilerCtx, buildCtx, 'src');
 
-      expect(mockFs.writeFile).toHaveBeenCalledWith(
+      expect(mockWriteFile).toHaveBeenCalledWith(
         '/components.d.ts',
         `/* eslint-disable */
 /* tslint:disable */
@@ -831,7 +833,7 @@ declare module "@stencil/core" {
 
       await generateAppTypes(config, compilerCtx, buildCtx, 'src');
 
-      expect(mockFs.writeFile).toHaveBeenCalledWith(
+      expect(mockWriteFile).toHaveBeenCalledWith(
         '/components.d.ts',
         `/* eslint-disable */
 /* tslint:disable */
@@ -943,7 +945,7 @@ declare module "@stencil/core" {
 
       await generateAppTypes(config, compilerCtx, buildCtx, 'src');
 
-      expect(mockFs.writeFile).toHaveBeenCalledWith(
+      expect(mockWriteFile).toHaveBeenCalledWith(
         '/components.d.ts',
         `/* eslint-disable */
 /* tslint:disable */
@@ -1083,7 +1085,7 @@ declare module "@stencil/core" {
 
       await generateAppTypes(config, compilerCtx, buildCtx, 'src');
 
-      expect(mockFs.writeFile).toHaveBeenCalledWith(
+      expect(mockWriteFile).toHaveBeenCalledWith(
         '/components.d.ts',
         `/* eslint-disable */
 /* tslint:disable */
@@ -1225,7 +1227,7 @@ declare module "@stencil/core" {
 
       await generateAppTypes(config, compilerCtx, buildCtx, 'src');
 
-      expect(mockFs.writeFile).toHaveBeenCalledWith(
+      expect(mockWriteFile).toHaveBeenCalledWith(
         '/components.d.ts',
         `/* eslint-disable */
 /* tslint:disable */
@@ -1347,7 +1349,7 @@ declare module "@stencil/core" {
 
     await generateAppTypes(config, compilerCtx, buildCtx, 'src');
 
-    expect(mockFs.writeFile).toHaveBeenCalledWith(
+    expect(mockWriteFile).toHaveBeenCalledWith(
       '/components.d.ts',
       `/* eslint-disable */
 /* tslint:disable */
@@ -1415,21 +1417,12 @@ declare module "@stencil/core" {
   });
 
   it('should transform aliased paths if the config option is true', async () => {
-    // TODO(STENCIL-223): remove spy to test actual resolution behavior
-    jest.spyOn(ts, 'resolveModuleName').mockReturnValue({
-      resolvedModule: {
-        isExternalLibraryImport: false,
-        extension: Extension.Dts,
-        resolvedFileName: 'utils',
-      },
-    });
-
     const compilerComponentMeta = stubComponentCompilerMeta({
       tagName: 'my-component',
       componentClassName: 'MyComponent',
-      jsFilePath: '/some/stubbed/path/a/my-component.js',
-      sourceFilePath: '/some/stubbed/path/a/my-component.tsx',
-      sourceMapPath: '/some/stubbed/path/a/my-component.js.map',
+      jsFilePath: path.join(config.rootDir, 'some/stubbed/path/a/my-component.js'),
+      sourceFilePath: path.join(config.rootDir, 'some/stubbed/path/a/my-component.tsx'),
+      sourceMapPath: path.join(config.rootDir, 'some/stubbed/path/a/my-component.js.map'),
       hasProp: true,
       properties: [
         stubComponentCompilerProperty({
@@ -1448,12 +1441,21 @@ declare module "@stencil/core" {
       ],
     });
     buildCtx.components = [compilerComponentMeta];
-    config.tsCompilerOptions = {};
+    config.tsCompilerOptions = {
+      paths: {
+        '@utils': [path.join(config.rootDir, 'some/stubbed/path/utils/utils.ts')],
+      },
+      declaration: true,
+    };
     config.transformAliasedImportPaths = true;
+    // We need to have a file in the in-memory fs for the TS module resolution to succeed
+    originalWriteFile(path.join(config.rootDir, 'some/stubbed/path/utils/utils.ts'), '');
+
+    patchTypescript(config, compilerCtx.fs);
 
     await generateAppTypes(config, compilerCtx, buildCtx, 'src');
 
-    expect(mockFs.writeFile).toHaveBeenCalledWith(
+    expect(mockWriteFile).toHaveBeenCalledWith(
       '/components.d.ts',
       `/* eslint-disable */
 /* tslint:disable */
@@ -1462,8 +1464,8 @@ declare module "@stencil/core" {
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
-import { UserImplementedPropType } from "utils";
-export { UserImplementedPropType } from "utils";
+import { UserImplementedPropType } from "./some/stubbed/path/utils/utils";
+export { UserImplementedPropType } from "./some/stubbed/path/utils/utils";
 export namespace Components {
     /**
      * docs
@@ -1544,7 +1546,7 @@ declare module "@stencil/core" {
 
     await generateAppTypes(config, compilerCtx, buildCtx, 'src');
 
-    expect(mockFs.writeFile).toHaveBeenCalledWith(
+    expect(mockWriteFile).toHaveBeenCalledWith(
       '/components.d.ts',
       `/* eslint-disable */
 /* tslint:disable */
