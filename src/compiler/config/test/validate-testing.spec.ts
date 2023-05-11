@@ -169,224 +169,92 @@ describe('validateTesting', () => {
     });
 
     describe('test.* extensions', () => {
-      it('matches files ending in .test.ts', () => {
-        expect(testRegex.test('my-component.test.ts')).toBe(true);
+      it.each([
+        'my-component.test.ts',
+        'my-component.test.tsx',
+        'my-component.test.js',
+        'my-component.test.jsx',
+        'some/path/test.ts',
+        'some/path/test.tsx',
+        'some/path/test.js',
+        'some/path/test.jsx',
+      ])(`matches the file '%s'`, (filename) => {
+        expect(testRegex.test(filename)).toBe(true);
       });
 
-      it('matches files ending in .test.tsx', () => {
-        expect(testRegex.test('my-component.test.tsx')).toBe(true);
-      });
-
-      it('matches files ending in .test.js', () => {
-        expect(testRegex.test('my-component.test.js')).toBe(true);
-      });
-
-      it('matches files ending in .test.jsx', () => {
-        expect(testRegex.test('my-component.test.jsx')).toBe(true);
-      });
-
-      it('matches the file "test.ts"', () => {
-        expect(testRegex.test('some/path/test.ts')).toBe(true);
-      });
-
-      it('matches the file "test.tsx"', () => {
-        expect(testRegex.test('some/path/test.tsx')).toBe(true);
-      });
-
-      it('matches the file "test.js"', () => {
-        expect(testRegex.test('some/path/test.js')).toBe(true);
-      });
-
-      it('matches the file "test.jsx"', () => {
-        expect(testRegex.test('some/path/test.jsx')).toBe(true);
-      });
-
-      it("doesn't match snap files ending in test.ts.snap", () => {
-        expect(testRegex.test('my-component.test.ts.snap')).toBe(false);
-      });
-
-      it("doesn't match snap files ending in test.tsx.snap", () => {
-        expect(testRegex.test('my-component.test.tsx.snap')).toBe(false);
-      });
-
-      it("doesn't match snap files ending in test.js.snap", () => {
-        expect(testRegex.test('my-component.test.js.snap')).toBe(false);
-      });
-
-      it("doesn't match snap files ending in test.jsx.snap", () => {
-        expect(testRegex.test('my-component.test.jsx.snap')).toBe(false);
-      });
-
-      it("doesn't match files ending in test.ts", () => {
-        expect(testRegex.test('my-component-test.ts')).toBe(false);
-      });
-
-      it("doesn't match files ending in test.tsx", () => {
-        expect(testRegex.test('my-component-test.tsx')).toBe(false);
-      });
-
-      it("doesn't match files ending in test.js", () => {
-        expect(testRegex.test('my-component-test.js')).toBe(false);
-      });
-
-      it("doesn't match files ending in test.jsx", () => {
-        expect(testRegex.test('my-component-test.jsx')).toBe(false);
-      });
-
-      it("doesn't match files ending in .test.t", () => {
-        expect(testRegex.test('my-component.test.t')).toBe(false);
-      });
-
-      it("doesn't match files ending in .test.j", () => {
-        expect(testRegex.test('my-component.test.j')).toBe(false);
+      it.each([
+        'my-component.test.ts.snap',
+        'my-component.test.tsx.snap',
+        'my-component.test.js.snap',
+        'my-component.test.jsx.snap',
+        'my-component-test.ts',
+        'my-component-test.tsx',
+        'my-component-test.js',
+        'my-component-test.jsx',
+        'my-component.test.t',
+        'my-component.test.j',
+      ])(`doesn't match the file '%s'`, (filename) => {
+        expect(testRegex.test(filename)).toBe(false);
       });
     });
 
     describe('spec.* extensions', () => {
-      it('matches files ending in .spec.ts', () => {
-        expect(testRegex.test('my-component.spec.ts')).toBe(true);
+      it.each([
+        'my-component.spec.ts',
+        'my-component.spec.tsx',
+        'my-component.spec.js',
+        'my-component.spec.jsx',
+        'some/path/spec.ts',
+        'some/path/spec.tsx',
+        'some/path/spec.js',
+        'some/path/spec.jsx',
+      ])(`matches the file '%s'`, (filename) => {
+        expect(testRegex.test(filename)).toBe(true);
       });
 
-      it('matches files ending in .spec.tsx', () => {
-        expect(testRegex.test('my-component.spec.tsx')).toBe(true);
-      });
-
-      it('matches files ending in .spec.js', () => {
-        expect(testRegex.test('my-component.spec.js')).toBe(true);
-      });
-
-      it('matches files ending in .spec.jsx', () => {
-        expect(testRegex.test('my-component.spec.jsx')).toBe(true);
-      });
-
-      it('matches the file "spec.ts"', () => {
-        expect(testRegex.test('some/path/spec.ts')).toBe(true);
-      });
-
-      it('matches the file "spec.tsx"', () => {
-        expect(testRegex.test('some/path/spec.tsx')).toBe(true);
-      });
-
-      it('matches the file "spec.js"', () => {
-        expect(testRegex.test('some/path/spec.js')).toBe(true);
-      });
-
-      it('matches the file "spec.jsx"', () => {
-        expect(testRegex.test('some/path/spec.jsx')).toBe(true);
-      });
-
-      it("doesn't match snap files ending in spec.ts.snap", () => {
-        expect(testRegex.test('my-component.spec.ts.snap')).toBe(false);
-      });
-
-      it("doesn't match snap files ending in spec.tsx.snap", () => {
-        expect(testRegex.test('my-component.spec.tsx.snap')).toBe(false);
-      });
-
-      it("doesn't match snap files ending in spec.js.snap", () => {
-        expect(testRegex.test('my-component.spec.js.snap')).toBe(false);
-      });
-
-      it("doesn't match snap files ending in spec.jsx.snap", () => {
-        expect(testRegex.test('my-component.spec.jsx.snap')).toBe(false);
-      });
-
-      it("doesn't match files ending in spec.ts", () => {
-        expect(testRegex.test('my-component-spec.ts')).toBe(false);
-      });
-
-      it("doesn't match files ending in spec.tsx", () => {
-        expect(testRegex.test('my-component-spec.tsx')).toBe(false);
-      });
-
-      it("doesn't match files ending in spec.js", () => {
-        expect(testRegex.test('my-component-spec.js')).toBe(false);
-      });
-
-      it("doesn't match files ending in spec.jsx", () => {
-        expect(testRegex.test('my-component-spec.jsx')).toBe(false);
-      });
-
-      it("doesn't match files ending in .spec.t", () => {
-        expect(testRegex.test('my-component.spec.t')).toBe(false);
-      });
-
-      it("doesn't match files ending in .spec.j", () => {
-        expect(testRegex.test('my-component.spec.j')).toBe(false);
+      it.each([
+        'my-component.spec.ts.snap',
+        'my-component.spec.tsx.snap',
+        'my-component.spec.js.snap',
+        'my-component.spec.jsx.snap',
+        'my-component-spec.ts',
+        'my-component-spec.tsx',
+        'my-component-spec.js',
+        'my-component-spec.jsx',
+        'my-component.spec.t',
+        'my-component.spec.j',
+      ])(`doesn't match the file '%s'`, (filename) => {
+        expect(testRegex.test(filename)).toBe(false);
       });
     });
 
     describe('e2e.* extensions', () => {
-      it('matches files ending in .e2e.ts', () => {
-        expect(testRegex.test('my-component.e2e.ts')).toBe(true);
+      it.each([
+        'my-component.e2e.ts',
+        'my-component.e2e.tsx',
+        'my-component.e2e.js',
+        'my-component.e2e.jsx',
+        'some/path/e2e.ts',
+        'some/path/e2e.tsx',
+        'some/path/e2e.js',
+        'some/path/e2e.jsx',
+      ])(`matches the file '%s'`, (filename) => {
+        expect(testRegex.test(filename)).toBe(true);
       });
 
-      it('matches files ending in .e2e.tsx', () => {
-        expect(testRegex.test('my-component.e2e.tsx')).toBe(true);
-      });
-
-      it('matches files ending in .e2e.js', () => {
-        expect(testRegex.test('my-component.e2e.js')).toBe(true);
-      });
-
-      it('matches files ending in .e2e.jsx', () => {
-        expect(testRegex.test('my-component.e2e.jsx')).toBe(true);
-      });
-
-      it('matches the file "e2e.ts"', () => {
-        expect(testRegex.test('some/path/e2e.ts')).toBe(true);
-      });
-
-      it('matches the file "e2e.tsx"', () => {
-        expect(testRegex.test('some/path/e2e.tsx')).toBe(true);
-      });
-
-      it('matches the file "e2e.js"', () => {
-        expect(testRegex.test('some/path/e2e.js')).toBe(true);
-      });
-
-      it('matches the file "e2e.jsx"', () => {
-        expect(testRegex.test('some/path/e2e.jsx')).toBe(true);
-      });
-
-      it("doesn't match snap files ending in e2e.ts.snap", () => {
-        expect(testRegex.test('my-component.e2e.ts.snap')).toBe(false);
-      });
-
-      it("doesn't match snap files ending in e2e.tsx.snap", () => {
-        expect(testRegex.test('my-component.e2e.tsx.snap')).toBe(false);
-      });
-
-      it("doesn't match snap files ending in e2e.js.snap", () => {
-        expect(testRegex.test('my-component.e2e.js.snap')).toBe(false);
-      });
-
-      it("doesn't match snap files ending in e2e.jsx.snap", () => {
-        expect(testRegex.test('my-component.e2e.jsx.snap')).toBe(false);
-      });
-
-      it("doesn't match files ending in e2e.ts", () => {
-        expect(testRegex.test('my-component-e2e.ts')).toBe(false);
-      });
-
-      it("doesn't match files ending in e2e.tsx", () => {
-        expect(testRegex.test('my-component-e2e.tsx')).toBe(false);
-      });
-
-      it("doesn't match files ending in e2e.js", () => {
-        expect(testRegex.test('my-component-e2e.js')).toBe(false);
-      });
-
-      it("doesn't match files ending in e2e.jsx", () => {
-        expect(testRegex.test('my-component-e2e.jsx')).toBe(false);
-      });
-
-      it("doesn't match files ending in .e2e.t", () => {
-        expect(testRegex.test('my-component.e2e.t')).toBe(false);
-      });
-
-      it("doesn't match files ending in .e2e.j", () => {
-        expect(testRegex.test('my-component.e2e.j')).toBe(false);
+      it.each([
+        'my-component.e2e.ts.snap',
+        'my-component.e2e.tsx.snap',
+        'my-component.e2e.js.snap',
+        'my-component.e2e.jsx.snap',
+        'my-component-e2e.ts',
+        'my-component-e2e.tsx',
+        'my-component-e2e.js',
+        'my-component-e2e.jsx',
+        'my-component.e2e.t',
+        'my-component.e2e.j',
+      ])(`doesn't match the file '%s'`, (filename) => {
+        expect(testRegex.test(filename)).toBe(false);
       });
     });
   });
