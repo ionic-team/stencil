@@ -65,6 +65,7 @@ export function initPageScreenshot(page: pd.E2EPageInternal) {
     // screen shot not enabled, so just skip over all the logic
     page.compareScreenshot = async () => {
       const diff: ScreenshotDiff = {
+        id: 'placeholder',
         mismatchedPixels: 0,
         allowableMismatchedPixels: 1,
         allowableMismatchedRatio: 1,
