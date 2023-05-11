@@ -82,74 +82,80 @@ describe('validateTesting', () => {
     });
   });
 
-  it('default to no-sandbox browser args with ci flag', () => {
-    userConfig.flags = { ...flags, ci: true, e2e: true };
-    const { config } = validateConfig(userConfig, mockLoadConfigInit());
-    expect(config.testing.browserArgs).toEqual([
-      '--font-render-hinting=medium',
-      '--incognito',
-      '--no-sandbox',
-      '--disable-setuid-sandbox',
-      '--disable-dev-shm-usage',
-    ]);
+  describe('browserArgs', () => {
+    it('adds default browser args', () => {
+      userConfig.flags = { ...flags, e2e: true };
+      const { config } = validateConfig(userConfig, mockLoadConfigInit());
+      expect(config.testing.browserArgs).toEqual(['--font-render-hinting=medium', '--incognito']);
+    });
+
+    it("adds additional browser args when the 'ci' flag is set", () => {
+      userConfig.flags = { ...flags, ci: true, e2e: true };
+      const { config } = validateConfig(userConfig, mockLoadConfigInit());
+      expect(config.testing.browserArgs).toEqual([
+        '--font-render-hinting=medium',
+        '--incognito',
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+      ]);
+    });
   });
 
-  it('default browser args', () => {
-    userConfig.flags = { ...flags, e2e: true };
-    const { config } = validateConfig(userConfig, mockLoadConfigInit());
-    expect(config.testing.browserArgs).toEqual(['--font-render-hinting=medium', '--incognito']);
+  describe('testPathIgnorePatterns', () => {
+    it('set default testPathIgnorePatterns', () => {
+      userConfig.flags = { ...flags, e2e: true };
+      const { config } = validateConfig(userConfig, mockLoadConfigInit());
+      expect(config.testing.testPathIgnorePatterns).toEqual([
+        path.join(ROOT, 'User', 'some', 'path', '.vscode'),
+        path.join(ROOT, 'User', 'some', 'path', '.stencil'),
+        path.join(ROOT, 'User', 'some', 'path', 'node_modules'),
+        path.join(ROOT, 'www'),
+      ]);
+    });
+
+    it('set default testPathIgnorePatterns with custom outputTargets', () => {
+      userConfig.flags = { ...flags, e2e: true };
+      userConfig.outputTargets = [
+        { type: 'dist', dir: 'dist-folder' },
+        { type: 'www', dir: 'www-folder' },
+        { type: 'docs-readme', dir: 'docs' },
+      ];
+      const { config } = validateConfig(userConfig, mockLoadConfigInit());
+      expect(config.testing.testPathIgnorePatterns).toEqual([
+        path.join(ROOT, 'User', 'some', 'path', '.vscode'),
+        path.join(ROOT, 'User', 'some', 'path', '.stencil'),
+        path.join(ROOT, 'User', 'some', 'path', 'node_modules'),
+        path.join(ROOT, 'User', 'some', 'path', 'www-folder'),
+        path.join(ROOT, 'User', 'some', 'path', 'dist-folder'),
+      ]);
+    });
   });
 
-  it('set default testPathIgnorePatterns', () => {
-    userConfig.flags = { ...flags, e2e: true };
-    const { config } = validateConfig(userConfig, mockLoadConfigInit());
-    expect(config.testing.testPathIgnorePatterns).toEqual([
-      path.join(ROOT, 'User', 'some', 'path', '.vscode'),
-      path.join(ROOT, 'User', 'some', 'path', '.stencil'),
-      path.join(ROOT, 'User', 'some', 'path', 'node_modules'),
-      path.join(ROOT, 'www'),
-    ]);
-  });
+  describe('testEnvironment', () => {
+    it('set relative testEnvironment to absolute', () => {
+      userConfig.flags = { ...flags, e2e: true };
+      userConfig.testing = {
+        testEnvironment: './rel-path.js',
+      };
+      const { config } = validateConfig(userConfig, mockLoadConfigInit());
+      expect(path.isAbsolute(config.testing.testEnvironment)).toBe(true);
+      expect(path.basename(config.testing.testEnvironment)).toEqual('rel-path.js');
+    });
 
-  it('set default testPathIgnorePatterns with custom outputTargets', () => {
-    userConfig.flags = { ...flags, e2e: true };
-    userConfig.outputTargets = [
-      { type: 'dist', dir: 'dist-folder' },
-      { type: 'www', dir: 'www-folder' },
-      { type: 'docs-readme', dir: 'docs' },
-    ];
-    const { config } = validateConfig(userConfig, mockLoadConfigInit());
-    expect(config.testing.testPathIgnorePatterns).toEqual([
-      path.join(ROOT, 'User', 'some', 'path', '.vscode'),
-      path.join(ROOT, 'User', 'some', 'path', '.stencil'),
-      path.join(ROOT, 'User', 'some', 'path', 'node_modules'),
-      path.join(ROOT, 'User', 'some', 'path', 'www-folder'),
-      path.join(ROOT, 'User', 'some', 'path', 'dist-folder'),
-    ]);
-  });
+    it('set node module testEnvironment', () => {
+      userConfig.flags = { ...flags, e2e: true };
+      userConfig.testing = {
+        testEnvironment: 'jsdom',
+      };
+      const { config } = validateConfig(userConfig, mockLoadConfigInit());
+      expect(config.testing.testEnvironment).toEqual('jsdom');
+    });
 
-  it('set relative testEnvironment to absolute', () => {
-    userConfig.flags = { ...flags, e2e: true };
-    userConfig.testing = {
-      testEnvironment: './rel-path.js',
-    };
-    const { config } = validateConfig(userConfig, mockLoadConfigInit());
-    expect(path.isAbsolute(config.testing.testEnvironment)).toBe(true);
-    expect(path.basename(config.testing.testEnvironment)).toEqual('rel-path.js');
-  });
-
-  it('set node module testEnvironment', () => {
-    userConfig.flags = { ...flags, e2e: true };
-    userConfig.testing = {
-      testEnvironment: 'jsdom',
-    };
-    const { config } = validateConfig(userConfig, mockLoadConfigInit());
-    expect(config.testing.testEnvironment).toEqual('jsdom');
-  });
-
-  it('do nothing for empty testEnvironment', () => {
-    const { config } = validateConfig(userConfig, mockLoadConfigInit());
-    expect(config.testing.testEnvironment).toBeUndefined();
+    it('do nothing for empty testEnvironment', () => {
+      const { config } = validateConfig(userConfig, mockLoadConfigInit());
+      expect(config.testing.testEnvironment).toBeUndefined();
+    });
   });
 
   describe('testRegex', () => {
