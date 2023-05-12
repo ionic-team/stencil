@@ -163,7 +163,7 @@ describe('validateDevServer', () => {
 
   it.each([1, []])('should default historyApiFallback when an invalid value (%s) is provided', (badValue) => {
     // this test explicitly checks for a bad value in the stencil.config file, hence the type assertion
-    (inputConfig.devServer.historyApiFallback as any) = badValue;
+    inputConfig.devServer = { ...inputDevServerConfig, historyApiFallback: badValue as any };
     const { config } = validateConfig(inputConfig, mockLoadConfigInit());
     expect(config.devServer.historyApiFallback).toBeDefined();
     expect(config.devServer.historyApiFallback.index).toBe('index.html');

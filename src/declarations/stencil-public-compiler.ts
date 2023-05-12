@@ -447,6 +447,7 @@ type RequireFields<T, K extends keyof T> = T & { [P in K]-?: T[P] };
  */
 type StrictConfigFields =
   | 'cacheDir'
+  | 'devServer'
   | 'flags'
   | 'hydratedFlag'
   | 'logger'
