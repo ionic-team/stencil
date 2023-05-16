@@ -55,7 +55,7 @@
   packageRules: [
     {
       matchPackageNames: ['@types/node'],
-      allowedVersions: '<19.0.0',
+      allowedVersions: '<21.0.0',
     },
     {
       // TODO(STENCIL-710): Increment this value as a part of updating TypeScript

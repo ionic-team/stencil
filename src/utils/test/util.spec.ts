@@ -158,7 +158,7 @@ describe('util', () => {
       const expectedDiagnostic: d.Diagnostic = stubDiagnostic({
         absFilePath: mockPackageJsonPath,
         header: 'Error Parsing JSON',
-        messageText: 'Unexpected string in JSON at position 13', // due to missing colon in input
+        messageText: expect.stringMatching(/.*in JSON at position 13$/),
         type: 'build',
       });
 
