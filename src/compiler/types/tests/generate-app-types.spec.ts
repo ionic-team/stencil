@@ -18,7 +18,7 @@ describe('generateAppTypes', () => {
 
   beforeEach(() => {
     config = mockValidatedConfig({
-      srcDir: path.resolve('/'),
+      srcDir: '/',
     });
     compilerCtx = mockCompilerCtx(config);
     buildCtx = mockBuildCtx(config, compilerCtx);
