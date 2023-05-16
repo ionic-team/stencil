@@ -62,7 +62,7 @@ function startServer(
 
   let isActivelyBuilding = false;
   let lastBuildResults: CompilerBuildResults = null;
-  let devServer: DevServer = null;
+  let devServer: DevServer | null = null;
   let removeWatcher: BuildOnEventRemove = null;
   let closeResolve: () => void = null;
   let hasStarted = false;

@@ -78,6 +78,7 @@ export const validateConfig = (
   const logger = bootstrapConfig.logger || config.logger || createLogger();
 
   const validatedConfig: ValidatedConfig = {
+    devServer: {}, // assign `devServer` before spreading `config`, in the event 'devServer' is not a key on `config`
     ...config,
     // flags _should_ be JSON safe
     flags: JSON.parse(JSON.stringify(config.flags || {})),

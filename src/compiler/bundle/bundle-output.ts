@@ -85,7 +85,7 @@ export const getRollupOptions = (
     }
     return resolved;
   });
-  if (config.devServer && config.devServer.experimentalDevModules) {
+  if (config.devServer?.experimentalDevModules) {
     nodeResolvePlugin.resolveId = async function (importee: string, importer: string) {
       const resolvedId = await orgNodeResolveId2.call(nodeResolvePlugin, importee, importer);
       return devNodeModuleResolveId(config, compilerCtx.fs, resolvedId, importee);
