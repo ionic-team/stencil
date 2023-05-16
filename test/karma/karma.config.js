@@ -48,7 +48,7 @@ const localLaunchers = {
     flags: [
       '--no-sandbox',
       // See https://chromium.googlesource.com/chromium/src/+/lkgr/headless/README.md
-      '--headless',
+      '--headless=new',
       '--disable-gpu',
       // Without a remote debugging port, Google Chrome exits immediately.
       '--remote-debugging-port=9333',
