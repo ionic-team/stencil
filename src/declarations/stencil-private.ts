@@ -1916,8 +1916,8 @@ export interface Screenshot {
   image: string;
   device?: string;
   userAgent?: string;
-  width?: number;
-  height?: number;
+  width: number;
+  height: number;
   deviceScaleFactor?: number;
   hasTouch?: boolean;
   isLandscape?: boolean;
@@ -1928,14 +1928,14 @@ export interface Screenshot {
 
 export interface ScreenshotDiff {
   mismatchedPixels: number;
-  id?: string;
+  id: string;
   desc?: string;
   imageA?: string;
   imageB?: string;
   device?: string;
   userAgent?: string;
-  width?: number;
-  height?: number;
+  width: number;
+  height: number;
   deviceScaleFactor?: number;
   hasTouch?: boolean;
   isLandscape?: boolean;
