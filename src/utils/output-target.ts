@@ -81,14 +81,7 @@ export const isOutputTargetStats = (o: d.OutputTarget): o is d.OutputTargetStats
 
 export const isOutputTargetDistTypes = (o: d.OutputTarget): o is d.OutputTargetDistTypes => o.type === DIST_TYPES;
 
-// TODO(NOW): rename
-export const isValidatableOutputTarget = (
-  o: d.OutputTarget
-): o is
-  | d.OutputTargetDist
-  | d.OutputTargetDistCollection
-  | d.OutputTargetDistTypes
-  | d.OutputTargetDistCustomElements =>
+export const isPrimaryPackageOutputTarget = (o: d.OutputTarget): o is d.PrimaryPackageOutputTarget =>
   isOutputTargetDist(o) ||
   isOutputTargetDistCollection(o) ||
   isOutputTargetDistCustomElements(o) ||

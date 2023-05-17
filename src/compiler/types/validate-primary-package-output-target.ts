@@ -1,17 +1,15 @@
-import { buildWarn, isString, isValidatableOutputTarget, normalizePath } from '@utils';
+import { buildWarn, isPrimaryPackageOutputTarget, isString, normalizePath } from '@utils';
 import { join, relative } from 'path';
 
 import type * as d from '../../declarations';
 import { packageJsonError, packageJsonWarn } from './package-json-log.utils';
 
-type PrimaryPackageOutputTargetRecommendedConfig = {
+export type PrimaryPackageOutputTargetRecommendedConfig = {
   getModulePath?: (rootDir: string, outputTargetDir: string) => string | null;
   getTypesPath?: (rootDir: string, outputTargetConfig: any) => string | null;
 };
 
-const PRIMARY_PACKAGE_TARGET_CONFIGS: {
-  [key: string]: PrimaryPackageOutputTargetRecommendedConfig;
-} = {
+export const PRIMARY_PACKAGE_TARGET_CONFIGS = {
   dist: {
     getModulePath: (rootDir: string, outputTargetDir: string) =>
       normalizePath(relative(rootDir, join(outputTargetDir, 'index.js'))),
@@ -35,7 +33,7 @@ const PRIMARY_PACKAGE_TARGET_CONFIGS: {
     getTypesPath: (rootDir: string, outputTargetConfig: d.OutputTargetDistTypes) =>
       normalizePath(relative(rootDir, join(outputTargetConfig.typesDir, 'index.d.ts'))),
   },
-};
+} satisfies Record<d.PrimaryPackageOutputTarget['type'], PrimaryPackageOutputTargetRecommendedConfig>;
 
 /**
  * Performs validation for specified fields in a Stencil project's
@@ -54,26 +52,25 @@ export const validatePrimaryPackageOutputTarget = (
   // TODO(NOW): should _all_ validation be gated behind the config flag, or just this
   // new layer of "primary" target validation?
   if (config.validatePrimaryPackageOutputTarget) {
-    // TODO(NOW): rename
-    const validatableTargets: d.ValidatableOutputTarget[] = [];
-    const nonValidatableTargets: d.OutputTarget[] = [];
+    const eligiblePrimaryTargets: d.PrimaryPackageOutputTarget[] = [];
+    const nonPrimaryTargets: d.OutputTarget[] = [];
 
     // Push each output target in the config into its respective
     // classification for validation messages
     // Using a `foreach` prevents us from iterating over
     // the array multiple times
     config.outputTargets.forEach((ref) => {
-      if (isValidatableOutputTarget(ref)) {
-        validatableTargets.push(ref);
+      if (isPrimaryPackageOutputTarget(ref)) {
+        eligiblePrimaryTargets.push(ref);
       } else {
-        nonValidatableTargets.push(ref);
+        nonPrimaryTargets.push(ref);
       }
     });
 
     // If there are no output targets designated as "primary", then we should warn the user
     // to designate one. In this case, we aren't gonna do any validation
-    if (validatableTargets.length) {
-      const targetsMarkedToValidate = validatableTargets.filter((ref) => ref.isPrimaryPackageOutputTarget);
+    if (eligiblePrimaryTargets.length) {
+      const targetsMarkedToValidate = eligiblePrimaryTargets.filter((ref) => ref.isPrimaryPackageOutputTarget);
 
       if (targetsMarkedToValidate.length) {
         // A user should only designate one target to validate against
@@ -82,8 +79,7 @@ export const validatePrimaryPackageOutputTarget = (
         if (targetsMarkedToValidate.length > 1) {
           logValidationWarning(
             buildCtx,
-            `Your Stencil config has multiple output targets with 'isPrimaryPackageOutputTarget: true'. Stencil does not support validating 'package.json' fields for multiple output targets.
-            Please updated your Stencil config to only assign one primary package output target. For now, Stencil will use the first primary target it finds.`
+            `Your Stencil config has multiple output targets with 'isPrimaryPackageOutputTarget: true'. Stencil does not support validating 'package.json' fields for multiple output targets. Please updated your Stencil config to only assign one primary package output target. For now, Stencil will use the first primary target it finds.`
           );
         }
 
@@ -99,21 +95,19 @@ export const validatePrimaryPackageOutputTarget = (
       } else {
         logValidationWarning(
           buildCtx,
-          `Your Stencil project has not assigned a primary package output target. Stencil recommends that you assign a primary output target so it can validate
-        values for fields in your project's 'package.json'`
+          `Your Stencil project has not assigned a primary package output target. Stencil recommends that you assign a primary output target so it can validate values for fields in your project's 'package.json'`
         );
       }
     }
 
-    // Log a warning if any non-validatable targets were marked as "primary"
-    if (nonValidatableTargets.length && nonValidatableTargets.some((ref: any) => ref.isPrimaryPackageOutputTarget)) {
+    // Log a warning if any targets that cannot be validated were marked as "primary"
+    if (nonPrimaryTargets.length && nonPrimaryTargets.some((ref: any) => ref.isPrimaryPackageOutputTarget)) {
       logValidationWarning(
         buildCtx,
-        `Your Stencil project has assigned one or more un-validated output targets as the primary package output target. No validation will take place. Please remove the 'isPrimaryPackageOutputTarget' flag
-      from the following output targets in your Stencil config: ${nonValidatableTargets
-        .filter((ref: any) => ref.isPrimaryPackageOutputTarget === true)
-        .map((ref) => ref.type)
-        .join(', ')}`
+        `Your Stencil project has assigned one or more un-validated output targets as the primary package output target. No validation will take place. Please remove the 'isPrimaryPackageOutputTarget' flag from the following output targets in your Stencil config: ${nonPrimaryTargets
+          .filter((ref: any) => ref.isPrimaryPackageOutputTarget === true)
+          .map((ref) => ref.type)
+          .join(', ')}`
       );
     }
   } else {
@@ -142,12 +136,12 @@ export const validatePrimaryPackageOutputTarget = (
  * recommended value for the `module` path based on the output target type.
  * @param targetToValidate The output target to validate against.
  */
-const validateModulePath = (
+export const validateModulePath = (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   recommendedOutputTargetConfig: PrimaryPackageOutputTargetRecommendedConfig,
-  targetToValidate: d.ValidatableOutputTarget
+  targetToValidate: d.PrimaryPackageOutputTarget
 ) => {
   const currentModulePath = buildCtx.packageJson.module;
   const recommendedModulePath = recommendedOutputTargetConfig.getModulePath
@@ -155,13 +149,12 @@ const validateModulePath = (
     : null;
 
   let warningMessage: string;
-  if (!isString(currentModulePath)) {
+  if (!isString(currentModulePath) || currentModulePath === '') {
     warningMessage = 'package.json "module" property is required when generating a distribution.';
 
     if (recommendedModulePath != null) {
       warningMessage += ` It's recommended to set the "module" property to: ${recommendedModulePath}`;
     }
-    return;
   } else if (recommendedModulePath != null && recommendedModulePath !== normalizePath(buildCtx.packageJson.module)) {
     warningMessage = `package.json "module" property is set to "${currentModulePath}". It's recommended to set the "module" property to: ${recommendedModulePath}`;
   }
@@ -187,12 +180,12 @@ const validateModulePath = (
  * recommended value for the `types` path based on the output target type.
  * @param targetToValidate The output target to validate against.
  */
-const validateTypesPath = async (
+export const validateTypesPath = async (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   recommendedOutputTargetConfig: PrimaryPackageOutputTargetRecommendedConfig,
-  targetToValidate: d.ValidatableOutputTarget
+  targetToValidate: d.PrimaryPackageOutputTarget
 ) => {
   const currentTypesPath = buildCtx.packageJson.types;
   const recommendedTypesPath = recommendedOutputTargetConfig.getTypesPath
@@ -211,7 +204,7 @@ const validateTypesPath = async (
     const typesFile = join(config.rootDir, currentTypesPath);
     const typesFileExists = compilerCtx.fs.accessSync(typesFile);
     if (!typesFileExists) {
-      warningMessage = `package.json "types" property is set to "${currentTypesPath}" but cannot be found.`;
+      errorMessage = `package.json "types" property is set to "${currentTypesPath}" but cannot be found.`;
     }
   }
 

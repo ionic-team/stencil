@@ -27,7 +27,6 @@ export const validateBuildPackageJson = async (
   // target that is bundled with their distribution
   validatePrimaryPackageOutputTarget(config, compilerCtx, buildCtx);
 
-  // TODO(NOW): remove validation checks for module/types in these
   const distCollectionOutputTargets = config.outputTargets.filter(isOutputTargetDistCollection);
   await Promise.all(
     distCollectionOutputTargets.map((distCollectionOT) =>

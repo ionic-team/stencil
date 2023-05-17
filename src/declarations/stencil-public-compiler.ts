@@ -1940,7 +1940,7 @@ export interface LoggerTimeSpan {
   finish(finishedMsg: string, color?: string, bold?: boolean, newLineSuffix?: boolean): number;
 }
 
-export interface OutputTargetDist extends ValidatableOutputTarget {
+export interface OutputTargetDist extends OutputTargetValidationConfig {
   type: 'dist';
 
   buildDir?: string;
@@ -1976,7 +1976,7 @@ export interface OutputTargetDist extends ValidatableOutputTarget {
   empty?: boolean;
 }
 
-export interface OutputTargetDistCollection extends ValidatableOutputTarget {
+export interface OutputTargetDistCollection extends OutputTargetValidationConfig {
   type: 'dist-collection';
   empty?: boolean;
   dir: string;
@@ -2003,7 +2003,7 @@ export interface OutputTargetDistCollection extends ValidatableOutputTarget {
   transformAliasedImportPaths?: boolean | null;
 }
 
-export interface OutputTargetDistTypes extends ValidatableOutputTarget {
+export interface OutputTargetDistTypes extends OutputTargetValidationConfig {
   type: 'dist-types';
   dir: string;
   typesDir: string;
@@ -2153,7 +2153,7 @@ export const CustomElementsExportBehaviorOptions = [
  */
 export type CustomElementsExportBehavior = (typeof CustomElementsExportBehaviorOptions)[number];
 
-export interface OutputTargetDistCustomElements extends ValidatableOutputTarget {
+export interface OutputTargetDistCustomElements extends OutputTargetValidationConfig {
   type: 'dist-custom-elements';
   empty?: boolean;
   /**
@@ -2188,10 +2188,15 @@ export interface OutputTargetBase {
   type: string;
 }
 
-// TODO(NOW): rename
-export interface ValidatableOutputTarget extends OutputTargetBaseNext {
+interface OutputTargetValidationConfig extends OutputTargetBaseNext {
   isPrimaryPackageOutputTarget?: boolean;
 }
+
+export type PrimaryPackageOutputTarget =
+  | OutputTargetDist
+  | OutputTargetDistCustomElements
+  | OutputTargetDistCollection
+  | OutputTargetDistTypes;
 
 export type OutputTargetBuild = OutputTargetDistCollection | OutputTargetDistLazy;
 
