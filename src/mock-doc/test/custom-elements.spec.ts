@@ -2,9 +2,9 @@ import { createWindow } from '../window';
 
 describe('customElements', () => {
   it('attributeChangedCallback, removeAttribute', () => {
-    let attrName: string = "";
-    let oldValue: string = "";
-    let newValue: string = "";
+    let attrName: string = '';
+    let oldValue: string = '';
+    let newValue: string = '';
     let called = 0;
 
     customElements.define(
@@ -39,9 +39,9 @@ describe('customElements', () => {
   });
 
   it('attributeChangedCallback, setAttribute', () => {
-    let attrName: string = "";
-    let oldValue: string = "";
-    let newValue: string = "";
+    let attrName: string = '';
+    let oldValue: string = '';
+    let newValue: string = '';
     let called = 0;
 
     customElements.define(
