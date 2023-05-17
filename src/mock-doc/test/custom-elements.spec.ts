@@ -61,7 +61,7 @@ describe('customElements', () => {
 
     const cmpA = document.createElement('cmp-a');
     document.body.appendChild(cmpA);
-    expect(attrName).toBe(undefined);
+    expect(attrName).toBe('');
     expect(called).toBe(0);
 
     cmpA.setAttribute('attr-a', 'value-a');
