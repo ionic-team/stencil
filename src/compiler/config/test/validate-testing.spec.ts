@@ -657,7 +657,7 @@ describe('validateTesting', () => {
     it.each([true, null])('defaults to a reasonable value if a non-number (%s) is provided', (waitBeforeScreenshot) => {
       userConfig.flags = { ...flags, e2e: true };
       userConfig.testing = {
-        // the nature of this test requires using a non-number, hence th type assertion
+        // the nature of this test requires using a non-number, hence the type assertion
         pixelmatchThreshold: waitBeforeScreenshot as unknown as number,
       };
 
