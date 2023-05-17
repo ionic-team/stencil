@@ -43,8 +43,8 @@ export const runTsProgram = async (
     } else if (
       emitFilePath.endsWith('.e2e.d.ts') ||
       emitFilePath.endsWith('.spec.d.ts') ||
-      emitFilePath === "e2e.d.ts" ||
-      emitFilePath === "spec.d.ts"
+      emitFilePath === 'e2e.d.ts' ||
+      emitFilePath === 'spec.d.ts'
     ) {
       // we don't want to write these to disk!
       return;
