@@ -133,12 +133,14 @@ jobs:
         # for syntax information, see https://github.com/peter-evans/create-or-update-comment#setting-the-comment-body-from-a-file
       - name: Set comment body
         id: set-comment-body
+        # GitHub - "Warning: Make sure the delimiter you're using is randomly generated and unique for each run.
+        # For more information, see https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions#understanding-the-risk-of-script-injections"
         run: |
           body=$(node scripts/build/tech-debt-burndown-report.js)
-          body="${body//'%'/'%25'}"
-          body="${body//$'\n'/'%0A'}"
-          body="${body//$'\r'/'%0D'}"
-          echo "body=$body" >> $GITHUB_OUTPUT
+          EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+          echo "body<<$EOF" >> $GITHUB_OUTPUT
+          echo "$body" >> $GITHUB_OUTPUT
+          echo "$EOF" >> $GITHUB_OUTPUT
 
       - name: Find Comment
         uses: peter-evans/find-comment@a54c31d7fa095754bfef525c0c8e5e5674c4b4b1 # v2.4.0
