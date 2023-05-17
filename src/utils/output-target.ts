@@ -81,6 +81,19 @@ export const isOutputTargetStats = (o: d.OutputTarget): o is d.OutputTargetStats
 
 export const isOutputTargetDistTypes = (o: d.OutputTarget): o is d.OutputTargetDistTypes => o.type === DIST_TYPES;
 
+// TODO(NOW): rename
+export const isValidatableOutputTarget = (
+  o: d.OutputTarget
+): o is
+  | d.OutputTargetDist
+  | d.OutputTargetDistCollection
+  | d.OutputTargetDistTypes
+  | d.OutputTargetDistCustomElements =>
+  isOutputTargetDist(o) ||
+  isOutputTargetDistCollection(o) ||
+  isOutputTargetDistCustomElements(o) ||
+  isOutputTargetDistTypes(o);
+
 /**
  * Retrieve the Stencil component compiler metadata from a collection of Stencil {@link Module}s
  * @param moduleFiles the collection of `Module`s to retrieve the metadata from

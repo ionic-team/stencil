@@ -113,6 +113,8 @@ export interface StencilConfig {
    */
   transformAliasedImportPaths?: boolean;
 
+  validatePrimaryPackageOutputTarget?: boolean;
+
   /**
    * Passes custom configuration down to the "@rollup/plugin-commonjs" that Stencil uses under the hood.
    * For further information: https://stenciljs.com/docs/module-bundling
@@ -459,7 +461,8 @@ type StrictConfigFields =
   | 'srcIndexHtml'
   | 'sys'
   | 'testing'
-  | 'transformAliasedImportPaths';
+  | 'transformAliasedImportPaths'
+  | 'validatePrimaryPackageOutputTarget';
 
 /**
  * A version of {@link Config} that makes certain fields required. This type represents a valid configuration entity.
@@ -1937,11 +1940,10 @@ export interface LoggerTimeSpan {
   finish(finishedMsg: string, color?: string, bold?: boolean, newLineSuffix?: boolean): number;
 }
 
-export interface OutputTargetDist extends OutputTargetBase {
+export interface OutputTargetDist extends ValidatableOutputTarget {
   type: 'dist';
 
   buildDir?: string;
-  dir?: string;
 
   collectionDir?: string | null;
   /**
@@ -1974,7 +1976,7 @@ export interface OutputTargetDist extends OutputTargetBase {
   empty?: boolean;
 }
 
-export interface OutputTargetDistCollection extends OutputTargetBase {
+export interface OutputTargetDistCollection extends ValidatableOutputTarget {
   type: 'dist-collection';
   empty?: boolean;
   dir: string;
@@ -2001,7 +2003,7 @@ export interface OutputTargetDistCollection extends OutputTargetBase {
   transformAliasedImportPaths?: boolean | null;
 }
 
-export interface OutputTargetDistTypes extends OutputTargetBase {
+export interface OutputTargetDistTypes extends ValidatableOutputTarget {
   type: 'dist-types';
   dir: string;
   typesDir: string;
@@ -2151,7 +2153,7 @@ export const CustomElementsExportBehaviorOptions = [
  */
 export type CustomElementsExportBehavior = (typeof CustomElementsExportBehaviorOptions)[number];
 
-export interface OutputTargetDistCustomElements extends OutputTargetBaseNext {
+export interface OutputTargetDistCustomElements extends ValidatableOutputTarget {
   type: 'dist-custom-elements';
   empty?: boolean;
   /**
@@ -2184,6 +2186,11 @@ export interface OutputTargetBase {
    * A unique string to differentiate one output target from another
    */
   type: string;
+}
+
+// TODO(NOW): rename
+export interface ValidatableOutputTarget extends OutputTargetBaseNext {
+  isPrimaryPackageOutputTarget?: boolean;
 }
 
 export type OutputTargetBuild = OutputTargetDistCollection | OutputTargetDistLazy;
