@@ -632,7 +632,7 @@ describe('validateTesting', () => {
       expect(config.testing.waitBeforeScreenshot).toBe(waitBeforeScreenshot);
     });
 
-    it('creates an error the value provided is negative', () => {
+    it('creates an error if the value provided is negative', () => {
       const waitBeforeScreenshot = -1;
       userConfig.flags = { ...flags, e2e: true };
       userConfig.testing = {
