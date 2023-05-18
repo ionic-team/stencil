@@ -14,7 +14,7 @@ export const PRIMARY_PACKAGE_TARGET_CONFIGS = {
     getModulePath: (rootDir: string, outputTargetDir: string) =>
       normalizePath(relative(rootDir, join(outputTargetDir, 'index.js'))),
     getTypesPath: (rootDir: string, outputTargetConfig: d.OutputTargetDist) =>
-      normalizePath(relative(rootDir, join(outputTargetConfig.typesDir, 'index.d.ts'))),
+      normalizePath(relative(rootDir, join(outputTargetConfig.typesDir!, 'index.d.ts'))),
   },
   'dist-collection': {
     getModulePath: (rootDir: string, outputTargetDir: string) =>
@@ -25,7 +25,7 @@ export const PRIMARY_PACKAGE_TARGET_CONFIGS = {
       normalizePath(relative(rootDir, join(outputTargetDir, 'index.js'))),
     getTypesPath: (rootDir: string, outputTargetConfig: d.OutputTargetDistCustomElements) => {
       return outputTargetConfig.generateTypeDeclarations
-        ? normalizePath(relative(rootDir, join(rootDir, outputTargetConfig.dir, 'index.d.ts')))
+        ? normalizePath(relative(rootDir, join(rootDir, outputTargetConfig.dir!, 'index.d.ts')))
         : null;
     },
   },
@@ -145,17 +145,17 @@ export const validateModulePath = (
 ) => {
   const currentModulePath = buildCtx.packageJson.module;
   const recommendedModulePath = recommendedOutputTargetConfig.getModulePath
-    ? recommendedOutputTargetConfig.getModulePath(config.rootDir, targetToValidate.dir)
+    ? recommendedOutputTargetConfig.getModulePath(config.rootDir, targetToValidate.dir!)
     : null;
 
-  let warningMessage: string;
+  let warningMessage: string | null = null;
   if (!isString(currentModulePath) || currentModulePath === '') {
     warningMessage = 'package.json "module" property is required when generating a distribution.';
 
     if (recommendedModulePath != null) {
       warningMessage += ` It's recommended to set the "module" property to: ${recommendedModulePath}`;
     }
-  } else if (recommendedModulePath != null && recommendedModulePath !== normalizePath(buildCtx.packageJson.module)) {
+  } else if (recommendedModulePath != null && recommendedModulePath !== normalizePath(currentModulePath)) {
     warningMessage = `package.json "module" property is set to "${currentModulePath}". It's recommended to set the "module" property to: ${recommendedModulePath}`;
   }
 
@@ -192,8 +192,8 @@ export const validateTypesPath = async (
     ? recommendedOutputTargetConfig.getTypesPath(config.rootDir, targetToValidate)
     : null;
 
-  let warningMessage: string;
-  let errorMessage: string;
+  let warningMessage: string | null = null;
+  let errorMessage: string | null = null;
   if (!isString(currentTypesPath) || currentTypesPath === '') {
     warningMessage = `package.json "types" property is required when generating a distribution. It's recommended to set the "types" property to: ${recommendedTypesPath}`;
   } else if (!currentTypesPath.endsWith('.d.ts')) {
