@@ -1,14 +1,16 @@
-import { buildError, isFunction, isString } from '@utils';
-import { isAbsolute, join } from 'path';
-
-import type * as d from '../../../declarations';
-import { NOTE } from '../../docs/constants';
 import {
+  buildError,
+  isFunction,
   isOutputTargetDocsCustom,
   isOutputTargetDocsJson,
   isOutputTargetDocsReadme,
   isOutputTargetDocsVscode,
-} from '../../output-targets/output-utils';
+  isString,
+} from '@utils';
+import { isAbsolute, join } from 'path';
+
+import type * as d from '../../../declarations';
+import { NOTE } from '../../docs/constants';
 
 export const validateDocs = (config: d.ValidatedConfig, diagnostics: d.Diagnostic[], userOutputs: d.OutputTarget[]) => {
   const docsOutputs: d.OutputTarget[] = [];

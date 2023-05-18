@@ -34,7 +34,8 @@ describe('removeUnusedStyles', () => {
 
     expect(results.diagnostics).toHaveLength(0);
 
-    const css = doc.querySelector('style').innerHTML;
+    // Assert that `querySelector()` will return a value, since we defined the `style` element above.
+    const css = doc.querySelector('style')!.innerHTML;
 
     expectSelector(css, 'pre[class*="language-"]');
   });
@@ -61,7 +62,8 @@ describe('removeUnusedStyles', () => {
 
     expect(results.diagnostics).toHaveLength(0);
 
-    const css = doc.querySelector('style').innerHTML;
+    // Assert that `querySelector()` will return a value, since we defined the `style` element above.
+    const css = doc.querySelector('style')!.innerHTML;
 
     expectSelector(css, '[dir="ltr"] h1+h2');
     expectNoSelector(css, '[dir="ltr"] h1+h3');
@@ -90,7 +92,8 @@ describe('removeUnusedStyles', () => {
 
     expect(results.diagnostics).toHaveLength(0);
 
-    const css = doc.querySelector('style').innerHTML;
+    // Assert that `querySelector()` will return a value, since we defined the `style` element above.
+    const css = doc.querySelector('style')!.innerHTML;
 
     expectNoSelector(css, 'label { font: used; }');
     expectNoSelector(css, 'div label { font: used; }');
@@ -124,7 +127,8 @@ describe('removeUnusedStyles', () => {
 
     expect(results.diagnostics).toHaveLength(0);
 
-    const css = doc.querySelector('style').innerHTML;
+    // Assert that `querySelector()` will return a value, since we defined the `style` element above.
+    const css = doc.querySelector('style')!.innerHTML;
 
     expectSelector(css, 'div{font:used}');
     expectSelector(css, 'label{font:used}');
@@ -159,7 +163,8 @@ describe('removeUnusedStyles', () => {
 
     expect(results.diagnostics).toHaveLength(0);
 
-    const css = doc.querySelector('style').innerHTML;
+    // Assert that `querySelector()` will return a value, since we defined the `style` element above.
+    const css = doc.querySelector('style')!.innerHTML;
 
     expectSelector(css, 'label{font:used}');
     expectSelector(css, 'label#usedId');
@@ -188,7 +193,8 @@ describe('removeUnusedStyles', () => {
 
     expect(results.diagnostics).toHaveLength(0);
 
-    const css = doc.querySelector('style').innerHTML;
+    // Assert that `querySelector()` will return a value, since we defined the `style` element above.
+    const css = doc.querySelector('style')!.innerHTML;
 
     expectSelector(css, 'label{font:used}');
     expectSelector(css, 'label[mph="88"]');
@@ -214,7 +220,8 @@ describe('removeUnusedStyles', () => {
 
     expect(results.diagnostics).toHaveLength(0);
 
-    const css = doc.querySelector('style').innerHTML;
+    // Assert that `querySelector()` will return a value, since we defined the `style` element above.
+    const css = doc.querySelector('style')!.innerHTML;
 
     expectSelector(css, 'label');
     expectNoSelector(css, 'div');
@@ -239,7 +246,8 @@ describe('removeUnusedStyles', () => {
 
     expect(results.diagnostics).toHaveLength(0);
 
-    const css = doc.querySelector('style').innerHTML;
+    // Assert that `querySelector()` will return a value, since we defined the `style` element above.
+    const css = doc.querySelector('style')!.innerHTML;
 
     expectSelector(css, '.used-class');
     expectNoSelector(css, '.unused-class');
@@ -265,7 +273,8 @@ describe('removeUnusedStyles', () => {
 
     expect(results.diagnostics).toHaveLength(0);
 
-    const css = doc.querySelector('style').innerHTML;
+    // Assert that `querySelector()` will return a value, since we defined the `style` element above.
+    const css = doc.querySelector('style')!.innerHTML;
 
     expectSelector(css, '.used-class');
     expectNoSelector(css, '.unused-class');

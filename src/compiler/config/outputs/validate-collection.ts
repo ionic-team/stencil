@@ -1,5 +1,6 @@
+import { isOutputTargetDistCollection } from '@utils';
+
 import type * as d from '../../../declarations';
-import { isOutputTargetDistCollection } from '../../output-targets/output-utils';
 import { getAbsolutePath } from '../config-utils';
 
 /**

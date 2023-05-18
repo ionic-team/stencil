@@ -294,14 +294,12 @@ const saveSlottedNodes = (elm: d.RenderNode) => {
  * @param vnodes a list of virtual DOM nodes to remove
  * @param startIdx the index at which to start removing nodes (inclusive)
  * @param endIdx the index at which to stop removing nodes (inclusive)
- * @param vnode a VNode
- * @param elm an element
  */
 const removeVnodes = (vnodes: d.VNode[], startIdx: number, endIdx: number, vnode?: d.VNode, elm?: d.RenderNode) => {
   for (; startIdx <= endIdx; ++startIdx) {
     if ((vnode = vnodes[startIdx])) {
       elm = vnode.$elm$;
-      callNodeRefs(vnode);
+      nullifyVNodeRefs(vnode);
 
       if (BUILD.slotRelocation) {
         // we're removing this element
@@ -317,10 +315,10 @@ const removeVnodes = (vnodes: d.VNode[], startIdx: number, endIdx: number, vnode
           // that's being removed are slot nodes
           putBackInOriginalLocation(elm, true);
         }
-      }
 
-      // remove the vnode's element from the dom
-      elm.remove();
+        // remove the vnode's element from the dom
+        elm.remove();
+      }
     }
   }
 };
@@ -825,10 +823,17 @@ const isNodeLocatedInSlot = (nodeToRelocate: d.RenderNode, slotNameAttr: string)
   return slotNameAttr === '';
 };
 
-export const callNodeRefs = (vNode: d.VNode) => {
+/**
+ * 'Nullify' any VDom `ref` callbacks on a VDom node or its children by
+ * calling them with `null`. This signals that the DOM element corresponding to
+ * the VDom node has been removed from the DOM.
+ *
+ * @param vNode a virtual DOM node
+ */
+export const nullifyVNodeRefs = (vNode: d.VNode) => {
   if (BUILD.vdomRef) {
     vNode.$attrs$ && vNode.$attrs$.ref && vNode.$attrs$.ref(null);
-    vNode.$children$ && vNode.$children$.map(callNodeRefs);
+    vNode.$children$ && vNode.$children$.map(nullifyVNodeRefs);
   }
 };
 

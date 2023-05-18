@@ -1,9 +1,9 @@
 import type * as d from '@stencil/core/declarations';
 import { mockLoadConfigInit } from '@stencil/core/testing';
+import { isOutputTargetCopy, isOutputTargetHydrate, isOutputTargetWww } from '@utils';
 import path from 'path';
 
 import { ConfigFlags, createConfigFlags } from '../../../cli/config-flags';
-import { isOutputTargetCopy, isOutputTargetHydrate, isOutputTargetWww } from '../../output-targets/output-utils';
 import { validateConfig } from '../validate-config';
 
 describe('validateOutputTargetWww', () => {
@@ -95,7 +95,7 @@ describe('validateOutputTargetWww', () => {
     };
     userConfig.outputTargets = [outputTarget];
     const { config } = validateConfig(userConfig, mockLoadConfigInit());
-    const www = config.outputTargets.find(isOutputTargetWww);
+    const www = config.outputTargets.find(isOutputTargetWww) as d.OutputTargetWww;
 
     expect(www.dir).toBe(path.join(rootDir, 'www', 'docs'));
     expect(www.appDir).toBe(path.join(rootDir, 'www', 'docs'));
@@ -113,7 +113,7 @@ describe('validateOutputTargetWww', () => {
     };
     userConfig.outputTargets = [outputTarget];
     const { config } = validateConfig(userConfig, mockLoadConfigInit());
-    const www = config.outputTargets.find(isOutputTargetWww);
+    const www = config.outputTargets.find(isOutputTargetWww) as d.OutputTargetWww;
 
     expect(www.type).toBe('www');
     expect(www.dir).toBe(path.join(rootDir, 'my-www'));
@@ -126,7 +126,7 @@ describe('validateOutputTargetWww', () => {
     const { config } = validateConfig(userConfig, mockLoadConfigInit());
     expect(config.outputTargets).toHaveLength(5);
 
-    const outputTarget = config.outputTargets.find(isOutputTargetWww);
+    const outputTarget = config.outputTargets.find(isOutputTargetWww) as d.OutputTargetWww;
     expect(outputTarget.dir).toBe(path.join(rootDir, 'www'));
     expect(outputTarget.buildDir).toBe(path.join(rootDir, 'www', 'build'));
     expect(outputTarget.indexHtml).toBe(path.join(rootDir, 'www', 'index.html'));
@@ -142,7 +142,7 @@ describe('validateOutputTargetWww', () => {
       };
       userConfig.outputTargets = [outputTarget];
       const { config } = validateConfig(userConfig, mockLoadConfigInit());
-      const www = config.outputTargets.find(isOutputTargetWww);
+      const www = config.outputTargets.find(isOutputTargetWww) as d.OutputTargetWww;
 
       expect(www.type).toBe('www');
       expect(www.dir).toBe(path.join(rootDir, 'my-www'));
@@ -160,7 +160,7 @@ describe('validateOutputTargetWww', () => {
       };
       userConfig.outputTargets = [outputTarget];
       const { config } = validateConfig(userConfig, mockLoadConfigInit());
-      const www = config.outputTargets.find(isOutputTargetWww);
+      const www = config.outputTargets.find(isOutputTargetWww) as d.OutputTargetWww;
 
       expect(www.type).toBe('www');
       expect(www.dir).toBe(path.join(rootDir, 'www'));
@@ -178,7 +178,7 @@ describe('validateOutputTargetWww', () => {
       };
       userConfig.outputTargets = [outputTarget];
       const { config } = validateConfig(userConfig, mockLoadConfigInit());
-      const www = config.outputTargets.find(isOutputTargetWww);
+      const www = config.outputTargets.find(isOutputTargetWww) as d.OutputTargetWww;
 
       expect(www.type).toBe('www');
       expect(www.dir).toBe(path.join(rootDir, 'www'));
@@ -347,7 +347,7 @@ describe('validateOutputTargetWww', () => {
       };
       userConfig.outputTargets = [hydrateOutputTarget];
       const { config } = validateConfig(userConfig, mockLoadConfigInit());
-      const o = config.outputTargets.find(isOutputTargetHydrate);
+      const o = config.outputTargets.find(isOutputTargetHydrate) as d.OutputTargetHydrate;
       expect(o.external).toContain('lodash');
       expect(o.external).toContain('left-pad');
       expect(o.external).toContain('fs');
@@ -359,7 +359,7 @@ describe('validateOutputTargetWww', () => {
       userConfig.flags = { ...flags, prerender: true };
 
       const { config } = validateConfig(userConfig, mockLoadConfigInit());
-      const o = config.outputTargets.find(isOutputTargetHydrate);
+      const o = config.outputTargets.find(isOutputTargetHydrate) as d.OutputTargetHydrate;
       expect(o.external).toContain('fs');
       expect(o.external).toContain('path');
       expect(o.external).toContain('crypto');

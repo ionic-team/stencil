@@ -1,14 +1,17 @@
-import { buildJsonFileError, COLLECTION_MANIFEST_FILE_NAME, isGlob, isString, normalizePath } from '@utils';
+import {
+  buildJsonFileError,
+  COLLECTION_MANIFEST_FILE_NAME,
+  getComponentsDtsTypesFilePath,
+  isGlob,
+  isOutputTargetDistCollection,
+  isOutputTargetDistCustomElements,
+  isOutputTargetDistTypes,
+  isString,
+  normalizePath,
+} from '@utils';
 import { dirname, join, relative } from 'path';
 
 import type * as d from '../../declarations';
-import {
-  getComponentsDtsTypesFilePath,
-  isOutputTargetDistCollection,
-  isOutputTargetDistCustomElements,
-  isOutputTargetDistCustomElementsBundle,
-  isOutputTargetDistTypes,
-} from '../output-targets/output-utils';
 
 /**
  * Validate the package.json file for a project, checking that various fields
@@ -185,7 +188,6 @@ export const validateModule = async (config: d.ValidatedConfig, compilerCtx: d.C
  * value is supplied
  */
 function recommendedModulePath(config: d.ValidatedConfig): string | null {
-  const customElementsBundleOT = config.outputTargets.find(isOutputTargetDistCustomElementsBundle);
   const customElementsOT = config.outputTargets.find(isOutputTargetDistCustomElements);
   const distCollectionOT = config.outputTargets.find(isOutputTargetDistCollection);
 
@@ -196,11 +198,6 @@ function recommendedModulePath(config: d.ValidatedConfig): string | null {
   if (customElementsOT) {
     const componentsIndexAbs = join(customElementsOT.dir, 'index.js');
     return relative(config.rootDir, componentsIndexAbs);
-  }
-
-  if (customElementsBundleOT) {
-    const customElementsAbs = join(customElementsBundleOT.dir, 'index.js');
-    return relative(config.rootDir, customElementsAbs);
   }
 
   // if no output target for which we define a recommended output target is set

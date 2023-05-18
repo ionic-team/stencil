@@ -31,7 +31,7 @@ module.exports = {
   testPathIgnorePatterns: ['/.cache', '/.stencil', '/.vscode', '/dist', '/node_modules', '/www'],
   testRegex: '(/__tests__/.*|\\.?(test|spec))\\.' + moduleExtensionRegexp + '$',
   transform: {
-    '^.+\\.(ts|tsx|jsx|css)$': path.join(testingDir, 'jest-preprocessor.js'),
+    '^.+\\.(ts|tsx|jsx|css|mjs)$': path.join(testingDir, 'jest-preprocessor.js'),
   },
   watchPathIgnorePatterns: ['^.+\\.d\\.ts$'],
 };

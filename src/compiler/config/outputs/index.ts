@@ -1,10 +1,8 @@
-import { buildError } from '@utils';
+import { buildError, isValidConfigOutputTarget, VALID_CONFIG_OUTPUT_TARGETS } from '@utils';
 
 import type * as d from '../../../declarations';
-import { isValidConfigOutputTarget, VALID_CONFIG_OUTPUT_TARGETS } from '../../output-targets/output-utils';
 import { validateCollection } from './validate-collection';
 import { validateCustomElement } from './validate-custom-element';
-import { validateCustomElementBundle } from './validate-custom-element-bundle';
 import { validateCustomOutput } from './validate-custom-output';
 import { validateDist } from './validate-dist';
 import { validateDocs } from './validate-docs';
@@ -28,7 +26,6 @@ export const validateOutputTargets = (config: d.ValidatedConfig, diagnostics: d.
   config.outputTargets = [
     ...validateCollection(config, userOutputs),
     ...validateCustomElement(config, userOutputs),
-    ...validateCustomElementBundle(config, userOutputs),
     ...validateCustomOutput(config, diagnostics, userOutputs),
     ...validateLazy(config, userOutputs),
     ...validateWww(config, diagnostics, userOutputs),

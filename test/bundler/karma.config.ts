@@ -11,7 +11,7 @@ const localLaunchers = {
     base: CHROME_HEADLESS,
     flags: [
       // run in headless mode (https://chromium.googlesource.com/chromium/src/+/lkgr/headless/README.md)
-      '--headless',
+      '--headless=new',
       // use --disable-gpu to avoid an error from a missing Mesa library (https://chromium.googlesource.com/chromium/src/+/lkgr/headless/README.md)
       '--disable-gpu',
       // without a remote debugging port, Chrome exits immediately.

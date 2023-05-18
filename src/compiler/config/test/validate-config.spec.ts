@@ -1,9 +1,9 @@
 import type * as d from '@stencil/core/declarations';
 import { mockCompilerSystem, mockLoadConfigInit, mockLogger } from '@stencil/core/testing';
+import { DOCS_CUSTOM, DOCS_JSON, DOCS_README, DOCS_VSCODE } from '@utils';
 
 import { createConfigFlags } from '../../../cli/config-flags';
 import { isWatchIgnorePath } from '../../fs-watch/fs-watch-rebuild';
-import { DOCS_CUSTOM, DOCS_JSON, DOCS_README, DOCS_VSCODE } from '../../output-targets/output-utils';
 import { validateConfig } from '../validate-config';
 
 describe('validation', () => {
@@ -20,6 +20,26 @@ describe('validation', () => {
       namespace: 'Testing',
     };
     bootstrapConfig = mockLoadConfigInit();
+  });
+
+  describe('caching', () => {
+    it('should cache the validated config between calls if the same config is passed back in', () => {
+      const { config } = validateConfig(userConfig, {});
+      const { config: secondRound } = validateConfig(config, {});
+      // we should have object identity
+      expect(config === secondRound).toBe(true);
+      // objects should be deepEqual as well
+      expect(config).toEqual(secondRound);
+    });
+
+    it('should bust the cache if a different config is supplied than the cached one', () => {
+      // validate once, caching that result
+      const { config } = validateConfig(userConfig, {});
+      // pass a new initial configuration
+      const { config: secondRound } = validateConfig({ ...userConfig }, {});
+      // shouldn't have object equality with the earlier one
+      expect(config === secondRound).toBe(false);
+    });
   });
 
   describe('flags', () => {

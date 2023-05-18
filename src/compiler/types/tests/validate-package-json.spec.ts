@@ -1,10 +1,9 @@
 import type * as d from '@stencil/core/declarations';
 import { mockBuildCtx, mockCompilerCtx, mockValidatedConfig } from '@stencil/core/testing';
+import { DIST_COLLECTION, DIST_CUSTOM_ELEMENTS } from '@utils';
 import path from 'path';
 
 import { normalizePath } from '../../../utils/normalize-path';
-// TODO(STENCIL-561): fully delete dist-custom-elements-bundle code
-import { DIST_COLLECTION, DIST_CUSTOM_ELEMENTS, DIST_CUSTOM_ELEMENTS_BUNDLE } from '../../output-targets/output-utils';
 import * as v from '../validate-build-package-json';
 
 describe('validate-package-json', () => {
@@ -94,20 +93,6 @@ describe('validate-package-json', () => {
       expect(buildCtx.diagnostics).toHaveLength(0);
     });
 
-    // TODO(STENCIL-561): fully delete dist-custom-elements-bundle code
-    it('validate custom elements bundle module', async () => {
-      config.outputTargets = [
-        {
-          type: DIST_CUSTOM_ELEMENTS_BUNDLE,
-          dir: path.join(root, 'custom-elements'),
-        },
-      ];
-      compilerCtx.fs.writeFile(path.join(root, 'dist', 'index.js'), '');
-      buildCtx.packageJson.module = 'custom-elements/index.js';
-      await v.validateModule(config, compilerCtx, buildCtx);
-      expect(buildCtx.diagnostics).toHaveLength(0);
-    });
-
     it('validates a valid custom elements module', async () => {
       config.outputTargets = [
         {
@@ -150,13 +135,6 @@ describe('validate-package-json', () => {
       ot: d.OutputTarget;
       path: string;
     }>([
-      {
-        ot: {
-          type: DIST_CUSTOM_ELEMENTS_BUNDLE,
-          dir: path.join(root, 'custom-elements'),
-        },
-        path: 'custom-elements/index.js',
-      },
       {
         ot: {
           type: DIST_CUSTOM_ELEMENTS,

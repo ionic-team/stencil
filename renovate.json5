@@ -1,0 +1,126 @@
+{
+  $schema: 'https://docs.renovatebot.com/renovate-schema.json',
+  /**
+   * Documentation: https://docs.renovatebot.com/configuration-options
+   *
+   * This configuration file can be locally validated:
+   * 1. `npm i -g renovate` will install the validator
+   * 2. `renovate-config-validator` will run the validator
+   */
+  dependencyDashboard: true,
+  // TODO(STENCIL-596): Remove once rollup upgrade is unblocked
+  ignoreDeps: [
+    'rollup',
+    'rollup-plugin-sourcemaps',
+    '@rollup/plugin-commonjs',
+    '@rollup/plugin-node-resolve',
+    '@rollup/plugin-replace',
+  ],
+  ignorePaths: [
+    'test/package.json',
+    'test/browser-compile',
+    'test/end-to-end',
+    'test/hello-vdom',
+    'test/hello-world',
+    'test/ionic-app',
+    'test/jest-spec-runner',
+    'test/karma',
+    'test/performance',
+    'test/prerender-shadow',
+    'test/style-modes',
+    'test/todo-app',
+  ],
+  /**
+   * Apply these labels to every PR
+   */
+  labels: ['dependencies'],
+  /**
+   * The minimum age (in days) for updates that have a release timestamp header to be PR'ed.
+   * This will not batch releases together - if package A gets a release on Monday, Tuesday and Wednesday and has a
+   * `minimumReleaseAge: 3` and runs every day, then a PR will be created on:
+   * - Thursday (for Monday's release)
+   * - Friday (for Tuesday's release)
+   * - Saturday (for Wednesday's release)
+   *
+   * This setting is to prevent a compromised package from being merged into Stencil in the first three days of its
+   * release date
+   *
+   * A value of 3 days was chosen as npm packages younger than 72 hours old can be unpublished. This prevents merging
+   * support for a package that could be removed from the registry.
+   */
+  minimumReleaseAge: '3 days',
+  /**
+   * Note: Renovate will evaluate all packageRules and not stop once it gets a first match.
+   */
+  packageRules: [
+    {
+      matchPackageNames: ['@types/node'],
+      allowedVersions: '<21.0.0',
+    },
+    {
+      // TODO(STENCIL-710): Increment this value as a part of updating TypeScript
+      matchPackageNames: ['typescript'],
+      allowedVersions: '<5.0.0',
+    },
+    {
+      // TODO(STENCIL-771): Remove this entry + upgrade after the TypeScript 5.0 upgrade
+      matchPackageNames: ['dts-bundle-generator'],
+      allowedVersions: '<8.0.0',
+    },
+    {
+      // disable Jest updates until the new testing architecture is in place
+      matchPackageNames: ['@types/jest', 'jest', 'jest-cli', 'jest-environment-node'],
+      groupName: 'Jest',
+      allowedVersions: '<28.0.0',
+    },
+    // TODO(STENCIL-590): remove these once deps are removed
+    {
+      matchPackageNames: ['@types/inquirer'],
+      allowedVersions: '<=7.3.1',
+    },
+    // TODO(STENCIL-590): remove these once deps are removed
+    {
+      matchPackageNames: ['inquirer'],
+      allowedVersions: '<=7.3.3',
+    },
+    // TODO(STENCIL-716): remove this once Stencil drops support for Node 14
+    {
+      matchPackageNames: ['@types/fs-extra'],
+      allowedVersions: '<10.0.0',
+    },
+    // TODO(STENCIL-716): remove this once Stencil drops support for Node 14
+    {
+      matchPackageNames: ['glob'],
+      allowedVersions: '<9.0.0',
+    },
+    // TODO(STENCIL-716): remove this once Stencil drops support for Node 14
+    {
+      matchPackageNames: ['minimatch'],
+      allowedVersions: '<6.0.0',
+    },
+    {
+      matchPackagePrefixes: ['@typescript-eslint'],
+      groupName: 'TypeScript-ESLint',
+      // these packages can be released often, let's look at them every week
+      // Note: Timezone for the schedule is specified as UTC
+      schedule: ["before 11am on monday"]
+    },
+    {
+      matchPackageNames: ['eslint-plugin-jsdoc'],
+      // this package can be released often, let's look at it every week
+      // Note: Timezone for the schedule is specified as UTC
+      schedule: ["before 11am on monday"]
+    }
+  ],
+  // Never rebase the branch or update it unless manually requested to avoid noisy PR emails
+  rebaseWhen: 'never',
+  // Note: Timezone for the schedule is specified as UTC
+  schedule: ['every weekday before 11am'],
+  /**
+   * Ensure semantic commits are enabled for commits + PR titles.
+   *
+   * By default, Angular-style semantic commits will have a type of 'chore' and a scope of 'deps':
+   * `chore(deps): _your git commit title here_`
+   */
+  semanticCommits: "enabled",
+}

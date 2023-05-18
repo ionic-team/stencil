@@ -165,6 +165,13 @@ export const createStaticGetter = (propName: string, returnExpression: ts.Expres
   );
 };
 
+/**
+ * Retrieves a value represented by TypeScript's syntax tree by name of a static getter. The value is transformed to a
+ * runtime value.
+ * @param staticMembers a collection of static getters to search
+ * @param staticName the name of the static getter to pull a value from
+ * @returns a TypeScript value, converted from its TypeScript syntax tree representation
+ */
 export const getStaticValue = (staticMembers: ts.ClassElement[], staticName: string): any => {
   const staticMember: ts.GetAccessorDeclaration = staticMembers.find(
     (member) => (member.name as any).escapedText === staticName
@@ -531,7 +538,41 @@ const getTypeReferenceLocation = (typeName: string, tsNode: ts.Node): d.Componen
   };
 };
 
-export const resolveType = (checker: ts.TypeChecker, type: ts.Type) => {
+/**
+ * Resolve a type annotation, using the TypeScript typechecker to convert a
+ * {@link ts.Type} record to a string.
+ *
+ * For instance, assume there's a module `foo.ts` which exports a type `Foo`
+ * which looks like this:
+ *
+ * ```ts
+ * // foo.ts
+ * type Foo = (b: string) => boolean;
+ * ```
+ *
+ * and then a module `bar.ts` which imports `Foo` and uses it to annotate a
+ * variable declaration like so:
+ *
+ * ```ts
+ * // bar.ts
+ * import { Foo } from './foo';
+ *
+ * let foo: Foo | undefined;
+ * ```
+ *
+ * If this function is called with the {@link ts.Type} object corresponding to
+ * the {@link ts.Node} object for the `foo` variable, it will return something
+ * like:
+ *
+ * ```ts
+ * "(b: string) => boolean | undefined";
+ * ```
+ *
+ * @param checker a typescript typechecker
+ * @param type the type to resolve
+ * @returns a resolved, user-readable string
+ */
+export const resolveType = (checker: ts.TypeChecker, type: ts.Type): string => {
   const set = new Set<string>();
   parseDocsType(checker, type, set);
 
@@ -543,7 +584,7 @@ export const resolveType = (checker: ts.TypeChecker, type: ts.Type) => {
   }
 
   let parts = Array.from(set.keys()).sort();
-  // TODO(STENCIL-366): Get this section of code under tests that directly exercises this behavior
+  // TODO(STENCIL-366): Get this section of code under tests that directly exercise this behavior
   if (parts.length > 1) {
     parts = parts.map((p) => (p.indexOf('=>') >= 0 ? `(${p})` : p));
   }
@@ -556,6 +597,7 @@ export const resolveType = (checker: ts.TypeChecker, type: ts.Type) => {
 
 /**
  * Formats a TypeScript `Type` entity as a string
+ *
  * @param checker a reference to the TypeScript type checker
  * @param type a TypeScript `Type` entity to format
  * @returns the formatted string
@@ -567,6 +609,18 @@ export const typeToString = (checker: ts.TypeChecker, type: ts.Type): string => 
   return checker.typeToString(type, undefined, TYPE_FORMAT_FLAGS);
 };
 
+/**
+ * Parse a type into its component parts, recursively dealing with each variant
+ * if it is a union type.
+ *
+ * **Note**: this function will mutate the `parts` set, adding new strings for
+ * any types it finds.
+ *
+ * @param checker a TypeScript typechecker instance
+ * @param type a TypeScript type
+ * @param parts an out param that holds parts of the type annotation we're
+ * assembling
+ */
 export const parseDocsType = (checker: ts.TypeChecker, type: ts.Type, parts: Set<string>): void => {
   if (type.isUnion()) {
     (type as ts.UnionType).types.forEach((t) => {
@@ -578,22 +632,42 @@ export const parseDocsType = (checker: ts.TypeChecker, type: ts.Type, parts: Set
   }
 };
 
-export const getModuleFromSourceFile = (compilerCtx: d.CompilerCtx, tsSourceFile: ts.SourceFile) => {
+/**
+ * Retrieves a Stencil `Module` entity from the compiler context for a given TypeScript `SourceFile`
+ * @param compilerCtx the current compiler context to retrieve the `Module` from
+ * @param tsSourceFile the TypeScript compiler `SourceFile` entity to use to retrieve the `Module`
+ * @returns the `Module`, or `undefined` if it cannot be found
+ */
+export const getModuleFromSourceFile = (
+  compilerCtx: d.CompilerCtx,
+  tsSourceFile: ts.SourceFile
+): d.Module | undefined => {
   const sourceFilePath = normalizePath(tsSourceFile.fileName);
   const moduleFile = compilerCtx.moduleMap.get(sourceFilePath);
   if (moduleFile != null) {
     return moduleFile;
   }
 
+  // a key with the `Module`'s filename could not be found, attempt to resolve it by iterating over all modules in the
+  // compiler context
   const moduleFiles = Array.from(compilerCtx.moduleMap.values());
   return moduleFiles.find((m) => m.jsFilePath === sourceFilePath);
 };
 
+/**
+ * Retrieve the Stencil metadata for a component from the current compiler context, based on the provided TypeScript
+ * syntax tree node. The TypeScript source file is used as a fallback in the event the metadata cannot be found based
+ * on the TypeScript node.
+ * @param compilerCtx the current compiler context
+ * @param tsSourceFile the TypeScript `SourceFile` entity
+ * @param node a TypeScript class representation of a Stencil component
+ * @returns the found metadata, or `undefined` if it cannot be found
+ */
 export const getComponentMeta = (
   compilerCtx: d.CompilerCtx,
   tsSourceFile: ts.SourceFile,
   node: ts.ClassDeclaration
-) => {
+): d.ComponentCompilerMeta | undefined => {
   const meta = compilerCtx.nodeMap.get(node);
   if (meta) {
     return meta;
@@ -610,7 +684,12 @@ export const getComponentMeta = (
   return undefined;
 };
 
-export const getComponentTagName = (staticMembers: ts.ClassElement[]) => {
+/**
+ * Retrieves the tag name associated with a Stencil component, based on the 'is' static getter assigned to the class at compile time
+ * @param staticMembers the static getters belonging to the Stencil component class
+ * @returns the tage name, or null if one cannot be found
+ */
+export const getComponentTagName = (staticMembers: ts.ClassElement[]): string | null => {
   if (staticMembers.length > 0) {
     const tagName = getStaticValue(staticMembers, 'is') as string;
 

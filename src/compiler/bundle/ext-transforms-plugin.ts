@@ -1,9 +1,8 @@
-import { hasError, normalizeFsPath } from '@utils';
+import { hasError, isOutputTargetDistCollection, normalizeFsPath } from '@utils';
 import { join, relative } from 'path';
 import type { Plugin } from 'rollup';
 
 import type * as d from '../../declarations';
-import { isOutputTargetDistCollection } from '../output-targets/output-utils';
 import { runPluginTransformsEsmImports } from '../plugin/plugin';
 import { parseImportPath } from '../transformers/stencil-import-path';
 import type { BundleOptions } from './bundle-interface';

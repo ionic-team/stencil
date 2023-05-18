@@ -1,4 +1,5 @@
-import { DIST_TYPES, isValidConfigOutputTarget, VALID_CONFIG_OUTPUT_TARGETS } from '../output-utils';
+import { DIST_TYPES, VALID_CONFIG_OUTPUT_TARGETS } from '../constants';
+import { isValidConfigOutputTarget } from '../output-target';
 
 describe('output-utils tests', () => {
   describe('isValidConfigOutputTarget', () => {

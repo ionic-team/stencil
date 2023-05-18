@@ -10,12 +10,10 @@ describe('validateStats', () => {
   });
 
   it('should use default if no config provided', () => {
-    validateRollupConfig(config);
-    expect(config).toEqual({
-      rollupConfig: {
-        inputOptions: {},
-        outputOptions: {},
-      },
+    const rollupConfig = validateRollupConfig(config);
+    expect(rollupConfig).toEqual({
+      inputOptions: {},
+      outputOptions: {},
     });
   });
 
@@ -25,14 +23,12 @@ describe('validateStats', () => {
         context: 'window',
       },
     };
-    validateRollupConfig(config);
-    expect(config).toEqual({
-      rollupConfig: {
-        inputOptions: {
-          context: 'window',
-        },
-        outputOptions: {},
+    const rollupConfig = validateRollupConfig(config);
+    expect(rollupConfig).toEqual({
+      inputOptions: {
+        context: 'window',
       },
+      outputOptions: {},
     });
   });
 
@@ -45,14 +41,12 @@ describe('validateStats', () => {
       },
     };
 
-    validateRollupConfig(config);
-    expect(config).toEqual({
-      rollupConfig: {
-        inputOptions: {},
-        outputOptions: {
-          globals: {
-            jquery: '$',
-          },
+    const rollupConfig = validateRollupConfig(config);
+    expect(rollupConfig).toEqual({
+      inputOptions: {},
+      outputOptions: {
+        globals: {
+          jquery: '$',
         },
       },
     });
@@ -71,16 +65,14 @@ describe('validateStats', () => {
       },
     } as d.RollupConfig;
 
-    validateRollupConfig(config);
-    expect(config).toEqual({
-      rollupConfig: {
-        inputOptions: {
-          context: 'window',
-        },
-        outputOptions: {
-          globals: {
-            jquery: '$',
-          },
+    const rollupConfig = validateRollupConfig(config);
+    expect(rollupConfig).toEqual({
+      inputOptions: {
+        context: 'window',
+      },
+      outputOptions: {
+        globals: {
+          jquery: '$',
         },
       },
     });

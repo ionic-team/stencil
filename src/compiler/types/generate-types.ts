@@ -3,7 +3,6 @@ import { join, relative } from 'path';
 
 import type * as d from '../../declarations';
 import { generateCustomElementsTypes } from '../output-targets/dist-custom-elements/custom-elements-types';
-import { generateCustomElementsBundleTypes } from '../output-targets/dist-custom-elements-bundle/custom-elements-bundle-types';
 import { generateAppTypes } from './generate-app-types';
 import { copyStencilCoreDts, updateStencilTypesImports } from './stencil-types';
 
@@ -64,7 +63,6 @@ const generateTypesOutput = async (
   const { typesDir } = outputTarget;
 
   if (distDtsFilePath) {
-    await generateCustomElementsBundleTypes(config, compilerCtx, buildCtx, distDtsFilePath);
     await generateCustomElementsTypes(config, compilerCtx, buildCtx, typesDir);
   }
 };

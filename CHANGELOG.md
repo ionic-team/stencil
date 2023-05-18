@@ -1,3 +1,51 @@
+## 🏒 [3.2.2](https://github.com/ionic-team/stencil/compare/v3.2.1...v3.2.2) (2023-05-01)
+
+
+### Bug Fixes
+
+* **declarations:** add `onCancel` to dialog attributes ([#4280](https://github.com/ionic-team/stencil/issues/4280)) ([725ff7e](https://github.com/ionic-team/stencil/commit/725ff7e5a4fac5aa5cd0adb263e484f2ada5cc40)), fixes [#4267](https://github.com/ionic-team/stencil/issues/4267)
+* **runtime:** initialize custom elements even when there is no styles ([#4296](https://github.com/ionic-team/stencil/issues/4296)) ([23f1e66](https://github.com/ionic-team/stencil/commit/23f1e66fb1a092266dfd17c31987499b2ece0b0d)), fixes [#4221](https://github.com/ionic-team/stencil/issues/4221)
+* **testing:** jest component disconnected callback ([#4269](https://github.com/ionic-team/stencil/issues/4269)) ([4ec3b69](https://github.com/ionic-team/stencil/commit/4ec3b694454fddfc71bf9999e31e1341e10117e2)), fixes [#4053](https://github.com/ionic-team/stencil/issues/4053)
+
+
+
+## 🎙 [3.2.1](https://github.com/ionic-team/stencil/compare/v3.2.0...v3.2.1) (2023-04-10)
+
+
+### Bug Fixes
+
+* **compiler:** sourcemap for dist-custom-elements generation ([#4200](https://github.com/ionic-team/stencil/issues/4200)) ([62ad269](https://github.com/ionic-team/stencil/commit/62ad269ca34f665e41bce825f54de9f81d5ed4a4))
+* **compiler:** write exports for defineCustomElement typedefs ([#4194](https://github.com/ionic-team/stencil/issues/4194)) ([89cd845](https://github.com/ionic-team/stencil/commit/89cd8456a6d274cb3e74e839c7fde228dcdcabc6))
+* **mock-doc:** add missing properties of object returned by matchMedia ([#2880](https://github.com/ionic-team/stencil/issues/2880)) ([69176f8](https://github.com/ionic-team/stencil/commit/69176f8290767c05206f324bccb5bea2cf780448))
+* **test:** fix infinite loops w/ react and @testing-library/dom ([#4188](https://github.com/ionic-team/stencil/issues/4188)) ([51750a2](https://github.com/ionic-team/stencil/commit/51750a28ece1638dae6bc5c02221d70f485bfb44)), closes [#3434](https://github.com/ionic-team/stencil/issues/3434)
+
+
+## Thanks
+
+🎉 Thanks for @cam-narzt for their contributions! 🎉
+
+
+# 🌷 [3.2.0](https://github.com/ionic-team/stencil/compare/v3.1.0...v3.2.0) (2023-03-14)
+
+
+### Bug Fixes
+
+* **cli:** support Jest-specific CLI flag aliases ([#4124](https://github.com/ionic-team/stencil/issues/4124)) ([56389a4](https://github.com/ionic-team/stencil/commit/56389a452d9b072976112ca6339d60b1aea9f73d))
+* **compiler:** use file system polling events in watch mode ([#4146](https://github.com/ionic-team/stencil/issues/4146)) ([4a12b06](https://github.com/ionic-team/stencil/commit/4a12b067f5dcc1048eeabe21fb551c071a3e67b4)), fixes [#3952](https://github.com/ionic-team/stencil/issues/3952), [#4011](https://github.com/ionic-team/stencil/issues/4011), [#4044](https://github.com/ionic-team/stencil/issues/4044)
+* **test:** support importing from ES modules in spec tests ([#4136](https://github.com/ionic-team/stencil/issues/4136)) ([23a73f0](https://github.com/ionic-team/stencil/commit/23a73f0954db1cbc14f3c1d630cc7b5f81382128)), closes [#3251](https://github.com/ionic-team/stencil/issues/3251)
+* **typo:** fix info task output ([#4099](https://github.com/ionic-team/stencil/issues/4099)) ([d88bf30](https://github.com/ionic-team/stencil/commit/d88bf3055123953cff8417c06cd07fc79680c76e))
+
+
+### Features
+
+* **config:** add enableImportInjection flag ([#4156](https://github.com/ionic-team/stencil/issues/4156)) ([2f23a8a](https://github.com/ionic-team/stencil/commit/2f23a8af5b0516218f352b41f6241bea96b28774))
+
+
+## Thanks
+
+🎉 Thanks for @sandrooco for their contributions! 🎉
+
+
 # 🍕 [3.1.0](https://github.com/ionic-team/stencil/compare/v3.0.1...v3.1.0) (2023-02-28)
 
 
@@ -165,6 +213,14 @@ See [BREAKING_CHANGES.md - v3.0.0](./BREAKING_CHANGES.md#stencil-v300) for a com
 
 See [the v3.0.0 Migration Guide](https://stenciljs.com/docs/introduction/upgrading-to-stencil-three) for a guide to migrate to Stencil v3.0.0.
 
+
+
+## 🎆 [2.22.3](https://github.com/ionic-team/stencil/compare/v2.22.2...v2.22.3) (2023-03-14)
+
+
+### Bug Fixes
+
+* **compiler:** use file system polling events in watch mode ([#4147](https://github.com/ionic-team/stencil/issues/4147)) ([7f3d514](https://github.com/ionic-team/stencil/commit/7f3d514c5a12e6563e315a834329da40026dd538)), fixes [#3952](https://github.com/ionic-team/stencil/issues/3952), [#4011](https://github.com/ionic-team/stencil/issues/4011), [#4044](https://github.com/ionic-team/stencil/issues/4044)
 
 
 ## 🎈 [2.22.2](https://github.com/ionic-team/stencil/compare/v2.22.1...v2.22.2) (2023-01-23)

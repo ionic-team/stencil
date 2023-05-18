@@ -2,8 +2,6 @@ import { BUILD } from '@app-data';
 import { getHostRef, win } from '@platform';
 import { HOST_FLAGS } from '@utils';
 
-import type * as d from '../declarations';
-
 let i = 0;
 
 export const createTime = (fnName: string, tagName = '') => {
@@ -44,7 +42,7 @@ const inspect = (ref: any) => {
     return undefined;
   }
   const flags = hostRef.$flags$;
-  const hostElement = hostRef.$hostElement$ as d.HostElement;
+  const hostElement = hostRef.$hostElement$;
   return {
     renderCount: hostRef.$renderCount$,
     flags: {

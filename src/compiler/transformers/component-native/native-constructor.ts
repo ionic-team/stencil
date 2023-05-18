@@ -1,17 +1,30 @@
+import { DIST_CUSTOM_ELEMENTS } from '@utils';
 import ts from 'typescript';
 
 import type * as d from '../../../declarations';
-import { addCoreRuntimeApi, RUNTIME_APIS } from '../core-runtime-apis';
+import { addOutputTargetCoreRuntimeApi, RUNTIME_APIS } from '../core-runtime-apis';
 import { addCreateEvents } from '../create-event';
 import { addLegacyProps } from '../legacy-props';
 import { retrieveTsModifiers } from '../transform-utils';
 
+/**
+ * Updates a constructor to include:
+ * - a `super()` call
+ * - function calls to initialize the component
+ * - function calls to create custom event emitters
+ * If a constructor does not exist, one will be created
+ *
+ * The constructor will be added to the provided list of {@link ts.ClassElement}s in place
+ *
+ * @param classMembers the class elements to modify
+ * @param moduleFile the Stencil module representation of the component class
+ * @param cmp the component metadata generated for the component
+ */
 export const updateNativeConstructor = (
   classMembers: ts.ClassElement[],
   moduleFile: d.Module,
-  cmp: d.ComponentCompilerMeta,
-  ensureSuper: boolean
-) => {
+  cmp: d.ComponentCompilerMeta
+): void => {
   if (cmp.isPlain) {
     return;
   }
@@ -20,19 +33,19 @@ export const updateNativeConstructor = (
   if (cstrMethodIndex >= 0) {
     // add to the existing constructor()
     const cstrMethod = classMembers[cstrMethodIndex] as ts.ConstructorDeclaration;
+    // a constructor may not have a body (e.g. in the case of constructor overloads)
+    const cstrBodyStatements: ts.NodeArray<ts.Statement> = cstrMethod.body?.statements ?? ts.factory.createNodeArray();
 
     let statements: ts.Statement[] = [
       ...nativeInit(moduleFile, cmp),
       ...addCreateEvents(moduleFile, cmp),
-      ...cstrMethod.body.statements,
+      ...cstrBodyStatements,
       ...addLegacyProps(moduleFile, cmp),
     ];
 
-    if (ensureSuper) {
-      const hasSuper = cstrMethod.body.statements.some((s) => s.kind === ts.SyntaxKind.SuperKeyword);
-      if (!hasSuper) {
-        statements = [createNativeConstructorSuper(), ...statements];
-      }
+    const hasSuper = cstrBodyStatements.some((s) => s.kind === ts.SyntaxKind.SuperKeyword);
+    if (!hasSuper) {
+      statements = [createNativeConstructorSuper(), ...statements];
     }
 
     classMembers[cstrMethodIndex] = ts.factory.updateConstructorDeclaration(
@@ -43,15 +56,12 @@ export const updateNativeConstructor = (
     );
   } else {
     // create a constructor()
-    let statements: ts.Statement[] = [
+    const statements: ts.Statement[] = [
+      createNativeConstructorSuper(),
       ...nativeInit(moduleFile, cmp),
       ...addCreateEvents(moduleFile, cmp),
       ...addLegacyProps(moduleFile, cmp),
     ];
-
-    if (ensureSuper) {
-      statements = [createNativeConstructorSuper(), ...statements];
-    }
 
     const cstrMethod = ts.factory.createConstructorDeclaration(undefined, [], ts.factory.createBlock(statements, true));
     classMembers.unshift(cstrMethod);
@@ -72,7 +82,13 @@ const nativeInit = (moduleFile: d.Module, cmp: d.ComponentCompilerMeta): Readonl
   return initStatements;
 };
 
-const nativeRegisterHostStatement = () => {
+/**
+ * Generate an expression statement to register a host element with its VDOM equivalent in a global element-to-vdom
+ * mapping.
+ * @returns the generated expression statement
+ */
+const nativeRegisterHostStatement = (): ts.ExpressionStatement => {
+  // Create an expression statement, `this.__registerHost();`
   return ts.factory.createExpressionStatement(
     ts.factory.createCallExpression(
       ts.factory.createPropertyAccessExpression(ts.factory.createThis(), ts.factory.createIdentifier('__registerHost')),
@@ -88,7 +104,7 @@ const nativeRegisterHostStatement = () => {
  * @returns the generated expression statement
  */
 const nativeAttachShadowStatement = (moduleFile: d.Module): ts.ExpressionStatement => {
-  addCoreRuntimeApi(moduleFile, RUNTIME_APIS.attachShadow);
+  addOutputTargetCoreRuntimeApi(moduleFile, DIST_CUSTOM_ELEMENTS, RUNTIME_APIS.attachShadow);
   // Create an expression statement, `this.__attachShadow();`
   return ts.factory.createExpressionStatement(
     ts.factory.createCallExpression(
@@ -99,8 +115,12 @@ const nativeAttachShadowStatement = (moduleFile: d.Module): ts.ExpressionStateme
   );
 };
 
-const createNativeConstructorSuper = () => {
+/**
+ * Create an expression statement for calling `super()` for a class.
+ * @returns the generated expression statement
+ */
+const createNativeConstructorSuper = (): ts.ExpressionStatement => {
   return ts.factory.createExpressionStatement(
-    ts.factory.createCallExpression(ts.factory.createIdentifier('super'), undefined, undefined)
+    ts.factory.createCallExpression(ts.factory.createSuper(), undefined, undefined)
   );
 };

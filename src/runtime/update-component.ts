@@ -9,7 +9,7 @@ import { PLATFORM_FLAGS } from './runtime-constants';
 import { attachStyles } from './styles';
 import { renderVdom } from './vdom/vdom-render';
 
-export const attachToAncestor = (hostRef: d.HostRef, ancestorComponent: d.HostElement) => {
+export const attachToAncestor = (hostRef: d.HostRef, ancestorComponent?: d.HostElement) => {
   if (BUILD.asyncLoading && ancestorComponent && !hostRef.$onRenderResolve$ && ancestorComponent['s-p']) {
     ancestorComponent['s-p'].push(new Promise((r) => (hostRef.$onRenderResolve$ = r)));
   }
@@ -32,43 +32,95 @@ export const scheduleUpdate = (hostRef: d.HostRef, isInitialLoad: boolean) => {
   return BUILD.taskQueue ? writeTask(dispatch) : dispatch();
 };
 
-const dispatchHooks = (hostRef: d.HostRef, isInitialLoad: boolean) => {
+/**
+ * Dispatch initial-render and update lifecycle hooks, enqueuing calls to
+ * component lifecycle methods like `componentWillLoad` as well as
+ * {@link updateComponent}, which will kick off the virtual DOM re-render.
+ *
+ * @param hostRef a reference to a host DOM node
+ * @param isInitialLoad whether we're on the initial load or not
+ * @returns an empty Promise which is used to enqueue a series of operations for
+ * the component
+ */
+const dispatchHooks = (hostRef: d.HostRef, isInitialLoad: boolean): Promise<void> => {
   const elm = hostRef.$hostElement$;
   const endSchedule = createTime('scheduleUpdate', hostRef.$cmpMeta$.$tagName$);
-  const instance = BUILD.lazyLoad ? hostRef.$lazyInstance$ : (elm as any);
+  const instance = BUILD.lazyLoad ? hostRef.$lazyInstance$ : elm;
 
-  let promise: Promise<void>;
+  // We're going to use this variable together with `enqueue` to implement a
+  // little promise-based queue. We start out with it `undefined`. When we add
+  // the first function to the queue we'll set this variable to be that
+  // function's return value. When we attempt to add subsequent values to the
+  // queue we'll check that value and, if it was a `Promise`, we'll then chain
+  // the new function off of that `Promise` using `.then()`. This will give our
+  // queue two nice properties:
+  //
+  // 1. If all functions added to the queue are synchronous they'll be called
+  //    synchronously right away.
+  // 2. If all functions added to the queue are asynchronous they'll all be
+  //    called in order after `dispatchHooks` exits.
+  let maybePromise: Promise<void> | undefined;
+
   if (isInitialLoad) {
     if (BUILD.lazyLoad && BUILD.hostListener) {
       hostRef.$flags$ |= HOST_FLAGS.isListenReady;
       if (hostRef.$queuedListeners$) {
         hostRef.$queuedListeners$.map(([methodName, event]) => safeCall(instance, methodName, event));
-        hostRef.$queuedListeners$ = null;
+        hostRef.$queuedListeners$ = undefined;
       }
     }
     emitLifecycleEvent(elm, 'componentWillLoad');
     if (BUILD.cmpWillLoad) {
-      promise = safeCall(instance, 'componentWillLoad');
+      // If `componentWillLoad` returns a `Promise` then we want to wait on
+      // whatever's going on in that `Promise` before we launch into
+      // rendering the component, doing other lifecycle stuff, etc. So
+      // in that case we assign the returned promise to the variable we
+      // declared above to hold a possible 'queueing' Promise
+      maybePromise = safeCall(instance, 'componentWillLoad');
     }
   } else {
     emitLifecycleEvent(elm, 'componentWillUpdate');
 
     if (BUILD.cmpWillUpdate) {
-      promise = safeCall(instance, 'componentWillUpdate');
+      // Like `componentWillLoad` above, we allow Stencil component
+      // authors to return a `Promise` from this lifecycle callback, and
+      // we specify that our runtime will wait for that `Promise` to
+      // resolve before the component re-renders. So if the method
+      // returns a `Promise` we need to keep it around!
+      maybePromise = safeCall(instance, 'componentWillUpdate');
     }
   }
 
   emitLifecycleEvent(elm, 'componentWillRender');
   if (BUILD.cmpWillRender) {
-    promise = then(promise, () => safeCall(instance, 'componentWillRender'));
+    maybePromise = enqueue(maybePromise, () => safeCall(instance, 'componentWillRender'));
   }
 
   endSchedule();
-  return then(promise, () => updateComponent(hostRef, instance, isInitialLoad));
+
+  return enqueue(maybePromise, () => updateComponent(hostRef, instance, isInitialLoad));
 };
 
+/**
+ * This function uses a Promise to implement a simple first-in, first-out queue
+ * of functions to be called.
+ *
+ * The queue is ordered on the basis of the first argument. If it's
+ * `undefined`, then nothing is on the queue yet, so the provided function can
+ * be called synchronously (although note that this function may return a
+ * `Promise`). The idea is that then the return value of that enqueueing
+ * operation is kept around, so that if it was a `Promise` then subsequent
+ * functions can be enqueued by calling this function again with that `Promise`
+ * as the first argument.
+ *
+ * @param maybePromise either a `Promise` which should resolve before the next function is called or an 'empty' sentinel
+ * @param fn a function to enqueue
+ * @returns either a `Promise` or the return value of the provided function
+ */
+const enqueue = (maybePromise: Promise<void> | undefined, fn: () => Promise<void>): Promise<void> | undefined =>
+  maybePromise instanceof Promise ? maybePromise.then(fn) : fn();
+
 const updateComponent = async (hostRef: d.HostRef, instance: any, isInitialLoad: boolean) => {
-  // updateComponent
   const elm = hostRef.$hostElement$ as d.RenderNode;
   const endUpdate = createTime('update', hostRef.$cmpMeta$.$tagName$);
   const rc = elm['s-rc'];
@@ -93,7 +145,7 @@ const updateComponent = async (hostRef: d.HostRef, instance: any, isInitialLoad:
     plt.$cssShim$.updateHost(elm);
   }
   if (BUILD.isDev) {
-    hostRef.$renderCount$++;
+    hostRef.$renderCount$ = hostRef.$renderCount$ === undefined ? 1 : hostRef.$renderCount$ + 1;
     hostRef.$flags$ &= ~HOST_FLAGS.devOnRender;
   }
 
@@ -127,7 +179,7 @@ const updateComponent = async (hostRef: d.HostRef, instance: any, isInitialLoad:
   endUpdate();
 
   if (BUILD.asyncLoading) {
-    const childrenPromises = elm['s-p'];
+    const childrenPromises = elm['s-p'] ?? [];
     const postUpdate = () => postUpdateComponent(hostRef);
     if (childrenPromises.length === 0) {
       postUpdate();
@@ -314,10 +366,6 @@ export const safeCall = (instance: any, method: string, arg?: any) => {
     }
   }
   return undefined;
-};
-
-const then = (promise: Promise<any>, thenFn: () => any) => {
-  return promise && promise.then ? promise.then(thenFn) : thenFn();
 };
 
 const emitLifecycleEvent = (elm: EventTarget, lifecycleName: string) => {

@@ -4,7 +4,7 @@ import type { CoreCompiler } from './load-compiler';
 import { startupCompilerLog } from './logs';
 
 export const taskWatch = async (coreCompiler: CoreCompiler, config: ValidatedConfig) => {
-  let devServer: DevServer = null;
+  let devServer: DevServer | null = null;
   let exitCode = 0;
 
   try {
@@ -36,7 +36,8 @@ export const taskWatch = async (coreCompiler: CoreCompiler, config: ValidatedCon
       const rmDevServerLog = watcher.on('buildFinish', () => {
         // log the dev server url one time
         rmDevServerLog();
-        config.logger.info(`${config.logger.cyan(devServer.browserUrl)}\n`);
+        const url = devServer?.browserUrl ?? 'UNKNOWN URL';
+        config.logger.info(`${config.logger.cyan(url)}\n`);
       });
     }
 

@@ -1,4 +1,4 @@
-import { isBoolean } from '@utils';
+import { COPY, DIST_TYPES, isBoolean, isOutputTargetDistCustomElements } from '@utils';
 import { join } from 'path';
 
 import type {
@@ -9,7 +9,6 @@ import type {
   ValidatedConfig,
 } from '../../../declarations';
 import { CustomElementsExportBehaviorOptions } from '../../../declarations';
-import { COPY, DIST_TYPES, isOutputTargetDistCustomElements } from '../../output-targets/output-utils';
 import { getAbsolutePath } from '../config-utils';
 import { validateCopy } from '../validate-copy';
 

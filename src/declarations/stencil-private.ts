@@ -1,3 +1,5 @@
+import { result } from '@utils';
+
 import type { InMemoryFileSystem } from '../compiler/sys/in-memory-fs';
 import type {
   BuildEvents,
@@ -18,6 +20,7 @@ import type {
   LoggerTimeSpan,
   OptimizeCssInput,
   OptimizeCssOutput,
+  OutputTarget,
   OutputTargetWww,
   PageReloadStrategy,
   PrerenderConfig,
@@ -215,7 +218,7 @@ export interface UpdatedLazyBuildCtx {
 export interface BuildCtx {
   buildId: number;
   buildResults: CompilerBuildResults;
-  buildStats?: CompilerBuildStats | { diagnostics: Diagnostic[] };
+  buildStats?: result.Result<CompilerBuildStats, { diagnostics: Diagnostic[] }>;
   buildMessages: string[];
   bundleBuildCount: number;
   collections: Collection[];
@@ -254,6 +257,9 @@ export interface BuildCtx {
   indexBuildCount: number;
   indexDoc: Document;
   isRebuild: boolean;
+  /**
+   * A collection of Stencil's intermediate representation of components, tied to the current build
+   */
   moduleFiles: Module[];
   packageJson: PackageJsonData;
   pendingCopyTasks: Promise<CopyResults>[];
@@ -697,6 +703,9 @@ export interface CompilerCtx {
   hasSuccessfulBuild: boolean;
   isActivelyBuilding: boolean;
   lastBuildResults: CompilerBuildResults;
+  /**
+   * A mapping of a file path to a Stencil {@link Module}
+   */
   moduleMap: ModuleMap;
   nodeMap: NodeMap;
   resolvedCollections: Set<string>;
@@ -769,6 +778,13 @@ export interface ComponentCompilerFeatures {
   htmlTagNames: string[];
   htmlParts: string[];
   isUpdateable: boolean;
+  /**
+   * A plain component is one that doesn't have:
+   * - any members decorated with `@Prop()`, `@State()`, `@Element()`, `@Method()`
+   * - any methods decorated with `@Listen()`
+   * - any styles
+   * - any lifecycle methods, including `render()`
+   */
   isPlain: boolean;
   potentialCmpRefs: string[];
 }
@@ -849,9 +865,26 @@ export interface ComponentCompilerVirtualProperty {
 
 export type ComponentCompilerPropertyType = 'any' | 'string' | 'boolean' | 'number' | 'unknown';
 
+/**
+ * Information about the type of a Stencil-implemented component property, in
+ * particular a `@Prop()` or `@Event()`.
+ */
 export interface ComponentCompilerPropertyComplexType {
+  /**
+   * The string of the original type annotation in the Stencil source code
+   */
   original: string;
+  /**
+   * A 'resolved' type, where e.g. imported types have been resolved and inlined
+   *
+   * For instance, an annotation like `(foo: Foo) => string;` will be
+   * converted to `(foo: { foo: string }) => string;`.
+   */
   resolved: string;
+  /**
+   * A record of the types which were referenced in the assorted type
+   * annotation in the original source file.
+   */
   references: ComponentCompilerTypeReferences;
 }
 
@@ -1387,6 +1420,12 @@ export interface MinifyJsResult {
   };
 }
 
+/**
+ * A mapping from a TypeScript or JavaScript source file path on disk, to a Stencil {@link Module}.
+ *
+ * It is advised that the key (path) be normalized before storing/retrieving the `Module` to avoid unnecessary lookup
+ * failures.
+ */
 export type ModuleMap = Map<string, Module>;
 
 /**
@@ -1394,12 +1433,21 @@ export type ModuleMap = Map<string, Module>;
  * various pieces of information like the classes declared within it, the path
  * to the original source file, HTML tag names defined in the file, and so on.
  *
- * Note that this gets serialized/parsed as JSON and therefore cannot be a
+ * Note that this gets serialized/parsed as JSON and therefore cannot contain a
  * `Map` or a `Set`.
  */
 export interface Module {
   cmps: ComponentCompilerMeta[];
+  /**
+   * A collection of modules that a component will need. The modules in this list must have import statements generated
+   * in order for the component to function.
+   */
   coreRuntimeApis: string[];
+  /**
+   * A collection of modules that a component will need for a specific output target. The modules in this list must
+   * have import statements generated in order for the component to function, but only for a specific output target.
+   */
+  outputTargetCoreRuntimeApis: Partial<Record<OutputTarget['type'], string[]>>;
   collectionName: string;
   dtsFilePath: string;
   excludeFromCollection: boolean;
@@ -1721,7 +1769,7 @@ export interface HostRef {
   $ancestorComponent$?: HostElement;
   $flags$: number;
   $cmpMeta$: ComponentRuntimeMeta;
-  $hostElement$?: HostElement;
+  $hostElement$: HostElement;
   $instanceValues$?: Map<string, any>;
   $lazyInstance$?: ComponentInterface;
   $onReadyPromise$?: Promise<any>;
@@ -1907,8 +1955,8 @@ export interface Screenshot {
   image: string;
   device?: string;
   userAgent?: string;
-  width?: number;
-  height?: number;
+  width: number;
+  height: number;
   deviceScaleFactor?: number;
   hasTouch?: boolean;
   isLandscape?: boolean;
@@ -1919,14 +1967,14 @@ export interface Screenshot {
 
 export interface ScreenshotDiff {
   mismatchedPixels: number;
-  id?: string;
+  id: string;
   desc?: string;
   imageA?: string;
   imageB?: string;
   device?: string;
   userAgent?: string;
-  width?: number;
-  height?: number;
+  width: number;
+  height: number;
   deviceScaleFactor?: number;
   hasTouch?: boolean;
   isLandscape?: boolean;
@@ -2367,7 +2415,7 @@ export interface SpecPage {
    */
   rootInstance?: any;
   /**
-   * Convenience function to set `document.body.innerHTML` and `waitForChanges()`. Function argument should be an html string.
+   * Convenience function to set `document.body.innerHTML` and `waitForChanges()`. Function argument should be a HTML string.
    */
   setContent: (html: string) => Promise<any>;
   /**
@@ -2385,6 +2433,9 @@ export interface SpecPage {
   styles: Map<string, string>;
 }
 
+/**
+ * Options pertaining to the creation and functionality of a {@link SpecPage}
+ */
 export interface NewSpecPageOptions {
   /**
    * An array of components to test. Component classes can be imported into the spec file, then their reference should be added to the `component` array in order to be used throughout the test.
@@ -2398,19 +2449,20 @@ export interface NewSpecPageOptions {
    * Sets the mocked `dir` attribute on `<html>`.
    */
   direction?: string;
+  /**
+   * If `false`, do not flush the render queue on initial test setup.
+   */
   flushQueue?: boolean;
   /**
    * The initial HTML used to generate the test. This can be useful to construct a collection of components working together, and assign HTML attributes. This value sets the mocked `document.body.innerHTML`.
    */
   html?: string;
-
   /**
    * The initial JSX used to generate the test.
    * Use `template` when you want to initialize a component using their properties, instead of their HTML attributes.
    * It will render the specified template (JSX) into `document.body`.
    */
   template?: () => any;
-
   /**
    * Sets the mocked `lang` attribute on `<html>`.
    */
@@ -2432,7 +2484,7 @@ export interface NewSpecPageOptions {
    */
   supportsShadowDom?: boolean;
   /**
-   * When a component is prerendered it includes HTML annotations, such as `s-id` attributes and `<!-t.0->` comments. This information is used by clientside hydrating. Default is `false`.
+   * When a component is pre-rendered it includes HTML annotations, such as `s-id` attributes and `<!-t.0->` comments. This information is used by clientside hydrating. Default is `false`.
    */
   includeAnnotations?: boolean;
   /**
@@ -2447,16 +2499,19 @@ export interface NewSpecPageOptions {
    * By default, any changes to component properties and attributes must `page.waitForChanges()` in order to test the updates. As an option, `autoAppluChanges` continuously flushes the queue on the background. Default is `false`.
    */
   autoApplyChanges?: boolean;
-
   /**
    * By default, styles are not attached to the DOM and they are not reflected in the serialized HTML.
    * Setting this option to `true` will include the component's styles in the serializable output.
    */
   attachStyles?: boolean;
-
+  /**
+   * Set {@link BuildConditionals} for testing based off the metadata of the component under test.
+   * When `true` all `BuildConditionals` will be assigned to the global testing `BUILD` object, regardless of their
+   * value. When `false`, only `BuildConditionals` with a value of `true` will be assigned to the `BUILD` object.
+   */
   strictBuild?: boolean;
   /**
-   * Default values to be set on the platform runtime object (@see PlatformRuntime) when creating
+   * Default values to be set on the platform runtime object {@see PlatformRuntime} when creating
    * the spec page.
    */
   platform?: Partial<PlatformRuntime>;

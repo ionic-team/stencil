@@ -6,13 +6,13 @@ import {
   mockModule,
   mockValidatedConfig,
 } from '@stencil/core/testing';
+import { DIST_CUSTOM_ELEMENTS } from '@utils';
 import { join, relative } from 'path';
 
 import type * as d from '../../../declarations';
 import { stubComponentCompilerMeta } from '../../types/tests/ComponentCompilerMeta.stub';
 import * as outputCustomElementsMod from '../dist-custom-elements';
 import { generateCustomElementsTypes } from '../dist-custom-elements/custom-elements-types';
-import { DIST_CUSTOM_ELEMENTS } from '../output-utils';
 
 const setup = () => {
   const sys = mockCompilerSystem();
@@ -67,11 +67,13 @@ describe('Custom Elements Typedef generation', () => {
     const expectedTypedefOutput = [
       '/* TestApp custom elements */',
       `export { StubCmp as MyComponent } from '${join(componentsTypeDirectoryPath, 'my-component', 'my-component')}';`,
+      `export { defineCustomElement as defineCustomElementMyComponent } from './my-component';`,
       `export { MyBestComponent as MyBestComponent } from '${join(
         componentsTypeDirectoryPath,
         'the-other-component',
         'my-real-best-component'
       )}';`,
+      `export { defineCustomElement as defineCustomElementMyBestComponent } from './my-best-component';`,
       '',
       '/**',
       ' * Used to manually set the base path where assets can be found.',

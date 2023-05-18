@@ -1,8 +1,7 @@
-import { addDocBlock, normalizePath } from '@utils';
+import { addDocBlock, GENERATED_DTS, getComponentsDtsSrcFilePath, normalizePath } from '@utils';
 import { isAbsolute, relative, resolve } from 'path';
 
 import type * as d from '../../declarations';
-import { GENERATED_DTS, getComponentsDtsSrcFilePath } from '../output-targets/output-utils';
 import { generateComponentTypes } from './generate-component-types';
 import { generateEventDetailTypes } from './generate-event-detail-types';
 import { updateStencilTypesImports } from './stencil-types';
@@ -79,7 +78,7 @@ const generateComponentTypesFile = (config: d.Config, buildCtx: d.BuildCtx, areT
      * data structure for each Stencil component in series, therefore the memory footprint of this entity will likely
      * grow as more components (with additional types) are processed.
      */
-    typeImportData = updateReferenceTypeImports(typeImportData, allTypes, cmp, cmp.sourceFilePath);
+    typeImportData = updateReferenceTypeImports(typeImportData, allTypes, cmp, cmp.sourceFilePath, config);
     if (cmp.events.length > 0) {
       /**
        * Only generate event detail types for components that have events.

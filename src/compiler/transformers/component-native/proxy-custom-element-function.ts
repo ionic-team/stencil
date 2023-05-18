@@ -1,7 +1,7 @@
 import ts from 'typescript';
 
 import type * as d from '../../../declarations';
-import { createAnonymousClassMetadataProxy } from '../add-component-meta-proxy';
+import { createClassMetadataProxy } from '../add-component-meta-proxy';
 import { addImports } from '../add-imports';
 import { RUNTIME_APIS } from '../core-runtime-apis';
 import { getModuleFromSourceFile } from '../transform-utils';
@@ -47,8 +47,22 @@ export const proxyCustomElement = (
               continue;
             }
 
+            // to narrow the type of `declaration.initializer` to `ts.ClassExpression`
+            if (!ts.isClassExpression(declaration.initializer)) {
+              continue;
+            }
+
+            const renamedClassExpression = ts.factory.updateClassExpression(
+              declaration.initializer,
+              ts.getModifiers(declaration.initializer),
+              ts.factory.createIdentifier(principalComponent.componentClassName),
+              declaration.initializer.typeParameters,
+              declaration.initializer.heritageClauses,
+              declaration.initializer.members
+            );
+
             // wrap the Stencil component's class declaration in a component proxy
-            const proxyCreationCall = createAnonymousClassMetadataProxy(principalComponent, declaration.initializer);
+            const proxyCreationCall = createClassMetadataProxy(principalComponent, renamedClassExpression);
             ts.addSyntheticLeadingComment(proxyCreationCall, ts.SyntaxKind.MultiLineCommentTrivia, '@__PURE__', false);
 
             // update the component's variable declaration to use the new initializer

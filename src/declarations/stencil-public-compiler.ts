@@ -304,8 +304,18 @@ export interface ConfigExtras {
    * loading components when using a bundler such as Vite or Parcel. Setting this flag to `true` will change how Stencil
    * lazily loads components in a way that works with additional bundlers. Setting this flag to `true` will increase
    * the size of the compiled output. Defaults to `false`.
+   * @deprecated This flag has been deprecated in favor of `enableImportInjection`, which provides the same
+   * functionality. `experimentalImportInjection` will be removed in a future major version of Stencil.
    */
   experimentalImportInjection?: boolean;
+
+  /**
+   * Projects that use a Stencil library built using the `dist` output target may have trouble lazily
+   * loading components when using a bundler such as Vite or Parcel. Setting this flag to `true` will change how Stencil
+   * lazily loads components in a way that works with additional bundlers. Setting this flag to `true` will increase
+   * the size of the compiled output. Defaults to `false`.
+   */
+  enableImportInjection?: boolean;
 
   /**
    * Dispatches component lifecycle events. Mainly used for testing. Defaults to `false`.
@@ -442,12 +452,17 @@ type RequireFields<T, K extends keyof T> = T & { [P in K]-?: T[P] };
  * Fields in {@link Config} to make required for {@link ValidatedConfig}
  */
 type StrictConfigFields =
+  | 'cacheDir'
+  | 'devServer'
   | 'flags'
   | 'hydratedFlag'
   | 'logger'
   | 'outputTargets'
   | 'packageJsonFilePath'
+  | 'rollupConfig'
   | 'rootDir'
+  | 'srcDir'
+  | 'srcIndexHtml'
   | 'sys'
   | 'testing'
   | 'transformAliasedImportPaths';
@@ -1147,7 +1162,24 @@ export interface CompilerSystem {
   statSync(p: string): CompilerFsStats;
   tmpDirSync(): string;
   watchDirectory?(p: string, callback: CompilerFileWatcherCallback, recursive?: boolean): CompilerFileWatcher;
-  watchFile?(p: string, callback: CompilerFileWatcherCallback): CompilerFileWatcher;
+
+  /**
+   * A `watchFile` implementation in order to hook into the rest of the {@link CompilerSystem} implementation that is
+   * used when running Stencil's compiler in "watch mode".
+   *
+   * It is analogous to TypeScript's `watchFile`  implementation.
+   *
+   * Note, this function may be called for full builds of Stencil projects by the TypeScript compiler. It should not
+   * assume that it will only be called in watch mode.
+   *
+   * This function should not perform any file watcher registration itself. Each `path` provided to it when called
+   * should already have been registered as a file to watch.
+   *
+   * @param path the path to the file that is being watched
+   * @param callback a callback to invoke when a file that is being watched has changed in some way
+   * @returns an object with a method for unhooking the file watcher from the system
+   */
+  watchFile?(path: string, callback: CompilerFileWatcherCallback): CompilerFileWatcher;
   /**
    * How many milliseconds to wait after a change before calling watch callbacks.
    */
@@ -1349,8 +1381,17 @@ export interface CompilerBuildStart {
   timestamp: string;
 }
 
+/**
+ * A type describing a function to call when an event is emitted by a file watcher
+ * @param fileName the path of the file tied to event
+ * @param eventKind a variant describing the type of event that was emitter (added, edited, etc.)
+ */
 export type CompilerFileWatcherCallback = (fileName: string, eventKind: CompilerFileWatcherEvent) => void;
 
+/**
+ * A type describing the different types of events that Stencil expects may happen when a file being watched is altered
+ * in some way
+ */
 export type CompilerFileWatcherEvent =
   | CompilerEventFileAdd
   | CompilerEventFileDelete
@@ -1741,9 +1782,18 @@ export interface TestingConfig extends JestConfig {
   browserWSEndpoint?: string;
 
   /**
-   * Whether to run browser e2e tests in headless mode. Defaults to true.
+   * Whether to run browser e2e tests in headless mode.
+   *
+   * Starting with Chrome v112, a new headless mode was introduced.
+   * The new headless mode unifies the "headful" and "headless" code paths in the Chrome distributable.
+   *
+   * To enable the "new" headless mode, a string value of "new" must be provided.
+   * To use the "old" headless mode, a boolean value of `true` must be provided.
+   * To use "headful" mode, a boolean value of `false` must be provided.
+   *
+   * Defaults to true.
    */
-  browserHeadless?: boolean;
+  browserHeadless?: boolean | 'new';
 
   /**
    * Slows down e2e browser operations by the specified amount of milliseconds.
@@ -2050,6 +2100,12 @@ export interface OutputTargetDocsJson extends OutputTargetBase {
   type: 'docs-json';
 
   file: string;
+  /**
+   * Set an optional file path where Stencil should write a `d.ts` file to disk
+   * at build-time containing type declarations for {@link JsonDocs} and related
+   * interfaces. If this is omitted or set to `null` Stencil will not write such
+   * a file.
+   */
   typesFile?: string | null;
   strict?: boolean;
 }
@@ -2124,15 +2180,6 @@ export interface OutputTargetDistCustomElements extends OutputTargetBaseNext {
    * If omitted, no auto-definition behavior or re-exporting will happen.
    */
   customElementsExportBehavior?: CustomElementsExportBehavior;
-}
-
-export interface OutputTargetDistCustomElementsBundle extends OutputTargetBaseNext {
-  type: 'dist-custom-elements-bundle';
-  empty?: boolean;
-  externalRuntime?: boolean;
-  copy?: CopyTask[];
-  includeGlobalScripts?: boolean;
-  minify?: boolean;
 }
 
 /**
@@ -2244,7 +2291,6 @@ export type OutputTarget =
   | OutputTargetDist
   | OutputTargetDistCollection
   | OutputTargetDistCustomElements
-  | OutputTargetDistCustomElementsBundle
   | OutputTargetDistLazy
   | OutputTargetDistGlobalStyles
   | OutputTargetDistLazyLoader
@@ -2257,6 +2303,17 @@ export type OutputTarget =
   | OutputTargetStats
   | OutputTargetDistTypes;
 
+/**
+ * Our custom configuration interface for generated caching Service Workers
+ * using the Workbox library (see https://developer.chrome.com/docs/workbox/).
+ *
+ * Although we are using Workbox we are unfortunately unable to depend on the
+ * published types for the library because they must be compiled using the
+ * `webworker` lib for TypeScript, which cannot be used at the same time as
+ * the `dom` lib. So as a workaround we maintain our own interface here. See
+ * here to refer to the published version:
+ * https://github.com/DefinitelyTyped/DefinitelyTyped/blob/c7b4dadae5b320ad1311a8f82242b8f2f41b7b8c/types/workbox-build/generate-sw.d.ts#L3
+ */
 export interface ServiceWorkerConfig {
   // https://developers.google.com/web/tools/workbox/modules/workbox-build#full_generatesw_config
   unregister?: boolean;
@@ -2433,10 +2490,18 @@ export interface LazyRequire {
   getModulePath(fromDir: string, moduleId: string): string;
 }
 
+/**
+ * @deprecated This interface is no longer used by Stencil
+ * TODO(STENCIL-743): Remove this interface
+ */
 export interface FsWatcherItem {
   close(): void;
 }
 
+/**
+ * @deprecated This interface is no longer used by Stencil
+ * TODO(STENCIL-743): Remove this interface
+ */
 export interface MakeDirectoryOptions {
   /**
    * Indicates whether parent folders should be created.
@@ -2450,6 +2515,10 @@ export interface MakeDirectoryOptions {
   mode?: number;
 }
 
+/**
+ * @deprecated This interface is no longer used by Stencil
+ * TODO(STENCIL-743): Remove this interface
+ */
 export interface FsStats {
   isFile(): boolean;
   isDirectory(): boolean;

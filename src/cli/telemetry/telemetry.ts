@@ -1,4 +1,5 @@
-import { isOutputTargetHydrate, WWW } from '../../compiler/output-targets/output-utils';
+import { isOutputTargetHydrate, WWW } from '@utils';
+
 import { IS_BROWSER_ENV } from '../../compiler/sys/environment';
 import type * as d from '../../declarations';
 import { readConfig, updateConfig, writeConfig } from '../ionic-config';

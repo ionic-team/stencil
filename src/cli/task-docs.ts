@@ -1,10 +1,11 @@
-import { isOutputTargetDocs } from '../compiler/output-targets/output-utils';
+import { isOutputTargetDocs } from '@utils';
+
 import type { ValidatedConfig } from '../declarations';
 import type { CoreCompiler } from './load-compiler';
 import { startupCompilerLog } from './logs';
 
 export const taskDocs = async (coreCompiler: CoreCompiler, config: ValidatedConfig) => {
-  config.devServer = null;
+  config.devServer = {};
   config.outputTargets = config.outputTargets.filter(isOutputTargetDocs);
   config.devMode = true;
 

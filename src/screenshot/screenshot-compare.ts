@@ -33,7 +33,7 @@ export async function compareScreenshot(
   // and what we can use to quickly see if they're identical or not
   const screenshotId = getScreenshotId(emulateConfig, desc);
 
-  const screenshot: d.Screenshot = {
+  const screenshot = {
     id: screenshotId,
     image: currentImageName,
     device: emulateConfig.device,
@@ -42,10 +42,10 @@ export async function compareScreenshot(
     testPath: testPath,
     width: width,
     height: height,
-    deviceScaleFactor: emulateConfig.viewport.deviceScaleFactor,
-    hasTouch: emulateConfig.viewport.hasTouch,
-    isLandscape: emulateConfig.viewport.isLandscape,
-    isMobile: emulateConfig.viewport.isMobile,
+    deviceScaleFactor: emulateConfig.viewport?.deviceScaleFactor,
+    hasTouch: emulateConfig.viewport?.hasTouch,
+    isLandscape: emulateConfig.viewport?.isLandscape,
+    isMobile: emulateConfig.viewport?.isMobile,
     diff: {
       id: screenshotId,
       desc: desc,
@@ -56,15 +56,16 @@ export async function compareScreenshot(
       userAgent: emulateConfig.userAgent,
       width: width,
       height: height,
-      deviceScaleFactor: emulateConfig.viewport.deviceScaleFactor,
-      hasTouch: emulateConfig.viewport.hasTouch,
-      isLandscape: emulateConfig.viewport.isLandscape,
-      isMobile: emulateConfig.viewport.isMobile,
+      deviceScaleFactor: emulateConfig.viewport?.deviceScaleFactor,
+      hasTouch: emulateConfig.viewport?.hasTouch,
+      isLandscape: emulateConfig.viewport?.isLandscape,
+      isMobile: emulateConfig.viewport?.isMobile,
       allowableMismatchedPixels: screenshotBuildData.allowableMismatchedPixels,
       allowableMismatchedRatio: screenshotBuildData.allowableMismatchedRatio,
       testPath: testPath,
+      cacheKey: undefined as string | undefined,
     },
-  };
+  } satisfies d.Screenshot;
 
   if (screenshotBuildData.updateMaster) {
     // this data is going to become the master data
@@ -180,11 +181,14 @@ function getScreenshotId(emulateConfig: d.EmulateConfig, uniqueDescription: stri
 
   hash.update(uniqueDescription + ':');
   hash.update(emulateConfig.userAgent + ':');
-  hash.update(emulateConfig.viewport.width + ':');
-  hash.update(emulateConfig.viewport.height + ':');
-  hash.update(emulateConfig.viewport.deviceScaleFactor + ':');
-  hash.update(emulateConfig.viewport.hasTouch + ':');
-  hash.update(emulateConfig.viewport.isMobile + ':');
+
+  if (emulateConfig.viewport !== undefined) {
+    hash.update(emulateConfig.viewport.width + ':');
+    hash.update(emulateConfig.viewport.height + ':');
+    hash.update(emulateConfig.viewport.deviceScaleFactor + ':');
+    hash.update(emulateConfig.viewport.hasTouch + ':');
+    hash.update(emulateConfig.viewport.isMobile + ':');
+  }
 
   return hash.digest('hex').slice(0, 8).toLowerCase();
 }
