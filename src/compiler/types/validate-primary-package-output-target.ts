@@ -25,7 +25,7 @@ export const PRIMARY_PACKAGE_TARGET_CONFIGS = {
       normalizePath(relative(rootDir, join(outputTargetDir, 'index.js'))),
     getTypesPath: (rootDir: string, outputTargetConfig: d.OutputTargetDistCustomElements) => {
       return outputTargetConfig.generateTypeDeclarations
-        ? normalizePath(relative(rootDir, join(rootDir, 'dist/types/index.d.ts')))
+        ? normalizePath(relative(rootDir, join(rootDir, outputTargetConfig.dir, 'index.d.ts')))
         : null;
     },
   },

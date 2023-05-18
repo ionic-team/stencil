@@ -102,21 +102,15 @@ describe('validatePrimaryPackageOutputTarget', () => {
     });
   });
 
-  // TODO(NOW): do for each target type
   describe('validateModulePath', () => {
-    let targetToValidate: d.PrimaryPackageOutputTarget;
-    let recommendedOutputTargetConfig: PrimaryPackageOutputTargetRecommendedConfig;
+    it('should log a warning if no module path is provided', () => {
+      delete buildCtx.packageJson.module;
 
-    beforeEach(() => {
-      targetToValidate = {
+      const targetToValidate: d.PrimaryPackageOutputTarget = {
         type: 'dist',
         dir: '/dist',
       };
-      recommendedOutputTargetConfig = PRIMARY_PACKAGE_TARGET_CONFIGS[targetToValidate.type];
-    });
-
-    it('should log a warning if no module path is provided', () => {
-      delete buildCtx.packageJson.module;
+      const recommendedOutputTargetConfig = PRIMARY_PACKAGE_TARGET_CONFIGS[targetToValidate.type];
 
       validateModulePath(config, compilerCtx, buildCtx, recommendedOutputTargetConfig, targetToValidate);
 
@@ -127,26 +121,67 @@ describe('validatePrimaryPackageOutputTarget', () => {
       );
     });
 
-    it('should log a warning if the set module path does not match the recommended path', () => {
-      buildCtx.packageJson.module = '/dist/tmp/index.js';
+    describe.each<[d.PrimaryPackageOutputTarget & { toString(): string }, string]>([
+      [
+        {
+          type: 'dist',
+          dir: '/dist',
+          toString: () => 'dist',
+        },
+        './dist/index.js',
+      ],
+      [
+        {
+          type: 'dist-collection',
+          dir: '/dist',
+          collectionDir: '/dist/collection',
+          toString: () => 'dist-collection',
+        },
+        './dist/index.js',
+      ],
+      [
+        {
+          type: 'dist-custom-elements',
+          dir: '/dist/components',
+          toString: () => 'dist-custom-elements',
+        },
+        './dist/components/index.js',
+      ],
+    ])('output target type - %s', (outputTarget, recommendedPath) => {
+      it('should log a warning if the set module path does not match the recommended path', () => {
+        buildCtx.packageJson.module = '/dist/tmp/index.js';
 
-      validateModulePath(config, compilerCtx, buildCtx, recommendedOutputTargetConfig, targetToValidate);
+        validateModulePath(
+          config,
+          compilerCtx,
+          buildCtx,
+          PRIMARY_PACKAGE_TARGET_CONFIGS[outputTarget.type],
+          outputTarget
+        );
 
-      expect(buildCtx.diagnostics.length).toBe(1);
-      expect(buildCtx.diagnostics[0].level).toEqual('warn');
-      expect(buildCtx.diagnostics[0].messageText).toEqual(
-        `package.json "module" property is set to "/dist/tmp/index.js". It's recommended to set the "module" property to: ./dist/index.js`
-      );
-    });
+        expect(buildCtx.diagnostics.length).toBe(1);
+        expect(buildCtx.diagnostics[0].level).toEqual('warn');
+        expect(buildCtx.diagnostics[0].messageText).toEqual(
+          `package.json "module" property is set to "${buildCtx.packageJson.module}". It's recommended to set the "module" property to: ${recommendedPath}`
+        );
+      });
 
-    it('should not log a warning if the recommended path is used', () => {
-      validateModulePath(config, compilerCtx, buildCtx, recommendedOutputTargetConfig, targetToValidate);
+      it('should not log a warning if the recommended path is used', () => {
+        buildCtx.packageJson.module = recommendedPath;
 
-      expect(buildCtx.diagnostics.length).toBe(0);
+        validateModulePath(
+          config,
+          compilerCtx,
+          buildCtx,
+          PRIMARY_PACKAGE_TARGET_CONFIGS[outputTarget.type],
+          outputTarget
+        );
+
+        expect(buildCtx.diagnostics.length).toBe(0);
+      });
     });
   });
 
-  // TODO(NOW): do for each target type
   describe('validateTypesPath', () => {
     let targetToValidate: d.PrimaryPackageOutputTarget;
     let recommendedOutputTargetConfig: PrimaryPackageOutputTargetRecommendedConfig;
@@ -184,18 +219,6 @@ describe('validatePrimaryPackageOutputTarget', () => {
       );
     });
 
-    it('should log a warning if the set types path does not match the recommended path', () => {
-      buildCtx.packageJson.types = '/dist/tmp/index.d.ts';
-
-      validateTypesPath(config, compilerCtx, buildCtx, recommendedOutputTargetConfig, targetToValidate);
-
-      expect(buildCtx.diagnostics.length).toBe(1);
-      expect(buildCtx.diagnostics[0].level).toEqual('warn');
-      expect(buildCtx.diagnostics[0].messageText).toEqual(
-        `package.json "types" property is set to "/dist/tmp/index.d.ts". It's recommended to set the "types" property to: ./dist/types/index.d.ts`
-      );
-    });
-
     it('should log a error if the types file cannot be accessed', () => {
       compilerCtx.fs.accessSync = () => false;
 
@@ -208,10 +231,66 @@ describe('validatePrimaryPackageOutputTarget', () => {
       );
     });
 
-    it('should not log anything if the recommended path is used and accessible', () => {
-      validateTypesPath(config, compilerCtx, buildCtx, recommendedOutputTargetConfig, targetToValidate);
+    describe.each<[d.PrimaryPackageOutputTarget & { toString(): string }, string]>([
+      [
+        {
+          type: 'dist',
+          dir: '/dist',
+          typesDir: '/dist/types',
+          toString: () => 'dist',
+        },
+        './dist/types/index.d.ts',
+      ],
+      [
+        {
+          type: 'dist-types',
+          dir: '/dist',
+          typesDir: '/dist/types',
+          toString: () => 'dist-types',
+        },
+        './dist/types/index.d.ts',
+      ],
+      [
+        {
+          type: 'dist-custom-elements',
+          dir: '/dist/components',
+          generateTypeDeclarations: true,
+          toString: () => 'dist-custom-elements',
+        },
+        './dist/components/index.d.ts',
+      ],
+    ])('output target type - %s', (outputTarget, recommendedPath) => {
+      it('should log a warning if the set types path does not match the recommended path', () => {
+        buildCtx.packageJson.types = '/dist/tmp/index.d.ts';
 
-      expect(buildCtx.diagnostics.length).toBe(0);
+        validateTypesPath(
+          config,
+          compilerCtx,
+          buildCtx,
+          PRIMARY_PACKAGE_TARGET_CONFIGS[outputTarget.type],
+          outputTarget
+        );
+
+        expect(buildCtx.diagnostics.length).toBe(1);
+        expect(buildCtx.diagnostics[0].level).toEqual('warn');
+        expect(buildCtx.diagnostics[0].messageText).toEqual(
+          `package.json "types" property is set to "${buildCtx.packageJson.types}". It's recommended to set the "types" property to: ${recommendedPath}`
+        );
+      });
+
+      it('should not log anything if the recommended path is used and accessible', () => {
+        buildCtx.packageJson.types = recommendedPath;
+
+        validateTypesPath(
+          config,
+          compilerCtx,
+          buildCtx,
+          PRIMARY_PACKAGE_TARGET_CONFIGS[outputTarget.type],
+          targetToValidate
+        );
+
+        expect(buildCtx.diagnostics.length).toBe(0);
+      });
     });
   });
 });
