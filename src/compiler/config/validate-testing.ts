@@ -39,6 +39,9 @@ export const validateTesting = (config: d.ValidatedConfig, diagnostics: d.Diagno
     addTestingConfigOption(testing.browserArgs, '--disable-setuid-sandbox');
     addTestingConfigOption(testing.browserArgs, '--disable-dev-shm-usage');
     testing.browserHeadless = testing.browserHeadless === 'new' ? 'new' : true;
+  } else if (config.flags.devtools || testing.browserDevtools) {
+    testing.browserDevtools = true;
+    testing.browserHeadless = false;
   }
 
   if (typeof testing.rootDir === 'string') {
