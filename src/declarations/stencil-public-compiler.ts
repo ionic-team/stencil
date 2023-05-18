@@ -112,7 +112,10 @@ export interface StencilConfig {
    * This behavior is opt-in and hence this flag defaults to `false`.
    */
   transformAliasedImportPaths?: boolean;
-
+  /**
+   * When `true`, we will validate a project's `package.json` based on the output target the user has designated
+   * as `isPrimaryPackageOutputTarget: true` in their Stencil config.
+   */
   validatePrimaryPackageOutputTarget?: boolean;
 
   /**
@@ -2188,6 +2191,10 @@ export interface OutputTargetBase {
   type: string;
 }
 
+/**
+ * Output targets that can have validation for common `package.json` field values
+ * (module, types, etc.). This allows them to be marked for validation in a project's Stencil config.
+ */
 interface OutputTargetValidationConfig extends OutputTargetBaseNext {
   isPrimaryPackageOutputTarget?: boolean;
 }
