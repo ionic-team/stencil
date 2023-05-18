@@ -6,7 +6,7 @@ import type * as d from '../../declarations';
 import { getScopeId } from '../style/scope-css';
 
 export const generateHmr = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
-  if (config.devServer == null || config.devServer.reloadStrategy == null) {
+  if (config.devServer?.reloadStrategy == null) {
     return null;
   }
 

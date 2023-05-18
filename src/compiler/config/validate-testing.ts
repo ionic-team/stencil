@@ -20,9 +20,9 @@ export const validateTesting = (config: d.ValidatedConfig, diagnostics: d.Diagno
     configPathDir = config.rootDir!;
   }
 
-  if (typeof config.flags.headless === 'boolean') {
+  if (typeof config.flags.headless === 'boolean' || config.flags.headless === 'new') {
     testing.browserHeadless = config.flags.headless;
-  } else if (typeof testing.browserHeadless !== 'boolean') {
+  } else if (typeof testing.browserHeadless !== 'boolean' && testing.browserHeadless !== 'new') {
     testing.browserHeadless = true;
   }
 
@@ -38,7 +38,7 @@ export const validateTesting = (config: d.ValidatedConfig, diagnostics: d.Diagno
     addTestingConfigOption(testing.browserArgs, '--no-sandbox');
     addTestingConfigOption(testing.browserArgs, '--disable-setuid-sandbox');
     addTestingConfigOption(testing.browserArgs, '--disable-dev-shm-usage');
-    testing.browserHeadless = true;
+    testing.browserHeadless = testing.browserHeadless === 'new' ? 'new' : true;
   }
 
   if (typeof testing.rootDir === 'string') {

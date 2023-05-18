@@ -3,12 +3,9 @@ import { isAbsolute, join } from 'path';
 
 import type * as d from '../../declarations';
 
-export const validateDevServer = (
-  config: d.ValidatedConfig,
-  diagnostics: d.Diagnostic[]
-): d.DevServerConfig | undefined => {
+export const validateDevServer = (config: d.ValidatedConfig, diagnostics: d.Diagnostic[]): d.DevServerConfig => {
   if ((config.devServer === null || (config.devServer as any)) === false) {
-    return undefined;
+    return {};
   }
 
   const { flags } = config;

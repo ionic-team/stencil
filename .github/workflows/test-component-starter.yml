@@ -11,7 +11,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node: ['14', '16', '18']
+        node: ['14', '16', '18', '20']
         os: ['ubuntu-latest', 'windows-latest']
     runs-on: ${{ matrix.os }}
     steps:
@@ -55,12 +55,6 @@ jobs:
 
       - name: Install Stencil Eval
         run: npm i ../stencil-eval.tgz
-        working-directory: ./tmp-component-starter
-        shell: bash
-
-      - name: Install Working @types/babel__traverse
-        # TODO(STENCIL-794): remove this once a new version of the library is available
-        run: npm i -D -E @types/babel__traverse@7.18.3
         working-directory: ./tmp-component-starter
         shell: bash
 

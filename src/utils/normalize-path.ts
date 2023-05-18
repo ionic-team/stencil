@@ -168,7 +168,6 @@ export const normalizeFsPathQuery = (importPath: string) => {
   return {
     filePath,
     ext,
-    params,
     format,
   };
 };

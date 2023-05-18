@@ -1,5 +1,6 @@
 import type * as d from '@stencil/core/declarations';
 import { mockBuildCtx, mockCompilerCtx, mockConfig } from '@stencil/core/testing';
+import { result } from '@utils';
 
 import { generateBuildResults } from '../build-results';
 import { generateBuildStats } from '../build-stats';
@@ -17,17 +18,17 @@ describe('generateBuildStats', () => {
   it('should return a structured json object', async () => {
     buildCtx.buildResults = generateBuildResults(config, compilerCtx, buildCtx);
 
-    const result = generateBuildStats(config, buildCtx) as d.CompilerBuildStats;
+    const compilerBuildStats = result.unwrap(generateBuildStats(config, buildCtx));
 
-    if (result.hasOwnProperty('timestamp')) {
-      delete result.timestamp;
+    if (compilerBuildStats.hasOwnProperty('timestamp')) {
+      delete compilerBuildStats.timestamp;
     }
 
-    if (result.hasOwnProperty('compiler') && result.compiler.hasOwnProperty('version')) {
-      delete result.compiler.version;
+    if (compilerBuildStats.hasOwnProperty('compiler') && compilerBuildStats.compiler.hasOwnProperty('version')) {
+      delete compilerBuildStats.compiler.version;
     }
 
-    expect(result).toStrictEqual({
+    expect(compilerBuildStats).toStrictEqual({
       app: { bundles: 0, components: 0, entries: 0, fsNamespace: undefined, namespace: 'Testing', outputs: [] },
       collections: [],
       compiler: { name: 'in-memory' },
@@ -58,9 +59,9 @@ describe('generateBuildStats', () => {
       lines: [],
     };
     buildCtx.buildResults.diagnostics = [diagnostic];
-    const result = generateBuildStats(config, buildCtx);
+    const diagnostics = result.unwrapErr(generateBuildStats(config, buildCtx));
 
-    expect(result).toStrictEqual({
+    expect(diagnostics).toStrictEqual({
       diagnostics: [diagnostic],
     });
   });

@@ -12,7 +12,7 @@
   },
   "devDependencies": {
     "@types/karma": "^6.3.3",
-    "@types/node": "^18.13.0",
+    "@types/node": "^20.0.0",
     "karma": "^6.4.1",
     "karma-chrome-launcher": "^3.1.1",
     "karma-jasmine": "^5.0.0",

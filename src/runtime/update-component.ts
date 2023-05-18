@@ -9,7 +9,7 @@ import { PLATFORM_FLAGS } from './runtime-constants';
 import { attachStyles } from './styles';
 import { renderVdom } from './vdom/vdom-render';
 
-export const attachToAncestor = (hostRef: d.HostRef, ancestorComponent: d.HostElement) => {
+export const attachToAncestor = (hostRef: d.HostRef, ancestorComponent?: d.HostElement) => {
   if (BUILD.asyncLoading && ancestorComponent && !hostRef.$onRenderResolve$ && ancestorComponent['s-p']) {
     ancestorComponent['s-p'].push(new Promise((r) => (hostRef.$onRenderResolve$ = r)));
   }
@@ -66,7 +66,7 @@ const dispatchHooks = (hostRef: d.HostRef, isInitialLoad: boolean): Promise<void
       hostRef.$flags$ |= HOST_FLAGS.isListenReady;
       if (hostRef.$queuedListeners$) {
         hostRef.$queuedListeners$.map(([methodName, event]) => safeCall(instance, methodName, event));
-        hostRef.$queuedListeners$ = null;
+        hostRef.$queuedListeners$ = undefined;
       }
     }
     emitLifecycleEvent(elm, 'componentWillLoad');
@@ -145,7 +145,7 @@ const updateComponent = async (hostRef: d.HostRef, instance: any, isInitialLoad:
     plt.$cssShim$.updateHost(elm);
   }
   if (BUILD.isDev) {
-    hostRef.$renderCount$++;
+    hostRef.$renderCount$ = hostRef.$renderCount$ === undefined ? 1 : hostRef.$renderCount$ + 1;
     hostRef.$flags$ &= ~HOST_FLAGS.devOnRender;
   }
 
@@ -179,7 +179,7 @@ const updateComponent = async (hostRef: d.HostRef, instance: any, isInitialLoad:
   endUpdate();
 
   if (BUILD.asyncLoading) {
-    const childrenPromises = elm['s-p'];
+    const childrenPromises = elm['s-p'] ?? [];
     const postUpdate = () => postUpdateComponent(hostRef);
     if (childrenPromises.length === 0) {
       postUpdate();

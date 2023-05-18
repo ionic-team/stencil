@@ -446,12 +446,17 @@ type RequireFields<T, K extends keyof T> = T & { [P in K]-?: T[P] };
  * Fields in {@link Config} to make required for {@link ValidatedConfig}
  */
 type StrictConfigFields =
+  | 'cacheDir'
+  | 'devServer'
   | 'flags'
   | 'hydratedFlag'
   | 'logger'
   | 'outputTargets'
   | 'packageJsonFilePath'
+  | 'rollupConfig'
   | 'rootDir'
+  | 'srcDir'
+  | 'srcIndexHtml'
   | 'sys'
   | 'testing'
   | 'transformAliasedImportPaths';
@@ -1771,9 +1776,18 @@ export interface TestingConfig extends JestConfig {
   browserWSEndpoint?: string;
 
   /**
-   * Whether to run browser e2e tests in headless mode. Defaults to true.
+   * Whether to run browser e2e tests in headless mode.
+   *
+   * Starting with Chrome v112, a new headless mode was introduced.
+   * The new headless mode unifies the "headful" and "headless" code paths in the Chrome distributable.
+   *
+   * To enable the "new" headless mode, a string value of "new" must be provided.
+   * To use the "old" headless mode, a boolean value of `true` must be provided.
+   * To use "headful" mode, a boolean value of `false` must be provided.
+   *
+   * Defaults to true.
    */
-  browserHeadless?: boolean;
+  browserHeadless?: boolean | 'new';
 
   /**
    * Slows down e2e browser operations by the specified amount of milliseconds.

@@ -3,6 +3,8 @@ import { toDashCase } from '@utils';
 import { LogLevel } from '../../declarations';
 import {
   BOOLEAN_CLI_FLAGS,
+  BOOLEAN_STRING_CLI_FLAGS,
+  BooleanStringCLIFlag,
   ConfigFlags,
   NUMBER_CLI_FLAGS,
   STRING_ARRAY_CLI_FLAGS,
@@ -130,6 +132,45 @@ describe('parseFlags', () => {
     const args = ['--config', '/config-1.js', '--config', '/config-2.js'];
     const flags = parseFlags(args);
     expect(flags.config).toBe('/config-2.js');
+  });
+
+  describe.each(BOOLEAN_STRING_CLI_FLAGS)('boolean-string flag - %s', (cliArg: BooleanStringCLIFlag) => {
+    it('parses a boolean-string flag as a boolean with no arg', () => {
+      const args = [`--${cliArg}`];
+      const flags = parseFlags(args);
+      expect(flags.headless).toBe(true);
+      expect(flags.knownArgs).toEqual([`--${cliArg}`]);
+    });
+
+    it(`parses a boolean-string flag as a falsy boolean with "no" arg - --no-${cliArg}`, () => {
+      const args = [`--no-${cliArg}`];
+      const flags = parseFlags(args);
+      expect(flags.headless).toBe(false);
+      expect(flags.knownArgs).toEqual([`--no-${cliArg}`]);
+    });
+
+    it(`parses a boolean-string flag as a falsy boolean with "no" arg - --no${
+      cliArg.charAt(0).toUpperCase() + cliArg.slice(1)
+    }`, () => {
+      const negativeFlag = '--no' + cliArg.charAt(0).toUpperCase() + cliArg.slice(1);
+      const flags = parseFlags([negativeFlag]);
+      expect(flags.headless).toBe(false);
+      expect(flags.knownArgs).toEqual([negativeFlag]);
+    });
+
+    it('parses a boolean-string flag as a string with a string arg', () => {
+      const args = [`--${cliArg}`, 'new'];
+      const flags = parseFlags(args);
+      expect(flags.headless).toBe('new');
+      expect(flags.knownArgs).toEqual(['--headless', 'new']);
+    });
+
+    it('parses a boolean-string flag as a string with a string arg using equality', () => {
+      const args = [`--${cliArg}=new`];
+      const flags = parseFlags(args);
+      expect(flags.headless).toBe('new');
+      expect(flags.knownArgs).toEqual([`--${cliArg}`, 'new']);
+    });
   });
 
   describe.each<LogLevel>(['info', 'warn', 'error', 'debug'])('logLevel %s', (level) => {

@@ -1,3 +1,14 @@
+## 🏒 [3.2.2](https://github.com/ionic-team/stencil/compare/v3.2.1...v3.2.2) (2023-05-01)
+
+
+### Bug Fixes
+
+* **declarations:** add `onCancel` to dialog attributes ([#4280](https://github.com/ionic-team/stencil/issues/4280)) ([725ff7e](https://github.com/ionic-team/stencil/commit/725ff7e5a4fac5aa5cd0adb263e484f2ada5cc40)), fixes [#4267](https://github.com/ionic-team/stencil/issues/4267)
+* **runtime:** initialize custom elements even when there is no styles ([#4296](https://github.com/ionic-team/stencil/issues/4296)) ([23f1e66](https://github.com/ionic-team/stencil/commit/23f1e66fb1a092266dfd17c31987499b2ece0b0d)), fixes [#4221](https://github.com/ionic-team/stencil/issues/4221)
+* **testing:** jest component disconnected callback ([#4269](https://github.com/ionic-team/stencil/issues/4269)) ([4ec3b69](https://github.com/ionic-team/stencil/commit/4ec3b694454fddfc71bf9999e31e1341e10117e2)), fixes [#4053](https://github.com/ionic-team/stencil/issues/4053)
+
+
+
 ## 🎙 [3.2.1](https://github.com/ionic-team/stencil/compare/v3.2.0...v3.2.1) (2023-04-10)
 
 

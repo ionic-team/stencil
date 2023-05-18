@@ -142,12 +142,8 @@ function getDocBlockLines(docs: d.CompilerJsDoc): string[] {
  * @param buildCtx the current build context to query for a specific package
  * @returns a list of package names the project is dependent on
  */
-const getDependencies = (buildCtx: d.BuildCtx): ReadonlyArray<string> => {
-  if (buildCtx.packageJson != null && buildCtx.packageJson.dependencies != null) {
-    return Object.keys(buildCtx.packageJson.dependencies).filter((pkgName) => !SKIP_DEPS.includes(pkgName));
-  }
-  return [];
-};
+const getDependencies = (buildCtx: d.BuildCtx): ReadonlyArray<string> =>
+  Object.keys(buildCtx?.packageJson?.dependencies ?? {}).filter((pkgName) => !SKIP_DEPS.includes(pkgName));
 
 /**
  * Utility to determine whether a project has a dependency on a package

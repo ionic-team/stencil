@@ -66,7 +66,7 @@ describe('util', () => {
     });
 
     it('returns false if a project has no dependencies', () => {
-      buildCtx.packageJson.dependencies = null;
+      buildCtx.packageJson.dependencies = undefined;
 
       expect(util.hasDependency(buildCtx, 'a-non-existent-pkg')).toBe(false);
     });
@@ -146,7 +146,6 @@ describe('util', () => {
     expect(util.createJsVarName('A')).toBe('a');
     expect(util.createJsVarName('    ')).toBe('');
     expect(util.createJsVarName('')).toBe('');
-    expect(util.createJsVarName(null)).toBe(null);
   });
 
   describe('parsePackageJson', () => {
@@ -159,7 +158,7 @@ describe('util', () => {
       const expectedDiagnostic: d.Diagnostic = stubDiagnostic({
         absFilePath: mockPackageJsonPath,
         header: 'Error Parsing JSON',
-        messageText: 'Unexpected string in JSON at position 13', // due to missing colon in input
+        messageText: expect.stringMatching(/.*in JSON at position 13$/),
         type: 'build',
       });
 
@@ -226,7 +225,7 @@ interface Foo extends Components.Foo, HTMLStencilElement {`);
     interface Foo extends Components.Foo, HTMLStencilElement {`);
     });
 
-    it.each([[null], [undefined], [{ tags: [], text: '' }]])(
+    it.each<[d.CompilerJsDoc | undefined]>([[undefined], [{ tags: [], text: '' }]])(
       'does not add a doc block when docs are empty (%j)',
       (docs) => {
         expect(util.addDocBlock(str, docs)).toEqual(str);
