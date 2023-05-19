@@ -69,10 +69,11 @@ export const BUILD: BuildConditionals = {
   scriptDataOpts: false,
   // TODO: Remove code related to deprecated `scopedSlotTextContentFix` field.
   scopedSlotTextContentFix: false,
+  // TODO(STENCIL-662): Remove code related to deprecated shadowDomShim field
   shadowDomShim: false,
-  invisiblePrehydration: true,
   // TODO: Remove code related to deprecated `slotChildNodesFix` field.
   slotChildNodesFix: false,
+  invisiblePrehydration: true,
   propBoolean: true,
   propNumber: true,
   propString: true,
