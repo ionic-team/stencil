@@ -35,7 +35,7 @@ export const connectedCallback = (elm: d.HostElement) => {
               : addStyle(elm.shadowRoot, cmpMeta);
             elm.classList.remove(scopeId + '-h', scopeId + '-s');
           } else if (BUILD.scoped && cmpMeta.$flags$ & CMP_FLAGS.scopedCssEncapsulation) {
-            let scopeId = getScopeId(cmpMeta, BUILD.mode ? elm.getAttribute('s-mode') : undefined);
+            const scopeId = getScopeId(cmpMeta, BUILD.mode ? elm.getAttribute('s-mode') : undefined);
             elm['s-sc'] = scopeId;
           }
           initializeClientHydrate(elm, cmpMeta.$tagName$, hostId, hostRef);

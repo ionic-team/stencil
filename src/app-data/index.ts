@@ -59,14 +59,20 @@ export const BUILD: BuildConditionals = {
   lazyLoad: false,
   profile: false,
   slotRelocation: true,
+  // TODO: Remove code related to deprecated `appendChildSlotFix` field.
+  appendChildSlotFix: false,
   cloneNodeFix: false,
   hydratedAttribute: false,
   hydratedClass: true,
   // TODO(STENCIL-663): Remove code related to deprecated `safari10` field.
   safari10: false,
   scriptDataOpts: false,
+  // TODO: Remove code related to deprecated `scopedSlotTextContentFix` field.
+  scopedSlotTextContentFix: false,
   shadowDomShim: false,
   invisiblePrehydration: true,
+  // TODO: Remove code related to deprecated `slotChildNodesFix` field.
+  slotChildNodesFix: false,
   propBoolean: true,
   propNumber: true,
   propString: true,

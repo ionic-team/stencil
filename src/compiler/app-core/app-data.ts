@@ -146,12 +146,18 @@ export const updateBuildConditionals = (config: Config, b: BuildConditionals) =>
   b.constructableCSS = !b.hotModuleReplacement || !!config._isTesting;
   b.asyncLoading = !!(b.asyncLoading || b.lazyLoad || b.taskQueue || b.initializeNextTick);
   b.cssAnnotations = true;
+  // TODO: Remove code related to deprecated `appendChildSlotFix` field.
+  b.appendChildSlotFix = config.extras.appendChildSlotFix;
+  // TODO: Remove code related to deprecated `slotChildNodesFix` field.
+  b.slotChildNodesFix = config.extras.slotChildNodesFix;
   b.cloneNodeFix = config.extras.cloneNodeFix;
   // TODO(STENCIL-661): Remove code related to the dynamic import shim
   b.dynamicImportShim = config.extras.__deprecated__dynamicImportShim;
   b.lifecycleDOMEvents = !!(b.isDebug || config._isTesting || config.extras.lifecycleDOMEvents);
   // TODO(STENCIL-663): Remove code related to deprecated `safari10` field.
   b.safari10 = config.extras.__deprecated__safari10;
+  // TODO: Remove code related to deprecated `scopedSlotTextContentFix` field.
+  b.scopedSlotTextContentFix = !!config.extras.scopedSlotTextContentFix;
   b.scriptDataOpts = config.extras.scriptDataOpts;
   // TODO(STENCIL-662): Remove code related to deprecated shadowDomShim field
   b.shadowDomShim = config.extras.__deprecated__shadowDomShim;

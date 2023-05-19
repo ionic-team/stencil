@@ -2,20 +2,20 @@ import { BUILD } from '@app-data';
 import { doc, plt } from '@platform';
 
 import type * as d from '../declarations';
+import { addSlotRelocateNode, patchNextPrev } from './dom-extras';
 import { createTime } from './profile';
 import {
   CONTENT_REF_ID,
-  HYDRATED_SLOT_FALLBACK_ID,
   HYDRATE_CHILD_ID,
   HYDRATE_ID,
+  HYDRATED_SLOT_FALLBACK_ID,
   NODE_TYPE,
   ORG_LOCATION_ID,
   SLOT_NODE_ID,
   TEXT_NODE_ID,
 } from './runtime-constants';
-import { newVNode } from './vdom/h';
-import { addSlotRelocateNode, patchNextPrev } from './dom-extras';
 import { COMMENT_NODE_ID } from './runtime-constants';
+import { newVNode } from './vdom/h';
 
 interface RenderNodeData extends d.VNode {
   $hostId$: string;
@@ -51,7 +51,7 @@ export const initializeClientHydrate = (
   const slotNodes: RenderNodeData[] = [];
   const slottedNodes: SlottedNodes[] = [];
   const shadowRootNodes: d.RenderNode[] = BUILD.shadowDom && shadowRoot ? [] : null;
-  let vnode: d.VNode = newVNode(tagName, null);
+  const vnode: d.VNode = newVNode(tagName, null);
   vnode.$elm$ = hostElm;
 
   if (!plt.$orgLocNodes$) {
@@ -271,7 +271,7 @@ const clientHydrate = (
         node.removeAttribute(HYDRATE_CHILD_ID);
 
         // this is a new child vnode
-        // so ensure it's parent vnode has the vchildren array
+        // so ensure its parent vnode has the vchildren array
         if (!parentVNode.$children$) {
           parentVNode.$children$ = [];
         }
@@ -378,7 +378,7 @@ const clientHydrate = (
       });
 
       if (childNodeType === TEXT_NODE_ID) {
-        let textNode = (childVNode.$elm$ = node.nextSibling as any);
+        const textNode = (childVNode.$elm$ = node.nextSibling as any);
 
         if (childVNode.$elm$ && childVNode.$elm$.nodeType === NODE_TYPE.TextNode) {
           childVNode.$text$ = childVNode.$elm$.textContent;
@@ -567,7 +567,7 @@ const clientHydrate = (
 /**
  * Skims whole SSR document to create
  * a map of component IDs and 'original location ID's.
- * original location ID's are derived from comment nodes placed by 'vdom-annotations.ts'.
+ * Original location ID's are derived from comment nodes placed by 'vdom-annotations.ts'.
  * They relate to lightDOM nodes that were moved deeper into the SSR markup.
  * e.g. `<!--o.1-->` maps to `<div c-id="0.1">`
  *

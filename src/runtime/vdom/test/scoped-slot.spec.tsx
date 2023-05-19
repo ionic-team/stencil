@@ -1,6 +1,5 @@
 import { Component, forceUpdate, h, Prop } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
-import { MockNode } from '../../../mock-doc';
 
 describe('scoped slot', () => {
   it('should relocate nested default slot nodes', async () => {

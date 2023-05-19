@@ -1,5 +1,3 @@
-import type * as d from '../../declarations';
-
 /**
  * Production setAccessor() function based on Preact by
  * Jason Miller (@developit)
@@ -8,11 +6,11 @@ import type * as d from '../../declarations';
  *
  * Modified for Stencil's compiler and vdom
  */
-
 import { BUILD } from '@app-data';
 import { isMemberInElement, plt, win } from '@platform';
 import { isComplexType } from '@utils';
 
+import type * as d from '../../declarations';
 import { VNODE_FLAGS, XLINK_NS } from '../runtime-constants';
 
 export const setAccessor = (

@@ -13,8 +13,8 @@ import { CMP_FLAGS, HTML_NS, isDef, SVG_NS } from '@utils';
 import type * as d from '../../declarations';
 import { NODE_TYPE, PLATFORM_FLAGS, VNODE_FLAGS } from '../runtime-constants';
 import { h, isHost, newVNode } from './h';
-import { updateElement } from './update-element';
 import { updateFallbackSlotVisibility } from './render-slot-fallback';
+import { updateElement } from './update-element';
 
 let scopeId: string;
 let contentRef: d.RenderNode;
@@ -295,13 +295,14 @@ const saveSlottedNodes = (elm: d.RenderNode) => {
  * @param startIdx the index at which to start removing nodes (inclusive)
  * @param endIdx the index at which to stop removing nodes (inclusive)
  */
-const removeVnodes = (vnodes: d.VNode[], startIdx: number, endIdx: number, vnode?: d.VNode, elm?: d.RenderNode) => {
-  for (; startIdx <= endIdx; ++startIdx) {
-    if ((vnode = vnodes[startIdx])) {
-      elm = vnode.$elm$;
+const removeVnodes = (vnodes: d.VNode[], startIdx: number, endIdx: number) => {
+  for (let index = startIdx; index <= endIdx; ++index) {
+    const vnode = vnodes[index];
+    if (vnode) {
+      const elm = vnode.$elm$;
       nullifyVNodeRefs(vnode);
 
-      if (BUILD.slotRelocation) {
+      if (elm && BUILD.slotRelocation) {
         // we're removing this element
         // so it's possible we need to show slot fallback content now
         checkSlotFallbackVisibility = true;

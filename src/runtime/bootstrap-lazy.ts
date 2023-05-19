@@ -5,14 +5,14 @@ import { CMP_FLAGS, queryNonceMetaTagContent } from '@utils';
 import type * as d from '../declarations';
 import { connectedCallback } from './connected-callback';
 import { disconnectedCallback } from './disconnected-callback';
-import { hmrStart } from './hmr-component';
 import { patchCloneNode, patchPseudoShadowDom } from './dom-extras';
+import { hmrStart } from './hmr-component';
+import { computeMode } from './mode';
 import { createTime, installDevTools } from './profile';
 import { proxyComponent } from './proxy-component';
 import { HYDRATED_CSS, HYDRATED_STYLE_ID, PLATFORM_FLAGS, PROXY_FLAGS } from './runtime-constants';
 import { convertScopedToShadow, getScopeId, registerStyle } from './styles';
 import { appDidLoad } from './update-component';
-import { computeMode } from './mode';
 
 export { setNonce } from '@platform';
 

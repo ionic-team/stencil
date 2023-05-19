@@ -4,9 +4,9 @@ import type * as d from '../../declarations';
 import {
   COMMENT_NODE_ID,
   CONTENT_REF_ID,
-  HYDRATED_SLOT_FALLBACK_ID,
   HYDRATE_CHILD_ID,
   HYDRATE_ID,
+  HYDRATED_SLOT_FALLBACK_ID,
   NODE_TYPE,
   ORG_LOCATION_ID,
   SLOT_NODE_ID,

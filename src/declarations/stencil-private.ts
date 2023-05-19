@@ -175,6 +175,12 @@ export interface BuildConditionals extends Partial<BuildFeatures> {
   // TODO(STENCIL-659): Remove code implementing the CSS variable shim
   cssVarShim?: boolean;
   constructableCSS?: boolean;
+  // TODO: Remove code related to deprecated `appendChildSlotFix` field.
+  appendChildSlotFix: boolean;
+  // TODO: Remove code related to deprecated `slotChildNodesFix` field.
+  slotChildNodesFix: boolean;
+  // TODO: Remove code related to deprecated `scopedSlotTextContentFix` field.
+  scopedSlotTextContentFix: boolean;
   cloneNodeFix?: boolean;
   // TODO(STENCIL-661): Remove code related to the dynamic import shim
   dynamicImportShim?: boolean;

@@ -1,12 +1,11 @@
 import type * as d from '../../declarations';
-import { NODE_TYPE } from '../runtime-constants';
 import { patchRemove } from '../dom-extras';
+import { NODE_TYPE } from '../runtime-constants';
 
 /**
  * Show or hide a slot nodes children
  * @param slotNode a slot node, the 'children' of which should be shown or hidden
  * @param hide whether to hide the slot node 'children'
- * @returns
  */
 const renderSlotFallbackContent = (slotNode: d.RenderNode, hide: boolean) => {
   // if this slot doesn't have fallback content, return
@@ -15,7 +14,7 @@ const renderSlotFallbackContent = (slotNode: d.RenderNode, hide: boolean) => {
   // in non-shadow component, slot nodes are just empty text nodes or comment nodes
   // the 'children' nodes are therefore placed next to it.
   // let's loop through those now
-  let childNodes = ((slotNode.parentNode as d.RenderNode).__childNodes ||
+  const childNodes = ((slotNode.parentNode as d.RenderNode).__childNodes ||
     slotNode.parentNode.childNodes) as NodeListOf<d.RenderNode>;
   let childNode: d.RenderNode;
 

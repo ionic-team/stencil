@@ -1,15 +1,33 @@
 import { BUILD } from '@app-data';
-import { updateFallbackSlotVisibility } from './vdom/render-slot-fallback';
 
 import type * as d from '../declarations';
 import { NODE_TYPE, ORG_LOCATION_ID } from './runtime-constants';
+import { updateFallbackSlotVisibility } from './vdom/render-slot-fallback';
 
 interface PatchedNode extends d.HostElement {
   __removeChild: (node: ChildNode) => void;
 }
 
-export const patchPseudoShadowDom = (HostElementPrototype: any, DescriptorPrototype?: any) => {
-  patchChildNodes(HostElementPrototype, DescriptorPrototype);
+/**
+ * Monkey patches a range of DOM methods and accessors.
+ * Makes `non-shadow-dom` (`scoped: true` or `shadow: false`) custom elements behave more closely to their native counterparts.
+ * - `innerHTML`
+ * - `innerText`
+ * - `textContent`
+ * - `insertBefore()`
+ * - `appendChild()`
+ * - `append()`
+ * - `prepend()`
+ * - `insertAdjacentText()`
+ * - `insertAdjacentElement()`
+ * - `insertAdjacentHTML()`
+ * - `replaceChildren()`
+ * @param HostElementPrototype the custom element prototype to patch
+ * @param DescriptorNodePrototype optional. Where to find OG descriptors for accessors.
+ * This will be different / required during during testing / mock environnement.
+ */
+export const patchPseudoShadowDom = (HostElementPrototype: any, DescriptorNodePrototype?: any) => {
+  patchChildNodes(HostElementPrototype, DescriptorNodePrototype);
   patchInsertBefore(HostElementPrototype);
   patchAppendChild(HostElementPrototype);
   patchAppend(HostElementPrototype);
@@ -18,16 +36,16 @@ export const patchPseudoShadowDom = (HostElementPrototype: any, DescriptorProtot
   patchInsertAdjacentText(HostElementPrototype);
   patchInsertAdjacentElement(HostElementPrototype);
   patchReplaceChildren(HostElementPrototype);
-  patchInnerHTML(HostElementPrototype, DescriptorPrototype);
-  patchInnerText(HostElementPrototype, DescriptorPrototype);
-  patchTextContent(HostElementPrototype, DescriptorPrototype);
+  patchInnerHTML(HostElementPrototype, DescriptorNodePrototype);
+  patchInnerText(HostElementPrototype, DescriptorNodePrototype);
+  patchTextContent(HostElementPrototype, DescriptorNodePrototype);
 };
 
 ////// non-shadow host component patches
 
 /**
- * Patch `cloneNode()` for non-shadow components ()
- * @param HostElementPrototype the host prototype to polyfill
+ * Patch `cloneNode()` for non-shadow components
+ * @param HostElementPrototype the host element prototype to monkey patch
  */
 export const patchCloneNode = (HostElementPrototype: any) => {
   HostElementPrototype.__cloneNode = HostElementPrototype.cloneNode;
@@ -76,9 +94,11 @@ export const patchCloneNode = (HostElementPrototype: any) => {
 /**
  * Patches children accessors of a non-shadow component.
  * (`childNodes`, `children`, `firstChild`, `lastChild` and `childElementCount`)
- * @param HostElementPrototype
+ * @param HostElementPrototype the custom element prototype to patch
+ * @param DescriptorNodePrototype optional. Where to find the OG descriptor for `childNodes`.
+ * Required during during testing / mock environnement.
  */
-const patchChildNodes = (HostElementPrototype: any, DescriptorPrototype?: any) => {
+const patchChildNodes = (HostElementPrototype: any, DescriptorNodePrototype?: any) => {
   if (!globalThis.Node) return;
 
   class FakeNodeList extends Array {
@@ -87,18 +107,18 @@ const patchChildNodes = (HostElementPrototype: any, DescriptorPrototype?: any) =
     }
   }
 
-  let childNodesDesc = Object.getOwnPropertyDescriptor(DescriptorPrototype || Node.prototype, 'childNodes');
+  let childNodesDesc = Object.getOwnPropertyDescriptor(DescriptorNodePrototype || Node.prototype, 'childNodes');
   if (!childNodesDesc) {
     childNodesDesc = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(Node.prototype), 'childNodes');
   }
   if (childNodesDesc) Object.defineProperty(HostElementPrototype, '__childNodes', childNodesDesc);
 
-  let childrenDesc = Object.getOwnPropertyDescriptor(DescriptorPrototype || Element.prototype, 'children');
+  const childrenDesc = Object.getOwnPropertyDescriptor(DescriptorNodePrototype || Element.prototype, 'children');
   // MockNode won't have these
   if (childrenDesc) Object.defineProperty(HostElementPrototype, '__children', childrenDesc);
 
   const childElementCountDesc = Object.getOwnPropertyDescriptor(
-    DescriptorPrototype || Element.prototype,
+    DescriptorNodePrototype || Element.prototype,
     'childElementCount'
   );
   if (childElementCountDesc) Object.defineProperty(HostElementPrototype, '__childElementCount', childElementCountDesc);
@@ -150,12 +170,14 @@ const patchChildNodes = (HostElementPrototype: any, DescriptorPrototype?: any) =
 
 /**
  * Patches the inner html accessors of a non-shadow component
- * @param HostElementPrototype the host `Element` to be patched
+ * @param HostElementPrototype the custom element prototype to patch
+ * @param DescriptorNodePrototype optional. Where to find the OG descriptor for `innerHTML`.
+ * Required during during testing / mock environnement.
  */
-const patchInnerHTML = (HostElementPrototype: any, DescriptorPrototype?: any) => {
+const patchInnerHTML = (HostElementPrototype: any, DescriptorNodePrototype?: any) => {
   if (!globalThis.Element) return;
 
-  let descriptor = Object.getOwnPropertyDescriptor(DescriptorPrototype || Element.prototype, 'innerHTML');
+  let descriptor = Object.getOwnPropertyDescriptor(DescriptorNodePrototype || Element.prototype, 'innerHTML');
   // on IE it's on HTMLElement.prototype
   if (!descriptor) descriptor = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'innerHTML');
   // MockNode won't have these
@@ -183,12 +205,14 @@ const patchInnerHTML = (HostElementPrototype: any, DescriptorPrototype?: any) =>
 
 /**
  * Patches the inner text accessors of a non-shadow component
- * @param HostElementPrototype the host `Element` to be patched
+ * @param HostElementPrototype the custom element prototype to patch
+ * @param DescriptorNodePrototype optional. Where to find the OG descriptor for `innerText`.
+ * Required during during testing / mock environnement.
  */
-const patchInnerText = (HostElementPrototype: any, DescriptorPrototype?: any) => {
+const patchInnerText = (HostElementPrototype: any, DescriptorNodePrototype?: any) => {
   if (!globalThis.Element) return;
 
-  let descriptor = Object.getOwnPropertyDescriptor(DescriptorPrototype || Element.prototype, 'innerText');
+  let descriptor = Object.getOwnPropertyDescriptor(DescriptorNodePrototype || Element.prototype, 'innerText');
   // on IE it's on HTMLElement.prototype
   if (!descriptor) descriptor = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'innerText');
   // MockNode won't have these
@@ -215,12 +239,14 @@ const patchInnerText = (HostElementPrototype: any, DescriptorPrototype?: any) =>
 
 /**
  * Patches the text content accessors of a non-shadow component
- * @param HostElementPrototype the host `Element` to be patched
+ * @param HostElementPrototype the custom element prototype to patch
+ * @param DescriptorNodePrototype optional. Where to find the OG descriptor for `textContent`.
+ * Required during during testing / mock environnement.
  */
-const patchTextContent = (HostElementPrototype: any, DescriptorPrototype?: any) => {
+const patchTextContent = (HostElementPrototype: any, DescriptorNodePrototype?: any) => {
   if (!globalThis.Node) return;
 
-  const descriptor = Object.getOwnPropertyDescriptor(DescriptorPrototype || Node.prototype, 'textContent');
+  const descriptor = Object.getOwnPropertyDescriptor(DescriptorNodePrototype || Node.prototype, 'textContent');
   // MockNode won't have these
   if (descriptor) Object.defineProperty(HostElementPrototype, '__textContent', descriptor);
 
@@ -242,9 +268,9 @@ const patchTextContent = (HostElementPrototype: any, DescriptorPrototype?: any) 
 
 /**
  * Patches the `insertBefore` of a non-shadow component.
- * The problem solved being that the 'current' node to insert before may not be in the root of our component.
- * This tries to find where the 'current' node lives within the component and insert the new node before it
- * @param HostElementPrototype the host `Element` to be patched
+ * The *current* node to insert before may not be in the root of our component.
+ * This tries to find where the *current* node lives within the component and insert the new node before it
+ * @param HostElementPrototype the custom element prototype to patch
  */
 const patchInsertBefore = (HostElementPrototype: any) => {
   if (HostElementPrototype.__insertBefore) return;
@@ -290,7 +316,7 @@ const patchInsertBefore = (HostElementPrototype: any) => {
 
 /**
  * Patches the `appendChild` method of a non-shadow component
- * @param HostElementPrototype the host `Element` to be patched
+ * @param HostElementPrototype the custom element prototype to patch
  */
 const patchAppendChild = (HostElementPrototype: any) => {
   if (HostElementPrototype.__appendChild) return;
@@ -327,7 +353,7 @@ const patchAppendChild = (HostElementPrototype: any) => {
 
 /**
  * Patches the `prepend` method of a non-shadow component
- * @param HostElementPrototype the host `Element` to be patched
+ * @param HostElementPrototype the custom element prototype to patch
  */
 const patchPrepend = (HostElementPrototype: PatchedNode) => {
   if (HostElementPrototype.__prepend) return;
@@ -367,7 +393,7 @@ const patchPrepend = (HostElementPrototype: PatchedNode) => {
 
 /**
  * Patches the `append` method of a non-shadow component
- * @param HostElementPrototype the host `Element` to be patched
+ * @param HostElementPrototype the custom element prototype to patch
  */
 const patchAppend = (HostElementPrototype: PatchedNode) => {
   if (HostElementPrototype.__append) return;
@@ -385,7 +411,7 @@ const patchAppend = (HostElementPrototype: PatchedNode) => {
 
 /**
  * Patches the `replaceChildren` method of a non-shadow component
- * @param HostElementPrototype the host `Element` to be patched
+ * @param HostElementPrototype the custom element prototype to patch
  */
 const patchReplaceChildren = (HostElementPrototype: PatchedNode) => {
   if (HostElementPrototype.__replaceChildren) return;
@@ -407,7 +433,7 @@ const patchReplaceChildren = (HostElementPrototype: PatchedNode) => {
 
 /**
  * Patches the `insertAdjacentHTML` method of a non-shadow component
- * @param HostElementPrototype the host `Element` to be patched
+ * @param HostElementPrototype the custom element prototype to patch
  */
 const patchInsertAdjacentHTML = (HostElementPrototype: any) => {
   if (HostElementPrototype.__insertAdjacentHTML) return;
@@ -436,7 +462,7 @@ const patchInsertAdjacentHTML = (HostElementPrototype: any) => {
 
 /**
  * Patches the `insertAdjacentText` method of a non-shadow component
- * @param HostElementPrototype the host `Element` to be patched
+ * @param HostElementPrototype the custom element prototype to patch
  */
 const patchInsertAdjacentText = (HostElementPrototype: any) => {
   if (HostElementPrototype.__insertAdjacentText) return;
@@ -448,7 +474,7 @@ const patchInsertAdjacentText = (HostElementPrototype: any) => {
 
 /**
  * Patches the `insertAdjacentElement` method of a non-shadow component
- * @param HostElementPrototype the host `Element` to be patched
+ * @param HostElementPrototype the custom element prototype to patch
  */
 const patchInsertAdjacentElement = (HostElementPrototype: any) => {
   if (HostElementPrototype.__insertAdjacentElement) return;
@@ -472,8 +498,12 @@ const patchInsertAdjacentElement = (HostElementPrototype: any) => {
 ////// Slotted node patches
 
 /**
- * Patches sibling accessors (`nextSibling`, `nextSiblingElement`, `previousSibling`, `previousSiblingElement`)
- * of a 'slotted' node within a non-shadow component.
+ * Patches sibling accessors of a 'slotted' node within a non-shadow component.
+ * Meaning whilst stepping through a non-shadow element's nodes, only the mock 'lightdom' nodes are returned.
+ * - `nextSibling`
+ * - `nextSiblingElement`
+ * - `previousSibling`
+ * - `previousSiblingElement`
  * @param NodePrototype the slotted node to be patched
  */
 export const patchNextPrev = (NodePrototype: any) => {
@@ -481,7 +511,7 @@ export const patchNextPrev = (NodePrototype: any) => {
   // Frameworks will often try to reconcile their VDOM with the real DOM
   // by stepping through nodes with 'nextSibling' (and similar).
   // This works with a shadowDOM; the lightDOM matches the framework's VDOM.
-  // This doesn't work without shadowDOM
+  // This does not work without shadowDOM
 
   if (!NodePrototype || NodePrototype.__nextSibling || !globalThis.Node) return;
 
@@ -494,11 +524,13 @@ export const patchNextPrev = (NodePrototype: any) => {
 /**
  * Patches the `nextSibling` accessor of a non-shadow slotted node
  * @param NodePrototype the slotted node to be patched
+ * @param DescriptorNodePrototype optional. Where to find the OG descriptor for `nextSibling`.
+ * Required during during testing / mock environnement.
  */
-export const patchNextSibling = (NodePrototype: any, DescriptorPrototype?: any) => {
+export const patchNextSibling = (NodePrototype: any, DescriptorNodePrototype?: any) => {
   if (!NodePrototype || NodePrototype.__nextSibling) return;
 
-  const descriptor = Object.getOwnPropertyDescriptor(DescriptorPrototype || Node.prototype, 'nextSibling');
+  const descriptor = Object.getOwnPropertyDescriptor(DescriptorNodePrototype || Node.prototype, 'nextSibling');
   // MockNode might not have these
   if (descriptor) Object.defineProperty(NodePrototype, '__nextSibling', descriptor);
   else {
@@ -519,12 +551,17 @@ export const patchNextSibling = (NodePrototype: any, DescriptorPrototype?: any) 
 
 /**
  * Patches the `nextElementSibling` accessor of a non-shadow slotted node
- * @param NodePrototype the slotted node to be patched
+ * @param ElementPrototype the slotted node to be patched
+ * @param DescriptorNodePrototype optional. Where to find the OG descriptor for `nextElementSibling`.
+ * Required during during testing / mock environnement.
  */
-export const patchNextElementSibling = (ElementPrototype: any, DescriptorPrototype?: any) => {
+export const patchNextElementSibling = (ElementPrototype: any, DescriptorNodePrototype?: any) => {
   if (!ElementPrototype || ElementPrototype.__nextElementSibling || !ElementPrototype.nextSiblingElement) return;
 
-  const descriptor = Object.getOwnPropertyDescriptor(DescriptorPrototype || Element.prototype, 'nextElementSibling');
+  const descriptor = Object.getOwnPropertyDescriptor(
+    DescriptorNodePrototype || Element.prototype,
+    'nextElementSibling'
+  );
   // MockNode won't have these
   if (descriptor) Object.defineProperty(ElementPrototype, '__nextElementSibling', descriptor);
   else {
@@ -546,11 +583,13 @@ export const patchNextElementSibling = (ElementPrototype: any, DescriptorPrototy
 /**
  * Patches the `previousSibling` accessor of a non-shadow slotted node
  * @param NodePrototype the slotted node to be patched
+ * @param DescriptorNodePrototype optional. Where to find the OG descriptor for `previousSibling`.
+ * Required during during testing / mock environnement.
  */
-export const patchPreviousSibling = (NodePrototype: any, DescriptorPrototype?: any) => {
+export const patchPreviousSibling = (NodePrototype: any, DescriptorNodePrototype?: any) => {
   if (!NodePrototype || NodePrototype.__previousSibling) return;
 
-  const descriptor = Object.getOwnPropertyDescriptor(DescriptorPrototype || Node.prototype, 'previousSibling');
+  const descriptor = Object.getOwnPropertyDescriptor(DescriptorNodePrototype || Node.prototype, 'previousSibling');
   // MockNode won't have these
   if (descriptor) Object.defineProperty(NodePrototype, '__previousSibling', descriptor);
   else {
@@ -572,13 +611,15 @@ export const patchPreviousSibling = (NodePrototype: any, DescriptorPrototype?: a
 /**
  * Patches the `previousElementSibling` accessor of a non-shadow slotted node
  * @param ElementPrototype the slotted node to be patched
+ * @param DescriptorNodePrototype optional. Where to find the OG descriptor for `previousElementSibling`.
+ * Required during during testing / mock environnement.
  */
-export const patchPreviousElementSibling = (ElementPrototype: any, DescriptorPrototype?: any) => {
+export const patchPreviousElementSibling = (ElementPrototype: any, DescriptorNodePrototype?: any) => {
   if (!ElementPrototype || ElementPrototype.__previousElementSibling || !ElementPrototype.previousElementSibling)
     return;
 
   const descriptor = Object.getOwnPropertyDescriptor(
-    DescriptorPrototype || Element.prototype,
+    DescriptorNodePrototype || Element.prototype,
     'previousElementSibling'
   );
   // MockNode won't have these
@@ -637,7 +678,7 @@ export const patchRemove = (NodePrototype: any) => {
 
 /**
  * Patches the `removeChild` method of a non-shadow slotted node
- * @param NodePrototype the slotted node to be patched
+ * @param ElementPrototype the slotted node to be patched
  */
 const patchRemoveChild = (ElementPrototype: any) => {
   if (!ElementPrototype || ElementPrototype.__removeChild) return;
@@ -663,10 +704,11 @@ const patchRemoveChild = (ElementPrototype: any) => {
  * Creates an empty text node to act as a forwarding address to a slotted node:
  * 1) When non-shadow components re-render, they need a place to temporarily put 'lightDOM' elements.
  * 2) Patched dom methods and accessors use this node to calculate what 'lightDOM' nodes are in the host.
- * @param newChild - A node that's going to be added to the component
- * @param slotNode - The slot node that the node will be added to
+ * @param newChild a node that's going to be added to the component
+ * @param slotNode the slot node that the node will be added to
+ * @param position an ordered position to add the ref node which mirrors the lightDom nodes' order
  */
-export const addSlotRelocateNode = (newChild: d.RenderNode, slotNode: d.RenderNode, order?: number) => {
+export const addSlotRelocateNode = (newChild: d.RenderNode, slotNode: d.RenderNode, position?: number) => {
   if (newChild['s-ol'] && newChild['s-ol'].isConnected) return;
 
   const slottedNodeLocation: d.RenderNode = document.createTextNode('') as any;
@@ -676,13 +718,14 @@ export const addSlotRelocateNode = (newChild: d.RenderNode, slotNode: d.RenderNo
     const parent = slotNode['s-cr'].parentNode as PatchedNode;
     const appendChild = parent.__appendChild || parent.appendChild;
 
-    if (typeof order !== 'undefined') {
-      slottedNodeLocation['s-oo'] = order;
+    if (typeof position !== 'undefined') {
+      slottedNodeLocation['s-oo'] = position;
       const childNodes = (parent.__childNodes || parent.childNodes) as NodeListOf<d.RenderNode>;
       const slotRelocateNodes: d.RenderNode[] = [slottedNodeLocation];
       childNodes.forEach((n) => {
         if (n['s-nr']) slotRelocateNodes.push(n);
       });
+
       slotRelocateNodes.sort((a, b) => {
         if (!a['s-oo'] || a['s-oo'] < b['s-oo']) return -1;
         else if (!b['s-oo'] || b['s-oo'] < a['s-oo']) return 1;
@@ -699,7 +742,7 @@ export const addSlotRelocateNode = (newChild: d.RenderNode, slotNode: d.RenderNo
 
 /**
  * Find the slot name of a given node
- * @param node
+ * @param node a dom node
  * @returns the node's slot name
  */
 const getSlotName = (node: d.RenderNode) =>

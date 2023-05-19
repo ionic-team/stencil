@@ -260,14 +260,15 @@ export interface StencilConfig {
 }
 
 export interface ConfigExtras {
+  // TODO:  Remove code related to deprecated `appendChildSlotFix` field.
   /**
-   * @deprecated - this is now automatically applied when components do not use `shadow: true`
-   *
    * By default, the slot polyfill does not update `appendChild()` so that it appends
    * new child nodes into the correct child slot like how shadow dom works. This is an opt-in
    * polyfill for those who need it when using `element.appendChild(node)` and expecting the
    * child to be appended in the same location shadow dom would. This is not required for
    * IE11 or Edge 18, but can be enabled if the app is using `appendChild()`. Defaults to `false`.
+   *
+   * @deprecated This is now automatically applied when components do not use `shadow: true`
    */
   appendChildSlotFix?: boolean;
 
@@ -340,11 +341,12 @@ export interface ConfigExtras {
    */
   scriptDataOpts?: boolean;
 
+  // TODO:  Remove code related to deprecated `scopedSlotTextContentFix` field.
   /**
-   * @deprecated - this is now automatically applied when components do not use `shadow: true`
-   *
    * Experimental flag to align the behavior of invoking `textContent` on a scoped component to act more like a
    * component that uses the shadow DOM. Defaults to `false`
+   *
+   * @deprecated - this is now automatically applied when components do not use `shadow: true`
    */
   scopedSlotTextContentFix?: boolean;
 
@@ -368,13 +370,14 @@ export interface ConfigExtras {
    */
   initializeNextTick?: boolean;
 
+  // TODO:  Remove code related to deprecated `slotChildNodesFix` field.
   /**
-   * @deprecated - this is now automatically applied when components do not use `shadow: true`
-   *
    * For browsers that do not support shadow dom (IE11 and Edge 18 and below), slot is polyfilled
    * to simulate the same behavior. However, the host element's `childNodes` and `children`
    * getters are not patched to only show the child nodes and elements of the default slot.
    * Defaults to `false`.
+   *
+   * @deprecated - this is now automatically applied when components do not use `shadow: true`
    */
   slotChildNodesFix?: boolean;
 

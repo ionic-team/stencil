@@ -5,10 +5,10 @@ import { CMP_FLAGS } from '@utils';
 import type * as d from '../declarations';
 import { connectedCallback } from './connected-callback';
 import { disconnectedCallback } from './disconnected-callback';
+import { patchCloneNode, patchPseudoShadowDom } from './dom-extras';
 import { computeMode } from './mode';
 import { proxyComponent } from './proxy-component';
 import { PROXY_FLAGS } from './runtime-constants';
-import { patchCloneNode, patchPseudoShadowDom } from './dom-extras';
 import { attachStyles, getScopeId, registerStyle } from './styles';
 
 export const defineCustomElement = (Cstr: any, compactMeta: d.ComponentRuntimeMetaCompact) => {
