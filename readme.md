@@ -38,8 +38,8 @@
   <span> · </span>
   <a href="https://ionicframework.com/blog/tag/stencil/">Blog</a>
   <br />
-  Community: 
-  <a href="https://stencil-worldwide.slack.com">Slack</a>
+  Community:
+  <a href="https://chat.stenciljs.com">Discord</a>
   <span> · </span>
   <a href="https://forum.ionicframework.com/c/stencil/21/">Forums</a>
   <span> · </span>
