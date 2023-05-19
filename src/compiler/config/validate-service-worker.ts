@@ -20,66 +20,65 @@ import type * as d from '../../declarations';
  *
  * @param config the current, validated configuration
  * @param outputTarget the `www` outputTarget whose service worker
- * configuration we want to validate. **Note**: the `.serviceWorker` object
- * _will be mutated_ if it is present.
+ * configuration we want to validate.
+ * @returns `null` or `false` if a service worker is not used or a validated service worker object
  */
-export const validateServiceWorker = (config: d.ValidatedConfig, outputTarget: d.OutputTargetWww): void => {
+export const validateServiceWorker = (
+  config: d.ValidatedConfig,
+  outputTarget: d.OutputTargetWww
+): d.ValidatedOutputTargetWww['serviceWorker'] => {
   if (outputTarget.serviceWorker === false) {
-    return;
+    return false;
   }
   if (config.devMode && !config.flags.serviceWorker) {
-    outputTarget.serviceWorker = null;
-    return;
+    return null;
   }
-
   if (outputTarget.serviceWorker === null) {
-    outputTarget.serviceWorker = null;
-    return;
+    return null;
   }
-
   if (!outputTarget.serviceWorker && config.devMode) {
-    outputTarget.serviceWorker = null;
-    return;
+    return null;
   }
 
-  const globDirectory =
-    typeof outputTarget.serviceWorker?.globDirectory === 'string'
-      ? outputTarget.serviceWorker.globDirectory
-      : outputTarget.appDir;
+  const globDirectory = isString(outputTarget.serviceWorker?.globDirectory)
+    ? outputTarget.serviceWorker!.globDirectory
+    : outputTarget.appDir;
 
-  outputTarget.serviceWorker = {
+  const serviceWorkerConfig: d.ServiceWorkerConfig = {
     ...outputTarget.serviceWorker,
     globDirectory,
     swDest: isString(outputTarget.serviceWorker?.swDest)
-      ? outputTarget.serviceWorker.swDest
+      ? outputTarget.serviceWorker!.swDest
       : join(outputTarget.appDir ?? '', DEFAULT_FILENAME),
   };
 
-  if (!Array.isArray(outputTarget.serviceWorker.globPatterns)) {
-    if (typeof outputTarget.serviceWorker.globPatterns === 'string') {
-      outputTarget.serviceWorker.globPatterns = [outputTarget.serviceWorker.globPatterns];
-    } else if (typeof outputTarget.serviceWorker.globPatterns !== 'string') {
-      outputTarget.serviceWorker.globPatterns = DEFAULT_GLOB_PATTERNS.slice();
+  if (!Array.isArray(serviceWorkerConfig.globPatterns)) {
+    if (typeof serviceWorkerConfig.globPatterns === 'string') {
+      serviceWorkerConfig.globPatterns = [serviceWorkerConfig.globPatterns];
+    } else if (typeof serviceWorkerConfig.globPatterns !== 'string') {
+      serviceWorkerConfig.globPatterns = DEFAULT_GLOB_PATTERNS.slice();
     }
   }
 
-  if (typeof outputTarget.serviceWorker.globIgnores === 'string') {
-    outputTarget.serviceWorker.globIgnores = [outputTarget.serviceWorker.globIgnores];
+  if (typeof serviceWorkerConfig.globIgnores === 'string') {
+    serviceWorkerConfig.globIgnores = [serviceWorkerConfig.globIgnores];
   }
 
-  outputTarget.serviceWorker.globIgnores = outputTarget.serviceWorker.globIgnores || [];
+  serviceWorkerConfig.globIgnores = serviceWorkerConfig.globIgnores || [];
 
-  addGlobIgnores(config, outputTarget.serviceWorker.globIgnores);
+  addGlobIgnores(config, serviceWorkerConfig.globIgnores);
 
-  outputTarget.serviceWorker.dontCacheBustURLsMatching = /p-\w{8}/;
+  serviceWorkerConfig.dontCacheBustURLsMatching = /p-\w{8}/;
 
-  if (isString(outputTarget.serviceWorker.swSrc) && !isAbsolute(outputTarget.serviceWorker.swSrc)) {
-    outputTarget.serviceWorker.swSrc = join(config.rootDir, outputTarget.serviceWorker.swSrc);
+  if (isString(serviceWorkerConfig.swSrc) && !isAbsolute(serviceWorkerConfig.swSrc)) {
+    serviceWorkerConfig.swSrc = join(config.rootDir, serviceWorkerConfig.swSrc);
   }
 
-  if (isString(outputTarget.serviceWorker.swDest) && !isAbsolute(outputTarget.serviceWorker.swDest)) {
-    outputTarget.serviceWorker.swDest = join(outputTarget.appDir ?? '', outputTarget.serviceWorker.swDest);
+  if (isString(serviceWorkerConfig.swDest) && !isAbsolute(serviceWorkerConfig.swDest)) {
+    serviceWorkerConfig.swDest = join(outputTarget.appDir ?? '', serviceWorkerConfig.swDest);
   }
+
+  return serviceWorkerConfig;
 };
 
 /**

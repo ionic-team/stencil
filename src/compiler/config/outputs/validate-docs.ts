@@ -64,8 +64,8 @@ const validateReadmeOutputTarget = (config: d.ValidatedConfig, outputTarget: d.O
     outputTarget.dir = config.srcDir;
   }
 
-  if (!isAbsolute(outputTarget.dir)) {
-    outputTarget.dir = join(config.rootDir, outputTarget.dir);
+  if (!isAbsolute(outputTarget.dir!)) {
+    outputTarget.dir = join(config.rootDir, outputTarget.dir!);
   }
 
   if (outputTarget.footer == null) {

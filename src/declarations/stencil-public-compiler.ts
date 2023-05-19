@@ -449,8 +449,10 @@ type StrictConfigFields =
   | 'cacheDir'
   | 'devServer'
   | 'flags'
+  | 'fsNamespace'
   | 'hydratedFlag'
   | 'logger'
+  | 'namespace'
   | 'outputTargets'
   | 'packageJsonFilePath'
   | 'rollupConfig'
@@ -2267,7 +2269,7 @@ export interface OutputTargetWww extends OutputTargetBase {
    * }
    * ```
    */
-  prerenderConfig?: string;
+  prerenderConfig?: string | null;
 
   /**
    * Service worker config for production builds. During development builds
@@ -2278,6 +2280,8 @@ export interface OutputTargetWww extends OutputTargetBase {
   serviceWorker?: ServiceWorkerConfig | null | false;
   appDir?: string;
 }
+
+export type ValidatedOutputTargetWww = Required<OutputTargetWww>;
 
 export type OutputTarget =
   | OutputTargetCopy

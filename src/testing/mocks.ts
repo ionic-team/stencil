@@ -34,23 +34,25 @@ export function mockValidatedConfig(overrides: Partial<ValidatedConfig> = {}): V
 
   return {
     ...baseConfig,
+    cacheDir: '.stencil',
     devServer: {},
     flags: createConfigFlags(),
+    fsNamespace: 'app',
     hydratedFlag: null,
     logger: mockLogger(),
+    namespace: 'App',
     outputTargets: baseConfig.outputTargets ?? [],
     packageJsonFilePath: path.join(rootDir, 'package.json'),
     rootDir,
-    cacheDir: '.stencil',
+    rollupConfig: {
+      inputOptions: {},
+      outputOptions: {},
+    },
     srcIndexHtml: 'src/index.html',
     srcDir: '/src',
     sys: createTestingSystem(),
     testing: {},
     transformAliasedImportPaths: false,
-    rollupConfig: {
-      inputOptions: {},
-      outputOptions: {},
-    },
     ...overrides,
   };
 }

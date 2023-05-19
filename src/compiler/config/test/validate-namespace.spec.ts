@@ -5,6 +5,7 @@ import { validateNamespace } from '../validate-namespace';
 describe('validateNamespace', () => {
   let config: d.Config;
   const diagnostics: d.Diagnostic[] = [];
+
   beforeEach(() => {
     config = {};
     diagnostics.length = 0;
@@ -58,35 +59,44 @@ describe('validateNamespace', () => {
 
   it('should allow $ in the namespace', () => {
     config.namespace = '$MyNamespace';
-    validateNamespace(config, diagnostics);
-    expect(config.namespace).toBe('$MyNamespace');
-    expect(config.fsNamespace).toBe('$mynamespace');
+
+    const validated = validateNamespace(config, diagnostics);
+
+    expect(validated.namespace).toBe('$MyNamespace');
+    expect(validated.fsNamespace).toBe('$mynamespace');
   });
 
   it('should allow underscore in the namespace', () => {
     config.namespace = 'My_Namespace';
-    validateNamespace(config, diagnostics);
-    expect(config.namespace).toBe('My_Namespace');
-    expect(config.fsNamespace).toBe('my_namespace');
+
+    const validated = validateNamespace(config, diagnostics);
+
+    expect(validated.namespace).toBe('My_Namespace');
+    expect(validated.fsNamespace).toBe('my_namespace');
   });
 
   it('should allow dash in the namespace', () => {
     config.namespace = 'My-Namespace';
-    validateNamespace(config, diagnostics);
-    expect(config.namespace).toBe('MyNamespace');
-    expect(config.fsNamespace).toBe('my-namespace');
+
+    const validated = validateNamespace(config, diagnostics);
+
+    expect(validated.namespace).toBe('MyNamespace');
+    expect(validated.fsNamespace).toBe('my-namespace');
   });
 
   it('should set user namespace', () => {
     config.namespace = 'MyNamespace';
-    validateNamespace(config, diagnostics);
-    expect(config.namespace).toBe('MyNamespace');
-    expect(config.fsNamespace).toBe('mynamespace');
+
+    const validated = validateNamespace(config, diagnostics);
+
+    expect(validated.namespace).toBe('MyNamespace');
+    expect(validated.fsNamespace).toBe('mynamespace');
   });
 
   it('should set default namespace', () => {
-    validateNamespace(config, diagnostics);
-    expect(config.namespace).toBe('App');
-    expect(config.fsNamespace).toBe('app');
+    const validated = validateNamespace(config, diagnostics);
+
+    expect(validated.namespace).toBe('App');
+    expect(validated.fsNamespace).toBe('app');
   });
 });

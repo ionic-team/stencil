@@ -7,6 +7,7 @@ import {
   isOutputTargetDist,
   isOutputTargetWww,
   isString,
+  normalizePath,
   WWW,
 } from '@utils';
 import { isAbsolute, join } from 'path';
@@ -14,7 +15,6 @@ import { isAbsolute, join } from 'path';
 import type * as d from '../../../declarations';
 import { getAbsolutePath } from '../config-utils';
 import { validateCopy } from '../validate-copy';
-import { validatePrerender } from '../validate-prerender';
 import { validateServiceWorker } from '../validate-service-worker';
 
 export const validateWww = (config: d.ValidatedConfig, diagnostics: d.Diagnostic[], userOutputs: d.OutputTarget[]) => {
@@ -87,52 +87,63 @@ const validateWwwOutputTarget = (
   config: d.ValidatedConfig,
   outputTarget: d.OutputTargetWww,
   diagnostics: d.Diagnostic[]
-) => {
-  if (!isString(outputTarget.baseUrl)) {
-    outputTarget.baseUrl = '/';
-  }
-
-  if (!outputTarget.baseUrl.endsWith('/')) {
+): d.ValidatedOutputTargetWww => {
+  // Validate baseUrl
+  let baseUrl = !isString(outputTarget.baseUrl) ? '/' : normalizePath(outputTarget.baseUrl);
+  if (!baseUrl.endsWith('/')) {
     // Make sure the baseUrl always finish with "/"
-    outputTarget.baseUrl += '/';
+    baseUrl += '/';
+  }
+  if (config.flags.ssr || config.flags.prerender || config.flags.task === 'prerender') {
+    try {
+      new URL(baseUrl);
+    } catch (e) {
+      const err = buildError(diagnostics);
+      err.messageText = `invalid "baseUrl": ${e}`;
+    }
+
+    if (!baseUrl.startsWith('http://') && !baseUrl.startsWith('https://')) {
+      const err = buildError(diagnostics);
+      err.messageText = `When prerendering, the "baseUrl" output target config must be a full URL and start with either "http://" or "https://". The config can be updated in the "www" output target within the stencil config.`;
+    }
   }
 
-  outputTarget.dir = getAbsolutePath(config, outputTarget.dir || 'www');
+  const dir = getAbsolutePath(config, outputTarget.dir || 'www');
 
   // Fix "dir" to account
-  const pathname = new URL(outputTarget.baseUrl, 'http://localhost/').pathname;
-  outputTarget.appDir = join(outputTarget.dir, pathname);
-  if (outputTarget.appDir.endsWith('/') || outputTarget.appDir.endsWith('\\')) {
-    outputTarget.appDir = outputTarget.appDir.substring(0, outputTarget.appDir.length - 1);
+  const pathname = new URL(baseUrl, 'http://localhost/').pathname;
+  let appDir = join(dir, pathname);
+  if (appDir.endsWith('/') || appDir.endsWith('\\')) {
+    appDir = appDir.substring(0, appDir.length - 1);
   }
 
-  if (!isString(outputTarget.buildDir)) {
-    outputTarget.buildDir = 'build';
+  // Validate buildDir
+  let buildDir = !isString(outputTarget.buildDir) ? 'build' : outputTarget.buildDir;
+  if (!isAbsolute(buildDir)) {
+    buildDir = join(appDir, buildDir);
   }
 
-  if (!isAbsolute(outputTarget.buildDir)) {
-    outputTarget.buildDir = join(outputTarget.appDir, outputTarget.buildDir);
+  // Validate indexHtml
+  let indexHtml = !isString(outputTarget.indexHtml) ? 'index.html' : outputTarget.indexHtml;
+  if (!isAbsolute(indexHtml)) {
+    indexHtml = join(appDir, indexHtml);
   }
 
-  if (!isString(outputTarget.indexHtml)) {
-    outputTarget.indexHtml = 'index.html';
-  }
-
-  if (!isAbsolute(outputTarget.indexHtml)) {
-    outputTarget.indexHtml = join(outputTarget.appDir, outputTarget.indexHtml);
-  }
-
-  if (!isBoolean(outputTarget.empty)) {
-    outputTarget.empty = true;
-  }
-
-  validatePrerender(config, diagnostics, outputTarget);
-  validateServiceWorker(config, outputTarget);
-
-  if (outputTarget.polyfills === undefined) {
-    outputTarget.polyfills = true;
-  }
-  outputTarget.polyfills = !!outputTarget.polyfills;
-
-  return outputTarget;
+  return {
+    appDir,
+    baseUrl,
+    copy: outputTarget.copy,
+    dir,
+    buildDir,
+    empty: isBoolean(outputTarget.empty) ? outputTarget.empty : true,
+    indexHtml,
+    polyfills: isBoolean(outputTarget.polyfills) ? outputTarget.polyfills : true,
+    prerenderConfig: isString(outputTarget.prerenderConfig)
+      ? !isAbsolute(outputTarget.prerenderConfig)
+        ? join(config.rootDir, outputTarget.prerenderConfig)
+        : outputTarget.prerenderConfig
+      : null,
+    serviceWorker: validateServiceWorker(config, { ...outputTarget, appDir }),
+    type: outputTarget.type,
+  };
 };

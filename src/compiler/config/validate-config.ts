@@ -74,7 +74,6 @@ export const validateConfig = (
   }
 
   const config = Object.assign({}, userConfig);
-
   const logger = bootstrapConfig.logger || config.logger || createLogger();
 
   const validatedConfig: ValidatedConfig = {
@@ -90,6 +89,7 @@ export const validateConfig = (
     transformAliasedImportPaths: userConfig.transformAliasedImportPaths ?? false,
     rollupConfig: validateRollupConfig(config),
     ...validatePaths(config),
+    ...validateNamespace(config, diagnostics),
   };
 
   // default devMode false
@@ -161,9 +161,6 @@ export const validateConfig = (
   if (!validatedConfig.env) {
     validatedConfig.env = {};
   }
-
-  // get a good namespace
-  validateNamespace(validatedConfig, diagnostics);
 
   // outputTargets
   validateOutputTargets(validatedConfig, diagnostics);
