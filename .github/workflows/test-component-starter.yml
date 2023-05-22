@@ -51,7 +51,7 @@ jobs:
         shell: bash
 
       - name: untar
-        run: tar -C ./my_test -xvf $(ls -t *.tgz | head -1) && ls -hal ./my_test
+        run: mkdir my_test && tar -C ./my_test -xvf $(ls -t *.tgz | head -1) && ls -hal ./my_test
 
       - name: Move the Stencil Build Artifact
         # TODO(STENCIL-688): revisit this logic
