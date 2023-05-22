@@ -142,10 +142,8 @@ module.exports = function (config) {
     karmaTypescriptConfig: {
       tsconfig: './tsconfig.json',
       bundlerOptions: {
-        transforms: [
-          require("karma-typescript-es6-transform")()
-        ]
-      }
+        transforms: [require('karma-typescript-es6-transform')()],
+      },
     },
   });
 };
