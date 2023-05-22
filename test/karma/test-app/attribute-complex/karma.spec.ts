@@ -24,6 +24,8 @@ describe('attribute-complex', function () {
     el.setAttribute('str-1', '123');
     el.str2 = 321;
 
+    el.setAttribute('obj', 'James Pond RoboCod');
+
     await waitForChanges();
 
     const instance = await el.getInstance();
@@ -38,6 +40,8 @@ describe('attribute-complex', function () {
     expect(instance.str0).toBe('false');
     expect(instance.str1).toBe('123');
     expect(instance.str2).toBe('321');
+
+    expect(instance.obj).toBe('{"name":"James Pond RoboCod"}');
   });
 
   it('should cast element props', async () => {
@@ -51,6 +55,8 @@ describe('attribute-complex', function () {
     el.bool1 = 'false';
     el.bool2 = false;
 
+    el.obj = 'James Pond RoboCod';
+
     await waitForChanges();
 
     expect(instance.nu0).toBe(1234);
@@ -61,5 +67,6 @@ describe('attribute-complex', function () {
     expect(instance.bool2).toBe(false);
 
     expect(instance.str0).toBe('hello'); // default value
+    expect(instance.obj).toBe('{"name":"James Pond RoboCod"}');
   });
 });

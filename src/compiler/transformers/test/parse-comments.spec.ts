@@ -56,6 +56,8 @@ describe('parse comments', () => {
       reflect: false,
       required: false,
       type: 'string',
+      getter: false,
+      setter: false,
     });
     expect(t.method).toEqual({
       complexType: {
@@ -93,7 +95,7 @@ describe('parse comments', () => {
       method: 'event',
       name: 'event',
     });
-    expect(t.cmp.docs).toEqual({
+    expect(t.cmp?.docs).toEqual({
       tags: [
         {
           name: 'usage',

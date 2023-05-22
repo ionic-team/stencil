@@ -37,8 +37,16 @@ export const propDecoratorsToStatic = (
   newMembers: ts.ClassElement[]
 ): void => {
   const properties = decoratedProps
-    .filter(ts.isPropertyDeclaration)
-    .map((prop) => parsePropDecorator(diagnostics, typeChecker, prop, watchable))
+    .filter((prop) => (ts.isPropertyDeclaration(prop) && !!prop.name) || ts.isGetAccessor(prop))
+    .map((prop) =>
+      parsePropDecorator(
+        diagnostics,
+        typeChecker,
+        prop as ts.PropertyDeclaration | ts.GetAccessorDeclaration,
+        watchable,
+        newMembers
+      )
+    )
     .filter((prop): prop is ts.PropertyAssignment => prop != null);
 
   if (properties.length > 0) {
@@ -53,13 +61,15 @@ export const propDecoratorsToStatic = (
  * @param typeChecker a reference to the TypeScript type checker
  * @param prop the TypeScript `PropertyDeclaration` to parse
  * @param watchable a collection of class members that can be watched for changes using Stencil's `@Watch` decorator
+ * @param newMembers a collection of parsed `@Prop` annotated class members
  * @returns a property assignment expression to be added to the Stencil component's class
  */
 const parsePropDecorator = (
   diagnostics: d.Diagnostic[],
   typeChecker: ts.TypeChecker,
-  prop: ts.PropertyDeclaration,
-  watchable: Set<string>
+  prop: ts.PropertyDeclaration | ts.GetAccessorDeclaration,
+  watchable: Set<string>,
+  newMembers: ts.ClassElement[],
 ): ts.PropertyAssignment | null => {
   const propDecorator = retrieveTsDecorators(prop)?.find(isDecoratorNamed('Prop'));
   if (propDecorator == null) {
@@ -89,6 +99,7 @@ const parsePropDecorator = (
   const symbol = typeChecker.getSymbolAtLocation(prop.name);
   const type = typeChecker.getTypeAtLocation(prop);
   const typeStr = propTypeFromTSType(type);
+  const foundSetter = ts.isGetAccessor(prop) ? findSetter(propName, newMembers) : null;
 
   const propMeta: d.ComponentCompilerStaticProperty = {
     type: typeStr,
@@ -97,8 +108,10 @@ const parsePropDecorator = (
     required: prop.exclamationToken !== undefined && propName !== 'mode',
     optional: prop.questionToken !== undefined,
     docs: serializeSymbol(typeChecker, symbol),
+    getter: ts.isGetAccessor(prop),
+    setter: !!foundSetter,
   };
-  validateReferences(diagnostics, propMeta.complexType.references, prop.type);
+  if (prop.type) validateReferences(diagnostics, propMeta.complexType.references, prop.type);
 
   // prop can have an attribute if type is NOT "unknown"
   if (typeStr !== 'unknown') {
@@ -107,9 +120,20 @@ const parsePropDecorator = (
   }
 
   // extract default value
-  const initializer = prop.initializer;
-  if (initializer) {
-    propMeta.defaultValue = initializer.getText();
+  if (ts.isPropertyDeclaration(prop) && prop.initializer) {
+    propMeta.defaultValue = prop.initializer.getText();
+  } else if (ts.isGetAccessorDeclaration(prop)) {
+    // shallow comb to find default value for a getter
+    const returnSt = prop.body?.statements.find((st) => ts.isReturnStatement(st)) as ts.ReturnStatement;
+    const retExp = returnSt.expression;
+
+    if (retExp && ts.isLiteralExpression(retExp)) {
+      propMeta.defaultValue = retExp.getText();
+    } else if (retExp && ts.isPropertyAccessExpression(retExp)) {
+      const nameToFind = retExp.name.getText();
+      const foundProp = findGetProp(nameToFind, newMembers);
+      if (foundProp && foundProp.initializer) propMeta.defaultValue = foundProp.initializer.getText();
+    }
   }
 
   const staticProp = ts.factory.createPropertyAssignment(
@@ -118,6 +142,29 @@ const parsePropDecorator = (
   );
   watchable.add(propName);
   return staticProp;
+};
+
+/**
+ * Attempts to find a `set` member of the class when there is a corresponding getter
+ * @param propName - the property name of the setter to find
+ * @param members - all the component class members
+ * @returns the found typescript AST setter node
+ */
+const findSetter = (propName: string, members: ts.ClassElement[]): ts.SetAccessorDeclaration | undefined => {
+  return members.find((m) => ts.isSetAccessor(m) && m.name.getText() === propName) as
+    | ts.SetAccessorDeclaration
+    | undefined;
+};
+
+/**
+ * When attempting to find the default value of a decorated `get` prop, if a member like `this.something`
+ * is returned, this method is used to comb the class members to attempt to get it's default value
+ * @param propName - the property name of the member to find
+ * @param members - all the component class members
+ * @returns the found typescript AST class member
+ */
+const findGetProp = (propName: string, members: ts.ClassElement[]): ts.PropertyDeclaration | undefined => {
+  return members.find((m) => ts.isPropertyDeclaration(m) && m.name.getText() === propName) as ts.PropertyDeclaration;
 };
 
 /**
@@ -162,7 +209,7 @@ const getReflect = (diagnostics: d.Diagnostic[], propDecorator: ts.Decorator, pr
 
 const getComplexType = (
   typeChecker: ts.TypeChecker,
-  node: ts.PropertyDeclaration,
+  node: ts.PropertyDeclaration | ts.GetAccessorDeclaration,
   type: ts.Type
 ): d.ComponentCompilerPropertyComplexType => {
   const nodeType = node.type;

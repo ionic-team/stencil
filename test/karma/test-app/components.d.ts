@@ -14,6 +14,7 @@ export namespace Components {
     }
     interface AttributeBasic {
         "customAttr": string;
+        "getter": string;
         "multiWord": string;
         "single": string;
     }
@@ -35,6 +36,7 @@ export namespace Components {
         "nu0": number;
         "nu1"?: number;
         "nu2"?: SomeTypes.Number;
+        "obj": string;
         "str0": string;
         "str1"?: string;
         "str2"?: SomeTypes.String;
@@ -1271,6 +1273,7 @@ declare namespace LocalJSX {
     }
     interface AttributeBasic {
         "customAttr"?: string;
+        "getter"?: string;
         "multiWord"?: string;
         "single"?: string;
     }
@@ -1290,6 +1293,7 @@ declare namespace LocalJSX {
         "nu0"?: number;
         "nu1"?: number;
         "nu2"?: SomeTypes.Number;
+        "obj"?: string;
         "str0"?: string;
         "str1"?: string;
         "str2"?: SomeTypes.String;
