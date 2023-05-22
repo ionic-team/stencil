@@ -25,7 +25,7 @@ jobs:
         uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
         with:
           node-version: ${{ matrix.node }}
-          cache: 'npm'
+#          cache: 'npm'
 
       - name: Download Build Archive
         uses: ./.github/workflows/actions/download-archive
@@ -36,6 +36,10 @@ jobs:
 
       - name: Pack the Build Archive
         run: npm pack
+        shell: bash
+
+      - name: Run ls
+        run: ls
         shell: bash
 
       - name: Move the Stencil Build Artifact
