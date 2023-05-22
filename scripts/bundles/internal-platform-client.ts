@@ -148,18 +148,7 @@ export async function internalClient(opts: BuildOptions) {
     ],
   };
 
-  const internalClientPatchEsmBundle = { ...internalClientPatchBrowserBundle };
-  internalClientPatchEsmBundle.input = join(inputClientDir, 'client-patch-esm.js');
-  internalClientPatchEsmBundle.output = {
-    format: 'es',
-    dir: outputInternalClientDir,
-    entryFileNames: 'patch-esm.js',
-    chunkFileNames: '[name].js',
-    banner: getBanner(opts, 'Stencil Client Patch Esm'),
-    preferConst: true,
-  };
-
-  return [internalClientBundle, internalClientPatchBrowserBundle, internalClientPatchEsmBundle];
+  return [internalClientBundle, internalClientPatchBrowserBundle];
 }
 
 async function copyPolyfills(opts: BuildOptions, outputInternalClientPolyfillsDir: string) {

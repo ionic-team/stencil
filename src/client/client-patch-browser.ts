@@ -10,13 +10,6 @@ export const patchBrowser = (): Promise<d.CustomElementsDefineOptions> => {
     consoleDevInfo('Running in development mode.');
   }
 
-  // TODO(STENCIL-659): Remove code implementing the CSS variable shim
-  if (BUILD.cssVarShim) {
-    // shim css vars
-    // TODO(STENCIL-659): Remove code implementing the CSS variable shim
-    plt.$cssShim$ = (win as any).__cssshim;
-  }
-
   if (BUILD.cloneNodeFix) {
     // opted-in to polyfill cloneNode() for slot polyfilled components
     patchCloneNodeFix((H as any).prototype);
