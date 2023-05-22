@@ -1,4 +1,4 @@
-import { hasError, hasWarning, result } from '@utils';
+import { hasError, hasWarning } from '@utils';
 
 import type * as d from '../../declarations';
 
@@ -18,7 +18,7 @@ export class BuildContext implements d.BuildCtx {
   componentGraph = new Map<string, string[]>();
   config: d.Config;
   data: any = {};
-  buildStats?: result.Result<d.CompilerBuildStats, { diagnostics: d.Diagnostic[] }> = undefined;
+  buildStats?: d.CompilerBuildStats = undefined;
   esmBrowserComponentBundle: d.BundleModule[];
   esmComponentBundle: d.BundleModule[];
   es5ComponentBundle: d.BundleModule[];
