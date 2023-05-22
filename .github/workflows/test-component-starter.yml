@@ -27,37 +27,43 @@ jobs:
           node-version: ${{ matrix.node }}
       #          cache: 'npm'
 
+      - name: Create a Dir
+        run: mkdir landing
+        shell: bash
+
       - name: Download Build Archive
         uses: ./.github/workflows/actions/download-archive
         with:
           name: stencil-core
           path: .
-          filename: stencil-core-build.zip
+          filename: landing/stencil-core-build.zip
 
       - name: Remove the Tarball
-        run: rm stencil-core-build.zip
+        run: rm landing/stencil-core-build.zip
         shell: bash
 
       - name: Run ls
-        run: ls
+        run: ls && ls landing
         shell: bash
 
       - name: Pack the Build Archive
         run: npm pack
         shell: bash
+        working-directory: landing
 
       - name: Run ls after pack
-        run: ls
+        run: ls landing
         shell: bash
 
       - name: untar
-        run: mkdir my_test && tar -C ./my_test -xvf $(ls -t *.tgz | head -1) && ls -hal ./my_test
+        run: mkdir landing/my_test && tar -C ./landing/my_test -xvf $(ls -t *.tgz | head -1) && ls -hal ./landing/my_test
 
       - name: Move the Stencil Build Artifact
         # TODO(STENCIL-688): revisit this logic
         # there isn't a great way to get the output of `npm pack`, just grab the most recent and hope for the best
         run: mv $(ls -t *.tgz | head -1) stencil-eval.tgz
         shell: bash
+        working-directory: landing
 
       - name: Initialize Component Starter
         run: npm init stencil component tmp-component-starter
@@ -69,7 +75,7 @@ jobs:
         shell: bash
 
       - name: Install Stencil Eval
-        run: npm i ../stencil-eval.tgz
+        run: npm i ../landing/stencil-eval.tgz
         working-directory: ./tmp-component-starter
         shell: bash
 
