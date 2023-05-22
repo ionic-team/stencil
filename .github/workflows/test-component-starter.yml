@@ -35,8 +35,8 @@ jobs:
         uses: ./.github/workflows/actions/download-archive
         with:
           name: stencil-core
-          path: .
-          filename: landing/stencil-core-build.zip
+          path: ./landing
+          filename: stencil-core-build.zip
 
       - name: Remove the Tarball
         run: rm landing/stencil-core-build.zip
