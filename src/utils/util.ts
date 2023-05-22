@@ -155,9 +155,6 @@ export const hasDependency = (buildCtx: d.BuildCtx, depName: string): boolean =>
   return getDependencies(buildCtx).includes(depName);
 };
 
-// TODO(STENCIL-661): Remove code related to the dynamic import shim
-export const getDynamicImportFunction = (namespace: string) => `__sc_import_${namespace.replace(/\s|-/g, '_')}`;
-
 export const readPackageJson = async (config: d.ValidatedConfig, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   try {
     const pkgJson = await compilerCtx.fs.readFile(config.packageJsonFilePath);
