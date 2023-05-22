@@ -37,7 +37,7 @@
     "karma-ie-launcher": "^1.0.0",
     "karma-jasmine": "^5.1.0",
     "karma-polyfill": "^1.1.0",
-    "karma-typescript": "^5.5.3",
+    "karma-typescript": "^5.5.4",
     "karma-typescript-es6-transform": "^5.5.4",
     "normalize.css": "^8.0.1",
     "rollup-plugin-node-polyfills": "^0.1.2",
