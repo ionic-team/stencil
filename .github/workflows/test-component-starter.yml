@@ -43,7 +43,15 @@ jobs:
         shell: bash
 
       - name: Run ls
-        run: ls && ls landing
+        run: ls
+        shell: bash
+
+      - name: Run ls landing
+        run: ls landing
+        shell: bash
+
+      - name: Cp Package Json
+        run: cp package.json landing/
         shell: bash
 
       - name: Pack the Build Archive
