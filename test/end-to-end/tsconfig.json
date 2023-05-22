@@ -27,6 +27,9 @@
       "@stencil/core": [
         "../../internal"
       ],
+      "@stencil/core/mock-doc": [
+        "../../mock-doc"
+      ],
       "@stencil/core/internal": [
         "../../internal"
       ],

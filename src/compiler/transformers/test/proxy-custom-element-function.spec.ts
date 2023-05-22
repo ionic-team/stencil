@@ -7,6 +7,7 @@ import { proxyCustomElement } from '../component-native/proxy-custom-element-fun
 import { PROXY_CUSTOM_ELEMENT } from '../core-runtime-apis';
 import * as TransformUtils from '../transform-utils';
 import { transpileModule } from './transpile';
+import { formatCode } from './utils';
 
 describe('proxy-custom-element-function', () => {
   const componentClassName = 'MyComponent';
@@ -80,8 +81,10 @@ describe('proxy-custom-element-function', () => {
       const transformer = proxyCustomElement(compilerCtx, transformOpts);
       const transpiledModule = transpileModule(code, null, compilerCtx, [], [transformer]);
 
-      expect(transpiledModule.outputText).toContain(
-        `export const ${componentClassName} = /*@__PURE__*/ __stencil_proxyCustomElement(class ${componentClassName} extends HTMLElement {}, true);`
+      expect(formatCode(transpiledModule.outputText)).toContain(
+        formatCode(
+          `export const ${componentClassName} = /*@__PURE__*/ __stencil_proxyCustomElement(class ${componentClassName} extends HTMLElement {}, true);`
+        )
       );
     });
 
@@ -92,8 +95,10 @@ describe('proxy-custom-element-function', () => {
         const transformer = proxyCustomElement(compilerCtx, transformOpts);
         const transpiledModule = transpileModule(code, null, compilerCtx, [], [transformer]);
 
-        expect(transpiledModule.outputText).toContain(
-          `export const foo = 'hello world!', ${componentClassName} = /*@__PURE__*/ __stencil_proxyCustomElement(class ${componentClassName} extends HTMLElement {}, true);`
+        expect(formatCode(transpiledModule.outputText)).toContain(
+          formatCode(
+            `export const foo = 'hello world!', ${componentClassName} = /*@__PURE__*/ __stencil_proxyCustomElement(class ${componentClassName} extends HTMLElement {}, true);`
+          )
         );
       });
 
@@ -103,8 +108,10 @@ describe('proxy-custom-element-function', () => {
         const transformer = proxyCustomElement(compilerCtx, transformOpts);
         const transpiledModule = transpileModule(code, null, compilerCtx, [], [transformer]);
 
-        expect(transpiledModule.outputText).toContain(
-          `export const ${componentClassName} = /*@__PURE__*/ __stencil_proxyCustomElement(class ${componentClassName} extends HTMLElement {}, true), foo = 'hello world!';`
+        expect(formatCode(transpiledModule.outputText)).toContain(
+          formatCode(
+            `export const ${componentClassName} = /*@__PURE__*/ __stencil_proxyCustomElement(class ${componentClassName} extends HTMLElement {}, true), foo = 'hello world!';`
+          )
         );
       });
 
@@ -114,8 +121,10 @@ describe('proxy-custom-element-function', () => {
         const transformer = proxyCustomElement(compilerCtx, transformOpts);
         const transpiledModule = transpileModule(code, null, compilerCtx, [], [transformer]);
 
-        expect(transpiledModule.outputText).toContain(
-          `export const foo = 'hello world!', ${componentClassName} = /*@__PURE__*/ __stencil_proxyCustomElement(class ${componentClassName} extends HTMLElement {}, true), bar = 'goodbye?';`
+        expect(formatCode(transpiledModule.outputText)).toContain(
+          formatCode(
+            `export const foo = 'hello world!', ${componentClassName} = /*@__PURE__*/ __stencil_proxyCustomElement(class ${componentClassName} extends HTMLElement {}, true), bar = 'goodbye?';`
+          )
         );
       });
     });
@@ -135,7 +144,7 @@ describe('proxy-custom-element-function', () => {
       const transformer = proxyCustomElement(compilerCtx, transformOpts);
       const transpiledModule = transpileModule(code, null, compilerCtx, [], [transformer]);
 
-      expect(transpiledModule.outputText).toBe(code);
+      expect(formatCode(transpiledModule.outputText)).toBe(formatCode(code));
     });
 
     it('returns the source file when no variable statements are found', () => {
@@ -155,7 +164,7 @@ describe('proxy-custom-element-function', () => {
       const transformer = proxyCustomElement(compilerCtx, transformOpts);
       const transpiledModule = transpileModule(code, null, compilerCtx, [], [transformer]);
 
-      expect(transpiledModule.outputText).toBe(code);
+      expect(transpiledModule.outputText.trim()).toBe(code);
     });
 
     it("returns the source file when variable statements don't match the component name", () => {
@@ -170,12 +179,12 @@ describe('proxy-custom-element-function', () => {
         } as d.Module;
       });
 
-      const code = `const ${componentClassName} = class extends HTMLElement {};`;
+      const code = `const ${componentClassName} = class extends HTMLElement { };`;
 
       const transformer = proxyCustomElement(compilerCtx, transformOpts);
       const transpiledModule = transpileModule(code, null, compilerCtx, [], [transformer]);
 
-      expect(transpiledModule.outputText).toBe(code);
+      expect(transpiledModule.outputText.trim()).toBe(code);
     });
   });
 });

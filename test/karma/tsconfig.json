@@ -27,6 +27,7 @@
     "paths": {
       "@stencil/core": ["../../internal"],
       "@stencil/core/internal": ["../../internal"],
+      "@stencil/core/internal/client": ["../../internal/client"],
       "@stencil/core/testing": ["../../testing"]
     }
   },

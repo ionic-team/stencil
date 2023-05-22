@@ -1,4 +1,5 @@
 import { getStaticGetter, transpileModule } from './transpile';
+import { formatCode } from './utils';
 
 describe('parse styles', () => {
   it('add static "styleUrl"', () => {
@@ -49,8 +50,10 @@ describe('parse styles', () => {
       })
       export class CmpA {}
     `);
-    expect(t.outputText).toEqual(
-      `const md = 'p{color:red}';const ios = 'p{color:black}';export class CmpA { static get is() { return "cmp-a"; } static get styles() { return { "md": md, "ios": ios }; }}`
+    expect(formatCode(t.outputText)).toEqual(
+      formatCode(
+        `const md = 'p{color:red}';const ios = 'p{color:black}';export class CmpA { static get is() { return "cmp-a"; } static get styles() { return { "md": md, "ios": ios }; }}`
+      )
     );
   });
 
@@ -81,8 +84,10 @@ describe('parse styles', () => {
       })
       export class CmpA {}
     `);
-    expect(t.outputText).toEqual(
-      `const styles = 'p{color:red}';export class CmpA { static get is() { return "cmp-a"; } static get styles() { return styles; }}`
+    expect(formatCode(t.outputText)).toEqual(
+      formatCode(
+        `const styles = 'p{color:red}';export class CmpA { static get is() { return "cmp-a"; } static get styles() { return styles; }}`
+      )
     );
   });
 });
