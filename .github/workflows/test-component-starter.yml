@@ -18,8 +18,16 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@8e5e7e5ab8b370d6c329ec480221332ada57f0ab # v3.5.2
 
+      - name: Run ls
+        run: ls
+        shell: bash
+
       - name: Get Core Dependencies
         uses: ./.github/workflows/actions/get-core-dependencies
+
+      - name: Run ls
+        run: ls
+        shell: bash
 
       - name: Use Node ${{ matrix.node }}
         uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
@@ -31,12 +39,14 @@ jobs:
         run: mkdir landing
         shell: bash
 
-      - name: Download Build Archive
-        uses: ./.github/workflows/actions/download-archive
+      - uses: actions/download-artifact@9bc31d5ccc31df68ecc42ccf4149144866c47d8a # v3.0.2
         with:
           name: stencil-core
           path: ./landing
-          filename: stencil-core-build.zip
+
+      - name: Extract Archive
+        run: unzip -o ./landing/stencil-core ./landing
+        shell: bash
 
       - name: Remove the Tarball
         run: rm landing/stencil-core-build.zip
