@@ -1,7 +1,5 @@
-import ionicConfig from '@ionic/prettier-config';
 import * as d from '@stencil/core/declarations';
 import { mockCompilerCtx } from '@stencil/core/testing';
-import { format } from 'prettier';
 import * as ts from 'typescript';
 
 import * as AddComponentMetaProxy from '../add-component-meta-proxy';
@@ -9,8 +7,7 @@ import { proxyCustomElement } from '../component-native/proxy-custom-element-fun
 import { PROXY_CUSTOM_ELEMENT } from '../core-runtime-apis';
 import * as TransformUtils from '../transform-utils';
 import { transpileModule } from './transpile';
-
-const formatCode = (code: string) => format(code, { ...ionicConfig, parser: 'typescript' });
+import { formatCode } from './utils';
 
 describe('proxy-custom-element-function', () => {
   const componentClassName = 'MyComponent';
