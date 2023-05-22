@@ -145,16 +145,16 @@ module.exports = function (config) {
         transforms: [require('karma-typescript-es6-transform')()],
         resolve: {
           alias: {
-            "@stencil/core": "../../internal/index.js",
-            "@stencil/core/internal": "../../internal/index.js",
-            "@stencil/core/internal/client": "../../internal/client/index.js",
-            "@stencil/core/internal/app-data": "../../internal/app-data/index.js",
-            "@stencil/core/testing": "../../testing/index.js"
-          }
+            '@stencil/core': '../../internal/index.js',
+            '@stencil/core/internal': '../../internal/index.js',
+            '@stencil/core/internal/client': '../../internal/client/index.js',
+            '@stencil/core/internal/app-data': '../../internal/app-data/index.js',
+            '@stencil/core/testing': '../../testing/index.js',
+          },
         },
         acornOptions: {
-          ecmaVersion: 11
-        }
+          ecmaVersion: 11,
+        },
       },
     },
   });
