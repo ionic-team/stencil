@@ -210,19 +210,6 @@ describe('run', () => {
           const compilerSystemUsed: d.CompilerSystem = taskBuildSpy.mock.calls[0][1].sys;
           expect(compilerSystemUsed).toBe(sys);
         });
-
-        it('uses the sys field on the config if no sys argument is provided', async () => {
-          // if the optional `sys` argument isn't provided, attempt to default to the one on the config
-          await runTask(coreCompiler, unvalidatedConfig, 'build');
-          const validated = coreCompiler.validateConfig(unvalidatedConfig, {});
-
-          // first validate there was one call, and that call had two arguments
-          expect(taskBuildSpy).toHaveBeenCalledTimes(1);
-          expect(taskBuildSpy).toHaveBeenCalledWith(coreCompiler, validated.config);
-
-          const compilerSystemUsed: d.CompilerSystem = taskBuildSpy.mock.calls[0][1].sys;
-          expect(compilerSystemUsed).toBe(unvalidatedConfig.sys);
-        });
       });
     });
 
@@ -248,7 +235,7 @@ describe('run', () => {
         const validated = coreCompiler.validateConfig(unvalidatedConfig, {});
 
         expect(taskGenerateSpy).toHaveBeenCalledTimes(1);
-        expect(taskGenerateSpy).toHaveBeenCalledWith(coreCompiler, validated.config);
+        expect(taskGenerateSpy).toHaveBeenCalledWith(validated.config);
       });
 
       it("calls the generate task for the argument 'g'", async () => {
@@ -256,7 +243,7 @@ describe('run', () => {
         const validated = coreCompiler.validateConfig(unvalidatedConfig, {});
 
         expect(taskGenerateSpy).toHaveBeenCalledTimes(1);
-        expect(taskGenerateSpy).toHaveBeenCalledWith(coreCompiler, validated.config);
+        expect(taskGenerateSpy).toHaveBeenCalledWith(validated.config);
       });
     });
 

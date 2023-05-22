@@ -27,5 +27,5 @@ export { E2EElement, E2EPage, newE2EPage } from './puppeteer';
 export { newSpecPage } from './spec-page';
 export { transpile } from './test-transpile';
 export { createTesting } from './testing';
-export { shuffleArray } from './testing-utils';
+export { getMockFSPatch, shuffleArray } from './testing-utils';
 export type { EventSpy, SpecPage, Testing } from '@stencil/core/internal';

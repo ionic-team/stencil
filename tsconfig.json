@@ -28,7 +28,6 @@
     "paths": {
       "@app-data": ["src/app-data/index.ts"],
       "@app-globals": ["src/app-globals/index.ts"],
-      "@compiler-deps": ["src/compiler/sys/modules/compiler-deps.ts"],
       "@dev-server-process": ["src/dev-server/server-process.ts"],
       "@hydrate-factory": ["src/hydrate/runner/hydrate-factory.ts"],
       "@platform": ["src/client/index.ts"],
@@ -57,7 +56,6 @@
     "src/client/client-patch-browser.ts",
     "src/compiler/index.ts",
     "src/compiler/public.ts",
-    "src/compiler/sys/modules/index.ts",
     "src/dev-server/index.ts",
     "src/dev-server/client/index.ts",
     "src/dev-server/dev-server-client/index.ts",
