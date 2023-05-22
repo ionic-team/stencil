@@ -10,6 +10,7 @@ import { mockDoc } from './bundles/mock-doc';
 import { screenshot } from './bundles/screenshot';
 import { sysNode, sysNodeExternalBundles } from './bundles/sys-node';
 import { testing } from './bundles/testing';
+import { utils } from './bundles/utils';
 import { createLicense } from './license';
 import { release } from './release';
 import { validateBuild } from './test/validate-build';
@@ -66,6 +67,7 @@ export async function createBuild(opts: BuildOptions): Promise<readonly RollupOp
     screenshot(opts),
     testing(opts),
     sysNode(opts),
+    utils(opts),
   ]);
 
   return bundles.flat();
