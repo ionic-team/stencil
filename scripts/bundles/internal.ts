@@ -54,11 +54,7 @@ async function copyStencilInternalDts(opts: BuildOptions, outputInternalDir: str
   // @stencil/core/internal/stencil-private.d.ts
   const privateDtsSrcPath = join(declarationsInputDir, 'stencil-private.d.ts');
   const privateDtsDestPath = join(outputInternalDir, 'stencil-private.d.ts');
-  let privateDts = cleanDts(await fs.readFile(privateDtsSrcPath, 'utf8'));
-
-  // the private `.d.ts` imports the `Result` type from the `@utils` module, so
-  // we need to rewrite the path so it imports from the right relative path
-  privateDts = privateDts.replace('@utils', './utils');
+  const privateDts = cleanDts(await fs.readFile(privateDtsSrcPath, 'utf8'));
   await fs.writeFile(privateDtsDestPath, privateDts);
 
   // @stencil/core/internal/stencil-public.compiler.d.ts
