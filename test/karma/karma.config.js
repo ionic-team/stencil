@@ -143,18 +143,18 @@ module.exports = function (config) {
       tsconfig: './tsconfig.json',
       bundlerOptions: {
         transforms: [require('karma-typescript-es6-transform')()],
-        // resolve: {
-        //   alias: {
-        //     "@stencil/core": "../../internal/index.js",
-        //     "@stencil/core/internal": "../../internal/index.js",
-        //     "@stencil/core/internal/client/css-shim": "../../internal/client/css-shim.js",
-        //     "@stencil/core/internal/client/dom": "../../internal/client/dom.js",
-        //     "@stencil/core/internal/client/patch-browser": "../../internal/client/patch-browser.js",
-        //     "@stencil/core/internal/client/patch-esm": "../../internal/client/patch-esm.js",
-        //     "@stencil/core/internal/client/shadow-css": "../../internal/client/shadow-css.js",
-        //     "@stencil/core/testing": "../../testing/index.js"
-        //   }
-        // }
+        resolve: {
+          alias: {
+            "@stencil/core": "../../internal/index.js",
+            "@stencil/core/internal": "../../internal/index.js",
+            "@stencil/core/internal/client": "../../internal/client/index.js",
+            "@stencil/core/internal/app-data": "../../internal/app-data/index.js",
+            "@stencil/core/testing": "../../testing/index.js"
+          }
+        },
+        acornOptions: {
+          ecmaVersion: 11
+        }
       },
     },
   });
