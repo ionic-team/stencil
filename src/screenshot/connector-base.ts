@@ -16,9 +16,9 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
   logger: d.Logger;
   buildId: string;
   buildMessage: string;
-  buildAuthor: string;
-  buildUrl: string;
-  previewUrl: string;
+  buildAuthor: string | undefined;
+  buildUrl: string | undefined;
+  previewUrl: string | undefined;
   buildTimestamp: number;
   appNamespace: string;
   screenshotDir: string;
@@ -28,11 +28,11 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
   screenshotCacheFilePath: string;
   currentBuildDir: string;
   updateMaster: boolean;
-  allowableMismatchedRatio: number;
-  allowableMismatchedPixels: number;
-  pixelmatchThreshold: number;
-  waitBeforeScreenshot: number;
-  pixelmatchModulePath: string;
+  allowableMismatchedRatio: number | undefined;
+  allowableMismatchedPixels: number | undefined;
+  pixelmatchThreshold: number | undefined;
+  waitBeforeScreenshot: number | undefined;
+  pixelmatchModulePath: string | undefined;
 
   async initBuild(opts: d.ScreenshotConnectorOptions) {
     this.logger = opts.logger;
@@ -120,13 +120,12 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
   }
 
   async getMasterBuild() {
-    let masterBuild: d.ScreenshotBuild = null;
-
     try {
-      masterBuild = JSON.parse(await readFile(this.masterBuildFilePath));
+      const masterBuild = JSON.parse(await readFile(this.masterBuildFilePath));
+      return masterBuild;
     } catch (e) {}
 
-    return masterBuild;
+    return null;
   }
 
   async completeBuild(masterBuild: d.ScreenshotBuild) {

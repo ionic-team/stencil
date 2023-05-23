@@ -141,6 +141,21 @@ module.exports = function (config) {
 
     karmaTypescriptConfig: {
       tsconfig: './tsconfig.json',
+      bundlerOptions: {
+        transforms: [require('karma-typescript-es6-transform')()],
+        resolve: {
+          alias: {
+            '@stencil/core': '../../internal/index.js',
+            '@stencil/core/internal': '../../internal/index.js',
+            '@stencil/core/internal/client': '../../internal/client/index.js',
+            '@stencil/core/internal/app-data': '../../internal/app-data/index.js',
+            '@stencil/core/testing': '../../testing/index.js',
+          },
+        },
+        acornOptions: {
+          ecmaVersion: 11,
+        },
+      },
     },
   });
 };
