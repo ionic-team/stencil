@@ -106,7 +106,7 @@ describe('validatePrimaryPackageOutputTarget', () => {
     it('should log a warning if no module path is provided', () => {
       delete buildCtx.packageJson.module;
 
-      const targetToValidate: d.PrimaryPackageOutputTarget = {
+      const targetToValidate: d.EligiblePrimaryPackageOutputTarget = {
         type: 'dist',
         dir: '/dist',
       };
@@ -121,7 +121,7 @@ describe('validatePrimaryPackageOutputTarget', () => {
       );
     });
 
-    describe.each<[d.PrimaryPackageOutputTarget & { toString(): string }, string]>([
+    describe.each<[d.EligiblePrimaryPackageOutputTarget & { toString(): string }, string]>([
       [
         {
           type: 'dist',
@@ -183,7 +183,7 @@ describe('validatePrimaryPackageOutputTarget', () => {
   });
 
   describe('validateTypesPath', () => {
-    let targetToValidate: d.PrimaryPackageOutputTarget;
+    let targetToValidate: d.EligiblePrimaryPackageOutputTarget;
     let recommendedOutputTargetConfig: PrimaryPackageOutputTargetRecommendedConfig;
 
     beforeEach(() => {
@@ -231,7 +231,7 @@ describe('validatePrimaryPackageOutputTarget', () => {
       );
     });
 
-    describe.each<[d.PrimaryPackageOutputTarget & { toString(): string }, string]>([
+    describe.each<[d.EligiblePrimaryPackageOutputTarget & { toString(): string }, string]>([
       [
         {
           type: 'dist',

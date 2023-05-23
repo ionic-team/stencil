@@ -2199,7 +2199,7 @@ interface OutputTargetValidationConfig extends OutputTargetBaseNext {
   isPrimaryPackageOutputTarget?: boolean;
 }
 
-export type PrimaryPackageOutputTarget =
+export type EligiblePrimaryPackageOutputTarget =
   | OutputTargetDist
   | OutputTargetDistCustomElements
   | OutputTargetDistCollection

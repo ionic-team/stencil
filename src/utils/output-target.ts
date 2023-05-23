@@ -81,7 +81,7 @@ export const isOutputTargetStats = (o: d.OutputTarget): o is d.OutputTargetStats
 
 export const isOutputTargetDistTypes = (o: d.OutputTarget): o is d.OutputTargetDistTypes => o.type === DIST_TYPES;
 
-export const isPrimaryPackageOutputTarget = (o: d.OutputTarget): o is d.PrimaryPackageOutputTarget =>
+export const isEligiblePrimaryPackageOutputTarget = (o: d.OutputTarget): o is d.EligiblePrimaryPackageOutputTarget =>
   isOutputTargetDist(o) ||
   isOutputTargetDistCollection(o) ||
   isOutputTargetDistCustomElements(o) ||

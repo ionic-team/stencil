@@ -1,4 +1,4 @@
-import { buildWarn, isPrimaryPackageOutputTarget, isString, normalizePath } from '@utils';
+import { buildWarn, isEligiblePrimaryPackageOutputTarget, isString, normalizePath } from '@utils';
 import { join, relative } from 'path';
 
 import type * as d from '../../declarations';
@@ -33,7 +33,7 @@ export const PRIMARY_PACKAGE_TARGET_CONFIGS = {
     getTypesPath: (rootDir: string, outputTargetConfig: d.OutputTargetDistTypes) =>
       normalizePath(relative(rootDir, join(outputTargetConfig.typesDir, 'index.d.ts'))),
   },
-} satisfies Record<d.PrimaryPackageOutputTarget['type'], PrimaryPackageOutputTargetRecommendedConfig>;
+} satisfies Record<d.EligiblePrimaryPackageOutputTarget['type'], PrimaryPackageOutputTargetRecommendedConfig>;
 
 /**
  * Performs validation for specified fields in a Stencil project's
@@ -52,7 +52,7 @@ export const validatePrimaryPackageOutputTarget = (
   // TODO(NOW): should _all_ validation be gated behind the config flag, or just this
   // new layer of "primary" target validation?
   if (config.validatePrimaryPackageOutputTarget) {
-    const eligiblePrimaryTargets: d.PrimaryPackageOutputTarget[] = [];
+    const eligiblePrimaryTargets: d.EligiblePrimaryPackageOutputTarget[] = [];
     const nonPrimaryTargets: d.OutputTarget[] = [];
 
     // Push each output target in the config into its respective
@@ -60,7 +60,7 @@ export const validatePrimaryPackageOutputTarget = (
     // Using a `foreach` prevents us from iterating over
     // the array multiple times
     config.outputTargets.forEach((ref) => {
-      if (isPrimaryPackageOutputTarget(ref)) {
+      if (isEligiblePrimaryPackageOutputTarget(ref)) {
         eligiblePrimaryTargets.push(ref);
       } else {
         nonPrimaryTargets.push(ref);
@@ -141,7 +141,7 @@ export const validateModulePath = (
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   recommendedOutputTargetConfig: PrimaryPackageOutputTargetRecommendedConfig,
-  targetToValidate: d.PrimaryPackageOutputTarget
+  targetToValidate: d.EligiblePrimaryPackageOutputTarget
 ) => {
   const currentModulePath = buildCtx.packageJson.module;
   const recommendedModulePath = recommendedOutputTargetConfig.getModulePath
@@ -185,7 +185,7 @@ export const validateTypesPath = async (
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   recommendedOutputTargetConfig: PrimaryPackageOutputTargetRecommendedConfig,
-  targetToValidate: d.PrimaryPackageOutputTarget
+  targetToValidate: d.EligiblePrimaryPackageOutputTarget
 ) => {
   const currentTypesPath = buildCtx.packageJson.types;
   const recommendedTypesPath = recommendedOutputTargetConfig.getTypesPath
