@@ -2,13 +2,39 @@ import { buildWarn, isEligiblePrimaryPackageOutputTarget, isString, normalizePat
 import { join, relative } from 'path';
 
 import type * as d from '../../declarations';
-import { packageJsonError, packageJsonWarn } from './package-json-log.utils';
+import { packageJsonError, packageJsonWarn } from './package-json-log-utils';
 
+/**
+ * Contains utility methods that can be used to generate recommended values for a
+ * project's `package.json` fields that get validated for output targets designated
+ * as `isPrimaryPackageOutputTarget`.
+ */
 export type PrimaryPackageOutputTargetRecommendedConfig = {
+  /**
+   * Generates the recommended path for the `module` property based on the output target type,
+   * the project's root directory, and the output target's designated output location.
+   *
+   * @param rootDir The Stencil project's root directory pulled from the validated config.
+   * @param outputTargetDir The output directory for the output target's compiled code.
+   * @returns The recommended path for the `module` property in a project's `package.json`
+   */
   getModulePath?: (rootDir: string, outputTargetDir: string) => string | null;
+  /**
+   * Generates the recommended path for the `types` property based on the output target type,
+   * the project's root directory, and the output target's configuration.
+   *
+   * @param rootDir The Stencil project's root directory pulled from the validated config.
+   * @param outputTargetConfig The output target's config.
+   * @returns The recommended path for the `types` property in a project's `package.json`
+   */
   getTypesPath?: (rootDir: string, outputTargetConfig: any) => string | null;
 };
 
+/**
+ * Contains a `PrimaryPackageOutputTargetRecommendedConfig` for each output target
+ * that can be marked as `isPrimaryPackageOutputTarget`. Each config defines how
+ * it will generate recommended values for certain `package.json` fields.
+ */
 export const PRIMARY_PACKAGE_TARGET_CONFIGS = {
   dist: {
     getModulePath: (rootDir: string, outputTargetDir: string) =>
@@ -49,8 +75,6 @@ export const validatePrimaryPackageOutputTarget = (
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx
 ) => {
-  // TODO(NOW): should _all_ validation be gated behind the config flag, or just this
-  // new layer of "primary" target validation?
   if (config.validatePrimaryPackageOutputTarget) {
     const eligiblePrimaryTargets: d.EligiblePrimaryPackageOutputTarget[] = [];
     const nonPrimaryTargets: d.OutputTarget[] = [];
@@ -79,7 +103,11 @@ export const validatePrimaryPackageOutputTarget = (
         if (targetsMarkedToValidate.length > 1) {
           logValidationWarning(
             buildCtx,
-            `Your Stencil config has multiple output targets with 'isPrimaryPackageOutputTarget: true'. Stencil does not support validating 'package.json' fields for multiple output targets. Please updated your Stencil config to only assign one primary package output target. For now, Stencil will use the first primary target it finds.`
+            `Your Stencil config has multiple output targets with 'isPrimaryPackageOutputTarget: true'. Stencil does not support validating 'package.json' fields for multiple output targets. Please remove the 'isPrimaryPackageOutputTarget' flag from all but one of the following output targets: ${targetsMarkedToValidate
+              .map((ref) => ref.type)
+              .join(
+                ', '
+              )}. For now, Stencil will use the first primary target it finds. You can read more about primary package output targets in the Stencil docs: https://stenciljs.com/docs/output-targets#primary-package-output-target-validation`
           );
         }
 
@@ -95,7 +123,7 @@ export const validatePrimaryPackageOutputTarget = (
       } else {
         logValidationWarning(
           buildCtx,
-          `Your Stencil project has not assigned a primary package output target. Stencil recommends that you assign a primary output target so it can validate values for fields in your project's 'package.json'`
+          `Your Stencil project has not assigned a primary package output target. Stencil recommends that you assign a primary output target so it can validate values for fields in your project's 'package.json'. You can read more about primary package output targets in the Stencil docs: https://stenciljs.com/docs/output-targets#primary-package-output-target-validation`
         );
       }
     }
@@ -104,17 +132,19 @@ export const validatePrimaryPackageOutputTarget = (
     if (nonPrimaryTargets.length && nonPrimaryTargets.some((ref: any) => ref.isPrimaryPackageOutputTarget)) {
       logValidationWarning(
         buildCtx,
-        `Your Stencil project has assigned one or more un-validated output targets as the primary package output target. No validation will take place. Please remove the 'isPrimaryPackageOutputTarget' flag from the following output targets in your Stencil config: ${nonPrimaryTargets
+        `Your Stencil project has assigned one or more ineligible output targets as the primary package output target. No validation will take place. Please remove the 'isPrimaryPackageOutputTarget' flag from the following output targets in your Stencil config: ${nonPrimaryTargets
           .filter((ref: any) => ref.isPrimaryPackageOutputTarget === true)
           .map((ref) => ref.type)
-          .join(', ')}`
+          .join(
+            ', '
+          )}. You can read more about primary package output targets in the Stencil docs: https://stenciljs.com/docs/output-targets#primary-package-output-target-validation`
       );
     }
   } else {
     if (config.outputTargets.some((ref: any) => ref.isPrimaryPackageOutputTarget)) {
       logValidationWarning(
         buildCtx,
-        'Your Stencil project has designated a primary package output target without enabling primary package validation for your project. Either set `validatePrimaryPackageOutputTarget: true` in your Stencil config or remove `isPrimaryPackageOutputTarget: true` from all output targets.'
+        'Your Stencil project has designated a primary package output target without enabling primary package validation for your project. Either set `validatePrimaryPackageOutputTarget: true` in your Stencil config or remove `isPrimaryPackageOutputTarget: true` from all output targets. You can read more about primary package output targets in the Stencil docs: https://stenciljs.com/docs/output-targets#primary-package-output-target-validation'
       );
     }
   }
@@ -180,7 +210,7 @@ export const validateModulePath = (
  * recommended value for the `types` path based on the output target type.
  * @param targetToValidate The output target to validate against.
  */
-export const validateTypesPath = async (
+export const validateTypesPath = (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
@@ -197,7 +227,7 @@ export const validateTypesPath = async (
   if (!isString(currentTypesPath) || currentTypesPath === '') {
     warningMessage = `package.json "types" property is required when generating a distribution. It's recommended to set the "types" property to: ${recommendedTypesPath}`;
   } else if (!currentTypesPath.endsWith('.d.ts')) {
-    warningMessage = `package.json "types" file must have a ".d.ts" extension: ${currentTypesPath}`;
+    warningMessage = `package.json "types" file must have a ".d.ts" extension. The "types" property is currently set to: ${currentTypesPath}`;
   } else if (recommendedTypesPath != null && recommendedTypesPath !== normalizePath(currentTypesPath)) {
     warningMessage = `package.json "types" property is set to "${currentTypesPath}". It's recommended to set the "types" property to: ${recommendedTypesPath}`;
   } else {

@@ -36,7 +36,7 @@ describe('validatePrimaryPackageOutputTarget', () => {
   });
 
   describe('check basic Stencil config scenarios', () => {
-    it('should log a warning if `validatePrimaryPackageOutputTarget` if `false` but primary targets are set', () => {
+    it('should log a warning if `validatePrimaryPackageOutputTarget` is `false` but primary targets are set', () => {
       config.validatePrimaryPackageOutputTarget = false;
 
       validatePrimaryPackageOutputTarget(config, compilerCtx, buildCtx);
@@ -44,7 +44,7 @@ describe('validatePrimaryPackageOutputTarget', () => {
       expect(buildCtx.diagnostics.length).toBe(1);
       expect(buildCtx.diagnostics[0].level).toEqual('warn');
       expect(buildCtx.diagnostics[0].messageText).toEqual(
-        'Your Stencil project has designated a primary package output target without enabling primary package validation for your project. Either set `validatePrimaryPackageOutputTarget: true` in your Stencil config or remove `isPrimaryPackageOutputTarget: true` from all output targets.'
+        'Your Stencil project has designated a primary package output target without enabling primary package validation for your project. Either set `validatePrimaryPackageOutputTarget: true` in your Stencil config or remove `isPrimaryPackageOutputTarget: true` from all output targets. You can read more about primary package output targets in the Stencil docs: https://stenciljs.com/docs/output-targets#primary-package-output-target-validation'
       );
     });
 
@@ -61,7 +61,7 @@ describe('validatePrimaryPackageOutputTarget', () => {
       expect(buildCtx.diagnostics.length).toBe(1);
       expect(buildCtx.diagnostics[0].level).toEqual('warn');
       expect(buildCtx.diagnostics[0].messageText).toEqual(
-        `Your Stencil project has assigned one or more un-validated output targets as the primary package output target. No validation will take place. Please remove the 'isPrimaryPackageOutputTarget' flag from the following output targets in your Stencil config: copy`
+        `Your Stencil project has assigned one or more ineligible output targets as the primary package output target. No validation will take place. Please remove the 'isPrimaryPackageOutputTarget' flag from the following output targets in your Stencil config: copy. You can read more about primary package output targets in the Stencil docs: https://stenciljs.com/docs/output-targets#primary-package-output-target-validation`
       );
     });
 
@@ -77,7 +77,7 @@ describe('validatePrimaryPackageOutputTarget', () => {
       expect(buildCtx.diagnostics.length).toBe(1);
       expect(buildCtx.diagnostics[0].level).toEqual('warn');
       expect(buildCtx.diagnostics[0].messageText).toEqual(
-        `Your Stencil project has not assigned a primary package output target. Stencil recommends that you assign a primary output target so it can validate values for fields in your project's 'package.json'`
+        `Your Stencil project has not assigned a primary package output target. Stencil recommends that you assign a primary output target so it can validate values for fields in your project's 'package.json'. You can read more about primary package output targets in the Stencil docs: https://stenciljs.com/docs/output-targets#primary-package-output-target-validation`
       );
     });
 
@@ -92,12 +92,10 @@ describe('validatePrimaryPackageOutputTarget', () => {
 
       validatePrimaryPackageOutputTarget(config, compilerCtx, buildCtx);
 
-      console.log('DIAG', buildCtx.diagnostics);
-
       expect(buildCtx.diagnostics.length).toBe(1);
       expect(buildCtx.diagnostics[0].level).toEqual('warn');
       expect(buildCtx.diagnostics[0].messageText).toEqual(
-        `Your Stencil config has multiple output targets with 'isPrimaryPackageOutputTarget: true'. Stencil does not support validating 'package.json' fields for multiple output targets. Please updated your Stencil config to only assign one primary package output target. For now, Stencil will use the first primary target it finds.`
+        `Your Stencil config has multiple output targets with 'isPrimaryPackageOutputTarget: true'. Stencil does not support validating 'package.json' fields for multiple output targets. Please remove the 'isPrimaryPackageOutputTarget' flag from all but one of the following output targets: dist, dist-custom-elements. For now, Stencil will use the first primary target it finds. You can read more about primary package output targets in the Stencil docs: https://stenciljs.com/docs/output-targets#primary-package-output-target-validation`
       );
     });
   });
@@ -215,7 +213,7 @@ describe('validatePrimaryPackageOutputTarget', () => {
       expect(buildCtx.diagnostics.length).toBe(1);
       expect(buildCtx.diagnostics[0].level).toEqual('warn');
       expect(buildCtx.diagnostics[0].messageText).toEqual(
-        `package.json "types" file must have a ".d.ts" extension: /dist/types/index.ts`
+        `package.json "types" file must have a ".d.ts" extension. The "types" property is currently set to: /dist/types/index.ts`
       );
     });
 

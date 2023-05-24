@@ -2,7 +2,7 @@ import { COLLECTION_MANIFEST_FILE_NAME, isGlob, isOutputTargetDistCollection, is
 import { dirname, join, relative } from 'path';
 
 import type * as d from '../../declarations';
-import { packageJsonError, packageJsonWarn } from './package-json-log.utils';
+import { packageJsonError, packageJsonWarn } from './package-json-log-utils';
 import { validatePrimaryPackageOutputTarget } from './validate-primary-package-output-target';
 
 /**

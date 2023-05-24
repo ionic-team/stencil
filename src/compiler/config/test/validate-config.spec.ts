@@ -480,4 +480,20 @@ describe('validation', () => {
       expect(config.buildDist).toBe(config.buildEs5);
     });
   });
+
+  describe('validatePrimaryPackageOutputTarget', () => {
+    it('should default to false', () => {
+      const { config } = validateConfig(userConfig, bootstrapConfig);
+
+      expect(config.validatePrimaryPackageOutputTarget).toBe(false);
+    });
+
+    it.each([true, false])('should set validatePrimaryPackageOutputTarget to %p', (transformAliasedImportPaths) => {
+      userConfig.transformAliasedImportPaths = transformAliasedImportPaths;
+
+      const { config } = validateConfig(userConfig, bootstrapConfig);
+
+      expect(config.transformAliasedImportPaths).toBe(transformAliasedImportPaths);
+    });
+  });
 });
