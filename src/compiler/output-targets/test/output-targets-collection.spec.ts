@@ -47,7 +47,7 @@ describe('Dist Collection output target', () => {
 
   describe('transform aliased import paths', () => {
     // These tests ensure that the transformer for import paths is called regardless
-    // of the config value (the function will decided whether or not to actually do anything) to avoid
+    // of the config value (the function will decide whether or not to actually do anything) to avoid
     // a race condition with duplicate file writes
     it.each([true, false])(
       'calls function to transform aliased import paths when the output target config flag is `%s`',
