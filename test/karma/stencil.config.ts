@@ -1,5 +1,5 @@
-import nodePolyfills from 'rollup-plugin-node-polyfills';
 import { sass } from '@stencil/sass';
+import nodePolyfills from 'rollup-plugin-node-polyfills';
 
 const { CUSTOM_ELEMENTS_OUT_DIR, DIST_OUT_DIR, TEST_OUTPUT_DIR, WWW_OUT_DIR } = require('./constants');
 import { Config } from '../../internal';
@@ -31,7 +31,6 @@ export const config: Config = {
   extras: {
     appendChildSlotFix: true,
     cloneNodeFix: true,
-    cssVarsShim: true,
     dynamicImportShim: true,
     lifecycleDOMEvents: true,
     safari10: true,
