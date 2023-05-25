@@ -33,7 +33,6 @@ export const config: Config = {
     cloneNodeFix: true,
     cssVarsShim: true,
     lifecycleDOMEvents: true,
-    safari10: true,
     scopedSlotTextContentFix: true,
     scriptDataOpts: true,
     shadowDomShim: true,
