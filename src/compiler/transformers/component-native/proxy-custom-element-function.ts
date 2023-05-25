@@ -84,7 +84,7 @@ export const proxyCustomElement = (
             // update the variable statement containing the updated declaration list
             const updatedVariableStatement = ts.factory.updateVariableStatement(
               stmt,
-              [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
+              stmt.modifiers,
               updatedDeclarationList
             );
 

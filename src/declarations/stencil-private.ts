@@ -762,6 +762,7 @@ export interface ComponentCompilerFeatures {
   hasReflect: boolean;
   hasRenderFn: boolean;
   hasState: boolean;
+  hasStaticInitializedMember: boolean;
   hasStyle: boolean;
   hasVdomAttribute: boolean;
   hasVdomClass: boolean;

@@ -175,11 +175,19 @@ export function transpileModule(
  */
 const prettifyTSOutput = (tsOutput: string): string => tsOutput.replace(/\s+/gm, ' ');
 
-export function getStaticGetter(output: string, prop: string) {
-  const toEvaluate = `return ${output.replace('export', '')}`;
+/**
+ * Helper function for tests that converts stringified JavaScript to a runtime value.
+ * A value from the generated JavaScript is returned based on the provided property name.
+ * @param stringifiedJs the stringified JavaScript
+ * @param propertyName the property name to pull off the generated JavaScript
+ * @returns the value associated with the provided property name. Returns undefined if an error occurs while converting
+ * the stringified JS to JavaScript, or if the property does not exist on the generated JavaScript.
+ */
+export function getStaticGetter(stringifiedJs: string, propertyName: string): string | void {
+  const toEvaluate = `return ${stringifiedJs.replace('export', '')}`;
   try {
     const Obj = new Function(toEvaluate);
-    return Obj()[prop];
+    return Obj()[propertyName];
   } catch (e) {
     console.error(e);
     console.error(toEvaluate);
