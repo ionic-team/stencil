@@ -488,12 +488,15 @@ describe('validation', () => {
       expect(config.validatePrimaryPackageOutputTarget).toBe(false);
     });
 
-    it.each([true, false])('should set validatePrimaryPackageOutputTarget to %p', (transformAliasedImportPaths) => {
-      userConfig.transformAliasedImportPaths = transformAliasedImportPaths;
+    it.each([true, false])(
+      'should set validatePrimaryPackageOutputTarget to %p',
+      (validatePrimaryPackageOutputTarget) => {
+        userConfig.validatePrimaryPackageOutputTarget = validatePrimaryPackageOutputTarget;
 
-      const { config } = validateConfig(userConfig, bootstrapConfig);
+        const { config } = validateConfig(userConfig, bootstrapConfig);
 
-      expect(config.transformAliasedImportPaths).toBe(transformAliasedImportPaths);
-    });
+        expect(config.validatePrimaryPackageOutputTarget).toBe(validatePrimaryPackageOutputTarget);
+      }
+    );
   });
 });
