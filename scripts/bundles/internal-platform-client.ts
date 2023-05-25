@@ -1,8 +1,7 @@
 import fs from 'fs-extra';
 import glob from 'glob';
 import { basename, join } from 'path';
-import { rollup, RollupOptions } from 'rollup';
-import ts from 'typescript';
+import { RollupOptions } from 'rollup';
 
 import { getBanner } from '../utils/banner';
 import type { BuildOptions } from '../utils/options';
@@ -85,52 +84,6 @@ export async function internalClient(opts: BuildOptions) {
           }
         },
       },
-      {
-        name: 'internalClientRuntimeCssShim',
-        resolveId(importee) {
-          if (importee === './polyfills/css-shim.js') {
-            return importee;
-          }
-          return null;
-        },
-
-        async load(id) {
-          // bundle the css-shim into one file
-          if (id === './polyfills/css-shim.js') {
-            const rollupBuild = await rollup({
-              input: join(inputClientDir, 'polyfills', 'css-shim', 'index.js'),
-              onwarn: (message) => {
-                if (/top level of an ES module/.test(message as any)) return;
-                console.error(message);
-              },
-            });
-
-            const { output } = await rollupBuild.generate({ format: 'es' });
-
-            const { minify } = await import('terser');
-
-            const transpileToEs5 = ts.transpileModule(output[0].code, {
-              compilerOptions: {
-                target: ts.ScriptTarget.ES5,
-              },
-            });
-
-            let code = transpileToEs5.outputText;
-
-            if (opts.isProd) {
-              const minifyResults = await minify(code);
-              code = minifyResults.code;
-            }
-
-            const dest = join(outputInternalClientPolyfillsDir, 'css-shim.js');
-            await fs.writeFile(dest, code);
-
-            return code;
-          }
-          return null;
-        },
-      },
-
       {
         name: 'internalClientRuntimePolyfills',
         resolveId(importee) {
