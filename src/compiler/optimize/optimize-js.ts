@@ -13,12 +13,7 @@ export const optimizeJs = async (inputOpts: OptimizeJsInput) => {
 
   try {
     const prettyOutput = !!inputOpts.pretty;
-    const config: Config = {
-      extras: {
-        // TODO(STENCIL-663): Remove code related to deprecated `safari10` field.
-        __deprecated__safari10: true,
-      },
-    };
+    const config: Config = {};
     const sourceTarget = inputOpts.target === 'es5' ? 'es5' : 'latest';
     const minifyOpts = getTerserOptions(config, sourceTarget, prettyOutput);
 
