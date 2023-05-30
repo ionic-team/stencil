@@ -18,6 +18,12 @@ This is a comprehensive list of the breaking changes introduced in the major ver
 
 #### Legacy Browser Support Fields Removed
 
+##### `__deprecated__cssVarsShim`
+
+`extras.__deprecated__cssVarsShim` causes Stencil to include a polyfill for [CSS
+variables](https://developer.mozilla.org/en-US/docs/Web/CSS/--*). For Stencil
+v4.0.0 this field and corresponding behavior has been removed.
+
 ##### `__deprecated__dynamicImportShim`
 
 The `extras.__deprecated__dynamicImportShim` option causes Stencil to include a polyfill for

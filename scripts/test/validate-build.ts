@@ -316,7 +316,6 @@ async function validateTreeshaking(opts: BuildOptions) {
   await validateModuleTreeshake(opts, 'app-data', join(opts.output.internalDir, 'app-data', 'index.js'));
   await validateModuleTreeshake(opts, 'client', join(opts.output.internalDir, 'client', 'index.js'));
   await validateModuleTreeshake(opts, 'patch-browser', join(opts.output.internalDir, 'client', 'patch-browser.js'));
-  await validateModuleTreeshake(opts, 'patch-esm', join(opts.output.internalDir, 'client', 'patch-esm.js'));
   await validateModuleTreeshake(opts, 'shadow-css', join(opts.output.internalDir, 'client', 'shadow-css.js'));
   await validateModuleTreeshake(opts, 'hydrate', join(opts.output.internalDir, 'hydrate', 'index.js'));
   await validateModuleTreeshake(opts, 'stencil-core', join(opts.output.internalDir, 'stencil-core', 'index.js'));
