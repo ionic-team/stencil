@@ -29,8 +29,6 @@ export async function startPuppeteerBrowser(config: ValidatedConfig) {
   env.__STENCIL_BROWSER_WAIT_UNTIL = config.testing.browserWaitUntil;
 
   if (config.flags.devtools) {
-    config.testing.browserDevtools = true;
-    config.testing.browserHeadless = false;
     env.__STENCIL_E2E_DEVTOOLS__ = 'true';
   }
 

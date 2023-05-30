@@ -82,6 +82,39 @@ describe('validateTesting', () => {
     });
   });
 
+  describe('devTools', () => {
+    it('ignores devTools settings if CI is enabled', () => {
+      userConfig.flags = { ...flags, ci: true, devtools: true, e2e: true };
+      userConfig.testing = {};
+
+      const { config } = validateConfig(userConfig, mockLoadConfigInit());
+
+      expect(config.testing.browserDevtools).toBeUndefined();
+    });
+
+    it('sets browserDevTools to true when the devtools flag is set', () => {
+      userConfig.flags = { ...flags, devtools: true, e2e: true };
+      userConfig.testing = {};
+
+      const { config } = validateConfig(userConfig, mockLoadConfigInit());
+
+      expect(config.testing.browserDevtools).toBe(true);
+      // browserHeadless must be false to enabled dev tools (which are headful by definition)
+      expect(config.testing.browserHeadless).toBe(false);
+    });
+
+    it("sets browserDevTools to true when set in a project's config", () => {
+      userConfig.flags = { ...flags, devtools: false, e2e: true };
+      userConfig.testing = { browserDevtools: true };
+
+      const { config } = validateConfig(userConfig, mockLoadConfigInit());
+
+      expect(config.testing.browserDevtools).toBe(true);
+      // browserHeadless must be false to enabled dev tools (which are headful by definition)
+      expect(config.testing.browserHeadless).toBe(false);
+    });
+  });
+
   describe('browserWaitUntil', () => {
     it('sets the default to "load" if no value is provided', () => {
       userConfig.flags = { ...flags, e2e: true };
