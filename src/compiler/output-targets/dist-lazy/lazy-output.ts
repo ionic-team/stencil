@@ -10,7 +10,6 @@ import {
   STENCIL_APP_GLOBALS_ID,
   STENCIL_CORE_ID,
   STENCIL_INTERNAL_CLIENT_PATCH_BROWSER_ID,
-  STENCIL_INTERNAL_CLIENT_PATCH_ESM_ID,
   USER_INDEX_ENTRY_ID,
 } from '../../bundle/entry-alias-ids';
 import { generateComponentBundles } from '../../entries/component-bundles';
@@ -166,14 +165,11 @@ const getLazyEntry = (isBrowser: boolean): string => {
     s.append(`  return bootstrapLazy([/*!__STENCIL_LAZY_DATA__*/], options);\n`);
     s.append(`});\n`);
   } else {
-    s.append(`import { patchEsm } from '${STENCIL_INTERNAL_CLIENT_PATCH_ESM_ID}';\n`);
     s.append(`import { globalScripts } from '${STENCIL_APP_GLOBALS_ID}';\n`);
     s.append(`export const defineCustomElements = (win, options) => {\n`);
     s.append(`  if (typeof window === 'undefined') return Promise.resolve();\n`);
-    s.append(`  return patchEsm().then(() => {\n`);
-    s.append(`    globalScripts();\n`);
-    s.append(`    return bootstrapLazy([/*!__STENCIL_LAZY_DATA__*/], options);\n`);
-    s.append(`  });\n`);
+    s.append(`  globalScripts();\n`);
+    s.append(`  return bootstrapLazy([/*!__STENCIL_LAZY_DATA__*/], options);\n`);
     s.append(`};\n`);
   }
 

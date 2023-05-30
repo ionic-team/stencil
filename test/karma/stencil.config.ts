@@ -31,7 +31,6 @@ export const config: Config = {
   extras: {
     appendChildSlotFix: true,
     cloneNodeFix: true,
-    cssVarsShim: true,
     lifecycleDOMEvents: true,
     scopedSlotTextContentFix: true,
     scriptDataOpts: true,

@@ -11,7 +11,6 @@ import {
   STENCIL_CORE_ID,
   STENCIL_INTERNAL_CLIENT_ID,
   STENCIL_INTERNAL_CLIENT_PATCH_BROWSER_ID,
-  STENCIL_INTERNAL_CLIENT_PATCH_ESM_ID,
   STENCIL_INTERNAL_HYDRATE_ID,
   STENCIL_INTERNAL_ID,
 } from './entry-alias-ids';
@@ -25,7 +24,6 @@ export const coreResolvePlugin = (
   const compilerExe = config.sys.getCompilerExecutingPath();
   const internalClient = getStencilInternalModule(config, compilerExe, 'client/index.js');
   const internalClientPatchBrowser = getStencilInternalModule(config, compilerExe, 'client/patch-browser.js');
-  const internalClientPatchEsm = getStencilInternalModule(config, compilerExe, 'client/patch-esm.js');
   const internalHydrate = getStencilInternalModule(config, compilerExe, 'hydrate/index.js');
 
   return {
@@ -70,15 +68,6 @@ export const coreResolvePlugin = (
           };
         }
         return internalClientPatchBrowser;
-      }
-      if (id === STENCIL_INTERNAL_CLIENT_PATCH_ESM_ID) {
-        if (externalRuntime) {
-          return {
-            id: STENCIL_INTERNAL_CLIENT_PATCH_ESM_ID,
-            external: true,
-          };
-        }
-        return internalClientPatchEsm;
       }
       if (id === STENCIL_INTERNAL_HYDRATE_ID) {
         return internalHydrate;
