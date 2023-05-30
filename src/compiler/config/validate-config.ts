@@ -105,8 +105,6 @@ export const validateConfig = (
   validatedConfig.extras = validatedConfig.extras || {};
   validatedConfig.extras.appendChildSlotFix = !!validatedConfig.extras.appendChildSlotFix;
   validatedConfig.extras.cloneNodeFix = !!validatedConfig.extras.cloneNodeFix;
-  // TODO(STENCIL-659): Remove code implementing the CSS variable shim
-  validatedConfig.extras.__deprecated__cssVarsShim = !!validatedConfig.extras.__deprecated__cssVarsShim;
   validatedConfig.extras.lifecycleDOMEvents = !!validatedConfig.extras.lifecycleDOMEvents;
   validatedConfig.extras.scriptDataOpts = !!validatedConfig.extras.scriptDataOpts;
   // TODO(STENCIL-662): Remove code related to deprecated shadowDomShim field
