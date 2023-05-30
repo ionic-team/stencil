@@ -55,8 +55,6 @@
     "src/cli/config-flags.ts",
     "src/client/index.ts",
     "src/client/client-patch-browser.ts",
-    "src/client/client-patch-esm.ts",
-    "src/client/polyfills/css-shim/index.ts",
     "src/compiler/index.ts",
     "src/compiler/public.ts",
     "src/compiler/sys/modules/index.ts",

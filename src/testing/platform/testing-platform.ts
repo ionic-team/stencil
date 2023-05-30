@@ -26,8 +26,6 @@ export const setPlatformHelpers = (helpers: {
   Object.assign(plt, helpers);
 };
 
-// TODO(STENCIL-659): Remove code implementing the CSS variable shim
-export const cssVarShim: d.CssVarShim = false as any;
 export const supportsListenerOptions = true;
 export const supportsConstructableStylesheets = false;
 /**
