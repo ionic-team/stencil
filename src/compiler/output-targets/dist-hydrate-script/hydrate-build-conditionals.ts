@@ -25,13 +25,9 @@ export const getHydrateBuildConditionals = (cmps: d.ComponentCompilerMeta[]) => 
   build.cssAnnotations = true;
   // TODO(STENCIL-662): Remove code related to deprecated shadowDomShim field
   build.shadowDomShim = true;
-  // TODO(STENCIL-663): Remove code related to deprecated `safari10` field.
-  build.safari10 = false;
   build.hydratedAttribute = false;
   build.hydratedClass = true;
   build.scriptDataOpts = false;
-  // TODO(STENCIL-661): Remove code related to the dynamic import shim
-  build.dynamicImportShim = false;
   build.attachStyles = true;
 
   return build;

@@ -31,9 +31,7 @@ export const config: Config = {
   extras: {
     appendChildSlotFix: true,
     cloneNodeFix: true,
-    dynamicImportShim: true,
     lifecycleDOMEvents: true,
-    safari10: true,
     scopedSlotTextContentFix: true,
     scriptDataOpts: true,
     shadowDomShim: true,

@@ -104,11 +104,7 @@ export const validateConfig = (
   validatedConfig.extras = validatedConfig.extras || {};
   validatedConfig.extras.appendChildSlotFix = !!validatedConfig.extras.appendChildSlotFix;
   validatedConfig.extras.cloneNodeFix = !!validatedConfig.extras.cloneNodeFix;
-  // TODO(STENCIL-661): Remove code related to the dynamic import shim
-  validatedConfig.extras.__deprecated__dynamicImportShim = !!validatedConfig.extras.__deprecated__dynamicImportShim;
   validatedConfig.extras.lifecycleDOMEvents = !!validatedConfig.extras.lifecycleDOMEvents;
-  // TODO(STENCIL-663): Remove code related to deprecated `safari10` field.
-  validatedConfig.extras.__deprecated__safari10 = !!validatedConfig.extras.__deprecated__safari10;
   validatedConfig.extras.scriptDataOpts = !!validatedConfig.extras.scriptDataOpts;
   // TODO(STENCIL-662): Remove code related to deprecated shadowDomShim field
   validatedConfig.extras.__deprecated__shadowDomShim = !!validatedConfig.extras.__deprecated__shadowDomShim;

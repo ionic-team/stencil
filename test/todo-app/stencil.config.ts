@@ -11,8 +11,6 @@ export const config: Config = {
   hashFileNames: false,
   hydratedFlag: null,
   extras: {
-    dynamicImportShim: false,
-    safari10: false,
     scriptDataOpts: false,
     shadowDomShim: false,
   },
