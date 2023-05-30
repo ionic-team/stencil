@@ -12,7 +12,6 @@ export const config: Config = {
   hydratedFlag: null,
   extras: {
     cssVarsShim: false,
-    dynamicImportShim: false,
     safari10: false,
     scriptDataOpts: false,
     shadowDomShim: false,
