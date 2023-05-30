@@ -25,6 +25,11 @@ the [dynamic `import()`
 function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import)
 for use at runtime. For Stencil v4.0.0 this field and corresponding behavior has been removed.
 
+##### `__deprecated__safari10`
+
+If `extras.__deprecated__safari10` is set to `true` the Stencil runtime will patch ES module
+support for Safari 10. In Stencil v4.0.0 this field and corresponding behavior has been removed.
+
 ## Stencil v3.0.0
 
 * [General](#general)

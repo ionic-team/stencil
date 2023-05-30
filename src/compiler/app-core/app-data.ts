@@ -150,8 +150,6 @@ export const updateBuildConditionals = (config: Config, b: BuildConditionals) =>
   b.slotChildNodesFix = config.extras.slotChildNodesFix;
   b.cloneNodeFix = config.extras.cloneNodeFix;
   b.lifecycleDOMEvents = !!(b.isDebug || config._isTesting || config.extras.lifecycleDOMEvents);
-  // TODO(STENCIL-663): Remove code related to deprecated `safari10` field.
-  b.safari10 = config.extras.__deprecated__safari10;
   b.scopedSlotTextContentFix = !!config.extras.scopedSlotTextContentFix;
   b.scriptDataOpts = config.extras.scriptDataOpts;
   // TODO(STENCIL-662): Remove code related to deprecated shadowDomShim field
