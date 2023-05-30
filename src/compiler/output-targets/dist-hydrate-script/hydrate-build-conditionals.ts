@@ -7,8 +7,6 @@ export const getHydrateBuildConditionals = (cmps: d.ComponentCompilerMeta[]) => 
   build.slotRelocation = true;
   build.lazyLoad = true;
   build.hydrateServerSide = true;
-  // TODO(STENCIL-659): Remove code implementing the CSS variable shim
-  build.cssVarShim = false;
   build.hydrateClientSide = true;
   build.isDebug = false;
   build.isDev = false;

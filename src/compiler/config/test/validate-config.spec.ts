@@ -387,8 +387,6 @@ describe('validation', () => {
     const { config } = validateConfig(userConfig, bootstrapConfig);
     expect(config.extras.appendChildSlotFix).toBe(false);
     expect(config.extras.cloneNodeFix).toBe(false);
-    // TODO(STENCIL-659): Remove code implementing the CSS variable shim
-    expect(config.extras.__deprecated__cssVarsShim).toBe(false);
     expect(config.extras.lifecycleDOMEvents).toBe(false);
     expect(config.extras.scriptDataOpts).toBe(false);
     // TODO(STENCIL-662): Remove code related to deprecated shadowDomShim field
