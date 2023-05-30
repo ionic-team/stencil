@@ -107,11 +107,7 @@ const getSystemLoader = async (
       System.import(url.href);
     };
 
-    if (window.__cssshim) {
-      window.__cssshim.i().then(start);
-    } else {
-      start();
-    }
+    start();
 
     // Note: using .call(window) here because the self-executing function needs
     // to be scoped to the window object for the ES6Promise polyfill to work

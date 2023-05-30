@@ -11,7 +11,6 @@ export const config: Config = {
   hashFileNames: false,
   hydratedFlag: null,
   extras: {
-    cssVarsShim: false,
     scriptDataOpts: false,
     shadowDomShim: false,
   },

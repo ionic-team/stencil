@@ -81,7 +81,6 @@ export const optimizeModule = async (
         compressOpts.passes = 2;
         compressOpts.global_defs = {
           supportsListenerOptions: true,
-          'plt.$cssShim$': false,
         };
         compressOpts.pure_funcs = compressOpts.pure_funcs || [];
         compressOpts.pure_funcs = ['getHostRef', ...compressOpts.pure_funcs];

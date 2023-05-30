@@ -1,5 +1,5 @@
 import { BUILD, NAMESPACE } from '@app-data';
-import { consoleDevInfo, doc, H, plt, promiseResolve, win } from '@platform';
+import { consoleDevInfo, doc, H, promiseResolve } from '@platform';
 
 import type * as d from '../declarations';
 
@@ -7,13 +7,6 @@ export const patchBrowser = (): Promise<d.CustomElementsDefineOptions> => {
   // NOTE!! This fn cannot use async/await!
   if (BUILD.isDev && !BUILD.isTesting) {
     consoleDevInfo('Running in development mode.');
-  }
-
-  // TODO(STENCIL-659): Remove code implementing the CSS variable shim
-  if (BUILD.cssVarShim) {
-    // shim css vars
-    // TODO(STENCIL-659): Remove code implementing the CSS variable shim
-    plt.$cssShim$ = (win as any).__cssshim;
   }
 
   if (BUILD.cloneNodeFix) {
