@@ -1,6 +1,7 @@
 name: Unit Tests
 
 on:
+  merge_group:
   workflow_call:
     # Make this a reusable workflow, no value needed
     # https://docs.github.com/en/actions/using-workflows/reusing-workflows
