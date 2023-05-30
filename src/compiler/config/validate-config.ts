@@ -107,8 +107,6 @@ export const validateConfig = (
   // TODO(STENCIL-659): Remove code implementing the CSS variable shim
   validatedConfig.extras.__deprecated__cssVarsShim = !!validatedConfig.extras.__deprecated__cssVarsShim;
   validatedConfig.extras.lifecycleDOMEvents = !!validatedConfig.extras.lifecycleDOMEvents;
-  // TODO(STENCIL-663): Remove code related to deprecated `safari10` field.
-  validatedConfig.extras.__deprecated__safari10 = !!validatedConfig.extras.__deprecated__safari10;
   validatedConfig.extras.scriptDataOpts = !!validatedConfig.extras.scriptDataOpts;
   // TODO(STENCIL-662): Remove code related to deprecated shadowDomShim field
   validatedConfig.extras.__deprecated__shadowDomShim = !!validatedConfig.extras.__deprecated__shadowDomShim;
