@@ -34,44 +34,20 @@ export const patchBrowser = (): Promise<d.CustomElementsDefineOptions> => {
   }
 
   // @ts-ignore
-  const scriptElm =
-    // TODO(STENCIL-663): Remove code related to deprecated `safari10` field.
-    BUILD.scriptDataOpts || BUILD.safari10
-      ? Array.from(doc.querySelectorAll('script')).find(
-          (s) =>
-            new RegExp(`\/${NAMESPACE}(\\.esm)?\\.js($|\\?|#)`).test(s.src) ||
-            s.getAttribute('data-stencil-namespace') === NAMESPACE
-        )
-      : null;
+  const scriptElm = BUILD.scriptDataOpts
+    ? Array.from(doc.querySelectorAll('script')).find(
+        (s) =>
+          new RegExp(`\/${NAMESPACE}(\\.esm)?\\.js($|\\?|#)`).test(s.src) ||
+          s.getAttribute('data-stencil-namespace') === NAMESPACE
+      )
+    : null;
   const importMeta = import.meta.url;
   const opts = BUILD.scriptDataOpts ? ((scriptElm as any) || {})['data-opts'] || {} : {};
 
-  // TODO(STENCIL-663): Remove code related to deprecated `safari10` field.
-  if (BUILD.safari10 && 'onbeforeload' in scriptElm && !history.scrollRestoration /* IS_ESM_BUILD */) {
-    // Safari < v11 support: This IF is true if it's Safari below v11.
-    // This fn cannot use async/await since Safari didn't support it until v11,
-    // however, Safari 10 did support modules. Safari 10 also didn't support "nomodule",
-    // so both the ESM file and nomodule file would get downloaded. Only Safari
-    // has 'onbeforeload' in the script, and "history.scrollRestoration" was added
-    // to Safari in v11. Return a noop then() so the async/await ESM code doesn't continue.
-    // IS_ESM_BUILD is replaced at build time so this check doesn't happen in systemjs builds.
-    return {
-      then() {
-        /* promise noop */
-      },
-    } as any;
+  if (importMeta !== '') {
+    opts.resourcesUrl = new URL('.', importMeta).href;
   }
 
-  // TODO(STENCIL-663): Remove code related to deprecated `safari10` field.
-  if (!BUILD.safari10 && importMeta !== '') {
-    opts.resourcesUrl = new URL('.', importMeta).href;
-    // TODO(STENCIL-663): Remove code related to deprecated `safari10` field.
-  } else if (BUILD.safari10) {
-    opts.resourcesUrl = new URL(
-      '.',
-      new URL(scriptElm.getAttribute('data-resources-url') || scriptElm.src, win.location.href)
-    ).href;
-  }
   return promiseResolve(opts);
 };
 

@@ -311,17 +311,6 @@ export interface ConfigExtras {
    */
   lifecycleDOMEvents?: boolean;
 
-  // TODO(STENCIL-663): Remove code related to deprecated `safari10` field.
-  /**
-   * Safari 10 supports ES modules with `<script type="module">`, however, it did not implement
-   * `<script nomodule>`. When set to `true`, the runtime will patch support for Safari 10
-   * due to its lack of `nomodule` support.
-   * Defaults to `false`.
-   *
-   * @deprecated Since Stencil v3.0.0, Safari 10 is no longer supported.
-   */
-  __deprecated__safari10?: boolean;
-
   /**
    * It is possible to assign data to the actual `<script>` element's `data-opts` property,
    * which then gets passed to Stencil's initial bootstrap. This feature is only required
