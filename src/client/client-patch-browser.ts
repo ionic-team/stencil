@@ -1,5 +1,5 @@
 import { BUILD, NAMESPACE } from '@app-data';
-import { consoleDevInfo, doc, H, plt, promiseResolve, win } from '@platform';
+import { consoleDevInfo, doc, H, promiseResolve } from '@platform';
 
 import type * as d from '../declarations';
 
