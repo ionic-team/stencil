@@ -1,4 +1,4 @@
-import { generatePreamble, getDynamicImportFunction } from '@utils';
+import { generatePreamble } from '@utils';
 import type { OutputOptions, RollupBuild } from 'rollup';
 
 import type * as d from '../../../declarations';
@@ -24,11 +24,7 @@ export const generateEsmBrowser = async (
       preferConst: true,
       sourcemap: config.sourceMap,
     };
-    // TODO(STENCIL-661): Remove code related to the dynamic import shim
-    if (config.extras.__deprecated__dynamicImportShim) {
-      // for Edge 16-18
-      esmOpts.dynamicImportFunction = getDynamicImportFunction(config.fsNamespace);
-    }
+
     const output = await generateRollupOutput(rollupBuild, esmOpts, config, buildCtx.entryModules);
 
     if (output != null) {

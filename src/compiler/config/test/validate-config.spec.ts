@@ -389,8 +389,6 @@ describe('validation', () => {
     expect(config.extras.cloneNodeFix).toBe(false);
     // TODO(STENCIL-659): Remove code implementing the CSS variable shim
     expect(config.extras.__deprecated__cssVarsShim).toBe(false);
-    // TODO(STENCIL-661): Remove code related to the dynamic import shim
-    expect(config.extras.__deprecated__dynamicImportShim).toBe(false);
     expect(config.extras.lifecycleDOMEvents).toBe(false);
     // TODO(STENCIL-663): Remove code related to deprecated `safari10` field.
     expect(config.extras.__deprecated__safari10).toBe(false);
