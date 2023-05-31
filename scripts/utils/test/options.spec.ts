@@ -88,10 +88,10 @@ describe('release options', () => {
 
         expect(version).toBeDefined();
         // Expect a version string with the format 0.0.0-dev-[EPOCH_TIME]-[GIT_SHA_7_CHARS]
-        expect(version).toMatch(new RegExp(`\\d+\\.\\d+\\.\\d+-dev.${FAKE_SYSTEM_TIME_S}.\\w{7}`));
+        expect(version).toMatch(new RegExp(`\\d+\\.\\d+\\.\\d+(-(.{1,}))?-dev.${FAKE_SYSTEM_TIME_S}.\\w{7}`));
       });
 
-      it('uses the provided the version', () => {
+      it('uses the provided version', () => {
         const expectedVersion = '3.0.0-dev-1234';
         const { version } = getOptions(ROOT_DIR, { version: expectedVersion });
 
