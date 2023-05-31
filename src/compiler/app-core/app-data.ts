@@ -156,8 +156,6 @@ export const updateBuildConditionals = (config: Config, b: BuildConditionals) =>
   b.safari10 = config.extras.__deprecated__safari10;
   b.scopedSlotTextContentFix = !!config.extras.scopedSlotTextContentFix;
   b.scriptDataOpts = config.extras.scriptDataOpts;
-  // TODO(STENCIL-662): Remove code related to deprecated shadowDomShim field
-  b.shadowDomShim = config.extras.__deprecated__shadowDomShim;
   b.attachStyles = true;
   b.invisiblePrehydration = typeof config.invisiblePrehydration === 'undefined' ? true : config.invisiblePrehydration;
   // TODO(STENCIL-662): Remove code related to deprecated shadowDomShim field
