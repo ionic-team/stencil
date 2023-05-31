@@ -47,7 +47,7 @@ export const connectedCallback = (elm: d.HostElement) => {
         if (
           BUILD.hydrateServerSide ||
           ((BUILD.slot || BUILD.shadowDom) &&
-            // TODO(STENCIL-662): Remove code related to deprecated shadowDomShim field
+            // TODO(STENCIL-854): Remove code related to legacy shadowDomShim field
             cmpMeta.$flags$ & (CMP_FLAGS.hasSlotRelocation | CMP_FLAGS.needsShadowDomShim))
         ) {
           setContentReference(elm);

@@ -32,7 +32,7 @@ export const proxyCustomElement = (Cstr: any, compactMeta: d.ComponentRuntimeMet
     cmpMeta.$attrsToReflect$ = [];
   }
   if (BUILD.shadowDom && !supportsShadow && cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation) {
-    // TODO(STENCIL-662): Remove code related to deprecated shadowDomShim field
+    // TODO(STENCIL-854): Remove code related to legacy shadowDomShim field
     cmpMeta.$flags$ |= CMP_FLAGS.needsShadowDomShim;
   }
 

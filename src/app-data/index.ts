@@ -67,7 +67,7 @@ export const BUILD: BuildConditionals = {
   safari10: false,
   scriptDataOpts: false,
   scopedSlotTextContentFix: false,
-  // TODO(STENCIL-662): Remove code related to deprecated shadowDomShim field
+  // TODO(STENCIL-854): Remove code related to legacy shadowDomShim field
   shadowDomShim: false,
   slotChildNodesFix: false,
   invisiblePrehydration: true,

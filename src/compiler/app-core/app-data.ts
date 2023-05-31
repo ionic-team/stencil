@@ -158,7 +158,7 @@ export const updateBuildConditionals = (config: Config, b: BuildConditionals) =>
   b.scriptDataOpts = config.extras.scriptDataOpts;
   b.attachStyles = true;
   b.invisiblePrehydration = typeof config.invisiblePrehydration === 'undefined' ? true : config.invisiblePrehydration;
-  // TODO(STENCIL-662): Remove code related to deprecated shadowDomShim field
+  // TODO(STENCIL-854): Remove code related to legacy shadowDomShim field
   if (b.shadowDomShim) {
     b.slotRelocation = b.slot;
   }

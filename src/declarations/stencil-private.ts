@@ -185,7 +185,7 @@ export interface BuildConditionals extends Partial<BuildFeatures> {
   // TODO(STENCIL-663): Remove code related to deprecated `safari10` field.
   safari10?: boolean;
   scriptDataOpts?: boolean;
-  // TODO(STENCIL-662): Remove code related to deprecated shadowDomShim field
+  // TODO(STENCIL-854): Remove code related to legacy shadowDomShim field
   shadowDomShim?: boolean;
   asyncQueue?: boolean;
   transformTagName?: boolean;
