@@ -43,6 +43,4 @@ const REMOVE_STATIC_GETTERS = new Set([
   'styleUrl',
   'watchers',
   'styleUrls',
-  'contextProps',
-  'connectProps',
 ]);

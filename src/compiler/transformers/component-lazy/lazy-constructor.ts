@@ -3,7 +3,6 @@ import ts from 'typescript';
 import type * as d from '../../../declarations';
 import { addCoreRuntimeApi, REGISTER_INSTANCE, RUNTIME_APIS } from '../core-runtime-apis';
 import { addCreateEvents } from '../create-event';
-import { addLegacyProps } from '../legacy-props';
 import { retrieveTsModifiers } from '../transform-utils';
 
 export const updateLazyComponentConstructor = (
@@ -24,7 +23,6 @@ export const updateLazyComponentConstructor = (
       registerInstanceStatement(moduleFile),
       ...addCreateEvents(moduleFile, cmp),
       ...cstrMethod.body.statements,
-      ...addLegacyProps(moduleFile, cmp),
     ]);
 
     classMembers[cstrMethodIndex] = ts.factory.updateConstructorDeclaration(
@@ -38,14 +36,7 @@ export const updateLazyComponentConstructor = (
     const cstrMethod = ts.factory.createConstructorDeclaration(
       undefined,
       cstrMethodArgs,
-      ts.factory.createBlock(
-        [
-          registerInstanceStatement(moduleFile),
-          ...addCreateEvents(moduleFile, cmp),
-          ...addLegacyProps(moduleFile, cmp),
-        ],
-        true
-      )
+      ts.factory.createBlock([registerInstanceStatement(moduleFile), ...addCreateEvents(moduleFile, cmp)], true)
     );
     classMembers.unshift(cstrMethod);
   }

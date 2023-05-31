@@ -171,8 +171,6 @@ export {
   forceUpdate,
   Fragment,
   getAssetPath,
-  getConnect,
-  getContext,
   getElement,
   getMode,
   getRenderingRef,

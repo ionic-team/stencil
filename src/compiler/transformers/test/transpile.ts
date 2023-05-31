@@ -134,8 +134,6 @@ export function transpileModule(
   const methods = cmp ? cmp.methods : null;
   const method = methods ? methods[0] : null;
   const elementRef = cmp ? cmp.elementRef : null;
-  const legacyConnect = cmp ? cmp.legacyConnect : null;
-  const legacyContext = cmp ? cmp.legacyContext : null;
 
   return {
     buildCtx,
@@ -148,8 +146,6 @@ export function transpileModule(
     elementRef,
     event,
     events,
-    legacyConnect,
-    legacyContext,
     listener,
     listeners,
     method,

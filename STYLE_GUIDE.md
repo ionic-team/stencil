@@ -164,14 +164,7 @@ export class Something {
   @State() status = 0;
 
   /**
-   * 4. Internal props (context and connect)
-   * Inlined decorator, alphabetical order.
-   */
-  @Prop({ context: 'config' }) config: Config;
-  @Prop({ connect: 'ion-menu-controller' }) lazyMenuCtrl: Lazy<MenuController>;
-
-  /**
-   * 5. Public Property API
+   * 4. Public Property API
    * Inlined decorator, alphabetical order. These are
    * different than "own properties" in that public props
    * are exposed as properties and attributes on the host element.
