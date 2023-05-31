@@ -4,9 +4,27 @@ This is a comprehensive list of the breaking changes introduced in the major ver
 
 ## Versions
 
+- [Stencil 4.x](#stencil-v400)
 - [Stencil 3.x](#stencil-v300)
 - [Stencil 2.x](#stencil-two)
 - [Stencil 1.x](#stencil-one)
+
+## Stencil v4.0.0
+
+- [General](#general)
+  - [Legacy Browser Support Fields Removed](#legacy-browser-support-fields-removed)
+
+### General
+
+#### Legacy Browser Support Fields Removed
+
+##### `__deprecated__shadowDomShim`
+
+If `extras.__deprecated__shadowDomShim` is set to `true` the Stencil runtime will check
+whether a shim for [shadow
+DOM](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_shadow_DOM)
+is needed in the current browser, and include one if so. For Stencil v4.0.0
+this field and its corresponding behavior has been removed.
 
 ## Stencil v3.0.0
 

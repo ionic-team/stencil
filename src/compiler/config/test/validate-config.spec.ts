@@ -395,8 +395,6 @@ describe('validation', () => {
     // TODO(STENCIL-663): Remove code related to deprecated `safari10` field.
     expect(config.extras.__deprecated__safari10).toBe(false);
     expect(config.extras.scriptDataOpts).toBe(false);
-    // TODO(STENCIL-662): Remove code related to deprecated shadowDomShim field
-    expect(config.extras.__deprecated__shadowDomShim).toBe(false);
     expect(config.extras.slotChildNodesFix).toBe(false);
     expect(config.extras.initializeNextTick).toBe(false);
     expect(config.extras.tagNameTransform).toBe(false);

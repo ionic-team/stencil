@@ -15,6 +15,5 @@ export const config: Config = {
     dynamicImportShim: false,
     safari10: false,
     scriptDataOpts: false,
-    shadowDomShim: false,
   },
 };

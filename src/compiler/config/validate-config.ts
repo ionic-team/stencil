@@ -112,8 +112,6 @@ export const validateConfig = (
   // TODO(STENCIL-663): Remove code related to deprecated `safari10` field.
   validatedConfig.extras.__deprecated__safari10 = !!validatedConfig.extras.__deprecated__safari10;
   validatedConfig.extras.scriptDataOpts = !!validatedConfig.extras.scriptDataOpts;
-  // TODO(STENCIL-662): Remove code related to deprecated shadowDomShim field
-  validatedConfig.extras.__deprecated__shadowDomShim = !!validatedConfig.extras.__deprecated__shadowDomShim;
   validatedConfig.extras.slotChildNodesFix = !!validatedConfig.extras.slotChildNodesFix;
   validatedConfig.extras.initializeNextTick = !!validatedConfig.extras.initializeNextTick;
   validatedConfig.extras.tagNameTransform = !!validatedConfig.extras.tagNameTransform;
