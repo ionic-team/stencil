@@ -88,6 +88,8 @@ describe('release options', () => {
 
         expect(version).toBeDefined();
         // Expect a version string with the format 0.0.0-dev-[EPOCH_TIME]-[GIT_SHA_7_CHARS]
+        // or, contain a possible pre-release string like 0.0.0-beta.0-dev-[EPOCH_TIME]-[GIT_SHA_7_CHARS]
+
         expect(version).toMatch(new RegExp(`\\d+\\.\\d+\\.\\d+(-(.{1,}))?-dev.${FAKE_SYSTEM_TIME_S}.\\w{7}`));
       });
 
