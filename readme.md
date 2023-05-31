@@ -27,6 +27,9 @@
   <a href="https://twitter.com/stenciljs">
     <img src="https://img.shields.io/badge/follow-%40stenciljs-1DA1F2?logo=twitter" alt="Follow @stenciljs">
   </a>
+  <a href="[https://ionic.link/discord](https://chat.stenciljs.com)">
+    <img src="https://img.shields.io/discord/520266681499779082?color=7289DA&label=%23stencil&logo=discord&logoColor=white" alt="Official Ionic Discord" />
+  </a>
 </p>
 
 <h2 align="center">
@@ -38,8 +41,8 @@
   <span> · </span>
   <a href="https://ionicframework.com/blog/tag/stencil/">Blog</a>
   <br />
-  Community: 
-  <a href="https://stencil-worldwide.slack.com">Slack</a>
+  Community:
+  <a href="https://chat.stenciljs.com">Discord</a>
   <span> · </span>
   <a href="https://forum.ionicframework.com/c/stencil/21/">Forums</a>
   <span> · </span>

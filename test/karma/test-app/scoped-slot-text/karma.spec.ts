@@ -47,7 +47,7 @@ describe('scoped-slot-text', () => {
      */
     expect(label).toBeDefined();
     expect(label.childNodes.length).toBe(2);
-    expect(label.childNodes[0]['s-cr']).toBeDefined();
+    expect((label.childNodes[0] as any)['s-cr'] as string).toBeDefined();
     expect(label.childNodes[1].textContent).toBe('New text for label structure testing');
   });
 });

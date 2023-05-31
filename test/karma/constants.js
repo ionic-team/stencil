@@ -1,6 +1,6 @@
 const path = require('path');
 
-TEST_ROOT_OUT_DIR = 'test-output';
+global.TEST_ROOT_OUT_DIR = 'test-output';
 
 module.exports = {
   TEST_OUTPUT_DIR: TEST_ROOT_OUT_DIR,

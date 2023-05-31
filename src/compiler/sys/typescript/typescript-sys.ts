@@ -198,7 +198,6 @@ export const patchTypescript = (config: d.Config, inMemoryFs: InMemoryFileSystem
       patchTsSystemWatch(config.sys, ts.sys);
     }
     patchTypeScriptResolveModule(config, inMemoryFs);
-    patchTypeScriptGetParsedCommandLineOfConfigFile();
     (ts as any).__patched = true;
   }
 };
@@ -242,27 +241,4 @@ export const getTypescriptPathFromUrl = (config: d.Config, tsExecutingUrl: strin
     return normalizePath(tsNodePath);
   }
   return url;
-};
-
-export const patchTypeScriptGetParsedCommandLineOfConfigFile = () => {
-  const orgGetParsedCommandLineOfConfigFile = ts.getParsedCommandLineOfConfigFile;
-
-  ts.getParsedCommandLineOfConfigFile = (configFileName, optionsToExtend, host, extendedConfigCache) => {
-    const results = orgGetParsedCommandLineOfConfigFile(configFileName, optionsToExtend, host, extendedConfigCache);
-
-    // manually filter out any .spec or .e2e files
-    results.fileNames = results.fileNames.filter((f) => {
-      // filter e2e tests
-      if (f.includes('.e2e.') || f.includes('/e2e.')) {
-        return false;
-      }
-      // filter spec tests
-      if (f.includes('.spec.') || f.includes('/spec.')) {
-        return false;
-      }
-      return true;
-    });
-
-    return results;
-  };
 };

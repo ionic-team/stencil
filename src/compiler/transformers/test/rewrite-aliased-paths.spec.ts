@@ -7,6 +7,7 @@ import ts from 'typescript';
 import { patchTypescript } from '../../sys/typescript/typescript-sys';
 import { rewriteAliasedDTSImportPaths, rewriteAliasedSourceFileImportPaths } from '../rewrite-aliased-paths';
 import { transpileModule } from './transpile';
+import { formatCode } from './utils';
 
 /**
  * Helper function for running the transpilation for tests in this module.
@@ -61,8 +62,10 @@ describe('rewrite alias module paths transform', () => {
       }
     `);
 
-    expect(t.outputText).toBe(
-      'import { foo } from "./name/space";export class CmpA { render() { return h("some-cmp", null, foo("bar")); }}'
+    expect(formatCode(t.outputText)).toBe(
+      formatCode(
+        'import { foo } from "./name/space";export class CmpA { render() { return h("some-cmp", null, foo("bar")); }}'
+      )
     );
   });
 
@@ -76,8 +79,10 @@ describe('rewrite alias module paths transform', () => {
       }
     `);
 
-    expect(t.outputText).toBe(
-      'import { foo } from "./name/space/subdir";export class CmpA { render() { return h("some-cmp", null, foo("bar")); }}'
+    expect(formatCode(t.outputText)).toBe(
+      formatCode(
+        'import { foo } from "./name/space/subdir";export class CmpA { render() { return h("some-cmp", null, foo("bar")); }}'
+      )
     );
   });
 
@@ -95,8 +100,8 @@ describe('rewrite alias module paths transform', () => {
       }
     `);
 
-    expect(t.declarationOutputText).toBe(
-      'import { Foo } from "./name/space";export declare class CmpA { field: Foo; render(): any;}'
+    expect(formatCode(t.declarationOutputText)).toBe(
+      formatCode('import { Foo } from "./name/space";export declare class CmpA { field: Foo; render(): any;}')
     );
   });
 
@@ -109,8 +114,8 @@ describe('rewrite alias module paths transform', () => {
       }
     `);
 
-    expect(t.declarationOutputText).toBe(
-      'import { Foo } from "./name/space/subdir";export declare function fooUtil(foo: Foo): Foo;'
+    expect(formatCode(t.declarationOutputText)).toBe(
+      formatCode('import { Foo } from "./name/space/subdir";export declare function fooUtil(foo: Foo): Foo;')
     );
   });
 
@@ -124,8 +129,10 @@ describe('rewrite alias module paths transform', () => {
       }
     `);
 
-    expect(t.declarationOutputText).toBe(
-      'import { Foo } from "./name/space/subdir";import { Bar } from "./name/space";export declare function fooUtil(foo: Foo): Bar;'
+    expect(formatCode(t.declarationOutputText)).toBe(
+      formatCode(
+        'import { Foo } from "./name/space/subdir";import { Bar } from "./name/space";export declare function fooUtil(foo: Foo): Bar;'
+      )
     );
   });
 
@@ -139,8 +146,10 @@ describe('rewrite alias module paths transform', () => {
       }
     `);
 
-    expect(t.declarationOutputText).toBe(
-      'import { Foo } from "./name/space/subdir";import { Bar } from "./name/space";export declare function fooUtil(foo: Foo): Bar;'
+    expect(formatCode(t.declarationOutputText)).toBe(
+      formatCode(
+        'import { Foo } from "./name/space/subdir";import { Bar } from "./name/space";export declare function fooUtil(foo: Foo): Bar;'
+      )
     );
   });
 
@@ -168,8 +177,10 @@ describe('rewrite alias module paths transform', () => {
     //
     // we need to test that the relative path from `name/component.tsx` to
     // `name/space.ts` is resolved correctly as `'./space'`.
-    expect(t.outputText).toBe(
-      'import { foo } from "./space";export class CmpA { render() { return h("some-cmp", null, foo("bar")); }}'
+    expect(formatCode(t.outputText)).toBe(
+      formatCode(
+        'import { foo } from "./space";export class CmpA { render() { return h("some-cmp", null, foo("bar")); }}'
+      )
     );
   });
 
@@ -198,8 +209,15 @@ describe('rewrite alias module paths transform', () => {
     //
     // we need to test that the relative path from `name/component.tsx` to
     // `name/space/subdir.ts` is resolved correctly as `'./space/subdir'`.
-    expect(t.outputText).toBe(
-      'import { foo } from "./space/subdir";export class CmpA { render() { return h("some-cmp", null, foo("bar")); }}'
+    expect(formatCode(t.outputText)).toBe(
+      formatCode(
+        `import { foo } from "./space/subdir";
+        export class CmpA {
+          render() {
+            return h("some-cmp", null, foo("bar"));
+          }
+        }`
+      )
     );
   });
 });

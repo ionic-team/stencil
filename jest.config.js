@@ -11,6 +11,7 @@ module.exports = {
     '@stencil/core/mock-doc': '<rootDir>/mock-doc/index.cjs',
     '@stencil/core/testing': '<rootDir>/testing/index.js',
     '@utils': '<rootDir>/src/utils',
+    '^typescript$': '<rootDir>/scripts/build/typescript-modified-for-jest.js',
   },
   coverageDirectory: './coverage/',
   coverageReporters: ['json', 'lcov', 'text', 'clover'],
