@@ -139,11 +139,7 @@ const updateComponent = async (hostRef: d.HostRef, instance: any, isInitialLoad:
   } else {
     callRender(hostRef, instance, elm);
   }
-  // TODO(STENCIL-659): Remove code implementing the CSS variable shim
-  if (BUILD.cssVarShim && plt.$cssShim$) {
-    // TODO(STENCIL-659): Remove code implementing the CSS variable shim
-    plt.$cssShim$.updateHost(elm);
-  }
+
   if (BUILD.isDev) {
     hostRef.$renderCount$ = hostRef.$renderCount$ === undefined ? 1 : hostRef.$renderCount$ + 1;
     hostRef.$flags$ &= ~HOST_FLAGS.devOnRender;

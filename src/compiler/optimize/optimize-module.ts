@@ -81,7 +81,6 @@ export const optimizeModule = async (
         compressOpts.passes = 2;
         compressOpts.global_defs = {
           supportsListenerOptions: true,
-          'plt.$cssShim$': false,
         };
         compressOpts.pure_funcs = compressOpts.pure_funcs || [];
         compressOpts.pure_funcs = ['getHostRef', ...compressOpts.pure_funcs];
@@ -128,8 +127,7 @@ export const optimizeModule = async (
 export const getTerserOptions = (config: Config, sourceTarget: SourceTarget, prettyOutput: boolean): MinifyOptions => {
   const opts: MinifyOptions = {
     ie8: false,
-    // TODO(STENCIL-663): Remove code related to deprecated `safari10` field.
-    safari10: !!config.extras.__deprecated__safari10,
+    safari10: false,
     format: {},
     sourceMap: config.sourceMap,
   };

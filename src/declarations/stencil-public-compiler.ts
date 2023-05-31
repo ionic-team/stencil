@@ -278,25 +278,6 @@ export interface ConfigExtras {
    */
   cloneNodeFix?: boolean;
 
-  // TODO(STENCIL-659): Remove code implementing the CSS variable shim
-  /**
-   * Include the CSS Custom Property polyfill/shim for legacy browsers. ESM builds will
-   * not include the css vars shim. Defaults to `false`
-   *
-   * @deprecated Since Stencil v3.0.0. IE 11, Edge <= 18, and old Safari
-   * versions are no longer supported.
-   */
-  __deprecated__cssVarsShim?: boolean;
-
-  // TODO(STENCIL-661): Remove code related to the dynamic import shim
-  /**
-   * Dynamic `import()` shim. This is only needed for Edge 18 and below, and
-   * Firefox 67 and below. Defaults to `false`.
-   * @deprecated Since Stencil v3.0.0. IE 11, Edge <= 18, and old Safari
-   * versions are no longer supported.
-   */
-  __deprecated__dynamicImportShim?: boolean;
-
   /**
    * Experimental flag. Projects that use a Stencil library built using the `dist` output target may have trouble lazily
    * loading components when using a bundler such as Vite or Parcel. Setting this flag to `true` will change how Stencil
@@ -319,17 +300,6 @@ export interface ConfigExtras {
    * Dispatches component lifecycle events. Mainly used for testing. Defaults to `false`.
    */
   lifecycleDOMEvents?: boolean;
-
-  // TODO(STENCIL-663): Remove code related to deprecated `safari10` field.
-  /**
-   * Safari 10 supports ES modules with `<script type="module">`, however, it did not implement
-   * `<script nomodule>`. When set to `true`, the runtime will patch support for Safari 10
-   * due to its lack of `nomodule` support.
-   * Defaults to `false`.
-   *
-   * @deprecated Since Stencil v3.0.0, Safari 10 is no longer supported.
-   */
-  __deprecated__safari10?: boolean;
 
   /**
    * It is possible to assign data to the actual `<script>` element's `data-opts` property,

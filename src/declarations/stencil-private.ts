@@ -170,20 +170,14 @@ export interface BuildConditionals extends Partial<BuildFeatures> {
   cssAnnotations?: boolean;
   lazyLoad?: boolean;
   profile?: boolean;
-  // TODO(STENCIL-659): Remove code implementing the CSS variable shim
-  cssVarShim?: boolean;
   constructableCSS?: boolean;
   appendChildSlotFix?: boolean;
   slotChildNodesFix?: boolean;
   scopedSlotTextContentFix?: boolean;
   cloneNodeFix?: boolean;
-  // TODO(STENCIL-661): Remove code related to the dynamic import shim
-  dynamicImportShim?: boolean;
   hydratedAttribute?: boolean;
   hydratedClass?: boolean;
   initializeNextTick?: boolean;
-  // TODO(STENCIL-663): Remove code related to deprecated `safari10` field.
-  safari10?: boolean;
   scriptDataOpts?: boolean;
   // TODO(STENCIL-854): Remove code related to legacy shadowDomShim field
   shadowDomShim?: boolean;
@@ -1113,19 +1107,6 @@ export interface HostRuleHeader {
   value?: string;
 }
 
-// TODO(STENCIL-659): Remove code implementing the CSS variable shim
-export interface CssVarShim {
-  i(): Promise<any>;
-  addLink(linkEl: HTMLLinkElement): Promise<any>;
-  addGlobalStyle(styleEl: HTMLStyleElement): void;
-
-  createHostStyle(hostEl: HTMLElement, templateName: string, cssText: string, isScoped: boolean): HTMLStyleElement;
-
-  removeHost(hostEl: HTMLElement): void;
-  updateHost(hostEl: HTMLElement): void;
-  updateGlobal(): void;
-}
-
 export interface DevClientWindow extends Window {
   ['s-dev-server']: boolean;
   ['s-initial-load']: boolean;
@@ -1744,8 +1725,6 @@ export interface HostRef {
 }
 
 export interface PlatformRuntime {
-  // TODO(STENCIL-659): Remove code implementing the CSS variable shim
-  $cssShim$?: CssVarShim;
   $flags$: number;
   $orgLocNodes$?: Map<string, RenderNode>;
   $resourcesUrl$: string;

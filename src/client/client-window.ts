@@ -4,9 +4,6 @@ import type * as d from '../declarations';
 
 export const win = typeof window !== 'undefined' ? window : ({} as Window);
 
-// TODO(STENCIL-659): Remove code implementing the CSS variable shim
-export const CSS = BUILD.cssVarShim ? (win as any).CSS : null;
-
 export const doc = win.document || ({ head: {} } as Document);
 
 export const H = ((win as any).HTMLElement || (class {} as any)) as HTMLElement;

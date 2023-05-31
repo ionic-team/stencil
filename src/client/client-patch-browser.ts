@@ -1,6 +1,5 @@
 import { BUILD, NAMESPACE } from '@app-data';
-import { consoleDevInfo, doc, H, plt, promiseResolve, win } from '@platform';
-import { getDynamicImportFunction, queryNonceMetaTagContent } from '@utils';
+import { consoleDevInfo, doc, H, promiseResolve } from '@platform';
 
 import type * as d from '../declarations';
 
@@ -8,13 +7,6 @@ export const patchBrowser = (): Promise<d.CustomElementsDefineOptions> => {
   // NOTE!! This fn cannot use async/await!
   if (BUILD.isDev && !BUILD.isTesting) {
     consoleDevInfo('Running in development mode.');
-  }
-
-  // TODO(STENCIL-659): Remove code implementing the CSS variable shim
-  if (BUILD.cssVarShim) {
-    // shim css vars
-    // TODO(STENCIL-659): Remove code implementing the CSS variable shim
-    plt.$cssShim$ = (win as any).__cssshim;
   }
 
   if (BUILD.cloneNodeFix) {
@@ -35,105 +27,21 @@ export const patchBrowser = (): Promise<d.CustomElementsDefineOptions> => {
   }
 
   // @ts-ignore
-  const scriptElm =
-    // TODO(STENCIL-661): Remove code related to the dynamic import shim
-    // TODO(STENCIL-663): Remove code related to deprecated `safari10` field.
-    BUILD.scriptDataOpts || BUILD.safari10 || BUILD.dynamicImportShim
-      ? Array.from(doc.querySelectorAll('script')).find(
-          (s) =>
-            new RegExp(`\/${NAMESPACE}(\\.esm)?\\.js($|\\?|#)`).test(s.src) ||
-            s.getAttribute('data-stencil-namespace') === NAMESPACE
-        )
-      : null;
+  const scriptElm = BUILD.scriptDataOpts
+    ? Array.from(doc.querySelectorAll('script')).find(
+        (s) =>
+          new RegExp(`\/${NAMESPACE}(\\.esm)?\\.js($|\\?|#)`).test(s.src) ||
+          s.getAttribute('data-stencil-namespace') === NAMESPACE
+      )
+    : null;
   const importMeta = import.meta.url;
   const opts = BUILD.scriptDataOpts ? ((scriptElm as any) || {})['data-opts'] || {} : {};
 
-  // TODO(STENCIL-663): Remove code related to deprecated `safari10` field.
-  if (BUILD.safari10 && 'onbeforeload' in scriptElm && !history.scrollRestoration /* IS_ESM_BUILD */) {
-    // Safari < v11 support: This IF is true if it's Safari below v11.
-    // This fn cannot use async/await since Safari didn't support it until v11,
-    // however, Safari 10 did support modules. Safari 10 also didn't support "nomodule",
-    // so both the ESM file and nomodule file would get downloaded. Only Safari
-    // has 'onbeforeload' in the script, and "history.scrollRestoration" was added
-    // to Safari in v11. Return a noop then() so the async/await ESM code doesn't continue.
-    // IS_ESM_BUILD is replaced at build time so this check doesn't happen in systemjs builds.
-    return {
-      then() {
-        /* promise noop */
-      },
-    } as any;
-  }
-
-  // TODO(STENCIL-663): Remove code related to deprecated `safari10` field.
-  if (!BUILD.safari10 && importMeta !== '') {
+  if (importMeta !== '') {
     opts.resourcesUrl = new URL('.', importMeta).href;
-    // TODO(STENCIL-661): Remove code related to the dynamic import shim
-    // TODO(STENCIL-663): Remove code related to deprecated `safari10` field.
-  } else if (BUILD.dynamicImportShim || BUILD.safari10) {
-    opts.resourcesUrl = new URL(
-      '.',
-      new URL(scriptElm.getAttribute('data-resources-url') || scriptElm.src, win.location.href)
-    ).href;
-    // TODO(STENCIL-661): Remove code related to the dynamic import shim
-    if (BUILD.dynamicImportShim) {
-      patchDynamicImport(opts.resourcesUrl, scriptElm);
-    }
-
-    // TODO(STENCIL-661): Remove code related to the dynamic import shim
-    if (BUILD.dynamicImportShim && !win.customElements) {
-      // module support, but no custom elements support (Old Edge)
-      // @ts-ignore
-      return import(/* webpackChunkName: "polyfills-dom" */ './polyfills/dom.js').then(() => opts);
-    }
   }
+
   return promiseResolve(opts);
-};
-
-// TODO(STENCIL-661): Remove code related to the dynamic import shim
-const patchDynamicImport = (base: string, orgScriptElm: HTMLScriptElement) => {
-  const importFunctionName = getDynamicImportFunction(NAMESPACE);
-  try {
-    // test if this browser supports dynamic imports
-    // There is a caching issue in V8, that breaks using import() in Function
-    // By generating a random string, we can workaround it
-    // Check https://bugs.chromium.org/p/chromium/issues/detail?id=990810 for more info
-    (win as any)[importFunctionName] = new Function('w', `return import(w);//${Math.random()}`);
-  } catch (e) {
-    // this shim is specifically for browsers that do support "esm" imports
-    // however, they do NOT support "dynamic" imports
-    // basically this code is for old Edge, v18 and below
-    const moduleMap = new Map<string, any>();
-    (win as any)[importFunctionName] = (src: string) => {
-      const url = new URL(src, base).href;
-      let mod = moduleMap.get(url);
-      if (!mod) {
-        const script = doc.createElement('script');
-        script.type = 'module';
-        script.crossOrigin = orgScriptElm.crossOrigin;
-        script.src = URL.createObjectURL(
-          new Blob([`import * as m from '${url}'; window.${importFunctionName}.m = m;`], {
-            type: 'application/javascript',
-          })
-        );
-
-        // Apply CSP nonce to the script tag if it exists
-        const nonce = plt.$nonce$ ?? queryNonceMetaTagContent(doc);
-        if (nonce != null) {
-          script.setAttribute('nonce', nonce);
-        }
-
-        mod = new Promise((resolve) => {
-          script.onload = () => {
-            resolve((win as any)[importFunctionName].m);
-            script.remove();
-          };
-        });
-        moduleMap.set(url, mod);
-        doc.head.appendChild(script);
-      }
-      return mod;
-    };
-  }
 };
 
 const patchCloneNodeFix = (HTMLElementPrototype: any) => {
