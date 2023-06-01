@@ -34,7 +34,6 @@ export const config: Config = {
     lifecycleDOMEvents: true,
     scopedSlotTextContentFix: true,
     scriptDataOpts: true,
-    shadowDomShim: true,
     slotChildNodesFix: true,
   },
   devServer: {
