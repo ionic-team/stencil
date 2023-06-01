@@ -133,7 +133,7 @@ export async function newSpecPage(opts: NewSpecPageOptions): Promise<SpecPage> {
     BUILD.hydrateClientSide = false;
   }
   BUILD.cloneNodeFix = false;
-  // TODO(STENCIL-662): Remove code related to deprecated shadowDomShim field
+  // TODO(STENCIL-854): Remove code related to legacy shadowDomShim field
   BUILD.shadowDomShim = false;
   BUILD.attachStyles = !!opts.attachStyles;
 

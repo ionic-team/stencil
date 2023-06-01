@@ -102,7 +102,7 @@ export const initializeComponent = async (
         if (
           !BUILD.hydrateServerSide &&
           BUILD.shadowDom &&
-          // TODO(STENCIL-662): Remove code related to deprecated shadowDomShim field
+          // TODO(STENCIL-854): Remove code related to legacy shadowDomShim field
           BUILD.shadowDomShim &&
           cmpMeta.$flags$ & CMP_FLAGS.needsShadowDomShim
         ) {

@@ -89,7 +89,6 @@ export const attachStyles = (hostRef: d.HostRef) => {
     hostRef.$modeName$
   );
 
-  // TODO(STENCIL-662): Remove code related to deprecated shadowDomShim field
   if ((BUILD.shadowDom || BUILD.scoped) && BUILD.cssAnnotations && flags & CMP_FLAGS.needsScopedEncapsulation) {
     // only required when we're NOT using native shadow dom (slot)
     // or this browser doesn't support native shadow dom

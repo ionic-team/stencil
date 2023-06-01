@@ -36,6 +36,14 @@ for use at runtime. For Stencil v4.0.0 this field and corresponding behavior has
 If `extras.__deprecated__safari10` is set to `true` the Stencil runtime will patch ES module
 support for Safari 10. In Stencil v4.0.0 this field and corresponding behavior has been removed.
 
+##### `__deprecated__shadowDomShim`
+
+If `extras.__deprecated__shadowDomShim` is set to `true` the Stencil runtime will check
+whether a shim for [shadow
+DOM](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_shadow_DOM)
+is needed in the current browser, and include one if so. For Stencil v4.0.0
+this field and its corresponding behavior has been removed.
+
 ## Stencil v3.0.0
 
 * [General](#general)
