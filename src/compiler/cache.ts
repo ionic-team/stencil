@@ -8,6 +8,7 @@ export class Cache implements d.Cache {
   private skip = false;
   private sys: d.CompilerSystem;
   private logger: d.Logger;
+  private cacheDir: string;
 
   constructor(private config: d.Config, private cacheFs: InMemoryFileSystem) {
     this.sys = config.sys;
@@ -19,16 +20,18 @@ export class Cache implements d.Cache {
       return;
     }
 
+    this.cacheDir = this.config.cacheDir;
+
     if (!this.config.enableCache || !this.cacheFs) {
       this.config.logger.info(`cache optimizations disabled`);
       this.clearDiskCache();
       return;
     }
 
-    this.config.logger.debug(`cache enabled, cacheDir: ${this.config.cacheDir}`);
+    this.config.logger.debug(`cache enabled, cacheDir: ${this.cacheDir}`);
 
     try {
-      const readmeFilePath = join(this.config.cacheDir, '_README.log');
+      const readmeFilePath = join(this.cacheDir, '_README.log');
       await this.cacheFs.writeFile(readmeFilePath, CACHE_DIR_README);
     } catch (e) {
       this.logger.error(`Cache, initCacheDir: ${e}`);
@@ -44,7 +47,7 @@ export class Cache implements d.Cache {
     if (this.failed >= MAX_FAILED) {
       if (!this.skip) {
         this.skip = true;
-        this.logger.debug(`cache had ${this.failed} failed ops, skip disk ops for remander of build`);
+        this.logger.debug(`cache had ${this.failed} failed ops, skip disk ops for remainder of build`);
       }
       return null;
     }
@@ -54,7 +57,7 @@ export class Cache implements d.Cache {
       result = await this.cacheFs.readFile(this.getCacheFilePath(key));
       this.failed = 0;
       this.skip = false;
-    } catch (e) {
+    } catch (e: unknown) {
       this.failed++;
       result = null;
     }
@@ -72,7 +75,7 @@ export class Cache implements d.Cache {
     try {
       await this.cacheFs.writeFile(this.getCacheFilePath(key), value);
       result = true;
-    } catch (e) {
+    } catch (e: unknown) {
       this.failed++;
       result = false;
     }
@@ -123,8 +126,8 @@ export class Cache implements d.Cache {
       }
 
       const fs = this.cacheFs.sys;
-      const cachedFileNames = await fs.readDir(this.config.cacheDir);
-      const cachedFilePaths = cachedFileNames.map((f) => join(this.config.cacheDir, f));
+      const cachedFileNames = await fs.readDir(this.cacheDir);
+      const cachedFilePaths = cachedFileNames.map((f) => join(this.cacheDir, f));
 
       let totalCleared = 0;
 
@@ -150,16 +153,16 @@ export class Cache implements d.Cache {
 
   async clearDiskCache() {
     if (this.cacheFs != null) {
-      const hasAccess = await this.cacheFs.access(this.config.cacheDir);
+      const hasAccess = await this.cacheFs.access(this.cacheDir);
       if (hasAccess) {
-        await this.cacheFs.remove(this.config.cacheDir);
+        await this.cacheFs.remove(this.cacheDir);
         await this.cacheFs.commit();
       }
     }
   }
 
   private getCacheFilePath(key: string) {
-    return join(this.config.cacheDir, key) + '.log';
+    return join(this.cacheDir, key) + '.log';
   }
 
   getMemoryStats() {

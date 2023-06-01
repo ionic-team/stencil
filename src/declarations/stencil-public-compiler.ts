@@ -247,6 +247,9 @@ export interface StencilConfig {
   cacheDir?: string;
   devInspector?: boolean;
   devServer?: StencilDevServerConfig;
+  /**
+   * @deprecated this flag is no longer used by Stencil and can be safely removed.
+   */
   enableCacheStats?: boolean;
   sys?: CompilerSystem;
   tsconfig?: string;

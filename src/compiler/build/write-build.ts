@@ -32,7 +32,9 @@ export const writeBuild = async (
 
     // successful write
     // kick off writing the cached file stuff
+    await compilerCtx.cache.commit();
     buildCtx.debug(`in-memory-fs: ${compilerCtx.fs.getMemoryStats()}`);
+    buildCtx.debug(`cache: ${compilerCtx.cache.getMemoryStats()}`);
 
     await outputServiceWorkers(config, buildCtx);
     await validateBuildFiles(config, compilerCtx, buildCtx);
