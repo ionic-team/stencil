@@ -1,3 +1,19 @@
+# 🐐 [4.0.0-beta.1](https://github.com/ionic-team/stencil/compare/v3.3.1...v4.0.0-beta.1) (2023-06-02)
+
+### Features
+
+* **compiler** remove shadow dom shim ([#4440](https://github.com/ionic-team/stencil/pull/4440)) ([8ecdec9](https://github.com/ionic-team/stencil/commit/8ecdec9fafffa7d3ca5cc9621e26481c70cfbb89))
+
+### BREAKING CHANGES
+
+See [BREAKING_CHANGES.md - v4.0.0](./BREAKING_CHANGES.md#stencil-v300) for a comprehensive list of breaking changes.
+
+See [the v4.0.0 Migration Guide](https://stenciljs.com/docs/next/introduction/upgrading-to-stencil-four) for a guide to migrate to Stencil v4.0.0.
+
+### Additional Changes
+
+This release includes the latest changes from Stencil v3.3.1.
+
 # 🎬 [4.0.0-beta.0](https://github.com/ionic-team/stencil/compare/v3.3.0...v4.0.0-beta.0) (2023-05-30)
 
 
