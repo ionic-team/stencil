@@ -1,3 +1,19 @@
+# 🐐 [4.0.0-beta.1](https://github.com/ionic-team/stencil/compare/v3.3.1...v4.0.0-beta.1) (2023-06-02)
+
+### Features
+
+* **compiler** remove shadow dom shim ([#4440](https://github.com/ionic-team/stencil/pull/4440)) ([8ecdec9](https://github.com/ionic-team/stencil/commit/8ecdec9fafffa7d3ca5cc9621e26481c70cfbb89))
+
+### BREAKING CHANGES
+
+See [BREAKING_CHANGES.md - v4.0.0](./BREAKING_CHANGES.md#stencil-v300) for a comprehensive list of breaking changes.
+
+See [the v4.0.0 Migration Guide](https://stenciljs.com/docs/next/introduction/upgrading-to-stencil-four) for a guide to migrate to Stencil v4.0.0.
+
+### Additional Changes
+
+This release includes the latest changes from Stencil v3.3.1.
+
 # 🎬 [4.0.0-beta.0](https://github.com/ionic-team/stencil/compare/v3.3.0...v4.0.0-beta.0) (2023-05-30)
 
 
@@ -17,6 +33,15 @@
 See [BREAKING_CHANGES.md - v4.0.0](./BREAKING_CHANGES.md#stencil-v300) for a comprehensive list of breaking changes.
 
 See [the v4.0.0 Migration Guide](https://stenciljs.com/docs/next/introduction/upgrading-to-stencil-four) for a guide to migrate to Stencil v4.0.0.
+
+
+## 🎀 [3.3.1](https://github.com/ionic-team/stencil/compare/v3.3.0...v3.3.1) (2023-06-02)
+
+
+### Bug Fixes
+
+* **compiler:** handle ts 5.0 static members ([#4447](https://github.com/ionic-team/stencil/issues/4447)) ([6dbe9a5](https://github.com/ionic-team/stencil/commit/6dbe9a5b4548ddb2cd08b389509f22f9895639f9)), closes [#4424](https://github.com/ionic-team/stencil/issues/4424)
+* **e2e:** honor devtools and browserDevtools settings ([#4403](https://github.com/ionic-team/stencil/issues/4403)) ([fe433b6](https://github.com/ionic-team/stencil/commit/fe433b6005ac3e544501ab9d6c481864c84b20f2)), closes [#2537](https://github.com/ionic-team/stencil/issues/2537)
 
 
 # 🍭 [3.3.0](https://github.com/ionic-team/stencil/compare/v3.2.2...v3.3.0) (2023-05-23)

@@ -12,6 +12,5 @@ export const config: Config = {
   hydratedFlag: null,
   extras: {
     scriptDataOpts: false,
-    shadowDomShim: false,
   },
 };

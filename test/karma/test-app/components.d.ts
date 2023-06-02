@@ -318,6 +318,12 @@ export namespace Components {
     }
     interface SlottedCss {
     }
+    interface StaticMembers {
+    }
+    interface StaticMembersSeparateExport {
+    }
+    interface StaticMembersSeparateInitializer {
+    }
     interface StaticStyles {
     }
     interface StencilSibling {
@@ -1098,6 +1104,24 @@ declare global {
         prototype: HTMLSlottedCssElement;
         new (): HTMLSlottedCssElement;
     };
+    interface HTMLStaticMembersElement extends Components.StaticMembers, HTMLStencilElement {
+    }
+    var HTMLStaticMembersElement: {
+        prototype: HTMLStaticMembersElement;
+        new (): HTMLStaticMembersElement;
+    };
+    interface HTMLStaticMembersSeparateExportElement extends Components.StaticMembersSeparateExport, HTMLStencilElement {
+    }
+    var HTMLStaticMembersSeparateExportElement: {
+        prototype: HTMLStaticMembersSeparateExportElement;
+        new (): HTMLStaticMembersSeparateExportElement;
+    };
+    interface HTMLStaticMembersSeparateInitializerElement extends Components.StaticMembersSeparateInitializer, HTMLStencilElement {
+    }
+    var HTMLStaticMembersSeparateInitializerElement: {
+        prototype: HTMLStaticMembersSeparateInitializerElement;
+        new (): HTMLStaticMembersSeparateInitializerElement;
+    };
     interface HTMLStaticStylesElement extends Components.StaticStyles, HTMLStencilElement {
     }
     var HTMLStaticStylesElement: {
@@ -1258,6 +1282,9 @@ declare global {
         "slot-replace-wrapper": HTMLSlotReplaceWrapperElement;
         "slot-replace-wrapper-root": HTMLSlotReplaceWrapperRootElement;
         "slotted-css": HTMLSlottedCssElement;
+        "static-members": HTMLStaticMembersElement;
+        "static-members-separate-export": HTMLStaticMembersSeparateExportElement;
+        "static-members-separate-initializer": HTMLStaticMembersSeparateInitializerElement;
         "static-styles": HTMLStaticStylesElement;
         "stencil-sibling": HTMLStencilSiblingElement;
         "svg-attr": HTMLSvgAttrElement;
@@ -1582,6 +1609,12 @@ declare namespace LocalJSX {
     }
     interface SlottedCss {
     }
+    interface StaticMembers {
+    }
+    interface StaticMembersSeparateExport {
+    }
+    interface StaticMembersSeparateInitializer {
+    }
     interface StaticStyles {
     }
     interface StencilSibling {
@@ -1718,6 +1751,9 @@ declare namespace LocalJSX {
         "slot-replace-wrapper": SlotReplaceWrapper;
         "slot-replace-wrapper-root": SlotReplaceWrapperRoot;
         "slotted-css": SlottedCss;
+        "static-members": StaticMembers;
+        "static-members-separate-export": StaticMembersSeparateExport;
+        "static-members-separate-initializer": StaticMembersSeparateInitializer;
         "static-styles": StaticStyles;
         "stencil-sibling": StencilSibling;
         "svg-attr": SvgAttr;
@@ -1853,6 +1889,9 @@ declare module "@stencil/core" {
             "slot-replace-wrapper": LocalJSX.SlotReplaceWrapper & JSXBase.HTMLAttributes<HTMLSlotReplaceWrapperElement>;
             "slot-replace-wrapper-root": LocalJSX.SlotReplaceWrapperRoot & JSXBase.HTMLAttributes<HTMLSlotReplaceWrapperRootElement>;
             "slotted-css": LocalJSX.SlottedCss & JSXBase.HTMLAttributes<HTMLSlottedCssElement>;
+            "static-members": LocalJSX.StaticMembers & JSXBase.HTMLAttributes<HTMLStaticMembersElement>;
+            "static-members-separate-export": LocalJSX.StaticMembersSeparateExport & JSXBase.HTMLAttributes<HTMLStaticMembersSeparateExportElement>;
+            "static-members-separate-initializer": LocalJSX.StaticMembersSeparateInitializer & JSXBase.HTMLAttributes<HTMLStaticMembersSeparateInitializerElement>;
             "static-styles": LocalJSX.StaticStyles & JSXBase.HTMLAttributes<HTMLStaticStylesElement>;
             "stencil-sibling": LocalJSX.StencilSibling & JSXBase.HTMLAttributes<HTMLStencilSiblingElement>;
             "svg-attr": LocalJSX.SvgAttr & JSXBase.HTMLAttributes<HTMLSvgAttrElement>;

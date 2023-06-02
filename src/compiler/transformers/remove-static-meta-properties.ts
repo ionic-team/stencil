@@ -24,6 +24,7 @@ export const removeStaticMetaProperties = (classNode: ts.ClassDeclaration): ts.C
   });
 };
 
+// TODO(STENCIL-856): Move these properties to constants for better type safety within the codebase
 /**
  * A list of static getter names that are specific to Stencil to exclude from a class's member list
  */
@@ -37,6 +38,7 @@ const REMOVE_STATIC_GETTERS = new Set([
   'methods',
   'states',
   'originalStyleUrls',
+  'stencilHasStaticMembersWithInit',
   'styleMode',
   'style',
   'styles',

@@ -54,7 +54,6 @@ export const parseStaticComponentMeta = (
   const docs = serializeSymbol(typeChecker, symbol);
   const isCollectionDependency = moduleFile.isCollectionDependency;
   const encapsulation = parseStaticEncapsulation(staticMembers);
-
   const cmp: d.ComponentCompilerMeta = {
     tagName: tagName,
     excludeFromCollection: moduleFile.excludeFromCollection,
@@ -62,6 +61,7 @@ export const parseStaticComponentMeta = (
     componentClassName: cmpNode.name ? cmpNode.name.text : '',
     elementRef: parseStaticElementRef(staticMembers),
     encapsulation,
+    hasStaticInitializedMember: getStaticValue(staticMembers, 'stencilHasStaticMembersWithInit') ?? false,
     shadowDelegatesFocus: parseStaticShadowDelegatesFocus(encapsulation, staticMembers),
     properties: parseStaticProps(staticMembers),
     virtualProperties: parseVirtualProps(docs),

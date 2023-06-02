@@ -83,6 +83,19 @@ describe('proxy-custom-element-function', () => {
 
       expect(formatCode(transpiledModule.outputText)).toContain(
         formatCode(
+          `const ${componentClassName} = /*@__PURE__*/ __stencil_proxyCustomElement(class ${componentClassName} extends HTMLElement {}, true);`
+        )
+      );
+    });
+
+    it('wraps an exported class initializer in a proxyCustomElement call', () => {
+      const code = `export const ${componentClassName} = class extends HTMLElement {};`;
+
+      const transformer = proxyCustomElement(compilerCtx, transformOpts);
+      const transpiledModule = transpileModule(code, null, compilerCtx, [], [transformer]);
+
+      expect(formatCode(transpiledModule.outputText)).toContain(
+        formatCode(
           `export const ${componentClassName} = /*@__PURE__*/ __stencil_proxyCustomElement(class ${componentClassName} extends HTMLElement {}, true);`
         )
       );
@@ -97,7 +110,7 @@ describe('proxy-custom-element-function', () => {
 
         expect(formatCode(transpiledModule.outputText)).toContain(
           formatCode(
-            `export const foo = 'hello world!', ${componentClassName} = /*@__PURE__*/ __stencil_proxyCustomElement(class ${componentClassName} extends HTMLElement {}, true);`
+            `const foo = 'hello world!', ${componentClassName} = /*@__PURE__*/ __stencil_proxyCustomElement(class ${componentClassName} extends HTMLElement {}, true);`
           )
         );
       });
@@ -110,7 +123,7 @@ describe('proxy-custom-element-function', () => {
 
         expect(formatCode(transpiledModule.outputText)).toContain(
           formatCode(
-            `export const ${componentClassName} = /*@__PURE__*/ __stencil_proxyCustomElement(class ${componentClassName} extends HTMLElement {}, true), foo = 'hello world!';`
+            `const ${componentClassName} = /*@__PURE__*/ __stencil_proxyCustomElement(class ${componentClassName} extends HTMLElement {}, true), foo = 'hello world!';`
           )
         );
       });
@@ -123,7 +136,7 @@ describe('proxy-custom-element-function', () => {
 
         expect(formatCode(transpiledModule.outputText)).toContain(
           formatCode(
-            `export const foo = 'hello world!', ${componentClassName} = /*@__PURE__*/ __stencil_proxyCustomElement(class ${componentClassName} extends HTMLElement {}, true), bar = 'goodbye?';`
+            `const foo = 'hello world!', ${componentClassName} = /*@__PURE__*/ __stencil_proxyCustomElement(class ${componentClassName} extends HTMLElement {}, true), bar = 'goodbye?';`
           )
         );
       });
