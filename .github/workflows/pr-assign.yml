@@ -1,8 +1,8 @@
 name: Auto Request Review
 
-on:
-  pull_request:
-    types: [opened, ready_for_review, reopened]
+#on:
+#  pull_request:
+#    types: [opened, ready_for_review, reopened]
 
 jobs:
   auto-request-review:
