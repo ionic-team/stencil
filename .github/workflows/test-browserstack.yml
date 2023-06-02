@@ -9,6 +9,7 @@ on:
   push:
     branches:
       - 'main'
+      - 'stencil/v4-dev'
 
 env:
   BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSER_STACK_ACCESS_KEY }}
