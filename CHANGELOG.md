@@ -1,3 +1,19 @@
+# 🍭 [3.3.0](https://github.com/ionic-team/stencil/compare/v3.2.2...v3.3.0) (2023-05-23)
+
+
+### Bug Fixes
+
+* **compiler:** components typedef path aliases ([#4365](https://github.com/ionic-team/stencil/issues/4365)) ([fd63c17](https://github.com/ionic-team/stencil/commit/fd63c1779a2b4889be536e23ad763199f02d861d))
+
+
+### Features
+
+* **node** add support for node v20 ([#4368](https://github.com/ionic-team/stencil/pull/4368)) ([ffe1847](https://github.com/ionic-team/stencil/commit/ffe1847062ccae0e2b525ac290e3ac977e3ad6a3))
+* **testing:** support puppeteer's 'headless': 'new' ([#4356](https://github.com/ionic-team/stencil/issues/4356)) ([79dc015](https://github.com/ionic-team/stencil/commit/79dc0159d216824d623e34f814dfeb32474a1550))
+* **typescript:** upgrade to TypeScript 5 ([#4315](https://github.com/ionic-team/stencil/issues/4315)) ([0b6621f](https://github.com/ionic-team/stencil/commit/0b6621f21634b7498de0666a872ffcacc93fef87))
+
+
+
 ## 🏒 [3.2.2](https://github.com/ionic-team/stencil/compare/v3.2.1...v3.2.2) (2023-05-01)
 
 

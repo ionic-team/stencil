@@ -1,4 +1,4 @@
-import { buildError, isString, normalizePath, result } from '@utils';
+import { buildError, isString, normalizePath } from '@utils';
 
 import type { CompilerSystem, Diagnostic } from '../declarations';
 
@@ -17,6 +17,7 @@ export type FindConfigOptions = {
 export type FindConfigResults = {
   configPath: string;
   rootDir: string;
+  diagnostics: Diagnostic[];
 };
 
 /**
@@ -24,7 +25,7 @@ export type FindConfigResults = {
  * @param opts the options needed to find the configuration file
  * @returns the results of attempting to find a configuration file on disk
  */
-export const findConfig = async (opts: FindConfigOptions): Promise<result.Result<FindConfigResults, Diagnostic[]>> => {
+export const findConfig = async (opts: FindConfigOptions): Promise<FindConfigResults> => {
   const sys = opts.sys;
   const cwd = sys.getCurrentDirectory();
   const rootDir = normalizePath(cwd);
@@ -48,16 +49,16 @@ export const findConfig = async (opts: FindConfigOptions): Promise<result.Result
   const results: FindConfigResults = {
     configPath,
     rootDir: normalizePath(cwd),
+    diagnostics: [],
   };
 
   const stat = await sys.stat(configPath);
   if (stat.error) {
-    const diagnostics: Diagnostic[] = [];
-    const diagnostic = buildError(diagnostics);
+    const diagnostic = buildError(results.diagnostics);
     diagnostic.absFilePath = configPath;
     diagnostic.header = `Invalid config path`;
     diagnostic.messageText = `Config path "${configPath}" not found`;
-    return result.err(diagnostics);
+    return results;
   }
 
   if (stat.isFile) {
@@ -76,5 +77,5 @@ export const findConfig = async (opts: FindConfigOptions): Promise<result.Result
     }
   }
 
-  return result.ok(results);
+  return results;
 };

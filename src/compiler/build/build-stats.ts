@@ -1,4 +1,4 @@
-import { byteSize, isOutputTargetStats, result, sortBy } from '@utils';
+import { byteSize, isOutputTargetStats, sortBy } from '@utils';
 
 import type * as d from '../../declarations';
 
@@ -11,15 +11,17 @@ import type * as d from '../../declarations';
 export function generateBuildStats(
   config: d.Config,
   buildCtx: d.BuildCtx
-): result.Result<d.CompilerBuildStats, { diagnostics: d.Diagnostic[] }> {
+): d.CompilerBuildStats | { diagnostics: d.Diagnostic[] } {
   // TODO(STENCIL-461): Investigate making this return only a single type
   const buildResults = buildCtx.buildResults;
 
+  let jsonData: d.CompilerBuildStats | { diagnostics: d.Diagnostic[] };
+
   try {
     if (buildResults.hasError) {
-      return result.err({
+      jsonData = {
         diagnostics: buildResults.diagnostics,
-      });
+      };
     } else {
       const stats: d.CompilerBuildStats = {
         timestamp: buildResults.timestamp,
@@ -56,7 +58,8 @@ export function generateBuildStats(
         rollupResults: buildCtx.rollupResults,
         collections: getCollections(config, buildCtx),
       };
-      return result.ok(stats);
+
+      jsonData = stats;
     }
   } catch (e: unknown) {
     const diagnostic: d.Diagnostic = {
@@ -65,10 +68,12 @@ export function generateBuildStats(
       messageText: `Generate Build Stats Error: ` + e,
       type: `build`,
     };
-    return result.err({
+    jsonData = {
       diagnostics: [diagnostic],
-    });
+    };
   }
+
+  return jsonData;
 }
 
 /**
@@ -79,21 +84,19 @@ export function generateBuildStats(
  */
 export async function writeBuildStats(
   config: d.Config,
-  data: result.Result<d.CompilerBuildStats, { diagnostics: d.Diagnostic[] }>
+  data: d.CompilerBuildStats | { diagnostics: d.Diagnostic[] }
 ): Promise<void> {
   const statsTargets = config.outputTargets.filter(isOutputTargetStats);
 
-  await result.map(data, async (compilerBuildStats) => {
-    await Promise.all(
-      statsTargets.map(async (outputTarget) => {
-        const result = await config.sys.writeFile(outputTarget.file, JSON.stringify(compilerBuildStats, null, 2));
+  await Promise.all(
+    statsTargets.map(async (outputTarget) => {
+      const result = await config.sys.writeFile(outputTarget.file, JSON.stringify(data, null, 2));
 
-        if (result.error) {
-          config.logger.warn([`Stats failed to write file to ${outputTarget.file}`]);
-        }
-      })
-    );
-  });
+      if (result.error) {
+        config.logger.warn([`Stats failed to write file to ${outputTarget.file}`]);
+      }
+    })
+  );
 }
 
 function sanitizeBundlesForStats(bundleArray: ReadonlyArray<d.BundleModule>): ReadonlyArray<d.CompilerBuildStatBundle> {

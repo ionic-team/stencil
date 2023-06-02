@@ -1,4 +1,4 @@
-import { setupDomTests, waitForChanges } from '../util';
+import { setupDomTests } from '../util';
 
 describe('reflect-single-render', () => {
   const { setupDom, tearDownDom } = setupDomTests(document);
