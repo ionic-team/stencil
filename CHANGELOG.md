@@ -1,3 +1,13 @@
+## 🎀 [3.3.1](https://github.com/ionic-team/stencil/compare/v3.3.0...v3.3.1) (2023-06-02)
+
+
+### Bug Fixes
+
+* **compiler:** handle ts 5.0 static members ([#4447](https://github.com/ionic-team/stencil/issues/4447)) ([6dbe9a5](https://github.com/ionic-team/stencil/commit/6dbe9a5b4548ddb2cd08b389509f22f9895639f9)), closes [#4424](https://github.com/ionic-team/stencil/issues/4424)
+* **e2e:** honor devtools and browserDevtools settings ([#4403](https://github.com/ionic-team/stencil/issues/4403)) ([fe433b6](https://github.com/ionic-team/stencil/commit/fe433b6005ac3e544501ab9d6c481864c84b20f2)), closes [#2537](https://github.com/ionic-team/stencil/issues/2537)
+
+
+
 # 🍭 [3.3.0](https://github.com/ionic-team/stencil/compare/v3.2.2...v3.3.0) (2023-05-23)
 
 
