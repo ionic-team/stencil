@@ -19,6 +19,12 @@ export const generateComponentTypes = (
 ): d.TypesModule => {
   const tagName = cmp.tagName.toLowerCase();
   const tagNameAsPascal = dashToPascalCase(tagName);
+  const classTypeParams =
+    cmp.componentClassTypeParameters.length > 0 ? `<${cmp.componentClassTypeParameters.join(',')}>` : '';
+  const classTypeParamsAny =
+    cmp.componentClassTypeParameters.length > 0
+      ? `<${cmp.componentClassTypeParameters.map(() => 'any').join(',')}>`
+      : '';
   const htmlElementName = `HTML${tagNameAsPascal}Element`;
 
   const propAttributes = generatePropTypes(cmp, typeImportData);
@@ -35,23 +41,26 @@ export const generateComponentTypes = (
 
   const element = [
     addDocBlock(
-      `        interface ${htmlElementName} extends Components.${tagNameAsPascal}, HTMLStencilElement {`,
+      `        interface ${htmlElementName}${classTypeParams} extends Components.${tagNameAsPascal}${classTypeParams}, HTMLStencilElement {`,
       cmp.docs,
       4
     ),
+    `                prototype: ${htmlElementName}${classTypeParams};`,
+    `                new (): ${htmlElementName}${classTypeParams};`,
     `        }`,
-    `        var ${htmlElementName}: {`,
-    `                prototype: ${htmlElementName};`,
-    `                new (): ${htmlElementName};`,
-    `        };`,
+    `        var ${htmlElementName}: ${htmlElementName}${classTypeParamsAny};`,
   ];
   return {
     isDep,
     tagName,
-    tagNameAsPascal,
-    htmlElementName,
-    component: addDocBlock(`        interface ${tagNameAsPascal} {\n${componentAttributes}        }`, cmp.docs, 4),
-    jsx: `    interface ${tagNameAsPascal} {\n${jsxAttributes}        }`,
+    tagNameAsPascal: `${tagNameAsPascal}${classTypeParamsAny}`,
+    htmlElementName: `${htmlElementName}${classTypeParamsAny}`,
+    component: addDocBlock(
+      `        interface ${tagNameAsPascal}${classTypeParams} {\n${componentAttributes}        }`,
+      cmp.docs,
+      4
+    ),
+    jsx: `    interface ${tagNameAsPascal}${classTypeParams} {\n${jsxAttributes}        }`,
     element: element.join(`\n`),
   };
 };

@@ -11,11 +11,10 @@ export namespace Components {
 }
 declare global {
     interface HTMLPrehydratedStylesElement extends Components.PrehydratedStyles, HTMLStencilElement {
-    }
-    var HTMLPrehydratedStylesElement: {
         prototype: HTMLPrehydratedStylesElement;
         new (): HTMLPrehydratedStylesElement;
-    };
+    }
+    var HTMLPrehydratedStylesElement: HTMLPrehydratedStylesElement;
     interface HTMLElementTagNameMap {
         "prehydrated-styles": HTMLPrehydratedStylesElement;
     }
