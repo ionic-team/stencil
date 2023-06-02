@@ -2,8 +2,14 @@ import { augmentDiagnosticWithNode, buildError } from '@utils';
 import ts from 'typescript';
 
 import type * as d from '../../../declarations';
-import { retrieveTsDecorators, retrieveTsModifiers } from '../transform-utils';
+import {
+  convertValueToLiteral,
+  createStaticGetter,
+  retrieveTsDecorators,
+  retrieveTsModifiers,
+} from '../transform-utils';
 import { componentDecoratorToStatic } from './component-decorator';
+import { hasStaticInitializerInClass } from './convert-static-members';
 import { isDecoratorNamed } from './decorator-utils';
 import {
   CLASS_DECORATORS_TO_REMOVE,
@@ -70,6 +76,14 @@ const visitClassDeclaration = (
     elementDecoratorsToStatic(diagnostics, decoratedMembers, typeChecker, filteredMethodsAndFields);
     watchDecoratorsToStatic(config, diagnostics, decoratedMembers, watchable, filteredMethodsAndFields);
     listenDecoratorsToStatic(diagnostics, decoratedMembers, filteredMethodsAndFields);
+  }
+
+  // Handle static members that are initialized
+  const hasStaticMembersWithInit = classMembers.some(hasStaticInitializerInClass);
+  if (hasStaticMembersWithInit) {
+    filteredMethodsAndFields.push(
+      createStaticGetter('stencilHasStaticMembersWithInit', convertValueToLiteral(hasStaticMembersWithInit))
+    );
   }
 
   // We call the `handleClassFields` method which handles transforming any
