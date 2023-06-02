@@ -17,7 +17,6 @@ import { HtmlSerializer } from './jest-serializer';
 declare const global: d.JestEnvironmentGlobal;
 
 export function jestSetupTestFramework() {
-  global.Context = {};
   global.resourcesUrl = '/build';
 
   expect.extend(expectExtend);
@@ -59,7 +58,6 @@ export function jestSetupTestFramework() {
     bodyNode?.childNodes?.forEach(removeDomNodes);
 
     teardownGlobal(global);
-    global.Context = {};
     global.resourcesUrl = '/build';
   });
 

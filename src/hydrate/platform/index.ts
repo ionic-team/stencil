@@ -96,8 +96,6 @@ export const consoleDevInfo = (..._: any[]) => {
 
 export const setErrorHandler = (handler: d.ErrorHandler) => (customError = handler);
 
-/*hydrate context start*/ export const Context = {}; /*hydrate context end*/
-
 export const plt: d.PlatformRuntime = {
   $flags$: 0,
   $resourcesUrl$: '',
