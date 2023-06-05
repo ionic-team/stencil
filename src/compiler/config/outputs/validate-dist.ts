@@ -138,6 +138,7 @@ const validateOutputTargetDist = (config: d.ValidatedConfig, o: d.OutputTargetDi
     polyfills: isBoolean(o.polyfills) ? o.polyfills : undefined,
     empty: isBoolean(o.empty) ? o.empty : true,
     transformAliasedImportPathsInCollection: o.transformAliasedImportPathsInCollection ?? false,
+    isPrimaryPackageOutputTarget: o.isPrimaryPackageOutputTarget ?? false,
   };
 
   if (!isAbsolute(outputTarget.buildDir)) {

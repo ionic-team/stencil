@@ -85,10 +85,11 @@ export const validateConfig = (
     hydratedFlag: validateHydrated(config),
     logger,
     outputTargets: config.outputTargets ?? [],
+    rollupConfig: validateRollupConfig(config),
     sys: config.sys ?? bootstrapConfig.sys ?? createSystem({ logger }),
     testing: config.testing ?? {},
     transformAliasedImportPaths: userConfig.transformAliasedImportPaths ?? false,
-    rollupConfig: validateRollupConfig(config),
+    validatePrimaryPackageOutputTarget: userConfig.validatePrimaryPackageOutputTarget ?? false,
     ...validatePaths(config),
   };
 
