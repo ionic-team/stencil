@@ -15,6 +15,12 @@ describe('static-members', function () {
     expect(cmp.textContent.trim()).toBe('This is a component with static public and private members');
   });
 
+  it('renders properly with initialized, decorated static members', async () => {
+    const cmp = app.querySelector('static-decorated-members');
+
+    expect(cmp.textContent.trim()).toBe('This is a component with a static Stencil decorated member');
+  });
+
   it('renders properly with a separate export', async () => {
     const cmp = app.querySelector('static-members-separate-export');
 
