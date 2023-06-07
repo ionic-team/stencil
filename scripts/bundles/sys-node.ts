@@ -174,9 +174,6 @@ function bundleExternal(opts: BuildOptions, outputDir: string, cachedDir: string
           'source-map': join(opts.nodeModulesDir, 'source-map'),
           chalk: join(opts.bundleHelpersDir, 'empty.js'),
         },
-        fallback: {
-          assert: require.resolve('assert'),
-        },
       },
       optimization: {
         minimize: false,

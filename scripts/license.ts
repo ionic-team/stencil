@@ -13,7 +13,6 @@ const entryDeps = [
   '@rollup/plugin-node-resolve',
   '@yarnpkg/lockfile',
   'ansi-colors',
-  'assert',
   'autoprefixer',
   'exit',
   'glob',
