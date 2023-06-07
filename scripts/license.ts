@@ -27,7 +27,6 @@ const entryDeps = [
   'pixelmatch',
   'pngjs',
   'postcss',
-  'process',
   'prompts',
   'rollup',
   'semver',
