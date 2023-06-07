@@ -1,4 +1,7 @@
-import { rollupCommonjsPlugin, rollupJsonPlugin, rollupNodeResolvePlugin, rollupReplacePlugin } from '@compiler-deps';
+import rollupCommonjsPlugin from '@rollup/plugin-commonjs';
+import rollupJsonPlugin from '@rollup/plugin-json';
+import rollupNodeResolvePlugin from '@rollup/plugin-node-resolve';
+import rollupReplacePlugin from '@rollup/plugin-replace';
 import { createOnWarnFn, isString, loadRollupDiagnostics } from '@utils';
 import { rollup, RollupOptions, TreeshakingOptions } from 'rollup';
 
