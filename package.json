@@ -97,7 +97,6 @@
     "fs-extra": "^11.0.0",
     "glob": "8.1.0",
     "graceful-fs": "~4.2.6",
-    "hash.js": "^1.1.7",
     "inquirer": "^7.3.3",
     "jest": "^27.4.5",
     "jest-cli": "^27.4.5",
