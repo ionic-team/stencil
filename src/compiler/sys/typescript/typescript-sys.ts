@@ -165,7 +165,7 @@ const patchTsSystemWatch = (compilerSystem: d.CompilerSystem, tsSys: ts.System) 
 };
 
 // TODO(STENCIL-728): fix typing of `inMemoryFs` parameter in `patchTypescript`, related functions
-export const patchTypescript = (config: d.Config, inMemoryFs: InMemoryFileSystem) => {
+export const patchTypescript = (config: d.ValidatedConfig, inMemoryFs: InMemoryFileSystem) => {
   if (!(ts as any).__patched) {
     if (config.sys) {
       patchTsSystemFileSystem(config, config.sys, inMemoryFs, ts.sys);
