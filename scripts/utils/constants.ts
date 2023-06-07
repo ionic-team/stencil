@@ -1,5 +1,5 @@
 /**
- * Node builtin modules as of v14.5.0
+ * Node built-ins that we mark as external when building Stencil
  */
 export const NODE_BUILTINS = [
   '_http_agent',
@@ -58,9 +58,3 @@ export const NODE_BUILTINS = [
   'worker_threads',
   'zlib',
 ];
-
-export default class Module {
-  static get builtinModules() {
-    return NODE_BUILTINS;
-  }
-}

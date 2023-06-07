@@ -6,6 +6,7 @@ import type { RollupOptions } from 'rollup';
 import webpack, { Configuration } from 'webpack';
 
 import { getBanner } from '../utils/banner';
+import { NODE_BUILTINS } from '../utils/constants';
 import type { BuildOptions } from '../utils/options';
 import { writePkgJson } from '../utils/write-pkg-json';
 import { aliasPlugin } from './plugins/alias-plugin';
@@ -38,7 +39,7 @@ export async function sysNode(opts: BuildOptions) {
       preferConst: true,
       freeze: false,
     },
-    external: ['child_process', 'crypto', 'events', 'https', 'path', 'readline', 'os', 'util'],
+    external: NODE_BUILTINS,
     plugins: [
       relativePathPlugin('glob', './glob.js'),
       relativePathPlugin('graceful-fs', './graceful-fs.js'),
@@ -69,7 +70,7 @@ export async function sysNode(opts: BuildOptions) {
       preferConst: true,
       freeze: false,
     },
-    external: ['child_process', 'crypto', 'events', 'https', 'path', 'readline', 'os', 'util'],
+    external: NODE_BUILTINS,
     plugins: [
       {
         name: 'sysNodeWorkerAlias',
@@ -82,6 +83,7 @@ export async function sysNode(opts: BuildOptions) {
           }
         },
       },
+      relativePathPlugin('@sys-api-node', './index.js'),
       rollupResolve({
         preferBuiltins: true,
       }),

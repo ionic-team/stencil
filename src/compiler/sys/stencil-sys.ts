@@ -22,7 +22,7 @@ import type {
 } from '../../declarations';
 import { version } from '../../version';
 import { buildEvents } from '../events';
-import { HAS_WEB_WORKER, IS_BROWSER_ENV, IS_WEB_WORKER_ENV } from './environment';
+import { HAS_WEB_WORKER, IS_BROWSER_ENV } from './environment';
 import { createLogger } from './logger/console-logger';
 import { resolveModuleIdAsync } from './resolve/resolve-module-async';
 import { createWebWorkerMainController } from './worker/web-worker-main';
@@ -146,9 +146,6 @@ export const createSystem = (c?: { logger?: Logger }): CompilerSystem => {
   const getCurrentDirectory = () => '/';
 
   const getCompilerExecutingPath = () => {
-    if (IS_WEB_WORKER_ENV) {
-      return location.href;
-    }
     return sys.getRemoteModuleUrl({ moduleId: '@stencil/core', path: 'compiler/stencil.min.js' });
   };
 
