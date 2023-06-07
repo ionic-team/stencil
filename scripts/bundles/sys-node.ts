@@ -176,7 +176,6 @@ function bundleExternal(opts: BuildOptions, outputDir: string, cachedDir: string
         },
         fallback: {
           assert: require.resolve('assert'),
-          process: require.resolve('process/browser'),
         },
       },
       optimization: {
