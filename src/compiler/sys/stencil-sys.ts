@@ -1,7 +1,6 @@
 import { isRootPath, normalizePath } from '@utils';
 import * as os from 'os';
-import { basename, dirname, join } from 'path';
-import platformPath from 'path-browserify';
+import path, { basename, dirname, join } from 'path';
 import * as process from 'process';
 
 import type {
@@ -601,7 +600,7 @@ export const createSystem = (c?: { logger?: Logger }): CompilerSystem => {
     isSymbolicLink,
     nextTick,
     normalizePath: normalize,
-    platformPath,
+    platformPath: path,
     readDir,
     readDirSync,
     readFile,
