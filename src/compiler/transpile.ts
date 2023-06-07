@@ -1,4 +1,4 @@
-import { rollupPluginUtils } from '@compiler-deps';
+import rollupPluginUtils from '@rollup/pluginutils';
 import type {
   Config,
   TransformCssToEsmInput,

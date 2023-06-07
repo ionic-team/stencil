@@ -1,6 +1,5 @@
 import { hasError, isFunction, shouldIgnoreError } from '@utils';
 
-import { createLogger } from '../compiler/sys/logger/console-logger';
 import type * as d from '../declarations';
 import { ValidatedConfig } from '../declarations';
 import { createConfigFlags } from './config-flags';
@@ -114,13 +113,14 @@ export const runTask = async (
   coreCompiler: CoreCompiler,
   config: d.Config,
   task: d.TaskCommand,
-  sys?: d.CompilerSystem
+  sys: d.CompilerSystem
 ): Promise<void> => {
-  const logger = config.logger ?? createLogger();
   const flags = createConfigFlags(config.flags ?? { task });
-  config.logger = logger;
   config.flags = flags;
-  config.sys = sys ?? config.sys ?? coreCompiler.createSystem({ logger });
+
+  if (!config.sys) {
+    config.sys = sys;
+  }
   const strictConfig: ValidatedConfig = coreCompiler.validateConfig(config, {}).config;
 
   switch (task) {
@@ -134,7 +134,7 @@ export const runTask = async (
 
     case 'generate':
     case 'g':
-      await taskGenerate(coreCompiler, strictConfig);
+      await taskGenerate(strictConfig);
       break;
 
     case 'help':

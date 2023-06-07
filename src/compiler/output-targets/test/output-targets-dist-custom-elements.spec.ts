@@ -1,4 +1,3 @@
-import { path } from '@stencil/core/compiler';
 import {
   mockBuildCtx,
   mockCompilerCtx,
@@ -7,6 +6,7 @@ import {
   mockValidatedConfig,
 } from '@stencil/core/testing';
 import { DIST_CUSTOM_ELEMENTS } from '@utils';
+import path from 'path';
 
 import type * as d from '../../../declarations';
 import { OutputTargetDistCustomElements } from '../../../declarations';

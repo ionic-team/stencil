@@ -1,3 +1,4 @@
+import { createNodeSys } from '@sys-api-node';
 import { buildError, catchError, hasError, isString, normalizePath } from '@utils';
 import { dirname } from 'path';
 import ts from 'typescript';
@@ -11,7 +12,6 @@ import type {
 } from '../../declarations';
 import { IS_NODE_ENV } from '../sys/environment';
 import { nodeRequire } from '../sys/node-require';
-import { createSystem } from '../sys/stencil-sys';
 import { validateTsConfig } from '../sys/typescript/typescript-config';
 import { validateConfig } from './validate-config';
 
@@ -53,7 +53,7 @@ export const loadConfig = async (init: LoadConfigInit = {}): Promise<LoadConfigR
     // Pull the {@link CompilerSystem} out of the initialization object, or create one if it does not exist.
     // This entity is needed to load the project's configuration (and therefore needs to be created before it can be
     // attached to a configuration entity, validated or otherwise)
-    const sys = init.sys ?? createSystem();
+    const sys = init.sys ?? createNodeSys();
 
     const loadedConfigFile = await loadConfigFile(sys, results.diagnostics, configPath);
     if (hasError(results.diagnostics)) {

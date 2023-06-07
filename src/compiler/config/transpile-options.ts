@@ -11,8 +11,7 @@ import type {
   TranspileResults,
 } from '../../declarations';
 import { STENCIL_INTERNAL_CLIENT_ID } from '../bundle/entry-alias-ids';
-import { IS_NODE_ENV, requireFunc } from '../sys/environment';
-import { createSystem } from '../sys/stencil-sys';
+import { requireFunc } from '../sys/environment';
 import { parseImportPath } from '../transformers/stencil-import-path';
 
 export const getTranspileResults = (code: string, input: TranspileOptions) => {
@@ -60,11 +59,7 @@ export const getTranspileConfig = (input: TranspileOptions): TranspileConfig => 
   if (input.sys) {
     transpileCtx.sys = input.sys;
   } else if (!transpileCtx.sys) {
-    if (IS_NODE_ENV) {
-      transpileCtx.sys = requireFunc('../sys/node/index.js').createNodeSys();
-    } else {
-      transpileCtx.sys = createSystem();
-    }
+    transpileCtx.sys = requireFunc('../sys/node/index.js').createNodeSys();
   }
 
   const compileOpts: TranspileOptions = {
