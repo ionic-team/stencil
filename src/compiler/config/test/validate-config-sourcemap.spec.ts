@@ -1,13 +1,15 @@
 import { mockLoadConfigInit } from '@stencil/core/testing';
+import { getMockFSPatch } from '@stencil/core/testing';
+import { createNodeSys } from '@sys-api-node';
+import mock from 'mock-fs';
 import path from 'path';
 
-import { createSystem } from '../../../compiler/sys/stencil-sys';
 import type * as d from '../../../declarations';
 import { loadConfig } from '../load-config';
 
 describe('stencil config - sourceMap option', () => {
-  const configPath = require.resolve('./fixtures/stencil.config.ts');
-  const fixturesPath = path.dirname(configPath);
+  const fixturesDir = 'fixtures';
+  const configPath = path.join(fixturesDir, 'stencil.config.ts');
   let sys: d.CompilerSystem;
 
   /**
@@ -29,9 +31,16 @@ describe('stencil config - sourceMap option', () => {
   };
 
   beforeEach(() => {
-    sys = createSystem();
-    sys.writeFileSync(configPath, ``);
-    sys.createDirSync(fixturesPath);
+    sys = createNodeSys();
+
+    mock({
+      [configPath]: mock.load(path.resolve(__dirname, configPath)),
+      ...getMockFSPatch(mock),
+    });
+  });
+
+  afterEach(() => {
+    mock.restore();
   });
 
   it('sets sourceMap options to true in tsconfig', async () => {

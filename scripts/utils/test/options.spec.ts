@@ -1,4 +1,5 @@
-import { path } from '../../../compiler';
+import path from 'path';
+
 import { BuildOptions, getOptions } from '../options';
 import * as Vermoji from '../vermoji';
 
