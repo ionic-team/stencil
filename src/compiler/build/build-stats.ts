@@ -157,8 +157,6 @@ function getComponentsFileMap(config: d.Config, buildCtx: d.BuildCtx) {
       excludeFromCollection: component.excludeFromCollection,
       events: component.events,
       internal: component.internal,
-      legacyConnect: component.legacyConnect,
-      legacyContext: component.legacyContext,
       listeners: component.listeners,
       methods: component.methods,
       potentialCmpRefs: component.potentialCmpRefs,

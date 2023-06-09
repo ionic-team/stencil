@@ -75,8 +75,6 @@ export const stubComponentCompilerMeta = (
   isPlain: false,
   isUpdateable: false,
   jsFilePath: '/some/stubbed/path/my-component.js',
-  legacyConnect: [],
-  legacyContext: [],
   listeners: [],
   methods: [],
   potentialCmpRefs: [],
