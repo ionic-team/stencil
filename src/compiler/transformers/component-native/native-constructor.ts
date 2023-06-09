@@ -4,7 +4,6 @@ import ts from 'typescript';
 import type * as d from '../../../declarations';
 import { addOutputTargetCoreRuntimeApi, RUNTIME_APIS } from '../core-runtime-apis';
 import { addCreateEvents } from '../create-event';
-import { addLegacyProps } from '../legacy-props';
 import { retrieveTsModifiers } from '../transform-utils';
 
 /**
@@ -40,7 +39,6 @@ export const updateNativeConstructor = (
       ...nativeInit(moduleFile, cmp),
       ...addCreateEvents(moduleFile, cmp),
       ...cstrBodyStatements,
-      ...addLegacyProps(moduleFile, cmp),
     ];
 
     const hasSuper = cstrBodyStatements.some((s) => s.kind === ts.SyntaxKind.SuperKeyword);
@@ -60,7 +58,6 @@ export const updateNativeConstructor = (
       createNativeConstructorSuper(),
       ...nativeInit(moduleFile, cmp),
       ...addCreateEvents(moduleFile, cmp),
-      ...addLegacyProps(moduleFile, cmp),
     ];
 
     const cstrMethod = ts.factory.createConstructorDeclaration(undefined, [], ts.factory.createBlock(statements, true));

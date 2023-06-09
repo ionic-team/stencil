@@ -809,23 +809,10 @@ export interface ComponentCompilerMeta extends ComponentCompilerFeatures {
   styles: StyleCompiler[];
   tagName: string;
   internal: boolean;
-  legacyConnect: ComponentCompilerLegacyConnect[];
-  legacyContext: ComponentCompilerLegacyContext[];
-
   dependencies?: string[];
   dependents?: string[];
   directDependencies?: string[];
   directDependents?: string[];
-}
-
-export interface ComponentCompilerLegacyConnect {
-  name: string;
-  connect: string;
-}
-
-export interface ComponentCompilerLegacyContext {
-  name: string;
-  context: string;
 }
 
 export type Encapsulation = 'shadow' | 'scoped' | 'none';
@@ -2285,7 +2272,6 @@ export interface EventInitDict {
 export interface JestEnvironmentGlobal {
   __NEW_TEST_PAGE__: () => Promise<any>;
   __CLOSE_OPEN_PAGES__: () => Promise<any>;
-  Context: any;
   loadTestWindow: (testWindow: any) => Promise<void>;
   h: any;
   resourcesUrl: string;
