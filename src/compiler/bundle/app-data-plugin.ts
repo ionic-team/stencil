@@ -6,13 +6,7 @@ import ts from 'typescript';
 
 import type * as d from '../../declarations';
 import { removeCollectionImports } from '../transformers/remove-collection-imports';
-import {
-  APP_DATA_CONDITIONAL,
-  STENCIL_APP_DATA_ID,
-  STENCIL_APP_GLOBALS_ID,
-  STENCIL_CORE_ID,
-  STENCIL_INTERNAL_HYDRATE_ID,
-} from './entry-alias-ids';
+import { APP_DATA_CONDITIONAL, STENCIL_APP_DATA_ID, STENCIL_APP_GLOBALS_ID } from './entry-alias-ids';
 
 export const appDataPlugin = (
   config: d.Config,
@@ -93,7 +87,7 @@ export const appDataPlugin = (
         const program = this.parse(code, {});
         const needsDefault = !(program as any).body.some((s: any) => s.type === 'ExportDefaultDeclaration');
         const defaultExport = needsDefault ? '\nexport const globalFn = () => {};\nexport default globalFn;' : '';
-        code = getContextImport(platform) + code + defaultExport;
+        code = code + defaultExport;
 
         const compilerOptions: ts.CompilerOptions = { ...config.tsCompilerOptions };
         compilerOptions.module = ts.ModuleKind.ESNext;
@@ -203,10 +197,6 @@ const appendEnv = (config: d.Config, s: MagicString) => {
 
 const appendNamespace = (config: d.Config, s: MagicString) => {
   s.append(`export const NAMESPACE = '${config.fsNamespace}';\n`);
-};
-
-const getContextImport = (platform: string) => {
-  return `import { Context } from '${platform === 'hydrate' ? STENCIL_INTERNAL_HYDRATE_ID : STENCIL_CORE_ID}';\n`;
 };
 
 interface GlobalScript {
