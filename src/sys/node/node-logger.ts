@@ -6,7 +6,7 @@ import { Logger } from '../../declarations';
 
 /**
  * Create a logger to run in a Node environment
- * @param context a context with NodeJS specific details used to create the logger
+ *
  * @returns the created logger
  */
 export const createNodeLogger = (): Logger => {
@@ -22,7 +22,6 @@ export const createNodeLogger = (): Logger => {
  * environment-specific details so that the terminal logger can deal with
  * things in a (potentially) platform-agnostic way.
  *
- * @param prcs the current node.js process object
  * @returns a configured logger sys object
  */
 export function createNodeLoggerSys(): TerminalLoggerSys {
