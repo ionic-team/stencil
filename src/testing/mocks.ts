@@ -51,6 +51,7 @@ export function mockValidatedConfig(overrides: Partial<ValidatedConfig> = {}): V
       inputOptions: {},
       outputOptions: {},
     },
+    validatePrimaryPackageOutputTarget: false,
     ...overrides,
   };
 }

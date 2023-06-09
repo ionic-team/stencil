@@ -112,6 +112,11 @@ export interface StencilConfig {
    * This behavior is opt-in and hence this flag defaults to `false`.
    */
   transformAliasedImportPaths?: boolean;
+  /**
+   * When `true`, we will validate a project's `package.json` based on the output target the user has designated
+   * as `isPrimaryPackageOutputTarget: true` in their Stencil config.
+   */
+  validatePrimaryPackageOutputTarget?: boolean;
 
   /**
    * Passes custom configuration down to the "@rollup/plugin-commonjs" that Stencil uses under the hood.
@@ -417,7 +422,8 @@ type StrictConfigFields =
   | 'srcIndexHtml'
   | 'sys'
   | 'testing'
-  | 'transformAliasedImportPaths';
+  | 'transformAliasedImportPaths'
+  | 'validatePrimaryPackageOutputTarget';
 
 /**
  * A version of {@link Config} that makes certain fields required. This type represents a valid configuration entity.
@@ -1895,11 +1901,10 @@ export interface LoggerTimeSpan {
   finish(finishedMsg: string, color?: string, bold?: boolean, newLineSuffix?: boolean): number;
 }
 
-export interface OutputTargetDist extends OutputTargetBase {
+export interface OutputTargetDist extends OutputTargetValidationConfig {
   type: 'dist';
 
   buildDir?: string;
-  dir?: string;
 
   collectionDir?: string | null;
   /**
@@ -1932,7 +1937,7 @@ export interface OutputTargetDist extends OutputTargetBase {
   empty?: boolean;
 }
 
-export interface OutputTargetDistCollection extends OutputTargetBase {
+export interface OutputTargetDistCollection extends OutputTargetValidationConfig {
   type: 'dist-collection';
   empty?: boolean;
   dir: string;
@@ -1959,7 +1964,7 @@ export interface OutputTargetDistCollection extends OutputTargetBase {
   transformAliasedImportPaths?: boolean | null;
 }
 
-export interface OutputTargetDistTypes extends OutputTargetBase {
+export interface OutputTargetDistTypes extends OutputTargetValidationConfig {
   type: 'dist-types';
   dir: string;
   typesDir: string;
@@ -2109,7 +2114,7 @@ export const CustomElementsExportBehaviorOptions = [
  */
 export type CustomElementsExportBehavior = (typeof CustomElementsExportBehaviorOptions)[number];
 
-export interface OutputTargetDistCustomElements extends OutputTargetBaseNext {
+export interface OutputTargetDistCustomElements extends OutputTargetValidationConfig {
   type: 'dist-custom-elements';
   empty?: boolean;
   /**
@@ -2143,6 +2148,20 @@ export interface OutputTargetBase {
    */
   type: string;
 }
+
+/**
+ * Output targets that can have validation for common `package.json` field values
+ * (module, types, etc.). This allows them to be marked for validation in a project's Stencil config.
+ */
+interface OutputTargetValidationConfig extends OutputTargetBaseNext {
+  isPrimaryPackageOutputTarget?: boolean;
+}
+
+export type EligiblePrimaryPackageOutputTarget =
+  | OutputTargetDist
+  | OutputTargetDistCustomElements
+  | OutputTargetDistCollection
+  | OutputTargetDistTypes;
 
 export type OutputTargetBuild = OutputTargetDistCollection | OutputTargetDistLazy;
 

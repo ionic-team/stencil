@@ -1,3 +1,22 @@
+# 👻 [4.0.0-beta.2](https://github.com/ionic-team/stencil/compare/v3.3.1...v4.0.0-beta.2) (2023-06-07)
+
+
+### Features
+
+* **compiler:** remove in-browser compilation support ([#4317](https://github.com/ionic-team/stencil/issues/4317)) ([b042d8b](https://github.com/ionic-team/stencil/commit/b042d8b6e02c2df09a920db14abe551879cde5a2))
+* **compiler:** primary package output target validation ([#4395](https://github.com/ionic-team/stencil/issues/4395)) ([e53ee07](https://github.com/ionic-team/stencil/commit/e53ee076547c834f3867f866925d04eab0739b0d))
+
+### BREAKING CHANGES
+
+See [BREAKING_CHANGES.md - v4.0.0](./BREAKING_CHANGES.md#stencil-v300) for a comprehensive list of breaking changes.
+
+See [the v4.0.0 Migration Guide](https://stenciljs.com/docs/next/introduction/upgrading-to-stencil-four) for a guide to migrate to Stencil v4.0.0.
+
+### Additional Changes
+
+This release includes the latest changes from Stencil v3.3.1.
+
+
 # 🐐 [4.0.0-beta.1](https://github.com/ionic-team/stencil/compare/v3.3.1...v4.0.0-beta.1) (2023-06-02)
 
 ### Features

@@ -1,8 +1,7 @@
+import { createNodeLogger, createNodeSys } from '@sys-api-node';
 import { buildError, isBoolean, isNumber, isString, sortBy } from '@utils';
 
 import { ConfigBundle, Diagnostic, LoadConfigInit, UnvalidatedConfig, ValidatedConfig } from '../../declarations';
-import { createLogger } from '../sys/logger/console-logger';
-import { createSystem } from '../sys/stencil-sys';
 import { setBooleanConfig } from './config-utils';
 import { validateOutputTargets } from './outputs';
 import { validateDevServer } from './validate-dev-server';
@@ -75,7 +74,12 @@ export const validateConfig = (
 
   const config = Object.assign({}, userConfig);
 
-  const logger = bootstrapConfig.logger || config.logger || createLogger();
+  const logger =
+    bootstrapConfig.logger ||
+    config.logger ||
+    createNodeLogger({
+      process,
+    });
 
   const validatedConfig: ValidatedConfig = {
     devServer: {}, // assign `devServer` before spreading `config`, in the event 'devServer' is not a key on `config`
@@ -85,10 +89,11 @@ export const validateConfig = (
     hydratedFlag: validateHydrated(config),
     logger,
     outputTargets: config.outputTargets ?? [],
-    sys: config.sys ?? bootstrapConfig.sys ?? createSystem({ logger }),
+    rollupConfig: validateRollupConfig(config),
+    sys: config.sys ?? bootstrapConfig.sys ?? createNodeSys({ logger }),
     testing: config.testing ?? {},
     transformAliasedImportPaths: userConfig.transformAliasedImportPaths ?? false,
-    rollupConfig: validateRollupConfig(config),
+    validatePrimaryPackageOutputTarget: userConfig.validatePrimaryPackageOutputTarget ?? false,
     ...validatePaths(config),
   };
 

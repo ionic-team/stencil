@@ -3,6 +3,7 @@ import { dirname, join, relative } from 'path';
 import { rollup } from 'rollup';
 import ts, { ModuleResolutionKind, ScriptTarget } from 'typescript';
 
+import { NODE_BUILTINS } from '../utils/constants';
 import { BuildOptions, getOptions } from '../utils/options';
 import { PackageData } from '../utils/write-pkg-json';
 
@@ -335,8 +336,11 @@ async function validateModuleTreeshake(opts: BuildOptions, moduleName: string, e
   const outputFile = join(opts.scriptsBuildDir, `treeshake_${moduleName}.js`);
 
   const bundle = await rollup({
+    external: NODE_BUILTINS,
     input: virtualInputId,
-    treeshake: true,
+    treeshake: {
+      moduleSideEffects: false,
+    },
     plugins: [
       {
         name: 'stencilResolver',
