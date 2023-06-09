@@ -71,8 +71,6 @@ export const parseStaticComponentMeta = (
     events: parseStaticEvents(staticMembers),
     watchers: parseStaticWatchers(staticMembers),
     styles: parseStaticStyles(compilerCtx, tagName, moduleFile.sourceFilePath, isCollectionDependency, staticMembers),
-    legacyConnect: getStaticValue(staticMembers, 'connectProps') || [],
-    legacyContext: getStaticValue(staticMembers, 'contextProps') || [],
     internal: isInternal(docs),
     assetsDirs: parseAssetsDirs(staticMembers, moduleFile.jsFilePath),
     styleDocs: [],
@@ -144,13 +142,6 @@ export const parseStaticComponentMeta = (
   };
   visitComponentChildNode(cmpNode);
   parseClassMethods(cmpNode, cmp);
-
-  cmp.legacyConnect.forEach(({ connect }) => {
-    cmp.htmlTagNames.push(connect);
-    if (connect.includes('-')) {
-      cmp.potentialCmpRefs.push(connect);
-    }
-  });
 
   cmp.htmlAttrNames = unique(cmp.htmlAttrNames);
   cmp.htmlTagNames = unique(cmp.htmlTagNames);

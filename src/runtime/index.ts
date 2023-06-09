@@ -1,9 +1,7 @@
 export { getAssetPath, setAssetPath } from './asset-path';
 export { defineCustomElement, forceModeUpdate, proxyCustomElement } from './bootstrap-custom-element';
 export { bootstrapLazy } from './bootstrap-lazy';
-export { getConnect } from './connect';
 export { connectedCallback } from './connected-callback';
-export { getContext } from './context';
 export { disconnectedCallback } from './disconnected-callback';
 export { getElement } from './element';
 export { createEvent } from './event-emitter';
