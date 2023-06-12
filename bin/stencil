@@ -39,7 +39,7 @@ if (isNodeLT(futureDeprecationMinVersion)) {
 
 var cli = require('../cli/index.cjs');
 var nodeApi = require('../sys/node/index.js');
-var nodeLogger = nodeApi.createNodeLogger({ process: process });
+var nodeLogger = nodeApi.createNodeLogger();
 var nodeSys = nodeApi.createNodeSys({ process: process, logger: nodeLogger });
 
 nodeApi.setupNodeProcess({ process: process, logger: nodeLogger });
