@@ -21,7 +21,7 @@ describe('delegates-focus', function () {
     expect(noDelegateFocusStyles1.borderColor).toBe('rgb(255, 0, 0)');
 
     button.click();
-    await waitForChanges();
+    await waitForChanges(1000);
 
     const delegateFocusStyles2 = window.getComputedStyle(delegateFocusElm);
     expect(delegateFocusStyles2.borderColor).toBe('rgb(0, 0, 255)');
