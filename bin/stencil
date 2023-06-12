@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 'use strict';
 
-var minimumVersion = '16.4';
+var minimumVersion = '16.0';
 var futureDeprecationMinVersion = '16.0';
 var recommendedVersion = '18.16';
 var currentVersion = process.versions.node;
