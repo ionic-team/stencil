@@ -118,7 +118,21 @@ const dispatchHooks = (hostRef: d.HostRef, isInitialLoad: boolean): Promise<void
  * @returns either a `Promise` or the return value of the provided function
  */
 const enqueue = (maybePromise: Promise<void> | undefined, fn: () => Promise<void>): Promise<void> | undefined =>
-  maybePromise instanceof Promise ? maybePromise.then(fn) : fn();
+  isPromisey(maybePromise) ? maybePromise.then(fn) : fn();
+
+/**
+ * Check that a value is a `Promise`. To check, we first see if the value is an
+ * instance of the `Promise` global. In a few circumstances, in particular if
+ * the global has been overwritten, this is could be misleading, so we also do
+ * a little 'duck typing' check to see if the `.then` property of the value is
+ * defined and a function.
+ *
+ * @param maybePromise it might be a promise!
+ * @returns whether it is or not
+ */
+const isPromisey = (maybePromise: Promise<void> | unknown): maybePromise is Promise<void> =>
+  maybePromise instanceof Promise ||
+  (maybePromise && (maybePromise as any).then && typeof (maybePromise as Promise<void>).then === 'function');
 
 const updateComponent = async (hostRef: d.HostRef, instance: any, isInitialLoad: boolean) => {
   const elm = hostRef.$hostElement$ as d.RenderNode;
