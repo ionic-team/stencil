@@ -59,8 +59,8 @@ export const validateConfig = (
 
   if (CACHED_VALIDATED_CONFIG !== null && CACHED_VALIDATED_CONFIG === userConfig) {
     // We've previously done the work to validate a Stencil config. Since our
-    // overall validated pipeline is unfortunately not idempotent we do not
-    // want to simply validate again. leaving aside the performance
+    // overall validation pipeline is unfortunately not idempotent we do not
+    // want to simply validate again. Leaving aside the performance
     // implications of needlessly repeating the validation, we don't want to do
     // certain operations multiple times.
     //
@@ -74,12 +74,7 @@ export const validateConfig = (
 
   const config = Object.assign({}, userConfig);
 
-  const logger =
-    bootstrapConfig.logger ||
-    config.logger ||
-    createNodeLogger({
-      process,
-    });
+  const logger = bootstrapConfig.logger || config.logger || createNodeLogger();
 
   const validatedConfig: ValidatedConfig = {
     devServer: {}, // assign `devServer` before spreading `config`, in the event 'devServer' is not a key on `config`

@@ -1,3 +1,4 @@
+import { createNodeLogger } from '@sys-api-node';
 import { isNumber, isString, loadTypeScriptDiagnostics, normalizePath } from '@utils';
 import ts from 'typescript';
 
@@ -5,7 +6,6 @@ import type * as d from '../../declarations';
 import { BuildContext } from '../build/build-ctx';
 import { CompilerContext } from '../build/compiler-ctx';
 import { getCurrentDirectory } from '../sys/environment';
-import { createLogger } from '../sys/logger/console-logger';
 import { lazyComponentTransform } from '../transformers/component-lazy/transform-lazy-component';
 import { nativeComponentTransform } from '../transformers/component-native/tranform-to-native-component';
 import { convertDecoratorsToStatic } from '../transformers/decorators-to-static/convert-decorators';
@@ -31,7 +31,7 @@ export const transpileModule = (
   if (!config.logger) {
     config = {
       ...config,
-      logger: createLogger(),
+      logger: createNodeLogger(),
     };
   }
   const compilerCtx = new CompilerContext();

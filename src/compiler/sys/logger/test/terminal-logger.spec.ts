@@ -45,7 +45,7 @@ describe('terminal-logger', () => {
     function setup() {
       const { logMock, warnMock, errorMock } = setupConsoleMocks();
 
-      const loggerSys = createNodeLoggerSys(process);
+      const loggerSys = createNodeLoggerSys();
 
       loggerSys.memoryUsage = jest.fn().mockReturnValue(10_000_000);
 
