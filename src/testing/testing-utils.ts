@@ -214,4 +214,8 @@ export const getMockFSPatch = (mock: any) => ({
   'node_modules/imurmurhash': mock.load(resolve(process.cwd(), 'node_modules', 'imurmurhash')),
   'node_modules/is-typedarray': mock.load(resolve(process.cwd(), 'node_modules', 'is-typedarray')),
   'node_modules/typedarray-to-buffer': mock.load(resolve(process.cwd(), 'node_modules', 'typedarray-to-buffer')),
+  // we need to add this because sometimes after the fs mock has been applied,
+  // code called in a test will end up requiring one of the `@sys-node-api`
+  // functions (like `createNodeSys`, `createNodeLogger`)
+  [resolve(process.cwd(), 'sys')]: mock.load(resolve(process.cwd(), 'sys')),
 });
