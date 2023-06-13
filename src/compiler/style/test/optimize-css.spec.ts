@@ -1,12 +1,12 @@
 import type * as d from '@stencil/core/declarations';
-import { mockCompilerCtx, mockConfig } from '@stencil/core/testing';
+import { mockCompilerCtx, mockValidatedConfig } from '@stencil/core/testing';
 import os from 'os';
 import path from 'path';
 
 import { optimizeCss } from '../optimize-css';
 
 describe('optimizeCss', () => {
-  let config: d.Config;
+  let config: d.ValidatedConfig;
   let compilerCtx: d.CompilerCtx;
   let diagnostics: d.Diagnostic[];
 
@@ -15,7 +15,7 @@ describe('optimizeCss', () => {
   jasmine.DEFAULT_TIMEOUT_INTERVAL = 30000;
 
   beforeEach(() => {
-    config = mockConfig({ maxConcurrentWorkers: 0, minifyCss: true });
+    config = mockValidatedConfig({ maxConcurrentWorkers: 0, minifyCss: true });
     compilerCtx = mockCompilerCtx(config);
     diagnostics = [];
   });

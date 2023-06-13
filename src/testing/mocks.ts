@@ -3,7 +3,6 @@ import type {
   BuildCtx,
   Cache,
   CompilerCtx,
-  Config,
   LoadConfigInit,
   Module,
   UnvalidatedConfig,
@@ -128,10 +127,8 @@ export const mockLoadConfigInit = (overrides?: Partial<LoadConfigInit>): LoadCon
   return { ...defaults, ...overrides };
 };
 
-export function mockCompilerCtx(config?: Config) {
-  if (!config) {
-    config = mockConfig();
-  }
+export function mockCompilerCtx(config?: ValidatedConfig) {
+  const innerConfig = config || mockValidatedConfig();
   const compilerCtx: CompilerCtx = {
     version: 1,
     activeBuildId: 0,
@@ -163,13 +160,13 @@ export function mockCompilerCtx(config?: Config) {
     rollupCacheLazy: null,
     rollupCacheNative: null,
     styleModeNames: new Set(),
-    worker: createWorkerContext(config.sys),
+    worker: createWorkerContext(innerConfig.sys),
   };
 
   Object.defineProperty(compilerCtx, 'fs', {
     get() {
       if (this._fs == null) {
-        this._fs = createInMemoryFs(config.sys);
+        this._fs = createInMemoryFs(innerConfig.sys);
       }
       return this._fs;
     },
@@ -178,7 +175,7 @@ export function mockCompilerCtx(config?: Config) {
   Object.defineProperty(compilerCtx, 'cache', {
     get() {
       if (this._cache == null) {
-        this._cache = mockCache(config, compilerCtx);
+        this._cache = mockCache(innerConfig, compilerCtx);
       }
       return this._cache;
     },
@@ -187,25 +184,15 @@ export function mockCompilerCtx(config?: Config) {
   return compilerCtx;
 }
 
-export function mockBuildCtx(config?: Config, compilerCtx?: CompilerCtx): BuildCtx {
-  if (!config) {
-    config = mockConfig();
-  }
-  if (!compilerCtx) {
-    compilerCtx = mockCompilerCtx(config);
-  }
-  const buildCtx = new BuildContext(config, compilerCtx);
+export function mockBuildCtx(config?: ValidatedConfig, compilerCtx?: CompilerCtx): BuildCtx {
+  config ||= mockValidatedConfig();
+  compilerCtx ||= mockCompilerCtx(config);
 
+  const buildCtx = new BuildContext(config, compilerCtx);
   return buildCtx as BuildCtx;
 }
 
-export function mockCache(config?: Config, compilerCtx?: CompilerCtx) {
-  if (!config) {
-    config = mockConfig();
-  }
-  if (!compilerCtx) {
-    compilerCtx = mockCompilerCtx(config);
-  }
+function mockCache(config: ValidatedConfig, compilerCtx: CompilerCtx) {
   config.enableCache = true;
   const cache = new CompilerCache(config, compilerCtx.fs);
   cache.initCacheDir();
@@ -230,12 +217,12 @@ export function mockCompilerSystem(): TestingSystem {
   return createTestingSystem();
 }
 
-export function mockDocument(html: string = null) {
+export function mockDocument(html: string | null = null) {
   const win = new MockWindow(html);
   return win.document as Document;
 }
 
-export function mockWindow(html: string = null) {
+export function mockWindow(html?: string) {
   const win = new MockWindow(html);
   return win as any as Window;
 }
