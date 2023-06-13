@@ -9,7 +9,7 @@ import type {
 import { catchError, getInlineSourceMappingUrlLinker, isString } from '@utils';
 
 import { getTranspileConfig, getTranspileCssConfig, getTranspileResults } from './config/transpile-options';
-import {validateConfig} from './config/validate-config';
+import { validateConfig } from './config/validate-config';
 import { transformCssToEsm, transformCssToEsmSync } from './style/css-to-esm';
 import { patchTypescript } from './sys/typescript/typescript-sys';
 import { getPublicCompilerMeta } from './transformers/add-component-meta-static';
