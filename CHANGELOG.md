@@ -1,3 +1,19 @@
+# ✨ [3.4.0](https://github.com/ionic-team/stencil/compare/v3.3.1...v3.4.0) (2023-06-13)
+
+
+### Bug Fixes
+
+* **compiler:** handle static members with stencil decorators ([#4463](https://github.com/ionic-team/stencil/issues/4463)) ([dc3925e](https://github.com/ionic-team/stencil/commit/dc3925e86d27d4f7360d0b7d398a251f60042265))
+* **runtime:** add autocomplete to textarea ([#4465](https://github.com/ionic-team/stencil/issues/4465)) ([7f42430](https://github.com/ionic-team/stencil/commit/7f42430196d1bb9c928df9f0dbd0bfebcd20d01a))
+* **runtime:** issue with update-component and patched Promise ([#4460](https://github.com/ionic-team/stencil/issues/4460)) ([1187694](https://github.com/ionic-team/stencil/commit/1187694f4ccfc5911d352d6770dafa5b46a29432))
+
+
+### Features
+
+* **compiler:** primary package output target validation ([#4395](https://github.com/ionic-team/stencil/issues/4395)) ([e53ee07](https://github.com/ionic-team/stencil/commit/e53ee076547c834f3867f866925d04eab0739b0d))
+
+
+
 ## 🎀 [3.3.1](https://github.com/ionic-team/stencil/compare/v3.3.0...v3.3.1) (2023-06-02)
 
 
