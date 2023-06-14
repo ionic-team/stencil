@@ -13,7 +13,7 @@ This is a comprehensive list of the breaking changes introduced in the major ver
 
 - [General](#general)
   - [Legacy Context and Connect APIs Removed](#legacy-context-and-connect-APIs-removed)
-  - [Legacy Browser Support Fields Removed](#legacy-browser-support-fields-removed)
+  - [Legacy Browser Support Removed](#legacy-browser-support-fields-removed)
 
 ### General
 
@@ -32,31 +32,38 @@ To migrate away from usages of `connect`, please see [the original deprecation a
 
 #### Legacy Browser Support Fields Removed
 
+In Stencil v3.0.0, we announced [the deprecation of IE 11, pre-Chromium Edge, and Safari 10 support](#legacy-browser-support-fields-deprecated).
+In Stencil v4.0.0, support for these browsers has been dropped.
+For a full list of supported browsers, please see our [Browser Support page](https://stenciljs.com/docs/browser-support).
+By dropping these browsers, a few configuration options are no longer valid in a Stencil configuration file:
+
 ##### `__deprecated__cssVarsShim`
 
-`extras.__deprecated__cssVarsShim` causes Stencil to include a polyfill for [CSS
-variables](https://developer.mozilla.org/en-US/docs/Web/CSS/--*). For Stencil
-v4.0.0 this field and corresponding behavior has been removed.
+`extras.__deprecated__cssVarsShim` caused Stencil to include a polyfill for [CSS variables](https://developer.mozilla.org/en-US/docs/Web/CSS/--*).
+In Stencil v4.0.0, this field and corresponding behavior has been removed.
+This field should be removed from a project's Stencil configuration file (`stencil.config.ts`).
 
 ##### `__deprecated__dynamicImportShim`
 
-The `extras.__deprecated__dynamicImportShim` option causes Stencil to include a polyfill for
-the [dynamic `import()`
-function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import)
-for use at runtime. For Stencil v4.0.0 this field and corresponding behavior has been removed.
+The `extras.__deprecated__dynamicImportShim` option caused Stencil to include a polyfill for
+the [dynamic `import()` function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import)
+for use at runtime.
+In Stencil v4.0.0, this field and corresponding behavior has been removed.
+This field should be removed from a project's Stencil configuration file (`stencil.config.ts`).
 
 ##### `__deprecated__safari10`
 
-If `extras.__deprecated__safari10` is set to `true` the Stencil runtime will patch ES module
-support for Safari 10. In Stencil v4.0.0 this field and corresponding behavior has been removed.
+The `extras.__deprecated__safari10` option would patch ES module support for Safari 10.
+In Stencil v4.0.0, this field and corresponding behavior has been removed.
+This field should be removed from a project's Stencil configuration file (`stencil.config.ts`).
 
 ##### `__deprecated__shadowDomShim`
 
-If `extras.__deprecated__shadowDomShim` is set to `true` the Stencil runtime will check
-whether a shim for [shadow
+The `extras.__deprecated__shadowDomShim` option would check whether a shim for [shadow
 DOM](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_shadow_DOM)
-is needed in the current browser, and include one if so. For Stencil v4.0.0
-this field and its corresponding behavior has been removed.
+was needed in the current browser, and include one if so.
+In Stencil v4.0.0, this field and corresponding behavior has been removed.
+This field should be removed from a project's Stencil configuration file (`stencil.config.ts`). 
 
 ## Stencil v3.0.0
 
