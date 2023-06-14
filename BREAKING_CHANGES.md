@@ -19,12 +19,16 @@ This is a comprehensive list of the breaking changes introduced in the major ver
 
 #### Legacy Context and Connect APIs Removed
 
-Previously Stencil supported `context` and `connect` as options within the `@Prop` decorator. Both of these APIs were deprecated in Stencil v1 and are now removed.
+Previously, Stencil supported `context` and `connect` as options within the `@Prop` decorator.
+Both of these APIs were deprecated in Stencil v1 and are now removed.
 
 ```ts
 @Prop({ context: 'config' }) config: Config;
 @Prop({ connect: 'ion-menu-controller' }) lazyMenuCtrl: Lazy<MenuController>;
 ```
+
+To migrate away from usages of `context`, please see [the original deprecation announcement](#propcontext)
+To migrate away from usages of `connect`, please see [the original deprecation announcement](#propconnect)
 
 #### Legacy Browser Support Fields Removed
 
