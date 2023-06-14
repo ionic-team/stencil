@@ -14,6 +14,7 @@ This is a comprehensive list of the breaking changes introduced in the major ver
 - [General](#general)
   - [Legacy Context and Connect APIs Removed](#legacy-context-and-connect-APIs-removed)
   - [Legacy Browser Support Removed](#legacy-browser-support-fields-removed)
+  - [Drop Node 14 Support](#drop-node-14-support)
 
 ### General
 
@@ -64,6 +65,12 @@ DOM](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_shadow_DO
 was needed in the current browser, and include one if so.
 In Stencil v4.0.0, this field and corresponding behavior has been removed.
 This field should be removed from a project's Stencil configuration file (`stencil.config.ts`). 
+
+### Drop Node 14 Support
+
+Stencil no longer supports Node 14.
+Please upgrade local development machines, continuous integration pipelines, etc. to use Node v16 or higher.
+For the full list of supported runtimes, please see [our Support Policy](../reference/support-policy.md#javascript-runtime).
 
 ## Stencil v3.0.0
 
