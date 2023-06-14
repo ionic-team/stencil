@@ -1,3 +1,4 @@
+import { createNodeLogger } from '@sys-api-node';
 import { isRootPath, normalizePath } from '@utils';
 import * as os from 'os';
 import path, { basename, dirname, join } from 'path';
@@ -22,7 +23,6 @@ import type {
 import { version } from '../../version';
 import { buildEvents } from '../events';
 import { HAS_WEB_WORKER, IS_BROWSER_ENV } from './environment';
-import { createLogger } from './logger/console-logger';
 import { resolveModuleIdAsync } from './resolve/resolve-module-async';
 import { createWebWorkerMainController } from './worker/web-worker-main';
 
@@ -39,7 +39,7 @@ import { createWebWorkerMainController } from './worker/web-worker-main';
  * @returns a complete CompilerSystem, ready for use!
  */
 export const createSystem = (c?: { logger?: Logger }): CompilerSystem => {
-  const logger = c?.logger ?? createLogger();
+  const logger = c?.logger ?? createNodeLogger();
   const items = new Map<string, FsItem>();
   const destroys = new Set<() => Promise<void> | void>();
 
