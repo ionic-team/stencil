@@ -12,11 +12,19 @@ This is a comprehensive list of the breaking changes introduced in the major ver
 ## Stencil v4.0.0
 
 - [General](#general)
+  - [In Browser Compilation Support Removed](#in-browser-compilation-support-removed)
   - [Legacy Context and Connect APIs Removed](#legacy-context-and-connect-APIs-removed)
   - [Legacy Browser Support Removed](#legacy-browser-support-fields-removed)
   - [Drop Node 14 Support](#drop-node-14-support)
 
 ### General
+
+#### In Browser Compilation Support Removed
+
+Prior to Stencil v4.0.0, components could be compiled from TSX to JS in the browser.
+This feature was seldom used, and has been removed from Stencil.
+At this time, there is no replacement functionality.
+For additional details, please see the [request-for-comment](https://github.com/ionic-team/stencil/discussions/4134) on the Stencil GitHub Discussions page.
 
 #### Legacy Context and Connect APIs Removed
 
