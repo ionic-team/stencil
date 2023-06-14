@@ -9,5 +9,8 @@
     "build": "node ../../bin/stencil build",
     "start": "node ../../bin/stencil build --dev --watch --serve --debug",
     "start.prod": "node ../../bin/stencil build --watch --serve"
+  },
+  "volta": {
+    "extends": "../../package.json"
   }
 }

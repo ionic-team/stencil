@@ -9,5 +9,8 @@
     "start": "node ../../bin/stencil build --debug --watch --dev --serve"
   },
   "author": "Ionic Team",
-  "license": "MIT"
+  "license": "MIT",
+  "volta": {
+    "extends": "../../package.json"
+  }
 }

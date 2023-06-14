@@ -6,5 +6,8 @@
     "start": "node ../../bin/stencil build --dev --watch --serve",
     "start.prod": "node ../../bin/stencil build --watch --serve",
     "prerender": "node prerender.js"
+  },
+  "volta": {
+    "extends": "../../package.json"
   }
 }

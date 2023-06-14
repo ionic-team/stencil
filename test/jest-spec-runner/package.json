@@ -4,5 +4,8 @@
   "scripts": {
     "build": "node ../../bin/stencil build",
     "test": "node ../../bin/stencil test --spec"
+  },
+  "volta": {
+    "extends": "../../package.json"
   }
 }

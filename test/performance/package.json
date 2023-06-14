@@ -12,5 +12,8 @@
   "module": "dist/index.js",
   "devDependencies": {
     "workbox-build": "4.3.1"
+  },
+  "volta": {
+    "extends": "../../package.json"
   }
 }
