@@ -14,7 +14,7 @@ This is a comprehensive list of the breaking changes introduced in the major ver
 - [General](#general)
   - [In Browser Compilation Support Removed](#in-browser-compilation-support-removed)
   - [Legacy Context and Connect APIs Removed](#legacy-context-and-connect-APIs-removed)
-  - [Legacy Browser Support Removed](#legacy-browser-support-fields-removed)
+  - [Legacy Browser Support Removed](#legacy-browser-support-removed)
   - [Drop Node 14 Support](#drop-node-14-support)
 
 ### General
@@ -39,7 +39,7 @@ Both of these APIs were deprecated in Stencil v1 and are now removed.
 To migrate away from usages of `context`, please see [the original deprecation announcement](#propcontext)
 To migrate away from usages of `connect`, please see [the original deprecation announcement](#propconnect)
 
-#### Legacy Browser Support Fields Removed
+#### Legacy Browser Support Removed
 
 In Stencil v3.0.0, we announced [the deprecation of IE 11, pre-Chromium Edge, and Safari 10 support](#legacy-browser-support-fields-deprecated).
 In Stencil v4.0.0, support for these browsers has been dropped.
