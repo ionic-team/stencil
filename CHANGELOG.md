@@ -1,3 +1,35 @@
+# 🍜 [4.0.0-rc.0](https://github.com/ionic-team/stencil/compare/v3.4.0...v4.0.0-rc.0) (2023-06-16)
+
+
+### Features
+
+The following changes are new to this release:
+
+* **props:** removal of deprecated connect and context APIs ([#4437](https://github.com/ionic-team/stencil/issues/4437)) ([f399ef1](https://github.com/ionic-team/stencil/commit/f399ef162e8db8046e39d6f3c6aa4a589ee68ca6))
+* **runtime:** drop Node 14 support ([#4472](https://github.com/ionic-team/stencil/issues/4472)) ([ce18945](https://github.com/ionic-team/stencil/commit/ce189456bd601c647bb47871ccd5897707d48ee0))
+
+The following changes are also present from previous beta releases:
+
+* **compiler:** remove in-browser compilation support ([#4317](https://github.com/ionic-team/stencil/issues/4317)) ([b042d8b](https://github.com/ionic-team/stencil/commit/b042d8b6e02c2df09a920db14abe551879cde5a2))
+* **compiler:** primary package output target validation ([#4395](https://github.com/ionic-team/stencil/issues/4395)) ([e53ee07](https://github.com/ionic-team/stencil/commit/e53ee076547c834f3867f866925d04eab0739b0d))
+* **compiler** remove shadow dom shim ([#4440](https://github.com/ionic-team/stencil/pull/4440)) ([8ecdec9](https://github.com/ionic-team/stencil/commit/8ecdec9fafffa7d3ca5cc9621e26481c70cfbb89))
+* **compiler** remove CSS var shim & patchEsm() ([#4419](https://github.com/ionic-team/stencil/pull/4419)) ([4977f38](https://github.com/ionic-team/stencil/commit/4977f38f6b248f1e9644f2fc78d255b4ef7bbb03))
+* **compiler** remove safari10 extra flag ([#4421](https://github.com/ionic-team/stencil/pull/4421)) ([283fd5c](https://github.com/ionic-team/stencil/commit/283fd5c1bf93a4f89c84127c49c26c34559da644))
+* **compiler** remove dynamicImportShim ([#4420](https://github.com/ionic-team/stencil/pull/4420)) ([3ee20b7](https://github.com/ionic-team/stencil/commit/3ee20b7aa9704de5811f7fec7c517012b88ed5b6))
+
+
+### BREAKING CHANGES
+
+See [BREAKING_CHANGES.md - v4.0.0](./BREAKING_CHANGES.md#stencil-v400) for a comprehensive list of breaking changes.
+
+See [the v4.0.0 Migration Guide](https://stenciljs.com/docs/next/introduction/upgrading-to-stencil-four) for a guide to migrate to Stencil v4.0.0.
+
+### Additional Changes
+
+This release includes the latest changes from Stencil v3.4.0.
+
+
+
 # 👻 [4.0.0-beta.2](https://github.com/ionic-team/stencil/compare/v3.3.1...v4.0.0-beta.2) (2023-06-07)
 
 
@@ -8,7 +40,7 @@
 
 ### BREAKING CHANGES
 
-See [BREAKING_CHANGES.md - v4.0.0](./BREAKING_CHANGES.md#stencil-v300) for a comprehensive list of breaking changes.
+See [BREAKING_CHANGES.md - v4.0.0](./BREAKING_CHANGES.md#stencil-v400) for a comprehensive list of breaking changes.
 
 See [the v4.0.0 Migration Guide](https://stenciljs.com/docs/next/introduction/upgrading-to-stencil-four) for a guide to migrate to Stencil v4.0.0.
 
@@ -25,7 +57,7 @@ This release includes the latest changes from Stencil v3.3.1.
 
 ### BREAKING CHANGES
 
-See [BREAKING_CHANGES.md - v4.0.0](./BREAKING_CHANGES.md#stencil-v300) for a comprehensive list of breaking changes.
+See [BREAKING_CHANGES.md - v4.0.0](./BREAKING_CHANGES.md#stencil-v400) for a comprehensive list of breaking changes.
 
 See [the v4.0.0 Migration Guide](https://stenciljs.com/docs/next/introduction/upgrading-to-stencil-four) for a guide to migrate to Stencil v4.0.0.
 
@@ -49,9 +81,10 @@ This release includes the latest changes from Stencil v3.3.1.
 
 ### BREAKING CHANGES
 
-See [BREAKING_CHANGES.md - v4.0.0](./BREAKING_CHANGES.md#stencil-v300) for a comprehensive list of breaking changes.
+See [BREAKING_CHANGES.md - v4.0.0](./BREAKING_CHANGES.md#stencil-v400) for a comprehensive list of breaking changes.
 
 See [the v4.0.0 Migration Guide](https://stenciljs.com/docs/next/introduction/upgrading-to-stencil-four) for a guide to migrate to Stencil v4.0.0.
+
 
 # ✨ [3.4.0](https://github.com/ionic-team/stencil/compare/v3.3.1...v3.4.0) (2023-06-13)
 
