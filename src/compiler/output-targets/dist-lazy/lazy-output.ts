@@ -1,5 +1,6 @@
 import { catchError, isOutputTargetDist, isOutputTargetDistLazy, sortBy } from '@utils';
 import MagicString from 'magic-string';
+import * as ts from 'typescript';
 
 import type * as d from '../../../declarations';
 import type { BundleOptions } from '../../bundle/bundle-interface';
@@ -17,6 +18,7 @@ import { generateComponentBundles } from '../../entries/component-bundles';
 import { generateModuleGraph } from '../../entries/component-graph';
 import { lazyComponentTransform } from '../../transformers/component-lazy/transform-lazy-component';
 import { removeCollectionImports } from '../../transformers/remove-collection-imports';
+import { rewriteAliasedSourceFileImportPaths } from '../../transformers/rewrite-aliased-paths';
 import { updateStencilCoreImports } from '../../transformers/update-stencil-core-import';
 import { generateCjs } from './generate-cjs';
 import { generateEsm } from './generate-esm';
@@ -42,7 +44,7 @@ export const outputLazy = async (
       id: 'lazy',
       platform: 'client',
       conditionals: getLazyBuildConditionals(config, buildCtx.components),
-      customTransformers: getLazyCustomTransformer(config, compilerCtx),
+      customBeforeTransformers: getCustomBeforeTransformers(config, compilerCtx),
       inlineWorkers: config.outputTargets.some(isOutputTargetDist),
       inputs: {
         [config.fsNamespace]: LAZY_BROWSER_ENTRY_ID,
@@ -97,7 +99,19 @@ export const outputLazy = async (
   timespan.finish(`${bundleEventMessage} finished`);
 };
 
-const getLazyCustomTransformer = (config: d.ValidatedConfig, compilerCtx: d.CompilerCtx) => {
+/**
+ * Generate a collection of transformations that are to be applied as a part of the `before` step in the TypeScript
+ * compilation process.
+ #
+ * @param config the Stencil configuration associated with the current build
+ * @param compilerCtx the current compiler context
+ * @returns a collection of transformations that should be applied to the source code, intended for the `before` part
+ * of the pipeline
+ */
+const getCustomBeforeTransformers = (
+  config: d.ValidatedConfig,
+  compilerCtx: d.CompilerCtx
+): ts.TransformerFactory<ts.SourceFile>[] => {
   const transformOpts: d.TransformOptions = {
     coreImportPath: STENCIL_CORE_ID,
     componentExport: 'lazy',
@@ -107,11 +121,17 @@ const getLazyCustomTransformer = (config: d.ValidatedConfig, compilerCtx: d.Comp
     style: 'static',
     styleImportData: 'queryparams',
   };
-  return [
-    updateStencilCoreImports(transformOpts.coreImportPath),
+  const customBeforeTransformers = [updateStencilCoreImports(transformOpts.coreImportPath)];
+
+  if (config.transformAliasedImportPaths) {
+    customBeforeTransformers.push(rewriteAliasedSourceFileImportPaths);
+  }
+
+  customBeforeTransformers.push(
     lazyComponentTransform(compilerCtx, transformOpts),
-    removeCollectionImports(compilerCtx),
-  ];
+    removeCollectionImports(compilerCtx)
+  );
+  return customBeforeTransformers;
 };
 
 /**

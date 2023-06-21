@@ -57,7 +57,9 @@ export const typescriptPlugin = (compilerCtx: d.CompilerCtx, bundleOpts: BundleO
           const tsResult = ts.transpileModule(mod.staticSourceFileText, {
             compilerOptions: config.tsCompilerOptions,
             fileName: mod.sourceFilePath,
-            transformers: { before: bundleOpts.customTransformers },
+            transformers: {
+              before: bundleOpts.customBeforeTransformers ?? [],
+            },
           });
           const sourceMap: d.SourceMap = tsResult.sourceMapText ? JSON.parse(tsResult.sourceMapText) : null;
           return { code: tsResult.outputText, map: sourceMap };
