@@ -46,22 +46,30 @@ export interface StencilConfig {
    * The directory where sub-directories will be created for caching when `enableCache` is set
    * `true` or if using Stencil's Screenshot Connector.
    *
+   * @default '.stencil'
+   *
    * @example
-   * {
-   *   ...,
-   *   enableCache: true,
-   *   cacheDir: '.cache',
-   *   testing: {
-   *     screenshotConnector: 'connector.js'
-   *   }
+   *
+   * A Stencil config like the following:
+   * ```ts
+   * export const config = {
+   *  ...,
+   *  enableCache: true,
+   *  cacheDir: '.cache',
+   *  testing: {
+   *    screenshotConnector: 'connector.js'
+   *  }
    * }
+   * ```
    *
    * Will result in the following file structure:
+   * ```tree
    * stencil-project-root
    * └── .cache
    *     ├── .build <-- Where build related file caching is written
    *     |
    *     └── screenshot-cache.json <-- Where screenshot caching is written
+   * ```
    */
   cacheDir?: string;
   /**
