@@ -42,6 +42,32 @@ export interface StencilConfig {
    * To disable this feature, set enableCache to false.
    */
   enableCache?: boolean;
+  /**
+   * The directory where sub-directories will be created for caching when `enableCache` is set
+   * `true` or if using Stencil's Screenshot Connector.
+   *
+   * @example
+   * {
+   *   ...,
+   *   enableCache: true,
+   *   cacheDir: '.cache',
+   *   testing: {
+   *     screenshotConnector: 'connector.js'
+   *   }
+   * }
+   *
+   * Will result in the following file structure:
+   * stencil-project-root
+   * └── .cache
+   *     ├── .build <-- Where build related file caching is written
+   *     |
+   *     └── screenshot-cache.json <-- Where screenshot caching is written
+   */
+  cacheDir?: string;
+  /**
+   * @deprecated this flag is no longer used by Stencil and can be safely removed.
+   */
+  enableCacheStats?: boolean;
 
   /**
    * Stencil is traditionally used to compile many components into an app,
@@ -244,13 +270,8 @@ export interface StencilConfig {
   entryComponentsHint?: string[];
   buildDist?: boolean;
   buildLogFilePath?: string;
-  cacheDir?: string;
   devInspector?: boolean;
   devServer?: StencilDevServerConfig;
-  /**
-   * @deprecated this flag is no longer used by Stencil and can be safely removed.
-   */
-  enableCacheStats?: boolean;
   sys?: CompilerSystem;
   tsconfig?: string;
   validateTypes?: boolean;

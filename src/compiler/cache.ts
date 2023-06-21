@@ -8,7 +8,7 @@ export class Cache implements d.Cache {
   private skip = false;
   private sys: d.CompilerSystem;
   private logger: d.Logger;
-  private cacheDir: string;
+  private buildCacheDir: string;
 
   constructor(private config: d.Config, private cacheFs: InMemoryFileSystem) {
     this.sys = config.sys;
@@ -20,7 +20,7 @@ export class Cache implements d.Cache {
       return;
     }
 
-    this.cacheDir = this.config.cacheDir;
+    this.buildCacheDir = join(this.config.cacheDir, '.build');
 
     if (!this.config.enableCache || !this.cacheFs) {
       this.config.logger.info(`cache optimizations disabled`);
@@ -28,10 +28,10 @@ export class Cache implements d.Cache {
       return;
     }
 
-    this.config.logger.debug(`cache enabled, cacheDir: ${this.cacheDir}`);
+    this.config.logger.debug(`cache enabled, cacheDir: ${this.buildCacheDir}`);
 
     try {
-      const readmeFilePath = join(this.cacheDir, '_README.log');
+      const readmeFilePath = join(this.buildCacheDir, '_README.log');
       await this.cacheFs.writeFile(readmeFilePath, CACHE_DIR_README);
     } catch (e) {
       this.logger.error(`Cache, initCacheDir: ${e}`);
@@ -126,8 +126,8 @@ export class Cache implements d.Cache {
       }
 
       const fs = this.cacheFs.sys;
-      const cachedFileNames = await fs.readDir(this.cacheDir);
-      const cachedFilePaths = cachedFileNames.map((f) => join(this.cacheDir, f));
+      const cachedFileNames = await fs.readDir(this.buildCacheDir);
+      const cachedFilePaths = cachedFileNames.map((f) => join(this.buildCacheDir, f));
 
       let totalCleared = 0;
 
@@ -153,16 +153,16 @@ export class Cache implements d.Cache {
 
   async clearDiskCache() {
     if (this.cacheFs != null) {
-      const hasAccess = await this.cacheFs.access(this.cacheDir);
+      const hasAccess = await this.cacheFs.access(this.buildCacheDir);
       if (hasAccess) {
-        await this.cacheFs.remove(this.cacheDir);
+        await this.cacheFs.remove(this.buildCacheDir);
         await this.cacheFs.commit();
       }
     }
   }
 
   private getCacheFilePath(key: string) {
-    return join(this.cacheDir, key) + '.log';
+    return join(this.buildCacheDir, key) + '.log';
   }
 
   getMemoryStats() {
