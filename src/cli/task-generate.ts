@@ -1,7 +1,6 @@
 import { normalizePath, validateComponentTag } from '@utils';
 import { join, parse, relative } from 'path';
 
-import { IS_NODE_ENV } from '../compiler/sys/environment';
 import type { ValidatedConfig } from '../declarations';
 
 /**
@@ -14,11 +13,6 @@ import type { ValidatedConfig } from '../declarations';
  * @returns a void promise
  */
 export const taskGenerate = async (config: ValidatedConfig): Promise<void> => {
-  if (!IS_NODE_ENV) {
-    config.logger.error(`"generate" command is currently only implemented for a NodeJS environment`);
-    return config.sys.exit(1);
-  }
-
   if (!config.configPath) {
     config.logger.error('Please run this command in your root directory (i. e. the one containing stencil.config.ts).');
     return config.sys.exit(1);
