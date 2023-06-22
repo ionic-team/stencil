@@ -22,5 +22,3 @@ export const HAS_WEB_WORKER = IS_BROWSER_ENV && typeof Worker === 'function';
 export const IS_FETCH_ENV = typeof fetch === 'function';
 
 export const requireFunc = IS_NODE_ENV ? require : () => {};
-
-export const getCurrentDirectory: () => string = IS_NODE_ENV ? process.cwd : () => '/';
