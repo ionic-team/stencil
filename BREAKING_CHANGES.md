@@ -73,7 +73,7 @@ This field should be removed from a project's Stencil configuration file (`stenc
 ### Legacy Cache Stats Config Flag Removed
 
 The `enableCacheStats` flag was used in legacy behavior for caching, but has not been used for some time. This
-flag has been removed from Stencil's API and should be removed from any projects' Stencil configs.
+flag has been removed from Stencil's API and should be removed from a project's Stencil configuration file (`stencil.config.ts`).
 
 ### Drop Node 14 Support
 
