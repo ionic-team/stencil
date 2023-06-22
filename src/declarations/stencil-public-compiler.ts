@@ -72,10 +72,6 @@ export interface StencilConfig {
    * ```
    */
   cacheDir?: string;
-  /**
-   * @deprecated this flag is no longer used by Stencil and can be safely removed.
-   */
-  enableCacheStats?: boolean;
 
   /**
    * Stencil is traditionally used to compile many components into an app,

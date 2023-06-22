@@ -15,6 +15,7 @@ This is a comprehensive list of the breaking changes introduced in the major ver
   - [In Browser Compilation Support Removed](#in-browser-compilation-support-removed)
   - [Legacy Context and Connect APIs Removed](#legacy-context-and-connect-APIs-removed)
   - [Legacy Browser Support Removed](#legacy-browser-support-removed)
+  - [Legacy Cache Stats Config Flag Removed](#legacy-cache-stats-config-flag-removed)
   - [Drop Node 14 Support](#drop-node-14-support)
 
 ### General
@@ -68,6 +69,11 @@ The `extras.__deprecated__shadowDomShim` option would check whether a shim for [
 DOM](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_shadow_DOM)
 was needed in the current browser, and include one if so.
 This field should be removed from a project's Stencil configuration file (`stencil.config.ts`). 
+
+### Legacy Cache Stats Config Flag Removed
+
+The `enableCacheStats` flag was used in legacy behavior for caching, but has not been used for some time. This
+flag has been removed from Stencil's API and should be removed from any projects' Stencil configs.
 
 ### Drop Node 14 Support
 
