@@ -1,4 +1,3 @@
-import { IS_NODE_ENV } from '../compiler/sys/environment';
 import type { TestingRunOptions, ValidatedConfig } from '../declarations';
 
 /**
@@ -7,11 +6,6 @@ import type { TestingRunOptions, ValidatedConfig } from '../declarations';
  * @returns a void promise
  */
 export const taskTest = async (config: ValidatedConfig): Promise<void> => {
-  if (!IS_NODE_ENV) {
-    config.logger.error(`"test" command is currently only implemented for a NodeJS environment`);
-    return config.sys.exit(1);
-  }
-
   config.buildDocs = false;
   const testingRunOpts: TestingRunOptions = {
     e2e: !!config.flags.e2e,
