@@ -5,7 +5,6 @@ import ts from 'typescript';
 import type * as d from '../../declarations';
 import { BuildContext } from '../build/build-ctx';
 import { CompilerContext } from '../build/compiler-ctx';
-import { getCurrentDirectory } from '../sys/environment';
 import { lazyComponentTransform } from '../transformers/component-lazy/transform-lazy-component';
 import { nativeComponentTransform } from '../transformers/component-native/tranform-to-native-component';
 import { convertDecoratorsToStatic } from '../transformers/decorators-to-static/convert-decorators';
@@ -99,7 +98,7 @@ export const transpileModule = (
     getDefaultLibFileName: () => `lib.d.ts`,
     useCaseSensitiveFileNames: () => false,
     getCanonicalFileName: (fileName) => fileName,
-    getCurrentDirectory: () => transformOpts.currentDirectory || getCurrentDirectory(),
+    getCurrentDirectory: () => transformOpts.currentDirectory || process.cwd(),
     getNewLine: () => ts.sys.newLine || '\n',
     fileExists: (fileName) => normalizePath(fileName) === normalizePath(sourceFilePath),
     readFile: () => '',

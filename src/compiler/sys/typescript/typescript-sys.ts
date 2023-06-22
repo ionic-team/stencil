@@ -3,7 +3,7 @@ import { basename, resolve } from 'path';
 import ts from 'typescript';
 
 import type * as d from '../../../declarations';
-import { getCurrentDirectory, IS_CASE_SENSITIVE_FILE_NAMES, IS_WEB_WORKER_ENV } from '../environment';
+import { IS_CASE_SENSITIVE_FILE_NAMES, IS_WEB_WORKER_ENV } from '../environment';
 import { fetchUrlSync } from '../fetch/fetch-module-sync';
 import { InMemoryFileSystem } from '../in-memory-fs';
 import { patchTypeScriptResolveModule } from './typescript-resolve-module';
@@ -214,7 +214,7 @@ const patchTypeScriptSysMinimum = () => {
       directoryExists: () => false,
       exit: noop,
       fileExists: () => false,
-      getCurrentDirectory,
+      getCurrentDirectory: process.cwd,
       getDirectories: () => [],
       getExecutingFilePath: () => './',
       readDirectory: () => [],
