@@ -155,7 +155,13 @@ function rewriteAliasedImport(
   // from the import path
   const extensionRegex = new RegExp(
     Object.values(ts.Extension)
-      .map((extension) => `${extension}$`)
+      // The values of `ts.Extension` look like `".d.ts"`, `".ts"`, etc
+      //
+      // We want to use them to match file extensions at the end of strings,
+      // like `foo.ts`. In order to match on the exact file extension strings we
+      // need to escape periods (`"."`) so that they are correctly interpreted as
+      // literal characters instead of as wildcards.
+      .map((extension) => `${extension}$`.replace('.', '\\.'))
       .join('|')
   );
 

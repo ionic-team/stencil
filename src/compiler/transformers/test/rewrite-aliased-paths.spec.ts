@@ -29,6 +29,7 @@ async function pathTransformTranspile(component: string, inputFileName = 'module
     paths: {
       '@namespace': [path.join(config.rootDir, 'name/space.ts')],
       '@namespace/subdir': [path.join(config.rootDir, 'name/space/subdir.ts')],
+      '@namespace/keyboard': [path.join(config.rootDir, 'name/space/keyboard.ts')],
     },
     declaration: true,
   };
@@ -38,6 +39,10 @@ async function pathTransformTranspile(component: string, inputFileName = 'module
   // transform the module ID
   await compilerContext.fs.writeFile(path.join(config.rootDir, 'name/space.ts'), 'export const foo = x => x');
   await compilerContext.fs.writeFile(path.join(config.rootDir, 'name/space/subdir.ts'), 'export const bar = x => x;');
+  await compilerContext.fs.writeFile(
+    path.join(config.rootDir, 'name/space/keyboard.ts'),
+    'export const keyboard = "keyboard"'
+  );
 
   return transpileModule(
     component,
@@ -217,6 +222,25 @@ describe('rewrite alias module paths transform', () => {
             return h("some-cmp", null, foo("bar"));
           }
         }`
+      )
+    );
+  });
+
+  // this is a regression test for STENCIL-840, the issue referenced here:
+  // https://github.com/ionic-team/ionic-framework/pull/27417#discussion_r1187779290
+  it("shouldn't get tripped up by regexes!", async () => {
+    const t = await pathTransformTranspile(`
+      import { foo } from "@namespace/keyboard";
+      export class CmpA {
+        render() {
+          return <some-cmp>{ foo("bar") }</some-cmp>
+        }
+      }
+    `);
+
+    expect(formatCode(t.outputText)).toBe(
+      formatCode(
+        'import { foo } from "./name/space/keyboard";export class CmpA { render() { return h("some-cmp", null, foo("bar")); }}'
       )
     );
   });
