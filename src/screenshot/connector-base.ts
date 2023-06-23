@@ -42,8 +42,8 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
     this.buildAuthor = opts.buildAuthor;
     this.buildUrl = opts.buildUrl;
     this.previewUrl = opts.previewUrl;
-    (this.buildTimestamp = typeof opts.buildTimestamp === 'number' ? opts.buildTimestamp : Date.now()),
-      (this.cacheDir = opts.cacheDir);
+    this.buildTimestamp = typeof opts.buildTimestamp === 'number' ? opts.buildTimestamp : Date.now();
+    this.cacheDir = opts.cacheDir;
     this.packageDir = opts.packageDir;
     this.rootDir = opts.rootDir;
     this.appNamespace = opts.appNamespace;
