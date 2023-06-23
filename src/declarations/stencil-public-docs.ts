@@ -1,3 +1,23 @@
+import {
+  ComponentCompilerEventComplexType,
+  ComponentCompilerMethodComplexType,
+  ComponentCompilerPropertyComplexType,
+  ComponentCompilerReferencedType,
+} from './stencil-private';
+
+/**
+ * The Type Library holds information about the types which are used in a
+ * Stencil project. During compilation, Stencil gathers information about the
+ * types which form part of a component's public API, such as properties
+ * decorated with `@Prop`, `@Event`, `@Watch`, etc. This type information is
+ * then added to the Type Library, where it can be accessed later on for
+ * generating documentation.
+ *
+ * This information is included in the file written by the `docs-json` output
+ * target (see {@link JsonDocs.typeLibrary}).
+ */
+export type JsonDocsTypeLibrary = Record<string, ComponentCompilerReferencedType>;
+
 /**
  * A container for JSDoc metadata for a project
  */
@@ -24,6 +44,7 @@ export interface JsonDocs {
      */
     typescriptVersion: string;
   };
+  typeLibrary: JsonDocsTypeLibrary;
 }
 
 /**
@@ -191,6 +212,7 @@ export interface JsonDocsProp {
    * the name of the prop
    */
   name: string;
+  complexType?: ComponentCompilerPropertyComplexType;
   /**
    * the type of the prop, in terms of the TypeScript type system (as opposed to JavaScript's or HTML's)
    */
@@ -218,7 +240,7 @@ export interface JsonDocsProp {
   /**
    * The default value of the prop
    */
-  default: string;
+  default?: string;
   /**
    * Deprecation text associated with the prop. This is the text that immediately follows a `@deprecated` tag
    */
@@ -252,6 +274,7 @@ export interface JsonDocsMethod {
   signature: string;
   returns: JsonDocsMethodReturn;
   parameters: JsonDocMethodParameter[];
+  complexType: ComponentCompilerMethodComplexType;
 }
 
 export interface JsonDocsMethodReturn {
@@ -270,6 +293,7 @@ export interface JsonDocsEvent {
   bubbles: boolean;
   cancelable: boolean;
   composed: boolean;
+  complexType: ComponentCompilerEventComplexType;
   docs: string;
   docsTags: JsonDocsTag[];
   deprecation?: string;

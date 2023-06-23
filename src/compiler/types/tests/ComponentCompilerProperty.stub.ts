@@ -17,6 +17,7 @@ export const stubComponentCompilerProperty = (
       resolved: '123 | 456',
       references: {
         UserImplementedEventType: {
+          id: 'placeholder',
           location: 'import',
           path: './resources',
         },

@@ -1,14 +1,17 @@
-import { flatOne, normalizePath, sortBy, unique } from '@utils';
+import { flatOne, isOutputTargetDocsJson, normalizePath, sortBy, unique } from '@utils';
 import { basename, dirname, join, relative } from 'path';
 
 import type * as d from '../../declarations';
 import { JsonDocsValue } from '../../declarations';
 import { typescriptVersion, version } from '../../version';
 import { getBuildTimestamp } from '../build/build-ctx';
+import { addFileToLibrary, getTypeLibrary } from '../transformers/type-library';
 import { AUTO_GENERATE_COMMENT } from './constants';
 
 /**
- * Generate metadata that will be used to generate any given documentation-related output target(s)
+ * Generate metadata that will be used to generate any given documentation-related
+ * output target(s)
+ *
  * @param config the configuration associated with the current Stencil task run
  * @param compilerCtx the current compiler context
  * @param buildCtx the build context for the current Stencil task run
@@ -19,6 +22,18 @@ export const generateDocData = async (
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx
 ): Promise<d.JsonDocs> => {
+  const jsonOutputTargets = config.outputTargets.filter(isOutputTargetDocsJson);
+  const supplementalPublicTypes = findSupplementalPublicTypes(jsonOutputTargets);
+
+  if (supplementalPublicTypes !== '') {
+    // if supplementalPublicTypes is set then we want to add all the public
+    // types in that file to the type library so that output targets producing
+    // documentation can make use of that data later.
+    addFileToLibrary(config, supplementalPublicTypes);
+  }
+
+  const typeLibrary = getTypeLibrary();
+
   return {
     timestamp: getBuildTimestamp(),
     compiler: {
@@ -27,11 +42,28 @@ export const generateDocData = async (
       typescriptVersion,
     },
     components: await getDocsComponents(config, compilerCtx, buildCtx),
+    typeLibrary,
   };
 };
 
 /**
+ * If the `supplementalPublicTypes` option is set on one output target, find that value and return it.
+ *
+ * @param outputTargets an array of docs-json output targets
+ * @returns the first value encountered for supplementalPublicTypes or an empty string
+ */
+function findSupplementalPublicTypes(outputTargets: d.OutputTargetDocsJson[]): string {
+  for (const docsJsonOT of outputTargets) {
+    if (docsJsonOT.supplementalPublicTypes) {
+      return docsJsonOT.supplementalPublicTypes;
+    }
+  }
+  return '';
+}
+
+/**
  * Derive the metadata for each Stencil component
+ *
  * @param config the configuration associated with the current Stencil task run
  * @param compilerCtx the current compiler context
  * @param buildCtx the build context for the current Stencil task run
@@ -50,11 +82,12 @@ const getDocsComponents = async (
       const usagesDir = normalizePath(join(dirPath, 'usage'));
       const readme = await getUserReadmeContent(compilerCtx, readmePath);
       const usage = await generateUsages(compilerCtx, usagesDir);
+
       return moduleFile.cmps
         .filter((cmp: d.ComponentCompilerMeta) => !cmp.internal && !cmp.isCollectionDependency)
         .map((cmp: d.ComponentCompilerMeta) => ({
           dirPath,
-          filePath: relative(config.rootDir, filePath),
+          filePath: normalizePath(relative(config.rootDir, filePath), false),
           fileName: basename(filePath),
           readmePath,
           usagesDir,
@@ -150,6 +183,7 @@ const getRealProperties = (properties: d.ComponentCompilerProperty[]): d.JsonDoc
     .map((member) => ({
       name: member.name,
       type: member.complexType.resolved,
+      complexType: member.complexType,
       mutable: member.mutable,
       attr: member.attribute,
       reflectToAttr: !!member.reflect,
@@ -243,6 +277,7 @@ const getDocsMethods = (methods: d.ComponentCompilerMethod[]): d.JsonDocsMethod[
           .map((t) => t.text)
           .join('\n'),
       },
+      complexType: member.complexType,
       signature: `${member.name}${member.complexType.signature}`,
       parameters: [], // TODO
       docs: member.docs.text,
@@ -258,6 +293,7 @@ const getDocsEvents = (events: d.ComponentCompilerEvent[]): d.JsonDocsEvent[] =>
       event: eventMeta.name,
       detail: eventMeta.complexType.resolved,
       bubbles: eventMeta.bubbles,
+      complexType: eventMeta.complexType,
       cancelable: eventMeta.cancelable,
       composed: eventMeta.composed,
       docs: eventMeta.docs.text,
@@ -356,7 +392,7 @@ const getUserReadmeContent = async (compilerCtx: d.CompilerCtx, readmePath: stri
  * @param jsdoc the JSDoc associated with the component's declaration
  * @returns the generated documentation
  */
-const generateDocs = (readme: string, jsdoc: d.CompilerJsDoc): string => {
+const generateDocs = (readme: string | undefined, jsdoc: d.CompilerJsDoc): string => {
   const docs = jsdoc.text;
   if (docs !== '' || !readme) {
     // just return the existing docs if they exist. these would have been captured earlier in the compilation process.

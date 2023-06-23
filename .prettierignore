@@ -45,6 +45,8 @@ test/**/components.d.ts
 test/end-to-end/screenshot/
 test/end-to-end/docs.d.ts
 test/end-to-end/docs.json
+test/docs-json/docs.d.ts
+test/docs-json/docs.json
 
 # minified angular that exists in the test directory
 test/karma/test-app/assets/angular.min.js

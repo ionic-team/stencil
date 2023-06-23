@@ -40,7 +40,7 @@ describe('terminal-logger', () => {
   });
 
   describe('basic logging functionality', () => {
-    const setupConsoleMocks = setupConsoleMocker();
+    const { setupConsoleMocks } = setupConsoleMocker();
 
     function setup() {
       const { logMock, warnMock, errorMock } = setupConsoleMocks();

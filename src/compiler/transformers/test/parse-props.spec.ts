@@ -166,6 +166,7 @@ describe('parse props', () => {
           references: {
             Object: {
               location: 'global',
+              id: 'global::Object',
             },
           },
           resolved: 'Object',

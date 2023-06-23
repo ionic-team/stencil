@@ -59,7 +59,7 @@ export const runTsProgram = async (
   };
 
   const transformers: ts.CustomTransformers = {
-    before: [convertDecoratorsToStatic(config, buildCtx.diagnostics, tsTypeChecker)],
+    before: [convertDecoratorsToStatic(config, buildCtx.diagnostics, tsTypeChecker, tsProgram)],
     afterDeclarations: [],
   };
 
@@ -112,7 +112,7 @@ export const runTsProgram = async (
     const srcRootDtsFiles = tsProgram
       .getRootFileNames()
       .filter((f) => f.endsWith('.d.ts') && !f.endsWith('components.d.ts'))
-      .map(normalizePath)
+      .map((s) => normalizePath(s))
       .filter((f) => !emittedDts.includes(f))
       .map((srcRootDtsFilePath) => {
         const relativeEmitFilepath = relative(config.srcDir, srcRootDtsFilePath);
