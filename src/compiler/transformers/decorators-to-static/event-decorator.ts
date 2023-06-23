@@ -17,11 +17,12 @@ export const eventDecoratorsToStatic = (
   diagnostics: d.Diagnostic[],
   decoratedProps: ts.ClassElement[],
   typeChecker: ts.TypeChecker,
+  program: ts.Program,
   newMembers: ts.ClassElement[]
 ) => {
   const events = decoratedProps
     .filter(ts.isPropertyDeclaration)
-    .map((prop) => parseEventDecorator(diagnostics, typeChecker, prop))
+    .map((prop) => parseEventDecorator(diagnostics, typeChecker, program, prop))
     .filter((ev) => !!ev);
 
   if (events.length > 0) {
@@ -35,6 +36,7 @@ export const eventDecoratorsToStatic = (
  * @param diagnostics a list of diagnostics used as a part of the parsing process. Any parse errors/warnings shall be
  * added to this collection
  * @param typeChecker an instance of the TypeScript type checker, used to generate information about the `@Event()` and
+ * @param program a {@link ts.Program} object
  * its surrounding context in the AST
  * @param prop the property on the Stencil component class that is decorated with `@Event()`
  * @returns generated metadata for the class member decorated by `@Event()`, or `null` if none could be derived
@@ -42,6 +44,7 @@ export const eventDecoratorsToStatic = (
 const parseEventDecorator = (
   diagnostics: d.Diagnostic[],
   typeChecker: ts.TypeChecker,
+  program: ts.Program,
   prop: ts.PropertyDeclaration
 ): d.ComponentCompilerStaticEvent | null => {
   const eventDecorator = retrieveTsDecorators(prop)?.find(isDecoratorNamed('Event'));
@@ -68,7 +71,7 @@ const parseEventDecorator = (
     cancelable: eventOpts && typeof eventOpts.cancelable === 'boolean' ? eventOpts.cancelable : true,
     composed: eventOpts && typeof eventOpts.composed === 'boolean' ? eventOpts.composed : true,
     docs: serializeSymbol(typeChecker, symbol),
-    complexType: getComplexType(typeChecker, prop),
+    complexType: getComplexType(typeChecker, program, prop),
   };
   validateReferences(diagnostics, eventMeta.complexType.references, prop.type);
   return eventMeta;
@@ -85,11 +88,13 @@ export const getEventName = (eventOptions: d.EventOptions, memberName: string) =
 /**
  * Derive Stencil's class member type metadata from a node in the AST
  * @param typeChecker the TypeScript type checker
+ * @param program a {@link ts.Program} object
  * @param node the node in the AST to generate metadata for
  * @returns the generated metadata
  */
 const getComplexType = (
   typeChecker: ts.TypeChecker,
+  program: ts.Program,
   node: ts.PropertyDeclaration
 ): d.ComponentCompilerPropertyComplexType => {
   const sourceFile = node.getSourceFile();
@@ -97,7 +102,7 @@ const getComplexType = (
   return {
     original: eventType ? eventType.getText() : 'any',
     resolved: eventType ? resolveType(typeChecker, typeChecker.getTypeFromTypeNode(eventType)) : 'any',
-    references: eventType ? getAttributeTypeInfo(eventType, sourceFile) : {},
+    references: eventType ? getAttributeTypeInfo(eventType, sourceFile, typeChecker, program) : {},
   };
 };
 

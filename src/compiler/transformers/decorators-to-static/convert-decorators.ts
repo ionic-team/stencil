@@ -27,12 +27,13 @@ import { watchDecoratorsToStatic } from './watch-decorator';
 export const convertDecoratorsToStatic = (
   config: d.Config,
   diagnostics: d.Diagnostic[],
-  typeChecker: ts.TypeChecker
+  typeChecker: ts.TypeChecker,
+  program: ts.Program
 ): ts.TransformerFactory<ts.SourceFile> => {
   return (transformCtx) => {
     const visit = (node: ts.Node): ts.VisitResult<ts.Node> => {
       if (ts.isClassDeclaration(node)) {
-        return visitClassDeclaration(config, diagnostics, typeChecker, node);
+        return visitClassDeclaration(config, diagnostics, typeChecker, program, node);
       }
       return ts.visitEachChild(node, visit, transformCtx);
     };
@@ -47,6 +48,7 @@ const visitClassDeclaration = (
   config: d.Config,
   diagnostics: d.Diagnostic[],
   typeChecker: ts.TypeChecker,
+  program: ts.Program,
   classNode: ts.ClassDeclaration
 ) => {
   const componentDecorator = retrieveTsDecorators(classNode)?.find(isDecoratorNamed('Component'));
@@ -69,10 +71,18 @@ const visitClassDeclaration = (
   const watchable = new Set<string>();
   // parse member decorators (Prop, State, Listen, Event, Method, Element and Watch)
   if (decoratedMembers.length > 0) {
-    propDecoratorsToStatic(diagnostics, decoratedMembers, typeChecker, watchable, filteredMethodsAndFields);
+    propDecoratorsToStatic(diagnostics, decoratedMembers, typeChecker, program, watchable, filteredMethodsAndFields);
     stateDecoratorsToStatic(decoratedMembers, watchable, filteredMethodsAndFields);
-    eventDecoratorsToStatic(diagnostics, decoratedMembers, typeChecker, filteredMethodsAndFields);
-    methodDecoratorsToStatic(config, diagnostics, classNode, decoratedMembers, typeChecker, filteredMethodsAndFields);
+    eventDecoratorsToStatic(diagnostics, decoratedMembers, typeChecker, program, filteredMethodsAndFields);
+    methodDecoratorsToStatic(
+      config,
+      diagnostics,
+      classNode,
+      decoratedMembers,
+      typeChecker,
+      program,
+      filteredMethodsAndFields
+    );
     elementDecoratorsToStatic(diagnostics, decoratedMembers, typeChecker, filteredMethodsAndFields);
     watchDecoratorsToStatic(config, diagnostics, decoratedMembers, watchable, filteredMethodsAndFields);
     listenDecoratorsToStatic(diagnostics, decoratedMembers, filteredMethodsAndFields);

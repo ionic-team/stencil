@@ -111,7 +111,7 @@ export const transpileModule = (
 
   const transformers: ts.CustomTransformers = {
     before: [
-      convertDecoratorsToStatic(config, buildCtx.diagnostics, typeChecker),
+      convertDecoratorsToStatic(config, buildCtx.diagnostics, typeChecker, program),
       updateStencilCoreImports(transformOpts.coreImportPath),
     ],
     after: [convertStaticToMeta(config, compilerCtx, buildCtx, typeChecker, null, transformOpts)],

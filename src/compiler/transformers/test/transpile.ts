@@ -109,7 +109,7 @@ export function transpileModule(
   };
 
   tsProgram.emit(undefined, undefined, undefined, undefined, {
-    before: [convertDecoratorsToStatic(config, buildCtx.diagnostics, tsTypeChecker), ...beforeTransformers],
+    before: [convertDecoratorsToStatic(config, buildCtx.diagnostics, tsTypeChecker, tsProgram), ...beforeTransformers],
     after: [
       convertStaticToMeta(config, compilerCtx, buildCtx, tsTypeChecker, null, transformOpts),
       ...afterTransformers,

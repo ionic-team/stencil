@@ -43,6 +43,13 @@ describe('normalizePath', () => {
     expect(normalizePath('/./dir')).toBe('/dir');
   });
 
+  it('relative, no dot', () => {
+    expect(normalizePath('foo/bar.ts')).toBe('./foo/bar.ts');
+    expect(normalizePath('foo/bar.ts', false)).toBe('foo/bar.ts');
+    expect(normalizePath('foo\\bar.ts')).toBe('./foo/bar.ts');
+    expect(normalizePath('foo\\bar.ts', false)).toBe('foo/bar.ts');
+  });
+
   it('absolute win32', () => {
     expect(normalizePath('C:\\dir\\basename.ext')).toBe('C:/dir/basename.ext');
     expect(normalizePath('C:\\dir')).toBe('C:/dir');

@@ -12,6 +12,7 @@ export const stubComponentCompilerTypeReference = (
 ): d.ComponentCompilerTypeReference => {
   const defaults: d.ComponentCompilerTypeReference = {
     location: 'global',
+    id: 'placeholder',
   };
 
   return { ...defaults, ...overrides };

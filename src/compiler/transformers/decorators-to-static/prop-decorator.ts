@@ -25,6 +25,7 @@ import { getDeclarationParameters, isDecoratorNamed } from './decorator-utils';
  * @param decoratedProps a collection of class elements that may or may not my class members decorated with `@Prop`.
  * Only those decorated with `@Prop()` will be parsed.
  * @param typeChecker a reference to the TypeScript type checker
+ * @param program a {@link ts.Program} object
  * @param watchable a collection of class members that can be watched for changes using Stencil's `@Watch` decorator
  * @param newMembers a collection that parsed `@Prop` annotated class members should be pushed to as a side effect of
  * calling this function
@@ -33,12 +34,13 @@ export const propDecoratorsToStatic = (
   diagnostics: d.Diagnostic[],
   decoratedProps: ts.ClassElement[],
   typeChecker: ts.TypeChecker,
+  program: ts.Program,
   watchable: Set<string>,
   newMembers: ts.ClassElement[]
 ): void => {
   const properties = decoratedProps
     .filter(ts.isPropertyDeclaration)
-    .map((prop) => parsePropDecorator(diagnostics, typeChecker, prop, watchable))
+    .map((prop) => parsePropDecorator(diagnostics, typeChecker, program, prop, watchable))
     .filter((prop): prop is ts.PropertyAssignment => prop != null);
 
   if (properties.length > 0) {
@@ -51,6 +53,7 @@ export const propDecoratorsToStatic = (
  * @param diagnostics a collection of compiler diagnostics. During the parsing process, any errors detected must be
  * added to this collection
  * @param typeChecker a reference to the TypeScript type checker
+ * @param program a {@link ts.Program} object
  * @param prop the TypeScript `PropertyDeclaration` to parse
  * @param watchable a collection of class members that can be watched for changes using Stencil's `@Watch` decorator
  * @returns a property assignment expression to be added to the Stencil component's class
@@ -58,6 +61,7 @@ export const propDecoratorsToStatic = (
 const parsePropDecorator = (
   diagnostics: d.Diagnostic[],
   typeChecker: ts.TypeChecker,
+  program: ts.Program,
   prop: ts.PropertyDeclaration,
   watchable: Set<string>
 ): ts.PropertyAssignment | null => {
@@ -93,7 +97,7 @@ const parsePropDecorator = (
   const propMeta: d.ComponentCompilerStaticProperty = {
     type: typeStr,
     mutable: !!propOptions.mutable,
-    complexType: getComplexType(typeChecker, prop, type),
+    complexType: getComplexType(typeChecker, prop, type, program),
     required: prop.exclamationToken !== undefined && propName !== 'mode',
     optional: prop.questionToken !== undefined,
     docs: serializeSymbol(typeChecker, symbol),
@@ -163,13 +167,14 @@ const getReflect = (diagnostics: d.Diagnostic[], propDecorator: ts.Decorator, pr
 const getComplexType = (
   typeChecker: ts.TypeChecker,
   node: ts.PropertyDeclaration,
-  type: ts.Type
+  type: ts.Type,
+  program: ts.Program
 ): d.ComponentCompilerPropertyComplexType => {
   const nodeType = node.type;
   return {
     original: nodeType ? nodeType.getText() : typeToString(typeChecker, type),
     resolved: resolveType(typeChecker, type),
-    references: getAttributeTypeInfo(node, node.getSourceFile()),
+    references: getAttributeTypeInfo(node, node.getSourceFile(), typeChecker, program),
   };
 };
 

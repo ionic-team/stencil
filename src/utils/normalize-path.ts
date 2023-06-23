@@ -4,9 +4,10 @@
  * extended-length paths and don't contain any non-ascii characters.
  * This was created since the path methods in Node.js outputs \\ paths on Windows.
  * @param path the Windows-based path to convert
+ * @param relativize whether or not a relative path should have `./` prepended
  * @returns the converted path
  */
-export const normalizePath = (path: string): string => {
+export const normalizePath = (path: string, relativize = true): string => {
   if (typeof path !== 'string') {
     throw new Error(`invalid path to normalize`);
   }
@@ -26,7 +27,8 @@ export const normalizePath = (path: string): string => {
     secondPart &&
     path.includes('/') &&
     !secondPart.startsWith('.') &&
-    !secondPart.startsWith('@')
+    !secondPart.startsWith('@') &&
+    relativize
   ) {
     return './' + normalized;
   }
