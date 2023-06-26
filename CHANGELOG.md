@@ -1,3 +1,13 @@
+## 🐨 [3.4.1](https://github.com/ionic-team/stencil/compare/v3.4.0...v3.4.1) (2023-06-26)
+
+
+### Bug Fixes
+
+* **compiler:** fix issue with aliased paths getting cut off ([#4481](https://github.com/ionic-team/stencil/issues/4481)) ([1a2c160](https://github.com/ionic-team/stencil/commit/1a2c1608a41bbe0420ec066d2bf56f32ed6613b8))
+* **compiler:** reorder tsconfig#path transforms ([#4501](https://github.com/ionic-team/stencil/issues/4501)) ([6b4fe58](https://github.com/ionic-team/stencil/commit/6b4fe58deeb1cf9097763aec3bbb3ee7a56afec9))
+
+
+
 # ✨ [3.4.0](https://github.com/ionic-team/stencil/compare/v3.3.1...v3.4.0) (2023-06-13)
 
 
