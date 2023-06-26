@@ -18,7 +18,11 @@ export interface BundleOptions {
    */
   externalRuntime?: boolean;
   platform: 'client' | 'hydrate' | 'worker';
-  customTransformers?: TransformerFactory<SourceFile>[];
+  /**
+   * A collection of TypeScript transformation factories to apply during the "before" stage of the TypeScript
+   * compilation pipeline (before built-in .js transformations)
+   */
+  customBeforeTransformers?: TransformerFactory<SourceFile>[];
   /**
    * This is equivalent to the Rollup `input` configuration option. It's
    * an object mapping names to entry points which tells Rollup to bundle

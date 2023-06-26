@@ -20,6 +20,7 @@ import { addDefineCustomElementFunctions } from '../../transformers/component-na
 import { proxyCustomElement } from '../../transformers/component-native/proxy-custom-element-function';
 import { nativeComponentTransform } from '../../transformers/component-native/tranform-to-native-component';
 import { removeCollectionImports } from '../../transformers/remove-collection-imports';
+import { rewriteAliasedSourceFileImportPaths } from '../../transformers/rewrite-aliased-paths';
 import { updateStencilCoreImports } from '../../transformers/update-stencil-core-import';
 import { getCustomElementsBuildConditionals } from './custom-elements-build-conditionals';
 
@@ -75,7 +76,7 @@ export const getBundleOptions = (
   id: 'customElements',
   platform: 'client',
   conditionals: getCustomElementsBuildConditionals(config, buildCtx.components),
-  customTransformers: getCustomElementCustomTransformer(config, compilerCtx, buildCtx.components, outputTarget),
+  customBeforeTransformers: getCustomBeforeTransformers(config, compilerCtx, buildCtx.components, outputTarget),
   externalRuntime: !!outputTarget.externalRuntime,
   inlineWorkers: true,
   inputs: {
@@ -314,7 +315,7 @@ export const generateEntryPoint = (
  * @param outputTarget the output target configuration
  * @returns a list of transformers to use in the transpilation process
  */
-const getCustomElementCustomTransformer = (
+const getCustomBeforeTransformers = (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   components: d.ComponentCompilerMeta[],
@@ -329,11 +330,19 @@ const getCustomElementCustomTransformer = (
     style: 'static',
     styleImportData: 'queryparams',
   };
-  return [
+  const customBeforeTransformers = [
     addDefineCustomElementFunctions(compilerCtx, components, outputTarget),
     updateStencilCoreImports(transformOpts.coreImportPath),
+  ];
+
+  if (config.transformAliasedImportPaths) {
+    customBeforeTransformers.push(rewriteAliasedSourceFileImportPaths);
+  }
+
+  customBeforeTransformers.push(
     nativeComponentTransform(compilerCtx, transformOpts),
     proxyCustomElement(compilerCtx, transformOpts),
-    removeCollectionImports(compilerCtx),
-  ];
+    removeCollectionImports(compilerCtx)
+  );
+  return customBeforeTransformers;
 };
