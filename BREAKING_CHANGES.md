@@ -11,24 +11,21 @@ This is a comprehensive list of the breaking changes introduced in the major ver
 
 ## Stencil v4.0.0
 
-- [General](#general)
-  - [New Configuration Defaults](#new-configuration-defaults)
-    - [transformAliasedImportPaths](#transformaliasedimportpaths)
-    - [transformAliasedImportPathsInCollection](#transformaliasedimportpathsincollection)
-  - [In Browser Compilation Support Removed](#in-browser-compilation-support-removed)
-  - [Legacy Context and Connect APIs Removed](#legacy-context-and-connect-APIs-removed)
-  - [Legacy Browser Support Removed](#legacy-browser-support-removed)
-  - [Legacy Cache Stats Config Flag Removed](#legacy-cache-stats-config-flag-removed)
-  - [Drop Node 14 Support](#drop-node-14-support)
-  - [Information included in JSON documentation expanded](#information-included-in-docs-json-expanded)
+- [New Configuration Defaults](#new-configuration-defaults)
+  - [transformAliasedImportPaths](#transformaliasedimportpaths)
+  - [transformAliasedImportPathsInCollection](#transformaliasedimportpathsincollection)
+- [In Browser Compilation Support Removed](#in-browser-compilation-support-removed)
+- [Legacy Context and Connect APIs Removed](#legacy-context-and-connect-APIs-removed)
+- [Legacy Browser Support Removed](#legacy-browser-support-removed)
+- [Legacy Cache Stats Config Flag Removed](#legacy-cache-stats-config-flag-removed)
+- [Drop Node 14 Support](#drop-node-14-support)
+- [Information Included in JSON Documentation Expanded](#information-included-in-docs-json-expanded)
 
-### General
-
-#### New Configuration Defaults
+### New Configuration Defaults
 Starting with Stencil v4.0.0, the default configuration values have changed for a few configuration options.
 The following sections lay out the configuration options that have changed, their new default values, and ways to opt-out of the new behavior (if applicable).
 
-##### `transformAliasedImportPaths`
+#### `transformAliasedImportPaths`
 
 TypeScript projects have the ability to specify a path aliases via the [`paths` configuration in their `tsconfig.json`](https://www.typescriptlang.org/docs/handbook/module-resolution.html#path-mapping) like so:
 ```json title="tsconfig.json"
@@ -72,10 +69,10 @@ export const config: Config = {
 
 For more information on this flag, please see the [configuration documentation](https://stenciljs.com/docs/config#transformaliasedimportpaths)
 
-##### `transformAliasedImportPathsInCollection`
+#### `transformAliasedImportPathsInCollection`
 
 Introduced in [Stencil v2.18.0](https://github.com/ionic-team/stencil/releases/tag/v2.18.0), `transformAliasedImportPathsInCollection` is a configuration flag on the [`dist` output target](https://stenciljs.com/docs/distribution#transformaliasedimportpathsincollection).
-`transformAliasedImportPathsInCollection` transforms import paths, similar to [`transformAliasedImportPaths`](#transformaliasedimportpathsincollection).
+`transformAliasedImportPathsInCollection` transforms import paths, similar to [`transformAliasedImportPaths`](#transformaliasedimportpaths).
 This flag however, only enables the functionality of `transformAliasedImportPaths` for collection output targets.
 
 Starting with Stencil v4.0.0, this flag is enabled by default.
@@ -100,14 +97,14 @@ export const config: Config = {
 
 For more information on this flag, please see the [`dist` output target's documentation](https://stenciljs.com/docs/distribution#transformaliasedimportpathsincollection).
 
-#### In Browser Compilation Support Removed
+### In Browser Compilation Support Removed
 
 Prior to Stencil v4.0.0, components could be compiled from TSX to JS in the browser.
 This feature was seldom used, and has been removed from Stencil.
 At this time, there is no replacement functionality.
 For additional details, please see the [request-for-comment](https://github.com/ionic-team/stencil/discussions/4134) on the Stencil GitHub Discussions page.
 
-#### Legacy Context and Connect APIs Removed
+### Legacy Context and Connect APIs Removed
 
 Previously, Stencil supported `context` and `connect` as options within the `@Prop` decorator.
 Both of these APIs were deprecated in Stencil v1 and are now removed.
@@ -120,48 +117,48 @@ Both of these APIs were deprecated in Stencil v1 and are now removed.
 To migrate away from usages of `context`, please see [the original deprecation announcement](#propcontext)
 To migrate away from usages of `connect`, please see [the original deprecation announcement](#propconnect)
 
-#### Legacy Browser Support Removed
+### Legacy Browser Support Removed
 
 In Stencil v3.0.0, we announced [the deprecation of IE 11, pre-Chromium Edge, and Safari 10 support](#legacy-browser-support-fields-deprecated).
-In Stencil v4.0.0, support for these browsers has been dropped (for a full list of supported browsers, please see our [Browser Support page](https://stenciljs.com/docs/browser-support)).
+In Stencil v4.0.0, support for these browsers has been dropped (for a full list of supported browsers, please see our [Browser Support policy](https://stenciljs.com/docs/support-policy#browser-support)).
 By dropping these browsers, a few configuration options are no longer valid in a Stencil configuration file:
 
-##### `__deprecated__cssVarsShim`
+#### `__deprecated__cssVarsShim`
 
 The `extras.__deprecated__cssVarsShim` option caused Stencil to include a polyfill for [CSS variables](https://developer.mozilla.org/en-US/docs/Web/CSS/--*).
 This field should be removed from a project's Stencil configuration file (`stencil.config.ts`).
 
-##### `__deprecated__dynamicImportShim`
+#### `__deprecated__dynamicImportShim`
 
 The `extras.__deprecated__dynamicImportShim` option caused Stencil to include a polyfill for
 the [dynamic `import()` function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import)
 for use at runtime.
 This field should be removed from a project's Stencil configuration file (`stencil.config.ts`).
 
-##### `__deprecated__safari10`
+#### `__deprecated__safari10`
 
 The `extras.__deprecated__safari10` option would patch ES module support for Safari 10.
 This field should be removed from a project's Stencil configuration file (`stencil.config.ts`).
 
-##### `__deprecated__shadowDomShim`
+#### `__deprecated__shadowDomShim`
 
 The `extras.__deprecated__shadowDomShim` option would check whether a shim for [shadow
 DOM](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_shadow_DOM)
 was needed in the current browser, and include one if so.
 This field should be removed from a project's Stencil configuration file (`stencil.config.ts`). 
 
-### Legacy Cache Stats Config Flag Removed
+## Legacy Cache Stats Config Flag Removed
 
 The `enableCacheStats` flag was used in legacy behavior for caching, but has not been used for some time. This
 flag has been removed from Stencil's API and should be removed from a project's Stencil configuration file (`stencil.config.ts`).
 
-### Drop Node 14 Support
+## Drop Node 14 Support
 
 Stencil no longer supports Node 14.
 Please upgrade local development machines, continuous integration pipelines, etc. to use Node v16 or higher.
-For the full list of supported runtimes, please see [our Support Policy](../reference/support-policy.md#javascript-runtime).
+For the full list of supported runtimes, please see [our Support Policy](https://stenciljs.com/docs/support-policy#javascript-runtime).
 
-#### Information included in `docs-json` expanded
+## Information Included in `docs-json` Expanded
 
 For Stencil v4 the information included in the output of the `docs-json` output
 target was expanded to include more information about the types of properties
@@ -171,7 +168,7 @@ For more context on this change, see the [documentation for the new
 `supplementalPublicTypes`](https://stenciljs.com/docs/docs-json#supplementalpublictypes)
 option for the JSON documentation output target.
 
-##### `JsonDocsEvent`
+### `JsonDocsEvent`
 
 The JSON-formatted documentation for an `@Event` now includes a field called
 `complexType` which includes more information about the types referenced in the
@@ -197,7 +194,7 @@ on the `Modal` component in Ionic Framework:
 }
 ```
 
-##### `JsonDocsMethod`
+### `JsonDocsMethod`
 
 The JSON-formatted documentation for a `@Method` now includes a field called
 `complexType` which includes more information about the types referenced in 
