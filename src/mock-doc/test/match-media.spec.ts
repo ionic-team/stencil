@@ -19,14 +19,20 @@ describe('matchMedia', () => {
   it('MediaQueryList.matches', () => {
     expect(media.matches).toBe(false);
   });
+  it('MediaQueryList.addListener', () => {
+    expect(media.addListener).toBeDefined();
+  });
+  it('MediaQueryList.removeListener', () => {
+    expect(media.removeListener).toBeDefined();
+  });
   it('MediaQueryList.addEventListener', () => {
     expect(media.addEventListener).toBeDefined();
   });
-  it('MediaQueryList.dispatchEvent', () => {
-    expect(media.dispatchEvent).toBeDefined();
-  });
   it('MediaQueryList.removeEventListener', () => {
     expect(media.removeEventListener).toBeDefined();
+  });
+  it('MediaQueryList.dispatchEvent', () => {
+    expect(media.dispatchEvent).toBeDefined();
   });
   it('MediaQueryList.onchange', () => {
     expect(media.onchange).toBe(null);
