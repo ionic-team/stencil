@@ -110,9 +110,9 @@ describe('validation', () => {
       expect(config.transformAliasedImportPaths).toBe(bool);
     });
 
-    it('default transformAliasedImportPaths false', () => {
+    it('defaults `transformAliasedImportPaths` to true', () => {
       const { config } = validateConfig(userConfig, bootstrapConfig);
-      expect(config.transformAliasedImportPaths).toBe(false);
+      expect(config.transformAliasedImportPaths).toBe(true);
     });
   });
 

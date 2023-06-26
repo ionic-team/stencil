@@ -139,7 +139,7 @@ export interface StencilConfig {
    * Sets whether or not Stencil should transform path aliases set in a project's
    * `tsconfig.json` from the assigned module aliases to resolved relative paths.
    *
-   * This behavior is opt-in and hence this flag defaults to `false`.
+   * This behavior defaults to `true`, but may be opted-out of by setting this flag to `false`.
    */
   transformAliasedImportPaths?: boolean;
   /**
@@ -1940,7 +1940,7 @@ export interface OutputTargetDist extends OutputTargetValidationConfig {
    * a project's `tsconfig.json` to relative import paths in the compiled output's
    * `dist-collection` bundle if it is generated (i.e. `collectionDir` is set).
    *
-   * Paths will be left in aliased format if `false` or `undefined`.
+   * Paths will be left in aliased format if `false`.
    *
    * @example
    * // tsconfig.json
