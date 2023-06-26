@@ -12,6 +12,9 @@ This is a comprehensive list of the breaking changes introduced in the major ver
 ## Stencil v4.0.0
 
 - [General](#general)
+  - [New Configuration Defaults](#new-configuration-defaults)
+    - [transformAliasedImportPaths](#transformaliasedimportpaths)
+    - [transformAliasedImportPathsInCollection](#transformaliasedimportpathsincollection)
   - [In Browser Compilation Support Removed](#in-browser-compilation-support-removed)
   - [Legacy Context and Connect APIs Removed](#legacy-context-and-connect-APIs-removed)
   - [Legacy Browser Support Removed](#legacy-browser-support-removed)
@@ -20,6 +23,82 @@ This is a comprehensive list of the breaking changes introduced in the major ver
   - [Information included in JSON documentation expanded](#information-included-in-docs-json-expanded)
 
 ### General
+
+#### New Configuration Defaults
+Starting with Stencil v4.0.0, the default configuration values have changed for a few configuration options.
+The following sections lay out the configuration options that have changed, their new default values, and ways to opt-out of the new behavior (if applicable).
+
+##### `transformAliasedImportPaths`
+
+TypeScript projects have the ability to specify a path aliases via the [`paths` configuration in their `tsconfig.json`](https://www.typescriptlang.org/docs/handbook/module-resolution.html#path-mapping) like so:
+```json title="tsconfig.json"
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@utils": ["src/utils/index.ts"]
+    }
+  }
+}
+```
+In the example above, `"@utils"` would be mapped to the string `"src/utils/index.ts"` when TypeScript performs type resolution.
+The TypeScript compiler does not however, transform these paths from their keys to their values as a part of its output.
+Instead, it relies on a bundler/loader to do the transformation.
+
+The ability to transform path aliases was introduced in [Stencil v3.1.0](https://github.com/ionic-team/stencil/releases/tag/v3.1.0) as an opt-in feature.
+Previously, users had to explicitly enable this functionality in their `stencil.config.ts` file with `transformAliasedImportPaths`:
+```ts title="stencil.config.ts - enabling 'transformAliasedImportPaths' in Stencil v3.1.0"
+import { Config } from '@stencil/core';
+
+export const config: Config = {
+  transformAliasedImportPaths: true,
+  // ...
+};
+```
+
+Starting with Stencil v4.0.0, this feature is enabled by default.
+Projects that had previously enabled this functionality that are migrating from Stencil v3.1.0+ may safely remove the flag from their Stencil configuration file(s).
+
+For users that run into issues with this new default, we encourage you to file a [new issue on the Stencil GitHub repo](https://github.com/ionic-team/stencil/issues/new?assignees=&labels=&projects=&template=bug_report.yml&title=bug%3A+).
+As a workaround, this flag can be set to `false` to disable the default functionality.
+```ts title="stencil.config.ts - disabling 'transformAliasedImportPaths' in Stencil v4.0.0"
+import { Config } from '@stencil/core';
+
+export const config: Config = {
+  transformAliasedImportPaths: false,
+  // ...
+};
+```
+
+For more information on this flag, please see the [configuration documentation](https://stenciljs.com/docs/config#transformaliasedimportpaths)
+
+##### `transformAliasedImportPathsInCollection`
+
+Introduced in [Stencil v2.18.0](https://github.com/ionic-team/stencil/releases/tag/v2.18.0), `transformAliasedImportPathsInCollection` is a configuration flag on the [`dist` output target](https://stenciljs.com/docs/distribution#transformaliasedimportpathsincollection).
+`transformAliasedImportPathsInCollection` transforms import paths, similar to [`transformAliasedImportPaths`](#transformaliasedimportpathsincollection).
+This flag however, only enables the functionality of `transformAliasedImportPaths` for collection output targets.
+
+Starting with Stencil v4.0.0, this flag is enabled by default.
+Projects that had previously enabled this functionality that are migrating from Stencil v2.18.0+ may safely remove the flag from their Stencil configuration file(s).
+
+For users that run into issues with this new default, we encourage you to file a [new issue on the Stencil GitHub repo](https://github.com/ionic-team/stencil/issues/new?assignees=&labels=&projects=&template=bug_report.yml&title=bug%3A+).
+As a workaround, this flag can be set to `false` to disable the default functionality.
+```ts title="stencil.config.ts - disabling 'transformAliasedImportPathsInCollection' in Stencil v4.0.0"
+import { Config } from '@stencil/core';
+
+export const config: Config = {
+  outputTargets: [
+    {
+      type: 'dist',
+      transformAliasedImportPathsInCollection: false,
+    },
+    // ...
+  ]
+  // ...
+};
+```
+
+For more information on this flag, please see the [`dist` output target's documentation](https://stenciljs.com/docs/distribution#transformaliasedimportpathsincollection).
 
 #### In Browser Compilation Support Removed
 

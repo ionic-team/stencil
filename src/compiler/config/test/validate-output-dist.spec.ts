@@ -33,7 +33,7 @@ describe('validateDistOutputTarget', () => {
         type: 'dist',
         polyfills: undefined,
         typesDir: path.join(rootDir, 'my-dist', 'types'),
-        transformAliasedImportPathsInCollection: false,
+        transformAliasedImportPathsInCollection: true,
         isPrimaryPackageOutputTarget: false,
       },
       {
@@ -65,7 +65,7 @@ describe('validateDistOutputTarget', () => {
         collectionDir: path.join(rootDir, 'my-dist', 'collection'),
         dir: path.join(rootDir, '/my-dist'),
         empty: false,
-        transformAliasedImportPaths: false,
+        transformAliasedImportPaths: true,
         type: 'dist-collection',
       },
       {
@@ -223,7 +223,7 @@ describe('validateDistOutputTarget', () => {
         type: 'dist',
         polyfills: undefined,
         typesDir: path.join(rootDir, 'my-dist', 'types'),
-        transformAliasedImportPathsInCollection: false,
+        transformAliasedImportPathsInCollection: true,
         isPrimaryPackageOutputTarget: true,
       },
       {
@@ -255,7 +255,7 @@ describe('validateDistOutputTarget', () => {
         collectionDir: path.join(rootDir, 'my-dist', 'collection'),
         dir: path.join(rootDir, '/my-dist'),
         empty: false,
-        transformAliasedImportPaths: false,
+        transformAliasedImportPaths: true,
         type: 'dist-collection',
       },
       {

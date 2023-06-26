@@ -87,7 +87,9 @@ export const validateConfig = (
     rollupConfig: validateRollupConfig(config),
     sys: config.sys ?? bootstrapConfig.sys ?? createNodeSys({ logger }),
     testing: config.testing ?? {},
-    transformAliasedImportPaths: userConfig.transformAliasedImportPaths ?? false,
+    transformAliasedImportPaths: isBoolean(userConfig.transformAliasedImportPaths)
+      ? userConfig.transformAliasedImportPaths
+      : true,
     validatePrimaryPackageOutputTarget: userConfig.validatePrimaryPackageOutputTarget ?? false,
     ...validatePaths(config),
   };
