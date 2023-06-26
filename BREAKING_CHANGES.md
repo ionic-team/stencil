@@ -147,18 +147,18 @@ DOM](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_shadow_DO
 was needed in the current browser, and include one if so.
 This field should be removed from a project's Stencil configuration file (`stencil.config.ts`). 
 
-## Legacy Cache Stats Config Flag Removed
+### Legacy Cache Stats Config Flag Removed
 
 The `enableCacheStats` flag was used in legacy behavior for caching, but has not been used for some time. This
 flag has been removed from Stencil's API and should be removed from a project's Stencil configuration file (`stencil.config.ts`).
 
-## Drop Node 14 Support
+### Drop Node 14 Support
 
 Stencil no longer supports Node 14.
 Please upgrade local development machines, continuous integration pipelines, etc. to use Node v16 or higher.
 For the full list of supported runtimes, please see [our Support Policy](https://stenciljs.com/docs/support-policy#javascript-runtime).
 
-## Information Included in `docs-json` Expanded
+### Information Included in `docs-json` Expanded
 
 For Stencil v4 the information included in the output of the `docs-json` output
 target was expanded to include more information about the types of properties
@@ -168,7 +168,7 @@ For more context on this change, see the [documentation for the new
 `supplementalPublicTypes`](https://stenciljs.com/docs/docs-json#supplementalpublictypes)
 option for the JSON documentation output target.
 
-### `JsonDocsEvent`
+#### `JsonDocsEvent`
 
 The JSON-formatted documentation for an `@Event` now includes a field called
 `complexType` which includes more information about the types referenced in the
@@ -194,7 +194,7 @@ on the `Modal` component in Ionic Framework:
 }
 ```
 
-### `JsonDocsMethod`
+#### `JsonDocsMethod`
 
 The JSON-formatted documentation for a `@Method` now includes a field called
 `complexType` which includes more information about the types referenced in 
