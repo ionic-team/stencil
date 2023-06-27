@@ -150,7 +150,10 @@ export const validateCollection = (
 ) => {
   if (outputTarget.collectionDir) {
     const collectionRel = join(relative(config.rootDir, outputTarget.collectionDir), COLLECTION_MANIFEST_FILE_NAME);
-    if (!buildCtx.packageJson.collection || normalizePath(buildCtx.packageJson.collection) !== collectionRel) {
+    if (
+      !buildCtx.packageJson.collection ||
+      normalizePath(buildCtx.packageJson.collection) !== normalizePath(collectionRel)
+    ) {
       const msg = `package.json "collection" property is required when generating a distribution and must be set to: ${collectionRel}`;
       packageJsonWarn(config, compilerCtx, buildCtx, msg, `"collection"`);
     }
