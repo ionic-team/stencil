@@ -149,8 +149,11 @@ export const validateCollection = (
   outputTarget: d.OutputTargetDistCollection
 ) => {
   if (outputTarget.collectionDir) {
-    const collectionRel = join(relative(config.rootDir, outputTarget.collectionDir), COLLECTION_MANIFEST_FILE_NAME);
-    if (!buildCtx.packageJson.collection || normalizePath(buildCtx.packageJson.collection) !== collectionRel) {
+    const collectionRel = normalizePath(
+      join(relative(config.rootDir, outputTarget.collectionDir), COLLECTION_MANIFEST_FILE_NAME),
+      false
+    );
+    if (!buildCtx.packageJson.collection || normalizePath(buildCtx.packageJson.collection, false) !== collectionRel) {
       const msg = `package.json "collection" property is required when generating a distribution and must be set to: ${collectionRel}`;
       packageJsonWarn(config, compilerCtx, buildCtx, msg, `"collection"`);
     }

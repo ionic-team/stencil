@@ -1,5 +1,6 @@
 import type * as d from '@stencil/core/declarations';
 import { mockBuildCtx, mockCompilerCtx, mockValidatedConfig } from '@stencil/core/testing';
+import { normalizePath } from '@utils';
 import path from 'path';
 
 import * as v from '../validate-build-package-json';
@@ -99,9 +100,33 @@ describe('validate-package-json', () => {
   });
 
   describe('collection', () => {
-    it('should error when missing collection property', async () => {
+    it('should produce a warning when missing collection property', async () => {
       v.validateCollection(config, compilerCtx, buildCtx, collectionOutputTarget);
+
       expect(buildCtx.diagnostics[0].messageText).toMatch(/package.json "collection" property is required/);
+      expect(buildCtx.diagnostics[0].level).toBe('warn');
+    });
+
+    it('should produce a warning if the supplied path does not match the recommended path', () => {
+      buildCtx.packageJson.collection = 'bad/path';
+
+      v.validateCollection(config, compilerCtx, buildCtx, collectionOutputTarget);
+
+      expect(buildCtx.diagnostics[0].messageText).toBe(
+        `package.json "collection" property is required when generating a distribution and must be set to: ${normalizePath(
+          'dist/collection/collection-manifest.json',
+          false
+        )}`
+      );
+      expect(buildCtx.diagnostics[0].level).toBe('warn');
+    });
+
+    it('should not produce a warning if the normalized paths are the same', () => {
+      buildCtx.packageJson.collection = './dist/collection/collection-manifest.json';
+
+      v.validateCollection(config, compilerCtx, buildCtx, collectionOutputTarget);
+
+      expect(buildCtx.diagnostics.length).toEqual(0);
     });
   });
 });
