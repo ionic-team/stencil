@@ -1,5 +1,6 @@
 import type * as d from '@stencil/core/declarations';
 import { mockBuildCtx, mockCompilerCtx, mockValidatedConfig } from '@stencil/core/testing';
+import { normalizePath } from '@utils';
 import path from 'path';
 
 import * as v from '../validate-build-package-json';
@@ -112,7 +113,10 @@ describe('validate-package-json', () => {
       v.validateCollection(config, compilerCtx, buildCtx, collectionOutputTarget);
 
       expect(buildCtx.diagnostics[0].messageText).toBe(
-        `package.json "collection" property is required when generating a distribution and must be set to: dist/collection/collection-manifest.json`
+        `package.json "collection" property is required when generating a distribution and must be set to: ${normalizePath(
+          'dist/collection/collection-manifest.json',
+          false
+        )}`
       );
       expect(buildCtx.diagnostics[0].level).toBe('warn');
     });
