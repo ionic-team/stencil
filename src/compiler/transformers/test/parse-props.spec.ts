@@ -34,6 +34,39 @@ describe('parse props', () => {
     expect(t.cmp?.hasProp).toBe(true);
   });
 
+  it('should correctly parse a prop with an unresolved type', () => {
+    const t = transpileModule(`
+    @Component({tag: 'cmp-a'})
+      export class CmpA {
+        @Prop() val?: Foo;
+      }
+    `);
+    expect(getStaticGetter(t.outputText, 'properties')).toEqual({
+      val: {
+        attribute: 'val',
+        complexType: {
+          references: {
+            Foo: {
+              id: 'global::Foo',
+              location: 'global',
+            },
+          },
+          resolved: 'Foo',
+          original: 'Foo',
+        },
+        docs: {
+          text: '',
+          tags: [],
+        },
+        mutable: false,
+        optional: true,
+        reflect: false,
+        required: false,
+        type: 'any',
+      },
+    });
+  });
+
   it('prop required', () => {
     const t = transpileModule(`
     @Component({tag: 'cmp-a'})
