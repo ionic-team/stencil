@@ -1,4 +1,4 @@
-import { hasError, isFunction, result, shouldIgnoreError } from '@utils';
+import { hasError, isFunction, shouldIgnoreError } from '@utils';
 
 import type * as d from '../declarations';
 import { ValidatedConfig } from '../declarations';
@@ -46,8 +46,8 @@ export const run = async (init: d.CliInitOptions) => {
     startupLog(logger, task);
 
     const findConfigResults = await findConfig({ sys, configPath: flags.config });
-    if (findConfigResults.isErr) {
-      logger.printDiagnostics(findConfigResults.value);
+    if (hasError(findConfigResults.diagnostics)) {
+      logger.printDiagnostics(findConfigResults.diagnostics);
       return sys.exit(1);
     }
 
@@ -67,12 +67,11 @@ export const run = async (init: d.CliInitOptions) => {
       return;
     }
 
-    const foundConfig = result.unwrap(findConfigResults);
     const validated = await coreCompiler.loadConfig({
       config: {
         flags,
       },
-      configPath: foundConfig.configPath,
+      configPath: findConfigResults.configPath,
       logger,
       sys,
     });
