@@ -519,18 +519,20 @@ const getTypeReferenceLocation = (
     const compilerHost = ts.createCompilerHost(options);
     const importHomeModule = getHomeModule(sourceFile, localImportPath, options, compilerHost, program);
 
-    const importName = namedImportBindings.elements.find((nbe) => nbe.name.getText() === typeName).name;
-    const originalTypeName = getOriginalTypeName(importName, checker);
+    if (importHomeModule) {
+      const importName = namedImportBindings.elements.find((nbe) => nbe.name.getText() === typeName).name;
+      const originalTypeName = getOriginalTypeName(importName, checker);
 
-    const typeDecl = findTypeWithName(importHomeModule, originalTypeName);
-    type = checker.getTypeAtLocation(typeDecl);
+      const typeDecl = findTypeWithName(importHomeModule, originalTypeName);
+      type = checker.getTypeAtLocation(typeDecl);
 
-    const id = addToLibrary(type, originalTypeName, checker, normalizePath(importHomeModule.fileName, false));
-    return {
-      location: 'import',
-      path: localImportPath,
-      id,
-    };
+      const id = addToLibrary(type, originalTypeName, checker, normalizePath(importHomeModule.fileName, false));
+      return {
+        location: 'import',
+        path: localImportPath,
+        id,
+      };
+    }
   }
 
   // Loop through all top level exports to find if any reference to the type for 'local' reference location
