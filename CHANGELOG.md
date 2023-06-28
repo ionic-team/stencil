@@ -1,3 +1,13 @@
+## ⛹ [4.0.1](https://github.com/ionic-team/stencil/compare/v4.0.0...v4.0.1) (2023-06-28)
+
+
+### Bug Fixes
+
+* **compiler:** address when a home module cannot be found ([#4521](https://github.com/ionic-team/stencil/issues/4521)) ([06eaa8f](https://github.com/ionic-team/stencil/commit/06eaa8f4edbf83e48be1e83b7b5db4e7b48e5918))
+* **compiler:** normalize recommended `collection` path for `package.json` validation ([#4522](https://github.com/ionic-team/stencil/issues/4522)) ([af9639c](https://github.com/ionic-team/stencil/commit/af9639c8c286a8863f7f384f38a7efaa9ec8fafa))
+
+
+
 # 🐅 [4.0.0](https://github.com/ionic-team/stencil/compare/v3.4.1...v4.0.0) (2023-06-26)
 
 
