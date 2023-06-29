@@ -1444,7 +1444,7 @@ export namespace JSXBase {
     clipPathUnits?: number | string;
     'clip-rule'?: number | string;
     'color-interpolation'?: number | string;
-    'color-interpolation-filters'?: 'auto' | 's-rGB' | 'linear-rGB' | 'inherit';
+    'color-interpolation-filters'?: 'auto' | 'sRGB' | 'linearRGB';
     'color-profile'?: number | string;
     'color-rendering'?: number | string;
     contentScriptType?: number | string;
