@@ -1,8 +1,6 @@
-import { DIST_CUSTOM_ELEMENTS } from '@utils';
 import ts from 'typescript';
 
 import type * as d from '../../../declarations';
-import { addOutputTargetCoreRuntimeApi, RUNTIME_APIS } from '../core-runtime-apis';
 import { addCreateEvents } from '../create-event';
 import { retrieveTsModifiers } from '../transform-utils';
 
@@ -35,11 +33,7 @@ export const updateNativeConstructor = (
     // a constructor may not have a body (e.g. in the case of constructor overloads)
     const cstrBodyStatements: ts.NodeArray<ts.Statement> = cstrMethod.body?.statements ?? ts.factory.createNodeArray();
 
-    let statements: ts.Statement[] = [
-      ...nativeInit(moduleFile, cmp),
-      ...addCreateEvents(moduleFile, cmp),
-      ...cstrBodyStatements,
-    ];
+    let statements: ts.Statement[] = [...nativeInit(cmp), ...addCreateEvents(moduleFile, cmp), ...cstrBodyStatements];
 
     const hasSuper = cstrBodyStatements.some((s) => s.kind === ts.SyntaxKind.SuperKeyword);
     if (!hasSuper) {
@@ -56,7 +50,7 @@ export const updateNativeConstructor = (
     // create a constructor()
     const statements: ts.Statement[] = [
       createNativeConstructorSuper(),
-      ...nativeInit(moduleFile, cmp),
+      ...nativeInit(cmp),
       ...addCreateEvents(moduleFile, cmp),
     ];
 
@@ -67,14 +61,13 @@ export const updateNativeConstructor = (
 
 /**
  * Generates a series of expression statements used to help initialize a Stencil component
- * @param moduleFile the Stencil module that will be instantiated
  * @param cmp the component's metadata
  * @returns the generated expression statements
  */
-const nativeInit = (moduleFile: d.Module, cmp: d.ComponentCompilerMeta): ReadonlyArray<ts.ExpressionStatement> => {
+const nativeInit = (cmp: d.ComponentCompilerMeta): ReadonlyArray<ts.ExpressionStatement> => {
   const initStatements = [nativeRegisterHostStatement()];
   if (cmp.encapsulation === 'shadow') {
-    initStatements.push(nativeAttachShadowStatement(moduleFile));
+    initStatements.push(nativeAttachShadowStatement());
   }
   return initStatements;
 };
@@ -97,11 +90,9 @@ const nativeRegisterHostStatement = (): ts.ExpressionStatement => {
 
 /**
  * Generates an expression statement for attaching a shadow DOM tree to an element.
- * @param moduleFile the Stencil module that will use the generated expression statement
  * @returns the generated expression statement
  */
-const nativeAttachShadowStatement = (moduleFile: d.Module): ts.ExpressionStatement => {
-  addOutputTargetCoreRuntimeApi(moduleFile, DIST_CUSTOM_ELEMENTS, RUNTIME_APIS.attachShadow);
+const nativeAttachShadowStatement = (): ts.ExpressionStatement => {
   // Create an expression statement, `this.__attachShadow();`
   return ts.factory.createExpressionStatement(
     ts.factory.createCallExpression(

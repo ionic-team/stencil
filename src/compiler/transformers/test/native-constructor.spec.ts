@@ -38,7 +38,7 @@ describe('nativeComponentTransform', () => {
       const transpiledModule = transpileModule(code, null, compilerCtx, [], [transformer]);
 
       expect(transpiledModule.outputText).toContain(
-        `import { defineCustomElement as __stencil_defineCustomElement, HTMLElement, attachShadow as __stencil_attachShadow } from "@stencil/core";`
+        `import { defineCustomElement as __stencil_defineCustomElement, HTMLElement } from "@stencil/core";`
       );
       expect(transpiledModule.outputText).toContain(`this.__attachShadow()`);
     });
@@ -63,7 +63,7 @@ describe('nativeComponentTransform', () => {
       const transpiledModule = transpileModule(code, null, compilerCtx, [], [transformer]);
 
       expect(transpiledModule.outputText).toContain(
-        `import { defineCustomElement as __stencil_defineCustomElement, HTMLElement, attachShadow as __stencil_attachShadow } from "@stencil/core";`
+        `import { defineCustomElement as __stencil_defineCustomElement, HTMLElement } from "@stencil/core";`
       );
       expect(transpiledModule.outputText).toContain(`this.__attachShadow()`);
     });
