@@ -1,7 +1,8 @@
+import { DIST_CUSTOM_ELEMENTS } from '@utils';
 import ts from 'typescript';
 
 import type * as d from '../../../declarations';
-import { addCoreRuntimeApi, HTML_ELEMENT, RUNTIME_APIS } from '../core-runtime-apis';
+import { addOutputTargetCoreRuntimeApi, HTML_ELEMENT, RUNTIME_APIS } from '../core-runtime-apis';
 import { transformHostData } from '../host-data-transform';
 import { removeStaticMetaProperties } from '../remove-static-meta-properties';
 import { updateComponentClass } from '../update-component-class';
@@ -40,7 +41,7 @@ const updateNativeHostComponentHeritageClauses = (
 
   if (moduleFile.cmps.length >= 1) {
     // we'll need to import `HTMLElement` in order to extend it
-    addCoreRuntimeApi(moduleFile, RUNTIME_APIS.HTMLElement);
+    addOutputTargetCoreRuntimeApi(moduleFile, DIST_CUSTOM_ELEMENTS, RUNTIME_APIS.HTMLElement);
   }
 
   const heritageClause = ts.factory.createHeritageClause(ts.SyntaxKind.ExtendsKeyword, [
