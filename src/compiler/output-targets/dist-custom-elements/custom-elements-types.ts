@@ -1,5 +1,5 @@
 import { dashToPascalCase, isOutputTargetDistCustomElements, normalizePath } from '@utils';
-import { dirname, join, relative } from 'path';
+import { dirname, join, posix } from 'path';
 
 import type * as d from '../../../declarations';
 
@@ -48,7 +48,7 @@ const generateCustomElementsTypesOutput = async (
   // the path where we're going to write the typedef for the whole dist-custom-elements output
   const customElementsDtsPath = join(outputTarget.dir!, 'index.d.ts');
   // the directory where types for the individual components are written
-  const componentsTypeDirectoryRelPath = relative(outputTarget.dir!, typesDir);
+  const componentsTypeDirectoryRelPath = posix.relative(outputTarget.dir!, typesDir);
 
   const components = buildCtx.components.filter((m) => !m.isCollectionDependency);
 
@@ -71,8 +71,8 @@ const generateCustomElementsTypesOutput = async (
             // - get the relative path to the component's source file from the source directory
             // - join that relative path to the relative path from the `index.d.ts` file to the
             //   directory where typedefs are saved
-            const componentSourceRelPath = relative(config.srcDir, component.sourceFilePath).replace(/\.tsx$/, '');
-            const componentDTSPath = join(componentsTypeDirectoryRelPath, componentSourceRelPath);
+            const componentSourceRelPath = posix.relative(config.srcDir, component.sourceFilePath).replace(/\.tsx$/, '');
+            const componentDTSPath = posix.join(componentsTypeDirectoryRelPath, componentSourceRelPath);
 
             const defineFunctionExportName = `defineCustomElement${exportName}`;
             // Get the path to the sibling typedef file for the current component
@@ -205,7 +205,7 @@ const generateCustomElementType = (componentsDtsRelPath: string, cmp: d.Componen
  * @returns the relative path from the provided `fromPath` to the `dtsPath`
  */
 const relDts = (fromPath: string, dtsPath: string): string => {
-  dtsPath = relative(fromPath, dtsPath);
+  dtsPath = posix.relative(fromPath, dtsPath);
   if (!dtsPath.startsWith('.')) {
     dtsPath = '.' + dtsPath;
   }
