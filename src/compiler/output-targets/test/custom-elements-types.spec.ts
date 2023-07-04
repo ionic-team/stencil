@@ -7,7 +7,7 @@ import {
 } from '@stencil/core/testing';
 import { DIST_CUSTOM_ELEMENTS } from '@utils';
 import path from 'path';
-import { join, relative } from 'path';
+import { join } from 'path';
 
 import type * as d from '../../../declarations';
 import { stubComponentCompilerMeta } from '../../types/tests/ComponentCompilerMeta.stub';
@@ -62,17 +62,11 @@ describe('Custom Elements Typedef generation', () => {
 
     await generateCustomElementsTypes(config, compilerCtx, buildCtx, 'types_dir');
 
-    const componentsTypeDirectoryPath = relative('my-best-dir', join('types_dir', 'components'));
-
     const expectedTypedefOutput = [
       '/* TestApp custom elements */',
-      `export { StubCmp as MyComponent } from '${join(componentsTypeDirectoryPath, 'my-component', 'my-component')}';`,
+      `export { StubCmp as MyComponent } from '../types_dir/components/my-component/my-component';`,
       `export { defineCustomElement as defineCustomElementMyComponent } from './my-component';`,
-      `export { MyBestComponent as MyBestComponent } from '${join(
-        componentsTypeDirectoryPath,
-        'the-other-component',
-        'my-real-best-component'
-      )}';`,
+      `export { MyBestComponent as MyBestComponent } from '../types_dir/components/the-other-component/my-real-best-component';`,
       `export { defineCustomElement as defineCustomElementMyBestComponent } from './my-best-component';`,
       '',
       '/**',
