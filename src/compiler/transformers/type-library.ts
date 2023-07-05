@@ -1,5 +1,4 @@
-import { normalizePath } from '@utils';
-import path from 'path';
+import { normalizePath, relative } from '@utils';
 import ts from 'typescript';
 
 import type * as d from '../../declarations';
@@ -30,8 +29,7 @@ export function addToLibrary(
   checker: ts.TypeChecker,
   pathToTypeModule: string
 ): string {
-  pathToTypeModule = path.relative(process.cwd(), pathToTypeModule);
-  pathToTypeModule = normalizePath(pathToTypeModule, false);
+  pathToTypeModule = relative(process.cwd(), pathToTypeModule);
 
   // for now we don't make any attempt to include types in node_modules
   if (pathToTypeModule.startsWith('node_modules')) {

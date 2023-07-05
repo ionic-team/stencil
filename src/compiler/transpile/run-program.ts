@@ -1,5 +1,12 @@
-import { getComponentsFromModules, isOutputTargetDistTypes, loadTypeScriptDiagnostics, normalizePath } from '@utils';
-import { basename, join, relative } from 'path';
+import {
+  getComponentsFromModules,
+  isOutputTargetDistTypes,
+  join,
+  loadTypeScriptDiagnostics,
+  normalizePath,
+  relative,
+} from '@utils';
+import { basename } from 'path';
 import ts from 'typescript';
 
 import type * as d from '../../declarations';

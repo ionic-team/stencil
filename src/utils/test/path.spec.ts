@@ -1,4 +1,4 @@
-import { normalizeFsPathQuery, normalizePath } from '../normalize-path';
+import { join, normalizeFsPathQuery, normalizePath, relative } from '../path';
 
 describe('normalizePath', () => {
   it('node module', () => {
@@ -132,5 +132,21 @@ describe('normalizeFsPathQuery', () => {
     expect(p.filePath).toBe(`/Johnny/B/Goode`);
     expect(p.format).toBe(null);
     expect(p.ext).toBe(`/johnny/b/goode`);
+  });
+
+  describe('wrapped nodejs path functions', () => {
+    it('join should always return a POSIX path', () => {
+      expect(join('foo')).toBe('foo');
+      expect(join('foo', 'bar')).toBe('foo/bar');
+      expect(join('..', 'foo', 'bar.ts')).toBe('../foo/bar.ts');
+      expect(join('.', 'foo', 'bar.ts')).toBe('foo/bar.ts');
+    });
+
+    it('relative should always return a POSIX path', () => {
+      expect(relative('.', 'foo/bar')).toBe('foo/bar');
+      expect(relative('foo/bar', '..')).toBe('../../..');
+      expect(relative('foo/bar/baz', 'foo/bar/boz')).toBe('../boz');
+      expect(relative('.', '../foo/bar')).toBe('../foo/bar');
+    });
   });
 });

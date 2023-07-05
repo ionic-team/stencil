@@ -1,5 +1,5 @@
-import { normalizePath } from '@utils';
-import { dirname, join, relative } from 'path';
+import { join, normalizePath, relative } from '@utils';
+import { dirname } from 'path';
 
 import type * as d from '../../../declarations';
 import { parseCollectionManifest } from './parse-collection-manifest';

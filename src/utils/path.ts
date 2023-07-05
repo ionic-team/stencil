@@ -1,3 +1,5 @@
+import path from 'path';
+
 /**
  * Convert Windows backslash paths to slash paths: foo\\bar ➔ foo/bar
  * Forward-slash paths can be used in Windows as long as they're not
@@ -186,4 +188,32 @@ const enum CharacterCodes {
   dot = 0x2e, // .
   percent = 0x25, // %
   slash = 0x2f, // /
+}
+
+/**
+ * A wrapped version of node.js' {@link path.relative} which adds our custom
+ * normalization logic. This solves the relative path between `from` and `to`!
+ *
+ * @throws the underlying node.js function can throw if either path is not a
+ * string
+ * @param from the path where relative resolution starts
+ * @param to the destination path
+ * @returns the resolved relative path
+ */
+export function relative(from: string, to: string): string {
+  return normalizePath(path.relative(from, to), false);
+}
+
+/**
+ * A wrapped version of node.js' {@link path.join} which adds our custom
+ * normalization logic. This joins all the arguments (path fragments) into a
+ * single path.
+ *
+ * @throws the underlying node function will throw if any argument is not a
+ * string
+ * @param paths the paths to join together
+ * @returns a joined path!
+ */
+export function join(...paths: string[]): string {
+  return normalizePath(path.join(...paths), false);
 }

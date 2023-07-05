@@ -5,9 +5,8 @@ import {
   mockModule,
   mockValidatedConfig,
 } from '@stencil/core/testing';
-import { DIST_CUSTOM_ELEMENTS } from '@utils';
+import { DIST_CUSTOM_ELEMENTS, normalizePath } from '@utils';
 import path from 'path';
-import { join, relative } from 'path';
 
 import type * as d from '../../../declarations';
 import { stubComponentCompilerMeta } from '../../types/tests/ComponentCompilerMeta.stub';
@@ -29,8 +28,8 @@ const setup = () => {
   const buildCtx = mockBuildCtx(config, compilerCtx);
 
   const root = config.rootDir;
-  config.rootDir = path.join(root, 'User', 'testing', '/');
-  config.globalScript = path.join(root, 'User', 'testing', 'src', 'global.ts');
+  config.rootDir = normalizePath(path.join(root, 'User', 'testing', '/'));
+  config.globalScript = normalizePath(path.join(root, 'User', 'testing', 'src', 'global.ts'));
 
   const bundleCustomElementsSpy = jest.spyOn(outputCustomElementsMod, 'bundleCustomElements');
 
@@ -62,17 +61,11 @@ describe('Custom Elements Typedef generation', () => {
 
     await generateCustomElementsTypes(config, compilerCtx, buildCtx, 'types_dir');
 
-    const componentsTypeDirectoryPath = relative('my-best-dir', join('types_dir', 'components'));
-
     const expectedTypedefOutput = [
       '/* TestApp custom elements */',
-      `export { StubCmp as MyComponent } from '${join(componentsTypeDirectoryPath, 'my-component', 'my-component')}';`,
+      `export { StubCmp as MyComponent } from '../types_dir/components/my-component/my-component';`,
       `export { defineCustomElement as defineCustomElementMyComponent } from './my-component';`,
-      `export { MyBestComponent as MyBestComponent } from '${join(
-        componentsTypeDirectoryPath,
-        'the-other-component',
-        'my-real-best-component'
-      )}';`,
+      `export { MyBestComponent as MyBestComponent } from '../types_dir/components/the-other-component/my-real-best-component';`,
       `export { defineCustomElement as defineCustomElementMyBestComponent } from './my-best-component';`,
       '',
       '/**',
@@ -106,7 +99,7 @@ describe('Custom Elements Typedef generation', () => {
       '',
     ].join('\n');
 
-    expect(compilerCtx.fs.writeFile).toHaveBeenCalledWith(join('my-best-dir', 'index.d.ts'), expectedTypedefOutput, {
+    expect(compilerCtx.fs.writeFile).toHaveBeenCalledWith('my-best-dir/index.d.ts', expectedTypedefOutput, {
       outputTargetType: DIST_CUSTOM_ELEMENTS,
     });
 
@@ -165,7 +158,7 @@ describe('Custom Elements Typedef generation', () => {
       '',
     ].join('\n');
 
-    expect(compilerCtx.fs.writeFile).toHaveBeenCalledWith(join('my-best-dir', 'index.d.ts'), expectedTypedefOutput, {
+    expect(compilerCtx.fs.writeFile).toHaveBeenCalledWith('my-best-dir/index.d.ts', expectedTypedefOutput, {
       outputTargetType: DIST_CUSTOM_ELEMENTS,
     });
 
@@ -233,7 +226,7 @@ describe('Custom Elements Typedef generation', () => {
       '',
     ].join('\n');
 
-    expect(compilerCtx.fs.writeFile).toHaveBeenCalledWith(join('my-best-dir', 'index.d.ts'), expectedTypedefOutput, {
+    expect(compilerCtx.fs.writeFile).toHaveBeenCalledWith('my-best-dir/index.d.ts', expectedTypedefOutput, {
       outputTargetType: DIST_CUSTOM_ELEMENTS,
     });
 

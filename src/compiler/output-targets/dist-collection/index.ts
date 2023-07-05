@@ -4,10 +4,11 @@ import {
   flatOne,
   generatePreamble,
   isOutputTargetDistCollection,
+  join,
   normalizePath,
+  relative,
   sortBy,
 } from '@utils';
-import { join, relative } from 'path';
 import ts from 'typescript';
 
 import type * as d from '../../../declarations';
@@ -108,10 +109,10 @@ const writeCollectionManifest = async (
   outputTarget: d.OutputTargetDistCollection
 ) => {
   // get the absolute path to the directory where the collection will be saved
-  const collectionDir = normalizePath(outputTarget.collectionDir);
+  const { collectionDir } = outputTarget;
 
   // create an absolute file path to the actual collection json file
-  const collectionFilePath = normalizePath(join(collectionDir, COLLECTION_MANIFEST_FILE_NAME));
+  const collectionFilePath = join(collectionDir, COLLECTION_MANIFEST_FILE_NAME);
 
   // don't bother serializing/writing the collection if we're not creating a distribution
   await compilerCtx.fs.writeFile(collectionFilePath, collectionData);

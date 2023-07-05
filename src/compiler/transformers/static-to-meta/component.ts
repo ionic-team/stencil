@@ -1,5 +1,5 @@
-import { normalizePath, unique } from '@utils';
-import { dirname, isAbsolute, join, relative } from 'path';
+import { join, normalizePath, relative, unique } from '@utils';
+import { dirname, isAbsolute } from 'path';
 import ts from 'typescript';
 
 import type * as d from '../../../declarations';
