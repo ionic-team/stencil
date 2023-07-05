@@ -499,7 +499,7 @@ export interface QueueApi {
 /**
  * Host
  */
-interface HostAttributes {
+export interface HostAttributes {
   class?: string | { [className: string]: boolean };
   style?: { [key: string]: string | undefined };
   ref?: (el: HTMLElement | null) => void;
