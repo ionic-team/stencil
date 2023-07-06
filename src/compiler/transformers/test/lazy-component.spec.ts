@@ -33,4 +33,33 @@ describe('lazy-component', () => {
     expect(t.outputText).toContain(`import { registerInstance as __stencil_registerInstance } from "@stencil/core"`);
     expect(t.outputText).toContain(`__stencil_registerInstance(this, hostRef)`);
   });
+
+  it('adds a getter for an @Element() reference', () => {
+    const compilerCtx = mockCompilerCtx();
+    const transformOpts: d.TransformOptions = {
+      coreImportPath: '@stencil/core',
+      componentExport: 'lazy',
+      componentMetadata: null,
+      currentDirectory: '/',
+      proxy: null,
+      style: 'static',
+      styleImportData: null,
+    };
+
+    const code = `
+      @Component({
+        tag: 'cmp-a'
+      })
+      export class CmpA {
+        @Element() el: HtmlElement;
+      }
+    `;
+
+    const transformer = lazyComponentTransform(compilerCtx, transformOpts);
+
+    const t = transpileModule(code, null, compilerCtx, [], [transformer]);
+
+    expect(t.outputText).toContain(`get el() { return __stencil_getElement(this); } };`);
+    expect(t.outputText).not.toContain(`el;`);
+  });
 });
