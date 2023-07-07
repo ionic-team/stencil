@@ -6,7 +6,6 @@ import type * as d from '../../../declarations';
 import { IS_CASE_SENSITIVE_FILE_NAMES, IS_WEB_WORKER_ENV } from '../environment';
 import { fetchUrlSync } from '../fetch/fetch-module-sync';
 import { InMemoryFileSystem } from '../in-memory-fs';
-import { patchTypeScriptResolveModule } from './typescript-resolve-module';
 
 // TODO(STENCIL-728): fix typing of `inMemoryFs` parameter in `patchTypescript`, related functions
 export const patchTsSystemFileSystem = (
@@ -197,7 +196,6 @@ export const patchTypescript = (config: d.Config, inMemoryFs: InMemoryFileSystem
       patchTsSystemFileSystem(config, config.sys, inMemoryFs, ts.sys);
       patchTsSystemWatch(config.sys, ts.sys);
     }
-    patchTypeScriptResolveModule(config, inMemoryFs);
     (ts as any).__patched = true;
   }
 };
