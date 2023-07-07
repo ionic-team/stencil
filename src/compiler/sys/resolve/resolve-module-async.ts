@@ -1,18 +1,10 @@
 import { isString, normalizeFsPath, normalizePath } from '@utils';
-import { basename, dirname } from 'path';
+import { dirname } from 'path';
 import resolve, { AsyncOpts } from 'resolve';
 
 import type * as d from '../../../declarations';
-import { fetchModuleAsync } from '../fetch/fetch-module-async';
-import { getCommonDirUrl, getNodeModuleFetchUrl, packageVersions } from '../fetch/fetch-utils';
 import { InMemoryFileSystem } from '../in-memory-fs';
-import {
-  COMMON_DIR_FILENAMES,
-  getCommonDirName,
-  getPackageDirPath,
-  isCommonDirModuleFile,
-  shouldFetchModule,
-} from './resolve-utils';
+import { getPackageDirPath } from './resolve-utils';
 
 export const resolveModuleIdAsync = (
   sys: d.CompilerSystem,
@@ -66,17 +58,6 @@ export const createCustomResolverAsync = (
         return;
       }
 
-      if (shouldFetchModule(fsFilePath)) {
-        const endsWithExt = exts.some((ext) => fsFilePath.endsWith(ext));
-        if (endsWithExt) {
-          const url = getNodeModuleFetchUrl(sys, packageVersions, fsFilePath);
-          const content = await fetchModuleAsync(sys, inMemoryFs, packageVersions, url, fsFilePath);
-          const checkFileExists = typeof content === 'string';
-          cb(null, checkFileExists);
-          return;
-        }
-      }
-
       cb(null, false);
     },
 
@@ -87,32 +68,6 @@ export const createCustomResolverAsync = (
       if (stat.isDirectory) {
         cb(null, true);
         return;
-      }
-
-      if (shouldFetchModule(fsDirPath)) {
-        if (basename(fsDirPath) === 'node_modules') {
-          // just the /node_modules directory
-          inMemoryFs.sys.createDirSync(fsDirPath);
-          inMemoryFs.clearFileCache(fsDirPath);
-          cb(null, true);
-          return;
-        }
-
-        if (isCommonDirModuleFile(fsDirPath)) {
-          // don't bother seeing if it's a directory if it has a common file extension
-          cb(null, false);
-          return;
-        }
-
-        for (const fileName of COMMON_DIR_FILENAMES) {
-          const url = getCommonDirUrl(sys, packageVersions, fsDirPath, fileName);
-          const filePath = getCommonDirName(fsDirPath, fileName);
-          const content = await fetchModuleAsync(sys, inMemoryFs, packageVersions, url, filePath);
-          if (isString(content)) {
-            cb(null, true);
-            return;
-          }
-        }
       }
 
       cb(null, false);

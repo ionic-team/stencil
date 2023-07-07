@@ -3,8 +3,7 @@ import { basename, resolve } from 'path';
 import ts from 'typescript';
 
 import type * as d from '../../../declarations';
-import { IS_CASE_SENSITIVE_FILE_NAMES, IS_WEB_WORKER_ENV } from '../environment';
-import { fetchUrlSync } from '../fetch/fetch-module-sync';
+import { IS_CASE_SENSITIVE_FILE_NAMES } from '../environment';
 import { InMemoryFileSystem } from '../in-memory-fs';
 
 // TODO(STENCIL-728): fix typing of `inMemoryFs` parameter in `patchTypescript`, related functions
@@ -120,32 +119,8 @@ export const patchTsSystemFileSystem = (
     );
   };
 
-  tsSys.readFile = (p) => {
-    let filePath = p;
-    const isUrl = isRemoteUrl(p);
-
-    if (isUrl) {
-      filePath = getTypescriptPathFromUrl(config, tsSys.getExecutingFilePath(), p);
-    }
-
-    // At present the typing for `inMemoryFs` in this function is not accurate
-    // TODO(STENCIL-728): fix typing of `inMemoryFs` parameter in `patchTypescript`, related functions
-    let content = inMemoryFs
-      ? inMemoryFs.readFileSync(filePath, { useCache: isUrl })
-      : compilerSys.readFileSync(filePath);
-
-    if (typeof content !== 'string' && isUrl) {
-      if (IS_WEB_WORKER_ENV) {
-        content = fetchUrlSync(p);
-        if (typeof content === 'string') {
-          inMemoryFs.writeFile(filePath, content);
-        }
-      } else {
-        config.logger.error(`ts.sys can only request http resources from within a web worker: ${p}`);
-      }
-    }
-
-    return content;
+  tsSys.readFile = (filePath) => {
+    return inMemoryFs ? inMemoryFs.readFileSync(filePath, { useCache: false }) : compilerSys.readFileSync(filePath);
   };
 
   // At present the typing for `inMemoryFs` in this function is not accurate
