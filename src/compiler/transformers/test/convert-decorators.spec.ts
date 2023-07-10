@@ -19,7 +19,7 @@ function c(strings: TemplateStringsArray) {
 }
 
 describe('convert-decorators', () => {
-  it('should convert `@Prop` class fields to properties', () => {
+  it('should convert `@Prop` class fields to properties', async () => {
     const t = transpileModule(`
     @Component({tag: 'cmp-a'})
       export class CmpA {
@@ -30,8 +30,8 @@ describe('convert-decorators', () => {
     // we test the whole output here to ensure that the field has been
     // removed from the class body correctly and replaced with an initializer
     // in the constructor
-    expect(formatCode(t.outputText)).toBe(
-      c`export class CmpA {
+    expect(await formatCode(t.outputText)).toBe(
+      await c`export class CmpA {
         constructor() {
           this.val = "initial value";
         }
@@ -56,7 +56,7 @@ describe('convert-decorators', () => {
     );
   });
 
-  it('should initialize decorated class fields to undefined, if nothing provided', () => {
+  it('should initialize decorated class fields to undefined, if nothing provided', async () => {
     const t = transpileModule(`
     @Component({tag: 'cmp-a'})
       export class CmpA {
@@ -67,14 +67,14 @@ describe('convert-decorators', () => {
     // we test the whole output here to ensure that the field has been
     // removed from the class body correctly and replaced with an initializer
     // in the constructor
-    expect(formatCode(t.outputText)).toContain(
+    expect(await formatCode(t.outputText)).toContain(
       `  constructor() {
     this.val = undefined;
   }`
     );
   });
 
-  it('should convert `@State` class fields to properties', () => {
+  it('should convert `@State` class fields to properties', async () => {
     const t = transpileModule(`
     @Component({tag: 'cmp-b'})
       export class CmpB {
@@ -85,8 +85,8 @@ describe('convert-decorators', () => {
     // we test the whole output here to ensure that the field has been
     // removed from the class body correctly and replaced with an initializer
     // in the constructor
-    expect(formatCode(t.outputText)).toBe(
-      c`export class CmpB {
+    expect(await formatCode(t.outputText)).toBe(
+      await c`export class CmpB {
         constructor() {
           this.count = 0;
         }
@@ -99,7 +99,7 @@ describe('convert-decorators', () => {
     );
   });
 
-  it('should not add a constructor if no class fields are present', () => {
+  it('should not add a constructor if no class fields are present', async () => {
     const t = transpileModule(`
     @Component({tag: 'cmp-a'})
       export class CmpA {
@@ -109,15 +109,15 @@ describe('convert-decorators', () => {
     // we test the whole output here to ensure that the field has been
     // removed from the class body correctly and replaced with an initializer
     // in the constructor
-    expect(formatCode(t.outputText)).toBe(
-      c`export class CmpA {
+    expect(await formatCode(t.outputText)).toBe(
+      await c`export class CmpA {
         static get is() {
           return "cmp-a";
         }}`
     );
   });
 
-  it('should add a super call to the constructor if necessary', () => {
+  it('should add a super call to the constructor if necessary', async () => {
     const t = transpileModule(
       `@Component({tag: 'cmp-a'})
       export class CmpA extends Foobar {
@@ -126,8 +126,8 @@ describe('convert-decorators', () => {
     `
     );
 
-    expect(formatCode(t.outputText)).toBe(
-      c`export class CmpA extends Foobar {
+    expect(await formatCode(t.outputText)).toBe(
+      await c`export class CmpA extends Foobar {
         constructor() {
           super();
           this.count = 0;
@@ -138,7 +138,7 @@ describe('convert-decorators', () => {
     );
   });
 
-  it('should preserve statements in an existing constructor', () => {
+  it('should preserve statements in an existing constructor', async () => {
     const t = transpileModule(`
     @Component({
       tag: 'my-component',
@@ -149,8 +149,8 @@ describe('convert-decorators', () => {
       }
     }`);
 
-    expect(formatCode(t.outputText)).toBe(
-      c`export class MyComponent {
+    expect(await formatCode(t.outputText)).toBe(
+      await c`export class MyComponent {
         constructor() {
           console.log('boop');
         }
@@ -160,7 +160,7 @@ describe('convert-decorators', () => {
     );
   });
 
-  it('should preserve statements in an existing constructor w/ @Prop', () => {
+  it('should preserve statements in an existing constructor w/ @Prop', async () => {
     const t = transpileModule(`
     @Component({
       tag: 'my-component',
@@ -173,7 +173,7 @@ describe('convert-decorators', () => {
       }
     }`);
 
-    expect(formatCode(t.outputText)).toContain(
+    expect(await formatCode(t.outputText)).toContain(
       `  constructor() {
     this.count = undefined;
     console.log('boop');
@@ -181,7 +181,7 @@ describe('convert-decorators', () => {
     );
   });
 
-  it('should allow user to initialize field in an existing constructor w/ @Prop', () => {
+  it('should allow user to initialize field in an existing constructor w/ @Prop', async () => {
     const t = transpileModule(
       `@Component({
       tag: 'my-component',
@@ -198,7 +198,7 @@ describe('convert-decorators', () => {
     // the initialization we do to `undefined` (since no value is present)
     // should be before the user's `this.count = 3` to ensure that their code
     // wins.
-    expect(formatCode(t.outputText)).toContain(
+    expect(await formatCode(t.outputText)).toContain(
       `  constructor() {
     this.count = undefined;
     this.count = 3;
@@ -206,7 +206,7 @@ describe('convert-decorators', () => {
     );
   });
 
-  it('should preserve statements in an existing constructor w/ non-decorated field', () => {
+  it('should preserve statements in an existing constructor w/ non-decorated field', async () => {
     const t = transpileModule(`
     @Component({
       tag: 'example',
@@ -219,15 +219,15 @@ describe('convert-decorators', () => {
       }
     }`);
 
-    expect(formatCode(t.outputText)).toBe(
-      c`export class Example {
+    expect(await formatCode(t.outputText)).toBe(
+      await c`export class Example {
         constructor() {
           this.classProps = ["variant", "theme"];
         }}`
     );
   });
 
-  it('should preserve statements in an existing constructor super, decorated field', () => {
+  it('should preserve statements in an existing constructor super, decorated field', async () => {
     const t = transpileModule(`
     @Component({
       tag: 'example',
@@ -240,7 +240,7 @@ describe('convert-decorators', () => {
       }
     }`);
 
-    expect(formatCode(t.outputText)).toContain(
+    expect(await formatCode(t.outputText)).toContain(
       `  constructor() {
     super();
     this.foo = 'bar';
@@ -249,7 +249,7 @@ describe('convert-decorators', () => {
     );
   });
 
-  it('should not add a super call to the constructor if not necessary', () => {
+  it('should not add a super call to the constructor if not necessary', async () => {
     const t = transpileModule(`
     @Component({tag: 'cmp-a'})
       export class CmpA implements Foobar {
@@ -257,8 +257,8 @@ describe('convert-decorators', () => {
       }
     `);
 
-    expect(formatCode(formatCode(t.outputText))).toBe(
-      c`export class CmpA {
+    expect(await formatCode(await formatCode(t.outputText))).toBe(
+      await c`export class CmpA {
         constructor() {
           this.count = 0;
         }
@@ -271,7 +271,7 @@ describe('convert-decorators', () => {
     );
   });
 
-  it('should not convert `@Event` fields to constructor-initialization', () => {
+  it('should not convert `@Event` fields to constructor-initialization', async () => {
     const t = transpileModule(`
     @Component({tag: 'cmp-a'})
       export class CmpA {
@@ -288,8 +288,8 @@ describe('convert-decorators', () => {
     // we test the whole output here to ensure that the field has been
     // removed from the class body correctly and replaced with an initializer
     // in the constructor
-    expect(formatCode(t.outputText)).toBe(
-      c`export class CmpA {
+    expect(await formatCode(t.outputText)).toBe(
+      await c`export class CmpA {
         static get is() {
           return "cmp-a";
         }

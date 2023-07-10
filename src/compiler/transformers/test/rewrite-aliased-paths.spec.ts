@@ -67,8 +67,8 @@ describe('rewrite alias module paths transform', () => {
       }
     `);
 
-    expect(formatCode(t.outputText)).toBe(
-      formatCode(
+    expect(await formatCode(t.outputText)).toBe(
+      await formatCode(
         'import { foo } from "./name/space";export class CmpA { render() { return h("some-cmp", null, foo("bar")); }}'
       )
     );
@@ -84,8 +84,8 @@ describe('rewrite alias module paths transform', () => {
       }
     `);
 
-    expect(formatCode(t.outputText)).toBe(
-      formatCode(
+    expect(await formatCode(t.outputText)).toBe(
+      await formatCode(
         'import { foo } from "./name/space/subdir";export class CmpA { render() { return h("some-cmp", null, foo("bar")); }}'
       )
     );
@@ -105,8 +105,8 @@ describe('rewrite alias module paths transform', () => {
       }
     `);
 
-    expect(formatCode(t.declarationOutputText)).toBe(
-      formatCode('import { Foo } from "./name/space";export declare class CmpA { field: Foo; render(): any;}')
+    expect(await formatCode(t.declarationOutputText)).toBe(
+      await formatCode('import { Foo } from "./name/space";export declare class CmpA { field: Foo; render(): any;}')
     );
   });
 
@@ -119,8 +119,8 @@ describe('rewrite alias module paths transform', () => {
       }
     `);
 
-    expect(formatCode(t.declarationOutputText)).toBe(
-      formatCode('import { Foo } from "./name/space/subdir";export declare function fooUtil(foo: Foo): Foo;')
+    expect(await formatCode(t.declarationOutputText)).toBe(
+      await formatCode('import { Foo } from "./name/space/subdir";export declare function fooUtil(foo: Foo): Foo;')
     );
   });
 
@@ -134,8 +134,8 @@ describe('rewrite alias module paths transform', () => {
       }
     `);
 
-    expect(formatCode(t.declarationOutputText)).toBe(
-      formatCode(
+    expect(await formatCode(t.declarationOutputText)).toBe(
+      await formatCode(
         'import { Foo } from "./name/space/subdir";import { Bar } from "./name/space";export declare function fooUtil(foo: Foo): Bar;'
       )
     );
@@ -151,8 +151,8 @@ describe('rewrite alias module paths transform', () => {
       }
     `);
 
-    expect(formatCode(t.declarationOutputText)).toBe(
-      formatCode(
+    expect(await formatCode(t.declarationOutputText)).toBe(
+      await formatCode(
         'import { Foo } from "./name/space/subdir";import { Bar } from "./name/space";export declare function fooUtil(foo: Foo): Bar;'
       )
     );
@@ -182,8 +182,8 @@ describe('rewrite alias module paths transform', () => {
     //
     // we need to test that the relative path from `name/component.tsx` to
     // `name/space.ts` is resolved correctly as `'./space'`.
-    expect(formatCode(t.outputText)).toBe(
-      formatCode(
+    expect(await formatCode(t.outputText)).toBe(
+      await formatCode(
         'import { foo } from "./space";export class CmpA { render() { return h("some-cmp", null, foo("bar")); }}'
       )
     );
@@ -214,8 +214,8 @@ describe('rewrite alias module paths transform', () => {
     //
     // we need to test that the relative path from `name/component.tsx` to
     // `name/space/subdir.ts` is resolved correctly as `'./space/subdir'`.
-    expect(formatCode(t.outputText)).toBe(
-      formatCode(
+    expect(await formatCode(t.outputText)).toBe(
+      await formatCode(
         `import { foo } from "./space/subdir";
         export class CmpA {
           render() {
@@ -238,8 +238,8 @@ describe('rewrite alias module paths transform', () => {
       }
     `);
 
-    expect(formatCode(t.outputText)).toBe(
-      formatCode(
+    expect(await formatCode(t.outputText)).toBe(
+      await formatCode(
         'import { foo } from "./name/space/keyboard";export class CmpA { render() { return h("some-cmp", null, foo("bar")); }}'
       )
     );
