@@ -2,7 +2,6 @@ import { catchError, isFunction, isPromise, isRootPath, normalizePath } from '@u
 import { dirname, join } from 'path';
 
 import type * as d from '../../declarations';
-import { requireFunc } from '../sys/environment';
 import { crawlAnchorsForNextUrls } from './crawl-urls';
 import { getPrerenderConfig } from './prerender-config';
 import { getHydrateOptions } from './prerender-hydrate-options';
@@ -33,7 +32,7 @@ export const prerenderWorker = async (sys: d.CompilerSystem, prerenderRequest: d
     const componentGraph = getComponentGraph(sys, prerenderCtx, prerenderRequest.componentGraphPath);
 
     // webpack work-around/hack
-    const hydrateApp = requireFunc(prerenderRequest.hydrateAppFilePath);
+    const hydrateApp = require(prerenderRequest.hydrateAppFilePath);
 
     if (prerenderCtx.templateHtml == null) {
       // cache template html in this process

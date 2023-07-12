@@ -1,7 +1,7 @@
 import { Postcss } from 'postcss';
 
 import type * as d from '../../declarations';
-import { IS_NODE_ENV, requireFunc } from '../sys/environment';
+import { IS_NODE_ENV } from '../sys/environment';
 
 type CssProcessor = ReturnType<Postcss>;
 let cssProcessor: CssProcessor;
@@ -102,7 +102,7 @@ export const autoprefixCss = async (cssText: string, opts: boolean | null | d.Au
  * @returns postCSS with the Autoprefixer plugin applied
  */
 const getProcessor = (autoprefixerOpts: d.AutoprefixerOptions): CssProcessor => {
-  const { postcss, autoprefixer } = requireFunc('../sys/node/autoprefixer.js');
+  const { postcss, autoprefixer } = require('../sys/node/autoprefixer.js');
   if (!cssProcessor) {
     cssProcessor = postcss([autoprefixer(autoprefixerOpts)]);
   }
