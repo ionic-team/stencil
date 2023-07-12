@@ -6,7 +6,7 @@ import type * as d from '../../../declarations';
 import { addExternalImport } from '../collections/add-external-import';
 
 export const parseModuleImport = (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   moduleFile: d.Module,

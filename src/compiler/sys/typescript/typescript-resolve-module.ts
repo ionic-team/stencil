@@ -19,7 +19,7 @@ import {
 import { patchTsSystemFileSystem } from './typescript-sys';
 
 export const tsResolveModuleName = (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   moduleName: string,
   containingFile: string
@@ -38,7 +38,7 @@ export const tsResolveModuleName = (
 };
 
 export const tsResolveModuleNamePackageJsonPath = (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   moduleName: string,
   containingFile: string

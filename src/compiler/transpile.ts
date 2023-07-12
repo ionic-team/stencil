@@ -1,14 +1,15 @@
 import rollupPluginUtils from '@rollup/pluginutils';
 import type {
-  Config,
   TransformCssToEsmInput,
   TransformOptions,
   TranspileOptions,
   TranspileResults,
+  ValidatedConfig,
 } from '@stencil/core/internal';
 import { catchError, getInlineSourceMappingUrlLinker, isString } from '@utils';
 
 import { getTranspileConfig, getTranspileCssConfig, getTranspileResults } from './config/transpile-options';
+import { validateConfig } from './config/validate-config';
 import { transformCssToEsm, transformCssToEsmSync } from './style/css-to-esm';
 import { patchTypescript } from './sys/typescript/typescript-sys';
 import { getPublicCompilerMeta } from './transformers/add-component-meta-static';
@@ -40,8 +41,9 @@ export const transpile = async (code: string, opts: TranspileOptions = {}): Prom
   try {
     if (shouldTranspileModule(results.inputFileExtension)) {
       const { config, compileOpts, transformOpts } = getTranspileConfig(opts);
-      patchTypescript(config, null);
-      transpileCode(config, compileOpts, transformOpts, results);
+      const validatedConfig = validateConfig(config, {}).config;
+      patchTypescript(validatedConfig, null);
+      transpileCode(validatedConfig, compileOpts, transformOpts, results);
     } else if (results.inputFileExtension === 'd.ts') {
       results.code = '';
     } else if (results.inputFileExtension === 'css') {
@@ -72,8 +74,9 @@ export const transpileSync = (code: string, opts: TranspileOptions = {}): Transp
   try {
     if (shouldTranspileModule(results.inputFileExtension)) {
       const { config, compileOpts, transformOpts } = getTranspileConfig(opts);
-      patchTypescript(config, null);
-      transpileCode(config, compileOpts, transformOpts, results);
+      const validatedConfig = validateConfig(config, {}).config;
+      patchTypescript(validatedConfig, null);
+      transpileCode(validatedConfig, compileOpts, transformOpts, results);
     } else if (results.inputFileExtension === 'd.ts') {
       results.code = '';
     } else if (results.inputFileExtension === 'css') {
@@ -90,7 +93,7 @@ export const transpileSync = (code: string, opts: TranspileOptions = {}): Transp
 };
 
 const transpileCode = (
-  config: Config,
+  config: ValidatedConfig,
   transpileOpts: TranspileOptions,
   transformOpts: TransformOptions,
   results: TranspileResults
