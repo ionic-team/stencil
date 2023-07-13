@@ -1,3 +1,5 @@
+import { result } from '@utils';
+
 import type { InMemoryFileSystem } from '../compiler/sys/in-memory-fs';
 import type {
   BuildEvents,
@@ -213,7 +215,7 @@ export interface UpdatedLazyBuildCtx {
 export interface BuildCtx {
   buildId: number;
   buildResults: CompilerBuildResults;
-  buildStats?: CompilerBuildStats | { diagnostics: Diagnostic[] };
+  buildStats?: result.Result<CompilerBuildStats, { diagnostics: Diagnostic[] }>;
   buildMessages: string[];
   bundleBuildCount: number;
   collections: Collection[];

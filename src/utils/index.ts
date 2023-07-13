@@ -11,6 +11,7 @@ export * from './message-utils';
 export * from './output-target';
 export * from './path';
 export * from './query-nonce-meta-tag-content';
+export * as result from './result';
 export * from './sourcemaps';
 export * from './url-paths';
 export * from './util';
