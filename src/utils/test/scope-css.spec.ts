@@ -206,6 +206,12 @@ describe('ShadowCss', function () {
       expect(s(':host.class:before {}', 'a')).toEqual('.class.a-h:before {}');
       expect(s(':host(:not(p)):before {}', 'a')).toEqual('.a-h:not(p):before {}');
     });
+
+    it('should not replace the selector in a `@supports` rule', () => {
+      expect(s('@supports selector(:host()) {:host {color: red; }}', 'a')).toEqual(
+        '@supports selector(:host()) {.a-h {color:red;}}'
+      );
+    });
   });
 
   describe(':host-context', () => {
@@ -231,6 +237,13 @@ describe('ShadowCss', function () {
       expect(s(':host-context([a="b"]) {}', 'a')).toEqual('[a="b"].a-h, [a="b"] .a-h {}');
       expect(s(':host-context([a=b]) {}', 'a')).toEqual('[a=b].a-h, [a="b"] .a-h {}');
     });
+
+    it('should not replace the selector in a `@supports` rule', () => {
+      expect(s('@supports selector(:host-context(.class1)) {:host-context(.class1) {color: red; }}', 'a')).toEqual(
+        '@supports selector(:host-context(.class1)) {.class1.a-h, .class1 .a-h {color:red;}}'
+      );
+    });
+    ``;
   });
 
   describe('::slotted', () => {
@@ -306,6 +319,12 @@ describe('ShadowCss', function () {
     it('should handle multiple selector, commentOriginalSelector', () => {
       const r = s('::slotted(ul), ::slotted(li) {}', 'sc-ion-tag', true);
       expect(r).toEqual('/*!@::slotted(ul), ::slotted(li)*/.sc-ion-tag-s > ul, .sc-ion-tag-s > li {}');
+    });
+
+    it('should not replace the selector in a `@supports` rule', () => {
+      expect(s('@supports selector(::slotted(*)) {::slotted(*) {color: red; }}', 'sc-cmp')).toEqual(
+        '@supports selector(::slotted(*)) {.sc-cmp-s > * {color:red;}}'
+      );
     });
   });
 
