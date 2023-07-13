@@ -15,8 +15,7 @@ describe('custom-elements-delegates-focus', () => {
     const elm: Element = app.querySelector('custom-elements-delegates-focus');
 
     expect(elm.shadowRoot).toBeDefined();
-    // as of TypeScript 4.3, `delegatesFocus` does not exist on the `shadowRoot` object
-    expect((elm.shadowRoot as any).delegatesFocus).toBe(true);
+    expect(elm.shadowRoot.delegatesFocus).toBe(true);
   });
 
   it('does not set delegatesFocus when shadow is set to "true"', async () => {
@@ -25,7 +24,6 @@ describe('custom-elements-delegates-focus', () => {
     const elm: Element = app.querySelector('custom-elements-no-delegates-focus');
 
     expect(elm.shadowRoot).toBeDefined();
-    // as of TypeScript 4.3, `delegatesFocus` does not exist on the `shadowRoot` object
-    expect((elm.shadowRoot as any).delegatesFocus).toBe(false);
+    expect(elm.shadowRoot.delegatesFocus).toBe(false);
   });
 });

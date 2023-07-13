@@ -1,6 +1,5 @@
 import type * as d from '../../declarations';
 
-export const ATTACH_SHADOW = '__stencil_attachShadow';
 export const CREATE_EVENT = '__stencil_createEvent';
 export const DEFINE_CUSTOM_ELEMENT = '__stencil_defineCustomElement';
 export const GET_ELEMENT = '__stencil_getElement';
@@ -12,7 +11,6 @@ export const REGISTER_HOST = '__stencil_registerHost';
 export const H = '__stencil_h';
 
 export const RUNTIME_APIS = {
-  attachShadow: `attachShadow as ${ATTACH_SHADOW}`,
   createEvent: `createEvent as ${CREATE_EVENT}`,
   defineCustomElement: `defineCustomElement as ${DEFINE_CUSTOM_ELEMENT}`,
   getElement: `getElement as ${GET_ELEMENT}`,
