@@ -1526,7 +1526,12 @@ export interface CopyTask {
   keepDirStructure?: boolean;
 }
 
+// TODO(STENCIL-882): Remove this interface [BREAKING_CHANGE]
 export interface BundlingConfig {
+  /**
+   * @deprecated the `namedExports` field is no longer honored by `@rollup/plugin-commonjs` and is not used by Stencil.
+   * This field can be safely removed from your Stencil configuration file.
+   */
   namedExports?: {
     [key: string]: string[];
   };
