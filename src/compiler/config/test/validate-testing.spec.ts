@@ -31,6 +31,29 @@ describe('validateTesting', () => {
     ];
   });
 
+  describe('no testing flags', () => {
+    it('returns an empty testing config when no testing config nor testing flags are provided', () => {
+      userConfig.flags = { ...flags, e2e: false, spec: false };
+      delete userConfig.testing;
+
+      const { config } = validateConfig(userConfig, mockLoadConfigInit());
+
+      expect(config.testing).toEqual({});
+    });
+
+    it('returns the provided testing config when neither testing flag is provided', () => {
+      const testingConfig: d.TestingConfig = {
+        bail: false,
+      };
+      userConfig.flags = { ...flags, e2e: false, spec: false };
+      userConfig.testing = testingConfig;
+
+      const { config } = validateConfig(userConfig, mockLoadConfigInit());
+
+      expect(config.testing).toEqual(testingConfig);
+    });
+  });
+
   describe('browserHeadless', () => {
     describe("using 'headless' value from cli", () => {
       it.each([false, true, 'new'])('sets browserHeadless to %s', (headless) => {
