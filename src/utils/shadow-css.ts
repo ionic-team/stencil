@@ -80,7 +80,7 @@ const _polyfillHostRe = /-shadowcsshost/gim;
  * @param selector The CSS selector we want to match for replacement
  * @returns A look-behind regex containing the selector
  */
-const createSupportsRuleRe = (selector: string) => new RegExp(`^((?!@supports).)*${selector}\\b`, 'gim');
+const createSupportsRuleRe = (selector: string) => new RegExp(`(?<!(^@supports(.*)))(${selector}\\b)`, 'gim');
 const _colonSlottedRe = createSupportsRuleRe('::slotted');
 const _colonHostRe = createSupportsRuleRe(':host');
 const _colonHostContextRe = createSupportsRuleRe(':host-context');
@@ -199,10 +199,18 @@ const escapeBlocks = (input: string) => {
  * @returns The modified CSS string
  */
 const insertPolyfillHostInCssText = (cssText: string) => {
+  // These replacements use a special syntax with the `$1`. When the replacement
+  // occurs, `$1` maps to the content of the string leading up to the selector
+  // to be replaced.
+  //
+  // Otherwise, we will replace all the preceding content in addition to the
+  // selector because of the lookbehind in the regex.
+  //
+  // e.g. `/*!@___0___*/:host {}` => `/*!@___0___*/--shadowcsshost {}`
   cssText = cssText
-    .replace(_colonHostContextRe, _polyfillHostContext)
-    .replace(_colonHostRe, _polyfillHost)
-    .replace(_colonSlottedRe, _polyfillSlotted);
+    .replace(_colonHostContextRe, `$1${_polyfillHostContext}`)
+    .replace(_colonHostRe, `$1${_polyfillHost}`)
+    .replace(_colonSlottedRe, `$1${_polyfillSlotted}`);
 
   return cssText;
 };
@@ -262,10 +270,7 @@ const convertColonSlotted = (cssText: string, slotScopeId: string) => {
 
       const orgSelector = prefixSelector + slottedSelector;
       const addedSelector = `${prefixSelector.trimRight()}${slottedSelector.trim()}`;
-      // We want to compare the pure content of the selector. So, we can use this little
-      // regex to remove any line breaks
-      const pureContextRe = /(?:\r\n|\r|\n)/g;
-      if (orgSelector.replace(pureContextRe, '').trim() !== addedSelector.replace(pureContextRe, '').trim()) {
+      if (orgSelector.trim() !== addedSelector.trim()) {
         const updatedSelector = `${addedSelector}, ${orgSelector}`;
         selectors.push({
           orgSelector,
