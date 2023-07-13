@@ -80,7 +80,8 @@ const _polyfillHostRe = /-shadowcsshost/gim;
  * @param selector The CSS selector we want to match for replacement
  * @returns A look-behind regex containing the selector
  */
-const createSupportsRuleRe = (selector: string) => new RegExp(`(?<!(^@supports(.*)))(${selector}\\b)`, 'gim');
+const createSupportsRuleRe = (selector: string) =>
+  new RegExp(`((?<!(^@supports(.*)))|(?<=\{.*))(${selector}\\b)`, 'gim');
 const _colonSlottedRe = createSupportsRuleRe('::slotted');
 const _colonHostRe = createSupportsRuleRe(':host');
 const _colonHostContextRe = createSupportsRuleRe(':host-context');
