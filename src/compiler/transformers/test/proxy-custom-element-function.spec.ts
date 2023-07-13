@@ -1,6 +1,6 @@
 import * as d from '@stencil/core/declarations';
 import { mockCompilerCtx } from '@stencil/core/testing';
-import ts from 'typescript';
+import * as ts from 'typescript';
 
 import * as AddComponentMetaProxy from '../add-component-meta-proxy';
 import { proxyCustomElement } from '../component-native/proxy-custom-element-function';
