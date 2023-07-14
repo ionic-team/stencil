@@ -58,6 +58,15 @@ jobs:
         working-directory: ./tmp-component-starter
         shell: bash
 
+      # newer versions of puppeteer use the `??=` operator, which node 14 doesn't understand.
+      # puppeteer v20 dropped support for Node 14, pin a known working version of puppeteer v19 for cases where we need
+      # to land something to the v3-maintenance branch.
+      - name: Install Puppeteer (Node 14)
+        run: npm i -D -E puppeteer@19.11.1
+        working-directory: ./tmp-component-starter
+        shell: bash
+        if: ${{ matrix.node == 14 }}
+
       - name: Build Starter Project
         run: npm run build
         working-directory: ./tmp-component-starter
