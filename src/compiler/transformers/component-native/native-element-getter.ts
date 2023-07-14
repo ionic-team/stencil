@@ -7,14 +7,30 @@ export const addNativeElementGetter = (classMembers: ts.ClassElement[], cmp: d.C
   // is transformed into:
   // get element() { return this; }
   if (cmp.elementRef) {
-    classMembers.push(
-      ts.factory.createGetAccessorDeclaration(
-        undefined,
-        cmp.elementRef,
-        [],
-        undefined,
-        ts.factory.createBlock([ts.factory.createReturnStatement(ts.factory.createThis())])
-      )
+    // Create the getter that will be used in the transformed class declaration
+    const getter = ts.factory.createGetAccessorDeclaration(
+      undefined,
+      cmp.elementRef,
+      [],
+      undefined,
+      ts.factory.createBlock([ts.factory.createReturnStatement(ts.factory.createThis())])
     );
+
+    ts.SyntaxKind.AmpersandToken;
+    // Find the index in the class members array that correlates with the element
+    // ref identifier we have
+    const index = classMembers.findIndex(
+      (member) =>
+        member.kind === ts.SyntaxKind.PropertyDeclaration && (member.name as any)?.escapedText === cmp.elementRef
+    );
+
+    // Index should never not be a valid integer, but we'll be safe just in case.
+    // If the index is valid, we'll overwrite the existing class member with the getter
+    // so we don't create multiple members with the same identifier
+    if (index >= 0) {
+      classMembers[index] = getter;
+    } else {
+      classMembers.push(getter);
+    }
   }
 };
