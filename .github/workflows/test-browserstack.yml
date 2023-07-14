@@ -6,10 +6,11 @@ on:
     branches:
       - 'main'
       - 'v3.*-feature'
+      - 'v3-maintenance'
   push:
     branches:
       - 'main'
-      - 'stencil/v4-dev'
+      - 'v3-maintenance'
 
 env:
   BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSER_STACK_ACCESS_KEY }}
