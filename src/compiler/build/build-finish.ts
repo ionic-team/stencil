@@ -2,7 +2,6 @@ import { isFunction, isRemoteUrl } from '@utils';
 import { relative } from 'path';
 
 import type * as d from '../../declarations';
-import { IS_NODE_ENV } from '../sys/environment';
 import { generateBuildResults } from './build-results';
 import { generateBuildStats, writeBuildStats } from './build-stats';
 
@@ -122,7 +121,7 @@ const buildDone = async (
 
   if (!config.watch) {
     compilerCtx.reset();
-    if (IS_NODE_ENV && global.gc) {
+    if (global.gc) {
       buildCtx.debug(`triggering forced gc`);
       global.gc();
       buildCtx.debug(`forced gc finished`);

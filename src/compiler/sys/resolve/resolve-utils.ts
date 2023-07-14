@@ -1,7 +1,6 @@
 import { normalizePath } from '@utils';
 
 import type * as d from '../../../declarations';
-import { IS_BROWSER_ENV, IS_FETCH_ENV } from '../environment';
 
 const COMMON_DIR_MODULE_EXTS = ['.tsx', '.ts', '.mjs', '.js', '.jsx', '.json', '.md'];
 
@@ -65,8 +64,6 @@ export const setPackageVersionByContent = (pkgVersions: Map<string, string>, pkg
 export const isLocalModule = (p: string) => p.startsWith('.') || p.startsWith('/');
 
 export const isStencilCoreImport = (p: string) => p.startsWith('@stencil/core');
-
-export const shouldFetchModule = (p: string) => IS_FETCH_ENV && IS_BROWSER_ENV && isNodeModulePath(p);
 
 export const isNodeModulePath = (p: string) => normalizePath(p).split('/').includes('node_modules');
 

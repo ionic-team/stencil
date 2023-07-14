@@ -22,9 +22,7 @@ import type {
 } from '../../declarations';
 import { version } from '../../version';
 import { buildEvents } from '../events';
-import { HAS_WEB_WORKER, IS_BROWSER_ENV } from './environment';
 import { resolveModuleIdAsync } from './resolve/resolve-module-async';
-import { createWebWorkerMainController } from './worker/web-worker-main';
 
 /**
  * Create an in-memory `CompilerSystem` object, optionally using a supplied
@@ -46,7 +44,7 @@ export const createSystem = (c?: { logger?: Logger }): CompilerSystem => {
   const addDestroy = (cb: () => void) => destroys.add(cb);
   const removeDestroy = (cb: () => void) => destroys.delete(cb);
   const events = buildEvents();
-  const hardwareConcurrency = (IS_BROWSER_ENV && navigator.hardwareConcurrency) || 1;
+  const hardwareConcurrency = 1;
 
   const destroy = async () => {
     const waits: Promise<void>[] = [];
@@ -624,9 +622,7 @@ export const createSystem = (c?: { logger?: Logger }): CompilerSystem => {
     writeFile,
     writeFileSync,
     generateContentHash,
-    createWorkerController: HAS_WEB_WORKER
-      ? (maxConcurrentWorkers) => createWebWorkerMainController(sys, maxConcurrentWorkers)
-      : null,
+    createWorkerController: null,
     details: {
       cpuModel: '',
       freemem: () => 0,

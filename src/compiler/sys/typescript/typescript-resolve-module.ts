@@ -1,10 +1,9 @@
-import { isRemoteUrl, isString, normalizePath } from '@utils';
+import { isString, normalizePath } from '@utils';
 import { basename, dirname, isAbsolute, join, resolve } from 'path';
 import ts from 'typescript';
 
 import type * as d from '../../../declarations';
 import { version } from '../../../version';
-import { IS_BROWSER_ENV, IS_NODE_ENV } from '../environment';
 import { InMemoryFileSystem } from '../in-memory-fs';
 import { resolveRemoteModuleIdSync } from '../resolve/resolve-module-sync';
 import {
@@ -18,28 +17,6 @@ import {
   isTsxFile,
 } from '../resolve/resolve-utils';
 import { patchTsSystemFileSystem } from './typescript-sys';
-
-// TODO(STENCIL-728): fix typing of `inMemoryFs` parameter in `patchTypescript`, related functions
-export const patchTypeScriptResolveModule = (config: d.Config, inMemoryFs: InMemoryFileSystem) => {
-  let compilerExe: string;
-  if (config.sys) {
-    compilerExe = config.sys.getCompilerExecutingPath();
-  } else if (IS_BROWSER_ENV) {
-    compilerExe = location.href;
-  }
-
-  if (shouldPatchRemoteTypeScript(compilerExe)) {
-    const resolveModuleName = ((ts as any).__resolveModuleName = ts.resolveModuleName);
-
-    ts.resolveModuleName = (moduleName, containingFile, compilerOptions, host, cache, redirectedReference) => {
-      const resolvedModule = patchedTsResolveModule(config, inMemoryFs, moduleName, containingFile);
-      if (resolvedModule) {
-        return resolvedModule;
-      }
-      return resolveModuleName(moduleName, containingFile, compilerOptions, host, cache, redirectedReference);
-    };
-  }
-};
 
 export const tsResolveModuleName = (
   config: d.Config,
@@ -235,5 +212,3 @@ const getTsResolveExtension = (p: string) => {
   }
   return ts.Extension.Ts;
 };
-
-const shouldPatchRemoteTypeScript = (compilerExe: string) => !IS_NODE_ENV && isRemoteUrl(compilerExe);

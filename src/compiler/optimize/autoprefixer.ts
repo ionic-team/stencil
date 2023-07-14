@@ -1,7 +1,6 @@
 import { Postcss } from 'postcss';
 
 import type * as d from '../../declarations';
-import { IS_NODE_ENV } from '../sys/environment';
 
 type CssProcessor = ReturnType<Postcss>;
 let cssProcessor: CssProcessor;
@@ -22,9 +21,6 @@ export const autoprefixCss = async (cssText: string, opts: boolean | null | d.Au
     output: cssText,
     diagnostics: [],
   };
-  if (!IS_NODE_ENV) {
-    return output;
-  }
 
   try {
     const autoprefixerOpts = opts != null && typeof opts === 'object' ? opts : DEFAULT_AUTOPREFIX_OPTIONS;
