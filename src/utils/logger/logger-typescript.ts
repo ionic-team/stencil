@@ -2,7 +2,7 @@ import type { Diagnostic, DiagnosticMessageChain, Node } from 'typescript';
 
 import type * as d from '../../declarations';
 import { isIterable } from '../helpers';
-import { normalizePath } from '../normalize-path';
+import { normalizePath } from '../path';
 import { splitLineBreaks } from './logger-utils';
 
 /**

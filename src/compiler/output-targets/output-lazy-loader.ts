@@ -1,5 +1,4 @@
-import { generatePreamble, isOutputTargetDistLazyLoader, normalizePath, relativeImport } from '@utils';
-import { join, relative } from 'path';
+import { generatePreamble, isOutputTargetDistLazyLoader, join, relative, relativeImport } from '@utils';
 
 import type * as d from '../../declarations';
 import { getClientPolyfill } from '../app-core/app-polyfills';
@@ -49,18 +48,18 @@ const generateLoader = async (
   const es2017EntryPoint = join(es2017Dir, 'loader.js');
   const polyfillsEntryPoint = join(es2017Dir, 'polyfills/index.js');
   const cjsEntryPoint = join(cjsDir, 'loader.cjs.js');
-  const polyfillsExport = `export * from '${normalizePath(relative(loaderPath, polyfillsEntryPoint))}';`;
+  const polyfillsExport = `export * from '${relative(loaderPath, polyfillsEntryPoint)}';`;
   const indexContent = `${generatePreamble(config)}
 ${es5HtmlElement}
 ${polyfillsExport}
-export * from '${normalizePath(relative(loaderPath, es5EntryPoint))}';
+export * from '${relative(loaderPath, es5EntryPoint)}';
 `;
   const indexES2017Content = `${generatePreamble(config)}
 ${polyfillsExport}
-export * from '${normalizePath(relative(loaderPath, es2017EntryPoint))}';
+export * from '${relative(loaderPath, es2017EntryPoint)}';
 `;
   const indexCjsContent = `${generatePreamble(config)}
-module.exports = require('${normalizePath(relative(loaderPath, cjsEntryPoint))}');
+module.exports = require('${relative(loaderPath, cjsEntryPoint)}');
 module.exports.applyPolyfills = function() { return Promise.resolve() };
 `;
 

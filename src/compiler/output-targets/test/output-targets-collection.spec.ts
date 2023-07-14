@@ -1,5 +1,4 @@
 import { mockBuildCtx, mockCompilerCtx, mockModule, mockValidatedConfig } from '@stencil/core/testing';
-import { normalize } from 'path';
 
 import type * as d from '../../../declarations';
 import * as test from '../../transformers/map-imports-to-path-aliases';
@@ -61,7 +60,7 @@ describe('Dist Collection output target', () => {
 
         await outputCollection(mockConfig, mockedCompilerCtx, mockedBuildCtx, changedModules);
 
-        expect(mapImportPathSpy).toHaveBeenCalledWith(mockConfig, normalize('/dist/collection/main.js'), {
+        expect(mapImportPathSpy).toHaveBeenCalledWith(mockConfig, '/dist/collection/main.js', {
           collectionDir: '/dist/collection',
           dir: '',
           transformAliasedImportPaths,

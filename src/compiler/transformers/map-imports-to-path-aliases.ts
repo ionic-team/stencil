@@ -1,5 +1,5 @@
-import { normalizePath } from '@utils';
-import { dirname, relative } from 'path';
+import { normalizePath, relative } from '@utils';
+import { dirname } from 'path';
 import ts from 'typescript';
 
 import type * as d from '../../declarations';

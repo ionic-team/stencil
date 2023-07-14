@@ -1,6 +1,5 @@
 import { cloneDocument, serializeNodeToHtml } from '@stencil/core/mock-doc';
-import { catchError, flatOne, isOutputTargetWww, unique } from '@utils';
-import { join, relative } from 'path';
+import { catchError, flatOne, isOutputTargetWww, join, relative, unique } from '@utils';
 
 import type * as d from '../../declarations';
 import { generateEs5DisabledMessage } from '../app-core/app-es5-disabled';
