@@ -119,7 +119,7 @@
     "rollup-plugin-sourcemaps": "^0.6.3",
     "semver": "^7.3.7",
     "sizzle": "^2.3.6",
-    "terser": "5.18.2",
+    "terser": "5.19.0",
     "typescript": "~5.0.4",
     "webpack": "^5.75.0",
     "ws": "8.13.0"
