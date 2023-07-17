@@ -77,6 +77,16 @@ const _polyfillHostRe = /-shadowcsshost/gim;
  * Little helper for generating a regex that will match a specified
  * CSS selector when that selector is _not_ a part of a `@supports` rule.
  *
+ * The pattern will match the provided `selector` (i.e. ':host', ':host-context', etc.)
+ * when that selector is not a part of a `@supports` selector rule _or_ if the selector
+ * is a part of the rule's declaration.
+ *
+ * For instance, if we create the regex with the selector ':host-context':
+ * - '@supports selector(:host-context())' will return no matches (starts with '@supports')
+ * - '@supports selector(:host-context()) { :host-context() { ... }}' will match the second ':host-context' (part of declaration)
+ * - ':host-context() { ... }' will match ':host-context' (selector is not a '@supports' rule)
+ * - ':host() { ... }' will return no matches (selector doesn't match selector used to create regex)
+ *
  * @param selector The CSS selector we want to match for replacement
  * @returns A look-behind regex containing the selector
  */
