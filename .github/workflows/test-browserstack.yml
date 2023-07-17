@@ -5,7 +5,6 @@ on:
   pull_request_target:
     branches:
       - 'main'
-      - 'v3.*-feature'
       - 'v3-maintenance'
   push:
     branches:
