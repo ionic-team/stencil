@@ -10,7 +10,10 @@ export class Cache implements d.Cache {
   private logger: d.Logger;
   private buildCacheDir: string;
 
-  constructor(private config: d.Config, private cacheFs: InMemoryFileSystem) {
+  constructor(
+    private config: d.Config,
+    private cacheFs: InMemoryFileSystem
+  ) {
     this.sys = config.sys;
     this.logger = config.logger;
   }

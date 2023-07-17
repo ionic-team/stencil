@@ -12,7 +12,10 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
     this._queuedActions.push(action);
   }
 
-  constructor(private _page: pd.E2EPageInternal, private _elmHandle: puppeteer.ElementHandle) {
+  constructor(
+    private _page: pd.E2EPageInternal,
+    private _elmHandle: puppeteer.ElementHandle
+  ) {
     super(null, null);
     _page._e2eElements.push(this);
   }

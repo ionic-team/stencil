@@ -37,7 +37,7 @@ describe('parse styles', () => {
     expect(getStaticGetter(t.outputText, 'styles')).toEqual('p{color:red}');
   });
 
-  it('add static "styles" as object', () => {
+  it('add static "styles" as object', async () => {
     const t = transpileModule(`
       const md = 'p{color:red}';
       const ios = 'p{color:black}';
@@ -50,8 +50,8 @@ describe('parse styles', () => {
       })
       export class CmpA {}
     `);
-    expect(formatCode(t.outputText)).toEqual(
-      formatCode(
+    expect(await formatCode(t.outputText)).toEqual(
+      await formatCode(
         `const md = 'p{color:red}';const ios = 'p{color:black}';export class CmpA { static get is() { return "cmp-a"; } static get styles() { return { "md": md, "ios": ios }; }}`
       )
     );
@@ -75,7 +75,7 @@ describe('parse styles', () => {
     });
   });
 
-  it('add static "styles" const', () => {
+  it('add static "styles" const', async () => {
     const t = transpileModule(`
       const styles = 'p{color:red}';
       @Component({
@@ -84,8 +84,8 @@ describe('parse styles', () => {
       })
       export class CmpA {}
     `);
-    expect(formatCode(t.outputText)).toEqual(
-      formatCode(
+    expect(await formatCode(t.outputText)).toEqual(
+      await formatCode(
         `const styles = 'p{color:red}';export class CmpA { static get is() { return "cmp-a"; } static get styles() { return styles; }}`
       )
     );

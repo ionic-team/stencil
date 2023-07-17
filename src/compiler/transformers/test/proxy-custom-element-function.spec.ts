@@ -75,67 +75,67 @@ describe('proxy-custom-element-function', () => {
       );
     });
 
-    it('wraps a class initializer in a proxyCustomElement call', () => {
+    it('wraps a class initializer in a proxyCustomElement call', async () => {
       const code = `const ${componentClassName} = class extends HTMLElement {};`;
 
       const transformer = proxyCustomElement(compilerCtx, transformOpts);
       const transpiledModule = transpileModule(code, null, compilerCtx, [], [transformer]);
 
-      expect(formatCode(transpiledModule.outputText)).toContain(
-        formatCode(
+      expect(await formatCode(transpiledModule.outputText)).toContain(
+        await formatCode(
           `const ${componentClassName} = /*@__PURE__*/ __stencil_proxyCustomElement(class ${componentClassName} extends HTMLElement {}, true);`
         )
       );
     });
 
-    it('wraps an exported class initializer in a proxyCustomElement call', () => {
+    it('wraps an exported class initializer in a proxyCustomElement call', async () => {
       const code = `export const ${componentClassName} = class extends HTMLElement {};`;
 
       const transformer = proxyCustomElement(compilerCtx, transformOpts);
       const transpiledModule = transpileModule(code, null, compilerCtx, [], [transformer]);
 
-      expect(formatCode(transpiledModule.outputText)).toContain(
-        formatCode(
+      expect(await formatCode(transpiledModule.outputText)).toContain(
+        await formatCode(
           `export const ${componentClassName} = /*@__PURE__*/ __stencil_proxyCustomElement(class ${componentClassName} extends HTMLElement {}, true);`
         )
       );
     });
 
     describe('multiple variable declarations', () => {
-      it('wraps a class initializer properly when a variable declaration precedes it', () => {
+      it('wraps a class initializer properly when a variable declaration precedes it', async () => {
         const code = `const foo = 'hello world!', ${componentClassName} = class extends HTMLElement {};`;
 
         const transformer = proxyCustomElement(compilerCtx, transformOpts);
         const transpiledModule = transpileModule(code, null, compilerCtx, [], [transformer]);
 
-        expect(formatCode(transpiledModule.outputText)).toContain(
-          formatCode(
+        expect(await formatCode(transpiledModule.outputText)).toContain(
+          await formatCode(
             `const foo = 'hello world!', ${componentClassName} = /*@__PURE__*/ __stencil_proxyCustomElement(class ${componentClassName} extends HTMLElement {}, true);`
           )
         );
       });
 
-      it('wraps a class initializer properly when it precedes another variable declaration', () => {
+      it('wraps a class initializer properly when it precedes another variable declaration', async () => {
         const code = `const ${componentClassName} = class extends HTMLElement {}, foo = 'hello world!';`;
 
         const transformer = proxyCustomElement(compilerCtx, transformOpts);
         const transpiledModule = transpileModule(code, null, compilerCtx, [], [transformer]);
 
-        expect(formatCode(transpiledModule.outputText)).toContain(
-          formatCode(
+        expect(await formatCode(transpiledModule.outputText)).toContain(
+          await formatCode(
             `const ${componentClassName} = /*@__PURE__*/ __stencil_proxyCustomElement(class ${componentClassName} extends HTMLElement {}, true), foo = 'hello world!';`
           )
         );
       });
 
-      it('wraps a class initializer properly in the middle of multiple variable declarations', () => {
+      it('wraps a class initializer properly in the middle of multiple variable declarations', async () => {
         const code = `const foo = 'hello world!', ${componentClassName} = class ${componentClassName} extends HTMLElement {}, bar = 'goodbye?'`;
 
         const transformer = proxyCustomElement(compilerCtx, transformOpts);
         const transpiledModule = transpileModule(code, null, compilerCtx, [], [transformer]);
 
-        expect(formatCode(transpiledModule.outputText)).toContain(
-          formatCode(
+        expect(await formatCode(transpiledModule.outputText)).toContain(
+          await formatCode(
             `const foo = 'hello world!', ${componentClassName} = /*@__PURE__*/ __stencil_proxyCustomElement(class ${componentClassName} extends HTMLElement {}, true), bar = 'goodbye?';`
           )
         );
@@ -144,7 +144,7 @@ describe('proxy-custom-element-function', () => {
   });
 
   describe('source file unchanged', () => {
-    it('returns the source file when no Stencil module is found', () => {
+    it('returns the source file when no Stencil module is found', async () => {
       getModuleFromSourceFileSpy.mockImplementation((_compilerCtx: d.CompilerCtx, _tsSourceFile: ts.SourceFile) => {
         // TODO(STENCIL-379): Replace with a getMockModule() call
         return {
@@ -157,7 +157,7 @@ describe('proxy-custom-element-function', () => {
       const transformer = proxyCustomElement(compilerCtx, transformOpts);
       const transpiledModule = transpileModule(code, null, compilerCtx, [], [transformer]);
 
-      expect(formatCode(transpiledModule.outputText)).toBe(formatCode(code));
+      expect(await formatCode(transpiledModule.outputText)).toBe(await formatCode(code));
     });
 
     it('returns the source file when no variable statements are found', () => {

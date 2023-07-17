@@ -1608,7 +1608,7 @@ export type LazyBundlesRuntimeData = LazyBundleRuntimeData[];
 export type LazyBundleRuntimeData = [
   /** bundleIds */
   string,
-  ComponentRuntimeMetaCompact[]
+  ComponentRuntimeMetaCompact[],
 ];
 
 export type ComponentRuntimeMetaCompact = [
@@ -1622,7 +1622,7 @@ export type ComponentRuntimeMetaCompact = [
   { [memberName: string]: ComponentRuntimeMember }?,
 
   /** listeners */
-  ComponentRuntimeHostListener[]?
+  ComponentRuntimeHostListener[]?,
 ];
 
 /**
