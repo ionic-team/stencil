@@ -7,7 +7,7 @@ export const outputCustom = async (
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   docs: d.JsonDocs,
-  outputTargets: d.OutputTarget[]
+  outputTargets: d.OutputTarget[],
 ) => {
   const customOutputTargets = outputTargets.filter(isOutputTargetCustom);
   if (customOutputTargets.length === 0) {
@@ -23,6 +23,6 @@ export const outputCustom = async (
         catchError(buildCtx.diagnostics, e);
       }
       timespan.finish(`generate ${o.name} finished`);
-    })
+    }),
   );
 };

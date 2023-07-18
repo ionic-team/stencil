@@ -6,7 +6,7 @@ import type * as d from '../declarations';
 
 export function createWebSocket(
   httpServer: Server,
-  onMessageFromClient: (msg: d.DevServerMessage) => void
+  onMessageFromClient: (msg: d.DevServerMessage) => void,
 ): DevWebSocket {
   const wsConfig: ws.ServerOptions = {
     server: httpServer,

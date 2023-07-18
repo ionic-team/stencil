@@ -8,7 +8,7 @@ import * as d from '@stencil/core/declarations';
  * @returns the stubbed `ComponentCompilerTypeReference`
  */
 export const stubComponentCompilerTypeReference = (
-  overrides: Partial<d.ComponentCompilerTypeReference> = {}
+  overrides: Partial<d.ComponentCompilerTypeReference> = {},
 ): d.ComponentCompilerTypeReference => {
   const defaults: d.ComponentCompilerTypeReference = {
     location: 'global',

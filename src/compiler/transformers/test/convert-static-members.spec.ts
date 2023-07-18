@@ -16,9 +16,9 @@ describe('convert-static-members', () => {
             ts.factory.createIdentifier('propertyName'),
             undefined,
             undefined,
-            ts.factory.createStringLiteral('initial value')
+            ts.factory.createStringLiteral('initial value'),
           ),
-        ]
+        ],
       );
       expect(classWithStaticMembers.members.some(hasStaticInitializerInClass)).toBe(true);
     });
@@ -35,9 +35,9 @@ describe('convert-static-members', () => {
             ts.factory.createIdentifier('propertyName'),
             undefined,
             undefined,
-            ts.factory.createStringLiteral('initial value')
+            ts.factory.createStringLiteral('initial value'),
           ),
-        ]
+        ],
       );
       expect(classWithStaticMembers.members.some(hasStaticInitializerInClass)).toBe(true);
     });
@@ -55,17 +55,17 @@ describe('convert-static-members', () => {
                 ts.factory.createCallExpression(
                   ts.factory.createIdentifier('SomeDecorator'), // Imaginary decorator
                   undefined,
-                  []
-                )
+                  [],
+                ),
               ),
               ts.factory.createToken(ts.SyntaxKind.StaticKeyword),
             ],
             ts.factory.createIdentifier('propertyName'),
             undefined,
             undefined,
-            ts.factory.createStringLiteral('initial value')
+            ts.factory.createStringLiteral('initial value'),
           ),
-        ]
+        ],
       );
       expect(classWithStaticMembers.members.some(hasStaticInitializerInClass)).toBe(true);
     });
@@ -85,20 +85,20 @@ describe('convert-static-members', () => {
                   ts.factory.createCallExpression(
                     ts.factory.createIdentifier(decoratorName), // Stencil decorator
                     undefined,
-                    []
-                  )
+                    [],
+                  ),
                 ),
                 ts.factory.createToken(ts.SyntaxKind.StaticKeyword),
               ],
               ts.factory.createIdentifier('propertyName'),
               undefined,
               undefined,
-              ts.factory.createStringLiteral('initial value')
+              ts.factory.createStringLiteral('initial value'),
             ),
-          ]
+          ],
         );
         expect(classWithStaticMembers.members.some(hasStaticInitializerInClass)).toBe(false);
-      }
+      },
     );
 
     it('returns true for a static property with an initializer with multiple members', () => {
@@ -113,16 +113,16 @@ describe('convert-static-members', () => {
             ts.factory.createIdentifier('nonStaticProperty'),
             undefined,
             undefined,
-            ts.factory.createStringLiteral('some value')
+            ts.factory.createStringLiteral('some value'),
           ),
           ts.factory.createPropertyDeclaration(
             [ts.factory.createToken(ts.SyntaxKind.StaticKeyword)],
             ts.factory.createIdentifier('propertyName'),
             undefined,
             undefined,
-            ts.factory.createStringLiteral('initial value')
+            ts.factory.createStringLiteral('initial value'),
           ),
-        ]
+        ],
       );
       expect(classWithStaticMembers.members.some(hasStaticInitializerInClass)).toBe(true);
     });
@@ -133,7 +133,7 @@ describe('convert-static-members', () => {
         ts.factory.createIdentifier('ClassWithNoMembers'),
         undefined,
         undefined,
-        [] // no members for this class
+        [], // no members for this class
       );
       expect(classWithStaticMembers.members.some(hasStaticInitializerInClass)).toBe(false);
     });
@@ -150,9 +150,9 @@ describe('convert-static-members', () => {
             ts.factory.createIdentifier('propertyName'),
             undefined,
             undefined,
-            undefined // the initializer is false
+            undefined, // the initializer is false
           ),
-        ]
+        ],
       );
       expect(classWithStaticMembers.members.some(hasStaticInitializerInClass)).toBe(false);
     });
@@ -169,9 +169,9 @@ describe('convert-static-members', () => {
             ts.factory.createIdentifier('propertyName'),
             undefined,
             undefined,
-            undefined // the initializer is false
+            undefined, // the initializer is false
           ),
-        ]
+        ],
       );
       expect(classWithStaticMembers.members.some(hasStaticInitializerInClass)).toBe(false);
     });
@@ -188,9 +188,9 @@ describe('convert-static-members', () => {
             ts.factory.createIdentifier('propertyName'),
             undefined,
             undefined,
-            ts.factory.createStringLiteral('initial value')
+            ts.factory.createStringLiteral('initial value'),
           ),
-        ]
+        ],
       );
       expect(classWithStaticMembers.members.some(hasStaticInitializerInClass)).toBe(false);
     });
@@ -207,9 +207,9 @@ describe('convert-static-members', () => {
             ts.factory.createIdentifier('propertyName'),
             undefined,
             undefined,
-            ts.factory.createStringLiteral('initial value')
+            ts.factory.createStringLiteral('initial value'),
           ),
-        ]
+        ],
       );
       expect(classWithStaticMembers.members.some(hasStaticInitializerInClass)).toBe(false);
     });

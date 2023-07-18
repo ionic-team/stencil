@@ -99,7 +99,7 @@ declare module "@stencil/core" {
 `,
       {
         immediateWrite: true,
-      }
+      },
     );
   });
 
@@ -176,7 +176,7 @@ declare module "@stencil/core" {
 `,
         {
           immediateWrite: true,
-        }
+        },
       );
     });
 
@@ -270,7 +270,7 @@ declare module "@stencil/core" {
 `,
         {
           immediateWrite: true,
-        }
+        },
       );
     });
 
@@ -413,7 +413,7 @@ declare module "@stencil/core" {
 `,
         {
           immediateWrite: true,
-        }
+        },
       );
     });
 
@@ -561,7 +561,7 @@ declare module "@stencil/core" {
 `,
         {
           immediateWrite: true,
-        }
+        },
       );
     });
 
@@ -709,7 +709,7 @@ declare module "@stencil/core" {
 `,
         {
           immediateWrite: true,
-        }
+        },
       );
     });
   });
@@ -799,7 +799,7 @@ declare module "@stencil/core" {
 `,
         {
           immediateWrite: true,
-        }
+        },
       );
     });
 
@@ -903,7 +903,7 @@ declare module "@stencil/core" {
 `,
         {
           immediateWrite: true,
-        }
+        },
       );
     });
 
@@ -1042,7 +1042,7 @@ declare module "@stencil/core" {
 `,
         {
           immediateWrite: true,
-        }
+        },
       );
     });
 
@@ -1186,7 +1186,7 @@ declare module "@stencil/core" {
 `,
         {
           immediateWrite: true,
-        }
+        },
       );
     });
 
@@ -1330,7 +1330,7 @@ declare module "@stencil/core" {
 `,
         {
           immediateWrite: true,
-        }
+        },
       );
     });
   });
@@ -1429,7 +1429,7 @@ declare module "@stencil/core" {
 `,
       {
         immediateWrite: true,
-      }
+      },
     );
   });
 
@@ -1531,7 +1531,7 @@ declare module "@stencil/core" {
 `,
       {
         immediateWrite: true,
-      }
+      },
     );
   });
 
@@ -1623,7 +1623,7 @@ declare module "@stencil/core" {
 `,
       {
         immediateWrite: true,
-      }
+      },
     );
   });
 });

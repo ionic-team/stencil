@@ -13,9 +13,9 @@ export const addNativeConnectedCallback = (classMembers: ts.ClassElement[], cmp:
         ts.factory.createCallExpression(
           ts.factory.createPropertyAccessExpression(ts.factory.createThis(), 'render'),
           undefined,
-          undefined
-        )
-      )
+          undefined,
+        ),
+      ),
     );
     const connectedCallback = classMembers.find((classMember) => {
       return ts.isMethodDeclaration(classMember) && (classMember.name as any).escapedText === 'connectedCallback';
@@ -31,7 +31,7 @@ export const addNativeConnectedCallback = (classMembers: ts.ClassElement[], cmp:
         undefined,
         [],
         undefined,
-        ts.factory.createBlock([fnCall, ...connectedCallback.body.statements], true)
+        ts.factory.createBlock([fnCall, ...connectedCallback.body.statements], true),
       );
       const index = classMembers.indexOf(connectedCallback);
       classMembers[index] = callbackMethod;
@@ -45,7 +45,7 @@ export const addNativeConnectedCallback = (classMembers: ts.ClassElement[], cmp:
         undefined,
         [],
         undefined,
-        ts.factory.createBlock([fnCall], true)
+        ts.factory.createBlock([fnCall], true),
       );
       classMembers.push(callbackMethod);
     }

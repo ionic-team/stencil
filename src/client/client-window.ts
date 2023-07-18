@@ -44,7 +44,7 @@ export const supportsListenerOptions = /*@__PURE__*/ (() => {
         get() {
           supportsListenerOptions = true;
         },
-      })
+      }),
     );
   } catch (e) {}
   return supportsListenerOptions;

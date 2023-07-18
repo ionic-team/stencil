@@ -31,7 +31,7 @@ import { BuildContext } from './build-ctx';
  */
 export const createWatchBuild = async (
   config: d.ValidatedConfig,
-  compilerCtx: d.CompilerCtx
+  compilerCtx: d.CompilerCtx,
 ): Promise<d.CompilerWatcher> => {
   let isRebuild = false;
   let tsWatchProgram: {
@@ -74,13 +74,13 @@ export const createWatchBuild = async (
     if (config.flags.debug) {
       config.logger.debug(`WATCH_BUILD::watchBuild::onBuild filesAdded: ${formatFilesForDebug(buildCtx.filesAdded)}`);
       config.logger.debug(
-        `WATCH_BUILD::watchBuild::onBuild filesDeleted: ${formatFilesForDebug(buildCtx.filesDeleted)}`
+        `WATCH_BUILD::watchBuild::onBuild filesDeleted: ${formatFilesForDebug(buildCtx.filesDeleted)}`,
       );
       config.logger.debug(
-        `WATCH_BUILD::watchBuild::onBuild filesUpdated: ${formatFilesForDebug(buildCtx.filesUpdated)}`
+        `WATCH_BUILD::watchBuild::onBuild filesUpdated: ${formatFilesForDebug(buildCtx.filesUpdated)}`,
       );
       config.logger.debug(
-        `WATCH_BUILD::watchBuild::onBuild filesWritten: ${formatFilesForDebug(buildCtx.filesWritten)}`
+        `WATCH_BUILD::watchBuild::onBuild filesWritten: ${formatFilesForDebug(buildCtx.filesWritten)}`,
       );
     }
 
@@ -177,7 +177,7 @@ export const createWatchBuild = async (
       }
 
       config.logger.debug(
-        `WATCH_BUILD::fs_event_change - type=${eventKind}, path=${filePath}, time=${new Date().getTime()}`
+        `WATCH_BUILD::fs_event_change - type=${eventKind}, path=${filePath}, time=${new Date().getTime()}`,
       );
 
       // Trigger a rebuild of the project
@@ -325,7 +325,7 @@ const updateCompilerCtxCache = (
   config: d.Config,
   compilerCtx: d.CompilerCtx,
   path: string,
-  kind: d.CompilerFileWatcherEvent
+  kind: d.CompilerFileWatcherEvent,
 ) => {
   compilerCtx.fs.clearFileCache(path);
   compilerCtx.changedFiles.add(path);

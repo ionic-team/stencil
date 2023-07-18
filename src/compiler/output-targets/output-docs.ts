@@ -23,7 +23,7 @@ import { outputCustom } from './output-custom';
 export const outputDocs = async (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
-  buildCtx: d.BuildCtx
+  buildCtx: d.BuildCtx,
 ): Promise<void> => {
   if (!config.buildDocs) {
     return;
@@ -34,7 +34,7 @@ export const outputDocs = async (
       isOutputTargetDocsReadme(o) ||
       isOutputTargetDocsJson(o) ||
       isOutputTargetDocsCustom(o) ||
-      isOutputTargetDocsVscode(o)
+      isOutputTargetDocsVscode(o),
   );
 
   if (docsOutputTargets.length === 0) {

@@ -10,7 +10,7 @@ export const getClientPolyfill = async (config: d.Config, compilerCtx: d.Compile
     'internal',
     'client',
     'polyfills',
-    polyfillFile
+    polyfillFile,
   );
   return compilerCtx.fs.readFile(polyfillFilePath);
 };
@@ -20,7 +20,7 @@ export const getAppBrowserCorePolyfills = async (config: d.Config, compilerCtx: 
   const polyfills = INLINE_POLYFILLS.slice();
 
   const results = await Promise.all(
-    polyfills.map((polyfillFile) => getClientPolyfill(config, compilerCtx, polyfillFile))
+    polyfills.map((polyfillFile) => getClientPolyfill(config, compilerCtx, polyfillFile)),
   );
 
   // concat the polyfills

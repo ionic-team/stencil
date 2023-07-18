@@ -22,7 +22,7 @@ import { validateCopy } from '../validate-copy';
  */
 export const validateCustomElement = (
   config: ValidatedConfig,
-  userOutputs: ReadonlyArray<OutputTarget>
+  userOutputs: ReadonlyArray<OutputTarget>,
 ): ReadonlyArray<OutputTargetDistCustomElements | OutputTargetDistTypes | OutputTargetCopy> => {
   const defaultDir = 'dist';
 
@@ -73,6 +73,6 @@ export const validateCustomElement = (
 
       return outputs;
     },
-    [] as (OutputTargetDistCustomElements | OutputTargetCopy | OutputTargetDistTypes)[]
+    [] as (OutputTargetDistCustomElements | OutputTargetCopy | OutputTargetDistTypes)[],
   );
 };

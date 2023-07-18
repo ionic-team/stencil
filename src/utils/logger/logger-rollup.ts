@@ -9,7 +9,7 @@ export const loadRollupDiagnostics = (
   config: d.Config,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
-  rollupError: RollupError
+  rollupError: RollupError,
 ) => {
   const formattedCode = formatErrorCode(rollupError.code);
 

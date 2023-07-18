@@ -44,7 +44,7 @@ describe('typescript resolve module', () => {
   it('resolve ./stencil-private.d.ts to full dts path when imported by internal dts url', async () => {
     const moduleName = './stencil-private';
     const containingFile = normalizePath(
-      sys.getLocalModulePath({ rootDir: config.rootDir, moduleId: '@stencil/core', path: 'internal/index.d.ts' })
+      sys.getLocalModulePath({ rootDir: config.rootDir, moduleId: '@stencil/core', path: 'internal/index.d.ts' }),
     );
     expect(containingFile).toBe('/some/path/node_modules/@stencil/core/internal/index.d.ts');
 

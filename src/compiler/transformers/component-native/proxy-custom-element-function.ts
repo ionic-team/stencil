@@ -29,7 +29,7 @@ import { getModuleFromSourceFile } from '../transform-utils';
  */
 export const proxyCustomElement = (
   compilerCtx: d.CompilerCtx,
-  transformOpts: d.TransformOptions
+  transformOpts: d.TransformOptions,
 ): ts.TransformerFactory<ts.SourceFile> => {
   return () => {
     return (tsSourceFile: ts.SourceFile): ts.SourceFile => {
@@ -58,7 +58,7 @@ export const proxyCustomElement = (
               ts.factory.createIdentifier(principalComponent.componentClassName),
               declaration.initializer.typeParameters,
               declaration.initializer.heritageClauses,
-              declaration.initializer.members
+              declaration.initializer.members,
             );
 
             // wrap the Stencil component's class declaration in a component proxy
@@ -71,7 +71,7 @@ export const proxyCustomElement = (
               declaration.name,
               declaration.exclamationToken,
               declaration.type,
-              proxyCreationCall
+              proxyCreationCall,
             );
 
             // update the declaration list that contains the updated variable declaration
@@ -85,7 +85,7 @@ export const proxyCustomElement = (
             const updatedVariableStatement = ts.factory.updateVariableStatement(
               stmt,
               stmt.modifiers,
-              updatedDeclarationList
+              updatedDeclarationList,
             );
 
             // update the source file's statements to use the new variable statement
@@ -100,7 +100,7 @@ export const proxyCustomElement = (
               transformOpts,
               tsSourceFile,
               [RUNTIME_APIS.proxyCustomElement],
-              transformOpts.coreImportPath
+              transformOpts.coreImportPath,
             );
 
             return tsSourceFile;

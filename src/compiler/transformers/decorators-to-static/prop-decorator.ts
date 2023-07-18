@@ -36,7 +36,7 @@ export const propDecoratorsToStatic = (
   typeChecker: ts.TypeChecker,
   program: ts.Program,
   watchable: Set<string>,
-  newMembers: ts.ClassElement[]
+  newMembers: ts.ClassElement[],
 ): void => {
   const properties = decoratedProps
     .filter(ts.isPropertyDeclaration)
@@ -63,7 +63,7 @@ const parsePropDecorator = (
   typeChecker: ts.TypeChecker,
   program: ts.Program,
   prop: ts.PropertyDeclaration,
-  watchable: Set<string>
+  watchable: Set<string>,
 ): ts.PropertyAssignment | null => {
   const propDecorator = retrieveTsDecorators(prop)?.find(isDecoratorNamed('Prop'));
   if (propDecorator == null) {
@@ -118,7 +118,7 @@ const parsePropDecorator = (
 
   const staticProp = ts.factory.createPropertyAssignment(
     ts.factory.createStringLiteral(propName),
-    convertValueToLiteral(propMeta)
+    convertValueToLiteral(propMeta),
   );
   watchable.add(propName);
   return staticProp;
@@ -168,7 +168,7 @@ const getComplexType = (
   typeChecker: ts.TypeChecker,
   node: ts.PropertyDeclaration,
   type: ts.Type,
-  program: ts.Program
+  program: ts.Program,
 ): d.ComponentCompilerPropertyComplexType => {
   const nodeType = node.type;
   return {

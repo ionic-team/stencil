@@ -16,7 +16,7 @@ export class NodeWorkerMain extends EventEmitter {
 
   constructor(
     public id: number,
-    forkModulePath: string
+    forkModulePath: string,
   ) {
     super();
     this.fork(forkModulePath);

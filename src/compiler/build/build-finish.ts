@@ -45,7 +45,7 @@ const buildDone = async (
   config: d.Config,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
-  aborted: boolean
+  aborted: boolean,
 ): Promise<d.CompilerBuildResults> => {
   if (buildCtx.hasFinished && buildCtx.buildResults) {
     // we've already marked this build as finished and

@@ -14,7 +14,7 @@ import { outputWww } from './output-www';
 export const generateOutputTargets = async (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
-  buildCtx: d.BuildCtx
+  buildCtx: d.BuildCtx,
 ) => {
   const timeSpan = buildCtx.createTimeSpan('generate outputs started', true);
 

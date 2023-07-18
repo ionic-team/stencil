@@ -9,7 +9,7 @@ export const elementDecoratorsToStatic = (
   diagnostics: d.Diagnostic[],
   decoratedMembers: ts.ClassElement[],
   typeChecker: ts.TypeChecker,
-  newMembers: ts.ClassElement[]
+  newMembers: ts.ClassElement[],
 ) => {
   const elementRefs = decoratedMembers
     .filter(ts.isPropertyDeclaration)
@@ -28,7 +28,7 @@ export const elementDecoratorsToStatic = (
 const parseElementDecorator = (
   _diagnostics: d.Diagnostic[],
   _typeChecker: ts.TypeChecker,
-  prop: ts.PropertyDeclaration
+  prop: ts.PropertyDeclaration,
 ): string | null => {
   const elementDecorator = retrieveTsDecorators(prop)?.find(isDecoratorNamed('Element'));
 

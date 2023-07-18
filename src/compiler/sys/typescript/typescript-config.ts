@@ -163,7 +163,7 @@ const createDefaultTsConfig = (config: d.Config) =>
       include: [relative(config.rootDir, config.srcDir)],
     },
     null,
-    2
+    2,
   );
 
 const hasSrcDirectoryInclude = (includeProp: string[], src: string) =>

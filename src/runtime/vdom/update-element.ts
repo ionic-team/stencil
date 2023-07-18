@@ -9,7 +9,7 @@ export const updateElement = (
   oldVnode: d.VNode | null,
   newVnode: d.VNode,
   isSvgMode: boolean,
-  memberName?: string
+  memberName?: string,
 ): void => {
   // if the element passed in is a shadow root, which is a document fragment
   // then we want to be adding attrs/props to the shadow root's "host" element

@@ -7,7 +7,7 @@ export const generateJsonDocs = async (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   docsData: d.JsonDocs,
-  outputTargets: d.OutputTarget[]
+  outputTargets: d.OutputTarget[],
 ) => {
   const jsonOutputTargets = outputTargets.filter(isOutputTargetDocsJson);
   if (jsonOutputTargets.length === 0) {
@@ -53,7 +53,7 @@ export default _default;
   await Promise.all(
     jsonOutputTargets.map((jsonOutput) => {
       return writeDocsOutput(compilerCtx, jsonOutput, jsonContent, typesContent);
-    })
+    }),
   );
 };
 
@@ -61,7 +61,7 @@ export const writeDocsOutput = async (
   compilerCtx: d.CompilerCtx,
   jsonOutput: d.OutputTargetDocsJson,
   jsonContent: string,
-  typesContent: string
+  typesContent: string,
 ) => {
   return Promise.all([
     compilerCtx.fs.writeFile(jsonOutput.file, jsonContent),

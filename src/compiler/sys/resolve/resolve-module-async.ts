@@ -9,7 +9,7 @@ import { getPackageDirPath } from './resolve-utils';
 export const resolveModuleIdAsync = (
   sys: d.CompilerSystem,
   inMemoryFs: InMemoryFileSystem,
-  opts: d.ResolveModuleIdOptions
+  opts: d.ResolveModuleIdOptions,
 ) => {
   const resolverOpts: AsyncOpts = createCustomResolverAsync(sys, inMemoryFs, opts.exts);
   resolverOpts.basedir = dirname(normalizeFsPath(opts.containingFile));
@@ -46,7 +46,7 @@ export const resolveModuleIdAsync = (
 export const createCustomResolverAsync = (
   sys: d.CompilerSystem,
   inMemoryFs: InMemoryFileSystem,
-  exts: string[]
+  exts: string[],
 ): any => {
   return {
     async isFile(filePath: string, cb: (err: any, isFile: boolean) => void) {

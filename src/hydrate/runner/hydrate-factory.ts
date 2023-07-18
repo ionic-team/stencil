@@ -8,9 +8,9 @@ export function hydrateFactory<DocOptions extends d.SerializeDocumentOptions>(
     win: Window,
     opts: DocOptions,
     results: d.HydrateResults,
-    resolve: (results: d.HydrateResults) => void
+    resolve: (results: d.HydrateResults) => void,
   ) => void,
-  resolve: (results: d.HydrateResults) => void
+  resolve: (results: d.HydrateResults) => void,
 ) {
   win;
   opts;

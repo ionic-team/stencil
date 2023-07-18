@@ -12,7 +12,7 @@ import { retrieveTsModifiers } from './transform-utils';
  * @returns a TypeScript transformer
  */
 export function rewriteAliasedDTSImportPaths(
-  transformCtx: ts.TransformationContext
+  transformCtx: ts.TransformationContext,
 ): ts.Transformer<ts.Bundle | ts.SourceFile> {
   const compilerHost = ts.createCompilerHost(transformCtx.getCompilerOptions());
 
@@ -33,7 +33,7 @@ export function rewriteAliasedDTSImportPaths(
  * @returns a TypeScript transformer
  */
 export function rewriteAliasedSourceFileImportPaths(
-  transformCtx: ts.TransformationContext
+  transformCtx: ts.TransformationContext,
 ): ts.Transformer<ts.SourceFile> {
   const compilerHost = ts.createCompilerHost(transformCtx.getCompilerOptions());
 
@@ -125,7 +125,7 @@ function rewriteAliasedImport(
   compilerHost: ts.CompilerHost,
   transformCtx: ts.TransformationContext,
   sourceFilePath: string,
-  node: ts.ImportDeclaration
+  node: ts.ImportDeclaration,
 ): ts.ImportDeclaration {
   // this most likely won't be the case, but we'll leave it to TypeScript to
   // error in the case that the user does something like `import foo from 3;`
@@ -162,7 +162,7 @@ function rewriteAliasedImport(
       // need to escape periods (`"."`) so that they are correctly interpreted as
       // literal characters instead of as wildcards.
       .map((extension) => `${extension}$`.replace('.', '\\.'))
-      .join('|')
+      .join('|'),
   );
 
   const resolvePathInDestination = module.resolvedModule.resolvedFileName;
@@ -206,8 +206,8 @@ function rewriteAliasedImport(
       // Note also that any relative paths as module specifiers which _don't_
       // need to be transformed (e.g. `'./foo'`) have already been handled
       // above.
-      importPath.startsWith('.') ? importPath : './' + importPath
+      importPath.startsWith('.') ? importPath : './' + importPath,
     ),
-    node.assertClause
+    node.assertClause,
   );
 }

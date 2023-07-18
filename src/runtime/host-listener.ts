@@ -8,7 +8,7 @@ export const addHostEventListeners = (
   elm: d.HostElement,
   hostRef: d.HostRef,
   listeners: d.ComponentRuntimeHostListener[],
-  attachParentListeners: boolean
+  attachParentListeners: boolean,
 ) => {
   if (BUILD.hostListener && listeners) {
     // this is called immediately within the element's constructor

@@ -53,8 +53,8 @@ describe('proxy-custom-element-function', () => {
       ts.factory.createCallExpression(
         ts.factory.createIdentifier(PROXY_CUSTOM_ELEMENT),
         [],
-        [clazz, ts.factory.createTrue()]
-      )
+        [clazz, ts.factory.createTrue()],
+      ),
     );
   });
 
@@ -71,7 +71,7 @@ describe('proxy-custom-element-function', () => {
       const transpiledModule = transpileModule(code, null, compilerCtx, [], [transformer]);
 
       expect(transpiledModule.outputText).toContain(
-        `import { proxyCustomElement as __stencil_proxyCustomElement } from "@stencil/core";`
+        `import { proxyCustomElement as __stencil_proxyCustomElement } from "@stencil/core";`,
       );
     });
 
@@ -83,8 +83,8 @@ describe('proxy-custom-element-function', () => {
 
       expect(await formatCode(transpiledModule.outputText)).toContain(
         await formatCode(
-          `const ${componentClassName} = /*@__PURE__*/ __stencil_proxyCustomElement(class ${componentClassName} extends HTMLElement {}, true);`
-        )
+          `const ${componentClassName} = /*@__PURE__*/ __stencil_proxyCustomElement(class ${componentClassName} extends HTMLElement {}, true);`,
+        ),
       );
     });
 
@@ -96,8 +96,8 @@ describe('proxy-custom-element-function', () => {
 
       expect(await formatCode(transpiledModule.outputText)).toContain(
         await formatCode(
-          `export const ${componentClassName} = /*@__PURE__*/ __stencil_proxyCustomElement(class ${componentClassName} extends HTMLElement {}, true);`
-        )
+          `export const ${componentClassName} = /*@__PURE__*/ __stencil_proxyCustomElement(class ${componentClassName} extends HTMLElement {}, true);`,
+        ),
       );
     });
 
@@ -110,8 +110,8 @@ describe('proxy-custom-element-function', () => {
 
         expect(await formatCode(transpiledModule.outputText)).toContain(
           await formatCode(
-            `const foo = 'hello world!', ${componentClassName} = /*@__PURE__*/ __stencil_proxyCustomElement(class ${componentClassName} extends HTMLElement {}, true);`
-          )
+            `const foo = 'hello world!', ${componentClassName} = /*@__PURE__*/ __stencil_proxyCustomElement(class ${componentClassName} extends HTMLElement {}, true);`,
+          ),
         );
       });
 
@@ -123,8 +123,8 @@ describe('proxy-custom-element-function', () => {
 
         expect(await formatCode(transpiledModule.outputText)).toContain(
           await formatCode(
-            `const ${componentClassName} = /*@__PURE__*/ __stencil_proxyCustomElement(class ${componentClassName} extends HTMLElement {}, true), foo = 'hello world!';`
-          )
+            `const ${componentClassName} = /*@__PURE__*/ __stencil_proxyCustomElement(class ${componentClassName} extends HTMLElement {}, true), foo = 'hello world!';`,
+          ),
         );
       });
 
@@ -136,8 +136,8 @@ describe('proxy-custom-element-function', () => {
 
         expect(await formatCode(transpiledModule.outputText)).toContain(
           await formatCode(
-            `const foo = 'hello world!', ${componentClassName} = /*@__PURE__*/ __stencil_proxyCustomElement(class ${componentClassName} extends HTMLElement {}, true), bar = 'goodbye?';`
-          )
+            `const foo = 'hello world!', ${componentClassName} = /*@__PURE__*/ __stencil_proxyCustomElement(class ${componentClassName} extends HTMLElement {}, true), bar = 'goodbye?';`,
+          ),
         );
       });
     });

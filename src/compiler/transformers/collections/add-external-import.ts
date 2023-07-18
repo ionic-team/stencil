@@ -6,13 +6,13 @@ import { tsResolveModuleNamePackageJsonPath } from '../../sys/typescript/typescr
 import { parseCollection } from './parse-collection-module';
 
 export const addExternalImport = (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   moduleFile: d.Module,
   containingFile: string,
   moduleId: string,
-  resolveCollections: boolean
+  resolveCollections: boolean,
 ) => {
   if (!moduleFile.externalImports.includes(moduleId)) {
     moduleFile.externalImports.push(moduleId);
@@ -74,7 +74,7 @@ export const addExternalImport = (
     buildCtx,
     moduleId,
     parsedPkgJson.filePath,
-    parsedPkgJson.data
+    parsedPkgJson.data,
   );
   if (!collection) {
     return;
@@ -105,7 +105,7 @@ export const addExternalImport = (
         moduleFile,
         resolveFromDir,
         dependencyModuleId,
-        resolveCollections
+        resolveCollections,
       );
     });
   }

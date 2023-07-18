@@ -39,7 +39,7 @@ export function createRequestHandler(devServerConfig: d.DevServerConfig, serverC
             req,
             res,
             `invalid basePath`,
-            `404 File Not Found, base path: ${devServerConfig.basePath}`
+            `404 File Not Found, base path: ${devServerConfig.basePath}`,
           );
         }
 

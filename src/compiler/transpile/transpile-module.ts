@@ -23,9 +23,9 @@ import { updateStencilCoreImports } from '../transformers/update-stencil-core-im
  * @returns the results of compiling the provided input string
  */
 export const transpileModule = (
-  config: d.Config,
+  config: d.ValidatedConfig,
   input: string,
-  transformOpts: d.TransformOptions
+  transformOpts: d.TransformOptions,
 ): d.TranspileModuleResults => {
   if (!config.logger) {
     config = {

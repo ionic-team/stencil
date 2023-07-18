@@ -42,7 +42,7 @@ describe('type library', () => {
     config.logger = logger;
     addFileToLibrary(config, 'fixtures/not-found.ts');
     expect(warnMock).toHaveBeenCalledWith(
-      'docs-json: unable to gather type information from "fixtures/not-found.ts". Please double check this path exists relative to your project root.'
+      'docs-json: unable to gather type information from "fixtures/not-found.ts". Please double check this path exists relative to your project root.',
     );
     teardownConsoleMocks();
   });

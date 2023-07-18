@@ -21,7 +21,7 @@ export const extTransformsPlugin = (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
-  bundleOpts: BundleOptions
+  bundleOpts: BundleOptions,
 ): Plugin => {
   return {
     name: 'extTransformsPlugin',
@@ -92,7 +92,7 @@ export const extTransformsPlugin = (
               collectionDirs.map(async (outputTarget) => {
                 const collectionPath = join(outputTarget.collectionDir, relPath);
                 await compilerCtx.fs.writeFile(collectionPath, pluginTransforms.code);
-              })
+              }),
             );
           }
         }

@@ -17,7 +17,7 @@ export const taskInfo = (coreCompiler: CoreCompiler, sys: CompilerSystem, logger
   console.log(
     `${logger.cyan('   CPU Model:')} ${details.cpuModel} (${sys.hardwareConcurrency} cpu${
       sys.hardwareConcurrency !== 1 ? 's' : ''
-    })`
+    })`,
   );
   console.log(`${logger.cyan('    Compiler:')} ${sys.getCompilerExecutingPath()}`);
   console.log(`${logger.cyan('       Build:')} ${coreCompiler.buildId}`);

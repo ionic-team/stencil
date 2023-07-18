@@ -26,7 +26,7 @@ export const outputServiceWorkers = async (config: d.ValidatedConfig, buildCtx: 
     const workbox: d.Workbox = config.sys.lazyRequire.require(config.rootDir, 'workbox-build');
 
     await Promise.all(
-      wwwServiceOutputs.map((outputTarget) => generateServiceWorker(config, buildCtx, workbox, outputTarget))
+      wwwServiceOutputs.map((outputTarget) => generateServiceWorker(config, buildCtx, workbox, outputTarget)),
     );
   }
 };

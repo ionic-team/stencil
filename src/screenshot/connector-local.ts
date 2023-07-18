@@ -44,7 +44,7 @@ export class ScreenshotLocalConnector extends ScreenshotConnector {
       imagesUrl,
       jsonpUrl,
       results.masterBuild,
-      results.currentBuild
+      results.currentBuild,
     );
 
     const compareAppFileName = 'compare.html';
@@ -90,7 +90,7 @@ function createLocalCompareApp(
   imagesUrl: string,
   jsonpUrl: string,
   a: d.ScreenshotBuild,
-  b: d.ScreenshotBuild
+  b: d.ScreenshotBuild,
 ) {
   return `<!doctype html>
 <html dir="ltr" lang="en">

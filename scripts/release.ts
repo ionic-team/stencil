@@ -69,7 +69,7 @@ async function prepareRelease(opts: BuildOptions, args: ReadonlyArray<string>): 
   const pkg = opts.packageJson;
   const oldVersion = opts.packageJson.version;
   console.log(
-    `\nPrepare to publish ${opts.vermoji}  ${color.bold.magenta(pkg.name)} ${color.dim(`(currently ${oldVersion})`)}\n`
+    `\nPrepare to publish ${opts.vermoji}  ${color.bold.magenta(pkg.name)} ${color.dim(`(currently ${oldVersion})`)}\n`,
   );
 
   try {
@@ -90,7 +90,7 @@ async function publishRelease(opts: BuildOptions, args: ReadonlyArray<string>): 
   const pkg = opts.packageJson;
   if (opts.version !== pkg.version) {
     throw new Error(
-      `Prepare release data (${opts.version}) and package.json (${pkg.version}) versions do not match. Try re-running release prepare.`
+      `Prepare release data (${opts.version}) and package.json (${pkg.version}) versions do not match. Try re-running release prepare.`,
     );
   }
 

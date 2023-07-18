@@ -18,7 +18,7 @@ export const eventDecoratorsToStatic = (
   decoratedProps: ts.ClassElement[],
   typeChecker: ts.TypeChecker,
   program: ts.Program,
-  newMembers: ts.ClassElement[]
+  newMembers: ts.ClassElement[],
 ) => {
   const events = decoratedProps
     .filter(ts.isPropertyDeclaration)
@@ -45,7 +45,7 @@ const parseEventDecorator = (
   diagnostics: d.Diagnostic[],
   typeChecker: ts.TypeChecker,
   program: ts.Program,
-  prop: ts.PropertyDeclaration
+  prop: ts.PropertyDeclaration,
 ): d.ComponentCompilerStaticEvent | null => {
   const eventDecorator = retrieveTsDecorators(prop)?.find(isDecoratorNamed('Event'));
 
@@ -95,7 +95,7 @@ export const getEventName = (eventOptions: d.EventOptions, memberName: string) =
 const getComplexType = (
   typeChecker: ts.TypeChecker,
   program: ts.Program,
-  node: ts.PropertyDeclaration
+  node: ts.PropertyDeclaration,
 ): d.ComponentCompilerPropertyComplexType => {
   const sourceFile = node.getSourceFile();
   const eventType = node.type ? getEventType(node.type) : null;
@@ -425,5 +425,5 @@ const DOM_EVENT_NAMES: Set<string> = new Set(
     'vrdisplaypresentchange',
     'waiting',
     'wheel',
-  ].map((e) => e.toLowerCase())
+  ].map((e) => e.toLowerCase()),
 );

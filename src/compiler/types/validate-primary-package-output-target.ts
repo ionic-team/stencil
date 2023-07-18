@@ -73,7 +73,7 @@ export const PRIMARY_PACKAGE_TARGET_CONFIGS = {
 export const validatePrimaryPackageOutputTarget = (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
-  buildCtx: d.BuildCtx
+  buildCtx: d.BuildCtx,
 ) => {
   if (config.validatePrimaryPackageOutputTarget) {
     const eligiblePrimaryTargets: d.EligiblePrimaryPackageOutputTarget[] = [];
@@ -106,8 +106,8 @@ export const validatePrimaryPackageOutputTarget = (
             `Your Stencil config has multiple output targets with 'isPrimaryPackageOutputTarget: true'. Stencil does not support validating 'package.json' fields for multiple output targets. Please remove the 'isPrimaryPackageOutputTarget' flag from all but one of the following output targets: ${targetsMarkedToValidate
               .map((ref) => ref.type)
               .join(
-                ', '
-              )}. For now, Stencil will use the first primary target it finds. You can read more about primary package output targets in the Stencil docs: https://stenciljs.com/docs/output-targets#primary-package-output-target-validation`
+                ', ',
+              )}. For now, Stencil will use the first primary target it finds. You can read more about primary package output targets in the Stencil docs: https://stenciljs.com/docs/output-targets#primary-package-output-target-validation`,
           );
         }
 
@@ -123,7 +123,7 @@ export const validatePrimaryPackageOutputTarget = (
       } else {
         logValidationWarning(
           buildCtx,
-          `Your Stencil project has not assigned a primary package output target. Stencil recommends that you assign a primary output target so it can validate values for fields in your project's 'package.json'. You can read more about primary package output targets in the Stencil docs: https://stenciljs.com/docs/output-targets#primary-package-output-target-validation`
+          `Your Stencil project has not assigned a primary package output target. Stencil recommends that you assign a primary output target so it can validate values for fields in your project's 'package.json'. You can read more about primary package output targets in the Stencil docs: https://stenciljs.com/docs/output-targets#primary-package-output-target-validation`,
         );
       }
     }
@@ -136,15 +136,15 @@ export const validatePrimaryPackageOutputTarget = (
           .filter((ref: any) => ref.isPrimaryPackageOutputTarget === true)
           .map((ref) => ref.type)
           .join(
-            ', '
-          )}. You can read more about primary package output targets in the Stencil docs: https://stenciljs.com/docs/output-targets#primary-package-output-target-validation`
+            ', ',
+          )}. You can read more about primary package output targets in the Stencil docs: https://stenciljs.com/docs/output-targets#primary-package-output-target-validation`,
       );
     }
   } else {
     if (config.outputTargets.some((ref: any) => ref.isPrimaryPackageOutputTarget)) {
       logValidationWarning(
         buildCtx,
-        'Your Stencil project has designated a primary package output target without enabling primary package validation for your project. Either set `validatePrimaryPackageOutputTarget: true` in your Stencil config or remove `isPrimaryPackageOutputTarget: true` from all output targets. You can read more about primary package output targets in the Stencil docs: https://stenciljs.com/docs/output-targets#primary-package-output-target-validation'
+        'Your Stencil project has designated a primary package output target without enabling primary package validation for your project. Either set `validatePrimaryPackageOutputTarget: true` in your Stencil config or remove `isPrimaryPackageOutputTarget: true` from all output targets. You can read more about primary package output targets in the Stencil docs: https://stenciljs.com/docs/output-targets#primary-package-output-target-validation',
       );
     }
   }
@@ -171,7 +171,7 @@ export const validateModulePath = (
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   recommendedOutputTargetConfig: PrimaryPackageOutputTargetRecommendedConfig,
-  targetToValidate: d.EligiblePrimaryPackageOutputTarget
+  targetToValidate: d.EligiblePrimaryPackageOutputTarget,
 ) => {
   const currentModulePath = buildCtx.packageJson.module;
   const recommendedModulePath = recommendedOutputTargetConfig.getModulePath
@@ -215,7 +215,7 @@ export const validateTypesPath = (
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   recommendedOutputTargetConfig: PrimaryPackageOutputTargetRecommendedConfig,
-  targetToValidate: d.EligiblePrimaryPackageOutputTarget
+  targetToValidate: d.EligiblePrimaryPackageOutputTarget,
 ) => {
   const currentTypesPath = buildCtx.packageJson.types;
   const recommendedTypesPath = recommendedOutputTargetConfig.getTypesPath

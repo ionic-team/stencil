@@ -10,7 +10,7 @@ export class MockCustomElementRegistry implements CustomElementRegistry {
   define(tagName: string, cstr: any, options?: any) {
     if (tagName.toLowerCase() !== tagName) {
       throw new Error(
-        `Failed to execute 'define' on 'CustomElementRegistry': "${tagName}" is not a valid custom element name`
+        `Failed to execute 'define' on 'CustomElementRegistry': "${tagName}" is not a valid custom element name`,
       );
     }
 
@@ -143,7 +143,7 @@ export function createCustomElement(customElements: MockCustomElementRegistry, o
         }
         return false;
       },
-    }
+    },
   );
 
   const elm = new MockHTMLElement(ownerDocument, tagName);

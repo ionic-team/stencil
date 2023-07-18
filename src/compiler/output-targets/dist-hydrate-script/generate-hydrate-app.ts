@@ -20,7 +20,7 @@ export const generateHydrateApp = async (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
-  outputTargets: d.OutputTargetHydrate[]
+  outputTargets: d.OutputTargetHydrate[],
 ) => {
   try {
     const packageDir = join(config.sys.getCompilerExecutingPath(), '..', '..');

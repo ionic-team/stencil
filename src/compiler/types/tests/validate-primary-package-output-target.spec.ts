@@ -44,7 +44,7 @@ describe('validatePrimaryPackageOutputTarget', () => {
       expect(buildCtx.diagnostics.length).toBe(1);
       expect(buildCtx.diagnostics[0].level).toEqual('warn');
       expect(buildCtx.diagnostics[0].messageText).toEqual(
-        'Your Stencil project has designated a primary package output target without enabling primary package validation for your project. Either set `validatePrimaryPackageOutputTarget: true` in your Stencil config or remove `isPrimaryPackageOutputTarget: true` from all output targets. You can read more about primary package output targets in the Stencil docs: https://stenciljs.com/docs/output-targets#primary-package-output-target-validation'
+        'Your Stencil project has designated a primary package output target without enabling primary package validation for your project. Either set `validatePrimaryPackageOutputTarget: true` in your Stencil config or remove `isPrimaryPackageOutputTarget: true` from all output targets. You can read more about primary package output targets in the Stencil docs: https://stenciljs.com/docs/output-targets#primary-package-output-target-validation',
       );
     });
 
@@ -61,7 +61,7 @@ describe('validatePrimaryPackageOutputTarget', () => {
       expect(buildCtx.diagnostics.length).toBe(1);
       expect(buildCtx.diagnostics[0].level).toEqual('warn');
       expect(buildCtx.diagnostics[0].messageText).toEqual(
-        `Your Stencil project has assigned one or more ineligible output targets as the primary package output target. No validation will take place. Please remove the 'isPrimaryPackageOutputTarget' flag from the following output targets in your Stencil config: copy. You can read more about primary package output targets in the Stencil docs: https://stenciljs.com/docs/output-targets#primary-package-output-target-validation`
+        `Your Stencil project has assigned one or more ineligible output targets as the primary package output target. No validation will take place. Please remove the 'isPrimaryPackageOutputTarget' flag from the following output targets in your Stencil config: copy. You can read more about primary package output targets in the Stencil docs: https://stenciljs.com/docs/output-targets#primary-package-output-target-validation`,
       );
     });
 
@@ -77,7 +77,7 @@ describe('validatePrimaryPackageOutputTarget', () => {
       expect(buildCtx.diagnostics.length).toBe(1);
       expect(buildCtx.diagnostics[0].level).toEqual('warn');
       expect(buildCtx.diagnostics[0].messageText).toEqual(
-        `Your Stencil project has not assigned a primary package output target. Stencil recommends that you assign a primary output target so it can validate values for fields in your project's 'package.json'. You can read more about primary package output targets in the Stencil docs: https://stenciljs.com/docs/output-targets#primary-package-output-target-validation`
+        `Your Stencil project has not assigned a primary package output target. Stencil recommends that you assign a primary output target so it can validate values for fields in your project's 'package.json'. You can read more about primary package output targets in the Stencil docs: https://stenciljs.com/docs/output-targets#primary-package-output-target-validation`,
       );
     });
 
@@ -95,7 +95,7 @@ describe('validatePrimaryPackageOutputTarget', () => {
       expect(buildCtx.diagnostics.length).toBe(1);
       expect(buildCtx.diagnostics[0].level).toEqual('warn');
       expect(buildCtx.diagnostics[0].messageText).toEqual(
-        `Your Stencil config has multiple output targets with 'isPrimaryPackageOutputTarget: true'. Stencil does not support validating 'package.json' fields for multiple output targets. Please remove the 'isPrimaryPackageOutputTarget' flag from all but one of the following output targets: dist, dist-custom-elements. For now, Stencil will use the first primary target it finds. You can read more about primary package output targets in the Stencil docs: https://stenciljs.com/docs/output-targets#primary-package-output-target-validation`
+        `Your Stencil config has multiple output targets with 'isPrimaryPackageOutputTarget: true'. Stencil does not support validating 'package.json' fields for multiple output targets. Please remove the 'isPrimaryPackageOutputTarget' flag from all but one of the following output targets: dist, dist-custom-elements. For now, Stencil will use the first primary target it finds. You can read more about primary package output targets in the Stencil docs: https://stenciljs.com/docs/output-targets#primary-package-output-target-validation`,
       );
     });
   });
@@ -115,7 +115,7 @@ describe('validatePrimaryPackageOutputTarget', () => {
       expect(buildCtx.diagnostics.length).toBe(1);
       expect(buildCtx.diagnostics[0].level).toEqual('warn');
       expect(buildCtx.diagnostics[0].messageText).toEqual(
-        `package.json "module" property is required when generating a distribution. It's recommended to set the "module" property to: ./dist/index.js`
+        `package.json "module" property is required when generating a distribution. It's recommended to set the "module" property to: ./dist/index.js`,
       );
     });
 
@@ -154,13 +154,13 @@ describe('validatePrimaryPackageOutputTarget', () => {
           compilerCtx,
           buildCtx,
           PRIMARY_PACKAGE_TARGET_CONFIGS[outputTarget.type],
-          outputTarget
+          outputTarget,
         );
 
         expect(buildCtx.diagnostics.length).toBe(1);
         expect(buildCtx.diagnostics[0].level).toEqual('warn');
         expect(buildCtx.diagnostics[0].messageText).toEqual(
-          `package.json "module" property is set to "${buildCtx.packageJson.module}". It's recommended to set the "module" property to: ${recommendedPath}`
+          `package.json "module" property is set to "${buildCtx.packageJson.module}". It's recommended to set the "module" property to: ${recommendedPath}`,
         );
       });
 
@@ -172,7 +172,7 @@ describe('validatePrimaryPackageOutputTarget', () => {
           compilerCtx,
           buildCtx,
           PRIMARY_PACKAGE_TARGET_CONFIGS[outputTarget.type],
-          outputTarget
+          outputTarget,
         );
 
         expect(buildCtx.diagnostics.length).toBe(0);
@@ -201,7 +201,7 @@ describe('validatePrimaryPackageOutputTarget', () => {
       expect(buildCtx.diagnostics.length).toBe(1);
       expect(buildCtx.diagnostics[0].level).toEqual('warn');
       expect(buildCtx.diagnostics[0].messageText).toEqual(
-        `package.json "types" property is required when generating a distribution. It's recommended to set the "types" property to: ./dist/types/index.d.ts`
+        `package.json "types" property is required when generating a distribution. It's recommended to set the "types" property to: ./dist/types/index.d.ts`,
       );
     });
 
@@ -213,7 +213,7 @@ describe('validatePrimaryPackageOutputTarget', () => {
       expect(buildCtx.diagnostics.length).toBe(1);
       expect(buildCtx.diagnostics[0].level).toEqual('warn');
       expect(buildCtx.diagnostics[0].messageText).toEqual(
-        `package.json "types" file must have a ".d.ts" extension. The "types" property is currently set to: /dist/types/index.ts`
+        `package.json "types" file must have a ".d.ts" extension. The "types" property is currently set to: /dist/types/index.ts`,
       );
     });
 
@@ -225,7 +225,7 @@ describe('validatePrimaryPackageOutputTarget', () => {
       expect(buildCtx.diagnostics.length).toBe(1);
       expect(buildCtx.diagnostics[0].level).toEqual('error');
       expect(buildCtx.diagnostics[0].messageText).toEqual(
-        `package.json "types" property is set to "dist/types/index.d.ts" but cannot be found.`
+        `package.json "types" property is set to "dist/types/index.d.ts" but cannot be found.`,
       );
     });
 
@@ -266,13 +266,13 @@ describe('validatePrimaryPackageOutputTarget', () => {
           compilerCtx,
           buildCtx,
           PRIMARY_PACKAGE_TARGET_CONFIGS[outputTarget.type],
-          outputTarget
+          outputTarget,
         );
 
         expect(buildCtx.diagnostics.length).toBe(1);
         expect(buildCtx.diagnostics[0].level).toEqual('warn');
         expect(buildCtx.diagnostics[0].messageText).toEqual(
-          `package.json "types" property is set to "${buildCtx.packageJson.types}". It's recommended to set the "types" property to: ${recommendedPath}`
+          `package.json "types" property is set to "${buildCtx.packageJson.types}". It's recommended to set the "types" property to: ${recommendedPath}`,
         );
       });
 
@@ -284,7 +284,7 @@ describe('validatePrimaryPackageOutputTarget', () => {
           compilerCtx,
           buildCtx,
           PRIMARY_PACKAGE_TARGET_CONFIGS[outputTarget.type],
-          targetToValidate
+          targetToValidate,
         );
 
         expect(buildCtx.diagnostics.length).toBe(0);

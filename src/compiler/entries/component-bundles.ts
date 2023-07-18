@@ -21,7 +21,7 @@ import { getDefaultBundles } from './default-bundles';
 function computeUsedComponents(
   config: d.ValidatedConfig,
   defaultBundles: readonly d.ComponentCompilerMeta[][],
-  allCmps: readonly d.ComponentCompilerMeta[]
+  allCmps: readonly d.ComponentCompilerMeta[],
 ): Set<string> {
   if (!config.excludeUnusedDependencies) {
     // the user/config has specified that Stencil should use all the dependencies it's found, return the set of all
@@ -63,7 +63,7 @@ function computeUsedComponents(
  */
 export function generateComponentBundles(
   config: d.ValidatedConfig,
-  buildCtx: d.BuildCtx
+  buildCtx: d.BuildCtx,
 ): readonly d.ComponentCompilerMeta[][] {
   const components = sortBy(buildCtx.components, (cmp: d.ComponentCompilerMeta) => cmp.dependents.length);
 
@@ -89,7 +89,7 @@ export function generateComponentBundles(
     .map((c: d.ComponentCompilerMeta) => [c]);
 
   return [...defaultBundles, ...optimizeBundlers(bundlers, 0.6)].filter(
-    (b: readonly d.ComponentCompilerMeta[]) => b.length > 0
+    (b: readonly d.ComponentCompilerMeta[]) => b.length > 0,
   );
 }
 
@@ -101,7 +101,7 @@ export function generateComponentBundles(
  */
 function optimizeBundlers(
   bundles: readonly d.ComponentCompilerMeta[][],
-  threshold: number
+  threshold: number,
 ): readonly d.ComponentCompilerMeta[][] {
   /**
    * build a mapping of component tag names in each `bundles` entry to the index where that entry occurs in `bundles`:

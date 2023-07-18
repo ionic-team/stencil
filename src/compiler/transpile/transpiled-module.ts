@@ -24,7 +24,7 @@ export const getModule = (compilerCtx: d.CompilerCtx, filePath: string): d.Modul
 export const createModule = (
   staticSourceFile: ts.SourceFile, // this may NOT be the original
   staticSourceFileText: string,
-  emitFilepath: string
+  emitFilepath: string,
 ): d.Module => ({
   sourceFilePath: normalizePath(staticSourceFile.fileName),
   jsFilePath: emitFilepath,

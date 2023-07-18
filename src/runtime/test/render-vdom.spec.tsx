@@ -406,7 +406,7 @@ describe('render-vdom', () => {
       newSpecPage({
         components: [CmpA],
         html: `<cmp-a></cmp-a>`,
-      })
+      }),
     );
 
     expect(root).toEqualHtml(`
@@ -434,7 +434,7 @@ describe('render-vdom', () => {
       newSpecPage({
         components: [CmpA],
         html: `<cmp-a></cmp-a>`,
-      })
+      }),
     );
 
     expect(root).toEqualHtml(`

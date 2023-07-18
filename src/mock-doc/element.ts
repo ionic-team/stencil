@@ -120,7 +120,7 @@ patchPropAttributes(
   },
   {
     type: 'submit',
-  }
+  },
 );
 
 export class MockImageElement extends MockHTMLElement {
@@ -198,7 +198,7 @@ patchPropAttributes(
   },
   {
     type: 'text',
-  }
+  },
 );
 
 export class MockFormElement extends MockHTMLElement {

@@ -29,7 +29,7 @@ export const runPrerenderTask = async (
   config: ValidatedConfig,
   hydrateAppFilePath: string,
   componentGraph: BuildResultsComponentGraph,
-  srcIndexHtmlPath: string
+  srcIndexHtmlPath: string,
 ) => {
   const diagnostics: Diagnostic[] = [];
 

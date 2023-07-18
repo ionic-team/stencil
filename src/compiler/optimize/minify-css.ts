@@ -20,7 +20,7 @@ export const minifyCss = async (input: { css: string; resolveUrl?: (url: string)
 const resolveStylesheetUrl = async (
   nodes: CssNode[],
   resolveUrl: (url: string) => Promise<string> | string,
-  resolved: Map<string, string>
+  resolved: Map<string, string>,
 ) => {
   for (const node of nodes) {
     if (node.type === CssNodeType.Declaration && isString(node.value) && node.value.includes('url(')) {
