@@ -15,7 +15,7 @@ export const initializeComponent = async (
   hostRef: d.HostRef,
   cmpMeta: d.ComponentRuntimeMeta,
   hmrVersionId?: string,
-  Cstr?: any
+  Cstr?: any,
 ) => {
   // initializeComponent
   if ((hostRef.$flags$ & HOST_FLAGS.hasInitializedComponent) === 0) {
@@ -31,7 +31,7 @@ export const initializeComponent = async (
         // Await creates a micro-task avoid if possible
         const endLoad = uniqueTime(
           `st:load:${cmpMeta.$tagName$}:${hostRef.$modeName$}`,
-          `[Stencil] Load module for <${cmpMeta.$tagName$}>`
+          `[Stencil] Load module for <${cmpMeta.$tagName$}>`,
         );
         Cstr = await Cstr;
         endLoad();

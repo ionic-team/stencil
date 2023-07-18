@@ -3,7 +3,7 @@ import { CMP_FLAGS, LISTENER_FLAGS, MEMBER_FLAGS } from './constants';
 
 export const formatLazyBundleRuntimeMeta = (
   bundleId: any,
-  cmps: d.ComponentCompilerMeta[]
+  cmps: d.ComponentCompilerMeta[],
 ): d.LazyBundleRuntimeData => {
   return [bundleId, cmps.map((cmp) => formatComponentRuntimeMeta(cmp, true))];
 };
@@ -18,7 +18,7 @@ export const formatLazyBundleRuntimeMeta = (
  */
 export const formatComponentRuntimeMeta = (
   compilerMeta: d.ComponentCompilerMeta,
-  includeMethods: boolean
+  includeMethods: boolean,
 ): d.ComponentRuntimeMetaCompact => {
   let flags = 0;
   if (compilerMeta.encapsulation === 'shadow') {
@@ -58,7 +58,7 @@ export const stringifyRuntimeData = (data: any) => {
 
 const formatComponentRuntimeMembers = (
   compilerMeta: d.ComponentCompilerMeta,
-  includeMethods = true
+  includeMethods = true,
 ): d.ComponentRuntimeMembers => {
   return {
     ...formatPropertiesRuntimeMember(compilerMeta.properties),

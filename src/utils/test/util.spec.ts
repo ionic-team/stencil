@@ -125,7 +125,7 @@ describe('util', () => {
 
   it('createJsVarName', () => {
     expect(util.createJsVarName('./scoped-style-import.css?tag=my-button&encapsulation=scoped')).toBe(
-      'scopedStyleImportCss'
+      'scopedStyleImportCss',
     );
     expect(util.createJsVarName('./scoped-style-import.css#hash')).toBe('scopedStyleImportCss');
     expect(util.createJsVarName('./scoped-style-import.css&data')).toBe('scopedStyleImportCss');
@@ -229,7 +229,7 @@ interface Foo extends Components.Foo, HTMLStencilElement {`);
       'does not add a doc block when docs are empty (%j)',
       (docs) => {
         expect(util.addDocBlock(str, docs)).toEqual(str);
-      }
+      },
     );
   });
 });

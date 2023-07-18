@@ -47,7 +47,7 @@ const getCopyTasks = (
   config: d.ValidatedConfig,
   buildCtx: d.BuildCtx,
   o: d.OutputTargetCopy,
-  changedFiles: string[]
+  changedFiles: string[],
 ) => {
   if (!Array.isArray(o.copy)) {
     return [];

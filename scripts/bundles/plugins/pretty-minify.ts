@@ -28,7 +28,7 @@ export function prettyMinifyPlugin(opts: BuildOptions, preamble?: string): Plugi
               });
               b.code = minifyResults.code;
             }
-          })
+          }),
         );
       },
     };

@@ -13,7 +13,7 @@ describe('addCoreRuntimeApi()', () => {
     mockModule = createModule(
       ts.createSourceFile('mock-file.ts', sourceText, ts.ScriptTarget.ES5),
       sourceText,
-      'mock-file.js'
+      'mock-file.js',
     );
   });
 
@@ -49,7 +49,7 @@ describe('addOutputTargetCoreRuntimeApi()', () => {
     mockModule = createModule(
       ts.createSourceFile('mock-file.ts', sourceText, ts.ScriptTarget.ES5),
       sourceText,
-      'mock-file.js'
+      'mock-file.js',
     );
   });
 
@@ -87,7 +87,7 @@ describe('addLegacyApis()', () => {
     mockModule = createModule(
       ts.createSourceFile('mock-file.ts', sourceText, ts.ScriptTarget.ES5),
       sourceText,
-      'mock-file.js'
+      'mock-file.js',
     );
   });
 

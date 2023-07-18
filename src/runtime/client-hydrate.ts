@@ -18,7 +18,7 @@ export const initializeClientHydrate = (
   hostElm: d.HostElement,
   tagName: string,
   hostId: string,
-  hostRef: d.HostRef
+  hostRef: d.HostRef,
 ) => {
   const endHydrate = createTime('hydrateClient', tagName);
   const shadowRoot = hostElm.shadowRoot;
@@ -74,7 +74,7 @@ const clientHydrate = (
   shadowRootNodes: d.RenderNode[],
   hostElm: d.HostElement,
   node: d.RenderNode,
-  hostId: string
+  hostId: string,
 ) => {
   let childNodeType: string;
   let childIdSplt: string[];
@@ -134,7 +134,7 @@ const clientHydrate = (
         shadowRootNodes,
         hostElm,
         node.childNodes[i] as any,
-        hostId
+        hostId,
       );
     }
 
@@ -148,7 +148,7 @@ const clientHydrate = (
           shadowRootNodes,
           hostElm,
           node.shadowRoot.childNodes[i] as any,
-          hostId
+          hostId,
         );
       }
     }

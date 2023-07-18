@@ -7,7 +7,7 @@ import { retrieveTsModifiers } from './transform-utils';
 export const updateStyleImports = (
   transformOpts: d.TransformOptions,
   tsSourceFile: ts.SourceFile,
-  moduleFile: d.Module
+  moduleFile: d.Module,
 ) => {
   // add style imports built from @Component() styleUrl option
   if (transformOpts.module === 'cjs') {
@@ -20,7 +20,7 @@ export const updateStyleImports = (
 const updateEsmStyleImports = (
   transformOpts: d.TransformOptions,
   tsSourceFile: ts.SourceFile,
-  moduleFile: d.Module
+  moduleFile: d.Module,
 ) => {
   const styleImports: ts.Statement[] = [];
   let statements = tsSourceFile.statements.slice();
@@ -63,7 +63,7 @@ const updateEsmStyleImportPath = (
   tsSourceFile: ts.SourceFile,
   statements: ts.Statement[],
   cmp: d.ComponentCompilerMeta,
-  style: d.StyleCompiler
+  style: d.StyleCompiler,
 ): ts.Statement[] => {
   for (let i = 0; i < statements.length; i++) {
     const n = statements[i];
@@ -77,7 +77,7 @@ const updateEsmStyleImportPath = (
           retrieveTsModifiers(n),
           n.importClause,
           ts.factory.createStringLiteral(importPath),
-          undefined
+          undefined,
         );
         break;
       }
@@ -90,7 +90,7 @@ const createEsmStyleImport = (
   transformOpts: d.TransformOptions,
   tsSourceFile: ts.SourceFile,
   cmp: d.ComponentCompilerMeta,
-  style: d.StyleCompiler
+  style: d.StyleCompiler,
 ) => {
   const importName = ts.factory.createIdentifier(style.styleIdentifier);
   const importPath = getStyleImportPath(transformOpts, tsSourceFile, cmp, style, style.externalStyles[0].absolutePath);
@@ -98,14 +98,14 @@ const createEsmStyleImport = (
   return ts.factory.createImportDeclaration(
     undefined,
     ts.factory.createImportClause(false, importName, undefined),
-    ts.factory.createStringLiteral(importPath)
+    ts.factory.createStringLiteral(importPath),
   );
 };
 
 const updateCjsStyleRequires = (
   transformOpts: d.TransformOptions,
   tsSourceFile: ts.SourceFile,
-  moduleFile: d.Module
+  moduleFile: d.Module,
 ) => {
   const styleRequires: ts.Statement[] = [];
 
@@ -129,7 +129,7 @@ const createCjsStyleRequire = (
   transformOpts: d.TransformOptions,
   tsSourceFile: ts.SourceFile,
   cmp: d.ComponentCompilerMeta,
-  style: d.StyleCompiler
+  style: d.StyleCompiler,
 ) => {
   const importName = ts.factory.createIdentifier(style.styleIdentifier);
   const importPath = getStyleImportPath(transformOpts, tsSourceFile, cmp, style, style.externalStyles[0].absolutePath);
@@ -145,12 +145,12 @@ const createCjsStyleRequire = (
           ts.factory.createCallExpression(
             ts.factory.createIdentifier('require'),
             [],
-            [ts.factory.createStringLiteral(importPath)]
-          )
+            [ts.factory.createStringLiteral(importPath)],
+          ),
         ),
       ],
-      ts.NodeFlags.Const
-    )
+      ts.NodeFlags.Const,
+    ),
   );
 };
 
@@ -159,7 +159,7 @@ const getStyleImportPath = (
   tsSourceFile: ts.SourceFile,
   cmp: d.ComponentCompilerMeta,
   style: d.StyleCompiler,
-  importPath: string
+  importPath: string,
 ) => {
   const importData: d.SerializeImportData = {
     importeePath: importPath,

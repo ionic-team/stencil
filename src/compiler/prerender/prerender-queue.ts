@@ -160,7 +160,7 @@ const prerenderUrl = async (results: d.PrerenderResults, manager: d.PrerenderMan
   const urlsCompletedSize = manager.urlsCompleted.size;
   if (manager.progressLogger && urlsCompletedSize > 1) {
     manager.progressLogger.update(
-      `           prerendered ${urlsCompletedSize} urls: ${manager.config.logger.dim(previewUrl)}`
+      `           prerendered ${urlsCompletedSize} urls: ${manager.config.logger.dim(previewUrl)}`,
     );
   }
 

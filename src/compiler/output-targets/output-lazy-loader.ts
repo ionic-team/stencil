@@ -15,7 +15,7 @@ export const outputLazyLoader = async (config: d.ValidatedConfig, compilerCtx: d
 const generateLoader = async (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
-  outputTarget: d.OutputTargetDistLazyLoader
+  outputTarget: d.OutputTargetDistLazyLoader,
 ) => {
   const loaderPath = outputTarget.dir;
   const es2017Dir = outputTarget.esmDir;
@@ -41,7 +41,7 @@ const generateLoader = async (
       unpkg: './cdn.js',
     },
     null,
-    2
+    2,
   );
 
   const es5EntryPoint = join(es5Dir, 'loader.js');

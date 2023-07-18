@@ -23,8 +23,8 @@ export const addCreateEvents = (moduleFile: d.Module, cmp: d.ComponentCompilerMe
           ts.factory.createThis(),
           ts.factory.createStringLiteral(ev.name),
           ts.factory.createNumericLiteral(computeFlags(ev)),
-        ])
-      )
+        ]),
+      ),
     );
   });
 };

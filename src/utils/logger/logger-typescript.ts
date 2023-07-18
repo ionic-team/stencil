@@ -183,7 +183,7 @@ export const loadTypeScriptDiagnostic = (tsDiagnostic: Diagnostic): d.Diagnostic
  */
 const flattenDiagnosticMessageText = (
   tsDiagnostic: Diagnostic,
-  diag: string | DiagnosticMessageChain | undefined
+  diag: string | DiagnosticMessageChain | undefined,
 ): string => {
   if (typeof diag === 'string') {
     return diag;

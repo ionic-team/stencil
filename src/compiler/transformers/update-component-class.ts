@@ -22,7 +22,7 @@ export const updateComponentClass = (
   classNode: ts.ClassDeclaration,
   heritageClauses: ts.HeritageClause[] | ts.NodeArray<ts.HeritageClause>,
   members: ts.ClassElement[],
-  moduleFile: d.Module
+  moduleFile: d.Module,
 ): ts.ClassDeclaration | ts.VariableStatement => {
   let classModifiers = retrieveTsModifiers(classNode)?.slice() ?? [];
 
@@ -42,7 +42,7 @@ export const updateComponentClass = (
       classNode.name,
       classNode.typeParameters,
       heritageClauses,
-      members
+      members,
     );
   }
 
@@ -73,7 +73,7 @@ const createConstClass = (
   classNode: ts.ClassDeclaration,
   heritageClauses: ts.HeritageClause[] | ts.NodeArray<ts.HeritageClause>,
   members: ts.ClassElement[],
-  moduleFile: d.Module
+  moduleFile: d.Module,
 ): ts.VariableStatement => {
   const className = classNode.name;
 
@@ -105,11 +105,11 @@ const createConstClass = (
             undefined,
             classNode.typeParameters,
             heritageClauses,
-            members
-          )
+            members,
+          ),
         ),
       ],
-      ts.NodeFlags.Const
-    )
+      ts.NodeFlags.Const,
+    ),
   );
 };

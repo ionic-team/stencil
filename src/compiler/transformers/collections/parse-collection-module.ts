@@ -10,7 +10,7 @@ export const parseCollection = (
   buildCtx: d.BuildCtx,
   moduleId: string,
   pkgJsonFilePath: string,
-  pkgData: d.PackageJsonData
+  pkgData: d.PackageJsonData,
 ) => {
   // note this MUST be synchronous because this is used during transpile
   const collectionName = pkgData.name;

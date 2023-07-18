@@ -31,7 +31,7 @@ export const patchBrowser = (): Promise<d.CustomElementsDefineOptions> => {
     ? Array.from(doc.querySelectorAll('script')).find(
         (s) =>
           new RegExp(`\/${NAMESPACE}(\\.esm)?\\.js($|\\?|#)`).test(s.src) ||
-          s.getAttribute('data-stencil-namespace') === NAMESPACE
+          s.getAttribute('data-stencil-namespace') === NAMESPACE,
       )
     : null;
   const importMeta = import.meta.url;

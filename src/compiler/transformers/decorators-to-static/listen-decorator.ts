@@ -8,7 +8,7 @@ import { getDeclarationParameters, isDecoratorNamed } from './decorator-utils';
 export const listenDecoratorsToStatic = (
   diagnostics: d.Diagnostic[],
   decoratedMembers: ts.ClassElement[],
-  newMembers: ts.ClassElement[]
+  newMembers: ts.ClassElement[],
 ) => {
   const listeners = decoratedMembers
     .filter(ts.isMethodDeclaration)
@@ -22,7 +22,7 @@ export const listenDecoratorsToStatic = (
 
 const parseListenDecorators = (
   diagnostics: d.Diagnostic[],
-  method: ts.MethodDeclaration
+  method: ts.MethodDeclaration,
 ): d.ComponentCompilerListener[] => {
   const listenDecorators = (retrieveTsDecorators(method) ?? []).filter(isDecoratorNamed('Listen'));
   if (listenDecorators.length === 0) {

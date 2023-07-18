@@ -73,7 +73,7 @@ export const buildJsonFileError = (
   diagnostics: d.Diagnostic[],
   jsonFilePath: string,
   msg: string,
-  jsonField: string
+  jsonField: string,
 ) => {
   const err = buildError(diagnostics);
   err.messageText = msg;

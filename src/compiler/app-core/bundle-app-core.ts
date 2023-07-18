@@ -17,7 +17,7 @@ export const generateRollupOutput = async (
   build: RollupBuild,
   options: OutputOptions,
   config: d.Config,
-  entryModules: d.EntryModule[]
+  entryModules: d.EntryModule[],
 ): Promise<d.RollupResult[] | null> => {
   if (build == null) {
     return null;

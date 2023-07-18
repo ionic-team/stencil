@@ -15,7 +15,7 @@ import { convertValueToLiteral, createStaticGetter, retrieveModifierLike } from 
  */
 export const addComponentMetaStatic = (
   cmpNode: ts.ClassDeclaration,
-  cmpMeta: d.ComponentCompilerMeta
+  cmpMeta: d.ComponentCompilerMeta,
 ): ts.ClassDeclaration => {
   const publicCompilerMeta = getPublicCompilerMeta(cmpMeta);
 
@@ -28,7 +28,7 @@ export const addComponentMetaStatic = (
     cmpNode.name,
     cmpNode.typeParameters,
     cmpNode.heritageClauses,
-    classMembers
+    classMembers,
   );
 };
 

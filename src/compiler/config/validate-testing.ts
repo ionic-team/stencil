@@ -66,7 +66,7 @@ export const validateTesting = (config: d.ValidatedConfig, diagnostics: d.Diagno
       '..',
       '..',
       'screenshot',
-      'local-connector.js'
+      'local-connector.js',
     );
   }
 
@@ -77,7 +77,7 @@ export const validateTesting = (config: d.ValidatedConfig, diagnostics: d.Diagno
 
     (config.outputTargets ?? [])
       .filter(
-        (o): o is d.OutputTargetWww | d.OutputTargetDist => (isOutputTargetDist(o) || isOutputTargetWww(o)) && !!o.dir
+        (o): o is d.OutputTargetWww | d.OutputTargetDist => (isOutputTargetDist(o) || isOutputTargetWww(o)) && !!o.dir,
       )
       .forEach((outputTarget) => {
         testing.testPathIgnorePatterns?.push(outputTarget.dir!);
@@ -95,7 +95,7 @@ export const validateTesting = (config: d.ValidatedConfig, diagnostics: d.Diagno
   }
 
   testing.setupFilesAfterEnv.unshift(
-    join(config.sys!.getCompilerExecutingPath(), '..', '..', 'testing', 'jest-setuptestframework.js')
+    join(config.sys!.getCompilerExecutingPath(), '..', '..', 'testing', 'jest-setuptestframework.js'),
   );
 
   if (isString(testing.testEnvironment)) {

@@ -23,7 +23,7 @@ export const addImports = (
   transformOpts: d.TransformOptions,
   tsSourceFile: ts.SourceFile,
   importFnNames: string[],
-  importPath: string
+  importPath: string,
 ): ts.SourceFile => {
   if (importFnNames.length === 0) {
     return tsSourceFile;

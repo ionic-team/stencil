@@ -110,7 +110,7 @@ export const createSystem = (c?: { logger?: Logger }): CompilerSystem => {
   const createDirRecursiveSync = (
     p: string,
     opts: CompilerSystemCreateDirectoryOptions,
-    results: CompilerSystemCreateDirectoryResults
+    results: CompilerSystemCreateDirectoryResults,
   ) => {
     const parentDir = dirname(p);
 
@@ -303,7 +303,7 @@ export const createSystem = (c?: { logger?: Logger }): CompilerSystem => {
   const removeDirSyncRecursive = (
     p: string,
     opts: CompilerSystemRemoveDirectoryOptions,
-    results: CompilerSystemRemoveDirectoryResults
+    results: CompilerSystemRemoveDirectoryResults,
   ) => {
     if (!results.error) {
       p = normalize(p);

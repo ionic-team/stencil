@@ -34,7 +34,7 @@ const hmrStyleSheetImages = (
   cssImageProps: string[],
   styleSheet: CSSStyleSheet,
   versionId: string,
-  imageFileNames: string[]
+  imageFileNames: string[],
 ) => {
   try {
     const cssRules = styleSheet.cssRules;
@@ -64,7 +64,7 @@ const hmrStyleSheetRuleImages = (
   cssImageProps: string[],
   cssRule: CSSStyleRule,
   versionId: string,
-  imageFileNames: string[]
+  imageFileNames: string[],
 ) => {
   cssImageProps.forEach((cssImageProp) => {
     imageFileNames.forEach((imageFileName) => {

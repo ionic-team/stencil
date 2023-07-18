@@ -163,7 +163,7 @@ export const pluck = (obj: { [key: string]: any }, keys: string[]) => {
       }
       return final;
     },
-    {} as { [key: string]: any }
+    {} as { [key: string]: any },
   );
 };
 

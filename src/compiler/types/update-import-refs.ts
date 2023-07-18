@@ -17,14 +17,14 @@ export const updateReferenceTypeImports = (
   typeCounts: Map<string, number>,
   cmp: d.ComponentCompilerMeta,
   filePath: string,
-  config: d.Config
+  config: d.Config,
 ): d.TypesImportData => {
   const updateImportReferences = updateImportReferenceFactory(typeCounts, filePath, config);
 
   return [...cmp.properties, ...cmp.events, ...cmp.methods]
     .filter(
       (cmpProp: d.ComponentCompilerProperty | d.ComponentCompilerEvent | d.ComponentCompilerMethod) =>
-        cmpProp.complexType && cmpProp.complexType.references
+        cmpProp.complexType && cmpProp.complexType.references,
     )
     .reduce((typesImportData: d.TypesImportData, cmpProp) => {
       return updateImportReferences(typesImportData, cmpProp.complexType.references);
@@ -40,7 +40,7 @@ export const updateReferenceTypeImports = (
  */
 type ImportReferenceUpdater = (
   existingTypeImportData: d.TypesImportData,
-  typeReferences: { [key: string]: d.ComponentCompilerTypeReference }
+  typeReferences: { [key: string]: d.ComponentCompilerTypeReference },
 ) => d.TypesImportData;
 
 /**
@@ -53,7 +53,7 @@ type ImportReferenceUpdater = (
 const updateImportReferenceFactory = (
   typeCounts: Map<string, number>,
   filePath: string,
-  config: d.Config
+  config: d.Config,
 ): ImportReferenceUpdater => {
   /**
    * Determines the number of times that a type identifier (name) has been used. If an identifier has been used before,
@@ -73,7 +73,7 @@ const updateImportReferenceFactory = (
 
   return (
     existingTypeImportData: d.TypesImportData,
-    typeReferences: { [key: string]: d.ComponentCompilerTypeReference }
+    typeReferences: { [key: string]: d.ComponentCompilerTypeReference },
   ): d.TypesImportData => {
     Object.keys(typeReferences)
       .map<[string, d.ComponentCompilerTypeReference]>((typeName) => {
@@ -101,7 +101,7 @@ const updateImportReferenceFactory = (
               typeReference.path!,
               filePath,
               config.tsCompilerOptions,
-              ts.createCompilerHost(config.tsCompilerOptions)
+              ts.createCompilerHost(config.tsCompilerOptions),
             );
 
             if (resolvedModule && !resolvedModule.isExternalLibraryImport && resolvedModule.resolvedFileName) {

@@ -29,7 +29,7 @@ export const setBooleanConfig = <K extends keyof d.Config>(
   config: d.UnvalidatedConfig,
   configName: (K & keyof ConfigFlags) | K,
   flagName: keyof ConfigFlags | null,
-  defaultValue: d.Config[K]
+  defaultValue: d.Config[K],
 ) => {
   if (flagName) {
     const flagValue = config.flags?.[flagName];

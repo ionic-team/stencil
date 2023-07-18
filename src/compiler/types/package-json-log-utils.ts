@@ -19,7 +19,7 @@ export const packageJsonError = (
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   msg: string,
-  jsonField: string
+  jsonField: string,
 ): d.Diagnostic => {
   const err = buildJsonFileError(compilerCtx, buildCtx.diagnostics, config.packageJsonFilePath, msg, jsonField);
   err.header = `Package Json`;
@@ -43,7 +43,7 @@ export const packageJsonWarn = (
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   msg: string,
-  jsonField: string
+  jsonField: string,
 ): d.Diagnostic => {
   const warn = buildJsonFileError(compilerCtx, buildCtx.diagnostics, config.packageJsonFilePath, msg, jsonField);
   warn.header = `Package Json`;

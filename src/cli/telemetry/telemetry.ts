@@ -18,7 +18,7 @@ export async function telemetryBuildFinishedAction(
   sys: d.CompilerSystem,
   config: d.ValidatedConfig,
   coreCompiler: CoreCompiler,
-  result: d.CompilerBuildResults
+  result: d.CompilerBuildResults,
 ) {
   const tracking = await shouldTrack(config, sys, !!config.flags.ci);
 
@@ -48,7 +48,7 @@ export async function telemetryAction(
   sys: d.CompilerSystem,
   config: d.ValidatedConfig,
   coreCompiler: CoreCompiler,
-  action?: d.TelemetryCallback
+  action?: d.TelemetryCallback,
 ) {
   const tracking = await shouldTrack(config, sys, !!config.flags.ci);
 
@@ -94,7 +94,7 @@ export async function telemetryAction(
  */
 export function hasAppTarget(config: d.ValidatedConfig): boolean {
   return config.outputTargets.some(
-    (target) => target.type === WWW && (!!target.serviceWorker || (!!target.baseUrl && target.baseUrl !== '/'))
+    (target) => target.type === WWW && (!!target.serviceWorker || (!!target.baseUrl && target.baseUrl !== '/')),
   );
 }
 
@@ -130,7 +130,7 @@ export const prepareData = async (
   config: d.ValidatedConfig,
   sys: d.CompilerSystem,
   duration_ms: number | undefined,
-  component_count: number | undefined = undefined
+  component_count: number | undefined = undefined,
 ): Promise<d.TrackableData> => {
   const { typescript, rollup } = coreCompiler.versions || { typescript: 'unknown', rollup: 'unknown' };
   const { packages, packagesNoVersions } = await getInstalledPackages(sys, config);
@@ -241,7 +241,7 @@ export const anonymizeConfigForTelemetry = (config: d.ValidatedConfig): d.Config
           return value;
         }
         return 'omitted';
-      })
+      }),
     );
 
     // this prop has to be handled separately because it is an array
@@ -274,7 +274,7 @@ export const anonymizeConfigForTelemetry = (config: d.ValidatedConfig): d.Config
  */
 async function getInstalledPackages(
   sys: d.CompilerSystem,
-  config: d.ValidatedConfig
+  config: d.ValidatedConfig,
 ): Promise<{ packages: string[]; packagesNoVersions: string[] }> {
   let packages: string[] = [];
   let packagesNoVersions: string[] = [];
@@ -287,7 +287,7 @@ async function getInstalledPackages(
     const packageJson: d.PackageJsonData | null = await tryFn(
       readJson,
       sys,
-      sys.resolvePath(appRootDir + '/package.json')
+      sys.resolvePath(appRootDir + '/package.json'),
     );
 
     // They don't have a package.json for some reason? Eject button.
@@ -303,7 +303,7 @@ async function getInstalledPackages(
     // Collect packages only in the stencil, ionic, or capacitor org's:
     // https://www.npmjs.com/org/stencil
     const ionicPackages = rawPackages.filter(
-      ([k]) => k.startsWith('@stencil/') || k.startsWith('@ionic/') || k.startsWith('@capacitor/')
+      ([k]) => k.startsWith('@stencil/') || k.startsWith('@ionic/') || k.startsWith('@capacitor/'),
     );
 
     try {
@@ -380,7 +380,7 @@ export async function sendMetric(
   sys: d.CompilerSystem,
   config: d.ValidatedConfig,
   name: string,
-  value: d.TrackableData
+  value: d.TrackableData,
 ): Promise<void> {
   const session_id = await getTelemetryToken(sys);
 

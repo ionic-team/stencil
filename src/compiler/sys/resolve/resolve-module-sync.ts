@@ -8,7 +8,7 @@ import { InMemoryFileSystem } from '../in-memory-fs';
 export const resolveRemoteModuleIdSync = (
   config: d.Config,
   inMemoryFs: InMemoryFileSystem,
-  opts: d.ResolveModuleIdOptions
+  opts: d.ResolveModuleIdOptions,
 ) => {
   const packageJson = resolveRemotePackageJsonSync(config, inMemoryFs, opts.moduleId);
   if (packageJson) {
@@ -30,7 +30,7 @@ export const resolveRemoteModuleIdSync = (
 const resolveRemotePackageJsonSync = (config: d.Config, inMemoryFs: InMemoryFileSystem, moduleId: string) => {
   if (inMemoryFs) {
     const filePath = normalizePath(
-      config.sys.getLocalModulePath({ rootDir: config.rootDir, moduleId, path: 'package.json' })
+      config.sys.getLocalModulePath({ rootDir: config.rootDir, moduleId, path: 'package.json' }),
     );
     const pkgJson = inMemoryFs.readFileSync(filePath);
     if (typeof pkgJson === 'string') {
@@ -45,7 +45,7 @@ const resolveRemotePackageJsonSync = (config: d.Config, inMemoryFs: InMemoryFile
 export const resolveModuleIdSync = (
   sys: d.CompilerSystem,
   inMemoryFs: InMemoryFileSystem,
-  opts: d.ResolveModuleIdOptions
+  opts: d.ResolveModuleIdOptions,
 ) => {
   if (inMemoryFs) {
     const resolverOpts = createCustomResolverSync(sys, inMemoryFs, opts.exts);
@@ -61,7 +61,7 @@ export const resolveModuleIdSync = (
 export const createCustomResolverSync = (
   sys: d.CompilerSystem,
   inMemoryFs: InMemoryFileSystem,
-  exts: string[]
+  exts: string[],
 ): SyncOpts => {
   return {
     isFile(filePath: string) {

@@ -9,7 +9,7 @@ import { updateLazyComponentClass } from './lazy-component';
 
 export const lazyComponentTransform = (
   compilerCtx: d.CompilerCtx,
-  transformOpts: d.TransformOptions
+  transformOpts: d.TransformOptions,
 ): ts.TransformerFactory<ts.SourceFile> => {
   return (transformCtx) => {
     return (tsSourceFile) => {

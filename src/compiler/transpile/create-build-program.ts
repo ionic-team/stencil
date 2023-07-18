@@ -12,7 +12,7 @@ import { getTsOptionsToExtend } from './ts-config';
  */
 export const createTsBuildProgram = async (
   config: d.ValidatedConfig,
-  buildCallback: (tsBuilder: ts.BuilderProgram) => Promise<void>
+  buildCallback: (tsBuilder: ts.BuilderProgram) => Promise<void>,
 ): Promise<ts.WatchOfConfigFile<ts.EmitAndSemanticDiagnosticsBuilderProgram>> => {
   let isBuildRunning = false;
   let currentBuildTimeoutId: any;
@@ -102,7 +102,7 @@ export const createTsBuildProgram = async (
       },
       (reportWatchStatus) => {
         config.logger.debug(reportWatchStatus.messageText);
-      }
+      },
     );
 
   /**

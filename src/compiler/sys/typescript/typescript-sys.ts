@@ -11,7 +11,7 @@ export const patchTsSystemFileSystem = (
   config: d.ValidatedConfig,
   compilerSys: d.CompilerSystem,
   inMemoryFs: InMemoryFileSystem,
-  tsSys: ts.System
+  tsSys: ts.System,
 ): ts.System => {
   const realpath = (path: string) => {
     const rp = compilerSys.realpathSync(path);
@@ -115,7 +115,7 @@ export const patchTsSystemFileSystem = (
       cwd,
       depth,
       getAccessibleFileSystemEntries,
-      realpath
+      realpath,
     );
   };
 
@@ -137,7 +137,7 @@ const patchTsSystemWatch = (compilerSystem: d.CompilerSystem, tsSys: ts.System) 
       (filePath) => {
         cb(filePath);
       },
-      recursive
+      recursive,
     );
     return {
       close() {

@@ -125,7 +125,7 @@ export const prerenderWorker = async (sys: d.CompilerSystem, prerenderRequest: d
     if (hydrateOpts.hashAssets && !prerenderRequest.isDebug) {
       try {
         docPromises.push(
-          hashAssets(sys, prerenderCtx, results.diagnostics, hydrateOpts, prerenderRequest.appDir, doc, url)
+          hashAssets(sys, prerenderCtx, results.diagnostics, hydrateOpts, prerenderRequest.appDir, doc, url),
         );
       } catch (e: any) {
         catchError(results.diagnostics, e);
@@ -142,7 +142,7 @@ export const prerenderWorker = async (sys: d.CompilerSystem, prerenderRequest: d
         results.diagnostics,
         baseUrl,
         url,
-        hydrateResults.anchors
+        hydrateResults.anchors,
       );
     }
 
@@ -188,7 +188,7 @@ export const prerenderWorker = async (sys: d.CompilerSystem, prerenderRequest: d
             const contentFilePath = join(pageDir, contentFileName);
             await sys.writeFile(contentFilePath, s.content);
           }
-        })
+        }),
       );
     }
 

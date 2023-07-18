@@ -37,7 +37,7 @@ export const createTesting = async (config: ValidatedConfig): Promise<Testing> =
     try {
       if (!opts.spec && !opts.e2e) {
         config.logger.error(
-          `Testing requires either the --spec or --e2e command line flags, or both. For example, to run unit tests, use the command: stencil test --spec`
+          `Testing requires either the --spec or --e2e command line flags, or both. For example, to run unit tests, use the command: stencil test --spec`,
         );
         return false;
       }

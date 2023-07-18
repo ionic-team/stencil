@@ -10,7 +10,7 @@ export async function ssrPageRequest(
   devServerConfig: d.DevServerConfig,
   serverCtx: d.DevServerContext,
   req: d.HttpRequest,
-  res: ServerResponse
+  res: ServerResponse,
 ) {
   try {
     let status = 500;
@@ -48,7 +48,7 @@ export async function ssrPageRequest(
       responseHeaders({
         'content-type': 'text/html; charset=utf-8',
         'content-length': Buffer.byteLength(content, 'utf8'),
-      })
+      }),
     );
     res.write(content);
     res.end();
@@ -61,7 +61,7 @@ export async function ssrStaticDataRequest(
   devServerConfig: d.DevServerConfig,
   serverCtx: d.DevServerContext,
   req: d.HttpRequest,
-  res: ServerResponse
+  res: ServerResponse,
 ) {
   try {
     const data: any = {};
@@ -109,8 +109,8 @@ export async function ssrStaticDataRequest(
           'content-type': 'application/json; charset=utf-8',
           'content-length': Buffer.byteLength(content, 'utf8'),
         },
-        httpCache && status === 200
-      )
+        httpCache && status === 200,
+      ),
     );
     res.write(content);
     res.end();
@@ -232,7 +232,7 @@ function getSsrErrorContent(diagnostics: d.Diagnostic[]) {
   <p>
     ${diagnostic.messageText}
   </p>
-  `
+  `,
   )}
 </body>
 </html>`;

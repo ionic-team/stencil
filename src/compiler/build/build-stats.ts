@@ -10,7 +10,7 @@ import type * as d from '../../declarations';
  */
 export function generateBuildStats(
   config: d.Config,
-  buildCtx: d.BuildCtx
+  buildCtx: d.BuildCtx,
 ): result.Result<d.CompilerBuildStats, { diagnostics: d.Diagnostic[] }> {
   // TODO(STENCIL-461): Investigate making this return only a single type
   const buildResults = buildCtx.buildResults;
@@ -79,7 +79,7 @@ export function generateBuildStats(
  */
 export async function writeBuildStats(
   config: d.Config,
-  data: result.Result<d.CompilerBuildStats, { diagnostics: d.Diagnostic[] }>
+  data: result.Result<d.CompilerBuildStats, { diagnostics: d.Diagnostic[] }>,
 ): Promise<void> {
   const statsTargets = config.outputTargets.filter(isOutputTargetStats);
 
@@ -91,7 +91,7 @@ export async function writeBuildStats(
         if (result.error) {
           config.logger.warn([`Stats failed to write file to ${outputTarget.file}`]);
         }
-      })
+      }),
     );
   });
 }

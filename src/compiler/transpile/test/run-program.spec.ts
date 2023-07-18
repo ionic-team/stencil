@@ -9,7 +9,7 @@ describe('run-program.ts', () => {
       const foo = getRelativeDts(
         config,
         '/Testuser/stencil-project/src/index.ts',
-        '/Testuser/stencil-project/.stencil/index.d.ts'
+        '/Testuser/stencil-project/.stencil/index.d.ts',
       );
       expect(foo).toBe('index.d.ts');
     });
@@ -19,7 +19,7 @@ describe('run-program.ts', () => {
       const foo = getRelativeDts(
         config,
         '/Testuser/stencil-project/src/components/index.ts',
-        '/Testuser/stencil-project/.stencil/components/index.d.ts'
+        '/Testuser/stencil-project/.stencil/components/index.d.ts',
       );
       expect(foo).toBe('./components/index.d.ts');
     });
@@ -29,7 +29,7 @@ describe('run-program.ts', () => {
       const foo = getRelativeDts(
         config,
         'C:/Testuser/stencil-project/src/index.ts',
-        'C:/Testuser/stencil-project/.stencil/index.d.ts'
+        'C:/Testuser/stencil-project/.stencil/index.d.ts',
       );
       expect(foo).toBe('index.d.ts');
     });
@@ -39,7 +39,7 @@ describe('run-program.ts', () => {
       const foo = getRelativeDts(
         config,
         'C:/Testuser/stencil-project/src/components/index.ts',
-        'C:/Testuser/stencil-project/.stencil/components/index.d.ts'
+        'C:/Testuser/stencil-project/.stencil/components/index.d.ts',
       );
       expect(foo).toBe('./components/index.d.ts');
     });

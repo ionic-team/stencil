@@ -17,7 +17,7 @@ export const generateReadme = async (
   compilerCtx: d.CompilerCtx,
   readmeOutputs: d.OutputTargetDocsReadme[],
   docsData: d.JsonDocsComponent,
-  cmps: d.JsonDocsComponent[]
+  cmps: d.JsonDocsComponent[],
 ) => {
   const isUpdate = !!docsData.readme;
   const userContent = isUpdate ? docsData.readme : getDefaultReadme(docsData);
@@ -37,7 +37,7 @@ export const generateReadme = async (
           }
         }
       }
-    })
+    }),
   );
 };
 
@@ -45,7 +45,7 @@ export const generateMarkdown = (
   userContent: string,
   cmp: d.JsonDocsComponent,
   cmps: d.JsonDocsComponent[],
-  readmeOutput: d.OutputTargetDocsReadme
+  readmeOutput: d.OutputTargetDocsReadme,
 ) => {
   //If the readmeOutput.dependencies is true or undefined the dependencies will be generated.
   const dependencies = readmeOutput.dependencies !== false ? depsToMarkdown(cmp, cmps) : [];

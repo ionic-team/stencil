@@ -114,7 +114,7 @@ export const runTask = async (
   coreCompiler: CoreCompiler,
   config: d.Config,
   task: d.TaskCommand,
-  sys: d.CompilerSystem
+  sys: d.CompilerSystem,
 ): Promise<void> => {
   const flags = createConfigFlags(config.flags ?? { task });
   config.flags = flags;
@@ -164,7 +164,7 @@ export const runTask = async (
 
     default:
       strictConfig.logger.error(
-        `${strictConfig.logger.emoji('❌ ')}Invalid stencil command, please see the options below:`
+        `${strictConfig.logger.emoji('❌ ')}Invalid stencil command, please see the options below:`,
       );
       await taskHelp(strictConfig.flags, strictConfig.logger, sys);
       return config.sys.exit(1);

@@ -53,7 +53,7 @@ let CACHED_VALIDATED_CONFIG: ValidatedConfig | null = null;
  */
 export const validateConfig = (
   userConfig: UnvalidatedConfig = {},
-  bootstrapConfig: LoadConfigInit
+  bootstrapConfig: LoadConfigInit,
 ): ConfigValidationResults => {
   const diagnostics: Diagnostic[] = [];
 
@@ -121,7 +121,7 @@ export const validateConfig = (
     validatedConfig,
     'sourceMap',
     null,
-    typeof validatedConfig.sourceMap === 'undefined' ? true : validatedConfig.sourceMap
+    typeof validatedConfig.sourceMap === 'undefined' ? true : validatedConfig.sourceMap,
   );
   setBooleanConfig(validatedConfig, 'watch', 'watch', false);
   setBooleanConfig(validatedConfig, 'buildDocs', 'docs', !validatedConfig.devMode);

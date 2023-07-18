@@ -7,7 +7,7 @@ export function toMatchScreenshot(compare: d.ScreenshotDiff, opts: d.MatchScreen
 
   if (typeof (compare as any).then === 'function') {
     throw new Error(
-      `expect(compare).toMatchScreenshot() must be a resolved value, not a promise, before it can be tested`
+      `expect(compare).toMatchScreenshot() must be a resolved value, not a promise, before it can be tested`,
     );
   }
 
@@ -35,7 +35,7 @@ export function toMatchScreenshot(compare: d.ScreenshotDiff, opts: d.MatchScreen
   if (typeof opts.allowableMismatchedPixels === 'number') {
     if (opts.allowableMismatchedPixels < 0) {
       throw new Error(
-        `expect toMatchScreenshot() allowableMismatchedPixels value must be a value that is 0 or greater`
+        `expect toMatchScreenshot() allowableMismatchedPixels value must be a value that is 0 or greater`,
       );
     }
     return {

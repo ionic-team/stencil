@@ -38,7 +38,7 @@ import { getCustomElementsBuildConditionals } from './custom-elements-build-cond
 export const outputCustomElements = async (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
-  buildCtx: d.BuildCtx
+  buildCtx: d.BuildCtx,
 ): Promise<void> => {
   if (!config.buildDist) {
     return;
@@ -71,7 +71,7 @@ export const getBundleOptions = (
   config: d.ValidatedConfig,
   buildCtx: d.BuildCtx,
   compilerCtx: d.CompilerCtx,
-  outputTarget: d.OutputTargetDistCustomElements
+  outputTarget: d.OutputTargetDistCustomElements,
 ): BundleOptions => ({
   id: 'customElements',
   platform: 'client',
@@ -106,7 +106,7 @@ export const bundleCustomElements = async (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
-  outputTarget: d.OutputTargetDistCustomElements
+  outputTarget: d.OutputTargetDistCustomElements,
 ) => {
   try {
     const bundleOpts = getBundleOptions(config, buildCtx, compilerCtx, outputTarget);
@@ -185,7 +185,7 @@ export const bundleCustomElements = async (
 export const addCustomElementInputs = (
   buildCtx: d.BuildCtx,
   bundleOpts: BundleOptions,
-  outputTarget: d.OutputTargetDistCustomElements
+  outputTarget: d.OutputTargetDistCustomElements,
 ): void => {
   const components = buildCtx.components;
   // An array to store the imports of these modules that we're going to add to our entry chunk
@@ -210,7 +210,7 @@ export const addCustomElementInputs = (
     } else {
       // the `importName` may collide with the `exportName`, alias it just in case it does with `importAs`
       exp.push(
-        `import { ${importName} as ${importAs}, defineCustomElement as cmpDefCustomEle } from '${cmp.sourceFilePath}';`
+        `import { ${importName} as ${importAs}, defineCustomElement as cmpDefCustomEle } from '${cmp.sourceFilePath}';`,
       );
       exp.push(`export const ${exportName} = ${importAs};`);
       exp.push(`export const defineCustomElement = cmpDefCustomEle;`);
@@ -222,7 +222,7 @@ export const addCustomElementInputs = (
       // `cmp.sourceFilePath`, we would end up with duplicated modules in our
       // output.
       indexExports.push(
-        `export { ${exportName}, defineCustomElement as defineCustomElement${exportName} } from '${coreKey}';`
+        `export { ${exportName}, defineCustomElement as defineCustomElement${exportName} } from '${coreKey}';`,
       );
     }
 
@@ -249,7 +249,7 @@ export const generateEntryPoint = (
   outputTarget: d.OutputTargetDistCustomElements,
   cmpImports: string[] = [],
   cmpExports: string[] = [],
-  cmpNames: string[] = []
+  cmpNames: string[] = [],
 ): string => {
   const body: string[] = [];
   const imports: string[] = [];
@@ -258,7 +258,7 @@ export const generateEntryPoint = (
   // Exports that are always present
   exports.push(
     `export { setAssetPath, setNonce, setPlatformOptions } from '${STENCIL_INTERNAL_CLIENT_ID}';`,
-    `export * from '${USER_INDEX_ENTRY_ID}';`
+    `export * from '${USER_INDEX_ENTRY_ID}';`,
   );
 
   // Content related to global scripts
@@ -281,7 +281,7 @@ export const generateEntryPoint = (
       '            }',
       '        });',
       '    }',
-      '};'
+      '};',
     );
   }
 
@@ -319,7 +319,7 @@ const getCustomBeforeTransformers = (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   components: d.ComponentCompilerMeta[],
-  outputTarget: d.OutputTargetDistCustomElements
+  outputTarget: d.OutputTargetDistCustomElements,
 ): ts.TransformerFactory<ts.SourceFile>[] => {
   const transformOpts: d.TransformOptions = {
     coreImportPath: STENCIL_INTERNAL_CLIENT_ID,
@@ -342,7 +342,7 @@ const getCustomBeforeTransformers = (
   customBeforeTransformers.push(
     nativeComponentTransform(compilerCtx, transformOpts),
     proxyCustomElement(compilerCtx, transformOpts),
-    removeCollectionImports(compilerCtx)
+    removeCollectionImports(compilerCtx),
   );
   return customBeforeTransformers;
 };

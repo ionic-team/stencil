@@ -19,7 +19,7 @@ export const createSysWorker = (config: ValidatedConfig) => {
   }
 
   config.logger.debug(
-    `no workers, maxConcurrentWorkers: ${config.maxConcurrentWorkers}, hardwareConcurrency: ${config.sys.hardwareConcurrency}`
+    `no workers, maxConcurrentWorkers: ${config.maxConcurrentWorkers}, hardwareConcurrency: ${config.sys.hardwareConcurrency}`,
   );
   return createWorkerContext(config.sys);
 };

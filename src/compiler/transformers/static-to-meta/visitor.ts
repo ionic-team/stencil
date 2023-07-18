@@ -14,7 +14,7 @@ export const convertStaticToMeta = (
   buildCtx: d.BuildCtx,
   typeChecker: ts.TypeChecker,
   collection: d.CollectionCompilerMeta,
-  transformOpts: d.TransformOptions
+  transformOpts: d.TransformOptions,
 ): ts.TransformerFactory<ts.SourceFile> => {
   return (transformCtx) => {
     let dirPath: string;

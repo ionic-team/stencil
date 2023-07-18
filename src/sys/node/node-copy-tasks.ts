@@ -127,7 +127,7 @@ async function processCopyTaskDirectory(results: d.CopyResults, allCopyTasks: d.
         };
 
         await processCopyTask(results, allCopyTasks, subCopyTask);
-      })
+      }),
     );
   } catch (e: any) {
     catchError(results.diagnostics, e);

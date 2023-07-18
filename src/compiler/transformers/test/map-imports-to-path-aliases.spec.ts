@@ -146,7 +146,7 @@ describe('mapImportsToPathAliases', () => {
       config,
       null,
       [],
-      [mapImportsToPathAliases(config, '/dist/collection/test.js', outputTarget)]
+      [mapImportsToPathAliases(config, '/dist/collection/test.js', outputTarget)],
     );
 
     expect(module.outputText).toContain(`import { utils } from "../../some-compiled-dir/utils/utils";`);
@@ -173,7 +173,7 @@ describe('mapImportsToPathAliases', () => {
       config,
       null,
       [],
-      [mapImportsToPathAliases(config, 'dist/collection/test.js', outputTarget)]
+      [mapImportsToPathAliases(config, 'dist/collection/test.js', outputTarget)],
     );
 
     expect(module.outputText).toContain(`import { utils } from "./utils/utils";`);

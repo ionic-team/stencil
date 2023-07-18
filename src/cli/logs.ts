@@ -63,7 +63,7 @@ export const loadedCompilerLog = (
   sys: CompilerSystem,
   logger: Logger,
   flags: ConfigFlags,
-  coreCompiler: CoreCompiler
+  coreCompiler: CoreCompiler,
 ): void => {
   const sysDetails = sys.details;
   const runtimeInfo = `${sys.name} ${sys.version}`;
@@ -73,7 +73,7 @@ export const loadedCompilerLog = (
     : `Unknown Platform, Unknown CPU Model`;
   const statsInfo = sysDetails
     ? `cpus: ${sys.hardwareConcurrency}, freemem: ${Math.round(
-        sysDetails.freemem() / 1000000
+        sysDetails.freemem() / 1000000,
       )}MB, totalmem: ${Math.round(sysDetails.totalmem / 1000000)}MB`
     : 'Unknown CPU Core Count, Unknown Memory';
 
@@ -111,15 +111,15 @@ export const startupCompilerLog = (coreCompiler: CoreCompiler, config: Validated
   if (isPrerelease && !isDevBuild) {
     logger.warn(
       logger.yellow(
-        `This is a prerelease build, undocumented changes might happen at any time. Technical support is not available for prereleases, but any assistance testing is appreciated.`
-      )
+        `This is a prerelease build, undocumented changes might happen at any time. Technical support is not available for prereleases, but any assistance testing is appreciated.`,
+      ),
     );
   }
 
   if (config.devMode && !isDebug) {
     if (config.buildEs5) {
       logger.warn(
-        `Generating ES5 during development is a very task expensive, initial and incremental builds will be much slower. Drop the '--es5' flag and use a modern browser for development.`
+        `Generating ES5 during development is a very task expensive, initial and incremental builds will be much slower. Drop the '--es5' flag and use a modern browser for development.`,
       );
     }
 

@@ -7,7 +7,7 @@ export const updateGlobalStylesLink = (
   config: d.Config,
   doc: Document,
   globalScriptFilename: string,
-  outputTarget: d.OutputTargetWww
+  outputTarget: d.OutputTargetWww,
 ) => {
   if (!globalScriptFilename) {
     return;

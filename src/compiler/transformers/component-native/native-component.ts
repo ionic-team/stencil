@@ -17,7 +17,7 @@ export const updateNativeComponentClass = (
   transformOpts: d.TransformOptions,
   classNode: ts.ClassDeclaration,
   moduleFile: d.Module,
-  cmp: d.ComponentCompilerMeta
+  cmp: d.ComponentCompilerMeta,
 ): ts.ClassDeclaration | ts.VariableStatement => {
   const heritageClauses = updateNativeHostComponentHeritageClauses(classNode, moduleFile);
   const members = updateNativeHostComponentMembers(transformOpts, classNode, moduleFile, cmp);
@@ -32,7 +32,7 @@ export const updateNativeComponentClass = (
  */
 const updateNativeHostComponentHeritageClauses = (
   classNode: ts.ClassDeclaration,
-  moduleFile: d.Module
+  moduleFile: d.Module,
 ): ts.NodeArray<ts.HeritageClause> | [ts.HeritageClause] => {
   if (classNode.heritageClauses != null && classNode.heritageClauses.length > 0) {
     // the syntax tree has a heritage clause already, don't generate a new one
@@ -55,7 +55,7 @@ const updateNativeHostComponentMembers = (
   transformOpts: d.TransformOptions,
   classNode: ts.ClassDeclaration,
   moduleFile: d.Module,
-  cmp: d.ComponentCompilerMeta
+  cmp: d.ComponentCompilerMeta,
 ): ts.ClassElement[] => {
   const classMembers = removeStaticMetaProperties(classNode);
 

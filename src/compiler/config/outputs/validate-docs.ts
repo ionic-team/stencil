@@ -21,7 +21,7 @@ export const validateDocs = (config: d.ValidatedConfig, diagnostics: d.Diagnosti
       validateJsonDocsOutputTarget(config, diagnostics, {
         type: 'docs-json',
         file: config.flags.docsJson,
-      })
+      }),
     );
   }
 
@@ -78,7 +78,7 @@ const validateReadmeOutputTarget = (config: d.ValidatedConfig, outputTarget: d.O
 const validateJsonDocsOutputTarget = (
   config: d.ValidatedConfig,
   diagnostics: d.Diagnostic[],
-  outputTarget: d.OutputTargetDocsJson
+  outputTarget: d.OutputTargetDocsJson,
 ) => {
   if (!isString(outputTarget.file)) {
     const err = buildError(diagnostics);

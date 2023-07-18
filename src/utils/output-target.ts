@@ -63,7 +63,7 @@ export const isOutputTargetHydrate = (o: d.OutputTarget): o is d.OutputTargetHyd
 export const isOutputTargetCustom = (o: d.OutputTarget): o is d.OutputTargetCustom => o.type === CUSTOM;
 
 export const isOutputTargetDocs = (
-  o: d.OutputTarget
+  o: d.OutputTarget,
 ): o is d.OutputTargetDocsJson | d.OutputTargetDocsReadme | d.OutputTargetDocsVscode | d.OutputTargetDocsCustom =>
   o.type === DOCS_README || o.type === DOCS_JSON || o.type === DOCS_CUSTOM || o.type === DOCS_VSCODE;
 

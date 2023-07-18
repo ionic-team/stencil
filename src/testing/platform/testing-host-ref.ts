@@ -22,7 +22,7 @@ export const getHostRef = (elm: d.RuntimeRef | undefined): d.HostRef | undefined
  */
 export const registerInstance = (
   lazyInstance: any,
-  hostRef: d.HostRef | null | undefined
+  hostRef: d.HostRef | null | undefined,
 ): Map<d.RuntimeRef, d.HostRef> => {
   if (lazyInstance == null || lazyInstance.constructor == null) {
     throw new Error(`Invalid component constructor`);

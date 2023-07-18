@@ -209,7 +209,7 @@ describe('ShadowCss', function () {
 
     it('should not replace the selector in a `@supports` rule', () => {
       expect(s('@supports selector(:host()) {:host {color: red; }}', 'a')).toEqual(
-        '@supports selector(:host()) {.a-h {color:red;}}'
+        '@supports selector(:host()) {.a-h {color:red;}}',
       );
     });
   });
@@ -218,7 +218,7 @@ describe('ShadowCss', function () {
     it('should handle tag selector, commentOriginalSelector', () => {
       expect(s(':host-context(div) {}', 'a', true)).toEqual('/*!@:host-context(div)*/div.a-h, div .a-h {}');
       expect(s(':host-context(ul) > .y {}', 'a', true)).toEqual(
-        '/*!@:host-context(ul) > .y*/ul.a-h > .y.a, ul .a-h > .y.a {}'
+        '/*!@:host-context(ul) > .y*/ul.a-h > .y.a, ul .a-h > .y.a {}',
       );
     });
 
@@ -240,7 +240,7 @@ describe('ShadowCss', function () {
 
     it('should not replace the selector in a `@supports` rule', () => {
       expect(s('@supports selector(:host-context(.class1)) {:host-context(.class1) {color: red; }}', 'a')).toEqual(
-        '@supports selector(:host-context(.class1)) {.class1.a-h, .class1 .a-h {color:red;}}'
+        '@supports selector(:host-context(.class1)) {.class1.a-h, .class1 .a-h {color:red;}}',
       );
     });
     ``;
@@ -270,7 +270,7 @@ describe('ShadowCss', function () {
     it('should handle host-context complex selector', () => {
       const r = s(':host-context(.red) > ::slotted(*:nth-of-type(2n - 1)) {}', 'sc-ion-tag');
       expect(r).toEqual(
-        '.sc-ion-tag-h.red > .sc-ion-tag-s > *:nth-of-type(2n - 1), .red .sc-ion-tag-h > .sc-ion-tag-s > *:nth-of-type(2n - 1) {}'
+        '.sc-ion-tag-h.red > .sc-ion-tag-s > *:nth-of-type(2n - 1), .red .sc-ion-tag-h > .sc-ion-tag-s > *:nth-of-type(2n - 1) {}',
       );
     });
 
@@ -307,7 +307,7 @@ describe('ShadowCss', function () {
     it('same selectors, commentOriginalSelector', () => {
       const r = s('::slotted(*) {}, ::slotted(*) {}, ::slotted(*) {}', 'sc-ion-tag', true);
       expect(r).toEqual(
-        '/*!@::slotted(*)*/.sc-ion-tag-s > * {}/*!@, ::slotted(*)*/.sc-ion-tag, .sc-ion-tag-s > * {}/*!@, ::slotted(*)*/.sc-ion-tag, .sc-ion-tag-s > * {}'
+        '/*!@::slotted(*)*/.sc-ion-tag-s > * {}/*!@, ::slotted(*)*/.sc-ion-tag, .sc-ion-tag-s > * {}/*!@, ::slotted(*)*/.sc-ion-tag, .sc-ion-tag-s > * {}',
       );
     });
 
@@ -323,7 +323,7 @@ describe('ShadowCss', function () {
 
     it('should not replace the selector in a `@supports` rule', () => {
       expect(s('@supports selector(::slotted(*)) {::slotted(*) {color: red; }}', 'sc-cmp')).toEqual(
-        '@supports selector(::slotted(*)) {.sc-cmp-s > * {color:red;}}'
+        '@supports selector(::slotted(*)) {.sc-cmp-s > * {color:red;}}',
       );
     });
   });

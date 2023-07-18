@@ -27,7 +27,7 @@ export const removeUnusedStyles = (doc: Document, diagnostics: d.Diagnostic[]) =
 const removeUnusedStyleText = (
   usedSelectors: UsedSelectors,
   diagnostics: d.Diagnostic[],
-  styleElm: HTMLStyleElement
+  styleElm: HTMLStyleElement,
 ) => {
   try {
     // parse the css from being applied to the document

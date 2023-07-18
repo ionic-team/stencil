@@ -151,7 +151,7 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys): Logger => {
     textBold: boolean,
     newLineSuffix: boolean,
     debug: boolean,
-    appendTo: string[]
+    appendTo: string[],
   ) => {
     let msg = finishMsg;
 

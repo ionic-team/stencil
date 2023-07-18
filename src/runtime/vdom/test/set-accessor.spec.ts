@@ -687,7 +687,7 @@ describe('setAccessor for standard html elements', () => {
               class2
        class3  `,
         false,
-        0
+        0,
       );
       expect(elm).toHaveClasses(['class1', 'class2', 'class3']);
     });
@@ -724,7 +724,7 @@ describe('setAccessor for standard html elements', () => {
            ion-color`,
         'icon2',
         false,
-        0
+        0,
       );
       expect(elm).toHaveClasses(['icon2']);
     });
@@ -775,7 +775,7 @@ describe('setAccessor for standard html elements', () => {
           marginRight: '55px',
         },
         false,
-        0
+        0,
       );
       expect(elm.style.cssText).toEqual('font-size: 12px; margin-right: 55px;');
 
@@ -791,7 +791,7 @@ describe('setAccessor for standard html elements', () => {
           'font-size': '20px',
         },
         false,
-        0
+        0,
       );
 
       expect(elm.style.cssText).toEqual('font-size: 20px;');
@@ -808,7 +808,7 @@ describe('setAccessor for standard html elements', () => {
         { color: 'blue', 'font-size': '12px', paddingLeft: '88px' },
         { color: 'blue', 'font-size': '12px', paddingLeft: '88px' },
         false,
-        0
+        0,
       );
       expect(elm.style.cssText).toEqual('');
 
@@ -827,7 +827,7 @@ describe('setAccessor for standard html elements', () => {
         { color: 'blue', padding: '20px', marginRight: '88px' },
         { color: 'blue', padding: '30px', marginRight: '55px' },
         false,
-        0
+        0,
       );
 
       expect(elm.style.cssText).toEqual('color: black; padding: 30px; margin-right: 55px;');

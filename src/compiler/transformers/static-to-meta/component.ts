@@ -39,7 +39,7 @@ export const parseStaticComponentMeta = (
   typeChecker: ts.TypeChecker,
   cmpNode: ts.ClassDeclaration,
   moduleFile: d.Module,
-  transformOpts?: d.TransformOptions
+  transformOpts?: d.TransformOptions,
 ): ts.ClassDeclaration => {
   if (cmpNode.members == null) {
     return cmpNode;

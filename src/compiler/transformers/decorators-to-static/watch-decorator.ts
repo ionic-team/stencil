@@ -10,7 +10,7 @@ export const watchDecoratorsToStatic = (
   diagnostics: d.Diagnostic[],
   decoratedProps: ts.ClassElement[],
   watchable: Set<string>,
-  newMembers: ts.ClassElement[]
+  newMembers: ts.ClassElement[],
 ) => {
   const watchers = decoratedProps
     .filter(ts.isMethodDeclaration)
@@ -27,7 +27,7 @@ const parseWatchDecorator = (
   config: d.Config,
   diagnostics: d.Diagnostic[],
   watchable: Set<string>,
-  method: ts.MethodDeclaration
+  method: ts.MethodDeclaration,
 ): d.ComponentCompilerWatch[] => {
   const methodName = method.name.getText();
   const decorators = retrieveTsDecorators(method) ?? [];

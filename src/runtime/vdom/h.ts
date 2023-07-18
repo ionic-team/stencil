@@ -83,7 +83,7 @@ Empty objects can also be the cause, look for JSX comments that became objects.`
     return (nodeName as d.FunctionalComponent<any>)(
       vnodeData === null ? {} : vnodeData,
       vNodeChildren,
-      vdomFnUtils
+      vdomFnUtils,
     ) as any;
   }
 

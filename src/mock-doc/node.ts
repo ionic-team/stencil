@@ -249,7 +249,7 @@ export class MockElement extends MockNode {
   blur() {
     dispatchEvent(
       this,
-      new MockFocusEvent('blur', { relatedTarget: null, bubbles: true, cancelable: true, composed: true })
+      new MockFocusEvent('blur', { relatedTarget: null, bubbles: true, cancelable: true, composed: true }),
     );
   }
 
@@ -341,7 +341,7 @@ export class MockElement extends MockNode {
   focus(_options?: { preventScroll?: boolean }) {
     dispatchEvent(
       this,
-      new MockFocusEvent('focus', { relatedTarget: null, bubbles: true, cancelable: true, composed: true })
+      new MockFocusEvent('focus', { relatedTarget: null, bubbles: true, cancelable: true, composed: true }),
     );
   }
 

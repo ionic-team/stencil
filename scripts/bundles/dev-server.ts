@@ -36,7 +36,7 @@ export async function devServer(opts: BuildOptions) {
   // copy server-worker-thread.js
   await fs.copy(
     join(opts.srcDir, 'dev-server', 'server-worker-thread.js'),
-    join(opts.output.devServerDir, 'server-worker-thread.js')
+    join(opts.output.devServerDir, 'server-worker-thread.js'),
   );
 
   // copy template files

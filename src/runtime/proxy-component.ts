@@ -19,7 +19,7 @@ import { getValue, setValue } from './set-value';
 export const proxyComponent = (
   Cstr: d.ComponentConstructor,
   cmpMeta: d.ComponentRuntimeMeta,
-  flags: number
+  flags: number,
 ): d.ComponentConstructor => {
   if (BUILD.member && cmpMeta.$members$) {
     if (BUILD.watchCallback && Cstr.watchers) {
@@ -56,7 +56,7 @@ export const proxyComponent = (
                 (memberFlags & MEMBER_FLAGS.Mutable) === 0
               ) {
                 consoleDevWarn(
-                  `@Prop() "${memberName}" on <${cmpMeta.$tagName$}> is immutable but was modified from within the component.\nMore information: https://stenciljs.com/docs/properties#prop-mutability`
+                  `@Prop() "${memberName}" on <${cmpMeta.$tagName$}> is immutable but was modified from within the component.\nMore information: https://stenciljs.com/docs/properties#prop-mutability`,
                 );
               }
             }

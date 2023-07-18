@@ -44,7 +44,7 @@ describe('style', () => {
     });
 
     expect(doc.head.innerHTML).toEqual(
-      '<style data-styles nonce="1234">cmp-a{visibility:hidden}.hydrated{visibility:inherit}</style>'
+      '<style data-styles nonce="1234">cmp-a{visibility:hidden}.hydrated{visibility:inherit}</style>',
     );
   });
 

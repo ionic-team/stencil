@@ -21,7 +21,7 @@ import { retrieveTsModifiers } from './transform-utils';
 export const mapImportsToPathAliases = (
   config: d.ValidatedConfig,
   destinationFilePath: string,
-  outputTarget: d.OutputTargetDistCollection
+  outputTarget: d.OutputTargetDistCollection,
 ): ts.TransformerFactory<ts.SourceFile> => {
   return (transformCtx) => {
     const compilerHost = ts.createCompilerHost(config.tsCompilerOptions);
@@ -61,18 +61,18 @@ export const mapImportsToPathAliases = (
               const extensionRegex = new RegExp(
                 Object.values(ts.Extension)
                   .map((extension) => `${extension}$`)
-                  .join('|')
+                  .join('|'),
               );
 
               // In order to make sure the relative path works when the destination depth is different than the source
               // file structure depth, we need to determine where the resolved file exists relative to the destination directory
               const resolvePathInDestination = module.resolvedModule.resolvedFileName.replace(
                 config.srcDir,
-                outputTarget.collectionDir
+                outputTarget.collectionDir,
               );
 
               importPath = normalizePath(
-                relative(dirname(destinationFilePath), resolvePathInDestination).replace(extensionRegex, '')
+                relative(dirname(destinationFilePath), resolvePathInDestination).replace(extensionRegex, ''),
               );
               // if the importee is a sibling file of the importer then `relative` will
               // produce a somewhat confusing result. We use `dirname` to get the
@@ -115,7 +115,7 @@ export const mapImportsToPathAliases = (
             retrieveTsModifiers(node),
             node.importClause,
             transformCtx.factory.createStringLiteral(importPath),
-            node.assertClause
+            node.assertClause,
           );
         }
 

@@ -40,7 +40,7 @@ describe('generate-doc-data', () => {
      * @returns the arguments required to invoke the method under test
      */
     const setup = (
-      moduleMap: d.ModuleMap
+      moduleMap: d.ModuleMap,
     ): { validatedConfig: d.ValidatedConfig; compilerCtx: d.CompilerCtx; buildCtx: d.BuildCtx } => {
       const validatedConfig: d.ValidatedConfig = mockValidatedConfig();
 
@@ -127,7 +127,7 @@ describe('generate-doc-data', () => {
 
         await compilerCtx.fs.writeFile(
           'readme.md',
-          `this is manually generated user content\n${AUTO_GENERATE_COMMENT}\nauto-generated content`
+          `this is manually generated user content\n${AUTO_GENERATE_COMMENT}\nauto-generated content`,
         );
 
         const generatedDocData = await generateDocData(validatedConfig, compilerCtx, buildCtx);

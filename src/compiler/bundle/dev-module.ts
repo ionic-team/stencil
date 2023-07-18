@@ -10,7 +10,7 @@ import { DEV_MODULE_CACHE_BUSTER, DEV_MODULE_DIR } from './constants';
 export const compilerRequest = async (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
-  data: d.CompilerRequest
+  data: d.CompilerRequest,
 ) => {
   const results: d.CompilerRequestResponse = {
     path: data.path,
@@ -84,7 +84,7 @@ const bundleDevModule = async (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   parsedUrl: ParsedDevModuleUrl,
-  results: d.CompilerRequestResponse
+  results: d.CompilerRequestResponse,
 ) => {
   const buildCtx = new BuildContext(config, compilerCtx);
 
@@ -182,7 +182,7 @@ const parseDevModuleUrl = (config: d.Config, u: string) => {
 const getDevModuleCachePath = (config: d.Config, parsedUrl: ParsedDevModuleUrl) => {
   return join(
     config.cacheDir,
-    `dev_module_${parsedUrl.nodeModuleId}_${parsedUrl.nodeModuleVersion}_${DEV_MODULE_CACHE_BUSTER}.log`
+    `dev_module_${parsedUrl.nodeModuleId}_${parsedUrl.nodeModuleVersion}_${DEV_MODULE_CACHE_BUSTER}.log`,
   );
 };
 

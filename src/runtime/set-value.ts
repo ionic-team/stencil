@@ -34,7 +34,7 @@ export const setValue = (ref: d.RuntimeRef, propName: string, newVal: any, cmpMe
           '\nNew value',
           newVal,
           '\nOld value',
-          oldVal
+          oldVal,
         );
       } else if (hostRef.$flags$ & HOST_FLAGS.devOnDidLoad) {
         consoleDevWarn(
@@ -44,7 +44,7 @@ export const setValue = (ref: d.RuntimeRef, propName: string, newVal: any, cmpMe
           '\nNew value',
           newVal,
           '\nOld value',
-          oldVal
+          oldVal,
         );
       }
     }
