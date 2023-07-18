@@ -36,7 +36,7 @@ describe('globals', () => {
     expect(Build.isBrowser).toBe(true);
     expect(Build.isDev).toBe(true);
     expect(Build.isTesting).toBe(true);
-    expect(Build.isServer).toBe(false)
+    expect(Build.isServer).toBe(false);
   });
 
   it('Env is defined', () => {
