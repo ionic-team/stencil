@@ -46,7 +46,7 @@ export class NodeLazyRequire implements d.LazyRequire {
    */
   constructor(
     private nodeResolveModule: NodeResolveModule,
-    private lazyDependencies: LazyDependencies
+    private lazyDependencies: LazyDependencies,
   ) {}
 
   /**

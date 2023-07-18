@@ -90,11 +90,11 @@ export async function bundleBuild(opts: BuildOptions): Promise<void> {
         await Promise.all(
           rollupOption.output.map(async (output) => {
             await bundle.write(output);
-          })
+          }),
         );
       } else {
         await bundle.write(rollupOption.output);
       }
-    })
+    }),
   );
 }

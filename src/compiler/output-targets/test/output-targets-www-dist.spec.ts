@@ -55,7 +55,7 @@ describe.skip('outputTarget, www / dist / docs', () => {
         'testing',
         'src',
         'components',
-        'cmp-a.tsx'
+        'cmp-a.tsx',
       )]: `@Component({ tag: 'cmp-a' }) export class CmpA {}`,
     });
     await compiler.fs.commit();

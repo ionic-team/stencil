@@ -12,7 +12,7 @@ import { addHydrateRuntimeCmpMeta } from './hydrate-runtime-cmp-meta';
 export const updateHydrateComponentClass = (
   classNode: ts.ClassDeclaration,
   moduleFile: d.Module,
-  cmp: d.ComponentCompilerMeta
+  cmp: d.ComponentCompilerMeta,
 ) => {
   return ts.factory.updateClassDeclaration(
     classNode,
@@ -20,14 +20,14 @@ export const updateHydrateComponentClass = (
     classNode.name,
     classNode.typeParameters,
     classNode.heritageClauses,
-    updateHydrateHostComponentMembers(classNode, moduleFile, cmp)
+    updateHydrateHostComponentMembers(classNode, moduleFile, cmp),
   );
 };
 
 const updateHydrateHostComponentMembers = (
   classNode: ts.ClassDeclaration,
   moduleFile: d.Module,
-  cmp: d.ComponentCompilerMeta
+  cmp: d.ComponentCompilerMeta,
 ) => {
   const classMembers = removeStaticMetaProperties(classNode);
 

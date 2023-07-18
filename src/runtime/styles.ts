@@ -86,7 +86,7 @@ export const attachStyles = (hostRef: d.HostRef) => {
   const scopeId = addStyle(
     BUILD.shadowDom && supportsShadow && elm.shadowRoot ? elm.shadowRoot : elm.getRootNode(),
     cmpMeta,
-    hostRef.$modeName$
+    hostRef.$modeName$,
   );
 
   if ((BUILD.shadowDom || BUILD.scoped) && BUILD.cssAnnotations && flags & CMP_FLAGS.needsScopedEncapsulation) {

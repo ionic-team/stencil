@@ -106,7 +106,7 @@ export function map<T1, T2, E>(result: Result<T1, E>, fn: (t: T1) => Promise<T2>
 export function map<T1, T2, E>(result: Result<T1, E>, fn: (t: T1) => T2): Result<T2, E>;
 export function map<T1, T2, E>(
   result: Result<T1, E>,
-  fn: ((t: T1) => T2) | ((t: T1) => Promise<T2>)
+  fn: ((t: T1) => T2) | ((t: T1) => Promise<T2>),
 ): Promise<Result<T2, E>> | Result<T2, E> {
   if (result.isOk) {
     const val = fn(result.value);

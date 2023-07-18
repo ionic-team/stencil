@@ -10,7 +10,7 @@ export const generateEsmBrowser = async (
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   rollupBuild: RollupBuild,
-  outputTargets: d.OutputTargetDistLazy[]
+  outputTargets: d.OutputTargetDistLazy[],
 ): Promise<d.UpdatedLazyBuildCtx> => {
   const esmOutputs = outputTargets.filter((o) => !!o.esmDir && !!o.isBrowserBuild);
   if (esmOutputs.length) {
@@ -38,7 +38,7 @@ export const generateEsmBrowser = async (
         output,
         'es2017',
         true,
-        ''
+        '',
       );
     }
   }

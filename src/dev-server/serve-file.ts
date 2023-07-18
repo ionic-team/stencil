@@ -12,7 +12,7 @@ export async function serveFile(
   devServerConfig: d.DevServerConfig,
   serverCtx: d.DevServerContext,
   req: d.HttpRequest,
-  res: ServerResponse
+  res: ServerResponse,
 ) {
   try {
     if (util.isSimpleText(req.filePath)) {
@@ -34,7 +34,7 @@ export async function serveFile(
             'content-type': util.getContentType(req.filePath) + '; charset=utf-8',
             'content-encoding': 'gzip',
             vary: 'Accept-Encoding',
-          })
+          }),
         );
 
         zlib.gzip(content, { level: 9 }, (_, data) => {
@@ -47,7 +47,7 @@ export async function serveFile(
           util.responseHeaders({
             'content-type': util.getContentType(req.filePath) + '; charset=utf-8',
             'content-length': Buffer.byteLength(content, 'utf8'),
-          })
+          }),
         );
         res.write(content);
         res.end();
@@ -60,7 +60,7 @@ export async function serveFile(
         util.responseHeaders({
           'content-type': util.getContentType(req.filePath),
           'content-length': req.stats.size,
-        })
+        }),
       );
       fs.createReadStream(req.filePath).pipe(res);
     }
@@ -110,7 +110,7 @@ export function appendDevServerClientScript(devServerConfig: d.DevServerConfig, 
   const devServerClientUrl = util.getDevServerClientUrl(
     devServerConfig,
     req.headers?.['x-forwarded-host'] ?? req.host,
-    req.headers?.['x-forwarded-proto']
+    req.headers?.['x-forwarded-proto'],
   );
   const iframe = `<iframe title="Stencil Dev Server Connector ${version} &#9889;" src="${devServerClientUrl}" style="display:block;width:0;height:0;border:0;visibility:hidden" aria-hidden="true"></iframe>`;
   return appendDevServerClientIframe(content, iframe);

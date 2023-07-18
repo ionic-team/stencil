@@ -12,7 +12,7 @@ export const generateSystem = async (
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   rollupBuild: RollupBuild,
-  outputTargets: d.OutputTargetDistLazy[]
+  outputTargets: d.OutputTargetDistLazy[],
 ): Promise<d.UpdatedLazyBuildCtx> => {
   const systemOutputs = outputTargets.filter((o) => !!o.systemDir);
 
@@ -38,7 +38,7 @@ export const generateSystem = async (
         results,
         'es5',
         true,
-        '.system'
+        '.system',
       );
 
       await generateSystemLoaders(config, compilerCtx, results, systemOutputs);
@@ -52,7 +52,7 @@ const generateSystemLoaders = (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   rollupResult: d.RollupResult[],
-  systemOutputs: d.OutputTargetDistLazy[]
+  systemOutputs: d.OutputTargetDistLazy[],
 ): Promise<void[]> => {
   const loaderFilename = rollupResult.find((r) => r.type === 'chunk' && r.isBrowserLoader).fileName;
 
@@ -63,7 +63,7 @@ const writeSystemLoader = async (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   loaderFilename: string,
-  outputTarget: d.OutputTargetDistLazy
+  outputTarget: d.OutputTargetDistLazy,
 ): Promise<void> => {
   if (outputTarget.systemLoaderFile) {
     const entryPointPath = join(outputTarget.systemDir, loaderFilename);
@@ -79,7 +79,7 @@ const getSystemLoader = async (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   corePath: string,
-  includePolyfills: boolean
+  includePolyfills: boolean,
 ): Promise<string> => {
   const polyfills = includePolyfills
     ? await getAppBrowserCorePolyfills(config, compilerCtx)

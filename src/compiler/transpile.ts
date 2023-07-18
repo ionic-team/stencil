@@ -96,7 +96,7 @@ const transpileCode = (
   config: ValidatedConfig,
   transpileOpts: TranspileOptions,
   transformOpts: TransformOptions,
-  results: TranspileResults
+  results: TranspileResults,
 ) => {
   const transpileResults = transpileModule(config, results.code, transformOpts);
 

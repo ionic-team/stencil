@@ -5,7 +5,7 @@ import { getBuildFeatures, updateBuildConditionals } from '../../app-core/app-da
 
 export const getLazyBuildConditionals = (
   config: d.ValidatedConfig,
-  cmps: d.ComponentCompilerMeta[]
+  cmps: d.ComponentCompilerMeta[],
 ): d.BuildConditionals => {
   const build = getBuildFeatures(cmps) as d.BuildConditionals;
 

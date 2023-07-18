@@ -17,7 +17,7 @@ export class NodeWorkerController extends EventEmitter implements d.WorkerMainCo
 
   constructor(
     public forkModulePath: string,
-    maxConcurrentWorkers: number
+    maxConcurrentWorkers: number,
   ) {
     super();
     const osCpus = cpus().length;

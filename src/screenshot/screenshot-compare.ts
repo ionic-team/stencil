@@ -14,7 +14,7 @@ export async function compareScreenshot(
   width: number,
   height: number,
   testPath: string,
-  pixelmatchThreshold: number
+  pixelmatchThreshold: number,
 ) {
   const currentImageHash = createHash('md5').update(currentScreenshotBuf).digest('hex');
   const currentImageName = `${currentImageHash}.png`;
@@ -118,7 +118,7 @@ export async function compareScreenshot(
 
       screenshot.diff.mismatchedPixels = await getMismatchedPixels(
         screenshotBuildData.pixelmatchModulePath,
-        pixelMatchInput
+        pixelMatchInput,
       );
     }
   }

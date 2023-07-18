@@ -64,8 +64,8 @@ export const taskGenerate = async (config: ValidatedConfig): Promise<void> => {
 
   const writtenFiles = await Promise.all(
     filesToGenerate.map((file) =>
-      getBoilerplateAndWriteFile(config, componentName, extensionsToGenerate.includes('css'), file)
-    )
+      getBoilerplateAndWriteFile(config, componentName, extensionsToGenerate.includes('css'), file),
+    ),
   ).catch((error) => config.logger.error(error));
 
   if (!writtenFiles) {
@@ -138,7 +138,7 @@ const getBoilerplateAndWriteFile = async (
   config: ValidatedConfig,
   componentName: string,
   withCss: boolean,
-  file: BoilerplateFile
+  file: BoilerplateFile,
 ): Promise<string> => {
   const boilerplate = getBoilerplateByExtension(componentName, file.extension, withCss);
   await config.sys.writeFile(normalizePath(file.path), boilerplate);
@@ -165,13 +165,13 @@ const checkForOverwrite = async (files: readonly BoilerplateFile[], config: Vali
       if ((await config.sys.readFile(path)) !== undefined) {
         alreadyPresent.push(path);
       }
-    })
+    }),
   );
 
   if (alreadyPresent.length > 0) {
     config.logger.error(
       'Generating code would overwrite the following files:',
-      ...alreadyPresent.map((path) => '\t' + normalizePath(path))
+      ...alreadyPresent.map((path) => '\t' + normalizePath(path)),
     );
     await config.sys.exit(1);
   }

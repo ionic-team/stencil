@@ -21,7 +21,7 @@ import { createStaticGetter } from './transform-utils';
 export const addStaticStyleGetterWithinClass = (
   classMembers: ts.ClassElement[],
   cmp: d.ComponentCompilerMeta,
-  commentOriginalSelector: boolean
+  commentOriginalSelector: boolean,
 ): void => {
   const styleLiteral = getStyleLiteral(cmp, commentOriginalSelector);
   if (styleLiteral) {
@@ -46,8 +46,8 @@ export const addStaticStylePropertyToClass = (styleStatements: ts.Statement[], c
     const statement = ts.factory.createExpressionStatement(
       ts.factory.createAssignment(
         ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier(cmp.componentClassName), 'style'),
-        styleLiteral
-      )
+        styleLiteral,
+      ),
     );
     styleStatements.push(statement);
   }
@@ -69,7 +69,7 @@ const getStyleLiteral = (cmp: d.ComponentCompilerMeta, commentOriginalSelector: 
 const getMultipleModeStyle = (
   cmp: d.ComponentCompilerMeta,
   styles: d.StyleCompiler[],
-  commentOriginalSelector: boolean
+  commentOriginalSelector: boolean,
 ) => {
   const styleModes: ts.ObjectLiteralElementLike[] = [];
 

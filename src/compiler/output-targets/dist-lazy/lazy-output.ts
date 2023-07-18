@@ -28,7 +28,7 @@ import { getLazyBuildConditionals } from './lazy-build-conditionals';
 export const outputLazy = async (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
-  buildCtx: d.BuildCtx
+  buildCtx: d.BuildCtx,
 ): Promise<void> => {
   const outputTargets = config.outputTargets.filter(isOutputTargetDistLazy);
   if (outputTargets.length === 0) {
@@ -109,7 +109,7 @@ export const outputLazy = async (
  */
 const getCustomBeforeTransformers = (
   config: d.ValidatedConfig,
-  compilerCtx: d.CompilerCtx
+  compilerCtx: d.CompilerCtx,
 ): ts.TransformerFactory<ts.SourceFile>[] => {
   const transformOpts: d.TransformOptions = {
     coreImportPath: STENCIL_CORE_ID,
@@ -128,7 +128,7 @@ const getCustomBeforeTransformers = (
 
   customBeforeTransformers.push(
     lazyComponentTransform(compilerCtx, transformOpts),
-    removeCollectionImports(compilerCtx)
+    removeCollectionImports(compilerCtx),
   );
   return customBeforeTransformers;
 };

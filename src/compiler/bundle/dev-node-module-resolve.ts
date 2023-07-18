@@ -9,7 +9,7 @@ export const devNodeModuleResolveId = async (
   config: d.Config,
   inMemoryFs: InMemoryFileSystem,
   resolvedId: PartialResolvedId,
-  importee: string
+  importee: string,
 ) => {
   if (!shouldCheckDevModule(resolvedId, importee)) {
     return resolvedId;

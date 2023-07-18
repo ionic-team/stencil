@@ -19,7 +19,7 @@ export const coreResolvePlugin = (
   config: d.Config,
   compilerCtx: d.CompilerCtx,
   platform: 'client' | 'hydrate' | 'worker',
-  externalRuntime: boolean
+  externalRuntime: boolean,
 ): Plugin => {
   const compilerExe = config.sys.getCompilerExecutingPath();
   const internalClient = getStencilInternalModule(config, compilerExe, 'client/index.js');
@@ -129,7 +129,7 @@ export const getStencilInternalModule = (config: d.Config, compilerExe: string, 
         rootDir: config.rootDir,
         moduleId: '@stencil/core',
         path: 'internal/' + internalModule,
-      })
+      }),
     );
   }
 

@@ -29,7 +29,7 @@ export function transpileModule(
   afterTransformers: ts.TransformerFactory<ts.SourceFile>[] = [],
   afterDeclarations: ts.TransformerFactory<ts.SourceFile | ts.Bundle>[] = [],
   tsConfig: ts.CompilerOptions = {},
-  inputFileName = 'module.tsx'
+  inputFileName = 'module.tsx',
 ) {
   const options: ts.CompilerOptions = {
     ...ts.getDefaultCompilerOptions(),

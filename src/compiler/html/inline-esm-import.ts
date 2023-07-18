@@ -11,7 +11,7 @@ export const optimizeEsmImport = async (
   config: d.Config,
   compilerCtx: d.CompilerCtx,
   doc: Document,
-  outputTarget: d.OutputTargetWww
+  outputTarget: d.OutputTargetWww,
 ) => {
   const resourcesUrl = getAbsoluteBuildDir(outputTarget);
   const entryFilename = `${config.fsNamespace}.esm.js`;
@@ -19,7 +19,7 @@ export const optimizeEsmImport = async (
 
   const script = Array.from(doc.querySelectorAll('script')).find(
     (s) =>
-      s.getAttribute('type') === 'module' && !s.hasAttribute('crossorigin') && s.getAttribute('src') === expectedSrc
+      s.getAttribute('type') === 'module' && !s.hasAttribute('crossorigin') && s.getAttribute('src') === expectedSrc,
   );
 
   if (!script) {

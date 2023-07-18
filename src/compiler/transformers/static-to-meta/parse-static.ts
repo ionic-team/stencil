@@ -17,7 +17,7 @@ export const updateModule = (
   sourceFileText: string,
   emitFilePath: string,
   typeChecker: ts.TypeChecker,
-  collection: d.CollectionCompilerMeta
+  collection: d.CollectionCompilerMeta,
 ) => {
   const sourceFilePath = normalizePath(tsSourceFile.fileName);
   const prevModuleFile = getModule(compilerCtx, sourceFilePath);
@@ -73,7 +73,7 @@ export const updateModule = (
       sourceFileText,
       tsSourceFile.languageVersion,
       true,
-      ts.ScriptKind.JS
+      ts.ScriptKind.JS,
     );
   }
   return moduleFile;

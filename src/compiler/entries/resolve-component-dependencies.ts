@@ -24,7 +24,7 @@ function computeDependents(cmps: d.ComponentCompilerMeta[]) {
 function resolveTransitiveDependencies(
   cmp: d.ComponentCompilerMeta,
   cmps: d.ComponentCompilerMeta[],
-  visited: Set<d.ComponentCompilerMeta>
+  visited: Set<d.ComponentCompilerMeta>,
 ): string[] {
   if (visited.has(cmp)) {
     return cmp.dependencies;
@@ -37,7 +37,7 @@ function resolveTransitiveDependencies(
   const transitiveDeps = flatOne(
     dependencies
       .map((tagName) => cmps.find((c) => c.tagName === tagName))
-      .map((c) => resolveTransitiveDependencies(c, cmps, visited))
+      .map((c) => resolveTransitiveDependencies(c, cmps, visited)),
   );
   return (cmp.dependencies = [...dependencies, ...transitiveDeps]);
 }

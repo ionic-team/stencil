@@ -9,7 +9,7 @@ export async function serveDirectoryIndex(
   devServerConfig: d.DevServerConfig,
   serverCtx: d.DevServerContext,
   req: d.HttpRequest,
-  res: ServerResponse
+  res: ServerResponse,
 ) {
   const indexFilePath = path.join(req.filePath, 'index.html');
   req.stats = await serverCtx.sys.stat(indexFilePath);
@@ -44,7 +44,7 @@ export async function serveDirectoryIndex(
         responseHeaders({
           'content-type': 'text/html; charset=utf-8',
           'x-directory-index': req.pathname,
-        })
+        }),
       );
 
       res.write(templateHtml);
@@ -95,7 +95,7 @@ async function getDirectoryItems(sys: d.CompilerSystem, baseUrl: URL, dirFilePat
       };
 
       return item;
-    })
+    }),
   );
   return items;
 }

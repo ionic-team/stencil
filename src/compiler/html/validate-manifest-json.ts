@@ -27,7 +27,7 @@ export const validateManifestJson = (config: d.ValidatedConfig, compilerCtx: d.C
           }
         }
       } catch (e) {}
-    })
+    }),
   );
 };
 
@@ -35,13 +35,13 @@ const validateManifestJsonData = async (
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   manifestFilePath: string,
-  manifestData: any
+  manifestData: any,
 ) => {
   if (Array.isArray(manifestData.icons)) {
     await Promise.all(
       manifestData.icons.map((manifestIcon: any) => {
         return validateManifestJsonIcon(compilerCtx, buildCtx, manifestFilePath, manifestIcon);
-      })
+      }),
     );
   }
 };
@@ -50,7 +50,7 @@ const validateManifestJsonIcon = async (
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   manifestFilePath: string,
-  manifestIcon: any
+  manifestIcon: any,
 ) => {
   let iconSrc = manifestIcon.src;
   if (typeof iconSrc !== 'string') {

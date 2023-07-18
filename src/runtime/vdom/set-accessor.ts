@@ -19,7 +19,7 @@ export const setAccessor = (
   oldValue: any,
   newValue: any,
   isSvg: boolean,
-  flags: number
+  flags: number,
 ) => {
   if (oldValue !== newValue) {
     let isProp = isMemberInElement(elm, memberName);

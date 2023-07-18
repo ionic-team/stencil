@@ -133,7 +133,7 @@ const transformCssToEsmModule = (input: d.TransformCssToEsmInput): d.TransformCs
           encapsulation: input.encapsulation,
           mode: input.mode,
         },
-        input.styleImportData
+        input.styleImportData,
       );
 
       // str.append(`import ${cssImport.varName} from '${importPath}';\n`);
@@ -159,7 +159,7 @@ const transformCssToEsmModule = (input: d.TransformCssToEsmInput): d.TransformCs
  */
 const generateTransformCssToEsm = (
   input: d.TransformCssToEsmInput,
-  results: d.TransformCssToEsmOutput
+  results: d.TransformCssToEsmOutput,
 ): d.TransformCssToEsmOutput => {
   const s = new MagicString('');
 
@@ -210,7 +210,7 @@ const getCssToEsmImports = (
   varNames: Set<string>,
   cssText: string,
   filePath: string,
-  modeName: string
+  modeName: string,
 ): d.CssToEsmImportData[] => {
   const cssImports: d.CssToEsmImportData[] = [];
 

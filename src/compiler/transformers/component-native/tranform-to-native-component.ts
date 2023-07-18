@@ -19,7 +19,7 @@ import { updateNativeComponentClass } from './native-component';
  */
 export const nativeComponentTransform = (
   compilerCtx: d.CompilerCtx,
-  transformOpts: d.TransformOptions
+  transformOpts: d.TransformOptions,
 ): ts.TransformerFactory<ts.SourceFile> => {
   return (transformCtx: ts.TransformationContext) => {
     return (tsSourceFile: ts.SourceFile) => {

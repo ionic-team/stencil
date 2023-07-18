@@ -12,7 +12,7 @@ export class Cache implements d.Cache {
 
   constructor(
     private config: d.Config,
-    private cacheFs: InMemoryFileSystem
+    private cacheFs: InMemoryFileSystem,
   ) {
     this.sys = config.sys;
     this.logger = config.logger;

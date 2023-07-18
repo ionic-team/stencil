@@ -13,7 +13,7 @@ describe('output-utils tests', () => {
       'should return false for invalid config output type "%s"',
       (outputTargetType) => {
         expect(isValidConfigOutputTarget(outputTargetType)).toBe(false);
-      }
+      },
     );
   });
 

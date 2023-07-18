@@ -66,7 +66,7 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
     consoleDevError(
       `The JSX ${
         newVNode.$text$ !== null ? `"${newVNode.$text$}" text` : `"${newVNode.$tag$}" element`
-      } node should not be shared within the same renderer. The renderer caches element lookups in order to improve performance. However, a side effect from this is that the exact same JSX node should not be reused. For more information please see https://stenciljs.com/docs/templating-jsx#avoid-shared-jsx-nodes`
+      } node should not be shared within the same renderer. The renderer caches element lookups in order to improve performance. However, a side effect from this is that the exact same JSX node should not be reused. For more information please see https://stenciljs.com/docs/templating-jsx#avoid-shared-jsx-nodes`,
     );
   }
 
@@ -88,12 +88,12 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
             isSvgMode ? SVG_NS : HTML_NS,
             BUILD.slotRelocation && newVNode.$flags$ & VNODE_FLAGS.isSlotFallback
               ? 'slot-fb'
-              : (newVNode.$tag$ as string)
+              : (newVNode.$tag$ as string),
           )
         : doc.createElement(
             BUILD.slotRelocation && newVNode.$flags$ & VNODE_FLAGS.isSlotFallback
               ? 'slot-fb'
-              : (newVNode.$tag$ as string)
+              : (newVNode.$tag$ as string),
           )
     ) as any;
 
@@ -213,7 +213,7 @@ const addVnodes = (
   parentVNode: d.VNode,
   vnodes: d.VNode[],
   startIdx: number,
-  endIdx: number
+  endIdx: number,
 ) => {
   let containerElm = ((BUILD.slotRelocation && parentElm['s-cr'] && parentElm['s-cr'].parentNode) || parentElm) as any;
   let childNode: Node;
@@ -511,7 +511,7 @@ const updateChildren = (parentElm: d.RenderNode, oldCh: d.VNode[], newVNode: d.V
       newVNode,
       newCh,
       newStartIdx,
-      newEndIdx
+      newEndIdx,
     );
   } else if (BUILD.updatable && newStartIdx > newEndIdx) {
     // there are nodes in the `oldCh` array which no longer correspond to nodes
@@ -836,7 +836,7 @@ render() {
   if (BUILD.reflect && cmpMeta.$attrsToReflect$) {
     rootVnode.$attrs$ = rootVnode.$attrs$ || {};
     cmpMeta.$attrsToReflect$.map(
-      ([propName, attribute]) => (rootVnode.$attrs$[attribute] = (hostElm as any)[propName])
+      ([propName, attribute]) => (rootVnode.$attrs$[attribute] = (hostElm as any)[propName]),
     );
   }
 
@@ -957,7 +957,7 @@ render() {
 // otherwise these nodes are text nodes w/out content
 const slotReferenceDebugNode = (slotVNode: d.VNode) =>
   doc.createComment(
-    `<slot${slotVNode.$name$ ? ' name="' + slotVNode.$name$ + '"' : ''}> (host=${hostTagName.toLowerCase()})`
+    `<slot${slotVNode.$name$ ? ' name="' + slotVNode.$name$ + '"' : ''}> (host=${hostTagName.toLowerCase()})`,
   );
 
 const originalLocationDebugNode = (nodeToRelocate: d.RenderNode): any =>
@@ -965,5 +965,5 @@ const originalLocationDebugNode = (nodeToRelocate: d.RenderNode): any =>
     `org-location for ` +
       (nodeToRelocate.localName
         ? `<${nodeToRelocate.localName}> (host=${nodeToRelocate['s-hn']})`
-        : `[${nodeToRelocate.textContent}]`)
+        : `[${nodeToRelocate.textContent}]`),
   );

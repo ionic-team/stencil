@@ -94,7 +94,7 @@ describe('validateTesting', () => {
           userConfig.testing = { browserHeadless: browserHeadlessValue };
           const { config } = validateConfig(userConfig, mockLoadConfigInit());
           expect(config.testing.browserHeadless).toBe(browserHeadlessValue);
-        }
+        },
       );
 
       it('defaults the headless mode to true when browserHeadless is not provided', () => {
@@ -337,7 +337,7 @@ describe('validateTesting', () => {
           path.join('testing', 'jest-setuptestframework.js'),
           ...setupFilesAfterEnv,
         ]);
-      }
+      },
     );
   });
 
@@ -430,7 +430,7 @@ describe('validateTesting', () => {
         const { config } = validateConfig(userConfig, mockLoadConfigInit());
 
         expect(config.testing.allowableMismatchedRatio).toBe(allowableMismatchedRatio);
-      }
+      },
     );
 
     it.each([-1, -0.1, 1.1, 2])(
@@ -454,7 +454,7 @@ describe('validateTesting', () => {
           relFilePath: null,
           type: 'build',
         });
-      }
+      },
     );
 
     it.each([true, null])('does nothing when a non-number (%s) is provided', (allowableMismatchedRatio) => {
@@ -501,7 +501,7 @@ describe('validateTesting', () => {
           relFilePath: null,
           type: 'build',
         });
-      }
+      },
     );
 
     it.each([true, null])('defaults to a reasonable value if a non-number (%s) is provided', (pixelmatchThreshold) => {

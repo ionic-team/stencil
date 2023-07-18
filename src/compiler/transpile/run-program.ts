@@ -23,7 +23,7 @@ export const runTsProgram = async (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
-  tsBuilder: ts.BuilderProgram
+  tsBuilder: ts.BuilderProgram,
 ): Promise<boolean> => {
   const tsSyntactic = loadTypeScriptDiagnostics(tsBuilder.getSyntacticDiagnostics());
   const tsGlobal = loadTypeScriptDiagnostics(tsBuilder.getGlobalDiagnostics());
@@ -129,7 +129,7 @@ export const runTsProgram = async (
             let dtsContent = await compilerCtx.fs.readFile(srcRootDtsFilePath);
             dtsContent = updateStencilTypesImports(o.typesDir, distPath, dtsContent);
             await compilerCtx.fs.writeFile(distPath, dtsContent);
-          })
+          }),
         );
       });
 

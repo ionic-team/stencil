@@ -13,7 +13,7 @@ export const appDataPlugin = (
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   build: d.BuildConditionals,
-  platform: 'client' | 'hydrate' | 'worker'
+  platform: 'client' | 'hydrate' | 'worker',
 ): Plugin => {
   if (!platform) {
     return {

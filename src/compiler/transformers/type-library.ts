@@ -27,7 +27,7 @@ export function addToLibrary(
   type: ts.Type,
   typeName: string,
   checker: ts.TypeChecker,
-  pathToTypeModule: string
+  pathToTypeModule: string,
 ): string {
   pathToTypeModule = relative(process.cwd(), pathToTypeModule);
 
@@ -87,7 +87,7 @@ export function addFileToLibrary(config: ValidatedConfig, filePath: string): voi
 
   if (!sourceFile) {
     config.logger.warn(
-      `docs-json: unable to gather type information from "${filePath}". Please double check this path exists relative to your project root.`
+      `docs-json: unable to gather type information from "${filePath}". Please double check this path exists relative to your project root.`,
     );
     return;
   }
@@ -98,7 +98,7 @@ export function addFileToLibrary(config: ValidatedConfig, filePath: string): voi
   // the scope of the outer `addFileToLibrary` function.
   function exportedTypesInSourceFile(
     sourceFile: ts.SourceFile,
-    exportedTypeNodes: TypeDeclLike[] = []
+    exportedTypeNodes: TypeDeclLike[] = [],
   ): TypeDeclLike[] {
     ts.forEachChild(sourceFile, (node) => {
       if (isTypeDeclLike(node) && isExported(node) && isNotPrivate(node)) {
@@ -183,7 +183,7 @@ export function getHomeModule(
   importPath: string,
   options: ts.CompilerOptions,
   compilerHost: ts.CompilerHost,
-  program: ts.Program
+  program: ts.Program,
 ): ts.SourceFile | undefined {
   const module = ts.resolveModuleName(importPath, importer.fileName, options, compilerHost);
   const resolvedFileName = module?.resolvedModule?.resolvedFileName;

@@ -8,14 +8,14 @@ import { convertValueToLiteral } from './transform-utils';
 export const defineCustomElement = (
   tsSourceFile: ts.SourceFile,
   moduleFile: d.Module,
-  transformOpts: d.TransformOptions
+  transformOpts: d.TransformOptions,
 ) => {
   let statements = tsSourceFile.statements.slice();
 
   statements.push(
     ...moduleFile.cmps.map((cmp) => {
       return addDefineCustomElement(moduleFile, cmp);
-    })
+    }),
   );
 
   if (transformOpts.module === 'cjs') {
@@ -33,14 +33,14 @@ const addDefineCustomElement = (moduleFile: d.Module, compilerMeta: d.ComponentC
       ts.factory.createCallExpression(
         ts.factory.createPropertyAccessExpression(
           ts.factory.createIdentifier('customElements'),
-          ts.factory.createIdentifier('define')
+          ts.factory.createIdentifier('define'),
         ),
         [],
         [
           ts.factory.createStringLiteral(compilerMeta.tagName),
           ts.factory.createIdentifier(compilerMeta.componentClassName),
-        ]
-      )
+        ],
+      ),
     );
   }
 
@@ -54,8 +54,8 @@ const addDefineCustomElement = (moduleFile: d.Module, compilerMeta: d.ComponentC
     ts.factory.createCallExpression(
       ts.factory.createIdentifier(DEFINE_CUSTOM_ELEMENT),
       [],
-      [liternalCmpClassName, liternalMeta]
-    )
+      [liternalCmpClassName, liternalMeta],
+    ),
   );
 };
 

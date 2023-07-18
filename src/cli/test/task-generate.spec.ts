@@ -65,7 +65,7 @@ describe('generate task', () => {
     await taskGenerate(config);
     expect(config.sys.exit).toHaveBeenCalledWith(1);
     expect(errorSpy).toHaveBeenCalledWith(
-      'Please run this command in your root directory (i. e. the one containing stencil.config.ts).'
+      'Please run this command in your root directory (i. e. the one containing stencil.config.ts).',
     );
   });
 
@@ -99,7 +99,7 @@ describe('generate task', () => {
     await silentGenerate(config);
     expect(createDirSpy).toHaveBeenCalledWith(
       includeTests ? `${config.srcDir}/components/my-component/test` : `${config.srcDir}/components/my-component`,
-      { recursive: true }
+      { recursive: true },
     );
   });
 
@@ -117,7 +117,7 @@ describe('generate task', () => {
     userChoices.forEach((file) => {
       expect(writeFileSpy).toHaveBeenCalledWith(
         file.path,
-        getBoilerplateByExtension('my-component', file.extension, true)
+        getBoilerplateByExtension('my-component', file.extension, true),
       );
     });
   });
@@ -131,7 +131,7 @@ describe('generate task', () => {
       '\t/src/components/my-component/my-component.tsx',
       '\t/src/components/my-component/my-component.css',
       '\t/src/components/my-component/test/my-component.spec.tsx',
-      '\t/src/components/my-component/test/my-component.e2e.ts'
+      '\t/src/components/my-component/test/my-component.e2e.ts',
     );
     expect(config.sys.exit).toHaveBeenCalledWith(1);
   });

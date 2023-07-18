@@ -52,8 +52,8 @@ describe('parse styles', () => {
     `);
     expect(await formatCode(t.outputText)).toEqual(
       await formatCode(
-        `const md = 'p{color:red}';const ios = 'p{color:black}';export class CmpA { static get is() { return "cmp-a"; } static get styles() { return { "md": md, "ios": ios }; }}`
-      )
+        `const md = 'p{color:red}';const ios = 'p{color:black}';export class CmpA { static get is() { return "cmp-a"; } static get styles() { return { "md": md, "ios": ios }; }}`,
+      ),
     );
   });
 
@@ -86,8 +86,8 @@ describe('parse styles', () => {
     `);
     expect(await formatCode(t.outputText)).toEqual(
       await formatCode(
-        `const styles = 'p{color:red}';export class CmpA { static get is() { return "cmp-a"; } static get styles() { return styles; }}`
-      )
+        `const styles = 'p{color:red}';export class CmpA { static get is() { return "cmp-a"; } static get styles() { return styles; }}`,
+      ),
     );
   });
 });

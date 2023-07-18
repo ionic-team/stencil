@@ -15,7 +15,7 @@ describe('scoped-basic', function () {
 
     const scopedEl = doc.querySelector('scoped-basic');
     expect(scopedEl.classList.toString()).toEqual(
-      'sc-scoped-basic-root-md sc-scoped-basic-h sc-scoped-basic-s hydrated'
+      'sc-scoped-basic-root-md sc-scoped-basic-h sc-scoped-basic-s hydrated',
     );
 
     const scopedStyles = window.getComputedStyle(scopedEl);

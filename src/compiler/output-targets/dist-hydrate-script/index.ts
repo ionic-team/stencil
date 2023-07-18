@@ -6,7 +6,7 @@ import { generateHydrateApp } from './generate-hydrate-app';
 export const outputHydrateScript = async (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
-  buildCtx: d.BuildCtx
+  buildCtx: d.BuildCtx,
 ) => {
   const hydrateOutputTargets = config.outputTargets.filter(isOutputTargetHydrate);
   if (hydrateOutputTargets.length > 0) {

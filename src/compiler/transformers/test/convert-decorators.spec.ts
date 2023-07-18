@@ -52,7 +52,7 @@ describe('convert-decorators', () => {
               "defaultValue": "\\"initial value\\""
             }
           };
-        }}`
+        }}`,
     );
   });
 
@@ -70,7 +70,7 @@ describe('convert-decorators', () => {
     expect(await formatCode(t.outputText)).toContain(
       `  constructor() {
     this.val = undefined;
-  }`
+  }`,
     );
   });
 
@@ -95,7 +95,7 @@ describe('convert-decorators', () => {
         }
         static get states() {
           return { "count": {}};
-        }}`
+        }}`,
     );
   });
 
@@ -113,7 +113,7 @@ describe('convert-decorators', () => {
       await c`export class CmpA {
         static get is() {
           return "cmp-a";
-        }}`
+        }}`,
     );
   });
 
@@ -123,7 +123,7 @@ describe('convert-decorators', () => {
       export class CmpA extends Foobar {
         @State() count: number = 0;
       }
-    `
+    `,
     );
 
     expect(await formatCode(t.outputText)).toBe(
@@ -134,7 +134,7 @@ describe('convert-decorators', () => {
         }
         static get states() {
           return { "count": {} };
-        }}`
+        }}`,
     );
   });
 
@@ -156,7 +156,7 @@ describe('convert-decorators', () => {
         }
         static get is() {
           return "my-component";
-      }}`
+      }}`,
     );
   });
 
@@ -177,7 +177,7 @@ describe('convert-decorators', () => {
       `  constructor() {
     this.count = undefined;
     console.log('boop');
-  }`
+  }`,
     );
   });
 
@@ -192,7 +192,7 @@ describe('convert-decorators', () => {
       constructor() {
         this.count = 3;
       }
-    }`
+    }`,
     );
 
     // the initialization we do to `undefined` (since no value is present)
@@ -202,7 +202,7 @@ describe('convert-decorators', () => {
       `  constructor() {
     this.count = undefined;
     this.count = 3;
-  }`
+  }`,
     );
   });
 
@@ -223,7 +223,7 @@ describe('convert-decorators', () => {
       await c`export class Example {
         constructor() {
           this.classProps = ["variant", "theme"];
-        }}`
+        }}`,
     );
   });
 
@@ -245,7 +245,7 @@ describe('convert-decorators', () => {
     super();
     this.foo = 'bar';
     console.log('hello!');
-  }`
+  }`,
     );
   });
 
@@ -267,7 +267,7 @@ describe('convert-decorators', () => {
         }
         static get states() {
           return { "count": {} };
-        }}`
+        }}`,
     );
   });
 
@@ -303,7 +303,7 @@ describe('convert-decorators', () => {
             "docs": { "tags": [], "text": "" },
             "complexType": { "original": "{ mph: number }", "resolved": "{ mph: number; }", "references": {} }
           }];
-      }}`
+      }}`,
     );
   });
 
@@ -314,7 +314,7 @@ describe('convert-decorators', () => {
         const filteredDecorators = filterDecorators(undefined, excludeList);
 
         expect(filteredDecorators).toBeUndefined();
-      }
+      },
     );
 
     it.each<ReadonlyArray<ReadonlyArray<string>>>([[[]], [['ExcludedDecorator']]])(
@@ -323,7 +323,7 @@ describe('convert-decorators', () => {
         const filteredDecorators = filterDecorators([], excludeList);
 
         expect(filteredDecorators).toBeUndefined();
-      }
+      },
     );
 
     it('returns a decorator if it is not a call expression', () => {
@@ -340,11 +340,11 @@ describe('convert-decorators', () => {
     it("doesn't return any decorators when all decorators in the exclude list", () => {
       // create a '@CustomProp()' decorator
       const customDecorator = ts.factory.createDecorator(
-        ts.factory.createCallExpression(ts.factory.createIdentifier('CustomProp'), undefined, [])
+        ts.factory.createCallExpression(ts.factory.createIdentifier('CustomProp'), undefined, []),
       );
       // create '@Prop()' decorator
       const decorator = ts.factory.createDecorator(
-        ts.factory.createCallExpression(ts.factory.createIdentifier('Prop'), undefined, [])
+        ts.factory.createCallExpression(ts.factory.createIdentifier('Prop'), undefined, []),
       );
 
       const filteredDecorators = filterDecorators([customDecorator, decorator], ['Prop', 'CustomProp']);
@@ -355,11 +355,11 @@ describe('convert-decorators', () => {
     it('returns any decorators not in the exclude list', () => {
       // create a '@CustomProp()' decorator
       const customDecorator = ts.factory.createDecorator(
-        ts.factory.createCallExpression(ts.factory.createIdentifier('CustomProp'), undefined, [])
+        ts.factory.createCallExpression(ts.factory.createIdentifier('CustomProp'), undefined, []),
       );
       // create '@Prop()' decorator
       const decorator = ts.factory.createDecorator(
-        ts.factory.createCallExpression(ts.factory.createIdentifier('Prop'), undefined, [])
+        ts.factory.createCallExpression(ts.factory.createIdentifier('Prop'), undefined, []),
       );
 
       const filteredDecorators = filterDecorators([customDecorator, decorator], ['Prop']);

@@ -82,7 +82,7 @@ describe('validateDistCollectionOutputTarget', () => {
             transformAliasedImportPaths,
           },
         ]);
-      }
+      },
     );
   });
 });

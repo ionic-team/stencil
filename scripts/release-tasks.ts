@@ -51,7 +51,7 @@ export async function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<st
       task: () => {
         if (!pkg.private && isPrereleaseVersion(newVersion) && !opts.tag) {
           throw new Error(
-            'You must specify a dist-tag using --tag when publishing a pre-release version. This prevents accidentally tagging unstable versions as "latest". https://docs.npmjs.com/cli/dist-tag'
+            'You must specify a dist-tag using --tag when publishing a pre-release version. This prevents accidentally tagging unstable versions as "latest". https://docs.npmjs.com/cli/dist-tag',
           );
         }
       },
@@ -67,7 +67,7 @@ export async function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<st
           .then(() => execa('npm', ['config', 'get', 'tag-version-prefix']))
           .then(
             ({ stdout }) => (tagPrefix = stdout),
-            () => {}
+            () => {},
           )
           // verify that a tag for the new version string does not already exist by checking the output of
           // `git rev-parse --verify`
@@ -84,7 +84,7 @@ export async function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<st
               if (err.stdout !== '' || err.stderr !== '') {
                 throw err;
               }
-            }
+            },
           ),
       skip: () => isDryRun,
     },
@@ -117,7 +117,7 @@ export async function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<st
           }
         }),
       skip: () => isDryRun,
-    }
+    },
   );
 
   if (!opts.isPublishRelease) {
@@ -162,7 +162,7 @@ export async function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<st
         task: () => {
           return updateChangeLog(opts);
         },
-      }
+      },
     );
   }
 
@@ -224,7 +224,7 @@ export async function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<st
           }
           return postGithubRelease(opts);
         },
-      }
+      },
     );
   }
 
@@ -237,13 +237,13 @@ export async function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<st
         console.log(
           `\n ${opts.vermoji}  ${color.bold.magenta(pkg.name)} ${color.bold.yellow(newVersion)} published!! ${
             opts.vermoji
-          }\n`
+          }\n`,
         );
       } else {
         console.log(
           `\n ${opts.vermoji}  ${color.bold.magenta(pkg.name)} ${color.bold.yellow(
-            newVersion
-          )} prepared, check the diffs and commit ${opts.vermoji}\n`
+            newVersion,
+          )} prepared, check the diffs and commit ${opts.vermoji}\n`,
         );
       }
     })

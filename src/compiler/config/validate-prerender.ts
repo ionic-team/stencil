@@ -6,7 +6,7 @@ import type * as d from '../../declarations';
 export const validatePrerender = (
   config: d.ValidatedConfig,
   diagnostics: d.Diagnostic[],
-  outputTarget: d.OutputTargetWww
+  outputTarget: d.OutputTargetWww,
 ) => {
   if (!config.flags.ssr && !config.flags.prerender && config.flags.task !== 'prerender') {
     return;

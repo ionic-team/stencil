@@ -115,8 +115,8 @@ describe('validate-package-json', () => {
       expect(buildCtx.diagnostics[0].messageText).toBe(
         `package.json "collection" property is required when generating a distribution and must be set to: ${normalizePath(
           'dist/collection/collection-manifest.json',
-          false
-        )}`
+          false,
+        )}`,
       );
       expect(buildCtx.diagnostics[0].level).toBe('warn');
     });

@@ -10,7 +10,7 @@ export const parseCollectionComponents = (
   buildCtx: d.BuildCtx,
   collectionDir: string,
   collectionManifest: d.CollectionManifest,
-  collection: d.CollectionCompilerMeta
+  collection: d.CollectionCompilerMeta,
 ) => {
   if (collectionManifest.entries) {
     collectionManifest.entries.forEach((entryPath) => {
@@ -25,7 +25,7 @@ export const transpileCollectionModule = (
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   collection: d.CollectionCompilerMeta,
-  inputFileName: string
+  inputFileName: string,
 ) => {
   const sourceText = compilerCtx.fs.readFileSync(inputFileName);
   const sourceFile = ts.createSourceFile(inputFileName, sourceText, ts.ScriptTarget.ES2017, true, ts.ScriptKind.JS);

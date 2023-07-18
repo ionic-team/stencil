@@ -22,7 +22,7 @@ export const tsResolveModuleName = (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   moduleName: string,
-  containingFile: string
+  containingFile: string,
 ) => {
   const resolveModuleName: typeof ts.resolveModuleName = (ts as any).__resolveModuleName || ts.resolveModuleName;
 
@@ -41,7 +41,7 @@ export const tsResolveModuleNamePackageJsonPath = (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   moduleName: string,
-  containingFile: string
+  containingFile: string,
 ) => {
   try {
     const resolvedModule = tsResolveModuleName(config, compilerCtx, moduleName, containingFile);
@@ -71,7 +71,7 @@ export const patchedTsResolveModule = (
   config: d.Config,
   inMemoryFs: InMemoryFileSystem,
   moduleName: string,
-  containingFile: string
+  containingFile: string,
 ): ts.ResolvedModuleWithFailedLookupLocations => {
   if (isLocalModule(moduleName)) {
     const containingDir = dirname(containingFile);
@@ -128,7 +128,7 @@ export const tsResolveNodeModule = (
   config: d.Config,
   inMemoryFs: InMemoryFileSystem,
   moduleId: string,
-  containingFile: string
+  containingFile: string,
 ): ts.ResolvedModuleWithFailedLookupLocations => {
   if (isStencilCoreImport(moduleId)) {
     const rtn: ts.ResolvedModuleWithFailedLookupLocations = {
@@ -139,7 +139,7 @@ export const tsResolveNodeModule = (
             rootDir: config.rootDir,
             moduleId: '@stencil/core',
             path: 'internal/index.d.ts',
-          })
+          }),
         ),
         packageId: {
           name: moduleId,

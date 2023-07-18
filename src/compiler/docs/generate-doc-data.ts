@@ -20,7 +20,7 @@ import { AUTO_GENERATE_COMMENT } from './constants';
 export const generateDocData = async (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
-  buildCtx: d.BuildCtx
+  buildCtx: d.BuildCtx,
 ): Promise<d.JsonDocs> => {
   const jsonOutputTargets = config.outputTargets.filter(isOutputTargetDocsJson);
   const supplementalPublicTypes = findSupplementalPublicTypes(jsonOutputTargets);
@@ -72,7 +72,7 @@ function findSupplementalPublicTypes(outputTargets: d.OutputTargetDocsJson[]): s
 const getDocsComponents = async (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
-  buildCtx: d.BuildCtx
+  buildCtx: d.BuildCtx,
 ): Promise<d.JsonDocsComponent[]> => {
   const results = await Promise.all(
     buildCtx.moduleFiles.map(async (moduleFile) => {
@@ -111,7 +111,7 @@ const getDocsComponents = async (
           parts: getDocsParts(cmp.htmlParts, cmp.docs.tags),
           listeners: getDocsListeners(cmp.listeners),
         }));
-    })
+    }),
   );
 
   return sortBy(flatOne(results), (cmp) => cmp.tag);
@@ -119,7 +119,7 @@ const getDocsComponents = async (
 
 const buildDocsDepGraph = (
   cmp: d.ComponentCompilerMeta,
-  cmps: d.ComponentCompilerMeta[]
+  cmps: d.ComponentCompilerMeta[],
 ): d.JsonDocsDependencyGraph => {
   const dependencies: d.JsonDocsDependencyGraph = {};
   function walk(tagName: string): void {
@@ -168,7 +168,7 @@ const getDocsEncapsulation = (cmp: d.ComponentCompilerMeta): 'shadow' | 'scoped'
 const getDocsProperties = (cmpMeta: d.ComponentCompilerMeta): d.JsonDocsProp[] => {
   return sortBy(
     [...getRealProperties(cmpMeta.properties), ...getVirtualProperties(cmpMeta.virtualProperties)],
-    (p) => p.name
+    (p) => p.name,
   );
 };
 
@@ -342,7 +342,7 @@ const getDocsDeprecationText = (tags: d.JsonDocsTag[]): string | undefined => {
 const getDocsSlots = (tags: d.JsonDocsTag[]): d.JsonDocsSlot[] => {
   return sortBy(
     getNameText('slot', tags).map(([name, docs]) => ({ name, docs })),
-    (a) => a.name
+    (a) => a.name,
   );
 };
 
@@ -351,7 +351,7 @@ const getDocsParts = (vdom: string[], tags: d.JsonDocsTag[]): d.JsonDocsSlot[] =
   const vdomParts = vdom.map((name) => ({ name, docs: '' }));
   return sortBy(
     unique([...docsParts, ...vdomParts], (p) => p.name),
-    (p) => p.name
+    (p) => p.name,
   );
 };
 
@@ -466,7 +466,7 @@ const generateUsages = async (compilerCtx: d.CompilerCtx, usagesDir: string): Pr
         const key = parts.join('.');
 
         usages[key] = await compilerCtx.fs.readFile(f.absPath);
-      })
+      }),
     );
 
     Object.keys(usages)

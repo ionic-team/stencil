@@ -243,7 +243,7 @@ if (errorsOnPRCount === errorsOnMainCount) {
   lines.push(`That's ${errorsOnMainCount - errorsOnPRCount} fewer than on \`main\`! 🎉🎉🎉`);
 } else {
   lines.push(
-    `Unfortunately, it looks like that's an increase of ${errorsOnPRCount - errorsOnMainCount} over \`main\` 😞.`
+    `Unfortunately, it looks like that's an increase of ${errorsOnPRCount - errorsOnMainCount} over \`main\` 😞.`,
   );
   const newEntries = prData.filter(
     (prTsError) =>
@@ -253,8 +253,8 @@ if (errorsOnPRCount === errorsOnMainCount) {
           prTsError.value.cursor.value.line === mainTsError.value.cursor.value.line &&
           prTsError.value.cursor.value.col === mainTsError.value.cursor.value.col &&
           prTsError.value.tsError.value.errorString === mainTsError.value.tsError.value.errorString &&
-          prTsError.value.message.value === mainTsError.value.message.value
-      )
+          prTsError.value.message.value === mainTsError.value.message.value,
+      ),
   );
   lines.push(
     collapsible('Violations Not on `main` (may be more than the count above)', (out: string[]) => {
@@ -269,11 +269,11 @@ if (errorsOnPRCount === errorsOnMainCount) {
             `${value.path.value}`,
             `(${location.line}, ${location.col})`,
             `${value.tsError.value.errorString}`,
-            `${sanitizedErrorMsg}`
-          )
+            `${sanitizedErrorMsg}`,
+          ),
         );
       });
-    })
+    }),
   );
 
   lines.push('');
@@ -296,7 +296,7 @@ lines.push(
       .forEach(([path, errorCount]) => {
         out.push(tableRow(path, String(errorCount)));
       });
-  })
+  }),
 );
 
 lines.push('');
@@ -310,8 +310,8 @@ lines.push(
       tableHeader(
         '[Typescript Error Code](https://github.com/microsoft/TypeScript/blob/main/src/compiler/diagnosticMessages.json)',
         'Count',
-        'Error messages'
-      )
+        'Error messages',
+      ),
     );
 
     sortEntries(errorCodeCounts).forEach(([tsErrorCode, errorCount]) => {
@@ -324,11 +324,11 @@ lines.push(
           `<details><summary>Error messages</summary>${[...messages]
             .map((msg) => msg.replace(/\n/g, '<br>'))
             .map((msg) => msg.replace(/\|/g, '\\|'))
-            .join('<br>')}</details>`
-        )
+            .join('<br>')}</details>`,
+        ),
       );
     });
-  })
+  }),
 );
 
 lines.push('');
@@ -350,7 +350,7 @@ if (deadCodeCountPR === deadCodeCountMain) {
   deadCodeLine.push(`That's ${deadCodeCountMain - deadCodeCountPR} fewer than on \`main\`! 🎉🎉🎉`);
 } else {
   deadCodeLine.push(
-    `Unfortunately, it looks like that's an increase of ${deadCodeCountPR - deadCodeCountMain} over \`main\` 😞.`
+    `Unfortunately, it looks like that's an increase of ${deadCodeCountPR - deadCodeCountMain} over \`main\` 😞.`,
   );
 }
 lines.push(deadCodeLine.join(''));
@@ -363,7 +363,7 @@ lines.push(
     deadCodePR.forEach((deadCode) => {
       out.push(tableRow(deadCode.fileName, deadCode.lineNumber, deadCode.identifier));
     });
-  })
+  }),
 );
 
 console.log(lines.join('\n'));

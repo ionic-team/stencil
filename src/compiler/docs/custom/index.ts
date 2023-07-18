@@ -5,7 +5,7 @@ import type * as d from '../../../declarations';
 export const generateCustomDocs = async (
   config: d.ValidatedConfig,
   docsData: d.JsonDocs,
-  outputTargets: d.OutputTarget[]
+  outputTargets: d.OutputTarget[],
 ) => {
   const customOutputTargets = outputTargets.filter(isOutputTargetDocsCustom);
   if (customOutputTargets.length === 0) {
@@ -18,6 +18,6 @@ export const generateCustomDocs = async (
       } catch (e) {
         config.logger.error(`uncaught custom docs error: ${e}`);
       }
-    })
+    }),
   );
 };

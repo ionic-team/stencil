@@ -39,8 +39,8 @@ const createComponentMetadataProxy = (compilerMeta: d.ComponentCompilerMeta): ts
     ts.factory.createCallExpression(
       ts.factory.createIdentifier(PROXY_CUSTOM_ELEMENT),
       [],
-      [literalCmpClassName, literalMeta]
-    )
+      [literalCmpClassName, literalMeta],
+    ),
   );
 };
 
@@ -65,7 +65,7 @@ const createComponentMetadataProxy = (compilerMeta: d.ComponentCompilerMeta): ts
  */
 export const createClassMetadataProxy = (
   compilerMeta: d.ComponentCompilerMeta,
-  clazz: ts.ClassExpression
+  clazz: ts.ClassExpression,
 ): ts.CallExpression => {
   const compactMeta: d.ComponentRuntimeMetaCompact = formatComponentRuntimeMeta(compilerMeta, true);
   const literalMeta = convertValueToLiteral(compactMeta);

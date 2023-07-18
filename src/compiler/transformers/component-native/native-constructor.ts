@@ -20,7 +20,7 @@ import { retrieveTsModifiers } from '../transform-utils';
 export const updateNativeConstructor = (
   classMembers: ts.ClassElement[],
   moduleFile: d.Module,
-  cmp: d.ComponentCompilerMeta
+  cmp: d.ComponentCompilerMeta,
 ): void => {
   if (cmp.isPlain) {
     return;
@@ -44,7 +44,7 @@ export const updateNativeConstructor = (
       cstrMethod,
       retrieveTsModifiers(cstrMethod),
       cstrMethod.parameters,
-      ts.factory.updateBlock(cstrMethod.body, statements)
+      ts.factory.updateBlock(cstrMethod.body, statements),
     );
   } else {
     // create a constructor()
@@ -83,8 +83,8 @@ const nativeRegisterHostStatement = (): ts.ExpressionStatement => {
     ts.factory.createCallExpression(
       ts.factory.createPropertyAccessExpression(ts.factory.createThis(), ts.factory.createIdentifier('__registerHost')),
       undefined,
-      undefined
-    )
+      undefined,
+    ),
   );
 };
 
@@ -98,8 +98,8 @@ const nativeAttachShadowStatement = (): ts.ExpressionStatement => {
     ts.factory.createCallExpression(
       ts.factory.createPropertyAccessExpression(ts.factory.createThis(), ts.factory.createIdentifier('__attachShadow')),
       undefined,
-      undefined
-    )
+      undefined,
+    ),
   );
 };
 
@@ -109,6 +109,6 @@ const nativeAttachShadowStatement = (): ts.ExpressionStatement => {
  */
 const createNativeConstructorSuper = (): ts.ExpressionStatement => {
   return ts.factory.createExpressionStatement(
-    ts.factory.createCallExpression(ts.factory.createSuper(), undefined, undefined)
+    ts.factory.createCallExpression(ts.factory.createSuper(), undefined, undefined),
   );
 };

@@ -61,7 +61,7 @@ describe('transform-utils', () => {
    * @returns a new empty method
    */
   const createMemberWithModifiers = (
-    modifiers: ReadonlyArray<ts.ModifierLike> | undefined = undefined
+    modifiers: ReadonlyArray<ts.ModifierLike> | undefined = undefined,
   ): ts.MethodDeclaration => {
     return ts.factory.createMethodDeclaration(
       modifiers,
@@ -71,7 +71,7 @@ describe('transform-utils', () => {
       undefined,
       [],
       undefined,
-      ts.factory.createBlock([], false)
+      ts.factory.createBlock([], false),
     );
   };
 

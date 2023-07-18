@@ -12,7 +12,7 @@ export const parseModuleImport = (
   moduleFile: d.Module,
   dirPath: string,
   importNode: ts.ImportDeclaration,
-  resolveCollections: boolean
+  resolveCollections: boolean,
 ) => {
   if (importNode.moduleSpecifier && ts.isStringLiteral(importNode.moduleSpecifier)) {
     let importPath = importNode.moduleSpecifier.text;
@@ -38,7 +38,7 @@ export const parseModuleImport = (
         moduleFile,
         moduleFile.sourceFilePath,
         importPath,
-        resolveCollections
+        resolveCollections,
       );
     }
   }

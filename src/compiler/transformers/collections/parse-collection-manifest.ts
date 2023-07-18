@@ -10,7 +10,7 @@ export const parseCollectionManifest = (
   buildCtx: d.BuildCtx,
   collectionName: string,
   collectionDir: string,
-  collectionJsonStr: string
+  collectionJsonStr: string,
 ) => {
   const collectionManifest: d.CollectionManifest = JSON.parse(collectionJsonStr);
 
@@ -45,7 +45,7 @@ export const parseGlobal = (
   buildCtx: d.BuildCtx,
   collectionDir: string,
   collectionManifest: d.CollectionManifest,
-  collection: d.CollectionCompilerMeta
+  collection: d.CollectionCompilerMeta,
 ) => {
   if (typeof collectionManifest.global !== 'string') {
     return;

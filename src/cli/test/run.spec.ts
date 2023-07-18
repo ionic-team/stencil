@@ -42,7 +42,7 @@ describe('run', () => {
           // use the 'help' task as a reasonable default for all calls to this function.
           // code paths that require a different task can always override this value as needed.
           task: 'help',
-        })
+        }),
       );
     });
 
@@ -74,7 +74,7 @@ describe('run', () => {
             unknownArgs: [],
           },
           mockLogger,
-          mockSystem
+          mockSystem,
         );
 
         taskHelpSpy.mockRestore();
@@ -84,7 +84,7 @@ describe('run', () => {
         parseFlagsSpy.mockReturnValue(
           createConfigFlags({
             task: null,
-          })
+          }),
         );
 
         await run(cliInitOptions);
@@ -98,7 +98,7 @@ describe('run', () => {
             unknownArgs: [],
           },
           mockLogger,
-          mockSystem
+          mockSystem,
         );
 
         taskHelpSpy.mockRestore();
@@ -108,7 +108,7 @@ describe('run', () => {
         parseFlagsSpy.mockReturnValue(
           createConfigFlags({
             help: true,
-          })
+          }),
         );
 
         await run(cliInitOptions);
@@ -122,7 +122,7 @@ describe('run', () => {
             knownArgs: [],
           },
           mockLogger,
-          mockSystem
+          mockSystem,
         );
 
         taskHelpSpy.mockRestore();

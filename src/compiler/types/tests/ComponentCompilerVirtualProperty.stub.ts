@@ -8,7 +8,7 @@ import * as d from '@stencil/core/declarations';
  * @returns the stubbed `ComponentCompilerVirtualProperty`
  */
 export const stubComponentCompilerVirtualProperty = (
-  overrides: Partial<d.ComponentCompilerVirtualProperty> = {}
+  overrides: Partial<d.ComponentCompilerVirtualProperty> = {},
 ): d.ComponentCompilerVirtualProperty => {
   const defaults: d.ComponentCompilerVirtualProperty = {
     docs: 'this is a doc string',

@@ -18,7 +18,7 @@ export const isInteractive = (sys: d.CompilerSystem, flags: ConfigFlags, object?
       tty: sys.isTTY() ? true : false,
       ci:
         ['CI', 'BUILD_ID', 'BUILD_NUMBER', 'BITBUCKET_COMMIT', 'CODEBUILD_BUILD_ARN'].filter(
-          (v) => !!sys.getEnvironmentVar?.(v)
+          (v) => !!sys.getEnvironmentVar?.(v),
         ).length > 0 || !!flags.ci,
     });
 

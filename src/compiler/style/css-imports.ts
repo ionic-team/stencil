@@ -27,7 +27,7 @@ export const parseCssImports = async (
   srcFilePath: string,
   resolvedFilePath: string,
   styleText: string,
-  styleDocs?: d.StyleDoc[]
+  styleDocs?: d.StyleDoc[],
 ): Promise<ParseCSSReturn> => {
   const isCssEntry = resolvedFilePath.toLowerCase().endsWith('.css');
   const allCssImports: string[] = [];
@@ -58,7 +58,7 @@ export const parseCssImports = async (
   async function resolveAndFlattenImports(
     srcFilePath: string,
     resolvedFilePath: string,
-    styleText: string
+    styleText: string,
   ): Promise<string> {
     // if we've seen this path before we early return
     if (resolvedFilePaths.has(resolvedFilePath)) {
@@ -93,7 +93,7 @@ export const parseCssImports = async (
           cssImportData.styleText = await resolveAndFlattenImports(
             cssImportData.filePath,
             cssImportData.filePath,
-            cssImportData.styleText
+            cssImportData.styleText,
           );
         } else {
           // we had some error loading the file from disk, so write a diagnostic
@@ -101,7 +101,7 @@ export const parseCssImports = async (
           err.messageText = `Unable to read css import: ${cssImportData.srcImport}`;
           err.absFilePath = srcFilePath;
         }
-      })
+      }),
     );
 
     // replace import statements with the actual CSS code in children modules
@@ -162,7 +162,7 @@ export const getCssImports = async (
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   filePath: string,
-  styleText: string
+  styleText: string,
 ) => {
   const imports: d.CssImportData[] = [];
 
@@ -230,7 +230,7 @@ export const resolveCssNodeModule = async (
   compilerCtx: d.CompilerCtx,
   diagnostics: d.Diagnostic[],
   filePath: string,
-  cssImportData: d.CssImportData
+  cssImportData: d.CssImportData,
 ) => {
   try {
     const m = getModuleId(cssImportData.url);

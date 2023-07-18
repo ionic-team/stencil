@@ -22,7 +22,7 @@ export const appError = (data: AppErrorData): AppErrorResults => {
 
   if (data && data.window && Array.isArray(data.buildResults.diagnostics)) {
     const diagnostics = (data.buildResults as CompilerBuildResults).diagnostics.filter(
-      (diagnostic) => diagnostic.level === 'error'
+      (diagnostic) => diagnostic.level === 'error',
     );
 
     if (diagnostics.length > 0) {
@@ -44,7 +44,7 @@ const appendDiagnostic = (
   doc: Document,
   openInEditor: OpenInEditorCallback | undefined,
   modal: HTMLElement,
-  diagnostic: Diagnostic
+  diagnostic: Diagnostic,
 ) => {
   const card = doc.createElement('div');
   card.className = 'dev-server-diagnostic';
@@ -101,7 +101,7 @@ const appendDiagnostic = (
           fileHeader,
           diagnostic.absFilePath,
           diagnostic.lineNumber,
-          diagnostic.columnNumber
+          diagnostic.columnNumber,
         );
       }
     }
@@ -169,7 +169,7 @@ const addOpenInEditor = (
   elm: HTMLElement,
   file: string,
   line: number | undefined,
-  column: number | undefined
+  column: number | undefined,
 ) => {
   if (elm.tagName === 'A') {
     (elm as HTMLAnchorElement).href = '#open-in-editor';

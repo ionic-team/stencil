@@ -8,7 +8,7 @@ import { optimizeCss } from './optimize-css';
 export const generateGlobalStyles = async (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
-  buildCtx: d.BuildCtx
+  buildCtx: d.BuildCtx,
 ) => {
   const outputTargets = config.outputTargets.filter(isOutputTargetDistGlobalStyles);
   if (outputTargets.length === 0) {
@@ -44,7 +44,7 @@ const buildGlobalStyles = async (config: d.ValidatedConfig, compilerCtx: d.Compi
         compilerCtx,
         buildCtx.diagnostics,
         transformResults.code,
-        globalStylePath
+        globalStylePath,
       );
       compilerCtx.cachedGlobalStyle = optimizedCss;
 
@@ -98,7 +98,7 @@ const canSkipGlobalStyles = async (config: d.ValidatedConfig, compilerCtx: d.Com
     buildCtx,
     config.globalStyle,
     compilerCtx.cachedGlobalStyle,
-    []
+    [],
   );
   if (hasChangedImports) {
     return false;
@@ -113,7 +113,7 @@ const hasChangedImportFile = async (
   buildCtx: d.BuildCtx,
   filePath: string,
   content: string,
-  noLoop: string[]
+  noLoop: string[],
 ): Promise<boolean> => {
   if (noLoop.includes(filePath)) {
     return false;
@@ -129,7 +129,7 @@ const hasChangedImportContent = async (
   buildCtx: d.BuildCtx,
   filePath: string,
   content: string,
-  checkedFiles: string[]
+  checkedFiles: string[],
 ) => {
   const cssImports = await getCssImports(config, compilerCtx, buildCtx, filePath, content);
   if (cssImports.length === 0) {
