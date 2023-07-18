@@ -5,7 +5,7 @@ import type * as d from '../../../declarations';
 import { updateModule } from '../static-to-meta/parse-static';
 
 export const parseCollectionComponents = (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   collectionDir: string,
@@ -21,7 +21,7 @@ export const parseCollectionComponents = (
 };
 
 export const transpileCollectionModule = (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   collection: d.CollectionCompilerMeta,

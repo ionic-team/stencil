@@ -10,7 +10,7 @@ import { parseModuleImport } from './import';
 import { parseStringLiteral } from './string-literal';
 
 export const updateModule = (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   tsSourceFile: ts.SourceFile,

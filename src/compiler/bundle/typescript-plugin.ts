@@ -70,7 +70,7 @@ export const typescriptPlugin = (compilerCtx: d.CompilerCtx, bundleOpts: BundleO
   };
 };
 
-export const resolveIdWithTypeScript = (config: d.Config, compilerCtx: d.CompilerCtx): Plugin => {
+export const resolveIdWithTypeScript = (config: d.ValidatedConfig, compilerCtx: d.CompilerCtx): Plugin => {
   return {
     name: `resolveIdWithTypeScript`,
 

@@ -5,7 +5,7 @@ import type * as d from '../../../declarations';
 import { parseCollectionComponents, transpileCollectionModule } from './parse-collection-components';
 
 export const parseCollectionManifest = (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   collectionName: string,
@@ -40,7 +40,7 @@ export const parseCollectionDependencies = (collectionManifest: d.CollectionMani
 };
 
 export const parseGlobal = (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   collectionDir: string,
