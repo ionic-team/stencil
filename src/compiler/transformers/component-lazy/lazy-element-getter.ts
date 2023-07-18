@@ -6,7 +6,7 @@ import { addCoreRuntimeApi, GET_ELEMENT, RUNTIME_APIS } from '../core-runtime-ap
 export const addLazyElementGetter = (
   classMembers: ts.ClassElement[],
   moduleFile: d.Module,
-  cmp: d.ComponentCompilerMeta
+  cmp: d.ComponentCompilerMeta,
 ) => {
   // @Element() element;
   // is transformed into:
@@ -24,16 +24,16 @@ export const addLazyElementGetter = (
         ts.factory.createReturnStatement(
           ts.factory.createCallExpression(ts.factory.createIdentifier(GET_ELEMENT), undefined, [
             ts.factory.createThis(),
-          ])
+          ]),
         ),
-      ])
+      ]),
     );
 
     // Find the index in the class members array that correlates with the element
     // ref identifier we have
     const index = classMembers.findIndex(
       (member) =>
-        member.kind === ts.SyntaxKind.PropertyDeclaration && (member.name as any)?.escapedText === cmp.elementRef
+        member.kind === ts.SyntaxKind.PropertyDeclaration && (member.name as any)?.escapedText === cmp.elementRef,
     );
 
     // Index should never not be a valid integer, but we'll be safe just in case.

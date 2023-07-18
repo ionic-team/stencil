@@ -272,7 +272,7 @@ export function createNodeSys(c: { process?: any; logger?: Logger } = {}): Compi
             resolve(
               files.map((f) => {
                 return normalizePath(path.join(p, f));
-              })
+              }),
             );
           }
         });
@@ -461,7 +461,7 @@ export function createNodeSys(c: { process?: any; logger?: Logger } = {}): Compi
             logger?.debug(`NODE_SYS_DEBUG::watchDir:callback dir=${p} changedPath=${fileName}`);
             callback(normalizePath(fileName), 'fileUpdate');
           },
-          recursive
+          recursive,
         );
 
         const close = () => {
@@ -541,7 +541,7 @@ export function createNodeSys(c: { process?: any; logger?: Logger } = {}): Compi
             watchFile: ts.WatchFileKind.FixedPollingInterval,
             // set fallbackPolling so that directories are given the correct watcher variant
             fallbackPolling: ts.PollingWatchKind.FixedInterval,
-          }
+          },
         );
 
         const close = () => {

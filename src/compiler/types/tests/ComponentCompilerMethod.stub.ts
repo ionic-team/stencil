@@ -8,7 +8,7 @@ import * as d from '@stencil/core/declarations';
  * @returns the stubbed `ComponentCompilerMethod`
  */
 export const stubComponentCompilerMethod = (
-  overrides: Partial<d.ComponentCompilerMethod> = {}
+  overrides: Partial<d.ComponentCompilerMethod> = {},
 ): d.ComponentCompilerMethod => {
   const defaults: d.ComponentCompilerMethod = {
     name: 'myMethod',

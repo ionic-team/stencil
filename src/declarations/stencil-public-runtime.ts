@@ -1,7 +1,7 @@
 declare type CustomMethodDecorator<T> = (
   target: Object,
   propertyKey: string | symbol,
-  descriptor: TypedPropertyDescriptor<T>
+  descriptor: TypedPropertyDescriptor<T>,
 ) => TypedPropertyDescriptor<T> | void;
 
 export interface ComponentDecorator {
@@ -1823,13 +1823,13 @@ export interface CustomElementsDefineOptions {
     el: EventTarget,
     eventName: string,
     listener: EventListenerOrEventListenerObject,
-    options: boolean | AddEventListenerOptions
+    options: boolean | AddEventListenerOptions,
   ) => void;
   rel?: (
     el: EventTarget,
     eventName: string,
     listener: EventListenerOrEventListenerObject,
-    options: boolean | AddEventListenerOptions
+    options: boolean | AddEventListenerOptions,
   ) => void;
   ce?: (eventName: string, opts?: any) => CustomEvent;
 }

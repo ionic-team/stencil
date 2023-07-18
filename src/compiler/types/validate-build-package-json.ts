@@ -17,7 +17,7 @@ import { validatePrimaryPackageOutputTarget } from './validate-primary-package-o
 export const validateBuildPackageJson = async (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
-  buildCtx: d.BuildCtx
+  buildCtx: d.BuildCtx,
 ): Promise<void> => {
   if (config.watch || buildCtx.packageJson == null) {
     return;
@@ -30,8 +30,8 @@ export const validateBuildPackageJson = async (
   const distCollectionOutputTargets = config.outputTargets.filter(isOutputTargetDistCollection);
   await Promise.all(
     distCollectionOutputTargets.map((distCollectionOT) =>
-      validateDistCollectionPkgJson(config, compilerCtx, buildCtx, distCollectionOT)
-    )
+      validateDistCollectionPkgJson(config, compilerCtx, buildCtx, distCollectionOT),
+    ),
   );
 };
 
@@ -49,7 +49,7 @@ const validateDistCollectionPkgJson = async (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
-  outputTarget: d.OutputTargetDistCollection
+  outputTarget: d.OutputTargetDistCollection,
 ) => {
   await Promise.all([
     validatePackageFiles(config, compilerCtx, buildCtx, outputTarget),
@@ -72,7 +72,7 @@ export const validatePackageFiles = async (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
-  outputTarget: d.OutputTargetDistCollection
+  outputTarget: d.OutputTargetDistCollection,
 ) => {
   if (!config.devMode && Array.isArray(buildCtx.packageJson.files)) {
     const actualDistDir = normalizePath(relative(config.rootDir, outputTarget.dir));
@@ -80,7 +80,7 @@ export const validatePackageFiles = async (
     const validPaths = [`${actualDistDir}`, `${actualDistDir}/`, `./${actualDistDir}`, `./${actualDistDir}/`];
 
     const containsDistDir = buildCtx.packageJson.files.some((userPath) =>
-      validPaths.some((validPath) => normalizePath(userPath) === validPath)
+      validPaths.some((validPath) => normalizePath(userPath) === validPath),
     );
 
     if (!containsDistDir) {
@@ -101,7 +101,7 @@ export const validatePackageFiles = async (
             packageJsonError(config, compilerCtx, buildCtx, msg, `"${pkgFile}"`);
           }
         }
-      })
+      }),
     );
   }
 };
@@ -119,7 +119,7 @@ export const validateMain = (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
-  outputTarget: d.OutputTargetDistCollection
+  outputTarget: d.OutputTargetDistCollection,
 ) => {
   const mainAbs = join(outputTarget.dir, 'index.cjs.js');
   const mainRel = relative(config.rootDir, mainAbs);
@@ -146,12 +146,12 @@ export const validateCollection = (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
-  outputTarget: d.OutputTargetDistCollection
+  outputTarget: d.OutputTargetDistCollection,
 ) => {
   if (outputTarget.collectionDir) {
     const collectionRel = normalizePath(
       join(relative(config.rootDir, outputTarget.collectionDir), COLLECTION_MANIFEST_FILE_NAME),
-      false
+      false,
     );
     if (!buildCtx.packageJson.collection || normalizePath(buildCtx.packageJson.collection, false) !== collectionRel) {
       const msg = `package.json "collection" property is required when generating a distribution and must be set to: ${collectionRel}`;

@@ -25,7 +25,7 @@ export const outputWww = async (config: d.ValidatedConfig, compilerCtx: d.Compil
   const criticalBundles = getCriticalPath(buildCtx);
 
   await Promise.all(
-    outputTargets.map((outputTarget) => generateWww(config, compilerCtx, buildCtx, criticalBundles, outputTarget))
+    outputTargets.map((outputTarget) => generateWww(config, compilerCtx, buildCtx, criticalBundles, outputTarget)),
   );
 
   timespan.finish(`generate www finished`);
@@ -40,8 +40,8 @@ const getCriticalPath = (buildCtx: d.BuildCtx) => {
     flatOne(
       getUsedComponents(buildCtx.indexDoc, buildCtx.components)
         .map((tagName) => getScopeId(tagName))
-        .map((scopeId) => buildCtx.componentGraph.get(scopeId) || [])
-    )
+        .map((scopeId) => buildCtx.componentGraph.get(scopeId) || []),
+    ),
   ).sort();
 };
 
@@ -50,7 +50,7 @@ const generateWww = async (
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   criticalPath: string[],
-  outputTarget: d.OutputTargetWww
+  outputTarget: d.OutputTargetWww,
 ) => {
   if (!config.buildEs5) {
     await generateEs5DisabledMessage(config, compilerCtx, outputTarget);
@@ -84,7 +84,7 @@ const generateHostConfig = (compilerCtx: d.CompilerCtx, outputTarget: d.OutputTa
       },
     },
     null,
-    '  '
+    '  ',
   );
 
   return compilerCtx.fs.writeFile(hostConfigPath, hostConfigContent, { outputTargetType: outputTarget.type });
@@ -95,7 +95,7 @@ const generateIndexHtml = async (
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   criticalPath: string[],
-  outputTarget: d.OutputTargetWww
+  outputTarget: d.OutputTargetWww,
 ) => {
   if (compilerCtx.hasSuccessfulBuild && !buildCtx.hasHtmlChanges) {
     // no need to rebuild index.html if there were no app file changes
@@ -113,7 +113,7 @@ const generateIndexHtml = async (
       const globalStylesFilename = await generateHashedCopy(
         config,
         compilerCtx,
-        join(outputTarget.buildDir, `${config.fsNamespace}.css`)
+        join(outputTarget.buildDir, `${config.fsNamespace}.css`),
       );
       const scriptFound = await optimizeEsmImport(config, compilerCtx, doc, outputTarget);
       await inlineStyleSheets(compilerCtx, doc, MAX_CSS_INLINE_SIZE, outputTarget);

@@ -47,7 +47,7 @@ describe.skip('outputTarget, dist', () => {
         'User',
         'testing',
         'src',
-        'global.ts'
+        'global.ts',
       )]: `export default function() { console.log('my global'); }`,
     });
     await compiler.fs.commit();

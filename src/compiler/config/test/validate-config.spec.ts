@@ -335,7 +335,7 @@ describe('validation', () => {
     (targetType) => {
       const { config } = validateConfig(userConfig, bootstrapConfig);
       expect(config.outputTargets.some((o) => o.type === targetType)).toBe(false);
-    }
+    },
   );
 
   it('should set devInspector false', () => {
@@ -488,7 +488,7 @@ describe('validation', () => {
         const { config } = validateConfig(userConfig, bootstrapConfig);
 
         expect(config.validatePrimaryPackageOutputTarget).toBe(validatePrimaryPackageOutputTarget);
-      }
+      },
     );
   });
 });

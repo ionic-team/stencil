@@ -13,9 +13,9 @@ export function hydrateApp(
     win: Window,
     opts: d.HydrateFactoryOptions,
     results: d.HydrateResults,
-    resolve: (results: d.HydrateResults) => void
+    resolve: (results: d.HydrateResults) => void,
   ) => void,
-  resolve: (results: d.HydrateResults) => void
+  resolve: (results: d.HydrateResults) => void,
 ) {
   const connectedElements = new Set<any>();
   const createdElements = new Set<HTMLElement>();
@@ -79,7 +79,7 @@ export function hydrateApp(
               $tagName$: elm.nodeName.toLowerCase(),
               $flags$: null,
             },
-            null
+            null,
           ) as d.ComponentConstructor;
 
           if (Cstr != null && Cstr.cmpMeta != null) {
@@ -167,7 +167,7 @@ async function hydrateComponent(
   results: d.HydrateResults,
   tagName: string,
   elm: d.HostElement,
-  waitingElements: Set<HTMLElement>
+  waitingElements: Set<HTMLElement>,
 ) {
   tagName = tagName.toLowerCase();
   const Cstr = loadModule(
@@ -175,7 +175,7 @@ async function hydrateComponent(
       $tagName$: tagName,
       $flags$: null,
     },
-    null
+    null,
   ) as d.ComponentConstructor;
 
   if (Cstr != null) {

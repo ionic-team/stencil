@@ -77,7 +77,7 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
 
     this.logger.debug(`screenshot build: ${this.buildId}, ${this.buildMessage}, updateMaster: ${this.updateMaster}`);
     this.logger.debug(
-      `screenshot, allowableMismatchedPixels: ${this.allowableMismatchedPixels}, allowableMismatchedRatio: ${this.allowableMismatchedRatio}, pixelmatchThreshold: ${this.pixelmatchThreshold}`
+      `screenshot, allowableMismatchedPixels: ${this.allowableMismatchedPixels}, allowableMismatchedRatio: ${this.allowableMismatchedRatio}, pixelmatchThreshold: ${this.pixelmatchThreshold}`,
     );
 
     if (typeof opts.screenshotDirName === 'string') {
@@ -216,7 +216,7 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
           const imageFilePath = join(this.imagesDir, screenshot.image);
           const imageBuf = await readFileBuffer(imageFilePath);
           const jsonpContent = `loadScreenshot("${screenshot.image}","data:image/png;base64,${imageBuf.toString(
-            'base64'
+            'base64',
           )}");`;
           await writeFile(jsonFilePath, jsonpContent);
         }

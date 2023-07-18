@@ -21,8 +21,8 @@ describe('generate-method-types', () => {
           _typeReferences: d.ComponentCompilerTypeReferences,
           _typeImportData: d.TypesImportData,
           _sourceFilePath: string,
-          initialType: string
-        ) => initialType
+          initialType: string,
+        ) => initialType,
       );
 
       getTextDocsSpy = jest.spyOn(Util, 'getTextDocs');

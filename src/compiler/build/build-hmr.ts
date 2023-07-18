@@ -52,7 +52,7 @@ export const generateHmr = (config: d.Config, compilerCtx: d.CompilerCtx, buildC
           styleText: s.styleText,
         } as d.HmrStyleUpdate;
       }),
-      (s) => s.styleId
+      (s) => s.styleId,
     );
   }
 
@@ -118,7 +118,7 @@ const addTsFileImporters = (
   filesToLookForImporters: string[],
   checkedFiles: Set<string>,
   changedScriptFiles: string[],
-  scriptFile: string
+  scriptFile: string,
 ) => {
   if (!changedScriptFiles.includes(scriptFile)) {
     // add it to our list of files to transpile

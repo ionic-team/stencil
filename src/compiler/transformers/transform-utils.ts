@@ -17,7 +17,7 @@ export const getScriptTarget = () => {
  */
 export const isMemberPrivate = (member: ts.ClassElement): boolean => {
   return !!retrieveTsModifiers(member)?.some(
-    (m) => m.kind === ts.SyntaxKind.PrivateKeyword || m.kind === ts.SyntaxKind.ProtectedKeyword
+    (m) => m.kind === ts.SyntaxKind.PrivateKeyword || m.kind === ts.SyntaxKind.ProtectedKeyword,
   );
 };
 
@@ -40,7 +40,7 @@ export const isMemberPrivate = (member: ts.ClassElement): boolean => {
  */
 export const convertValueToLiteral = (
   val: any,
-  refs: WeakSet<any> = null
+  refs: WeakSet<any> = null,
 ):
   | ts.Identifier
   | ts.StringLiteral
@@ -140,7 +140,7 @@ const objectToObjectLiteral = (obj: { [key: string]: any }, refs: WeakSet<any>):
   const newProperties: ts.ObjectLiteralElementLike[] = Object.keys(obj).map((key) => {
     const prop = ts.factory.createPropertyAssignment(
       ts.factory.createStringLiteral(key),
-      convertValueToLiteral(obj[key], refs) as ts.Expression
+      convertValueToLiteral(obj[key], refs) as ts.Expression,
     );
     return prop;
   });
@@ -162,7 +162,7 @@ export const createStaticGetter = (propName: string, returnExpression: ts.Expres
     propName,
     [],
     undefined,
-    ts.factory.createBlock([ts.factory.createReturnStatement(returnExpression)])
+    ts.factory.createBlock([ts.factory.createReturnStatement(returnExpression)]),
   );
 };
 
@@ -175,14 +175,14 @@ export const createStaticGetter = (propName: string, returnExpression: ts.Expres
  */
 export const getStaticValue = (staticMembers: ts.ClassElement[], staticName: string): any => {
   const staticMember: ts.GetAccessorDeclaration = staticMembers.find(
-    (member) => (member.name as any).escapedText === staticName
+    (member) => (member.name as any).escapedText === staticName,
   ) as any;
   if (!staticMember || !staticMember.body || !staticMember.body.statements) {
     return null;
   }
 
   const rtnStatement: ts.ReturnStatement = staticMember.body.statements.find(
-    (s) => s.kind === ts.SyntaxKind.ReturnStatement
+    (s) => s.kind === ts.SyntaxKind.ReturnStatement,
   ) as any;
   if (!rtnStatement || !rtnStatement.expression) {
     return null;
@@ -380,7 +380,7 @@ export const getAttributeTypeInfo = (
   baseNode: ts.Node,
   sourceFile: ts.SourceFile,
   checker: ts.TypeChecker,
-  program: ts.Program
+  program: ts.Program,
 ): d.ComponentCompilerTypeReferences => {
   const allReferences: d.ComponentCompilerTypeReferences = {};
   getAllTypeReferences(checker, baseNode).forEach((typeInfo) => {
@@ -457,7 +457,7 @@ export const getAllTypeReferences = (checker: ts.TypeChecker, node: ts.Node): Re
 export const validateReferences = (
   diagnostics: d.Diagnostic[],
   references: d.ComponentCompilerTypeReferences,
-  node: ts.Node
+  node: ts.Node,
 ) => {
   Object.keys(references).forEach((refName) => {
     const ref = references[refName];
@@ -492,7 +492,7 @@ const getTypeReferenceLocation = (
   type: ts.Type,
   sourceFile: ts.SourceFile,
   checker: ts.TypeChecker,
-  program: ts.Program
+  program: ts.Program,
 ): d.ComponentCompilerTypeReference => {
   // Loop through all top level imports to find any reference to the type for 'import' reference location
   const importTypeDeclaration = sourceFile.statements.find((st) => {
@@ -691,7 +691,7 @@ export const parseDocsType = (checker: ts.TypeChecker, type: ts.Type, parts: Set
  */
 export const getModuleFromSourceFile = (
   compilerCtx: d.CompilerCtx,
-  tsSourceFile: ts.SourceFile
+  tsSourceFile: ts.SourceFile,
 ): d.Module | undefined => {
   const sourceFilePath = normalizePath(tsSourceFile.fileName);
   const moduleFile = compilerCtx.moduleMap.get(sourceFilePath);
@@ -717,7 +717,7 @@ export const getModuleFromSourceFile = (
 export const getComponentMeta = (
   compilerCtx: d.CompilerCtx,
   tsSourceFile: ts.SourceFile,
-  node: ts.ClassDeclaration
+  node: ts.ClassDeclaration,
 ): d.ComponentCompilerMeta | undefined => {
   const meta = compilerCtx.nodeMap.get(node);
   if (meta) {
@@ -845,14 +845,14 @@ export const createImportStatement = (importFnNames: string[], importPath: strin
       typeof importFnName === 'string' && importFnName !== importAs
         ? ts.factory.createIdentifier(importFnName)
         : undefined,
-      ts.factory.createIdentifier(importAs)
+      ts.factory.createIdentifier(importAs),
     );
   });
 
   return ts.factory.createImportDeclaration(
     undefined,
     ts.factory.createImportClause(false, undefined, ts.factory.createNamedImports(importSpecifiers)),
-    ts.factory.createStringLiteral(importPath)
+    ts.factory.createStringLiteral(importPath),
   );
 };
 
@@ -871,7 +871,7 @@ export const createRequireStatement = (importFnNames: string[], importPath: stri
         importFnName = splt[0];
       }
       return ts.factory.createBindingElement(undefined, importFnName, importAs);
-    })
+    }),
   );
 
   return ts.factory.createVariableStatement(
@@ -885,12 +885,12 @@ export const createRequireStatement = (importFnNames: string[], importPath: stri
           ts.factory.createCallExpression(
             ts.factory.createIdentifier('require'),
             [],
-            [ts.factory.createStringLiteral(importPath)]
-          )
+            [ts.factory.createStringLiteral(importPath)],
+          ),
         ),
       ],
-      ts.NodeFlags.Const
-    )
+      ts.NodeFlags.Const,
+    ),
   );
 };
 

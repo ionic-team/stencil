@@ -41,7 +41,7 @@ async function pathTransformTranspile(component: string, inputFileName = 'module
   await compilerContext.fs.writeFile(path.join(config.rootDir, 'name/space/subdir.ts'), 'export const bar = x => x;');
   await compilerContext.fs.writeFile(
     path.join(config.rootDir, 'name/space/keyboard.ts'),
-    'export const keyboard = "keyboard"'
+    'export const keyboard = "keyboard"',
   );
 
   return transpileModule(
@@ -52,7 +52,7 @@ async function pathTransformTranspile(component: string, inputFileName = 'module
     [],
     [rewriteAliasedDTSImportPaths],
     mockPathsConfig,
-    normalizePath(path.join(config.rootDir, inputFileName))
+    normalizePath(path.join(config.rootDir, inputFileName)),
   );
 }
 
@@ -69,8 +69,8 @@ describe('rewrite alias module paths transform', () => {
 
     expect(await formatCode(t.outputText)).toBe(
       await formatCode(
-        'import { foo } from "./name/space";export class CmpA { render() { return h("some-cmp", null, foo("bar")); }}'
-      )
+        'import { foo } from "./name/space";export class CmpA { render() { return h("some-cmp", null, foo("bar")); }}',
+      ),
     );
   });
 
@@ -86,8 +86,8 @@ describe('rewrite alias module paths transform', () => {
 
     expect(await formatCode(t.outputText)).toBe(
       await formatCode(
-        'import { foo } from "./name/space/subdir";export class CmpA { render() { return h("some-cmp", null, foo("bar")); }}'
-      )
+        'import { foo } from "./name/space/subdir";export class CmpA { render() { return h("some-cmp", null, foo("bar")); }}',
+      ),
     );
   });
 
@@ -106,7 +106,7 @@ describe('rewrite alias module paths transform', () => {
     `);
 
     expect(await formatCode(t.declarationOutputText)).toBe(
-      await formatCode('import { Foo } from "./name/space";export declare class CmpA { field: Foo; render(): any;}')
+      await formatCode('import { Foo } from "./name/space";export declare class CmpA { field: Foo; render(): any;}'),
     );
   });
 
@@ -120,7 +120,7 @@ describe('rewrite alias module paths transform', () => {
     `);
 
     expect(await formatCode(t.declarationOutputText)).toBe(
-      await formatCode('import { Foo } from "./name/space/subdir";export declare function fooUtil(foo: Foo): Foo;')
+      await formatCode('import { Foo } from "./name/space/subdir";export declare function fooUtil(foo: Foo): Foo;'),
     );
   });
 
@@ -136,8 +136,8 @@ describe('rewrite alias module paths transform', () => {
 
     expect(await formatCode(t.declarationOutputText)).toBe(
       await formatCode(
-        'import { Foo } from "./name/space/subdir";import { Bar } from "./name/space";export declare function fooUtil(foo: Foo): Bar;'
-      )
+        'import { Foo } from "./name/space/subdir";import { Bar } from "./name/space";export declare function fooUtil(foo: Foo): Bar;',
+      ),
     );
   });
 
@@ -153,8 +153,8 @@ describe('rewrite alias module paths transform', () => {
 
     expect(await formatCode(t.declarationOutputText)).toBe(
       await formatCode(
-        'import { Foo } from "./name/space/subdir";import { Bar } from "./name/space";export declare function fooUtil(foo: Foo): Bar;'
-      )
+        'import { Foo } from "./name/space/subdir";import { Bar } from "./name/space";export declare function fooUtil(foo: Foo): Bar;',
+      ),
     );
   });
 
@@ -168,7 +168,7 @@ describe('rewrite alias module paths transform', () => {
         }
       }
     `,
-      'name/component.tsx'
+      'name/component.tsx',
     );
 
     // with the import filename passed to `pathTransformTranspile` the file
@@ -184,8 +184,8 @@ describe('rewrite alias module paths transform', () => {
     // `name/space.ts` is resolved correctly as `'./space'`.
     expect(await formatCode(t.outputText)).toBe(
       await formatCode(
-        'import { foo } from "./space";export class CmpA { render() { return h("some-cmp", null, foo("bar")); }}'
-      )
+        'import { foo } from "./space";export class CmpA { render() { return h("some-cmp", null, foo("bar")); }}',
+      ),
     );
   });
 
@@ -199,7 +199,7 @@ describe('rewrite alias module paths transform', () => {
         }
       }
     `,
-      'name/component.tsx'
+      'name/component.tsx',
     );
 
     // with the import filename passed to `pathTransformTranspile` the file
@@ -221,8 +221,8 @@ describe('rewrite alias module paths transform', () => {
           render() {
             return h("some-cmp", null, foo("bar"));
           }
-        }`
-      )
+        }`,
+      ),
     );
   });
 
@@ -240,8 +240,8 @@ describe('rewrite alias module paths transform', () => {
 
     expect(await formatCode(t.outputText)).toBe(
       await formatCode(
-        'import { foo } from "./name/space/keyboard";export class CmpA { render() { return h("some-cmp", null, foo("bar")); }}'
-      )
+        'import { foo } from "./name/space/keyboard";export class CmpA { render() { return h("some-cmp", null, foo("bar")); }}',
+      ),
     );
   });
 });

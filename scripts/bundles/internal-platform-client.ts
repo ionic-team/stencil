@@ -114,6 +114,6 @@ async function copyPolyfills(opts: BuildOptions, outputInternalClientPolyfillsDi
       const src = join(srcPolyfillsDir, fileName);
       const dest = join(outputInternalClientPolyfillsDir, fileName);
       await fs.copyFile(src, dest);
-    })
+    }),
   );
 }

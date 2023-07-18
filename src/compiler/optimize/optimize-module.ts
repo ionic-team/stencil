@@ -26,7 +26,7 @@ interface OptimizeModuleOptions {
 export const optimizeModule = async (
   config: Config,
   compilerCtx: CompilerCtx,
-  opts: OptimizeModuleOptions
+  opts: OptimizeModuleOptions,
 ): Promise<OptimizeJsResult> => {
   if ((!opts.minify && opts.sourceTarget !== 'es5') || opts.input === '') {
     return {
@@ -184,7 +184,7 @@ export const prepareModule = async (
   input: string,
   minifyOpts: MinifyOptions,
   transpileToEs5: boolean,
-  inlineHelpers: boolean
+  inlineHelpers: boolean,
 ): Promise<OptimizeJsResult> => {
   const results: OptimizeJsResult = {
     output: input,
@@ -214,7 +214,7 @@ export const prepareModule = async (
       // need to merge sourcemaps at this point
       const mergeMap = sourceMapMerge(
         (minifyOpts.sourceMap as SourceMapOptions)?.content as SourceMap,
-        JSON.parse(tsResults.sourceMapText)
+        JSON.parse(tsResults.sourceMapText),
       );
 
       if (mergeMap != null) {

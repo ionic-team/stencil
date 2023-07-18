@@ -30,7 +30,7 @@ export const outputCollection = async (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
-  changedModuleFiles: d.Module[]
+  changedModuleFiles: d.Module[],
 ): Promise<void> => {
   const outputTargets = config.outputTargets.filter(isOutputTargetDistCollection);
   if (outputTargets.length === 0) {
@@ -75,9 +75,9 @@ export const outputCollection = async (
               const sourceMapOutputFilePath = join(target.collectionDir, relativeSourceMapPath);
               await compilerCtx.fs.writeFile(sourceMapOutputFilePath, mapCode, { outputTargetType: target.type });
             }
-          })
+          }),
         );
-      })
+      }),
     );
 
     await writeCollectionManifests(config, compilerCtx, buildCtx, outputTargets);
@@ -92,7 +92,7 @@ const writeCollectionManifests = async (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
-  outputTargets: d.OutputTargetDistCollection[]
+  outputTargets: d.OutputTargetDistCollection[],
 ) => {
   const collectionData = JSON.stringify(serializeCollectionManifest(config, compilerCtx, buildCtx), null, 2);
   return Promise.all(outputTargets.map((o) => writeCollectionManifest(compilerCtx, collectionData, o)));
@@ -106,7 +106,7 @@ const writeCollectionManifests = async (
 const writeCollectionManifest = async (
   compilerCtx: d.CompilerCtx,
   collectionData: string,
-  outputTarget: d.OutputTargetDistCollection
+  outputTarget: d.OutputTargetDistCollection,
 ) => {
   // get the absolute path to the directory where the collection will be saved
   const { collectionDir } = outputTarget;

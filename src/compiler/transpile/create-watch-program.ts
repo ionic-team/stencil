@@ -19,7 +19,7 @@ import { getTsOptionsToExtend } from './ts-config';
  */
 export const createTsWatchProgram = async (
   config: d.ValidatedConfig,
-  buildCallback: (tsBuilder: ts.BuilderProgram) => Promise<void>
+  buildCallback: (tsBuilder: ts.BuilderProgram) => Promise<void>,
 ) => {
   let isRunning = false;
   let lastTsBuilder: any;
@@ -81,7 +81,7 @@ export const createTsWatchProgram = async (
     // Add a callback to log out statuses of the the watch program
     (reportWatchStatus) => {
       config.logger.debug(reportWatchStatus.messageText);
-    }
+    },
   );
 
   // Add a callback that will execute whenever a new instance

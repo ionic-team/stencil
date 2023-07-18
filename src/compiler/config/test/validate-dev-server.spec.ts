@@ -35,7 +35,7 @@ describe('validateDevServer', () => {
       inputConfig.devServer = { ...inputDevServerConfig, address };
       const { config } = validateConfig(inputConfig, mockLoadConfigInit());
       expect(config.devServer.address).toBe('localhost');
-    }
+    },
   );
 
   it('should set address', () => {
@@ -119,7 +119,7 @@ describe('validateDevServer', () => {
       inputConfig.devServer = { ...inputDevServerConfig, address, port: 1234 };
       const { config } = validateConfig(inputConfig, mockLoadConfigInit());
       expect(config.devServer.port).toBe(1234);
-    }
+    },
   );
 
   it('should not set default port if null', () => {

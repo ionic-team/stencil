@@ -1,5 +1,5 @@
 import type * as d from '@stencil/core/declarations';
-import { mockBuildCtx, mockCompilerCtx, mockConfig } from '@stencil/core/testing';
+import { mockBuildCtx, mockCompilerCtx, mockValidatedConfig } from '@stencil/core/testing';
 import ts from 'typescript';
 
 import { convertDecoratorsToStatic } from '../decorators-to-static/convert-decorators';
@@ -23,13 +23,13 @@ import { getScriptTarget } from '../transform-utils';
  */
 export function transpileModule(
   input: string,
-  config?: d.Config | null,
+  config?: d.ValidatedConfig | null,
   compilerCtx?: d.CompilerCtx | null,
   beforeTransformers: ts.TransformerFactory<ts.SourceFile>[] = [],
   afterTransformers: ts.TransformerFactory<ts.SourceFile>[] = [],
   afterDeclarations: ts.TransformerFactory<ts.SourceFile | ts.Bundle>[] = [],
   tsConfig: ts.CompilerOptions = {},
-  inputFileName = 'module.tsx'
+  inputFileName = 'module.tsx',
 ) {
   const options: ts.CompilerOptions = {
     ...ts.getDefaultCompilerOptions(),
@@ -61,7 +61,7 @@ export function transpileModule(
     ...tsConfig,
   };
 
-  config = config || mockConfig();
+  config = config || mockValidatedConfig();
   compilerCtx = compilerCtx || mockCompilerCtx(config);
 
   const sourceFile = ts.createSourceFile(inputFileName, input, options.target);

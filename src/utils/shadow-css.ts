@@ -428,7 +428,7 @@ const scopeSelectors = (
   scopeSelectorText: string,
   hostSelector: string,
   slotSelector: string,
-  commentOriginalSelector: boolean
+  commentOriginalSelector: boolean,
 ) => {
   return processRules(cssText, (rule: CssRule) => {
     let selector = rule.selector;
@@ -457,7 +457,7 @@ const scopeCssText = (
   scopeId: string,
   hostScopeId: string,
   slotScopeId: string,
-  commentOriginalSelector: boolean
+  commentOriginalSelector: boolean,
 ) => {
   cssText = insertPolyfillHostInCssText(cssText);
   cssText = convertColonHost(cssText);

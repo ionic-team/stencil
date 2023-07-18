@@ -32,13 +32,13 @@ describe('add-component-meta-proxy', () => {
         'MyComponent',
         undefined,
         [htmlElementHeritageClause],
-        []
+        [],
       );
       literalMetadata = ts.factory.createStringLiteral('MyComponent');
 
       formatComponentRuntimeMetaSpy = jest.spyOn(FormatComponentRuntimeMeta, 'formatComponentRuntimeMeta');
       formatComponentRuntimeMetaSpy.mockImplementation(
-        (_compilerMeta: d.ComponentCompilerMeta, _includeMethods: boolean) => [0, 'tag-name']
+        (_compilerMeta: d.ComponentCompilerMeta, _includeMethods: boolean) => [0, 'tag-name'],
       );
 
       convertValueToLiteralSpy = jest.spyOn(TransformUtils, 'convertValueToLiteral');

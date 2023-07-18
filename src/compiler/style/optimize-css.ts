@@ -8,7 +8,7 @@ export const optimizeCss = async (
   compilerCtx: d.CompilerCtx,
   diagnostics: d.Diagnostic[],
   styleText: string,
-  filePath: string
+  filePath: string,
 ) => {
   if (typeof styleText !== 'string' || !styleText.length) {
     //  don't bother with invalid data

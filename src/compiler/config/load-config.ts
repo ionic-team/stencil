@@ -153,7 +153,7 @@ const loadConfigFile = async (diagnostics: Diagnostic[], configPath: string): Pr
  */
 const evaluateConfigFile = async (
   diagnostics: Diagnostic[],
-  configFilePath: string
+  configFilePath: string,
 ): Promise<{ config?: UnvalidatedConfig } | null> => {
   let configFileData: { config?: UnvalidatedConfig } | null = null;
 

@@ -11,7 +11,7 @@ import { getBuildFeatures, updateBuildConditionals } from '../../app-core/app-da
  */
 export const getCustomElementsBuildConditionals = (
   config: d.ValidatedConfig,
-  cmps: d.ComponentCompilerMeta[]
+  cmps: d.ComponentCompilerMeta[],
 ): d.BuildConditionals => {
   // because custom elements bundling does not customize the build conditionals by default
   // then the default in "import { BUILD, NAMESPACE } from '@stencil/core/internal/app-data'"

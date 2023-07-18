@@ -12,7 +12,7 @@ import { generateTypes } from '../types/generate-types';
 export const outputTypes = async (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
-  buildCtx: d.BuildCtx
+  buildCtx: d.BuildCtx,
 ): Promise<void> => {
   const outputTargets = config.outputTargets.filter(isOutputTargetDistTypes);
   if (outputTargets.length === 0) {

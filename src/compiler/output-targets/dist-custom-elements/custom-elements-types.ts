@@ -15,14 +15,14 @@ export const generateCustomElementsTypes = async (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
-  typesDir: string
+  typesDir: string,
 ): Promise<void> => {
   const outputTargets = config.outputTargets.filter(isOutputTargetDistCustomElements);
 
   await Promise.all(
     outputTargets.map((outputTarget) =>
-      generateCustomElementsTypesOutput(config, compilerCtx, buildCtx, typesDir, outputTarget)
-    )
+      generateCustomElementsTypesOutput(config, compilerCtx, buildCtx, typesDir, outputTarget),
+    ),
   );
 };
 
@@ -40,7 +40,7 @@ const generateCustomElementsTypesOutput = async (
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   typesDir: string,
-  outputTarget: d.OutputTargetDistCustomElements
+  outputTarget: d.OutputTargetDistCustomElements,
 ) => {
   const isBarrelExport = outputTarget.customElementsExportBehavior === 'single-export-module';
   const isBundleExport = outputTarget.customElementsExportBehavior === 'bundle';
@@ -166,7 +166,7 @@ const generateCustomElementsTypesOutput = async (
       const fileName = `${cmp.tagName}.d.ts`;
       const filePath = join(outputTarget.dir!, fileName);
       await compilerCtx.fs.writeFile(filePath, dtsCode, { outputTargetType: outputTarget.type });
-    })
+    }),
   );
 };
 

@@ -100,7 +100,7 @@ describe('watch', () => {
       newSpecPage({
         components: [CmpA],
         html: `<cmp-a prop="123"></cmp-a>`,
-      })
+      }),
     );
 
     expect(rootInstance.watchCalled).toBe(6);
@@ -162,7 +162,7 @@ describe('watch', () => {
       newSpecPage({
         components: [CmpA],
         html: `<cmp-a></cmp-a>`,
-      })
+      }),
     );
 
     expect(root).toEqualHtml(`<cmp-a>2 4 4</cmp-a>`);

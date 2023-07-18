@@ -56,7 +56,7 @@ const formatUrl = (
   pluginCtx: TransformPluginContext,
   code: string,
   filePath: string,
-  ext: string
+  ext: string,
 ) => {
   const mime = FORMAT_URL_MIME[ext];
   if (!mime) {

@@ -48,7 +48,7 @@ export const addCoreRuntimeApi = (moduleFile: d.Module, coreRuntimeApi: string):
 export const addOutputTargetCoreRuntimeApi = (
   moduleFile: d.Module,
   outputTarget: d.OutputTarget['type'],
-  coreRuntimeApi: string
+  coreRuntimeApi: string,
 ): void => {
   if (!moduleFile.outputTargetCoreRuntimeApis[outputTarget]) {
     // no such output target-specific collection exists, create the empty collection

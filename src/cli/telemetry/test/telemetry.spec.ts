@@ -27,7 +27,7 @@ describe('telemetryBuildFinishedAction', () => {
     spyShouldTrack.mockReturnValue(
       new Promise((resolve) => {
         resolve(true);
-      })
+      }),
     );
 
     const results = {
@@ -60,7 +60,7 @@ describe('telemetryAction', () => {
     spyShouldTrack.mockReturnValue(
       new Promise((resolve) => {
         resolve(true);
-      })
+      }),
     );
 
     await telemetry.telemetryAction(sys, config, coreCompiler, () => {});
@@ -74,7 +74,7 @@ describe('telemetryAction', () => {
     spyShouldTrack.mockReturnValue(
       new Promise((resolve) => {
         resolve(true);
-      })
+      }),
     );
 
     await telemetry.telemetryAction(sys, config, coreCompiler, async () => {

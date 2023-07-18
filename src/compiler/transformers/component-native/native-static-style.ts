@@ -21,7 +21,7 @@ export const addNativeStaticStyle = (classMembers: ts.ClassElement[], cmp: d.Com
 const addMultipleModeStyleGetter = (
   classMembers: ts.ClassElement[],
   cmp: d.ComponentCompilerMeta,
-  styles: d.StyleCompiler[]
+  styles: d.StyleCompiler[],
 ) => {
   const styleModes: ts.ObjectLiteralElementLike[] = [];
 
@@ -57,7 +57,7 @@ const addMultipleModeStyleGetter = (
 const addSingleStyleGetter = (
   classMembers: ts.ClassElement[],
   cmp: d.ComponentCompilerMeta,
-  style: d.StyleCompiler
+  style: d.StyleCompiler,
 ) => {
   if (typeof style.styleStr === 'string') {
     // inline the style string

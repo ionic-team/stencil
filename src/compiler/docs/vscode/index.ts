@@ -21,7 +21,7 @@ import { getNameText } from '../generate-doc-data';
 export const generateVscodeDocs = async (
   compilerCtx: d.CompilerCtx,
   docsData: d.JsonDocs,
-  outputTargets: d.OutputTarget[]
+  outputTargets: d.OutputTarget[],
 ): Promise<void> => {
   const vsCodeOutputTargets = outputTargets.filter(isOutputTargetDocsVscode);
   if (vsCodeOutputTargets.length === 0) {
@@ -55,7 +55,7 @@ export const generateVscodeDocs = async (
       // fields in the custom data may have a value of `undefined`. calling `stringify` will remove such fields.
       const jsonContent = JSON.stringify(json, null, 2);
       await compilerCtx.fs.writeFile(outputTarget.file, jsonContent);
-    })
+    }),
   );
 };
 
@@ -129,7 +129,7 @@ const serializeAttribute = (prop: DocPropWithAttribute): AttributeData => {
   const values = prop.values
     .filter(
       (jsonDocValue: d.JsonDocsValue): jsonDocValue is Required<d.JsonDocsValue> =>
-        jsonDocValue.type === 'string' && jsonDocValue.value !== undefined
+        jsonDocValue.type === 'string' && jsonDocValue.value !== undefined,
     )
     .map((jsonDocValue: Required<d.JsonDocsValue>) => ({ name: jsonDocValue.value }));
 

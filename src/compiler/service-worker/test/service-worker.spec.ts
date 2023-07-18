@@ -33,7 +33,7 @@ describe.skip('service worker', () => {
       path.join(root, 'src', 'components', 'cmp-a', 'cmp-a.tsx'),
       `
       @Component({ tag: 'cmp-a' }) export class CmpA { render() { return <p>cmp-a</p>; } }
-    `
+    `,
     );
     await compiler.fs.commit();
 

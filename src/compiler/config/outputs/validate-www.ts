@@ -37,7 +37,7 @@ export const validateWww = (config: d.ValidatedConfig, diagnostics: d.Diagnostic
   return userWwwOutputs.reduce(
     (
       outputs: (d.OutputTargetWww | d.OutputTargetDistLazy | d.OutputTargetCopy | d.OutputTargetDistGlobalStyles)[],
-      o
+      o,
     ) => {
       const outputTarget = validateWwwOutputTarget(config, o, diagnostics);
       outputs.push(outputTarget);
@@ -79,14 +79,14 @@ export const validateWww = (config: d.ValidatedConfig, diagnostics: d.Diagnostic
 
       return outputs;
     },
-    []
+    [],
   );
 };
 
 const validateWwwOutputTarget = (
   config: d.ValidatedConfig,
   outputTarget: d.OutputTargetWww,
-  diagnostics: d.Diagnostic[]
+  diagnostics: d.Diagnostic[],
 ) => {
   if (!isString(outputTarget.baseUrl)) {
     outputTarget.baseUrl = '/';

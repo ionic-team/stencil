@@ -13,7 +13,7 @@ import { getAbsolutePath } from '../config-utils';
  */
 export const validateCollection = (
   config: d.ValidatedConfig,
-  userOutputs: d.OutputTarget[]
+  userOutputs: d.OutputTarget[],
 ): d.OutputTargetDistCollection[] => {
   return userOutputs.filter(isOutputTargetDistCollection).map((outputTarget) => {
     return {

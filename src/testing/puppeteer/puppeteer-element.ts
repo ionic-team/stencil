@@ -14,7 +14,7 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
 
   constructor(
     private _page: pd.E2EPageInternal,
-    private _elmHandle: puppeteer.ElementHandle
+    private _elmHandle: puppeteer.ElementHandle,
   ) {
     super(null, null);
     _page._e2eElements.push(this);
@@ -175,7 +175,7 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
         return elm[propertyName];
       },
       this._elmHandle,
-      propertyName
+      propertyName,
     );
 
     return propValue;
@@ -387,7 +387,7 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
         return rtn;
       },
       this._elmHandle,
-      pseudoElt
+      pseudoElt,
     );
 
     style.getPropertyValue = (propName: string) => {
@@ -461,7 +461,7 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
         });
       },
       this._elmHandle,
-      this._queuedActions as any
+      this._queuedActions as any,
     );
 
     this._queuedActions.length = 0;
@@ -546,7 +546,7 @@ async function findWithCssSelector(
   page: pd.E2EPageInternal,
   rootHandle: puppeteer.ElementHandle,
   lightSelector: string,
-  shadowSelector: string
+  shadowSelector: string,
 ) {
   let elmHandle = await rootHandle.$(lightSelector);
 
@@ -564,7 +564,7 @@ async function findWithCssSelector(
         return elm.shadowRoot.querySelector(shadowSelector);
       },
       elmHandle,
-      shadowSelector
+      shadowSelector,
     );
 
     await elmHandle.dispose();
@@ -583,7 +583,7 @@ async function findWithText(
   page: pd.E2EPageInternal,
   rootHandle: puppeteer.ElementHandle,
   text: string,
-  contains: string
+  contains: string,
 ) {
   const jsHandle = await page.evaluateHandle(
     (rootElm: Element, text: string, contains: string) => {
@@ -622,7 +622,7 @@ async function findWithText(
     },
     rootHandle,
     text,
-    contains
+    contains,
   );
 
   if (jsHandle) {
@@ -635,7 +635,7 @@ async function findWithText(
 export async function findAll(
   page: pd.E2EPageInternal,
   rootHandle: puppeteer.ElementHandle,
-  selector: pd.FindSelector
+  selector: pd.FindSelector,
 ) {
   const foundElms: E2EElement[] = [];
 
@@ -659,7 +659,7 @@ export async function findAll(
           return elm.shadowRoot.querySelectorAll(shadowSelector);
         },
         lightElmHandles[i],
-        shadowSelector
+        shadowSelector,
       );
 
       await lightElmHandles[i].dispose();

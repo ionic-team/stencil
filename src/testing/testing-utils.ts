@@ -39,7 +39,7 @@ export function expectFilesExist(fs: InMemoryFileSystem, filePaths: string[]): v
     throw new Error(
       `The following files were expected, but could not be found:\n${notFoundFiles
         .map((result: string) => '-' + result)
-        .join('\n')}`
+        .join('\n')}`,
     );
   }
 }
@@ -58,7 +58,7 @@ export function expectFilesDoNotExist(fs: InMemoryFileSystem, filePaths: string[
     throw new Error(
       `The following files were expected to not exist, but do:\n${existentFiles
         .map((result: string) => '-' + result)
-        .join('\n')}`
+        .join('\n')}`,
     );
   }
 }

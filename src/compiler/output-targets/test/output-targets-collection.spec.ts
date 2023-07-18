@@ -67,7 +67,7 @@ describe('Dist Collection output target', () => {
           type: 'dist-collection',
         });
         expect(mapImportPathSpy).toHaveBeenCalledTimes(1);
-      }
+      },
     );
   });
 });

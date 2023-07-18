@@ -106,7 +106,7 @@ describe('release options', () => {
     describe('publish + prod check', () => {
       it("throws an error if 'isPublishRelease' is set, but Stencil is not built for 'isProd'", () => {
         expect(() => getOptions(ROOT_DIR, { isProd: false, isPublishRelease: true })).toThrow(
-          'release must also be a prod build'
+          'release must also be a prod build',
         );
       });
 

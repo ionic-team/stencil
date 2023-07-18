@@ -35,7 +35,7 @@ export { transpile, transpileSync } from './transpile';
 export declare const createCompiler: (config: Config) => Promise<Compiler>;
 
 export declare const createPrerenderer: (
-  config: Config
+  config: Config,
 ) => Promise<{ start: (opts: PrerenderStartOptions) => Promise<PrerenderResults> }>;
 
 /**

@@ -7,7 +7,7 @@ export const generateServiceWorker = async (
   config: d.ValidatedConfig,
   buildCtx: d.BuildCtx,
   workbox: d.Workbox,
-  outputTarget: d.OutputTargetWww
+  outputTarget: d.OutputTargetWww,
 ): Promise<void[] | void> => {
   const serviceWorker = await getServiceWorker(outputTarget);
   if (serviceWorker.unregister) {

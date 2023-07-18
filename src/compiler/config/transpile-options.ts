@@ -154,7 +154,7 @@ export const getTranspileConfig = (input: TranspileOptions): TranspileConfig => 
 export const getTranspileCssConfig = (
   compileOpts: TranspileOptions,
   importData: ImportData,
-  results: TranspileResults
+  results: TranspileResults,
 ) => {
   const transformInput: TransformCssToEsmInput = {
     file: results.inputFilePath,

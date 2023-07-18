@@ -160,11 +160,11 @@ describe('terminal-logger', () => {
 
           expect(logMock).toHaveBeenNthCalledWith(
             1,
-            `${cyan('[32:32.0]')}  start the timespan ${dim('...')} ${dim(' MEM: 10.0MB')}`
+            `${cyan('[32:32.0]')}  start the timespan ${dim('...')} ${dim(' MEM: 10.0MB')}`,
           );
           expect(logMock).toHaveBeenNthCalledWith(
             2,
-            `${cyan('[32:42.0]')}  finish the timespan ${dim('in 10.00 s')} ${dim(' MEM: 10.0MB')}`
+            `${cyan('[32:42.0]')}  finish the timespan ${dim('in 10.00 s')} ${dim(' MEM: 10.0MB')}`,
           );
         });
 
@@ -194,7 +194,7 @@ describe('terminal-logger', () => {
             jest.advanceTimersByTime(10_000);
             timespan.finish('finish the timespan');
             expect(logMock).not.toHaveBeenCalled();
-          }
+          },
         );
       });
 
@@ -216,7 +216,7 @@ describe('terminal-logger', () => {
         expect(logMock).toHaveBeenNthCalledWith(1, `${dim('[32:32.0]')}  start the timespan ${dim('...')}`);
         expect(logMock).toHaveBeenNthCalledWith(
           2,
-          `${dim('[32:32.0]')}  finish the timespan ${dim('in less than 1 ms')}`
+          `${dim('[32:32.0]')}  finish the timespan ${dim('in less than 1 ms')}`,
         );
       });
 

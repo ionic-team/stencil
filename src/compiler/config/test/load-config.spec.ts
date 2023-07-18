@@ -34,7 +34,7 @@ describe('load config', () => {
         include: ['src'],
       },
       null,
-      2
+      2,
     );
 
     mock({
@@ -119,7 +119,7 @@ describe('load config', () => {
         level: 'error',
         lines: [],
         messageText: `Unable to load TypeScript config file. Please create a "tsconfig.json" file within the "./${path.dirname(
-          noTsConfigPath
+          noTsConfigPath,
         )}" directory.`,
         relFilePath: null,
         type: 'build',
@@ -137,7 +137,7 @@ describe('load config', () => {
         level: 'error',
         lines: [],
         messageText: expect.stringMatching(
-          `Unable to load TypeScript config file. Please create a "tsconfig.json" file within the`
+          `Unable to load TypeScript config file. Please create a "tsconfig.json" file within the`,
         ),
         relFilePath: null,
         type: 'build',

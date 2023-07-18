@@ -10,7 +10,7 @@ export const writeFetchSuccessSync = (
   url: string,
   filePath: string,
   content: string,
-  pkgVersions: Map<string, string>
+  pkgVersions: Map<string, string>,
 ) => {
   if (url.endsWith('package.json')) {
     setPackageVersionByContent(pkgVersions, content);
@@ -42,7 +42,7 @@ export const writeFetchSuccessAsync = async (
   url: string,
   filePath: string,
   content: string,
-  pkgVersions: Map<string, string>
+  pkgVersions: Map<string, string>,
 ) => {
   if (url.endsWith('package.json')) {
     setPackageVersionByContent(pkgVersions, content);

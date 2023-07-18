@@ -17,7 +17,7 @@ export const generateTypes = async (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
-  outputTarget: d.OutputTargetDistTypes
+  outputTarget: d.OutputTargetDistTypes,
 ): Promise<void> => {
   if (!buildCtx.hasError) {
     await generateTypesOutput(config, compilerCtx, buildCtx, outputTarget);
@@ -36,7 +36,7 @@ const generateTypesOutput = async (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
-  outputTarget: d.OutputTargetDistTypes
+  outputTarget: d.OutputTargetDistTypes,
 ): Promise<void> => {
   // get all type declaration files in a project's src/ directory
   const srcDirItems = await compilerCtx.fs.readdir(config.srcDir, { recursive: false });
@@ -54,7 +54,7 @@ const generateTypesOutput = async (
 
       await compilerCtx.fs.writeFile(distPath, distDtsContent);
       return distPath;
-    })
+    }),
   );
   const distDtsFilePath = copiedDTSFilePaths.slice(-1)[0];
 

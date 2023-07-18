@@ -61,7 +61,7 @@ describe('Custom Elements output target', () => {
       config.outputTargets = outputTargets;
       await outputCustomElements(config, compilerCtx, buildCtx);
       expect(bundleCustomElementsSpy).not.toHaveBeenCalled();
-    }
+    },
   );
 
   describe('generateEntryPoint', () => {
@@ -159,7 +159,7 @@ export * from '${USER_INDEX_ENTRY_ID}';
           config,
           buildCtx,
           compilerCtx,
-          config.outputTargets[0] as OutputTargetDistCustomElements
+          config.outputTargets[0] as OutputTargetDistCustomElements,
         );
         addCustomElementInputs(buildCtx, bundleOptions, config.outputTargets[0] as OutputTargetDistCustomElements);
         expect(bundleOptions.loader['\0core']).toEqual(
@@ -168,7 +168,7 @@ export { setAssetPath, setNonce, setPlatformOptions } from '${STENCIL_INTERNAL_C
 export * from '${USER_INDEX_ENTRY_ID}';
 
 globalScripts();
-`
+`,
         );
       });
     });
@@ -192,7 +192,7 @@ globalScripts();
           config,
           buildCtx,
           compilerCtx,
-          config.outputTargets[0] as OutputTargetDistCustomElements
+          config.outputTargets[0] as OutputTargetDistCustomElements,
         );
         addCustomElementInputs(buildCtx, bundleOptions, config.outputTargets[0] as OutputTargetDistCustomElements);
         expect(bundleOptions.loader['\0core']).toEqual(
@@ -203,7 +203,7 @@ export { StubCmp, defineCustomElement as defineCustomElementStubCmp } from '\0St
 export { MyBestComponent, defineCustomElement as defineCustomElementMyBestComponent } from '\0MyBestComponent';
 
 globalScripts();
-`
+`,
         );
       });
 
@@ -219,7 +219,7 @@ globalScripts();
           config,
           buildCtx,
           compilerCtx,
-          config.outputTargets[0] as OutputTargetDistCustomElements
+          config.outputTargets[0] as OutputTargetDistCustomElements,
         );
         addCustomElementInputs(buildCtx, bundleOptions, config.outputTargets[0] as OutputTargetDistCustomElements);
         expect(bundleOptions.loader['\0core']).toEqual(
@@ -229,7 +229,7 @@ export * from '${USER_INDEX_ENTRY_ID}';
 export { ComponentWithJsx, defineCustomElement as defineCustomElementComponentWithJsx } from '\0ComponentWithJsx';
 
 globalScripts();
-`
+`,
         );
       });
     });
@@ -252,7 +252,7 @@ globalScripts();
           config,
           buildCtx,
           compilerCtx,
-          config.outputTargets[0] as OutputTargetDistCustomElements
+          config.outputTargets[0] as OutputTargetDistCustomElements,
         );
         addCustomElementInputs(buildCtx, bundleOptions, config.outputTargets[0] as OutputTargetDistCustomElements);
         expect(bundleOptions.loader['\0core']).toEqual(
@@ -275,7 +275,7 @@ export const defineCustomElements = (opts) => {
         });
     }
 };
-`
+`,
         );
       });
     });

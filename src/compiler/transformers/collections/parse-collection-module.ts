@@ -5,12 +5,12 @@ import type * as d from '../../../declarations';
 import { parseCollectionManifest } from './parse-collection-manifest';
 
 export const parseCollection = (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   moduleId: string,
   pkgJsonFilePath: string,
-  pkgData: d.PackageJsonData
+  pkgData: d.PackageJsonData,
 ) => {
   // note this MUST be synchronous because this is used during transpile
   const collectionName = pkgData.name;

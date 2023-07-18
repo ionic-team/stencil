@@ -32,7 +32,7 @@ xdescribe('component-styles', () => {
           "target": "es2017"
         }
       }
-    `
+    `,
     );
 
     const { config } = validateConfig(
@@ -40,7 +40,7 @@ xdescribe('component-styles', () => {
         rootDir: '/',
         tsconfig: '/tsconfig.json',
       },
-      mockLoadConfigInit()
+      mockLoadConfigInit(),
     );
     config.sys = sys;
     compiler = await createCompiler(config);
@@ -86,7 +86,7 @@ xdescribe('component-styles', () => {
   it('should build one component w/ out inline style, and re-compile when adding inline styles', async () => {
     await compiler.sys.writeFile(
       path.join(root, 'src', 'cmp-a.tsx'),
-      `@Component({ tag: 'cmp-a' }) export class CmpA {}`
+      `@Component({ tag: 'cmp-a' }) export class CmpA {}`,
     );
     const watcher = await compiler.createWatcher();
     // compiler.config.watch = true;

@@ -13,7 +13,7 @@ export const addNativeElementGetter = (classMembers: ts.ClassElement[], cmp: d.C
       cmp.elementRef,
       [],
       undefined,
-      ts.factory.createBlock([ts.factory.createReturnStatement(ts.factory.createThis())])
+      ts.factory.createBlock([ts.factory.createReturnStatement(ts.factory.createThis())]),
     );
 
     ts.SyntaxKind.AmpersandToken;
@@ -21,7 +21,7 @@ export const addNativeElementGetter = (classMembers: ts.ClassElement[], cmp: d.C
     // ref identifier we have
     const index = classMembers.findIndex(
       (member) =>
-        member.kind === ts.SyntaxKind.PropertyDeclaration && (member.name as any)?.escapedText === cmp.elementRef
+        member.kind === ts.SyntaxKind.PropertyDeclaration && (member.name as any)?.escapedText === cmp.elementRef,
     );
 
     // Index should never not be a valid integer, but we'll be safe just in case.

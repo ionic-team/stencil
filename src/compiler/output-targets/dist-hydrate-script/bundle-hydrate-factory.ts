@@ -16,7 +16,7 @@ export const bundleHydrateFactory = async (
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   _build: d.BuildConditionals,
-  appFactoryEntryCode: string
+  appFactoryEntryCode: string,
 ) => {
   try {
     const bundleOpts: BundleOptions = {
@@ -56,7 +56,7 @@ export const bundleHydrateFactory = async (
  */
 const getCustomBeforeTransformers = (
   config: d.ValidatedConfig,
-  compilerCtx: d.CompilerCtx
+  compilerCtx: d.CompilerCtx,
 ): ts.TransformerFactory<ts.SourceFile>[] => {
   const transformOpts: d.TransformOptions = {
     coreImportPath: STENCIL_INTERNAL_HYDRATE_ID,
@@ -75,7 +75,7 @@ const getCustomBeforeTransformers = (
 
   customBeforeTransformers.push(
     hydrateComponentTransform(compilerCtx, transformOpts),
-    removeCollectionImports(compilerCtx)
+    removeCollectionImports(compilerCtx),
   );
   return customBeforeTransformers;
 };

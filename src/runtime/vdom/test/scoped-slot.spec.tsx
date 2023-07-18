@@ -282,10 +282,10 @@ describe('scoped slot', () => {
     expect(root.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('CAMEL');
     expect(root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('OWL');
     expect(
-      root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.nodeName
+      root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.nodeName,
     ).toBe('DINGO');
     expect(
-      root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.textContent
+      root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.textContent,
     ).toBe('parent message');
 
     forceUpdate(root);
@@ -296,10 +296,10 @@ describe('scoped slot', () => {
     expect(root.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('CAMEL');
     expect(root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('OWL');
     expect(
-      root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.nodeName
+      root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.nodeName,
     ).toBe('DINGO');
     expect(
-      root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.textContent
+      root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.textContent,
     ).toBe('parent message');
   });
 
@@ -398,7 +398,7 @@ describe('scoped slot', () => {
     expect(root.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('CHIPMUNK');
     expect(root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('BEAR');
     expect(root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.textContent).toBe(
-      'parent message'
+      'parent message',
     );
 
     root.msg = 'change 1';
@@ -658,10 +658,10 @@ describe('scoped slot', () => {
     expect(root.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('TEST-2');
     expect(root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('GOOSE');
     expect(
-      root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.nodeName
+      root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.nodeName,
     ).toBe('GOAT');
     expect(
-      root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.textContent
+      root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.textContent,
     ).toBe('1');
 
     forceUpdate(root);
@@ -672,10 +672,10 @@ describe('scoped slot', () => {
     expect(root.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('TEST-2');
     expect(root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('GOOSE');
     expect(
-      root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.nodeName
+      root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.nodeName,
     ).toBe('GOAT');
     expect(
-      root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.textContent
+      root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.textContent,
     ).toBe('2');
 
     forceUpdate(root);
@@ -686,10 +686,10 @@ describe('scoped slot', () => {
     expect(root.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('TEST-2');
     expect(root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.nodeName).toBe('GOOSE');
     expect(
-      root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.nodeName
+      root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.nodeName,
     ).toBe('GOAT');
     expect(
-      root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.textContent
+      root.firstElementChild.firstElementChild.firstElementChild.firstElementChild.firstElementChild.textContent,
     ).toBe('3');
   });
 

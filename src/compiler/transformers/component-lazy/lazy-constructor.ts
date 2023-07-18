@@ -8,7 +8,7 @@ import { retrieveTsModifiers } from '../transform-utils';
 export const updateLazyComponentConstructor = (
   classMembers: ts.ClassElement[],
   moduleFile: d.Module,
-  cmp: d.ComponentCompilerMeta
+  cmp: d.ComponentCompilerMeta,
 ) => {
   const cstrMethodArgs = [
     ts.factory.createParameterDeclaration(undefined, undefined, ts.factory.createIdentifier(HOST_REF_ARG)),
@@ -29,14 +29,14 @@ export const updateLazyComponentConstructor = (
       cstrMethod,
       retrieveTsModifiers(cstrMethod),
       cstrMethodArgs,
-      body
+      body,
     );
   } else {
     // create a constructor()
     const cstrMethod = ts.factory.createConstructorDeclaration(
       undefined,
       cstrMethodArgs,
-      ts.factory.createBlock([registerInstanceStatement(moduleFile), ...addCreateEvents(moduleFile, cmp)], true)
+      ts.factory.createBlock([registerInstanceStatement(moduleFile), ...addCreateEvents(moduleFile, cmp)], true),
     );
     classMembers.unshift(cstrMethod);
   }
@@ -49,7 +49,7 @@ const registerInstanceStatement = (moduleFile: d.Module) => {
     ts.factory.createCallExpression(ts.factory.createIdentifier(REGISTER_INSTANCE), undefined, [
       ts.factory.createThis(),
       ts.factory.createIdentifier(HOST_REF_ARG),
-    ])
+    ]),
   );
 };
 
