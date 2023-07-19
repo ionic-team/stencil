@@ -187,7 +187,7 @@ const getLazyEntry = (isBrowser: boolean): string => {
   } else {
     s.append(`import { globalScripts } from '${STENCIL_APP_GLOBALS_ID}';\n`);
     s.append(`export const defineCustomElements = (win, options) => {\n`);
-    s.append(`  if (typeof window === 'undefined') return Promise.resolve();\n`);
+    s.append(`  if (typeof window === 'undefined') return undefined;\n`);
     s.append(`  globalScripts();\n`);
     s.append(`  return bootstrapLazy([/*!__STENCIL_LAZY_DATA__*/], options);\n`);
     s.append(`};\n`);
