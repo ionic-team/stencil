@@ -231,13 +231,13 @@ export async function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<st
     console.log(
       `\n ${opts.vermoji}  ${color.bold.magenta(pkg.name)} ${color.bold.yellow(newVersion)} published!! ${
         opts.vermoji
-          }\n`,
+      }\n`,
     );
   } else {
     console.log(
       `\n ${opts.vermoji}  ${color.bold.magenta(pkg.name)} ${color.bold.yellow(
-            newVersion,
-          )} prepared, check the diffs and commit ${opts.vermoji}\n`,
+        newVersion,
+      )} prepared, check the diffs and commit ${opts.vermoji}\n`,
     );
   }
 }
