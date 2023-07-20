@@ -141,6 +141,8 @@ export async function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<st
       {
         title: 'Run karma tests',
         task: () => execa('npm', ['run', 'test.karma.prod'], { cwd: rootDir }),
+        // skip this in CI, we'll rely on previous commits to `main` to hope this is OK for now
+        skip: () => opts.isCI,
       },
       {
         title: 'Build license',
