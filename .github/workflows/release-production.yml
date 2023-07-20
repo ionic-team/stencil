@@ -45,7 +45,6 @@ jobs:
         shell: bash
 
       - name: Run Publish Preparation Script
-        # TODO(NOW): Remove hardcoded --any-branch
         run: npm run release.ci.prepare -- --version ${{ inputs.version }} --tag ${{ inputs.tag }} --any-branch
         shell: bash
 
@@ -76,6 +75,5 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Run Publish Scripts
-        # TODO(NOW): Remove --any-branch
         run: npm run release.ci -- --dry-run --version $(./bin/stencil version) --tag ${{ inputs.tag }} --any-branch
         shell: bash
