@@ -45,7 +45,7 @@ jobs:
         shell: bash
 
       - name: Run Publish Preparation Script
-        run: npm run release.ci.prepare -- --version ${{ inputs.version }} --tag ${{ inputs.tag }} --any-branch
+        run: npm run release.ci.prepare --userconfig=.npmrc -- --version ${{ inputs.version }} --tag ${{ inputs.tag }} --any-branch
         shell: bash
 
       - name: Log Generated Changes
