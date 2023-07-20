@@ -974,6 +974,7 @@ export interface CompilerSystem {
   applyGlobalPatch?(fromDir: string): Promise<void>;
   applyPrerenderGlobalPatch?(opts: { devServerHostUrl: string; window: any }): void;
   cacheStorage?: CacheStorage;
+  // TODO(STENCIL-898): Make this property non-optional, check for unnecessary null checks on it
   checkVersion?: (logger: Logger, currentVersion: string) => Promise<() => void>;
   copy?(copyTasks: Required<CopyTask>[], srcDir: string): Promise<CopyResults>;
   /**
