@@ -77,5 +77,5 @@ jobs:
 
       - name: Run Publish Scripts
         # TODO(NOW): Remove --any-branch
-        run: npm run release.ci -- --dry-run --version ${{ inputs.version }} --tag ${{ inputs.tag }} --any-branch
+        run: npm run release.ci -- --dry-run --version $(./bin/stencil version) --tag ${{ inputs.tag }} --any-branch
         shell: bash
