@@ -201,9 +201,9 @@ export async function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<st
           const cmd = 'git';
           const cmdArgs = ['push'];
 
-          if (isDryRun) {
-            return console.log(`[dry-run] ${cmd} ${cmdArgs.join(' ')}`);
-          }
+          // if (isDryRun) {
+          //   return console.log(`[dry-run] ${cmd} ${cmdArgs.join(' ')}`);
+          // }
           return execa(cmd, cmdArgs, { cwd: rootDir });
         },
       },
