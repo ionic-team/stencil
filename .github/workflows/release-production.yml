@@ -62,6 +62,8 @@ jobs:
       # - The version (and vermoji) is pulled directly from the compiled Stencil binary, as the value from the action's
       #   input form may be a word such as 'major'. This requires the version to have already been incremented to show
       #   the correct version in the commit message.
+      # - `stencil info` returns "<TAB>Stencil: <VERSION> <VERMOJI>
+      #   we match on "Stencil:" and capture the current version + vermoji to print "<VERMOJI> v<VERSION>"
       - name: Commit Release Preparations
         run: |
           git config user.name "Stencil Release Bot (on behalf of ${{ github.actor }})"
@@ -79,5 +81,7 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Run Publish Scripts
+        # pass the generated version number instead of the input, since we've already incremented it in the prerelease
+        # step
         run: npm run release.ci -- --dry-run --version $(./bin/stencil version) --tag ${{ inputs.tag }} --any-branch
         shell: bash
