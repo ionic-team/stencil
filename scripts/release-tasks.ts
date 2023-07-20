@@ -96,7 +96,7 @@ export async function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<st
             throw new Error('Not on `main` branch. Use --any-branch to publish anyway.');
           }
         }),
-      skip: () => isDryRun,
+      skip: () => isDryRun || opts.isCI, // in CI, we may be publishing from another branch
     },
     {
       title: 'Check local working tree',
@@ -141,8 +141,7 @@ export async function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<st
       {
         title: 'Run karma tests',
         task: () => execa('npm', ['run', 'test.karma.prod'], { cwd: rootDir }),
-        // skip this in CI, we'll rely on previous commits to `main` to hope this is OK for now
-        skip: () => opts.isCI,
+        skip: () => opts.isCI, // skip this in CI, we'll rely on previous commits to `main` to hope this is OK for now
       },
       {
         title: 'Build license',
