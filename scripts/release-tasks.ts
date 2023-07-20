@@ -196,6 +196,19 @@ export async function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<st
         },
       },
       {
+        title: 'Pushing git commits',
+        task: () => {
+          const cmd = 'git';
+          const cmdArgs = ['push'];
+
+          if (isDryRun) {
+            return console.log(`[dry-run] ${cmd} ${cmdArgs.join(' ')}`);
+          }
+          return execa(cmd, cmdArgs, { cwd: rootDir });
+        },
+        skip: () => opts.isCI, // on CI, the commit occurs on `main`, no need to push
+      },
+      {
         title: 'Pushing git tags',
         task: () => {
           const cmd = 'git';
