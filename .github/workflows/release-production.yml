@@ -83,5 +83,5 @@ jobs:
       - name: Run Publish Scripts
         # pass the generated version number instead of the input, since we've already incremented it in the prerelease
         # step
-        run: npm run release.ci -- --dry-run --version $(./bin/stencil version) --tag ${{ inputs.tag }} --any-branch
+        run: npm run release.ci -- --version $(./bin/stencil version) --tag ${{ inputs.tag }} --any-branch
         shell: bash
