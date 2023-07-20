@@ -103,7 +103,17 @@ export async function updateChangeLog(opts: BuildOptions): Promise<void> {
   // API Docs for conventional-changelog: https://github.com/conventional-changelog/conventional-changelog/tree/master/packages/conventional-changelog-core#api
   await execa(
     'node',
-    [ccPath, '--preset', 'angular', '--infile', opts.changelogPath, '--outfile', '--same-file', '--config', ccConfigPath],
+    [
+      ccPath,
+      '--preset',
+      'angular',
+      '--infile',
+      opts.changelogPath,
+      '--outfile',
+      '--same-file',
+      '--config',
+      ccConfigPath,
+    ],
     {
       cwd: opts.rootDir,
     },
