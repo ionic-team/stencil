@@ -215,6 +215,7 @@ export async function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<st
           }
           return postGithubRelease(opts);
         },
+        skip: () => opts.isCI,
       },
     );
   }
