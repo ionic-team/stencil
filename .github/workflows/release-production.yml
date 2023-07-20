@@ -55,15 +55,15 @@ jobs:
 
       # Commit the Changelog, NOTICE, License, package.json, etc.
       # Note:
-      # - The version is pulled directly from the compiled Stencil binary, as the value from the action's input form
-      #   may be a word such as 'major'. This requires the version to have already been incremented to show the correct
-      #   version in the commit message.
+      # - The version (and vermoji) is pulled directly from the compiled Stencil binary, as the value from the action's
+      #   input form may be a word such as 'major'. This requires the version to have already been incremented to show
+      #   the correct version in the commit message.
       - name: Commit Release Preparations
         run: |
           git config user.name "Stencil Release Bot (on behalf of ${{ github.actor }})"
           git config user.email "stencil-release-bot@ionic.io"
           git add .
-          git commit -m "v$(./bin/stencil version)"
+          git commit -m "$(./bin/stencil info | awk '/Stencil:/ { print $4,"v"$3;}')"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: bash
