@@ -106,7 +106,7 @@ export async function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<st
             throw new Error('Unclean working tree. Commit or stash changes first.');
           }
         }),
-      skip: () => true || isDryRun,
+      skip: () => isDryRun,
     },
     {
       title: 'Check remote history',
@@ -116,7 +116,7 @@ export async function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<st
             throw new Error('Remote history differs. Please pull changes.');
           }
         }),
-      skip: () => true || isDryRun,
+      skip: () => isDryRun,
     },
   );
 
@@ -134,14 +134,14 @@ export async function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<st
         title: `Bundle @stencil/core ${color.dim('(' + opts.buildId + ')')}`,
         task: () => bundleBuild(opts),
       },
-      // {
-      //   title: 'Run jest tests',
-      //   task: () => execa('npm', ['run', 'test.jest'], { cwd: rootDir }),
-      // },
-      // {
-      //   title: 'Run karma tests',
-      //   task: () => execa('npm', ['run', 'test.karma.prod'], { cwd: rootDir }),
-      // },
+      {
+        title: 'Run jest tests',
+        task: () => execa('npm', ['run', 'test.jest'], { cwd: rootDir }),
+      },
+      {
+        title: 'Run karma tests',
+        task: () => execa('npm', ['run', 'test.karma.prod'], { cwd: rootDir }),
+      },
       {
         title: 'Build license',
         task: () => createLicense(rootDir),
