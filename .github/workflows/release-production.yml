@@ -45,8 +45,8 @@ jobs:
         shell: bash
 
       - name: Run Publish Preparation Script
-        # TODO(NOW): Remove hardcoded values (need for release check) and --any-branch. Replace with commented out code
-        run: npm run release.ci.prepare -- --version 2.22.2-dev.1678795942.e009e9 --tag dev --any-branch # --version ${{ inputs.version }} --tag ${{ inputs.tag }}
+        # TODO(NOW): Remove hardcoded --any-branch
+        run: npm run release.ci.prepare -- --version ${{ inputs.version }} --tag ${{ inputs.tag }} --any-branch
         shell: bash
 
       - name: Log Generated Changes
@@ -76,6 +76,6 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Run Publish Scripts
-        # TODO(NOW): These values should feed in from the choices above. Replace with commented out code
-        run: npm run release.ci -- --dry-run --version 2.22.2-dev.1678795942.e009e9 --tag dev --any-branch # --version ${{ inputs.version }} --tag ${{ inputs.tag }}
+        # TODO(NOW): Remove --any-branch
+        run: npm run release.ci -- --dry-run --version ${{ inputs.version }} --tag ${{ inputs.tag }} --any-branch
         shell: bash
