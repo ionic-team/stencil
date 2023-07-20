@@ -206,7 +206,6 @@ export async function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<st
           }
           return execa(cmd, cmdArgs, { cwd: rootDir });
         },
-        skip: () => opts.isCI, // on CI, the commit occurs on `main`, no need to push
       },
       {
         title: 'Pushing git tags',
