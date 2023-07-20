@@ -66,7 +66,6 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: bash
-      #        TODO(): Who pushes what? GH Tag, GH commit, NPM Tag + release
 
       - name: Prepare NPM Token
         run: echo //registry.npmjs.org/:_authToken=${NPM_TOKEN} > .npmrc
