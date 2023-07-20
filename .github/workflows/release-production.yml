@@ -33,6 +33,11 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
+        with:
+          # A depth of 0 gets the entire git history.
+          # We need git history to generate the changelog; however, we don't know how deep to go.
+          # Since publishing is a one-off activity, just get everything.
+          fetch-depth: 0
 
       - name: Get Core Dependencies
         uses: ./.github/workflows/actions/get-core-dependencies
