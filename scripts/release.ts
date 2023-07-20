@@ -80,7 +80,6 @@ export async function release(rootDir: string, args: ReadonlyArray<string>): Pro
   }
 
   if (args.includes('--ci-publish')) {
-    // TODO(NOW): Refactor this. I just want a proof of concept of end to end
     const prepareOpts = getOptions(rootDir, {
       isCI: true,
       isPublishRelease: false,
@@ -101,7 +100,6 @@ export async function release(rootDir: string, args: ReadonlyArray<string>): Pro
     }
     const newTag = args[tagIdx + 1];
 
-    // TODO(NOW): This may be superfluous - but it's nice for debugging for now
     console.log(`${color.bold.blue(`Version: ${prepareOpts.version}`)}`);
     console.log(`${color.bold.blue(`Tag: ${newTag}`)}`);
 
