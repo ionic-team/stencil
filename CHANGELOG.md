@@ -1,3 +1,25 @@
+## 😈 [4.0.2](https://github.com/ionic-team/stencil/compare/v4.0.1...v4.0.2) (2023-07-24)
+
+
+### Bug Fixes
+
+* **compiler:** ensures transformed paths are relative paths for `dist-collection` ([#4552](https://github.com/ionic-team/stencil/issues/4552)) ([e11ac0e](https://github.com/ionic-team/stencil/commit/e11ac0e52f8ed1e3bc605779d893df3d4e767957))
+* **compiler:** handle `@supports` blocks when scoping css ([#4572](https://github.com/ionic-team/stencil/issues/4572)) ([18ed5fc](https://github.com/ionic-team/stencil/commit/18ed5fc0a8828c3df4a5b31e2778ceda48f49730))
+* **compiler:** only create one class member when transforming `@Element()` decorators ([#4547](https://github.com/ionic-team/stencil/issues/4547)) ([13fac03](https://github.com/ionic-team/stencil/commit/13fac0399fd08672832adb52ee3caed57aef2f2f))
+* **compiler:** sourcemap errors for dist-custom-elements + dist-hydrate-script ([#4527](https://github.com/ionic-team/stencil/issues/4527)) ([1d79672](https://github.com/ionic-team/stencil/commit/1d79672809dcaa3b56ec3761e46f9d1ef51915ad))
+* **compiler:** sourcemap generation without ext runtime ([#4570](https://github.com/ionic-team/stencil/issues/4570)) ([d1be334](https://github.com/ionic-team/stencil/commit/d1be334b5ed12381eafbcd05ab56029a9366a21d))
+* **lazy:** adjust the type of `defineCustomElements` ([#4592](https://github.com/ionic-team/stencil/issues/4592)) ([5c85c33](https://github.com/ionic-team/stencil/commit/5c85c332a7390b30fdba1d8598e618e5bf0f2b59))
+* **mock-doc:** adjust matchMedia mock return ([#4509](https://github.com/ionic-team/stencil/issues/4509)) ([3cda014](https://github.com/ionic-team/stencil/commit/3cda014035412c775f2b03b4feda337944907b8f))
+* **output-targets:** fix path normalization logic ([#4545](https://github.com/ionic-team/stencil/issues/4545)) ([cd5849c](https://github.com/ionic-team/stencil/commit/cd5849c6e1853750adde2b71791ca825f38f730d))
+* **rollup-config:** deprecate BundlingConfig#namedExports ([#4532](https://github.com/ionic-team/stencil/issues/4532)) ([a353769](https://github.com/ionic-team/stencil/commit/a353769b0094cd502a9ce35f797f74c7dc1d9232)), closes [#2523](https://github.com/ionic-team/stencil/issues/2523)
+* **runtime:** properly type color-interpolation-filter ([#4530](https://github.com/ionic-team/stencil/issues/4530)) ([3ccf753](https://github.com/ionic-team/stencil/commit/3ccf753f13ced6fa1339850882919192e912da30))
+
+
+## Thanks
+
+🎉 Thanks for @bdriguesdev for their contributions! 🎉
+
+
 ## ⛹ [4.0.1](https://github.com/ionic-team/stencil/compare/v4.0.0...v4.0.1) (2023-06-28)
 
 
@@ -127,6 +149,13 @@ See [BREAKING_CHANGES.md - v4.0.0](./BREAKING_CHANGES.md#stencil-v400) for a com
 
 See [the v4.0.0 Migration Guide](https://stenciljs.com/docs/introduction/upgrading-to-stencil-four) for a guide to migrate to Stencil v4.0.0.
 
+
+## ☀️ [3.4.2](https://github.com/ionic-team/stencil/compare/v3.4.1...v3.4.2) (2023-07-24)
+
+
+### Bug Fixes
+
+* **compiler:** ensures transformed paths are relative paths for `dist-collection` (v3) ([#4553](https://github.com/ionic-team/stencil/issues/4553)) ([2d3e0d3](https://github.com/ionic-team/stencil/commit/2d3e0d30507ad251b88b3381de8828a95a0057d0))
 
 
 ## 🐨 [3.4.1](https://github.com/ionic-team/stencil/compare/v3.4.0...v3.4.1) (2023-06-26)
