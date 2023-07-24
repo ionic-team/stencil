@@ -1,3 +1,12 @@
+## ☀️ [3.4.2](https://github.com/ionic-team/stencil/compare/v3.4.1...v3.4.2) (2023-07-24)
+
+
+### Bug Fixes
+
+* **compiler:** ensures transformed paths are relative paths for `dist-collection` (v3) ([#4553](https://github.com/ionic-team/stencil/issues/4553)) ([2d3e0d3](https://github.com/ionic-team/stencil/commit/2d3e0d30507ad251b88b3381de8828a95a0057d0))
+
+
+
 ## 🐨 [3.4.1](https://github.com/ionic-team/stencil/compare/v3.4.0...v3.4.1) (2023-06-26)
 
 
