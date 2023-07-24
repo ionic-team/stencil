@@ -63,11 +63,6 @@
       allowedVersions: '<5.0.0',
     },
     {
-      // TODO(STENCIL-771): Remove this entry + upgrade after the TypeScript 5.0 upgrade
-      matchPackageNames: ['dts-bundle-generator'],
-      allowedVersions: '<8.0.0',
-    },
-    {
       // disable Jest updates until the new testing architecture is in place
       matchPackageNames: ['@types/jest', 'jest', 'jest-cli', 'jest-environment-node'],
       groupName: 'Jest',
@@ -82,21 +77,6 @@
     {
       matchPackageNames: ['inquirer'],
       allowedVersions: '<=7.3.3',
-    },
-    // TODO(STENCIL-716): remove this once Stencil drops support for Node 14
-    {
-      matchPackageNames: ['@types/fs-extra'],
-      allowedVersions: '<10.0.0',
-    },
-    // TODO(STENCIL-716): remove this once Stencil drops support for Node 14
-    {
-      matchPackageNames: ['glob'],
-      allowedVersions: '<9.0.0',
-    },
-    // TODO(STENCIL-716): remove this once Stencil drops support for Node 14
-    {
-      matchPackageNames: ['minimatch'],
-      allowedVersions: '<6.0.0',
     },
     {
       matchPackagePrefixes: ['@typescript-eslint'],
