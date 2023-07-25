@@ -11,7 +11,6 @@ import {
   STENCIL_CORE_ID,
   STENCIL_INTERNAL_CLIENT_ID,
   STENCIL_INTERNAL_CLIENT_PATCH_BROWSER_ID,
-  STENCIL_INTERNAL_CLIENT_PATCH_ESM_ID,
   STENCIL_INTERNAL_HYDRATE_ID,
   STENCIL_INTERNAL_ID,
 } from './entry-alias-ids';
@@ -20,12 +19,11 @@ export const coreResolvePlugin = (
   config: d.Config,
   compilerCtx: d.CompilerCtx,
   platform: 'client' | 'hydrate' | 'worker',
-  externalRuntime: boolean
+  externalRuntime: boolean,
 ): Plugin => {
   const compilerExe = config.sys.getCompilerExecutingPath();
   const internalClient = getStencilInternalModule(config, compilerExe, 'client/index.js');
   const internalClientPatchBrowser = getStencilInternalModule(config, compilerExe, 'client/patch-browser.js');
-  const internalClientPatchEsm = getStencilInternalModule(config, compilerExe, 'client/patch-esm.js');
   const internalHydrate = getStencilInternalModule(config, compilerExe, 'hydrate/index.js');
 
   return {
@@ -70,15 +68,6 @@ export const coreResolvePlugin = (
           };
         }
         return internalClientPatchBrowser;
-      }
-      if (id === STENCIL_INTERNAL_CLIENT_PATCH_ESM_ID) {
-        if (externalRuntime) {
-          return {
-            id: STENCIL_INTERNAL_CLIENT_PATCH_ESM_ID,
-            external: true,
-          };
-        }
-        return internalClientPatchEsm;
       }
       if (id === STENCIL_INTERNAL_HYDRATE_ID) {
         return internalHydrate;
@@ -130,14 +119,6 @@ export const Build = {
       }
       return null;
     },
-
-    resolveImportMeta(prop, { format }) {
-      // TODO(STENCIL-661): Remove code related to the dynamic import shim
-      if (config.extras.__deprecated__dynamicImportShim && prop === 'url' && format === 'es') {
-        return '""';
-      }
-      return null;
-    },
   };
 };
 
@@ -148,7 +129,7 @@ export const getStencilInternalModule = (config: d.Config, compilerExe: string, 
         rootDir: config.rootDir,
         moduleId: '@stencil/core',
         path: 'internal/' + internalModule,
-      })
+      }),
     );
   }
 

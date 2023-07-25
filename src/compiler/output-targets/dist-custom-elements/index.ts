@@ -4,6 +4,7 @@ import {
   generatePreamble,
   getSourceMappingUrlForEndOfFile,
   hasError,
+  isOutputTargetDistCustomElements,
   isString,
   rollupToStencilSourceMap,
 } from '@utils';
@@ -19,9 +20,9 @@ import { addDefineCustomElementFunctions } from '../../transformers/component-na
 import { proxyCustomElement } from '../../transformers/component-native/proxy-custom-element-function';
 import { nativeComponentTransform } from '../../transformers/component-native/tranform-to-native-component';
 import { removeCollectionImports } from '../../transformers/remove-collection-imports';
+import { rewriteAliasedSourceFileImportPaths } from '../../transformers/rewrite-aliased-paths';
 import { updateStencilCoreImports } from '../../transformers/update-stencil-core-import';
-import { getCustomElementsBuildConditionals } from '../dist-custom-elements-bundle/custom-elements-build-conditionals';
-import { isOutputTargetDistCustomElements } from '../output-utils';
+import { getCustomElementsBuildConditionals } from './custom-elements-build-conditionals';
 
 /**
  * Main output target function for `dist-custom-elements`. This function just
@@ -37,7 +38,7 @@ import { isOutputTargetDistCustomElements } from '../output-utils';
 export const outputCustomElements = async (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
-  buildCtx: d.BuildCtx
+  buildCtx: d.BuildCtx,
 ): Promise<void> => {
   if (!config.buildDist) {
     return;
@@ -48,7 +49,7 @@ export const outputCustomElements = async (
     return;
   }
 
-  const bundlingEventMessage = 'generate custom elements';
+  const bundlingEventMessage = `generate custom elements${config.sourceMap ? ' + source maps' : ''}`;
   const timespan = buildCtx.createTimeSpan(`${bundlingEventMessage} started`);
 
   await Promise.all(outputTargets.map((target) => bundleCustomElements(config, compilerCtx, buildCtx, target)));
@@ -70,12 +71,12 @@ export const getBundleOptions = (
   config: d.ValidatedConfig,
   buildCtx: d.BuildCtx,
   compilerCtx: d.CompilerCtx,
-  outputTarget: d.OutputTargetDistCustomElements
+  outputTarget: d.OutputTargetDistCustomElements,
 ): BundleOptions => ({
   id: 'customElements',
   platform: 'client',
   conditionals: getCustomElementsBuildConditionals(config, buildCtx.components),
-  customTransformers: getCustomElementCustomTransformer(config, compilerCtx, buildCtx.components, outputTarget),
+  customBeforeTransformers: getCustomBeforeTransformers(config, compilerCtx, buildCtx.components, outputTarget),
   externalRuntime: !!outputTarget.externalRuntime,
   inlineWorkers: true,
   inputs: {
@@ -105,7 +106,7 @@ export const bundleCustomElements = async (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
-  outputTarget: d.OutputTargetDistCustomElements
+  outputTarget: d.OutputTargetDistCustomElements,
 ) => {
   try {
     const bundleOpts = getBundleOptions(config, buildCtx, compilerCtx, outputTarget);
@@ -184,7 +185,7 @@ export const bundleCustomElements = async (
 export const addCustomElementInputs = (
   buildCtx: d.BuildCtx,
   bundleOpts: BundleOptions,
-  outputTarget: d.OutputTargetDistCustomElements
+  outputTarget: d.OutputTargetDistCustomElements,
 ): void => {
   const components = buildCtx.components;
   // An array to store the imports of these modules that we're going to add to our entry chunk
@@ -204,11 +205,12 @@ export const addCustomElementInputs = (
 
     if (cmp.isPlain) {
       exp.push(`export { ${importName} as ${exportName} } from '${cmp.sourceFilePath}';`);
+      // TODO(STENCIL-855): Invalid syntax generation, note the unbalanced left curly brace
       indexExports.push(`export { {${exportName} } from '${coreKey}';`);
     } else {
       // the `importName` may collide with the `exportName`, alias it just in case it does with `importAs`
       exp.push(
-        `import { ${importName} as ${importAs}, defineCustomElement as cmpDefCustomEle } from '${cmp.sourceFilePath}';`
+        `import { ${importName} as ${importAs}, defineCustomElement as cmpDefCustomEle } from '${cmp.sourceFilePath}';`,
       );
       exp.push(`export const ${exportName} = ${importAs};`);
       exp.push(`export const defineCustomElement = cmpDefCustomEle;`);
@@ -220,7 +222,7 @@ export const addCustomElementInputs = (
       // `cmp.sourceFilePath`, we would end up with duplicated modules in our
       // output.
       indexExports.push(
-        `export { ${exportName}, defineCustomElement as defineCustomElement${exportName} } from '${coreKey}';`
+        `export { ${exportName}, defineCustomElement as defineCustomElement${exportName} } from '${coreKey}';`,
       );
     }
 
@@ -247,7 +249,7 @@ export const generateEntryPoint = (
   outputTarget: d.OutputTargetDistCustomElements,
   cmpImports: string[] = [],
   cmpExports: string[] = [],
-  cmpNames: string[] = []
+  cmpNames: string[] = [],
 ): string => {
   const body: string[] = [];
   const imports: string[] = [];
@@ -256,7 +258,7 @@ export const generateEntryPoint = (
   // Exports that are always present
   exports.push(
     `export { setAssetPath, setNonce, setPlatformOptions } from '${STENCIL_INTERNAL_CLIENT_ID}';`,
-    `export * from '${USER_INDEX_ENTRY_ID}';`
+    `export * from '${USER_INDEX_ENTRY_ID}';`,
   );
 
   // Content related to global scripts
@@ -279,7 +281,7 @@ export const generateEntryPoint = (
       '            }',
       '        });',
       '    }',
-      '};'
+      '};',
     );
   }
 
@@ -313,11 +315,11 @@ export const generateEntryPoint = (
  * @param outputTarget the output target configuration
  * @returns a list of transformers to use in the transpilation process
  */
-const getCustomElementCustomTransformer = (
+const getCustomBeforeTransformers = (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   components: d.ComponentCompilerMeta[],
-  outputTarget: d.OutputTargetDistCustomElements
+  outputTarget: d.OutputTargetDistCustomElements,
 ): ts.TransformerFactory<ts.SourceFile>[] => {
   const transformOpts: d.TransformOptions = {
     coreImportPath: STENCIL_INTERNAL_CLIENT_ID,
@@ -328,11 +330,19 @@ const getCustomElementCustomTransformer = (
     style: 'static',
     styleImportData: 'queryparams',
   };
-  return [
+  const customBeforeTransformers = [
     addDefineCustomElementFunctions(compilerCtx, components, outputTarget),
     updateStencilCoreImports(transformOpts.coreImportPath),
+  ];
+
+  if (config.transformAliasedImportPaths) {
+    customBeforeTransformers.push(rewriteAliasedSourceFileImportPaths);
+  }
+
+  customBeforeTransformers.push(
     nativeComponentTransform(compilerCtx, transformOpts),
     proxyCustomElement(compilerCtx, transformOpts),
     removeCollectionImports(compilerCtx),
-  ];
+  );
+  return customBeforeTransformers;
 };

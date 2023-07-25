@@ -1,16 +1,11 @@
-import { IS_NODE_ENV } from '../compiler/sys/environment';
 import type { TestingRunOptions, ValidatedConfig } from '../declarations';
 
 /**
  * Entrypoint for any Stencil tests
  * @param config a validated Stencil configuration entity
+ * @returns a void promise
  */
 export const taskTest = async (config: ValidatedConfig): Promise<void> => {
-  if (!IS_NODE_ENV) {
-    config.logger.error(`"test" command is currently only implemented for a NodeJS environment`);
-    return config.sys.exit(1);
-  }
-
   config.buildDocs = false;
   const testingRunOpts: TestingRunOptions = {
     e2e: !!config.flags.e2e,
@@ -33,8 +28,8 @@ export const taskTest = async (config: ValidatedConfig): Promise<void> => {
       // ensure we've got pixelmatch for screenshots
       config.logger.warn(
         config.logger.yellow(
-          `EXPERIMENTAL: screenshot visual diff testing is currently under heavy development and has not reached a stable status. However, any assistance testing would be appreciated.`
-        )
+          `EXPERIMENTAL: screenshot visual diff testing is currently under heavy development and has not reached a stable status. However, any assistance testing would be appreciated.`,
+        ),
       );
     }
   }

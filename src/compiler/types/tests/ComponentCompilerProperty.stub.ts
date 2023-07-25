@@ -8,7 +8,7 @@ import * as d from '@stencil/core/declarations';
  * @returns the stubbed `ComponentCompilerProperty`
  */
 export const stubComponentCompilerProperty = (
-  overrides: Partial<d.ComponentCompilerProperty> = {}
+  overrides: Partial<d.ComponentCompilerProperty> = {},
 ): d.ComponentCompilerProperty => {
   const defaults: d.ComponentCompilerProperty = {
     attribute: 'my-cmp',
@@ -17,6 +17,7 @@ export const stubComponentCompilerProperty = (
       resolved: '123 | 456',
       references: {
         UserImplementedEventType: {
+          id: 'placeholder',
           location: 'import',
           path: './resources',
         },

@@ -31,7 +31,7 @@ describe('validateDistCollectionOutputTarget', () => {
         empty: false,
         dir: defaultDir,
         collectionDir: null,
-        transformAliasedImportPaths: false,
+        transformAliasedImportPaths: true,
       },
     ]);
   });
@@ -53,7 +53,7 @@ describe('validateDistCollectionOutputTarget', () => {
         empty: false,
         dir: '/my-dist',
         collectionDir: null,
-        transformAliasedImportPaths: false,
+        transformAliasedImportPaths: true,
       },
     ]);
   });
@@ -82,7 +82,7 @@ describe('validateDistCollectionOutputTarget', () => {
             transformAliasedImportPaths,
           },
         ]);
-      }
+      },
     );
   });
 });

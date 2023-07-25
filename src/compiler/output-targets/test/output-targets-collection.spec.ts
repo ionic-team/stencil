@@ -1,5 +1,4 @@
 import { mockBuildCtx, mockCompilerCtx, mockModule, mockValidatedConfig } from '@stencil/core/testing';
-import { normalize } from 'path';
 
 import type * as d from '../../../declarations';
 import * as test from '../../transformers/map-imports-to-path-aliases';
@@ -47,7 +46,7 @@ describe('Dist Collection output target', () => {
 
   describe('transform aliased import paths', () => {
     // These tests ensure that the transformer for import paths is called regardless
-    // of the config value (the function will decided whether or not to actually do anything) to avoid
+    // of the config value (the function will decide whether or not to actually do anything) to avoid
     // a race condition with duplicate file writes
     it.each([true, false])(
       'calls function to transform aliased import paths when the output target config flag is `%s`',
@@ -61,14 +60,14 @@ describe('Dist Collection output target', () => {
 
         await outputCollection(mockConfig, mockedCompilerCtx, mockedBuildCtx, changedModules);
 
-        expect(mapImportPathSpy).toHaveBeenCalledWith(mockConfig, normalize('/dist/collection/main.js'), {
+        expect(mapImportPathSpy).toHaveBeenCalledWith(mockConfig, '/dist/collection/main.js', {
           collectionDir: '/dist/collection',
           dir: '',
           transformAliasedImportPaths,
           type: 'dist-collection',
         });
         expect(mapImportPathSpy).toHaveBeenCalledTimes(1);
-      }
+      },
     );
   });
 });

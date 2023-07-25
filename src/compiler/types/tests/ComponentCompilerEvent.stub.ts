@@ -8,7 +8,7 @@ import * as d from '@stencil/core/declarations';
  * @returns the stubbed `ComponentCompilerEvent`
  */
 export const stubComponentCompilerEvent = (
-  overrides: Partial<d.ComponentCompilerEvent> = {}
+  overrides: Partial<d.ComponentCompilerEvent> = {},
 ): d.ComponentCompilerEvent => {
   const defaults: d.ComponentCompilerEvent = {
     bubbles: true,
@@ -22,6 +22,7 @@ export const stubComponentCompilerEvent = (
       resolved: '"foo" | "bar"',
       references: {
         UserImplementedEventType: {
+          id: 'placeholder',
           location: 'import',
           path: './resources',
         },

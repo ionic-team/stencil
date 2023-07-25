@@ -1,8 +1,7 @@
-import { buildError, isString } from '@utils';
+import { buildError, isOutputTargetDist, isOutputTargetWww, isString } from '@utils';
 import { basename, dirname, isAbsolute, join } from 'path';
 
 import type * as d from '../../declarations';
-import { isOutputTargetDist, isOutputTargetWww } from '../output-targets/output-utils';
 import { isLocalModule } from '../sys/resolve/resolve-utils';
 
 export const validateTesting = (config: d.ValidatedConfig, diagnostics: d.Diagnostic[]) => {
@@ -21,9 +20,9 @@ export const validateTesting = (config: d.ValidatedConfig, diagnostics: d.Diagno
     configPathDir = config.rootDir!;
   }
 
-  if (typeof config.flags.headless === 'boolean') {
+  if (typeof config.flags.headless === 'boolean' || config.flags.headless === 'new') {
     testing.browserHeadless = config.flags.headless;
-  } else if (typeof testing.browserHeadless !== 'boolean') {
+  } else if (typeof testing.browserHeadless !== 'boolean' && testing.browserHeadless !== 'new') {
     testing.browserHeadless = true;
   }
 
@@ -39,7 +38,10 @@ export const validateTesting = (config: d.ValidatedConfig, diagnostics: d.Diagno
     addTestingConfigOption(testing.browserArgs, '--no-sandbox');
     addTestingConfigOption(testing.browserArgs, '--disable-setuid-sandbox');
     addTestingConfigOption(testing.browserArgs, '--disable-dev-shm-usage');
-    testing.browserHeadless = true;
+    testing.browserHeadless = testing.browserHeadless === 'new' ? 'new' : true;
+  } else if (config.flags.devtools || testing.browserDevtools) {
+    testing.browserDevtools = true;
+    testing.browserHeadless = false;
   }
 
   if (typeof testing.rootDir === 'string') {
@@ -64,7 +66,7 @@ export const validateTesting = (config: d.ValidatedConfig, diagnostics: d.Diagno
       '..',
       '..',
       'screenshot',
-      'local-connector.js'
+      'local-connector.js',
     );
   }
 
@@ -75,7 +77,7 @@ export const validateTesting = (config: d.ValidatedConfig, diagnostics: d.Diagno
 
     (config.outputTargets ?? [])
       .filter(
-        (o): o is d.OutputTargetWww | d.OutputTargetDist => (isOutputTargetDist(o) || isOutputTargetWww(o)) && !!o.dir
+        (o): o is d.OutputTargetWww | d.OutputTargetDist => (isOutputTargetDist(o) || isOutputTargetWww(o)) && !!o.dir,
       )
       .forEach((outputTarget) => {
         testing.testPathIgnorePatterns?.push(outputTarget.dir!);
@@ -93,7 +95,7 @@ export const validateTesting = (config: d.ValidatedConfig, diagnostics: d.Diagno
   }
 
   testing.setupFilesAfterEnv.unshift(
-    join(config.sys!.getCompilerExecutingPath(), '..', '..', 'testing', 'jest-setuptestframework.js')
+    join(config.sys!.getCompilerExecutingPath(), '..', '..', 'testing', 'jest-setuptestframework.js'),
   );
 
   if (isString(testing.testEnvironment)) {

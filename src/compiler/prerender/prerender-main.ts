@@ -1,10 +1,9 @@
-import { buildError, catchError, hasError, isString } from '@utils';
+import { buildError, catchError, hasError, isOutputTargetWww, isString } from '@utils';
 import { isAbsolute, join } from 'path';
 
 import type * as d from '../../declarations';
 import { createHydrateBuildId } from '../../hydrate/runner/render-utils';
 import { getAbsoluteBuildDir } from '../html/html-utils';
-import { isOutputTargetWww } from '../output-targets/output-utils';
 import { createWorkerMainContext } from '../worker/main-thread';
 import { createWorkerContext } from '../worker/worker-thread';
 import { getPrerenderConfig } from './prerender-config';
@@ -28,7 +27,7 @@ const runPrerender = async (
   hydrateAppFilePath: string,
   componentGraph: d.BuildResultsComponentGraph,
   srcIndexHtmlPath: string,
-  buildId: string
+  buildId: string,
 ) => {
   const startTime = Date.now();
   const diagnostics: d.Diagnostic[] = [];
@@ -99,9 +98,9 @@ const runPrerender = async (
             hydrateAppFilePath,
             componentGraph,
             srcIndexHtmlPath,
-            outputTarget
+            outputTarget,
           );
-        })
+        }),
       );
     } catch (e: any) {
       catchError(diagnostics, e);
@@ -132,7 +131,7 @@ const runPrerenderOutputTarget = async (
   hydrateAppFilePath: string,
   componentGraph: d.BuildResultsComponentGraph,
   srcIndexHtmlPath: string,
-  outputTarget: d.OutputTargetWww
+  outputTarget: d.OutputTargetWww,
 ) => {
   try {
     const timeSpan = config.logger.createTimeSpan(`prerendering started`);
@@ -193,7 +192,7 @@ const runPrerenderOutputTarget = async (
       srcIndexHtmlPath,
       outputTarget,
       hydrateOpts,
-      manager
+      manager,
     );
     if (diagnostics.length > 0 || !templateData || !isString(templateData.html)) {
       return;
@@ -265,7 +264,7 @@ const createPrerenderTemplate = async (config: d.Config, templateHtml: string) =
 const createComponentGraphPath = async (
   config: d.Config,
   componentGraph: d.BuildResultsComponentGraph,
-  outputTarget: d.OutputTargetWww
+  outputTarget: d.OutputTargetWww,
 ) => {
   if (componentGraph) {
     const content = getComponentPathContent(componentGraph, outputTarget);

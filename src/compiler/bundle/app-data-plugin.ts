@@ -6,20 +6,14 @@ import ts from 'typescript';
 
 import type * as d from '../../declarations';
 import { removeCollectionImports } from '../transformers/remove-collection-imports';
-import {
-  APP_DATA_CONDITIONAL,
-  STENCIL_APP_DATA_ID,
-  STENCIL_APP_GLOBALS_ID,
-  STENCIL_CORE_ID,
-  STENCIL_INTERNAL_HYDRATE_ID,
-} from './entry-alias-ids';
+import { APP_DATA_CONDITIONAL, STENCIL_APP_DATA_ID, STENCIL_APP_GLOBALS_ID } from './entry-alias-ids';
 
 export const appDataPlugin = (
   config: d.Config,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   build: d.BuildConditionals,
-  platform: 'client' | 'hydrate' | 'worker'
+  platform: 'client' | 'hydrate' | 'worker',
 ): Plugin => {
   if (!platform) {
     return {
@@ -93,7 +87,7 @@ export const appDataPlugin = (
         const program = this.parse(code, {});
         const needsDefault = !(program as any).body.some((s: any) => s.type === 'ExportDefaultDeclaration');
         const defaultExport = needsDefault ? '\nexport const globalFn = () => {};\nexport default globalFn;' : '';
-        code = getContextImport(platform) + code + defaultExport;
+        code = code + defaultExport;
 
         const compilerOptions: ts.CompilerOptions = { ...config.tsCompilerOptions };
         compilerOptions.module = ts.ModuleKind.ESNext;
@@ -118,7 +112,17 @@ export const appDataPlugin = (
             hires: true,
           });
 
-          return { code: results.outputText, map: codeMap };
+          return {
+            code: results.outputText,
+            map: {
+              ...codeMap,
+              // MagicString changed their types in this PR: https://github.com/Rich-Harris/magic-string/pull/235
+              // so that their `sourcesContent` is of type `(string | null)[]`. But, it will only return `[null]` if
+              // `includeContent` is set to `false`. Since we explicitly set `includeContent: true`, we can override
+              // the type to satisfy Rollup's type expectation
+              sourcesContent: codeMap.sourcesContent as string[],
+            },
+          };
         }
 
         return { code: results.outputText };
@@ -193,10 +197,6 @@ const appendEnv = (config: d.Config, s: MagicString) => {
 
 const appendNamespace = (config: d.Config, s: MagicString) => {
   s.append(`export const NAMESPACE = '${config.fsNamespace}';\n`);
-};
-
-const getContextImport = (platform: string) => {
-  return `import { Context } from '${platform === 'hydrate' ? STENCIL_INTERNAL_HYDRATE_ID : STENCIL_CORE_ID}';\n`;
 };
 
 interface GlobalScript {

@@ -1,10 +1,8 @@
-import * as coreCompiler from '@stencil/core/compiler';
 import { mockCompilerSystem, mockValidatedConfig } from '@stencil/core/testing';
 
 import type * as d from '../../declarations';
 import * as utils from '../../utils/validation';
 import { createConfigFlags } from '../config-flags';
-import { CoreCompiler } from '../load-compiler';
 import { BoilerplateFile, getBoilerplateByExtension, taskGenerate } from '../task-generate';
 
 const promptMock = jest.fn().mockResolvedValue('my-component');
@@ -41,13 +39,12 @@ const setup = async () => {
 /**
  * Little test helper function which just temporarily silences
  * console.log calls, so we can avoid spewing a bunch of stuff.
- * @param coreCompiler the core compiler instance to forward to `taskGenerate`
  * @param config the user-supplied config to forward to `taskGenerate`
  */
-async function silentGenerate(coreCompiler: CoreCompiler, config: d.ValidatedConfig): Promise<void> {
+async function silentGenerate(config: d.ValidatedConfig): Promise<void> {
   const tmp = console.log;
   console.log = jest.fn();
-  await taskGenerate(coreCompiler, config);
+  await taskGenerate(config);
   console.log = tmp;
 }
 
@@ -65,17 +62,17 @@ describe('generate task', () => {
   it('should exit with an error if no `configPath` is supplied', async () => {
     const { config, errorSpy } = await setup();
     config.configPath = undefined;
-    await taskGenerate(coreCompiler, config);
+    await taskGenerate(config);
     expect(config.sys.exit).toHaveBeenCalledWith(1);
     expect(errorSpy).toHaveBeenCalledWith(
-      'Please run this command in your root directory (i. e. the one containing stencil.config.ts).'
+      'Please run this command in your root directory (i. e. the one containing stencil.config.ts).',
     );
   });
 
   it('should exit with an error if no `srcDir` is supplied', async () => {
     const { config, errorSpy } = await setup();
     config.srcDir = undefined;
-    await taskGenerate(coreCompiler, config);
+    await taskGenerate(config);
     expect(config.sys.exit).toHaveBeenCalledWith(1);
     expect(errorSpy).toHaveBeenCalledWith("Stencil's srcDir was not specified.");
   });
@@ -83,7 +80,7 @@ describe('generate task', () => {
   it('should exit with an error if the component name does not validate', async () => {
     const { config, errorSpy, validateTagSpy } = await setup();
     validateTagSpy.mockReturnValue('error error error');
-    await taskGenerate(coreCompiler, config);
+    await taskGenerate(config);
     expect(config.sys.exit).toHaveBeenCalledWith(1);
     expect(errorSpy).toHaveBeenCalledWith('error error error');
   });
@@ -99,17 +96,17 @@ describe('generate task', () => {
     }
 
     const createDirSpy = jest.spyOn(config.sys, 'createDir');
-    await silentGenerate(coreCompiler, config);
+    await silentGenerate(config);
     expect(createDirSpy).toHaveBeenCalledWith(
       includeTests ? `${config.srcDir}/components/my-component/test` : `${config.srcDir}/components/my-component`,
-      { recursive: true }
+      { recursive: true },
     );
   });
 
   it('should generate the files the user picked', async () => {
     const { config } = await setup();
     const writeFileSpy = jest.spyOn(config.sys, 'writeFile');
-    await silentGenerate(coreCompiler, config);
+    await silentGenerate(config);
     const userChoices: ReadonlyArray<BoilerplateFile> = [
       { extension: 'tsx', path: '/src/components/my-component/my-component.tsx' },
       { extension: 'css', path: '/src/components/my-component/my-component.css' },
@@ -120,7 +117,7 @@ describe('generate task', () => {
     userChoices.forEach((file) => {
       expect(writeFileSpy).toHaveBeenCalledWith(
         file.path,
-        getBoilerplateByExtension('my-component', file.extension, true)
+        getBoilerplateByExtension('my-component', file.extension, true),
       );
     });
   });
@@ -128,13 +125,13 @@ describe('generate task', () => {
   it('should error without writing anything if a to-be-generated file is already present', async () => {
     const { config, errorSpy } = await setup();
     jest.spyOn(config.sys, 'readFile').mockResolvedValue('some file contents');
-    await silentGenerate(coreCompiler, config);
+    await silentGenerate(config);
     expect(errorSpy).toHaveBeenCalledWith(
       'Generating code would overwrite the following files:',
       '\t/src/components/my-component/my-component.tsx',
       '\t/src/components/my-component/my-component.css',
       '\t/src/components/my-component/test/my-component.spec.tsx',
-      '\t/src/components/my-component/test/my-component.e2e.ts'
+      '\t/src/components/my-component/test/my-component.e2e.ts',
     );
     expect(config.sys.exit).toHaveBeenCalledWith(1);
   });

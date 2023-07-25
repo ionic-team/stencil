@@ -10,7 +10,7 @@ export const getClientPolyfill = async (config: d.Config, compilerCtx: d.Compile
     'internal',
     'client',
     'polyfills',
-    polyfillFile
+    polyfillFile,
   );
   return compilerCtx.fs.readFile(polyfillFilePath);
 };
@@ -19,13 +19,8 @@ export const getAppBrowserCorePolyfills = async (config: d.Config, compilerCtx: 
   // read all the polyfill content, in this particular order
   const polyfills = INLINE_POLYFILLS.slice();
 
-  // TODO(STENCIL-659): Remove code implementing the CSS variable shim
-  if (config.extras.__deprecated__cssVarsShim) {
-    polyfills.push(INLINE_CSS_SHIM);
-  }
-
   const results = await Promise.all(
-    polyfills.map((polyfillFile) => getClientPolyfill(config, compilerCtx, polyfillFile))
+    polyfills.map((polyfillFile) => getClientPolyfill(config, compilerCtx, polyfillFile)),
   );
 
   // concat the polyfills
@@ -35,5 +30,3 @@ export const getAppBrowserCorePolyfills = async (config: d.Config, compilerCtx: 
 // order of the polyfills matters!! test test test
 // actual source of the polyfills are found in /src/client/polyfills/
 const INLINE_POLYFILLS = ['core-js.js', 'dom.js', 'es5-html-element.js', 'system.js'];
-
-const INLINE_CSS_SHIM = 'css-shim.js';

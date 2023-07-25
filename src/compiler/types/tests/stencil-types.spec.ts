@@ -32,7 +32,7 @@ describe('stencil-types', () => {
           {},
           {},
           stubComponentCompilerMeta().sourceFilePath,
-          expectedTypeName
+          expectedTypeName,
         );
 
         expect(actualTypeName).toBe(expectedTypeName);
@@ -48,7 +48,7 @@ describe('stencil-types', () => {
           typeReferences,
           {},
           stubComponentCompilerMeta().sourceFilePath,
-          expectedTypeName
+          expectedTypeName,
         );
 
         expect(actualTypeName).toBe(expectedTypeName);
@@ -65,7 +65,7 @@ describe('stencil-types', () => {
           typeReferences,
           {},
           stubComponentCompilerMeta().sourceFilePath,
-          expectedTypeName
+          expectedTypeName,
         );
 
         expect(actualTypeName).toBe(expectedTypeName);
@@ -94,7 +94,7 @@ describe('stencil-types', () => {
           typeReferences,
           typeImports,
           componentCompilerMeta.sourceFilePath,
-          initialType
+          initialType,
         );
 
         expect(actualTypeName).toBe(initialType);
@@ -160,7 +160,7 @@ describe('stencil-types', () => {
           typeReferences,
           typeImports,
           componentCompilerMeta.sourceFilePath,
-          initialType
+          initialType,
         );
 
         expect(actualTypeName).toBe(expectedType);
@@ -271,7 +271,7 @@ describe('stencil-types', () => {
     const expectTypeIsTransformed = (
       initialType: string,
       expectedType: string,
-      typeMemberNames: d.TypesMemberNameData[]
+      typeMemberNames: d.TypesMemberNameData[],
     ) => {
       const basePath = '~/some/stubbed/path';
 
@@ -290,7 +290,7 @@ describe('stencil-types', () => {
         typeReferences,
         typeImports,
         componentCompilerMeta.sourceFilePath,
-        initialType
+        initialType,
       );
 
       expect(actualTypeName).toBe(expectedType);

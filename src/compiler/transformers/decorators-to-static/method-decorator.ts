@@ -23,12 +23,13 @@ export const methodDecoratorsToStatic = (
   cmpNode: ts.ClassDeclaration,
   decoratedProps: ts.ClassElement[],
   typeChecker: ts.TypeChecker,
-  newMembers: ts.ClassElement[]
+  program: ts.Program,
+  newMembers: ts.ClassElement[],
 ) => {
   const tsSourceFile = cmpNode.getSourceFile();
   const methods = decoratedProps
     .filter(ts.isMethodDeclaration)
-    .map((method) => parseMethodDecorator(config, diagnostics, tsSourceFile, typeChecker, method))
+    .map((method) => parseMethodDecorator(config, diagnostics, tsSourceFile, typeChecker, program, method))
     .filter((method) => !!method);
 
   if (methods.length > 0) {
@@ -41,7 +42,8 @@ const parseMethodDecorator = (
   diagnostics: d.Diagnostic[],
   tsSourceFile: ts.SourceFile,
   typeChecker: ts.TypeChecker,
-  method: ts.MethodDeclaration
+  program: ts.Program,
+  method: ts.MethodDeclaration,
 ): ts.PropertyAssignment | null => {
   const methodDecorator = retrieveTsDecorators(method)?.find(isDecoratorNamed('Method'));
   if (methodDecorator == null) {
@@ -55,7 +57,7 @@ const parseMethodDecorator = (
   const returnTypeNode = typeChecker.typeToTypeNode(
     returnType,
     method,
-    ts.NodeBuilderFlags.NoTruncation | ts.NodeBuilderFlags.NoTypeReduction
+    ts.NodeBuilderFlags.NoTruncation | ts.NodeBuilderFlags.NoTypeReduction,
   );
   let returnString = typeToString(typeChecker, returnType);
   let signatureString = typeChecker.signatureToString(signature, method, flags, ts.SignatureKind.Call);
@@ -92,8 +94,8 @@ const parseMethodDecorator = (
       signature: signatureString,
       parameters: signature.parameters.map((symbol) => serializeSymbol(typeChecker, symbol)),
       references: {
-        ...getAttributeTypeInfo(returnTypeNode, tsSourceFile),
-        ...getAttributeTypeInfo(method, tsSourceFile),
+        ...getAttributeTypeInfo(returnTypeNode, tsSourceFile, typeChecker, program),
+        ...getAttributeTypeInfo(method, tsSourceFile, typeChecker, program),
       },
       return: returnString,
     },
@@ -106,7 +108,7 @@ const parseMethodDecorator = (
 
   const staticProp = ts.factory.createPropertyAssignment(
     ts.factory.createStringLiteral(methodName),
-    convertValueToLiteral(methodMeta)
+    convertValueToLiteral(methodMeta),
   );
 
   return staticProp;

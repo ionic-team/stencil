@@ -1,15 +1,11 @@
-import { buildError, isBoolean, isNumber, isString, normalizePath } from '@utils';
+import { buildError, isBoolean, isNumber, isOutputTargetWww, isString, normalizePath } from '@utils';
 import { isAbsolute, join } from 'path';
 
 import type * as d from '../../declarations';
-import { isOutputTargetWww } from '../output-targets/output-utils';
 
-export const validateDevServer = (
-  config: d.ValidatedConfig,
-  diagnostics: d.Diagnostic[]
-): d.DevServerConfig | undefined => {
+export const validateDevServer = (config: d.ValidatedConfig, diagnostics: d.Diagnostic[]): d.DevServerConfig => {
   if ((config.devServer === null || (config.devServer as any)) === false) {
-    return undefined;
+    return {};
   }
 
   const { flags } = config;

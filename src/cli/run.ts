@@ -1,6 +1,5 @@
-import { hasError, isFunction, shouldIgnoreError } from '@utils';
+import { hasError, isFunction, result, shouldIgnoreError } from '@utils';
 
-import { createLogger } from '../compiler/sys/logger/console-logger';
 import type * as d from '../declarations';
 import { ValidatedConfig } from '../declarations';
 import { createConfigFlags } from './config-flags';
@@ -47,8 +46,8 @@ export const run = async (init: d.CliInitOptions) => {
     startupLog(logger, task);
 
     const findConfigResults = await findConfig({ sys, configPath: flags.config });
-    if (hasError(findConfigResults.diagnostics)) {
-      logger.printDiagnostics(findConfigResults.diagnostics);
+    if (findConfigResults.isErr) {
+      logger.printDiagnostics(findConfigResults.value);
       return sys.exit(1);
     }
 
@@ -68,11 +67,12 @@ export const run = async (init: d.CliInitOptions) => {
       return;
     }
 
+    const foundConfig = result.unwrap(findConfigResults);
     const validated = await coreCompiler.loadConfig({
       config: {
         flags,
       },
-      configPath: findConfigResults.configPath,
+      configPath: foundConfig.configPath,
       logger,
       sys,
     });
@@ -102,32 +102,27 @@ export const run = async (init: d.CliInitOptions) => {
 
 /**
  * Run a specified task
+ *
  * @param coreCompiler an instance of a minimal, bootstrap compiler for running the specified task
  * @param config a configuration for the Stencil project to apply to the task run
  * @param task the task to run
  * @param sys the {@link CompilerSystem} for interacting with the operating system
  * @public
+ * @returns a void promise
  */
 export const runTask = async (
   coreCompiler: CoreCompiler,
   config: d.Config,
   task: d.TaskCommand,
-  sys?: d.CompilerSystem
+  sys: d.CompilerSystem,
 ): Promise<void> => {
-  const logger = config.logger ?? createLogger();
-  const rootDir = config.rootDir ?? '/';
-  const configSys = sys ?? config.sys ?? coreCompiler.createSystem({ logger });
-  const strictConfig: ValidatedConfig = {
-    ...config,
-    flags: createConfigFlags(config.flags ?? { task }),
-    hydratedFlag: config.hydratedFlag ?? null,
-    logger,
-    outputTargets: config.outputTargets ?? [],
-    packageJsonFilePath: configSys.platformPath.join(rootDir, 'package.json'),
-    rootDir,
-    sys: configSys,
-    testing: config.testing ?? {},
-  };
+  const flags = createConfigFlags(config.flags ?? { task });
+  config.flags = flags;
+
+  if (!config.sys) {
+    config.sys = sys;
+  }
+  const strictConfig: ValidatedConfig = coreCompiler.validateConfig(config, {}).config;
 
   switch (task) {
     case 'build':
@@ -140,7 +135,7 @@ export const runTask = async (
 
     case 'generate':
     case 'g':
-      await taskGenerate(coreCompiler, strictConfig);
+      await taskGenerate(strictConfig);
       break;
 
     case 'help':
@@ -169,7 +164,7 @@ export const runTask = async (
 
     default:
       strictConfig.logger.error(
-        `${strictConfig.logger.emoji('❌ ')}Invalid stencil command, please see the options below:`
+        `${strictConfig.logger.emoji('❌ ')}Invalid stencil command, please see the options below:`,
       );
       await taskHelp(strictConfig.flags, strictConfig.logger, sys);
       return config.sys.exit(1);

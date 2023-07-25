@@ -15,7 +15,7 @@ import { generatePropTypes } from './generate-prop-types';
 export const generateComponentTypes = (
   cmp: d.ComponentCompilerMeta,
   typeImportData: d.TypesImportData,
-  areTypesInternal: boolean
+  areTypesInternal: boolean,
 ): d.TypesModule => {
   const tagName = cmp.tagName.toLowerCase();
   const tagNameAsPascal = dashToPascalCase(tagName);
@@ -28,7 +28,7 @@ export const generateComponentTypes = (
   const componentAttributes = attributesToMultiLineString(
     [...propAttributes, ...methodAttributes],
     false,
-    areTypesInternal
+    areTypesInternal,
   );
   const isDep = cmp.isCollectionDependency;
   const jsxAttributes = attributesToMultiLineString([...propAttributes, ...eventAttributes], true, areTypesInternal);
@@ -37,7 +37,7 @@ export const generateComponentTypes = (
     addDocBlock(
       `        interface ${htmlElementName} extends Components.${tagNameAsPascal}, HTMLStencilElement {`,
       cmp.docs,
-      4
+      4,
     ),
     `        }`,
     `        var ${htmlElementName}: {`,

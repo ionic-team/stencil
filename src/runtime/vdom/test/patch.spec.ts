@@ -599,7 +599,7 @@ describe('renderer', () => {
             null,
             ...arr.map(function (n) {
               return spanNumWithOpacity(n, '1');
-            })
+            }),
           );
 
           const shufArr = shuffleArray(arr.slice(0));
@@ -618,7 +618,7 @@ describe('renderer', () => {
             null,
             ...arr.map(function (n) {
               return spanNumWithOpacity(shufArr[n], opacities[n]);
-            })
+            }),
           );
 
           patch(vnode1, vnode2);
@@ -679,7 +679,7 @@ describe('renderer', () => {
           expect(map(inner, hostElm.children)).toEqual(
             arr.filter(function (x) {
               return x != null;
-            })
+            }),
           );
         }
       });

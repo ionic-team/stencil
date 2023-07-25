@@ -1,11 +1,19 @@
-import { catchError, COLLECTION_MANIFEST_FILE_NAME, flatOne, generatePreamble, normalizePath, sortBy } from '@utils';
-import { join, relative } from 'path';
+import {
+  catchError,
+  COLLECTION_MANIFEST_FILE_NAME,
+  flatOne,
+  generatePreamble,
+  isOutputTargetDistCollection,
+  join,
+  normalizePath,
+  relative,
+  sortBy,
+} from '@utils';
 import ts from 'typescript';
 
 import type * as d from '../../../declarations';
 import { typescriptVersion, version } from '../../../version';
 import { mapImportsToPathAliases } from '../../transformers/map-imports-to-path-aliases';
-import { isOutputTargetDistCollection } from '../output-utils';
 
 /**
  * Main output target function for `dist-collection`. This function takes the compiled output from a
@@ -22,7 +30,7 @@ export const outputCollection = async (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
-  changedModuleFiles: d.Module[]
+  changedModuleFiles: d.Module[],
 ): Promise<void> => {
   const outputTargets = config.outputTargets.filter(isOutputTargetDistCollection);
   if (outputTargets.length === 0) {
@@ -67,9 +75,9 @@ export const outputCollection = async (
               const sourceMapOutputFilePath = join(target.collectionDir, relativeSourceMapPath);
               await compilerCtx.fs.writeFile(sourceMapOutputFilePath, mapCode, { outputTargetType: target.type });
             }
-          })
+          }),
         );
-      })
+      }),
     );
 
     await writeCollectionManifests(config, compilerCtx, buildCtx, outputTargets);
@@ -84,7 +92,7 @@ const writeCollectionManifests = async (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
-  outputTargets: d.OutputTargetDistCollection[]
+  outputTargets: d.OutputTargetDistCollection[],
 ) => {
   const collectionData = JSON.stringify(serializeCollectionManifest(config, compilerCtx, buildCtx), null, 2);
   return Promise.all(outputTargets.map((o) => writeCollectionManifest(compilerCtx, collectionData, o)));
@@ -98,13 +106,13 @@ const writeCollectionManifests = async (
 const writeCollectionManifest = async (
   compilerCtx: d.CompilerCtx,
   collectionData: string,
-  outputTarget: d.OutputTargetDistCollection
+  outputTarget: d.OutputTargetDistCollection,
 ) => {
   // get the absolute path to the directory where the collection will be saved
-  const collectionDir = normalizePath(outputTarget.collectionDir);
+  const { collectionDir } = outputTarget;
 
   // create an absolute file path to the actual collection json file
-  const collectionFilePath = normalizePath(join(collectionDir, COLLECTION_MANIFEST_FILE_NAME));
+  const collectionFilePath = join(collectionDir, COLLECTION_MANIFEST_FILE_NAME);
 
   // don't bother serializing/writing the collection if we're not creating a distribution
   await compilerCtx.fs.writeFile(collectionFilePath, collectionData);

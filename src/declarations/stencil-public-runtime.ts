@@ -1,7 +1,7 @@
 declare type CustomMethodDecorator<T> = (
   target: Object,
   propertyKey: string | symbol,
-  descriptor: TypedPropertyDescriptor<T>
+  descriptor: TypedPropertyDescriptor<T>,
 ) => TypedPropertyDescriptor<T> | void;
 
 export interface ComponentDecorator {
@@ -905,6 +905,7 @@ export namespace JSXBase {
   }
 
   export interface DialogHTMLAttributes<T> extends HTMLAttributes<T> {
+    onCancel?: (event: Event) => void;
     onClose?: (event: Event) => void;
     open?: boolean;
     returnValue?: string;
@@ -1256,6 +1257,8 @@ export namespace JSXBase {
   }
 
   export interface TextareaHTMLAttributes<T> extends HTMLAttributes<T> {
+    autoComplete?: string;
+    autocomplete?: string;
     autoFocus?: boolean;
     autofocus?: boolean | string;
     cols?: number;
@@ -1441,7 +1444,7 @@ export namespace JSXBase {
     clipPathUnits?: number | string;
     'clip-rule'?: number | string;
     'color-interpolation'?: number | string;
-    'color-interpolation-filters'?: 'auto' | 's-rGB' | 'linear-rGB' | 'inherit';
+    'color-interpolation-filters'?: 'auto' | 'sRGB' | 'linearRGB';
     'color-profile'?: number | string;
     'color-rendering'?: number | string;
     contentScriptType?: number | string;
@@ -1820,13 +1823,13 @@ export interface CustomElementsDefineOptions {
     el: EventTarget,
     eventName: string,
     listener: EventListenerOrEventListenerObject,
-    options: boolean | AddEventListenerOptions
+    options: boolean | AddEventListenerOptions,
   ) => void;
   rel?: (
     el: EventTarget,
     eventName: string,
     listener: EventListenerOrEventListenerObject,
-    options: boolean | AddEventListenerOptions
+    options: boolean | AddEventListenerOptions,
   ) => void;
   ce?: (eventName: string, opts?: any) => CustomEvent;
 }

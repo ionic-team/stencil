@@ -3,13 +3,12 @@ import ts from 'typescript';
 import type * as d from '../../../declarations';
 import { addCoreRuntimeApi, REGISTER_INSTANCE, RUNTIME_APIS } from '../core-runtime-apis';
 import { addCreateEvents } from '../create-event';
-import { addLegacyProps } from '../legacy-props';
 import { retrieveTsModifiers } from '../transform-utils';
 
 export const updateLazyComponentConstructor = (
   classMembers: ts.ClassElement[],
   moduleFile: d.Module,
-  cmp: d.ComponentCompilerMeta
+  cmp: d.ComponentCompilerMeta,
 ) => {
   const cstrMethodArgs = [
     ts.factory.createParameterDeclaration(undefined, undefined, ts.factory.createIdentifier(HOST_REF_ARG)),
@@ -24,28 +23,20 @@ export const updateLazyComponentConstructor = (
       registerInstanceStatement(moduleFile),
       ...addCreateEvents(moduleFile, cmp),
       ...cstrMethod.body.statements,
-      ...addLegacyProps(moduleFile, cmp),
     ]);
 
     classMembers[cstrMethodIndex] = ts.factory.updateConstructorDeclaration(
       cstrMethod,
       retrieveTsModifiers(cstrMethod),
       cstrMethodArgs,
-      body
+      body,
     );
   } else {
     // create a constructor()
     const cstrMethod = ts.factory.createConstructorDeclaration(
       undefined,
       cstrMethodArgs,
-      ts.factory.createBlock(
-        [
-          registerInstanceStatement(moduleFile),
-          ...addCreateEvents(moduleFile, cmp),
-          ...addLegacyProps(moduleFile, cmp),
-        ],
-        true
-      )
+      ts.factory.createBlock([registerInstanceStatement(moduleFile), ...addCreateEvents(moduleFile, cmp)], true),
     );
     classMembers.unshift(cstrMethod);
   }
@@ -58,7 +49,7 @@ const registerInstanceStatement = (moduleFile: d.Module) => {
     ts.factory.createCallExpression(ts.factory.createIdentifier(REGISTER_INSTANCE), undefined, [
       ts.factory.createThis(),
       ts.factory.createIdentifier(HOST_REF_ARG),
-    ])
+    ]),
   );
 };
 

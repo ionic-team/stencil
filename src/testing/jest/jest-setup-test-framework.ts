@@ -7,7 +7,7 @@ import {
   setErrorHandler,
   stopAutoApplyChanges,
 } from '@stencil/core/internal/testing';
-import { setupGlobal, teardownGlobal } from '@stencil/core/mock-doc';
+import { MockDocument, MockNode, MockWindow, setupGlobal, teardownGlobal } from '@stencil/core/mock-doc';
 
 import { expectExtend } from '../matchers';
 import { setupMockFetch } from '../mock-fetch';
@@ -17,7 +17,6 @@ import { HtmlSerializer } from './jest-serializer';
 declare const global: d.JestEnvironmentGlobal;
 
 export function jestSetupTestFramework() {
-  global.Context = {};
   global.resourcesUrl = '/build';
 
   expect.extend(expectExtend);
@@ -40,8 +39,25 @@ export function jestSetupTestFramework() {
     }
     stopAutoApplyChanges();
 
+    // Remove each node from the mocked DOM
+    // Without this step, a component's `disconnectedCallback`
+    // will not be called since this only happens when a node is removed,
+    // not if the window is destroyed.
+    //
+    // So, we do this outside the mocked window/DOM teardown
+    // because this operation is really only necessary in the testing
+    // context so any "cleanup" operations in the `disconnectedCallback`
+    // can happen to prevent testing errors with async code in the component
+    //
+    // We only care about removing all the nodes that are children of the 'body' tag/node.
+    // This node is a child of the `html` tag which is the 2nd child of the document (hence
+    // the `1` index).
+    const bodyNode = (
+      ((global as any).window as MockWindow)?.document as unknown as MockDocument
+    )?.childNodes?.[1]?.childNodes?.find((ref) => ref.nodeName === 'BODY');
+    bodyNode?.childNodes?.forEach(removeDomNodes);
+
     teardownGlobal(global);
-    global.Context = {};
     global.resourcesUrl = '/build';
   });
 
@@ -71,4 +87,22 @@ export function jestSetupTestFramework() {
     const stencilEnv = JSON.parse(env.__STENCIL_ENV__);
     Object.assign(Env, stencilEnv);
   }
+}
+
+/**
+ * Recursively removes all child nodes of a passed node starting with the
+ * furthest descendant and then moving back up the DOM tree.
+ *
+ * @param node The mocked DOM node that will be removed from the DOM
+ */
+export function removeDomNodes(node: MockNode) {
+  if (node == null) {
+    return;
+  }
+
+  if (!node.childNodes?.length) {
+    node.remove();
+  }
+
+  node.childNodes?.forEach(removeDomNodes);
 }

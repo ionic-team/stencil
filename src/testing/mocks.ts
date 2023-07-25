@@ -34,14 +34,24 @@ export function mockValidatedConfig(overrides: Partial<ValidatedConfig> = {}): V
 
   return {
     ...baseConfig,
+    devServer: {},
     flags: createConfigFlags(),
     hydratedFlag: null,
     logger: mockLogger(),
     outputTargets: baseConfig.outputTargets ?? [],
     packageJsonFilePath: path.join(rootDir, 'package.json'),
     rootDir,
+    cacheDir: '.stencil',
+    srcIndexHtml: 'src/index.html',
+    srcDir: '/src',
     sys: createTestingSystem(),
     testing: {},
+    transformAliasedImportPaths: true,
+    rollupConfig: {
+      inputOptions: {},
+      outputOptions: {},
+    },
+    validatePrimaryPackageOutputTarget: false,
     ...overrides,
   };
 }
@@ -241,6 +251,7 @@ export function mockWindow(html: string = null) {
 export const mockModule = (mod: Partial<Module> = {}): Module => ({
   cmps: [],
   coreRuntimeApis: [],
+  outputTargetCoreRuntimeApis: {},
   collectionName: '',
   dtsFilePath: '',
   excludeFromCollection: false,

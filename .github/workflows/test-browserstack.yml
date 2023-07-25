@@ -1,12 +1,16 @@
 name: BrowserStack Tests
 
 on:
+  merge_group:
   pull_request_target:
     branches:
       - 'main'
+      - 'v3.*-feature'
+      - 'stencil/v4-dev'
   push:
     branches:
       - 'main'
+      - 'stencil/v4-dev'
 
 env:
   BROWSERSTACK_ACCESS_KEY: ${{ secrets.BROWSER_STACK_ACCESS_KEY }}
@@ -49,13 +53,13 @@ jobs:
     # GitHub Actions 'concurrency' field as means to block the job until no other tests are running.
     concurrency: run_browserstack_queue
     steps:
-      - uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c # v3.3.0
+      - uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
         with:
           ref: ${{ github.event_name == 'pull_request_target' && format('refs/pull/{0}/merge', github.event.number) || '' }}
           persist-credentials: false
 
       - name: Use Node Version from Volta (Karma)
-        uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
+        uses: actions/setup-node@e33196f7422957bea03ed53f6fbb155025ffc7b8 # v3.7.0
         with:
           # pull the version to use from the volta key in package.json
           node-version-file: './test/karma/package.json'
@@ -88,7 +92,11 @@ jobs:
           local-identifier: random
 
       - name: Run Karma Tests
-        run: npm run test.karma.prod
+        uses: nick-fields/retry@943e742917ac94714d2f408a0e8320f2d1fcafcd # v2.8.3
+        with:
+          timeout_minutes: 15
+          max_attempts: 3
+          command: npm run test.karma.prod
 
       - name: Stop BrowserStack
         uses: browserstack/github-actions/setup-local@master

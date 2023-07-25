@@ -1,5 +1,5 @@
-import { DEFAULT_STYLE_MODE, isString, normalizePath } from '@utils';
-import { basename, dirname, isAbsolute, relative } from 'path';
+import { DEFAULT_STYLE_MODE, isString, relative } from '@utils';
+import { basename, dirname, isAbsolute } from 'path';
 
 import type { ImportData, ParsedImport, SerializeImportData } from '../../declarations';
 
@@ -24,7 +24,6 @@ export const serializeImportPath = (data: SerializeImportData, styleImportData: 
     if (isString(data.importerPath) && isAbsolute(data.importeePath)) {
       p = relative(dirname(data.importerPath), data.importeePath);
     }
-    p = normalizePath(p);
     if (!p.startsWith('.')) {
       p = './' + p;
     }

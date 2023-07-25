@@ -8,7 +8,7 @@ import * as d from '@stencil/core/declarations';
  * @returns the stubbed `ComponentCompilerMeta`
  */
 export const stubComponentCompilerMeta = (
-  overrides: Partial<d.ComponentCompilerMeta> = {}
+  overrides: Partial<d.ComponentCompilerMeta> = {},
 ): d.ComponentCompilerMeta => ({
   assetsDirs: [],
   componentClassName: 'StubCmp',
@@ -53,6 +53,7 @@ export const stubComponentCompilerMeta = (
   hasReflect: false,
   hasRenderFn: false,
   hasState: false,
+  hasStaticInitializedMember: false,
   hasStyle: false,
   hasVdomAttribute: false,
   hasVdomClass: false,
@@ -74,8 +75,6 @@ export const stubComponentCompilerMeta = (
   isPlain: false,
   isUpdateable: false,
   jsFilePath: '/some/stubbed/path/my-component.js',
-  legacyConnect: [],
-  legacyContext: [],
   listeners: [],
   methods: [],
   potentialCmpRefs: [],

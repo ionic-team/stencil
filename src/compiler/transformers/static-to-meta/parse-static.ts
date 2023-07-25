@@ -10,14 +10,14 @@ import { parseModuleImport } from './import';
 import { parseStringLiteral } from './string-literal';
 
 export const updateModule = (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   tsSourceFile: ts.SourceFile,
   sourceFileText: string,
   emitFilePath: string,
   typeChecker: ts.TypeChecker,
-  collection: d.CollectionCompilerMeta
+  collection: d.CollectionCompilerMeta,
 ) => {
   const sourceFilePath = normalizePath(tsSourceFile.fileName);
   const prevModuleFile = getModule(compilerCtx, sourceFilePath);
@@ -73,7 +73,7 @@ export const updateModule = (
       sourceFileText,
       tsSourceFile.languageVersion,
       true,
-      ts.ScriptKind.JS
+      ts.ScriptKind.JS,
     );
   }
   return moduleFile;

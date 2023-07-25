@@ -134,7 +134,7 @@ describe('lifecycle sync', () => {
 
     expect(root.textContent).toBe('connectedCallback componentWillLoad componentWillRender render');
     expect(log.trim()).toEqual(
-      'connectedCallback componentWillLoad componentWillRender render componentDidRender componentDidLoad'
+      'connectedCallback componentWillLoad componentWillRender render componentDidRender componentDidLoad',
     );
 
     log = '';
@@ -144,7 +144,7 @@ describe('lifecycle sync', () => {
     expect(root.textContent).toBe('propDidChange componentWillUpdate componentWillRender render');
 
     expect(log.trim()).toBe(
-      'propDidChange componentWillUpdate componentWillRender render componentDidRender componentDidUpdate'
+      'propDidChange componentWillUpdate componentWillRender render componentDidRender componentDidUpdate',
     );
   });
 

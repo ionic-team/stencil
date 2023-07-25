@@ -6,7 +6,7 @@ import type * as d from '../../declarations';
 export const generateEs5DisabledMessage = async (
   config: d.Config,
   compilerCtx: d.CompilerCtx,
-  outputTarget: d.OutputTargetWww
+  outputTarget: d.OutputTargetWww,
 ) => {
   // not doing an es5 right now
   // but it's possible during development the user
@@ -109,7 +109,7 @@ h2 {
     config.fsNamespace
   }<span style="background:yellow">.esm</span>.js"${escapeHtml(`></script>`)}
   ${escapeHtml(`<script`)} <span style="background:yellow">nomodule</span> ${escapeHtml(
-    `src="/build/${config.fsNamespace}.js"></script>`
+    `src="/build/${config.fsNamespace}.js"></script>`,
   )}</code>
     </pre>
   `;

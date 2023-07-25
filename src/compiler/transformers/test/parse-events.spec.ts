@@ -104,6 +104,7 @@ describe('parse events', () => {
       resolved: `"ios" | "md"`,
       references: {
         Mode: {
+          id: 'module.tsx::Mode',
           location: 'local',
           path: 'module.tsx',
         },

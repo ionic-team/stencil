@@ -1,9 +1,11 @@
 name: CI
 
 on:
+  merge_group:
   push:
     branches:
       - 'main'
+      - 'stencil/v4-dev'
   pull_request:
     branches:
       - '**'

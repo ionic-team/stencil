@@ -1,9 +1,7 @@
 import fs from 'fs-extra';
 import glob from 'glob';
 import { basename, join } from 'path';
-import { rollup, RollupOptions } from 'rollup';
-import { minify } from 'terser';
-import ts from 'typescript';
+import { RollupOptions } from 'rollup';
 
 import { getBanner } from '../utils/banner';
 import type { BuildOptions } from '../utils/options';
@@ -87,50 +85,6 @@ export async function internalClient(opts: BuildOptions) {
         },
       },
       {
-        name: 'internalClientRuntimeCssShim',
-        resolveId(importee) {
-          if (importee === './polyfills/css-shim.js') {
-            return importee;
-          }
-          return null;
-        },
-
-        async load(id) {
-          // bundle the css-shim into one file
-          if (id === './polyfills/css-shim.js') {
-            const rollupBuild = await rollup({
-              input: join(inputClientDir, 'polyfills', 'css-shim', 'index.js'),
-              onwarn: (message) => {
-                if (/top level of an ES module/.test(message as any)) return;
-                console.error(message);
-              },
-            });
-
-            const { output } = await rollupBuild.generate({ format: 'es' });
-
-            const transpileToEs5 = ts.transpileModule(output[0].code, {
-              compilerOptions: {
-                target: ts.ScriptTarget.ES5,
-              },
-            });
-
-            let code = transpileToEs5.outputText;
-
-            if (opts.isProd) {
-              const minifyResults = await minify(code);
-              code = minifyResults.code;
-            }
-
-            const dest = join(outputInternalClientPolyfillsDir, 'css-shim.js');
-            await fs.writeFile(dest, code);
-
-            return code;
-          }
-          return null;
-        },
-      },
-
-      {
         name: 'internalClientRuntimePolyfills',
         resolveId(importee) {
           if (importee.startsWith('./polyfills')) {
@@ -147,18 +101,7 @@ export async function internalClient(opts: BuildOptions) {
     ],
   };
 
-  const internalClientPatchEsmBundle = { ...internalClientPatchBrowserBundle };
-  internalClientPatchEsmBundle.input = join(inputClientDir, 'client-patch-esm.js');
-  internalClientPatchEsmBundle.output = {
-    format: 'es',
-    dir: outputInternalClientDir,
-    entryFileNames: 'patch-esm.js',
-    chunkFileNames: '[name].js',
-    banner: getBanner(opts, 'Stencil Client Patch Esm'),
-    preferConst: true,
-  };
-
-  return [internalClientBundle, internalClientPatchBrowserBundle, internalClientPatchEsmBundle];
+  return [internalClientBundle, internalClientPatchBrowserBundle];
 }
 
 async function copyPolyfills(opts: BuildOptions, outputInternalClientPolyfillsDir: string) {
@@ -171,6 +114,6 @@ async function copyPolyfills(opts: BuildOptions, outputInternalClientPolyfillsDi
       const src = join(srcPolyfillsDir, fileName);
       const dest = join(outputInternalClientPolyfillsDir, fileName);
       await fs.copyFile(src, dest);
-    })
+    }),
   );
 }

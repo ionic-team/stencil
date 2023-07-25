@@ -21,7 +21,7 @@ export const generateLazyModules = async (
   results: d.RollupResult[],
   sourceTarget: d.SourceTarget,
   isBrowserBuild: boolean,
-  sufix: string
+  sufix: string,
 ): Promise<d.BundleModule[]> => {
   if (!Array.isArray(destinations) || destinations.length === 0) {
     return [];
@@ -43,12 +43,12 @@ export const generateLazyModules = async (
         sourceTarget,
         shouldMinify,
         isBrowserBuild,
-        sufix
+        sufix,
       );
-    })
+    }),
   );
 
-  if (!!config.extras?.experimentalImportInjection && !isBrowserBuild) {
+  if ((!!config.extras?.experimentalImportInjection || !!config.extras?.enableImportInjection) && !isBrowserBuild) {
     addStaticImports(rollupResults, bundleModules);
   }
 
@@ -63,9 +63,9 @@ export const generateLazyModules = async (
         destinations,
         sourceTarget,
         shouldMinify,
-        isBrowserBuild
+        isBrowserBuild,
       );
-    })
+    }),
   );
 
   const lazyRuntimeData = formatLazyBundlesRuntimeMeta(bundleModules);
@@ -82,9 +82,9 @@ export const generateLazyModules = async (
         lazyRuntimeData,
         sourceTarget,
         shouldMinify,
-        isBrowserBuild
+        isBrowserBuild,
       );
-    })
+    }),
   );
 
   await Promise.all(
@@ -94,9 +94,9 @@ export const generateLazyModules = async (
         return Promise.all(
           destinations.map((dest) => {
             return compilerCtx.fs.writeFile(join(dest, r.fileName), r.content);
-          })
+          }),
         );
-      })
+      }),
   );
 
   return bundleModules;
@@ -123,7 +123,7 @@ const addStaticImports = (rollupChunkResults: d.RollupChunkResult[], bundleModul
           switch(bundleId) {
               ${bundleModules.map((mod) => generateCjs(mod.output.bundleId)).join('')}
           }
-      }`
+      }`,
     );
   });
 };
@@ -190,7 +190,7 @@ const generateLazyEntryModule = async (
   sourceTarget: d.SourceTarget,
   shouldMinify: boolean,
   isBrowserBuild: boolean,
-  sufix: string
+  sufix: string,
 ): Promise<d.BundleModule> => {
   const entryModule = buildCtx.entryModules.find((entryModule) => entryModule.entryKey === rollupResult.entryKey);
   const shouldHash = config.hashFileNames && isBrowserBuild;
@@ -204,7 +204,7 @@ const generateLazyEntryModule = async (
     false,
     isBrowserBuild,
     rollupResult.code,
-    rollupResult.map
+    rollupResult.map,
   );
 
   const output = await writeLazyModule(
@@ -216,7 +216,7 @@ const generateLazyEntryModule = async (
     shouldHash,
     code,
     sourceMap,
-    sufix
+    sufix,
   );
 
   return {
@@ -236,7 +236,7 @@ const writeLazyChunk = async (
   destinations: string[],
   sourceTarget: d.SourceTarget,
   shouldMinify: boolean,
-  isBrowserBuild: boolean
+  isBrowserBuild: boolean,
 ) => {
   const { code, sourceMap } = await convertChunk(
     config,
@@ -247,7 +247,7 @@ const writeLazyChunk = async (
     rollupResult.isCore,
     isBrowserBuild,
     rollupResult.code,
-    rollupResult.map
+    rollupResult.map,
   );
 
   await Promise.all(
@@ -259,7 +259,7 @@ const writeLazyChunk = async (
         compilerCtx.fs.writeFile(filePath + '.map', JSON.stringify(sourceMap), { outputTargetType });
       }
       compilerCtx.fs.writeFile(filePath, fileCode, { outputTargetType });
-    })
+    }),
   );
 };
 
@@ -273,7 +273,7 @@ const writeLazyEntry = async (
   lazyRuntimeData: string,
   sourceTarget: d.SourceTarget,
   shouldMinify: boolean,
-  isBrowserBuild: boolean
+  isBrowserBuild: boolean,
 ): Promise<void> => {
   if (isBrowserBuild && ['loader'].includes(rollupResult.entryKey)) {
     return;
@@ -288,7 +288,7 @@ const writeLazyEntry = async (
     false,
     isBrowserBuild,
     inputCode,
-    rollupResult.map
+    rollupResult.map,
   );
 
   await Promise.all(
@@ -300,7 +300,7 @@ const writeLazyEntry = async (
         compilerCtx.fs.writeFile(filePath + '.map', JSON.stringify(sourceMap), { outputTargetType });
       }
       return compilerCtx.fs.writeFile(filePath, fileCode, { outputTargetType });
-    })
+    }),
   );
 };
 
@@ -407,7 +407,7 @@ const convertChunk = async (
   isCore: boolean,
   isBrowserBuild: boolean,
   code: string,
-  rollupSrcMap: RollupSourceMap
+  rollupSrcMap: RollupSourceMap,
 ) => {
   let sourceMap = rollupToStencilSourceMap(rollupSrcMap);
   const inlineHelpers = isBrowserBuild || !hasDependency(buildCtx, 'tslib');

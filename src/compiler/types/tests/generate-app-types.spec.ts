@@ -1,6 +1,8 @@
 import { mockBuildCtx, mockCompilerCtx, mockValidatedConfig } from '@stencil/core/testing';
+import path from 'path';
 
 import type * as d from '../../../declarations';
+import { patchTypescript } from '../../sys/typescript/typescript-sys';
 import { generateAppTypes } from '../generate-app-types';
 import { stubComponentCompilerEvent } from './ComponentCompilerEvent.stub';
 import { stubComponentCompilerMeta } from './ComponentCompilerMeta.stub';
@@ -10,22 +12,23 @@ describe('generateAppTypes', () => {
   let config: d.ValidatedConfig;
   let compilerCtx: d.CompilerCtx;
   let buildCtx: d.BuildCtx;
+  let originalWriteFile: typeof compilerCtx.fs.writeFile;
 
-  const mockFs = {
-    writeFile: jest.fn(),
-  };
+  const mockWriteFile = jest.fn();
 
   beforeEach(() => {
     config = mockValidatedConfig({
       srcDir: '/',
     });
-    compilerCtx = {
-      ...mockCompilerCtx(config),
-      fs: mockFs as any,
-    };
+    compilerCtx = mockCompilerCtx(config);
     buildCtx = mockBuildCtx(config, compilerCtx);
 
-    mockFs.writeFile.mockResolvedValueOnce({ changedContent: true });
+    // Save the original write function to we can create a file in the
+    // in-memory fs if needed
+    originalWriteFile = compilerCtx.fs.writeFile;
+    compilerCtx.fs.writeFile = mockWriteFile;
+
+    mockWriteFile.mockResolvedValueOnce({ changedContent: true });
   });
 
   afterEach(() => {
@@ -42,7 +45,7 @@ describe('generateAppTypes', () => {
 
     await generateAppTypes(config, compilerCtx, buildCtx, 'src');
 
-    expect(mockFs.writeFile).toHaveBeenCalledWith(
+    expect(mockWriteFile).toHaveBeenCalledWith(
       '/components.d.ts',
       `/* eslint-disable */
 /* tslint:disable */
@@ -96,7 +99,7 @@ declare module "@stencil/core" {
 `,
       {
         immediateWrite: true,
-      }
+      },
     );
   });
 
@@ -112,7 +115,7 @@ declare module "@stencil/core" {
 
       await generateAppTypes(config, compilerCtx, buildCtx, 'src');
 
-      expect(mockFs.writeFile).toHaveBeenCalledWith(
+      expect(mockWriteFile).toHaveBeenCalledWith(
         '/components.d.ts',
         `/* eslint-disable */
 /* tslint:disable */
@@ -173,7 +176,7 @@ declare module "@stencil/core" {
 `,
         {
           immediateWrite: true,
-        }
+        },
       );
     });
 
@@ -192,6 +195,7 @@ declare module "@stencil/core" {
               resolved: '"wee" | "woo"',
               references: {
                 SecondUserImplementedEventType: {
+                  id: 'placeholder',
                   location: 'import',
                   path: './resources',
                 },
@@ -204,7 +208,7 @@ declare module "@stencil/core" {
 
       await generateAppTypes(config, compilerCtx, buildCtx, 'src');
 
-      expect(mockFs.writeFile).toHaveBeenCalledWith(
+      expect(mockWriteFile).toHaveBeenCalledWith(
         '/components.d.ts',
         `/* eslint-disable */
 /* tslint:disable */
@@ -266,7 +270,7 @@ declare module "@stencil/core" {
 `,
         {
           immediateWrite: true,
-        }
+        },
       );
     });
 
@@ -283,6 +287,7 @@ declare module "@stencil/core" {
               references: {
                 UserImplementedEventType: {
                   location: 'import',
+                  id: 'placeholder',
                   path: './resources',
                 },
               },
@@ -305,6 +310,7 @@ declare module "@stencil/core" {
               references: {
                 UserImplementedEventType: {
                   location: 'import',
+                  id: 'placeholder',
                   path: '../resources',
                 },
               },
@@ -316,7 +322,7 @@ declare module "@stencil/core" {
 
       await generateAppTypes(config, compilerCtx, buildCtx, 'src');
 
-      expect(mockFs.writeFile).toHaveBeenCalledWith(
+      expect(mockWriteFile).toHaveBeenCalledWith(
         '/components.d.ts',
         `/* eslint-disable */
 /* tslint:disable */
@@ -407,7 +413,7 @@ declare module "@stencil/core" {
 `,
         {
           immediateWrite: true,
-        }
+        },
       );
     });
 
@@ -428,6 +434,7 @@ declare module "@stencil/core" {
                 UserImplementedEventType: {
                   location: 'import',
                   path: './resources',
+                  id: 'placeholder',
                 },
               },
             },
@@ -450,6 +457,7 @@ declare module "@stencil/core" {
                 UserImplementedEventType: {
                   location: 'import',
                   path: './resources',
+                  id: 'placeholder',
                 },
               },
             },
@@ -460,7 +468,7 @@ declare module "@stencil/core" {
 
       await generateAppTypes(config, compilerCtx, buildCtx, 'src');
 
-      expect(mockFs.writeFile).toHaveBeenCalledWith(
+      expect(mockWriteFile).toHaveBeenCalledWith(
         '/components.d.ts',
         `/* eslint-disable */
 /* tslint:disable */
@@ -553,7 +561,7 @@ declare module "@stencil/core" {
 `,
         {
           immediateWrite: true,
-        }
+        },
       );
     });
 
@@ -574,6 +582,7 @@ declare module "@stencil/core" {
                 UserImplementedEventType: {
                   location: 'local',
                   path: '/some/stubbed/path/a/my-component.tsx',
+                  id: 'placeholder',
                 },
               },
             },
@@ -595,6 +604,7 @@ declare module "@stencil/core" {
               references: {
                 UserImplementedEventType: {
                   location: 'local',
+                  id: 'placeholder',
                   path: '/some/stubbed/path/b/my-new-component.tsx',
                 },
               },
@@ -606,7 +616,7 @@ declare module "@stencil/core" {
 
       await generateAppTypes(config, compilerCtx, buildCtx, 'src');
 
-      expect(mockFs.writeFile).toHaveBeenCalledWith(
+      expect(mockWriteFile).toHaveBeenCalledWith(
         '/components.d.ts',
         `/* eslint-disable */
 /* tslint:disable */
@@ -699,7 +709,7 @@ declare module "@stencil/core" {
 `,
         {
           immediateWrite: true,
-        }
+        },
       );
     });
   });
@@ -720,6 +730,7 @@ declare module "@stencil/core" {
                 UserImplementedPropType: {
                   location: 'import',
                   path: './resources',
+                  id: 'placeholder',
                 },
               },
             },
@@ -730,7 +741,7 @@ declare module "@stencil/core" {
 
       await generateAppTypes(config, compilerCtx, buildCtx, 'src');
 
-      expect(mockFs.writeFile).toHaveBeenCalledWith(
+      expect(mockWriteFile).toHaveBeenCalledWith(
         '/components.d.ts',
         `/* eslint-disable */
 /* tslint:disable */
@@ -788,7 +799,7 @@ declare module "@stencil/core" {
 `,
         {
           immediateWrite: true,
-        }
+        },
       );
     });
 
@@ -807,6 +818,7 @@ declare module "@stencil/core" {
                 UserImplementedPropType: {
                   location: 'import',
                   path: './resources',
+                  id: 'placeholder',
                 },
               },
             },
@@ -820,6 +832,7 @@ declare module "@stencil/core" {
                 SecondUserImplementedPropType: {
                   location: 'import',
                   path: './resources',
+                  id: 'placeholder',
                 },
               },
             },
@@ -830,7 +843,7 @@ declare module "@stencil/core" {
 
       await generateAppTypes(config, compilerCtx, buildCtx, 'src');
 
-      expect(mockFs.writeFile).toHaveBeenCalledWith(
+      expect(mockWriteFile).toHaveBeenCalledWith(
         '/components.d.ts',
         `/* eslint-disable */
 /* tslint:disable */
@@ -890,7 +903,7 @@ declare module "@stencil/core" {
 `,
         {
           immediateWrite: true,
-        }
+        },
       );
     });
 
@@ -909,6 +922,7 @@ declare module "@stencil/core" {
                 UserImplementedPropType: {
                   location: 'import',
                   path: './resources',
+                  id: 'placeholder',
                 },
               },
             },
@@ -932,6 +946,7 @@ declare module "@stencil/core" {
                 UserImplementedPropType: {
                   location: 'import',
                   path: '../resources',
+                  id: 'placeholder',
                 },
               },
             },
@@ -942,7 +957,7 @@ declare module "@stencil/core" {
 
       await generateAppTypes(config, compilerCtx, buildCtx, 'src');
 
-      expect(mockFs.writeFile).toHaveBeenCalledWith(
+      expect(mockWriteFile).toHaveBeenCalledWith(
         '/components.d.ts',
         `/* eslint-disable */
 /* tslint:disable */
@@ -1027,7 +1042,7 @@ declare module "@stencil/core" {
 `,
         {
           immediateWrite: true,
-        }
+        },
       );
     });
 
@@ -1048,6 +1063,7 @@ declare module "@stencil/core" {
               references: {
                 UserImplementedPropType: {
                   location: 'import',
+                  id: 'placeholder',
                   path: './resources',
                 },
               },
@@ -1072,6 +1088,7 @@ declare module "@stencil/core" {
                 UserImplementedPropType: {
                   location: 'import',
                   path: './resources',
+                  id: 'placeholder',
                 },
               },
             },
@@ -1082,7 +1099,7 @@ declare module "@stencil/core" {
 
       await generateAppTypes(config, compilerCtx, buildCtx, 'src');
 
-      expect(mockFs.writeFile).toHaveBeenCalledWith(
+      expect(mockWriteFile).toHaveBeenCalledWith(
         '/components.d.ts',
         `/* eslint-disable */
 /* tslint:disable */
@@ -1169,7 +1186,7 @@ declare module "@stencil/core" {
 `,
         {
           immediateWrite: true,
-        }
+        },
       );
     });
 
@@ -1191,6 +1208,7 @@ declare module "@stencil/core" {
                 UserImplementedPropType: {
                   location: 'local',
                   path: '/some/stubbed/path/a/my-component.tsx',
+                  id: 'placeholder',
                 },
               },
             },
@@ -1214,6 +1232,7 @@ declare module "@stencil/core" {
                 UserImplementedPropType: {
                   location: 'local',
                   path: '/some/stubbed/path/b/my-new-component.tsx',
+                  id: 'placeholder',
                 },
               },
             },
@@ -1224,7 +1243,7 @@ declare module "@stencil/core" {
 
       await generateAppTypes(config, compilerCtx, buildCtx, 'src');
 
-      expect(mockFs.writeFile).toHaveBeenCalledWith(
+      expect(mockWriteFile).toHaveBeenCalledWith(
         '/components.d.ts',
         `/* eslint-disable */
 /* tslint:disable */
@@ -1311,7 +1330,7 @@ declare module "@stencil/core" {
 `,
         {
           immediateWrite: true,
-        }
+        },
       );
     });
   });
@@ -1336,6 +1355,7 @@ declare module "@stencil/core" {
               UserImplementedPropType: {
                 location: 'import',
                 path: './resources',
+                id: 'placeholder',
               },
             },
           },
@@ -1346,7 +1366,7 @@ declare module "@stencil/core" {
 
     await generateAppTypes(config, compilerCtx, buildCtx, 'src');
 
-    expect(mockFs.writeFile).toHaveBeenCalledWith(
+    expect(mockWriteFile).toHaveBeenCalledWith(
       '/components.d.ts',
       `/* eslint-disable */
 /* tslint:disable */
@@ -1409,7 +1429,201 @@ declare module "@stencil/core" {
 `,
       {
         immediateWrite: true,
-      }
+      },
+    );
+  });
+
+  it('should transform aliased paths if transformAliasedImportPaths is true', async () => {
+    const compilerComponentMeta = stubComponentCompilerMeta({
+      tagName: 'my-component',
+      componentClassName: 'MyComponent',
+      jsFilePath: path.join(config.rootDir, 'some/stubbed/path/a/my-component.js'),
+      sourceFilePath: path.join(config.rootDir, 'some/stubbed/path/a/my-component.tsx'),
+      sourceMapPath: path.join(config.rootDir, 'some/stubbed/path/a/my-component.js.map'),
+      hasProp: true,
+      properties: [
+        stubComponentCompilerProperty({
+          name: 'name',
+          complexType: {
+            original: 'UserImplementedPropType',
+            resolved: '"foo" | "bar"',
+            references: {
+              UserImplementedPropType: {
+                id: 'some-module.ts::UserImplementedPropType',
+                location: 'import',
+                path: '@utils',
+              },
+            },
+          },
+        }),
+      ],
+    });
+    buildCtx.components = [compilerComponentMeta];
+    config.tsCompilerOptions = {
+      paths: {
+        '@utils': [path.join(config.rootDir, 'some/stubbed/path/utils/utils.ts')],
+      },
+      declaration: true,
+    };
+    config.transformAliasedImportPaths = true;
+    // We need to have a file in the in-memory fs for the TS module resolution to succeed
+    await originalWriteFile(path.join(config.rootDir, 'some/stubbed/path/utils/utils.ts'), '');
+
+    patchTypescript(config, compilerCtx.fs);
+
+    await generateAppTypes(config, compilerCtx, buildCtx, 'src');
+
+    expect(mockWriteFile).toHaveBeenCalledWith(
+      '/components.d.ts',
+      `/* eslint-disable */
+/* tslint:disable */
+/**
+ * This is an autogenerated file created by the Stencil compiler.
+ * It contains typing information for all components that exist in this project.
+ */
+import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
+import { UserImplementedPropType } from "./some/stubbed/path/utils/utils";
+export { UserImplementedPropType } from "./some/stubbed/path/utils/utils";
+export namespace Components {
+    /**
+     * docs
+     */
+        interface MyComponent {
+                "name": UserImplementedPropType;
+        }
+}
+declare global {
+    /**
+     * docs
+     */
+        interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
+        }
+        var HTMLMyComponentElement: {
+                prototype: HTMLMyComponentElement;
+                new (): HTMLMyComponentElement;
+        };
+        interface HTMLElementTagNameMap {
+                "my-component": HTMLMyComponentElement;
+        }
+}
+declare namespace LocalJSX {
+    /**
+     * docs
+     */
+      interface MyComponent {
+                "name"?: UserImplementedPropType;
+        }
+        interface IntrinsicElements {
+              "my-component": MyComponent;
+        }
+}
+export { LocalJSX as JSX };
+declare module "@stencil/core" {
+        export namespace JSX {
+                interface IntrinsicElements {
+            /**
+             * docs
+             */
+                        "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
+                }
+        }
+}
+`,
+      {
+        immediateWrite: true,
+      },
+    );
+  });
+
+  it('should not transform aliased paths if transformAliasedImportPaths is false', async () => {
+    const compilerComponentMeta = stubComponentCompilerMeta({
+      tagName: 'my-component',
+      componentClassName: 'MyComponent',
+      jsFilePath: '/some/stubbed/path/a/my-component.js',
+      sourceFilePath: '/some/stubbed/path/a/my-component.tsx',
+      sourceMapPath: '/some/stubbed/path/a/my-component.js.map',
+      hasProp: true,
+      properties: [
+        stubComponentCompilerProperty({
+          name: 'name',
+          complexType: {
+            original: 'UserImplementedPropType',
+            resolved: '"foo" | "bar"',
+            references: {
+              UserImplementedPropType: {
+                id: 'some-file.ts::UserImplementedPropType',
+                location: 'import',
+                path: '@utils',
+              },
+            },
+          },
+        }),
+      ],
+    });
+    buildCtx.components = [compilerComponentMeta];
+    config.tsCompilerOptions = {};
+
+    await generateAppTypes(config, compilerCtx, buildCtx, 'src');
+
+    expect(mockWriteFile).toHaveBeenCalledWith(
+      '/components.d.ts',
+      `/* eslint-disable */
+/* tslint:disable */
+/**
+ * This is an autogenerated file created by the Stencil compiler.
+ * It contains typing information for all components that exist in this project.
+ */
+import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
+import { UserImplementedPropType } from "@utils";
+export { UserImplementedPropType } from "@utils";
+export namespace Components {
+    /**
+     * docs
+     */
+        interface MyComponent {
+                "name": UserImplementedPropType;
+        }
+}
+declare global {
+    /**
+     * docs
+     */
+        interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
+        }
+        var HTMLMyComponentElement: {
+                prototype: HTMLMyComponentElement;
+                new (): HTMLMyComponentElement;
+        };
+        interface HTMLElementTagNameMap {
+                "my-component": HTMLMyComponentElement;
+        }
+}
+declare namespace LocalJSX {
+    /**
+     * docs
+     */
+      interface MyComponent {
+                "name"?: UserImplementedPropType;
+        }
+        interface IntrinsicElements {
+              "my-component": MyComponent;
+        }
+}
+export { LocalJSX as JSX };
+declare module "@stencil/core" {
+        export namespace JSX {
+                interface IntrinsicElements {
+            /**
+             * docs
+             */
+                        "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
+                }
+        }
+}
+`,
+      {
+        immediateWrite: true,
+      },
     );
   });
 });

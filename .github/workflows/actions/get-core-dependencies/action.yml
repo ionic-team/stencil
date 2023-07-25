@@ -7,7 +7,7 @@ runs:
     # jobs that need a different version of the Node runtime should explicitly
     # set their node version after running this step
     - name: Use Node Version from Volta
-      uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516 # v3.5.1
+      uses: actions/setup-node@e33196f7422957bea03ed53f6fbb155025ffc7b8 # v3.7.0
       with:
         node-version-file: './package.json'
         cache: 'npm'

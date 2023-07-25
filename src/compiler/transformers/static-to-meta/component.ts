@@ -1,5 +1,5 @@
-import { normalizePath, unique } from '@utils';
-import { dirname, isAbsolute, join, relative } from 'path';
+import { join, normalizePath, relative, unique } from '@utils';
+import { dirname, isAbsolute } from 'path';
 import ts from 'typescript';
 
 import type * as d from '../../../declarations';
@@ -39,7 +39,7 @@ export const parseStaticComponentMeta = (
   typeChecker: ts.TypeChecker,
   cmpNode: ts.ClassDeclaration,
   moduleFile: d.Module,
-  transformOpts?: d.TransformOptions
+  transformOpts?: d.TransformOptions,
 ): ts.ClassDeclaration => {
   if (cmpNode.members == null) {
     return cmpNode;
@@ -54,7 +54,6 @@ export const parseStaticComponentMeta = (
   const docs = serializeSymbol(typeChecker, symbol);
   const isCollectionDependency = moduleFile.isCollectionDependency;
   const encapsulation = parseStaticEncapsulation(staticMembers);
-
   const cmp: d.ComponentCompilerMeta = {
     tagName: tagName,
     excludeFromCollection: moduleFile.excludeFromCollection,
@@ -62,6 +61,7 @@ export const parseStaticComponentMeta = (
     componentClassName: cmpNode.name ? cmpNode.name.text : '',
     elementRef: parseStaticElementRef(staticMembers),
     encapsulation,
+    hasStaticInitializedMember: getStaticValue(staticMembers, 'stencilHasStaticMembersWithInit') ?? false,
     shadowDelegatesFocus: parseStaticShadowDelegatesFocus(encapsulation, staticMembers),
     properties: parseStaticProps(staticMembers),
     virtualProperties: parseVirtualProps(docs),
@@ -71,8 +71,6 @@ export const parseStaticComponentMeta = (
     events: parseStaticEvents(staticMembers),
     watchers: parseStaticWatchers(staticMembers),
     styles: parseStaticStyles(compilerCtx, tagName, moduleFile.sourceFilePath, isCollectionDependency, staticMembers),
-    legacyConnect: getStaticValue(staticMembers, 'connectProps') || [],
-    legacyContext: getStaticValue(staticMembers, 'contextProps') || [],
     internal: isInternal(docs),
     assetsDirs: parseAssetsDirs(staticMembers, moduleFile.jsFilePath),
     styleDocs: [],
@@ -144,13 +142,6 @@ export const parseStaticComponentMeta = (
   };
   visitComponentChildNode(cmpNode);
   parseClassMethods(cmpNode, cmp);
-
-  cmp.legacyConnect.forEach(({ connect }) => {
-    cmp.htmlTagNames.push(connect);
-    if (connect.includes('-')) {
-      cmp.potentialCmpRefs.push(connect);
-    }
-  });
 
   cmp.htmlAttrNames = unique(cmp.htmlAttrNames);
   cmp.htmlTagNames = unique(cmp.htmlTagNames);

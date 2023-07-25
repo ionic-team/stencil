@@ -2,6 +2,13 @@ import ts from 'typescript';
 
 import { retrieveTsModifiers } from './transform-utils';
 
+/**
+ * Creates a new collection of class members that belong to the provided class node and that do not exist in
+ * {@link REMOVE_STATIC_GETTERS}
+ * @param classNode the class node in the syntax tree to inspect
+ * @returns a new collection of class members belonging to the provided class node, less those found in
+ * {@link REMOVE_STATIC_GETTERS}
+ */
 export const removeStaticMetaProperties = (classNode: ts.ClassDeclaration): ts.ClassElement[] => {
   if (classNode.members == null) {
     return [];
@@ -17,6 +24,10 @@ export const removeStaticMetaProperties = (classNode: ts.ClassDeclaration): ts.C
   });
 };
 
+// TODO(STENCIL-856): Move these properties to constants for better type safety within the codebase
+/**
+ * A list of static getter names that are specific to Stencil to exclude from a class's member list
+ */
 const REMOVE_STATIC_GETTERS = new Set([
   'is',
   'properties',
@@ -27,12 +38,11 @@ const REMOVE_STATIC_GETTERS = new Set([
   'methods',
   'states',
   'originalStyleUrls',
+  'stencilHasStaticMembersWithInit',
   'styleMode',
   'style',
   'styles',
   'styleUrl',
   'watchers',
   'styleUrls',
-  'contextProps',
-  'connectProps',
 ]);

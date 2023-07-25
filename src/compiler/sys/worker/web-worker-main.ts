@@ -4,7 +4,7 @@ import type * as d from '../../../declarations';
 
 export const createWebWorkerMainController = (
   sys: d.CompilerSystem,
-  maxConcurrentWorkers: number
+  maxConcurrentWorkers: number,
 ): d.WorkerMainController => {
   let msgIds = 0;
   let isDestroyed = false;

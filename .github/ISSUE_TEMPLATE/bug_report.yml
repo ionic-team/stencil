@@ -7,7 +7,7 @@ body:
       label: Prerequisites
       description: Please ensure you have completed all of the following.
       options:
-        - label: I have read the [Contributing Guidelines](https://github.com/ionic-team/stencil/blob/main/.github/CONTRIBUTING.md).
+        - label: I have read the [Contributing Guidelines](https://github.com/ionic-team/stencil/blob/main/CONTRIBUTING.md).
           required: true
         - label: I agree to follow the [Code of Conduct](https://github.com/ionic-team/stencil/blob/main/CODE_OF_CONDUCT.md).
           required: true
@@ -35,9 +35,10 @@ body:
     attributes:
       label: System Info
       description: |
-        Operating system & version, npm, node, and browser(s) & version(s) (if applicable)
+        Output of `npx stencil info`.
+        Please provide any additional information, such as npm version, browser(s) & version(s) as well
       render: shell
-      placeholder: System, Environment, Browsers
+      placeholder: System, Environment, Browsers. At minimum, please include `npx stencil info` output.
   - type: textarea
     attributes:
       label: Steps to Reproduce

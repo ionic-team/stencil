@@ -1,17 +1,23 @@
 import type { CompilerSystem, Logger } from '../declarations';
 import type { CoreCompiler } from './load-compiler';
 
-export const taskInfo = (coreCompiler: CoreCompiler, sys: CompilerSystem, logger: Logger) => {
+/**
+ * Generate the output for Stencils 'info' task, and log that output - `npx stencil info`
+ * @param coreCompiler the compiler instance to derive certain version information from
+ * @param sys the compiler system instance that provides details about the system Stencil is running on
+ * @param logger the logger instance to use to log information out to
+ */
+export const taskInfo = (coreCompiler: CoreCompiler, sys: CompilerSystem, logger: Logger): void => {
   const details = sys.details;
   const versions = coreCompiler.versions;
 
   console.log(``);
   console.log(`${logger.cyan('      System:')} ${sys.name} ${sys.version}`);
-  console.log(`${logger.cyan('     Plaform:')} ${details.platform} (${details.release})`);
+  console.log(`${logger.cyan('    Platform:')} ${details.platform} (${details.release})`);
   console.log(
     `${logger.cyan('   CPU Model:')} ${details.cpuModel} (${sys.hardwareConcurrency} cpu${
       sys.hardwareConcurrency !== 1 ? 's' : ''
-    })`
+    })`,
   );
   console.log(`${logger.cyan('    Compiler:')} ${sys.getCompilerExecutingPath()}`);
   console.log(`${logger.cyan('       Build:')} ${coreCompiler.buildId}`);

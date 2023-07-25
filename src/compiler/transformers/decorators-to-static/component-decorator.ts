@@ -12,7 +12,7 @@ export const componentDecoratorToStatic = (
   diagnostics: d.Diagnostic[],
   cmpNode: ts.ClassDeclaration,
   newMembers: ts.ClassElement[],
-  componentDecorator: ts.Decorator
+  componentDecorator: ts.Decorator,
 ) => {
   const [componentOptions] = getDeclarationParameters<d.ComponentOptions>(componentDecorator);
   if (!componentOptions) {
@@ -52,7 +52,7 @@ const validateComponent = (
   typeChecker: ts.TypeChecker,
   componentOptions: d.ComponentOptions,
   cmpNode: ts.ClassDeclaration,
-  componentDecorator: ts.Node
+  componentDecorator: ts.Node,
 ) => {
   const extendNode =
     cmpNode.heritageClauses && cmpNode.heritageClauses.find((c) => c.token === ts.SyntaxKind.ExtendsKeyword);

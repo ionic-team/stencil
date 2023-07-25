@@ -1,9 +1,8 @@
-import { hasError, normalizeFsPath } from '@utils';
+import { hasError, isOutputTargetDistCollection, normalizeFsPath } from '@utils';
 import { join, relative } from 'path';
 import type { Plugin } from 'rollup';
 
 import type * as d from '../../declarations';
-import { isOutputTargetDistCollection } from '../output-targets/output-utils';
 import { runPluginTransformsEsmImports } from '../plugin/plugin';
 import { parseImportPath } from '../transformers/stencil-import-path';
 import type { BundleOptions } from './bundle-interface';
@@ -22,7 +21,7 @@ export const extTransformsPlugin = (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
-  bundleOpts: BundleOptions
+  bundleOpts: BundleOptions,
 ): Plugin => {
   return {
     name: 'extTransformsPlugin',
@@ -93,7 +92,7 @@ export const extTransformsPlugin = (
               collectionDirs.map(async (outputTarget) => {
                 const collectionPath = join(outputTarget.collectionDir, relPath);
                 await compilerCtx.fs.writeFile(collectionPath, pluginTransforms.code);
-              })
+              }),
             );
           }
         }

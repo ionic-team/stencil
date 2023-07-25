@@ -356,7 +356,7 @@ describe('css-imports', () => {
           filePath: normalizePath(path.join(root, 'node_modules', '@ionic', 'core', 'dist', 'ionic', 'ionic.css')),
           srcImport: `@import '~@ionic/core/dist/ionic/ionic.css';`,
           updatedImport: `@import "${normalizePath(
-            path.join(root, 'node_modules', '@ionic', 'core', 'dist', 'ionic', 'ionic.css')
+            path.join(root, 'node_modules', '@ionic', 'core', 'dist', 'ionic', 'ionic.css'),
           )}";`,
           url: `~@ionic/core/dist/ionic/ionic.css`,
         },
@@ -413,7 +413,7 @@ describe('css-imports', () => {
           filePath: normalizePath(path.join(root, 'node_modules', '@ionic', 'core', 'dist', 'ionic', 'ionic.css')),
           srcImport: `@import '~@ionic/core/dist/ionic/ionic.css';`,
           updatedImport: `@import "${normalizePath(
-            path.join(root, 'node_modules', '@ionic', 'core', 'dist', 'ionic', 'ionic.css')
+            path.join(root, 'node_modules', '@ionic', 'core', 'dist', 'ionic', 'ionic.css'),
           )}";`,
           url: `~@ionic/core/dist/ionic/ionic.css`,
         },
@@ -485,7 +485,7 @@ describe('css-imports', () => {
         mainFilePath,
         mainFilePath,
         files[mainFilePath],
-        []
+        [],
       );
       // CSS from child and grandchild are merged in
       expect(result.styleText).toBe('div { display: flex } :host { color: red; }');

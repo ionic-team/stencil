@@ -6,7 +6,7 @@ export const updateIndexHtmlServiceWorker = async (
   config: d.Config,
   buildCtx: d.BuildCtx,
   doc: Document,
-  outputTarget: d.OutputTargetWww
+  outputTarget: d.OutputTargetWww,
 ) => {
   const serviceWorker = outputTarget.serviceWorker;
 

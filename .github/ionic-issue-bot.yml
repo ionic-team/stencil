@@ -7,7 +7,7 @@ closeAndLock:
     - label: 'ionitron: support'
       message: >
         Thanks for the issue! This issue appears to be a support request. We use this issue tracker exclusively for
-        bug reports and feature requests. Please use our [slack channel](https://stencil-worldwide.herokuapp.com/)
+        bug reports and feature requests. Please use our [Discord server](https://chat.stenciljs.com)
         for questions about Stencil.
 
 
@@ -42,7 +42,7 @@ comment:
 
 
         For a guide on how to create a good reproduction, see our
-        [Contributing Guide](https://github.com/ionic-team/stencil/blob/main/.github/CONTRIBUTING.md).
+        [Contributing Guide](https://github.com/ionic-team/stencil/blob/main/CONTRIBUTING.md).
   dryRun: false
 
 noReply:

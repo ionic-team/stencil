@@ -337,9 +337,16 @@ export class MockWindow {
     }
   }
 
-  matchMedia() {
+  matchMedia(media: string) {
     return {
+      media,
       matches: false,
+      addListener: (_handler: (ev?: any) => void) => {},
+      removeListener: (_handler: (ev?: any) => void) => {},
+      addEventListener: (_type: string, _handler: (ev?: any) => void) => {},
+      removeEventListener: (_type: string, _handler: (ev?: any) => void) => {},
+      dispatchEvent: (_ev: any) => {},
+      onchange: null as ((this: MediaQueryList, ev: MediaQueryListEvent) => any) | null,
     };
   }
 

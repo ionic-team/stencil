@@ -28,10 +28,43 @@ describe('parse props', () => {
       },
     });
 
-    expect(t.property.attribute).toBe('val');
-    expect(t.property.type).toBe('string');
-    expect(t.property.optional).toBe(true);
-    expect(t.cmp.hasProp).toBe(true);
+    expect(t.property?.attribute).toBe('val');
+    expect(t.property?.type).toBe('string');
+    expect(t.property?.optional).toBe(true);
+    expect(t.cmp?.hasProp).toBe(true);
+  });
+
+  it('should correctly parse a prop with an unresolved type', () => {
+    const t = transpileModule(`
+    @Component({tag: 'cmp-a'})
+      export class CmpA {
+        @Prop() val?: Foo;
+      }
+    `);
+    expect(getStaticGetter(t.outputText, 'properties')).toEqual({
+      val: {
+        attribute: 'val',
+        complexType: {
+          references: {
+            Foo: {
+              id: 'global::Foo',
+              location: 'global',
+            },
+          },
+          resolved: 'Foo',
+          original: 'Foo',
+        },
+        docs: {
+          text: '',
+          tags: [],
+        },
+        mutable: false,
+        optional: true,
+        reflect: false,
+        required: false,
+        type: 'any',
+      },
+    });
   });
 
   it('prop required', () => {
@@ -60,7 +93,7 @@ describe('parse props', () => {
         type: 'string',
       },
     });
-    expect(t.property.required).toBe(true);
+    expect(t.property?.required).toBe(true);
   });
 
   it('prop mutable', () => {
@@ -90,7 +123,7 @@ describe('parse props', () => {
         type: 'string',
       },
     });
-    expect(t.property.mutable).toBe(true);
+    expect(t.property?.mutable).toBe(true);
   });
 
   it('prop reflectAttr', () => {
@@ -119,8 +152,8 @@ describe('parse props', () => {
         type: 'string',
       },
     });
-    expect(t.property.reflect).toBe(true);
-    expect(t.cmp.hasReflect).toBe(true);
+    expect(t.property?.reflect).toBe(true);
+    expect(t.cmp?.hasReflect).toBe(true);
   });
 
   it('prop array', () => {
@@ -147,9 +180,9 @@ describe('parse props', () => {
         type: 'unknown',
       },
     });
-    expect(t.property.type).toBe('unknown');
-    expect(t.property.attribute).toBe(undefined);
-    expect(t.property.reflect).toBe(false);
+    expect(t.property?.type).toBe('unknown');
+    expect(t.property?.attribute).toBe(undefined);
+    expect(t.property?.reflect).toBe(false);
   });
 
   it('prop object', () => {
@@ -166,6 +199,7 @@ describe('parse props', () => {
           references: {
             Object: {
               location: 'global',
+              id: 'global::Object',
             },
           },
           resolved: 'Object',
@@ -182,9 +216,9 @@ describe('parse props', () => {
         type: 'any',
       },
     });
-    expect(t.property.type).toBe('any');
-    expect(t.property.attribute).toBe('val');
-    expect(t.property.reflect).toBe(false);
+    expect(t.property?.type).toBe('any');
+    expect(t.property?.attribute).toBe('val');
+    expect(t.property?.reflect).toBe(false);
   });
 
   it('prop multiword', () => {
@@ -214,8 +248,8 @@ describe('parse props', () => {
         type: 'string',
       },
     });
-    expect(t.property.name).toBe('multiWord');
-    expect(t.property.attribute).toBe('multi-word');
+    expect(t.property?.name).toBe('multiWord');
+    expect(t.property?.attribute).toBe('multi-word');
   });
 
   it('prop w/ string type', () => {
@@ -244,8 +278,8 @@ describe('parse props', () => {
         type: 'string',
       },
     });
-    expect(t.property.type).toBe('string');
-    expect(t.property.attribute).toBe('val');
+    expect(t.property?.type).toBe('string');
+    expect(t.property?.attribute).toBe('val');
   });
 
   it('prop w/ number type', () => {
@@ -274,8 +308,8 @@ describe('parse props', () => {
         type: 'number',
       },
     });
-    expect(t.property.type).toBe('number');
-    expect(t.property.attribute).toBe('val');
+    expect(t.property?.type).toBe('number');
+    expect(t.property?.attribute).toBe('val');
   });
 
   it('prop w/ boolean type', () => {
@@ -304,8 +338,8 @@ describe('parse props', () => {
         type: 'boolean',
       },
     });
-    expect(t.property.type).toBe('boolean');
-    expect(t.property.attribute).toBe('val');
+    expect(t.property?.type).toBe('boolean');
+    expect(t.property?.attribute).toBe('val');
   });
 
   it('prop w/ any type', () => {
@@ -334,8 +368,8 @@ describe('parse props', () => {
         type: 'any',
       },
     });
-    expect(t.property.type).toBe('any');
-    expect(t.property.attribute).toBe('val');
+    expect(t.property?.type).toBe('any');
+    expect(t.property?.attribute).toBe('val');
   });
 
   it('prop w/ inferred string type', () => {
@@ -365,8 +399,8 @@ describe('parse props', () => {
         type: 'string',
       },
     });
-    expect(t.property.type).toBe('string');
-    expect(t.property.attribute).toBe('val');
+    expect(t.property?.type).toBe('string');
+    expect(t.property?.attribute).toBe('val');
   });
 
   it('prop w/ inferred number type', () => {
@@ -396,8 +430,8 @@ describe('parse props', () => {
         type: 'number',
       },
     });
-    expect(t.property.type).toBe('number');
-    expect(t.property.attribute).toBe('val');
+    expect(t.property?.type).toBe('number');
+    expect(t.property?.attribute).toBe('val');
   });
 
   it('prop w/ inferred boolean type', () => {
@@ -427,8 +461,8 @@ describe('parse props', () => {
         type: 'boolean',
       },
     });
-    expect(t.property.type).toBe('boolean');
-    expect(t.property.attribute).toBe('val');
+    expect(t.property?.type).toBe('boolean');
+    expect(t.property?.attribute).toBe('val');
   });
 
   it('prop w/ inferred any type from null', () => {
@@ -459,7 +493,7 @@ describe('parse props', () => {
         type: 'any',
       },
     });
-    expect(t.property.type).toBe('any');
-    expect(t.property.attribute).toBe('val');
+    expect(t.property?.type).toBe('any');
+    expect(t.property?.attribute).toBe('val');
   });
 });

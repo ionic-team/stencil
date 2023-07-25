@@ -42,6 +42,36 @@ export interface StencilConfig {
    * To disable this feature, set enableCache to false.
    */
   enableCache?: boolean;
+  /**
+   * The directory where sub-directories will be created for caching when `enableCache` is set
+   * `true` or if using Stencil's Screenshot Connector.
+   *
+   * @default '.stencil'
+   *
+   * @example
+   *
+   * A Stencil config like the following:
+   * ```ts
+   * export const config = {
+   *  ...,
+   *  enableCache: true,
+   *  cacheDir: '.cache',
+   *  testing: {
+   *    screenshotConnector: 'connector.js'
+   *  }
+   * }
+   * ```
+   *
+   * Will result in the following file structure:
+   * ```tree
+   * stencil-project-root
+   * └── .cache
+   *     ├── .build <-- Where build related file caching is written
+   *     |
+   *     └── screenshot-cache.json <-- Where screenshot caching is written
+   * ```
+   */
+  cacheDir?: string;
 
   /**
    * Stencil is traditionally used to compile many components into an app,
@@ -104,6 +134,19 @@ export interface StencilConfig {
    * for each component. The standard for Stencil apps is to use src, which is the default.
    */
   srcDir?: string;
+
+  /**
+   * Sets whether or not Stencil should transform path aliases set in a project's
+   * `tsconfig.json` from the assigned module aliases to resolved relative paths.
+   *
+   * This behavior defaults to `true`, but may be opted-out of by setting this flag to `false`.
+   */
+  transformAliasedImportPaths?: boolean;
+  /**
+   * When `true`, we will validate a project's `package.json` based on the output target the user has designated
+   * as `isPrimaryPackageOutputTarget: true` in their Stencil config.
+   */
+  validatePrimaryPackageOutputTarget?: boolean;
 
   /**
    * Passes custom configuration down to the "@rollup/plugin-commonjs" that Stencil uses under the hood.
@@ -231,10 +274,8 @@ export interface StencilConfig {
   entryComponentsHint?: string[];
   buildDist?: boolean;
   buildLogFilePath?: string;
-  cacheDir?: string;
   devInspector?: boolean;
   devServer?: StencilDevServerConfig;
-  enableCacheStats?: boolean;
   sys?: CompilerSystem;
   tsconfig?: string;
   validateTypes?: boolean;
@@ -270,48 +311,28 @@ export interface ConfigExtras {
    */
   cloneNodeFix?: boolean;
 
-  // TODO(STENCIL-659): Remove code implementing the CSS variable shim
-  /**
-   * Include the CSS Custom Property polyfill/shim for legacy browsers. ESM builds will
-   * not include the css vars shim. Defaults to `false`
-   *
-   * @deprecated Since Stencil v3.0.0. IE 11, Edge <= 18, and old Safari
-   * versions are no longer supported.
-   */
-  __deprecated__cssVarsShim?: boolean;
-
-  // TODO(STENCIL-661): Remove code related to the dynamic import shim
-  /**
-   * Dynamic `import()` shim. This is only needed for Edge 18 and below, and
-   * Firefox 67 and below. Defaults to `false`.
-   * @deprecated Since Stencil v3.0.0. IE 11, Edge <= 18, and old Safari
-   * versions are no longer supported.
-   */
-  __deprecated__dynamicImportShim?: boolean;
-
   /**
    * Experimental flag. Projects that use a Stencil library built using the `dist` output target may have trouble lazily
    * loading components when using a bundler such as Vite or Parcel. Setting this flag to `true` will change how Stencil
    * lazily loads components in a way that works with additional bundlers. Setting this flag to `true` will increase
    * the size of the compiled output. Defaults to `false`.
+   * @deprecated This flag has been deprecated in favor of `enableImportInjection`, which provides the same
+   * functionality. `experimentalImportInjection` will be removed in a future major version of Stencil.
    */
   experimentalImportInjection?: boolean;
+
+  /**
+   * Projects that use a Stencil library built using the `dist` output target may have trouble lazily
+   * loading components when using a bundler such as Vite or Parcel. Setting this flag to `true` will change how Stencil
+   * lazily loads components in a way that works with additional bundlers. Setting this flag to `true` will increase
+   * the size of the compiled output. Defaults to `false`.
+   */
+  enableImportInjection?: boolean;
 
   /**
    * Dispatches component lifecycle events. Mainly used for testing. Defaults to `false`.
    */
   lifecycleDOMEvents?: boolean;
-
-  // TODO(STENCIL-663): Remove code related to deprecated `safari10` field.
-  /**
-   * Safari 10 supports ES modules with `<script type="module">`, however, it did not implement
-   * `<script nomodule>`. When set to `true`, the runtime will patch support for Safari 10
-   * due to its lack of `nomodule` support.
-   * Defaults to `false`.
-   *
-   * @deprecated Since Stencil v3.0.0, Safari 10 is no longer supported.
-   */
-  __deprecated__safari10?: boolean;
 
   /**
    * It is possible to assign data to the actual `<script>` element's `data-opts` property,
@@ -325,18 +346,6 @@ export interface ConfigExtras {
    * component that uses the shadow DOM. Defaults to `false`
    */
   scopedSlotTextContentFix?: boolean;
-
-  // TODO(STENCIL-662): Remove code related to deprecated shadowDomShim field
-  /**
-   * If enabled `true`, the runtime will check if the shadow dom shim is required. However,
-   * if it's determined that shadow dom is already natively supported by the browser then
-   * it does not request the shim. When set to `false` it will avoid all shadow dom tests.
-   * Defaults to `false`.
-   *
-   * @deprecated Since Stencil v3.0.0. IE 11, Edge <= 18, and old Safari versions
-   * are no longer supported.
-   */
-  __deprecated__shadowDomShim?: boolean;
 
   /**
    * When a component is first attached to the DOM, this setting will wait a single tick before
@@ -428,14 +437,21 @@ type RequireFields<T, K extends keyof T> = T & { [P in K]-?: T[P] };
  * Fields in {@link Config} to make required for {@link ValidatedConfig}
  */
 type StrictConfigFields =
+  | 'cacheDir'
+  | 'devServer'
   | 'flags'
   | 'hydratedFlag'
   | 'logger'
   | 'outputTargets'
   | 'packageJsonFilePath'
+  | 'rollupConfig'
   | 'rootDir'
+  | 'srcDir'
+  | 'srcIndexHtml'
   | 'sys'
-  | 'testing';
+  | 'testing'
+  | 'transformAliasedImportPaths'
+  | 'validatePrimaryPackageOutputTarget';
 
 /**
  * A version of {@link Config} that makes certain fields required. This type represents a valid configuration entity.
@@ -958,6 +974,7 @@ export interface CompilerSystem {
   applyGlobalPatch?(fromDir: string): Promise<void>;
   applyPrerenderGlobalPatch?(opts: { devServerHostUrl: string; window: any }): void;
   cacheStorage?: CacheStorage;
+  // TODO(STENCIL-898): Make this property non-optional, check for unnecessary null checks on it
   checkVersion?: (logger: Logger, currentVersion: string) => Promise<() => void>;
   copy?(copyTasks: Required<CopyTask>[], srcDir: string): Promise<CopyResults>;
   /**
@@ -1132,7 +1149,24 @@ export interface CompilerSystem {
   statSync(p: string): CompilerFsStats;
   tmpDirSync(): string;
   watchDirectory?(p: string, callback: CompilerFileWatcherCallback, recursive?: boolean): CompilerFileWatcher;
-  watchFile?(p: string, callback: CompilerFileWatcherCallback): CompilerFileWatcher;
+
+  /**
+   * A `watchFile` implementation in order to hook into the rest of the {@link CompilerSystem} implementation that is
+   * used when running Stencil's compiler in "watch mode".
+   *
+   * It is analogous to TypeScript's `watchFile`  implementation.
+   *
+   * Note, this function may be called for full builds of Stencil projects by the TypeScript compiler. It should not
+   * assume that it will only be called in watch mode.
+   *
+   * This function should not perform any file watcher registration itself. Each `path` provided to it when called
+   * should already have been registered as a file to watch.
+   *
+   * @param path the path to the file that is being watched
+   * @param callback a callback to invoke when a file that is being watched has changed in some way
+   * @returns an object with a method for unhooking the file watcher from the system
+   */
+  watchFile?(path: string, callback: CompilerFileWatcherCallback): CompilerFileWatcher;
   /**
    * How many milliseconds to wait after a change before calling watch callbacks.
    */
@@ -1334,8 +1368,17 @@ export interface CompilerBuildStart {
   timestamp: string;
 }
 
+/**
+ * A type describing a function to call when an event is emitted by a file watcher
+ * @param fileName the path of the file tied to event
+ * @param eventKind a variant describing the type of event that was emitter (added, edited, etc.)
+ */
 export type CompilerFileWatcherCallback = (fileName: string, eventKind: CompilerFileWatcherEvent) => void;
 
+/**
+ * A type describing the different types of events that Stencil expects may happen when a file being watched is altered
+ * in some way
+ */
 export type CompilerFileWatcherEvent =
   | CompilerEventFileAdd
   | CompilerEventFileDelete
@@ -1484,7 +1527,12 @@ export interface CopyTask {
   keepDirStructure?: boolean;
 }
 
+// TODO(STENCIL-882): Remove this interface [BREAKING_CHANGE]
 export interface BundlingConfig {
+  /**
+   * @deprecated the `namedExports` field is no longer honored by `@rollup/plugin-commonjs` and is not used by Stencil.
+   * This field can be safely removed from your Stencil configuration file.
+   */
   namedExports?: {
     [key: string]: string[];
   };
@@ -1726,9 +1774,18 @@ export interface TestingConfig extends JestConfig {
   browserWSEndpoint?: string;
 
   /**
-   * Whether to run browser e2e tests in headless mode. Defaults to true.
+   * Whether to run browser e2e tests in headless mode.
+   *
+   * Starting with Chrome v112, a new headless mode was introduced.
+   * The new headless mode unifies the "headful" and "headless" code paths in the Chrome distributable.
+   *
+   * To enable the "new" headless mode, a string value of "new" must be provided.
+   * To use the "old" headless mode, a boolean value of `true` must be provided.
+   * To use "headful" mode, a boolean value of `false` must be provided.
+   *
+   * Defaults to true.
    */
-  browserHeadless?: boolean;
+  browserHeadless?: boolean | 'new';
 
   /**
    * Slows down e2e browser operations by the specified amount of milliseconds.
@@ -1878,11 +1935,10 @@ export interface LoggerTimeSpan {
   finish(finishedMsg: string, color?: string, bold?: boolean, newLineSuffix?: boolean): number;
 }
 
-export interface OutputTargetDist extends OutputTargetBase {
+export interface OutputTargetDist extends OutputTargetValidationConfig {
   type: 'dist';
 
   buildDir?: string;
-  dir?: string;
 
   collectionDir?: string | null;
   /**
@@ -1890,7 +1946,7 @@ export interface OutputTargetDist extends OutputTargetBase {
    * a project's `tsconfig.json` to relative import paths in the compiled output's
    * `dist-collection` bundle if it is generated (i.e. `collectionDir` is set).
    *
-   * Paths will be left in aliased format if `false` or `undefined`.
+   * Paths will be left in aliased format if `false`.
    *
    * @example
    * // tsconfig.json
@@ -1915,7 +1971,7 @@ export interface OutputTargetDist extends OutputTargetBase {
   empty?: boolean;
 }
 
-export interface OutputTargetDistCollection extends OutputTargetBase {
+export interface OutputTargetDistCollection extends OutputTargetValidationConfig {
   type: 'dist-collection';
   empty?: boolean;
   dir: string;
@@ -1942,7 +1998,7 @@ export interface OutputTargetDistCollection extends OutputTargetBase {
   transformAliasedImportPaths?: boolean | null;
 }
 
-export interface OutputTargetDistTypes extends OutputTargetBase {
+export interface OutputTargetDistTypes extends OutputTargetValidationConfig {
   type: 'dist-types';
   dir: string;
   typesDir: string;
@@ -2035,8 +2091,27 @@ export interface OutputTargetDocsJson extends OutputTargetBase {
   type: 'docs-json';
 
   file: string;
+  /**
+   * Set an optional file path where Stencil should write a `d.ts` file to disk
+   * at build-time containing type declarations for {@link JsonDocs} and related
+   * interfaces. If this is omitted or set to `null` Stencil will not write such
+   * a file.
+   */
   typesFile?: string | null;
   strict?: boolean;
+  /**
+   * An optional file path pointing to a public type library which should be
+   * included and documented in the same way as other types which are included
+   * in this output target.
+   *
+   * This could be useful if, for instance, there are some important interfaces
+   * used in a few places in a Stencil project which don't form part of the
+   * public API for any of the project's components. Such interfaces will not
+   * be included in the `docs-json` output by default, but if they're declared
+   * and exported from a 'supplemental' file designated with this property then
+   * they'll be included in the output, facilitating their documentation.
+   */
+  supplementalPublicTypes?: string;
 }
 
 export interface OutputTargetDocsCustom extends OutputTargetBase {
@@ -2086,7 +2161,7 @@ export const CustomElementsExportBehaviorOptions = [
  */
 export type CustomElementsExportBehavior = (typeof CustomElementsExportBehaviorOptions)[number];
 
-export interface OutputTargetDistCustomElements extends OutputTargetBaseNext {
+export interface OutputTargetDistCustomElements extends OutputTargetValidationConfig {
   type: 'dist-custom-elements';
   empty?: boolean;
   /**
@@ -2111,15 +2186,6 @@ export interface OutputTargetDistCustomElements extends OutputTargetBaseNext {
   customElementsExportBehavior?: CustomElementsExportBehavior;
 }
 
-export interface OutputTargetDistCustomElementsBundle extends OutputTargetBaseNext {
-  type: 'dist-custom-elements-bundle';
-  empty?: boolean;
-  externalRuntime?: boolean;
-  copy?: CopyTask[];
-  includeGlobalScripts?: boolean;
-  minify?: boolean;
-}
-
 /**
  * The base type for output targets. All output targets should extend this base type.
  */
@@ -2129,6 +2195,20 @@ export interface OutputTargetBase {
    */
   type: string;
 }
+
+/**
+ * Output targets that can have validation for common `package.json` field values
+ * (module, types, etc.). This allows them to be marked for validation in a project's Stencil config.
+ */
+interface OutputTargetValidationConfig extends OutputTargetBaseNext {
+  isPrimaryPackageOutputTarget?: boolean;
+}
+
+export type EligiblePrimaryPackageOutputTarget =
+  | OutputTargetDist
+  | OutputTargetDistCustomElements
+  | OutputTargetDistCollection
+  | OutputTargetDistTypes;
 
 export type OutputTargetBuild = OutputTargetDistCollection | OutputTargetDistLazy;
 
@@ -2229,7 +2309,6 @@ export type OutputTarget =
   | OutputTargetDist
   | OutputTargetDistCollection
   | OutputTargetDistCustomElements
-  | OutputTargetDistCustomElementsBundle
   | OutputTargetDistLazy
   | OutputTargetDistGlobalStyles
   | OutputTargetDistLazyLoader
@@ -2242,6 +2321,17 @@ export type OutputTarget =
   | OutputTargetStats
   | OutputTargetDistTypes;
 
+/**
+ * Our custom configuration interface for generated caching Service Workers
+ * using the Workbox library (see https://developer.chrome.com/docs/workbox/).
+ *
+ * Although we are using Workbox we are unfortunately unable to depend on the
+ * published types for the library because they must be compiled using the
+ * `webworker` lib for TypeScript, which cannot be used at the same time as
+ * the `dom` lib. So as a workaround we maintain our own interface here. See
+ * here to refer to the published version:
+ * https://github.com/DefinitelyTyped/DefinitelyTyped/blob/c7b4dadae5b320ad1311a8f82242b8f2f41b7b8c/types/workbox-build/generate-sw.d.ts#L3
+ */
 export interface ServiceWorkerConfig {
   // https://developers.google.com/web/tools/workbox/modules/workbox-build#full_generatesw_config
   unregister?: boolean;
@@ -2418,10 +2508,18 @@ export interface LazyRequire {
   getModulePath(fromDir: string, moduleId: string): string;
 }
 
+/**
+ * @deprecated This interface is no longer used by Stencil
+ * TODO(STENCIL-743): Remove this interface
+ */
 export interface FsWatcherItem {
   close(): void;
 }
 
+/**
+ * @deprecated This interface is no longer used by Stencil
+ * TODO(STENCIL-743): Remove this interface
+ */
 export interface MakeDirectoryOptions {
   /**
    * Indicates whether parent folders should be created.
@@ -2435,6 +2533,10 @@ export interface MakeDirectoryOptions {
   mode?: number;
 }
 
+/**
+ * @deprecated This interface is no longer used by Stencil
+ * TODO(STENCIL-743): Remove this interface
+ */
 export interface FsStats {
   isFile(): boolean;
   isDirectory(): boolean;
@@ -2491,6 +2593,9 @@ export interface CompilerRequestResponse {
   status: number;
 }
 
+/**
+ * Options for Stencil's string-to-string transpiler
+ */
 export interface TranspileOptions {
   /**
    * A component can be defined as a custom element by using `customelement`, or the
@@ -2567,6 +2672,11 @@ export interface TranspileOptions {
    * Passed in Stencil Compiler System, otherwise falls back to the internal in-memory only system.
    */
   sys?: CompilerSystem;
+  /**
+   * This option enables the same behavior as {@link Config.transformAliasedImportPaths}, transforming paths aliased in
+   * `tsconfig.json` to relative paths.
+   */
+  transformAliasedImportPaths?: boolean;
 }
 
 export type CompileTarget =

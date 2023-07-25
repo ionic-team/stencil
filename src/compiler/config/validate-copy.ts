@@ -10,7 +10,7 @@ import type * as d from '../../declarations';
  */
 export const validateCopy = (
   copy: d.CopyTask[] | boolean | null | undefined,
-  defaultCopy: d.CopyTask[] = []
+  defaultCopy: d.CopyTask[] = [],
 ): d.CopyTask[] => {
   if (copy === null || copy === false) {
     return [];

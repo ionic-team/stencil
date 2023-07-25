@@ -17,7 +17,7 @@ import { isDecoratorNamed } from './decorator-utils';
 export const stateDecoratorsToStatic = (
   decoratedProps: ts.ClassElement[],
   watchable: Set<string>,
-  newMembers: ts.ClassElement[]
+  newMembers: ts.ClassElement[],
 ) => {
   const states = decoratedProps
     .filter(ts.isPropertyDeclaration)
@@ -52,6 +52,6 @@ const stateDecoratorToStatic = (prop: ts.PropertyDeclaration, watchable: Set<str
   watchable.add(stateName);
   return ts.factory.createPropertyAssignment(
     ts.factory.createStringLiteral(stateName),
-    ts.factory.createObjectLiteralExpression([], true)
+    ts.factory.createObjectLiteralExpression([], true),
   );
 };

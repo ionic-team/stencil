@@ -1,10 +1,9 @@
-import { isRemoteUrl, isString, normalizePath } from '@utils';
+import { isString, normalizePath } from '@utils';
 import { basename, dirname, isAbsolute, join, resolve } from 'path';
 import ts from 'typescript';
 
 import type * as d from '../../../declarations';
 import { version } from '../../../version';
-import { IS_BROWSER_ENV, IS_NODE_ENV } from '../environment';
 import { InMemoryFileSystem } from '../in-memory-fs';
 import { resolveRemoteModuleIdSync } from '../resolve/resolve-module-sync';
 import {
@@ -19,32 +18,11 @@ import {
 } from '../resolve/resolve-utils';
 import { patchTsSystemFileSystem } from './typescript-sys';
 
-export const patchTypeScriptResolveModule = (config: d.Config, inMemoryFs: InMemoryFileSystem) => {
-  let compilerExe: string;
-  if (config.sys) {
-    compilerExe = config.sys.getCompilerExecutingPath();
-  } else if (IS_BROWSER_ENV) {
-    compilerExe = location.href;
-  }
-
-  if (shouldPatchRemoteTypeScript(compilerExe)) {
-    const resolveModuleName = ((ts as any).__resolveModuleName = ts.resolveModuleName);
-
-    ts.resolveModuleName = (moduleName, containingFile, compilerOptions, host, cache, redirectedReference) => {
-      const resolvedModule = patchedTsResolveModule(config, inMemoryFs, moduleName, containingFile);
-      if (resolvedModule) {
-        return resolvedModule;
-      }
-      return resolveModuleName(moduleName, containingFile, compilerOptions, host, cache, redirectedReference);
-    };
-  }
-};
-
 export const tsResolveModuleName = (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   moduleName: string,
-  containingFile: string
+  containingFile: string,
 ) => {
   const resolveModuleName: typeof ts.resolveModuleName = (ts as any).__resolveModuleName || ts.resolveModuleName;
 
@@ -60,10 +38,10 @@ export const tsResolveModuleName = (
 };
 
 export const tsResolveModuleNamePackageJsonPath = (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   moduleName: string,
-  containingFile: string
+  containingFile: string,
 ) => {
   try {
     const resolvedModule = tsResolveModuleName(config, compilerCtx, moduleName, containingFile);
@@ -93,14 +71,32 @@ export const patchedTsResolveModule = (
   config: d.Config,
   inMemoryFs: InMemoryFileSystem,
   moduleName: string,
-  containingFile: string
+  containingFile: string,
 ): ts.ResolvedModuleWithFailedLookupLocations => {
   if (isLocalModule(moduleName)) {
     const containingDir = dirname(containingFile);
     let resolvedFileName = join(containingDir, moduleName);
     resolvedFileName = normalizePath(ensureExtension(resolvedFileName, containingFile));
 
-    if (isAbsolute(resolvedFileName) && !inMemoryFs.accessSync(resolvedFileName)) {
+    // In some cases `inMemoryFs` will not be defined here, so we should use
+    // `accessSync` on `config.sys` instead. This is because this function is
+    // called by `patchTypeScriptResolveModule` which is then in turn called by
+    // `patchTypescript`. If you check out that function it takes an
+    // `InMemoryFileSystem` as its second parameter:
+    //
+    // https://github.com/ionic-team/stencil/blob/5b4bb06a4d0369c09aeb63b1a626ff8df9464117/src/compiler/sys/typescript/typescript-sys.ts#L165-L175
+    //
+    // but if you look at its call sites there are a few where we pass `null`
+    // instead, eg:
+    //
+    // https://github.com/ionic-team/stencil/blob/5b4bb06a4d0369c09aeb63b1a626ff8df9464117/src/compiler/transpile.ts#L42-L44
+    //
+    // so in short the type for `inMemoryFs` here is not accurate, so we need
+    // to add a runtime check here to avoid an error.
+    //
+    // TODO(STENCIL-728): fix typing of `inMemoryFs` parameter in `patchTypescript`, related functions
+    const accessSync = inMemoryFs?.accessSync ?? config.sys.accessSync;
+    if (isAbsolute(resolvedFileName) && !accessSync(resolvedFileName)) {
       return null;
     }
 
@@ -132,7 +128,7 @@ export const tsResolveNodeModule = (
   config: d.Config,
   inMemoryFs: InMemoryFileSystem,
   moduleId: string,
-  containingFile: string
+  containingFile: string,
 ): ts.ResolvedModuleWithFailedLookupLocations => {
   if (isStencilCoreImport(moduleId)) {
     const rtn: ts.ResolvedModuleWithFailedLookupLocations = {
@@ -143,7 +139,7 @@ export const tsResolveNodeModule = (
             rootDir: config.rootDir,
             moduleId: '@stencil/core',
             path: 'internal/index.d.ts',
-          })
+          }),
         ),
         packageId: {
           name: moduleId,
@@ -216,5 +212,3 @@ const getTsResolveExtension = (p: string) => {
   }
   return ts.Extension.Ts;
 };
-
-const shouldPatchRemoteTypeScript = (compilerExe: string) => !IS_NODE_ENV && isRemoteUrl(compilerExe);

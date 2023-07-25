@@ -21,8 +21,8 @@ describe('generate-method-types', () => {
           _typeReferences: d.ComponentCompilerTypeReferences,
           _typeImportData: d.TypesImportData,
           _sourceFilePath: string,
-          initialType: string
-        ) => initialType
+          initialType: string,
+        ) => initialType,
       );
 
       getTextDocsSpy = jest.spyOn(Util, 'getTextDocs');
@@ -98,7 +98,7 @@ describe('generate-method-types', () => {
         internal: true,
         complexType: {
           parameters: [{ tags: [], text: '' }],
-          references: { Bar: { location: 'local', path: './other-resources' } },
+          references: { Bar: { location: 'local', id: 'placeholder_id', path: './other-resources' } },
           return: 'Promise<boolean>',
           signature: '(age: Bar) => Promise<boolean>',
         },

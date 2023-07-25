@@ -1,6 +1,6 @@
 import type * as d from '@stencil/core/declarations';
 import { OutputTargetWww } from '@stencil/core/declarations';
-import { mockCompilerSystem, mockLogger } from '@stencil/core/testing';
+import { mockCompilerSystem, mockLogger, mockValidatedConfig } from '@stencil/core/testing';
 
 import { createConfigFlags } from '../../../cli/config-flags';
 import { validateServiceWorker } from '../validate-service-worker';
@@ -11,7 +11,7 @@ describe('validateServiceWorker', () => {
   let outputTarget: d.OutputTargetWww;
 
   beforeEach(() => {
-    config = {
+    config = mockValidatedConfig({
       devMode: false,
       flags: createConfigFlags(),
       fsNamespace: 'app',
@@ -22,7 +22,8 @@ describe('validateServiceWorker', () => {
       rootDir: '/',
       sys: mockCompilerSystem(),
       testing: {},
-    };
+      transformAliasedImportPaths: true,
+    });
   });
 
   /**

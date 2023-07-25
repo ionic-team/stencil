@@ -1,27 +1,14 @@
-import { join } from 'path';
+import { createNodeLogger } from '@sys-api-node';
 
 import { createConfigFlags } from '../../cli/config-flags';
 import type * as d from '../../declarations';
-import { setPlatformPath } from '../sys/modules/path';
-import { createLogger } from './logger/console-logger';
-import { createSystem } from './stencil-sys';
+import { validateConfig } from '../config/validate-config';
 
 export const getConfig = (userConfig: d.Config): d.ValidatedConfig => {
-  const logger = userConfig.logger ?? createLogger();
-  const rootDir = userConfig.rootDir ?? '/';
-  const config: d.ValidatedConfig = {
-    ...userConfig,
-    flags: createConfigFlags(userConfig.flags ?? {}),
-    hydratedFlag: userConfig.hydratedFlag ?? null,
-    logger,
-    outputTargets: userConfig.outputTargets ?? [],
-    packageJsonFilePath: join(rootDir, 'package.json'),
-    rootDir,
-    sys: userConfig.sys ?? createSystem({ logger }),
-    testing: userConfig ?? {},
-  };
-
-  setPlatformPath(config.sys.platformPath);
+  userConfig.logger = userConfig.logger ?? createNodeLogger();
+  const flags = createConfigFlags(userConfig.flags ?? {});
+  userConfig.flags = flags;
+  const config: d.ValidatedConfig = validateConfig(userConfig, {}).config;
 
   if (config.flags.debug || config.flags.verbose) {
     config.logLevel = 'debug';

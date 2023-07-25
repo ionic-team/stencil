@@ -3,6 +3,7 @@ import { dirname, join, relative } from 'path';
 import { rollup } from 'rollup';
 import ts, { ModuleResolutionKind, ScriptTarget } from 'typescript';
 
+import { NODE_BUILTINS } from '../utils/constants';
 import { BuildOptions, getOptions } from '../utils/options';
 import { PackageData } from '../utils/write-pkg-json';
 
@@ -316,7 +317,6 @@ async function validateTreeshaking(opts: BuildOptions) {
   await validateModuleTreeshake(opts, 'app-data', join(opts.output.internalDir, 'app-data', 'index.js'));
   await validateModuleTreeshake(opts, 'client', join(opts.output.internalDir, 'client', 'index.js'));
   await validateModuleTreeshake(opts, 'patch-browser', join(opts.output.internalDir, 'client', 'patch-browser.js'));
-  await validateModuleTreeshake(opts, 'patch-esm', join(opts.output.internalDir, 'client', 'patch-esm.js'));
   await validateModuleTreeshake(opts, 'shadow-css', join(opts.output.internalDir, 'client', 'shadow-css.js'));
   await validateModuleTreeshake(opts, 'hydrate', join(opts.output.internalDir, 'hydrate', 'index.js'));
   await validateModuleTreeshake(opts, 'stencil-core', join(opts.output.internalDir, 'stencil-core', 'index.js'));
@@ -336,8 +336,11 @@ async function validateModuleTreeshake(opts: BuildOptions, moduleName: string, e
   const outputFile = join(opts.scriptsBuildDir, `treeshake_${moduleName}.js`);
 
   const bundle = await rollup({
+    external: NODE_BUILTINS,
     input: virtualInputId,
-    treeshake: true,
+    treeshake: {
+      moduleSideEffects: false,
+    },
     plugins: [
       {
         name: 'stencilResolver',

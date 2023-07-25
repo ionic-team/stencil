@@ -1,8 +1,7 @@
-import { dashToPascalCase, normalizePath } from '@utils';
-import { dirname, join, relative } from 'path';
+import { dashToPascalCase, isOutputTargetDistCustomElements, join, normalizePath, relative } from '@utils';
+import { dirname } from 'path';
 
 import type * as d from '../../../declarations';
-import { isOutputTargetDistCustomElements } from '../output-utils';
 
 /**
  * Entrypoint for generating types for one or more `dist-custom-elements` output targets defined in a Stencil project's
@@ -16,14 +15,14 @@ export const generateCustomElementsTypes = async (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
-  typesDir: string
+  typesDir: string,
 ): Promise<void> => {
   const outputTargets = config.outputTargets.filter(isOutputTargetDistCustomElements);
 
   await Promise.all(
     outputTargets.map((outputTarget) =>
-      generateCustomElementsTypesOutput(config, compilerCtx, buildCtx, typesDir, outputTarget)
-    )
+      generateCustomElementsTypesOutput(config, compilerCtx, buildCtx, typesDir, outputTarget),
+    ),
   );
 };
 
@@ -41,7 +40,7 @@ const generateCustomElementsTypesOutput = async (
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   typesDir: string,
-  outputTarget: d.OutputTargetDistCustomElements
+  outputTarget: d.OutputTargetDistCustomElements,
 ) => {
   const isBarrelExport = outputTarget.customElementsExportBehavior === 'single-export-module';
   const isBundleExport = outputTarget.customElementsExportBehavior === 'bundle';
@@ -72,10 +71,22 @@ const generateCustomElementsTypesOutput = async (
             // - get the relative path to the component's source file from the source directory
             // - join that relative path to the relative path from the `index.d.ts` file to the
             //   directory where typedefs are saved
-            const componentSourceRelPath = relative(config.srcDir, component.sourceFilePath).replace('.tsx', '');
+            const componentSourceRelPath = relative(config.srcDir, component.sourceFilePath).replace(/\.tsx$/, '');
             const componentDTSPath = join(componentsTypeDirectoryRelPath, componentSourceRelPath);
 
-            return `export { ${importName} as ${exportName} } from '${componentDTSPath}';`;
+            const defineFunctionExportName = `defineCustomElement${exportName}`;
+            // Get the path to the sibling typedef file for the current component
+            // When we bundle the code to generate the component JS files it generates
+            // the JS and typedef files based on the component tag name. So, we can
+            // just use the tagname to create the relative path
+            const localComponentTypeDefFilePath = `./${component.tagName}`;
+
+            return [
+              `export { ${importName} as ${exportName} } from '${componentDTSPath}';`,
+              // We need to alias each `defineCustomElement` function typedef to match the aliased name given to the
+              // function in the `index.js`
+              `export { defineCustomElement as ${defineFunctionExportName} } from '${localComponentTypeDefFilePath}';`,
+            ].join('\n');
           }),
           ``,
         ]
@@ -155,7 +166,7 @@ const generateCustomElementsTypesOutput = async (
       const fileName = `${cmp.tagName}.d.ts`;
       const filePath = join(outputTarget.dir!, fileName);
       await compilerCtx.fs.writeFile(filePath, dtsCode, { outputTargetType: outputTarget.type });
-    })
+    }),
   );
 };
 

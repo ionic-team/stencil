@@ -13,7 +13,7 @@ import { BuildContext } from './build-ctx';
  */
 export const createFullBuild = async (
   config: d.ValidatedConfig,
-  compilerCtx: d.CompilerCtx
+  compilerCtx: d.CompilerCtx,
 ): Promise<d.CompilerBuildResults> => {
   return new Promise<d.CompilerBuildResults>((resolve) => {
     let tsWatchProgram: ts.WatchOfConfigFile<ts.BuilderProgram> = null;

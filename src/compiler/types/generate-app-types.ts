@@ -1,8 +1,7 @@
-import { addDocBlock, normalizePath } from '@utils';
+import { addDocBlock, GENERATED_DTS, getComponentsDtsSrcFilePath, normalizePath } from '@utils';
 import { isAbsolute, relative, resolve } from 'path';
 
 import type * as d from '../../declarations';
-import { GENERATED_DTS, getComponentsDtsSrcFilePath } from '../output-targets/output-utils';
 import { generateComponentTypes } from './generate-component-types';
 import { generateEventDetailTypes } from './generate-event-detail-types';
 import { updateStencilTypesImports } from './stencil-types';
@@ -22,7 +21,7 @@ export const generateAppTypes = async (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
-  destination: string
+  destination: string,
 ): Promise<boolean> => {
   // only gather components that are still root ts files we've found and have component metadata
   // the compilerCtx cache may still have files that may have been deleted/renamed
@@ -40,7 +39,7 @@ export const generateAppTypes = async (
     componentTypesFileContent = updateStencilTypesImports(
       destination,
       componentsDtsFilePath,
-      componentTypesFileContent
+      componentTypesFileContent,
     );
   }
 
@@ -79,7 +78,7 @@ const generateComponentTypesFile = (config: d.Config, buildCtx: d.BuildCtx, areT
      * data structure for each Stencil component in series, therefore the memory footprint of this entity will likely
      * grow as more components (with additional types) are processed.
      */
-    typeImportData = updateReferenceTypeImports(typeImportData, allTypes, cmp, cmp.sourceFilePath);
+    typeImportData = updateReferenceTypeImports(typeImportData, allTypes, cmp, cmp.sourceFilePath, config);
     if (cmp.events.length > 0) {
       /**
        * Only generate event detail types for components that have events.
@@ -138,7 +137,7 @@ const generateComponentTypesFile = (config: d.Config, buildCtx: d.BuildCtx, areT
     ...modules.map((m) => {
       const docs = components.find((c) => c.tagName === m.tagName).docs;
       return addDocBlock(`  ${m.jsx}`, docs, 4);
-    })
+    }),
   );
 
   c.push(`        interface IntrinsicElements {`);
@@ -159,9 +158,9 @@ const generateComponentTypesFile = (config: d.Config, buildCtx: d.BuildCtx, areT
       return addDocBlock(
         `                        "${m.tagName}": LocalJSX.${m.tagNameAsPascal} & JSXBase.HTMLAttributes<${m.htmlElementName}>;`,
         docs,
-        12
+        12,
       );
-    })
+    }),
   );
   c.push(`                }`);
   c.push(`        }`);

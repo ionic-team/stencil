@@ -66,7 +66,7 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
     consoleDevError(
       `The JSX ${
         newVNode.$text$ !== null ? `"${newVNode.$text$}" text` : `"${newVNode.$tag$}" element`
-      } node should not be shared within the same renderer. The renderer caches element lookups in order to improve performance. However, a side effect from this is that the exact same JSX node should not be reused. For more information please see https://stenciljs.com/docs/templating-jsx#avoid-shared-jsx-nodes`
+      } node should not be shared within the same renderer. The renderer caches element lookups in order to improve performance. However, a side effect from this is that the exact same JSX node should not be reused. For more information please see https://stenciljs.com/docs/templating-jsx#avoid-shared-jsx-nodes`,
     );
   }
 
@@ -88,12 +88,12 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
             isSvgMode ? SVG_NS : HTML_NS,
             BUILD.slotRelocation && newVNode.$flags$ & VNODE_FLAGS.isSlotFallback
               ? 'slot-fb'
-              : (newVNode.$tag$ as string)
+              : (newVNode.$tag$ as string),
           )
         : doc.createElement(
             BUILD.slotRelocation && newVNode.$flags$ & VNODE_FLAGS.isSlotFallback
               ? 'slot-fb'
-              : (newVNode.$tag$ as string)
+              : (newVNode.$tag$ as string),
           )
     ) as any;
 
@@ -213,7 +213,7 @@ const addVnodes = (
   parentVNode: d.VNode,
   vnodes: d.VNode[],
   startIdx: number,
-  endIdx: number
+  endIdx: number,
 ) => {
   let containerElm = ((BUILD.slotRelocation && parentElm['s-cr'] && parentElm['s-cr'].parentNode) || parentElm) as any;
   let childNode: Node;
@@ -242,32 +242,33 @@ const addVnodes = (
  * @param vnodes a list of virtual DOM nodes to remove
  * @param startIdx the index at which to start removing nodes (inclusive)
  * @param endIdx the index at which to stop removing nodes (inclusive)
- * @param vnode a VNode
- * @param elm an element
  */
-const removeVnodes = (vnodes: d.VNode[], startIdx: number, endIdx: number, vnode?: d.VNode, elm?: d.RenderNode) => {
-  for (; startIdx <= endIdx; ++startIdx) {
-    if ((vnode = vnodes[startIdx])) {
-      elm = vnode.$elm$;
-      callNodeRefs(vnode);
+const removeVnodes = (vnodes: d.VNode[], startIdx: number, endIdx: number) => {
+  for (let index = startIdx; index <= endIdx; ++index) {
+    const vnode = vnodes[index];
+    if (vnode) {
+      const elm = vnode.$elm$;
+      nullifyVNodeRefs(vnode);
 
-      if (BUILD.slotRelocation) {
-        // we're removing this element
-        // so it's possible we need to show slot fallback content now
-        checkSlotFallbackVisibility = true;
+      if (elm) {
+        if (BUILD.slotRelocation) {
+          // we're removing this element
+          // so it's possible we need to show slot fallback content now
+          checkSlotFallbackVisibility = true;
 
-        if (elm['s-ol']) {
-          // remove the original location comment
-          elm['s-ol'].remove();
-        } else {
-          // it's possible that child nodes of the node
-          // that's being removed are slot nodes
-          putBackInOriginalLocation(elm, true);
+          if (elm['s-ol']) {
+            // remove the original location comment
+            elm['s-ol'].remove();
+          } else {
+            // it's possible that child nodes of the node
+            // that's being removed are slot nodes
+            putBackInOriginalLocation(elm, true);
+          }
         }
-      }
 
-      // remove the vnode's element from the dom
-      elm.remove();
+        // remove the vnode's element from the dom
+        elm.remove();
+      }
     }
   }
 };
@@ -510,7 +511,7 @@ const updateChildren = (parentElm: d.RenderNode, oldCh: d.VNode[], newVNode: d.V
       newVNode,
       newCh,
       newStartIdx,
-      newEndIdx
+      newEndIdx,
     );
   } else if (BUILD.updatable && newStartIdx > newEndIdx) {
     // there are nodes in the `oldCh` array which no longer correspond to nodes
@@ -778,10 +779,17 @@ const isNodeLocatedInSlot = (nodeToRelocate: d.RenderNode, slotNameAttr: string)
   return slotNameAttr === '';
 };
 
-export const callNodeRefs = (vNode: d.VNode) => {
+/**
+ * 'Nullify' any VDom `ref` callbacks on a VDom node or its children by
+ * calling them with `null`. This signals that the DOM element corresponding to
+ * the VDom node has been removed from the DOM.
+ *
+ * @param vNode a virtual DOM node
+ */
+export const nullifyVNodeRefs = (vNode: d.VNode) => {
   if (BUILD.vdomRef) {
     vNode.$attrs$ && vNode.$attrs$.ref && vNode.$attrs$.ref(null);
-    vNode.$children$ && vNode.$children$.map(callNodeRefs);
+    vNode.$children$ && vNode.$children$.map(nullifyVNodeRefs);
   }
 };
 
@@ -828,7 +836,7 @@ render() {
   if (BUILD.reflect && cmpMeta.$attrsToReflect$) {
     rootVnode.$attrs$ = rootVnode.$attrs$ || {};
     cmpMeta.$attrsToReflect$.map(
-      ([propName, attribute]) => (rootVnode.$attrs$[attribute] = (hostElm as any)[propName])
+      ([propName, attribute]) => (rootVnode.$attrs$[attribute] = (hostElm as any)[propName]),
     );
   }
 
@@ -949,7 +957,7 @@ render() {
 // otherwise these nodes are text nodes w/out content
 const slotReferenceDebugNode = (slotVNode: d.VNode) =>
   doc.createComment(
-    `<slot${slotVNode.$name$ ? ' name="' + slotVNode.$name$ + '"' : ''}> (host=${hostTagName.toLowerCase()})`
+    `<slot${slotVNode.$name$ ? ' name="' + slotVNode.$name$ + '"' : ''}> (host=${hostTagName.toLowerCase()})`,
   );
 
 const originalLocationDebugNode = (nodeToRelocate: d.RenderNode): any =>
@@ -957,5 +965,5 @@ const originalLocationDebugNode = (nodeToRelocate: d.RenderNode): any =>
     `org-location for ` +
       (nodeToRelocate.localName
         ? `<${nodeToRelocate.localName}> (host=${nodeToRelocate['s-hn']})`
-        : `[${nodeToRelocate.textContent}]`)
+        : `[${nodeToRelocate.textContent}]`),
   );

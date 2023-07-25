@@ -54,7 +54,7 @@ export function initPageScreenshot(page: pd.E2EPageInternal) {
 
       if (jestEnv.screenshotDescriptions.has(desc)) {
         throw new Error(
-          `Screenshot description "${desc}" found in "${testPath}" cannot be used for multiple screenshots and must be unique. To make screenshot descriptions unique within the same test, use the first argument to "compareScreenshot", such as "compareScreenshot('more to the description')".`
+          `Screenshot description "${desc}" found in "${testPath}" cannot be used for multiple screenshots and must be unique. To make screenshot descriptions unique within the same test, use the first argument to "compareScreenshot", such as "compareScreenshot('more to the description')".`,
         );
       }
       jestEnv.screenshotDescriptions.add(desc);
@@ -65,6 +65,7 @@ export function initPageScreenshot(page: pd.E2EPageInternal) {
     // screen shot not enabled, so just skip over all the logic
     page.compareScreenshot = async () => {
       const diff: ScreenshotDiff = {
+        id: 'placeholder',
         mismatchedPixels: 0,
         allowableMismatchedPixels: 1,
         allowableMismatchedRatio: 1,
@@ -83,7 +84,7 @@ export async function pageCompareScreenshot(
   env: E2EProcessEnv,
   desc: string,
   testPath: string,
-  opts: ScreenshotOptions
+  opts: ScreenshotOptions,
 ) {
   if (typeof env.__STENCIL_EMULATE__ !== 'string') {
     throw new Error(`compareScreenshot, missing screenshot emulate env var`);
@@ -130,7 +131,7 @@ export async function pageCompareScreenshot(
     width,
     height,
     testPath,
-    pixelmatchThreshold
+    pixelmatchThreshold,
   );
 
   return results;

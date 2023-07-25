@@ -6,11 +6,11 @@ import { Logger } from '../../declarations';
 
 /**
  * Create a logger to run in a Node environment
- * @param context a context with NodeJS specific details used to create the logger
+ *
  * @returns the created logger
  */
-export const createNodeLogger = (context: { process: NodeJS.Process }): Logger => {
-  const loggerSys = createNodeLoggerSys(context.process);
+export const createNodeLogger = (): Logger => {
+  const loggerSys = createNodeLoggerSys();
   const logger = createTerminalLogger(loggerSys);
   return logger;
 };
@@ -22,13 +22,12 @@ export const createNodeLogger = (context: { process: NodeJS.Process }): Logger =
  * environment-specific details so that the terminal logger can deal with
  * things in a (potentially) platform-agnostic way.
  *
- * @param prcs the current node.js process object
  * @returns a configured logger sys object
  */
-export function createNodeLoggerSys(prcs: NodeJS.Process): TerminalLoggerSys {
-  const cwd = () => prcs.cwd();
+export function createNodeLoggerSys(): TerminalLoggerSys {
+  const cwd = () => process.cwd();
 
-  const emoji = (emoji: string) => (prcs.platform !== 'win32' ? emoji : '');
+  const emoji = (emoji: string) => (process.platform !== 'win32' ? emoji : '');
 
   /**
    * Get the number of columns for the terminal to use when printing
@@ -39,11 +38,11 @@ export function createNodeLoggerSys(prcs: NodeJS.Process): TerminalLoggerSys {
     const max_columns = 120;
     const defaultWidth = 80;
 
-    const terminalWidth = prcs?.stdout?.columns ?? defaultWidth;
+    const terminalWidth = process?.stdout?.columns ?? defaultWidth;
     return Math.max(Math.min(terminalWidth, max_columns), min_columns);
   };
 
-  const memoryUsage = () => prcs.memoryUsage().rss;
+  const memoryUsage = () => process.memoryUsage().rss;
 
   const relativePath = (from: string, to: string) => path.relative(from, to);
 
@@ -67,12 +66,12 @@ export function createNodeLoggerSys(prcs: NodeJS.Process): TerminalLoggerSys {
     const readline = await import('readline');
     let promise = Promise.resolve();
     const update = (text: string) => {
-      text = text.substring(0, prcs.stdout.columns - 5) + '\x1b[0m';
+      text = text.substring(0, process.stdout.columns - 5) + '\x1b[0m';
       return (promise = promise.then(() => {
         return new Promise<any>((resolve) => {
-          readline.clearLine(prcs.stdout, 0);
-          readline.cursorTo(prcs.stdout, 0, null);
-          prcs.stdout.write(text, resolve);
+          readline.clearLine(process.stdout, 0);
+          readline.cursorTo(process.stdout, 0, null);
+          process.stdout.write(text, resolve);
         });
       }));
     };
@@ -82,7 +81,7 @@ export function createNodeLoggerSys(prcs: NodeJS.Process): TerminalLoggerSys {
     };
 
     // hide cursor
-    prcs.stdout.write('\x1B[?25l');
+    process.stdout.write('\x1B[?25l');
     return {
       update,
       stop,

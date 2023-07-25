@@ -1,7 +1,7 @@
 import ts from 'typescript';
 
 import type * as d from '../../../declarations';
-import { createAnonymousClassMetadataProxy } from '../add-component-meta-proxy';
+import { createClassMetadataProxy } from '../add-component-meta-proxy';
 import { addImports } from '../add-imports';
 import { RUNTIME_APIS } from '../core-runtime-apis';
 import { getModuleFromSourceFile } from '../transform-utils';
@@ -29,7 +29,7 @@ import { getModuleFromSourceFile } from '../transform-utils';
  */
 export const proxyCustomElement = (
   compilerCtx: d.CompilerCtx,
-  transformOpts: d.TransformOptions
+  transformOpts: d.TransformOptions,
 ): ts.TransformerFactory<ts.SourceFile> => {
   return () => {
     return (tsSourceFile: ts.SourceFile): ts.SourceFile => {
@@ -47,8 +47,22 @@ export const proxyCustomElement = (
               continue;
             }
 
+            // to narrow the type of `declaration.initializer` to `ts.ClassExpression`
+            if (!ts.isClassExpression(declaration.initializer)) {
+              continue;
+            }
+
+            const renamedClassExpression = ts.factory.updateClassExpression(
+              declaration.initializer,
+              ts.getModifiers(declaration.initializer),
+              ts.factory.createIdentifier(principalComponent.componentClassName),
+              declaration.initializer.typeParameters,
+              declaration.initializer.heritageClauses,
+              declaration.initializer.members,
+            );
+
             // wrap the Stencil component's class declaration in a component proxy
-            const proxyCreationCall = createAnonymousClassMetadataProxy(principalComponent, declaration.initializer);
+            const proxyCreationCall = createClassMetadataProxy(principalComponent, renamedClassExpression);
             ts.addSyntheticLeadingComment(proxyCreationCall, ts.SyntaxKind.MultiLineCommentTrivia, '@__PURE__', false);
 
             // update the component's variable declaration to use the new initializer
@@ -57,7 +71,7 @@ export const proxyCustomElement = (
               declaration.name,
               declaration.exclamationToken,
               declaration.type,
-              proxyCreationCall
+              proxyCreationCall,
             );
 
             // update the declaration list that contains the updated variable declaration
@@ -70,8 +84,8 @@ export const proxyCustomElement = (
             // update the variable statement containing the updated declaration list
             const updatedVariableStatement = ts.factory.updateVariableStatement(
               stmt,
-              [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
-              updatedDeclarationList
+              stmt.modifiers,
+              updatedDeclarationList,
             );
 
             // update the source file's statements to use the new variable statement
@@ -86,7 +100,7 @@ export const proxyCustomElement = (
               transformOpts,
               tsSourceFile,
               [RUNTIME_APIS.proxyCustomElement],
-              transformOpts.coreImportPath
+              transformOpts.coreImportPath,
             );
 
             return tsSourceFile;

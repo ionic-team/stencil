@@ -29,19 +29,19 @@ describe('validation', () => {
 
     it.each(['你-好', 'my-@component', '!@#$!@#4-ohno'])('should error on any invalid characters', (funkyTag) => {
       expect(validateComponentTag(funkyTag)).toBe(
-        `"${funkyTag}" tag contains invalid characters: ${funkyTag.replace(/\w|-/g, '')}`
+        `"${funkyTag}" tag contains invalid characters: ${funkyTag.replace(/\w|-/g, '')}`,
       );
     });
 
     it('should error if no dash', () => {
       expect(validateComponentTag('dashless')).toBe(
-        '"dashless" tag must contain a dash (-) to work as a valid web component'
+        '"dashless" tag must contain a dash (-) to work as a valid web component',
       );
     });
 
     it('should error on multiple dashes in a row', () => {
       expect(validateComponentTag('dash--crazy')).toBe(
-        '"dash--crazy" tag cannot contain multiple dashes (--) next to each other'
+        '"dash--crazy" tag cannot contain multiple dashes (--) next to each other',
       );
     });
 

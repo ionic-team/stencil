@@ -1,5 +1,15 @@
 import type * as d from '@stencil/core/internal';
 
+/**
+ * Reset build conditionals used for testing to a known "good state".
+ *
+ * This function does not return a value, but rather mutates its argument in place.
+ * Certain values are set to `true` or `false` for testing purpose (see this function's implementation for the full
+ * list). Build conditional options _not_ in that list that are set to `true` when this function is invoked will remain
+ * set to `true`.
+ *
+ * @param b the build conditionals to reset.
+ */
 export function resetBuildConditionals(b: d.BuildConditionals) {
   Object.keys(b).forEach((key) => {
     (b as any)[key] = true;
@@ -38,11 +48,7 @@ export function resetBuildConditionals(b: d.BuildConditionals) {
   b.invisiblePrehydration = true;
   b.appendChildSlotFix = false;
   b.cloneNodeFix = false;
-  // TODO(STENCIL-661): Remove code related to the dynamic import shim
-  b.dynamicImportShim = false;
   b.hotModuleReplacement = false;
-  // TODO(STENCIL-663): Remove code related to deprecated `safari10` field.
-  b.safari10 = false;
   b.scriptDataOpts = false;
   b.scopedSlotTextContentFix = false;
   b.slotChildNodesFix = false;

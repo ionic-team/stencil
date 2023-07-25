@@ -1,10 +1,9 @@
-import { generatePreamble } from '@utils';
+import { generatePreamble, relativeImport } from '@utils';
 import { join } from 'path';
 import type { OutputOptions, RollupBuild } from 'rollup';
 
 import type * as d from '../../../declarations';
 import { generateRollupOutput } from '../../app-core/bundle-app-core';
-import { relativeImport } from '../output-utils';
 import { generateLazyModules } from './generate-lazy-module';
 
 export const generateCjs = async (
@@ -12,7 +11,7 @@ export const generateCjs = async (
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   rollupBuild: RollupBuild,
-  outputTargets: d.OutputTargetDistLazy[]
+  outputTargets: d.OutputTargetDistLazy[],
 ): Promise<d.UpdatedLazyBuildCtx> => {
   const cjsOutputs = outputTargets.filter((o) => !!o.cjsDir);
 
@@ -39,7 +38,7 @@ export const generateCjs = async (
         results,
         'es2017',
         false,
-        '.cjs'
+        '.cjs',
       );
 
       await generateShortcuts(compilerCtx, results, cjsOutputs);
@@ -52,7 +51,7 @@ export const generateCjs = async (
 const generateShortcuts = (
   compilerCtx: d.CompilerCtx,
   rollupResult: d.RollupResult[],
-  outputTargets: d.OutputTargetDistLazy[]
+  outputTargets: d.OutputTargetDistLazy[],
 ): Promise<void[]> => {
   const indexFilename = rollupResult.find((r) => r.type === 'chunk' && r.isIndex).fileName;
   return Promise.all(
@@ -63,6 +62,6 @@ const generateShortcuts = (
         const shortcutContent = `module.exports = require('${relativePath}');\n`;
         await compilerCtx.fs.writeFile(o.cjsIndexFile, shortcutContent, { outputTargetType: o.type });
       }
-    })
+    }),
   );
 };

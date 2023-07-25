@@ -54,7 +54,7 @@ describe.skip('build-conditionals', () => {
       {
         [path.join(root, 'src', 'cmp-a.tsx')]: `@Component({ tag: 'cmp-a' }) export class CmpA {}`,
       },
-      { clearFileCache: true }
+      { clearFileCache: true },
     );
     await compiler.fs.commit();
 
@@ -80,7 +80,7 @@ describe.skip('build-conditionals', () => {
         }
       }`,
       },
-      { clearFileCache: true }
+      { clearFileCache: true },
     );
     await compiler.fs.commit();
 

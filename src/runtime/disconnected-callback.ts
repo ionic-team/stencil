@@ -25,13 +25,6 @@ export const disconnectedCallback = async (elm: d.HostElement) => {
       }
     }
 
-    // clear CSS var-shim tracking
-    // TODO(STENCIL-659): Remove code implementing the CSS variable shim
-    if (BUILD.cssVarShim && plt.$cssShim$) {
-      // TODO(STENCIL-659): Remove code implementing the CSS variable shim
-      plt.$cssShim$.removeHost(elm);
-    }
-
     if (!BUILD.lazyLoad) {
       disconnectInstance(elm);
     } else if (hostRef.$lazyInstance$) {

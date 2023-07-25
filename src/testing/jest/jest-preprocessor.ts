@@ -56,7 +56,7 @@ export const jestPreprocessor = {
     sourceText: string,
     sourcePath: string,
     jestConfig: Jest26Config | Jest27TransformOptions,
-    transformOptions?: Jest26Config
+    transformOptions?: Jest26Config,
   ): string {
     // TODO(STENCIL-306): Drop support for versions of Jest <27
     /**
@@ -132,7 +132,7 @@ export const jestPreprocessor = {
     sourceText: string,
     sourcePath: string,
     jestConfigStr: string | Jest27TransformOptions,
-    transformOptions?: Jest26CacheKeyOptions
+    transformOptions?: Jest26CacheKeyOptions,
   ): string {
     // TODO(STENCIL-306): Remove support for earlier versions of Jest
     /**
@@ -225,7 +225,7 @@ function getCompilerOptions(rootDir: string): ts.CompilerOptions | null {
     ts.sys,
     rootDir,
     undefined,
-    tsconfigFilePath
+    tsconfigFilePath,
   );
 
   _tsCompilerOptions = parseResult.options;

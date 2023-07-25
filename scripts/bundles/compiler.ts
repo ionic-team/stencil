@@ -6,17 +6,15 @@ import MagicString from 'magic-string';
 import { join } from 'path';
 import type { OutputChunk, RollupOptions, RollupWarning, TransformResult } from 'rollup';
 import sourcemaps from 'rollup-plugin-sourcemaps';
-import { minify, MinifyOptions } from 'terser';
 
 import { getBanner } from '../utils/banner';
+import { NODE_BUILTINS } from '../utils/constants';
 import type { BuildOptions } from '../utils/options';
 import { writePkgJson } from '../utils/write-pkg-json';
 import { aliasPlugin } from './plugins/alias-plugin';
-import { inlinedCompilerDepsPlugin } from './plugins/inlined-compiler-deps-plugin';
 import { parse5Plugin } from './plugins/parse5-plugin';
 import { replacePlugin } from './plugins/replace-plugin';
 import { sizzlePlugin } from './plugins/sizzle-plugin';
-import { sysModulesPlugin } from './plugins/sys-modules-plugin';
 import { terserPlugin } from './plugins/terser-plugin';
 import { typescriptSourcePlugin } from './plugins/typescript-source-plugin';
 
@@ -68,6 +66,7 @@ export async function compiler(opts: BuildOptions) {
   const rollupWatchPath = join(opts.nodeModulesDir, 'rollup', 'dist', 'es', 'shared', 'watch.js');
   const compilerBundle: RollupOptions = {
     input: join(inputDir, 'index.js'),
+    external: NODE_BUILTINS,
     output: {
       format: 'cjs',
       file: join(opts.output.compilerDir, compilerFileName),
@@ -155,14 +154,11 @@ export async function compiler(opts: BuildOptions) {
           };
         },
       },
-      inlinedCompilerDepsPlugin(opts, inputDir),
       parse5Plugin(opts),
       sizzlePlugin(opts),
       aliasPlugin(opts),
-      sysModulesPlugin(inputDir),
       rollupNodeResolve({
         mainFields: ['module', 'main'],
-        preferBuiltins: false,
       }),
       rollupCommonjs({
         transformMixedEsModules: false,
@@ -206,7 +202,7 @@ export async function compiler(opts: BuildOptions) {
 }
 
 async function minifyStencilCompiler(code: string, opts: BuildOptions) {
-  const minifyOpts: MinifyOptions = {
+  const minifyOpts = {
     ecma: 2018,
     compress: {
       ecma: 2018,
@@ -221,7 +217,13 @@ async function minifyStencilCompiler(code: string, opts: BuildOptions) {
     },
   };
 
-  const results = await minify(code, minifyOpts);
+  const { minify } = await import('terser');
+  // when `execa` changed to use only esm for distribution we also had to start
+  // importing esm for `terser`, but unfortunately we could not work out a way
+  // to also import the type while doing a dynamic import, hence the `any`
+  // here. See here: https://github.com/ionic-team/stencil/pull/4047 for more
+  // context
+  const results = await minify(code, minifyOpts as any);
 
   code = getBanner(opts, `Stencil Compiler`, true) + '\n' + results.code;
 

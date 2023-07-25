@@ -1,5 +1,4 @@
 import color from 'ansi-colors';
-import execa from 'execa';
 import Listr, { ListrTask } from 'listr';
 
 import { bundleBuild } from './build';
@@ -19,7 +18,7 @@ import {
  * @param opts build options containing the metadata needed to release a new version of Stencil
  * @param args stringified arguments used to influence the release steps that are taken
  */
-export function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<string>): void {
+export async function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<string>): Promise<void> {
   const rootDir = opts.rootDir;
   const pkg = opts.packageJson;
   const tasks: ListrTask[] = [];
@@ -27,6 +26,8 @@ export function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<string>)
   const isDryRun = args.includes('--dry-run') || opts.version.includes('dryrun');
   const isAnyBranch = args.includes('--any-branch');
   let tagPrefix: string;
+
+  const { execa } = await import('execa');
 
   if (isDryRun) {
     console.log(color.bold.yellow(`\n  🏃‍ Dry Run!\n`));
@@ -50,7 +51,7 @@ export function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<string>)
       task: () => {
         if (!pkg.private && isPrereleaseVersion(newVersion) && !opts.tag) {
           throw new Error(
-            'You must specify a dist-tag using --tag when publishing a pre-release version. This prevents accidentally tagging unstable versions as "latest". https://docs.npmjs.com/cli/dist-tag'
+            'You must specify a dist-tag using --tag when publishing a pre-release version. This prevents accidentally tagging unstable versions as "latest". https://docs.npmjs.com/cli/dist-tag',
           );
         }
       },
@@ -66,7 +67,7 @@ export function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<string>)
           .then(() => execa('npm', ['config', 'get', 'tag-version-prefix']))
           .then(
             ({ stdout }) => (tagPrefix = stdout),
-            () => {}
+            () => {},
           )
           // verify that a tag for the new version string does not already exist by checking the output of
           // `git rev-parse --verify`
@@ -83,7 +84,7 @@ export function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<string>)
               if (err.stdout !== '' || err.stderr !== '') {
                 throw err;
               }
-            }
+            },
           ),
       skip: () => isDryRun,
     },
@@ -95,7 +96,7 @@ export function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<string>)
             throw new Error('Not on `main` branch. Use --any-branch to publish anyway.');
           }
         }),
-      skip: () => isDryRun,
+      skip: () => isDryRun || opts.isCI, // in CI, we may be publishing from another branch
     },
     {
       title: 'Check local working tree',
@@ -105,7 +106,7 @@ export function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<string>)
             throw new Error('Unclean working tree. Commit or stash changes first.');
           }
         }),
-      skip: () => isDryRun,
+      skip: () => opts.isCI, // don't check the tree in CI, we may have a temp file we need for publish
     },
     {
       title: 'Check remote history',
@@ -116,7 +117,7 @@ export function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<string>)
           }
         }),
       skip: () => isDryRun,
-    }
+    },
   );
 
   if (!opts.isPublishRelease) {
@@ -140,6 +141,7 @@ export function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<string>)
       {
         title: 'Run karma tests',
         task: () => execa('npm', ['run', 'test.karma.prod'], { cwd: rootDir }),
+        skip: () => opts.isCI, // skip this in CI, we'll rely on previous commits to `main` to hope this is OK for now
       },
       {
         title: 'Build license',
@@ -161,7 +163,7 @@ export function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<string>)
         task: () => {
           return updateChangeLog(opts);
         },
-      }
+      },
     );
   }
 
@@ -171,7 +173,9 @@ export function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<string>)
         title: 'Publish @stencil/core to npm',
         task: () => {
           const cmd = 'npm';
-          const cmdArgs = ['publish', '--otp', opts.otp].concat(opts.tag ? ['--tag', opts.tag] : []);
+          const cmdArgs = ['publish']
+            .concat(opts.tag ? ['--tag', opts.tag] : [])
+            .concat(opts.isCI ? ['--provenance'] : ['--otp', opts.otp]);
 
           if (isDryRun) {
             return console.log(`[dry-run] ${cmd} ${cmdArgs.join(' ')}`);
@@ -214,41 +218,40 @@ export function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<string>)
           }
           return execa(cmd, cmdArgs, { cwd: rootDir });
         },
-      }
-    );
-  }
-
-  if (opts.isPublishRelease) {
-    tasks.push({
-      title: 'Create Github Release',
-      task: () => {
-        return postGithubRelease(opts);
       },
-    });
+      {
+        title: 'Create Github Release',
+        task: () => {
+          if (isDryRun) {
+            return console.log('[dry-run] Create GitHub Release skipped');
+          }
+          return postGithubRelease(opts);
+        },
+        skip: () => opts.isCI,
+      },
+    );
   }
 
   const listr = new Listr(tasks);
 
-  listr
-    .run()
-    .then(() => {
-      if (opts.isPublishRelease) {
-        console.log(
-          `\n ${opts.vermoji}  ${color.bold.magenta(pkg.name)} ${color.bold.yellow(newVersion)} published!! ${
-            opts.vermoji
-          }\n`
-        );
-      } else {
-        console.log(
-          `\n ${opts.vermoji}  ${color.bold.magenta(pkg.name)} ${color.bold.yellow(
-            newVersion
-          )} prepared, check the diffs and commit ${opts.vermoji}\n`
-        );
-      }
-    })
-    .catch((err) => {
-      console.log(`\n🤒  ${color.red(err)}\n`);
-      console.log(err);
-      process.exit(1);
-    });
+  try {
+    await listr.run();
+  } catch (err: any) {
+    console.log(`\n🤒  ${color.red(err)}\n`);
+    console.log(err);
+    process.exit(1);
+  }
+  if (opts.isPublishRelease) {
+    console.log(
+      `\n ${opts.vermoji}  ${color.bold.magenta(pkg.name)} ${color.bold.yellow(newVersion)} published!! ${
+        opts.vermoji
+      }\n`,
+    );
+  } else {
+    console.log(
+      `\n ${opts.vermoji}  ${color.bold.magenta(pkg.name)} ${color.bold.yellow(
+        newVersion,
+      )} prepared, check the diffs and commit ${opts.vermoji}\n`,
+    );
+  }
 }

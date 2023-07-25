@@ -2,8 +2,14 @@ import { augmentDiagnosticWithNode, buildError } from '@utils';
 import ts from 'typescript';
 
 import type * as d from '../../../declarations';
-import { retrieveTsDecorators, retrieveTsModifiers } from '../transform-utils';
+import {
+  convertValueToLiteral,
+  createStaticGetter,
+  retrieveTsDecorators,
+  retrieveTsModifiers,
+} from '../transform-utils';
 import { componentDecoratorToStatic } from './component-decorator';
+import { hasStaticInitializerInClass } from './convert-static-members';
 import { isDecoratorNamed } from './decorator-utils';
 import {
   CLASS_DECORATORS_TO_REMOVE,
@@ -21,12 +27,13 @@ import { watchDecoratorsToStatic } from './watch-decorator';
 export const convertDecoratorsToStatic = (
   config: d.Config,
   diagnostics: d.Diagnostic[],
-  typeChecker: ts.TypeChecker
+  typeChecker: ts.TypeChecker,
+  program: ts.Program,
 ): ts.TransformerFactory<ts.SourceFile> => {
   return (transformCtx) => {
     const visit = (node: ts.Node): ts.VisitResult<ts.Node> => {
       if (ts.isClassDeclaration(node)) {
-        return visitClassDeclaration(config, diagnostics, typeChecker, node);
+        return visitClassDeclaration(config, diagnostics, typeChecker, program, node);
       }
       return ts.visitEachChild(node, visit, transformCtx);
     };
@@ -41,7 +48,8 @@ const visitClassDeclaration = (
   config: d.Config,
   diagnostics: d.Diagnostic[],
   typeChecker: ts.TypeChecker,
-  classNode: ts.ClassDeclaration
+  program: ts.Program,
+  classNode: ts.ClassDeclaration,
 ) => {
   const componentDecorator = retrieveTsDecorators(classNode)?.find(isDecoratorNamed('Component'));
   if (!componentDecorator) {
@@ -63,13 +71,29 @@ const visitClassDeclaration = (
   const watchable = new Set<string>();
   // parse member decorators (Prop, State, Listen, Event, Method, Element and Watch)
   if (decoratedMembers.length > 0) {
-    propDecoratorsToStatic(diagnostics, decoratedMembers, typeChecker, watchable, filteredMethodsAndFields);
+    propDecoratorsToStatic(diagnostics, decoratedMembers, typeChecker, program, watchable, filteredMethodsAndFields);
     stateDecoratorsToStatic(decoratedMembers, watchable, filteredMethodsAndFields);
-    eventDecoratorsToStatic(diagnostics, decoratedMembers, typeChecker, filteredMethodsAndFields);
-    methodDecoratorsToStatic(config, diagnostics, classNode, decoratedMembers, typeChecker, filteredMethodsAndFields);
+    eventDecoratorsToStatic(diagnostics, decoratedMembers, typeChecker, program, filteredMethodsAndFields);
+    methodDecoratorsToStatic(
+      config,
+      diagnostics,
+      classNode,
+      decoratedMembers,
+      typeChecker,
+      program,
+      filteredMethodsAndFields,
+    );
     elementDecoratorsToStatic(diagnostics, decoratedMembers, typeChecker, filteredMethodsAndFields);
     watchDecoratorsToStatic(config, diagnostics, decoratedMembers, watchable, filteredMethodsAndFields);
     listenDecoratorsToStatic(diagnostics, decoratedMembers, filteredMethodsAndFields);
+  }
+
+  // Handle static members that are initialized
+  const hasStaticMembersWithInit = classMembers.some(hasStaticInitializerInClass);
+  if (hasStaticMembersWithInit) {
+    filteredMethodsAndFields.push(
+      createStaticGetter('stencilHasStaticMembersWithInit', convertValueToLiteral(hasStaticMembersWithInit)),
+    );
   }
 
   // We call the `handleClassFields` method which handles transforming any
@@ -89,7 +113,7 @@ const visitClassDeclaration = (
     classNode.name,
     classNode.typeParameters,
     classNode.heritageClauses,
-    updatedClassFields
+    updatedClassFields,
   );
 };
 
@@ -111,7 +135,7 @@ const visitClassDeclaration = (
  */
 const removeStencilMethodDecorators = (
   classMembers: ts.ClassElement[],
-  diagnostics: d.Diagnostic[]
+  diagnostics: d.Diagnostic[],
 ): ts.ClassElement[] => {
   return classMembers.map((member) => {
     const currentDecorators = retrieveTsDecorators(member);
@@ -128,7 +152,7 @@ const removeStencilMethodDecorators = (
           member.typeParameters,
           member.parameters,
           member.type,
-          member.body
+          member.body,
         );
       } else if (ts.isPropertyDeclaration(member)) {
         if (shouldInitializeInConstructor(member)) {
@@ -147,7 +171,7 @@ const removeStencilMethodDecorators = (
             member.name,
             member.questionToken,
             member.type,
-            member.initializer
+            member.initializer,
           );
         }
       } else {
@@ -171,7 +195,7 @@ const removeStencilMethodDecorators = (
  */
 export const filterDecorators = (
   decorators: ReadonlyArray<ts.Decorator> | undefined,
-  excludeList: ReadonlyArray<string>
+  excludeList: ReadonlyArray<string>,
 ): ReadonlyArray<ts.Decorator> | undefined => {
   if (decorators) {
     const updatedDecoratorList = decorators.filter((dec) => {
@@ -336,9 +360,9 @@ function handleClassFields(classNode: ts.ClassDeclaration, classMembers: ts.Clas
             ts.factory.createToken(ts.SyntaxKind.EqualsToken),
             // if the member has no initializer we should default to setting it to
             // just 'undefined'
-            member.initializer ?? ts.factory.createIdentifier('undefined')
-          )
-        )
+            member.initializer ?? ts.factory.createIdentifier('undefined'),
+          ),
+        ),
       );
     } else {
       // if it's not a class field that is decorated with a Stencil decorator then
@@ -371,7 +395,7 @@ function handleClassFields(classNode: ts.ClassDeclaration, classMembers: ts.Clas
 export const updateConstructor = (
   classNode: ts.ClassDeclaration,
   classMembers: ts.ClassElement[],
-  statements: ts.Statement[]
+  statements: ts.Statement[],
 ): ts.ClassElement[] => {
   const constructorIndex = classMembers.findIndex((m) => m.kind === ts.SyntaxKind.Constructor);
   const constructorMethod = classMembers[constructorIndex];
@@ -401,7 +425,7 @@ export const updateConstructor = (
       constructorMethod,
       retrieveTsModifiers(constructorMethod),
       constructorMethod.parameters,
-      ts.factory.updateBlock(constructorMethod?.body ?? ts.factory.createBlock([]), statements)
+      ts.factory.updateBlock(constructorMethod?.body ?? ts.factory.createBlock([]), statements),
     );
   } else {
     // we don't seem to have a constructor, so let's create one and stick it
@@ -448,7 +472,7 @@ const needsSuper = (classDeclaration: ts.ClassDeclaration): boolean => {
  */
 const createConstructorBodyWithSuper = (): ts.ExpressionStatement => {
   return ts.factory.createExpressionStatement(
-    ts.factory.createCallExpression(ts.factory.createIdentifier('super'), undefined, undefined)
+    ts.factory.createCallExpression(ts.factory.createIdentifier('super'), undefined, undefined),
   );
 };
 

@@ -38,7 +38,7 @@ describe('nativeComponentTransform', () => {
       const transpiledModule = transpileModule(code, null, compilerCtx, [], [transformer]);
 
       expect(transpiledModule.outputText).toContain(
-        `import { HTMLElement, attachShadow as __stencil_attachShadow, defineCustomElement as __stencil_defineCustomElement } from "@stencil/core";`
+        `import { defineCustomElement as __stencil_defineCustomElement, HTMLElement } from "@stencil/core";`,
       );
       expect(transpiledModule.outputText).toContain(`this.__attachShadow()`);
     });
@@ -63,9 +63,27 @@ describe('nativeComponentTransform', () => {
       const transpiledModule = transpileModule(code, null, compilerCtx, [], [transformer]);
 
       expect(transpiledModule.outputText).toContain(
-        `import { HTMLElement, attachShadow as __stencil_attachShadow, defineCustomElement as __stencil_defineCustomElement } from "@stencil/core";`
+        `import { defineCustomElement as __stencil_defineCustomElement, HTMLElement } from "@stencil/core";`,
       );
       expect(transpiledModule.outputText).toContain(`this.__attachShadow()`);
+    });
+
+    it('adds a getter for an @Element() reference', () => {
+      const code = `
+        @Component({
+          tag: 'cmp-a'
+        })
+        export class CmpA {
+          @Element() el: HtmlElement;
+        }
+      `;
+
+      const transformer = nativeComponentTransform(compilerCtx, transformOpts);
+
+      const transpiledModule = transpileModule(code, null, compilerCtx, [], [transformer]);
+
+      expect(transpiledModule.outputText).toContain(`get el() { return this; }`);
+      expect(transpiledModule.outputText).not.toContain(`el;`);
     });
   });
 });

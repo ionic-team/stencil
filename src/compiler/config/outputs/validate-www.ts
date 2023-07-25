@@ -1,15 +1,17 @@
-import { buildError, isBoolean, isString } from '@utils';
-import { isAbsolute, join } from 'path';
-
-import type * as d from '../../../declarations';
 import {
+  buildError,
   COPY,
   DIST_GLOBAL_STYLES,
   DIST_LAZY,
+  isBoolean,
   isOutputTargetDist,
   isOutputTargetWww,
+  isString,
   WWW,
-} from '../../output-targets/output-utils';
+} from '@utils';
+import { isAbsolute, join } from 'path';
+
+import type * as d from '../../../declarations';
 import { getAbsolutePath } from '../config-utils';
 import { validateCopy } from '../validate-copy';
 import { validatePrerender } from '../validate-prerender';
@@ -35,7 +37,7 @@ export const validateWww = (config: d.ValidatedConfig, diagnostics: d.Diagnostic
   return userWwwOutputs.reduce(
     (
       outputs: (d.OutputTargetWww | d.OutputTargetDistLazy | d.OutputTargetCopy | d.OutputTargetDistGlobalStyles)[],
-      o
+      o,
     ) => {
       const outputTarget = validateWwwOutputTarget(config, o, diagnostics);
       outputs.push(outputTarget);
@@ -77,14 +79,14 @@ export const validateWww = (config: d.ValidatedConfig, diagnostics: d.Diagnostic
 
       return outputs;
     },
-    []
+    [],
   );
 };
 
 const validateWwwOutputTarget = (
   config: d.ValidatedConfig,
   outputTarget: d.OutputTargetWww,
-  diagnostics: d.Diagnostic[]
+  diagnostics: d.Diagnostic[],
 ) => {
   if (!isString(outputTarget.baseUrl)) {
     outputTarget.baseUrl = '/';

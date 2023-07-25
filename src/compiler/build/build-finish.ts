@@ -1,8 +1,6 @@
-import { isFunction, isRemoteUrl } from '@utils';
-import { relative } from 'path';
+import { isFunction, isRemoteUrl, relative } from '@utils';
 
 import type * as d from '../../declarations';
-import { IS_NODE_ENV } from '../sys/environment';
 import { generateBuildResults } from './build-results';
 import { generateBuildStats, writeBuildStats } from './build-stats';
 
@@ -47,7 +45,7 @@ const buildDone = async (
   config: d.Config,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
-  aborted: boolean
+  aborted: boolean,
 ): Promise<d.CompilerBuildResults> => {
   if (buildCtx.hasFinished && buildCtx.buildResults) {
     // we've already marked this build as finished and
@@ -122,7 +120,7 @@ const buildDone = async (
 
   if (!config.watch) {
     compilerCtx.reset();
-    if (IS_NODE_ENV && global.gc) {
+    if (global.gc) {
       buildCtx.debug(`triggering forced gc`);
       global.gc();
       buildCtx.debug(`forced gc finished`);

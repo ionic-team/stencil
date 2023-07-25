@@ -1,3 +1,4 @@
+import type { Config } from '@jest/types';
 import type * as d from '@stencil/core/declarations';
 import { mockValidatedConfig } from '@stencil/core/testing';
 import path from 'path';
@@ -224,5 +225,44 @@ describe('jest-config', () => {
     expect(jestArgv.json).toBe(true);
     // the `_` field holds any filename pattern matches
     expect(jestArgv._).toEqual(['foobar/*', 'my-spec.ts']);
+  });
+
+  describe('Jest aliases', () => {
+    it('should support the string Jest alias "-w=4" for maxWorkers', () => {
+      const args = ['test', '--spec', '-w=4'];
+      const jestArgv = buildJestArgv(mockValidatedConfig({ flags: parseFlags(args) }));
+      expect(jestArgv.maxWorkers).toBe(4);
+    });
+
+    it('should support the string Jest alias "-w 4" for maxWorkers', () => {
+      const args = ['test', '--spec', '-w', '4'];
+      const jestArgv = buildJestArgv(mockValidatedConfig({ flags: parseFlags(args) }));
+      expect(jestArgv.maxWorkers).toBe(4);
+    });
+
+    it('should support the string Jest alias "-t" for testNamePattern', () => {
+      const args = ['test', '--spec', '-t=my-test-pattern'];
+      const jestArgv = buildJestArgv(mockValidatedConfig({ flags: parseFlags(args) }));
+      expect(jestArgv.testNamePattern).toBe('my-test-pattern');
+    });
+
+    it('should support the string Jest alias "-t pattern" for testNamePattern', () => {
+      const args = ['test', '--spec', '-t', 'my-test-pattern'];
+      const jestArgv = buildJestArgv(mockValidatedConfig({ flags: parseFlags(args) }));
+      expect(jestArgv.testNamePattern).toBe('my-test-pattern');
+    });
+
+    it.each<[string, keyof Config.Argv]>([
+      ['b', 'bail'],
+      ['e', 'expand'],
+      ['o', 'onlyChanged'],
+      ['f', 'onlyFailures'],
+      ['i', 'runInBand'],
+      ['u', 'updateSnapshot'],
+    ])('should support the boolean Jest alias %p for %p', (alias, fullArgument) => {
+      const args = ['test', '--spec', `-${alias}`];
+      const jestArgv = buildJestArgv(mockValidatedConfig({ flags: parseFlags(args) }));
+      expect(jestArgv[fullArgument]).toBe(true);
+    });
   });
 });

@@ -142,12 +142,8 @@ function getDocBlockLines(docs: d.CompilerJsDoc): string[] {
  * @param buildCtx the current build context to query for a specific package
  * @returns a list of package names the project is dependent on
  */
-const getDependencies = (buildCtx: d.BuildCtx): ReadonlyArray<string> => {
-  if (buildCtx.packageJson != null && buildCtx.packageJson.dependencies != null) {
-    return Object.keys(buildCtx.packageJson.dependencies).filter((pkgName) => !SKIP_DEPS.includes(pkgName));
-  }
-  return [];
-};
+const getDependencies = (buildCtx: d.BuildCtx): ReadonlyArray<string> =>
+  Object.keys(buildCtx?.packageJson?.dependencies ?? {}).filter((pkgName) => !SKIP_DEPS.includes(pkgName));
 
 /**
  * Utility to determine whether a project has a dependency on a package
@@ -158,9 +154,6 @@ const getDependencies = (buildCtx: d.BuildCtx): ReadonlyArray<string> => {
 export const hasDependency = (buildCtx: d.BuildCtx, depName: string): boolean => {
   return getDependencies(buildCtx).includes(depName);
 };
-
-// TODO(STENCIL-661): Remove code related to the dynamic import shim
-export const getDynamicImportFunction = (namespace: string) => `__sc_import_${namespace.replace(/\s|-/g, '_')}`;
 
 export const readPackageJson = async (config: d.ValidatedConfig, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   try {
@@ -237,5 +230,5 @@ const SKIP_DEPS = ['@stencil/core'];
  */
 export const readOnlyArrayHasStringMember = <T extends string>(
   readOnlyArray: ReadonlyArray<T>,
-  maybeMember: T | string
+  maybeMember: T | string,
 ): maybeMember is T => readOnlyArray.includes(maybeMember as (typeof readOnlyArray)[number]);

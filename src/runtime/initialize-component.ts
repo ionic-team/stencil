@@ -15,17 +15,14 @@ export const initializeComponent = async (
   hostRef: d.HostRef,
   cmpMeta: d.ComponentRuntimeMeta,
   hmrVersionId?: string,
-  Cstr?: any
+  Cstr?: any,
 ) => {
   // initializeComponent
-  if (
-    (BUILD.lazyLoad || BUILD.hydrateServerSide || BUILD.style) &&
-    (hostRef.$flags$ & HOST_FLAGS.hasInitializedComponent) === 0
-  ) {
-    if (BUILD.lazyLoad || BUILD.hydrateClientSide) {
-      // we haven't initialized this element yet
-      hostRef.$flags$ |= HOST_FLAGS.hasInitializedComponent;
+  if ((hostRef.$flags$ & HOST_FLAGS.hasInitializedComponent) === 0) {
+    // Let the runtime know that the component has been initialized
+    hostRef.$flags$ |= HOST_FLAGS.hasInitializedComponent;
 
+    if (BUILD.lazyLoad || BUILD.hydrateClientSide) {
       // lazy loaded components
       // request the component's implementation to be
       // wired up with the host element
@@ -34,7 +31,7 @@ export const initializeComponent = async (
         // Await creates a micro-task avoid if possible
         const endLoad = uniqueTime(
           `st:load:${cmpMeta.$tagName$}:${hostRef.$modeName$}`,
-          `[Stencil] Load module for <${cmpMeta.$tagName$}>`
+          `[Stencil] Load module for <${cmpMeta.$tagName$}>`,
         );
         Cstr = await Cstr;
         endLoad();
@@ -81,7 +78,7 @@ export const initializeComponent = async (
     } else {
       // sync constructor component
       Cstr = elm.constructor as any;
-      hostRef.$flags$ |= HOST_FLAGS.hasInitializedComponent;
+
       // wait for the CustomElementRegistry to mark the component as ready before setting `isWatchReady`. Otherwise,
       // watchers may fire prematurely if `customElements.get()`/`customElements.whenDefined()` resolves _before_
       // Stencil has completed instantiating the component.
@@ -105,7 +102,7 @@ export const initializeComponent = async (
         if (
           !BUILD.hydrateServerSide &&
           BUILD.shadowDom &&
-          // TODO(STENCIL-662): Remove code related to deprecated shadowDomShim field
+          // TODO(STENCIL-854): Remove code related to legacy shadowDomShim field
           BUILD.shadowDomShim &&
           cmpMeta.$flags$ & CMP_FLAGS.needsShadowDomShim
         ) {

@@ -33,7 +33,7 @@ async function pageSpyOnEvent(page: pd.E2EPageInternal, eventName: string, selec
 export async function waitForEvent(
   page: pd.E2EPageInternal,
   eventName: string,
-  elementHandle: puppeteer.ElementHandle
+  elementHandle: puppeteer.ElementHandle,
 ) {
   const timeoutMs = jasmine.DEFAULT_TIMEOUT_INTERVAL * 0.5;
   const ev = await page.evaluate(
@@ -49,13 +49,13 @@ export async function waitForEvent(
             clearTimeout(tmr);
             resolve((window as unknown as pd.BrowserWindow).stencilSerializeEvent(ev as any));
           },
-          { once: true }
+          { once: true },
         );
       });
     },
     elementHandle,
     eventName,
-    timeoutMs
+    timeoutMs,
   );
 
   await page.waitForChanges();
@@ -113,7 +113,7 @@ export async function addE2EListener(
   page: pd.E2EPageInternal,
   elmHandle: puppeteer.JSHandle,
   eventName: string,
-  callback: (ev: any) => void
+  callback: (ev: any) => void,
 ) {
   // NODE CONTEXT
   const id = page._e2eEventIds++;
@@ -128,12 +128,12 @@ export async function addE2EListener(
       elm.addEventListener(eventName, (ev: any) => {
         (window as unknown as pd.BrowserWindow).stencilOnEvent(
           id,
-          (window as unknown as pd.BrowserWindow).stencilSerializeEvent(ev)
+          (window as unknown as pd.BrowserWindow).stencilSerializeEvent(ev),
         );
       });
     },
     id,
-    eventName
+    eventName,
   );
 }
 

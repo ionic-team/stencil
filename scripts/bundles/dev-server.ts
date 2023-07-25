@@ -4,7 +4,6 @@ import { dataToEsm } from '@rollup/pluginutils';
 import fs from 'fs-extra';
 import { join } from 'path';
 import type { OutputChunk, Plugin, RollupOptions } from 'rollup';
-import { minify } from 'terser';
 import ts from 'typescript';
 
 import { getBanner } from '../utils/banner';
@@ -37,7 +36,7 @@ export async function devServer(opts: BuildOptions) {
   // copy server-worker-thread.js
   await fs.copy(
     join(opts.srcDir, 'dev-server', 'server-worker-thread.js'),
-    join(opts.output.devServerDir, 'server-worker-thread.js')
+    join(opts.output.devServerDir, 'server-worker-thread.js'),
   );
 
   // copy template files
@@ -182,6 +181,8 @@ export async function devServer(opts: BuildOptions) {
             code = tsResults.outputText;
 
             code = intro + code + outro;
+
+            const { minify } = await import('terser');
 
             if (opts.isProd) {
               const minifyResults = await minify(code, {

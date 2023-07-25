@@ -72,7 +72,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
         cmpMeta.$watchers$ = {};
       }
       if (BUILD.shadowDom && !supportsShadow && cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation) {
-        // TODO(STENCIL-662): Remove code related to deprecated shadowDomShim field
+        // TODO(STENCIL-854): Remove code related to legacy shadowDomShim field
         cmpMeta.$flags$ |= CMP_FLAGS.needsShadowDomShim;
       }
       const tagName =
@@ -159,7 +159,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
         cmpTags.push(tagName);
         customElements.define(
           tagName,
-          proxyComponent(HostElement as any, cmpMeta, PROXY_FLAGS.isElementConstructor) as any
+          proxyComponent(HostElement as any, cmpMeta, PROXY_FLAGS.isElementConstructor) as any,
         );
       }
     });

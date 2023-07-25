@@ -1,9 +1,7 @@
-import { generatePreamble, normalizePath } from '@utils';
-import { join, relative } from 'path';
+import { generatePreamble, isOutputTargetDistLazyLoader, join, relative, relativeImport } from '@utils';
 
 import type * as d from '../../declarations';
 import { getClientPolyfill } from '../app-core/app-polyfills';
-import { isOutputTargetDistLazyLoader, relativeImport } from './output-utils';
 
 export const outputLazyLoader = async (config: d.ValidatedConfig, compilerCtx: d.CompilerCtx) => {
   const outputTargets = config.outputTargets.filter(isOutputTargetDistLazyLoader);
@@ -17,7 +15,7 @@ export const outputLazyLoader = async (config: d.ValidatedConfig, compilerCtx: d
 const generateLoader = async (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
-  outputTarget: d.OutputTargetDistLazyLoader
+  outputTarget: d.OutputTargetDistLazyLoader,
 ) => {
   const loaderPath = outputTarget.dir;
   const es2017Dir = outputTarget.esmDir;
@@ -43,25 +41,25 @@ const generateLoader = async (
       unpkg: './cdn.js',
     },
     null,
-    2
+    2,
   );
 
   const es5EntryPoint = join(es5Dir, 'loader.js');
   const es2017EntryPoint = join(es2017Dir, 'loader.js');
   const polyfillsEntryPoint = join(es2017Dir, 'polyfills/index.js');
   const cjsEntryPoint = join(cjsDir, 'loader.cjs.js');
-  const polyfillsExport = `export * from '${normalizePath(relative(loaderPath, polyfillsEntryPoint))}';`;
+  const polyfillsExport = `export * from '${relative(loaderPath, polyfillsEntryPoint)}';`;
   const indexContent = `${generatePreamble(config)}
 ${es5HtmlElement}
 ${polyfillsExport}
-export * from '${normalizePath(relative(loaderPath, es5EntryPoint))}';
+export * from '${relative(loaderPath, es5EntryPoint)}';
 `;
   const indexES2017Content = `${generatePreamble(config)}
 ${polyfillsExport}
-export * from '${normalizePath(relative(loaderPath, es2017EntryPoint))}';
+export * from '${relative(loaderPath, es2017EntryPoint)}';
 `;
   const indexCjsContent = `${generatePreamble(config)}
-module.exports = require('${normalizePath(relative(loaderPath, cjsEntryPoint))}');
+module.exports = require('${relative(loaderPath, cjsEntryPoint)}');
 module.exports.applyPolyfills = function() { return Promise.resolve() };
 `;
 
@@ -87,10 +85,10 @@ export interface CustomElementsDefineOptions {
   ael?: (el: EventTarget, eventName: string, listener: EventListenerOrEventListenerObject, options: boolean | AddEventListenerOptions) => void;
   rel?: (el: EventTarget, eventName: string, listener: EventListenerOrEventListenerObject, options: boolean | AddEventListenerOptions) => void;
 }
-export declare function defineCustomElements(win?: Window, opts?: CustomElementsDefineOptions): Promise<void>;
+export declare function defineCustomElements(win?: Window, opts?: CustomElementsDefineOptions): void;
 export declare function applyPolyfills(): Promise<void>;
 
-/** 
+/**
  * Used to specify a nonce value that corresponds with an application's CSP.
  * When set, the nonce will be added to all dynamically created script and style tags at runtime.
  * Alternatively, the nonce value can be set on a meta tag in the DOM head

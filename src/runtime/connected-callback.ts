@@ -47,7 +47,7 @@ export const connectedCallback = (elm: d.HostElement) => {
         if (
           BUILD.hydrateServerSide ||
           ((BUILD.slot || BUILD.shadowDom) &&
-            // TODO(STENCIL-662): Remove code related to deprecated shadowDomShim field
+            // TODO(STENCIL-854): Remove code related to legacy shadowDomShim field
             cmpMeta.$flags$ & (CMP_FLAGS.hasSlotRelocation | CMP_FLAGS.needsShadowDomShim))
         ) {
           setContentReference(elm);
@@ -125,7 +125,7 @@ const setContentReference = (elm: d.HostElement) => {
   // create a node to represent where the original
   // content was first placed, which is useful later on
   const contentRefElm = (elm['s-cr'] = doc.createComment(
-    BUILD.isDebug ? `content-ref (host=${elm.localName})` : ''
+    BUILD.isDebug ? `content-ref (host=${elm.localName})` : '',
   ) as any);
   contentRefElm['s-cn'] = true;
   elm.insertBefore(contentRefElm, elm.firstChild);

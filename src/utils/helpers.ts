@@ -156,12 +156,15 @@ export const fromEntries = <V>(entries: IterableIterator<[string, V]>) => {
  * every `key` in `keys`
  */
 export const pluck = (obj: { [key: string]: any }, keys: string[]) => {
-  return keys.reduce((final, key) => {
-    if (obj[key]) {
-      final[key] = obj[key];
-    }
-    return final;
-  }, {} as { [key: string]: any });
+  return keys.reduce(
+    (final, key) => {
+      if (obj[key]) {
+        final[key] = obj[key];
+      }
+      return final;
+    },
+    {} as { [key: string]: any },
+  );
 };
 
 const isDefined = (v: any): v is NonNullable<typeof v> => v !== null && v !== undefined;

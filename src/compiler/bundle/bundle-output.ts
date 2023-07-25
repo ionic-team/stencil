@@ -1,4 +1,7 @@
-import { rollupCommonjsPlugin, rollupJsonPlugin, rollupNodeResolvePlugin, rollupReplacePlugin } from '@compiler-deps';
+import rollupCommonjsPlugin from '@rollup/plugin-commonjs';
+import rollupJsonPlugin from '@rollup/plugin-json';
+import rollupNodeResolvePlugin from '@rollup/plugin-node-resolve';
+import rollupReplacePlugin from '@rollup/plugin-replace';
 import { createOnWarnFn, isString, loadRollupDiagnostics } from '@utils';
 import { rollup, RollupOptions, TreeshakingOptions } from 'rollup';
 
@@ -23,7 +26,7 @@ export const bundleOutput = async (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
-  bundleOpts: BundleOptions
+  bundleOpts: BundleOptions,
 ) => {
   try {
     const rollupOptions = getRollupOptions(config, compilerCtx, buildCtx, bundleOpts);
@@ -53,7 +56,7 @@ export const getRollupOptions = (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
-  bundleOpts: BundleOptions
+  bundleOpts: BundleOptions,
 ): RollupOptions => {
   const customResolveOptions = createCustomResolverAsync(config.sys, compilerCtx.fs, [
     '.tsx',
@@ -85,7 +88,7 @@ export const getRollupOptions = (
     }
     return resolved;
   });
-  if (config.devServer && config.devServer.experimentalDevModules) {
+  if (config.devServer?.experimentalDevModules) {
     nodeResolvePlugin.resolveId = async function (importee: string, importer: string) {
       const resolvedId = await orgNodeResolveId2.call(nodeResolvePlugin, importee, importer);
       return devNodeModuleResolveId(config, compilerCtx.fs, resolvedId, importee);
@@ -142,7 +145,7 @@ export const getRollupOptions = (
   return rollupOptions;
 };
 
-const getTreeshakeOption = (config: d.Config, bundleOpts: BundleOptions): TreeshakingOptions | boolean => {
+const getTreeshakeOption = (config: d.ValidatedConfig, bundleOpts: BundleOptions): TreeshakingOptions | boolean => {
   if (bundleOpts.platform === 'hydrate') {
     return {
       propertyReadSideEffects: false,

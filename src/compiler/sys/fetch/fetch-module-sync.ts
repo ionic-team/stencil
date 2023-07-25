@@ -11,7 +11,7 @@ export const fetchModuleSync = (
   inMemoryFs: InMemoryFileSystem,
   pkgVersions: Map<string, string>,
   url: string,
-  filePath: string
+  filePath: string,
 ) => {
   if (skipFilePathFetch(filePath)) {
     return undefined;

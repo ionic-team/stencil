@@ -1,8 +1,7 @@
-import { normalizePath } from '@utils';
+import { isOutputTargetDistTypes, normalizePath } from '@utils';
 import { dirname, join, relative, resolve } from 'path';
 
 import type * as d from '../../declarations';
-import { isOutputTargetDistTypes } from '../output-targets/output-utils';
 import { FsWriteResults } from '../sys/in-memory-fs';
 
 /**
@@ -46,7 +45,7 @@ export const updateTypeIdentifierNames = (
   typeReferences: d.ComponentCompilerTypeReferences,
   typeImportData: d.TypesImportData,
   sourceFilePath: string,
-  initialType: string
+  initialType: string,
 ): string => {
   let currentTypeName = initialType;
 
@@ -115,7 +114,7 @@ const updateTypeName = (currentTypeName: string, typeAlias: d.TypesMemberNameDat
  */
 export const copyStencilCoreDts = async (
   config: d.ValidatedConfig,
-  compilerCtx: d.CompilerCtx
+  compilerCtx: d.CompilerCtx,
 ): Promise<ReadonlyArray<FsWriteResults>> => {
   const typesOutputTargets = config.outputTargets.filter(isOutputTargetDistTypes).filter((o) => o.typesDir);
 
@@ -126,7 +125,7 @@ export const copyStencilCoreDts = async (
     typesOutputTargets.map((o) => {
       const coreDtsFilePath = join(o.typesDir, CORE_DTS);
       return compilerCtx.fs.writeFile(coreDtsFilePath, srcStencilCoreDts, { outputTargetType: o.type });
-    })
+    }),
   );
 };
 

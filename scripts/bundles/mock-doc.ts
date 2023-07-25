@@ -86,7 +86,7 @@ async function bundleMockDocDts(inputDir: string, outputDir: string) {
   const output = await Promise.all(
     srcDtsFiles.map((inputDtsFile) => {
       return getDtsContent(inputDir, inputDtsFile);
-    })
+    }),
   );
 
   const srcIndexDts = await fs.readFile(join(inputDir, 'index.d.ts'), 'utf8');
