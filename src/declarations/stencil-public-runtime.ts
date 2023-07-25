@@ -1031,6 +1031,7 @@ export namespace JSXBase {
     minlength?: number | string;
     multiple?: boolean;
     name?: string;
+    onSelect?: (event: Event) => void;
     pattern?: string;
     placeholder?: string;
     readOnly?: boolean;
@@ -1269,6 +1270,7 @@ export namespace JSXBase {
     minLength?: number;
     minlength?: number | string;
     name?: string;
+    onSelect?: (event: Event) => void;
     placeholder?: string;
     readOnly?: boolean;
     readonly?: boolean | string;
