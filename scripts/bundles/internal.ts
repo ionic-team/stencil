@@ -1,7 +1,7 @@
 import fs from 'fs-extra';
 import { join } from 'path';
 
-import { cleanDts } from '../utils/bundle-dts';
+import { bundleDts, cleanDts } from '../utils/bundle-dts';
 import type { BuildOptions } from '../utils/options';
 import { writePkgJson } from '../utils/write-pkg-json';
 import { internalAppData } from './internal-app-data';
@@ -70,7 +70,16 @@ async function copyStencilInternalDts(opts: BuildOptions, outputInternalDir: str
   // @stencil/core/internal/stencil-public-docs.d.ts
   const docsDtsSrcPath = join(declarationsInputDir, 'stencil-public-docs.d.ts');
   const docsDtsDestPath = join(outputInternalDir, 'stencil-public-docs.d.ts');
-  const docsDts = cleanDts(await fs.readFile(docsDtsSrcPath, 'utf8'));
+  // We bundle with `dts-bundle-generator` here to ensure that when the `docs-json`
+  // OT writes a `docs.d.ts` file based on this file it is fully portable.
+  const docsDts = await bundleDts(opts, docsDtsSrcPath, {
+    // we want to suppress the `dts-bundle-generator` banner here because we do
+    // our own later on
+    noBanner: true,
+    // we also don't want the types which are inlined into our bundled file to
+    // be re-exported, which will change the 'surface' of the module
+    exportReferencedTypes: false,
+  });
   await fs.writeFile(docsDtsDestPath, docsDts);
 
   // @stencil/core/internal/stencil-public-runtime.d.ts
