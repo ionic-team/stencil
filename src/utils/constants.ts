@@ -55,19 +55,55 @@ export const enum HOST_FLAGS {
   devOnDidLoad = 1 << 11,
 }
 
+/**
+ * A set of flags used for bitwise calculations against {@link ComponentRuntimeMeta#$flags$}.
+ *
+ * These flags should only be used in conjunction with {@link ComponentRuntimeMeta#$flags$}.
+ * They should _not_ be used for calculations against other fields/numbers
+ */
 export const enum CMP_FLAGS {
+  /**
+   * Used to determine if a component is using the shadow DOM.
+   * e.g. `shadow: true | {}` is set on the `@Component()` decorator
+   */
   shadowDomEncapsulation = 1 << 0,
+  /**
+   * Used to determine if a component is using scoped stylesheets
+   * e.g. `scoped: true` is set on the `@Component()` decorator
+   */
   scopedCssEncapsulation = 1 << 1,
+  /**
+   * Used to determine if a component does not use the shadow DOM _and_ has `<slot/>` tags in its markup.
+   */
   hasSlotRelocation = 1 << 2,
   // TODO(STENCIL-854): Remove code related to legacy shadowDomShim field
   // Note that when we remove this field we should consider whether we need to
   // retain a placeholder here, since if we want to have compatability between
   // different versions of the runtime then we'll need to not shift the values
   // of the other higher flags down
+  /**
+   * Determines if a shim for the shadow DOM is necessary.
+   *
+   * The shim should only be needed if a component requires {@link shadowDomEncapsulation} and if any output
+   * target-specific criteria are met. Refer to this flag's usage to determine each output target's criteria.
+   */
   needsShadowDomShim = 1 << 3,
+  /**
+   * Determines if `delegatesFocus` is enabled for a component that uses the shadow DOM.
+   * e.g. `shadow: { delegatesFocus: true }` is set on the `@Component()` decorator
+   */
   shadowDelegatesFocus = 1 << 4,
+  /**
+   * Determines if `mode` is set on the `@Component()` decorator
+   */
   hasMode = 1 << 5,
   // TODO(STENCIL-854): Remove code related to legacy shadowDomShim field
+  /**
+   * Determines if styles must be scoped due to either:
+   * 1. A component is using scoped stylesheets ({@link scopedCssEncapsulation})
+   * 2. A component is using the shadow DOM _and_ the output target's rules for requiring a shadow DOM shim have been
+   * met ({@link needsShadowDomShim})
+   */
   needsScopedEncapsulation = scopedCssEncapsulation | needsShadowDomShim,
 }
 

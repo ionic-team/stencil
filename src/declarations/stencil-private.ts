@@ -817,6 +817,12 @@ export interface ComponentCompilerMeta extends ComponentCompilerFeatures {
   directDependents?: string[];
 }
 
+/**
+ * The supported style encapsulation modes on a Stencil component:
+ * 1. 'shadow' - native Shadow DOM
+ * 2. 'scoped' - encapsulated styles and polyfilled slots
+ * 3. 'none' - a basic HTML element
+ */
 export type Encapsulation = 'shadow' | 'scoped' | 'none';
 
 /**
