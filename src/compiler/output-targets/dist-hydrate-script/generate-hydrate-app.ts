@@ -5,7 +5,6 @@ import { RollupOptions } from 'rollup';
 import { rollup } from 'rollup';
 
 import type * as d from '../../../declarations';
-import { getBuildFeatures, updateBuildConditionals } from '../../app-core/app-data';
 import {
   STENCIL_HYDRATE_FACTORY_ID,
   STENCIL_INTERNAL_HYDRATE_ID,
@@ -76,12 +75,9 @@ export const generateHydrateApp = async (
 const generateHydrateFactory = async (config: d.ValidatedConfig, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   if (!buildCtx.hasError) {
     try {
-      const cmps = buildCtx.components;
-      const build = getHydrateBuildConditionals(config, cmps);
-
       const appFactoryEntryCode = await generateHydrateFactoryEntry(buildCtx);
 
-      const rollupFactoryBuild = await bundleHydrateFactory(config, compilerCtx, buildCtx, build, appFactoryEntryCode);
+      const rollupFactoryBuild = await bundleHydrateFactory(config, compilerCtx, buildCtx, appFactoryEntryCode);
       if (rollupFactoryBuild != null) {
         const rollupOutput = await rollupFactoryBuild.generate({
           format: 'cjs',
@@ -121,24 +117,4 @@ const generateHydrateFactoryEntry = async (buildCtx: d.BuildCtx) => {
   s.append(`export { hydrateApp }\n`);
 
   return s.toString();
-};
-
-const getHydrateBuildConditionals = (config: d.ValidatedConfig, cmps: d.ComponentCompilerMeta[]) => {
-  const build = getBuildFeatures(cmps) as d.BuildConditionals;
-
-  build.lazyLoad = true;
-  build.hydrateClientSide = false;
-  build.hydrateServerSide = true;
-
-  updateBuildConditionals(config, build);
-  build.lifecycleDOMEvents = false;
-  build.devTools = false;
-  build.hotModuleReplacement = false;
-  build.cloneNodeFix = false;
-  build.appendChildSlotFix = false;
-  build.slotChildNodesFix = false;
-  // TODO(STENCIL-854): Remove code related to legacy shadowDomShim field
-  build.shadowDomShim = false;
-
-  return build;
 };
