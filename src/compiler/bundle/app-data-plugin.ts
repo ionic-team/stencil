@@ -8,8 +8,18 @@ import type * as d from '../../declarations';
 import { removeCollectionImports } from '../transformers/remove-collection-imports';
 import { APP_DATA_CONDITIONAL, STENCIL_APP_DATA_ID, STENCIL_APP_GLOBALS_ID } from './entry-alias-ids';
 
+/**
+ * A Rollup plugin which bundles application data.
+ *
+ * @param config the Stencil configuration for a particular project
+ * @param compilerCtx the current compiler context
+ * @param buildCtx the current build context
+ * @param build the set build conditionals for the build
+ * @param platform the platform that is being built
+ * @returns a Rollup plugin which carries out the necessary work
+ */
 export const appDataPlugin = (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   build: d.BuildConditionals,
@@ -182,7 +192,16 @@ const appendGlobalScripts = (globalScripts: GlobalScript[], s: MagicString) => {
   }
 };
 
-const appendBuildConditionals = (config: d.Config, build: d.BuildConditionals, s: MagicString) => {
+/**
+ * Generates the `BUILD` constant that is used at compile-time in a Stencil project
+ *
+ * **This function mutates the provided string argument**
+ *
+ * @param config the configuration associated with the Stencil project
+ * @param build the build conditionals to serialize into a JS object
+ * @param s a string to append the generated constant onto
+ */
+const appendBuildConditionals = (config: d.ValidatedConfig, build: d.BuildConditionals, s: MagicString): void => {
   const buildData = Object.keys(build)
     .sort()
     .map((key) => key + ': ' + ((build as any)[key] ? 'true' : 'false'))
