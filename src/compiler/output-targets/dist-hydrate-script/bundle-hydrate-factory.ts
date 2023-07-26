@@ -15,7 +15,6 @@ export const bundleHydrateFactory = async (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
-  _build: d.BuildConditionals,
   appFactoryEntryCode: string,
 ) => {
   try {
