@@ -21,9 +21,6 @@ import type { BuildConditionals } from '@stencil/core/internal';
  * `STENCIL_APP_DATA_ID` uses it to replace these defaults with {@link BuildConditionals} that are derived from a
  * Stencil project's contents (i.e. metadata from the components). This replacement happens at a Stencil project's
  * compile time. Such code can be found at `src/compiler/app-core/app-data.ts`.
- *
- *
- * This collection is expected to be updated before used in compilation of a Stencil project.
  */
 export const BUILD: BuildConditionals = {
   allRenderFn: false,
