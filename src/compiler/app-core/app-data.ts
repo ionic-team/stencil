@@ -138,7 +138,7 @@ const getModuleImports = (moduleMap: ModuleMap, filePath: string, importedModule
 };
 
 /**
- * For a provided Stencil project configuration, update provided the build conditionals
+ * Update the provided build conditionals object in-line with a provided Stencil project configuration
  *
  * **This function mutates the build conditionals argument**
  *
