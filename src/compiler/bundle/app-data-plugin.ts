@@ -195,11 +195,11 @@ const appendGlobalScripts = (globalScripts: GlobalScript[], s: MagicString) => {
 /**
  * Generates the `BUILD` constant that is used at compile-time in a Stencil project
  *
- * **This function mutates the provided string argument**
+ * **This function mutates the provided {@link MagicString} argument**
  *
  * @param config the configuration associated with the Stencil project
  * @param build the build conditionals to serialize into a JS object
- * @param s a string to append the generated constant onto
+ * @param s a `MagicString` to append the generated constant onto
  */
 const appendBuildConditionals = (config: d.ValidatedConfig, build: d.BuildConditionals, s: MagicString): void => {
   const buildData = Object.keys(build)
