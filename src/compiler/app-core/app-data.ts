@@ -2,15 +2,23 @@ import {
   BuildConditionals,
   BuildFeatures,
   ComponentCompilerMeta,
-  Config,
   Module,
   ModuleMap,
+  ValidatedConfig,
 } from '@stencil/core/internal';
 import { unique } from '@utils';
 
+/**
+ * Re-export {@link BUILD} defaults
+ */
 export * from '../../app-data';
 
-export const getBuildFeatures = (cmps: ComponentCompilerMeta[]) => {
+/**
+ * Generate a {@link BuildFeatures} entity, based on the provided component metadata
+ * @param cmps a collection of component compiler metadata, used to set values on the generated build features object
+ * @returns the generated build features entity
+ */
+export const getBuildFeatures = (cmps: ComponentCompilerMeta[]): BuildFeatures => {
   const slot = cmps.some((c) => c.htmlTagNames.includes('slot'));
   const shadowDom = cmps.some((c) => c.encapsulation === 'shadow');
   const slotRelocation = cmps.some((c) => c.encapsulation !== 'shadow' && c.htmlTagNames.includes('slot'));
@@ -129,7 +137,15 @@ const getModuleImports = (moduleMap: ModuleMap, filePath: string, importedModule
   return importedModules;
 };
 
-export const updateBuildConditionals = (config: Config, b: BuildConditionals) => {
+/**
+ * Update the provided build conditionals object in-line with a provided Stencil project configuration
+ *
+ * **This function mutates the build conditionals argument**
+ *
+ * @param config the Stencil configuration to use to update the provided build conditionals
+ * @param b the build conditionals to update
+ */
+export const updateBuildConditionals = (config: ValidatedConfig, b: BuildConditionals): void => {
   b.isDebug = config.logLevel === 'debug';
   b.isDev = !!config.devMode;
   b.isTesting = !!config._isTesting;
