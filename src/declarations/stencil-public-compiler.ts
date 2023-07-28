@@ -1806,8 +1806,11 @@ export interface TestingConfig extends JestConfig {
   browserDevtools?: boolean;
 
   /**
-   * Array of browser emulations to be using during e2e tests. A full e2e
+   * Array of browser emulations to be used during _screenshot_ tests. A full screenshot
    * test is ran for each emulation.
+   *
+   * To emulate a device display for your e2e tests, use the `setViewport` method on a test's E2E page.
+   * An example can be found in [the Stencil docs](https://stenciljs.com/docs/end-to-end-testing#emulate-a-display).
    */
   emulate?: EmulateConfig[];
 
