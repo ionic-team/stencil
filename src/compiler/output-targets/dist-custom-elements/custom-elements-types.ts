@@ -82,7 +82,9 @@ const generateCustomElementsTypesOutput = async (
             const localComponentTypeDefFilePath = `./${component.tagName}`;
 
             return [
-              `export { ${importName} as ${exportName} } from '${componentDTSPath}';`,
+              `export { ${importName} as ${exportName} } from '${
+                componentDTSPath.startsWith('.') ? componentDTSPath : './' + componentDTSPath
+              }';`,
               // We need to alias each `defineCustomElement` function typedef to match the aliased name given to the
               // function in the `index.js`
               `export { defineCustomElement as ${defineFunctionExportName} } from '${localComponentTypeDefFilePath}';`,
@@ -206,8 +208,6 @@ const generateCustomElementType = (componentsDtsRelPath: string, cmp: d.Componen
  */
 const relDts = (fromPath: string, dtsPath: string): string => {
   dtsPath = relative(fromPath, dtsPath);
-  if (!dtsPath.startsWith('.')) {
-    dtsPath = '.' + dtsPath;
-  }
-  return normalizePath(dtsPath.replace('.d.ts', ''));
+
+  return normalizePath(dtsPath.replace('.d.ts', ''), true);
 };
