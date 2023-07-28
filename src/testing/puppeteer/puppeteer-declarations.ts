@@ -28,6 +28,7 @@ type PuppeteerPage = Omit<
   | 'bringToFront'
   | 'browser'
   | 'screenshot'
+  | 'emulate'
   | 'emulateMedia'
   | 'frames'
   | 'goBack'
