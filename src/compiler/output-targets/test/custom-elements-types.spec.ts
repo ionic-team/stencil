@@ -39,71 +39,131 @@ const setup = () => {
 };
 
 describe('Custom Elements Typedef generation', () => {
-  it('should generate an index.d.ts file corresponding to the index.js file when barrel export behavior is enabled', async () => {
-    // this component tests the 'happy path' of a component's filename coinciding with its
-    // tag name
-    const componentOne = stubComponentCompilerMeta({
-      tagName: 'my-component',
-      sourceFilePath: '/src/components/my-component/my-component.tsx',
-    });
-    // this component tests that we correctly resolve its path when the component tag does
-    // not match its filename
-    const componentTwo = stubComponentCompilerMeta({
-      sourceFilePath: '/src/components/the-other-component/my-real-best-component.tsx',
-      componentClassName: 'MyBestComponent',
-      tagName: 'my-best-component',
-    });
-    const { config, compilerCtx, buildCtx } = setup();
-    (config.outputTargets[0] as d.OutputTargetDistCustomElements).customElementsExportBehavior = 'single-export-module';
-    buildCtx.components = [componentOne, componentTwo];
+  describe('export behavior: single-export-module', () => {
+    let config: d.ValidatedConfig;
+    let compilerCtx: d.CompilerCtx;
+    let buildCtx: d.BuildCtx;
+    let writeFileSpy: jest.SpyInstance;
 
-    const writeFileSpy = jest.spyOn(compilerCtx.fs, 'writeFile');
+    beforeEach(() => {
+      // this component tests the 'happy path' of a component's filename coinciding with its
+      // tag name
+      const componentOne = stubComponentCompilerMeta({
+        tagName: 'my-component',
+        sourceFilePath: '/src/components/my-component/my-component.tsx',
+      });
+      // this component tests that we correctly resolve its path when the component tag does
+      // not match its filename
+      const componentTwo = stubComponentCompilerMeta({
+        sourceFilePath: '/src/components/the-other-component/my-real-best-component.tsx',
+        componentClassName: 'MyBestComponent',
+        tagName: 'my-best-component',
+      });
+      ({ config, compilerCtx, buildCtx } = setup());
+      (config.outputTargets[0] as d.OutputTargetDistCustomElements).customElementsExportBehavior =
+        'single-export-module';
+      buildCtx.components = [componentOne, componentTwo];
 
-    await generateCustomElementsTypes(config, compilerCtx, buildCtx, 'types_dir');
-
-    const expectedTypedefOutput = [
-      '/* TestApp custom elements */',
-      `export { StubCmp as MyComponent } from '../types_dir/components/my-component/my-component';`,
-      `export { defineCustomElement as defineCustomElementMyComponent } from './my-component';`,
-      `export { MyBestComponent as MyBestComponent } from '../types_dir/components/the-other-component/my-real-best-component';`,
-      `export { defineCustomElement as defineCustomElementMyBestComponent } from './my-best-component';`,
-      '',
-      '/**',
-      ' * Used to manually set the base path where assets can be found.',
-      ' * If the script is used as "module", it\'s recommended to use "import.meta.url",',
-      ' * such as "setAssetPath(import.meta.url)". Other options include',
-      ' * "setAssetPath(document.currentScript.src)", or using a bundler\'s replace plugin to',
-      ' * dynamically set the path at build time, such as "setAssetPath(process.env.ASSET_PATH)".',
-      ' * But do note that this configuration depends on how your script is bundled, or lack of',
-      ' * bundling, and where your assets can be loaded from. Additionally custom bundling',
-      ' * will have to ensure the static assets are copied to its build directory.',
-      ' */',
-      'export declare const setAssetPath: (path: string) => void;',
-      '',
-      '/**',
-      ` * Used to specify a nonce value that corresponds with an application's CSP.`,
-      ' * When set, the nonce will be added to all dynamically created script and style tags at runtime.',
-      ' * Alternatively, the nonce value can be set on a meta tag in the DOM head',
-      ' * (<meta name="csp-nonce" content="{ nonce value here }" />) which',
-      ' * will result in the same behavior.',
-      ' */',
-      'export declare const setNonce: (nonce: string) => void',
-      '',
-      'export interface SetPlatformOptions {',
-      '  raf?: (c: FrameRequestCallback) => number;',
-      '  ael?: (el: EventTarget, eventName: string, listener: EventListenerOrEventListenerObject, options: boolean | AddEventListenerOptions) => void;',
-      '  rel?: (el: EventTarget, eventName: string, listener: EventListenerOrEventListenerObject, options: boolean | AddEventListenerOptions) => void;',
-      '}',
-      'export declare const setPlatformOptions: (opts: SetPlatformOptions) => void;',
-      "export * from '../types_dir/components';",
-      '',
-    ].join('\n');
-
-    expect(compilerCtx.fs.writeFile).toHaveBeenCalledWith('my-best-dir/index.d.ts', expectedTypedefOutput, {
-      outputTargetType: DIST_CUSTOM_ELEMENTS,
+      writeFileSpy = jest.spyOn(compilerCtx.fs, 'writeFile');
     });
 
-    writeFileSpy.mockRestore();
+    it('should generate an index.d.ts file corresponding to the index.js file when outputting to a sub-dir of dist', async () => {
+      await generateCustomElementsTypes(config, compilerCtx, buildCtx, 'types_dir');
+
+      const expectedTypedefOutput = [
+        '/* TestApp custom elements */',
+        `export { StubCmp as MyComponent } from '../types_dir/components/my-component/my-component';`,
+        `export { defineCustomElement as defineCustomElementMyComponent } from './my-component';`,
+        `export { MyBestComponent as MyBestComponent } from '../types_dir/components/the-other-component/my-real-best-component';`,
+        `export { defineCustomElement as defineCustomElementMyBestComponent } from './my-best-component';`,
+        '',
+        '/**',
+        ' * Used to manually set the base path where assets can be found.',
+        ' * If the script is used as "module", it\'s recommended to use "import.meta.url",',
+        ' * such as "setAssetPath(import.meta.url)". Other options include',
+        ' * "setAssetPath(document.currentScript.src)", or using a bundler\'s replace plugin to',
+        ' * dynamically set the path at build time, such as "setAssetPath(process.env.ASSET_PATH)".',
+        ' * But do note that this configuration depends on how your script is bundled, or lack of',
+        ' * bundling, and where your assets can be loaded from. Additionally custom bundling',
+        ' * will have to ensure the static assets are copied to its build directory.',
+        ' */',
+        'export declare const setAssetPath: (path: string) => void;',
+        '',
+        '/**',
+        ` * Used to specify a nonce value that corresponds with an application's CSP.`,
+        ' * When set, the nonce will be added to all dynamically created script and style tags at runtime.',
+        ' * Alternatively, the nonce value can be set on a meta tag in the DOM head',
+        ' * (<meta name="csp-nonce" content="{ nonce value here }" />) which',
+        ' * will result in the same behavior.',
+        ' */',
+        'export declare const setNonce: (nonce: string) => void',
+        '',
+        'export interface SetPlatformOptions {',
+        '  raf?: (c: FrameRequestCallback) => number;',
+        '  ael?: (el: EventTarget, eventName: string, listener: EventListenerOrEventListenerObject, options: boolean | AddEventListenerOptions) => void;',
+        '  rel?: (el: EventTarget, eventName: string, listener: EventListenerOrEventListenerObject, options: boolean | AddEventListenerOptions) => void;',
+        '}',
+        'export declare const setPlatformOptions: (opts: SetPlatformOptions) => void;',
+        "export * from '../types_dir/components';",
+        '',
+      ].join('\n');
+
+      expect(compilerCtx.fs.writeFile).toHaveBeenCalledWith('my-best-dir/index.d.ts', expectedTypedefOutput, {
+        outputTargetType: DIST_CUSTOM_ELEMENTS,
+      });
+
+      writeFileSpy.mockRestore();
+    });
+
+    it('should generate an index.d.ts file corresponding to the index.js file when outputting to top-level of dist', async () => {
+      (config.outputTargets[0] as d.OutputTargetDistCustomElements).dir = 'dist';
+
+      await generateCustomElementsTypes(config, compilerCtx, buildCtx, 'dist/types_dir');
+
+      const expectedTypedefOutput = [
+        '/* TestApp custom elements */',
+        `export { StubCmp as MyComponent } from './types_dir/components/my-component/my-component';`,
+        `export { defineCustomElement as defineCustomElementMyComponent } from './my-component';`,
+        `export { MyBestComponent as MyBestComponent } from './types_dir/components/the-other-component/my-real-best-component';`,
+        `export { defineCustomElement as defineCustomElementMyBestComponent } from './my-best-component';`,
+        '',
+        '/**',
+        ' * Used to manually set the base path where assets can be found.',
+        ' * If the script is used as "module", it\'s recommended to use "import.meta.url",',
+        ' * such as "setAssetPath(import.meta.url)". Other options include',
+        ' * "setAssetPath(document.currentScript.src)", or using a bundler\'s replace plugin to',
+        ' * dynamically set the path at build time, such as "setAssetPath(process.env.ASSET_PATH)".',
+        ' * But do note that this configuration depends on how your script is bundled, or lack of',
+        ' * bundling, and where your assets can be loaded from. Additionally custom bundling',
+        ' * will have to ensure the static assets are copied to its build directory.',
+        ' */',
+        'export declare const setAssetPath: (path: string) => void;',
+        '',
+        '/**',
+        ` * Used to specify a nonce value that corresponds with an application's CSP.`,
+        ' * When set, the nonce will be added to all dynamically created script and style tags at runtime.',
+        ' * Alternatively, the nonce value can be set on a meta tag in the DOM head',
+        ' * (<meta name="csp-nonce" content="{ nonce value here }" />) which',
+        ' * will result in the same behavior.',
+        ' */',
+        'export declare const setNonce: (nonce: string) => void',
+        '',
+        'export interface SetPlatformOptions {',
+        '  raf?: (c: FrameRequestCallback) => number;',
+        '  ael?: (el: EventTarget, eventName: string, listener: EventListenerOrEventListenerObject, options: boolean | AddEventListenerOptions) => void;',
+        '  rel?: (el: EventTarget, eventName: string, listener: EventListenerOrEventListenerObject, options: boolean | AddEventListenerOptions) => void;',
+        '}',
+        'export declare const setPlatformOptions: (opts: SetPlatformOptions) => void;',
+        "export * from './types_dir/components';",
+        '',
+      ].join('\n');
+
+      expect(compilerCtx.fs.writeFile).toHaveBeenCalledWith('dist/index.d.ts', expectedTypedefOutput, {
+        outputTargetType: DIST_CUSTOM_ELEMENTS,
+      });
+
+      writeFileSpy.mockRestore();
+    });
   });
 
   it('should generate an index.d.ts file corresponding to the index.js file when barrel export behavior is disabled', async () => {
