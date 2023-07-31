@@ -1,3 +1,17 @@
+## 🎾 [4.0.3](https://github.com/ionic-team/stencil/compare/v4.0.2...v4.0.3) (2023-07-31)
+
+
+### Bug Fixes
+
+* **compiler:** custom elements relative typedef import paths ([#4633](https://github.com/ionic-team/stencil/issues/4633)) ([feba98c](https://github.com/ionic-team/stencil/commit/feba98c35bab96ee0e7c72617a2f3a20c4bf7b72))
+* **docs-json:** use dts-bundle-generator to bundle types for docs-json ([#4619](https://github.com/ionic-team/stencil/issues/4619)) ([6ba3249](https://github.com/ionic-team/stencil/commit/6ba3249cab485f09ab6e16d4eb63076d40a564a0))
+* **runtime:** add onSelect to textarea and input ([#4616](https://github.com/ionic-team/stencil/issues/4616)) ([8ae64f2](https://github.com/ionic-team/stencil/commit/8ae64f21a046c88204f785519e3b59fbe1670612))
+* **runtime:** handle lazy-instance promises for connected & disconnected callbacks ([#4072](https://github.com/ionic-team/stencil/issues/4072)) ([dffc5bb](https://github.com/ionic-team/stencil/commit/dffc5bb4c3c6f19274051a4953601e2af5ac6f95))
+* **runtime:** override attrs set on Host with values from host element ([#4548](https://github.com/ionic-team/stencil/issues/4548)) ([b088b9e](https://github.com/ionic-team/stencil/commit/b088b9e48d8c4799cfa2b7210f4bc9feb4d6ef94))
+* **testing:** remove use of `emulate` field in `E2EPage()` ([#4632](https://github.com/ionic-team/stencil/issues/4632)) ([4d7b138](https://github.com/ionic-team/stencil/commit/4d7b138a6d57509d8ecc25c5b9cbb7932752881c))
+
+
+
 ## 😈 [4.0.2](https://github.com/ionic-team/stencil/compare/v4.0.1...v4.0.2) (2023-07-24)
 
 
