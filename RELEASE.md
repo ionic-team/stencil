@@ -6,15 +6,18 @@ Manual releases should only be performed when there are extenuating circumstance
 
 ## Automated Releases
 
+1. Check that [Stencil's Merge
+   Queue](https://github.com/ionic-team/stencil/queue/) is empty (nothing is
+   queued for merge).
 1. Run the [Stencil Production Release](https://github.com/ionic-team/stencil/actions/workflows/release-production.yml)
 in GitHub
    1. Run the workflow from the `main` branch, _unless_ the release is for a previous major version of Stencil.
    In that scenario, select the `v#-maintenance` branch corresponding to the version of Stencil being released.
    For example, `v3-maintenance` to release a new version of Stencil v3.
-   2. Stencil follows semantic versioning. Select the appropriate version from the dropdown for this release.
-   3. Stencil should be published under the `latest` tag, _unless_ the release is for a previous major version of
+   1. Stencil follows semantic versioning. Select the appropriate version from the dropdown for this release.
+   1. Stencil should be published under the `latest` tag, _unless_ the release is for a previous major version of
    Stencil.
-2. Proceed to the [Follow-Up section](#follow-up-steps) of this document to run manual follow-up tasks.
+1. Proceed to the [Follow-Up section](#follow-up-steps) of this document to run manual follow-up tasks.
 
 ## Manual Releases
 
