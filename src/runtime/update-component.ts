@@ -134,7 +134,21 @@ const isPromisey = (maybePromise: Promise<void> | unknown): maybePromise is Prom
   maybePromise instanceof Promise ||
   (maybePromise && (maybePromise as any).then && typeof (maybePromise as Promise<void>).then === 'function');
 
-const updateComponent = async (hostRef: d.HostRef, instance: any, isInitialLoad: boolean) => {
+/**
+ * Update a component given reference to its host elements and so on.
+ *
+ * @param hostRef an object containing references to the element's host node,
+ * VDom nodes, and other metadata
+ * @param instance a reference to the underlying host element where it will be
+ * rendered
+ * @param isInitialLoad whether or not this function is being called as part of
+ * the first render cycle
+ */
+const updateComponent = async (
+  hostRef: d.HostRef,
+  instance: d.HostElement | d.ComponentInterface,
+  isInitialLoad: boolean,
+) => {
   const elm = hostRef.$hostElement$ as d.RenderNode;
   const endUpdate = createTime('update', hostRef.$cmpMeta$.$tagName$);
   const rc = elm['s-rc'];
@@ -149,9 +163,9 @@ const updateComponent = async (hostRef: d.HostRef, instance: any, isInitialLoad:
   }
 
   if (BUILD.hydrateServerSide) {
-    await callRender(hostRef, instance, elm);
+    await callRender(hostRef, instance, elm, isInitialLoad);
   } else {
-    callRender(hostRef, instance, elm);
+    callRender(hostRef, instance, elm, isInitialLoad);
   }
 
   if (BUILD.isDev) {
@@ -205,7 +219,19 @@ const updateComponent = async (hostRef: d.HostRef, instance: any, isInitialLoad:
 
 let renderingRef: any = null;
 
-const callRender = (hostRef: d.HostRef, instance: any, elm: HTMLElement) => {
+/**
+ * Handle making the call to the VDom renderer with the proper context given
+ * various build variables
+ *
+ * @param hostRef an object containing references to the element's host node,
+ * VDom nodes, and other metadata
+ * @param instance a reference to the underlying host element where it will be
+ * rendered
+ * @param elm the Host element for the component
+ * @param isInitialLoad whether or not this function is being called as part of
+ * @returns an empty promise
+ */
+const callRender = (hostRef: d.HostRef, instance: any, elm: HTMLElement, isInitialLoad: boolean) => {
   // in order for bundlers to correctly treeshake the BUILD object
   // we need to ensure BUILD is not deoptimized within a try/catch
   // https://rollupjs.org/guide/en/#treeshake tryCatchDeoptimization
@@ -231,9 +257,9 @@ const callRender = (hostRef: d.HostRef, instance: any, elm: HTMLElement) => {
         // or we need to update the css class/attrs on the host element
         // DOM WRITE!
         if (BUILD.hydrateServerSide) {
-          return Promise.resolve(instance).then((value) => renderVdom(hostRef, value));
+          return Promise.resolve(instance).then((value) => renderVdom(hostRef, value, isInitialLoad));
         } else {
-          renderVdom(hostRef, instance);
+          renderVdom(hostRef, instance, isInitialLoad);
         }
       } else {
         elm.textContent = instance;

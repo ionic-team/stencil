@@ -1261,6 +1261,10 @@ export interface EventEmitterData<T = any> {
   composed?: boolean;
 }
 
+/**
+ * An interface extending `HTMLElement` which describes the fields added onto
+ * host HTML elements by the Stencil runtime.
+ */
 export interface HostElement extends HTMLElement {
   // web component APIs
   connectedCallback?: () => void;
@@ -1755,12 +1759,18 @@ export interface PlatformRuntime {
   $nonce$?: string | null;
   jmp: (c: Function) => any;
   raf: (c: FrameRequestCallback) => number;
+  /**
+   * A wrapper for AddEventListener
+   */
   ael: (
     el: EventTarget,
     eventName: string,
     listener: EventListenerOrEventListenerObject,
     options: boolean | AddEventListenerOptions,
   ) => void;
+  /**
+   * A wrapper for `RemoveEventListener`
+   */
   rel: (
     el: EventTarget,
     eventName: string,

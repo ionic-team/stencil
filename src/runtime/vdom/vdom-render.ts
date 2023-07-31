@@ -809,11 +809,18 @@ interface RelocateNodeData {
  * @param hostRef data needed to root and render the virtual DOM tree, such as
  * the DOM node into which it should be rendered.
  * @param renderFnResults the virtual DOM nodes to be rendered
+ * @param isInitialLoad whether or not this is the first call after page load
  */
-export const renderVdom = (hostRef: d.HostRef, renderFnResults: d.VNode | d.VNode[]) => {
+export const renderVdom = (hostRef: d.HostRef, renderFnResults: d.VNode | d.VNode[], isInitialLoad = false) => {
   const hostElm = hostRef.$hostElement$;
   const cmpMeta = hostRef.$cmpMeta$;
   const oldVNode: d.VNode = hostRef.$vnode$ || newVNode(null, null);
+
+  // if `renderFnResults` is a Host node then we can use it directly. If not,
+  // we need to call `h` again to wrap the children of our component in a
+  // 'dummy' Host node (well, an empty vnode) since `renderVdom` assumes
+  // implicitly that the top-level vdom node is 1) an only child and 2)
+  // contains attrs that need to be set on the host element.
   const rootVnode = isHost(renderFnResults) ? renderFnResults : h(null, null, renderFnResults as any);
 
   hostTagName = hostElm.tagName;
@@ -838,6 +845,28 @@ render() {
     cmpMeta.$attrsToReflect$.map(
       ([propName, attribute]) => (rootVnode.$attrs$[attribute] = (hostElm as any)[propName]),
     );
+  }
+
+  // On the first render and *only* on the first render we want to check for
+  // any attributes set on the host element which are also set on the vdom
+  // node. If we find them, we override the value on the VDom node attrs with
+  // the value from the host element, which allows developers building apps
+  // with Stencil components to override e.g. the `role` attribute on a
+  // component even if it's already set on the `Host`.
+  if (isInitialLoad && rootVnode.$attrs$) {
+    for (const key of Object.keys(rootVnode.$attrs$)) {
+      // We have a special implementation in `setAccessor` for `style` and
+      // `class` which reconciles values coming from the VDom with values
+      // already present on the DOM element, so we don't want to override those
+      // attributes on the VDom tree with values from the host element if they
+      // are present.
+      //
+      // Likewise, `ref` and `key` are special internal values for the Stencil
+      // runtime and we don't want to override those either.
+      if (hostElm.hasAttribute(key) && !['key', 'ref', 'style', 'class'].includes(key)) {
+        rootVnode.$attrs$[key] = hostElm[key as keyof d.HostElement];
+      }
+    }
   }
 
   rootVnode.$tag$ = null;

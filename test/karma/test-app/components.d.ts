@@ -124,6 +124,8 @@ export namespace Components {
     }
     interface FactoryJsx {
     }
+    interface HostAttrOverride {
+    }
     interface ImageImport {
     }
     interface InitCssRoot {
@@ -625,6 +627,12 @@ declare global {
     var HTMLFactoryJsxElement: {
         prototype: HTMLFactoryJsxElement;
         new (): HTMLFactoryJsxElement;
+    };
+    interface HTMLHostAttrOverrideElement extends Components.HostAttrOverride, HTMLStencilElement {
+    }
+    var HTMLHostAttrOverrideElement: {
+        prototype: HTMLHostAttrOverrideElement;
+        new (): HTMLHostAttrOverrideElement;
     };
     interface HTMLImageImportElement extends Components.ImageImport, HTMLStencilElement {
     }
@@ -1210,6 +1218,7 @@ declare global {
         "external-import-b": HTMLExternalImportBElement;
         "external-import-c": HTMLExternalImportCElement;
         "factory-jsx": HTMLFactoryJsxElement;
+        "host-attr-override": HTMLHostAttrOverrideElement;
         "image-import": HTMLImageImportElement;
         "init-css-root": HTMLInitCssRootElement;
         "input-basic-root": HTMLInputBasicRootElement;
@@ -1415,6 +1424,8 @@ declare namespace LocalJSX {
     interface ExternalImportC {
     }
     interface FactoryJsx {
+    }
+    interface HostAttrOverride {
     }
     interface ImageImport {
     }
@@ -1682,6 +1693,7 @@ declare namespace LocalJSX {
         "external-import-b": ExternalImportB;
         "external-import-c": ExternalImportC;
         "factory-jsx": FactoryJsx;
+        "host-attr-override": HostAttrOverride;
         "image-import": ImageImport;
         "init-css-root": InitCssRoot;
         "input-basic-root": InputBasicRoot;
@@ -1821,6 +1833,7 @@ declare module "@stencil/core" {
             "external-import-b": LocalJSX.ExternalImportB & JSXBase.HTMLAttributes<HTMLExternalImportBElement>;
             "external-import-c": LocalJSX.ExternalImportC & JSXBase.HTMLAttributes<HTMLExternalImportCElement>;
             "factory-jsx": LocalJSX.FactoryJsx & JSXBase.HTMLAttributes<HTMLFactoryJsxElement>;
+            "host-attr-override": LocalJSX.HostAttrOverride & JSXBase.HTMLAttributes<HTMLHostAttrOverrideElement>;
             "image-import": LocalJSX.ImageImport & JSXBase.HTMLAttributes<HTMLImageImportElement>;
             "init-css-root": LocalJSX.InitCssRoot & JSXBase.HTMLAttributes<HTMLInitCssRootElement>;
             "input-basic-root": LocalJSX.InputBasicRoot & JSXBase.HTMLAttributes<HTMLInputBasicRootElement>;
