@@ -1805,8 +1805,14 @@ export namespace JSXBase {
     onAnimationIterationCapture?: (event: AnimationEvent) => void;
 
     // Transition Events
+    onTransitionCancel?: (event: TransitionEvent) => void;
+    onTransitionCancelCapture?: (event: TransitionEvent) => void;
     onTransitionEnd?: (event: TransitionEvent) => void;
     onTransitionEndCapture?: (event: TransitionEvent) => void;
+    onTransitionRun?: (event: TransitionEvent) => void;
+    onTransitionRunCapture?: (event: TransitionEvent) => void;
+    onTransitionStart?: (event: TransitionEvent) => void;
+    onTransitionStartCapture?: (event: TransitionEvent) => void;
   }
 }
 
