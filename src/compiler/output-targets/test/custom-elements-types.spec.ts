@@ -67,6 +67,10 @@ describe('Custom Elements Typedef generation', () => {
       writeFileSpy = jest.spyOn(compilerCtx.fs, 'writeFile');
     });
 
+    afterEach(() => {
+      writeFileSpy.mockRestore();
+    });
+
     it('should generate an index.d.ts file corresponding to the index.js file when outputting to a sub-dir of dist', async () => {
       await generateCustomElementsTypes(config, compilerCtx, buildCtx, 'types_dir');
 
@@ -111,8 +115,6 @@ describe('Custom Elements Typedef generation', () => {
       expect(compilerCtx.fs.writeFile).toHaveBeenCalledWith('my-best-dir/index.d.ts', expectedTypedefOutput, {
         outputTargetType: DIST_CUSTOM_ELEMENTS,
       });
-
-      writeFileSpy.mockRestore();
     });
 
     it('should generate an index.d.ts file corresponding to the index.js file when outputting to top-level of dist', async () => {
@@ -161,8 +163,6 @@ describe('Custom Elements Typedef generation', () => {
       expect(compilerCtx.fs.writeFile).toHaveBeenCalledWith('dist/index.d.ts', expectedTypedefOutput, {
         outputTargetType: DIST_CUSTOM_ELEMENTS,
       });
-
-      writeFileSpy.mockRestore();
     });
   });
 
