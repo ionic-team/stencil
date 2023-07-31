@@ -1,5 +1,5 @@
-import type { E2EProcessEnv, EmulateConfig, HostElement, JestEnvironmentGlobal } from '@stencil/core/internal';
-import type { ConsoleMessage, ConsoleMessageLocation, ElementHandle, JSHandle, Page, WaitForOptions } from 'puppeteer';
+import type { E2EProcessEnv, HostElement, JestEnvironmentGlobal } from '@stencil/core/internal';
+import type { ConsoleMessage, ConsoleMessageLocation, ElementHandle, JSHandle, WaitForOptions } from 'puppeteer';
 
 import type {
   E2EPage,
@@ -30,7 +30,6 @@ export async function newE2EPage(opts: NewE2EPageOptions = {}): Promise<E2EPage>
     page._e2eGoto = page.goto;
     page._e2eClose = page.close;
 
-    await setPageEmulate(page as any);
     await page.setCacheEnabled(false);
     await initPageEvents(page);
 
@@ -274,26 +273,6 @@ async function waitForStencil(page: E2EPage, options: WaitForOptions) {
   } catch (e) {
     throw new Error(`App did not load in allowed time. Please ensure the content loads a stencil application.`);
   }
-}
-
-async function setPageEmulate(page: Page) {
-  if (page.isClosed()) {
-    return;
-  }
-
-  const emulateJsonContent = env.__STENCIL_EMULATE__;
-  if (!emulateJsonContent) {
-    return;
-  }
-
-  const screenshotEmulate = JSON.parse(emulateJsonContent) as EmulateConfig;
-
-  const emulateOptions = {
-    viewport: screenshotEmulate.viewport,
-    userAgent: screenshotEmulate.userAgent,
-  };
-
-  await (page as Page).emulate(emulateOptions);
 }
 
 async function waitForChanges(page: E2EPageInternal) {
