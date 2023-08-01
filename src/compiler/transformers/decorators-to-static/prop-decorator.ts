@@ -174,7 +174,21 @@ const getComplexType = (
   return {
     original: nodeType ? nodeType.getText() : typeToString(typeChecker, type),
     resolved: resolveType(typeChecker, type),
-    references: getAttributeTypeInfo(node, node.getSourceFile(), typeChecker, program),
+    references: getAttributeTypeInfo(
+      // If the node did not explicity have a type set (i.e. `name: string`), then
+      // we can generate a type node via the type checker to resolve references for inferred types.
+      //
+      // This is only a concern with non-primitive types such as a user-defined enum.
+      //
+      // For instance, a @Prop() defined as:
+      // @Prop() mode = ComponentModes.DEFAULT;
+      // Should be able to correctly infer the type to be `ComponentModes` and
+      // resolve the reference to this type for use in generated component type declarations.
+      nodeType ? node : typeChecker.typeToTypeNode(type, undefined, undefined),
+      node.getSourceFile(),
+      typeChecker,
+      program,
+    ),
   };
 };
 
