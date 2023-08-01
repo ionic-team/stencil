@@ -1,5 +1,5 @@
 import { BUILD, NAMESPACE } from '@app-data';
-import { consoleError, doc, getHostRef, nextTick, plt, win, writeTask } from '@platform';
+import { Build, consoleError, doc, getHostRef, nextTick, plt, win, writeTask } from '@platform';
 import { CMP_FLAGS, HOST_FLAGS } from '@utils';
 
 import type * as d from '../declarations';
@@ -362,7 +362,7 @@ export const postUpdateComponent = (hostRef: d.HostRef) => {
 };
 
 export const forceUpdate = (ref: any) => {
-  if (BUILD.updatable) {
+  if (BUILD.updatable && Build.isBrowser) {
     const hostRef = getHostRef(ref);
     const isConnected = hostRef.$hostElement$.isConnected;
     if (
