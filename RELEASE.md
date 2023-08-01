@@ -39,12 +39,14 @@ used literally, as opposed to ':facepalm:').
 The following steps should be always run, regardless of whether an automated or manual release was performed.
 
 1. Publish the release notes in GitHub using GitHub's [release notes form](https://github.com/ionic-team/stencil/releases/new).
-   1. If anyone from the community contributed commit(s) to this release, append the following to the end of the GitHub release notes:
-```md
-## Thanks
+   1. If anyone from the community contributed commit(s) to this release,
+      append the following to the end of the GitHub release notes:
 
-🎉 Thanks <GitHub_Usernames> for their contributions! 🎉
-```
+      ```md
+      ## Thanks
+
+      🎉 Thanks <GitHub_Usernames> for their contributions! 🎉
+      ```
 2. Navigate to the [Stencil Site](https://github.com/ionic-team/stencil-site/pulls) repository and merge PRs
    containing documentation that has been approved, but not merged that is related to the release. Such PRs should be
    labelled as `do not merge: waiting for next stencil release`. It's a good idea to review _all_ PRs though, just in
@@ -56,3 +58,11 @@ The following steps should be always run, regardless of whether an automated or 
    2. Move the task card in this current sprint to the 'Done' swim-lane.
    3. Stub out the next release and task for the release in JIRA.
 5. Ensure all GitHub Issues associated with stories/tasks that shipped in this version of Stencil are closed.
+   1. For each issue, add a comment stating the version of Stencil that
+      included the fix/feature (be sure to update the version number _and_
+      tag):
+      
+      ```md
+      The fix for this issue has been released as a part of today's [Stencil
+      vNUMBER release](https://github.com/ionic-team/stencil/releases/tag/TAG). 
+      ```
