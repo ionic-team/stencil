@@ -394,6 +394,31 @@ describe('validation', () => {
     expect(config.extras.tagNameTransform).toBe(false);
   });
 
+  it('should set slot config based on `experimentalSlotFixes`', () => {
+    userConfig.extras = {};
+    userConfig.extras.experimentalSlotFixes = true;
+    const { config } = validateConfig(userConfig, bootstrapConfig);
+    expect(config.extras.appendChildSlotFix).toBe(true);
+    expect(config.extras.cloneNodeFix).toBe(true);
+    expect(config.extras.slotChildNodesFix).toBe(true);
+    expect(config.extras.scopedSlotTextContentFix).toBe(true);
+  });
+
+  it('should override slot fix config based on `experimentalSlotFixes`', () => {
+    userConfig.extras = {
+      appendChildSlotFix: false,
+      slotChildNodesFix: false,
+      cloneNodeFix: false,
+      scopedSlotTextContentFix: false,
+    };
+    userConfig.extras.experimentalSlotFixes = true;
+    const { config } = validateConfig(userConfig, bootstrapConfig);
+    expect(config.extras.appendChildSlotFix).toBe(true);
+    expect(config.extras.cloneNodeFix).toBe(true);
+    expect(config.extras.slotChildNodesFix).toBe(true);
+    expect(config.extras.scopedSlotTextContentFix).toBe(true);
+  });
+
   it('should set taskQueue "async" by default', () => {
     const { config } = validateConfig(userConfig, bootstrapConfig);
     expect(config.taskQueue).toBe('async');

@@ -368,6 +368,13 @@ export interface ConfigExtras {
    * can be customized at runtime. Defaults to `false`.
    */
   tagNameTransform?: boolean;
+
+  // TODO(STENCIL-914): remove `experimentalSlotFixes` when it's the default behavior
+  /**
+   * Enables all slot-related fixes such as {@link slotChildNodesFix}, and
+   * {@link scopedSlotTextContentFix}.
+   */
+  experimentalSlotFixes?: boolean;
 }
 
 export interface Config extends StencilConfig {
