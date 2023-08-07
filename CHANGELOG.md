@@ -1,3 +1,13 @@
+## 🍧 [4.0.4](https://github.com/ionic-team/stencil/compare/v4.0.3...v4.0.4) (2023-08-07)
+
+
+### Bug Fixes
+
+* **runtime:** `forceUpdate` calls only execute when in a browser env ([#4591](https://github.com/ionic-team/stencil/issues/4591)) ([b203263](https://github.com/ionic-team/stencil/commit/b203263482140fde31edfb7a91ac6054f5f98460))
+* **typings:** add additional transition events to DOMAttributes ([#4645](https://github.com/ionic-team/stencil/issues/4645)) ([420052f](https://github.com/ionic-team/stencil/commit/420052f26b9429906476584f174493d1d42db9ac)), closes [#4643](https://github.com/ionic-team/stencil/issues/4643)
+
+
+
 ## 🎾 [4.0.3](https://github.com/ionic-team/stencil/compare/v4.0.2...v4.0.3) (2023-07-31)
 
 
