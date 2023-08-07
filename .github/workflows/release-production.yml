@@ -2,76 +2,57 @@ name: 'Stencil Production Release'
 on:
   workflow_dispatch:
     inputs:
-      version:
-        required: true
-        type: choice
-        description: Which version should be published?
-        options:
-          - prerelease
-          - prepatch
-          - preminor
-          - premajor
-          - patch
-          - minor
-          - major
       tag:
-        required: true
+        required: false
+        default: latest
         type: choice
         description: Which npm tag should this be published to?
         options:
           - dev
           - latest
+          - use_pkg_json_version
+      base:
+        required: true
+        type: choice
+        description: Which base branch should be targeted?
+        default: main
+        options:
+          - main
+          - v3-maintenance
 
 jobs:
   release-stencil-production-build:
-    name: Publish Production Build
+    name: Publish Stencil (Production)
     runs-on: ubuntu-latest
     permissions:
       contents: write
       id-token: write
     steps:
+      # Log the input from GitHub Actions for easy traceability
+      - name: Log GitHub Workflow UI Input
+        run: |
+          echo "Tag: ${{ inputs.tag }}"
+          echo "Base Branch: ${{ inputs.base }}"
+        shell: bash
+
+      - name: Verify that the 'latest' tag is applied only to the 'main' branch
+        run: |
+          echo "The 'latest' tag can only be published from the 'main' branch. Exiting."
+          exit 1
+        shell: bash
+        if: ${{ inputs.base != 'main' && inputs.tag == 'latest' }}
+
       - name: Checkout Code
         uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
         with:
-          # A depth of 0 gets the entire git history.
+          # A depth of 0 gets the entire git history, which we'll want for things like checking all git history/tags.
           # We need git history to generate the changelog; however, we don't know how deep to go.
           # Since publishing is a one-off activity, just get everything.
           fetch-depth: 0
+          ref: ${{ inputs.base }}
 
       - name: Get Core Dependencies
         uses: ./.github/workflows/actions/get-core-dependencies
-
-      # Log the input from GitHub Actions for easy traceability
-      - name: Log GitHub Input
-        run: |
-          echo "Version: ${{ inputs.version }}"
-          echo "Tag: ${{ inputs.tag }}"
-        shell: bash
-
-      - name: Run Publish Preparation Script
-        run: npm run release.ci.prepare -- --version ${{ inputs.version }} --tag ${{ inputs.tag }} --any-branch
-        shell: bash
-
-      - name: Log Generated Changes
-        run: git --no-pager diff
-        shell: bash
-
-      # Commit the Changelog, NOTICE, License, package.json, etc.
-      # Note:
-      # - The version (and vermoji) is pulled directly from the compiled Stencil binary, as the value from the action's
-      #   input form may be a word such as 'major'. This requires the version to have already been incremented to show
-      #   the correct version in the commit message.
-      # - `stencil info` returns "<TAB>Stencil: <VERSION> <VERMOJI>
-      #   we match on "Stencil:" and capture the current version + vermoji to print "<VERMOJI> v<VERSION>"
-      - name: Commit Release Preparations
-        run: |
-          git config user.name "Stencil Release Bot (on behalf of ${{ github.actor }})"
-          git config user.email "stencil-release-bot@ionic.io"
-          git add .
-          git commit -m "$(./bin/stencil info | awk '/Stencil:/ { print $4,"v"$3;}')"
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        shell: bash
 
       - name: Prepare NPM Token
         run: echo //registry.npmjs.org/:_authToken=${NPM_TOKEN} > .npmrc
@@ -82,5 +63,5 @@ jobs:
       - name: Run Publish Scripts
         # pass the generated version number instead of the input, since we've already incremented it in the prerelease
         # step
-        run: npm run release.ci -- --version $(./bin/stencil version) --tag ${{ inputs.tag }} --any-branch
+        run: npm run release.ci -- --any-branch --tag ${{ inputs.tag }}
         shell: bash
