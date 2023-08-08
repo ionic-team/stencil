@@ -1,0 +1,81 @@
+name: 'Stencil Release PR Creation'
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        required: true
+        type: choice
+        description: Which version should be published?
+        options:
+          - prerelease
+          - prepatch
+          - preminor
+          - premajor
+          - patch
+          - minor
+          - major
+
+jobs:
+  create-stencil-release-pull-request:
+    name: Generate Stencil Release PR
+    runs-on: ubuntu-latest
+    steps:
+      # Log the input from GitHub Actions for easy traceability
+      - name: Log GitHub Input
+        run: |
+          echo "Version: ${{ inputs.version }}"
+        shell: bash
+
+      - name: Checkout Code
+        uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
+        with:
+          # A depth of 0 gets the entire git history.
+          # We need git history to generate the changelog; however, we don't know how deep to go.
+          # Since publishing is a one-off activity, just get everything.
+          fetch-depth: 0
+
+      - name: Get Core Dependencies
+        uses: ./.github/workflows/actions/get-core-dependencies
+
+      - name: Run Publish Preparation Script
+        run: npm run release.ci.prepare -- --version ${{ inputs.version }} --any-branch
+        shell: bash
+
+      - name: Log Generated Changes
+        run: git --no-pager diff
+        shell: bash
+
+      - name: Generate Version String and Branch Name
+        id: name_gen
+        run: |
+          VERSION_STR=$(jq '.version' package.json | sed s/\"//g)
+          echo "VERSION_STR=$VERSION_STR" >> "$GITHUB_OUTPUT"
+          echo "BRANCH_NAME=release/$VERSION_STR-run-${{ github.run_number }}-${{ github.run_attempt }}" >> "$GITHUB_OUTPUT"
+        shell: bash
+
+      - name: Print Version String and Branch Name
+        run: |
+          echo Version: ${{ steps.name_gen.outputs.VERSION_STR }}
+          echo Branch Name: ${{ steps.name_gen.outputs.BRANCH_NAME }}
+        shell: bash
+
+      - name: Create Git Branch
+        # Note: We'll let GitHub clean up the branch for us (this is configured in the repo settings on GitHub)
+        run: git checkout -b ${{ steps.name_gen.outputs.BRANCH_NAME }}
+
+      # Commit the CHANGELOG.md, NOTICE.md, LICENSE.md, package.json, etc.
+      - name: Commit Release Preparations
+        run: |
+          git config user.name "Stencil Release Bot (on behalf of ${{ github.actor }})"
+          git config user.email "stencil-release-bot@ionic.io"
+          git add .
+          git commit -m "v${{ steps.name_gen.outputs.VERSION_STR }}"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+
+      - name: Push Branch to GitHub
+        run: |
+          git push --set-upstream origin ${{ steps.name_gen.outputs.BRANCH_NAME }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
