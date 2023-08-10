@@ -166,8 +166,21 @@ const createDefaultTsConfig = (config: d.Config) =>
     2,
   );
 
-const hasSrcDirectoryInclude = (includeProp: string[], src: string) =>
-  Array.isArray(includeProp) && includeProp.includes(src);
+/**
+ * Determines if the included `src` argument belongs in `includeProp`.
+ *
+ * This function normalizes the paths found in both arguments, to catch cases where it's called with:
+ * ```ts
+ * hasSrcDirectoryInclude(['src'], './src'); // should return `true`
+ * ```
+ *
+ * @param includeProp the paths in `include` that should be tested
+ * @param src the path to find in `includeProp`
+ * @returns true if the provided `src` directory is found, `false` otherwise
+ */
+export const hasSrcDirectoryInclude = (includeProp: string[], src: string): boolean =>
+  Array.isArray(includeProp) &&
+  includeProp.some((included) => normalizePath(included, false) === normalizePath(src, false));
 
 const hasStencilConfigInclude = (includeProp: string[]) =>
   Array.isArray(includeProp) && includeProp.includes('stencil.config.ts');
