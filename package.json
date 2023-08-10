@@ -89,7 +89,7 @@
     "conventional-changelog-cli": "^3.0.0",
     "dts-bundle-generator": "~8.0.0",
     "eslint": "^8.23.1",
-    "eslint-config-prettier": "^8.5.0",
+    "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-jest": "^27.0.4",
     "eslint-plugin-jsdoc": "^46.0.0",
     "eslint-plugin-simple-import-sort": "^10.0.0",
