@@ -6,7 +6,6 @@ import type {
   BuildLog,
   BuildResultsComponentGraph,
   CompilerBuildResults,
-  CompilerBuildStart,
   CompilerFsStats,
   CompilerRequestResponse,
   CompilerSystem,
@@ -27,13 +26,7 @@ import type {
   StyleDoc,
   TaskCommand,
 } from './stencil-public-compiler';
-import type {
-  ComponentInterface,
-  ListenOptions,
-  ListenTargetOptions,
-  VNode,
-  VNodeData,
-} from './stencil-public-runtime';
+import type { ComponentInterface, ListenTargetOptions, VNode } from './stencil-public-runtime';
 
 export interface SourceMap {
   file: string;
@@ -285,8 +278,6 @@ export interface BuildStyleUpdate {
 
 export type BuildTask = any;
 
-export type BuildStatus = 'pending' | 'error' | 'disabled' | 'default';
-
 export interface CompilerBuildStats {
   timestamp: string;
   compiler: {
@@ -336,24 +327,6 @@ export interface CompilerBuildStatBundle {
   originalByteSize: number;
 }
 
-export interface BuildEntry {
-  entryId: string;
-  components: BuildComponent[];
-  bundles: BuildBundle[];
-  inputs: string[];
-  modes?: string[];
-  encapsulations: Encapsulation[];
-}
-
-export interface BuildBundle {
-  fileName: string;
-  outputs: string[];
-  size?: number;
-  mode?: string;
-  scopedStyles?: boolean;
-  target?: string;
-}
-
 export interface BuildSourceGraph {
   [filePath: string]: string[];
 }
@@ -364,31 +337,7 @@ export interface BuildComponent {
   dependencies?: string[];
 }
 
-export interface BundleOutputChunk {
-  code: string;
-  fileName: string;
-  isDynamicEntry: boolean;
-  isEntry: boolean;
-  map: any;
-  dynamicImports: string[];
-  imports: string[];
-  exports: string[];
-  modules: {
-    [modulePath: string]: {
-      renderedExports: string[];
-      removedExports: string[];
-      renderedLength: number;
-      originalLength: number;
-    };
-  };
-  name: string;
-}
-
 export type SourceTarget = 'es5' | 'es2017' | 'latest';
-
-export interface BundleEntryInputs {
-  [entryKey: string]: string;
-}
 
 /**
  * A note regarding Rollup types:
@@ -526,159 +475,10 @@ export interface CollectionCompiler {
   typescriptVersion?: string;
 }
 
-export interface AppRegistry {
-  namespace?: string;
-  fsNamespace?: string;
-  loader?: string;
-  core?: string;
-  corePolyfilled?: string;
-  global?: string;
-  components?: AppRegistryComponents;
-}
-
-export interface AppRegistryComponents {
-  [tagName: string]: {
-    bundleIds: ModeBundleIds;
-    encapsulation?: 'shadow' | 'scoped';
-  };
-}
-
-/** OLD WAY */
-export interface ModuleFile {
-  sourceFilePath: string;
-  jsFilePath?: string;
-  dtsFilePath?: string;
-  cmpMeta?: any;
-  isCollectionDependency?: boolean;
-  excludeFromCollection?: boolean;
-  originalCollectionComponentPath?: string;
-  externalImports?: string[];
-  localImports?: string[];
-  potentialCmpRefs?: string[];
-  hasSlot?: boolean;
-  hasSvg?: boolean;
-}
-
-export interface ModuleBundles {
-  [bundleId: string]: string;
-}
-
-// this maps the json data to our internal data structure
-// so that the internal data structure "could" change,
-// but the external user data will always use the same api
-// consider these property values to be locked in as is
-// there should be a VERY good reason to have to rename them
-// DO NOT UPDATE PROPERTY KEYS COMING FROM THE EXTERNAL DATA!!
-// DO NOT UPDATE PROPERTY KEYS COMING FROM THE EXTERNAL DATA!!
-// DO NOT UPDATE PROPERTY KEYS COMING FROM THE EXTERNAL DATA!!
-
-export interface CollectionData {
-  components?: ComponentData[];
-  collections?: CollectionDependencyData[];
-  global?: string;
-  modules?: string[];
-  compiler?: {
-    name: string;
-    version: string;
-    typescriptVersion?: string;
-  };
-  bundles?: CollectionBundle[];
-}
-
-export interface CollectionBundle {
-  components: string[];
-}
-
 export interface CollectionDependencyData {
   name: string;
   tags: string[];
 }
-
-export interface ComponentData {
-  tag?: string;
-  componentPath?: string;
-  componentClass?: string;
-  dependencies?: string[];
-  styles?: StylesData;
-  props?: PropData[];
-  states?: StateData[];
-  listeners?: ListenerData[];
-  methods?: MethodData[];
-  events?: EventData[];
-  connect?: ConnectData[];
-  context?: ContextData[];
-  hostElement?: HostElementData;
-  host?: any;
-  assetPaths?: string[];
-  slot?: 'hasSlots' | 'hasNamedSlots';
-  shadow?: boolean;
-  scoped?: boolean;
-  priority?: 'low';
-}
-
-export interface StylesData {
-  [modeName: string]: StyleData;
-}
-
-export interface StyleData {
-  stylePaths?: string[];
-  style?: string;
-}
-
-export interface PropData {
-  name?: string;
-  type?: 'Boolean' | 'Number' | 'String' | 'Any';
-  mutable?: boolean;
-  attr?: string;
-  reflectToAttr?: boolean;
-  watch?: string[];
-}
-
-export interface StateData {
-  name: string;
-}
-
-export interface ListenerData {
-  event: string;
-  method: string;
-  capture?: boolean;
-  passive?: boolean;
-  enabled?: boolean;
-}
-
-export interface MethodData {
-  name: string;
-}
-
-export interface EventData {
-  event: string;
-  method?: string;
-  bubbles?: boolean;
-  cancelable?: boolean;
-  composed?: boolean;
-}
-
-export interface ConnectData {
-  name: string;
-  tag?: string;
-}
-
-export interface ContextData {
-  name: string;
-  id?: string;
-}
-
-export interface HostElementData {
-  name: string;
-}
-
-export interface BuildOutputFile {
-  name: string;
-  content: string;
-}
-
-export type OnCallback = (buildStart: CompilerBuildStart) => void;
-export type RemoveCallback = () => boolean;
 
 export interface CompilerCtx {
   version: number;
@@ -1111,22 +911,6 @@ export interface ComponentConstructorListener {
   passive?: boolean;
 }
 
-export interface HostConfig {
-  hosting?: {
-    rules?: HostRule[];
-  };
-}
-
-export interface HostRule {
-  include: string;
-  headers: HostRuleHeader[];
-}
-
-export interface HostRuleHeader {
-  name?: string;
-  value?: string;
-}
-
 export interface DevClientWindow extends Window {
   ['s-dev-server']: boolean;
   ['s-initial-load']: boolean;
@@ -1220,45 +1004,6 @@ export interface OpenInEditorData {
 export interface EntryModule {
   entryKey: string;
   cmps: ComponentCompilerMeta[];
-}
-
-export interface EntryBundle {
-  fileName: string;
-  text: string;
-  outputs: string[];
-  modeName: string;
-  isScopedStyles: boolean;
-  sourceTarget: string;
-}
-
-export interface EntryComponent {
-  tag: string;
-  dependencyOf?: string[];
-}
-
-export interface ComponentRef {
-  tag: string;
-  filePath: string;
-}
-
-export interface ModuleGraph {
-  filePath: string;
-  importPaths: string[];
-}
-
-export interface AddEventListener {
-  (elm: Element | Document | Window, eventName: string, cb: EventListenerCallback, opts?: ListenOptions): Function;
-}
-
-export interface EventListenerCallback {
-  (ev?: any): void;
-}
-
-export interface EventEmitterData<T = any> {
-  detail?: T;
-  bubbles?: boolean;
-  cancelable?: boolean;
-  composed?: boolean;
 }
 
 /**
@@ -1396,18 +1141,6 @@ export interface JsDoc {
 export interface JSDocTagInfo {
   name: string;
   text?: string;
-}
-
-export interface MinifyJsResult {
-  code: string;
-  sourceMap: any;
-  error: {
-    message: string;
-    filename: string;
-    line: number;
-    col: number;
-    pos: number;
-  };
 }
 
 /**
@@ -1718,12 +1451,6 @@ export type ComponentRuntimeHostListener = [number, string, string];
  */
 export type ComponentRuntimeReflectingAttr = [string, string | undefined];
 
-export type ModeBundleId = ModeBundleIds | string;
-
-export interface ModeBundleIds {
-  [modeName: string]: string;
-}
-
 export type RuntimeRef = HostElement | {};
 
 /**
@@ -1780,15 +1507,9 @@ export interface PlatformRuntime {
   ce: (eventName: string, opts?: any) => CustomEvent;
 }
 
-export type RefMap = WeakMap<any, HostRef>;
-
 export type StyleMap = Map<string, CSSStyleSheet | string>;
 
 export type RootAppliedStyleMap = WeakMap<Element, Set<string>>;
-
-export type AppliedStyleMap = Set<string>;
-
-export type ActivelyProcessingCmpMap = Set<Element>;
 
 export interface ScreenshotConnector {
   initBuild(opts: ScreenshotConnectorOptions): Promise<void>;
@@ -2000,27 +1721,6 @@ export interface ScreenshotBoundingBox {
   height: number;
 }
 
-export interface ServerConfigInput {
-  app: ExpressApp;
-  configPath?: string;
-}
-
-export interface ServerConfigOutput {
-  config: Config;
-  logger: Logger;
-  wwwDir: string;
-  destroy?: () => void;
-}
-
-export interface ExpressApp {
-  use?: Function;
-}
-
-export interface MiddlewareConfig {
-  config: string | Config;
-  destroy?: () => void;
-}
-
 export interface StyleCompiler {
   modeName: string;
   styleId: string;
@@ -2124,20 +1824,6 @@ export interface Workbox {
   getFileManifestEntries(): Promise<any>;
   injectManifest(swConfig: any): Promise<any>;
   copyWorkboxLibraries(wwwDir: string): Promise<any>;
-}
-
-export interface Url {
-  href?: string;
-  protocol?: string;
-  auth?: string;
-  hostname?: string;
-  host?: string;
-  port?: string;
-  pathname?: string;
-  path?: string;
-  search?: string;
-  query?: string | any;
-  hash?: string;
 }
 
 declare global {
@@ -2530,17 +2216,6 @@ export type TypeInfo = {
   jsdoc?: string;
 }[];
 
-export interface Hyperscript {
-  (sel: any): VNode;
-  (sel: Node, data: VNodeData): VNode;
-  (sel: any, data: VNodeData): VNode;
-  (sel: any, text: string): VNode;
-  (sel: any, children: Array<VNode | undefined | null>): VNode;
-  (sel: any, data: VNodeData, text: string): VNode;
-  (sel: any, data: VNodeData, children: Array<VNode | undefined | null>): VNode;
-  (sel: any, data: VNodeData, children: VNode): VNode;
-}
-
 export type ChildType = VNode | number | string;
 
 export type PropsType = VNodeProdData | number | string | null;
@@ -2585,38 +2260,6 @@ export interface CompilerWorkerTask {
 }
 
 export type WorkerMsgHandler = (msgToWorker: MsgToWorker) => Promise<any>;
-
-export interface WorkerTask {
-  taskId: number;
-  method: string;
-  args: any[];
-  resolve: (val: any) => any;
-  reject: (msg: string) => any;
-  retries: number;
-  isLongRunningTask: boolean;
-  workerKey: string;
-}
-
-export interface WorkerMessage {
-  taskId?: number;
-  method?: string;
-  args?: any[];
-  value?: any;
-  error?: string;
-  exit?: boolean;
-}
-
-export type WorkerRunner = (methodName: string, args: any[]) => Promise<any>;
-
-export interface WorkerRunnerOptions {
-  isLongRunningTask?: boolean;
-  workerKey?: string;
-}
-
-export interface WorkerContext {
-  tsHost?: any;
-  tsProgram?: any;
-}
 
 export interface TranspileModuleResults {
   sourceFilePath: string;
