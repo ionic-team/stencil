@@ -32,7 +32,7 @@ export const generateOutputTargets = async (
     outputCustomElements(config, compilerCtx, buildCtx),
     outputHydrateScript(config, compilerCtx, buildCtx),
     outputLazyLoader(config, compilerCtx),
-    outputLazy(config, compilerCtx, buildCtx)
+    outputLazy(config, compilerCtx, buildCtx),
   ]);
 
   // must run after all the other outputs
