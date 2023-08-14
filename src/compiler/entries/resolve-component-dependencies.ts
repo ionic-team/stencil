@@ -102,6 +102,9 @@ function resolveTransitiveDependencies(
  * 1. directly _and_ indirectly (transitively) dependent on the component being inspected
  * 2. only directly dependent on the component being inspected
  *
+ * This function assumes that the {@link d.ComponentCompilerMeta#dependencies} and
+ * {@link d.ComponentCompilerMeta#directDependencies} properties are pre-populated for `cmp` and all entries in `cmps`.
+ *
  * This function mutates the `dependents` and `directDependents` field on the provided `cmp` argument for both lists,
  * respectively.
  *
