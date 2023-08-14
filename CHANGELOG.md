@@ -1,3 +1,12 @@
+## 🚣 [4.0.5](https://github.com/ionic-team/stencil/compare/v4.0.4...v4.0.5) (2023-08-14)
+
+
+### Bug Fixes
+
+* **compiler:** match tsconfig include paths properly ([#4676](https://github.com/ionic-team/stencil/issues/4676)) ([664ecb7](https://github.com/ionic-team/stencil/commit/664ecb78cba3a267fa436cada551d878655cd2ab)), closes [#4667](https://github.com/ionic-team/stencil/issues/4667)
+
+
+
 ## 🍧 [4.0.4](https://github.com/ionic-team/stencil/compare/v4.0.3...v4.0.4) (2023-08-07)
 
 
