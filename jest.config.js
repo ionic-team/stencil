@@ -1,5 +1,4 @@
 module.exports = {
-  preset: './testing/jest-preset.js',
   moduleNameMapper: {
     '@app-data': '<rootDir>/internal/app-data/index.cjs',
     '@app-globals': '<rootDir>/internal/app-globals/index.cjs',
@@ -12,6 +11,8 @@ module.exports = {
     '@sys-api-node': '<rootDir>/sys/node/index.js',
     '@utils': '<rootDir>/src/utils',
     '^typescript$': '<rootDir>/scripts/build/typescript-modified-for-jest.js',
+    '^@stencil/core/internal/app-data$': '<rootDir>/internal/app-data/index.cjs',
+    '^@stencil/core/internal/testing$': '<rootDir>/internal/testing/index.js',
   },
   coverageDirectory: './coverage/',
   coverageReporters: ['json', 'lcov', 'text', 'clover'],
@@ -36,7 +37,10 @@ module.exports = {
     '<rootDir>/src/testing/**/*.{js,jsx,ts,tsx}',
     '<rootDir>/src/utils/**/*.{js,jsx,ts,tsx}',
   ],
+  moduleFileExtensions: ['ts', 'tsx', 'js', 'mjs', 'jsx', 'json', 'd.ts'],
   modulePathIgnorePatterns: ['/bin', '/www'],
+  setupFilesAfterEnv: ['<rootDir>/testing/jest-setuptestframework.js'],
+  testEnvironment: '<rootDir>/testing/jest-environment.js',
   testPathIgnorePatterns: [
     '<rootDir>/.cache/',
     '<rootDir>/.github/',
@@ -57,7 +61,10 @@ module.exports = {
     '<rootDir>/testing/',
   ],
   testRegex: '/(src|scripts)/.*\\.spec\\.(ts|tsx|js)$',
-  // TODO(STENCIL-307): Move away from Jasmine runner for internal Stencil tests, which involves re-working environment
-  // setup
+  // TODO(STENCIL-307): Move away from Jasmine runner for internal Stencil tests as a part of the (internal) Jest 28+ upgrade
   testRunner: 'jest-jasmine2',
+  transform: {
+    '^.+\\.(ts|tsx|jsx|css|mjs)$': '<rootDir>/testing/jest-preprocessor.js',
+  },
+  watchPathIgnorePatterns: ['^.+\\.d\\.ts$'],
 };
