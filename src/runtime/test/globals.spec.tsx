@@ -33,10 +33,10 @@ describe('globals', () => {
   });
 
   it('build values', () => {
-    expect(Build.isBrowser).toBe(true);
+    expect(Build.isBrowser).toBe(false);
     expect(Build.isDev).toBe(true);
     expect(Build.isTesting).toBe(true);
-    expect(Build.isServer).toBe(false);
+    expect(Build.isServer).toBe(true);
   });
 
   it('Env is defined', () => {
