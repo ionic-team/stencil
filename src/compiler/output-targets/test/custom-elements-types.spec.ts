@@ -81,6 +81,12 @@ describe('Custom Elements Typedef generation', () => {
         `export { MyBestComponent as MyBestComponent } from '../types_dir/components/the-other-component/my-real-best-component';`,
         `export { defineCustomElement as defineCustomElementMyBestComponent } from './my-best-component';`,
         '',
+        `/**`,
+        ` * Get the base path to where the assets can be found. Use "setAssetPath(path)"`,
+        ` * if the path needs to be customized.`,
+        ` */`,
+        `export declare const getAssetPath: (path: string) => string;`,
+        '',
         '/**',
         ' * Used to manually set the base path where assets can be found.',
         ' * If the script is used as "module", it\'s recommended to use "import.meta.url",',
@@ -128,6 +134,12 @@ describe('Custom Elements Typedef generation', () => {
         `export { defineCustomElement as defineCustomElementMyComponent } from './my-component';`,
         `export { MyBestComponent as MyBestComponent } from './types_dir/components/the-other-component/my-real-best-component';`,
         `export { defineCustomElement as defineCustomElementMyBestComponent } from './my-best-component';`,
+        '',
+        `/**`,
+        ` * Get the base path to where the assets can be found. Use "setAssetPath(path)"`,
+        ` * if the path needs to be customized.`,
+        ` */`,
+        `export declare const getAssetPath: (path: string) => string;`,
         '',
         '/**',
         ' * Used to manually set the base path where assets can be found.',
@@ -188,6 +200,12 @@ describe('Custom Elements Typedef generation', () => {
     await generateCustomElementsTypes(config, compilerCtx, buildCtx, 'types_dir');
 
     const expectedTypedefOutput = [
+      `/**`,
+      ` * Get the base path to where the assets can be found. Use "setAssetPath(path)"`,
+      ` * if the path needs to be customized.`,
+      ` */`,
+      `export declare const getAssetPath: (path: string) => string;`,
+      '',
       '/**',
       ' * Used to manually set the base path where assets can be found.',
       ' * If the script is used as "module", it\'s recommended to use "import.meta.url",',
@@ -244,6 +262,12 @@ describe('Custom Elements Typedef generation', () => {
     await generateCustomElementsTypes(config, compilerCtx, buildCtx, 'types_dir');
 
     const expectedTypedefOutput = [
+      `/**`,
+      ` * Get the base path to where the assets can be found. Use "setAssetPath(path)"`,
+      ` * if the path needs to be customized.`,
+      ` */`,
+      `export declare const getAssetPath: (path: string) => string;`,
+      '',
       '/**',
       ' * Used to manually set the base path where assets can be found.',
       ' * If the script is used as "module", it\'s recommended to use "import.meta.url",',

@@ -94,6 +94,12 @@ const generateCustomElementsTypesOutput = async (
         ]
       : []),
     `/**`,
+    ` * Get the base path to where the assets can be found. Use "setAssetPath(path)"`,
+    ` * if the path needs to be customized.`,
+    ` */`,
+    `export declare const getAssetPath: (path: string) => string;`,
+    ``,
+    `/**`,
     ` * Used to manually set the base path where assets can be found.`,
     ` * If the script is used as "module", it's recommended to use "import.meta.url",`,
     ` * such as "setAssetPath(import.meta.url)". Other options include`,
