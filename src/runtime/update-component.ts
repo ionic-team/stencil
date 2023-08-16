@@ -362,7 +362,7 @@ export const postUpdateComponent = (hostRef: d.HostRef) => {
 };
 
 export const forceUpdate = (ref: any) => {
-  if (BUILD.updatable && Build.isBrowser) {
+  if (BUILD.updatable && (Build.isBrowser || Build.isTesting)) {
     const hostRef = getHostRef(ref);
     const isConnected = hostRef.$hostElement$.isConnected;
     if (

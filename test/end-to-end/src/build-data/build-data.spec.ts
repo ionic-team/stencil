@@ -11,7 +11,7 @@ describe('build-data', () => {
     expect(root).toEqualHtml(`
       <build-data>
         <p>isDev: true</p>
-        <p>isBrowser: true</p>
+        <p>isBrowser: false</p>
         <p>isTesting: true</p>
       </build-data>
     `);
