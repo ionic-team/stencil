@@ -584,6 +584,9 @@ export interface ComponentCompilerFeatures {
    * - any lifecycle methods, including `render()`
    */
   isPlain: boolean;
+  /**
+   * A collection of tag names of web components that a component references in its JSX/h() function
+   */
   potentialCmpRefs: string[];
 }
 
@@ -611,9 +614,25 @@ export interface ComponentCompilerMeta extends ComponentCompilerFeatures {
   styles: StyleCompiler[];
   tagName: string;
   internal: boolean;
+  /**
+   * A list of web component tag names that are either:
+   * - directly referenced in a Stencil component's JSX/h() function
+   * - are referenced by a web component that is directly referenced in a Stencil component's JSX/h() function
+   */
   dependencies?: string[];
+  /**
+   * A list of web component tag names that either:
+   * - directly reference the current component directly in their JSX/h() function
+   * - indirectly/transitively reference the current component directly in their JSX/h() function
+   */
   dependents?: string[];
+  /**
+   * A list of web component tag names that are directly referenced in a Stencil component's JSX/h() function
+   */
   directDependencies?: string[];
+  /**
+   * A list of web component tag names that the current component directly in their JSX/h() function
+   */
   directDependents?: string[];
 }
 
