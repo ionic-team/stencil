@@ -8,13 +8,16 @@
    * 2. `renovate-config-validator` will run the validator
    */
   dependencyDashboard: true,
-  // TODO(STENCIL-596): Remove once rollup upgrade is unblocked
   ignoreDeps: [
+    // TODO(STENCIL-596): Remove once rollup upgrade is unblocked
     'rollup',
     'rollup-plugin-sourcemaps',
     '@rollup/plugin-commonjs',
     '@rollup/plugin-node-resolve',
     '@rollup/plugin-replace',
+    // TODO(STENCIL-912): Upgrade these two dependencies
+    'glob',
+    'minimatch',
   ],
   ignorePaths: [
     'test/package.json',

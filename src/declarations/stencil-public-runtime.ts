@@ -971,6 +971,8 @@ export namespace JSXBase {
 
   export interface ImgHTMLAttributes<T> extends HTMLAttributes<T> {
     alt?: string;
+    crossOrigin?: string;
+    crossorigin?: string;
     decoding?: 'async' | 'auto' | 'sync';
     importance?: 'low' | 'auto' | 'high';
     height?: number | string;
@@ -1805,8 +1807,14 @@ export namespace JSXBase {
     onAnimationIterationCapture?: (event: AnimationEvent) => void;
 
     // Transition Events
+    onTransitionCancel?: (event: TransitionEvent) => void;
+    onTransitionCancelCapture?: (event: TransitionEvent) => void;
     onTransitionEnd?: (event: TransitionEvent) => void;
     onTransitionEndCapture?: (event: TransitionEvent) => void;
+    onTransitionRun?: (event: TransitionEvent) => void;
+    onTransitionRunCapture?: (event: TransitionEvent) => void;
+    onTransitionStart?: (event: TransitionEvent) => void;
+    onTransitionStartCapture?: (event: TransitionEvent) => void;
   }
 }
 
