@@ -71,4 +71,7 @@ manual release was performed.
       ```
 1. Let folks in Ionic know about the release in the #whathappened Slack channel
    with a link to the changelog.
+   1. Let the CS team know by 'at-ing' them  about any enterprise reported issues or feature requests that were included in the release in a thread on your #whathappened post. Jira
+      tickets related to enterprise requests should be marked with the "jira_escalated" label and/or the "Enterprise Support"
+      or "Enterprise Feature Requests" epic.
 1. End the code freeze in the Stencil team Slack channel.
