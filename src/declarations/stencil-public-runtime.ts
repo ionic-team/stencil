@@ -971,6 +971,8 @@ export namespace JSXBase {
 
   export interface ImgHTMLAttributes<T> extends HTMLAttributes<T> {
     alt?: string;
+    crossOrigin?: string;
+    crossorigin?: string;
     decoding?: 'async' | 'auto' | 'sync';
     importance?: 'low' | 'auto' | 'high';
     height?: number | string;
