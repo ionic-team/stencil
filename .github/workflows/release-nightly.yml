@@ -15,7 +15,7 @@ jobs:
   get-nightly-version:
     name: Get Nightly Build Version
     needs: [build_core]
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     outputs:
       nightly-version: ${{ steps.get-nightly-version.outputs.NIGHTLY_VERSION }}
     steps:
@@ -55,7 +55,7 @@ jobs:
   release-stencil-nightly-build:
     name: Publish Nightly Build
     needs: [get-nightly-version, build_core]
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     permissions:
       id-token: write
     steps:

@@ -17,7 +17,7 @@ jobs:
       matrix:
         branch: ['main', 'pr']
     name: 'Get strictNullChecks errors on ${{ matrix.branch }}'
-    runs-on: 'ubuntu-20.04'
+    runs-on: 'ubuntu-22.04'
     steps:
       - name: Checkout main
         uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
@@ -55,7 +55,7 @@ jobs:
       matrix:
         branch: ['main', 'pr']
     name: Find unused variables on ${{ matrix.branch }}
-    runs-on: 'ubuntu-20.04'
+    runs-on: 'ubuntu-22.04'
     steps:
       - name: Checkout main
         uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
@@ -87,7 +87,7 @@ jobs:
   format_report:
     needs: ['strict_null_check', 'unused_exports_check']
     name: Download error files and report
-    runs-on: 'ubuntu-20.04'
+    runs-on: 'ubuntu-22.04'
     steps:
       - name: Checkout current branch
         uses: actions/checkout@c85c95e3d7251135ab7dc9ce3241c5835cc595a9 # v3.5.3
