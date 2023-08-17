@@ -6,6 +6,10 @@ Manual releases should only be performed when there are extenuating circumstance
 
 ## Automated Releases
 
+⚠️ Do not run this workflow at this time ⚠️
+
+⚠️ It is currently not in a working state ⚠️
+
 1. Call a `code-freeze` in the Stencil team channel
 1. Check that [Stencil's Merge
    Queue](https://github.com/ionic-team/stencil/queue/) is empty (nothing is

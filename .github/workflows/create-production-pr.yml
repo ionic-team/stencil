@@ -41,7 +41,8 @@ jobs:
           # We need git history to generate the changelog; however, we don't know how deep to go.
           # Since publishing is a one-off activity, just get everything.
           fetch-depth: 0
-          ref: ${{ inputs.base }}
+          ref:  ${{ inputs.base }}
+#          token: ${{ secrets.IONITRON_GITHUB_TOKEN }}
 
       - name: Get Core Dependencies
         uses: ./.github/workflows/actions/get-core-dependencies
@@ -72,6 +73,8 @@ jobs:
       - name: Create the Pull Request
         uses: peter-evans/create-pull-request@153407881ec5c347639a548ade7d8ad1d6740e38 # v5.0.2
         with:
+          # TODO(MONDAY): Can we create this if we don't specify the token
+          #          token: ${{ secrets.IONITRON_GITHUB_TOKEN }}
           # create a new pull request using the specified base branch
           base: ${{ inputs.base }}
           # specifies the name of the branch to create off of the base branch
@@ -80,6 +83,10 @@ jobs:
           draft: true
           # create a commit message containing the semver version, prefixed with a 'v' - e.g. 'v4.1.0'
           commit-message: 'v${{ steps.name_gen.outputs.VERSION_STR }}'
+            # set GitHub as the committer of the changes generated
+          #          committer: "ionitron <hi@ionicframework.com>"
+          # the person who kicked off the workflow is the author of the changes
+          #          author: "ionitron <hi@ionicframework.com>"
           # set the title of the pull request, otherwise it'll default to generic message
           title: 'Release v${{ steps.name_gen.outputs.VERSION_STR }}'
           # the body of the pull request summary can be empty

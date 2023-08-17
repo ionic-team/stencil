@@ -145,6 +145,7 @@ export async function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<st
     },
     {
       title: `Bundle @stencil/core ${color.dim('(' + opts.buildId + ')')}`,
+        // TODO(NOW) - bundle diffs
       task: () => bundleBuild(opts),
       // for pre-releases, this step will occur in GitHub after the PR has been created.
       // for actual releases, we'll need to build + bundle stencil in order to publish it to npm.
