@@ -1,3 +1,18 @@
+## 🔈 [4.0.6-0](https://github.com/ionic-team/stencil/compare/v4.0.5...v4.0.6-0) (2023-08-17)
+
+
+### Bug Fixes
+
+* **runtime:** adds a testing check to the forceUpdate method ([#4682](https://github.com/ionic-team/stencil/issues/4682)) ([7e9544d](https://github.com/ionic-team/stencil/commit/7e9544d4c9c586d9bdd969a0ae9a6a0bb7681d90))
+* **typings:** add crossorigin html attr to img ([#4686](https://github.com/ionic-team/stencil/issues/4686)) ([65d60fb](https://github.com/ionic-team/stencil/commit/65d60fbef16efd35f5680787c0e72a4b4b410a2b)), closes [#4685](https://github.com/ionic-team/stencil/issues/4685)
+
+
+### Features
+
+* **compiler:** include `getAssetPath` in generated export statement ([#4683](https://github.com/ionic-team/stencil/issues/4683)) ([821da79](https://github.com/ionic-team/stencil/commit/821da79c3b4e32f8580257f45bea4733577c08f3))
+
+
+
 ## 🚣 [4.0.5](https://github.com/ionic-team/stencil/compare/v4.0.4...v4.0.5) (2023-08-14)
 
 
