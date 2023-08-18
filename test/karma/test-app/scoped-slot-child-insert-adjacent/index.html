@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<meta charset="utf8">
+<script src="./build/testapp.esm.js" type="module"></script>
+<script src="./build/testapp.js" nomodule></script>
+
+<scoped-slot-child-insert-adjacent>
+  <p>I am slotted and will receive a red background</p>
+</scoped-slot-child-insert-adjacent>
+
+<button type="button" id="addInsertAdjacentHtml">add via insertAdjacentHTML</button>
+
+<script>
+  var scopedSlotChildInsertAdjacent = document.querySelector('scoped-slot-child-insert-adjacent');
+  var addInsertAdjacentHtml = document.querySelector('#addInsertAdjacentHtml');
+
+  addInsertAdjacentHtml.addEventListener('click', () => {
+    scopedSlotChildInsertAdjacent.insertAdjacentHTML('beforeend', `<p>Added via insertAdjacentHTML. I should have a red background.</p>`)
+  });
+</script>
