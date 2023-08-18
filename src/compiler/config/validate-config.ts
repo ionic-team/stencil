@@ -111,6 +111,18 @@ export const validateConfig = (
   validatedConfig.extras.slotChildNodesFix = !!validatedConfig.extras.slotChildNodesFix;
   validatedConfig.extras.initializeNextTick = !!validatedConfig.extras.initializeNextTick;
   validatedConfig.extras.tagNameTransform = !!validatedConfig.extras.tagNameTransform;
+  // TODO(STENCIL-914): remove `experimentalSlotFixes` when it's the default behavior
+  validatedConfig.extras.experimentalSlotFixes = !!validatedConfig.extras.experimentalSlotFixes;
+
+  // if the user has set `extras.experimentalSlotFixes` then we turn on all of
+  // the slot-related fixes automatically.
+  // TODO(STENCIL-914): remove `experimentalSlotFixes` when it's the default behavior
+  if (validatedConfig.extras.experimentalSlotFixes) {
+    validatedConfig.extras.appendChildSlotFix = true;
+    validatedConfig.extras.cloneNodeFix = true;
+    validatedConfig.extras.slotChildNodesFix = true;
+    validatedConfig.extras.scopedSlotTextContentFix = true;
+  }
 
   validatedConfig.buildEs5 =
     validatedConfig.buildEs5 === true || (!validatedConfig.devMode && validatedConfig.buildEs5 === 'prod');
