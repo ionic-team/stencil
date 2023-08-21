@@ -265,11 +265,14 @@ function getAuthor(contributor: any): string | null {
  */
 function getBundledDepLicenseContent(opts: BuildOptions, moduleId: string): string | null {
   const licenseFiles = ['LICENSE', 'LICENSE.md', 'LICENSE-MIT', 'LICENSE.txt'];
+  console.log(`for ${opts.nodeModulesDir} ${moduleId}`)
   for (const licenseFile of licenseFiles) {
     try {
       const licensePath = join(opts.nodeModulesDir, moduleId, licenseFile);
       return fs.readFileSync(licensePath, 'utf8');
-    } catch (e) {}
+    } catch (e) {
+      console.log(`not found for ${licenseFile}`);
+    }
   }
   return null;
 }
