@@ -29,12 +29,9 @@ export const config: Config = {
   plugins: [nodePolyfills(), sass()],
   buildEs5: true,
   extras: {
-    appendChildSlotFix: true,
-    cloneNodeFix: true,
     lifecycleDOMEvents: true,
-    scopedSlotTextContentFix: true,
     scriptDataOpts: true,
-    slotChildNodesFix: true,
+    experimentalSlotFixes: true,
   },
   devServer: {
     // when running `npm start`, serve from the root directory, rather than the `www` output target location
