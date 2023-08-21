@@ -1,3 +1,7 @@
+## 🍫 [4.1.1-0](https://github.com/ionic-team/stencil/compare/v4.1.0...v4.1.1-0) (2023-08-21)
+
+
+
 # 🐟 [4.1.0](https://github.com/ionic-team/stencil/compare/v4.0.5...v4.1.0) (2023-08-21)
 
 
