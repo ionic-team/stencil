@@ -32,6 +32,7 @@ export const getBuildFeatures = (cmps: ComponentCompilerMeta[]): BuildFeatures =
     cmpWillLoad: cmps.some((c) => c.hasComponentWillLoadFn),
     cmpWillUpdate: cmps.some((c) => c.hasComponentWillUpdateFn),
     cmpWillRender: cmps.some((c) => c.hasComponentWillRenderFn),
+    formAssociated: cmps.some((c) => c.formAssociated),
 
     connectedCallback: cmps.some((c) => c.hasConnectedCallbackFn),
     disconnectedCallback: cmps.some((c) => c.hasDisconnectedCallbackFn),

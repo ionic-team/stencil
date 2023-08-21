@@ -3,6 +3,7 @@ import ts from 'typescript';
 import type * as d from '../../../declarations';
 import { addCreateEvents } from '../create-event';
 import { updateConstructor } from '../transform-utils';
+import { createNativeAttachInternalsBinding } from './attach-internals';
 
 /**
  * Updates a constructor to include:
@@ -28,8 +29,11 @@ export const updateNativeConstructor = (
     return;
   }
 
-  const nativeCstrStatements = [...nativeInit(cmp), ...addCreateEvents(moduleFile, cmp)];
-
+  const nativeCstrStatements: ts.Statement[] = [
+    ...nativeInit(cmp),
+    ...addCreateEvents(moduleFile, cmp),
+    ...createNativeAttachInternalsBinding(cmp),
+  ];
   updateConstructor(classNode, classMembers, nativeCstrStatements);
 };
 

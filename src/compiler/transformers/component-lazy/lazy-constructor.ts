@@ -4,6 +4,8 @@ import type * as d from '../../../declarations';
 import { addCoreRuntimeApi, REGISTER_INSTANCE, RUNTIME_APIS } from '../core-runtime-apis';
 import { addCreateEvents } from '../create-event';
 import { updateConstructor } from '../transform-utils';
+import { createLazyAttachInternalsBinding } from './attach-internals';
+import { HOST_REF_ARG } from './constants';
 
 /**
  * Update the constructor for a Stencil component's class in order to prepare
@@ -24,7 +26,11 @@ export const updateLazyComponentConstructor = (
     ts.factory.createParameterDeclaration(undefined, undefined, ts.factory.createIdentifier(HOST_REF_ARG)),
   ];
 
-  const cstrStatements = [registerInstanceStatement(moduleFile), ...addCreateEvents(moduleFile, cmp)];
+  const cstrStatements = [
+    registerInstanceStatement(moduleFile),
+    ...addCreateEvents(moduleFile, cmp),
+    ...createLazyAttachInternalsBinding(cmp),
+  ];
 
   updateConstructor(classNode, classMembers, cstrStatements, cstrMethodArgs);
 };
@@ -50,5 +56,3 @@ const registerInstanceStatement = (moduleFile: d.Module): ts.ExpressionStatement
     ]),
   );
 };
-
-const HOST_REF_ARG = 'hostRef';

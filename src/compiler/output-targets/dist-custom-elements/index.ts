@@ -306,8 +306,9 @@ export const generateEntryPoint = (
 };
 
 /**
- * Get the series of custom transformers that will be applied to a Stencil project's source code during the TypeScript
- * transpilation process
+ * Get the series of custom transformers, specific to the needs of the
+ * `dist-custom-elements` output target, that will be applied to a Stencil
+ * project's source code during the TypeScript transpilation process
  *
  * @param config the configuration for the Stencil project
  * @param compilerCtx the current compiler context
