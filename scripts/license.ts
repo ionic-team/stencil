@@ -100,17 +100,6 @@ ${bundledDeps.map((l) => l.content).join('\n')}
 `.trim() + '\n';
 
   fs.writeFileSync(thirdPartyLicensesRootPath, output);
-
-  const licenseSource: string[] = [];
-  bundledDeps.forEach((d) => {
-    licenseSource.push(d.moduleId);
-    d.dependencies.forEach((childDep) => {
-      licenseSource.push(`  ${childDep}`);
-    });
-    licenseSource.push('');
-  });
-
-  fs.writeFileSync(join(opts.buildDir, 'license-source.txt'), licenseSource.join('\n'));
 }
 
 /**
@@ -269,7 +258,9 @@ function getBundledDepLicenseContent(opts: BuildOptions, moduleId: string): stri
   for (const licenseFile of licenseFiles) {
     try {
       const licensePath = join(opts.nodeModulesDir, moduleId, licenseFile);
-      return fs.readFileSync(licensePath, 'utf8');
+      const text =  fs.readFileSync(licensePath, 'utf8');
+      console.log('found for',licenseFile);
+      return text;
     } catch (e) {
       console.log(`not found for ${licenseFile}`);
     }

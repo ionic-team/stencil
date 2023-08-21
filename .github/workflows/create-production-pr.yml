@@ -22,6 +22,7 @@ on:
         options:
           - main
           - v3-maintenance
+          - rwaskiewicz/release-pr-tmp
 
 jobs:
   create-stencil-release-pull-request:
