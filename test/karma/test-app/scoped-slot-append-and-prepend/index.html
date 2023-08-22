@@ -1,0 +1,32 @@
+<!doctype html>
+<meta charset="utf8" />
+<script src="./build/testapp.esm.js" type="module"></script>
+<script src="./build/testapp.js" nomodule></script>
+
+<scoped-slot-append-and-prepend>
+  <p>My initial slotted content.</p>
+</scoped-slot-append-and-prepend>
+
+<button type="button" id="appendNodes">append nodes via "append"</button>
+<button type="button" id="appendChildNodes">append nodes via "appendChild"</button>
+<button type="button" id="prependNodes">prepend nodes</button>
+
+<script>
+  var scopedSlotAppendAndPrepend = document.querySelector('scoped-slot-append-and-prepend');
+
+  // The element to be inserted
+  var el = document.createElement('p');
+  el.innerText = 'The new slotted content.';
+
+  document.querySelector('#appendNodes').addEventListener('click', () => {
+    scopedSlotAppendAndPrepend.append(el);
+  });
+
+  document.querySelector('#appendChildNodes').addEventListener('click', () => {
+    scopedSlotAppendAndPrepend.appendChild(el);
+  });
+
+  document.querySelector('#prependNodes').addEventListener('click', () => {
+    scopedSlotAppendAndPrepend.prepend(el);
+  });
+</script>
