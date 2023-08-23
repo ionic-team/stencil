@@ -24,7 +24,7 @@
   <a href="https://twitter.com/stenciljs">
     <img src="https://img.shields.io/badge/follow-%40stenciljs-1DA1F2?logo=twitter" alt="Follow @stenciljs">
   </a>
-  <a href="[https://ionic.link/discord](https://chat.stenciljs.com)">
+  <a href="https://chat.stenciljs.com">
     <img src="https://img.shields.io/discord/520266681499779082?color=7289DA&label=%23stencil&logo=discord&logoColor=white" alt="Official Ionic Discord" />
   </a>
 </p>

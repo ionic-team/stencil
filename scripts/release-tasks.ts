@@ -34,6 +34,10 @@ export async function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<st
   }
 
   if (!opts.isPublishRelease) {
+    /**
+     * For automated and manual releases, always verify that the version provided to the release scripts is a valid
+     * semver 'word' (e.g. 'major', 'minor', etc.) or version (e.g. 1.0.0)
+     */
     tasks.push({
       title: 'Validate version',
       task: () => {
@@ -60,6 +64,10 @@ export async function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<st
 
   tasks.push(
     {
+      /**
+       * When we both pre-release and release, it's beneficial to ensure that the tag does not already exist in git.
+       * Doing so ought to catch out of the ordinary circumstances that ought to be investigated.
+       */
       title: 'Check git tag existence',
       task: () =>
         execa('git', ['fetch'])
@@ -106,7 +114,6 @@ export async function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<st
             throw new Error('Unclean working tree. Commit or stash changes first.');
           }
         }),
-      skip: () => opts.isCI, // don't check the tree in CI, we may have a temp file we need for publish
     },
     {
       title: 'Check remote history',
@@ -116,7 +123,7 @@ export async function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<st
             throw new Error('Remote history differs. Please pull changes.');
           }
         }),
-      skip: () => isDryRun,
+      skip: () => isDryRun || opts.isCI, // no need to check remote history in CI, we just pulled it
     },
   );
 
@@ -125,23 +132,27 @@ export async function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<st
       {
         title: `Install npm dependencies ${color.dim('(npm ci)')}`,
         task: () => execa('npm', ['ci'], { cwd: rootDir }),
+        skip: () => opts.isCI, // this step will occur in GitHub after the PR has been created
       },
       {
         title: `Transpile Stencil ${color.dim('(tsc.prod)')}`,
         task: () => execa('npm', ['run', 'tsc.prod'], { cwd: rootDir }),
+        skip: () => opts.isCI, // this step will occur in GitHub after the PR has been created
       },
       {
         title: `Bundle @stencil/core ${color.dim('(' + opts.buildId + ')')}`,
         task: () => bundleBuild(opts),
+        skip: () => opts.isCI, // this step will occur in GitHub after the PR has been created
       },
       {
         title: 'Run jest tests',
         task: () => execa('npm', ['run', 'test.jest'], { cwd: rootDir }),
+        skip: () => opts.isCI, // this step will occur in GitHub after the PR has been created
       },
       {
         title: 'Run karma tests',
         task: () => execa('npm', ['run', 'test.karma.prod'], { cwd: rootDir }),
-        skip: () => opts.isCI, // skip this in CI, we'll rely on previous commits to `main` to hope this is OK for now
+        skip: () => opts.isCI, // this step will occur in GitHub after the PR has been created
       },
       {
         title: 'Build license',
@@ -150,6 +161,7 @@ export async function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<st
       {
         title: 'Validate build',
         task: () => validateBuild(rootDir),
+        skip: () => opts.isCI, // this step will occur in GitHub after the PR has been created
       },
       {
         title: `Set package.json version to ${color.bold.yellow(opts.version)}`,
@@ -160,8 +172,8 @@ export async function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<st
       },
       {
         title: `Generate ${opts.version} Changelog ${opts.vermoji}`,
-        task: () => {
-          return updateChangeLog(opts);
+        task: async () => {
+          await updateChangeLog(opts);
         },
       },
     );
