@@ -14,7 +14,6 @@ import { retrieveTsDecorators, retrieveTsModifiers } from './transform-utils';
  * @param classNode the node in the AST pertaining to the Stencil component class to transform
  * @param heritageClauses a collection of heritage clauses associated with the provided class node
  * @param members a collection of members attached to the provided class node
- * @param moduleFile the Stencil intermediate representation associated with the provided class node
  * @returns the updated component class declaration
  */
 export const updateComponentClass = (
@@ -22,7 +21,6 @@ export const updateComponentClass = (
   classNode: ts.ClassDeclaration,
   heritageClauses: ts.HeritageClause[] | ts.NodeArray<ts.HeritageClause>,
   members: ts.ClassElement[],
-  moduleFile: d.Module,
 ): ts.ClassDeclaration | ts.VariableStatement => {
   let classModifiers = retrieveTsModifiers(classNode)?.slice() ?? [];
 
@@ -47,7 +45,7 @@ export const updateComponentClass = (
   }
 
   // ESM with export
-  return createConstClass(transformOpts, classNode, heritageClauses, members, moduleFile);
+  return createConstClass(transformOpts, classNode, heritageClauses, members);
 };
 
 /**
@@ -65,7 +63,6 @@ export const updateComponentClass = (
  * @param classNode the node in the AST pertaining to the Stencil component class to transform
  * @param heritageClauses a collection of heritage clauses associated with the provided class node
  * @param members a collection of members attached to the provided class node
- * @param moduleFile the Stencil intermediate representation associated with the provided class node
  * @returns the component class, re-written as a variable statement
  */
 const createConstClass = (
@@ -73,22 +70,33 @@ const createConstClass = (
   classNode: ts.ClassDeclaration,
   heritageClauses: ts.HeritageClause[] | ts.NodeArray<ts.HeritageClause>,
   members: ts.ClassElement[],
-  moduleFile: d.Module,
 ): ts.VariableStatement => {
   const className = classNode.name;
 
-  const classModifiers = (retrieveTsModifiers(classNode) ?? []).filter((m) => {
-    // remove the export - it may already be removed by the TypeScript compiler in certain circumstances if this
-    // transformation is run after transpilation occurs
+  const tsModifiers = retrieveTsModifiers(classNode) ?? [];
+
+  // we might be in a situation where the class decl doesn't have `export` on
+  // it but the symbol is nonetheless exported from the module, like
+  //
+  // ```ts
+  // class MyClass {}
+  // export { MyClass };
+  // ```
+  //
+  // so we want to keep track of whether the class decl actually has `export`
+  // on it, and only add it below if so
+  const classHasExportKeyword = tsModifiers.some((m) => m.kind === ts.SyntaxKind.ExportKeyword);
+
+  const classModifiers = tsModifiers.filter((m) => {
+    // remove the export - it may already be removed by the TypeScript compiler
+    // in certain circumstances if this transformation is run after
+    // transpilation occurs
     return m.kind !== ts.SyntaxKind.ExportKeyword;
   });
 
   const constModifiers: ts.Modifier[] = [];
 
-  if (
-    transformOpts.componentExport !== 'customelement' &&
-    !moduleFile.cmps.some((cmp) => cmp.hasStaticInitializedMember)
-  ) {
+  if (transformOpts.componentExport !== 'customelement' && classHasExportKeyword) {
     constModifiers.push(ts.factory.createModifier(ts.SyntaxKind.ExportKeyword));
   }
 
