@@ -46,10 +46,15 @@ export function resetBuildConditionals(b: d.BuildConditionals) {
   b.hydratedAttribute = false;
   b.hydratedClass = true;
   b.invisiblePrehydration = true;
+  // TODO(STENCIL-914): remove this option when `experimentalSlotFixes` is the default behavior
   b.appendChildSlotFix = false;
   b.cloneNodeFix = false;
   b.hotModuleReplacement = false;
   b.scriptDataOpts = false;
+  // TODO(STENCIL-914): remove this option when `experimentalSlotFixes` is the default behavior
   b.scopedSlotTextContentFix = false;
+  // TODO(STENCIL-914): remove this option when `experimentalSlotFixes` is the default behavior
   b.slotChildNodesFix = false;
+  // TODO(STENCIL-914): remove this option when `experimentalSlotFixes` is the default behavior
+  b.patchPseudoShadowDom = false;
 }

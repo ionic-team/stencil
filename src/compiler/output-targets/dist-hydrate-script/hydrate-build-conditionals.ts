@@ -19,8 +19,13 @@ export const getHydrateBuildConditionals = (cmps: d.ComponentCompilerMeta[]) => 
   build.member = true;
   build.constructableCSS = false;
   build.asyncLoading = true;
+  // TODO(STENCIL-914): remove this option when `experimentalSlotFixes` is the default behavior
   build.appendChildSlotFix = false;
+  // TODO(STENCIL-914): remove this option when `experimentalSlotFixes` is the default behavior
   build.slotChildNodesFix = false;
+  // TODO(STENCIL-914): remove this option when `experimentalSlotFixes` is the default behavior
+  build.patchPseudoShadowDom = false;
+  // TODO(STENCIL-914): remove this option when `experimentalSlotFixes` is the default behavior
   build.cloneNodeFix = false;
   build.cssAnnotations = true;
   // TODO(STENCIL-854): Remove code related to legacy shadowDomShim field

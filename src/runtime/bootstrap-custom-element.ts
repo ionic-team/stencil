@@ -5,6 +5,13 @@ import { CMP_FLAGS } from '@utils';
 import type * as d from '../declarations';
 import { connectedCallback } from './connected-callback';
 import { disconnectedCallback } from './disconnected-callback';
+import {
+  patchChildSlotNodes,
+  patchCloneNode,
+  patchPseudoShadowDom,
+  patchSlotAppendChild,
+  patchTextContent,
+} from './dom-extras';
 import { computeMode } from './mode';
 import { proxyComponent } from './proxy-component';
 import { PROXY_FLAGS } from './runtime-constants';
@@ -34,6 +41,25 @@ export const proxyCustomElement = (Cstr: any, compactMeta: d.ComponentRuntimeMet
   if (BUILD.shadowDom && !supportsShadow && cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation) {
     // TODO(STENCIL-854): Remove code related to legacy shadowDomShim field
     cmpMeta.$flags$ |= CMP_FLAGS.needsShadowDomShim;
+  }
+
+  // TODO(STENCIL-914): this check and `else` block can go away and be replaced by just `BUILD.scoped` once we
+  // default our pseudo-slot behavior
+  if (BUILD.patchPseudoShadowDom && BUILD.scoped) {
+    patchPseudoShadowDom(Cstr.prototype, cmpMeta);
+  } else {
+    if (BUILD.slotChildNodesFix) {
+      patchChildSlotNodes(Cstr.prototype, cmpMeta);
+    }
+    if (BUILD.cloneNodeFix) {
+      patchCloneNode(Cstr.prototype);
+    }
+    if (BUILD.appendChildSlotFix) {
+      patchSlotAppendChild(Cstr.prototype);
+    }
+    if (BUILD.scopedSlotTextContentFix) {
+      patchTextContent(Cstr.prototype, cmpMeta);
+    }
   }
 
   const originalConnectedCallback = Cstr.prototype.connectedCallback;

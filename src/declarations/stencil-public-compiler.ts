@@ -293,6 +293,7 @@ export interface StencilConfig {
 }
 
 export interface ConfigExtras {
+  // TODO(STENCIL-914): remove this option when `experimentalSlotFixes` is the default behavior
   /**
    * By default, the slot polyfill does not update `appendChild()` so that it appends
    * new child nodes into the correct child slot like how shadow dom works. This is an opt-in
@@ -302,6 +303,7 @@ export interface ConfigExtras {
    */
   appendChildSlotFix?: boolean;
 
+  // TODO(STENCIL-914): remove this option when `experimentalSlotFixes` is the default behavior
   /**
    * By default, the runtime does not polyfill `cloneNode()` when cloning a component
    * that uses the slot polyfill. This is an opt-in polyfill for those who need it.
@@ -341,6 +343,7 @@ export interface ConfigExtras {
    */
   scriptDataOpts?: boolean;
 
+  // TODO(STENCIL-914): remove this option when `experimentalSlotFixes` is the default behavior
   /**
    * Experimental flag to align the behavior of invoking `textContent` on a scoped component to act more like a
    * component that uses the shadow DOM. Defaults to `false`
@@ -355,6 +358,7 @@ export interface ConfigExtras {
    */
   initializeNextTick?: boolean;
 
+  // TODO(STENCIL-914): remove this option when `experimentalSlotFixes` is the default behavior
   /**
    * For browsers that do not support shadow dom (IE11 and Edge 18 and below), slot is polyfilled
    * to simulate the same behavior. However, the host element's `childNodes` and `children`
