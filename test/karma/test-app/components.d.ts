@@ -10,8 +10,6 @@ import { TestEventDetail } from "./event-custom-type/cmp";
 export { SomeTypes } from "./util";
 export { TestEventDetail } from "./event-custom-type/cmp";
 export namespace Components {
-    interface AppendChild {
-    }
     interface AttributeBasic {
         "customAttr": string;
         "multiWord": string;
@@ -374,12 +372,6 @@ export interface LifecycleBasicCCustomEvent<T> extends CustomEvent<T> {
     target: HTMLLifecycleBasicCElement;
 }
 declare global {
-    interface HTMLAppendChildElement extends Components.AppendChild, HTMLStencilElement {
-    }
-    var HTMLAppendChildElement: {
-        prototype: HTMLAppendChildElement;
-        new (): HTMLAppendChildElement;
-    };
     interface HTMLAttributeBasicElement extends Components.AttributeBasic, HTMLStencilElement {
     }
     var HTMLAttributeBasicElement: {
@@ -1191,7 +1183,6 @@ declare global {
         new (): HTMLTag88Element;
     };
     interface HTMLElementTagNameMap {
-        "append-child": HTMLAppendChildElement;
         "attribute-basic": HTMLAttributeBasicElement;
         "attribute-basic-root": HTMLAttributeBasicRootElement;
         "attribute-boolean": HTMLAttributeBooleanElement;
@@ -1330,8 +1321,6 @@ declare global {
     }
 }
 declare namespace LocalJSX {
-    interface AppendChild {
-    }
     interface AttributeBasic {
         "customAttr"?: string;
         "multiWord"?: string;
@@ -1672,7 +1661,6 @@ declare namespace LocalJSX {
     interface Tag88 {
     }
     interface IntrinsicElements {
-        "append-child": AppendChild;
         "attribute-basic": AttributeBasic;
         "attribute-basic-root": AttributeBasicRoot;
         "attribute-boolean": AttributeBoolean;
@@ -1814,7 +1802,6 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
-            "append-child": LocalJSX.AppendChild & JSXBase.HTMLAttributes<HTMLAppendChildElement>;
             "attribute-basic": LocalJSX.AttributeBasic & JSXBase.HTMLAttributes<HTMLAttributeBasicElement>;
             "attribute-basic-root": LocalJSX.AttributeBasicRoot & JSXBase.HTMLAttributes<HTMLAttributeBasicRootElement>;
             "attribute-boolean": LocalJSX.AttributeBoolean & JSXBase.HTMLAttributes<HTMLAttributeBooleanElement>;
