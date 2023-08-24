@@ -1,6 +1,7 @@
 import ts from 'typescript';
 
 import { objectLiteralToObjectMap } from '../transform-utils';
+import { StencilDecorator } from './decorators-constants';
 
 export const getDeclarationParameters: GetDeclarationParameters = (decorator: ts.Decorator): any => {
   if (!ts.isCallExpression(decorator.expression)) {
@@ -28,7 +29,7 @@ const getDeclarationParameter = (arg: ts.Expression): any => {
  * @param propName the name of the decorator to match against
  * @returns true if the conditions above are both true, false otherwise
  */
-export const isDecoratorNamed = (propName: string) => {
+export const isDecoratorNamed = (propName: StencilDecorator) => {
   return (dec: ts.Decorator): boolean => {
     return ts.isCallExpression(dec.expression) && dec.expression.expression.getText() === propName;
   };
