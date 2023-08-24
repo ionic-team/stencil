@@ -63,7 +63,7 @@
     {
       // TODO(STENCIL-710): Increment this value as a part of updating TypeScript
       matchPackageNames: ['typescript'],
-      allowedVersions: '<5.0.0',
+      allowedVersions: '<5.1.6',
     },
     {
       // disable Jest updates until the new testing architecture is in place

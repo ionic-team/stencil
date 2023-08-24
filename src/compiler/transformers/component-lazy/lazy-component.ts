@@ -17,7 +17,7 @@ export const updateLazyComponentClass = (
   cmp: d.ComponentCompilerMeta,
 ) => {
   const members = updateLazyComponentMembers(transformOpts, styleStatements, classNode, moduleFile, cmp);
-  return updateComponentClass(transformOpts, classNode, classNode.heritageClauses, members, moduleFile);
+  return updateComponentClass(transformOpts, classNode, classNode.heritageClauses, members);
 };
 
 const updateLazyComponentMembers = (
