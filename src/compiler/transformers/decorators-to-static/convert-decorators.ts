@@ -18,6 +18,23 @@ import { propDecoratorsToStatic } from './prop-decorator';
 import { stateDecoratorsToStatic } from './state-decorator';
 import { watchDecoratorsToStatic } from './watch-decorator';
 
+/**
+ * Create a {@link ts.TransformerFactory} which will handle converting any
+ * decorators on Stencil component classes (i.e. classes decorated with
+ * `@Component`) to static representations of the options, names, etc.
+ * associated with the various decorators that Stencil supports like `@Prop`,
+ * `@State`, etc.
+ *
+ * This `TransformerFactory` returned by this function will handle all classes
+ * declared within a module.
+ *
+ * @param config a user-supplied configuration for Stencil
+ * @param diagnostics for surfacing errors and warnings
+ * @param typeChecker a TypeScript typechecker instance
+ * @param program a {@link ts.Program} object
+ * @returns a TypeScript transformer factory which can be passed to
+ * TypeScript to transform source code during the compilation process
+ */
 export const convertDecoratorsToStatic = (
   config: d.Config,
   diagnostics: d.Diagnostic[],
@@ -38,13 +55,37 @@ export const convertDecoratorsToStatic = (
   };
 };
 
+/**
+ * Visit {@link ts.ClassDeclaration} nodes as part of the tree-traversal
+ * required for {@link convertDecoratorsToStatic} to work.
+ *
+ * If a given class declaration node is not decorated with `@Component` this
+ * function will simply return it as-is. If it _is_ decorated, then it will
+ *
+ * 1. Convert the arguments to the `@Component` decorator to static values.
+ * 2. Strip off properties decorated with Stencil-implemented decorators like
+ * `@State`, `@Prop`, etc which need to be removed and convert their metadata
+ * to static values.
+ * 3. Validate that the various options selected by the component author are
+ * valid, both individually and in combination.
+ * 4. Return an updated class declaration node which is ready to be used in
+ * the rest of the Stencil compilation pipeline (e.g. in output target
+ * generation).
+ *
+ * @param config a user-supplied Stencil config
+ * @param diagnostics for surfacing errors and warnings
+ * @param typeChecker a TypeScript typechecker instance
+ * @param program a {@link ts.Program} object
+ * @param classNode the node currently being visited
+ * @returns a class node, possibly updated with new static values
+ */
 const visitClassDeclaration = (
   config: d.Config,
   diagnostics: d.Diagnostic[],
   typeChecker: ts.TypeChecker,
   program: ts.Program,
   classNode: ts.ClassDeclaration,
-) => {
+): ts.ClassDeclaration => {
   const componentDecorator = retrieveTsDecorators(classNode)?.find(isDecoratorNamed('Component'));
   if (!componentDecorator) {
     return classNode;
