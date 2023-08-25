@@ -197,7 +197,7 @@ const serializeCssKeyframes = (opts: SerializeOpts, node: CssNode) => {
 };
 
 const serializeCssKeyframe = (opts: SerializeOpts, node: CssNode) => {
-  return node.values.join(',') + '{' + serializeCssMapVisit(opts, node.declarations) + '}';
+  return (node.values?.join(',') ?? '') + '{' + serializeCssMapVisit(opts, node.declarations) + '}';
 };
 
 const serializeCssFontFace = (opts: SerializeOpts, node: CssNode) => {
@@ -217,7 +217,7 @@ const serializeCssSupports = (opts: SerializeOpts, node: CssNode) => {
 };
 
 const serializeCssPage = (opts: SerializeOpts, node: CssNode) => {
-  const sel = node.selectors.join(', ');
+  const sel = node.selectors?.join(', ') ?? '';
   return '@page ' + sel + '{' + serializeCssMapVisit(opts, node.declarations) + '}';
 };
 
