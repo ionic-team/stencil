@@ -1,4 +1,4 @@
-name: 'Stencil Release PR Creation'
+name: 'Stencil Production Release PR Creation'
 on:
   workflow_dispatch:
     inputs:
@@ -14,6 +14,14 @@ on:
           - patch
           - minor
           - major
+      base:
+        required: true
+        type: choice
+        description: Which base branch should be targeted?
+        default: main
+        options:
+          - main
+          - v3-maintenance
 
 jobs:
   create-stencil-release-pull-request:
@@ -33,10 +41,12 @@ jobs:
           # We need git history to generate the changelog; however, we don't know how deep to go.
           # Since publishing is a one-off activity, just get everything.
           fetch-depth: 0
+          ref: ${{ inputs.base }}
 
       - name: Get Core Dependencies
         uses: ./.github/workflows/actions/get-core-dependencies
 
+      # TODO(STENCIL-927): Backport changes to the v3 branch
       - name: Run Publish Preparation Script
         run: npm run release.ci.prepare -- --version ${{ inputs.version }} --any-branch
         shell: bash
@@ -59,23 +69,18 @@ jobs:
           echo Branch Name: ${{ steps.name_gen.outputs.BRANCH_NAME }}
         shell: bash
 
-      - name: Create Git Branch
-        # Note: We'll let GitHub clean up the branch for us (this is configured in the repo settings on GitHub)
-        run: git checkout -b ${{ steps.name_gen.outputs.BRANCH_NAME }}
-
-      # Commit the CHANGELOG.md, NOTICE.md, LICENSE.md, package.json, etc.
-      - name: Commit Release Preparations
-        run: |
-          git config user.name "Stencil Release Bot (on behalf of ${{ github.actor }})"
-          git config user.email "stencil-release-bot@ionic.io"
-          git add .
-          git commit -m "v${{ steps.name_gen.outputs.VERSION_STR }}"
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        shell: bash
-
-      - name: Push Branch to GitHub
-        run: |
-          git push --set-upstream origin ${{ steps.name_gen.outputs.BRANCH_NAME }}
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create the Pull Request
+        uses: peter-evans/create-pull-request@153407881ec5c347639a548ade7d8ad1d6740e38 # v5.0.2
+        with:
+          # create a new pull request using the specified base branch
+          base: ${{ inputs.base }}
+          # specifies the name of the branch to create off of the base branch
+          branch: '${{ steps.name_gen.outputs.BRANCH_NAME }}'
+          # TODO(STENCIL-928): Remove this once pipeline is 'ready'
+          draft: true
+          # create a commit message containing the semver version, prefixed with a 'v' - e.g. 'v4.1.0'
+          commit-message: 'v${{ steps.name_gen.outputs.VERSION_STR }}'
+          # set the title of the pull request, otherwise it'll default to generic message
+          title: 'Release v${{ steps.name_gen.outputs.VERSION_STR }}'
+          # the body of the pull request summary can be empty
+          body: ''
