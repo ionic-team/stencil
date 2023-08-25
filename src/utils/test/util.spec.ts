@@ -36,7 +36,7 @@ describe('util', () => {
     });
 
     it('returns an empty string a null preamble is provided', () => {
-      const testConfig = mockConfig({ preamble: null });
+      const testConfig = mockConfig({ preamble: undefined });
 
       const result = util.generatePreamble(testConfig);
 
@@ -60,7 +60,9 @@ describe('util', () => {
     });
 
     it("returns false when the packageJson field isn't set on the build context", () => {
-      buildCtx.packageJson = null;
+      // this cast is done to specifically test the case where this is not the
+      // expected type
+      buildCtx.packageJson = null as unknown as d.PackageJsonData;
 
       expect(util.hasDependency(buildCtx, 'a-non-existent-pkg')).toBe(false);
     });
