@@ -35,7 +35,7 @@ const serializeCssVisitNode = (opts: SerializeOpts, node: CssNode, index: number
     return serializeCssRule(opts, node);
   }
   if (nodeType === CssNodeType.Comment) {
-    if (node.comment[0] === '!') {
+    if (node.comment?.[0] === '!') {
       return `/*${node.comment}*/`;
     } else {
       return '';
