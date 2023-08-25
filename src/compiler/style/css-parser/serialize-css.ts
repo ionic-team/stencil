@@ -83,7 +83,7 @@ const serializeCssVisitNode = (opts: SerializeOpts, node: CssNode, index: number
 const serializeCssRule = (opts: SerializeOpts, node: CssNode) => {
   const decls = node.declarations;
   const usedSelectors = opts.usedSelectors;
-  const selectors = node.selectors.slice();
+  const selectors = node.selectors?.slice() ?? [];
 
   if (decls == null || decls.length === 0) {
     return '';
@@ -160,10 +160,12 @@ const serializeCssRule = (opts: SerializeOpts, node: CssNode) => {
 
   const cleanedSelectors: string[] = [];
   let cleanedSelector = '';
-  for (const selector of node.selectors) {
-    cleanedSelector = removeSelectorWhitespace(selector);
-    if (!cleanedSelectors.includes(cleanedSelector)) {
-      cleanedSelectors.push(cleanedSelector);
+  if (node.selectors) {
+    for (const selector of node.selectors) {
+      cleanedSelector = removeSelectorWhitespace(selector);
+      if (!cleanedSelectors.includes(cleanedSelector)) {
+        cleanedSelectors.push(cleanedSelector);
+      }
     }
   }
 
