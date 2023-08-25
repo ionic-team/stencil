@@ -145,7 +145,7 @@ export const bundleCustomElements = async (
       const files = rollupOutput.output.map(async (bundle) => {
         if (bundle.type === 'chunk') {
           let code = bundle.code;
-          let sourceMap = rollupToStencilSourceMap(bundle.map);
+          let sourceMap = bundle.map ? rollupToStencilSourceMap(bundle.map) : undefined;
 
           const optimizeResults = await optimizeModule(config, compilerCtx, {
             input: code,
