@@ -272,10 +272,10 @@ const removeSelectorWhitespace = (selector: string) => {
   return rtn;
 };
 
-const removeMediaWhitespace = (media: string) => {
+const removeMediaWhitespace = (media: string | undefined) => {
   let rtn = '';
   let char = '';
-  media = media.trim();
+  media = media?.trim() ?? '';
 
   for (let i = 0, l = media.length; i < l; i++) {
     char = media[i];
