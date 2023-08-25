@@ -230,7 +230,7 @@ const serializeCssDocument = (opts: SerializeOpts, node: CssNode) => {
   return doc + '{' + documentCss + '}';
 };
 
-const serializeCssMapVisit = (opts: SerializeOpts, nodes: CssNode[] | void) => {
+const serializeCssMapVisit = (opts: SerializeOpts, nodes: CssNode[] | undefined | null): string => {
   let rtn = '';
 
   if (nodes) {
