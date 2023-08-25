@@ -6,27 +6,29 @@ Manual releases should only be performed when there are extenuating circumstance
 
 ## Automated Releases
 
-⚠️ Do not run this workflow at this time ⚠️
-
-⚠️ It is currently not in a working state ⚠️
-
 1. Call a `code-freeze` in the Stencil team channel
 1. Check that [Stencil's Merge
    Queue](https://github.com/ionic-team/stencil/queue/) is empty (nothing is
    queued for merge).
 1. Run the [Stencil Production Release PR Creation Workflow](https://github.com/ionic-team/stencil/actions/workflows/create-production-pr.yml)
-in GitHub
-   1. Run the workflow from the `main` branch, _unless_ the release is for a previous major version of Stencil.
-   In that scenario, select the `v#-maintenance` branch corresponding to the version of Stencil being released.
-   For example, `v3-maintenance` to release a new version of Stencil v3.
-   1. Stencil follows semantic versioning. Select the appropriate version from the dropdown for this release.
-   1. Hit "Run Workflow" and wait for a new pull request to be created.
+   in GitHub
+    1. Run the workflow from the `main` branch, _unless_ the release is for a previous major version of Stencil.
+       In that scenario, select the `v#-maintenance` branch corresponding to the version of Stencil being released.
+       For example, `v3-maintenance` to release a new version of Stencil v3.
+    1. Stencil follows semantic versioning. Select the appropriate version from the dropdown for this release.
+    1. Hit "Run Workflow" and wait for a new pull request to be created.
 1. Open the pull request that was opened as a result of running the Stencil Production Release PR Creation Workflow.
 1. Complete the following (temporary) steps:
-   1. Close the pull request and reopen it. This allows actions that the team gates pull requests on to run.
-   1. Mark the pull request as ready for review.
+    1. Close the pull request and reopen it. This allows actions that the team gates pull requests on to run.
+    1. Mark the pull request as ready for review.
 1. Ask the Stencil team for an approval on the PR
-1. Once approved, add it to the merge queue
+1. Once approved, add it to the merge queue.
+1. ⚠️ Wait for the pull request to land before continuing to the next step. ⚠️
+1. Run the [Stencil Production Release Workflow](https://github.com/ionic-team/stencil/actions/workflows/release-production.yml)
+    1. Stencil should be published under the `latest` tag, _unless_ the release is for a previous major version of
+     Stencil.
+    1. The base branch should be set to `main`, _unless_ the release is for a previous major version of Stencil.
+    1. Tail the logs to verify everything runs successfully.
 1. Proceed to the [Follow-Up section](#follow-up-steps) of this document to run manual follow-up tasks.
 
 ## Manual Releases

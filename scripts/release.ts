@@ -85,20 +85,23 @@ export async function release(rootDir: string, args: ReadonlyArray<string>): Pro
       isPublishRelease: false,
       isProd: true,
     });
-
-    const versionIdx = args.indexOf('--version');
-    if (versionIdx === -1 || versionIdx === args.length) {
-      console.log(`\n${color.bold.red('No `--version [VERSION]` argument was found. Exiting')}\n`);
-      process.exit(1);
-    }
-    prepareOpts.version = getNewVersion(prepareOpts.packageJson.version, args[versionIdx + 1]);
+    // this was bumped already, we just need to copy it from package.json into this field
+    prepareOpts.version = prepareOpts.packageJson.version;
 
     const tagIdx = args.indexOf('--tag');
+    let newTag = null;
     if (tagIdx === -1 || tagIdx === args.length) {
-      console.log(`\n${color.bold.red('No `--tag [TAG]` argument was found. Exiting')}\n`);
-      process.exit(1);
+      console.log(`\n${color.bold.yellow('No `--tag [TAG]` argument was found.')}\n`);
+    } else if (args[tagIdx + 1] === 'use_pkg_json_version') {
+      console.log(
+        `\n${color.bold.green(
+          'The default package.json version will be used for the tag. No additional tags will be applied.',
+        )}\n`,
+      );
+    } else {
+      newTag = args[tagIdx + 1];
+      console.log(`\n${color.bold.green(`Set '--tag' argument to '${newTag}'.`)}\n`);
     }
-    const newTag = args[tagIdx + 1];
 
     console.log(`${color.bold.blue(`Version: ${prepareOpts.version}`)}`);
     console.log(`${color.bold.blue(`Tag: ${newTag}`)}`);
