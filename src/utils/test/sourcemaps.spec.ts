@@ -32,7 +32,7 @@ describe('sourcemaps', () => {
         toUrl: () => 'stub',
       };
 
-      const stencilSourceMap: d.SourceMap = rollupToStencilSourceMap(rollupSourceMap);
+      const stencilSourceMap = rollupToStencilSourceMap(rollupSourceMap);
 
       const expectedSourceMap: d.SourceMap = {
         file: 'index.js',

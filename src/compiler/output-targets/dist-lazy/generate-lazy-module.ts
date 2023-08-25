@@ -413,7 +413,7 @@ const convertChunk = async (
   const inlineHelpers = isBrowserBuild || !hasDependency(buildCtx, 'tslib');
   const optimizeResults = await optimizeModule(config, compilerCtx, {
     input: code,
-    sourceMap: sourceMap,
+    sourceMap,
     isCore,
     sourceTarget,
     inlineHelpers,
@@ -423,6 +423,9 @@ const convertChunk = async (
 
   if (typeof optimizeResults.output === 'string') {
     code = optimizeResults.output;
+  }
+
+  if (optimizeResults.sourceMap) {
     sourceMap = optimizeResults.sourceMap;
   }
   return { code, sourceMap };
