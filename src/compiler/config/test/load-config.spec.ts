@@ -10,10 +10,10 @@ import { normalizePath } from '../../../utils';
 import { loadConfig } from '../load-config';
 
 describe('load config', () => {
-  const configPath = 'fixtures/stencil.config.ts';
-  const configPath2 = 'fixtures/stencil.config2.ts';
+  const configPath = require.resolve('./fixtures/stencil.config.ts');
+  const configPath2 = require.resolve('./fixtures/stencil.config2.ts');
+
   let sys: d.CompilerSystem;
-  const noTsConfigPath = 'no-ts-dir/stencil.config.ts';
 
   beforeEach(() => {
     sys = createNodeSys();
@@ -41,7 +41,6 @@ describe('load config', () => {
       [configPath]: mock.load(path.resolve(__dirname, configPath)),
       [configPath2]: mock.load(path.resolve(__dirname, configPath2)),
       'fixtures/tsconfig.json': tsconfig,
-      [noTsConfigPath]: mock.load(path.resolve(__dirname, configPath)),
       ...getMockFSPatch(mock),
     });
   });
@@ -103,23 +102,23 @@ describe('load config', () => {
     });
 
     it('creates a tsconfig file when "initTsConfig" set', async () => {
-      const tsconfigPath = path.resolve(path.dirname(noTsConfigPath), 'tsconfig.json');
+      const tsconfigPath = path.resolve(path.dirname(configPath), 'tsconfig.json');
       expect(fs.existsSync(tsconfigPath)).toBe(false);
-      const loadedConfig = await loadConfig({ initTsConfig: true, configPath: noTsConfigPath });
+      const loadedConfig = await loadConfig({ initTsConfig: true, configPath });
       expect(fs.existsSync(tsconfigPath)).toBe(true);
       expect(loadedConfig.diagnostics).toHaveLength(0);
     });
 
     it('errors that a tsconfig file could not be created when "initTsConfig" isn\'t present', async () => {
-      const loadedConfig = await loadConfig({ configPath: noTsConfigPath });
+      const loadedConfig = await loadConfig({ configPath });
       expect(loadedConfig.diagnostics).toHaveLength(1);
       expect<d.Diagnostic>(loadedConfig.diagnostics[0]).toEqual({
         absFilePath: null,
         header: 'Missing tsconfig.json',
         level: 'error',
         lines: [],
-        messageText: `Unable to load TypeScript config file. Please create a "tsconfig.json" file within the "./${path.dirname(
-          noTsConfigPath,
+        messageText: `Unable to load TypeScript config file. Please create a "tsconfig.json" file within the "${path.dirname(
+          configPath,
         )}" directory.`,
         relFilePath: null,
         type: 'build',
