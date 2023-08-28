@@ -6,7 +6,10 @@ import { CMP_FLAGS, HOST_FLAGS } from '@utils';
 import type * as d from '../declarations';
 import { PLATFORM_FLAGS } from './runtime-constants';
 
-export const patchPseudoShadowDom = (hostElementPrototype: any, descriptorPrototype: any) => {
+export const patchPseudoShadowDom = (
+  hostElementPrototype: HTMLElement,
+  descriptorPrototype: d.ComponentRuntimeMeta,
+) => {
   patchCloneNode(hostElementPrototype);
   patchSlotAppendChild(hostElementPrototype);
   patchSlotAppend(hostElementPrototype);
@@ -18,7 +21,7 @@ export const patchPseudoShadowDom = (hostElementPrototype: any, descriptorProtot
   patchChildSlotNodes(hostElementPrototype, descriptorPrototype);
 };
 
-export const patchCloneNode = (HostElementPrototype: any) => {
+export const patchCloneNode = (HostElementPrototype: HTMLElement) => {
   const orgCloneNode = HostElementPrototype.cloneNode;
 
   HostElementPrototype.cloneNode = function (deep?: boolean) {
@@ -82,8 +85,8 @@ export const patchSlotAppendChild = (HostElementPrototype: any) => {
  *
  * @param HostElementPrototype the `Element` to be patched
  */
-export const patchSlotPrepend = (HostElementPrototype: any) => {
-  HostElementPrototype.__prepend = HostElementPrototype.prepend;
+export const patchSlotPrepend = (HostElementPrototype: HTMLElement) => {
+  (HostElementPrototype as any).__prepend = HostElementPrototype.prepend;
   HostElementPrototype.prepend = function (this: d.HostElement, ...newChildren: (d.RenderNode | string)[]) {
     newChildren.forEach((newChild: d.RenderNode | string) => {
       if (typeof newChild === 'string') {
@@ -117,8 +120,8 @@ export const patchSlotPrepend = (HostElementPrototype: any) => {
  *
  * @param HostElementPrototype the `Element` to be patched
  */
-export const patchSlotAppend = (HostElementPrototype: any) => {
-  HostElementPrototype.__append = HostElementPrototype.append;
+export const patchSlotAppend = (HostElementPrototype: HTMLElement) => {
+  (HostElementPrototype as any).__append = HostElementPrototype.append;
   HostElementPrototype.append = function (this: d.HostElement, ...newChildren: (d.RenderNode | string)[]) {
     newChildren.forEach((newChild: d.RenderNode | string) => {
       if (typeof newChild === 'string') {
@@ -136,8 +139,8 @@ export const patchSlotAppend = (HostElementPrototype: any) => {
  *
  * @param HostElementPrototype the `Element` to be patched
  */
-export const patchSlotInsertAdjacentHTML = (HostElementPrototype: any) => {
-  HostElementPrototype.__insertAdjacentHTML = HostElementPrototype.insertAdjacentHTML;
+export const patchSlotInsertAdjacentHTML = (HostElementPrototype: HTMLElement) => {
+  (HostElementPrototype as any).__insertAdjacentHTML = HostElementPrototype.insertAdjacentHTML;
   HostElementPrototype.insertAdjacentHTML = function (this: d.HostElement, position: InsertPosition, text: string) {
     if (position !== 'afterbegin' && position !== 'beforeend') {
       return (this as any).__insertAdjacentHTML(position, text);
@@ -165,8 +168,8 @@ export const patchSlotInsertAdjacentHTML = (HostElementPrototype: any) => {
  *
  * @param HostElementPrototype the `Element` to be patched
  */
-export const patchSlotInsertAdjacentText = (HostElementPrototype: any) => {
-  HostElementPrototype.__insertAdjacentText = HostElementPrototype.insertAdjacentText;
+export const patchSlotInsertAdjacentText = (HostElementPrototype: HTMLElement) => {
+  (HostElementPrototype as any).__insertAdjacentText = HostElementPrototype.insertAdjacentText;
   HostElementPrototype.insertAdjacentText = function (this: d.HostElement, position: InsertPosition, text: string) {
     this.insertAdjacentHTML(position, text);
   };
@@ -179,8 +182,8 @@ export const patchSlotInsertAdjacentText = (HostElementPrototype: any) => {
  *
  * @param HostElementPrototype the `Element` to be patched
  */
-export const patchSlotInsertAdjacentElement = (HostElementPrototype: any) => {
-  HostElementPrototype.__insertAdjacentElement = HostElementPrototype.insertAdjacentElement;
+export const patchSlotInsertAdjacentElement = (HostElementPrototype: HTMLElement) => {
+  (HostElementPrototype as any).__insertAdjacentElement = HostElementPrototype.insertAdjacentElement;
   HostElementPrototype.insertAdjacentElement = function (
     this: d.HostElement,
     position: InsertPosition,
@@ -251,7 +254,7 @@ export const patchTextContent = (hostElementPrototype: HTMLElement, cmpMeta: d.C
   }
 };
 
-export const patchChildSlotNodes = (elm: any, cmpMeta: d.ComponentRuntimeMeta) => {
+export const patchChildSlotNodes = (elm: HTMLElement, cmpMeta: d.ComponentRuntimeMeta) => {
   class FakeNodeList extends Array {
     item(n: number) {
       return this[n];
@@ -259,7 +262,7 @@ export const patchChildSlotNodes = (elm: any, cmpMeta: d.ComponentRuntimeMeta) =
   }
   // TODO(STENCIL-854): Remove code related to legacy shadowDomShim field
   if (cmpMeta.$flags$ & CMP_FLAGS.needsShadowDomShim) {
-    const childNodesFn = elm.__lookupGetter__('childNodes');
+    const childNodesFn = (elm as any).__lookupGetter__('childNodes');
 
     Object.defineProperty(elm, 'children', {
       get() {
@@ -275,7 +278,7 @@ export const patchChildSlotNodes = (elm: any, cmpMeta: d.ComponentRuntimeMeta) =
 
     Object.defineProperty(elm, 'childNodes', {
       get() {
-        const childNodes = childNodesFn.call(this);
+        const childNodes = childNodesFn.call(this) as NodeListOf<d.RenderNode>;
         if (
           (plt.$flags$ & PLATFORM_FLAGS.isTmpDisconnected) === 0 &&
           getHostRef(this).$flags$ & HOST_FLAGS.hasRendered
