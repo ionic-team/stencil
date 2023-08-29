@@ -2,6 +2,15 @@ import ts from 'typescript';
 
 import type * as d from '../../../declarations';
 
+/**
+ * Add or update a `connectedCallback` method for a Stencil component
+ *
+ * *Note*: This function will mutate either the `classMembers` parameter or
+ * one of its members.
+ *
+ * @param classMembers the members on the component's class
+ * @param cmp metadata about the component
+ */
 export const addNativeConnectedCallback = (classMembers: ts.ClassElement[], cmp: d.ComponentCompilerMeta) => {
   // function call to stencil's exported connectedCallback(elm, plt)
 
@@ -18,7 +27,7 @@ export const addNativeConnectedCallback = (classMembers: ts.ClassElement[], cmp:
       ),
     );
     const connectedCallback = classMembers.find((classMember) => {
-      return ts.isMethodDeclaration(classMember) && (classMember.name as any).escapedText === 'connectedCallback';
+      return ts.isMethodDeclaration(classMember) && (classMember.name as any).escapedText === CONNECTED_CALLBACK;
     }) as ts.MethodDeclaration;
 
     if (connectedCallback != null) {
@@ -26,7 +35,7 @@ export const addNativeConnectedCallback = (classMembers: ts.ClassElement[], cmp:
       const callbackMethod = ts.factory.createMethodDeclaration(
         undefined,
         undefined,
-        'connectedCallback',
+        CONNECTED_CALLBACK,
         undefined,
         undefined,
         [],
@@ -40,7 +49,7 @@ export const addNativeConnectedCallback = (classMembers: ts.ClassElement[], cmp:
       const callbackMethod = ts.factory.createMethodDeclaration(
         undefined,
         undefined,
-        'connectedCallback',
+        CONNECTED_CALLBACK,
         undefined,
         undefined,
         [],
@@ -51,3 +60,5 @@ export const addNativeConnectedCallback = (classMembers: ts.ClassElement[], cmp:
     }
   }
 };
+
+const CONNECTED_CALLBACK = 'connectedCallback';
