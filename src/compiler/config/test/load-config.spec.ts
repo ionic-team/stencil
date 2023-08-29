@@ -117,8 +117,8 @@ describe('load config', () => {
         header: 'Missing tsconfig.json',
         level: 'error',
         lines: [],
-        messageText: `Unable to load TypeScript config file. Please create a "tsconfig.json" file within the "${path.dirname(
-          configPath,
+        messageText: `Unable to load TypeScript config file. Please create a "tsconfig.json" file within the "${normalizePath(
+          path.dirname(configPath),
         )}" directory.`,
         relFilePath: null,
         type: 'build',
