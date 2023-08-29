@@ -2408,7 +2408,7 @@ export interface LoadConfigResults {
 }
 
 export interface Diagnostic {
-  absFilePath?: string | undefined;
+  absFilePath?: string | undefined | null;
   code?: string;
   columnNumber?: number | undefined;
   debugText?: string;
@@ -2418,7 +2418,7 @@ export interface Diagnostic {
   lineNumber?: number | undefined;
   lines: PrintLine[];
   messageText: string;
-  relFilePath?: string | undefined;
+  relFilePath?: string | undefined | null;
   type: string;
 }
 
