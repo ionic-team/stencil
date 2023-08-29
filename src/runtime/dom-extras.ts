@@ -86,7 +86,8 @@ export const patchSlotAppendChild = (HostElementPrototype: any) => {
  * @param HostElementPrototype the `Element` to be patched
  */
 export const patchSlotPrepend = (HostElementPrototype: HTMLElement) => {
-  (HostElementPrototype as any).__prepend = HostElementPrototype.prepend;
+  const originalPrepend = HostElementPrototype.prepend;
+
   HostElementPrototype.prepend = function (this: d.HostElement, ...newChildren: (d.RenderNode | string)[]) {
     newChildren.forEach((newChild: d.RenderNode | string) => {
       if (typeof newChild === 'string') {
@@ -109,7 +110,7 @@ export const patchSlotPrepend = (HostElementPrototype: HTMLElement) => {
         newChild.hidden = true;
       }
 
-      return (this as any).__prepend(newChild);
+      return originalPrepend.call(this, newChild);
     });
   };
 };
@@ -121,7 +122,6 @@ export const patchSlotPrepend = (HostElementPrototype: HTMLElement) => {
  * @param HostElementPrototype the `Element` to be patched
  */
 export const patchSlotAppend = (HostElementPrototype: HTMLElement) => {
-  (HostElementPrototype as any).__append = HostElementPrototype.append;
   HostElementPrototype.append = function (this: d.HostElement, ...newChildren: (d.RenderNode | string)[]) {
     newChildren.forEach((newChild: d.RenderNode | string) => {
       if (typeof newChild === 'string') {
@@ -140,10 +140,11 @@ export const patchSlotAppend = (HostElementPrototype: HTMLElement) => {
  * @param HostElementPrototype the `Element` to be patched
  */
 export const patchSlotInsertAdjacentHTML = (HostElementPrototype: HTMLElement) => {
-  (HostElementPrototype as any).__insertAdjacentHTML = HostElementPrototype.insertAdjacentHTML;
+  const originalInsertAdjacentHtml = HostElementPrototype.insertAdjacentHTML;
+
   HostElementPrototype.insertAdjacentHTML = function (this: d.HostElement, position: InsertPosition, text: string) {
     if (position !== 'afterbegin' && position !== 'beforeend') {
-      return (this as any).__insertAdjacentHTML(position, text);
+      return originalInsertAdjacentHtml.call(this, position, text);
     }
     const container = this.ownerDocument.createElement('_');
     let node: d.RenderNode;
@@ -169,7 +170,6 @@ export const patchSlotInsertAdjacentHTML = (HostElementPrototype: HTMLElement) =
  * @param HostElementPrototype the `Element` to be patched
  */
 export const patchSlotInsertAdjacentText = (HostElementPrototype: HTMLElement) => {
-  (HostElementPrototype as any).__insertAdjacentText = HostElementPrototype.insertAdjacentText;
   HostElementPrototype.insertAdjacentText = function (this: d.HostElement, position: InsertPosition, text: string) {
     this.insertAdjacentHTML(position, text);
   };
@@ -183,14 +183,15 @@ export const patchSlotInsertAdjacentText = (HostElementPrototype: HTMLElement) =
  * @param HostElementPrototype the `Element` to be patched
  */
 export const patchSlotInsertAdjacentElement = (HostElementPrototype: HTMLElement) => {
-  (HostElementPrototype as any).__insertAdjacentElement = HostElementPrototype.insertAdjacentElement;
+  const originalInsertAdjacentElement = HostElementPrototype.insertAdjacentElement;
+
   HostElementPrototype.insertAdjacentElement = function (
     this: d.HostElement,
     position: InsertPosition,
     element: d.RenderNode,
   ) {
     if (position !== 'afterbegin' && position !== 'beforeend') {
-      return (this as any).__insertAdjacentElement(position, element);
+      return originalInsertAdjacentElement.call(this, position, element);
     }
     if (position === 'afterbegin') {
       this.prepend(element);
