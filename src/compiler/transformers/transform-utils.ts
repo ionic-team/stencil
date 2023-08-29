@@ -2,7 +2,7 @@ import { augmentDiagnosticWithNode, buildError, normalizePath, readOnlyArrayHasS
 import ts from 'typescript';
 
 import type * as d from '../../declarations';
-import { MEMBER_DECORATORS_TO_REMOVE } from './decorators-to-static/decorators-constants';
+import { MEMBER_DECORATORS_TO_REMOVE, StencilStaticGetter } from './decorators-to-static/decorators-constants';
 import { addToLibrary, findTypeWithName, getHomeModule, getOriginalTypeName } from './type-library';
 
 export const getScriptTarget = () => {
@@ -156,7 +156,10 @@ const objectToObjectLiteral = (obj: { [key: string]: any }, refs: WeakSet<any>):
  * @param returnExpression a TypeScript AST node to return from the getter
  * @returns an AST node representing a getter
  */
-export const createStaticGetter = (propName: string, returnExpression: ts.Expression): ts.GetAccessorDeclaration => {
+export const createStaticGetter = (
+  propName: StencilStaticGetter,
+  returnExpression: ts.Expression,
+): ts.GetAccessorDeclaration => {
   return ts.factory.createGetAccessorDeclaration(
     [ts.factory.createToken(ts.SyntaxKind.StaticKeyword)],
     propName,

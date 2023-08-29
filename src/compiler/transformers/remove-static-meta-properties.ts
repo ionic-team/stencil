@@ -1,13 +1,15 @@
+import { readOnlyArrayHasStringMember } from '@utils';
 import ts from 'typescript';
 
+import { StencilStaticGetter } from './decorators-to-static/decorators-constants';
 import { retrieveTsModifiers } from './transform-utils';
 
 /**
  * Creates a new collection of class members that belong to the provided class node and that do not exist in
- * {@link REMOVE_STATIC_GETTERS}
+ * {@link STATIC_GETTERS_TO_REMOVE}
  * @param classNode the class node in the syntax tree to inspect
  * @returns a new collection of class members belonging to the provided class node, less those found in
- * {@link REMOVE_STATIC_GETTERS}
+ * {@link STATIC_GETTERS_TO_REMOVE}
  */
 export const removeStaticMetaProperties = (classNode: ts.ClassDeclaration): ts.ClassElement[] => {
   if (classNode.members == null) {
@@ -16,7 +18,8 @@ export const removeStaticMetaProperties = (classNode: ts.ClassDeclaration): ts.C
   return classNode.members.filter((classMember) => {
     if (retrieveTsModifiers(classMember)?.some((m) => m.kind === ts.SyntaxKind.StaticKeyword)) {
       const memberName = (classMember.name as any).escapedText;
-      if (REMOVE_STATIC_GETTERS.has(memberName)) {
+
+      if (readOnlyArrayHasStringMember(STATIC_GETTERS_TO_REMOVE, memberName)) {
         return false;
       }
     }
@@ -24,24 +27,24 @@ export const removeStaticMetaProperties = (classNode: ts.ClassDeclaration): ts.C
   });
 };
 
-// TODO(STENCIL-856): Move these properties to constants for better type safety within the codebase
 /**
- * A list of static getter names that are specific to Stencil to exclude from a class's member list
+ * A list of the static getters to remove here, which is a subset of the total
+ * set of static getters used by Stencil during the compilation process.
  */
-const REMOVE_STATIC_GETTERS = new Set([
-  'is',
-  'properties',
-  'encapsulation',
+const STATIC_GETTERS_TO_REMOVE = [
   'elementRef',
+  'encapsulation',
   'events',
+  'is',
   'listeners',
   'methods',
-  'states',
   'originalStyleUrls',
-  'styleMode',
+  'properties',
+  'states',
   'style',
-  'styles',
+  'styleMode',
   'styleUrl',
-  'watchers',
   'styleUrls',
-]);
+  'styles',
+  'watchers',
+] as const satisfies readonly StencilStaticGetter[];
