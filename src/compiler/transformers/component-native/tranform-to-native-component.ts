@@ -11,8 +11,12 @@ import { getComponentMeta, getModuleFromSourceFile } from '../transform-utils';
 import { updateNativeComponentClass } from './native-component';
 
 /**
- * A function that returns a transformation factory. The returned factory performs a series of transformations on
- * Stencil components, in order to generate 'native' web components.
+ * A function that returns a transformation factory. The returned factory
+ * performs a series of transformations on Stencil components, in order to
+ * generate 'native' web components, which is to say standalone custom elements
+ * that are defined by classes extending `HTMLElement` with a
+ * `connectedCallback` method and so on.
+ *
  * @param compilerCtx the current compiler context, which acts as the source of truth for the transformations
  * @param transformOpts the transformation configuration to use when performing the transformations
  * @returns a transformer factory, to be run by the TypeScript compiler
