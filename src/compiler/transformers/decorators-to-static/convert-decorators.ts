@@ -2,7 +2,7 @@ import { augmentDiagnosticWithNode, buildError } from '@utils';
 import ts from 'typescript';
 
 import type * as d from '../../../declarations';
-import { retrieveTsDecorators, retrieveTsModifiers } from '../transform-utils';
+import { retrieveTsDecorators, retrieveTsModifiers, updateConstructor } from '../transform-utils';
 import { componentDecoratorToStatic } from './component-decorator';
 import { isDecoratorNamed } from './decorator-utils';
 import {
@@ -409,99 +409,6 @@ function handleClassFields(classNode: ts.ClassDeclaration, classMembers: ts.Clas
     return updateConstructor(classNode, updatedClassMembers, statements);
   }
 }
-
-/**
- * Helper util for updating the constructor on a class declaration AST node.
- *
- * @param classNode the class node whose constructor will be updated
- * @param classMembers a list of class members for that class
- * @param statements a list of statements which should be added to the
- * constructor
- * @returns a list of updated class elements
- */
-export const updateConstructor = (
-  classNode: ts.ClassDeclaration,
-  classMembers: ts.ClassElement[],
-  statements: ts.Statement[],
-): ts.ClassElement[] => {
-  const constructorIndex = classMembers.findIndex((m) => m.kind === ts.SyntaxKind.Constructor);
-  const constructorMethod = classMembers[constructorIndex];
-
-  if (constructorIndex >= 0 && ts.isConstructorDeclaration(constructorMethod)) {
-    const constructorBodyStatements: ts.NodeArray<ts.Statement> =
-      constructorMethod.body?.statements ?? ts.factory.createNodeArray();
-    const hasSuper = constructorBodyStatements.some((s) => s.kind === ts.SyntaxKind.SuperKeyword);
-
-    if (!hasSuper && needsSuper(classNode)) {
-      // if there is no super and it needs one the statements comprising the
-      // body of the constructor should be:
-      //
-      // 1. the `super()` call
-      // 2. the new statements we've created to initialize fields
-      // 3. the statements currently comprising the body of the constructor
-      statements = [createConstructorBodyWithSuper(), ...statements, ...constructorBodyStatements];
-    } else {
-      // if no super is needed then the body of the constructor should be:
-      //
-      // 1. the new statements we've created to initialize fields
-      // 2. the statements currently comprising the body of the constructor
-      statements = [...statements, ...constructorBodyStatements];
-    }
-
-    classMembers[constructorIndex] = ts.factory.updateConstructorDeclaration(
-      constructorMethod,
-      retrieveTsModifiers(constructorMethod),
-      constructorMethod.parameters,
-      ts.factory.updateBlock(constructorMethod?.body ?? ts.factory.createBlock([]), statements),
-    );
-  } else {
-    // we don't seem to have a constructor, so let's create one and stick it
-    // into the array of class elements
-    if (needsSuper(classNode)) {
-      statements = [createConstructorBodyWithSuper(), ...statements];
-    }
-
-    classMembers = [
-      ts.factory.createConstructorDeclaration(undefined, [], ts.factory.createBlock(statements, true)),
-      ...classMembers,
-    ];
-  }
-
-  return classMembers;
-};
-
-/**
- * Check that a given class declaration should have a `super()` call in its
- * constructor. This is something we can check by looking for a
- * {@link ts.HeritageClause} on the class's AST node.
- *
- * @param classDeclaration a class declaration AST node
- * @returns whether this class has parents or not
- */
-const needsSuper = (classDeclaration: ts.ClassDeclaration): boolean => {
-  const hasHeritageClauses = classDeclaration.heritageClauses && classDeclaration.heritageClauses.length > 0;
-
-  if (hasHeritageClauses) {
-    // A {@link ts.SyntaxKind.HeritageClause} node may be for extending a
-    // superclass _or_ for implementing an interface. We only want to add a
-    // `super()` call to our synthetic constructor here in the case that there
-    // is a superclass, so we can check for that situation by checking for the
-    // presence of a heritage clause with the `.token` property set to
-    // `ts.SyntaxKind.ExtendsKeyword`.
-    return classDeclaration.heritageClauses.some((clause) => clause.token === ts.SyntaxKind.ExtendsKeyword);
-  }
-  return false;
-};
-
-/**
- * Create a statement with a call to `super()` suitable for including in the body of a constructor.
- * @returns a {@link ts.ExpressionStatement} node equivalent to `super()`
- */
-const createConstructorBodyWithSuper = (): ts.ExpressionStatement => {
-  return ts.factory.createExpressionStatement(
-    ts.factory.createCallExpression(ts.factory.createIdentifier('super'), undefined, undefined),
-  );
-};
 
 /**
  * Check whether a given class element should be rewritten from a class field

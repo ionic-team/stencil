@@ -2,7 +2,7 @@ import ts from 'typescript';
 
 import type * as d from '../../../declarations';
 import { addCreateEvents } from '../create-event';
-import { retrieveTsModifiers } from '../transform-utils';
+import { updateConstructor } from '../transform-utils';
 
 /**
  * Updates a constructor to include:
@@ -16,47 +16,21 @@ import { retrieveTsModifiers } from '../transform-utils';
  * @param classMembers the class elements to modify
  * @param moduleFile the Stencil module representation of the component class
  * @param cmp the component metadata generated for the component
+ * @param classNode the TypeScript syntax tree node for the class
  */
 export const updateNativeConstructor = (
   classMembers: ts.ClassElement[],
   moduleFile: d.Module,
   cmp: d.ComponentCompilerMeta,
+  classNode: ts.ClassDeclaration,
 ): void => {
   if (cmp.isPlain) {
     return;
   }
-  const cstrMethodIndex = classMembers.findIndex((m) => m.kind === ts.SyntaxKind.Constructor);
 
-  if (cstrMethodIndex >= 0) {
-    // add to the existing constructor()
-    const cstrMethod = classMembers[cstrMethodIndex] as ts.ConstructorDeclaration;
-    // a constructor may not have a body (e.g. in the case of constructor overloads)
-    const cstrBodyStatements: ts.NodeArray<ts.Statement> = cstrMethod.body?.statements ?? ts.factory.createNodeArray();
+  const nativeCstrStatements = [...nativeInit(cmp), ...addCreateEvents(moduleFile, cmp)];
 
-    let statements: ts.Statement[] = [...nativeInit(cmp), ...addCreateEvents(moduleFile, cmp), ...cstrBodyStatements];
-
-    const hasSuper = cstrBodyStatements.some((s) => s.kind === ts.SyntaxKind.SuperKeyword);
-    if (!hasSuper) {
-      statements = [createNativeConstructorSuper(), ...statements];
-    }
-
-    classMembers[cstrMethodIndex] = ts.factory.updateConstructorDeclaration(
-      cstrMethod,
-      retrieveTsModifiers(cstrMethod),
-      cstrMethod.parameters,
-      ts.factory.updateBlock(cstrMethod.body, statements),
-    );
-  } else {
-    // create a constructor()
-    const statements: ts.Statement[] = [
-      createNativeConstructorSuper(),
-      ...nativeInit(cmp),
-      ...addCreateEvents(moduleFile, cmp),
-    ];
-
-    const cstrMethod = ts.factory.createConstructorDeclaration(undefined, [], ts.factory.createBlock(statements, true));
-    classMembers.unshift(cstrMethod);
-  }
+  updateConstructor(classNode, classMembers, nativeCstrStatements);
 };
 
 /**
@@ -100,15 +74,5 @@ const nativeAttachShadowStatement = (): ts.ExpressionStatement => {
       undefined,
       undefined,
     ),
-  );
-};
-
-/**
- * Create an expression statement for calling `super()` for a class.
- * @returns the generated expression statement
- */
-const createNativeConstructorSuper = (): ts.ExpressionStatement => {
-  return ts.factory.createExpressionStatement(
-    ts.factory.createCallExpression(ts.factory.createSuper(), undefined, undefined),
   );
 };
