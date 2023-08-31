@@ -34,6 +34,41 @@ describe('parse props', () => {
     expect(t.cmp?.hasProp).toBe(true);
   });
 
+  it('should correctly parse a prop with an inferred enum type', () => {
+    const t = transpileModule(`
+    export enum Mode {
+      DEFAULT = 'default'
+    }
+    @Component({tag: 'cmp-a'})
+      export class CmpA {
+        @Prop() val: Mode;
+      }
+    `);
+
+    // Using the `properties` array directly here since the `transpileModule`
+    // method doesn't like the top-level enum export with the current `target` and
+    // `module` values for the tsconfig
+    expect(t.properties[0]).toEqual({
+      name: 'val',
+      type: 'string',
+      attribute: 'val',
+      reflect: false,
+      mutable: false,
+      required: false,
+      optional: false,
+      defaultValue: undefined,
+      complexType: {
+        original: 'Mode',
+        resolved: 'Mode',
+        references: {
+          Mode: { location: 'local', path: 'module.tsx', id: 'module.tsx::Mode' },
+        },
+      },
+      docs: { tags: [], text: '' },
+      internal: false,
+    });
+  });
+
   it('should correctly parse a prop with an unresolved type', () => {
     const t = transpileModule(`
     @Component({tag: 'cmp-a'})

@@ -146,7 +146,9 @@ const validateComponent = (
   if (!config._isTesting) {
     const nonTypeExports = typeChecker
       .getExportsOfModule(typeChecker.getSymbolAtLocation(cmpNode.getSourceFile()))
-      .filter((symbol) => (symbol.flags & (ts.SymbolFlags.Interface | ts.SymbolFlags.TypeAlias)) === 0)
+      .filter(
+        (symbol) => (symbol.flags & (ts.SymbolFlags.Interface | ts.SymbolFlags.TypeAlias | ts.SymbolFlags.Enum)) === 0,
+      )
       .filter((symbol) => symbol.name !== cmpNode.name.text);
 
     nonTypeExports.forEach((symbol) => {

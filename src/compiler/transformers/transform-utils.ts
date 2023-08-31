@@ -539,18 +539,17 @@ const getTypeReferenceLocation = (
   const isExported = sourceFile.statements.some((st) => {
     const statementModifiers = retrieveTsModifiers(st);
 
-    // Is the interface defined in the file and exported
-    const isInterfaceDeclarationExported =
-      ts.isInterfaceDeclaration(st) &&
-      (<ts.Identifier>st.name).getText() === typeName &&
+    const isDeclarationExported = (statement: ts.InterfaceDeclaration | ts.TypeAliasDeclaration | ts.EnumDeclaration) =>
+      (<ts.Identifier>statement.name).getText() === typeName &&
       Array.isArray(statementModifiers) &&
       statementModifiers.some((mod) => mod.kind === ts.SyntaxKind.ExportKeyword);
 
-    const isTypeAliasDeclarationExported =
-      ts.isTypeAliasDeclaration(st) &&
-      (<ts.Identifier>st.name).getText() === typeName &&
-      Array.isArray(statementModifiers) &&
-      statementModifiers.some((mod) => mod.kind === ts.SyntaxKind.ExportKeyword);
+    // Is the interface defined in the file and exported
+    const isInterfaceDeclarationExported = ts.isInterfaceDeclaration(st) && isDeclarationExported(st);
+
+    const isTypeAliasDeclarationExported = ts.isTypeAliasDeclaration(st) && isDeclarationExported(st);
+
+    const isEnumDeclarationExported = ts.isEnumDeclaration(st) && isDeclarationExported(st);
 
     // Is the interface exported through a named export
     const isTypeInExportDeclaration =
@@ -558,7 +557,12 @@ const getTypeReferenceLocation = (
       ts.isNamedExports(st.exportClause) &&
       st.exportClause.elements.some((nee) => nee.name.getText() === typeName);
 
-    return isInterfaceDeclarationExported || isTypeAliasDeclarationExported || isTypeInExportDeclaration;
+    return (
+      isInterfaceDeclarationExported ||
+      isTypeAliasDeclarationExported ||
+      isEnumDeclarationExported ||
+      isTypeInExportDeclaration
+    );
   });
 
   if (isExported) {
