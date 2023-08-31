@@ -15,6 +15,15 @@ const getDeclarationParameter = (arg: ts.Expression): any => {
     return objectLiteralToObjectMap(arg);
   } else if (ts.isStringLiteral(arg)) {
     return arg.text;
+  } else if (ts.isPropertyAccessExpression(arg)) {
+    /**
+     * Enum members are property access expressions, so we can evaluate them
+     * to get the enum member value as a string.
+     *
+     * This enables developers to use enum members in decorators.
+     * e.g. @Watch(MyEnum.VALUE)
+     */
+    return arg.name.getText();
   }
 
   throw new Error(`invalid decorator argument: ${arg.getText()}`);
