@@ -184,7 +184,7 @@ export function createNodeSys(c: { process?: any; logger?: Logger } = {}): Compi
       destroys.forEach((cb) => {
         try {
           const rtn = cb();
-          if (rtn && rtn.then) {
+          if (rtn && typeof rtn.then === 'function') {
             waits.push(rtn);
           }
         } catch (e) {

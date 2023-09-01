@@ -51,7 +51,7 @@ export const createSystem = (c?: { logger?: Logger }): CompilerSystem => {
     destroys.forEach((cb) => {
       try {
         const rtn = cb();
-        if (rtn && rtn.then) {
+        if (rtn && typeof rtn.then === 'function') {
           waits.push(rtn);
         }
       } catch (e) {
