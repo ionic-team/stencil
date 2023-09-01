@@ -47,18 +47,18 @@ export const loadRollupDiagnostics = (
           try {
             const srcLines = splitLineBreaks(sourceText);
 
-            const errorLine: d.PrintLine = {
+            const errorLine = {
               lineIndex: loc.line - 1,
               lineNumber: loc.line,
               text: srcLines[loc.line - 1],
               errorCharStart: loc.column,
               errorLength: 0,
-            };
+            } satisfies d.PrintLine;
 
             diagnostic.lineNumber = errorLine.lineNumber;
             diagnostic.columnNumber = errorLine.errorCharStart;
 
-            const highlightLine = errorLine.text.slice(loc.column);
+            const highlightLine = errorLine.text?.slice(loc.column) ?? '';
             for (let i = 0; i < highlightLine.length; i++) {
               if (charBreak.has(highlightLine.charAt(i))) {
                 break;
@@ -114,11 +114,17 @@ export const createOnWarnFn = (diagnostics: d.Diagnostic[], bundleModulesFiles?:
   const previousWarns = new Set<string>();
 
   return function onWarningMessage(warning: { code?: string; importer?: string; message?: string }) {
-    if (warning == null || ignoreWarnCodes.has(warning.code) || previousWarns.has(warning.message)) {
+    if (
+      warning == null ||
+      (warning.code && ignoreWarnCodes.has(warning.code)) ||
+      (warning.message && previousWarns.has(warning.message))
+    ) {
       return;
     }
 
-    previousWarns.add(warning.message);
+    if (warning.message) {
+      previousWarns.add(warning.message);
+    }
 
     let label = '';
     if (bundleModulesFiles) {
