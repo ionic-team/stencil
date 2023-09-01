@@ -78,7 +78,7 @@ export const enum CMP_FLAGS {
   hasSlotRelocation = 1 << 2,
   // TODO(STENCIL-854): Remove code related to legacy shadowDomShim field
   // Note that when we remove this field we should consider whether we need to
-  // retain a placeholder here, since if we want to have compatability between
+  // retain a placeholder here, since if we want to have compatibility between
   // different versions of the runtime then we'll need to not shift the values
   // of the other higher flags down
   /**

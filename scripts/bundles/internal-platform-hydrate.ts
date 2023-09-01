@@ -51,12 +51,12 @@ export async function internalHydrate(opts: BuildOptions) {
      * import "path";
      * ```
      *
-     * If you say `moduleSideEffects: false` you're basically saying 'dont assume
-     * that imported a module has a desired side effect' which allows an import that
+     * If you say `moduleSideEffects: false` you're basically saying "don't assume
+     * that imported a module has a desired side effect" which allows an import that
      * doesn't result in any symbols being pulled into the importing module to be
      * eliminated.
      *
-     * Another way to say this is that without this change the treeshaking
+     * Another way to say this is that without this change the tree-shaking
      * validation for `test.dist` doesn't pass for this bundle.
      */
     treeshake: {

@@ -8,7 +8,7 @@ import { getModuleFromSourceFile } from '../transform-utils';
 
 /**
  * Proxy custom elements for the `dist-custom-elements` output target. This function searches for a Stencil component's
- * class initializer (found on the righthand side of the '=' operator):
+ * class initializer (found on the right-hand side of the '=' operator):
  *
  * ```ts
  * const MyComponent = class extends HTMLElement { // Implementation omitted }
@@ -20,7 +20,7 @@ import { getModuleFromSourceFile } from '../transform-utils';
  * const MyComponent = proxyCustomElement(class extends HTMLElement { // Implementation omitted }, componentMetadata);
  * ```
  *
- * This is to work around an issue where treeshaking does not work for webpack users, whose details are captured in full
+ * This is to work around an issue where tree-shaking does not work for webpack users, whose details are captured in full
  * in [this issue on the webpack GitHub repo](https://github.com/webpack/webpack/issues/14963).
  *
  * @param compilerCtx current compiler context

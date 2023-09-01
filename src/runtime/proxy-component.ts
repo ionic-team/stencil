@@ -109,12 +109,12 @@ export const proxyComponent = (
           //      customElements.define('my-component', MyComponent);
           //    </script>
           //  ```
-          //  In this case if we do not unshadow here and use the value of the shadowing property, attributeChangedCallback
+          //  In this case if we do not un-shadow here and use the value of the shadowing property, attributeChangedCallback
           //  will be called with `newValue = "some-value"` and will set the shadowed property (this.someAttribute = "another-value")
           //  to the value that was set inline i.e. "some-value" from above example. When
-          //  the connectedCallback attempts to unshadow it will use "some-value" as the initial value rather than "another-value"
+          //  the connectedCallback attempts to un-shadow it will use "some-value" as the initial value rather than "another-value"
           //
-          //  The case where the attribute was NOT set inline but was not set programmatically shall be handled/unshadowed
+          //  The case where the attribute was NOT set inline but was not set programmatically shall be handled/un-shadowed
           //  by connectedCallback as this attributeChangedCallback will not fire.
           //
           //  https://developers.google.com/web/fundamentals/web-components/best-practices#lazy-properties

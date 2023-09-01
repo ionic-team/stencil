@@ -90,7 +90,7 @@ async function processCopyTask(results: d.CopyResults, allCopyTasks: d.CopyTask[
     // get the stats for this src to see if it's a directory or not
     const stats = await stat(copyTask.src);
     if (stats.isDirectory()) {
-      // still a directory, keep diggin down
+      // still a directory, keep digging down
       if (!results.dirPaths.includes(copyTask.dest)) {
         results.dirPaths.push(copyTask.dest);
       }

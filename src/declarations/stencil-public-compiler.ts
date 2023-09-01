@@ -79,7 +79,7 @@ export interface StencilConfig {
    * However, it's still common to have styles which should be "global" across all components and the website.
    * A global CSS file is often useful to set CSS Variables.
    *
-   * Additionally, the globalStyle config can be used to precompile styles with Sass, PostCss, etc.
+   * Additionally, the globalStyle config can be used to precompile styles with Sass, PostCSS, etc.
    * Below is an example folder structure containing a webapp's global sass file, named app.css.
    */
   globalStyle?: string;
@@ -119,7 +119,7 @@ export interface StencilConfig {
 
   /**
    * The plugins config can be used to add your own rollup plugins.
-   * By default, Stencil does not come with Sass or PostCss support.
+   * By default, Stencil does not come with Sass or PostCSS support.
    * However, either can be added using the plugin array.
    */
   plugins?: any[];
@@ -223,7 +223,7 @@ export interface StencilConfig {
    * to the head of the document containing some `visibility: hidden;` css rules.
    *
    * Disabling this will remove the style tag that sets `visibility: hidden;` on all
-   * unhydrated web components. This more closely follows the HTML spec, and allows
+   * un-hydrated web components. This more closely follows the HTML spec, and allows
    * you to set your own fallback content.
    *
    */
@@ -743,12 +743,12 @@ export interface PrerenderConfig {
   robotsTxt?(opts: RobotsTxtOpts): string | RobotsTxtResults;
   sitemapXml?(opts: SitemapXmpOpts): string | SitemapXmpResults;
   /**
-   * Static Site Generated (SSG). Does not include Stencil's clientside
+   * Static Site Generated (SSG). Does not include Stencil's client-side
    * JavaScript, custom elements or preload modules.
    */
   staticSite?: boolean;
   /**
-   * If the prerenndered URLs should have a trailing "/"" or not. Defaults to `false`.
+   * If the prerendered URLs should have a trailing "/"" or not. Defaults to `false`.
    */
   trailingSlash?: boolean;
 }
@@ -766,7 +766,7 @@ export interface HydrateDocumentOptions {
    */
   canonicalUrl?: string;
   /**
-   * Include the HTML comments and attributes used by the clientside
+   * Include the HTML comments and attributes used by the client-side
    * JavaScript to read the structure of the HTML and rebuild each
    * component. Defaults to `true`.
    */
@@ -787,7 +787,7 @@ export interface HydrateDocumentOptions {
   direction?: string;
   /**
    * Component tag names listed here will not be prerendered, nor will
-   * hydrated on the clientside. Components listed here will be ignored
+   * hydrated on the client-side. Components listed here will be ignored
    * as custom elements and treated no differently than a `<div>`.
    */
   excludeComponents?: string[];
@@ -820,11 +820,11 @@ export interface HydrateDocumentOptions {
    */
   runtimeLogging?: boolean;
   /**
-   * Component tags listed here will only be prerendered or serverside-rendered
-   * and will not be clientside hydrated. This is useful for components that
+   * Component tags listed here will only be prerendered or server-side-rendered
+   * and will not be client-side hydrated. This is useful for components that
    * are not dynamic and do not need to be defined as a custom element within the
    * browser. For example, a header or footer component would be a good example that
-   * may not require any clientside JavaScript.
+   * may not require any client-side JavaScript.
    */
   staticComponents?: string[];
   /**
@@ -1073,7 +1073,7 @@ export interface CompilerSystem {
    */
   getRemoteModuleUrl(opts: { moduleId: string; path?: string; version?: string }): string;
   /**
-   * Aync glob task. Only available in NodeJS compiler system.
+   * Async glob task. Only available in NodeJS compiler system.
    */
   glob?(pattern: string, options: { cwd?: string; nodir?: boolean; [key: string]: any }): Promise<string[]>;
   /**
@@ -1660,7 +1660,7 @@ export interface JestConfig {
 
   /**
    * A list of reporter names that Jest uses when writing coverage reports. Any istanbul reporter can be used.
-   * Default: ["json", "lcov", "text"]
+   * Default: `["json", "lcov", "text"]`
    */
   coverageReporters?: any[];
 
@@ -2309,9 +2309,9 @@ export interface OutputTargetWww extends OutputTargetBase {
 
   /**
    * Service worker config for production builds. During development builds
-   * service worker script will be injected to automatically unregister existing
+   * service worker script will be injected to automatically deregister existing
    * service workers. When set to `false` neither a service worker registration
-   * or unregistration will be added to the index.html.
+   * or deregistration will be added to the index.html.
    */
   serviceWorker?: ServiceWorkerConfig | null | false;
   appDir?: string;

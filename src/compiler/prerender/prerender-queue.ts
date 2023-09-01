@@ -127,7 +127,7 @@ const prerenderUrl = async (results: d.PrerenderResults, manager: d.PrerenderMan
       writeToFilePath: getWriteFilePathFromUrlPath(manager, url),
     };
 
-    // prender this path and wait on the results
+    // prerender this path and wait on the results
     const urlResults = await manager.prerenderUrlWorker(prerenderRequest);
 
     if (manager.isDebug) {

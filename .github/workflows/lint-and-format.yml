@@ -23,3 +23,6 @@ jobs:
       - name: Prettier Check
         run: npm run prettier.dry-run
         shell: bash
+
+      - name: Spellcheck
+        run: npm run spellcheck

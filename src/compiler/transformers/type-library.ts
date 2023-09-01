@@ -201,7 +201,7 @@ export function getHomeModule(
  *
  * @param module the home module for the type of interest
  * @param typeName the name of the type of interest
- * @returns a type declaration for the type of intereset or `undefined` if it
+ * @returns a type declaration for the type of interest or `undefined` if it
  * cannot be found
  */
 export function findTypeWithName(module: ts.SourceFile, typeName: string): TypeDeclLike | undefined {
@@ -220,7 +220,7 @@ export function findTypeWithName(module: ts.SourceFile, typeName: string): TypeD
  *
  * @param identifier an identifier for the type whose 'true name' we're after
  * @param checker a {@link ts.TypeChecker} instance
- * @returns the type's original, unaliased name (if successful) or `undefined`
+ * @returns the type's original, un-aliased name (if successful) or `undefined`
  * if not
  */
 export function getOriginalTypeName(identifier: ts.Node, checker: ts.TypeChecker): string | undefined {

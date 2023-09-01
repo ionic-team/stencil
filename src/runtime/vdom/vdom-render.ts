@@ -953,7 +953,7 @@ render() {
 
             if (nodeToRelocate !== insertBeforeNode) {
               if (!nodeToRelocate['s-hn'] && nodeToRelocate['s-ol']) {
-                // probably a component in the index.html that doesn't have it's hostname set
+                // probably a component in the index.html that doesn't have its hostname set
                 nodeToRelocate['s-hn'] = nodeToRelocate['s-ol'].parentNode.nodeName;
               }
               // add it back to the dom but in its new home

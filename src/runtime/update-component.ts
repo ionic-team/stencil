@@ -232,7 +232,7 @@ let renderingRef: any = null;
  * @returns an empty promise
  */
 const callRender = (hostRef: d.HostRef, instance: any, elm: HTMLElement, isInitialLoad: boolean) => {
-  // in order for bundlers to correctly treeshake the BUILD object
+  // in order for bundlers to correctly tree-shake the BUILD object
   // we need to ensure BUILD is not deoptimized within a try/catch
   // https://rollupjs.org/guide/en/#treeshake tryCatchDeoptimization
   const allRenderFn = BUILD.allRenderFn ? true : false;

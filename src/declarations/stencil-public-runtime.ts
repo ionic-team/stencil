@@ -74,7 +74,7 @@ export interface PropOptions {
   /**
    * The name of the associated DOM attribute.
    * Stencil uses different heuristics to determine the default name of the attribute,
-   * but using this property, you can override the default behaviour.
+   * but using this property, you can override the default behavior.
    */
   attribute?: string | null;
 
@@ -149,7 +149,7 @@ export interface ListenOptions {
    * By default, Stencil uses several heuristics to determine if
    * it must attach a `passive` event listener or not.
    *
-   * Using the `passive` option can be used to change the default behaviour.
+   * Using the `passive` option can be used to change the default behavior.
    * Please see https://developers.google.com/web/updates/2016/06/passive-event-listeners for further information.
    */
   passive?: boolean;
@@ -536,7 +536,7 @@ export interface FunctionalUtilities {
   /**
    * Utility for reading the children of a functional component at runtime.
    * Since the Stencil runtime uses a different interface for children it is
-   * not recommendeded to read the children directly, and is preferable to use
+   * not recommended to read the children directly, and is preferable to use
    * this utility to, for instance, perform a side effect for each child.
    */
   forEach: (children: VNode[], cb: (vnode: ChildNode, index: number, array: ChildNode[]) => void) => void;
@@ -1389,7 +1389,6 @@ export namespace JSXBase {
 
   export interface SVGAttributes<T = SVGElement> extends DOMAttributes<T> {
     // Attributes which also defined in HTMLAttributes
-    // See comment in SVGDOMPropertyConfig.js
     class?: string | { [className: string]: boolean };
     color?: string;
     height?: number | string;

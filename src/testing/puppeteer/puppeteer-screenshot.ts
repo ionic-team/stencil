@@ -106,7 +106,7 @@ export async function pageCompareScreenshot(
     });
   });
 
-  const screenshotOpts = createPuppeteerScreenshopOptions(opts);
+  const screenshotOpts = createPuppeteerScreenshotOptions(opts);
   const screenshotBuf = await page.screenshot(screenshotOpts);
   const pixelmatchThreshold =
     typeof opts.pixelmatchThreshold === 'number' ? opts.pixelmatchThreshold : screenshotBuildData.pixelmatchThreshold;
@@ -137,7 +137,7 @@ export async function pageCompareScreenshot(
   return results;
 }
 
-function createPuppeteerScreenshopOptions(opts: ScreenshotOptions) {
+function createPuppeteerScreenshotOptions(opts: ScreenshotOptions) {
   const puppeteerOpts: puppeteer.ScreenshotOptions = {
     type: 'png',
     fullPage: opts.fullPage,

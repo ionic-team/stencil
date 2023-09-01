@@ -742,7 +742,7 @@ export const getComponentMeta = (
 /**
  * Retrieves the tag name associated with a Stencil component, based on the 'is' static getter assigned to the class at compile time
  * @param staticMembers the static getters belonging to the Stencil component class
- * @returns the tage name, or null if one cannot be found
+ * @returns the tag name, or null if one cannot be found
  */
 export const getComponentTagName = (staticMembers: ts.ClassElement[]): string | null => {
   if (staticMembers.length > 0) {

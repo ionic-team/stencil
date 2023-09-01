@@ -726,11 +726,11 @@ function getPuppeteerExecution(elmHandle: puppeteer.ElementHandle) {
   const puppeteerMajorVersion = parseInt(process.env.__STENCIL_PUPPETEER_VERSION__, 10);
   if (puppeteerMajorVersion >= 17) {
     // in puppeteer v17, a context for executing JS can be retrieved from a frame
-    // the `any` type assertion is necessary for backwards compatability with the type checker
+    // the `any` type assertion is necessary for backwards compatibility with the type checker
     return (elmHandle as any).frame;
   } else {
     // in puppeteer v16 and lower, an execution context could be retrieved from a handle to execute JS
-    // the `any` type assertion is necessary for backwards compatability with the type checker
+    // the `any` type assertion is necessary for backwards compatibility with the type checker
     //
     // if the result of `parseInt` on the puppeteer version is NaN, assume that the user is on a lower version of
     // puppeteer

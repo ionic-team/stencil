@@ -1868,7 +1868,7 @@ declare global {
       toEqualHtml(expectHtml: string): void;
 
       /**
-       * Compares HTML light DOKM only, but first normalizes the HTML so all
+       * Compares HTML light DOM only, but first normalizes the HTML so all
        * whitespace, attribute order and css class order are
        * the same. When given an element, it will compare
        * the element's `outerHTML`. When given a Document Fragment,
@@ -2162,7 +2162,7 @@ export interface NewSpecPageOptions {
    */
   supportsShadowDom?: boolean;
   /**
-   * When a component is pre-rendered it includes HTML annotations, such as `s-id` attributes and `<!-t.0->` comments. This information is used by clientside hydrating. Default is `false`.
+   * When a component is pre-rendered it includes HTML annotations, such as `s-id` attributes and `<!-t.0->` comments. This information is used by client-side hydrating. Default is `false`.
    */
   includeAnnotations?: boolean;
   /**
@@ -2174,7 +2174,7 @@ export interface NewSpecPageOptions {
    */
   userAgent?: string;
   /**
-   * By default, any changes to component properties and attributes must `page.waitForChanges()` in order to test the updates. As an option, `autoAppluChanges` continuously flushes the queue on the background. Default is `false`.
+   * By default, any changes to component properties and attributes must `page.waitForChanges()` in order to test the updates. As an option, `autoApplyChanges` continuously flushes the queue on the background. Default is `false`.
    */
   autoApplyChanges?: boolean;
   /**

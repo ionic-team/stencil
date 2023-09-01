@@ -19,7 +19,7 @@ import { BuildOptions } from './utils/options';
 /**
  * Runner for releasing a new version of Stencil
  * @param rootDir the root directory of the Stencil repository
- * @param args stringifed arguments that influence the release process
+ * @param args stringified arguments that influence the release process
  */
 export async function run(rootDir: string, args: ReadonlyArray<string>): Promise<void> {
   try {

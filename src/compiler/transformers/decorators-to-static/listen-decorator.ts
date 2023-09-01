@@ -61,7 +61,7 @@ export const parseListener = (eventName: string, opts: d.ListenOptions = {}, met
     passive:
       typeof opts.passive === 'boolean'
         ? opts.passive
-        : // if the event name is kown to be a passive event then set it to true
+        : // if the event name is known to be a passive event then set it to true
           PASSIVE_TRUE_DEFAULTS.has(rawEventName.toLowerCase()),
   };
   return listener;
