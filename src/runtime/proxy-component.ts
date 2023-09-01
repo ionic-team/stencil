@@ -136,22 +136,46 @@ export const proxyComponent = (
             return;
           }
 
-          this[propName] = newValue === null && typeof this[propName] === 'boolean' ? false : newValue;
+          // Not sure if this would need a conditional, but this is what we would do if the watched name is not a "member"
+          // Would somehow need a map of attrName back to the function to use as a callback
+          // Need to account for possibility of multiple callbacks
+          const entry = cmpMeta.$watchers$[attrName];
+          entry?.forEach((callbackName) => {
+            if (this[callbackName] != null) {
+              this[callbackName].call(this, newValue, _oldValue);
+            }
+          });
+
+          // Would this ever actually get reached?
+          // IDK how this works if the prop doesn't exist. This will be an issue if we allow watching built-ins
+          // because there won't be a class member mapping to the name. Not an issue atm since we can only watch
+          // Stencil "members" (state and props)
+          // this[propName] = newValue === null && typeof this[propName] === 'boolean' ? false : newValue;
         });
       };
 
-      // create an array of attributes to observe
-      // and also create a map of html attribute name to js property name
-      Cstr.observedAttributes = members
-        .filter(([_, m]) => m[0] & MEMBER_FLAGS.HasAttribute) // filter to only keep props that should match attributes
-        .map(([propName, m]) => {
-          const attrName = m[1] || propName;
+      // Create an array of attributes to observe
+      // This list in comprised of all strings used within a `@Watch()` decorator
+      // on a component. This can include watchable Stencil class members like `@Prop()`s
+      // and `@State()`s, as well as native HTML attributes like aria attributes.
+      // As such, there is no way to guarantee type-safety here that a used hasn't entered
+      // an invalid attribute.
+      Cstr.observedAttributes = Object.keys(cmpMeta.$watchers$).map((attrName) => {
+        // Do some special stuff if this is a "member"
+        const member = members.find(([name]) => name === attrName);
+        if (member) {
+          const propName = member[1][1] ?? attrName;
           attrNameToPropName.set(attrName, propName);
-          if (BUILD.reflect && m[0] & MEMBER_FLAGS.ReflectAttr) {
-            cmpMeta.$attrsToReflect$.push([propName, attrName]);
+
+          if (BUILD.reflect && member[1][0] & MEMBER_FLAGS.ReflectAttr) {
+            cmpMeta.$attrsToReflect$.push([attrName, propName]);
           }
-          return attrName;
-        });
+
+          attrName = propName;
+        }
+
+        return attrName;
+      });
     }
   }
 
