@@ -125,6 +125,7 @@ export const proxyComponent = (
           if (this.hasOwnProperty(propName)) {
             newValue = this[propName];
             delete this[propName];
+            this[propName] = newValue === null && typeof this[propName] === 'boolean' ? false : newValue;
           } else if (
             prototype.hasOwnProperty(propName) &&
             typeof this[propName] === 'number' &&
@@ -134,23 +135,16 @@ export const proxyComponent = (
             // APIs to reflect props as attributes. Calls to `setAttribute(someElement, propName)` will result in
             // `propName` to be converted to a `DOMString`, which may not be what we want for other primitive props.
             return;
+          } else {
+            // At this point we should know this is not a "member", so we can treat it like watching an attribute
+            // on a vanilla web component
+            const entry = cmpMeta.$watchers$[attrName];
+            entry?.forEach((callbackName) => {
+              if (this[callbackName] != null) {
+                this[callbackName].call(this, newValue, _oldValue);
+              }
+            });
           }
-
-          // Not sure if this would need a conditional, but this is what we would do if the watched name is not a "member"
-          // Would somehow need a map of attrName back to the function to use as a callback
-          // Need to account for possibility of multiple callbacks
-          const entry = cmpMeta.$watchers$[attrName];
-          entry?.forEach((callbackName) => {
-            if (this[callbackName] != null) {
-              this[callbackName].call(this, newValue, _oldValue);
-            }
-          });
-
-          // Would this ever actually get reached?
-          // IDK how this works if the prop doesn't exist. This will be an issue if we allow watching built-ins
-          // because there won't be a class member mapping to the name. Not an issue atm since we can only watch
-          // Stencil "members" (state and props)
-          // this[propName] = newValue === null && typeof this[propName] === 'boolean' ? false : newValue;
         });
       };
 
