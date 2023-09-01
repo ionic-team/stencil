@@ -1,5 +1,6 @@
-import { getDeclarationParameters } from '../decorators-to-static/decorator-utils';
 import ts from 'typescript';
+
+import { getDeclarationParameters } from '../decorators-to-static/decorator-utils';
 
 describe('decorator utils', () => {
   describe('getDeclarationParameters', () => {
