@@ -35,7 +35,7 @@ export const componentDecoratorToStatic = (
   newMembers: ts.ClassElement[],
   componentDecorator: ts.Decorator,
 ) => {
-  const [componentOptions] = getDeclarationParameters<d.ComponentOptions>(componentDecorator);
+  const [componentOptions] = getDeclarationParameters<d.ComponentOptions>(componentDecorator, typeChecker);
   if (!componentOptions) {
     return;
   }

@@ -1,29 +1,35 @@
 import ts from 'typescript';
 
 import { objectLiteralToObjectMap } from '../transform-utils';
-import { StencilDecorator } from './decorators-constants';
+import type { StencilDecorator } from './decorators-constants';
 
-export const getDeclarationParameters: GetDeclarationParameters = (decorator: ts.Decorator): any => {
+export const getDeclarationParameters: GetDeclarationParameters = (
+  decorator: ts.Decorator,
+  typeChecker: ts.TypeChecker,
+): any => {
   if (!ts.isCallExpression(decorator.expression)) {
     return [];
   }
-  return decorator.expression.arguments.map(getDeclarationParameter);
+  return decorator.expression.arguments.map((arg) => getDeclarationParameter(arg, typeChecker));
 };
 
-const getDeclarationParameter = (arg: ts.Expression): any => {
+const getDeclarationParameter = (arg: ts.Expression, typeChecker: ts.TypeChecker): any => {
   if (ts.isObjectLiteralExpression(arg)) {
     return objectLiteralToObjectMap(arg);
   } else if (ts.isStringLiteral(arg)) {
     return arg.text;
   } else if (ts.isPropertyAccessExpression(arg)) {
-    /**
-     * Enum members are property access expressions, so we can evaluate them
-     * to get the enum member value as a string.
-     *
-     * This enables developers to use enum members in decorators.
-     * e.g. @Watch(MyEnum.VALUE)
-     */
-    return arg.name.getText();
+    const symbol = typeChecker.getTypeAtLocation(arg);
+    if (symbol !== undefined && symbol.isLiteral()) {
+      /**
+       * Enum members are property access expressions, so we can evaluate them
+       * to get the enum member value as a string.
+       *
+       * This enables developers to use enum members in decorators.
+       * e.g. @Watch(MyEnum.VALUE)
+       */
+      return symbol.value;
+    }
   }
 
   throw new Error(`invalid decorator argument: ${arg.getText()}`);
@@ -45,7 +51,7 @@ export const isDecoratorNamed = (propName: StencilDecorator) => {
 };
 
 export interface GetDeclarationParameters {
-  <T>(decorator: ts.Decorator): [T];
-  <T, T1>(decorator: ts.Decorator): [T, T1];
-  <T, T1, T2>(decorator: ts.Decorator): [T, T1, T2];
+  <T>(decorator: ts.Decorator, typeChecker: ts.TypeChecker): [T];
+  <T, T1>(decorator: ts.Decorator, typeChecker: ts.TypeChecker): [T, T1];
+  <T, T1, T2>(decorator: ts.Decorator, typeChecker: ts.TypeChecker): [T, T1, T2];
 }

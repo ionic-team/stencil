@@ -123,8 +123,8 @@ const visitClassDeclaration = (
       filteredMethodsAndFields,
     );
     elementDecoratorsToStatic(diagnostics, decoratedMembers, typeChecker, filteredMethodsAndFields);
-    watchDecoratorsToStatic(decoratedMembers, filteredMethodsAndFields);
-    listenDecoratorsToStatic(diagnostics, decoratedMembers, filteredMethodsAndFields);
+    watchDecoratorsToStatic(typeChecker, decoratedMembers, filteredMethodsAndFields);
+    listenDecoratorsToStatic(diagnostics, typeChecker, decoratedMembers, filteredMethodsAndFields);
   }
 
   // We call the `handleClassFields` method which handles transforming any

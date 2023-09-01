@@ -66,7 +66,7 @@ const parsePropDecorator = (
     return null;
   }
 
-  const decoratorParams = getDeclarationParameters<d.PropOptions>(propDecorator);
+  const decoratorParams = getDeclarationParameters<d.PropOptions>(propDecorator, typeChecker);
   const propOptions: d.PropOptions = decoratorParams[0] || {};
 
   const propName = prop.name.getText();
