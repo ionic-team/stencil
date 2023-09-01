@@ -19,8 +19,8 @@ const getDeclarationParameter = (arg: ts.Expression, typeChecker: ts.TypeChecker
   } else if (ts.isStringLiteral(arg)) {
     return arg.text;
   } else if (ts.isPropertyAccessExpression(arg)) {
-    const symbol = typeChecker.getTypeAtLocation(arg);
-    if (symbol !== undefined && symbol.isLiteral()) {
+    const type = typeChecker.getTypeAtLocation(arg);
+    if (type !== undefined && type.isLiteral()) {
       /**
        * Enum members are property access expressions, so we can evaluate them
        * to get the enum member value as a string.
@@ -28,7 +28,7 @@ const getDeclarationParameter = (arg: ts.Expression, typeChecker: ts.TypeChecker
        * This enables developers to use enum members in decorators.
        * e.g. @Watch(MyEnum.VALUE)
        */
-      return symbol.value;
+      return type.value;
     }
   }
 
