@@ -125,7 +125,6 @@ export const proxyComponent = (
           if (this.hasOwnProperty(propName)) {
             newValue = this[propName];
             delete this[propName];
-            this[propName] = newValue === null && typeof this[propName] === 'boolean' ? false : newValue;
           } else if (
             prototype.hasOwnProperty(propName) &&
             typeof this[propName] === 'number' &&
@@ -135,7 +134,7 @@ export const proxyComponent = (
             // APIs to reflect props as attributes. Calls to `setAttribute(someElement, propName)` will result in
             // `propName` to be converted to a `DOMString`, which may not be what we want for other primitive props.
             return;
-          } else {
+          } else if (propName == null) {
             // At this point we should know this is not a "member", so we can treat it like watching an attribute
             // on a vanilla web component
             const hostRef = getHostRef(this);
@@ -157,7 +156,11 @@ export const proxyComponent = (
                 }
               });
             }
+
+            return;
           }
+
+          this[propName] = newValue === null && typeof this[propName] === 'boolean' ? false : newValue;
         });
       };
 
