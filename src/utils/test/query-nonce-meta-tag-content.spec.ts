@@ -20,7 +20,7 @@ describe('queryNonceMetaTagContent', () => {
 
   it('should return `undefined` if the document does not have a head element', () => {
     const head = document.querySelector('head');
-    head.remove();
+    head?.remove();
 
     const nonce = queryNonceMetaTagContent(document);
 
