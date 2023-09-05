@@ -85,7 +85,7 @@ export const proxyComponent = (
     if (BUILD.observeAttribute && (!BUILD.lazyLoad || flags & PROXY_FLAGS.isElementConstructor)) {
       const attrNameToPropName = new Map();
 
-      prototype.attributeChangedCallback = function (attrName: string, _oldValue: string, newValue: string) {
+      prototype.attributeChangedCallback = function (attrName: string, oldValue: string, newValue: string) {
         plt.jmp(() => {
           const propName = attrNameToPropName.get(attrName);
 
@@ -138,12 +138,25 @@ export const proxyComponent = (
           } else {
             // At this point we should know this is not a "member", so we can treat it like watching an attribute
             // on a vanilla web component
-            const entry = cmpMeta.$watchers$[attrName];
-            entry?.forEach((callbackName) => {
-              if (this[callbackName] != null) {
-                this[callbackName].call(this, newValue, _oldValue);
-              }
-            });
+            const hostRef = getHostRef(this);
+            const flags = hostRef?.$flags$;
+
+            // We only want to trigger the callback(s) if:
+            // 1. The instance is ready
+            // 2. The watchers are ready
+            // 3. The value has changed
+            if (
+              !(flags & HOST_FLAGS.isConstructingInstance) &&
+              flags & HOST_FLAGS.isWatchReady &&
+              newValue !== oldValue
+            ) {
+              const entry = cmpMeta.$watchers$[attrName];
+              entry?.forEach((callbackName) => {
+                if (this[callbackName] != null) {
+                  this[callbackName].call(this, newValue, oldValue, attrName);
+                }
+              });
+            }
           }
         });
       };
