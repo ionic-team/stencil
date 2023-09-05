@@ -263,8 +263,8 @@ function renderCatchError(opts: d.HydrateFactoryOptions, results: d.HydrateResul
     type: 'build',
     header: 'Hydrate Error',
     messageText: '',
-    relFilePath: null,
-    absFilePath: null,
+    relFilePath: undefined,
+    absFilePath: undefined,
     lines: [],
   };
 

@@ -63,8 +63,8 @@ const loadMinifyJsDiagnostics = (sourceText: string, diagnostics: d.Diagnostic[]
     header: 'Minify JS',
     code: '',
     messageText: error.message,
-    absFilePath: null,
-    relFilePath: null,
+    absFilePath: undefined,
+    relFilePath: undefined,
     lines: [],
   };
 

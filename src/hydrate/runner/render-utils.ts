@@ -127,8 +127,8 @@ export function renderBuildDiagnostic(
     type: 'build',
     header: header,
     messageText: msg,
-    relFilePath: null,
-    absFilePath: null,
+    relFilePath: undefined,
+    absFilePath: undefined,
     lines: [],
   };
 
