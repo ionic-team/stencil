@@ -7,6 +7,10 @@
 * **runtime:** patch methods for scoped slot `append`, `prepend`, and `insertAdjacent` ([#4719](https://github.com/ionic-team/stencil/issues/4719)) ([1d98462](https://github.com/ionic-team/stencil/commit/1d98462135a196b9d9037dd46f0e7fe55d108496))
 
 
+### Features
+* **typescript:** upgrade to TypeScript 5.1 ([#4718](https://github.com/ionic-team/stencil/pull/4718)) ([49df0e7](https://github.com/ionic-team/stencil/commit/49df0e7b9bc1862d690e3239404243de1c838d6d))
+
+
 
 # 🐟 [4.1.0](https://github.com/ionic-team/stencil/compare/v4.0.5...v4.1.0) (2023-08-21)
 
