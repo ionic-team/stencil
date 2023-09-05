@@ -163,26 +163,25 @@ export const proxyComponent = (
 
       // Create an array of attributes to observe
       // This list in comprised of all strings used within a `@Watch()` decorator
-      // on a component. This can include watchable Stencil class members like `@Prop()`s
-      // and `@State()`s, as well as native HTML attributes like aria attributes.
-      // As such, there is no way to guarantee type-safety here that a used hasn't entered
+      // on a component as well as any Stencil-specific "members" (`@Prop()`s and `@State()`s).
+      // As such, there is no way to guarantee type-safety here that a user hasn't entered
       // an invalid attribute.
-      Cstr.observedAttributes = Object.keys(cmpMeta.$watchers$).map((attrName) => {
-        // Do some special stuff if this is a "member"
-        const member = members.find(([name]) => name === attrName);
-        if (member) {
-          const propName = member[1][1] ?? attrName;
-          attrNameToPropName.set(attrName, propName);
+      Cstr.observedAttributes = Array.from(
+        new Set([
+          ...Object.keys(cmpMeta.$watchers$ ?? {}),
+          ...members
+            .filter(([_, m]) => m[0] & MEMBER_FLAGS.HasAttribute)
+            .map(([propName, m]) => {
+              const attrName = m[1] || propName;
+              attrNameToPropName.set(attrName, propName);
+              if (BUILD.reflect && m[0] & MEMBER_FLAGS.ReflectAttr) {
+                cmpMeta.$attrsToReflect$.push([propName, attrName]);
+              }
 
-          if (BUILD.reflect && member[1][0] & MEMBER_FLAGS.ReflectAttr) {
-            cmpMeta.$attrsToReflect$.push([attrName, propName]);
-          }
-
-          attrName = propName;
-        }
-
-        return attrName;
-      });
+              return attrName;
+            }),
+        ]),
+      );
     }
   }
 
