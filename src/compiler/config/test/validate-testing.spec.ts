@@ -395,12 +395,12 @@ describe('validateTesting', () => {
       expect(config.testing.allowableMismatchedPixels).toBe(pixelCount);
       expect(diagnostics).toHaveLength(1);
       expect(diagnostics[0]).toEqual({
-        absFilePath: null,
+        absFilePath: undefined,
         header: 'Build Error',
         level: 'error',
         lines: [],
         messageText: 'allowableMismatchedPixels must be a value that is 0 or greater',
-        relFilePath: null,
+        relFilePath: undefined,
         type: 'build',
       });
     });
@@ -446,12 +446,12 @@ describe('validateTesting', () => {
         expect(config.testing.allowableMismatchedRatio).toBe(allowableMismatchedRatio);
         expect(diagnostics).toHaveLength(1);
         expect(diagnostics[0]).toEqual({
-          absFilePath: null,
+          absFilePath: undefined,
           header: 'Build Error',
           level: 'error',
           lines: [],
           messageText: 'allowableMismatchedRatio must be a value ranging from 0 to 1',
-          relFilePath: null,
+          relFilePath: undefined,
           type: 'build',
         });
       },
@@ -493,12 +493,12 @@ describe('validateTesting', () => {
         expect(config.testing.pixelmatchThreshold).toBe(pixelmatchThreshold);
         expect(diagnostics).toHaveLength(1);
         expect(diagnostics[0]).toEqual({
-          absFilePath: null,
+          absFilePath: undefined,
           header: 'Build Error',
           level: 'error',
           lines: [],
           messageText: 'pixelmatchThreshold must be a value ranging from 0 to 1',
-          relFilePath: null,
+          relFilePath: undefined,
           type: 'build',
         });
       },
@@ -700,12 +700,12 @@ describe('validateTesting', () => {
       expect(config.testing.waitBeforeScreenshot).toBe(waitBeforeScreenshot);
       expect(diagnostics).toHaveLength(1);
       expect(diagnostics[0]).toEqual({
-        absFilePath: null,
+        absFilePath: undefined,
         header: 'Build Error',
         level: 'error',
         lines: [],
         messageText: 'waitBeforeScreenshot must be a value that is 0 or greater',
-        relFilePath: null,
+        relFilePath: undefined,
         type: 'build',
       });
     });

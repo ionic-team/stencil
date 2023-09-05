@@ -114,14 +114,14 @@ describe('load config', () => {
       const loadedConfig = await loadConfig({ configPath: noTsConfigPath });
       expect(loadedConfig.diagnostics).toHaveLength(1);
       expect<d.Diagnostic>(loadedConfig.diagnostics[0]).toEqual({
-        absFilePath: null,
+        absFilePath: undefined,
         header: 'Missing tsconfig.json',
         level: 'error',
         lines: [],
         messageText: `Unable to load TypeScript config file. Please create a "tsconfig.json" file within the "./${path.dirname(
           noTsConfigPath,
         )}" directory.`,
-        relFilePath: null,
+        relFilePath: undefined,
         type: 'build',
       });
     });
@@ -132,14 +132,14 @@ describe('load config', () => {
       const loadConfigResults = await loadConfig();
       expect(loadConfigResults.diagnostics).toHaveLength(1);
       expect<d.Diagnostic>(loadConfigResults.diagnostics[0]).toEqual({
-        absFilePath: null,
+        absFilePath: undefined,
         header: 'Missing tsconfig.json',
         level: 'error',
         lines: [],
         messageText: expect.stringMatching(
           `Unable to load TypeScript config file. Please create a "tsconfig.json" file within the`,
         ),
-        relFilePath: null,
+        relFilePath: undefined,
         type: 'build',
       });
     });
