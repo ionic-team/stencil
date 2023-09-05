@@ -166,9 +166,13 @@ export interface BuildConditionals extends Partial<BuildFeatures> {
   lazyLoad?: boolean;
   profile?: boolean;
   constructableCSS?: boolean;
+  // TODO(STENCIL-914): remove this option when `experimentalSlotFixes` is the default behavior
   appendChildSlotFix?: boolean;
+  // TODO(STENCIL-914): remove this option when `experimentalSlotFixes` is the default behavior
   slotChildNodesFix?: boolean;
+  // TODO(STENCIL-914): remove this option when `experimentalSlotFixes` is the default behavior
   scopedSlotTextContentFix?: boolean;
+  // TODO(STENCIL-914): remove this option when `experimentalSlotFixes` is the default behavior
   cloneNodeFix?: boolean;
   hydratedAttribute?: boolean;
   hydratedClass?: boolean;
@@ -179,6 +183,9 @@ export interface BuildConditionals extends Partial<BuildFeatures> {
   asyncQueue?: boolean;
   transformTagName?: boolean;
   attachStyles?: boolean;
+
+  // TODO(STENCIL-914): remove this option when `experimentalSlotFixes` is the default behavior
+  patchPseudoShadowDom?: boolean;
 }
 
 export type ModuleFormat =

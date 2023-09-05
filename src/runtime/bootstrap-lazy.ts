@@ -5,7 +5,13 @@ import { CMP_FLAGS, queryNonceMetaTagContent } from '@utils';
 import type * as d from '../declarations';
 import { connectedCallback } from './connected-callback';
 import { disconnectedCallback } from './disconnected-callback';
-import { patchChildSlotNodes, patchCloneNode, patchSlotAppendChild, patchTextContent } from './dom-extras';
+import {
+  patchChildSlotNodes,
+  patchCloneNode,
+  patchPseudoShadowDom,
+  patchSlotAppendChild,
+  patchTextContent,
+} from './dom-extras';
 import { hmrStart } from './hmr-component';
 import { createTime, installDevTools } from './profile';
 import { proxyComponent } from './proxy-component';
@@ -108,9 +114,6 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
               (self as any).shadowRoot = self;
             }
           }
-          if (BUILD.slotChildNodesFix) {
-            patchChildSlotNodes(self, cmpMeta);
-          }
         }
 
         connectedCallback() {
@@ -135,22 +138,29 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
         }
       };
 
-      if (BUILD.cloneNodeFix) {
-        patchCloneNode(HostElement.prototype);
-      }
-
-      if (BUILD.appendChildSlotFix) {
-        patchSlotAppendChild(HostElement.prototype);
+      // TODO(STENCIL-914): this check and `else` block can go away and be replaced by just `BUILD.scoped` once we
+      // default our pseudo-slot behavior
+      if (BUILD.patchPseudoShadowDom && BUILD.scoped) {
+        patchPseudoShadowDom(HostElement.prototype, cmpMeta);
+      } else {
+        if (BUILD.slotChildNodesFix) {
+          patchChildSlotNodes(HostElement.prototype, cmpMeta);
+        }
+        if (BUILD.cloneNodeFix) {
+          patchCloneNode(HostElement.prototype);
+        }
+        if (BUILD.appendChildSlotFix) {
+          patchSlotAppendChild(HostElement.prototype);
+        }
+        if (BUILD.scopedSlotTextContentFix) {
+          patchTextContent(HostElement.prototype, cmpMeta);
+        }
       }
 
       if (BUILD.hotModuleReplacement) {
         (HostElement as any).prototype['s-hmr'] = function (hmrVersionId: string) {
           hmrStart(this, cmpMeta, hmrVersionId);
         };
-      }
-
-      if (BUILD.scopedSlotTextContentFix) {
-        patchTextContent(HostElement.prototype, cmpMeta);
       }
 
       cmpMeta.$lazyBundleId$ = lazyBundle[0];

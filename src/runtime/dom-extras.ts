@@ -6,7 +6,22 @@ import { CMP_FLAGS, HOST_FLAGS } from '@utils';
 import type * as d from '../declarations';
 import { PLATFORM_FLAGS } from './runtime-constants';
 
-export const patchCloneNode = (HostElementPrototype: any) => {
+export const patchPseudoShadowDom = (
+  hostElementPrototype: HTMLElement,
+  descriptorPrototype: d.ComponentRuntimeMeta,
+) => {
+  patchCloneNode(hostElementPrototype);
+  patchSlotAppendChild(hostElementPrototype);
+  patchSlotAppend(hostElementPrototype);
+  patchSlotPrepend(hostElementPrototype);
+  patchSlotInsertAdjacentElement(hostElementPrototype);
+  patchSlotInsertAdjacentHTML(hostElementPrototype);
+  patchSlotInsertAdjacentText(hostElementPrototype);
+  patchTextContent(hostElementPrototype, descriptorPrototype);
+  patchChildSlotNodes(hostElementPrototype, descriptorPrototype);
+};
+
+export const patchCloneNode = (HostElementPrototype: HTMLElement) => {
   const orgCloneNode = HostElementPrototype.cloneNode;
 
   HostElementPrototype.cloneNode = function (deep?: boolean) {
@@ -66,6 +81,127 @@ export const patchSlotAppendChild = (HostElementPrototype: any) => {
 };
 
 /**
+ * Patches the `prepend` method for a slotted node inside a scoped component.
+ *
+ * @param HostElementPrototype the `Element` to be patched
+ */
+export const patchSlotPrepend = (HostElementPrototype: HTMLElement) => {
+  const originalPrepend = HostElementPrototype.prepend;
+
+  HostElementPrototype.prepend = function (this: d.HostElement, ...newChildren: (d.RenderNode | string)[]) {
+    newChildren.forEach((newChild: d.RenderNode | string) => {
+      if (typeof newChild === 'string') {
+        newChild = this.ownerDocument.createTextNode(newChild) as unknown as d.RenderNode;
+      }
+      const slotName = (newChild['s-sn'] = getSlotName(newChild));
+      const slotNode = getHostSlotNode(this.childNodes, slotName);
+      if (slotNode) {
+        const slotPlaceholder: d.RenderNode = document.createTextNode('') as any;
+        slotPlaceholder['s-nr'] = newChild;
+        (slotNode['s-cr'].parentNode as any).__appendChild(slotPlaceholder);
+        newChild['s-ol'] = slotPlaceholder;
+
+        const slotChildNodes = getHostSlotChildNodes(slotNode, slotName);
+        const appendAfter = slotChildNodes[0];
+        return appendAfter.parentNode.insertBefore(newChild, appendAfter.nextSibling);
+      }
+
+      if (newChild.nodeType === 1 && !!newChild.getAttribute('slot')) {
+        newChild.hidden = true;
+      }
+
+      return originalPrepend.call(this, newChild);
+    });
+  };
+};
+
+/**
+ * Patches the `append` method for a slotted node inside a scoped component. The patched method uses
+ * `appendChild` under-the-hood while creating text nodes for any new children that passed as bare strings.
+ *
+ * @param HostElementPrototype the `Element` to be patched
+ */
+export const patchSlotAppend = (HostElementPrototype: HTMLElement) => {
+  HostElementPrototype.append = function (this: d.HostElement, ...newChildren: (d.RenderNode | string)[]) {
+    newChildren.forEach((newChild: d.RenderNode | string) => {
+      if (typeof newChild === 'string') {
+        newChild = this.ownerDocument.createTextNode(newChild) as unknown as d.RenderNode;
+      }
+      this.appendChild(newChild);
+    });
+  };
+};
+
+/**
+ * Patches the `insertAdjacentHTML` method for a slotted node inside a scoped component. Specifically,
+ * we only need to patch the behavior for the specific `beforeend` and `afterbegin` positions so the element
+ * gets inserted into the DOM in the correct location.
+ *
+ * @param HostElementPrototype the `Element` to be patched
+ */
+export const patchSlotInsertAdjacentHTML = (HostElementPrototype: HTMLElement) => {
+  const originalInsertAdjacentHtml = HostElementPrototype.insertAdjacentHTML;
+
+  HostElementPrototype.insertAdjacentHTML = function (this: d.HostElement, position: InsertPosition, text: string) {
+    if (position !== 'afterbegin' && position !== 'beforeend') {
+      return originalInsertAdjacentHtml.call(this, position, text);
+    }
+    const container = this.ownerDocument.createElement('_');
+    let node: d.RenderNode;
+    container.innerHTML = text;
+
+    if (position === 'afterbegin') {
+      while ((node = container.firstChild as d.RenderNode)) {
+        this.prepend(node);
+      }
+    } else if (position === 'beforeend') {
+      while ((node = container.firstChild as d.RenderNode)) {
+        this.append(node);
+      }
+    }
+  };
+};
+
+/**
+ * Patches the `insertAdjacentText` method for a slotted node inside a scoped component. Specifically,
+ * we only need to patch the behavior for the specific `beforeend` and `afterbegin` positions so the text node
+ * gets inserted into the DOM in the correct location.
+ *
+ * @param HostElementPrototype the `Element` to be patched
+ */
+export const patchSlotInsertAdjacentText = (HostElementPrototype: HTMLElement) => {
+  HostElementPrototype.insertAdjacentText = function (this: d.HostElement, position: InsertPosition, text: string) {
+    this.insertAdjacentHTML(position, text);
+  };
+};
+
+/**
+ * Patches the `insertAdjacentElement` method for a slotted node inside a scoped component. Specifically,
+ * we only need to patch the behavior for the specific `beforeend` and `afterbegin` positions so the element
+ * gets inserted into the DOM in the correct location.
+ *
+ * @param HostElementPrototype the `Element` to be patched
+ */
+export const patchSlotInsertAdjacentElement = (HostElementPrototype: HTMLElement) => {
+  const originalInsertAdjacentElement = HostElementPrototype.insertAdjacentElement;
+
+  HostElementPrototype.insertAdjacentElement = function (
+    this: d.HostElement,
+    position: InsertPosition,
+    element: d.RenderNode,
+  ) {
+    if (position !== 'afterbegin' && position !== 'beforeend') {
+      return originalInsertAdjacentElement.call(this, position, element);
+    }
+    if (position === 'afterbegin') {
+      this.prepend(element);
+    } else if (position === 'beforeend') {
+      this.append(element);
+    }
+  };
+};
+
+/**
  * Patches the text content of an unnamed slotted node inside a scoped component
  * @param hostElementPrototype the `Element` to be patched
  * @param cmpMeta component runtime metadata used to determine if the component should be patched or not
@@ -119,7 +255,7 @@ export const patchTextContent = (hostElementPrototype: HTMLElement, cmpMeta: d.C
   }
 };
 
-export const patchChildSlotNodes = (elm: any, cmpMeta: d.ComponentRuntimeMeta) => {
+export const patchChildSlotNodes = (elm: HTMLElement, cmpMeta: d.ComponentRuntimeMeta) => {
   class FakeNodeList extends Array {
     item(n: number) {
       return this[n];
@@ -127,7 +263,7 @@ export const patchChildSlotNodes = (elm: any, cmpMeta: d.ComponentRuntimeMeta) =
   }
   // TODO(STENCIL-854): Remove code related to legacy shadowDomShim field
   if (cmpMeta.$flags$ & CMP_FLAGS.needsShadowDomShim) {
-    const childNodesFn = elm.__lookupGetter__('childNodes');
+    const childNodesFn = (elm as any).__lookupGetter__('childNodes');
 
     Object.defineProperty(elm, 'children', {
       get() {
@@ -143,7 +279,7 @@ export const patchChildSlotNodes = (elm: any, cmpMeta: d.ComponentRuntimeMeta) =
 
     Object.defineProperty(elm, 'childNodes', {
       get() {
-        const childNodes = childNodesFn.call(this);
+        const childNodes = childNodesFn.call(this) as NodeListOf<d.RenderNode>;
         if (
           (plt.$flags$ & PLATFORM_FLAGS.isTmpDisconnected) === 0 &&
           getHostRef(this).$flags$ & HOST_FLAGS.hasRendered

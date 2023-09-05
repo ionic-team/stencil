@@ -1,0 +1,69 @@
+<!doctype html>
+<meta charset="utf8" />
+<script src="./build/testapp.esm.js" type="module"></script>
+<script src="./build/testapp.js" nomodule></script>
+
+<scoped-slot-child-insert-adjacent>
+  <p>I am slotted and will receive a red background</p>
+</scoped-slot-child-insert-adjacent>
+
+<button type="button" id="addInsertAdjacentHtmlBeforeEnd">add via insertAdjacentHTML (beforeend)</button>
+<button type="button" id="addInsertAdjacentHtmlAfterBegin">add via insertAdjacentHTML (afterbegin)</button>
+
+<button type="button" id="addInsertAdjacentTextBeforeEnd">add via insertAdjacentText (beforeend)</button>
+<button type="button" id="addInsertAdjacentTextAfterBegin">add via insertAdjacentText (afterbegin)</button>
+
+<button type="button" id="addInsertAdjacentElementBeforeEnd">add via insertAdjacentElement (beforeend)</button>
+<button type="button" id="addInsertAdjacentElementAfterBegin">add via insertAdjacentElement (afterbegin)</button>
+
+<script>
+  var scopedSlotChildInsertAdjacent = document.querySelector('scoped-slot-child-insert-adjacent');
+
+  // Event listeners for `insertAdjacentHtml`
+  var addInsertAdjacentHtmlBeforeEnd = document.querySelector('#addInsertAdjacentHtmlBeforeEnd');
+  addInsertAdjacentHtmlBeforeEnd.addEventListener('click', () => {
+    scopedSlotChildInsertAdjacent.insertAdjacentHTML(
+      'beforeend',
+      `<p>Added via insertAdjacentHTMLBeforeEnd. I should have a red background.</p>`,
+    );
+  });
+  var addInsertAdjacentHtmlAfterBegin = document.querySelector('#addInsertAdjacentHtmlAfterBegin');
+  addInsertAdjacentHtmlAfterBegin.addEventListener('click', () => {
+    scopedSlotChildInsertAdjacent.insertAdjacentHTML(
+      'afterbegin',
+      `<p>Added via insertAdjacentHTMLAfterBegin. I should have a red background.</p>`,
+    );
+  });
+
+  // Event listeners for `insertAdjacentText`
+  var addInsertAdjacentTextBeforeEnd = document.querySelector('#addInsertAdjacentTextBeforeEnd');
+  addInsertAdjacentTextBeforeEnd.addEventListener('click', () => {
+    scopedSlotChildInsertAdjacent.insertAdjacentText(
+      'beforeend',
+      `Added via insertAdjacentTextBeforeEnd. I should have a red background.`,
+    );
+  });
+  var addInsertAdjacentTextAfterBegin = document.querySelector('#addInsertAdjacentTextAfterBegin');
+  addInsertAdjacentTextAfterBegin.addEventListener('click', () => {
+    scopedSlotChildInsertAdjacent.insertAdjacentText(
+      'afterbegin',
+      `Added via insertAdjacentTextAfterBegin. I should have a red background.`,
+    );
+  });
+
+  // Event listeners for `insertAdjacentElement`
+  var addInsertAdjacentElementBeforeEnd = document.querySelector('#addInsertAdjacentElementBeforeEnd');
+  addInsertAdjacentElementBeforeEnd.addEventListener('click', () => {
+    const el = document.createElement('span');
+    el.textContent = 'Added via insertAdjacentElementBeforeEnd. I should have a red background.';
+
+    scopedSlotChildInsertAdjacent.insertAdjacentElement('beforeend', el);
+  });
+  var addInsertAdjacentElementAfterBegin = document.querySelector('#addInsertAdjacentElementAfterBegin');
+  addInsertAdjacentElementAfterBegin.addEventListener('click', () => {
+    const el = document.createElement('span');
+    el.textContent = 'Added via insertAdjacentElementAfterBegin. I should have a red background.';
+
+    scopedSlotChildInsertAdjacent.insertAdjacentElement('afterbegin', el);
+  });
+</script>

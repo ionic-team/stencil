@@ -10,8 +10,6 @@ import { TestEventDetail } from "./event-custom-type/cmp";
 export { SomeTypes } from "./util";
 export { TestEventDetail } from "./event-custom-type/cmp";
 export namespace Components {
-    interface AppendChild {
-    }
     interface AttributeBasic {
         "customAttr": string;
         "multiWord": string;
@@ -221,6 +219,10 @@ export namespace Components {
     }
     interface ScopedBasicRoot {
     }
+    interface ScopedSlotAppendAndPrepend {
+    }
+    interface ScopedSlotChildInsertAdjacent {
+    }
     interface ShadowDomArray {
         "values": number[];
     }
@@ -370,12 +372,6 @@ export interface LifecycleBasicCCustomEvent<T> extends CustomEvent<T> {
     target: HTMLLifecycleBasicCElement;
 }
 declare global {
-    interface HTMLAppendChildElement extends Components.AppendChild, HTMLStencilElement {
-    }
-    var HTMLAppendChildElement: {
-        prototype: HTMLAppendChildElement;
-        new (): HTMLAppendChildElement;
-    };
     interface HTMLAttributeBasicElement extends Components.AttributeBasic, HTMLStencilElement {
     }
     var HTMLAttributeBasicElement: {
@@ -862,6 +858,18 @@ declare global {
         prototype: HTMLScopedBasicRootElement;
         new (): HTMLScopedBasicRootElement;
     };
+    interface HTMLScopedSlotAppendAndPrependElement extends Components.ScopedSlotAppendAndPrepend, HTMLStencilElement {
+    }
+    var HTMLScopedSlotAppendAndPrependElement: {
+        prototype: HTMLScopedSlotAppendAndPrependElement;
+        new (): HTMLScopedSlotAppendAndPrependElement;
+    };
+    interface HTMLScopedSlotChildInsertAdjacentElement extends Components.ScopedSlotChildInsertAdjacent, HTMLStencilElement {
+    }
+    var HTMLScopedSlotChildInsertAdjacentElement: {
+        prototype: HTMLScopedSlotChildInsertAdjacentElement;
+        new (): HTMLScopedSlotChildInsertAdjacentElement;
+    };
     interface HTMLShadowDomArrayElement extends Components.ShadowDomArray, HTMLStencilElement {
     }
     var HTMLShadowDomArrayElement: {
@@ -1175,7 +1183,6 @@ declare global {
         new (): HTMLTag88Element;
     };
     interface HTMLElementTagNameMap {
-        "append-child": HTMLAppendChildElement;
         "attribute-basic": HTMLAttributeBasicElement;
         "attribute-basic-root": HTMLAttributeBasicRootElement;
         "attribute-boolean": HTMLAttributeBooleanElement;
@@ -1257,6 +1264,8 @@ declare global {
         "sass-cmp": HTMLSassCmpElement;
         "scoped-basic": HTMLScopedBasicElement;
         "scoped-basic-root": HTMLScopedBasicRootElement;
+        "scoped-slot-append-and-prepend": HTMLScopedSlotAppendAndPrependElement;
+        "scoped-slot-child-insert-adjacent": HTMLScopedSlotChildInsertAdjacentElement;
         "shadow-dom-array": HTMLShadowDomArrayElement;
         "shadow-dom-array-root": HTMLShadowDomArrayRootElement;
         "shadow-dom-basic": HTMLShadowDomBasicElement;
@@ -1312,8 +1321,6 @@ declare global {
     }
 }
 declare namespace LocalJSX {
-    interface AppendChild {
-    }
     interface AttributeBasic {
         "customAttr"?: string;
         "multiWord"?: string;
@@ -1530,6 +1537,10 @@ declare namespace LocalJSX {
     }
     interface ScopedBasicRoot {
     }
+    interface ScopedSlotAppendAndPrepend {
+    }
+    interface ScopedSlotChildInsertAdjacent {
+    }
     interface ShadowDomArray {
         "values"?: number[];
     }
@@ -1650,7 +1661,6 @@ declare namespace LocalJSX {
     interface Tag88 {
     }
     interface IntrinsicElements {
-        "append-child": AppendChild;
         "attribute-basic": AttributeBasic;
         "attribute-basic-root": AttributeBasicRoot;
         "attribute-boolean": AttributeBoolean;
@@ -1732,6 +1742,8 @@ declare namespace LocalJSX {
         "sass-cmp": SassCmp;
         "scoped-basic": ScopedBasic;
         "scoped-basic-root": ScopedBasicRoot;
+        "scoped-slot-append-and-prepend": ScopedSlotAppendAndPrepend;
+        "scoped-slot-child-insert-adjacent": ScopedSlotChildInsertAdjacent;
         "shadow-dom-array": ShadowDomArray;
         "shadow-dom-array-root": ShadowDomArrayRoot;
         "shadow-dom-basic": ShadowDomBasic;
@@ -1790,7 +1802,6 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
-            "append-child": LocalJSX.AppendChild & JSXBase.HTMLAttributes<HTMLAppendChildElement>;
             "attribute-basic": LocalJSX.AttributeBasic & JSXBase.HTMLAttributes<HTMLAttributeBasicElement>;
             "attribute-basic-root": LocalJSX.AttributeBasicRoot & JSXBase.HTMLAttributes<HTMLAttributeBasicRootElement>;
             "attribute-boolean": LocalJSX.AttributeBoolean & JSXBase.HTMLAttributes<HTMLAttributeBooleanElement>;
@@ -1872,6 +1883,8 @@ declare module "@stencil/core" {
             "sass-cmp": LocalJSX.SassCmp & JSXBase.HTMLAttributes<HTMLSassCmpElement>;
             "scoped-basic": LocalJSX.ScopedBasic & JSXBase.HTMLAttributes<HTMLScopedBasicElement>;
             "scoped-basic-root": LocalJSX.ScopedBasicRoot & JSXBase.HTMLAttributes<HTMLScopedBasicRootElement>;
+            "scoped-slot-append-and-prepend": LocalJSX.ScopedSlotAppendAndPrepend & JSXBase.HTMLAttributes<HTMLScopedSlotAppendAndPrependElement>;
+            "scoped-slot-child-insert-adjacent": LocalJSX.ScopedSlotChildInsertAdjacent & JSXBase.HTMLAttributes<HTMLScopedSlotChildInsertAdjacentElement>;
             "shadow-dom-array": LocalJSX.ShadowDomArray & JSXBase.HTMLAttributes<HTMLShadowDomArrayElement>;
             "shadow-dom-array-root": LocalJSX.ShadowDomArrayRoot & JSXBase.HTMLAttributes<HTMLShadowDomArrayRootElement>;
             "shadow-dom-basic": LocalJSX.ShadowDomBasic & JSXBase.HTMLAttributes<HTMLShadowDomBasicElement>;
