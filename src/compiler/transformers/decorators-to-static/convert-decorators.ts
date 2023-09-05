@@ -119,7 +119,7 @@ const visitClassDeclaration = (
       filteredMethodsAndFields,
     );
     elementDecoratorsToStatic(diagnostics, decoratedMembers, typeChecker, filteredMethodsAndFields);
-    watchDecoratorsToStatic(config, diagnostics, decoratedMembers, watchable, filteredMethodsAndFields);
+    watchDecoratorsToStatic(decoratedMembers, filteredMethodsAndFields);
     listenDecoratorsToStatic(diagnostics, decoratedMembers, filteredMethodsAndFields);
   }
 

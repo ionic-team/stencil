@@ -5,16 +5,8 @@ import type * as d from '../../../declarations';
 import { convertValueToLiteral, createStaticGetter, retrieveTsDecorators } from '../transform-utils';
 import { getDeclarationParameters, isDecoratorNamed } from './decorator-utils';
 
-export const watchDecoratorsToStatic = (
-  config: d.Config,
-  diagnostics: d.Diagnostic[],
-  decoratedProps: ts.ClassElement[],
-  watchable: Set<string>,
-  newMembers: ts.ClassElement[],
-) => {
-  const watchers = decoratedProps
-    .filter(ts.isMethodDeclaration)
-    .map((method) => parseWatchDecorator(config, diagnostics, watchable, method));
+export const watchDecoratorsToStatic = (decoratedProps: ts.ClassElement[], newMembers: ts.ClassElement[]) => {
+  const watchers = decoratedProps.filter(ts.isMethodDeclaration).map((method) => parseWatchDecorator(method));
 
   const flatWatchers = flatOne(watchers);
 
@@ -23,12 +15,7 @@ export const watchDecoratorsToStatic = (
   }
 };
 
-const parseWatchDecorator = (
-  _config: d.Config,
-  _diagnostics: d.Diagnostic[],
-  _watchable: Set<string>,
-  method: ts.MethodDeclaration,
-): d.ComponentCompilerWatch[] => {
+const parseWatchDecorator = (method: ts.MethodDeclaration): d.ComponentCompilerWatch[] => {
   const methodName = method.name.getText();
   const decorators = retrieveTsDecorators(method) ?? [];
   return decorators.filter(isDecoratorNamed('Watch')).map((decorator) => {
