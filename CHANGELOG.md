@@ -1,3 +1,13 @@
+# 🐸 [4.2.0-0](https://github.com/ionic-team/stencil/compare/v4.1.0...v4.2.0-0) (2023-09-05)
+
+
+### Bug Fixes
+
+* **compiler:** resolve implicit enum types ([#4739](https://github.com/ionic-team/stencil/issues/4739)) ([f5a3bd8](https://github.com/ionic-team/stencil/commit/f5a3bd8739a4b9eab3b8b9b1f9c808c47b2aa4fc))
+* **runtime:** patch methods for scoped slot `append`, `prepend`, and `insertAdjacent` ([#4719](https://github.com/ionic-team/stencil/issues/4719)) ([1d98462](https://github.com/ionic-team/stencil/commit/1d98462135a196b9d9037dd46f0e7fe55d108496))
+
+
+
 # 🐟 [4.1.0](https://github.com/ionic-team/stencil/compare/v4.0.5...v4.1.0) (2023-08-21)
 
 
