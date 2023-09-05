@@ -149,10 +149,12 @@ export const proxyComponent = (
               flags & HOST_FLAGS.isWatchReady &&
               newValue !== oldValue
             ) {
+              const elm = BUILD.lazyLoad ? hostRef.$hostElement$ : this;
+              const instance = BUILD.lazyLoad ? hostRef.$lazyInstance$ : (elm as any);
               const entry = cmpMeta.$watchers$[attrName];
               entry?.forEach((callbackName) => {
-                if (this[callbackName] != null) {
-                  this[callbackName].call(this, newValue, oldValue, attrName);
+                if (instance[callbackName] != null) {
+                  instance[callbackName].call(this, newValue, oldValue, attrName);
                 }
               });
             }

@@ -1386,6 +1386,9 @@ export type ComponentRuntimeMetaCompact = [
 
   /** listeners */
   ComponentRuntimeHostListener[]?,
+
+  /** watchers */
+  ComponentConstructorWatchers?,
 ];
 
 /**
