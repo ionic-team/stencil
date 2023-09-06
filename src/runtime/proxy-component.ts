@@ -154,7 +154,7 @@ export const proxyComponent = (
               const entry = cmpMeta.$watchers$[attrName];
               entry?.forEach((callbackName) => {
                 if (instance[callbackName] != null) {
-                  instance[callbackName].call(this, newValue, oldValue, attrName);
+                  instance[callbackName].call(instance, newValue, oldValue, attrName);
                 }
               });
             }
