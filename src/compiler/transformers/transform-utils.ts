@@ -1046,3 +1046,41 @@ const createConstructorBodyWithSuper = (): ts.ExpressionStatement => {
     ts.factory.createCallExpression(ts.factory.createIdentifier('super'), undefined, undefined),
   );
 };
+
+/**
+ * Given a {@link ts.PropertyDeclaration} node get its name as a string
+ *
+ * @param node a property decl node
+ * @returns the name of the property in string form
+ */
+export const tsPropDeclNameAsString = (node: ts.PropertyDeclaration): string => {
+  const declarationName: ts.DeclarationName = ts.getNameOfDeclaration(node);
+
+  // The name of a class field declaration can be a computed property name,
+  // like so:
+  //
+  // ```ts
+  // const argName = "arghhh"
+  //
+  // class MyClass {
+  //   [argName] = "best property around";
+  // }
+  // ```
+  //
+  // In this case we need to get the expression which evaluates to some
+  // valid property name and call `.getText` on it. In the case that it's
+  // _not_ a computed property name, like
+  //
+  // ```ts
+  // class MyClass {
+  //   argName = "best property around";
+  // }
+  // ```
+  //
+  // we can just call `.getText` on the name itself.
+  const memberName =
+    declarationName.kind === ts.SyntaxKind.ComputedPropertyName
+      ? declarationName.expression.getText()
+      : declarationName.getText();
+  return memberName;
+};

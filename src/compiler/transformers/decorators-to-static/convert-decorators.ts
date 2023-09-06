@@ -2,7 +2,12 @@ import { augmentDiagnosticWithNode, buildError } from '@utils';
 import ts from 'typescript';
 
 import type * as d from '../../../declarations';
-import { retrieveTsDecorators, retrieveTsModifiers, updateConstructor } from '../transform-utils';
+import {
+  retrieveTsDecorators,
+  retrieveTsModifiers,
+  tsPropDeclNameAsString,
+  updateConstructor,
+} from '../transform-utils';
 import { componentDecoratorToStatic } from './component-decorator';
 import { isDecoratorNamed } from './decorator-utils';
 import {
@@ -349,34 +354,7 @@ function handleClassFields(classNode: ts.ClassDeclaration, classMembers: ts.Clas
 
   for (const member of classMembers) {
     if (shouldInitializeInConstructor(member) && ts.isPropertyDeclaration(member)) {
-      const declarationName: ts.DeclarationName = ts.getNameOfDeclaration(member);
-
-      // The name of a class field declaration can be a computed property name,
-      // like so:
-      //
-      // ```ts
-      // const argName = "arghhh"
-      //
-      // class MyClass {
-      //   [argName] = "best property around";
-      // }
-      // ```
-      //
-      // In this case we need to get the expression which evaluates to some
-      // valid property name and call `.getText` on it. In the case that it's
-      // _not_ a computed property name, like
-      //
-      // ```ts
-      // class MyClass {
-      //   argName = "best property around";
-      // }
-      // ```
-      //
-      // we can just call `.getText` on the name itself.
-      const memberName =
-        declarationName.kind === ts.SyntaxKind.ComputedPropertyName
-          ? declarationName.expression.getText()
-          : declarationName.getText();
+      const memberName = tsPropDeclNameAsString(member);
 
       // this is a class field that we'll need to handle, so lets push a statement for
       // initializing the value onto our statements list
