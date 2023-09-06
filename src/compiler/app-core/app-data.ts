@@ -163,16 +163,17 @@ export const updateBuildConditionals = (config: ValidatedConfig, b: BuildConditi
   b.asyncLoading = !!(b.asyncLoading || b.lazyLoad || b.taskQueue || b.initializeNextTick);
   b.cssAnnotations = true;
   // TODO(STENCIL-914): remove this option when `experimentalSlotFixes` is the default behavior
-  b.appendChildSlotFix = config.extras.appendChildSlotFix;
+  b.appendChildSlotFix = config.extras.experimentalSlotFixes === true ? true : config.extras.appendChildSlotFix;
   // TODO(STENCIL-914): remove this option when `experimentalSlotFixes` is the default behavior
-  b.slotChildNodesFix = config.extras.slotChildNodesFix;
+  b.slotChildNodesFix = config.extras.experimentalSlotFixes === true ? true : config.extras.slotChildNodesFix;
   // TODO(STENCIL-914): remove this option when `experimentalSlotFixes` is the default behavior
   b.patchPseudoShadowDom = config.extras.experimentalSlotFixes;
   // TODO(STENCIL-914): remove this option when `experimentalSlotFixes` is the default behavior
-  b.cloneNodeFix = config.extras.cloneNodeFix;
+  b.cloneNodeFix = config.extras.experimentalSlotFixes === true ? true : config.extras.cloneNodeFix;
   b.lifecycleDOMEvents = !!(b.isDebug || config._isTesting || config.extras.lifecycleDOMEvents);
   // TODO(STENCIL-914): remove this option when `experimentalSlotFixes` is the default behavior
-  b.scopedSlotTextContentFix = !!config.extras.scopedSlotTextContentFix;
+  b.scopedSlotTextContentFix =
+    config.extras.experimentalSlotFixes === true ? true : config.extras.scopedSlotTextContentFix;
   b.scriptDataOpts = config.extras.scriptDataOpts;
   b.attachStyles = true;
   b.invisiblePrehydration = typeof config.invisiblePrehydration === 'undefined' ? true : config.invisiblePrehydration;
