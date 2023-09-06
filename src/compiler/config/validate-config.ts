@@ -109,6 +109,22 @@ export const validateConfig = (
   validatedConfig.extras.initializeNextTick = !!validatedConfig.extras.initializeNextTick;
   validatedConfig.extras.tagNameTransform = !!validatedConfig.extras.tagNameTransform;
 
+  // TODO(STENCIL-914): remove when `experimentalSlotFixes` is the default behavior
+  // If the user set `experimentalSlotFixes` and any individual slot fix flags, we need to log a warning
+  // to the user that we will "override" the individual flags
+  if (
+    userConfig.extras.experimentalSlotFixes === true &&
+    ((userConfig.extras as any).appendChildSlotFix === true ||
+      (userConfig.extras as any).cloneNodeFix === true ||
+      (userConfig.extras as any).slotChildNodesFix === true ||
+      (userConfig.extras as any).scopedSlotTextContentFix === true)
+  ) {
+    const warning = buildError(diagnostics);
+    warning.level = 'warn';
+    warning.messageText =
+      'The `experimentalSlotFixes` flag cannot be used in combination with other slot fix flags. These individual flags will be ignored. Please update your Stencil config accordingly.';
+  }
+
   // TODO(STENCIL-914): remove `experimentalSlotFixes` when it's the default behavior
   validatedConfig.extras.experimentalSlotFixes = !!validatedConfig.extras.experimentalSlotFixes;
   if (validatedConfig.extras.experimentalSlotFixes === false) {
