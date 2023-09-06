@@ -20,8 +20,8 @@ export const loadRollupDiagnostics = (
     code: rollupError.code,
     header: `Rollup${formattedCode.length > 0 ? ': ' + formattedCode : ''}`,
     messageText: formattedCode,
-    relFilePath: null,
-    absFilePath: null,
+    relFilePath: undefined,
+    absFilePath: undefined,
     lines: [],
   };
 

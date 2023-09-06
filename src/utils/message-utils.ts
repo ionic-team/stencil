@@ -17,8 +17,8 @@ export const buildError = (diagnostics?: d.Diagnostic[]): d.Diagnostic => {
     type: 'build',
     header: 'Build Error',
     messageText: 'build error',
-    relFilePath: null,
-    absFilePath: null,
+    relFilePath: undefined,
+    absFilePath: undefined,
     lines: [],
   };
 
@@ -45,8 +45,6 @@ export const buildWarn = (diagnostics: d.Diagnostic[]): d.Diagnostic => {
     type: 'build',
     header: 'Build Warn',
     messageText: 'build warn',
-    relFilePath: null,
-    absFilePath: null,
     lines: [],
   };
 
@@ -144,8 +142,6 @@ export const catchError = (diagnostics: d.Diagnostic[], err: Error | null | unde
     type: 'build',
     header: 'Build Error',
     messageText: 'build error',
-    relFilePath: null,
-    absFilePath: null,
     lines: [],
   };
 

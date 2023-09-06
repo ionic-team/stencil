@@ -9,12 +9,12 @@ import * as d from '@stencil/core/declarations';
  */
 export const stubDiagnostic = (overrides: Partial<d.Diagnostic> = {}): d.Diagnostic => {
   const defaults: d.Diagnostic = {
-    absFilePath: null,
+    absFilePath: undefined,
     header: 'Mock Error',
     level: 'error',
     lines: [],
     messageText: 'mock error',
-    relFilePath: null,
+    relFilePath: undefined,
     type: 'mock',
   };
 
