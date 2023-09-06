@@ -3,6 +3,14 @@ import ts from 'typescript';
 import type * as d from '../../../declarations';
 import { addCoreRuntimeApi, GET_ELEMENT, RUNTIME_APIS } from '../core-runtime-apis';
 
+/**
+ * If a Stencil component was declared with an `@Element` ref, transform the
+ * class to support this getter.
+ *
+ * @param classMembers an out param which holds class members for the component
+ * @param moduleFile information about the stencil component's home module
+ * @param cmp metadata gathered about the Stencil component during compilation
+ */
 export const addLazyElementGetter = (
   classMembers: ts.ClassElement[],
   moduleFile: d.Module,

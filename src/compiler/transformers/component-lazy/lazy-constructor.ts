@@ -5,6 +5,14 @@ import { addCoreRuntimeApi, REGISTER_INSTANCE, RUNTIME_APIS } from '../core-runt
 import { addCreateEvents } from '../create-event';
 import { retrieveTsModifiers } from '../transform-utils';
 
+/**
+ * Update the constructor for a Stencil component's class in order to prepare
+ * it for lazy-build duty (i.e. to take over a bootstrapped component)
+ *
+ * @param classMembers an out param of class members for the component
+ * @param moduleFile information about the component's home module
+ * @param cmp compiler metadata about the component
+ */
 export const updateLazyComponentConstructor = (
   classMembers: ts.ClassElement[],
   moduleFile: d.Module,
@@ -42,7 +50,18 @@ export const updateLazyComponentConstructor = (
   }
 };
 
-const registerInstanceStatement = (moduleFile: d.Module) => {
+/**
+ * Create a statement containing an expression calling the `registerInstance`
+ * helper with the {@link d.HostRef} argument passed to the lazy element
+ * constructor
+ *
+ * **NOTE** this mutates the `moduleFile` param to add an import of the
+ * `registerInstance` method from the Stencil core component runtime API.
+ *
+ * @param moduleFile information about a module containing a Stencil component
+ * @returns an expression statement for a call to the `registerInstance` helper
+ */
+const registerInstanceStatement = (moduleFile: d.Module): ts.ExpressionStatement => {
   addCoreRuntimeApi(moduleFile, RUNTIME_APIS.registerInstance);
 
   return ts.factory.createExpressionStatement(
