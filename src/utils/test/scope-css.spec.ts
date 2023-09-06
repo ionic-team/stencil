@@ -107,7 +107,7 @@ describe('ShadowCss', function () {
     expect(s(css, 'a')).toEqual(expected);
   });
 
-  // Check that the browser supports unprefixed CSS animation
+  // Check that the browser supports un-prefixed CSS animation
   it('should handle keyframes rules', () => {
     const css = '@keyframes foo {0% {transform:translate(-50%) scaleX(0);}}';
     expect(s(css, 'a')).toEqual(css);

@@ -61,7 +61,7 @@ export const jestPreprocessor = {
     // TODO(STENCIL-306): Drop support for versions of Jest <27
     /**
      * As of Jest 27, `jestConfig` changes its shape (as it's been moved into `transformOptions`). To preserve
-     * backwards compatability, we allow Jest to pass 4 arguments and check the shape of the third and fourth arguments
+     * backwards compatibility, we allow Jest to pass 4 arguments and check the shape of the third and fourth arguments
      * to run Jest properly (in lieu of a global Jest version available to us). Support for this functionality will be
      * removed in a future major version of Stencil.
      */
@@ -137,7 +137,7 @@ export const jestPreprocessor = {
     // TODO(STENCIL-306): Remove support for earlier versions of Jest
     /**
      * As of Jest 27, jestConfigStr is no longer an accepted argument (as it's been moved into `transformOptions`). To
-     * preserve backwards compatability, we allow Jest to pass 4 arguments and check the shape of the third and fourth
+     * preserve backwards compatibility, we allow Jest to pass 4 arguments and check the shape of the third and fourth
      * arguments to run Jest properly (in lieu of a global Jest version available to us). Support for this
      * functionality will be removed in a future major version of Stencil.
      */
@@ -260,7 +260,7 @@ export function shouldTransform(filePath: string, sourceText: string): boolean {
     }
   }
   if (ext === 'css') {
-    // convert a standard css file into an nodejs ready file
+    // convert a standard css file into an NodeJS ready file
     return true;
   }
   return false;

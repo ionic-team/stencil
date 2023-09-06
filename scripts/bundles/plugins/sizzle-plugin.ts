@@ -7,7 +7,7 @@ import type { BuildOptions } from '../../utils/options';
 /**
  * Bundles sizzle, a CSS selector engine, into the Stencil compiler
  * @param opts the options being used during a build of the Stencil compiler
- * @returns the plugin that inlines sizzle
+ * @returns the plugin that in-lines sizzle
  */
 export function sizzlePlugin(opts: BuildOptions): Plugin {
   return {

@@ -51,7 +51,7 @@ export const optimizeModule = async (
   let minifyOpts: MinifyOptions;
   let code = opts.input;
   if (opts.isCore) {
-    // IS_ESM_BUILD is replaced at build time so systemjs and esm builds have diff values
+    // IS_ESM_BUILD is replaced at build time so SystemJS and esm builds have diff values
     // not using the BUILD conditional since rollup would input the same value
     code = code.replace(/\/\* IS_ESM_BUILD \*\//g, '&& false /* IS_SYSTEM_JS_BUILD */');
   }

@@ -8,7 +8,7 @@ let cssProcessor: CssProcessor;
 /**
  * Autoprefix a CSS string, adding vendor prefixes to make sure that what
  * is written in the CSS will render correctly in our range of supported browsers.
- * This function uses PostCSS in compbination with the Autoprefix plugin to
+ * This function uses PostCSS in combination with the Autoprefix plugin to
  * automatically add vendor prefixes based on a list of browsers which we want
  * to support.
  *

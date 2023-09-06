@@ -52,13 +52,13 @@ Empty objects can also be the cause, look for JSX comments that became objects.`
     if (BUILD.isDev && nodeName === 'input') {
       validateInputProperties(vnodeData);
     }
-    // normalize class / classname attributes
     if (BUILD.vdomKey && vnodeData.key) {
       key = vnodeData.key;
     }
     if (BUILD.slotRelocation && vnodeData.name) {
       slotName = vnodeData.name;
     }
+    // normalize class / className attributes
     if (BUILD.vdomClass) {
       const classData = vnodeData.className || vnodeData.class;
       if (classData) {

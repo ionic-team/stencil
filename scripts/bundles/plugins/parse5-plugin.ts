@@ -11,7 +11,7 @@ import { aliasPlugin } from './alias-plugin';
 /**
  * Bundles parse5, an HTML serializer & parser, into the compiler
  * @param opts the options being used during a build of the Stencil compiler
- * @returns the plugin that inlines parse5
+ * @returns the plugin that in-lines parse5
  */
 export function parse5Plugin(opts: BuildOptions): Plugin {
   return {
@@ -62,7 +62,7 @@ export function parse5Plugin(opts: BuildOptions): Plugin {
  * @returns the contents of the file containing parse5
  */
 async function bundleParse5(opts: BuildOptions): Promise<string> {
-  const fileName = `parse5-${opts.parse5Verion.replace(/\./g, '_')}-bundle-cache${opts.isProd ? '.min' : ''}.js`;
+  const fileName = `parse5-${opts.parse5Version.replace(/\./g, '_')}-bundle-cache${opts.isProd ? '.min' : ''}.js`;
   const cacheFile = join(opts.scriptsBuildDir, fileName);
 
   try {
@@ -132,7 +132,7 @@ async function bundleParse5(opts: BuildOptions): Promise<string> {
     code = minified.code;
   }
 
-  code = `// Parse5 ${opts.parse5Verion}\n` + code;
+  code = `// Parse5 ${opts.parse5Version}\n` + code;
 
   await fs.writeFile(cacheFile, code);
 

@@ -311,7 +311,7 @@ async function validateCompiler(opts: BuildOptions): Promise<void> {
 
 /**
  * Validate tree shaking for various modules in the output
- * @param opts build options to be used to validate treeshaking
+ * @param opts build options to be used to validate tree-shaking
  */
 async function validateTreeshaking(opts: BuildOptions) {
   await validateModuleTreeshake(opts, 'app-data', join(opts.output.internalDir, 'app-data', 'index.js'));
@@ -324,8 +324,8 @@ async function validateTreeshaking(opts: BuildOptions) {
 }
 
 /**
- * Validates treeshaking for a single module & entrypoint
- * @param opts build options to be used to validate treeshaking for a specific module
+ * Validates tree-shaking for a single module & entrypoint
+ * @param opts build options to be used to validate tree-shaking for a specific module
  * @param moduleName the module to validate
  * @param entryModulePath the entrypoint to validate
  */

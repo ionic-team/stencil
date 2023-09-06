@@ -147,7 +147,7 @@ export function hydrateApp(
       return elm;
     };
 
-    // ensure we use nodejs's native setTimeout, not the mocked hydrate app scoped one
+    // ensure we use NodeJS's native setTimeout, not the mocked hydrate app scoped one
     tmrId = global.setTimeout(timeoutExceeded, opts.timeout);
 
     plt.$resourcesUrl$ = new URL(opts.resourcesUrl || './', doc.baseURI).href;

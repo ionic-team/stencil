@@ -12,7 +12,7 @@ export const hmrStart = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta, hm
   hostRef.$flags$ = HOST_FLAGS.hasConnected;
 
   // TODO
-  // detatch any event listeners that may have been added
+  // detach any event listeners that may have been added
   // because we're not passing an exact event name it'll
   // remove all of this element's event, which is good
 

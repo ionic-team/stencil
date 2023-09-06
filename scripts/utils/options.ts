@@ -119,7 +119,7 @@ export function createReplaceData(opts: BuildOptions): Record<string, any> {
     autoprefixerPkg.name + autoprefixerPkg.version + '_' + postcssPkg.name + postcssPkg.version + '_' + CACHE_BUSTER;
 
   const parse5Pkg = getPkg(opts, 'parse5');
-  opts.parse5Verion = parse5Pkg.version;
+  opts.parse5Version = parse5Pkg.version;
 
   const sizzlePkg = getPkg(opts, 'sizzle');
   opts.sizzleVersion = sizzlePkg.version;
@@ -190,7 +190,7 @@ export interface BuildOptions {
   tag?: string;
   typescriptVersion?: string;
   rollupVersion?: string;
-  parse5Verion?: string;
+  parse5Version?: string;
   sizzleVersion?: string;
   terserVersion?: string;
   otp?: string;

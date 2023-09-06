@@ -17,7 +17,7 @@ import { formatCode } from './utils';
  *
  * @param component the string of a component
  * @param inputFileName an optional filename to use for the input file
- * @returns the tranpiled module
+ * @returns the transpiled module
  */
 async function pathTransformTranspile(component: string, inputFileName = 'module.tsx') {
   const compilerContext: CompilerCtx = mockCompilerCtx();

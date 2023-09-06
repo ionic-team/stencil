@@ -146,7 +146,7 @@ const hasChangedImportContent = async (
     return true;
   }
 
-  // keep diggin'
+  // keep digging
   const promises = cssImports.map(async (cssImportData) => {
     try {
       const content = await compilerCtx.fs.readFile(cssImportData.filePath);

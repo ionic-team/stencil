@@ -226,7 +226,7 @@ describe('renderer', () => {
         const text = document.createTextNode('Foobar');
         (<any>text).testProperty = function () {
           /**/
-        }; // ensures we dont recreate the Text Node
+        }; // ensures we don't recreate the Text Node
         prevElm.appendChild(text);
         prevElm.appendChild(h2);
 

@@ -42,7 +42,7 @@ export const generateTemplateHtml = async (
     let staticSite = false;
 
     if (prerenderConfig.staticSite) {
-      // purposely do not want any clientside JS
+      // purposely do not want any client-side JS
       // go through the document and remove only stencil's scripts
       removeStencilScripts(doc);
       staticSite = true;

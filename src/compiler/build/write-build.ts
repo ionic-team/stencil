@@ -20,7 +20,7 @@ export const writeBuild = async (
   let totalFilesWrote = 0;
 
   try {
-    // commit all the writeFiles, mkdirs, rmdirs and unlinks to disk
+    // commit all the `writeFile`, `mkdir`, `rmdir` and `unlink` operations to disk
     const commitResults = await compilerCtx.fs.commit();
 
     // get the results from the write to disk commit

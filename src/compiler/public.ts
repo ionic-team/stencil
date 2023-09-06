@@ -24,7 +24,7 @@ export { transpile, transpileSync } from './transpile';
 /**
  * The compiler is the utility that brings together many tools to build optimized components,
  * such as a transpiler, bundler, and minifier, along with many internal optimizations to
- * create small efficient compoennts. When using the CLI, the `stencil build` command uses
+ * create small efficient components. When using the CLI, the `stencil build` command uses
  * the compiler for the various builds, such as a production build, or watch mode during
  * development. If only one file should be transformed then the `transpile()` function
  * should be used instead.
@@ -77,7 +77,7 @@ export declare const optimizeCss: (cssInput?: OptimizeCssInput) => Promise<Optim
 export declare const optimizeJs: (jsInput?: OptimizeJsInput) => Promise<OptimizeJsOutput>;
 
 /**
- * Utility of the `path` API providied by NodeJS, but capable of running in any environment.
+ * Utility of the `path` API provided by NodeJS, but capable of running in any environment.
  */
 export declare const path: PlatformPath;
 

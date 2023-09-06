@@ -153,7 +153,7 @@ async function setupHydrateApp(devServerConfig: d.DevServerConfig, serverCtx: d.
       // ensure we cleared out node's internal require() cache for this file
       const hydrateAppFilePath = path.resolve(buildResults.hydrateAppFilePath);
 
-      // brute force way of clearning node's module cache
+      // brute force way of clearing node's module cache
       // not using `delete require.cache[id]` since it'll cause memory leaks
       require.cache = {};
       const Module = require('module');

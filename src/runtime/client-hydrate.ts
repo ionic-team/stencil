@@ -194,7 +194,7 @@ const clientHydrate = (
           }
         }
       } else if (childVNode.$hostId$ === hostId) {
-        // this comment node is specifcally for this host id
+        // this comment node is specifically for this host id
 
         if (childNodeType === SLOT_NODE_ID) {
           // `${SLOT_NODE_ID}.${hostId}.${nodeId}.${depth}.${index}.${slotName}`;
