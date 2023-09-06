@@ -340,6 +340,8 @@ export namespace Components {
     }
     interface Tag88 {
     }
+    interface WatchNativeAttributes {
+    }
 }
 export interface EsmImportCustomEvent<T> extends CustomEvent<T> {
     detail: T;
@@ -1174,6 +1176,12 @@ declare global {
         prototype: HTMLTag88Element;
         new (): HTMLTag88Element;
     };
+    interface HTMLWatchNativeAttributesElement extends Components.WatchNativeAttributes, HTMLStencilElement {
+    }
+    var HTMLWatchNativeAttributesElement: {
+        prototype: HTMLWatchNativeAttributesElement;
+        new (): HTMLWatchNativeAttributesElement;
+    };
     interface HTMLElementTagNameMap {
         "append-child": HTMLAppendChildElement;
         "attribute-basic": HTMLAttributeBasicElement;
@@ -1309,6 +1317,7 @@ declare global {
         "svg-class": HTMLSvgClassElement;
         "tag-3d-component": HTMLTag3dComponentElement;
         "tag-88": HTMLTag88Element;
+        "watch-native-attributes": HTMLWatchNativeAttributesElement;
     }
 }
 declare namespace LocalJSX {
@@ -1649,6 +1658,8 @@ declare namespace LocalJSX {
     }
     interface Tag88 {
     }
+    interface WatchNativeAttributes {
+    }
     interface IntrinsicElements {
         "append-child": AppendChild;
         "attribute-basic": AttributeBasic;
@@ -1784,6 +1795,7 @@ declare namespace LocalJSX {
         "svg-class": SvgClass;
         "tag-3d-component": Tag3dComponent;
         "tag-88": Tag88;
+        "watch-native-attributes": WatchNativeAttributes;
     }
 }
 export { LocalJSX as JSX };
@@ -1924,6 +1936,7 @@ declare module "@stencil/core" {
             "svg-class": LocalJSX.SvgClass & JSXBase.HTMLAttributes<HTMLSvgClassElement>;
             "tag-3d-component": LocalJSX.Tag3dComponent & JSXBase.HTMLAttributes<HTMLTag3dComponentElement>;
             "tag-88": LocalJSX.Tag88 & JSXBase.HTMLAttributes<HTMLTag88Element>;
+            "watch-native-attributes": LocalJSX.WatchNativeAttributes & JSXBase.HTMLAttributes<HTMLWatchNativeAttributesElement>;
         }
     }
 }
