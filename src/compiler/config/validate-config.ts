@@ -113,11 +113,11 @@ export const validateConfig = (
   // If the user set `experimentalSlotFixes` and any individual slot fix flags, we need to log a warning
   // to the user that we will "override" the individual flags
   if (
-    userConfig.extras.experimentalSlotFixes === true &&
-    ((userConfig.extras as any).appendChildSlotFix === true ||
-      (userConfig.extras as any).cloneNodeFix === true ||
-      (userConfig.extras as any).slotChildNodesFix === true ||
-      (userConfig.extras as any).scopedSlotTextContentFix === true)
+    validatedConfig.extras.experimentalSlotFixes === true &&
+    ((validatedConfig.extras as any).appendChildSlotFix === true ||
+      (validatedConfig.extras as any).cloneNodeFix === true ||
+      (validatedConfig.extras as any).slotChildNodesFix === true ||
+      (validatedConfig.extras as any).scopedSlotTextContentFix === true)
   ) {
     const warning = buildError(diagnostics);
     warning.level = 'warn';
