@@ -960,12 +960,14 @@ export const retrieveTsModifiers = (node: ts.Node): ReadonlyArray<ts.Modifier> |
  * @param classMembers a list of class members for that class
  * @param statements a list of statements which should be added to the
  * constructor
+ * @param parameters an optional list of parameters for the constructor
  * @returns a list of updated class elements
  */
 export const updateConstructor = (
   classNode: ts.ClassDeclaration,
   classMembers: ts.ClassElement[],
   statements: ts.Statement[],
+  parameters?: ts.ParameterDeclaration[],
 ): ts.ClassElement[] => {
   const constructorIndex = classMembers.findIndex((m) => m.kind === ts.SyntaxKind.Constructor);
   const constructorMethod = classMembers[constructorIndex];
@@ -994,7 +996,7 @@ export const updateConstructor = (
     classMembers[constructorIndex] = ts.factory.updateConstructorDeclaration(
       constructorMethod,
       retrieveTsModifiers(constructorMethod),
-      constructorMethod.parameters,
+      constructorMethod.parameters.concat(parameters ?? []),
       ts.factory.updateBlock(constructorMethod?.body ?? ts.factory.createBlock([]), statements),
     );
   } else {
@@ -1007,7 +1009,7 @@ export const updateConstructor = (
     // add the new constructor to the class members, putting it at the
     // beginning
     classMembers.unshift(
-      ts.factory.createConstructorDeclaration(undefined, [], ts.factory.createBlock(statements, true)),
+      ts.factory.createConstructorDeclaration(undefined, parameters ?? [], ts.factory.createBlock(statements, true)),
     );
   }
 

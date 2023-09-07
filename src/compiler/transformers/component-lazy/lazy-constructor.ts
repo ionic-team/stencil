@@ -3,18 +3,20 @@ import ts from 'typescript';
 import type * as d from '../../../declarations';
 import { addCoreRuntimeApi, REGISTER_INSTANCE, RUNTIME_APIS } from '../core-runtime-apis';
 import { addCreateEvents } from '../create-event';
-import { retrieveTsModifiers } from '../transform-utils';
+import { updateConstructor } from '../transform-utils';
 
 /**
  * Update the constructor for a Stencil component's class in order to prepare
  * it for lazy-build duty (i.e. to take over a bootstrapped component)
  *
  * @param classMembers an out param of class members for the component
+ * @param classNode the class declaration of interest
  * @param moduleFile information about the component's home module
  * @param cmp compiler metadata about the component
  */
 export const updateLazyComponentConstructor = (
   classMembers: ts.ClassElement[],
+  classNode: ts.ClassDeclaration,
   moduleFile: d.Module,
   cmp: d.ComponentCompilerMeta,
 ) => {
@@ -22,32 +24,9 @@ export const updateLazyComponentConstructor = (
     ts.factory.createParameterDeclaration(undefined, undefined, ts.factory.createIdentifier(HOST_REF_ARG)),
   ];
 
-  const cstrMethodIndex = classMembers.findIndex((m) => m.kind === ts.SyntaxKind.Constructor);
-  if (cstrMethodIndex >= 0) {
-    // add to the existing constructor()
-    const cstrMethod = classMembers[cstrMethodIndex] as ts.ConstructorDeclaration;
+  const cstrStatements = [registerInstanceStatement(moduleFile), ...addCreateEvents(moduleFile, cmp)];
 
-    const body = ts.factory.updateBlock(cstrMethod.body, [
-      registerInstanceStatement(moduleFile),
-      ...addCreateEvents(moduleFile, cmp),
-      ...cstrMethod.body.statements,
-    ]);
-
-    classMembers[cstrMethodIndex] = ts.factory.updateConstructorDeclaration(
-      cstrMethod,
-      retrieveTsModifiers(cstrMethod),
-      cstrMethodArgs,
-      body,
-    );
-  } else {
-    // create a constructor()
-    const cstrMethod = ts.factory.createConstructorDeclaration(
-      undefined,
-      cstrMethodArgs,
-      ts.factory.createBlock([registerInstanceStatement(moduleFile), ...addCreateEvents(moduleFile, cmp)], true),
-    );
-    classMembers.unshift(cstrMethod);
-  }
+  updateConstructor(classNode, classMembers, cstrStatements, cstrMethodArgs);
 };
 
 /**

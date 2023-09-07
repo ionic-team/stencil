@@ -31,7 +31,7 @@ const updateHydrateHostComponentMembers = (
 ) => {
   const classMembers = removeStaticMetaProperties(classNode);
 
-  updateLazyComponentConstructor(classMembers, moduleFile, cmp);
+  updateLazyComponentConstructor(classMembers, classNode, moduleFile, cmp);
   addLazyElementGetter(classMembers, moduleFile, cmp);
   addWatchers(classMembers, cmp);
   addHydrateRuntimeCmpMeta(classMembers, cmp);
