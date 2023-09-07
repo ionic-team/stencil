@@ -6,7 +6,7 @@ import { convertValueToLiteral, createStaticGetter, retrieveTsDecorators } from 
 import { getDeclarationParameters, isDecoratorNamed } from './decorator-utils';
 
 export const watchDecoratorsToStatic = (decoratedProps: ts.ClassElement[], newMembers: ts.ClassElement[]) => {
-  const watchers = decoratedProps.filter(ts.isMethodDeclaration).map((method) => parseWatchDecorator(method));
+  const watchers = decoratedProps.filter(ts.isMethodDeclaration).map(parseWatchDecorator);
 
   const flatWatchers = flatOne(watchers);
 
