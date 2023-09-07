@@ -176,7 +176,8 @@ describe('message-utils', () => {
 
         beforeEach(() => {
           err = new Error();
-          err.message = undefined;
+          // this test explicitly checks for a bad value for the `message` property, hence the type assertion
+          err.message = undefined as unknown as string;
           err.stack = undefined;
         });
 
