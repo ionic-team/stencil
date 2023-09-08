@@ -69,7 +69,13 @@ const parsePropDecorator = (
   const decoratorParams = getDeclarationParameters<d.PropOptions>(propDecorator, typeChecker);
   const propOptions: d.PropOptions = decoratorParams[0] || {};
 
-  const propName = prop.name.getText();
+  let propName = prop.name.getText();
+  if (ts.isComputedPropertyName(prop.name)) {
+    const type = typeChecker.getTypeAtLocation(prop.name.expression);
+    if (type != null && type.isLiteral()) {
+      propName = type.value.toString();
+    }
+  }
 
   if (isMemberPrivate(prop)) {
     const err = buildError(diagnostics);

@@ -130,7 +130,7 @@ const visitClassDeclaration = (
   // We call the `handleClassFields` method which handles transforming any
   // class fields, removing them from the class and adding statements to the
   // class' constructor which instantiate them there instead.
-  const updatedClassFields = handleClassFields(classNode, filteredMethodsAndFields);
+  const updatedClassFields = handleClassFields(classNode, filteredMethodsAndFields, typeChecker);
 
   validateMethods(diagnostics, classMembers);
 
@@ -345,15 +345,20 @@ export const filterDecorators = (
  *
  * @param classNode a TypeScript AST node for a Stencil component class
  * @param classMembers the class members that we need to update
+ * @param typeChecker a reference to the {@link ts.TypeChecker}
  * @returns a list of updated class elements which can be inserted into the class
  */
-function handleClassFields(classNode: ts.ClassDeclaration, classMembers: ts.ClassElement[]): ts.ClassElement[] {
+function handleClassFields(
+  classNode: ts.ClassDeclaration,
+  classMembers: ts.ClassElement[],
+  typeChecker: ts.TypeChecker,
+): ts.ClassElement[] {
   const statements: ts.ExpressionStatement[] = [];
   const updatedClassMembers: ts.ClassElement[] = [];
 
   for (const member of classMembers) {
     if (shouldInitializeInConstructor(member) && ts.isPropertyDeclaration(member)) {
-      const memberName = tsPropDeclNameAsString(member);
+      const memberName = tsPropDeclNameAsString(member, typeChecker);
 
       // this is a class field that we'll need to handle, so lets push a statement for
       // initializing the value onto our statements list
