@@ -12,6 +12,7 @@ import {
   retrieveTsDecorators,
   retrieveTsModifiers,
   serializeSymbol,
+  tsPropDeclNameAsString,
   typeToString,
   validateReferences,
 } from '../transform-utils';
@@ -69,13 +70,7 @@ const parsePropDecorator = (
   const decoratorParams = getDeclarationParameters<d.PropOptions>(propDecorator, typeChecker);
   const propOptions: d.PropOptions = decoratorParams[0] || {};
 
-  let propName = prop.name.getText();
-  if (ts.isComputedPropertyName(prop.name)) {
-    const type = typeChecker.getTypeAtLocation(prop.name.expression);
-    if (type != null && type.isLiteral()) {
-      propName = type.value.toString();
-    }
-  }
+  const propName = tsPropDeclNameAsString(prop, typeChecker);
 
   if (isMemberPrivate(prop)) {
     const err = buildError(diagnostics);
