@@ -110,20 +110,24 @@ export const validateConfig = (
   validatedConfig.extras.tagNameTransform = !!validatedConfig.extras.tagNameTransform;
 
   // TODO(STENCIL-914): remove when `experimentalSlotFixes` is the default behavior
-  // If the user set `experimentalSlotFixes` and any individual slot fix flags, we need to log a warning
+  // If the user set `experimentalSlotFixes` and any individual slot fix flags to `false`, we need to log a warning
   // to the user that we will "override" the individual flags
-  // if (
-  //   validatedConfig.extras.experimentalSlotFixes === true &&
-  //   ((validatedConfig.extras as any).appendChildSlotFix === true ||
-  //     (validatedConfig.extras as any).cloneNodeFix === true ||
-  //     (validatedConfig.extras as any).slotChildNodesFix === true ||
-  //     (validatedConfig.extras as any).scopedSlotTextContentFix === true)
-  // ) {
-  //   const warning = buildError(diagnostics);
-  //   warning.level = 'warn';
-  //   warning.messageText =
-  //     'The `experimentalSlotFixes` flag cannot be used in combination with other slot fix flags. These individual flags will be ignored. Please update your Stencil config accordingly.';
-  // }
+  if (validatedConfig.extras.experimentalSlotFixes === true) {
+    const possibleFlags: (keyof ValidatedConfig['extras'])[] = [
+      'appendChildSlotFix',
+      'slotChildNodesFix',
+      'cloneNodeFix',
+      'scopedSlotTextContentFix',
+    ];
+    const conflictingFlags = possibleFlags.filter((flag) => validatedConfig.extras[flag] === false);
+    if (conflictingFlags.length > 0) {
+      const warning = buildError(diagnostics);
+      warning.level = 'warn';
+      warning.messageText = `The 'experimentalSlotFixes' flag cannot be used in combination with other slot fix flags disabled. The following flags will be ignored: ${conflictingFlags.join(
+        ', ',
+      )}. Please update your Stencil config accordingly.`;
+    }
+  }
 
   // TODO(STENCIL-914): remove `experimentalSlotFixes` when it's the default behavior
   validatedConfig.extras.experimentalSlotFixes = !!validatedConfig.extras.experimentalSlotFixes;
