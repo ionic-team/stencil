@@ -153,6 +153,40 @@ describe('convert-decorators', () => {
     );
   });
 
+  it('should get the correct literal for a computed property enum used for a `@State`', async () => {
+    const t = transpileModule(`
+      enum MyEnum {
+        MY_PROP = 'myVal'
+      }
+      @Component({tag: 'cmp-a'})
+      export class CmpA {
+        @State() [MyEnum.MY_PROP]: string;
+      }
+    `);
+
+    expect(t.states).toEqual([
+      {
+        name: 'myVal',
+      },
+    ]);
+  });
+
+  it('should get the correct literal for a computed property variable used for a `@State`', async () => {
+    const t = transpileModule(`
+      const tmp = 'myVal';
+      @Component({tag: 'cmp-a'})
+      export class CmpA {
+        @State() [tmp]: string;
+      }
+    `);
+
+    expect(t.states).toEqual([
+      {
+        name: 'myVal',
+      },
+    ]);
+  });
+
   it('should not add a constructor if no class fields are present', async () => {
     const t = transpileModule(`
     @Component({tag: 'cmp-a'})

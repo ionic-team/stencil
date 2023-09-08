@@ -111,7 +111,7 @@ const visitClassDeclaration = (
   // parse member decorators (Prop, State, Listen, Event, Method, Element and Watch)
   if (decoratedMembers.length > 0) {
     propDecoratorsToStatic(diagnostics, decoratedMembers, typeChecker, program, filteredMethodsAndFields);
-    stateDecoratorsToStatic(decoratedMembers, filteredMethodsAndFields);
+    stateDecoratorsToStatic(decoratedMembers, filteredMethodsAndFields, typeChecker);
     eventDecoratorsToStatic(diagnostics, decoratedMembers, typeChecker, program, filteredMethodsAndFields);
     methodDecoratorsToStatic(
       config,
