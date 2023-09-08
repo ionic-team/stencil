@@ -18,7 +18,7 @@ const getDeclarationParameter = (arg: ts.Expression, typeChecker: ts.TypeChecker
     return objectLiteralToObjectMap(arg);
   } else if (ts.isStringLiteral(arg)) {
     return arg.text;
-  } else if (ts.isPropertyAccessExpression(arg)) {
+  } else if (ts.isPropertyAccessExpression(arg) || ts.isIdentifier(arg)) {
     const type = typeChecker.getTypeAtLocation(arg);
     if (type !== undefined && type.isLiteral()) {
       /**
