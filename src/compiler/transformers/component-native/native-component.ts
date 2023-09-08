@@ -35,9 +35,9 @@ export const updateNativeComponentClass = (
   moduleFile: d.Module,
   cmp: d.ComponentCompilerMeta,
 ): ts.ClassDeclaration | ts.VariableStatement => {
-  const heritageClauses = updateNativeHostComponentHeritageClauses(classNode, moduleFile);
-  const members = updateNativeHostComponentMembers(transformOpts, classNode, moduleFile, cmp);
-  return updateComponentClass(transformOpts, classNode, heritageClauses, members);
+  const withHeritageClauses = updateNativeHostComponentHeritageClauses(classNode, moduleFile);
+  const members = updateNativeHostComponentMembers(transformOpts, withHeritageClauses, moduleFile, cmp);
+  return updateComponentClass(transformOpts, withHeritageClauses, withHeritageClauses.heritageClauses, members);
 };
 
 /**
@@ -46,15 +46,15 @@ export const updateNativeComponentClass = (
  *
  * @param classNode the syntax tree of the Stencil component class to update
  * @param moduleFile the Stencil Module associated with the provided class node
- * @returns the generated heritage clause
+ * @returns an updated class declaration with the generated heritage clause
  */
 const updateNativeHostComponentHeritageClauses = (
   classNode: ts.ClassDeclaration,
   moduleFile: d.Module,
-): ts.NodeArray<ts.HeritageClause> | [ts.HeritageClause] => {
+): ts.ClassDeclaration => {
   if (classNode.heritageClauses != null && classNode.heritageClauses.length > 0) {
     // the syntax tree has a heritage clause already, don't generate a new one
-    return classNode.heritageClauses;
+    return classNode;
   }
 
   if (moduleFile.cmps.length >= 1) {
@@ -66,7 +66,14 @@ const updateNativeHostComponentHeritageClauses = (
     ts.factory.createExpressionWithTypeArguments(ts.factory.createIdentifier(HTML_ELEMENT), []),
   ]);
 
-  return [heritageClause];
+  return ts.factory.updateClassDeclaration(
+    classNode,
+    classNode.modifiers,
+    classNode.name,
+    classNode.typeParameters,
+    [heritageClause],
+    classNode.members,
+  );
 };
 
 /**
