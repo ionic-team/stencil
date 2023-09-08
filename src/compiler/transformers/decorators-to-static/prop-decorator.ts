@@ -16,7 +16,7 @@ import {
   typeToString,
   validateReferences,
 } from '../transform-utils';
-import { getDeclarationParameters, isDecoratorNamed } from './decorator-utils';
+import { getDecoratorParameters, isDecoratorNamed } from './decorator-utils';
 
 /**
  * Parse a collection of class members decorated with `@Prop()`
@@ -67,7 +67,7 @@ const parsePropDecorator = (
     return null;
   }
 
-  const decoratorParams = getDeclarationParameters<d.PropOptions>(propDecorator, typeChecker);
+  const decoratorParams = getDecoratorParameters<d.PropOptions>(propDecorator, typeChecker);
   const propOptions: d.PropOptions = decoratorParams[0] || {};
 
   const propName = tsPropDeclNameAsString(prop, typeChecker);

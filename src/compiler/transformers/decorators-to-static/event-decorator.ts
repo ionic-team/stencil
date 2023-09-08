@@ -11,7 +11,7 @@ import {
   serializeSymbol,
   validateReferences,
 } from '../transform-utils';
-import { getDeclarationParameters, isDecoratorNamed } from './decorator-utils';
+import { getDecoratorParameters, isDecoratorNamed } from './decorator-utils';
 
 export const eventDecoratorsToStatic = (
   diagnostics: d.Diagnostic[],
@@ -58,7 +58,7 @@ const parseEventDecorator = (
     return null;
   }
 
-  const [eventOpts] = getDeclarationParameters<d.EventOptions>(eventDecorator, typeChecker);
+  const [eventOpts] = getDecoratorParameters<d.EventOptions>(eventDecorator, typeChecker);
   const symbol = typeChecker.getSymbolAtLocation(prop.name);
   const eventName = getEventName(eventOpts, memberName);
 

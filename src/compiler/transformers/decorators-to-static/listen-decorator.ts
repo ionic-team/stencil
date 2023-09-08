@@ -3,7 +3,7 @@ import ts from 'typescript';
 
 import type * as d from '../../../declarations';
 import { convertValueToLiteral, createStaticGetter, retrieveTsDecorators } from '../transform-utils';
-import { getDeclarationParameters, isDecoratorNamed } from './decorator-utils';
+import { getDecoratorParameters, isDecoratorNamed } from './decorator-utils';
 
 export const listenDecoratorsToStatic = (
   diagnostics: d.Diagnostic[],
@@ -33,7 +33,7 @@ const parseListenDecorators = (
 
   return listenDecorators.map((listenDecorator) => {
     const methodName = method.name.getText();
-    const [listenText, listenOptions] = getDeclarationParameters<string, d.ListenOptions>(listenDecorator, typeChecker);
+    const [listenText, listenOptions] = getDecoratorParameters<string, d.ListenOptions>(listenDecorator, typeChecker);
 
     const eventNames = listenText.split(',');
     if (eventNames.length > 1) {

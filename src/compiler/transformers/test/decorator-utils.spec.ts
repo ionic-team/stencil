@@ -1,16 +1,16 @@
 import ts from 'typescript';
 
-import { getDeclarationParameters } from '../decorators-to-static/decorator-utils';
+import { getDecoratorParameters } from '../decorators-to-static/decorator-utils';
 
 describe('decorator utils', () => {
-  describe('getDeclarationParameters', () => {
+  describe('getDecoratorParameters', () => {
     it('should return an empty array for decorator with no arguments', () => {
       const decorator: ts.Decorator = {
         expression: ts.factory.createIdentifier('DecoratorName'),
       } as unknown as ts.Decorator;
 
       const typeCheckerMock = {} as ts.TypeChecker;
-      const result = getDeclarationParameters(decorator, typeCheckerMock);
+      const result = getDecoratorParameters(decorator, typeCheckerMock);
 
       expect(result).toEqual([]);
     });
@@ -24,7 +24,7 @@ describe('decorator utils', () => {
       } as unknown as ts.Decorator;
 
       const typeCheckerMock = {} as ts.TypeChecker;
-      const result = getDeclarationParameters(decorator, typeCheckerMock);
+      const result = getDecoratorParameters(decorator, typeCheckerMock);
 
       expect(result).toEqual(['arg1', 'arg2']);
     });
@@ -46,7 +46,7 @@ describe('decorator utils', () => {
         ]),
       } as unknown as ts.Decorator;
 
-      const result = getDeclarationParameters(decorator, typeCheckerMock);
+      const result = getDecoratorParameters(decorator, typeCheckerMock);
 
       expect(result).toEqual(['arg1']);
     });

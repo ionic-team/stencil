@@ -3,17 +3,17 @@ import ts from 'typescript';
 import { objectLiteralToObjectMap } from '../transform-utils';
 import type { StencilDecorator } from './decorators-constants';
 
-export const getDeclarationParameters: GetDeclarationParameters = (
+export const getDecoratorParameters: GetDecoratorParameters = (
   decorator: ts.Decorator,
   typeChecker: ts.TypeChecker,
 ): any => {
   if (!ts.isCallExpression(decorator.expression)) {
     return [];
   }
-  return decorator.expression.arguments.map((arg) => getDeclarationParameter(arg, typeChecker));
+  return decorator.expression.arguments.map((arg) => getDecoratorParameter(arg, typeChecker));
 };
 
-const getDeclarationParameter = (arg: ts.Expression, typeChecker: ts.TypeChecker): any => {
+const getDecoratorParameter = (arg: ts.Expression, typeChecker: ts.TypeChecker): any => {
   if (ts.isObjectLiteralExpression(arg)) {
     return objectLiteralToObjectMap(arg);
   } else if (ts.isStringLiteral(arg)) {
@@ -50,7 +50,7 @@ export const isDecoratorNamed = (propName: StencilDecorator) => {
   };
 };
 
-export interface GetDeclarationParameters {
+export interface GetDecoratorParameters {
   <T>(decorator: ts.Decorator, typeChecker: ts.TypeChecker): [T];
   <T, T1>(decorator: ts.Decorator, typeChecker: ts.TypeChecker): [T, T1];
   <T, T1, T2>(decorator: ts.Decorator, typeChecker: ts.TypeChecker): [T, T1, T2];
