@@ -385,16 +385,28 @@ describe('validation', () => {
 
   it('should set extras defaults', () => {
     const { config } = validateConfig(userConfig, bootstrapConfig);
-    expect(config.extras.experimentalSlotFixes).toBe(false);
-    expect((config.extras as any).cloneNodeFix).toBe(false);
+    expect(config.extras.appendChildSlotFix).toBe(false);
+    expect(config.extras.cloneNodeFix).toBe(false);
     expect(config.extras.lifecycleDOMEvents).toBe(false);
     expect(config.extras.scriptDataOpts).toBe(false);
-    expect((config.extras as any).slotChildNodesFix).toBe(false);
+    expect(config.extras.slotChildNodesFix).toBe(false);
     expect(config.extras.initializeNextTick).toBe(false);
     expect(config.extras.tagNameTransform).toBe(false);
   });
 
+  it('should set slot config based on `experimentalSlotFixes`', () => {
+    userConfig.extras = {};
+    userConfig.extras.experimentalSlotFixes = true;
+    const { config } = validateConfig(userConfig, bootstrapConfig);
+    expect(config.extras.appendChildSlotFix).toBe(true);
+    expect(config.extras.cloneNodeFix).toBe(true);
+    expect(config.extras.slotChildNodesFix).toBe(true);
+    expect(config.extras.scopedSlotTextContentFix).toBe(true);
+  });
+
   it('should override slot fix config based on `experimentalSlotFixes`', () => {
+    // This test is to verify the flags get overwritten correctly even if an
+    // invalid config is ingested. Hence, the `any` cast
     userConfig.extras = {
       appendChildSlotFix: false,
       slotChildNodesFix: false,
@@ -403,10 +415,10 @@ describe('validation', () => {
       experimentalSlotFixes: true,
     } as any;
     const { config } = validateConfig(userConfig, bootstrapConfig);
-    expect((config.extras as any).appendChildSlotFix).toBe(undefined);
-    expect((config.extras as any).cloneNodeFix).toBe(undefined);
-    expect((config.extras as any).slotChildNodesFix).toBe(undefined);
-    expect((config.extras as any).scopedSlotTextContentFix).toBe(undefined);
+    expect(config.extras.appendChildSlotFix).toBe(true);
+    expect(config.extras.cloneNodeFix).toBe(true);
+    expect(config.extras.slotChildNodesFix).toBe(true);
+    expect(config.extras.scopedSlotTextContentFix).toBe(true);
   });
 
   it('should set taskQueue "async" by default', () => {

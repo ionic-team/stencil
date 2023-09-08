@@ -339,7 +339,7 @@ interface ConfigExtrasBase {
 }
 
 // TODO(STENCIL-914): delete this interface when `experimentalSlotFixes` is the default behavior
-interface ConfigExtrasSlotFixes {
+type ConfigExtrasSlotFixes<ExpirimentalFixesEnabled extends boolean, IndividualFlags extends boolean> = {
   // TODO(STENCIL-914): remove this option when `experimentalSlotFixes` is the default behavior
   /**
    * By default, the slot polyfill does not update `appendChild()` so that it appends
@@ -348,7 +348,7 @@ interface ConfigExtrasSlotFixes {
    * child to be appended in the same location shadow dom would. This is not required for
    * IE11 or Edge 18, but can be enabled if the app is using `appendChild()`. Defaults to `false`.
    */
-  appendChildSlotFix?: boolean;
+  appendChildSlotFix?: IndividualFlags;
 
   // TODO(STENCIL-914): remove this option when `experimentalSlotFixes` is the default behavior
   /**
@@ -358,14 +358,14 @@ interface ConfigExtrasSlotFixes {
    * `cloneNode()` and unexpected node are being cloned due to the slot polyfill
    * simulating shadow dom. Defaults to `false`.
    */
-  cloneNodeFix?: boolean;
+  cloneNodeFix?: IndividualFlags;
 
   // TODO(STENCIL-914): remove this option when `experimentalSlotFixes` is the default behavior
   /**
    * Experimental flag to align the behavior of invoking `textContent` on a scoped component to act more like a
    * component that uses the shadow DOM. Defaults to `false`
    */
-  scopedSlotTextContentFix?: boolean;
+  scopedSlotTextContentFix?: IndividualFlags;
 
   // TODO(STENCIL-914): remove this option when `experimentalSlotFixes` is the default behavior
   /**
@@ -374,28 +374,18 @@ interface ConfigExtrasSlotFixes {
    * getters are not patched to only show the child nodes and elements of the default slot.
    * Defaults to `false`.
    */
-  slotChildNodesFix?: boolean;
+  slotChildNodesFix?: IndividualFlags;
 
   // TODO(STENCIL-914): remove `experimentalSlotFixes` when it's the default behavior
   /**
    * Enables all slot-related fixes such as {@link slotChildNodesFix}, and
    * {@link scopedSlotTextContentFix}.
    */
-  experimentalSlotFixes?: false;
-}
+  experimentalSlotFixes?: ExpirimentalFixesEnabled;
+};
 
 export type ConfigExtras = ConfigExtrasBase &
-  (
-    | ConfigExtrasSlotFixes
-    | {
-        // TODO(STENCIL-914): remove `experimentalSlotFixes` when it's the default behavior
-        /**
-         * Enables all slot-related fixes such as {@link slotChildNodesFix}, and
-         * {@link scopedSlotTextContentFix}.
-         */
-        experimentalSlotFixes?: true;
-      }
-  );
+  (ConfigExtrasSlotFixes<true, true> | ConfigExtrasSlotFixes<false, boolean>);
 
 export interface Config extends StencilConfig {
   buildAppCore?: boolean;
