@@ -8,8 +8,7 @@ import type * as d from '../../../declarations';
 import { loadConfig } from '../load-config';
 
 describe('stencil config - sourceMap option', () => {
-  const fixturesDir = 'fixtures';
-  const configPath = path.join(fixturesDir, 'stencil.config.ts');
+  const configPath = require.resolve('./fixtures/stencil.config.ts');
   let sys: d.CompilerSystem;
 
   /**
@@ -21,7 +20,7 @@ describe('stencil config - sourceMap option', () => {
    */
   const getLoadConfigForTests = (overrides?: Partial<d.LoadConfigInit>): d.LoadConfigInit => {
     const defaults: d.LoadConfigInit = {
-      configPath: configPath,
+      configPath,
       sys,
       config: {},
       initTsConfig: true,
