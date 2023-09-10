@@ -131,7 +131,7 @@ const visitClassDeclaration = (
   // We call the `handleClassFields` method which handles transforming any
   // class fields, removing them from the class and adding statements to the
   // class' constructor which instantiate them there instead.
-  const updatedClassFields = handleClassFields(classNode, filteredMethodsAndFields);
+  const updatedClassFields = handleClassFields(classNode, decoratedMembers, filteredMethodsAndFields);
 
   validateMethods(diagnostics, classMembers);
 
@@ -187,25 +187,16 @@ const removeStencilMethodDecorators = (
           member.body,
         );
       } else if (ts.isPropertyDeclaration(member)) {
-        if (shouldInitializeInConstructor(member)) {
-          // if the current class member is decorated with either 'State' or
-          // 'Prop' we need to modify the property declaration to transform it
-          // from a class field but we handle this in the `handleClassFields`
-          // method below, so we just want to return the class member here
-          // untouched.
-          return member;
-        } else {
-          // update the property to remove decorators
-          const modifiers = retrieveTsModifiers(member);
-          return ts.factory.updatePropertyDeclaration(
-            member,
-            [...(newDecorators ?? []), ...(modifiers ?? [])],
-            member.name,
-            member.questionToken,
-            member.type,
-            member.initializer,
-          );
-        }
+        // update the property to remove Stencil-specific decorators
+        const modifiers = retrieveTsModifiers(member);
+        return ts.factory.updatePropertyDeclaration(
+          member,
+          [...(newDecorators ?? []), ...(modifiers ?? [])],
+          member.name,
+          member.questionToken,
+          member.type,
+          member.initializer,
+        );
       } else {
         const err = buildError(diagnostics);
         err.messageText = 'Unknown class member encountered!';
@@ -345,36 +336,36 @@ export const filterDecorators = (
  * the class or define a new one otherwise.
  *
  * @param classNode a TypeScript AST node for a Stencil component class
- * @param classMembers the class members that we need to update
+ * @param originalClassMembers the class members that we need to check for Stencil-specific decorators.
+ * @param updatedClassMembers the class members to use for the update.
  * @returns a list of updated class elements which can be inserted into the class
  */
-function handleClassFields(classNode: ts.ClassDeclaration, classMembers: ts.ClassElement[]): ts.ClassElement[] {
+function handleClassFields(classNode: ts.ClassDeclaration, originalClassMembers: ts.ClassElement[], updatedClassMembers: ts.ClassElement[]): ts.ClassElement[] {
   const statements: ts.ExpressionStatement[] = [];
-  const updatedClassMembers: ts.ClassElement[] = [];
 
-  for (const member of classMembers) {
-    if (shouldInitializeInConstructor(member) && ts.isPropertyDeclaration(member)) {
-      const memberName = tsPropDeclNameAsString(member);
-
-      // this is a class field that we'll need to handle, so lets push a statement for
-      // initializing the value onto our statements list
-      statements.push(
-        ts.factory.createExpressionStatement(
-          ts.factory.createBinaryExpression(
-            ts.factory.createPropertyAccessExpression(ts.factory.createThis(), ts.factory.createIdentifier(memberName)),
-            ts.factory.createToken(ts.SyntaxKind.EqualsToken),
-            // if the member has no initializer we should default to setting it to
-            // just 'undefined'
-            member.initializer ?? ts.factory.createIdentifier('undefined'),
-          ),
-        ),
-      );
-    } else {
-      // if it's not a class field that is decorated with a Stencil decorator then
-      // we just push it onto our class member list
-      updatedClassMembers.push(member);
+  for (const member of originalClassMembers) {
+    if(!shouldInitializeInConstructor(member)) {
+      continue;
     }
-  }
+    if(!ts.isPropertyDeclaration(member)) {
+      continue;
+    }
+    const memberName = tsPropDeclNameAsString(member);
+
+    // this is a class field that we'll need to handle, so lets push a statement for
+    // initializing the value onto our statements list
+    statements.push(
+      ts.factory.createExpressionStatement(
+        ts.factory.createBinaryExpression(
+          ts.factory.createPropertyAccessExpression(ts.factory.createThis(), ts.factory.createIdentifier(memberName)),
+          ts.factory.createToken(ts.SyntaxKind.EqualsToken),
+          // if the member has no initializer we should default to setting it to
+          // just 'undefined'
+          member.initializer ?? ts.factory.createIdentifier('undefined'),
+        ),
+      ),
+    );
+}
 
   if (statements.length === 0) {
     // we didn't encounter any class fields we need to update, so we can
