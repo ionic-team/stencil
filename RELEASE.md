@@ -17,11 +17,11 @@ Manual releases should only be performed when there are extenuating circumstance
        For example, `v3-maintenance` to release a new version of Stencil v3.
     1. Stencil follows semantic versioning. Select the appropriate version from the dropdown for this release.
     1. Hit "Run Workflow" and wait for a new pull request to be created.
-1. Open the pull request that was opened as a result of running the Stencil Production Release PR Creation Workflow.
+1. Navigate to the pull request that was opened as a result of running the Stencil Production Release PR Creation Workflow.
 1. Complete the following (temporary) steps:
     1. Close the pull request and reopen it. This allows actions that the team gates pull requests on to run.
     1. Mark the pull request as ready for review.
-1. Ask the Stencil team for an approval on the PR
+1. Ask the Stencil team for an approval on the PR.
    Only one approval is required for pull requests that only include the version bump/prerelease commit.
 1. Once approved, add it to the merge queue.
 1. ⚠️ Wait for the pull request to land before continuing to the next step. ⚠️
@@ -76,9 +76,8 @@ manual release was performed.
 1. If there are any 'next' branches in GitHub, say for a future major version of Stencil (e.g. `v5.0.0-dev`), now is a
    good time to rebase them against the `main` branch.
 1. Perform the following tasks in JIRA:
-   1. Mark this version of Stencil as 'released' in JIRA on the 'Releases' page.
-   1. Move the task card in this current sprint to the 'Done' swim-lane.
-   1. Stub out the next release and task for the release in JIRA.
+   1. Ask someone with appropriate permissions to mark this version of Stencil as 'released' in JIRA on the 'Releases' page.
+   1. Ask someone with appropriate permissions to stub out the next release and task for the release in JIRA.
 1. Ensure all GitHub Issues associated with stories/tasks that shipped in this version of Stencil are closed.
    1. For each issue, add a comment stating the version of Stencil that
       included the fix/feature (be sure to update the version number _and_
