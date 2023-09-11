@@ -339,7 +339,7 @@ interface ConfigExtrasBase {
 }
 
 // TODO(STENCIL-914): delete this interface when `experimentalSlotFixes` is the default behavior
-type ConfigExtrasSlotFixes<ExpirimentalFixesEnabled extends boolean, IndividualFlags extends boolean> = {
+type ConfigExtrasSlotFixes<ExperimentalFixesEnabled extends boolean, IndividualFlags extends boolean> = {
   // TODO(STENCIL-914): remove this option when `experimentalSlotFixes` is the default behavior
   /**
    * By default, the slot polyfill does not update `appendChild()` so that it appends
@@ -381,7 +381,7 @@ type ConfigExtrasSlotFixes<ExpirimentalFixesEnabled extends boolean, IndividualF
    * Enables all slot-related fixes such as {@link slotChildNodesFix}, and
    * {@link scopedSlotTextContentFix}.
    */
-  experimentalSlotFixes?: ExpirimentalFixesEnabled;
+  experimentalSlotFixes?: ExperimentalFixesEnabled;
 };
 
 export type ConfigExtras = ConfigExtrasBase &

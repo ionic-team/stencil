@@ -1,7 +1,14 @@
 import { createNodeLogger, createNodeSys } from '@sys-api-node';
 import { buildError, isBoolean, isNumber, isString, sortBy } from '@utils';
 
-import { ConfigBundle, Diagnostic, LoadConfigInit, UnvalidatedConfig, ValidatedConfig } from '../../declarations';
+import {
+  ConfigBundle,
+  ConfigExtras,
+  Diagnostic,
+  LoadConfigInit,
+  UnvalidatedConfig,
+  ValidatedConfig,
+} from '../../declarations';
 import { setBooleanConfig } from './config-utils';
 import { validateOutputTargets } from './outputs';
 import { validateDevServer } from './validate-dev-server';
@@ -113,7 +120,7 @@ export const validateConfig = (
   // If the user set `experimentalSlotFixes` and any individual slot fix flags to `false`, we need to log a warning
   // to the user that we will "override" the individual flags
   if (validatedConfig.extras.experimentalSlotFixes === true) {
-    const possibleFlags: (keyof ValidatedConfig['extras'])[] = [
+    const possibleFlags: (keyof ConfigExtras)[] = [
       'appendChildSlotFix',
       'slotChildNodesFix',
       'cloneNodeFix',
