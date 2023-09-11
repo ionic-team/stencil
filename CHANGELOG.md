@@ -1,3 +1,12 @@
+## 🌝 [4.2.1](https://github.com/ionic-team/stencil/compare/v4.2.0...v4.2.1) (2023-09-11)
+
+
+### Bug Fixes
+
+* **compiler:** add heritage clauses earlier in native transform ([#4769](https://github.com/ionic-team/stencil/issues/4769)) ([9a92ad1](https://github.com/ionic-team/stencil/commit/9a92ad12f628a5c2eae3048bda983fed2bc140b5))
+
+
+
 # 🎺 [4.2.0](https://github.com/ionic-team/stencil/compare/v4.2.0-0...v4.2.0) (2023-09-05)
 
 

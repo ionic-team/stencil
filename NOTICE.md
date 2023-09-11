@@ -3586,8 +3586,6 @@ Author: Mihai Bazon <mihai.bazon@gmail.com> (http://lisperator.net/)
 
 Homepage: https://terser.org
 
-> Terser is released under the BSD license:
-> 
 > Copyright 2012-2018 (c) Mihai Bazon <mihai.bazon@gmail.com>
 > 
 > Redistribution and use in source and binary forms, with or without
