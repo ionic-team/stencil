@@ -410,7 +410,7 @@ export interface BundleModuleOutput {
 }
 
 export interface Cache {
-  get(key: string): Promise<string>;
+  get(key: string): Promise<string | null>;
   put(key: string, value: string): Promise<boolean>;
   has(key: string): Promise<boolean>;
   createKey(domain: string, ...args: any[]): Promise<string>;
