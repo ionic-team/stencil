@@ -405,13 +405,15 @@ describe('validation', () => {
   });
 
   it('should override slot fix config based on `experimentalSlotFixes`', () => {
+    // This test is to verify the flags get overwritten correctly even if an
+    // invalid config is ingested. Hence, the `any` cast
     userConfig.extras = {
       appendChildSlotFix: false,
       slotChildNodesFix: false,
       cloneNodeFix: false,
       scopedSlotTextContentFix: false,
-    };
-    userConfig.extras.experimentalSlotFixes = true;
+      experimentalSlotFixes: true,
+    } as any;
     const { config } = validateConfig(userConfig, bootstrapConfig);
     expect(config.extras.appendChildSlotFix).toBe(true);
     expect(config.extras.cloneNodeFix).toBe(true);

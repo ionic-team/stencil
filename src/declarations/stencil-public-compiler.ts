@@ -292,27 +292,7 @@ export interface StencilConfig {
   stencilCoreResolvedId?: string;
 }
 
-export interface ConfigExtras {
-  // TODO(STENCIL-914): remove this option when `experimentalSlotFixes` is the default behavior
-  /**
-   * By default, the slot polyfill does not update `appendChild()` so that it appends
-   * new child nodes into the correct child slot like how shadow dom works. This is an opt-in
-   * polyfill for those who need it when using `element.appendChild(node)` and expecting the
-   * child to be appended in the same location shadow dom would. This is not required for
-   * IE11 or Edge 18, but can be enabled if the app is using `appendChild()`. Defaults to `false`.
-   */
-  appendChildSlotFix?: boolean;
-
-  // TODO(STENCIL-914): remove this option when `experimentalSlotFixes` is the default behavior
-  /**
-   * By default, the runtime does not polyfill `cloneNode()` when cloning a component
-   * that uses the slot polyfill. This is an opt-in polyfill for those who need it.
-   * This is not required for IE11 or Edge 18, but can be enabled if the app is using
-   * `cloneNode()` and unexpected node are being cloned due to the slot polyfill
-   * simulating shadow dom. Defaults to `false`.
-   */
-  cloneNodeFix?: boolean;
-
+interface ConfigExtrasBase {
   /**
    * Experimental flag. Projects that use a Stencil library built using the `dist` output target may have trouble lazily
    * loading components when using a bundler such as Vite or Parcel. Setting this flag to `true` will change how Stencil
@@ -343,13 +323,6 @@ export interface ConfigExtras {
    */
   scriptDataOpts?: boolean;
 
-  // TODO(STENCIL-914): remove this option when `experimentalSlotFixes` is the default behavior
-  /**
-   * Experimental flag to align the behavior of invoking `textContent` on a scoped component to act more like a
-   * component that uses the shadow DOM. Defaults to `false`
-   */
-  scopedSlotTextContentFix?: boolean;
-
   /**
    * When a component is first attached to the DOM, this setting will wait a single tick before
    * rendering. This works around an Angular issue, where Angular attaches the elements before
@@ -358,6 +331,42 @@ export interface ConfigExtras {
    */
   initializeNextTick?: boolean;
 
+  /**
+   * Enables the tagNameTransform option of `defineCustomElements()`, so the component tagName
+   * can be customized at runtime. Defaults to `false`.
+   */
+  tagNameTransform?: boolean;
+}
+
+// TODO(STENCIL-914): delete this interface when `experimentalSlotFixes` is the default behavior
+type ConfigExtrasSlotFixes<ExperimentalFixesEnabled extends boolean, IndividualFlags extends boolean> = {
+  // TODO(STENCIL-914): remove this option when `experimentalSlotFixes` is the default behavior
+  /**
+   * By default, the slot polyfill does not update `appendChild()` so that it appends
+   * new child nodes into the correct child slot like how shadow dom works. This is an opt-in
+   * polyfill for those who need it when using `element.appendChild(node)` and expecting the
+   * child to be appended in the same location shadow dom would. This is not required for
+   * IE11 or Edge 18, but can be enabled if the app is using `appendChild()`. Defaults to `false`.
+   */
+  appendChildSlotFix?: IndividualFlags;
+
+  // TODO(STENCIL-914): remove this option when `experimentalSlotFixes` is the default behavior
+  /**
+   * By default, the runtime does not polyfill `cloneNode()` when cloning a component
+   * that uses the slot polyfill. This is an opt-in polyfill for those who need it.
+   * This is not required for IE11 or Edge 18, but can be enabled if the app is using
+   * `cloneNode()` and unexpected node are being cloned due to the slot polyfill
+   * simulating shadow dom. Defaults to `false`.
+   */
+  cloneNodeFix?: IndividualFlags;
+
+  // TODO(STENCIL-914): remove this option when `experimentalSlotFixes` is the default behavior
+  /**
+   * Experimental flag to align the behavior of invoking `textContent` on a scoped component to act more like a
+   * component that uses the shadow DOM. Defaults to `false`
+   */
+  scopedSlotTextContentFix?: IndividualFlags;
+
   // TODO(STENCIL-914): remove this option when `experimentalSlotFixes` is the default behavior
   /**
    * For browsers that do not support shadow dom (IE11 and Edge 18 and below), slot is polyfilled
@@ -365,21 +374,18 @@ export interface ConfigExtras {
    * getters are not patched to only show the child nodes and elements of the default slot.
    * Defaults to `false`.
    */
-  slotChildNodesFix?: boolean;
-
-  /**
-   * Enables the tagNameTransform option of `defineCustomElements()`, so the component tagName
-   * can be customized at runtime. Defaults to `false`.
-   */
-  tagNameTransform?: boolean;
+  slotChildNodesFix?: IndividualFlags;
 
   // TODO(STENCIL-914): remove `experimentalSlotFixes` when it's the default behavior
   /**
    * Enables all slot-related fixes such as {@link slotChildNodesFix}, and
    * {@link scopedSlotTextContentFix}.
    */
-  experimentalSlotFixes?: boolean;
-}
+  experimentalSlotFixes?: ExperimentalFixesEnabled;
+};
+
+export type ConfigExtras = ConfigExtrasBase &
+  (ConfigExtrasSlotFixes<true, true> | ConfigExtrasSlotFixes<false, boolean>);
 
 export interface Config extends StencilConfig {
   buildAppCore?: boolean;

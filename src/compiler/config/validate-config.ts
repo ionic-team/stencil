@@ -1,7 +1,14 @@
 import { createNodeLogger, createNodeSys } from '@sys-api-node';
 import { buildError, isBoolean, isNumber, isString, sortBy } from '@utils';
 
-import { ConfigBundle, Diagnostic, LoadConfigInit, UnvalidatedConfig, ValidatedConfig } from '../../declarations';
+import {
+  ConfigBundle,
+  ConfigExtras,
+  Diagnostic,
+  LoadConfigInit,
+  UnvalidatedConfig,
+  ValidatedConfig,
+} from '../../declarations';
 import { setBooleanConfig } from './config-utils';
 import { validateOutputTargets } from './outputs';
 import { validateDevServer } from './validate-dev-server';
@@ -104,24 +111,43 @@ export const validateConfig = (
   }
 
   validatedConfig.extras = validatedConfig.extras || {};
-  validatedConfig.extras.appendChildSlotFix = !!validatedConfig.extras.appendChildSlotFix;
-  validatedConfig.extras.cloneNodeFix = !!validatedConfig.extras.cloneNodeFix;
   validatedConfig.extras.lifecycleDOMEvents = !!validatedConfig.extras.lifecycleDOMEvents;
   validatedConfig.extras.scriptDataOpts = !!validatedConfig.extras.scriptDataOpts;
-  validatedConfig.extras.slotChildNodesFix = !!validatedConfig.extras.slotChildNodesFix;
   validatedConfig.extras.initializeNextTick = !!validatedConfig.extras.initializeNextTick;
   validatedConfig.extras.tagNameTransform = !!validatedConfig.extras.tagNameTransform;
+
+  // TODO(STENCIL-914): remove when `experimentalSlotFixes` is the default behavior
+  // If the user set `experimentalSlotFixes` and any individual slot fix flags to `false`, we need to log a warning
+  // to the user that we will "override" the individual flags
+  if (validatedConfig.extras.experimentalSlotFixes === true) {
+    const possibleFlags: (keyof ConfigExtras)[] = [
+      'appendChildSlotFix',
+      'slotChildNodesFix',
+      'cloneNodeFix',
+      'scopedSlotTextContentFix',
+    ];
+    const conflictingFlags = possibleFlags.filter((flag) => validatedConfig.extras[flag] === false);
+    if (conflictingFlags.length > 0) {
+      const warning = buildError(diagnostics);
+      warning.level = 'warn';
+      warning.messageText = `If the 'experimentalSlotFixes' flag is enabled it will override any slot fix flags which are disabled. In particular, the following currently-disabled flags will be ignored: ${conflictingFlags.join(
+        ', ',
+      )}. Please update your Stencil config accordingly.`;
+    }
+  }
+
   // TODO(STENCIL-914): remove `experimentalSlotFixes` when it's the default behavior
   validatedConfig.extras.experimentalSlotFixes = !!validatedConfig.extras.experimentalSlotFixes;
-
-  // if the user has set `extras.experimentalSlotFixes` then we turn on all of
-  // the slot-related fixes automatically.
-  // TODO(STENCIL-914): remove `experimentalSlotFixes` when it's the default behavior
-  if (validatedConfig.extras.experimentalSlotFixes) {
+  if (validatedConfig.extras.experimentalSlotFixes === true) {
     validatedConfig.extras.appendChildSlotFix = true;
     validatedConfig.extras.cloneNodeFix = true;
     validatedConfig.extras.slotChildNodesFix = true;
     validatedConfig.extras.scopedSlotTextContentFix = true;
+  } else {
+    validatedConfig.extras.appendChildSlotFix = !!validatedConfig.extras.appendChildSlotFix;
+    validatedConfig.extras.cloneNodeFix = !!validatedConfig.extras.cloneNodeFix;
+    validatedConfig.extras.slotChildNodesFix = !!validatedConfig.extras.slotChildNodesFix;
+    validatedConfig.extras.scopedSlotTextContentFix = !!validatedConfig.extras.scopedSlotTextContentFix;
   }
 
   validatedConfig.buildEs5 =
