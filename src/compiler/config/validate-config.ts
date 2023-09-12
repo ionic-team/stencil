@@ -130,7 +130,7 @@ export const validateConfig = (
     if (conflictingFlags.length > 0) {
       const warning = buildError(diagnostics);
       warning.level = 'warn';
-      warning.messageText = `The 'experimentalSlotFixes' flag cannot be used in combination with other slot fix flags disabled. The following flags will be ignored: ${conflictingFlags.join(
+      warning.messageText = `If the 'experimentalSlotFixes' flag is enabled it will override any slot fix flags which are disabled. In particular, the following currently-disabled flags will be ignored: ${conflictingFlags.join(
         ', ',
       )}. Please update your Stencil config accordingly.`;
     }
