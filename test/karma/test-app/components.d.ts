@@ -58,6 +58,16 @@ export namespace Components {
     }
     interface CmpLabelWithSlotSibling {
     }
+    interface ComputedPropertiesPropDecorator {
+        "first": string;
+        "last": string;
+        "middle": string;
+    }
+    interface ComputedPropertiesPropDecoratorReflect {
+        "first": string;
+        "last": string;
+        "middle": string;
+    }
     interface ConditionalBasic {
     }
     interface ConditionalRerender {
@@ -451,6 +461,18 @@ declare global {
     var HTMLCmpLabelWithSlotSiblingElement: {
         prototype: HTMLCmpLabelWithSlotSiblingElement;
         new (): HTMLCmpLabelWithSlotSiblingElement;
+    };
+    interface HTMLComputedPropertiesPropDecoratorElement extends Components.ComputedPropertiesPropDecorator, HTMLStencilElement {
+    }
+    var HTMLComputedPropertiesPropDecoratorElement: {
+        prototype: HTMLComputedPropertiesPropDecoratorElement;
+        new (): HTMLComputedPropertiesPropDecoratorElement;
+    };
+    interface HTMLComputedPropertiesPropDecoratorReflectElement extends Components.ComputedPropertiesPropDecoratorReflect, HTMLStencilElement {
+    }
+    var HTMLComputedPropertiesPropDecoratorReflectElement: {
+        prototype: HTMLComputedPropertiesPropDecoratorReflectElement;
+        new (): HTMLComputedPropertiesPropDecoratorReflectElement;
     };
     interface HTMLConditionalBasicElement extends Components.ConditionalBasic, HTMLStencilElement {
     }
@@ -1204,6 +1226,8 @@ declare global {
         "child-with-reflection": HTMLChildWithReflectionElement;
         "cmp-label": HTMLCmpLabelElement;
         "cmp-label-with-slot-sibling": HTMLCmpLabelWithSlotSiblingElement;
+        "computed-properties-prop-decorator": HTMLComputedPropertiesPropDecoratorElement;
+        "computed-properties-prop-decorator-reflect": HTMLComputedPropertiesPropDecoratorReflectElement;
         "conditional-basic": HTMLConditionalBasicElement;
         "conditional-rerender": HTMLConditionalRerenderElement;
         "conditional-rerender-root": HTMLConditionalRerenderRootElement;
@@ -1375,6 +1399,16 @@ declare namespace LocalJSX {
     interface CmpLabel {
     }
     interface CmpLabelWithSlotSibling {
+    }
+    interface ComputedPropertiesPropDecorator {
+        "first"?: string;
+        "last"?: string;
+        "middle"?: string;
+    }
+    interface ComputedPropertiesPropDecoratorReflect {
+        "first"?: string;
+        "last"?: string;
+        "middle"?: string;
     }
     interface ConditionalBasic {
     }
@@ -1685,6 +1719,8 @@ declare namespace LocalJSX {
         "child-with-reflection": ChildWithReflection;
         "cmp-label": CmpLabel;
         "cmp-label-with-slot-sibling": CmpLabelWithSlotSibling;
+        "computed-properties-prop-decorator": ComputedPropertiesPropDecorator;
+        "computed-properties-prop-decorator-reflect": ComputedPropertiesPropDecoratorReflect;
         "conditional-basic": ConditionalBasic;
         "conditional-rerender": ConditionalRerender;
         "conditional-rerender-root": ConditionalRerenderRoot;
@@ -1827,6 +1863,8 @@ declare module "@stencil/core" {
             "child-with-reflection": LocalJSX.ChildWithReflection & JSXBase.HTMLAttributes<HTMLChildWithReflectionElement>;
             "cmp-label": LocalJSX.CmpLabel & JSXBase.HTMLAttributes<HTMLCmpLabelElement>;
             "cmp-label-with-slot-sibling": LocalJSX.CmpLabelWithSlotSibling & JSXBase.HTMLAttributes<HTMLCmpLabelWithSlotSiblingElement>;
+            "computed-properties-prop-decorator": LocalJSX.ComputedPropertiesPropDecorator & JSXBase.HTMLAttributes<HTMLComputedPropertiesPropDecoratorElement>;
+            "computed-properties-prop-decorator-reflect": LocalJSX.ComputedPropertiesPropDecoratorReflect & JSXBase.HTMLAttributes<HTMLComputedPropertiesPropDecoratorReflectElement>;
             "conditional-basic": LocalJSX.ConditionalBasic & JSXBase.HTMLAttributes<HTMLConditionalBasicElement>;
             "conditional-rerender": LocalJSX.ConditionalRerender & JSXBase.HTMLAttributes<HTMLConditionalRerenderElement>;
             "conditional-rerender-root": LocalJSX.ConditionalRerenderRoot & JSXBase.HTMLAttributes<HTMLConditionalRerenderRootElement>;
