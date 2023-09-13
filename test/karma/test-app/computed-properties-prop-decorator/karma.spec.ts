@@ -1,6 +1,6 @@
 import { setupDomTests, waitForChanges } from '../util';
 
-describe('conditional-basic', function () {
+describe('computed-properties-peop-decorator', function () {
   const { setupDom, tearDownDom } = setupDomTests(document);
   let app: HTMLElement;
 

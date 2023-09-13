@@ -71,6 +71,10 @@ export namespace Components {
     interface ComputedPropertiesStateDecorator {
         "changeStates": () => Promise<void>;
     }
+    interface ComputedPropertiesWatchDecorator {
+        "first": string;
+        "last": string;
+    }
     interface ConditionalBasic {
     }
     interface ConditionalRerender {
@@ -482,6 +486,12 @@ declare global {
     var HTMLComputedPropertiesStateDecoratorElement: {
         prototype: HTMLComputedPropertiesStateDecoratorElement;
         new (): HTMLComputedPropertiesStateDecoratorElement;
+    };
+    interface HTMLComputedPropertiesWatchDecoratorElement extends Components.ComputedPropertiesWatchDecorator, HTMLStencilElement {
+    }
+    var HTMLComputedPropertiesWatchDecoratorElement: {
+        prototype: HTMLComputedPropertiesWatchDecoratorElement;
+        new (): HTMLComputedPropertiesWatchDecoratorElement;
     };
     interface HTMLConditionalBasicElement extends Components.ConditionalBasic, HTMLStencilElement {
     }
@@ -1238,6 +1248,7 @@ declare global {
         "computed-properties-prop-decorator": HTMLComputedPropertiesPropDecoratorElement;
         "computed-properties-prop-decorator-reflect": HTMLComputedPropertiesPropDecoratorReflectElement;
         "computed-properties-state-decorator": HTMLComputedPropertiesStateDecoratorElement;
+        "computed-properties-watch-decorator": HTMLComputedPropertiesWatchDecoratorElement;
         "conditional-basic": HTMLConditionalBasicElement;
         "conditional-rerender": HTMLConditionalRerenderElement;
         "conditional-rerender-root": HTMLConditionalRerenderRootElement;
@@ -1421,6 +1432,10 @@ declare namespace LocalJSX {
         "middle"?: string;
     }
     interface ComputedPropertiesStateDecorator {
+    }
+    interface ComputedPropertiesWatchDecorator {
+        "first"?: string;
+        "last"?: string;
     }
     interface ConditionalBasic {
     }
@@ -1734,6 +1749,7 @@ declare namespace LocalJSX {
         "computed-properties-prop-decorator": ComputedPropertiesPropDecorator;
         "computed-properties-prop-decorator-reflect": ComputedPropertiesPropDecoratorReflect;
         "computed-properties-state-decorator": ComputedPropertiesStateDecorator;
+        "computed-properties-watch-decorator": ComputedPropertiesWatchDecorator;
         "conditional-basic": ConditionalBasic;
         "conditional-rerender": ConditionalRerender;
         "conditional-rerender-root": ConditionalRerenderRoot;
@@ -1879,6 +1895,7 @@ declare module "@stencil/core" {
             "computed-properties-prop-decorator": LocalJSX.ComputedPropertiesPropDecorator & JSXBase.HTMLAttributes<HTMLComputedPropertiesPropDecoratorElement>;
             "computed-properties-prop-decorator-reflect": LocalJSX.ComputedPropertiesPropDecoratorReflect & JSXBase.HTMLAttributes<HTMLComputedPropertiesPropDecoratorReflectElement>;
             "computed-properties-state-decorator": LocalJSX.ComputedPropertiesStateDecorator & JSXBase.HTMLAttributes<HTMLComputedPropertiesStateDecoratorElement>;
+            "computed-properties-watch-decorator": LocalJSX.ComputedPropertiesWatchDecorator & JSXBase.HTMLAttributes<HTMLComputedPropertiesWatchDecoratorElement>;
             "conditional-basic": LocalJSX.ConditionalBasic & JSXBase.HTMLAttributes<HTMLConditionalBasicElement>;
             "conditional-rerender": LocalJSX.ConditionalRerender & JSXBase.HTMLAttributes<HTMLConditionalRerenderElement>;
             "conditional-rerender-root": LocalJSX.ConditionalRerenderRoot & JSXBase.HTMLAttributes<HTMLConditionalRerenderRootElement>;
