@@ -86,6 +86,7 @@ export const validateConfig = (
   const validatedConfig: ValidatedConfig = {
     devServer: {}, // assign `devServer` before spreading `config`, in the event 'devServer' is not a key on `config`
     ...config,
+    extras: config.extras || {},
     // flags _should_ be JSON safe
     flags: JSON.parse(JSON.stringify(config.flags || {})),
     hydratedFlag: validateHydrated(config),
@@ -110,7 +111,6 @@ export const validateConfig = (
     validatedConfig.devMode = DEFAULT_DEV_MODE;
   }
 
-  validatedConfig.extras = validatedConfig.extras || {};
   validatedConfig.extras.lifecycleDOMEvents = !!validatedConfig.extras.lifecycleDOMEvents;
   validatedConfig.extras.scriptDataOpts = !!validatedConfig.extras.scriptDataOpts;
   validatedConfig.extras.initializeNextTick = !!validatedConfig.extras.initializeNextTick;
