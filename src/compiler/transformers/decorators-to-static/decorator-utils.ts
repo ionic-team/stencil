@@ -22,11 +22,10 @@ const getDecoratorParameter = (arg: ts.Expression, typeChecker: ts.TypeChecker):
     const type = typeChecker.getTypeAtLocation(arg);
     if (type !== undefined && type.isLiteral()) {
       /**
-       * Enum members are property access expressions, so we can evaluate them
-       * to get the enum member value as a string.
-       *
-       * This enables developers to use enum members in decorators.
-       * e.g. @Watch(MyEnum.VALUE)
+       * Using enums or variables require us to resolve the value for
+       * the computed property/identifier via the TS type checker. As long
+       * as the type resolves to a literal, we can grab its value to be used
+       * as the `@Watch()` decorator argument.
        */
       return type.value;
     }
