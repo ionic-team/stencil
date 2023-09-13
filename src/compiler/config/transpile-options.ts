@@ -78,6 +78,9 @@ export const getTranspileConfig = (input: TranspileOptions): TranspileConfig => 
   };
 
   const tsCompilerOptions: CompilerOptions = {
+    // ensure we uses legacy decorators
+    experimentalDecorators: true,
+
     // best we always set this to true
     allowSyntheticDefaultImports: true,
 
