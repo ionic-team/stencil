@@ -68,6 +68,9 @@ export namespace Components {
         "last": string;
         "middle": string;
     }
+    interface ComputedPropertiesStateDecorator {
+        "changeStates": () => Promise<void>;
+    }
     interface ConditionalBasic {
     }
     interface ConditionalRerender {
@@ -473,6 +476,12 @@ declare global {
     var HTMLComputedPropertiesPropDecoratorReflectElement: {
         prototype: HTMLComputedPropertiesPropDecoratorReflectElement;
         new (): HTMLComputedPropertiesPropDecoratorReflectElement;
+    };
+    interface HTMLComputedPropertiesStateDecoratorElement extends Components.ComputedPropertiesStateDecorator, HTMLStencilElement {
+    }
+    var HTMLComputedPropertiesStateDecoratorElement: {
+        prototype: HTMLComputedPropertiesStateDecoratorElement;
+        new (): HTMLComputedPropertiesStateDecoratorElement;
     };
     interface HTMLConditionalBasicElement extends Components.ConditionalBasic, HTMLStencilElement {
     }
@@ -1228,6 +1237,7 @@ declare global {
         "cmp-label-with-slot-sibling": HTMLCmpLabelWithSlotSiblingElement;
         "computed-properties-prop-decorator": HTMLComputedPropertiesPropDecoratorElement;
         "computed-properties-prop-decorator-reflect": HTMLComputedPropertiesPropDecoratorReflectElement;
+        "computed-properties-state-decorator": HTMLComputedPropertiesStateDecoratorElement;
         "conditional-basic": HTMLConditionalBasicElement;
         "conditional-rerender": HTMLConditionalRerenderElement;
         "conditional-rerender-root": HTMLConditionalRerenderRootElement;
@@ -1409,6 +1419,8 @@ declare namespace LocalJSX {
         "first"?: string;
         "last"?: string;
         "middle"?: string;
+    }
+    interface ComputedPropertiesStateDecorator {
     }
     interface ConditionalBasic {
     }
@@ -1721,6 +1733,7 @@ declare namespace LocalJSX {
         "cmp-label-with-slot-sibling": CmpLabelWithSlotSibling;
         "computed-properties-prop-decorator": ComputedPropertiesPropDecorator;
         "computed-properties-prop-decorator-reflect": ComputedPropertiesPropDecoratorReflect;
+        "computed-properties-state-decorator": ComputedPropertiesStateDecorator;
         "conditional-basic": ConditionalBasic;
         "conditional-rerender": ConditionalRerender;
         "conditional-rerender-root": ConditionalRerenderRoot;
@@ -1865,6 +1878,7 @@ declare module "@stencil/core" {
             "cmp-label-with-slot-sibling": LocalJSX.CmpLabelWithSlotSibling & JSXBase.HTMLAttributes<HTMLCmpLabelWithSlotSiblingElement>;
             "computed-properties-prop-decorator": LocalJSX.ComputedPropertiesPropDecorator & JSXBase.HTMLAttributes<HTMLComputedPropertiesPropDecoratorElement>;
             "computed-properties-prop-decorator-reflect": LocalJSX.ComputedPropertiesPropDecoratorReflect & JSXBase.HTMLAttributes<HTMLComputedPropertiesPropDecoratorReflectElement>;
+            "computed-properties-state-decorator": LocalJSX.ComputedPropertiesStateDecorator & JSXBase.HTMLAttributes<HTMLComputedPropertiesStateDecoratorElement>;
             "conditional-basic": LocalJSX.ConditionalBasic & JSXBase.HTMLAttributes<HTMLConditionalBasicElement>;
             "conditional-rerender": LocalJSX.ConditionalRerender & JSXBase.HTMLAttributes<HTMLConditionalRerenderElement>;
             "conditional-rerender-root": LocalJSX.ConditionalRerenderRoot & JSXBase.HTMLAttributes<HTMLConditionalRerenderRootElement>;
