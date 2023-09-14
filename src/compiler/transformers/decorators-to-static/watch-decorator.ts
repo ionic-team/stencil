@@ -25,8 +25,8 @@ const parseWatchDecorator = (typeChecker: ts.TypeChecker, method: ts.MethodDecla
   const methodName = method.name.getText();
   const decorators = retrieveTsDecorators(method) ?? [];
   return decorators.filter(isDecoratorNamed('Watch')).map((decorator) => {
-    const [propName] = getDeclarationParameters<string>(decorator, typeChecker);
-    
+    const [propName] = getDecoratorParameters<string>(decorator, typeChecker);
+
     return {
       propName,
       methodName,
