@@ -58,6 +58,15 @@ export const stringifyRuntimeData = (data: any) => {
   return json;
 };
 
+/**
+ * Transforms Stencil compiler metadata into a {@link d.ComponentCompilerMeta} object.
+ * This handles processing any compiler metadata transformed from components' uses of `@Watch()`.
+ * The map of watched attributes to their callback(s) will be immediately available
+ * to the runtime at bootstrap.
+ *
+ * @param compilerMeta Component metadata gathered during compilation
+ * @returns An object mapping watched attributes to their respective callback(s)
+ */
 const formatComponentRuntimeWatchers = (compilerMeta: d.ComponentCompilerMeta) => {
   const watchers: d.ComponentConstructorWatchers = {};
 
