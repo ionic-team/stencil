@@ -38,11 +38,13 @@ export const formatComponentRuntimeMeta = (
 
   const members = formatComponentRuntimeMembers(compilerMeta, includeMethods);
   const hostListeners = formatHostListeners(compilerMeta);
+  const watchers = formatComponentRuntimeWatchers(compilerMeta);
   return trimFalsy([
     flags,
     compilerMeta.tagName,
     Object.keys(members).length > 0 ? members : undefined,
     hostListeners.length > 0 ? hostListeners : undefined,
+    Object.keys(watchers).length > 0 ? watchers : undefined,
   ]);
 };
 
@@ -54,6 +56,25 @@ export const stringifyRuntimeData = (data: any) => {
     return `JSON.parse(${JSON.stringify(json)})`;
   }
   return json;
+};
+
+/**
+ * Transforms Stencil compiler metadata into a {@link d.ComponentCompilerMeta} object.
+ * This handles processing any compiler metadata transformed from components' uses of `@Watch()`.
+ * The map of watched attributes to their callback(s) will be immediately available
+ * to the runtime at bootstrap.
+ *
+ * @param compilerMeta Component metadata gathered during compilation
+ * @returns An object mapping watched attributes to their respective callback(s)
+ */
+const formatComponentRuntimeWatchers = (compilerMeta: d.ComponentCompilerMeta) => {
+  const watchers: d.ComponentConstructorWatchers = {};
+
+  compilerMeta.watchers.forEach(({ propName, methodName }) => {
+    watchers[propName] = [...(watchers[propName] ?? []), methodName];
+  });
+
+  return watchers;
 };
 
 const formatComponentRuntimeMembers = (

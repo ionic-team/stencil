@@ -26,7 +26,6 @@ import { getDeclarationParameters, isDecoratorNamed } from './decorator-utils';
  * Only those decorated with `@Prop()` will be parsed.
  * @param typeChecker a reference to the TypeScript type checker
  * @param program a {@link ts.Program} object
- * @param watchable a collection of class members that can be watched for changes using Stencil's `@Watch` decorator
  * @param newMembers a collection that parsed `@Prop` annotated class members should be pushed to as a side effect of
  * calling this function
  */
@@ -35,12 +34,11 @@ export const propDecoratorsToStatic = (
   decoratedProps: ts.ClassElement[],
   typeChecker: ts.TypeChecker,
   program: ts.Program,
-  watchable: Set<string>,
   newMembers: ts.ClassElement[],
 ): void => {
   const properties = decoratedProps
     .filter(ts.isPropertyDeclaration)
-    .map((prop) => parsePropDecorator(diagnostics, typeChecker, program, prop, watchable))
+    .map((prop) => parsePropDecorator(diagnostics, typeChecker, program, prop))
     .filter((prop): prop is ts.PropertyAssignment => prop != null);
 
   if (properties.length > 0) {
@@ -55,7 +53,6 @@ export const propDecoratorsToStatic = (
  * @param typeChecker a reference to the TypeScript type checker
  * @param program a {@link ts.Program} object
  * @param prop the TypeScript `PropertyDeclaration` to parse
- * @param watchable a collection of class members that can be watched for changes using Stencil's `@Watch` decorator
  * @returns a property assignment expression to be added to the Stencil component's class
  */
 const parsePropDecorator = (
@@ -63,7 +60,6 @@ const parsePropDecorator = (
   typeChecker: ts.TypeChecker,
   program: ts.Program,
   prop: ts.PropertyDeclaration,
-  watchable: Set<string>,
 ): ts.PropertyAssignment | null => {
   const propDecorator = retrieveTsDecorators(prop)?.find(isDecoratorNamed('Prop'));
   if (propDecorator == null) {
@@ -120,7 +116,7 @@ const parsePropDecorator = (
     ts.factory.createStringLiteral(propName),
     convertValueToLiteral(propMeta),
   );
-  watchable.add(propName);
+
   return staticProp;
 };
 

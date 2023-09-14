@@ -85,7 +85,7 @@ export const proxyComponent = (
     if (BUILD.observeAttribute && (!BUILD.lazyLoad || flags & PROXY_FLAGS.isElementConstructor)) {
       const attrNameToPropName = new Map();
 
-      prototype.attributeChangedCallback = function (attrName: string, _oldValue: string, newValue: string) {
+      prototype.attributeChangedCallback = function (attrName: string, oldValue: string, newValue: string) {
         plt.jmp(() => {
           const propName = attrNameToPropName.get(attrName);
 
@@ -134,24 +134,59 @@ export const proxyComponent = (
             // APIs to reflect props as attributes. Calls to `setAttribute(someElement, propName)` will result in
             // `propName` to be converted to a `DOMString`, which may not be what we want for other primitive props.
             return;
+          } else if (propName == null) {
+            // At this point we should know this is not a "member", so we can treat it like watching an attribute
+            // on a vanilla web component
+            const hostRef = getHostRef(this);
+            const flags = hostRef?.$flags$;
+
+            // We only want to trigger the callback(s) if:
+            // 1. The instance is ready
+            // 2. The watchers are ready
+            // 3. The value has changed
+            if (
+              !(flags & HOST_FLAGS.isConstructingInstance) &&
+              flags & HOST_FLAGS.isWatchReady &&
+              newValue !== oldValue
+            ) {
+              const elm = BUILD.lazyLoad ? hostRef.$hostElement$ : this;
+              const instance = BUILD.lazyLoad ? hostRef.$lazyInstance$ : (elm as any);
+              const entry = cmpMeta.$watchers$[attrName];
+              entry?.forEach((callbackName) => {
+                if (instance[callbackName] != null) {
+                  instance[callbackName].call(instance, newValue, oldValue, attrName);
+                }
+              });
+            }
+
+            return;
           }
 
           this[propName] = newValue === null && typeof this[propName] === 'boolean' ? false : newValue;
         });
       };
 
-      // create an array of attributes to observe
-      // and also create a map of html attribute name to js property name
-      Cstr.observedAttributes = members
-        .filter(([_, m]) => m[0] & MEMBER_FLAGS.HasAttribute) // filter to only keep props that should match attributes
-        .map(([propName, m]) => {
-          const attrName = m[1] || propName;
-          attrNameToPropName.set(attrName, propName);
-          if (BUILD.reflect && m[0] & MEMBER_FLAGS.ReflectAttr) {
-            cmpMeta.$attrsToReflect$.push([propName, attrName]);
-          }
-          return attrName;
-        });
+      // Create an array of attributes to observe
+      // This list in comprised of all strings used within a `@Watch()` decorator
+      // on a component as well as any Stencil-specific "members" (`@Prop()`s and `@State()`s).
+      // As such, there is no way to guarantee type-safety here that a user hasn't entered
+      // an invalid attribute.
+      Cstr.observedAttributes = Array.from(
+        new Set([
+          ...Object.keys(cmpMeta.$watchers$ ?? {}),
+          ...members
+            .filter(([_, m]) => m[0] & MEMBER_FLAGS.HasAttribute)
+            .map(([propName, m]) => {
+              const attrName = m[1] || propName;
+              attrNameToPropName.set(attrName, propName);
+              if (BUILD.reflect && m[0] & MEMBER_FLAGS.ReflectAttr) {
+                cmpMeta.$attrsToReflect$.push([propName, attrName]);
+              }
+
+              return attrName;
+            }),
+        ]),
+      );
     }
   }
 
