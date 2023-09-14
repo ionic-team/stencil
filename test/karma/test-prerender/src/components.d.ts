@@ -29,6 +29,8 @@ export namespace Components {
     }
     interface CmpTextGreen {
     }
+    interface TestSvg {
+    }
 }
 declare global {
     interface HTMLAppRootElement extends Components.AppRoot, HTMLStencilElement {
@@ -97,6 +99,12 @@ declare global {
         prototype: HTMLCmpTextGreenElement;
         new (): HTMLCmpTextGreenElement;
     };
+    interface HTMLTestSvgElement extends Components.TestSvg, HTMLStencilElement {
+    }
+    var HTMLTestSvgElement: {
+        prototype: HTMLTestSvgElement;
+        new (): HTMLTestSvgElement;
+    };
     interface HTMLElementTagNameMap {
         "app-root": HTMLAppRootElement;
         "cmp-a": HTMLCmpAElement;
@@ -109,6 +117,7 @@ declare global {
         "cmp-scoped-b": HTMLCmpScopedBElement;
         "cmp-text-blue": HTMLCmpTextBlueElement;
         "cmp-text-green": HTMLCmpTextGreenElement;
+        "test-svg": HTMLTestSvgElement;
     }
 }
 declare namespace LocalJSX {
@@ -135,6 +144,8 @@ declare namespace LocalJSX {
     }
     interface CmpTextGreen {
     }
+    interface TestSvg {
+    }
     interface IntrinsicElements {
         "app-root": AppRoot;
         "cmp-a": CmpA;
@@ -147,6 +158,7 @@ declare namespace LocalJSX {
         "cmp-scoped-b": CmpScopedB;
         "cmp-text-blue": CmpTextBlue;
         "cmp-text-green": CmpTextGreen;
+        "test-svg": TestSvg;
     }
 }
 export { LocalJSX as JSX };
@@ -164,6 +176,7 @@ declare module "@stencil/core" {
             "cmp-scoped-b": LocalJSX.CmpScopedB & JSXBase.HTMLAttributes<HTMLCmpScopedBElement>;
             "cmp-text-blue": LocalJSX.CmpTextBlue & JSXBase.HTMLAttributes<HTMLCmpTextBlueElement>;
             "cmp-text-green": LocalJSX.CmpTextGreen & JSXBase.HTMLAttributes<HTMLCmpTextGreenElement>;
+            "test-svg": LocalJSX.TestSvg & JSXBase.HTMLAttributes<HTMLTestSvgElement>;
         }
     }
 }
