@@ -9,8 +9,7 @@ describe('delegates-focus', function () {
   });
   afterEach(tearDownDom);
 
-  // TODO(STENCIL-862): Re-enable this test
-  xit('should delegate focus', async () => {
+  it('should delegate focus', async () => {
     const button = app.querySelector('button');
     const delegateFocusElm = app.querySelector('delegates-focus');
     const noDelegateFocusElm = app.querySelector('no-delegates-focus');
