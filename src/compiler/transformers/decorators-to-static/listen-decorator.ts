@@ -3,16 +3,17 @@ import ts from 'typescript';
 
 import type * as d from '../../../declarations';
 import { convertValueToLiteral, createStaticGetter, retrieveTsDecorators } from '../transform-utils';
-import { getDeclarationParameters, isDecoratorNamed } from './decorator-utils';
+import { getDecoratorParameters, isDecoratorNamed } from './decorator-utils';
 
 export const listenDecoratorsToStatic = (
   diagnostics: d.Diagnostic[],
+  typeChecker: ts.TypeChecker,
   decoratedMembers: ts.ClassElement[],
   newMembers: ts.ClassElement[],
 ) => {
   const listeners = decoratedMembers
     .filter(ts.isMethodDeclaration)
-    .map((method) => parseListenDecorators(diagnostics, method));
+    .map((method) => parseListenDecorators(diagnostics, typeChecker, method));
 
   const flatListeners = flatOne(listeners);
   if (flatListeners.length > 0) {
@@ -22,6 +23,7 @@ export const listenDecoratorsToStatic = (
 
 const parseListenDecorators = (
   diagnostics: d.Diagnostic[],
+  typeChecker: ts.TypeChecker,
   method: ts.MethodDeclaration,
 ): d.ComponentCompilerListener[] => {
   const listenDecorators = (retrieveTsDecorators(method) ?? []).filter(isDecoratorNamed('Listen'));
@@ -31,7 +33,7 @@ const parseListenDecorators = (
 
   return listenDecorators.map((listenDecorator) => {
     const methodName = method.name.getText();
-    const [listenText, listenOptions] = getDeclarationParameters<string, d.ListenOptions>(listenDecorator);
+    const [listenText, listenOptions] = getDecoratorParameters<string, d.ListenOptions>(listenDecorator, typeChecker);
 
     const eventNames = listenText.split(',');
     if (eventNames.length > 1) {

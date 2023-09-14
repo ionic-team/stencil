@@ -1053,9 +1053,10 @@ const createConstructorBodyWithSuper = (): ts.ExpressionStatement => {
  * Given a {@link ts.PropertyDeclaration} node get its name as a string
  *
  * @param node a property decl node
+ * @param typeChecker a reference to the {@link ts.TypeChecker}
  * @returns the name of the property in string form
  */
-export const tsPropDeclNameAsString = (node: ts.PropertyDeclaration): string => {
+export const tsPropDeclNameAsString = (node: ts.PropertyDeclaration, typeChecker: ts.TypeChecker): string => {
   const declarationName: ts.DeclarationName = ts.getNameOfDeclaration(node);
 
   // The name of a class field declaration can be a computed property name,
@@ -1069,9 +1070,8 @@ export const tsPropDeclNameAsString = (node: ts.PropertyDeclaration): string => 
   // }
   // ```
   //
-  // In this case we need to get the expression which evaluates to some
-  // valid property name and call `.getText` on it. In the case that it's
-  // _not_ a computed property name, like
+  // In this case we need to evaluate the expression via the typechecker to get the literal
+  // value of the property. In the case that it's _not_ a computed property name, like
   //
   // ```ts
   // class MyClass {
@@ -1080,9 +1080,13 @@ export const tsPropDeclNameAsString = (node: ts.PropertyDeclaration): string => 
   // ```
   //
   // we can just call `.getText` on the name itself.
-  const memberName =
-    declarationName.kind === ts.SyntaxKind.ComputedPropertyName
-      ? declarationName.expression.getText()
-      : declarationName.getText();
+  let memberName = declarationName.getText();
+  if (ts.isComputedPropertyName(declarationName)) {
+    const type = typeChecker.getTypeAtLocation(declarationName.expression);
+    if (type != null && type.isLiteral()) {
+      memberName = type.value.toString();
+    }
+  }
+
   return memberName;
 };

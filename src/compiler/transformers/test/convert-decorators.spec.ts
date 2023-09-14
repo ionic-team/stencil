@@ -74,6 +74,60 @@ describe('convert-decorators', () => {
     );
   });
 
+  it('should get the correct literal for a computed property enum used for a `@Prop`', async () => {
+    const t = transpileModule(`
+      enum MyEnum {
+        MY_PROP = 'myVal'
+      }
+      @Component({tag: 'cmp-a'})
+      export class CmpA {
+        @Prop() [MyEnum.MY_PROP]: string;
+      }
+    `);
+
+    expect(t.properties).toEqual([
+      {
+        name: 'myVal',
+        type: 'string',
+        attribute: 'my-val',
+        reflect: false,
+        mutable: false,
+        required: false,
+        optional: false,
+        defaultValue: undefined,
+        complexType: { original: 'string', resolved: 'string', references: {} },
+        docs: { tags: [], text: '' },
+        internal: false,
+      },
+    ]);
+  });
+
+  it('should get the correct literal for a computed property variable used for a `@Prop`', async () => {
+    const t = transpileModule(`
+      const tmp = 'myVal';
+      @Component({tag: 'cmp-a'})
+      export class CmpA {
+        @Prop() [tmp]: string;
+      }
+    `);
+
+    expect(t.properties).toEqual([
+      {
+        name: 'myVal',
+        type: 'string',
+        attribute: 'my-val',
+        reflect: false,
+        mutable: false,
+        required: false,
+        optional: false,
+        defaultValue: undefined,
+        complexType: { original: 'string', resolved: 'string', references: {} },
+        docs: { tags: [], text: '' },
+        internal: false,
+      },
+    ]);
+  });
+
   it('should convert `@State` class fields to properties', async () => {
     const t = transpileModule(`
     @Component({tag: 'cmp-b'})
@@ -97,6 +151,40 @@ describe('convert-decorators', () => {
           return { "count": {}};
         }}`,
     );
+  });
+
+  it('should get the correct literal for a computed property enum used for a `@State`', async () => {
+    const t = transpileModule(`
+      enum MyEnum {
+        MY_PROP = 'myVal'
+      }
+      @Component({tag: 'cmp-a'})
+      export class CmpA {
+        @State() [MyEnum.MY_PROP]: string;
+      }
+    `);
+
+    expect(t.states).toEqual([
+      {
+        name: 'myVal',
+      },
+    ]);
+  });
+
+  it('should get the correct literal for a computed property variable used for a `@State`', async () => {
+    const t = transpileModule(`
+      const tmp = 'myVal';
+      @Component({tag: 'cmp-a'})
+      export class CmpA {
+        @State() [tmp]: string;
+      }
+    `);
+
+    expect(t.states).toEqual([
+      {
+        name: 'myVal',
+      },
+    ]);
   });
 
   it('should not add a constructor if no class fields are present', async () => {

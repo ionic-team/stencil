@@ -1,6 +1,6 @@
 import ts from 'typescript';
 
-import { createStaticGetter, retrieveTsDecorators } from '../transform-utils';
+import { createStaticGetter, retrieveTsDecorators, tsPropDeclNameAsString } from '../transform-utils';
 import { isDecoratorNamed } from './decorator-utils';
 
 /**
@@ -12,11 +12,16 @@ import { isDecoratorNamed } from './decorator-utils';
  *
  * @param decoratedProps TypeScript AST nodes representing class members
  * @param newMembers an out param containing new class members
+ * @param typeChecker a reference to the TypeScript type checker
  */
-export const stateDecoratorsToStatic = (decoratedProps: ts.ClassElement[], newMembers: ts.ClassElement[]) => {
+export const stateDecoratorsToStatic = (
+  decoratedProps: ts.ClassElement[],
+  newMembers: ts.ClassElement[],
+  typeChecker: ts.TypeChecker,
+) => {
   const states = decoratedProps
     .filter(ts.isPropertyDeclaration)
-    .map(stateDecoratorToStatic)
+    .map((prop) => stateDecoratorToStatic(prop, typeChecker))
     .filter((state): state is ts.PropertyAssignment => !!state);
 
   if (states.length > 0) {
@@ -33,16 +38,20 @@ export const stateDecoratorsToStatic = (decoratedProps: ts.ClassElement[], newMe
  * decorated with other decorators.
  *
  * @param prop A TypeScript AST node representing a class property declaration
+ * @param typeChecker a reference to the TypeScript type checker
  * @returns a property assignment AST Node which maps the name of the state
  * prop to an empty object
  */
-const stateDecoratorToStatic = (prop: ts.PropertyDeclaration): ts.PropertyAssignment | null => {
+const stateDecoratorToStatic = (
+  prop: ts.PropertyDeclaration,
+  typeChecker: ts.TypeChecker,
+): ts.PropertyAssignment | null => {
   const stateDecorator = retrieveTsDecorators(prop)?.find(isDecoratorNamed('State'));
   if (stateDecorator == null) {
     return null;
   }
 
-  const stateName = prop.name.getText();
+  const stateName = tsPropDeclNameAsString(prop, typeChecker);
 
   return ts.factory.createPropertyAssignment(
     ts.factory.createStringLiteral(stateName),

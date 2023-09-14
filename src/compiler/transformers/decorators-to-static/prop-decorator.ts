@@ -12,10 +12,11 @@ import {
   retrieveTsDecorators,
   retrieveTsModifiers,
   serializeSymbol,
+  tsPropDeclNameAsString,
   typeToString,
   validateReferences,
 } from '../transform-utils';
-import { getDeclarationParameters, isDecoratorNamed } from './decorator-utils';
+import { getDecoratorParameters, isDecoratorNamed } from './decorator-utils';
 
 /**
  * Parse a collection of class members decorated with `@Prop()`
@@ -66,10 +67,10 @@ const parsePropDecorator = (
     return null;
   }
 
-  const decoratorParams = getDeclarationParameters<d.PropOptions>(propDecorator);
+  const decoratorParams = getDecoratorParameters<d.PropOptions>(propDecorator, typeChecker);
   const propOptions: d.PropOptions = decoratorParams[0] || {};
 
-  const propName = prop.name.getText();
+  const propName = tsPropDeclNameAsString(prop, typeChecker);
 
   if (isMemberPrivate(prop)) {
     const err = buildError(diagnostics);

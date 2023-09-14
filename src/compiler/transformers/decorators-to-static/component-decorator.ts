@@ -3,7 +3,7 @@ import ts from 'typescript';
 
 import type * as d from '../../../declarations';
 import { convertValueToLiteral, createStaticGetter, retrieveTsDecorators } from '../transform-utils';
-import { getDeclarationParameters } from './decorator-utils';
+import { getDecoratorParameters } from './decorator-utils';
 import { styleToStatic } from './style-to-static';
 
 /**
@@ -35,7 +35,7 @@ export const componentDecoratorToStatic = (
   newMembers: ts.ClassElement[],
   componentDecorator: ts.Decorator,
 ) => {
-  const [componentOptions] = getDeclarationParameters<d.ComponentOptions>(componentDecorator);
+  const [componentOptions] = getDecoratorParameters<d.ComponentOptions>(componentDecorator, typeChecker);
   if (!componentOptions) {
     return;
   }
