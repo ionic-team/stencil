@@ -1,6 +1,6 @@
 import { setupDomTests, waitForChanges } from '../util';
 
-describe('computed-properties-peop-decorator', function () {
+describe('computed-properties-prop-decorator', function () {
   const { setupDom, tearDownDom } = setupDomTests(document);
   let app: HTMLElement;
 

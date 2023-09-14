@@ -42,7 +42,10 @@ export const stateDecoratorsToStatic = (
  * @returns a property assignment AST Node which maps the name of the state
  * prop to an empty object
  */
-const stateDecoratorToStatic = (prop: ts.PropertyDeclaration, typeChecker: ts.TypeChecker): ts.PropertyAssignment | null => {
+const stateDecoratorToStatic = (
+  prop: ts.PropertyDeclaration,
+  typeChecker: ts.TypeChecker,
+): ts.PropertyAssignment | null => {
   const stateDecorator = retrieveTsDecorators(prop)?.find(isDecoratorNamed('State'));
   if (stateDecorator == null) {
     return null;
