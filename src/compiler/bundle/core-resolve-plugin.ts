@@ -16,7 +16,7 @@ import {
 } from './entry-alias-ids';
 
 export const coreResolvePlugin = (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   platform: 'client' | 'hydrate' | 'worker',
   externalRuntime: boolean,
@@ -122,7 +122,7 @@ export const Build = {
   };
 };
 
-export const getStencilInternalModule = (config: d.Config, compilerExe: string, internalModule: string) => {
+export const getStencilInternalModule = (config: d.ValidatedConfig, compilerExe: string, internalModule: string) => {
   if (isRemoteUrl(compilerExe)) {
     return normalizePath(
       config.sys.getLocalModulePath({

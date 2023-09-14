@@ -125,7 +125,7 @@ const bundleDevModule = async (
   }
 };
 
-const useDevModuleCache = async (config: d.Config, p: string) => {
+const useDevModuleCache = async (config: d.ValidatedConfig, p: string) => {
   if (config.enableCache) {
     for (let i = 0; i < 10; i++) {
       const n = basename(p);
@@ -142,7 +142,7 @@ const useDevModuleCache = async (config: d.Config, p: string) => {
   return false;
 };
 
-const writeCachedFile = async (config: d.Config, results: d.CompilerRequestResponse) => {
+const writeCachedFile = async (config: d.ValidatedConfig, results: d.CompilerRequestResponse) => {
   try {
     await config.sys.createDir(config.cacheDir);
     config.sys.writeFile(results.cachePath, results.content);
@@ -151,7 +151,7 @@ const writeCachedFile = async (config: d.Config, results: d.CompilerRequestRespo
   }
 };
 
-const parseDevModuleUrl = (config: d.Config, u: string) => {
+const parseDevModuleUrl = (config: d.ValidatedConfig, u: string) => {
   const parsedUrl: ParsedDevModuleUrl = {
     nodeModuleId: null,
     nodeModuleVersion: null,
@@ -179,7 +179,7 @@ const parseDevModuleUrl = (config: d.Config, u: string) => {
   return parsedUrl;
 };
 
-const getDevModuleCachePath = (config: d.Config, parsedUrl: ParsedDevModuleUrl) => {
+const getDevModuleCachePath = (config: d.ValidatedConfig, parsedUrl: ParsedDevModuleUrl) => {
   return join(
     config.cacheDir,
     `dev_module_${parsedUrl.nodeModuleId}_${parsedUrl.nodeModuleVersion}_${DEV_MODULE_CACHE_BUSTER}.log`,

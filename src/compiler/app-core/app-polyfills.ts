@@ -2,7 +2,11 @@ import { join } from 'path';
 
 import type * as d from '../../declarations';
 
-export const getClientPolyfill = async (config: d.Config, compilerCtx: d.CompilerCtx, polyfillFile: string) => {
+export const getClientPolyfill = async (
+  config: d.ValidatedConfig,
+  compilerCtx: d.CompilerCtx,
+  polyfillFile: string,
+) => {
   const polyfillFilePath = join(
     config.sys.getCompilerExecutingPath(),
     '..',
@@ -15,7 +19,7 @@ export const getClientPolyfill = async (config: d.Config, compilerCtx: d.Compile
   return compilerCtx.fs.readFile(polyfillFilePath);
 };
 
-export const getAppBrowserCorePolyfills = async (config: d.Config, compilerCtx: d.CompilerCtx) => {
+export const getAppBrowserCorePolyfills = async (config: d.ValidatedConfig, compilerCtx: d.CompilerCtx) => {
   // read all the polyfill content, in this particular order
   const polyfills = INLINE_POLYFILLS.slice();
 

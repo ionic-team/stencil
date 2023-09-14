@@ -4,7 +4,7 @@ import type { Plugin, TransformPluginContext, TransformResult } from 'rollup';
 
 import type * as d from '../../declarations';
 
-export const extFormatPlugin = (config: d.Config): Plugin => {
+export const extFormatPlugin = (config: d.ValidatedConfig): Plugin => {
   return {
     name: 'extFormatPlugin',
 
@@ -52,7 +52,7 @@ const formatText = (code: string, filePath: string) => {
 };
 
 const formatUrl = (
-  config: d.Config,
+  config: d.ValidatedConfig,
   pluginCtx: TransformPluginContext,
   code: string,
   filePath: string,

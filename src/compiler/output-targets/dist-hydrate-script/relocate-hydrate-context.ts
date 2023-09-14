@@ -2,7 +2,7 @@ import type * as d from '../../../declarations';
 import { getGlobalScriptData } from '../../bundle/app-data-plugin';
 import { HYDRATE_APP_CLOSURE_START } from './hydrate-factory-closure';
 
-export const relocateHydrateContextConst = (config: d.Config, compilerCtx: d.CompilerCtx, code: string) => {
+export const relocateHydrateContextConst = (config: d.ValidatedConfig, compilerCtx: d.CompilerCtx, code: string) => {
   const globalScripts = getGlobalScriptData(config, compilerCtx);
   if (globalScripts.length > 0) {
     const startCode = code.indexOf('/*hydrate context start*/');

@@ -15,7 +15,11 @@ import type { BundleOptions } from './bundle-interface';
  * @param config the Stencil configuration for the project
  * @returns the rollup plugin for handling TypeScript files.
  */
-export const typescriptPlugin = (compilerCtx: d.CompilerCtx, bundleOpts: BundleOptions, config: d.Config): Plugin => {
+export const typescriptPlugin = (
+  compilerCtx: d.CompilerCtx,
+  bundleOpts: BundleOptions,
+  config: d.ValidatedConfig,
+): Plugin => {
   return {
     name: `${bundleOpts.id}TypescriptPlugin`,
 
