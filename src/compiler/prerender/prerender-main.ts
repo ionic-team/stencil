@@ -252,7 +252,7 @@ const runPrerenderOutputTarget = async (
   }
 };
 
-const createPrerenderTemplate = async (config: d.Config, templateHtml: string) => {
+const createPrerenderTemplate = async (config: d.ValidatedConfig, templateHtml: string) => {
   const hash = await config.sys.generateContentHash(templateHtml, 12);
   const templateFileName = `prerender-${hash}.html`;
   const templateId = join(config.sys.tmpDirSync(), templateFileName);

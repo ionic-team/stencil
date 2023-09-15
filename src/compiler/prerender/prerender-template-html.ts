@@ -11,7 +11,7 @@ import {
 } from './prerender-optimize';
 
 export const generateTemplateHtml = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   prerenderConfig: d.PrerenderConfig,
   diagnostics: d.Diagnostic[],
   isDebug: boolean,

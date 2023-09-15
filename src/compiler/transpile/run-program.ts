@@ -175,7 +175,7 @@ export const runTsProgram = async (
  * @returns a relative path to a suitable location where the typedef file can be
  * written
  */
-export const getRelativeDts = (config: d.Config, srcPath: string, emitDtsPath: string): string => {
+export const getRelativeDts = (config: d.ValidatedConfig, srcPath: string, emitDtsPath: string): string => {
   const parts: string[] = [];
   for (let i = 0; i < 30; i++) {
     if (normalizePath(config.srcDir) === srcPath) {

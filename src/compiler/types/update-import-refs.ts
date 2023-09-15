@@ -17,7 +17,7 @@ export const updateReferenceTypeImports = (
   typeCounts: Map<string, number>,
   cmp: d.ComponentCompilerMeta,
   filePath: string,
-  config: d.Config,
+  config: d.ValidatedConfig,
 ): d.TypesImportData => {
   const updateImportReferences = updateImportReferenceFactory(typeCounts, filePath, config);
 
@@ -53,7 +53,7 @@ type ImportReferenceUpdater = (
 const updateImportReferenceFactory = (
   typeCounts: Map<string, number>,
   filePath: string,
-  config: d.Config,
+  config: d.ValidatedConfig,
 ): ImportReferenceUpdater => {
   /**
    * Determines the number of times that a type identifier (name) has been used. If an identifier has been used before,

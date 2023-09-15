@@ -3,7 +3,7 @@ import { getRegisterSW, UNREGISTER_SW } from '../service-worker/generate-sw';
 import { generateServiceWorkerUrl } from '../service-worker/service-worker-util';
 
 export const updateIndexHtmlServiceWorker = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   buildCtx: d.BuildCtx,
   doc: Document,
   outputTarget: d.OutputTargetWww,

@@ -90,7 +90,7 @@ export const hasStyleChanges = (buildCtx: d.BuildCtx): boolean => buildCtx.files
  * @param buildCtx the build context
  * @returns whether or not HTML files were changed
  */
-export const hasHtmlChanges = (config: d.Config, buildCtx: d.BuildCtx): boolean => {
+export const hasHtmlChanges = (config: d.ValidatedConfig, buildCtx: d.BuildCtx): boolean => {
   const anyHtmlChanged = buildCtx.filesChanged.some((f) => f.toLowerCase().endsWith('.html'));
 
   if (anyHtmlChanged) {
@@ -121,7 +121,7 @@ export const updateCacheFromRebuild = (compilerCtx: d.CompilerCtx, buildCtx: d.B
   });
 };
 
-export const isWatchIgnorePath = (config: d.Config, path: string) => {
+export const isWatchIgnorePath = (config: d.ValidatedConfig, path: string) => {
   if (isString(path)) {
     const isWatchIgnore = (config.watchIgnoredRegex as RegExp[]).some((reg) => reg.test(path));
     if (isWatchIgnore) {
