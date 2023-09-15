@@ -35,7 +35,7 @@ export const relativeImport = (pathFrom: string, pathTo: string, ext?: string, a
   return normalizePath(`${relativePath}/${basename(pathTo, ext)}`);
 };
 
-export const getComponentsDtsSrcFilePath = (config: d.Config) => join(config.srcDir, GENERATED_DTS);
+export const getComponentsDtsSrcFilePath = (config: d.ValidatedConfig) => join(config.srcDir, GENERATED_DTS);
 
 export const getComponentsDtsTypesFilePath = (outputTarget: d.OutputTargetDist | d.OutputTargetDistTypes) =>
   join(outputTarget.typesDir, GENERATED_DTS);

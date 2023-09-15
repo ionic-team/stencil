@@ -4,7 +4,7 @@ import type * as d from '../../declarations';
 import { getAbsoluteBuildDir } from './html-utils';
 
 export const updateGlobalStylesLink = (
-  config: d.Config,
+  config: d.ValidatedConfig,
   doc: Document,
   globalScriptFilename: string,
   outputTarget: d.OutputTargetWww,

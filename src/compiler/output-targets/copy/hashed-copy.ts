@@ -2,7 +2,7 @@ import { dirname, extname, join } from 'path';
 
 import type * as d from '../../../declarations';
 
-export const generateHashedCopy = async (config: d.Config, compilerCtx: d.CompilerCtx, path: string) => {
+export const generateHashedCopy = async (config: d.ValidatedConfig, compilerCtx: d.CompilerCtx, path: string) => {
   try {
     const content = await compilerCtx.fs.readFile(path);
     const hash = await config.sys.generateContentHash(content, config.hashedFileNameLength);

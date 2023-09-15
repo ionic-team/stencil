@@ -110,7 +110,7 @@ export const validateTsConfig = async (config: d.ValidatedConfig, sys: d.Compile
   return tsconfig;
 };
 
-const getTsConfigPath = async (config: d.Config, sys: d.CompilerSystem, init: d.LoadConfigInit) => {
+const getTsConfigPath = async (config: d.ValidatedConfig, sys: d.CompilerSystem, init: d.LoadConfigInit) => {
   const tsconfig = {
     path: null as string,
     content: null as string,
@@ -144,7 +144,7 @@ const getTsConfigPath = async (config: d.Config, sys: d.CompilerSystem, init: d.
   return tsconfig;
 };
 
-const createDefaultTsConfig = (config: d.Config) =>
+const createDefaultTsConfig = (config: d.ValidatedConfig) =>
   JSON.stringify(
     {
       compilerOptions: {

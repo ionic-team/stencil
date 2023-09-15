@@ -6,7 +6,7 @@ import { buildWarn } from '../message-utils';
 import { splitLineBreaks } from './logger-utils';
 
 export const loadRollupDiagnostics = (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   rollupError: RollupError,

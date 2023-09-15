@@ -8,7 +8,7 @@ import { getAbsoluteBuildDir } from './html-utils';
 import { injectModulePreloads } from './inject-module-preloads';
 
 export const optimizeEsmImport = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   doc: Document,
   outputTarget: d.OutputTargetWww,
