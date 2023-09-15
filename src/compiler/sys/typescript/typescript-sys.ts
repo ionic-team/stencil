@@ -200,7 +200,7 @@ const patchTypeScriptSysMinimum = () => {
 };
 patchTypeScriptSysMinimum();
 
-export const getTypescriptPathFromUrl = (config: d.Config, tsExecutingUrl: string, url: string) => {
+export const getTypescriptPathFromUrl = (config: d.ValidatedConfig, tsExecutingUrl: string, url: string) => {
   const tsBaseUrl = new URL('..', tsExecutingUrl).href;
   if (url.startsWith(tsBaseUrl)) {
     const tsFilePath = url.replace(tsBaseUrl, '/');

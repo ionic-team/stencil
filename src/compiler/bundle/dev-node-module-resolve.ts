@@ -6,7 +6,7 @@ import { InMemoryFileSystem } from '../sys/in-memory-fs';
 import { DEV_MODULE_DIR } from './constants';
 
 export const devNodeModuleResolveId = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   inMemoryFs: InMemoryFileSystem,
   resolvedId: PartialResolvedId,
   importee: string,
@@ -66,7 +66,12 @@ const getPackageJsonPath = (resolvedPath: string, importee: string): string => {
   return null;
 };
 
-const serializeDevNodeModuleUrl = (config: d.Config, moduleId: string, moduleVersion: string, resolvedPath: string) => {
+const serializeDevNodeModuleUrl = (
+  config: d.ValidatedConfig,
+  moduleId: string,
+  moduleVersion: string,
+  resolvedPath: string,
+) => {
   resolvedPath = relative(config.rootDir, resolvedPath);
 
   let id = `/${DEV_MODULE_DIR}/`;

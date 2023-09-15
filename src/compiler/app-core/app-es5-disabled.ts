@@ -4,7 +4,7 @@ import { join } from 'path';
 import type * as d from '../../declarations';
 
 export const generateEs5DisabledMessage = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   outputTarget: d.OutputTargetWww,
 ) => {
@@ -17,7 +17,7 @@ export const generateEs5DisabledMessage = async (
   return fileName;
 };
 
-const getDisabledMessageScript = (config: d.Config) => {
+const getDisabledMessageScript = (config: d.ValidatedConfig) => {
   const style = `
 <style>
 body {

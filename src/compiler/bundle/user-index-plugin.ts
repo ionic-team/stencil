@@ -4,7 +4,7 @@ import type { Plugin } from 'rollup';
 import type * as d from '../../declarations';
 import { USER_INDEX_ENTRY_ID } from './entry-alias-ids';
 
-export const userIndexPlugin = (config: d.Config, compilerCtx: d.CompilerCtx): Plugin => {
+export const userIndexPlugin = (config: d.ValidatedConfig, compilerCtx: d.CompilerCtx): Plugin => {
   return {
     name: 'userIndexPlugin',
 

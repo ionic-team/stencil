@@ -142,7 +142,7 @@ export const appDataPlugin = (
   };
 };
 
-export const getGlobalScriptData = (config: d.Config, compilerCtx: d.CompilerCtx) => {
+export const getGlobalScriptData = (config: d.ValidatedConfig, compilerCtx: d.CompilerCtx) => {
   const globalScripts: GlobalScript[] = [];
 
   if (isString(config.globalScript)) {
@@ -210,11 +210,11 @@ const appendBuildConditionals = (config: d.ValidatedConfig, build: d.BuildCondit
   s.append(`export const BUILD = /* ${config.fsNamespace} */ { ${buildData} };\n`);
 };
 
-const appendEnv = (config: d.Config, s: MagicString) => {
+const appendEnv = (config: d.ValidatedConfig, s: MagicString) => {
   s.append(`export const Env = /* ${config.fsNamespace} */ ${JSON.stringify(config.env)};\n`);
 };
 
-const appendNamespace = (config: d.Config, s: MagicString) => {
+const appendNamespace = (config: d.ValidatedConfig, s: MagicString) => {
   s.append(`export const NAMESPACE = '${config.fsNamespace}';\n`);
 };
 

@@ -35,7 +35,7 @@ export const convertStaticToMeta = (
 
     return (tsSourceFile) => {
       dirPath = dirname(tsSourceFile.fileName);
-      moduleFile = getModuleLegacy(config, compilerCtx, tsSourceFile.fileName);
+      moduleFile = getModuleLegacy(compilerCtx, tsSourceFile.fileName);
       resetModuleLegacy(moduleFile);
 
       if (collection != null) {
