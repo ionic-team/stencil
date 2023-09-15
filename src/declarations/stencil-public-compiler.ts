@@ -1605,10 +1605,25 @@ export interface Testing {
   destroy(): Promise<void>;
 }
 
+/**
+ * Options for initiating a run of Stencil tests (spec and/or end-to-end)
+ */
 export interface TestingRunOptions {
+  /**
+   * If true, run end-to-end tests
+   */
   e2e?: boolean;
+  /**
+   * If true, run screenshot tests
+   */
   screenshot?: boolean;
+  /**
+   * If true, run spec tests
+   */
   spec?: boolean;
+  /**
+   * If true, update 'golden' screenshots. Otherwise, compare against priori.
+   */
   updateScreenshot?: boolean;
 }
 
