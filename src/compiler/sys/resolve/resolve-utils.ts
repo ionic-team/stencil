@@ -4,8 +4,6 @@ import type * as d from '../../../declarations';
 
 const COMMON_DIR_MODULE_EXTS = ['.tsx', '.ts', '.mjs', '.js', '.jsx', '.json', '.md'];
 
-export const COMMON_DIR_FILENAMES = ['package.json', 'index.js', 'index.mjs'];
-
 /**
  * Determine if a stringified file path is a TypeScript declaration file based on the extension at the end of the path.
  * @param p the path to evaluate
@@ -41,10 +39,6 @@ export const isJsxFile = (p: string) => p.endsWith('.jsx');
  * @returns `true` if the path ends in `.js` (case-sensitive), `false` otherwise.
  */
 export const isJsFile = (p: string) => p.endsWith('.js');
-
-export const isJsonFile = (p: string) => p.endsWith('.json');
-
-export const getCommonDirName = (dirPath: string, fileName: string) => dirPath + '/' + fileName;
 
 export const isCommonDirModuleFile = (p: string) => COMMON_DIR_MODULE_EXTS.some((ext) => p.endsWith(ext));
 
