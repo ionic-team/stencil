@@ -37,6 +37,7 @@ export function mockValidatedConfig(overrides: Partial<ValidatedConfig> = {}): V
     extras: {},
     flags: createConfigFlags(),
     hydratedFlag: null,
+    logLevel: 'info',
     logger: mockLogger(),
     outputTargets: baseConfig.outputTargets ?? [],
     packageJsonFilePath: path.join(rootDir, 'package.json'),

@@ -75,16 +75,6 @@ export const loadConfig = async (init: LoadConfigInit = {}): Promise<LoadConfigR
 
     results.config = validated.config;
 
-    if (results.config.flags.debug || results.config.flags.verbose) {
-      results.config.logLevel = 'debug';
-    } else if (results.config.flags.logLevel) {
-      results.config.logLevel = results.config.flags.logLevel;
-    } else if (typeof results.config.logLevel !== 'string') {
-      results.config.logLevel = 'info';
-    }
-
-    results.config.logger.setLevel(results.config.logLevel);
-
     if (!hasError(results.diagnostics)) {
       const tsConfigResults = await validateTsConfig(results.config, sys, init);
       results.diagnostics.push(...tsConfigResults.diagnostics);

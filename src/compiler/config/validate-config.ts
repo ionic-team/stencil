@@ -6,6 +6,7 @@ import {
   ConfigExtras,
   Diagnostic,
   LoadConfigInit,
+  LogLevel,
   UnvalidatedConfig,
   ValidatedConfig,
 } from '../../declarations';
@@ -83,13 +84,29 @@ export const validateConfig = (
 
   const logger = bootstrapConfig.logger || config.logger || createNodeLogger();
 
+  // flags _should_ be JSON safe here
+  //
+  // we access `'flags'` on validated config to avoid having to introduce an
+  // import of the CLI module
+  const flags: ValidatedConfig['flags'] = JSON.parse(JSON.stringify(config.flags || {}));
+
+  // default level is 'info'
+  let logLevel: LogLevel = 'info';
+  if (flags.debug || flags.verbose) {
+    logLevel = 'debug';
+  } else if (flags.logLevel) {
+    logLevel = flags.logLevel;
+  }
+
+  logger.setLevel(logLevel);
+
   const validatedConfig: ValidatedConfig = {
     devServer: {}, // assign `devServer` before spreading `config`, in the event 'devServer' is not a key on `config`
     ...config,
     extras: config.extras || {},
-    // flags _should_ be JSON safe
-    flags: JSON.parse(JSON.stringify(config.flags || {})),
+    flags,
     hydratedFlag: validateHydrated(config),
+    logLevel,
     logger,
     outputTargets: config.outputTargets ?? [],
     rollupConfig: validateRollupConfig(config),
