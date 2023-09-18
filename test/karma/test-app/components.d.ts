@@ -201,8 +201,6 @@ export namespace Components {
     }
     interface NoDelegatesFocus {
     }
-    interface NodeGlobals {
-    }
     interface NodeResolution {
     }
     interface ParentReflectNanAttribute {
@@ -829,12 +827,6 @@ declare global {
         prototype: HTMLNoDelegatesFocusElement;
         new (): HTMLNoDelegatesFocusElement;
     };
-    interface HTMLNodeGlobalsElement extends Components.NodeGlobals, HTMLStencilElement {
-    }
-    var HTMLNodeGlobalsElement: {
-        prototype: HTMLNodeGlobalsElement;
-        new (): HTMLNodeGlobalsElement;
-    };
     interface HTMLNodeResolutionElement extends Components.NodeResolution, HTMLStencilElement {
     }
     var HTMLNodeResolutionElement: {
@@ -1305,7 +1297,6 @@ declare global {
         "listen-reattach": HTMLListenReattachElement;
         "listen-window": HTMLListenWindowElement;
         "no-delegates-focus": HTMLNoDelegatesFocusElement;
-        "node-globals": HTMLNodeGlobalsElement;
         "node-resolution": HTMLNodeResolutionElement;
         "parent-reflect-nan-attribute": HTMLParentReflectNanAttributeElement;
         "parent-with-reflect-child": HTMLParentWithReflectChildElement;
@@ -1572,8 +1563,6 @@ declare namespace LocalJSX {
     }
     interface NoDelegatesFocus {
     }
-    interface NodeGlobals {
-    }
     interface NodeResolution {
     }
     interface ParentReflectNanAttribute {
@@ -1806,7 +1795,6 @@ declare namespace LocalJSX {
         "listen-reattach": ListenReattach;
         "listen-window": ListenWindow;
         "no-delegates-focus": NoDelegatesFocus;
-        "node-globals": NodeGlobals;
         "node-resolution": NodeResolution;
         "parent-reflect-nan-attribute": ParentReflectNanAttribute;
         "parent-with-reflect-child": ParentWithReflectChild;
@@ -1952,7 +1940,6 @@ declare module "@stencil/core" {
             "listen-reattach": LocalJSX.ListenReattach & JSXBase.HTMLAttributes<HTMLListenReattachElement>;
             "listen-window": LocalJSX.ListenWindow & JSXBase.HTMLAttributes<HTMLListenWindowElement>;
             "no-delegates-focus": LocalJSX.NoDelegatesFocus & JSXBase.HTMLAttributes<HTMLNoDelegatesFocusElement>;
-            "node-globals": LocalJSX.NodeGlobals & JSXBase.HTMLAttributes<HTMLNodeGlobalsElement>;
             "node-resolution": LocalJSX.NodeResolution & JSXBase.HTMLAttributes<HTMLNodeResolutionElement>;
             "parent-reflect-nan-attribute": LocalJSX.ParentReflectNanAttribute & JSXBase.HTMLAttributes<HTMLParentReflectNanAttributeElement>;
             "parent-with-reflect-child": LocalJSX.ParentWithReflectChild & JSXBase.HTMLAttributes<HTMLParentWithReflectChildElement>;
