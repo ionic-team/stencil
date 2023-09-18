@@ -1,3 +1,19 @@
+# 🎱 [4.3.0](https://github.com/ionic-team/stencil/compare/v4.2.1...v4.3.0) (2023-09-18)
+
+
+### Bug Fixes
+
+* **compiler:** restrict config extras slot fix flags ([#4767](https://github.com/ionic-team/stencil/issues/4767)) ([f2c3229](https://github.com/ionic-team/stencil/commit/f2c322959c13400b1a17bb698ae3ee37295ab08d))
+* **test:** ensure legacy decorators are used when using transpile ([#4771](https://github.com/ionic-team/stencil/issues/4771)) ([2ef9ec7](https://github.com/ionic-team/stencil/commit/2ef9ec7549930ef2b9fcfeba11374c8a543ed36f))
+
+
+### Features
+
+* **compiler:** computed properties can be used with Stencil decorators ([#4746](https://github.com/ionic-team/stencil/issues/4746)) ([a848269](https://github.com/ionic-team/stencil/commit/a848269f9883d68a44237caae469cd8a3ba5fa65))
+* **runtime:** watch native HTML attributes ([#4760](https://github.com/ionic-team/stencil/issues/4760)) ([fc86c23](https://github.com/ionic-team/stencil/commit/fc86c23e3bf690b19fa84d8bb34e7da4598291dc))
+
+
+
 ## 🌝 [4.2.1](https://github.com/ionic-team/stencil/compare/v4.2.0...v4.2.1) (2023-09-11)
 
 
