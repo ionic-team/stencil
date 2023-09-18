@@ -21,7 +21,7 @@ import { stripCssComments } from './style-utils';
  * @returns an object with concatenated styleText and imports
  */
 export const parseCssImports = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   srcFilePath: string,
@@ -158,7 +158,7 @@ const loadStyleText = async (compilerCtx: d.CompilerCtx, cssImportData: d.CssImp
  * @returns a Promise wrapping a list of CSS import data objects
  */
 export const getCssImports = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   filePath: string,
@@ -226,7 +226,7 @@ export const getCssImports = async (
 export const isCssNodeModule = (url: string) => url.startsWith('~');
 
 export const resolveCssNodeModule = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   diagnostics: d.Diagnostic[],
   filePath: string,

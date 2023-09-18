@@ -41,7 +41,7 @@ import { watchDecoratorsToStatic } from './watch-decorator';
  * TypeScript to transform source code during the compilation process
  */
 export const convertDecoratorsToStatic = (
-  config: d.Config,
+  config: d.ValidatedConfig,
   diagnostics: d.Diagnostic[],
   typeChecker: ts.TypeChecker,
   program: ts.Program,
@@ -85,7 +85,7 @@ export const convertDecoratorsToStatic = (
  * @returns a class node, possibly updated with new static values
  */
 const visitClassDeclaration = (
-  config: d.Config,
+  config: d.ValidatedConfig,
   diagnostics: d.Diagnostic[],
   typeChecker: ts.TypeChecker,
   program: ts.Program,
