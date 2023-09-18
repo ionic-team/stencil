@@ -47,15 +47,6 @@ interface TSError {
         errorString: string;
       };
     };
-    message: {
-      type: 'Message';
-      /**
-       * this is the actual, concrete error message for a given error, so it includes
-       * concrete information about the actual type error encountered (for instance
-       * "string cannot be coerced to undefined" vs "number cannot be coerced to undefined")
-       */
-      value: string;
-    };
   };
 }
 
@@ -71,29 +62,6 @@ const mainData: TSError[] = JSON.parse(String(fs.readFileSync('./null_errors_mai
 
 const errorsOnMainCount = mainData.length;
 const errorsOnPRCount = prData.length;
-
-/**
- * Build up an object which maps error codes (like `TS2339`) to
- * a `Set` of all the messages we see for that code.
- * @returns a map from error codes to the messages for that code
- */
-const getErrorCodeMessages = (): Record<string, Set<string>> => {
-  const errorCodeMessageMap = {};
-
-  prData.forEach((error) => {
-    const errorCode = error.value.tsError.value.errorString;
-    const message = error.value.message.value;
-    errorCodeMessageMap[errorCode] = (errorCodeMessageMap[errorCode] ?? new Set()).add(message);
-  });
-
-  return errorCodeMessageMap;
-};
-
-/**
- * Map of TS error codes to all of the unique, concrete error messages we see
- * for that code.
- */
-const errorCodeMessages = getErrorCodeMessages();
 
 /**
  * Build a map which just counts the entries in an array
@@ -252,8 +220,7 @@ if (errorsOnPRCount === errorsOnMainCount) {
           prTsError.value.path.value === mainTsError.value.path.value &&
           prTsError.value.cursor.value.line === mainTsError.value.cursor.value.line &&
           prTsError.value.cursor.value.col === mainTsError.value.cursor.value.col &&
-          prTsError.value.tsError.value.errorString === mainTsError.value.tsError.value.errorString &&
-          prTsError.value.message.value === mainTsError.value.message.value,
+          prTsError.value.tsError.value.errorString === mainTsError.value.tsError.value.errorString,
       ),
   );
   lines.push(
@@ -262,15 +229,8 @@ if (errorsOnPRCount === errorsOnMainCount) {
 
       newEntries.forEach(({ value }) => {
         const location = value.cursor.value;
-        // error messages with pipes ('|') can cause formatting issues, escape them
-        const sanitizedErrorMsg = value.message.value.replace(/\|/g, '\\|').replace(/\r?\n/g, '');
         out.push(
-          tableRow(
-            `${value.path.value}`,
-            `(${location.line}, ${location.col})`,
-            `${value.tsError.value.errorString}`,
-            `${sanitizedErrorMsg}`,
-          ),
+          tableRow(`${value.path.value}`, `(${location.line}, ${location.col})`, `${value.tsError.value.errorString}`),
         );
       });
     }),
@@ -310,23 +270,11 @@ lines.push(
       tableHeader(
         '[Typescript Error Code](https://github.com/microsoft/TypeScript/blob/main/src/compiler/diagnosticMessages.json)',
         'Count',
-        'Error messages',
       ),
     );
 
     sortEntries(errorCodeCounts).forEach(([tsErrorCode, errorCount]) => {
-      const messages = errorCodeMessages[tsErrorCode];
-
-      out.push(
-        tableRow(
-          tsErrorCode,
-          String(errorCount),
-          `<details><summary>Error messages</summary>${[...messages]
-            .map((msg) => msg.replace(/\n/g, '<br>'))
-            .map((msg) => msg.replace(/\|/g, '\\|'))
-            .join('<br>')}</details>`,
-        ),
-      );
+      out.push(tableRow(tsErrorCode, String(errorCount)));
     });
   }),
 );
