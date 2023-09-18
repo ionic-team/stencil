@@ -460,6 +460,7 @@ type StrictConfigFields =
   | 'flags'
   | 'hydratedFlag'
   | 'logger'
+  | 'logLevel'
   | 'outputTargets'
   | 'packageJsonFilePath'
   | 'rollupConfig'
