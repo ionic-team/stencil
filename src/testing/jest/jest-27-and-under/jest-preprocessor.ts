@@ -2,7 +2,7 @@ import { ts } from '@stencil/core/compiler';
 import type { Diagnostic, TranspileOptions } from '@stencil/core/internal';
 import { loadTypeScriptDiagnostic, normalizePath } from '@utils';
 
-import { transpile } from '../test-transpile';
+import { transpile } from '../../test-transpile';
 
 // TODO(STENCIL-306): Remove support for earlier versions of Jest
 type Jest26CacheKeyOptions = { instrument: boolean; rootDir: string };

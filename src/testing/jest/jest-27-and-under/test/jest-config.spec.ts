@@ -3,7 +3,7 @@ import type * as d from '@stencil/core/declarations';
 import { mockValidatedConfig } from '@stencil/core/testing';
 import path from 'path';
 
-import { parseFlags } from '../../../cli/parse-flags';
+import { parseFlags } from '../../../../cli/parse-flags';
 import { buildJestArgv } from '../jest-config';
 
 describe('jest-config', () => {

@@ -1,8 +1,8 @@
 import type { AggregatedResult } from '@jest/test-result';
 import type * as d from '@stencil/core/internal';
 
-import type { ConfigFlags } from '../../cli/config-flags';
-import { setScreenshotEmulateData } from '../puppeteer/puppeteer-emulate';
+import type { ConfigFlags } from '../../../cli/config-flags';
+import { setScreenshotEmulateData } from '../../puppeteer/puppeteer-emulate';
 import { buildJestArgv, getProjectListFromCLIArgs } from './jest-config';
 
 export async function runJest(config: d.ValidatedConfig, env: d.E2EProcessEnv) {
