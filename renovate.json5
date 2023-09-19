@@ -27,7 +27,6 @@
     'test/hello-world',
     'test/ionic-app',
     'test/jest-spec-runner',
-    'test/karma',
     'test/performance',
     'test/prerender-shadow',
     'test/style-modes',
