@@ -18,7 +18,7 @@ import {
 import { isDecoratorNamed } from './decorator-utils';
 
 export const methodDecoratorsToStatic = (
-  config: d.Config,
+  config: d.ValidatedConfig,
   diagnostics: d.Diagnostic[],
   cmpNode: ts.ClassDeclaration,
   decoratedProps: ts.ClassElement[],
@@ -38,7 +38,7 @@ export const methodDecoratorsToStatic = (
 };
 
 const parseMethodDecorator = (
-  config: d.Config,
+  config: d.ValidatedConfig,
   diagnostics: d.Diagnostic[],
   tsSourceFile: ts.SourceFile,
   typeChecker: ts.TypeChecker,

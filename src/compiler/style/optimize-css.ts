@@ -4,7 +4,7 @@ import type * as d from '../../declarations';
 import { optimizeCssId } from '../../version';
 
 export const optimizeCss = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   diagnostics: d.Diagnostic[],
   styleText: string,

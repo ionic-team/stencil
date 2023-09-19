@@ -28,7 +28,7 @@ import { styleToStatic } from './style-to-static';
  * decorator
  */
 export const componentDecoratorToStatic = (
-  config: d.Config,
+  config: d.ValidatedConfig,
   typeChecker: ts.TypeChecker,
   diagnostics: d.Diagnostic[],
   cmpNode: ts.ClassDeclaration,
@@ -84,7 +84,7 @@ export const componentDecoratorToStatic = (
  * @returns whether or not the component is valid
  */
 const validateComponent = (
-  config: d.Config,
+  config: d.ValidatedConfig,
   diagnostics: d.Diagnostic[],
   typeChecker: ts.TypeChecker,
   componentOptions: d.ComponentOptions,

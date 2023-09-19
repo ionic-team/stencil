@@ -262,7 +262,7 @@ const createPrerenderTemplate = async (config: d.ValidatedConfig, templateHtml: 
 };
 
 const createComponentGraphPath = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   componentGraph: d.BuildResultsComponentGraph,
   outputTarget: d.OutputTargetWww,
 ) => {
