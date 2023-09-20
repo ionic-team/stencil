@@ -41,7 +41,7 @@
     "karma-typescript-es6-transform": "^5.5.4",
     "normalize.css": "^8.0.1",
     "rollup-plugin-node-polyfills": "^0.1.2",
-    "typescript": "~5.0.4",
+    "typescript": "~5.1.0",
     "webpack-cli": "^4.9.1",
     "workbox-build": "4.3.1"
   },
