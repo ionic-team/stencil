@@ -7,6 +7,7 @@ import { promptRelease } from './release-prompts';
 import { runReleaseTasks } from './release-tasks';
 import { BuildOptions, getOptions } from './utils/options';
 import { getNewVersion } from './utils/release-utils';
+import { getLatestVermoji } from './utils/vermoji';
 
 /**
  * Runner for creating a release of Stencil
@@ -87,6 +88,9 @@ export async function release(rootDir: string, args: ReadonlyArray<string>): Pro
     });
     // this was bumped already, we just need to copy it from package.json into this field
     prepareOpts.version = prepareOpts.packageJson.version;
+
+    // we generated a vermoji during the preparation step, let's grab it from the changelog
+    prepareOpts.vermoji = getLatestVermoji(prepareOpts.changelogPath);
 
     const tagIdx = args.indexOf('--tag');
     let newTag = null;
