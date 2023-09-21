@@ -92,6 +92,21 @@
       // this package can be released often, let's look at it every week
       // Note: Timezone for the schedule is specified as UTC
       schedule: ["before 11am on monday"]
+    },
+    {
+      // We intentionally run the karma tests against the oldest LTS of Node we support.
+      // Prevent renovate from trying to bump node
+      matchFileNames: ['./test/karma/package.json'],
+      matchPackageNames: ['node', '@types/node'],
+      allowedVersions: '<=16'
+    },
+    {
+      // We intentionally run the karma tests against the oldest LTS of Node we support.
+      // Prevent renovate from trying to bump npm and keep it in sync with a version that's supported by the version of
+      // Node we run against.
+      matchFileNames: ['./test/karma/package.json'],
+      matchPackageNames: ['npm'],
+      allowedVersions: '<=8'
     }
   ],
   // Never rebase the branch or update it unless manually requested to avoid noisy PR emails
