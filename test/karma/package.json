@@ -27,7 +27,7 @@
   },
   "devDependencies": {
     "@stencil/sass": "^1.3.2",
-    "@types/node": "^16.18.36",
+    "@types/node": "^20.0.0",
     "bootstrap": "^4.5.1",
     "karma": "^6.4.1",
     "karma-browserstack-launcher": "^1.6.0",
