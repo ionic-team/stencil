@@ -189,15 +189,18 @@ export const patchSlotInsertAdjacentElement = (HostElementPrototype: HTMLElement
     this: d.HostElement,
     position: InsertPosition,
     element: d.RenderNode,
-  ) {
+  ): Element {
     if (position !== 'afterbegin' && position !== 'beforeend') {
       return originalInsertAdjacentElement.call(this, position, element);
     }
     if (position === 'afterbegin') {
       this.prepend(element);
+      return element;
     } else if (position === 'beforeend') {
       this.append(element);
+      return element;
     }
+    return element;
   };
 };
 
