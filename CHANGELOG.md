@@ -1,4 +1,4 @@
-# 🎱 [4.3.0](https://github.com/ionic-team/stencil/compare/v4.2.1...v4.3.0) (2023-09-18)
+# 🐫 [4.3.0](https://github.com/ionic-team/stencil/compare/v4.2.1...v4.3.0) (2023-09-18)
 
 
 ### Bug Fixes
@@ -14,7 +14,7 @@
 
 
 
-## 🌝 [4.2.1](https://github.com/ionic-team/stencil/compare/v4.2.0...v4.2.1) (2023-09-11)
+## 😀 [4.2.1](https://github.com/ionic-team/stencil/compare/v4.2.0...v4.2.1) (2023-09-11)
 
 
 ### Bug Fixes
@@ -23,7 +23,7 @@
 
 
 
-# 🎺 [4.2.0](https://github.com/ionic-team/stencil/compare/v4.2.0-0...v4.2.0) (2023-09-05)
+# 🌲 [4.2.0](https://github.com/ionic-team/stencil/compare/v4.2.0-0...v4.2.0) (2023-09-05)
 
 
 ### Bug Fixes
@@ -37,7 +37,7 @@
 
 
 
-# 🐸 [4.2.0-0](https://github.com/ionic-team/stencil/compare/v4.1.0...v4.2.0-0) (2023-09-05)
+# ⚽️ [4.2.0-0](https://github.com/ionic-team/stencil/compare/v4.1.0...v4.2.0-0) (2023-09-05)
 
 
 ### Bug Fixes
