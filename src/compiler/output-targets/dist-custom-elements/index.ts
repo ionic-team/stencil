@@ -196,12 +196,14 @@ export const addCustomElementInputs = (
   // function on the `bundle` export behavior option
   const exportNames: string[] = [];
 
-  components.forEach((cmp) => {
-    const exp: string[] = [];
-    const exportName = dashToPascalCase(cmp.tagName);
-    const importName = cmp.componentClassName;
-    const importAs = `$Cmp${exportName}`;
-    const coreKey = `\0${exportName}`;
+  components
+    .filter((cmp) => !!cmp.tagName)
+    .forEach((cmp) => {
+      const exp: string[] = [];
+      const exportName = dashToPascalCase(cmp.tagName);
+      const importName = cmp.componentClassName;
+      const importAs = `$Cmp${exportName}`;
+      const coreKey = `\0${exportName}`;
 
     if (cmp.isPlain) {
       exp.push(`export { ${importName} as ${exportName} } from '${cmp.sourceFilePath}';`);
@@ -214,23 +216,23 @@ export const addCustomElementInputs = (
       exp.push(`export const ${exportName} = ${importAs};`);
       exp.push(`export const defineCustomElement = cmpDefCustomEle;`);
 
-      // Here we push an export (with a rename for `defineCustomElement`) for
-      // this component onto our array which references the `coreKey` (prefixed
-      // with `\0`). We have to do this so that our import is referencing the
-      // correct virtual module, if we instead referenced, for instance,
-      // `cmp.sourceFilePath`, we would end up with duplicated modules in our
-      // output.
-      indexExports.push(
-        `export { ${exportName}, defineCustomElement as defineCustomElement${exportName} } from '${coreKey}';`,
-      );
-    }
+        // Here we push an export (with a rename for `defineCustomElement`) for
+        // this component onto our array which references the `coreKey` (prefixed
+        // with `\0`). We have to do this so that our import is referencing the
+        // correct virtual module, if we instead referenced, for instance,
+        // `cmp.sourceFilePath`, we would end up with duplicated modules in our
+        // output.
+        indexExports.push(
+          `export { ${exportName}, defineCustomElement as defineCustomElement${exportName} } from '${coreKey}';`,
+        );
+      }
 
-    indexImports.push(`import { ${exportName} } from '${coreKey}';`);
-    exportNames.push(exportName);
+      indexImports.push(`import { ${exportName} } from '${coreKey}';`);
+      exportNames.push(exportName);
 
-    bundleOpts.inputs[cmp.tagName] = coreKey;
-    bundleOpts.loader![coreKey] = exp.join('\n');
-  });
+      bundleOpts.inputs[cmp.tagName] = coreKey;
+      bundleOpts.loader![coreKey] = exp.join('\n');
+    });
 
   // Generate the contents of the entry file to be created by the bundler
   bundleOpts.loader!['\0core'] = generateEntryPoint(outputTarget, indexImports, indexExports, exportNames);
@@ -330,6 +332,7 @@ const getCustomBeforeTransformers = (
     style: 'static',
     styleImportData: 'queryparams',
   };
+
   const customBeforeTransformers = [
     addDefineCustomElementFunctions(compilerCtx, components, outputTarget),
     updateStencilCoreImports(transformOpts.coreImportPath),
@@ -344,5 +347,6 @@ const getCustomBeforeTransformers = (
     proxyCustomElement(compilerCtx, transformOpts),
     removeCollectionImports(compilerCtx),
   );
+
   return customBeforeTransformers;
 };

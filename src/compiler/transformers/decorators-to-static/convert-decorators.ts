@@ -99,11 +99,6 @@ const visitClassDeclaration = (
 ): ts.ClassDeclaration => {
   const importAliasMap = new ImportAliasMap(sourceFile);
 
-  const componentDecorator = retrieveTsDecorators(classNode)?.find(isDecoratorNamed(importAliasMap.get('Component')));
-  if (!componentDecorator) {
-    return classNode;
-  }
-
   const classMembers = classNode.members;
   const decoratedMembers = classMembers.filter((member) => (retrieveTsDecorators(member)?.length ?? 0) > 0);
 
@@ -112,8 +107,11 @@ const visitClassDeclaration = (
   // behavior specified for those decorated methods later on.
   const filteredMethodsAndFields = removeStencilMethodDecorators(Array.from(classMembers), diagnostics, importAliasMap);
 
-  // parse component decorator
-  componentDecoratorToStatic(config, typeChecker, diagnostics, classNode, filteredMethodsAndFields, componentDecorator);
+  // parse component decorator (Component)
+  const componentDecorator = retrieveTsDecorators(classNode)?.find(isDecoratorNamed(importAliasMap.get('Component')));
+  if (componentDecorator) {
+    componentDecoratorToStatic(config, typeChecker, diagnostics, classNode, filteredMethodsAndFields, componentDecorator);
+  }
 
   // stores a reference to fields that should be watched for changes
   // parse member decorators (Prop, State, Listen, Event, Method, Element and Watch)

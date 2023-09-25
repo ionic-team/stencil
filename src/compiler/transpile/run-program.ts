@@ -16,7 +16,7 @@ import { performAutomaticKeyInsertion } from '../transformers/automatic-key-inse
 import { convertDecoratorsToStatic } from '../transformers/decorators-to-static/convert-decorators';
 import { rewriteAliasedDTSImportPaths } from '../transformers/rewrite-aliased-paths';
 import { updateModule } from '../transformers/static-to-meta/parse-static';
-import { generateAppTypes } from '../types/generate-app-types';
+// import { generateAppTypes } from '../types/generate-app-types';
 import { updateStencilTypesImports } from '../types/stencil-types';
 import { validateTranspiledComponents } from './validate-components';
 
@@ -112,7 +112,11 @@ export const runTsProgram = async (
   }
 
   // create the components.d.ts file and write to disk
-  const hasTypesChanged = await generateAppTypes(config, compilerCtx, buildCtx, 'src');
+  // const hasTypesChanged = await generateAppTypes(config, compilerCtx, buildCtx, 'src');
+  // if (hasTypesChanged) {
+  //   return true;
+  // }
+
   if (typesOutputTarget.length > 0) {
     // copy src dts files that do not get emitted by the compiler
     // but we still want to ship them in the dist directory

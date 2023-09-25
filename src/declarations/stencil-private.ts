@@ -1276,6 +1276,9 @@ export interface Module {
   hasVdomStyle: boolean;
   hasVdomText: boolean;
   hasVdomXlink: boolean;
+
+  // TODO: make not optional
+  parentClassPath?: string;
 }
 
 export interface Plugin {

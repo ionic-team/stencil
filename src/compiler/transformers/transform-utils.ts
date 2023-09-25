@@ -719,11 +719,13 @@ export const getComponentMeta = (
 
   const moduleFile = getModuleFromSourceFile(compilerCtx, tsSourceFile);
   if (moduleFile != null && node.members != null) {
-    const staticMembers = node.members.filter(isStaticGetter);
-    const tagName = getComponentTagName(staticMembers);
-    if (typeof tagName === 'string') {
-      return moduleFile.cmps.find((cmp) => cmp.tagName === tagName);
-    }
+    // const staticMembers = node.members.filter(isStaticGetter);
+    // const tagName = getComponentTagName(staticMembers);
+    // if (typeof tagName === 'string') {
+    //   return moduleFile.cmps.find((cmp) => cmp.tagName === tagName);
+    // }
+
+    return moduleFile.cmps.find((cmp) => cmp.componentClassName === node.name.getText());
   }
   return undefined;
 };

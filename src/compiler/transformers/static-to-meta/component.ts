@@ -50,14 +50,14 @@ export const parseStaticComponentMeta = (
   moduleFile: d.Module,
   transformOpts?: d.TransformOptions,
 ): ts.ClassDeclaration => {
-  if (cmpNode.members == null) {
-    return cmpNode;
-  }
+  // if (cmpNode.members == null) {
+  //   return cmpNode;
+  // }
   const staticMembers = cmpNode.members.filter(isStaticGetter);
   const tagName = getComponentTagName(staticMembers);
-  if (tagName == null) {
-    return cmpNode;
-  }
+  // if (tagName == null) {
+  //   return cmpNode;
+  // }
 
   const symbol = typeChecker ? typeChecker.getSymbolAtLocation(cmpNode.name) : undefined;
   const docs = serializeSymbol(typeChecker, symbol);
@@ -80,6 +80,7 @@ export const parseStaticComponentMeta = (
     listeners: parseStaticListeners(staticMembers),
     events: parseStaticEvents(staticMembers),
     watchers: parseStaticWatchers(staticMembers),
+
     styles: parseStaticStyles(compilerCtx, tagName, moduleFile.sourceFilePath, isCollectionDependency, staticMembers),
     internal: isInternal(docs),
     assetsDirs: parseAssetsDirs(staticMembers, moduleFile.jsFilePath),
