@@ -1,3 +1,3 @@
-const { jestPreprocessor } = require('./index.js');
-
+const { getJestPreprocessor } = require('./index.js');
+const jestPreprocessor = getJestPreprocessor();
 module.exports = jestPreprocessor;
