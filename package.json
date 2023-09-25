@@ -38,7 +38,6 @@
     "rollup.prod.ci": "rollup --config --config-prod --config-ci",
     "rollup.watch": "rollup --watch --config",
     "spellcheck": "cspell --no-progress \"src/**/*.ts\" \"src/**/*.tsx\" \"scripts/**/*.ts\" \"*.md\"",
-    "start": "npm run watch",
     "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --coverage",
     "test.analysis": "cd test && npm run analysis.build-and-analyze",
     "test.bundlers": "cd test && npm run bundlers",
