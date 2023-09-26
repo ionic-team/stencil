@@ -177,7 +177,7 @@ const putBackInOriginalLocation = (parentElm: Node, recursive: boolean) => {
 
       // remove the old original location comment entirely
       // later on the patch function will know what to do
-      // and move this to the correct spot in need be
+      // and move this to the correct spot if need be
       childNode['s-ol'].remove();
       childNode['s-ol'] = undefined;
 
@@ -629,36 +629,41 @@ export const patch = (oldVNode: d.VNode, newVNode: d.VNode) => {
   }
 };
 
+/**
+ * Adjust the `.hidden` property as-needed on any nodes in a DOM subtree which
+ * are slot fallbacks nodes.
+ *
+ * A slot fallback node should be visible by default. Then, it should be
+ * conditionally hidden if:
+ *
+ * - it has a sibling with a `slot` property set to its slot name or if
+ * - it is a default fallback slot node, in which case we hide if it has any
+ *   content
+ *
+ * @param elm the element of interest
+ */
 const updateFallbackSlotVisibility = (elm: d.RenderNode) => {
-  // tslint:disable-next-line: prefer-const
   const childNodes: d.RenderNode[] = elm.childNodes as any;
-  let childNode: d.RenderNode;
-  let i: number;
-  let ilen: number;
-  let j: number;
-  let slotNameAttr: string;
-  let nodeType: number;
 
-  for (i = 0, ilen = childNodes.length; i < ilen; i++) {
-    childNode = childNodes[i];
-
+  for (const childNode of childNodes) {
     if (childNode.nodeType === NODE_TYPE.ElementNode) {
       if (childNode['s-sr']) {
         // this is a slot fallback node
 
         // get the slot name for this slot reference node
-        slotNameAttr = childNode['s-sn'];
+        const slotName = childNode['s-sn'];
 
         // by default always show a fallback slot node
         // then hide it if there are other slots in the light dom
         childNode.hidden = false;
 
-        for (j = 0; j < ilen; j++) {
-          nodeType = childNodes[j].nodeType;
-
-          if (childNodes[j]['s-hn'] !== childNode['s-hn'] || slotNameAttr !== '') {
-            // this sibling node is from a different component OR is a named fallback slot node
-            if (nodeType === NODE_TYPE.ElementNode && slotNameAttr === childNodes[j].getAttribute('slot')) {
+        // we need to check all of its sibling nodes in order to see if
+        // `childNode` should be hidden
+        for (const siblingNode of childNodes) {
+          if (siblingNode['s-hn'] !== childNode['s-hn'] || slotName !== '') {
+            // this sibling node is from a different component OR is a named
+            // fallback slot node
+            if (siblingNode.nodeType === NODE_TYPE.ElementNode && slotName === siblingNode.getAttribute('slot')) {
               childNode.hidden = true;
               break;
             }
@@ -667,8 +672,8 @@ const updateFallbackSlotVisibility = (elm: d.RenderNode) => {
             // any element or text node (with content)
             // should hide the default fallback slot node
             if (
-              nodeType === NODE_TYPE.ElementNode ||
-              (nodeType === NODE_TYPE.TextNode && childNodes[j].textContent.trim() !== '')
+              siblingNode.nodeType === NODE_TYPE.ElementNode ||
+              (siblingNode.nodeType === NODE_TYPE.TextNode && siblingNode.textContent.trim() !== '')
             ) {
               childNode.hidden = true;
               break;
@@ -683,50 +688,61 @@ const updateFallbackSlotVisibility = (elm: d.RenderNode) => {
   }
 };
 
+/**
+ * Component-global information about nodes which are either currently being
+ * relocated or will be shortly.
+ */
 const relocateNodes: RelocateNodeData[] = [];
 
-const relocateSlotContent = (elm: d.RenderNode) => {
+/**
+ * Mark the contents of a slot for relocation via adding references to them to
+ * the {@link relocateNodes} data structure. The actual work of relocating them
+ * will then be handled in {@link renderVdom}.
+ *
+ * @param elm a render node whose child nodes need to be relocated
+ */
+const markSlotContentForRelocation = (elm: d.RenderNode) => {
   // tslint:disable-next-line: prefer-const
-  let childNode: d.RenderNode;
   let node: d.RenderNode;
   let hostContentNodes: NodeList;
-  let slotNameAttr: string;
-  let relocateNodeData: RelocateNodeData;
   let j;
-  let i = 0;
-  const childNodes: d.RenderNode[] = elm.childNodes as any;
-  const ilen = childNodes.length;
 
-  for (; i < ilen; i++) {
-    childNode = childNodes[i];
-
+  for (const childNode of elm.childNodes as unknown as d.RenderNode[]) {
+    // we need to find child nodes which are slot references so we can then try
+    // to match them up with nodes that need to be relocated
     if (childNode['s-sr'] && (node = childNode['s-cr']) && node.parentNode) {
-      // first got the content reference comment node
-      // then we got it's parent, which is where all the host content is in now
+      // first get the content reference comment node ('s-cr'), then we get
+      // its parent, which is where all the host content is now
       hostContentNodes = node.parentNode.childNodes;
-      slotNameAttr = childNode['s-sn'];
+      const slotName = childNode['s-sn'];
 
+      // iterate through all the nodes under the location where the host was
+      // originally rendered
       for (j = hostContentNodes.length - 1; j >= 0; j--) {
         node = hostContentNodes[j] as d.RenderNode;
 
+        // check that the node is not a content reference node or a node
+        // reference and then check that the host name does not match that of
+        // childNode
         if (!node['s-cn'] && !node['s-nr'] && node['s-hn'] !== childNode['s-hn']) {
-          // let's do some relocating to its new home
-          // but never relocate a content reference node
-          // that is suppose to always represent the original content location
-
-          if (isNodeLocatedInSlot(node, slotNameAttr)) {
+          // if `node` is located in the slot that `childNode` refers to (via the
+          // `'s-sn'` property) then we need to relocate it from it's current spot
+          // (under the host element parent) to the right slot location
+          if (isNodeLocatedInSlot(node, slotName)) {
             // it's possible we've already decided to relocate this node
-            relocateNodeData = relocateNodes.find((r) => r.$nodeToRelocate$ === node);
+            let relocateNodeData = relocateNodes.find((r) => r.$nodeToRelocate$ === node);
 
             // made some changes to slots
             // let's make sure we also double check
             // fallbacks are correctly hidden or shown
             checkSlotFallbackVisibility = true;
-            node['s-sn'] = node['s-sn'] || slotNameAttr;
+            // ensure that the slot-name attr is correct
+            node['s-sn'] = node['s-sn'] || slotName;
 
             if (relocateNodeData) {
-              // previously we never found a slot home for this node
-              // but turns out we did, so let's remember it now
+              // we marked this node for relocation previously but didn't find
+              // out the slot reference node to which it needs to be relocated
+              // so write it down now!
               relocateNodeData.$slotRefNode$ = childNode;
             } else {
               // add to our list of nodes to relocate
@@ -740,6 +756,7 @@ const relocateSlotContent = (elm: d.RenderNode) => {
               relocateNodes.map((relocateNode) => {
                 if (isNodeLocatedInSlot(relocateNode.$nodeToRelocate$, node['s-sn'])) {
                   relocateNodeData = relocateNodes.find((r) => r.$nodeToRelocate$ === node);
+
                   if (relocateNodeData && !relocateNode.$slotRefNode$) {
                     relocateNode.$slotRefNode$ = relocateNodeData.$slotRefNode$;
                   }
@@ -747,8 +764,10 @@ const relocateSlotContent = (elm: d.RenderNode) => {
               });
             }
           } else if (!relocateNodes.some((r) => r.$nodeToRelocate$ === node)) {
-            // so far this element does not have a slot home, not setting slotRefNode on purpose
-            // if we never find a home for this element then we'll need to hide it
+            // the node is not found within the slot (`childNode`) that we're
+            // currently looking at, so we stick it into `relocateNodes` to
+            // handle later. If we never find a home for this element then
+            // we'll need to hide it
             relocateNodes.push({
               $nodeToRelocate$: node,
             });
@@ -757,32 +776,43 @@ const relocateSlotContent = (elm: d.RenderNode) => {
       }
     }
 
+    // if we're dealing with any type of element (capable of itself being a
+    // slot reference or containing one) then we recur
     if (childNode.nodeType === NODE_TYPE.ElementNode) {
-      relocateSlotContent(childNode);
+      markSlotContentForRelocation(childNode);
     }
   }
 };
 
-const isNodeLocatedInSlot = (nodeToRelocate: d.RenderNode, slotNameAttr: string) => {
+/**
+ * Check whether a node is located in a given named slot.
+ *
+ * @param nodeToRelocate the node of interest
+ * @param slotName the slot name to check
+ * @returns whether the node is located in the slot or not
+ */
+const isNodeLocatedInSlot = (nodeToRelocate: d.RenderNode, slotName: string): boolean => {
   if (nodeToRelocate.nodeType === NODE_TYPE.ElementNode) {
-    if (nodeToRelocate.getAttribute('slot') === null && slotNameAttr === '') {
+    if (nodeToRelocate.getAttribute('slot') === null && slotName === '') {
+      // if the node doesn't have a slot attribute, and the slot we're checking
+      // is not a named slot, then we assume the node should be within the slot
       return true;
     }
-    if (nodeToRelocate.getAttribute('slot') === slotNameAttr) {
+    if (nodeToRelocate.getAttribute('slot') === slotName) {
       return true;
     }
     return false;
   }
-  if (nodeToRelocate['s-sn'] === slotNameAttr) {
+  if (nodeToRelocate['s-sn'] === slotName) {
     return true;
   }
-  return slotNameAttr === '';
+  return slotName === '';
 };
 
 /**
- * 'Nullify' any VDom `ref` callbacks on a VDom node or its children by
- * calling them with `null`. This signals that the DOM element corresponding to
- * the VDom node has been removed from the DOM.
+ * 'Nullify' any VDom `ref` callbacks on a VDom node or its children by calling
+ * them with `null`. This signals that the DOM element corresponding to the VDom
+ * node has been removed from the DOM.
  *
  * @param vNode a virtual DOM node
  */
@@ -793,6 +823,10 @@ export const nullifyVNodeRefs = (vNode: d.VNode) => {
   }
 };
 
+/**
+ * Information about nodes to be relocated in order to support
+ * `<slot>` elements in scoped (i.e. non-shadow DOM) components
+ */
 interface RelocateNodeData {
   $slotRefNode$?: d.RenderNode;
   $nodeToRelocate$: d.RenderNode;
@@ -894,7 +928,7 @@ render() {
     plt.$flags$ |= PLATFORM_FLAGS.isTmpDisconnected;
 
     if (checkSlotRelocate) {
-      relocateSlotContent(rootVnode.$elm$);
+      markSlotContentForRelocation(rootVnode.$elm$);
 
       let relocateData: RelocateNodeData;
       let nodeToRelocate: d.RenderNode;
