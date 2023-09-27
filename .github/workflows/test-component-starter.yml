@@ -11,6 +11,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        jest: ['24', '25', '26', '27']
         node: ['16', '18', '20']
         os: ['ubuntu-latest', 'windows-latest']
     runs-on: ${{ matrix.os }}
@@ -84,6 +85,9 @@ jobs:
         run: npm i ../stencil-eval.tgz
         working-directory: ./tmp-component-starter
         shell: bash
+
+      - name: Install Jest
+        run: npm install --dev-dependencies jest@${{ matrix.jest }} jest-cli@${{ matrix.jest }} @types/jest@${{ matrix.jest }}
 
       - name: Build Starter Project
         run: npm run build
