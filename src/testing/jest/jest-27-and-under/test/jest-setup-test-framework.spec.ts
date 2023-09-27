@@ -1,4 +1,4 @@
-import { MockHTMLElement, MockNode } from '../../../mock-doc/node';
+import { MockHTMLElement, MockNode } from '../../../../mock-doc/node';
 import { removeDomNodes } from '../jest-setup-test-framework';
 
 describe('jest setup test framework', () => {

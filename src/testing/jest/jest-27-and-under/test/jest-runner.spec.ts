@@ -1,6 +1,6 @@
 import type * as d from '@stencil/core/declarations';
 
-import { ConfigFlags, createConfigFlags } from '../../../cli/config-flags';
+import { ConfigFlags, createConfigFlags } from '../../../../cli/config-flags';
 import { getEmulateConfigs, includeTestFile } from '../jest-runner';
 
 describe('jest-runner', () => {

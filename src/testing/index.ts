@@ -1,7 +1,7 @@
-export { createJestPuppeteerEnvironment } from './jest/jest-environment';
-export { jestPreprocessor } from './jest/jest-preprocessor';
-export { createTestRunner } from './jest/jest-runner';
-export { jestSetupTestFramework } from './jest/jest-setup-test-framework';
+export { createJestPuppeteerEnvironment } from './jest/jest-27-and-under/jest-environment';
+export { jestPreprocessor } from './jest/jest-27-and-under/jest-preprocessor';
+export { createTestRunner } from './jest/jest-27-and-under/jest-runner';
+export { jestSetupTestFramework } from './jest/jest-27-and-under/jest-setup-test-framework';
 export {
   mockFetch,
   MockHeaders,
