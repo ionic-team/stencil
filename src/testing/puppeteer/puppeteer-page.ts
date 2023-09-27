@@ -262,8 +262,6 @@ async function e2eSetContent(page: E2EPageInternal, html: string, options: WaitF
   }
 
   await waitForStencil(page, options);
-
-  return rsp;
 }
 
 async function waitForStencil(page: E2EPage, options: WaitForOptions) {
