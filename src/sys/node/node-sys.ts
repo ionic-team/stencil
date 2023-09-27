@@ -665,7 +665,7 @@ export function createNodeSys(c: { process?: any; logger?: Logger } = {}): Compi
 
   sys.lazyRequire = new NodeLazyRequire(nodeResolve, {
     '@types/jest': { minVersion: '24.9.1', recommendedVersion: '27.0.3', maxVersion: '27.0.0' },
-    jest: { minVersion: '24.9.1', recommendedVersion: '27.0.3', maxVersion: '27.0.0' },
+    jest: { minVersion: '24.9.0', recommendedVersion: '27.0.3', maxVersion: '27.0.0' },
     'jest-cli': { minVersion: '24.9.0', recommendedVersion: '27.4.5', maxVersion: '27.0.0' },
     puppeteer: { minVersion: '10.0.0', recommendedVersion: '20' },
     'puppeteer-core': { minVersion: '10.0.0', recommendedVersion: '20' },
