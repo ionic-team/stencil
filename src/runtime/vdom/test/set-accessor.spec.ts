@@ -322,6 +322,13 @@ describe('setAccessor for custom elements', () => {
     expect(elm.myprop).toBeUndefined();
     expect(elm).toEqualAttributes({ myprop: 'stringval' });
   });
+
+  it('ignore when updating readonly properties', () => {
+    const readOnlyProp = 'namespaceURI';
+    const oldReadOnlyVal = 'http://www.w3.org/1999/xhtml';
+    setAccessor(elm, readOnlyProp, oldReadOnlyVal, 'foobar', false, 0);
+    expect(elm[readOnlyProp]).toBe(oldReadOnlyVal);
+  });
 });
 
 describe('setAccessor for inputs', () => {
