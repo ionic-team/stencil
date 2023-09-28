@@ -101,16 +101,23 @@
     {
       // We intentionally run the karma tests against the oldest LTS of Node we support.
       // Prevent renovate from trying to bump node
-      matchFileNames: ['./test/karma/package.json'],
-      matchPackageNames: ['node', '@types/node'],
+      matchFileNames: ['test/karma/package.json'],
+      matchDepNames: ['node'],
+      allowedVersions: '<=16'
+    },
+    {
+      // We intentionally run the karma tests against the oldest LTS of Node we support.
+      // Prevent renovate from trying to bump node
+      matchFileNames: ['test/karma/package.json'],
+      matchPackageNames: ['@types/node'],
       allowedVersions: '<=16'
     },
     {
       // We intentionally run the karma tests against the oldest LTS of Node we support.
       // Prevent renovate from trying to bump npm and keep it in sync with a version that's supported by the version of
       // Node we run against.
-      matchFileNames: ['./test/karma/package.json'],
-      matchPackageNames: ['npm'],
+      matchFileNames: ['test/karma/package.json'],
+      matchDepNames: ['npm'],
       allowedVersions: '<=8'
     }
   ],
