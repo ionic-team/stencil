@@ -226,7 +226,7 @@ export class MockNodeList {
 type MockElementInternals = Record<keyof ElementInternals, null>;
 
 export class MockElement extends MockNode {
-  #namespaceURI: string | null;
+  __namespaceURI: string | null;
   __attributeMap: MockAttributeMap | null | undefined;
   __shadowRoot: ShadowRoot | null | undefined;
   __style: MockCSSStyleDeclaration | null | undefined;
@@ -242,9 +242,9 @@ Testing components with ElementInternals is fully supported in e2e tests.`,
     });
   }
 
-  constructor(ownerDocument: any, nodeName: string | null) {
+  constructor(ownerDocument: any, nodeName: string | null, namespaceURI: string | null = null) {
     super(ownerDocument, NODE_TYPES.ELEMENT_NODE, typeof nodeName === 'string' ? nodeName : null, null);
-    this.#namespaceURI = null;
+    this.__namespaceURI = namespaceURI;
     this.__shadowRoot = null;
     this.__attributeMap = null;
   }
@@ -267,7 +267,7 @@ Testing components with ElementInternals is fully supported in e2e tests.`,
   }
 
   get namespaceURI() {
-    return this.#namespaceURI;
+    return this.__namespaceURI;
   }
 
   get shadowRoot() {
