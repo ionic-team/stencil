@@ -158,7 +158,10 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
       }
 
       if (BUILD.hotModuleReplacement) {
-        (HostElement as any).prototype['s-hmr'] = function (hmrVersionId: string) {
+        // if we're in an HMR dev build then we need to set up the callback
+        // which will carry out the work of actually replacing the module for
+        // this particular component
+        ((HostElement as any).prototype as d.HostElement)['s-hmr'] = function (hmrVersionId: string) {
           hmrStart(this, cmpMeta, hmrVersionId);
         };
       }
