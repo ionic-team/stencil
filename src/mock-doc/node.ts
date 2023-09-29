@@ -1088,9 +1088,7 @@ function insertBefore(parentNode: MockNode, newNode: MockNode, referenceNode: Mo
 }
 
 export class MockHTMLElement extends MockElement {
-  override get namespaceURI() {
-    return 'http://www.w3.org/1999/xhtml';
-  }
+  override __namespaceURI = 'http://www.w3.org/1999/xhtml';
 
   constructor(ownerDocument: any, nodeName: string) {
     super(ownerDocument, typeof nodeName === 'string' ? nodeName.toUpperCase() : null);
