@@ -1479,6 +1479,12 @@ export type ComponentRuntimeHostListener = [number, string, string];
  */
 export type ComponentRuntimeReflectingAttr = [string, string | undefined];
 
+/**
+ * A runtime component reference, consistent of either a host element _or_ an
+ * empty object. This is used in particular in a few different places as the
+ * keys in a `WeakMap` which maps {@link HostElement} instances to their
+ * associated {@link HostRef} instance.
+ */
 export type RuntimeRef = HostElement | {};
 
 /**
