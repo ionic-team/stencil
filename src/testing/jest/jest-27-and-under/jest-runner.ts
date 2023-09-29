@@ -50,7 +50,6 @@ export async function runJest(config: d.ValidatedConfig, env: d.E2EProcessEnv) {
  * @returns the test runner
  */
 export function createTestRunner(): any {
-  // TODO(STENCIL-306): Remove support for earlier versions of Jest
   // The left hand side of the '??' is needed for Jest v27, the right hand side for Jest 26 and below
   const TestRunner = require('jest-runner').default ?? require('jest-runner');
 
