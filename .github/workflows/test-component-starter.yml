@@ -7,7 +7,7 @@ on:
 
 jobs:
   analysis_test:
-    name: (${{ matrix.os }}.${{ matrix.node }})
+    name: (${{ matrix.os }}.node-${{ matrix.node }}.jest-${{ matrix.jest }})
     strategy:
       fail-fast: false
       matrix:
