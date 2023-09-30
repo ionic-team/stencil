@@ -1504,18 +1504,36 @@ export interface HostRef {
 }
 
 export interface PlatformRuntime {
+  /**
+   * This number is used to hold a series of bitflags for various features we
+   * support within the runtime. The flags which this value is intended to store are
+   * documented in the {@link PLATFORM_FLAGS} enum.
+   */
   $flags$: number;
+  /**
+   * Holds a map of nodes to be hydrated.
+   */
   $orgLocNodes$?: Map<string, RenderNode>;
+  /**
+   * Holds the resource url for given platform environment.
+   */
   $resourcesUrl$: string;
   /**
    * The nonce value to be applied to all script/style tags at runtime.
    * If `null`, the nonce attribute will not be applied.
    */
   $nonce$?: string | null;
+  /**
+   * A utility function that executes a given function and returns the result.
+   * @param c The callback function to execute
+   */
   jmp: (c: Function) => any;
+  /**
+   * A wrapper for {@link https://developer.mozilla.org/en-US/docs/Web/API/Window/requestAnimationFrame `requestAnimationFrame`}
+   */
   raf: (c: FrameRequestCallback) => number;
   /**
-   * A wrapper for AddEventListener
+   * A wrapper for {@link https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener `addEventListener`}
    */
   ael: (
     el: EventTarget,
@@ -1524,7 +1542,7 @@ export interface PlatformRuntime {
     options: boolean | AddEventListenerOptions,
   ) => void;
   /**
-   * A wrapper for `RemoveEventListener`
+   * A wrapper for {@link https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/removeEventListener `removeEventListener`}
    */
   rel: (
     el: EventTarget,
@@ -1532,6 +1550,9 @@ export interface PlatformRuntime {
     listener: EventListenerOrEventListenerObject,
     options: boolean | AddEventListenerOptions,
   ) => void;
+  /**
+   * A wrapper for creating a {@link https://developer.mozilla.org/docs/Web/API/CustomEvent `CustomEvent`}
+   */
   ce: (eventName: string, opts?: any) => CustomEvent;
 }
 
