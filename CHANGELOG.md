@@ -11,11 +11,6 @@
 * **typescript:** upgrade to TypeScript 5.2 ([#4852](https://github.com/ionic-team/stencil/issues/4852)) ([b589a07](https://github.com/ionic-team/stencil/commit/b589a07188a956dbde858bab2b6abf1ad7a1e65b))
 
 
-### Reverts
-
-* **test:** update dependency rollup-plugin-node-polyfills to ^0.2.0 ([#4833](https://github.com/ionic-team/stencil/issues/4833)) ([0bb8a9b](https://github.com/ionic-team/stencil/commit/0bb8a9b770b666a9e0f0719ac3a960d62e7232d1))
-
-
 
 # 🐫 [4.3.0](https://github.com/ionic-team/stencil/compare/v4.2.1...v4.3.0) (2023-09-18)
 
