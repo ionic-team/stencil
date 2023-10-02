@@ -2,7 +2,6 @@ import color from 'ansi-colors';
 import Listr, { ListrTask } from 'listr';
 
 import { bundleBuild } from './build';
-import { createLicense } from './license';
 import { validateBuild } from './test/validate-build';
 import { BuildOptions } from './utils/options';
 import {
@@ -163,10 +162,6 @@ export async function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<st
         title: 'Run karma tests',
         task: () => execa('npm', ['run', 'test.karma.prod'], { cwd: rootDir }),
         skip: () => opts.isCI, // this step will occur in GitHub after the PR has been created
-      },
-      {
-        title: 'Build license',
-        task: () => createLicense(rootDir),
       },
       {
         title: 'Validate build',
