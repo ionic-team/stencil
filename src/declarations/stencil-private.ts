@@ -1082,11 +1082,6 @@ export interface HostElement extends HTMLElement {
    */
   ['s-hmr']?: (versionId: string) => void;
 
-  /**
-   * Callback method for when HMR finishes
-   */
-  ['s-hmr-load']?: () => void;
-
   ['s-p']?: Promise<void>[];
 
   componentOnReady?: () => Promise<this>;

@@ -341,10 +341,6 @@ export const postUpdateComponent = (hostRef: d.HostRef) => {
     endPostUpdate();
   }
 
-  if (BUILD.hotModuleReplacement) {
-    elm['s-hmr-load'] && elm['s-hmr-load']();
-  }
-
   if (BUILD.method && BUILD.lazyLoad) {
     hostRef.$onInstanceResolve$(elm);
   }
