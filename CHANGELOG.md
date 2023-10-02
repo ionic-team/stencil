@@ -1,3 +1,17 @@
+# 🍫 [4.4.0](https://github.com/ionic-team/stencil/compare/v4.3.0...v4.4.0) (2023-10-02)
+
+
+### Bug Fixes
+
+* **jest:** use correct minimum jest version ([#4851](https://github.com/ionic-team/stencil/issues/4851)) ([2f7fb88](https://github.com/ionic-team/stencil/commit/2f7fb88dcd75312f658421c4c518fa76292517db))
+
+
+### Features
+
+* **typescript:** upgrade to TypeScript 5.2 ([#4852](https://github.com/ionic-team/stencil/issues/4852)) ([b589a07](https://github.com/ionic-team/stencil/commit/b589a07188a956dbde858bab2b6abf1ad7a1e65b))
+
+
+
 # 🐫 [4.3.0](https://github.com/ionic-team/stencil/compare/v4.2.1...v4.3.0) (2023-09-18)
 
 
