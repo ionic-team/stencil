@@ -1301,13 +1301,13 @@ Homepage: https://github.com/jimmywarting/FormData#readme
 
 License: MIT
 
-Author: Robert Eisele <robert@xarg.org> (http://www.xarg.org/)
+Author: [Robert Eisele](https://raw.org/)
 
 Homepage: https://www.xarg.org/2014/03/rational-numbers-in-javascript/
 
 > MIT License
 > 
-> Copyright (c) 2017 Robert Eisele
+> Copyright (c) 2023 Robert Eisele
 > 
 > Permission is hereby granted, free of charge, to any person obtaining a copy
 > of this software and associated documentation files (the "Software"), to deal
