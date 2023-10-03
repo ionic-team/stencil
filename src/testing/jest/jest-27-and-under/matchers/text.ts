@@ -12,8 +12,8 @@ export function toEqualText(input: HTMLElement | string, expectTextContent: stri
   let textContent: string;
 
   if ((input as HTMLElement).nodeType === NODE_TYPES.ELEMENT_NODE) {
-    textContent = (input as HTMLElement).textContent.replace(/\s\s+/g, ' ').trim();
-  } else if (input != null) {
+    textContent = ((input as HTMLElement).textContent ?? '').replace(/\s\s+/g, ' ').trim();
+  } else {
     textContent = String(input).replace(/\s\s+/g, ' ').trim();
   }
 
