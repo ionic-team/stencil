@@ -82,7 +82,7 @@ jobs:
         shell: bash
 
       - name: Install Stencil Eval
-        run: npm i ../stencil-eval.tgz
+        run: npm i --ignore-scripts ../stencil-eval.tgz
         working-directory: ./tmp-component-starter
         shell: bash
 
