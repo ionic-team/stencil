@@ -28,7 +28,7 @@
     "clean-scripts": "rm -rf scripts/build",
     "license": "node scripts/build --license",
     "lint": "eslint 'bin/*' 'scripts/*.ts' 'scripts/**/*.ts' 'src/*.ts' 'src/**/*.ts' 'src/**/*.tsx'",
-    "postinstall": "./install-jest.sh",
+    "postinstall": "sh install-jest.sh",
     "prettier": "npm run prettier.base -- --write",
     "prettier.base": "prettier --cache \"./({bin,scripts,src,test}/**/*.{ts,tsx,js,jsx})|bin/stencil|.github/(**/)?*.(yml|yaml)|*.js\"",
     "prettier.dry-run": "npm run prettier.base -- --list-different",
