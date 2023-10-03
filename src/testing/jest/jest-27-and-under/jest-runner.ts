@@ -60,7 +60,7 @@ export function createTestRunner(): any {
       // filter out only the tests the flags said we should run
       tests = tests.filter((t) => includeTestFile(t.path, env));
 
-      if (env.__STENCIL_SCREENSHOT__ === 'true') {
+      if (env.__STENCIL_SCREENSHOT__ === 'true' && env.__STENCIL_EMULATE_CONFIGS__) {
         // we're doing e2e screenshots, so let's loop through
         // each of the emulate configs for each test
 
@@ -105,8 +105,8 @@ export function includeTestFile(testPath: string, env: d.E2EProcessEnv) {
   return false;
 }
 
-export function getEmulateConfigs(testing: d.TestingConfig, flags: ConfigFlags) {
-  let emulateConfigs = testing.emulate.slice();
+export function getEmulateConfigs(testing: d.TestingConfig, flags: ConfigFlags): d.EmulateConfig[] {
+  let emulateConfigs = testing.emulate?.slice() ?? [];
 
   if (typeof flags.emulate === 'string') {
     const emulateFlag = flags.emulate.toLowerCase();

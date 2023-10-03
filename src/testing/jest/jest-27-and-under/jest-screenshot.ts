@@ -6,7 +6,7 @@ import { runJest } from './jest-runner';
 export async function runJestScreenshot(config: d.ValidatedConfig, env: d.E2EProcessEnv) {
   config.logger.debug(`screenshot connector: ${config.testing.screenshotConnector}`);
 
-  const ScreenshotConnector = require(config.testing.screenshotConnector) as any;
+  const ScreenshotConnector = require(config.testing.screenshotConnector!) as any;
   const connector: d.ScreenshotConnector = new ScreenshotConnector();
 
   // for CI, let's wait a little longer than locally before taking the screenshot
@@ -22,7 +22,7 @@ export async function runJestScreenshot(config: d.ValidatedConfig, env: d.E2EPro
     rootDir: config.rootDir,
     cacheDir: config.cacheDir,
     packageDir: join(config.sys.getCompilerExecutingPath(), '..', '..'),
-    updateMaster: config.flags.updateScreenshot,
+    updateMaster: !!config.flags.updateScreenshot,
     logger: config.logger,
     allowableMismatchedPixels: config.testing.allowableMismatchedPixels,
     allowableMismatchedRatio: config.testing.allowableMismatchedRatio,
