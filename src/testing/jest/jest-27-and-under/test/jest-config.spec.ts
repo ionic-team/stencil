@@ -148,7 +148,9 @@ describe('jest-config', () => {
     expect(config.flags.task).toBe('test');
 
     const jestArgv = buildJestArgv(config);
-    const parsedConfig = JSON.parse(jestArgv.config) as d.JestConfig;
+    // `buildJestArgv` is expected to place a `config` property on the returned `Config.Argv`, hence the use of the bang
+    // operator. if one wasn't on the object, `JSON.parse` is expected to throw (failing the test).
+    const parsedConfig = JSON.parse(jestArgv.config!) as d.JestConfig;
     expect(parsedConfig.testMatch).toEqual(['hello.spec.ts']);
   });
 
@@ -162,7 +164,9 @@ describe('jest-config', () => {
     config.flags = parseFlags(args);
 
     const jestArgv = buildJestArgv(config);
-    const parsedConfig = JSON.parse(jestArgv.config) as d.JestConfig;
+    // `buildJestArgv` is expected to place a `config` property on the returned `Config.Argv`, hence the use of the bang
+    // operator. if one wasn't on the object, `JSON.parse` is expected to throw (failing the test).
+    const parsedConfig = JSON.parse(jestArgv.config!) as d.JestConfig;
     expect(parsedConfig.reporters).toHaveLength(2);
     expect(parsedConfig.reporters[0]).toBe('default');
     expect(parsedConfig.reporters[1][0]).toBe('jest-junit');
@@ -176,7 +180,9 @@ describe('jest-config', () => {
     config.flags = parseFlags(args);
 
     const jestArgv = buildJestArgv(config);
-    const parsedConfig = JSON.parse(jestArgv.config) as d.JestConfig;
+    // `buildJestArgv` is expected to place a `config` property on the returned `Config.Argv`, hence the use of the bang
+    // operator. if one wasn't on the object, `JSON.parse` is expected to throw (failing the test).
+    const parsedConfig = JSON.parse(jestArgv.config!) as d.JestConfig;
     expect(parsedConfig.rootDir).toBe(rootDir);
   });
 
@@ -187,9 +193,11 @@ describe('jest-config', () => {
     config.flags = parseFlags(args);
 
     const jestArgv = buildJestArgv(config);
-    const parsedConfig = JSON.parse(jestArgv.config) as d.JestConfig;
+    // `buildJestArgv` is expected to place a `config` property on the returned `Config.Argv`, hence the use of the bang
+    // operator. if one wasn't on the object, `JSON.parse` is expected to throw (failing the test).
+    const parsedConfig = JSON.parse(jestArgv.config!) as d.JestConfig;
     expect(parsedConfig.collectCoverageFrom).toHaveLength(1);
-    expect(parsedConfig.collectCoverageFrom[0]).toBe('**/*.+(ts|tsx)');
+    expect(parsedConfig.collectCoverageFrom![0]).toBe('**/*.+(ts|tsx)');
   });
 
   it('passed flags should be respected over defaults', () => {

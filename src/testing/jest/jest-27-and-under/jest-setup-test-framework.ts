@@ -93,7 +93,7 @@ export function jestSetupTestFramework() {
  *
  * @param node The mocked DOM node that will be removed from the DOM
  */
-export function removeDomNodes(node: MockNode) {
+export function removeDomNodes(node: MockNode | undefined | null) {
   if (node == null) {
     return;
   }
