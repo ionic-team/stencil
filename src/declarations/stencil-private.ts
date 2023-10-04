@@ -1079,6 +1079,9 @@ export interface HostElement extends HTMLElement {
 
   /**
    * Hot Module Replacement, dev mode only
+   *
+   * This function should be defined by the HMR-supporting runtime and should
+   * do the work of actually updating the component in-place.
    */
   ['s-hmr']?: (versionId: string) => void;
 
