@@ -112,3 +112,12 @@ export const getCreateJestTestRunner = () => {
 export const getJestSetupTestFramework = () => {
   return getJestFacade().getJestSetupTestFramework();
 };
+
+/**
+ * Retrieve Stencil's Jest presets for the detected version of Jest
+ *
+ * @returns an object representing a Jest preset
+ */
+export const getJestPreset = () => {
+  return getJestFacade().getJestPreset();
+};

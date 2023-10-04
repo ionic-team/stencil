@@ -1,6 +1,7 @@
 import { JestFacade } from '../jest-facade';
 import { createJestPuppeteerEnvironment as createJestPuppeteerEnvironment27 } from './jest-environment';
 import { jestPreprocessor as jestPreprocessor27 } from './jest-preprocessor';
+import { preset as jestPreset27 } from './jest-preset';
 import { createTestRunner as createTestRunner27 } from './jest-runner';
 import { runJest as runJest27 } from './jest-runner';
 import { runJestScreenshot as runJestScreenshot27 } from './jest-screenshot';
@@ -36,5 +37,9 @@ export class Jest27Stencil implements JestFacade {
 
   getJestSetupTestFramework() {
     return jestSetupTestFramework27;
+  }
+
+  getJestPreset() {
+    return jestPreset27;
   }
 }

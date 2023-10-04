@@ -167,5 +167,6 @@ const transpileJson = (results: TranspileResults) => {
   results.map = { mappings: '' };
 };
 
-// NOTE: if you change this, also change scripts/bundles/helpers/jest/jest-preset.js
+// NOTE: if you change this, also change jest configuration files in `src/testing/jest/jest*`.
+// Search for 'mod_extensions_jest' to find comments like this.
 const shouldTranspileModule = (ext: string) => ['tsx', 'ts', 'mjs', 'jsx', 'js'].includes(ext);

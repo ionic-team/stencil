@@ -2,6 +2,7 @@ export {
   getCreateJestPuppeteerEnvironment,
   getCreateJestTestRunner,
   getJestPreprocessor,
+  getJestPreset,
   getJestSetupTestFramework,
 } from './jest/jest-stencil-connector';
 export {
