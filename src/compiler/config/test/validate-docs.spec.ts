@@ -11,7 +11,9 @@ describe('validateDocs', () => {
   });
 
   it('readme docs dir', () => {
-    userConfig.flags.docs = true;
+    // the flags field is expected to have been set by the mock creation function for unvalidated configs, hence the
+    // bang operator
+    userConfig.flags!.docs = true;
     userConfig.outputTargets = [
       {
         type: 'docs-readme',
