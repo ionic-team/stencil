@@ -33,53 +33,54 @@ export const validateWww = (config: d.ValidatedConfig, diagnostics: d.Diagnostic
     err.messageText = `You need at least one "www" output target configured in your stencil.config.ts, when the "--prerender" flag is used`;
   }
 
-  return userWwwOutputs.reduce(
-    (
-      outputs: (d.OutputTargetWww | d.OutputTargetDistLazy | d.OutputTargetCopy | d.OutputTargetDistGlobalStyles)[],
-      o,
-    ) => {
-      const outputTarget = validateWwwOutputTarget(config, o, diagnostics);
-      outputs.push(outputTarget);
+  const outputs: (
+    | d.ValidatedOutputTargetWww
+    | d.OutputTargetDistLazy
+    | d.OutputTargetCopy
+    | d.OutputTargetDistGlobalStyles
+  )[] = [];
 
-      // Add dist-lazy output target
-      const buildDir = outputTarget.buildDir;
-      outputs.push({
-        type: DIST_LAZY,
-        dir: buildDir,
-        esmDir: buildDir,
-        systemDir: config.buildEs5 ? buildDir : undefined,
-        systemLoaderFile: config.buildEs5 ? join(buildDir, `${config.fsNamespace}.js`) : undefined,
-        polyfills: outputTarget.polyfills,
-        isBrowserBuild: true,
-      });
+  for (const userOutputTarget of userWwwOutputs) {
+    const outputTarget = validateWwwOutputTarget(config, userOutputTarget, diagnostics);
+    outputs.push(outputTarget);
 
-      // Copy for dist
-      outputs.push({
-        type: COPY,
-        dir: buildDir,
-        copyAssets: 'dist',
-      });
+    // Add dist-lazy output target
+    const buildDir = outputTarget.buildDir;
+    outputs.push({
+      type: DIST_LAZY,
+      dir: buildDir,
+      esmDir: buildDir,
+      systemDir: config.buildEs5 ? buildDir : undefined,
+      systemLoaderFile: config.buildEs5 ? join(buildDir, `${config.fsNamespace}.js`) : undefined,
+      polyfills: outputTarget.polyfills,
+      isBrowserBuild: true,
+    });
 
-      // Copy for www
-      outputs.push({
-        type: COPY,
-        dir: outputTarget.appDir,
-        copy: validateCopy(outputTarget.copy, [
-          { src: 'assets', warn: false },
-          { src: 'manifest.json', warn: false },
-        ]),
-      });
+    // Copy for dist
+    outputs.push({
+      type: COPY,
+      dir: buildDir,
+      copyAssets: 'dist',
+    });
 
-      // Generate global style with original name
-      outputs.push({
-        type: DIST_GLOBAL_STYLES,
-        file: join(buildDir, `${config.fsNamespace}.css`),
-      });
+    // Copy for www
+    outputs.push({
+      type: COPY,
+      dir: outputTarget.appDir,
+      copy: validateCopy(outputTarget.copy, [
+        { src: 'assets', warn: false },
+        { src: 'manifest.json', warn: false },
+      ]),
+    });
 
-      return outputs;
-    },
-    [],
-  );
+    // Generate global style with original name
+    outputs.push({
+      type: DIST_GLOBAL_STYLES,
+      file: join(buildDir, `${config.fsNamespace}.css`),
+    });
+  }
+
+  return outputs;
 };
 
 const validateWwwOutputTarget = (
