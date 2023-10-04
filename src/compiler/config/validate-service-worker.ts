@@ -22,64 +22,67 @@ import type * as d from '../../declarations';
  * @param outputTarget the `www` outputTarget whose service worker
  * configuration we want to validate. **Note**: the `.serviceWorker` object
  * _will be mutated_ if it is present.
+ * @param serviceWorker
+ * @param appDir
  */
-export const validateServiceWorker = (config: d.ValidatedConfig, outputTarget: d.OutputTargetWww): void => {
-  if (outputTarget.serviceWorker === false) {
-    return;
+export const validateServiceWorker = (
+  config: d.ValidatedConfig,
+  serviceWorker: d.OutputTargetWww['serviceWorker'],
+  appDir: string,
+): false | null | d.ServiceWorkerConfig => {
+  if (serviceWorker === false) {
+    return false;
   }
   if (config.devMode && !config.flags.serviceWorker) {
-    outputTarget.serviceWorker = null;
-    return;
+    return null;
   }
 
-  if (outputTarget.serviceWorker === null) {
-    outputTarget.serviceWorker = null;
-    return;
+  if (serviceWorker === null) {
+    return null;
   }
 
-  if (!outputTarget.serviceWorker && config.devMode) {
-    outputTarget.serviceWorker = null;
-    return;
+  if (!serviceWorker && config.devMode) {
+    return null;
   }
 
-  const globDirectory =
-    typeof outputTarget.serviceWorker?.globDirectory === 'string'
-      ? outputTarget.serviceWorker.globDirectory
-      : outputTarget.appDir;
+  const globDirectory = typeof serviceWorker?.globDirectory === 'string' ? serviceWorker.globDirectory : appDir;
 
-  outputTarget.serviceWorker = {
-    ...outputTarget.serviceWorker,
+  serviceWorker = {
+    ...serviceWorker,
     globDirectory,
-    swDest: isString(outputTarget.serviceWorker?.swDest)
-      ? outputTarget.serviceWorker.swDest
-      : join(outputTarget.appDir ?? '', DEFAULT_FILENAME),
+    swDest:
+      serviceWorker?.swDest != null && isString(serviceWorker?.swDest)
+        ? serviceWorker.swDest
+        : join(appDir ?? '', DEFAULT_FILENAME),
   };
 
-  if (!Array.isArray(outputTarget.serviceWorker.globPatterns)) {
-    if (typeof outputTarget.serviceWorker.globPatterns === 'string') {
-      outputTarget.serviceWorker.globPatterns = [outputTarget.serviceWorker.globPatterns];
-    } else if (typeof outputTarget.serviceWorker.globPatterns !== 'string') {
-      outputTarget.serviceWorker.globPatterns = DEFAULT_GLOB_PATTERNS.slice();
+  if (!Array.isArray(serviceWorker.globPatterns)) {
+    if (typeof serviceWorker.globPatterns === 'string') {
+      serviceWorker.globPatterns = [serviceWorker.globPatterns];
+    } else if (typeof serviceWorker.globPatterns !== 'string') {
+      serviceWorker.globPatterns = DEFAULT_GLOB_PATTERNS.slice();
     }
   }
 
-  if (typeof outputTarget.serviceWorker.globIgnores === 'string') {
-    outputTarget.serviceWorker.globIgnores = [outputTarget.serviceWorker.globIgnores];
+  if (typeof serviceWorker.globIgnores === 'string') {
+    serviceWorker.globIgnores = [serviceWorker.globIgnores];
   }
 
-  outputTarget.serviceWorker.globIgnores = outputTarget.serviceWorker.globIgnores || [];
+  serviceWorker.globIgnores = serviceWorker.globIgnores || [];
 
-  addGlobIgnores(config, outputTarget.serviceWorker.globIgnores);
+  addGlobIgnores(config, serviceWorker.globIgnores);
 
-  outputTarget.serviceWorker.dontCacheBustURLsMatching = /p-\w{8}/;
+  serviceWorker.dontCacheBustURLsMatching = /p-\w{8}/;
 
-  if (isString(outputTarget.serviceWorker.swSrc) && !isAbsolute(outputTarget.serviceWorker.swSrc)) {
-    outputTarget.serviceWorker.swSrc = join(config.rootDir, outputTarget.serviceWorker.swSrc);
+  if (isString(serviceWorker.swSrc) && !isAbsolute(serviceWorker.swSrc)) {
+    serviceWorker.swSrc = join(config.rootDir, serviceWorker.swSrc);
   }
 
-  if (isString(outputTarget.serviceWorker.swDest) && !isAbsolute(outputTarget.serviceWorker.swDest)) {
-    outputTarget.serviceWorker.swDest = join(outputTarget.appDir ?? '', outputTarget.serviceWorker.swDest);
+  if (isString(serviceWorker.swDest) && !isAbsolute(serviceWorker.swDest)) {
+    serviceWorker.swDest = join(appDir ?? '', serviceWorker.swDest);
   }
+
+  return serviceWorker;
 };
 
 /**

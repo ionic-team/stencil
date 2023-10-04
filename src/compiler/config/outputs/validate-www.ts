@@ -14,7 +14,6 @@ import { isAbsolute, join } from 'path';
 import type * as d from '../../../declarations';
 import { getAbsolutePath } from '../config-utils';
 import { validateCopy } from '../validate-copy';
-import { validatePrerender } from '../validate-prerender';
 import { validateServiceWorker } from '../validate-service-worker';
 
 export const validateWww = (config: d.ValidatedConfig, diagnostics: d.Diagnostic[], userOutputs: d.OutputTarget[]) => {
@@ -87,52 +86,97 @@ const validateWwwOutputTarget = (
   config: d.ValidatedConfig,
   outputTarget: d.OutputTargetWww,
   diagnostics: d.Diagnostic[],
-) => {
-  if (!isString(outputTarget.baseUrl)) {
-    outputTarget.baseUrl = '/';
+): d.ValidatedOutputTargetWww => {
+  const baseUrl = validateBaseUrl(outputTarget.baseUrl);
+  const dir = getAbsolutePath(config, outputTarget.dir || 'www');
+  const appDir = validateAppDir(baseUrl, dir);
+
+  const validatedOutputTarget = {
+    appDir,
+    baseUrl,
+    buildDir: validateBuildDir(outputTarget.buildDir, appDir),
+    copy: outputTarget.copy ?? null,
+    dir,
+    empty: isBoolean(outputTarget.empty) ? outputTarget.empty : true,
+    indexHtml: validateIndexHtml(outputTarget.indexHtml, appDir),
+    polyfills: isBoolean(outputTarget.polyfills) ? outputTarget.polyfills : true,
+    prerenderConfig: validatePrerenderConfig(outputTarget.prerenderConfig, baseUrl, config, diagnostics),
+    serviceWorker: validateServiceWorker(config, outputTarget.serviceWorker, appDir),
+    type: 'www',
+  } satisfies d.ValidatedOutputTargetWww;
+
+  return validatedOutputTarget;
+};
+
+const validateAppDir = (baseUrl: string, dir: string): string => {
+  const pathname = new URL(baseUrl, 'http://localhost/').pathname;
+  let appDir = join(dir, pathname);
+  if (appDir.endsWith('/') || appDir.endsWith('\\')) {
+    appDir = appDir.substring(0, appDir.length - 1);
   }
 
-  if (!outputTarget.baseUrl.endsWith('/')) {
+  return appDir;
+};
+
+const validateBaseUrl = (baseUrl: string | undefined): string => {
+  if (!isString(baseUrl)) {
+    baseUrl = '/';
+  }
+  if (!baseUrl.endsWith('/')) {
     // Make sure the baseUrl always finish with "/"
-    outputTarget.baseUrl += '/';
+    baseUrl += '/';
   }
 
-  outputTarget.dir = getAbsolutePath(config, outputTarget.dir || 'www');
+  return baseUrl;
+};
 
-  // Fix "dir" to account
-  const pathname = new URL(outputTarget.baseUrl, 'http://localhost/').pathname;
-  outputTarget.appDir = join(outputTarget.dir, pathname);
-  if (outputTarget.appDir.endsWith('/') || outputTarget.appDir.endsWith('\\')) {
-    outputTarget.appDir = outputTarget.appDir.substring(0, outputTarget.appDir.length - 1);
+const validateBuildDir = (buildDir: string | undefined, appDir: string): string => {
+  buildDir = isString(buildDir) ? buildDir : 'build';
+  if (!isAbsolute(buildDir)) {
+    buildDir = join(appDir, buildDir);
   }
 
-  if (!isString(outputTarget.buildDir)) {
-    outputTarget.buildDir = 'build';
+  return buildDir;
+};
+
+const validateIndexHtml = (indexHtml: string | undefined, appDir: string): string => {
+  if (!isString(indexHtml)) {
+    indexHtml = 'index.html';
+  }
+  if (!isAbsolute(indexHtml)) {
+    indexHtml = join(appDir, indexHtml);
   }
 
-  if (!isAbsolute(outputTarget.buildDir)) {
-    outputTarget.buildDir = join(outputTarget.appDir, outputTarget.buildDir);
+  return indexHtml;
+};
+
+const validatePrerenderConfig = (
+  prerenderConfig: string | null | undefined,
+  baseUrl: string,
+  config: d.ValidatedConfig,
+  diagnostics: d.Diagnostic[],
+): string | null => {
+  if (!config.flags.ssr && !config.flags.prerender && config.flags.task !== 'prerender') {
+    return null;
   }
 
-  if (!isString(outputTarget.indexHtml)) {
-    outputTarget.indexHtml = 'index.html';
+  if (!baseUrl.startsWith('http://') && !baseUrl.startsWith('https://')) {
+    const err = buildError(diagnostics);
+    err.messageText = `When prerendering, the "baseUrl" output target config must be a full URL and start with either "http://" or "https://". The config can be updated in the "www" output target within the stencil config.`;
   }
 
-  if (!isAbsolute(outputTarget.indexHtml)) {
-    outputTarget.indexHtml = join(outputTarget.appDir, outputTarget.indexHtml);
+  try {
+    new URL(baseUrl);
+  } catch (e) {
+    const err = buildError(diagnostics);
+    err.messageText = `invalid "baseUrl": ${e}`;
   }
 
-  if (!isBoolean(outputTarget.empty)) {
-    outputTarget.empty = true;
+  if (isString(prerenderConfig)) {
+    if (!isAbsolute(prerenderConfig)) {
+      prerenderConfig = join(config.rootDir, prerenderConfig);
+    }
   }
 
-  validatePrerender(config, diagnostics, outputTarget);
-  validateServiceWorker(config, outputTarget);
-
-  if (outputTarget.polyfills === undefined) {
-    outputTarget.polyfills = true;
-  }
-  outputTarget.polyfills = !!outputTarget.polyfills;
-
-  return outputTarget;
+  return prerenderConfig ?? null;
 };
