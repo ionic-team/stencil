@@ -620,13 +620,13 @@ export declare function h(sel: any, data: VNodeData | null, children: VNode): VN
  */
 export interface VNode {
   $flags$: number;
-  $tag$: string | number | Function;
+  $tag$: string | number | Function | null;
   $elm$: any;
-  $text$: string;
-  $children$: VNode[];
+  $text$: string | undefined | null;
+  $children$: VNode[] | undefined | null;
   $attrs$?: any;
-  $name$?: string;
-  $key$?: string | number;
+  $name$?: string | null;
+  $key$?: string | number | null;
 }
 
 export interface VNodeData {

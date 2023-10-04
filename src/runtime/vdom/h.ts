@@ -17,8 +17,8 @@ import type * as d from '../../declarations';
 // export function h(nodeName: string | d.FunctionalComponent, vnodeData: d.PropsType, ...children: d.ChildType[]): d.VNode;
 export const h = (nodeName: any, vnodeData: any, ...children: d.ChildType[]): d.VNode => {
   let child = null;
-  let key: string = null;
-  let slotName: string = null;
+  let key: string | null = null;
+  let slotName: string | null = null;
   let simple = false;
   let lastSimple = false;
   const vNodeChildren: d.VNode[] = [];
@@ -109,7 +109,7 @@ Empty objects can also be the cause, look for JSX comments that became objects.`
  * @param text possible text content for the node
  * @returns a newly-minted virtual DOM node
  */
-export const newVNode = (tag: string, text: string) => {
+export const newVNode = (tag: string | null, text: string | undefined | null) => {
   const vnode: d.VNode = {
     $flags$: 0,
     $tag$: tag,
