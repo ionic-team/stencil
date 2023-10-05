@@ -12,7 +12,15 @@ export function toMatchScreenshot(compare: d.ScreenshotDiff, opts: d.MatchScreen
   }
 
   if (typeof compare.mismatchedPixels !== 'number') {
-    throw new Error(`expect toMatchScreenshot() value is not a screenshot compare`);
+    throw new Error(
+      `expect toMatchScreenshot() value is not a valid screenshot compare object - 'mismatchedPixels' has type '${typeof compare.mismatchedPixels}', but should be a number`,
+    );
+  }
+
+  if (typeof compare.deviceScaleFactor !== 'number') {
+    throw new Error(
+      `expect toMatchScreenshot() value is not a valid screenshot compare object - 'deviceScaleFactor' has type '${typeof compare.deviceScaleFactor}', but should be a number`,
+    );
   }
 
   const device = compare.device || compare.userAgent;
