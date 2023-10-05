@@ -33,10 +33,12 @@ describe('validateOutputTargetWww', () => {
         appDir: path.join(rootDir, 'www', 'docs'),
         baseUrl: '/',
         buildDir: path.join(rootDir, 'www', 'docs', 'build'),
+        copy: [],
         dir: path.join(rootDir, 'www', 'docs'),
         empty: true,
         indexHtml: path.join(rootDir, 'www', 'docs', 'index.html'),
         polyfills: true,
+        prerenderConfig: null,
         serviceWorker: {
           dontCacheBustURLsMatching: /p-\w{8}/,
           globDirectory: path.join(rootDir, 'www', 'docs'),

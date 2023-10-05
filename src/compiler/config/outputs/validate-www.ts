@@ -96,14 +96,14 @@ const validateWwwOutputTarget = (
     appDir,
     baseUrl,
     buildDir: validateBuildDir(outputTarget.buildDir, appDir),
-    copy: outputTarget.copy ?? null,
+    copy: outputTarget.copy === undefined ? [] : outputTarget.copy,
     dir,
     empty: isBoolean(outputTarget.empty) ? outputTarget.empty : true,
     indexHtml: validateIndexHtml(outputTarget.indexHtml, appDir),
     polyfills: isBoolean(outputTarget.polyfills) ? outputTarget.polyfills : true,
     prerenderConfig: validatePrerenderConfig(outputTarget.prerenderConfig, baseUrl, config, diagnostics),
     serviceWorker: validateServiceWorker(config, outputTarget.serviceWorker, appDir),
-    type: 'www',
+    type: WWW,
   } satisfies d.ValidatedOutputTargetWww;
 
   return validatedOutputTarget;

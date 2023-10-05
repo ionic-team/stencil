@@ -18,18 +18,17 @@ import type * as d from '../../declarations';
  * If we do find a service worker configuration we do some validation to ensure
  * that things are set up correctly.
  *
- * @param config the current, validated configuration
- * @param outputTarget the `www` outputTarget whose service worker
- * configuration we want to validate. **Note**: the `.serviceWorker` object
- * _will be mutated_ if it is present.
- * @param serviceWorker
- * @param appDir
+ * @param config the current, validated Stencil config.
+ * @param serviceWorker The existing service worker property on the un-validated output target.
+ * @param appDir The validated `appDir` string for the output target.
+ * @returns `false` if explicitly set by the user, `null` if explicitly set by user or in development mode,
+ * or a {@link d.ServiceWorkerConfig} otherwise.
  */
 export const validateServiceWorker = (
   config: d.ValidatedConfig,
   serviceWorker: d.OutputTargetWww['serviceWorker'],
   appDir: string,
-): false | null | d.ServiceWorkerConfig => {
+): d.ValidatedOutputTargetWww['serviceWorker'] => {
   if (serviceWorker === false) {
     return false;
   }
