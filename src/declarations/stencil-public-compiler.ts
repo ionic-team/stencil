@@ -453,14 +453,17 @@ type RequireFields<T, K extends keyof T> = T & { [P in K]-?: T[P] };
 /**
  * Fields in {@link Config} to make required for {@link ValidatedConfig}
  */
-type StrictConfigFields =
+type StrictConfigFields = keyof Pick<
+  Config,
   | 'cacheDir'
   | 'devServer'
   | 'extras'
   | 'flags'
+  | 'fsNamespace'
   | 'hydratedFlag'
   | 'logger'
   | 'logLevel'
+  | 'namespace'
   | 'outputTargets'
   | 'packageJsonFilePath'
   | 'rollupConfig'
@@ -470,7 +473,8 @@ type StrictConfigFields =
   | 'sys'
   | 'testing'
   | 'transformAliasedImportPaths'
-  | 'validatePrimaryPackageOutputTarget';
+  | 'validatePrimaryPackageOutputTarget'
+>;
 
 /**
  * A version of {@link Config} that makes certain fields required. This type represents a valid configuration entity.

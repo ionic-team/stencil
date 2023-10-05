@@ -2,42 +2,48 @@ import { buildError, dashToPascalCase, isOutputTargetDist, isString } from '@uti
 
 import type * as d from '../../declarations';
 
-export const validateNamespace = (c: d.UnvalidatedConfig, diagnostics: d.Diagnostic[]) => {
-  c.namespace = isString(c.namespace) ? c.namespace : DEFAULT_NAMESPACE;
-  c.namespace = c.namespace.trim();
+export const validateNamespace = (
+  namespace: string | undefined,
+  fsNamespace: string | undefined,
+  diagnostics: d.Diagnostic[],
+) => {
+  namespace = isString(namespace) ? namespace : DEFAULT_NAMESPACE;
+  namespace = namespace.trim();
 
-  const invalidNamespaceChars = c.namespace.replace(/(\w)|(\-)|(\$)/g, '');
+  const invalidNamespaceChars = namespace.replace(/(\w)|(\-)|(\$)/g, '');
   if (invalidNamespaceChars !== '') {
     const err = buildError(diagnostics);
-    err.messageText = `Namespace "${c.namespace}" contains invalid characters: ${invalidNamespaceChars}`;
+    err.messageText = `Namespace "${namespace}" contains invalid characters: ${invalidNamespaceChars}`;
   }
-  if (c.namespace.length < 3) {
+  if (namespace.length < 3) {
     const err = buildError(diagnostics);
-    err.messageText = `Namespace "${c.namespace}" must be at least 3 characters`;
+    err.messageText = `Namespace "${namespace}" must be at least 3 characters`;
   }
-  if (/^\d+$/.test(c.namespace.charAt(0))) {
+  if (/^\d+$/.test(namespace.charAt(0))) {
     const err = buildError(diagnostics);
-    err.messageText = `Namespace "${c.namespace}" cannot have a number for the first character`;
+    err.messageText = `Namespace "${namespace}" cannot have a number for the first character`;
   }
-  if (c.namespace.charAt(0) === '-') {
+  if (namespace.charAt(0) === '-') {
     const err = buildError(diagnostics);
-    err.messageText = `Namespace "${c.namespace}" cannot have a dash for the first character`;
+    err.messageText = `Namespace "${namespace}" cannot have a dash for the first character`;
   }
-  if (c.namespace.charAt(c.namespace.length - 1) === '-') {
+  if (namespace.charAt(namespace.length - 1) === '-') {
     const err = buildError(diagnostics);
-    err.messageText = `Namespace "${c.namespace}" cannot have a dash for the last character`;
+    err.messageText = `Namespace "${namespace}" cannot have a dash for the last character`;
   }
 
   // the file system namespace is the one
   // used in filenames and seen in the url
-  if (!isString(c.fsNamespace)) {
-    c.fsNamespace = c.namespace.toLowerCase().trim();
+  if (!isString(fsNamespace)) {
+    fsNamespace = namespace.toLowerCase().trim();
   }
 
-  if (c.namespace.includes('-')) {
+  if (namespace.includes('-')) {
     // convert to PascalCase
-    c.namespace = dashToPascalCase(c.namespace);
+    namespace = dashToPascalCase(namespace);
   }
+
+  return { namespace, fsNamespace };
 };
 
 export const validateDistNamespace = (config: d.UnvalidatedConfig, diagnostics: d.Diagnostic[]) => {
