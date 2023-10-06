@@ -61,8 +61,8 @@ describe('updateElement', () => {
 
   it('should add new classes when no oldVNode.vattrs', () => {
     const elm = document.createElement('my-tag') as HTMLElement;
-    const oldVNode: d.VNode = newVNode(null, null);
-    const newVnode: d.VNode = newVNode(null, null);
+    const oldVNode: d.VNode = newVNode('my-component', 'text value');
+    const newVnode: d.VNode = newVNode('my-component', 'text value');
     newVnode.$elm$ = elm;
     newVnode.$attrs$ = { class: 'mr fusion' };
     updateElement(oldVNode, newVnode, false);
