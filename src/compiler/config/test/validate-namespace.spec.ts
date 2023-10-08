@@ -2,6 +2,7 @@ import type * as d from '@stencil/core/declarations';
 
 import { validateNamespace } from '../validate-namespace';
 
+// TODO(STENCIL-968): Update tests to check diagnostic messages
 describe('validateNamespace', () => {
   const diagnostics: d.Diagnostic[] = [];
 
