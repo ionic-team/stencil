@@ -145,9 +145,9 @@ declare global {
      * docs
      */
         interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
-                addEventListener<K extends keyof HTMLMyComponentElementEventMap>(type: K, listener: (this: HTMLMyComponentElement, ev: HTMLMyComponentElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+                addEventListener<K extends keyof HTMLMyComponentElementEventMap>(type: K, listener: (this: HTMLMyComponentElement, ev: MyComponentCustomEvent<HTMLMyComponentElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
                 addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-                removeEventListener<K extends keyof HTMLMyComponentElementEventMap>(type: K, listener: (this: HTMLMyComponentElement, ev: ev: HTMLMyComponentElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+                removeEventListener<K extends keyof HTMLMyComponentElementEventMap>(type: K, listener: (this: HTMLMyComponentElement, ev: MyComponentCustomEvent<HTMLMyComponentElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
                 removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
         }
         var HTMLMyComponentElement: {
@@ -246,9 +246,9 @@ declare global {
      * docs
      */
         interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
-                addEventListener<K extends keyof HTMLMyComponentElementEventMap>(type: K, listener: (this: HTMLMyComponentElement, ev: HTMLMyComponentElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+                addEventListener<K extends keyof HTMLMyComponentElementEventMap>(type: K, listener: (this: HTMLMyComponentElement, ev: MyComponentCustomEvent<HTMLMyComponentElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
                 addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-                removeEventListener<K extends keyof HTMLMyComponentElementEventMap>(type: K, listener: (this: HTMLMyComponentElement, ev: ev: HTMLMyComponentElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+                removeEventListener<K extends keyof HTMLMyComponentElementEventMap>(type: K, listener: (this: HTMLMyComponentElement, ev: MyComponentCustomEvent<HTMLMyComponentElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
                 removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
         }
         var HTMLMyComponentElement: {
@@ -376,9 +376,9 @@ declare global {
      * docs
      */
         interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
-                addEventListener<K extends keyof HTMLMyComponentElementEventMap>(type: K, listener: (this: HTMLMyComponentElement, ev: HTMLMyComponentElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+                addEventListener<K extends keyof HTMLMyComponentElementEventMap>(type: K, listener: (this: HTMLMyComponentElement, ev: MyComponentCustomEvent<HTMLMyComponentElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
                 addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-                removeEventListener<K extends keyof HTMLMyComponentElementEventMap>(type: K, listener: (this: HTMLMyComponentElement, ev: ev: HTMLMyComponentElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+                removeEventListener<K extends keyof HTMLMyComponentElementEventMap>(type: K, listener: (this: HTMLMyComponentElement, ev: MyComponentCustomEvent<HTMLMyComponentElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
                 removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
         }
         var HTMLMyComponentElement: {
@@ -392,9 +392,9 @@ declare global {
      * docs
      */
         interface HTMLMyNewComponentElement extends Components.MyNewComponent, HTMLStencilElement {
-                addEventListener<K extends keyof HTMLMyNewComponentElementEventMap>(type: K, listener: (this: HTMLMyNewComponentElement, ev: HTMLMyNewComponentElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+                addEventListener<K extends keyof HTMLMyNewComponentElementEventMap>(type: K, listener: (this: HTMLMyNewComponentElement, ev: MyNewComponentCustomEvent<HTMLMyNewComponentElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
                 addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-                removeEventListener<K extends keyof HTMLMyNewComponentElementEventMap>(type: K, listener: (this: HTMLMyNewComponentElement, ev: ev: HTMLMyNewComponentElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+                removeEventListener<K extends keyof HTMLMyNewComponentElementEventMap>(type: K, listener: (this: HTMLMyNewComponentElement, ev: MyNewComponentCustomEvent<HTMLMyNewComponentElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
                 removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
         }
         var HTMLMyNewComponentElement: {
@@ -538,9 +538,9 @@ declare global {
      * docs
      */
         interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
-                addEventListener<K extends keyof HTMLMyComponentElementEventMap>(type: K, listener: (this: HTMLMyComponentElement, ev: HTMLMyComponentElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+                addEventListener<K extends keyof HTMLMyComponentElementEventMap>(type: K, listener: (this: HTMLMyComponentElement, ev: MyComponentCustomEvent<HTMLMyComponentElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
                 addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-                removeEventListener<K extends keyof HTMLMyComponentElementEventMap>(type: K, listener: (this: HTMLMyComponentElement, ev: ev: HTMLMyComponentElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+                removeEventListener<K extends keyof HTMLMyComponentElementEventMap>(type: K, listener: (this: HTMLMyComponentElement, ev: MyComponentCustomEvent<HTMLMyComponentElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
                 removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
         }
         var HTMLMyComponentElement: {
@@ -554,9 +554,9 @@ declare global {
      * docs
      */
         interface HTMLMyNewComponentElement extends Components.MyNewComponent, HTMLStencilElement {
-                addEventListener<K extends keyof HTMLMyNewComponentElementEventMap>(type: K, listener: (this: HTMLMyNewComponentElement, ev: HTMLMyNewComponentElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+                addEventListener<K extends keyof HTMLMyNewComponentElementEventMap>(type: K, listener: (this: HTMLMyNewComponentElement, ev: MyNewComponentCustomEvent<HTMLMyNewComponentElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
                 addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-                removeEventListener<K extends keyof HTMLMyNewComponentElementEventMap>(type: K, listener: (this: HTMLMyNewComponentElement, ev: ev: HTMLMyNewComponentElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+                removeEventListener<K extends keyof HTMLMyNewComponentElementEventMap>(type: K, listener: (this: HTMLMyNewComponentElement, ev: MyNewComponentCustomEvent<HTMLMyNewComponentElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
                 removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
         }
         var HTMLMyNewComponentElement: {
@@ -700,9 +700,9 @@ declare global {
      * docs
      */
         interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
-                addEventListener<K extends keyof HTMLMyComponentElementEventMap>(type: K, listener: (this: HTMLMyComponentElement, ev: HTMLMyComponentElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+                addEventListener<K extends keyof HTMLMyComponentElementEventMap>(type: K, listener: (this: HTMLMyComponentElement, ev: MyComponentCustomEvent<HTMLMyComponentElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
                 addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-                removeEventListener<K extends keyof HTMLMyComponentElementEventMap>(type: K, listener: (this: HTMLMyComponentElement, ev: ev: HTMLMyComponentElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+                removeEventListener<K extends keyof HTMLMyComponentElementEventMap>(type: K, listener: (this: HTMLMyComponentElement, ev: MyComponentCustomEvent<HTMLMyComponentElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
                 removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
         }
         var HTMLMyComponentElement: {
@@ -716,9 +716,9 @@ declare global {
      * docs
      */
         interface HTMLMyNewComponentElement extends Components.MyNewComponent, HTMLStencilElement {
-                addEventListener<K extends keyof HTMLMyNewComponentElementEventMap>(type: K, listener: (this: HTMLMyNewComponentElement, ev: HTMLMyNewComponentElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+                addEventListener<K extends keyof HTMLMyNewComponentElementEventMap>(type: K, listener: (this: HTMLMyNewComponentElement, ev: MyNewComponentCustomEvent<HTMLMyNewComponentElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
                 addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-                removeEventListener<K extends keyof HTMLMyNewComponentElementEventMap>(type: K, listener: (this: HTMLMyNewComponentElement, ev: ev: HTMLMyNewComponentElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+                removeEventListener<K extends keyof HTMLMyNewComponentElementEventMap>(type: K, listener: (this: HTMLMyNewComponentElement, ev: MyNewComponentCustomEvent<HTMLMyNewComponentElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
                 removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
         }
         var HTMLMyNewComponentElement: {
@@ -1454,9 +1454,9 @@ declare global {
      * docs
      */
         interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
-                addEventListener<K extends keyof HTMLMyComponentElementEventMap>(type: K, listener: (this: HTMLMyComponentElement, ev: HTMLMyComponentElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+                addEventListener<K extends keyof HTMLMyComponentElementEventMap>(type: K, listener: (this: HTMLMyComponentElement, ev: MyComponentCustomEvent<HTMLMyComponentElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
                 addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-                removeEventListener<K extends keyof HTMLMyComponentElementEventMap>(type: K, listener: (this: HTMLMyComponentElement, ev: ev: HTMLMyComponentElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+                removeEventListener<K extends keyof HTMLMyComponentElementEventMap>(type: K, listener: (this: HTMLMyComponentElement, ev: MyComponentCustomEvent<HTMLMyComponentElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
                 removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
         }
         var HTMLMyComponentElement: {
