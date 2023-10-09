@@ -96,10 +96,17 @@ declare global {
         prototype: HTMLCarDetailElement;
         new (): HTMLCarDetailElement;
     };
+    interface HTMLCarListElementEventMap {
+        carSelected: CarData;
+    }
     /**
      * Component that helps display a list of cars
      */
     interface HTMLCarListElement extends Components.CarList, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLCarListElementEventMap>(type: K, listener: (this: HTMLCarListElement, ev: CarListCustomEvent<HTMLCarListElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLCarListElementEventMap>(type: K, listener: (this: HTMLCarListElement, ev: CarListCustomEvent<HTMLCarListElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
     var HTMLCarListElement: {
         prototype: HTMLCarListElement;
@@ -135,7 +142,16 @@ declare global {
         prototype: HTMLEnvDataElement;
         new (): HTMLEnvDataElement;
     };
+    interface HTMLEventCmpElementEventMap {
+        myDocumentEvent: any;
+        my-event-with-options: { mph: number };
+        myWindowEvent: number;
+    }
     interface HTMLEventCmpElement extends Components.EventCmp, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLEventCmpElementEventMap>(type: K, listener: (this: HTMLEventCmpElement, ev: EventCmpCustomEvent<HTMLEventCmpElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLEventCmpElementEventMap>(type: K, listener: (this: HTMLEventCmpElement, ev: EventCmpCustomEvent<HTMLEventCmpElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
     var HTMLEventCmpElement: {
         prototype: HTMLEventCmpElement;
