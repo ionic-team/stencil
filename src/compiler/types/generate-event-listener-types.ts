@@ -18,6 +18,7 @@ export const generateEventListenerTypes = (
   const tagName = cmp.tagName.toLowerCase();
   const tagNameAsPascal = dashToPascalCase(tagName);
   const htmlElementName = `HTML${tagNameAsPascal}Element`;
+  const cmpEventInterface = `${tagNameAsPascal}CustomEvent`;
   const htmlElementEventMapName = `${htmlElementName}EventMap`;
   const cmpEvents = cmp.events.filter((cmpEvent) => cmpEvent.complexType.original);
   if (!cmpEvents.length) {
@@ -26,9 +27,9 @@ export const generateEventListenerTypes = (
   return {
     htmlElementEventMap: getHtmlElementEventMap(cmpEvents, typeImportData, cmp.sourceFilePath, htmlElementEventMapName),
     htmlElementEventListenerProperties: [
-      `                addEventListener<K extends keyof ${htmlElementEventMapName}>(type: K, listener: (this: ${htmlElementName}, ev: ${htmlElementEventMapName}[K]) => any, options?: boolean | AddEventListenerOptions): void;`,
+      `                addEventListener<K extends keyof ${htmlElementEventMapName}>(type: K, listener: (this: ${htmlElementName}, ev: ${cmpEventInterface}<${htmlElementEventMapName}[K]>) => any, options?: boolean | AddEventListenerOptions): void;`,
       `                addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;`,
-      `                removeEventListener<K extends keyof ${htmlElementEventMapName}>(type: K, listener: (this: ${htmlElementName}, ev: ev: ${htmlElementEventMapName}[K]) => any, options?: boolean | EventListenerOptions): void;`,
+      `                removeEventListener<K extends keyof ${htmlElementEventMapName}>(type: K, listener: (this: ${htmlElementName}, ev: ${cmpEventInterface}<${htmlElementEventMapName}[K]>) => any, options?: boolean | EventListenerOptions): void;`,
       `                removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;`,
     ],
   };
