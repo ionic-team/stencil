@@ -165,7 +165,8 @@ export const normalizeFsPath = (p: string) => normalizePath(p.split('?')[0].repl
 export const normalizeFsPathQuery = (importPath: string) => {
   const pathParts = importPath.split('?');
   const filePath = normalizePath(pathParts[0]);
-  const ext = filePath.split('.').pop().toLowerCase();
+  const filePathParts = filePath.split('.');
+  const ext = filePathParts.length > 1 ? filePathParts.pop()!.toLowerCase() : null;
   const params = pathParts.length > 1 ? new URLSearchParams(pathParts[1]) : null;
   const format = params ? params.get('format') : null;
 

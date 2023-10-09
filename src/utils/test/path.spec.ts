@@ -131,7 +131,7 @@ describe('normalizeFsPathQuery', () => {
     const p = normalizeFsPathQuery(`/Johnny/B/Goode`);
     expect(p.filePath).toBe(`/Johnny/B/Goode`);
     expect(p.format).toBe(null);
-    expect(p.ext).toBe(`/johnny/b/goode`);
+    expect(p.ext).toBe(null);
   });
 
   describe('wrapped nodejs path functions', () => {
