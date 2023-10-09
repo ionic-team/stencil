@@ -97,7 +97,7 @@ declare global {
         new (): HTMLCarDetailElement;
     };
     interface HTMLCarListElementEventMap {
-        carSelected: CarData;
+        "carSelected": CarData;
     }
     /**
      * Component that helps display a list of cars
@@ -143,9 +143,9 @@ declare global {
         new (): HTMLEnvDataElement;
     };
     interface HTMLEventCmpElementEventMap {
-        myDocumentEvent: any;
-        my-event-with-options: { mph: number };
-        myWindowEvent: number;
+        "myDocumentEvent": any;
+        "my-event-with-options": { mph: number };
+        "myWindowEvent": number;
     }
     interface HTMLEventCmpElement extends Components.EventCmp, HTMLStencilElement {
         addEventListener<K extends keyof HTMLEventCmpElementEventMap>(type: K, listener: (this: HTMLEventCmpElement, ev: EventCmpCustomEvent<HTMLEventCmpElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;

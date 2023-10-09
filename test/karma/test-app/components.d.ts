@@ -624,7 +624,7 @@ declare global {
         new (): HTMLEs5AddclassSvgElement;
     };
     interface HTMLEsmImportElementEventMap {
-        someEvent: any;
+        "someEvent": any;
     }
     interface HTMLEsmImportElement extends Components.EsmImport, HTMLStencilElement {
         addEventListener<K extends keyof HTMLEsmImportElementEventMap>(type: K, listener: (this: HTMLEsmImportElement, ev: EsmImportCustomEvent<HTMLEsmImportElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
@@ -637,7 +637,7 @@ declare global {
         new (): HTMLEsmImportElement;
     };
     interface HTMLEventBasicElementEventMap {
-        testEvent: any;
+        "testEvent": any;
     }
     interface HTMLEventBasicElement extends Components.EventBasic, HTMLStencilElement {
         addEventListener<K extends keyof HTMLEventBasicElementEventMap>(type: K, listener: (this: HTMLEventBasicElement, ev: EventBasicCustomEvent<HTMLEventBasicElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
@@ -650,7 +650,7 @@ declare global {
         new (): HTMLEventBasicElement;
     };
     interface HTMLEventCustomTypeElementEventMap {
-        testEvent: TestEventDetail;
+        "testEvent": TestEventDetail;
     }
     interface HTMLEventCustomTypeElement extends Components.EventCustomType, HTMLStencilElement {
         addEventListener<K extends keyof HTMLEventCustomTypeElementEventMap>(type: K, listener: (this: HTMLEventCustomTypeElement, ev: EventCustomTypeCustomEvent<HTMLEventCustomTypeElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
@@ -735,8 +735,8 @@ declare global {
         new (): HTMLLifecycleAsyncAElement;
     };
     interface HTMLLifecycleAsyncBElementEventMap {
-        lifecycleLoad: any;
-        lifecycleUpdate: any;
+        "lifecycleLoad": any;
+        "lifecycleUpdate": any;
     }
     interface HTMLLifecycleAsyncBElement extends Components.LifecycleAsyncB, HTMLStencilElement {
         addEventListener<K extends keyof HTMLLifecycleAsyncBElementEventMap>(type: K, listener: (this: HTMLLifecycleAsyncBElement, ev: LifecycleAsyncBCustomEvent<HTMLLifecycleAsyncBElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
@@ -749,8 +749,8 @@ declare global {
         new (): HTMLLifecycleAsyncBElement;
     };
     interface HTMLLifecycleAsyncCElementEventMap {
-        lifecycleLoad: any;
-        lifecycleUpdate: any;
+        "lifecycleLoad": any;
+        "lifecycleUpdate": any;
     }
     interface HTMLLifecycleAsyncCElement extends Components.LifecycleAsyncC, HTMLStencilElement {
         addEventListener<K extends keyof HTMLLifecycleAsyncCElementEventMap>(type: K, listener: (this: HTMLLifecycleAsyncCElement, ev: LifecycleAsyncCCustomEvent<HTMLLifecycleAsyncCElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
@@ -769,8 +769,8 @@ declare global {
         new (): HTMLLifecycleBasicAElement;
     };
     interface HTMLLifecycleBasicBElementEventMap {
-        lifecycleLoad: any;
-        lifecycleUpdate: any;
+        "lifecycleLoad": any;
+        "lifecycleUpdate": any;
     }
     interface HTMLLifecycleBasicBElement extends Components.LifecycleBasicB, HTMLStencilElement {
         addEventListener<K extends keyof HTMLLifecycleBasicBElementEventMap>(type: K, listener: (this: HTMLLifecycleBasicBElement, ev: LifecycleBasicBCustomEvent<HTMLLifecycleBasicBElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
@@ -783,8 +783,8 @@ declare global {
         new (): HTMLLifecycleBasicBElement;
     };
     interface HTMLLifecycleBasicCElementEventMap {
-        lifecycleLoad: any;
-        lifecycleUpdate: any;
+        "lifecycleLoad": any;
+        "lifecycleUpdate": any;
     }
     interface HTMLLifecycleBasicCElement extends Components.LifecycleBasicC, HTMLStencilElement {
         addEventListener<K extends keyof HTMLLifecycleBasicCElementEventMap>(type: K, listener: (this: HTMLLifecycleBasicCElement, ev: LifecycleBasicCCustomEvent<HTMLLifecycleBasicCElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;

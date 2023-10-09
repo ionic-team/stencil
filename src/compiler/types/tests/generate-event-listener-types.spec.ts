@@ -63,7 +63,35 @@ describe('generate-event-listener-types', () => {
 
       const expectedHtmlElementEventMap = [
         '        interface HTMLStubCmpElementEventMap {',
-        '                myEvent: UserImplementedEventType;',
+        '                "myEvent": UserImplementedEventType;',
+        '        }',
+      ];
+
+      const { htmlElementEventMap } = generateEventListenerTypes(componentMeta, stubImportTypes);
+
+      expect(htmlElementEventMap).toEqual(expectedHtmlElementEventMap);
+    });
+
+    it('returns the correct event map type where keys are wrapped with quotes', () => {
+      const expectedEventMapKey = "my-key-with-dashes";
+      const componentEvent = stubComponentCompilerEvent({
+        internal: true,
+        name: expectedEventMapKey,
+        method: expectedEventMapKey,
+        complexType: {
+          original: 'UserImplementedEventType',
+          resolved: '',
+          references: {},
+        },
+      })
+      const stubImportTypes = stubTypesImportData();
+      const componentMeta = stubComponentCompilerMeta({
+        events: [componentEvent],
+      });
+
+      const expectedHtmlElementEventMap = [
+        '        interface HTMLStubCmpElementEventMap {',
+        `                "${expectedEventMapKey}": UserImplementedEventType;`,
         '        }',
       ];
 
@@ -101,7 +129,7 @@ describe('generate-event-listener-types', () => {
 
       const expectedHtmlElementEventMap = [
         '        interface HTMLStubCmpElementEventMap {',
-        `                myEvent: ${updatedTypeName};`,
+        `                "myEvent": ${updatedTypeName};`,
         '        }',
       ];
 
@@ -119,7 +147,7 @@ describe('generate-event-listener-types', () => {
       const expectedEventListenerTypes = {
         htmlElementEventMap: [
           '        interface HTMLStubCmpElementEventMap {',
-          '                myEvent: UserImplementedEventType;',
+          '                "myEvent": UserImplementedEventType;',
           '        }',
         ],
         htmlElementEventListenerProperties: [
@@ -160,8 +188,8 @@ describe('generate-event-listener-types', () => {
       const expectedEventListenerTypes = {
         htmlElementEventMap: [
           '        interface HTMLStubCmpElementEventMap {',
-          '                myEvent: UserImplementedEventType;',
-          '                anotherEvent: AnotherUserImplementedEventType;',
+          '                "myEvent": UserImplementedEventType;',
+          '                "anotherEvent": AnotherUserImplementedEventType;',
           '        }',
         ],
         htmlElementEventListenerProperties: [
@@ -194,7 +222,7 @@ describe('generate-event-listener-types', () => {
       const expectedEventListenerTypes = {
         htmlElementEventMap: [
           '        interface HTMLStubCmpElementEventMap {',
-          '                myEvent: UserImplementedEventType;',
+          '                "myEvent": UserImplementedEventType;',
           '        }',
         ],
         htmlElementEventListenerProperties: [

@@ -139,7 +139,7 @@ export interface MyComponentCustomEvent<T> extends CustomEvent<T> {
 }
 declare global {
         interface HTMLMyComponentElementEventMap {
-                myEvent: UserImplementedEventType;
+                "myEvent": UserImplementedEventType;
         }
     /**
      * docs
@@ -239,8 +239,8 @@ export interface MyComponentCustomEvent<T> extends CustomEvent<T> {
 }
 declare global {
         interface HTMLMyComponentElementEventMap {
-                myEvent: UserImplementedEventType;
-                mySecondEvent: SecondUserImplementedEventType;
+                "myEvent": UserImplementedEventType;
+                "mySecondEvent": SecondUserImplementedEventType;
         }
     /**
      * docs
@@ -370,7 +370,7 @@ export interface MyNewComponentCustomEvent<T> extends CustomEvent<T> {
 }
 declare global {
         interface HTMLMyComponentElementEventMap {
-                myEvent: UserImplementedEventType;
+                "myEvent": UserImplementedEventType;
         }
     /**
      * docs
@@ -386,7 +386,7 @@ declare global {
                 new (): HTMLMyComponentElement;
         };
         interface HTMLMyNewComponentElementEventMap {
-                myEvent: UserImplementedEventType;
+                "myEvent": UserImplementedEventType;
         }
     /**
      * docs
@@ -532,7 +532,7 @@ export interface MyNewComponentCustomEvent<T> extends CustomEvent<T> {
 }
 declare global {
         interface HTMLMyComponentElementEventMap {
-                myEvent: UserImplementedEventType;
+                "myEvent": UserImplementedEventType;
         }
     /**
      * docs
@@ -548,7 +548,7 @@ declare global {
                 new (): HTMLMyComponentElement;
         };
         interface HTMLMyNewComponentElementEventMap {
-                myEvent: UserImplementedEventType1;
+                "myEvent": UserImplementedEventType1;
         }
     /**
      * docs
@@ -694,7 +694,7 @@ export interface MyNewComponentCustomEvent<T> extends CustomEvent<T> {
 }
 declare global {
         interface HTMLMyComponentElementEventMap {
-                myEvent: UserImplementedEventType;
+                "myEvent": UserImplementedEventType;
         }
     /**
      * docs
@@ -710,7 +710,7 @@ declare global {
                 new (): HTMLMyComponentElement;
         };
         interface HTMLMyNewComponentElementEventMap {
-                myEvent: UserImplementedEventType1;
+                "myEvent": UserImplementedEventType1;
         }
     /**
      * docs
@@ -1448,7 +1448,7 @@ export interface MyComponentCustomEvent<T> extends CustomEvent<T> {
 }
 declare global {
         interface HTMLMyComponentElementEventMap {
-                myEvent: UserImplementedEventType;
+                "myEvent": UserImplementedEventType;
         }
     /**
      * docs
