@@ -2,7 +2,7 @@ import { BUILD } from '@app-data';
 
 import type * as d from '../declarations';
 
-export const win = typeof window !== 'undefined' ? window : ({} as Window);
+export const win = typeof window !== 'undefined' ? window : ((globalThis || {}) as Window);
 
 export const doc = win.document || ({ head: {} } as Document);
 
