@@ -40,6 +40,7 @@ const hmrStyleElement = (elm: Element, versionId: string, stylesUpdated: HmrStyl
     // if we made it this far then it's a match!
     // update the new style text
     elm.innerHTML = stylesUpdated.styleText.replace(/\\n/g, '\n');
+    // TODO(STENCIL-958): determine if we need to set this attribute
     elm.setAttribute('data-hmr', versionId);
   }
 };
