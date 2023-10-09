@@ -53,7 +53,7 @@ const getHtmlElementEventMap = (
 ): string[] => {
   const eventMapProperties = cmpEvents.map((cmpEvent) => {
     const type = getEventGenericType(cmpEvent, typeImportData, sourceFilePath);
-    return `                ${cmpEvent.name}: ${type};`;
+    return `                "${cmpEvent.name}": ${type};`;
   });
   return [`        interface ${htmlElementEventMapName} {`, ...eventMapProperties, `        }`];
 };
