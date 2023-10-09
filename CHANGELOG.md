@@ -1,3 +1,12 @@
+## ❤️ [4.4.1](https://github.com/ionic-team/stencil/compare/v4.4.0...v4.4.1) (2023-10-09)
+
+
+### Bug Fixes
+
+* **screenshot:** alert user when toMatchScreenshot uses NaN ([#4891](https://github.com/ionic-team/stencil/issues/4891)) ([a251946](https://github.com/ionic-team/stencil/commit/a251946106f116701787853893b3fa53dfaa8c9f))
+
+
+
 # 🍫 [4.4.0](https://github.com/ionic-team/stencil/compare/v4.3.0...v4.4.0) (2023-10-02)
 
 
