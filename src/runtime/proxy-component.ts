@@ -171,22 +171,26 @@ export const proxyComponent = (
       // on a component as well as any Stencil-specific "members" (`@Prop()`s and `@State()`s).
       // As such, there is no way to guarantee type-safety here that a user hasn't entered
       // an invalid attribute.
-      Cstr.observedAttributes = Array.from(
-        new Set([
-          ...Object.keys(cmpMeta.$watchers$ ?? {}),
-          ...members
-            .filter(([_, m]) => m[0] & MEMBER_FLAGS.HasAttribute)
-            .map(([propName, m]) => {
-              const attrName = m[1] || propName;
-              attrNameToPropName.set(attrName, propName);
-              if (BUILD.reflect && m[0] & MEMBER_FLAGS.ReflectAttr) {
-                cmpMeta.$attrsToReflect$.push([propName, attrName]);
-              }
+      Object.defineProperty(Cstr, 'observedAttributes', {
+        get: function () {
+          return Array.from(
+            new Set([
+              ...Object.keys(cmpMeta.$watchers$ ?? {}),
+              ...members
+                .filter(([_, m]) => m[0] & MEMBER_FLAGS.HasAttribute)
+                .map(([propName, m]) => {
+                  const attrName = m[1] || propName;
+                  attrNameToPropName.set(attrName, propName);
+                  if (BUILD.reflect && m[0] & MEMBER_FLAGS.ReflectAttr) {
+                    cmpMeta.$attrsToReflect$.push([propName, attrName]);
+                  }
 
-              return attrName;
-            }),
-        ]),
-      );
+                  return attrName;
+                }),
+            ]),
+          );
+        },
+      });
     }
   }
 
