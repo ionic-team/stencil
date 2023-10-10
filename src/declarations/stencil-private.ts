@@ -1334,6 +1334,8 @@ export interface RenderNode extends HostElement {
    */
   ['s-hn']?: string;
 
+  ['s-sh']?: string;
+
   /**
    * Original Location Reference:
    * A reference pointing to the comment

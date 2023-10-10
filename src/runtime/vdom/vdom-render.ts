@@ -181,6 +181,8 @@ const putBackInOriginalLocation = (parentElm: Node, recursive: boolean) => {
       childNode['s-ol'].remove();
       childNode['s-ol'] = undefined;
 
+      childNode['s-sh'] = undefined;
+
       checkSlotRelocate = true;
     }
 
@@ -724,7 +726,12 @@ const markSlotContentForRelocation = (elm: d.RenderNode) => {
         // check that the node is not a content reference node or a node
         // reference and then check that the host name does not match that of
         // childNode
-        if (!node['s-cn'] && !node['s-nr'] && node['s-hn'] !== childNode['s-hn']) {
+        if (
+          !node['s-cn'] &&
+          !node['s-nr'] &&
+          node['s-hn'] !== childNode['s-hn'] &&
+          (!node['s-sh'] || node['s-sh'] !== childNode['s-hn'])
+        ) {
           // if `node` is located in the slot that `childNode` refers to (via the
           // `'s-sn'` property) then we need to relocate it from it's current spot
           // (under the host element parent) to the right slot location
@@ -740,11 +747,13 @@ const markSlotContentForRelocation = (elm: d.RenderNode) => {
             node['s-sn'] = node['s-sn'] || slotName;
 
             if (relocateNodeData) {
+              relocateNodeData.$nodeToRelocate$['s-sh'] = childNode['s-hn'];
               // we marked this node for relocation previously but didn't find
               // out the slot reference node to which it needs to be relocated
               // so write it down now!
               relocateNodeData.$slotRefNode$ = childNode;
             } else {
+              node['s-sh'] = childNode['s-hn'];
               // add to our list of nodes to relocate
               relocateNodes.push({
                 $slotRefNode$: childNode,
