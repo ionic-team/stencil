@@ -730,7 +730,7 @@ const markSlotContentForRelocation = (elm: d.RenderNode) => {
           !node['s-cn'] &&
           !node['s-nr'] &&
           node['s-hn'] !== childNode['s-hn'] &&
-          (!node['s-sh'] || node['s-sh'] !== childNode['s-hn'])
+          (!BUILD.experimentalSlotFixes || !node['s-sh'] || node['s-sh'] !== childNode['s-hn'])
         ) {
           // if `node` is located in the slot that `childNode` refers to (via the
           // `'s-sn'` property) then we need to relocate it from it's current spot
