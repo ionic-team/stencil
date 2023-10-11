@@ -13,8 +13,7 @@ import type {
 import { hasError } from '@utils';
 import type * as puppeteer from 'puppeteer';
 
-import { runJest } from './jest/jest-27-and-under/jest-runner';
-import { runJestScreenshot } from './jest/jest-27-and-under/jest-screenshot';
+import { getRunner, getScreenshot } from './jest/jest-stencil-connector';
 import { startPuppeteerBrowser } from './puppeteer/puppeteer-browser';
 import { getAppScriptUrl, getAppStyleUrl } from './testing-utils';
 
@@ -144,8 +143,10 @@ export const createTesting = async (config: ValidatedConfig): Promise<Testing> =
 
     try {
       if (doScreenshots) {
+        const runJestScreenshot = getScreenshot();
         passed = await runJestScreenshot(config, env);
       } else {
+        const runJest = getRunner();
         passed = await runJest(config, env);
       }
       config.logger.info('');

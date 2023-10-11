@@ -3,6 +3,7 @@ import type * as d from '@stencil/core/internal';
 
 import type { ConfigFlags } from '../../../cli/config-flags';
 import { setScreenshotEmulateData } from '../../puppeteer/puppeteer-emulate';
+import type { JestTestRunner } from '../jest-apis';
 import { buildJestArgv, getProjectListFromCLIArgs } from './jest-config';
 
 export async function runJest(config: d.ValidatedConfig, env: d.E2EProcessEnv) {
@@ -49,7 +50,7 @@ export async function runJest(config: d.ValidatedConfig, env: d.E2EProcessEnv) {
  * Creates a Stencil test runner
  * @returns the test runner
  */
-export function createTestRunner(): any {
+export function createTestRunner(): JestTestRunner {
   // The left hand side of the '??' is needed for Jest v27, the right hand side for Jest 26 and below
   const TestRunner = require('jest-runner').default ?? require('jest-runner');
 
