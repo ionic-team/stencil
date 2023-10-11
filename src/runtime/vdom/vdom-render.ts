@@ -181,6 +181,7 @@ const putBackInOriginalLocation = (parentElm: Node, recursive: boolean) => {
       childNode['s-ol'].remove();
       childNode['s-ol'] = undefined;
 
+      // Reset so we can correctly move the node around again.
       childNode['s-sh'] = undefined;
 
       checkSlotRelocate = true;
@@ -725,7 +726,11 @@ const markSlotContentForRelocation = (elm: d.RenderNode) => {
 
         // check that the node is not a content reference node or a node
         // reference and then check that the host name does not match that of
-        // childNode
+        // childNode.
+        // In addition, check that the slot either has not already been relocated, or
+        // that its current location's host is not childNode's host. This is essentially
+        // a check so that we don't try to relocate (and then hide) a node that is already
+        // where it should be.
         if (
           !node['s-cn'] &&
           !node['s-nr'] &&

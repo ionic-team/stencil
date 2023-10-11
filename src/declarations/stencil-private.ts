@@ -1334,6 +1334,17 @@ export interface RenderNode extends HostElement {
    */
   ['s-hn']?: string;
 
+  /**
+   * Slot host tag name:
+   * This is the tag name of the element where this node
+   * has been moved to during slot relocation.
+   *
+   * This allows us to check if the node has been moved and prevent
+   * us from thinking a node _should_ be moved when it may already be in
+   * its final destination.
+   *
+   * This value is reset whenever the node is put back into its original location.
+   */
   ['s-sh']?: string;
 
   /**
