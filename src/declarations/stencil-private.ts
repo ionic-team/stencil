@@ -185,7 +185,7 @@ export interface BuildConditionals extends Partial<BuildFeatures> {
   attachStyles?: boolean;
 
   // TODO(STENCIL-914): remove this option when `experimentalSlotFixes` is the default behavior
-  patchPseudoShadowDom?: boolean;
+  experimentalSlotFixes?: boolean;
 }
 
 export type ModuleFormat =
