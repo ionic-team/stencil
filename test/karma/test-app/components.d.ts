@@ -148,6 +148,12 @@ export namespace Components {
     interface InputBasicRoot {
         "value"?: string;
     }
+    interface IonChild {
+    }
+    interface IonHost {
+    }
+    interface IonParent {
+    }
     interface JsonBasic {
     }
     interface KeyReorder {
@@ -688,6 +694,24 @@ declare global {
     var HTMLInputBasicRootElement: {
         prototype: HTMLInputBasicRootElement;
         new (): HTMLInputBasicRootElement;
+    };
+    interface HTMLIonChildElement extends Components.IonChild, HTMLStencilElement {
+    }
+    var HTMLIonChildElement: {
+        prototype: HTMLIonChildElement;
+        new (): HTMLIonChildElement;
+    };
+    interface HTMLIonHostElement extends Components.IonHost, HTMLStencilElement {
+    }
+    var HTMLIonHostElement: {
+        prototype: HTMLIonHostElement;
+        new (): HTMLIonHostElement;
+    };
+    interface HTMLIonParentElement extends Components.IonParent, HTMLStencilElement {
+    }
+    var HTMLIonParentElement: {
+        prototype: HTMLIonParentElement;
+        new (): HTMLIonParentElement;
     };
     interface HTMLJsonBasicElement extends Components.JsonBasic, HTMLStencilElement {
     }
@@ -1274,6 +1298,9 @@ declare global {
         "image-import": HTMLImageImportElement;
         "init-css-root": HTMLInitCssRootElement;
         "input-basic-root": HTMLInputBasicRootElement;
+        "ion-child": HTMLIonChildElement;
+        "ion-host": HTMLIonHostElement;
+        "ion-parent": HTMLIonParentElement;
         "json-basic": HTMLJsonBasicElement;
         "key-reorder": HTMLKeyReorderElement;
         "key-reorder-root": HTMLKeyReorderRootElement;
@@ -1501,6 +1528,12 @@ declare namespace LocalJSX {
     }
     interface InputBasicRoot {
         "value"?: string;
+    }
+    interface IonChild {
+    }
+    interface IonHost {
+    }
+    interface IonParent {
     }
     interface JsonBasic {
     }
@@ -1772,6 +1805,9 @@ declare namespace LocalJSX {
         "image-import": ImageImport;
         "init-css-root": InitCssRoot;
         "input-basic-root": InputBasicRoot;
+        "ion-child": IonChild;
+        "ion-host": IonHost;
+        "ion-parent": IonParent;
         "json-basic": JsonBasic;
         "key-reorder": KeyReorder;
         "key-reorder-root": KeyReorderRoot;
@@ -1917,6 +1953,9 @@ declare module "@stencil/core" {
             "image-import": LocalJSX.ImageImport & JSXBase.HTMLAttributes<HTMLImageImportElement>;
             "init-css-root": LocalJSX.InitCssRoot & JSXBase.HTMLAttributes<HTMLInitCssRootElement>;
             "input-basic-root": LocalJSX.InputBasicRoot & JSXBase.HTMLAttributes<HTMLInputBasicRootElement>;
+            "ion-child": LocalJSX.IonChild & JSXBase.HTMLAttributes<HTMLIonChildElement>;
+            "ion-host": LocalJSX.IonHost & JSXBase.HTMLAttributes<HTMLIonHostElement>;
+            "ion-parent": LocalJSX.IonParent & JSXBase.HTMLAttributes<HTMLIonParentElement>;
             "json-basic": LocalJSX.JsonBasic & JSXBase.HTMLAttributes<HTMLJsonBasicElement>;
             "key-reorder": LocalJSX.KeyReorder & JSXBase.HTMLAttributes<HTMLKeyReorderElement>;
             "key-reorder-root": LocalJSX.KeyReorderRoot & JSXBase.HTMLAttributes<HTMLKeyReorderRootElement>;
