@@ -12,6 +12,7 @@
  * file be added to sparingly.
  */
 
+import type { Config } from '@jest/types';
 import { getVersion } from 'jest';
 
 // TODO(STENCIL-959): Improve this typing by narrowing it
@@ -37,6 +38,8 @@ export type JestPreprocessor = {
 
 // TODO(STENCIL-960): Improve this typing by narrowing it
 export type JestTestRunner = any;
+
+export type JestConfig = Config.InitialOptions;
 
 /**
  * Get the current major version of Jest that Stencil reconciles

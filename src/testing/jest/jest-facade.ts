@@ -1,4 +1,4 @@
-import { JestPreprocessor, JestPuppeteerEnvironment, JestTestRunner } from './jest-apis';
+import { JestConfig, JestPreprocessor, JestPuppeteerEnvironment, JestTestRunner } from './jest-apis';
 
 /**
  * Interface for Jest-version specific code implementations that interact with Stencil.
@@ -71,4 +71,14 @@ export interface JestFacade {
    * @returns a function that runs a setup configuration between tests.
    */
   getJestSetupTestFramework(): () => void;
+
+  /**
+   * Retrieve the Jest preset configuration object for configuring tests.
+   *
+   * The value returned by said function is expected to be used in a
+   * [preset](https://jestjs.io/docs/configuration#preset-string) context.
+   *
+   * @returns the Jest preset object to be used for a particular version of Jest.
+   */
+  getJestPreset(): JestConfig;
 }
