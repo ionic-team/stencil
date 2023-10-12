@@ -2340,8 +2340,6 @@ export interface OutputTargetWww extends OutputTargetBase {
   appDir?: string;
 }
 
-export type ValidatedOutputTargetWww = Required<OutputTargetWww>;
-
 export type OutputTarget =
   | OutputTargetCopy
   | OutputTargetCustom

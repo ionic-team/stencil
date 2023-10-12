@@ -25,18 +25,18 @@ describe('validateServiceWorker', () => {
 
   /**
    * A little util to work around a typescript annoyance. Because
-   * `outputTarget.serviceWorker` is typed as
-   * `serviceWorker?: ServiceWorkerConfig | null | false;` we get type errors
+   * a validated service worker on a `www` output target is typed as
+   * `serviceWorker: ServiceWorkerConfig | null | false;` we get type errors
    * all over if we try to just access it directly. So instead, do a little
    * check to see if it's falsy. If not, we return it, and if it is we fail the test.
    *
-   * @param serviceWorker The value returned from `validateServiceWorker`
+   * @param validatedServiceWorker The value returned from `validateServiceWorker`
    * @returns a serviceWorker object or `void`, with a `void` return being
    * accompanied by a manually-triggered test failure.
    */
-  function getServiceWorker(serviceWorker: d.ValidatedOutputTargetWww['serviceWorker']) {
-    if (serviceWorker) {
-      return serviceWorker;
+  function ensureServiceWorkerDefined(validatedServiceWorker: d.OutputTargetWww['serviceWorker']) {
+    if (validatedServiceWorker) {
+      return validatedServiceWorker;
     } else {
       throw new Error('the serviceWorker on the provided target was unexpectedly falsy, so this test needs to fail!');
     }
@@ -44,7 +44,7 @@ describe('validateServiceWorker', () => {
 
   it('should add host.config.json to globIgnores', () => {
     const validatedServiceWorker = validateServiceWorker(config, undefined, '/User/me/app/www/');
-    expect(getServiceWorker(validatedServiceWorker).globIgnores).toContain('**/host.config.json');
+    expect(ensureServiceWorkerDefined(validatedServiceWorker).globIgnores).toContain('**/host.config.json');
   });
 
   it('should set globIgnores from string', () => {
@@ -55,7 +55,7 @@ describe('validateServiceWorker', () => {
       },
       '/User/me/app/www/',
     );
-    expect(getServiceWorker(validatedServiceWorker).globIgnores).toContain('**/some-file.js');
+    expect(ensureServiceWorkerDefined(validatedServiceWorker).globIgnores).toContain('**/some-file.js');
   });
 
   it('should set globDirectory', () => {
@@ -66,12 +66,12 @@ describe('validateServiceWorker', () => {
       },
       '/User/me/app/www/',
     );
-    expect(getServiceWorker(validatedServiceWorker).globDirectory).toBe('/custom/www');
+    expect(ensureServiceWorkerDefined(validatedServiceWorker).globDirectory).toBe('/custom/www');
   });
 
   it('should set default globDirectory', () => {
     const validatedServiceWorker = validateServiceWorker(config, undefined, '/User/me/app/www/');
-    expect(getServiceWorker(validatedServiceWorker).globDirectory).toBe('/User/me/app/www/');
+    expect(ensureServiceWorkerDefined(validatedServiceWorker).globDirectory).toBe('/User/me/app/www/');
   });
 
   it('should set globPatterns array', () => {
@@ -82,7 +82,7 @@ describe('validateServiceWorker', () => {
       },
       '/www',
     );
-    expect(getServiceWorker(validatedServiceWorker).globPatterns).toEqual(['**/*.{png,svg}']);
+    expect(ensureServiceWorkerDefined(validatedServiceWorker).globPatterns).toEqual(['**/*.{png,svg}']);
   });
 
   it('should set globPatterns string', () => {
@@ -93,12 +93,12 @@ describe('validateServiceWorker', () => {
       },
       '/www',
     );
-    expect(getServiceWorker(validatedServiceWorker).globPatterns).toEqual(['**/*.{png,svg}']);
+    expect(ensureServiceWorkerDefined(validatedServiceWorker).globPatterns).toEqual(['**/*.{png,svg}']);
   });
 
   it('should create default globPatterns', () => {
     const validatedServiceWorker = validateServiceWorker(config, undefined, '/www');
-    expect(getServiceWorker(validatedServiceWorker).globPatterns).toEqual(['*.html', '**/*.{js,css,json}']);
+    expect(ensureServiceWorkerDefined(validatedServiceWorker).globPatterns).toEqual(['*.html', '**/*.{js,css,json}']);
   });
 
   it('should create default sw config when www type and prod mode', () => {

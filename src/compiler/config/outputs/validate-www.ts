@@ -34,7 +34,7 @@ export const validateWww = (config: d.ValidatedConfig, diagnostics: d.Diagnostic
   }
 
   const outputs: (
-    | d.ValidatedOutputTargetWww
+    | Required<d.OutputTargetWww>
     | d.OutputTargetDistLazy
     | d.OutputTargetCopy
     | d.OutputTargetDistGlobalStyles
@@ -87,7 +87,7 @@ const validateWwwOutputTarget = (
   config: d.ValidatedConfig,
   outputTarget: d.OutputTargetWww,
   diagnostics: d.Diagnostic[],
-): d.ValidatedOutputTargetWww => {
+): Required<d.OutputTargetWww> => {
   const baseUrl = validateBaseUrl(outputTarget.baseUrl);
   const dir = getAbsolutePath(config, outputTarget.dir || 'www');
   const appDir = validateAppDir(baseUrl, dir);
@@ -104,7 +104,7 @@ const validateWwwOutputTarget = (
     prerenderConfig: validatePrerenderConfig(outputTarget.prerenderConfig, baseUrl, config, diagnostics),
     serviceWorker: validateServiceWorker(config, outputTarget.serviceWorker, appDir),
     type: WWW,
-  } satisfies d.ValidatedOutputTargetWww;
+  } satisfies Required<d.OutputTargetWww>;
 
   return validatedOutputTarget;
 };

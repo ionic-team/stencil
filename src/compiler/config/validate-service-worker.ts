@@ -28,7 +28,7 @@ export const validateServiceWorker = (
   config: d.ValidatedConfig,
   serviceWorker: d.OutputTargetWww['serviceWorker'],
   appDir: string,
-): d.ValidatedOutputTargetWww['serviceWorker'] => {
+): d.OutputTargetWww['serviceWorker'] => {
   if (serviceWorker === false) {
     return false;
   }
