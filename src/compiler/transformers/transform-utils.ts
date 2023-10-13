@@ -970,16 +970,47 @@ export const updateConstructor = (
   if (constructorIndex >= 0 && ts.isConstructorDeclaration(constructorMethod)) {
     const constructorBodyStatements: ts.NodeArray<ts.Statement> =
       constructorMethod.body?.statements ?? ts.factory.createNodeArray();
-    const hasSuper = constructorBodyStatements.some((s) => s.kind === ts.SyntaxKind.SuperKeyword);
+    const superIndex = constructorBodyStatements.findIndex((s) => {
+      if (s.kind === ts.SyntaxKind.SuperKeyword) {
+        return true;
+      }
 
-    if (!hasSuper && needsSuper(classNode)) {
-      // if there is no super and it needs one the statements comprising the
-      // body of the constructor should be:
-      //
-      // 1. the `super()` call
-      // 2. the new statements we've created to initialize fields
-      // 3. the statements currently comprising the body of the constructor
-      statements = [createConstructorBodyWithSuper(), ...statements, ...constructorBodyStatements];
+      if (ts.isExpressionStatement(s)) {
+        // write a loop to check if the expression statement is a call to super
+        let expression = s.expression;
+        while (expression) {
+          if (expression.kind === ts.SyntaxKind.SuperKeyword) {
+            return true;
+          }
+
+          expression =
+            ts.isExpressionStatement(expression) || ts.isCallExpression(expression) ? expression.expression : null;
+        }
+      }
+
+      return false;
+    });
+
+    if (needsSuper(classNode)) {
+      // Don't have one, so let's create one
+      if (superIndex < 0) {
+        // if there is no super and it needs one the statements comprising the
+        // body of the constructor should be:
+        //
+        // 1. the `super()` call
+        // 2. the new statements we've created to initialize fields
+        // 3. the statements currently comprising the body of the constructor
+        statements = [createConstructorBodyWithSuper(), ...statements, ...constructorBodyStatements];
+      }
+      // Already have a super call, make sure it's first
+      else {
+        statements = [
+          constructorBodyStatements[superIndex],
+          ...statements,
+          ...constructorBodyStatements.slice(0, superIndex),
+          ...constructorBodyStatements.slice(superIndex + 1),
+        ];
+      }
     } else {
       // if no super is needed then the body of the constructor should be:
       //
