@@ -26,27 +26,33 @@ export const addDefineCustomElementFunctions = (
 
       if (moduleFile.cmps.length) {
         const principalComponent = moduleFile.cmps[0];
-        tagNames.push(principalComponent.tagName);
 
-        // define the current component - `customElements.define(tagName, MyProxiedComponent);`
-        const customElementsDefineCallExpression = ts.factory.createCallExpression(
-          ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('customElements'), 'define'),
-          undefined,
-          [ts.factory.createIdentifier('tagName'), ts.factory.createIdentifier(principalComponent.componentClassName)],
-        );
-        // create a `case` block that defines the current component. We'll add them to our switch statement later.
-        caseStatements.push(
-          createCustomElementsDefineCase(principalComponent.tagName, customElementsDefineCallExpression),
-        );
+        if (principalComponent.tagName != null) {
+          tagNames.push(principalComponent.tagName);
 
-        setupComponentDependencies(moduleFile, components, newStatements, caseStatements, tagNames);
-        addDefineCustomElementFunction(tagNames, newStatements, caseStatements);
-
-        if (outputTarget.customElementsExportBehavior === 'auto-define-custom-elements') {
-          const conditionalDefineCustomElementCall = createAutoDefinitionExpression(
-            principalComponent.componentClassName,
+          // define the current component - `customElements.define(tagName, MyProxiedComponent);`
+          const customElementsDefineCallExpression = ts.factory.createCallExpression(
+            ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('customElements'), 'define'),
+            undefined,
+            [
+              ts.factory.createIdentifier('tagName'),
+              ts.factory.createIdentifier(principalComponent.componentClassName),
+            ],
           );
-          newStatements.push(conditionalDefineCustomElementCall);
+          // create a `case` block that defines the current component. We'll add them to our switch statement later.
+          caseStatements.push(
+            createCustomElementsDefineCase(principalComponent.tagName, customElementsDefineCallExpression),
+          );
+
+          setupComponentDependencies(moduleFile, components, newStatements, caseStatements, tagNames);
+          addDefineCustomElementFunction(tagNames, newStatements, caseStatements);
+
+          if (outputTarget.customElementsExportBehavior === 'auto-define-custom-elements') {
+            const conditionalDefineCustomElementCall = createAutoDefinitionExpression(
+              principalComponent.componentClassName,
+            );
+            newStatements.push(conditionalDefineCustomElementCall);
+          }
         }
       }
 

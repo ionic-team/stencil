@@ -48,15 +48,17 @@ export const updateModule = (
       // Need to add context to the module for its parent class
       if (node.heritageClauses?.length > 0) {
         const baseClass = typeChecker.getSymbolAtLocation(node.heritageClauses[0].types[0].expression);
-        const parentClassRelativePath = (baseClass.declarations[0].parent.parent.parent as ts.ImportDeclaration)
-          .moduleSpecifier;
-        // const parentClassPath = path
-        const parentClassPath = resolve(
-          dirname(moduleFile.sourceFilePath),
-          // TODO: need to figure out how to append correct file extension
-          parentClassRelativePath.getText().replace("'", '').concat('.tsx'),
-        );
-        moduleFile.parentClassPath = parentClassPath;
+        // TODO: need to figure out a better way of knowing if this is a custom parent class
+        if (baseClass.name !== 'HTMLElement') {
+          const parentClassRelativePath = (baseClass.declarations[0].parent.parent.parent as ts.ImportDeclaration)
+            .moduleSpecifier;
+          const parentClassPath = resolve(
+            dirname(moduleFile.sourceFilePath),
+            // TODO: need to figure out how to append correct file extension
+            parentClassRelativePath.getText().replace("'", '').concat('.tsx'),
+          );
+          moduleFile.parentClassPath = parentClassPath;
+        }
       }
 
       parseStaticComponentMeta(compilerCtx, typeChecker, node, moduleFile);
