@@ -55,7 +55,7 @@ export const updateModule = (
           const parentClassPath = resolve(
             dirname(moduleFile.sourceFilePath),
             // TODO: need to figure out how to append correct file extension
-            parentClassRelativePath.getText().replace("'", '').concat('.tsx'),
+            parentClassRelativePath.getText().replace(/'/g, '').concat('.tsx'),
           );
           moduleFile.parentClassPath = parentClassPath;
         }

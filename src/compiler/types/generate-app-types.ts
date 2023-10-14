@@ -75,22 +75,27 @@ const generateComponentTypesFile = (
   const components = buildCtx.components.filter((m) => !m.isCollectionDependency);
   const componentEventDetailTypes: d.TypesModule[] = [];
 
-  const modules: d.TypesModule[] = components.map((cmp) => {
-    /**
-     * Generate a key-value store that uses the path to the file where an import is defined as the key, and an object
-     * containing the import's original name and any 'new' name we give it to avoid collisions. We're generating this
-     * data structure for each Stencil component in series, therefore the memory footprint of this entity will likely
-     * grow as more components (with additional types) are processed.
-     */
-    typeImportData = updateReferenceTypeImports(typeImportData, allTypes, cmp, cmp.sourceFilePath, config);
-    if (cmp.events.length > 0) {
+  const modules: d.TypesModule[] = components
+    .filter((cmp) => cmp.tagName != null)
+    .map((cmp) => {
+      // TODO: we'll likely need to merge some data here to generate types for components correctly that
+      // use inheritance
+
       /**
-       * Only generate event detail types for components that have events.
+       * Generate a key-value store that uses the path to the file where an import is defined as the key, and an object
+       * containing the import's original name and any 'new' name we give it to avoid collisions. We're generating this
+       * data structure for each Stencil component in series, therefore the memory footprint of this entity will likely
+       * grow as more components (with additional types) are processed.
        */
-      componentEventDetailTypes.push(generateEventDetailTypes(cmp));
-    }
-    return generateComponentTypes(cmp, typeImportData, areTypesInternal);
-  });
+      typeImportData = updateReferenceTypeImports(typeImportData, allTypes, cmp, cmp.sourceFilePath, config);
+      if (cmp.events.length > 0) {
+        /**
+         * Only generate event detail types for components that have events.
+         */
+        componentEventDetailTypes.push(generateEventDetailTypes(cmp));
+      }
+      return generateComponentTypes(cmp, typeImportData, areTypesInternal);
+    });
 
   c.push(COMPONENTS_DTS_HEADER);
   c.push(`import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";`);

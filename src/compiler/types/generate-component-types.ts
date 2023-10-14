@@ -18,9 +18,6 @@ export const generateComponentTypes = (
   typeImportData: d.TypesImportData,
   areTypesInternal: boolean,
 ): d.TypesModule => {
-  if (cmp.tagName == null) {
-    return null;
-  }
   const tagName = cmp.tagName.toLowerCase();
   const tagNameAsPascal = dashToPascalCase(tagName);
   const htmlElementName = `HTML${tagNameAsPascal}Element`;

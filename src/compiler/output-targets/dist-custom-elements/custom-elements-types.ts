@@ -50,7 +50,7 @@ const generateCustomElementsTypesOutput = async (
   // the directory where types for the individual components are written
   const componentsTypeDirectoryRelPath = relative(outputTarget.dir!, typesDir);
 
-  const components = buildCtx.components.filter((m) => !m.isCollectionDependency);
+  const components = buildCtx.components.filter((m) => !m.isCollectionDependency && m.tagName);
 
   const code = [
     // To mirror the index.js file and only export the typedefs for the
