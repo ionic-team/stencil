@@ -43,7 +43,10 @@ export const updateNativeConstructor = (
  * @returns the generated expression statements
  */
 const nativeInit = (cmp: d.ComponentCompilerMeta): ReadonlyArray<ts.ExpressionStatement> => {
-  const initStatements = [nativeRegisterHostStatement()];
+  const initStatements = [];
+  if (cmp.parentClassPath == null) {
+    initStatements.push(nativeRegisterHostStatement());
+  }
   if (cmp.encapsulation === 'shadow') {
     initStatements.push(nativeAttachShadowStatement());
   }
