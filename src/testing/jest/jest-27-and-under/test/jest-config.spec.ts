@@ -273,4 +273,10 @@ describe('jest-config', () => {
       expect(jestArgv[fullArgument]).toBe(true);
     });
   });
+
+  it('sets the default runner', () => {
+    const jestArgv = buildJestArgv(mockValidatedConfig());
+    const config = JSON.parse(jestArgv.config!);
+    expect(config.testRunner).toBe('jest-jasmine2');
+  });
 });
