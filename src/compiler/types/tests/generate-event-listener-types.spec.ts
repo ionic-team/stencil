@@ -73,6 +73,7 @@ describe('generate-event-listener-types', () => {
     });
 
     it('returns the correct event map type where keys are wrapped with quotes', () => {
+      const stubImportTypes = stubTypesImportData();
       const expectedEventMapKey = "my-key-with-dashes";
       const componentEvent = stubComponentCompilerEvent({
         internal: true,
@@ -83,8 +84,7 @@ describe('generate-event-listener-types', () => {
           resolved: '',
           references: {},
         },
-      })
-      const stubImportTypes = stubTypesImportData();
+      });
       const componentMeta = stubComponentCompilerMeta({
         events: [componentEvent],
       });
@@ -119,10 +119,10 @@ describe('generate-event-listener-types', () => {
     });
 
     it('uses an updated type name to avoid naming collisions', () => {
+      const stubImportTypes = stubTypesImportData();
       const updatedTypeName = 'SomeTypeReturned';
       updateTypeIdentifierNamesSpy.mockReturnValue(updatedTypeName);
 
-      const stubImportTypes = stubTypesImportData();
       const componentMeta = stubComponentCompilerMeta({
         events: [stubComponentCompilerEvent()],
       });
@@ -138,11 +138,11 @@ describe('generate-event-listener-types', () => {
       expect(htmlElementEventMap).toEqual(expectedHtmlElementEventMap);
     });
 
-    it('returns the correct event listerner types for a single event', () => {
+    it('returns the correct event listener types for a single event', () => {
+      const stubImportTypes = stubTypesImportData();
       const componentMeta = stubComponentCompilerMeta({
         events: [stubComponentCompilerEvent()],
       });
-      const stubImportTypes = stubTypesImportData();
 
       const expectedEventListenerTypes = {
         htmlElementEventMap: [
@@ -164,9 +164,9 @@ describe('generate-event-listener-types', () => {
     });
 
     it('returns the correct type info for multiple events', () => {
+      const stubImportTypes = stubTypesImportData();
       toTitleCaseSpy.mockReturnValueOnce('MyEvent');
       toTitleCaseSpy.mockReturnValueOnce('AnotherEvent');
-
       const componentEvent1 = stubComponentCompilerEvent(stubComponentCompilerEvent());
       componentEvent1.complexType.original
       const componentEvent2 = stubComponentCompilerEvent({
@@ -179,11 +179,9 @@ describe('generate-event-listener-types', () => {
           references: {},
         },
       });
-
       const componentMeta = stubComponentCompilerMeta({
         events: [componentEvent1, componentEvent2],
       });
-      const stubImportTypes = stubTypesImportData();
 
       const expectedEventListenerTypes = {
         htmlElementEventMap: [
