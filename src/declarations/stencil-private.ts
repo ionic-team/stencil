@@ -644,6 +644,7 @@ export interface ComponentCompilerMeta extends ComponentCompilerFeatures {
   jsFilePath: string;
   listeners: ComponentCompilerListener[];
   methods: ComponentCompilerMethod[];
+  parentClassPath?: string;
   properties: ComponentCompilerProperty[];
   shadowDelegatesFocus: boolean;
   sourceFilePath: string;

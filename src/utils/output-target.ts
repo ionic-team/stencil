@@ -107,8 +107,16 @@ export const isEligiblePrimaryPackageOutputTarget = (o: d.OutputTarget): o is d.
  * @param moduleFiles the collection of `Module`s to retrieve the metadata from
  * @returns the metadata, lexicographically sorted by the tag names of the components
  */
-export const getComponentsFromModules = (moduleFiles: d.Module[]): d.ComponentCompilerMeta[] =>
-  sortBy(flatOne(moduleFiles.map((m) => m.cmps)), (c: d.ComponentCompilerMeta) => c.tagName);
+export const getComponentsFromModules = (moduleFiles: d.Module[]): d.ComponentCompilerMeta[] => {
+  // Can't break reference here or stuff downstream explodes
+  const cmps = moduleFiles.map((m) =>
+    m.cmps.map((cmp) => {
+      cmp.parentClassPath = m.parentClassPath;
+      return cmp;
+    }),
+  );
+  return sortBy(flatOne(cmps), (c: d.ComponentCompilerMeta) => c.tagName);
+};
 
 // Given a ReadonlyArray of strings we can derive a union type from them
 // by getting `typeof ARRAY[number]`, i.e. the type of all values returns
