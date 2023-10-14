@@ -14,6 +14,11 @@ describe('form associated', function () {
     expect(elm).not.toBeNull();
   });
 
+  it('should trigger form associated custom element lifecycle callbacks', async () => {
+    const formEl = app.querySelector('form');
+    expect(formEl.ariaLabel).toBe('formAssociated called');
+  });
+
   it('should link up to the surrounding form', async () => {
     const formEl = app.querySelector('form');
     // this shows that the element has, through the `ElementInternals`
