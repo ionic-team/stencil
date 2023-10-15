@@ -46,6 +46,7 @@ export const updateModule = (
   const visitNode = (node: ts.Node) => {
     if (ts.isClassDeclaration(node)) {
       // Need to add context to the module for its parent class
+      // TODO: Might not even need to know the actual class/file, maybe can get away with just having a boolean flag
       if (node.heritageClauses?.length > 0) {
         const baseClass = typeChecker.getSymbolAtLocation(node.heritageClauses[0].types[0].expression);
         // TODO: need to figure out a better way of knowing if this is a custom parent class

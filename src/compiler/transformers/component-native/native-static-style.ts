@@ -88,7 +88,14 @@ const addSingleStyleGetter = (
     // import myTagStyle from './import-path.css';
     // static get style() { return myTagStyle; }
     const styleIdentifier = ts.factory.createIdentifier(style.styleIdentifier);
-    classMembers.push(createStaticGetter('style', styleIdentifier));
+
+    classMembers.push(createStaticGetter('style', checkForAppendParentStyles(styleIdentifier, cmp)));
+  } else if (Array.isArray(style.externalStyles) && style.externalStyles.length > 0) {
+    // import generated from @Component() styleUrls option
+    // import myTagStyle from './import-path.css';
+    // static get style() { return myTagStyle; }
+    const styleUrlIdentifier = createStyleIdentifierFromUrl(cmp, style);
+    classMembers.push(createStaticGetter('style', styleUrlIdentifier));
   }
 };
 
@@ -99,5 +106,28 @@ const createStyleLiteral = (cmp: d.ComponentCompilerMeta, style: d.StyleCompiler
     return ts.factory.createStringLiteral(scopeCss(style.styleStr, scopeId, false));
   }
 
-  return ts.factory.createStringLiteral(style.styleStr);
+  const baseStyles = ts.factory.createStringLiteral(style.styleStr);
+  return checkForAppendParentStyles(baseStyles, cmp);
+};
+
+const createStyleIdentifierFromUrl = (cmp: d.ComponentCompilerMeta, style: d.StyleCompiler) => {
+  style.styleIdentifier = dashToPascalCase(cmp.tagName);
+  style.styleIdentifier = style.styleIdentifier.charAt(0).toLowerCase() + style.styleIdentifier.substring(1);
+
+  if (style.modeName !== DEFAULT_STYLE_MODE) {
+    style.styleIdentifier += dashToPascalCase(style.modeName);
+  }
+
+  style.styleIdentifier += 'Style';
+  style.externalStyles = [style.externalStyles[0]];
+
+  const identifier = ts.factory.createIdentifier(style.styleIdentifier);
+
+  return checkForAppendParentStyles(identifier, cmp);
+};
+
+const checkForAppendParentStyles = (baseStyles: ts.Identifier | ts.StringLiteral, cmp: d.ComponentCompilerMeta) => {
+  return cmp.parentClassPath
+    ? ts.factory.createAdd(baseStyles, ts.factory.createIdentifier("super.style ?? ''"))
+    : baseStyles;
 };
