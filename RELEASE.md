@@ -88,10 +88,10 @@ manual release was performed.
       The fix for this issue has been released as a part of today's [Stencil
       vNUMBER release](https://github.com/ionic-team/stencil/releases/tag/TAG). 
       ```
-1. Let folks in Ionic know about the release
+1. Let folks in Ionic know about the release:
    1. Add a message to the `#whathappened` Slack channel with a link to the changelog.
       1. Let the CS team know by 'at-ing' them  about any enterprise reported issues or feature requests that were included in the release in a thread on your #whathappened post. Jira
          tickets related to enterprise requests should be marked with the "jira_escalated" label and/or the "Enterprise Support"
          or "Enterprise Feature Requests" epic.
-   1. If there's a blog post to go out (either today or this week), let the folks in the `#stencil-devrel` channel know about the release and that the blog can go out.
-      1. When the blog goes out, put an announcement in the `#announcements` channel in Discord 
+   1. If there's a blog post to go out (either today or this week), let the folks in the `#devrel-stencil` channel know about the release and that the blog can go out.
+      1. When the blog goes out, put an announcement in the `#announcements` channel in Discord.
