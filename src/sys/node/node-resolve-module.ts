@@ -1,4 +1,4 @@
-import { normalizePath } from '@utils';
+import { normalizePath, join } from '@utils';
 import fs from 'graceful-fs';
 import path from 'path';
 
@@ -26,7 +26,7 @@ export class NodeResolveModule {
     const Module = require('module');
 
     fromDir = path.resolve(fromDir);
-    const fromFile = path.join(fromDir, 'noop.js');
+    const fromFile = join(fromDir, 'noop.js');
 
     let dir = normalizePath(
       Module._resolveFilename(moduleId, {
@@ -41,7 +41,7 @@ export class NodeResolveModule {
 
     while (dir !== root) {
       dir = normalizePath(path.dirname(dir));
-      packageJsonFilePath = path.join(dir, 'package.json');
+      packageJsonFilePath = join(dir, 'package.json');
 
       if (!fs.existsSync(packageJsonFilePath)) {
         continue;
@@ -60,12 +60,12 @@ export class NodeResolveModule {
 
     const root = normalizePath(path.parse(fromDir).root);
 
-    let dir = normalizePath(path.join(fromDir, 'noop.js'));
+    let dir = normalizePath(join(fromDir, 'noop.js'));
     let typesPackageJsonFilePath: string;
 
     while (dir !== root) {
       dir = normalizePath(path.dirname(dir));
-      typesPackageJsonFilePath = path.join(dir, 'node_modules', moduleSplt[0], moduleSplt[1], 'package.json');
+      typesPackageJsonFilePath = join(dir, 'node_modules', moduleSplt[0], moduleSplt[1], 'package.json');
 
       if (!fs.existsSync(typesPackageJsonFilePath)) {
         continue;
@@ -82,12 +82,12 @@ export class NodeResolveModule {
   resolveModuleManually(fromDir: string, moduleId: string, cacheKey: string) {
     const root = normalizePath(path.parse(fromDir).root);
 
-    let dir = normalizePath(path.join(fromDir, 'noop.js'));
+    let dir = normalizePath(join(fromDir, 'noop.js'));
     let packageJsonFilePath: string;
 
     while (dir !== root) {
       dir = normalizePath(path.dirname(dir));
-      packageJsonFilePath = path.join(dir, 'node_modules', moduleId, 'package.json');
+      packageJsonFilePath = join(dir, 'node_modules', moduleId, 'package.json');
 
       if (!fs.existsSync(packageJsonFilePath)) {
         continue;

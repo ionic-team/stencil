@@ -1,4 +1,5 @@
-import { dirname, extname, join } from 'path';
+import { dirname, extname } from 'path';
+import { join } from '@utils';
 
 import type * as d from '../../../declarations';
 

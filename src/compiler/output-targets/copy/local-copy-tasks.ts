@@ -1,4 +1,5 @@
-import { isAbsolute, join } from 'path';
+import { isAbsolute } from 'path';
+import { join } from '@utils';
 
 import type * as d from '../../../declarations';
 

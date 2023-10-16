@@ -7,8 +7,8 @@ import {
   isOutputTargetDistCustomElements,
   isString,
   rollupToStencilSourceMap,
+  join,
 } from '@utils';
-import { join } from 'path';
 import ts from 'typescript';
 
 import type * as d from '../../../declarations';

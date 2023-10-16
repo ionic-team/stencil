@@ -1,4 +1,4 @@
-import { buildError, catchError, flatOne, isGlob, normalizePath } from '@utils';
+import { buildError, catchError, flatOne, isGlob, normalizePath, join } from '@utils';
 import glob from 'glob';
 import path from 'path';
 
@@ -50,7 +50,7 @@ async function processGlobs(copyTask: Required<d.CopyTask>, srcDir: string): Pro
     : [
         {
           src: getSrcAbsPath(srcDir, copyTask.src),
-          dest: copyTask.keepDirStructure ? path.join(copyTask.dest, copyTask.src) : copyTask.dest,
+          dest: copyTask.keepDirStructure ? join(copyTask.dest, copyTask.src) : copyTask.dest,
           warn: copyTask.warn,
           keepDirStructure: copyTask.keepDirStructure,
         },
@@ -61,7 +61,7 @@ function getSrcAbsPath(srcDir: string, src: string) {
   if (path.isAbsolute(src)) {
     return src;
   }
-  return path.join(srcDir, src);
+  return join(srcDir, src);
 }
 
 async function processGlobTask(copyTask: Required<d.CopyTask>, srcDir: string): Promise<Required<d.CopyTask>[]> {
@@ -73,9 +73,9 @@ async function processGlobTask(copyTask: Required<d.CopyTask>, srcDir: string): 
 }
 
 function createGlobCopyTask(copyTask: Required<d.CopyTask>, srcDir: string, globRelPath: string): Required<d.CopyTask> {
-  const dest = path.join(copyTask.dest, copyTask.keepDirStructure ? globRelPath : path.basename(globRelPath));
+  const dest = join(copyTask.dest, copyTask.keepDirStructure ? globRelPath : path.basename(globRelPath));
   return {
-    src: path.join(srcDir, globRelPath),
+    src: join(srcDir, globRelPath),
     dest,
     warn: copyTask.warn,
     keepDirStructure: copyTask.keepDirStructure,
@@ -121,8 +121,8 @@ async function processCopyTaskDirectory(results: d.CopyResults, allCopyTasks: d.
     await Promise.all(
       dirItems.map(async (dirItem) => {
         const subCopyTask: d.CopyTask = {
-          src: path.join(copyTask.src, dirItem),
-          dest: path.join(copyTask.dest, dirItem),
+          src: join(copyTask.src, dirItem),
+          dest: join(copyTask.dest, dirItem),
           warn: copyTask.warn,
         };
 
