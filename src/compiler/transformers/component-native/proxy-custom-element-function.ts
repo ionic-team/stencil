@@ -1,6 +1,7 @@
 import ts from 'typescript';
 
 import type * as d from '../../../declarations';
+import { getModule } from '../../transpile/transpiled-module';
 import { createClassMetadataProxy } from '../add-component-meta-proxy';
 import { addImports } from '../add-imports';
 import { RUNTIME_APIS } from '../core-runtime-apis';
@@ -38,7 +39,8 @@ export const proxyCustomElement = (
         return tsSourceFile;
       }
 
-      const principalComponent = moduleFile.cmps[0];
+      let principalComponent = moduleFile.cmps[0];
+      principalComponent = combineInheritedCompilerMeta(compilerCtx, principalComponent);
 
       for (const [stmtIndex, stmt] of tsSourceFile.statements.entries()) {
         if (ts.isVariableStatement(stmt)) {
@@ -110,4 +112,22 @@ export const proxyCustomElement = (
       return tsSourceFile;
     };
   };
+};
+
+// TODO: make recursive
+const combineInheritedCompilerMeta = (compilerCtx: d.CompilerCtx, compilerMeta: d.ComponentCompilerMeta) => {
+  if (compilerMeta.parentClassPath) {
+    const parentModule = getModule(compilerCtx, compilerMeta.parentClassPath);
+
+    if (parentModule?.cmps.length) {
+      const parentCmp = parentModule.cmps[0];
+      compilerMeta.watchers = [...(compilerMeta.watchers ?? []), ...(parentCmp.watchers ?? [])];
+      compilerMeta.listeners = [...(compilerMeta.listeners ?? []), ...(parentCmp.listeners ?? [])];
+      compilerMeta.properties = [...(compilerMeta.properties ?? []), ...(parentCmp.properties ?? [])];
+      compilerMeta.states = [...(compilerMeta.states ?? []), ...(parentCmp.states ?? [])];
+      compilerMeta.methods = [...(compilerMeta.methods ?? []), ...(parentCmp.methods ?? [])];
+    }
+  }
+
+  return compilerMeta;
 };
