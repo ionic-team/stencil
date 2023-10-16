@@ -6,8 +6,8 @@ import {
   hasError,
   isOutputTargetDistCustomElements,
   isString,
-  rollupToStencilSourceMap,
   join,
+  rollupToStencilSourceMap,
 } from '@utils';
 import ts from 'typescript';
 

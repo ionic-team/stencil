@@ -1,5 +1,6 @@
 import { mockValidatedConfig } from '@stencil/core/testing';
-import { join, resolve } from 'path';
+import { join } from '@utils';
+import { resolve } from 'path';
 
 import type * as d from '../../../declarations';
 import { validateWww } from '../../config/outputs/validate-www';

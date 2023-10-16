@@ -1,4 +1,4 @@
-import { buildError, catchError, flatOne, isGlob, normalizePath, join } from '@utils';
+import { buildError, catchError, flatOne, isGlob, join, normalizePath } from '@utils';
 import glob from 'glob';
 import path from 'path';
 
