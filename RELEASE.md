@@ -75,6 +75,7 @@ manual release was performed.
    case.
 1. If there are any 'next' branches in GitHub, say for a future major version of Stencil (e.g. `v5.0.0-dev`), now is a
    good time to rebase them against the `main` branch.
+1. End the code freeze in the Stencil team Slack channel.
 1. Perform the following tasks in JIRA:
    1. Ask someone with appropriate permissions to mark this version of Stencil as 'released' in JIRA on the 'Releases' page.
    1. Ask someone with appropriate permissions to stub out the next release and task for the release in JIRA.
@@ -92,4 +93,3 @@ manual release was performed.
    1. Let the CS team know by 'at-ing' them  about any enterprise reported issues or feature requests that were included in the release in a thread on your #whathappened post. Jira
       tickets related to enterprise requests should be marked with the "jira_escalated" label and/or the "Enterprise Support"
       or "Enterprise Feature Requests" epic.
-1. End the code freeze in the Stencil team Slack channel.
