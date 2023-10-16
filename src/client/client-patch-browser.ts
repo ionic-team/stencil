@@ -14,19 +14,6 @@ export const patchBrowser = (): Promise<d.CustomElementsDefineOptions> => {
     patchCloneNodeFix((H as any).prototype);
   }
 
-  if (BUILD.profile && !performance.mark) {
-    // not all browsers support performance.mark/measure (Safari 10)
-    // because the mark/measure APIs are designed to write entries to a buffer in the browser that does not exist,
-    // simply stub the implementations out.
-    // TODO(STENCIL-323): Remove this patch when support for older browsers is removed (breaking)
-    // @ts-ignore
-    performance.mark = performance.measure = () => {
-      /*noop*/
-    };
-    performance.getEntriesByName = () => [];
-  }
-
-  // @ts-ignore
   const scriptElm = BUILD.scriptDataOpts
     ? Array.from(doc.querySelectorAll('script')).find(
         (s) =>
