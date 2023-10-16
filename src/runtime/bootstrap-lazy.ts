@@ -157,6 +157,13 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
         }
       }
 
+      // if the component is formAssociated we need to set that on the host
+      // element so that it will be ready for `attachInternals` to be called on
+      // it later on
+      if (BUILD.formAssociated && cmpMeta.$flags$ & CMP_FLAGS.formAssociated) {
+        (HostElement as any).formAssociated = true;
+      }
+
       if (BUILD.hotModuleReplacement) {
         // if we're in an HMR dev build then we need to set up the callback
         // which will carry out the work of actually replacing the module for

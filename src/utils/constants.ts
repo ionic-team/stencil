@@ -105,6 +105,11 @@ export const enum CMP_FLAGS {
    * met ({@link needsShadowDomShim})
    */
   needsScopedEncapsulation = scopedCssEncapsulation | needsShadowDomShim,
+  /**
+   * Determines if a component is form-associated or not. This is set based on
+   * options passed to the `@Component` decorator.
+   */
+  formAssociated = 1 << 6,
 }
 
 /**
