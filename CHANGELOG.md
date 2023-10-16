@@ -1,3 +1,12 @@
+# 📢 [4.5.0](https://github.com/ionic-team/stencil/compare/v4.4.1...v4.5.0) (2023-10-16)
+
+
+### Features
+
+* **compiler, runtime:** add support for form-associated elements ([#4784](https://github.com/ionic-team/stencil/issues/4784)) ([5976c9b](https://github.com/ionic-team/stencil/commit/5976c9b6a6e7b49d470390021b9c31e4d3cbbf4b))
+
+
+
 ## ❤️ [4.4.1](https://github.com/ionic-team/stencil/compare/v4.4.0...v4.4.1) (2023-10-09)
 
 
