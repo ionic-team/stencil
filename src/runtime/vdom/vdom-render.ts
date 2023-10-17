@@ -1008,33 +1008,25 @@ render() {
                 nodeToRelocate['s-hn'] = nodeToRelocate['s-ol'].parentNode.nodeName;
               }
 
-              if (BUILD.experimentalSlotFixes) {
-                // Need to handle special case where we are forwarding a text node
-                // through a default slot to a named slot. Since text nodes don't
-                // have attributes, we need to wrap the text in an element (`span` works
-                // nicely) so that we can keep track of the slot name it should go to.
-                //
-                // So, to make our lives simpler, we'll just always wrap text nodes
-                // in spans so we don't have to perform a bunch of checks for where slotted
-                // content may be forwarded to later.
-                if (nodeToRelocate.nodeName === '#text') {
-                  // Grab the text content
-                  const content = nodeToRelocate.textContent;
-
-                  // Destroy the old node
-                  nodeToRelocate.remove();
-
-                  // Create a new span so we can keep track of slot name
-                  nodeToRelocate = doc.createElement('span');
-                  nodeToRelocate.textContent = content;
-                }
-
-                if (slotRefNode['s-fs'] !== nodeToRelocate.getAttribute('slot')) {
-                  if (!slotRefNode['s-fs']) {
-                    nodeToRelocate.removeAttribute('slot');
-                  } else {
-                    nodeToRelocate.setAttribute('slot', slotRefNode['s-fs']);
-                  }
+              // Handle a niche use-case where we relocate a slot from a non-shadow
+              // to shadow component (and potentially into further nested components) where
+              // the slot name changes along the way (for instance, a default to a named slot).
+              // In this case, we need to update the relocated node's slot attribute to match
+              // the slot name it is being relocated into.
+              //
+              // There is a very niche use case where we may be relocating a text node. For now,
+              // we ignore anything that is not an element node since non-element nodes cannot have
+              // attributes to specify the slot. We'll deal with this if it becomes a problem... but super edge-case-y
+              if (
+                BUILD.experimentalSlotFixes &&
+                nodeToRelocate.nodeType === NODE_TYPE.ElementNode &&
+                slotRefNode.parentElement.shadowRoot &&
+                slotRefNode['s-fs'] !== nodeToRelocate.getAttribute('slot')
+              ) {
+                if (!slotRefNode['s-fs']) {
+                  nodeToRelocate.removeAttribute('slot');
+                } else {
+                  nodeToRelocate.setAttribute('slot', slotRefNode['s-fs']);
                 }
               }
 
