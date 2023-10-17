@@ -142,6 +142,8 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
       // remember the content reference comment
       elm['s-sr'] = true;
 
+      elm['s-fs'] = newVNode.$attrs$?.slot;
+
       // remember the content reference comment
       elm['s-cr'] = contentRef;
 
@@ -972,12 +974,13 @@ render() {
       for (i = 0; i < relocateNodes.length; i++) {
         relocateData = relocateNodes[i];
         nodeToRelocate = relocateData.$nodeToRelocate$;
+        const slotRefNode = relocateData.$slotRefNode$;
 
-        if (relocateData.$slotRefNode$) {
+        if (slotRefNode) {
           // by default we're just going to insert it directly
           // after the slot reference node
-          parentNodeRef = relocateData.$slotRefNode$.parentNode;
-          insertBeforeNode = relocateData.$slotRefNode$.nextSibling;
+          parentNodeRef = slotRefNode.parentNode;
+          insertBeforeNode = slotRefNode.nextSibling;
           orgLocationNode = nodeToRelocate['s-ol'] as any;
 
           while ((orgLocationNode = orgLocationNode.previousSibling as any)) {
@@ -1004,6 +1007,37 @@ render() {
                 // probably a component in the index.html that doesn't have its hostname set
                 nodeToRelocate['s-hn'] = nodeToRelocate['s-ol'].parentNode.nodeName;
               }
+
+              if (BUILD.experimentalSlotFixes) {
+                // Need to handle special case where we are forwarding a text node
+                // through a default slot to a named slot. Since text nodes don't
+                // have attributes, we need to wrap the text in an element (`span` works
+                // nicely) so that we can keep track of the slot name it should go to.
+                //
+                // So, to make our lives simpler, we'll just always wrap text nodes
+                // in spans so we don't have to perform a bunch of checks for where slotted
+                // content may be forwarded to later.
+                if (nodeToRelocate.nodeName === '#text') {
+                  // Grab the text content
+                  const content = nodeToRelocate.textContent;
+
+                  // Destroy the old node
+                  nodeToRelocate.remove();
+
+                  // Create a new span so we can keep track of slot name
+                  nodeToRelocate = doc.createElement('span');
+                  nodeToRelocate.textContent = content;
+                }
+
+                if (slotRefNode['s-fs'] !== nodeToRelocate.getAttribute('slot')) {
+                  if (!slotRefNode['s-fs']) {
+                    nodeToRelocate.removeAttribute('slot');
+                  } else {
+                    nodeToRelocate.setAttribute('slot', slotRefNode['s-fs']);
+                  }
+                }
+              }
+
               // add it back to the dom but in its new home
               parentNodeRef.insertBefore(nodeToRelocate, insertBeforeNode);
             }
