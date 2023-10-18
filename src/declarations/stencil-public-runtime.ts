@@ -1259,11 +1259,13 @@ export namespace JSXBase {
   }
 
   export interface SourceHTMLAttributes<T> extends HTMLAttributes<T> {
+    height?: number;
     media?: string;
     sizes?: string;
     src?: string;
     srcSet?: string;
     type?: string;
+    width?: number;
   }
 
   export interface StyleHTMLAttributes<T> extends HTMLAttributes<T> {
