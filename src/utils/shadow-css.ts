@@ -280,7 +280,7 @@ const convertColonSlotted = (cssText: string, slotScopeId: string) => {
       }
 
       const orgSelector = prefixSelector + slottedSelector;
-      const addedSelector = `${prefixSelector.trimRight()}${slottedSelector.trim()}`;
+      const addedSelector = `${prefixSelector.trimEnd()}${slottedSelector.trim()}`;
       if (orgSelector.trim() !== addedSelector.trim()) {
         const updatedSelector = `${addedSelector}, ${orgSelector}`;
         selectors.push({
@@ -471,13 +471,30 @@ const scopeCssText = (
     cssText = scopeSelectors(cssText, scopeId, hostScopeId, slotScopeId, commentOriginalSelector);
   }
 
-  cssText = cssText.replace(/-shadowcsshost-no-combinator/g, `.${hostScopeId}`);
+  cssText = replaceShadowCssHost(cssText, hostScopeId);
   cssText = cssText.replace(/>\s*\*\s+([^{, ]+)/gm, ' $1 ');
 
   return {
     cssText: cssText.trim(),
-    slottedSelectors: slotted.selectors,
+    // We need to replace the shadow CSS host string in each of these selectors since we created
+    // them prior to the replacement happening in the components CSS text.
+    slottedSelectors: slotted.selectors.map((ref) => ({
+      orgSelector: replaceShadowCssHost(ref.orgSelector, hostScopeId),
+      updatedSelector: replaceShadowCssHost(ref.updatedSelector, hostScopeId),
+    })),
   };
+};
+
+/**
+ * Helper function that replaces the interim string representing a `:host` selector with
+ * the host scope selector class for the element.
+ *
+ * @param cssText The CSS string to make the replacement in
+ * @param hostScopeId The scope ID that will be used as the class representing the host element
+ * @returns CSS with the selector replaced
+ */
+const replaceShadowCssHost = (cssText: string, hostScopeId: string) => {
+  return cssText.replace(/-shadowcsshost-no-combinator/g, `.${hostScopeId}`);
 };
 
 export const scopeCss = (cssText: string, scopeId: string, commentOriginalSelector: boolean) => {
