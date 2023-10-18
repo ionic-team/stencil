@@ -142,6 +142,7 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
       // remember the content reference comment
       elm['s-sr'] = true;
 
+      // Persist the name of the slot that this slot was going to be projected into.
       elm['s-fs'] = newVNode.$attrs$?.slot;
 
       // remember the content reference comment
