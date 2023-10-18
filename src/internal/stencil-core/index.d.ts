@@ -23,6 +23,7 @@ export type {
   VNodeData,
 } from '../stencil-public-runtime';
 export {
+  AttachInternals,
   Build,
   Component,
   Element,

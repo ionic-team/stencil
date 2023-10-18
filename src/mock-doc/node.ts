@@ -223,11 +223,24 @@ export class MockNodeList {
   }
 }
 
+type MockElementInternals = Record<keyof ElementInternals, null>;
+
 export class MockElement extends MockNode {
   namespaceURI: string | null;
   __attributeMap: MockAttributeMap | null | undefined;
   __shadowRoot: ShadowRoot | null | undefined;
   __style: MockCSSStyleDeclaration | null | undefined;
+
+  attachInternals(): MockElementInternals {
+    return new Proxy({} as unknown as MockElementInternals, {
+      get: function (_target, prop, _receiver) {
+        console.error(
+          `NOTE: Property ${String(prop)} was accessed on ElementInternals, but this property is not implemented.
+Testing components with ElementInternals is fully supported in e2e tests.`,
+        );
+      },
+    });
+  }
 
   constructor(ownerDocument: any, nodeName: string | null) {
     super(ownerDocument, NODE_TYPES.ELEMENT_NODE, typeof nodeName === 'string' ? nodeName : null, null);
