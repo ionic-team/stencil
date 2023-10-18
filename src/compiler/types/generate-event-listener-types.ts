@@ -28,22 +28,24 @@ export const generateEventListenerTypes = (
     htmlElementEventMap: getHtmlElementEventMap(cmpEvents, typeImportData, cmp.sourceFilePath, htmlElementEventMapName),
     htmlElementEventListenerProperties: [
       `                addEventListener<K extends keyof ${htmlElementEventMapName}>(type: K, listener: (this: ${htmlElementName}, ev: ${cmpEventInterface}<${htmlElementEventMapName}[K]>) => any, options?: boolean | AddEventListenerOptions): void;`,
+      `                addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;`,
       `                addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;`,
       `                removeEventListener<K extends keyof ${htmlElementEventMapName}>(type: K, listener: (this: ${htmlElementName}, ev: ${cmpEventInterface}<${htmlElementEventMapName}[K]>) => any, options?: boolean | EventListenerOptions): void;`,
+      `                removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;`,
       `                removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;`,
     ],
   };
 };
 
 /**
- * Generates map of event names and user user implemented event type(s). Used to avoid having to write individual
+ * Generates map of event names and user implemented event type(s). Used to avoid having to write individual
  * event listener method overloads per event type.
  *
- * @param cmpEvents a collection of the compiler metadata for a each individual `@Event()`
+ * @param cmpEvents a collection of the compiler metadata for each individual `@Event()`
  * @param typeImportData locally/imported/globally used type names, which may be used to prevent naming collisions
  * @param sourceFilePath the path to the source file being visited
  * @param htmlElementEventMapName the name of the component event map type
- * @returns map of event names and user user implemented event type(s)
+ * @returns map of event names and user implemented event type(s)
  */
 const getHtmlElementEventMap = (
   cmpEvents: d.ComponentCompilerEvent[],

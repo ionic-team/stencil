@@ -1,6 +1,4 @@
 import type * as d from '../../../declarations';
-import * as UtilHelpers from '../../../utils/helpers';
-import * as Util from '../../../utils/util';
 import { generateEventListenerTypes } from '../generate-event-listener-types';
 import * as StencilTypes from '../stencil-types';
 import { stubComponentCompilerEvent } from './ComponentCompilerEvent.stub';
@@ -13,11 +11,6 @@ describe('generate-event-listener-types', () => {
       ReturnType<typeof StencilTypes.updateTypeIdentifierNames>,
       Parameters<typeof StencilTypes.updateTypeIdentifierNames>
     >;
-    let getTextDocsSpy: jest.SpyInstance<ReturnType<typeof Util.getTextDocs>, Parameters<typeof Util.getTextDocs>>;
-    let toTitleCaseSpy: jest.SpyInstance<
-      ReturnType<typeof UtilHelpers.toTitleCase>,
-      Parameters<typeof UtilHelpers.toTitleCase>
-    >;
 
     beforeEach(() => {
       updateTypeIdentifierNamesSpy = jest.spyOn(StencilTypes, 'updateTypeIdentifierNames');
@@ -29,18 +22,10 @@ describe('generate-event-listener-types', () => {
           initialType: string,
         ) => initialType,
       );
-
-      getTextDocsSpy = jest.spyOn(Util, 'getTextDocs');
-      getTextDocsSpy.mockReturnValue('');
-
-      toTitleCaseSpy = jest.spyOn(UtilHelpers, 'toTitleCase');
-      toTitleCaseSpy.mockImplementation((_name: string) => 'MyEvent');
     });
 
     afterEach(() => {
       updateTypeIdentifierNamesSpy.mockRestore();
-      getTextDocsSpy.mockRestore();
-      toTitleCaseSpy.mockRestore();
     });
 
     it('returns empty arrays when no events are provided', () => {
@@ -74,7 +59,7 @@ describe('generate-event-listener-types', () => {
 
     it('returns the correct event map type where keys are wrapped with quotes', () => {
       const stubImportTypes = stubTypesImportData();
-      const expectedEventMapKey = "my-key-with-dashes";
+      const expectedEventMapKey = 'my-key-with-dashes';
       const componentEvent = stubComponentCompilerEvent({
         internal: true,
         name: expectedEventMapKey,
@@ -108,8 +93,10 @@ describe('generate-event-listener-types', () => {
 
       const expectedHtmlElementEventListenerProperties = [
         '                addEventListener<K extends keyof HTMLStubCmpElementEventMap>(type: K, listener: (this: HTMLStubCmpElement, ev: StubCmpCustomEvent<HTMLStubCmpElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;',
+        '                addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;',
         '                addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;',
         '                removeEventListener<K extends keyof HTMLStubCmpElementEventMap>(type: K, listener: (this: HTMLStubCmpElement, ev: StubCmpCustomEvent<HTMLStubCmpElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;',
+        '                removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;',
         '                removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;',
       ];
 
@@ -152,8 +139,10 @@ describe('generate-event-listener-types', () => {
         ],
         htmlElementEventListenerProperties: [
           '                addEventListener<K extends keyof HTMLStubCmpElementEventMap>(type: K, listener: (this: HTMLStubCmpElement, ev: StubCmpCustomEvent<HTMLStubCmpElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;',
+          '                addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;',
           '                addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;',
           '                removeEventListener<K extends keyof HTMLStubCmpElementEventMap>(type: K, listener: (this: HTMLStubCmpElement, ev: StubCmpCustomEvent<HTMLStubCmpElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;',
+          '                removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;',
           '                removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;',
         ],
       };
@@ -165,10 +154,7 @@ describe('generate-event-listener-types', () => {
 
     it('returns the correct type info for multiple events', () => {
       const stubImportTypes = stubTypesImportData();
-      toTitleCaseSpy.mockReturnValueOnce('MyEvent');
-      toTitleCaseSpy.mockReturnValueOnce('AnotherEvent');
       const componentEvent1 = stubComponentCompilerEvent(stubComponentCompilerEvent());
-      componentEvent1.complexType.original
       const componentEvent2 = stubComponentCompilerEvent({
         internal: true,
         name: 'anotherEvent',
@@ -192,8 +178,10 @@ describe('generate-event-listener-types', () => {
         ],
         htmlElementEventListenerProperties: [
           '                addEventListener<K extends keyof HTMLStubCmpElementEventMap>(type: K, listener: (this: HTMLStubCmpElement, ev: StubCmpCustomEvent<HTMLStubCmpElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;',
+          '                addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;',
           '                addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;',
           '                removeEventListener<K extends keyof HTMLStubCmpElementEventMap>(type: K, listener: (this: HTMLStubCmpElement, ev: StubCmpCustomEvent<HTMLStubCmpElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;',
+          '                removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;',
           '                removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;',
         ],
       };
@@ -225,8 +213,10 @@ describe('generate-event-listener-types', () => {
         ],
         htmlElementEventListenerProperties: [
           '                addEventListener<K extends keyof HTMLStubCmpElementEventMap>(type: K, listener: (this: HTMLStubCmpElement, ev: StubCmpCustomEvent<HTMLStubCmpElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;',
+          '                addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;',
           '                addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;',
           '                removeEventListener<K extends keyof HTMLStubCmpElementEventMap>(type: K, listener: (this: HTMLStubCmpElement, ev: StubCmpCustomEvent<HTMLStubCmpElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;',
+          '                removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;',
           '                removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;',
         ],
       };
