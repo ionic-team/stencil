@@ -4,6 +4,11 @@ on:
   workflow_call:
     # Make this a reusable workflow, no value needed
     # https://docs.github.com/en/actions/using-workflows/reusing-workflows
+    inputs:
+      build_name:
+        description: Name for the build, used to resolve the correct build artifact
+        required: true
+        type: string
 
 jobs:
   analysis_test:
@@ -30,7 +35,7 @@ jobs:
       - name: Download Build Archive
         uses: ./.github/workflows/actions/download-archive
         with:
-          name: stencil-core
+          name: ${{ inputs.build_name }}
           path: .
           filename: stencil-core-build.zip
 
