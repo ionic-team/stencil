@@ -1020,7 +1020,7 @@ render() {
               if (
                 BUILD.experimentalSlotFixes &&
                 nodeToRelocate.nodeType === NODE_TYPE.ElementNode &&
-                slotRefNode.parentElement.shadowRoot &&
+                slotRefNode.parentElement?.shadowRoot != null &&
                 slotRefNode['s-fs'] !== nodeToRelocate.getAttribute('slot')
               ) {
                 if (!slotRefNode['s-fs']) {
