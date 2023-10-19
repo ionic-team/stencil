@@ -10,6 +10,8 @@
  * https://github.com/angular/angular/blob/master/packages/compiler/src/shadow_css.ts
  */
 
+import { escapeRegExpSpecialCharacters } from './regular-expression';
+
 const safeSelector = (selector: string) => {
   const placeholders: string[] = [];
   let index = 0;
@@ -279,9 +281,9 @@ const convertColonSlotted = (cssText: string, slotScopeId: string) => {
         prefixSelector = char + prefixSelector;
       }
 
-      const orgSelector = prefixSelector + slottedSelector;
-      const addedSelector = `${prefixSelector.trimEnd()}${slottedSelector.trim()}`;
-      if (orgSelector.trim() !== addedSelector.trim()) {
+      const orgSelector = (prefixSelector + slottedSelector).trim();
+      const addedSelector = `${prefixSelector.trimEnd()}${slottedSelector.trim()}`.trim();
+      if (orgSelector !== addedSelector) {
         const updatedSelector = `${addedSelector}, ${orgSelector}`;
         selectors.push({
           orgSelector,
@@ -545,7 +547,8 @@ export const scopeCss = (cssText: string, scopeId: string, commentOriginalSelect
   }
 
   scoped.slottedSelectors.forEach((slottedSelector) => {
-    cssText = cssText.replace(slottedSelector.orgSelector, slottedSelector.updatedSelector);
+    const regex = new RegExp(escapeRegExpSpecialCharacters(slottedSelector.orgSelector), 'g');
+    cssText = cssText.replace(regex, slottedSelector.updatedSelector);
   });
 
   return cssText;
