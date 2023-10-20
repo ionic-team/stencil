@@ -187,7 +187,7 @@ function _getPrototypeOf(o) {
       };
   return _getPrototypeOf(o);
 }
-var bootstrapLazy = function bootstrapLazy(lazyBundles) {
+export var bootstrapLazy = function bootstrapLazy(lazyBundles) {
   var options =
     arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
   if (BUILD.profile && performance.mark) {
@@ -421,5 +421,3 @@ var bootstrapLazy = function bootstrapLazy(lazyBundles) {
   // Fallback appLoad event
   endBootstrap();
 };
-
-export bootstrapLazy;
