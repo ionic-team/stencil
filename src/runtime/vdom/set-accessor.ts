@@ -109,11 +109,20 @@ export const setAccessor = (
         // except for the first character, we keep the event name case
         memberName = ln[2] + memberName.slice(3);
       }
-      if (oldValue) {
-        plt.rel(elm, memberName, oldValue, false);
-      }
-      if (newValue) {
-        plt.ael(elm, memberName, newValue, false);
+      if (oldValue || newValue) {
+        // Need to account for "capture" events
+        let capture = false;
+        if (memberName.endsWith(CAPTURE_EVENT_SUFFIX)) {
+          capture = true;
+          memberName = memberName.replace(CAPTURE_EVENT_SUFFIX, '');
+        }
+
+        if (oldValue) {
+          plt.rel(elm, memberName, oldValue, capture);
+        }
+        if (newValue) {
+          plt.ael(elm, memberName, newValue, capture);
+        }
       }
     } else if (BUILD.vdomPropOrAttr) {
       // Set property if it exists and it's not a SVG
@@ -170,3 +179,4 @@ export const setAccessor = (
 };
 const parseClassListRegex = /\s/;
 const parseClassList = (value: string | undefined | null): string[] => (!value ? [] : value.split(parseClassListRegex));
+const CAPTURE_EVENT_SUFFIX = 'Capture';
