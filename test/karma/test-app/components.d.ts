@@ -143,6 +143,8 @@ export namespace Components {
     }
     interface FactoryJsx {
     }
+    interface FormAssociated {
+    }
     interface HostAttrOverride {
     }
     interface ImageImport {
@@ -647,19 +649,52 @@ declare global {
         prototype: HTMLEs5AddclassSvgElement;
         new (): HTMLEs5AddclassSvgElement;
     };
+    interface HTMLEsmImportElementEventMap {
+        "someEvent": any;
+    }
     interface HTMLEsmImportElement extends Components.EsmImport, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLEsmImportElementEventMap>(type: K, listener: (this: HTMLEsmImportElement, ev: EsmImportCustomEvent<HTMLEsmImportElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLEsmImportElementEventMap>(type: K, listener: (this: HTMLEsmImportElement, ev: EsmImportCustomEvent<HTMLEsmImportElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
     var HTMLEsmImportElement: {
         prototype: HTMLEsmImportElement;
         new (): HTMLEsmImportElement;
     };
+    interface HTMLEventBasicElementEventMap {
+        "testEvent": any;
+    }
     interface HTMLEventBasicElement extends Components.EventBasic, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLEventBasicElementEventMap>(type: K, listener: (this: HTMLEventBasicElement, ev: EventBasicCustomEvent<HTMLEventBasicElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLEventBasicElementEventMap>(type: K, listener: (this: HTMLEventBasicElement, ev: EventBasicCustomEvent<HTMLEventBasicElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
     var HTMLEventBasicElement: {
         prototype: HTMLEventBasicElement;
         new (): HTMLEventBasicElement;
     };
+    interface HTMLEventCustomTypeElementEventMap {
+        "testEvent": TestEventDetail;
+    }
     interface HTMLEventCustomTypeElement extends Components.EventCustomType, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLEventCustomTypeElementEventMap>(type: K, listener: (this: HTMLEventCustomTypeElement, ev: EventCustomTypeCustomEvent<HTMLEventCustomTypeElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLEventCustomTypeElementEventMap>(type: K, listener: (this: HTMLEventCustomTypeElement, ev: EventCustomTypeCustomEvent<HTMLEventCustomTypeElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
     var HTMLEventCustomTypeElement: {
         prototype: HTMLEventCustomTypeElement;
@@ -688,6 +723,12 @@ declare global {
     var HTMLFactoryJsxElement: {
         prototype: HTMLFactoryJsxElement;
         new (): HTMLFactoryJsxElement;
+    };
+    interface HTMLFormAssociatedElement extends Components.FormAssociated, HTMLStencilElement {
+    }
+    var HTMLFormAssociatedElement: {
+        prototype: HTMLFormAssociatedElement;
+        new (): HTMLFormAssociatedElement;
     };
     interface HTMLHostAttrOverrideElement extends Components.HostAttrOverride, HTMLStencilElement {
     }
@@ -755,13 +796,37 @@ declare global {
         prototype: HTMLLifecycleAsyncAElement;
         new (): HTMLLifecycleAsyncAElement;
     };
+    interface HTMLLifecycleAsyncBElementEventMap {
+        "lifecycleLoad": any;
+        "lifecycleUpdate": any;
+    }
     interface HTMLLifecycleAsyncBElement extends Components.LifecycleAsyncB, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLLifecycleAsyncBElementEventMap>(type: K, listener: (this: HTMLLifecycleAsyncBElement, ev: LifecycleAsyncBCustomEvent<HTMLLifecycleAsyncBElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLLifecycleAsyncBElementEventMap>(type: K, listener: (this: HTMLLifecycleAsyncBElement, ev: LifecycleAsyncBCustomEvent<HTMLLifecycleAsyncBElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
     var HTMLLifecycleAsyncBElement: {
         prototype: HTMLLifecycleAsyncBElement;
         new (): HTMLLifecycleAsyncBElement;
     };
+    interface HTMLLifecycleAsyncCElementEventMap {
+        "lifecycleLoad": any;
+        "lifecycleUpdate": any;
+    }
     interface HTMLLifecycleAsyncCElement extends Components.LifecycleAsyncC, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLLifecycleAsyncCElementEventMap>(type: K, listener: (this: HTMLLifecycleAsyncCElement, ev: LifecycleAsyncCCustomEvent<HTMLLifecycleAsyncCElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLLifecycleAsyncCElementEventMap>(type: K, listener: (this: HTMLLifecycleAsyncCElement, ev: LifecycleAsyncCCustomEvent<HTMLLifecycleAsyncCElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
     var HTMLLifecycleAsyncCElement: {
         prototype: HTMLLifecycleAsyncCElement;
@@ -773,13 +838,37 @@ declare global {
         prototype: HTMLLifecycleBasicAElement;
         new (): HTMLLifecycleBasicAElement;
     };
+    interface HTMLLifecycleBasicBElementEventMap {
+        "lifecycleLoad": any;
+        "lifecycleUpdate": any;
+    }
     interface HTMLLifecycleBasicBElement extends Components.LifecycleBasicB, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLLifecycleBasicBElementEventMap>(type: K, listener: (this: HTMLLifecycleBasicBElement, ev: LifecycleBasicBCustomEvent<HTMLLifecycleBasicBElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLLifecycleBasicBElementEventMap>(type: K, listener: (this: HTMLLifecycleBasicBElement, ev: LifecycleBasicBCustomEvent<HTMLLifecycleBasicBElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
     var HTMLLifecycleBasicBElement: {
         prototype: HTMLLifecycleBasicBElement;
         new (): HTMLLifecycleBasicBElement;
     };
+    interface HTMLLifecycleBasicCElementEventMap {
+        "lifecycleLoad": any;
+        "lifecycleUpdate": any;
+    }
     interface HTMLLifecycleBasicCElement extends Components.LifecycleBasicC, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLLifecycleBasicCElementEventMap>(type: K, listener: (this: HTMLLifecycleBasicCElement, ev: LifecycleBasicCCustomEvent<HTMLLifecycleBasicCElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLLifecycleBasicCElementEventMap>(type: K, listener: (this: HTMLLifecycleBasicCElement, ev: LifecycleBasicCCustomEvent<HTMLLifecycleBasicCElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
     var HTMLLifecycleBasicCElement: {
         prototype: HTMLLifecycleBasicCElement;
@@ -1320,6 +1409,7 @@ declare global {
         "external-import-b": HTMLExternalImportBElement;
         "external-import-c": HTMLExternalImportCElement;
         "factory-jsx": HTMLFactoryJsxElement;
+        "form-associated": HTMLFormAssociatedElement;
         "host-attr-override": HTMLHostAttrOverrideElement;
         "image-import": HTMLImageImportElement;
         "init-css-root": HTMLInitCssRootElement;
@@ -1550,6 +1640,8 @@ declare namespace LocalJSX {
     interface ExternalImportC {
     }
     interface FactoryJsx {
+    }
+    interface FormAssociated {
     }
     interface HostAttrOverride {
     }
@@ -1836,6 +1928,7 @@ declare namespace LocalJSX {
         "external-import-b": ExternalImportB;
         "external-import-c": ExternalImportC;
         "factory-jsx": FactoryJsx;
+        "form-associated": FormAssociated;
         "host-attr-override": HostAttrOverride;
         "image-import": ImageImport;
         "init-css-root": InitCssRoot;
@@ -1987,6 +2080,7 @@ declare module "@stencil/core" {
             "external-import-b": LocalJSX.ExternalImportB & JSXBase.HTMLAttributes<HTMLExternalImportBElement>;
             "external-import-c": LocalJSX.ExternalImportC & JSXBase.HTMLAttributes<HTMLExternalImportCElement>;
             "factory-jsx": LocalJSX.FactoryJsx & JSXBase.HTMLAttributes<HTMLFactoryJsxElement>;
+            "form-associated": LocalJSX.FormAssociated & JSXBase.HTMLAttributes<HTMLFormAssociatedElement>;
             "host-attr-override": LocalJSX.HostAttrOverride & JSXBase.HTMLAttributes<HTMLHostAttrOverrideElement>;
             "image-import": LocalJSX.ImageImport & JSXBase.HTMLAttributes<HTMLImageImportElement>;
             "init-css-root": LocalJSX.InitCssRoot & JSXBase.HTMLAttributes<HTMLInitCssRootElement>;

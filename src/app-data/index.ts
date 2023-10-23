@@ -56,6 +56,7 @@ export const BUILD: BuildConditionals = {
   cssAnnotations: true,
   state: true,
   style: true,
+  formAssociated: false,
   svg: true,
   updatable: true,
   vdomAttribute: true,

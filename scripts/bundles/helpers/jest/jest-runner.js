@@ -1,3 +1,3 @@
-const { createTestRunner } = require('./index.js');
-
+const { getCreateJestTestRunner } = require('./index.js');
+const createTestRunner = getCreateJestTestRunner();
 module.exports = createTestRunner();
