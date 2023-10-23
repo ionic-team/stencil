@@ -27,7 +27,9 @@ export const generateCjs = async (
     };
     const results = await generateRollupOutput(rollupBuild, esmOpts, config, buildCtx.entryModules);
     if (results != null) {
-      const destinations = cjsOutputs.map((o) => o.cjsDir);
+      const destinations = cjsOutputs
+        .map((o) => o.cjsDir)
+        .filter((cjsDir): cjsDir is string => typeof cjsDir === 'string');
 
       buildCtx.commonJsComponentBundle = await generateLazyModules(
         config,

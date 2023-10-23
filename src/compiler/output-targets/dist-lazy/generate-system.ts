@@ -28,7 +28,9 @@ export const generateSystem = async (
     };
     const results = await generateRollupOutput(rollupBuild, esmOpts, config, buildCtx.entryModules);
     if (results != null) {
-      const destinations = systemOutputs.map((o) => o.esmDir);
+      const destinations = systemOutputs
+        .map((o) => o.esmDir)
+        .filter((esmDir): esmDir is string => typeof esmDir === 'string');
       buildCtx.systemComponentBundle = await generateLazyModules(
         config,
         compilerCtx,
