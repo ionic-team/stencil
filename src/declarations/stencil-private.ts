@@ -1349,7 +1349,7 @@ export interface RenderNode extends HostElement {
 
   /**
    * Slot forward slot:
-   * Thi is the slot that the original `slot` tag element was going to be
+   * This is the slot that the original `slot` tag element was going to be
    * forwarded to in another element. For instance:
    *
    * ```html

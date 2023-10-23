@@ -24,12 +24,15 @@ describe('non-shadow-to-shadow-slot-relocation', () => {
     expect(mainDiv.children[0].getAttribute('slot')).toBe('main-content');
 
     // Dropdown content
-    expect(mainDiv.children[1].tagName).toBe('DIV');
-    expect(mainDiv.children[1].getAttribute('slot')).toBe('dropdown-content-element');
-    expect(mainDiv.children[1].children.length).toBe(1);
-    expect(mainDiv.children[1].children[0].tagName).toBe('DROP-DOWN-CONTENT');
-    expect(mainDiv.children[1].children[0].children.length).toBe(1);
-    expect(mainDiv.children[1].children[0].children[0].tagName).toBe('B');
-    expect(mainDiv.children[1].children[0].children[0].getAttribute('slot')).toBe(null);
+    const slottedDiv = mainDiv.children[1];
+    expect(slottedDiv.tagName).toBe('DIV');
+    expect(slottedDiv.getAttribute('slot')).toBe('dropdown-content-element');
+    expect(slottedDiv.children.length).toBe(1);
+
+    const slottedDropdownContent = slottedDiv.children[0];
+    expect(slottedDropdownContent.tagName).toBe('DROP-DOWN-CONTENT');
+    expect(slottedDropdownContent.children.length).toBe(1);
+    expect(slottedDropdownContent.children[0].tagName).toBe('B');
+    expect(slottedDropdownContent.children[0].getAttribute('slot')).toBe(null);
   });
 });
