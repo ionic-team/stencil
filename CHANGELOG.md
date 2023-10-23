@@ -1,3 +1,19 @@
+# 💥 [4.6.0](https://github.com/ionic-team/stencil/compare/v4.5.0...v4.6.0) (2023-10-23)
+
+
+### Bug Fixes
+
+* **compiler:** consistently generate additional type files ([#4938](https://github.com/ionic-team/stencil/issues/4938)) ([70cba50](https://github.com/ionic-team/stencil/commit/70cba503e881755f5d24d2f23a8e121aedf5a805))
+* **compiler:** persist polyfills on build ([#4932](https://github.com/ionic-team/stencil/issues/4932)) ([b97dadc](https://github.com/ionic-team/stencil/commit/b97dadc967b1fde892cb75a544b1eecd2361b194)), closes [#4661](https://github.com/ionic-team/stencil/issues/4661)
+* **runtime:** add height, width Source attrs ([#4943](https://github.com/ionic-team/stencil/issues/4943)) ([c9a3eac](https://github.com/ionic-team/stencil/commit/c9a3eac789c8fe9c6fdb6b7be2037a19ee361c6d)), closes [#4942](https://github.com/ionic-team/stencil/issues/4942)
+
+
+### Features
+
+* **types:** generate addEventListener and removeEventListener overloads to component html element type ([#4909](https://github.com/ionic-team/stencil/issues/4909)) ([0249798](https://github.com/ionic-team/stencil/commit/024979841f7124aa3bcce6a6ecd094dfecf1566c))
+
+
+
 # 📢 [4.5.0](https://github.com/ionic-team/stencil/compare/v4.4.1...v4.5.0) (2023-10-16)
 
 
