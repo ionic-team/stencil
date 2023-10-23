@@ -138,9 +138,12 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
         }
       };
 
-      // TODO(STENCIL-914): this check and `else` block can go away and be replaced by just `BUILD.scoped` once we
-      // default our pseudo-slot behavior
-      if (BUILD.experimentalSlotFixes && BUILD.scoped) {
+      // TODO(STENCIL-914): this check and `else` block can go away and be replaced by just a
+      // check for shadow encapsulation once we default our pseudo-slot behavior
+      if (
+        BUILD.experimentalSlotFixes &&
+        (cmpMeta.$flags$ & CMP_FLAGS.needsShadowDomShim || !(cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation))
+      ) {
         patchPseudoShadowDom(HostElement.prototype, cmpMeta);
       } else {
         if (BUILD.slotChildNodesFix) {
