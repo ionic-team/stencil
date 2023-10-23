@@ -113,6 +113,20 @@ describe('setAccessor for custom elements', () => {
       expect(addEventSpy).toHaveBeenCalledWith('click', newValue, false);
       expect(removeEventSpy).not.toHaveBeenCalled();
     });
+
+    it('should add a capture style event listener', () => {
+      const addEventSpy = jest.spyOn(elm, 'addEventListener');
+      const removeEventSpy = jest.spyOn(elm, 'removeEventListener');
+
+      const newValue = () => {
+        /**/
+      };
+
+      setAccessor(elm, 'onClickCapture', undefined, newValue, false, 0);
+
+      expect(addEventSpy).toHaveBeenCalledWith('click', newValue, true);
+      expect(removeEventSpy).not.toHaveBeenCalled();
+    });
   });
 
   it('should set object property to child', () => {
