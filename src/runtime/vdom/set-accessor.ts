@@ -110,11 +110,14 @@ export const setAccessor = (
         memberName = ln[2] + memberName.slice(3);
       }
       if (oldValue || newValue) {
-        // Need to account for "capture" events
+        // Need to account for "capture" events.
+        // If the event name ends with "Capture", we'll update the name to remove
+        // the "Capture" suffix and make sure the event listener is setup to handle the capture event.
         let capture = false;
         if (memberName.endsWith(CAPTURE_EVENT_SUFFIX)) {
           capture = true;
-          memberName = memberName.replace(CAPTURE_EVENT_SUFFIX, '');
+          // Make sure we only replace the last instance of "Capture"
+          memberName = memberName.replace(new RegExp(CAPTURE_EVENT_SUFFIX + '$'), '');
         }
 
         if (oldValue) {
