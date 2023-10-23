@@ -53,7 +53,7 @@ jobs:
     # GitHub Actions 'concurrency' field as means to block the job until no other tests are running.
     concurrency: run_browserstack_queue
     steps:
-      - uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # v4.1.0
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
         with:
           ref: ${{ github.event_name == 'pull_request_target' && format('refs/pull/{0}/merge', github.event.number) || '' }}
           persist-credentials: false
