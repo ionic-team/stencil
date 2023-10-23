@@ -186,7 +186,7 @@ export interface BuildConditionals extends Partial<BuildFeatures> {
   attachStyles?: boolean;
 
   // TODO(STENCIL-914): remove this option when `experimentalSlotFixes` is the default behavior
-  patchPseudoShadowDom?: boolean;
+  experimentalSlotFixes?: boolean;
 }
 
 export type ModuleFormat =
@@ -1363,6 +1363,19 @@ export interface RenderNode extends HostElement {
    * node was created in.
    */
   ['s-hn']?: string;
+
+  /**
+   * Slot host tag name:
+   * This is the tag name of the element where this node
+   * has been moved to during slot relocation.
+   *
+   * This allows us to check if the node has been moved and prevent
+   * us from thinking a node _should_ be moved when it may already be in
+   * its final destination.
+   *
+   * This value is set to `undefined` whenever the node is put back into its original location.
+   */
+  ['s-sh']?: string;
 
   /**
    * Original Location Reference:

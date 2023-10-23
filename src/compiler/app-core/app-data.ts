@@ -168,7 +168,7 @@ export const updateBuildConditionals = (config: ValidatedConfig, b: BuildConditi
   // TODO(STENCIL-914): remove this option when `experimentalSlotFixes` is the default behavior
   b.slotChildNodesFix = config.extras.slotChildNodesFix;
   // TODO(STENCIL-914): remove this option when `experimentalSlotFixes` is the default behavior
-  b.patchPseudoShadowDom = config.extras.experimentalSlotFixes;
+  b.experimentalSlotFixes = config.extras.experimentalSlotFixes;
   // TODO(STENCIL-914): remove this option when `experimentalSlotFixes` is the default behavior
   b.cloneNodeFix = config.extras.cloneNodeFix;
   b.lifecycleDOMEvents = !!(b.isDebug || config._isTesting || config.extras.lifecycleDOMEvents);
