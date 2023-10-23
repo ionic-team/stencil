@@ -139,7 +139,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
       };
 
       // TODO(STENCIL-914): this check and `else` block can go away and be replaced by just a
-      // check for shadow encapsulation once we default our pseudo-slot behavior
+      // check for shadow encapsulation/shim once we default our pseudo-slot behavior
       if (
         BUILD.experimentalSlotFixes &&
         (cmpMeta.$flags$ & CMP_FLAGS.needsShadowDomShim || !(cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation))
@@ -155,8 +155,8 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
         if (BUILD.appendChildSlotFix) {
           patchSlotAppendChild(HostElement.prototype);
         }
-        if (BUILD.scopedSlotTextContentFix) {
-          patchTextContent(HostElement.prototype, cmpMeta);
+        if (BUILD.scopedSlotTextContentFix && BUILD.scoped && cmpMeta.$flags$ & CMP_FLAGS.scopedCssEncapsulation) {
+          patchTextContent(HostElement.prototype);
         }
       }
 

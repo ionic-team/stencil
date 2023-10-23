@@ -44,7 +44,7 @@ export const proxyCustomElement = (Cstr: any, compactMeta: d.ComponentRuntimeMet
   }
 
   // TODO(STENCIL-914): this check and `else` block can go away and be replaced by just a
-  // check for shadow encapsulation once we default our pseudo-slot behavior
+  // check for shadow encapsulation/shim once we default our pseudo-slot behavior
   if (
     BUILD.experimentalSlotFixes &&
     (cmpMeta.$flags$ & CMP_FLAGS.needsShadowDomShim || !(cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation))
@@ -60,8 +60,8 @@ export const proxyCustomElement = (Cstr: any, compactMeta: d.ComponentRuntimeMet
     if (BUILD.appendChildSlotFix) {
       patchSlotAppendChild(Cstr.prototype);
     }
-    if (BUILD.scopedSlotTextContentFix) {
-      patchTextContent(Cstr.prototype, cmpMeta);
+    if (BUILD.scopedSlotTextContentFix && BUILD.scoped && cmpMeta.$flags$ & CMP_FLAGS.scopedCssEncapsulation) {
+      patchTextContent(Cstr.prototype);
     }
   }
 
