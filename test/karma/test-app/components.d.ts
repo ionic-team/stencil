@@ -116,6 +116,10 @@ export namespace Components {
     }
     interface DomReattachCloneHost {
     }
+    interface DropDown {
+    }
+    interface DropDownContent {
+    }
     interface DynamicCssVariable {
     }
     interface DynamicImport {
@@ -210,6 +214,8 @@ export namespace Components {
     interface NoDelegatesFocus {
     }
     interface NodeResolution {
+    }
+    interface NonShadowHost {
     }
     interface ParentReflectNanAttribute {
     }
@@ -613,6 +619,18 @@ declare global {
         prototype: HTMLDomReattachCloneHostElement;
         new (): HTMLDomReattachCloneHostElement;
     };
+    interface HTMLDropDownElement extends Components.DropDown, HTMLStencilElement {
+    }
+    var HTMLDropDownElement: {
+        prototype: HTMLDropDownElement;
+        new (): HTMLDropDownElement;
+    };
+    interface HTMLDropDownContentElement extends Components.DropDownContent, HTMLStencilElement {
+    }
+    var HTMLDropDownContentElement: {
+        prototype: HTMLDropDownContentElement;
+        new (): HTMLDropDownContentElement;
+    };
     interface HTMLDynamicCssVariableElement extends Components.DynamicCssVariable, HTMLStencilElement {
     }
     var HTMLDynamicCssVariableElement: {
@@ -945,6 +963,12 @@ declare global {
     var HTMLNodeResolutionElement: {
         prototype: HTMLNodeResolutionElement;
         new (): HTMLNodeResolutionElement;
+    };
+    interface HTMLNonShadowHostElement extends Components.NonShadowHost, HTMLStencilElement {
+    }
+    var HTMLNonShadowHostElement: {
+        prototype: HTMLNonShadowHostElement;
+        new (): HTMLNonShadowHostElement;
     };
     interface HTMLParentReflectNanAttributeElement extends Components.ParentReflectNanAttribute, HTMLStencilElement {
     }
@@ -1373,6 +1397,8 @@ declare global {
         "dom-reattach-clone": HTMLDomReattachCloneElement;
         "dom-reattach-clone-deep-slot": HTMLDomReattachCloneDeepSlotElement;
         "dom-reattach-clone-host": HTMLDomReattachCloneHostElement;
+        "drop-down": HTMLDropDownElement;
+        "drop-down-content": HTMLDropDownContentElement;
         "dynamic-css-variable": HTMLDynamicCssVariableElement;
         "dynamic-import": HTMLDynamicImportElement;
         "es5-addclass-svg": HTMLEs5AddclassSvgElement;
@@ -1415,6 +1441,7 @@ declare global {
         "listen-window": HTMLListenWindowElement;
         "no-delegates-focus": HTMLNoDelegatesFocusElement;
         "node-resolution": HTMLNodeResolutionElement;
+        "non-shadow-host": HTMLNonShadowHostElement;
         "parent-reflect-nan-attribute": HTMLParentReflectNanAttributeElement;
         "parent-with-reflect-child": HTMLParentWithReflectChildElement;
         "reflect-nan-attribute": HTMLReflectNanAttributeElement;
@@ -1586,6 +1613,10 @@ declare namespace LocalJSX {
     }
     interface DomReattachCloneHost {
     }
+    interface DropDown {
+    }
+    interface DropDownContent {
+    }
     interface DynamicCssVariable {
     }
     interface DynamicImport {
@@ -1689,6 +1720,8 @@ declare namespace LocalJSX {
     interface NoDelegatesFocus {
     }
     interface NodeResolution {
+    }
+    interface NonShadowHost {
     }
     interface ParentReflectNanAttribute {
     }
@@ -1883,6 +1916,8 @@ declare namespace LocalJSX {
         "dom-reattach-clone": DomReattachClone;
         "dom-reattach-clone-deep-slot": DomReattachCloneDeepSlot;
         "dom-reattach-clone-host": DomReattachCloneHost;
+        "drop-down": DropDown;
+        "drop-down-content": DropDownContent;
         "dynamic-css-variable": DynamicCssVariable;
         "dynamic-import": DynamicImport;
         "es5-addclass-svg": Es5AddclassSvg;
@@ -1925,6 +1960,7 @@ declare namespace LocalJSX {
         "listen-window": ListenWindow;
         "no-delegates-focus": NoDelegatesFocus;
         "node-resolution": NodeResolution;
+        "non-shadow-host": NonShadowHost;
         "parent-reflect-nan-attribute": ParentReflectNanAttribute;
         "parent-with-reflect-child": ParentWithReflectChild;
         "reflect-nan-attribute": ReflectNanAttribute;
@@ -2032,6 +2068,8 @@ declare module "@stencil/core" {
             "dom-reattach-clone": LocalJSX.DomReattachClone & JSXBase.HTMLAttributes<HTMLDomReattachCloneElement>;
             "dom-reattach-clone-deep-slot": LocalJSX.DomReattachCloneDeepSlot & JSXBase.HTMLAttributes<HTMLDomReattachCloneDeepSlotElement>;
             "dom-reattach-clone-host": LocalJSX.DomReattachCloneHost & JSXBase.HTMLAttributes<HTMLDomReattachCloneHostElement>;
+            "drop-down": LocalJSX.DropDown & JSXBase.HTMLAttributes<HTMLDropDownElement>;
+            "drop-down-content": LocalJSX.DropDownContent & JSXBase.HTMLAttributes<HTMLDropDownContentElement>;
             "dynamic-css-variable": LocalJSX.DynamicCssVariable & JSXBase.HTMLAttributes<HTMLDynamicCssVariableElement>;
             "dynamic-import": LocalJSX.DynamicImport & JSXBase.HTMLAttributes<HTMLDynamicImportElement>;
             "es5-addclass-svg": LocalJSX.Es5AddclassSvg & JSXBase.HTMLAttributes<HTMLEs5AddclassSvgElement>;
@@ -2074,6 +2112,7 @@ declare module "@stencil/core" {
             "listen-window": LocalJSX.ListenWindow & JSXBase.HTMLAttributes<HTMLListenWindowElement>;
             "no-delegates-focus": LocalJSX.NoDelegatesFocus & JSXBase.HTMLAttributes<HTMLNoDelegatesFocusElement>;
             "node-resolution": LocalJSX.NodeResolution & JSXBase.HTMLAttributes<HTMLNodeResolutionElement>;
+            "non-shadow-host": LocalJSX.NonShadowHost & JSXBase.HTMLAttributes<HTMLNonShadowHostElement>;
             "parent-reflect-nan-attribute": LocalJSX.ParentReflectNanAttribute & JSXBase.HTMLAttributes<HTMLParentReflectNanAttributeElement>;
             "parent-with-reflect-child": LocalJSX.ParentWithReflectChild & JSXBase.HTMLAttributes<HTMLParentWithReflectChildElement>;
             "reflect-nan-attribute": LocalJSX.ReflectNanAttribute & JSXBase.HTMLAttributes<HTMLReflectNanAttributeElement>;

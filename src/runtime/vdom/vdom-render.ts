@@ -142,6 +142,9 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
       // remember the content reference comment
       elm['s-sr'] = true;
 
+      // Persist the name of the slot that this slot was going to be projected into.
+      elm['s-fs'] = newVNode.$attrs$?.slot;
+
       // remember the content reference comment
       elm['s-cr'] = contentRef;
 
@@ -972,12 +975,13 @@ render() {
       for (i = 0; i < relocateNodes.length; i++) {
         relocateData = relocateNodes[i];
         nodeToRelocate = relocateData.$nodeToRelocate$;
+        const slotRefNode = relocateData.$slotRefNode$;
 
-        if (relocateData.$slotRefNode$) {
+        if (slotRefNode) {
           // by default we're just going to insert it directly
           // after the slot reference node
-          parentNodeRef = relocateData.$slotRefNode$.parentNode;
-          insertBeforeNode = relocateData.$slotRefNode$.nextSibling;
+          parentNodeRef = slotRefNode.parentNode;
+          insertBeforeNode = slotRefNode.nextSibling;
           orgLocationNode = nodeToRelocate['s-ol'] as any;
 
           while ((orgLocationNode = orgLocationNode.previousSibling as any)) {
@@ -1004,6 +1008,29 @@ render() {
                 // probably a component in the index.html that doesn't have its hostname set
                 nodeToRelocate['s-hn'] = nodeToRelocate['s-ol'].parentNode.nodeName;
               }
+
+              // Handle a niche use-case where we relocate a slot from a non-shadow
+              // to shadow component (and potentially into further nested components) where
+              // the slot name changes along the way (for instance, a default to a named slot).
+              // In this case, we need to update the relocated node's slot attribute to match
+              // the slot name it is being relocated into.
+              //
+              // There is a very niche use case where we may be relocating a text node. For now,
+              // we ignore anything that is not an element node since non-element nodes cannot have
+              // attributes to specify the slot. We'll deal with this if it becomes a problem... but super edge-case-y
+              if (
+                BUILD.experimentalSlotFixes &&
+                nodeToRelocate.nodeType === NODE_TYPE.ElementNode &&
+                slotRefNode.parentElement?.shadowRoot != null &&
+                slotRefNode['s-fs'] !== nodeToRelocate.getAttribute('slot')
+              ) {
+                if (!slotRefNode['s-fs']) {
+                  nodeToRelocate.removeAttribute('slot');
+                } else {
+                  nodeToRelocate.setAttribute('slot', slotRefNode['s-fs']);
+                }
+              }
+
               // add it back to the dom but in its new home
               parentNodeRef.insertBefore(nodeToRelocate, insertBeforeNode);
             }
