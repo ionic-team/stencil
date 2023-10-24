@@ -95,7 +95,7 @@
     },
     {
       "matchFileNames": ["src/testing/jest/jest-27-and-under/package.json"],
-      matchPackageNames: ['@types/jest'],
+      matchPackageNames: ['@types/jest', 'jest'],
       allowedVersions: '<=27'
     },
     {
