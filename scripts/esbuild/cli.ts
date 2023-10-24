@@ -50,9 +50,10 @@ export async function buildCli(opts: BuildOptions) {
   };
 
   // CommonJS build options
-  const cjsContext: ESBuildOptions = {
+  const cjsOptions: ESBuildOptions = {
     ...cliEsbuildOptions,
     outfile: join(outputDir, cjsFilename),
+    platform: 'node',
     format: 'cjs',
     banner: {
       js: getBanner(opts, `Stencil CLI (CommonJS)`, true),
@@ -78,5 +79,5 @@ export async function buildCli(opts: BuildOptions) {
     types: dtsFilename,
   });
 
-  return runBuilds([esmOptions, cjsContext], opts);
+  return runBuilds([esmOptions, cjsOptions], opts);
 }

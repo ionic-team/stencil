@@ -21,6 +21,7 @@ export function getEsbuildAliases(): Record<string, string> {
     '@stencil/core/dev-server': './dev-server/index.js',
     '@stencil/core/mock-doc': './mock-doc/index.cjs',
     '@stencil/core/internal/testing': './internal/testing/index.js',
+    '@sys-api-node': './sys/node/index.js',
 
     // mapping node.js module names to `sys/node` "cache"
     //
@@ -28,6 +29,8 @@ export function getEsbuildAliases(): Record<string, string> {
     // of the Stencil distributable but also have our separate bundles
     // reference the same file
     prompts: './sys/node/prompts.js',
+    glob: './sys/node/glob.js',
+    'graceful-fs': './sys/node/graceful-fs.js',
   };
 }
 
@@ -43,31 +46,17 @@ const externalNodeModules = [
   '@jest/core',
   '@jest/reporters',
   '@microsoft/typescript-etw',
-  'assert',
-  'buffer',
-  'child_process',
-  'console',
-  'constants',
   'expect',
   'fsevents',
-  'inspector',
   'jest',
   'jest-cli',
   'jest-config',
   'jest-message-id',
   'jest-pnp-resolver',
   'jest-runner',
-  'net',
   'puppeteer',
   'puppeteer-core',
-  'readline',
-  'stream',
-  'tty',
-  'url',
-  'util',
-  'vm',
   'yargs',
-  'zlib',
 ];
 
 /**
