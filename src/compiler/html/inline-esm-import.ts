@@ -59,7 +59,11 @@ export const optimizeEsmImport = async (
       if (results.orgImportPaths.length > 0) {
         // insert inline script
         script.removeAttribute('src');
-        script.innerHTML = results.code;
+        // the `'\n'` is added here to avoid possible issues with HTML parsers
+        // since the inlined JS will often end in a sourcemap-related `//`
+        // comment a newline ensures that in the rendered HTML string the
+        // closing script tag will be on its own line
+        script.innerHTML = results.code + '\n';
       }
     } else {
       const hashedFile = await generateHashedCopy(config, compilerCtx, entryPath);
