@@ -982,9 +982,19 @@ render() {
 
         if (slotRefNode) {
           const parentNodeRef = slotRefNode.parentNode;
-          // TODO(NOW): document the behavior around determining where to insert the content
+          // When determining where to insert content, the most simple case would be
+          // to relocate the node immediately following the slot reference node. We do this
+          // by getting a reference to the node immediately following the slot reference node
+          // since we will use `insertBefore` to manipulate the DOM.
+          //
+          // If there is no node immediately following the slot reference node, then we will just
+          // end up appending the node as the last child of the parent.
           let insertBeforeNode = slotRefNode.nextSibling as d.RenderNode;
 
+          // If the node we're currently planning on inserting the new node before is an element,
+          // we need to do some additional checks to make sure we're inserting the node in the correct order.
+          // The use case here would be that we have multiple nodes being relocated to the same slot. So, we want
+          // to make sure they get inserted into their new how in the same order they were declared in their original location.
           if (insertBeforeNode && insertBeforeNode.nodeType === NODE_TYPE.ElementNode) {
             let orgLocationNode = nodeToRelocate['s-ol'];
             let refNode: d.RenderNode;
@@ -1034,7 +1044,10 @@ render() {
                 }
               }
 
-              // add it back to the dom but in its new home
+              // Add it back to the dom but in its new home
+              // If we get to this point and `insertBeforeNode` is `null`, that means
+              // we're just going to append the node as the last child of the parent. Passing
+              // `null` as the second arg here will trigger that behavior.
               parentNodeRef.insertBefore(nodeToRelocate, insertBeforeNode);
             }
           }
