@@ -960,13 +960,8 @@ render() {
     if (checkSlotRelocate) {
       markSlotContentForRelocation(rootVnode.$elm$);
 
-      let relocateData: RelocateNodeData;
-      let nodeToRelocate: d.RenderNode;
-      let i = 0;
-
-      for (; i < relocateNodes.length; i++) {
-        relocateData = relocateNodes[i];
-        nodeToRelocate = relocateData.$nodeToRelocate$;
+      for (const relocateData of relocateNodes) {
+        const nodeToRelocate = relocateData.$nodeToRelocate$;
 
         if (!nodeToRelocate['s-ol']) {
           // add a reference node marking this node's original location
@@ -981,9 +976,8 @@ render() {
         }
       }
 
-      for (i = 0; i < relocateNodes.length; i++) {
-        relocateData = relocateNodes[i];
-        nodeToRelocate = relocateData.$nodeToRelocate$;
+      for (const relocateData of relocateNodes) {
+        const nodeToRelocate = relocateData.$nodeToRelocate$;
         const slotRefNode = relocateData.$slotRefNode$;
 
         if (slotRefNode) {
