@@ -982,14 +982,13 @@ render() {
 
         if (slotRefNode) {
           const parentNodeRef = slotRefNode.parentNode;
-          // TODO(NOW): type
           // TODO(NOW): document the behavior around determining where to insert the content
-          let insertBeforeNode = slotRefNode.nextSibling as unknown as d.RenderNode;
+          let insertBeforeNode = slotRefNode.nextSibling as d.RenderNode;
 
           if (insertBeforeNode && insertBeforeNode.nodeType === NODE_TYPE.ElementNode) {
             let orgLocationNode = nodeToRelocate['s-ol'];
             let refNode: d.RenderNode;
-            while ((orgLocationNode = orgLocationNode.previousSibling as any)) {
+            while ((orgLocationNode = orgLocationNode.previousSibling as d.RenderNode)) {
               refNode = orgLocationNode['s-nr'];
               if (refNode && refNode['s-sn'] === nodeToRelocate['s-sn'] && parentNodeRef === refNode.parentNode) {
                 refNode = refNode.nextSibling as any;
