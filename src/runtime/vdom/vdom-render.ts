@@ -962,10 +962,6 @@ render() {
 
       let relocateData: RelocateNodeData;
       let nodeToRelocate: d.RenderNode;
-      let orgLocationNode: d.RenderNode;
-      let parentNodeRef: Node;
-      let insertBeforeNode: Node;
-      let refNode: d.RenderNode;
       let i = 0;
 
       for (; i < relocateNodes.length; i++) {
@@ -975,7 +971,7 @@ render() {
         if (!nodeToRelocate['s-ol']) {
           // add a reference node marking this node's original location
           // keep a reference to this node for later lookups
-          orgLocationNode =
+          const orgLocationNode =
             BUILD.isDebug || BUILD.hydrateServerSide
               ? originalLocationDebugNode(nodeToRelocate)
               : (doc.createTextNode('') as any);
@@ -991,19 +987,20 @@ render() {
         const slotRefNode = relocateData.$slotRefNode$;
 
         if (slotRefNode) {
-          // by default we're just going to insert it directly
-          // after the slot reference node
-          parentNodeRef = slotRefNode.parentNode;
-          insertBeforeNode = slotRefNode.nextSibling;
-          orgLocationNode = nodeToRelocate['s-ol'] as any;
+          const parentNodeRef = slotRefNode.parentNode;
 
-          while ((orgLocationNode = orgLocationNode.previousSibling as any)) {
-            refNode = orgLocationNode['s-nr'];
-            if (refNode && refNode['s-sn'] === nodeToRelocate['s-sn'] && parentNodeRef === refNode.parentNode) {
-              refNode = refNode.nextSibling as any;
-              if (!refNode || !refNode['s-nr']) {
-                insertBeforeNode = refNode;
-                break;
+          let insertBeforeNode = slotRefNode.nextSibling as unknown as d.RenderNode;
+          if (insertBeforeNode) {
+            let orgLocationNode = nodeToRelocate['s-ol'];
+            let refNode: d.RenderNode;
+            while ((orgLocationNode = orgLocationNode.previousSibling as any)) {
+              refNode = orgLocationNode['s-nr'];
+              if (refNode && refNode['s-sn'] === nodeToRelocate['s-sn'] && parentNodeRef === refNode.parentNode) {
+                refNode = refNode.nextSibling as any;
+                if (!refNode || !refNode['s-nr']) {
+                  insertBeforeNode = refNode;
+                  break;
+                }
               }
             }
           }
