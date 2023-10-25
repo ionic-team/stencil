@@ -982,8 +982,10 @@ render() {
 
         if (slotRefNode) {
           const parentNodeRef = slotRefNode.parentNode;
-
+          // TODO(NOW): type
+          // TODO(NOW): document the behavior around determining where to insert the content
           let insertBeforeNode = slotRefNode.nextSibling as unknown as d.RenderNode;
+
           if (insertBeforeNode) {
             let orgLocationNode = nodeToRelocate['s-ol'];
             let refNode: d.RenderNode;
