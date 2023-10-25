@@ -986,7 +986,7 @@ render() {
           // TODO(NOW): document the behavior around determining where to insert the content
           let insertBeforeNode = slotRefNode.nextSibling as unknown as d.RenderNode;
 
-          if (insertBeforeNode) {
+          if (insertBeforeNode && insertBeforeNode.nodeType === NODE_TYPE.ElementNode) {
             let orgLocationNode = nodeToRelocate['s-ol'];
             let refNode: d.RenderNode;
             while ((orgLocationNode = orgLocationNode.previousSibling as any)) {
