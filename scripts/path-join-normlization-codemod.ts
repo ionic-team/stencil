@@ -1,7 +1,21 @@
 import { ImportDeclaration, Project, SourceFile } from 'ts-morph';
+import path from 'path';
+
+/**
+ * Absolute path to ./src/compiler
+ */
+const compilerDir = path.join(path.resolve('.'), 'src/compiler');
+
+function* compilerSourceFiles(project: Project) {
+  for (const sourceFile of project.getSourceFiles()) {
+    if (sourceFile.getFilePath().startsWith(compilerDir)) {
+      yield sourceFile;
+    }
+  }
+}
 
 function* pathImportingSourceFiles(project: Project) {
-  for (const sourceFile of project.getSourceFiles()) {
+  for (const sourceFile of compilerSourceFiles(project)) {
     const importDecl = sourceFile.getImportDeclaration('path');
     if (importDecl) {
       yield [importDecl, sourceFile] as [ImportDeclaration, SourceFile];
