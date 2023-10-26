@@ -989,7 +989,7 @@ render() {
           //
           // If there is no node immediately following the slot reference node, then we will just
           // end up appending the node as the last child of the parent.
-          let insertBeforeNode = slotRefNode.nextSibling as d.RenderNode;
+          let insertBeforeNode = slotRefNode.nextSibling as d.RenderNode | null;
 
           // If the node we're currently planning on inserting the new node before is an element,
           // we need to do some additional checks to make sure we're inserting the node in the correct order.
@@ -1001,10 +1001,11 @@ render() {
             !BUILD.experimentalSlotFixes ||
             (insertBeforeNode && insertBeforeNode.nodeType === NODE_TYPE.ElementNode)
           ) {
-            let orgLocationNode = nodeToRelocate['s-ol'];
-            let refNode: d.RenderNode;
-            while ((orgLocationNode = orgLocationNode.previousSibling as d.RenderNode)) {
-              refNode = orgLocationNode['s-nr'];
+            let orgLocationNode = nodeToRelocate['s-ol']?.previousSibling as d.RenderNode | null;
+
+            while (orgLocationNode) {
+              let refNode = orgLocationNode['s-nr'] ?? null;
+
               if (refNode && refNode['s-sn'] === nodeToRelocate['s-sn'] && parentNodeRef === refNode.parentNode) {
                 refNode = refNode.nextSibling as any;
                 if (!refNode || !refNode['s-nr']) {
@@ -1012,6 +1013,8 @@ render() {
                   break;
                 }
               }
+
+              orgLocationNode = orgLocationNode.previousSibling as d.RenderNode | null;
             }
           }
 
