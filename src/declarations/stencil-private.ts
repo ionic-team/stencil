@@ -2097,10 +2097,10 @@ export interface JestEnvironmentGlobal {
   h: any;
   resourcesUrl: string;
   currentSpec?: {
-    id: string;
+    id?: string;
     description: string;
     fullName: string;
-    testPath: string;
+    testPath: string | null;
   };
   env: { [prop: string]: string };
   screenshotDescriptions: Set<string>;

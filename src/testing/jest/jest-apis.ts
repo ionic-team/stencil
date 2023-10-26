@@ -12,28 +12,16 @@
  * file be added to sparingly.
  */
 
+import type { TransformedSource } from '@jest/transform';
 import type { Config } from '@jest/types';
 import { getVersion } from 'jest';
 
 // TODO(STENCIL-959): Improve this typing by narrowing it
 export type JestPuppeteerEnvironment = any;
 
-type Jest26CacheKeyOptions = { instrument: boolean; rootDir: string };
-type Jest26Config = { instrument: boolean; rootDir: string };
-type Jest27TransformOptions = { config: Jest26Config };
 export type JestPreprocessor = {
-  process(
-    sourceText: string,
-    sourcePath: string,
-    jestConfig: Jest26Config | Jest27TransformOptions,
-    transformOptions?: Jest26Config,
-  ): string;
-  getCacheKey(
-    sourceText: string,
-    sourcePath: string,
-    jestConfigStr: string | Jest27TransformOptions,
-    transformOptions?: Jest26CacheKeyOptions,
-  ): string;
+  process(sourceText: string, sourcePath: string, ...args: any[]): string | TransformedSource;
+  getCacheKey(sourceText: string, sourcePath: string, ...args: any[]): string;
 };
 
 // TODO(STENCIL-960): Improve this typing by narrowing it
