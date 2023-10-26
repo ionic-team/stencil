@@ -1,48 +1,49 @@
-import { Project, ImportDeclaration } from "ts-morph";
+import { Project, ImportDeclaration, SourceFile } from 'ts-morph';
 
 const project = new Project({
- tsConfigFilePath: "./tsconfig.json",
+  tsConfigFilePath: './tsconfig.json',
 });
 
-function isFsImport(importDecl: ImportDeclaration): boolean {
-  return importDecl.getModuleSpecifier().getText() === "fs";
+function* pathImportingSourceFiles() {
+  for (const sourceFile of project.getSourceFiles()) {
+    const importDecl = sourceFile.getImportDeclaration('path');
+    if (importDecl) {
+      yield [importDecl, sourceFile] as [ImportDeclaration, SourceFile];
+    }
+  }
 }
 
+const PROBLEMATIC_PATH_FUNCTIONS = ['join', 'relative'];
 
-for (const sourceFile of project.getSourceFiles()) {
-  console.log(`checking ${sourceFile.getFilePath()}`);
-  const pathImport = sourceFile.getImportDeclaration("path");
+for (const [pathImportDecl, sourceFile] of pathImportingSourceFiles()) {
+  console.log(`found path imports in ${sourceFile.getFilePath()}`);
 
-  if (!pathImport) {
+  const toImportFromUtilModule: string[] = [];
+
+  for (const problematicFn of PROBLEMATIC_PATH_FUNCTIONS) {
+    const importSpecifier = pathImportDecl.getNamedImports().find((specifier) => specifier.getName() === problematicFn);
+
+    if (importSpecifier) {
+      importSpecifier.remove();
+      toImportFromUtilModule.push(problematicFn);
+    }
+  }
+
+  if (toImportFromUtilModule.length === 0) {
+    // didn't remove any import specifiers from path import, get outta here!
     continue;
   }
 
-  const imports = pathImport.getNamedImports();
-  const joinImport = imports.find(importSpecifier => importSpecifier.getName() === "join");
-  const relativeImport = imports.find(importSpecifier => importSpecifier.getName() === "relative");
-
-  const utilImports = []
-
-  if (joinImport) {
-    joinImport.remove();
-    utilImports.push("join");
+  // remove the path import entirely if it's now empty
+  if (pathImportDecl.getNamedImports().length === 0) {
+    pathImportDecl.remove();
   }
 
-  if (relativeImport) {
-    relativeImport.remove();
-    utilImports.push("relative");
-  }
-
-  if (pathImport.getNamedImports().length === 0) {
-    pathImport.remove();
-  }
-
+  // add an import for our `@utils` dir
   sourceFile.addImportDeclaration({
-    moduleSpecifier: "@utils",
-    namedImports: utilImports
-  })
-
-  sourceFile.fixUnusedIdentifiers();
+    moduleSpecifier: '@utils',
+    namedImports: toImportFromUtilModule,
+  });
 }
 
 project.save();
