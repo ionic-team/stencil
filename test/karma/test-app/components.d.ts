@@ -331,6 +331,11 @@ export namespace Components {
     }
     interface SlotMapOrderRoot {
     }
+    interface SlotNestedNameChange {
+    }
+    interface SlotNestedNameChangeChild {
+        "state": boolean;
+    }
     interface SlotNestedOrderChild {
     }
     interface SlotNestedOrderParent {
@@ -1240,6 +1245,18 @@ declare global {
         prototype: HTMLSlotMapOrderRootElement;
         new (): HTMLSlotMapOrderRootElement;
     };
+    interface HTMLSlotNestedNameChangeElement extends Components.SlotNestedNameChange, HTMLStencilElement {
+    }
+    var HTMLSlotNestedNameChangeElement: {
+        prototype: HTMLSlotNestedNameChangeElement;
+        new (): HTMLSlotNestedNameChangeElement;
+    };
+    interface HTMLSlotNestedNameChangeChildElement extends Components.SlotNestedNameChangeChild, HTMLStencilElement {
+    }
+    var HTMLSlotNestedNameChangeChildElement: {
+        prototype: HTMLSlotNestedNameChangeChildElement;
+        new (): HTMLSlotNestedNameChangeChildElement;
+    };
     interface HTMLSlotNestedOrderChildElement extends Components.SlotNestedOrderChild, HTMLStencilElement {
     }
     var HTMLSlotNestedOrderChildElement: {
@@ -1487,6 +1504,8 @@ declare global {
         "slot-list-light-scoped-root": HTMLSlotListLightScopedRootElement;
         "slot-map-order": HTMLSlotMapOrderElement;
         "slot-map-order-root": HTMLSlotMapOrderRootElement;
+        "slot-nested-name-change": HTMLSlotNestedNameChangeElement;
+        "slot-nested-name-change-child": HTMLSlotNestedNameChangeChildElement;
         "slot-nested-order-child": HTMLSlotNestedOrderChildElement;
         "slot-nested-order-parent": HTMLSlotNestedOrderParentElement;
         "slot-ng-if": HTMLSlotNgIfElement;
@@ -1837,6 +1856,11 @@ declare namespace LocalJSX {
     }
     interface SlotMapOrderRoot {
     }
+    interface SlotNestedNameChange {
+    }
+    interface SlotNestedNameChangeChild {
+        "state"?: boolean;
+    }
     interface SlotNestedOrderChild {
     }
     interface SlotNestedOrderParent {
@@ -2006,6 +2030,8 @@ declare namespace LocalJSX {
         "slot-list-light-scoped-root": SlotListLightScopedRoot;
         "slot-map-order": SlotMapOrder;
         "slot-map-order-root": SlotMapOrderRoot;
+        "slot-nested-name-change": SlotNestedNameChange;
+        "slot-nested-name-change-child": SlotNestedNameChangeChild;
         "slot-nested-order-child": SlotNestedOrderChild;
         "slot-nested-order-parent": SlotNestedOrderParent;
         "slot-ng-if": SlotNgIf;
@@ -2158,6 +2184,8 @@ declare module "@stencil/core" {
             "slot-list-light-scoped-root": LocalJSX.SlotListLightScopedRoot & JSXBase.HTMLAttributes<HTMLSlotListLightScopedRootElement>;
             "slot-map-order": LocalJSX.SlotMapOrder & JSXBase.HTMLAttributes<HTMLSlotMapOrderElement>;
             "slot-map-order-root": LocalJSX.SlotMapOrderRoot & JSXBase.HTMLAttributes<HTMLSlotMapOrderRootElement>;
+            "slot-nested-name-change": LocalJSX.SlotNestedNameChange & JSXBase.HTMLAttributes<HTMLSlotNestedNameChangeElement>;
+            "slot-nested-name-change-child": LocalJSX.SlotNestedNameChangeChild & JSXBase.HTMLAttributes<HTMLSlotNestedNameChangeChildElement>;
             "slot-nested-order-child": LocalJSX.SlotNestedOrderChild & JSXBase.HTMLAttributes<HTMLSlotNestedOrderChildElement>;
             "slot-nested-order-parent": LocalJSX.SlotNestedOrderParent & JSXBase.HTMLAttributes<HTMLSlotNestedOrderParentElement>;
             "slot-ng-if": LocalJSX.SlotNgIf & JSXBase.HTMLAttributes<HTMLSlotNgIfElement>;
