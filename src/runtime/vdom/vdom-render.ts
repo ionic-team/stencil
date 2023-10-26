@@ -187,7 +187,7 @@ const putBackInOriginalLocation = (parentElm: Node, recursive: boolean) => {
       // Reset so we can correctly move the node around again.
       childNode['s-sh'] = undefined;
 
-      // When putting an element node back in it's original location,
+      // When putting an element node back in its original location,
       // we need to reset the `slot` attribute back to the value it originally had
       // so we can correctly relocate it again in the future
       if (childNode.nodeType === NODE_TYPE.ElementNode && !childNode['s-sr']) {
