@@ -1,10 +1,6 @@
-import { Project, ImportDeclaration, SourceFile } from 'ts-morph';
+import { ImportDeclaration, Project, SourceFile } from 'ts-morph';
 
-const project = new Project({
-  tsConfigFilePath: './tsconfig.json',
-});
-
-function* pathImportingSourceFiles() {
+function* pathImportingSourceFiles(project: Project) {
   for (const sourceFile of project.getSourceFiles()) {
     const importDecl = sourceFile.getImportDeclaration('path');
     if (importDecl) {
@@ -15,7 +11,23 @@ function* pathImportingSourceFiles() {
 
 const PROBLEMATIC_PATH_FUNCTIONS = ['join', 'relative'];
 
-for (const [pathImportDecl, sourceFile] of pathImportingSourceFiles()) {
+function addOrUpdateImports(sourceFile: SourceFile, moduleSpecifier: string, namedImports: string[]) {
+  const utilsIimport = sourceFile.getImportDeclaration(moduleSpecifier);
+  if (utilsIimport) {
+    utilsIimport.addNamedImports(namedImports);
+  } else {
+    sourceFile.addImportDeclaration({
+      moduleSpecifier,
+      namedImports,
+    });
+  }
+}
+
+const project = new Project({
+  tsConfigFilePath: './tsconfig.json',
+});
+
+for (const [pathImportDecl, sourceFile] of pathImportingSourceFiles(project)) {
   console.log(`found path imports in ${sourceFile.getFilePath()}`);
 
   const toImportFromUtilModule: string[] = [];
@@ -39,11 +51,7 @@ for (const [pathImportDecl, sourceFile] of pathImportingSourceFiles()) {
     pathImportDecl.remove();
   }
 
-  // add an import for our `@utils` dir
-  sourceFile.addImportDeclaration({
-    moduleSpecifier: '@utils',
-    namedImports: toImportFromUtilModule,
-  });
+  addOrUpdateImports(sourceFile, '@utils', toImportFromUtilModule);
 }
 
 project.save();
