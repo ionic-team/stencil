@@ -995,7 +995,12 @@ render() {
           // we need to do some additional checks to make sure we're inserting the node in the correct order.
           // The use case here would be that we have multiple nodes being relocated to the same slot. So, we want
           // to make sure they get inserted into their new how in the same order they were declared in their original location.
-          if (insertBeforeNode && insertBeforeNode.nodeType === NODE_TYPE.ElementNode) {
+          //
+          // TODO(STENCIL-914): Remove `experimentalSlotFixes` check
+          if (
+            !BUILD.experimentalSlotFixes ||
+            (insertBeforeNode && insertBeforeNode.nodeType === NODE_TYPE.ElementNode)
+          ) {
             let orgLocationNode = nodeToRelocate['s-ol'];
             let refNode: d.RenderNode;
             while ((orgLocationNode = orgLocationNode.previousSibling as d.RenderNode)) {
