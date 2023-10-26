@@ -104,6 +104,11 @@
       allowedVersions: '<=28'
     },
     {
+      "matchFileNames": ["src/testing/jest/jest-29/package.json"],
+      matchPackageNames: ['@types/jest', 'jest'],
+      allowedVersions: '<=29'
+    },
+    {
       // We intentionally run the karma tests against the oldest LTS of Node we support.
       // Prevent renovate from trying to bump node
       matchFileNames: ['test/karma/package.json'],
