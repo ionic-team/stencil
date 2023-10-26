@@ -28,6 +28,7 @@
     "build.esbuild.watch": "npm run clean && npm run build && node scripts/build/esbuild/build.js --watch",
     "clean": "rm -rf build/ cli/ compiler/ dev-server/ internal/ mock-doc/ sys/ testing/ && npm run clean-scripts",
     "clean-scripts": "rm -rf scripts/build",
+    "codemod": "npm run tsc.scripts && node ./scripts/build/path-join-normlization-codemod.js && npm run prettier && npm run lint -- --fix",
     "lint": "eslint 'bin/*' 'scripts/*.ts' 'scripts/**/*.ts' 'src/*.ts' 'src/**/*.ts' 'src/**/*.tsx'",
     "prettier": "npm run prettier.base -- --write",
     "prettier.base": "prettier --cache \"./({bin,scripts,src,test}/**/*.{ts,tsx,js,jsx})|bin/stencil|.github/(**/)?*.(yml|yaml)|*.js\"",
