@@ -1,5 +1,5 @@
-import { ImportDeclaration, Project, SourceFile } from 'ts-morph';
 import path from 'path';
+import { ImportDeclaration, Project, SourceFile } from 'ts-morph';
 
 /**
  * Absolute path to ./src/compiler
@@ -23,7 +23,7 @@ function* pathImportingSourceFiles(project: Project) {
   }
 }
 
-const PROBLEMATIC_PATH_FUNCTIONS = ['join', 'relative'];
+const PROBLEMATIC_PATH_FUNCTIONS = ['join', 'relative', 'resolve', 'normalize'];
 
 function addOrUpdateImports(sourceFile: SourceFile, moduleSpecifier: string, namedImports: string[]) {
   const utilsIimport = sourceFile.getImportDeclaration(moduleSpecifier);
