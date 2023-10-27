@@ -187,6 +187,13 @@ const putBackInOriginalLocation = (parentElm: Node, recursive: boolean) => {
       // Reset so we can correctly move the node around again.
       childNode['s-sh'] = undefined;
 
+      // When putting an element node back in its original location,
+      // we need to reset the `slot` attribute back to the value it originally had
+      // so we can correctly relocate it again in the future
+      if (childNode.nodeType === NODE_TYPE.ElementNode) {
+        childNode.setAttribute('slot', childNode['s-sn'] ?? '');
+      }
+
       checkSlotRelocate = true;
     }
 
@@ -666,23 +673,29 @@ const updateFallbackSlotVisibility = (elm: d.RenderNode) => {
         // we need to check all of its sibling nodes in order to see if
         // `childNode` should be hidden
         for (const siblingNode of childNodes) {
-          if (siblingNode['s-hn'] !== childNode['s-hn'] || slotName !== '') {
-            // this sibling node is from a different component OR is a named
-            // fallback slot node
-            if (siblingNode.nodeType === NODE_TYPE.ElementNode && slotName === siblingNode.getAttribute('slot')) {
-              childNode.hidden = true;
-              break;
-            }
-          } else {
-            // this is a default fallback slot node
-            // any element or text node (with content)
-            // should hide the default fallback slot node
-            if (
-              siblingNode.nodeType === NODE_TYPE.ElementNode ||
-              (siblingNode.nodeType === NODE_TYPE.TextNode && siblingNode.textContent.trim() !== '')
-            ) {
-              childNode.hidden = true;
-              break;
+          // Don't check the node against itself
+          if (siblingNode !== childNode) {
+            if (siblingNode['s-hn'] !== childNode['s-hn'] || slotName !== '') {
+              // this sibling node is from a different component OR is a named
+              // fallback slot node
+              if (
+                siblingNode.nodeType === NODE_TYPE.ElementNode &&
+                (slotName === siblingNode.getAttribute('slot') || slotName === siblingNode['s-sn'])
+              ) {
+                childNode.hidden = true;
+                break;
+              }
+            } else {
+              // this is a default fallback slot node
+              // any element or text node (with content)
+              // should hide the default fallback slot node
+              if (
+                siblingNode.nodeType === NODE_TYPE.ElementNode ||
+                (siblingNode.nodeType === NODE_TYPE.TextNode && siblingNode.textContent.trim() !== '')
+              ) {
+                childNode.hidden = true;
+                break;
+              }
             }
           }
         }
@@ -1009,8 +1022,7 @@ render() {
                 nodeToRelocate['s-hn'] = nodeToRelocate['s-ol'].parentNode.nodeName;
               }
 
-              // Handle a niche use-case where we relocate a slot from a non-shadow
-              // to shadow component (and potentially into further nested components) where
+              // Handle a use-case where we relocate a slot where
               // the slot name changes along the way (for instance, a default to a named slot).
               // In this case, we need to update the relocated node's slot attribute to match
               // the slot name it is being relocated into.
@@ -1021,7 +1033,6 @@ render() {
               if (
                 BUILD.experimentalSlotFixes &&
                 nodeToRelocate.nodeType === NODE_TYPE.ElementNode &&
-                slotRefNode.parentElement?.shadowRoot != null &&
                 slotRefNode['s-fs'] !== nodeToRelocate.getAttribute('slot')
               ) {
                 if (!slotRefNode['s-fs']) {
