@@ -218,3 +218,31 @@ export function relative(from: string, to: string): string {
 export function join(...paths: string[]): string {
   return normalizePath(path.join(...paths), false);
 }
+
+/**
+ * A wrapped version of node.js' {@link path.resolve} which adds our custom
+ * normalization logic. This resolves a path to a given (relative or absolute)
+ * path.
+ *
+ * @throws the underlying node function will throw if any argument is not a
+ * string
+ * @param paths a path or path fragments to resolve
+ * @returns a resolved path!
+ */
+export function resolve(...paths: string[]): string {
+  return normalizePath(path.resolve(...paths), false);
+}
+
+/**
+ * A wrapped version of node.js' {@link path.normalize} which adds our custom
+ * normalization logic. This normalizes a path, de-duping repeated segment
+ * separators and resolving `'..'` segments.
+ *
+ * @throws the underlying node function will throw if the argument is not a
+ * string
+ * @param toNormalize a path to normalize
+ * @returns a normalized path!
+ */
+export function normalize(toNormalize: string): string {
+  return normalizePath(path.normalize(toNormalize), false);
+}

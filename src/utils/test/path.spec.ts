@@ -1,4 +1,4 @@
-import { join, normalizeFsPathQuery, normalizePath, relative } from '../path';
+import { join, normalize, normalizeFsPathQuery, normalizePath, relative, resolve } from '../path';
 
 describe('normalizePath', () => {
   it('node module', () => {
@@ -147,6 +147,20 @@ describe('normalizeFsPathQuery', () => {
       expect(relative('foo/bar', '..')).toBe('../../..');
       expect(relative('foo/bar/baz', 'foo/bar/boz')).toBe('../boz');
       expect(relative('.', '../foo/bar')).toBe('../foo/bar');
+    });
+
+    it('resolve should always return a POSIX path', () => {
+      expect(resolve('.')).toBe(normalizePath(process.cwd()));
+      expect(resolve('foo/bar/baz')).toBe(join(normalizePath(process.cwd()), 'foo/bar/baz'));
+      expect(resolve('foo\\bar\\baz')).toBe(join(normalizePath(process.cwd()), 'foo/bar/baz'));
+    });
+
+    it('normalize should always return a POSIX path', () => {
+      // these examples taken from
+      // https://nodejs.org/api/path.html#pathnormalizepath
+      expect(normalize('\\temp\\\\foo\\bar\\..\\')).toBe('/temp/foo');
+      expect(normalize('/temp/foo//bar/../')).toBe('/temp/foo');
+      expect(normalize('/foo/bar//baz/asdf/quux/..')).toBe('/foo/bar/baz/asdf');
     });
   });
 });
