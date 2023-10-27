@@ -960,22 +960,13 @@ render() {
     if (checkSlotRelocate) {
       markSlotContentForRelocation(rootVnode.$elm$);
 
-      let relocateData: RelocateNodeData;
-      let nodeToRelocate: d.RenderNode;
-      let orgLocationNode: d.RenderNode;
-      let parentNodeRef: Node;
-      let insertBeforeNode: Node;
-      let refNode: d.RenderNode;
-      let i = 0;
-
-      for (; i < relocateNodes.length; i++) {
-        relocateData = relocateNodes[i];
-        nodeToRelocate = relocateData.$nodeToRelocate$;
+      for (const relocateData of relocateNodes) {
+        const nodeToRelocate = relocateData.$nodeToRelocate$;
 
         if (!nodeToRelocate['s-ol']) {
           // add a reference node marking this node's original location
           // keep a reference to this node for later lookups
-          orgLocationNode =
+          const orgLocationNode =
             BUILD.isDebug || BUILD.hydrateServerSide
               ? originalLocationDebugNode(nodeToRelocate)
               : (doc.createTextNode('') as any);
@@ -985,26 +976,45 @@ render() {
         }
       }
 
-      for (i = 0; i < relocateNodes.length; i++) {
-        relocateData = relocateNodes[i];
-        nodeToRelocate = relocateData.$nodeToRelocate$;
+      for (const relocateData of relocateNodes) {
+        const nodeToRelocate = relocateData.$nodeToRelocate$;
         const slotRefNode = relocateData.$slotRefNode$;
 
         if (slotRefNode) {
-          // by default we're just going to insert it directly
-          // after the slot reference node
-          parentNodeRef = slotRefNode.parentNode;
-          insertBeforeNode = slotRefNode.nextSibling;
-          orgLocationNode = nodeToRelocate['s-ol'] as any;
+          const parentNodeRef = slotRefNode.parentNode;
+          // When determining where to insert content, the most simple case would be
+          // to relocate the node immediately following the slot reference node. We do this
+          // by getting a reference to the node immediately following the slot reference node
+          // since we will use `insertBefore` to manipulate the DOM.
+          //
+          // If there is no node immediately following the slot reference node, then we will just
+          // end up appending the node as the last child of the parent.
+          let insertBeforeNode = slotRefNode.nextSibling as d.RenderNode | null;
 
-          while ((orgLocationNode = orgLocationNode.previousSibling as any)) {
-            refNode = orgLocationNode['s-nr'];
-            if (refNode && refNode['s-sn'] === nodeToRelocate['s-sn'] && parentNodeRef === refNode.parentNode) {
-              refNode = refNode.nextSibling as any;
-              if (!refNode || !refNode['s-nr']) {
-                insertBeforeNode = refNode;
-                break;
+          // If the node we're currently planning on inserting the new node before is an element,
+          // we need to do some additional checks to make sure we're inserting the node in the correct order.
+          // The use case here would be that we have multiple nodes being relocated to the same slot. So, we want
+          // to make sure they get inserted into their new how in the same order they were declared in their original location.
+          //
+          // TODO(STENCIL-914): Remove `experimentalSlotFixes` check
+          if (
+            !BUILD.experimentalSlotFixes ||
+            (insertBeforeNode && insertBeforeNode.nodeType === NODE_TYPE.ElementNode)
+          ) {
+            let orgLocationNode = nodeToRelocate['s-ol']?.previousSibling as d.RenderNode | null;
+
+            while (orgLocationNode) {
+              let refNode = orgLocationNode['s-nr'] ?? null;
+
+              if (refNode && refNode['s-sn'] === nodeToRelocate['s-sn'] && parentNodeRef === refNode.parentNode) {
+                refNode = refNode.nextSibling as any;
+                if (!refNode || !refNode['s-nr']) {
+                  insertBeforeNode = refNode;
+                  break;
+                }
               }
+
+              orgLocationNode = orgLocationNode.previousSibling as d.RenderNode | null;
             }
           }
 
@@ -1042,7 +1052,10 @@ render() {
                 }
               }
 
-              // add it back to the dom but in its new home
+              // Add it back to the dom but in its new home
+              // If we get to this point and `insertBeforeNode` is `null`, that means
+              // we're just going to append the node as the last child of the parent. Passing
+              // `null` as the second arg here will trigger that behavior.
               parentNodeRef.insertBefore(nodeToRelocate, insertBeforeNode);
             }
           }
