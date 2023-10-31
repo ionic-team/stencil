@@ -1,11 +1,9 @@
-import { getMockFSPatch } from '@stencil/core/testing';
-import { createNodeSys } from '@sys-api-node';
-import fs from 'fs';
-import mock from 'mock-fs';
 import path from 'path';
+import ts from 'typescript';
 
 import { ConfigFlags } from '../../../cli/config-flags';
 import type * as d from '../../../declarations';
+import { createTestingSystem } from '../../../testing/testing-sys';
 import { normalizePath } from '../../../utils';
 import { loadConfig } from '../load-config';
 
@@ -16,37 +14,18 @@ describe('load config', () => {
   let sys: d.CompilerSystem;
 
   beforeEach(() => {
-    sys = createNodeSys();
+    // TODO(NOW): fix types
+    sys = createTestingSystem() as unknown as d.CompilerSystem;
 
-    const tsconfig = JSON.stringify(
-      {
-        compilerOptions: {
-          allowSyntheticDefaultImports: true,
-          experimentalDecorators: true,
-          lib: ['dom', 'es2015'],
-          moduleResolution: 'node',
-          module: 'esnext',
-          target: 'es2017',
-          jsx: 'react',
-          jsxFactory: 'h',
-          jsxFragmentFactory: 'Fragment',
-        },
-        include: ['src'],
-      },
-      null,
-      2,
-    );
-
-    mock({
-      [configPath]: mock.load(path.resolve(__dirname, configPath)),
-      [configPath2]: mock.load(path.resolve(__dirname, configPath2)),
-      'fixtures/tsconfig.json': tsconfig,
-      ...getMockFSPatch(mock),
+    jest.spyOn(ts, 'getParsedCommandLineOfConfigFile').mockReturnValue({
+      options: null,
+      fileNames: [],
+      errors: [],
     });
   });
 
   afterEach(() => {
-    mock.restore();
+    jest.clearAllMocks();
   });
 
   it("merges a user's configuration with a stencil.config file on disk", async () => {
@@ -92,7 +71,7 @@ describe('load config', () => {
 
   describe('empty initialization argument', () => {
     it('provides sensible default values with no config', async () => {
-      const loadedConfig = await loadConfig({ initTsConfig: true });
+      const loadedConfig = await loadConfig({ initTsConfig: true, sys });
 
       const actualConfig = loadedConfig.config;
       expect(actualConfig).toBeDefined();
@@ -103,14 +82,14 @@ describe('load config', () => {
 
     it('creates a tsconfig file when "initTsConfig" set', async () => {
       const tsconfigPath = path.resolve(path.dirname(configPath), 'tsconfig.json');
-      expect(fs.existsSync(tsconfigPath)).toBe(false);
-      const loadedConfig = await loadConfig({ initTsConfig: true, configPath });
-      expect(fs.existsSync(tsconfigPath)).toBe(true);
+      expect(sys.accessSync(tsconfigPath)).toBe(false);
+      const loadedConfig = await loadConfig({ initTsConfig: true, configPath, sys });
+      expect(sys.accessSync(tsconfigPath)).toBe(true);
       expect(loadedConfig.diagnostics).toHaveLength(0);
     });
 
     it('errors that a tsconfig file could not be created when "initTsConfig" isn\'t present', async () => {
-      const loadedConfig = await loadConfig({ configPath });
+      const loadedConfig = await loadConfig({ configPath, sys });
       expect(loadedConfig.diagnostics).toHaveLength(1);
       expect<d.Diagnostic>(loadedConfig.diagnostics[0]).toEqual({
         absFilePath: undefined,
@@ -128,7 +107,7 @@ describe('load config', () => {
 
   describe('no initialization argument', () => {
     it('errors that a tsconfig file cannot be found', async () => {
-      const loadConfigResults = await loadConfig();
+      const loadConfigResults = await loadConfig({ sys });
       expect(loadConfigResults.diagnostics).toHaveLength(1);
       expect<d.Diagnostic>(loadConfigResults.diagnostics[0]).toEqual({
         absFilePath: undefined,
