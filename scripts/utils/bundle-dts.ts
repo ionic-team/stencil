@@ -13,12 +13,18 @@ import { BuildOptions } from './options';
  * @param opts an object holding information about the current build of Stencil
  * @param inputFile the path to the file which should be bundled
  * @param outputOptions options for bundling the file
+ * @param useCache whether or not the bundled file should be cached to disk
  * @returns a string containing the bundled typedef
  */
-export async function bundleDts(opts: BuildOptions, inputFile: string, outputOptions?: OutputOptions): Promise<string> {
+export async function bundleDts(
+  opts: BuildOptions,
+  inputFile: string,
+  outputOptions?: OutputOptions,
+  useCache = true,
+): Promise<string> {
   const cachedDtsOutput = inputFile + '-bundled.d.ts';
 
-  if (!opts.isProd) {
+  if (!opts.isProd && useCache) {
     try {
       return await fs.readFile(cachedDtsOutput, 'utf8');
     } catch (e) {}
@@ -34,7 +40,9 @@ export async function bundleDts(opts: BuildOptions, inputFile: string, outputOpt
 
   const outputCode = cleanDts(generateDtsBundle([config]).join('\n'));
 
-  await fs.writeFile(cachedDtsOutput, outputCode);
+  if (useCache) {
+    await fs.writeFile(cachedDtsOutput, outputCode);
+  }
 
   return outputCode;
 }
