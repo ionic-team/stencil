@@ -47,8 +47,7 @@ describe('stencil config - sourceMap option', () => {
   };
 
   beforeEach(() => {
-    // TODO(NOW): fix types
-    sys = createTestingSystem() as unknown as d.CompilerSystem;
+    sys = createTestingSystem();
   });
 
   afterEach(() => {

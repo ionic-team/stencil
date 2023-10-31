@@ -14,8 +14,7 @@ describe('load config', () => {
   let sys: d.CompilerSystem;
 
   beforeEach(() => {
-    // TODO(NOW): fix types
-    sys = createTestingSystem() as unknown as d.CompilerSystem;
+    sys = createTestingSystem();
 
     jest.spyOn(ts, 'getParsedCommandLineOfConfigFile').mockReturnValue({
       options: null,
