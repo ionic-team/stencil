@@ -1,6 +1,7 @@
 import { ValidatedConfig } from '@stencil/core/declarations';
 import { mockLogger, mockValidatedConfig, setupConsoleMocker } from '@stencil/core/testing';
 import { normalizePath } from '@utils';
+import { relative } from '@utils';
 import path from 'path';
 
 import { addFileToLibrary, getTypeLibrary } from '../type-library';
@@ -46,7 +47,7 @@ describe('type library', () => {
   it('should include an enum', () => {
     addFileToLibrary(config, mealModulePath);
 
-    const relativePath = path.relative(config.rootDir, mealModulePath);
+    const relativePath = relative(config.rootDir, mealModulePath);
 
     expect(getTypeLibrary()[`${relativePath}::BestEnum`]).toEqual({
       declaration: `export enum BestEnum {
@@ -62,7 +63,7 @@ describe('type library', () => {
   it('should include a string union', () => {
     addFileToLibrary(config, mealModulePath);
 
-    const relativePath = path.relative(config.rootDir, mealModulePath);
+    const relativePath = relative(config.rootDir, mealModulePath);
 
     expect(getTypeLibrary()[`${relativePath}::StringUnion`]).toEqual({
       declaration: `export type StringUnion = 'left' | 'right';`,
@@ -74,7 +75,7 @@ describe('type library', () => {
   it('should include a simple alias', () => {
     addFileToLibrary(config, mealModulePath);
 
-    const relativePath = path.relative(config.rootDir, mealModulePath);
+    const relativePath = relative(config.rootDir, mealModulePath);
 
     expect(getTypeLibrary()[`${relativePath}::JustAnAlias`]).toEqual({
       declaration: `string`,
@@ -85,14 +86,14 @@ describe('type library', () => {
 
   it('should exclude any private types', () => {
     addFileToLibrary(config, mealModulePath);
-    const relativePath = path.relative(config.rootDir, mealModulePath);
+    const relativePath = relative(config.rootDir, mealModulePath);
     expect(getTypeLibrary()[`${relativePath}::PrivateType`]).toBeUndefined();
   });
 
   it('should include an aliased type re-export', () => {
     addFileToLibrary(config, mealModulePath);
 
-    const relativePath = path.relative(config.rootDir, dessertModulePath);
+    const relativePath = relative(config.rootDir, dessertModulePath);
 
     expect(getTypeLibrary()[`${relativePath}::IceCream`]).toEqual({
       declaration: `export interface IceCream {
@@ -107,7 +108,7 @@ describe('type library', () => {
   it('should include an aliased re-export', () => {
     addFileToLibrary(config, mealModulePath);
 
-    const relativePath = path.relative(config.rootDir, dessertModulePath);
+    const relativePath = relative(config.rootDir, dessertModulePath);
 
     expect(getTypeLibrary()[`${relativePath}::Cake`]).toEqual({
       declaration: `export interface Cake {
@@ -121,7 +122,7 @@ describe('type library', () => {
   it('should include a type re-export', () => {
     addFileToLibrary(config, mealModulePath);
 
-    const relativePath = path.relative(config.rootDir, dessertModulePath);
+    const relativePath = relative(config.rootDir, dessertModulePath);
 
     expect(getTypeLibrary()[`${relativePath}::Pie`]).toEqual({
       declaration: `export interface Pie {
@@ -135,7 +136,7 @@ describe('type library', () => {
   it('should include a re-export', () => {
     addFileToLibrary(config, mealModulePath);
 
-    const relativePath = path.relative(config.rootDir, dessertModulePath);
+    const relativePath = relative(config.rootDir, dessertModulePath);
 
     expect(getTypeLibrary()[`${relativePath}::Cookie`]).toEqual({
       declaration: `export interface Cookie {
@@ -149,7 +150,7 @@ describe('type library', () => {
   it('should include a type when `export *` is used', () => {
     addFileToLibrary(config, mealModulePath);
 
-    const relativePath = path.relative(config.rootDir, dessertModulePath);
+    const relativePath = relative(config.rootDir, dessertModulePath);
 
     expect(getTypeLibrary()[`${relativePath}::Candy`]).toEqual({
       declaration: `export interface Candy {
