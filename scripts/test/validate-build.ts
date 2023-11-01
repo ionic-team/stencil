@@ -232,6 +232,7 @@ function validateDts(opts: BuildOptions, dtsEntries: string[]): void {
       '@stencil/core/mock-doc': [join(opts.rootDir, 'mock-doc', 'index.d.ts')],
       '@stencil/core/internal': [join(opts.rootDir, 'internal', 'index.d.ts')],
       '@stencil/core/internal/testing': [join(opts.rootDir, 'internal', 'testing', 'index.d.ts')],
+      '@stencil/core/declarations': [join(opts.rootDir, 'internal', 'index.d.ts')],
     },
     moduleResolution: ModuleResolutionKind.NodeJs,
     target: ScriptTarget.ES2016,
