@@ -128,6 +128,8 @@ async function copyTestingInternalDts(opts: BuildOptions, inputDir: string) {
     },
   });
 
+  // Replace `@stencil/core/declarations` imports with `@stencil/core/internal` imports in
+  // all typedef files
   const files = await fs.readdir(opts.output.testingDir);
   for (const file of files) {
     if (file.endsWith('.d.ts')) {
