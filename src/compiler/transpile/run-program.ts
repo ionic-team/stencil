@@ -132,7 +132,10 @@ export const runTsProgram = async (
     await Promise.all(srcRootDtsFiles);
   }
 
-  if (config.validateTypes) {
+  // TODO(STENCIL-540): remove `hasTypesChanged` check and figure out how to generate types before
+  // executing the TS build program so we don't get semantic diagnostic errors about referencing the
+  // auto-generated `components.d.ts` file.
+  if (config.validateTypes && !hasTypesChanged) {
     const tsSemantic = loadTypeScriptDiagnostics(tsBuilder.getSemanticDiagnostics());
     if (config.devMode) {
       tsSemantic.forEach((semanticDiagnostic) => {
