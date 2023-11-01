@@ -1,4 +1,4 @@
-import { CompilerSystem } from '@stencil/core/declarations';
+import type { CompilerSystem } from '@stencil/core/declarations';
 import { createHash } from 'crypto';
 import path from 'path';
 
