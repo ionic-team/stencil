@@ -56,7 +56,7 @@ describe('stencil config - sourceMap option', () => {
 
   it('sets sourceMap options to true in tsconfig', async () => {
     const testConfig = getLoadConfigForTests({ config: { sourceMap: true } });
-    mockTsConfigParser(testConfig.config.sourceMap);
+    mockTsConfigParser(testConfig.config!.sourceMap!);
 
     const loadConfigResults = await loadConfig(testConfig);
 
@@ -67,7 +67,7 @@ describe('stencil config - sourceMap option', () => {
 
   it('sets sourceMap options to false in tsconfig', async () => {
     const testConfig = getLoadConfigForTests({ config: { sourceMap: false } });
-    mockTsConfigParser(testConfig.config.sourceMap);
+    mockTsConfigParser(testConfig.config!.sourceMap!);
 
     const loadConfigResults = await loadConfig(testConfig);
 
@@ -78,7 +78,7 @@ describe('stencil config - sourceMap option', () => {
 
   it('sets the sourceMap options to true in tsconfig by default', async () => {
     const testConfig = getLoadConfigForTests();
-    mockTsConfigParser(testConfig.config.sourceMap);
+    mockTsConfigParser(testConfig.config!.sourceMap!);
 
     const loadConfigResults = await loadConfig(testConfig);
 

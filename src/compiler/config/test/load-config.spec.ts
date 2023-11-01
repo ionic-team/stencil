@@ -17,7 +17,10 @@ describe('load config', () => {
     sys = createTestingSystem();
 
     jest.spyOn(ts, 'getParsedCommandLineOfConfigFile').mockReturnValue({
-      options: null,
+      options: {
+        target: ts.ScriptTarget.ES2017,
+        module: ts.ModuleKind.ESNext,
+      },
       fileNames: [],
       errors: [],
     });
