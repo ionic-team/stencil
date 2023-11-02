@@ -2,6 +2,7 @@ import { addDocBlock, GENERATED_DTS, getComponentsDtsSrcFilePath, normalizePath,
 import { isAbsolute } from 'path';
 
 import type * as d from '../../declarations';
+import { getModule } from '../transpile/transpiled-module';
 import { generateComponentTypes } from './generate-component-types';
 import { generateEventDetailTypes } from './generate-event-detail-types';
 import { updateStencilTypesImports } from './stencil-types';
@@ -78,9 +79,6 @@ const generateComponentTypesFile = (
   const modules: d.TypesModule[] = components
     .filter((cmp) => cmp.tagName != null)
     .map((cmp) => {
-      // TODO: we'll likely need to merge some data here to generate types for components correctly that
-      // use inheritance
-
       /**
        * Generate a key-value store that uses the path to the file where an import is defined as the key, and an object
        * containing the import's original name and any 'new' name we give it to avoid collisions. We're generating this
@@ -94,7 +92,10 @@ const generateComponentTypesFile = (
          */
         componentEventDetailTypes.push(generateEventDetailTypes(cmp));
       }
-      return generateComponentTypes(cmp, typeImportData, areTypesInternal);
+
+      const cmpClone = combineInheritedCompilerMeta(buildCtx.compilerCtx, cmp);
+
+      return generateComponentTypes(cmpClone, typeImportData, areTypesInternal);
     });
 
   c.push(COMPONENTS_DTS_HEADER);
@@ -176,4 +177,24 @@ const generateComponentTypesFile = (
   c.push(`}`);
 
   return c.join(`\n`) + `\n`;
+};
+
+// TODO: make recursive and abstract for use in `proxy-custom-element-function` as well
+const combineInheritedCompilerMeta = (compilerCtx: d.CompilerCtx, compilerMeta: d.ComponentCompilerMeta) => {
+  const clone = { ...compilerMeta };
+
+  if (compilerMeta.parentClassPath) {
+    const parentModule = getModule(compilerCtx, compilerMeta.parentClassPath);
+
+    if (parentModule?.cmps.length) {
+      const parentCmp = parentModule.cmps[0];
+      clone.watchers = [...(clone.watchers ?? []), ...(parentCmp.watchers ?? [])];
+      clone.listeners = [...(clone.listeners ?? []), ...(parentCmp.listeners ?? [])];
+      clone.properties = [...(clone.properties ?? []), ...(parentCmp.properties ?? [])];
+      clone.states = [...(clone.states ?? []), ...(parentCmp.states ?? [])];
+      clone.methods = [...(clone.methods ?? []), ...(parentCmp.methods ?? [])];
+    }
+  }
+
+  return clone;
 };

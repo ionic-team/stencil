@@ -116,18 +116,20 @@ export const proxyCustomElement = (
 
 // TODO: make recursive
 const combineInheritedCompilerMeta = (compilerCtx: d.CompilerCtx, compilerMeta: d.ComponentCompilerMeta) => {
+  const clone = { ...compilerMeta };
+
   if (compilerMeta.parentClassPath) {
     const parentModule = getModule(compilerCtx, compilerMeta.parentClassPath);
 
     if (parentModule?.cmps.length) {
       const parentCmp = parentModule.cmps[0];
-      compilerMeta.watchers = [...(compilerMeta.watchers ?? []), ...(parentCmp.watchers ?? [])];
-      compilerMeta.listeners = [...(compilerMeta.listeners ?? []), ...(parentCmp.listeners ?? [])];
-      compilerMeta.properties = [...(compilerMeta.properties ?? []), ...(parentCmp.properties ?? [])];
-      compilerMeta.states = [...(compilerMeta.states ?? []), ...(parentCmp.states ?? [])];
-      compilerMeta.methods = [...(compilerMeta.methods ?? []), ...(parentCmp.methods ?? [])];
+      clone.watchers = [...(clone.watchers ?? []), ...(parentCmp.watchers ?? [])];
+      clone.listeners = [...(clone.listeners ?? []), ...(parentCmp.listeners ?? [])];
+      clone.properties = [...(clone.properties ?? []), ...(parentCmp.properties ?? [])];
+      clone.states = [...(clone.states ?? []), ...(parentCmp.states ?? [])];
+      clone.methods = [...(clone.methods ?? []), ...(parentCmp.methods ?? [])];
     }
   }
 
-  return compilerMeta;
+  return clone;
 };
