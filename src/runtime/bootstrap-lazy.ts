@@ -15,7 +15,7 @@ import {
 import { hmrStart } from './hmr-component';
 import { createTime, installDevTools } from './profile';
 import { proxyComponent } from './proxy-component';
-import { HYDRATED_CSS, HYDRATED_STYLE_ID, PLATFORM_FLAGS, PROXY_FLAGS } from './runtime-constants';
+import { HYDRATED_CSS, HYDRATED_STYLE_ID, PLATFORM_FLAGS, PROXY_FLAGS, SLOT_FB_CSS } from './runtime-constants';
 import { convertScopedToShadow, registerStyle } from './styles';
 import { appDidLoad } from './update-component';
 export { setNonce } from '@platform';
@@ -185,7 +185,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
     });
   });
 
-  dataStyles.innerHTML = 'slot-fb:not([hidden]){display:contents}';
+  dataStyles.innerHTML = SLOT_FB_CSS;
   dataStyles.setAttribute('data-styles', '');
   head.insertBefore(dataStyles, metaCharset ? metaCharset.nextSibling : head.firstChild);
 
