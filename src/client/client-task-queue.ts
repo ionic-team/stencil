@@ -96,7 +96,7 @@ const flush = () => {
   }
 };
 
-export const nextTick = /*@__PURE__*/ (cb: () => void) => promiseResolve().then(cb);
+export const nextTick = (cb: () => void) => promiseResolve().then(cb);
 
 export const readTask = /*@__PURE__*/ queueTask(queueDomReads, false);
 
