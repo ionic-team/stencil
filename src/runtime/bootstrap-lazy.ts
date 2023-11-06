@@ -32,7 +32,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
   const customElements = win.customElements;
   const head = doc.head;
   const metaCharset = /*@__PURE__*/ head.querySelector('meta[charset]');
-  const visibilityStyle = /*@__PURE__*/ doc.createElement('style');
+  const dataStyles = /*@__PURE__*/ doc.createElement('style');
   const deferredConnectedCallbacks: { connectedCallback: () => void }[] = [];
   const styles = /*@__PURE__*/ doc.querySelectorAll(`[${HYDRATED_STYLE_ID}]`);
   let appLoadFallback: any;
@@ -185,18 +185,18 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
     });
   });
 
-  visibilityStyle.innerHTML = 'slot-fb:not([hidden]){display:contents}';
-  visibilityStyle.setAttribute('data-styles', '');
-  head.insertBefore(visibilityStyle, metaCharset ? metaCharset.nextSibling : head.firstChild);
+  dataStyles.innerHTML = 'slot-fb:not([hidden]){display:contents}';
+  dataStyles.setAttribute('data-styles', '');
+  head.insertBefore(dataStyles, metaCharset ? metaCharset.nextSibling : head.firstChild);
 
   if (BUILD.invisiblePrehydration && (BUILD.hydratedClass || BUILD.hydratedAttribute)) {
-    visibilityStyle.innerHTML += cmpTags + HYDRATED_CSS;
+    dataStyles.innerHTML += cmpTags + HYDRATED_CSS;
   }
 
   // Apply CSP nonce to the style tag if it exists
   const nonce = plt.$nonce$ ?? queryNonceMetaTagContent(doc);
   if (nonce != null) {
-    visibilityStyle.setAttribute('nonce', nonce);
+    dataStyles.setAttribute('nonce', nonce);
   }
 
   // Process deferred connectedCallbacks now all components have been registered
