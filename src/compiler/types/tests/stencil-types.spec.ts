@@ -76,7 +76,10 @@ describe('stencil-types', () => {
         const typeReferences: d.ComponentCompilerTypeReferences = {
           // we're testing the `path` value doesn't exist on the type import data.
           // in practice this should never happen, but let's ensure that we cover this case explicitly in tests
-          [expectedTypeName]: stubComponentCompilerTypeReference({ location: 'import',  path: 'some/mock/unknown/path'}),
+          [expectedTypeName]: stubComponentCompilerTypeReference({
+            location: 'import',
+            path: 'some/mock/unknown/path',
+          }),
         };
 
         const actualTypeName = updateTypeIdentifierNames(
