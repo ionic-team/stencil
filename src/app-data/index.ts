@@ -56,6 +56,7 @@ export const BUILD: BuildConditionals = {
   cssAnnotations: true,
   state: true,
   style: true,
+  formAssociated: false,
   svg: true,
   updatable: true,
   vdomAttribute: true,
@@ -108,7 +109,7 @@ export const BUILD: BuildConditionals = {
   transformTagName: false,
   attachStyles: true,
   // TODO(STENCIL-914): remove this option when `experimentalSlotFixes` is the default behavior
-  patchPseudoShadowDom: false,
+  experimentalSlotFixes: false,
 };
 
 export const Env = {};

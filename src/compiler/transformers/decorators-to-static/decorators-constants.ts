@@ -2,6 +2,7 @@
  * All the decorators supported by Stencil
  */
 export const STENCIL_DECORATORS = [
+  'AttachInternals',
   'Component',
   'Element',
   'Event',
@@ -25,6 +26,7 @@ export const CLASS_DECORATORS_TO_REMOVE = ['Component'] as const satisfies reado
  * process
  */
 export const MEMBER_DECORATORS_TO_REMOVE = [
+  'AttachInternals',
   'Element',
   'Event',
   'Listen',
@@ -47,11 +49,13 @@ export const CONSTRUCTOR_DEFINED_MEMBER_DECORATORS = ['State', 'Prop'] as const 
 export const STATIC_GETTER_NAMES = [
   'COMPILER_META',
   'assetsDirs',
+  'attachInternalsMemberName',
   'cmpMeta',
   'delegatesFocus',
   'elementRef',
   'encapsulation',
   'events',
+  'formAssociated',
   'is',
   'listeners',
   'methods',

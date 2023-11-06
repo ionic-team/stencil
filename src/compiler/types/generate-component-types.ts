@@ -1,6 +1,7 @@
 import { addDocBlock, dashToPascalCase, sortBy } from '@utils';
 
 import type * as d from '../../declarations';
+import { generateEventListenerTypes } from './generate-event-listener-types';
 import { generateEventTypes } from './generate-event-types';
 import { generateMethodTypes } from './generate-method-types';
 import { generatePropTypes } from './generate-prop-types';
@@ -24,6 +25,7 @@ export const generateComponentTypes = (
   const propAttributes = generatePropTypes(cmp, typeImportData);
   const methodAttributes = generateMethodTypes(cmp, typeImportData);
   const eventAttributes = generateEventTypes(cmp, typeImportData, tagNameAsPascal);
+  const { htmlElementEventMap, htmlElementEventListenerProperties } = generateEventListenerTypes(cmp, typeImportData);
 
   const componentAttributes = attributesToMultiLineString(
     [...propAttributes, ...methodAttributes],
@@ -34,11 +36,13 @@ export const generateComponentTypes = (
   const jsxAttributes = attributesToMultiLineString([...propAttributes, ...eventAttributes], true, areTypesInternal);
 
   const element = [
+    ...htmlElementEventMap,
     addDocBlock(
       `        interface ${htmlElementName} extends Components.${tagNameAsPascal}, HTMLStencilElement {`,
       cmp.docs,
       4,
     ),
+    ...htmlElementEventListenerProperties,
     `        }`,
     `        var ${htmlElementName}: {`,
     `                prototype: ${htmlElementName};`,

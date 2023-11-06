@@ -29,6 +29,9 @@ export const formatComponentRuntimeMeta = (
   } else if (compilerMeta.encapsulation === 'scoped') {
     flags |= CMP_FLAGS.scopedCssEncapsulation;
   }
+  if (compilerMeta.formAssociated) {
+    flags |= CMP_FLAGS.formAssociated;
+  }
   if (compilerMeta.encapsulation !== 'shadow' && compilerMeta.htmlTagNames.includes('slot')) {
     flags |= CMP_FLAGS.hasSlotRelocation;
   }

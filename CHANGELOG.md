@@ -1,3 +1,58 @@
+# 💪 [4.7.0](https://github.com/ionic-team/stencil/compare/v4.6.0...v4.7.0) (2023-10-30)
+
+
+### Bug Fixes
+
+* **runtime:** prevent additional attempted move of slot content ([#4921](https://github.com/ionic-team/stencil/issues/4921)) ([adb3ccf](https://github.com/ionic-team/stencil/commit/adb3ccf2d58c4a2f3f97d2dc9fbe8c8fd4daac62))
+* **runtime:** relocate slot content from non-shadow to shadow components w/ slot name change ([#4940](https://github.com/ionic-team/stencil/issues/4940)) ([0fe78c7](https://github.com/ionic-team/stencil/commit/0fe78c74ceea857641d0ce1ad7634c4fbd372e8e))
+* **runtime:** slot name forwarding & attribute reset ([#4993](https://github.com/ionic-team/stencil/issues/4993)) ([ee60f3b](https://github.com/ionic-team/stencil/commit/ee60f3b33bcd44acb29261ab444c111513cccd4b))
+* **runtime:** slotted content order with sibling elements ([#4994](https://github.com/ionic-team/stencil/issues/4994)) ([740c1e4](https://github.com/ionic-team/stencil/commit/740c1e4faaf8bc221a2db32e2923c1efc553fd8b))
+* **runtime:** support "capture" style events ([#4968](https://github.com/ionic-team/stencil/issues/4968)) ([2c8cfac](https://github.com/ionic-team/stencil/commit/2c8cfac6389730f82bfeff776c5f495cafe0b627))
+* **www:** ensure that files necessary for www build are on disk ([#4992](https://github.com/ionic-team/stencil/issues/4992)) ([b74220b](https://github.com/ionic-team/stencil/commit/b74220bed26bfa0c869cf1be0e3ebb5b8527f594))
+* **www:** fix an inconsistency between www builds ([#4983](https://github.com/ionic-team/stencil/issues/4983)) ([f113b05](https://github.com/ionic-team/stencil/commit/f113b052af728a0e5dbc96b1cdc443405c277ec1))
+
+
+### Features
+
+* **test:** jest 28 support ([#4979](https://github.com/ionic-team/stencil/issues/4979)) ([d3aa539](https://github.com/ionic-team/stencil/commit/d3aa5395b8c6c54ccf9eb90811649749875b5a17))
+* **test:** jest 29 support ([#4981](https://github.com/ionic-team/stencil/issues/4981)) ([4959295](https://github.com/ionic-team/stencil/commit/4959295c24ec3effcc8d63a8305dffd6e07a617d))
+
+
+
+# 💥 [4.6.0](https://github.com/ionic-team/stencil/compare/v4.5.0...v4.6.0) (2023-10-23)
+
+
+### Bug Fixes
+
+* **compiler:** consistently generate additional type files ([#4938](https://github.com/ionic-team/stencil/issues/4938)) ([70cba50](https://github.com/ionic-team/stencil/commit/70cba503e881755f5d24d2f23a8e121aedf5a805))
+* **compiler:** persist polyfills on build ([#4932](https://github.com/ionic-team/stencil/issues/4932)) ([b97dadc](https://github.com/ionic-team/stencil/commit/b97dadc967b1fde892cb75a544b1eecd2361b194)), closes [#4661](https://github.com/ionic-team/stencil/issues/4661)
+* **runtime:** add height, width Source attrs ([#4943](https://github.com/ionic-team/stencil/issues/4943)) ([c9a3eac](https://github.com/ionic-team/stencil/commit/c9a3eac789c8fe9c6fdb6b7be2037a19ee361c6d)), closes [#4942](https://github.com/ionic-team/stencil/issues/4942)
+
+
+### Features
+
+* **types:** generate addEventListener and removeEventListener overloads to component html element type ([#4909](https://github.com/ionic-team/stencil/issues/4909)) ([0249798](https://github.com/ionic-team/stencil/commit/024979841f7124aa3bcce6a6ecd094dfecf1566c))
+
+
+
+# 📢 [4.5.0](https://github.com/ionic-team/stencil/compare/v4.4.1...v4.5.0) (2023-10-16)
+
+
+### Features
+
+* **compiler, runtime:** add support for form-associated elements ([#4784](https://github.com/ionic-team/stencil/issues/4784)) ([5976c9b](https://github.com/ionic-team/stencil/commit/5976c9b6a6e7b49d470390021b9c31e4d3cbbf4b))
+
+
+
+## ❤️ [4.4.1](https://github.com/ionic-team/stencil/compare/v4.4.0...v4.4.1) (2023-10-09)
+
+
+### Bug Fixes
+
+* **screenshot:** alert user when toMatchScreenshot uses NaN ([#4891](https://github.com/ionic-team/stencil/issues/4891)) ([a251946](https://github.com/ionic-team/stencil/commit/a251946106f116701787853893b3fa53dfaa8c9f))
+
+
+
 # 🍫 [4.4.0](https://github.com/ionic-team/stencil/compare/v4.3.0...v4.4.0) (2023-10-02)
 
 

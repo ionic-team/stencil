@@ -74,6 +74,7 @@ export interface BuildFeatures {
   // encapsulation
   style: boolean;
   mode: boolean;
+  formAssociated: boolean;
 
   // dom
   shadowDom: boolean;
@@ -185,7 +186,7 @@ export interface BuildConditionals extends Partial<BuildFeatures> {
   attachStyles?: boolean;
 
   // TODO(STENCIL-914): remove this option when `experimentalSlotFixes` is the default behavior
-  patchPseudoShadowDom?: boolean;
+  experimentalSlotFixes?: boolean;
 }
 
 export type ModuleFormat =
@@ -528,7 +529,12 @@ export interface CompilerCtx {
 
 export type NodeMap = WeakMap<any, ComponentCompilerMeta>;
 
-/** Must be serializable to JSON!! */
+/**
+ * Record, for a specific component, whether or not it has various features
+ * which need to be handled correctly in the compilation pipeline.
+ *
+ * Note: this must be serializable to JSON.
+ */
 export interface ComponentCompilerFeatures {
   hasAttribute: boolean;
   hasAttributeChangedCallbackFn: boolean;
@@ -596,30 +602,20 @@ export interface ComponentCompilerFeatures {
   potentialCmpRefs: string[];
 }
 
-/** Must be serializable to JSON!! */
+/**
+ * Metadata about a given component
+ *
+ * Note: must be serializable to JSON!
+ */
 export interface ComponentCompilerMeta extends ComponentCompilerFeatures {
   assetsDirs: CompilerAssetDir[];
+  /**
+   * The name to which an `ElementInternals` object (the return value of
+   * `HTMLElement.attachInternals`) should be attached at runtime. If this is
+   * `null` then `attachInternals` should not be called.
+   */
+  attachInternalsMemberName: string | null;
   componentClassName: string;
-  elementRef: string;
-  encapsulation: Encapsulation;
-  shadowDelegatesFocus: boolean;
-  excludeFromCollection: boolean;
-  isCollectionDependency: boolean;
-  docs: CompilerJsDoc;
-  jsFilePath: string;
-  sourceMapPath: string;
-  listeners: ComponentCompilerListener[];
-  events: ComponentCompilerEvent[];
-  methods: ComponentCompilerMethod[];
-  virtualProperties: ComponentCompilerVirtualProperty[];
-  properties: ComponentCompilerProperty[];
-  watchers: ComponentCompilerWatch[];
-  sourceFilePath: string;
-  states: ComponentCompilerState[];
-  styleDocs: CompilerStyleDoc[];
-  styles: StyleCompiler[];
-  tagName: string;
-  internal: boolean;
   /**
    * A list of web component tag names that are either:
    * - directly referenced in a Stencil component's JSX/h() function
@@ -640,6 +636,30 @@ export interface ComponentCompilerMeta extends ComponentCompilerFeatures {
    * A list of web component tag names that the current component directly in their JSX/h() function
    */
   directDependents?: string[];
+  docs: CompilerJsDoc;
+  elementRef: string;
+  encapsulation: Encapsulation;
+  events: ComponentCompilerEvent[];
+  excludeFromCollection: boolean;
+  /**
+   * Whether or not the component is form-associated
+   */
+  formAssociated: boolean;
+  internal: boolean;
+  isCollectionDependency: boolean;
+  jsFilePath: string;
+  listeners: ComponentCompilerListener[];
+  methods: ComponentCompilerMethod[];
+  properties: ComponentCompilerProperty[];
+  shadowDelegatesFocus: boolean;
+  sourceFilePath: string;
+  sourceMapPath: string;
+  states: ComponentCompilerState[];
+  styleDocs: CompilerStyleDoc[];
+  styles: StyleCompiler[];
+  tagName: string;
+  virtualProperties: ComponentCompilerVirtualProperty[];
+  watchers: ComponentCompilerWatch[];
 }
 
 /**
@@ -1065,6 +1085,16 @@ export interface HostElement extends HTMLElement {
   ['s-lr']?: boolean;
 
   /**
+   * A reference to the `ElementInternals` object for the current host
+   *
+   * This is used for maintaining a reference to the object between HMR
+   * refreshes in the lazy build.
+   *
+   * "stencil-element-internals"
+   */
+  ['s-ei']?: ElementInternals;
+
+  /**
    * On Render Callbacks:
    * Array of callbacks to fire off after it has rendered.
    */
@@ -1333,6 +1363,37 @@ export interface RenderNode extends HostElement {
    * node was created in.
    */
   ['s-hn']?: string;
+
+  /**
+   * Slot host tag name:
+   * This is the tag name of the element where this node
+   * has been moved to during slot relocation.
+   *
+   * This allows us to check if the node has been moved and prevent
+   * us from thinking a node _should_ be moved when it may already be in
+   * its final destination.
+   *
+   * This value is set to `undefined` whenever the node is put back into its original location.
+   */
+  ['s-sh']?: string;
+
+  /**
+   * Slot forward slot:
+   * This is the slot that the original `slot` tag element was going to be
+   * forwarded to in another element. For instance:
+   *
+   * ```html
+   * <my-cmp>
+   *  <slot name="my-slot" slot="another-slot"></slot>
+   * </my-cmp>
+   * ```
+   *
+   * In this case, the value would be `another-slot`.
+   *
+   * This allows us to correctly set the `slot` attribute on an element when it is moved
+   * from a non-shadow to shadow element.
+   */
+  ['s-fs']?: string;
 
   /**
    * Original Location Reference:
@@ -2036,10 +2097,10 @@ export interface JestEnvironmentGlobal {
   h: any;
   resourcesUrl: string;
   currentSpec?: {
-    id: string;
+    id?: string;
     description: string;
     fullName: string;
-    testPath: string;
+    testPath: string | null;
   };
   env: { [prop: string]: string };
   screenshotDescriptions: Set<string>;

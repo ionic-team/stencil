@@ -42,7 +42,15 @@ export const taskTest = async (config: ValidatedConfig): Promise<void> => {
   }
 
   try {
-    // let's test!
+    /**
+     * We dynamically import the testing submodule here in order for Stencil's lazy module checking to work properly.
+     *
+     * Prior to this call, we create a collection of string-based node module names and ensure that they're installed &
+     * on disk. The testing submodule includes `jest` (amongst other) testing libraries in its dependency chain. We need
+     * to run the lazy module check _before_ we include `jest` et al. in our dependency chain otherwise, the lazy module
+     * checking would fail to run properly (because we'd import `jest`, which wouldn't exist, before we even checked if
+     * it was installed).
+     */
     const { createTesting } = await import('@stencil/core/testing');
     const testing = await createTesting(config);
     const passed = await testing.run(testingRunOpts);

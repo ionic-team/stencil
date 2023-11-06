@@ -116,6 +116,7 @@ export const validateConfig = (
       ? userConfig.transformAliasedImportPaths
       : true,
     validatePrimaryPackageOutputTarget: userConfig.validatePrimaryPackageOutputTarget ?? false,
+    ...validateNamespace(config.namespace, config.fsNamespace, diagnostics),
     ...validatePaths(config),
   };
 
@@ -210,9 +211,6 @@ export const validateConfig = (
   if (!validatedConfig.env) {
     validatedConfig.env = {};
   }
-
-  // get a good namespace
-  validateNamespace(validatedConfig, diagnostics);
 
   // outputTargets
   validateOutputTargets(validatedConfig, diagnostics);

@@ -150,5 +150,6 @@ const hmrUpdateStyleElementUrl = (styleElm: HTMLStyleElement, versionId: string,
 const hmrUpdateLinkElementUrl = (linkElm: HTMLLinkElement, versionId: string, imageFileNames: string[]) => {
   linkElm.href = setQueryString(linkElm.href, 's-hmr-urls', imageFileNames.sort().join(','));
   linkElm.href = setHmrQueryString(linkElm.href, versionId);
+  // TODO(STENCIL-958): determine if we need to set this attribute
   linkElm.setAttribute('data-hmr', versionId);
 };

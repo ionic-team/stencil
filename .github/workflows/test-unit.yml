@@ -4,6 +4,11 @@ on:
   workflow_call:
     # Make this a reusable workflow, no value needed
     # https://docs.github.com/en/actions/using-workflows/reusing-workflows
+    inputs:
+      build_name:
+        description: Name for the build, used to resolve the correct build artifact
+        required: true
+        type: string
 
 jobs:
   unit_test:
@@ -17,13 +22,13 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout Code
-        uses: actions/checkout@8ade135a41bc03ea155e62e844d188df1ea18608 # v4.1.0
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
 
       - name: Get Core Dependencies
         uses: ./.github/workflows/actions/get-core-dependencies
 
       - name: Use Node ${{ matrix.node }}
-        uses: actions/setup-node@5e21ff4d9bc1a8cf6de233a3057d20ec6b3fb69d # v3.8.1
+        uses: actions/setup-node@8f152de45cc393bb48ce5d89d36b731f54556e65 # v4.0.0
         with:
           node-version: ${{ matrix.node }}
           cache: 'npm'
@@ -31,7 +36,7 @@ jobs:
       - name: Download Build Archive
         uses: ./.github/workflows/actions/download-archive
         with:
-          name: stencil-core
+          name: ${{ inputs.build_name }}
           path: .
           filename: stencil-core-build.zip
 

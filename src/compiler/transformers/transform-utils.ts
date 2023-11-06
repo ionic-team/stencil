@@ -176,7 +176,7 @@ export const createStaticGetter = (
  * @param staticName the name of the static getter to pull a value from
  * @returns a TypeScript value, converted from its TypeScript syntax tree representation
  */
-export const getStaticValue = (staticMembers: ts.ClassElement[], staticName: string): any => {
+export const getStaticValue = (staticMembers: ts.ClassElement[], staticName: StencilStaticGetter): any => {
   const staticMember: ts.GetAccessorDeclaration = staticMembers.find(
     (member) => (member.name as any).escapedText === staticName,
   ) as any;

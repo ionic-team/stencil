@@ -142,6 +142,9 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
       // remember the content reference comment
       elm['s-sr'] = true;
 
+      // Persist the name of the slot that this slot was going to be projected into.
+      elm['s-fs'] = newVNode.$attrs$?.slot;
+
       // remember the content reference comment
       elm['s-cr'] = contentRef;
 
@@ -180,6 +183,16 @@ const putBackInOriginalLocation = (parentElm: Node, recursive: boolean) => {
       // and move this to the correct spot if need be
       childNode['s-ol'].remove();
       childNode['s-ol'] = undefined;
+
+      // Reset so we can correctly move the node around again.
+      childNode['s-sh'] = undefined;
+
+      // When putting an element node back in its original location,
+      // we need to reset the `slot` attribute back to the value it originally had
+      // so we can correctly relocate it again in the future
+      if (childNode.nodeType === NODE_TYPE.ElementNode) {
+        childNode.setAttribute('slot', childNode['s-sn'] ?? '');
+      }
 
       checkSlotRelocate = true;
     }
@@ -660,23 +673,29 @@ const updateFallbackSlotVisibility = (elm: d.RenderNode) => {
         // we need to check all of its sibling nodes in order to see if
         // `childNode` should be hidden
         for (const siblingNode of childNodes) {
-          if (siblingNode['s-hn'] !== childNode['s-hn'] || slotName !== '') {
-            // this sibling node is from a different component OR is a named
-            // fallback slot node
-            if (siblingNode.nodeType === NODE_TYPE.ElementNode && slotName === siblingNode.getAttribute('slot')) {
-              childNode.hidden = true;
-              break;
-            }
-          } else {
-            // this is a default fallback slot node
-            // any element or text node (with content)
-            // should hide the default fallback slot node
-            if (
-              siblingNode.nodeType === NODE_TYPE.ElementNode ||
-              (siblingNode.nodeType === NODE_TYPE.TextNode && siblingNode.textContent.trim() !== '')
-            ) {
-              childNode.hidden = true;
-              break;
+          // Don't check the node against itself
+          if (siblingNode !== childNode) {
+            if (siblingNode['s-hn'] !== childNode['s-hn'] || slotName !== '') {
+              // this sibling node is from a different component OR is a named
+              // fallback slot node
+              if (
+                siblingNode.nodeType === NODE_TYPE.ElementNode &&
+                (slotName === siblingNode.getAttribute('slot') || slotName === siblingNode['s-sn'])
+              ) {
+                childNode.hidden = true;
+                break;
+              }
+            } else {
+              // this is a default fallback slot node
+              // any element or text node (with content)
+              // should hide the default fallback slot node
+              if (
+                siblingNode.nodeType === NODE_TYPE.ElementNode ||
+                (siblingNode.nodeType === NODE_TYPE.TextNode && siblingNode.textContent.trim() !== '')
+              ) {
+                childNode.hidden = true;
+                break;
+              }
             }
           }
         }
@@ -723,8 +742,17 @@ const markSlotContentForRelocation = (elm: d.RenderNode) => {
 
         // check that the node is not a content reference node or a node
         // reference and then check that the host name does not match that of
-        // childNode
-        if (!node['s-cn'] && !node['s-nr'] && node['s-hn'] !== childNode['s-hn']) {
+        // childNode.
+        // In addition, check that the slot either has not already been relocated, or
+        // that its current location's host is not childNode's host. This is essentially
+        // a check so that we don't try to relocate (and then hide) a node that is already
+        // where it should be.
+        if (
+          !node['s-cn'] &&
+          !node['s-nr'] &&
+          node['s-hn'] !== childNode['s-hn'] &&
+          (!BUILD.experimentalSlotFixes || !node['s-sh'] || node['s-sh'] !== childNode['s-hn'])
+        ) {
           // if `node` is located in the slot that `childNode` refers to (via the
           // `'s-sn'` property) then we need to relocate it from it's current spot
           // (under the host element parent) to the right slot location
@@ -740,11 +768,13 @@ const markSlotContentForRelocation = (elm: d.RenderNode) => {
             node['s-sn'] = node['s-sn'] || slotName;
 
             if (relocateNodeData) {
+              relocateNodeData.$nodeToRelocate$['s-sh'] = childNode['s-hn'];
               // we marked this node for relocation previously but didn't find
               // out the slot reference node to which it needs to be relocated
               // so write it down now!
               relocateNodeData.$slotRefNode$ = childNode;
             } else {
+              node['s-sh'] = childNode['s-hn'];
               // add to our list of nodes to relocate
               relocateNodes.push({
                 $slotRefNode$: childNode,
@@ -930,22 +960,13 @@ render() {
     if (checkSlotRelocate) {
       markSlotContentForRelocation(rootVnode.$elm$);
 
-      let relocateData: RelocateNodeData;
-      let nodeToRelocate: d.RenderNode;
-      let orgLocationNode: d.RenderNode;
-      let parentNodeRef: Node;
-      let insertBeforeNode: Node;
-      let refNode: d.RenderNode;
-      let i = 0;
-
-      for (; i < relocateNodes.length; i++) {
-        relocateData = relocateNodes[i];
-        nodeToRelocate = relocateData.$nodeToRelocate$;
+      for (const relocateData of relocateNodes) {
+        const nodeToRelocate = relocateData.$nodeToRelocate$;
 
         if (!nodeToRelocate['s-ol']) {
           // add a reference node marking this node's original location
           // keep a reference to this node for later lookups
-          orgLocationNode =
+          const orgLocationNode =
             BUILD.isDebug || BUILD.hydrateServerSide
               ? originalLocationDebugNode(nodeToRelocate)
               : (doc.createTextNode('') as any);
@@ -955,25 +976,45 @@ render() {
         }
       }
 
-      for (i = 0; i < relocateNodes.length; i++) {
-        relocateData = relocateNodes[i];
-        nodeToRelocate = relocateData.$nodeToRelocate$;
+      for (const relocateData of relocateNodes) {
+        const nodeToRelocate = relocateData.$nodeToRelocate$;
+        const slotRefNode = relocateData.$slotRefNode$;
 
-        if (relocateData.$slotRefNode$) {
-          // by default we're just going to insert it directly
-          // after the slot reference node
-          parentNodeRef = relocateData.$slotRefNode$.parentNode;
-          insertBeforeNode = relocateData.$slotRefNode$.nextSibling;
-          orgLocationNode = nodeToRelocate['s-ol'] as any;
+        if (slotRefNode) {
+          const parentNodeRef = slotRefNode.parentNode;
+          // When determining where to insert content, the most simple case would be
+          // to relocate the node immediately following the slot reference node. We do this
+          // by getting a reference to the node immediately following the slot reference node
+          // since we will use `insertBefore` to manipulate the DOM.
+          //
+          // If there is no node immediately following the slot reference node, then we will just
+          // end up appending the node as the last child of the parent.
+          let insertBeforeNode = slotRefNode.nextSibling as d.RenderNode | null;
 
-          while ((orgLocationNode = orgLocationNode.previousSibling as any)) {
-            refNode = orgLocationNode['s-nr'];
-            if (refNode && refNode['s-sn'] === nodeToRelocate['s-sn'] && parentNodeRef === refNode.parentNode) {
-              refNode = refNode.nextSibling as any;
-              if (!refNode || !refNode['s-nr']) {
-                insertBeforeNode = refNode;
-                break;
+          // If the node we're currently planning on inserting the new node before is an element,
+          // we need to do some additional checks to make sure we're inserting the node in the correct order.
+          // The use case here would be that we have multiple nodes being relocated to the same slot. So, we want
+          // to make sure they get inserted into their new how in the same order they were declared in their original location.
+          //
+          // TODO(STENCIL-914): Remove `experimentalSlotFixes` check
+          if (
+            !BUILD.experimentalSlotFixes ||
+            (insertBeforeNode && insertBeforeNode.nodeType === NODE_TYPE.ElementNode)
+          ) {
+            let orgLocationNode = nodeToRelocate['s-ol']?.previousSibling as d.RenderNode | null;
+
+            while (orgLocationNode) {
+              let refNode = orgLocationNode['s-nr'] ?? null;
+
+              if (refNode && refNode['s-sn'] === nodeToRelocate['s-sn'] && parentNodeRef === refNode.parentNode) {
+                refNode = refNode.nextSibling as any;
+                if (!refNode || !refNode['s-nr']) {
+                  insertBeforeNode = refNode;
+                  break;
+                }
               }
+
+              orgLocationNode = orgLocationNode.previousSibling as d.RenderNode | null;
             }
           }
 
@@ -990,7 +1031,31 @@ render() {
                 // probably a component in the index.html that doesn't have its hostname set
                 nodeToRelocate['s-hn'] = nodeToRelocate['s-ol'].parentNode.nodeName;
               }
-              // add it back to the dom but in its new home
+
+              // Handle a use-case where we relocate a slot where
+              // the slot name changes along the way (for instance, a default to a named slot).
+              // In this case, we need to update the relocated node's slot attribute to match
+              // the slot name it is being relocated into.
+              //
+              // There is a very niche use case where we may be relocating a text node. For now,
+              // we ignore anything that is not an element node since non-element nodes cannot have
+              // attributes to specify the slot. We'll deal with this if it becomes a problem... but super edge-case-y
+              if (
+                BUILD.experimentalSlotFixes &&
+                nodeToRelocate.nodeType === NODE_TYPE.ElementNode &&
+                slotRefNode['s-fs'] !== nodeToRelocate.getAttribute('slot')
+              ) {
+                if (!slotRefNode['s-fs']) {
+                  nodeToRelocate.removeAttribute('slot');
+                } else {
+                  nodeToRelocate.setAttribute('slot', slotRefNode['s-fs']);
+                }
+              }
+
+              // Add it back to the dom but in its new home
+              // If we get to this point and `insertBeforeNode` is `null`, that means
+              // we're just going to append the node as the last child of the parent. Passing
+              // `null` as the second arg here will trigger that behavior.
               parentNodeRef.insertBefore(nodeToRelocate, insertBeforeNode);
             }
           }

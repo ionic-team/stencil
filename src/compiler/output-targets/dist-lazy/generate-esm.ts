@@ -1,5 +1,4 @@
-import { generatePreamble, relativeImport } from '@utils';
-import { join } from 'path';
+import { generatePreamble, join, relativeImport } from '@utils';
 import type { OutputOptions, RollupBuild } from 'rollup';
 
 import type * as d from '../../../declarations';
@@ -29,7 +28,9 @@ export const generateEsm = async (
     const output = await generateRollupOutput(rollupBuild, esmOpts, config, buildCtx.entryModules);
 
     if (output != null) {
-      const es2017destinations = esmOutputs.map((o) => o.esmDir);
+      const es2017destinations = esmOutputs
+        .map((o) => o.esmDir)
+        .filter((esmDir): esmDir is string => typeof esmDir === 'string');
       buildCtx.esmComponentBundle = await generateLazyModules(
         config,
         compilerCtx,
@@ -42,7 +43,9 @@ export const generateEsm = async (
         '',
       );
 
-      const es5destinations = esmEs5Outputs.map((o) => o.esmEs5Dir);
+      const es5destinations = esmEs5Outputs
+        .map((o) => o.esmEs5Dir)
+        .filter((esmEs5Dir): esmEs5Dir is string => typeof esmEs5Dir === 'string');
       buildCtx.es5ComponentBundle = await generateLazyModules(
         config,
         compilerCtx,
@@ -68,7 +71,10 @@ const copyPolyfills = async (
   compilerCtx: d.CompilerCtx,
   outputTargets: d.OutputTargetDistLazy[],
 ): Promise<void> => {
-  const destinations = outputTargets.filter((o) => o.polyfills).map((o) => o.esmDir);
+  const destinations = outputTargets
+    .filter((o) => o.polyfills)
+    .map((o) => o.esmDir)
+    .filter((esmDir): esmDir is string => typeof esmDir === 'string');
   if (destinations.length === 0) {
     return;
   }

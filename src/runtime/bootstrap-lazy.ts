@@ -140,7 +140,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
 
       // TODO(STENCIL-914): this check and `else` block can go away and be replaced by just `BUILD.scoped` once we
       // default our pseudo-slot behavior
-      if (BUILD.patchPseudoShadowDom && BUILD.scoped) {
+      if (BUILD.experimentalSlotFixes && BUILD.scoped) {
         patchPseudoShadowDom(HostElement.prototype, cmpMeta);
       } else {
         if (BUILD.slotChildNodesFix) {
@@ -155,6 +155,13 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
         if (BUILD.scopedSlotTextContentFix) {
           patchTextContent(HostElement.prototype, cmpMeta);
         }
+      }
+
+      // if the component is formAssociated we need to set that on the host
+      // element so that it will be ready for `attachInternals` to be called on
+      // it later on
+      if (BUILD.formAssociated && cmpMeta.$flags$ & CMP_FLAGS.formAssociated) {
+        (HostElement as any).formAssociated = true;
       }
 
       if (BUILD.hotModuleReplacement) {

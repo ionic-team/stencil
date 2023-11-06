@@ -18,7 +18,7 @@ export const updateModule = (
   emitFilePath: string,
   typeChecker: ts.TypeChecker,
   collection: d.CollectionCompilerMeta,
-) => {
+): d.Module => {
   const sourceFilePath = normalizePath(tsSourceFile.fileName);
   const prevModuleFile = getModule(compilerCtx, sourceFilePath);
 
