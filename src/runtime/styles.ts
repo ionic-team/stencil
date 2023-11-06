@@ -4,7 +4,7 @@ import { CMP_FLAGS, queryNonceMetaTagContent } from '@utils';
 
 import type * as d from '../declarations';
 import { createTime } from './profile';
-import { HYDRATED_STYLE_ID, NODE_TYPE } from './runtime-constants';
+import { HYDRATED_STYLE_ID, NODE_TYPE, SLOT_FB_CSS } from './runtime-constants';
 
 const rootAppliedStyles: d.RootAppliedStyleMap = /*@__PURE__*/ new WeakMap();
 
@@ -66,6 +66,8 @@ export const addStyle = (styleContainerNode: any, cmpMeta: d.ComponentRuntimeMet
 
           styleContainerNode.insertBefore(styleElm, styleContainerNode.querySelector('link'));
         }
+
+        styleElm.innerHTML += SLOT_FB_CSS;
 
         if (appliedStyles) {
           appliedStyles.add(scopeId);
