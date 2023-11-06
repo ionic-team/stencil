@@ -185,16 +185,18 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
     });
   });
 
-  if (BUILD.invisiblePrehydration && (BUILD.hydratedClass || BUILD.hydratedAttribute)) {
-    visibilityStyle.innerHTML = cmpTags + HYDRATED_CSS;
-    visibilityStyle.setAttribute('data-styles', '');
+  visibilityStyle.innerHTML = 'slot-fb:not([hidden]){display:contents}';
+  visibilityStyle.setAttribute('data-styles', '');
+  head.insertBefore(visibilityStyle, metaCharset ? metaCharset.nextSibling : head.firstChild);
 
-    // Apply CSP nonce to the style tag if it exists
-    const nonce = plt.$nonce$ ?? queryNonceMetaTagContent(doc);
-    if (nonce != null) {
-      visibilityStyle.setAttribute('nonce', nonce);
-    }
-    head.insertBefore(visibilityStyle, metaCharset ? metaCharset.nextSibling : head.firstChild);
+  if (BUILD.invisiblePrehydration && (BUILD.hydratedClass || BUILD.hydratedAttribute)) {
+    visibilityStyle.innerHTML += cmpTags + HYDRATED_CSS;
+  }
+
+  // Apply CSP nonce to the style tag if it exists
+  const nonce = plt.$nonce$ ?? queryNonceMetaTagContent(doc);
+  if (nonce != null) {
+    visibilityStyle.setAttribute('nonce', nonce);
   }
 
   // Process deferred connectedCallbacks now all components have been registered

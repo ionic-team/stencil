@@ -60,4 +60,6 @@ export const HYDRATED_STYLE_ID = 'sty-id';
 export const HYDRATE_CHILD_ID = 'c-id';
 export const HYDRATED_CSS = '{visibility:hidden}.hydrated{visibility:inherit}';
 
+export const SLOT_FB_CSS = 'slot-fb{display:contents}slot-fb[hidden]{display:none}';
+
 export const XLINK_NS = 'http://www.w3.org/1999/xlink';
