@@ -53,6 +53,10 @@ export const updateTypeIdentifierNames = (
   for (const typeReference of Object.values(typeReferences)) {
     const importResolvedFile = getTypeImportPath(typeReference.path, sourceFilePath);
 
+    if (typeof importResolvedFile !== 'string') {
+      continue;
+    }
+
     if (!typeImportData.hasOwnProperty(importResolvedFile)) {
       continue;
     }
