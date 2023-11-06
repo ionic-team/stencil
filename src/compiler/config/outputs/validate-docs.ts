@@ -1,5 +1,7 @@
 import {
   buildError,
+  DOCS_JSON,
+  DOCS_README,
   isFunction,
   isOutputTargetDocsCustom,
   isOutputTargetDocsJson,
@@ -19,7 +21,7 @@ export const validateDocs = (config: d.ValidatedConfig, diagnostics: d.Diagnosti
   if (isString(config.flags.docsJson)) {
     docsOutputs.push(
       validateJsonDocsOutputTarget(config, diagnostics, {
-        type: 'docs-json',
+        type: DOCS_JSON,
         file: config.flags.docsJson,
       }),
     );
@@ -35,7 +37,7 @@ export const validateDocs = (config: d.ValidatedConfig, diagnostics: d.Diagnosti
   if (config.flags.docs || config.flags.task === 'docs') {
     if (!userOutputs.some(isOutputTargetDocsReadme)) {
       // didn't provide a docs config, so let's add one
-      docsOutputs.push(validateReadmeOutputTarget(config, { type: 'docs-readme' }));
+      docsOutputs.push(validateReadmeOutputTarget(config, { type: DOCS_README }));
     }
   }
 
