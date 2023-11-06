@@ -127,17 +127,4 @@ async function copyTestingInternalDts(opts: BuildOptions, inputDir: string) {
       return false;
     },
   });
-
-  // Replace `@stencil/core/declarations` imports with `@stencil/core/internal` imports in
-  // all typedef files
-  const files = await fs.readdir(opts.output.testingDir);
-  for (const file of files) {
-    if (file.endsWith('.d.ts')) {
-      const dts = await fs.readFile(join(opts.output.testingDir, file), 'utf8');
-      await fs.writeFile(
-        join(opts.output.testingDir, file),
-        dts.replace('@stencil/core/declarations', '@stencil/core/internal'),
-      );
-    }
-  }
 }

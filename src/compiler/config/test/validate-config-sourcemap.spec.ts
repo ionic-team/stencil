@@ -1,8 +1,7 @@
-import { mockLoadConfigInit } from '@stencil/core/testing';
+import { mockCompilerSystem, mockLoadConfigInit } from '@stencil/core/testing';
 import ts from 'typescript';
 
 import type * as d from '../../../declarations';
-import { createTestingSystem } from '../../../testing/testing-sys';
 import { loadConfig } from '../load-config';
 
 describe('stencil config - sourceMap option', () => {
@@ -47,7 +46,7 @@ describe('stencil config - sourceMap option', () => {
   };
 
   beforeEach(() => {
-    sys = createTestingSystem();
+    sys = mockCompilerSystem();
   });
 
   afterEach(() => {

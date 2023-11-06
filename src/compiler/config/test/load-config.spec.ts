@@ -1,9 +1,9 @@
+import { mockCompilerSystem } from '@stencil/core/testing';
 import path from 'path';
 import ts from 'typescript';
 
 import { ConfigFlags } from '../../../cli/config-flags';
 import type * as d from '../../../declarations';
-import { createTestingSystem } from '../../../testing/testing-sys';
 import { normalizePath } from '../../../utils';
 import { loadConfig } from '../load-config';
 
@@ -14,7 +14,7 @@ describe('load config', () => {
   let sys: d.CompilerSystem;
 
   beforeEach(() => {
-    sys = createTestingSystem();
+    sys = mockCompilerSystem();
 
     jest.spyOn(ts, 'getParsedCommandLineOfConfigFile').mockReturnValue({
       options: {
