@@ -1,3 +1,13 @@
+## 🍿 [4.7.1](https://github.com/ionic-team/stencil/compare/v4.7.0...v4.7.1) (2023-11-06)
+
+
+### Bug Fixes
+
+* **compiler:** correctly generate CSS rules using `::slotted` outside shadow DOM ([#4969](https://github.com/ionic-team/stencil/issues/4969)) ([4fd0ecd](https://github.com/ionic-team/stencil/commit/4fd0ecd17e72f6892c96b8256a0206f6e583be13))
+* **compiler:** ignore TS diagnostics on builds where typedef file changes ([#5013](https://github.com/ionic-team/stencil/issues/5013)) ([2a75b65](https://github.com/ionic-team/stencil/commit/2a75b6501f4f76dad0d8fa8304af57be1c04eef1))
+
+
+
 # 💪 [4.7.0](https://github.com/ionic-team/stencil/compare/v4.6.0...v4.7.0) (2023-10-30)
 
 
