@@ -163,4 +163,19 @@ describe('slot-fallback', () => {
     result = app.querySelector('.results1 article span content-end');
     expect(result.textContent).toBe('slot light dom 2 : end');
   });
+
+  it('should have correct display style on slot-fb element', () => {
+    const slotFbElements = app.querySelectorAll<HTMLElement>('slot-fallback-root slot-fallback slot-fb');
+    slotFbElements.forEach((slotFb) => expect(getComputedStyle(slotFb).display).toBe('contents'));
+  });
+
+  it('should hide slot-fb elements when slotted content exists', async () => {
+    // Show slotted content
+    const buttonChangeLightDom = app.querySelector<HTMLButtonElement>('button.change-light-dom');
+    buttonChangeLightDom.click();
+    await waitForChanges();
+
+    const slotFbElements = app.querySelectorAll<HTMLElement>('slot-fallback-root slot-fallback slot-fb');
+    slotFbElements.forEach((slotFb) => expect(getComputedStyle(slotFb).display).toBe('none'));
+  });
 });
