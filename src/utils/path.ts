@@ -195,6 +195,9 @@ const enum CharacterCodes {
  * A wrapped version of node.js' {@link path.relative} which adds our custom
  * normalization logic. This solves the relative path between `from` and `to`!
  *
+ * The calculation of the returned path follows that of Node's logic, with one exception - if the calculated path
+ * results in an empty string, a string of length one with a period (`'.'`) is returned.
+ *
  * @throws the underlying node.js function can throw if either path is not a
  * string
  * @param from the path where relative resolution starts
@@ -202,6 +205,12 @@ const enum CharacterCodes {
  * @returns the resolved relative path
  */
 export function relative(from: string, to: string): string {
+  /**
+   * When normalizing, we should _not_ attempt to relativize the path returned by the native Node `relative` method.
+   * When finding the relative path between `from` and `to`, Node does not prepend './' a non-zero length calculated
+   * path. However, our algorithm does differ from that of Node's, as described in this function's JSDoc when an zero
+   * length string is encountered.
+   */
   return normalizePath(path.relative(from, to), false);
 }
 

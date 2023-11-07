@@ -145,7 +145,10 @@ describe('normalizeFsPathQuery', () => {
     it('relative should always return a POSIX path', () => {
       expect(relative('.', 'foo/bar')).toBe('foo/bar');
       expect(relative('foo/bar', '..')).toBe('../../..');
+      expect(relative('foo', 'foo/bar/file.js')).toBe('bar/file.js');
+      expect(relative('foo/bar', 'foo/bar/file.js')).toBe('file.js');
       expect(relative('foo/bar/baz', 'foo/bar/boz')).toBe('../boz');
+      expect(relative('foo/bar/file.js', 'foo/bar/file.js')).toBe('.');
       expect(relative('.', '../foo/bar')).toBe('../foo/bar');
     });
 
