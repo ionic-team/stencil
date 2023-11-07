@@ -137,8 +137,13 @@ describe('normalizeFsPathQuery', () => {
   describe('wrapped nodejs path functions', () => {
     it('join should always return a POSIX path', () => {
       expect(join('foo')).toBe('foo');
+      expect(join('foo/')).toBe('foo');
       expect(join('foo', 'bar')).toBe('foo/bar');
+      expect(join('foo', 'bar', '/')).toBe('foo/bar');
+      expect(join('foo', '/', 'bar')).toBe('foo/bar');
+      expect(join('foo', '/', '/', 'bar')).toBe('foo/bar');
       expect(join('..', 'foo', 'bar.ts')).toBe('../foo/bar.ts');
+      expect(join('foo', '..', 'bar.ts')).toBe('bar.ts');
       expect(join('.', 'foo', 'bar.ts')).toBe('foo/bar.ts');
     });
 
