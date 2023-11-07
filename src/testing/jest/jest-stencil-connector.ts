@@ -118,11 +118,12 @@ export const getJestSetupTestFramework = () => {
   return getJestFacade().getJestSetupTestFramework();
 };
 
+// TODO(STENCIL-1003): Fix typing resolution bug where dynamic type imports would result in build failures for Jest 28/29
 /**
  * Retrieve Stencil's Jest presets for the detected version of Jest
  *
  * @returns an object representing a Jest preset
  */
-export const getJestPreset = () => {
+export const getJestPreset = (): any => {
   return getJestFacade().getJestPreset();
 };
