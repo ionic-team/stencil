@@ -72,7 +72,7 @@ export const writeTask = (cb: Function) => {
 };
 
 const resolved = /*@__PURE__*/ Promise.resolve();
-export const nextTick = /*@__PURE__*/ (cb: () => void) => resolved.then(cb);
+export const nextTick = (cb: () => void) => resolved.then(cb);
 
 const defaultConsoleError = (e: any) => {
   if (e != null) {

@@ -1,6 +1,6 @@
 {
   "name": "@stencil/core",
-  "version": "4.7.0",
+  "version": "4.7.1",
   "license": "MIT",
   "main": "./internal/stencil-core/index.cjs",
   "module": "./internal/stencil-core/index.js",
@@ -120,7 +120,7 @@
     "rollup-plugin-sourcemaps": "^0.6.3",
     "semver": "^7.3.7",
     "sizzle": "^2.3.6",
-    "terser": "5.22.0",
+    "terser": "5.24.0",
     "typescript": "~5.2.2",
     "webpack": "^5.75.0",
     "ws": "8.14.2"
@@ -149,6 +149,6 @@
   "prettier": "@ionic/prettier-config",
   "volta": {
     "node": "20.8.0",
-    "npm": "10.2.1"
+    "npm": "10.2.3"
   }
 }

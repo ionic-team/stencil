@@ -71,6 +71,27 @@ describe('stencil-types', () => {
         expect(actualTypeName).toBe(expectedTypeName);
       });
 
+      it('returns the provided type for imports without the resolved file', () => {
+        const expectedTypeName = 'CustomType';
+        const typeReferences: d.ComponentCompilerTypeReferences = {
+          // we're testing the `path` value doesn't exist on the type import data.
+          // in practice this should never happen, but let's ensure that we cover this case explicitly in tests
+          [expectedTypeName]: stubComponentCompilerTypeReference({
+            location: 'import',
+            path: 'some/mock/unknown/path',
+          }),
+        };
+
+        const actualTypeName = updateTypeIdentifierNames(
+          typeReferences,
+          {},
+          stubComponentCompilerMeta().sourceFilePath,
+          expectedTypeName,
+        );
+
+        expect(actualTypeName).toBe(expectedTypeName);
+      });
+
       it("does not change a simple type when there's no import name to alias", () => {
         const initialType = 'InitialType';
         const basePath = '~/some/stubbed/path';
