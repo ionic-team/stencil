@@ -53,6 +53,10 @@ export const updateTypeIdentifierNames = (
   for (const typeReference of Object.values(typeReferences)) {
     const importResolvedFile = getTypeImportPath(typeReference.path, sourceFilePath);
 
+    if (typeof importResolvedFile !== 'string') {
+      continue;
+    }
+
     if (!typeImportData.hasOwnProperty(importResolvedFile)) {
       continue;
     }
@@ -70,9 +74,9 @@ export const updateTypeIdentifierNames = (
  * @param sourceFilePath the component source file path to resolve against
  * @returns the path of the type import
  */
-const getTypeImportPath = (importResolvedFile: string | undefined, sourceFilePath: string): string => {
-  const isPathRelative = importResolvedFile && importResolvedFile.startsWith('.');
-  if (isPathRelative) {
+const getTypeImportPath = (importResolvedFile: string | undefined, sourceFilePath: string): string | undefined => {
+  if (importResolvedFile && importResolvedFile.startsWith('.')) {
+    // the path to the type reference is relative, resolve it relative to the provided source path
     importResolvedFile = resolve(dirname(sourceFilePath), importResolvedFile);
   }
 
