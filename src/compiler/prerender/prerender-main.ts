@@ -70,8 +70,15 @@ const runPrerender = async (
     let workerCtrl: d.WorkerMainController;
 
     if (config.sys.createWorkerController == null || config.maxConcurrentWorkers < 1) {
+      // we don't have a `maxConcurrentWorkers` setting which makes it
+      // necessary to actually use threaded workers, so we create a
+      // single-threaded worker context here
       workerCtx = createWorkerContext(config.sys);
     } else {
+      // we want to stand up the full threaded worker setup, so we first need
+      // to build a worker controller and then we create an appropriate worker
+      // context for it (this will mean that when methods are called on
+      // `workerCtx` they're dispatched to workers in other threads)
       workerCtrl = config.sys.createWorkerController(config.maxConcurrentWorkers);
       workerCtx = createWorkerMainContext(workerCtrl);
     }

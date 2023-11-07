@@ -622,6 +622,7 @@ export const createSystem = (c?: { logger?: Logger }): CompilerSystem => {
     writeFile,
     writeFileSync,
     generateContentHash,
+    // no threading when we're running in-memory
     createWorkerController: null,
     details: {
       cpuModel: '',
