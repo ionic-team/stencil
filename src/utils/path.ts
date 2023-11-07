@@ -207,8 +207,8 @@ const enum CharacterCodes {
 export function relative(from: string, to: string): string {
   /**
    * When normalizing, we should _not_ attempt to relativize the path returned by the native Node `relative` method.
-   * When finding the relative path between `from` and `to`, Node does not prepend './' a non-zero length calculated
-   * path. However, our algorithm does differ from that of Node's, as described in this function's JSDoc when an zero
+   * When finding the relative path between `from` and `to`, Node does not prepend './' to a non-zero length calculated
+   * path. However, our algorithm does differ from that of Node's, as described in this function's JSDoc when a zero
    * length string is encountered.
    */
   return normalizePath(path.relative(from, to), false);
