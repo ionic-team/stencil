@@ -1,4 +1,4 @@
-import { join } from '@utils';
+import { join, normalizePath } from '@utils';
 import { isAbsolute } from 'path';
 
 import type * as d from '../../declarations';
@@ -39,6 +39,8 @@ export const validatePaths = (config: d.Config): ConfigPaths => {
 
   if (!isAbsolute(cacheDir)) {
     cacheDir = join(rootDir, cacheDir);
+  } else {
+    cacheDir = normalizePath(cacheDir);
   }
 
   let srcIndexHtml = typeof config.srcIndexHtml !== 'string' ? join(srcDir, DEFAULT_INDEX_HTML) : config.srcIndexHtml;
