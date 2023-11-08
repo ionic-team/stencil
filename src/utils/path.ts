@@ -219,12 +219,22 @@ export function relative(from: string, to: string): string {
  * normalization logic. This joins all the arguments (path fragments) into a
  * single path.
  *
+ * The calculation of the returned path follows that of Node's logic, with one exception - any trailing slashes will
+ * be removed from the calculated path.
+ *
  * @throws the underlying node function will throw if any argument is not a
  * string
  * @param paths the paths to join together
  * @returns a joined path!
  */
 export function join(...paths: string[]): string {
+  /**
+   * When normalizing, we should _not_ attempt to relativize the path returned by the native Node `join` method. When
+   * calculating the path from each of the string-based parts, Node does not prepend './' to any calculated path.
+   *
+   * Note that our algorithm does differ from Node's, as described in this function's JSDoc regarding trailing
+   * slashes.
+   */
   return normalizePath(path.join(...paths), false);
 }
 
