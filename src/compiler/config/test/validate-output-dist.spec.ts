@@ -1,10 +1,13 @@
 import type * as d from '@stencil/core/declarations';
 import { mockConfig, mockLoadConfigInit } from '@stencil/core/testing';
+import { join } from '@utils';
 import path from 'path';
 
 import { validateConfig } from '../validate-config';
 
 describe('validateDistOutputTarget', () => {
+  // use Node's resolve() here to simulate a user using either Win/Posix separators (depending on the platform these
+  // tests are run on)
   const rootDir = path.resolve('/');
 
   let userConfig: d.Config;
@@ -24,23 +27,23 @@ describe('validateDistOutputTarget', () => {
     const { config } = validateConfig(userConfig, mockLoadConfigInit());
     expect(config.outputTargets).toEqual([
       {
-        buildDir: path.join(rootDir, 'my-dist', 'my-build'),
-        collectionDir: path.join(rootDir, 'my-dist', 'collection'),
+        buildDir: join(rootDir, 'my-dist', 'my-build'),
+        collectionDir: join(rootDir, 'my-dist', 'collection'),
         copy: [],
-        dir: path.join(rootDir, 'my-dist'),
+        dir: join(rootDir, 'my-dist'),
         empty: false,
-        esmLoaderPath: path.join(rootDir, 'my-dist', 'loader'),
+        esmLoaderPath: join(rootDir, 'my-dist', 'loader'),
         type: 'dist',
         polyfills: false,
-        typesDir: path.join(rootDir, 'my-dist', 'types'),
+        typesDir: join(rootDir, 'my-dist', 'types'),
         transformAliasedImportPathsInCollection: true,
         isPrimaryPackageOutputTarget: false,
       },
       {
-        esmDir: path.join(rootDir, 'my-dist', 'my-build', 'testing'),
+        esmDir: join(rootDir, 'my-dist', 'my-build', 'testing'),
         empty: false,
         isBrowserBuild: true,
-        legacyLoaderFile: path.join(rootDir, 'my-dist', 'my-build', 'testing.js'),
+        legacyLoaderFile: join(rootDir, 'my-dist', 'my-build', 'testing.js'),
         polyfills: true,
         systemDir: undefined,
         systemLoaderFile: undefined,
@@ -49,21 +52,21 @@ describe('validateDistOutputTarget', () => {
       {
         copyAssets: 'dist',
         copy: [],
-        dir: path.join(rootDir, 'my-dist', 'my-build', 'testing'),
+        dir: join(rootDir, 'my-dist', 'my-build', 'testing'),
         type: 'copy',
       },
       {
-        file: path.join(rootDir, 'my-dist', 'my-build', 'testing', 'testing.css'),
+        file: join(rootDir, 'my-dist', 'my-build', 'testing', 'testing.css'),
         type: 'dist-global-styles',
       },
       {
-        dir: path.join(rootDir, 'my-dist'),
+        dir: join(rootDir, 'my-dist'),
         type: 'dist-types',
-        typesDir: path.join(rootDir, 'my-dist', 'types'),
+        typesDir: join(rootDir, 'my-dist', 'types'),
       },
       {
-        collectionDir: path.join(rootDir, 'my-dist', 'collection'),
-        dir: path.join(rootDir, '/my-dist'),
+        collectionDir: join(rootDir, 'my-dist', 'collection'),
+        dir: join(rootDir, '/my-dist'),
         empty: false,
         transformAliasedImportPaths: true,
         type: 'dist-collection',
@@ -71,25 +74,25 @@ describe('validateDistOutputTarget', () => {
       {
         copy: [{ src: '**/*.svg' }, { src: '**/*.js' }],
         copyAssets: 'collection',
-        dir: path.join(rootDir, 'my-dist', 'collection'),
+        dir: join(rootDir, 'my-dist', 'collection'),
         type: 'copy',
       },
       {
         type: 'dist-lazy',
-        cjsDir: path.join(rootDir, 'my-dist', 'cjs'),
-        cjsIndexFile: path.join(rootDir, 'my-dist', 'index.cjs.js'),
+        cjsDir: join(rootDir, 'my-dist', 'cjs'),
+        cjsIndexFile: join(rootDir, 'my-dist', 'index.cjs.js'),
         empty: false,
-        esmDir: path.join(rootDir, 'my-dist', 'esm'),
+        esmDir: join(rootDir, 'my-dist', 'esm'),
         esmEs5Dir: undefined,
-        esmIndexFile: path.join(rootDir, 'my-dist', 'index.js'),
+        esmIndexFile: join(rootDir, 'my-dist', 'index.js'),
         polyfills: true,
       },
       {
-        cjsDir: path.join(rootDir, 'my-dist', 'cjs'),
-        componentDts: path.join(rootDir, 'my-dist', 'types', 'components.d.ts'),
-        dir: path.join(rootDir, 'my-dist', 'loader'),
+        cjsDir: join(rootDir, 'my-dist', 'cjs'),
+        componentDts: join(rootDir, 'my-dist', 'types', 'components.d.ts'),
+        dir: join(rootDir, 'my-dist', 'loader'),
         empty: false,
-        esmDir: path.join(rootDir, 'my-dist', 'esm'),
+        esmDir: join(rootDir, 'my-dist', 'esm'),
         esmEs5Dir: undefined,
         type: 'dist-lazy-loader',
       },
@@ -101,8 +104,8 @@ describe('validateDistOutputTarget', () => {
     const { config } = validateConfig(userConfig, mockLoadConfigInit());
     const outputTarget = config.outputTargets.find((o) => o.type === 'dist') as d.OutputTargetDist;
     expect(outputTarget).toBeDefined();
-    expect(outputTarget.dir).toBe(path.join(rootDir, 'dist'));
-    expect(outputTarget.buildDir).toBe(path.join(rootDir, '/dist'));
+    expect(outputTarget.dir).toBe(join(rootDir, 'dist'));
+    expect(outputTarget.buildDir).toBe(join(rootDir, '/dist'));
     expect(outputTarget.empty).toBe(true);
   });
 
@@ -127,23 +130,23 @@ describe('validateDistOutputTarget', () => {
 
     expect(config.outputTargets).toEqual([
       {
-        buildDir: path.join(rootDir, 'my-dist', 'my-build'),
-        collectionDir: path.join(rootDir, 'my-dist', 'collection'),
+        buildDir: join(rootDir, 'my-dist', 'my-build'),
+        collectionDir: join(rootDir, 'my-dist', 'collection'),
         copy: [],
-        dir: path.join(rootDir, 'my-dist'),
+        dir: join(rootDir, 'my-dist'),
         empty: false,
-        esmLoaderPath: path.join(rootDir, 'my-dist', 'loader'),
+        esmLoaderPath: join(rootDir, 'my-dist', 'loader'),
         type: 'dist',
         polyfills: false,
-        typesDir: path.join(rootDir, 'my-dist', 'types'),
+        typesDir: join(rootDir, 'my-dist', 'types'),
         transformAliasedImportPathsInCollection: true,
         isPrimaryPackageOutputTarget: false,
       },
       {
-        esmDir: path.join(rootDir, 'my-dist', 'my-build', 'testing'),
+        esmDir: join(rootDir, 'my-dist', 'my-build', 'testing'),
         empty: false,
         isBrowserBuild: true,
-        legacyLoaderFile: path.join(rootDir, 'my-dist', 'my-build', 'testing.js'),
+        legacyLoaderFile: join(rootDir, 'my-dist', 'my-build', 'testing.js'),
         polyfills: true,
         systemDir: undefined,
         systemLoaderFile: undefined,
@@ -152,21 +155,21 @@ describe('validateDistOutputTarget', () => {
       {
         copyAssets: 'dist',
         copy: [],
-        dir: path.join(rootDir, 'my-dist', 'my-build', 'testing'),
+        dir: join(rootDir, 'my-dist', 'my-build', 'testing'),
         type: 'copy',
       },
       {
-        file: path.join(rootDir, 'my-dist', 'my-build', 'testing', 'testing.css'),
+        file: join(rootDir, 'my-dist', 'my-build', 'testing', 'testing.css'),
         type: 'dist-global-styles',
       },
       {
-        dir: path.join(rootDir, 'my-dist'),
+        dir: join(rootDir, 'my-dist'),
         type: 'dist-types',
-        typesDir: path.join(rootDir, 'my-dist', 'types'),
+        typesDir: join(rootDir, 'my-dist', 'types'),
       },
       {
-        collectionDir: path.join(rootDir, 'my-dist', 'collection'),
-        dir: path.join(rootDir, '/my-dist'),
+        collectionDir: join(rootDir, 'my-dist', 'collection'),
+        dir: join(rootDir, '/my-dist'),
         empty: false,
         transformAliasedImportPaths: true,
         type: 'dist-collection',
@@ -174,25 +177,25 @@ describe('validateDistOutputTarget', () => {
       {
         copy: [{ src: '**/*.svg' }, { src: '**/*.js' }],
         copyAssets: 'collection',
-        dir: path.join(rootDir, 'my-dist', 'collection'),
+        dir: join(rootDir, 'my-dist', 'collection'),
         type: 'copy',
       },
       {
         type: 'dist-lazy',
-        cjsDir: path.join(rootDir, 'my-dist', 'cjs'),
-        cjsIndexFile: path.join(rootDir, 'my-dist', 'index.cjs.js'),
+        cjsDir: join(rootDir, 'my-dist', 'cjs'),
+        cjsIndexFile: join(rootDir, 'my-dist', 'index.cjs.js'),
         empty: false,
-        esmDir: path.join(rootDir, 'my-dist', 'esm'),
+        esmDir: join(rootDir, 'my-dist', 'esm'),
         esmEs5Dir: undefined,
-        esmIndexFile: path.join(rootDir, 'my-dist', 'index.js'),
+        esmIndexFile: join(rootDir, 'my-dist', 'index.js'),
         polyfills: true,
       },
       {
-        cjsDir: path.join(rootDir, 'my-dist', 'cjs'),
-        componentDts: path.join(rootDir, 'my-dist', 'types', 'components.d.ts'),
-        dir: path.join(rootDir, 'my-dist', 'loader'),
+        cjsDir: join(rootDir, 'my-dist', 'cjs'),
+        componentDts: join(rootDir, 'my-dist', 'types', 'components.d.ts'),
+        dir: join(rootDir, 'my-dist', 'loader'),
         empty: false,
-        esmDir: path.join(rootDir, 'my-dist', 'esm'),
+        esmDir: join(rootDir, 'my-dist', 'esm'),
         esmEs5Dir: undefined,
         type: 'dist-lazy-loader',
       },
@@ -214,23 +217,23 @@ describe('validateDistOutputTarget', () => {
 
     expect(config.outputTargets).toEqual([
       {
-        buildDir: path.join(rootDir, 'my-dist', 'my-build'),
-        collectionDir: path.join(rootDir, 'my-dist', 'collection'),
+        buildDir: join(rootDir, 'my-dist', 'my-build'),
+        collectionDir: join(rootDir, 'my-dist', 'collection'),
         copy: [],
-        dir: path.join(rootDir, 'my-dist'),
+        dir: join(rootDir, 'my-dist'),
         empty: false,
-        esmLoaderPath: path.join(rootDir, 'my-dist', 'loader'),
+        esmLoaderPath: join(rootDir, 'my-dist', 'loader'),
         type: 'dist',
         polyfills: false,
-        typesDir: path.join(rootDir, 'my-dist', 'types'),
+        typesDir: join(rootDir, 'my-dist', 'types'),
         transformAliasedImportPathsInCollection: true,
         isPrimaryPackageOutputTarget: true,
       },
       {
-        esmDir: path.join(rootDir, 'my-dist', 'my-build', 'testing'),
+        esmDir: join(rootDir, 'my-dist', 'my-build', 'testing'),
         empty: false,
         isBrowserBuild: true,
-        legacyLoaderFile: path.join(rootDir, 'my-dist', 'my-build', 'testing.js'),
+        legacyLoaderFile: join(rootDir, 'my-dist', 'my-build', 'testing.js'),
         polyfills: true,
         systemDir: undefined,
         systemLoaderFile: undefined,
@@ -239,21 +242,21 @@ describe('validateDistOutputTarget', () => {
       {
         copyAssets: 'dist',
         copy: [],
-        dir: path.join(rootDir, 'my-dist', 'my-build', 'testing'),
+        dir: join(rootDir, 'my-dist', 'my-build', 'testing'),
         type: 'copy',
       },
       {
-        file: path.join(rootDir, 'my-dist', 'my-build', 'testing', 'testing.css'),
+        file: join(rootDir, 'my-dist', 'my-build', 'testing', 'testing.css'),
         type: 'dist-global-styles',
       },
       {
-        dir: path.join(rootDir, 'my-dist'),
+        dir: join(rootDir, 'my-dist'),
         type: 'dist-types',
-        typesDir: path.join(rootDir, 'my-dist', 'types'),
+        typesDir: join(rootDir, 'my-dist', 'types'),
       },
       {
-        collectionDir: path.join(rootDir, 'my-dist', 'collection'),
-        dir: path.join(rootDir, '/my-dist'),
+        collectionDir: join(rootDir, 'my-dist', 'collection'),
+        dir: join(rootDir, '/my-dist'),
         empty: false,
         transformAliasedImportPaths: true,
         type: 'dist-collection',
@@ -261,25 +264,25 @@ describe('validateDistOutputTarget', () => {
       {
         copy: [{ src: '**/*.svg' }, { src: '**/*.js' }],
         copyAssets: 'collection',
-        dir: path.join(rootDir, 'my-dist', 'collection'),
+        dir: join(rootDir, 'my-dist', 'collection'),
         type: 'copy',
       },
       {
         type: 'dist-lazy',
-        cjsDir: path.join(rootDir, 'my-dist', 'cjs'),
-        cjsIndexFile: path.join(rootDir, 'my-dist', 'index.cjs.js'),
+        cjsDir: join(rootDir, 'my-dist', 'cjs'),
+        cjsIndexFile: join(rootDir, 'my-dist', 'index.cjs.js'),
         empty: false,
-        esmDir: path.join(rootDir, 'my-dist', 'esm'),
+        esmDir: join(rootDir, 'my-dist', 'esm'),
         esmEs5Dir: undefined,
-        esmIndexFile: path.join(rootDir, 'my-dist', 'index.js'),
+        esmIndexFile: join(rootDir, 'my-dist', 'index.js'),
         polyfills: true,
       },
       {
-        cjsDir: path.join(rootDir, 'my-dist', 'cjs'),
-        componentDts: path.join(rootDir, 'my-dist', 'types', 'components.d.ts'),
-        dir: path.join(rootDir, 'my-dist', 'loader'),
+        cjsDir: join(rootDir, 'my-dist', 'cjs'),
+        componentDts: join(rootDir, 'my-dist', 'types', 'components.d.ts'),
+        dir: join(rootDir, 'my-dist', 'loader'),
         empty: false,
-        esmDir: path.join(rootDir, 'my-dist', 'esm'),
+        esmDir: join(rootDir, 'my-dist', 'esm'),
         esmEs5Dir: undefined,
         type: 'dist-lazy-loader',
       },
