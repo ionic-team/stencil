@@ -57,3 +57,10 @@ jobs:
     uses: ./.github/workflows/test-unit.yml
     with:
       build_name: stencil-core
+
+  karma_tests:
+    name: Karma Tests
+    needs: [build_core]
+    uses: ./.github/workflows/test-karma.yml
+    with:
+      build_name: stencil-core
