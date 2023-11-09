@@ -27,7 +27,16 @@ export type JestPreprocessor = {
 // TODO(STENCIL-960): Improve this typing by narrowing it
 export type JestTestRunner = any;
 
-export type JestConfig = Config.InitialOptions;
+/**
+ * This type serves as an alias for the type representing the initial configuration for Jest.
+ * This alias serves two purposes:
+ * 1. It allows Stencil to have a single source of truth for the return type(s) on {@link JestFacade} (and its
+ *    implementations)
+ * 2. It prevents TypeScript from expanding Jest typings in the generated `.d.ts` file. This is necessary as TypeScript
+ *    will make assumptions about where it can dynamically resolve Jest typings from, which do not necessarily hold
+ *    true for every type of Stencil project directory structure.
+ */
+export type JestPresetConfig = Config.InitialOptions;
 
 /**
  * Get the current major version of Jest that Stencil reconciles
