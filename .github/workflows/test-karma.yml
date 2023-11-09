@@ -38,6 +38,9 @@ jobs:
           path: .
           filename: stencil-core-build.zip
 
+      - name: Setup MS Edge
+        uses: browser-actions/setup-edge@v1
+
       - name: Karma Tests
         run: npm run test.karma.prod
         shell: bash
