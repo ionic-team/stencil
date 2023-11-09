@@ -164,6 +164,11 @@ describe('normalizeFsPathQuery', () => {
     });
 
     it('normalize should always return a POSIX path', () => {
+      expect(normalize('')).toBe('.');
+      expect(normalize('.')).toBe('.');
+      expect(normalize('..')).toBe('..');
+      expect(normalize('/')).toBe('/');
+      expect(normalize('\\')).toBe('/');
       // these examples taken from
       // https://nodejs.org/api/path.html#pathnormalizepath
       expect(normalize('\\temp\\\\foo\\bar\\..\\')).toBe('/temp/foo');

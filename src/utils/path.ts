@@ -249,6 +249,10 @@ export function join(...paths: string[]): string {
  * @returns a resolved path!
  */
 export function resolve(...paths: string[]): string {
+  /**
+   * When normalizing, we should _not_ attempt to relativize the path returned by the native Node `resolve` method. When
+   * calculating the path from each of the string-based parts, Node does not prepend './' to the calculated path.
+   */
   return normalizePath(path.resolve(...paths), false);
 }
 
@@ -263,5 +267,9 @@ export function resolve(...paths: string[]): string {
  * @returns a normalized path!
  */
 export function normalize(toNormalize: string): string {
+  /**
+   * When normalizing, we should _not_ attempt to relativize the path returned by the native Node `normalize` method.
+   * When calculating the path from each of the string-based parts, Node does not prepend './' to the calculated path.
+   */
   return normalizePath(path.normalize(toNormalize), false);
 }
