@@ -1,0 +1,46 @@
+name: Unit Tests
+
+on:
+  workflow_call:
+    # Make this a reusable workflow, no value needed
+    # https://docs.github.com/en/actions/using-workflows/reusing-workflows
+    inputs:
+      build_name:
+        description: Name for the build, used to resolve the correct build artifact
+        required: true
+        type: string
+
+jobs:
+  unit_test:
+    name: (${{ matrix.os }} karma tests)
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ['ubuntu-latest', 'windows-latest']
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+
+      - name: Get Core Dependencies
+        uses: ./.github/workflows/actions/get-core-dependencies
+
+      - name: Use Node 20
+        uses: actions/setup-node@8f152de45cc393bb48ce5d89d36b731f54556e65 # v4.0.0
+        with:
+          node-version: 20.7
+          cache: 'npm'
+
+      - name: Download Build Archive
+        uses: ./.github/workflows/actions/download-archive
+        with:
+          name: ${{ inputs.build_name }}
+          path: .
+          filename: stencil-core-build.zip
+
+      - name: Karma Tests
+        run: npm run test.karma.prod
+        shell: bash
+
+      - name: Check Git Context
+        uses: ./.github/workflows/actions/check-git-context
