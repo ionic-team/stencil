@@ -185,6 +185,8 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
     });
   });
 
+  // These style should always be constructed and inserted into the DOM
+  // We'll conditionally add some more styles later on
   dataStyles.innerHTML = SLOT_FB_CSS;
   dataStyles.setAttribute('data-styles', '');
   head.insertBefore(dataStyles, metaCharset ? metaCharset.nextSibling : head.firstChild);

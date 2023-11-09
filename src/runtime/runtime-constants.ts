@@ -60,6 +60,12 @@ export const HYDRATED_STYLE_ID = 'sty-id';
 export const HYDRATE_CHILD_ID = 'c-id';
 export const HYDRATED_CSS = '{visibility:hidden}.hydrated{visibility:inherit}';
 
+/**
+ * Constant for styles to be globally applied to `slot-fb` elements for pseudo-slot behavior.
+ *
+ * Two cascading rules must be used instead of a `:not()` selector due to Stencil browser
+ * support as of Stencil v4.
+ */
 export const SLOT_FB_CSS = 'slot-fb{display:contents}slot-fb[hidden]{display:none}';
 
 export const XLINK_NS = 'http://www.w3.org/1999/xlink';

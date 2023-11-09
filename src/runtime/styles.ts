@@ -67,6 +67,7 @@ export const addStyle = (styleContainerNode: any, cmpMeta: d.ComponentRuntimeMet
           styleContainerNode.insertBefore(styleElm, styleContainerNode.querySelector('link'));
         }
 
+        // Add styles for `slot-fb` elements
         styleElm.innerHTML += SLOT_FB_CSS;
 
         if (appliedStyles) {
