@@ -44,7 +44,7 @@ jobs:
         shell: bash
 
       - name: Unit Tests
-        run: npm run test.jest
+        run: npm run test.jest -- --runInBand --logHeapUsage
         shell: bash
 
       - name: Check Git Context
