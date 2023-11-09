@@ -48,7 +48,7 @@ jobs:
           for i in {1..10}
           do
             echo "This is run number $i"
-            npm run test.jest -- --runInBand --logHeapUsage
+            npm run test.jest -- --logHeapUsage
           done
         shell: bash
 
