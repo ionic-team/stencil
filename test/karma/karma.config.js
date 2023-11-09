@@ -57,9 +57,9 @@ const localLaunchers = {
 };
 
 if (process.platform === 'win32') {
-  localLaunchers.IE = {
-    base: 'IE',
-  };
+  // localLaunchers.IE = {
+  //   base: 'IE',
+  // };
   localLaunchers.Edge = {
     base: 'Edge',
   };
@@ -88,7 +88,7 @@ module.exports = function (config) {
       'karma-chrome-launcher',
       // 'karma-browserstack-launcher',
       'karma-firefox-launcher',
-      'karma-ie-launcher',
+      // 'karma-ie-launcher',
       'karma-edge-launcher',
       'karma-jasmine',
       'karma-typescript',
