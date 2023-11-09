@@ -1,4 +1,4 @@
-name: Unit Tests
+name: Karma Tests
 
 on:
   workflow_call:
@@ -11,7 +11,7 @@ on:
         type: string
 
 jobs:
-  unit_test:
+  karma_test:
     name: (${{ matrix.os }} karma tests)
     strategy:
       fail-fast: false
