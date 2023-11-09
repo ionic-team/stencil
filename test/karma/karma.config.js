@@ -86,7 +86,7 @@ module.exports = function (config) {
   config.set({
     plugins: [
       'karma-chrome-launcher',
-      'karma-browserstack-launcher',
+      // 'karma-browserstack-launcher',
       'karma-firefox-launcher',
       'karma-ie-launcher',
       'karma-edge-launcher',
@@ -94,7 +94,7 @@ module.exports = function (config) {
       'karma-typescript',
       'karma-polyfill',
     ],
-    browsers: useBrowserStack ? Object.keys(browserStackLaunchers) : Object.keys(localLaunchers),
+    browsers: Object.keys(localLaunchers),
 
     singleRun: true, // set this to false to leave the browser open
 
@@ -102,17 +102,17 @@ module.exports = function (config) {
 
     polyfill: ['Promise'],
 
-    browserStack: {
-      // identifier for all browser runs in BrowserStack
-      project: 'stencil_core',
-      ...(isCI ? ciBrowserstackConfig : localBrowserstackConfig),
-    },
+    // browserStack: {
+    //   // identifier for all browser runs in BrowserStack
+    //   project: 'stencil_core',
+    //   ...(isCI ? ciBrowserstackConfig : localBrowserstackConfig),
+    // },
 
     preprocessors: {
       '**/*.ts': 'karma-typescript',
     },
 
-    customLaunchers: useBrowserStack ? browserStackLaunchers : {},
+    customLaunchers: {},
     urlRoot: '/__karma__/',
     files: [
       // 'test-app/prerender-test/karma.spec.ts',
@@ -137,7 +137,7 @@ module.exports = function (config) {
 
     logLevel: config.LOG_INFO,
 
-    reporters: ['progress'].concat(useBrowserStack ? ['BrowserStack'] : []),
+    reporters: ['progress'],
 
     karmaTypescriptConfig: {
       tsconfig: './tsconfig.json',
