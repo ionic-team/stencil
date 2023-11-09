@@ -1,6 +1,15 @@
 import * as d from '@stencil/core/declarations';
 import path from 'path';
 
+jest.mock('@utils', () => {
+  const originalUtils = jest.requireActual('@utils');
+  return {
+    __esModule: true,
+    ...originalUtils,
+    resolve: (...pathSegments: string[]) => pathSegments.pop(),
+  };
+});
+
 import { updateTypeIdentifierNames } from '../stencil-types';
 import { stubComponentCompilerMeta } from './ComponentCompilerMeta.stub';
 import { stubComponentCompilerTypeReference } from './ComponentCompilerTypeReference.stub';
@@ -9,19 +18,14 @@ import { stubTypesImportData } from './TypesImportData.stub';
 describe('stencil-types', () => {
   describe('updateTypeMemberNames', () => {
     let dirnameSpy: jest.SpyInstance<ReturnType<typeof path.dirname>, Parameters<typeof path.dirname>>;
-    let resolveSpy: jest.SpyInstance<ReturnType<typeof path.resolve>, Parameters<typeof path.resolve>>;
 
     beforeEach(() => {
       dirnameSpy = jest.spyOn(path, 'dirname');
       dirnameSpy.mockImplementation((path: string) => path);
-
-      resolveSpy = jest.spyOn(path, 'resolve');
-      resolveSpy.mockImplementation((...pathSegments: string[]) => pathSegments.pop());
     });
 
     afterEach(() => {
       dirnameSpy.mockRestore();
-      resolveSpy.mockRestore();
     });
 
     describe('no type transformations', () => {
