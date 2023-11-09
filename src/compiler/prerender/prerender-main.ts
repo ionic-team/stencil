@@ -1,5 +1,5 @@
-import { buildError, catchError, hasError, isOutputTargetWww, isString } from '@utils';
-import { isAbsolute, join } from 'path';
+import { buildError, catchError, hasError, isOutputTargetWww, isString, join } from '@utils';
+import { isAbsolute } from 'path';
 
 import type * as d from '../../declarations';
 import { createHydrateBuildId } from '../../hydrate/runner/render-utils';

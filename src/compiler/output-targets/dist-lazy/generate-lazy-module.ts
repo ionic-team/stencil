@@ -2,10 +2,10 @@ import {
   formatComponentRuntimeMeta,
   getSourceMappingUrlForEndOfFile,
   hasDependency,
+  join,
   rollupToStencilSourceMap,
   stringifyRuntimeData,
 } from '@utils';
-import { join } from 'path';
 import type { SourceMap as RollupSourceMap } from 'rollup';
 
 import type * as d from '../../../declarations';

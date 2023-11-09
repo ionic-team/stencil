@@ -1,5 +1,5 @@
-import { buildError, isOutputTargetDist, isOutputTargetWww, isString } from '@utils';
-import { basename, dirname, isAbsolute, join } from 'path';
+import { buildError, isOutputTargetDist, isOutputTargetWww, isString, join } from '@utils';
+import { basename, dirname, isAbsolute } from 'path';
 
 import type * as d from '../../declarations';
 import { isLocalModule } from '../sys/resolve/resolve-utils';

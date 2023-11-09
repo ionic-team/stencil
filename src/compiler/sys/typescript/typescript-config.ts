@@ -1,5 +1,14 @@
-import { buildError, buildWarn, catchError, isString, loadTypeScriptDiagnostic, normalizePath } from '@utils';
-import { isAbsolute, join, relative } from 'path';
+import {
+  buildError,
+  buildWarn,
+  catchError,
+  isString,
+  join,
+  loadTypeScriptDiagnostic,
+  normalizePath,
+  relative,
+} from '@utils';
+import { isAbsolute } from 'path';
 import ts from 'typescript';
 
 import type * as d from '../../../declarations';

@@ -1,5 +1,5 @@
-import { addDocBlock, GENERATED_DTS, getComponentsDtsSrcFilePath, normalizePath } from '@utils';
-import { isAbsolute, relative, resolve } from 'path';
+import { addDocBlock, GENERATED_DTS, getComponentsDtsSrcFilePath, normalizePath, relative, resolve } from '@utils';
+import { isAbsolute } from 'path';
 
 import type * as d from '../../declarations';
 import { generateComponentTypes } from './generate-component-types';

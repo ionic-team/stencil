@@ -1,4 +1,4 @@
-import { catchError, createJsVarName, DEFAULT_STYLE_MODE, hasError, isString, normalizePath } from '@utils';
+import { catchError, createJsVarName, DEFAULT_STYLE_MODE, hasError, isString, normalizePath, resolve } from '@utils';
 import MagicString from 'magic-string';
 import path from 'path';
 
@@ -243,7 +243,7 @@ const getCssToEsmImports = (
       cssImportData.filePath = normalizePath(cssImportData.url);
     } else {
       // relative path
-      cssImportData.filePath = normalizePath(path.resolve(dir, cssImportData.url));
+      cssImportData.filePath = normalizePath(resolve(dir, cssImportData.url));
     }
 
     cssImportData.varName = createCssVarName(cssImportData.filePath, modeName);

@@ -1,5 +1,4 @@
-import { isString } from '@utils';
-import { join } from 'path';
+import { isString, join } from '@utils';
 import ts from 'typescript';
 
 import type * as d from '../../declarations';
