@@ -39,6 +39,10 @@ jobs:
           path: .
           filename: stencil-core-build.zip
 
+      - name: What's In This Dir?
+        run: ls -hal
+        shell: bash
+
       - name: Unit Tests
         run: npm run test.jest
         shell: bash
