@@ -25,6 +25,9 @@ jobs:
       - name: Get Core Dependencies
         uses: ./.github/workflows/actions/get-core-dependencies
 
+      - name: Get Karma Dependencies
+        uses: ./.github/workflows/actions/get-karma-dependencies
+
       - name: Use Node 20
         uses: actions/setup-node@8f152de45cc393bb48ce5d89d36b731f54556e65 # v4.0.0
         with:
