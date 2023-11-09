@@ -44,7 +44,12 @@ jobs:
         shell: bash
 
       - name: Unit Tests
-        run: npm run test.jest -- --runInBand --logHeapUsage
+        run: |
+          for i in {1..10}
+          do
+            echo "This is run number $i"
+            npm run test.jest -- --runInBand --logHeapUsage
+          done
         shell: bash
 
       - name: Check Git Context
