@@ -16,8 +16,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # TODO(STENCIL-964): Use latest Node minor version (remove '.7' from v20 entry)
-        node: ['16', '18', '20.7']
+        node: ['16', '18', '20']
         os: ['ubuntu-latest', 'windows-latest']
     runs-on: ${{ matrix.os }}
     steps:
