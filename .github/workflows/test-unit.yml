@@ -45,10 +45,10 @@ jobs:
 
       - name: Unit Tests
         run: |
-          for i in {1..10}
+          for i in {1..100}
           do
             echo "This is run number $i"
-            npm run test.jest -- --logHeapUsage
+            npm run test.jest
           done
         shell: bash
 
