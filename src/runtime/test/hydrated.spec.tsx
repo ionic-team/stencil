@@ -45,7 +45,7 @@ describe('globals', () => {
     });
     expect(doc.head.children[0]).toEqualHtml(`
       <style data-styles>
-        slot-fb{display:contents}slot-fb[hidden]{display:none}cmp-a,cmp-b{visibility:hidden}.hydrated{visibility:inherit}
+        cmp-a,cmp-b{visibility:hidden}.hydrated{visibility:inherit}
       </style>
     `);
   });
