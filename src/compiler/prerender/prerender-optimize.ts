@@ -1,5 +1,4 @@
-import { catchError, flatOne, isString, unique } from '@utils';
-import { join } from 'path';
+import { catchError, flatOne, isString, join, unique } from '@utils';
 
 import type * as d from '../../declarations';
 import { injectModulePreloads } from '../html/inject-module-preloads';

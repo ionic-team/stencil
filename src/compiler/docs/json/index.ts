@@ -1,5 +1,4 @@
-import { isOutputTargetDocsJson } from '@utils';
-import { join } from 'path';
+import { isOutputTargetDocsJson, join } from '@utils';
 
 import type * as d from '../../../declarations';
 

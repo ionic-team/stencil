@@ -1,4 +1,5 @@
-import { basename, dirname, join, relative } from 'path';
+import { join, relative } from '@utils';
+import { basename, dirname } from 'path';
 import { ResolveIdResult } from 'rollup';
 
 import type * as d from '../../declarations';

@@ -1,5 +1,5 @@
-import { DEFAULT_STYLE_MODE } from '@utils';
-import { basename, dirname, extname, join } from 'path';
+import { DEFAULT_STYLE_MODE, join } from '@utils';
+import { basename, dirname, extname } from 'path';
 import ts from 'typescript';
 
 import type * as d from '../../../declarations';

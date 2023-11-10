@@ -1,14 +1,16 @@
 import type * as d from '@stencil/core/declarations';
 import { mockConfig, mockLoadConfigInit } from '@stencil/core/testing';
-import { COPY, DIST_CUSTOM_ELEMENTS, DIST_TYPES } from '@utils';
+import { COPY, DIST_CUSTOM_ELEMENTS, DIST_TYPES, join } from '@utils';
 import path from 'path';
 
 import { validateConfig } from '../validate-config';
 
 describe('validate-output-dist-custom-element', () => {
   describe('validateCustomElement', () => {
+    // use Node's resolve() here to simulate a user using either Win/Posix separators (depending on the platform these
+    // tests are run on)
     const rootDir = path.resolve('/');
-    const defaultDistDir = path.join(rootDir, 'dist', 'components');
+    const defaultDistDir = join(rootDir, 'dist', 'components');
     const distCustomElementsDir = 'my-dist-custom-elements';
     let userConfig: d.Config;
 
@@ -27,7 +29,7 @@ describe('validate-output-dist-custom-element', () => {
         {
           type: DIST_TYPES,
           dir: defaultDistDir,
-          typesDir: path.join(rootDir, 'dist', 'types'),
+          typesDir: join(rootDir, 'dist', 'types'),
         },
         {
           type: DIST_CUSTOM_ELEMENTS,
@@ -53,7 +55,7 @@ describe('validate-output-dist-custom-element', () => {
         {
           type: DIST_TYPES,
           dir: defaultDistDir,
-          typesDir: path.join(rootDir, 'dist', 'types'),
+          typesDir: join(rootDir, 'dist', 'types'),
         },
         {
           type: DIST_CUSTOM_ELEMENTS,
@@ -79,7 +81,7 @@ describe('validate-output-dist-custom-element', () => {
         {
           type: DIST_TYPES,
           dir: defaultDistDir,
-          typesDir: path.join(rootDir, 'dist', 'types'),
+          typesDir: join(rootDir, 'dist', 'types'),
         },
         {
           type: DIST_CUSTOM_ELEMENTS,
@@ -106,7 +108,7 @@ describe('validate-output-dist-custom-element', () => {
         {
           type: DIST_CUSTOM_ELEMENTS,
           copy: [],
-          dir: path.join(rootDir, distCustomElementsDir),
+          dir: join(rootDir, distCustomElementsDir),
           empty: true,
           externalRuntime: true,
           generateTypeDeclarations: false,
@@ -222,7 +224,7 @@ describe('validate-output-dist-custom-element', () => {
           {
             type: DIST_TYPES,
             dir: defaultDistDir,
-            typesDir: path.join(rootDir, 'dist', 'types'),
+            typesDir: join(rootDir, 'dist', 'types'),
           },
           {
             type: DIST_CUSTOM_ELEMENTS,
@@ -249,7 +251,7 @@ describe('validate-output-dist-custom-element', () => {
           {
             type: DIST_TYPES,
             dir: defaultDistDir,
-            typesDir: path.join(rootDir, 'dist', 'types'),
+            typesDir: join(rootDir, 'dist', 'types'),
           },
           {
             type: DIST_CUSTOM_ELEMENTS,
@@ -277,7 +279,7 @@ describe('validate-output-dist-custom-element', () => {
           {
             type: DIST_TYPES,
             dir: defaultDistDir,
-            typesDir: path.join(rootDir, 'dist', 'types'),
+            typesDir: join(rootDir, 'dist', 'types'),
           },
           {
             type: DIST_CUSTOM_ELEMENTS,
@@ -305,13 +307,13 @@ describe('validate-output-dist-custom-element', () => {
         expect(config.outputTargets).toEqual([
           {
             type: DIST_TYPES,
-            dir: path.join(rootDir, distCustomElementsDir),
-            typesDir: path.join(rootDir, 'dist', 'types'),
+            dir: join(rootDir, distCustomElementsDir),
+            typesDir: join(rootDir, 'dist', 'types'),
           },
           {
             type: DIST_CUSTOM_ELEMENTS,
             copy: [],
-            dir: path.join(rootDir, distCustomElementsDir),
+            dir: join(rootDir, distCustomElementsDir),
             empty: false,
             externalRuntime: false,
             generateTypeDeclarations: true,
@@ -375,7 +377,7 @@ describe('validate-output-dist-custom-element', () => {
           {
             type: DIST_CUSTOM_ELEMENTS,
             copy: [copyOutputTarget, copyOutputTarget2],
-            dir: path.join(rootDir, distCustomElementsDir),
+            dir: join(rootDir, distCustomElementsDir),
             empty: false,
             externalRuntime: false,
             generateTypeDeclarations: false,

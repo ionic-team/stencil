@@ -1,5 +1,13 @@
-import { COLLECTION_MANIFEST_FILE_NAME, isGlob, isOutputTargetDistCollection, isString, normalizePath } from '@utils';
-import { dirname, join, relative } from 'path';
+import {
+  COLLECTION_MANIFEST_FILE_NAME,
+  isGlob,
+  isOutputTargetDistCollection,
+  isString,
+  join,
+  normalizePath,
+  relative,
+} from '@utils';
+import { dirname } from 'path';
 
 import type * as d from '../../declarations';
 import { packageJsonError, packageJsonWarn } from './package-json-log-utils';

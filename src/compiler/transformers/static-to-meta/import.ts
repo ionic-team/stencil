@@ -1,5 +1,5 @@
-import { normalizePath } from '@utils';
-import { isAbsolute, resolve } from 'path';
+import { normalizePath, resolve } from '@utils';
+import { isAbsolute } from 'path';
 import ts from 'typescript';
 
 import type * as d from '../../../declarations';

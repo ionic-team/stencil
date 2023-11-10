@@ -1,4 +1,5 @@
-import { basename, join } from 'path';
+import { join } from '@utils';
+import { basename } from 'path';
 import type { RollupOutput } from 'rollup';
 
 import type * as d from '../../../declarations';

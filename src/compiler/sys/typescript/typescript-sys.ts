@@ -1,5 +1,5 @@
-import { isRemoteUrl, isString, noop, normalizePath } from '@utils';
-import { basename, resolve } from 'path';
+import { isRemoteUrl, isString, noop, normalizePath, resolve } from '@utils';
+import { basename } from 'path';
 import ts from 'typescript';
 
 import type * as d from '../../../declarations';
