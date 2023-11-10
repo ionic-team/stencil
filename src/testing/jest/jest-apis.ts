@@ -24,8 +24,19 @@ export type JestPreprocessor = {
   getCacheKey(sourceText: string, sourcePath: string, ...args: any[]): string;
 };
 
-// TODO(STENCIL-960): Improve this typing by narrowing it
-export type JestTestRunner = any;
+/**
+ * For Stencil's purposes, an instance of a Jest `TestRunner` only needs to have an async `runTests` function.
+ * This does not mean that Jest does not require additional functions. However, those requirements may change from
+ * version-to-version of Jest. Stencil overrides the `runTests` function, and with our current design of integrating
+ * with Jest, require it to be overridden (for test filtering and supporting screenshot testing.
+ */
+export type JestTestRunner = {
+  runTests(...args: any[]): Promise<any>;
+};
+/**
+ * Helper type for describing a function that returns a {@link JestTestRunner}.
+ */
+export type JestTestRunnerConstructor = new (...args: any[]) => JestTestRunner;
 
 /**
  * This type serves as an alias for the type representing the initial configuration for Jest.

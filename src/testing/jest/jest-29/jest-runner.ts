@@ -1,9 +1,10 @@
 import type { AggregatedResult } from '@jest/test-result';
 import type * as d from '@stencil/core/internal';
+import { default as TestRunner } from 'jest-runner';
 
 import type { ConfigFlags } from '../../../cli/config-flags';
 import { setScreenshotEmulateData } from '../../puppeteer/puppeteer-emulate';
-import type { JestTestRunner } from '../jest-apis';
+import { JestTestRunnerConstructor } from '../jest-apis';
 import { buildJestArgv, getProjectListFromCLIArgs } from './jest-config';
 
 export async function runJest(config: d.ValidatedConfig, env: d.E2EProcessEnv) {
@@ -50,11 +51,9 @@ export async function runJest(config: d.ValidatedConfig, env: d.E2EProcessEnv) {
  * Creates a Stencil test runner
  * @returns the test runner
  */
-export function createTestRunner(): JestTestRunner {
-  const TestRunner = require('jest-runner').default;
-
+export function createTestRunner(): JestTestRunnerConstructor {
   class StencilTestRunner extends TestRunner {
-    async runTests(tests: { path: string }[], watcher: any, onStart: any, onResult: any, onFailure: any, options: any) {
+    override async runTests(tests: { context: any; path: string }[], watcher: any, options: any) {
       const env = process.env as d.E2EProcessEnv;
 
       // filter out only the tests the flags said we should run
@@ -76,12 +75,12 @@ export function createTestRunner(): JestTestRunner {
           setScreenshotEmulateData(emulateConfig, env);
 
           // run the test for each emulate config
-          await super.runTests(tests, watcher, onStart, onResult, onFailure, options);
+          await super.runTests(tests, watcher, options);
         }
       } else {
         // not doing e2e screenshot tests
         // so just run each test once
-        await super.runTests(tests, watcher, onStart, onResult, onFailure, options);
+        await super.runTests(tests, watcher, options);
       }
     }
   }
