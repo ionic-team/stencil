@@ -57,6 +57,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
     }
   }
 
+  let hasSlotRelocation = false;
   lazyBundles.map((lazyBundle) => {
     lazyBundle[1].map((compactMeta) => {
       const cmpMeta: d.ComponentRuntimeMeta = {
@@ -65,6 +66,13 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
         $members$: compactMeta[2],
         $listeners$: compactMeta[3],
       };
+
+      // Check if we are using slots outside the shadow DOM in this component.
+      // We'll use this information later to add styles for `slot-fb` elements
+      if (cmpMeta.$flags$ & CMP_FLAGS.hasSlotRelocation) {
+        hasSlotRelocation = true;
+      }
+
       if (BUILD.member) {
         cmpMeta.$members$ = compactMeta[2];
       }
@@ -185,20 +193,26 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
     });
   });
 
-  // These style should always be constructed and inserted into the DOM
-  // We'll conditionally add some more styles later on
-  dataStyles.innerHTML = SLOT_FB_CSS;
-  dataStyles.setAttribute('data-styles', '');
-  head.insertBefore(dataStyles, metaCharset ? metaCharset.nextSibling : head.firstChild);
+  // Add styles for `slot-fb` elements if any of our components are using slots outside the Shadow DOM
+  if (hasSlotRelocation) {
+    dataStyles.innerHTML += SLOT_FB_CSS;
+  }
 
+  // Add hydration styles
   if (BUILD.invisiblePrehydration && (BUILD.hydratedClass || BUILD.hydratedAttribute)) {
     dataStyles.innerHTML += cmpTags + HYDRATED_CSS;
   }
 
-  // Apply CSP nonce to the style tag if it exists
-  const nonce = plt.$nonce$ ?? queryNonceMetaTagContent(doc);
-  if (nonce != null) {
-    dataStyles.setAttribute('nonce', nonce);
+  // If we have styles, add them to the DOM
+  if (dataStyles.innerHTML.length) {
+    dataStyles.setAttribute('data-styles', '');
+    head.insertBefore(dataStyles, metaCharset ? metaCharset.nextSibling : head.firstChild);
+
+    // Apply CSP nonce to the style tag if it exists
+    const nonce = plt.$nonce$ ?? queryNonceMetaTagContent(doc);
+    if (nonce != null) {
+      dataStyles.setAttribute('nonce', nonce);
+    }
   }
 
   // Process deferred connectedCallbacks now all components have been registered
