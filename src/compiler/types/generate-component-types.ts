@@ -38,24 +38,24 @@ export const generateComponentTypes = (
   const element = [
     ...htmlElementEventMap,
     addDocBlock(
-      `        interface ${htmlElementName} extends Components.${tagNameAsPascal}, HTMLStencilElement {`,
+      `    interface ${htmlElementName} extends Components.${tagNameAsPascal}, HTMLStencilElement {`,
       cmp.docs,
       4,
     ),
     ...htmlElementEventListenerProperties,
-    `        }`,
-    `        var ${htmlElementName}: {`,
-    `                prototype: ${htmlElementName};`,
-    `                new (): ${htmlElementName};`,
-    `        };`,
+    `    }`,
+    `    var ${htmlElementName}: {`,
+    `        prototype: ${htmlElementName};`,
+    `        new (): ${htmlElementName};`,
+    `    };`,
   ];
   return {
     isDep,
     tagName,
     tagNameAsPascal,
     htmlElementName,
-    component: addDocBlock(`        interface ${tagNameAsPascal} {\n${componentAttributes}        }`, cmp.docs, 4),
-    jsx: `    interface ${tagNameAsPascal} {\n${jsxAttributes}        }`,
+    component: addDocBlock(`    interface ${tagNameAsPascal} {\n${componentAttributes}    }`, cmp.docs, 4),
+    jsx: `    interface ${tagNameAsPascal} {\n${jsxAttributes}    }`,
     element: element.join(`\n`),
   };
 };
@@ -70,12 +70,12 @@ const attributesToMultiLineString = (attributes: d.TypeInfo, jsxAttributes: bool
     })
     .reduce((fullList, type) => {
       if (type.jsdoc) {
-        fullList.push(`                /**`);
-        fullList.push(...type.jsdoc.split('\n').map((line) => '                  * ' + line));
-        fullList.push(`                 */`);
+        fullList.push(`        /**`);
+        fullList.push(...type.jsdoc.split('\n').map((line) => '          * ' + line));
+        fullList.push(`         */`);
       }
       const optional = jsxAttributes ? !type.required : type.optional;
-      fullList.push(`                "${type.name}"${optional ? '?' : ''}: ${type.type};`);
+      fullList.push(`        "${type.name}"${optional ? '?' : ''}: ${type.type};`);
       return fullList;
     }, [] as string[])
     .join(`\n`);
