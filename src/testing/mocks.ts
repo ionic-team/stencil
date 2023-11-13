@@ -33,6 +33,7 @@ export function mockValidatedConfig(overrides: Partial<ValidatedConfig> = {}): V
 
   return {
     ...baseConfig,
+    devMode: true,
     devServer: {},
     extras: {},
     flags: createConfigFlags(),
