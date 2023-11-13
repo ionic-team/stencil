@@ -65,7 +65,7 @@ export const parseStaticComponentMeta = (
     componentClassName: cmpNode.name ? cmpNode.name.text : '',
     elementRef: parseStaticElementRef(staticMembers),
     encapsulation,
-    shadowDelegatesFocus: parseStaticShadowDelegatesFocus(encapsulation, staticMembers),
+    shadowDelegatesFocus: !!parseStaticShadowDelegatesFocus(encapsulation, staticMembers),
     properties: parseStaticProps(staticMembers),
     virtualProperties: parseVirtualProps(docs),
     states: parseStaticStates(staticMembers),

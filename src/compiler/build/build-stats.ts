@@ -36,11 +36,11 @@ export function generateBuildStats(
           outputs: getAppOutputs(config, buildResults),
         },
         options: {
-          minifyJs: config.minifyJs,
-          minifyCss: config.minifyCss,
-          hashFileNames: config.hashFileNames,
+          minifyJs: !!config.minifyJs,
+          minifyCss: !!config.minifyCss,
+          hashFileNames: !!config.hashFileNames,
           hashedFileNameLength: config.hashedFileNameLength,
-          buildEs5: config.buildEs5,
+          buildEs5: !!config.buildEs5,
         },
         formats: {
           esmBrowser: sanitizeBundlesForStats(buildCtx.esmBrowserComponentBundle),
