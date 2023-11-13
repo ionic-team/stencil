@@ -1,3 +1,15 @@
+## 🐄 [4.7.2](https://github.com/ionic-team/stencil/compare/v4.7.1...v4.7.2) (2023-11-13)
+
+
+### Bug Fixes
+
+* **compiler:** normalize paths on windows ([#4997](https://github.com/ionic-team/stencil/issues/4997)) ([bb0b1d4](https://github.com/ionic-team/stencil/commit/bb0b1d46f63175dc09d0a23445be4d4a0d891a01)), closes [#4980](https://github.com/ionic-team/stencil/issues/4980) [#4961](https://github.com/ionic-team/stencil/issues/4961)
+* **runtime:** add display style to slot-fb elements ([#5028](https://github.com/ionic-team/stencil/issues/5028)) ([72c1f1a](https://github.com/ionic-team/stencil/commit/72c1f1a352e8b9ce3c965f6dc751e16acd9cb3ae))
+* **test:** don't fail build when jest typings can't be resolved ([#5031](https://github.com/ionic-team/stencil/issues/5031)) ([5df16e6](https://github.com/ionic-team/stencil/commit/5df16e69d25db818737a8d827386f8acf3800281)), closes [#5030](https://github.com/ionic-team/stencil/issues/5030)
+* **vite:** resolve PURE comment warnings ([#5018](https://github.com/ionic-team/stencil/issues/5018)) ([0a1fbe1](https://github.com/ionic-team/stencil/commit/0a1fbe144e72acdb28af1fcc208c6a1e6a1fdf73)), closes [#5008](https://github.com/ionic-team/stencil/issues/5008)
+
+
+
 ## 🍿 [4.7.1](https://github.com/ionic-team/stencil/compare/v4.7.0...v4.7.1) (2023-11-06)
 
 
