@@ -12,7 +12,7 @@ import semverMajor from 'semver/functions/major';
 import { Jest27Stencil } from './jest-27-and-under/jest-facade';
 import { Jest28Stencil } from './jest-28/jest-facade';
 import { Jest29Stencil } from './jest-29/jest-facade';
-import { getJestMajorVersion } from './jest-apis';
+import { getJestMajorVersion, JestPresetConfig } from './jest-apis';
 import { JestFacade } from './jest-facade';
 
 /**
@@ -118,12 +118,11 @@ export const getJestSetupTestFramework = () => {
   return getJestFacade().getJestSetupTestFramework();
 };
 
-// TODO(STENCIL-1003): Fix typing resolution bug where dynamic type imports would result in build failures for Jest 28/29
 /**
  * Retrieve Stencil's Jest presets for the detected version of Jest
  *
  * @returns an object representing a Jest preset
  */
-export const getJestPreset = (): any => {
+export const getJestPreset = (): JestPresetConfig => {
   return getJestFacade().getJestPreset();
 };
