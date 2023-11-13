@@ -1,5 +1,5 @@
 import type * as d from '@stencil/core/internal';
-import { isOutputTargetDistLazy, isOutputTargetWww } from '@utils';
+import { isOutputTargetDistLazy, isOutputTargetWww, isString } from '@utils';
 import { join, relative } from 'path';
 
 import { InMemoryFileSystem } from '../compiler/sys/in-memory-fs';
@@ -78,7 +78,7 @@ export function getAppStyleUrl(config: d.ValidatedConfig, browserUrl: string) {
 
 function getAppUrl(config: d.ValidatedConfig, browserUrl: string, appFileName: string) {
   const wwwOutput = config.outputTargets.find(isOutputTargetWww);
-  if (wwwOutput) {
+  if (wwwOutput && isString(wwwOutput.buildDir) && isString(wwwOutput.dir)) {
     const appBuildDir = wwwOutput.buildDir;
     const appFilePath = join(appBuildDir, appFileName);
     const appUrlPath = relative(wwwOutput.dir, appFilePath);
@@ -87,7 +87,7 @@ function getAppUrl(config: d.ValidatedConfig, browserUrl: string, appFileName: s
   }
 
   const distOutput = config.outputTargets.find(isOutputTargetDistLazy);
-  if (distOutput) {
+  if (distOutput && isString(distOutput.esmDir)) {
     const appBuildDir = distOutput.esmDir;
     const appFilePath = join(appBuildDir, appFileName);
     const appUrlPath = relative(config.rootDir, appFilePath);
