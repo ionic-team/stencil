@@ -899,6 +899,11 @@ export namespace JSXBase {
     name?: string;
     type?: string;
     value?: string | string[] | number;
+
+    // popover
+    popoverTargetAction?: 'hide' | 'show' | 'toggle';
+    popoverTargetElement?: Element;
+    popoverTarget?: string;
   }
 
   export interface CanvasHTMLAttributes<T> extends HTMLAttributes<T> {
@@ -1074,6 +1079,11 @@ export namespace JSXBase {
     webkitdirectory?: boolean;
     webkitEntries?: any;
     width?: number | string;
+
+    // popover
+    popoverTargetAction?: 'hide' | 'show' | 'toggle';
+    popoverTargetElement?: Element;
+    popoverTarget?: string;
   }
 
   export interface KeygenHTMLAttributes<T> extends HTMLAttributes<T> {
@@ -1364,6 +1374,7 @@ export namespace JSXBase {
     tabIndex?: number;
     tabindex?: number | string;
     title?: string;
+    popover?: 'auto' | 'manual';
 
     // Unknown
     inputMode?: string;
