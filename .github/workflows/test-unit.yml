@@ -44,12 +44,7 @@ jobs:
         shell: bash
 
       - name: Unit Tests
-        run: |
-          for i in {1..100}
-          do
-            echo "This is run number $i"
-            npm run test.jest
-          done
+        run: npm run test.jest
         shell: bash
 
       - name: Check Git Context
