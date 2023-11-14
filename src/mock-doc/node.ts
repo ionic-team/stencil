@@ -380,6 +380,14 @@ Testing components with ElementInternals is fully supported in e2e tests.`,
     return null;
   }
 
+  getAttributeNode(attrName: string): MockAttr | null {
+    if (!this.hasAttribute(attrName)) {
+      return null;
+    }
+
+    return new MockAttr(attrName, this.getAttribute(attrName));
+  }
+
   getBoundingClientRect() {
     return { bottom: 0, height: 0, left: 0, right: 0, top: 0, width: 0, x: 0, y: 0 };
   }
