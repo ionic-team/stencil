@@ -12,7 +12,7 @@ import semverMajor from 'semver/functions/major';
 import { Jest27Stencil } from './jest-27-and-under/jest-facade';
 import { Jest28Stencil } from './jest-28/jest-facade';
 import { Jest29Stencil } from './jest-29/jest-facade';
-import { getJestMajorVersion, JestPresetConfig } from './jest-apis';
+import { getJestMajorVersion, JestCliRunner, JestPresetConfig, JestScreenshotRunner } from './jest-apis';
 import { JestFacade } from './jest-facade';
 
 /**
@@ -69,7 +69,7 @@ export const getDefaultJestRunner = (): string => {
  *
  * @returns a test runner for Stencil tests, based on the version of Jest that's detected
  */
-export const getRunner = () => {
+export const getRunner = (): JestCliRunner => {
   return getJestFacade().getJestCliRunner();
 };
 
@@ -78,7 +78,7 @@ export const getRunner = () => {
  *
  * @returns a screenshot facade implementation for Stencil tests, based on the version of Jest that's detected
  */
-export const getScreenshot = () => {
+export const getScreenshot = (): JestScreenshotRunner => {
   return getJestFacade().getRunJestScreenshot();
 };
 
