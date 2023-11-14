@@ -1358,6 +1358,7 @@ export namespace JSXBase {
     draggable?: boolean;
     hidden?: boolean;
     id?: string;
+    inert?: boolean;
     lang?: string;
     spellcheck?: 'true' | 'false' | any;
     style?: { [key: string]: string | undefined };
