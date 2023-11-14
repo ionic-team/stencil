@@ -57,3 +57,703 @@ jobs:
     uses: ./.github/workflows/test-unit.yml
     with:
       build_name: stencil-core
+
+  unit_tests_1:
+    name: Unit Tests
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_2:
+    name: Unit Tests 2
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_3:
+    name: Unit Tests 3
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_4:
+    name: Unit Tests 4
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_5:
+    name: Unit Tests 5
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_6:
+    name: Unit Tests 6
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_7:
+    name: Unit Tests 7
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_8:
+    name: Unit Tests 8
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_9:
+    name: Unit Tests 9
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_10:
+    name: Unit Tests 10
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_11:
+    name: Unit Tests 11
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_12:
+    name: Unit Tests 12
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_13:
+    name: Unit Tests 13
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_14:
+    name: Unit Tests 14
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_15:
+    name: Unit Tests 15
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_16:
+    name: Unit Tests 16
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_17:
+    name: Unit Tests 17
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_18:
+    name: Unit Tests 18
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_19:
+    name: Unit Tests 19
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_20:
+    name: Unit Tests 20
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_21:
+    name: Unit Tests 21
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_22:
+    name: Unit Tests 22
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_23:
+    name: Unit Tests 23
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_24:
+    name: Unit Tests 24
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_25:
+    name: Unit Tests 25
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_26:
+    name: Unit Tests 26
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_27:
+    name: Unit Tests 27
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_28:
+    name: Unit Tests 28
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_29:
+    name: Unit Tests 29
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_30:
+    name: Unit Tests 30
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_31:
+    name: Unit Tests 31
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_32:
+    name: Unit Tests 32
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_33:
+    name: Unit Tests 33
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_34:
+    name: Unit Tests 34
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_35:
+    name: Unit Tests 35
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_36:
+    name: Unit Tests 36
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_37:
+    name: Unit Tests 37
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_38:
+    name: Unit Tests 38
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_39:
+    name: Unit Tests 39
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_40:
+    name: Unit Tests 40
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_41:
+    name: Unit Tests 41
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_42:
+    name: Unit Tests 42
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_43:
+    name: Unit Tests 43
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_44:
+    name: Unit Tests 44
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_45:
+    name: Unit Tests 45
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_46:
+    name: Unit Tests 46
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_47:
+    name: Unit Tests 47
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_48:
+    name: Unit Tests 48
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_49:
+    name: Unit Tests 49
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_50:
+    name: Unit Tests 50
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_51:
+    name: Unit Tests 51
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_52:
+    name: Unit Tests 52
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_53:
+    name: Unit Tests 53
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_54:
+    name: Unit Tests 54
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_55:
+    name: Unit Tests 55
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_56:
+    name: Unit Tests 56
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_57:
+    name: Unit Tests 57
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_58:
+    name: Unit Tests 58
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_59:
+    name: Unit Tests 59
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_60:
+    name: Unit Tests 60
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_61:
+    name: Unit Tests 61
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_62:
+    name: Unit Tests 62
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_63:
+    name: Unit Tests 63
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_64:
+    name: Unit Tests 64
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_65:
+    name: Unit Tests 65
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_66:
+    name: Unit Tests 66
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_67:
+    name: Unit Tests 67
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_68:
+    name: Unit Tests 68
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_69:
+    name: Unit Tests 69
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_70:
+    name: Unit Tests 70
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_71:
+    name: Unit Tests 71
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_72:
+    name: Unit Tests 72
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_73:
+    name: Unit Tests 73
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_74:
+    name: Unit Tests 74
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_75:
+    name: Unit Tests 75
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_76:
+    name: Unit Tests 76
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_77:
+    name: Unit Tests 77
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_78:
+    name: Unit Tests 78
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_79:
+    name: Unit Tests 79
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_80:
+    name: Unit Tests 80
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_81:
+    name: Unit Tests 81
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_82:
+    name: Unit Tests 82
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_83:
+    name: Unit Tests 83
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_84:
+    name: Unit Tests 84
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_85:
+    name: Unit Tests 85
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_86:
+    name: Unit Tests 86
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_87:
+    name: Unit Tests 87
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_88:
+    name: Unit Tests 88
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_89:
+    name: Unit Tests 89
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_90:
+    name: Unit Tests 90
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_91:
+    name: Unit Tests 91
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_92:
+    name: Unit Tests 92
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_93:
+    name: Unit Tests 93
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_94:
+    name: Unit Tests 94
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_95:
+    name: Unit Tests 95
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_96:
+    name: Unit Tests 96
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_97:
+    name: Unit Tests 97
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_98:
+    name: Unit Tests 98
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_99:
+    name: Unit Tests 99
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
+
+  unit_tests_100:
+    name: Unit Tests 100
+    needs: [build_core]
+    uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core
