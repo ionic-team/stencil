@@ -1374,6 +1374,10 @@ export namespace JSXBase {
     tabIndex?: number;
     tabindex?: number | string;
     title?: string;
+    // These types don't allow you to use popover as a boolean attribute
+    // so you can't write HTML like `<div popover>` and get the default value.
+    // Developer must explicitly specify one of the valid popover values or it will fallback
+    // to `manual` (following the HTML spec).
     popover?: string | null;
 
     // Unknown
