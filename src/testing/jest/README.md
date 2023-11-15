@@ -6,7 +6,8 @@ This directory contains support for the Jest testing library.
 
 To be able to work on the sub-projects in this directory, Jest dependencies are required to be installed explicitly.
 To do so, one may either:
-1. (Recommended) Run the `install-dependencies.sh` script found in this directory to install _all_ Jest dependencies
+1. (Recommended) Run `npm run install.jest` from the root of the repository to install _all_ Jest dependencies
+1. Run the `install-dependencies.sh` script found in this directory to install _all_ Jest dependencies
 1. Run `npm ci` in the Jest version-specific directory you plan on working in
 
 ## Adding Support for a New Version of Jest
