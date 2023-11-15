@@ -901,8 +901,8 @@ export namespace JSXBase {
     value?: string | string[] | number;
 
     // popover
-    popoverTargetAction?: 'hide' | 'show' | 'toggle';
-    popoverTargetElement?: Element;
+    popoverTargetAction?: string;
+    popoverTargetElement?: Element | null;
     popoverTarget?: string;
   }
 
@@ -1081,8 +1081,8 @@ export namespace JSXBase {
     width?: number | string;
 
     // popover
-    popoverTargetAction?: 'hide' | 'show' | 'toggle';
-    popoverTargetElement?: Element;
+    popoverTargetAction?: string;
+    popoverTargetElement?: Element | null;
     popoverTarget?: string;
   }
 
@@ -1374,7 +1374,7 @@ export namespace JSXBase {
     tabIndex?: number;
     tabindex?: number | string;
     title?: string;
-    popover?: 'auto' | 'manual';
+    popover?: string | null;
 
     // Unknown
     inputMode?: string;
