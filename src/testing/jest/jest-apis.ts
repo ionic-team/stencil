@@ -17,8 +17,22 @@ import type { Config } from '@jest/types';
 import * as d from '@stencil/core/internal';
 import { getVersion } from 'jest';
 
-// TODO(STENCIL-959): Improve this typing by narrowing it
-export type JestPuppeteerEnvironment = any;
+/**
+ * For Stencil's purposes, an instance of a Jest/Puppeteer environment only needs to have a handful of functions.
+ * This does not mean that Jest does not require additional functions on an environment. However, those requirements may
+ * change from version-to-version of Jest. Stencil overrides the functions below, and with our current design of
+ * integrating with Jest, require them to be overridden.
+ */
+export type JestPuppeteerEnvironment = {
+  setup(): Promise<void>;
+  teardown(): Promise<void>;
+  getVmContext(): any | null;
+};
+
+/**
+ * Helper type for describing a function that returns a {@link JestPuppeteerEnvironment}.
+ */
+export type JestPuppeteerEnvironmentConstructor = new (...args: any[]) => JestPuppeteerEnvironment;
 
 export type JestPreprocessor = {
   process(sourceText: string, sourcePath: string, ...args: any[]): string | TransformedSource;

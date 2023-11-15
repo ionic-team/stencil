@@ -43,6 +43,7 @@ export async function testing(opts: BuildOptions) {
     'jest',
     'expect',
     '@jest/reporters',
+    'jest-environment-node',
     'jest-message-id',
     'jest-runner',
     'net',

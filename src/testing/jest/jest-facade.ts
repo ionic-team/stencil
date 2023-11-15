@@ -2,7 +2,7 @@ import {
   JestCliRunner,
   JestPreprocessor,
   JestPresetConfig,
-  JestPuppeteerEnvironment,
+  JestPuppeteerEnvironmentConstructor,
   JestScreenshotRunner,
   JestTestRunnerConstructor,
 } from './jest-apis';
@@ -48,7 +48,7 @@ export interface JestFacade {
    *
    * @returns A function that builds an E2E testing environment.
    */
-  getCreateJestPuppeteerEnvironment(): () => JestPuppeteerEnvironment;
+  getCreateJestPuppeteerEnvironment(): () => JestPuppeteerEnvironmentConstructor;
 
   /**
    * Create an object used to transform files as a part of running Jest.
