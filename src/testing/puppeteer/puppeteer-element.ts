@@ -593,7 +593,7 @@ async function findWithCssSelector(
       return null;
     }
 
-    elmHandle = shadowHandle.asElement();
+    elmHandle = shadowHandle;
   }
 
   return elmHandle;
@@ -607,7 +607,7 @@ async function findWithText(
 ) {
   const jsHandle = await page.evaluateHandle(
     (rootElm: Element, text: string, contains: string) => {
-      let foundElm: any = null;
+      let foundElm: HTMLElement | null = null;
 
       function checkContent(elm: Node) {
         if (!elm || foundElm) {
@@ -646,7 +646,7 @@ async function findWithText(
   );
 
   if (jsHandle) {
-    return jsHandle.asElement();
+    return jsHandle;
   }
 
   return null;
