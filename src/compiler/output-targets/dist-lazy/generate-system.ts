@@ -69,7 +69,7 @@ const writeSystemLoader = async (
   if (outputTarget.systemLoaderFile) {
     const entryPointPath = join(outputTarget.systemDir, loaderFilename);
     const relativePath = relativeImport(outputTarget.systemLoaderFile, entryPointPath);
-    const loaderContent = await getSystemLoader(config, compilerCtx, relativePath, outputTarget.polyfills);
+    const loaderContent = await getSystemLoader(config, compilerCtx, relativePath, !!outputTarget.polyfills);
     await compilerCtx.fs.writeFile(outputTarget.systemLoaderFile, loaderContent, {
       outputTargetType: outputTarget.type,
     });

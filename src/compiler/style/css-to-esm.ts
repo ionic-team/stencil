@@ -116,7 +116,7 @@ const transformCssToEsmModule = (input: d.TransformCssToEsmInput): d.TransformCs
     if (isString(input.tag)) {
       if (input.encapsulation === 'scoped' || (input.encapsulation === 'shadow' && input.commentOriginalSelector)) {
         const scopeId = getScopeId(input.tag, input.mode);
-        results.styleText = scopeCss(results.styleText, scopeId, input.commentOriginalSelector);
+        results.styleText = scopeCss(results.styleText, scopeId, !!input.commentOriginalSelector);
       }
     }
 
