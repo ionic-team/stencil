@@ -13,5 +13,8 @@ runs:
         cache: 'npm'
 
     - name: Install Dependencies
-      run: npm ci
+      run: |
+        npm ci \
+        && ./src/testing/jest/install-dependencies.sh
+
       shell: bash
