@@ -7,8 +7,8 @@ describe('vdom-annotations', () => {
   let root: HTMLElement;
 
   beforeEach(async () => {
-    @Component({ tag: 'cmpa-test', scoped: true })
-    class CmpA {
+    @Component({ tag: 'component-a-test', scoped: true })
+    class ComponentA {
       render() {
         return (
           <div>
@@ -18,8 +18,8 @@ describe('vdom-annotations', () => {
       }
     }
 
-    @Component({ tag: 'cmpb-test', scoped: true })
-    class CmpB {
+    @Component({ tag: 'component-b-test', scoped: true })
+    class ComponentB {
       render() {
         return (
           <div>
@@ -30,10 +30,10 @@ describe('vdom-annotations', () => {
     }
 
     const { root: rootElm } = await newSpecPage({
-      components: [CmpA, CmpB],
+      components: [ComponentA, ComponentB],
       html: `<section>
-        <cmpa-test>slotContent</cmpa-test>
-        <cmpb-test>slotContent</cmpb-test>
+        <component-a-test>slotContent</component-a-test>
+        <component-b-test>slotContent</component-b-test>
       </section>`,
     });
     root = rootElm;
@@ -43,60 +43,60 @@ describe('vdom-annotations', () => {
     insertVdomAnnotations(root.ownerDocument, []);
     /**
       <section>
-        <cmpa-test s-id="1">
+        <component-a-test s-id="1">
             <!--r.1-->o.0.1
             <div c-id="1.0.0.0">
               <!--t.1.1.1.0--> <!--t.0.1-->slotContent
             </div>
-        </cmpa-test>
-        <cmpb-test s-id="2">
+        </component-a-test>
+        <component-b-test s-id="2">
             <!--r.2-->o.0.2
             <div c-id="2.0.0.0">
               <!--t.2.1.1.0--> <!--t.0.2-->slotContent
             </div>
-        </cmpb-test>
+        </component-b-test>
       </section>
      */
     expect(root.ownerDocument.body.innerHTML).toMatchSnapshot();
   });
 
-  it('should add annotations when cmpa-test is given as static component', () => {
-    insertVdomAnnotations(root.ownerDocument, ['cmpa-test']);
+  it('should add annotations when component-a-test is given as static component', () => {
+    insertVdomAnnotations(root.ownerDocument, ['component-a-test']);
     /**
       <section>
-        <cmpa-test>
+        <component-a-test>
             <!---->o.0.1
             <div>
               <!--t.0.1-->slotContent
             </div>
-        </cmpa-test>
-        <cmpb-test s-id="1">
+        </component-a-test>
+        <component-b-test s-id="1">
             <!--r.1-->o.0.2
             <div c-id="1.0.0.0">
               <!--t.1.1.1.0--> <!--t.0.2-->slotContent
             </div>
-        </cmpb-test>
+        </component-b-test>
       </section>
      */
     expect(root.ownerDocument.body.innerHTML).toMatchSnapshot();
   });
 
-  it('should add annotations when cmpa-test and cmpb-test is given as static component', () => {
-    insertVdomAnnotations(root.ownerDocument, ['cmpa-test', 'cmpb-test']);
+  it('should add annotations when component-a-test and component-b-test is given as static component', () => {
+    insertVdomAnnotations(root.ownerDocument, ['component-a-test', 'component-b-test']);
     /**
       <section>
-        <cmpa-test>
+        <component-a-test>
             <!---->o.0.1
             <div>
               <!--t.0.1-->slotContent
             </div>
-        </cmpa-test>
-        <cmpb-test>
+        </component-a-test>
+        <component-b-test>
             <!---->o.0.2
             <div>
               <!--t.0.2-->slotContent
             </div>
-        </cmpb-test>
+        </component-b-test>
       </section>
      */
     expect(root.ownerDocument.body.innerHTML).toMatchSnapshot();
