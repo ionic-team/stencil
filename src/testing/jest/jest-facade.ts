@@ -1,4 +1,4 @@
-import { JestPreprocessor, JestPresetConfig, JestPuppeteerEnvironment, JestTestRunner } from './jest-apis';
+import { JestPreprocessor, JestPresetConfig, JestPuppeteerEnvironment, JestTestRunnerConstructor } from './jest-apis';
 
 /**
  * Interface for Jest-version specific code implementations that interact with Stencil.
@@ -56,11 +56,11 @@ export interface JestFacade {
   getJestPreprocessor(): JestPreprocessor;
 
   /**
-   * Retrieve a custom Stencil-Jest test runner
+   * Retrieve a function that returns the custom Stencil-Jest test runner
    *
-   * @returns the test runner
+   * @returns a function that retrieves the test runner
    */
-  getCreateJestTestRunner(): JestTestRunner;
+  getCreateJestTestRunner(): () => JestTestRunnerConstructor;
 
   /**
    * Retrieve a function that returns the setup configuration code to run between tests.
