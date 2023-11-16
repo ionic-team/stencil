@@ -254,7 +254,10 @@ const clientHydrate = (
   }
 };
 
-export const initializeDocumentHydrate = (node: d.RenderNode, orgLocNodes: d.PlatformRuntime['$orgLocNodes$']) => {
+export const initializeDocumentHydrate = (
+  node: d.RenderNode,
+  orgLocNodes: d.PlatformRuntime['$orgLocNodes$']
+) => {
   if (node.nodeType === NODE_TYPE.ElementNode) {
     let i = 0;
     for (; i < node.childNodes.length; i++) {

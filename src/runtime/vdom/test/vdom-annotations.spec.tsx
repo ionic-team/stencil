@@ -1,8 +1,7 @@
-import { Component, forceUpdate, h, Prop } from '@stencil/core';
+import { Component, h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
 import { insertVdomAnnotations } from '../vdom-annotations';
-// import { createDocument } from '../../../mock-doc';
 
 describe('vdom-annotations', () => {
   let root: HTMLElement;
