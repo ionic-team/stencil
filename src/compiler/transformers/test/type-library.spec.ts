@@ -1,7 +1,7 @@
 import { ValidatedConfig } from '@stencil/core/declarations';
-import { getMockFSPatch, mockLogger, mockValidatedConfig, setupConsoleMocker } from '@stencil/core/testing';
+import { mockLogger, mockValidatedConfig, setupConsoleMocker } from '@stencil/core/testing';
 import { normalizePath } from '@utils';
-import mock from 'mock-fs';
+import { relative } from '@utils';
 import path from 'path';
 
 import { addFileToLibrary, getTypeLibrary } from '../type-library';
@@ -15,22 +15,19 @@ function resetLibrary() {
 }
 
 const fixturesDir = 'fixtures';
-const dessertModulePath = normalizePath(path.join(fixturesDir, 'dessert.ts'), false);
-const mealModulePath = normalizePath(path.join(fixturesDir, 'meal-entry.ts'), false);
+const dessertModulePath = normalizePath(path.join(__dirname, fixturesDir, 'dessert.ts'), false);
+const mealModulePath = normalizePath(path.join(__dirname, fixturesDir, 'meal-entry.ts'), false);
 
 describe('type library', () => {
   let config: ValidatedConfig;
+
   beforeEach(() => {
-    config = mockValidatedConfig();
-    mock({
-      [mealModulePath]: mock.load(path.resolve(__dirname, mealModulePath)),
-      [dessertModulePath]: mock.load(path.resolve(__dirname, dessertModulePath)),
-      ...getMockFSPatch(mock),
+    config = mockValidatedConfig({
+      rootDir: process.cwd(),
     });
   });
 
   afterEach(() => {
-    mock.restore();
     resetLibrary();
   });
 
@@ -49,93 +46,118 @@ describe('type library', () => {
 
   it('should include an enum', () => {
     addFileToLibrary(config, mealModulePath);
-    expect(getTypeLibrary()[`${mealModulePath}::BestEnum`]).toEqual({
+
+    const relativePath = relative(config.rootDir, mealModulePath);
+
+    expect(getTypeLibrary()[`${relativePath}::BestEnum`]).toEqual({
       declaration: `export enum BestEnum {
   Best,
   Worst,
   JustAlright,
 }`,
       docstring: 'This has some documentation!',
-      path: mealModulePath,
+      path: relativePath,
     });
   });
 
   it('should include a string union', () => {
     addFileToLibrary(config, mealModulePath);
-    expect(getTypeLibrary()[`${mealModulePath}::StringUnion`]).toEqual({
+
+    const relativePath = relative(config.rootDir, mealModulePath);
+
+    expect(getTypeLibrary()[`${relativePath}::StringUnion`]).toEqual({
       declaration: `export type StringUnion = 'left' | 'right';`,
       docstring: '',
-      path: mealModulePath,
+      path: relativePath,
     });
   });
 
   it('should include a simple alias', () => {
     addFileToLibrary(config, mealModulePath);
-    expect(getTypeLibrary()[`${mealModulePath}::JustAnAlias`]).toEqual({
+
+    const relativePath = relative(config.rootDir, mealModulePath);
+
+    expect(getTypeLibrary()[`${relativePath}::JustAnAlias`]).toEqual({
       declaration: `string`,
       docstring: '',
-      path: mealModulePath,
+      path: relativePath,
     });
   });
 
   it('should exclude any private types', () => {
     addFileToLibrary(config, mealModulePath);
-    expect(getTypeLibrary()[`${mealModulePath}::PrivateType`]).toBeUndefined();
+    const relativePath = relative(config.rootDir, mealModulePath);
+    expect(getTypeLibrary()[`${relativePath}::PrivateType`]).toBeUndefined();
   });
 
   it('should include an aliased type re-export', () => {
     addFileToLibrary(config, mealModulePath);
-    expect(getTypeLibrary()[`${dessertModulePath}::IceCream`]).toEqual({
+
+    const relativePath = relative(config.rootDir, dessertModulePath);
+
+    expect(getTypeLibrary()[`${relativePath}::IceCream`]).toEqual({
       declaration: `export interface IceCream {
   delicious: true;
   flavor: string;
 }`,
       docstring: '',
-      path: dessertModulePath,
+      path: relativePath,
     });
   });
 
   it('should include an aliased re-export', () => {
     addFileToLibrary(config, mealModulePath);
-    expect(getTypeLibrary()[`${dessertModulePath}::Cake`]).toEqual({
+
+    const relativePath = relative(config.rootDir, dessertModulePath);
+
+    expect(getTypeLibrary()[`${relativePath}::Cake`]).toEqual({
       declaration: `export interface Cake {
   not: 'pie';
 }`,
       docstring: '',
-      path: dessertModulePath,
+      path: relativePath,
     });
   });
 
   it('should include a type re-export', () => {
     addFileToLibrary(config, mealModulePath);
-    expect(getTypeLibrary()[`${dessertModulePath}::Pie`]).toEqual({
+
+    const relativePath = relative(config.rootDir, dessertModulePath);
+
+    expect(getTypeLibrary()[`${relativePath}::Pie`]).toEqual({
       declaration: `export interface Pie {
   type: 'pumpkin' | 'apple' | 'pecan';
 }`,
       docstring: '',
-      path: dessertModulePath,
+      path: relativePath,
     });
   });
 
   it('should include a re-export', () => {
     addFileToLibrary(config, mealModulePath);
-    expect(getTypeLibrary()[`${dessertModulePath}::Cookie`]).toEqual({
+
+    const relativePath = relative(config.rootDir, dessertModulePath);
+
+    expect(getTypeLibrary()[`${relativePath}::Cookie`]).toEqual({
       declaration: `export interface Cookie {
   goodWith: 'cake';
 }`,
       docstring: '',
-      path: dessertModulePath,
+      path: relativePath,
     });
   });
 
   it('should include a type when `export *` is used', () => {
     addFileToLibrary(config, mealModulePath);
-    expect(getTypeLibrary()[`${dessertModulePath}::Candy`]).toEqual({
+
+    const relativePath = relative(config.rootDir, dessertModulePath);
+
+    expect(getTypeLibrary()[`${relativePath}::Candy`]).toEqual({
       declaration: `export interface Candy {
   sweet: 'very yes';
 }`,
       docstring: '',
-      path: dessertModulePath,
+      path: relativePath,
     });
   });
 });

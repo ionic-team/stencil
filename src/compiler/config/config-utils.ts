@@ -1,5 +1,5 @@
-import { isBoolean } from '@utils';
-import { isAbsolute, join } from 'path';
+import { isBoolean, join } from '@utils';
+import { isAbsolute } from 'path';
 
 import type { ConfigFlags } from '../../cli/config-flags';
 import type * as d from '../../declarations';

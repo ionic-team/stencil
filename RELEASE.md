@@ -75,6 +75,7 @@ manual release was performed.
    case.
 1. If there are any 'next' branches in GitHub, say for a future major version of Stencil (e.g. `v5.0.0-dev`), now is a
    good time to rebase them against the `main` branch.
+1. End the code freeze in the Stencil team Slack channel.
 1. Perform the following tasks in JIRA:
    1. Ask someone with appropriate permissions to mark this version of Stencil as 'released' in JIRA on the 'Releases' page.
    1. Ask someone with appropriate permissions to stub out the next release and task for the release in JIRA.
@@ -87,9 +88,10 @@ manual release was performed.
       The fix for this issue has been released as a part of today's [Stencil
       vNUMBER release](https://github.com/ionic-team/stencil/releases/tag/TAG). 
       ```
-1. Let folks in Ionic know about the release in the #whathappened Slack channel
-   with a link to the changelog.
-   1. Let the CS team know by 'at-ing' them  about any enterprise reported issues or feature requests that were included in the release in a thread on your #whathappened post. Jira
-      tickets related to enterprise requests should be marked with the "jira_escalated" label and/or the "Enterprise Support"
-      or "Enterprise Feature Requests" epic.
-1. End the code freeze in the Stencil team Slack channel.
+1. Let folks in Ionic know about the release:
+   1. Add a message to the `#whathappened` Slack channel with a link to the changelog.
+      1. Let the CS team know by 'at-ing' them  about any enterprise reported issues or feature requests that were included in the release in a thread on your #whathappened post. Jira
+         tickets related to enterprise requests should be marked with the "jira_escalated" label and/or the "Enterprise Support"
+         or "Enterprise Feature Requests" epic.
+   1. If there's a blog post to go out (either today or this week), let the folks in the `#devrel-stencil` channel know about the release and that the blog can go out.
+      1. When the blog goes out, put an announcement in the `#announcements` channel in Discord.

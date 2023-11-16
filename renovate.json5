@@ -95,8 +95,18 @@
     },
     {
       "matchFileNames": ["src/testing/jest/jest-27-and-under/package.json"],
-      matchPackageNames: ['@types/jest'],
+      matchPackageNames: ['@types/jest', 'jest'],
       allowedVersions: '<=27'
+    },
+    {
+      "matchFileNames": ["src/testing/jest/jest-28/package.json"],
+      matchPackageNames: ['@types/jest', 'jest'],
+      allowedVersions: '<=28'
+    },
+    {
+      "matchFileNames": ["src/testing/jest/jest-29/package.json"],
+      matchPackageNames: ['@types/jest', 'jest'],
+      allowedVersions: '<=29'
     },
     {
       // We intentionally run the karma tests against the oldest LTS of Node we support.

@@ -6,9 +6,9 @@ import {
   hasError,
   isOutputTargetDistCustomElements,
   isString,
+  join,
   rollupToStencilSourceMap,
 } from '@utils';
-import { join } from 'path';
 import ts from 'typescript';
 
 import type * as d from '../../../declarations';

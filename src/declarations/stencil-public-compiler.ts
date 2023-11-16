@@ -457,12 +457,13 @@ type StrictConfigFields = keyof Pick<
   Config,
   | 'cacheDir'
   | 'devServer'
+  | 'devMode'
   | 'extras'
   | 'flags'
   | 'fsNamespace'
   | 'hydratedFlag'
-  | 'logger'
   | 'logLevel'
+  | 'logger'
   | 'namespace'
   | 'outputTargets'
   | 'packageJsonFilePath'
@@ -1027,6 +1028,10 @@ export interface CompilerSystem {
   dynamicImport?(p: string): Promise<any>;
   /**
    * Creates the worker controller for the current system.
+   *
+   * @param maxConcurrentWorkers the max number of concurrent workers to
+   * support
+   * @returns a worker controller appropriate for the current platform (node.js)
    */
   createWorkerController?(maxConcurrentWorkers: number): WorkerMainController;
   encodeToBase64(str: string): string;
@@ -1255,10 +1260,31 @@ export interface ResolveModuleIdResults {
   pkgDirPath: string;
 }
 
+// TODO(STENCIL-1005): improve the typing for this interface
+/**
+ * A controller which provides for communication and coordination between
+ * threaded workers.
+ */
 export interface WorkerMainController {
+  /**
+   * Send a given set of arguments to a worker
+   */
   send(...args: any[]): Promise<any>;
+  /**
+   * Handle a particular method
+   *
+   * @param name of the method to be passed to a worker
+   * @returns a Promise wrapping the results
+   */
   handler(name: string): (...args: any[]) => Promise<any>;
+  /**
+   * Destroy the worker represented by this instance, rejecting all outstanding
+   * tasks and killing the child process.
+   */
   destroy(): void;
+  /**
+   * The current setting for the max number of workers
+   */
   maxWorkers: number;
 }
 

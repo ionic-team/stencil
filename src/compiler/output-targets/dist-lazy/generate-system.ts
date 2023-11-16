@@ -1,5 +1,4 @@
-import { generatePreamble, relativeImport } from '@utils';
-import { join } from 'path';
+import { generatePreamble, join, relativeImport } from '@utils';
 import type { OutputOptions, RollupBuild } from 'rollup';
 
 import type * as d from '../../../declarations';
@@ -28,7 +27,9 @@ export const generateSystem = async (
     };
     const results = await generateRollupOutput(rollupBuild, esmOpts, config, buildCtx.entryModules);
     if (results != null) {
-      const destinations = systemOutputs.map((o) => o.esmDir);
+      const destinations = systemOutputs
+        .map((o) => o.esmDir)
+        .filter((esmDir): esmDir is string => typeof esmDir === 'string');
       buildCtx.systemComponentBundle = await generateLazyModules(
         config,
         compilerCtx,
@@ -68,7 +69,7 @@ const writeSystemLoader = async (
   if (outputTarget.systemLoaderFile) {
     const entryPointPath = join(outputTarget.systemDir, loaderFilename);
     const relativePath = relativeImport(outputTarget.systemLoaderFile, entryPointPath);
-    const loaderContent = await getSystemLoader(config, compilerCtx, relativePath, outputTarget.polyfills);
+    const loaderContent = await getSystemLoader(config, compilerCtx, relativePath, !!outputTarget.polyfills);
     await compilerCtx.fs.writeFile(outputTarget.systemLoaderFile, loaderContent, {
       outputTargetType: outputTarget.type,
     });

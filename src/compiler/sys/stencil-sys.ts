@@ -1,7 +1,7 @@
 import { createNodeLogger } from '@sys-api-node';
-import { isRootPath, normalizePath } from '@utils';
+import { isRootPath, join, normalizePath } from '@utils';
 import * as os from 'os';
-import path, { basename, dirname, join } from 'path';
+import path, { basename, dirname } from 'path';
 import * as process from 'process';
 
 import type {
@@ -524,10 +524,10 @@ export const createSystem = (c?: { logger?: Logger }): CompilerSystem => {
     typeof self !== 'undefined'
       ? self?.fetch
       : typeof window !== 'undefined'
-      ? window?.fetch
-      : typeof global !== 'undefined'
-      ? global?.fetch
-      : undefined;
+        ? window?.fetch
+        : typeof global !== 'undefined'
+          ? global?.fetch
+          : undefined;
 
   const writeFile = async (p: string, data: string) => writeFileSync(p, data);
 
@@ -622,6 +622,7 @@ export const createSystem = (c?: { logger?: Logger }): CompilerSystem => {
     writeFile,
     writeFileSync,
     generateContentHash,
+    // no threading when we're running in-memory
     createWorkerController: null,
     details: {
       cpuModel: '',

@@ -1,5 +1,5 @@
-import { buildError, isOutputTargetDist, isOutputTargetWww, isString } from '@utils';
-import { basename, dirname, isAbsolute, join } from 'path';
+import { buildError, isOutputTargetDist, isOutputTargetWww, isString, join, normalizePath } from '@utils';
+import { basename, dirname, isAbsolute } from 'path';
 
 import type * as d from '../../declarations';
 import { isLocalModule } from '../sys/resolve/resolve-utils';
@@ -59,6 +59,8 @@ export const validateTesting = (config: d.ValidatedConfig, diagnostics: d.Diagno
   if (typeof testing.screenshotConnector === 'string') {
     if (!isAbsolute(testing.screenshotConnector)) {
       testing.screenshotConnector = join(config.rootDir!, testing.screenshotConnector);
+    } else {
+      testing.screenshotConnector = normalizePath(testing.screenshotConnector);
     }
   } else {
     testing.screenshotConnector = join(

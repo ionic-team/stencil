@@ -264,13 +264,15 @@ describe('ShadowCss', function () {
 
     it('should handle :host complex selector', () => {
       const r = s(':host > ::slotted(*:nth-of-type(2n - 1)) {}', 'sc-ion-tag');
-      expect(r).toEqual('.sc-ion-tag-h > .sc-ion-tag-s > *:nth-of-type(2n - 1) {}');
+      expect(r).toEqual(
+        '.sc-ion-tag-h >.sc-ion-tag-s > *:nth-of-type(2n - 1), .sc-ion-tag-h > .sc-ion-tag-s > *:nth-of-type(2n - 1) {}',
+      );
     });
 
     it('should handle host-context complex selector', () => {
       const r = s(':host-context(.red) > ::slotted(*:nth-of-type(2n - 1)) {}', 'sc-ion-tag');
       expect(r).toEqual(
-        '.sc-ion-tag-h.red > .sc-ion-tag-s > *:nth-of-type(2n - 1), .red .sc-ion-tag-h > .sc-ion-tag-s > *:nth-of-type(2n - 1) {}',
+        '.sc-ion-tag-h.red >.sc-ion-tag-s > *:nth-of-type(2n - 1), .sc-ion-tag-h.red > .sc-ion-tag-s > *:nth-of-type(2n - 1), .red .sc-ion-tag-h >.sc-ion-tag-s > *:nth-of-type(2n - 1), .red .sc-ion-tag-h > .sc-ion-tag-s > *:nth-of-type(2n - 1) {}',
       );
     });
 

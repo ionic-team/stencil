@@ -5,7 +5,7 @@ describe('invisible-prehydration-true', () => {
 
   afterEach(tearDownDom);
 
-  it('the style element will not be placed in the head', async () => {
+  it('the style element will be placed in the head', async () => {
     tearDownStylesScripts();
     await setupDom('/invisible-prehydration-true/index.html', 1000);
 

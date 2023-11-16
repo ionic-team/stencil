@@ -1,6 +1,15 @@
 import * as d from '@stencil/core/declarations';
 import path from 'path';
 
+jest.mock('@utils', () => {
+  const originalUtils = jest.requireActual('@utils');
+  return {
+    __esModule: true,
+    ...originalUtils,
+    resolve: (...pathSegments: string[]) => pathSegments.pop(),
+  };
+});
+
 import { updateTypeIdentifierNames } from '../stencil-types';
 import { stubComponentCompilerMeta } from './ComponentCompilerMeta.stub';
 import { stubComponentCompilerTypeReference } from './ComponentCompilerTypeReference.stub';
@@ -9,19 +18,14 @@ import { stubTypesImportData } from './TypesImportData.stub';
 describe('stencil-types', () => {
   describe('updateTypeMemberNames', () => {
     let dirnameSpy: jest.SpyInstance<ReturnType<typeof path.dirname>, Parameters<typeof path.dirname>>;
-    let resolveSpy: jest.SpyInstance<ReturnType<typeof path.resolve>, Parameters<typeof path.resolve>>;
 
     beforeEach(() => {
       dirnameSpy = jest.spyOn(path, 'dirname');
       dirnameSpy.mockImplementation((path: string) => path);
-
-      resolveSpy = jest.spyOn(path, 'resolve');
-      resolveSpy.mockImplementation((...pathSegments: string[]) => pathSegments.pop());
     });
 
     afterEach(() => {
       dirnameSpy.mockRestore();
-      resolveSpy.mockRestore();
     });
 
     describe('no type transformations', () => {
@@ -59,6 +63,27 @@ describe('stencil-types', () => {
         const typeReferences: d.ComponentCompilerTypeReferences = {
           // pretend that the expected type name is a globally accessible type, and therefore has no path
           [expectedTypeName]: stubComponentCompilerTypeReference({ location: 'global' }),
+        };
+
+        const actualTypeName = updateTypeIdentifierNames(
+          typeReferences,
+          {},
+          stubComponentCompilerMeta().sourceFilePath,
+          expectedTypeName,
+        );
+
+        expect(actualTypeName).toBe(expectedTypeName);
+      });
+
+      it('returns the provided type for imports without the resolved file', () => {
+        const expectedTypeName = 'CustomType';
+        const typeReferences: d.ComponentCompilerTypeReferences = {
+          // we're testing the `path` value doesn't exist on the type import data.
+          // in practice this should never happen, but let's ensure that we cover this case explicitly in tests
+          [expectedTypeName]: stubComponentCompilerTypeReference({
+            location: 'import',
+            path: 'some/mock/unknown/path',
+          }),
         };
 
         const actualTypeName = updateTypeIdentifierNames(

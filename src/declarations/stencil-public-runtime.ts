@@ -899,6 +899,11 @@ export namespace JSXBase {
     name?: string;
     type?: string;
     value?: string | string[] | number;
+
+    // popover
+    popoverTargetAction?: string;
+    popoverTargetElement?: Element | null;
+    popoverTarget?: string;
   }
 
   export interface CanvasHTMLAttributes<T> extends HTMLAttributes<T> {
@@ -1074,6 +1079,11 @@ export namespace JSXBase {
     webkitdirectory?: boolean;
     webkitEntries?: any;
     width?: number | string;
+
+    // popover
+    popoverTargetAction?: string;
+    popoverTargetElement?: Element | null;
+    popoverTarget?: string;
   }
 
   export interface KeygenHTMLAttributes<T> extends HTMLAttributes<T> {
@@ -1259,11 +1269,13 @@ export namespace JSXBase {
   }
 
   export interface SourceHTMLAttributes<T> extends HTMLAttributes<T> {
+    height?: number;
     media?: string;
     sizes?: string;
     src?: string;
     srcSet?: string;
     type?: string;
+    width?: number;
   }
 
   export interface StyleHTMLAttributes<T> extends HTMLAttributes<T> {
@@ -1356,12 +1368,18 @@ export namespace JSXBase {
     draggable?: boolean;
     hidden?: boolean;
     id?: string;
+    inert?: boolean;
     lang?: string;
     spellcheck?: 'true' | 'false' | any;
     style?: { [key: string]: string | undefined };
     tabIndex?: number;
     tabindex?: number | string;
     title?: string;
+    // These types don't allow you to use popover as a boolean attribute
+    // so you can't write HTML like `<div popover>` and get the default value.
+    // Developer must explicitly specify one of the valid popover values or it will fallback
+    // to `manual` (following the HTML spec).
+    popover?: string | null;
 
     // Unknown
     inputMode?: string;

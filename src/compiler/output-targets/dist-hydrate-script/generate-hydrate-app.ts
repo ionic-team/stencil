@@ -1,6 +1,5 @@
-import { catchError, createOnWarnFn, generatePreamble, loadRollupDiagnostics } from '@utils';
+import { catchError, createOnWarnFn, generatePreamble, join, loadRollupDiagnostics } from '@utils';
 import MagicString from 'magic-string';
-import { join } from 'path';
 import { RollupOptions } from 'rollup';
 import { rollup } from 'rollup';
 

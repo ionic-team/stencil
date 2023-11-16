@@ -1,5 +1,5 @@
-import { flatOne, isOutputTargetDocsJson, normalizePath, sortBy, unique } from '@utils';
-import { basename, dirname, join, relative } from 'path';
+import { flatOne, isOutputTargetDocsJson, join, normalizePath, relative, sortBy, unique } from '@utils';
+import { basename, dirname } from 'path';
 
 import type * as d from '../../declarations';
 import { JsonDocsValue } from '../../declarations';

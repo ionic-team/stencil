@@ -98,7 +98,7 @@ export const optimizeModule = async (
   }
 
   const shouldTranspile = opts.sourceTarget === 'es5';
-  const results = await compilerCtx.worker.prepareModule(code, minifyOpts, shouldTranspile, opts.inlineHelpers);
+  const results = await compilerCtx.worker.prepareModule(code, minifyOpts, shouldTranspile, !!opts.inlineHelpers);
   if (
     results != null &&
     typeof results.output === 'string' &&

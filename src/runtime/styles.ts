@@ -4,7 +4,7 @@ import { CMP_FLAGS, queryNonceMetaTagContent } from '@utils';
 
 import type * as d from '../declarations';
 import { createTime } from './profile';
-import { HYDRATED_STYLE_ID, NODE_TYPE } from './runtime-constants';
+import { HYDRATED_STYLE_ID, NODE_TYPE, SLOT_FB_CSS } from './runtime-constants';
 
 const rootAppliedStyles: d.RootAppliedStyleMap = /*@__PURE__*/ new WeakMap();
 
@@ -65,6 +65,11 @@ export const addStyle = (styleContainerNode: any, cmpMeta: d.ComponentRuntimeMet
           }
 
           styleContainerNode.insertBefore(styleElm, styleContainerNode.querySelector('link'));
+        }
+
+        // Add styles for `slot-fb` elements if we're using slots outside the Shadow DOM
+        if (cmpMeta.$flags$ & CMP_FLAGS.hasSlotRelocation) {
+          styleElm.innerHTML += SLOT_FB_CSS;
         }
 
         if (appliedStyles) {

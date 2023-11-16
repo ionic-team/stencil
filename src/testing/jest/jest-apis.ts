@@ -12,34 +12,67 @@
  * file be added to sparingly.
  */
 
+import type { TransformedSource } from '@jest/transform';
 import type { Config } from '@jest/types';
+import * as d from '@stencil/core/internal';
 import { getVersion } from 'jest';
 
 // TODO(STENCIL-959): Improve this typing by narrowing it
 export type JestPuppeteerEnvironment = any;
 
-type Jest26CacheKeyOptions = { instrument: boolean; rootDir: string };
-type Jest26Config = { instrument: boolean; rootDir: string };
-type Jest27TransformOptions = { config: Jest26Config };
 export type JestPreprocessor = {
-  process(
-    sourceText: string,
-    sourcePath: string,
-    jestConfig: Jest26Config | Jest27TransformOptions,
-    transformOptions?: Jest26Config,
-  ): string;
-  getCacheKey(
-    sourceText: string,
-    sourcePath: string,
-    jestConfigStr: string | Jest27TransformOptions,
-    transformOptions?: Jest26CacheKeyOptions,
-  ): string;
+  process(sourceText: string, sourcePath: string, ...args: any[]): string | TransformedSource;
+  getCacheKey(sourceText: string, sourcePath: string, ...args: any[]): string;
 };
 
-// TODO(STENCIL-960): Improve this typing by narrowing it
-export type JestTestRunner = any;
+/**
+ * For Stencil's purposes, an instance of a Jest `TestRunner` only needs to have an async `runTests` function.
+ * This does not mean that Jest does not require additional functions. However, those requirements may change from
+ * version-to-version of Jest. Stencil overrides the `runTests` function, and with our current design of integrating
+ * with Jest, require it to be overridden (for test filtering and supporting screenshot testing.
+ */
+export type JestTestRunner = {
+  runTests(...args: any[]): Promise<any>;
+};
+/**
+ * Helper type for describing a function that returns a {@link JestTestRunner}.
+ */
+export type JestTestRunnerConstructor = new (...args: any[]) => JestTestRunner;
 
-export type JestConfig = Config.InitialOptions;
+/**
+ * This type serves as an alias for a function that invokes the Jest CLI.
+ *
+ * This alias serves two purposes:
+ * 1. It allows Stencil to have a single source of truth for the return type(s) on {@link JestFacade} (and its
+ *    implementations)
+ * 2. It prevents TypeScript from expanding Stencil type declarations in the generated `.d.ts` file. This is necessary
+ *    as TypeScript will make assumptions about where it can dynamically resolve Stencil typings from, which are not
+ *    always necessarily true when `tsconfig#paths` are used.
+ */
+export type JestCliRunner = (config: d.ValidatedConfig, e2eEnv: d.E2EProcessEnv) => Promise<boolean>;
+
+/**
+ * This type serves as an alias for a function that invokes Stencil's Screenshot runner.
+ *
+ * This alias serves two purposes:
+ * 1. It allows Stencil to have a single source of truth for the return type(s) on {@link JestFacade} (and its
+ *    implementations)
+ * 2. It prevents TypeScript from expanding Stencil type declarations in the generated `.d.ts` file. This is necessary
+ *    as TypeScript will make assumptions about where it can dynamically resolve Stencil typings from, which are not
+ *   always necessarily true when `tsconfig#paths` are used.
+ */
+export type JestScreenshotRunner = (config: d.ValidatedConfig, e2eEnv: d.E2EProcessEnv) => Promise<boolean>;
+
+/**
+ * This type serves as an alias for the type representing the initial configuration for Jest.
+ * This alias serves two purposes:
+ * 1. It allows Stencil to have a single source of truth for the return type(s) on {@link JestFacade} (and its
+ *    implementations)
+ * 2. It prevents TypeScript from expanding Jest typings in the generated `.d.ts` file. This is necessary as TypeScript
+ *    will make assumptions about where it can dynamically resolve Jest typings from, which do not necessarily hold
+ *    true for every type of Stencil project directory structure.
+ */
+export type JestPresetConfig = Config.InitialOptions;
 
 /**
  * Get the current major version of Jest that Stencil reconciles
