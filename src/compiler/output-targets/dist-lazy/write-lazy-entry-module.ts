@@ -1,5 +1,4 @@
-import { getSourceMappingUrlForEndOfFile } from '@utils';
-import { join } from 'path';
+import { getSourceMappingUrlForEndOfFile, join } from '@utils';
 
 import type * as d from '../../../declarations';
 

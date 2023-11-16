@@ -8,6 +8,7 @@ import {
   tsPropDeclNameAsString,
   updateConstructor,
 } from '../transform-utils';
+import { attachInternalsDecoratorsToStatic } from './attach-internals';
 import { componentDecoratorToStatic } from './component-decorator';
 import { isDecoratorNamed } from './decorator-utils';
 import {
@@ -125,6 +126,7 @@ const visitClassDeclaration = (
     elementDecoratorsToStatic(diagnostics, decoratedMembers, typeChecker, filteredMethodsAndFields);
     watchDecoratorsToStatic(typeChecker, decoratedMembers, filteredMethodsAndFields);
     listenDecoratorsToStatic(diagnostics, typeChecker, decoratedMembers, filteredMethodsAndFields);
+    attachInternalsDecoratorsToStatic(diagnostics, decoratedMembers, filteredMethodsAndFields, typeChecker);
   }
 
   // We call the `handleClassFields` method which handles transforming any

@@ -2,7 +2,8 @@ import type { Config } from '@jest/types';
 import type * as d from '@stencil/core/internal';
 import { isString } from '@utils';
 
-// TODO(STENCIL-306): Remove support for earlier versions of Jest
+import { Jest27Stencil } from './jest-facade';
+
 /**
  * Helper function for retrieving legacy Jest options. These options have been provided as defaults to Stencil users
  * by Jest + yargs for all users using Jest versions 24 through 26 (inclusively). Between Jest v26 and v27, a few
@@ -146,8 +147,7 @@ export function buildJestConfig(config: d.ValidatedConfig): string {
     jestConfig.verbose = stencilConfigTesting.verbose;
   }
 
-  // TODO(STENCIL-307): Move away from Jasmine runner for Stencil tests, which involves a potentially breaking change
-  jestConfig.testRunner = 'jest-jasmine2';
+  jestConfig.testRunner = new Jest27Stencil().getDefaultJestRunner();
 
   return JSON.stringify(jestConfig);
 }

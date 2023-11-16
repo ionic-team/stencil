@@ -1,5 +1,5 @@
-import { isString, normalizePath } from '@utils';
-import { basename, dirname, join, resolve } from 'path';
+import { isString, join, normalizePath, resolve } from '@utils';
+import { basename, dirname } from 'path';
 import ts from 'typescript';
 
 import type * as d from '../../../declarations';

@@ -1,8 +1,10 @@
 import type { AggregatedResult } from '@jest/test-result';
 import type * as d from '@stencil/core/internal';
+import { default as TestRunner } from 'jest-runner';
 
 import type { ConfigFlags } from '../../../cli/config-flags';
 import { setScreenshotEmulateData } from '../../puppeteer/puppeteer-emulate';
+import { JestTestRunnerConstructor } from '../jest-apis';
 import { buildJestArgv, getProjectListFromCLIArgs } from './jest-config';
 
 export async function runJest(config: d.ValidatedConfig, env: d.E2EProcessEnv) {
@@ -49,19 +51,22 @@ export async function runJest(config: d.ValidatedConfig, env: d.E2EProcessEnv) {
  * Creates a Stencil test runner
  * @returns the test runner
  */
-export function createTestRunner(): any {
-  // TODO(STENCIL-306): Remove support for earlier versions of Jest
-  // The left hand side of the '??' is needed for Jest v27, the right hand side for Jest 26 and below
-  const TestRunner = require('jest-runner').default ?? require('jest-runner');
-
+export function createTestRunner(): JestTestRunnerConstructor {
   class StencilTestRunner extends TestRunner {
-    async runTests(tests: { path: string }[], watcher: any, onStart: any, onResult: any, onFailure: any, options: any) {
+    override async runTests(
+      tests: { context: any; path: string }[],
+      watcher: any,
+      onStart: any,
+      onResult: any,
+      onFailure: any,
+      options: any,
+    ) {
       const env = process.env as d.E2EProcessEnv;
 
       // filter out only the tests the flags said we should run
       tests = tests.filter((t) => includeTestFile(t.path, env));
 
-      if (env.__STENCIL_SCREENSHOT__ === 'true') {
+      if (env.__STENCIL_SCREENSHOT__ === 'true' && env.__STENCIL_EMULATE_CONFIGS__) {
         // we're doing e2e screenshots, so let's loop through
         // each of the emulate configs for each test
 
@@ -106,8 +111,8 @@ export function includeTestFile(testPath: string, env: d.E2EProcessEnv) {
   return false;
 }
 
-export function getEmulateConfigs(testing: d.TestingConfig, flags: ConfigFlags) {
-  let emulateConfigs = testing.emulate.slice();
+export function getEmulateConfigs(testing: d.TestingConfig, flags: ConfigFlags): d.EmulateConfig[] {
+  let emulateConfigs = testing.emulate?.slice() ?? [];
 
   if (typeof flags.emulate === 'string') {
     const emulateFlag = flags.emulate.toLowerCase();

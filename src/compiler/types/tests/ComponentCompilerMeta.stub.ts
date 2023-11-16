@@ -11,6 +11,7 @@ export const stubComponentCompilerMeta = (
   overrides: Partial<d.ComponentCompilerMeta> = {},
 ): d.ComponentCompilerMeta => ({
   assetsDirs: [],
+  attachInternalsMemberName: null,
   componentClassName: 'StubCmp',
   dependencies: [],
   dependents: [],
@@ -21,6 +22,7 @@ export const stubComponentCompilerMeta = (
   encapsulation: 'none',
   events: [],
   excludeFromCollection: false,
+  formAssociated: false,
   hasAttribute: false,
   hasAttributeChangedCallbackFn: false,
   hasComponentDidLoadFn: false,

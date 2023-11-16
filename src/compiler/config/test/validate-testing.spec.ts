@@ -1,11 +1,14 @@
 import type * as d from '@stencil/core/declarations';
 import { mockCompilerSystem, mockLoadConfigInit, mockLogger } from '@stencil/core/testing';
+import { join } from '@utils';
 import path from 'path';
 
 import { ConfigFlags, createConfigFlags } from '../../../cli/config-flags';
 import { validateConfig } from '../validate-config';
 
 describe('validateTesting', () => {
+  // use Node's resolve() here to simulate a user using either Win/Posix separators (depending on the platform these
+  // tests are run on)
   const ROOT = path.resolve('/');
   const sys = mockCompilerSystem();
   const logger = mockLogger();
@@ -17,15 +20,21 @@ describe('validateTesting', () => {
     userConfig = {
       sys: sys as any,
       logger: logger,
+      // use Node's join() here to simulate a user using either Win/Posix separators (depending on the platform these
+      // tests are run on) for their input
       rootDir: path.join(ROOT, 'User', 'some', 'path'),
       srcDir: path.join(ROOT, 'User', 'some', 'path', 'src'),
       flags,
       namespace: 'Testing',
+      // use Node's join() here to simulate a user using either Win/Posix separators (depending on the platform these
+      // tests are run on) for their input
       configPath: path.join(ROOT, 'User', 'some', 'path', 'stencil.config.ts'),
     };
     userConfig.outputTargets = [
       {
         type: 'www',
+        // use Node's join() here to simulate a user using either Win/Posix separators (depending on the platform these
+        // tests are run on) for their input
         dir: path.join(ROOT, 'www'),
       } as any as d.OutputTargetStats,
     ];
@@ -195,21 +204,25 @@ describe('validateTesting', () => {
 
   describe('screenshotConnector', () => {
     it('assigns the screenshotConnector value from the provided flags', () => {
+      // use Node's join() here to simulate a user using either Win/Posix separators (depending on the platform these
+      // tests are run on) for their input
       userConfig.flags = { ...flags, e2e: true, screenshotConnector: path.join(ROOT, 'mock', 'path') };
       userConfig.testing = { screenshotConnector: path.join(ROOT, 'another', 'mock', 'path') };
 
       const { config } = validateConfig(userConfig, mockLoadConfigInit());
 
-      expect(config.testing.screenshotConnector).toBe(path.join(ROOT, 'mock', 'path'));
+      expect(config.testing.screenshotConnector).toBe(join(ROOT, 'mock', 'path'));
     });
 
     it("uses the config's root dir to make the screenshotConnector path absolute", () => {
+      // use Node's join() here to simulate a user using either Win/Posix separators (depending on the platform these
+      // tests are run on) for their input
       userConfig.flags = { ...flags, e2e: true, screenshotConnector: path.join('mock', 'path') };
       userConfig.testing = { screenshotConnector: path.join('another', 'mock', 'path') };
 
       const { config } = validateConfig(userConfig, mockLoadConfigInit());
 
-      expect(config.testing.screenshotConnector).toBe(path.join(ROOT, 'User', 'some', 'path', 'mock', 'path'));
+      expect(config.testing.screenshotConnector).toBe(join(ROOT, 'User', 'some', 'path', 'mock', 'path'));
     });
 
     it('sets screenshotConnector if a non-string is provided', () => {
@@ -219,7 +232,7 @@ describe('validateTesting', () => {
 
       const { config } = validateConfig(userConfig, mockLoadConfigInit());
 
-      expect(config.testing.screenshotConnector).toBe(path.join('screenshot', 'local-connector.js'));
+      expect(config.testing.screenshotConnector).toBe(join('screenshot', 'local-connector.js'));
     });
   });
 
@@ -227,6 +240,8 @@ describe('validateTesting', () => {
     it('does not alter a provided testPathIgnorePatterns', () => {
       userConfig.flags = { ...flags, e2e: true };
 
+      // use Node's join() here to simulate a user using either Win/Posix separators (depending on the platform these
+      // tests are run on) for their input
       const mockPath1 = path.join('this', 'is', 'a', 'mock', 'path');
       const mockPath2 = path.join('this', 'is', 'another', 'mock', 'path');
       userConfig.testing = { testPathIgnorePatterns: [mockPath1, mockPath2] };
@@ -236,15 +251,16 @@ describe('validateTesting', () => {
       expect(config.testing.testPathIgnorePatterns).toEqual([mockPath1, mockPath2]);
     });
 
-    it('sets the default testPathIgnorePatterns if not array is provided', () => {
+    it('sets the default testPathIgnorePatterns if no array is provided', () => {
       userConfig.flags = { ...flags, e2e: true };
 
       const { config } = validateConfig(userConfig, mockLoadConfigInit());
 
       expect(config.testing.testPathIgnorePatterns).toEqual([
-        path.join(ROOT, 'User', 'some', 'path', '.vscode'),
-        path.join(ROOT, 'User', 'some', 'path', '.stencil'),
-        path.join(ROOT, 'User', 'some', 'path', 'node_modules'),
+        join(ROOT, 'User', 'some', 'path', '.vscode'),
+        join(ROOT, 'User', 'some', 'path', '.stencil'),
+        join(ROOT, 'User', 'some', 'path', 'node_modules'),
+        // use Node's join() here as the normalization process doesn't necessarily occur for this field
         path.join(ROOT, 'www'),
       ]);
     });
@@ -260,11 +276,11 @@ describe('validateTesting', () => {
       const { config } = validateConfig(userConfig, mockLoadConfigInit());
 
       expect(config.testing.testPathIgnorePatterns).toEqual([
-        path.join(ROOT, 'User', 'some', 'path', '.vscode'),
-        path.join(ROOT, 'User', 'some', 'path', '.stencil'),
-        path.join(ROOT, 'User', 'some', 'path', 'node_modules'),
-        path.join(ROOT, 'User', 'some', 'path', 'www-folder'),
-        path.join(ROOT, 'User', 'some', 'path', 'dist-folder'),
+        join(ROOT, 'User', 'some', 'path', '.vscode'),
+        join(ROOT, 'User', 'some', 'path', '.stencil'),
+        join(ROOT, 'User', 'some', 'path', 'node_modules'),
+        join(ROOT, 'User', 'some', 'path', 'www-folder'),
+        join(ROOT, 'User', 'some', 'path', 'dist-folder'),
       ]);
     });
   });
@@ -286,17 +302,21 @@ describe('validateTesting', () => {
     it('forces a provided preset path to be absolute', () => {
       userConfig.flags = { ...flags, e2e: true };
       userConfig.testing = {
+        // use Node's join() here to simulate a user using either Win/Posix separators (depending on the platform these
+        // tests are run on) for their input
         preset: path.join('mock', 'path'),
       };
 
       const { config } = validateConfig(userConfig, mockLoadConfigInit());
 
-      expect(config.testing.preset).toEqual(path.join(ROOT, 'User', 'some', 'path', 'mock', 'path'));
+      expect(config.testing.preset).toEqual(join(ROOT, 'User', 'some', 'path', 'mock', 'path'));
     });
 
     it('does not change an already absolute preset path', () => {
       userConfig.flags = { ...flags, e2e: true };
 
+      // use Node's join() here to simulate a user using either Win/Posix separators (depending on the platform these
+      // tests are run on) for their input
       const presetPath = path.join(ROOT, 'mock', 'path');
       userConfig.testing = {
         preset: presetPath,
@@ -304,6 +324,8 @@ describe('validateTesting', () => {
 
       const { config } = validateConfig(userConfig, mockLoadConfigInit());
 
+      // per the test name, we should not change an already absolute path - assert against the preset path that was
+      // generated using Node's join()
       expect(config.testing.preset).toEqual(presetPath);
     });
   });
@@ -319,7 +341,7 @@ describe('validateTesting', () => {
       const { config } = validateConfig(userConfig, mockLoadConfigInit());
 
       // 'testing' is the internal directory where the default setup file can be found
-      expect(config.testing.setupFilesAfterEnv).toEqual([path.join('testing', 'jest-setuptestframework.js')]);
+      expect(config.testing.setupFilesAfterEnv).toEqual([join('testing', 'jest-setuptestframework.js')]);
     });
 
     it.each([[[]], [['mock-setup-file.js']]])(
@@ -334,7 +356,7 @@ describe('validateTesting', () => {
 
         expect(config.testing.setupFilesAfterEnv).toEqual([
           // 'testing' is the internal directory where the default setup file can be found
-          path.join('testing', 'jest-setuptestframework.js'),
+          join('testing', 'jest-setuptestframework.js'),
           ...setupFilesAfterEnv,
         ]);
       },
@@ -672,7 +694,7 @@ describe('validateTesting', () => {
       const { config } = validateConfig(userConfig, mockLoadConfigInit());
 
       // 'testing' is the internal directory where the default runner file can be found
-      expect(config.testing.runner).toEqual(path.join('testing', 'jest-runner.js'));
+      expect(config.testing.runner).toEqual(join('testing', 'jest-runner.js'));
     });
   });
 

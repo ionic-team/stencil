@@ -341,10 +341,6 @@ export const postUpdateComponent = (hostRef: d.HostRef) => {
     endPostUpdate();
   }
 
-  if (BUILD.hotModuleReplacement) {
-    elm['s-hmr-load'] && elm['s-hmr-load']();
-  }
-
   if (BUILD.method && BUILD.lazyLoad) {
     hostRef.$onInstanceResolve$(elm);
   }
@@ -440,8 +436,8 @@ const addHydratedFlag = (elm: Element) =>
   BUILD.hydratedClass
     ? elm.classList.add('hydrated')
     : BUILD.hydratedAttribute
-    ? elm.setAttribute('hydrated', '')
-    : undefined;
+      ? elm.setAttribute('hydrated', '')
+      : undefined;
 
 const serverSideConnected = (elm: any) => {
   const children = elm.children;

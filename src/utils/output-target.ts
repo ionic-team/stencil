@@ -1,5 +1,6 @@
 import { flatOne, normalizePath, sortBy } from '@utils';
-import { basename, dirname, join, relative } from 'path';
+import { join } from '@utils';
+import { basename, dirname, relative } from 'path';
 
 import type * as d from '../declarations';
 import {
@@ -37,7 +38,14 @@ export const relativeImport = (pathFrom: string, pathTo: string, ext?: string, a
 
 export const getComponentsDtsSrcFilePath = (config: d.ValidatedConfig) => join(config.srcDir, GENERATED_DTS);
 
-export const getComponentsDtsTypesFilePath = (outputTarget: d.OutputTargetDist | d.OutputTargetDistTypes) =>
+/**
+ * Helper to get an appropriate file path for `components.d.ts` for a `"dist"`
+ * or `"dist-types"` output target.
+ *
+ * @param outputTarget the output target of interest
+ * @returns a properly-formatted path
+ */
+export const getComponentsDtsTypesFilePath = (outputTarget: Required<d.OutputTargetDist> | d.OutputTargetDistTypes) =>
   join(outputTarget.typesDir, GENERATED_DTS);
 
 export const isOutputTargetDist = (o: d.OutputTarget): o is d.OutputTargetDist => o.type === DIST;

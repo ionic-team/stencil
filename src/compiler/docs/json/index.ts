@@ -1,5 +1,4 @@
-import { isOutputTargetDocsJson } from '@utils';
-import { join } from 'path';
+import { isOutputTargetDocsJson, join } from '@utils';
 
 import type * as d from '../../../declarations';
 
@@ -19,7 +18,7 @@ export const generateJsonDocs = async (
   // indentation. Instead, let's replace those with spaces!
   docsDts = docsDts
     .split('\n')
-    .map((line) => line.replace(/\t/g, '    '))
+    .map((line) => line.replace(/\t/g, '  '))
     .join('\n');
 
   const typesContent = `

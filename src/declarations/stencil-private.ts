@@ -1,4 +1,5 @@
 import { result } from '@utils';
+import type { Serializable as CPSerializable } from 'child_process';
 
 import type { InMemoryFileSystem } from '../compiler/sys/in-memory-fs';
 import type {
@@ -74,6 +75,7 @@ export interface BuildFeatures {
   // encapsulation
   style: boolean;
   mode: boolean;
+  formAssociated: boolean;
 
   // dom
   shadowDom: boolean;
@@ -185,7 +187,7 @@ export interface BuildConditionals extends Partial<BuildFeatures> {
   attachStyles?: boolean;
 
   // TODO(STENCIL-914): remove this option when `experimentalSlotFixes` is the default behavior
-  patchPseudoShadowDom?: boolean;
+  experimentalSlotFixes?: boolean;
 }
 
 export type ModuleFormat =
@@ -528,7 +530,12 @@ export interface CompilerCtx {
 
 export type NodeMap = WeakMap<any, ComponentCompilerMeta>;
 
-/** Must be serializable to JSON!! */
+/**
+ * Record, for a specific component, whether or not it has various features
+ * which need to be handled correctly in the compilation pipeline.
+ *
+ * Note: this must be serializable to JSON.
+ */
 export interface ComponentCompilerFeatures {
   hasAttribute: boolean;
   hasAttributeChangedCallbackFn: boolean;
@@ -596,30 +603,20 @@ export interface ComponentCompilerFeatures {
   potentialCmpRefs: string[];
 }
 
-/** Must be serializable to JSON!! */
+/**
+ * Metadata about a given component
+ *
+ * Note: must be serializable to JSON!
+ */
 export interface ComponentCompilerMeta extends ComponentCompilerFeatures {
   assetsDirs: CompilerAssetDir[];
+  /**
+   * The name to which an `ElementInternals` object (the return value of
+   * `HTMLElement.attachInternals`) should be attached at runtime. If this is
+   * `null` then `attachInternals` should not be called.
+   */
+  attachInternalsMemberName: string | null;
   componentClassName: string;
-  elementRef: string;
-  encapsulation: Encapsulation;
-  shadowDelegatesFocus: boolean;
-  excludeFromCollection: boolean;
-  isCollectionDependency: boolean;
-  docs: CompilerJsDoc;
-  jsFilePath: string;
-  sourceMapPath: string;
-  listeners: ComponentCompilerListener[];
-  events: ComponentCompilerEvent[];
-  methods: ComponentCompilerMethod[];
-  virtualProperties: ComponentCompilerVirtualProperty[];
-  properties: ComponentCompilerProperty[];
-  watchers: ComponentCompilerWatch[];
-  sourceFilePath: string;
-  states: ComponentCompilerState[];
-  styleDocs: CompilerStyleDoc[];
-  styles: StyleCompiler[];
-  tagName: string;
-  internal: boolean;
   /**
    * A list of web component tag names that are either:
    * - directly referenced in a Stencil component's JSX/h() function
@@ -640,6 +637,30 @@ export interface ComponentCompilerMeta extends ComponentCompilerFeatures {
    * A list of web component tag names that the current component directly in their JSX/h() function
    */
   directDependents?: string[];
+  docs: CompilerJsDoc;
+  elementRef: string;
+  encapsulation: Encapsulation;
+  events: ComponentCompilerEvent[];
+  excludeFromCollection: boolean;
+  /**
+   * Whether or not the component is form-associated
+   */
+  formAssociated: boolean;
+  internal: boolean;
+  isCollectionDependency: boolean;
+  jsFilePath: string;
+  listeners: ComponentCompilerListener[];
+  methods: ComponentCompilerMethod[];
+  properties: ComponentCompilerProperty[];
+  shadowDelegatesFocus: boolean;
+  sourceFilePath: string;
+  sourceMapPath: string;
+  states: ComponentCompilerState[];
+  styleDocs: CompilerStyleDoc[];
+  styles: StyleCompiler[];
+  tagName: string;
+  virtualProperties: ComponentCompilerVirtualProperty[];
+  watchers: ComponentCompilerWatch[];
 }
 
 /**
@@ -1065,6 +1086,16 @@ export interface HostElement extends HTMLElement {
   ['s-lr']?: boolean;
 
   /**
+   * A reference to the `ElementInternals` object for the current host
+   *
+   * This is used for maintaining a reference to the object between HMR
+   * refreshes in the lazy build.
+   *
+   * "stencil-element-internals"
+   */
+  ['s-ei']?: ElementInternals;
+
+  /**
    * On Render Callbacks:
    * Array of callbacks to fire off after it has rendered.
    */
@@ -1079,13 +1110,11 @@ export interface HostElement extends HTMLElement {
 
   /**
    * Hot Module Replacement, dev mode only
+   *
+   * This function should be defined by the HMR-supporting runtime and should
+   * do the work of actually updating the component in-place.
    */
   ['s-hmr']?: (versionId: string) => void;
-
-  /**
-   * Callback method for when HMR finishes
-   */
-  ['s-hmr-load']?: () => void;
 
   ['s-p']?: Promise<void>[];
 
@@ -1337,6 +1366,37 @@ export interface RenderNode extends HostElement {
   ['s-hn']?: string;
 
   /**
+   * Slot host tag name:
+   * This is the tag name of the element where this node
+   * has been moved to during slot relocation.
+   *
+   * This allows us to check if the node has been moved and prevent
+   * us from thinking a node _should_ be moved when it may already be in
+   * its final destination.
+   *
+   * This value is set to `undefined` whenever the node is put back into its original location.
+   */
+  ['s-sh']?: string;
+
+  /**
+   * Slot forward slot:
+   * This is the slot that the original `slot` tag element was going to be
+   * forwarded to in another element. For instance:
+   *
+   * ```html
+   * <my-cmp>
+   *  <slot name="my-slot" slot="another-slot"></slot>
+   * </my-cmp>
+   * ```
+   *
+   * In this case, the value would be `another-slot`.
+   *
+   * This allows us to correctly set the `slot` attribute on an element when it is moved
+   * from a non-shadow to shadow element.
+   */
+  ['s-fs']?: string;
+
+  /**
    * Original Location Reference:
    * A reference pointing to the comment
    * which represents the original location
@@ -1479,6 +1539,12 @@ export type ComponentRuntimeHostListener = [number, string, string];
  */
 export type ComponentRuntimeReflectingAttr = [string, string | undefined];
 
+/**
+ * A runtime component reference, consistent of either a host element _or_ an
+ * empty object. This is used in particular in a few different places as the
+ * keys in a `WeakMap` which maps {@link HostElement} instances to their
+ * associated {@link HostRef} instance.
+ */
 export type RuntimeRef = HostElement | {};
 
 /**
@@ -2053,10 +2119,10 @@ export interface JestEnvironmentGlobal {
   h: any;
   resourcesUrl: string;
   currentSpec?: {
-    id: string;
+    id?: string;
     description: string;
     fullName: string;
-    testPath: string;
+    testPath: string | null;
   };
   env: { [prop: string]: string };
   screenshotDescriptions: Set<string>;
@@ -2277,6 +2343,13 @@ export interface VNodeProdData {
   [key: string]: any;
 }
 
+/**
+ * An abstraction to bundle up four methods which _may_ be handled by
+ * dispatching work to workers running in other OS threads or may be called
+ * synchronously. Environment and `CompilerSystem` related setup code will
+ * determine which one, but in either case the call sites for these methods can
+ * dispatch to this shared interface.
+ */
 export interface CompilerWorkerContext {
   optimizeCss(inputOpts: OptimizeCssInput): Promise<OptimizeCssOutput>;
   prepareModule(
@@ -2289,17 +2362,53 @@ export interface CompilerWorkerContext {
   transformCssToEsm(input: TransformCssToEsmInput): Promise<TransformCssToEsmOutput>;
 }
 
-export interface MsgToWorker {
+/**
+ * The methods that are supported on a {@link d.CompilerWorkerContext}
+ */
+export type WorkerContextMethod = keyof CompilerWorkerContext;
+
+/**
+ * A little type guard which will cause a type error if the parameter `T` does
+ * not satisfy {@link CPSerializable} (i.e. if it's not possible to cleanly
+ * serialize it for message passing via an IPC channel).
+ */
+type IPCSerializable<T extends CPSerializable> = T;
+
+/**
+ * A manifest for a job that a worker thread should carry out, as determined by
+ * and dispatched from the main thread. This includes the name of the task to do
+ * and any arguments necessary to carry it out properly.
+ *
+ * This message must satisfy {@link CPSerializable} so it can be sent from the
+ * main thread to a worker thread via an IPC channel
+ */
+export type MsgToWorker<T extends WorkerContextMethod> = IPCSerializable<{
   stencilId: number;
-  args: any[];
-}
+  method: T;
+  args: Parameters<CompilerWorkerContext[T]>;
+}>;
 
-export interface MsgFromWorker {
+/**
+ * A manifest for a job that a worker thread should carry out, as determined by
+ * and dispatched from the main thread. This includes the name of the task to do
+ * and any arguments necessary to carry it out properly.
+ *
+ * This message must satisfy {@link CPSerializable} so it can be sent from the
+ * main thread to a worker thread via an IPC channel
+ */
+export type MsgFromWorker<T extends WorkerContextMethod> = IPCSerializable<{
   stencilId?: number;
-  stencilRtnValue: any;
-  stencilRtnError: string;
-}
+  stencilRtnValue: ReturnType<CompilerWorkerContext[T]>;
+  stencilRtnError: string | null;
+}>;
 
+/**
+ * A description of a task which should be passed to a worker in another
+ * thread. This interface differs from {@link MsgToWorker} in that it doesn't
+ * have to be serializable for transmission through an IPC channel, so we can
+ * hold things like a `resolve` and `reject` callback to use when the task
+ * completes.
+ */
 export interface CompilerWorkerTask {
   stencilId?: number;
   inputArgs?: any[];
@@ -2308,7 +2417,17 @@ export interface CompilerWorkerTask {
   retries?: number;
 }
 
-export type WorkerMsgHandler = (msgToWorker: MsgToWorker) => Promise<any>;
+/**
+ * A handler for IPC messages from the main thread to a worker thread. This
+ * involves dispatching an action specified by a {@link MsgToWorker} object to a
+ * {@link CompilerWorkerContext}.
+ *
+ * @param msgToWorker the message to handle
+ * @returns the return value of the specified function
+ */
+export type WorkerMsgHandler = <T extends WorkerContextMethod>(
+  msgToWorker: MsgToWorker<T>,
+) => ReturnType<CompilerWorkerContext[T]>;
 
 export interface TranspileModuleResults {
   sourceFilePath: string;

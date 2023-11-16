@@ -45,7 +45,7 @@ export const proxyCustomElement = (Cstr: any, compactMeta: d.ComponentRuntimeMet
 
   // TODO(STENCIL-914): this check and `else` block can go away and be replaced by just `BUILD.scoped` once we
   // default our pseudo-slot behavior
-  if (BUILD.patchPseudoShadowDom && BUILD.scoped) {
+  if (BUILD.experimentalSlotFixes && BUILD.scoped) {
     patchPseudoShadowDom(Cstr.prototype, cmpMeta);
   } else {
     if (BUILD.slotChildNodesFix) {

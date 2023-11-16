@@ -58,6 +58,10 @@ export const componentDecoratorToStatic = (
     newMembers.push(createStaticGetter('encapsulation', convertValueToLiteral('scoped')));
   }
 
+  if (componentOptions.formAssociated === true) {
+    newMembers.push(createStaticGetter('formAssociated', convertValueToLiteral(true)));
+  }
+
   styleToStatic(newMembers, componentOptions);
 
   const assetsDirs = componentOptions.assetsDirs || [];

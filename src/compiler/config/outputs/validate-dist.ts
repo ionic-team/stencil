@@ -9,8 +9,10 @@ import {
   isBoolean,
   isOutputTargetDist,
   isString,
+  join,
+  resolve,
 } from '@utils';
-import { isAbsolute, join, resolve } from 'path';
+import { isAbsolute } from 'path';
 
 import type * as d from '../../../declarations';
 import { getAbsolutePath } from '../config-utils';
@@ -27,8 +29,11 @@ import { validateCopy } from '../validate-copy';
  */
 export const validateDist = (config: d.ValidatedConfig, userOutputs: d.OutputTarget[]): d.OutputTarget[] => {
   const distOutputTargets = userOutputs.filter(isOutputTargetDist);
-  return distOutputTargets.reduce((outputs: d.OutputTarget[], o: d.OutputTargetDist) => {
-    const distOutputTarget = validateOutputTargetDist(config, o);
+
+  const outputs: d.OutputTarget[] = [];
+
+  for (const outputTarget of distOutputTargets) {
+    const distOutputTarget = validateOutputTargetDist(config, outputTarget);
     outputs.push(distOutputTarget);
 
     const namespace = config.fsNamespace || 'app';
@@ -41,7 +46,7 @@ export const validateDist = (config: d.ValidatedConfig, userOutputs: d.OutputTar
       systemDir: config.buildEs5 ? lazyDir : undefined,
       systemLoaderFile: config.buildEs5 ? join(lazyDir, namespace + '.js') : undefined,
       legacyLoaderFile: join(distOutputTarget.buildDir, namespace + '.js'),
-      polyfills: distOutputTarget.polyfills !== undefined ? !!distOutputTarget.polyfills : true,
+      polyfills: outputTarget.polyfills !== undefined ? !!distOutputTarget.polyfills : true,
       isBrowserBuild: true,
       empty: distOutputTarget.empty,
     });
@@ -108,9 +113,9 @@ export const validateDist = (config: d.ValidatedConfig, userOutputs: d.OutputTar
         empty: distOutputTarget.empty,
       });
     }
+  }
 
-    return outputs;
-  }, []);
+  return outputs;
 };
 
 /**
@@ -135,13 +140,13 @@ const validateOutputTargetDist = (config: d.ValidatedConfig, o: d.OutputTargetDi
     typesDir: o.typesDir || DEFAULT_TYPES_DIR,
     esmLoaderPath: o.esmLoaderPath || DEFAULT_ESM_LOADER_DIR,
     copy: validateCopy(o.copy ?? [], []),
-    polyfills: isBoolean(o.polyfills) ? o.polyfills : undefined,
+    polyfills: isBoolean(o.polyfills) ? o.polyfills : false,
     empty: isBoolean(o.empty) ? o.empty : true,
     transformAliasedImportPathsInCollection: isBoolean(o.transformAliasedImportPathsInCollection)
       ? o.transformAliasedImportPathsInCollection
       : true,
     isPrimaryPackageOutputTarget: o.isPrimaryPackageOutputTarget ?? false,
-  };
+  } satisfies Required<d.OutputTargetDist>;
 
   if (!isAbsolute(outputTarget.buildDir)) {
     outputTarget.buildDir = join(outputTarget.dir, outputTarget.buildDir);

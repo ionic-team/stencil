@@ -15,7 +15,7 @@ import {
 import { hmrStart } from './hmr-component';
 import { createTime, installDevTools } from './profile';
 import { proxyComponent } from './proxy-component';
-import { HYDRATED_CSS, HYDRATED_STYLE_ID, PLATFORM_FLAGS, PROXY_FLAGS } from './runtime-constants';
+import { HYDRATED_CSS, HYDRATED_STYLE_ID, PLATFORM_FLAGS, PROXY_FLAGS, SLOT_FB_CSS } from './runtime-constants';
 import { convertScopedToShadow, registerStyle } from './styles';
 import { appDidLoad } from './update-component';
 export { setNonce } from '@platform';
@@ -32,7 +32,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
   const customElements = win.customElements;
   const head = doc.head;
   const metaCharset = /*@__PURE__*/ head.querySelector('meta[charset]');
-  const visibilityStyle = /*@__PURE__*/ doc.createElement('style');
+  const dataStyles = /*@__PURE__*/ doc.createElement('style');
   const deferredConnectedCallbacks: { connectedCallback: () => void }[] = [];
   const styles = /*@__PURE__*/ doc.querySelectorAll(`[${HYDRATED_STYLE_ID}]`);
   let appLoadFallback: any;
@@ -57,6 +57,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
     }
   }
 
+  let hasSlotRelocation = false;
   lazyBundles.map((lazyBundle) => {
     lazyBundle[1].map((compactMeta) => {
       const cmpMeta: d.ComponentRuntimeMeta = {
@@ -65,6 +66,13 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
         $members$: compactMeta[2],
         $listeners$: compactMeta[3],
       };
+
+      // Check if we are using slots outside the shadow DOM in this component.
+      // We'll use this information later to add styles for `slot-fb` elements
+      if (cmpMeta.$flags$ & CMP_FLAGS.hasSlotRelocation) {
+        hasSlotRelocation = true;
+      }
+
       if (BUILD.member) {
         cmpMeta.$members$ = compactMeta[2];
       }
@@ -140,7 +148,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
 
       // TODO(STENCIL-914): this check and `else` block can go away and be replaced by just `BUILD.scoped` once we
       // default our pseudo-slot behavior
-      if (BUILD.patchPseudoShadowDom && BUILD.scoped) {
+      if (BUILD.experimentalSlotFixes && BUILD.scoped) {
         patchPseudoShadowDom(HostElement.prototype, cmpMeta);
       } else {
         if (BUILD.slotChildNodesFix) {
@@ -157,8 +165,18 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
         }
       }
 
+      // if the component is formAssociated we need to set that on the host
+      // element so that it will be ready for `attachInternals` to be called on
+      // it later on
+      if (BUILD.formAssociated && cmpMeta.$flags$ & CMP_FLAGS.formAssociated) {
+        (HostElement as any).formAssociated = true;
+      }
+
       if (BUILD.hotModuleReplacement) {
-        (HostElement as any).prototype['s-hmr'] = function (hmrVersionId: string) {
+        // if we're in an HMR dev build then we need to set up the callback
+        // which will carry out the work of actually replacing the module for
+        // this particular component
+        ((HostElement as any).prototype as d.HostElement)['s-hmr'] = function (hmrVersionId: string) {
           hmrStart(this, cmpMeta, hmrVersionId);
         };
       }
@@ -175,16 +193,26 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
     });
   });
 
+  // Add styles for `slot-fb` elements if any of our components are using slots outside the Shadow DOM
+  if (hasSlotRelocation) {
+    dataStyles.innerHTML += SLOT_FB_CSS;
+  }
+
+  // Add hydration styles
   if (BUILD.invisiblePrehydration && (BUILD.hydratedClass || BUILD.hydratedAttribute)) {
-    visibilityStyle.innerHTML = cmpTags + HYDRATED_CSS;
-    visibilityStyle.setAttribute('data-styles', '');
+    dataStyles.innerHTML += cmpTags + HYDRATED_CSS;
+  }
+
+  // If we have styles, add them to the DOM
+  if (dataStyles.innerHTML.length) {
+    dataStyles.setAttribute('data-styles', '');
+    head.insertBefore(dataStyles, metaCharset ? metaCharset.nextSibling : head.firstChild);
 
     // Apply CSP nonce to the style tag if it exists
     const nonce = plt.$nonce$ ?? queryNonceMetaTagContent(doc);
     if (nonce != null) {
-      visibilityStyle.setAttribute('nonce', nonce);
+      dataStyles.setAttribute('nonce', nonce);
     }
-    head.insertBefore(visibilityStyle, metaCharset ? metaCharset.nextSibling : head.firstChild);
   }
 
   // Process deferred connectedCallbacks now all components have been registered

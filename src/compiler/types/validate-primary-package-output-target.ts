@@ -1,5 +1,4 @@
-import { buildWarn, isEligiblePrimaryPackageOutputTarget, isString, normalizePath } from '@utils';
-import { join, relative } from 'path';
+import { buildWarn, isEligiblePrimaryPackageOutputTarget, isString, join, normalizePath, relative } from '@utils';
 
 import type * as d from '../../declarations';
 import { packageJsonError, packageJsonWarn } from './package-json-log-utils';

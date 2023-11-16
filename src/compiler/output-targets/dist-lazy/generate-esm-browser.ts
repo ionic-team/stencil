@@ -28,7 +28,9 @@ export const generateEsmBrowser = async (
     const output = await generateRollupOutput(rollupBuild, esmOpts, config, buildCtx.entryModules);
 
     if (output != null) {
-      const es2017destinations = esmOutputs.map((o) => o.esmDir);
+      const es2017destinations = esmOutputs
+        .map((o) => o.esmDir)
+        .filter((esmDir): esmDir is string => typeof esmDir === 'string');
       buildCtx.esmBrowserComponentBundle = await generateLazyModules(
         config,
         compilerCtx,

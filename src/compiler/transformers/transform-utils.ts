@@ -176,7 +176,7 @@ export const createStaticGetter = (
  * @param staticName the name of the static getter to pull a value from
  * @returns a TypeScript value, converted from its TypeScript syntax tree representation
  */
-export const getStaticValue = (staticMembers: ts.ClassElement[], staticName: string): any => {
+export const getStaticValue = (staticMembers: ts.ClassElement[], staticName: StencilStaticGetter): any => {
   const staticMember: ts.GetAccessorDeclaration = staticMembers.find(
     (member) => (member.name as any).escapedText === staticName,
   ) as any;
@@ -825,8 +825,15 @@ export const serializeDocsSymbol = (checker: ts.TypeChecker, symbol: ts.Symbol) 
   }
 };
 
-export const isInternal = (jsDocs: d.CompilerJsDoc | undefined) => {
-  return jsDocs && jsDocs.tags.some((s) => s.name === 'internal');
+/**
+ * Given the JSDoc for a given bit of code, determine whether or not it is
+ * marked 'internal'
+ *
+ * @param jsDocs the JSDoc to examine
+ * @returns whether the JSDoc is marked 'internal' or not
+ */
+export const isInternal = (jsDocs: d.CompilerJsDoc | undefined): boolean => {
+  return !!(jsDocs && jsDocs.tags.some((s) => s.name === 'internal'));
 };
 
 export const isMethod = (member: ts.ClassElement, methodName: string): member is ts.MethodDeclaration => {

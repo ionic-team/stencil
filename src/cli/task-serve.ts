@@ -6,7 +6,7 @@ export const taskServe = async (config: ValidatedConfig) => {
   config.suppressLogs = true;
 
   config.flags.serve = true;
-  config.devServer.openBrowser = config.flags.open;
+  config.devServer.openBrowser = !!config.flags.open;
   config.devServer.reloadStrategy = null;
   config.devServer.initialLoadUrl = '/';
   config.devServer.websocket = false;

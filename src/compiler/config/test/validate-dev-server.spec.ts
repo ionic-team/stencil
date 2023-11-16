@@ -205,7 +205,8 @@ describe('validateDevServer', () => {
   });
 
   it('should set openBrowser from flag', () => {
-    inputConfig.flags.open = false;
+    // the flags field should have been set up in the `beforeEach` block for this test, hence the bang operator
+    inputConfig.flags!.open = false;
     const { config } = validateConfig(inputConfig, mockLoadConfigInit());
     expect(config.devServer.openBrowser).toBe(false);
   });

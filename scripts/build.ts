@@ -11,7 +11,6 @@ import { screenshot } from './bundles/screenshot';
 import { sysNode, sysNodeExternalBundles } from './bundles/sys-node';
 import { testing } from './bundles/testing';
 import { utils } from './bundles/utils';
-import { createLicense } from './license';
 import { release } from './release';
 import { validateBuild } from './test/validate-build';
 import { BuildOptions } from './utils/options';
@@ -25,10 +24,6 @@ export async function run(rootDir: string, args: ReadonlyArray<string>): Promise
   try {
     if (args.includes('--release')) {
       await release(rootDir, args);
-    }
-
-    if (args.includes('--license')) {
-      createLicense(rootDir);
     }
 
     if (args.includes('--validate-build')) {

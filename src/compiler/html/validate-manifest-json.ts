@@ -1,5 +1,5 @@
-import { buildError, buildJsonFileError, isOutputTargetWww } from '@utils';
-import { dirname, join } from 'path';
+import { buildError, buildJsonFileError, isOutputTargetWww, join } from '@utils';
+import { dirname } from 'path';
 
 import type * as d from '../../declarations';
 

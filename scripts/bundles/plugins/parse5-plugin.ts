@@ -2,8 +2,7 @@ import rollupCommonjs from '@rollup/plugin-commonjs';
 import rollupResolve from '@rollup/plugin-node-resolve';
 import fs from 'fs-extra';
 import { join } from 'path';
-import type { NormalizedOutputOptions, OutputBundle } from 'rollup';
-import { OutputChunk, Plugin, rollup } from 'rollup';
+import { Plugin, rollup } from 'rollup';
 
 import type { BuildOptions } from '../../utils/options';
 import { aliasPlugin } from './alias-plugin';
@@ -37,20 +36,6 @@ export function parse5Plugin(opts: BuildOptions): Plugin {
         return await bundleParse5(opts);
       }
       return null;
-    },
-    /**
-     * Output generation hook used to reduce the amount of whitespace in the bundle
-     * @param _ unused output options
-     * @param bundle the bundle to minify
-     */
-    generateBundle(_: NormalizedOutputOptions, bundle: OutputBundle): void {
-      Object.keys(bundle).forEach((fileName) => {
-        // not minifying, but we are reducing whitespace
-        const chunk = bundle[fileName] as OutputChunk;
-        if (chunk.type === 'chunk') {
-          chunk.code = chunk.code.replace(/    /g, '  ');
-        }
-      });
     },
   };
 }

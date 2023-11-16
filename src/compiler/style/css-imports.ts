@@ -1,5 +1,5 @@
-import { buildError, normalizePath } from '@utils';
-import { basename, dirname, isAbsolute, join } from 'path';
+import { buildError, join, normalizePath } from '@utils';
+import { basename, dirname, isAbsolute } from 'path';
 
 import type * as d from '../../declarations';
 import { parseStyleDocs } from '../docs/style-docs';

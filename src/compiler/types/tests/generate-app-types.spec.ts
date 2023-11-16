@@ -58,43 +58,43 @@ export namespace Components {
     /**
      * docs
      */
-        interface MyComponent {
-        }
+    interface MyComponent {
+    }
 }
 declare global {
     /**
      * docs
      */
-        interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
-        }
-        var HTMLMyComponentElement: {
-                prototype: HTMLMyComponentElement;
-                new (): HTMLMyComponentElement;
-        };
-        interface HTMLElementTagNameMap {
-                "my-component": HTMLMyComponentElement;
-        }
+    interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
+    }
+    var HTMLMyComponentElement: {
+        prototype: HTMLMyComponentElement;
+        new (): HTMLMyComponentElement;
+    };
+    interface HTMLElementTagNameMap {
+        "my-component": HTMLMyComponentElement;
+    }
 }
 declare namespace LocalJSX {
     /**
      * docs
      */
-      interface MyComponent {
-        }
-        interface IntrinsicElements {
-              "my-component": MyComponent;
-        }
+    interface MyComponent {
+    }
+    interface IntrinsicElements {
+        "my-component": MyComponent;
+    }
 }
 export { LocalJSX as JSX };
 declare module "@stencil/core" {
-        export namespace JSX {
-                interface IntrinsicElements {
+    export namespace JSX {
+        interface IntrinsicElements {
             /**
              * docs
              */
-                        "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
-                }
+            "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
         }
+    }
 }
 `,
       {
@@ -130,48 +130,59 @@ export namespace Components {
     /**
      * docs
      */
-        interface MyComponent {
-        }
+    interface MyComponent {
+    }
 }
 export interface MyComponentCustomEvent<T> extends CustomEvent<T> {
-        detail: T;
-        target: HTMLMyComponentElement;
+    detail: T;
+    target: HTMLMyComponentElement;
 }
 declare global {
+    interface HTMLMyComponentElementEventMap {
+        "myEvent": UserImplementedEventType;
+    }
     /**
      * docs
      */
-        interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
-        }
-        var HTMLMyComponentElement: {
-                prototype: HTMLMyComponentElement;
-                new (): HTMLMyComponentElement;
-        };
-        interface HTMLElementTagNameMap {
-                "my-component": HTMLMyComponentElement;
-        }
+    interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLMyComponentElementEventMap>(type: K, listener: (this: HTMLMyComponentElement, ev: MyComponentCustomEvent<HTMLMyComponentElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLMyComponentElementEventMap>(type: K, listener: (this: HTMLMyComponentElement, ev: MyComponentCustomEvent<HTMLMyComponentElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLMyComponentElement: {
+        prototype: HTMLMyComponentElement;
+        new (): HTMLMyComponentElement;
+    };
+    interface HTMLElementTagNameMap {
+        "my-component": HTMLMyComponentElement;
+    }
 }
 declare namespace LocalJSX {
     /**
      * docs
      */
-      interface MyComponent {
-                "onMyEvent"?: (event: MyComponentCustomEvent<UserImplementedEventType>) => void;
-        }
-        interface IntrinsicElements {
-              "my-component": MyComponent;
-        }
+    interface MyComponent {
+        "onMyEvent"?: (event: MyComponentCustomEvent<UserImplementedEventType>) => void;
+    }
+    interface IntrinsicElements {
+        "my-component": MyComponent;
+    }
 }
 export { LocalJSX as JSX };
 declare module "@stencil/core" {
-        export namespace JSX {
-                interface IntrinsicElements {
+    export namespace JSX {
+        interface IntrinsicElements {
             /**
              * docs
              */
-                        "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
-                }
+            "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
         }
+    }
 }
 `,
         {
@@ -223,49 +234,61 @@ export namespace Components {
     /**
      * docs
      */
-        interface MyComponent {
-        }
+    interface MyComponent {
+    }
 }
 export interface MyComponentCustomEvent<T> extends CustomEvent<T> {
-        detail: T;
-        target: HTMLMyComponentElement;
+    detail: T;
+    target: HTMLMyComponentElement;
 }
 declare global {
+    interface HTMLMyComponentElementEventMap {
+        "myEvent": UserImplementedEventType;
+        "mySecondEvent": SecondUserImplementedEventType;
+    }
     /**
      * docs
      */
-        interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
-        }
-        var HTMLMyComponentElement: {
-                prototype: HTMLMyComponentElement;
-                new (): HTMLMyComponentElement;
-        };
-        interface HTMLElementTagNameMap {
-                "my-component": HTMLMyComponentElement;
-        }
+    interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLMyComponentElementEventMap>(type: K, listener: (this: HTMLMyComponentElement, ev: MyComponentCustomEvent<HTMLMyComponentElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLMyComponentElementEventMap>(type: K, listener: (this: HTMLMyComponentElement, ev: MyComponentCustomEvent<HTMLMyComponentElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLMyComponentElement: {
+        prototype: HTMLMyComponentElement;
+        new (): HTMLMyComponentElement;
+    };
+    interface HTMLElementTagNameMap {
+        "my-component": HTMLMyComponentElement;
+    }
 }
 declare namespace LocalJSX {
     /**
      * docs
      */
-      interface MyComponent {
-                "onMyEvent"?: (event: MyComponentCustomEvent<UserImplementedEventType>) => void;
-                "onMySecondEvent"?: (event: MyComponentCustomEvent<SecondUserImplementedEventType>) => void;
-        }
-        interface IntrinsicElements {
-              "my-component": MyComponent;
-        }
+    interface MyComponent {
+        "onMyEvent"?: (event: MyComponentCustomEvent<UserImplementedEventType>) => void;
+        "onMySecondEvent"?: (event: MyComponentCustomEvent<SecondUserImplementedEventType>) => void;
+    }
+    interface IntrinsicElements {
+        "my-component": MyComponent;
+    }
 }
 export { LocalJSX as JSX };
 declare module "@stencil/core" {
-        export namespace JSX {
-                interface IntrinsicElements {
+    export namespace JSX {
+        interface IntrinsicElements {
             /**
              * docs
              */
-                        "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
-                }
+            "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
         }
+    }
 }
 `,
         {
@@ -337,78 +360,100 @@ export namespace Components {
     /**
      * docs
      */
-        interface MyComponent {
-        }
+    interface MyComponent {
+    }
     /**
      * docs
      */
-        interface MyNewComponent {
-        }
+    interface MyNewComponent {
+    }
 }
 export interface MyComponentCustomEvent<T> extends CustomEvent<T> {
-        detail: T;
-        target: HTMLMyComponentElement;
+    detail: T;
+    target: HTMLMyComponentElement;
 }
 export interface MyNewComponentCustomEvent<T> extends CustomEvent<T> {
-        detail: T;
-        target: HTMLMyNewComponentElement;
+    detail: T;
+    target: HTMLMyNewComponentElement;
 }
 declare global {
+    interface HTMLMyComponentElementEventMap {
+        "myEvent": UserImplementedEventType;
+    }
     /**
      * docs
      */
-        interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
-        }
-        var HTMLMyComponentElement: {
-                prototype: HTMLMyComponentElement;
-                new (): HTMLMyComponentElement;
-        };
+    interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLMyComponentElementEventMap>(type: K, listener: (this: HTMLMyComponentElement, ev: MyComponentCustomEvent<HTMLMyComponentElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLMyComponentElementEventMap>(type: K, listener: (this: HTMLMyComponentElement, ev: MyComponentCustomEvent<HTMLMyComponentElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLMyComponentElement: {
+        prototype: HTMLMyComponentElement;
+        new (): HTMLMyComponentElement;
+    };
+    interface HTMLMyNewComponentElementEventMap {
+        "myEvent": UserImplementedEventType;
+    }
     /**
      * docs
      */
-        interface HTMLMyNewComponentElement extends Components.MyNewComponent, HTMLStencilElement {
-        }
-        var HTMLMyNewComponentElement: {
-                prototype: HTMLMyNewComponentElement;
-                new (): HTMLMyNewComponentElement;
-        };
-        interface HTMLElementTagNameMap {
-                "my-component": HTMLMyComponentElement;
-                "my-new-component": HTMLMyNewComponentElement;
-        }
+    interface HTMLMyNewComponentElement extends Components.MyNewComponent, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLMyNewComponentElementEventMap>(type: K, listener: (this: HTMLMyNewComponentElement, ev: MyNewComponentCustomEvent<HTMLMyNewComponentElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLMyNewComponentElementEventMap>(type: K, listener: (this: HTMLMyNewComponentElement, ev: MyNewComponentCustomEvent<HTMLMyNewComponentElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLMyNewComponentElement: {
+        prototype: HTMLMyNewComponentElement;
+        new (): HTMLMyNewComponentElement;
+    };
+    interface HTMLElementTagNameMap {
+        "my-component": HTMLMyComponentElement;
+        "my-new-component": HTMLMyNewComponentElement;
+    }
 }
 declare namespace LocalJSX {
     /**
      * docs
      */
-      interface MyComponent {
-                "onMyEvent"?: (event: MyComponentCustomEvent<UserImplementedEventType>) => void;
-        }
+    interface MyComponent {
+        "onMyEvent"?: (event: MyComponentCustomEvent<UserImplementedEventType>) => void;
+    }
     /**
      * docs
      */
-      interface MyNewComponent {
-                "onMyEvent"?: (event: MyNewComponentCustomEvent<UserImplementedEventType>) => void;
-        }
-        interface IntrinsicElements {
-              "my-component": MyComponent;
-              "my-new-component": MyNewComponent;
-        }
+    interface MyNewComponent {
+        "onMyEvent"?: (event: MyNewComponentCustomEvent<UserImplementedEventType>) => void;
+    }
+    interface IntrinsicElements {
+        "my-component": MyComponent;
+        "my-new-component": MyNewComponent;
+    }
 }
 export { LocalJSX as JSX };
 declare module "@stencil/core" {
-        export namespace JSX {
-                interface IntrinsicElements {
+    export namespace JSX {
+        interface IntrinsicElements {
             /**
              * docs
              */
-                        "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
+            "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
             /**
              * docs
              */
-                        "my-new-component": LocalJSX.MyNewComponent & JSXBase.HTMLAttributes<HTMLMyNewComponentElement>;
-                }
+            "my-new-component": LocalJSX.MyNewComponent & JSXBase.HTMLAttributes<HTMLMyNewComponentElement>;
         }
+    }
 }
 `,
         {
@@ -485,78 +530,100 @@ export namespace Components {
     /**
      * docs
      */
-        interface MyComponent {
-        }
+    interface MyComponent {
+    }
     /**
      * docs
      */
-        interface MyNewComponent {
-        }
+    interface MyNewComponent {
+    }
 }
 export interface MyComponentCustomEvent<T> extends CustomEvent<T> {
-        detail: T;
-        target: HTMLMyComponentElement;
+    detail: T;
+    target: HTMLMyComponentElement;
 }
 export interface MyNewComponentCustomEvent<T> extends CustomEvent<T> {
-        detail: T;
-        target: HTMLMyNewComponentElement;
+    detail: T;
+    target: HTMLMyNewComponentElement;
 }
 declare global {
+    interface HTMLMyComponentElementEventMap {
+        "myEvent": UserImplementedEventType;
+    }
     /**
      * docs
      */
-        interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
-        }
-        var HTMLMyComponentElement: {
-                prototype: HTMLMyComponentElement;
-                new (): HTMLMyComponentElement;
-        };
+    interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLMyComponentElementEventMap>(type: K, listener: (this: HTMLMyComponentElement, ev: MyComponentCustomEvent<HTMLMyComponentElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLMyComponentElementEventMap>(type: K, listener: (this: HTMLMyComponentElement, ev: MyComponentCustomEvent<HTMLMyComponentElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLMyComponentElement: {
+        prototype: HTMLMyComponentElement;
+        new (): HTMLMyComponentElement;
+    };
+    interface HTMLMyNewComponentElementEventMap {
+        "myEvent": UserImplementedEventType1;
+    }
     /**
      * docs
      */
-        interface HTMLMyNewComponentElement extends Components.MyNewComponent, HTMLStencilElement {
-        }
-        var HTMLMyNewComponentElement: {
-                prototype: HTMLMyNewComponentElement;
-                new (): HTMLMyNewComponentElement;
-        };
-        interface HTMLElementTagNameMap {
-                "my-component": HTMLMyComponentElement;
-                "my-new-component": HTMLMyNewComponentElement;
-        }
+    interface HTMLMyNewComponentElement extends Components.MyNewComponent, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLMyNewComponentElementEventMap>(type: K, listener: (this: HTMLMyNewComponentElement, ev: MyNewComponentCustomEvent<HTMLMyNewComponentElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLMyNewComponentElementEventMap>(type: K, listener: (this: HTMLMyNewComponentElement, ev: MyNewComponentCustomEvent<HTMLMyNewComponentElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLMyNewComponentElement: {
+        prototype: HTMLMyNewComponentElement;
+        new (): HTMLMyNewComponentElement;
+    };
+    interface HTMLElementTagNameMap {
+        "my-component": HTMLMyComponentElement;
+        "my-new-component": HTMLMyNewComponentElement;
+    }
 }
 declare namespace LocalJSX {
     /**
      * docs
      */
-      interface MyComponent {
-                "onMyEvent"?: (event: MyComponentCustomEvent<UserImplementedEventType>) => void;
-        }
+    interface MyComponent {
+        "onMyEvent"?: (event: MyComponentCustomEvent<UserImplementedEventType>) => void;
+    }
     /**
      * docs
      */
-      interface MyNewComponent {
-                "onMyEvent"?: (event: MyNewComponentCustomEvent<UserImplementedEventType1>) => void;
-        }
-        interface IntrinsicElements {
-              "my-component": MyComponent;
-              "my-new-component": MyNewComponent;
-        }
+    interface MyNewComponent {
+        "onMyEvent"?: (event: MyNewComponentCustomEvent<UserImplementedEventType1>) => void;
+    }
+    interface IntrinsicElements {
+        "my-component": MyComponent;
+        "my-new-component": MyNewComponent;
+    }
 }
 export { LocalJSX as JSX };
 declare module "@stencil/core" {
-        export namespace JSX {
-                interface IntrinsicElements {
+    export namespace JSX {
+        interface IntrinsicElements {
             /**
              * docs
              */
-                        "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
+            "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
             /**
              * docs
              */
-                        "my-new-component": LocalJSX.MyNewComponent & JSXBase.HTMLAttributes<HTMLMyNewComponentElement>;
-                }
+            "my-new-component": LocalJSX.MyNewComponent & JSXBase.HTMLAttributes<HTMLMyNewComponentElement>;
         }
+    }
 }
 `,
         {
@@ -633,78 +700,100 @@ export namespace Components {
     /**
      * docs
      */
-        interface MyComponent {
-        }
+    interface MyComponent {
+    }
     /**
      * docs
      */
-        interface MyNewComponent {
-        }
+    interface MyNewComponent {
+    }
 }
 export interface MyComponentCustomEvent<T> extends CustomEvent<T> {
-        detail: T;
-        target: HTMLMyComponentElement;
+    detail: T;
+    target: HTMLMyComponentElement;
 }
 export interface MyNewComponentCustomEvent<T> extends CustomEvent<T> {
-        detail: T;
-        target: HTMLMyNewComponentElement;
+    detail: T;
+    target: HTMLMyNewComponentElement;
 }
 declare global {
+    interface HTMLMyComponentElementEventMap {
+        "myEvent": UserImplementedEventType;
+    }
     /**
      * docs
      */
-        interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
-        }
-        var HTMLMyComponentElement: {
-                prototype: HTMLMyComponentElement;
-                new (): HTMLMyComponentElement;
-        };
+    interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLMyComponentElementEventMap>(type: K, listener: (this: HTMLMyComponentElement, ev: MyComponentCustomEvent<HTMLMyComponentElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLMyComponentElementEventMap>(type: K, listener: (this: HTMLMyComponentElement, ev: MyComponentCustomEvent<HTMLMyComponentElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLMyComponentElement: {
+        prototype: HTMLMyComponentElement;
+        new (): HTMLMyComponentElement;
+    };
+    interface HTMLMyNewComponentElementEventMap {
+        "myEvent": UserImplementedEventType1;
+    }
     /**
      * docs
      */
-        interface HTMLMyNewComponentElement extends Components.MyNewComponent, HTMLStencilElement {
-        }
-        var HTMLMyNewComponentElement: {
-                prototype: HTMLMyNewComponentElement;
-                new (): HTMLMyNewComponentElement;
-        };
-        interface HTMLElementTagNameMap {
-                "my-component": HTMLMyComponentElement;
-                "my-new-component": HTMLMyNewComponentElement;
-        }
+    interface HTMLMyNewComponentElement extends Components.MyNewComponent, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLMyNewComponentElementEventMap>(type: K, listener: (this: HTMLMyNewComponentElement, ev: MyNewComponentCustomEvent<HTMLMyNewComponentElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLMyNewComponentElementEventMap>(type: K, listener: (this: HTMLMyNewComponentElement, ev: MyNewComponentCustomEvent<HTMLMyNewComponentElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLMyNewComponentElement: {
+        prototype: HTMLMyNewComponentElement;
+        new (): HTMLMyNewComponentElement;
+    };
+    interface HTMLElementTagNameMap {
+        "my-component": HTMLMyComponentElement;
+        "my-new-component": HTMLMyNewComponentElement;
+    }
 }
 declare namespace LocalJSX {
     /**
      * docs
      */
-      interface MyComponent {
-                "onMyEvent"?: (event: MyComponentCustomEvent<UserImplementedEventType>) => void;
-        }
+    interface MyComponent {
+        "onMyEvent"?: (event: MyComponentCustomEvent<UserImplementedEventType>) => void;
+    }
     /**
      * docs
      */
-      interface MyNewComponent {
-                "onMyEvent"?: (event: MyNewComponentCustomEvent<UserImplementedEventType1>) => void;
-        }
-        interface IntrinsicElements {
-              "my-component": MyComponent;
-              "my-new-component": MyNewComponent;
-        }
+    interface MyNewComponent {
+        "onMyEvent"?: (event: MyNewComponentCustomEvent<UserImplementedEventType1>) => void;
+    }
+    interface IntrinsicElements {
+        "my-component": MyComponent;
+        "my-new-component": MyNewComponent;
+    }
 }
 export { LocalJSX as JSX };
 declare module "@stencil/core" {
-        export namespace JSX {
-                interface IntrinsicElements {
+    export namespace JSX {
+        interface IntrinsicElements {
             /**
              * docs
              */
-                        "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
+            "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
             /**
              * docs
              */
-                        "my-new-component": LocalJSX.MyNewComponent & JSXBase.HTMLAttributes<HTMLMyNewComponentElement>;
-                }
+            "my-new-component": LocalJSX.MyNewComponent & JSXBase.HTMLAttributes<HTMLMyNewComponentElement>;
         }
+    }
 }
 `,
         {
@@ -756,45 +845,45 @@ export namespace Components {
     /**
      * docs
      */
-        interface MyComponent {
-                "name": UserImplementedPropType;
-        }
+    interface MyComponent {
+        "name": UserImplementedPropType;
+    }
 }
 declare global {
     /**
      * docs
      */
-        interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
-        }
-        var HTMLMyComponentElement: {
-                prototype: HTMLMyComponentElement;
-                new (): HTMLMyComponentElement;
-        };
-        interface HTMLElementTagNameMap {
-                "my-component": HTMLMyComponentElement;
-        }
+    interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
+    }
+    var HTMLMyComponentElement: {
+        prototype: HTMLMyComponentElement;
+        new (): HTMLMyComponentElement;
+    };
+    interface HTMLElementTagNameMap {
+        "my-component": HTMLMyComponentElement;
+    }
 }
 declare namespace LocalJSX {
     /**
      * docs
      */
-      interface MyComponent {
-                "name"?: UserImplementedPropType;
-        }
-        interface IntrinsicElements {
-              "my-component": MyComponent;
-        }
+    interface MyComponent {
+        "name"?: UserImplementedPropType;
+    }
+    interface IntrinsicElements {
+        "my-component": MyComponent;
+    }
 }
 export { LocalJSX as JSX };
 declare module "@stencil/core" {
-        export namespace JSX {
-                interface IntrinsicElements {
+    export namespace JSX {
+        interface IntrinsicElements {
             /**
              * docs
              */
-                        "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
-                }
+            "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
         }
+    }
 }
 `,
         {
@@ -858,47 +947,47 @@ export namespace Components {
     /**
      * docs
      */
-        interface MyComponent {
-                "email": SecondUserImplementedPropType;
-                "name": UserImplementedPropType;
-        }
+    interface MyComponent {
+        "email": SecondUserImplementedPropType;
+        "name": UserImplementedPropType;
+    }
 }
 declare global {
     /**
      * docs
      */
-        interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
-        }
-        var HTMLMyComponentElement: {
-                prototype: HTMLMyComponentElement;
-                new (): HTMLMyComponentElement;
-        };
-        interface HTMLElementTagNameMap {
-                "my-component": HTMLMyComponentElement;
-        }
+    interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
+    }
+    var HTMLMyComponentElement: {
+        prototype: HTMLMyComponentElement;
+        new (): HTMLMyComponentElement;
+    };
+    interface HTMLElementTagNameMap {
+        "my-component": HTMLMyComponentElement;
+    }
 }
 declare namespace LocalJSX {
     /**
      * docs
      */
-      interface MyComponent {
-                "email"?: SecondUserImplementedPropType;
-                "name"?: UserImplementedPropType;
-        }
-        interface IntrinsicElements {
-              "my-component": MyComponent;
-        }
+    interface MyComponent {
+        "email"?: SecondUserImplementedPropType;
+        "name"?: UserImplementedPropType;
+    }
+    interface IntrinsicElements {
+        "my-component": MyComponent;
+    }
 }
 export { LocalJSX as JSX };
 declare module "@stencil/core" {
-        export namespace JSX {
-                interface IntrinsicElements {
+    export namespace JSX {
+        interface IntrinsicElements {
             /**
              * docs
              */
-                        "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
-                }
+            "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
         }
+    }
 }
 `,
         {
@@ -972,72 +1061,72 @@ export namespace Components {
     /**
      * docs
      */
-        interface MyComponent {
-                "name": UserImplementedPropType;
-        }
+    interface MyComponent {
+        "name": UserImplementedPropType;
+    }
     /**
      * docs
      */
-        interface MyNewComponent {
-                "fullName": UserImplementedPropType;
-        }
+    interface MyNewComponent {
+        "fullName": UserImplementedPropType;
+    }
 }
 declare global {
     /**
      * docs
      */
-        interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
-        }
-        var HTMLMyComponentElement: {
-                prototype: HTMLMyComponentElement;
-                new (): HTMLMyComponentElement;
-        };
+    interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
+    }
+    var HTMLMyComponentElement: {
+        prototype: HTMLMyComponentElement;
+        new (): HTMLMyComponentElement;
+    };
     /**
      * docs
      */
-        interface HTMLMyNewComponentElement extends Components.MyNewComponent, HTMLStencilElement {
-        }
-        var HTMLMyNewComponentElement: {
-                prototype: HTMLMyNewComponentElement;
-                new (): HTMLMyNewComponentElement;
-        };
-        interface HTMLElementTagNameMap {
-                "my-component": HTMLMyComponentElement;
-                "my-new-component": HTMLMyNewComponentElement;
-        }
+    interface HTMLMyNewComponentElement extends Components.MyNewComponent, HTMLStencilElement {
+    }
+    var HTMLMyNewComponentElement: {
+        prototype: HTMLMyNewComponentElement;
+        new (): HTMLMyNewComponentElement;
+    };
+    interface HTMLElementTagNameMap {
+        "my-component": HTMLMyComponentElement;
+        "my-new-component": HTMLMyNewComponentElement;
+    }
 }
 declare namespace LocalJSX {
     /**
      * docs
      */
-      interface MyComponent {
-                "name"?: UserImplementedPropType;
-        }
+    interface MyComponent {
+        "name"?: UserImplementedPropType;
+    }
     /**
      * docs
      */
-      interface MyNewComponent {
-                "fullName"?: UserImplementedPropType;
-        }
-        interface IntrinsicElements {
-              "my-component": MyComponent;
-              "my-new-component": MyNewComponent;
-        }
+    interface MyNewComponent {
+        "fullName"?: UserImplementedPropType;
+    }
+    interface IntrinsicElements {
+        "my-component": MyComponent;
+        "my-new-component": MyNewComponent;
+    }
 }
 export { LocalJSX as JSX };
 declare module "@stencil/core" {
-        export namespace JSX {
-                interface IntrinsicElements {
+    export namespace JSX {
+        interface IntrinsicElements {
             /**
              * docs
              */
-                        "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
+            "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
             /**
              * docs
              */
-                        "my-new-component": LocalJSX.MyNewComponent & JSXBase.HTMLAttributes<HTMLMyNewComponentElement>;
-                }
+            "my-new-component": LocalJSX.MyNewComponent & JSXBase.HTMLAttributes<HTMLMyNewComponentElement>;
         }
+    }
 }
 `,
         {
@@ -1116,72 +1205,72 @@ export namespace Components {
     /**
      * docs
      */
-        interface MyComponent {
-                "name": UserImplementedPropType;
-        }
+    interface MyComponent {
+        "name": UserImplementedPropType;
+    }
     /**
      * docs
      */
-        interface MyNewComponent {
-                "newName": UserImplementedPropType1;
-        }
+    interface MyNewComponent {
+        "newName": UserImplementedPropType1;
+    }
 }
 declare global {
     /**
      * docs
      */
-        interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
-        }
-        var HTMLMyComponentElement: {
-                prototype: HTMLMyComponentElement;
-                new (): HTMLMyComponentElement;
-        };
+    interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
+    }
+    var HTMLMyComponentElement: {
+        prototype: HTMLMyComponentElement;
+        new (): HTMLMyComponentElement;
+    };
     /**
      * docs
      */
-        interface HTMLMyNewComponentElement extends Components.MyNewComponent, HTMLStencilElement {
-        }
-        var HTMLMyNewComponentElement: {
-                prototype: HTMLMyNewComponentElement;
-                new (): HTMLMyNewComponentElement;
-        };
-        interface HTMLElementTagNameMap {
-                "my-component": HTMLMyComponentElement;
-                "my-new-component": HTMLMyNewComponentElement;
-        }
+    interface HTMLMyNewComponentElement extends Components.MyNewComponent, HTMLStencilElement {
+    }
+    var HTMLMyNewComponentElement: {
+        prototype: HTMLMyNewComponentElement;
+        new (): HTMLMyNewComponentElement;
+    };
+    interface HTMLElementTagNameMap {
+        "my-component": HTMLMyComponentElement;
+        "my-new-component": HTMLMyNewComponentElement;
+    }
 }
 declare namespace LocalJSX {
     /**
      * docs
      */
-      interface MyComponent {
-                "name"?: UserImplementedPropType;
-        }
+    interface MyComponent {
+        "name"?: UserImplementedPropType;
+    }
     /**
      * docs
      */
-      interface MyNewComponent {
-                "newName"?: UserImplementedPropType1;
-        }
-        interface IntrinsicElements {
-              "my-component": MyComponent;
-              "my-new-component": MyNewComponent;
-        }
+    interface MyNewComponent {
+        "newName"?: UserImplementedPropType1;
+    }
+    interface IntrinsicElements {
+        "my-component": MyComponent;
+        "my-new-component": MyNewComponent;
+    }
 }
 export { LocalJSX as JSX };
 declare module "@stencil/core" {
-        export namespace JSX {
-                interface IntrinsicElements {
+    export namespace JSX {
+        interface IntrinsicElements {
             /**
              * docs
              */
-                        "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
+            "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
             /**
              * docs
              */
-                        "my-new-component": LocalJSX.MyNewComponent & JSXBase.HTMLAttributes<HTMLMyNewComponentElement>;
-                }
+            "my-new-component": LocalJSX.MyNewComponent & JSXBase.HTMLAttributes<HTMLMyNewComponentElement>;
         }
+    }
 }
 `,
         {
@@ -1260,72 +1349,72 @@ export namespace Components {
     /**
      * docs
      */
-        interface MyComponent {
-                "name": UserImplementedPropType;
-        }
+    interface MyComponent {
+        "name": UserImplementedPropType;
+    }
     /**
      * docs
      */
-        interface MyNewComponent {
-                "name": UserImplementedPropType1;
-        }
+    interface MyNewComponent {
+        "name": UserImplementedPropType1;
+    }
 }
 declare global {
     /**
      * docs
      */
-        interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
-        }
-        var HTMLMyComponentElement: {
-                prototype: HTMLMyComponentElement;
-                new (): HTMLMyComponentElement;
-        };
+    interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
+    }
+    var HTMLMyComponentElement: {
+        prototype: HTMLMyComponentElement;
+        new (): HTMLMyComponentElement;
+    };
     /**
      * docs
      */
-        interface HTMLMyNewComponentElement extends Components.MyNewComponent, HTMLStencilElement {
-        }
-        var HTMLMyNewComponentElement: {
-                prototype: HTMLMyNewComponentElement;
-                new (): HTMLMyNewComponentElement;
-        };
-        interface HTMLElementTagNameMap {
-                "my-component": HTMLMyComponentElement;
-                "my-new-component": HTMLMyNewComponentElement;
-        }
+    interface HTMLMyNewComponentElement extends Components.MyNewComponent, HTMLStencilElement {
+    }
+    var HTMLMyNewComponentElement: {
+        prototype: HTMLMyNewComponentElement;
+        new (): HTMLMyNewComponentElement;
+    };
+    interface HTMLElementTagNameMap {
+        "my-component": HTMLMyComponentElement;
+        "my-new-component": HTMLMyNewComponentElement;
+    }
 }
 declare namespace LocalJSX {
     /**
      * docs
      */
-      interface MyComponent {
-                "name"?: UserImplementedPropType;
-        }
+    interface MyComponent {
+        "name"?: UserImplementedPropType;
+    }
     /**
      * docs
      */
-      interface MyNewComponent {
-                "name"?: UserImplementedPropType1;
-        }
-        interface IntrinsicElements {
-              "my-component": MyComponent;
-              "my-new-component": MyNewComponent;
-        }
+    interface MyNewComponent {
+        "name"?: UserImplementedPropType1;
+    }
+    interface IntrinsicElements {
+        "my-component": MyComponent;
+        "my-new-component": MyNewComponent;
+    }
 }
 export { LocalJSX as JSX };
 declare module "@stencil/core" {
-        export namespace JSX {
-                interface IntrinsicElements {
+    export namespace JSX {
+        interface IntrinsicElements {
             /**
              * docs
              */
-                        "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
+            "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
             /**
              * docs
              */
-                        "my-new-component": LocalJSX.MyNewComponent & JSXBase.HTMLAttributes<HTMLMyNewComponentElement>;
-                }
+            "my-new-component": LocalJSX.MyNewComponent & JSXBase.HTMLAttributes<HTMLMyNewComponentElement>;
         }
+    }
 }
 `,
         {
@@ -1381,50 +1470,61 @@ export namespace Components {
     /**
      * docs
      */
-        interface MyComponent {
-                "name": UserImplementedPropType;
-        }
+    interface MyComponent {
+        "name": UserImplementedPropType;
+    }
 }
 export interface MyComponentCustomEvent<T> extends CustomEvent<T> {
-        detail: T;
-        target: HTMLMyComponentElement;
+    detail: T;
+    target: HTMLMyComponentElement;
 }
 declare global {
+    interface HTMLMyComponentElementEventMap {
+        "myEvent": UserImplementedEventType;
+    }
     /**
      * docs
      */
-        interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
-        }
-        var HTMLMyComponentElement: {
-                prototype: HTMLMyComponentElement;
-                new (): HTMLMyComponentElement;
-        };
-        interface HTMLElementTagNameMap {
-                "my-component": HTMLMyComponentElement;
-        }
+    interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLMyComponentElementEventMap>(type: K, listener: (this: HTMLMyComponentElement, ev: MyComponentCustomEvent<HTMLMyComponentElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLMyComponentElementEventMap>(type: K, listener: (this: HTMLMyComponentElement, ev: MyComponentCustomEvent<HTMLMyComponentElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLMyComponentElement: {
+        prototype: HTMLMyComponentElement;
+        new (): HTMLMyComponentElement;
+    };
+    interface HTMLElementTagNameMap {
+        "my-component": HTMLMyComponentElement;
+    }
 }
 declare namespace LocalJSX {
     /**
      * docs
      */
-      interface MyComponent {
-                "name"?: UserImplementedPropType;
-                "onMyEvent"?: (event: MyComponentCustomEvent<UserImplementedEventType>) => void;
-        }
-        interface IntrinsicElements {
-              "my-component": MyComponent;
-        }
+    interface MyComponent {
+        "name"?: UserImplementedPropType;
+        "onMyEvent"?: (event: MyComponentCustomEvent<UserImplementedEventType>) => void;
+    }
+    interface IntrinsicElements {
+        "my-component": MyComponent;
+    }
 }
 export { LocalJSX as JSX };
 declare module "@stencil/core" {
-        export namespace JSX {
-                interface IntrinsicElements {
+    export namespace JSX {
+        interface IntrinsicElements {
             /**
              * docs
              */
-                        "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
-                }
+            "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
         }
+    }
 }
 `,
       {
@@ -1488,45 +1588,45 @@ export namespace Components {
     /**
      * docs
      */
-        interface MyComponent {
-                "name": UserImplementedPropType;
-        }
+    interface MyComponent {
+        "name": UserImplementedPropType;
+    }
 }
 declare global {
     /**
      * docs
      */
-        interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
-        }
-        var HTMLMyComponentElement: {
-                prototype: HTMLMyComponentElement;
-                new (): HTMLMyComponentElement;
-        };
-        interface HTMLElementTagNameMap {
-                "my-component": HTMLMyComponentElement;
-        }
+    interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
+    }
+    var HTMLMyComponentElement: {
+        prototype: HTMLMyComponentElement;
+        new (): HTMLMyComponentElement;
+    };
+    interface HTMLElementTagNameMap {
+        "my-component": HTMLMyComponentElement;
+    }
 }
 declare namespace LocalJSX {
     /**
      * docs
      */
-      interface MyComponent {
-                "name"?: UserImplementedPropType;
-        }
-        interface IntrinsicElements {
-              "my-component": MyComponent;
-        }
+    interface MyComponent {
+        "name"?: UserImplementedPropType;
+    }
+    interface IntrinsicElements {
+        "my-component": MyComponent;
+    }
 }
 export { LocalJSX as JSX };
 declare module "@stencil/core" {
-        export namespace JSX {
-                interface IntrinsicElements {
+    export namespace JSX {
+        interface IntrinsicElements {
             /**
              * docs
              */
-                        "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
-                }
+            "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
         }
+    }
 }
 `,
       {
@@ -1580,45 +1680,45 @@ export namespace Components {
     /**
      * docs
      */
-        interface MyComponent {
-                "name": UserImplementedPropType;
-        }
+    interface MyComponent {
+        "name": UserImplementedPropType;
+    }
 }
 declare global {
     /**
      * docs
      */
-        interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
-        }
-        var HTMLMyComponentElement: {
-                prototype: HTMLMyComponentElement;
-                new (): HTMLMyComponentElement;
-        };
-        interface HTMLElementTagNameMap {
-                "my-component": HTMLMyComponentElement;
-        }
+    interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
+    }
+    var HTMLMyComponentElement: {
+        prototype: HTMLMyComponentElement;
+        new (): HTMLMyComponentElement;
+    };
+    interface HTMLElementTagNameMap {
+        "my-component": HTMLMyComponentElement;
+    }
 }
 declare namespace LocalJSX {
     /**
      * docs
      */
-      interface MyComponent {
-                "name"?: UserImplementedPropType;
-        }
-        interface IntrinsicElements {
-              "my-component": MyComponent;
-        }
+    interface MyComponent {
+        "name"?: UserImplementedPropType;
+    }
+    interface IntrinsicElements {
+        "my-component": MyComponent;
+    }
 }
 export { LocalJSX as JSX };
 declare module "@stencil/core" {
-        export namespace JSX {
-                interface IntrinsicElements {
+    export namespace JSX {
+        interface IntrinsicElements {
             /**
              * docs
              */
-                        "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
-                }
+            "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
         }
+    }
 }
 `,
       {

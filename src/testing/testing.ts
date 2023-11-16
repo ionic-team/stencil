@@ -13,8 +13,7 @@ import type {
 import { hasError } from '@utils';
 import type * as puppeteer from 'puppeteer';
 
-import { runJest } from './jest/jest-27-and-under/jest-runner';
-import { runJestScreenshot } from './jest/jest-27-and-under/jest-screenshot';
+import { getRunner, getScreenshot } from './jest/jest-stencil-connector';
 import { startPuppeteerBrowser } from './puppeteer/puppeteer-browser';
 import { getAppScriptUrl, getAppStyleUrl } from './testing-utils';
 
@@ -91,13 +90,14 @@ export const createTesting = async (config: ValidatedConfig): Promise<Testing> =
 
         if (doBuild) {
           if (compilerWatcher) {
+            const watcher = compilerWatcher;
             buildTask = new Promise((resolve) => {
-              const removeListener = compilerWatcher.on('buildFinish', (buildResults) => {
+              const removeListener = watcher.on('buildFinish', (buildResults) => {
                 removeListener();
                 resolve(buildResults);
               });
             });
-            compilerWatcher.start();
+            watcher.start();
           } else {
             buildTask = compiler.build();
           }
@@ -144,8 +144,10 @@ export const createTesting = async (config: ValidatedConfig): Promise<Testing> =
 
     try {
       if (doScreenshots) {
+        const runJestScreenshot = getScreenshot();
         passed = await runJestScreenshot(config, env);
       } else {
+        const runJest = getRunner();
         passed = await runJest(config, env);
       }
       config.logger.info('');
@@ -159,12 +161,20 @@ export const createTesting = async (config: ValidatedConfig): Promise<Testing> =
     return passed;
   };
 
+  /**
+   * As the name suggests, this destroys things! In particular it will call the
+   * `destroy` method on `config.sys` (if present) and it will also "null out"
+   * `config` for GC purposes.
+   */
   const destroy = async () => {
     const closingTime: Promise<any>[] = []; // you don't have to go home but you can't stay here
     if (config) {
       if (config.sys && config.sys.destroy) {
         closingTime.push(config.sys.destroy());
       }
+      // we're doing this for a good reason! we want to ensure that there's not
+      // a reference to the config object so it can be GC'ed
+      // @ts-ignore
       config = null;
     }
 
