@@ -10,7 +10,9 @@
 import semverMajor from 'semver/functions/major';
 
 import { Jest27Stencil } from './jest-27-and-under/jest-facade';
-import { getJestMajorVersion } from './jest-apis';
+import { Jest28Stencil } from './jest-28/jest-facade';
+import { Jest29Stencil } from './jest-29/jest-facade';
+import { getJestMajorVersion, JestCliRunner, JestPresetConfig, JestScreenshotRunner } from './jest-apis';
 import { JestFacade } from './jest-facade';
 
 /**
@@ -40,9 +42,12 @@ const getJestFacade = (): JestFacade => {
     const version = getVersion();
     if (version <= 27) {
       JEST_STENCIL_FACADE = new Jest27Stencil();
+    } else if (version === 28) {
+      JEST_STENCIL_FACADE = new Jest28Stencil();
+    } else if (version === 29) {
+      JEST_STENCIL_FACADE = new Jest29Stencil();
     } else {
       // in Stencil 4.X, defaulting to jest 27 infrastructure is the default behavior.
-      // when Jest 28+ is supported, this will likely change.
       JEST_STENCIL_FACADE = new Jest27Stencil();
     }
   }
@@ -64,7 +69,7 @@ export const getDefaultJestRunner = (): string => {
  *
  * @returns a test runner for Stencil tests, based on the version of Jest that's detected
  */
-export const getRunner = () => {
+export const getRunner = (): JestCliRunner => {
   return getJestFacade().getJestCliRunner();
 };
 
@@ -73,7 +78,7 @@ export const getRunner = () => {
  *
  * @returns a screenshot facade implementation for Stencil tests, based on the version of Jest that's detected
  */
-export const getScreenshot = () => {
+export const getScreenshot = (): JestScreenshotRunner => {
   return getJestFacade().getRunJestScreenshot();
 };
 
@@ -118,6 +123,6 @@ export const getJestSetupTestFramework = () => {
  *
  * @returns an object representing a Jest preset
  */
-export const getJestPreset = () => {
+export const getJestPreset = (): JestPresetConfig => {
   return getJestFacade().getJestPreset();
 };

@@ -1,4 +1,5 @@
-import { dirname, resolve } from 'path';
+import { resolve } from '@utils';
+import { dirname } from 'path';
 import ts from 'typescript';
 
 import type * as d from '../../declarations';

@@ -195,6 +195,9 @@ const enum CharacterCodes {
  * A wrapped version of node.js' {@link path.relative} which adds our custom
  * normalization logic. This solves the relative path between `from` and `to`!
  *
+ * The calculation of the returned path follows that of Node's logic, with one exception - if the calculated path
+ * results in an empty string, a string of length one with a period (`'.'`) is returned.
+ *
  * @throws the underlying node.js function can throw if either path is not a
  * string
  * @param from the path where relative resolution starts
@@ -202,6 +205,12 @@ const enum CharacterCodes {
  * @returns the resolved relative path
  */
 export function relative(from: string, to: string): string {
+  /**
+   * When normalizing, we should _not_ attempt to relativize the path returned by the native Node `relative` method.
+   * When finding the relative path between `from` and `to`, Node does not prepend './' to a non-zero length calculated
+   * path. However, our algorithm does differ from that of Node's, as described in this function's JSDoc when a zero
+   * length string is encountered.
+   */
   return normalizePath(path.relative(from, to), false);
 }
 
@@ -210,11 +219,57 @@ export function relative(from: string, to: string): string {
  * normalization logic. This joins all the arguments (path fragments) into a
  * single path.
  *
+ * The calculation of the returned path follows that of Node's logic, with one exception - any trailing slashes will
+ * be removed from the calculated path.
+ *
  * @throws the underlying node function will throw if any argument is not a
  * string
  * @param paths the paths to join together
  * @returns a joined path!
  */
 export function join(...paths: string[]): string {
+  /**
+   * When normalizing, we should _not_ attempt to relativize the path returned by the native Node `join` method. When
+   * calculating the path from each of the string-based parts, Node does not prepend './' to any calculated path.
+   *
+   * Note that our algorithm does differ from Node's, as described in this function's JSDoc regarding trailing
+   * slashes.
+   */
   return normalizePath(path.join(...paths), false);
+}
+
+/**
+ * A wrapped version of node.js' {@link path.resolve} which adds our custom
+ * normalization logic. This resolves a path to a given (relative or absolute)
+ * path.
+ *
+ * @throws the underlying node function will throw if any argument is not a
+ * string
+ * @param paths a path or path fragments to resolve
+ * @returns a resolved path!
+ */
+export function resolve(...paths: string[]): string {
+  /**
+   * When normalizing, we should _not_ attempt to relativize the path returned by the native Node `resolve` method. When
+   * calculating the path from each of the string-based parts, Node does not prepend './' to the calculated path.
+   */
+  return normalizePath(path.resolve(...paths), false);
+}
+
+/**
+ * A wrapped version of node.js' {@link path.normalize} which adds our custom
+ * normalization logic. This normalizes a path, de-duping repeated segment
+ * separators and resolving `'..'` segments.
+ *
+ * @throws the underlying node function will throw if the argument is not a
+ * string
+ * @param toNormalize a path to normalize
+ * @returns a normalized path!
+ */
+export function normalize(toNormalize: string): string {
+  /**
+   * When normalizing, we should _not_ attempt to relativize the path returned by the native Node `normalize` method.
+   * When calculating the path from each of the string-based parts, Node does not prepend './' to the calculated path.
+   */
+  return normalizePath(path.normalize(toNormalize), false);
 }

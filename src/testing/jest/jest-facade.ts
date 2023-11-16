@@ -1,4 +1,11 @@
-import { JestConfig, JestPreprocessor, JestPuppeteerEnvironment, JestTestRunner } from './jest-apis';
+import {
+  JestCliRunner,
+  JestPreprocessor,
+  JestPresetConfig,
+  JestPuppeteerEnvironment,
+  JestScreenshotRunner,
+  JestTestRunnerConstructor,
+} from './jest-apis';
 
 /**
  * Interface for Jest-version specific code implementations that interact with Stencil.
@@ -7,7 +14,6 @@ import { JestConfig, JestPreprocessor, JestPuppeteerEnvironment, JestTestRunner 
  * directory Stencil supports.
  */
 export interface JestFacade {
-  // TODO(STENCIL-961): Fix build validation when types are pulled in from `@stencil/core/declarations`
   /**
    * Retrieve a function that invokes the Jest CLI.
    *
@@ -16,9 +22,8 @@ export interface JestFacade {
    *
    * @returns A function that invokes the Jest CLI.
    */
-  getJestCliRunner(): (config: any, e2eEnv: any) => Promise<boolean>;
+  getJestCliRunner(): JestCliRunner;
 
-  // TODO(STENCIL-961): Fix build validation when types are pulled in from `@stencil/core/declarations`
   /**
    * Retrieve a function that invokes Stencil's Screenshot runner.
    *
@@ -27,7 +32,7 @@ export interface JestFacade {
    *
    * @returns A function that invokes the Screenshot runner.
    */
-  getRunJestScreenshot(): (config: any, e2eEnv: any) => Promise<boolean>;
+  getRunJestScreenshot(): JestScreenshotRunner;
 
   /**
    * Retrieve the default Jest runner name prescribed by Stencil.
@@ -56,11 +61,11 @@ export interface JestFacade {
   getJestPreprocessor(): JestPreprocessor;
 
   /**
-   * Retrieve a custom Stencil-Jest test runner
+   * Retrieve a function that returns the custom Stencil-Jest test runner
    *
-   * @returns the test runner
+   * @returns a function that retrieves the test runner
    */
-  getCreateJestTestRunner(): JestTestRunner;
+  getCreateJestTestRunner(): () => JestTestRunnerConstructor;
 
   /**
    * Retrieve a function that returns the setup configuration code to run between tests.
@@ -80,5 +85,5 @@ export interface JestFacade {
    *
    * @returns the Jest preset object to be used for a particular version of Jest.
    */
-  getJestPreset(): JestConfig;
+  getJestPreset(): JestPresetConfig;
 }

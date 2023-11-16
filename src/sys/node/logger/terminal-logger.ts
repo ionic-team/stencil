@@ -210,7 +210,7 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys): Logger => {
           }
         }
 
-        timespanFinish(finishMsg, time, colorName, textBold, newLineSuffix, debug, appendTo);
+        timespanFinish(finishMsg, time, colorName, !!textBold, !!newLineSuffix, debug, appendTo);
 
         return dur;
       },

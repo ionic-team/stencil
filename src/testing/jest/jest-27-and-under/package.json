@@ -9,6 +9,7 @@
     "extends": "../../../../package.json"
   },
   "devDependencies": {
-    "@types/jest": "^27.5.2"
+    "@types/jest": "^27.5.2",
+    "jest": "^27.5.1"
   }
 }

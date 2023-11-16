@@ -1,7 +1,6 @@
 import { setupDomTests, waitForChanges } from '../util';
 
-// TODO(STENCIL-18) Restore this test and fix the underlying issue.
-xdescribe('slot-fallback', () => {
+describe('slot-fallback', () => {
   const { setupDom, tearDownDom } = setupDomTests(document);
   let app: HTMLElement;
 
@@ -58,7 +57,7 @@ xdescribe('slot-fallback', () => {
     expect(result.textContent).toBe('slot end fallback 1');
 
     // light dom content rendered
-    result = app.querySelector('.results1 content-start[slot="start"]');
+    result = app.querySelector('.results1 content-start');
     expect(result.textContent).toBe('slot light dom 0 : start');
 
     result = app.querySelector('.results1 section content-default');
@@ -82,7 +81,7 @@ xdescribe('slot-fallback', () => {
     expect(result.textContent).toBe('slot end fallback 2');
 
     // light dom content updated
-    result = app.querySelector('.results1 content-start[slot="start"]');
+    result = app.querySelector('.results1 content-start');
     expect(result.textContent).toBe('slot light dom 1 : start');
 
     result = app.querySelector('.results1 section content-default');
@@ -106,7 +105,7 @@ xdescribe('slot-fallback', () => {
     expect(result.textContent).toBe('slot end fallback 2');
 
     // light dom content should not exist
-    result = app.querySelector('.results1 content-start[slot="start"]');
+    result = app.querySelector('.results1 content-start');
     expect(result).toBe(null);
 
     result = app.querySelector('.results1 section content-default');
@@ -131,7 +130,7 @@ xdescribe('slot-fallback', () => {
     expect(result.textContent).toBe('slot end fallback 3');
 
     // light dom content should not exist
-    result = app.querySelector('.results1 content-start[slot="start"]');
+    result = app.querySelector('.results1 content-start');
     expect(result).toBe(null);
 
     result = app.querySelector('.results1 section content-default');
@@ -155,7 +154,7 @@ xdescribe('slot-fallback', () => {
     expect(result.textContent).toBe('slot end fallback 3');
 
     // light dom content updated
-    result = app.querySelector('.results1 content-start[slot="start"]');
+    result = app.querySelector('.results1 content-start');
     expect(result.textContent).toBe('slot light dom 2 : start');
 
     result = app.querySelector('.results1 section content-default');
@@ -163,5 +162,20 @@ xdescribe('slot-fallback', () => {
 
     result = app.querySelector('.results1 article span content-end');
     expect(result.textContent).toBe('slot light dom 2 : end');
+  });
+
+  it('should have correct display style on slot-fb element', () => {
+    const slotFbElements = app.querySelectorAll<HTMLElement>('slot-fallback-root slot-fallback slot-fb');
+    slotFbElements.forEach((slotFb) => expect(getComputedStyle(slotFb).display).toBe('contents'));
+  });
+
+  it('should hide slot-fb elements when slotted content exists', async () => {
+    // Show slotted content
+    const buttonChangeLightDom = app.querySelector<HTMLButtonElement>('button.change-light-dom');
+    buttonChangeLightDom.click();
+    await waitForChanges();
+
+    const slotFbElements = app.querySelectorAll<HTMLElement>('slot-fallback-root slot-fallback slot-fb');
+    slotFbElements.forEach((slotFb) => expect(getComputedStyle(slotFb).display).toBe('none'));
   });
 });

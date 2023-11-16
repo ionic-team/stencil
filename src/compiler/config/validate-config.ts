@@ -100,9 +100,19 @@ export const validateConfig = (
 
   logger.setLevel(logLevel);
 
+  let devMode = config.devMode ?? DEFAULT_DEV_MODE;
+  if (flags.prod) {
+    devMode = false;
+  } else if (flags.dev) {
+    devMode = true;
+  } else if (!isBoolean(config.devMode)) {
+    devMode = DEFAULT_DEV_MODE;
+  }
+
   const validatedConfig: ValidatedConfig = {
     devServer: {}, // assign `devServer` before spreading `config`, in the event 'devServer' is not a key on `config`
     ...config,
+    devMode,
     extras: config.extras || {},
     flags,
     hydratedFlag: validateHydrated(config),
@@ -119,15 +129,6 @@ export const validateConfig = (
     ...validateNamespace(config.namespace, config.fsNamespace, diagnostics),
     ...validatePaths(config),
   };
-
-  // default devMode false
-  if (validatedConfig.flags.prod) {
-    validatedConfig.devMode = false;
-  } else if (validatedConfig.flags.dev) {
-    validatedConfig.devMode = true;
-  } else if (!isBoolean(validatedConfig.devMode)) {
-    validatedConfig.devMode = DEFAULT_DEV_MODE;
-  }
 
   validatedConfig.extras.lifecycleDOMEvents = !!validatedConfig.extras.lifecycleDOMEvents;
   validatedConfig.extras.scriptDataOpts = !!validatedConfig.extras.scriptDataOpts;

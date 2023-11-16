@@ -109,10 +109,6 @@ export const runTsProgram = async (
 
   // create the components.d.ts file and write to disk
   const hasTypesChanged = await generateAppTypes(config, compilerCtx, buildCtx, 'src');
-  if (hasTypesChanged) {
-    return true;
-  }
-
   if (typesOutputTarget.length > 0) {
     // copy src dts files that do not get emitted by the compiler
     // but we still want to ship them in the dist directory
@@ -136,7 +132,10 @@ export const runTsProgram = async (
     await Promise.all(srcRootDtsFiles);
   }
 
-  if (config.validateTypes) {
+  // TODO(STENCIL-540): remove `hasTypesChanged` check and figure out how to generate types before
+  // executing the TS build program so we don't get semantic diagnostic errors about referencing the
+  // auto-generated `components.d.ts` file.
+  if (config.validateTypes && !hasTypesChanged) {
     const tsSemantic = loadTypeScriptDiagnostics(tsBuilder.getSemanticDiagnostics());
     if (config.devMode) {
       tsSemantic.forEach((semanticDiagnostic) => {
@@ -149,7 +148,7 @@ export const runTsProgram = async (
     buildCtx.diagnostics.push(...tsSemantic);
   }
 
-  return false;
+  return hasTypesChanged;
 };
 
 /**

@@ -24,14 +24,14 @@ describe('slot-html', () => {
     expect(results[1].textContent.trim()).toBe('default slot element 2');
     expect(results[2].textContent.trim()).toBe('default slot element 3');
 
-    results = app.querySelectorAll('.results4 div article span content-start[slot="start"]');
+    results = app.querySelectorAll('.results4 div article span content-start');
     expect(results[0].textContent.trim()).toBe('start slot 1');
     expect(results[1].textContent.trim()).toBe('start slot 2');
 
     result = app.querySelector('.results4 div content-default');
     expect(result.textContent.trim()).toBe('default slot');
 
-    results = app.querySelectorAll('.results5 div article span content-start[slot="start"]');
+    results = app.querySelectorAll('.results5 div article span content-start');
     expect(results[0].textContent.trim()).toBe('start slot 1');
     expect(results[1].textContent.trim()).toBe('start slot 2');
 
@@ -54,11 +54,11 @@ describe('slot-html', () => {
     expect(results[0].textContent.trim()).toBe('default slot 1');
     expect(results[1].textContent.trim()).toBe('default slot 2');
 
-    results = app.querySelectorAll('.results8 div section content-end[slot="end"]');
+    results = app.querySelectorAll('.results8 div section content-end');
     expect(results[0].textContent.trim()).toBe('end slot 1');
     expect(results[1].textContent.trim()).toBe('end slot 2');
 
-    results = app.querySelectorAll('.results9 div section content-end[slot="end"]');
+    results = app.querySelectorAll('.results9 div section content-end');
     expect(results[0].textContent.trim()).toBe('end slot 1');
     expect(results[1].textContent.trim()).toBe('end slot 2');
 

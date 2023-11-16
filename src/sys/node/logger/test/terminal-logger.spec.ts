@@ -1,8 +1,8 @@
 import { bgRed, blue, bold, cyan, dim, gray, green, magenta, red, yellow } from 'ansi-colors';
 
 import { LOG_LEVELS, LogLevel } from '../../../../declarations';
-import { createNodeLoggerSys } from '../../../../sys/node/node-logger';
 import { setupConsoleMocker } from '../../../../testing/testing-utils';
+import { createNodeLoggerSys } from '../index';
 import { createTerminalLogger, shouldLog } from '../terminal-logger';
 
 describe('terminal-logger', () => {

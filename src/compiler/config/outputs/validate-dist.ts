@@ -9,8 +9,10 @@ import {
   isBoolean,
   isOutputTargetDist,
   isString,
+  join,
+  resolve,
 } from '@utils';
-import { isAbsolute, join, resolve } from 'path';
+import { isAbsolute } from 'path';
 
 import type * as d from '../../../declarations';
 import { getAbsolutePath } from '../config-utils';

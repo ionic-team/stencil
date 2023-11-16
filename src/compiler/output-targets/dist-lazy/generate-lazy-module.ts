@@ -2,10 +2,10 @@ import {
   formatComponentRuntimeMeta,
   getSourceMappingUrlForEndOfFile,
   hasDependency,
+  join,
   rollupToStencilSourceMap,
   stringifyRuntimeData,
 } from '@utils';
-import { join } from 'path';
 import type { SourceMap as RollupSourceMap } from 'rollup';
 
 import type * as d from '../../../declarations';
@@ -26,7 +26,7 @@ export const generateLazyModules = async (
   if (!Array.isArray(destinations) || destinations.length === 0) {
     return [];
   }
-  const shouldMinify = config.minifyJs && isBrowserBuild;
+  const shouldMinify = !!(config.minifyJs && isBrowserBuild);
   const rollupResults = results.filter((r): r is d.RollupChunkResult => r.type === 'chunk');
   const entryComponentsResults = rollupResults.filter((rollupResult) => rollupResult.isComponent);
   const chunkResults = rollupResults.filter((rollupResult) => !rollupResult.isComponent && !rollupResult.isEntry);

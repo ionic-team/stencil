@@ -1,22 +1,22 @@
 import { JestFacade } from '../jest-facade';
-import { createJestPuppeteerEnvironment as createJestPuppeteerEnvironment27 } from './jest-environment';
-import { jestPreprocessor as jestPreprocessor27 } from './jest-preprocessor';
-import { preset as jestPreset27 } from './jest-preset';
-import { createTestRunner as createTestRunner27 } from './jest-runner';
-import { runJest as runJest27 } from './jest-runner';
-import { runJestScreenshot as runJestScreenshot27 } from './jest-screenshot';
-import { jestSetupTestFramework as jestSetupTestFramework27 } from './jest-setup-test-framework';
+import { createJestPuppeteerEnvironment } from './jest-environment';
+import { jestPreprocessor } from './jest-preprocessor';
+import { preset } from './jest-preset';
+import { createTestRunner } from './jest-runner';
+import { runJest } from './jest-runner';
+import { runJestScreenshot } from './jest-screenshot';
+import { jestSetupTestFramework } from './jest-setup-test-framework';
 
 /**
  * `JestFacade` implementation for communicating between this directory's version of Jest and Stencil
  */
 export class Jest27Stencil implements JestFacade {
   getJestCliRunner() {
-    return runJest27;
+    return runJest;
   }
 
   getRunJestScreenshot() {
-    return runJestScreenshot27;
+    return runJestScreenshot;
   }
 
   getDefaultJestRunner() {
@@ -24,22 +24,22 @@ export class Jest27Stencil implements JestFacade {
   }
 
   getCreateJestPuppeteerEnvironment() {
-    return createJestPuppeteerEnvironment27;
+    return createJestPuppeteerEnvironment;
   }
 
   getJestPreprocessor() {
-    return jestPreprocessor27;
+    return jestPreprocessor;
   }
 
   getCreateJestTestRunner() {
-    return createTestRunner27;
+    return createTestRunner;
   }
 
   getJestSetupTestFramework() {
-    return jestSetupTestFramework27;
+    return jestSetupTestFramework;
   }
 
   getJestPreset() {
-    return jestPreset27;
+    return preset;
   }
 }

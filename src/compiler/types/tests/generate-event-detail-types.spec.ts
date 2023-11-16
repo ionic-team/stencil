@@ -9,8 +9,8 @@ describe('generate-event-detail-types', () => {
       const tagNameAsPascal = 'EventDetailTestTag';
 
       const expectedTypeInfo = `export interface ${tagNameAsPascal}CustomEvent<T> extends CustomEvent<T> {
-        detail: T;
-        target: HTML${tagNameAsPascal}Element;
+    detail: T;
+    target: HTML${tagNameAsPascal}Element;
 }`;
       const componentMeta = stubComponentCompilerMeta({
         tagName,

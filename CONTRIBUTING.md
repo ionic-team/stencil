@@ -36,7 +36,8 @@ Please see our [Contributor Code of Conduct](https://github.com/ionic-team/stenc
    [Install it](https://docs.volta.sh/guide/getting-started) before proceeding.
    1. There's no need to install a specific version of npm or Node right now, it shall be done automatically for you in
       the next step
-5. Run `npm install`
+5. Run `npm ci`
+6. (Optional) If you are working on [Jest support](./src/testing/jest), [see the installation steps in that directory's README](./src/testing/jest/README.md#installing-dependencies).
 
 
 ### Updates

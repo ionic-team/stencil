@@ -1,5 +1,4 @@
-import { generatePreamble, relativeImport } from '@utils';
-import { join } from 'path';
+import { generatePreamble, join, relativeImport } from '@utils';
 import type { OutputOptions, RollupBuild } from 'rollup';
 
 import type * as d from '../../../declarations';
@@ -27,7 +26,9 @@ export const generateCjs = async (
     };
     const results = await generateRollupOutput(rollupBuild, esmOpts, config, buildCtx.entryModules);
     if (results != null) {
-      const destinations = cjsOutputs.map((o) => o.cjsDir);
+      const destinations = cjsOutputs
+        .map((o) => o.cjsDir)
+        .filter((cjsDir): cjsDir is string => typeof cjsDir === 'string');
 
       buildCtx.commonJsComponentBundle = await generateLazyModules(
         config,

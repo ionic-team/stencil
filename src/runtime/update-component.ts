@@ -441,8 +441,8 @@ const addHydratedFlag = (elm: Element) =>
   BUILD.hydratedClass
     ? elm.classList.add('hydrated')
     : BUILD.hydratedAttribute
-    ? elm.setAttribute('hydrated', '')
-    : undefined;
+      ? elm.setAttribute('hydrated', '')
+      : undefined;
 
 const serverSideConnected = (elm: any) => {
   const children = elm.children;
