@@ -524,10 +524,10 @@ export const createSystem = (c?: { logger?: Logger }): CompilerSystem => {
     typeof self !== 'undefined'
       ? self?.fetch
       : typeof window !== 'undefined'
-      ? window?.fetch
-      : typeof global !== 'undefined'
-      ? global?.fetch
-      : undefined;
+        ? window?.fetch
+        : typeof global !== 'undefined'
+          ? global?.fetch
+          : undefined;
 
   const writeFile = async (p: string, data: string) => writeFileSync(p, data);
 
