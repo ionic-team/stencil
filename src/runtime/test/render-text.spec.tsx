@@ -36,7 +36,11 @@ describe('render-text', () => {
     await waitForChanges();
 
     expect(body).toEqualHtml(`
-      <cmp-a>Hello World</cmp-a>
+      <cmp-a>
+        <mock:shadow-root>
+          Hello World
+        </mock:shadow-root>
+      </cmp-a>
     `);
   });
 
