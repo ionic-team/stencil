@@ -267,7 +267,7 @@ const callRender = (hostRef: d.HostRef, instance: any, elm: HTMLElement, isIniti
         }
       } else {
         const shadowRoot = elm.shadowRoot;
-        if (BUILD.shadowDom) {
+        if (hostRef.$cmpMeta$.$flags$ & CMP_FLAGS.shadowDomEncapsulation) {
           shadowRoot.textContent = instance;
         } else {
           elm.textContent = instance;
