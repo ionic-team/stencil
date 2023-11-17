@@ -266,7 +266,12 @@ const callRender = (hostRef: d.HostRef, instance: any, elm: HTMLElement, isIniti
           renderVdom(hostRef, instance, isInitialLoad);
         }
       } else {
-        elm.textContent = instance;
+        const shadowRoot = elm.shadowRoot;
+        if (hostRef.$cmpMeta$.$flags$ & CMP_FLAGS.shadowDomEncapsulation) {
+          shadowRoot.textContent = instance;
+        } else {
+          elm.textContent = instance;
+        }
       }
     }
   } catch (e) {
