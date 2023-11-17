@@ -214,20 +214,20 @@ export const patchTextContent = (hostElementPrototype: HTMLElement): void => {
   Object.defineProperty(hostElementPrototype, '__textContent', descriptor);
 
   Object.defineProperty(hostElementPrototype, 'textContent', {
-    /**
-     * Text content is just an aggregate of all child nodes of a node (whether they are
-     * style elements, slotted, or hidden). So, we just iterate over all child nodes
-     * and keep appending the text content of each node to a string.
-     *
-     * @returns The text content of all child nodes of the element
-     */
     get(): string | null {
-      let text = '';
-      this.childNodes.forEach((node: d.RenderNode) => {
-        text += node.textContent || '';
-      });
-
-      return text;
+      // get the 'default slot', which would be the first slot in a shadow tree (if we were using one), whose name is
+      // the empty string
+      const slotNode = getHostSlotNode(this.childNodes, '');
+      // when a slot node is found, the textContent _may_ be found in the next sibling (text) node, depending on how
+      // nodes were reordered during the vdom render. first try to get the text content from the sibling.
+      if (slotNode?.nextSibling?.nodeType === NODE_TYPES.TEXT_NODE) {
+        return slotNode.nextSibling.textContent;
+      } else if (slotNode) {
+        return slotNode.textContent;
+      } else {
+        // fallback to the original implementation
+        return this.__textContent;
+      }
     },
 
     set(value: string | null) {
