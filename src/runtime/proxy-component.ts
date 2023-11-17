@@ -72,7 +72,7 @@ export const proxyComponent = (
                 // we are proxying the instance (not element)
                 (flags & PROXY_FLAGS.isElementConstructor) === 0 &&
                 // the element is not constructing
-                (ref.$flags$ & HOST_FLAGS.isConstructingInstance) === 0 &&
+                (ref && ref.$flags$ & HOST_FLAGS.isConstructingInstance) === 0 &&
                 // the member is a prop
                 (memberFlags & MEMBER_FLAGS.Prop) !== 0 &&
                 // the member is not mutable
@@ -99,7 +99,7 @@ export const proxyComponent = (
         Object.defineProperty(prototype, memberName, {
           value(this: d.HostElement, ...args: any[]) {
             const ref = getHostRef(this);
-            return ref.$onInstancePromise$.then(() => ref.$lazyInstance$[memberName](...args));
+            return ref?.$onInstancePromise$?.then(() => ref.$lazyInstance$?.[memberName](...args));
           },
         });
       }
@@ -168,13 +168,14 @@ export const proxyComponent = (
             // 2. The watchers are ready
             // 3. The value has changed
             if (
+              flags &&
               !(flags & HOST_FLAGS.isConstructingInstance) &&
               flags & HOST_FLAGS.isWatchReady &&
               newValue !== oldValue
             ) {
               const elm = BUILD.lazyLoad ? hostRef.$hostElement$ : this;
               const instance = BUILD.lazyLoad ? hostRef.$lazyInstance$ : (elm as any);
-              const entry = cmpMeta.$watchers$[attrName];
+              const entry = cmpMeta.$watchers$?.[attrName];
               entry?.forEach((callbackName) => {
                 if (instance[callbackName] != null) {
                   instance[callbackName].call(instance, newValue, oldValue, attrName);
@@ -203,7 +204,7 @@ export const proxyComponent = (
               const attrName = m[1] || propName;
               attrNameToPropName.set(attrName, propName);
               if (BUILD.reflect && m[0] & MEMBER_FLAGS.ReflectAttr) {
-                cmpMeta.$attrsToReflect$.push([propName, attrName]);
+                cmpMeta.$attrsToReflect$?.push([propName, attrName]);
               }
 
               return attrName;
