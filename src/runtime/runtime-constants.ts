@@ -69,3 +69,10 @@ export const HYDRATED_CSS = '{visibility:hidden}.hydrated{visibility:inherit}';
 export const SLOT_FB_CSS = 'slot-fb{display:contents}slot-fb[hidden]{display:none}';
 
 export const XLINK_NS = 'http://www.w3.org/1999/xlink';
+
+export const FORM_ASSOCIATED_CUSTOM_ELEMENT_CALLBACKS = [
+  'formAssociatedCallback',
+  'formResetCallback',
+  'formDisabledCallback',
+  'formStateRestoreCallback',
+] as const;
