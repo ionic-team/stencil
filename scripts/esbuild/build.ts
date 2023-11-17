@@ -1,6 +1,7 @@
 import { getOptions } from '../utils/options';
 import { buildCli } from './cli';
 import { buildSysNode } from './sys-node';
+import { buildTesting } from './testing';
 
 // the main entry point for the Esbuild-based build
 async function main() {
@@ -10,7 +11,7 @@ async function main() {
     isWatch: !!process.argv.includes('--watch'),
   });
 
-  await Promise.all([buildCli(opts), buildSysNode(opts)]);
+  await Promise.all([buildCli(opts), buildSysNode(opts), buildTesting(opts)]);
 }
 
 main();
