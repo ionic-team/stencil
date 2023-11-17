@@ -198,7 +198,6 @@ export class MockDocument extends MockHTMLElement {
 
   createElementNS(namespaceURI: string, tagName: string) {
     const elmNs = createElementNS(this, namespaceURI, tagName);
-    elmNs.namespaceURI = namespaceURI;
     return elmNs;
   }
 

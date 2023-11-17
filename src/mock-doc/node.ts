@@ -226,7 +226,7 @@ export class MockNodeList {
 type MockElementInternals = Record<keyof ElementInternals, null>;
 
 export class MockElement extends MockNode {
-  namespaceURI: string | null;
+  __namespaceURI: string | null;
   __attributeMap: MockAttributeMap | null | undefined;
   __shadowRoot: ShadowRoot | null | undefined;
   __style: MockCSSStyleDeclaration | null | undefined;
@@ -242,9 +242,9 @@ Testing components with ElementInternals is fully supported in e2e tests.`,
     });
   }
 
-  constructor(ownerDocument: any, nodeName: string | null) {
+  constructor(ownerDocument: any, nodeName: string | null, namespaceURI: string | null = null) {
     super(ownerDocument, NODE_TYPES.ELEMENT_NODE, typeof nodeName === 'string' ? nodeName : null, null);
-    this.namespaceURI = null;
+    this.__namespaceURI = namespaceURI;
     this.__shadowRoot = null;
     this.__attributeMap = null;
   }
@@ -264,6 +264,10 @@ Testing components with ElementInternals is fully supported in e2e tests.`,
       this,
       new MockFocusEvent('blur', { relatedTarget: null, bubbles: true, cancelable: true, composed: true }),
     );
+  }
+
+  get namespaceURI() {
+    return this.__namespaceURI;
   }
 
   get shadowRoot() {
@@ -1084,7 +1088,7 @@ function insertBefore(parentNode: MockNode, newNode: MockNode, referenceNode: Mo
 }
 
 export class MockHTMLElement extends MockElement {
-  override namespaceURI = 'http://www.w3.org/1999/xhtml';
+  override __namespaceURI = 'http://www.w3.org/1999/xhtml';
 
   constructor(ownerDocument: any, nodeName: string) {
     super(ownerDocument, typeof nodeName === 'string' ? nodeName.toUpperCase() : null);

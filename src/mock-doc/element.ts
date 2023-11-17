@@ -88,7 +88,7 @@ export function createElementNS(ownerDocument: any, namespaceURI: string, tagNam
         return new MockSVGElement(ownerDocument, tagName);
     }
   } else {
-    return new MockElement(ownerDocument, tagName);
+    return new MockElement(ownerDocument, tagName, namespaceURI);
   }
 }
 
@@ -377,6 +377,8 @@ export class MockStyleElement extends MockHTMLElement {
   }
 }
 export class MockSVGElement extends MockElement {
+  override __namespaceURI = 'http://www.w3.org/2000/svg';
+
   // SVGElement properties and methods
   get ownerSVGElement(): SVGSVGElement {
     return null;
