@@ -1,9 +1,10 @@
 import type { BuildOptions as ESBuildOptions } from 'esbuild';
+import { replace } from 'esbuild-plugin-replace';
 import fs from 'fs-extra';
 import { join } from 'path';
 
 import { getBanner } from '../utils/banner';
-import { BuildOptions } from '../utils/options';
+import { BuildOptions, createReplaceData } from '../utils/options';
 import { writePkgJson } from '../utils/write-pkg-json';
 import { getBaseEsbuildOptions, getEsbuildAliases, getEsbuildExternalModules, runBuilds } from './util';
 
@@ -37,6 +38,7 @@ export async function buildCli(opts: BuildOptions) {
     external,
     platform: 'node',
     sourcemap: 'linked',
+    plugins: [replace(createReplaceData(opts))],
   } satisfies ESBuildOptions;
 
   // ESM build options
