@@ -2,7 +2,7 @@ import ts from 'typescript';
 
 import type * as d from '../../declarations';
 import { serializeImportPath } from './stencil-import-path';
-import { retrieveTsModifiers } from './transform-utils';
+import { getIdentifierFromResourceUrl, retrieveTsModifiers } from './transform-utils';
 
 export const updateStyleImports = (
   transformOpts: d.TransformOptions,
@@ -28,15 +28,12 @@ const updateEsmStyleImports = (
 
   moduleFile.cmps.forEach((cmp) => {
     cmp.styles.forEach((style) => {
+      updateSourceFile = true;
       if (typeof style.styleIdentifier === 'string') {
-        updateSourceFile = true;
-        if (style.externalStyles.length > 0) {
-          // add style imports built from @Component() styleUrl option
-          styleImports.push(createEsmStyleImport(transformOpts, tsSourceFile, cmp, style));
-        } else {
-          // update existing esm import of a style identifier
-          statements = updateEsmStyleImportPath(transformOpts, tsSourceFile, statements, cmp, style);
-        }
+        statements = updateEsmStyleImportPath(transformOpts, tsSourceFile, statements, cmp, style);
+      } else if (style.externalStyles.length > 0) {
+        // add style imports built from @Component() styleUrl option
+        styleImports.push(...createEsmStyleImport(transformOpts, tsSourceFile, cmp, style));
       }
     });
   });
@@ -92,14 +89,24 @@ const createEsmStyleImport = (
   cmp: d.ComponentCompilerMeta,
   style: d.StyleCompiler,
 ) => {
-  const importName = ts.factory.createIdentifier(style.styleIdentifier);
-  const importPath = getStyleImportPath(transformOpts, tsSourceFile, cmp, style, style.externalStyles[0].absolutePath);
+  const imports: ts.ImportDeclaration[] = []
+  for (const externalStyle of style.externalStyles) {
+    // add import statement for each style
+    // e.g. `import _ImportPathStyle from './import-path.css';`
+    const importName = getIdentifierFromResourceUrl(externalStyle.absolutePath)
+    const importIdentifier = ts.factory.createIdentifier(importName);
+    const importPath = getStyleImportPath(transformOpts, tsSourceFile, cmp, style, externalStyle.absolutePath);
 
-  return ts.factory.createImportDeclaration(
-    undefined,
-    ts.factory.createImportClause(false, importName, undefined),
-    ts.factory.createStringLiteral(importPath),
-  );
+    imports.push(
+      ts.factory.createImportDeclaration(
+        undefined,
+        ts.factory.createImportClause(false, importIdentifier, undefined),
+        ts.factory.createStringLiteral(importPath),
+      )
+    );
+  }
+
+  return imports;
 };
 
 const updateCjsStyleRequires = (
@@ -111,9 +118,9 @@ const updateCjsStyleRequires = (
 
   moduleFile.cmps.forEach((cmp) => {
     cmp.styles.forEach((style) => {
-      if (typeof style.styleIdentifier === 'string' && style.externalStyles.length > 0) {
+      if (style.externalStyles.length > 0) {
         // add style imports built from @Component() styleUrl option
-        styleRequires.push(createCjsStyleRequire(transformOpts, tsSourceFile, cmp, style));
+        styleRequires.push(...createCjsStyleRequire(transformOpts, tsSourceFile, cmp, style));
       }
     });
   });
@@ -131,27 +138,37 @@ const createCjsStyleRequire = (
   cmp: d.ComponentCompilerMeta,
   style: d.StyleCompiler,
 ) => {
-  const importName = ts.factory.createIdentifier(style.styleIdentifier);
-  const importPath = getStyleImportPath(transformOpts, tsSourceFile, cmp, style, style.externalStyles[0].absolutePath);
+  const imports: ts.VariableStatement[] = []
+  for (const externalStyle of style.externalStyles) {
+    // add import statement for each style
+    // e.g. `import _ImportPathStyle from './import-path.css';`
+    const importName = getIdentifierFromResourceUrl(externalStyle.absolutePath)
+    const importIdentifier = ts.factory.createIdentifier(importName);
+    const importPath = getStyleImportPath(transformOpts, tsSourceFile, cmp, style, externalStyle.absolutePath);
 
-  return ts.factory.createVariableStatement(
-    undefined,
-    ts.factory.createVariableDeclarationList(
-      [
-        ts.factory.createVariableDeclaration(
-          importName,
-          undefined,
-          undefined,
-          ts.factory.createCallExpression(
-            ts.factory.createIdentifier('require'),
-            [],
-            [ts.factory.createStringLiteral(importPath)],
-          ),
+    imports.push(
+      ts.factory.createVariableStatement(
+        undefined,
+        ts.factory.createVariableDeclarationList(
+          [
+            ts.factory.createVariableDeclaration(
+              importIdentifier,
+              undefined,
+              undefined,
+              ts.factory.createCallExpression(
+                ts.factory.createIdentifier('require'),
+                [],
+                [ts.factory.createStringLiteral(importPath)],
+              ),
+            ),
+          ],
+          ts.NodeFlags.Const,
         ),
-      ],
-      ts.NodeFlags.Const,
-    ),
-  );
+      )
+    );
+  }
+
+  return imports;
 };
 
 const getStyleImportPath = (
