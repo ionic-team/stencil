@@ -142,6 +142,40 @@ describe('lazy-component', () => {
     );
   });
 
+  it('allows to define multiple styleUrls in CJS', async () => {
+    const compilerCtx = mockCompilerCtx();
+    const transformOpts: d.TransformOptions = {
+      coreImportPath: '@stencil/core',
+      componentExport: 'lazy',
+      componentMetadata: null,
+      currentDirectory: '/',
+      proxy: null,
+      module: 'cjs',
+      style: 'static',
+      styleImportData: null,
+    };
+    const code = `
+      @Component({
+        styleUrls: ['./foo/bar.css', './bar/foo.css'],
+        tag: 'cmp-a'
+      })
+      export class CmpA {}
+    `;
+    const transformer = lazyComponentTransform(compilerCtx, transformOpts);
+    const t = transpileModule(code, null, compilerCtx, [], [transformer]);
+    expect(await formatCode(t.outputText)).toBe(
+      await c`const _FooBarCssStyle = require('./foo/bar.css');
+      const _BarFooCssStyle = require('./bar/foo.css');
+      const { registerInstance: __stencil_registerInstance } = require('@stencil/core');
+      export class CmpA {
+        constructor(hostRef) {
+          __stencil_registerInstance(this, hostRef);
+        }
+      };
+      CmpA.style = _FooBarCssStyle + _BarFooCssStyle;`,
+    );
+  });
+
   it('allows to define multiple platform styles', async () => {
     const compilerCtx = mockCompilerCtx();
     const transformOpts: d.TransformOptions = {
@@ -176,5 +210,5 @@ describe('lazy-component', () => {
       }
       CmpA.style = { bar: _BarFooCssStyle, foo: _FooBarCssStyle }`,
     );
-  })
+  });
 });

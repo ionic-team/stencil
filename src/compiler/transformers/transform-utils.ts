@@ -1104,6 +1104,7 @@ export const tsPropDeclNameAsString = (node: ts.PropertyDeclaration, typeChecker
   return memberName;
 };
 
+const SPECIAL_CHARS = /[\s~`!@#$%\^&*+=\-\[\]\\';,/{}|\\":<>\?()\._]/g
 /**
  * transform any path to a valid identifier, e.g.
  *   - `/foo/bar/loo.css` -> `_fooBarLooCssStyle`
@@ -1116,7 +1117,7 @@ export const getIdentifierFromResourceUrl = (absolutePath: string): string => {
   return `_${dashToPascalCase(
     absolutePath
       .toLocaleLowerCase()
-      .replace(/(\.|\/|\\|:)/g, '-')
+      .replace(SPECIAL_CHARS, '-')
       .replace(/--/, '-'),
   )}Style`;
 };
