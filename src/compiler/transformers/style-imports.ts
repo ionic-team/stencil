@@ -89,11 +89,11 @@ const createEsmStyleImport = (
   cmp: d.ComponentCompilerMeta,
   style: d.StyleCompiler,
 ) => {
-  const imports: ts.ImportDeclaration[] = []
+  const imports: ts.ImportDeclaration[] = [];
   for (const externalStyle of style.externalStyles) {
     // add import statement for each style
     // e.g. `import _ImportPathStyle from './import-path.css';`
-    const importName = getIdentifierFromResourceUrl(externalStyle.absolutePath)
+    const importName = getIdentifierFromResourceUrl(externalStyle.absolutePath);
     const importIdentifier = ts.factory.createIdentifier(importName);
     const importPath = getStyleImportPath(transformOpts, tsSourceFile, cmp, style, externalStyle.absolutePath);
 
@@ -102,7 +102,7 @@ const createEsmStyleImport = (
         undefined,
         ts.factory.createImportClause(false, importIdentifier, undefined),
         ts.factory.createStringLiteral(importPath),
-      )
+      ),
     );
   }
 
@@ -138,11 +138,11 @@ const createCjsStyleRequire = (
   cmp: d.ComponentCompilerMeta,
   style: d.StyleCompiler,
 ) => {
-  const imports: ts.VariableStatement[] = []
+  const imports: ts.VariableStatement[] = [];
   for (const externalStyle of style.externalStyles) {
     // add import statement for each style
     // e.g. `import _ImportPathStyle from './import-path.css';`
-    const importName = getIdentifierFromResourceUrl(externalStyle.absolutePath)
+    const importName = getIdentifierFromResourceUrl(externalStyle.absolutePath);
     const importIdentifier = ts.factory.createIdentifier(importName);
     const importPath = getStyleImportPath(transformOpts, tsSourceFile, cmp, style, externalStyle.absolutePath);
 
@@ -164,7 +164,7 @@ const createCjsStyleRequire = (
           ],
           ts.NodeFlags.Const,
         ),
-      )
+      ),
     );
   }
 

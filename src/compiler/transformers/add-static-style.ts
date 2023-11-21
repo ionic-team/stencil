@@ -163,9 +163,11 @@ const createStyleLiteral = (cmp: d.ComponentCompilerMeta, style: d.StyleCompiler
  * @param externalStyles a list of external styles to be applied the component
  * @returns an assignment expression to be applied to the `style` property of a component class (e.g. `_myComponentCssStyle + _myComponentIosCssStyle` based on the example)
  */
-export const createStyleIdentifierFromUrl = (externalStyles: d.ExternalStyleCompiler[]): ts.Identifier | ts.BinaryExpression => {
+export const createStyleIdentifierFromUrl = (
+  externalStyles: d.ExternalStyleCompiler[],
+): ts.Identifier | ts.BinaryExpression => {
   if (externalStyles.length === 1) {
-    return ts.factory.createIdentifier(getIdentifierFromResourceUrl(externalStyles[0].absolutePath))
+    return ts.factory.createIdentifier(getIdentifierFromResourceUrl(externalStyles[0].absolutePath));
   }
 
   const firstExternalStyle = externalStyles[0];
@@ -173,5 +175,5 @@ export const createStyleIdentifierFromUrl = (externalStyles: d.ExternalStyleComp
     createStyleIdentifierFromUrl([firstExternalStyle]),
     ts.SyntaxKind.PlusToken,
     createStyleIdentifierFromUrl(externalStyles.slice(1)),
-  )
+  );
 };

@@ -140,5 +140,5 @@ describe('lazy-component', () => {
       }
       CmpA.style = _FooBarCssStyle + _BarFooCssStyle;`,
     );
-  })
+  });
 });
