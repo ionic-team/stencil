@@ -1,5 +1,5 @@
-import { generatePreamble } from '@utils';
-import { basename, dirname, join, relative } from 'path';
+import { generatePreamble, join, relative } from '@utils';
+import { basename, dirname } from 'path';
 import { OutputOptions, rollup } from 'rollup';
 
 import type * as d from '../../declarations';

@@ -37,6 +37,7 @@ describe('release options', () => {
         isCI: false,
         isProd: false,
         isPublishRelease: false,
+        isWatch: false,
         nodeModulesDir: 'node_modules',
         output: {
           cliDir: 'cli',

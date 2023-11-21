@@ -33,12 +33,15 @@ export function mockValidatedConfig(overrides: Partial<ValidatedConfig> = {}): V
 
   return {
     ...baseConfig,
+    devMode: true,
     devServer: {},
     extras: {},
     flags: createConfigFlags(),
+    fsNamespace: 'testing',
     hydratedFlag: null,
     logLevel: 'info',
     logger: mockLogger(),
+    namespace: 'Testing',
     outputTargets: baseConfig.outputTargets ?? [],
     packageJsonFilePath: path.join(rootDir, 'package.json'),
     rootDir,

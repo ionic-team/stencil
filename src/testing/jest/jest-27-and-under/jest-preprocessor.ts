@@ -4,7 +4,6 @@ import { loadTypeScriptDiagnostic, normalizePath } from '@utils';
 
 import { transpile } from '../../test-transpile';
 
-// TODO(STENCIL-306): Remove support for earlier versions of Jest
 type Jest26CacheKeyOptions = { instrument: boolean; rootDir: string };
 type Jest26Config = { instrument: boolean; rootDir: string };
 type Jest27TransformOptions = { config: Jest26Config };
@@ -58,7 +57,6 @@ export const jestPreprocessor = {
     jestConfig: Jest26Config | Jest27TransformOptions,
     transformOptions?: Jest26Config,
   ): string {
-    // TODO(STENCIL-306): Drop support for versions of Jest <27
     /**
      * As of Jest 27, `jestConfig` changes its shape (as it's been moved into `transformOptions`). To preserve
      * backwards compatibility, we allow Jest to pass 4 arguments and check the shape of the third and fourth arguments
@@ -134,7 +132,6 @@ export const jestPreprocessor = {
     jestConfigStr: string | Jest27TransformOptions,
     transformOptions?: Jest26CacheKeyOptions,
   ): string {
-    // TODO(STENCIL-306): Remove support for earlier versions of Jest
     /**
      * As of Jest 27, jestConfigStr is no longer an accepted argument (as it's been moved into `transformOptions`). To
      * preserve backwards compatibility, we allow Jest to pass 4 arguments and check the shape of the third and fourth

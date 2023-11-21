@@ -165,6 +165,24 @@ describe('attributes', () => {
     expect(img.draggable).toEqual(false);
   });
 
+  describe('getAttributeNode', () => {
+    it('should return an attribute node if the attribute exists', () => {
+      const div = doc.createElement('div');
+      div.setAttribute('draggable', 'true');
+      expect(div.getAttributeNode('draggable')).toEqual({
+        _name: 'draggable',
+        _namespaceURI: null,
+        _value: 'true',
+      });
+    });
+
+    it('should return `null` if the attribute does not exist', () => {
+      const div = doc.createElement('div');
+      div.setAttribute('draggable', 'true');
+      expect(div.getAttributeNode('test')).toEqual(null);
+    });
+  });
+
   function testNsAttributes(element: MockHTMLElement) {
     element.setAttributeNS('tEst', 'viewBox', '1');
     element.setAttributeNS('tEst', 'viewbox', '2');

@@ -223,15 +223,28 @@ export class MockNodeList {
   }
 }
 
+type MockElementInternals = Record<keyof ElementInternals, null>;
+
 export class MockElement extends MockNode {
-  namespaceURI: string | null;
+  __namespaceURI: string | null;
   __attributeMap: MockAttributeMap | null | undefined;
   __shadowRoot: ShadowRoot | null | undefined;
   __style: MockCSSStyleDeclaration | null | undefined;
 
-  constructor(ownerDocument: any, nodeName: string | null) {
+  attachInternals(): MockElementInternals {
+    return new Proxy({} as unknown as MockElementInternals, {
+      get: function (_target, prop, _receiver) {
+        console.error(
+          `NOTE: Property ${String(prop)} was accessed on ElementInternals, but this property is not implemented.
+Testing components with ElementInternals is fully supported in e2e tests.`,
+        );
+      },
+    });
+  }
+
+  constructor(ownerDocument: any, nodeName: string | null, namespaceURI: string | null = null) {
     super(ownerDocument, NODE_TYPES.ELEMENT_NODE, typeof nodeName === 'string' ? nodeName : null, null);
-    this.namespaceURI = null;
+    this.__namespaceURI = namespaceURI;
     this.__shadowRoot = null;
     this.__attributeMap = null;
   }
@@ -251,6 +264,10 @@ export class MockElement extends MockNode {
       this,
       new MockFocusEvent('blur', { relatedTarget: null, bubbles: true, cancelable: true, composed: true }),
     );
+  }
+
+  get namespaceURI() {
+    return this.__namespaceURI;
   }
 
   get shadowRoot() {
@@ -365,6 +382,14 @@ export class MockElement extends MockNode {
       return attr.value;
     }
     return null;
+  }
+
+  getAttributeNode(attrName: string): MockAttr | null {
+    if (!this.hasAttribute(attrName)) {
+      return null;
+    }
+
+    return new MockAttr(attrName, this.getAttribute(attrName));
   }
 
   getBoundingClientRect() {
@@ -1063,7 +1088,7 @@ function insertBefore(parentNode: MockNode, newNode: MockNode, referenceNode: Mo
 }
 
 export class MockHTMLElement extends MockElement {
-  override namespaceURI = 'http://www.w3.org/1999/xhtml';
+  override __namespaceURI = 'http://www.w3.org/1999/xhtml';
 
   constructor(ownerDocument: any, nodeName: string) {
     super(ownerDocument, typeof nodeName === 'string' ? nodeName.toUpperCase() : null);

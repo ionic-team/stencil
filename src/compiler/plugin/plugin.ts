@@ -1,5 +1,5 @@
-import { buildError, catchError, isFunction, isOutputTargetDocs, isString } from '@utils';
-import { basename, relative } from 'path';
+import { buildError, catchError, isFunction, isOutputTargetDocs, isString, relative } from '@utils';
+import { basename } from 'path';
 
 import type * as d from '../../declarations';
 import { PluginCtx, PluginTransformResults } from '../../declarations';

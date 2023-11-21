@@ -48,7 +48,11 @@ body:
   - type: input
     attributes:
       label: Code Reproduction URL
-      description: Please reproduce this issue in a blank Stencil starter application and provide a link to the repo. Run `npm init stencil` to quickly spin up a Stencil project. This is the best way to ensure this issue is triaged quickly. Issues without a code reproduction may be closed if the Stencil Team cannot reproduce the issue you are reporting.
+      description: |
+        Please reproduce this issue in a blank Stencil starter application and provide a link to the repo.
+        Run `npm init stencil@latest` to quickly spin up a Stencil project.
+        This is the best way to ensure this issue is triaged quickly.
+        Issues that do not include a code reproduction are likely to be be closed without any investigation.
       placeholder: https://github.com/...
     validations:
       required: true

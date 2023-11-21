@@ -60,6 +60,7 @@ export function getOptions(rootDir: string, inputOpts: BuildOptions = {}): Build
     buildId: null,
     isProd: false,
     isCI: false,
+    isWatch: false,
     isPublishRelease: false,
     vermoji: null,
     tag: 'dev',
@@ -153,18 +154,18 @@ function getPkg(opts: BuildOptions, pkgName: string): PackageData {
 }
 
 export interface BuildOptions {
-  ghRepoOrg?: string;
+  buildDir?: string;
+  bundleHelpersDir?: string;
   ghRepoName?: string;
-  rootDir?: string;
-  srcDir?: string;
+  ghRepoOrg?: string;
   nodeModulesDir?: string;
+  rootDir?: string;
+  scriptsBuildDir?: string;
+  scriptsBundlesDir?: string;
+  scriptsDir?: string;
+  srcDir?: string;
   typescriptDir?: string;
   typescriptLibDir?: string;
-  buildDir?: string;
-  scriptsDir?: string;
-  scriptsBundlesDir?: string;
-  scriptsBuildDir?: string;
-  bundleHelpersDir?: string;
 
   output?: {
     cliDir: string;
@@ -177,23 +178,24 @@ export interface BuildOptions {
     testingDir: string;
   };
 
-  version?: string;
   buildId?: string;
+  changelogPath?: string;
+  isCI?: boolean;
   isProd?: boolean;
   isPublishRelease?: boolean;
-  isCI?: boolean;
-  vermoji?: string;
+  isWatch?: boolean;
+  otp?: string;
+  packageJson?: PackageData;
   packageJsonPath?: string;
   packageLockJsonPath?: string;
-  packageJson?: PackageData;
-  changelogPath?: string;
-  tag?: string;
-  typescriptVersion?: string;
-  rollupVersion?: string;
   parse5Version?: string;
+  rollupVersion?: string;
   sizzleVersion?: string;
+  tag?: string;
   terserVersion?: string;
-  otp?: string;
+  typescriptVersion?: string;
+  vermoji?: string;
+  version?: string;
 }
 
 /**

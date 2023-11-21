@@ -1,5 +1,5 @@
-import { isOutputTargetStats, STATS } from '@utils';
-import { isAbsolute, join } from 'path';
+import { isOutputTargetStats, join, STATS } from '@utils';
+import { isAbsolute } from 'path';
 
 import type * as d from '../../../declarations';
 

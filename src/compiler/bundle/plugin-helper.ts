@@ -1,5 +1,4 @@
-import { buildError } from '@utils';
-import { relative } from 'path';
+import { buildError, relative } from '@utils';
 
 import type * as d from '../../declarations';
 

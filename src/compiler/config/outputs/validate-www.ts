@@ -7,9 +7,10 @@ import {
   isOutputTargetDist,
   isOutputTargetWww,
   isString,
+  join,
   WWW,
 } from '@utils';
-import { isAbsolute, join } from 'path';
+import { isAbsolute } from 'path';
 
 import type * as d from '../../../declarations';
 import { getAbsolutePath } from '../config-utils';

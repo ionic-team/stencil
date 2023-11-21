@@ -60,17 +60,6 @@ async function bundleTypeScriptSource(tsPath: string, opts: BuildOptions): Promi
   // get the source typescript.js file to modify
   let code = await fs.readFile(tsPath, 'utf8');
 
-  // remove the default ts.getDefaultLibFilePath because it uses some
-  // node apis and we'll be replacing it with our own anyways
-  // TODO(STENCIL-816): remove in-browser compilation
-  code = removeFromSource(code, `getDefaultLibFilePath: () => getDefaultLibFilePath,`);
-
-  // remove the CPUProfiler since it uses node apis
-  // TODO(STENCIL-816): remove in-browser compilation
-  code = removeFromSource(code, `enableCPUProfiler,`);
-  // TODO(STENCIL-816): remove in-browser compilation
-  code = removeFromSource(code, `disableCPUProfiler,`);
-
   // As of 5.0, because typescript is now bundled with esbuild the structure of
   // the file we're dealing with here (`lib/typescript.js`) has changed.
   // Previously there was an iife which got an object as an argument and just
@@ -165,17 +154,4 @@ async function bundleTypeScriptSource(tsPath: string, opts: BuildOptions): Promi
   await fs.writeFile(cacheFile, code);
 
   return code;
-}
-
-/**
- * Removes a specific section from the provided source code via commenting the offending code out
- * @param srcCode the source code to modify
- * @param removeCode the code to remove from the source
- * @returns the updated source code
- */
-function removeFromSource(srcCode: string, removeCode: string): string {
-  if (!srcCode.includes(removeCode)) {
-    throw new Error(`"${removeCode}" not found`);
-  }
-  return srcCode.replace(removeCode, `/* commented out: ${removeCode} */`);
 }

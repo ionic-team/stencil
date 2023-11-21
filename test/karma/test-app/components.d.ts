@@ -116,6 +116,10 @@ export namespace Components {
     }
     interface DomReattachCloneHost {
     }
+    interface DropDown {
+    }
+    interface DropDownContent {
+    }
     interface DynamicCssVariable {
     }
     interface DynamicImport {
@@ -131,6 +135,8 @@ export namespace Components {
     }
     interface EventCustomType {
     }
+    interface EventListenerCapture {
+    }
     interface ExternalImportA {
     }
     interface ExternalImportB {
@@ -138,6 +144,8 @@ export namespace Components {
     interface ExternalImportC {
     }
     interface FactoryJsx {
+    }
+    interface FormAssociated {
     }
     interface HostAttrOverride {
     }
@@ -147,6 +155,12 @@ export namespace Components {
     }
     interface InputBasicRoot {
         "value"?: string;
+    }
+    interface IonChild {
+    }
+    interface IonHost {
+    }
+    interface IonParent {
     }
     interface JsonBasic {
     }
@@ -202,6 +216,8 @@ export namespace Components {
     interface NoDelegatesFocus {
     }
     interface NodeResolution {
+    }
+    interface NonShadowHost {
     }
     interface ParentReflectNanAttribute {
     }
@@ -316,6 +332,16 @@ export namespace Components {
     interface SlotMapOrder {
     }
     interface SlotMapOrderRoot {
+    }
+    interface SlotNestedDefaultOrderChild {
+        "state": boolean;
+    }
+    interface SlotNestedDefaultOrderParent {
+    }
+    interface SlotNestedNameChange {
+    }
+    interface SlotNestedNameChangeChild {
+        "state": boolean;
     }
     interface SlotNestedOrderChild {
     }
@@ -605,6 +631,18 @@ declare global {
         prototype: HTMLDomReattachCloneHostElement;
         new (): HTMLDomReattachCloneHostElement;
     };
+    interface HTMLDropDownElement extends Components.DropDown, HTMLStencilElement {
+    }
+    var HTMLDropDownElement: {
+        prototype: HTMLDropDownElement;
+        new (): HTMLDropDownElement;
+    };
+    interface HTMLDropDownContentElement extends Components.DropDownContent, HTMLStencilElement {
+    }
+    var HTMLDropDownContentElement: {
+        prototype: HTMLDropDownContentElement;
+        new (): HTMLDropDownContentElement;
+    };
     interface HTMLDynamicCssVariableElement extends Components.DynamicCssVariable, HTMLStencilElement {
     }
     var HTMLDynamicCssVariableElement: {
@@ -623,23 +661,62 @@ declare global {
         prototype: HTMLEs5AddclassSvgElement;
         new (): HTMLEs5AddclassSvgElement;
     };
+    interface HTMLEsmImportElementEventMap {
+        "someEvent": any;
+    }
     interface HTMLEsmImportElement extends Components.EsmImport, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLEsmImportElementEventMap>(type: K, listener: (this: HTMLEsmImportElement, ev: EsmImportCustomEvent<HTMLEsmImportElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLEsmImportElementEventMap>(type: K, listener: (this: HTMLEsmImportElement, ev: EsmImportCustomEvent<HTMLEsmImportElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
     var HTMLEsmImportElement: {
         prototype: HTMLEsmImportElement;
         new (): HTMLEsmImportElement;
     };
+    interface HTMLEventBasicElementEventMap {
+        "testEvent": any;
+    }
     interface HTMLEventBasicElement extends Components.EventBasic, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLEventBasicElementEventMap>(type: K, listener: (this: HTMLEventBasicElement, ev: EventBasicCustomEvent<HTMLEventBasicElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLEventBasicElementEventMap>(type: K, listener: (this: HTMLEventBasicElement, ev: EventBasicCustomEvent<HTMLEventBasicElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
     var HTMLEventBasicElement: {
         prototype: HTMLEventBasicElement;
         new (): HTMLEventBasicElement;
     };
+    interface HTMLEventCustomTypeElementEventMap {
+        "testEvent": TestEventDetail;
+    }
     interface HTMLEventCustomTypeElement extends Components.EventCustomType, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLEventCustomTypeElementEventMap>(type: K, listener: (this: HTMLEventCustomTypeElement, ev: EventCustomTypeCustomEvent<HTMLEventCustomTypeElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLEventCustomTypeElementEventMap>(type: K, listener: (this: HTMLEventCustomTypeElement, ev: EventCustomTypeCustomEvent<HTMLEventCustomTypeElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
     var HTMLEventCustomTypeElement: {
         prototype: HTMLEventCustomTypeElement;
         new (): HTMLEventCustomTypeElement;
+    };
+    interface HTMLEventListenerCaptureElement extends Components.EventListenerCapture, HTMLStencilElement {
+    }
+    var HTMLEventListenerCaptureElement: {
+        prototype: HTMLEventListenerCaptureElement;
+        new (): HTMLEventListenerCaptureElement;
     };
     interface HTMLExternalImportAElement extends Components.ExternalImportA, HTMLStencilElement {
     }
@@ -665,6 +742,12 @@ declare global {
         prototype: HTMLFactoryJsxElement;
         new (): HTMLFactoryJsxElement;
     };
+    interface HTMLFormAssociatedElement extends Components.FormAssociated, HTMLStencilElement {
+    }
+    var HTMLFormAssociatedElement: {
+        prototype: HTMLFormAssociatedElement;
+        new (): HTMLFormAssociatedElement;
+    };
     interface HTMLHostAttrOverrideElement extends Components.HostAttrOverride, HTMLStencilElement {
     }
     var HTMLHostAttrOverrideElement: {
@@ -688,6 +771,24 @@ declare global {
     var HTMLInputBasicRootElement: {
         prototype: HTMLInputBasicRootElement;
         new (): HTMLInputBasicRootElement;
+    };
+    interface HTMLIonChildElement extends Components.IonChild, HTMLStencilElement {
+    }
+    var HTMLIonChildElement: {
+        prototype: HTMLIonChildElement;
+        new (): HTMLIonChildElement;
+    };
+    interface HTMLIonHostElement extends Components.IonHost, HTMLStencilElement {
+    }
+    var HTMLIonHostElement: {
+        prototype: HTMLIonHostElement;
+        new (): HTMLIonHostElement;
+    };
+    interface HTMLIonParentElement extends Components.IonParent, HTMLStencilElement {
+    }
+    var HTMLIonParentElement: {
+        prototype: HTMLIonParentElement;
+        new (): HTMLIonParentElement;
     };
     interface HTMLJsonBasicElement extends Components.JsonBasic, HTMLStencilElement {
     }
@@ -713,13 +814,37 @@ declare global {
         prototype: HTMLLifecycleAsyncAElement;
         new (): HTMLLifecycleAsyncAElement;
     };
+    interface HTMLLifecycleAsyncBElementEventMap {
+        "lifecycleLoad": any;
+        "lifecycleUpdate": any;
+    }
     interface HTMLLifecycleAsyncBElement extends Components.LifecycleAsyncB, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLLifecycleAsyncBElementEventMap>(type: K, listener: (this: HTMLLifecycleAsyncBElement, ev: LifecycleAsyncBCustomEvent<HTMLLifecycleAsyncBElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLLifecycleAsyncBElementEventMap>(type: K, listener: (this: HTMLLifecycleAsyncBElement, ev: LifecycleAsyncBCustomEvent<HTMLLifecycleAsyncBElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
     var HTMLLifecycleAsyncBElement: {
         prototype: HTMLLifecycleAsyncBElement;
         new (): HTMLLifecycleAsyncBElement;
     };
+    interface HTMLLifecycleAsyncCElementEventMap {
+        "lifecycleLoad": any;
+        "lifecycleUpdate": any;
+    }
     interface HTMLLifecycleAsyncCElement extends Components.LifecycleAsyncC, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLLifecycleAsyncCElementEventMap>(type: K, listener: (this: HTMLLifecycleAsyncCElement, ev: LifecycleAsyncCCustomEvent<HTMLLifecycleAsyncCElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLLifecycleAsyncCElementEventMap>(type: K, listener: (this: HTMLLifecycleAsyncCElement, ev: LifecycleAsyncCCustomEvent<HTMLLifecycleAsyncCElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
     var HTMLLifecycleAsyncCElement: {
         prototype: HTMLLifecycleAsyncCElement;
@@ -731,13 +856,37 @@ declare global {
         prototype: HTMLLifecycleBasicAElement;
         new (): HTMLLifecycleBasicAElement;
     };
+    interface HTMLLifecycleBasicBElementEventMap {
+        "lifecycleLoad": any;
+        "lifecycleUpdate": any;
+    }
     interface HTMLLifecycleBasicBElement extends Components.LifecycleBasicB, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLLifecycleBasicBElementEventMap>(type: K, listener: (this: HTMLLifecycleBasicBElement, ev: LifecycleBasicBCustomEvent<HTMLLifecycleBasicBElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLLifecycleBasicBElementEventMap>(type: K, listener: (this: HTMLLifecycleBasicBElement, ev: LifecycleBasicBCustomEvent<HTMLLifecycleBasicBElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
     var HTMLLifecycleBasicBElement: {
         prototype: HTMLLifecycleBasicBElement;
         new (): HTMLLifecycleBasicBElement;
     };
+    interface HTMLLifecycleBasicCElementEventMap {
+        "lifecycleLoad": any;
+        "lifecycleUpdate": any;
+    }
     interface HTMLLifecycleBasicCElement extends Components.LifecycleBasicC, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLLifecycleBasicCElementEventMap>(type: K, listener: (this: HTMLLifecycleBasicCElement, ev: LifecycleBasicCCustomEvent<HTMLLifecycleBasicCElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLLifecycleBasicCElementEventMap>(type: K, listener: (this: HTMLLifecycleBasicCElement, ev: LifecycleBasicCCustomEvent<HTMLLifecycleBasicCElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
     var HTMLLifecycleBasicCElement: {
         prototype: HTMLLifecycleBasicCElement;
@@ -832,6 +981,12 @@ declare global {
     var HTMLNodeResolutionElement: {
         prototype: HTMLNodeResolutionElement;
         new (): HTMLNodeResolutionElement;
+    };
+    interface HTMLNonShadowHostElement extends Components.NonShadowHost, HTMLStencilElement {
+    }
+    var HTMLNonShadowHostElement: {
+        prototype: HTMLNonShadowHostElement;
+        new (): HTMLNonShadowHostElement;
     };
     interface HTMLParentReflectNanAttributeElement extends Components.ParentReflectNanAttribute, HTMLStencilElement {
     }
@@ -1103,6 +1258,30 @@ declare global {
         prototype: HTMLSlotMapOrderRootElement;
         new (): HTMLSlotMapOrderRootElement;
     };
+    interface HTMLSlotNestedDefaultOrderChildElement extends Components.SlotNestedDefaultOrderChild, HTMLStencilElement {
+    }
+    var HTMLSlotNestedDefaultOrderChildElement: {
+        prototype: HTMLSlotNestedDefaultOrderChildElement;
+        new (): HTMLSlotNestedDefaultOrderChildElement;
+    };
+    interface HTMLSlotNestedDefaultOrderParentElement extends Components.SlotNestedDefaultOrderParent, HTMLStencilElement {
+    }
+    var HTMLSlotNestedDefaultOrderParentElement: {
+        prototype: HTMLSlotNestedDefaultOrderParentElement;
+        new (): HTMLSlotNestedDefaultOrderParentElement;
+    };
+    interface HTMLSlotNestedNameChangeElement extends Components.SlotNestedNameChange, HTMLStencilElement {
+    }
+    var HTMLSlotNestedNameChangeElement: {
+        prototype: HTMLSlotNestedNameChangeElement;
+        new (): HTMLSlotNestedNameChangeElement;
+    };
+    interface HTMLSlotNestedNameChangeChildElement extends Components.SlotNestedNameChangeChild, HTMLStencilElement {
+    }
+    var HTMLSlotNestedNameChangeChildElement: {
+        prototype: HTMLSlotNestedNameChangeChildElement;
+        new (): HTMLSlotNestedNameChangeChildElement;
+    };
     interface HTMLSlotNestedOrderChildElement extends Components.SlotNestedOrderChild, HTMLStencilElement {
     }
     var HTMLSlotNestedOrderChildElement: {
@@ -1260,20 +1439,27 @@ declare global {
         "dom-reattach-clone": HTMLDomReattachCloneElement;
         "dom-reattach-clone-deep-slot": HTMLDomReattachCloneDeepSlotElement;
         "dom-reattach-clone-host": HTMLDomReattachCloneHostElement;
+        "drop-down": HTMLDropDownElement;
+        "drop-down-content": HTMLDropDownContentElement;
         "dynamic-css-variable": HTMLDynamicCssVariableElement;
         "dynamic-import": HTMLDynamicImportElement;
         "es5-addclass-svg": HTMLEs5AddclassSvgElement;
         "esm-import": HTMLEsmImportElement;
         "event-basic": HTMLEventBasicElement;
         "event-custom-type": HTMLEventCustomTypeElement;
+        "event-listener-capture": HTMLEventListenerCaptureElement;
         "external-import-a": HTMLExternalImportAElement;
         "external-import-b": HTMLExternalImportBElement;
         "external-import-c": HTMLExternalImportCElement;
         "factory-jsx": HTMLFactoryJsxElement;
+        "form-associated": HTMLFormAssociatedElement;
         "host-attr-override": HTMLHostAttrOverrideElement;
         "image-import": HTMLImageImportElement;
         "init-css-root": HTMLInitCssRootElement;
         "input-basic-root": HTMLInputBasicRootElement;
+        "ion-child": HTMLIonChildElement;
+        "ion-host": HTMLIonHostElement;
+        "ion-parent": HTMLIonParentElement;
         "json-basic": HTMLJsonBasicElement;
         "key-reorder": HTMLKeyReorderElement;
         "key-reorder-root": HTMLKeyReorderRootElement;
@@ -1298,6 +1484,7 @@ declare global {
         "listen-window": HTMLListenWindowElement;
         "no-delegates-focus": HTMLNoDelegatesFocusElement;
         "node-resolution": HTMLNodeResolutionElement;
+        "non-shadow-host": HTMLNonShadowHostElement;
         "parent-reflect-nan-attribute": HTMLParentReflectNanAttributeElement;
         "parent-with-reflect-child": HTMLParentWithReflectChildElement;
         "reflect-nan-attribute": HTMLReflectNanAttributeElement;
@@ -1343,6 +1530,10 @@ declare global {
         "slot-list-light-scoped-root": HTMLSlotListLightScopedRootElement;
         "slot-map-order": HTMLSlotMapOrderElement;
         "slot-map-order-root": HTMLSlotMapOrderRootElement;
+        "slot-nested-default-order-child": HTMLSlotNestedDefaultOrderChildElement;
+        "slot-nested-default-order-parent": HTMLSlotNestedDefaultOrderParentElement;
+        "slot-nested-name-change": HTMLSlotNestedNameChangeElement;
+        "slot-nested-name-change-child": HTMLSlotNestedNameChangeChildElement;
         "slot-nested-order-child": HTMLSlotNestedOrderChildElement;
         "slot-nested-order-parent": HTMLSlotNestedOrderParentElement;
         "slot-ng-if": HTMLSlotNgIfElement;
@@ -1469,6 +1660,10 @@ declare namespace LocalJSX {
     }
     interface DomReattachCloneHost {
     }
+    interface DropDown {
+    }
+    interface DropDownContent {
+    }
     interface DynamicCssVariable {
     }
     interface DynamicImport {
@@ -1485,6 +1680,8 @@ declare namespace LocalJSX {
     interface EventCustomType {
         "onTestEvent"?: (event: EventCustomTypeCustomEvent<TestEventDetail>) => void;
     }
+    interface EventListenerCapture {
+    }
     interface ExternalImportA {
     }
     interface ExternalImportB {
@@ -1492,6 +1689,8 @@ declare namespace LocalJSX {
     interface ExternalImportC {
     }
     interface FactoryJsx {
+    }
+    interface FormAssociated {
     }
     interface HostAttrOverride {
     }
@@ -1501,6 +1700,12 @@ declare namespace LocalJSX {
     }
     interface InputBasicRoot {
         "value"?: string;
+    }
+    interface IonChild {
+    }
+    interface IonHost {
+    }
+    interface IonParent {
     }
     interface JsonBasic {
     }
@@ -1564,6 +1769,8 @@ declare namespace LocalJSX {
     interface NoDelegatesFocus {
     }
     interface NodeResolution {
+    }
+    interface NonShadowHost {
     }
     interface ParentReflectNanAttribute {
     }
@@ -1679,6 +1886,16 @@ declare namespace LocalJSX {
     }
     interface SlotMapOrderRoot {
     }
+    interface SlotNestedDefaultOrderChild {
+        "state"?: boolean;
+    }
+    interface SlotNestedDefaultOrderParent {
+    }
+    interface SlotNestedNameChange {
+    }
+    interface SlotNestedNameChangeChild {
+        "state"?: boolean;
+    }
     interface SlotNestedOrderChild {
     }
     interface SlotNestedOrderParent {
@@ -1758,20 +1975,27 @@ declare namespace LocalJSX {
         "dom-reattach-clone": DomReattachClone;
         "dom-reattach-clone-deep-slot": DomReattachCloneDeepSlot;
         "dom-reattach-clone-host": DomReattachCloneHost;
+        "drop-down": DropDown;
+        "drop-down-content": DropDownContent;
         "dynamic-css-variable": DynamicCssVariable;
         "dynamic-import": DynamicImport;
         "es5-addclass-svg": Es5AddclassSvg;
         "esm-import": EsmImport;
         "event-basic": EventBasic;
         "event-custom-type": EventCustomType;
+        "event-listener-capture": EventListenerCapture;
         "external-import-a": ExternalImportA;
         "external-import-b": ExternalImportB;
         "external-import-c": ExternalImportC;
         "factory-jsx": FactoryJsx;
+        "form-associated": FormAssociated;
         "host-attr-override": HostAttrOverride;
         "image-import": ImageImport;
         "init-css-root": InitCssRoot;
         "input-basic-root": InputBasicRoot;
+        "ion-child": IonChild;
+        "ion-host": IonHost;
+        "ion-parent": IonParent;
         "json-basic": JsonBasic;
         "key-reorder": KeyReorder;
         "key-reorder-root": KeyReorderRoot;
@@ -1796,6 +2020,7 @@ declare namespace LocalJSX {
         "listen-window": ListenWindow;
         "no-delegates-focus": NoDelegatesFocus;
         "node-resolution": NodeResolution;
+        "non-shadow-host": NonShadowHost;
         "parent-reflect-nan-attribute": ParentReflectNanAttribute;
         "parent-with-reflect-child": ParentWithReflectChild;
         "reflect-nan-attribute": ReflectNanAttribute;
@@ -1841,6 +2066,10 @@ declare namespace LocalJSX {
         "slot-list-light-scoped-root": SlotListLightScopedRoot;
         "slot-map-order": SlotMapOrder;
         "slot-map-order-root": SlotMapOrderRoot;
+        "slot-nested-default-order-child": SlotNestedDefaultOrderChild;
+        "slot-nested-default-order-parent": SlotNestedDefaultOrderParent;
+        "slot-nested-name-change": SlotNestedNameChange;
+        "slot-nested-name-change-child": SlotNestedNameChangeChild;
         "slot-nested-order-child": SlotNestedOrderChild;
         "slot-nested-order-parent": SlotNestedOrderParent;
         "slot-ng-if": SlotNgIf;
@@ -1903,20 +2132,27 @@ declare module "@stencil/core" {
             "dom-reattach-clone": LocalJSX.DomReattachClone & JSXBase.HTMLAttributes<HTMLDomReattachCloneElement>;
             "dom-reattach-clone-deep-slot": LocalJSX.DomReattachCloneDeepSlot & JSXBase.HTMLAttributes<HTMLDomReattachCloneDeepSlotElement>;
             "dom-reattach-clone-host": LocalJSX.DomReattachCloneHost & JSXBase.HTMLAttributes<HTMLDomReattachCloneHostElement>;
+            "drop-down": LocalJSX.DropDown & JSXBase.HTMLAttributes<HTMLDropDownElement>;
+            "drop-down-content": LocalJSX.DropDownContent & JSXBase.HTMLAttributes<HTMLDropDownContentElement>;
             "dynamic-css-variable": LocalJSX.DynamicCssVariable & JSXBase.HTMLAttributes<HTMLDynamicCssVariableElement>;
             "dynamic-import": LocalJSX.DynamicImport & JSXBase.HTMLAttributes<HTMLDynamicImportElement>;
             "es5-addclass-svg": LocalJSX.Es5AddclassSvg & JSXBase.HTMLAttributes<HTMLEs5AddclassSvgElement>;
             "esm-import": LocalJSX.EsmImport & JSXBase.HTMLAttributes<HTMLEsmImportElement>;
             "event-basic": LocalJSX.EventBasic & JSXBase.HTMLAttributes<HTMLEventBasicElement>;
             "event-custom-type": LocalJSX.EventCustomType & JSXBase.HTMLAttributes<HTMLEventCustomTypeElement>;
+            "event-listener-capture": LocalJSX.EventListenerCapture & JSXBase.HTMLAttributes<HTMLEventListenerCaptureElement>;
             "external-import-a": LocalJSX.ExternalImportA & JSXBase.HTMLAttributes<HTMLExternalImportAElement>;
             "external-import-b": LocalJSX.ExternalImportB & JSXBase.HTMLAttributes<HTMLExternalImportBElement>;
             "external-import-c": LocalJSX.ExternalImportC & JSXBase.HTMLAttributes<HTMLExternalImportCElement>;
             "factory-jsx": LocalJSX.FactoryJsx & JSXBase.HTMLAttributes<HTMLFactoryJsxElement>;
+            "form-associated": LocalJSX.FormAssociated & JSXBase.HTMLAttributes<HTMLFormAssociatedElement>;
             "host-attr-override": LocalJSX.HostAttrOverride & JSXBase.HTMLAttributes<HTMLHostAttrOverrideElement>;
             "image-import": LocalJSX.ImageImport & JSXBase.HTMLAttributes<HTMLImageImportElement>;
             "init-css-root": LocalJSX.InitCssRoot & JSXBase.HTMLAttributes<HTMLInitCssRootElement>;
             "input-basic-root": LocalJSX.InputBasicRoot & JSXBase.HTMLAttributes<HTMLInputBasicRootElement>;
+            "ion-child": LocalJSX.IonChild & JSXBase.HTMLAttributes<HTMLIonChildElement>;
+            "ion-host": LocalJSX.IonHost & JSXBase.HTMLAttributes<HTMLIonHostElement>;
+            "ion-parent": LocalJSX.IonParent & JSXBase.HTMLAttributes<HTMLIonParentElement>;
             "json-basic": LocalJSX.JsonBasic & JSXBase.HTMLAttributes<HTMLJsonBasicElement>;
             "key-reorder": LocalJSX.KeyReorder & JSXBase.HTMLAttributes<HTMLKeyReorderElement>;
             "key-reorder-root": LocalJSX.KeyReorderRoot & JSXBase.HTMLAttributes<HTMLKeyReorderRootElement>;
@@ -1941,6 +2177,7 @@ declare module "@stencil/core" {
             "listen-window": LocalJSX.ListenWindow & JSXBase.HTMLAttributes<HTMLListenWindowElement>;
             "no-delegates-focus": LocalJSX.NoDelegatesFocus & JSXBase.HTMLAttributes<HTMLNoDelegatesFocusElement>;
             "node-resolution": LocalJSX.NodeResolution & JSXBase.HTMLAttributes<HTMLNodeResolutionElement>;
+            "non-shadow-host": LocalJSX.NonShadowHost & JSXBase.HTMLAttributes<HTMLNonShadowHostElement>;
             "parent-reflect-nan-attribute": LocalJSX.ParentReflectNanAttribute & JSXBase.HTMLAttributes<HTMLParentReflectNanAttributeElement>;
             "parent-with-reflect-child": LocalJSX.ParentWithReflectChild & JSXBase.HTMLAttributes<HTMLParentWithReflectChildElement>;
             "reflect-nan-attribute": LocalJSX.ReflectNanAttribute & JSXBase.HTMLAttributes<HTMLReflectNanAttributeElement>;
@@ -1986,6 +2223,10 @@ declare module "@stencil/core" {
             "slot-list-light-scoped-root": LocalJSX.SlotListLightScopedRoot & JSXBase.HTMLAttributes<HTMLSlotListLightScopedRootElement>;
             "slot-map-order": LocalJSX.SlotMapOrder & JSXBase.HTMLAttributes<HTMLSlotMapOrderElement>;
             "slot-map-order-root": LocalJSX.SlotMapOrderRoot & JSXBase.HTMLAttributes<HTMLSlotMapOrderRootElement>;
+            "slot-nested-default-order-child": LocalJSX.SlotNestedDefaultOrderChild & JSXBase.HTMLAttributes<HTMLSlotNestedDefaultOrderChildElement>;
+            "slot-nested-default-order-parent": LocalJSX.SlotNestedDefaultOrderParent & JSXBase.HTMLAttributes<HTMLSlotNestedDefaultOrderParentElement>;
+            "slot-nested-name-change": LocalJSX.SlotNestedNameChange & JSXBase.HTMLAttributes<HTMLSlotNestedNameChangeElement>;
+            "slot-nested-name-change-child": LocalJSX.SlotNestedNameChangeChild & JSXBase.HTMLAttributes<HTMLSlotNestedNameChangeChildElement>;
             "slot-nested-order-child": LocalJSX.SlotNestedOrderChild & JSXBase.HTMLAttributes<HTMLSlotNestedOrderChildElement>;
             "slot-nested-order-parent": LocalJSX.SlotNestedOrderParent & JSXBase.HTMLAttributes<HTMLSlotNestedOrderParentElement>;
             "slot-ng-if": LocalJSX.SlotNgIf & JSXBase.HTMLAttributes<HTMLSlotNgIfElement>;

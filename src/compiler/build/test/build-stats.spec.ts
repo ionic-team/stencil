@@ -30,7 +30,7 @@ describe('generateBuildStats', () => {
     }
 
     expect(compilerBuildStats).toStrictEqual({
-      app: { bundles: 0, components: 0, entries: 0, fsNamespace: undefined, namespace: 'Testing', outputs: [] },
+      app: { bundles: 0, components: 0, entries: 0, fsNamespace: 'testing', namespace: 'Testing', outputs: [] },
       collections: [],
       compiler: { name: 'in-memory' },
       componentGraph: {},

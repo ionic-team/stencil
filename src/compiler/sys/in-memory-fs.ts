@@ -1,6 +1,6 @@
 import type * as d from '@stencil/core/internal';
-import { isIterable, isString, normalizePath } from '@utils';
-import { basename, dirname, relative } from 'path';
+import { isIterable, isString, normalizePath, relative } from '@utils';
+import { basename, dirname } from 'path';
 
 /**
  * An in-memory FS which proxies the underlying OS filesystem using a simple

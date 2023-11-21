@@ -266,7 +266,12 @@ const callRender = (hostRef: d.HostRef, instance: any, elm: HTMLElement, isIniti
           renderVdom(hostRef, instance, isInitialLoad);
         }
       } else {
-        elm.textContent = instance;
+        const shadowRoot = elm.shadowRoot;
+        if (hostRef.$cmpMeta$.$flags$ & CMP_FLAGS.shadowDomEncapsulation) {
+          shadowRoot.textContent = instance;
+        } else {
+          elm.textContent = instance;
+        }
       }
     }
   } catch (e) {
@@ -339,10 +344,6 @@ export const postUpdateComponent = (hostRef: d.HostRef) => {
     }
     emitLifecycleEvent(elm, 'componentDidUpdate');
     endPostUpdate();
-  }
-
-  if (BUILD.hotModuleReplacement) {
-    elm['s-hmr-load'] && elm['s-hmr-load']();
   }
 
   if (BUILD.method && BUILD.lazyLoad) {
@@ -440,8 +441,8 @@ const addHydratedFlag = (elm: Element) =>
   BUILD.hydratedClass
     ? elm.classList.add('hydrated')
     : BUILD.hydratedAttribute
-    ? elm.setAttribute('hydrated', '')
-    : undefined;
+      ? elm.setAttribute('hydrated', '')
+      : undefined;
 
 const serverSideConnected = (elm: any) => {
   const children = elm.children;

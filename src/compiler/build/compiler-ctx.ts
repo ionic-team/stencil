@@ -1,5 +1,5 @@
-import { noop, normalizePath } from '@utils';
-import { basename, dirname, extname, join } from 'path';
+import { join, noop, normalizePath } from '@utils';
+import { basename, dirname, extname } from 'path';
 
 import type * as d from '../../declarations';
 import { buildEvents } from '../events';

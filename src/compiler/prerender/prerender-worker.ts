@@ -1,5 +1,5 @@
-import { catchError, isFunction, isPromise, isRootPath, normalizePath } from '@utils';
-import { dirname, join } from 'path';
+import { catchError, isFunction, isPromise, isRootPath, join, normalizePath } from '@utils';
+import { dirname } from 'path';
 
 import type * as d from '../../declarations';
 import { crawlAnchorsForNextUrls } from './crawl-urls';

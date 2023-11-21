@@ -1,22 +1,8 @@
 import * as ts from 'typescript';
 
 import { filterDecorators } from '../decorators-to-static/convert-decorators';
-import { transpileModule } from './transpile';
-import { formatCode } from './utils';
-
-/**
- * c for compact, c for class declaration, make of it what you will!
- *
- * a little util to take a multiline template literal and convert it to a
- * single line, with any whitespace substrings converting to single spaces.
- * this can help us compare with the output of `transpileModule`.
- *
- * @param strings an array of strings from a template literal
- * @returns a formatted string!
- */
-function c(strings: TemplateStringsArray) {
-  return formatCode(strings.join(''));
-}
+import { getStaticGetter, transpileModule } from './transpile';
+import { c, formatCode } from './utils';
 
 describe('convert-decorators', () => {
   it('should convert `@Prop` class fields to properties', async () => {
@@ -393,6 +379,62 @@ describe('convert-decorators', () => {
           }];
       }}`,
     );
+  });
+
+  it('should create formAssociated static getter', async () => {
+    const t = transpileModule(`
+     @Component({
+       tag: 'cmp-a',
+       formAssociated: true
+     })
+      export class CmpA {
+    }
+    `);
+
+    expect(getStaticGetter(t.outputText, 'formAssociated')).toBe(true);
+  });
+
+  it('should support formAssociated with shadow', async () => {
+    const t = transpileModule(`
+     @Component({
+       tag: 'cmp-a',
+       formAssociated: true,
+       shadow: true
+     })
+      export class CmpA {
+    }
+    `);
+
+    expect(getStaticGetter(t.outputText, 'encapsulation')).toBe('shadow');
+    expect(getStaticGetter(t.outputText, 'formAssociated')).toBe(true);
+  });
+
+  it('should support formAssociated with scoped', async () => {
+    const t = transpileModule(`
+     @Component({
+       tag: 'cmp-a',
+       formAssociated: true,
+       scoped: true
+     })
+      export class CmpA {
+    }
+    `);
+
+    expect(getStaticGetter(t.outputText, 'encapsulation')).toBe('scoped');
+    expect(getStaticGetter(t.outputText, 'formAssociated')).toBe(true);
+  });
+
+  it('should create attachInternalsMemberName static getter', async () => {
+    const t = transpileModule(`
+     @Component({
+       tag: 'cmp-a',
+     })
+      export class CmpA {
+      @AttachInternals()
+      elementInternals;
+    }
+    `);
+    expect(getStaticGetter(t.outputText, 'attachInternalsMemberName')).toBe('elementInternals');
   });
 
   describe('filterDecorators', () => {

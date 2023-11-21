@@ -33,8 +33,13 @@ export const generateOutputTargets = async (
     outputHydrateScript(config, compilerCtx, buildCtx),
     outputLazyLoader(config, compilerCtx),
     outputLazy(config, compilerCtx, buildCtx),
-    outputWww(config, compilerCtx, buildCtx),
   ]);
+
+  // the www output target depends on the output of the lazy output target
+  // since it attempts to inline the lazy build entry point into `index.html`
+  // so we want to ensure that the lazy OT has already completed and written
+  // all of its files before the www OT runs.
+  await outputWww(config, compilerCtx, buildCtx);
 
   // must run after all the other outputs
   // since it validates files were created

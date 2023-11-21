@@ -109,11 +109,20 @@ export const setAccessor = (
         // except for the first character, we keep the event name case
         memberName = ln[2] + memberName.slice(3);
       }
-      if (oldValue) {
-        plt.rel(elm, memberName, oldValue, false);
-      }
-      if (newValue) {
-        plt.ael(elm, memberName, newValue, false);
+      if (oldValue || newValue) {
+        // Need to account for "capture" events.
+        // If the event name ends with "Capture", we'll update the name to remove
+        // the "Capture" suffix and make sure the event listener is setup to handle the capture event.
+        const capture = memberName.endsWith(CAPTURE_EVENT_SUFFIX);
+        // Make sure we only replace the last instance of "Capture"
+        memberName = memberName.replace(CAPTURE_EVENT_REGEX, '');
+
+        if (oldValue) {
+          plt.rel(elm, memberName, oldValue, capture);
+        }
+        if (newValue) {
+          plt.ael(elm, memberName, newValue, capture);
+        }
       }
     } else if (BUILD.vdomPropOrAttr) {
       // Set property if it exists and it's not a SVG
@@ -132,7 +141,11 @@ export const setAccessor = (
           } else {
             (elm as any)[memberName] = newValue;
           }
-        } catch (e) {}
+        } catch (e) {
+          /**
+           * in case someone tries to set a read-only property, e.g. "namespaceURI", we just ignore it
+           */
+        }
       }
 
       /**
@@ -168,5 +181,13 @@ export const setAccessor = (
     }
   }
 };
+
 const parseClassListRegex = /\s/;
+/**
+ * Parsed a string of classnames into an array
+ * @param value className string, e.g. "foo bar baz"
+ * @returns list of classes, e.g. ["foo", "bar", "baz"]
+ */
 const parseClassList = (value: string | undefined | null): string[] => (!value ? [] : value.split(parseClassListRegex));
+const CAPTURE_EVENT_SUFFIX = 'Capture';
+const CAPTURE_EVENT_REGEX = new RegExp(CAPTURE_EVENT_SUFFIX + '$');

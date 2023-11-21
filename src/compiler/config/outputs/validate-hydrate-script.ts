@@ -5,8 +5,9 @@ import {
   isOutputTargetHydrate,
   isOutputTargetWww,
   isString,
+  join,
 } from '@utils';
-import { isAbsolute, join } from 'path';
+import { isAbsolute } from 'path';
 
 import type * as d from '../../../declarations';
 

@@ -1,4 +1,4 @@
-import { join, relative } from 'path';
+import { join, relative } from '@utils';
 
 import type * as d from '../../../declarations';
 import { AUTO_GENERATE_COMMENT } from '../constants';

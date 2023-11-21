@@ -1,5 +1,5 @@
-import { isRemoteUrl, normalizeFsPath, normalizePath } from '@utils';
-import { dirname, join } from 'path';
+import { isRemoteUrl, join, normalizeFsPath, normalizePath } from '@utils';
+import { dirname } from 'path';
 import type { Plugin } from 'rollup';
 
 import type * as d from '../../declarations';

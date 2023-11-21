@@ -1,9 +1,10 @@
 import { BUILD } from '@app-data';
 import { consoleDevWarn, getHostRef, plt } from '@platform';
+import { CMP_FLAGS } from '@utils';
 
 import type * as d from '../declarations';
 import { HOST_FLAGS, MEMBER_FLAGS } from '../utils/constants';
-import { PROXY_FLAGS } from './runtime-constants';
+import { FORM_ASSOCIATED_CUSTOM_ELEMENT_CALLBACKS, PROXY_FLAGS } from './runtime-constants';
 import { getValue, setValue } from './set-value';
 
 /**
@@ -21,14 +22,36 @@ export const proxyComponent = (
   cmpMeta: d.ComponentRuntimeMeta,
   flags: number,
 ): d.ComponentConstructor => {
+  const prototype = (Cstr as any).prototype;
+
+  /**
+   * proxy form associated custom element lifecycle callbacks
+   * @ref https://web.dev/articles/more-capable-form-controls#lifecycle_callbacks
+   */
+  if (BUILD.formAssociated && cmpMeta.$flags$ & CMP_FLAGS.formAssociated && flags & PROXY_FLAGS.isElementConstructor) {
+    FORM_ASSOCIATED_CUSTOM_ELEMENT_CALLBACKS.forEach((cbName) =>
+      Object.defineProperty(prototype, cbName, {
+        value(this: d.HostElement, ...args: any[]) {
+          const hostRef = getHostRef(this);
+          const elm = BUILD.lazyLoad ? hostRef.$hostElement$ : this;
+          const instance = BUILD.lazyLoad ? hostRef.$lazyInstance$ : (elm as any);
+          if (!instance) {
+            hostRef.$onReadyPromise$.then((instance) => instance?.[cbName](...args));
+          } else {
+            const cb = instance[cbName];
+            typeof cb === 'function' && cb(...args);
+          }
+        },
+      }),
+    );
+  }
+
   if (BUILD.member && cmpMeta.$members$) {
     if (BUILD.watchCallback && Cstr.watchers) {
       cmpMeta.$watchers$ = Cstr.watchers;
     }
     // It's better to have a const than two Object.entries()
     const members = Object.entries(cmpMeta.$members$);
-    const prototype = (Cstr as any).prototype;
-
     members.map(([memberName, [memberFlags]]) => {
       if (
         (BUILD.prop || BUILD.state) &&
@@ -49,7 +72,7 @@ export const proxyComponent = (
                 // we are proxying the instance (not element)
                 (flags & PROXY_FLAGS.isElementConstructor) === 0 &&
                 // the element is not constructing
-                (ref.$flags$ & HOST_FLAGS.isConstructingInstance) === 0 &&
+                (ref && ref.$flags$ & HOST_FLAGS.isConstructingInstance) === 0 &&
                 // the member is a prop
                 (memberFlags & MEMBER_FLAGS.Prop) !== 0 &&
                 // the member is not mutable
@@ -76,7 +99,7 @@ export const proxyComponent = (
         Object.defineProperty(prototype, memberName, {
           value(this: d.HostElement, ...args: any[]) {
             const ref = getHostRef(this);
-            return ref.$onInstancePromise$.then(() => ref.$lazyInstance$[memberName](...args));
+            return ref?.$onInstancePromise$?.then(() => ref.$lazyInstance$?.[memberName](...args));
           },
         });
       }
@@ -145,13 +168,14 @@ export const proxyComponent = (
             // 2. The watchers are ready
             // 3. The value has changed
             if (
+              flags &&
               !(flags & HOST_FLAGS.isConstructingInstance) &&
               flags & HOST_FLAGS.isWatchReady &&
               newValue !== oldValue
             ) {
               const elm = BUILD.lazyLoad ? hostRef.$hostElement$ : this;
               const instance = BUILD.lazyLoad ? hostRef.$lazyInstance$ : (elm as any);
-              const entry = cmpMeta.$watchers$[attrName];
+              const entry = cmpMeta.$watchers$?.[attrName];
               entry?.forEach((callbackName) => {
                 if (instance[callbackName] != null) {
                   instance[callbackName].call(instance, newValue, oldValue, attrName);
@@ -180,7 +204,7 @@ export const proxyComponent = (
               const attrName = m[1] || propName;
               attrNameToPropName.set(attrName, propName);
               if (BUILD.reflect && m[0] & MEMBER_FLAGS.ReflectAttr) {
-                cmpMeta.$attrsToReflect$.push([propName, attrName]);
+                cmpMeta.$attrsToReflect$?.push([propName, attrName]);
               }
 
               return attrName;

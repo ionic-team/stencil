@@ -32,6 +32,11 @@ export const removeStaticMetaProperties = (classNode: ts.ClassDeclaration): ts.C
  * set of static getters used by Stencil during the compilation process.
  */
 const STATIC_GETTERS_TO_REMOVE = [
+  // we want to remove `attachInternalsMemberName`, which is an 'internal' static
+  // property used to pass a string value along from the 'decorators-to-static'
+  // step through to the `ComponentCompilerMeta` phase, but we want to keep the
+  // `formAssociated` prop that we also set at the same time.
+  'attachInternalsMemberName',
   'elementRef',
   'encapsulation',
   'events',

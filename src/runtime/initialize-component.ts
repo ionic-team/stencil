@@ -10,13 +10,23 @@ import { PROXY_FLAGS } from './runtime-constants';
 import { getScopeId, registerStyle } from './styles';
 import { safeCall, scheduleUpdate } from './update-component';
 
+/**
+ * Initialize a Stencil component given a reference to its host element, its
+ * runtime bookkeeping data structure, runtime metadata about the component,
+ * and (optionally) an HMR version ID.
+ *
+ * @param elm a host element
+ * @param hostRef the element's runtime bookkeeping object
+ * @param cmpMeta runtime metadata for the Stencil component
+ * @param hmrVersionId an (optional) HMR version ID
+ */
 export const initializeComponent = async (
   elm: d.HostElement,
   hostRef: d.HostRef,
   cmpMeta: d.ComponentRuntimeMeta,
   hmrVersionId?: string,
-  Cstr?: any,
 ) => {
+  let Cstr: any;
   // initializeComponent
   if ((hostRef.$flags$ & HOST_FLAGS.hasInitializedComponent) === 0) {
     // Let the runtime know that the component has been initialized

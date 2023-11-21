@@ -1,4 +1,4 @@
-import { join, normalizeFsPathQuery, normalizePath, relative } from '../path';
+import { join, normalize, normalizeFsPathQuery, normalizePath, relative, resolve } from '../path';
 
 describe('normalizePath', () => {
   it('node module', () => {
@@ -131,22 +131,49 @@ describe('normalizeFsPathQuery', () => {
     const p = normalizeFsPathQuery(`/Johnny/B/Goode`);
     expect(p.filePath).toBe(`/Johnny/B/Goode`);
     expect(p.format).toBe(null);
-    expect(p.ext).toBe(`/johnny/b/goode`);
+    expect(p.ext).toBe(null);
   });
 
   describe('wrapped nodejs path functions', () => {
     it('join should always return a POSIX path', () => {
       expect(join('foo')).toBe('foo');
+      expect(join('foo/')).toBe('foo');
       expect(join('foo', 'bar')).toBe('foo/bar');
+      expect(join('foo', 'bar', '/')).toBe('foo/bar');
+      expect(join('foo', '/', 'bar')).toBe('foo/bar');
+      expect(join('foo', '/', '/', 'bar')).toBe('foo/bar');
       expect(join('..', 'foo', 'bar.ts')).toBe('../foo/bar.ts');
+      expect(join('foo', '..', 'bar.ts')).toBe('bar.ts');
       expect(join('.', 'foo', 'bar.ts')).toBe('foo/bar.ts');
     });
 
     it('relative should always return a POSIX path', () => {
       expect(relative('.', 'foo/bar')).toBe('foo/bar');
       expect(relative('foo/bar', '..')).toBe('../../..');
+      expect(relative('foo', 'foo/bar/file.js')).toBe('bar/file.js');
+      expect(relative('foo/bar', 'foo/bar/file.js')).toBe('file.js');
       expect(relative('foo/bar/baz', 'foo/bar/boz')).toBe('../boz');
+      expect(relative('foo/bar/file.js', 'foo/bar/file.js')).toBe('.');
       expect(relative('.', '../foo/bar')).toBe('../foo/bar');
+    });
+
+    it('resolve should always return a POSIX path', () => {
+      expect(resolve('.')).toBe(normalizePath(process.cwd()));
+      expect(resolve('foo/bar/baz')).toBe(join(normalizePath(process.cwd()), 'foo/bar/baz'));
+      expect(resolve('foo\\bar\\baz')).toBe(join(normalizePath(process.cwd()), 'foo/bar/baz'));
+    });
+
+    it('normalize should always return a POSIX path', () => {
+      expect(normalize('')).toBe('.');
+      expect(normalize('.')).toBe('.');
+      expect(normalize('..')).toBe('..');
+      expect(normalize('/')).toBe('/');
+      expect(normalize('\\')).toBe('/');
+      // these examples taken from
+      // https://nodejs.org/api/path.html#pathnormalizepath
+      expect(normalize('\\temp\\\\foo\\bar\\..\\')).toBe('/temp/foo');
+      expect(normalize('/temp/foo//bar/../')).toBe('/temp/foo');
+      expect(normalize('/foo/bar//baz/asdf/quux/..')).toBe('/foo/bar/baz/asdf');
     });
   });
 });
