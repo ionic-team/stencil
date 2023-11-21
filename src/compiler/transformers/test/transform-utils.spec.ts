@@ -1,6 +1,7 @@
 import * as ts from 'typescript';
 
 import {
+  getIdentifierFromResourceUrl,
   isMemberPrivate,
   mapJSDocTagInfo,
   retrieveModifierLike,
@@ -9,6 +10,16 @@ import {
 } from '../transform-utils';
 
 describe('transform-utils', () => {
+  it('getIdentifierFromResourceUrl', () => {
+    const testData = [
+      ['/foo/bar.css', '_FooBarCssStyle'],
+      ['C:\\foo\\bar.css', '_CFooBarCssStyle'],
+    ]
+    for (const [input, output] of testData) {
+      expect(getIdentifierFromResourceUrl(input)).toBe(output)
+    }
+  })
+
   it('flattens TypeScript JSDocTagInfo to Stencil JSDocTagInfo', () => {
     // tags corresponds to the following JSDoc
     /*

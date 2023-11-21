@@ -1107,5 +1107,5 @@ export const tsPropDeclNameAsString = (node: ts.PropertyDeclaration, typeChecker
  * @returns a valid identifier to be used as variable name
  */
 export const getIdentifierFromResourceUrl = (absolutePath: string): string => {
-  return `_${dashToPascalCase(absolutePath.toLocaleLowerCase().replace(/(\.|\/|\\)/g, '-').replace(/--/, '-'))}Style`
+  return `_${dashToPascalCase(absolutePath.toLocaleLowerCase().replace(/(\.|\/|\\|:)/g, '-').replace(/--/, '-'))}Style`
 }

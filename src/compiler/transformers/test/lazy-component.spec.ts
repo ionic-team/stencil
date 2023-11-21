@@ -108,4 +108,37 @@ describe('lazy-component', () => {
       }`,
     );
   });
+
+  it('allows to define multiple styleUrls', async () => {
+    const compilerCtx = mockCompilerCtx();
+    const transformOpts: d.TransformOptions = {
+      coreImportPath: '@stencil/core',
+      componentExport: 'lazy',
+      componentMetadata: null,
+      currentDirectory: '/',
+      proxy: null,
+      style: 'static',
+      styleImportData: null,
+    };
+    const code = `
+      @Component({
+        styleUrls: ['./foo/bar.css', './bar/foo.css'],
+        tag: 'cmp-a'
+      })
+      export class CmpA {}
+    `;
+    const transformer = lazyComponentTransform(compilerCtx, transformOpts);
+    const t = transpileModule(code, null, compilerCtx, [], [transformer]);
+    expect(await formatCode(t.outputText)).toBe(
+      await c`import { registerInstance as __stencil_registerInstance } from "@stencil/core";
+      import _FooBarCssStyle from './foo/bar.css';
+      import _BarFooCssStyle from './bar/foo.css';
+      export const CmpA = class {
+        constructor(hostRef) {
+          __stencil_registerInstance(this, hostRef);
+        }
+      }
+      CmpA.style = _FooBarCssStyle + _BarFooCssStyle;`,
+    );
+  })
 });
