@@ -13,7 +13,7 @@ describe('transform-utils', () => {
   it('getIdentifierFromResourceUrl', () => {
     const testData = [
       ['/foo/bar.css', '_FooBarCssStyle'],
-      ['C:\\foo\\bar.css', '_CFooBarCssStyle'],
+      ['C:\\foo\\bar.css?tag=my-component&encapsulation=shadow', '_CFooBarCssStyle'],
       ['/project/node_modules/@scope/foo/b_$%^&*(*())!@#a_r.css', '_ProjectNodeModulesScopeFooBARCssStyle'],
     ];
     for (const [input, output] of testData) {

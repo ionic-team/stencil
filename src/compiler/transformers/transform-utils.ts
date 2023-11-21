@@ -1114,5 +1114,7 @@ const SPECIAL_CHARS = /[\s~`!@#$%\^&*+=\-\[\]\\';,/{}|\\":<>\?()\._]/g;
  * @returns a valid identifier to be used as variable name
  */
 export const getIdentifierFromResourceUrl = (absolutePath: string): string => {
-  return `_${dashToPascalCase(absolutePath.toLocaleLowerCase().replace(SPECIAL_CHARS, '-').replace(/--/, '-'))}Style`;
+  return `_${dashToPascalCase(
+    absolutePath.split('?').shift().toLocaleLowerCase().replace(SPECIAL_CHARS, '-').replace(/--/, '-'),
+  )}Style`;
 };
