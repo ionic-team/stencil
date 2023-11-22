@@ -4,6 +4,7 @@ import { format } from './utils';
 
 @Component({
   tag: 'cmp-a',
+  styleUrl: 'cmp-a.css',
   shadow: true,
 })
 export class CmpA {
