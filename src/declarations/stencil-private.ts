@@ -1557,10 +1557,31 @@ export interface HostRef {
   $hostElement$: HostElement;
   $instanceValues$?: Map<string, any>;
   $lazyInstance$?: ComponentInterface;
-  $onReadyPromise$?: Promise<any>;
-  $onReadyResolve$?: (elm: any) => void;
-  $onInstancePromise$?: Promise<any>;
-  $onInstanceResolve$?: (elm: any) => void;
+  /**
+   * A promise that gets resolved if `BUILD.asyncLoading` is enabled and after the `componentDidLoad`
+   * and before the `componentDidUpdate` lifecycle events are triggered.
+   */
+  $onReadyPromise$?: Promise<HostElement>;
+  /**
+   * A callback which resolves {@link HostRef.$onReadyPromise$}
+   * @param elm host element
+   */
+  $onReadyResolve$?: (elm: HostElement) => void;
+  /**
+   * A promise which resolves with the host component once it has finished rendering
+   * for the first time. This is primarily used to wait for the first `update` to be
+   * called on a component.
+   */
+  $onInstancePromise$?: Promise<HostElement>;
+  /**
+   * A callback which resolves {@link HostRef.$onInstancePromise$}
+   * @param elm host element
+   */
+  $onInstanceResolve$?: (elm: HostElement) => void;
+  /**
+   * A promise which resolves when the component has finished rendering for the first time.
+   * It is called after {@link HostRef.$onInstancePromise$} resolves.
+   */
   $onRenderResolve$?: () => void;
   $vnode$?: VNode;
   $queuedListeners$?: [string, any][];
