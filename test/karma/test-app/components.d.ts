@@ -383,6 +383,14 @@ export namespace Components {
     }
     interface Tag88 {
     }
+    interface TextContentPatch {
+    }
+    interface TextContentPatchScoped {
+    }
+    interface TextContentPatchScopedWithSlot {
+    }
+    interface TextContentPatchWithSlot {
+    }
     interface WatchNativeAttributes {
     }
 }
@@ -1396,6 +1404,30 @@ declare global {
         prototype: HTMLTag88Element;
         new (): HTMLTag88Element;
     };
+    interface HTMLTextContentPatchElement extends Components.TextContentPatch, HTMLStencilElement {
+    }
+    var HTMLTextContentPatchElement: {
+        prototype: HTMLTextContentPatchElement;
+        new (): HTMLTextContentPatchElement;
+    };
+    interface HTMLTextContentPatchScopedElement extends Components.TextContentPatchScoped, HTMLStencilElement {
+    }
+    var HTMLTextContentPatchScopedElement: {
+        prototype: HTMLTextContentPatchScopedElement;
+        new (): HTMLTextContentPatchScopedElement;
+    };
+    interface HTMLTextContentPatchScopedWithSlotElement extends Components.TextContentPatchScopedWithSlot, HTMLStencilElement {
+    }
+    var HTMLTextContentPatchScopedWithSlotElement: {
+        prototype: HTMLTextContentPatchScopedWithSlotElement;
+        new (): HTMLTextContentPatchScopedWithSlotElement;
+    };
+    interface HTMLTextContentPatchWithSlotElement extends Components.TextContentPatchWithSlot, HTMLStencilElement {
+    }
+    var HTMLTextContentPatchWithSlotElement: {
+        prototype: HTMLTextContentPatchWithSlotElement;
+        new (): HTMLTextContentPatchWithSlotElement;
+    };
     interface HTMLWatchNativeAttributesElement extends Components.WatchNativeAttributes, HTMLStencilElement {
     }
     var HTMLWatchNativeAttributesElement: {
@@ -1553,6 +1585,10 @@ declare global {
         "svg-class": HTMLSvgClassElement;
         "tag-3d-component": HTMLTag3dComponentElement;
         "tag-88": HTMLTag88Element;
+        "text-content-patch": HTMLTextContentPatchElement;
+        "text-content-patch-scoped": HTMLTextContentPatchScopedElement;
+        "text-content-patch-scoped-with-slot": HTMLTextContentPatchScopedWithSlotElement;
+        "text-content-patch-with-slot": HTMLTextContentPatchWithSlotElement;
         "watch-native-attributes": HTMLWatchNativeAttributesElement;
     }
 }
@@ -1936,6 +1972,14 @@ declare namespace LocalJSX {
     }
     interface Tag88 {
     }
+    interface TextContentPatch {
+    }
+    interface TextContentPatchScoped {
+    }
+    interface TextContentPatchScopedWithSlot {
+    }
+    interface TextContentPatchWithSlot {
+    }
     interface WatchNativeAttributes {
     }
     interface IntrinsicElements {
@@ -2089,6 +2133,10 @@ declare namespace LocalJSX {
         "svg-class": SvgClass;
         "tag-3d-component": Tag3dComponent;
         "tag-88": Tag88;
+        "text-content-patch": TextContentPatch;
+        "text-content-patch-scoped": TextContentPatchScoped;
+        "text-content-patch-scoped-with-slot": TextContentPatchScopedWithSlot;
+        "text-content-patch-with-slot": TextContentPatchWithSlot;
         "watch-native-attributes": WatchNativeAttributes;
     }
 }
@@ -2246,6 +2294,10 @@ declare module "@stencil/core" {
             "svg-class": LocalJSX.SvgClass & JSXBase.HTMLAttributes<HTMLSvgClassElement>;
             "tag-3d-component": LocalJSX.Tag3dComponent & JSXBase.HTMLAttributes<HTMLTag3dComponentElement>;
             "tag-88": LocalJSX.Tag88 & JSXBase.HTMLAttributes<HTMLTag88Element>;
+            "text-content-patch": LocalJSX.TextContentPatch & JSXBase.HTMLAttributes<HTMLTextContentPatchElement>;
+            "text-content-patch-scoped": LocalJSX.TextContentPatchScoped & JSXBase.HTMLAttributes<HTMLTextContentPatchScopedElement>;
+            "text-content-patch-scoped-with-slot": LocalJSX.TextContentPatchScopedWithSlot & JSXBase.HTMLAttributes<HTMLTextContentPatchScopedWithSlotElement>;
+            "text-content-patch-with-slot": LocalJSX.TextContentPatchWithSlot & JSXBase.HTMLAttributes<HTMLTextContentPatchWithSlotElement>;
             "watch-native-attributes": LocalJSX.WatchNativeAttributes & JSXBase.HTMLAttributes<HTMLWatchNativeAttributesElement>;
         }
     }
