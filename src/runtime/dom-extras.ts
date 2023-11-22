@@ -204,6 +204,7 @@ export const patchSlotInsertAdjacentElement = (HostElementPrototype: HTMLElement
   };
 };
 
+// TODO(STENCIL-1019): Evaluate if this patch should be modified
 /**
  * Patches the text content of an unnamed slotted node inside a scoped component
  * @param hostElementPrototype the `Element` to be patched
