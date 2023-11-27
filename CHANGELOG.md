@@ -1,3 +1,22 @@
+# 🌞 [4.8.0](https://github.com/ionic-team/stencil/compare/v4.7.2...v4.8.0) (2023-11-27)
+
+
+### Bug Fixes
+
+* **hydrate:** prevent dead code elimination of patch dom implementation ([#4966](https://github.com/ionic-team/stencil/issues/4966)) ([5e36057](https://github.com/ionic-team/stencil/commit/5e3605779589105d6a3da73fcfc2bbe5ceeb5def))
+* **mock-doc:** add `getAttributeNode` to mock elements ([#5070](https://github.com/ionic-team/stencil/issues/5070)) ([4e840e0](https://github.com/ionic-team/stencil/commit/4e840e0e0e6af86e1cda551f3ec9e50ac57417fa))
+* **mock-doc:** add inert to HTMLAttributes ([#5072](https://github.com/ionic-team/stencil/issues/5072)) ([71a4110](https://github.com/ionic-team/stencil/commit/71a4110bbce310d2f405557acb25de552db4f78f)), closes [#5071](https://github.com/ionic-team/stencil/issues/5071)
+* **runtime:** apply textnodes to shadow DOM instead of light DOM ([#4946](https://github.com/ionic-team/stencil/issues/4946)) ([217d588](https://github.com/ionic-team/stencil/commit/217d58894959d4b05d6dda590f006c35772c321c))
+* **test:** pass jest args correctly for v28/29 ([#5068](https://github.com/ionic-team/stencil/issues/5068)) ([5c4ac32](https://github.com/ionic-team/stencil/commit/5c4ac328052c1a1f1c13d6393c3d9875ba3573c1))
+
+
+### Features
+
+* **declarations:** add popover attributes to JSX declarations ([#5064](https://github.com/ionic-team/stencil/issues/5064)) ([f73aa14](https://github.com/ionic-team/stencil/commit/f73aa149f06dd3014bfbc2ab7223f8363b859b41))
+* **runtime:** proxy form associated custom element lifecycle callbacks ([#4939](https://github.com/ionic-team/stencil/issues/4939)) ([ca53dbb](https://github.com/ionic-team/stencil/commit/ca53dbb02ec4babd2957c12eb1a787eee98d2645))
+
+
+
 ## 🐄 [4.7.2](https://github.com/ionic-team/stencil/compare/v4.7.1...v4.7.2) (2023-11-13)
 
 
