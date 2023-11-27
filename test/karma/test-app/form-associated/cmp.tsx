@@ -14,6 +14,9 @@ export class FormAssociatedCmp {
 
   formAssociatedCallback(form: HTMLFormAssociatedElement) {
     form.ariaLabel = 'formAssociated called';
+    // this is a regression test for #5106 which ensures that `this` is
+    // resolved correctly
+    this.internals.setValidity({});
   }
 
   render() {

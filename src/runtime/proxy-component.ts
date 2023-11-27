@@ -36,10 +36,13 @@ export const proxyComponent = (
           const elm = BUILD.lazyLoad ? hostRef.$hostElement$ : this;
           const instance: d.ComponentInterface = BUILD.lazyLoad ? hostRef.$lazyInstance$ : elm;
           if (!instance) {
-            hostRef.$onReadyPromise$.then((instance: d.ComponentInterface) => instance[cbName]?.(...args));
+            hostRef.$onReadyPromise$.then((instance: d.ComponentInterface) => {
+              const cb = instance[cbName];
+              typeof cb === 'function' && cb.call(instance, ...args);
+            });
           } else {
             const cb = instance[cbName];
-            typeof cb === 'function' && cb(...args);
+            typeof cb === 'function' && cb.call(instance, ...args);
           }
         },
       }),
