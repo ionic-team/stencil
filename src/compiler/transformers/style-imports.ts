@@ -118,7 +118,7 @@ const updateCjsStyleRequires = (
 
   moduleFile.cmps.forEach((cmp) => {
     cmp.styles.forEach((style) => {
-      if (typeof style.styleIdentifier === 'string' && style.externalStyles.length > 0) {
+      if (style.externalStyles.length > 0) {
         // add style imports built from @Component() styleUrl option
         styleRequires.push(...createCjsStyleRequire(transformOpts, tsSourceFile, cmp, style));
       }
@@ -185,5 +185,5 @@ const getStyleImportPath = (
     encapsulation: cmp.encapsulation,
     mode: style.modeName,
   };
-  return serializeImportPath(importData, transformOpts.styleImportData);
+  return serializeImportPath(importData, transformOpts.styleImportData, transformOpts.module);
 };
