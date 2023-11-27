@@ -18,7 +18,11 @@ import type { ImportData, ParsedImport, SerializeImportData } from '../../declar
  * @param moduleSystem the module system we compile to
  * @returns a formatted string
  */
-export const serializeImportPath = (data: SerializeImportData, styleImportData: string | undefined | null, moduleSystem?: 'esm' | 'cjs'): string => {
+export const serializeImportPath = (
+  data: SerializeImportData,
+  styleImportData: string | undefined | null,
+  moduleSystem?: 'esm' | 'cjs',
+): string => {
   let p = data.importeePath;
 
   if (isString(p)) {
