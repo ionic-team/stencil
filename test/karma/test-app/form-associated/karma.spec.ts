@@ -32,12 +32,12 @@ describe('form associated', function () {
       const elm = app.querySelector('form-associated');
       const formEl = app.querySelector('form');
 
-      elm.setAttribute('disabled', 'disabled')
+      elm.setAttribute('disabled', 'disabled');
       expect(formEl.ariaLabel).toBe('formDisabledCallback called with true');
-      elm.removeAttribute('disabled')
+      elm.removeAttribute('disabled');
       expect(formEl.ariaLabel).toBe('formDisabledCallback called with false');
-    })
-  })
+    });
+  });
 
   it('should link up to the surrounding form', async () => {
     const formEl = app.querySelector('form');

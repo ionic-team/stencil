@@ -1,6 +1,5 @@
 import { AttachInternals, Component, h } from '@stencil/core';
 
-
 @Component({
   tag: 'form-associated',
   formAssociated: true,
