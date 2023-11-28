@@ -1,5 +1,9 @@
 import { setupDomTests } from '../util';
 
+function sleep (ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 describe('form associated', function () {
   const { setupDom, tearDownDom } = setupDomTests(document);
   let app: HTMLElement;
@@ -21,8 +25,10 @@ describe('form associated', function () {
     });
 
     it('should trigger "formResetCallback"', async () => {
-      const resetBtn: HTMLInputElement = app.querySelector('input');
+      const resetBtn: HTMLInputElement = app.querySelector('input[type="reset"]');
       resetBtn.click();
+
+      await sleep(100)
 
       const formEl = app.querySelector('form');
       expect(formEl.ariaLabel).toBe('formResetCallback called');
@@ -33,8 +39,11 @@ describe('form associated', function () {
       const formEl = app.querySelector('form');
 
       elm.setAttribute('disabled', 'disabled');
+      await sleep(100)
       expect(formEl.ariaLabel).toBe('formDisabledCallback called with true');
+
       elm.removeAttribute('disabled');
+      await sleep(100)
       expect(formEl.ariaLabel).toBe('formDisabledCallback called with false');
     });
   });
