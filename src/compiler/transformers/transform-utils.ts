@@ -1,9 +1,4 @@
-import {
-  augmentDiagnosticWithNode,
-  buildError,
-  normalizePath,
-  readOnlyArrayHasStringMember,
-} from '@utils';
+import { augmentDiagnosticWithNode, buildError, normalizePath, readOnlyArrayHasStringMember } from '@utils';
 import ts from 'typescript';
 
 import type * as d from '../../declarations';
