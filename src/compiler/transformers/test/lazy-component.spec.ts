@@ -131,14 +131,14 @@ describe('lazy-component', () => {
     const t = transpileModule(code, null, compilerCtx, [], [transformer]);
     expect(await formatCode(t.outputText)).toBe(
       await c`import { registerInstance as __stencil_registerInstance } from "@stencil/core";
-      import _FooBarCssStyle from './foo/bar.css';
-      import _BarFooCssStyle from './bar/foo.css';
+      import __foo_bar_css from './foo/bar.css';
+      import __bar_foo_css  from './bar/foo.css';
       export const CmpA = class {
         constructor(hostRef) {
           __stencil_registerInstance(this, hostRef);
         }
       }
-      CmpA.style = _FooBarCssStyle + _BarFooCssStyle;`,
+      CmpA.style = __foo_bar_css + __bar_foo_css ;`,
     );
   });
 
@@ -164,15 +164,15 @@ describe('lazy-component', () => {
     const transformer = lazyComponentTransform(compilerCtx, transformOpts);
     const t = transpileModule(code, null, compilerCtx, [], [transformer]);
     expect(await formatCode(t.outputText)).toBe(
-      await c`const _FooBarCssStyle = require('./foo/bar.css');
-      const _BarFooCssStyle = require('./bar/foo.css');
+      await c`const __foo_bar_css = require('./foo/bar.css');
+      const __bar_foo_css  = require('./bar/foo.css');
       const { registerInstance: __stencil_registerInstance } = require('@stencil/core');
       export class CmpA {
         constructor(hostRef) {
           __stencil_registerInstance(this, hostRef);
         }
       };
-      CmpA.style = _FooBarCssStyle + _BarFooCssStyle;`,
+      CmpA.style = __foo_bar_css + __bar_foo_css ;`,
     );
   });
 
@@ -201,14 +201,14 @@ describe('lazy-component', () => {
     const t = transpileModule(code, null, compilerCtx, [], [transformer]);
     expect(await formatCode(t.outputText)).toBe(
       await c`import { registerInstance as __stencil_registerInstance } from "@stencil/core";
-      import _BarFooCssStyle from './bar/foo.css';
-      import _FooBarCssStyle from './foo/bar.css';
+      import __bar_foo_css  from './bar/foo.css';
+      import __foo_bar_css from './foo/bar.css';
       export const CmpA = class {
         constructor(hostRef) {
           __stencil_registerInstance(this, hostRef);
         }
       }
-      CmpA.style = { bar: _BarFooCssStyle, foo: _FooBarCssStyle }`,
+      CmpA.style = { bar: __bar_foo_css , foo: __foo_bar_css }`,
     );
   });
 });

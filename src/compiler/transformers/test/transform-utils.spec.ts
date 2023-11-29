@@ -12,9 +12,15 @@ import {
 describe('transform-utils', () => {
   it('getIdentifierFromResourceUrl', () => {
     const testData = [
-      ['/foo/bar.css', '_FooBarCssStyle'],
-      ['C:\\foo\\bar.css?tag=my-component&encapsulation=shadow', '_CFooBarCssStyle'],
-      ['/project/node_modules/@scope/foo/b_$%^&*(*())!@#a_r.css', '_ProjectNodeModulesScopeFooBARCssStyle'],
+      ['/foo/bar.css', '_foo_bar_css'],
+      ['/foo/Bar.css', '_foo_Bar_css'],
+      ['/my-other-styles.css', '_my_other_styles_css'],
+      ['/my--other-styles.css', '_my__other_styles_css'],
+      ['C:\\foo\\bar.css?tag=my-component&encapsulation=shadow', 'C__foo_bar_css'],
+      [
+        '/project/node_modules/@scope/foo/b_$%^&*(*())!@#a_r.css',
+        '_project_node_modules__scope_foo_b______________a_r_css',
+      ],
     ];
     for (const [input, output] of testData) {
       expect(getIdentifierFromResourceUrl(input)).toBe(output);

@@ -9,7 +9,7 @@ import { getIdentifierFromResourceUrl, retrieveTsModifiers } from './transform-u
  * imported from the component's styleUrls option. For example, if a component
  * has the following:
  *
-  * ```ts
+ * ```ts
  * @Component({
  *  styleUrls: ['my-component.css', 'my-component.ios.css']
  * })
@@ -149,7 +149,6 @@ const createEsmStyleImport = (
 
   return imports;
 };
-
 
 /**
  * Iterate over all components defined in given module, collect require
