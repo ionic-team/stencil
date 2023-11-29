@@ -184,6 +184,8 @@ The subject contains succinct description of the change:
 
 #### Footer
 
+If a pull request fixes an open GitHub issue, `fixes: #` + the issue number should be included in the footer.
+
 Members of the Stencil engineering team should take care to add the JIRA ticket associated with a PR in the footer of
 the git commit. Community members need not worry about adding a footer.
 
@@ -194,6 +196,8 @@ This syntax must be used over the 'exclamation' syntax that other projects using
 Note the newline separating the body from the footer, as well as between the JIRA ticket & 'BREAKING CHANGE:' notice:
 ```
 <BODY>
+
+fixes: #123
 
 STENCIL-13: Watchers Not Firing as Expected when using the Custom Elements Build
 
@@ -211,6 +215,8 @@ Wait for the CustomElementRegistry to mark the component as ready
 before setting `isWatchReady`. Otherwise, watchers may fire prematurely
 if `customElements.get()` or `customElements.whenDefined()` resolve
 _before_ Stencil has completed instantiating a component
+
+fixes: #123
 
 STENCIL-13: Watchers Not Firing as Expected when using the Custom Elements Build
 
