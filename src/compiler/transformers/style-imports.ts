@@ -4,6 +4,35 @@ import type * as d from '../../declarations';
 import { serializeImportPath } from './stencil-import-path';
 import { getIdentifierFromResourceUrl, retrieveTsModifiers } from './transform-utils';
 
+/**
+ * This function adds imports (either in ESM or CJS syntax) for styles that are
+ * imported from the component's styleUrls option. For example, if a component
+ * has the following:
+ *
+  * ```ts
+ * @Component({
+ *  styleUrls: ['my-component.css', 'my-component.ios.css']
+ * })
+ * export class MyComponent {
+ *   // ...
+ * }
+ * ```
+ *
+ * then this function will add the following import statement:
+ *
+ * ```ts
+ * import _myComponentCssStyle from './my-component.css';
+ * import _myComponentIosCssStyle from './my-component.ios.css';
+ * ```
+ *
+ * Note that import identifier are used in [`addStaticStyleGetterWithinClass`](src/compiler/transformers/add-static-style.ts)
+ * to attach them to a components static style property.
+ *
+ * @param transformOpts transform options configured for the current output target transpilation
+ * @param tsSourceFile the TypeScript source file that is being updated
+ * @param moduleFile component file to update
+ * @returns an updated source file with the added import statements
+ */
 export const updateStyleImports = (
   transformOpts: d.TransformOptions,
   tsSourceFile: ts.SourceFile,
@@ -17,6 +46,14 @@ export const updateStyleImports = (
   return updateEsmStyleImports(transformOpts, tsSourceFile, moduleFile);
 };
 
+/**
+ * Iterate over all components defined in given module, collect import
+ * statements to be added and update source file with them.
+ * @param transformOpts transform options configured for the current output target transpilation
+ * @param tsSourceFile the TypeScript source file that is being updated
+ * @param moduleFile component file to update
+ * @returns update source file with added import statements
+ */
 const updateEsmStyleImports = (
   transformOpts: d.TransformOptions,
   tsSourceFile: ts.SourceFile,
@@ -91,10 +128,14 @@ const createEsmStyleImport = (
 ) => {
   const imports: ts.ImportDeclaration[] = [];
   for (const externalStyle of style.externalStyles) {
-    // add import statement for each style
-    // e.g. `import _ImportPathStyle from './import-path.css';`
-    const importName = getIdentifierFromResourceUrl(externalStyle.absolutePath);
-    const importIdentifier = ts.factory.createIdentifier(importName);
+    /**
+     * Add import statement for each style
+     * e.g. `const _ImportPathStyle = require('./import-path.css');`
+     *
+     * Attention: if you make changes to the import identifier (e.g. `_ImportPathStyle`),
+     * you also need to update the identifier in [`createStyleIdentifierFromUrl`](`src/compiler/transformers/add-static-style.ts`).
+     */
+    const importIdentifier = ts.factory.createIdentifier(getIdentifierFromResourceUrl(externalStyle.absolutePath));
     const importPath = getStyleImportPath(transformOpts, tsSourceFile, cmp, style, externalStyle.absolutePath);
 
     imports.push(
@@ -109,6 +150,15 @@ const createEsmStyleImport = (
   return imports;
 };
 
+
+/**
+ * Iterate over all components defined in given module, collect require
+ * statements to be added and update source file with them.
+ * @param transformOpts transform options configured for the current output target transpilation
+ * @param tsSourceFile the TypeScript source file that is being updated
+ * @param moduleFile component file to update
+ * @returns update source file with added import statements
+ */
 const updateCjsStyleRequires = (
   transformOpts: d.TransformOptions,
   tsSourceFile: ts.SourceFile,
@@ -140,10 +190,14 @@ const createCjsStyleRequire = (
 ) => {
   const imports: ts.VariableStatement[] = [];
   for (const externalStyle of style.externalStyles) {
-    // add import statement for each style
-    // e.g. `import _ImportPathStyle from './import-path.css';`
-    const importName = getIdentifierFromResourceUrl(externalStyle.absolutePath);
-    const importIdentifier = ts.factory.createIdentifier(importName);
+    /**
+     * Add import statement for each style
+     * e.g. `import _ImportPathStyle from './import-path.css';`
+     *
+     * Attention: if you make changes to the import identifier (e.g. `_ImportPathStyle`),
+     * you also need to update the identifier in [`createStyleIdentifierFromUrl`](`src/compiler/transformers/add-static-style.ts`).
+     */
+    const importIdentifier = ts.factory.createIdentifier(getIdentifierFromResourceUrl(externalStyle.absolutePath));
     const importPath = getStyleImportPath(transformOpts, tsSourceFile, cmp, style, externalStyle.absolutePath);
 
     imports.push(
