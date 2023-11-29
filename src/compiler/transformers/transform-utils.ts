@@ -1,7 +1,6 @@
 import {
   augmentDiagnosticWithNode,
   buildError,
-  dashToPascalCase,
   normalizePath,
   readOnlyArrayHasStringMember,
 } from '@utils';
