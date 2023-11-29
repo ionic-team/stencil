@@ -733,7 +733,10 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
 
         if (results.changedContent) {
           await ensureDir(filePath, false);
-          await sys.writeFile(filePath, item.fileText);
+          const { error } = await sys.writeFile(filePath, item.fileText);
+          if (error) {
+            throw error;
+          }
         }
       }
     } else {
