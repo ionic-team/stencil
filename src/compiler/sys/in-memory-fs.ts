@@ -827,6 +827,15 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
    * only change the in-memory cache
    */
   const ensureDir = async (path: string, inMemoryOnly: boolean) => {
+    /**
+     * in case we write to disk immediately, there is no need to split
+     * all directories into separate calls, we can just use the recursive flag
+     */
+    if (!inMemoryOnly) {
+      await sys.createDir(dirname(path), { recursive: true });
+      return;
+    }
+
     const allDirs: string[] = [];
 
     while (true) {

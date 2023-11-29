@@ -37,8 +37,6 @@ const generateTypesOutput = async (
   buildCtx: d.BuildCtx,
   outputTarget: d.OutputTargetDistTypes,
 ): Promise<void> => {
-  await config.sys.createDir(outputTarget.typesDir, { recursive: true })
-
   // get all type declaration files in a project's src/ directory
   const srcDirItems = await compilerCtx.fs.readdir(config.srcDir, { recursive: false });
   const srcDtsFiles = srcDirItems.filter((srcItem) => srcItem.isFile && isDtsFile(srcItem.absPath));
