@@ -66,9 +66,18 @@ export type FsItems = Map<string, FsItem>;
  * Options supported by write methods on the in-memory filesystem.
  */
 export interface FsWriteOptions {
+  /**
+   * only use the in-memory cache and do not write the file to disk
+   */
   inMemoryOnly?: boolean;
   clearFileCache?: boolean;
+  /**
+   * flush the write to disk immediately, skipping the in-memory cache
+   */
   immediateWrite?: boolean;
+  /**
+   * specify that the cache should be used
+   */
   useCache?: boolean;
   /**
    * An optional tag for the current output target for which this file is being
