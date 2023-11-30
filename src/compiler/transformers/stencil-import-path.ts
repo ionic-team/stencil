@@ -15,9 +15,14 @@ import type { ImportData, ParsedImport, SerializeImportData } from '../../declar
  * @param data import data to be serialized
  * @param styleImportData an argument which controls whether the import data
  * will be added to the path (formatted as query params)
+ * @param moduleSystem the module system we compile to
  * @returns a formatted string
  */
-export const serializeImportPath = (data: SerializeImportData, styleImportData: string | undefined | null): string => {
+export const serializeImportPath = (
+  data: SerializeImportData,
+  styleImportData: string | undefined | null,
+  moduleSystem?: 'esm' | 'cjs',
+): string => {
   let p = data.importeePath;
 
   if (isString(p)) {
@@ -28,7 +33,7 @@ export const serializeImportPath = (data: SerializeImportData, styleImportData: 
       p = './' + p;
     }
 
-    if (styleImportData === 'queryparams' || styleImportData === undefined) {
+    if (moduleSystem !== 'cjs' && (styleImportData === 'queryparams' || styleImportData === undefined)) {
       const paramData: ImportData = {};
       if (isString(data.tag)) {
         paramData.tag = data.tag;
