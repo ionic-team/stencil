@@ -593,7 +593,7 @@ async function findWithCssSelector(
       return null;
     }
 
-    elmHandle = shadowHandle;
+    elmHandle = shadowHandle.asElement() as puppeteer.ElementHandle<Element>;
   }
 
   return elmHandle;
@@ -646,7 +646,7 @@ async function findWithText(
   );
 
   if (jsHandle) {
-    return jsHandle;
+    return jsHandle.asElement() as puppeteer.ElementHandle<Element>;
   }
 
   return null;
