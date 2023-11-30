@@ -155,13 +155,38 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
       oldVNode = oldParentVNode && oldParentVNode.$children$ && oldParentVNode.$children$[childIndex];
       if (oldVNode && oldVNode.$tag$ === newVNode.$tag$ && oldParentVNode.$elm$) {
         // we've got an old slot vnode and the wrapper is being replaced
-        // so let's move the old slot content back to it's original location
-        putBackInOriginalLocation(oldParentVNode.$elm$, false);
+        // so let's move the old slot content to the root of the element currently being rendered
+        relocateToHostRoot(oldParentVNode.$elm$);
       }
     }
   }
 
   return elm;
+};
+
+const relocateToHostRoot = (parentElm: Element) => {
+  plt.$flags$ |= PLATFORM_FLAGS.isTmpDisconnected;
+
+  const host = parentElm.closest(hostTagName.toLowerCase());
+  for (const childNode of Array.from(parentElm.childNodes) as d.RenderNode[]) {
+    // Only relocate nodes that were slotted in
+    if (childNode['s-sh'] != null) {
+      host.insertBefore(childNode, null);
+      // Reset so we can correctly move the node around again.
+      childNode['s-sh'] = undefined;
+
+      // When putting an element node back in its original location,
+      // we need to reset the `slot` attribute back to the value it originally had
+      // so we can correctly relocate it again in the future
+      if (childNode.nodeType === NODE_TYPE.ElementNode && !!childNode['s-sn']) {
+        childNode.setAttribute('slot', childNode['s-sn']);
+      }
+
+      checkSlotRelocate = true;
+    }
+  }
+
+  plt.$flags$ &= ~PLATFORM_FLAGS.isTmpDisconnected;
 };
 
 const putBackInOriginalLocation = (parentElm: Node, recursive: boolean) => {
@@ -171,10 +196,6 @@ const putBackInOriginalLocation = (parentElm: Node, recursive: boolean) => {
   for (let i = oldSlotChildNodes.length - 1; i >= 0; i--) {
     const childNode = oldSlotChildNodes[i] as any;
     if (childNode['s-hn'] !== hostTagName && childNode['s-ol']) {
-      // // this child node in the old element is from another component
-      // // remove this node from the old slot's parent
-      // childNode.remove();
-
       // and relocate it back to it's original location
       parentReferenceNode(childNode).insertBefore(childNode, referenceNode(childNode));
 
@@ -1027,11 +1048,6 @@ render() {
             // has a different next sibling or parent relocated
 
             if (nodeToRelocate !== insertBeforeNode) {
-              if (!nodeToRelocate['s-hn'] && nodeToRelocate['s-ol']) {
-                // probably a component in the index.html that doesn't have its hostname set
-                nodeToRelocate['s-hn'] = nodeToRelocate['s-ol'].parentNode.nodeName;
-              }
-
               // Handle a use-case where we relocate a slot where
               // the slot name changes along the way (for instance, a default to a named slot).
               // In this case, we need to update the relocated node's slot attribute to match
