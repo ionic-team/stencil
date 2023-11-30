@@ -12,7 +12,7 @@ describe('validateDistOutputTarget', () => {
 
   let userConfig: d.Config;
   beforeEach(() => {
-    userConfig = mockConfig();
+    userConfig = mockConfig({ fsNamespace: 'testing' });
   });
 
   it('should set dist values', () => {

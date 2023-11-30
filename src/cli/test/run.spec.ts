@@ -156,7 +156,7 @@ describe('run', () => {
       sys = mockCompilerSystem();
       sys.exit = jest.fn();
 
-      unvalidatedConfig = mockConfig({ outputTargets: [], sys });
+      unvalidatedConfig = mockConfig({ outputTargets: [], sys, fsNamespace: 'testing' });
 
       taskBuildSpy = jest.spyOn(BuildTask, 'taskBuild');
       taskBuildSpy.mockResolvedValue();
