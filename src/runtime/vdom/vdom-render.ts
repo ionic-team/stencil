@@ -164,6 +164,15 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
   return elm;
 };
 
+/**
+ * Relocates all child nodes of an element that were a part of a previous slot relocation
+ * to the root of the Stencil component currently being rendered. This happens when a the parent
+ * element of a slot reference node is dynamically changes and triggers a re-render. We cannot use
+ * `putBackInOriginalLocation()` because that may relocate nodes to elements that will not be re-rendered
+ * and so they will not be relocated again.
+ *
+ * @param parentElm The element potentially containing relocated nodes.
+ */
 const relocateToHostRoot = (parentElm: Element) => {
   plt.$flags$ |= PLATFORM_FLAGS.isTmpDisconnected;
 
@@ -182,6 +191,7 @@ const relocateToHostRoot = (parentElm: Element) => {
         childNode.setAttribute('slot', childNode['s-sn']);
       }
 
+      // Need to tell the render pipeline to check to relocate slot content again
       checkSlotRelocate = true;
     }
   }
