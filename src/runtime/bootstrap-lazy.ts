@@ -213,6 +213,8 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
       dataStyles.setAttribute('nonce', nonce);
     }
 
+    // Insert the styles into the document head
+    // NOTE: this _needs_ to happen last so we can ensure the nonce (and other attributes) are applied
     head.insertBefore(dataStyles, metaCharset ? metaCharset.nextSibling : head.firstChild);
   }
 
