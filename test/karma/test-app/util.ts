@@ -87,8 +87,9 @@ function onReady(callback: Function): void {
 /**
  * Helper function that wraps an RAF call in a promise. Used to trigger a new paint for tests that asynchronously
  * update.
+ * @returns a promise that resolves after the next paint
  */
-function waitFrame(): Promise<DOMHighResTimeStamp> {
+export function waitFrame(): Promise<DOMHighResTimeStamp> {
   return new Promise<DOMHighResTimeStamp>((resolve) => {
     requestAnimationFrame(resolve);
   });
