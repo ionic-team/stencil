@@ -30,7 +30,8 @@ export function terserPlugin(opts: BuildOptions): Plugin {
      */
     async load(id: string): Promise<string> | null {
       if (id === 'terser') {
-        return await bundleTerser(opts);
+        const [content] = await bundleTerser(opts);
+        return content;
       }
       return null;
     },
@@ -40,14 +41,16 @@ export function terserPlugin(opts: BuildOptions): Plugin {
 /**
  * Creates a bundle containing Terser
  * @param opts the options being used during a build
- * @returns bundled Terser code
+ * @returns a tuple containing the bundled Terser code and the path where it
+ * was written
  */
-async function bundleTerser(opts: BuildOptions): Promise<string> {
+export async function bundleTerser(opts: BuildOptions): Promise<[content: string, path: string]> {
   const fileName = `terser-${opts.terserVersion.replace(/\./g, '_')}-bundle-cache${opts.isProd ? '.min' : ''}.js`;
   const cacheFile = join(opts.scriptsBuildDir, fileName);
 
   try {
-    return await fs.readFile(cacheFile, 'utf8');
+    const content = await fs.readFile(cacheFile, 'utf8');
+    return [content, cacheFile];
   } catch (e) {}
 
   const rollupBuild = await rollup({
@@ -84,5 +87,5 @@ async function bundleTerser(opts: BuildOptions): Promise<string> {
 
   await fs.writeFile(cacheFile, code);
 
-  return code;
+  return [code, cacheFile];
 }

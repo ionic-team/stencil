@@ -77,9 +77,9 @@ export function getEsbuildExternalModules(opts: BuildOptions, ownEntryPoint: str
 /**
  * A helper which runs an array of esbuild, uh, _builds_
  *
- * This accepts an array of build configurations and will either run a synchronous
- * build _or_ run them all in watch mode, depending on the {@link BuildOptions['isWatch']}
- * setting.
+ * This accepts an array of build configurations and will either run a
+ * synchronous build _or_ run them all in watch mode, depending on the
+ * {@link BuildOptions['isWatch']} setting.
  *
  * @param builds the array of outputs to build
  * @param opts Stencil build options

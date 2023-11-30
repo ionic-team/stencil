@@ -1023,7 +1023,7 @@ export interface CompilerSystem {
    */
   isTTY(): boolean;
   /**
-   * Each platform as a different way to dynamically import modules.
+   * Each platform has a different way to dynamically import modules.
    */
   dynamicImport?(p: string): Promise<any>;
   /**

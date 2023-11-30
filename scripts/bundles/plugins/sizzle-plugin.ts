@@ -32,10 +32,7 @@ export function sizzlePlugin(opts: BuildOptions): Plugin {
       if (id !== 'sizzle') {
         return null;
       }
-      const f = opts.isProd ? 'sizzle.min.js' : 'sizzle.js';
-      const sizzlePath = join(opts.nodeModulesDir, 'sizzle', 'dist', f);
-      const sizzleContent = await fs.readFile(sizzlePath, 'utf8');
-      return getSizzleBundle(opts, sizzleContent);
+      return getSizzleBundle(opts);
     },
   };
 }
@@ -43,10 +40,13 @@ export function sizzlePlugin(opts: BuildOptions): Plugin {
 /**
  * Creates a sizzle bundle to inline
  * @param opts the options being used during a build of the Stencil compiler
- * @param content the sizzle source contents
  * @returns a modified version of sizzle, wrapped in an immediately invoked function expression (IIFE)
  */
-function getSizzleBundle(opts: BuildOptions, content: string): string {
+async function getSizzleBundle(opts: BuildOptions): Promise<string> {
+  const f = opts.isProd ? 'sizzle.min.js' : 'sizzle.js';
+  const sizzlePath = join(opts.nodeModulesDir, 'sizzle', 'dist', f);
+  const sizzleContent = await fs.readFile(sizzlePath, 'utf8');
+
   return `// Sizzle ${opts.sizzleVersion}
 export default (function() {
 const window = {
@@ -63,9 +63,24 @@ const window = {
 };
 const module = { exports: {} };
 
-${content}
+${sizzleContent}
 
 return module.exports;
 })();
 `;
+}
+
+/**
+ * Write a file to disk with our patched version of sizzle so that tools like
+ * esbuild can access it
+ *
+ * @param opts Stencil build options
+ * @returns a promise wrapping the filename
+ */
+export async function writeSizzleBundle(opts: BuildOptions): Promise<string> {
+  const patchedSizzle = await getSizzleBundle(opts);
+  const fileName = `sizzle-bundle-cache${opts.isProd ? '.min' : ''}.js`;
+  const cacheFile = join(opts.scriptsBuildDir, fileName);
+  fs.writeFileSync(cacheFile, patchedSizzle);
+  return cacheFile;
 }

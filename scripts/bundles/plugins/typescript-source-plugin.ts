@@ -46,11 +46,8 @@ export function typescriptSourcePlugin(opts: BuildOptions): Plugin {
  * @param opts the options being used during a build of the Stencil compiler
  * @returns the modified TypeScript source
  */
-async function bundleTypeScriptSource(tsPath: string, opts: BuildOptions): Promise<string> {
-  const fileName = `typescript-${opts.typescriptVersion.replace(/\./g, '_')}-bundle-cache${
-    opts.isProd ? '.min' : ''
-  }.js`;
-  const cacheFile = join(opts.scriptsBuildDir, fileName);
+export async function bundleTypeScriptSource(tsPath: string, opts: BuildOptions): Promise<string> {
+  const cacheFile = tsCacheFilePath(opts);
 
   try {
     // check if we've already cached this bundle
@@ -154,4 +151,19 @@ async function bundleTypeScriptSource(tsPath: string, opts: BuildOptions): Promi
   await fs.writeFile(cacheFile, code);
 
   return code;
+}
+
+/**
+ * Get the file path to which the cached, modified version of TypeScript will
+ * be written
+ *
+ * @param opts build options for the current Stencil build
+ * @returns the path where the modified TypeScript source can be found
+ */
+export function tsCacheFilePath(opts: BuildOptions): string {
+  const fileName = `typescript-${opts.typescriptVersion.replace(/\./g, '_')}-bundle-cache${
+    opts.isProd ? '.min' : ''
+  }.js`;
+  const cacheFile = join(opts.scriptsBuildDir, fileName);
+  return cacheFile;
 }

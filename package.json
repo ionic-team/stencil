@@ -89,6 +89,7 @@
     "cspell": "^8.0.0",
     "dts-bundle-generator": "~8.1.0",
     "esbuild": "^0.19.4",
+    "esbuild-plugin-replace": "^1.4.0",
     "eslint": "^8.23.1",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-jest": "^27.0.4",

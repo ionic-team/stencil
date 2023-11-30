@@ -94,7 +94,12 @@ export function getOptions(rootDir: string, inputOpts: BuildOptions = {}): Build
 }
 
 /**
- * Generates an object containing versioning information of various packages installed at build time
+ * Generates an object containing versioning information of various packages
+ * installed at build time
+ *
+ * **NOTE** this will mutate the `opts` parameter, adding information about
+ * the versions used for various dependencies
+ *
  * @param opts the options being used during a build
  * @returns an object that contains package names/versions installed at the time a build was invoked
  */
