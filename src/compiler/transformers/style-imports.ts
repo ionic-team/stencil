@@ -136,7 +136,10 @@ const createStyleImport = <ModuleType extends 'esm' | 'cjs'>(
   tsSourceFile: ts.SourceFile,
   cmp: d.ComponentCompilerMeta,
   style: d.StyleCompiler,
-  moduleType: ModuleType,
+  /**
+   * default to 'esm' if not provided, behavior defined in `updateStyleImports`
+   */
+  moduleType: ModuleType = 'esm' as ModuleType,
 ) => {
   type ImportDeclarationOrVariableStatementType = ModuleType extends 'esm'
     ? ts.ImportDeclaration

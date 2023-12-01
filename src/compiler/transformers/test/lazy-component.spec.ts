@@ -220,7 +220,6 @@ describe('lazy-component', () => {
       proxy: null,
       style: 'static',
       styleImportData: null,
-      module: 'esm',
     };
     const code = `
       @Component({
