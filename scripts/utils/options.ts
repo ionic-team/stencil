@@ -127,8 +127,8 @@ export function createReplaceData(opts: BuildOptions): Record<string, any> {
   const parse5Pkg = getPkg(opts, 'parse5');
   opts.parse5Version = parse5Pkg.version;
 
-  const sizzlePkg = getPkg(opts, 'sizzle');
-  opts.sizzleVersion = sizzlePkg.version;
+  const jqueryPkg = getPkg(opts, 'jquery');
+  opts.jqueryVersion = jqueryPkg.version;
 
   return {
     __BUILDID__: opts.buildId,
@@ -140,7 +140,7 @@ export function createReplaceData(opts: BuildOptions): Record<string, any> {
     '__VERSION:STENCIL__': opts.version,
     '__VERSION:PARSE5__': parse5Pkg.version,
     '__VERSION:ROLLUP__': rollupPkg.version,
-    '__VERSION:SIZZLE__': rollupPkg.version,
+    '__VERSION:JQUERY__': jqueryPkg.version,
     '__VERSION:TERSER__': terserPkg.version,
     '__VERSION:TYPESCRIPT__': typescriptPkg.version,
 
@@ -195,7 +195,7 @@ export interface BuildOptions {
   packageLockJsonPath?: string;
   parse5Version?: string;
   rollupVersion?: string;
-  sizzleVersion?: string;
+  jqueryVersion?: string;
   tag?: string;
   terserVersion?: string;
   typescriptVersion?: string;
