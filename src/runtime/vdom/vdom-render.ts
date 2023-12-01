@@ -154,9 +154,15 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
       // check if we've got an old vnode for this slot
       oldVNode = oldParentVNode && oldParentVNode.$children$ && oldParentVNode.$children$[childIndex];
       if (oldVNode && oldVNode.$tag$ === newVNode.$tag$ && oldParentVNode.$elm$) {
-        // we've got an old slot vnode and the wrapper is being replaced
-        // so let's move the old slot content to the root of the element currently being rendered
-        relocateToHostRoot(oldParentVNode.$elm$);
+        if (BUILD.experimentalSlotFixes) {
+          // we've got an old slot vnode and the wrapper is being replaced
+          // so let's move the old slot content to the root of the element currently being rendered
+          relocateToHostRoot(oldParentVNode.$elm$);
+        } else {
+          // we've got an old slot vnode and the wrapper is being replaced
+          // so let's move the old slot content back to its original location
+          putBackInOriginalLocation(oldParentVNode.$elm$, false);
+        }
       }
     }
   }
@@ -1058,6 +1064,11 @@ render() {
             // has a different next sibling or parent relocated
 
             if (nodeToRelocate !== insertBeforeNode) {
+              if (!BUILD.experimentalSlotFixes && !nodeToRelocate['s-hn'] && nodeToRelocate['s-ol']) {
+                // probably a component in the index.html that doesn't have its hostname set
+                nodeToRelocate['s-hn'] = nodeToRelocate['s-ol'].parentNode.nodeName;
+              }
+
               // Handle a use-case where we relocate a slot where
               // the slot name changes along the way (for instance, a default to a named slot).
               // In this case, we need to update the relocated node's slot attribute to match
