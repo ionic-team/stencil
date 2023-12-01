@@ -44,7 +44,8 @@ const addMultipleModeStyleGetter = (
       // import generated from @Component() styleUrls option
       // import myTagIosStyle from './import-path.css';
       // static get style() { return { "ios": myTagIosStyle }; }
-      const styleUrlIdentifier = createStyleIdentifierFromUrl(style.externalStyles);
+      const externalStyles = Array.from(new Set(style.externalStyles.map((s) => s.absolutePath)));
+      const styleUrlIdentifier = createStyleIdentifierFromUrl(style.styleId, externalStyles);
       const propUrlIdentifier = ts.factory.createPropertyAssignment(style.modeName, styleUrlIdentifier);
       styleModes.push(propUrlIdentifier);
     }
@@ -75,7 +76,8 @@ const addSingleStyleGetter = (
     // import generated from @Component() styleUrls option
     // import myTagStyle from './import-path.css';
     // static get style() { return myTagStyle; }
-    const styleUrlIdentifier = createStyleIdentifierFromUrl(style.externalStyles);
+    const externalStyles = Array.from(new Set(style.externalStyles.map((s) => s.absolutePath)));
+    const styleUrlIdentifier = createStyleIdentifierFromUrl(style.styleId, externalStyles);
     classMembers.push(createStaticGetter('style', styleUrlIdentifier));
   }
 };

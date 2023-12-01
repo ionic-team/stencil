@@ -70,7 +70,7 @@ const updateEsmStyleImports = (
         statements = updateEsmStyleImportPath(transformOpts, tsSourceFile, statements, cmp, style);
       } else if (style.externalStyles.length > 0) {
         // add style imports built from @Component() styleUrl option
-        styleImports.push(...createEsmStyleImport(transformOpts, tsSourceFile, cmp, style));
+        styleImports.push(...createStyleImport(transformOpts, tsSourceFile, cmp, style, transformOpts.module as 'esm'));
       }
     });
   });
@@ -120,31 +120,108 @@ const updateEsmStyleImportPath = (
   return statements;
 };
 
-const createEsmStyleImport = (
+/**
+ * Add import or require statement for each style
+ * e.g. `import CMP__import_path_css from './import-path.css';`
+ *
+ * @param transformOpts transform options configured for the current output target transpilation
+ * @param tsSourceFile the TypeScript source file that is being updated
+ * @param cmp component meta data
+ * @param style style meta data
+ * @param moduleType module type (either 'esm' or 'cjs')
+ * @returns an set or import or require statements to add to the source file
+ */
+const createStyleImport = <ModuleType extends 'esm' | 'cjs'>(
   transformOpts: d.TransformOptions,
   tsSourceFile: ts.SourceFile,
   cmp: d.ComponentCompilerMeta,
   style: d.StyleCompiler,
+  /**
+   * default to 'esm' if not provided, behavior defined in `updateStyleImports`
+   */
+  moduleType: ModuleType = 'esm' as ModuleType,
 ) => {
-  const imports: ts.ImportDeclaration[] = [];
+  type ImportDeclarationOrVariableStatementType = ModuleType extends 'esm'
+    ? ts.ImportDeclaration
+    : ts.VariableStatement;
+  const imports: ImportDeclarationOrVariableStatementType[] = [];
+  const importedStyleIdentifiers: string[] = [];
+
   for (const externalStyle of style.externalStyles) {
     /**
-     * Add import statement for each style
-     * e.g. `const _ImportPathStyle = require('./import-path.css');`
+     * Concat styleId and absolutePath to get a unique identifier for each style.
      *
-     * Attention: if you make changes to the import identifier (e.g. `_ImportPathStyle`),
-     * you also need to update the identifier in [`createStyleIdentifierFromUrl`](`src/compiler/transformers/add-static-style.ts`).
+     * For example:
+     * ```ts
+     * @Component({
+     *   styleUrls: {
+     *     md: './foo/bar.css',
+     *     ios: './bar/foo.css'
+     *   },
+     *   tag: 'cmp-a'
+     * })
+     * ```
+     *
+     * it would create the following identifiers:
+     * ```ts
+     * import CMP_A_md__foo_bar_css from './foo/bar.css';
+     * import CMP_A_ios__bar_foo_css from './bar/foo.css';
+     * ```
+     *
+     * Attention: if you make changes to how this identifier is created you also need
+     * to update this in [`createStyleIdentifierFromUrl`](`src/compiler/transformers/add-static-style.ts`).
      */
-    const importIdentifier = ts.factory.createIdentifier(getIdentifierFromResourceUrl(externalStyle.absolutePath));
+    const styleIdentifier = getIdentifierFromResourceUrl(style.styleId + externalStyle.absolutePath);
+
+    /**
+     * avoid to have duplicate style imports, e.g. if we have the following component:
+     * ```ts
+     * @Component({
+     *   styleUrls: ['./foo/bar.css', './foo/bar.css'],
+     *   tag: 'cmp-a'
+     * })
+     * ```
+     */
+    if (importedStyleIdentifiers.includes(styleIdentifier)) {
+      continue;
+    }
+
+    importedStyleIdentifiers.push(styleIdentifier);
+    const importIdentifier = ts.factory.createIdentifier(styleIdentifier);
     const importPath = getStyleImportPath(transformOpts, tsSourceFile, cmp, style, externalStyle.absolutePath);
 
-    imports.push(
-      ts.factory.createImportDeclaration(
-        undefined,
-        ts.factory.createImportClause(false, importIdentifier, undefined),
-        ts.factory.createStringLiteral(importPath),
-      ),
-    );
+    if (moduleType === 'esm') {
+      imports.push(
+        ts.factory.createImportDeclaration(
+          undefined,
+          ts.factory.createImportClause(false, importIdentifier, undefined),
+          ts.factory.createStringLiteral(importPath),
+        ) as ImportDeclarationOrVariableStatementType,
+      );
+    } else if (moduleType === 'cjs') {
+      imports.push(
+        ts.factory.createVariableStatement(
+          undefined,
+          ts.factory.createVariableDeclarationList(
+            [
+              ts.factory.createVariableDeclaration(
+                importIdentifier,
+                undefined,
+                undefined,
+                ts.factory.createCallExpression(
+                  ts.factory.createIdentifier('require'),
+                  [],
+                  [ts.factory.createStringLiteral(importPath)],
+                ),
+              ),
+            ],
+            ts.NodeFlags.Const,
+          ),
+        ) as ImportDeclarationOrVariableStatementType,
+      );
+    } else {
+      throw new Error(`Invalid module type: ${moduleType}`);
+    }
   }
 
   return imports;
@@ -169,7 +246,7 @@ const updateCjsStyleRequires = (
     cmp.styles.forEach((style) => {
       if (style.externalStyles.length > 0) {
         // add style imports built from @Component() styleUrl option
-        styleRequires.push(...createCjsStyleRequire(transformOpts, tsSourceFile, cmp, style));
+        styleRequires.push(...createStyleImport(transformOpts, tsSourceFile, cmp, style, transformOpts.module));
       }
     });
   });
@@ -179,49 +256,6 @@ const updateCjsStyleRequires = (
   }
 
   return tsSourceFile;
-};
-
-const createCjsStyleRequire = (
-  transformOpts: d.TransformOptions,
-  tsSourceFile: ts.SourceFile,
-  cmp: d.ComponentCompilerMeta,
-  style: d.StyleCompiler,
-) => {
-  const imports: ts.VariableStatement[] = [];
-  for (const externalStyle of style.externalStyles) {
-    /**
-     * Add import statement for each style
-     * e.g. `import _ImportPathStyle from './import-path.css';`
-     *
-     * Attention: if you make changes to the import identifier (e.g. `_ImportPathStyle`),
-     * you also need to update the identifier in [`createStyleIdentifierFromUrl`](`src/compiler/transformers/add-static-style.ts`).
-     */
-    const importIdentifier = ts.factory.createIdentifier(getIdentifierFromResourceUrl(externalStyle.absolutePath));
-    const importPath = getStyleImportPath(transformOpts, tsSourceFile, cmp, style, externalStyle.absolutePath);
-
-    imports.push(
-      ts.factory.createVariableStatement(
-        undefined,
-        ts.factory.createVariableDeclarationList(
-          [
-            ts.factory.createVariableDeclaration(
-              importIdentifier,
-              undefined,
-              undefined,
-              ts.factory.createCallExpression(
-                ts.factory.createIdentifier('require'),
-                [],
-                [ts.factory.createStringLiteral(importPath)],
-              ),
-            ),
-          ],
-          ts.NodeFlags.Const,
-        ),
-      ),
-    );
-  }
-
-  return imports;
 };
 
 const getStyleImportPath = (
