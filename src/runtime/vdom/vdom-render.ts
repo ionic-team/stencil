@@ -183,22 +183,24 @@ const relocateToHostRoot = (parentElm: Element) => {
   plt.$flags$ |= PLATFORM_FLAGS.isTmpDisconnected;
 
   const host = parentElm.closest(hostTagName.toLowerCase());
-  for (const childNode of Array.from(parentElm.childNodes) as d.RenderNode[]) {
-    // Only relocate nodes that were slotted in
-    if (childNode['s-sh'] != null) {
-      host.insertBefore(childNode, null);
-      // Reset so we can correctly move the node around again.
-      childNode['s-sh'] = undefined;
+  if (host != null) {
+    for (const childNode of Array.from(parentElm.childNodes) as d.RenderNode[]) {
+      // Only relocate nodes that were slotted in
+      if (childNode['s-sh'] != null) {
+        host.insertBefore(childNode, null);
+        // Reset so we can correctly move the node around again.
+        childNode['s-sh'] = undefined;
 
-      // When putting an element node back in its original location,
-      // we need to reset the `slot` attribute back to the value it originally had
-      // so we can correctly relocate it again in the future
-      if (childNode.nodeType === NODE_TYPE.ElementNode && !!childNode['s-sn']) {
-        childNode.setAttribute('slot', childNode['s-sn']);
+        // When putting an element node back in its original location,
+        // we need to reset the `slot` attribute back to the value it originally had
+        // so we can correctly relocate it again in the future
+        if (childNode.nodeType === NODE_TYPE.ElementNode && !!childNode['s-sn']) {
+          childNode.setAttribute('slot', childNode['s-sn']);
+        }
+
+        // Need to tell the render pipeline to check to relocate slot content again
+        checkSlotRelocate = true;
       }
-
-      // Need to tell the render pipeline to check to relocate slot content again
-      checkSlotRelocate = true;
     }
   }
 
