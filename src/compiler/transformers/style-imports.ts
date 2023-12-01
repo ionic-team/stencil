@@ -168,7 +168,7 @@ const createStyleImport = <ModuleType extends 'esm' | 'cjs'>(
      * Attention: if you make changes to how this identifier is created you also need
      * to update this in [`createStyleIdentifierFromUrl`](`src/compiler/transformers/add-static-style.ts`).
      */
-    const styleIdentifier = getIdentifierFromResourceUrl(style.styleId + externalStyle.absolutePath)
+    const styleIdentifier = getIdentifierFromResourceUrl(style.styleId + externalStyle.absolutePath);
 
     /**
      * avoid to have duplicate style imports, e.g. if we have the following component:
