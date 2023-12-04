@@ -1,3 +1,17 @@
+## 🍹 [4.8.1](https://github.com/ionic-team/stencil/compare/v4.8.0...v4.8.1) (2023-12-04)
+
+
+### Bug Fixes
+
+* **compiler:** ensure not to import duplicate style identifier ([#5119](https://github.com/ionic-team/stencil/issues/5119)) ([7591dce](https://github.com/ionic-team/stencil/commit/7591dce85e3b19ab623752341344d009881032be))
+* **compiler:** revert changes to style import transformer ([#5125](https://github.com/ionic-team/stencil/issues/5125)) ([cf4a701](https://github.com/ionic-team/stencil/commit/cf4a70150c91e9dcc6690396a7e1b3a0a1e92215))
+* **compiler:** support multiple styleUrls in components ([#5090](https://github.com/ionic-team/stencil/issues/5090)) ([54e52da](https://github.com/ionic-team/stencil/commit/54e52da952faa59026c00cf603a027dae5fe82ee))
+* **runtime:** apply nonce to data styles before DOM insert ([#5112](https://github.com/ionic-team/stencil/issues/5112)) ([df46fdc](https://github.com/ionic-team/stencil/commit/df46fdc0cb9168171546e335a5628b25909fdd89)), closes [#5102](https://github.com/ionic-team/stencil/issues/5102)
+* **runtime:** call form-associated lifecycle callbacks w/ `this` ([#5104](https://github.com/ionic-team/stencil/issues/5104)) ([1ac8aa3](https://github.com/ionic-team/stencil/commit/1ac8aa3da139656c82914fda7eb9e8de62cba56d))
+* **testing:** re-add Puppeteer `asElement()` calls ([#5114](https://github.com/ionic-team/stencil/issues/5114)) ([0c843f8](https://github.com/ionic-team/stencil/commit/0c843f8d19e6ee04c02ae8699c76c33d5ebb1c70)), closes [#5113](https://github.com/ionic-team/stencil/issues/5113)
+
+
+
 # 🌞 [4.8.0](https://github.com/ionic-team/stencil/compare/v4.7.2...v4.8.0) (2023-11-27)
 
 
