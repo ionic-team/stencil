@@ -172,8 +172,8 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
 
 /**
  * Relocates all child nodes of an element that were a part of a previous slot relocation
- * to the root of the Stencil component currently being rendered. This happens when a the parent
- * element of a slot reference node is dynamically changes and triggers a re-render. We cannot use
+ * to the root of the Stencil component currently being rendered. This happens when a parent
+ * element of a slot reference node dynamically changes and triggers a re-render. We cannot use
  * `putBackInOriginalLocation()` because that may relocate nodes to elements that will not be re-rendered
  * and so they will not be relocated again.
  *
