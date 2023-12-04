@@ -622,7 +622,7 @@ export function createNodeSys(c: { process?: any; logger?: Logger } = {}): Compi
       try {
         fs.writeFileSync(p, content);
       } catch (e) {
-        results.error = e as Error;
+        results.error = e;
       }
       return results;
     },

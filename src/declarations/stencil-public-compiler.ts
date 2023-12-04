@@ -1562,7 +1562,7 @@ export interface CompilerSystemRemoveFileResults {
 
 export interface CompilerSystemWriteFileResults {
   path: string;
-  error: Error;
+  error: any;
 }
 
 export interface Credentials {
