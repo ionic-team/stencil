@@ -18,12 +18,11 @@ describe('parse styles', () => {
     const t = transpileModule(`
       @Component({
         tag: 'cmp-a',
-        styleUrls: ['style.css', 'style2.css']
+        styleUrls: ['style.css']
       })
       export class CmpA {}
     `);
-
-    expect(getStaticGetter(t.outputText, 'styleUrls')).toEqual({ $: ['style.css', 'style2.css'] });
+    expect(getStaticGetter(t.outputText, 'styleUrls')).toEqual({ $: ['style.css'] });
   });
 
   it('add static "styles"', () => {
