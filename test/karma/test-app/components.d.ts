@@ -213,6 +213,8 @@ export namespace Components {
     }
     interface ListenWindow {
     }
+    interface MultipleStylesCmp {
+    }
     interface NoDelegatesFocus {
     }
     interface NodeResolution {
@@ -970,6 +972,12 @@ declare global {
         prototype: HTMLListenWindowElement;
         new (): HTMLListenWindowElement;
     };
+    interface HTMLMultipleStylesCmpElement extends Components.MultipleStylesCmp, HTMLStencilElement {
+    }
+    var HTMLMultipleStylesCmpElement: {
+        prototype: HTMLMultipleStylesCmpElement;
+        new (): HTMLMultipleStylesCmpElement;
+    };
     interface HTMLNoDelegatesFocusElement extends Components.NoDelegatesFocus, HTMLStencilElement {
     }
     var HTMLNoDelegatesFocusElement: {
@@ -1482,6 +1490,7 @@ declare global {
         "listen-jsx-root": HTMLListenJsxRootElement;
         "listen-reattach": HTMLListenReattachElement;
         "listen-window": HTMLListenWindowElement;
+        "multiple-styles-cmp": HTMLMultipleStylesCmpElement;
         "no-delegates-focus": HTMLNoDelegatesFocusElement;
         "node-resolution": HTMLNodeResolutionElement;
         "non-shadow-host": HTMLNonShadowHostElement;
@@ -1766,6 +1775,8 @@ declare namespace LocalJSX {
     }
     interface ListenWindow {
     }
+    interface MultipleStylesCmp {
+    }
     interface NoDelegatesFocus {
     }
     interface NodeResolution {
@@ -2018,6 +2029,7 @@ declare namespace LocalJSX {
         "listen-jsx-root": ListenJsxRoot;
         "listen-reattach": ListenReattach;
         "listen-window": ListenWindow;
+        "multiple-styles-cmp": MultipleStylesCmp;
         "no-delegates-focus": NoDelegatesFocus;
         "node-resolution": NodeResolution;
         "non-shadow-host": NonShadowHost;
@@ -2175,6 +2187,7 @@ declare module "@stencil/core" {
             "listen-jsx-root": LocalJSX.ListenJsxRoot & JSXBase.HTMLAttributes<HTMLListenJsxRootElement>;
             "listen-reattach": LocalJSX.ListenReattach & JSXBase.HTMLAttributes<HTMLListenReattachElement>;
             "listen-window": LocalJSX.ListenWindow & JSXBase.HTMLAttributes<HTMLListenWindowElement>;
+            "multiple-styles-cmp": LocalJSX.MultipleStylesCmp & JSXBase.HTMLAttributes<HTMLMultipleStylesCmpElement>;
             "no-delegates-focus": LocalJSX.NoDelegatesFocus & JSXBase.HTMLAttributes<HTMLNoDelegatesFocusElement>;
             "node-resolution": LocalJSX.NodeResolution & JSXBase.HTMLAttributes<HTMLNodeResolutionElement>;
             "non-shadow-host": LocalJSX.NonShadowHost & JSXBase.HTMLAttributes<HTMLNonShadowHostElement>;

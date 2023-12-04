@@ -1097,3 +1097,35 @@ export const tsPropDeclNameAsString = (node: ts.PropertyDeclaration, typeChecker
 
   return memberName;
 };
+
+/**
+ * Reverse order and reduce to remove duplicates. This will make sure that duplicate
+ * styles applied to the same component will be applied in the order they are
+ * defined in the component, e.g.
+ * ```
+ * @Component({
+ *  styleUrls: ['cmp-a.css', 'cmp-b.css', 'cmp-a.css']
+ * })
+ * ```
+ * will be applied in the order `cmp-b.css`, `cmp-a.css`.
+ *
+ * @param style style meta data
+ * @returns a list of external styles sorted in order
+ */
+export function getExternalStyles(style: d.StyleCompiler) {
+  return (
+    style.externalStyles
+      .map((s) => s.absolutePath)
+      .reverse()
+      .reduce((extStyles, styleUrl) => {
+        if (!extStyles.includes(styleUrl)) {
+          extStyles.push(styleUrl);
+        }
+        return extStyles;
+      }, [] as string[])
+      /**
+       * Reverse back to the original order
+       */
+      .reverse()
+  );
+}

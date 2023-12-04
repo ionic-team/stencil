@@ -108,4 +108,102 @@ describe('lazy-component', () => {
       }`,
     );
   });
+
+  describe('styling', () => {
+    function verifyStylingUsingComponent(inputComponent: string, expectedOutput: string) {
+      return async () => {
+        const compilerCtx = mockCompilerCtx();
+        const transformOpts: d.TransformOptions = {
+          coreImportPath: '@stencil/core',
+          componentExport: 'lazy',
+          componentMetadata: null,
+          currentDirectory: '/',
+          proxy: null,
+          style: 'static',
+          styleImportData: null,
+        };
+
+        const transformer = lazyComponentTransform(compilerCtx, transformOpts);
+        const t = transpileModule(inputComponent, null, compilerCtx, [], [transformer]);
+        expect(await formatCode(t.outputText)).toBe(await formatCode(expectedOutput));
+      };
+    }
+
+    // eslint-disable-next-line jest/expect-expect
+    it(
+      'using `styleUrl` parameter',
+      verifyStylingUsingComponent(
+        `
+        @Component({
+          tag: 'cmp-a',
+          styleUrl: 'cmp-a.css'
+        })
+        export class CmpA {}
+      `,
+        `
+        import { registerInstance as __stencil_registerInstance } from "@stencil/core";
+        import CmpAStyle0 from './cmp-a.css';
+        export const CmpA = class {
+          constructor (hostRef) {
+            __stencil_registerInstance(this, hostRef);
+          }
+        };
+        CmpA.style = CmpAStyle0;
+      `,
+      ),
+    );
+
+    // eslint-disable-next-line jest/expect-expect
+    it(
+      'using `styleUrls` parameter as object',
+      verifyStylingUsingComponent(
+        `
+        @Component({
+          tag: 'cmp-a',
+          styleUrls: {
+            foo: 'cmp-a.foo.css',
+            bar: 'cmp-a.bar.css',
+          }
+        })
+        export class CmpA {}
+      `,
+        `
+        import { registerInstance as __stencil_registerInstance } from "@stencil/core";
+        import CmpABarStyle0 from './cmp-a.bar.css';
+        import CmpAFooStyle0 from './cmp-a.foo.css';
+        export const CmpA = class {
+          constructor (hostRef) {
+            __stencil_registerInstance(this, hostRef);
+          }
+        };
+        CmpA.style = { bar: CmpABarStyle0, foo: CmpAFooStyle0 };
+      `,
+      ),
+    );
+
+    // eslint-disable-next-line jest/expect-expect
+    it(
+      'using `styleUrls` parameter as array',
+      verifyStylingUsingComponent(
+        `
+        @Component({
+          tag: 'cmp-a',
+          styleUrls: ['cmp-a.foo.css', 'cmp-a.bar.css', 'cmp-a.foo.css'],
+        })
+        export class CmpA {}
+      `,
+        `
+        import { registerInstance as __stencil_registerInstance } from "@stencil/core";
+        import CmpAStyle0 from './cmp-a.bar.css';
+        import CmpAStyle1 from './cmp-a.foo.css';
+        export const CmpA = class {
+          constructor (hostRef) {
+            __stencil_registerInstance(this, hostRef);
+          }
+        };
+        CmpA.style = CmpAStyle0 + CmpAStyle1;
+      `,
+      ),
+    );
+  });
 });
