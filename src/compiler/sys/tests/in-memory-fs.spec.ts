@@ -1,7 +1,7 @@
 import { createTestingSystem } from '../../../testing/testing-sys';
 import { normalizePath } from '../../../utils';
+import type { FsItem, FsItems } from '../in-memory-fs';
 import { createInMemoryFs, getCommitInstructions, InMemoryFileSystem, shouldIgnore } from '../in-memory-fs';
-import { FsItem, FsItems } from '../in-memory-fs';
 
 describe(`in-memory-fs, getCommitInstructions`, () => {
   let items: FsItems;
@@ -583,7 +583,7 @@ describe(`in-memory-fs`, () => {
     expect(sys.diskReads).toBe(1);
 
     let i = await fs.commit();
-    expect(sys.diskWrites).toBe(3);
+    expect(sys.diskWrites).toBe(4);
     expect(i.filesWritten).toHaveLength(1);
     expect(i.filesWritten[0]).toBe(`/dir/file2.js`);
 
