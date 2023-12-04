@@ -1,10 +1,10 @@
-import { DEFAULT_STYLE_MODE } from '@utils';
+import { dashToPascalCase, DEFAULT_STYLE_MODE } from '@utils';
 import ts from 'typescript';
 
 import type * as d from '../../declarations';
 import { scopeCss } from '../../utils/shadow-css';
 import { getScopeId } from '../style/scope-css';
-import { createStaticGetter, getIdentifierFromResourceUrl } from './transform-utils';
+import { createStaticGetter } from './transform-utils';
 
 /**
  * Adds static "style" getter within the class
@@ -91,8 +91,7 @@ const getMultipleModeStyle = (
       // import generated from @Component() styleUrls option
       // import myTagIosStyle from './import-path.css';
       // static get style() { return { ios: myTagIosStyle }; }
-      const externalStyles = Array.from(new Set(style.externalStyles.map((s) => s.absolutePath)));
-      const styleUrlIdentifier = createStyleIdentifierFromUrl(style.styleId, externalStyles);
+      const styleUrlIdentifier = createStyleIdentifierFromUrl(cmp, style);
       const propUrlIdentifier = ts.factory.createPropertyAssignment(style.modeName, styleUrlIdentifier);
       styleModes.push(propUrlIdentifier);
     }
@@ -119,8 +118,7 @@ const getSingleStyle = (cmp: d.ComponentCompilerMeta, style: d.StyleCompiler, co
     // import generated from @Component() styleUrls option
     // import myTagStyle from './import-path.css';
     // static get style() { return myTagStyle; }
-    const externalStyles = Array.from(new Set(style.externalStyles.map((s) => s.absolutePath)));
-    return createStyleIdentifierFromUrl(style.styleId, externalStyles);
+    return createStyleIdentifierFromUrl(cmp, style);
   }
 
   return null;
@@ -136,49 +134,16 @@ const createStyleLiteral = (cmp: d.ComponentCompilerMeta, style: d.StyleCompiler
   return ts.factory.createStringLiteral(style.styleStr);
 };
 
-/**
- * Creates an expression to be assigned to the `style` property of a component class. For example
- * given the following component:
- *
- * ```ts
- * @Component({
- *  styleUrls: ['my-component.css', 'my-component.ios.css']
- *  tag: 'cmp',
- * })
- * export class MyComponent {
- *   // ...
- * }
- * ```
- *
- * it would generate the following expression:
- *
- * ```ts
- * import CMP_my_component_css from './my-component.css';
- * import CMP_my_component_ios_css from './my-component.ios.css';
- * export class MyComponent {
- *   // ...
- * }
- * MyComponent.style = CMP_my_component_css + CMP_my_component_ios_css;
- * ```
- *
- * Note: style imports are made in [`createEsmStyleImport`](src/compiler/transformers/style-imports.ts).
- *
- * @param styleId a unique identifier for the component style
- * @param externalStyles a list of external styles to be applied the component
- * @returns an assignment expression to be applied to the `style` property of a component class (e.g. `_myComponentCssStyle + _myComponentIosCssStyle` based on the example)
- */
-export const createStyleIdentifierFromUrl = (
-  styleId: string,
-  externalStyles: string[],
-): ts.Identifier | ts.BinaryExpression => {
-  if (externalStyles.length === 1) {
-    return ts.factory.createIdentifier(getIdentifierFromResourceUrl(styleId + externalStyles[0]));
+const createStyleIdentifierFromUrl = (cmp: d.ComponentCompilerMeta, style: d.StyleCompiler) => {
+  style.styleIdentifier = dashToPascalCase(cmp.tagName);
+  style.styleIdentifier = style.styleIdentifier.charAt(0).toLowerCase() + style.styleIdentifier.substring(1);
+
+  if (style.modeName !== DEFAULT_STYLE_MODE) {
+    style.styleIdentifier += dashToPascalCase(style.modeName);
   }
 
-  const firstExternalStyle = externalStyles[0];
-  return ts.factory.createBinaryExpression(
-    createStyleIdentifierFromUrl(styleId, [firstExternalStyle]),
-    ts.SyntaxKind.PlusToken,
-    createStyleIdentifierFromUrl(styleId, externalStyles.slice(1)),
-  );
+  style.styleIdentifier += 'Style';
+  style.externalStyles = [style.externalStyles[0]];
+
+  return ts.factory.createIdentifier(style.styleIdentifier);
 };

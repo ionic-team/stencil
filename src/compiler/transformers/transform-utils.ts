@@ -1097,31 +1097,3 @@ export const tsPropDeclNameAsString = (node: ts.PropertyDeclaration, typeChecker
 
   return memberName;
 };
-
-const SPECIAL_CHARS = /[\s~`!@#$%\^&*+=\-\[\]\\';,/{}|\\":<>\?()\._]/g;
-/**
- * transform any path to a valid identifier, e.g.
- *   - `/foo/bar/loo.css` -> `_foo_bar_loo_css`
- *   - `C:\\foo\bar\loo.css` -> `_C__foo_bar_loo_css`
- *
- * @param absolutePath  windows or linux based path
- * @returns a valid identifier to be used as variable name
- */
-export const getIdentifierFromResourceUrl = (absolutePath: string): string => {
-  return (
-    absolutePath
-      /**
-       * remove query params
-       */
-      .split('?')
-      .shift()
-      /**
-       * replace special characters with `-`
-       */
-      .replace(SPECIAL_CHARS, '-')
-      /**
-       * replace all `-` with `_`
-       */
-      .replace(/-/g, '_')
-  );
-};
