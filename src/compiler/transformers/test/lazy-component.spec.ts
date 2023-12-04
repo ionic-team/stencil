@@ -132,8 +132,6 @@ describe('lazy-component', () => {
     const t = transpileModule(code, null, compilerCtx, [], [transformer]);
     expect(await formatCode(t.outputText)).toBe(
       await c`import { registerInstance as __stencil_registerInstance } from "@stencil/core";
-      import CMP_A__foo_bar_css from './foo/bar.css';
-      import CMP_A__bar_foo_css  from './bar/foo.css';
       export const CmpA = class {
         constructor(hostRef) {
           __stencil_registerInstance(this, hostRef);
@@ -165,14 +163,12 @@ describe('lazy-component', () => {
     const transformer = lazyComponentTransform(compilerCtx, transformOpts);
     const t = transpileModule(code, null, compilerCtx, [], [transformer]);
     expect(await formatCode(t.outputText)).toBe(
-      await c`const CMP_A__foo_bar_css = require('./foo/bar.css');
-      const CMP_A__bar_foo_css  = require('./bar/foo.css');
-      const { registerInstance: __stencil_registerInstance } = require('@stencil/core');
-      export class CmpA {
+      await c`export class CmpA {
         constructor(hostRef) {
           __stencil_registerInstance(this, hostRef);
         }
       };
+      const { registerInstance: __stencil_registerInstance } = require('@stencil/core');
       CmpA.style = CMP_A__foo_bar_css + CMP_A__bar_foo_css ;`,
     );
   });
@@ -199,8 +195,7 @@ describe('lazy-component', () => {
     const transformer = lazyComponentTransform(compilerCtx, transformOpts);
     const t = transpileModule(code, null, compilerCtx, [], [transformer]);
     expect(await formatCode(t.outputText)).toBe(
-      await c`const CMP_A__foo_bar_css = require('./foo/bar.css');
-      export class CmpA {
+      await c`export class CmpA {
         constructor(hostRef) {
           __stencil_registerInstance(this, hostRef);
         }
@@ -236,9 +231,6 @@ describe('lazy-component', () => {
     const t = transpileModule(code, null, compilerCtx, [], [transformer]);
     expect(await formatCode(t.outputText)).toBe(
       await c`import { registerInstance as __stencil_registerInstance } from "@stencil/core";
-      import CMP_A_bar__bar_foo_css  from './bar/foo.css';
-      import CMP_A_foo__foo_bar_css from './foo/bar.css';
-      import CMP_A_loo__bar_foo_css  from './bar/foo.css';
       export const CmpA = class {
         constructor(hostRef) {
           __stencil_registerInstance(this, hostRef);

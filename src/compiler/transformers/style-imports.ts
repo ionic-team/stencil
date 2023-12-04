@@ -65,12 +65,15 @@ const updateEsmStyleImports = (
 
   moduleFile.cmps.forEach((cmp) => {
     cmp.styles.forEach((style) => {
-      updateSourceFile = true;
       if (typeof style.styleIdentifier === 'string') {
-        statements = updateEsmStyleImportPath(transformOpts, tsSourceFile, statements, cmp, style);
-      } else if (style.externalStyles.length > 0) {
-        // add style imports built from @Component() styleUrl option
-        styleImports.push(...createStyleImport(transformOpts, tsSourceFile, cmp, style, transformOpts.module as 'esm'));
+        updateSourceFile = true;
+        if (style.externalStyles.length > 0) {
+          // add style imports built from @Component() styleUrl option
+          styleImports.push(...createStyleImport(transformOpts, tsSourceFile, cmp, style));
+        } else if (style.externalStyles.length > 0) {
+          // update existing esm import of a style identifier
+          statements = updateEsmStyleImportPath(transformOpts, tsSourceFile, statements, cmp, style);
+        }
       }
     });
   });
@@ -244,7 +247,7 @@ const updateCjsStyleRequires = (
 
   moduleFile.cmps.forEach((cmp) => {
     cmp.styles.forEach((style) => {
-      if (style.externalStyles.length > 0) {
+      if (typeof style.styleIdentifier === 'string' && style.externalStyles.length > 0) {
         // add style imports built from @Component() styleUrl option
         styleRequires.push(...createStyleImport(transformOpts, tsSourceFile, cmp, style, transformOpts.module));
       }
