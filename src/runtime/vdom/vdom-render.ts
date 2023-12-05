@@ -1096,11 +1096,25 @@ render() {
               // we're just going to append the node as the last child of the parent. Passing
               // `null` as the second arg here will trigger that behavior.
               parentNodeRef.insertBefore(nodeToRelocate, insertBeforeNode);
+
+              // Reset the `hidden` value back to what it was defined as originally
+              // This solves a problem where a `slot` is dynamically rendered and `hidden` may have
+              // been set on content originally, but now it has a slot to go to so it should have
+              // the value it was defined as having in the DOM, not what we overrode it to.
+              if (nodeToRelocate.nodeType === NODE_TYPE.ElementNode) {
+                nodeToRelocate.hidden = nodeToRelocate['s-ih'] ?? false;
+              }
             }
           }
         } else {
           // this node doesn't have a slot home to go to, so let's hide it
           if (nodeToRelocate.nodeType === NODE_TYPE.ElementNode) {
+            // Store the initial value of `hidden` so we can reset it later when
+            // moving nodes around.
+            if (isInitialLoad) {
+              nodeToRelocate['s-ih'] = nodeToRelocate.hidden ?? false;
+            }
+
             nodeToRelocate.hidden = true;
           }
         }

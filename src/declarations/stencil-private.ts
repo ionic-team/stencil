@@ -1341,6 +1341,14 @@ export interface RenderNode extends HostElement {
   host?: Element;
 
   /**
+   * Is initially hidden
+   * Whether this node was originally rendered with the `hidden` attribute.
+   *
+   * Used to reset the `hidden` state of a node during slot relocation.
+   */
+  ['s-ih']?: boolean;
+
+  /**
    * Is Content Reference Node:
    * This node is a content reference node.
    */
