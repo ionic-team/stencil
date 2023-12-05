@@ -119,6 +119,8 @@ const pkgs: TestPackage[] = [
 ];
 
 /**
+ * Validate that certain files were written to disk during the build, and that
+ * these files tree-shake correctly.
  *
  * @param rootDir the root of the Stencil repository
  */

@@ -1,4 +1,4 @@
-import type { BuildOptions as ESBuildOptions, BuildResult as ESBuildResult } from 'esbuild';
+import type { BuildOptions as ESBuildOptions, BuildResult as ESBuildResult, Plugin } from 'esbuild';
 import * as esbuild from 'esbuild';
 import { join } from 'path';
 
@@ -124,4 +124,25 @@ export function getBaseEsbuildOptions(): ESBuildOptions {
  */
 export function getEsbuildTargets(): string[] {
   return ['node16', 'chrome79', 'edge79', 'firefox70', 'safari14'];
+}
+
+/**
+ * Alias and mark a module as external at the same time
+ *
+ * @param moduleId the module ID to alias and externalize
+ * @param resolveToPath the path to which imports of the module should be rewritten
+ * @returns an Esbuild plugin
+ */
+export function externalAlias(moduleId: string, resolveToPath: string): Plugin {
+  return {
+    name: 'externalAliases',
+    setup(build) {
+      build.onResolve({ filter: new RegExp(`^${moduleId}$`) }, () => {
+        return {
+          path: resolveToPath,
+          external: true,
+        };
+      });
+    },
+  };
 }
