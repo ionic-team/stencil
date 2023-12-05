@@ -10,7 +10,7 @@ import { bundleTypeScriptSource, tsCacheFilePath } from '../bundles/plugins/type
 import { getBanner } from '../utils/banner';
 import { BuildOptions, createReplaceData } from '../utils/options';
 import { writePkgJson } from '../utils/write-pkg-json';
-import { getEsbuildAliases, getEsbuildExternalModules, runBuilds } from './util';
+import { getBaseEsbuildOptions, getEsbuildAliases, getEsbuildExternalModules, runBuilds } from './util';
 
 export async function buildCompiler(opts: BuildOptions) {
   const inputDir = join(opts.buildDir, 'compiler');
@@ -80,11 +80,10 @@ export async function buildCompiler(opts: BuildOptions) {
   alias['parse5'] = parse5path;
 
   const compilerEsbuildOptions: ESBuildOptions = {
+    ...getBaseEsbuildOptions(),
     banner: { js: getBanner(opts, 'Stencil Compiler', true) },
     entryPoints: [join(srcDir, 'index.ts')],
-    bundle: true,
     platform: 'node',
-    logLevel: 'info',
     sourcemap: 'linked',
     external,
     format: 'cjs',
