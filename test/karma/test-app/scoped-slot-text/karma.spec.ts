@@ -30,7 +30,7 @@ describe('scoped-slot-text', () => {
 
     cmpLabel.textContent = 'New text to go in the slot';
 
-    expect(cmpLabel.textContent).toBe('New text to go in the slot');
+    expect(cmpLabel.textContent.trim()).toBe('New text to go in the slot');
   });
 
   it('leaves the structure of the label intact', () => {

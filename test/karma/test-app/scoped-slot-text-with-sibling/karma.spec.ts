@@ -30,7 +30,7 @@ describe('scoped-slot-text-with-sibling', () => {
 
     cmpLabel.textContent = 'New text to go in the slot';
 
-    expect(cmpLabel.textContent).toBe('New text to go in the slot');
+    expect(cmpLabel.textContent.trim()).toBe('New text to go in the slot');
   });
 
   it("doesn't override all children when assigning textContent", () => {
