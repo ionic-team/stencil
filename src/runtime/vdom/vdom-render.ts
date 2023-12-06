@@ -135,7 +135,7 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
     }
   }
 
-  // This needs to always happen so we can hide nodes that are projected through
+  // This needs to always happen so we can hide nodes that are projected
   // to another component but don't end up in a slot
   elm['s-hn'] = hostTagName;
   if (BUILD.slotRelocation) {
