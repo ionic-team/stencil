@@ -116,7 +116,7 @@ module.exports = function (config) {
     urlRoot: '/__karma__/',
     files: [
       // 'test-app/prerender-test/karma.spec.ts',
-      'test-app/slot-hide-content/*.spec.ts', // tells karma these are tests we need to serve & run
+      'test-app/**/*.spec.ts', // tells karma these are tests we need to serve & run
       'test-app/util.ts', // used by 'www' output target tests to load components
       'test-app/assets/angular.min.js', // used by a 'www' output target test
       {
