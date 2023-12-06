@@ -43,9 +43,8 @@ export const proxyCustomElement = (Cstr: any, compactMeta: d.ComponentRuntimeMet
     cmpMeta.$flags$ |= CMP_FLAGS.needsShadowDomShim;
   }
 
-  // TODO(STENCIL-914): this check and `else` block can go away and be replaced by just `BUILD.scoped` once we
-  // default our pseudo-slot behavior
-  if (BUILD.experimentalSlotFixes && BUILD.scoped) {
+  // TODO(STENCIL-914): this check and `else` block can go away and be replaced by just the `scoped` check
+  if (BUILD.experimentalSlotFixes && cmpMeta.$flags$ & CMP_FLAGS.scopedCssEncapsulation) {
     patchPseudoShadowDom(Cstr.prototype, cmpMeta);
   } else {
     if (BUILD.slotChildNodesFix) {
@@ -57,8 +56,8 @@ export const proxyCustomElement = (Cstr: any, compactMeta: d.ComponentRuntimeMet
     if (BUILD.appendChildSlotFix) {
       patchSlotAppendChild(Cstr.prototype);
     }
-    if (BUILD.scopedSlotTextContentFix) {
-      patchTextContent(Cstr.prototype, cmpMeta);
+    if (BUILD.scopedSlotTextContentFix && cmpMeta.$flags$ & CMP_FLAGS.scopedCssEncapsulation) {
+      patchTextContent(Cstr.prototype);
     }
   }
 
