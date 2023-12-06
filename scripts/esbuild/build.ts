@@ -1,5 +1,6 @@
 import { getOptions } from '../utils/options';
 import { buildCli } from './cli';
+import { buildCompiler } from './compiler';
 import { buildScreenshot } from './screenshot';
 import { buildSysNode } from './sys-node';
 
@@ -11,7 +12,7 @@ async function main() {
     isWatch: !!process.argv.includes('--watch'),
   });
 
-  await Promise.all([buildCli(opts), buildSysNode(opts), buildScreenshot(opts)]);
+  await Promise.all([buildCli(opts), buildCompiler(opts), buildSysNode(opts), buildScreenshot(opts)]);
 }
 
 main();

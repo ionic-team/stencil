@@ -206,13 +206,16 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
   // If we have styles, add them to the DOM
   if (dataStyles.innerHTML.length) {
     dataStyles.setAttribute('data-styles', '');
-    head.insertBefore(dataStyles, metaCharset ? metaCharset.nextSibling : head.firstChild);
 
     // Apply CSP nonce to the style tag if it exists
     const nonce = plt.$nonce$ ?? queryNonceMetaTagContent(doc);
     if (nonce != null) {
       dataStyles.setAttribute('nonce', nonce);
     }
+
+    // Insert the styles into the document head
+    // NOTE: this _needs_ to happen last so we can ensure the nonce (and other attributes) are applied
+    head.insertBefore(dataStyles, metaCharset ? metaCharset.nextSibling : head.firstChild);
   }
 
   // Process deferred connectedCallbacks now all components have been registered

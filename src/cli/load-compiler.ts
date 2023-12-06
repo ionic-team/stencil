@@ -1,9 +1,15 @@
 import type { CompilerSystem } from '../declarations';
 
 export const loadCoreCompiler = async (sys: CompilerSystem): Promise<CoreCompiler> => {
-  await sys.dynamicImport(sys.getCompilerExecutingPath());
+  const compilerMod = await sys.dynamicImport!(sys.getCompilerExecutingPath());
 
-  return (globalThis as any).stencil;
+  // TODO(STENCIL-1018): Remove Rollup Infrastructure
+  if ((globalThis as any).stencil) {
+    return (globalThis as any).stencil;
+  } else {
+    (globalThis as any).stencil = compilerMod;
+    return compilerMod;
+  }
 };
 
 export type CoreCompiler = typeof import('@stencil/core/compiler');

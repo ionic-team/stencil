@@ -33,7 +33,8 @@ export function parse5Plugin(opts: BuildOptions): Plugin {
      */
     async load(id: string): Promise<string> | null {
       if (id === 'parse5') {
-        return await bundleParse5(opts);
+        const [contents] = await bundleParse5(opts);
+        return contents;
       }
       return null;
     },
@@ -44,14 +45,14 @@ export function parse5Plugin(opts: BuildOptions): Plugin {
  * Bundles parse5 to be used in the Stencil output. Writes the results to disk and returns its contents. The file
  * written to disk may be used as a simple cache to speed up subsequent build times.
  * @param opts the options being used during a build of the Stencil compiler
- * @returns the contents of the file containing parse5
+ * @returns a tuple holding 1) contents of the file containing parse5 and 2) the file path where it's written
  */
-async function bundleParse5(opts: BuildOptions): Promise<string> {
+export async function bundleParse5(opts: BuildOptions): Promise<[contents: string, path: string]> {
   const fileName = `parse5-${opts.parse5Version.replace(/\./g, '_')}-bundle-cache${opts.isProd ? '.min' : ''}.js`;
   const cacheFile = join(opts.scriptsBuildDir, fileName);
 
   try {
-    return await fs.readFile(cacheFile, 'utf8');
+    return [await fs.readFile(cacheFile, 'utf8'), cacheFile];
   } catch (e) {}
 
   const rollupBuild = await rollup({
@@ -121,5 +122,5 @@ async function bundleParse5(opts: BuildOptions): Promise<string> {
 
   await fs.writeFile(cacheFile, code);
 
-  return code;
+  return [code, cacheFile];
 }

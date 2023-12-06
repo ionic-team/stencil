@@ -42,7 +42,7 @@ export const buildAbort = (buildCtx: d.BuildCtx): Promise<d.CompilerBuildResults
  * @returns the build results
  */
 const buildDone = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   aborted: boolean,

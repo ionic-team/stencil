@@ -455,15 +455,20 @@ type RequireFields<T, K extends keyof T> = T & { [P in K]-?: T[P] };
  */
 type StrictConfigFields = keyof Pick<
   Config,
+  | 'buildEs5'
   | 'cacheDir'
-  | 'devServer'
   | 'devMode'
+  | 'devServer'
   | 'extras'
   | 'flags'
   | 'fsNamespace'
+  | 'hashFileNames'
+  | 'hashedFileNameLength'
   | 'hydratedFlag'
   | 'logLevel'
   | 'logger'
+  | 'minifyCss'
+  | 'minifyJs'
   | 'namespace'
   | 'outputTargets'
   | 'packageJsonFilePath'
@@ -1023,7 +1028,7 @@ export interface CompilerSystem {
    */
   isTTY(): boolean;
   /**
-   * Each platform as a different way to dynamically import modules.
+   * Each platform has a different way to dynamically import modules.
    */
   dynamicImport?(p: string): Promise<any>;
   /**

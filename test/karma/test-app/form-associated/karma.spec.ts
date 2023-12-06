@@ -1,4 +1,4 @@
-import { setupDomTests } from '../util';
+import { setupDomTests, waitFrame } from '../util';
 
 describe('form associated', function () {
   const { setupDom, tearDownDom } = setupDomTests(document);
@@ -14,9 +14,34 @@ describe('form associated', function () {
     expect(elm).not.toBeNull();
   });
 
-  it('should trigger form associated custom element lifecycle callbacks', async () => {
-    const formEl = app.querySelector('form');
-    expect(formEl.ariaLabel).toBe('formAssociated called');
+  describe('form associated custom element lifecycle callback', () => {
+    it('should trigger "formAssociated"', async () => {
+      const formEl = app.querySelector('form');
+      expect(formEl.ariaLabel).toBe('formAssociated called');
+    });
+
+    it('should trigger "formResetCallback"', async () => {
+      const resetBtn: HTMLInputElement = app.querySelector('input[type="reset"]');
+      resetBtn.click();
+
+      await waitFrame();
+
+      const formEl = app.querySelector('form');
+      expect(formEl.ariaLabel).toBe('formResetCallback called');
+    });
+
+    it('should trigger "formDisabledCallback"', async () => {
+      const elm = app.querySelector('form-associated');
+      const formEl = app.querySelector('form');
+
+      elm.setAttribute('disabled', 'disabled');
+      await waitFrame();
+      expect(formEl.ariaLabel).toBe('formDisabledCallback called with true');
+
+      elm.removeAttribute('disabled');
+      await waitFrame();
+      expect(formEl.ariaLabel).toBe('formDisabledCallback called with false');
+    });
   });
 
   it('should link up to the surrounding form', async () => {

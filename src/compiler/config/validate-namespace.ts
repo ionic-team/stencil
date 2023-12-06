@@ -1,6 +1,7 @@
 import { buildError, dashToPascalCase, isOutputTargetDist, isString } from '@utils';
 
 import type * as d from '../../declarations';
+import { DEFAULT_NAMESPACE } from './constants';
 
 /**
  * Ensures that the `namespace` and `fsNamespace` properties on a project's
@@ -72,5 +73,3 @@ export const validateDistNamespace = (config: d.UnvalidatedConfig, diagnostics: 
     }
   }
 };
-
-const DEFAULT_NAMESPACE = 'App';

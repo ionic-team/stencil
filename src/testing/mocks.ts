@@ -33,21 +33,26 @@ export function mockValidatedConfig(overrides: Partial<ValidatedConfig> = {}): V
 
   return {
     ...baseConfig,
+    buildEs5: false,
+    cacheDir: '.stencil',
     devMode: true,
     devServer: {},
     extras: {},
     flags: createConfigFlags(),
     fsNamespace: 'testing',
+    hashFileNames: false,
+    hashedFileNameLength: 8,
     hydratedFlag: null,
     logLevel: 'info',
     logger: mockLogger(),
+    minifyCss: false,
+    minifyJs: false,
     namespace: 'Testing',
     outputTargets: baseConfig.outputTargets ?? [],
     packageJsonFilePath: path.join(rootDir, 'package.json'),
     rootDir,
-    cacheDir: '.stencil',
-    srcIndexHtml: 'src/index.html',
     srcDir: '/src',
+    srcIndexHtml: 'src/index.html',
     sys: createTestingSystem(),
     testing: {},
     transformAliasedImportPaths: true,
@@ -190,10 +195,10 @@ export function mockCompilerCtx(config?: ValidatedConfig) {
 }
 
 export function mockBuildCtx(config?: ValidatedConfig, compilerCtx?: CompilerCtx): BuildCtx {
-  config ||= mockValidatedConfig();
-  compilerCtx ||= mockCompilerCtx(config);
+  const validatedConfig = config || mockValidatedConfig();
+  const validatedCompilerCtx = compilerCtx || mockCompilerCtx(validatedConfig);
 
-  const buildCtx = new BuildContext(config, compilerCtx);
+  const buildCtx = new BuildContext(validatedConfig, validatedCompilerCtx);
   return buildCtx as BuildCtx;
 }
 

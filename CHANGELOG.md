@@ -1,3 +1,14 @@
+## 🍹 [4.8.1](https://github.com/ionic-team/stencil/compare/v4.8.0...v4.8.1) (2023-12-04)
+
+
+### Bug Fixes
+
+* **runtime:** apply nonce to data styles before DOM insert ([#5112](https://github.com/ionic-team/stencil/issues/5112)) ([df46fdc](https://github.com/ionic-team/stencil/commit/df46fdc0cb9168171546e335a5628b25909fdd89)), closes [#5102](https://github.com/ionic-team/stencil/issues/5102)
+* **runtime:** call form-associated lifecycle callbacks w/ `this` ([#5104](https://github.com/ionic-team/stencil/issues/5104)) ([1ac8aa3](https://github.com/ionic-team/stencil/commit/1ac8aa3da139656c82914fda7eb9e8de62cba56d))
+* **testing:** re-add Puppeteer `asElement()` calls ([#5114](https://github.com/ionic-team/stencil/issues/5114)) ([0c843f8](https://github.com/ionic-team/stencil/commit/0c843f8d19e6ee04c02ae8699c76c33d5ebb1c70)), closes [#5113](https://github.com/ionic-team/stencil/issues/5113)
+
+
+
 # 🌞 [4.8.0](https://github.com/ionic-team/stencil/compare/v4.7.2...v4.8.0) (2023-11-27)
 
 

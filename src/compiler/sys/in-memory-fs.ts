@@ -66,9 +66,18 @@ export type FsItems = Map<string, FsItem>;
  * Options supported by write methods on the in-memory filesystem.
  */
 export interface FsWriteOptions {
+  /**
+   * only use the in-memory cache and do not write the file to disk
+   */
   inMemoryOnly?: boolean;
   clearFileCache?: boolean;
+  /**
+   * flush the write to disk immediately, skipping the in-memory cache
+   */
   immediateWrite?: boolean;
+  /**
+   * specify that the cache should be used
+   */
   useCache?: boolean;
   /**
    * An optional tag for the current output target for which this file is being
@@ -724,7 +733,10 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
 
         if (results.changedContent) {
           await ensureDir(filePath, false);
-          await sys.writeFile(filePath, item.fileText);
+          const { error } = await sys.writeFile(filePath, item.fileText);
+          if (error) {
+            throw error;
+          }
         }
       }
     } else {
@@ -815,6 +827,15 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
    * only change the in-memory cache
    */
   const ensureDir = async (path: string, inMemoryOnly: boolean) => {
+    /**
+     * in case we write to disk immediately, there is no need to split
+     * all directories into separate calls, we can just use the recursive flag
+     */
+    if (!inMemoryOnly) {
+      await sys.createDir(dirname(path), { recursive: true });
+      return;
+    }
+
     const allDirs: string[] = [];
 
     while (true) {
