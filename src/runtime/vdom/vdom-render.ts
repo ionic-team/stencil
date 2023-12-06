@@ -154,14 +154,57 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
       // check if we've got an old vnode for this slot
       oldVNode = oldParentVNode && oldParentVNode.$children$ && oldParentVNode.$children$[childIndex];
       if (oldVNode && oldVNode.$tag$ === newVNode.$tag$ && oldParentVNode.$elm$) {
-        // we've got an old slot vnode and the wrapper is being replaced
-        // so let's move the old slot content back to it's original location
-        putBackInOriginalLocation(oldParentVNode.$elm$, false);
+        if (BUILD.experimentalSlotFixes) {
+          // we've got an old slot vnode and the wrapper is being replaced
+          // so let's move the old slot content to the root of the element currently being rendered
+          relocateToHostRoot(oldParentVNode.$elm$);
+        } else {
+          // we've got an old slot vnode and the wrapper is being replaced
+          // so let's move the old slot content back to its original location
+          putBackInOriginalLocation(oldParentVNode.$elm$, false);
+        }
       }
     }
   }
 
   return elm;
+};
+
+/**
+ * Relocates all child nodes of an element that were a part of a previous slot relocation
+ * to the root of the Stencil component currently being rendered. This happens when a parent
+ * element of a slot reference node dynamically changes and triggers a re-render. We cannot use
+ * `putBackInOriginalLocation()` because that may relocate nodes to elements that will not be re-rendered
+ * and so they will not be relocated again.
+ *
+ * @param parentElm The element potentially containing relocated nodes.
+ */
+const relocateToHostRoot = (parentElm: Element) => {
+  plt.$flags$ |= PLATFORM_FLAGS.isTmpDisconnected;
+
+  const host = parentElm.closest(hostTagName.toLowerCase());
+  if (host != null) {
+    for (const childNode of Array.from(parentElm.childNodes) as d.RenderNode[]) {
+      // Only relocate nodes that were slotted in
+      if (childNode['s-sh'] != null) {
+        host.insertBefore(childNode, null);
+        // Reset so we can correctly move the node around again.
+        childNode['s-sh'] = undefined;
+
+        // When putting an element node back in its original location,
+        // we need to reset the `slot` attribute back to the value it originally had
+        // so we can correctly relocate it again in the future
+        if (childNode.nodeType === NODE_TYPE.ElementNode && !!childNode['s-sn']) {
+          childNode.setAttribute('slot', childNode['s-sn']);
+        }
+
+        // Need to tell the render pipeline to check to relocate slot content again
+        checkSlotRelocate = true;
+      }
+    }
+  }
+
+  plt.$flags$ &= ~PLATFORM_FLAGS.isTmpDisconnected;
 };
 
 const putBackInOriginalLocation = (parentElm: Node, recursive: boolean) => {
@@ -171,10 +214,6 @@ const putBackInOriginalLocation = (parentElm: Node, recursive: boolean) => {
   for (let i = oldSlotChildNodes.length - 1; i >= 0; i--) {
     const childNode = oldSlotChildNodes[i] as any;
     if (childNode['s-hn'] !== hostTagName && childNode['s-ol']) {
-      // // this child node in the old element is from another component
-      // // remove this node from the old slot's parent
-      // childNode.remove();
-
       // and relocate it back to it's original location
       parentReferenceNode(childNode).insertBefore(childNode, referenceNode(childNode));
 
@@ -1027,7 +1066,7 @@ render() {
             // has a different next sibling or parent relocated
 
             if (nodeToRelocate !== insertBeforeNode) {
-              if (!nodeToRelocate['s-hn'] && nodeToRelocate['s-ol']) {
+              if (!BUILD.experimentalSlotFixes && !nodeToRelocate['s-hn'] && nodeToRelocate['s-ol']) {
                 // probably a component in the index.html that doesn't have its hostname set
                 nodeToRelocate['s-hn'] = nodeToRelocate['s-ol'].parentNode.nodeName;
               }
