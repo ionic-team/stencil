@@ -1,0 +1,1 @@
+{"version":3,"file":"test-worker-main.js","sourceRoot":"","sources":["../../../../src/sys/node/test/test-worker-main.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,cAAc,EAAE,MAAM,qBAAqB,CAAC;AAErD,MAAM,OAAO,cAAe,SAAQ,cAAc;IAChD,YAAY,QAAgB;QAC1B,KAAK,CAAC,QAAQ,EAAE,IAAI,CAAC,CAAC;QACtB,IAAI,CAAC,IAAI,EAAE,CAAC;IACd,CAAC;IAEQ,IAAI;QACX,IAAI,CAAC,YAAY,GAAG,EAAS,CAAC;IAChC,CAAC;CACF"}

@@ -1,0 +1,1 @@
+{"version":3,"file":"navigator.js","sourceRoot":"","sources":["../../src/mock-doc/navigator.ts"],"names":[],"mappings":"AAAA,MAAM,OAAO,aAAa;IAA1B;QACE,gBAAW,GAAG,eAAe,CAAC;QAC9B,YAAO,GAAG,eAAe,CAAC;QAC1B,eAAU,GAAG,eAAe,CAAC;QAC7B,aAAQ,GAAG,eAAe,CAAC;QAC3B,cAAS,GAAG,eAAe,CAAC;IAC9B,CAAC;CAAA"}

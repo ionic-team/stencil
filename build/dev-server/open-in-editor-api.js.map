@@ -1,0 +1,1 @@
+{"version":3,"file":"open-in-editor-api.js","sourceRoot":"","sources":["../../src/dev-server/open-in-editor-api.ts"],"names":[],"mappings":"AAAA,MAAM,eAAe,GAAG;IACtB,oCAAoC;IACpC,SAAS,CAAC,KAA0B,EAAE,GAAyB;QAC7D,OAAO,IAAI,CAAC;IACd,CAAC;IACD,OAAO,EAAE,EAA4B;CACtC,CAAC;AAcF,eAAe,eAAe,CAAC"}

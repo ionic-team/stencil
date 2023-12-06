@@ -1,0 +1,21 @@
+import type * as d from '../declarations';
+export declare function responseHeaders(headers: d.DevResponseHeaders, httpCache?: boolean): any;
+export declare function getBrowserUrl(protocol: string, address: string, port: number, basePath: string, pathname: string): string;
+export declare function getDevServerClientUrl(devServerConfig: d.DevServerConfig, host: string, protocol: string): string;
+export declare function getContentType(filePath: string): any;
+export declare function isHtmlFile(filePath: string): boolean;
+export declare function isCssFile(filePath: string): boolean;
+export declare function isSimpleText(filePath: string): boolean;
+export declare function isExtensionLessPath(pathname: string): boolean;
+export declare function isSsrStaticDataPath(pathname: string): boolean;
+export declare function getSsrStaticDataPath(req: d.HttpRequest): {
+    ssrPath: string;
+    fileName: string;
+    hasQueryString: boolean;
+};
+export declare function isDevClient(pathname: string): boolean;
+export declare function isDevModule(pathname: string): boolean;
+export declare function isOpenInEditor(pathname: string): boolean;
+export declare function isInitialDevServerLoad(pathname: string): boolean;
+export declare function isDevServerClient(pathname: string): boolean;
+export declare function shouldCompress(devServerConfig: d.DevServerConfig, req: d.HttpRequest): boolean;

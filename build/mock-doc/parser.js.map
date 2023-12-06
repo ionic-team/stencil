@@ -1,0 +1,1 @@
+{"version":3,"file":"parser.js","sourceRoot":"","sources":["../../src/mock-doc/parser.ts"],"names":[],"mappings":"AACA,OAAO,EAAE,mBAAmB,EAAE,MAAM,cAAc,CAAC;AASnD,MAAM,OAAO,aAAa;IACxB,eAAe,CAAC,WAAmB,EAAE,QAAgC;QACnE,IAAI,QAAQ,KAAK,WAAW,EAAE;YAC5B,OAAO,CAAC,KAAK,CAAC,qDAAqD,CAAC,CAAC;SACtE;QACD,OAAO,mBAAmB,CAAC,WAAW,CAAC,CAAC;IAC1C,CAAC;CACF"}

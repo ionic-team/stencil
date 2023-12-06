@@ -1,0 +1,38 @@
+import type * as d from '../../declarations';
+export declare const cmpModules: Map<string, {
+    [exportName: string]: d.ComponentConstructor;
+}>;
+export declare const loadModule: (cmpMeta: d.ComponentRuntimeMeta, _hostRef: d.HostRef, _hmrVersionId?: string) => any;
+export declare const isMemberInElement: (elm: any, memberName: string) => boolean;
+export declare const registerComponents: (Cstrs: d.ComponentNativeConstructor[]) => void;
+export declare const win: Window & typeof globalThis;
+export declare const doc: Document;
+export declare const readTask: (cb: Function) => void;
+export declare const writeTask: (cb: Function) => void;
+export declare const nextTick: (cb: () => void) => Promise<void>;
+export declare const consoleError: d.ErrorHandler;
+export declare const consoleDevError: (..._: any[]) => void;
+export declare const consoleDevWarn: (..._: any[]) => void;
+export declare const consoleDevInfo: (..._: any[]) => void;
+export declare const setErrorHandler: (handler: d.ErrorHandler) => d.ErrorHandler;
+export declare const plt: d.PlatformRuntime;
+export declare const setPlatformHelpers: (helpers: {
+    jmp?: (c: any) => any;
+    raf?: (c: any) => number;
+    ael?: (el: any, eventName: string, listener: any, options: any) => void;
+    rel?: (el: any, eventName: string, listener: any, options: any) => void;
+    ce?: (eventName: string, opts?: any) => any;
+}) => void;
+export declare const supportsShadow = false;
+export declare const supportsListenerOptions = false;
+export declare const supportsConstructableStylesheets = false;
+export declare const getHostRef: (ref: d.RuntimeRef) => d.HostRef;
+export declare const registerInstance: (lazyInstance: any, hostRef: d.HostRef) => WeakMap<d.RuntimeRef, d.HostRef>;
+export declare const registerHost: (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta) => WeakMap<d.RuntimeRef, d.HostRef>;
+export declare const Build: d.UserBuildConditionals;
+export declare const styles: d.StyleMap;
+export declare const modeResolutionChain: d.ResolutionHandler[];
+export { hAsync as h } from './h-async';
+export { hydrateApp } from './hydrate-app';
+export { BUILD, Env, NAMESPACE } from '@app-data';
+export { addHostEventListeners, bootstrapLazy, connectedCallback, createEvent, defineCustomElement, disconnectedCallback, forceModeUpdate, forceUpdate, Fragment, getAssetPath, getElement, getMode, getRenderingRef, getValue, Host, insertVdomAnnotations, parsePropertyValue, postUpdateComponent, proxyComponent, proxyCustomElement, renderVdom, setAssetPath, setMode, setNonce, setValue, } from '@runtime';

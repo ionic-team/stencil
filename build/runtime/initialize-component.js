@@ -1,0 +1,127 @@
+import { BUILD } from '@app-data';
+import { consoleError, loadModule, styles } from '@platform';
+import { computeMode } from './mode';
+import { createTime, uniqueTime } from './profile';
+import { proxyComponent } from './proxy-component';
+import { getScopeId, registerStyle } from './styles';
+import { safeCall, scheduleUpdate } from './update-component';
+/**
+ * Initialize a Stencil component given a reference to its host element, its
+ * runtime bookkeeping data structure, runtime metadata about the component,
+ * and (optionally) an HMR version ID.
+ *
+ * @param elm a host element
+ * @param hostRef the element's runtime bookkeeping object
+ * @param cmpMeta runtime metadata for the Stencil component
+ * @param hmrVersionId an (optional) HMR version ID
+ */
+export const initializeComponent = async (elm, hostRef, cmpMeta, hmrVersionId) => {
+    let Cstr;
+    // initializeComponent
+    if ((hostRef.$flags$ & 32 /* HOST_FLAGS.hasInitializedComponent */) === 0) {
+        // Let the runtime know that the component has been initialized
+        hostRef.$flags$ |= 32 /* HOST_FLAGS.hasInitializedComponent */;
+        if (BUILD.lazyLoad || BUILD.hydrateClientSide) {
+            // lazy loaded components
+            // request the component's implementation to be
+            // wired up with the host element
+            Cstr = loadModule(cmpMeta, hostRef, hmrVersionId);
+            if (Cstr.then) {
+                // Await creates a micro-task avoid if possible
+                const endLoad = uniqueTime(`st:load:${cmpMeta.$tagName$}:${hostRef.$modeName$}`, `[Stencil] Load module for <${cmpMeta.$tagName$}>`);
+                Cstr = await Cstr;
+                endLoad();
+            }
+            if ((BUILD.isDev || BUILD.isDebug) && !Cstr) {
+                throw new Error(`Constructor for "${cmpMeta.$tagName$}#${hostRef.$modeName$}" was not found`);
+            }
+            if (BUILD.member && !Cstr.isProxied) {
+                // we've never proxied this Constructor before
+                // let's add the getters/setters to its prototype before
+                // the first time we create an instance of the implementation
+                if (BUILD.watchCallback) {
+                    cmpMeta.$watchers$ = Cstr.watchers;
+                }
+                proxyComponent(Cstr, cmpMeta, 2 /* PROXY_FLAGS.proxyState */);
+                Cstr.isProxied = true;
+            }
+            const endNewInstance = createTime('createInstance', cmpMeta.$tagName$);
+            // ok, time to construct the instance
+            // but let's keep track of when we start and stop
+            // so that the getters/setters don't incorrectly step on data
+            if (BUILD.member) {
+                hostRef.$flags$ |= 8 /* HOST_FLAGS.isConstructingInstance */;
+            }
+            // construct the lazy-loaded component implementation
+            // passing the hostRef is very important during
+            // construction in order to directly wire together the
+            // host element and the lazy-loaded instance
+            try {
+                new Cstr(hostRef);
+            }
+            catch (e) {
+                consoleError(e);
+            }
+            if (BUILD.member) {
+                hostRef.$flags$ &= ~8 /* HOST_FLAGS.isConstructingInstance */;
+            }
+            if (BUILD.watchCallback) {
+                hostRef.$flags$ |= 128 /* HOST_FLAGS.isWatchReady */;
+            }
+            endNewInstance();
+            fireConnectedCallback(hostRef.$lazyInstance$);
+        }
+        else {
+            // sync constructor component
+            Cstr = elm.constructor;
+            // wait for the CustomElementRegistry to mark the component as ready before setting `isWatchReady`. Otherwise,
+            // watchers may fire prematurely if `customElements.get()`/`customElements.whenDefined()` resolves _before_
+            // Stencil has completed instantiating the component.
+            customElements.whenDefined(cmpMeta.$tagName$).then(() => (hostRef.$flags$ |= 128 /* HOST_FLAGS.isWatchReady */));
+        }
+        if (BUILD.style && Cstr.style) {
+            // this component has styles but we haven't registered them yet
+            let style = Cstr.style;
+            if (BUILD.mode && typeof style !== 'string') {
+                style = style[(hostRef.$modeName$ = computeMode(elm))];
+                if (BUILD.hydrateServerSide && hostRef.$modeName$) {
+                    elm.setAttribute('s-mode', hostRef.$modeName$);
+                }
+            }
+            const scopeId = getScopeId(cmpMeta, hostRef.$modeName$);
+            if (!styles.has(scopeId)) {
+                const endRegisterStyles = createTime('registerStyles', cmpMeta.$tagName$);
+                if (!BUILD.hydrateServerSide &&
+                    BUILD.shadowDom &&
+                    // TODO(STENCIL-854): Remove code related to legacy shadowDomShim field
+                    BUILD.shadowDomShim &&
+                    cmpMeta.$flags$ & 8 /* CMP_FLAGS.needsShadowDomShim */) {
+                    style = await import('../utils/shadow-css').then((m) => m.scopeCss(style, scopeId, false));
+                }
+                registerStyle(scopeId, style, !!(cmpMeta.$flags$ & 1 /* CMP_FLAGS.shadowDomEncapsulation */));
+                endRegisterStyles();
+            }
+        }
+    }
+    // we've successfully created a lazy instance
+    const ancestorComponent = hostRef.$ancestorComponent$;
+    const schedule = () => scheduleUpdate(hostRef, true);
+    if (BUILD.asyncLoading && ancestorComponent && ancestorComponent['s-rc']) {
+        // this is the initial load and this component it has an ancestor component
+        // but the ancestor component has NOT fired its will update lifecycle yet
+        // so let's just cool our jets and wait for the ancestor to continue first
+        // this will get fired off when the ancestor component
+        // finally gets around to rendering its lazy self
+        // fire off the initial update
+        ancestorComponent['s-rc'].push(schedule);
+    }
+    else {
+        schedule();
+    }
+};
+export const fireConnectedCallback = (instance) => {
+    if (BUILD.lazyLoad && BUILD.connectedCallback) {
+        safeCall(instance, 'connectedCallback');
+    }
+};
+//# sourceMappingURL=initialize-component.js.map

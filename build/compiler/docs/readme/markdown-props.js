@@ -1,0 +1,36 @@
+import { MarkdownTable } from './docs-util';
+export const propsToMarkdown = (props) => {
+    const content = [];
+    if (props.length === 0) {
+        return content;
+    }
+    content.push(`## Properties`);
+    content.push(``);
+    const table = new MarkdownTable();
+    table.addHeader(['Property', 'Attribute', 'Description', 'Type', 'Default']);
+    props.forEach((prop) => {
+        table.addRow([
+            getPropertyField(prop),
+            getAttributeField(prop),
+            getDocsField(prop),
+            `\`${prop.type}\``,
+            `\`${prop.default}\``,
+        ]);
+    });
+    content.push(...table.toMarkdown());
+    content.push(``);
+    content.push(``);
+    return content;
+};
+const getPropertyField = (prop) => {
+    return `\`${prop.name}\`${prop.required ? ' _(required)_' : ''}`;
+};
+const getAttributeField = (prop) => {
+    return prop.attr ? `\`${prop.attr}\`` : '--';
+};
+const getDocsField = (prop) => {
+    return `${prop.deprecation !== undefined
+        ? `<span style="color:red">**[DEPRECATED]**</span> ${prop.deprecation}<br/><br/>`
+        : ''}${prop.docs}`;
+};
+//# sourceMappingURL=markdown-props.js.map

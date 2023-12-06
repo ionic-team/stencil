@@ -1,0 +1,152 @@
+import type { Config } from '@jest/types';
+import { JestFacade } from '../jest-facade';
+import { createJestPuppeteerEnvironment } from './jest-environment';
+import { createTestRunner } from './jest-runner';
+import { runJest } from './jest-runner';
+import { runJestScreenshot } from './jest-screenshot';
+import { jestSetupTestFramework } from './jest-setup-test-framework';
+/**
+ * `JestFacade` implementation for communicating between this directory's version of Jest and Stencil
+ */
+export declare class Jest28Stencil implements JestFacade {
+    getJestCliRunner(): typeof runJest;
+    getRunJestScreenshot(): typeof runJestScreenshot;
+    getDefaultJestRunner(): string;
+    getCreateJestPuppeteerEnvironment(): typeof createJestPuppeteerEnvironment;
+    getJestPreprocessor(): {
+        process(sourceText: string, sourcePath: string, options: import("@jest/transform").TransformOptions<unknown>): import("@jest/transform").TransformedSource;
+        getCacheKey(sourceText: string, sourcePath: string, options: import("@jest/transform").TransformOptions<unknown>): string;
+    };
+    getCreateJestTestRunner(): typeof createTestRunner;
+    getJestSetupTestFramework(): typeof jestSetupTestFramework;
+    getJestPreset(): Partial<{
+        automock: boolean;
+        bail: number | boolean;
+        cache: boolean;
+        cacheDirectory: string;
+        ci: boolean;
+        clearMocks: boolean;
+        changedFilesWithAncestor: boolean;
+        changedSince: string;
+        collectCoverage: boolean;
+        collectCoverageFrom: string[];
+        collectCoverageOnlyFrom: {
+            [key: string]: boolean;
+        };
+        coverageDirectory: string;
+        coveragePathIgnorePatterns: string[];
+        coverageProvider: "v8" | "babel";
+        coverageReporters: Config.CoverageReporters;
+        coverageThreshold: {
+            [path: string]: Config.CoverageThresholdValue;
+            global: Config.CoverageThresholdValue;
+        };
+        dependencyExtractor: string;
+        detectLeaks: boolean;
+        detectOpenHandles: boolean;
+        displayName: string | Config.DisplayName;
+        expand: boolean;
+        extensionsToTreatAsEsm: string[];
+        fakeTimers: Config.GlobalFakeTimersConfig & ((Config.FakeTimersConfig & {
+            now?: number;
+        }) | Config.LegacyFakeTimersConfig);
+        filter: string;
+        findRelatedTests: boolean;
+        forceCoverageMatch: string[];
+        forceExit: boolean;
+        json: boolean;
+        globals: Config.ConfigGlobals;
+        globalSetup: string;
+        globalTeardown: string;
+        haste: Config.HasteConfig;
+        id: string;
+        injectGlobals: boolean;
+        reporters: (string | Config.ReporterConfig)[];
+        logHeapUsage: boolean;
+        lastCommit: boolean;
+        listTests: boolean;
+        maxConcurrency: number;
+        maxWorkers: string | number;
+        moduleDirectories: string[];
+        moduleFileExtensions: string[];
+        moduleNameMapper: {
+            [key: string]: string | string[];
+        };
+        modulePathIgnorePatterns: string[];
+        modulePaths: string[];
+        noStackTrace: boolean;
+        notify: boolean;
+        notifyMode: string;
+        onlyChanged: boolean;
+        onlyFailures: boolean;
+        outputFile: string;
+        passWithNoTests: boolean;
+        preset: string;
+        prettierPath: string;
+        projects: (string | Config.InitialProjectOptions)[];
+        replname: string;
+        resetMocks: boolean;
+        resetModules: boolean;
+        resolver: string;
+        restoreMocks: boolean;
+        rootDir: string;
+        roots: string[];
+        runner: string;
+        runTestsByPath: boolean;
+        runtime: string;
+        sandboxInjectedGlobals: string[];
+        setupFiles: string[];
+        setupFilesAfterEnv: string[];
+        silent: boolean;
+        skipFilter: boolean;
+        skipNodeResolution: boolean;
+        slowTestThreshold: number;
+        snapshotResolver: string;
+        snapshotSerializers: string[];
+        snapshotFormat: Partial<{
+            readonly min: boolean;
+            readonly maxWidth: number;
+            readonly indent: number;
+            readonly highlight: boolean;
+            readonly callToJSON: boolean;
+            readonly escapeRegex: boolean;
+            readonly escapeString: boolean;
+            readonly maxDepth: number;
+            readonly printBasicPrototype: boolean;
+            readonly printFunctionName: boolean;
+            readonly theme: Partial<{
+                readonly content: string;
+                readonly value: string;
+                readonly comment: string;
+                readonly prop: string;
+                readonly tag: string;
+            }>;
+        }>;
+        errorOnDeprecated: boolean;
+        testEnvironment: string;
+        testEnvironmentOptions: Record<string, unknown>;
+        testFailureExitCode: string | number;
+        testLocationInResults: boolean;
+        testMatch: string[];
+        testNamePattern: string;
+        testPathIgnorePatterns: string[];
+        testRegex: string | string[];
+        testResultsProcessor: string;
+        testRunner: string;
+        testSequencer: string;
+        testTimeout: number;
+        transform: {
+            [regex: string]: string | Config.TransformerConfig;
+        };
+        transformIgnorePatterns: string[];
+        watchPathIgnorePatterns: string[];
+        unmockedModulePathPatterns: string[];
+        updateSnapshot: boolean;
+        useStderr: boolean;
+        verbose?: boolean;
+        watch: boolean;
+        watchAll: boolean;
+        watchman: boolean;
+        watchPlugins: (string | [string, Record<string, unknown>])[];
+    }>;
+}

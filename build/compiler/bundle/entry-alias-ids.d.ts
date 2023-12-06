@@ -1,0 +1,13 @@
+export declare const STENCIL_CORE_ID = "@stencil/core";
+export declare const STENCIL_INTERNAL_ID = "@stencil/core/internal";
+export declare const STENCIL_APP_DATA_ID = "@stencil/core/internal/app-data";
+export declare const STENCIL_APP_GLOBALS_ID = "@stencil/core/internal/app-globals";
+export declare const STENCIL_HYDRATE_FACTORY_ID = "@stencil/core/hydrate-factory";
+export declare const STENCIL_INTERNAL_CLIENT_ID = "@stencil/core/internal/client";
+export declare const STENCIL_INTERNAL_CLIENT_PATCH_BROWSER_ID = "@stencil/core/internal/client/patch-browser";
+export declare const STENCIL_INTERNAL_HYDRATE_ID = "@stencil/core/internal/hydrate";
+export declare const STENCIL_MOCK_DOC_ID = "@stencil/core/mock-doc";
+export declare const APP_DATA_CONDITIONAL = "?app-data=conditional";
+export declare const LAZY_BROWSER_ENTRY_ID: string;
+export declare const LAZY_EXTERNAL_ENTRY_ID: string;
+export declare const USER_INDEX_ENTRY_ID = "@user-index-entrypoint";

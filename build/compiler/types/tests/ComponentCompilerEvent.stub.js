@@ -1,0 +1,31 @@
+/**
+ * Generates a stub {@link ComponentCompilerEvent}. This function uses sensible defaults for the initial stub. However,
+ * any field in the object may be overridden via the `overrides` argument.
+ * @param overrides a partial implementation of `ComponentCompilerEvent`. Any provided fields will override the
+ * defaults provided by this function.
+ * @returns the stubbed `ComponentCompilerEvent`
+ */
+export const stubComponentCompilerEvent = (overrides = {}) => {
+    const defaults = {
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+        internal: false,
+        name: 'myEvent',
+        method: 'myEvent',
+        complexType: {
+            original: 'UserImplementedEventType',
+            resolved: '"foo" | "bar"',
+            references: {
+                UserImplementedEventType: {
+                    id: 'placeholder',
+                    location: 'import',
+                    path: './resources',
+                },
+            },
+        },
+        docs: undefined,
+    };
+    return { ...defaults, ...overrides };
+};
+//# sourceMappingURL=ComponentCompilerEvent.stub.js.map

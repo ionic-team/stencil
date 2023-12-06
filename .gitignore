@@ -18,10 +18,6 @@ log.txt
 node_modules/
 coverage/
 
-/build/
-/scripts/build/
-dist/
-
 # submodule packages
 /build-conditionals
 /cli

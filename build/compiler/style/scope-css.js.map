@@ -1,0 +1,1 @@
+{"version":3,"file":"scope-css.js","sourceRoot":"","sources":["../../../src/compiler/style/scope-css.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,kBAAkB,EAAE,MAAM,QAAQ,CAAC;AAE5C,MAAM,CAAC,MAAM,UAAU,GAAG,CAAC,OAAe,EAAE,IAAa,EAAE,EAAE;IAC3D,OAAO,KAAK,GAAG,OAAO,GAAG,CAAC,IAAI,IAAI,IAAI,KAAK,kBAAkB,CAAC,CAAC,CAAC,GAAG,GAAG,IAAI,CAAC,CAAC,CAAC,EAAE,CAAC,CAAC;AACnF,CAAC,CAAC"}

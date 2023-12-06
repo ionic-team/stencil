@@ -1,0 +1,1 @@
+{"version":3,"file":"intersection-observer.js","sourceRoot":"","sources":["../../src/mock-doc/intersection-observer.ts"],"names":[],"mappings":"AAAA,MAAM,OAAO,wBAAwB;IACnC;QACE,IAAI;IACN,CAAC;IAED,UAAU;QACR,IAAI;IACN,CAAC;IAED,OAAO;QACL,IAAI;IACN,CAAC;IAED,WAAW;QACT,OAAO,EAAE,CAAC;IACZ,CAAC;IAED,SAAS;QACP,IAAI;IACN,CAAC;CACF"}
