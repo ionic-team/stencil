@@ -213,46 +213,102 @@ export const patchTextContent = (hostElementPrototype: HTMLElement): void => {
 
   Object.defineProperty(hostElementPrototype, '__textContent', descriptor);
 
-  Object.defineProperty(hostElementPrototype, 'textContent', {
-    get(): string | null {
-      // get the 'default slot', which would be the first slot in a shadow tree (if we were using one), whose name is
-      // the empty string
-      const slotNode = getHostSlotNode(this.childNodes, '');
-      // when a slot node is found, the textContent _may_ be found in the next sibling (text) node, depending on how
-      // nodes were reordered during the vdom render. first try to get the text content from the sibling.
-      if (slotNode?.nextSibling?.nodeType === NODE_TYPES.TEXT_NODE) {
-        return slotNode.nextSibling.textContent;
-      } else if (slotNode) {
-        return slotNode.textContent;
-      } else {
-        // fallback to the original implementation
-        return this.__textContent;
-      }
-    },
+  if (BUILD.experimentalSlotFixes) {
+    // Patch `textContent` to mimic shadow root behavior
+    Object.defineProperty(hostElementPrototype, 'textContent', {
+      // To mimic shadow root behavior, we need to return the text content of all
+      // nodes in a slot reference node
+      get(): string | null {
+        const slotRefNodes = getAllChildSlotNodes(this.childNodes);
 
-    set(value: string | null) {
-      // get the 'default slot', which would be the first slot in a shadow tree (if we were using one), whose name is
-      // the empty string
-      const slotNode = getHostSlotNode(this.childNodes, '');
-      // when a slot node is found, the textContent _may_ need to be placed in the next sibling (text) node,
-      // depending on how nodes were reordered during the vdom render. first try to set the text content on the
-      // sibling.
-      if (slotNode?.nextSibling?.nodeType === NODE_TYPES.TEXT_NODE) {
-        slotNode.nextSibling.textContent = value;
-      } else if (slotNode) {
-        slotNode.textContent = value;
-      } else {
-        // we couldn't find a slot, but that doesn't mean that there isn't one. if this check ran before the DOM
-        // loaded, we could have missed it. check for a content reference element on the scoped component and insert
-        // it there
-        this.__textContent = value;
-        const contentRefElm = this['s-cr'];
-        if (contentRefElm) {
-          this.insertBefore(contentRefElm, this.firstChild);
+        const textContent = slotRefNodes
+          .map((node) => {
+            const text = [];
+
+            // Need to get the text content of all nodes in the slot reference node
+            let slotContent = node.nextSibling as d.RenderNode | null;
+            while (slotContent && slotContent['s-sn'] === node['s-sn']) {
+              text.push(slotContent.textContent?.trim() ?? '');
+              slotContent = slotContent.nextSibling as d.RenderNode | null;
+            }
+
+            return text.filter((ref) => ref !== '').join(' ');
+          })
+          .filter((text) => text !== '')
+          .join(' ');
+
+        // Pad the string to return
+        return ' ' + textContent + ' ';
+      },
+
+      // To mimic shadow root behavior, we need to overwrite all nodes in a slot
+      // reference node. If a default slot reference node exists, the text content will be
+      // placed there. Otherwise, the new text node will be hidden
+      set(value: string | null) {
+        const slotRefNodes = getAllChildSlotNodes(this.childNodes);
+
+        slotRefNodes.forEach((node) => {
+          // Remove the existing content of the slot
+          let slotContent = node.nextSibling as d.RenderNode | null;
+          while (slotContent && slotContent['s-sn'] === node['s-sn']) {
+            slotContent.remove();
+            slotContent = slotContent.nextSibling as d.RenderNode | null;
+          }
+
+          // If this is a default slot, add the text node in the slot location.
+          // Otherwise, destroy the slot reference node
+          if (node['s-sn'] === '') {
+            const textNode = this.ownerDocument.createTextNode(value);
+            textNode['s-sn'] = '';
+            node.parentElement.insertBefore(textNode, node.nextSibling);
+          } else {
+            node.remove();
+          }
+        });
+      },
+    });
+  } else {
+    Object.defineProperty(hostElementPrototype, 'textContent', {
+      get(): string | null {
+        // get the 'default slot', which would be the first slot in a shadow tree (if we were using one), whose name is
+        // the empty string
+        const slotNode = getHostSlotNode(this.childNodes, '');
+        // when a slot node is found, the textContent _may_ be found in the next sibling (text) node, depending on how
+        // nodes were reordered during the vdom render. first try to get the text content from the sibling.
+        if (slotNode?.nextSibling?.nodeType === NODE_TYPES.TEXT_NODE) {
+          return slotNode.nextSibling.textContent;
+        } else if (slotNode) {
+          return slotNode.textContent;
+        } else {
+          // fallback to the original implementation
+          return this.__textContent;
         }
-      }
-    },
-  });
+      },
+
+      set(value: string | null) {
+        // get the 'default slot', which would be the first slot in a shadow tree (if we were using one), whose name is
+        // the empty string
+        const slotNode = getHostSlotNode(this.childNodes, '');
+        // when a slot node is found, the textContent _may_ need to be placed in the next sibling (text) node,
+        // depending on how nodes were reordered during the vdom render. first try to set the text content on the
+        // sibling.
+        if (slotNode?.nextSibling?.nodeType === NODE_TYPES.TEXT_NODE) {
+          slotNode.nextSibling.textContent = value;
+        } else if (slotNode) {
+          slotNode.textContent = value;
+        } else {
+          // we couldn't find a slot, but that doesn't mean that there isn't one. if this check ran before the DOM
+          // loaded, we could have missed it. check for a content reference element on the scoped component and insert
+          // it there
+          this.__textContent = value;
+          const contentRefElm = this['s-cr'];
+          if (contentRefElm) {
+            this.insertBefore(contentRefElm, this.firstChild);
+          }
+        }
+      },
+    });
+  }
 };
 
 export const patchChildSlotNodes = (elm: HTMLElement, cmpMeta: d.ComponentRuntimeMeta) => {
@@ -297,6 +353,25 @@ export const patchChildSlotNodes = (elm: HTMLElement, cmpMeta: d.ComponentRuntim
       },
     });
   }
+};
+
+/**
+ * Recursively finds all slot reference nodes ('s-sr') in a series of child nodes.
+ *
+ * @param childNodes The set of child nodes to search for slot reference nodes.
+ * @returns An array of slot reference nodes.
+ */
+const getAllChildSlotNodes = (childNodes: NodeListOf<ChildNode>): d.RenderNode[] => {
+  const slotRefNodes = [];
+
+  for (const childNode of Array.from(childNodes) as d.RenderNode[]) {
+    if (childNode['s-sr']) {
+      slotRefNodes.push(childNode);
+    }
+    slotRefNodes.push(...getAllChildSlotNodes(childNode.childNodes));
+  }
+
+  return slotRefNodes;
 };
 
 const getSlotName = (node: d.RenderNode) =>
