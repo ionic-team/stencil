@@ -314,6 +314,12 @@ export namespace Components {
     }
     interface SlotFallbackRoot {
     }
+    interface SlotHideContentOpen {
+        "enabled": boolean;
+    }
+    interface SlotHideContentScoped {
+        "enabled": boolean;
+    }
     interface SlotHtml {
         "inc": number;
     }
@@ -1218,6 +1224,18 @@ declare global {
         prototype: HTMLSlotFallbackRootElement;
         new (): HTMLSlotFallbackRootElement;
     };
+    interface HTMLSlotHideContentOpenElement extends Components.SlotHideContentOpen, HTMLStencilElement {
+    }
+    var HTMLSlotHideContentOpenElement: {
+        prototype: HTMLSlotHideContentOpenElement;
+        new (): HTMLSlotHideContentOpenElement;
+    };
+    interface HTMLSlotHideContentScopedElement extends Components.SlotHideContentScoped, HTMLStencilElement {
+    }
+    var HTMLSlotHideContentScopedElement: {
+        prototype: HTMLSlotHideContentScopedElement;
+        new (): HTMLSlotHideContentScopedElement;
+    };
     interface HTMLSlotHtmlElement extends Components.SlotHtml, HTMLStencilElement {
     }
     var HTMLSlotHtmlElement: {
@@ -1548,6 +1566,8 @@ declare global {
         "slot-dynamic-wrapper-root": HTMLSlotDynamicWrapperRootElement;
         "slot-fallback": HTMLSlotFallbackElement;
         "slot-fallback-root": HTMLSlotFallbackRootElement;
+        "slot-hide-content-open": HTMLSlotHideContentOpenElement;
+        "slot-hide-content-scoped": HTMLSlotHideContentScopedElement;
         "slot-html": HTMLSlotHtmlElement;
         "slot-light-dom-content": HTMLSlotLightDomContentElement;
         "slot-light-dom-root": HTMLSlotLightDomRootElement;
@@ -1896,6 +1916,12 @@ declare namespace LocalJSX {
     }
     interface SlotFallbackRoot {
     }
+    interface SlotHideContentOpen {
+        "enabled"?: boolean;
+    }
+    interface SlotHideContentScoped {
+        "enabled"?: boolean;
+    }
     interface SlotHtml {
         "inc"?: number;
     }
@@ -2095,6 +2121,8 @@ declare namespace LocalJSX {
         "slot-dynamic-wrapper-root": SlotDynamicWrapperRoot;
         "slot-fallback": SlotFallback;
         "slot-fallback-root": SlotFallbackRoot;
+        "slot-hide-content-open": SlotHideContentOpen;
+        "slot-hide-content-scoped": SlotHideContentScoped;
         "slot-html": SlotHtml;
         "slot-light-dom-content": SlotLightDomContent;
         "slot-light-dom-root": SlotLightDomRoot;
@@ -2255,6 +2283,8 @@ declare module "@stencil/core" {
             "slot-dynamic-wrapper-root": LocalJSX.SlotDynamicWrapperRoot & JSXBase.HTMLAttributes<HTMLSlotDynamicWrapperRootElement>;
             "slot-fallback": LocalJSX.SlotFallback & JSXBase.HTMLAttributes<HTMLSlotFallbackElement>;
             "slot-fallback-root": LocalJSX.SlotFallbackRoot & JSXBase.HTMLAttributes<HTMLSlotFallbackRootElement>;
+            "slot-hide-content-open": LocalJSX.SlotHideContentOpen & JSXBase.HTMLAttributes<HTMLSlotHideContentOpenElement>;
+            "slot-hide-content-scoped": LocalJSX.SlotHideContentScoped & JSXBase.HTMLAttributes<HTMLSlotHideContentScopedElement>;
             "slot-html": LocalJSX.SlotHtml & JSXBase.HTMLAttributes<HTMLSlotHtmlElement>;
             "slot-light-dom-content": LocalJSX.SlotLightDomContent & JSXBase.HTMLAttributes<HTMLSlotLightDomContentElement>;
             "slot-light-dom-root": LocalJSX.SlotLightDomRoot & JSXBase.HTMLAttributes<HTMLSlotLightDomRootElement>;

@@ -135,9 +135,10 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
     }
   }
 
+  // This needs to always happen so we can hide nodes that are projected
+  // to another component but don't end up in a slot
+  elm['s-hn'] = hostTagName;
   if (BUILD.slotRelocation) {
-    elm['s-hn'] = hostTagName;
-
     if (newVNode.$flags$ & (VNODE_FLAGS.isSlotFallback | VNODE_FLAGS.isSlotReference)) {
       // remember the content reference comment
       elm['s-sr'] = true;
@@ -1096,11 +1097,25 @@ render() {
               // we're just going to append the node as the last child of the parent. Passing
               // `null` as the second arg here will trigger that behavior.
               parentNodeRef.insertBefore(nodeToRelocate, insertBeforeNode);
+
+              // Reset the `hidden` value back to what it was defined as originally
+              // This solves a problem where a `slot` is dynamically rendered and `hidden` may have
+              // been set on content originally, but now it has a slot to go to so it should have
+              // the value it was defined as having in the DOM, not what we overrode it to.
+              if (nodeToRelocate.nodeType === NODE_TYPE.ElementNode) {
+                nodeToRelocate.hidden = nodeToRelocate['s-ih'] ?? false;
+              }
             }
           }
         } else {
           // this node doesn't have a slot home to go to, so let's hide it
           if (nodeToRelocate.nodeType === NODE_TYPE.ElementNode) {
+            // Store the initial value of `hidden` so we can reset it later when
+            // moving nodes around.
+            if (isInitialLoad) {
+              nodeToRelocate['s-ih'] = nodeToRelocate.hidden ?? false;
+            }
+
             nodeToRelocate.hidden = true;
           }
         }
@@ -1117,6 +1132,23 @@ render() {
 
     // always reset
     relocateNodes.length = 0;
+  }
+
+  // Hide any elements that were projected through, but don't have a slot to go to.
+  // Only an issue if there were no "slots" rendered. Otherwise, nodes are hidden correctly.
+  // This _only_ happens for `scoped` components!
+  if (BUILD.experimentalSlotFixes && cmpMeta.$flags$ & CMP_FLAGS.scopedCssEncapsulation) {
+    for (const childNode of rootVnode.$elm$.childNodes) {
+      if (childNode['s-hn'] !== hostTagName && !childNode['s-sh']) {
+        // Store the initial value of `hidden` so we can reset it later when
+        // moving nodes around.
+        if (isInitialLoad && childNode['s-ih'] == null) {
+          childNode['s-ih'] = childNode.hidden ?? false;
+        }
+
+        childNode.hidden = true;
+      }
+    }
   }
 };
 
