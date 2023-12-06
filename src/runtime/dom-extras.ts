@@ -253,8 +253,9 @@ export const patchTextContent = (hostElementPrototype: HTMLElement): void => {
           // Remove the existing content of the slot
           let slotContent = node.nextSibling as d.RenderNode | null;
           while (slotContent && slotContent['s-sn'] === node['s-sn']) {
-            slotContent.remove();
+            const tmp = slotContent;
             slotContent = slotContent.nextSibling as d.RenderNode | null;
+            tmp.remove();
           }
 
           // If this is a default slot, add the text node in the slot location.
