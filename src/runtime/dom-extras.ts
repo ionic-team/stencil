@@ -228,7 +228,9 @@ export const patchTextContent = (hostElementPrototype: HTMLElement): void => {
             // Need to get the text content of all nodes in the slot reference node
             let slotContent = node.nextSibling as d.RenderNode | null;
             while (slotContent && slotContent['s-sn'] === node['s-sn']) {
-              text.push(slotContent.textContent?.trim() ?? '');
+              if (slotContent.nodeType === NODE_TYPES.TEXT_NODE || slotContent.nodeType === NODE_TYPES.ELEMENT_NODE) {
+                text.push(slotContent.textContent?.trim() ?? '');
+              }
               slotContent = slotContent.nextSibling as d.RenderNode | null;
             }
 
