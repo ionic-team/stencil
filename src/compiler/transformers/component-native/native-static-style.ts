@@ -1,9 +1,10 @@
-import { dashToPascalCase, DEFAULT_STYLE_MODE } from '@utils';
+import { DEFAULT_STYLE_MODE } from '@utils';
 import ts from 'typescript';
 
 import type * as d from '../../../declarations';
 import { scopeCss } from '../../../utils/shadow-css';
 import { getScopeId } from '../../style/scope-css';
+import { createStyleIdentifier } from '../add-static-style';
 import { createStaticGetter } from '../transform-utils';
 
 export const addNativeStaticStyle = (classMembers: ts.ClassElement[], cmp: d.ComponentCompilerMeta) => {
@@ -43,7 +44,7 @@ const addMultipleModeStyleGetter = (
       // import generated from @Component() styleUrls option
       // import myTagIosStyle from './import-path.css';
       // static get style() { return { "ios": myTagIosStyle }; }
-      const styleUrlIdentifier = createStyleIdentifierFromUrl(cmp, style);
+      const styleUrlIdentifier = createStyleIdentifier(cmp, style);
       const propUrlIdentifier = ts.factory.createPropertyAssignment(style.modeName, styleUrlIdentifier);
       styleModes.push(propUrlIdentifier);
     }
@@ -74,7 +75,7 @@ const addSingleStyleGetter = (
     // import generated from @Component() styleUrls option
     // import myTagStyle from './import-path.css';
     // static get style() { return myTagStyle; }
-    const styleUrlIdentifier = createStyleIdentifierFromUrl(cmp, style);
+    const styleUrlIdentifier = createStyleIdentifier(cmp, style);
     classMembers.push(createStaticGetter('style', styleUrlIdentifier));
   }
 };
@@ -87,18 +88,4 @@ const createStyleLiteral = (cmp: d.ComponentCompilerMeta, style: d.StyleCompiler
   }
 
   return ts.factory.createStringLiteral(style.styleStr);
-};
-
-const createStyleIdentifierFromUrl = (cmp: d.ComponentCompilerMeta, style: d.StyleCompiler) => {
-  style.styleIdentifier = dashToPascalCase(cmp.tagName);
-  style.styleIdentifier = style.styleIdentifier.charAt(0).toLowerCase() + style.styleIdentifier.substring(1);
-
-  if (style.modeName !== DEFAULT_STYLE_MODE) {
-    style.styleIdentifier += dashToPascalCase(style.modeName);
-  }
-
-  style.styleIdentifier += 'Style';
-  style.externalStyles = [style.externalStyles[0]];
-
-  return ts.factory.createIdentifier(style.styleIdentifier);
 };
