@@ -2673,7 +2673,7 @@ export interface TranspileOptions {
    * A component can be defined as a custom element by using `customelement`, or the
    * component class can be exported by using `module`. Default is `customelement`.
    */
-  componentExport?: 'customelement' | 'module' | string | undefined;
+  componentExport?: 'customelement' | 'module' | string | undefined | null;
   /**
    * Sets how and if component metadata should be assigned on the compiled
    * component output. The `compilerstatic` value will set the metadata to
@@ -2704,12 +2704,12 @@ export interface TranspileOptions {
    * component class. The `defineproperty` value sets the getters and setters
    * using Object.defineProperty. Default is `defineproperty`.
    */
-  proxy?: 'defineproperty' | string | undefined;
+  proxy?: 'defineproperty' | string | undefined | null;
   /**
    * How component styles should be associated to the component. The `static`
    * setting will assign the styles as a static getter on the component class.
    */
-  style?: 'static' | string | undefined;
+  style?: 'static' | string | undefined | null;
   /**
    * How style data should be added for imports. For example, the `queryparams` value
    * adds the component's tagname and encapsulation info as querystring parameter
