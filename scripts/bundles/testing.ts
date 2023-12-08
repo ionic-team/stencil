@@ -106,6 +106,7 @@ export async function testing(opts: BuildOptions) {
         preferConst: true,
       }),
       prettyMinifyPlugin(opts, getBanner(opts, `Stencil Testing`, true)),
+      ignorePuppteerDependency(opts),
     ],
     treeshake: {
       moduleSideEffects: false,
@@ -129,4 +130,30 @@ async function copyTestingInternalDts(opts: BuildOptions, inputDir: string) {
       return false;
     },
   });
+}
+
+/**
+ * To avoid having user to install puppeteer for building their app (even if they don't use e2e testing),
+ * we ignore the puppeteer dependency in the generated d.ts file.
+ * @param opts build options
+ * @returns void
+ */
+function ignorePuppteerDependency(opts: BuildOptions) {
+  return {
+    name: 'ignorePuppteerDependency',
+    async buildEnd() {
+      const typeFilePath = join(opts.output.testingDir, 'puppeteer', 'puppeteer-declarations.d.ts');
+      const updatedFileContent = (await fs.readFile(typeFilePath, 'utf8'))
+        .split('\n')
+        .reduce((lines, line) => {
+          if (line.endsWith(`from 'puppeteer';`)) {
+            lines.push('// @ts-ignore - avoid requiring puppeteer as dependency');
+          }
+          lines.push(line);
+          return lines;
+        }, [] as string[])
+        .join('\n');
+      await fs.writeFile(typeFilePath, updatedFileContent);
+    },
+  };
 }
