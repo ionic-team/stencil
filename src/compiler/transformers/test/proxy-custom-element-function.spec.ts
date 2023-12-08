@@ -1,7 +1,8 @@
 import * as d from '@stencil/core/declarations';
-import { mockCompilerCtx } from '@stencil/core/testing';
+import { mockCompilerCtx, mockModule } from '@stencil/core/testing';
 import * as ts from 'typescript';
 
+import { stubComponentCompilerMeta } from '../../types/tests/ComponentCompilerMeta.stub';
 import * as AddComponentMetaProxy from '../add-component-meta-proxy';
 import { proxyCustomElement } from '../component-native/proxy-custom-element-function';
 import { PROXY_CUSTOM_ELEMENT } from '../core-runtime-apis';
@@ -38,14 +39,13 @@ describe('proxy-custom-element-function', () => {
 
     getModuleFromSourceFileSpy = jest.spyOn(TransformUtils, 'getModuleFromSourceFile');
     getModuleFromSourceFileSpy.mockImplementation((_compilerCtx: d.CompilerCtx, _tsSourceFile: ts.SourceFile) => {
-      // TODO(STENCIL-379): Replace with a getMockModule() call
-      return {
+      return mockModule({
         cmps: [
-          {
+          stubComponentCompilerMeta({
             componentClassName,
-          },
+          }),
         ],
-      } as d.Module;
+      });
     });
 
     createClassMetadataProxySpy = jest.spyOn(AddComponentMetaProxy, 'createClassMetadataProxy');
@@ -146,10 +146,7 @@ describe('proxy-custom-element-function', () => {
   describe('source file unchanged', () => {
     it('returns the source file when no Stencil module is found', async () => {
       getModuleFromSourceFileSpy.mockImplementation((_compilerCtx: d.CompilerCtx, _tsSourceFile: ts.SourceFile) => {
-        // TODO(STENCIL-379): Replace with a getMockModule() call
-        return {
-          cmps: [],
-        } as d.Module;
+        return mockModule();
       });
 
       const code = `const ${componentClassName} = class extends HTMLElement {};`;
@@ -162,14 +159,9 @@ describe('proxy-custom-element-function', () => {
 
     it('returns the source file when no variable statements are found', () => {
       getModuleFromSourceFileSpy.mockImplementation((_compilerCtx: d.CompilerCtx, _tsSourceFile: ts.SourceFile) => {
-        // TODO(STENCIL-379): Replace with a getMockModule() call
-        return {
-          cmps: [
-            {
-              componentClassName,
-            },
-          ],
-        } as d.Module;
+        return mockModule({
+          cmps: [stubComponentCompilerMeta({ componentClassName })],
+        });
       });
 
       const code = `helloWorld();`;
@@ -182,14 +174,13 @@ describe('proxy-custom-element-function', () => {
 
     it("returns the source file when variable statements don't match the component name", () => {
       getModuleFromSourceFileSpy.mockImplementation((_compilerCtx: d.CompilerCtx, _tsSourceFile: ts.SourceFile) => {
-        // TODO(STENCIL-379): Replace with a getMockModule() call
-        return {
+        return mockModule({
           cmps: [
-            {
+            stubComponentCompilerMeta({
               componentClassName: 'ComponentNameDoesNotExist',
-            },
+            }),
           ],
-        } as d.Module;
+        });
       });
 
       const code = `const ${componentClassName} = class extends HTMLElement { };`;
