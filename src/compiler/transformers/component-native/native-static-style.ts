@@ -33,13 +33,6 @@ const addMultipleModeStyleGetter = (
       const styleLiteral = createStyleLiteral(cmp, style);
       const propStr = ts.factory.createPropertyAssignment(style.modeName, styleLiteral);
       styleModes.push(propStr);
-    } else if (typeof style.styleIdentifier === 'string') {
-      // direct import already written in the source code
-      // import myTagIosStyle from './import-path.css';
-      // static get style() { return { "ios": myTagIosStyle }; }
-      const styleIdentifier = ts.factory.createIdentifier(style.styleIdentifier);
-      const propIdentifier = ts.factory.createPropertyAssignment(style.modeName, styleIdentifier);
-      styleModes.push(propIdentifier);
     } else if (Array.isArray(style.externalStyles) && style.externalStyles.length > 0) {
       // import generated from @Component() styleUrls option
       // import myTagIosStyle from './import-path.css';
@@ -47,6 +40,13 @@ const addMultipleModeStyleGetter = (
       const styleUrlIdentifier = createStyleIdentifier(cmp, style);
       const propUrlIdentifier = ts.factory.createPropertyAssignment(style.modeName, styleUrlIdentifier);
       styleModes.push(propUrlIdentifier);
+    } else if (typeof style.styleIdentifier === 'string') {
+      // direct import already written in the source code
+      // import myTagIosStyle from './import-path.css';
+      // static get style() { return { "ios": myTagIosStyle }; }
+      const styleIdentifier = ts.factory.createIdentifier(style.styleIdentifier);
+      const propIdentifier = ts.factory.createPropertyAssignment(style.modeName, styleIdentifier);
+      styleModes.push(propIdentifier);
     }
   });
 
