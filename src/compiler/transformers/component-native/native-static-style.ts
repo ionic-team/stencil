@@ -65,18 +65,18 @@ const addSingleStyleGetter = (
     // static get style() { return "string"; }
     const styleLiteral = createStyleLiteral(cmp, style);
     classMembers.push(createStaticGetter('style', styleLiteral));
-  } else if (typeof style.styleIdentifier === 'string') {
-    // direct import already written in the source code
-    // import myTagStyle from './import-path.css';
-    // static get style() { return myTagStyle; }
-    const styleIdentifier = ts.factory.createIdentifier(style.styleIdentifier);
-    classMembers.push(createStaticGetter('style', styleIdentifier));
   } else if (Array.isArray(style.externalStyles) && style.externalStyles.length > 0) {
     // import generated from @Component() styleUrls option
     // import myTagStyle from './import-path.css';
     // static get style() { return myTagStyle; }
     const styleUrlIdentifier = createStyleIdentifier(cmp, style);
     classMembers.push(createStaticGetter('style', styleUrlIdentifier));
+  } else if (typeof style.styleIdentifier === 'string') {
+    // direct import already written in the source code
+    // import myTagStyle from './import-path.css';
+    // static get style() { return myTagStyle; }
+    const styleIdentifier = ts.factory.createIdentifier(style.styleIdentifier);
+    classMembers.push(createStaticGetter('style', styleIdentifier));
   }
 };
 
