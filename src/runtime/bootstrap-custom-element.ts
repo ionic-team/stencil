@@ -44,7 +44,7 @@ export const proxyCustomElement = (Cstr: any, compactMeta: d.ComponentRuntimeMet
   }
 
   // TODO(STENCIL-914): this check and `else` block can go away and be replaced by just the `scoped` check
-  if (BUILD.experimentalSlotFixes && cmpMeta.$flags$ & CMP_FLAGS.scopedCssEncapsulation) {
+  if (BUILD.experimentalSlotFixes && BUILD.scoped && cmpMeta.$flags$ & CMP_FLAGS.scopedCssEncapsulation) {
     patchPseudoShadowDom(Cstr.prototype, cmpMeta);
   } else {
     if (BUILD.slotChildNodesFix) {
