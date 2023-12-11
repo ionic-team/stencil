@@ -27,6 +27,12 @@ const addMultipleModeStyleGetter = (
   const styleModes: ts.ObjectLiteralElementLike[] = [];
 
   styles.forEach((style) => {
+    /**
+     * the order of these if statements must match with
+     * - {@link src/compiler/transformers/component-native/native-static-style.ts#addSingleStyleGetter}
+     * - {@link src/compiler/transformers/add-static-style.ts#getSingleStyle}
+     * - {@link src/compiler/transformers/add-static-style.ts#getMultipleModeStyle}
+     */
     if (typeof style.styleStr === 'string') {
       // inline the style string
       // static get style() { return { "ios": "string" }; }
@@ -60,6 +66,12 @@ const addSingleStyleGetter = (
   cmp: d.ComponentCompilerMeta,
   style: d.StyleCompiler,
 ) => {
+  /**
+   * the order of these if statements must match with
+   * - {@link src/compiler/transformers/component-native/native-static-style.ts#addMultipleModeStyleGetter}
+   * - {@link src/compiler/transformers/add-static-style.ts#getSingleStyle}
+   * - {@link src/compiler/transformers/add-static-style.ts#getMultipleModeStyle}
+   */
   if (typeof style.styleStr === 'string') {
     // inline the style string
     // static get style() { return "string"; }
