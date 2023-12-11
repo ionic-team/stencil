@@ -15,11 +15,10 @@ import {
   CLASS_DECORATORS_TO_REMOVE,
   CONSTRUCTOR_DEFINED_MEMBER_DECORATORS,
   MEMBER_DECORATORS_TO_REMOVE,
-  STENCIL_DECORATORS,
-  StencilDecorator,
 } from './decorators-constants';
 import { elementDecoratorsToStatic } from './element-decorator';
 import { eventDecoratorsToStatic } from './event-decorator';
+import { ImportAliasMap } from './import-alias-map';
 import { listenDecoratorsToStatic } from './listen-decorator';
 import { methodDecoratorsToStatic, validateMethods } from './method-decorator';
 import { propDecoratorsToStatic } from './prop-decorator';
@@ -98,7 +97,7 @@ const visitClassDeclaration = (
   classNode: ts.ClassDeclaration,
   sourceFile: ts.SourceFile,
 ): ts.ClassDeclaration => {
-  const importAliasMap = generateImportAliasMap(sourceFile);
+  const importAliasMap = new ImportAliasMap(sourceFile);
 
   const componentDecorator = retrieveTsDecorators(classNode)?.find(isDecoratorNamed(importAliasMap.get('Component')));
   if (!componentDecorator) {
@@ -156,38 +155,6 @@ const visitClassDeclaration = (
     classNode.heritageClauses,
     updatedClassFields,
   );
-};
-
-/**
- * Parses a {@link ts.SourceFile} and generates a map of all imported Stencil decorators
- * to their aliases import name (if one exists).
- *
- * @param sourceFile The source file to parse
- * @returns A map of all imported Stencil decorators to their aliases import name
- */
-const generateImportAliasMap = (sourceFile: ts.SourceFile): Map<StencilDecorator, string> => {
-  const importAliasMap = new Map<StencilDecorator, string>();
-  const importDeclarations = sourceFile.statements.filter(ts.isImportDeclaration);
-
-  for (const importDeclaration of importDeclarations) {
-    if (importDeclaration.moduleSpecifier.getText().includes('@stencil/core')) {
-      const namedBindings = importDeclaration.importClause?.namedBindings;
-
-      if (ts.isNamedImports(namedBindings)) {
-        for (const element of namedBindings.elements) {
-          const importName = element.name.getText();
-          const originalImportName = element.propertyName?.getText() ?? importName;
-
-          // We only care to generate a map for the Stencil decorators
-          if (STENCIL_DECORATORS.includes(originalImportName as StencilDecorator)) {
-            importAliasMap.set(originalImportName as StencilDecorator, importName);
-          }
-        }
-      }
-    }
-  }
-
-  return importAliasMap;
 };
 
 /**
