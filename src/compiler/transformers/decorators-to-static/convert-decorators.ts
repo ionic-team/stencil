@@ -15,6 +15,8 @@ import {
   CLASS_DECORATORS_TO_REMOVE,
   CONSTRUCTOR_DEFINED_MEMBER_DECORATORS,
   MEMBER_DECORATORS_TO_REMOVE,
+  STENCIL_DECORATORS,
+  StencilDecorator,
 } from './decorators-constants';
 import { elementDecoratorsToStatic } from './element-decorator';
 import { eventDecoratorsToStatic } from './event-decorator';
@@ -48,14 +50,16 @@ export const convertDecoratorsToStatic = (
   program: ts.Program,
 ): ts.TransformerFactory<ts.SourceFile> => {
   return (transformCtx) => {
+    let sourceFile: ts.SourceFile;
     const visit = (node: ts.Node): ts.VisitResult<ts.Node> => {
       if (ts.isClassDeclaration(node)) {
-        return visitClassDeclaration(config, diagnostics, typeChecker, program, node);
+        return visitClassDeclaration(config, diagnostics, typeChecker, program, node, sourceFile);
       }
       return ts.visitEachChild(node, visit, transformCtx);
     };
 
     return (tsSourceFile) => {
+      sourceFile = tsSourceFile;
       return ts.visitEachChild(tsSourceFile, visit, transformCtx);
     };
   };
@@ -83,6 +87,7 @@ export const convertDecoratorsToStatic = (
  * @param typeChecker a TypeScript typechecker instance
  * @param program a {@link ts.Program} object
  * @param classNode the node currently being visited
+ * @param sourceFile the source file containing the class node
  * @returns a class node, possibly updated with new static values
  */
 const visitClassDeclaration = (
@@ -91,8 +96,11 @@ const visitClassDeclaration = (
   typeChecker: ts.TypeChecker,
   program: ts.Program,
   classNode: ts.ClassDeclaration,
+  sourceFile: ts.SourceFile,
 ): ts.ClassDeclaration => {
-  const componentDecorator = retrieveTsDecorators(classNode)?.find(isDecoratorNamed('Component'));
+  const importAliasMap = generateImportAliasMap(sourceFile);
+
+  const componentDecorator = retrieveTsDecorators(classNode)?.find(isDecoratorNamed(importAliasMap.get('Component')));
   if (!componentDecorator) {
     return classNode;
   }
@@ -105,7 +113,7 @@ const visitClassDeclaration = (
   // behavior specified for those decorated methods later on.
   const filteredMethodsAndFields = removeStencilMethodDecorators(Array.from(classMembers), diagnostics);
 
-  // parser component decorator (Component)
+  // parse component decorator
   componentDecoratorToStatic(config, typeChecker, diagnostics, classNode, filteredMethodsAndFields, componentDecorator);
 
   // stores a reference to fields that should be watched for changes
@@ -148,6 +156,38 @@ const visitClassDeclaration = (
     classNode.heritageClauses,
     updatedClassFields,
   );
+};
+
+/**
+ * Parses a {@link ts.SourceFile} and generates a map of all imported Stencil decorators
+ * to their aliases import name (if one exists).
+ *
+ * @param sourceFile The source file to parse
+ * @returns A map of all imported Stencil decorators to their aliases import name
+ */
+const generateImportAliasMap = (sourceFile: ts.SourceFile): Map<StencilDecorator, string> => {
+  const importAliasMap = new Map<StencilDecorator, string>();
+  const importDeclarations = sourceFile.statements.filter(ts.isImportDeclaration);
+
+  for (const importDeclaration of importDeclarations) {
+    if (importDeclaration.moduleSpecifier.getText().includes('@stencil/core')) {
+      const namedBindings = importDeclaration.importClause?.namedBindings;
+
+      if (ts.isNamedImports(namedBindings)) {
+        for (const element of namedBindings.elements) {
+          const importName = element.name.getText();
+          const originalImportName = element.propertyName?.getText() ?? importName;
+
+          // We only care to generate a map for the Stencil decorators
+          if (STENCIL_DECORATORS.includes(originalImportName as StencilDecorator)) {
+            importAliasMap.set(originalImportName as StencilDecorator, importName);
+          }
+        }
+      }
+    }
+  }
+
+  return importAliasMap;
 };
 
 /**
