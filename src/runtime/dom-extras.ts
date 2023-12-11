@@ -17,7 +17,7 @@ export const patchPseudoShadowDom = (
   patchSlotInsertAdjacentElement(hostElementPrototype);
   patchSlotInsertAdjacentHTML(hostElementPrototype);
   patchSlotInsertAdjacentText(hostElementPrototype);
-  patchTextContent(hostElementPrototype, descriptorPrototype);
+  patchTextContent(hostElementPrototype);
   patchChildSlotNodes(hostElementPrototype, descriptorPrototype);
 };
 
@@ -207,14 +207,70 @@ export const patchSlotInsertAdjacentElement = (HostElementPrototype: HTMLElement
 /**
  * Patches the text content of an unnamed slotted node inside a scoped component
  * @param hostElementPrototype the `Element` to be patched
- * @param cmpMeta component runtime metadata used to determine if the component should be patched or not
  */
-export const patchTextContent = (hostElementPrototype: HTMLElement, cmpMeta: d.ComponentRuntimeMeta): void => {
-  if (BUILD.scoped && cmpMeta.$flags$ & CMP_FLAGS.scopedCssEncapsulation) {
-    const descriptor = Object.getOwnPropertyDescriptor(Node.prototype, 'textContent');
+export const patchTextContent = (hostElementPrototype: HTMLElement): void => {
+  const descriptor = Object.getOwnPropertyDescriptor(Node.prototype, 'textContent');
 
-    Object.defineProperty(hostElementPrototype, '__textContent', descriptor);
+  Object.defineProperty(hostElementPrototype, '__textContent', descriptor);
 
+  if (BUILD.experimentalSlotFixes) {
+    // Patch `textContent` to mimic shadow root behavior
+    Object.defineProperty(hostElementPrototype, 'textContent', {
+      // To mimic shadow root behavior, we need to return the text content of all
+      // nodes in a slot reference node
+      get(): string | null {
+        const slotRefNodes = getAllChildSlotNodes(this.childNodes);
+
+        const textContent = slotRefNodes
+          .map((node) => {
+            const text = [];
+
+            // Need to get the text content of all nodes in the slot reference node
+            let slotContent = node.nextSibling as d.RenderNode | null;
+            while (slotContent && slotContent['s-sn'] === node['s-sn']) {
+              if (slotContent.nodeType === NODE_TYPES.TEXT_NODE || slotContent.nodeType === NODE_TYPES.ELEMENT_NODE) {
+                text.push(slotContent.textContent?.trim() ?? '');
+              }
+              slotContent = slotContent.nextSibling as d.RenderNode | null;
+            }
+
+            return text.filter((ref) => ref !== '').join(' ');
+          })
+          .filter((text) => text !== '')
+          .join(' ');
+
+        // Pad the string to return
+        return ' ' + textContent + ' ';
+      },
+
+      // To mimic shadow root behavior, we need to overwrite all nodes in a slot
+      // reference node. If a default slot reference node exists, the text content will be
+      // placed there. Otherwise, the new text node will be hidden
+      set(value: string | null) {
+        const slotRefNodes = getAllChildSlotNodes(this.childNodes);
+
+        slotRefNodes.forEach((node) => {
+          // Remove the existing content of the slot
+          let slotContent = node.nextSibling as d.RenderNode | null;
+          while (slotContent && slotContent['s-sn'] === node['s-sn']) {
+            const tmp = slotContent;
+            slotContent = slotContent.nextSibling as d.RenderNode | null;
+            tmp.remove();
+          }
+
+          // If this is a default slot, add the text node in the slot location.
+          // Otherwise, destroy the slot reference node
+          if (node['s-sn'] === '') {
+            const textNode = this.ownerDocument.createTextNode(value);
+            textNode['s-sn'] = '';
+            node.parentElement.insertBefore(textNode, node.nextSibling);
+          } else {
+            node.remove();
+          }
+        });
+      },
+    });
+  } else {
     Object.defineProperty(hostElementPrototype, 'textContent', {
       get(): string | null {
         // get the 'default slot', which would be the first slot in a shadow tree (if we were using one), whose name is
@@ -300,6 +356,25 @@ export const patchChildSlotNodes = (elm: HTMLElement, cmpMeta: d.ComponentRuntim
       },
     });
   }
+};
+
+/**
+ * Recursively finds all slot reference nodes ('s-sr') in a series of child nodes.
+ *
+ * @param childNodes The set of child nodes to search for slot reference nodes.
+ * @returns An array of slot reference nodes.
+ */
+const getAllChildSlotNodes = (childNodes: NodeListOf<ChildNode>): d.RenderNode[] => {
+  const slotRefNodes = [];
+
+  for (const childNode of Array.from(childNodes) as d.RenderNode[]) {
+    if (childNode['s-sr']) {
+      slotRefNodes.push(childNode);
+    }
+    slotRefNodes.push(...getAllChildSlotNodes(childNode.childNodes));
+  }
+
+  return slotRefNodes;
 };
 
 const getSlotName = (node: d.RenderNode) =>

@@ -397,6 +397,10 @@ export namespace Components {
     }
     interface Tag88 {
     }
+    interface TextContentPatchScoped {
+    }
+    interface TextContentPatchScopedWithSlot {
+    }
     interface WatchNativeAttributes {
     }
 }
@@ -1440,6 +1444,18 @@ declare global {
         prototype: HTMLTag88Element;
         new (): HTMLTag88Element;
     };
+    interface HTMLTextContentPatchScopedElement extends Components.TextContentPatchScoped, HTMLStencilElement {
+    }
+    var HTMLTextContentPatchScopedElement: {
+        prototype: HTMLTextContentPatchScopedElement;
+        new (): HTMLTextContentPatchScopedElement;
+    };
+    interface HTMLTextContentPatchScopedWithSlotElement extends Components.TextContentPatchScopedWithSlot, HTMLStencilElement {
+    }
+    var HTMLTextContentPatchScopedWithSlotElement: {
+        prototype: HTMLTextContentPatchScopedWithSlotElement;
+        new (): HTMLTextContentPatchScopedWithSlotElement;
+    };
     interface HTMLWatchNativeAttributesElement extends Components.WatchNativeAttributes, HTMLStencilElement {
     }
     var HTMLWatchNativeAttributesElement: {
@@ -1602,6 +1618,8 @@ declare global {
         "svg-class": HTMLSvgClassElement;
         "tag-3d-component": HTMLTag3dComponentElement;
         "tag-88": HTMLTag88Element;
+        "text-content-patch-scoped": HTMLTextContentPatchScopedElement;
+        "text-content-patch-scoped-with-slot": HTMLTextContentPatchScopedWithSlotElement;
         "watch-native-attributes": HTMLWatchNativeAttributesElement;
     }
 }
@@ -1999,6 +2017,10 @@ declare namespace LocalJSX {
     }
     interface Tag88 {
     }
+    interface TextContentPatchScoped {
+    }
+    interface TextContentPatchScopedWithSlot {
+    }
     interface WatchNativeAttributes {
     }
     interface IntrinsicElements {
@@ -2157,6 +2179,8 @@ declare namespace LocalJSX {
         "svg-class": SvgClass;
         "tag-3d-component": Tag3dComponent;
         "tag-88": Tag88;
+        "text-content-patch-scoped": TextContentPatchScoped;
+        "text-content-patch-scoped-with-slot": TextContentPatchScopedWithSlot;
         "watch-native-attributes": WatchNativeAttributes;
     }
 }
@@ -2319,6 +2343,8 @@ declare module "@stencil/core" {
             "svg-class": LocalJSX.SvgClass & JSXBase.HTMLAttributes<HTMLSvgClassElement>;
             "tag-3d-component": LocalJSX.Tag3dComponent & JSXBase.HTMLAttributes<HTMLTag3dComponentElement>;
             "tag-88": LocalJSX.Tag88 & JSXBase.HTMLAttributes<HTMLTag88Element>;
+            "text-content-patch-scoped": LocalJSX.TextContentPatchScoped & JSXBase.HTMLAttributes<HTMLTextContentPatchScopedElement>;
+            "text-content-patch-scoped-with-slot": LocalJSX.TextContentPatchScopedWithSlot & JSXBase.HTMLAttributes<HTMLTextContentPatchScopedWithSlotElement>;
             "watch-native-attributes": LocalJSX.WatchNativeAttributes & JSXBase.HTMLAttributes<HTMLWatchNativeAttributesElement>;
         }
     }
