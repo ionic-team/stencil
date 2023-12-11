@@ -3,7 +3,6 @@
 
 ### Bug Fixes
 
-* **compiler:** make style getter behavior consistent between default and native components ([#5144](https://github.com/ionic-team/stencil/issues/5144)) ([6abe250](https://github.com/ionic-team/stencil/commit/6abe25070243a0b17b13f6fec020048b87c85a32))
 * **compiler:** make sure typesDir exist before writing to it ([#5109](https://github.com/ionic-team/stencil/issues/5109)) ([9e4e27e](https://github.com/ionic-team/stencil/commit/9e4e27e58ad918cb6a0358d63bd348880a6c04e4))
 * **compiler:** reapply changes to style import transformer ([#5125](https://github.com/ionic-team/stencil/issues/5125)) ([#5131](https://github.com/ionic-team/stencil/issues/5131)) ([735d45a](https://github.com/ionic-team/stencil/commit/735d45afdda420420f6d3992662cb63ded2c937e)), closes [#5016](https://github.com/ionic-team/stencil/issues/5016)
 * **runtime:** hide slotted content with no destination in scoped components ([#5135](https://github.com/ionic-team/stencil/issues/5135)) ([77bce27](https://github.com/ionic-team/stencil/commit/77bce27e028a8c2e72b51bada45ecae9e35420fb)), closes [#4284](https://github.com/ionic-team/stencil/issues/4284)
