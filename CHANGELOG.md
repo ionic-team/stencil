@@ -1,3 +1,18 @@
+## 🐳 [4.8.2](https://github.com/ionic-team/stencil/compare/v4.8.1...v4.8.2) (2023-12-11)
+
+
+### Bug Fixes
+
+* **compiler:** make style getter behavior consistent between default and native components ([#5144](https://github.com/ionic-team/stencil/issues/5144)) ([6abe250](https://github.com/ionic-team/stencil/commit/6abe25070243a0b17b13f6fec020048b87c85a32))
+* **compiler:** make sure typesDir exist before writing to it ([#5109](https://github.com/ionic-team/stencil/issues/5109)) ([9e4e27e](https://github.com/ionic-team/stencil/commit/9e4e27e58ad918cb6a0358d63bd348880a6c04e4))
+* **compiler:** reapply changes to style import transformer ([#5125](https://github.com/ionic-team/stencil/issues/5125)) ([#5131](https://github.com/ionic-team/stencil/issues/5131)) ([735d45a](https://github.com/ionic-team/stencil/commit/735d45afdda420420f6d3992662cb63ded2c937e)), closes [#5016](https://github.com/ionic-team/stencil/issues/5016)
+* **runtime:** hide slotted content with no destination in scoped components ([#5135](https://github.com/ionic-team/stencil/issues/5135)) ([77bce27](https://github.com/ionic-team/stencil/commit/77bce27e028a8c2e72b51bada45ecae9e35420fb)), closes [#4284](https://github.com/ionic-team/stencil/issues/4284)
+* **runtime:** relocate slotted content when slot parent element tag changes ([#5120](https://github.com/ionic-team/stencil/issues/5120)) ([4303d6a](https://github.com/ionic-team/stencil/commit/4303d6af1bbcd995e3e02891b5e50768e8eeaffd)), closes [#4284](https://github.com/ionic-team/stencil/issues/4284)
+* **runtime:** update `textContent` patch to mimic Shadow Root ([#5146](https://github.com/ionic-team/stencil/issues/5146)) ([55c56d6](https://github.com/ionic-team/stencil/commit/55c56d69a6e7d049bd8da17c6aec54667ec89489)), closes [#3977](https://github.com/ionic-team/stencil/issues/3977)
+* **testing:** make Puppeteer an optional dependency ([#5145](https://github.com/ionic-team/stencil/issues/5145)) ([43cf0dc](https://github.com/ionic-team/stencil/commit/43cf0dc5324fb90547d97a0592c3a2d98e69fb0d))
+
+
+
 ## 🍹 [4.8.1](https://github.com/ionic-team/stencil/compare/v4.8.0...v4.8.1) (2023-12-04)
 
 
