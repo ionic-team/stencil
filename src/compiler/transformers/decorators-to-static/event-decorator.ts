@@ -19,10 +19,11 @@ export const eventDecoratorsToStatic = (
   typeChecker: ts.TypeChecker,
   program: ts.Program,
   newMembers: ts.ClassElement[],
+  decoratorName: string,
 ) => {
   const events = decoratedProps
     .filter(ts.isPropertyDeclaration)
-    .map((prop) => parseEventDecorator(diagnostics, typeChecker, program, prop))
+    .map((prop) => parseEventDecorator(diagnostics, typeChecker, program, prop, decoratorName))
     .filter((ev) => !!ev);
 
   if (events.length > 0) {
@@ -39,6 +40,7 @@ export const eventDecoratorsToStatic = (
  * @param program a {@link ts.Program} object
  * its surrounding context in the AST
  * @param prop the property on the Stencil component class that is decorated with `@Event()`
+ * @param decoratorName the name of the decorator to look for
  * @returns generated metadata for the class member decorated by `@Event()`, or `null` if none could be derived
  */
 const parseEventDecorator = (
@@ -46,8 +48,9 @@ const parseEventDecorator = (
   typeChecker: ts.TypeChecker,
   program: ts.Program,
   prop: ts.PropertyDeclaration,
+  decoratorName: string,
 ): d.ComponentCompilerStaticEvent | null => {
-  const eventDecorator = retrieveTsDecorators(prop)?.find(isDecoratorNamed('Event'));
+  const eventDecorator = retrieveTsDecorators(prop)?.find(isDecoratorNamed(decoratorName));
 
   if (eventDecorator == null) {
     return null;

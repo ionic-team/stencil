@@ -29,15 +29,17 @@ import { isDecoratorNamed } from './decorator-utils';
  * @param newMembers an out param for new class members
  * @param typeChecker a TypeScript typechecker, needed for resolving the prop
  * declaration name
+ * @param decoratorName the name of the decorator to look for
  */
 export const attachInternalsDecoratorsToStatic = (
   diagnostics: d.Diagnostic[],
   decoratedMembers: ts.ClassElement[],
   newMembers: ts.ClassElement[],
   typeChecker: ts.TypeChecker,
+  decoratorName: string,
 ) => {
   const attachInternalsMembers = decoratedMembers.filter(ts.isPropertyDeclaration).filter((prop) => {
-    return !!retrieveTsDecorators(prop)?.find(isDecoratorNamed('AttachInternals'));
+    return !!retrieveTsDecorators(prop)?.find(isDecoratorNamed(decoratorName));
   });
 
   // no decorated fields, return!

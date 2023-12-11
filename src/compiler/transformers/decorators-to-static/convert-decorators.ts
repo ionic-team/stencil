@@ -110,7 +110,7 @@ const visitClassDeclaration = (
   // create an array of all class members which are _not_ methods decorated
   // with a Stencil decorator. We do this here because we'll implement the
   // behavior specified for those decorated methods later on.
-  const filteredMethodsAndFields = removeStencilMethodDecorators(Array.from(classMembers), diagnostics);
+  const filteredMethodsAndFields = removeStencilMethodDecorators(Array.from(classMembers), diagnostics, importAliasMap);
 
   // parse component decorator
   componentDecoratorToStatic(config, typeChecker, diagnostics, classNode, filteredMethodsAndFields, componentDecorator);
@@ -118,9 +118,23 @@ const visitClassDeclaration = (
   // stores a reference to fields that should be watched for changes
   // parse member decorators (Prop, State, Listen, Event, Method, Element and Watch)
   if (decoratedMembers.length > 0) {
-    propDecoratorsToStatic(diagnostics, decoratedMembers, typeChecker, program, filteredMethodsAndFields);
-    stateDecoratorsToStatic(decoratedMembers, filteredMethodsAndFields, typeChecker);
-    eventDecoratorsToStatic(diagnostics, decoratedMembers, typeChecker, program, filteredMethodsAndFields);
+    propDecoratorsToStatic(
+      diagnostics,
+      decoratedMembers,
+      typeChecker,
+      program,
+      filteredMethodsAndFields,
+      importAliasMap.get('Prop'),
+    );
+    stateDecoratorsToStatic(decoratedMembers, filteredMethodsAndFields, typeChecker, importAliasMap.get('State'));
+    eventDecoratorsToStatic(
+      diagnostics,
+      decoratedMembers,
+      typeChecker,
+      program,
+      filteredMethodsAndFields,
+      importAliasMap.get('Event'),
+    );
     methodDecoratorsToStatic(
       config,
       diagnostics,
@@ -129,17 +143,30 @@ const visitClassDeclaration = (
       typeChecker,
       program,
       filteredMethodsAndFields,
+      importAliasMap.get('Method'),
     );
-    elementDecoratorsToStatic(diagnostics, decoratedMembers, typeChecker, filteredMethodsAndFields);
-    watchDecoratorsToStatic(typeChecker, decoratedMembers, filteredMethodsAndFields);
-    listenDecoratorsToStatic(diagnostics, typeChecker, decoratedMembers, filteredMethodsAndFields);
-    attachInternalsDecoratorsToStatic(diagnostics, decoratedMembers, filteredMethodsAndFields, typeChecker);
+    elementDecoratorsToStatic(diagnostics, decoratedMembers, filteredMethodsAndFields, importAliasMap.get('Element'));
+    watchDecoratorsToStatic(typeChecker, decoratedMembers, filteredMethodsAndFields, importAliasMap.get('Watch'));
+    listenDecoratorsToStatic(
+      diagnostics,
+      typeChecker,
+      decoratedMembers,
+      filteredMethodsAndFields,
+      importAliasMap.get('Listen'),
+    );
+    attachInternalsDecoratorsToStatic(
+      diagnostics,
+      decoratedMembers,
+      filteredMethodsAndFields,
+      typeChecker,
+      importAliasMap.get('AttachInternals'),
+    );
   }
 
   // We call the `handleClassFields` method which handles transforming any
   // class fields, removing them from the class and adding statements to the
   // class' constructor which instantiate them there instead.
-  const updatedClassFields = handleClassFields(classNode, filteredMethodsAndFields, typeChecker);
+  const updatedClassFields = handleClassFields(classNode, filteredMethodsAndFields, typeChecker, importAliasMap);
 
   validateMethods(diagnostics, classMembers);
 
@@ -147,7 +174,10 @@ const visitClassDeclaration = (
   return ts.factory.updateClassDeclaration(
     classNode,
     [
-      ...(filterDecorators(currentDecorators, CLASS_DECORATORS_TO_REMOVE) ?? []),
+      ...(filterDecorators(
+        currentDecorators,
+        CLASS_DECORATORS_TO_REMOVE.map((decorator) => importAliasMap.get(decorator)),
+      ) ?? []),
       ...(retrieveTsModifiers(classNode) ?? []),
     ],
     classNode.name,
@@ -170,16 +200,21 @@ const visitClassDeclaration = (
  * @param classMembers a list of ClassElement AST nodes
  * @param diagnostics a collection of compiler diagnostics, to which an error
  * may be added
+ * @param importAliasMap a map of Stencil decorator names to their import names
  * @returns a new list of the same ClassElement nodes, with any nodes which have
  * Stencil-specific decorators modified to remove them
  */
 const removeStencilMethodDecorators = (
   classMembers: ts.ClassElement[],
   diagnostics: d.Diagnostic[],
+  importAliasMap: ImportAliasMap,
 ): ts.ClassElement[] => {
   return classMembers.map((member) => {
     const currentDecorators = retrieveTsDecorators(member);
-    const newDecorators = filterDecorators(currentDecorators, MEMBER_DECORATORS_TO_REMOVE);
+    const newDecorators = filterDecorators(
+      currentDecorators,
+      MEMBER_DECORATORS_TO_REMOVE.map((decorator) => importAliasMap.get(decorator)),
+    );
 
     if (currentDecorators !== newDecorators) {
       if (ts.isMethodDeclaration(member)) {
@@ -195,7 +230,7 @@ const removeStencilMethodDecorators = (
           member.body,
         );
       } else if (ts.isPropertyDeclaration(member)) {
-        if (shouldInitializeInConstructor(member)) {
+        if (shouldInitializeInConstructor(member, importAliasMap)) {
           // if the current class member is decorated with either 'State' or
           // 'Prop' we need to modify the property declaration to transform it
           // from a class field but we handle this in the `handleClassFields`
@@ -355,18 +390,20 @@ export const filterDecorators = (
  * @param classNode a TypeScript AST node for a Stencil component class
  * @param classMembers the class members that we need to update
  * @param typeChecker a reference to the {@link ts.TypeChecker}
+ * @param importAliasMap a map of Stencil decorator names to their import names
  * @returns a list of updated class elements which can be inserted into the class
  */
 function handleClassFields(
   classNode: ts.ClassDeclaration,
   classMembers: ts.ClassElement[],
   typeChecker: ts.TypeChecker,
+  importAliasMap: ImportAliasMap,
 ): ts.ClassElement[] {
   const statements: ts.ExpressionStatement[] = [];
   const updatedClassMembers: ts.ClassElement[] = [];
 
   for (const member of classMembers) {
-    if (shouldInitializeInConstructor(member) && ts.isPropertyDeclaration(member)) {
+    if (shouldInitializeInConstructor(member, importAliasMap) && ts.isPropertyDeclaration(member)) {
       const memberName = tsPropDeclNameAsString(member, typeChecker);
 
       // this is a class field that we'll need to handle, so lets push a statement for
@@ -408,15 +445,19 @@ function handleClassFields(
  * details.
  *
  * @param member the member to check
+ * @param importAliasMap a map of Stencil decorator names to their import names
  * @returns whether this should be rewritten or not
  */
-const shouldInitializeInConstructor = (member: ts.ClassElement): boolean => {
+const shouldInitializeInConstructor = (member: ts.ClassElement, importAliasMap: ImportAliasMap): boolean => {
   const currentDecorators = retrieveTsDecorators(member);
   if (currentDecorators === undefined) {
     // decorators have already been removed from this element, indicating that
     // we don't need to do anything
     return false;
   }
-  const filteredDecorators = filterDecorators(currentDecorators, CONSTRUCTOR_DEFINED_MEMBER_DECORATORS);
+  const filteredDecorators = filterDecorators(
+    currentDecorators,
+    CONSTRUCTOR_DEFINED_MEMBER_DECORATORS.map((decorator) => importAliasMap.get(decorator)),
+  );
   return currentDecorators !== filteredDecorators;
 };

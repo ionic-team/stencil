@@ -10,10 +10,11 @@ export const listenDecoratorsToStatic = (
   typeChecker: ts.TypeChecker,
   decoratedMembers: ts.ClassElement[],
   newMembers: ts.ClassElement[],
+  decoratorName: string,
 ) => {
   const listeners = decoratedMembers
     .filter(ts.isMethodDeclaration)
-    .map((method) => parseListenDecorators(diagnostics, typeChecker, method));
+    .map((method) => parseListenDecorators(diagnostics, typeChecker, method, decoratorName));
 
   const flatListeners = flatOne(listeners);
   if (flatListeners.length > 0) {
@@ -25,8 +26,9 @@ const parseListenDecorators = (
   diagnostics: d.Diagnostic[],
   typeChecker: ts.TypeChecker,
   method: ts.MethodDeclaration,
+  decoratorName: string,
 ): d.ComponentCompilerListener[] => {
-  const listenDecorators = (retrieveTsDecorators(method) ?? []).filter(isDecoratorNamed('Listen'));
+  const listenDecorators = (retrieveTsDecorators(method) ?? []).filter(isDecoratorNamed(decoratorName));
   if (listenDecorators.length === 0) {
     return [];
   }
