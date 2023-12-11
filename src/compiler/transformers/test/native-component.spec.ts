@@ -166,4 +166,47 @@ describe('nativeComponentTransform', () => {
       );
     });
   });
+
+  describe('static style property', () => {
+    it.each([
+      [`styleUrl: 'cmp-a.css'`, `import CmpAStyle0 from './cmp-a.css?tag=cmp-a';`, `CmpAStyle0`],
+      [
+        `styleUrls: ['cmp-a.css', 'cmp-b.css', 'cmp-a.css']`,
+        `import CmpAStyle0 from './cmp-b.css?tag=cmp-a';
+         import CmpAStyle1 from './cmp-a.css?tag=cmp-a';`,
+        `CmpAStyle0 + CmpAStyle1`,
+      ],
+      [
+        `styleUrls: { ios: 'cmp-a.ios.css', md: 'cmp-a.md.css' }`,
+        `import CmpAIosStyle0 from './cmp-a.ios.css?tag=cmp-a&mode=ios';
+        import CmpAMdStyle0 from './cmp-a.md.css?tag=cmp-a&mode=md';`,
+        `{ ios: CmpAIosStyle0, md: CmpAMdStyle0 }`,
+      ],
+    ])('adds a static style property when %s', async (styleConfig, expectedImport, expectedStyleReturn) => {
+      const code = `
+        @Component({
+          tag: 'cmp-a',
+          ${styleConfig}
+        }
+        export class CmpA {}
+      `;
+      const transformer = nativeComponentTransform(compilerCtx, transformOpts);
+      const transpiledModule = transpileModule(code, null, compilerCtx, [], [transformer]);
+
+      expect(await formatCode(transpiledModule.outputText)).toContain(
+        await formatCode(`import { defineCustomElement as __stencil_defineCustomElement, HTMLElement } from '@stencil/core';
+          ${expectedImport}
+          const CmpA = class extends HTMLElement {
+            constructor() {
+              super();
+              this.__registerHost();
+            }
+            static get style() {
+              return ${expectedStyleReturn};
+            }
+          };
+        `),
+      );
+    });
+  });
 });
