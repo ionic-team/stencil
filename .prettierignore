@@ -57,3 +57,5 @@ test/karma/test-app/assets/angular.min.js
 /screenshot/pixel-match.js
 /screenshot/*.d.ts
 
+# third party scripts
+src/mock-doc/third-party/jquery.ts

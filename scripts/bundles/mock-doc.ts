@@ -10,7 +10,6 @@ import { writePkgJson } from '../utils/write-pkg-json';
 import { aliasPlugin } from './plugins/alias-plugin';
 import { parse5Plugin } from './plugins/parse5-plugin';
 import { replacePlugin } from './plugins/replace-plugin';
-import { sizzlePlugin } from './plugins/sizzle-plugin';
 
 export async function mockDoc(opts: BuildOptions) {
   const inputDir = join(opts.buildDir, 'mock-doc');
@@ -48,14 +47,7 @@ export async function mockDoc(opts: BuildOptions) {
   const mockDocBundle: RollupOptions = {
     input: join(inputDir, 'index.js'),
     output: [esOutput, cjsOutput],
-    plugins: [
-      parse5Plugin(opts),
-      sizzlePlugin(opts),
-      aliasPlugin(opts),
-      replacePlugin(opts),
-      rollupResolve(),
-      rollupCommonjs(),
-    ],
+    plugins: [parse5Plugin(opts), aliasPlugin(opts), replacePlugin(opts), rollupResolve(), rollupCommonjs()],
   };
 
   await bundleDtsPromise;

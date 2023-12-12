@@ -3,7 +3,6 @@ import fs from 'fs-extra';
 import { join } from 'path';
 
 import { bundleParse5 } from '../bundles/plugins/parse5-plugin';
-import { writeSizzleBundle } from '../bundles/plugins/sizzle-plugin';
 import { getBanner } from '../utils/banner';
 import { bundleDts } from '../utils/bundle-dts';
 import { BuildOptions, createReplaceData } from '../utils/options';
@@ -41,9 +40,6 @@ export async function buildMockDoc(opts: BuildOptions) {
   createReplaceData(opts);
 
   const mockDocAliases = getEsbuildAliases();
-
-  const sizzlePath = await writeSizzleBundle(opts);
-  mockDocAliases['sizzle'] = sizzlePath;
 
   const [, parse5Path] = await bundleParse5(opts);
   mockDocAliases['parse5'] = parse5Path;

@@ -13,7 +13,6 @@ import { writePkgJson } from '../utils/write-pkg-json';
 import { aliasPlugin } from './plugins/alias-plugin';
 import { parse5Plugin } from './plugins/parse5-plugin';
 import { replacePlugin } from './plugins/replace-plugin';
-import { sizzlePlugin } from './plugins/sizzle-plugin';
 import { terserPlugin } from './plugins/terser-plugin';
 import { typescriptSourcePlugin } from './plugins/typescript-source-plugin';
 
@@ -130,7 +129,6 @@ export async function compiler(opts: BuildOptions) {
       },
       replacePlugin(opts),
       parse5Plugin(opts),
-      sizzlePlugin(opts),
       aliasPlugin(opts),
       rollupNodeResolve({
         mainFields: ['module', 'main'],
