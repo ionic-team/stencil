@@ -21,7 +21,7 @@ export class ImportAliasMap extends Map<StencilDecorator, string> {
       if (importDeclaration.moduleSpecifier.getText().includes('@stencil/core')) {
         const namedBindings = importDeclaration.importClause?.namedBindings;
 
-        if (ts.isNamedImports(namedBindings)) {
+        if (namedBindings && ts.isNamedImports(namedBindings)) {
           for (const element of namedBindings.elements) {
             const importName = element.name.getText();
             const originalImportName = element.propertyName?.getText() ?? importName;
