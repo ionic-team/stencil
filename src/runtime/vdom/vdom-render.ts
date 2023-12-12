@@ -695,7 +695,7 @@ export const patch = (oldVNode: d.VNode, newVNode: d.VNode) => {
  *
  * @param elm the element of interest
  */
-const updateFallbackSlotVisibility = (elm: d.RenderNode) => {
+export const updateFallbackSlotVisibility = (elm: d.RenderNode) => {
   const childNodes: d.RenderNode[] = elm.childNodes as any;
 
   for (const childNode of childNodes) {
