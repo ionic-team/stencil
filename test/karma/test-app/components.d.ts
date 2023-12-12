@@ -151,6 +151,9 @@ export namespace Components {
     }
     interface ImageImport {
     }
+    interface ImportAliasing {
+        "name": string;
+    }
     interface InitCssRoot {
     }
     interface InputBasicRoot {
@@ -773,6 +776,12 @@ declare global {
     var HTMLImageImportElement: {
         prototype: HTMLImageImportElement;
         new (): HTMLImageImportElement;
+    };
+    interface HTMLImportAliasingElement extends Components.ImportAliasing, HTMLStencilElement {
+    }
+    var HTMLImportAliasingElement: {
+        prototype: HTMLImportAliasingElement;
+        new (): HTMLImportAliasingElement;
     };
     interface HTMLInitCssRootElement extends Components.InitCssRoot, HTMLStencilElement {
     }
@@ -1499,6 +1508,7 @@ declare global {
         "form-associated": HTMLFormAssociatedElement;
         "host-attr-override": HTMLHostAttrOverrideElement;
         "image-import": HTMLImageImportElement;
+        "import-aliasing": HTMLImportAliasingElement;
         "init-css-root": HTMLInitCssRootElement;
         "input-basic-root": HTMLInputBasicRootElement;
         "ion-child": HTMLIonChildElement;
@@ -1744,6 +1754,9 @@ declare namespace LocalJSX {
     interface HostAttrOverride {
     }
     interface ImageImport {
+    }
+    interface ImportAliasing {
+        "name"?: string;
     }
     interface InitCssRoot {
     }
@@ -2054,6 +2067,7 @@ declare namespace LocalJSX {
         "form-associated": FormAssociated;
         "host-attr-override": HostAttrOverride;
         "image-import": ImageImport;
+        "import-aliasing": ImportAliasing;
         "init-css-root": InitCssRoot;
         "input-basic-root": InputBasicRoot;
         "ion-child": IonChild;
@@ -2216,6 +2230,7 @@ declare module "@stencil/core" {
             "form-associated": LocalJSX.FormAssociated & JSXBase.HTMLAttributes<HTMLFormAssociatedElement>;
             "host-attr-override": LocalJSX.HostAttrOverride & JSXBase.HTMLAttributes<HTMLHostAttrOverrideElement>;
             "image-import": LocalJSX.ImageImport & JSXBase.HTMLAttributes<HTMLImageImportElement>;
+            "import-aliasing": LocalJSX.ImportAliasing & JSXBase.HTMLAttributes<HTMLImportAliasingElement>;
             "init-css-root": LocalJSX.InitCssRoot & JSXBase.HTMLAttributes<HTMLInitCssRootElement>;
             "input-basic-root": LocalJSX.InputBasicRoot & JSXBase.HTMLAttributes<HTMLInputBasicRootElement>;
             "ion-child": LocalJSX.IonChild & JSXBase.HTMLAttributes<HTMLIonChildElement>;
