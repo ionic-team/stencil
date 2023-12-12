@@ -1,3 +1,4 @@
+import { generateDtsBundle } from 'dts-bundle-generator';
 import fs from 'fs-extra';
 import { join } from 'path';
 
@@ -55,6 +56,29 @@ async function copyStencilInternalDts(opts: BuildOptions, outputInternalDir: str
   const privateDtsSrcPath = join(declarationsInputDir, 'stencil-private.d.ts');
   const privateDtsDestPath = join(outputInternalDir, 'stencil-private.d.ts');
   let privateDts = cleanDts(await fs.readFile(privateDtsSrcPath, 'utf8'));
+
+  // @stencil/core/internal/child_process.d.ts
+  const childProcessSrcPath = join(declarationsInputDir, 'child_process.d.ts');
+  const childProcessDestPath = join(outputInternalDir, 'child_process.d.ts');
+
+  // we generate a tiny tiny bundle here of just
+  // `src/declarations/child_process.ts` so that `internal/stencil-private.d.ts`
+  // can import from `'./child_process'` without worrying about resolving the
+  // types from `node_modules`.
+  const childProcessDts = generateDtsBundle([
+    {
+      filePath: childProcessSrcPath,
+      libraries: {
+        // we need to mark this library so that types imported from it are inlined
+        inlinedLibraries: ['child_process'],
+      },
+      output: {
+        noBanner: true,
+        exportReferencedTypes: false,
+      },
+    },
+  ]).join('\n');
+  await fs.writeFile(childProcessDestPath, childProcessDts);
 
   // the private `.d.ts` imports the `Result` type from the `@utils` module, so
   // we need to rewrite the path so it imports from the right relative path
