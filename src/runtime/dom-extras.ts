@@ -96,7 +96,7 @@ export const patchSlotAppendChild = (HostElementPrototype: any) => {
 /**
  * Patches the `removeChild` method on a `scoped` Stencil component.
  * This patch attempts to remove the specified node from a slot reference
- * if the the slot exists. Otherwise, it falls-back to the original `removeChild` method.
+ * if the slot exists. Otherwise, it falls-back to the original `removeChild` method.
  *
  * @param ElementPrototype The Stencil component to be patched
  */
