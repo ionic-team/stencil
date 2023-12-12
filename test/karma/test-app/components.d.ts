@@ -242,6 +242,8 @@ export namespace Components {
         "str": string;
         "undef"?: string;
     }
+    interface RemoveChildPatch {
+    }
     interface ReparentStyleNoVars {
     }
     interface ReparentStyleWithVars {
@@ -1042,6 +1044,12 @@ declare global {
         prototype: HTMLReflectToAttrElement;
         new (): HTMLReflectToAttrElement;
     };
+    interface HTMLRemoveChildPatchElement extends Components.RemoveChildPatch, HTMLStencilElement {
+    }
+    var HTMLRemoveChildPatchElement: {
+        prototype: HTMLRemoveChildPatchElement;
+        new (): HTMLRemoveChildPatchElement;
+    };
     interface HTMLReparentStyleNoVarsElement extends Components.ReparentStyleNoVars, HTMLStencilElement {
     }
     var HTMLReparentStyleNoVarsElement: {
@@ -1551,6 +1559,7 @@ declare global {
         "reflect-nan-attribute": HTMLReflectNanAttributeElement;
         "reflect-nan-attribute-hyphen": HTMLReflectNanAttributeHyphenElement;
         "reflect-to-attr": HTMLReflectToAttrElement;
+        "remove-child-patch": HTMLRemoveChildPatchElement;
         "reparent-style-no-vars": HTMLReparentStyleNoVarsElement;
         "reparent-style-with-vars": HTMLReparentStyleWithVarsElement;
         "sass-cmp": HTMLSassCmpElement;
@@ -1862,6 +1871,8 @@ declare namespace LocalJSX {
         "str"?: string;
         "undef"?: string;
     }
+    interface RemoveChildPatch {
+    }
     interface ReparentStyleNoVars {
     }
     interface ReparentStyleWithVars {
@@ -2112,6 +2123,7 @@ declare namespace LocalJSX {
         "reflect-nan-attribute": ReflectNanAttribute;
         "reflect-nan-attribute-hyphen": ReflectNanAttributeHyphen;
         "reflect-to-attr": ReflectToAttr;
+        "remove-child-patch": RemoveChildPatch;
         "reparent-style-no-vars": ReparentStyleNoVars;
         "reparent-style-with-vars": ReparentStyleWithVars;
         "sass-cmp": SassCmp;
@@ -2276,6 +2288,7 @@ declare module "@stencil/core" {
             "reflect-nan-attribute": LocalJSX.ReflectNanAttribute & JSXBase.HTMLAttributes<HTMLReflectNanAttributeElement>;
             "reflect-nan-attribute-hyphen": LocalJSX.ReflectNanAttributeHyphen & JSXBase.HTMLAttributes<HTMLReflectNanAttributeHyphenElement>;
             "reflect-to-attr": LocalJSX.ReflectToAttr & JSXBase.HTMLAttributes<HTMLReflectToAttrElement>;
+            "remove-child-patch": LocalJSX.RemoveChildPatch & JSXBase.HTMLAttributes<HTMLRemoveChildPatchElement>;
             "reparent-style-no-vars": LocalJSX.ReparentStyleNoVars & JSXBase.HTMLAttributes<HTMLReparentStyleNoVarsElement>;
             "reparent-style-with-vars": LocalJSX.ReparentStyleWithVars & JSXBase.HTMLAttributes<HTMLReparentStyleWithVarsElement>;
             "sass-cmp": LocalJSX.SassCmp & JSXBase.HTMLAttributes<HTMLSassCmpElement>;

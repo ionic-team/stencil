@@ -5,6 +5,7 @@ import { CMP_FLAGS, HOST_FLAGS } from '@utils';
 
 import type * as d from '../declarations';
 import { PLATFORM_FLAGS } from './runtime-constants';
+import { updateFallbackSlotVisibility } from './vdom/vdom-render';
 
 export const patchPseudoShadowDom = (
   hostElementPrototype: HTMLElement,
@@ -19,6 +20,7 @@ export const patchPseudoShadowDom = (
   patchSlotInsertAdjacentText(hostElementPrototype);
   patchTextContent(hostElementPrototype);
   patchChildSlotNodes(hostElementPrototype, descriptorPrototype);
+  patchSlotRemoveChild(hostElementPrototype);
 };
 
 export const patchCloneNode = (HostElementPrototype: HTMLElement) => {
@@ -66,6 +68,14 @@ export const patchCloneNode = (HostElementPrototype: HTMLElement) => {
   };
 };
 
+/**
+ * Patches the `appendChild` method on a `scoped` Stencil component.
+ * The patch will attempt to find a slot with the same name as the node being appended
+ * and insert it into the slot reference if found. Otherwise, it falls-back to the original
+ * `appendChild` method.
+ *
+ * @param HostElementPrototype The Stencil component to be patched
+ */
 export const patchSlotAppendChild = (HostElementPrototype: any) => {
   HostElementPrototype.__appendChild = HostElementPrototype.appendChild;
   HostElementPrototype.appendChild = function (this: d.RenderNode, newChild: d.RenderNode) {
@@ -74,9 +84,43 @@ export const patchSlotAppendChild = (HostElementPrototype: any) => {
     if (slotNode) {
       const slotChildNodes = getHostSlotChildNodes(slotNode, slotName);
       const appendAfter = slotChildNodes[slotChildNodes.length - 1];
-      return appendAfter.parentNode.insertBefore(newChild, appendAfter.nextSibling);
+      appendAfter.parentNode.insertBefore(newChild, appendAfter.nextSibling);
+      // Check if there is fallback content that should be hidden
+      updateFallbackSlotVisibility(this);
+      return;
     }
     return (this as any).__appendChild(newChild);
+  };
+};
+
+/**
+ * Patches the `removeChild` method on a `scoped` Stencil component.
+ * This patch attempts to remove the specified node from a slot reference
+ * if the slot exists. Otherwise, it falls-back to the original `removeChild` method.
+ *
+ * @param ElementPrototype The Stencil component to be patched
+ */
+const patchSlotRemoveChild = (ElementPrototype: any) => {
+  ElementPrototype.__removeChild = ElementPrototype.removeChild;
+  ElementPrototype.removeChild = function (this: d.RenderNode, toRemove: d.RenderNode) {
+    if (toRemove && typeof toRemove['s-sn'] !== 'undefined') {
+      const slotNode = getHostSlotNode(this.childNodes, toRemove['s-sn']);
+      if (slotNode) {
+        // Get all slot content
+        const slotChildNodes = getHostSlotChildNodes(slotNode, toRemove['s-sn']);
+        // See if any of the slotted content matches the node to remove
+        const existingNode = slotChildNodes.find((n) => n === toRemove);
+
+        if (existingNode) {
+          existingNode.remove();
+          // Check if there is fallback content that should be displayed if that
+          // was the last node in the slot
+          updateFallbackSlotVisibility(this);
+          return;
+        }
+      }
+    }
+    return (this as any).__removeChild(toRemove);
   };
 };
 
