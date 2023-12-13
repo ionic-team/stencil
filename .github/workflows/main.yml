@@ -44,6 +44,13 @@ jobs:
     with:
       build_name: stencil-core
 
+  no_starter_smoke_tests:
+    name: Stencil Smoke Test (no starter)
+    needs: [build_core]
+    uses: ./.github/workflows/test-smoke-no-starter.yml
+    with:
+      build_name: stencil-core
+
   e2e_tests:
     name: E2E Tests
     needs: [build_core]
