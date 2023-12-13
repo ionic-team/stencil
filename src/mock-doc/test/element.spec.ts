@@ -1,5 +1,5 @@
 import { MockDocument } from '../document';
-import { MockAnchorElement, MockMetaElement, MockSVGElement } from '../element';
+import { MockAnchorElement, MockMetaElement, MockSVGElement, MockUListElement } from '../element';
 import { MockElement, MockHTMLElement } from '../node';
 import { cloneWindow, MockWindow } from '../window';
 
@@ -477,6 +477,14 @@ describe('element', () => {
       const elm: MockAnchorElement = doc.createElement('a');
       elm.href = 'http://stenciljs.com/path/to/page';
       expect(elm.pathname).toBe('/path/to/page');
+    });
+  });
+
+  describe('ul', () => {
+    it('textContent', () => {
+      const elm: MockUListElement = doc.createElement('ul');
+      elm.textContent = 'this is an item in an unordered list';
+      expect(elm.textContent).toBe('this is an item in an unordered list');
     });
   });
 });
