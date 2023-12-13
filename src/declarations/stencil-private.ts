@@ -611,21 +611,21 @@ export interface ComponentCompilerMeta extends ComponentCompilerFeatures {
    * - directly referenced in a Stencil component's JSX/h() function
    * - are referenced by a web component that is directly referenced in a Stencil component's JSX/h() function
    */
-  dependencies?: string[];
+  dependencies: string[];
   /**
    * A list of web component tag names that either:
    * - directly reference the current component directly in their JSX/h() function
    * - indirectly/transitively reference the current component directly in their JSX/h() function
    */
-  dependents?: string[];
+  dependents: string[];
   /**
    * A list of web component tag names that are directly referenced in a Stencil component's JSX/h() function
    */
-  directDependencies?: string[];
+  directDependencies: string[];
   /**
    * A list of web component tag names that the current component directly in their JSX/h() function
    */
-  directDependents?: string[];
+  directDependents: string[];
   docs: CompilerJsDoc;
   elementRef: string;
   encapsulation: Encapsulation;
