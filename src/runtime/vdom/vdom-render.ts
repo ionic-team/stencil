@@ -182,10 +182,14 @@ const relocateToHostRoot = (parentElm: Element) => {
 
   const host = parentElm.closest(hostTagName.toLowerCase());
   if (host != null) {
-    for (const childNode of Array.from(parentElm.childNodes) as d.RenderNode[]) {
+    const contentRefNode = (Array.from(host.childNodes) as d.RenderNode[]).find((ref) => ref['s-cr']);
+    const childNodeArray = Array.from(parentElm.childNodes) as d.RenderNode[];
+
+    for (const childNode of contentRefNode ? childNodeArray.reverse() : childNodeArray) {
       // Only relocate nodes that were slotted in
       if (childNode['s-sh'] != null) {
-        host.insertBefore(childNode, null);
+        host.insertBefore(childNode, contentRefNode ?? null);
+
         // Reset so we can correctly move the node around again.
         childNode['s-sh'] = undefined;
 
@@ -639,7 +643,10 @@ export const patch = (oldVNode: d.VNode, newVNode: d.VNode, isInitialRender = fa
 
     if (BUILD.vdomAttribute || BUILD.reflect) {
       if (BUILD.slot && tag === 'slot' && !useNativeShadowDom) {
-        // minifier will clean this up
+        if (oldVNode.$name$ !== newVNode.$name$) {
+          newVNode.$elm$['s-sn'] = newVNode.$name$ || '';
+          relocateToHostRoot(newVNode.$elm$.parentElement);
+        }
       } else {
         // either this is the first render of an element OR it's an update
         // AND we already know it's possible it could have changed
