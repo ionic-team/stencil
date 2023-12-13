@@ -133,6 +133,11 @@ export const parseStaticComponentMeta = (
     htmlParts: [],
     isUpdateable: false,
     potentialCmpRefs: [],
+
+    dependents: [],
+    dependencies: [],
+    directDependents: [],
+    directDependencies: [],
   };
 
   const visitComponentChildNode = (node: ts.Node) => {
