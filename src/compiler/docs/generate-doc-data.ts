@@ -268,22 +268,25 @@ const parseTypeIntoValues = (type: string): d.JsonDocsValue[] => {
 const getDocsMethods = (methods: d.ComponentCompilerMethod[]): d.JsonDocsMethod[] => {
   return sortBy(methods, (member) => member.name)
     .filter((member) => !member.internal)
-    .map((member) => ({
-      name: member.name,
-      returns: {
-        type: member.complexType.return,
-        docs: member.docs.tags
-          .filter((t) => t.name === 'return' || t.name === 'returns')
-          .map((t) => t.text)
-          .join('\n'),
-      },
-      complexType: member.complexType,
-      signature: `${member.name}${member.complexType.signature}`,
-      parameters: [], // TODO
-      docs: member.docs.text,
-      docsTags: member.docs.tags,
-      deprecation: getDocsDeprecationText(member.docs.tags),
-    }));
+    .map(
+      (member) =>
+        <d.JsonDocsMethod>{
+          name: member.name,
+          returns: {
+            type: member.complexType.return,
+            docs: member.docs.tags
+              .filter((t) => t.name === 'return' || t.name === 'returns')
+              .map((t) => t.text)
+              .join('\n'),
+          },
+          complexType: member.complexType,
+          signature: `${member.name}${member.complexType.signature}`,
+          parameters: member.complexType.parameters,
+          docs: member.docs.text,
+          docsTags: member.docs.tags,
+          deprecation: getDocsDeprecationText(member.docs.tags),
+        },
+    );
 };
 
 const getDocsEvents = (events: d.ComponentCompilerEvent[]): d.JsonDocsEvent[] => {

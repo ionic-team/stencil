@@ -60,29 +60,9 @@ interface ComponentCompilerEventComplexType {
 }
 interface ComponentCompilerMethodComplexType {
   signature: string;
-  parameters: CompilerJsDoc[];
+  parameters: JsonDocMethodParameter[];
   references: ComponentCompilerTypeReferences;
   return: string;
-}
-interface CompilerJsDoc {
-  /**
-   * The text associated with the JSDoc
-   */
-  text: string;
-  /**
-   * Tags included in the JSDoc
-   */
-  tags: CompilerJsDocTagInfo[];
-}
-interface CompilerJsDocTagInfo {
-  /**
-   * The name of the tag - e.g. `@deprecated`
-   */
-  name: string;
-  /**
-   * Additional text that is associated with the tag - e.g. `@deprecated use v2 of this API`
-   */
-  text?: string;
 }
 /**
  * The Type Library holds information about the types which are used in a

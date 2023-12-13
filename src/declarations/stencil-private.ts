@@ -28,6 +28,7 @@ import type {
   TaskCommand,
   ValidatedConfig,
 } from './stencil-public-compiler';
+import type { JsonDocMethodParameter } from './stencil-public-docs';
 import type { ComponentInterface, ListenTargetOptions, VNode } from './stencil-public-runtime';
 
 export interface SourceMap {
@@ -799,7 +800,7 @@ export interface ComponentCompilerStaticMethod {
 
 export interface ComponentCompilerMethodComplexType {
   signature: string;
-  parameters: CompilerJsDoc[];
+  parameters: JsonDocMethodParameter[];
   references: ComponentCompilerTypeReferences;
   return: string;
 }
