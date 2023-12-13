@@ -393,8 +393,15 @@ const removeVnodes = (vnodes: d.VNode[], startIdx: number, endIdx: number) => {
  * @param oldCh the old children of the parent node
  * @param newVNode the new VNode which will replace the parent
  * @param newCh the new children of the parent node
+ * @param isInitialRender whether or not this is the first render of the vdom
  */
-const updateChildren = (parentElm: d.RenderNode, oldCh: d.VNode[], newVNode: d.VNode, newCh: d.VNode[]) => {
+const updateChildren = (
+  parentElm: d.RenderNode,
+  oldCh: d.VNode[],
+  newVNode: d.VNode,
+  newCh: d.VNode[],
+  isInitialRender = false,
+) => {
   let oldStartIdx = 0;
   let newStartIdx = 0;
   let idxInOld = 0;
@@ -418,22 +425,22 @@ const updateChildren = (parentElm: d.RenderNode, oldCh: d.VNode[], newVNode: d.V
       newStartVnode = newCh[++newStartIdx];
     } else if (newEndVnode == null) {
       newEndVnode = newCh[--newEndIdx];
-    } else if (isSameVnode(oldStartVnode, newStartVnode)) {
+    } else if (isSameVnode(oldStartVnode, newStartVnode, isInitialRender)) {
       // if the start nodes are the same then we should patch the new VNode
       // onto the old one, and increment our `newStartIdx` and `oldStartIdx`
       // indices to reflect that. We don't need to move any DOM Nodes around
       // since things are matched up in order.
-      patch(oldStartVnode, newStartVnode);
+      patch(oldStartVnode, newStartVnode, isInitialRender);
       oldStartVnode = oldCh[++oldStartIdx];
       newStartVnode = newCh[++newStartIdx];
-    } else if (isSameVnode(oldEndVnode, newEndVnode)) {
+    } else if (isSameVnode(oldEndVnode, newEndVnode, isInitialRender)) {
       // likewise, if the end nodes are the same we patch new onto old and
       // decrement our end indices, and also likewise in this case we don't
       // need to move any DOM Nodes.
-      patch(oldEndVnode, newEndVnode);
+      patch(oldEndVnode, newEndVnode, isInitialRender);
       oldEndVnode = oldCh[--oldEndIdx];
       newEndVnode = newCh[--newEndIdx];
-    } else if (isSameVnode(oldStartVnode, newEndVnode)) {
+    } else if (isSameVnode(oldStartVnode, newEndVnode, isInitialRender)) {
       // case: "Vnode moved right"
       //
       // We've found that the last node in our window on the new children is
@@ -451,7 +458,7 @@ const updateChildren = (parentElm: d.RenderNode, oldCh: d.VNode[], newVNode: d.V
       if (BUILD.slotRelocation && (oldStartVnode.$tag$ === 'slot' || newEndVnode.$tag$ === 'slot')) {
         putBackInOriginalLocation(oldStartVnode.$elm$.parentNode, false);
       }
-      patch(oldStartVnode, newEndVnode);
+      patch(oldStartVnode, newEndVnode, isInitialRender);
       // We need to move the element for `oldStartVnode` into a position which
       // will be appropriate for `newEndVnode`. For this we can use
       // `.insertBefore` and `oldEndVnode.$elm$.nextSibling`. If there is a
@@ -472,7 +479,7 @@ const updateChildren = (parentElm: d.RenderNode, oldCh: d.VNode[], newVNode: d.V
       parentElm.insertBefore(oldStartVnode.$elm$, oldEndVnode.$elm$.nextSibling as any);
       oldStartVnode = oldCh[++oldStartIdx];
       newEndVnode = newCh[--newEndIdx];
-    } else if (isSameVnode(oldEndVnode, newStartVnode)) {
+    } else if (isSameVnode(oldEndVnode, newStartVnode, isInitialRender)) {
       // case: "Vnode moved left"
       //
       // We've found that the first node in our window on the new children is
@@ -491,7 +498,7 @@ const updateChildren = (parentElm: d.RenderNode, oldCh: d.VNode[], newVNode: d.V
       if (BUILD.slotRelocation && (oldStartVnode.$tag$ === 'slot' || newEndVnode.$tag$ === 'slot')) {
         putBackInOriginalLocation(oldEndVnode.$elm$.parentNode, false);
       }
-      patch(oldEndVnode, newStartVnode);
+      patch(oldEndVnode, newStartVnode, isInitialRender);
       // We've already checked above if `oldStartVnode` and `newStartVnode` are
       // the same node, so since we're here we know that they are not. Thus we
       // can move the element for `oldEndVnode` _before_ the element for
@@ -528,7 +535,7 @@ const updateChildren = (parentElm: d.RenderNode, oldCh: d.VNode[], newVNode: d.V
           // the tag doesn't match so we'll need a new DOM element
           node = createElm(oldCh && oldCh[newStartIdx], newVNode, idxInOld, parentElm);
         } else {
-          patch(elmToMove, newStartVnode);
+          patch(elmToMove, newStartVnode, isInitialRender);
           // invalidate the matching old node so that we won't try to update it
           // again later on
           oldCh[idxInOld] = undefined;
@@ -590,17 +597,22 @@ const updateChildren = (parentElm: d.RenderNode, oldCh: d.VNode[], newVNode: d.V
  *
  * @param leftVNode the first VNode to check
  * @param rightVNode the second VNode to check
+ * @param isInitialRender whether or not this is the first render of the vdom
  * @returns whether they're equal or not
  */
-export const isSameVnode = (leftVNode: d.VNode, rightVNode: d.VNode) => {
+export const isSameVnode = (leftVNode: d.VNode, rightVNode: d.VNode, isInitialRender = false) => {
   // compare if two vnode to see if they're "technically" the same
   // need to have the same element tag, and same key to be the same
   if (leftVNode.$tag$ === rightVNode.$tag$) {
     if (BUILD.slotRelocation && leftVNode.$tag$ === 'slot') {
       return leftVNode.$name$ === rightVNode.$name$;
     }
-    // this will be set if components in the build have `key` attrs set on them
-    if (BUILD.vdomKey) {
+    // this will be set if JSX tags in the build have `key` attrs set on them
+    // we only want to check this if we're not on the first render since on
+    // first render `leftVNode.$key$` will always be `null`, so we can be led
+    // astray and, for instance, accidentally delete a DOM node that we want to
+    // keep around.
+    if (BUILD.vdomKey && !isInitialRender) {
       return leftVNode.$key$ === rightVNode.$key$;
     }
     return true;
@@ -625,8 +637,9 @@ const parentReferenceNode = (node: d.RenderNode) => (node['s-ol'] ? node['s-ol']
  *
  * @param oldVNode an old VNode whose DOM element and children we want to update
  * @param newVNode a new VNode representing an updated version of the old one
+ * @param isInitialRender whether or not this is the first render of the vdom
  */
-export const patch = (oldVNode: d.VNode, newVNode: d.VNode) => {
+export const patch = (oldVNode: d.VNode, newVNode: d.VNode, isInitialRender = false) => {
   const elm = (newVNode.$elm$ = oldVNode.$elm$);
   const oldChildren = oldVNode.$children$;
   const newChildren = newVNode.$children$;
@@ -655,7 +668,7 @@ export const patch = (oldVNode: d.VNode, newVNode: d.VNode) => {
     if (BUILD.updatable && oldChildren !== null && newChildren !== null) {
       // looks like there's child vnodes for both the old and new vnodes
       // so we need to call `updateChildren` to reconcile them
-      updateChildren(elm, oldChildren, newVNode, newChildren);
+      updateChildren(elm, oldChildren, newVNode, newChildren, isInitialRender);
     } else if (newChildren !== null) {
       // no old child vnodes, but there are new child vnodes to add
       if (BUILD.updatable && BUILD.vdomText && oldVNode.$text$ !== null) {
@@ -944,6 +957,7 @@ render() {
 }
   `);
   }
+
   if (BUILD.reflect && cmpMeta.$attrsToReflect$) {
     rootVnode.$attrs$ = rootVnode.$attrs$ || {};
     cmpMeta.$attrsToReflect$.map(
@@ -990,7 +1004,7 @@ render() {
   }
 
   // synchronous patch
-  patch(oldVNode, rootVnode);
+  patch(oldVNode, rootVnode, isInitialLoad);
 
   if (BUILD.slotRelocation) {
     // while we're moving nodes around existing nodes, temporarily disable
