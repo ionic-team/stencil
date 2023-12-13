@@ -19,8 +19,9 @@
             "signature": "<T>(arg: T) => Promise<ImportedInterface<T>>",
             "parameters": [
               {
-                "tags": [],
-                "text": ""
+                "name": "arg",
+                "type": "T",
+                "docs": ""
               }
             ],
             "references": {
@@ -41,7 +42,13 @@
             "return": "Promise<ImportedInterface<T>>"
           },
           "signature": "onDidDismiss<T>(arg: T) => Promise<ImportedInterface<T>>",
-          "parameters": [],
+          "parameters": [
+            {
+              "name": "arg",
+              "type": "T",
+              "docs": ""
+            }
+          ],
           "docs": "A comment, which should be included, I should think!",
           "docsTags": []
         }

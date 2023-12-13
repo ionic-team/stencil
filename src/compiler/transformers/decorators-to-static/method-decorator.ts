@@ -11,7 +11,6 @@ import {
   mapJSDocTagInfo,
   retrieveTsDecorators,
   retrieveTsModifiers,
-  serializeSymbol,
   typeToString,
   validateReferences,
 } from '../transform-utils';
@@ -96,7 +95,11 @@ const parseMethodDecorator = (
   const methodMeta: d.ComponentCompilerStaticMethod = {
     complexType: {
       signature: signatureString,
-      parameters: signature.parameters.map((symbol) => serializeSymbol(typeChecker, symbol)),
+      parameters: signature.parameters.map((symbol) => ({
+        name: symbol.getName(),
+        type: typeToString(typeChecker, typeChecker.getTypeOfSymbolAtLocation(symbol, method)),
+        docs: ts.displayPartsToString(symbol.getDocumentationComment(typeChecker)),
+      })),
       references: {
         ...getAttributeTypeInfo(returnTypeNode, tsSourceFile, typeChecker, program),
         ...getAttributeTypeInfo(method, tsSourceFile, typeChecker, program),

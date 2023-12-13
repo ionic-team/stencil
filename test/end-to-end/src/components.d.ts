@@ -33,8 +33,21 @@ export namespace Components {
     interface EnvData {
     }
     interface EventCmp {
+        /**
+          * this is some method that fires an event with options
+          * @returns
+         */
         "methodThatFiresEventWithOptions": () => Promise<void>;
+        /**
+          * this is some method that fires a document event
+          * @returns
+         */
         "methodThatFiresMyDocumentEvent": () => Promise<void>;
+        /**
+          * this is some method that fires a window event
+          * @param value some value
+          * @returns
+         */
         "methodThatFiresMyWindowEvent": (value: number) => Promise<void>;
     }
     interface ImportAssets {
@@ -43,7 +56,17 @@ export namespace Components {
         "opened": boolean;
     }
     interface MethodCmp {
+        /**
+          * this is some method
+          * @returns some number
+         */
         "someMethod": () => Promise<number>;
+        /**
+          * this is some method with args
+          * @param unit some unit
+          * @param value some value
+          * @returns some string
+         */
         "someMethodWithArgs": (unit: string, value: number) => Promise<string>;
         "someProp": number;
     }

@@ -14,7 +14,7 @@ export const stubComponentCompilerMethod = (
     name: 'myMethod',
     internal: false,
     complexType: {
-      parameters: [{ tags: [], text: '' }],
+      parameters: [{ name: 'name', type: 'Foo', docs: '' }],
       references: { Foo: { location: 'import', path: './resources', id: 'placeholder' } },
       return: 'Promise<void>',
       signature: '(name: Foo) => Promise<void>',
