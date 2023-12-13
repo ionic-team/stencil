@@ -146,6 +146,7 @@ async function getMismatchedPixels(pixelmatchModulePath: string, pixelMatchInput
     }, timeout);
 
     try {
+      let error: string | undefined;
       const filteredExecArgs = process.execArgv.filter((v) => !/^--(debug|inspect)/.test(v));
 
       const options = {
@@ -166,6 +167,25 @@ async function getMismatchedPixels(pixelmatchModulePath: string, pixelMatchInput
       pixelMatchProcess.on('error', (err) => {
         clearTimeout(tmr);
         reject(err);
+      });
+
+      pixelMatchProcess.stderr.on('data', (data) => {
+        error = data.toString();
+      });
+
+      /**
+       * Make sure we reject the promise if the process exits due to an error
+       * or prematurely for some other reason. Note that in order to resolve
+       * the promise we expect a message to be sent containing information about
+       * the mismatched pixels.
+       */
+      pixelMatchProcess.on('exit', (code) => {
+        clearTimeout(tmr);
+        const exitError =
+          code === 0
+            ? new Error('Pixelmatch process exited unexpectedly')
+            : new Error(`Pixelmatch process exited with code ${code}: ${error || 'unknown error'}`);
+        return reject(exitError);
       });
 
       pixelMatchProcess.send(pixelMatchInput);
