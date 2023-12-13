@@ -152,7 +152,8 @@ export namespace Components {
     interface ImageImport {
     }
     interface ImportAliasing {
-        "name": string;
+        "myMethod": () => Promise<HTMLElement>;
+        "user": string;
     }
     interface InitCssRoot {
     }
@@ -414,6 +415,10 @@ export interface EventBasicCustomEvent<T> extends CustomEvent<T> {
 export interface EventCustomTypeCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLEventCustomTypeElement;
+}
+export interface ImportAliasingCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLImportAliasingElement;
 }
 export interface LifecycleAsyncBCustomEvent<T> extends CustomEvent<T> {
     detail: T;
@@ -777,7 +782,18 @@ declare global {
         prototype: HTMLImageImportElement;
         new (): HTMLImageImportElement;
     };
+    interface HTMLImportAliasingElementEventMap {
+        "myEvent": void;
+    }
     interface HTMLImportAliasingElement extends Components.ImportAliasing, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLImportAliasingElementEventMap>(type: K, listener: (this: HTMLImportAliasingElement, ev: ImportAliasingCustomEvent<HTMLImportAliasingElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLImportAliasingElementEventMap>(type: K, listener: (this: HTMLImportAliasingElement, ev: ImportAliasingCustomEvent<HTMLImportAliasingElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
     var HTMLImportAliasingElement: {
         prototype: HTMLImportAliasingElement;
@@ -1756,7 +1772,8 @@ declare namespace LocalJSX {
     interface ImageImport {
     }
     interface ImportAliasing {
-        "name"?: string;
+        "onMyEvent"?: (event: ImportAliasingCustomEvent<void>) => void;
+        "user"?: string;
     }
     interface InitCssRoot {
     }

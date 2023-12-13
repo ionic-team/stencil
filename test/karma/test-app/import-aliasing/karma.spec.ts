@@ -19,11 +19,29 @@ describe('import aliasing', function () {
 
     expect(host.children[0].textContent).toBe('My name is John');
     expect(host.children[1].textContent).toBe('Name changed 0 time(s)');
+    expect(host.children[2].textContent).toBe('Method called 0 time(s)');
+    expect(host.children[3].textContent).toBe('Event triggered 0 time(s)');
 
-    host.setAttribute('name', 'Peter');
+    host.setAttribute('user', 'Peter');
     await waitForChanges();
 
     expect(host.children[0].textContent).toBe('My name is Peter');
     expect(host.children[1].textContent).toBe('Name changed 1 time(s)');
+    expect(host.children[2].textContent).toBe('Method called 0 time(s)');
+    expect(host.children[3].textContent).toBe('Event triggered 0 time(s)');
+
+    const el = await host.myMethod();
+    await waitForChanges();
+
+    expect(el).toBe(host);
+    expect(host.children[0].textContent).toBe('My name is Peter');
+    expect(host.children[1].textContent).toBe('Name changed 1 time(s)');
+    expect(host.children[2].textContent).toBe('Method called 1 time(s)');
+    expect(host.children[3].textContent).toBe('Event triggered 1 time(s)');
+  });
+
+  it('should link up to the surrounding form', async () => {
+    const formEl = app.querySelector('form');
+    expect(new FormData(formEl).get('test-input')).toBe('my default value');
   });
 });
