@@ -638,7 +638,7 @@ export const patch = (oldVNode: d.VNode, newVNode: d.VNode, isInitialRender = fa
     }
 
     if (BUILD.vdomAttribute || BUILD.reflect) {
-      if (BUILD.slot && tag === 'slot') {
+      if (BUILD.slot && tag === 'slot' && !useNativeShadowDom) {
         // minifier will clean this up
       } else {
         // either this is the first render of an element OR it's an update
@@ -978,9 +978,10 @@ render() {
   if (BUILD.scoped || BUILD.shadowDom) {
     scopeId = hostElm['s-sc'];
   }
+
+  useNativeShadowDom = supportsShadow && (cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation) !== 0;
   if (BUILD.slotRelocation) {
     contentRef = hostElm['s-cr'];
-    useNativeShadowDom = supportsShadow && (cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation) !== 0;
 
     // always reset
     checkSlotFallbackVisibility = false;
