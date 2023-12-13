@@ -8,12 +8,12 @@ import { isDecoratorNamed } from './decorator-utils';
 export const elementDecoratorsToStatic = (
   diagnostics: d.Diagnostic[],
   decoratedMembers: ts.ClassElement[],
-  typeChecker: ts.TypeChecker,
   newMembers: ts.ClassElement[],
+  decoratorName: string,
 ) => {
   const elementRefs = decoratedMembers
     .filter(ts.isPropertyDeclaration)
-    .map((prop) => parseElementDecorator(diagnostics, typeChecker, prop))
+    .map((prop) => parseElementDecorator(prop, decoratorName))
     .filter((element) => !!element);
 
   if (elementRefs.length > 0) {
@@ -25,12 +25,8 @@ export const elementDecoratorsToStatic = (
   }
 };
 
-const parseElementDecorator = (
-  _diagnostics: d.Diagnostic[],
-  _typeChecker: ts.TypeChecker,
-  prop: ts.PropertyDeclaration,
-): string | null => {
-  const elementDecorator = retrieveTsDecorators(prop)?.find(isDecoratorNamed('Element'));
+const parseElementDecorator = (prop: ts.PropertyDeclaration, decoratorName: string): string | null => {
+  const elementDecorator = retrieveTsDecorators(prop)?.find(isDecoratorNamed(decoratorName));
 
   if (elementDecorator == null) {
     return null;
