@@ -10,7 +10,7 @@ import { checkTelemetry, disableTelemetry, enableTelemetry } from './telemetry/t
  * @param logger a logging implementation to log the results out to the user
  */
 export const taskTelemetry = async (flags: ConfigFlags, sys: d.CompilerSystem, logger: d.Logger): Promise<void> => {
-  const prompt = logger.dim(sys.details.platform === 'windows' ? '>' : '$');
+  const prompt = logger.dim(sys.details?.platform === 'windows' ? '>' : '$');
   const isEnabling = flags.args.includes('on');
   const isDisabling = flags.args.includes('off');
   const INFORMATION = `Opt in or out of telemetry. Information about the data we collect is available on our website: ${logger.bold(
