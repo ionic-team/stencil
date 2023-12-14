@@ -2428,11 +2428,11 @@ export type MsgFromWorker<T extends WorkerContextMethod> = IPCSerializable<{
  * completes.
  */
 export interface CompilerWorkerTask {
-  stencilId?: number;
-  inputArgs?: any[];
+  stencilId: number;
+  inputArgs: any[];
   resolve: (val: any) => any;
   reject: (msg: string) => any;
-  retries?: number;
+  retries: number;
 }
 
 /**
