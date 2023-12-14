@@ -14,7 +14,7 @@ export const validateBuildFiles = (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
-): Promise<(void | void[])[]> => {
+): Promise<(void | void[] | null)[]> | null => {
   if (buildCtx.hasError) {
     return null;
   }
