@@ -2,7 +2,7 @@ import { addDocBlock, GENERATED_DTS, getComponentsDtsSrcFilePath, normalizePath,
 import { isAbsolute } from 'path';
 
 import type * as d from '../../declarations';
-import { getModule } from '../transpile/transpiled-module';
+import { combineInheritedCompilerMeta } from '../utils/combine-inherited-compiler-meta';
 import { generateComponentTypes } from './generate-component-types';
 import { generateEventDetailTypes } from './generate-event-detail-types';
 import { updateStencilTypesImports } from './stencil-types';
@@ -177,24 +177,4 @@ const generateComponentTypesFile = (
   c.push(`}`);
 
   return c.join(`\n`) + `\n`;
-};
-
-// TODO: make recursive and abstract for use in `proxy-custom-element-function` as well
-const combineInheritedCompilerMeta = (compilerCtx: d.CompilerCtx, compilerMeta: d.ComponentCompilerMeta) => {
-  const clone = { ...compilerMeta };
-
-  if (compilerMeta.parentClassPath) {
-    const parentModule = getModule(compilerCtx, compilerMeta.parentClassPath);
-
-    if (parentModule?.cmps.length) {
-      const parentCmp = parentModule.cmps[0];
-      clone.watchers = [...(clone.watchers ?? []), ...(parentCmp.watchers ?? [])];
-      clone.listeners = [...(clone.listeners ?? []), ...(parentCmp.listeners ?? [])];
-      clone.properties = [...(clone.properties ?? []), ...(parentCmp.properties ?? [])];
-      clone.states = [...(clone.states ?? []), ...(parentCmp.states ?? [])];
-      clone.methods = [...(clone.methods ?? []), ...(parentCmp.methods ?? [])];
-    }
-  }
-
-  return clone;
 };
