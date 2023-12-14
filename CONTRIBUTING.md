@@ -8,7 +8,7 @@ Thanks for your interest in contributing to Stencil! :tada:
 Please see our [Contributor Code of Conduct](https://github.com/ionic-team/stencil/blob/main/CODE_OF_CONDUCT.md) for information on our rules of conduct.
 
 
-## Creating an Issue
+## Reporting a Bug
 
 * If you have a question about using Stencil, please ask in the [Stencil Discord server](https://chat.stenciljs.com).
 
@@ -16,12 +16,26 @@ Please see our [Contributor Code of Conduct](https://github.com/ionic-team/stenc
 
 * The issue list of this repository is exclusively for bug reports and feature requests. Non-conforming issues will be closed immediately.
 
-* Issues with no clear steps to reproduce will not be triaged. If an issue is labeled with "Awaiting Reply" and receives no further replies from the author of the issue for more than 5 days, it will be closed.
+* Issues with no clear steps to reproduce will not be triaged.
 
-* If you think you have found a bug, or have a new feature idea, please start by making sure it hasn't already been [reported](https://github.com/ionic-team/stencil/issues?utf8=%E2%9C%93&q=is%3Aissue). You can search through existing issues to see if there is a similar one reported. Include closed issues as it may have been closed with a solution.
+* If you think you have found a bug, please start by making sure it hasn't already been [reported](https://github.com/ionic-team/stencil/issues?utf8=%E2%9C%93&q=is%3Aissue). You can search through existing issues to see if there is a similar one reported. Include closed issues as it may have been closed with a solution.
+    * If a bug report already exists, please upvote it using the :+1: reaction on the GitHub Issue summary. The team is currently unable to track "+1" style comments on the issue.
 
-* Next, [create a new issue](https://github.com/ionic-team/stencil/issues/new) that thoroughly explains the problem. Please fill out the populated issue form before submitting the issue.
+* Next, [create a new issue](https://github.com/ionic-team/stencil/issues/new) that thoroughly explains the problem.
+    * Please fill out the issue form in full before submitting.
+    * Please only include one bug per issue.
 
+
+## Requesting a Feature
+
+* If you have a question about using Stencil, please ask in the [Stencil Discord server](https://chat.stenciljs.com).
+
+* Before requesting a feature, please start by making sure it hasn't already been [proposed](https://github.com/ionic-team/stencil/issues?utf8=%E2%9C%93&q=is%3Aissue). You can search through existing GitHub issues to see if there is a similar feature request has been reported. Include closed feature requests, as it may have been closed already.
+    * If a feature request already exists, please upvote it using the :+1: reaction on the GitHub Issue summary. The team is currently unable to track "+1" style comments on the issue.
+
+* Next, [create a new feature request]([https://github.com/ionic-team/stencil/issues/new](https://github.com/ionic-team/stencil/issues/new?assignees=&labels=&projects=&template=feature_request.yml&title=feat%3A+)) that thoroughly explains the feature request.
+    * Please fill out the feature request form in full before submitting.
+    * Please only include one feature request per report.
 
 ## Creating a Pull Request
 
