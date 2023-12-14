@@ -1,22 +1,27 @@
 import type { CompilerCtx, ComponentCompilerMeta } from '../../declarations';
 import { getModule } from '../transpile/transpiled-module';
 
-// TODO: make recursive
-export const combineInheritedCompilerMeta = (compilerCtx: CompilerCtx, compilerMeta: ComponentCompilerMeta) => {
-  const clone = { ...compilerMeta };
+export const combineInheritedCompilerMeta = (
+  compilerCtx: CompilerCtx,
+  compilerMeta: ComponentCompilerMeta,
+): ComponentCompilerMeta => {
+  const clonedMeta = { ...compilerMeta };
 
-  if (compilerMeta.parentClassPath) {
-    const parentModule = getModule(compilerCtx, compilerMeta.parentClassPath);
+  if (clonedMeta.parentClassPath) {
+    const parentModule = getModule(compilerCtx, clonedMeta.parentClassPath);
 
     if (parentModule?.cmps.length) {
       const parentCmp = parentModule.cmps[0];
-      clone.watchers = [...(clone.watchers ?? []), ...(parentCmp.watchers ?? [])];
-      clone.listeners = [...(clone.listeners ?? []), ...(parentCmp.listeners ?? [])];
-      clone.properties = [...(clone.properties ?? []), ...(parentCmp.properties ?? [])];
-      clone.states = [...(clone.states ?? []), ...(parentCmp.states ?? [])];
-      clone.methods = [...(clone.methods ?? []), ...(parentCmp.methods ?? [])];
+
+      const parentMeta = combineInheritedCompilerMeta(compilerCtx, parentCmp);
+
+      clonedMeta.watchers = [...(parentMeta.watchers ?? []), ...(clonedMeta.watchers ?? [])];
+      clonedMeta.listeners = [...(parentMeta.listeners ?? []), ...(clonedMeta.listeners ?? [])];
+      clonedMeta.properties = [...(parentMeta.properties ?? []), ...(clonedMeta.properties ?? [])];
+      clonedMeta.states = [...(parentMeta.states ?? []), ...(clonedMeta.states ?? [])];
+      clonedMeta.methods = [...(parentMeta.methods ?? []), ...(clonedMeta.methods ?? [])];
     }
   }
 
-  return clone;
+  return clonedMeta;
 };
