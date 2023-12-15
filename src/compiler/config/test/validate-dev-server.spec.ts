@@ -123,9 +123,16 @@ describe('validateDevServer', () => {
   );
 
   it('should not set default port if null', () => {
-    inputConfig.devServer = { ...inputDevServerConfig, port: null };
+    // we intentionally set the value to `null` for the purposes of this test, hence the type assertion
+    inputConfig.devServer = { ...inputDevServerConfig, port: null as unknown as number };
     const { config } = validateConfig(inputConfig, mockLoadConfigInit());
     expect(config.devServer.port).toBe(null);
+  });
+
+  it('sets the port to 3333 if the port is undefined', () => {
+    inputConfig.devServer = { ...inputDevServerConfig, port: undefined };
+    const { config } = validateConfig(inputConfig, mockLoadConfigInit());
+    expect(config.devServer.port).toBe(3333);
   });
 
   it.each(['localhost:20/', 'localhost:20'])('should set port from address %p if no port prop', (address) => {
