@@ -123,9 +123,16 @@ describe('validateDevServer', () => {
   );
 
   it('should not set default port if null', () => {
-    inputConfig.devServer = { ...inputDevServerConfig, port: null };
+    // we intentionally set the value to `null` for the purposes of this test, hence the type assertion
+    inputConfig.devServer = { ...inputDevServerConfig, port: null as unknown as number };
     const { config } = validateConfig(inputConfig, mockLoadConfigInit());
     expect(config.devServer.port).toBe(null);
+  });
+
+  it('sets the port to 3333 if the port is undefined', () => {
+    inputConfig.devServer = { ...inputDevServerConfig, port: undefined };
+    const { config } = validateConfig(inputConfig, mockLoadConfigInit());
+    expect(config.devServer.port).toBe(3333);
   });
 
   it.each(['localhost:20/', 'localhost:20'])('should set port from address %p if no port prop', (address) => {
@@ -158,7 +165,7 @@ describe('validateDevServer', () => {
   it('should default historyApiFallback', () => {
     const { config } = validateConfig(inputConfig, mockLoadConfigInit());
     expect(config.devServer.historyApiFallback).toBeDefined();
-    expect(config.devServer.historyApiFallback.index).toBe('index.html');
+    expect(config.devServer.historyApiFallback!.index).toBe('index.html');
   });
 
   it.each([1, []])('should default historyApiFallback when an invalid value (%s) is provided', (badValue) => {
@@ -166,18 +173,27 @@ describe('validateDevServer', () => {
     inputConfig.devServer = { ...inputDevServerConfig, historyApiFallback: badValue as any };
     const { config } = validateConfig(inputConfig, mockLoadConfigInit());
     expect(config.devServer.historyApiFallback).toBeDefined();
-    expect(config.devServer.historyApiFallback.index).toBe('index.html');
+    expect(config.devServer.historyApiFallback!.index).toBe('index.html');
   });
 
   it('should set historyApiFallback', () => {
     inputConfig.devServer = { ...inputDevServerConfig, historyApiFallback: {} };
     const { config } = validateConfig(inputConfig, mockLoadConfigInit());
     expect(config.devServer.historyApiFallback).toBeDefined();
-    expect(config.devServer.historyApiFallback.index).toBe('index.html');
+    expect(config.devServer.historyApiFallback!.index).toBe('index.html');
+  });
+
+  it('should sets the historyApiFallback when undefined is provided', () => {
+    inputConfig.devServer = { ...inputDevServerConfig, historyApiFallback: undefined };
+    const { config } = validateConfig(inputConfig, mockLoadConfigInit());
+    expect(config.devServer.historyApiFallback).toBeDefined();
+    expect(config.devServer.historyApiFallback!.disableDotRule).toBe(false);
+    expect(config.devServer.historyApiFallback!.index).toBe('index.html');
   });
 
   it('should disable historyApiFallback', () => {
-    inputConfig.devServer = { ...inputDevServerConfig, historyApiFallback: null };
+    // we intentionally set the value to `null` for the purposes of this test, hence the type assertion
+    inputConfig.devServer = { ...inputDevServerConfig, historyApiFallback: null as unknown as d.HistoryApiFallback };
     const { config } = validateConfig(inputConfig, mockLoadConfigInit());
     expect(config.devServer.historyApiFallback).toBe(null);
   });
