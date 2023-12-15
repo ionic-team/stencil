@@ -186,7 +186,7 @@ const cleanupUpdateMsg = (logger: d.Logger, msg: string, fileNames: string[]) =>
  */
 const cleanDiagnosticsRelativePath = (config: d.Config, diagnostics: ReadonlyArray<d.Diagnostic>): void => {
   diagnostics.forEach((diagnostic) => {
-    if (!diagnostic.relFilePath && !isRemoteUrl(diagnostic.absFilePath) && diagnostic.absFilePath && config.rootDir) {
+    if (!diagnostic.relFilePath && diagnostic.absFilePath && !isRemoteUrl(diagnostic.absFilePath) && config.rootDir) {
       diagnostic.relFilePath = relative(config.rootDir, diagnostic.absFilePath);
     }
   });
