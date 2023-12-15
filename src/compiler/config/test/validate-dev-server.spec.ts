@@ -165,7 +165,7 @@ describe('validateDevServer', () => {
   it('should default historyApiFallback', () => {
     const { config } = validateConfig(inputConfig, mockLoadConfigInit());
     expect(config.devServer.historyApiFallback).toBeDefined();
-    expect(config.devServer.historyApiFallback.index).toBe('index.html');
+    expect(config.devServer.historyApiFallback!.index).toBe('index.html');
   });
 
   it.each([1, []])('should default historyApiFallback when an invalid value (%s) is provided', (badValue) => {
@@ -173,14 +173,14 @@ describe('validateDevServer', () => {
     inputConfig.devServer = { ...inputDevServerConfig, historyApiFallback: badValue as any };
     const { config } = validateConfig(inputConfig, mockLoadConfigInit());
     expect(config.devServer.historyApiFallback).toBeDefined();
-    expect(config.devServer.historyApiFallback.index).toBe('index.html');
+    expect(config.devServer.historyApiFallback!.index).toBe('index.html');
   });
 
   it('should set historyApiFallback', () => {
     inputConfig.devServer = { ...inputDevServerConfig, historyApiFallback: {} };
     const { config } = validateConfig(inputConfig, mockLoadConfigInit());
     expect(config.devServer.historyApiFallback).toBeDefined();
-    expect(config.devServer.historyApiFallback.index).toBe('index.html');
+    expect(config.devServer.historyApiFallback!.index).toBe('index.html');
   });
 
   it('should sets the historyApiFallback when undefined is provided', () => {
