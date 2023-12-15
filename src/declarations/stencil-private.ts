@@ -44,7 +44,7 @@ export interface SourceMap {
 export interface PrintLine {
   lineIndex: number;
   lineNumber: number;
-  text?: string;
+  text: string;
   errorCharStart: number;
   errorLength?: number;
 }
