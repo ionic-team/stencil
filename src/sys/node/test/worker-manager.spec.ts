@@ -2,14 +2,24 @@ import type * as d from '../../../declarations';
 import { getNextWorker } from '../node-worker-controller';
 import { TestWorkerMain } from './test-worker-main';
 
+const incr = (function* () {
+  let i = 1;
+  while (true) {
+    yield i++;
+  }
+})();
+
 describe('getNextWorker', () => {
   let workers: TestWorkerMain[];
   const maxConcurrentWorkers = 4;
 
   const stubCompilerWorkerTask = (): d.CompilerWorkerTask => {
     return {
+      stencilId: incr.next().value,
       resolve: () => {},
       reject: () => {},
+      inputArgs: [],
+      retries: 1,
     };
   };
 
