@@ -1,6 +1,7 @@
 import { getOptions } from '../utils/options';
 import { buildCli } from './cli';
 import { buildCompiler } from './compiler';
+import { buildDevServer } from './dev-server';
 import { buildMockDoc } from './mock-doc';
 import { buildScreenshot } from './screenshot';
 import { buildSysNode } from './sys-node';
@@ -16,6 +17,7 @@ async function main() {
   await Promise.all([
     buildCli(opts),
     buildCompiler(opts),
+    buildDevServer(opts),
     buildMockDoc(opts),
     buildScreenshot(opts),
     buildSysNode(opts),

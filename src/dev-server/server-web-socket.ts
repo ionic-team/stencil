@@ -1,6 +1,6 @@
 import { noop } from '@utils';
 import type { Server } from 'http';
-import * as ws from 'ws';
+import ws from 'ws';
 
 import type * as d from '../declarations';
 

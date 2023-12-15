@@ -95,8 +95,9 @@ export async function sysNode(opts: BuildOptions) {
   return [sysNodeBundle, sysNodeWorkerBundle];
 }
 
+export const sysNodeBundleCacheDir = 'sys-node-bundle-cache';
 export async function sysNodeExternalBundles(opts: BuildOptions) {
-  const cachedDir = join(opts.scriptsBuildDir, 'sys-node-bundle-cache');
+  const cachedDir = join(opts.scriptsBuildDir, sysNodeBundleCacheDir);
 
   await fs.ensureDir(cachedDir);
 
@@ -106,22 +107,25 @@ export async function sysNodeExternalBundles(opts: BuildOptions) {
     bundleExternal(opts, opts.output.sysNodeDir, cachedDir, 'graceful-fs.js'),
     bundleExternal(opts, opts.output.sysNodeDir, cachedDir, 'node-fetch.js'),
     bundleExternal(opts, opts.output.sysNodeDir, cachedDir, 'prompts.js'),
+    // TODO(STENCIL-1052): remove next two entries once Rollup -> esbuild migration is complete
     bundleExternal(opts, opts.output.devServerDir, cachedDir, 'open-in-editor-api.js'),
     bundleExternal(opts, opts.output.devServerDir, cachedDir, 'ws.js'),
   ]);
 
   // open-in-editor's visualstudio.vbs file
+  // TODO(STENCIL-1052): remove once Rollup -> esbuild migration is complete
   const visualstudioVbsSrc = join(opts.nodeModulesDir, 'open-in-editor', 'lib', 'editors', 'visualstudio.vbs');
   const visualstudioVbsDesc = join(opts.output.devServerDir, 'visualstudio.vbs');
   await fs.copy(visualstudioVbsSrc, visualstudioVbsDesc);
 
   // copy open's xdg-open file
+  // TODO(STENCIL-1052): remove once Rollup -> esbuild migration is complete
   const xdgOpenSrcPath = join(opts.nodeModulesDir, 'open', 'xdg-open');
   const xdgOpenDestPath = join(opts.output.devServerDir, 'xdg-open');
   await fs.copy(xdgOpenSrcPath, xdgOpenDestPath);
 }
 
-function bundleExternal(opts: BuildOptions, outputDir: string, cachedDir: string, entryFileName: string) {
+export function bundleExternal(opts: BuildOptions, outputDir: string, cachedDir: string, entryFileName: string) {
   return new Promise<void>(async (resolveBundle, rejectBundle) => {
     const outputFile = join(outputDir, entryFileName);
     const cachedFile = join(cachedDir, entryFileName) + (opts.isProd ? '.min.js' : '');

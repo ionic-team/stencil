@@ -31,6 +31,9 @@ export function getEsbuildAliases(): Record<string, string> {
     prompts: './sys/node/prompts.js',
     glob: './sys/node/glob.js',
     'graceful-fs': './sys/node/graceful-fs.js',
+
+    // dev server related aliases
+    ws: './ws.js',
   };
 }
 
