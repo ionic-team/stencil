@@ -183,8 +183,17 @@ describe('validateDevServer', () => {
     expect(config.devServer.historyApiFallback.index).toBe('index.html');
   });
 
+  it('should sets the historyApiFallback when undefined is provided', () => {
+    inputConfig.devServer = { ...inputDevServerConfig, historyApiFallback: undefined };
+    const { config } = validateConfig(inputConfig, mockLoadConfigInit());
+    expect(config.devServer.historyApiFallback).toBeDefined();
+    expect(config.devServer.historyApiFallback!.disableDotRule).toBe(false);
+    expect(config.devServer.historyApiFallback!.index).toBe('index.html');
+  });
+
   it('should disable historyApiFallback', () => {
-    inputConfig.devServer = { ...inputDevServerConfig, historyApiFallback: null };
+    // we intentionally set the value to `null` for the purposes of this test, hence the type assertion
+    inputConfig.devServer = { ...inputDevServerConfig, historyApiFallback: null as unknown as d.HistoryApiFallback };
     const { config } = validateConfig(inputConfig, mockLoadConfigInit());
     expect(config.devServer.historyApiFallback).toBe(null);
   });
