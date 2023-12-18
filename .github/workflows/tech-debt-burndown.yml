@@ -44,7 +44,7 @@ jobs:
         run: npx tsc --strictNullChecks --noEmit --pretty false | npx tsc-output-parser > null_errors_${{ matrix.branch }}.json
 
       - name: Upload null_errors_${{ matrix.branch }}.json
-        uses: actions/upload-artifact@a8a3f3ad30e3422c9c7b888a15615d19a852ae32 # v3.1.3
+        uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 # v4.0.0
         with:
           name: null_errors_${{ matrix.branch }}
           path: 'null_errors_${{ matrix.branch }}.json'
@@ -79,7 +79,7 @@ jobs:
         run: npx ts-prune > unused-exports-${{ matrix.branch }}.txt
 
       - name: Upload unused exports
-        uses: actions/upload-artifact@a8a3f3ad30e3422c9c7b888a15615d19a852ae32 # v3.1.3
+        uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392 # v4.0.0
         with:
           name: unused-exports-${{ matrix.branch }}
           path: 'unused-exports-${{ matrix.branch }}.txt'
