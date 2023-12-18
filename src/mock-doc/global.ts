@@ -12,6 +12,7 @@ import {
   MockStyleElement,
   MockTemplateElement,
   MockTitleElement,
+  MockUListElement,
 } from './element';
 import { MockCustomEvent, MockEvent, MockFocusEvent, MockKeyboardEvent, MockMouseEvent } from './event';
 import { MockHeaders } from './headers';
@@ -177,4 +178,5 @@ const GLOBAL_CONSTRUCTORS: [string, any][] = [
   ['HTMLStyleElement', MockStyleElement],
   ['HTMLTemplateElement', MockTemplateElement],
   ['HTMLTitleElement', MockTitleElement],
+  ['HTMLUListElement', MockUListElement],
 ];

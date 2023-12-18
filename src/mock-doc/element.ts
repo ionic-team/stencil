@@ -49,6 +49,9 @@ export function createElement(ownerDocument: any, tagName: string): any {
 
     case 'title':
       return new MockTitleElement(ownerDocument);
+
+    case 'ul':
+      return new MockUListElement(ownerDocument);
   }
 
   if (ownerDocument != null && tagName.includes('-')) {
@@ -490,6 +493,12 @@ export class MockTitleElement extends MockHTMLElement {
   }
   set text(value: string) {
     this.textContent = value;
+  }
+}
+
+export class MockUListElement extends MockHTMLElement {
+  constructor(ownerDocument: any) {
+    super(ownerDocument, 'ul');
   }
 }
 
