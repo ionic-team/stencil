@@ -1,3 +1,21 @@
+# 🐏 [4.9.0](https://github.com/ionic-team/stencil/compare/v4.8.2...v4.9.0) (2023-12-18)
+
+
+### Bug Fixes
+
+* **compiler:** fix transforming method parameters into docs ([#5166](https://github.com/ionic-team/stencil/issues/5166)) ([2d16db6](https://github.com/ionic-team/stencil/commit/2d16db6d6e7b1b9559c895d3c7a0970207c0df7f))
+* **mock-doc:** add HTMLUListElement ([#5169](https://github.com/ionic-team/stencil/issues/5169)) ([6233cb5](https://github.com/ionic-team/stencil/commit/6233cb5ed8f8767cf69b328adc697b0f70030b6d)), closes [#3382](https://github.com/ionic-team/stencil/issues/3382)
+* **runtime:** allow setting `key` attr on nested Stencil components ([#5164](https://github.com/ionic-team/stencil/issues/5164)) ([f6903a8](https://github.com/ionic-team/stencil/commit/f6903a86caec1dda655290d99eaf8c42a8e102ac))
+* **runtime:** patch `removeChild` for `scoped` components ([#5148](https://github.com/ionic-team/stencil/issues/5148)) ([956c196](https://github.com/ionic-team/stencil/commit/956c19651772ce1770598e605b6c50e20b39cefa)), closes [#3278](https://github.com/ionic-team/stencil/issues/3278)
+* **screenshot:** reject pixel match process on exit ([#5167](https://github.com/ionic-team/stencil/issues/5167)) ([c2ee40d](https://github.com/ionic-team/stencil/commit/c2ee40db4b515224376b94019067de896d2f1a24))
+
+
+### Features
+
+* **compiler:** Stencil decorator import aliasing ([#5161](https://github.com/ionic-team/stencil/issues/5161)) ([97dcb45](https://github.com/ionic-team/stencil/commit/97dcb45d44751d239b0afb6380bea217818b211a)), closes [#3137](https://github.com/ionic-team/stencil/issues/3137)
+
+
+
 ## 🐳 [4.8.2](https://github.com/ionic-team/stencil/compare/v4.8.1...v4.8.2) (2023-12-11)
 
 
