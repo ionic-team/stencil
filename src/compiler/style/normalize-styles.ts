@@ -5,10 +5,12 @@ import type * as d from '../../declarations';
 
 export const normalizeStyles = (tagName: string, componentFilePath: string, styles: d.StyleCompiler[]) => {
   styles.forEach((style) => {
-    if (style.modeName === DEFAULT_STYLE_MODE) {
-      style.styleId = tagName?.toUpperCase();
-    } else {
-      style.styleId = `${tagName?.toUpperCase()}#${style.modeName}`;
+    if (tagName) {
+      if (style.modeName === DEFAULT_STYLE_MODE) {
+        style.styleId = tagName.toUpperCase();
+      } else {
+        style.styleId = `${tagName.toUpperCase()}#${style.modeName}`;
+      }
     }
 
     if (Array.isArray(style.externalStyles)) {
