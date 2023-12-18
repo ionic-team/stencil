@@ -76,7 +76,7 @@ const buildDone = async (
     if (buildCtx.isRebuild && hasChanges && buildCtx.buildResults.hmr && !aborted) {
       // this is a rebuild, and we've got hmr data
       // and this build hasn't been aborted
-      logHmr(config.logger, buildCtx);
+      logHmr(config.logger, buildCtx.buildResults.hmr);
     }
 
     // create a nice pretty message stating what happened
@@ -130,10 +130,12 @@ const buildDone = async (
   return buildCtx.buildResults;
 };
 
-const logHmr = (logger: d.Logger, buildCtx: d.BuildCtx) => {
-  // this is a rebuild, and we've got hmr data
-  // and this build hasn't been aborted
-  const hmr = buildCtx.buildResults.hmr;
+/**
+ * In a Hot Module Replacement (HMR) context, log what changed between builds
+ * @param logger the instance of the logger to report what's changed
+ * @param hmr the HMR data, which includes what's changed between builds
+ */
+const logHmr = (logger: d.Logger, hmr: d.HotModuleReplacement): void => {
   if (hmr.componentsUpdated) {
     cleanupUpdateMsg(logger, `updated component`, hmr.componentsUpdated);
   }
