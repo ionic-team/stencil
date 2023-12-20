@@ -57,4 +57,6 @@ export function resetBuildConditionals(b: d.BuildConditionals) {
   b.slotChildNodesFix = false;
   // TODO(STENCIL-914): remove this option when `experimentalSlotFixes` is the default behavior
   b.experimentalSlotFixes = false;
+  // TODO(STENCIL-1086): remove this option when it's the default behavior
+  b.experimentalScopedSlotChanges = false;
 }

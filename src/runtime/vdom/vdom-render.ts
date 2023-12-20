@@ -1151,7 +1151,7 @@ render() {
   // Hide any elements that were projected through, but don't have a slot to go to.
   // Only an issue if there were no "slots" rendered. Otherwise, nodes are hidden correctly.
   // This _only_ happens for `scoped` components!
-  if (BUILD.experimentalSlotFixes && cmpMeta.$flags$ & CMP_FLAGS.scopedCssEncapsulation) {
+  if (BUILD.experimentalScopedSlotChanges && cmpMeta.$flags$ & CMP_FLAGS.scopedCssEncapsulation) {
     for (const childNode of rootVnode.$elm$.childNodes) {
       if (childNode['s-hn'] !== hostTagName && !childNode['s-sh']) {
         // Store the initial value of `hidden` so we can reset it later when

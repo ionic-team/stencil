@@ -182,6 +182,9 @@ export const validateConfig = (
     validatedConfig.extras.scopedSlotTextContentFix = !!validatedConfig.extras.scopedSlotTextContentFix;
   }
 
+  // TODO(STENCIL-1086): remove this option when it's the default behavior
+  validatedConfig.extras.experimentalScopedSlotChanges = !!validatedConfig.extras.experimentalScopedSlotChanges;
+
   setBooleanConfig(
     validatedConfig,
     'sourceMap',
