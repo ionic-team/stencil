@@ -1,5 +1,5 @@
 import { BUILD } from '@app-data';
-import { getHostRef, plt, supportsShadow } from '@platform';
+import { forceUpdate, getHostRef, plt, supportsShadow } from '@platform';
 import { NODE_TYPES } from '@stencil/core/mock-doc';
 import { CMP_FLAGS, HOST_FLAGS } from '@utils';
 
@@ -84,10 +84,14 @@ export const patchSlotAppendChild = (HostElementPrototype: any) => {
     if (slotNode) {
       const slotChildNodes = getHostSlotChildNodes(slotNode, slotName);
       const appendAfter = slotChildNodes[slotChildNodes.length - 1];
-      appendAfter.parentNode.insertBefore(newChild, appendAfter.nextSibling);
+      const insertedNode = appendAfter.parentNode.insertBefore(newChild, appendAfter.nextSibling);
+
       // Check if there is fallback content that should be hidden
       updateFallbackSlotVisibility(this);
-      return;
+      // Fore a re-render of the host element
+      forceUpdate(this);
+
+      return insertedNode;
     }
     return (this as any).__appendChild(newChild);
   };
