@@ -7,6 +7,11 @@ import { BuildOptions } from '../utils/options';
 import { writePkgJson } from '../utils/write-pkg-json';
 import { getBaseEsbuildOptions, getEsbuildAliases, getEsbuildExternalModules, runBuilds } from './util';
 
+const screenshotBuilds = {
+  'Stencil Screenshot': 'index',
+  'Stencil Screenshot Pixel Match': 'pixel-match',
+};
+
 export async function buildScreenshot(opts: BuildOptions) {
   const inputScreenshotDir = join(opts.buildDir, 'screenshot');
   const inputScreenshotSrcDir = join(opts.srcDir, 'screenshot');
@@ -45,23 +50,18 @@ export async function buildScreenshot(opts: BuildOptions) {
     platform: 'node',
   } satisfies ESBuildOptions;
 
-  const screenshotEsbuildOptions = {
-    ...baseScreenshotOptions,
-    banner: {
-      js: getBanner(opts, 'Stencil Screenshot'),
-    },
-    entryPoints: [join(inputScreenshotSrcDir, 'index.ts')],
-    outfile: join(opts.output.screenshotDir, 'index.js'),
-  } satisfies ESBuildOptions;
-
-  const pixelmatchEsbuildOptions = {
-    ...baseScreenshotOptions,
-    banner: {
-      js: getBanner(opts, 'Stencil Screenshot Pixel Match'),
-    },
-    entryPoints: [join(inputScreenshotSrcDir, 'index.ts')],
-    outfile: join(opts.output.screenshotDir, 'pixel-match.js'),
-  } satisfies ESBuildOptions;
-
-  return runBuilds([screenshotEsbuildOptions, pixelmatchEsbuildOptions], opts);
+  return runBuilds(
+    Object.entries(screenshotBuilds).map(
+      ([label, file]) =>
+        ({
+          ...baseScreenshotOptions,
+          banner: {
+            js: getBanner(opts, label),
+          },
+          entryPoints: [join(inputScreenshotSrcDir, `${file}.ts`)],
+          outfile: join(opts.output.screenshotDir, `${file}.js`),
+        }) satisfies ESBuildOptions,
+    ),
+    opts,
+  );
 }
