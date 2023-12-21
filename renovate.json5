@@ -88,6 +88,11 @@
       schedule: ["before 11am on monday"]
     },
     {
+      // group these two, as they may rely on one another during major version bumps (see #5191)
+      matchPackageNames: ['actions/download-artifact', 'actions/upload-artifact'],
+      groupName: 'Download + Upload Artifacts',
+    },
+    {
       matchPackageNames: ['eslint-plugin-jsdoc'],
       // this package can be released often, let's look at it every week
       // Note: Timezone for the schedule is specified as UTC
