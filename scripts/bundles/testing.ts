@@ -116,7 +116,7 @@ export async function testing(opts: BuildOptions) {
   return [testingBundle];
 }
 
-async function copyTestingInternalDts(opts: BuildOptions, inputDir: string) {
+export async function copyTestingInternalDts(opts: BuildOptions, inputDir: string) {
   // copy testing d.ts files
 
   await fs.copy(join(inputDir), join(opts.output.testingDir), {
