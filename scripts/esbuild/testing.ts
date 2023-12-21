@@ -87,16 +87,13 @@ export async function buildTesting(opts: BuildOptions) {
       externalAliases('@platform', '@stencil/core/internal/testing'),
       externalAliases('../internal/testing/index.js', '@stencil/core/internal/testing'),
       externalAliases('@stencil/core/dev-server', '../dev-server/index.js'),
-      lazyRequirePlugin(
-        opts,
-        [
-          '@stencil/core/internal/app-data',
-          '@stencil/core/internal/testing',
-          '../dev-server/index.js',
-          '../internal/testing/index.js',
-          '../mock-doc/index.cjs'
-        ]
-      )
+      lazyRequirePlugin(opts, [
+        '@stencil/core/internal/app-data',
+        '@stencil/core/internal/testing',
+        '../dev-server/index.js',
+        '../internal/testing/index.js',
+        '../mock-doc/index.cjs',
+      ]),
     ],
   };
 
@@ -119,7 +116,7 @@ function externalAliases(moduleId: string, resolveToPath: string): Plugin {
       });
     },
   };
-};
+}
 
 function lazyRequirePlugin(opts: BuildOptions, moduleIds: string[]): Plugin {
   return {
@@ -130,7 +127,7 @@ function lazyRequirePlugin(opts: BuildOptions, moduleIds: string[]): Plugin {
         let code = Buffer.from(bundle.contents).toString();
 
         for (const moduleId of moduleIds) {
-          const str = `require("${moduleId}")`
+          const str = `require("${moduleId}")`;
           while (code.includes(str)) {
             code = code.replace(str, `_lazyRequire("${moduleId}")`);
           }
@@ -139,6 +136,6 @@ function lazyRequirePlugin(opts: BuildOptions, moduleIds: string[]): Plugin {
         code = code.replace(`"use strict";`, `"use strict";\n\n${getLazyRequireFn(opts)}`);
         return fs.writeFile(bundle.path, code);
       });
-    }
-  }
+    },
+  };
 }
