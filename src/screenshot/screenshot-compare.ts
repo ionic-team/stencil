@@ -104,15 +104,11 @@ export async function compareScreenshot(
       // compare the two images pixel by pixel to
       // figure out a mismatch value
 
-      // figure out the actual width and height of the screenshot
-      const naturalWidth = Math.round(emulateConfig.viewport.width * emulateConfig.viewport.deviceScaleFactor);
-      const naturalHeight = Math.round(emulateConfig.viewport.height * emulateConfig.viewport.deviceScaleFactor);
-
       const pixelMatchInput: d.PixelMatchInput = {
         imageAPath: join(screenshotBuildData.imagesDir, screenshot.diff.imageA),
         imageBPath: join(screenshotBuildData.imagesDir, screenshot.diff.imageB),
-        width: naturalWidth,
-        height: naturalHeight,
+        width,
+        height,
         pixelmatchThreshold: pixelmatchThreshold,
       };
 
