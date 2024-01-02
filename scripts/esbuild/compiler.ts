@@ -17,6 +17,9 @@ export async function buildCompiler(opts: BuildOptions) {
   const compilerFileName = 'stencil.js';
   const compilerDtsName = compilerFileName.replace('.js', '.d.ts');
 
+  // clear out rollup stuff and ensure directory exists
+  await fs.emptyDir(opts.output.compilerDir);
+
   // create public d.ts
   let dts = await fs.readFile(join(inputDir, 'public.d.ts'), 'utf8');
   dts = dts.replace('@stencil/core/internal', '../internal/index');
