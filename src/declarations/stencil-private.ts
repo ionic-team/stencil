@@ -1,7 +1,7 @@
 import { result } from '@utils';
-import type { Serializable as CPSerializable } from 'child_process';
 
 import type { InMemoryFileSystem } from '../compiler/sys/in-memory-fs';
+import type { CPSerializable } from './child_process';
 import type {
   BuildEvents,
   BuildLog,

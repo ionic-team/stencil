@@ -1,4 +1,4 @@
-import { EntryPointConfig, generateDtsBundle, OutputOptions } from 'dts-bundle-generator/dist/bundle-generator.js';
+import { EntryPointConfig, generateDtsBundle, OutputOptions } from 'dts-bundle-generator';
 import fs from 'fs-extra';
 
 import { BuildOptions } from './options';
