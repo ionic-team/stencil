@@ -56,6 +56,7 @@ const externalNodeModules = [
   'jest-config',
   'jest-message-id',
   'jest-pnp-resolver',
+  'jest-environment-node',
   'jest-runner',
   'puppeteer',
   'puppeteer-core',
