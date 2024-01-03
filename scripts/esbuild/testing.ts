@@ -9,36 +9,10 @@ import { writePkgJson } from '../utils/write-pkg-json';
 import { getBaseEsbuildOptions, getEsbuildAliases, getEsbuildExternalModules, runBuilds } from './util';
 
 const EXTERNAL_TESTING_MODULES = [
-  'assert',
-  'buffer',
-  'child_process',
-  'console',
   'constants',
-  'crypto',
-  'fs',
-  '@jest/core',
-  'jest-cli',
-  'jest',
-  'expect',
-  '@jest/reporters',
-  'jest-environment-node',
-  'jest-message-id',
-  'jest-runner',
-  'net',
-  'os',
-  'path',
-  'process',
-  'puppeteer',
-  'puppeteer-core',
-  'readline',
   'rollup',
   '@rollup/plugin-commonjs',
   '@rollup/plugin-node-resolve',
-  'stream',
-  'tty',
-  'url',
-  'util',
-  'vm',
   'yargs',
   'zlib',
 ];
@@ -46,10 +20,14 @@ const EXTERNAL_TESTING_MODULES = [
 export async function buildTesting(opts: BuildOptions) {
   const inputDir = join(opts.buildDir, 'testing');
   const sourceDir = join(opts.srcDir, 'testing');
+  await fs.emptyDir(opts.output.testingDir);
 
   await Promise.all([
     // copy jest testing entry files
-    fs.copy(join(opts.scriptsBundlesDir, 'helpers', 'jest'), opts.output.testingDir),
+    fs.copy(
+      join(opts.scriptsBundlesDir, 'helpers', 'jest'),
+      opts.output.testingDir
+    ),
     copyTestingInternalDts(opts, inputDir),
   ]);
 
@@ -64,9 +42,6 @@ export async function buildTesting(opts: BuildOptions) {
   const external = [
     ...EXTERNAL_TESTING_MODULES,
     ...getEsbuildExternalModules(opts, opts.output.testingDir),
-    '@rollup/plugin-commonjs',
-    '@rollup/plugin-node-resolve',
-    'rollup',
     '../compiler/stencil.js',
   ];
 
@@ -79,6 +54,10 @@ export async function buildTesting(opts: BuildOptions) {
     platform: 'node',
     logLevel: 'info',
     external,
+    /**
+     * set `write: false` so that we can run the `onEnd` hook
+     * in `lazyRequirePlugin` and modify the imports
+     */
     write: false,
     alias: getEsbuildAliases(),
     banner: { js: getBanner(opts, `Stencil Testing`, true) },
