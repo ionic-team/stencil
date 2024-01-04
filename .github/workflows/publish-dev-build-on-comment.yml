@@ -7,7 +7,6 @@ on:
 
 jobs:
   deploy:
-    needs: [authorize]
     permissions:
       pull-requests: write
     name: Publish a dev build to npm based on a PR comment
