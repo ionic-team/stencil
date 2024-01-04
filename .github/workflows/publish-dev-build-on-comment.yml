@@ -7,15 +7,25 @@ on:
 
 jobs:
   deploy:
+    needs: [authorize]
     permissions:
       pull-requests: write
     name: Publish a dev build to npm based on a PR comment
     runs-on: ubuntu-latest
-    if: ${{ github.event.issue.pull_request && github.event.comment.body == '/publish-dev' }}
+    if: ${{ github.event.issue.pull_request && github.event.comment.body == '/release-dev' }}
     steps:
+      - name: authorize
+        uses: octokit/request-action@v2.1.9
+        with:
+          route: GET /orgs/:organisation/teams/:team/memberships/${{ github.event.comment.user.id }}
+          team: stencil
+          organisation: ionic-team
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+
       # we need this action because the HEAD on an 'issue' event is normally
       # the HEAD of the main branch, not the PR. This relates to the way that
-      # GitHub treats issues and PRs as the same thing in some ways.
+      # Github treats issues and PRs as the same thing in some ways.
       # See https://github.com/xt0rted/pull-request-comment-branch
       - name: Get PR branch
         uses: xt0rted/pull-request-comment-branch@d97294d304604fa98a2600a6e2f916a84b596dc7 # v2.0.0
