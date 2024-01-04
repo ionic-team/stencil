@@ -4,6 +4,10 @@ on:
   workflow_dispatch:
     # Make this a reusable workflow, no value needed
     # https://docs.github.com/en/actions/using-workflows/reusing-workflows
+    outputs:
+      dev-version:
+        description: The version that was just published to npm.
+        value: ${{ jobs.get-dev-version.dev-version }}
 
 jobs:
   build_core:
