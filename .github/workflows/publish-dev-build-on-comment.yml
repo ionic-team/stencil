@@ -17,33 +17,29 @@ jobs:
         with:
           ref: ${{ steps.comment-branch.outputs.head_ref }}
 
-      - name: Add initial comment
-        id: initial_comment
-        uses: actions/github-script@v5
+      - name: Find Comment
+        uses: peter-evans/find-comment@a54c31d7fa095754bfef525c0c8e5e5674c4b4b1 # v2.4.0
+        id: fc
         with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
-          script: |
-            const comment = await github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: "I'm going to publish..."
-            });
-            return comment.data.id;
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: 'github-actions[bot]'
+          body-includes: '### dev build deploy bot'
+
+      - name: Create or update comment
+        uses: peter-evans/create-or-update-comment@23ff15729ef2fc348714a3bb66d2f655ca9066f2 # v3.1.0
+        with:
+          comment-id: ${{ steps.fc.outputs.comment-id }}
+          issue-number: ${{ github.event.issue.pull_request.number }}
+          body: "### dev build deploy bot\nPublishing to npm, stay tuned..."
+          edit-mode: replace
 
       - name: Run stencil dev release...
         uses: ./.github/workflows/release-dev.yml
 
       - name: Update comment
-        uses: actions/github-script@v5
+        uses: peter-evans/create-or-update-comment@23ff15729ef2fc348714a3bb66d2f655ca9066f2 # v3.1.0
         with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
-          script: |
-            await github.rest.issues.updateComment({
-              comment_id: ${{ steps.initial_comment.outputs.result }},
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: "I finished"
-            });
-
+          comment-id: ${{ steps.fc.outputs.comment-id }}
+          issue-number: ${{ github.event.issue.pull_request.number }}
+          body: "### dev build deploy bot\nI finished!"
+          edit-mode: replace
