@@ -1,65 +1,58 @@
 name: 'Deploy on Comment'
+
 on:
   issue_comment:
-    types: [created]
+    types:
+      - created
 
 jobs:
   deploy:
+    permissions:
+      pull-requests: write
+    name: Publish a dev build to npm based on a PR comment
     runs-on: ubuntu-latest
-    if: ${{github.event.issue.pull_request && contains(github.event.comment.body, '/deploy')}}
+    if: ${{ github.event.issue.pull_request && github.event.comment.body == '/publish-dev' }}
     steps:
+      # we need this action because the HEAD on an 'issue' event is normally
+      # the HEAD of the main branch, not the PR. This relates to the way that
+      # GitHub treats issues and PRs as the same thing in some ways.
+      # See https://github.com/xt0rted/pull-request-comment-branch
       - name: Get PR branch
-        uses: xt0rted/pull-request-comment-branch@v1
+        uses: xt0rted/pull-request-comment-branch@d97294d304604fa98a2600a6e2f916a84b596dc7 # v2.0.0
         id: comment-branch
 
       - name: Checkout PR branch
-        uses: actions/checkout@v3
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
         with:
           ref: ${{ steps.comment-branch.outputs.head_ref }}
 
-      - name: Find Comment
-        uses: peter-evans/find-comment@a54c31d7fa095754bfef525c0c8e5e5674c4b4b1 # v2.4.0
-        id: fc
-        with:
-          issue-number: ${{ github.event.issue.pull_request.number }}
-          comment-author: 'github-actions[bot]'
-          body-includes: '### dev build deploy bot'
-
-      # create a comment if one wasn't found
+      # Create a comment to output info about the build
       - name: Create comment
-        if: steps.fc.outputs.comment-id == ''
-        uses: peter-evans/find-comment@a54c31d7fa095754bfef525c0c8e5e5674c4b4b1 # v2.4.0
+        uses: peter-evans/create-or-update-comment@23ff15729ef2fc348714a3bb66d2f655ca9066f2 # v3.1.0
+        id: comment
         with:
-          issue-number: ${{ github.event.issue.pull_request.number }}
-          # need to get the current time in her
-          body: '### dev build deploy bot\n\n**Activity log**\n- publishing to npm...'
-
-      - name: Update comment
-        if: steps.fc.outputs.comment-id != ''
-        uses: peter-evans/find-comment@a54c31d7fa095754bfef525c0c8e5e5674c4b4b1 # v2.4.0
-        with:
-          comment-id: ${{ steps.fc.outputs.comment-id }}
-          body: '- publishing to npm...'
-          edit-mode: append
+          issue-number: ${{ github.event.issue.number }}
+          body: "I'm going to build and deploy this PR to npm! Stay tuned..."
 
       - name: Run stencil dev release...
+        id: release
         uses: ./.github/workflows/release-dev.yml
-
-      # we need to run this again since if we created a comment we won't already
-      # have a reference to it from earlier
-      - name: Find Comment Again
-        uses: peter-evans/find-comment@a54c31d7fa095754bfef525c0c8e5e5674c4b4b1 # v2.4.0
-        id: fcc
-        with:
-          issue-number: ${{ github.event.issue.pull_request.number }}
-          comment-author: 'github-actions[bot]'
-          body-includes: '### dev build deploy bot'
 
       - name: Update comment
         uses: peter-evans/create-or-update-comment@23ff15729ef2fc348714a3bb66d2f655ca9066f2 # v3.1.0
         with:
-          comment-id: ${{ steps.fcc.outputs.comment-id }}
-          issue-number: ${{ github.event.issue.pull_request.number }}
-          # need to get the build version in here somehow, out of the deploy action
-          body: "- published!"
-          edit-mode: append
+          comment-id: ${{ steps.comment.outputs.comment-id }}
+          issue-number: ${{ github.event.issue.number }}
+          body: |
+            I'm going to build and deploy this PR to npm! Stay tuned...
+
+            This PR was published to version ${{ steps.release.outputs.dev-version }}! 🎉
+
+            Install it here:
+
+            ```sh
+            npm install @stencil/core@${{ steps.release.outputs.dev-version }}
+            ```
+          edit-mode: replace
+
+      # probably need to find a good way to report a failure here
