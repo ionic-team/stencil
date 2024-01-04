@@ -1,4 +1,4 @@
-name: "Deploy on Comment"
+name: 'Deploy on Comment'
 on:
   issue_comment:
     types: [created]
@@ -6,7 +6,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    if: github.event.issue.pull_request && contains(github.event.comment.body, '/deploy')
+    if: ${{github.event.issue.pull_request && contains(github.event.comment.body, '/deploy')}}
     steps:
       - name: Get PR branch
         uses: xt0rted/pull-request-comment-branch@v1
@@ -25,21 +25,41 @@ jobs:
           comment-author: 'github-actions[bot]'
           body-includes: '### dev build deploy bot'
 
-      - name: Create or update comment
-        uses: peter-evans/create-or-update-comment@23ff15729ef2fc348714a3bb66d2f655ca9066f2 # v3.1.0
+      # create a comment if one wasn't found
+      - name: Create comment
+        if: steps.fc.outputs.comment-id == ''
+        uses: peter-evans/find-comment@a54c31d7fa095754bfef525c0c8e5e5674c4b4b1 # v2.4.0
+        with:
+          issue-number: ${{ github.event.issue.pull_request.number }}
+          # need to get the current time in her
+          body: '### dev build deploy bot\n\n**Activity log**\n- publishing to npm...'
+
+      - name: Update comment
+        if: steps.fc.outputs.comment-id != ''
+        uses: peter-evans/find-comment@a54c31d7fa095754bfef525c0c8e5e5674c4b4b1 # v2.4.0
         with:
           comment-id: ${{ steps.fc.outputs.comment-id }}
-          issue-number: ${{ github.event.issue.pull_request.number }}
-          body: "### dev build deploy bot\nPublishing to npm, stay tuned..."
-          edit-mode: replace
+          body: '- publishing to npm...'
+          edit-mode: append
 
       - name: Run stencil dev release...
         uses: ./.github/workflows/release-dev.yml
 
+      # we need to run this again since if we created a comment we won't already
+      # have a reference to it from earlier
+      - name: Find Comment Again
+        uses: peter-evans/find-comment@a54c31d7fa095754bfef525c0c8e5e5674c4b4b1 # v2.4.0
+        id: fcc
+        with:
+          issue-number: ${{ github.event.issue.pull_request.number }}
+          comment-author: 'github-actions[bot]'
+          body-includes: '### dev build deploy bot'
+
       - name: Update comment
         uses: peter-evans/create-or-update-comment@23ff15729ef2fc348714a3bb66d2f655ca9066f2 # v3.1.0
         with:
-          comment-id: ${{ steps.fc.outputs.comment-id }}
+          comment-id: ${{ steps.fcc.outputs.comment-id }}
           issue-number: ${{ github.event.issue.pull_request.number }}
-          body: "### dev build deploy bot\nI finished!"
-          edit-mode: replace
+          # need to get the build version in here somehow, out of the deploy action
+          body: "- published!"
+          edit-mode: append
