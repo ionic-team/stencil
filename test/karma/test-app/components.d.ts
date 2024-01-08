@@ -116,10 +116,6 @@ export namespace Components {
     }
     interface DomReattachCloneHost {
     }
-    interface DropDown {
-    }
-    interface DropDownContent {
-    }
     interface DynamicCssVariable {
     }
     interface DynamicImport {
@@ -222,8 +218,6 @@ export namespace Components {
     interface NoDelegatesFocus {
     }
     interface NodeResolution {
-    }
-    interface NonShadowHost {
     }
     interface ParentReflectNanAttribute {
     }
@@ -351,11 +345,6 @@ export namespace Components {
         "state": boolean;
     }
     interface SlotNestedDefaultOrderParent {
-    }
-    interface SlotNestedNameChange {
-    }
-    interface SlotNestedNameChangeChild {
-        "state": boolean;
     }
     interface SlotNestedOrderChild {
     }
@@ -658,18 +647,6 @@ declare global {
     var HTMLDomReattachCloneHostElement: {
         prototype: HTMLDomReattachCloneHostElement;
         new (): HTMLDomReattachCloneHostElement;
-    };
-    interface HTMLDropDownElement extends Components.DropDown, HTMLStencilElement {
-    }
-    var HTMLDropDownElement: {
-        prototype: HTMLDropDownElement;
-        new (): HTMLDropDownElement;
-    };
-    interface HTMLDropDownContentElement extends Components.DropDownContent, HTMLStencilElement {
-    }
-    var HTMLDropDownContentElement: {
-        prototype: HTMLDropDownContentElement;
-        new (): HTMLDropDownContentElement;
     };
     interface HTMLDynamicCssVariableElement extends Components.DynamicCssVariable, HTMLStencilElement {
     }
@@ -1033,12 +1010,6 @@ declare global {
         prototype: HTMLNodeResolutionElement;
         new (): HTMLNodeResolutionElement;
     };
-    interface HTMLNonShadowHostElement extends Components.NonShadowHost, HTMLStencilElement {
-    }
-    var HTMLNonShadowHostElement: {
-        prototype: HTMLNonShadowHostElement;
-        new (): HTMLNonShadowHostElement;
-    };
     interface HTMLParentReflectNanAttributeElement extends Components.ParentReflectNanAttribute, HTMLStencilElement {
     }
     var HTMLParentReflectNanAttributeElement: {
@@ -1339,18 +1310,6 @@ declare global {
         prototype: HTMLSlotNestedDefaultOrderParentElement;
         new (): HTMLSlotNestedDefaultOrderParentElement;
     };
-    interface HTMLSlotNestedNameChangeElement extends Components.SlotNestedNameChange, HTMLStencilElement {
-    }
-    var HTMLSlotNestedNameChangeElement: {
-        prototype: HTMLSlotNestedNameChangeElement;
-        new (): HTMLSlotNestedNameChangeElement;
-    };
-    interface HTMLSlotNestedNameChangeChildElement extends Components.SlotNestedNameChangeChild, HTMLStencilElement {
-    }
-    var HTMLSlotNestedNameChangeChildElement: {
-        prototype: HTMLSlotNestedNameChangeChildElement;
-        new (): HTMLSlotNestedNameChangeChildElement;
-    };
     interface HTMLSlotNestedOrderChildElement extends Components.SlotNestedOrderChild, HTMLStencilElement {
     }
     var HTMLSlotNestedOrderChildElement: {
@@ -1532,8 +1491,6 @@ declare global {
         "dom-reattach-clone": HTMLDomReattachCloneElement;
         "dom-reattach-clone-deep-slot": HTMLDomReattachCloneDeepSlotElement;
         "dom-reattach-clone-host": HTMLDomReattachCloneHostElement;
-        "drop-down": HTMLDropDownElement;
-        "drop-down-content": HTMLDropDownContentElement;
         "dynamic-css-variable": HTMLDynamicCssVariableElement;
         "dynamic-import": HTMLDynamicImportElement;
         "es5-addclass-svg": HTMLEs5AddclassSvgElement;
@@ -1579,7 +1536,6 @@ declare global {
         "multiple-styles-cmp": HTMLMultipleStylesCmpElement;
         "no-delegates-focus": HTMLNoDelegatesFocusElement;
         "node-resolution": HTMLNodeResolutionElement;
-        "non-shadow-host": HTMLNonShadowHostElement;
         "parent-reflect-nan-attribute": HTMLParentReflectNanAttributeElement;
         "parent-with-reflect-child": HTMLParentWithReflectChildElement;
         "reflect-nan-attribute": HTMLReflectNanAttributeElement;
@@ -1630,8 +1586,6 @@ declare global {
         "slot-map-order-root": HTMLSlotMapOrderRootElement;
         "slot-nested-default-order-child": HTMLSlotNestedDefaultOrderChildElement;
         "slot-nested-default-order-parent": HTMLSlotNestedDefaultOrderParentElement;
-        "slot-nested-name-change": HTMLSlotNestedNameChangeElement;
-        "slot-nested-name-change-child": HTMLSlotNestedNameChangeChildElement;
         "slot-nested-order-child": HTMLSlotNestedOrderChildElement;
         "slot-nested-order-parent": HTMLSlotNestedOrderParentElement;
         "slot-ng-if": HTMLSlotNgIfElement;
@@ -1762,10 +1716,6 @@ declare namespace LocalJSX {
     }
     interface DomReattachCloneHost {
     }
-    interface DropDown {
-    }
-    interface DropDownContent {
-    }
     interface DynamicCssVariable {
     }
     interface DynamicImport {
@@ -1877,8 +1827,6 @@ declare namespace LocalJSX {
     interface NoDelegatesFocus {
     }
     interface NodeResolution {
-    }
-    interface NonShadowHost {
     }
     interface ParentReflectNanAttribute {
     }
@@ -2007,11 +1955,6 @@ declare namespace LocalJSX {
     }
     interface SlotNestedDefaultOrderParent {
     }
-    interface SlotNestedNameChange {
-    }
-    interface SlotNestedNameChangeChild {
-        "state"?: boolean;
-    }
     interface SlotNestedOrderChild {
     }
     interface SlotNestedOrderParent {
@@ -2101,8 +2044,6 @@ declare namespace LocalJSX {
         "dom-reattach-clone": DomReattachClone;
         "dom-reattach-clone-deep-slot": DomReattachCloneDeepSlot;
         "dom-reattach-clone-host": DomReattachCloneHost;
-        "drop-down": DropDown;
-        "drop-down-content": DropDownContent;
         "dynamic-css-variable": DynamicCssVariable;
         "dynamic-import": DynamicImport;
         "es5-addclass-svg": Es5AddclassSvg;
@@ -2148,7 +2089,6 @@ declare namespace LocalJSX {
         "multiple-styles-cmp": MultipleStylesCmp;
         "no-delegates-focus": NoDelegatesFocus;
         "node-resolution": NodeResolution;
-        "non-shadow-host": NonShadowHost;
         "parent-reflect-nan-attribute": ParentReflectNanAttribute;
         "parent-with-reflect-child": ParentWithReflectChild;
         "reflect-nan-attribute": ReflectNanAttribute;
@@ -2199,8 +2139,6 @@ declare namespace LocalJSX {
         "slot-map-order-root": SlotMapOrderRoot;
         "slot-nested-default-order-child": SlotNestedDefaultOrderChild;
         "slot-nested-default-order-parent": SlotNestedDefaultOrderParent;
-        "slot-nested-name-change": SlotNestedNameChange;
-        "slot-nested-name-change-child": SlotNestedNameChangeChild;
         "slot-nested-order-child": SlotNestedOrderChild;
         "slot-nested-order-parent": SlotNestedOrderParent;
         "slot-ng-if": SlotNgIf;
@@ -2267,8 +2205,6 @@ declare module "@stencil/core" {
             "dom-reattach-clone": LocalJSX.DomReattachClone & JSXBase.HTMLAttributes<HTMLDomReattachCloneElement>;
             "dom-reattach-clone-deep-slot": LocalJSX.DomReattachCloneDeepSlot & JSXBase.HTMLAttributes<HTMLDomReattachCloneDeepSlotElement>;
             "dom-reattach-clone-host": LocalJSX.DomReattachCloneHost & JSXBase.HTMLAttributes<HTMLDomReattachCloneHostElement>;
-            "drop-down": LocalJSX.DropDown & JSXBase.HTMLAttributes<HTMLDropDownElement>;
-            "drop-down-content": LocalJSX.DropDownContent & JSXBase.HTMLAttributes<HTMLDropDownContentElement>;
             "dynamic-css-variable": LocalJSX.DynamicCssVariable & JSXBase.HTMLAttributes<HTMLDynamicCssVariableElement>;
             "dynamic-import": LocalJSX.DynamicImport & JSXBase.HTMLAttributes<HTMLDynamicImportElement>;
             "es5-addclass-svg": LocalJSX.Es5AddclassSvg & JSXBase.HTMLAttributes<HTMLEs5AddclassSvgElement>;
@@ -2314,7 +2250,6 @@ declare module "@stencil/core" {
             "multiple-styles-cmp": LocalJSX.MultipleStylesCmp & JSXBase.HTMLAttributes<HTMLMultipleStylesCmpElement>;
             "no-delegates-focus": LocalJSX.NoDelegatesFocus & JSXBase.HTMLAttributes<HTMLNoDelegatesFocusElement>;
             "node-resolution": LocalJSX.NodeResolution & JSXBase.HTMLAttributes<HTMLNodeResolutionElement>;
-            "non-shadow-host": LocalJSX.NonShadowHost & JSXBase.HTMLAttributes<HTMLNonShadowHostElement>;
             "parent-reflect-nan-attribute": LocalJSX.ParentReflectNanAttribute & JSXBase.HTMLAttributes<HTMLParentReflectNanAttributeElement>;
             "parent-with-reflect-child": LocalJSX.ParentWithReflectChild & JSXBase.HTMLAttributes<HTMLParentWithReflectChildElement>;
             "reflect-nan-attribute": LocalJSX.ReflectNanAttribute & JSXBase.HTMLAttributes<HTMLReflectNanAttributeElement>;
@@ -2365,8 +2300,6 @@ declare module "@stencil/core" {
             "slot-map-order-root": LocalJSX.SlotMapOrderRoot & JSXBase.HTMLAttributes<HTMLSlotMapOrderRootElement>;
             "slot-nested-default-order-child": LocalJSX.SlotNestedDefaultOrderChild & JSXBase.HTMLAttributes<HTMLSlotNestedDefaultOrderChildElement>;
             "slot-nested-default-order-parent": LocalJSX.SlotNestedDefaultOrderParent & JSXBase.HTMLAttributes<HTMLSlotNestedDefaultOrderParentElement>;
-            "slot-nested-name-change": LocalJSX.SlotNestedNameChange & JSXBase.HTMLAttributes<HTMLSlotNestedNameChangeElement>;
-            "slot-nested-name-change-child": LocalJSX.SlotNestedNameChangeChild & JSXBase.HTMLAttributes<HTMLSlotNestedNameChangeChildElement>;
             "slot-nested-order-child": LocalJSX.SlotNestedOrderChild & JSXBase.HTMLAttributes<HTMLSlotNestedOrderChildElement>;
             "slot-nested-order-parent": LocalJSX.SlotNestedOrderParent & JSXBase.HTMLAttributes<HTMLSlotNestedOrderParentElement>;
             "slot-ng-if": LocalJSX.SlotNgIf & JSXBase.HTMLAttributes<HTMLSlotNgIfElement>;

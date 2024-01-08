@@ -1376,24 +1376,6 @@ export interface RenderNode extends HostElement {
   ['s-sh']?: string;
 
   /**
-   * Slot forward slot:
-   * This is the slot that the original `slot` tag element was going to be
-   * forwarded to in another element. For instance:
-   *
-   * ```html
-   * <my-cmp>
-   *  <slot name="my-slot" slot="another-slot"></slot>
-   * </my-cmp>
-   * ```
-   *
-   * In this case, the value would be `another-slot`.
-   *
-   * This allows us to correctly set the `slot` attribute on an element when it is moved
-   * from a non-shadow to shadow element.
-   */
-  ['s-fs']?: string;
-
-  /**
    * Original Location Reference:
    * A reference pointing to the comment
    * which represents the original location
