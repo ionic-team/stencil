@@ -24,10 +24,7 @@ export async function buildTesting(opts: BuildOptions) {
 
   await Promise.all([
     // copy jest testing entry files
-    fs.copy(
-      join(opts.scriptsBundlesDir, 'helpers', 'jest'),
-      opts.output.testingDir
-    ),
+    fs.copy(join(opts.scriptsBundlesDir, 'helpers', 'jest'), opts.output.testingDir),
     copyTestingInternalDts(opts, inputDir),
   ]);
 
