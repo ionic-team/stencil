@@ -66,6 +66,7 @@ export async function buildTesting(opts: BuildOptions) {
       externalAliases('@platform', '@stencil/core/internal/testing'),
       externalAliases('../internal/testing/index.js', '@stencil/core/internal/testing'),
       externalAliases('@stencil/core/dev-server', '../dev-server/index.js'),
+      externalAliases('@stencil/core/mock-doc', '../mock-doc/index.cjs'),
       lazyRequirePlugin(opts, [
         '@stencil/core/internal/app-data',
         '@stencil/core/internal/testing',
