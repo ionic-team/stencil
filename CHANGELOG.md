@@ -1,3 +1,12 @@
+## 🍬 [4.9.1](https://github.com/ionic-team/stencil/compare/v4.9.0...v4.9.1) (2024-01-08)
+
+
+### Bug Fixes
+
+* **declarations:** bundle child_process type for portability ([#5165](https://github.com/ionic-team/stencil/issues/5165)) ([59ecd9e](https://github.com/ionic-team/stencil/commit/59ecd9e82ae43e7db67c81959bc34afa0d852087))
+
+
+
 # 🐏 [4.9.0](https://github.com/ionic-team/stencil/compare/v4.8.2...v4.9.0) (2023-12-18)
 
 
