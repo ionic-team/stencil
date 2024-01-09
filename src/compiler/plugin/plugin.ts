@@ -57,6 +57,14 @@ export const runPluginLoad = async (pluginCtx: PluginCtx, id: string) => {
   return pluginCtx.fs.readFile(id);
 };
 
+const getMissingImports = (baseline: string[], transformResultDeps: string[]) => {
+  if (!Array.isArray(baseline)) {
+    return [];
+  }
+
+  return baseline.filter((f) => !transformResultDeps.includes(f));
+};
+
 export const runPluginTransforms = async (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
@@ -137,6 +145,10 @@ export const runPluginTransforms = async (
               if (isString(pluginTransformResults.id)) {
                 transformResults.id = pluginTransformResults.id;
               }
+
+              transformResults.dependencies.push(
+                ...getMissingImports(pluginTransformResults.dependencies, transformResults.dependencies),
+              );
             }
           }
         }
@@ -166,7 +178,7 @@ export const runPluginTransforms = async (
         cmp.styleDocs,
       );
       transformResults.code = cssParseResults.styleText;
-      transformResults.dependencies = cssParseResults.imports;
+      transformResults.dependencies.push(...getMissingImports(cssParseResults.imports, transformResults.dependencies));
     } else {
       const cssParseResults = await parseCssImports(
         config,
@@ -177,7 +189,7 @@ export const runPluginTransforms = async (
         transformResults.code,
       );
       transformResults.code = cssParseResults.styleText;
-      transformResults.dependencies = cssParseResults.imports;
+      transformResults.dependencies.push(...getMissingImports(cssParseResults.imports, transformResults.dependencies));
     }
   }
 
