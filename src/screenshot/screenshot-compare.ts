@@ -107,8 +107,8 @@ export async function compareScreenshot(
       const pixelMatchInput: d.PixelMatchInput = {
         imageAPath: join(screenshotBuildData.imagesDir, screenshot.diff.imageA),
         imageBPath: join(screenshotBuildData.imagesDir, screenshot.diff.imageB),
-        width,
-        height,
+        width: Math.round(width),
+        height: Math.round(height),
         pixelmatchThreshold: pixelmatchThreshold,
       };
 
