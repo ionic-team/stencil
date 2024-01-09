@@ -12,5 +12,5 @@ export function replacePlugin(opts: BuildOptions): Plugin {
   const replaceData = createReplaceData(opts);
   replaceData[`process.env.NODE_DEBUG`] = false;
   replaceData[`process.binding('natives')`] = '';
-  return rollupReplace(replaceData);
+  return rollupReplace({ ...replaceData, preventAssignment: true });
 }
