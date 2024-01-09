@@ -60,7 +60,7 @@
     {
       // Increment this value as a part of updating TypeScript
       matchPackageNames: ['typescript'],
-      allowedVersions: '<5.3.0',
+      allowedVersions: '<5.4.0',
     },
     {
       // disable Jest updates until the new testing architecture is in place
