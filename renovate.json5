@@ -134,6 +134,13 @@
       allowedVersions: '<=8'
     },
     {
+      // We intentionally run the karma tests against TypeScript v5.2 as an attempt to update has failed
+      // due to incompatibilities with `karma-typescript`. Prevent renovate from trying to bump TypeScript.
+      matchFileNames: ['test/karma/package.json'],
+      matchDepNames: ['typescript'],
+      allowedVersions: '<5.3'
+    },
+    {
       matchPackageNames: ['rollup'],
       matchPackagePrefixes: ['@rollup'],
       groupName: 'rollup,'
