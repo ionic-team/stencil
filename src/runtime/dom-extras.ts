@@ -88,7 +88,7 @@ export const patchSlotAppendChild = (HostElementPrototype: any) => {
 
       // Check if there is fallback content that should be hidden
       updateFallbackSlotVisibility(this);
-      // Fore a re-render of the host element
+      // Force a re-render of the host element
       forceUpdate(this);
 
       return insertedNode;
