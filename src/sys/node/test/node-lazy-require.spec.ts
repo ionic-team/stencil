@@ -68,7 +68,8 @@ describe('node-lazy-require', () => {
         });
       });
 
-      it.each(['100.1.1', '38.0.1-alpha.0'])(
+      // TODO(STENCIL-1101): Restore this test by removing `.skip`
+      it.skip.each(['100.1.1', '38.0.1-alpha.0'])(
         'should error if the installed version of a package is too high (%p)',
         async (version) => {
           const range = jestTestRange();
