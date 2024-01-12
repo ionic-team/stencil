@@ -257,7 +257,7 @@ export const patchTextContent = (hostElementPrototype: HTMLElement): void => {
 
   Object.defineProperty(hostElementPrototype, '__textContent', descriptor);
 
-  if (BUILD.experimentalSlotFixes) {
+  if (BUILD.experimentalScopedSlotChanges) {
     // Patch `textContent` to mimic shadow root behavior
     Object.defineProperty(hostElementPrototype, 'textContent', {
       // To mimic shadow root behavior, we need to return the text content of all

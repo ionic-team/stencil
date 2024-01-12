@@ -392,6 +392,7 @@ describe('validation', () => {
     expect(config.extras.slotChildNodesFix).toBe(false);
     expect(config.extras.initializeNextTick).toBe(false);
     expect(config.extras.tagNameTransform).toBe(false);
+    expect(config.extras.scopedSlotTextContentFix).toBe(false);
   });
 
   it('should set slot config based on `experimentalSlotFixes`', () => {
@@ -419,6 +420,14 @@ describe('validation', () => {
     expect(config.extras.cloneNodeFix).toBe(true);
     expect(config.extras.slotChildNodesFix).toBe(true);
     expect(config.extras.scopedSlotTextContentFix).toBe(true);
+  });
+
+  it('should set extras experimentalScopedSlotChanges `true` if set in user config', () => {
+    userConfig.extras = {
+      experimentalScopedSlotChanges: true,
+    };
+    const { config } = validateConfig(userConfig, bootstrapConfig);
+    expect(config.extras.experimentalScopedSlotChanges).toBe(true);
   });
 
   it('should set taskQueue "async" by default', () => {

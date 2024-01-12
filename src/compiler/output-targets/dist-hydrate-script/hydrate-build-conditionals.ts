@@ -25,6 +25,8 @@ export const getHydrateBuildConditionals = (cmps: d.ComponentCompilerMeta[]) => 
   build.slotChildNodesFix = false;
   // TODO(STENCIL-914): remove this option when `experimentalSlotFixes` is the default behavior
   build.experimentalSlotFixes = false;
+  // TODO(STENCIL-1086): remove this option when it's the default behavior
+  build.experimentalScopedSlotChanges = false;
   // TODO(STENCIL-914): remove this option when `experimentalSlotFixes` is the default behavior
   build.cloneNodeFix = false;
   build.cssAnnotations = true;
