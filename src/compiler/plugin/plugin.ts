@@ -57,12 +57,18 @@ export const runPluginLoad = async (pluginCtx: PluginCtx, id: string) => {
   return pluginCtx.fs.readFile(id);
 };
 
-const getMissingImports = (baseline: string[], transformResultDeps: string[]) => {
+/**
+ * returns a subset of the baseline array of strings
+ * @param baseline baseline of files
+ * @param superset files that were added by a transform
+ * @returns files that were added by a transform but haven't been part of the baseline
+ */
+const getDependencySubset = (baseline: string[], superset: string[]) => {
   if (!Array.isArray(baseline)) {
     return [];
   }
 
-  return baseline.filter((f) => !transformResultDeps.includes(f));
+  return baseline.filter((f) => !superset.includes(f));
 };
 
 export const runPluginTransforms = async (
@@ -146,8 +152,11 @@ export const runPluginTransforms = async (
                 transformResults.id = pluginTransformResults.id;
               }
 
+              /**
+               * add dependencies from plugin transform results, e.g. transformed sass files
+               */
               transformResults.dependencies.push(
-                ...getMissingImports(pluginTransformResults.dependencies, transformResults.dependencies),
+                ...getDependencySubset(pluginTransformResults.dependencies, transformResults.dependencies),
               );
             }
           }
@@ -178,7 +187,7 @@ export const runPluginTransforms = async (
         cmp.styleDocs,
       );
       transformResults.code = cssParseResults.styleText;
-      transformResults.dependencies.push(...getMissingImports(cssParseResults.imports, transformResults.dependencies));
+      transformResults.dependencies.push(...getDependencySubset(cssParseResults.imports, transformResults.dependencies));
     } else {
       const cssParseResults = await parseCssImports(
         config,
@@ -189,7 +198,7 @@ export const runPluginTransforms = async (
         transformResults.code,
       );
       transformResults.code = cssParseResults.styleText;
-      transformResults.dependencies.push(...getMissingImports(cssParseResults.imports, transformResults.dependencies));
+      transformResults.dependencies.push(...getDependencySubset(cssParseResults.imports, transformResults.dependencies));
     }
   }
 
