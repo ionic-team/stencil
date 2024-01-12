@@ -81,7 +81,7 @@ export const getRollupOptions = (
       nodeResolvePlugin as unknown as PluginContext,
       realImportee,
       importer,
-      {isEntry: undefined},
+      {},
     );
     if (resolved) {
       if (isString(resolved)) {
