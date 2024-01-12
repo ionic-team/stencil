@@ -61,6 +61,11 @@ export const extTransformsPlugin = (
         return null;
       }
 
+      // make sure compiler context as registered worker
+      if (!compilerCtx.worker) {
+        return null;
+      }
+
       // The `id` here was possibly previously updated using
       // `serializeImportPath` to annotate the filepath with various metadata
       // serialized to query-params. If that was done for this particular `id`
@@ -78,7 +83,7 @@ export const extTransformsPlugin = (
         /**
          * initiate map for component styles
          */
-        const scopeId = getScopeId(data.tag, data.mode);
+        const scopeId = getScopeId(data.tag || '', data.mode);
         if (!allCmpStyles.has(scopeId)) {
           allCmpStyles.set(scopeId, new Map());
         }
@@ -140,7 +145,9 @@ export const extTransformsPlugin = (
         /**
          * persist component styles for transformed stylesheet
          */
-        cmpStyles.set(filePath, cssTransformResults.styleText)
+        if (cmpStyles) {
+          cmpStyles.set(filePath, cssTransformResults.styleText);
+        }
 
         // Set style docs
         if (cmp) {
@@ -167,8 +174,8 @@ export const extTransformsPlugin = (
         /**
          * if the style has updated, compose all styles for the component
          */
-        if (!hasUpdatedStyle) {
-          const externalStyles = cmp && cmp.styles[0] && cmp.styles[0].externalStyles
+        if (!hasUpdatedStyle && cmpStyles && data.tag && data.mode) {
+          const externalStyles = cmp && cmp.styles[0] && cmp.styles[0].externalStyles;
 
           /**
            * if component has external styles, use a list to keep the order to which

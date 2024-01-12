@@ -156,7 +156,7 @@ export const runPluginTransforms = async (
                * add dependencies from plugin transform results, e.g. transformed sass files
                */
               transformResults.dependencies.push(
-                ...getDependencySubset(pluginTransformResults.dependencies, transformResults.dependencies),
+                ...getDependencySubset(pluginTransformResults.dependencies || [], transformResults.dependencies),
               );
             }
           }
@@ -187,7 +187,9 @@ export const runPluginTransforms = async (
         cmp.styleDocs,
       );
       transformResults.code = cssParseResults.styleText;
-      transformResults.dependencies.push(...getDependencySubset(cssParseResults.imports, transformResults.dependencies));
+      transformResults.dependencies.push(
+        ...getDependencySubset(cssParseResults.imports, transformResults.dependencies),
+      );
     } else {
       const cssParseResults = await parseCssImports(
         config,
@@ -198,7 +200,9 @@ export const runPluginTransforms = async (
         transformResults.code,
       );
       transformResults.code = cssParseResults.styleText;
-      transformResults.dependencies.push(...getDependencySubset(cssParseResults.imports, transformResults.dependencies));
+      transformResults.dependencies.push(
+        ...getDependencySubset(cssParseResults.imports, transformResults.dependencies),
+      );
     }
   }
 
