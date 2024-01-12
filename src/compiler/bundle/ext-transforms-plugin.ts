@@ -3,8 +3,27 @@ import type { Plugin } from 'rollup';
 
 import type * as d from '../../declarations';
 import { runPluginTransformsEsmImports } from '../plugin/plugin';
+import { getScopeId } from '../style/scope-css';
 import { parseImportPath } from '../transformers/stencil-import-path';
 import type { BundleOptions } from './bundle-interface';
+
+/**
+ * This keeps a map of all the component styles we've seen already so we can create
+ * a correct state of all styles when we're doing a rebuild. This map helps by
+ * storing the state of all styles as follows, e.g.:
+ *
+ * ```
+ * {
+ *  'cmp-a-$': {
+ *   '/path/to/project/cmp-a.scss': 'button{color:red}',
+ *   '/path/to/project/cmp-a.md.scss': 'button{color:blue}'
+ * }
+ * ```
+ *
+ * Whenever one of the files change, we can propagate a correct concatenated
+ * version of all styles to the browser by setting `buildCtx.stylesUpdated`.
+ */
+const allCmpStyles = new Map<string, Map<string, string>>();
 
 /**
  * A Rollup plugin which bundles up some transformation of CSS imports as well
@@ -55,6 +74,15 @@ export const extTransformsPlugin = (
         if (typeof code !== 'string') {
           return null;
         }
+
+        /**
+         * initiate map for component styles
+         */
+        const scopeId = getScopeId(data.tag, data.mode);
+        if (!allCmpStyles.has(scopeId)) {
+          allCmpStyles.set(scopeId, new Map());
+        }
+        const cmpStyles = allCmpStyles.get(scopeId);
 
         const pluginTransforms = await runPluginTransformsEsmImports(config, compilerCtx, buildCtx, code, filePath);
 
@@ -109,6 +137,11 @@ export const extTransformsPlugin = (
           docs: config.buildDocs,
         });
 
+        /**
+         * persist component styles for transformed stylesheet
+         */
+        cmpStyles.set(filePath, cssTransformResults.styleText)
+
         // Set style docs
         if (cmp) {
           cmp.styleDocs = cssTransformResults.styleDocs;
@@ -131,11 +164,23 @@ export const extTransformsPlugin = (
           return s.styleTag === data.tag && s.styleMode === data.mode && s.styleText === cssTransformResults.styleText;
         });
 
+        /**
+         * if the style has updated, compose all styles for the component
+         */
         if (!hasUpdatedStyle) {
+          const externalStyles = cmp && cmp.styles[0] && cmp.styles[0].externalStyles
+
+          /**
+           * if component has external styles, use a list to keep the order to which
+           * styles are applied
+           */
+          const styleText = externalStyles
+            ? externalStyles.map((es) => cmpStyles.get(es.absolutePath)).join('\n')
+            : [...cmpStyles.values()].join('\n');
           buildCtx.stylesUpdated.push({
             styleTag: data.tag,
             styleMode: data.mode,
-            styleText: cssTransformResults.styleText,
+            styleText,
           });
         }
 
