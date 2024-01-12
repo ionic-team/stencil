@@ -2,6 +2,8 @@ import { buildError } from '@utils';
 import fs from 'graceful-fs';
 import path from 'path';
 import semverLte from 'semver/functions/lte';
+import major from 'semver/functions/major';
+import satisfies from 'semver/functions/satisfies';
 
 import type * as d from '../../declarations';
 import { NodeResolveModule } from './node-resolve-module';
@@ -66,14 +68,17 @@ export class NodeLazyRequire implements d.LazyRequire {
 
     ensureModuleIds.forEach((ensureModuleId) => {
       if (!this.ensured.has(ensureModuleId)) {
-        const { minVersion, recommendedVersion } = this.lazyDependencies[ensureModuleId];
+        const { minVersion, recommendedVersion, maxVersion } = this.lazyDependencies[ensureModuleId];
 
         try {
           const pkgJsonPath = this.nodeResolveModule.resolveModule(fromDir, ensureModuleId);
           const installedPkgJson: d.PackageJsonData = JSON.parse(fs.readFileSync(pkgJsonPath, 'utf8'));
 
-          // TODO(STENCIL-1101): Restore the check for `maxVersion`
-          const installedVersionIsGood = semverLte(minVersion, installedPkgJson.version);
+          const installedVersionIsGood = maxVersion
+            ? // if maxVersion, check that `minVersion <= installedVersion <= maxVersion`
+              satisfies(installedPkgJson.version, `${minVersion} - ${major(maxVersion)}.x`)
+            : // else, just check that `minVersion <= installedVersion`
+              semverLte(minVersion, installedPkgJson.version);
 
           if (installedVersionIsGood) {
             this.ensured.add(ensureModuleId);
