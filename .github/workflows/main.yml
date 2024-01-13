@@ -1,10 +1,11 @@
 name: CI
 
 on:
+  merge_group:
   push:
     branches:
       - 'main'
-      - 'v3.0.0-dev'
+      - 'stencil/v4-dev'
   pull_request:
     branches:
       - '**'
@@ -24,20 +25,35 @@ jobs:
 
   analysis_tests:
     name: Analysis Tests
-    needs: [ build_core ]
+    needs: [build_core]
     uses: ./.github/workflows/test-analysis.yml
+    with:
+      build_name: stencil-core
 
   bundler_tests:
     name: Bundler Tests
-    needs: [ build_core ]
+    needs: [build_core]
     uses: ./.github/workflows/test-bundlers.yml
+    with:
+      build_name: stencil-core
+
+  component_starter_tests:
+    name: Component Starter Smoke Test
+    needs: [build_core]
+    uses: ./.github/workflows/test-component-starter.yml
+    with:
+      build_name: stencil-core
 
   e2e_tests:
     name: E2E Tests
-    needs: [ build_core ]
+    needs: [build_core]
     uses: ./.github/workflows/test-e2e.yml
+    with:
+      build_name: stencil-core
 
   unit_tests:
     name: Unit Tests
-    needs: [ build_core ]
+    needs: [build_core]
     uses: ./.github/workflows/test-unit.yml
+    with:
+      build_name: stencil-core

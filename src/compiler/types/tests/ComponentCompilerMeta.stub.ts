@@ -8,9 +8,10 @@ import * as d from '@stencil/core/declarations';
  * @returns the stubbed `ComponentCompilerMeta`
  */
 export const stubComponentCompilerMeta = (
-  overrides: Partial<d.ComponentCompilerMeta> = {}
+  overrides: Partial<d.ComponentCompilerMeta> = {},
 ): d.ComponentCompilerMeta => ({
   assetsDirs: [],
+  attachInternalsMemberName: null,
   componentClassName: 'StubCmp',
   dependencies: [],
   dependents: [],
@@ -21,6 +22,7 @@ export const stubComponentCompilerMeta = (
   encapsulation: 'none',
   events: [],
   excludeFromCollection: false,
+  formAssociated: false,
   hasAttribute: false,
   hasAttributeChangedCallbackFn: false,
   hasComponentDidLoadFn: false,
@@ -74,8 +76,6 @@ export const stubComponentCompilerMeta = (
   isPlain: false,
   isUpdateable: false,
   jsFilePath: '/some/stubbed/path/my-component.js',
-  legacyConnect: [],
-  legacyContext: [],
   listeners: [],
   methods: [],
   potentialCmpRefs: [],

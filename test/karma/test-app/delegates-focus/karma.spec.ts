@@ -1,12 +1,6 @@
 import { setupDomTests, waitForChanges } from '../util';
 
 describe('delegates-focus', function () {
-  if (navigator.userAgent.indexOf('Chrome') === -1 || navigator.userAgent.indexOf('Edge') > -1) {
-    // Edge also puts "Chrome" in the user agent, and at
-    // this time Edge does not support delegatesFocus
-    return;
-  }
-
   const { setupDom, tearDownDom } = setupDomTests(document);
   let app: HTMLElement;
 
@@ -27,7 +21,7 @@ describe('delegates-focus', function () {
     expect(noDelegateFocusStyles1.borderColor).toBe('rgb(255, 0, 0)');
 
     button.click();
-    await waitForChanges();
+    await waitForChanges(1000);
 
     const delegateFocusStyles2 = window.getComputedStyle(delegateFocusElm);
     expect(delegateFocusStyles2.borderColor).toBe('rgb(0, 0, 255)');

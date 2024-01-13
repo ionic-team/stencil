@@ -1,24 +1,20 @@
-import fs from 'fs-extra';
-import { join } from 'path';
 import rollupCommonjs from '@rollup/plugin-commonjs';
 import rollupJson from '@rollup/plugin-json';
 import rollupNodeResolve from '@rollup/plugin-node-resolve';
-import { aliasPlugin } from './plugins/alias-plugin';
+import fs from 'fs-extra';
+import { join } from 'path';
+import type { OutputChunk, RollupOptions, RollupWarning } from 'rollup';
+import sourcemaps from 'rollup-plugin-sourcemaps';
+
 import { getBanner } from '../utils/banner';
-import { getTypeScriptDefaultLibNames } from '../utils/dependencies-json';
-import { inlinedCompilerDepsPlugin } from './plugins/inlined-compiler-deps-plugin';
+import { NODE_BUILTINS } from '../utils/constants';
+import type { BuildOptions } from '../utils/options';
+import { writePkgJson } from '../utils/write-pkg-json';
+import { aliasPlugin } from './plugins/alias-plugin';
 import { parse5Plugin } from './plugins/parse5-plugin';
 import { replacePlugin } from './plugins/replace-plugin';
-import { sizzlePlugin } from './plugins/sizzle-plugin';
-import { sysModulesPlugin } from './plugins/sys-modules-plugin';
-import { writePkgJson } from '../utils/write-pkg-json';
-import type { BuildOptions } from '../utils/options';
-import type { RollupOptions, OutputChunk, TransformResult, RollupWarning } from 'rollup';
-import { typescriptSourcePlugin } from './plugins/typescript-source-plugin';
-import sourcemaps from 'rollup-plugin-sourcemaps';
-import { MinifyOptions, minify } from 'terser';
 import { terserPlugin } from './plugins/terser-plugin';
-import MagicString from 'magic-string';
+import { typescriptSourcePlugin } from './plugins/typescript-source-plugin';
 
 /**
  * Generates a rollup configuration for the `compiler` submodule of the project
@@ -44,6 +40,17 @@ export async function compiler(opts: BuildOptions) {
     types: compilerDtsName,
   });
 
+  // copy and edit compiler/sys/in-memory-fs.d.ts
+  let inMemoryFsDts = await fs.readFile(join(inputDir, 'sys', 'in-memory-fs.d.ts'), 'utf8');
+  inMemoryFsDts = inMemoryFsDts.replace('@stencil/core/internal', '../../internal/index');
+  await fs.mkdir(join(opts.output.compilerDir, 'sys'));
+  await fs.writeFile(join(opts.output.compilerDir, 'sys', 'in-memory-fs.d.ts'), inMemoryFsDts);
+
+  // copy and edit compiler/transpile.d.ts
+  let transpileDts = await fs.readFile(join(inputDir, 'transpile.d.ts'), 'utf8');
+  transpileDts = transpileDts.replace('@stencil/core/internal', '../internal/index');
+  await fs.writeFile(join(opts.output.compilerDir, 'transpile.d.ts'), transpileDts);
+
   /**
    * These files are wrap the compiler in an Immediately-Invoked Function Expression (IIFE). The intro contains the
    * first half of the IIFE, and the outro contains the second half. Those files are not valid JavaScript on their own,
@@ -57,6 +64,7 @@ export async function compiler(opts: BuildOptions) {
   const rollupWatchPath = join(opts.nodeModulesDir, 'rollup', 'dist', 'es', 'shared', 'watch.js');
   const compilerBundle: RollupOptions = {
     input: join(inputDir, 'index.js'),
+    external: NODE_BUILTINS,
     output: {
       format: 'cjs',
       file: join(opts.output.compilerDir, compilerFileName),
@@ -97,10 +105,11 @@ export async function compiler(opts: BuildOptions) {
          * @param id the importee exactly as it is written in an import statement in the source code
          * @returns an object that resolves an import to some id
          */
-        resolveId(id: string): string | undefined {
+        resolveId(id: string): string | null {
           if (id === 'fsevents') {
             return id;
           }
+          return null;
         },
         /**
          * A rollup build hook for loading the Stencil mock-doc module, Microsoft's TypeScript event tracer, the V8
@@ -119,38 +128,10 @@ export async function compiler(opts: BuildOptions) {
         },
       },
       replacePlugin(opts),
-      {
-        name: 'hackReplaceNodeProcessBinding',
-        /**
-         * Removes instances of calls to deprecated `process.binding()` calls
-         * @param code the code to modify
-         * @param id module's identifier
-         * @returns the modified code
-         */
-        transform(code: string, id: string): TransformResult {
-          code = code.replace(` || Object.keys(process.binding('natives'))`, '');
-          return {
-            code: code,
-            map: new MagicString(code)
-              .generateMap({
-                source: id,
-                // this is the name of the sourcemap, not to be confused with the `file` field in a generated sourcemap
-                file: id + '.map',
-                includeContent: false,
-                hires: true,
-              })
-              .toString(),
-          };
-        },
-      },
-      inlinedCompilerDepsPlugin(opts, inputDir),
       parse5Plugin(opts),
-      sizzlePlugin(opts),
       aliasPlugin(opts),
-      sysModulesPlugin(inputDir),
       rollupNodeResolve({
         mainFields: ['module', 'main'],
-        preferBuiltins: false,
       }),
       rollupCommonjs({
         transformMixedEsModules: false,
@@ -194,7 +175,7 @@ export async function compiler(opts: BuildOptions) {
 }
 
 async function minifyStencilCompiler(code: string, opts: BuildOptions) {
-  const minifyOpts: MinifyOptions = {
+  const minifyOpts = {
     ecma: 2018,
     compress: {
       ecma: 2018,
@@ -209,9 +190,24 @@ async function minifyStencilCompiler(code: string, opts: BuildOptions) {
     },
   };
 
-  const results = await minify(code, minifyOpts);
+  const { minify } = await import('terser');
+  // when `execa` changed to use only esm for distribution we also had to start
+  // importing esm for `terser`, but unfortunately we could not work out a way
+  // to also import the type while doing a dynamic import, hence the `any`
+  // here. See here: https://github.com/ionic-team/stencil/pull/4047 for more
+  // context
+  const results = await minify(code, minifyOpts as any);
 
   code = getBanner(opts, `Stencil Compiler`, true) + '\n' + results.code;
 
   return code;
+}
+
+/**
+ * Helper function that reads in the `lib.*.d.ts` files in the TypeScript lib/ directory on disk.
+ * @param opts the Stencil build options, which includes the location of the TypeScript lib/
+ * @returns all file names that match the `lib.*.d.ts` format
+ */
+async function getTypeScriptDefaultLibNames(opts: BuildOptions): Promise<string[]> {
+  return (await fs.readdir(opts.typescriptLibDir)).filter((f) => f.startsWith('lib.') && f.endsWith('.d.ts'));
 }

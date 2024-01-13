@@ -1,26 +1,27 @@
-import { addGlobalsToWindowPrototype } from './global';
+import { MockHeaders } from '.';
 import { createConsole } from './console';
 import { MockCustomElementRegistry } from './custom-element-registry';
-import {
-  MockEvent,
-  addEventListener,
-  dispatchEvent,
-  removeEventListener,
-  resetEventListeners,
-  MockMouseEvent,
-  MockCustomEvent,
-  MockKeyboardEvent,
-} from './event';
 import { MockDocument, resetDocument } from './document';
 import { MockDocumentFragment } from './document-fragment';
-import { MockElement, MockHTMLElement, MockNode, MockNodeList } from './node';
+import {
+  addEventListener,
+  dispatchEvent,
+  MockCustomEvent,
+  MockEvent,
+  MockFocusEvent,
+  MockKeyboardEvent,
+  MockMouseEvent,
+  removeEventListener,
+  resetEventListeners,
+} from './event';
+import { addGlobalsToWindowPrototype } from './global';
 import { MockHistory } from './history';
 import { MockIntersectionObserver } from './intersection-observer';
 import { MockLocation } from './location';
 import { MockNavigator } from './navigator';
+import { MockElement, MockHTMLElement, MockNode, MockNodeList } from './node';
 import { MockPerformance, resetPerformance } from './performance';
 import { MockStorage } from './storage';
-import { MockHeaders } from '.';
 
 const nativeClearInterval = clearInterval;
 const nativeClearTimeout = clearTimeout;
@@ -74,6 +75,7 @@ export class MockWindow {
   CustomEvent: typeof MockCustomEvent;
   Event: typeof MockEvent;
   Headers: typeof MockHeaders;
+  FocusEvent: typeof MockFocusEvent;
   KeyboardEvent: typeof MockKeyboardEvent;
   MouseEvent: typeof MockMouseEvent;
 
@@ -335,9 +337,16 @@ export class MockWindow {
     }
   }
 
-  matchMedia() {
+  matchMedia(media: string) {
     return {
+      media,
       matches: false,
+      addListener: (_handler: (ev?: any) => void) => {},
+      removeListener: (_handler: (ev?: any) => void) => {},
+      addEventListener: (_type: string, _handler: (ev?: any) => void) => {},
+      removeEventListener: (_type: string, _handler: (ev?: any) => void) => {},
+      dispatchEvent: (_ev: any) => {},
+      onchange: null as ((this: MediaQueryList, ev: MediaQueryListEvent) => any) | null,
     };
   }
 

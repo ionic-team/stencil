@@ -30,7 +30,7 @@ describe('scoped-slot-text-with-sibling', () => {
 
     cmpLabel.textContent = 'New text to go in the slot';
 
-    expect(cmpLabel.textContent).toBe('New text to go in the slot');
+    expect(cmpLabel.textContent.trim()).toBe('New text to go in the slot');
   });
 
   it("doesn't override all children when assigning textContent", () => {
@@ -57,7 +57,7 @@ describe('scoped-slot-text-with-sibling', () => {
      */
     expect(label).toBeDefined();
     expect(label.childNodes.length).toBe(3);
-    expect(label.childNodes[0]['s-cr']).toBeDefined();
+    expect((label.childNodes[0] as any)['s-cr'] as string).toBeDefined();
     expect(label.childNodes[1].textContent).toBe('New text for label structure testing');
     expect(label.childNodes[2].textContent).toBe('Non-slotted text');
   });

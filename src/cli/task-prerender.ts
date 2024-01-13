@@ -1,6 +1,7 @@
+import { catchError } from '@utils';
+
 import type { BuildResultsComponentGraph, Diagnostic, ValidatedConfig } from '../declarations';
 import type { CoreCompiler } from './load-compiler';
-import { catchError } from '@utils';
 import { startupCompilerLog } from './logs';
 
 export const taskPrerender = async (coreCompiler: CoreCompiler, config: ValidatedConfig) => {
@@ -28,7 +29,7 @@ export const runPrerenderTask = async (
   config: ValidatedConfig,
   hydrateAppFilePath: string,
   componentGraph: BuildResultsComponentGraph,
-  srcIndexHtmlPath: string
+  srcIndexHtmlPath: string,
 ) => {
   const diagnostics: Diagnostic[] = [];
 

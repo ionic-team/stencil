@@ -1,25 +1,24 @@
-import type * as d from '../../../declarations';
-import { bundleHydrateFactory } from './bundle-hydrate-factory';
-import { catchError, createOnWarnFn, generatePreamble, loadRollupDiagnostics } from '@utils';
-import { getBuildFeatures, updateBuildConditionals } from '../../app-core/app-data';
-import { HYDRATE_FACTORY_INTRO, HYDRATE_FACTORY_OUTRO } from './hydrate-factory-closure';
-import { updateToHydrateComponents } from './update-to-hydrate-components';
-import { writeHydrateOutputs } from './write-hydrate-outputs';
+import { catchError, createOnWarnFn, generatePreamble, join, loadRollupDiagnostics } from '@utils';
+import MagicString from 'magic-string';
 import { RollupOptions } from 'rollup';
+import { rollup } from 'rollup';
+
+import type * as d from '../../../declarations';
 import {
   STENCIL_HYDRATE_FACTORY_ID,
   STENCIL_INTERNAL_HYDRATE_ID,
   STENCIL_MOCK_DOC_ID,
 } from '../../bundle/entry-alias-ids';
-import MagicString from 'magic-string';
-import { rollup } from 'rollup';
-import { join } from 'path';
+import { bundleHydrateFactory } from './bundle-hydrate-factory';
+import { HYDRATE_FACTORY_INTRO, HYDRATE_FACTORY_OUTRO } from './hydrate-factory-closure';
+import { updateToHydrateComponents } from './update-to-hydrate-components';
+import { writeHydrateOutputs } from './write-hydrate-outputs';
 
 export const generateHydrateApp = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
-  outputTargets: d.OutputTargetHydrate[]
+  outputTargets: d.OutputTargetHydrate[],
 ) => {
   try {
     const packageDir = join(config.sys.getCompilerExecutingPath(), '..', '..');
@@ -72,15 +71,12 @@ export const generateHydrateApp = async (
   }
 };
 
-const generateHydrateFactory = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
+const generateHydrateFactory = async (config: d.ValidatedConfig, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   if (!buildCtx.hasError) {
     try {
-      const cmps = buildCtx.components;
-      const build = getHydrateBuildConditionals(config, cmps);
-
       const appFactoryEntryCode = await generateHydrateFactoryEntry(buildCtx);
 
-      const rollupFactoryBuild = await bundleHydrateFactory(config, compilerCtx, buildCtx, build, appFactoryEntryCode);
+      const rollupFactoryBuild = await bundleHydrateFactory(config, compilerCtx, buildCtx, appFactoryEntryCode);
       if (rollupFactoryBuild != null) {
         const rollupOutput = await rollupFactoryBuild.generate({
           format: 'cjs',
@@ -89,6 +85,7 @@ const generateHydrateFactory = async (config: d.Config, compilerCtx: d.CompilerC
           intro: HYDRATE_FACTORY_INTRO,
           outro: HYDRATE_FACTORY_OUTRO,
           preferConst: false,
+          inlineDynamicImports: true,
         });
 
         if (!buildCtx.hasError && rollupOutput != null && Array.isArray(rollupOutput.output)) {
@@ -119,24 +116,4 @@ const generateHydrateFactoryEntry = async (buildCtx: d.BuildCtx) => {
   s.append(`export { hydrateApp }\n`);
 
   return s.toString();
-};
-
-const getHydrateBuildConditionals = (config: d.Config, cmps: d.ComponentCompilerMeta[]) => {
-  const build = getBuildFeatures(cmps) as d.BuildConditionals;
-
-  build.lazyLoad = true;
-  build.hydrateClientSide = false;
-  build.hydrateServerSide = true;
-
-  updateBuildConditionals(config, build);
-  build.lifecycleDOMEvents = false;
-  build.devTools = false;
-  build.hotModuleReplacement = false;
-  build.cloneNodeFix = false;
-  build.appendChildSlotFix = false;
-  build.slotChildNodesFix = false;
-  build.safari10 = false;
-  build.shadowDomShim = false;
-
-  return build;
 };

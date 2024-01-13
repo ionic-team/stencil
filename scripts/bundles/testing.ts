@@ -1,16 +1,17 @@
-import fs from 'fs-extra';
-import { join } from 'path';
 import rollupCommonjs from '@rollup/plugin-commonjs';
 import rollupJson from '@rollup/plugin-json';
 import rollupResolve from '@rollup/plugin-node-resolve';
-import { aliasPlugin } from './plugins/alias-plugin';
-import { BuildOptions } from '../utils/options';
-import { lazyRequirePlugin } from './plugins/lazy-require';
-import { replacePlugin } from './plugins/replace-plugin';
-import { writePkgJson } from '../utils/write-pkg-json';
-import { RollupOptions, OutputOptions } from 'rollup';
-import { prettyMinifyPlugin } from './plugins/pretty-minify';
+import fs from 'fs-extra';
+import { join } from 'path';
+import { OutputOptions, RollupOptions } from 'rollup';
+
 import { getBanner } from '../utils/banner';
+import { BuildOptions } from '../utils/options';
+import { writePkgJson } from '../utils/write-pkg-json';
+import { aliasPlugin } from './plugins/alias-plugin';
+import { lazyRequirePlugin } from './plugins/lazy-require';
+import { prettyMinifyPlugin } from './plugins/pretty-minify';
+import { replacePlugin } from './plugins/replace-plugin';
 
 export async function testing(opts: BuildOptions) {
   const inputDir = join(opts.buildDir, 'testing');
@@ -42,7 +43,9 @@ export async function testing(opts: BuildOptions) {
     'jest',
     'expect',
     '@jest/reporters',
+    'jest-environment-node',
     'jest-message-id',
+    'jest-runner',
     'net',
     'os',
     'path',
@@ -103,6 +106,7 @@ export async function testing(opts: BuildOptions) {
         preferConst: true,
       }),
       prettyMinifyPlugin(opts, getBanner(opts, `Stencil Testing`, true)),
+      ignorePuppteerDependency(opts),
     ],
     treeshake: {
       moduleSideEffects: false,
@@ -112,7 +116,7 @@ export async function testing(opts: BuildOptions) {
   return [testingBundle];
 }
 
-async function copyTestingInternalDts(opts: BuildOptions, inputDir: string) {
+export async function copyTestingInternalDts(opts: BuildOptions, inputDir: string) {
   // copy testing d.ts files
 
   await fs.copy(join(inputDir), join(opts.output.testingDir), {
@@ -126,4 +130,30 @@ async function copyTestingInternalDts(opts: BuildOptions, inputDir: string) {
       return false;
     },
   });
+}
+
+/**
+ * To avoid having user to install puppeteer for building their app (even if they don't use e2e testing),
+ * we ignore the puppeteer dependency in the generated d.ts file.
+ * @param opts build options
+ * @returns void
+ */
+function ignorePuppteerDependency(opts: BuildOptions) {
+  return {
+    name: 'ignorePuppteerDependency',
+    async buildEnd() {
+      const typeFilePath = join(opts.output.testingDir, 'puppeteer', 'puppeteer-declarations.d.ts');
+      const updatedFileContent = (await fs.readFile(typeFilePath, 'utf8'))
+        .split('\n')
+        .reduce((lines, line) => {
+          if (line.endsWith(`from 'puppeteer';`)) {
+            lines.push('// @ts-ignore - avoid requiring puppeteer as dependency');
+          }
+          lines.push(line);
+          return lines;
+        }, [] as string[])
+        .join('\n');
+      await fs.writeFile(typeFilePath, updatedFileContent);
+    },
+  };
 }

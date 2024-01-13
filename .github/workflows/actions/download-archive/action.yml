@@ -10,11 +10,11 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - uses: actions/download-artifact@fb598a63ae348fa914e94cd0ff38f362e927b741 # v3.0.0
+    - uses: actions/download-artifact@9bc31d5ccc31df68ecc42ccf4149144866c47d8a # v3.0.2
       with:
         name: ${{ inputs.name }}
         path: ${{ inputs.path }}
 
     - name: Extract Archive
-      run: unzip -q -o ${{ inputs.path }}/${{ inputs.filename }}
+      run: unzip -q -o ${{ inputs.path }}/${{ inputs.filename }} -d ${{ inputs.path }}
       shell: bash

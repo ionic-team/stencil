@@ -1,30 +1,38 @@
-import type * as d from '../declarations';
 import { BUILD } from '@app-data';
 import { consoleError, loadModule, styles } from '@platform';
 import { CMP_FLAGS, HOST_FLAGS } from '@utils';
-import { proxyComponent } from './proxy-component';
-import { safeCall, scheduleUpdate } from './update-component';
-import { computeMode } from './mode';
-import { getScopeId, registerStyle } from './styles';
-import { PROXY_FLAGS } from './runtime-constants';
-import { createTime, uniqueTime } from './profile';
 
+import type * as d from '../declarations';
+import { computeMode } from './mode';
+import { createTime, uniqueTime } from './profile';
+import { proxyComponent } from './proxy-component';
+import { PROXY_FLAGS } from './runtime-constants';
+import { getScopeId, registerStyle } from './styles';
+import { safeCall, scheduleUpdate } from './update-component';
+
+/**
+ * Initialize a Stencil component given a reference to its host element, its
+ * runtime bookkeeping data structure, runtime metadata about the component,
+ * and (optionally) an HMR version ID.
+ *
+ * @param elm a host element
+ * @param hostRef the element's runtime bookkeeping object
+ * @param cmpMeta runtime metadata for the Stencil component
+ * @param hmrVersionId an (optional) HMR version ID
+ */
 export const initializeComponent = async (
   elm: d.HostElement,
   hostRef: d.HostRef,
   cmpMeta: d.ComponentRuntimeMeta,
   hmrVersionId?: string,
-  Cstr?: any
 ) => {
+  let Cstr: any;
   // initializeComponent
-  if (
-    (BUILD.lazyLoad || BUILD.hydrateServerSide || BUILD.style) &&
-    (hostRef.$flags$ & HOST_FLAGS.hasInitializedComponent) === 0
-  ) {
-    if (BUILD.lazyLoad || BUILD.hydrateClientSide) {
-      // we haven't initialized this element yet
-      hostRef.$flags$ |= HOST_FLAGS.hasInitializedComponent;
+  if ((hostRef.$flags$ & HOST_FLAGS.hasInitializedComponent) === 0) {
+    // Let the runtime know that the component has been initialized
+    hostRef.$flags$ |= HOST_FLAGS.hasInitializedComponent;
 
+    if (BUILD.lazyLoad || BUILD.hydrateClientSide) {
       // lazy loaded components
       // request the component's implementation to be
       // wired up with the host element
@@ -33,7 +41,7 @@ export const initializeComponent = async (
         // Await creates a micro-task avoid if possible
         const endLoad = uniqueTime(
           `st:load:${cmpMeta.$tagName$}:${hostRef.$modeName$}`,
-          `[Stencil] Load module for <${cmpMeta.$tagName$}>`
+          `[Stencil] Load module for <${cmpMeta.$tagName$}>`,
         );
         Cstr = await Cstr;
         endLoad();
@@ -80,7 +88,7 @@ export const initializeComponent = async (
     } else {
       // sync constructor component
       Cstr = elm.constructor as any;
-      hostRef.$flags$ |= HOST_FLAGS.hasInitializedComponent;
+
       // wait for the CustomElementRegistry to mark the component as ready before setting `isWatchReady`. Otherwise,
       // watchers may fire prematurely if `customElements.get()`/`customElements.whenDefined()` resolves _before_
       // Stencil has completed instantiating the component.
@@ -104,6 +112,7 @@ export const initializeComponent = async (
         if (
           !BUILD.hydrateServerSide &&
           BUILD.shadowDom &&
+          // TODO(STENCIL-854): Remove code related to legacy shadowDomShim field
           BUILD.shadowDomShim &&
           cmpMeta.$flags$ & CMP_FLAGS.needsShadowDomShim
         ) {

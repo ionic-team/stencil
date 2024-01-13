@@ -1,6 +1,6 @@
 import { setupDomTests, waitForChanges } from '../util';
 
-describe('attribute-basic', function () {
+describe('input-basic', function () {
   const { setupDom, tearDownDom } = setupDomTests(document);
   let app: HTMLElement;
 

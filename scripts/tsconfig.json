@@ -6,14 +6,13 @@
     "forceConsistentCasingInFileNames": true,
     "lib": [
       "dom",
-      "es2017",
-      "esnext.array"
+      "es2020"
     ],
-    "module": "commonjs",
-    "moduleResolution": "node",
+    "module": "NodeNext",
+    "moduleResolution": "nodenext",
     "outDir": "build/",
     "pretty": true,
-    "target": "es2017",
+    "target": "ES2020",
     "incremental": false,
     "useUnknownInCatchVariables": true
   },
@@ -21,6 +20,6 @@
     "**/*.ts"
   ],
   "exclude": [
-    "**/*.spec.ts",
+    "**/*.spec.ts"
   ]
 }

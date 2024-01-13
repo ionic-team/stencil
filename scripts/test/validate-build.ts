@@ -1,9 +1,11 @@
-import { dirname, join, relative, resolve } from 'path';
 import fs from 'fs-extra';
+import { dirname, join, relative } from 'path';
+import { rollup } from 'rollup';
+import ts, { ModuleResolutionKind, ScriptTarget } from 'typescript';
+
+import { NODE_BUILTINS } from '../utils/constants';
 import { BuildOptions, getOptions } from '../utils/options';
 import { PackageData } from '../utils/write-pkg-json';
-import { rollup } from 'rollup';
-import ts from 'typescript';
 
 /**
  * Used to triple check that the final build files
@@ -219,7 +221,7 @@ function validatePackage(opts: BuildOptions, testPkg: TestPackage, dtsEntries: s
 }
 
 /**
- * Validate the the .d.ts files used in the output are semantically and syntactically correct
+ * Validate the .d.ts files used in the output are semantically and syntactically correct
  * @param opts build options to be used to validate .d.ts files
  * @param dtsEntries the .d.ts files to validate
  */
@@ -231,6 +233,8 @@ function validateDts(opts: BuildOptions, dtsEntries: string[]): void {
       '@stencil/core/internal': [join(opts.rootDir, 'internal', 'index.d.ts')],
       '@stencil/core/internal/testing': [join(opts.rootDir, 'internal', 'testing', 'index.d.ts')],
     },
+    moduleResolution: ModuleResolutionKind.NodeJs,
+    target: ScriptTarget.ES2016,
   });
 
   const tsDiagnostics = program.getSemanticDiagnostics().concat(program.getSyntacticDiagnostics());
@@ -307,13 +311,12 @@ async function validateCompiler(opts: BuildOptions): Promise<void> {
 
 /**
  * Validate tree shaking for various modules in the output
- * @param opts build options to be used to validate treeshaking
+ * @param opts build options to be used to validate tree-shaking
  */
 async function validateTreeshaking(opts: BuildOptions) {
   await validateModuleTreeshake(opts, 'app-data', join(opts.output.internalDir, 'app-data', 'index.js'));
   await validateModuleTreeshake(opts, 'client', join(opts.output.internalDir, 'client', 'index.js'));
   await validateModuleTreeshake(opts, 'patch-browser', join(opts.output.internalDir, 'client', 'patch-browser.js'));
-  await validateModuleTreeshake(opts, 'patch-esm', join(opts.output.internalDir, 'client', 'patch-esm.js'));
   await validateModuleTreeshake(opts, 'shadow-css', join(opts.output.internalDir, 'client', 'shadow-css.js'));
   await validateModuleTreeshake(opts, 'hydrate', join(opts.output.internalDir, 'hydrate', 'index.js'));
   await validateModuleTreeshake(opts, 'stencil-core', join(opts.output.internalDir, 'stencil-core', 'index.js'));
@@ -321,8 +324,8 @@ async function validateTreeshaking(opts: BuildOptions) {
 }
 
 /**
- * Validates treeshaking for a single module & entrypoint
- * @param opts build options to be used to validate treeshaking for a specific module
+ * Validates tree-shaking for a single module & entrypoint
+ * @param opts build options to be used to validate tree-shaking for a specific module
  * @param moduleName the module to validate
  * @param entryModulePath the entrypoint to validate
  */
@@ -333,8 +336,11 @@ async function validateModuleTreeshake(opts: BuildOptions, moduleName: string, e
   const outputFile = join(opts.scriptsBuildDir, `treeshake_${moduleName}.js`);
 
   const bundle = await rollup({
+    external: NODE_BUILTINS,
     input: virtualInputId,
-    treeshake: true,
+    treeshake: {
+      moduleSideEffects: false,
+    },
     plugins: [
       {
         name: 'stencilResolver',

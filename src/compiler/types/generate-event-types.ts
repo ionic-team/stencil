@@ -1,5 +1,6 @@
-import type * as d from '../../declarations';
 import { getTextDocs, toTitleCase } from '@utils';
+
+import type * as d from '../../declarations';
 import { updateTypeIdentifierNames } from './stencil-types';
 
 /**
@@ -12,7 +13,7 @@ import { updateTypeIdentifierNames } from './stencil-types';
 export const generateEventTypes = (
   cmpMeta: d.ComponentCompilerMeta,
   typeImportData: d.TypesImportData,
-  cmpClassName: string
+  cmpClassName: string,
 ): d.TypeInfo => {
   return cmpMeta.events.map((cmpEvent) => {
     const name = `on${toTitleCase(cmpEvent.name)}`;
@@ -43,7 +44,7 @@ const getEventType = (
   cmpEvent: d.ComponentCompilerEvent,
   cmpEventDetailInterface: string,
   typeImportData: d.TypesImportData,
-  componentSourcePath: string
+  componentSourcePath: string,
 ): string => {
   if (!cmpEvent.complexType.original) {
     return 'CustomEvent';
@@ -52,7 +53,7 @@ const getEventType = (
     cmpEvent.complexType.references,
     typeImportData,
     componentSourcePath,
-    cmpEvent.complexType.original
+    cmpEvent.complexType.original,
   );
   return `(event: ${cmpEventDetailInterface}<${updatedTypeName}>) => void`;
 };

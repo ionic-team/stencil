@@ -8,17 +8,33 @@
  */
 
 import { BUILD } from '@app-data';
-import { isComplexType } from '@utils';
 import { isMemberInElement, plt, win } from '@platform';
+import { isComplexType } from '@utils';
+
 import { VNODE_FLAGS, XLINK_NS } from '../runtime-constants';
 
+/**
+ * When running a VDom render set properties present on a VDom node onto the
+ * corresponding HTML element.
+ *
+ * Note that this function has special functionality for the `class`,
+ * `style`, `key`, and `ref` attributes, as well as event handlers (like
+ * `onClick`, etc). All others are just passed through as-is.
+ *
+ * @param elm the HTMLElement onto which attributes should be set
+ * @param memberName the name of the attribute to set
+ * @param oldValue the old value for the attribute
+ * @param newValue the new value for the attribute
+ * @param isSvg whether we're in an svg context or not
+ * @param flags bitflags for Vdom variables
+ */
 export const setAccessor = (
   elm: HTMLElement,
   memberName: string,
   oldValue: any,
   newValue: any,
   isSvg: boolean,
-  flags: number
+  flags: number,
 ) => {
   if (oldValue !== newValue) {
     let isProp = isMemberInElement(elm, memberName);
@@ -93,11 +109,20 @@ export const setAccessor = (
         // except for the first character, we keep the event name case
         memberName = ln[2] + memberName.slice(3);
       }
-      if (oldValue) {
-        plt.rel(elm, memberName, oldValue, false);
-      }
-      if (newValue) {
-        plt.ael(elm, memberName, newValue, false);
+      if (oldValue || newValue) {
+        // Need to account for "capture" events.
+        // If the event name ends with "Capture", we'll update the name to remove
+        // the "Capture" suffix and make sure the event listener is setup to handle the capture event.
+        const capture = memberName.endsWith(CAPTURE_EVENT_SUFFIX);
+        // Make sure we only replace the last instance of "Capture"
+        memberName = memberName.replace(CAPTURE_EVENT_REGEX, '');
+
+        if (oldValue) {
+          plt.rel(elm, memberName, oldValue, capture);
+        }
+        if (newValue) {
+          plt.ael(elm, memberName, newValue, capture);
+        }
       }
     } else if (BUILD.vdomPropOrAttr) {
       // Set property if it exists and it's not a SVG
@@ -116,7 +141,11 @@ export const setAccessor = (
           } else {
             (elm as any)[memberName] = newValue;
           }
-        } catch (e) {}
+        } catch (e) {
+          /**
+           * in case someone tries to set a read-only property, e.g. "namespaceURI", we just ignore it
+           */
+        }
       }
 
       /**
@@ -152,5 +181,13 @@ export const setAccessor = (
     }
   }
 };
+
 const parseClassListRegex = /\s/;
+/**
+ * Parsed a string of classnames into an array
+ * @param value className string, e.g. "foo bar baz"
+ * @returns list of classes, e.g. ["foo", "bar", "baz"]
+ */
 const parseClassList = (value: string | undefined | null): string[] => (!value ? [] : value.split(parseClassListRegex));
+const CAPTURE_EVENT_SUFFIX = 'Capture';
+const CAPTURE_EVENT_REGEX = new RegExp(CAPTURE_EVENT_SUFFIX + '$');

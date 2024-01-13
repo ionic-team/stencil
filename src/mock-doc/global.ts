@@ -12,11 +12,12 @@ import {
   MockStyleElement,
   MockTemplateElement,
   MockTitleElement,
+  MockUListElement,
 } from './element';
-import { MockCustomEvent, MockEvent, MockKeyboardEvent, MockMouseEvent } from './event';
+import { MockCustomEvent, MockEvent, MockFocusEvent, MockKeyboardEvent, MockMouseEvent } from './event';
 import { MockHeaders } from './headers';
-import { MockRequest, MockResponse } from './request-response';
 import { MockDOMParser } from './parser';
+import { MockRequest, MockResponse } from './request-response';
 import { MockWindow } from './window';
 
 export function setupGlobal(gbl: any) {
@@ -148,6 +149,7 @@ const WINDOW_PROPS = [
   'HTMLElement',
   'Node',
   'NodeList',
+  'FocusEvent',
   'KeyboardEvent',
   'MouseEvent',
 ];
@@ -156,6 +158,7 @@ const GLOBAL_CONSTRUCTORS: [string, any][] = [
   ['CustomEvent', MockCustomEvent],
   ['Event', MockEvent],
   ['Headers', MockHeaders],
+  ['FocusEvent', MockFocusEvent],
   ['KeyboardEvent', MockKeyboardEvent],
   ['MouseEvent', MockMouseEvent],
   ['Request', MockRequest],
@@ -175,4 +178,5 @@ const GLOBAL_CONSTRUCTORS: [string, any][] = [
   ['HTMLStyleElement', MockStyleElement],
   ['HTMLTemplateElement', MockTemplateElement],
   ['HTMLTitleElement', MockTitleElement],
+  ['HTMLUListElement', MockUListElement],
 ];

@@ -1,6 +1,7 @@
+import ts from 'typescript';
+
 import type * as d from '../../declarations';
 import { getTsOptionsToExtend } from './ts-config';
-import ts from 'typescript';
 
 /**
  * Create a TypeScript Program ({@link ts.Program}) to perform builds of a Stencil project using the provided
@@ -10,8 +11,8 @@ import ts from 'typescript';
  * @returns a Program that marries the TypeScript and Stencil compilers together.
  */
 export const createTsBuildProgram = async (
-  config: d.Config,
-  buildCallback: (tsBuilder: ts.BuilderProgram) => Promise<void>
+  config: d.ValidatedConfig,
+  buildCallback: (tsBuilder: ts.BuilderProgram) => Promise<void>,
 ): Promise<ts.WatchOfConfigFile<ts.EmitAndSemanticDiagnosticsBuilderProgram>> => {
   let isBuildRunning = false;
   let currentBuildTimeoutId: any;
@@ -70,7 +71,7 @@ export const createTsBuildProgram = async (
     },
   };
 
-  config.sys.addDestory(() => tsWatchSys.clearTimeout(currentBuildTimeoutId));
+  config.sys.addDestroy(() => tsWatchSys.clearTimeout(currentBuildTimeoutId));
 
   /**
    * Create a {@link ts.WatchCompilerHost}. A CompilerHost allows a {@link ts.Program} to interact with the
@@ -101,7 +102,7 @@ export const createTsBuildProgram = async (
       },
       (reportWatchStatus) => {
         config.logger.debug(reportWatchStatus.messageText);
-      }
+      },
     );
 
   /**

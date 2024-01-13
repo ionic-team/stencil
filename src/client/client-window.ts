@@ -1,9 +1,8 @@
-import type * as d from '../declarations';
 import { BUILD } from '@app-data';
 
-export const win = typeof window !== 'undefined' ? window : ({} as Window);
+import type * as d from '../declarations';
 
-export const CSS = BUILD.cssVarShim ? (win as any).CSS : null;
+export const win = typeof window !== 'undefined' ? window : ({} as Window);
 
 export const doc = win.document || ({ head: {} } as Document);
 
@@ -30,6 +29,7 @@ export const setPlatformHelpers = (helpers: {
 };
 
 export const supportsShadow =
+  // TODO(STENCIL-854): Remove code related to legacy shadowDomShim field
   BUILD.shadowDomShim && BUILD.shadowDom
     ? /*@__PURE__*/ (() => (doc.head.attachShadow + '').indexOf('[native') > -1)()
     : true;
@@ -44,7 +44,7 @@ export const supportsListenerOptions = /*@__PURE__*/ (() => {
         get() {
           supportsListenerOptions = true;
         },
-      })
+      }),
     );
   } catch (e) {}
   return supportsListenerOptions;

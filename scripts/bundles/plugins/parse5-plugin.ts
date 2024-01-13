@@ -1,17 +1,16 @@
-import fs from 'fs-extra';
-import { aliasPlugin } from './alias-plugin';
-import { join } from 'path';
-import type { BuildOptions } from '../../utils/options';
 import rollupCommonjs from '@rollup/plugin-commonjs';
 import rollupResolve from '@rollup/plugin-node-resolve';
-import { rollup, OutputChunk, Plugin } from 'rollup';
-import type { NormalizedOutputOptions, OutputBundle } from 'rollup';
-import { minify } from 'terser';
+import fs from 'fs-extra';
+import { join } from 'path';
+import { Plugin, rollup } from 'rollup';
+
+import type { BuildOptions } from '../../utils/options';
+import { aliasPlugin } from './alias-plugin';
 
 /**
  * Bundles parse5, an HTML serializer & parser, into the compiler
  * @param opts the options being used during a build of the Stencil compiler
- * @returns the plugin that inlines parse5
+ * @returns the plugin that in-lines parse5
  */
 export function parse5Plugin(opts: BuildOptions): Plugin {
   return {
@@ -34,23 +33,10 @@ export function parse5Plugin(opts: BuildOptions): Plugin {
      */
     async load(id: string): Promise<string> | null {
       if (id === 'parse5') {
-        return await bundleParse5(opts);
+        const [contents] = await bundleParse5(opts);
+        return contents;
       }
       return null;
-    },
-    /**
-     * Output generation hook used to reduce the amount of whitespace in the bundle
-     * @param _ unused output options
-     * @param bundle the bundle to minify
-     */
-    generateBundle(_: NormalizedOutputOptions, bundle: OutputBundle): void {
-      Object.keys(bundle).forEach((fileName) => {
-        // not minifying, but we are reducing whitespace
-        const chunk = bundle[fileName] as OutputChunk;
-        if (chunk.type === 'chunk') {
-          chunk.code = chunk.code.replace(/    /g, '  ');
-        }
-      });
     },
   };
 }
@@ -59,14 +45,14 @@ export function parse5Plugin(opts: BuildOptions): Plugin {
  * Bundles parse5 to be used in the Stencil output. Writes the results to disk and returns its contents. The file
  * written to disk may be used as a simple cache to speed up subsequent build times.
  * @param opts the options being used during a build of the Stencil compiler
- * @returns the contents of the file containing parse5
+ * @returns a tuple holding 1) contents of the file containing parse5 and 2) the file path where it's written
  */
-async function bundleParse5(opts: BuildOptions): Promise<string> {
-  const fileName = `parse5-${opts.parse5Verion.replace(/\./g, '_')}-bundle-cache${opts.isProd ? '.min' : ''}.js`;
+export async function bundleParse5(opts: BuildOptions): Promise<[contents: string, path: string]> {
+  const fileName = `parse5-${opts.parse5Version.replace(/\./g, '_')}-bundle-cache${opts.isProd ? '.min' : ''}.js`;
   const cacheFile = join(opts.scriptsBuildDir, fileName);
 
   try {
-    return await fs.readFile(cacheFile, 'utf8');
+    return [await fs.readFile(cacheFile, 'utf8'), cacheFile];
   } catch (e) {}
 
   const rollupBuild = await rollup({
@@ -114,6 +100,8 @@ async function bundleParse5(opts: BuildOptions): Promise<string> {
 
   let code = output[0].code;
 
+  const { minify } = await import('terser');
+
   if (opts.isProd) {
     const minified = await minify(code, {
       ecma: 2018,
@@ -130,9 +118,9 @@ async function bundleParse5(opts: BuildOptions): Promise<string> {
     code = minified.code;
   }
 
-  code = `// Parse5 ${opts.parse5Verion}\n` + code;
+  code = `// Parse5 ${opts.parse5Version}\n` + code;
 
   await fs.writeFile(cacheFile, code);
 
-  return code;
+  return [code, cacheFile];
 }

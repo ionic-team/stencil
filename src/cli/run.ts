@@ -1,8 +1,10 @@
+import { hasError, isFunction, result, shouldIgnoreError } from '@utils';
+
 import type * as d from '../declarations';
-import { dependencies } from '../compiler/sys/dependencies.json';
+import { ValidatedConfig } from '../declarations';
+import { createConfigFlags } from './config-flags';
 import { findConfig } from './find-config';
-import { hasError, isFunction, shouldIgnoreError } from '@utils';
-import { loadCoreCompiler, CoreCompiler } from './load-compiler';
+import { CoreCompiler, loadCoreCompiler } from './load-compiler';
 import { loadedCompilerLog, startupLog, startupLogVersion } from './logs';
 import { parseFlags } from './parse-flags';
 import { taskBuild } from './task-build';
@@ -12,18 +14,15 @@ import { taskHelp } from './task-help';
 import { taskInfo } from './task-info';
 import { taskPrerender } from './task-prerender';
 import { taskServe } from './task-serve';
-import { taskTest } from './task-test';
 import { taskTelemetry } from './task-telemetry';
+import { taskTest } from './task-test';
 import { telemetryAction } from './telemetry/telemetry';
-import { createLogger } from '../compiler/sys/logger/console-logger';
-import { ValidatedConfig } from '../declarations';
-import { createConfigFlags } from './config-flags';
 
 export const run = async (init: d.CliInitOptions) => {
   const { args, logger, sys } = init;
 
   try {
-    const flags = parseFlags(args, sys);
+    const flags = parseFlags(args);
     const task = flags.task;
 
     if (flags.debug || flags.verbose) {
@@ -38,7 +37,7 @@ export const run = async (init: d.CliInitOptions) => {
       sys.applyGlobalPatch(sys.getCurrentDirectory());
     }
 
-    if (task === 'help' || flags.help) {
+    if (!task || task === 'help' || flags.help) {
       await taskHelp(createConfigFlags({ task: 'help', args }), logger, sys);
 
       return;
@@ -47,19 +46,8 @@ export const run = async (init: d.CliInitOptions) => {
     startupLog(logger, task);
 
     const findConfigResults = await findConfig({ sys, configPath: flags.config });
-    if (hasError(findConfigResults.diagnostics)) {
-      logger.printDiagnostics(findConfigResults.diagnostics);
-      return sys.exit(1);
-    }
-
-    const ensureDepsResults = await sys.ensureDependencies({
-      rootDir: findConfigResults.rootDir,
-      logger,
-      dependencies: dependencies as any,
-    });
-
-    if (hasError(ensureDepsResults.diagnostics)) {
-      logger.printDiagnostics(ensureDepsResults.diagnostics);
+    if (findConfigResults.isErr) {
+      logger.printDiagnostics(findConfigResults.value);
       return sys.exit(1);
     }
 
@@ -75,17 +63,16 @@ export const run = async (init: d.CliInitOptions) => {
     loadedCompilerLog(sys, logger, flags, coreCompiler);
 
     if (task === 'info') {
-      await telemetryAction(sys, { flags: createConfigFlags({ task: 'info' }), logger }, coreCompiler, async () => {
-        await taskInfo(coreCompiler, sys, logger);
-      });
+      taskInfo(coreCompiler, sys, logger);
       return;
     }
 
+    const foundConfig = result.unwrap(findConfigResults);
     const validated = await coreCompiler.loadConfig({
       config: {
         flags,
       },
-      configPath: findConfigResults.configPath,
+      configPath: foundConfig.configPath,
       logger,
       sys,
     });
@@ -101,8 +88,6 @@ export const run = async (init: d.CliInitOptions) => {
       sys.applyGlobalPatch(validated.config.rootDir);
     }
 
-    await sys.ensureResources({ rootDir: validated.config.rootDir, logger, dependencies: dependencies as any });
-
     await telemetryAction(sys, validated.config, coreCompiler, async () => {
       await runTask(coreCompiler, validated.config, task, sys);
     });
@@ -115,20 +100,33 @@ export const run = async (init: d.CliInitOptions) => {
   }
 };
 
+/**
+ * Run a specified task
+ *
+ * @param coreCompiler an instance of a minimal, bootstrap compiler for running the specified task
+ * @param config a configuration for the Stencil project to apply to the task run
+ * @param task the task to run
+ * @param sys the {@link CompilerSystem} for interacting with the operating system
+ * @public
+ * @returns a void promise
+ */
 export const runTask = async (
   coreCompiler: CoreCompiler,
   config: d.Config,
   task: d.TaskCommand,
-  sys?: d.CompilerSystem
-) => {
-  const logger = config.logger ?? createLogger();
-  const strictConfig: ValidatedConfig = { ...config, flags: createConfigFlags(config.flags ?? { task }), logger };
+  sys: d.CompilerSystem,
+): Promise<void> => {
+  const flags = createConfigFlags(config.flags ?? { task });
+  config.flags = flags;
 
-  strictConfig.outputTargets = strictConfig.outputTargets || [];
+  if (!config.sys) {
+    config.sys = sys;
+  }
+  const strictConfig: ValidatedConfig = coreCompiler.validateConfig(config, {}).config;
 
   switch (task) {
     case 'build':
-      await taskBuild(coreCompiler, strictConfig, sys);
+      await taskBuild(coreCompiler, strictConfig);
       break;
 
     case 'docs':
@@ -137,7 +135,7 @@ export const runTask = async (
 
     case 'generate':
     case 'g':
-      await taskGenerate(coreCompiler, strictConfig);
+      await taskGenerate(strictConfig);
       break;
 
     case 'help':
@@ -153,10 +151,7 @@ export const runTask = async (
       break;
 
     case 'telemetry':
-      // TODO(STENCIL-148) make this parameter no longer optional, remove the surrounding if statement
-      if (sys) {
-        await taskTelemetry(strictConfig.flags, sys, strictConfig.logger);
-      }
+      await taskTelemetry(strictConfig.flags, sys, strictConfig.logger);
       break;
 
     case 'test':
@@ -169,7 +164,7 @@ export const runTask = async (
 
     default:
       strictConfig.logger.error(
-        `${strictConfig.logger.emoji('❌ ')}Invalid stencil command, please see the options below:`
+        `${strictConfig.logger.emoji('❌ ')}Invalid stencil command, please see the options below:`,
       );
       await taskHelp(strictConfig.flags, strictConfig.logger, sys);
       return config.sys.exit(1);

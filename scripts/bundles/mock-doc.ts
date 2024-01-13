@@ -1,15 +1,15 @@
-import fs from 'fs-extra';
-import { BuildOptions } from '../utils/options';
-import { join } from 'path';
 import rollupCommonjs from '@rollup/plugin-commonjs';
 import rollupResolve from '@rollup/plugin-node-resolve';
+import fs from 'fs-extra';
+import { join } from 'path';
+import { OutputOptions, RollupOptions } from 'rollup';
+
+import { getBanner } from '../utils/banner';
+import { BuildOptions } from '../utils/options';
+import { writePkgJson } from '../utils/write-pkg-json';
 import { aliasPlugin } from './plugins/alias-plugin';
 import { parse5Plugin } from './plugins/parse5-plugin';
 import { replacePlugin } from './plugins/replace-plugin';
-import { RollupOptions, OutputOptions } from 'rollup';
-import { sizzlePlugin } from './plugins/sizzle-plugin';
-import { writePkgJson } from '../utils/write-pkg-json';
-import { getBanner } from '../utils/banner';
 
 export async function mockDoc(opts: BuildOptions) {
   const inputDir = join(opts.buildDir, 'mock-doc');
@@ -47,14 +47,7 @@ export async function mockDoc(opts: BuildOptions) {
   const mockDocBundle: RollupOptions = {
     input: join(inputDir, 'index.js'),
     output: [esOutput, cjsOutput],
-    plugins: [
-      parse5Plugin(opts),
-      sizzlePlugin(opts),
-      aliasPlugin(opts),
-      replacePlugin(opts),
-      rollupResolve(),
-      rollupCommonjs(),
-    ],
+    plugins: [parse5Plugin(opts), aliasPlugin(opts), replacePlugin(opts), rollupResolve(), rollupCommonjs()],
   };
 
   await bundleDtsPromise;
@@ -85,7 +78,7 @@ async function bundleMockDocDts(inputDir: string, outputDir: string) {
   const output = await Promise.all(
     srcDtsFiles.map((inputDtsFile) => {
       return getDtsContent(inputDir, inputDtsFile);
-    })
+    }),
   );
 
   const srcIndexDts = await fs.readFile(join(inputDir, 'index.d.ts'), 'utf8');

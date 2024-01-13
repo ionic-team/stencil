@@ -1,5 +1,6 @@
-import type * as d from '../../declarations';
 import { dashToPascalCase } from '@utils';
+
+import type * as d from '../../declarations';
 
 /**
  * Generates the custom event interface for each component that combines the `CustomEvent` interface with
@@ -21,8 +22,8 @@ export const generateEventDetailTypes = (cmp: d.ComponentCompilerMeta): d.TypesM
   const cmpEventInterface = `${tagNameAsPascal}CustomEvent`;
   const cmpInterface = [
     `export interface ${cmpEventInterface}<T> extends CustomEvent<T> {`,
-    `        detail: T;`,
-    `        target: ${htmlElementName};`,
+    `    detail: T;`,
+    `    target: ${htmlElementName};`,
     `}`,
   ];
   return {

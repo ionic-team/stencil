@@ -1,7 +1,8 @@
-import { Config, OptimizeJsInput, OptimizeJsOutput } from '../../declarations';
 import { catchError } from '@utils';
-import { getTerserOptions } from './optimize-module';
+
+import { Config, OptimizeJsInput, OptimizeJsOutput } from '../../declarations';
 import { minifyJs } from './minify-js';
+import { getTerserOptions } from './optimize-module';
 
 export const optimizeJs = async (inputOpts: OptimizeJsInput) => {
   const result: OptimizeJsOutput = {
@@ -12,11 +13,7 @@ export const optimizeJs = async (inputOpts: OptimizeJsInput) => {
 
   try {
     const prettyOutput = !!inputOpts.pretty;
-    const config: Config = {
-      extras: {
-        safari10: true,
-      },
-    };
+    const config: Config = {};
     const sourceTarget = inputOpts.target === 'es5' ? 'es5' : 'latest';
     const minifyOpts = getTerserOptions(config, sourceTarget, prettyOutput);
 

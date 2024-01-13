@@ -1,6 +1,7 @@
+import { hasError } from '@utils';
+
 import { OptimizeCssInput, OptimizeCssOutput } from '../../declarations';
 import { autoprefixCss } from './autoprefixer';
-import { hasError } from '@utils';
 import { minifyCss } from './minify-css';
 
 /**
@@ -16,7 +17,7 @@ export const optimizeCss = async (inputOpts: OptimizeCssInput): Promise<Optimize
     diagnostics: [],
   };
   if (inputOpts.autoprefixer !== false && inputOpts.autoprefixer !== null) {
-    result = await autoprefixCss(inputOpts.input, inputOpts.autoprefixer);
+    result = await autoprefixCss(inputOpts.input, inputOpts.autoprefixer ?? null);
     if (hasError(result.diagnostics)) {
       return result;
     }

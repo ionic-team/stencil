@@ -1,14 +1,11 @@
-import type * as d from '../../declarations';
-import { buildError, isBoolean, isNumber, isString, normalizePath } from '@utils';
-import { isAbsolute, join } from 'path';
-import { isOutputTargetWww } from '../output-targets/output-utils';
+import { buildError, isBoolean, isNumber, isOutputTargetWww, isString, join, normalizePath } from '@utils';
+import { isAbsolute } from 'path';
 
-export const validateDevServer = (
-  config: d.ValidatedConfig,
-  diagnostics: d.Diagnostic[]
-): d.DevServerConfig | undefined => {
+import type * as d from '../../declarations';
+
+export const validateDevServer = (config: d.ValidatedConfig, diagnostics: d.Diagnostic[]): d.DevServerConfig => {
   if ((config.devServer === null || (config.devServer as any)) === false) {
-    return undefined;
+    return {};
   }
 
   const { flags } = config;
@@ -20,7 +17,7 @@ export const validateDevServer = (
     devServer.address = '0.0.0.0';
   }
 
-  // default to http for localdev
+  // default to http for local dev
   let addressProtocol: 'http' | 'https' = 'http';
   if (devServer.address.toLowerCase().startsWith('http://')) {
     devServer.address = devServer.address.substring(7);
@@ -99,8 +96,10 @@ export const validateDevServer = (
     devServer.protocol = devServer.https ? 'https' : addressProtocol ? addressProtocol : 'http';
   }
 
-  if (devServer.historyApiFallback !== null && devServer.historyApiFallback !== false) {
-    devServer.historyApiFallback = devServer.historyApiFallback || {};
+  if (devServer.historyApiFallback !== null) {
+    if (Array.isArray(devServer.historyApiFallback) || typeof devServer.historyApiFallback !== 'object') {
+      devServer.historyApiFallback = {};
+    }
 
     if (!isString(devServer.historyApiFallback.index)) {
       devServer.historyApiFallback.index = 'index.html';

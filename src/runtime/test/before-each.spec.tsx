@@ -1,4 +1,5 @@
 import { newSpecPage } from '@stencil/core/testing';
+
 import { CmpA } from './fixtures/cmp-a';
 
 describe('newSpecPage, spec testing', () => {
@@ -64,7 +65,7 @@ describe('newSpecPage, spec testing', () => {
       (ev: CustomEvent) => {
         expect(ev.detail.init).toBeTruthy();
       },
-      false
+      false,
     );
     root.init();
     await page.waitForChanges();

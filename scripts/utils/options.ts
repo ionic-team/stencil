@@ -1,7 +1,9 @@
+import { execSync } from 'child_process';
+import { readFileSync } from 'fs-extra';
 import { join } from 'path';
+
 import { getVermoji } from './vermoji';
 import { PackageData } from './write-pkg-json';
-import { readFileSync } from 'fs-extra';
 
 /**
  * Retrieves information used during a 'process' that requires knowledge of various project file paths, Stencil version
@@ -58,6 +60,7 @@ export function getOptions(rootDir: string, inputOpts: BuildOptions = {}): Build
     buildId: null,
     isProd: false,
     isCI: false,
+    isWatch: false,
     isPublishRelease: false,
     vermoji: null,
     tag: 'dev',
@@ -70,7 +73,7 @@ export function getOptions(rootDir: string, inputOpts: BuildOptions = {}): Build
   }
 
   if (!opts.version) {
-    opts.version = '0.0.0-dev.' + opts.buildId;
+    opts.version = getDevVersionId({ buildId: opts.buildId, semverVersion: opts.packageJson?.version });
   }
 
   if (opts.isPublishRelease) {
@@ -91,7 +94,12 @@ export function getOptions(rootDir: string, inputOpts: BuildOptions = {}): Build
 }
 
 /**
- * Generates an object containing versioning information of various packages installed at build time
+ * Generates an object containing versioning information of various packages
+ * installed at build time
+ *
+ * **NOTE** this will mutate the `opts` parameter, adding information about
+ * the versions used for various dependencies
+ *
  * @param opts the options being used during a build
  * @returns an object that contains package names/versions installed at the time a build was invoked
  */
@@ -117,10 +125,10 @@ export function createReplaceData(opts: BuildOptions): Record<string, any> {
     autoprefixerPkg.name + autoprefixerPkg.version + '_' + postcssPkg.name + postcssPkg.version + '_' + CACHE_BUSTER;
 
   const parse5Pkg = getPkg(opts, 'parse5');
-  opts.parse5Verion = parse5Pkg.version;
+  opts.parse5Version = parse5Pkg.version;
 
-  const sizzlePkg = getPkg(opts, 'sizzle');
-  opts.sizzleVersion = sizzlePkg.version;
+  const jqueryPkg = getPkg(opts, 'jquery');
+  opts.jqueryVersion = jqueryPkg.version;
 
   return {
     __BUILDID__: opts.buildId,
@@ -132,7 +140,7 @@ export function createReplaceData(opts: BuildOptions): Record<string, any> {
     '__VERSION:STENCIL__': opts.version,
     '__VERSION:PARSE5__': parse5Pkg.version,
     '__VERSION:ROLLUP__': rollupPkg.version,
-    '__VERSION:SIZZLE__': rollupPkg.version,
+    '__VERSION:JQUERY__': jqueryPkg.version,
     '__VERSION:TERSER__': terserPkg.version,
     '__VERSION:TYPESCRIPT__': typescriptPkg.version,
 
@@ -151,18 +159,18 @@ function getPkg(opts: BuildOptions, pkgName: string): PackageData {
 }
 
 export interface BuildOptions {
-  ghRepoOrg?: string;
+  buildDir?: string;
+  bundleHelpersDir?: string;
   ghRepoName?: string;
-  rootDir?: string;
-  srcDir?: string;
+  ghRepoOrg?: string;
   nodeModulesDir?: string;
+  rootDir?: string;
+  scriptsBuildDir?: string;
+  scriptsBundlesDir?: string;
+  scriptsDir?: string;
+  srcDir?: string;
   typescriptDir?: string;
   typescriptLibDir?: string;
-  buildDir?: string;
-  scriptsDir?: string;
-  scriptsBundlesDir?: string;
-  scriptsBuildDir?: string;
-  bundleHelpersDir?: string;
 
   output?: {
     cliDir: string;
@@ -175,39 +183,79 @@ export interface BuildOptions {
     testingDir: string;
   };
 
-  version?: string;
   buildId?: string;
+  changelogPath?: string;
+  isCI?: boolean;
   isProd?: boolean;
   isPublishRelease?: boolean;
-  isCI?: boolean;
-  vermoji?: string;
+  isWatch?: boolean;
+  otp?: string;
+  packageJson?: PackageData;
   packageJsonPath?: string;
   packageLockJsonPath?: string;
-  packageJson?: PackageData;
-  changelogPath?: string;
-  tag?: string;
-  typescriptVersion?: string;
+  parse5Version?: string;
   rollupVersion?: string;
-  parse5Verion?: string;
-  sizzleVersion?: string;
+  jqueryVersion?: string;
+  tag?: string;
   terserVersion?: string;
-  otp?: '';
+  typescriptVersion?: string;
+  vermoji?: string;
+  version?: string;
 }
 
-export interface CmdLineArgs {
-  'config-version'?: string;
-  'config-build-id'?: string;
-  'config-prod'?: string;
+/**
+ * Generate a build identifier, which is the Epoch Time in seconds
+ * @returns the generated build ID
+ */
+function getBuildId(): string {
+  return Date.now().toString(10).slice(0, -3);
 }
 
-function getBuildId() {
-  const d = new Date();
-  return [
-    d.getUTCFullYear() + '',
-    ('0' + (d.getUTCMonth() + 1)).slice(-2),
-    ('0' + d.getUTCDate()).slice(-2),
-    ('0' + d.getUTCHours()).slice(-2),
-    ('0' + d.getUTCMinutes()).slice(-2),
-    ('0' + d.getUTCSeconds()).slice(-2),
-  ].join('');
+/**
+ * Describes the contents of a version string for Stencil used in 'non-production' builds (e.g. a one-off dev build)
+ */
+interface DevVersionContents {
+  /**
+   * The build identifier string, used to uniquely identify when the build was generated
+   */
+  buildId: string;
+  /**
+   * A semver-compliant string to add to the one-off build version sting, used to identify a base version of Stencil
+   * that was used in the build.
+   */
+  semverVersion: string | undefined;
+}
+
+/**
+ * Helper function to return the first seven characters of a git SHA
+ *
+ * We use the first seven characters for two reasons:
+ * 1. Seven characters _should_ be enough to uniquely ID a commit in Stencil
+ * 2. It matches the number of characters used in our CHANGELOG.md
+ *
+ * @returns the seven character SHA
+ */
+function getSevenCharGitSha(): string {
+  return execSync('git rev-parse HEAD').toString().trim().slice(0, 7);
+}
+
+/**
+ * Helper function to generate a dev build version string of the format:
+ *
+ * [BASE_VERSION]-dev.[BUILD_IDENTIFIER].[GIT_SHA]
+ *
+ * where:
+ * - BASE_VERSION is the version of Stencil currently assigned in `package.json`
+ * - BUILD_IDENTIFIER is a unique identifier for this particular build
+ * - GIT_SHA is the SHA of the HEAD of the branch this build was created from
+ *
+ * @param devVersionContents an object containing the necessary arguments to build a dev-version identifier
+ * @returns the generated version string
+ */
+function getDevVersionId(devVersionContents: DevVersionContents): string {
+  const { buildId, semverVersion } = devVersionContents;
+  // if `package.json#package` is empty, default to a value that doesn't imply any particular version of Stencil
+  const version = semverVersion ?? '0.0.0';
+  // '-' and '-dev.' are a magic substrings that may get checked on startup of a Stencil process.
+  return version + '-dev.' + buildId + '.' + getSevenCharGitSha();
 }

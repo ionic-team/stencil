@@ -1,13 +1,13 @@
+import { catchError, isOutputTargetCustom } from '@utils';
+
 import type * as d from '../../declarations';
-import { catchError } from '@utils';
-import { isOutputTargetCustom } from './output-utils';
 
 export const outputCustom = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   docs: d.JsonDocs,
-  outputTargets: d.OutputTarget[]
+  outputTargets: d.OutputTarget[],
 ) => {
   const customOutputTargets = outputTargets.filter(isOutputTargetCustom);
   if (customOutputTargets.length === 0) {
@@ -23,6 +23,6 @@ export const outputCustom = async (
         catchError(buildCtx.diagnostics, e);
       }
       timespan.finish(`generate ${o.name} finished`);
-    })
+    }),
   );
 };

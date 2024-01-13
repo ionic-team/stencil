@@ -1,6 +1,7 @@
-import type * as d from '../../declarations';
 import { BUILD } from '@app-data';
 import { EMPTY_OBJ } from '@utils';
+
+import type * as d from '../../declarations';
 import { NODE_TYPE } from '../runtime-constants';
 import { setAccessor } from './set-accessor';
 
@@ -8,7 +9,7 @@ export const updateElement = (
   oldVnode: d.VNode | null,
   newVnode: d.VNode,
   isSvgMode: boolean,
-  memberName?: string
+  memberName?: string,
 ): void => {
   // if the element passed in is a shadow root, which is a document fragment
   // then we want to be adding attrs/props to the shadow root's "host" element

@@ -1,5 +1,25 @@
 import { setupDomTests, waitForChanges } from '../util';
 
+/**
+ * This monkey-patches `window.console.error` in order to fail a test if that
+ * function is called within a test.
+ *
+ * @returns a teardown function which ondoes the monkey-patch
+ */
+function patchConsoleError() {
+  const orgConsoleError = window.console.error;
+
+  window.console.error = function (...args: any[]) {
+    orgConsoleError.apply(window, args);
+    window.console.info('console.error', args);
+    throw new Error('console.error was called, this is not allowed in a unit test run');
+  };
+
+  return () => {
+    window.console.error = orgConsoleError;
+  };
+}
+
 describe('prerender', () => {
   const { setupDom, tearDownDom } = setupDomTests(document);
   let app: HTMLElement;
@@ -60,6 +80,21 @@ describe('prerender', () => {
     const greenText = shadow.shadowRoot.querySelector('cmp-text-green');
     const greenTextStyle = getComputedStyle(greenText.querySelector('text-green'));
     expect(greenTextStyle.color).toBe('rgb(0, 255, 0)');
+  });
+
+  // this describe block is just here to let us run a cleanup function after
+  // the test exits, whether or not it fails
+  describe('should render an svg child', () => {
+    const teardown = patchConsoleError();
+    afterAll(teardown);
+
+    it('should render an svg child', async () => {
+      app = await setupDom('/prerender/index.html');
+      await waitForChanges(500);
+
+      const testSvg = app.querySelector('test-svg');
+      expect(testSvg.className).toBe('hydrated');
+    });
   });
 });
 

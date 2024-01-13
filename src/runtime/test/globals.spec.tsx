@@ -1,4 +1,4 @@
-import { Component, Build, Env } from '@stencil/core';
+import { Build, Component, Env } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
 describe('globals', () => {
@@ -36,6 +36,7 @@ describe('globals', () => {
     expect(Build.isBrowser).toBe(false);
     expect(Build.isDev).toBe(true);
     expect(Build.isTesting).toBe(true);
+    expect(Build.isServer).toBe(true);
   });
 
   it('Env is defined', () => {

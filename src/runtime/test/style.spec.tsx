@@ -1,4 +1,4 @@
-import { Component, setMode, getMode } from '@stencil/core';
+import { Component, getMode, setMode } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
 describe('style', () => {
@@ -21,6 +21,31 @@ describe('style', () => {
 
     expect(root).toHaveClass('hydrated');
     expect(styles.get('sc-cmp-a')).toBe(`div { color: red; }`);
+  });
+
+  it('applies the nonce value to the head style tags', async () => {
+    @Component({
+      tag: 'cmp-a',
+      styles: `div { color: red; }`,
+    })
+    class CmpA {
+      render() {
+        return `innertext`;
+      }
+    }
+
+    const { doc } = await newSpecPage({
+      components: [CmpA],
+      includeAnnotations: true,
+      html: `<cmp-a></cmp-a>`,
+      platform: {
+        $nonce$: '1234',
+      },
+    });
+
+    expect(doc.head.innerHTML).toEqual(
+      '<style data-styles nonce="1234">cmp-a{visibility:hidden}.hydrated{visibility:inherit}</style>',
+    );
   });
 
   describe('mode', () => {

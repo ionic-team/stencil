@@ -7,7 +7,6 @@ export const getHydrateBuildConditionals = (cmps: d.ComponentCompilerMeta[]) => 
   build.slotRelocation = true;
   build.lazyLoad = true;
   build.hydrateServerSide = true;
-  build.cssVarShim = false;
   build.hydrateClientSide = true;
   build.isDebug = false;
   build.isDev = false;
@@ -20,16 +19,22 @@ export const getHydrateBuildConditionals = (cmps: d.ComponentCompilerMeta[]) => 
   build.member = true;
   build.constructableCSS = false;
   build.asyncLoading = true;
+  // TODO(STENCIL-914): remove this option when `experimentalSlotFixes` is the default behavior
   build.appendChildSlotFix = false;
+  // TODO(STENCIL-914): remove this option when `experimentalSlotFixes` is the default behavior
   build.slotChildNodesFix = false;
+  // TODO(STENCIL-914): remove this option when `experimentalSlotFixes` is the default behavior
+  build.experimentalSlotFixes = false;
+  // TODO(STENCIL-1086): remove this option when it's the default behavior
+  build.experimentalScopedSlotChanges = false;
+  // TODO(STENCIL-914): remove this option when `experimentalSlotFixes` is the default behavior
   build.cloneNodeFix = false;
   build.cssAnnotations = true;
+  // TODO(STENCIL-854): Remove code related to legacy shadowDomShim field
   build.shadowDomShim = true;
-  build.safari10 = false;
   build.hydratedAttribute = false;
   build.hydratedClass = true;
   build.scriptDataOpts = false;
-  build.dynamicImportShim = false;
   build.attachStyles = true;
 
   return build;

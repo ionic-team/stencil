@@ -9,8 +9,8 @@ import { taskTelemetry } from './task-telemetry';
  * @param logger a logging implementation to log the results out to the user
  * @param sys the abstraction for interfacing with the operating system
  */
-export const taskHelp = async (flags: ConfigFlags, logger: d.Logger, sys?: d.CompilerSystem): Promise<void> => {
-  const prompt = logger.dim(sys.details.platform === 'windows' ? '>' : '$');
+export const taskHelp = async (flags: ConfigFlags, logger: d.Logger, sys: d.CompilerSystem): Promise<void> => {
+  const prompt = logger.dim(sys.details?.platform === 'windows' ? '>' : '$');
 
   console.log(`
   ${logger.bold('Build:')} ${logger.dim('Build components for development or production.')}
@@ -42,10 +42,7 @@ export const taskHelp = async (flags: ConfigFlags, logger: d.Logger, sys?: d.Com
 
 `);
 
-  // TODO(STENCIL-148) make this parameter no longer optional, remove the surrounding if statement
-  if (sys) {
-    await taskTelemetry(flags, sys, logger);
-  }
+  await taskTelemetry(flags, sys, logger);
 
   console.log(`
   ${logger.bold('Examples:')}

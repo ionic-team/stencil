@@ -1,7 +1,8 @@
-import type * as d from '../declarations';
 import { BUILD } from '@app-data';
 import { consoleDevWarn, consoleError, getHostRef } from '@platform';
 import { HOST_FLAGS } from '@utils';
+
+import type * as d from '../declarations';
 import { parsePropertyValue } from './parse-property-value';
 import { scheduleUpdate } from './update-component';
 
@@ -33,7 +34,7 @@ export const setValue = (ref: d.RuntimeRef, propName: string, newVal: any, cmpMe
           '\nNew value',
           newVal,
           '\nOld value',
-          oldVal
+          oldVal,
         );
       } else if (hostRef.$flags$ & HOST_FLAGS.devOnDidLoad) {
         consoleDevWarn(
@@ -43,7 +44,7 @@ export const setValue = (ref: d.RuntimeRef, propName: string, newVal: any, cmpMe
           '\nNew value',
           newVal,
           '\nOld value',
-          oldVal
+          oldVal,
         );
       }
     }

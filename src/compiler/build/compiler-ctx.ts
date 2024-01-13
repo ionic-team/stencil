@@ -1,7 +1,9 @@
+import { join, noop, normalizePath } from '@utils';
+import { basename, dirname, extname } from 'path';
+
 import type * as d from '../../declarations';
-import { basename, dirname, extname, join } from 'path';
 import { buildEvents } from '../events';
-import { noop, normalizePath } from '@utils';
+import { InMemoryFileSystem } from '../sys/in-memory-fs';
 
 /**
  * The CompilerCtx is a persistent object that's reused throughout
@@ -26,7 +28,7 @@ export class CompilerContext implements d.CompilerCtx {
   collections: d.CollectionCompilerMeta[] = [];
   compilerOptions: any = null;
   events = buildEvents();
-  fs: d.InMemoryFileSystem;
+  fs: InMemoryFileSystem;
   hasSuccessfulBuild = false;
   isActivelyBuilding = false;
   lastBuildResults: d.CompilerBuildResults = null;
@@ -60,7 +62,7 @@ export class CompilerContext implements d.CompilerCtx {
   }
 }
 
-export const getModuleLegacy = (_config: d.Config, compilerCtx: d.CompilerCtx, sourceFilePath: string) => {
+export const getModuleLegacy = (compilerCtx: d.CompilerCtx, sourceFilePath: string) => {
   sourceFilePath = normalizePath(sourceFilePath);
 
   const moduleFile = compilerCtx.moduleMap.get(sourceFilePath);
@@ -77,6 +79,7 @@ export const getModuleLegacy = (_config: d.Config, compilerCtx: d.CompilerCtx, s
       jsFilePath: jsFilePath,
       cmps: [],
       coreRuntimeApis: [],
+      outputTargetCoreRuntimeApis: {},
       collectionName: null,
       dtsFilePath: null,
       excludeFromCollection: false,

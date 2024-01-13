@@ -1,12 +1,12 @@
 import type * as d from '../declarations';
+import { printCheckVersionResults, startCheckVersion } from './check-version';
 import type { CoreCompiler } from './load-compiler';
-import { runPrerenderTask } from './task-prerender';
-import { startCheckVersion, printCheckVersionResults } from './check-version';
 import { startupCompilerLog } from './logs';
+import { runPrerenderTask } from './task-prerender';
 import { taskWatch } from './task-watch';
 import { telemetryBuildFinishedAction } from './telemetry/telemetry';
 
-export const taskBuild = async (coreCompiler: CoreCompiler, config: d.ValidatedConfig, sys?: d.CompilerSystem) => {
+export const taskBuild = async (coreCompiler: CoreCompiler, config: d.ValidatedConfig) => {
   if (config.flags.watch) {
     // watch build
     await taskWatch(coreCompiler, config);
@@ -24,10 +24,7 @@ export const taskBuild = async (coreCompiler: CoreCompiler, config: d.ValidatedC
     const compiler = await coreCompiler.createCompiler(config);
     const results = await compiler.build();
 
-    // TODO(STENCIL-148) make this parameter no longer optional, remove the surrounding if statement
-    if (sys) {
-      await telemetryBuildFinishedAction(sys, config, coreCompiler, results);
-    }
+    await telemetryBuildFinishedAction(config.sys, config, coreCompiler, results);
 
     await compiler.destroy();
 
@@ -39,7 +36,7 @@ export const taskBuild = async (coreCompiler: CoreCompiler, config: d.ValidatedC
         config,
         results.hydrateAppFilePath,
         results.componentGraph,
-        null
+        null,
       );
       config.logger.printDiagnostics(prerenderDiagnostics);
 

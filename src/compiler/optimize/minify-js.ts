@@ -1,6 +1,7 @@
-import type * as d from '../../declarations';
 import { splitLineBreaks } from '@utils';
-import { CompressOptions, MangleOptions, ManglePropertiesOptions, MinifyOptions, minify } from 'terser';
+import { CompressOptions, MangleOptions, ManglePropertiesOptions, minify, MinifyOptions } from 'terser';
+
+import type * as d from '../../declarations';
 
 /**
  * Performs the minification of JavaScript source
@@ -62,8 +63,8 @@ const loadMinifyJsDiagnostics = (sourceText: string, diagnostics: d.Diagnostic[]
     header: 'Minify JS',
     code: '',
     messageText: error.message,
-    absFilePath: null,
-    relFilePath: null,
+    absFilePath: undefined,
+    relFilePath: undefined,
     lines: [],
   };
 

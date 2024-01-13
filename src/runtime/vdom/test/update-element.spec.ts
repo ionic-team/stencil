@@ -1,8 +1,8 @@
 import type * as d from '../../../declarations';
 import { NODE_TYPE } from '../../runtime-constants';
-import { updateElement } from '../update-element';
-import * as setAccessor from '../set-accessor';
 import { newVNode } from '../h';
+import * as setAccessor from '../set-accessor';
+import { updateElement } from '../update-element';
 
 describe('updateElement', () => {
   const createTestNode = (overrides: Partial<d.VNode> = {}): d.VNode => ({
@@ -61,8 +61,8 @@ describe('updateElement', () => {
 
   it('should add new classes when no oldVNode.vattrs', () => {
     const elm = document.createElement('my-tag') as HTMLElement;
-    const oldVNode: d.VNode = newVNode(null, null);
-    const newVnode: d.VNode = newVNode(null, null);
+    const oldVNode: d.VNode = newVNode('my-component', 'text value');
+    const newVnode: d.VNode = newVNode('my-component', 'text value');
     newVnode.$elm$ = elm;
     newVnode.$attrs$ = { class: 'mr fusion' };
     updateElement(oldVNode, newVnode, false);
@@ -71,7 +71,7 @@ describe('updateElement', () => {
 
   it('should add new class when no oldVNode', () => {
     const elm = document.createElement('my-tag') as HTMLElement;
-    const oldVNode: d.VNode = null;
+    const oldVNode: null = null;
     const newVnode = createTestNode({
       $flags$: 0,
       $elm$: elm,
@@ -84,7 +84,7 @@ describe('updateElement', () => {
   it('should do nothing when no newVnode attrs', () => {
     expect(() => {
       const elm = document.createElement('my-tag') as HTMLElement;
-      const oldVNode: d.VNode = null;
+      const oldVNode: null = null;
       const newVnode = createTestNode({
         $flags$: 0,
         $elm$: elm,
@@ -98,7 +98,7 @@ describe('updateElement', () => {
       host: document.createElement('div') as HTMLElement,
       nodeType: NODE_TYPE.DocumentFragment,
     };
-    const oldVNode: d.VNode = null;
+    const oldVNode: null = null;
     const newVnode = createTestNode({
       $flags$: 0,
       $elm$: elm,
@@ -115,7 +115,7 @@ describe('updateElement', () => {
   it('should use host element when using an element with a "host" property', () => {
     const elm: any = document.createElement('a') as HTMLElement;
     elm.host = 'localhost:8888';
-    const oldVNode: d.VNode = null;
+    const oldVNode: null = null;
     const newVnode = createTestNode({
       $flags$: 0,
       $elm$: elm,
@@ -131,7 +131,7 @@ describe('updateElement', () => {
 
   it('should use host element when not shadow dom', () => {
     const elm = document.createElement('my-tag') as HTMLElement;
-    const oldVNode: d.VNode = null;
+    const oldVNode: null = null;
     const newVnode = createTestNode({
       $flags$: 0,
       $elm$: elm,
@@ -148,7 +148,7 @@ describe('updateElement', () => {
   it('max test', () => {
     const spy = jest.spyOn(setAccessor, 'setAccessor');
     const elm = document.createElement('section') as HTMLElement;
-    const initialVNode: d.VNode = null;
+    const initialVNode: null = null;
     const firstVNode = createTestNode({
       $flags$: 0,
       $elm$: elm,

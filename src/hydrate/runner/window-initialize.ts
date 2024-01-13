@@ -1,5 +1,6 @@
-import type * as d from '../../declarations';
 import { constrainTimeouts } from '@stencil/core/mock-doc';
+
+import type * as d from '../../declarations';
 import { renderCatchError } from './render-utils';
 import { runtimeLogging } from './runtime-log';
 
@@ -7,7 +8,7 @@ export function initializeWindow(
   win: Window & typeof globalThis,
   doc: Document,
   opts: d.HydrateDocumentOptions,
-  results: d.HydrateResults
+  results: d.HydrateResults,
 ) {
   try {
     win.location.href = opts.url;

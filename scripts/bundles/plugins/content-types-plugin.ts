@@ -1,7 +1,8 @@
-import type { Plugin } from 'rollup';
-import type { BuildOptions } from '../../utils/options';
 import fs from 'fs-extra';
 import { join } from 'path';
+import type { Plugin } from 'rollup';
+
+import type { BuildOptions } from '../../utils/options';
 
 export function contentTypesPlugin(opts: BuildOptions): Plugin {
   return {
@@ -21,7 +22,7 @@ export function contentTypesPlugin(opts: BuildOptions): Plugin {
   };
 }
 
-async function createContentTypeData(opts: BuildOptions) {
+export async function createContentTypeData(opts: BuildOptions) {
   // create a focused content-type lookup object from
   // the mime db json file
   const mimeDbSrcPath = join(opts.nodeModulesDir, 'mime-db', 'db.json');

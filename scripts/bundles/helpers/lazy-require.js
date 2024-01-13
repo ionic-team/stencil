@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function _lazyRequire(moduleId) {
   return new Proxy(
     {},
@@ -10,6 +11,6 @@ function _lazyRequire(moduleId) {
         const importedModule = require(moduleId);
         return Reflect.set(importedModule, propertyKey, value);
       },
-    }
+    },
   );
 }

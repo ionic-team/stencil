@@ -1,11 +1,12 @@
-import type * as d from '../declarations';
-import type { Server } from 'http';
-import * as ws from 'ws';
 import { noop } from '@utils';
+import type { Server } from 'http';
+import ws from 'ws';
+
+import type * as d from '../declarations';
 
 export function createWebSocket(
   httpServer: Server,
-  onMessageFromClient: (msg: d.DevServerMessage) => void
+  onMessageFromClient: (msg: d.DevServerMessage) => void,
 ): DevWebSocket {
   const wsConfig: ws.ServerOptions = {
     server: httpServer,
@@ -13,8 +14,11 @@ export function createWebSocket(
 
   const wsServer: ws.Server = new ws.Server(wsConfig);
 
-  function heartbeat(this: DevWS) {
-    this.isAlive = true;
+  function heartbeat(this: ws) {
+    // we need to coerce the `ws` type to our custom `DevWS` type here, since
+    // this function is going to be passed in to `ws.on('pong'` which expects
+    // to be passed a function where `this` is bound to `ws`.
+    (this as DevWS).isAlive = true;
   }
 
   wsServer.on('connection', (ws: DevWS) => {
@@ -36,8 +40,8 @@ export function createWebSocket(
     ws.on('error', console.error);
   });
 
-  const pingInternval = setInterval(() => {
-    wsServer.clients.forEach((ws: DevWS) => {
+  const pingInterval = setInterval(() => {
+    (wsServer.clients as Set<DevWS>).forEach((ws: DevWS) => {
       if (!ws.isAlive) {
         return ws.close(1000);
       }
@@ -59,7 +63,7 @@ export function createWebSocket(
     },
     close: () => {
       return new Promise((resolve, reject) => {
-        clearInterval(pingInternval);
+        clearInterval(pingInterval);
         wsServer.clients.forEach((ws) => {
           ws.close(1000);
         });

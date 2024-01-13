@@ -7,7 +7,7 @@ export function normalizeHydrateOptions(inputOpts: d.HydrateDocumentOptions) {
       destroyWindow: false,
       destroyDocument: false,
     },
-    inputOpts || {}
+    inputOpts || {},
   );
 
   if (typeof outputOpts.clientHydrateAnnotations !== 'boolean') {
@@ -120,15 +120,15 @@ export function renderBuildDiagnostic(
   results: d.HydrateResults,
   level: 'error' | 'warn' | 'info' | 'log' | 'debug',
   header: string,
-  msg: string
+  msg: string,
 ) {
   const diagnostic: d.Diagnostic = {
     level: level,
     type: 'build',
     header: header,
     messageText: msg,
-    relFilePath: null,
-    absFilePath: null,
+    relFilePath: undefined,
+    absFilePath: undefined,
     lines: [],
   };
 

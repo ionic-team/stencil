@@ -4,14 +4,19 @@ on:
   workflow_call:
     # Make this a reusable workflow, no value needed
     # https://docs.github.com/en/actions/using-workflows/reusing-workflows
+    inputs:
+      build_name:
+        description: Name for the build, used to resolve the correct build artifact
+        required: true
+        type: string
 
 jobs:
   bundler_tests:
     name: Verify Bundlers
-    runs-on: 'ubuntu-latest'
+    runs-on: 'ubuntu-22.04'
     steps:
       - name: Checkout Code
-        uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # v2.4.0
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
 
       - name: Get Core Dependencies
         uses: ./.github/workflows/actions/get-core-dependencies
@@ -19,10 +24,13 @@ jobs:
       - name: Download Build Archive
         uses: ./.github/workflows/actions/download-archive
         with:
-          name: stencil-core
+          name: ${{ inputs.build_name }}
           path: .
           filename: stencil-core-build.zip
 
       - name: Bundler Tests
         run: npm run test.bundlers
         shell: bash
+
+      - name: Check Git Context
+        uses: ./.github/workflows/actions/check-git-context

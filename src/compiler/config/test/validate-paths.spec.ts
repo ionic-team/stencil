@@ -1,39 +1,47 @@
 import type * as d from '@stencil/core/declarations';
-import { mockLogger, mockCompilerSystem, mockLoadConfigInit } from '@stencil/core/testing';
-import { validateConfig } from '../validate-config';
+import { mockCompilerSystem, mockLoadConfigInit, mockLogger } from '@stencil/core/testing';
+import { join } from '@utils';
 import path from 'path';
+
+import { validateConfig } from '../validate-config';
 
 describe('validatePaths', () => {
   let userConfig: d.Config;
   const logger = mockLogger();
   const sys = mockCompilerSystem();
 
+  // use Node's resolve() here to simulate a user using either Win/Posix separators (depending on the platform these
+  // tests are run on)
   const ROOT = path.resolve('/');
 
   beforeEach(() => {
     userConfig = {
       sys: sys as any,
       logger: logger,
+      // use Node's join() here to simulate a user using either Win/Posix separators (depending on the platform these
+      // tests are run on) for their input
       rootDir: path.join(ROOT, 'User', 'my-app'),
       namespace: 'Testing',
     };
   });
 
   it('should set absolute cacheDir', () => {
+    // use Node's join() here to simulate a user using either Win/Posix separators (depending on the platform these
+    // tests are run on) for their input
     userConfig.cacheDir = path.join(ROOT, 'some', 'custom', 'cache');
     const { config } = validateConfig(userConfig, mockLoadConfigInit());
-    expect(config.cacheDir).toBe(path.join(ROOT, 'some', 'custom', 'cache'));
+    expect(config.cacheDir).toBe(join(ROOT, 'some', 'custom', 'cache'));
   });
 
   it('should set relative cacheDir', () => {
     userConfig.cacheDir = 'custom-cache';
     const { config } = validateConfig(userConfig, mockLoadConfigInit());
-    expect(config.cacheDir).toBe(path.join(ROOT, 'User', 'my-app', 'custom-cache'));
+    expect(config.cacheDir).toBe(join(ROOT, 'User', 'my-app', 'custom-cache'));
   });
 
   it('should set default cacheDir', () => {
     const { config } = validateConfig(userConfig, mockLoadConfigInit());
-    expect(config.cacheDir).toBe(path.join(ROOT, 'User', 'my-app', '.stencil'));
+    expect(config.cacheDir).toBe(join(ROOT, 'User', 'my-app', '.stencil'));
   });
 
   it('should set default wwwIndexHtml and convert to absolute path', () => {
@@ -46,6 +54,8 @@ describe('validatePaths', () => {
     userConfig.outputTargets = [
       {
         type: 'www',
+        // use Node's join() here to simulate a user using either Win/Posix separators (depending on the platform these
+        // tests are run on) for their input
         indexHtml: path.join('assets', 'custom-index.html'),
       },
     ] as d.OutputTargetWww[];
@@ -111,8 +121,8 @@ describe('validatePaths', () => {
 
   it('should set default build dir and convert to absolute path', () => {
     const { config } = validateConfig(userConfig, mockLoadConfigInit());
-    const normalizedPathSep = path.sep;
-    const parts = (config.outputTargets as d.OutputTargetDist[])[0].buildDir.split(normalizedPathSep);
+    // the path will be normalized by Stencil us use '/', split on that regardless of platform
+    const parts = (config.outputTargets as d.OutputTargetDist[])[0].buildDir.split('/');
     expect(parts[parts.length - 1]).toBe('build');
     expect(parts[parts.length - 2]).toBe('www');
     expect(path.isAbsolute((config.outputTargets as d.OutputTargetDist[])[0].buildDir)).toBe(true);
@@ -126,8 +136,8 @@ describe('validatePaths', () => {
       },
     ] as d.OutputTargetWww[];
     const { config } = validateConfig(userConfig, mockLoadConfigInit());
-    const normalizedPathSep = path.sep;
-    const parts = (config.outputTargets as d.OutputTargetDist[])[0].buildDir.split(normalizedPathSep);
+    // the path will be normalized by Stencil us use '/', split on that regardless of platform
+    const parts = (config.outputTargets as d.OutputTargetDist[])[0].buildDir.split('/');
     expect(parts[parts.length - 1]).toBe('build');
     expect(parts[parts.length - 2]).toBe('custom-www');
     expect(path.isAbsolute((config.outputTargets as d.OutputTargetDist[])[0].buildDir)).toBe(true);
@@ -147,6 +157,8 @@ describe('validatePaths', () => {
   });
 
   it('should convert globalScript to absolute path, if a globalScript property was provided', () => {
+    // use Node's join() here to simulate a user using either Win/Posix separators (depending on the platform these
+    // tests are run on) for their input
     userConfig.globalScript = path.join('src', 'global', 'index.ts');
     const { config } = validateConfig(userConfig, mockLoadConfigInit());
     expect(path.basename(config.globalScript)).toBe('index.ts');
@@ -154,6 +166,8 @@ describe('validatePaths', () => {
   });
 
   it('should convert globalStyle string to absolute path array, if a globalStyle property was provided', () => {
+    // use Node's join() here to simulate a user using either Win/Posix separators (depending on the platform these
+    // tests are run on) for their input
     userConfig.globalStyle = path.join('src', 'global', 'styles.css');
     const { config } = validateConfig(userConfig, mockLoadConfigInit());
     expect(path.basename(config.globalStyle)).toBe('styles.css');

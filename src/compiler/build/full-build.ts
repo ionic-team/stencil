@@ -1,8 +1,9 @@
+import ts from 'typescript';
+
 import type * as d from '../../declarations';
+import { createTsBuildProgram } from '../transpile/create-build-program';
 import { build } from './build';
 import { BuildContext } from './build-ctx';
-import { createTsBuildProgram } from '../transpile/create-build-program';
-import ts from 'typescript';
 
 /**
  * Build a callable function to perform a full build of a Stencil project
@@ -12,7 +13,7 @@ import ts from 'typescript';
  */
 export const createFullBuild = async (
   config: d.ValidatedConfig,
-  compilerCtx: d.CompilerCtx
+  compilerCtx: d.CompilerCtx,
 ): Promise<d.CompilerBuildResults> => {
   return new Promise<d.CompilerBuildResults>((resolve) => {
     let tsWatchProgram: ts.WatchOfConfigFile<ts.BuilderProgram> = null;

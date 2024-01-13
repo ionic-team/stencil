@@ -1,6 +1,6 @@
 import type * as d from '../../../declarations';
-import { stubComponentCompilerMeta } from './ComponentCompilerMeta.stub';
 import { generateEventDetailTypes } from '../generate-event-detail-types';
+import { stubComponentCompilerMeta } from './ComponentCompilerMeta.stub';
 
 describe('generate-event-detail-types', () => {
   describe('generateEventDetailTypes', () => {
@@ -9,8 +9,8 @@ describe('generate-event-detail-types', () => {
       const tagNameAsPascal = 'EventDetailTestTag';
 
       const expectedTypeInfo = `export interface ${tagNameAsPascal}CustomEvent<T> extends CustomEvent<T> {
-        detail: T;
-        target: HTML${tagNameAsPascal}Element;
+    detail: T;
+    target: HTML${tagNameAsPascal}Element;
 }`;
       const componentMeta = stubComponentCompilerMeta({
         tagName,

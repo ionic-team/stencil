@@ -6,6 +6,7 @@ export const config: Config = {
   outputTargets: [
     {
       type: 'dist',
+      transformAliasedImportPathsInCollection: false,
     },
   ],
   globalScript: 'src/global.ts',

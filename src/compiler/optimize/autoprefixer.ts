@@ -1,6 +1,6 @@
-import type * as d from '../../declarations';
-import { IS_NODE_ENV, requireFunc } from '../sys/environment';
 import { Postcss } from 'postcss';
+
+import type * as d from '../../declarations';
 
 type CssProcessor = ReturnType<Postcss>;
 let cssProcessor: CssProcessor;
@@ -8,7 +8,7 @@ let cssProcessor: CssProcessor;
 /**
  * Autoprefix a CSS string, adding vendor prefixes to make sure that what
  * is written in the CSS will render correctly in our range of supported browsers.
- * This function uses PostCSS in compbination with the Autoprefix plugin to
+ * This function uses PostCSS in combination with the Autoprefix plugin to
  * automatically add vendor prefixes based on a list of browsers which we want
  * to support.
  *
@@ -21,9 +21,6 @@ export const autoprefixCss = async (cssText: string, opts: boolean | null | d.Au
     output: cssText,
     diagnostics: [],
   };
-  if (!IS_NODE_ENV) {
-    return output;
-  }
 
   try {
     const autoprefixerOpts = opts != null && typeof opts === 'object' ? opts : DEFAULT_AUTOPREFIX_OPTIONS;
@@ -37,6 +34,7 @@ export const autoprefixCss = async (cssText: string, opts: boolean | null | d.Au
         messageText: warning.text,
         level: 'warn',
         type: 'css',
+        lines: [],
       });
     });
 
@@ -47,6 +45,7 @@ export const autoprefixCss = async (cssText: string, opts: boolean | null | d.Au
       messageText: `CSS Error` + e,
       level: `error`,
       type: `css`,
+      lines: [],
     };
 
     if (typeof e.name === 'string') {
@@ -99,7 +98,7 @@ export const autoprefixCss = async (cssText: string, opts: boolean | null | d.Au
  * @returns postCSS with the Autoprefixer plugin applied
  */
 const getProcessor = (autoprefixerOpts: d.AutoprefixerOptions): CssProcessor => {
-  const { postcss, autoprefixer } = requireFunc('../sys/node/autoprefixer.js');
+  const { postcss, autoprefixer } = require('../sys/node/autoprefixer.js');
   if (!cssProcessor) {
     cssProcessor = postcss([autoprefixer(autoprefixerOpts)]);
   }

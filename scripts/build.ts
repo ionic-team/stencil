@@ -1,33 +1,29 @@
-import { BuildOptions } from './utils/options';
+import { emptyDir } from 'fs-extra';
+import type { RollupOptions } from 'rollup';
+import { rollup } from 'rollup';
+
 import { cli } from './bundles/cli';
 import { compiler } from './bundles/compiler';
-import { updateDependenciesJson } from './utils/dependencies-json';
-import { createLicense } from './license';
 import { devServer } from './bundles/dev-server';
-import { emptyDir } from 'fs-extra';
 import { internal } from './bundles/internal';
 import { mockDoc } from './bundles/mock-doc';
-import { release } from './release';
 import { screenshot } from './bundles/screenshot';
 import { sysNode, sysNodeExternalBundles } from './bundles/sys-node';
 import { testing } from './bundles/testing';
+import { utils } from './bundles/utils';
+import { release } from './release';
 import { validateBuild } from './test/validate-build';
-import { rollup } from 'rollup';
-import type { RollupOptions } from 'rollup';
+import { BuildOptions } from './utils/options';
 
 /**
  * Runner for releasing a new version of Stencil
  * @param rootDir the root directory of the Stencil repository
- * @param args stringifed arguments that influence the release process
+ * @param args stringified arguments that influence the release process
  */
 export async function run(rootDir: string, args: ReadonlyArray<string>): Promise<void> {
   try {
     if (args.includes('--release')) {
       await release(rootDir, args);
-    }
-
-    if (args.includes('--license')) {
-      createLicense(rootDir);
     }
 
     if (args.includes('--validate-build')) {
@@ -53,7 +49,6 @@ export async function createBuild(opts: BuildOptions): Promise<readonly RollupOp
     emptyDir(opts.output.mockDocDir),
     emptyDir(opts.output.sysNodeDir),
     emptyDir(opts.output.testingDir),
-    updateDependenciesJson(opts),
   ]);
 
   await sysNodeExternalBundles(opts);
@@ -67,6 +62,7 @@ export async function createBuild(opts: BuildOptions): Promise<readonly RollupOp
     screenshot(opts),
     testing(opts),
     sysNode(opts),
+    utils(opts),
   ]);
 
   return bundles.flat();
@@ -89,11 +85,11 @@ export async function bundleBuild(opts: BuildOptions): Promise<void> {
         await Promise.all(
           rollupOption.output.map(async (output) => {
             await bundle.write(output);
-          })
+          }),
         );
       } else {
         await bundle.write(rollupOption.output);
       }
-    })
+    }),
   );
 }

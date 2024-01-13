@@ -1,0 +1,27 @@
+<!doctype html>
+<meta charset="utf8" />
+<script src="./build/testapp.esm.js" type="module"></script>
+<script src="./build/testapp.js" nomodule></script>
+
+<remove-child-patch>
+  <span>Slotted 1</span>
+  <span>Slotted 2</span>
+</remove-child-patch>
+
+<button id="remove-child-button" type="button">Remove Last Child</button>
+<button id="remove-child-div-button" type="button">Remove Child Div</button>
+
+<script>
+  document.querySelector('#remove-child-button').addEventListener('click', () => {
+    const el = document.querySelector('remove-child-patch');
+    const slotContainer = el.querySelector('.slot-container');
+    const elementToRemove = slotContainer.children[slotContainer.children.length - 1];
+    el.removeChild(elementToRemove);
+  });
+
+  document.querySelector('#remove-child-div-button').addEventListener('click', () => {
+    const el = document.querySelector('remove-child-patch');
+    const elementToRemove = el.querySelector('div');
+    el.removeChild(elementToRemove);
+  });
+</script>

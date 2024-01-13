@@ -1,5 +1,6 @@
-import type * as d from '../../declarations';
 import { getTextDocs } from '@utils';
+
+import type * as d from '../../declarations';
 import { updateTypeIdentifierNames } from './stencil-types';
 
 /**
@@ -39,12 +40,12 @@ export const generatePropTypes = (cmpMeta: d.ComponentCompilerMeta, typeImportDa
 function getType(
   cmpProp: d.ComponentCompilerProperty,
   typeImportData: d.TypesImportData,
-  componentSourcePath: string
+  componentSourcePath: string,
 ): string {
   return updateTypeIdentifierNames(
     cmpProp.complexType.references,
     typeImportData,
     componentSourcePath,
-    cmpProp.complexType.original
+    cmpProp.complexType.original,
   );
 }

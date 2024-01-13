@@ -1,24 +1,29 @@
-import type * as d from '../../declarations';
+import { createJsVarName, isString, loadTypeScriptDiagnostics, normalizePath } from '@utils';
 import MagicString from 'magic-string';
-import { createJsVarName, normalizePath, isString, loadTypeScriptDiagnostics } from '@utils';
-import type { LoadResult, Plugin, ResolveIdResult, TransformResult } from 'rollup';
-import { removeCollectionImports } from '../transformers/remove-collection-imports';
-import {
-  APP_DATA_CONDITIONAL,
-  STENCIL_APP_DATA_ID,
-  STENCIL_APP_GLOBALS_ID,
-  STENCIL_CORE_ID,
-  STENCIL_INTERNAL_HYDRATE_ID,
-} from './entry-alias-ids';
-import ts from 'typescript';
 import { basename } from 'path';
+import type { LoadResult, Plugin, ResolveIdResult, TransformResult } from 'rollup';
+import ts from 'typescript';
 
+import type * as d from '../../declarations';
+import { removeCollectionImports } from '../transformers/remove-collection-imports';
+import { APP_DATA_CONDITIONAL, STENCIL_APP_DATA_ID, STENCIL_APP_GLOBALS_ID } from './entry-alias-ids';
+
+/**
+ * A Rollup plugin which bundles application data.
+ *
+ * @param config the Stencil configuration for a particular project
+ * @param compilerCtx the current compiler context
+ * @param buildCtx the current build context
+ * @param build the set build conditionals for the build
+ * @param platform the platform that is being built
+ * @returns a Rollup plugin which carries out the necessary work
+ */
 export const appDataPlugin = (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   build: d.BuildConditionals,
-  platform: 'client' | 'hydrate' | 'worker'
+  platform: 'client' | 'hydrate' | 'worker',
 ): Plugin => {
   if (!platform) {
     return {
@@ -92,7 +97,7 @@ export const appDataPlugin = (
         const program = this.parse(code, {});
         const needsDefault = !(program as any).body.some((s: any) => s.type === 'ExportDefaultDeclaration');
         const defaultExport = needsDefault ? '\nexport const globalFn = () => {};\nexport default globalFn;' : '';
-        code = getContextImport(platform) + code + defaultExport;
+        code = code + defaultExport;
 
         const compilerOptions: ts.CompilerOptions = { ...config.tsCompilerOptions };
         compilerOptions.module = ts.ModuleKind.ESNext;
@@ -117,7 +122,17 @@ export const appDataPlugin = (
             hires: true,
           });
 
-          return { code: results.outputText, map: codeMap };
+          return {
+            code: results.outputText,
+            map: {
+              ...codeMap,
+              // MagicString changed their types in this PR: https://github.com/Rich-Harris/magic-string/pull/235
+              // so that their `sourcesContent` is of type `(string | null)[]`. But, it will only return `[null]` if
+              // `includeContent` is set to `false`. Since we explicitly set `includeContent: true`, we can override
+              // the type to satisfy Rollup's type expectation
+              sourcesContent: codeMap.sourcesContent as string[],
+            },
+          };
         }
 
         return { code: results.outputText };
@@ -127,7 +142,7 @@ export const appDataPlugin = (
   };
 };
 
-export const getGlobalScriptData = (config: d.Config, compilerCtx: d.CompilerCtx) => {
+export const getGlobalScriptData = (config: d.ValidatedConfig, compilerCtx: d.CompilerCtx) => {
   const globalScripts: GlobalScript[] = [];
 
   if (isString(config.globalScript)) {
@@ -177,7 +192,16 @@ const appendGlobalScripts = (globalScripts: GlobalScript[], s: MagicString) => {
   }
 };
 
-const appendBuildConditionals = (config: d.Config, build: d.BuildConditionals, s: MagicString) => {
+/**
+ * Generates the `BUILD` constant that is used at compile-time in a Stencil project
+ *
+ * **This function mutates the provided {@link MagicString} argument**
+ *
+ * @param config the configuration associated with the Stencil project
+ * @param build the build conditionals to serialize into a JS object
+ * @param s a `MagicString` to append the generated constant onto
+ */
+const appendBuildConditionals = (config: d.ValidatedConfig, build: d.BuildConditionals, s: MagicString): void => {
   const buildData = Object.keys(build)
     .sort()
     .map((key) => key + ': ' + ((build as any)[key] ? 'true' : 'false'))
@@ -186,16 +210,12 @@ const appendBuildConditionals = (config: d.Config, build: d.BuildConditionals, s
   s.append(`export const BUILD = /* ${config.fsNamespace} */ { ${buildData} };\n`);
 };
 
-const appendEnv = (config: d.Config, s: MagicString) => {
+const appendEnv = (config: d.ValidatedConfig, s: MagicString) => {
   s.append(`export const Env = /* ${config.fsNamespace} */ ${JSON.stringify(config.env)};\n`);
 };
 
-const appendNamespace = (config: d.Config, s: MagicString) => {
+const appendNamespace = (config: d.ValidatedConfig, s: MagicString) => {
   s.append(`export const NAMESPACE = '${config.fsNamespace}';\n`);
-};
-
-const getContextImport = (platform: string) => {
-  return `import { Context } from '${platform === 'hydrate' ? STENCIL_INTERNAL_HYDRATE_ID : STENCIL_CORE_ID}';\n`;
 };
 
 interface GlobalScript {

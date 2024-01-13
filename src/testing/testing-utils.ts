@@ -1,6 +1,8 @@
 import type * as d from '@stencil/core/internal';
-import { isOutputTargetDistLazy, isOutputTargetWww } from '../compiler/output-targets/output-utils';
+import { isOutputTargetDistLazy, isOutputTargetWww, isString } from '@utils';
 import { join, relative } from 'path';
+
+import { InMemoryFileSystem } from '../compiler/sys/in-memory-fs';
 
 export function shuffleArray(array: any[]) {
   // http://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
@@ -30,14 +32,14 @@ export function shuffleArray(array: any[]) {
  * @param filePaths the paths to validate
  * @throws when one or more of the provided file paths cannot be found
  */
-export function expectFilesExist(fs: d.InMemoryFileSystem, filePaths: string[]): void {
+export function expectFilesExist(fs: InMemoryFileSystem, filePaths: string[]): void {
   const notFoundFiles: ReadonlyArray<string> = filePaths.filter((filePath: string) => !fs.statSync(filePath).exists);
 
   if (notFoundFiles.length > 0) {
     throw new Error(
       `The following files were expected, but could not be found:\n${notFoundFiles
         .map((result: string) => '-' + result)
-        .join('\n')}`
+        .join('\n')}`,
     );
   }
 }
@@ -49,24 +51,24 @@ export function expectFilesExist(fs: d.InMemoryFileSystem, filePaths: string[]):
  * @param filePaths the paths to validate
  * @throws when one or more of the provided file paths is found
  */
-export function expectFilesDoNotExist(fs: d.InMemoryFileSystem, filePaths: string[]): void {
+export function expectFilesDoNotExist(fs: InMemoryFileSystem, filePaths: string[]): void {
   const existentFiles: ReadonlyArray<string> = filePaths.filter((filePath: string) => fs.statSync(filePath).exists);
 
   if (existentFiles.length > 0) {
     throw new Error(
       `The following files were expected to not exist, but do:\n${existentFiles
         .map((result: string) => '-' + result)
-        .join('\n')}`
+        .join('\n')}`,
     );
   }
 }
 
-export function getAppScriptUrl(config: d.Config, browserUrl: string) {
+export function getAppScriptUrl(config: d.ValidatedConfig, browserUrl: string) {
   const appFileName = `${config.fsNamespace}.esm.js`;
   return getAppUrl(config, browserUrl, appFileName);
 }
 
-export function getAppStyleUrl(config: d.Config, browserUrl: string) {
+export function getAppStyleUrl(config: d.ValidatedConfig, browserUrl: string) {
   if (config.globalStyle) {
     const appFileName = `${config.fsNamespace}.css`;
     return getAppUrl(config, browserUrl, appFileName);
@@ -74,9 +76,9 @@ export function getAppStyleUrl(config: d.Config, browserUrl: string) {
   return null;
 }
 
-function getAppUrl(config: d.Config, browserUrl: string, appFileName: string) {
+function getAppUrl(config: d.ValidatedConfig, browserUrl: string, appFileName: string) {
   const wwwOutput = config.outputTargets.find(isOutputTargetWww);
-  if (wwwOutput) {
+  if (wwwOutput && isString(wwwOutput.buildDir) && isString(wwwOutput.dir)) {
     const appBuildDir = wwwOutput.buildDir;
     const appFilePath = join(appBuildDir, appFileName);
     const appUrlPath = relative(wwwOutput.dir, appFilePath);
@@ -85,7 +87,7 @@ function getAppUrl(config: d.Config, browserUrl: string, appFileName: string) {
   }
 
   const distOutput = config.outputTargets.find(isOutputTargetDistLazy);
-  if (distOutput) {
+  if (distOutput && isString(distOutput.esmDir)) {
     const appBuildDir = distOutput.esmDir;
     const appFilePath = join(appBuildDir, appFileName);
     const appUrlPath = relative(config.rootDir, appFilePath);
@@ -116,12 +118,13 @@ function getAppUrl(config: d.Config, browserUrl: string, appFileName: string) {
  *
  * ```ts
  * describe("my-test-suite", () => {
- *   const setupConsoleMocks = setupConsoleMocker()
+ *   const { setupConsoleMocks, teardownConsoleMocks } = setupConsoleMocker()
  *
  *   it("should log a message", () => {
  *     const { logMock } = setupConsoleMocks();
  *     myFunctionWhichLogs(foo, bar);
  *     expect(logMock).toBeCalledWith('my log message');
+ *     teardownConsoleMocks();
  *   })
  * })
  * ```
@@ -133,10 +136,20 @@ export function setupConsoleMocker(): ConsoleMocker {
   const originalWarn = console.warn;
   const originalError = console.error;
 
-  afterAll(() => {
+  /**
+   * Function to tear down console mocks where you're done with them! Ideally
+   * this would be called right after the assertion you're looking to make in
+   * your test.
+   */
+  function teardownConsoleMocks() {
     console.log = originalLog;
     console.warn = originalWarn;
     console.error = originalError;
+  }
+
+  // this is insurance!
+  afterAll(() => {
+    teardownConsoleMocks();
   });
 
   function setupConsoleMocks() {
@@ -154,20 +167,21 @@ export function setupConsoleMocker(): ConsoleMocker {
       errorMock,
     };
   }
-  return setupConsoleMocks;
+  return { setupConsoleMocks, teardownConsoleMocks };
 }
 
 interface ConsoleMocker {
-  (): {
+  setupConsoleMocks: () => {
     logMock: jest.Mock<typeof console.log>;
     warnMock: jest.Mock<typeof console.warn>;
     errorMock: jest.Mock<typeof console.error>;
   };
+  teardownConsoleMocks: () => void;
 }
 
 /**
  * the callback that `withSilentWarn` expects to receive. Basically receives a mock
- * as its argument and returns a `Promise`, the value of which is returns by `withSilentWarn`
+ * as its argument and returns a `Promise`, the value of which is returned by `withSilentWarn`
  * as well.
  */
 type SilentWarnFunc<T> = (mock: jest.Mock<typeof console.warn>) => Promise<T>;

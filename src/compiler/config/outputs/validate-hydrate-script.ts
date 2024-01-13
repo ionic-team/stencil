@@ -1,13 +1,15 @@
-import type * as d from '../../../declarations';
 import {
   DIST_HYDRATE_SCRIPT,
+  isBoolean,
   isOutputTargetDist,
   isOutputTargetHydrate,
   isOutputTargetWww,
-} from '../../output-targets/output-utils';
-import { isBoolean, isString } from '@utils';
-import { isAbsolute, join } from 'path';
-import { NODE_BUILTINS } from '../../sys/modules';
+  isString,
+  join,
+} from '@utils';
+import { isAbsolute } from 'path';
+
+import type * as d from '../../../declarations';
 
 export const validateHydrateScript = (config: d.ValidatedConfig, userOutputs: d.OutputTarget[]) => {
   const output: d.OutputTargetHydrate[] = [];
@@ -57,7 +59,9 @@ export const validateHydrateScript = (config: d.ValidatedConfig, userOutputs: d.
 
     outputTarget.external = outputTarget.external || [];
 
-    outputTarget.external.push(...NODE_BUILTINS);
+    outputTarget.external.push('fs');
+    outputTarget.external.push('path');
+    outputTarget.external.push('crypto');
 
     output.push(outputTarget);
   });

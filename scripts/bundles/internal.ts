@@ -1,12 +1,14 @@
+import { generateDtsBundle } from 'dts-bundle-generator';
 import fs from 'fs-extra';
+import { join } from 'path';
+
+import { bundleDts, cleanDts } from '../utils/bundle-dts';
 import type { BuildOptions } from '../utils/options';
-import { cleanDts } from '../utils/bundle-dts';
+import { writePkgJson } from '../utils/write-pkg-json';
 import { internalAppData } from './internal-app-data';
 import { internalClient } from './internal-platform-client';
 import { internalHydrate } from './internal-platform-hydrate';
 import { internalTesting } from './internal-platform-testing';
-import { join } from 'path';
-import { writePkgJson } from '../utils/write-pkg-json';
 
 export async function internal(opts: BuildOptions) {
   const inputInternalDir = join(opts.buildDir, 'internal');
@@ -53,7 +55,34 @@ async function copyStencilInternalDts(opts: BuildOptions, outputInternalDir: str
   // @stencil/core/internal/stencil-private.d.ts
   const privateDtsSrcPath = join(declarationsInputDir, 'stencil-private.d.ts');
   const privateDtsDestPath = join(outputInternalDir, 'stencil-private.d.ts');
-  const privateDts = cleanDts(await fs.readFile(privateDtsSrcPath, 'utf8'));
+  let privateDts = cleanDts(await fs.readFile(privateDtsSrcPath, 'utf8'));
+
+  // @stencil/core/internal/child_process.d.ts
+  const childProcessSrcPath = join(declarationsInputDir, 'child_process.d.ts');
+  const childProcessDestPath = join(outputInternalDir, 'child_process.d.ts');
+
+  // we generate a tiny tiny bundle here of just
+  // `src/declarations/child_process.ts` so that `internal/stencil-private.d.ts`
+  // can import from `'./child_process'` without worrying about resolving the
+  // types from `node_modules`.
+  const childProcessDts = generateDtsBundle([
+    {
+      filePath: childProcessSrcPath,
+      libraries: {
+        // we need to mark this library so that types imported from it are inlined
+        inlinedLibraries: ['child_process'],
+      },
+      output: {
+        noBanner: true,
+        exportReferencedTypes: false,
+      },
+    },
+  ]).join('\n');
+  await fs.writeFile(childProcessDestPath, childProcessDts);
+
+  // the private `.d.ts` imports the `Result` type from the `@utils` module, so
+  // we need to rewrite the path so it imports from the right relative path
+  privateDts = privateDts.replace('@utils', './utils');
   await fs.writeFile(privateDtsDestPath, privateDts);
 
   // @stencil/core/internal/stencil-public.compiler.d.ts
@@ -65,7 +94,16 @@ async function copyStencilInternalDts(opts: BuildOptions, outputInternalDir: str
   // @stencil/core/internal/stencil-public-docs.d.ts
   const docsDtsSrcPath = join(declarationsInputDir, 'stencil-public-docs.d.ts');
   const docsDtsDestPath = join(outputInternalDir, 'stencil-public-docs.d.ts');
-  const docsDts = cleanDts(await fs.readFile(docsDtsSrcPath, 'utf8'));
+  // We bundle with `dts-bundle-generator` here to ensure that when the `docs-json`
+  // OT writes a `docs.d.ts` file based on this file it is fully portable.
+  const docsDts = await bundleDts(opts, docsDtsSrcPath, {
+    // we want to suppress the `dts-bundle-generator` banner here because we do
+    // our own later on
+    noBanner: true,
+    // we also don't want the types which are inlined into our bundled file to
+    // be re-exported, which will change the 'surface' of the module
+    exportReferencedTypes: false,
+  });
   await fs.writeFile(docsDtsDestPath, docsDts);
 
   // @stencil/core/internal/stencil-public-runtime.d.ts

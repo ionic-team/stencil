@@ -1,5 +1,6 @@
-import type * as d from '../../declarations';
 import { getTextDocs } from '@utils';
+
+import type * as d from '../../declarations';
 import { updateTypeIdentifierNames } from './stencil-types';
 
 /**
@@ -10,7 +11,7 @@ import { updateTypeIdentifierNames } from './stencil-types';
  */
 export const generateMethodTypes = (
   cmpMeta: d.ComponentCompilerMeta,
-  typeImportData: d.TypesImportData
+  typeImportData: d.TypesImportData,
 ): d.TypeInfo => {
   return cmpMeta.methods.map((cmpMethod) => ({
     name: cmpMethod.name,
@@ -32,12 +33,12 @@ export const generateMethodTypes = (
 function getType(
   cmpMethod: d.ComponentCompilerMethod,
   typeImportData: d.TypesImportData,
-  componentSourcePath: string
+  componentSourcePath: string,
 ): string {
   return updateTypeIdentifierNames(
     cmpMethod.complexType.references,
     typeImportData,
     componentSourcePath,
-    cmpMethod.complexType.signature
+    cmpMethod.complexType.signature,
   );
 }

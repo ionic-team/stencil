@@ -1,50 +1,81 @@
+import { createWorkerContext } from '@stencil/core/compiler';
 import type {
   BuildCtx,
   Cache,
   CompilerCtx,
-  CompilerSystem,
-  Config,
   LoadConfigInit,
-  ValidatedConfig,
   Module,
   UnvalidatedConfig,
+  ValidatedConfig,
 } from '@stencil/core/internal';
+import { MockWindow } from '@stencil/core/mock-doc';
+import { noop } from '@utils';
+import path from 'path';
+
+import { createConfigFlags } from '../cli/config-flags';
 import { BuildContext } from '../compiler/build/build-ctx';
 import { Cache as CompilerCache } from '../compiler/cache';
-import { createInMemoryFs } from '../compiler/sys/in-memory-fs';
-import { createTestingSystem, TestingSystem } from './testing-sys';
-import { createWorkerContext } from '@stencil/core/compiler';
-import { MockWindow } from '@stencil/core/mock-doc';
-import { TestingLogger } from './testing-logger';
-import path from 'path';
-import { noop } from '@utils';
 import { buildEvents } from '../compiler/events';
-import { createConfigFlags } from '../cli/config-flags';
+import { createInMemoryFs } from '../compiler/sys/in-memory-fs';
+import { TestingLogger } from './testing-logger';
+import { createTestingSystem, TestingSystem } from './testing-sys';
 
-// TODO(STENCIL-486): Update `mockValidatedConfig` to accept any property found on `ValidatedConfig`
 /**
  * Creates a mock instance of an internal, validated Stencil configuration object
- * @param sys an optional compiler system to associate with the config. If one is not provided, one will be created for
  * the caller
+ * @param overrides a partial implementation of `ValidatedConfig`. Any provided fields will override the defaults
+ * provided by this function.
  * @returns the mock Stencil configuration
  */
-export function mockValidatedConfig(sys?: CompilerSystem): ValidatedConfig {
-  const baseConfig = mockConfig(sys);
+export function mockValidatedConfig(overrides: Partial<ValidatedConfig> = {}): ValidatedConfig {
+  const baseConfig = mockConfig(overrides);
+  const rootDir = path.resolve('/');
 
-  return { ...baseConfig, flags: createConfigFlags(), logger: mockLogger() };
+  return {
+    ...baseConfig,
+    buildEs5: false,
+    cacheDir: '.stencil',
+    devMode: true,
+    devServer: {},
+    extras: {},
+    flags: createConfigFlags(),
+    fsNamespace: 'testing',
+    hashFileNames: false,
+    hashedFileNameLength: 8,
+    hydratedFlag: null,
+    logLevel: 'info',
+    logger: mockLogger(),
+    minifyCss: false,
+    minifyJs: false,
+    namespace: 'Testing',
+    outputTargets: baseConfig.outputTargets ?? [],
+    packageJsonFilePath: path.join(rootDir, 'package.json'),
+    rootDir,
+    srcDir: '/src',
+    srcIndexHtml: 'src/index.html',
+    sys: createTestingSystem(),
+    testing: {},
+    transformAliasedImportPaths: true,
+    rollupConfig: {
+      inputOptions: {},
+      outputOptions: {},
+    },
+    validatePrimaryPackageOutputTarget: false,
+    ...overrides,
+  };
 }
 
-// TODO(STENCIL-486): Update `mockConfig` to accept any property found on `UnvalidatedConfig`
 /**
  * Creates a mock instance of a Stencil configuration entity. The mocked configuration has no guarantees around the
  * types/validity of its data.
- * @param sys an optional compiler system to associate with the config. If one is not provided, one will be created for
- * the caller
+ * @param overrides a partial implementation of `UnvalidatedConfig`. Any provided fields will override the defaults
+ * provided by this function.
  * @returns the mock Stencil configuration
  */
-export function mockConfig(sys?: CompilerSystem): UnvalidatedConfig {
+export function mockConfig(overrides: Partial<UnvalidatedConfig> = {}): UnvalidatedConfig {
   const rootDir = path.resolve('/');
 
+  let { sys } = overrides;
   if (!sys) {
     sys = createTestingSystem();
   }
@@ -52,35 +83,35 @@ export function mockConfig(sys?: CompilerSystem): UnvalidatedConfig {
 
   return {
     _isTesting: true,
-
-    namespace: 'Testing',
-    rootDir: rootDir,
-    globalScript: null,
-    devMode: true,
-    enableCache: false,
     buildAppCore: false,
     buildDist: true,
-    flags: createConfigFlags(),
-    bundles: null,
-    outputTargets: null,
     buildEs5: false,
+    bundles: null,
+    devMode: true,
+    enableCache: false,
+    extras: {},
+    flags: createConfigFlags(),
+    globalScript: null,
     hashFileNames: false,
     logger: new TestingLogger(),
     maxConcurrentWorkers: 0,
     minifyCss: false,
     minifyJs: false,
-    sys,
-    testing: null,
-    validateTypes: false,
-    extras: {},
+    namespace: 'Testing',
     nodeResolve: {
       customResolveOptions: {},
     },
-    sourceMap: true,
+    outputTargets: null,
     rollupPlugins: {
       before: [],
       after: [],
     },
+    rootDir,
+    sourceMap: true,
+    sys,
+    testing: null,
+    validateTypes: false,
+    ...overrides,
   };
 }
 
@@ -106,10 +137,8 @@ export const mockLoadConfigInit = (overrides?: Partial<LoadConfigInit>): LoadCon
   return { ...defaults, ...overrides };
 };
 
-export function mockCompilerCtx(config?: Config) {
-  if (!config) {
-    config = mockConfig();
-  }
+export function mockCompilerCtx(config?: ValidatedConfig) {
+  const innerConfig = config || mockValidatedConfig();
   const compilerCtx: CompilerCtx = {
     version: 1,
     activeBuildId: 0,
@@ -141,13 +170,13 @@ export function mockCompilerCtx(config?: Config) {
     rollupCacheLazy: null,
     rollupCacheNative: null,
     styleModeNames: new Set(),
-    worker: createWorkerContext(config.sys),
+    worker: createWorkerContext(innerConfig.sys),
   };
 
   Object.defineProperty(compilerCtx, 'fs', {
     get() {
       if (this._fs == null) {
-        this._fs = createInMemoryFs(config.sys);
+        this._fs = createInMemoryFs(innerConfig.sys);
       }
       return this._fs;
     },
@@ -156,7 +185,7 @@ export function mockCompilerCtx(config?: Config) {
   Object.defineProperty(compilerCtx, 'cache', {
     get() {
       if (this._cache == null) {
-        this._cache = mockCache(config, compilerCtx);
+        this._cache = mockCache(innerConfig, compilerCtx);
       }
       return this._cache;
     },
@@ -165,25 +194,15 @@ export function mockCompilerCtx(config?: Config) {
   return compilerCtx;
 }
 
-export function mockBuildCtx(config?: Config, compilerCtx?: CompilerCtx): BuildCtx {
-  if (!config) {
-    config = mockConfig();
-  }
-  if (!compilerCtx) {
-    compilerCtx = mockCompilerCtx(config);
-  }
-  const buildCtx = new BuildContext(config, compilerCtx);
+export function mockBuildCtx(config?: ValidatedConfig, compilerCtx?: CompilerCtx): BuildCtx {
+  const validatedConfig = config || mockValidatedConfig();
+  const validatedCompilerCtx = compilerCtx || mockCompilerCtx(validatedConfig);
 
+  const buildCtx = new BuildContext(validatedConfig, validatedCompilerCtx);
   return buildCtx as BuildCtx;
 }
 
-export function mockCache(config?: Config, compilerCtx?: CompilerCtx) {
-  if (!config) {
-    config = mockConfig();
-  }
-  if (!compilerCtx) {
-    compilerCtx = mockCompilerCtx(config);
-  }
+function mockCache(config: ValidatedConfig, compilerCtx: CompilerCtx) {
   config.enableCache = true;
   const cache = new CompilerCache(config, compilerCtx.fs);
   cache.initCacheDir();
@@ -208,12 +227,12 @@ export function mockCompilerSystem(): TestingSystem {
   return createTestingSystem();
 }
 
-export function mockDocument(html: string = null) {
+export function mockDocument(html: string | null = null) {
   const win = new MockWindow(html);
   return win.document as Document;
 }
 
-export function mockWindow(html: string = null) {
+export function mockWindow(html?: string) {
   const win = new MockWindow(html);
   return win as any as Window;
 }
@@ -229,6 +248,7 @@ export function mockWindow(html: string = null) {
 export const mockModule = (mod: Partial<Module> = {}): Module => ({
   cmps: [],
   coreRuntimeApis: [],
+  outputTargetCoreRuntimeApis: {},
   collectionName: '',
   dtsFilePath: '',
   excludeFromCollection: false,

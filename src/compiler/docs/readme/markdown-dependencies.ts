@@ -1,6 +1,6 @@
+import { normalizePath, relative } from '@utils';
+
 import type * as d from '../../../declarations';
-import { normalizePath } from '@utils';
-import { relative } from 'path';
 
 export const depsToMarkdown = (cmp: d.JsonDocsComponent, cmps: d.JsonDocsComponent[]) => {
   const content: string[] = [];

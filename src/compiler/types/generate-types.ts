@@ -1,10 +1,9 @@
+import { isDtsFile, join, relative } from '@utils';
+
 import type * as d from '../../declarations';
-import { copyStencilCoreDts, updateStencilTypesImports } from './stencil-types';
-import { join, relative } from 'path';
-import { generateAppTypes } from './generate-app-types';
-import { generateCustomElementsBundleTypes } from '../output-targets/dist-custom-elements-bundle/custom-elements-bundle-types';
 import { generateCustomElementsTypes } from '../output-targets/dist-custom-elements/custom-elements-types';
-import { isDtsFile } from '@utils';
+import { generateAppTypes } from './generate-app-types';
+import { copyStencilCoreDts, updateStencilTypesImports } from './stencil-types';
 
 /**
  * For a single output target, generate types, then copy the Stencil core type declaration file
@@ -14,10 +13,10 @@ import { isDtsFile } from '@utils';
  * @param outputTarget the output target to generate types for
  */
 export const generateTypes = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
-  outputTarget: d.OutputTargetDistTypes
+  outputTarget: d.OutputTargetDistTypes,
 ): Promise<void> => {
   if (!buildCtx.hasError) {
     await generateTypesOutput(config, compilerCtx, buildCtx, outputTarget);
@@ -33,10 +32,10 @@ export const generateTypes = async (
  * @param outputTarget the output target to generate types for
  */
 const generateTypesOutput = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
-  outputTarget: d.OutputTargetDistTypes
+  outputTarget: d.OutputTargetDistTypes,
 ): Promise<void> => {
   // get all type declaration files in a project's src/ directory
   const srcDirItems = await compilerCtx.fs.readdir(config.srcDir, { recursive: false });
@@ -54,7 +53,7 @@ const generateTypesOutput = async (
 
       await compilerCtx.fs.writeFile(distPath, distDtsContent);
       return distPath;
-    })
+    }),
   );
   const distDtsFilePath = copiedDTSFilePaths.slice(-1)[0];
 
@@ -63,7 +62,6 @@ const generateTypesOutput = async (
   const { typesDir } = outputTarget;
 
   if (distDtsFilePath) {
-    await generateCustomElementsBundleTypes(config, compilerCtx, buildCtx, distDtsFilePath);
     await generateCustomElementsTypes(config, compilerCtx, buildCtx, typesDir);
   }
 };
