@@ -144,6 +144,11 @@
       matchPackageNames: ['rollup'],
       matchPackagePrefixes: ['@rollup'],
       groupName: 'rollup,'
+    },
+    // TODO(STENCIL-1088): remove once support for Node v16 is dropped
+    {
+      matchPackageNames: ['open'],
+      allowedVersions: '<10',
     }
   ],
   // Never rebase the branch or update it unless manually requested to avoid noisy PR emails
