@@ -60,7 +60,7 @@
   },
   "devDependencies": {
     "@ionic/prettier-config": "^4.0.0",
-    "@rollup/plugin-commonjs": "20.0.0",
+    "@rollup/plugin-commonjs": "21.1.0",
     "@rollup/plugin-json": "6.1.0",
     "@rollup/plugin-node-resolve": "9.0.0",
     "@rollup/plugin-replace": "5.0.5",
