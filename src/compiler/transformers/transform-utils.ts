@@ -776,7 +776,7 @@ export const isStaticGetter = (member: ts.ClassElement): boolean => {
  * @param symbol the `Symbol` to serialize
  * @returns the serialized `Symbol` data
  */
-export const serializeSymbol = (checker: ts.TypeChecker, symbol: ts.Symbol): d.CompilerJsDoc => {
+export const serializeSymbol = (checker: ts.TypeChecker, symbol: ts.Symbol | undefined): d.CompilerJsDoc => {
   if (!checker || !symbol) {
     return {
       tags: [],
