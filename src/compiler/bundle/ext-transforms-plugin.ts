@@ -84,7 +84,7 @@ export const extTransformsPlugin = (
          * add file to watch list if it is outside of the `srcDir` config path
          */
         if (config.watch && (id.startsWith('/') || id.startsWith('.')) && !id.startsWith(config.srcDir)) {
-          compilerCtx.addWatchFile(id.split('?')[0])
+          compilerCtx.addWatchFile(id.split('?')[0]);
         }
 
         /**
