@@ -1127,6 +1127,9 @@ render() {
       }
     }
   }
+
+  // Clear the content ref so we don't create a memory leak
+  contentRef = null;
 };
 
 // slot comment debug nodes only created with the `--debug` flag
