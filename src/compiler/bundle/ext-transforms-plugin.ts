@@ -23,7 +23,7 @@ import type { BundleOptions } from './bundle-interface';
  * Whenever one of the files change, we can propagate a correct concatenated
  * version of all styles to the browser by setting `buildCtx.stylesUpdated`.
  */
-type ComponentStyleMap = Map<string, string>
+type ComponentStyleMap = Map<string, string>;
 const allCmpStyles = new Map<string, ComponentStyleMap>();
 
 /**
@@ -195,20 +195,20 @@ export const extTransformsPlugin = (
            */
           const styleText = cmpStyles
             ? externalStyles
-              /**
-               * use `originalComponentPath` as it matches with how `filePath` is defined
+              ? /**
+                 * use `originalComponentPath` as it matches with how `filePath` is defined
+                 */
+                externalStyles.map((es) => cmpStyles.get(es.originalComponentPath)).join('\n')
+              : /**
+                 * if `externalStyles` is not defined, then created the style text in the
+                 * order of which the styles were compiled.
+                 */
+                [...cmpStyles.values()].join('\n')
+            : /**
+               * if `cmpStyles` is not defined, then use the style text from the transform
+               * as it is not connected to a component.
                */
-              ? externalStyles.map((es) => cmpStyles.get(es.originalComponentPath)).join('\n')
-              /**
-               * if `externalStyles` is not defined, then created the style text in the
-               * order of which the styles were compiled.
-               */
-              : [...cmpStyles.values()].join('\n')
-            /**
-             * if `cmpStyles` is not defined, then use the style text from the transform
-             * as it is not connected to a component.
-             */
-            : cssTransformResults.styleText;
+              cssTransformResults.styleText;
           buildCtx.stylesUpdated.push({
             styleTag: data.tag,
             styleMode: data.mode,
