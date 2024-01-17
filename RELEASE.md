@@ -88,5 +88,5 @@ manual release was performed.
       The fix for this issue has been released as a part of today's [Stencil
       vNUMBER release](https://github.com/ionic-team/stencil/releases/tag/TAG). 
       ```
-1. If there's a blog post to go out (either today or this week), let the folks in the `#devrel-stencil` channel know about the release and that the blog can go out.
+1. If there's a blog post to go out (either today or this week), let the folks in the `#ask-ionic-devrel` channel know about the release and that the blog can go out.
 When the blog goes out, put an announcement in the `#announcements` channel in Discord.
