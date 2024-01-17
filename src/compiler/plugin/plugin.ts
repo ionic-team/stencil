@@ -63,7 +63,7 @@ export const runPluginLoad = async (pluginCtx: PluginCtx, id: string) => {
  * @param superset files that were added by a transform
  * @returns files that were added by a transform but haven't been part of the baseline
  */
-const getDependencySubset = (baseline: string[], superset: string[]) => {
+const getDependencySubset = (baseline: string[] | undefined, superset: string[] = []) => {
   if (!Array.isArray(baseline)) {
     return [];
   }
@@ -156,7 +156,7 @@ export const runPluginTransforms = async (
                * add dependencies from plugin transform results, e.g. transformed sass files
                */
               transformResults.dependencies.push(
-                ...getDependencySubset(pluginTransformResults.dependencies || [], transformResults.dependencies),
+                ...getDependencySubset(pluginTransformResults.dependencies, transformResults.dependencies),
               );
             }
           }

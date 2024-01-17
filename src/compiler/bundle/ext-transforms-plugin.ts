@@ -23,7 +23,8 @@ import type { BundleOptions } from './bundle-interface';
  * Whenever one of the files change, we can propagate a correct concatenated
  * version of all styles to the browser by setting `buildCtx.stylesUpdated`.
  */
-const allCmpStyles = new Map<string, Map<string, string>>();
+type ComponentStyleMap = Map<string, string>
+const allCmpStyles = new Map<string, ComponentStyleMap>();
 
 /**
  * A Rollup plugin which bundles up some transformation of CSS imports as well
@@ -61,7 +62,10 @@ export const extTransformsPlugin = (
         return null;
       }
 
-      // make sure compiler context as registered worker
+      /**
+       * Make sure compiler context has a registered worker. The interface suggests that it
+       * potentially can be undefined, therefore check for it here.
+       */
       if (!compilerCtx.worker) {
         return null;
       }
@@ -73,6 +77,7 @@ export const extTransformsPlugin = (
       const { data } = parseImportPath(id);
 
       if (data != null) {
+        let cmpStyles: ComponentStyleMap | undefined = undefined;
         let cmp: d.ComponentCompilerMeta | undefined = undefined;
         const filePath = normalizeFsPath(id);
         const code = await compilerCtx.fs.readFile(filePath);
@@ -86,15 +91,6 @@ export const extTransformsPlugin = (
         if (config.watch && (id.startsWith('/') || id.startsWith('.')) && !id.startsWith(config.srcDir)) {
           compilerCtx.addWatchFile(id.split('?')[0]);
         }
-
-        /**
-         * initiate map for component styles
-         */
-        const scopeId = getScopeId(data.tag || '', data.mode);
-        if (!allCmpStyles.has(scopeId)) {
-          allCmpStyles.set(scopeId, new Map());
-        }
-        const cmpStyles = allCmpStyles.get(scopeId);
 
         const pluginTransforms = await runPluginTransformsEsmImports(config, compilerCtx, buildCtx, code, filePath);
 
@@ -134,6 +130,15 @@ export const extTransformsPlugin = (
               }),
             );
           }
+
+          /**
+           * initiate map for component styles
+           */
+          const scopeId = getScopeId(data.tag, data.mode);
+          if (!allCmpStyles.has(scopeId)) {
+            allCmpStyles.set(scopeId, new Map());
+          }
+          cmpStyles = allCmpStyles.get(scopeId);
         }
 
         const cssTransformResults = await compilerCtx.worker.transformCssToEsm({
@@ -181,16 +186,29 @@ export const extTransformsPlugin = (
         /**
          * if the style has updated, compose all styles for the component
          */
-        if (!hasUpdatedStyle && cmpStyles && data.tag && data.mode) {
-          const externalStyles = cmp && cmp.styles[0] && cmp.styles[0].externalStyles;
+        if (!hasUpdatedStyle && data.tag && data.mode) {
+          const externalStyles = cmp?.styles?.[0].externalStyles;
 
           /**
            * if component has external styles, use a list to keep the order to which
-           * styles are applied
+           * styles are applied.
            */
-          const styleText = externalStyles
-            ? externalStyles.map((es) => cmpStyles.get(es.absolutePath)).join('\n')
-            : [...cmpStyles.values()].join('\n');
+          const styleText = cmpStyles
+            ? externalStyles
+              /**
+               * use `originalComponentPath` as it matches with how `filePath` is defined
+               */
+              ? externalStyles.map((es) => cmpStyles.get(es.originalComponentPath)).join('\n')
+              /**
+               * if `externalStyles` is not defined, then created the style text in the
+               * order of which the styles were compiled.
+               */
+              : [...cmpStyles.values()].join('\n')
+            /**
+             * if `cmpStyles` is not defined, then use the style text from the transform
+             * as it is not connected to a component.
+             */
+            : cssTransformResults.styleText;
           buildCtx.stylesUpdated.push({
             styleTag: data.tag,
             styleMode: data.mode,
