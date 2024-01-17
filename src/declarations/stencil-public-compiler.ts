@@ -1613,8 +1613,12 @@ export interface NodeResolveConfig {
   only?: Array<string | RegExp>;
   modulesOnly?: boolean;
 
+  // TODO(STENCIL-1107): Remove this field [BREAKING_CHANGE]
   /**
    * @see https://github.com/browserify/resolve#resolveid-opts-cb
+   * @deprecated the `customResolveOptions` field is no longer honored in future versions of
+   * `@rollup/plugin-node-resolve`. If you are currently using it, please open a new issue in the Stencil repo to
+   * describe your use case & provide input (https://github.com/ionic-team/stencil/issues/new/choose)
    */
   customResolveOptions?: {
     basedir?: string;
