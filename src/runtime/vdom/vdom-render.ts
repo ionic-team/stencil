@@ -16,7 +16,7 @@ import { h, isHost, newVNode } from './h';
 import { updateElement } from './update-element';
 
 let scopeId: string;
-let contentRef: d.RenderNode;
+let contentRef: d.RenderNode | undefined;
 let hostTagName: string;
 let useNativeShadowDom = false;
 let checkSlotFallbackVisibility = false;
@@ -1127,6 +1127,9 @@ render() {
       }
     }
   }
+
+  // Clear the content ref so we don't create a memory leak
+  contentRef = undefined;
 };
 
 // slot comment debug nodes only created with the `--debug` flag
