@@ -187,7 +187,7 @@ export const extTransformsPlugin = (
          * if the style has updated, compose all styles for the component
          */
         if (!hasUpdatedStyle && data.tag && data.mode) {
-          const externalStyles = cmp?.styles?.[0].externalStyles;
+          const externalStyles = cmp?.styles?.[0]?.externalStyles;
 
           /**
            * if component has external styles, use a list to keep the order to which
