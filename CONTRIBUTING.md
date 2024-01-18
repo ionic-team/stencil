@@ -78,8 +78,8 @@ Using `npm link` is beneficial to the development cycle in that consecutive buil
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@stencil/core/internal": ["node_modules/@stencil/core/internal"],
-      "@stencil/core/internal/*": ["node_modules/@stencil/core/internal/*"]
+      "@stencil/core/internal": ["./node_modules/@stencil/core/internal"],
+      "@stencil/core/internal/*": ["./node_modules/@stencil/core/internal/*"]
     }
   }
 }
