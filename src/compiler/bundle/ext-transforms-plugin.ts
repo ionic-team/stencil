@@ -196,9 +196,14 @@ export const extTransformsPlugin = (
           const styleText = cmpStyles
             ? externalStyles
               ? /**
-                 * use `originalComponentPath` as it matches with how `filePath` is defined
+                 * attempt to find the original `filePath` key through `originalComponentPath`
+                 * and `absolutePath` as path can differ based on how Stencil is installed
+                 * e.g. through `npm link` or `npm install`
                  */
-                externalStyles.map((es) => cmpStyles.get(es.originalComponentPath)).join('\n')
+                externalStyles.map((es) => (
+                  cmpStyles.get(es.originalComponentPath) ||
+                  cmpStyles.get(es.absolutePath)
+                )).join('\n')
               : /**
                  * if `externalStyles` is not defined, then created the style text in the
                  * order of which the styles were compiled.
