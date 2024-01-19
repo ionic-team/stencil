@@ -1,4 +1,4 @@
-import { MockHeaders, MockRequestInfo, MockResponse } from '../mock-doc';
+import { MockHeaders, MockRequestInfo, MockResponse } from '@stencil/core/mock-doc';
 
 const mockedResponses = new Map<string, MockedResponseData>();
 
@@ -165,4 +165,4 @@ export {
   MockRequestInit,
   MockResponse,
   MockResponseInit,
-} from '../mock-doc';
+} from '@stencil/core/mock-doc';

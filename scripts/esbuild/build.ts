@@ -5,6 +5,7 @@ import { buildDevServer } from './dev-server';
 import { buildMockDoc } from './mock-doc';
 import { buildScreenshot } from './screenshot';
 import { buildSysNode } from './sys-node';
+import { buildTesting } from './testing';
 
 // the main entry point for the Esbuild-based build
 async function main() {
@@ -21,6 +22,7 @@ async function main() {
     buildMockDoc(opts),
     buildScreenshot(opts),
     buildSysNode(opts),
+    buildTesting(opts),
   ]);
 }
 

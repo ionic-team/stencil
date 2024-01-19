@@ -16,7 +16,7 @@ import { h, isHost, newVNode } from './h';
 import { updateElement } from './update-element';
 
 let scopeId: string;
-let contentRef: d.RenderNode;
+let contentRef: d.RenderNode | undefined;
 let hostTagName: string;
 let useNativeShadowDom = false;
 let checkSlotFallbackVisibility = false;
@@ -143,9 +143,6 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
       // remember the content reference comment
       elm['s-sr'] = true;
 
-      // Persist the name of the slot that this slot was going to be projected into.
-      elm['s-fs'] = newVNode.$attrs$?.slot;
-
       // remember the content reference comment
       elm['s-cr'] = contentRef;
 
@@ -192,13 +189,6 @@ const relocateToHostRoot = (parentElm: Element) => {
         // Reset so we can correctly move the node around again.
         childNode['s-sh'] = undefined;
 
-        // When putting an element node back in its original location,
-        // we need to reset the `slot` attribute back to the value it originally had
-        // so we can correctly relocate it again in the future
-        if (childNode.nodeType === NODE_TYPE.ElementNode && !!childNode['s-sn']) {
-          childNode.setAttribute('slot', childNode['s-sn']);
-        }
-
         // Need to tell the render pipeline to check to relocate slot content again
         checkSlotRelocate = true;
       }
@@ -226,13 +216,6 @@ const putBackInOriginalLocation = (parentElm: Node, recursive: boolean) => {
 
       // Reset so we can correctly move the node around again.
       childNode['s-sh'] = undefined;
-
-      // When putting an element node back in its original location,
-      // we need to reset the `slot` attribute back to the value it originally had
-      // so we can correctly relocate it again in the future
-      if (childNode.nodeType === NODE_TYPE.ElementNode) {
-        childNode.setAttribute('slot', childNode['s-sn'] ?? '');
-      }
 
       checkSlotRelocate = true;
     }
@@ -1086,26 +1069,6 @@ render() {
                 nodeToRelocate['s-hn'] = nodeToRelocate['s-ol'].parentNode.nodeName;
               }
 
-              // Handle a use-case where we relocate a slot where
-              // the slot name changes along the way (for instance, a default to a named slot).
-              // In this case, we need to update the relocated node's slot attribute to match
-              // the slot name it is being relocated into.
-              //
-              // There is a very niche use case where we may be relocating a text node. For now,
-              // we ignore anything that is not an element node since non-element nodes cannot have
-              // attributes to specify the slot. We'll deal with this if it becomes a problem... but super edge-case-y
-              if (
-                BUILD.experimentalSlotFixes &&
-                nodeToRelocate.nodeType === NODE_TYPE.ElementNode &&
-                slotRefNode['s-fs'] !== nodeToRelocate.getAttribute('slot')
-              ) {
-                if (!slotRefNode['s-fs']) {
-                  nodeToRelocate.removeAttribute('slot');
-                } else {
-                  nodeToRelocate.setAttribute('slot', slotRefNode['s-fs']);
-                }
-              }
-
               // Add it back to the dom but in its new home
               // If we get to this point and `insertBeforeNode` is `null`, that means
               // we're just going to append the node as the last child of the parent. Passing
@@ -1151,7 +1114,7 @@ render() {
   // Hide any elements that were projected through, but don't have a slot to go to.
   // Only an issue if there were no "slots" rendered. Otherwise, nodes are hidden correctly.
   // This _only_ happens for `scoped` components!
-  if (BUILD.experimentalSlotFixes && cmpMeta.$flags$ & CMP_FLAGS.scopedCssEncapsulation) {
+  if (BUILD.experimentalScopedSlotChanges && cmpMeta.$flags$ & CMP_FLAGS.scopedCssEncapsulation) {
     for (const childNode of rootVnode.$elm$.childNodes) {
       if (childNode['s-hn'] !== hostTagName && !childNode['s-sh']) {
         // Store the initial value of `hidden` so we can reset it later when
@@ -1164,6 +1127,9 @@ render() {
       }
     }
   }
+
+  // Clear the content ref so we don't create a memory leak
+  contentRef = undefined;
 };
 
 // slot comment debug nodes only created with the `--debug` flag

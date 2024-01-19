@@ -53,7 +53,6 @@ export async function buildMockDoc(opts: BuildOptions) {
     bundle: true,
     alias: mockDocAliases,
     logLevel: 'info',
-    target: 'node16',
   };
 
   const esmOptions: ESBuildOptions = {

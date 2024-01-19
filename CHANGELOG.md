@@ -1,3 +1,19 @@
+# 🍪 [4.10.0](https://github.com/ionic-team/stencil/compare/v4.9.1...v4.10.0) (2024-01-15)
+
+
+### Bug Fixes
+
+* **runtime:** revert slot relocation forwarding ([#5222](https://github.com/ionic-team/stencil/issues/5222)) ([a2e119d](https://github.com/ionic-team/stencil/commit/a2e119d059ba0d0fa6155dbd3d82c17612630828))
+* **runtime:** slot regressions from experimental slot fixes ([#5221](https://github.com/ionic-team/stencil/issues/5221)) ([3b4deaa](https://github.com/ionic-team/stencil/commit/3b4deaabb690963c6c807917af5a6a3401d11384))
+
+
+### Features
+
+* **deps:** update dependency typescript to ~5.3.0 ([#5248](https://github.com/ionic-team/stencil/issues/5248)) ([e0e6a96](https://github.com/ionic-team/stencil/commit/e0e6a9629e937c13d00653398b3c4f472d8b6757))
+* **runtime:** add extras flag for scoped slot changes ([#5220](https://github.com/ionic-team/stencil/issues/5220)) ([15ff950](https://github.com/ionic-team/stencil/commit/15ff9509a4530a73b5d6c4a3723bbd085d535534))
+
+
+
 ## 🍬 [4.9.1](https://github.com/ionic-team/stencil/compare/v4.9.0...v4.9.1) (2024-01-08)
 
 

@@ -140,6 +140,7 @@ export const getRollupOptions = (
       }),
       rollupReplacePlugin({
         'process.env.NODE_ENV': config.devMode ? '"development"' : '"production"',
+        preventAssignment: true,
       }),
       fileLoadPlugin(compilerCtx.fs),
     ],
