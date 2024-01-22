@@ -14,19 +14,6 @@
 * **deps:** upgrade rollup, commonjs plugin ([#5274](https://github.com/ionic-team/stencil/issues/5274)) ([661120c](https://github.com/ionic-team/stencil/commit/661120c6524f1bf2987547677c01654a8bfb199e))
 
 
-### BREAKING CHANGES
-
-* **compiler:** (nor could we find a suitable way to reuse an existing
-configuration).
-
-this change is a prerequisite to upgrading `@rollup/plugin-node-resolve`.
-we will not remove the configuration option/upgrade the plugin until
-stencil v5. in the interim, we add a warning message at config
-validation time to try to elicit feedback on this change
-
-STENCIL-595: Update Rollup v2.X Infrastructure
-
-
 
 # 🍪 [4.10.0](https://github.com/ionic-team/stencil/compare/v4.9.1...v4.10.0) (2024-01-15)
 
