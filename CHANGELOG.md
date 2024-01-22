@@ -1,3 +1,33 @@
+# 🍝 [4.11.0](https://github.com/ionic-team/stencil/compare/v4.10.0...v4.11.0) (2024-01-22)
+
+
+### Bug Fixes
+
+* **runtime:** resolve memory leak caused by global content ref ([#5266](https://github.com/ionic-team/stencil/issues/5266)) ([fb1b3f5](https://github.com/ionic-team/stencil/commit/fb1b3f5a5bf1096fa67ad0807881585975b4161b))
+* **screenshot:** recognise clip options ([#5205](https://github.com/ionic-team/stencil/issues/5205)) ([0d61a53](https://github.com/ionic-team/stencil/commit/0d61a53a24a361cc5b6f9545eaccb6957f9debcc))
+* **style:** fixes to watching nested and multiple styles on Stencil components ([#5244](https://github.com/ionic-team/stencil/issues/5244)) ([fa5ab1b](https://github.com/ionic-team/stencil/commit/fa5ab1b75f19e1117f0cead1caaf6b00ddccadf3))
+
+
+### Features
+
+* **compiler:** deprecate customResolveOptions config option ([#5269](https://github.com/ionic-team/stencil/issues/5269)) ([6faf746](https://github.com/ionic-team/stencil/commit/6faf746990330da4369e0d73725b0fc2becebb33))
+* **deps:** upgrade rollup, commonjs plugin ([#5274](https://github.com/ionic-team/stencil/issues/5274)) ([661120c](https://github.com/ionic-team/stencil/commit/661120c6524f1bf2987547677c01654a8bfb199e))
+
+
+### BREAKING CHANGES
+
+* **compiler:** (nor could we find a suitable way to reuse an existing
+configuration).
+
+this change is a prerequisite to upgrading `@rollup/plugin-node-resolve`.
+we will not remove the configuration option/upgrade the plugin until
+stencil v5. in the interim, we add a warning message at config
+validation time to try to elicit feedback on this change
+
+STENCIL-595: Update Rollup v2.X Infrastructure
+
+
+
 # 🍪 [4.10.0](https://github.com/ionic-team/stencil/compare/v4.9.1...v4.10.0) (2024-01-15)
 
 
