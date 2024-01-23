@@ -22,10 +22,17 @@ import { parseStaticStyles } from './styles';
 import { parseStaticWatchers } from './watchers';
 
 /**
- * Given an instance of TypeScript's Intermediate Representation (IR) for a
- * class declaration ({@see ts.ClassDeclaration}) which represents a Stencil
- * component class declaration, parse and format various pieces of data about
- * static class members which we use in the compilation process
+ * Given a {@see ts.ClassDeclaration} which represents a Stencil component
+ * class declaration, parse and format various pieces of data about static class
+ * members which we use in the compilation process.
+ *
+ * This performs some checks that this class is indeed a Stencil component
+ * and, if it is, will perform a side-effect, adding an object containing
+ * metadata about the component to the module map and the node map.
+ *
+ * Additionally, it will optionally transform the supplied class declaration
+ * node to add a static getter for the component metadata if the transformation
+ * options specify to do so.
  *
  * @param compilerCtx the current compiler context
  * @param typeChecker a TypeScript type checker instance
