@@ -62,7 +62,17 @@ export class CompilerContext implements d.CompilerCtx {
   }
 }
 
-export const getModuleLegacy = (compilerCtx: d.CompilerCtx, sourceFilePath: string) => {
+/**
+ * Get a {@link d.Module} from the current compiler context which corresponds
+ * to a supplied source file path. If a module record corresponding to the
+ * supplied path is not yet allocated, create one, save it in the compiler
+ * context, and then return the module record.
+ *
+ * @param compilerCtx the current compiler context
+ * @param sourceFilePath the path for which we want a module record
+ * @returns a module record corresponding to the supplied source file path
+ */
+export const getModuleLegacy = (compilerCtx: d.CompilerCtx, sourceFilePath: string): d.Module => {
   sourceFilePath = normalizePath(sourceFilePath);
 
   const moduleFile = compilerCtx.moduleMap.get(sourceFilePath);
@@ -114,6 +124,12 @@ export const getModuleLegacy = (compilerCtx: d.CompilerCtx, sourceFilePath: stri
   }
 };
 
+/**
+ * Reset a module record, mutating the supplied object to reset values to
+ * defaults.
+ *
+ * @param moduleFile the module record to reset
+ */
 export const resetModuleLegacy = (moduleFile: d.Module) => {
   moduleFile.cmps.length = 0;
   moduleFile.coreRuntimeApis.length = 0;
