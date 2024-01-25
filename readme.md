@@ -95,5 +95,3 @@ Please note that this project is released with a [Contributor Code of Conduct](h
 
 ### Thanks
 Stencil's internal testing suite is supported by the [BrowserStack Open-Source Program](https://www.browserstack.com/open-source)
-<br>
-<a href="https://www.browserstack.com/" target="_blank" rel="noopener noref"><img width="200" src="https://www.browserstack.com/images/layout/browserstack-logo-600x315.png"></a>
