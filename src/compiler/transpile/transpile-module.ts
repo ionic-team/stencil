@@ -5,6 +5,7 @@ import ts from 'typescript';
 import type * as d from '../../declarations';
 import { BuildContext } from '../build/build-ctx';
 import { CompilerContext } from '../build/compiler-ctx';
+import { performAutomaticKeyInsertion } from '../transformers/automatic-key-insertion';
 import { lazyComponentTransform } from '../transformers/component-lazy/transform-lazy-component';
 import { nativeComponentTransform } from '../transformers/component-native/tranform-to-native-component';
 import { convertDecoratorsToStatic } from '../transformers/decorators-to-static/convert-decorators';
@@ -113,6 +114,7 @@ export const transpileModule = (
   const transformers: ts.CustomTransformers = {
     before: [
       convertDecoratorsToStatic(config, buildCtx.diagnostics, typeChecker, program),
+      performAutomaticKeyInsertion,
       updateStencilCoreImports(transformOpts.coreImportPath),
     ],
     after: [convertStaticToMeta(config, compilerCtx, buildCtx, typeChecker, null, transformOpts)],

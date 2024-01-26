@@ -12,6 +12,7 @@ import ts from 'typescript';
 import type * as d from '../../declarations';
 import { updateComponentBuildConditionals } from '../app-core/app-data';
 import { resolveComponentDependencies } from '../entries/resolve-component-dependencies';
+import { performAutomaticKeyInsertion } from '../transformers/automatic-key-insertion';
 import { convertDecoratorsToStatic } from '../transformers/decorators-to-static/convert-decorators';
 import { rewriteAliasedDTSImportPaths } from '../transformers/rewrite-aliased-paths';
 import { updateModule } from '../transformers/static-to-meta/parse-static';
@@ -66,7 +67,10 @@ export const runTsProgram = async (
   };
 
   const transformers: ts.CustomTransformers = {
-    before: [convertDecoratorsToStatic(config, buildCtx.diagnostics, tsTypeChecker, tsProgram)],
+    before: [
+      convertDecoratorsToStatic(config, buildCtx.diagnostics, tsTypeChecker, tsProgram),
+      performAutomaticKeyInsertion,
+    ],
     afterDeclarations: [],
   };
 
