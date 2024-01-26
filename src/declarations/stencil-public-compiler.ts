@@ -272,6 +272,13 @@ export interface StencilConfig {
   rollupPlugins?: { before?: any[]; after?: any[] };
 
   entryComponentsHint?: string[];
+  /**
+   * Sets whether Stencil will write files to `dist/` during the build or not.
+   *
+   * By default this value is set to the opposite value of {@link devMode},
+   * i.e. it will be `true` when building for production and `false` when
+   * building for development.
+   */
   buildDist?: boolean;
   buildLogFilePath?: string;
   devInspector?: boolean;
