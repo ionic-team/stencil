@@ -1,3 +1,17 @@
+# 🌅 [4.12.0](https://github.com/ionic-team/stencil/compare/v4.11.0...v4.12.0) (2024-01-29)
+
+
+### Bug Fixes
+
+* **hmr:** allow changes to component decorators when using HMR ([#5290](https://github.com/ionic-team/stencil/issues/5290)) ([656355f](https://github.com/ionic-team/stencil/commit/656355fc753fe09128f6f20f33150123863839d8))
+
+
+### Features
+
+* **runtime:** automatically insert `key` attrs during compilation ([#5143](https://github.com/ionic-team/stencil/issues/5143)) ([9c47438](https://github.com/ionic-team/stencil/commit/9c47438a9a727c9d21cc7441e022097a966bd60d))
+
+
+
 # 🍝 [4.11.0](https://github.com/ionic-team/stencil/compare/v4.10.0...v4.11.0) (2024-01-22)
 
 
