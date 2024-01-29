@@ -185,6 +185,8 @@ const relocateToHostRoot = (parentElm: Element) => {
     const contentRefNode = (Array.from(host.childNodes) as d.RenderNode[]).find((ref) => ref['s-cr']);
     const childNodeArray = Array.from(parentElm.childNodes) as d.RenderNode[];
 
+    // If we have a content ref, we need to invert the order of the nodes we're relocating
+    // to preserve the correct order of elements in the DOM on future relocations
     for (const childNode of contentRefNode ? childNodeArray.reverse() : childNodeArray) {
       // Only relocate nodes that were slotted in
       if (childNode['s-sh'] != null) {
