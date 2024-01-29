@@ -645,7 +645,7 @@ export const patch = (oldVNode: d.VNode, newVNode: d.VNode, isInitialRender = fa
 
     if (BUILD.vdomAttribute || BUILD.reflect) {
       if (BUILD.slot && tag === 'slot' && !useNativeShadowDom) {
-        if (oldVNode.$name$ !== newVNode.$name$) {
+        if (BUILD.experimentalSlotFixes && oldVNode.$name$ !== newVNode.$name$) {
           newVNode.$elm$['s-sn'] = newVNode.$name$ || '';
           relocateToHostRoot(newVNode.$elm$.parentElement);
         }
