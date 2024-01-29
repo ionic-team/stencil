@@ -70,11 +70,11 @@ manual release was performed.
       ```
    1. Hit "Publish Release"    
 1. Navigate to the [Stencil Site](https://github.com/ionic-team/stencil-site/pulls) repository and:
-  1. Merge any open PRs containing documentation that has been approved, but
-     not merged that is related to the release. Such PRs should be labelled as
-     `do not merge: waiting for next stencil release`. It's a good idea to
-     review _all_ PRs though, just in case.
-  1. If the current release is a major or minor version, open a pull request
+   1. Merge any open PRs containing documentation that has been approved, but
+      not merged that is related to the release. Such PRs should be labelled as
+      `do not merge: waiting for next stencil release`. It's a good idea to
+      review _all_ PRs though, just in case.
+   1. If the current release is a major or minor version, open a pull request
      creating a new version of the docs by following the [guide in the
      stencil-site
      repo](https://github.com/ionic-team/stencil-site/blob/main/RELEASE.md#creating-a-new-version-section).
