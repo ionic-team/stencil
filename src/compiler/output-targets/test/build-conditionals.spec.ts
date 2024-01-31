@@ -15,6 +15,16 @@ describe('build-conditionals', () => {
   });
 
   describe('getCustomElementsBuildConditionals', () => {
+    it('default', () => {
+      const { config } = validateConfig(userConfig, mockLoadConfigInit());
+      const bc = getCustomElementsBuildConditionals(config, cmps);
+      expect(bc).toMatchObject({
+        lazyLoad: false,
+        hydrateClientSide: false,
+        hydrateServerSide: false,
+      });
+    });
+
     it('taskQueue async', () => {
       userConfig.taskQueue = 'async';
       const { config } = validateConfig(userConfig, mockLoadConfigInit());
@@ -49,9 +59,28 @@ describe('build-conditionals', () => {
       expect(bc.taskQueue).toBe(true);
       expect(config.taskQueue).toBe('async');
     });
+
+    it('hydrateClientSide true', () => {
+      const hydrateOutputTarget: d.OutputTargetHydrate = {
+        type: 'dist-hydrate-script',
+      };
+      userConfig.outputTargets = [hydrateOutputTarget];
+      const { config } = validateConfig(userConfig, mockLoadConfigInit());
+      const bc = getCustomElementsBuildConditionals(config, cmps);
+      expect(bc.hydrateClientSide).toBe(true);
+    });
   });
 
   describe('getLazyBuildConditionals', () => {
+    it('default', () => {
+      const { config } = validateConfig(userConfig, mockLoadConfigInit());
+      const bc = getLazyBuildConditionals(config, cmps);
+      expect(bc).toMatchObject({
+        lazyLoad: true,
+        hydrateServerSide: false,
+      });
+    });
+
     it('taskQueue async', () => {
       userConfig.taskQueue = 'async';
       const { config } = validateConfig(userConfig, mockLoadConfigInit());
@@ -98,6 +127,22 @@ describe('build-conditionals', () => {
       const { config } = validateConfig(userConfig, mockLoadConfigInit());
       const bc = getLazyBuildConditionals(config, cmps);
       expect(bc.transformTagName).toBe(true);
+    });
+
+    it('hydrateClientSide default', () => {
+      const { config } = validateConfig(userConfig, mockLoadConfigInit());
+      const bc = getLazyBuildConditionals(config, cmps);
+      expect(bc.hydrateClientSide).toBe(false);
+    });
+
+    it('hydrateClientSide true', () => {
+      const hydrateOutputTarget: d.OutputTargetHydrate = {
+        type: 'dist-hydrate-script',
+      };
+      userConfig.outputTargets = [hydrateOutputTarget];
+      const { config } = validateConfig(userConfig, mockLoadConfigInit());
+      const bc = getLazyBuildConditionals(config, cmps);
+      expect(bc.hydrateClientSide).toBe(true);
     });
   });
 });
