@@ -197,6 +197,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
   });
 
   // Only bother generating CSS if we have components
+  // TODO(STENCIL-1118): Add test cases for CSS content based on conditionals
   if (cmpTags.length > 0) {
     // Add styles for `slot-fb` elements if any of our components are using slots outside the Shadow DOM
     if (hasSlotRelocation) {
