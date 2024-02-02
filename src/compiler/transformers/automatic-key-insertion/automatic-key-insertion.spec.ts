@@ -262,6 +262,105 @@ describe('automatic key insertion', () => {
     );
   });
 
+  it('should add a key to a conditionally-rendered static element', async () => {
+    jest
+      .spyOn(keyInsertionUtils, 'deriveJSXKey')
+      .mockReturnValueOnce('my-best-key')
+      .mockReturnValueOnce('my-worst-key');
+    const t = transpile(`
+     @Component({tag: 'cmp-a'})
+     export class CmpA {
+       yes = false;
+       render() {
+         return (
+           <div>
+             { someConditional && <span>inner</span> }
+           </div>
+         )
+       }
+     }`);
+    expect(await formatCode(t.outputText)).toBe(
+      `export class CmpA {
+  constructor() {
+    this.yes = false;
+  }
+  render() {
+    return h('div', { key: 'my-best-key' }, someConditional && h('span', { key: 'my-worst-key' }, 'inner'));
+  }
+  static get is() {
+    return 'cmp-a';
+  }
+}
+`,
+    );
+  });
+
+  it('should not add a key to an IIFE in JSX', async () => {
+    jest
+      .spyOn(keyInsertionUtils, 'deriveJSXKey')
+      .mockReturnValueOnce('my-best-key')
+      .mockReturnValueOnce('my-worst-key');
+    const t = transpile(`
+     @Component({tag: 'cmp-a'})
+     export class CmpA {
+       yes = false;
+       render() {
+         return (
+           <div>
+             { (() => <div>foo</div>)() }
+           </div>
+         )
+       }
+     }`);
+    expect(await formatCode(t.outputText)).toBe(
+      `export class CmpA {
+  constructor() {
+    this.yes = false;
+  }
+  render() {
+    return h('div', { key: 'my-best-key' }, (() => h('div', null, 'foo'))());
+  }
+  static get is() {
+    return 'cmp-a';
+  }
+}
+`,
+    );
+  });
+
+  it('should not add a key within function arguments in JSX', async () => {
+    jest
+      .spyOn(keyInsertionUtils, 'deriveJSXKey')
+      .mockReturnValueOnce('my-best-key')
+      .mockReturnValueOnce('my-worst-key');
+    const t = transpile(`
+     @Component({tag: 'cmp-a'})
+     export class CmpA {
+       yes = false;
+       render() {
+         return (
+           <div>
+             { func(<div>foo</div>) }
+           </div>
+         )
+       }
+     }`);
+    expect(await formatCode(t.outputText)).toBe(
+      `export class CmpA {
+  constructor() {
+    this.yes = false;
+  }
+  render() {
+    return h('div', { key: 'my-worst-key' }, func(h('div', null, 'foo')));
+  }
+  static get is() {
+    return 'cmp-a';
+  }
+}
+`,
+    );
+  });
+
   it('should not transform JSX in methods with multiple returns', async () => {
     jest.spyOn(keyInsertionUtils, 'deriveJSXKey').mockReturnValue('shouldnt-see-key');
     const t = transpile(`
