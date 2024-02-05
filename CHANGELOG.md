@@ -1,3 +1,14 @@
+## 🏸 [4.12.1](https://github.com/ionic-team/stencil/compare/v4.12.0...v4.12.1) (2024-02-05)
+
+
+### Bug Fixes
+
+* **mock-doc:** improve error message when `:scope` selector is used ([#5318](https://github.com/ionic-team/stencil/issues/5318)) ([f5d4e98](https://github.com/ionic-team/stencil/commit/f5d4e98d0e12a218e8b2f472853905975b964e02))
+* **runtime:** dynamic slot name change ([#5304](https://github.com/ionic-team/stencil/issues/5304)) ([9d9fe41](https://github.com/ionic-team/stencil/commit/9d9fe419c669b0e85c00ce9e65ac22d564c51d9c))
+* **runtime:** only generate lazy build CSS when there are component tags ([#5305](https://github.com/ionic-team/stencil/issues/5305)) ([a0c1bd0](https://github.com/ionic-team/stencil/commit/a0c1bd0f91938f7f3cfc97cc5402d3ff955d327f)), closes [#3771](https://github.com/ionic-team/stencil/issues/3771)
+
+
+
 # 🌅 [4.12.0](https://github.com/ionic-team/stencil/compare/v4.11.0...v4.12.0) (2024-01-29)
 
 
