@@ -15,6 +15,13 @@ jobs:
     name: Pack and Comment
     runs-on: 'ubuntu-22.04'
     steps:
+      - name: Check event type
+        run: |
+          if [ "${{ github.event_name }}" != "pull_request" ]; then
+            echo "This workflow was not triggered by a pull request. Exiting..."
+            exit 0
+          fi
+
       - name: Checkout Code
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
 
@@ -67,7 +74,7 @@ jobs:
           echo "$EOF" >> $GITHUB_OUTPUT
 
       - name: Find Comment
-        uses: peter-evans/find-comment@a54c31d7fa095754bfef525c0c8e5e5674c4b4b1 # v2.4.0
+        uses: peter-evans/find-comment@d5fe37641ad8451bdd80312415672ba26c86575e # v3.0.0
         id: fc
         with:
           issue-number: ${{ github.event.pull_request.number }}
@@ -75,7 +82,7 @@ jobs:
           body-includes: '### PR built and packed!'
 
       - name: Create or update comment
-        uses: peter-evans/create-or-update-comment@23ff15729ef2fc348714a3bb66d2f655ca9066f2 # v3.1.0
+        uses: peter-evans/create-or-update-comment@71345be0265236311c031f5c7866368bd1eff043 # v4.0.0
         with:
           comment-id: ${{ steps.fc.outputs.comment-id }}
           issue-number: ${{ github.event.pull_request.number }}
