@@ -14,14 +14,8 @@ jobs:
   pack:
     name: Pack and Comment
     runs-on: 'ubuntu-22.04'
+    if: ${{ github.event_name == 'pull_request' }}
     steps:
-      - name: Check event type
-        run: |
-          if [ "${{ github.event_name }}" != "pull_request" ]; then
-            echo "This workflow was not triggered by a pull request. Exiting..."
-            exit 0
-          fi
-
       - name: Checkout Code
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
 
