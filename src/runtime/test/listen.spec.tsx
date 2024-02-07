@@ -113,13 +113,13 @@ describe('listen', () => {
     doc.dispatchEvent(new CustomEvent('click', { bubbles: true }));
     await waitForChanges();
     expect(root).toEqualHtml(`
-      <cmp-a>1,4,0,0</cmp-a>
+      <cmp-a>1,4,1,1</cmp-a>
     `);
 
     win.dispatchEvent(new CustomEvent('click', { bubbles: true }));
     await waitForChanges();
     expect(root).toEqualHtml(`
-      <cmp-a>1,4,0,0</cmp-a>
+      <cmp-a>1,4,1,2</cmp-a>
     `);
   });
 
