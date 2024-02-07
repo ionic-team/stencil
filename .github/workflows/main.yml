@@ -57,3 +57,10 @@ jobs:
     uses: ./.github/workflows/test-unit.yml
     with:
       build_name: stencil-core
+
+  pack_and_comment:
+    name: Pack and Comment
+    needs: [build_core]
+    uses: ./.github/workflows/pack-and-comment.yml
+    with:
+      build_name: stencil-core
