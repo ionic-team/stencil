@@ -149,6 +149,9 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
       // remember the slot name, or empty string for default slot
       elm['s-sn'] = newVNode.$name$ || '';
 
+      // remember the ref callback function
+      elm['s-rf'] = newVNode.$attrs$?.ref;
+
       // check if we've got an old vnode for this slot
       oldVNode = oldParentVNode && oldParentVNode.$children$ && oldParentVNode.$children$[childIndex];
       if (oldVNode && oldVNode.$tag$ === newVNode.$tag$ && oldParentVNode.$elm$) {
@@ -1094,6 +1097,8 @@ render() {
               }
             }
           }
+
+          nodeToRelocate && typeof slotRefNode['s-rf'] === 'function' && slotRefNode['s-rf'](nodeToRelocate);
         } else {
           // this node doesn't have a slot home to go to, so let's hide it
           if (nodeToRelocate.nodeType === NODE_TYPE.ElementNode) {
