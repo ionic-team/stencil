@@ -1101,6 +1101,13 @@ export class MockHTMLElement extends MockElement {
     this.nodeName = value;
   }
 
+  override get parentElement() {
+    return null;
+  }
+  override set parentElement(_value: any) {
+    /**/
+  }
+
   override get attributes(): MockAttributeMap {
     if (this.__attributeMap == null) {
       const attrMap = createAttributeProxy(true);
