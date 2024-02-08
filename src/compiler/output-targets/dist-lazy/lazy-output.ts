@@ -180,15 +180,15 @@ const getLazyEntry = (isBrowser: boolean): string => {
   if (isBrowser) {
     s.append(`import { patchBrowser } from '${STENCIL_INTERNAL_CLIENT_PATCH_BROWSER_ID}';\n`);
     s.append(`import { globalScripts } from '${STENCIL_APP_GLOBALS_ID}';\n`);
-    s.append(`patchBrowser().then(options => {\n`);
-    s.append(`  globalScripts();\n`);
+    s.append(`patchBrowser().then(async (options) => {\n`);
+    s.append(`  await globalScripts();\n`);
     s.append(`  return bootstrapLazy([/*!__STENCIL_LAZY_DATA__*/], options);\n`);
     s.append(`});\n`);
   } else {
     s.append(`import { globalScripts } from '${STENCIL_APP_GLOBALS_ID}';\n`);
-    s.append(`export const defineCustomElements = (win, options) => {\n`);
+    s.append(`export const defineCustomElements = async (win, options) => {\n`);
     s.append(`  if (typeof window === 'undefined') return undefined;\n`);
-    s.append(`  globalScripts();\n`);
+    s.append(`  await globalScripts();\n`);
     s.append(`  return bootstrapLazy([/*!__STENCIL_LAZY_DATA__*/], options);\n`);
     s.append(`};\n`);
   }

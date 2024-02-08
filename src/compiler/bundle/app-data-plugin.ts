@@ -183,9 +183,11 @@ const appendGlobalScripts = (globalScripts: GlobalScript[], s: MagicString) => {
     });
 
     s.append(`export const globalScripts = () => {\n`);
+    s.append(`  return Promise.all([\n`);
     globalScripts.forEach((globalScript) => {
-      s.append(`  ${globalScript.defaultName}();\n`);
+      s.append(`    ${globalScript.defaultName}(),\n`);
     });
+    s.append(`  ]);\n`);
     s.append(`};\n`);
   } else {
     s.append(`export const globalScripts = () => {};\n`);
