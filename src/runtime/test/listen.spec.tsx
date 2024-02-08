@@ -89,37 +89,37 @@ describe('listen', () => {
     root.click();
     await waitForChanges();
     expect(root).toEqualHtml(`
-      <cmp-a>1,1,0,0</cmp-a>
+      <cmp-a>1,1,1,1</cmp-a>
     `);
 
     parent.click();
     await waitForChanges();
     expect(root).toEqualHtml(`
-      <cmp-a>1,2,0,0</cmp-a>
+      <cmp-a>1,2,2,2</cmp-a>
     `);
 
     other.click();
     await waitForChanges();
     expect(root).toEqualHtml(`
-      <cmp-a>1,3,0,0</cmp-a>
+      <cmp-a>1,3,3,3</cmp-a>
     `);
 
     body.click();
     await waitForChanges();
     expect(root).toEqualHtml(`
-      <cmp-a>1,4,0,0</cmp-a>
+      <cmp-a>1,4,4,4</cmp-a>
     `);
 
     doc.dispatchEvent(new CustomEvent('click', { bubbles: true }));
     await waitForChanges();
     expect(root).toEqualHtml(`
-      <cmp-a>1,4,1,1</cmp-a>
+      <cmp-a>1,4,5,5</cmp-a>
     `);
 
     win.dispatchEvent(new CustomEvent('click', { bubbles: true }));
     await waitForChanges();
     expect(root).toEqualHtml(`
-      <cmp-a>1,4,1,2</cmp-a>
+      <cmp-a>1,4,5,6</cmp-a>
     `);
   });
 
