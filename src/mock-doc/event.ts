@@ -65,7 +65,7 @@ export class MockEvent {
        * @ref
        */
       if (currentElement.parentElement == null && currentElement.tagName === 'HTML') {
-        currentElement = currentElement.ownerDocument
+        currentElement = currentElement.ownerDocument;
       } else {
         currentElement = currentElement.parentElement;
       }
