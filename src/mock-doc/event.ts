@@ -62,7 +62,6 @@ export class MockEvent {
        * bubble up the parent chain until we arrive to the HTML element. Here we continue
        * with the document object instead of the parent element since the parent element
        * is `null` for HTML elements.
-       * @ref
        */
       if (currentElement.parentElement == null && currentElement.tagName === 'HTML') {
         currentElement = currentElement.ownerDocument;
