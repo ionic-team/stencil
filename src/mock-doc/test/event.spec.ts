@@ -291,10 +291,12 @@ describe('event', () => {
 
       const composedPath = event.composedPath();
 
-      expect(composedPath).toHaveLength(3);
+      expect(composedPath).toHaveLength(5);
       expect(composedPath[0]).toBe(divElm);
       expect(composedPath[1]).toBe(doc.body);
       expect(composedPath[2]).toBe(doc.documentElement);
+      expect(composedPath[3]).toBe(doc);
+      expect(composedPath[4]).toBe(win);
     });
 
     it('returns the correct path for a nested element', () => {
@@ -311,11 +313,13 @@ describe('event', () => {
 
       const composedPath = event.composedPath();
 
-      expect(composedPath).toHaveLength(4);
+      expect(composedPath).toHaveLength(6);
       expect(composedPath[0]).toBe(pElm);
       expect(composedPath[1]).toBe(divElm);
       expect(composedPath[2]).toBe(doc.body);
       expect(composedPath[3]).toBe(doc.documentElement);
+      expect(composedPath[4]).toBe(doc);
+      expect(composedPath[5]).toBe(win);
     });
   });
 });
