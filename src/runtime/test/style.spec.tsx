@@ -5,7 +5,11 @@ describe('style', () => {
   it('get style string', async () => {
     @Component({
       tag: 'cmp-a',
-      styles: `div { color: red; }`,
+      styles: `
+        div {
+          color: red;
+        }
+      `,
     })
     class CmpA {
       render() {
@@ -26,7 +30,11 @@ describe('style', () => {
   it('applies the nonce value to the head style tags', async () => {
     @Component({
       tag: 'cmp-a',
-      styles: `div { color: red; }`,
+      styles: `
+        div {
+          color: red;
+        }
+      `,
     })
     class CmpA {
       render() {
