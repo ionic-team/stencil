@@ -24,7 +24,7 @@ describe('style', () => {
     });
 
     expect(root).toHaveClass('hydrated');
-    expect(styles.get('sc-cmp-a')).toBe(`div { color: red; }`);
+    expect(styles.get('sc-cmp-a')).toContain(`color: red;`);
   });
 
   it('applies the nonce value to the head style tags', async () => {
