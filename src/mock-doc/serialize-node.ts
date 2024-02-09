@@ -3,6 +3,13 @@ import { cloneAttributes } from './attribute';
 import { NODE_TYPES } from './constants';
 import { MockNode } from './node';
 
+/**
+ * Serialize a node (either a DOM node or a mock-doc node) to an HTML string
+ *
+ * @param elm the node to serialize
+ * @param opts options to control serialization behavior
+ * @returns an html string
+ */
 export function serializeNodeToHtml(elm: Node | MockNode, opts: SerializeNodeToHtmlOptions = {}) {
   const output: SerializeOutput = {
     currentLineWidth: 0,
@@ -85,13 +92,13 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
 
     if (ignoreTag === false) {
       const isWithinWhitespaceSensitiveNode =
-        opts.newLines || opts.indentSpaces > 0 ? isWithinWhitespaceSensitive(node) : false;
+        opts.newLines || (opts.indentSpaces ?? 0) > 0 ? isWithinWhitespaceSensitive(node) : false;
       if (opts.newLines && !isWithinWhitespaceSensitiveNode) {
         output.text.push('\n');
         output.currentLineWidth = 0;
       }
 
-      if (opts.indentSpaces > 0 && !isWithinWhitespaceSensitiveNode) {
+      if ((opts.indentSpaces ?? 0) > 0 && !isWithinWhitespaceSensitiveNode) {
         for (let i = 0; i < output.indent; i++) {
           output.text.push(' ');
         }
@@ -108,7 +115,7 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
           : (node as Element).attributes;
 
       for (let i = 0; i < attrsLength; i++) {
-        const attr = attributes.item(i);
+        const attr = attributes.item(i)!;
         const attrName = attr.name;
 
         if (attrName === 'style') {
@@ -123,7 +130,11 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
         const attrNamespaceURI = attr.namespaceURI;
         if (attrNamespaceURI == null) {
           output.currentLineWidth += attrName.length + 1;
-          if (opts.approximateLineWidth > 0 && output.currentLineWidth > opts.approximateLineWidth) {
+          if (
+            opts.approximateLineWidth &&
+            opts.approximateLineWidth > 0 &&
+            output.currentLineWidth > opts.approximateLineWidth
+          ) {
             output.text.push('\n' + attrName);
             output.currentLineWidth = 0;
           } else {
@@ -179,6 +190,7 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
         const cssText = (node as HTMLElement).style.cssText;
 
         if (
+          opts.approximateLineWidth &&
           opts.approximateLineWidth > 0 &&
           output.currentLineWidth + cssText.length + 10 > opts.approximateLineWidth
         ) {
@@ -196,16 +208,16 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
 
     if (EMPTY_ELEMENTS.has(tagName) === false) {
       if (opts.serializeShadowRoot && (node as HTMLElement).shadowRoot != null) {
-        output.indent = output.indent + opts.indentSpaces;
-        serializeToHtml((node as HTMLElement).shadowRoot, opts, output, true);
-        output.indent = output.indent - opts.indentSpaces;
+        output.indent = output.indent + (opts.indentSpaces ?? 0);
+        serializeToHtml((node as HTMLElement).shadowRoot!, opts, output, true);
+        output.indent = output.indent - (opts.indentSpaces ?? 0);
 
         if (
           opts.newLines &&
           (node.childNodes.length === 0 ||
             (node.childNodes.length === 1 &&
               node.childNodes[0].nodeType === NODE_TYPES.TEXT_NODE &&
-              node.childNodes[0].nodeValue.trim() === ''))
+              node.childNodes[0].nodeValue?.trim() === ''))
         ) {
           output.text.push('\n');
           output.currentLineWidth = 0;
@@ -231,10 +243,10 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
             // skip over empty text nodes
           } else {
             const isWithinWhitespaceSensitiveNode =
-              opts.newLines || opts.indentSpaces > 0 ? isWithinWhitespaceSensitive(node) : false;
+              opts.newLines || (opts.indentSpaces ?? 0) > 0 ? isWithinWhitespaceSensitive(node) : false;
 
-            if (!isWithinWhitespaceSensitiveNode && opts.indentSpaces > 0 && ignoreTag === false) {
-              output.indent = output.indent + opts.indentSpaces;
+            if (!isWithinWhitespaceSensitiveNode && (opts.indentSpaces ?? 0) > 0 && ignoreTag === false) {
+              output.indent = output.indent + (opts.indentSpaces ?? 0);
             }
 
             for (let i = 0; i < childNodeLength; i++) {
@@ -247,8 +259,8 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
                 output.currentLineWidth = 0;
               }
 
-              if (opts.indentSpaces > 0 && !isWithinWhitespaceSensitiveNode) {
-                output.indent = output.indent - opts.indentSpaces;
+              if ((opts.indentSpaces ?? 0) > 0 && !isWithinWhitespaceSensitiveNode) {
+                output.indent = output.indent - (opts.indentSpaces ?? 0);
                 for (let i = 0; i < output.indent; i++) {
                   output.text.push(' ');
                 }
@@ -265,7 +277,7 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
       }
     }
 
-    if (opts.approximateLineWidth > 0 && STRUCTURE_ELEMENTS.has(tagName)) {
+    if ((opts.approximateLineWidth ?? 0) > 0 && STRUCTURE_ELEMENTS.has(tagName)) {
       output.text.push('\n');
       output.currentLineWidth = 0;
     }
@@ -285,7 +297,7 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
           // just add the exact text we were given
           output.text.push(textContent);
           output.currentLineWidth += textContent.length;
-        } else if (opts.approximateLineWidth > 0 && !output.isWithinBody) {
+        } else if ((opts.approximateLineWidth ?? 0) > 0 && !output.isWithinBody) {
           // do nothing if we're not in the <body> and we're tracking line width
         } else if (!opts.prettyHtml) {
           // this text node is only whitespace, and it's not
@@ -293,7 +305,11 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
           // so replace the entire white space with a single new line
           output.currentLineWidth += 1;
 
-          if (opts.approximateLineWidth > 0 && output.currentLineWidth > opts.approximateLineWidth) {
+          if (
+            opts.approximateLineWidth &&
+            opts.approximateLineWidth > 0 &&
+            output.currentLineWidth > opts.approximateLineWidth
+          ) {
             // good enough for a new line
             // for perf these are all just estimates
             // we don't care to ensure exact line lengths
@@ -307,13 +323,13 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
       } else {
         // this text node has text content
         const isWithinWhitespaceSensitiveNode =
-          opts.newLines || opts.indentSpaces > 0 || opts.prettyHtml ? isWithinWhitespaceSensitive(node) : false;
+          opts.newLines || (opts.indentSpaces ?? 0) > 0 || opts.prettyHtml ? isWithinWhitespaceSensitive(node) : false;
         if (opts.newLines && !isWithinWhitespaceSensitiveNode) {
           output.text.push('\n');
           output.currentLineWidth = 0;
         }
 
-        if (opts.indentSpaces > 0 && !isWithinWhitespaceSensitiveNode) {
+        if ((opts.indentSpaces ?? 0) > 0 && !isWithinWhitespaceSensitiveNode) {
           for (let i = 0; i < output.indent; i++) {
             output.text.push(' ');
           }
@@ -328,7 +344,7 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
             node.parentNode != null && node.parentNode.nodeType === NODE_TYPES.ELEMENT_NODE
               ? node.parentNode.nodeName
               : null;
-          if (NON_ESCAPABLE_CONTENT.has(parentTagName)) {
+          if (typeof parentTagName === 'string' && NON_ESCAPABLE_CONTENT.has(parentTagName)) {
             // this text node cannot have its content escaped since it's going
             // into an element like <style> or <script>
             if (isWithinWhitespaceSensitive(node)) {
@@ -359,6 +375,7 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
                 if (textContentLength > 1) {
                   if (/\s/.test(textContent.charAt(textContentLength - 1))) {
                     if (
+                      opts.approximateLineWidth &&
                       opts.approximateLineWidth > 0 &&
                       output.currentLineWidth + textContentLength > opts.approximateLineWidth
                     ) {
@@ -383,23 +400,23 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
 
     if (opts.removeHtmlComments) {
       const isHydrateAnnotation =
-        nodeValue.startsWith(CONTENT_REF_ID + '.') ||
-        nodeValue.startsWith(ORG_LOCATION_ID + '.') ||
-        nodeValue.startsWith(SLOT_NODE_ID + '.') ||
-        nodeValue.startsWith(TEXT_NODE_ID + '.');
+        nodeValue?.startsWith(CONTENT_REF_ID + '.') ||
+        nodeValue?.startsWith(ORG_LOCATION_ID + '.') ||
+        nodeValue?.startsWith(SLOT_NODE_ID + '.') ||
+        nodeValue?.startsWith(TEXT_NODE_ID + '.');
       if (!isHydrateAnnotation) {
         return;
       }
     }
 
     const isWithinWhitespaceSensitiveNode =
-      opts.newLines || opts.indentSpaces > 0 ? isWithinWhitespaceSensitive(node) : false;
+      opts.newLines || (opts.indentSpaces ?? 0) > 0 ? isWithinWhitespaceSensitive(node) : false;
     if (opts.newLines && !isWithinWhitespaceSensitiveNode) {
       output.text.push('\n');
       output.currentLineWidth = 0;
     }
 
-    if (opts.indentSpaces > 0 && !isWithinWhitespaceSensitiveNode) {
+    if ((opts.indentSpaces ?? 0) > 0 && !isWithinWhitespaceSensitiveNode) {
       for (let i = 0; i < output.indent; i++) {
         output.text.push(' ');
       }
@@ -438,12 +455,21 @@ function escapeString(str: string, attrMode: boolean) {
   return str.replace(LT_REGEX, '&lt;').replace(GT_REGEX, '&gt;');
 }
 
+/**
+ * Determine whether a given node is within a whitespace-sensitive node by
+ * walking the parent chain until either a whitespace-sensitive node is found or
+ * there are no more parents to examine.
+ *
+ * @param node a node to check
+ * @returns whether or not this is within a whitespace-sensitive node
+ */
 function isWithinWhitespaceSensitive(node: Node) {
-  while (node != null) {
-    if (WHITESPACE_SENSITIVE.has(node.nodeName)) {
+  let _node: Node | null = node;
+  while (_node != null) {
+    if (WHITESPACE_SENSITIVE.has(_node.nodeName)) {
       return true;
     }
-    node = node.parentNode;
+    _node = _node.parentNode;
   }
   return false;
 }
@@ -459,6 +485,9 @@ function isWithinWhitespaceSensitive(node: Node) {
   'PLAINTEXT',
 ]);
 
+/**
+ * A list of whitespace sensitive tag names, such as `code`, `pre`, etc.
+ */
 /*@__PURE__*/ export const WHITESPACE_SENSITIVE = new Set([
   'CODE',
   'OUTPUT',
