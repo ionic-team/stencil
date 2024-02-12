@@ -1101,6 +1101,19 @@ export class MockHTMLElement extends MockElement {
     this.nodeName = value;
   }
 
+  /**
+   * A node’s parent of type Element is known as its parent element.
+   * If the node has a parent of a different type, its parent element
+   * is null.
+   * @returns MockElement
+   */
+  override get parentElement() {
+    if (this.nodeName === 'HTML') {
+      return null;
+    }
+    return super.parentElement;
+  }
+
   override get attributes(): MockAttributeMap {
     if (this.__attributeMap == null) {
       const attrMap = createAttributeProxy(true);

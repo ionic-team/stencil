@@ -41,6 +41,7 @@
   ],
   "exclude": [
     "test-prerender",
-    "test-sibling"
+    "test-sibling",
+    "test-global-script"
   ]
 }

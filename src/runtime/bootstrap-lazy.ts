@@ -147,8 +147,12 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
       };
 
       // TODO(STENCIL-914): this check and `else` block can go away and be replaced by just the `scoped` check
-      if (BUILD.experimentalSlotFixes && BUILD.scoped && cmpMeta.$flags$ & CMP_FLAGS.scopedCssEncapsulation) {
-        patchPseudoShadowDom(HostElement.prototype, cmpMeta);
+      if (BUILD.experimentalSlotFixes) {
+        // This check is intentionally not combined with the surrounding `experimentalSlotFixes` check
+        // since, moving forward, we only want to patch the pseudo shadow DOM when the component is scoped
+        if (BUILD.scoped && cmpMeta.$flags$ & CMP_FLAGS.scopedCssEncapsulation) {
+          patchPseudoShadowDom(HostElement.prototype, cmpMeta);
+        }
       } else {
         if (BUILD.slotChildNodesFix) {
           patchChildSlotNodes(HostElement.prototype, cmpMeta);
@@ -192,29 +196,34 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
     });
   });
 
-  // Add styles for `slot-fb` elements if any of our components are using slots outside the Shadow DOM
-  if (hasSlotRelocation) {
-    dataStyles.textContent += SLOT_FB_CSS;
-  }
-
-  // Add hydration styles
-  if (BUILD.invisiblePrehydration && (BUILD.hydratedClass || BUILD.hydratedAttribute)) {
-    dataStyles.textContent += cmpTags + HYDRATED_CSS;
-  }
-
-  // If we have styles, add them to the DOM
-  if (dataStyles.innerHTML.length) {
-    dataStyles.setAttribute('data-styles', '');
-
-    // Apply CSP nonce to the style tag if it exists
-    const nonce = plt.$nonce$ ?? queryNonceMetaTagContent(doc);
-    if (nonce != null) {
-      dataStyles.setAttribute('nonce', nonce);
+  // Only bother generating CSS if we have components
+  // TODO(STENCIL-1118): Add test cases for CSS content based on conditionals
+  if (cmpTags.length > 0) {
+    // Add styles for `slot-fb` elements if any of our components are using slots outside the Shadow DOM
+    if (hasSlotRelocation) {
+      dataStyles.textContent += SLOT_FB_CSS;
     }
 
-    // Insert the styles into the document head
-    // NOTE: this _needs_ to happen last so we can ensure the nonce (and other attributes) are applied
-    head.insertBefore(dataStyles, metaCharset ? metaCharset.nextSibling : head.firstChild);
+    // Add hydration styles
+    if (BUILD.invisiblePrehydration && (BUILD.hydratedClass || BUILD.hydratedAttribute)) {
+      dataStyles.textContent += cmpTags + HYDRATED_CSS;
+    }
+
+
+    // If we have styles, add them to the DOM
+    if (dataStyles.innerHTML.length) {
+      dataStyles.setAttribute('data-styles', '');
+
+      // Apply CSP nonce to the style tag if it exists
+      const nonce = plt.$nonce$ ?? queryNonceMetaTagContent(doc);
+      if (nonce != null) {
+        dataStyles.setAttribute('nonce', nonce);
+      }
+
+      // Insert the styles into the document head
+      // NOTE: this _needs_ to happen last so we can ensure the nonce (and other attributes) are applied
+      head.insertBefore(dataStyles, metaCharset ? metaCharset.nextSibling : head.firstChild);
+    }
   }
 
   // Process deferred connectedCallbacks now all components have been registered

@@ -3,19 +3,19 @@ import { Component, State, h } from '@stencil/core';
 @Component({
   tag: 'attribute-host',
   styles: `
-    [color=lime] {
+    [color='lime'] {
       background: lime;
     }
     section::before {
       content: attr(content);
     }
-    [padding=true] {
+    [padding='true'] {
       padding: 50px;
     }
     [margin] {
       margin: 50px;
     }
-    [bold=true] {
+    [bold='true'] {
       font-weight: bold;
     }
   `,

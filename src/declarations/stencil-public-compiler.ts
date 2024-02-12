@@ -272,6 +272,13 @@ export interface StencilConfig {
   rollupPlugins?: { before?: any[]; after?: any[] };
 
   entryComponentsHint?: string[];
+  /**
+   * Sets whether Stencil will write files to `dist/` during the build or not.
+   *
+   * By default this value is set to the opposite value of {@link devMode},
+   * i.e. it will be `true` when building for production and `false` when
+   * building for development.
+   */
   buildDist?: boolean;
   buildLogFilePath?: string;
   devInspector?: boolean;
@@ -336,6 +343,16 @@ interface ConfigExtrasBase {
    * can be customized at runtime. Defaults to `false`.
    */
   tagNameTransform?: boolean;
+
+  // TODO(STENCIL-1086): remove this option when it's the default behavior
+  /**
+   * Experimental flag.
+   * Updates the behavior of scoped components to align more closely with the behavior of the native
+   * Shadow DOM when using `slot`s.
+   *
+   * Defaults to `false`.
+   */
+  experimentalScopedSlotChanges?: boolean;
 }
 
 // TODO(STENCIL-914): delete this interface when `experimentalSlotFixes` is the default behavior
@@ -1603,8 +1620,12 @@ export interface NodeResolveConfig {
   only?: Array<string | RegExp>;
   modulesOnly?: boolean;
 
+  // TODO(STENCIL-1107): Remove this field [BREAKING_CHANGE]
   /**
    * @see https://github.com/browserify/resolve#resolveid-opts-cb
+   * @deprecated the `customResolveOptions` field is no longer honored in future versions of
+   * `@rollup/plugin-node-resolve`. If you are currently using it, please open a new issue in the Stencil repo to
+   * describe your use case & provide input (https://github.com/ionic-team/stencil/issues/new/choose)
    */
   customResolveOptions?: {
     basedir?: string;

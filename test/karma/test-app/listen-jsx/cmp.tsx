@@ -4,13 +4,14 @@ import { Component, Listen, State, h } from '@stencil/core';
   tag: 'listen-jsx',
   scoped: true,
   styles: `
-  :host{
-    background: black;
-    display: block;
-    color: white;
-    width: 100px;
-    height: 100px;
-  }`,
+    :host {
+      background: black;
+      display: block;
+      color: white;
+      width: 100px;
+      height: 100px;
+    }
+  `,
 })
 export class AttributeBasic {
   @State() wasClicked = '';

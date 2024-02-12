@@ -11,10 +11,8 @@
   ignoreDeps: [
     // TODO(STENCIL-596): Remove once rollup upgrade is unblocked
     'rollup',
-    'rollup-plugin-sourcemaps',
     '@rollup/plugin-commonjs',
     '@rollup/plugin-node-resolve',
-    '@rollup/plugin-replace',
     // TODO(STENCIL-912): Upgrade these two dependencies
     'glob',
     'minimatch',
@@ -62,7 +60,7 @@
     {
       // Increment this value as a part of updating TypeScript
       matchPackageNames: ['typescript'],
-      allowedVersions: '<5.3.0',
+      allowedVersions: '<5.4.0',
     },
     {
       // disable Jest updates until the new testing architecture is in place
@@ -136,9 +134,21 @@
       allowedVersions: '<=8'
     },
     {
+      // We intentionally run the karma tests against TypeScript v5.2 as an attempt to update has failed
+      // due to incompatibilities with `karma-typescript`. Prevent renovate from trying to bump TypeScript.
+      matchFileNames: ['test/karma/package.json'],
+      matchDepNames: ['typescript'],
+      allowedVersions: '<5.3'
+    },
+    {
       matchPackageNames: ['rollup'],
       matchPackagePrefixes: ['@rollup'],
       groupName: 'rollup,'
+    },
+    // TODO(STENCIL-1088): remove once support for Node v16 is dropped
+    {
+      matchPackageNames: ['open'],
+      allowedVersions: '<10',
     }
   ],
   // Never rebase the branch or update it unless manually requested to avoid noisy PR emails

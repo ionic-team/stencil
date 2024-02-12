@@ -444,6 +444,13 @@ describe('element', () => {
     });
   });
 
+  describe('parentElement', () => {
+    it('returns `null` for when accessing the parent element of an html node', () => {
+      const element = new MockHTMLElement(doc, 'myElement');
+      expect(element.parentElement).toEqual(null);
+    });
+  });
+
   describe('input', () => {
     it('list is readonly prop', () => {
       const input = doc.createElement('input');

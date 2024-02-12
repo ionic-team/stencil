@@ -1,7 +1,7 @@
 import { result } from '@utils';
-import type { Serializable as CPSerializable } from 'child_process';
 
 import type { InMemoryFileSystem } from '../compiler/sys/in-memory-fs';
+import type { CPSerializable } from './child_process';
 import type {
   BuildEvents,
   BuildLog,
@@ -190,6 +190,8 @@ export interface BuildConditionals extends Partial<BuildFeatures> {
 
   // TODO(STENCIL-914): remove this option when `experimentalSlotFixes` is the default behavior
   experimentalSlotFixes?: boolean;
+  // TODO(STENCIL-1086): remove this option when it's the default behavior
+  experimentalScopedSlotChanges?: boolean;
 }
 
 export type ModuleFormat =
@@ -1374,24 +1376,6 @@ export interface RenderNode extends HostElement {
    * This value is set to `undefined` whenever the node is put back into its original location.
    */
   ['s-sh']?: string;
-
-  /**
-   * Slot forward slot:
-   * This is the slot that the original `slot` tag element was going to be
-   * forwarded to in another element. For instance:
-   *
-   * ```html
-   * <my-cmp>
-   *  <slot name="my-slot" slot="another-slot"></slot>
-   * </my-cmp>
-   * ```
-   *
-   * In this case, the value would be `another-slot`.
-   *
-   * This allows us to correctly set the `slot` attribute on an element when it is moved
-   * from a non-shadow to shadow element.
-   */
-  ['s-fs']?: string;
 
   /**
    * Original Location Reference:

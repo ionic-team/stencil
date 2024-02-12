@@ -10,16 +10,18 @@ describe('svg attr', () => {
   afterEach(tearDownDom);
 
   it('adds and removes attribute', async () => {
-    const rect = app.querySelector('rect');
+    let rect = app.querySelector('rect');
     expect(rect.getAttribute('transform')).toBe(null);
 
     const button = app.querySelector('button');
     button.click();
     await waitForChanges();
+    rect = app.querySelector('rect');
     expect(rect.getAttribute('transform')).toBe('rotate(45 27 27)');
 
     button.click();
     await waitForChanges();
+    rect = app.querySelector('rect');
     expect(rect.getAttribute('transform')).toBe(null);
   });
 });

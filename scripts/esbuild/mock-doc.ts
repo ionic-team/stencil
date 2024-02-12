@@ -20,6 +20,9 @@ export async function buildMockDoc(opts: BuildOptions) {
   const srcDir = join(opts.srcDir, 'mock-doc');
   const outputDir = opts.output.mockDocDir;
 
+  // clear out rollup stuff and ensure directory exists
+  await fs.emptyDir(outputDir);
+
   // bundle d.ts
   await bundleMockDocDts(opts, inputDir, outputDir);
 
@@ -50,7 +53,6 @@ export async function buildMockDoc(opts: BuildOptions) {
     bundle: true,
     alias: mockDocAliases,
     logLevel: 'info',
-    target: 'node16',
   };
 
   const esmOptions: ESBuildOptions = {

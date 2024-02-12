@@ -56,6 +56,7 @@ const externalNodeModules = [
   'jest-config',
   'jest-message-id',
   'jest-pnp-resolver',
+  'jest-environment-node',
   'jest-runner',
   'puppeteer',
   'puppeteer-core',
@@ -112,5 +113,15 @@ export function getBaseEsbuildOptions(): ESBuildOptions {
     bundle: true,
     legalComments: 'inline',
     logLevel: 'info',
+    target: getEsbuildTargets(),
   };
+}
+
+/**
+ * Get build targets with minimal supported browser versions
+ * @see https://stenciljs.com/docs/support-policy#browser-support
+ * @returns an array of build targets
+ */
+export function getEsbuildTargets(): string[] {
+  return ['node16', 'chrome79', 'edge79', 'firefox70', 'safari14'];
 }

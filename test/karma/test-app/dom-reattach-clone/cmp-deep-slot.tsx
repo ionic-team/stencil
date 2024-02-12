@@ -2,6 +2,7 @@ import { Component, h } from '@stencil/core';
 
 @Component({
   tag: 'dom-reattach-clone-deep-slot',
+  scoped: true,
 })
 export class DomReattachCloneDeep {
   render() {

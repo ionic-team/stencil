@@ -99,6 +99,8 @@ export function mockConfig(overrides: Partial<UnvalidatedConfig> = {}): Unvalida
     minifyJs: false,
     namespace: 'Testing',
     nodeResolve: {
+      // TODO(STENCIL-1107): Remove this field - it's currently overriding Stencil's default options to pass into
+      // the `@rollup/plugin-node-resolve` plugin.
       customResolveOptions: {},
     },
     outputTargets: null,

@@ -32,7 +32,7 @@ export const insertVdomAnnotations = (doc: Document, staticComponents: string[])
     parseVNodeAnnotations(doc, doc.body, docData, orgLocationNodes);
 
     orgLocationNodes.forEach((orgLocationNode) => {
-      if (orgLocationNode != null) {
+      if (orgLocationNode != null && orgLocationNode['s-nr']) {
         const nodeRef = orgLocationNode['s-nr'];
 
         let hostId = nodeRef['s-host-id'];
@@ -49,7 +49,7 @@ export const insertVdomAnnotations = (doc: Document, staticComponents: string[])
             nodeRef.setAttribute(HYDRATE_CHILD_ID, childId);
           } else if (nodeRef.nodeType === NODE_TYPE.TextNode) {
             if (hostId === 0) {
-              const textContent = nodeRef.nodeValue.trim();
+              const textContent = nodeRef.nodeValue?.trim();
               if (textContent === '') {
                 // useless whitespace node at the document root
                 orgLocationNode.remove();
@@ -58,7 +58,7 @@ export const insertVdomAnnotations = (doc: Document, staticComponents: string[])
             }
             const commentBeforeTextNode = doc.createComment(childId);
             commentBeforeTextNode.nodeValue = `${TEXT_NODE_ID}.${childId}`;
-            nodeRef.parentNode.insertBefore(commentBeforeTextNode, nodeRef);
+            nodeRef.parentNode?.insertBefore(commentBeforeTextNode, nodeRef);
           }
         }
 
@@ -138,7 +138,7 @@ const parseVNodeAnnotations = (
 const insertVNodeAnnotations = (
   doc: Document,
   hostElm: d.HostElement,
-  vnode: d.VNode,
+  vnode: d.VNode | undefined,
   docData: DocData,
   cmpData: CmpData,
 ) => {
@@ -162,7 +162,7 @@ const insertVNodeAnnotations = (
     // representing a slot, we use the content of the comment to set the child ID attribute
     // on the host element.
     if (hostElm && vnode && vnode.$elm$ && !hostElm.hasAttribute(HYDRATE_CHILD_ID)) {
-      const parent: HTMLElement = hostElm.parentElement;
+      const parent: HTMLElement | null = hostElm.parentElement;
       if (parent && parent.childNodes) {
         const parentChildNodes: ChildNode[] = Array.from(parent.childNodes);
         const comment: d.RenderNode | undefined = parentChildNodes.find(
@@ -215,12 +215,12 @@ const insertChildVNodeAnnotations = (
     childElm.setAttribute(HYDRATE_CHILD_ID, childId);
   } else if (childElm.nodeType === NODE_TYPE.TextNode) {
     const parentNode = childElm.parentNode;
-    const nodeName = parentNode.nodeName;
+    const nodeName = parentNode?.nodeName;
     if (nodeName !== 'STYLE' && nodeName !== 'SCRIPT') {
       const textNodeId = `${TEXT_NODE_ID}.${childId}`;
 
       const commentBeforeTextNode = doc.createComment(textNodeId);
-      parentNode.insertBefore(commentBeforeTextNode, childElm);
+      parentNode?.insertBefore(commentBeforeTextNode, childElm);
     }
   } else if (childElm.nodeType === NODE_TYPE.CommentNode) {
     if (childElm['s-sr']) {

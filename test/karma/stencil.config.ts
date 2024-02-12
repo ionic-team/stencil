@@ -31,6 +31,7 @@ export const config: Config = {
     lifecycleDOMEvents: true,
     scriptDataOpts: true,
     experimentalSlotFixes: true,
+    experimentalScopedSlotChanges: true,
   },
   devServer: {
     // when running `npm start`, serve from the root directory, rather than the `www` output target location

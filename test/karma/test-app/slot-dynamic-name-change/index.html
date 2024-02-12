@@ -1,0 +1,22 @@
+<!doctype html>
+<meta charset="utf8" />
+<script src="./build/testapp.esm.js" type="module"></script>
+<script src="./build/testapp.js" nomodule></script>
+
+<slot-dynamic-name-change-shadow>
+  <p slot="greeting">Hello</p>
+  <p slot="farewell">Goodbye</p>
+</slot-dynamic-name-change-shadow>
+<slot-dynamic-name-change-scoped>
+  <p slot="greeting">Hello</p>
+  <p slot="farewell">Goodbye</p>
+</slot-dynamic-name-change-scoped>
+
+<button>Toggle slot name</button>
+
+<script>
+  document.querySelector('button').addEventListener('click', () => {
+    document.querySelector('slot-dynamic-name-change-shadow').setAttribute('slot-name', 'farewell');
+    document.querySelector('slot-dynamic-name-change-scoped').setAttribute('slot-name', 'farewell');
+  });
+</script>
