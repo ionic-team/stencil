@@ -209,7 +209,6 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
       dataStyles.textContent += cmpTags + HYDRATED_CSS;
     }
 
-
     // If we have styles, add them to the DOM
     if (dataStyles.innerHTML.length) {
       dataStyles.setAttribute('data-styles', '');
