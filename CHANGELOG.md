@@ -1,3 +1,13 @@
+## 🎯 [4.12.2](https://github.com/ionic-team/stencil/compare/v4.12.1...v4.12.2) (2024-02-12)
+
+
+### Bug Fixes
+
+* **compiler:** support async globalScripts functions ([#5158](https://github.com/ionic-team/stencil/issues/5158)) ([8a129ce](https://github.com/ionic-team/stencil/commit/8a129ce7342ba737db70e0db6eda088cc9461d7f))
+* **mock-doc:** overwrite parentElement in MockHTMLElement to return null ([#5336](https://github.com/ionic-team/stencil/issues/5336)) ([0d9ed22](https://github.com/ionic-team/stencil/commit/0d9ed22c807b1788244258d6cf5eef7c6c637e43))
+
+
+
 ## 🏸 [4.12.1](https://github.com/ionic-team/stencil/compare/v4.12.0...v4.12.1) (2024-02-05)
 
 
