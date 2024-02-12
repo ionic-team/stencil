@@ -62,7 +62,7 @@ jobs:
           echo "" >> $GITHUB_OUTPUT
           echo "If your browser saves files to \`~/Downloads\` you can install it like so:" >> $GITHUB_OUTPUT
           echo "\`\`\`" >> $GITHUB_OUTPUT
-          echo "npm install ~/Downloads/$FILENAME" >> $GITHUB_OUTPUT
+          echo "unzip -d ~/Downloads ~/Downloads/$FILENAME.zip && npm install ~/Downloads/$FILENAME" >> $GITHUB_OUTPUT
           echo "\`\`\`" >> $GITHUB_OUTPUT
           echo "$EOF" >> $GITHUB_OUTPUT
 
