@@ -353,6 +353,15 @@ interface ConfigExtrasBase {
    * Defaults to `false`.
    */
   experimentalScopedSlotChanges?: boolean;
+
+  /**
+   * Experimental flag.
+   * Updates the behavior defined with {@link experimentalScopedSlotChanges} of scoped components
+   * to modify only the default slot's text content instead all the content of host element.
+   *
+   * Defaults to `false`.
+   */
+  experimentalDefaultSlotTextContentFix?: boolean;
 }
 
 // TODO(STENCIL-914): delete this interface when `experimentalSlotFixes` is the default behavior

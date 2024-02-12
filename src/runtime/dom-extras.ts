@@ -267,7 +267,10 @@ export const patchTextContent = (hostElementPrototype: HTMLElement): void => {
       // To mimic shadow root behavior, we need to return the text content of all
       // nodes in a slot reference node
       get(): string | null {
-        const slotRefNodes = getAllChildSlotNodes(this.childNodes);
+        let slotRefNodes = getAllChildSlotNodes(this.childNodes, this.tagName);
+        if (BUILD.experimentalDefaultSlotTextContentFix) {
+          slotRefNodes = slotRefNodes.filter((node) => node['s-sn'] === '');
+        }
 
         const textContent = slotRefNodes
           .map((node) => {
@@ -295,7 +298,10 @@ export const patchTextContent = (hostElementPrototype: HTMLElement): void => {
       // reference node. If a default slot reference node exists, the text content will be
       // placed there. Otherwise, the new text node will be hidden
       set(value: string | null) {
-        const slotRefNodes = getAllChildSlotNodes(this.childNodes);
+        let slotRefNodes = getAllChildSlotNodes(this.childNodes, this.tagName);
+        if (BUILD.experimentalDefaultSlotTextContentFix) {
+          slotRefNodes = slotRefNodes.filter((node) => node['s-sn'] === '');
+        }
 
         slotRefNodes.forEach((node) => {
           // Remove the existing content of the slot
@@ -410,16 +416,17 @@ export const patchChildSlotNodes = (elm: HTMLElement, cmpMeta: d.ComponentRuntim
  * Recursively finds all slot reference nodes ('s-sr') in a series of child nodes.
  *
  * @param childNodes The set of child nodes to search for slot reference nodes.
+ * @param hostName The host component name to search for slot hostname.
  * @returns An array of slot reference nodes.
  */
-const getAllChildSlotNodes = (childNodes: NodeListOf<ChildNode>): d.RenderNode[] => {
+const getAllChildSlotNodes = (childNodes: NodeListOf<ChildNode>, hostName: string): d.RenderNode[] => {
   const slotRefNodes = [];
 
   for (const childNode of Array.from(childNodes) as d.RenderNode[]) {
-    if (childNode['s-sr']) {
+    if (childNode['s-sr'] && hostName === childNode['s-hn']) {
       slotRefNodes.push(childNode);
     }
-    slotRefNodes.push(...getAllChildSlotNodes(childNode.childNodes));
+    slotRefNodes.push(...getAllChildSlotNodes(childNode.childNodes, hostName));
   }
 
   return slotRefNodes;

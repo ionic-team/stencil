@@ -192,6 +192,7 @@ export interface BuildConditionals extends Partial<BuildFeatures> {
   experimentalSlotFixes?: boolean;
   // TODO(STENCIL-1086): remove this option when it's the default behavior
   experimentalScopedSlotChanges?: boolean;
+  experimentalDefaultSlotTextContentFix?: boolean;
 }
 
 export type ModuleFormat =

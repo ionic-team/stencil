@@ -59,4 +59,5 @@ export function resetBuildConditionals(b: d.BuildConditionals) {
   b.experimentalSlotFixes = false;
   // TODO(STENCIL-1086): remove this option when it's the default behavior
   b.experimentalScopedSlotChanges = false;
+  b.experimentalDefaultSlotTextContentFix = false;
 }

@@ -182,8 +182,27 @@ export const validateConfig = (
     validatedConfig.extras.scopedSlotTextContentFix = !!validatedConfig.extras.scopedSlotTextContentFix;
   }
 
-  // TODO(STENCIL-1086): remove this option when it's the default behavior
-  validatedConfig.extras.experimentalScopedSlotChanges = !!validatedConfig.extras.experimentalScopedSlotChanges;
+  if (validatedConfig.extras.experimentalDefaultSlotTextContentFix === true) {
+    const possibleFlags: (keyof ConfigExtras)[] = ['experimentalScopedSlotChanges'];
+    const conflictingFlags = possibleFlags.filter((flag) => validatedConfig.extras[flag] === false);
+    if (conflictingFlags.length > 0) {
+      const warning = buildError(diagnostics);
+      warning.level = 'warn';
+      warning.messageText = `If the 'experimentalDefaultSlotTextContentFix' flag is enabled it will override the 'experimentalScopedSlotChanges' flag which are disabled. In particular, the following currently-disabled flags will be ignored: ${conflictingFlags.join(
+        ', ',
+      )}. Please update your Stencil config accordingly.`;
+    }
+  }
+
+  validatedConfig.extras.experimentalDefaultSlotTextContentFix =
+    !!validatedConfig.extras.experimentalDefaultSlotTextContentFix;
+
+  if (validatedConfig.extras.experimentalDefaultSlotTextContentFix === true) {
+    validatedConfig.extras.experimentalScopedSlotChanges = true;
+  } else {
+    // TODO(STENCIL-1086): remove this option when it's the default behavior
+    validatedConfig.extras.experimentalScopedSlotChanges = !!validatedConfig.extras.experimentalScopedSlotChanges;
+  }
 
   setBooleanConfig(
     validatedConfig,

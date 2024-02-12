@@ -430,6 +430,16 @@ describe('validation', () => {
     expect(config.extras.experimentalScopedSlotChanges).toBe(true);
   });
 
+  it('should override experimentalScopedSlotChanges config based on `experimentalDefaultSlotTextContentFix`', () => {
+    userConfig.extras = {
+      experimentalScopedSlotChanges: false,
+      experimentalDefaultSlotTextContentFix: true,
+    } as any;
+    const { config } = validateConfig(userConfig, bootstrapConfig);
+    expect(config.extras.experimentalScopedSlotChanges).toBe(true);
+    expect(config.extras.experimentalDefaultSlotTextContentFix).toBe(true);
+  });
+
   it('should set taskQueue "async" by default', () => {
     const { config } = validateConfig(userConfig, bootstrapConfig);
     expect(config.taskQueue).toBe('async');
