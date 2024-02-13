@@ -59,7 +59,7 @@ jobs:
           persist-credentials: false
 
       - name: Use Node Version from Volta (Karma)
-        uses: actions/setup-node@b39b52d1213e96004bfcb1c61a8a6fa8ab84f3e8 # v4.0.1
+        uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
         with:
           # pull the version to use from the volta key in package.json
           node-version-file: './test/karma/package.json'

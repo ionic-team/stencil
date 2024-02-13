@@ -201,12 +201,12 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
   if (cmpTags.length > 0) {
     // Add styles for `slot-fb` elements if any of our components are using slots outside the Shadow DOM
     if (hasSlotRelocation) {
-      dataStyles.innerHTML += SLOT_FB_CSS;
+      dataStyles.textContent += SLOT_FB_CSS;
     }
 
     // Add hydration styles
     if (BUILD.invisiblePrehydration && (BUILD.hydratedClass || BUILD.hydratedAttribute)) {
-      dataStyles.innerHTML += cmpTags + HYDRATED_CSS;
+      dataStyles.textContent += cmpTags + HYDRATED_CSS;
     }
 
     // If we have styles, add them to the DOM
