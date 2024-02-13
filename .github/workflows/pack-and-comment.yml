@@ -1,33 +1,32 @@
 name: Pack and Comment
+# for each PR this workflow builds and then packs a Stencil tarball and then
+# posts a comment on the PR with a link to download the tarball, as well as an
+# example command for installing the tarball in a project.
 
 on:
-  workflow_call:
-    # Make this a reusable workflow, no value needed
-    # https://docs.github.com/en/actions/using-workflows/reusing-workflows
-    inputs:
-      build_name:
-        description: Name for the build, used to resolve the correct build artifact
-        required: true
-        type: string
+  pull_request_target:
+    branches:
+      - '**'
 
 jobs:
   pack:
     name: Pack and Comment
     runs-on: 'ubuntu-22.04'
-    if: ${{ github.event_name == 'pull_request' }}
     steps:
       - name: Checkout Code
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        with:
+          # the pull_request_target event will consider the HEAD of `main` to be the SHA to use.
+          # attempt to use the SHA associated with a pull request and fallback to HEAD of `main`
+          ref: ${{ github.event_name == 'pull_request_target' && format('refs/pull/{0}/merge', github.event.number) || '' }}
+          persist-credentials: false
 
       - name: Get Core Dependencies
         uses: ./.github/workflows/actions/get-core-dependencies
 
-      - name: Download Build Archive
-        uses: ./.github/workflows/actions/download-archive
-        with:
-          name: ${{ inputs.build_name }}
-          path: .
-          filename: stencil-core-build.zip
+      - name: Core Build
+        run: npm run build -- --ci
+        shell: bash
 
       - name: Set Version
         run: npm version --no-git-tag-version $(./bin/stencil version)
@@ -40,7 +39,7 @@ jobs:
           FILENAME=$(npm pack --quiet)
           echo "FILENAME=$FILENAME" >> "$GITHUB_OUTPUT"
 
-      - uses: actions/upload-artifact@26f96dfa697d77e81fd5907df203aa23a56210a8 # v4.3.0
+      - uses: actions/upload-artifact@5d5d22a31266ced268874388b861e4b58bb5c2f3 # v4.3.1
         id: upload-tarball
         with:
           name: ${{ steps.pack.outputs.filename }}
