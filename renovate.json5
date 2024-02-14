@@ -68,16 +68,6 @@
       groupName: 'Jest',
       allowedVersions: '<28.0.0',
     },
-    // TODO(STENCIL-590): remove these once deps are removed
-    {
-      matchPackageNames: ['@types/inquirer'],
-      allowedVersions: '<=7.3.1',
-    },
-    // TODO(STENCIL-590): remove these once deps are removed
-    {
-      matchPackageNames: ['inquirer'],
-      allowedVersions: '<=7.3.3',
-    },
     {
       matchPackagePrefixes: ['@typescript-eslint'],
       groupName: 'TypeScript-ESLint',
