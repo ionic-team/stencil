@@ -149,6 +149,11 @@
     {
       matchPackageNames: ['open'],
       allowedVersions: '<10',
+    },
+    // TODO(STENCIL-1141): remove once support for Node v16 is dropped
+    {
+      matchPackageNames: ['puppeteer'],
+      allowedVersions: '<21',
     }
   ],
   // Never rebase the branch or update it unless manually requested to avoid noisy PR emails
