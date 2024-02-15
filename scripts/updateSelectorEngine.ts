@@ -13,7 +13,7 @@ import path from 'node:path';
  * ```
  */
 
-const rootDir = path.resolve(__dirname, '..', '..');
+const rootDir = path.resolve(__dirname, '..');
 const jqueryDepDir = path.resolve(rootDir, 'node_modules', 'jquery');
 const WINDOW_MOCK = `{
   document: {
