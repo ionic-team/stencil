@@ -13,7 +13,7 @@ import path from 'node:path';
  * ```
  */
 
-const rootDir = path.resolve(__dirname, '..', '..');
+const rootDir = path.resolve(__dirname, '..');
 const jqueryDepDir = path.resolve(rootDir, 'node_modules', 'jquery');
 const WINDOW_MOCK = `{
   document: {
@@ -29,7 +29,7 @@ const WINDOW_MOCK = `{
 }`;
 
 async function run() {
-  console.log('updating JQuery Sel!ector engine...');
+  console.log('updating JQuery Selector engine...');
 
   await runCommand(`npm install --ignore-scripts`, jqueryDepDir);
   await runCommand(`npm run build -- --include=selector`, jqueryDepDir);
