@@ -33,7 +33,7 @@ export async function createContentTypeData(opts: BuildOptions) {
   Object.keys(mimeDbJson).forEach((mimeType) => {
     const mimeTypeData = mimeDbJson[mimeType];
     if (Array.isArray(mimeTypeData.extensions)) {
-      mimeTypeData.extensions.forEach((ext) => {
+      mimeTypeData.extensions.forEach((ext: string) => {
         extData.push({
           ext,
           mimeType,
@@ -42,14 +42,14 @@ export async function createContentTypeData(opts: BuildOptions) {
     }
   });
 
-  const exts = {};
+  const exts: Record<string, string> = {};
   extData
     .sort((a, b) => {
       if (a.ext < b.ext) return -1;
       if (a.ext > b.ext) return 1;
       return 0;
     })
-    .forEach((x) => (exts[x.ext] = x.mimeType));
+    .forEach((x: any) => (exts[x.ext] = x.mimeType));
 
   return `export default ${JSON.stringify(exts)}`;
 }

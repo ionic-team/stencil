@@ -1,4 +1,4 @@
-import type { BuildOptions as ESBuildOptions, BuildResult as ESBuildResult, Plugin } from 'esbuild';
+import type { BuildOptions as ESBuildOptions, BuildResult as ESBuildResult, OutputFile, Plugin } from 'esbuild';
 import * as esbuild from 'esbuild';
 import { join } from 'path';
 
@@ -145,4 +145,21 @@ export function externalAlias(moduleId: string, resolveToPath: string): Plugin {
       });
     },
   };
+}
+
+/**
+ * Extract the first {@link OutputFile} record from an Esbuild
+ * {@link BuildResult}. This _may_ not be present, so in order to guarantee
+ * type safety this function throws if such an `OutputFile` cannot be found.
+ *
+ * @throws if no `OutputFile` can be found.
+ * @param buildResult the Esbuild build result in which to look
+ * @returns the OutputFile
+ */
+export function getFirstOutputFile(buildResult: ESBuildResult): OutputFile {
+  const bundle = buildResult.outputFiles?.[0];
+  if (!bundle) {
+    throw new Error('Could not find an output file in the BuildResult!');
+  }
+  return bundle;
 }

@@ -29,7 +29,9 @@ export async function release(rootDir: string, args: ReadonlyArray<string>): Pro
       console.log(`\n${color.bold.red('No `--version [VERSION]` argument was found. Exiting')}\n`);
       process.exit(1);
     }
-    prepareOpts.version = getNewVersion(prepareOpts.packageJson.version, args[versionIdx + 1]);
+    if (prepareOpts.packageJson.version) {
+      prepareOpts.version = getNewVersion(prepareOpts.packageJson.version, args[versionIdx + 1]);
+    }
 
     await prepareRelease(prepareOpts, args);
     console.log(`${color.bold.blue('Release Prepared!')}`);
@@ -42,7 +44,9 @@ export async function release(rootDir: string, args: ReadonlyArray<string>): Pro
       isProd: true,
     });
     // this was bumped already, we just need to copy it from package.json into this field
-    prepareOpts.version = prepareOpts.packageJson.version;
+    if (prepareOpts.packageJson.version) {
+      prepareOpts.version = prepareOpts.packageJson.version;
+    }
 
     // we generated a vermoji during the preparation step, let's grab it from the changelog
     prepareOpts.vermoji = getLatestVermoji(prepareOpts.changelogPath);
@@ -72,7 +76,7 @@ export async function release(rootDir: string, args: ReadonlyArray<string>): Pro
       isCI: prepareOpts.isCI,
       isPublishRelease: true,
       isProd: true,
-      tag: newTag,
+      tag: newTag ?? undefined,
     });
     return await publishRelease(publishOpts, args);
   }

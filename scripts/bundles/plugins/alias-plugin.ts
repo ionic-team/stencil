@@ -36,7 +36,7 @@ export function aliasPlugin(opts: BuildOptions): Plugin {
      * @param id the importee exactly as it is written in an import statement in the source code
      * @returns a resolution to an import to a different id, potentially externalizing it from the bundle simultaneously
      */
-    resolveId(id: string): PartialResolvedId | string | null {
+    resolveId(id: string): PartialResolvedId | string | null | undefined {
       const externalId = alias.get(id);
       if (externalId) {
         return {

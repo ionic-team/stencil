@@ -28,7 +28,7 @@ export function terserPlugin(opts: BuildOptions): Plugin {
      * @param id the path of the module to load
      * @returns the Terser source
      */
-    async load(id: string): Promise<string> | null {
+    async load(id: string): Promise<string | null> {
       if (id === 'terser') {
         const [content] = await bundleTerser(opts);
         return content;
@@ -45,6 +45,10 @@ export function terserPlugin(opts: BuildOptions): Plugin {
  * was written
  */
 export async function bundleTerser(opts: BuildOptions): Promise<[content: string, path: string]> {
+  if (!opts.terserVersion) {
+    throw new Error('Terser version not set on build opts!');
+  }
+
   const fileName = `terser-${opts.terserVersion.replace(/\./g, '_')}-bundle-cache${opts.isProd ? '.min' : ''}.js`;
   const cacheFile = join(opts.scriptsBuildDir, fileName);
 
@@ -80,7 +84,9 @@ export async function bundleTerser(opts: BuildOptions): Promise<[content: string
         comments: false,
       },
     });
-    code = minified.code;
+    if (minified.code) {
+      code = minified.code;
+    }
   }
 
   code = `// Terser ${opts.terserVersion}\n` + code;
