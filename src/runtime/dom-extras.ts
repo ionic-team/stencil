@@ -272,6 +272,12 @@ export const patchTextContent = (hostElementPrototype: HTMLElement): void => {
           slotRefNodes = slotRefNodes.filter((node) => node['s-sn'] === '');
         }
 
+        if (!slotRefNodes.length) {
+          // we couldn't find a slot, but that doesn't mean that there isn't one. if this check ran before the DOM
+          // loaded, we could have missed it. fallback to the original implementation
+          return this.__textContent;
+        }
+
         const textContent = slotRefNodes
           .map((node) => {
             const text = [];
@@ -303,6 +309,12 @@ export const patchTextContent = (hostElementPrototype: HTMLElement): void => {
           slotRefNodes = slotRefNodes.filter((node) => node['s-sn'] === '');
         }
 
+        if (!slotRefNodes.length) {
+          // we couldn't find a slot, but that doesn't mean that there isn't one. if this check ran before the DOM
+          // loaded, we could have missed it. fallback to the original implementation
+          this.__textContent = value;
+          return;
+        }
         slotRefNodes.forEach((node) => {
           // Remove the existing content of the slot
           let slotContent = node.nextSibling as d.RenderNode | null;
