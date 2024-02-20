@@ -5,6 +5,15 @@ import { consoleDevError, consoleError } from './client-log';
 
 export const cmpModules = /*@__PURE__*/ new Map<string, { [exportName: string]: d.ComponentConstructor }>();
 
+/**
+ * We need to separate out this prefix so that Esbuild doesn't try to resolve
+ * the below, but instead retains a dynamic `import()` statement in the
+ * emitted code.
+ *
+ * See here for details https://esbuild.github.io/api/#glob
+ */
+const MODULE_IMPORT_PREFIX = './';
+
 export const loadModule = (
   cmpMeta: d.ComponentRuntimeMeta,
   hostRef: d.HostRef,
@@ -29,7 +38,7 @@ export const loadModule = (
     /* webpackInclude: /\.entry\.js$/ */
     /* webpackExclude: /\.system\.entry\.js$/ */
     /* webpackMode: "lazy" */
-    `./${bundleId}.entry.js${BUILD.hotModuleReplacement && hmrVersionId ? '?s-hmr=' + hmrVersionId : ''}`
+    `${MODULE_IMPORT_PREFIX}${bundleId}.entry.js${BUILD.hotModuleReplacement && hmrVersionId ? '?s-hmr=' + hmrVersionId : ''}`
   ).then((importedModule) => {
     if (!BUILD.hotModuleReplacement) {
       cmpModules.set(bundleId, importedModule);
