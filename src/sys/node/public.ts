@@ -15,7 +15,7 @@ export declare function createNodeLogger(): Logger;
  * @param c an object containing a `Process` for Stencil to use and a logger instanced created by {@link createNodeLogger}
  * @returns a {@link CompilerSystem} object
  */
-export declare function createNodeSys(c: { process: any; logger: any }): CompilerSystem;
+export declare function createNodeSys(c: { process?: any; logger?: any }): CompilerSystem;
 
 /**
  * Sets up the NodeJS process to be used by Stencil. This includes setting up the process's
