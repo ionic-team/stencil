@@ -267,9 +267,9 @@ async function validateCompiler(opts: BuildOptions): Promise<void> {
 
   const compiler = await import(compilerPath);
   const cli = await import(cliPath);
-  const sysNodeApi = await import(sysNodePath) as {
-    createNodeSys: typeof createNodeSys,
-    createNodeLogger: typeof createNodeLogger
+  const sysNodeApi = (await import(sysNodePath)) as {
+    createNodeSys: typeof createNodeSys;
+    createNodeLogger: typeof createNodeLogger;
   };
 
   const nodeLogger = sysNodeApi.createNodeLogger();
