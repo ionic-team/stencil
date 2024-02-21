@@ -26,6 +26,18 @@ export function createRequestHandler(devServerConfig: d.DevServerConfig, serverC
           return serverCtx.serve302(req, res);
         }
 
+        // TODO: Make path configurable
+        if (req.pathname === '/ping') {
+          return serverCtx
+            .getBuildResults()
+            .then(() => {
+              res.statusCode = 200;
+              res.write('Yo');
+              res.end();
+            })
+            .catch(() => serverCtx.serve500(incomingReq, res, 'Error getting build results', 'ping error'));
+        }
+
         if (isDevClient(req.pathname) && devServerConfig.websocket) {
           return serveDevClient(devServerConfig, serverCtx, req, res);
         }
