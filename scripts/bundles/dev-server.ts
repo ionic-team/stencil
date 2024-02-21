@@ -60,7 +60,7 @@ export async function devServer(opts: BuildOptions) {
     'zlib',
   ];
 
-  const plugins = [
+  const plugins: Plugin[] = [
     contentTypesPlugin(opts),
     {
       name: 'devServerWorkerResolverPlugin',
@@ -174,7 +174,7 @@ export async function devServer(opts: BuildOptions) {
               },
             });
 
-            if (tsResults.diagnostics.length > 0) {
+            if (tsResults.diagnostics?.length) {
               throw new Error(tsResults.diagnostics as any);
             }
 
@@ -189,7 +189,9 @@ export async function devServer(opts: BuildOptions) {
                 compress: { hoist_vars: true, hoist_funs: true, ecma: 5 },
                 format: { ecma: 5 },
               });
-              code = minifyResults.code;
+              if (minifyResults.code) {
+                code = minifyResults.code;
+              }
             }
 
             code = banner + code + footer;

@@ -31,7 +31,7 @@ export function parse5Plugin(opts: BuildOptions): Plugin {
      * @param id the path of the module to load
      * @returns parse5, pre-bundled
      */
-    async load(id: string): Promise<string> | null {
+    async load(id: string): Promise<string | null> {
       if (id === 'parse5') {
         const [contents] = await bundleParse5(opts);
         return contents;
@@ -115,7 +115,9 @@ export async function bundleParse5(opts: BuildOptions): Promise<[contents: strin
         comments: false,
       },
     });
-    code = minified.code;
+    if (minified.code) {
+      code = minified.code;
+    }
   }
 
   code = `// Parse5 ${opts.parse5Version}\n` + code;

@@ -6,7 +6,14 @@ import { copyTestingInternalDts } from '../bundles/testing';
 import { getBanner } from '../utils/banner';
 import type { BuildOptions } from '../utils/options';
 import { writePkgJson } from '../utils/write-pkg-json';
-import { externalAlias, getBaseEsbuildOptions, getEsbuildAliases, getEsbuildExternalModules, runBuilds } from './util';
+import {
+  externalAlias,
+  getBaseEsbuildOptions,
+  getEsbuildAliases,
+  getEsbuildExternalModules,
+  getFirstOutputFile,
+  runBuilds,
+} from './util';
 
 const EXTERNAL_TESTING_MODULES = [
   'constants',
@@ -86,7 +93,7 @@ function lazyRequirePlugin(opts: BuildOptions, moduleIds: string[]): Plugin {
     name: 'lazyRequirePlugin',
     setup(build) {
       build.onEnd(async (buildResult) => {
-        const bundle = buildResult.outputFiles[0];
+        const bundle = getFirstOutputFile(buildResult);
         let code = Buffer.from(bundle.contents).toString();
 
         for (const moduleId of moduleIds) {

@@ -174,7 +174,7 @@ function validatePackage(opts: BuildOptions, testPkg: TestPackage, dtsEntries: s
         fs.accessSync(pkgFile);
       });
       testPkg.packageJsonFiles.forEach((testPkgFile) => {
-        if (!pkgJson.files.includes(testPkgFile)) {
+        if (!pkgJson.files?.includes(testPkgFile)) {
           throw new Error(testPkg.packageJson + ' missing file ' + testPkgFile);
         }
 
@@ -189,8 +189,10 @@ function validatePackage(opts: BuildOptions, testPkg: TestPackage, dtsEntries: s
 
     if (pkgJson.bin) {
       Object.keys(pkgJson.bin).forEach((k) => {
-        const binExe = join(pkgDir, pkgJson.bin[k]);
-        fs.accessSync(binExe);
+        if (pkgJson.bin?.[k]) {
+          const binExe = join(pkgDir, pkgJson.bin[k]);
+          fs.accessSync(binExe);
+        }
       });
     }
 
@@ -296,7 +298,7 @@ async function validateCompiler(opts: BuildOptions): Promise<void> {
   console.log(`🐋  Validated compiler.transpileSync()`);
 
   const orgConsoleLog = console.log;
-  let loggedVersion = null;
+  let loggedVersion = '';
   console.log = (value: string) => (loggedVersion = value);
 
   // this runTask is intentionally not wrapped in telemetry helpers

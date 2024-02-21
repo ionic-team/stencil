@@ -11,7 +11,7 @@ import { bundleExternal, sysNodeBundleCacheDir } from '../bundles/sys-node';
 import { getBanner } from '../utils/banner';
 import { type BuildOptions, createReplaceData } from '../utils/options';
 import { writePkgJson } from '../utils/write-pkg-json';
-import { getBaseEsbuildOptions, getEsbuildAliases, runBuilds } from './util';
+import { getBaseEsbuildOptions, getEsbuildAliases, getFirstOutputFile, runBuilds } from './util';
 
 const CONNECTOR_NAME = 'connector.html';
 
@@ -199,7 +199,10 @@ function clientConnectorPlugin(opts: BuildOptions): Plugin {
     name: 'clientConnectorPlugin',
     setup(build) {
       build.onEnd(async (buildResult) => {
-        const bundle = buildResult.outputFiles.find((b) => b.path.endsWith(CONNECTOR_NAME));
+        const bundle = buildResult.outputFiles?.find((b) => b.path.endsWith(CONNECTOR_NAME));
+        if (!bundle) {
+          throw "Couldn't find build result!";
+        }
         let code = Buffer.from(bundle.contents).toString();
 
         const tsResults = ts.transpileModule(code, {
@@ -208,7 +211,7 @@ function clientConnectorPlugin(opts: BuildOptions): Plugin {
           },
         });
 
-        if (tsResults.diagnostics.length > 0) {
+        if (tsResults.diagnostics?.length) {
           throw new Error(tsResults.diagnostics as any);
         }
 
@@ -221,7 +224,9 @@ function clientConnectorPlugin(opts: BuildOptions): Plugin {
             compress: { hoist_vars: true, hoist_funs: true, ecma: 5 },
             format: { ecma: 5 },
           });
-          code = minifyResults.code;
+          if (minifyResults.code) {
+            code = minifyResults.code;
+          }
         }
 
         code = banner + code + footer;
@@ -243,7 +248,7 @@ function serverProcessAliasPlugin(): Plugin {
     name: 'serverProcessAlias',
     setup(build) {
       build.onEnd(async (buildResult) => {
-        const bundle = buildResult.outputFiles[0];
+        const bundle = getFirstOutputFile(buildResult);
         let code = Buffer.from(bundle.contents).toString();
         code = code.replace('await import("@dev-server-process")', '(await import("./server-process.js")).default');
         return fs.writeFile(bundle.path, code);
@@ -262,7 +267,7 @@ function esm2CJSPlugin(): Plugin {
     name: 'esm2CJS',
     setup(build) {
       build.onEnd(async (buildResult) => {
-        const bundle = buildResult.outputFiles[0];
+        const bundle = getFirstOutputFile(buildResult);
         let code = Buffer.from(bundle.contents).toString();
         code = code.replace('import_meta.url', 'new (require("url").URL)("file:" + __filename).href');
         return fs.writeFile(bundle.path, code);
@@ -276,7 +281,7 @@ function esm2CJSPlugin(): Plugin {
  * @param opts build options
  * @returns an esbuild plugin
  */
-function contentTypesPlugin(opts) {
+function contentTypesPlugin(opts: BuildOptions): Plugin {
   return {
     name: 'contentTypesPlugin',
     setup(build) {
