@@ -6,6 +6,14 @@ import type { CompilerSystem, Logger } from '@stencil/core/internal';
  * @returns a {@link Logger} object
  */
 export declare function createNodeLogger(): Logger;
+/**
+ * Creates a "logger", based off of NodeJS APIs, that will be used by the compiler and dev-server.
+ * The NodeJS "process" object must be provided as a property in the first argument's object.
+ * @param c an object containing a `Process` for Stencil to use and a logger instanced created by {@link createNodeLogger}
+ * @returns a {@link Logger} object
+ * @deprecated Use {@link createNodeLogger} without parameters instead
+ */
+export declare function createNodeLogger(c: { process: any }): Logger;
 
 /**
  * Creates the "system", based off of NodeJS APIs, used by the compiler. This includes any and
