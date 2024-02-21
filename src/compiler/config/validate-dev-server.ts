@@ -29,6 +29,16 @@ export const validateDevServer = (config: d.ValidatedConfig, diagnostics: d.Diag
 
   devServer.address = devServer.address.split('/')[0];
 
+  // Validate "ping" route option
+  if (devServer.pingRoute !== null) {
+    let pingRoute = isString(devServer.pingRoute) ? devServer.pingRoute : '/ping';
+    if (!pingRoute.startsWith('/')) {
+      pingRoute = `/${pingRoute}`;
+    }
+
+    devServer.pingRoute = pingRoute;
+  }
+
   // split on `:` to get the domain and the (possibly present) port
   // separately. we've already sliced off the protocol (if present) above
   // so we can safely split on `:` here.
