@@ -199,7 +199,6 @@ export interface BuildOptions {
   isPublishRelease: boolean;
   isWatch: boolean;
   jqueryVersion: string;
-  otp?: string;
   packageJson: PackageData;
   packageJsonPath: string;
   packageLockJsonPath: string;
