@@ -3,7 +3,7 @@ import { dirname, join, relative } from 'path';
 import { rollup } from 'rollup';
 import ts, { ModuleResolutionKind, ScriptTarget } from 'typescript';
 
-import { createNodeLogger, createNodeSys } from '../../src/sys/node/index.js';
+import type { createNodeLogger, createNodeSys } from '../../src/sys/node/index.js';
 import { NODE_BUILTINS } from '../utils/constants.js';
 import { BuildOptions, getOptions } from '../utils/options.js';
 import { PackageData } from '../utils/write-pkg-json.js';
