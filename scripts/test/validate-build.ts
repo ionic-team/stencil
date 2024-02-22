@@ -3,7 +3,6 @@ import { dirname, join, relative } from 'path';
 import { rollup } from 'rollup';
 import ts, { ModuleResolutionKind, ScriptTarget } from 'typescript';
 
-import type { createNodeLogger, createNodeSys } from '../../src/sys/node/index.js';
 import { NODE_BUILTINS } from '../utils/constants.js';
 import { BuildOptions, getOptions } from '../utils/options.js';
 import { PackageData } from '../utils/write-pkg-json.js';
@@ -267,10 +266,7 @@ async function validateCompiler(opts: BuildOptions): Promise<void> {
 
   const compiler = await import(compilerPath);
   const cli = await import(cliPath);
-  const sysNodeApi = (await import(sysNodePath)) as {
-    createNodeSys: typeof createNodeSys;
-    createNodeLogger: typeof createNodeLogger;
-  };
+  const sysNodeApi = await import(sysNodePath);
 
   const nodeLogger = sysNodeApi.createNodeLogger();
   const nodeSys = sysNodeApi.createNodeSys({ process });
