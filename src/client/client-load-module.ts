@@ -10,7 +10,16 @@ export const cmpModules = /*@__PURE__*/ new Map<string, { [exportName: string]: 
  * the below, but instead retains a dynamic `import()` statement in the
  * emitted code.
  *
- * See here for details https://esbuild.github.io/api/#glob
+ * See here for details https://esbuild.github.io/api/#non-analyzable-imports
+ *
+ * We need to do this in order to prevent Esbuild from analyzing / transforming
+ * the input. However some _other_ bundlers will _not_ work with such an import
+ * if it _lacks_ a leading `"./"`, so we thus we have to do a little dance
+ * where here in the source code it must be like this, so that an undesirable
+ * transformation that Esbuild would otherwise carry out doesn't occur, but we
+ * actually need to then manually edit the bundled Esbuild code later on to fix
+ * that. We do this with plugins in the Esbuild and Rollup bundles which
+ * include this file.
  */
 const MODULE_IMPORT_PREFIX = './';
 
