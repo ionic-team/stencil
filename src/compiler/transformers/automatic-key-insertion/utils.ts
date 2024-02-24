@@ -1,5 +1,4 @@
-import { createHash } from 'node:crypto';
-
+import { createHash } from 'crypto';
 import ts from 'typescript';
 
 /**

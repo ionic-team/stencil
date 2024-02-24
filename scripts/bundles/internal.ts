@@ -40,7 +40,7 @@ export async function internal(opts: BuildOptions) {
   return [...clientPlatformBundle, ...hydratePlatformBundles, ...testingPlatform, await internalAppData(opts)];
 }
 
-async function copyStencilInternalDts(opts: BuildOptions, outputInternalDir: string) {
+export async function copyStencilInternalDts(opts: BuildOptions, outputInternalDir: string) {
   const declarationsInputDir = join(opts.buildDir, 'declarations');
 
   // copy to @stencil/core/internal
