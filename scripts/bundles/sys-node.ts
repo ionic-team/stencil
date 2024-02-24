@@ -2,6 +2,7 @@ import rollupCommonjs from '@rollup/plugin-commonjs';
 import rollupResolve from '@rollup/plugin-node-resolve';
 import fs from 'fs-extra';
 import { join } from 'path';
+import resolve from 'resolve';
 import type { RollupOptions } from 'rollup';
 import webpack, { Configuration } from 'webpack';
 
@@ -162,9 +163,9 @@ export function bundleExternal(opts: BuildOptions, outputDir: string, cachedDir:
           return callback(null, '../../mock-doc');
         }
 
-        if (whitelist.has(request)) {
+        if (typeof request === 'string' && whitelist.has(request)) {
           // we specifically do not want to bundle these imports
-          require.resolve(request);
+          resolve.sync(request);
           return callback(null, request);
         }
 
@@ -189,9 +190,9 @@ export function bundleExternal(opts: BuildOptions, outputDir: string, cachedDir:
       const { minify } = await import('terser');
       if (err && err.message) {
         rejectBundle(err);
-      } else {
+      } else if (stats) {
         const info = stats.toJson({ errors: true });
-        if (stats.hasErrors()) {
+        if (stats.hasErrors() && info && info.errors) {
           const webpackError = info.errors.join('\n');
           rejectBundle(webpackError);
         } else {
@@ -200,7 +201,9 @@ export function bundleExternal(opts: BuildOptions, outputDir: string, cachedDir:
           if (opts.isProd) {
             try {
               const minifyResults = await minify(code);
-              code = minifyResults.code;
+              if (minifyResults.code) {
+                code = minifyResults.code;
+              }
             } catch (e) {
               rejectBundle(e);
               return;

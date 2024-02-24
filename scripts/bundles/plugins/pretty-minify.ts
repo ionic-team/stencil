@@ -2,7 +2,7 @@ import type { OutputChunk, Plugin } from 'rollup';
 
 import type { BuildOptions } from '../../utils/options';
 
-export function prettyMinifyPlugin(opts: BuildOptions, preamble?: string): Plugin {
+export function prettyMinifyPlugin(opts: BuildOptions, preamble?: string): Plugin | undefined {
   if (opts.isProd) {
     return {
       name: 'prettyMinifyPlugin',
@@ -26,11 +26,15 @@ export function prettyMinifyPlugin(opts: BuildOptions, preamble?: string): Plugi
                 format: { ecma: 2018, indent_level: 1, beautify: true, comments: false, preamble },
                 sourceMap: false,
               });
-              b.code = minifyResults.code;
+              if (minifyResults.code) {
+                b.code = minifyResults.code;
+              }
             }
           }),
         );
       },
     };
+  } else {
+    return undefined;
   }
 }

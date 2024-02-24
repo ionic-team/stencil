@@ -1,3 +1,13 @@
+## 🐍 [4.12.3](https://github.com/ionic-team/stencil/compare/v4.12.2...v4.12.3) (2024-02-20)
+
+
+### Bug Fixes
+
+* **compiler:** point crypto import at `crypto` instead of `node:crypto` ([#5369](https://github.com/ionic-team/stencil/issues/5369)) ([7fb783f](https://github.com/ionic-team/stencil/commit/7fb783fbc0d3c67136cfc0a777da03c9ac22a51c)), closes [#5358](https://github.com/ionic-team/stencil/issues/5358)
+* **runtime:** replace `innerHTML` with `textContent` for CSS injection ([#5207](https://github.com/ionic-team/stencil/issues/5207)) ([8de2ab5](https://github.com/ionic-team/stencil/commit/8de2ab5a8ad99876d371a68c3709c5299be29974)), closes [#5206](https://github.com/ionic-team/stencil/issues/5206)
+
+
+
 ## 🎯 [4.12.2](https://github.com/ionic-team/stencil/compare/v4.12.1...v4.12.2) (2024-02-12)
 
 
