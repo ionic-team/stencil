@@ -8,7 +8,7 @@ import type { BuildOptions } from '../utils/options';
 import { writePkgJson } from '../utils/write-pkg-json';
 import { aliasPlugin } from './plugins/alias-plugin';
 import { reorderCoreStatementsPlugin } from './plugins/reorder-statements';
-import { replacePlugin } from './plugins/replace-plugin';
+import { loadModuleReplacePlugin, replacePlugin } from './plugins/replace-plugin';
 
 export async function internalClient(opts: BuildOptions) {
   const inputClientDir = join(opts.buildDir, 'client');
@@ -55,6 +55,7 @@ export async function internalClient(opts: BuildOptions) {
       aliasPlugin(opts),
       replacePlugin(opts),
       reorderCoreStatementsPlugin(),
+      loadModuleReplacePlugin(),
     ],
   };
 

@@ -87,7 +87,7 @@ export async function bundleBuild(opts: BuildOptions): Promise<void> {
             await bundle.write(output);
           }),
         );
-      } else {
+      } else if (rollupOption.output) {
         await bundle.write(rollupOption.output);
       }
     }),

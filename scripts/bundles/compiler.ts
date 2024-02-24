@@ -144,7 +144,7 @@ export async function compiler(opts: BuildOptions) {
         name: 'compilerMinify',
         async generateBundle(_, bundleFiles) {
           if (opts.isProd) {
-            const compilerFilename = Object.keys(bundleFiles).find((f) => f.includes('stencil'));
+            const compilerFilename = Object.keys(bundleFiles).find((f) => f.includes('stencil')) as string;
             const compilerBundle = bundleFiles[compilerFilename] as OutputChunk;
             const minified = await minifyStencilCompiler(compilerBundle.code, opts);
             await fs.writeFile(join(opts.output.compilerDir, compilerFilename.replace('.js', '.min.js')), minified);

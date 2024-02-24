@@ -36,7 +36,7 @@ export function aliasPlugin(opts: BuildOptions): Plugin {
      * @param id the importee exactly as it is written in an import statement in the source code
      * @returns a resolution to an import to a different id, potentially externalizing it from the bundle simultaneously
      */
-    resolveId(id: string): PartialResolvedId | string | null {
+    resolveId(id: string): PartialResolvedId | string | null | undefined {
       const externalId = alias.get(id);
       if (externalId) {
         return {
@@ -49,6 +49,9 @@ export function aliasPlugin(opts: BuildOptions): Plugin {
       }
       if (id === '@utils') {
         return join(opts.buildDir, 'utils', 'index.js');
+      }
+      if (id === '@utils/shadow-css') {
+        return join(opts.buildDir, 'utils', 'shadow-css.js');
       }
       if (id === '@environment') {
         return join(opts.buildDir, 'compiler', 'sys', 'environment.js');
