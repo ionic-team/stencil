@@ -3,7 +3,7 @@
 
 ### Bug Fixes
 
-* **build:** address issue with dynamic import and vite ([#5399](https://github.com/ionic-team/stencil/issues/5399)) ([8ebacae](https://github.com/ionic-team/stencil/commit/8ebacae1106704293a2b1720b44eb83209175f96))
+* **build:** address issue with dynamic import and vite ([#5399](https://github.com/ionic-team/stencil/issues/5399)) ([8ebacae](https://github.com/ionic-team/stencil/commit/8ebacae1106704293a2b1720b44eb83209175f96)), closes [#5389](https://github.com/ionic-team/stencil/issues/5389)
 
 
 
