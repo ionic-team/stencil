@@ -29,7 +29,11 @@ export function createRequestHandler(devServerConfig: d.DevServerConfig, serverC
         if (devServerConfig.pingRoute !== null && req.pathname === devServerConfig.pingRoute) {
           return serverCtx
             .getBuildResults()
-            .then(() => {
+            .then((result) => {
+              if (!result.hasSuccessfulBuild) {
+                return serverCtx.serve500(incomingReq, res, 'Build not successful', 'build error');
+              }
+
               res.statusCode = 200;
               res.write('OK');
               res.end();
