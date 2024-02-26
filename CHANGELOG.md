@@ -1,3 +1,12 @@
+## 🐮 [4.12.4](https://github.com/ionic-team/stencil/compare/v4.12.3...v4.12.4) (2024-02-26)
+
+
+### Bug Fixes
+
+* **build:** address issue with dynamic import and vite ([#5399](https://github.com/ionic-team/stencil/issues/5399)) ([8ebacae](https://github.com/ionic-team/stencil/commit/8ebacae1106704293a2b1720b44eb83209175f96)), closes [#5389](https://github.com/ionic-team/stencil/issues/5389)
+
+
+
 ## 🐍 [4.12.3](https://github.com/ionic-team/stencil/compare/v4.12.2...v4.12.3) (2024-02-20)
 
 
