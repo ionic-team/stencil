@@ -106,7 +106,7 @@ export async function testing(opts: BuildOptions) {
         preferConst: true,
       }),
       prettyMinifyPlugin(opts, getBanner(opts, `Stencil Testing`, true)),
-      ignorePuppteerDependency(opts),
+      ignorePuppeteerDependency(opts),
     ],
     treeshake: {
       moduleSideEffects: false,
@@ -136,24 +136,36 @@ export async function copyTestingInternalDts(opts: BuildOptions, inputDir: strin
  * To avoid having user to install puppeteer for building their app (even if they don't use e2e testing),
  * we ignore the puppeteer dependency in the generated d.ts file.
  * @param opts build options
- * @returns void
+ * @returns a Rollup plugin
  */
-function ignorePuppteerDependency(opts: BuildOptions) {
+function ignorePuppeteerDependency(opts: BuildOptions) {
   return {
-    name: 'ignorePuppteerDependency',
+    name: 'ignorePuppeteerDependency',
     async buildEnd() {
-      const typeFilePath = join(opts.output.testingDir, 'puppeteer', 'puppeteer-declarations.d.ts');
-      const updatedFileContent = (await fs.readFile(typeFilePath, 'utf8'))
-        .split('\n')
-        .reduce((lines, line) => {
-          if (line.endsWith(`from 'puppeteer';`)) {
-            lines.push('// @ts-ignore - avoid requiring puppeteer as dependency');
-          }
-          lines.push(line);
-          return lines;
-        }, [] as string[])
-        .join('\n');
-      await fs.writeFile(typeFilePath, updatedFileContent);
+      await writePatchedPuppeteerDts(opts);
     },
   };
+}
+
+/**
+ * Write a patched version of
+ * `src/testing/puppeteer/puppeteer-declarations.d.ts` which has a `@ts-ignore`
+ * added to prevent a type-checking error if a Stencil project does not have
+ * puppeteer installed.
+ *
+ * @param opts build options
+ */
+export async function writePatchedPuppeteerDts(opts: BuildOptions) {
+  const typeFilePath = join(opts.output.testingDir, 'puppeteer', 'puppeteer-declarations.d.ts');
+  const updatedFileContent = (await fs.readFile(typeFilePath, 'utf8'))
+    .split('\n')
+    .reduce((lines, line) => {
+      if (line.endsWith(`from 'puppeteer';`)) {
+        lines.push('// @ts-ignore - avoid requiring puppeteer as dependency');
+      }
+      lines.push(line);
+      return lines;
+    }, [] as string[])
+    .join('\n');
+  await fs.writeFile(typeFilePath, updatedFileContent);
 }
