@@ -276,4 +276,23 @@ describe('validateDevServer', () => {
     const { config } = validateConfig(inputConfig, mockLoadConfigInit());
     expect(config.devServer.prerenderConfig).toBe(wwwOutputTarget.prerenderConfig);
   });
+
+  describe('pingRoute', () => {
+    it('should default to /ping', () => {
+      const { config } = validateConfig(inputConfig, mockLoadConfigInit());
+      expect(config.devServer.pingRoute).toBe('/ping');
+    });
+
+    it('should set user defined pingRoute', () => {
+      inputConfig.devServer = { ...inputDevServerConfig, pingRoute: '/my-ping' };
+      const { config } = validateConfig(inputConfig, mockLoadConfigInit());
+      expect(config.devServer.pingRoute).toBe('/my-ping');
+    });
+
+    it('should clear ping route if set to null', () => {
+      inputConfig.devServer = { ...inputDevServerConfig, pingRoute: null };
+      const { config } = validateConfig(inputConfig, mockLoadConfigInit());
+      expect(config.devServer.pingRoute).toBe(null);
+    });
+  });
 });

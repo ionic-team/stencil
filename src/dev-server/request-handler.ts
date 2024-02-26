@@ -34,7 +34,7 @@ export function createRequestHandler(devServerConfig: d.DevServerConfig, serverC
                 return serverCtx.serve500(incomingReq, res, 'Build not successful', 'build error');
               }
 
-              res.statusCode = 200;
+              res.writeHead(200, 'OK');
               res.write('OK');
               res.end();
             })
