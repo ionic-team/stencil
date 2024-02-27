@@ -292,6 +292,12 @@ describe('validateDevServer', () => {
       expect(config.devServer.pingRoute).toBe('/my-ping');
     });
 
+    it('should prefix pingRoute with a "/"', () => {
+      inputConfig.devServer = { ...inputDevServerConfig, pingRoute: 'my-ping' };
+      const { config } = validateConfig(inputConfig, mockLoadConfigInit());
+      expect(config.devServer.pingRoute).toBe('/my-ping');
+    });
+
     it('should clear ping route if set to null', () => {
       inputConfig.devServer = { ...inputDevServerConfig, pingRoute: null };
       const { config } = validateConfig(inputConfig, mockLoadConfigInit());
