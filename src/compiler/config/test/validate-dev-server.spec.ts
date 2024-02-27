@@ -279,6 +279,9 @@ describe('validateDevServer', () => {
 
   describe('pingRoute', () => {
     it('should default to /ping', () => {
+      // Ensure the pingRoute is not set in the inputConfig so we know we're testing the
+      // default value added during validation
+      delete inputConfig.devServer.pingRoute;
       const { config } = validateConfig(inputConfig, mockLoadConfigInit());
       expect(config.devServer.pingRoute).toBe('/ping');
     });
