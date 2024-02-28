@@ -137,7 +137,7 @@ export async function pageCompareScreenshot(
   return results;
 }
 
-function createPuppeteerScreenshotOptions(opts: ScreenshotOptions, width: number, height: number) {
+export function createPuppeteerScreenshotOptions(opts: ScreenshotOptions, width: number, height: number) {
   const puppeteerOpts: puppeteer.ScreenshotOptions = {
     type: 'png',
     fullPage: opts.fullPage,
