@@ -2123,6 +2123,14 @@ export interface OutputTargetDist extends OutputTargetValidationConfig {
   transformAliasedImportPathsInCollection?: boolean | null;
 
   typesDir?: string;
+
+  /**
+   * Provide a custom path for the ESM loader directory, containing files you can import
+   * in an initiation script within your application to register all your components for
+   * lazy loading.
+   *
+   * @default /dist/loader
+   */
   esmLoaderPath?: string;
   copy?: CopyTask[];
   polyfills?: boolean;
