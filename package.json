@@ -29,7 +29,7 @@
     "build.updateSelectorEngine": "node scripts/build/updateSelectorEngine.js",
     "clean": "rm -rf build/ cli/ compiler/ dev-server/ internal/ mock-doc/ sys/ testing/ && npm run clean.scripts && npm run clean.screenshots",
     "clean.scripts": "rm -rf scripts/build",
-    "clean.screenshots": "rm -r test/end-to-end/screenshot/builds test/end-to-end/screenshot/images",
+    "clean.screenshots": "rm -rf test/end-to-end/screenshot/builds test/end-to-end/screenshot/images",
     "lint": "eslint 'bin/*' 'scripts/*.ts' 'scripts/**/*.ts' 'src/*.ts' 'src/**/*.ts' 'src/**/*.tsx'",
     "install.jest": "bash ./src/testing/jest/install-dependencies.sh",
     "prettier": "npm run prettier.base -- --write",
