@@ -3,7 +3,7 @@ import { createPuppeteerScreenshotOptions } from '../puppeteer-screenshot';
 describe('Puppeteer Screenshot', () => {
   describe('createPuppeteerScreenshotOptions', () => {
     it('should use the viewport width and height by default', () => {
-      const options = createPuppeteerScreenshotOptions({}, 800, 600);
+      const options = createPuppeteerScreenshotOptions({}, { width: 800, height: 600 });
 
       expect(options.clip).toEqual({
         x: 0,
@@ -23,8 +23,7 @@ describe('Puppeteer Screenshot', () => {
             height: 200,
           },
         },
-        800,
-        600,
+        { width: 800, height: 600 },
       );
 
       expect(options.clip).toEqual({

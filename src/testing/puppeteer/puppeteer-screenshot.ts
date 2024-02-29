@@ -118,7 +118,11 @@ export async function pageCompareScreenshot(
     }
   }
 
-  const screenshotOpts = createPuppeteerScreenshotOptions(opts, width, height);
+  // The width and height passed into this function will be the dimensions of the generated image
+  // This is _not_ guaranteed to be the viewport dimensions specified in the emulate config. If clip
+  // options were provided this comparison function, the width and height will be set to those clip dimensions.
+  // Otherwise, it will default to the emulate config viewport dimensions.
+  const screenshotOpts = createPuppeteerScreenshotOptions(opts, { width, height });
   const screenshotBuf = await page.screenshot(screenshotOpts);
   const pixelmatchThreshold =
     typeof opts.pixelmatchThreshold === 'number' ? opts.pixelmatchThreshold : screenshotBuildData.pixelmatchThreshold;
@@ -137,7 +141,10 @@ export async function pageCompareScreenshot(
   return results;
 }
 
-export function createPuppeteerScreenshotOptions(opts: ScreenshotOptions, width: number, height: number) {
+export function createPuppeteerScreenshotOptions(
+  opts: ScreenshotOptions,
+  { width, height }: { width: number; height: number },
+) {
   const puppeteerOpts: puppeteer.ScreenshotOptions = {
     type: 'png',
     fullPage: opts.fullPage,
