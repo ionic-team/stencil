@@ -23,9 +23,9 @@
     "testing/"
   ],
   "scripts": {
-    "build": "npm run tsc.scripts && npm run tsc.prod && npm run rollup.prod.ci",
-    "build.esbuild": "npm run clean && npm run tsc.scripts && npm run tsc.prod && node scripts/build/esbuild/build.js --prod --ci",
-    "build.esbuild.watch": "npm run build.esbuild -- --watch",
+    "build.rollup": "npm run tsc.scripts && npm run tsc.prod && npm run rollup.prod.ci",
+    "build": "npm run clean && npm run tsc.scripts && npm run tsc.prod && node scripts/build/esbuild/build.js --prod --ci",
+    "build.watch": "npm run build -- --watch",
     "build.updateSelectorEngine": "node scripts/build/updateSelectorEngine.js",
     "clean": "rm -rf build/ cli/ compiler/ dev-server/ internal/ mock-doc/ sys/ testing/ && npm run clean-scripts",
     "clean-scripts": "rm -rf scripts/build",
