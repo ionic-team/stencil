@@ -3,7 +3,7 @@
 
 ### Bug Fixes
 
-* **custom-elements:** hydrate on client side ([#5317](https://github.com/ionic-team/stencil/issues/5317)) ([d809658](https://github.com/ionic-team/stencil/commit/d809658635280e115d67f1403dba946cce1bb01b)), closes [#5317](https://github.com/ionic-team/stencil/issues/5317)
+* **custom-elements:** hydrate on client side ([#5317](https://github.com/ionic-team/stencil/issues/5317)) ([d809658](https://github.com/ionic-team/stencil/commit/d809658635280e115d67f1403dba946cce1bb01b)), closes [#3319](https://github.com/ionic-team/stencil/issues/3319)
 
 
 
