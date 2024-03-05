@@ -1,5 +1,5 @@
 import { isGlob, isOutputTargetWww, normalizePath, sortBy } from '@utils';
-import minimatch from 'minimatch';
+import { minimatch } from 'minimatch';
 import { basename } from 'path';
 
 import type * as d from '../../declarations';

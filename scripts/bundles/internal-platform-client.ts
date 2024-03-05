@@ -1,5 +1,5 @@
 import fs from 'fs-extra';
-import glob from 'glob';
+import { glob } from 'glob';
 import { basename, join } from 'path';
 import { RollupOptions } from 'rollup';
 
