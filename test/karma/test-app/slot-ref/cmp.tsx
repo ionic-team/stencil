@@ -11,7 +11,10 @@ export class SlotRef {
   render() {
     return (
       <Host>
-        <slot name="title" ref={() => (this.hostElement.setAttribute('data-ref', 'called'))} />
+        <slot name="title" ref={el => {
+          this.hostElement.setAttribute('data-ref-id', el.id);
+          this.hostElement.setAttribute('data-ref-tagname', el.tagName);
+        }} />
       </Host>
     );
   }

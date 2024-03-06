@@ -9,10 +9,11 @@ describe('slot-ref', function () {
   });
   afterEach(tearDownDom);
 
-  it('ref callback is called', async () => {
+  it('ref callback of slot is called', async () => {
     await waitForChanges();
 
     const host = app.querySelector('slot-ref');
-    expect(host.getAttribute('data-ref')).toBe('called');
+    expect(host.getAttribute('data-ref-id')).toBe('slotted-element-id');
+    expect(host.getAttribute('data-ref-tagname')).toBe('SPAN');
   });
 });
