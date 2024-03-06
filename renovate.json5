@@ -13,9 +13,6 @@
     'rollup',
     '@rollup/plugin-commonjs',
     '@rollup/plugin-node-resolve',
-    // TODO(STENCIL-912): Upgrade these two dependencies
-    'glob',
-    'minimatch',
   ],
   ignorePaths: [
     'test/package.json',

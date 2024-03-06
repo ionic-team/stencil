@@ -1,7 +1,7 @@
 import type { BuildOptions as ESBuildOptions, Plugin } from 'esbuild';
 import { replace } from 'esbuild-plugin-replace';
 import fs from 'fs-extra';
-import glob from 'glob';
+import { glob } from 'glob';
 import { join } from 'path';
 
 import { getBanner } from '../utils/banner';
