@@ -21,10 +21,8 @@ describe('dist-custom-elements', () => {
       customElementsExportBehavior: 'single-export-module',
     };
     addCustomElementInputs(buildCtx, bundleOpts, outputTarget);
-    expect(bundleOpts.loader['\x00MyTag']).toContain(
-      'export { StubCmp as MyTag } from \'./foo/bar.tsx\';')
-    expect(bundleOpts.loader['\x00core']).toContain(
-      `export { MyTag } from '\x00MyTag';\n`);
+    expect(bundleOpts.loader['\x00MyTag']).toContain("export { StubCmp as MyTag } from './foo/bar.tsx';");
+    expect(bundleOpts.loader['\x00core']).toContain(`export { MyTag } from '\x00MyTag';\n`);
   });
 
   it('should export component with a defineCustomElement function', () => {
@@ -42,11 +40,12 @@ describe('dist-custom-elements', () => {
       customElementsExportBehavior: 'single-export-module',
     };
     addCustomElementInputs(buildCtx, bundleOpts, outputTarget);
+    expect(bundleOpts.loader['\x00MyTag']).toContain('export const defineCustomElement = cmpDefCustomEle;');
     expect(bundleOpts.loader['\x00MyTag']).toContain(
-      'export const defineCustomElement = cmpDefCustomEle;')
-    expect(bundleOpts.loader['\x00MyTag']).toContain(
-      'import { StubCmp as $CmpMyTag, defineCustomElement as cmpDefCustomEle } from \'./foo/bar.tsx\';')
+      "import { StubCmp as $CmpMyTag, defineCustomElement as cmpDefCustomEle } from './foo/bar.tsx';",
+    );
     expect(bundleOpts.loader['\x00core']).toContain(
-      `export { MyTag, defineCustomElement as defineCustomElementMyTag } from '\x00MyTag';\n`);
-  })
+      `export { MyTag, defineCustomElement as defineCustomElementMyTag } from '\x00MyTag';\n`,
+    );
+  });
 });
