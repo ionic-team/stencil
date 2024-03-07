@@ -208,7 +208,7 @@ const putBackInOriginalLocation = (parentElm: d.RenderNode, recursive: boolean) 
   plt.$flags$ |= PLATFORM_FLAGS.isTmpDisconnected;
   const oldSlotChildNodes: ChildNode[] = Array.from(parentElm.childNodes);
 
-  if (parentElm['s-sr']) {
+  if (parentElm['s-sr'] && BUILD.experimentalSlotFixes) {
     let node = parentElm;
     while ((node = node.nextSibling as d.RenderNode)) {
       if (node && node['s-sn'] === parentElm['s-sn'] && node['s-sh'] === hostTagName) {
