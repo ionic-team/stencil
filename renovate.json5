@@ -13,9 +13,6 @@
     'rollup',
     '@rollup/plugin-commonjs',
     '@rollup/plugin-node-resolve',
-    // TODO(STENCIL-912): Upgrade these two dependencies
-    'glob',
-    'minimatch',
   ],
   ignorePaths: [
     'test/package.json',
@@ -61,22 +58,13 @@
       // Increment this value as a part of updating TypeScript
       matchPackageNames: ['typescript'],
       allowedVersions: '<5.4.0',
+      commitMessagePrefix: "feat(typescript):"
     },
     {
       // disable Jest updates until the new testing architecture is in place
       matchPackageNames: ['@types/jest', 'jest', 'jest-cli', 'jest-environment-node'],
       groupName: 'Jest',
       allowedVersions: '<28.0.0',
-    },
-    // TODO(STENCIL-590): remove these once deps are removed
-    {
-      matchPackageNames: ['@types/inquirer'],
-      allowedVersions: '<=7.3.1',
-    },
-    // TODO(STENCIL-590): remove these once deps are removed
-    {
-      matchPackageNames: ['inquirer'],
-      allowedVersions: '<=7.3.3',
     },
     {
       matchPackagePrefixes: ['@typescript-eslint'],
@@ -149,6 +137,11 @@
     {
       matchPackageNames: ['open'],
       allowedVersions: '<10',
+    },
+    // TODO(STENCIL-1141): remove once support for Node v16 is dropped
+    {
+      matchPackageNames: ['puppeteer'],
+      allowedVersions: '<=21',
     }
   ],
   // Never rebase the branch or update it unless manually requested to avoid noisy PR emails

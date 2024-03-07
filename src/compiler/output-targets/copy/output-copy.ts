@@ -1,5 +1,5 @@
 import { buildError, isGlob, isOutputTargetCopy, join, normalizePath } from '@utils';
-import minimatch from 'minimatch';
+import { minimatch } from 'minimatch';
 
 import type * as d from '../../../declarations';
 import { canSkipAssetsCopy, getComponentAssetsCopyTasks } from './assets-copy-tasks';

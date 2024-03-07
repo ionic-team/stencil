@@ -2,11 +2,18 @@ import type { BuildOptions as ESBuildOptions, Plugin } from 'esbuild';
 import fs from 'fs-extra';
 import { join } from 'path';
 
-import { copyTestingInternalDts } from '../bundles/testing';
+import { copyTestingInternalDts, writePatchedPuppeteerDts } from '../bundles/testing';
 import { getBanner } from '../utils/banner';
 import type { BuildOptions } from '../utils/options';
 import { writePkgJson } from '../utils/write-pkg-json';
-import { getBaseEsbuildOptions, getEsbuildAliases, getEsbuildExternalModules, runBuilds } from './util';
+import {
+  externalAlias,
+  getBaseEsbuildOptions,
+  getEsbuildAliases,
+  getEsbuildExternalModules,
+  getFirstOutputFile,
+  runBuilds,
+} from './util';
 
 const EXTERNAL_TESTING_MODULES = [
   'constants',
@@ -59,11 +66,11 @@ export async function buildTesting(opts: BuildOptions) {
     alias: getEsbuildAliases(),
     banner: { js: getBanner(opts, `Stencil Testing`, true) },
     plugins: [
-      externalAliases('@app-data', '@stencil/core/internal/app-data'),
-      externalAliases('@platform', '@stencil/core/internal/testing'),
-      externalAliases('../internal/testing/index.js', '@stencil/core/internal/testing'),
-      externalAliases('@stencil/core/dev-server', '../dev-server/index.js'),
-      externalAliases('@stencil/core/mock-doc', '../mock-doc/index.cjs'),
+      externalAlias('@app-data', '@stencil/core/internal/app-data'),
+      externalAlias('@platform', '@stencil/core/internal/testing'),
+      externalAlias('../internal/testing/index.js', '@stencil/core/internal/testing'),
+      externalAlias('@stencil/core/dev-server', '../dev-server/index.js'),
+      externalAlias('@stencil/core/mock-doc', '../mock-doc/index.cjs'),
       lazyRequirePlugin(opts, [
         '@stencil/core/internal/app-data',
         '@stencil/core/internal/testing',
@@ -71,6 +78,7 @@ export async function buildTesting(opts: BuildOptions) {
         '../internal/testing/index.js',
         '../mock-doc/index.cjs',
       ]),
+      ignorePuppeteerDependency(opts),
     ],
   };
 
@@ -81,26 +89,12 @@ function getLazyRequireFn(opts: BuildOptions) {
   return fs.readFileSync(join(opts.bundleHelpersDir, 'lazy-require.js'), 'utf8').trim();
 }
 
-function externalAliases(moduleId: string, resolveToPath: string): Plugin {
-  return {
-    name: 'externalAliases',
-    setup(build) {
-      build.onResolve({ filter: new RegExp(`^${moduleId}$`) }, () => {
-        return {
-          path: resolveToPath,
-          external: true,
-        };
-      });
-    },
-  };
-}
-
 function lazyRequirePlugin(opts: BuildOptions, moduleIds: string[]): Plugin {
   return {
     name: 'lazyRequirePlugin',
     setup(build) {
       build.onEnd(async (buildResult) => {
-        const bundle = buildResult.outputFiles[0];
+        const bundle = getFirstOutputFile(buildResult);
         let code = Buffer.from(bundle.contents).toString();
 
         for (const moduleId of moduleIds) {
@@ -112,6 +106,25 @@ function lazyRequirePlugin(opts: BuildOptions, moduleIds: string[]): Plugin {
 
         code = code.replace(`"use strict";`, `"use strict";\n\n${getLazyRequireFn(opts)}`);
         return fs.writeFile(bundle.path, code);
+      });
+    },
+  };
+}
+
+/**
+ * To avoid having user to install puppeteer for building their app (even if
+ * they don't use e2e testing), we ignore the puppeteer dependency in the
+ * generated d.ts file.
+ *
+ * @param opts build options
+ * @returns an ESbuild plugin
+ */
+function ignorePuppeteerDependency(opts: BuildOptions): Plugin {
+  return {
+    name: 'ignorePuppeteerDependency',
+    setup(build) {
+      build.onEnd(async () => {
+        await writePatchedPuppeteerDts(opts);
       });
     },
   };

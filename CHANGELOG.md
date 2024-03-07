@@ -1,3 +1,31 @@
+## 💙 [4.12.5](https://github.com/ionic-team/stencil/compare/v4.12.4...v4.12.5) (2024-03-04)
+
+
+### Bug Fixes
+
+* **custom-elements:** hydrate on client side ([#5317](https://github.com/ionic-team/stencil/issues/5317)) ([d809658](https://github.com/ionic-team/stencil/commit/d809658635280e115d67f1403dba946cce1bb01b)), closes [#3319](https://github.com/ionic-team/stencil/issues/3319)
+
+
+
+## 🐮 [4.12.4](https://github.com/ionic-team/stencil/compare/v4.12.3...v4.12.4) (2024-02-26)
+
+
+### Bug Fixes
+
+* **build:** address issue with dynamic import and vite ([#5399](https://github.com/ionic-team/stencil/issues/5399)) ([8ebacae](https://github.com/ionic-team/stencil/commit/8ebacae1106704293a2b1720b44eb83209175f96)), closes [#5389](https://github.com/ionic-team/stencil/issues/5389)
+
+
+
+## 🐍 [4.12.3](https://github.com/ionic-team/stencil/compare/v4.12.2...v4.12.3) (2024-02-20)
+
+
+### Bug Fixes
+
+* **compiler:** point crypto import at `crypto` instead of `node:crypto` ([#5369](https://github.com/ionic-team/stencil/issues/5369)) ([7fb783f](https://github.com/ionic-team/stencil/commit/7fb783fbc0d3c67136cfc0a777da03c9ac22a51c)), closes [#5358](https://github.com/ionic-team/stencil/issues/5358)
+* **runtime:** replace `innerHTML` with `textContent` for CSS injection ([#5207](https://github.com/ionic-team/stencil/issues/5207)) ([8de2ab5](https://github.com/ionic-team/stencil/commit/8de2ab5a8ad99876d371a68c3709c5299be29974)), closes [#5206](https://github.com/ionic-team/stencil/issues/5206)
+
+
+
 ## 🎯 [4.12.2](https://github.com/ionic-team/stencil/compare/v4.12.1...v4.12.2) (2024-02-12)
 
 

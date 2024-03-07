@@ -63,5 +63,5 @@ jobs:
       - name: Run Publish Scripts
         # pass the generated version number instead of the input, since we've already incremented it in the prerelease
         # step
-        run: npm run release.ci -- --any-branch --tag ${{ inputs.tag }}
+        run: npm run release.ci -- --tag ${{ inputs.tag }}
         shell: bash

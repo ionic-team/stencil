@@ -821,7 +821,7 @@ export function createWindow(html: string | boolean = null): Window {
   return new MockWindow(html) as any;
 }
 
-export function cloneWindow(srcWin: Window, opts: { customElementProxy?: boolean } = {}) {
+export function cloneWindow(srcWin: Window, opts: { customElementProxy?: boolean } = {}): MockWindow | null {
   if (srcWin == null) {
     return null;
   }

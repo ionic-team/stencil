@@ -1,4 +1,4 @@
-name: Build Stencil with Esbuild
+name: Build Stencil with Rollup
 
 on:
   workflow_call:
@@ -22,7 +22,7 @@ jobs:
         uses: ./.github/workflows/actions/get-core-dependencies
 
       - name: Core Build
-        run: npm run build.esbuild -- --ci
+        run: npm run build.rollup
         shell: bash
 
       - name: Validate Build
@@ -36,6 +36,6 @@ jobs:
       - name: Upload Build Artifacts
         uses: ./.github/workflows/actions/upload-archive
         with:
-          name: stencil-core-esbuild
+          name: stencil-core-rollup
           output: stencil-core-build.zip
           paths: build cli compiler dev-server internal mock-doc scripts/build screenshot sys testing
