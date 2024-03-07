@@ -61,6 +61,7 @@
       // Increment this value as a part of updating TypeScript
       matchPackageNames: ['typescript'],
       allowedVersions: '<5.4.0',
+      commitMessagePrefix: "feat(typescript):"
     },
     {
       // disable Jest updates until the new testing architecture is in place

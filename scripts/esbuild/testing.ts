@@ -2,7 +2,7 @@ import type { BuildOptions as ESBuildOptions, Plugin } from 'esbuild';
 import fs from 'fs-extra';
 import { join } from 'path';
 
-import { copyTestingInternalDts } from '../bundles/testing';
+import { copyTestingInternalDts, writePatchedPuppeteerDts } from '../bundles/testing';
 import { getBanner } from '../utils/banner';
 import type { BuildOptions } from '../utils/options';
 import { writePkgJson } from '../utils/write-pkg-json';
@@ -78,6 +78,7 @@ export async function buildTesting(opts: BuildOptions) {
         '../internal/testing/index.js',
         '../mock-doc/index.cjs',
       ]),
+      ignorePuppeteerDependency(opts),
     ],
   };
 
@@ -105,6 +106,25 @@ function lazyRequirePlugin(opts: BuildOptions, moduleIds: string[]): Plugin {
 
         code = code.replace(`"use strict";`, `"use strict";\n\n${getLazyRequireFn(opts)}`);
         return fs.writeFile(bundle.path, code);
+      });
+    },
+  };
+}
+
+/**
+ * To avoid having user to install puppeteer for building their app (even if
+ * they don't use e2e testing), we ignore the puppeteer dependency in the
+ * generated d.ts file.
+ *
+ * @param opts build options
+ * @returns an ESbuild plugin
+ */
+function ignorePuppeteerDependency(opts: BuildOptions): Plugin {
+  return {
+    name: 'ignorePuppeteerDependency',
+    setup(build) {
+      build.onEnd(async () => {
+        await writePatchedPuppeteerDts(opts);
       });
     },
   };
