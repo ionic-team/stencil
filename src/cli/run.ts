@@ -18,6 +18,16 @@ import { taskTelemetry } from './task-telemetry';
 import { taskTest } from './task-test';
 import { telemetryAction } from './telemetry/telemetry';
 
+/**
+ * Main entry point for the Stencil CLI
+ *
+ * Take care of parsing CLI arguments, initializing various components needed
+ * by the rest of the program, and kicking off the correct task (build, test,
+ * etc).
+ *
+ * @param init initial CLI options
+ * @returns an empty promise
+ */
 export const run = async (init: d.CliInitOptions) => {
   const { args, logger, sys } = init;
 
