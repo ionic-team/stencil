@@ -301,6 +301,8 @@ export namespace Components {
     }
     interface SlotChildrenRoot {
     }
+    interface SlotConditionalRendering {
+    }
     interface SlotDynamicNameChangeScoped {
         "slotName": string;
     }
@@ -1213,6 +1215,12 @@ declare global {
         prototype: HTMLSlotChildrenRootElement;
         new (): HTMLSlotChildrenRootElement;
     };
+    interface HTMLSlotConditionalRenderingElement extends Components.SlotConditionalRendering, HTMLStencilElement {
+    }
+    var HTMLSlotConditionalRenderingElement: {
+        prototype: HTMLSlotConditionalRenderingElement;
+        new (): HTMLSlotConditionalRenderingElement;
+    };
     interface HTMLSlotDynamicNameChangeScopedElement extends Components.SlotDynamicNameChangeScoped, HTMLStencilElement {
     }
     var HTMLSlotDynamicNameChangeScopedElement: {
@@ -1603,6 +1611,7 @@ declare global {
         "slot-basic-order-root": HTMLSlotBasicOrderRootElement;
         "slot-basic-root": HTMLSlotBasicRootElement;
         "slot-children-root": HTMLSlotChildrenRootElement;
+        "slot-conditional-rendering": HTMLSlotConditionalRenderingElement;
         "slot-dynamic-name-change-scoped": HTMLSlotDynamicNameChangeScopedElement;
         "slot-dynamic-name-change-shadow": HTMLSlotDynamicNameChangeShadowElement;
         "slot-dynamic-scoped-list": HTMLSlotDynamicScopedListElement;
@@ -1949,6 +1958,8 @@ declare namespace LocalJSX {
     }
     interface SlotChildrenRoot {
     }
+    interface SlotConditionalRendering {
+    }
     interface SlotDynamicNameChangeScoped {
         "slotName"?: string;
     }
@@ -2171,6 +2182,7 @@ declare namespace LocalJSX {
         "slot-basic-order-root": SlotBasicOrderRoot;
         "slot-basic-root": SlotBasicRoot;
         "slot-children-root": SlotChildrenRoot;
+        "slot-conditional-rendering": SlotConditionalRendering;
         "slot-dynamic-name-change-scoped": SlotDynamicNameChangeScoped;
         "slot-dynamic-name-change-shadow": SlotDynamicNameChangeShadow;
         "slot-dynamic-scoped-list": SlotDynamicScopedList;
@@ -2336,6 +2348,7 @@ declare module "@stencil/core" {
             "slot-basic-order-root": LocalJSX.SlotBasicOrderRoot & JSXBase.HTMLAttributes<HTMLSlotBasicOrderRootElement>;
             "slot-basic-root": LocalJSX.SlotBasicRoot & JSXBase.HTMLAttributes<HTMLSlotBasicRootElement>;
             "slot-children-root": LocalJSX.SlotChildrenRoot & JSXBase.HTMLAttributes<HTMLSlotChildrenRootElement>;
+            "slot-conditional-rendering": LocalJSX.SlotConditionalRendering & JSXBase.HTMLAttributes<HTMLSlotConditionalRenderingElement>;
             "slot-dynamic-name-change-scoped": LocalJSX.SlotDynamicNameChangeScoped & JSXBase.HTMLAttributes<HTMLSlotDynamicNameChangeScopedElement>;
             "slot-dynamic-name-change-shadow": LocalJSX.SlotDynamicNameChangeShadow & JSXBase.HTMLAttributes<HTMLSlotDynamicNameChangeShadowElement>;
             "slot-dynamic-scoped-list": LocalJSX.SlotDynamicScopedList & JSXBase.HTMLAttributes<HTMLSlotDynamicScopedListElement>;
