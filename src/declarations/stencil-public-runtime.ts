@@ -1102,7 +1102,6 @@ export namespace JSXBase {
   export interface LabelHTMLAttributes<T> extends HTMLAttributes<T> {
     form?: string;
     htmlFor?: string;
-    htmlfor?: string;
   }
 
   export interface LiHTMLAttributes<T> extends HTMLAttributes<T> {
@@ -1228,7 +1227,6 @@ export namespace JSXBase {
   export interface OutputHTMLAttributes<T> extends HTMLAttributes<T> {
     form?: string;
     htmlFor?: string;
-    htmlfor?: string;
     name?: string;
   }
 
