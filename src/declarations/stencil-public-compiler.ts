@@ -2054,9 +2054,12 @@ export const LOG_LEVELS = ['debug', 'info', 'warn', 'error'] as const;
 export type LogLevel = (typeof LOG_LEVELS)[number];
 
 /**
- * Common logger to be used by the compiler, dev-server and CLI. The CLI will use a
- * NodeJS based console logging and colors, and the web will use browser based
- * logs and colors.
+ * Abstract interface representing a logger with the capability to accept log
+ * messages at various levels (debug, info, warn, and error), set colors, log
+ * time spans, print diagnostic messages, and more.
+ *
+ * A Node.js-specific implementation of this interface is used when Stencil is
+ * building and compiling a project.
  */
 export interface Logger {
   enableColors: (useColors: boolean) => void;
