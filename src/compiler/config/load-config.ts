@@ -57,7 +57,7 @@ export const loadConfig = async (init: LoadConfigInit = {}): Promise<LoadConfigR
       configPath = loadedConfigFile.configPath;
       unknownConfig.config = { ...loadedConfigFile, ...config };
       unknownConfig.config.configPath = configPath;
-      unknownConfig.config.rootDir = normalizePath(dirname(configPath));
+      unknownConfig.config.rootDir = init.config.rootDir || normalizePath(dirname(configPath));
     } else {
       // no stencil.config.ts or .js file, which is fine
       unknownConfig.config = { ...config };
