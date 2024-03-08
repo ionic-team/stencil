@@ -517,6 +517,7 @@ export class MockCanvasElement extends MockHTMLElement {
           data: new Array(w * h * 4),
         };
       },
+      toDataURL() {},
       putImageData() {},
       createImageData: function (): any[] {
         return [];
