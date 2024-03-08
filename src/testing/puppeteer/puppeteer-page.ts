@@ -213,6 +213,10 @@ async function e2eSetContent(page: E2EPageInternal, html: string, options: WaitF
 
   const output: string[] = [];
 
+  const headContent: string = await page.$eval('head', async (headElement: Element) => {
+    return headElement ? headElement.innerHTML : '';
+  });
+
   const appScriptUrl = env.__STENCIL_APP_SCRIPT_URL__;
   if (typeof appScriptUrl !== 'string') {
     throw new Error('invalid e2eSetContent() app script url');
@@ -221,6 +225,8 @@ async function e2eSetContent(page: E2EPageInternal, html: string, options: WaitF
   output.push(`<!doctype html>`);
   output.push(`<html>`);
   output.push(`<head>`);
+
+  output.push(headContent);
 
   const appStyleUrl = env.__STENCIL_APP_STYLE_URL__;
   if (typeof appStyleUrl === 'string') {
