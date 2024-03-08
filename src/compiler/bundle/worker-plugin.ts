@@ -416,10 +416,17 @@ import { createWorker } from '${WORKER_HELPER_ID}';
 export const workerName = '${workerName}';
 export const workerMsgId = '${workerMsgId}';
 export const workerPath = /*@__PURE__*/import.meta.ROLLUP_FILE_URL_${referenceId};
-const blob = new Blob(['importScripts("' + workerPath + '")'], { type: 'text/javascript' });
-const url = URL.createObjectURL(blob);
-export const worker = /*@__PURE__*/createWorker(url, workerName, workerMsgId);
-URL.revokeObjectURL(url);
+export let worker;
+try {
+  // first try directly starting the worker with the URL
+  worker = /*@__PURE__*/createWorker(workerPath, workerName, workerMsgId);
+} catch(e) {
+  // probably a cross-origin issue, try using a Blob instead
+  const blob = new Blob(['importScripts("' + workerPath + '")'], { type: 'text/javascript' });
+  const url = URL.createObjectURL(blob);
+  worker = /*@__PURE__*/createWorker(url, workerName, workerMsgId);
+  URL.revokeObjectURL(url);
+}
 `;
 };
 
