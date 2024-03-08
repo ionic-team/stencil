@@ -4,7 +4,7 @@ import ts from 'typescript';
 import type * as d from '../../declarations';
 
 /**
- * Helper function for retrieving a Stencil {@link Module} from the provided compiler context
+ * Helper function for retrieving a Stencil {@link d.Module} from the provided compiler context
  * @param compilerCtx the compiler context to retrieve the `Module` from
  * @param filePath the path of the file corresponding to the `Module` to lookup
  * @returns the `Module`, or `undefined` if one cannot be found
@@ -13,7 +13,7 @@ export const getModule = (compilerCtx: d.CompilerCtx, filePath: string): d.Modul
   compilerCtx.moduleMap.get(normalizePath(filePath));
 
 /**
- * Creates a {@link Module} entity with reasonable defaults
+ * Creates a {@link d.Module} entity with reasonable defaults
  * @param staticSourceFile the TypeScript representation of the source file. This may not be the original
  * representation of the file, but instead a new `SourceFile` created using the TypeScript API
  * @param staticSourceFileText the text from the `SourceFile`. This text may originate from the original representation

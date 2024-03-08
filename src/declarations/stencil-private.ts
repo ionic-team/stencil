@@ -1480,7 +1480,7 @@ export interface ComponentRuntimeMeta {
   /**
    * This number is used to hold a series of bitflags for various features we
    * support on components. The flags which this value is intended to store are
-   * documented in the {@link CMP_FLAGS} enum.
+   * documented in the `CMP_FLAGS` enum.
    */
   $flags$: number;
   /**
@@ -1526,7 +1526,7 @@ export interface ComponentRuntimeMembers {
  * The fields are:
  *
  * 1. A number used to hold bitflags for component members. The bit flags which
- * this is intended to store are documented in the {@link MEMBER_FLAGS} enum.
+ * this is intended to store are documented in the `MEMBER_FLAGS` enum.
  * 2. The attribute name to observe.
  */
 export type ComponentRuntimeMember = [number, string?];
@@ -1536,7 +1536,7 @@ export type ComponentRuntimeMember = [number, string?];
  * runtime. The field are:
  *
  * 1. A number used to hold bitflags for listeners. The bit flags which this is
- * intended to store are documented in the {@link LISTENER_FLAGS} enum.
+ * intended to store are documented in the `LISTENER_FLAGS` enum.
  * 2. The event name.
  * 3. The method name.
  */
@@ -2416,7 +2416,7 @@ export interface CompilerWorkerContext {
 }
 
 /**
- * The methods that are supported on a {@link d.CompilerWorkerContext}
+ * The methods that are supported on a {@link CompilerWorkerContext}
  */
 export type WorkerContextMethod = keyof CompilerWorkerContext;
 
