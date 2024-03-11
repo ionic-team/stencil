@@ -7,7 +7,7 @@ import type { CompilerSystem, Logger } from '@stencil/core/internal';
  */
 export declare function createNodeLogger(): Logger;
 
-// TODO: Remove in Stencil v5, use `createNodeLogger` without parameters instead
+// TODO(STENCIL-1196): Remove in Stencil v5, use `createNodeLogger` without parameters instead
 /**
  * Creates a "logger", based off of NodeJS APIs, that will be used by the compiler and dev-server.
  * The NodeJS "process" object must be provided as a property in the first argument's object.
