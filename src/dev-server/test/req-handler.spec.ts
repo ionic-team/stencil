@@ -439,6 +439,32 @@ describe('request-handler', () => {
       expect(h).toBe(`88mph<iframe></iframe>`);
     });
   });
+
+  describe('pingRoute', () => {
+    it('should return a 200 for successful build', async () => {
+      serverCtx.getBuildResults = () =>
+        Promise.resolve({ hasSuccessfulBuild: true }) as Promise<d.CompilerBuildResults>;
+
+      const handler = createRequestHandler(devServerConfig, serverCtx);
+
+      req.url = '/ping';
+
+      await handler(req, res);
+      expect(res.$statusCode).toBe(200);
+    });
+
+    it('should return a 500 for unsuccessful build', async () => {
+      serverCtx.getBuildResults = () =>
+        Promise.resolve({ hasSuccessfulBuild: false }) as Promise<d.CompilerBuildResults>;
+
+      const handler = createRequestHandler(devServerConfig, serverCtx);
+
+      req.url = '/ping';
+
+      await handler(req, res);
+      expect(res.$statusCode).toBe(500);
+    });
+  });
 });
 
 interface TestServerResponse extends ServerResponse {
