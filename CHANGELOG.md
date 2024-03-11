@@ -1,3 +1,19 @@
+## 🍍 [4.12.6](https://github.com/ionic-team/stencil/compare/v4.12.5...v4.12.6) (2024-03-11)
+
+
+### Bug Fixes
+
+* **cli:** move version logging earlier in CLI to allow `-v`, `--version` ([#5425](https://github.com/ionic-team/stencil/issues/5425)) ([194b0fc](https://github.com/ionic-team/stencil/commit/194b0fc0d9741d45efbe17f90572fbe09fc5ec62))
+* **compiler:** fix generated import statement ([#5419](https://github.com/ionic-team/stencil/issues/5419)) ([502da1b](https://github.com/ionic-team/stencil/commit/502da1bc3d1503bd82fbf0cccc312825a82772cf))
+* **test:** ensure screenshot dir is cleaned up ([#5421](https://github.com/ionic-team/stencil/issues/5421)) ([15e7a49](https://github.com/ionic-team/stencil/commit/15e7a4960bc845212563141b00798fdee07cbfbd))
+
+
+### Features
+
+* **compiler:** update glob and minimatch dependencies ([#5436](https://github.com/ionic-team/stencil/issues/5436)) ([37bbd8c](https://github.com/ionic-team/stencil/commit/37bbd8ce651e599232c1e6370903b8242808f3ee))
+
+
+
 ## 💙 [4.12.5](https://github.com/ionic-team/stencil/compare/v4.12.4...v4.12.5) (2024-03-04)
 
 
