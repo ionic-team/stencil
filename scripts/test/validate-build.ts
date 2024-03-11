@@ -268,7 +268,7 @@ async function validateCompiler(opts: BuildOptions): Promise<void> {
   const cli = await import(cliPath);
   const sysNodeApi = await import(sysNodePath);
 
-  const nodeLogger = sysNodeApi.createNodeLogger({ process });
+  const nodeLogger = sysNodeApi.createNodeLogger();
   const nodeSys = sysNodeApi.createNodeSys({ process });
 
   if (!nodeSys || nodeSys.name !== 'node' || nodeSys.version.length < 4) {
