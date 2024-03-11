@@ -8,11 +8,6 @@
 * **test:** ensure screenshot dir is cleaned up ([#5421](https://github.com/ionic-team/stencil/issues/5421)) ([15e7a49](https://github.com/ionic-team/stencil/commit/15e7a4960bc845212563141b00798fdee07cbfbd))
 
 
-### Features
-
-* **compiler:** update glob and minimatch dependencies ([#5436](https://github.com/ionic-team/stencil/issues/5436)) ([37bbd8c](https://github.com/ionic-team/stencil/commit/37bbd8ce651e599232c1e6370903b8242808f3ee))
-
-
 
 ## 💙 [4.12.5](https://github.com/ionic-team/stencil/compare/v4.12.4...v4.12.5) (2024-03-04)
 
