@@ -5,6 +5,7 @@ import path from 'node:path';
 import type { Options } from '@wdio/types';
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
+const isCI = Boolean(process.env.CI);
 
 export const config: Options.Testrunner = {
   //
@@ -143,7 +144,7 @@ export const config: Options.Testrunner = {
 
   //
   // The number of times to retry the entire specfile when it fails as a whole
-  specFileRetries: 1,
+  specFileRetries: isCI ? 1 : 0,
   //
   // Delay in seconds between the spec file retry attempts
   // specFileRetriesDelay: 0,
@@ -324,7 +325,7 @@ export const config: Options.Testrunner = {
 /**
  * run with more browser in CI
  */
-if (process.env.CI) {
+if (isCI) {
   (config.capabilities as WebdriverIO.Capabilities[]).push(
     {
       browserName: 'firefox',

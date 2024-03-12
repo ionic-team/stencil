@@ -22,6 +22,7 @@ describe('style-plugin', function () {
     const sassHost = document.querySelector('sass-cmp');
     const shadowRoot = sassHost.shadowRoot;
 
+    await $('>>>.sass-entry').waitForExist();
     const sassEntry = shadowRoot.querySelector('.sass-entry');
     const sassImportee = shadowRoot.querySelector('.sass-importee');
     const cssImportee = shadowRoot.querySelector('.css-importee');
@@ -40,6 +41,7 @@ describe('style-plugin', function () {
     const cssHost = document.querySelector('css-cmp');
     const shadowRoot = cssHost.shadowRoot;
 
+    await $('>>>.css-entry').waitForExist();
     const cssEntry = shadowRoot.querySelector('.css-entry');
     const cssImportee = shadowRoot.querySelector('.css-importee');
     const hr = shadowRoot.querySelector('hr');
@@ -54,6 +56,7 @@ describe('style-plugin', function () {
     const cssHost = document.querySelector('multiple-styles-cmp');
     const shadowRoot = cssHost.shadowRoot;
 
+    await $('>>>h1').waitForExist();
     const h1 = getComputedStyle(shadowRoot.querySelector('h1'));
     const div = getComputedStyle(shadowRoot.querySelector('p'));
     // color is red because foo.scss is mentioned last and overwrites bar.scss

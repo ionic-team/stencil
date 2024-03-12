@@ -1,6 +1,8 @@
 import { h } from '@stencil/core';
 import { render } from '@wdio/browser-runner/stencil';
 
+import { isSafari } from '../util.js';
+
 describe('attribute-host', function () {
   before(async () => {
     render({
@@ -23,22 +25,26 @@ describe('attribute-host', function () {
 
     await expect(elm).toHaveStyle({
       // get default border color from body element as it might differ between different OS
-      borderColor: getComputedStyle(document.body).borderColor.replaceAll(' ', ''),
+      'border-color': browser.isChromium
+        ? 'rgba(255,255,255,1)'
+        : getComputedStyle(document.body).borderColor.replaceAll(' ', ''),
       display: 'inline-block',
-      fontSize: '16px',
+      'font-size': '16px',
     });
 
     // this tests CSS custom properties in inline style, but CSS var are
     // not supported natively in IE11, so let's skip the test
     const win = window as any;
-    if (win.CSS && win.CSS.supports && win.CSS.supports('--prop', 'value')) {
+    if (!isSafari() && win.CSS && win.CSS.supports && win.CSS.supports('--prop', 'value')) {
       await expect(elm).toHaveStyle({ '--css-var': '' });
     }
 
     await button.click();
 
     await expect(elm).toHaveStyle({
-      'border-color': 'rgba(0,0,0,1)',
+      'border-color': browser.isChromium
+        ? 'rgba(0,0,0,1)'
+        : 'rgb(0,0,0)',
       display: 'block',
       'font-size': '24px',
     });
@@ -48,18 +54,20 @@ describe('attribute-host', function () {
     }
 
     await expect($(elm)).toHaveAttribute('content', 'attributes added');
-    await expect($(elm)).toHaveAttribute('padding', '');
+    await expect($(elm)).toHaveAttribute('padding', isSafari() ? 'true' : '');
     await expect($(elm)).toHaveAttribute('bold', 'true');
-    await expect($(elm)).toHaveAttribute('margin', '');
+    await expect($(elm)).toHaveAttribute('margin', isSafari() ? 'true' : '');
     await expect($(elm)).toHaveAttribute('color', 'lime');
     await expect($(elm)).not.toHaveAttribute('no-attr');
 
     await button.click();
 
     await expect(elm).toHaveStyle({
-      borderColor: getComputedStyle(document.body).borderColor.replaceAll(' ', ''),
+      'border-color': browser.isChromium
+        ? 'rgba(255,255,255,1)'
+        : getComputedStyle(document.body).borderColor.replaceAll(' ', ''),
       display: 'inline-block',
-      fontSize: '16px',
+      'font-size': '16px',
     });
 
     if (win.CSS && win.CSS.supports && win.CSS.supports('--prop', 'value')) {
@@ -76,7 +84,9 @@ describe('attribute-host', function () {
     await button.click();
 
     await expect(elm).toHaveStyle({
-      'border-color': 'rgba(0,0,0,1)',
+      'border-color': browser.isChromium
+        ? 'rgba(0,0,0,1)'
+        : 'rgb(0,0,0)',
       display: 'block',
       'font-size': '24px',
     });
@@ -86,9 +96,9 @@ describe('attribute-host', function () {
     }
 
     await expect($(elm)).toHaveAttribute('content', 'attributes added');
-    await expect($(elm)).toHaveAttribute('padding', '');
+    await expect($(elm)).toHaveAttribute('padding', isSafari() ? 'true' : '');
     await expect($(elm)).toHaveAttribute('bold', 'true');
-    await expect($(elm)).toHaveAttribute('margin', '');
+    await expect($(elm)).toHaveAttribute('margin', isSafari() ? 'true' : '');
     await expect($(elm)).toHaveAttribute('color', 'lime');
     await expect($(elm)).not.toHaveAttribute('no-attr');
   });

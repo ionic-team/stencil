@@ -1,6 +1,8 @@
 import { Fragment, h } from '@stencil/core';
 import { render } from '@wdio/browser-runner/stencil';
 
+import { isSafari } from '../util.js';
+
 describe('computed-properties-state-decorator', function () {
   beforeEach(async () => {
     render({
@@ -19,13 +21,19 @@ describe('computed-properties-state-decorator', function () {
 
   it('correctly sets computed property `@State()`s and triggers re-renders', async () => {
     const el: HTMLElement = document.querySelector('computed-properties-state-decorator');
-    await expect($(el)).toHaveText('Has rendered: false\nMode: default');
+    await expect($(el)).toHaveText([
+      'Has rendered: false',
+      'Mode: default',
+    ].join(isSafari() ? '' : '\n'));
 
     const button = document.querySelector('button');
     expect(button).toBeDefined();
 
     await $(button).click();
 
-    await expect($(el)).toHaveText('Has rendered: true\nMode: super');
+    await expect($(el)).toHaveText([
+      'Has rendered: true',
+      'Mode: super',
+    ].join(isSafari() ? '' : '\n'));
   });
 });
