@@ -1,5 +1,6 @@
-import { Component, Prop, Method } from '@stencil/core';
-import { SomeTypes } from '../util';
+import { Component, Method, Prop } from '@stencil/core';
+
+import { SomeTypes } from '../util.js';
 
 @Component({
   tag: 'attribute-complex',

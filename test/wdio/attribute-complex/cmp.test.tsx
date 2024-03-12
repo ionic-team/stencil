@@ -1,5 +1,6 @@
 import { h } from '@stencil/core';
 import { render } from '@wdio/browser-runner/stencil';
+import { $, browser } from '@wdio/globals';
 
 customElements.whenDefined('attribute-complex').then(() => {
   const el: any = document.querySelector('attribute-complex');
@@ -33,7 +34,6 @@ describe('attribute-complex', function () {
     el.setAttribute('str-1', '123');
     el.str2 = 321;
 
-    // await waitForChanges();
     await browser.pause(100);
 
     const instance = await el.getInstance();

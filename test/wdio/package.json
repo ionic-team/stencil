@@ -13,6 +13,7 @@
     "@types/node": "^16.11.7",
     "@wdio/browser-runner": "^8.33.1",
     "@wdio/cli": "^8.33.1",
+    "@wdio/globals": "^8.33.1",
     "@wdio/mocha-framework": "^8.33.1",
     "@wdio/spec-reporter": "^8.32.4",
     "@wdio/types": "^8.32.4",
