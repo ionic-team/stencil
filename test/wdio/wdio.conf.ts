@@ -325,9 +325,12 @@ export const config: Options.Testrunner = {
  * run with more browser in CI
  */
 if (process.env.CI) {
-  (config.capabilities as WebdriverIO.Capabilities[]).push({
-    browserName: 'firefox',
-  }, {
-    browserName: 'safari',
-  })
+  (config.capabilities as WebdriverIO.Capabilities[]).push(
+    {
+      browserName: 'firefox',
+    },
+    {
+      browserName: 'safari',
+    },
+  );
 }
