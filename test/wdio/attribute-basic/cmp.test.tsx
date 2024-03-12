@@ -1,27 +1,25 @@
-import { setupDomTests, waitForChanges } from '../util';
+import { h } from '@stencil/core';
+import { render } from '@wdio/browser-runner/stencil';
+import { $, expect } from '@wdio/globals';
 
 describe('attribute-basic', function () {
-  const { setupDom, tearDownDom } = setupDomTests(document);
-  let app: HTMLElement;
-
-  beforeEach(async () => {
-    app = await setupDom('/attribute-basic/index.html');
+  before(async () => {
+    render({
+      template: () => <attribute-basic-root></attribute-basic-root>,
+    });
   });
-  afterEach(tearDownDom);
 
   it('button click rerenders', async () => {
-    expect(app.querySelector('.single').textContent).toBe('single');
-    expect(app.querySelector('.multiWord').textContent).toBe('multiWord');
-    expect(app.querySelector('.customAttr').textContent).toBe('my-custom-attr');
-    expect(app.querySelector('.htmlForLabel').getAttribute('for')).toBe('a');
+    await expect($('.single')).toHaveText('single');
+    await expect($('.multiWord')).toHaveText('multiWord');
+    await expect($('.customAttr')).toHaveText('my-custom-attr');
+    await expect($('.htmlForLabel')).toHaveAttribute('for', 'a');
 
-    const button = app.querySelector('button');
-    button.click();
+    const button = await $('button');
+    await button.click();
 
-    await waitForChanges();
-
-    expect(app.querySelector('.single').textContent).toBe('single-update');
-    expect(app.querySelector('.multiWord').textContent).toBe('multiWord-update');
-    expect(app.querySelector('.customAttr').textContent).toBe('my-custom-attr-update');
+    await expect($('.single')).toHaveText('single-update');
+    await expect($('.multiWord')).toHaveText('multiWord-update');
+    await expect($('.customAttr')).toHaveText('my-custom-attr-update');
   });
 });

@@ -1,28 +1,23 @@
-import { setupDomTests, waitForChanges } from '../util';
+import { h } from '@stencil/core';
+import { render } from '@wdio/browser-runner/stencil';
 
 describe('conditional-basic', function () {
-  const { setupDom, tearDownDom } = setupDomTests(document);
-  let app: HTMLElement;
-
   beforeEach(async () => {
-    app = await setupDom('/conditional-basic/index.html');
+    render({
+      template: () => <conditional-basic></conditional-basic>,
+    });
   });
-  afterEach(tearDownDom);
 
   it('contains a button as a child', async () => {
-    let button = app.querySelector('button');
-    expect(button).toBeDefined();
+    await expect($('button')).toBeExisting();
   });
 
   it('button click rerenders', async () => {
-    let button = app.querySelector('button');
-    let results = app.querySelector('div.results');
+    const button = $('button');
+    const results = $('div.results');
 
-    expect(results.textContent).toEqual('');
-
-    button.click();
-    await waitForChanges();
-
-    expect(results.textContent).toEqual('Content');
+    await expect(results).toHaveText('');
+    await button.click();
+    await expect(results).toHaveText('Content');
   });
 });

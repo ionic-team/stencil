@@ -1,88 +1,99 @@
-import { setupDomTests, waitForChanges } from '../util';
+import { h } from '@stencil/core';
+import { render } from '@wdio/browser-runner/stencil';
 
 describe('attribute-host', function () {
-  const { setupDom, tearDownDom } = setupDomTests(document);
-  let app: HTMLElement;
-
-  beforeEach(async () => {
-    app = await setupDom('/attribute-host/index.html');
+  before(async () => {
+    render({
+      template: () => <attribute-host></attribute-host>,
+    });
   });
-  afterEach(tearDownDom);
 
   it('add/remove attrs', async () => {
-    const elm = app.querySelector('section');
-    const button = app.querySelector('button');
+    await $('section').waitForExist();
 
-    expect(elm.getAttribute('content')).toBe('attributes removed');
-    expect(elm.getAttribute('padding')).toBe(null);
-    expect(elm.getAttribute('bold')).toBe('false');
-    expect(elm.getAttribute('margin')).toBe(null);
-    expect(elm.getAttribute('color')).toBe(null);
-    expect(elm.getAttribute('no-attr')).toBe(null);
+    const elm = await $('section');
+    const button = await $('button');
 
-    expect(elm.style.getPropertyValue('border-color')).toEqual('');
-    expect(elm.style.getPropertyValue('display')).toEqual('inline-block');
-    expect(elm.style.getPropertyValue('font-size')).toEqual('');
+    await expect(elm).toHaveAttribute('content', 'attributes removed');
+    await expect(elm).toHaveAttribute('bold', 'false');
+    await expect(elm).not.toHaveAttribute('padding');
+    await expect(elm).not.toHaveAttribute('margin');
+    await expect(elm).not.toHaveAttribute('color');
+    await expect(elm).not.toHaveAttribute('no-attr');
+
+    await expect(elm).toHaveStyle({
+      // get default border color from body element as it might differ between different OS
+      borderColor: getComputedStyle(document.body).borderColor.replaceAll(' ', ''),
+      display: 'inline-block',
+      fontSize: '16px',
+    });
 
     // this tests CSS custom properties in inline style, but CSS var are
     // not supported natively in IE11, so let's skip the test
     const win = window as any;
     if (win.CSS && win.CSS.supports && win.CSS.supports('--prop', 'value')) {
-      expect(elm.style.getPropertyValue('--css-var')).toEqual('');
+      await expect(elm).toHaveStyle({ '--css-var': '' });
     }
 
-    button.click();
-    await waitForChanges();
+    await button.click();
 
-    expect(elm.style.getPropertyValue('border-color')).toEqual('black');
-    expect(elm.style.getPropertyValue('display')).toEqual('block');
-    expect(elm.style.getPropertyValue('font-size')).toEqual('24px');
+    await expect(elm).toHaveStyle({
+      'border-color': 'rgba(0,0,0,1)',
+      display: 'block',
+      'font-size': '24px',
+    });
 
     if (win.CSS && win.CSS.supports && win.CSS.supports('--prop', 'value')) {
-      expect(elm.style.getPropertyValue('--css-var')).toEqual('12');
+      expect(document.querySelector('section')?.style.getPropertyValue('--css-var')).toEqual('12');
     }
 
-    expect(elm.getAttribute('content')).toBe('attributes added');
-    expect(elm.getAttribute('padding')).toBe('');
-    expect(elm.getAttribute('bold')).toBe('true');
-    expect(elm.getAttribute('margin')).toBe('');
-    expect(elm.getAttribute('color')).toBe('lime');
-    expect(elm.getAttribute('no-attr')).toBe(null);
+    await expect($(elm)).toHaveAttribute('content', 'attributes added');
+    await expect($(elm)).toHaveAttribute('padding', '');
+    await expect($(elm)).toHaveAttribute('bold', 'true');
+    await expect($(elm)).toHaveAttribute('margin', '');
+    await expect($(elm)).toHaveAttribute('color', 'lime');
+    await expect($(elm)).not.toHaveAttribute('no-attr');
 
-    button.click();
-    await waitForChanges();
+    await button.click();
 
-    expect(elm.style.getPropertyValue('border-color')).toEqual('');
-    expect(elm.style.getPropertyValue('display')).toEqual('inline-block');
-    expect(elm.style.getPropertyValue('font-size')).toEqual('');
+    await expect(elm).toHaveStyle({
+      borderColor: getComputedStyle(document.body).borderColor.replaceAll(' ', ''),
+      display: 'inline-block',
+      fontSize: '16px',
+    });
 
     if (win.CSS && win.CSS.supports && win.CSS.supports('--prop', 'value')) {
-      expect(elm.style.getPropertyValue('--css-var')).toEqual('');
+      await expect(elm).not.toHaveElementProperty('--css-var');
     }
 
-    expect(elm.getAttribute('content')).toBe('attributes removed');
-    expect(elm.getAttribute('padding')).toBe(null);
-    expect(elm.getAttribute('bold')).toBe('false');
-    expect(elm.getAttribute('margin')).toBe(null);
-    expect(elm.getAttribute('color')).toBe(null);
-    expect(elm.getAttribute('no-attr')).toBe(null);
+    await expect($(elm)).toHaveAttribute('content', 'attributes removed');
+    await expect($(elm)).not.toHaveAttribute('padding');
+    await expect($(elm)).toHaveAttribute('bold', 'false');
+    await expect($(elm)).not.toHaveAttribute('margin');
+    await expect($(elm)).not.toHaveAttribute('color');
+    await expect($(elm)).not.toHaveAttribute('no-attr');
 
-    button.click();
-    await waitForChanges();
+    await button.click();
 
-    expect(elm.style.getPropertyValue('border-color')).toEqual('black');
-    expect(elm.style.getPropertyValue('display')).toEqual('block');
-    expect(elm.style.getPropertyValue('font-size')).toEqual('24px');
+    await expect(elm).toHaveStyle({
+      'border-color': 'rgba(0,0,0,1)',
+      display: 'block',
+      'font-size': '24px',
+    });
 
     if (win.CSS && win.CSS.supports && win.CSS.supports('--prop', 'value')) {
-      expect(elm.style.getPropertyValue('--css-var')).toEqual('12');
+      expect(document.querySelector('section')?.style.getPropertyValue('--css-var')).toEqual('12');
     }
 
-    expect(elm.getAttribute('content')).toBe('attributes added');
-    expect(elm.getAttribute('padding')).toBe('');
-    expect(elm.getAttribute('bold')).toBe('true');
-    expect(elm.getAttribute('margin')).toBe('');
-    expect(elm.getAttribute('color')).toBe('lime');
-    expect(elm.getAttribute('no-attr')).toBe(null);
+    await expect($(elm)).toHaveAttribute('content', 'attributes added');
+    await expect($(elm)).toHaveAttribute('padding', '');
+    await expect($(elm)).toHaveAttribute('bold', 'true');
+    await expect($(elm)).toHaveAttribute('margin', '');
+    await expect($(elm)).toHaveAttribute('color', 'lime');
+    await expect($(elm)).not.toHaveAttribute('no-attr');
+  });
+
+  after(() => {
+    document.querySelector('#stage')?.remove();
   });
 });

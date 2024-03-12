@@ -1,24 +1,31 @@
-import { setupDomTests, waitForChanges } from '../util';
+import { Fragment, h } from '@stencil/core';
+import { render } from '@wdio/browser-runner/stencil';
 
 describe('computed-properties-state-decorator', function () {
-  const { setupDom, tearDownDom } = setupDomTests(document);
-  let app: HTMLElement;
-
   beforeEach(async () => {
-    app = await setupDom('/computed-properties-state-decorator/index.html');
+    render({
+      template: () => (
+        <>
+          <computed-properties-state-decorator></computed-properties-state-decorator>
+          <button type="button">Change state values</button>
+        </>
+      ),
+    });
+    document.querySelector('button').addEventListener('click', () => {
+      const cmp = document.querySelector('computed-properties-state-decorator');
+      cmp.changeStates();
+    });
   });
-  afterEach(tearDownDom);
 
   it('correctly sets computed property `@State()`s and triggers re-renders', async () => {
-    const el = app.querySelector('computed-properties-state-decorator');
-    expect(el.innerText).toBe('Has rendered: false\n\nMode: default');
+    const el: HTMLElement = document.querySelector('computed-properties-state-decorator');
+    await expect($(el)).toHaveText('Has rendered: false\nMode: default');
 
-    const button = app.querySelector('button');
+    const button = document.querySelector('button');
     expect(button).toBeDefined();
 
-    button.click();
-    await waitForChanges();
+    await $(button).click();
 
-    expect(el.innerText).toBe('Has rendered: true\n\nMode: super');
+    await expect($(el)).toHaveText('Has rendered: true\nMode: super');
   });
 });

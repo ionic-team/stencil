@@ -1,31 +1,39 @@
-import { setupDomTests, waitForChanges } from '../util';
+import { h } from '@stencil/core';
+import { render } from '@wdio/browser-runner/stencil';
 
 describe('computed-properties-prop-decorator', function () {
-  const { setupDom, tearDownDom } = setupDomTests(document);
-  let app: HTMLElement;
-
   beforeEach(async () => {
-    app = await setupDom('/computed-properties-prop-decorator/index.html');
+    render({
+      template: () => (
+        <div>
+          <computed-properties-prop-decorator></computed-properties-prop-decorator>
+          <computed-properties-prop-decorator-reflect></computed-properties-prop-decorator-reflect>
+          <button type="button">Change prop values</button>
+        </div>
+      ),
+    });
+
+    document.querySelector('button')?.addEventListener('click', () => {
+      const cmp = document.querySelector('computed-properties-prop-decorator');
+      cmp?.setAttribute('first', 'These');
+      cmp?.setAttribute('middle', 'are');
+      cmp?.setAttribute('last', 'my props');
+    });
   });
-  afterEach(tearDownDom);
 
   it('correctly sets computed property `@Prop()`s and triggers re-renders', async () => {
-    const el = app.querySelector('computed-properties-prop-decorator');
-    expect(el.textContent).toBe('no content');
-    const button = app.querySelector('button');
-    expect(button).toBeDefined();
+    await expect($('computed-properties-prop-decorator')).toHaveText('no content');
 
-    button.click();
-    await waitForChanges();
-    expect(el.textContent).toBe('These are my props');
+    const button = $('button');
+    await button.click();
+
+    await expect($('computed-properties-prop-decorator')).toHaveText('These are my props');
   });
 
   it('has the default value reflected to the correct attribute on the host', async () => {
-    const el = app.querySelector('computed-properties-prop-decorator-reflect');
+    const el = $('computed-properties-prop-decorator-reflect');
 
-    const firstNameAttr = el.getAttribute('first-name');
-    expect(firstNameAttr).toEqual('no');
-    const lastNameAttr = el.getAttribute('last-name');
-    expect(lastNameAttr).toEqual('content');
+    await expect(el).toHaveAttribute('first-name', 'no');
+    await expect(el).toHaveAttribute('last-name', 'content');
   });
 });

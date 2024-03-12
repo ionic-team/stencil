@@ -1,16 +1,25 @@
-import { setupDomTests, waitForChanges } from '../util';
+import { h } from '@stencil/core';
+import { render } from '@wdio/browser-runner/stencil';
+
+customElements.whenDefined('attribute-complex').then(() => {
+  const el: any = document.querySelector('attribute-complex');
+  el?.getInstance();
+});
 
 describe('attribute-complex', function () {
-  const { setupDom, tearDownDom } = setupDomTests(document);
-  let app: HTMLElement;
-
   beforeEach(async () => {
-    app = await setupDom('/attribute-complex/index.html');
+    render({
+      template: () => <attribute-complex></attribute-complex>,
+    });
   });
-  afterEach(tearDownDom);
+
+  this.afterEach(() => {
+    document.body.querySelector('attribute-complex')?.remove();
+  });
 
   it('should cast attributes', async () => {
-    const el = app.querySelector('attribute-complex') as any;
+    await $('attribute-complex').waitForExist();
+    const el = document.body.querySelector('attribute-complex') as any;
 
     el.setAttribute('nu-0', '3');
     el.setAttribute('nu-1', '-2.3');
@@ -24,7 +33,8 @@ describe('attribute-complex', function () {
     el.setAttribute('str-1', '123');
     el.str2 = 321;
 
-    await waitForChanges();
+    // await waitForChanges();
+    await browser.pause(100);
 
     const instance = await el.getInstance();
     expect(instance.nu0).toBe(3);
@@ -41,7 +51,7 @@ describe('attribute-complex', function () {
   });
 
   it('should cast element props', async () => {
-    const el = app.querySelector('attribute-complex') as any;
+    const el = document.body.querySelector('attribute-complex') as any;
     const instance = await el.getInstance();
 
     el.nu0 = '1234';
@@ -51,8 +61,6 @@ describe('attribute-complex', function () {
     el.bool1 = 'false';
     el.bool2 = false;
 
-    await waitForChanges();
-
     expect(instance.nu0).toBe(1234);
     expect(instance.nu1).toBe(-111.1);
 
@@ -60,6 +68,11 @@ describe('attribute-complex', function () {
     expect(instance.bool1).toBe(false);
     expect(instance.bool2).toBe(false);
 
+    await browser.pause(100);
     expect(instance.str0).toBe('hello'); // default value
+  });
+
+  after(() => {
+    document.querySelector('#stage')?.remove();
   });
 });

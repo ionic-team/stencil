@@ -1,16 +1,25 @@
-import { setupDomTests } from '../util';
+import { Fragment, h } from '@stencil/core';
+import { render } from '@wdio/browser-runner/stencil';
 
 describe('style-plugin', function () {
-  const { setupDom, tearDownDom } = setupDomTests(document);
-  let app: HTMLElement;
-
   beforeEach(async () => {
-    app = await setupDom('/style-plugin/index.html');
+    render({
+      template: () => (
+        <>
+          <h1>Styles!</h1>
+          <h2>Hurray!</h2>
+          <hr />
+          <css-cmp></css-cmp>
+          <sass-cmp></sass-cmp>
+          <multiple-styles-cmp></multiple-styles-cmp>
+        </>
+      ),
+    });
   });
-  afterEach(tearDownDom);
 
   it('sass-cmp', async () => {
-    const sassHost = app.querySelector('sass-cmp');
+    await $('sass-cmp').waitForExist();
+    const sassHost = document.querySelector('sass-cmp');
     const shadowRoot = sassHost.shadowRoot;
 
     const sassEntry = shadowRoot.querySelector('.sass-entry');
@@ -27,7 +36,8 @@ describe('style-plugin', function () {
   });
 
   it('css-cmp', async () => {
-    const cssHost = app.querySelector('css-cmp');
+    await $('css-cmp').waitForExist();
+    const cssHost = document.querySelector('css-cmp');
     const shadowRoot = cssHost.shadowRoot;
 
     const cssEntry = shadowRoot.querySelector('.css-entry');
@@ -40,7 +50,8 @@ describe('style-plugin', function () {
   });
 
   it('multiple-styles-cmp', async () => {
-    const cssHost = app.querySelector('multiple-styles-cmp');
+    await $('multiple-styles-cmp').waitForExist();
+    const cssHost = document.querySelector('multiple-styles-cmp');
     const shadowRoot = cssHost.shadowRoot;
 
     const h1 = getComputedStyle(shadowRoot.querySelector('h1'));

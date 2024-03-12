@@ -1,50 +1,50 @@
-import { setupDomTests, waitForChanges } from '../util';
+import { h } from '@stencil/core';
+import { render } from '@wdio/browser-runner/stencil';
+import { $, expect } from '@wdio/globals';
 
 describe('attribute-boolean', function () {
-  const { setupDom, tearDownDom } = setupDomTests(document);
-  let app: HTMLElement;
-
-  beforeEach(async () => {
-    app = await setupDom('/attribute-boolean/index.html');
+  before(async () => {
+    render({
+      template: () => <attribute-boolean-root></attribute-boolean-root>,
+    });
   });
-  afterEach(tearDownDom);
 
   it('button click rerenders', async () => {
-    const root = app.querySelector('attribute-boolean-root');
-    expect(root.getAttribute('aria-hidden')).toBe('false');
-    expect(root.getAttribute('fixedtrue')).toBe('true');
-    expect(root.getAttribute('fixedfalse')).toBe('false');
-    expect(root.getAttribute('readonly')).toBe(null);
-    expect(root.getAttribute('tappable')).toBe(null);
-    expect(root.getAttribute('str')).toBe(null);
-    expect(root.getAttribute('no-appear')).toBe(null);
-    expect(root.getAttribute('no-appear-two')).toBe(null);
+    const root: any = document.body.querySelector('attribute-boolean-root')!;
+    await expect($(root)).toHaveAttribute('aria-hidden', 'false');
+    await expect(root).toHaveAttribute('aria-hidden', 'false');
+    await expect(root).toHaveAttribute('fixedtrue', 'true');
+    await expect(root).toHaveAttribute('fixedfalse', 'false');
+    await expect(root).not.toHaveAttribute('readonly');
+    await expect(root).not.toHaveAttribute('tappable');
+    await expect(root).not.toHaveAttribute('str');
+    await expect(root).not.toHaveAttribute('no-appear');
+    await expect(root).not.toHaveAttribute('no-appear-two');
 
-    const child = root.querySelector('attribute-boolean');
-    expect(child.getAttribute('aria-hidden')).toBe('false');
-    expect(child.getAttribute('str-state')).toBe('false');
-    expect(child.getAttribute('bool-state')).toBe(null);
-    expect(child.getAttribute('noreflect')).toBe(null);
-    expect(child.getAttribute('tappable')).toBe(null);
+    await browser.pause(100);
+    const child = root.querySelector('attribute-boolean')!;
+    await expect(child).toHaveAttribute('aria-hidden', 'false');
+    await expect(child).toHaveAttribute('str-state', 'false');
+    await expect(child).not.toHaveAttribute('bool-state');
+    await expect(child).not.toHaveAttribute('noreflect');
+    await expect(child).not.toHaveAttribute('tappable');
 
-    const button = app.querySelector('button');
-    button.click();
+    const button = await $('button');
+    await button.click();
 
-    await waitForChanges();
+    await expect($(root)).toHaveAttribute('aria-hidden', 'true');
+    await expect(root).toHaveAttribute('fixedtrue', 'true');
+    await expect(root).toHaveAttribute('fixedfalse', 'false');
+    await expect(root).toHaveAttribute('readonly', 'true');
+    await expect(root).toHaveAttribute('tappable', '');
+    await expect(root).toHaveAttribute('str', 'hello');
+    await expect(root).not.toHaveAttribute('no-appear');
+    await expect(root).not.toHaveAttribute('no-appear-two');
 
-    expect(root.getAttribute('aria-hidden')).toBe('true');
-    expect(root.getAttribute('fixedtrue')).toBe('true');
-    expect(root.getAttribute('fixedfalse')).toBe('false');
-    expect(root.getAttribute('readonly')).toBe('');
-    expect(root.getAttribute('tappable')).toBe('');
-    expect(root.getAttribute('str')).toBe('hello');
-    expect(root.getAttribute('no-appear')).toBe(null);
-    expect(root.getAttribute('no-appear-two')).toBe(null);
-
-    expect(child.getAttribute('aria-hidden')).toBe('true');
-    expect(child.getAttribute('str-state')).toBe('true');
-    expect(child.getAttribute('bool-state')).toBe('');
-    expect(child.getAttribute('noreflect')).toBe(null);
-    expect(child.getAttribute('tappable')).toBe('');
+    await expect(child).toHaveAttribute('aria-hidden', 'true');
+    await expect(child).toHaveAttribute('str-state', 'true');
+    await expect(child).toHaveAttribute('bool-state', '');
+    await expect(child).not.toHaveAttribute('noreflect');
+    await expect(child).toHaveAttribute('tappable', '');
   });
 });

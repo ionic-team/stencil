@@ -1,17 +1,16 @@
-import { setupDomTests } from '../util';
+import { h } from '@stencil/core';
+import { render } from '@wdio/browser-runner/stencil';
 
 describe('attribute-html', function () {
-  const { setupDom, tearDownDom } = setupDomTests(document);
-  let app: HTMLElement;
-
-  beforeEach(async () => {
-    app = await setupDom('/attribute-html/index.html');
+  before(async () => {
+    render({
+      template: () => <attribute-html-root str-attr="my string" any-attr="0" nu-attr="12"></attribute-html-root>,
+    });
   });
-  afterEach(tearDownDom);
 
   it('should have proper values', async () => {
-    expect(app.querySelector('#str-attr').textContent).toBe('my string string');
-    expect(app.querySelector('#any-attr').textContent).toBe('0 string');
-    expect(app.querySelector('#nu-attr').textContent).toBe('12 number');
+    await expect($('#str-attr')).toHaveText('my string string');
+    await expect($('#any-attr')).toHaveText('0 string');
+    await expect($('#nu-attr')).toHaveText('12 number');
   });
 });

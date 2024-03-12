@@ -1,23 +1,31 @@
-import { setupDomTests, waitForChanges } from '../util';
+import { Fragment, h } from '@stencil/core';
+import { render } from '@wdio/browser-runner/stencil';
 
 describe('computed-properties-watch-decorator', function () {
-  const { setupDom, tearDownDom } = setupDomTests(document);
-  let app: HTMLElement;
-
   beforeEach(async () => {
-    app = await setupDom('/computed-properties-watch-decorator/index.html');
+    render({
+      template: () => (
+        <>
+          <computed-properties-watch-decorator></computed-properties-watch-decorator>
+          <button type="button">Trigger watch callbacks</button>
+        </>
+      ),
+    });
+    document.querySelector('button').addEventListener('click', () => {
+      const cmp = document.querySelector('computed-properties-watch-decorator');
+      cmp.setAttribute('first', 'Bob');
+      cmp.setAttribute('last', 'Builder');
+    });
   });
-  afterEach(tearDownDom);
 
   it('triggers the watch callback when the associated prop changes', async () => {
-    const el = app.querySelector('computed-properties-watch-decorator');
-    expect(el.innerText).toBe('First name called with: not yet\n\nLast name called with: not yet');
+    const el = document.querySelector('computed-properties-watch-decorator');
+    await expect(el).toHaveText('First name called with: not yet\nLast name called with: not yet');
 
-    const button = app.querySelector('button');
+    const button = document.querySelector('button');
     expect(button).toBeDefined();
 
-    button.click();
-    await waitForChanges();
+    await $(button).click();
 
     const firstNameCalledWith = {
       newVal: 'Bob',
@@ -29,8 +37,8 @@ describe('computed-properties-watch-decorator', function () {
       oldVal: 'content',
       attrName: 'last',
     };
-    expect(el.innerText).toBe(
-      `First name called with: ${JSON.stringify(firstNameCalledWith)}\n\nLast name called with: ${JSON.stringify(
+    await expect(el).toHaveText(
+      `First name called with: ${JSON.stringify(firstNameCalledWith)}\nLast name called with: ${JSON.stringify(
         lastNameCalledWith,
       )}`,
     );
