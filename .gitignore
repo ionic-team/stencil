@@ -52,6 +52,6 @@ null_errors*.json
 # TODO(STENCIL-454): Remove or change this up once we've eliminated unused exports
 unused-exports*.txt
 
-# TODO()
+# TODO(STENCIL-1203): check in type files back into the repository after migration
 test/wdio/src/components.d.ts
 test/karma/test-app/components.d.ts
