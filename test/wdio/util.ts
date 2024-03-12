@@ -8,6 +8,6 @@ export declare namespace SomeTypes {
   type String = string;
 }
 
-export function isSafari () {
+export function isSafari() {
   return (browser.capabilities as WebdriverIO.Capabilities).browserName.toLowerCase() === 'safari';
 }

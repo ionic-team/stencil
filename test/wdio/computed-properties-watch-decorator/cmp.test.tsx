@@ -22,10 +22,9 @@ describe('computed-properties-watch-decorator', function () {
 
   it('triggers the watch callback when the associated prop changes', async () => {
     const el = document.querySelector('computed-properties-watch-decorator');
-    await expect(el).toHaveText([
-      'First name called with: not yet',
-      'Last name called with: not yet',
-    ].join(isSafari() ? '' : '\n'));
+    await expect(el).toHaveText(
+      ['First name called with: not yet', 'Last name called with: not yet'].join(isSafari() ? '' : '\n'),
+    );
 
     const button = document.querySelector('button');
     expect(button).toBeDefined();
@@ -42,9 +41,11 @@ describe('computed-properties-watch-decorator', function () {
       oldVal: 'content',
       attrName: 'last',
     };
-    await expect(el).toHaveText([
-      `First name called with: ${JSON.stringify(firstNameCalledWith)}`,
-      `Last name called with: ${JSON.stringify(lastNameCalledWith)}`,
-    ].join(isSafari() ? '' : '\n'));
+    await expect(el).toHaveText(
+      [
+        `First name called with: ${JSON.stringify(firstNameCalledWith)}`,
+        `Last name called with: ${JSON.stringify(lastNameCalledWith)}`,
+      ].join(isSafari() ? '' : '\n'),
+    );
   });
 });

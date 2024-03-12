@@ -42,9 +42,7 @@ describe('attribute-host', function () {
     await button.click();
 
     await expect(elm).toHaveStyle({
-      'border-color': browser.isChromium
-        ? 'rgba(0,0,0,1)'
-        : 'rgb(0,0,0)',
+      'border-color': browser.isChromium ? 'rgba(0,0,0,1)' : 'rgb(0,0,0)',
       display: 'block',
       'font-size': '24px',
     });
@@ -84,9 +82,7 @@ describe('attribute-host', function () {
     await button.click();
 
     await expect(elm).toHaveStyle({
-      'border-color': browser.isChromium
-        ? 'rgba(0,0,0,1)'
-        : 'rgb(0,0,0)',
+      'border-color': browser.isChromium ? 'rgba(0,0,0,1)' : 'rgb(0,0,0)',
       display: 'block',
       'font-size': '24px',
     });

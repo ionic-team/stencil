@@ -38,9 +38,6 @@ describe('conditional-rerender', function () {
 
   it('contains a button as a child', async () => {
     await $('main').waitForExist();
-    await expect($('main')).toHaveText(
-      isSafari()
-        ? 'HeaderContentFooterNav'
-        : 'Header\nContent\nFooter\nNav');
+    await expect($('main')).toHaveText(isSafari() ? 'HeaderContentFooterNav' : 'Header\nContent\nFooter\nNav');
   });
 });
