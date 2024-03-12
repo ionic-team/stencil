@@ -369,6 +369,8 @@ export namespace Components {
     interface SlotParentTagChangeRoot {
         "element": string;
     }
+    interface SlotRef {
+    }
     interface SlotReorder {
         "reordered": boolean;
     }
@@ -1373,6 +1375,12 @@ declare global {
         prototype: HTMLSlotParentTagChangeRootElement;
         new (): HTMLSlotParentTagChangeRootElement;
     };
+    interface HTMLSlotRefElement extends Components.SlotRef, HTMLStencilElement {
+    }
+    var HTMLSlotRefElement: {
+        prototype: HTMLSlotRefElement;
+        new (): HTMLSlotRefElement;
+    };
     interface HTMLSlotReorderElement extends Components.SlotReorder, HTMLStencilElement {
     }
     var HTMLSlotReorderElement: {
@@ -1622,6 +1630,7 @@ declare global {
         "slot-no-default": HTMLSlotNoDefaultElement;
         "slot-parent-tag-change": HTMLSlotParentTagChangeElement;
         "slot-parent-tag-change-root": HTMLSlotParentTagChangeRootElement;
+        "slot-ref": HTMLSlotRefElement;
         "slot-reorder": HTMLSlotReorderElement;
         "slot-reorder-root": HTMLSlotReorderRootElement;
         "slot-replace-wrapper": HTMLSlotReplaceWrapperElement;
@@ -2008,6 +2017,8 @@ declare namespace LocalJSX {
     interface SlotParentTagChangeRoot {
         "element"?: string;
     }
+    interface SlotRef {
+    }
     interface SlotReorder {
         "reordered"?: boolean;
     }
@@ -2187,6 +2198,7 @@ declare namespace LocalJSX {
         "slot-no-default": SlotNoDefault;
         "slot-parent-tag-change": SlotParentTagChange;
         "slot-parent-tag-change-root": SlotParentTagChangeRoot;
+        "slot-ref": SlotRef;
         "slot-reorder": SlotReorder;
         "slot-reorder-root": SlotReorderRoot;
         "slot-replace-wrapper": SlotReplaceWrapper;
@@ -2351,6 +2363,7 @@ declare module "@stencil/core" {
             "slot-no-default": LocalJSX.SlotNoDefault & JSXBase.HTMLAttributes<HTMLSlotNoDefaultElement>;
             "slot-parent-tag-change": LocalJSX.SlotParentTagChange & JSXBase.HTMLAttributes<HTMLSlotParentTagChangeElement>;
             "slot-parent-tag-change-root": LocalJSX.SlotParentTagChangeRoot & JSXBase.HTMLAttributes<HTMLSlotParentTagChangeRootElement>;
+            "slot-ref": LocalJSX.SlotRef & JSXBase.HTMLAttributes<HTMLSlotRefElement>;
             "slot-reorder": LocalJSX.SlotReorder & JSXBase.HTMLAttributes<HTMLSlotReorderElement>;
             "slot-reorder-root": LocalJSX.SlotReorderRoot & JSXBase.HTMLAttributes<HTMLSlotReorderRootElement>;
             "slot-replace-wrapper": LocalJSX.SlotReplaceWrapper & JSXBase.HTMLAttributes<HTMLSlotReplaceWrapperElement>;
