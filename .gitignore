@@ -52,4 +52,6 @@ null_errors*.json
 # TODO(STENCIL-454): Remove or change this up once we've eliminated unused exports
 unused-exports*.txt
 
+# TODO()
 test/wdio/src/components.d.ts
+test/karma/test-app/components.d.ts
