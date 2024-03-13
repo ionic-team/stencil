@@ -207,10 +207,19 @@ const relocateToHostRoot = (parentElm: Element) => {
   plt.$flags$ &= ~PLATFORM_FLAGS.isTmpDisconnected;
 };
 
-const putBackInOriginalLocation = (parentElm: Node, recursive: boolean) => {
+const putBackInOriginalLocation = (parentElm: d.RenderNode, recursive: boolean) => {
   plt.$flags$ |= PLATFORM_FLAGS.isTmpDisconnected;
+  const oldSlotChildNodes: ChildNode[] = Array.from(parentElm.childNodes);
 
-  const oldSlotChildNodes = parentElm.childNodes;
+  if (parentElm['s-sr'] && BUILD.experimentalSlotFixes) {
+    let node = parentElm;
+    while ((node = node.nextSibling as d.RenderNode)) {
+      if (node && node['s-sn'] === parentElm['s-sn'] && node['s-sh'] === hostTagName) {
+        oldSlotChildNodes.push(node);
+      }
+    }
+  }
+
   for (let i = oldSlotChildNodes.length - 1; i >= 0; i--) {
     const childNode = oldSlotChildNodes[i] as any;
     if (childNode['s-hn'] !== hostTagName && childNode['s-ol']) {
