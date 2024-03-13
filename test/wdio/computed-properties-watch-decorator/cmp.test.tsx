@@ -20,9 +20,7 @@ describe('computed-properties-watch-decorator', function () {
 
   it('triggers the watch callback when the associated prop changes', async () => {
     const el = document.querySelector('computed-properties-watch-decorator');
-    await expect(el).toHaveText(
-      ['First name called with: not yet', 'Last name called with: not yet'].join('\n'),
-    );
+    await expect(el).toHaveText(['First name called with: not yet', 'Last name called with: not yet'].join('\n'));
 
     const button = document.querySelector('button');
     expect(button).toBeDefined();
