@@ -1,8 +1,6 @@
 import { Fragment, h } from '@stencil/core';
 import { render } from '@wdio/browser-runner/stencil';
 
-import { isSafari } from '../util.js';
-
 const css = `main {
   background: rgb(0, 0, 0);
   padding: 30px;
@@ -38,6 +36,6 @@ describe('conditional-rerender', function () {
 
   it('contains a button as a child', async () => {
     await $('main').waitForExist();
-    await expect($('main')).toHaveText(isSafari() ? 'HeaderContentFooterNav' : 'Header\nContent\nFooter\nNav');
+    await expect($('main')).toHaveText('Header\nContent\nFooter\nNav');
   });
 });

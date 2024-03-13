@@ -1,8 +1,6 @@
 import { h } from '@stencil/core';
 import { render } from '@wdio/browser-runner/stencil';
 
-import { isSafari } from '../util.js';
-
 describe('attribute-host', function () {
   before(async () => {
     render({
@@ -37,7 +35,7 @@ describe('attribute-host', function () {
     // this tests CSS custom properties in inline style, but CSS var are
     // not supported natively in IE11, so let's skip the test
     const win = window as any;
-    if (!isSafari() && win.CSS && win.CSS.supports && win.CSS.supports('--prop', 'value')) {
+    if (win.CSS && win.CSS.supports && win.CSS.supports('--prop', 'value')) {
       await expect(elm).toHaveStyle({ '--css-var': '' });
     }
 
@@ -54,9 +52,9 @@ describe('attribute-host', function () {
     }
 
     await expect($(elm)).toHaveAttribute('content', 'attributes added');
-    await expect($(elm)).toHaveAttribute('padding', isSafari() ? 'true' : '');
+    await expect($(elm)).toHaveAttribute('padding', '');
     await expect($(elm)).toHaveAttribute('bold', 'true');
-    await expect($(elm)).toHaveAttribute('margin', isSafari() ? 'true' : '');
+    await expect($(elm)).toHaveAttribute('margin', '');
     await expect($(elm)).toHaveAttribute('color', 'lime');
     await expect($(elm)).not.toHaveAttribute('no-attr');
 
@@ -92,9 +90,9 @@ describe('attribute-host', function () {
     }
 
     await expect($(elm)).toHaveAttribute('content', 'attributes added');
-    await expect($(elm)).toHaveAttribute('padding', isSafari() ? 'true' : '');
+    await expect($(elm)).toHaveAttribute('padding', '');
     await expect($(elm)).toHaveAttribute('bold', 'true');
-    await expect($(elm)).toHaveAttribute('margin', isSafari() ? 'true' : '');
+    await expect($(elm)).toHaveAttribute('margin', '');
     await expect($(elm)).toHaveAttribute('color', 'lime');
     await expect($(elm)).not.toHaveAttribute('no-attr');
   });

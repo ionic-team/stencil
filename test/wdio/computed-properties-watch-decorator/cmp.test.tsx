@@ -1,8 +1,6 @@
 import { Fragment, h } from '@stencil/core';
 import { render } from '@wdio/browser-runner/stencil';
 
-import { isSafari } from '../util.js';
-
 describe('computed-properties-watch-decorator', function () {
   beforeEach(async () => {
     render({
@@ -23,7 +21,7 @@ describe('computed-properties-watch-decorator', function () {
   it('triggers the watch callback when the associated prop changes', async () => {
     const el = document.querySelector('computed-properties-watch-decorator');
     await expect(el).toHaveText(
-      ['First name called with: not yet', 'Last name called with: not yet'].join(isSafari() ? '' : '\n'),
+      ['First name called with: not yet', 'Last name called with: not yet'].join('\n'),
     );
 
     const button = document.querySelector('button');
@@ -45,7 +43,7 @@ describe('computed-properties-watch-decorator', function () {
       [
         `First name called with: ${JSON.stringify(firstNameCalledWith)}`,
         `Last name called with: ${JSON.stringify(lastNameCalledWith)}`,
-      ].join(isSafari() ? '' : '\n'),
+      ].join('\n'),
     );
   });
 });

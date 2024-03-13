@@ -331,7 +331,7 @@ if (isCI) {
       browserName: 'firefox',
     },
     {
-      browserName: 'safari',
+      browserName: 'edge',
     },
   );
 }
