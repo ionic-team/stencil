@@ -1060,8 +1060,8 @@ render() {
 
                 // If the refNode is the same node to be relocated or another element's slot reference, keep searching to find the
                 // correct relocation target
-                while (refNode === nodeToRelocate || refNode['s-sr']) {
-                  refNode = refNode.nextSibling as d.RenderNode | null;
+                while (refNode === nodeToRelocate || refNode?.['s-sr']) {
+                  refNode = refNode?.nextSibling as d.RenderNode | null;
                 }
 
                 if (!refNode || !refNode['s-nr']) {
