@@ -26,7 +26,7 @@ describe('attribute-host', function () {
     await expect(elm).toHaveStyle({
       // get default border color from body element as it might differ between different OS
       'border-color': browser.isChromium
-        ? 'rgba(255,255,255,1)'
+        ? 'rgba(0,0,0,1)'
         : getComputedStyle(document.body).borderColor.replaceAll(' ', ''),
       display: 'inline-block',
       'font-size': '16px',
