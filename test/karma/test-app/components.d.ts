@@ -5,48 +5,10 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
-import { SomeTypes } from "./util";
 import { TestEventDetail } from "./event-custom-type/cmp";
-export { SomeTypes } from "./util";
 export { TestEventDetail } from "./event-custom-type/cmp";
 export namespace Components {
-    interface AttributeBasic {
-        "customAttr": string;
-        "multiWord": string;
-        "single": string;
-    }
-    interface AttributeBasicRoot {
-    }
-    interface AttributeBoolean {
-        "boolState"?: boolean;
-        "noreflect"?: boolean;
-        "strState"?: string;
-    }
-    interface AttributeBooleanRoot {
-        "toggleState": () => Promise<void>;
-    }
-    interface AttributeComplex {
-        "bool0": boolean;
-        "bool1"?: boolean;
-        "bool2"?: boolean;
-        "getInstance": () => Promise<this>;
-        "nu0": number;
-        "nu1"?: number;
-        "nu2"?: SomeTypes.Number;
-        "str0": string;
-        "str1"?: string;
-        "str2"?: SomeTypes.String;
-    }
-    interface AttributeHost {
-    }
-    interface AttributeHtmlRoot {
-        "anyAttr"?: any;
-        "nuAttr"?: number;
-        "strAttr"?: string;
-    }
     interface BadSharedJsx {
-    }
-    interface BuildData {
     }
     interface ChildReflectNanAttribute {
         "val": number;
@@ -57,31 +19,6 @@ export namespace Components {
     interface CmpLabel {
     }
     interface CmpLabelWithSlotSibling {
-    }
-    interface ComputedPropertiesPropDecorator {
-        "first": string;
-        "last": string;
-        "middle": string;
-    }
-    interface ComputedPropertiesPropDecoratorReflect {
-        "first": string;
-        "last": string;
-        "middle": string;
-    }
-    interface ComputedPropertiesStateDecorator {
-        "changeStates": () => Promise<void>;
-    }
-    interface ComputedPropertiesWatchDecorator {
-        "first": string;
-        "last": string;
-    }
-    interface ConditionalBasic {
-    }
-    interface ConditionalRerender {
-    }
-    interface ConditionalRerenderRoot {
-    }
-    interface CssCmp {
     }
     interface CssVariablesNoEncapsulation {
     }
@@ -144,8 +81,6 @@ export namespace Components {
     interface FormAssociated {
     }
     interface HostAttrOverride {
-    }
-    interface ImageImport {
     }
     interface ImportAliasing {
         "myMethod": () => Promise<HTMLElement>;
@@ -213,8 +148,6 @@ export namespace Components {
     }
     interface ListenWindow {
     }
-    interface MultipleStylesCmp {
-    }
     interface NoDelegatesFocus {
     }
     interface NodeResolution {
@@ -245,8 +178,6 @@ export namespace Components {
     interface ReparentStyleNoVars {
     }
     interface ReparentStyleWithVars {
-    }
-    interface SassCmp {
     }
     interface ScopedBasic {
     }
@@ -445,59 +376,11 @@ export interface LifecycleBasicCCustomEvent<T> extends CustomEvent<T> {
     target: HTMLLifecycleBasicCElement;
 }
 declare global {
-    interface HTMLAttributeBasicElement extends Components.AttributeBasic, HTMLStencilElement {
-    }
-    var HTMLAttributeBasicElement: {
-        prototype: HTMLAttributeBasicElement;
-        new (): HTMLAttributeBasicElement;
-    };
-    interface HTMLAttributeBasicRootElement extends Components.AttributeBasicRoot, HTMLStencilElement {
-    }
-    var HTMLAttributeBasicRootElement: {
-        prototype: HTMLAttributeBasicRootElement;
-        new (): HTMLAttributeBasicRootElement;
-    };
-    interface HTMLAttributeBooleanElement extends Components.AttributeBoolean, HTMLStencilElement {
-    }
-    var HTMLAttributeBooleanElement: {
-        prototype: HTMLAttributeBooleanElement;
-        new (): HTMLAttributeBooleanElement;
-    };
-    interface HTMLAttributeBooleanRootElement extends Components.AttributeBooleanRoot, HTMLStencilElement {
-    }
-    var HTMLAttributeBooleanRootElement: {
-        prototype: HTMLAttributeBooleanRootElement;
-        new (): HTMLAttributeBooleanRootElement;
-    };
-    interface HTMLAttributeComplexElement extends Components.AttributeComplex, HTMLStencilElement {
-    }
-    var HTMLAttributeComplexElement: {
-        prototype: HTMLAttributeComplexElement;
-        new (): HTMLAttributeComplexElement;
-    };
-    interface HTMLAttributeHostElement extends Components.AttributeHost, HTMLStencilElement {
-    }
-    var HTMLAttributeHostElement: {
-        prototype: HTMLAttributeHostElement;
-        new (): HTMLAttributeHostElement;
-    };
-    interface HTMLAttributeHtmlRootElement extends Components.AttributeHtmlRoot, HTMLStencilElement {
-    }
-    var HTMLAttributeHtmlRootElement: {
-        prototype: HTMLAttributeHtmlRootElement;
-        new (): HTMLAttributeHtmlRootElement;
-    };
     interface HTMLBadSharedJsxElement extends Components.BadSharedJsx, HTMLStencilElement {
     }
     var HTMLBadSharedJsxElement: {
         prototype: HTMLBadSharedJsxElement;
         new (): HTMLBadSharedJsxElement;
-    };
-    interface HTMLBuildDataElement extends Components.BuildData, HTMLStencilElement {
-    }
-    var HTMLBuildDataElement: {
-        prototype: HTMLBuildDataElement;
-        new (): HTMLBuildDataElement;
     };
     interface HTMLChildReflectNanAttributeElement extends Components.ChildReflectNanAttribute, HTMLStencilElement {
     }
@@ -522,54 +405,6 @@ declare global {
     var HTMLCmpLabelWithSlotSiblingElement: {
         prototype: HTMLCmpLabelWithSlotSiblingElement;
         new (): HTMLCmpLabelWithSlotSiblingElement;
-    };
-    interface HTMLComputedPropertiesPropDecoratorElement extends Components.ComputedPropertiesPropDecorator, HTMLStencilElement {
-    }
-    var HTMLComputedPropertiesPropDecoratorElement: {
-        prototype: HTMLComputedPropertiesPropDecoratorElement;
-        new (): HTMLComputedPropertiesPropDecoratorElement;
-    };
-    interface HTMLComputedPropertiesPropDecoratorReflectElement extends Components.ComputedPropertiesPropDecoratorReflect, HTMLStencilElement {
-    }
-    var HTMLComputedPropertiesPropDecoratorReflectElement: {
-        prototype: HTMLComputedPropertiesPropDecoratorReflectElement;
-        new (): HTMLComputedPropertiesPropDecoratorReflectElement;
-    };
-    interface HTMLComputedPropertiesStateDecoratorElement extends Components.ComputedPropertiesStateDecorator, HTMLStencilElement {
-    }
-    var HTMLComputedPropertiesStateDecoratorElement: {
-        prototype: HTMLComputedPropertiesStateDecoratorElement;
-        new (): HTMLComputedPropertiesStateDecoratorElement;
-    };
-    interface HTMLComputedPropertiesWatchDecoratorElement extends Components.ComputedPropertiesWatchDecorator, HTMLStencilElement {
-    }
-    var HTMLComputedPropertiesWatchDecoratorElement: {
-        prototype: HTMLComputedPropertiesWatchDecoratorElement;
-        new (): HTMLComputedPropertiesWatchDecoratorElement;
-    };
-    interface HTMLConditionalBasicElement extends Components.ConditionalBasic, HTMLStencilElement {
-    }
-    var HTMLConditionalBasicElement: {
-        prototype: HTMLConditionalBasicElement;
-        new (): HTMLConditionalBasicElement;
-    };
-    interface HTMLConditionalRerenderElement extends Components.ConditionalRerender, HTMLStencilElement {
-    }
-    var HTMLConditionalRerenderElement: {
-        prototype: HTMLConditionalRerenderElement;
-        new (): HTMLConditionalRerenderElement;
-    };
-    interface HTMLConditionalRerenderRootElement extends Components.ConditionalRerenderRoot, HTMLStencilElement {
-    }
-    var HTMLConditionalRerenderRootElement: {
-        prototype: HTMLConditionalRerenderRootElement;
-        new (): HTMLConditionalRerenderRootElement;
-    };
-    interface HTMLCssCmpElement extends Components.CssCmp, HTMLStencilElement {
-    }
-    var HTMLCssCmpElement: {
-        prototype: HTMLCssCmpElement;
-        new (): HTMLCssCmpElement;
     };
     interface HTMLCssVariablesNoEncapsulationElement extends Components.CssVariablesNoEncapsulation, HTMLStencilElement {
     }
@@ -771,12 +606,6 @@ declare global {
     var HTMLHostAttrOverrideElement: {
         prototype: HTMLHostAttrOverrideElement;
         new (): HTMLHostAttrOverrideElement;
-    };
-    interface HTMLImageImportElement extends Components.ImageImport, HTMLStencilElement {
-    }
-    var HTMLImageImportElement: {
-        prototype: HTMLImageImportElement;
-        new (): HTMLImageImportElement;
     };
     interface HTMLImportAliasingElementEventMap {
         "myEvent": void;
@@ -1005,12 +834,6 @@ declare global {
         prototype: HTMLListenWindowElement;
         new (): HTMLListenWindowElement;
     };
-    interface HTMLMultipleStylesCmpElement extends Components.MultipleStylesCmp, HTMLStencilElement {
-    }
-    var HTMLMultipleStylesCmpElement: {
-        prototype: HTMLMultipleStylesCmpElement;
-        new (): HTMLMultipleStylesCmpElement;
-    };
     interface HTMLNoDelegatesFocusElement extends Components.NoDelegatesFocus, HTMLStencilElement {
     }
     var HTMLNoDelegatesFocusElement: {
@@ -1070,12 +893,6 @@ declare global {
     var HTMLReparentStyleWithVarsElement: {
         prototype: HTMLReparentStyleWithVarsElement;
         new (): HTMLReparentStyleWithVarsElement;
-    };
-    interface HTMLSassCmpElement extends Components.SassCmp, HTMLStencilElement {
-    }
-    var HTMLSassCmpElement: {
-        prototype: HTMLSassCmpElement;
-        new (): HTMLSassCmpElement;
     };
     interface HTMLScopedBasicElement extends Components.ScopedBasic, HTMLStencilElement {
     }
@@ -1498,27 +1315,11 @@ declare global {
         new (): HTMLWatchNativeAttributesElement;
     };
     interface HTMLElementTagNameMap {
-        "attribute-basic": HTMLAttributeBasicElement;
-        "attribute-basic-root": HTMLAttributeBasicRootElement;
-        "attribute-boolean": HTMLAttributeBooleanElement;
-        "attribute-boolean-root": HTMLAttributeBooleanRootElement;
-        "attribute-complex": HTMLAttributeComplexElement;
-        "attribute-host": HTMLAttributeHostElement;
-        "attribute-html-root": HTMLAttributeHtmlRootElement;
         "bad-shared-jsx": HTMLBadSharedJsxElement;
-        "build-data": HTMLBuildDataElement;
         "child-reflect-nan-attribute": HTMLChildReflectNanAttributeElement;
         "child-with-reflection": HTMLChildWithReflectionElement;
         "cmp-label": HTMLCmpLabelElement;
         "cmp-label-with-slot-sibling": HTMLCmpLabelWithSlotSiblingElement;
-        "computed-properties-prop-decorator": HTMLComputedPropertiesPropDecoratorElement;
-        "computed-properties-prop-decorator-reflect": HTMLComputedPropertiesPropDecoratorReflectElement;
-        "computed-properties-state-decorator": HTMLComputedPropertiesStateDecoratorElement;
-        "computed-properties-watch-decorator": HTMLComputedPropertiesWatchDecoratorElement;
-        "conditional-basic": HTMLConditionalBasicElement;
-        "conditional-rerender": HTMLConditionalRerenderElement;
-        "conditional-rerender-root": HTMLConditionalRerenderRootElement;
-        "css-cmp": HTMLCssCmpElement;
         "css-variables-no-encapsulation": HTMLCssVariablesNoEncapsulationElement;
         "css-variables-shadow-dom": HTMLCssVariablesShadowDomElement;
         "custom-element-child": HTMLCustomElementChildElement;
@@ -1547,7 +1348,6 @@ declare global {
         "factory-jsx": HTMLFactoryJsxElement;
         "form-associated": HTMLFormAssociatedElement;
         "host-attr-override": HTMLHostAttrOverrideElement;
-        "image-import": HTMLImageImportElement;
         "import-aliasing": HTMLImportAliasingElement;
         "init-css-root": HTMLInitCssRootElement;
         "input-basic-root": HTMLInputBasicRootElement;
@@ -1576,7 +1376,6 @@ declare global {
         "listen-jsx-root": HTMLListenJsxRootElement;
         "listen-reattach": HTMLListenReattachElement;
         "listen-window": HTMLListenWindowElement;
-        "multiple-styles-cmp": HTMLMultipleStylesCmpElement;
         "no-delegates-focus": HTMLNoDelegatesFocusElement;
         "node-resolution": HTMLNodeResolutionElement;
         "parent-reflect-nan-attribute": HTMLParentReflectNanAttributeElement;
@@ -1587,7 +1386,6 @@ declare global {
         "remove-child-patch": HTMLRemoveChildPatchElement;
         "reparent-style-no-vars": HTMLReparentStyleNoVarsElement;
         "reparent-style-with-vars": HTMLReparentStyleWithVarsElement;
-        "sass-cmp": HTMLSassCmpElement;
         "scoped-basic": HTMLScopedBasicElement;
         "scoped-basic-root": HTMLScopedBasicRootElement;
         "scoped-conditional": HTMLScopedConditionalElement;
@@ -1661,41 +1459,7 @@ declare global {
     }
 }
 declare namespace LocalJSX {
-    interface AttributeBasic {
-        "customAttr"?: string;
-        "multiWord"?: string;
-        "single"?: string;
-    }
-    interface AttributeBasicRoot {
-    }
-    interface AttributeBoolean {
-        "boolState"?: boolean;
-        "noreflect"?: boolean;
-        "strState"?: string;
-    }
-    interface AttributeBooleanRoot {
-    }
-    interface AttributeComplex {
-        "bool0"?: boolean;
-        "bool1"?: boolean;
-        "bool2"?: boolean;
-        "nu0"?: number;
-        "nu1"?: number;
-        "nu2"?: SomeTypes.Number;
-        "str0"?: string;
-        "str1"?: string;
-        "str2"?: SomeTypes.String;
-    }
-    interface AttributeHost {
-    }
-    interface AttributeHtmlRoot {
-        "anyAttr"?: any;
-        "nuAttr"?: number;
-        "strAttr"?: string;
-    }
     interface BadSharedJsx {
-    }
-    interface BuildData {
     }
     interface ChildReflectNanAttribute {
         "val"?: number;
@@ -1706,30 +1470,6 @@ declare namespace LocalJSX {
     interface CmpLabel {
     }
     interface CmpLabelWithSlotSibling {
-    }
-    interface ComputedPropertiesPropDecorator {
-        "first"?: string;
-        "last"?: string;
-        "middle"?: string;
-    }
-    interface ComputedPropertiesPropDecoratorReflect {
-        "first"?: string;
-        "last"?: string;
-        "middle"?: string;
-    }
-    interface ComputedPropertiesStateDecorator {
-    }
-    interface ComputedPropertiesWatchDecorator {
-        "first"?: string;
-        "last"?: string;
-    }
-    interface ConditionalBasic {
-    }
-    interface ConditionalRerender {
-    }
-    interface ConditionalRerenderRoot {
-    }
-    interface CssCmp {
     }
     interface CssVariablesNoEncapsulation {
     }
@@ -1793,8 +1533,6 @@ declare namespace LocalJSX {
     interface FormAssociated {
     }
     interface HostAttrOverride {
-    }
-    interface ImageImport {
     }
     interface ImportAliasing {
         "onMyEvent"?: (event: ImportAliasingCustomEvent<void>) => void;
@@ -1870,8 +1608,6 @@ declare namespace LocalJSX {
     }
     interface ListenWindow {
     }
-    interface MultipleStylesCmp {
-    }
     interface NoDelegatesFocus {
     }
     interface NodeResolution {
@@ -1902,8 +1638,6 @@ declare namespace LocalJSX {
     interface ReparentStyleNoVars {
     }
     interface ReparentStyleWithVars {
-    }
-    interface SassCmp {
     }
     interface ScopedBasic {
     }
@@ -2069,27 +1803,11 @@ declare namespace LocalJSX {
     interface WatchNativeAttributes {
     }
     interface IntrinsicElements {
-        "attribute-basic": AttributeBasic;
-        "attribute-basic-root": AttributeBasicRoot;
-        "attribute-boolean": AttributeBoolean;
-        "attribute-boolean-root": AttributeBooleanRoot;
-        "attribute-complex": AttributeComplex;
-        "attribute-host": AttributeHost;
-        "attribute-html-root": AttributeHtmlRoot;
         "bad-shared-jsx": BadSharedJsx;
-        "build-data": BuildData;
         "child-reflect-nan-attribute": ChildReflectNanAttribute;
         "child-with-reflection": ChildWithReflection;
         "cmp-label": CmpLabel;
         "cmp-label-with-slot-sibling": CmpLabelWithSlotSibling;
-        "computed-properties-prop-decorator": ComputedPropertiesPropDecorator;
-        "computed-properties-prop-decorator-reflect": ComputedPropertiesPropDecoratorReflect;
-        "computed-properties-state-decorator": ComputedPropertiesStateDecorator;
-        "computed-properties-watch-decorator": ComputedPropertiesWatchDecorator;
-        "conditional-basic": ConditionalBasic;
-        "conditional-rerender": ConditionalRerender;
-        "conditional-rerender-root": ConditionalRerenderRoot;
-        "css-cmp": CssCmp;
         "css-variables-no-encapsulation": CssVariablesNoEncapsulation;
         "css-variables-shadow-dom": CssVariablesShadowDom;
         "custom-element-child": CustomElementChild;
@@ -2118,7 +1836,6 @@ declare namespace LocalJSX {
         "factory-jsx": FactoryJsx;
         "form-associated": FormAssociated;
         "host-attr-override": HostAttrOverride;
-        "image-import": ImageImport;
         "import-aliasing": ImportAliasing;
         "init-css-root": InitCssRoot;
         "input-basic-root": InputBasicRoot;
@@ -2147,7 +1864,6 @@ declare namespace LocalJSX {
         "listen-jsx-root": ListenJsxRoot;
         "listen-reattach": ListenReattach;
         "listen-window": ListenWindow;
-        "multiple-styles-cmp": MultipleStylesCmp;
         "no-delegates-focus": NoDelegatesFocus;
         "node-resolution": NodeResolution;
         "parent-reflect-nan-attribute": ParentReflectNanAttribute;
@@ -2158,7 +1874,6 @@ declare namespace LocalJSX {
         "remove-child-patch": RemoveChildPatch;
         "reparent-style-no-vars": ReparentStyleNoVars;
         "reparent-style-with-vars": ReparentStyleWithVars;
-        "sass-cmp": SassCmp;
         "scoped-basic": ScopedBasic;
         "scoped-basic-root": ScopedBasicRoot;
         "scoped-conditional": ScopedConditional;
@@ -2235,27 +1950,11 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
-            "attribute-basic": LocalJSX.AttributeBasic & JSXBase.HTMLAttributes<HTMLAttributeBasicElement>;
-            "attribute-basic-root": LocalJSX.AttributeBasicRoot & JSXBase.HTMLAttributes<HTMLAttributeBasicRootElement>;
-            "attribute-boolean": LocalJSX.AttributeBoolean & JSXBase.HTMLAttributes<HTMLAttributeBooleanElement>;
-            "attribute-boolean-root": LocalJSX.AttributeBooleanRoot & JSXBase.HTMLAttributes<HTMLAttributeBooleanRootElement>;
-            "attribute-complex": LocalJSX.AttributeComplex & JSXBase.HTMLAttributes<HTMLAttributeComplexElement>;
-            "attribute-host": LocalJSX.AttributeHost & JSXBase.HTMLAttributes<HTMLAttributeHostElement>;
-            "attribute-html-root": LocalJSX.AttributeHtmlRoot & JSXBase.HTMLAttributes<HTMLAttributeHtmlRootElement>;
             "bad-shared-jsx": LocalJSX.BadSharedJsx & JSXBase.HTMLAttributes<HTMLBadSharedJsxElement>;
-            "build-data": LocalJSX.BuildData & JSXBase.HTMLAttributes<HTMLBuildDataElement>;
             "child-reflect-nan-attribute": LocalJSX.ChildReflectNanAttribute & JSXBase.HTMLAttributes<HTMLChildReflectNanAttributeElement>;
             "child-with-reflection": LocalJSX.ChildWithReflection & JSXBase.HTMLAttributes<HTMLChildWithReflectionElement>;
             "cmp-label": LocalJSX.CmpLabel & JSXBase.HTMLAttributes<HTMLCmpLabelElement>;
             "cmp-label-with-slot-sibling": LocalJSX.CmpLabelWithSlotSibling & JSXBase.HTMLAttributes<HTMLCmpLabelWithSlotSiblingElement>;
-            "computed-properties-prop-decorator": LocalJSX.ComputedPropertiesPropDecorator & JSXBase.HTMLAttributes<HTMLComputedPropertiesPropDecoratorElement>;
-            "computed-properties-prop-decorator-reflect": LocalJSX.ComputedPropertiesPropDecoratorReflect & JSXBase.HTMLAttributes<HTMLComputedPropertiesPropDecoratorReflectElement>;
-            "computed-properties-state-decorator": LocalJSX.ComputedPropertiesStateDecorator & JSXBase.HTMLAttributes<HTMLComputedPropertiesStateDecoratorElement>;
-            "computed-properties-watch-decorator": LocalJSX.ComputedPropertiesWatchDecorator & JSXBase.HTMLAttributes<HTMLComputedPropertiesWatchDecoratorElement>;
-            "conditional-basic": LocalJSX.ConditionalBasic & JSXBase.HTMLAttributes<HTMLConditionalBasicElement>;
-            "conditional-rerender": LocalJSX.ConditionalRerender & JSXBase.HTMLAttributes<HTMLConditionalRerenderElement>;
-            "conditional-rerender-root": LocalJSX.ConditionalRerenderRoot & JSXBase.HTMLAttributes<HTMLConditionalRerenderRootElement>;
-            "css-cmp": LocalJSX.CssCmp & JSXBase.HTMLAttributes<HTMLCssCmpElement>;
             "css-variables-no-encapsulation": LocalJSX.CssVariablesNoEncapsulation & JSXBase.HTMLAttributes<HTMLCssVariablesNoEncapsulationElement>;
             "css-variables-shadow-dom": LocalJSX.CssVariablesShadowDom & JSXBase.HTMLAttributes<HTMLCssVariablesShadowDomElement>;
             "custom-element-child": LocalJSX.CustomElementChild & JSXBase.HTMLAttributes<HTMLCustomElementChildElement>;
@@ -2284,7 +1983,6 @@ declare module "@stencil/core" {
             "factory-jsx": LocalJSX.FactoryJsx & JSXBase.HTMLAttributes<HTMLFactoryJsxElement>;
             "form-associated": LocalJSX.FormAssociated & JSXBase.HTMLAttributes<HTMLFormAssociatedElement>;
             "host-attr-override": LocalJSX.HostAttrOverride & JSXBase.HTMLAttributes<HTMLHostAttrOverrideElement>;
-            "image-import": LocalJSX.ImageImport & JSXBase.HTMLAttributes<HTMLImageImportElement>;
             "import-aliasing": LocalJSX.ImportAliasing & JSXBase.HTMLAttributes<HTMLImportAliasingElement>;
             "init-css-root": LocalJSX.InitCssRoot & JSXBase.HTMLAttributes<HTMLInitCssRootElement>;
             "input-basic-root": LocalJSX.InputBasicRoot & JSXBase.HTMLAttributes<HTMLInputBasicRootElement>;
@@ -2313,7 +2011,6 @@ declare module "@stencil/core" {
             "listen-jsx-root": LocalJSX.ListenJsxRoot & JSXBase.HTMLAttributes<HTMLListenJsxRootElement>;
             "listen-reattach": LocalJSX.ListenReattach & JSXBase.HTMLAttributes<HTMLListenReattachElement>;
             "listen-window": LocalJSX.ListenWindow & JSXBase.HTMLAttributes<HTMLListenWindowElement>;
-            "multiple-styles-cmp": LocalJSX.MultipleStylesCmp & JSXBase.HTMLAttributes<HTMLMultipleStylesCmpElement>;
             "no-delegates-focus": LocalJSX.NoDelegatesFocus & JSXBase.HTMLAttributes<HTMLNoDelegatesFocusElement>;
             "node-resolution": LocalJSX.NodeResolution & JSXBase.HTMLAttributes<HTMLNodeResolutionElement>;
             "parent-reflect-nan-attribute": LocalJSX.ParentReflectNanAttribute & JSXBase.HTMLAttributes<HTMLParentReflectNanAttributeElement>;
@@ -2324,7 +2021,6 @@ declare module "@stencil/core" {
             "remove-child-patch": LocalJSX.RemoveChildPatch & JSXBase.HTMLAttributes<HTMLRemoveChildPatchElement>;
             "reparent-style-no-vars": LocalJSX.ReparentStyleNoVars & JSXBase.HTMLAttributes<HTMLReparentStyleNoVarsElement>;
             "reparent-style-with-vars": LocalJSX.ReparentStyleWithVars & JSXBase.HTMLAttributes<HTMLReparentStyleWithVarsElement>;
-            "sass-cmp": LocalJSX.SassCmp & JSXBase.HTMLAttributes<HTMLSassCmpElement>;
             "scoped-basic": LocalJSX.ScopedBasic & JSXBase.HTMLAttributes<HTMLScopedBasicElement>;
             "scoped-basic-root": LocalJSX.ScopedBasicRoot & JSXBase.HTMLAttributes<HTMLScopedBasicRootElement>;
             "scoped-conditional": LocalJSX.ScopedConditional & JSXBase.HTMLAttributes<HTMLScopedConditionalElement>;

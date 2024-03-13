@@ -24,7 +24,6 @@ export const config: Config = {
     },
   ],
   globalScript: 'test-app/global.ts',
-  globalStyle: 'test-app/style-plugin/global-sass-entry.scss',
   plugins: [sass()],
   buildEs5: true,
   extras: {
