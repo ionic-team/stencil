@@ -1,7 +1,7 @@
 import { h } from '@stencil/core';
 import { render } from '@wdio/browser-runner/stencil';
 
-describe('build-data', function () {
+describe('build-data', () => {
   beforeEach(async () => {
     render({
       template: () => <build-data></build-data>,

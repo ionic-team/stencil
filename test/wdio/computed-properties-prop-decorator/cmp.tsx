@@ -15,7 +15,7 @@ const MyProp = 'last';
 export class ComputedPropertiesPropDecorator {
   @Prop() [Foo.BAR] = 'no';
 
-  @Prop() [Foo.BAZ]: string;
+  @Prop() [Foo.BAZ]: string = '';
 
   @Prop() [MyProp] = 'content';
 

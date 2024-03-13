@@ -1,7 +1,7 @@
 import { Fragment, h } from '@stencil/core';
 import { render } from '@wdio/browser-runner/stencil';
 
-describe('computed-properties-watch-decorator', function () {
+describe('computed-properties-watch-decorator', () => {
   beforeEach(async () => {
     render({
       template: () => (

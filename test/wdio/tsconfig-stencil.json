@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    // "strict": true,
-    // "alwaysStrict": true,
+    "strict": true,
+    "alwaysStrict": true,
     "allowSyntheticDefaultImports": true,
     "allowUnreachableCode": false,
     "declaration": false,

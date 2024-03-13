@@ -12,7 +12,7 @@ jobs:
     name: Build
     uses: ./.github/workflows/build.yml
 
-  run_browserstack:
+  run_wdio:
     name: Run WebdriverIO Component Tests
     runs-on: ubuntu-22.04
     needs: [build_core]

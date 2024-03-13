@@ -2,7 +2,7 @@ import { h } from '@stencil/core';
 import { render } from '@wdio/browser-runner/stencil';
 import { $, expect } from '@wdio/globals';
 
-describe('attribute-boolean', function () {
+describe('attribute-boolean', () => {
   before(async () => {
     render({
       template: () => <attribute-boolean-root></attribute-boolean-root>,
@@ -21,7 +21,6 @@ describe('attribute-boolean', function () {
     await expect(root).not.toHaveAttribute('no-appear');
     await expect(root).not.toHaveAttribute('no-appear-two');
 
-    await browser.pause(100);
     const child = root.querySelector('attribute-boolean')!;
     await expect(child).toHaveAttribute('aria-hidden', 'false');
     await expect(child).toHaveAttribute('str-state', 'false');
@@ -35,7 +34,7 @@ describe('attribute-boolean', function () {
     await expect($(root)).toHaveAttribute('aria-hidden', 'true');
     await expect(root).toHaveAttribute('fixedtrue', 'true');
     await expect(root).toHaveAttribute('fixedfalse', 'false');
-    await expect(root).toHaveAttribute('readonly', browser.isFirefox ? '' : 'true');
+    await expect(root).toHaveAttribute('readonly');
     await expect(root).toHaveAttribute('tappable', '');
     await expect(root).toHaveAttribute('str', 'hello');
     await expect(root).not.toHaveAttribute('no-appear');

@@ -2,7 +2,7 @@ import { h } from '@stencil/core';
 import { render } from '@wdio/browser-runner/stencil';
 import { $, expect } from '@wdio/globals';
 
-describe('attribute-basic', function () {
+describe('attribute-basic', () => {
   before(async () => {
     render({
       template: () => <attribute-basic-root></attribute-basic-root>,

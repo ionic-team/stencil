@@ -1,7 +1,7 @@
 import { h } from '@stencil/core';
 import { render } from '@wdio/browser-runner/stencil';
 
-describe('attribute-host', function () {
+describe('attribute-host', () => {
   before(async () => {
     render({
       template: () => <attribute-host></attribute-host>,
@@ -47,9 +47,8 @@ describe('attribute-host', function () {
       'font-size': '24px',
     });
 
-    if (win.CSS && win.CSS.supports && win.CSS.supports('--prop', 'value')) {
-      expect(document.querySelector('section')?.style.getPropertyValue('--css-var')).toEqual('12');
-    }
+    let cssVar = document.querySelector('section')?.style.getPropertyValue('--css-var');
+    expect(cssVar).toEqual('12');
 
     await expect($(elm)).toHaveAttribute('content', 'attributes added');
     await expect($(elm)).toHaveAttribute('padding', '');
@@ -66,9 +65,8 @@ describe('attribute-host', function () {
       'font-size': '16px',
     });
 
-    if (win.CSS && win.CSS.supports && win.CSS.supports('--prop', 'value')) {
-      await expect(elm).not.toHaveElementProperty('--css-var');
-    }
+    cssVar = document.querySelector('section')?.style.getPropertyValue('--css-var');
+    expect(cssVar).toEqual('');
 
     await expect($(elm)).toHaveAttribute('content', 'attributes removed');
     await expect($(elm)).not.toHaveAttribute('padding');
@@ -85,9 +83,8 @@ describe('attribute-host', function () {
       'font-size': '24px',
     });
 
-    if (win.CSS && win.CSS.supports && win.CSS.supports('--prop', 'value')) {
-      expect(document.querySelector('section')?.style.getPropertyValue('--css-var')).toEqual('12');
-    }
+    cssVar = document.querySelector('section')?.style.getPropertyValue('--css-var');
+    expect(cssVar).toEqual('12');
 
     await expect($(elm)).toHaveAttribute('content', 'attributes added');
     await expect($(elm)).toHaveAttribute('padding', '');
@@ -95,9 +92,5 @@ describe('attribute-host', function () {
     await expect($(elm)).toHaveAttribute('margin', '');
     await expect($(elm)).toHaveAttribute('color', 'lime');
     await expect($(elm)).not.toHaveAttribute('no-attr');
-  });
-
-  after(() => {
-    document.querySelector('#stage')?.remove();
   });
 });

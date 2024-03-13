@@ -1,7 +1,7 @@
 import { h } from '@stencil/core';
 import { render } from '@wdio/browser-runner/stencil';
 
-describe('conditional-basic', function () {
+describe('conditional-basic', () => {
   beforeEach(async () => {
     render({
       template: () => <conditional-basic></conditional-basic>,

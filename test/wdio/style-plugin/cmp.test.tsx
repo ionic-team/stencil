@@ -1,7 +1,7 @@
 import { Fragment, h } from '@stencil/core';
 import { render } from '@wdio/browser-runner/stencil';
 
-describe('style-plugin', function () {
+describe('style-plugin', () => {
   beforeEach(async () => {
     render({
       template: () => (

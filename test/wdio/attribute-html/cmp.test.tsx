@@ -1,7 +1,7 @@
 import { h } from '@stencil/core';
 import { render } from '@wdio/browser-runner/stencil';
 
-describe('attribute-html', function () {
+describe('attribute-html', () => {
   before(async () => {
     render({
       template: () => <attribute-html-root str-attr="my string" any-attr="0" nu-attr="12"></attribute-html-root>,

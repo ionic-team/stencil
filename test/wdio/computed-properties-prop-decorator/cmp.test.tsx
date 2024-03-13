@@ -1,15 +1,15 @@
-import { h } from '@stencil/core';
+import { Fragment, h } from '@stencil/core';
 import { render } from '@wdio/browser-runner/stencil';
 
-describe('computed-properties-prop-decorator', function () {
+describe('computed-properties-prop-decorator', () => {
   beforeEach(async () => {
     render({
       template: () => (
-        <div>
+        <>
           <computed-properties-prop-decorator></computed-properties-prop-decorator>
           <computed-properties-prop-decorator-reflect></computed-properties-prop-decorator-reflect>
           <button type="button">Change prop values</button>
-        </div>
+        </>
       ),
     });
 

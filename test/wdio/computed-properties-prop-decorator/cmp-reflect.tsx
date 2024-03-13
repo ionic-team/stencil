@@ -19,7 +19,7 @@ export class ComputedPropertiesPropDecoratorReflect {
   })
   [Foo.BAR] = 'no';
 
-  @Prop() [Foo.BAZ]: string;
+  @Prop() [Foo.BAZ]: string = '';
 
   @Prop({
     reflect: true,

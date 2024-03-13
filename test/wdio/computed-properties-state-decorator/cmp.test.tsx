@@ -1,7 +1,7 @@
 import { Fragment, h } from '@stencil/core';
 import { render } from '@wdio/browser-runner/stencil';
 
-describe('computed-properties-state-decorator', function () {
+describe('computed-properties-state-decorator', () => {
   beforeEach(async () => {
     render({
       template: () => (
