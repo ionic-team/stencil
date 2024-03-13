@@ -355,6 +355,12 @@ export namespace Components {
     }
     interface SlotNestedDefaultOrderParent {
     }
+    interface SlotNestedDynamicChild {
+    }
+    interface SlotNestedDynamicParent {
+    }
+    interface SlotNestedDynamicWrapper {
+    }
     interface SlotNestedOrderChild {
     }
     interface SlotNestedOrderParent {
@@ -1339,6 +1345,24 @@ declare global {
         prototype: HTMLSlotNestedDefaultOrderParentElement;
         new (): HTMLSlotNestedDefaultOrderParentElement;
     };
+    interface HTMLSlotNestedDynamicChildElement extends Components.SlotNestedDynamicChild, HTMLStencilElement {
+    }
+    var HTMLSlotNestedDynamicChildElement: {
+        prototype: HTMLSlotNestedDynamicChildElement;
+        new (): HTMLSlotNestedDynamicChildElement;
+    };
+    interface HTMLSlotNestedDynamicParentElement extends Components.SlotNestedDynamicParent, HTMLStencilElement {
+    }
+    var HTMLSlotNestedDynamicParentElement: {
+        prototype: HTMLSlotNestedDynamicParentElement;
+        new (): HTMLSlotNestedDynamicParentElement;
+    };
+    interface HTMLSlotNestedDynamicWrapperElement extends Components.SlotNestedDynamicWrapper, HTMLStencilElement {
+    }
+    var HTMLSlotNestedDynamicWrapperElement: {
+        prototype: HTMLSlotNestedDynamicWrapperElement;
+        new (): HTMLSlotNestedDynamicWrapperElement;
+    };
     interface HTMLSlotNestedOrderChildElement extends Components.SlotNestedOrderChild, HTMLStencilElement {
     }
     var HTMLSlotNestedOrderChildElement: {
@@ -1624,6 +1648,9 @@ declare global {
         "slot-map-order-root": HTMLSlotMapOrderRootElement;
         "slot-nested-default-order-child": HTMLSlotNestedDefaultOrderChildElement;
         "slot-nested-default-order-parent": HTMLSlotNestedDefaultOrderParentElement;
+        "slot-nested-dynamic-child": HTMLSlotNestedDynamicChildElement;
+        "slot-nested-dynamic-parent": HTMLSlotNestedDynamicParentElement;
+        "slot-nested-dynamic-wrapper": HTMLSlotNestedDynamicWrapperElement;
         "slot-nested-order-child": HTMLSlotNestedOrderChildElement;
         "slot-nested-order-parent": HTMLSlotNestedOrderParentElement;
         "slot-ng-if": HTMLSlotNgIfElement;
@@ -2003,6 +2030,12 @@ declare namespace LocalJSX {
     }
     interface SlotNestedDefaultOrderParent {
     }
+    interface SlotNestedDynamicChild {
+    }
+    interface SlotNestedDynamicParent {
+    }
+    interface SlotNestedDynamicWrapper {
+    }
     interface SlotNestedOrderChild {
     }
     interface SlotNestedOrderParent {
@@ -2192,6 +2225,9 @@ declare namespace LocalJSX {
         "slot-map-order-root": SlotMapOrderRoot;
         "slot-nested-default-order-child": SlotNestedDefaultOrderChild;
         "slot-nested-default-order-parent": SlotNestedDefaultOrderParent;
+        "slot-nested-dynamic-child": SlotNestedDynamicChild;
+        "slot-nested-dynamic-parent": SlotNestedDynamicParent;
+        "slot-nested-dynamic-wrapper": SlotNestedDynamicWrapper;
         "slot-nested-order-child": SlotNestedOrderChild;
         "slot-nested-order-parent": SlotNestedOrderParent;
         "slot-ng-if": SlotNgIf;
@@ -2357,6 +2393,9 @@ declare module "@stencil/core" {
             "slot-map-order-root": LocalJSX.SlotMapOrderRoot & JSXBase.HTMLAttributes<HTMLSlotMapOrderRootElement>;
             "slot-nested-default-order-child": LocalJSX.SlotNestedDefaultOrderChild & JSXBase.HTMLAttributes<HTMLSlotNestedDefaultOrderChildElement>;
             "slot-nested-default-order-parent": LocalJSX.SlotNestedDefaultOrderParent & JSXBase.HTMLAttributes<HTMLSlotNestedDefaultOrderParentElement>;
+            "slot-nested-dynamic-child": LocalJSX.SlotNestedDynamicChild & JSXBase.HTMLAttributes<HTMLSlotNestedDynamicChildElement>;
+            "slot-nested-dynamic-parent": LocalJSX.SlotNestedDynamicParent & JSXBase.HTMLAttributes<HTMLSlotNestedDynamicParentElement>;
+            "slot-nested-dynamic-wrapper": LocalJSX.SlotNestedDynamicWrapper & JSXBase.HTMLAttributes<HTMLSlotNestedDynamicWrapperElement>;
             "slot-nested-order-child": LocalJSX.SlotNestedOrderChild & JSXBase.HTMLAttributes<HTMLSlotNestedOrderChildElement>;
             "slot-nested-order-parent": LocalJSX.SlotNestedOrderParent & JSXBase.HTMLAttributes<HTMLSlotNestedOrderParentElement>;
             "slot-ng-if": LocalJSX.SlotNgIf & JSXBase.HTMLAttributes<HTMLSlotNgIfElement>;
