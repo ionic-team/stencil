@@ -149,6 +149,9 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
       // remember the slot name, or empty string for default slot
       elm['s-sn'] = newVNode.$name$ || '';
 
+      // remember the ref callback function
+      elm['s-rf'] = newVNode.$attrs$?.ref;
+
       // check if we've got an old vnode for this slot
       oldVNode = oldParentVNode && oldParentVNode.$children$ && oldParentVNode.$children$[childIndex];
       if (oldVNode && oldVNode.$tag$ === newVNode.$tag$ && oldParentVNode.$elm$) {
@@ -1041,7 +1044,7 @@ render() {
           // If the node we're currently planning on inserting the new node before is an element,
           // we need to do some additional checks to make sure we're inserting the node in the correct order.
           // The use case here would be that we have multiple nodes being relocated to the same slot. So, we want
-          // to make sure they get inserted into their new how in the same order they were declared in their original location.
+          // to make sure they get inserted into their new home in the same order they were declared in their original location.
           //
           // TODO(STENCIL-914): Remove `experimentalSlotFixes` check
           if (
@@ -1100,6 +1103,8 @@ render() {
               }
             }
           }
+
+          nodeToRelocate && typeof slotRefNode['s-rf'] === 'function' && slotRefNode['s-rf'](nodeToRelocate);
         } else {
           // this node doesn't have a slot home to go to, so let's hide it
           if (nodeToRelocate.nodeType === NODE_TYPE.ElementNode) {

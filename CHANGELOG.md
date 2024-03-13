@@ -1,3 +1,32 @@
+## 🍍 [4.12.6](https://github.com/ionic-team/stencil/compare/v4.12.5...v4.12.6) (2024-03-11)
+
+
+### Bug Fixes
+
+* **cli:** move version logging earlier in CLI to allow `-v`, `--version` ([#5425](https://github.com/ionic-team/stencil/issues/5425)) ([194b0fc](https://github.com/ionic-team/stencil/commit/194b0fc0d9741d45efbe17f90572fbe09fc5ec62))
+* **compiler:** fix generated import statement ([#5419](https://github.com/ionic-team/stencil/issues/5419)) ([502da1b](https://github.com/ionic-team/stencil/commit/502da1bc3d1503bd82fbf0cccc312825a82772cf))
+* **test:** ensure screenshot dir is cleaned up ([#5421](https://github.com/ionic-team/stencil/issues/5421)) ([15e7a49](https://github.com/ionic-team/stencil/commit/15e7a4960bc845212563141b00798fdee07cbfbd))
+
+
+
+## 💙 [4.12.5](https://github.com/ionic-team/stencil/compare/v4.12.4...v4.12.5) (2024-03-04)
+
+
+### Bug Fixes
+
+* **custom-elements:** hydrate on client side ([#5317](https://github.com/ionic-team/stencil/issues/5317)) ([d809658](https://github.com/ionic-team/stencil/commit/d809658635280e115d67f1403dba946cce1bb01b)), closes [#3319](https://github.com/ionic-team/stencil/issues/3319)
+
+
+
+## 🐮 [4.12.4](https://github.com/ionic-team/stencil/compare/v4.12.3...v4.12.4) (2024-02-26)
+
+
+### Bug Fixes
+
+* **build:** address issue with dynamic import and vite ([#5399](https://github.com/ionic-team/stencil/issues/5399)) ([8ebacae](https://github.com/ionic-team/stencil/commit/8ebacae1106704293a2b1720b44eb83209175f96)), closes [#5389](https://github.com/ionic-team/stencil/issues/5389)
+
+
+
 ## 🐍 [4.12.3](https://github.com/ionic-team/stencil/compare/v4.12.2...v4.12.3) (2024-02-20)
 
 

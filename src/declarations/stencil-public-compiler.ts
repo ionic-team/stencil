@@ -651,6 +651,15 @@ export interface DevServerConfig extends StencilDevServerConfig {
   prerenderConfig?: string;
   protocol?: 'http' | 'https';
   srcIndexHtml?: string;
+
+  /**
+   * Route to be used for the "ping" sub-route of the Stencil dev server.
+   * This route will return a 200 status code once the Stencil build has finished.
+   * Setting this to `null` will disable the ping route.
+   *
+   * Defaults to `/ping`
+   */
+  pingRoute?: string | null;
 }
 
 export interface HistoryApiFallback {
@@ -1591,10 +1600,76 @@ export interface ConfigBundle {
   components: string[];
 }
 
+/**
+ * A file and/or directory copy operation that may be specified as part of
+ * certain output targets for Stencil (in particular `dist`,
+ * `dist-custom-elements`, and `www`).
+ */
 export interface CopyTask {
+  /**
+   * The source file path for a copy operation. This may be an absolute or
+   * relative path to a directory or a file, and may also include a glob
+   * pattern.
+   *
+   * If the path is a relative path it will be treated as relative to
+   * `Config.srcDir`.
+   */
   src: string;
+  /**
+   * An optional destination file path for a copy operation. This may be an
+   * absolute or relative path.
+   *
+   * If relative, this will be treated as relative to the output directory for
+   * the output target for which this copy operation is configured.
+   */
   dest?: string;
+  /**
+   * Whether or not Stencil should issue warnings if it cannot find the
+   * specified source files or directories. Defaults to `false`.
+   *
+   * To receive warnings if a copy task source can't be found set this to
+   * `true`.
+   */
   warn?: boolean;
+  /**
+   * Whether or not directory structure should be preserved when copying files
+   * from a source directory. Defaults to `true` if no `dest` path is supplied,
+   * else it defaults to `false`.
+   *
+   * If this is set to `false`, all the files from a source directory will be
+   * copied directly to the destination directory, but if it's set to `true` they
+   * will be copied to a new directory inside the destination directory with
+   * the same name as their original source directory.
+   *
+   * So if, for instance, `src` is set to `"images"` and `keepDirStructure` is
+   * set to `true` the copy task will then produce the following directory
+   * structure:
+   *
+   * ```
+   * images
+   * └── foo.png
+   * dist
+   * └── images
+   *     └── foo.png
+   * ```
+   *
+   * Conversely if `keepDirStructure` is set to `false` then files in `images/`
+   * will be copied to `dist` without first creating a new subdirectory,
+   * resulting in the following directory structure:
+   *
+   * ```
+   * images
+   * └── foo.png
+   * dist
+   * └── foo.png
+   * ```
+   *
+   * If a `dest` path is supplied then `keepDirStructure`
+   * will default to `false`, so that Stencil will write the
+   * copied files directly into the `dest` directory without creating a new
+   * subdirectory. This behavior can be overridden by setting
+   * `keepDirStructure` to `true`.
+   */
   keepDirStructure?: boolean;
 }
 
@@ -1988,9 +2063,12 @@ export const LOG_LEVELS = ['debug', 'info', 'warn', 'error'] as const;
 export type LogLevel = (typeof LOG_LEVELS)[number];
 
 /**
- * Common logger to be used by the compiler, dev-server and CLI. The CLI will use a
- * NodeJS based console logging and colors, and the web will use browser based
- * logs and colors.
+ * Abstract interface representing a logger with the capability to accept log
+ * messages at various levels (debug, info, warn, and error), set colors, log
+ * time spans, print diagnostic messages, and more.
+ *
+ * A Node.js-specific implementation of this interface is used when Stencil is
+ * building and compiling a project.
  */
 export interface Logger {
   enableColors: (useColors: boolean) => void;
@@ -2057,6 +2135,14 @@ export interface OutputTargetDist extends OutputTargetValidationConfig {
   transformAliasedImportPathsInCollection?: boolean | null;
 
   typesDir?: string;
+
+  /**
+   * Provide a custom path for the ESM loader directory, containing files you can import
+   * in an initiation script within your application to register all your components for
+   * lazy loading.
+   *
+   * @default /dist/loader
+   */
   esmLoaderPath?: string;
   copy?: CopyTask[];
   polyfills?: boolean;

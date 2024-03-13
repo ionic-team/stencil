@@ -1,5 +1,5 @@
 import { BUILD } from '@app-data';
-import { forceUpdate, getHostRef, plt, supportsShadow } from '@platform';
+import { getHostRef, plt, supportsShadow } from '@platform';
 import { NODE_TYPES } from '@stencil/core/mock-doc';
 import { CMP_FLAGS, HOST_FLAGS } from '@utils';
 
@@ -47,6 +47,7 @@ export const patchCloneNode = (HostElementPrototype: HTMLElement) => {
         's-ol',
         's-nr',
         's-si',
+        's-rf',
       ];
 
       for (; i < srcNode.childNodes.length; i++) {
@@ -88,8 +89,6 @@ export const patchSlotAppendChild = (HostElementPrototype: any) => {
 
       // Check if there is fallback content that should be hidden
       updateFallbackSlotVisibility(this);
-      // Force a re-render of the host element
-      forceUpdate(this);
 
       return insertedNode;
     }
