@@ -54,4 +54,3 @@ unused-exports*.txt
 
 # TODO(STENCIL-1203): check in type files back into the repository after migration
 test/wdio/src/components.d.ts
-test/karma/test-app/components.d.ts
