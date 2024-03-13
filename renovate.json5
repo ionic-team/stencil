@@ -57,7 +57,7 @@
     {
       // Increment this value as a part of updating TypeScript
       matchPackageNames: ['typescript'],
-      allowedVersions: '<5.4.0',
+      allowedVersions: '<5.5.0',
       commitMessagePrefix: "feat(typescript):"
     },
     {
