@@ -14,24 +14,24 @@ describe('form associated', function () {
   });
 
   it('should render without errors', async () => {
-    const elm = $('form-associated').waitForExist;
-    expect(elm).toExist();
+    const elm = $('form-associated');
+    await expect(elm).toBePresent();
   });
 
   describe('form associated custom element lifecycle callback', () => {
     it('should trigger "formAssociated"', async () => {
       const formEl = $('form');
-      expect(formEl).toHaveProperty('ariaLabel', 'formAssociated called');
+      await expect(formEl).toHaveProperty('ariaLabel', 'formAssociated called');
     });
 
     it('should trigger "formResetCallback"', async () => {
       const resetBtn = $('input[type="reset"]');
-      resetBtn.click();
+      await resetBtn.click();
 
       await resetBtn.waitForStable();
 
       const formEl = $('form');
-      expect(formEl).toHaveProperty('ariaLabel', 'formResetCallback called');
+      await expect(formEl).toHaveProperty('ariaLabel', 'formResetCallback called');
     });
 
     it('should trigger "formDisabledCallback"', async () => {
@@ -41,11 +41,11 @@ describe('form associated', function () {
       elm.setAttribute('disabled', 'disabled');
 
       await formEl.waitForStable();
-      expect(formEl).toHaveProperty('ariaLabel', 'formDisabledCallback called with true');
+      await expect(formEl).toHaveProperty('ariaLabel', 'formDisabledCallback called with true');
 
       elm.removeAttribute('disabled');
       await formEl.waitForStable();
-      expect(formEl).toHaveProperty('ariaLabel', 'formDisabledCallback called with false');
+      await expect(formEl).toHaveProperty('ariaLabel', 'formDisabledCallback called with false');
     });
   });
 
