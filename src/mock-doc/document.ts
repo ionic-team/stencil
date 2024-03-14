@@ -49,6 +49,10 @@ export class MockDocument extends MockHTMLElement {
     this.documentElement.dir = value;
   }
 
+  override get localName(): undefined {
+    return undefined;
+  }
+
   get location() {
     if (this.defaultView != null) {
       return (this.defaultView as Window).location;
