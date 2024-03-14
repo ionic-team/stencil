@@ -20,10 +20,6 @@ export namespace Components {
     }
     interface CmpLabelWithSlotSibling {
     }
-    interface CssVariablesNoEncapsulation {
-    }
-    interface CssVariablesShadowDom {
-    }
     interface CustomElementChild {
     }
     interface CustomElementChildDifferentNameThanClass {
@@ -322,18 +318,6 @@ declare global {
     var HTMLCmpLabelWithSlotSiblingElement: {
         prototype: HTMLCmpLabelWithSlotSiblingElement;
         new (): HTMLCmpLabelWithSlotSiblingElement;
-    };
-    interface HTMLCssVariablesNoEncapsulationElement extends Components.CssVariablesNoEncapsulation, HTMLStencilElement {
-    }
-    var HTMLCssVariablesNoEncapsulationElement: {
-        prototype: HTMLCssVariablesNoEncapsulationElement;
-        new (): HTMLCssVariablesNoEncapsulationElement;
-    };
-    interface HTMLCssVariablesShadowDomElement extends Components.CssVariablesShadowDom, HTMLStencilElement {
-    }
-    var HTMLCssVariablesShadowDomElement: {
-        prototype: HTMLCssVariablesShadowDomElement;
-        new (): HTMLCssVariablesShadowDomElement;
     };
     interface HTMLCustomElementChildElement extends Components.CustomElementChild, HTMLStencilElement {
     }
@@ -1016,8 +1000,6 @@ declare global {
         "child-with-reflection": HTMLChildWithReflectionElement;
         "cmp-label": HTMLCmpLabelElement;
         "cmp-label-with-slot-sibling": HTMLCmpLabelWithSlotSiblingElement;
-        "css-variables-no-encapsulation": HTMLCssVariablesNoEncapsulationElement;
-        "css-variables-shadow-dom": HTMLCssVariablesShadowDomElement;
         "custom-element-child": HTMLCustomElementChildElement;
         "custom-element-child-different-name-than-class": HTMLCustomElementChildDifferentNameThanClassElement;
         "custom-element-nested-child": HTMLCustomElementNestedChildElement;
@@ -1139,10 +1121,6 @@ declare namespace LocalJSX {
     interface CmpLabel {
     }
     interface CmpLabelWithSlotSibling {
-    }
-    interface CssVariablesNoEncapsulation {
-    }
-    interface CssVariablesShadowDom {
     }
     interface CustomElementChild {
     }
@@ -1406,8 +1384,6 @@ declare namespace LocalJSX {
         "child-with-reflection": ChildWithReflection;
         "cmp-label": CmpLabel;
         "cmp-label-with-slot-sibling": CmpLabelWithSlotSibling;
-        "css-variables-no-encapsulation": CssVariablesNoEncapsulation;
-        "css-variables-shadow-dom": CssVariablesShadowDom;
         "custom-element-child": CustomElementChild;
         "custom-element-child-different-name-than-class": CustomElementChildDifferentNameThanClass;
         "custom-element-nested-child": CustomElementNestedChild;
@@ -1526,8 +1502,6 @@ declare module "@stencil/core" {
             "child-with-reflection": LocalJSX.ChildWithReflection & JSXBase.HTMLAttributes<HTMLChildWithReflectionElement>;
             "cmp-label": LocalJSX.CmpLabel & JSXBase.HTMLAttributes<HTMLCmpLabelElement>;
             "cmp-label-with-slot-sibling": LocalJSX.CmpLabelWithSlotSibling & JSXBase.HTMLAttributes<HTMLCmpLabelWithSlotSiblingElement>;
-            "css-variables-no-encapsulation": LocalJSX.CssVariablesNoEncapsulation & JSXBase.HTMLAttributes<HTMLCssVariablesNoEncapsulationElement>;
-            "css-variables-shadow-dom": LocalJSX.CssVariablesShadowDom & JSXBase.HTMLAttributes<HTMLCssVariablesShadowDomElement>;
             "custom-element-child": LocalJSX.CustomElementChild & JSXBase.HTMLAttributes<HTMLCustomElementChildElement>;
             "custom-element-child-different-name-than-class": LocalJSX.CustomElementChildDifferentNameThanClass & JSXBase.HTMLAttributes<HTMLCustomElementChildDifferentNameThanClassElement>;
             "custom-element-nested-child": LocalJSX.CustomElementNestedChild & JSXBase.HTMLAttributes<HTMLCustomElementNestedChildElement>;
