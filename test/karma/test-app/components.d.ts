@@ -42,11 +42,6 @@ export namespace Components {
     }
     interface DelegatesFocus {
     }
-    interface DomReattach {
-        "didLoad": number;
-        "didUnload": number;
-        "willLoad": number;
-    }
     interface DomReattachClone {
     }
     interface DomReattachCloneDeepSlot {
@@ -471,12 +466,6 @@ declare global {
     var HTMLDelegatesFocusElement: {
         prototype: HTMLDelegatesFocusElement;
         new (): HTMLDelegatesFocusElement;
-    };
-    interface HTMLDomReattachElement extends Components.DomReattach, HTMLStencilElement {
-    }
-    var HTMLDomReattachElement: {
-        prototype: HTMLDomReattachElement;
-        new (): HTMLDomReattachElement;
     };
     interface HTMLDomReattachCloneElement extends Components.DomReattachClone, HTMLStencilElement {
     }
@@ -1331,7 +1320,6 @@ declare global {
         "custom-elements-no-delegates-focus": HTMLCustomElementsNoDelegatesFocusElement;
         "custom-event-root": HTMLCustomEventRootElement;
         "delegates-focus": HTMLDelegatesFocusElement;
-        "dom-reattach": HTMLDomReattachElement;
         "dom-reattach-clone": HTMLDomReattachCloneElement;
         "dom-reattach-clone-deep-slot": HTMLDomReattachCloneDeepSlotElement;
         "dom-reattach-clone-host": HTMLDomReattachCloneHostElement;
@@ -1492,11 +1480,6 @@ declare namespace LocalJSX {
     interface CustomEventRoot {
     }
     interface DelegatesFocus {
-    }
-    interface DomReattach {
-        "didLoad"?: number;
-        "didUnload"?: number;
-        "willLoad"?: number;
     }
     interface DomReattachClone {
     }
@@ -1819,7 +1802,6 @@ declare namespace LocalJSX {
         "custom-elements-no-delegates-focus": CustomElementsNoDelegatesFocus;
         "custom-event-root": CustomEventRoot;
         "delegates-focus": DelegatesFocus;
-        "dom-reattach": DomReattach;
         "dom-reattach-clone": DomReattachClone;
         "dom-reattach-clone-deep-slot": DomReattachCloneDeepSlot;
         "dom-reattach-clone-host": DomReattachCloneHost;
@@ -1966,7 +1948,6 @@ declare module "@stencil/core" {
             "custom-elements-no-delegates-focus": LocalJSX.CustomElementsNoDelegatesFocus & JSXBase.HTMLAttributes<HTMLCustomElementsNoDelegatesFocusElement>;
             "custom-event-root": LocalJSX.CustomEventRoot & JSXBase.HTMLAttributes<HTMLCustomEventRootElement>;
             "delegates-focus": LocalJSX.DelegatesFocus & JSXBase.HTMLAttributes<HTMLDelegatesFocusElement>;
-            "dom-reattach": LocalJSX.DomReattach & JSXBase.HTMLAttributes<HTMLDomReattachElement>;
             "dom-reattach-clone": LocalJSX.DomReattachClone & JSXBase.HTMLAttributes<HTMLDomReattachCloneElement>;
             "dom-reattach-clone-deep-slot": LocalJSX.DomReattachCloneDeepSlot & JSXBase.HTMLAttributes<HTMLDomReattachCloneDeepSlotElement>;
             "dom-reattach-clone-host": LocalJSX.DomReattachCloneHost & JSXBase.HTMLAttributes<HTMLDomReattachCloneHostElement>;
