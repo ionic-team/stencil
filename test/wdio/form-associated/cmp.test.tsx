@@ -15,7 +15,7 @@ describe('form associated', function () {
 
   it('should render without errors', async () => {
     const elm = $('form-associated').waitForExist;
-    expect(elm).not.toBeNull();
+    expect(elm).toExist();
   });
 
   describe('form associated custom element lifecycle callback', () => {

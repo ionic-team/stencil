@@ -5,8 +5,8 @@ import { AttachInternals, Component, h } from '@stencil/core';
   formAssociated: true,
 })
 export class FormAssociatedCmp {
-  @AttachInternals()
-  internals: ElementInternals;
+  // @ts-ignore typescript complains because this isn't initialized
+  @AttachInternals() internals: ElementInternals;
 
   componentWillLoad() {
     this.internals.setFormValue('my default value');
@@ -24,7 +24,7 @@ export class FormAssociatedCmp {
   }
 
   formDisabledCallback(disabled: boolean) {
-    this.internals.form.ariaLabel = `formDisabledCallback called with ${disabled}`;
+    this.internals.form!.ariaLabel = `formDisabledCallback called with ${disabled}`;
   }
 
   render() {
