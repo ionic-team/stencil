@@ -38,8 +38,6 @@ export namespace Components {
     }
     interface CustomElementsNoDelegatesFocus {
     }
-    interface DelegatesFocus {
-    }
     interface DomReattachClone {
     }
     interface DomReattachCloneDeepSlot {
@@ -126,8 +124,6 @@ export namespace Components {
     interface ListenReattach {
     }
     interface ListenWindow {
-    }
-    interface NoDelegatesFocus {
     }
     interface NodeResolution {
     }
@@ -431,12 +427,6 @@ declare global {
         prototype: HTMLCustomElementsNoDelegatesFocusElement;
         new (): HTMLCustomElementsNoDelegatesFocusElement;
     };
-    interface HTMLDelegatesFocusElement extends Components.DelegatesFocus, HTMLStencilElement {
-    }
-    var HTMLDelegatesFocusElement: {
-        prototype: HTMLDelegatesFocusElement;
-        new (): HTMLDelegatesFocusElement;
-    };
     interface HTMLDomReattachCloneElement extends Components.DomReattachClone, HTMLStencilElement {
     }
     var HTMLDomReattachCloneElement: {
@@ -732,12 +722,6 @@ declare global {
     var HTMLListenWindowElement: {
         prototype: HTMLListenWindowElement;
         new (): HTMLListenWindowElement;
-    };
-    interface HTMLNoDelegatesFocusElement extends Components.NoDelegatesFocus, HTMLStencilElement {
-    }
-    var HTMLNoDelegatesFocusElement: {
-        prototype: HTMLNoDelegatesFocusElement;
-        new (): HTMLNoDelegatesFocusElement;
     };
     interface HTMLNodeResolutionElement extends Components.NodeResolution, HTMLStencilElement {
     }
@@ -1228,7 +1212,6 @@ declare global {
         "custom-element-root-different-name-than-class": HTMLCustomElementRootDifferentNameThanClassElement;
         "custom-elements-delegates-focus": HTMLCustomElementsDelegatesFocusElement;
         "custom-elements-no-delegates-focus": HTMLCustomElementsNoDelegatesFocusElement;
-        "delegates-focus": HTMLDelegatesFocusElement;
         "dom-reattach-clone": HTMLDomReattachCloneElement;
         "dom-reattach-clone-deep-slot": HTMLDomReattachCloneDeepSlotElement;
         "dom-reattach-clone-host": HTMLDomReattachCloneHostElement;
@@ -1267,7 +1250,6 @@ declare global {
         "listen-jsx-root": HTMLListenJsxRootElement;
         "listen-reattach": HTMLListenReattachElement;
         "listen-window": HTMLListenWindowElement;
-        "no-delegates-focus": HTMLNoDelegatesFocusElement;
         "node-resolution": HTMLNodeResolutionElement;
         "parent-reflect-nan-attribute": HTMLParentReflectNanAttributeElement;
         "parent-with-reflect-child": HTMLParentWithReflectChildElement;
@@ -1380,8 +1362,6 @@ declare namespace LocalJSX {
     }
     interface CustomElementsNoDelegatesFocus {
     }
-    interface DelegatesFocus {
-    }
     interface DomReattachClone {
     }
     interface DomReattachCloneDeepSlot {
@@ -1473,8 +1453,6 @@ declare namespace LocalJSX {
     interface ListenReattach {
     }
     interface ListenWindow {
-    }
-    interface NoDelegatesFocus {
     }
     interface NodeResolution {
     }
@@ -1683,7 +1661,6 @@ declare namespace LocalJSX {
         "custom-element-root-different-name-than-class": CustomElementRootDifferentNameThanClass;
         "custom-elements-delegates-focus": CustomElementsDelegatesFocus;
         "custom-elements-no-delegates-focus": CustomElementsNoDelegatesFocus;
-        "delegates-focus": DelegatesFocus;
         "dom-reattach-clone": DomReattachClone;
         "dom-reattach-clone-deep-slot": DomReattachCloneDeepSlot;
         "dom-reattach-clone-host": DomReattachCloneHost;
@@ -1722,7 +1699,6 @@ declare namespace LocalJSX {
         "listen-jsx-root": ListenJsxRoot;
         "listen-reattach": ListenReattach;
         "listen-window": ListenWindow;
-        "no-delegates-focus": NoDelegatesFocus;
         "node-resolution": NodeResolution;
         "parent-reflect-nan-attribute": ParentReflectNanAttribute;
         "parent-with-reflect-child": ParentWithReflectChild;
@@ -1822,7 +1798,6 @@ declare module "@stencil/core" {
             "custom-element-root-different-name-than-class": LocalJSX.CustomElementRootDifferentNameThanClass & JSXBase.HTMLAttributes<HTMLCustomElementRootDifferentNameThanClassElement>;
             "custom-elements-delegates-focus": LocalJSX.CustomElementsDelegatesFocus & JSXBase.HTMLAttributes<HTMLCustomElementsDelegatesFocusElement>;
             "custom-elements-no-delegates-focus": LocalJSX.CustomElementsNoDelegatesFocus & JSXBase.HTMLAttributes<HTMLCustomElementsNoDelegatesFocusElement>;
-            "delegates-focus": LocalJSX.DelegatesFocus & JSXBase.HTMLAttributes<HTMLDelegatesFocusElement>;
             "dom-reattach-clone": LocalJSX.DomReattachClone & JSXBase.HTMLAttributes<HTMLDomReattachCloneElement>;
             "dom-reattach-clone-deep-slot": LocalJSX.DomReattachCloneDeepSlot & JSXBase.HTMLAttributes<HTMLDomReattachCloneDeepSlotElement>;
             "dom-reattach-clone-host": LocalJSX.DomReattachCloneHost & JSXBase.HTMLAttributes<HTMLDomReattachCloneHostElement>;
@@ -1861,7 +1836,6 @@ declare module "@stencil/core" {
             "listen-jsx-root": LocalJSX.ListenJsxRoot & JSXBase.HTMLAttributes<HTMLListenJsxRootElement>;
             "listen-reattach": LocalJSX.ListenReattach & JSXBase.HTMLAttributes<HTMLListenReattachElement>;
             "listen-window": LocalJSX.ListenWindow & JSXBase.HTMLAttributes<HTMLListenWindowElement>;
-            "no-delegates-focus": LocalJSX.NoDelegatesFocus & JSXBase.HTMLAttributes<HTMLNoDelegatesFocusElement>;
             "node-resolution": LocalJSX.NodeResolution & JSXBase.HTMLAttributes<HTMLNodeResolutionElement>;
             "parent-reflect-nan-attribute": LocalJSX.ParentReflectNanAttribute & JSXBase.HTMLAttributes<HTMLParentReflectNanAttributeElement>;
             "parent-with-reflect-child": LocalJSX.ParentWithReflectChild & JSXBase.HTMLAttributes<HTMLParentWithReflectChildElement>;
