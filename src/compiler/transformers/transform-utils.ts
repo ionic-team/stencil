@@ -457,20 +457,6 @@ export const getAllTypeReferences = (checker: ts.TypeChecker, node: ts.Node): Re
   return referencedTypes;
 };
 
-export const validateReferences = (
-  diagnostics: d.Diagnostic[],
-  references: d.ComponentCompilerTypeReferences,
-  node: ts.Node,
-) => {
-  Object.keys(references).forEach((refName) => {
-    const ref = references[refName];
-    if (ref.path === '@stencil/core' && readOnlyArrayHasStringMember(MEMBER_DECORATORS_TO_REMOVE, refName)) {
-      const err = buildError(diagnostics);
-      augmentDiagnosticWithNode(err, node);
-    }
-  });
-};
-
 /**
  * Determine where a TypeScript type reference originates from. This is accomplished by interrogating the AST node in
  * which the type's name appears
