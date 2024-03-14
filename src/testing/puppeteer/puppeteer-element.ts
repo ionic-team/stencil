@@ -547,6 +547,12 @@ export async function find(page: pd.E2EPageInternal, rootHandle: puppeteer.Eleme
 
   let elmHandle: puppeteer.ElementHandle;
 
+  if (shadowSelector && shadowSelector.includes('>>>')) {
+    const selector = getSelector(shadowSelector);
+    elmHandle = await findWithCssSelector(page, rootHandle, lightSelector, selector.lightSelector);
+    return find(page, elmHandle, selector.shadowSelector);
+  }
+
   if (typeof lightSelector === 'string') {
     elmHandle = await findWithCssSelector(page, rootHandle, lightSelector, shadowSelector);
   } else {
@@ -571,6 +577,26 @@ async function findWithCssSelector(
   let elmHandle = await rootHandle.$(lightSelector);
 
   if (!elmHandle) {
+    /**
+     * if elmHandle is null, attempt to look up from shadow element of `rootHandle`
+     */
+    const shadowHandle = await page.evaluateHandle(
+      (elm: Element, shadowSelector: string) => {
+        if (!elm.shadowRoot) {
+          throw new Error(`shadow root does not exist for element: ${elm.tagName.toLowerCase()}`);
+        }
+
+        return elm.shadowRoot.querySelector(shadowSelector);
+      },
+      rootHandle,
+      lightSelector,
+    );
+
+    if (shadowHandle) {
+      const elm = shadowHandle.asElement();
+      return elm as puppeteer.ElementHandle<Element>;
+    }
+
     return null;
   }
 
@@ -590,6 +616,27 @@ async function findWithCssSelector(
     await elmHandle.dispose();
 
     if (!shadowHandle) {
+      /**
+       * attempt to look up from shadow element of `rootHandle`
+       */
+      const shadowHandle = await page.evaluateHandle(
+        (elm: Element, shadowSelector: string) => {
+          if (!elm.shadowRoot) {
+            throw new Error(`shadow root does not exist for element: ${elm.tagName.toLowerCase()}`);
+          }
+
+          return elm.shadowRoot.querySelector(shadowSelector);
+        },
+        rootHandle,
+        shadowSelector,
+      );
+
+      if (shadowHandle) {
+        const elm = shadowHandle.asElement() as puppeteer.ElementHandle<Element>;
+        await shadowHandle.dispose();
+        return elm;
+      }
+
       return null;
     }
 
@@ -720,7 +767,7 @@ function getSelector(selector: pd.FindSelector) {
     const splt = selector.split('>>>');
 
     rtn.lightSelector = splt[0].trim();
-    rtn.shadowSelector = splt.length > 1 ? splt[1].trim() : null;
+    rtn.shadowSelector = splt.length > 1 ? splt.slice(1).join('>>>').trim() : null;
   } else if (typeof selector.text === 'string') {
     rtn.text = selector.text.trim();
   } else if (typeof selector.contains === 'string') {
