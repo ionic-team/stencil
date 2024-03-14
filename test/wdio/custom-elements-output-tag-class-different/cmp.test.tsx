@@ -8,7 +8,7 @@ describe('custom-elements-output-tag-class-different', () => {
         <>
           <custom-element-root-different-name-than-class></custom-element-root-different-name-than-class>
         </>
-      )
+      ),
     });
   });
 
@@ -18,7 +18,9 @@ describe('custom-elements-output-tag-class-different', () => {
     const elm = document.querySelector('custom-element-root-different-name-than-class');
     expect(elm.shadowRoot).toBeDefined();
 
-    const childElm = elm.shadowRoot.querySelector('custom-element-child-different-name-than-class');
+    const selector = 'custom-element-child-different-name-than-class';
+    await browser.waitUntil(() => Boolean(elm.shadowRoot.querySelector(selector)));
+    const childElm = elm.shadowRoot.querySelector(selector);
     expect(childElm.shadowRoot).toBeDefined();
   });
 });

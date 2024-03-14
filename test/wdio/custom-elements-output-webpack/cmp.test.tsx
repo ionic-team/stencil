@@ -18,7 +18,7 @@ describe('custom-elements-output-webpack', () => {
     expect(customElements.get('custom-element-nested-child')).toBeDefined();
 
     const elm = document.querySelector('custom-element-root');
-    await browser.waitUntil(() => Boolean(elm.shadowRoot.querySelector('custom-element-child')))
+    await browser.waitUntil(() => Boolean(elm.shadowRoot.querySelector('custom-element-child')));
     const childElm = elm.shadowRoot.querySelector('custom-element-child');
     const childNestedElm = childElm.shadowRoot.querySelector('custom-element-nested-child');
 

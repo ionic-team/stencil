@@ -4,12 +4,12 @@ import { render } from '@wdio/browser-runner/stencil';
 describe('custom-elements-delegates-focus', () => {
   before(() => {
     render({
-      template:() => (
+      template: () => (
         <>
           <custom-elements-delegates-focus></custom-elements-delegates-focus>
           <custom-elements-no-delegates-focus></custom-elements-no-delegates-focus>
         </>
-      )
+      ),
     });
   });
 
