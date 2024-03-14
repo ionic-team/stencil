@@ -1,9 +1,9 @@
 import { Component, State, h } from '@stencil/core';
 
 @Component({
-  tag: 'key-reorder-root',
+  tag: 'key-reorder',
 })
-export class KeyReorderRoot {
+export class KeyReorder {
   @State() isReversed = false;
 
   testClick() {

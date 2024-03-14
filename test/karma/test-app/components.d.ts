@@ -90,11 +90,6 @@ export namespace Components {
     }
     interface IonParent {
     }
-    interface KeyReorder {
-        "num"?: number;
-    }
-    interface KeyReorderRoot {
-    }
     interface LifecycleAsyncA {
     }
     interface LifecycleAsyncB {
@@ -632,18 +627,6 @@ declare global {
     var HTMLIonParentElement: {
         prototype: HTMLIonParentElement;
         new (): HTMLIonParentElement;
-    };
-    interface HTMLKeyReorderElement extends Components.KeyReorder, HTMLStencilElement {
-    }
-    var HTMLKeyReorderElement: {
-        prototype: HTMLKeyReorderElement;
-        new (): HTMLKeyReorderElement;
-    };
-    interface HTMLKeyReorderRootElement extends Components.KeyReorderRoot, HTMLStencilElement {
-    }
-    var HTMLKeyReorderRootElement: {
-        prototype: HTMLKeyReorderRootElement;
-        new (): HTMLKeyReorderRootElement;
     };
     interface HTMLLifecycleAsyncAElement extends Components.LifecycleAsyncA, HTMLStencilElement {
     }
@@ -1325,8 +1308,6 @@ declare global {
         "ion-child": HTMLIonChildElement;
         "ion-host": HTMLIonHostElement;
         "ion-parent": HTMLIonParentElement;
-        "key-reorder": HTMLKeyReorderElement;
-        "key-reorder-root": HTMLKeyReorderRootElement;
         "lifecycle-async-a": HTMLLifecycleAsyncAElement;
         "lifecycle-async-b": HTMLLifecycleAsyncBElement;
         "lifecycle-async-c": HTMLLifecycleAsyncCElement;
@@ -1511,11 +1492,6 @@ declare namespace LocalJSX {
     interface IonHost {
     }
     interface IonParent {
-    }
-    interface KeyReorder {
-        "num"?: number;
-    }
-    interface KeyReorderRoot {
     }
     interface LifecycleAsyncA {
     }
@@ -1801,8 +1777,6 @@ declare namespace LocalJSX {
         "ion-child": IonChild;
         "ion-host": IonHost;
         "ion-parent": IonParent;
-        "key-reorder": KeyReorder;
-        "key-reorder-root": KeyReorderRoot;
         "lifecycle-async-a": LifecycleAsyncA;
         "lifecycle-async-b": LifecycleAsyncB;
         "lifecycle-async-c": LifecycleAsyncC;
@@ -1945,8 +1919,6 @@ declare module "@stencil/core" {
             "ion-child": LocalJSX.IonChild & JSXBase.HTMLAttributes<HTMLIonChildElement>;
             "ion-host": LocalJSX.IonHost & JSXBase.HTMLAttributes<HTMLIonHostElement>;
             "ion-parent": LocalJSX.IonParent & JSXBase.HTMLAttributes<HTMLIonParentElement>;
-            "key-reorder": LocalJSX.KeyReorder & JSXBase.HTMLAttributes<HTMLKeyReorderElement>;
-            "key-reorder-root": LocalJSX.KeyReorderRoot & JSXBase.HTMLAttributes<HTMLKeyReorderRootElement>;
             "lifecycle-async-a": LocalJSX.LifecycleAsyncA & JSXBase.HTMLAttributes<HTMLLifecycleAsyncAElement>;
             "lifecycle-async-b": LocalJSX.LifecycleAsyncB & JSXBase.HTMLAttributes<HTMLLifecycleAsyncBElement>;
             "lifecycle-async-c": LocalJSX.LifecycleAsyncC & JSXBase.HTMLAttributes<HTMLLifecycleAsyncCElement>;
