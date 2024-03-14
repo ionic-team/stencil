@@ -1,8 +1,8 @@
-import { augmentDiagnosticWithNode, buildError, normalizePath, readOnlyArrayHasStringMember } from '@utils';
+import { normalizePath } from '@utils';
 import ts from 'typescript';
 
 import type * as d from '../../declarations';
-import { MEMBER_DECORATORS_TO_REMOVE, StencilStaticGetter } from './decorators-to-static/decorators-constants';
+import { StencilStaticGetter } from './decorators-to-static/decorators-constants';
 import { addToLibrary, findTypeWithName, getHomeModule, getOriginalTypeName } from './type-library';
 
 export const getScriptTarget = () => {
