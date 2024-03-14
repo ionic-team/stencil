@@ -5,7 +5,6 @@ import { AttachInternals, Component, h } from '@stencil/core';
   formAssociated: true,
 })
 export class FormAssociatedCmp {
-  // @ts-ignore typescript complains because this isn't initialized
   @AttachInternals() internals: ElementInternals;
 
   componentWillLoad() {
