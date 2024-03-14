@@ -27,7 +27,7 @@
     "skipLibCheck": true
   },
   "include": [
-    "./components.d.ts",
+    "./src/components.d.ts",
     "./**/*.spec.ts",
     "./**/*.tsx",
     "./util.ts",
