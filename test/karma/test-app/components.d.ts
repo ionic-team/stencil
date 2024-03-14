@@ -73,14 +73,6 @@ export namespace Components {
     }
     interface IonParent {
     }
-    interface LifecycleAsyncA {
-    }
-    interface LifecycleAsyncB {
-        "value": string;
-    }
-    interface LifecycleAsyncC {
-        "value": string;
-    }
     interface LifecycleUnloadA {
     }
     interface LifecycleUnloadB {
@@ -306,14 +298,6 @@ export interface ImportAliasingCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLImportAliasingElement;
 }
-export interface LifecycleAsyncBCustomEvent<T> extends CustomEvent<T> {
-    detail: T;
-    target: HTMLLifecycleAsyncBElement;
-}
-export interface LifecycleAsyncCCustomEvent<T> extends CustomEvent<T> {
-    detail: T;
-    target: HTMLLifecycleAsyncCElement;
-}
 declare global {
     interface HTMLBadSharedJsxElement extends Components.BadSharedJsx, HTMLStencilElement {
     }
@@ -521,48 +505,6 @@ declare global {
     var HTMLIonParentElement: {
         prototype: HTMLIonParentElement;
         new (): HTMLIonParentElement;
-    };
-    interface HTMLLifecycleAsyncAElement extends Components.LifecycleAsyncA, HTMLStencilElement {
-    }
-    var HTMLLifecycleAsyncAElement: {
-        prototype: HTMLLifecycleAsyncAElement;
-        new (): HTMLLifecycleAsyncAElement;
-    };
-    interface HTMLLifecycleAsyncBElementEventMap {
-        "lifecycleLoad": any;
-        "lifecycleUpdate": any;
-    }
-    interface HTMLLifecycleAsyncBElement extends Components.LifecycleAsyncB, HTMLStencilElement {
-        addEventListener<K extends keyof HTMLLifecycleAsyncBElementEventMap>(type: K, listener: (this: HTMLLifecycleAsyncBElement, ev: LifecycleAsyncBCustomEvent<HTMLLifecycleAsyncBElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
-        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
-        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
-        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-        removeEventListener<K extends keyof HTMLLifecycleAsyncBElementEventMap>(type: K, listener: (this: HTMLLifecycleAsyncBElement, ev: LifecycleAsyncBCustomEvent<HTMLLifecycleAsyncBElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
-        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
-        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
-        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
-    }
-    var HTMLLifecycleAsyncBElement: {
-        prototype: HTMLLifecycleAsyncBElement;
-        new (): HTMLLifecycleAsyncBElement;
-    };
-    interface HTMLLifecycleAsyncCElementEventMap {
-        "lifecycleLoad": any;
-        "lifecycleUpdate": any;
-    }
-    interface HTMLLifecycleAsyncCElement extends Components.LifecycleAsyncC, HTMLStencilElement {
-        addEventListener<K extends keyof HTMLLifecycleAsyncCElementEventMap>(type: K, listener: (this: HTMLLifecycleAsyncCElement, ev: LifecycleAsyncCCustomEvent<HTMLLifecycleAsyncCElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
-        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
-        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
-        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-        removeEventListener<K extends keyof HTMLLifecycleAsyncCElementEventMap>(type: K, listener: (this: HTMLLifecycleAsyncCElement, ev: LifecycleAsyncCCustomEvent<HTMLLifecycleAsyncCElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
-        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
-        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
-        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
-    }
-    var HTMLLifecycleAsyncCElement: {
-        prototype: HTMLLifecycleAsyncCElement;
-        new (): HTMLLifecycleAsyncCElement;
     };
     interface HTMLLifecycleUnloadAElement extends Components.LifecycleUnloadA, HTMLStencilElement {
     }
@@ -1122,9 +1064,6 @@ declare global {
         "ion-child": HTMLIonChildElement;
         "ion-host": HTMLIonHostElement;
         "ion-parent": HTMLIonParentElement;
-        "lifecycle-async-a": HTMLLifecycleAsyncAElement;
-        "lifecycle-async-b": HTMLLifecycleAsyncBElement;
-        "lifecycle-async-c": HTMLLifecycleAsyncCElement;
         "lifecycle-unload-a": HTMLLifecycleUnloadAElement;
         "lifecycle-unload-b": HTMLLifecycleUnloadBElement;
         "lifecycle-unload-root": HTMLLifecycleUnloadRootElement;
@@ -1281,18 +1220,6 @@ declare namespace LocalJSX {
     interface IonHost {
     }
     interface IonParent {
-    }
-    interface LifecycleAsyncA {
-    }
-    interface LifecycleAsyncB {
-        "onLifecycleLoad"?: (event: LifecycleAsyncBCustomEvent<any>) => void;
-        "onLifecycleUpdate"?: (event: LifecycleAsyncBCustomEvent<any>) => void;
-        "value"?: string;
-    }
-    interface LifecycleAsyncC {
-        "onLifecycleLoad"?: (event: LifecycleAsyncCCustomEvent<any>) => void;
-        "onLifecycleUpdate"?: (event: LifecycleAsyncCCustomEvent<any>) => void;
-        "value"?: string;
     }
     interface LifecycleUnloadA {
     }
@@ -1536,9 +1463,6 @@ declare namespace LocalJSX {
         "ion-child": IonChild;
         "ion-host": IonHost;
         "ion-parent": IonParent;
-        "lifecycle-async-a": LifecycleAsyncA;
-        "lifecycle-async-b": LifecycleAsyncB;
-        "lifecycle-async-c": LifecycleAsyncC;
         "lifecycle-unload-a": LifecycleUnloadA;
         "lifecycle-unload-b": LifecycleUnloadB;
         "lifecycle-unload-root": LifecycleUnloadRoot;
@@ -1662,9 +1586,6 @@ declare module "@stencil/core" {
             "ion-child": LocalJSX.IonChild & JSXBase.HTMLAttributes<HTMLIonChildElement>;
             "ion-host": LocalJSX.IonHost & JSXBase.HTMLAttributes<HTMLIonHostElement>;
             "ion-parent": LocalJSX.IonParent & JSXBase.HTMLAttributes<HTMLIonParentElement>;
-            "lifecycle-async-a": LocalJSX.LifecycleAsyncA & JSXBase.HTMLAttributes<HTMLLifecycleAsyncAElement>;
-            "lifecycle-async-b": LocalJSX.LifecycleAsyncB & JSXBase.HTMLAttributes<HTMLLifecycleAsyncBElement>;
-            "lifecycle-async-c": LocalJSX.LifecycleAsyncC & JSXBase.HTMLAttributes<HTMLLifecycleAsyncCElement>;
             "lifecycle-unload-a": LocalJSX.LifecycleUnloadA & JSXBase.HTMLAttributes<HTMLLifecycleUnloadAElement>;
             "lifecycle-unload-b": LocalJSX.LifecycleUnloadB & JSXBase.HTMLAttributes<HTMLLifecycleUnloadBElement>;
             "lifecycle-unload-root": LocalJSX.LifecycleUnloadRoot & JSXBase.HTMLAttributes<HTMLLifecycleUnloadRootElement>;
