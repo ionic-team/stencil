@@ -95,8 +95,6 @@ export namespace Components {
     }
     interface IonParent {
     }
-    interface JsonBasic {
-    }
     interface KeyReorder {
         "num"?: number;
     }
@@ -645,12 +643,6 @@ declare global {
     var HTMLIonParentElement: {
         prototype: HTMLIonParentElement;
         new (): HTMLIonParentElement;
-    };
-    interface HTMLJsonBasicElement extends Components.JsonBasic, HTMLStencilElement {
-    }
-    var HTMLJsonBasicElement: {
-        prototype: HTMLJsonBasicElement;
-        new (): HTMLJsonBasicElement;
     };
     interface HTMLKeyReorderElement extends Components.KeyReorder, HTMLStencilElement {
     }
@@ -1345,7 +1337,6 @@ declare global {
         "ion-child": HTMLIonChildElement;
         "ion-host": HTMLIonHostElement;
         "ion-parent": HTMLIonParentElement;
-        "json-basic": HTMLJsonBasicElement;
         "key-reorder": HTMLKeyReorderElement;
         "key-reorder-root": HTMLKeyReorderRootElement;
         "lifecycle-async-a": HTMLLifecycleAsyncAElement;
@@ -1537,8 +1528,6 @@ declare namespace LocalJSX {
     interface IonHost {
     }
     interface IonParent {
-    }
-    interface JsonBasic {
     }
     interface KeyReorder {
         "num"?: number;
@@ -1830,7 +1819,6 @@ declare namespace LocalJSX {
         "ion-child": IonChild;
         "ion-host": IonHost;
         "ion-parent": IonParent;
-        "json-basic": JsonBasic;
         "key-reorder": KeyReorder;
         "key-reorder-root": KeyReorderRoot;
         "lifecycle-async-a": LifecycleAsyncA;
@@ -1976,7 +1964,6 @@ declare module "@stencil/core" {
             "ion-child": LocalJSX.IonChild & JSXBase.HTMLAttributes<HTMLIonChildElement>;
             "ion-host": LocalJSX.IonHost & JSXBase.HTMLAttributes<HTMLIonHostElement>;
             "ion-parent": LocalJSX.IonParent & JSXBase.HTMLAttributes<HTMLIonParentElement>;
-            "json-basic": LocalJSX.JsonBasic & JSXBase.HTMLAttributes<HTMLJsonBasicElement>;
             "key-reorder": LocalJSX.KeyReorder & JSXBase.HTMLAttributes<HTMLKeyReorderElement>;
             "key-reorder-root": LocalJSX.KeyReorderRoot & JSXBase.HTMLAttributes<HTMLKeyReorderRootElement>;
             "lifecycle-async-a": LocalJSX.LifecycleAsyncA & JSXBase.HTMLAttributes<HTMLLifecycleAsyncAElement>;
