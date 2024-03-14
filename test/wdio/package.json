@@ -10,7 +10,7 @@
   "devDependencies": {
     "@stencil/core": "file:../..",
     "@stencil/sass": "^3.0.10",
-    "@types/node": "^16.11.7",
+    "@types/node": "^20.0.0",
     "@wdio/browser-runner": "^8.33.1",
     "@wdio/cli": "^8.33.1",
     "@wdio/globals": "^8.33.1",
@@ -23,7 +23,7 @@
     "ts-node": "^10.9.2"
   },
   "volta": {
-    "node": "16.20.2",
+    "node": "20.11.1",
     "npm": "8.19.4"
   }
 }
