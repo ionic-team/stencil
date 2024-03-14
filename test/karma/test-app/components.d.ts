@@ -78,8 +78,6 @@ export namespace Components {
     }
     interface FactoryJsx {
     }
-    interface FormAssociated {
-    }
     interface HostAttrOverride {
     }
     interface ImportAliasing {
@@ -594,12 +592,6 @@ declare global {
     var HTMLFactoryJsxElement: {
         prototype: HTMLFactoryJsxElement;
         new (): HTMLFactoryJsxElement;
-    };
-    interface HTMLFormAssociatedElement extends Components.FormAssociated, HTMLStencilElement {
-    }
-    var HTMLFormAssociatedElement: {
-        prototype: HTMLFormAssociatedElement;
-        new (): HTMLFormAssociatedElement;
     };
     interface HTMLHostAttrOverrideElement extends Components.HostAttrOverride, HTMLStencilElement {
     }
@@ -1346,7 +1338,6 @@ declare global {
         "external-import-b": HTMLExternalImportBElement;
         "external-import-c": HTMLExternalImportCElement;
         "factory-jsx": HTMLFactoryJsxElement;
-        "form-associated": HTMLFormAssociatedElement;
         "host-attr-override": HTMLHostAttrOverrideElement;
         "import-aliasing": HTMLImportAliasingElement;
         "init-css-root": HTMLInitCssRootElement;
@@ -1529,8 +1520,6 @@ declare namespace LocalJSX {
     interface ExternalImportC {
     }
     interface FactoryJsx {
-    }
-    interface FormAssociated {
     }
     interface HostAttrOverride {
     }
@@ -1834,7 +1823,6 @@ declare namespace LocalJSX {
         "external-import-b": ExternalImportB;
         "external-import-c": ExternalImportC;
         "factory-jsx": FactoryJsx;
-        "form-associated": FormAssociated;
         "host-attr-override": HostAttrOverride;
         "import-aliasing": ImportAliasing;
         "init-css-root": InitCssRoot;
@@ -1981,7 +1969,6 @@ declare module "@stencil/core" {
             "external-import-b": LocalJSX.ExternalImportB & JSXBase.HTMLAttributes<HTMLExternalImportBElement>;
             "external-import-c": LocalJSX.ExternalImportC & JSXBase.HTMLAttributes<HTMLExternalImportCElement>;
             "factory-jsx": LocalJSX.FactoryJsx & JSXBase.HTMLAttributes<HTMLFactoryJsxElement>;
-            "form-associated": LocalJSX.FormAssociated & JSXBase.HTMLAttributes<HTMLFormAssociatedElement>;
             "host-attr-override": LocalJSX.HostAttrOverride & JSXBase.HTMLAttributes<HTMLHostAttrOverrideElement>;
             "import-aliasing": LocalJSX.ImportAliasing & JSXBase.HTMLAttributes<HTMLImportAliasingElement>;
             "init-css-root": LocalJSX.InitCssRoot & JSXBase.HTMLAttributes<HTMLInitCssRootElement>;
