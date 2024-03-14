@@ -20,7 +20,7 @@ export class FormAssociatedCmp {
   }
 
   formResetCallback(this: HTMLFormAssociatedElement & FormAssociatedCmp) {
-    this.internals.form.ariaLabel = 'formResetCallback called';
+    this.internals.form!.ariaLabel = 'formResetCallback called';
   }
 
   formDisabledCallback(disabled: boolean) {
