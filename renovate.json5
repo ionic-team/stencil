@@ -107,6 +107,13 @@
       allowedVersions: '<=16'
     },
     {
+      // We intentionally run the WebdriverIO tests against the oldest LTS of Node we support.
+      // Prevent renovate from trying to bump node
+      matchFileNames: ['test/wdio/package.json'],
+      matchDepNames: ['node'],
+      allowedVersions: '<=16'
+    },
+    {
       // We intentionally run the karma tests against the oldest LTS of Node we support.
       // Prevent renovate from trying to bump node
       matchFileNames: ['test/karma/package.json'],
