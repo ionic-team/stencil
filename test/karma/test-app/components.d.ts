@@ -38,8 +38,6 @@ export namespace Components {
     }
     interface CustomElementsNoDelegatesFocus {
     }
-    interface Es5AddclassSvg {
-    }
     interface EsmImport {
         "propVal": number;
         "someMethod": () => Promise<void>;
@@ -376,12 +374,6 @@ declare global {
     var HTMLCustomElementsNoDelegatesFocusElement: {
         prototype: HTMLCustomElementsNoDelegatesFocusElement;
         new (): HTMLCustomElementsNoDelegatesFocusElement;
-    };
-    interface HTMLEs5AddclassSvgElement extends Components.Es5AddclassSvg, HTMLStencilElement {
-    }
-    var HTMLEs5AddclassSvgElement: {
-        prototype: HTMLEs5AddclassSvgElement;
-        new (): HTMLEs5AddclassSvgElement;
     };
     interface HTMLEsmImportElementEventMap {
         "someEvent": any;
@@ -1025,7 +1017,6 @@ declare global {
         "custom-element-root-different-name-than-class": HTMLCustomElementRootDifferentNameThanClassElement;
         "custom-elements-delegates-focus": HTMLCustomElementsDelegatesFocusElement;
         "custom-elements-no-delegates-focus": HTMLCustomElementsNoDelegatesFocusElement;
-        "es5-addclass-svg": HTMLEs5AddclassSvgElement;
         "esm-import": HTMLEsmImportElement;
         "event-custom-type": HTMLEventCustomTypeElement;
         "external-import-a": HTMLExternalImportAElement;
@@ -1157,8 +1148,6 @@ declare namespace LocalJSX {
     interface CustomElementsDelegatesFocus {
     }
     interface CustomElementsNoDelegatesFocus {
-    }
-    interface Es5AddclassSvg {
     }
     interface EsmImport {
         "onSomeEvent"?: (event: EsmImportCustomEvent<any>) => void;
@@ -1415,7 +1404,6 @@ declare namespace LocalJSX {
         "custom-element-root-different-name-than-class": CustomElementRootDifferentNameThanClass;
         "custom-elements-delegates-focus": CustomElementsDelegatesFocus;
         "custom-elements-no-delegates-focus": CustomElementsNoDelegatesFocus;
-        "es5-addclass-svg": Es5AddclassSvg;
         "esm-import": EsmImport;
         "event-custom-type": EventCustomType;
         "external-import-a": ExternalImportA;
@@ -1535,7 +1523,6 @@ declare module "@stencil/core" {
             "custom-element-root-different-name-than-class": LocalJSX.CustomElementRootDifferentNameThanClass & JSXBase.HTMLAttributes<HTMLCustomElementRootDifferentNameThanClassElement>;
             "custom-elements-delegates-focus": LocalJSX.CustomElementsDelegatesFocus & JSXBase.HTMLAttributes<HTMLCustomElementsDelegatesFocusElement>;
             "custom-elements-no-delegates-focus": LocalJSX.CustomElementsNoDelegatesFocus & JSXBase.HTMLAttributes<HTMLCustomElementsNoDelegatesFocusElement>;
-            "es5-addclass-svg": LocalJSX.Es5AddclassSvg & JSXBase.HTMLAttributes<HTMLEs5AddclassSvgElement>;
             "esm-import": LocalJSX.EsmImport & JSXBase.HTMLAttributes<HTMLEsmImportElement>;
             "event-custom-type": LocalJSX.EventCustomType & JSXBase.HTMLAttributes<HTMLEventCustomTypeElement>;
             "external-import-a": LocalJSX.ExternalImportA & JSXBase.HTMLAttributes<HTMLExternalImportAElement>;
