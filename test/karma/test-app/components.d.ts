@@ -38,12 +38,6 @@ export namespace Components {
     }
     interface CustomElementsNoDelegatesFocus {
     }
-    interface DomReattachClone {
-    }
-    interface DomReattachCloneDeepSlot {
-    }
-    interface DomReattachCloneHost {
-    }
     interface DynamicImport {
         "update": () => Promise<void>;
     }
@@ -415,24 +409,6 @@ declare global {
     var HTMLCustomElementsNoDelegatesFocusElement: {
         prototype: HTMLCustomElementsNoDelegatesFocusElement;
         new (): HTMLCustomElementsNoDelegatesFocusElement;
-    };
-    interface HTMLDomReattachCloneElement extends Components.DomReattachClone, HTMLStencilElement {
-    }
-    var HTMLDomReattachCloneElement: {
-        prototype: HTMLDomReattachCloneElement;
-        new (): HTMLDomReattachCloneElement;
-    };
-    interface HTMLDomReattachCloneDeepSlotElement extends Components.DomReattachCloneDeepSlot, HTMLStencilElement {
-    }
-    var HTMLDomReattachCloneDeepSlotElement: {
-        prototype: HTMLDomReattachCloneDeepSlotElement;
-        new (): HTMLDomReattachCloneDeepSlotElement;
-    };
-    interface HTMLDomReattachCloneHostElement extends Components.DomReattachCloneHost, HTMLStencilElement {
-    }
-    var HTMLDomReattachCloneHostElement: {
-        prototype: HTMLDomReattachCloneHostElement;
-        new (): HTMLDomReattachCloneHostElement;
     };
     interface HTMLDynamicImportElement extends Components.DynamicImport, HTMLStencilElement {
     }
@@ -1172,9 +1148,6 @@ declare global {
         "custom-element-root-different-name-than-class": HTMLCustomElementRootDifferentNameThanClassElement;
         "custom-elements-delegates-focus": HTMLCustomElementsDelegatesFocusElement;
         "custom-elements-no-delegates-focus": HTMLCustomElementsNoDelegatesFocusElement;
-        "dom-reattach-clone": HTMLDomReattachCloneElement;
-        "dom-reattach-clone-deep-slot": HTMLDomReattachCloneDeepSlotElement;
-        "dom-reattach-clone-host": HTMLDomReattachCloneHostElement;
         "dynamic-import": HTMLDynamicImportElement;
         "es5-addclass-svg": HTMLEs5AddclassSvgElement;
         "esm-import": HTMLEsmImportElement;
@@ -1318,12 +1291,6 @@ declare namespace LocalJSX {
     interface CustomElementsDelegatesFocus {
     }
     interface CustomElementsNoDelegatesFocus {
-    }
-    interface DomReattachClone {
-    }
-    interface DomReattachCloneDeepSlot {
-    }
-    interface DomReattachCloneHost {
     }
     interface DynamicImport {
     }
@@ -1610,9 +1577,6 @@ declare namespace LocalJSX {
         "custom-element-root-different-name-than-class": CustomElementRootDifferentNameThanClass;
         "custom-elements-delegates-focus": CustomElementsDelegatesFocus;
         "custom-elements-no-delegates-focus": CustomElementsNoDelegatesFocus;
-        "dom-reattach-clone": DomReattachClone;
-        "dom-reattach-clone-deep-slot": DomReattachCloneDeepSlot;
-        "dom-reattach-clone-host": DomReattachCloneHost;
         "dynamic-import": DynamicImport;
         "es5-addclass-svg": Es5AddclassSvg;
         "esm-import": EsmImport;
@@ -1744,9 +1708,6 @@ declare module "@stencil/core" {
             "custom-element-root-different-name-than-class": LocalJSX.CustomElementRootDifferentNameThanClass & JSXBase.HTMLAttributes<HTMLCustomElementRootDifferentNameThanClassElement>;
             "custom-elements-delegates-focus": LocalJSX.CustomElementsDelegatesFocus & JSXBase.HTMLAttributes<HTMLCustomElementsDelegatesFocusElement>;
             "custom-elements-no-delegates-focus": LocalJSX.CustomElementsNoDelegatesFocus & JSXBase.HTMLAttributes<HTMLCustomElementsNoDelegatesFocusElement>;
-            "dom-reattach-clone": LocalJSX.DomReattachClone & JSXBase.HTMLAttributes<HTMLDomReattachCloneElement>;
-            "dom-reattach-clone-deep-slot": LocalJSX.DomReattachCloneDeepSlot & JSXBase.HTMLAttributes<HTMLDomReattachCloneDeepSlotElement>;
-            "dom-reattach-clone-host": LocalJSX.DomReattachCloneHost & JSXBase.HTMLAttributes<HTMLDomReattachCloneHostElement>;
             "dynamic-import": LocalJSX.DynamicImport & JSXBase.HTMLAttributes<HTMLDynamicImportElement>;
             "es5-addclass-svg": LocalJSX.Es5AddclassSvg & JSXBase.HTMLAttributes<HTMLEs5AddclassSvgElement>;
             "esm-import": LocalJSX.EsmImport & JSXBase.HTMLAttributes<HTMLEsmImportElement>;
