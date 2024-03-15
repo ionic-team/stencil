@@ -1,4 +1,4 @@
-import { Component, Method, State, h } from '@stencil/core';
+import { Component, h, Method, State } from '@stencil/core';
 
 @Component({
   tag: 'dynamic-import',
@@ -11,7 +11,7 @@ export class DynamicImport {
   }
 
   async getResult() {
-    return (await import('./module1')).getResult();
+    return (await import('./module1.js')).getResult();
   }
 
   @Method()
