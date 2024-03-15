@@ -5,8 +5,7 @@ import { AttachInternals, Component, h } from '@stencil/core';
   formAssociated: true,
 })
 export class FormAssociatedCmp {
-  @AttachInternals()
-  internals: ElementInternals;
+  @AttachInternals() internals: ElementInternals;
 
   componentWillLoad() {
     this.internals.setFormValue('my default value');
@@ -20,11 +19,11 @@ export class FormAssociatedCmp {
   }
 
   formResetCallback(this: HTMLFormAssociatedElement & FormAssociatedCmp) {
-    this.internals.form.ariaLabel = 'formResetCallback called';
+    this.internals.form!.ariaLabel = 'formResetCallback called';
   }
 
   formDisabledCallback(disabled: boolean) {
-    this.internals.form.ariaLabel = `formDisabledCallback called with ${disabled}`;
+    this.internals.form!.ariaLabel = `formDisabledCallback called with ${disabled}`;
   }
 
   render() {
