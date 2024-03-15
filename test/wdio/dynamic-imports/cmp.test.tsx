@@ -3,7 +3,7 @@ import { render } from '@wdio/browser-runner/stencil';
 describe('tag-names', () => {
   beforeEach(() => {
     render({
-      template: () => <dynamic-import></dynamic-import>
+      template: () => <dynamic-import></dynamic-import>,
     });
   });
 
@@ -11,7 +11,7 @@ describe('tag-names', () => {
     await expect($('dynamic-import')).toHaveText('1 hello1 world1');
 
     const dynamicImport = document.querySelector('dynamic-import');
-    dynamicImport.update()
+    dynamicImport.update();
 
     await expect($('dynamic-import')).toHaveText('2 hello2 world2');
   });
