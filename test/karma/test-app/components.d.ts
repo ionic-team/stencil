@@ -101,14 +101,6 @@ export namespace Components {
     interface LifecycleAsyncC {
         "value": string;
     }
-    interface LifecycleBasicA {
-    }
-    interface LifecycleBasicB {
-        "value": string;
-    }
-    interface LifecycleBasicC {
-        "value": string;
-    }
     interface LifecycleNestedA {
     }
     interface LifecycleNestedB {
@@ -355,14 +347,6 @@ export interface LifecycleAsyncBCustomEvent<T> extends CustomEvent<T> {
 export interface LifecycleAsyncCCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLLifecycleAsyncCElement;
-}
-export interface LifecycleBasicBCustomEvent<T> extends CustomEvent<T> {
-    detail: T;
-    target: HTMLLifecycleBasicBElement;
-}
-export interface LifecycleBasicCCustomEvent<T> extends CustomEvent<T> {
-    detail: T;
-    target: HTMLLifecycleBasicCElement;
 }
 declare global {
     interface HTMLBadSharedJsxElement extends Components.BadSharedJsx, HTMLStencilElement {
@@ -678,48 +662,6 @@ declare global {
     var HTMLLifecycleAsyncCElement: {
         prototype: HTMLLifecycleAsyncCElement;
         new (): HTMLLifecycleAsyncCElement;
-    };
-    interface HTMLLifecycleBasicAElement extends Components.LifecycleBasicA, HTMLStencilElement {
-    }
-    var HTMLLifecycleBasicAElement: {
-        prototype: HTMLLifecycleBasicAElement;
-        new (): HTMLLifecycleBasicAElement;
-    };
-    interface HTMLLifecycleBasicBElementEventMap {
-        "lifecycleLoad": any;
-        "lifecycleUpdate": any;
-    }
-    interface HTMLLifecycleBasicBElement extends Components.LifecycleBasicB, HTMLStencilElement {
-        addEventListener<K extends keyof HTMLLifecycleBasicBElementEventMap>(type: K, listener: (this: HTMLLifecycleBasicBElement, ev: LifecycleBasicBCustomEvent<HTMLLifecycleBasicBElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
-        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
-        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
-        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-        removeEventListener<K extends keyof HTMLLifecycleBasicBElementEventMap>(type: K, listener: (this: HTMLLifecycleBasicBElement, ev: LifecycleBasicBCustomEvent<HTMLLifecycleBasicBElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
-        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
-        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
-        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
-    }
-    var HTMLLifecycleBasicBElement: {
-        prototype: HTMLLifecycleBasicBElement;
-        new (): HTMLLifecycleBasicBElement;
-    };
-    interface HTMLLifecycleBasicCElementEventMap {
-        "lifecycleLoad": any;
-        "lifecycleUpdate": any;
-    }
-    interface HTMLLifecycleBasicCElement extends Components.LifecycleBasicC, HTMLStencilElement {
-        addEventListener<K extends keyof HTMLLifecycleBasicCElementEventMap>(type: K, listener: (this: HTMLLifecycleBasicCElement, ev: LifecycleBasicCCustomEvent<HTMLLifecycleBasicCElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
-        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
-        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
-        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-        removeEventListener<K extends keyof HTMLLifecycleBasicCElementEventMap>(type: K, listener: (this: HTMLLifecycleBasicCElement, ev: LifecycleBasicCCustomEvent<HTMLLifecycleBasicCElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
-        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
-        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
-        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
-    }
-    var HTMLLifecycleBasicCElement: {
-        prototype: HTMLLifecycleBasicCElement;
-        new (): HTMLLifecycleBasicCElement;
     };
     interface HTMLLifecycleNestedAElement extends Components.LifecycleNestedA, HTMLStencilElement {
     }
@@ -1321,9 +1263,6 @@ declare global {
         "lifecycle-async-a": HTMLLifecycleAsyncAElement;
         "lifecycle-async-b": HTMLLifecycleAsyncBElement;
         "lifecycle-async-c": HTMLLifecycleAsyncCElement;
-        "lifecycle-basic-a": HTMLLifecycleBasicAElement;
-        "lifecycle-basic-b": HTMLLifecycleBasicBElement;
-        "lifecycle-basic-c": HTMLLifecycleBasicCElement;
         "lifecycle-nested-a": HTMLLifecycleNestedAElement;
         "lifecycle-nested-b": HTMLLifecycleNestedBElement;
         "lifecycle-nested-c": HTMLLifecycleNestedCElement;
@@ -1516,18 +1455,6 @@ declare namespace LocalJSX {
     interface LifecycleAsyncC {
         "onLifecycleLoad"?: (event: LifecycleAsyncCCustomEvent<any>) => void;
         "onLifecycleUpdate"?: (event: LifecycleAsyncCCustomEvent<any>) => void;
-        "value"?: string;
-    }
-    interface LifecycleBasicA {
-    }
-    interface LifecycleBasicB {
-        "onLifecycleLoad"?: (event: LifecycleBasicBCustomEvent<any>) => void;
-        "onLifecycleUpdate"?: (event: LifecycleBasicBCustomEvent<any>) => void;
-        "value"?: string;
-    }
-    interface LifecycleBasicC {
-        "onLifecycleLoad"?: (event: LifecycleBasicCCustomEvent<any>) => void;
-        "onLifecycleUpdate"?: (event: LifecycleBasicCCustomEvent<any>) => void;
         "value"?: string;
     }
     interface LifecycleNestedA {
@@ -1794,9 +1721,6 @@ declare namespace LocalJSX {
         "lifecycle-async-a": LifecycleAsyncA;
         "lifecycle-async-b": LifecycleAsyncB;
         "lifecycle-async-c": LifecycleAsyncC;
-        "lifecycle-basic-a": LifecycleBasicA;
-        "lifecycle-basic-b": LifecycleBasicB;
-        "lifecycle-basic-c": LifecycleBasicC;
         "lifecycle-nested-a": LifecycleNestedA;
         "lifecycle-nested-b": LifecycleNestedB;
         "lifecycle-nested-c": LifecycleNestedC;
@@ -1937,9 +1861,6 @@ declare module "@stencil/core" {
             "lifecycle-async-a": LocalJSX.LifecycleAsyncA & JSXBase.HTMLAttributes<HTMLLifecycleAsyncAElement>;
             "lifecycle-async-b": LocalJSX.LifecycleAsyncB & JSXBase.HTMLAttributes<HTMLLifecycleAsyncBElement>;
             "lifecycle-async-c": LocalJSX.LifecycleAsyncC & JSXBase.HTMLAttributes<HTMLLifecycleAsyncCElement>;
-            "lifecycle-basic-a": LocalJSX.LifecycleBasicA & JSXBase.HTMLAttributes<HTMLLifecycleBasicAElement>;
-            "lifecycle-basic-b": LocalJSX.LifecycleBasicB & JSXBase.HTMLAttributes<HTMLLifecycleBasicBElement>;
-            "lifecycle-basic-c": LocalJSX.LifecycleBasicC & JSXBase.HTMLAttributes<HTMLLifecycleBasicCElement>;
             "lifecycle-nested-a": LocalJSX.LifecycleNestedA & JSXBase.HTMLAttributes<HTMLLifecycleNestedAElement>;
             "lifecycle-nested-b": LocalJSX.LifecycleNestedB & JSXBase.HTMLAttributes<HTMLLifecycleNestedBElement>;
             "lifecycle-nested-c": LocalJSX.LifecycleNestedC & JSXBase.HTMLAttributes<HTMLLifecycleNestedCElement>;
