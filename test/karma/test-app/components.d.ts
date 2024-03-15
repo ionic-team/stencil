@@ -46,8 +46,6 @@ export namespace Components {
     }
     interface DomReattachCloneHost {
     }
-    interface DynamicCssVariable {
-    }
     interface DynamicImport {
         "update": () => Promise<void>;
     }
@@ -474,12 +472,6 @@ declare global {
     var HTMLDomReattachCloneHostElement: {
         prototype: HTMLDomReattachCloneHostElement;
         new (): HTMLDomReattachCloneHostElement;
-    };
-    interface HTMLDynamicCssVariableElement extends Components.DynamicCssVariable, HTMLStencilElement {
-    }
-    var HTMLDynamicCssVariableElement: {
-        prototype: HTMLDynamicCssVariableElement;
-        new (): HTMLDynamicCssVariableElement;
     };
     interface HTMLDynamicImportElement extends Components.DynamicImport, HTMLStencilElement {
     }
@@ -1306,7 +1298,6 @@ declare global {
         "dom-reattach-clone": HTMLDomReattachCloneElement;
         "dom-reattach-clone-deep-slot": HTMLDomReattachCloneDeepSlotElement;
         "dom-reattach-clone-host": HTMLDomReattachCloneHostElement;
-        "dynamic-css-variable": HTMLDynamicCssVariableElement;
         "dynamic-import": HTMLDynamicImportElement;
         "es5-addclass-svg": HTMLEs5AddclassSvgElement;
         "esm-import": HTMLEsmImportElement;
@@ -1466,8 +1457,6 @@ declare namespace LocalJSX {
     interface DomReattachCloneDeepSlot {
     }
     interface DomReattachCloneHost {
-    }
-    interface DynamicCssVariable {
     }
     interface DynamicImport {
     }
@@ -1782,7 +1771,6 @@ declare namespace LocalJSX {
         "dom-reattach-clone": DomReattachClone;
         "dom-reattach-clone-deep-slot": DomReattachCloneDeepSlot;
         "dom-reattach-clone-host": DomReattachCloneHost;
-        "dynamic-css-variable": DynamicCssVariable;
         "dynamic-import": DynamicImport;
         "es5-addclass-svg": Es5AddclassSvg;
         "esm-import": EsmImport;
@@ -1926,7 +1914,6 @@ declare module "@stencil/core" {
             "dom-reattach-clone": LocalJSX.DomReattachClone & JSXBase.HTMLAttributes<HTMLDomReattachCloneElement>;
             "dom-reattach-clone-deep-slot": LocalJSX.DomReattachCloneDeepSlot & JSXBase.HTMLAttributes<HTMLDomReattachCloneDeepSlotElement>;
             "dom-reattach-clone-host": LocalJSX.DomReattachCloneHost & JSXBase.HTMLAttributes<HTMLDomReattachCloneHostElement>;
-            "dynamic-css-variable": LocalJSX.DynamicCssVariable & JSXBase.HTMLAttributes<HTMLDynamicCssVariableElement>;
             "dynamic-import": LocalJSX.DynamicImport & JSXBase.HTMLAttributes<HTMLDynamicImportElement>;
             "es5-addclass-svg": LocalJSX.Es5AddclassSvg & JSXBase.HTMLAttributes<HTMLEs5AddclassSvgElement>;
             "esm-import": LocalJSX.EsmImport & JSXBase.HTMLAttributes<HTMLEsmImportElement>;
