@@ -574,76 +574,70 @@ async function findWithCssSelector(
   lightSelector: string,
   shadowSelector: string,
 ) {
-  let elmHandle = await rootHandle.$(lightSelector);
+  const elmHandle = await rootHandle.$(lightSelector);
 
   if (!elmHandle) {
     /**
      * if elmHandle is null, attempt to look up from shadow element of `rootHandle`
      */
-    const shadowHandle = await page.evaluateHandle(
-      (elm: Element, shadowSelector: string) => {
-        if (!elm.shadowRoot) {
-          throw new Error(`shadow root does not exist for element: ${elm.tagName.toLowerCase()}`);
-        }
-
-        return elm.shadowRoot.querySelector(shadowSelector);
-      },
-      rootHandle,
-      lightSelector,
-    );
-
+    const shadowHandle = await shadowQuerySelector(page, rootHandle, lightSelector);
     if (shadowHandle) {
-      const elm = shadowHandle.asElement();
-      return elm as puppeteer.ElementHandle<Element>;
+      return shadowHandle;
     }
 
     return null;
   }
 
   if (shadowSelector) {
-    const shadowHandle = await page.evaluateHandle(
-      (elm: Element, shadowSelector: string) => {
-        if (!elm.shadowRoot) {
-          throw new Error(`shadow root does not exist for element: ${elm.tagName.toLowerCase()}`);
-        }
-
-        return elm.shadowRoot.querySelector(shadowSelector);
-      },
-      elmHandle,
-      shadowSelector,
-    );
-
-    await elmHandle.dispose();
-
+    const shadowHandle = await shadowQuerySelector(page, elmHandle, shadowSelector);
     if (!shadowHandle) {
       /**
        * attempt to look up from shadow element of `rootHandle`
        */
-      const shadowHandle = await page.evaluateHandle(
-        (elm: Element, shadowSelector: string) => {
-          if (!elm.shadowRoot) {
-            throw new Error(`shadow root does not exist for element: ${elm.tagName.toLowerCase()}`);
-          }
-
-          return elm.shadowRoot.querySelector(shadowSelector);
-        },
-        rootHandle,
-        shadowSelector,
-      );
-
+      const shadowHandle = await shadowQuerySelector(page, rootHandle, shadowSelector);
       if (shadowHandle) {
-        const elm = shadowHandle.asElement() as puppeteer.ElementHandle<Element>;
-        await shadowHandle.dispose();
-        return elm;
+        return shadowHandle;
       }
 
       return null;
     }
 
-    elmHandle = shadowHandle.asElement() as puppeteer.ElementHandle<Element>;
+    return shadowHandle;
   }
 
   return elmHandle;
+}
+
+/**
+ * attempt to look up from shadow element of `rootHandle`
+ * @param page the puppeteer page
+ * @param rootHandle the root element handle
+ * @param selector the selector to query
+ * @returns the element handle
+ */
+async function shadowQuerySelector (
+  page: pd.E2EPageInternal,
+  rootHandle: puppeteer.ElementHandle,
+  selector: string,
+) {
+  const shadowHandle = await page.evaluateHandle(
+    (elm: Element, shadowSelector: string) => {
+      if (!elm.shadowRoot) {
+        throw new Error(`shadow root does not exist for element: ${elm.tagName.toLowerCase()}`);
+      }
+
+      return elm.shadowRoot.querySelector(shadowSelector);
+    },
+    rootHandle,
+    selector,
+  );
+
+  if (!shadowHandle) {
+    return null;
+  }
+
+  const elm = shadowHandle.asElement() as puppeteer.ElementHandle<Element>;
+  return elm;
 }
 
 async function findWithText(
