@@ -4,7 +4,7 @@ import { render } from '@wdio/browser-runner/stencil';
 const css = `
 body {
   color: yellow;
-}`
+}`;
 
 describe('esm-import', () => {
   beforeEach(() => {
@@ -14,12 +14,12 @@ describe('esm-import', () => {
           <style>{css}</style>
           <esm-import prop-val="88"></esm-import>
         </>
-      )
-    })
+      ),
+    });
   });
 
   it('import', async () => {
-    await $('esm-import').waitForExist()
+    await $('esm-import').waitForExist();
     const host = document.querySelector('esm-import');
 
     const hostStyles = window.getComputedStyle(host);
