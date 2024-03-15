@@ -84,12 +84,6 @@ export namespace Components {
     interface LifecycleAsyncC {
         "value": string;
     }
-    interface LifecycleNestedA {
-    }
-    interface LifecycleNestedB {
-    }
-    interface LifecycleNestedC {
-    }
     interface LifecycleUnloadA {
     }
     interface LifecycleUnloadB {
@@ -578,24 +572,6 @@ declare global {
     var HTMLLifecycleAsyncCElement: {
         prototype: HTMLLifecycleAsyncCElement;
         new (): HTMLLifecycleAsyncCElement;
-    };
-    interface HTMLLifecycleNestedAElement extends Components.LifecycleNestedA, HTMLStencilElement {
-    }
-    var HTMLLifecycleNestedAElement: {
-        prototype: HTMLLifecycleNestedAElement;
-        new (): HTMLLifecycleNestedAElement;
-    };
-    interface HTMLLifecycleNestedBElement extends Components.LifecycleNestedB, HTMLStencilElement {
-    }
-    var HTMLLifecycleNestedBElement: {
-        prototype: HTMLLifecycleNestedBElement;
-        new (): HTMLLifecycleNestedBElement;
-    };
-    interface HTMLLifecycleNestedCElement extends Components.LifecycleNestedC, HTMLStencilElement {
-    }
-    var HTMLLifecycleNestedCElement: {
-        prototype: HTMLLifecycleNestedCElement;
-        new (): HTMLLifecycleNestedCElement;
     };
     interface HTMLLifecycleUnloadAElement extends Components.LifecycleUnloadA, HTMLStencilElement {
     }
@@ -1159,9 +1135,6 @@ declare global {
         "lifecycle-async-a": HTMLLifecycleAsyncAElement;
         "lifecycle-async-b": HTMLLifecycleAsyncBElement;
         "lifecycle-async-c": HTMLLifecycleAsyncCElement;
-        "lifecycle-nested-a": HTMLLifecycleNestedAElement;
-        "lifecycle-nested-b": HTMLLifecycleNestedBElement;
-        "lifecycle-nested-c": HTMLLifecycleNestedCElement;
         "lifecycle-unload-a": HTMLLifecycleUnloadAElement;
         "lifecycle-unload-b": HTMLLifecycleUnloadBElement;
         "lifecycle-unload-root": HTMLLifecycleUnloadRootElement;
@@ -1332,12 +1305,6 @@ declare namespace LocalJSX {
         "onLifecycleLoad"?: (event: LifecycleAsyncCCustomEvent<any>) => void;
         "onLifecycleUpdate"?: (event: LifecycleAsyncCCustomEvent<any>) => void;
         "value"?: string;
-    }
-    interface LifecycleNestedA {
-    }
-    interface LifecycleNestedB {
-    }
-    interface LifecycleNestedC {
     }
     interface LifecycleUnloadA {
     }
@@ -1585,9 +1552,6 @@ declare namespace LocalJSX {
         "lifecycle-async-a": LifecycleAsyncA;
         "lifecycle-async-b": LifecycleAsyncB;
         "lifecycle-async-c": LifecycleAsyncC;
-        "lifecycle-nested-a": LifecycleNestedA;
-        "lifecycle-nested-b": LifecycleNestedB;
-        "lifecycle-nested-c": LifecycleNestedC;
         "lifecycle-unload-a": LifecycleUnloadA;
         "lifecycle-unload-b": LifecycleUnloadB;
         "lifecycle-unload-root": LifecycleUnloadRoot;
@@ -1715,9 +1679,6 @@ declare module "@stencil/core" {
             "lifecycle-async-a": LocalJSX.LifecycleAsyncA & JSXBase.HTMLAttributes<HTMLLifecycleAsyncAElement>;
             "lifecycle-async-b": LocalJSX.LifecycleAsyncB & JSXBase.HTMLAttributes<HTMLLifecycleAsyncBElement>;
             "lifecycle-async-c": LocalJSX.LifecycleAsyncC & JSXBase.HTMLAttributes<HTMLLifecycleAsyncCElement>;
-            "lifecycle-nested-a": LocalJSX.LifecycleNestedA & JSXBase.HTMLAttributes<HTMLLifecycleNestedAElement>;
-            "lifecycle-nested-b": LocalJSX.LifecycleNestedB & JSXBase.HTMLAttributes<HTMLLifecycleNestedBElement>;
-            "lifecycle-nested-c": LocalJSX.LifecycleNestedC & JSXBase.HTMLAttributes<HTMLLifecycleNestedCElement>;
             "lifecycle-unload-a": LocalJSX.LifecycleUnloadA & JSXBase.HTMLAttributes<HTMLLifecycleUnloadAElement>;
             "lifecycle-unload-b": LocalJSX.LifecycleUnloadB & JSXBase.HTMLAttributes<HTMLLifecycleUnloadBElement>;
             "lifecycle-unload-root": LocalJSX.LifecycleUnloadRoot & JSXBase.HTMLAttributes<HTMLLifecycleUnloadRootElement>;
