@@ -36,12 +36,6 @@ export namespace Components {
         "propVal": number;
         "someMethod": () => Promise<void>;
     }
-    interface ExternalImportA {
-    }
-    interface ExternalImportB {
-    }
-    interface ExternalImportC {
-    }
     interface FactoryJsx {
     }
     interface HostAttrOverride {
@@ -362,24 +356,6 @@ declare global {
     var HTMLEsmImportElement: {
         prototype: HTMLEsmImportElement;
         new (): HTMLEsmImportElement;
-    };
-    interface HTMLExternalImportAElement extends Components.ExternalImportA, HTMLStencilElement {
-    }
-    var HTMLExternalImportAElement: {
-        prototype: HTMLExternalImportAElement;
-        new (): HTMLExternalImportAElement;
-    };
-    interface HTMLExternalImportBElement extends Components.ExternalImportB, HTMLStencilElement {
-    }
-    var HTMLExternalImportBElement: {
-        prototype: HTMLExternalImportBElement;
-        new (): HTMLExternalImportBElement;
-    };
-    interface HTMLExternalImportCElement extends Components.ExternalImportC, HTMLStencilElement {
-    }
-    var HTMLExternalImportCElement: {
-        prototype: HTMLExternalImportCElement;
-        new (): HTMLExternalImportCElement;
     };
     interface HTMLFactoryJsxElement extends Components.FactoryJsx, HTMLStencilElement {
     }
@@ -958,9 +934,6 @@ declare global {
         "custom-elements-delegates-focus": HTMLCustomElementsDelegatesFocusElement;
         "custom-elements-no-delegates-focus": HTMLCustomElementsNoDelegatesFocusElement;
         "esm-import": HTMLEsmImportElement;
-        "external-import-a": HTMLExternalImportAElement;
-        "external-import-b": HTMLExternalImportBElement;
-        "external-import-c": HTMLExternalImportCElement;
         "factory-jsx": HTMLFactoryJsxElement;
         "host-attr-override": HTMLHostAttrOverrideElement;
         "import-aliasing": HTMLImportAliasingElement;
@@ -1085,12 +1058,6 @@ declare namespace LocalJSX {
     interface EsmImport {
         "onSomeEvent"?: (event: EsmImportCustomEvent<any>) => void;
         "propVal"?: number;
-    }
-    interface ExternalImportA {
-    }
-    interface ExternalImportB {
-    }
-    interface ExternalImportC {
     }
     interface FactoryJsx {
     }
@@ -1328,9 +1295,6 @@ declare namespace LocalJSX {
         "custom-elements-delegates-focus": CustomElementsDelegatesFocus;
         "custom-elements-no-delegates-focus": CustomElementsNoDelegatesFocus;
         "esm-import": EsmImport;
-        "external-import-a": ExternalImportA;
-        "external-import-b": ExternalImportB;
-        "external-import-c": ExternalImportC;
         "factory-jsx": FactoryJsx;
         "host-attr-override": HostAttrOverride;
         "import-aliasing": ImportAliasing;
@@ -1442,9 +1406,6 @@ declare module "@stencil/core" {
             "custom-elements-delegates-focus": LocalJSX.CustomElementsDelegatesFocus & JSXBase.HTMLAttributes<HTMLCustomElementsDelegatesFocusElement>;
             "custom-elements-no-delegates-focus": LocalJSX.CustomElementsNoDelegatesFocus & JSXBase.HTMLAttributes<HTMLCustomElementsNoDelegatesFocusElement>;
             "esm-import": LocalJSX.EsmImport & JSXBase.HTMLAttributes<HTMLEsmImportElement>;
-            "external-import-a": LocalJSX.ExternalImportA & JSXBase.HTMLAttributes<HTMLExternalImportAElement>;
-            "external-import-b": LocalJSX.ExternalImportB & JSXBase.HTMLAttributes<HTMLExternalImportBElement>;
-            "external-import-c": LocalJSX.ExternalImportC & JSXBase.HTMLAttributes<HTMLExternalImportCElement>;
             "factory-jsx": LocalJSX.FactoryJsx & JSXBase.HTMLAttributes<HTMLFactoryJsxElement>;
             "host-attr-override": LocalJSX.HostAttrOverride & JSXBase.HTMLAttributes<HTMLHostAttrOverrideElement>;
             "import-aliasing": LocalJSX.ImportAliasing & JSXBase.HTMLAttributes<HTMLImportAliasingElement>;

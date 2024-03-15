@@ -1,4 +1,4 @@
-import { data } from './external-data';
+import { data } from './external-data.js';
 
 export function store() {
   return {
