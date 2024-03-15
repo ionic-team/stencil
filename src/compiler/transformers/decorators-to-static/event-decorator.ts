@@ -9,7 +9,6 @@ import {
   resolveType,
   retrieveTsDecorators,
   serializeSymbol,
-  validateReferences,
 } from '../transform-utils';
 import { getDecoratorParameters, isDecoratorNamed } from './decorator-utils';
 
@@ -76,7 +75,6 @@ const parseEventDecorator = (
     docs: serializeSymbol(typeChecker, symbol),
     complexType: getComplexType(typeChecker, program, prop),
   };
-  validateReferences(diagnostics, eventMeta.complexType.references, prop.type);
   return eventMeta;
 };
 

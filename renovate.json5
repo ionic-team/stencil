@@ -57,7 +57,7 @@
     {
       // Increment this value as a part of updating TypeScript
       matchPackageNames: ['typescript'],
-      allowedVersions: '<5.4.0',
+      allowedVersions: '<5.5.0',
       commitMessagePrefix: "feat(typescript):"
     },
     {
@@ -103,6 +103,13 @@
       // We intentionally run the karma tests against the oldest LTS of Node we support.
       // Prevent renovate from trying to bump node
       matchFileNames: ['test/karma/package.json'],
+      matchDepNames: ['node'],
+      allowedVersions: '<=16'
+    },
+    {
+      // We intentionally run the WebdriverIO tests against the oldest LTS of Node we support.
+      // Prevent renovate from trying to bump node
+      matchFileNames: ['test/wdio/package.json'],
       matchDepNames: ['node'],
       allowedVersions: '<=16'
     },

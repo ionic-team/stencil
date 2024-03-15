@@ -48,6 +48,8 @@
     "test.jest": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js",
     "test.karma": "cd test/karma && npm ci && npm run karma",
     "test.karma.prod": "cd test/karma && npm ci && npm run karma.prod",
+    "test.wdio": "cd test/wdio && npm ci && npm run test",
+    "test.wdio.testOnly": "cd test/wdio && npm ci && npm run wdio",
     "test.prod": "npm run test.dist && npm run test.end-to-end && npm run test.jest && npm run test.karma && npm run test.sys.node && npm run test.testing && npm run test.analysis",
     "test.testing": "node scripts/test/validate-testing.js",
     "test.watch": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --watch",
@@ -119,7 +121,7 @@
     "rollup-plugin-sourcemaps": "^0.6.3",
     "semver": "^7.3.7",
     "terser": "5.29.1",
-    "typescript": "~5.3.0",
+    "typescript": "~5.4.0",
     "webpack": "^5.75.0",
     "ws": "8.16.0"
   },

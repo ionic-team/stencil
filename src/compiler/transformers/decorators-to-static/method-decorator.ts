@@ -12,7 +12,6 @@ import {
   retrieveTsDecorators,
   retrieveTsModifiers,
   typeToString,
-  validateReferences,
 } from '../transform-utils';
 import { isDecoratorNamed } from './decorator-utils';
 
@@ -111,7 +110,6 @@ const parseMethodDecorator = (
       tags: mapJSDocTagInfo(signature.getJsDocTags()),
     },
   };
-  validateReferences(diagnostics, methodMeta.complexType.references, method.type || method.name);
 
   const staticProp = ts.factory.createPropertyAssignment(
     ts.factory.createStringLiteral(methodName),

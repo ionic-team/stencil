@@ -67,6 +67,15 @@ export class MockCustomElementRegistry implements CustomElementRegistry {
     return undefined;
   }
 
+  getName(cstr: CustomElementConstructor) {
+    for (const [tagName, def] of this.__registry.entries()) {
+      if (def.cstr === cstr) {
+        return tagName;
+      }
+    }
+    return undefined;
+  }
+
   upgrade(_rootNode: any) {
     //
   }
