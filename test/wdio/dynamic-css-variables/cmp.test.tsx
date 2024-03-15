@@ -1,34 +1,28 @@
-import { setupDomTests, waitForChanges } from '../util';
+import { render } from '@wdio/browser-runner/stencil';
 
-describe('dynamic-css-variables', function () {
-  const { setupDom, tearDownDom } = setupDomTests(document);
-  let app: HTMLElement;
-
+describe('dynamic-css-variables', () => {
   beforeEach(async () => {
-    app = await setupDom('/dynamic-css-variables/index.html');
+    render({
+      template: () => <dynamic-css-variable></dynamic-css-variable>
+    });
   });
-  afterEach(tearDownDom);
 
   it('should dynamically change the inline css variable', async () => {
-    const win = window as any;
+    await expect($('header')).toHaveStyle({
+      color: browser.isChromium ? 'rgba(0,0,255,1)' : 'rgb(0,0,255)'
+    });
 
-    if (win.CSS && win.CSS.supports && win.CSS.supports('--fake-var', 0)) {
-      const header = app.querySelector('header');
-      const headerStyles1 = window.getComputedStyle(header);
-      expect(headerStyles1.color).toBe('rgb(0, 0, 255)');
+    const button = $('button');
+    await button.click();
 
-      const button = app.querySelector('button');
-      button.click();
-      await waitForChanges();
+    await expect($('header')).toHaveStyle({
+      color: browser.isChromium ? 'rgba(255,255,255,1)' : 'rgb(255,255,255)'
+    });
 
-      const headerStyles2 = window.getComputedStyle(header);
-      expect(headerStyles2.color).toBe('rgb(255, 255, 255)');
+    await button.click();
 
-      button.click();
-      await waitForChanges();
-
-      const headerStyles3 = window.getComputedStyle(header);
-      expect(headerStyles3.color).toBe('rgb(0, 0, 255)');
-    }
+    await expect($('header')).toHaveStyle({
+      color: browser.isChromium ? 'rgba(0,0,255,1)' : 'rgb(0,0,255)'
+    });
   });
 });
