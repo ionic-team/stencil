@@ -116,8 +116,6 @@ export namespace Components {
     }
     interface ListenReattach {
     }
-    interface ListenWindow {
-    }
     interface NodeResolution {
     }
     interface ParentReflectNanAttribute {
@@ -677,12 +675,6 @@ declare global {
         prototype: HTMLListenReattachElement;
         new (): HTMLListenReattachElement;
     };
-    interface HTMLListenWindowElement extends Components.ListenWindow, HTMLStencilElement {
-    }
-    var HTMLListenWindowElement: {
-        prototype: HTMLListenWindowElement;
-        new (): HTMLListenWindowElement;
-    };
     interface HTMLNodeResolutionElement extends Components.NodeResolution, HTMLStencilElement {
     }
     var HTMLNodeResolutionElement: {
@@ -1206,7 +1198,6 @@ declare global {
         "listen-jsx": HTMLListenJsxElement;
         "listen-jsx-root": HTMLListenJsxRootElement;
         "listen-reattach": HTMLListenReattachElement;
-        "listen-window": HTMLListenWindowElement;
         "node-resolution": HTMLNodeResolutionElement;
         "parent-reflect-nan-attribute": HTMLParentReflectNanAttributeElement;
         "parent-with-reflect-child": HTMLParentWithReflectChildElement;
@@ -1400,8 +1391,6 @@ declare namespace LocalJSX {
     interface ListenJsxRoot {
     }
     interface ListenReattach {
-    }
-    interface ListenWindow {
     }
     interface NodeResolution {
     }
@@ -1644,7 +1633,6 @@ declare namespace LocalJSX {
         "listen-jsx": ListenJsx;
         "listen-jsx-root": ListenJsxRoot;
         "listen-reattach": ListenReattach;
-        "listen-window": ListenWindow;
         "node-resolution": NodeResolution;
         "parent-reflect-nan-attribute": ParentReflectNanAttribute;
         "parent-with-reflect-child": ParentWithReflectChild;
@@ -1778,7 +1766,6 @@ declare module "@stencil/core" {
             "listen-jsx": LocalJSX.ListenJsx & JSXBase.HTMLAttributes<HTMLListenJsxElement>;
             "listen-jsx-root": LocalJSX.ListenJsxRoot & JSXBase.HTMLAttributes<HTMLListenJsxRootElement>;
             "listen-reattach": LocalJSX.ListenReattach & JSXBase.HTMLAttributes<HTMLListenReattachElement>;
-            "listen-window": LocalJSX.ListenWindow & JSXBase.HTMLAttributes<HTMLListenWindowElement>;
             "node-resolution": LocalJSX.NodeResolution & JSXBase.HTMLAttributes<HTMLNodeResolutionElement>;
             "parent-reflect-nan-attribute": LocalJSX.ParentReflectNanAttribute & JSXBase.HTMLAttributes<HTMLParentReflectNanAttributeElement>;
             "parent-with-reflect-child": LocalJSX.ParentWithReflectChild & JSXBase.HTMLAttributes<HTMLParentWithReflectChildElement>;
