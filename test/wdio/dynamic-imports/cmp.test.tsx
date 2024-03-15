@@ -1,20 +1,18 @@
-import { setupDomTests, waitForChanges } from '../util';
+import { render } from '@wdio/browser-runner/stencil';
 
 describe('tag-names', () => {
-  const { setupDom, tearDownDom } = setupDomTests(document);
-  let app: HTMLElement;
-
-  beforeEach(async () => {
-    app = await setupDom('/dynamic-imports/index.html');
+  beforeEach(() => {
+    render({
+      template: () => <dynamic-import></dynamic-import>
+    });
   });
-  afterEach(tearDownDom);
 
   it('should load content from dynamic import', async () => {
-    const dynamicImport = app.querySelector('dynamic-import');
-    expect(dynamicImport.textContent.trim()).toBe('1 hello1 world1');
+    await expect($('dynamic-import')).toHaveText('1 hello1 world1');
 
-    (dynamicImport as any).update();
-    await waitForChanges();
-    expect(dynamicImport.textContent.trim()).toBe('2 hello2 world2');
+    const dynamicImport = document.querySelector('dynamic-import');
+    dynamicImport.update()
+
+    await expect($('dynamic-import')).toHaveText('2 hello2 world2');
   });
 });

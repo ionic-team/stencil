@@ -1,4 +1,4 @@
-var state = 0;
+let state = 0;
 
 export function concat(a: string, b: string) {
   state++;
