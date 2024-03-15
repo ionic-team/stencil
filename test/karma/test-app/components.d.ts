@@ -95,10 +95,6 @@ export namespace Components {
     interface LifecycleUpdateC {
         "value": number;
     }
-    interface ListenJsx {
-    }
-    interface ListenJsxRoot {
-    }
     interface ListenReattach {
     }
     interface NodeResolution {
@@ -599,18 +595,6 @@ declare global {
     var HTMLLifecycleUpdateCElement: {
         prototype: HTMLLifecycleUpdateCElement;
         new (): HTMLLifecycleUpdateCElement;
-    };
-    interface HTMLListenJsxElement extends Components.ListenJsx, HTMLStencilElement {
-    }
-    var HTMLListenJsxElement: {
-        prototype: HTMLListenJsxElement;
-        new (): HTMLListenJsxElement;
-    };
-    interface HTMLListenJsxRootElement extends Components.ListenJsxRoot, HTMLStencilElement {
-    }
-    var HTMLListenJsxRootElement: {
-        prototype: HTMLListenJsxRootElement;
-        new (): HTMLListenJsxRootElement;
     };
     interface HTMLListenReattachElement extends Components.ListenReattach, HTMLStencilElement {
     }
@@ -1131,8 +1115,6 @@ declare global {
         "lifecycle-update-a": HTMLLifecycleUpdateAElement;
         "lifecycle-update-b": HTMLLifecycleUpdateBElement;
         "lifecycle-update-c": HTMLLifecycleUpdateCElement;
-        "listen-jsx": HTMLListenJsxElement;
-        "listen-jsx-root": HTMLListenJsxRootElement;
         "listen-reattach": HTMLListenReattachElement;
         "node-resolution": HTMLNodeResolutionElement;
         "parent-reflect-nan-attribute": HTMLParentReflectNanAttributeElement;
@@ -1307,10 +1289,6 @@ declare namespace LocalJSX {
     }
     interface LifecycleUpdateC {
         "value"?: number;
-    }
-    interface ListenJsx {
-    }
-    interface ListenJsxRoot {
     }
     interface ListenReattach {
     }
@@ -1545,8 +1523,6 @@ declare namespace LocalJSX {
         "lifecycle-update-a": LifecycleUpdateA;
         "lifecycle-update-b": LifecycleUpdateB;
         "lifecycle-update-c": LifecycleUpdateC;
-        "listen-jsx": ListenJsx;
-        "listen-jsx-root": ListenJsxRoot;
         "listen-reattach": ListenReattach;
         "node-resolution": NodeResolution;
         "parent-reflect-nan-attribute": ParentReflectNanAttribute;
@@ -1671,8 +1647,6 @@ declare module "@stencil/core" {
             "lifecycle-update-a": LocalJSX.LifecycleUpdateA & JSXBase.HTMLAttributes<HTMLLifecycleUpdateAElement>;
             "lifecycle-update-b": LocalJSX.LifecycleUpdateB & JSXBase.HTMLAttributes<HTMLLifecycleUpdateBElement>;
             "lifecycle-update-c": LocalJSX.LifecycleUpdateC & JSXBase.HTMLAttributes<HTMLLifecycleUpdateCElement>;
-            "listen-jsx": LocalJSX.ListenJsx & JSXBase.HTMLAttributes<HTMLListenJsxElement>;
-            "listen-jsx-root": LocalJSX.ListenJsxRoot & JSXBase.HTMLAttributes<HTMLListenJsxRootElement>;
             "listen-reattach": LocalJSX.ListenReattach & JSXBase.HTMLAttributes<HTMLListenReattachElement>;
             "node-resolution": LocalJSX.NodeResolution & JSXBase.HTMLAttributes<HTMLNodeResolutionElement>;
             "parent-reflect-nan-attribute": LocalJSX.ParentReflectNanAttribute & JSXBase.HTMLAttributes<HTMLParentReflectNanAttributeElement>;
