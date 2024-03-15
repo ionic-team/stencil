@@ -1,8 +1,8 @@
-import { augmentDiagnosticWithNode, buildError, normalizePath, readOnlyArrayHasStringMember } from '@utils';
+import { normalizePath } from '@utils';
 import ts from 'typescript';
 
 import type * as d from '../../declarations';
-import { MEMBER_DECORATORS_TO_REMOVE, StencilStaticGetter } from './decorators-to-static/decorators-constants';
+import { StencilStaticGetter } from './decorators-to-static/decorators-constants';
 import { addToLibrary, findTypeWithName, getHomeModule, getOriginalTypeName } from './type-library';
 
 export const getScriptTarget = () => {
@@ -455,20 +455,6 @@ export const getAllTypeReferences = (checker: ts.TypeChecker, node: ts.Node): Re
   visit(node);
 
   return referencedTypes;
-};
-
-export const validateReferences = (
-  diagnostics: d.Diagnostic[],
-  references: d.ComponentCompilerTypeReferences,
-  node: ts.Node,
-) => {
-  Object.keys(references).forEach((refName) => {
-    const ref = references[refName];
-    if (ref.path === '@stencil/core' && readOnlyArrayHasStringMember(MEMBER_DECORATORS_TO_REMOVE, refName)) {
-      const err = buildError(diagnostics);
-      augmentDiagnosticWithNode(err, node);
-    }
-  });
 };
 
 /**
