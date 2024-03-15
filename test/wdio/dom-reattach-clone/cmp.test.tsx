@@ -1,8 +1,7 @@
 import { Fragment, h } from '@stencil/core';
 import { render } from '@wdio/browser-runner/stencil';
-import { browser } from '@wdio/globals';
 
-describe('conditional-rerender', function () {
+describe('dom-reattach-clone', function () {
   const clone = (id: string): void => {
     const element = document.querySelector('#' + id + '.hydrated');
     const parent = document.querySelector('#' + id + '-parent');
