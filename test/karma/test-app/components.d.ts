@@ -192,8 +192,6 @@ export namespace Components {
     }
     interface SlotChildrenRoot {
     }
-    interface SlotConditionalRendering {
-    }
     interface SlotDynamicNameChangeScoped {
         "slotName": string;
     }
@@ -248,12 +246,6 @@ export namespace Components {
     }
     interface SlotNestedDefaultOrderParent {
     }
-    interface SlotNestedDynamicChild {
-    }
-    interface SlotNestedDynamicParent {
-    }
-    interface SlotNestedDynamicWrapper {
-    }
     interface SlotNestedOrderChild {
     }
     interface SlotNestedOrderParent {
@@ -267,8 +259,6 @@ export namespace Components {
     }
     interface SlotParentTagChangeRoot {
         "element": string;
-    }
-    interface SlotRef {
     }
     interface SlotReorder {
         "reordered": boolean;
@@ -849,12 +839,6 @@ declare global {
         prototype: HTMLSlotChildrenRootElement;
         new (): HTMLSlotChildrenRootElement;
     };
-    interface HTMLSlotConditionalRenderingElement extends Components.SlotConditionalRendering, HTMLStencilElement {
-    }
-    var HTMLSlotConditionalRenderingElement: {
-        prototype: HTMLSlotConditionalRenderingElement;
-        new (): HTMLSlotConditionalRenderingElement;
-    };
     interface HTMLSlotDynamicNameChangeScopedElement extends Components.SlotDynamicNameChangeScoped, HTMLStencilElement {
     }
     var HTMLSlotDynamicNameChangeScopedElement: {
@@ -981,24 +965,6 @@ declare global {
         prototype: HTMLSlotNestedDefaultOrderParentElement;
         new (): HTMLSlotNestedDefaultOrderParentElement;
     };
-    interface HTMLSlotNestedDynamicChildElement extends Components.SlotNestedDynamicChild, HTMLStencilElement {
-    }
-    var HTMLSlotNestedDynamicChildElement: {
-        prototype: HTMLSlotNestedDynamicChildElement;
-        new (): HTMLSlotNestedDynamicChildElement;
-    };
-    interface HTMLSlotNestedDynamicParentElement extends Components.SlotNestedDynamicParent, HTMLStencilElement {
-    }
-    var HTMLSlotNestedDynamicParentElement: {
-        prototype: HTMLSlotNestedDynamicParentElement;
-        new (): HTMLSlotNestedDynamicParentElement;
-    };
-    interface HTMLSlotNestedDynamicWrapperElement extends Components.SlotNestedDynamicWrapper, HTMLStencilElement {
-    }
-    var HTMLSlotNestedDynamicWrapperElement: {
-        prototype: HTMLSlotNestedDynamicWrapperElement;
-        new (): HTMLSlotNestedDynamicWrapperElement;
-    };
     interface HTMLSlotNestedOrderChildElement extends Components.SlotNestedOrderChild, HTMLStencilElement {
     }
     var HTMLSlotNestedOrderChildElement: {
@@ -1034,12 +1000,6 @@ declare global {
     var HTMLSlotParentTagChangeRootElement: {
         prototype: HTMLSlotParentTagChangeRootElement;
         new (): HTMLSlotParentTagChangeRootElement;
-    };
-    interface HTMLSlotRefElement extends Components.SlotRef, HTMLStencilElement {
-    }
-    var HTMLSlotRefElement: {
-        prototype: HTMLSlotRefElement;
-        new (): HTMLSlotRefElement;
     };
     interface HTMLSlotReorderElement extends Components.SlotReorder, HTMLStencilElement {
     }
@@ -1227,7 +1187,6 @@ declare global {
         "slot-basic-order-root": HTMLSlotBasicOrderRootElement;
         "slot-basic-root": HTMLSlotBasicRootElement;
         "slot-children-root": HTMLSlotChildrenRootElement;
-        "slot-conditional-rendering": HTMLSlotConditionalRenderingElement;
         "slot-dynamic-name-change-scoped": HTMLSlotDynamicNameChangeScopedElement;
         "slot-dynamic-name-change-shadow": HTMLSlotDynamicNameChangeShadowElement;
         "slot-dynamic-scoped-list": HTMLSlotDynamicScopedListElement;
@@ -1249,16 +1208,12 @@ declare global {
         "slot-map-order-root": HTMLSlotMapOrderRootElement;
         "slot-nested-default-order-child": HTMLSlotNestedDefaultOrderChildElement;
         "slot-nested-default-order-parent": HTMLSlotNestedDefaultOrderParentElement;
-        "slot-nested-dynamic-child": HTMLSlotNestedDynamicChildElement;
-        "slot-nested-dynamic-parent": HTMLSlotNestedDynamicParentElement;
-        "slot-nested-dynamic-wrapper": HTMLSlotNestedDynamicWrapperElement;
         "slot-nested-order-child": HTMLSlotNestedOrderChildElement;
         "slot-nested-order-parent": HTMLSlotNestedOrderParentElement;
         "slot-ng-if": HTMLSlotNgIfElement;
         "slot-no-default": HTMLSlotNoDefaultElement;
         "slot-parent-tag-change": HTMLSlotParentTagChangeElement;
         "slot-parent-tag-change-root": HTMLSlotParentTagChangeRootElement;
-        "slot-ref": HTMLSlotRefElement;
         "slot-reorder": HTMLSlotReorderElement;
         "slot-reorder-root": HTMLSlotReorderRootElement;
         "slot-replace-wrapper": HTMLSlotReplaceWrapperElement;
@@ -1468,8 +1423,6 @@ declare namespace LocalJSX {
     }
     interface SlotChildrenRoot {
     }
-    interface SlotConditionalRendering {
-    }
     interface SlotDynamicNameChangeScoped {
         "slotName"?: string;
     }
@@ -1524,12 +1477,6 @@ declare namespace LocalJSX {
     }
     interface SlotNestedDefaultOrderParent {
     }
-    interface SlotNestedDynamicChild {
-    }
-    interface SlotNestedDynamicParent {
-    }
-    interface SlotNestedDynamicWrapper {
-    }
     interface SlotNestedOrderChild {
     }
     interface SlotNestedOrderParent {
@@ -1543,8 +1490,6 @@ declare namespace LocalJSX {
     }
     interface SlotParentTagChangeRoot {
         "element"?: string;
-    }
-    interface SlotRef {
     }
     interface SlotReorder {
         "reordered"?: boolean;
@@ -1662,7 +1607,6 @@ declare namespace LocalJSX {
         "slot-basic-order-root": SlotBasicOrderRoot;
         "slot-basic-root": SlotBasicRoot;
         "slot-children-root": SlotChildrenRoot;
-        "slot-conditional-rendering": SlotConditionalRendering;
         "slot-dynamic-name-change-scoped": SlotDynamicNameChangeScoped;
         "slot-dynamic-name-change-shadow": SlotDynamicNameChangeShadow;
         "slot-dynamic-scoped-list": SlotDynamicScopedList;
@@ -1684,16 +1628,12 @@ declare namespace LocalJSX {
         "slot-map-order-root": SlotMapOrderRoot;
         "slot-nested-default-order-child": SlotNestedDefaultOrderChild;
         "slot-nested-default-order-parent": SlotNestedDefaultOrderParent;
-        "slot-nested-dynamic-child": SlotNestedDynamicChild;
-        "slot-nested-dynamic-parent": SlotNestedDynamicParent;
-        "slot-nested-dynamic-wrapper": SlotNestedDynamicWrapper;
         "slot-nested-order-child": SlotNestedOrderChild;
         "slot-nested-order-parent": SlotNestedOrderParent;
         "slot-ng-if": SlotNgIf;
         "slot-no-default": SlotNoDefault;
         "slot-parent-tag-change": SlotParentTagChange;
         "slot-parent-tag-change-root": SlotParentTagChangeRoot;
-        "slot-ref": SlotRef;
         "slot-reorder": SlotReorder;
         "slot-reorder-root": SlotReorderRoot;
         "slot-replace-wrapper": SlotReplaceWrapper;
@@ -1795,7 +1735,6 @@ declare module "@stencil/core" {
             "slot-basic-order-root": LocalJSX.SlotBasicOrderRoot & JSXBase.HTMLAttributes<HTMLSlotBasicOrderRootElement>;
             "slot-basic-root": LocalJSX.SlotBasicRoot & JSXBase.HTMLAttributes<HTMLSlotBasicRootElement>;
             "slot-children-root": LocalJSX.SlotChildrenRoot & JSXBase.HTMLAttributes<HTMLSlotChildrenRootElement>;
-            "slot-conditional-rendering": LocalJSX.SlotConditionalRendering & JSXBase.HTMLAttributes<HTMLSlotConditionalRenderingElement>;
             "slot-dynamic-name-change-scoped": LocalJSX.SlotDynamicNameChangeScoped & JSXBase.HTMLAttributes<HTMLSlotDynamicNameChangeScopedElement>;
             "slot-dynamic-name-change-shadow": LocalJSX.SlotDynamicNameChangeShadow & JSXBase.HTMLAttributes<HTMLSlotDynamicNameChangeShadowElement>;
             "slot-dynamic-scoped-list": LocalJSX.SlotDynamicScopedList & JSXBase.HTMLAttributes<HTMLSlotDynamicScopedListElement>;
@@ -1817,16 +1756,12 @@ declare module "@stencil/core" {
             "slot-map-order-root": LocalJSX.SlotMapOrderRoot & JSXBase.HTMLAttributes<HTMLSlotMapOrderRootElement>;
             "slot-nested-default-order-child": LocalJSX.SlotNestedDefaultOrderChild & JSXBase.HTMLAttributes<HTMLSlotNestedDefaultOrderChildElement>;
             "slot-nested-default-order-parent": LocalJSX.SlotNestedDefaultOrderParent & JSXBase.HTMLAttributes<HTMLSlotNestedDefaultOrderParentElement>;
-            "slot-nested-dynamic-child": LocalJSX.SlotNestedDynamicChild & JSXBase.HTMLAttributes<HTMLSlotNestedDynamicChildElement>;
-            "slot-nested-dynamic-parent": LocalJSX.SlotNestedDynamicParent & JSXBase.HTMLAttributes<HTMLSlotNestedDynamicParentElement>;
-            "slot-nested-dynamic-wrapper": LocalJSX.SlotNestedDynamicWrapper & JSXBase.HTMLAttributes<HTMLSlotNestedDynamicWrapperElement>;
             "slot-nested-order-child": LocalJSX.SlotNestedOrderChild & JSXBase.HTMLAttributes<HTMLSlotNestedOrderChildElement>;
             "slot-nested-order-parent": LocalJSX.SlotNestedOrderParent & JSXBase.HTMLAttributes<HTMLSlotNestedOrderParentElement>;
             "slot-ng-if": LocalJSX.SlotNgIf & JSXBase.HTMLAttributes<HTMLSlotNgIfElement>;
             "slot-no-default": LocalJSX.SlotNoDefault & JSXBase.HTMLAttributes<HTMLSlotNoDefaultElement>;
             "slot-parent-tag-change": LocalJSX.SlotParentTagChange & JSXBase.HTMLAttributes<HTMLSlotParentTagChangeElement>;
             "slot-parent-tag-change-root": LocalJSX.SlotParentTagChangeRoot & JSXBase.HTMLAttributes<HTMLSlotParentTagChangeRootElement>;
-            "slot-ref": LocalJSX.SlotRef & JSXBase.HTMLAttributes<HTMLSlotRefElement>;
             "slot-reorder": LocalJSX.SlotReorder & JSXBase.HTMLAttributes<HTMLSlotReorderElement>;
             "slot-reorder-root": LocalJSX.SlotReorderRoot & JSXBase.HTMLAttributes<HTMLSlotReorderRootElement>;
             "slot-replace-wrapper": LocalJSX.SlotReplaceWrapper & JSXBase.HTMLAttributes<HTMLSlotReplaceWrapperElement>;
