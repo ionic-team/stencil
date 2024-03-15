@@ -1,15 +1,14 @@
-import { setupDomTests } from '../util';
+import { h } from '@stencil/core';
+import { render } from '@wdio/browser-runner/stencil';
 
 describe('event-basic', function () {
-  const { setupDom, tearDownDom } = setupDomTests(document);
-  let app: HTMLElement;
-
-  beforeEach(async () => {
-    app = await setupDom('/event-basic/index.html');
+  beforeEach(() => {
+    render({
+      template: () => <event-basic></event-basic>,
+    });
   });
-  afterEach(tearDownDom);
 
-  it('should dispatch an event on load', () => {
-    expect(app.querySelector('#counter').textContent).toBe('1');
+  it('should dispatch an event on load', async () => {
+    await expect($('#counter')).toHaveText('1');
   });
 });

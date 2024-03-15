@@ -57,8 +57,6 @@ export namespace Components {
         "propVal": number;
         "someMethod": () => Promise<void>;
     }
-    interface EventBasic {
-    }
     interface EventCustomType {
     }
     interface EventListenerCapture {
@@ -338,10 +336,6 @@ export interface EsmImportCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLEsmImportElement;
 }
-export interface EventBasicCustomEvent<T> extends CustomEvent<T> {
-    detail: T;
-    target: HTMLEventBasicElement;
-}
 export interface EventCustomTypeCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLEventCustomTypeElement;
@@ -509,23 +503,6 @@ declare global {
     var HTMLEsmImportElement: {
         prototype: HTMLEsmImportElement;
         new (): HTMLEsmImportElement;
-    };
-    interface HTMLEventBasicElementEventMap {
-        "testEvent": any;
-    }
-    interface HTMLEventBasicElement extends Components.EventBasic, HTMLStencilElement {
-        addEventListener<K extends keyof HTMLEventBasicElementEventMap>(type: K, listener: (this: HTMLEventBasicElement, ev: EventBasicCustomEvent<HTMLEventBasicElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
-        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
-        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
-        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-        removeEventListener<K extends keyof HTMLEventBasicElementEventMap>(type: K, listener: (this: HTMLEventBasicElement, ev: EventBasicCustomEvent<HTMLEventBasicElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
-        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
-        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
-        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
-    }
-    var HTMLEventBasicElement: {
-        prototype: HTMLEventBasicElement;
-        new (): HTMLEventBasicElement;
     };
     interface HTMLEventCustomTypeElementEventMap {
         "testEvent": TestEventDetail;
@@ -1310,7 +1287,6 @@ declare global {
         "dynamic-import": HTMLDynamicImportElement;
         "es5-addclass-svg": HTMLEs5AddclassSvgElement;
         "esm-import": HTMLEsmImportElement;
-        "event-basic": HTMLEventBasicElement;
         "event-custom-type": HTMLEventCustomTypeElement;
         "event-listener-capture": HTMLEventListenerCaptureElement;
         "external-import-a": HTMLExternalImportAElement;
@@ -1476,9 +1452,6 @@ declare namespace LocalJSX {
     interface EsmImport {
         "onSomeEvent"?: (event: EsmImportCustomEvent<any>) => void;
         "propVal"?: number;
-    }
-    interface EventBasic {
-        "onTestEvent"?: (event: EventBasicCustomEvent<any>) => void;
     }
     interface EventCustomType {
         "onTestEvent"?: (event: EventCustomTypeCustomEvent<TestEventDetail>) => void;
@@ -1786,7 +1759,6 @@ declare namespace LocalJSX {
         "dynamic-import": DynamicImport;
         "es5-addclass-svg": Es5AddclassSvg;
         "esm-import": EsmImport;
-        "event-basic": EventBasic;
         "event-custom-type": EventCustomType;
         "event-listener-capture": EventListenerCapture;
         "external-import-a": ExternalImportA;
@@ -1930,7 +1902,6 @@ declare module "@stencil/core" {
             "dynamic-import": LocalJSX.DynamicImport & JSXBase.HTMLAttributes<HTMLDynamicImportElement>;
             "es5-addclass-svg": LocalJSX.Es5AddclassSvg & JSXBase.HTMLAttributes<HTMLEs5AddclassSvgElement>;
             "esm-import": LocalJSX.EsmImport & JSXBase.HTMLAttributes<HTMLEsmImportElement>;
-            "event-basic": LocalJSX.EventBasic & JSXBase.HTMLAttributes<HTMLEventBasicElement>;
             "event-custom-type": LocalJSX.EventCustomType & JSXBase.HTMLAttributes<HTMLEventCustomTypeElement>;
             "event-listener-capture": LocalJSX.EventListenerCapture & JSXBase.HTMLAttributes<HTMLEventListenerCaptureElement>;
             "external-import-a": LocalJSX.ExternalImportA & JSXBase.HTMLAttributes<HTMLExternalImportAElement>;
