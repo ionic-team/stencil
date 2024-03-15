@@ -5,8 +5,6 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
-import { TestEventDetail } from "./event-custom-type/cmp";
-export { TestEventDetail } from "./event-custom-type/cmp";
 export namespace Components {
     interface BadSharedJsx {
     }
@@ -43,8 +41,6 @@ export namespace Components {
     interface EsmImport {
         "propVal": number;
         "someMethod": () => Promise<void>;
-    }
-    interface EventCustomType {
     }
     interface ExternalImportA {
     }
@@ -284,10 +280,6 @@ export interface EsmImportCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLEsmImportElement;
 }
-export interface EventCustomTypeCustomEvent<T> extends CustomEvent<T> {
-    detail: T;
-    target: HTMLEventCustomTypeElement;
-}
 export interface ImportAliasingCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLImportAliasingElement;
@@ -399,23 +391,6 @@ declare global {
     var HTMLEsmImportElement: {
         prototype: HTMLEsmImportElement;
         new (): HTMLEsmImportElement;
-    };
-    interface HTMLEventCustomTypeElementEventMap {
-        "testEvent": TestEventDetail;
-    }
-    interface HTMLEventCustomTypeElement extends Components.EventCustomType, HTMLStencilElement {
-        addEventListener<K extends keyof HTMLEventCustomTypeElementEventMap>(type: K, listener: (this: HTMLEventCustomTypeElement, ev: EventCustomTypeCustomEvent<HTMLEventCustomTypeElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
-        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
-        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
-        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-        removeEventListener<K extends keyof HTMLEventCustomTypeElementEventMap>(type: K, listener: (this: HTMLEventCustomTypeElement, ev: EventCustomTypeCustomEvent<HTMLEventCustomTypeElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
-        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
-        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
-        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
-    }
-    var HTMLEventCustomTypeElement: {
-        prototype: HTMLEventCustomTypeElement;
-        new (): HTMLEventCustomTypeElement;
     };
     interface HTMLExternalImportAElement extends Components.ExternalImportA, HTMLStencilElement {
     }
@@ -1027,7 +1002,6 @@ declare global {
         "custom-elements-no-delegates-focus": HTMLCustomElementsNoDelegatesFocusElement;
         "es5-addclass-svg": HTMLEs5AddclassSvgElement;
         "esm-import": HTMLEsmImportElement;
-        "event-custom-type": HTMLEventCustomTypeElement;
         "external-import-a": HTMLExternalImportAElement;
         "external-import-b": HTMLExternalImportBElement;
         "external-import-c": HTMLExternalImportCElement;
@@ -1163,9 +1137,6 @@ declare namespace LocalJSX {
     interface EsmImport {
         "onSomeEvent"?: (event: EsmImportCustomEvent<any>) => void;
         "propVal"?: number;
-    }
-    interface EventCustomType {
-        "onTestEvent"?: (event: EventCustomTypeCustomEvent<TestEventDetail>) => void;
     }
     interface ExternalImportA {
     }
@@ -1417,7 +1388,6 @@ declare namespace LocalJSX {
         "custom-elements-no-delegates-focus": CustomElementsNoDelegatesFocus;
         "es5-addclass-svg": Es5AddclassSvg;
         "esm-import": EsmImport;
-        "event-custom-type": EventCustomType;
         "external-import-a": ExternalImportA;
         "external-import-b": ExternalImportB;
         "external-import-c": ExternalImportC;
@@ -1537,7 +1507,6 @@ declare module "@stencil/core" {
             "custom-elements-no-delegates-focus": LocalJSX.CustomElementsNoDelegatesFocus & JSXBase.HTMLAttributes<HTMLCustomElementsNoDelegatesFocusElement>;
             "es5-addclass-svg": LocalJSX.Es5AddclassSvg & JSXBase.HTMLAttributes<HTMLEs5AddclassSvgElement>;
             "esm-import": LocalJSX.EsmImport & JSXBase.HTMLAttributes<HTMLEsmImportElement>;
-            "event-custom-type": LocalJSX.EventCustomType & JSXBase.HTMLAttributes<HTMLEventCustomTypeElement>;
             "external-import-a": LocalJSX.ExternalImportA & JSXBase.HTMLAttributes<HTMLExternalImportAElement>;
             "external-import-b": LocalJSX.ExternalImportB & JSXBase.HTMLAttributes<HTMLExternalImportBElement>;
             "external-import-c": LocalJSX.ExternalImportC & JSXBase.HTMLAttributes<HTMLExternalImportCElement>;
