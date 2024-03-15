@@ -1,4 +1,4 @@
-import { Component, Element, Event, EventEmitter, Listen, Method, Prop, State, h } from '@stencil/core';
+import { Component, Element, Event, EventEmitter, h, Listen, Method, Prop, State } from '@stencil/core';
 
 @Component({
   tag: 'esm-import',
