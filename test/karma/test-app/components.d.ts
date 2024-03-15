@@ -49,8 +49,6 @@ export namespace Components {
     }
     interface EventCustomType {
     }
-    interface EventListenerCapture {
-    }
     interface ExternalImportA {
     }
     interface ExternalImportB {
@@ -447,12 +445,6 @@ declare global {
     var HTMLEventCustomTypeElement: {
         prototype: HTMLEventCustomTypeElement;
         new (): HTMLEventCustomTypeElement;
-    };
-    interface HTMLEventListenerCaptureElement extends Components.EventListenerCapture, HTMLStencilElement {
-    }
-    var HTMLEventListenerCaptureElement: {
-        prototype: HTMLEventListenerCaptureElement;
-        new (): HTMLEventListenerCaptureElement;
     };
     interface HTMLExternalImportAElement extends Components.ExternalImportA, HTMLStencilElement {
     }
@@ -1120,7 +1112,6 @@ declare global {
         "es5-addclass-svg": HTMLEs5AddclassSvgElement;
         "esm-import": HTMLEsmImportElement;
         "event-custom-type": HTMLEventCustomTypeElement;
-        "event-listener-capture": HTMLEventListenerCaptureElement;
         "external-import-a": HTMLExternalImportAElement;
         "external-import-b": HTMLExternalImportBElement;
         "external-import-c": HTMLExternalImportCElement;
@@ -1266,8 +1257,6 @@ declare namespace LocalJSX {
     }
     interface EventCustomType {
         "onTestEvent"?: (event: EventCustomTypeCustomEvent<TestEventDetail>) => void;
-    }
-    interface EventListenerCapture {
     }
     interface ExternalImportA {
     }
@@ -1537,7 +1526,6 @@ declare namespace LocalJSX {
         "es5-addclass-svg": Es5AddclassSvg;
         "esm-import": EsmImport;
         "event-custom-type": EventCustomType;
-        "event-listener-capture": EventListenerCapture;
         "external-import-a": ExternalImportA;
         "external-import-b": ExternalImportB;
         "external-import-c": ExternalImportC;
@@ -1664,7 +1652,6 @@ declare module "@stencil/core" {
             "es5-addclass-svg": LocalJSX.Es5AddclassSvg & JSXBase.HTMLAttributes<HTMLEs5AddclassSvgElement>;
             "esm-import": LocalJSX.EsmImport & JSXBase.HTMLAttributes<HTMLEsmImportElement>;
             "event-custom-type": LocalJSX.EventCustomType & JSXBase.HTMLAttributes<HTMLEventCustomTypeElement>;
-            "event-listener-capture": LocalJSX.EventListenerCapture & JSXBase.HTMLAttributes<HTMLEventListenerCaptureElement>;
             "external-import-a": LocalJSX.ExternalImportA & JSXBase.HTMLAttributes<HTMLExternalImportAElement>;
             "external-import-b": LocalJSX.ExternalImportB & JSXBase.HTMLAttributes<HTMLExternalImportBElement>;
             "external-import-c": LocalJSX.ExternalImportC & JSXBase.HTMLAttributes<HTMLExternalImportCElement>;

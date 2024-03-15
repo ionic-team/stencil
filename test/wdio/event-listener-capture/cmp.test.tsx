@@ -1,31 +1,26 @@
-import { setupDomTests, waitForChanges } from '../util';
+import { h } from '@stencil/core';
+import { render } from '@wdio/browser-runner/stencil';
 
 describe('event-listener-capture', function () {
-  const { setupDom, tearDownDom } = setupDomTests(document);
+  const eventListenerCaptureCmp = () => $('event-listener-capture');
 
-  let app: HTMLElement | undefined;
-  let host: HTMLElement | undefined;
-
-  beforeEach(async () => {
-    app = await setupDom('/event-listener-capture/index.html');
-    host = app.querySelector('event-listener-capture');
+  beforeEach(() => {
+    render({
+      template: () => <event-listener-capture></event-listener-capture>,
+    });
   });
 
-  afterEach(tearDownDom);
-
-  it('should render', () => {
-    expect(host).toBeDefined();
+  it('should render', async () => {
+    await expect(eventListenerCaptureCmp()).toBePresent();
   });
 
   it('should increment counter on click', async () => {
-    const counter = host.querySelector('#counter');
-    expect(counter.textContent).toBe('0');
+    const counter = $('#counter');
+    await expect(counter).toHaveText('0');
 
-    const p = host.querySelector('#incrementer') as HTMLParagraphElement;
-    expect(p).toBeDefined();
-    p.click();
-    await waitForChanges();
-
-    expect(counter.textContent).toBe('1');
+    const p = eventListenerCaptureCmp().$('#incrementer');
+    await expect(p).toBePresent();
+    await p.click();
+    await expect(counter).toHaveText('1');
   });
 });
