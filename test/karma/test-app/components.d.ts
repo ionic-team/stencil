@@ -67,14 +67,6 @@ export namespace Components {
     }
     interface LifecycleUnloadRoot {
     }
-    interface LifecycleUpdateA {
-    }
-    interface LifecycleUpdateB {
-        "value": number;
-    }
-    interface LifecycleUpdateC {
-        "value": number;
-    }
     interface NodeResolution {
     }
     interface ParentReflectNanAttribute {
@@ -457,24 +449,6 @@ declare global {
     var HTMLLifecycleUnloadRootElement: {
         prototype: HTMLLifecycleUnloadRootElement;
         new (): HTMLLifecycleUnloadRootElement;
-    };
-    interface HTMLLifecycleUpdateAElement extends Components.LifecycleUpdateA, HTMLStencilElement {
-    }
-    var HTMLLifecycleUpdateAElement: {
-        prototype: HTMLLifecycleUpdateAElement;
-        new (): HTMLLifecycleUpdateAElement;
-    };
-    interface HTMLLifecycleUpdateBElement extends Components.LifecycleUpdateB, HTMLStencilElement {
-    }
-    var HTMLLifecycleUpdateBElement: {
-        prototype: HTMLLifecycleUpdateBElement;
-        new (): HTMLLifecycleUpdateBElement;
-    };
-    interface HTMLLifecycleUpdateCElement extends Components.LifecycleUpdateC, HTMLStencilElement {
-    }
-    var HTMLLifecycleUpdateCElement: {
-        prototype: HTMLLifecycleUpdateCElement;
-        new (): HTMLLifecycleUpdateCElement;
     };
     interface HTMLNodeResolutionElement extends Components.NodeResolution, HTMLStencilElement {
     }
@@ -972,9 +946,6 @@ declare global {
         "lifecycle-unload-a": HTMLLifecycleUnloadAElement;
         "lifecycle-unload-b": HTMLLifecycleUnloadBElement;
         "lifecycle-unload-root": HTMLLifecycleUnloadRootElement;
-        "lifecycle-update-a": HTMLLifecycleUpdateAElement;
-        "lifecycle-update-b": HTMLLifecycleUpdateBElement;
-        "lifecycle-update-c": HTMLLifecycleUpdateCElement;
         "node-resolution": HTMLNodeResolutionElement;
         "parent-reflect-nan-attribute": HTMLParentReflectNanAttributeElement;
         "parent-with-reflect-child": HTMLParentWithReflectChildElement;
@@ -1116,14 +1087,6 @@ declare namespace LocalJSX {
     interface LifecycleUnloadB {
     }
     interface LifecycleUnloadRoot {
-    }
-    interface LifecycleUpdateA {
-    }
-    interface LifecycleUpdateB {
-        "value"?: number;
-    }
-    interface LifecycleUpdateC {
-        "value"?: number;
     }
     interface NodeResolution {
     }
@@ -1342,9 +1305,6 @@ declare namespace LocalJSX {
         "lifecycle-unload-a": LifecycleUnloadA;
         "lifecycle-unload-b": LifecycleUnloadB;
         "lifecycle-unload-root": LifecycleUnloadRoot;
-        "lifecycle-update-a": LifecycleUpdateA;
-        "lifecycle-update-b": LifecycleUpdateB;
-        "lifecycle-update-c": LifecycleUpdateC;
         "node-resolution": NodeResolution;
         "parent-reflect-nan-attribute": ParentReflectNanAttribute;
         "parent-with-reflect-child": ParentWithReflectChild;
@@ -1456,9 +1416,6 @@ declare module "@stencil/core" {
             "lifecycle-unload-a": LocalJSX.LifecycleUnloadA & JSXBase.HTMLAttributes<HTMLLifecycleUnloadAElement>;
             "lifecycle-unload-b": LocalJSX.LifecycleUnloadB & JSXBase.HTMLAttributes<HTMLLifecycleUnloadBElement>;
             "lifecycle-unload-root": LocalJSX.LifecycleUnloadRoot & JSXBase.HTMLAttributes<HTMLLifecycleUnloadRootElement>;
-            "lifecycle-update-a": LocalJSX.LifecycleUpdateA & JSXBase.HTMLAttributes<HTMLLifecycleUpdateAElement>;
-            "lifecycle-update-b": LocalJSX.LifecycleUpdateB & JSXBase.HTMLAttributes<HTMLLifecycleUpdateBElement>;
-            "lifecycle-update-c": LocalJSX.LifecycleUpdateC & JSXBase.HTMLAttributes<HTMLLifecycleUpdateCElement>;
             "node-resolution": LocalJSX.NodeResolution & JSXBase.HTMLAttributes<HTMLNodeResolutionElement>;
             "parent-reflect-nan-attribute": LocalJSX.ParentReflectNanAttribute & JSXBase.HTMLAttributes<HTMLParentReflectNanAttributeElement>;
             "parent-with-reflect-child": LocalJSX.ParentWithReflectChild & JSXBase.HTMLAttributes<HTMLParentWithReflectChildElement>;
