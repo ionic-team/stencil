@@ -1,19 +1,45 @@
-import { setupDomTests, waitForChanges } from '../util';
+import { Fragment, h } from '@stencil/core';
+import { render } from '@wdio/browser-runner/stencil';
 
 describe('scoped-slot-append-and-prepend', () => {
-  const { setupDom, tearDownDom } = setupDomTests(document);
-
-  let app: HTMLElement | undefined;
-  let host: HTMLElement | undefined;
-  let parentDiv: HTMLDivElement | undefined;
+  let host: HTMLScopedSlotAppendAndPrependElement;
+  let parentDiv: HTMLDivElement;
 
   beforeEach(async () => {
-    app = await setupDom('/scoped-slot-append-and-prepend/index.html');
-    host = app.querySelector('scoped-slot-append-and-prepend');
+    render({
+      template: () => <>
+        <scoped-slot-append-and-prepend>
+          <p>My initial slotted content.</p>
+        </scoped-slot-append-and-prepend>
+
+        <button type="button" id="appendNodes">append nodes via "append"</button>
+        <button type="button" id="appendChildNodes">append nodes via "appendChild"</button>
+        <button type="button" id="prependNodes">prepend nodes</button>
+      </>
+    });
+
+    const scopedSlotAppendAndPrepend = document.querySelector('scoped-slot-append-and-prepend');
+
+    // The element to be inserted
+    const el = document.createElement('p');
+    el.innerText = 'The new slotted content.';
+
+    await $('#appendNodes').waitForExist()
+    document.querySelector('#appendNodes').addEventListener('click', () => {
+      scopedSlotAppendAndPrepend.append(el);
+    });
+
+    document.querySelector('#appendChildNodes').addEventListener('click', () => {
+      scopedSlotAppendAndPrepend.appendChild(el);
+    });
+
+    document.querySelector('#prependNodes').addEventListener('click', () => {
+      scopedSlotAppendAndPrepend.prepend(el);
+    });
+
+    host = document.querySelector('scoped-slot-append-and-prepend');
     parentDiv = host.querySelector('#parentDiv');
   });
-
-  afterEach(tearDownDom);
 
   describe('append', () => {
     it('inserts a DOM element at the end of the slot', async () => {
@@ -23,11 +49,10 @@ describe('scoped-slot-append-and-prepend', () => {
       expect(parentDiv.children.length).toBe(1);
       expect(parentDiv.children[0].textContent).toBe('My initial slotted content.');
 
-      const addButton = app.querySelector<HTMLButtonElement>('#appendNodes');
-      addButton.click();
-      await waitForChanges();
+      const addButton = $('#appendNodes');
+      await addButton.click();
 
-      expect(parentDiv.children.length).toBe(2);
+      await browser.waitUntil(async () => parentDiv.children.length === 2);
       expect(parentDiv.children[1].textContent).toBe('The new slotted content.');
     });
   });
@@ -40,11 +65,10 @@ describe('scoped-slot-append-and-prepend', () => {
       expect(parentDiv.children.length).toBe(1);
       expect(parentDiv.children[0].textContent).toBe('My initial slotted content.');
 
-      const addButton = app.querySelector<HTMLButtonElement>('#appendChildNodes');
-      addButton.click();
-      await waitForChanges();
+      const addButton = $('#appendChildNodes');
+      await addButton.click();
 
-      expect(parentDiv.children.length).toBe(2);
+      await browser.waitUntil(async () => parentDiv.children.length === 2);
       expect(parentDiv.children[1].textContent).toBe('The new slotted content.');
     });
   });
@@ -57,11 +81,10 @@ describe('scoped-slot-append-and-prepend', () => {
       expect(parentDiv.children.length).toBe(1);
       expect(parentDiv.children[0].textContent).toBe('My initial slotted content.');
 
-      const addButton = app.querySelector<HTMLButtonElement>('#prependNodes');
-      addButton.click();
-      await waitForChanges();
+      const addButton = $('#prependNodes');
+      await addButton.click();
 
-      expect(parentDiv.children.length).toBe(2);
+      await browser.waitUntil(async () => parentDiv.children.length === 2);
       expect(parentDiv.children[0].textContent).toBe('The new slotted content.');
     });
   });
