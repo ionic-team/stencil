@@ -26,12 +26,6 @@ export namespace Components {
     }
     interface InitCssRoot {
     }
-    interface LifecycleUnloadA {
-    }
-    interface LifecycleUnloadB {
-    }
-    interface LifecycleUnloadRoot {
-    }
     interface ReparentStyleNoVars {
     }
     interface ReparentStyleWithVars {
@@ -234,24 +228,6 @@ declare global {
     var HTMLInitCssRootElement: {
         prototype: HTMLInitCssRootElement;
         new (): HTMLInitCssRootElement;
-    };
-    interface HTMLLifecycleUnloadAElement extends Components.LifecycleUnloadA, HTMLStencilElement {
-    }
-    var HTMLLifecycleUnloadAElement: {
-        prototype: HTMLLifecycleUnloadAElement;
-        new (): HTMLLifecycleUnloadAElement;
-    };
-    interface HTMLLifecycleUnloadBElement extends Components.LifecycleUnloadB, HTMLStencilElement {
-    }
-    var HTMLLifecycleUnloadBElement: {
-        prototype: HTMLLifecycleUnloadBElement;
-        new (): HTMLLifecycleUnloadBElement;
-    };
-    interface HTMLLifecycleUnloadRootElement extends Components.LifecycleUnloadRoot, HTMLStencilElement {
-    }
-    var HTMLLifecycleUnloadRootElement: {
-        prototype: HTMLLifecycleUnloadRootElement;
-        new (): HTMLLifecycleUnloadRootElement;
     };
     interface HTMLReparentStyleNoVarsElement extends Components.ReparentStyleNoVars, HTMLStencilElement {
     }
@@ -624,9 +600,6 @@ declare global {
         "custom-elements-no-delegates-focus": HTMLCustomElementsNoDelegatesFocusElement;
         "factory-jsx": HTMLFactoryJsxElement;
         "init-css-root": HTMLInitCssRootElement;
-        "lifecycle-unload-a": HTMLLifecycleUnloadAElement;
-        "lifecycle-unload-b": HTMLLifecycleUnloadBElement;
-        "lifecycle-unload-root": HTMLLifecycleUnloadRootElement;
         "reparent-style-no-vars": HTMLReparentStyleNoVarsElement;
         "reparent-style-with-vars": HTMLReparentStyleWithVarsElement;
         "shadow-dom-mode": HTMLShadowDomModeElement;
@@ -709,12 +682,6 @@ declare namespace LocalJSX {
     interface FactoryJsx {
     }
     interface InitCssRoot {
-    }
-    interface LifecycleUnloadA {
-    }
-    interface LifecycleUnloadB {
-    }
-    interface LifecycleUnloadRoot {
     }
     interface ReparentStyleNoVars {
     }
@@ -868,9 +835,6 @@ declare namespace LocalJSX {
         "custom-elements-no-delegates-focus": CustomElementsNoDelegatesFocus;
         "factory-jsx": FactoryJsx;
         "init-css-root": InitCssRoot;
-        "lifecycle-unload-a": LifecycleUnloadA;
-        "lifecycle-unload-b": LifecycleUnloadB;
-        "lifecycle-unload-root": LifecycleUnloadRoot;
         "reparent-style-no-vars": ReparentStyleNoVars;
         "reparent-style-with-vars": ReparentStyleWithVars;
         "shadow-dom-mode": ShadowDomMode;
@@ -947,9 +911,6 @@ declare module "@stencil/core" {
             "custom-elements-no-delegates-focus": LocalJSX.CustomElementsNoDelegatesFocus & JSXBase.HTMLAttributes<HTMLCustomElementsNoDelegatesFocusElement>;
             "factory-jsx": LocalJSX.FactoryJsx & JSXBase.HTMLAttributes<HTMLFactoryJsxElement>;
             "init-css-root": LocalJSX.InitCssRoot & JSXBase.HTMLAttributes<HTMLInitCssRootElement>;
-            "lifecycle-unload-a": LocalJSX.LifecycleUnloadA & JSXBase.HTMLAttributes<HTMLLifecycleUnloadAElement>;
-            "lifecycle-unload-b": LocalJSX.LifecycleUnloadB & JSXBase.HTMLAttributes<HTMLLifecycleUnloadBElement>;
-            "lifecycle-unload-root": LocalJSX.LifecycleUnloadRoot & JSXBase.HTMLAttributes<HTMLLifecycleUnloadRootElement>;
             "reparent-style-no-vars": LocalJSX.ReparentStyleNoVars & JSXBase.HTMLAttributes<HTMLReparentStyleNoVarsElement>;
             "reparent-style-with-vars": LocalJSX.ReparentStyleWithVars & JSXBase.HTMLAttributes<HTMLReparentStyleWithVarsElement>;
             "shadow-dom-mode": LocalJSX.ShadowDomMode & JSXBase.HTMLAttributes<HTMLShadowDomModeElement>;
