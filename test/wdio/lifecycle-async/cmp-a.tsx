@@ -1,4 +1,4 @@
-import { Component, Listen, State, h } from '@stencil/core';
+import { Component, h, Listen, State } from '@stencil/core';
 
 @Component({
   tag: 'lifecycle-async-a',

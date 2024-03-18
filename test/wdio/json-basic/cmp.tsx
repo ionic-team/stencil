@@ -1,4 +1,5 @@
 import { Component, h } from '@stencil/core';
+
 import { foo } from './data.json';
 
 @Component({

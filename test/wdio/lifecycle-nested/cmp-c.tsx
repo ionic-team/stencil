@@ -1,4 +1,5 @@
-import { Host, Component, h } from '@stencil/core';
+import { Component, h, Host } from '@stencil/core';
+
 import output from './output';
 
 @Component({

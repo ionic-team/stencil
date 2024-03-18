@@ -1,4 +1,4 @@
-import { Component, State, h } from '@stencil/core';
+import { Component, h, State } from '@stencil/core';
 
 @Component({
   tag: 'key-reorder',
@@ -11,7 +11,7 @@ export class KeyReorder {
   }
 
   render() {
-    let items = [0, 1, 2, 3, 4];
+    const items = [0, 1, 2, 3, 4];
     if (this.isReversed) {
       items.reverse();
     }
