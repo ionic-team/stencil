@@ -7,15 +7,23 @@ describe('scoped-slot-append-and-prepend', () => {
 
   beforeEach(async () => {
     render({
-      template: () => <>
-        <scoped-slot-append-and-prepend>
-          <p>My initial slotted content.</p>
-        </scoped-slot-append-and-prepend>
+      template: () => (
+        <>
+          <scoped-slot-append-and-prepend>
+            <p>My initial slotted content.</p>
+          </scoped-slot-append-and-prepend>
 
-        <button type="button" id="appendNodes">append nodes via "append"</button>
-        <button type="button" id="appendChildNodes">append nodes via "appendChild"</button>
-        <button type="button" id="prependNodes">prepend nodes</button>
-      </>
+          <button type="button" id="appendNodes">
+            append nodes via "append"
+          </button>
+          <button type="button" id="appendChildNodes">
+            append nodes via "appendChild"
+          </button>
+          <button type="button" id="prependNodes">
+            prepend nodes
+          </button>
+        </>
+      ),
     });
 
     const scopedSlotAppendAndPrepend = document.querySelector('scoped-slot-append-and-prepend');
@@ -24,7 +32,7 @@ describe('scoped-slot-append-and-prepend', () => {
     const el = document.createElement('p');
     el.innerText = 'The new slotted content.';
 
-    await $('#appendNodes').waitForExist()
+    await $('#appendNodes').waitForExist();
     document.querySelector('#appendNodes').addEventListener('click', () => {
       scopedSlotAppendAndPrepend.append(el);
     });
