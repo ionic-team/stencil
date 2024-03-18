@@ -1,16 +1,18 @@
 import { Component, h } from '@stencil/core';
-import { data } from './external-data';
+
+import { store } from './external-store.js';
 
 @Component({
-  tag: 'external-import-c',
+  tag: 'external-import-b',
 })
 export class ExternalImportB {
   first?: string;
   last?: string;
 
   componentWillLoad() {
-    this.first = data().first;
-    this.last = data().last;
+    const data = store().data;
+    this.first = data.first;
+    this.last = data.last;
   }
 
   render() {

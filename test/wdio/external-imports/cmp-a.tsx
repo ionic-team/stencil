@@ -1,10 +1,11 @@
 import { Component, h } from '@stencil/core';
-import { store } from './external-store';
+
+import { store } from './external-store.js';
 
 @Component({
-  tag: 'external-import-b',
+  tag: 'external-import-a',
 })
-export class ExternalImportB {
+export class ExternalImportA {
   first?: string;
   last?: string;
 

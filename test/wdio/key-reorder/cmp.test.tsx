@@ -1,4 +1,4 @@
-import { h, Fragment } from '@stencil/core';
+import { h } from '@stencil/core';
 import { render } from '@wdio/browser-runner/stencil';
 
 describe('key-reorder', function () {
@@ -31,6 +31,7 @@ describe('key-reorder', function () {
 
     const button = root.$('button');
     await button.click();
+    await $('#item-4').waitForExist();
 
     item0 = document.body.querySelector('#item-0') as any;
     item1 = document.body.querySelector('#item-1') as any;
