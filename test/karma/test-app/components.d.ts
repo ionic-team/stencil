@@ -16,8 +16,6 @@ export namespace Components {
     }
     interface CmpLabel {
     }
-    interface CmpLabelWithSlotSibling {
-    }
     interface CustomElementChild {
     }
     interface CustomElementChildDifferentNameThanClass {
@@ -261,12 +259,6 @@ declare global {
     var HTMLCmpLabelElement: {
         prototype: HTMLCmpLabelElement;
         new (): HTMLCmpLabelElement;
-    };
-    interface HTMLCmpLabelWithSlotSiblingElement extends Components.CmpLabelWithSlotSibling, HTMLStencilElement {
-    }
-    var HTMLCmpLabelWithSlotSiblingElement: {
-        prototype: HTMLCmpLabelWithSlotSiblingElement;
-        new (): HTMLCmpLabelWithSlotSiblingElement;
     };
     interface HTMLCustomElementChildElement extends Components.CustomElementChild, HTMLStencilElement {
     }
@@ -824,7 +816,6 @@ declare global {
         "child-reflect-nan-attribute": HTMLChildReflectNanAttributeElement;
         "child-with-reflection": HTMLChildWithReflectionElement;
         "cmp-label": HTMLCmpLabelElement;
-        "cmp-label-with-slot-sibling": HTMLCmpLabelWithSlotSiblingElement;
         "custom-element-child": HTMLCustomElementChildElement;
         "custom-element-child-different-name-than-class": HTMLCustomElementChildDifferentNameThanClassElement;
         "custom-element-nested-child": HTMLCustomElementNestedChildElement;
@@ -927,8 +918,6 @@ declare namespace LocalJSX {
         "val"?: number | any;
     }
     interface CmpLabel {
-    }
-    interface CmpLabelWithSlotSibling {
     }
     interface CustomElementChild {
     }
@@ -1149,7 +1138,6 @@ declare namespace LocalJSX {
         "child-reflect-nan-attribute": ChildReflectNanAttribute;
         "child-with-reflection": ChildWithReflection;
         "cmp-label": CmpLabel;
-        "cmp-label-with-slot-sibling": CmpLabelWithSlotSibling;
         "custom-element-child": CustomElementChild;
         "custom-element-child-different-name-than-class": CustomElementChildDifferentNameThanClass;
         "custom-element-nested-child": CustomElementNestedChild;
@@ -1250,7 +1238,6 @@ declare module "@stencil/core" {
             "child-reflect-nan-attribute": LocalJSX.ChildReflectNanAttribute & JSXBase.HTMLAttributes<HTMLChildReflectNanAttributeElement>;
             "child-with-reflection": LocalJSX.ChildWithReflection & JSXBase.HTMLAttributes<HTMLChildWithReflectionElement>;
             "cmp-label": LocalJSX.CmpLabel & JSXBase.HTMLAttributes<HTMLCmpLabelElement>;
-            "cmp-label-with-slot-sibling": LocalJSX.CmpLabelWithSlotSibling & JSXBase.HTMLAttributes<HTMLCmpLabelWithSlotSiblingElement>;
             "custom-element-child": LocalJSX.CustomElementChild & JSXBase.HTMLAttributes<HTMLCustomElementChildElement>;
             "custom-element-child-different-name-than-class": LocalJSX.CustomElementChildDifferentNameThanClass & JSXBase.HTMLAttributes<HTMLCustomElementChildDifferentNameThanClassElement>;
             "custom-element-nested-child": LocalJSX.CustomElementNestedChild & JSXBase.HTMLAttributes<HTMLCustomElementNestedChildElement>;
