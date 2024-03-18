@@ -14,8 +14,6 @@ export namespace Components {
     interface ChildWithReflection {
         "val": number | any;
     }
-    interface CmpLabel {
-    }
     interface CustomElementChild {
     }
     interface CustomElementChildDifferentNameThanClass {
@@ -237,12 +235,6 @@ declare global {
     var HTMLChildWithReflectionElement: {
         prototype: HTMLChildWithReflectionElement;
         new (): HTMLChildWithReflectionElement;
-    };
-    interface HTMLCmpLabelElement extends Components.CmpLabel, HTMLStencilElement {
-    }
-    var HTMLCmpLabelElement: {
-        prototype: HTMLCmpLabelElement;
-        new (): HTMLCmpLabelElement;
     };
     interface HTMLCustomElementChildElement extends Components.CustomElementChild, HTMLStencilElement {
     }
@@ -757,7 +749,6 @@ declare global {
         "bad-shared-jsx": HTMLBadSharedJsxElement;
         "child-reflect-nan-attribute": HTMLChildReflectNanAttributeElement;
         "child-with-reflection": HTMLChildWithReflectionElement;
-        "cmp-label": HTMLCmpLabelElement;
         "custom-element-child": HTMLCustomElementChildElement;
         "custom-element-child-different-name-than-class": HTMLCustomElementChildDifferentNameThanClassElement;
         "custom-element-nested-child": HTMLCustomElementNestedChildElement;
@@ -851,8 +842,6 @@ declare namespace LocalJSX {
     }
     interface ChildWithReflection {
         "val"?: number | any;
-    }
-    interface CmpLabel {
     }
     interface CustomElementChild {
     }
@@ -1056,7 +1045,6 @@ declare namespace LocalJSX {
         "bad-shared-jsx": BadSharedJsx;
         "child-reflect-nan-attribute": ChildReflectNanAttribute;
         "child-with-reflection": ChildWithReflection;
-        "cmp-label": CmpLabel;
         "custom-element-child": CustomElementChild;
         "custom-element-child-different-name-than-class": CustomElementChildDifferentNameThanClass;
         "custom-element-nested-child": CustomElementNestedChild;
@@ -1149,7 +1137,6 @@ declare module "@stencil/core" {
             "bad-shared-jsx": LocalJSX.BadSharedJsx & JSXBase.HTMLAttributes<HTMLBadSharedJsxElement>;
             "child-reflect-nan-attribute": LocalJSX.ChildReflectNanAttribute & JSXBase.HTMLAttributes<HTMLChildReflectNanAttributeElement>;
             "child-with-reflection": LocalJSX.ChildWithReflection & JSXBase.HTMLAttributes<HTMLChildWithReflectionElement>;
-            "cmp-label": LocalJSX.CmpLabel & JSXBase.HTMLAttributes<HTMLCmpLabelElement>;
             "custom-element-child": LocalJSX.CustomElementChild & JSXBase.HTMLAttributes<HTMLCustomElementChildElement>;
             "custom-element-child-different-name-than-class": LocalJSX.CustomElementChildDifferentNameThanClass & JSXBase.HTMLAttributes<HTMLCustomElementChildDifferentNameThanClassElement>;
             "custom-element-nested-child": LocalJSX.CustomElementNestedChild & JSXBase.HTMLAttributes<HTMLCustomElementNestedChildElement>;
