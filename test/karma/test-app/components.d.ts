@@ -40,10 +40,6 @@ export namespace Components {
     }
     interface HostAttrOverride {
     }
-    interface ImportAliasing {
-        "myMethod": () => Promise<HTMLElement>;
-        "user": string;
-    }
     interface InitCssRoot {
     }
     interface IonChild {
@@ -248,10 +244,6 @@ export interface EsmImportCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLEsmImportElement;
 }
-export interface ImportAliasingCustomEvent<T> extends CustomEvent<T> {
-    detail: T;
-    target: HTMLImportAliasingElement;
-}
 declare global {
     interface HTMLBadSharedJsxElement extends Components.BadSharedJsx, HTMLStencilElement {
     }
@@ -353,23 +345,6 @@ declare global {
     var HTMLHostAttrOverrideElement: {
         prototype: HTMLHostAttrOverrideElement;
         new (): HTMLHostAttrOverrideElement;
-    };
-    interface HTMLImportAliasingElementEventMap {
-        "myEvent": void;
-    }
-    interface HTMLImportAliasingElement extends Components.ImportAliasing, HTMLStencilElement {
-        addEventListener<K extends keyof HTMLImportAliasingElementEventMap>(type: K, listener: (this: HTMLImportAliasingElement, ev: ImportAliasingCustomEvent<HTMLImportAliasingElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
-        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
-        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
-        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-        removeEventListener<K extends keyof HTMLImportAliasingElementEventMap>(type: K, listener: (this: HTMLImportAliasingElement, ev: ImportAliasingCustomEvent<HTMLImportAliasingElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
-        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
-        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
-        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
-    }
-    var HTMLImportAliasingElement: {
-        prototype: HTMLImportAliasingElement;
-        new (): HTMLImportAliasingElement;
     };
     interface HTMLInitCssRootElement extends Components.InitCssRoot, HTMLStencilElement {
     }
@@ -885,7 +860,6 @@ declare global {
         "esm-import": HTMLEsmImportElement;
         "factory-jsx": HTMLFactoryJsxElement;
         "host-attr-override": HTMLHostAttrOverrideElement;
-        "import-aliasing": HTMLImportAliasingElement;
         "init-css-root": HTMLInitCssRootElement;
         "ion-child": HTMLIonChildElement;
         "ion-host": HTMLIonHostElement;
@@ -1005,10 +979,6 @@ declare namespace LocalJSX {
     interface FactoryJsx {
     }
     interface HostAttrOverride {
-    }
-    interface ImportAliasing {
-        "onMyEvent"?: (event: ImportAliasingCustomEvent<void>) => void;
-        "user"?: string;
     }
     interface InitCssRoot {
     }
@@ -1225,7 +1195,6 @@ declare namespace LocalJSX {
         "esm-import": EsmImport;
         "factory-jsx": FactoryJsx;
         "host-attr-override": HostAttrOverride;
-        "import-aliasing": ImportAliasing;
         "init-css-root": InitCssRoot;
         "ion-child": IonChild;
         "ion-host": IonHost;
@@ -1330,7 +1299,6 @@ declare module "@stencil/core" {
             "esm-import": LocalJSX.EsmImport & JSXBase.HTMLAttributes<HTMLEsmImportElement>;
             "factory-jsx": LocalJSX.FactoryJsx & JSXBase.HTMLAttributes<HTMLFactoryJsxElement>;
             "host-attr-override": LocalJSX.HostAttrOverride & JSXBase.HTMLAttributes<HTMLHostAttrOverrideElement>;
-            "import-aliasing": LocalJSX.ImportAliasing & JSXBase.HTMLAttributes<HTMLImportAliasingElement>;
             "init-css-root": LocalJSX.InitCssRoot & JSXBase.HTMLAttributes<HTMLInitCssRootElement>;
             "ion-child": LocalJSX.IonChild & JSXBase.HTMLAttributes<HTMLIonChildElement>;
             "ion-host": LocalJSX.IonHost & JSXBase.HTMLAttributes<HTMLIonHostElement>;
