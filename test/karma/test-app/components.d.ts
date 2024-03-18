@@ -38,8 +38,6 @@ export namespace Components {
     }
     interface FactoryJsx {
     }
-    interface HostAttrOverride {
-    }
     interface InitCssRoot {
     }
     interface IonChild {
@@ -336,12 +334,6 @@ declare global {
     var HTMLFactoryJsxElement: {
         prototype: HTMLFactoryJsxElement;
         new (): HTMLFactoryJsxElement;
-    };
-    interface HTMLHostAttrOverrideElement extends Components.HostAttrOverride, HTMLStencilElement {
-    }
-    var HTMLHostAttrOverrideElement: {
-        prototype: HTMLHostAttrOverrideElement;
-        new (): HTMLHostAttrOverrideElement;
     };
     interface HTMLInitCssRootElement extends Components.InitCssRoot, HTMLStencilElement {
     }
@@ -850,7 +842,6 @@ declare global {
         "custom-elements-no-delegates-focus": HTMLCustomElementsNoDelegatesFocusElement;
         "esm-import": HTMLEsmImportElement;
         "factory-jsx": HTMLFactoryJsxElement;
-        "host-attr-override": HTMLHostAttrOverrideElement;
         "init-css-root": HTMLInitCssRootElement;
         "ion-child": HTMLIonChildElement;
         "ion-host": HTMLIonHostElement;
@@ -967,8 +958,6 @@ declare namespace LocalJSX {
         "propVal"?: number;
     }
     interface FactoryJsx {
-    }
-    interface HostAttrOverride {
     }
     interface InitCssRoot {
     }
@@ -1181,7 +1170,6 @@ declare namespace LocalJSX {
         "custom-elements-no-delegates-focus": CustomElementsNoDelegatesFocus;
         "esm-import": EsmImport;
         "factory-jsx": FactoryJsx;
-        "host-attr-override": HostAttrOverride;
         "init-css-root": InitCssRoot;
         "ion-child": IonChild;
         "ion-host": IonHost;
@@ -1284,7 +1272,6 @@ declare module "@stencil/core" {
             "custom-elements-no-delegates-focus": LocalJSX.CustomElementsNoDelegatesFocus & JSXBase.HTMLAttributes<HTMLCustomElementsNoDelegatesFocusElement>;
             "esm-import": LocalJSX.EsmImport & JSXBase.HTMLAttributes<HTMLEsmImportElement>;
             "factory-jsx": LocalJSX.FactoryJsx & JSXBase.HTMLAttributes<HTMLFactoryJsxElement>;
-            "host-attr-override": LocalJSX.HostAttrOverride & JSXBase.HTMLAttributes<HTMLHostAttrOverrideElement>;
             "init-css-root": LocalJSX.InitCssRoot & JSXBase.HTMLAttributes<HTMLInitCssRootElement>;
             "ion-child": LocalJSX.IonChild & JSXBase.HTMLAttributes<HTMLIonChildElement>;
             "ion-host": LocalJSX.IonHost & JSXBase.HTMLAttributes<HTMLIonHostElement>;
