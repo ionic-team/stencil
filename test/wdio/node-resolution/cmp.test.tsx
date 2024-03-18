@@ -1,16 +1,15 @@
-import { setupDomTests } from '../util';
+import { h } from '@stencil/core';
+import { render } from '@wdio/browser-runner/stencil';
 
 describe('node-resolution', () => {
-  const { setupDom, tearDownDom } = setupDomTests(document);
-  let app: HTMLElement;
-
   beforeEach(async () => {
-    app = await setupDom('/node-resolution/index.html');
+    render({
+      template: () => <node-resolution></node-resolution>,
+    });
   });
-  afterEach(tearDownDom);
 
   it('should import from the right sources', async () => {
-    expect(app.querySelector('#module-index').textContent).toEqual('module/index.js');
-    expect(app.querySelector('#module').textContent).toEqual('module.js');
+    await expect($('#module-index')).toHaveText('module/index.js');
+    await expect($('#module')).toHaveText('module.js');
   });
 });
