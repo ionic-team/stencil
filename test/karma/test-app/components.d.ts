@@ -71,8 +71,6 @@ export namespace Components {
     }
     interface ReparentStyleWithVars {
     }
-    interface ScopedSlotChildInsertAdjacent {
-    }
     interface ShadowDomMode {
         /**
           * The mode determines which platform styles to use.
@@ -386,12 +384,6 @@ declare global {
     var HTMLReparentStyleWithVarsElement: {
         prototype: HTMLReparentStyleWithVarsElement;
         new (): HTMLReparentStyleWithVarsElement;
-    };
-    interface HTMLScopedSlotChildInsertAdjacentElement extends Components.ScopedSlotChildInsertAdjacent, HTMLStencilElement {
-    }
-    var HTMLScopedSlotChildInsertAdjacentElement: {
-        prototype: HTMLScopedSlotChildInsertAdjacentElement;
-        new (): HTMLScopedSlotChildInsertAdjacentElement;
     };
     interface HTMLShadowDomModeElement extends Components.ShadowDomMode, HTMLStencilElement {
     }
@@ -780,7 +772,6 @@ declare global {
         "remove-child-patch": HTMLRemoveChildPatchElement;
         "reparent-style-no-vars": HTMLReparentStyleNoVarsElement;
         "reparent-style-with-vars": HTMLReparentStyleWithVarsElement;
-        "scoped-slot-child-insert-adjacent": HTMLScopedSlotChildInsertAdjacentElement;
         "shadow-dom-mode": HTMLShadowDomModeElement;
         "shadow-dom-mode-root": HTMLShadowDomModeRootElement;
         "shadow-dom-slot-nested": HTMLShadowDomSlotNestedElement;
@@ -908,8 +899,6 @@ declare namespace LocalJSX {
     interface ReparentStyleNoVars {
     }
     interface ReparentStyleWithVars {
-    }
-    interface ScopedSlotChildInsertAdjacent {
     }
     interface ShadowDomMode {
         /**
@@ -1079,7 +1068,6 @@ declare namespace LocalJSX {
         "remove-child-patch": RemoveChildPatch;
         "reparent-style-no-vars": ReparentStyleNoVars;
         "reparent-style-with-vars": ReparentStyleWithVars;
-        "scoped-slot-child-insert-adjacent": ScopedSlotChildInsertAdjacent;
         "shadow-dom-mode": ShadowDomMode;
         "shadow-dom-mode-root": ShadowDomModeRoot;
         "shadow-dom-slot-nested": ShadowDomSlotNested;
@@ -1172,7 +1160,6 @@ declare module "@stencil/core" {
             "remove-child-patch": LocalJSX.RemoveChildPatch & JSXBase.HTMLAttributes<HTMLRemoveChildPatchElement>;
             "reparent-style-no-vars": LocalJSX.ReparentStyleNoVars & JSXBase.HTMLAttributes<HTMLReparentStyleNoVarsElement>;
             "reparent-style-with-vars": LocalJSX.ReparentStyleWithVars & JSXBase.HTMLAttributes<HTMLReparentStyleWithVarsElement>;
-            "scoped-slot-child-insert-adjacent": LocalJSX.ScopedSlotChildInsertAdjacent & JSXBase.HTMLAttributes<HTMLScopedSlotChildInsertAdjacentElement>;
             "shadow-dom-mode": LocalJSX.ShadowDomMode & JSXBase.HTMLAttributes<HTMLShadowDomModeElement>;
             "shadow-dom-mode-root": LocalJSX.ShadowDomModeRoot & JSXBase.HTMLAttributes<HTMLShadowDomModeRootElement>;
             "shadow-dom-slot-nested": LocalJSX.ShadowDomSlotNested & JSXBase.HTMLAttributes<HTMLShadowDomSlotNestedElement>;
