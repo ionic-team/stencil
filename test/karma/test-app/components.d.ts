@@ -20,10 +20,6 @@ export namespace Components {
     }
     interface CmpLabelWithSlotSibling {
     }
-    interface CssVariablesNoEncapsulation {
-    }
-    interface CssVariablesShadowDom {
-    }
     interface CustomElementChild {
     }
     interface CustomElementChildDifferentNameThanClass {
@@ -82,8 +78,6 @@ export namespace Components {
     }
     interface LifecycleUpdateC {
         "value": number;
-    }
-    interface ListenReattach {
     }
     interface NodeResolution {
     }
@@ -321,18 +315,6 @@ declare global {
         prototype: HTMLCmpLabelWithSlotSiblingElement;
         new (): HTMLCmpLabelWithSlotSiblingElement;
     };
-    interface HTMLCssVariablesNoEncapsulationElement extends Components.CssVariablesNoEncapsulation, HTMLStencilElement {
-    }
-    var HTMLCssVariablesNoEncapsulationElement: {
-        prototype: HTMLCssVariablesNoEncapsulationElement;
-        new (): HTMLCssVariablesNoEncapsulationElement;
-    };
-    interface HTMLCssVariablesShadowDomElement extends Components.CssVariablesShadowDom, HTMLStencilElement {
-    }
-    var HTMLCssVariablesShadowDomElement: {
-        prototype: HTMLCssVariablesShadowDomElement;
-        new (): HTMLCssVariablesShadowDomElement;
-    };
     interface HTMLCustomElementChildElement extends Components.CustomElementChild, HTMLStencilElement {
     }
     var HTMLCustomElementChildElement: {
@@ -521,12 +503,6 @@ declare global {
     var HTMLLifecycleUpdateCElement: {
         prototype: HTMLLifecycleUpdateCElement;
         new (): HTMLLifecycleUpdateCElement;
-    };
-    interface HTMLListenReattachElement extends Components.ListenReattach, HTMLStencilElement {
-    }
-    var HTMLListenReattachElement: {
-        prototype: HTMLListenReattachElement;
-        new (): HTMLListenReattachElement;
     };
     interface HTMLNodeResolutionElement extends Components.NodeResolution, HTMLStencilElement {
     }
@@ -1008,8 +984,6 @@ declare global {
         "child-with-reflection": HTMLChildWithReflectionElement;
         "cmp-label": HTMLCmpLabelElement;
         "cmp-label-with-slot-sibling": HTMLCmpLabelWithSlotSiblingElement;
-        "css-variables-no-encapsulation": HTMLCssVariablesNoEncapsulationElement;
-        "css-variables-shadow-dom": HTMLCssVariablesShadowDomElement;
         "custom-element-child": HTMLCustomElementChildElement;
         "custom-element-child-different-name-than-class": HTMLCustomElementChildDifferentNameThanClassElement;
         "custom-element-nested-child": HTMLCustomElementNestedChildElement;
@@ -1036,7 +1010,6 @@ declare global {
         "lifecycle-update-a": HTMLLifecycleUpdateAElement;
         "lifecycle-update-b": HTMLLifecycleUpdateBElement;
         "lifecycle-update-c": HTMLLifecycleUpdateCElement;
-        "listen-reattach": HTMLListenReattachElement;
         "node-resolution": HTMLNodeResolutionElement;
         "parent-reflect-nan-attribute": HTMLParentReflectNanAttributeElement;
         "parent-with-reflect-child": HTMLParentWithReflectChildElement;
@@ -1131,10 +1104,6 @@ declare namespace LocalJSX {
     }
     interface CmpLabelWithSlotSibling {
     }
-    interface CssVariablesNoEncapsulation {
-    }
-    interface CssVariablesShadowDom {
-    }
     interface CustomElementChild {
     }
     interface CustomElementChildDifferentNameThanClass {
@@ -1194,8 +1163,6 @@ declare namespace LocalJSX {
     }
     interface LifecycleUpdateC {
         "value"?: number;
-    }
-    interface ListenReattach {
     }
     interface NodeResolution {
     }
@@ -1395,8 +1362,6 @@ declare namespace LocalJSX {
         "child-with-reflection": ChildWithReflection;
         "cmp-label": CmpLabel;
         "cmp-label-with-slot-sibling": CmpLabelWithSlotSibling;
-        "css-variables-no-encapsulation": CssVariablesNoEncapsulation;
-        "css-variables-shadow-dom": CssVariablesShadowDom;
         "custom-element-child": CustomElementChild;
         "custom-element-child-different-name-than-class": CustomElementChildDifferentNameThanClass;
         "custom-element-nested-child": CustomElementNestedChild;
@@ -1423,7 +1388,6 @@ declare namespace LocalJSX {
         "lifecycle-update-a": LifecycleUpdateA;
         "lifecycle-update-b": LifecycleUpdateB;
         "lifecycle-update-c": LifecycleUpdateC;
-        "listen-reattach": ListenReattach;
         "node-resolution": NodeResolution;
         "parent-reflect-nan-attribute": ParentReflectNanAttribute;
         "parent-with-reflect-child": ParentWithReflectChild;
@@ -1514,8 +1478,6 @@ declare module "@stencil/core" {
             "child-with-reflection": LocalJSX.ChildWithReflection & JSXBase.HTMLAttributes<HTMLChildWithReflectionElement>;
             "cmp-label": LocalJSX.CmpLabel & JSXBase.HTMLAttributes<HTMLCmpLabelElement>;
             "cmp-label-with-slot-sibling": LocalJSX.CmpLabelWithSlotSibling & JSXBase.HTMLAttributes<HTMLCmpLabelWithSlotSiblingElement>;
-            "css-variables-no-encapsulation": LocalJSX.CssVariablesNoEncapsulation & JSXBase.HTMLAttributes<HTMLCssVariablesNoEncapsulationElement>;
-            "css-variables-shadow-dom": LocalJSX.CssVariablesShadowDom & JSXBase.HTMLAttributes<HTMLCssVariablesShadowDomElement>;
             "custom-element-child": LocalJSX.CustomElementChild & JSXBase.HTMLAttributes<HTMLCustomElementChildElement>;
             "custom-element-child-different-name-than-class": LocalJSX.CustomElementChildDifferentNameThanClass & JSXBase.HTMLAttributes<HTMLCustomElementChildDifferentNameThanClassElement>;
             "custom-element-nested-child": LocalJSX.CustomElementNestedChild & JSXBase.HTMLAttributes<HTMLCustomElementNestedChildElement>;
@@ -1542,7 +1504,6 @@ declare module "@stencil/core" {
             "lifecycle-update-a": LocalJSX.LifecycleUpdateA & JSXBase.HTMLAttributes<HTMLLifecycleUpdateAElement>;
             "lifecycle-update-b": LocalJSX.LifecycleUpdateB & JSXBase.HTMLAttributes<HTMLLifecycleUpdateBElement>;
             "lifecycle-update-c": LocalJSX.LifecycleUpdateC & JSXBase.HTMLAttributes<HTMLLifecycleUpdateCElement>;
-            "listen-reattach": LocalJSX.ListenReattach & JSXBase.HTMLAttributes<HTMLListenReattachElement>;
             "node-resolution": LocalJSX.NodeResolution & JSXBase.HTMLAttributes<HTMLNodeResolutionElement>;
             "parent-reflect-nan-attribute": LocalJSX.ParentReflectNanAttribute & JSXBase.HTMLAttributes<HTMLParentReflectNanAttributeElement>;
             "parent-with-reflect-child": LocalJSX.ParentWithReflectChild & JSXBase.HTMLAttributes<HTMLParentWithReflectChildElement>;
