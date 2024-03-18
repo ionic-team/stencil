@@ -84,9 +84,6 @@ export namespace Components {
     }
     interface ReparentStyleWithVars {
     }
-    interface ScopedConditional {
-        "renderHello": boolean;
-    }
     interface ScopedSlotAppendAndPrepend {
     }
     interface ScopedSlotChildInsertAdjacent {
@@ -460,12 +457,6 @@ declare global {
     var HTMLReparentStyleWithVarsElement: {
         prototype: HTMLReparentStyleWithVarsElement;
         new (): HTMLReparentStyleWithVarsElement;
-    };
-    interface HTMLScopedConditionalElement extends Components.ScopedConditional, HTMLStencilElement {
-    }
-    var HTMLScopedConditionalElement: {
-        prototype: HTMLScopedConditionalElement;
-        new (): HTMLScopedConditionalElement;
     };
     interface HTMLScopedSlotAppendAndPrependElement extends Components.ScopedSlotAppendAndPrepend, HTMLStencilElement {
     }
@@ -901,7 +892,6 @@ declare global {
         "remove-child-patch": HTMLRemoveChildPatchElement;
         "reparent-style-no-vars": HTMLReparentStyleNoVarsElement;
         "reparent-style-with-vars": HTMLReparentStyleWithVarsElement;
-        "scoped-conditional": HTMLScopedConditionalElement;
         "scoped-slot-append-and-prepend": HTMLScopedSlotAppendAndPrependElement;
         "scoped-slot-child-insert-adjacent": HTMLScopedSlotChildInsertAdjacentElement;
         "shadow-dom-array": HTMLShadowDomArrayElement;
@@ -1049,9 +1039,6 @@ declare namespace LocalJSX {
     interface ReparentStyleNoVars {
     }
     interface ReparentStyleWithVars {
-    }
-    interface ScopedConditional {
-        "renderHello"?: boolean;
     }
     interface ScopedSlotAppendAndPrepend {
     }
@@ -1241,7 +1228,6 @@ declare namespace LocalJSX {
         "remove-child-patch": RemoveChildPatch;
         "reparent-style-no-vars": ReparentStyleNoVars;
         "reparent-style-with-vars": ReparentStyleWithVars;
-        "scoped-conditional": ScopedConditional;
         "scoped-slot-append-and-prepend": ScopedSlotAppendAndPrepend;
         "scoped-slot-child-insert-adjacent": ScopedSlotChildInsertAdjacent;
         "shadow-dom-array": ShadowDomArray;
@@ -1346,7 +1332,6 @@ declare module "@stencil/core" {
             "remove-child-patch": LocalJSX.RemoveChildPatch & JSXBase.HTMLAttributes<HTMLRemoveChildPatchElement>;
             "reparent-style-no-vars": LocalJSX.ReparentStyleNoVars & JSXBase.HTMLAttributes<HTMLReparentStyleNoVarsElement>;
             "reparent-style-with-vars": LocalJSX.ReparentStyleWithVars & JSXBase.HTMLAttributes<HTMLReparentStyleWithVarsElement>;
-            "scoped-conditional": LocalJSX.ScopedConditional & JSXBase.HTMLAttributes<HTMLScopedConditionalElement>;
             "scoped-slot-append-and-prepend": LocalJSX.ScopedSlotAppendAndPrepend & JSXBase.HTMLAttributes<HTMLScopedSlotAppendAndPrependElement>;
             "scoped-slot-child-insert-adjacent": LocalJSX.ScopedSlotChildInsertAdjacent & JSXBase.HTMLAttributes<HTMLScopedSlotChildInsertAdjacentElement>;
             "shadow-dom-array": LocalJSX.ShadowDomArray & JSXBase.HTMLAttributes<HTMLShadowDomArrayElement>;
