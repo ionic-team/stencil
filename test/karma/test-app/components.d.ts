@@ -87,10 +87,6 @@ export namespace Components {
     }
     interface ReparentStyleWithVars {
     }
-    interface ScopedBasic {
-    }
-    interface ScopedBasicRoot {
-    }
     interface ScopedConditional {
         "renderHello": boolean;
     }
@@ -473,18 +469,6 @@ declare global {
     var HTMLReparentStyleWithVarsElement: {
         prototype: HTMLReparentStyleWithVarsElement;
         new (): HTMLReparentStyleWithVarsElement;
-    };
-    interface HTMLScopedBasicElement extends Components.ScopedBasic, HTMLStencilElement {
-    }
-    var HTMLScopedBasicElement: {
-        prototype: HTMLScopedBasicElement;
-        new (): HTMLScopedBasicElement;
-    };
-    interface HTMLScopedBasicRootElement extends Components.ScopedBasicRoot, HTMLStencilElement {
-    }
-    var HTMLScopedBasicRootElement: {
-        prototype: HTMLScopedBasicRootElement;
-        new (): HTMLScopedBasicRootElement;
     };
     interface HTMLScopedConditionalElement extends Components.ScopedConditional, HTMLStencilElement {
     }
@@ -927,8 +911,6 @@ declare global {
         "remove-child-patch": HTMLRemoveChildPatchElement;
         "reparent-style-no-vars": HTMLReparentStyleNoVarsElement;
         "reparent-style-with-vars": HTMLReparentStyleWithVarsElement;
-        "scoped-basic": HTMLScopedBasicElement;
-        "scoped-basic-root": HTMLScopedBasicRootElement;
         "scoped-conditional": HTMLScopedConditionalElement;
         "scoped-slot-append-and-prepend": HTMLScopedSlotAppendAndPrependElement;
         "scoped-slot-child-insert-adjacent": HTMLScopedSlotChildInsertAdjacentElement;
@@ -1080,10 +1062,6 @@ declare namespace LocalJSX {
     interface ReparentStyleNoVars {
     }
     interface ReparentStyleWithVars {
-    }
-    interface ScopedBasic {
-    }
-    interface ScopedBasicRoot {
     }
     interface ScopedConditional {
         "renderHello"?: boolean;
@@ -1277,8 +1255,6 @@ declare namespace LocalJSX {
         "remove-child-patch": RemoveChildPatch;
         "reparent-style-no-vars": ReparentStyleNoVars;
         "reparent-style-with-vars": ReparentStyleWithVars;
-        "scoped-basic": ScopedBasic;
-        "scoped-basic-root": ScopedBasicRoot;
         "scoped-conditional": ScopedConditional;
         "scoped-slot-append-and-prepend": ScopedSlotAppendAndPrepend;
         "scoped-slot-child-insert-adjacent": ScopedSlotChildInsertAdjacent;
@@ -1385,8 +1361,6 @@ declare module "@stencil/core" {
             "remove-child-patch": LocalJSX.RemoveChildPatch & JSXBase.HTMLAttributes<HTMLRemoveChildPatchElement>;
             "reparent-style-no-vars": LocalJSX.ReparentStyleNoVars & JSXBase.HTMLAttributes<HTMLReparentStyleNoVarsElement>;
             "reparent-style-with-vars": LocalJSX.ReparentStyleWithVars & JSXBase.HTMLAttributes<HTMLReparentStyleWithVarsElement>;
-            "scoped-basic": LocalJSX.ScopedBasic & JSXBase.HTMLAttributes<HTMLScopedBasicElement>;
-            "scoped-basic-root": LocalJSX.ScopedBasicRoot & JSXBase.HTMLAttributes<HTMLScopedBasicRootElement>;
             "scoped-conditional": LocalJSX.ScopedConditional & JSXBase.HTMLAttributes<HTMLScopedConditionalElement>;
             "scoped-slot-append-and-prepend": LocalJSX.ScopedSlotAppendAndPrepend & JSXBase.HTMLAttributes<HTMLScopedSlotAppendAndPrependElement>;
             "scoped-slot-child-insert-adjacent": LocalJSX.ScopedSlotChildInsertAdjacent & JSXBase.HTMLAttributes<HTMLScopedSlotChildInsertAdjacentElement>;
