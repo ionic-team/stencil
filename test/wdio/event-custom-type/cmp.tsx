@@ -1,6 +1,6 @@
 import { Component, h, Event, EventEmitter, State, Listen } from '@stencil/core';
 
-import { EventCustomTypeCustomEvent } from '../components';
+import { EventCustomTypeCustomEvent } from '../src/components.js';
 
 export interface TestEventDetail {
   value: string;
