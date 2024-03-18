@@ -81,9 +81,6 @@ export namespace Components {
     }
     interface ParentWithReflectChild {
     }
-    interface ReflectNanAttribute {
-        "val": number;
-    }
     interface ReflectNanAttributeHyphen {
         "valNum": number;
     }
@@ -496,12 +493,6 @@ declare global {
     var HTMLParentWithReflectChildElement: {
         prototype: HTMLParentWithReflectChildElement;
         new (): HTMLParentWithReflectChildElement;
-    };
-    interface HTMLReflectNanAttributeElement extends Components.ReflectNanAttribute, HTMLStencilElement {
-    }
-    var HTMLReflectNanAttributeElement: {
-        prototype: HTMLReflectNanAttributeElement;
-        new (): HTMLReflectNanAttributeElement;
     };
     interface HTMLReflectNanAttributeHyphenElement extends Components.ReflectNanAttributeHyphen, HTMLStencilElement {
     }
@@ -987,7 +978,6 @@ declare global {
         "node-resolution": HTMLNodeResolutionElement;
         "parent-reflect-nan-attribute": HTMLParentReflectNanAttributeElement;
         "parent-with-reflect-child": HTMLParentWithReflectChildElement;
-        "reflect-nan-attribute": HTMLReflectNanAttributeElement;
         "reflect-nan-attribute-hyphen": HTMLReflectNanAttributeHyphenElement;
         "reflect-to-attr": HTMLReflectToAttrElement;
         "remove-child-patch": HTMLRemoveChildPatchElement;
@@ -1140,9 +1130,6 @@ declare namespace LocalJSX {
     interface ParentReflectNanAttribute {
     }
     interface ParentWithReflectChild {
-    }
-    interface ReflectNanAttribute {
-        "val"?: number;
     }
     interface ReflectNanAttributeHyphen {
         "valNum"?: number;
@@ -1361,7 +1348,6 @@ declare namespace LocalJSX {
         "node-resolution": NodeResolution;
         "parent-reflect-nan-attribute": ParentReflectNanAttribute;
         "parent-with-reflect-child": ParentWithReflectChild;
-        "reflect-nan-attribute": ReflectNanAttribute;
         "reflect-nan-attribute-hyphen": ReflectNanAttributeHyphen;
         "reflect-to-attr": ReflectToAttr;
         "remove-child-patch": RemoveChildPatch;
@@ -1476,7 +1462,6 @@ declare module "@stencil/core" {
             "node-resolution": LocalJSX.NodeResolution & JSXBase.HTMLAttributes<HTMLNodeResolutionElement>;
             "parent-reflect-nan-attribute": LocalJSX.ParentReflectNanAttribute & JSXBase.HTMLAttributes<HTMLParentReflectNanAttributeElement>;
             "parent-with-reflect-child": LocalJSX.ParentWithReflectChild & JSXBase.HTMLAttributes<HTMLParentWithReflectChildElement>;
-            "reflect-nan-attribute": LocalJSX.ReflectNanAttribute & JSXBase.HTMLAttributes<HTMLReflectNanAttributeElement>;
             "reflect-nan-attribute-hyphen": LocalJSX.ReflectNanAttributeHyphen & JSXBase.HTMLAttributes<HTMLReflectNanAttributeHyphenElement>;
             "reflect-to-attr": LocalJSX.ReflectToAttr & JSXBase.HTMLAttributes<HTMLReflectToAttrElement>;
             "remove-child-patch": LocalJSX.RemoveChildPatch & JSXBase.HTMLAttributes<HTMLRemoveChildPatchElement>;
