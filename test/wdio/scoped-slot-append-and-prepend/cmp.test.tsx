@@ -45,6 +45,7 @@ describe('scoped-slot-append-and-prepend', () => {
       scopedSlotAppendAndPrepend.prepend(el);
     });
 
+    await $('#parentDiv').waitForExist();
     host = document.querySelector('scoped-slot-append-and-prepend');
     parentDiv = host.querySelector('#parentDiv');
   });
