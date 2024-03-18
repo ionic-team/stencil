@@ -24,7 +24,7 @@ describe('scoped-slot-in-slot', () => {
     await browser.waitUntil(async () => {
       const parent = host.querySelector('ion-parent');
       return parent && parent.firstElementChild;
-    })
+    });
     const parent = host.querySelector('ion-parent');
     expect(parent.firstElementChild.tagName).toBe('LABEL');
 
@@ -43,7 +43,7 @@ describe('scoped-slot-in-slot', () => {
     expect(child).toBeDefined();
 
     // Ensure the suffix slot content made it through
-    await browser.waitUntil(async () => child.firstElementChild.firstElementChild)
+    await browser.waitUntil(async () => child.firstElementChild.firstElementChild);
     expect(child.firstElementChild.firstElementChild.tagName).toBe('SPAN');
     expect(child.firstElementChild.firstElementChild.textContent).toBe('Suffix text');
   });
