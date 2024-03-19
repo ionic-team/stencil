@@ -1,4 +1,4 @@
-import { Fragment, h } from '@stencil/core';
+import { h } from '@stencil/core';
 import { render } from '@wdio/browser-runner/stencil';
 
 describe('shadow-dom-array', () => {
@@ -9,8 +9,11 @@ describe('shadow-dom-array', () => {
   });
 
   it('renders children', async () => {
-    const root = $('shadow-dom-array-root');
-    await root.waitForExist();
+    await $('shadow-dom-array-root').$('shadow-dom-array').waitForExist();
+
+    // Test will fail on Firefox without this
+    await browser.pause();
+
     const shadowRoot = document.body.querySelector('shadow-dom-array').shadowRoot;
 
     await expect(shadowRoot.children.length).toBe(1);
