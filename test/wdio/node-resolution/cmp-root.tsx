@@ -1,6 +1,7 @@
 import { Component, h } from '@stencil/core';
-import { location as module } from './module';
-import { location as moduleIndex } from './module/index';
+
+import { location as module } from './module.js';
+import { location as moduleIndex } from './module/index.js';
 
 @Component({
   tag: 'node-resolution',

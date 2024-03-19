@@ -38,12 +38,6 @@ export namespace Components {
     }
     interface FactoryJsx {
     }
-    interface HostAttrOverride {
-    }
-    interface ImportAliasing {
-        "myMethod": () => Promise<HTMLElement>;
-        "user": string;
-    }
     interface InitCssRoot {
     }
     interface LifecycleUnloadA {
@@ -51,8 +45,6 @@ export namespace Components {
     interface LifecycleUnloadB {
     }
     interface LifecycleUnloadRoot {
-    }
-    interface NodeResolution {
     }
     interface ParentReflectNanAttribute {
     }
@@ -77,9 +69,6 @@ export namespace Components {
     interface ReparentStyleNoVars {
     }
     interface ReparentStyleWithVars {
-    }
-    interface ScopedConditional {
-        "renderHello": boolean;
     }
     interface ScopedSlotAppendAndPrepend {
     }
@@ -242,10 +231,6 @@ export interface EsmImportCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLEsmImportElement;
 }
-export interface ImportAliasingCustomEvent<T> extends CustomEvent<T> {
-    detail: T;
-    target: HTMLImportAliasingElement;
-}
 declare global {
     interface HTMLBadSharedJsxElement extends Components.BadSharedJsx, HTMLStencilElement {
     }
@@ -342,29 +327,6 @@ declare global {
         prototype: HTMLFactoryJsxElement;
         new (): HTMLFactoryJsxElement;
     };
-    interface HTMLHostAttrOverrideElement extends Components.HostAttrOverride, HTMLStencilElement {
-    }
-    var HTMLHostAttrOverrideElement: {
-        prototype: HTMLHostAttrOverrideElement;
-        new (): HTMLHostAttrOverrideElement;
-    };
-    interface HTMLImportAliasingElementEventMap {
-        "myEvent": void;
-    }
-    interface HTMLImportAliasingElement extends Components.ImportAliasing, HTMLStencilElement {
-        addEventListener<K extends keyof HTMLImportAliasingElementEventMap>(type: K, listener: (this: HTMLImportAliasingElement, ev: ImportAliasingCustomEvent<HTMLImportAliasingElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
-        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
-        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
-        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-        removeEventListener<K extends keyof HTMLImportAliasingElementEventMap>(type: K, listener: (this: HTMLImportAliasingElement, ev: ImportAliasingCustomEvent<HTMLImportAliasingElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
-        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
-        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
-        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
-    }
-    var HTMLImportAliasingElement: {
-        prototype: HTMLImportAliasingElement;
-        new (): HTMLImportAliasingElement;
-    };
     interface HTMLInitCssRootElement extends Components.InitCssRoot, HTMLStencilElement {
     }
     var HTMLInitCssRootElement: {
@@ -388,12 +350,6 @@ declare global {
     var HTMLLifecycleUnloadRootElement: {
         prototype: HTMLLifecycleUnloadRootElement;
         new (): HTMLLifecycleUnloadRootElement;
-    };
-    interface HTMLNodeResolutionElement extends Components.NodeResolution, HTMLStencilElement {
-    }
-    var HTMLNodeResolutionElement: {
-        prototype: HTMLNodeResolutionElement;
-        new (): HTMLNodeResolutionElement;
     };
     interface HTMLParentReflectNanAttributeElement extends Components.ParentReflectNanAttribute, HTMLStencilElement {
     }
@@ -436,12 +392,6 @@ declare global {
     var HTMLReparentStyleWithVarsElement: {
         prototype: HTMLReparentStyleWithVarsElement;
         new (): HTMLReparentStyleWithVarsElement;
-    };
-    interface HTMLScopedConditionalElement extends Components.ScopedConditional, HTMLStencilElement {
-    }
-    var HTMLScopedConditionalElement: {
-        prototype: HTMLScopedConditionalElement;
-        new (): HTMLScopedConditionalElement;
     };
     interface HTMLScopedSlotAppendAndPrependElement extends Components.ScopedSlotAppendAndPrepend, HTMLStencilElement {
     }
@@ -860,13 +810,10 @@ declare global {
         "custom-elements-no-delegates-focus": HTMLCustomElementsNoDelegatesFocusElement;
         "esm-import": HTMLEsmImportElement;
         "factory-jsx": HTMLFactoryJsxElement;
-        "host-attr-override": HTMLHostAttrOverrideElement;
-        "import-aliasing": HTMLImportAliasingElement;
         "init-css-root": HTMLInitCssRootElement;
         "lifecycle-unload-a": HTMLLifecycleUnloadAElement;
         "lifecycle-unload-b": HTMLLifecycleUnloadBElement;
         "lifecycle-unload-root": HTMLLifecycleUnloadRootElement;
-        "node-resolution": HTMLNodeResolutionElement;
         "parent-reflect-nan-attribute": HTMLParentReflectNanAttributeElement;
         "parent-with-reflect-child": HTMLParentWithReflectChildElement;
         "reflect-nan-attribute-hyphen": HTMLReflectNanAttributeHyphenElement;
@@ -874,7 +821,6 @@ declare global {
         "remove-child-patch": HTMLRemoveChildPatchElement;
         "reparent-style-no-vars": HTMLReparentStyleNoVarsElement;
         "reparent-style-with-vars": HTMLReparentStyleWithVarsElement;
-        "scoped-conditional": HTMLScopedConditionalElement;
         "scoped-slot-append-and-prepend": HTMLScopedSlotAppendAndPrependElement;
         "scoped-slot-child-insert-adjacent": HTMLScopedSlotChildInsertAdjacentElement;
         "shadow-dom-array": HTMLShadowDomArrayElement;
@@ -977,12 +923,6 @@ declare namespace LocalJSX {
     }
     interface FactoryJsx {
     }
-    interface HostAttrOverride {
-    }
-    interface ImportAliasing {
-        "onMyEvent"?: (event: ImportAliasingCustomEvent<void>) => void;
-        "user"?: string;
-    }
     interface InitCssRoot {
     }
     interface LifecycleUnloadA {
@@ -990,8 +930,6 @@ declare namespace LocalJSX {
     interface LifecycleUnloadB {
     }
     interface LifecycleUnloadRoot {
-    }
-    interface NodeResolution {
     }
     interface ParentReflectNanAttribute {
     }
@@ -1016,9 +954,6 @@ declare namespace LocalJSX {
     interface ReparentStyleNoVars {
     }
     interface ReparentStyleWithVars {
-    }
-    interface ScopedConditional {
-        "renderHello"?: boolean;
     }
     interface ScopedSlotAppendAndPrepend {
     }
@@ -1191,13 +1126,10 @@ declare namespace LocalJSX {
         "custom-elements-no-delegates-focus": CustomElementsNoDelegatesFocus;
         "esm-import": EsmImport;
         "factory-jsx": FactoryJsx;
-        "host-attr-override": HostAttrOverride;
-        "import-aliasing": ImportAliasing;
         "init-css-root": InitCssRoot;
         "lifecycle-unload-a": LifecycleUnloadA;
         "lifecycle-unload-b": LifecycleUnloadB;
         "lifecycle-unload-root": LifecycleUnloadRoot;
-        "node-resolution": NodeResolution;
         "parent-reflect-nan-attribute": ParentReflectNanAttribute;
         "parent-with-reflect-child": ParentWithReflectChild;
         "reflect-nan-attribute-hyphen": ReflectNanAttributeHyphen;
@@ -1205,7 +1137,6 @@ declare namespace LocalJSX {
         "remove-child-patch": RemoveChildPatch;
         "reparent-style-no-vars": ReparentStyleNoVars;
         "reparent-style-with-vars": ReparentStyleWithVars;
-        "scoped-conditional": ScopedConditional;
         "scoped-slot-append-and-prepend": ScopedSlotAppendAndPrepend;
         "scoped-slot-child-insert-adjacent": ScopedSlotChildInsertAdjacent;
         "shadow-dom-array": ShadowDomArray;
@@ -1293,13 +1224,10 @@ declare module "@stencil/core" {
             "custom-elements-no-delegates-focus": LocalJSX.CustomElementsNoDelegatesFocus & JSXBase.HTMLAttributes<HTMLCustomElementsNoDelegatesFocusElement>;
             "esm-import": LocalJSX.EsmImport & JSXBase.HTMLAttributes<HTMLEsmImportElement>;
             "factory-jsx": LocalJSX.FactoryJsx & JSXBase.HTMLAttributes<HTMLFactoryJsxElement>;
-            "host-attr-override": LocalJSX.HostAttrOverride & JSXBase.HTMLAttributes<HTMLHostAttrOverrideElement>;
-            "import-aliasing": LocalJSX.ImportAliasing & JSXBase.HTMLAttributes<HTMLImportAliasingElement>;
             "init-css-root": LocalJSX.InitCssRoot & JSXBase.HTMLAttributes<HTMLInitCssRootElement>;
             "lifecycle-unload-a": LocalJSX.LifecycleUnloadA & JSXBase.HTMLAttributes<HTMLLifecycleUnloadAElement>;
             "lifecycle-unload-b": LocalJSX.LifecycleUnloadB & JSXBase.HTMLAttributes<HTMLLifecycleUnloadBElement>;
             "lifecycle-unload-root": LocalJSX.LifecycleUnloadRoot & JSXBase.HTMLAttributes<HTMLLifecycleUnloadRootElement>;
-            "node-resolution": LocalJSX.NodeResolution & JSXBase.HTMLAttributes<HTMLNodeResolutionElement>;
             "parent-reflect-nan-attribute": LocalJSX.ParentReflectNanAttribute & JSXBase.HTMLAttributes<HTMLParentReflectNanAttributeElement>;
             "parent-with-reflect-child": LocalJSX.ParentWithReflectChild & JSXBase.HTMLAttributes<HTMLParentWithReflectChildElement>;
             "reflect-nan-attribute-hyphen": LocalJSX.ReflectNanAttributeHyphen & JSXBase.HTMLAttributes<HTMLReflectNanAttributeHyphenElement>;
@@ -1307,7 +1235,6 @@ declare module "@stencil/core" {
             "remove-child-patch": LocalJSX.RemoveChildPatch & JSXBase.HTMLAttributes<HTMLRemoveChildPatchElement>;
             "reparent-style-no-vars": LocalJSX.ReparentStyleNoVars & JSXBase.HTMLAttributes<HTMLReparentStyleNoVarsElement>;
             "reparent-style-with-vars": LocalJSX.ReparentStyleWithVars & JSXBase.HTMLAttributes<HTMLReparentStyleWithVarsElement>;
-            "scoped-conditional": LocalJSX.ScopedConditional & JSXBase.HTMLAttributes<HTMLScopedConditionalElement>;
             "scoped-slot-append-and-prepend": LocalJSX.ScopedSlotAppendAndPrepend & JSXBase.HTMLAttributes<HTMLScopedSlotAppendAndPrependElement>;
             "scoped-slot-child-insert-adjacent": LocalJSX.ScopedSlotChildInsertAdjacent & JSXBase.HTMLAttributes<HTMLScopedSlotChildInsertAdjacentElement>;
             "shadow-dom-array": LocalJSX.ShadowDomArray & JSXBase.HTMLAttributes<HTMLShadowDomArrayElement>;
