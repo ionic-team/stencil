@@ -9,7 +9,7 @@ describe('shadow-dom-array', () => {
   });
 
   it('renders children', async () => {
-    await $('shadow-dom-array-root').$('shadow-dom-array').waitForExist();
+    await $('shadow-dom-array-root shadow-dom-array').waitForExist();
 
     // Test will fail on Firefox without this
     await browser.pause();
