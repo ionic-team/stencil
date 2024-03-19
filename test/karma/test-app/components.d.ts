@@ -41,17 +41,6 @@ export namespace Components {
     }
     interface ParentWithReflectChild {
     }
-    interface ReflectToAttr {
-        "bool": boolean;
-        "disabled": boolean;
-        "dynamicNu"?: number;
-        "dynamicStr"?: string;
-        "nu": number;
-        "null": string | null;
-        "otherBool": boolean;
-        "str": string;
-        "undef"?: string;
-    }
     interface ReparentStyleNoVars {
     }
     interface ReparentStyleWithVars {
@@ -311,12 +300,6 @@ declare global {
     var HTMLParentWithReflectChildElement: {
         prototype: HTMLParentWithReflectChildElement;
         new (): HTMLParentWithReflectChildElement;
-    };
-    interface HTMLReflectToAttrElement extends Components.ReflectToAttr, HTMLStencilElement {
-    }
-    var HTMLReflectToAttrElement: {
-        prototype: HTMLReflectToAttrElement;
-        new (): HTMLReflectToAttrElement;
     };
     interface HTMLReparentStyleNoVarsElement extends Components.ReparentStyleNoVars, HTMLStencilElement {
     }
@@ -713,7 +696,6 @@ declare global {
         "lifecycle-unload-b": HTMLLifecycleUnloadBElement;
         "lifecycle-unload-root": HTMLLifecycleUnloadRootElement;
         "parent-with-reflect-child": HTMLParentWithReflectChildElement;
-        "reflect-to-attr": HTMLReflectToAttrElement;
         "reparent-style-no-vars": HTMLReparentStyleNoVarsElement;
         "reparent-style-with-vars": HTMLReparentStyleWithVarsElement;
         "scoped-slot-child-insert-adjacent": HTMLScopedSlotChildInsertAdjacentElement;
@@ -814,17 +796,6 @@ declare namespace LocalJSX {
     interface LifecycleUnloadRoot {
     }
     interface ParentWithReflectChild {
-    }
-    interface ReflectToAttr {
-        "bool"?: boolean;
-        "disabled"?: boolean;
-        "dynamicNu"?: number;
-        "dynamicStr"?: string;
-        "nu"?: number;
-        "null"?: string | null;
-        "otherBool"?: boolean;
-        "str"?: string;
-        "undef"?: string;
     }
     interface ReparentStyleNoVars {
     }
@@ -990,7 +961,6 @@ declare namespace LocalJSX {
         "lifecycle-unload-b": LifecycleUnloadB;
         "lifecycle-unload-root": LifecycleUnloadRoot;
         "parent-with-reflect-child": ParentWithReflectChild;
-        "reflect-to-attr": ReflectToAttr;
         "reparent-style-no-vars": ReparentStyleNoVars;
         "reparent-style-with-vars": ReparentStyleWithVars;
         "scoped-slot-child-insert-adjacent": ScopedSlotChildInsertAdjacent;
@@ -1076,7 +1046,6 @@ declare module "@stencil/core" {
             "lifecycle-unload-b": LocalJSX.LifecycleUnloadB & JSXBase.HTMLAttributes<HTMLLifecycleUnloadBElement>;
             "lifecycle-unload-root": LocalJSX.LifecycleUnloadRoot & JSXBase.HTMLAttributes<HTMLLifecycleUnloadRootElement>;
             "parent-with-reflect-child": LocalJSX.ParentWithReflectChild & JSXBase.HTMLAttributes<HTMLParentWithReflectChildElement>;
-            "reflect-to-attr": LocalJSX.ReflectToAttr & JSXBase.HTMLAttributes<HTMLReflectToAttrElement>;
             "reparent-style-no-vars": LocalJSX.ReparentStyleNoVars & JSXBase.HTMLAttributes<HTMLReparentStyleNoVarsElement>;
             "reparent-style-with-vars": LocalJSX.ReparentStyleWithVars & JSXBase.HTMLAttributes<HTMLReparentStyleWithVarsElement>;
             "scoped-slot-child-insert-adjacent": LocalJSX.ScopedSlotChildInsertAdjacent & JSXBase.HTMLAttributes<HTMLScopedSlotChildInsertAdjacentElement>;
