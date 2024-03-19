@@ -31,8 +31,8 @@ describe('scoped-basic', function () {
 
     const scopedDiv = await $('scoped-basic div');
     await expect(scopedDiv).toHaveElementClass(expect.stringContaining('sc-scoped-basic'));
-    expect(scopedDiv).toHaveStyle({
-      color: browser.isChromium ? 'rgba(255,0,0,1)' : browser.isFirefox ? '' : 'rgb(255, 0, 0)',
+    await expect(scopedDiv).toHaveStyle({
+      color: browser.isChromium ? 'rgba(255,0,0,1)' : browser.isFirefox ? 'rgb(255,0,0)' : 'rgb(255, 0, 0)',
     });
 
     const scopedP = await $('scoped-basic p');
