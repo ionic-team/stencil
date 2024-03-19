@@ -1,4 +1,4 @@
-import { Component, State, h } from '@stencil/core';
+import { Component, h, State } from '@stencil/core';
 
 @Component({
   tag: 'shadow-dom-array-root',
