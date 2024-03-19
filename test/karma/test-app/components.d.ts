@@ -89,10 +89,6 @@ export namespace Components {
     }
     interface ShadowDomArrayRoot {
     }
-    interface ShadowDomBasic {
-    }
-    interface ShadowDomBasicRoot {
-    }
     interface ShadowDomMode {
         /**
           * The mode determines which platform styles to use.
@@ -456,18 +452,6 @@ declare global {
     var HTMLShadowDomArrayRootElement: {
         prototype: HTMLShadowDomArrayRootElement;
         new (): HTMLShadowDomArrayRootElement;
-    };
-    interface HTMLShadowDomBasicElement extends Components.ShadowDomBasic, HTMLStencilElement {
-    }
-    var HTMLShadowDomBasicElement: {
-        prototype: HTMLShadowDomBasicElement;
-        new (): HTMLShadowDomBasicElement;
-    };
-    interface HTMLShadowDomBasicRootElement extends Components.ShadowDomBasicRoot, HTMLStencilElement {
-    }
-    var HTMLShadowDomBasicRootElement: {
-        prototype: HTMLShadowDomBasicRootElement;
-        new (): HTMLShadowDomBasicRootElement;
     };
     interface HTMLShadowDomModeElement extends Components.ShadowDomMode, HTMLStencilElement {
     }
@@ -870,8 +854,6 @@ declare global {
         "scoped-slot-child-insert-adjacent": HTMLScopedSlotChildInsertAdjacentElement;
         "shadow-dom-array": HTMLShadowDomArrayElement;
         "shadow-dom-array-root": HTMLShadowDomArrayRootElement;
-        "shadow-dom-basic": HTMLShadowDomBasicElement;
-        "shadow-dom-basic-root": HTMLShadowDomBasicRootElement;
         "shadow-dom-mode": HTMLShadowDomModeElement;
         "shadow-dom-mode-root": HTMLShadowDomModeRootElement;
         "shadow-dom-slot-basic": HTMLShadowDomSlotBasicElement;
@@ -1018,10 +1000,6 @@ declare namespace LocalJSX {
         "values"?: number[];
     }
     interface ShadowDomArrayRoot {
-    }
-    interface ShadowDomBasic {
-    }
-    interface ShadowDomBasicRoot {
     }
     interface ShadowDomMode {
         /**
@@ -1201,8 +1179,6 @@ declare namespace LocalJSX {
         "scoped-slot-child-insert-adjacent": ScopedSlotChildInsertAdjacent;
         "shadow-dom-array": ShadowDomArray;
         "shadow-dom-array-root": ShadowDomArrayRoot;
-        "shadow-dom-basic": ShadowDomBasic;
-        "shadow-dom-basic-root": ShadowDomBasicRoot;
         "shadow-dom-mode": ShadowDomMode;
         "shadow-dom-mode-root": ShadowDomModeRoot;
         "shadow-dom-slot-basic": ShadowDomSlotBasic;
@@ -1304,8 +1280,6 @@ declare module "@stencil/core" {
             "scoped-slot-child-insert-adjacent": LocalJSX.ScopedSlotChildInsertAdjacent & JSXBase.HTMLAttributes<HTMLScopedSlotChildInsertAdjacentElement>;
             "shadow-dom-array": LocalJSX.ShadowDomArray & JSXBase.HTMLAttributes<HTMLShadowDomArrayElement>;
             "shadow-dom-array-root": LocalJSX.ShadowDomArrayRoot & JSXBase.HTMLAttributes<HTMLShadowDomArrayRootElement>;
-            "shadow-dom-basic": LocalJSX.ShadowDomBasic & JSXBase.HTMLAttributes<HTMLShadowDomBasicElement>;
-            "shadow-dom-basic-root": LocalJSX.ShadowDomBasicRoot & JSXBase.HTMLAttributes<HTMLShadowDomBasicRootElement>;
             "shadow-dom-mode": LocalJSX.ShadowDomMode & JSXBase.HTMLAttributes<HTMLShadowDomModeElement>;
             "shadow-dom-mode-root": LocalJSX.ShadowDomModeRoot & JSXBase.HTMLAttributes<HTMLShadowDomModeRootElement>;
             "shadow-dom-slot-basic": LocalJSX.ShadowDomSlotBasic & JSXBase.HTMLAttributes<HTMLShadowDomSlotBasicElement>;
