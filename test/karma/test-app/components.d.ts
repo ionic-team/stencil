@@ -97,8 +97,6 @@ export namespace Components {
     }
     interface ShadowDomModeRoot {
     }
-    interface ShadowDomSlotBasic {
-    }
     interface ShadowDomSlotNested {
         "i"?: number;
     }
@@ -464,12 +462,6 @@ declare global {
     var HTMLShadowDomModeRootElement: {
         prototype: HTMLShadowDomModeRootElement;
         new (): HTMLShadowDomModeRootElement;
-    };
-    interface HTMLShadowDomSlotBasicElement extends Components.ShadowDomSlotBasic, HTMLStencilElement {
-    }
-    var HTMLShadowDomSlotBasicElement: {
-        prototype: HTMLShadowDomSlotBasicElement;
-        new (): HTMLShadowDomSlotBasicElement;
     };
     interface HTMLShadowDomSlotNestedElement extends Components.ShadowDomSlotNested, HTMLStencilElement {
     }
@@ -856,7 +848,6 @@ declare global {
         "shadow-dom-basic-root": HTMLShadowDomBasicRootElement;
         "shadow-dom-mode": HTMLShadowDomModeElement;
         "shadow-dom-mode-root": HTMLShadowDomModeRootElement;
-        "shadow-dom-slot-basic": HTMLShadowDomSlotBasicElement;
         "shadow-dom-slot-nested": HTMLShadowDomSlotNestedElement;
         "shadow-dom-slot-nested-root": HTMLShadowDomSlotNestedRootElement;
         "slot-array-basic": HTMLSlotArrayBasicElement;
@@ -1008,8 +999,6 @@ declare namespace LocalJSX {
         "colormode"?: string;
     }
     interface ShadowDomModeRoot {
-    }
-    interface ShadowDomSlotBasic {
     }
     interface ShadowDomSlotNested {
         "i"?: number;
@@ -1181,7 +1170,6 @@ declare namespace LocalJSX {
         "shadow-dom-basic-root": ShadowDomBasicRoot;
         "shadow-dom-mode": ShadowDomMode;
         "shadow-dom-mode-root": ShadowDomModeRoot;
-        "shadow-dom-slot-basic": ShadowDomSlotBasic;
         "shadow-dom-slot-nested": ShadowDomSlotNested;
         "shadow-dom-slot-nested-root": ShadowDomSlotNestedRoot;
         "slot-array-basic": SlotArrayBasic;
@@ -1282,7 +1270,6 @@ declare module "@stencil/core" {
             "shadow-dom-basic-root": LocalJSX.ShadowDomBasicRoot & JSXBase.HTMLAttributes<HTMLShadowDomBasicRootElement>;
             "shadow-dom-mode": LocalJSX.ShadowDomMode & JSXBase.HTMLAttributes<HTMLShadowDomModeElement>;
             "shadow-dom-mode-root": LocalJSX.ShadowDomModeRoot & JSXBase.HTMLAttributes<HTMLShadowDomModeRootElement>;
-            "shadow-dom-slot-basic": LocalJSX.ShadowDomSlotBasic & JSXBase.HTMLAttributes<HTMLShadowDomSlotBasicElement>;
             "shadow-dom-slot-nested": LocalJSX.ShadowDomSlotNested & JSXBase.HTMLAttributes<HTMLShadowDomSlotNestedElement>;
             "shadow-dom-slot-nested-root": LocalJSX.ShadowDomSlotNestedRoot & JSXBase.HTMLAttributes<HTMLShadowDomSlotNestedRootElement>;
             "slot-array-basic": LocalJSX.SlotArrayBasic & JSXBase.HTMLAttributes<HTMLSlotArrayBasicElement>;
