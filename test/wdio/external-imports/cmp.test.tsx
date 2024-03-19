@@ -14,7 +14,7 @@ describe('external-imports', () => {
     });
   });
   it('render all components without errors', async () => {
-    let elm = $('external-import-a');
+    const elm = $('external-import-a');
     await expect(elm).toHaveText('Marty McFly');
 
     const elm2 = $('external-import-b');

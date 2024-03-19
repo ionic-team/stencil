@@ -1,4 +1,4 @@
-import { Component, h, Event, EventEmitter, State, Listen } from '@stencil/core';
+import { Component, Event, EventEmitter, h, Listen, State } from '@stencil/core';
 
 import { EventCustomTypeCustomEvent } from '../src/components.js';
 

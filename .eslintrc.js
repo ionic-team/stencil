@@ -89,6 +89,13 @@ module.exports = {
         'no-var': 'off',
       },
     },
+    {
+      // we don't want to use jest-related lint rules in the wdio tests
+      files: 'test/wdio/**/*.tsx',
+      rules: {
+        'jest/expect-expect': 'off',
+      },
+    },
   ],
   // inform ESLint about the global variables defined in a Jest context
   // see https://github.com/jest-community/eslint-plugin-jest/#usage

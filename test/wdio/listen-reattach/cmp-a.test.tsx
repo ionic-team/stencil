@@ -1,4 +1,4 @@
-import { h, Fragment } from '@stencil/core';
+import { Fragment, h } from '@stencil/core';
 import { render } from '@wdio/browser-runner/stencil';
 
 describe('listen-reattach', () => {
