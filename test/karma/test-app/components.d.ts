@@ -46,9 +46,6 @@ export namespace Components {
     }
     interface InitCssRoot {
     }
-    interface InputBasicRoot {
-        "value"?: string;
-    }
     interface IonChild {
     }
     interface IonHost {
@@ -379,12 +376,6 @@ declare global {
     var HTMLInitCssRootElement: {
         prototype: HTMLInitCssRootElement;
         new (): HTMLInitCssRootElement;
-    };
-    interface HTMLInputBasicRootElement extends Components.InputBasicRoot, HTMLStencilElement {
-    }
-    var HTMLInputBasicRootElement: {
-        prototype: HTMLInputBasicRootElement;
-        new (): HTMLInputBasicRootElement;
     };
     interface HTMLIonChildElement extends Components.IonChild, HTMLStencilElement {
     }
@@ -896,7 +887,6 @@ declare global {
         "host-attr-override": HTMLHostAttrOverrideElement;
         "import-aliasing": HTMLImportAliasingElement;
         "init-css-root": HTMLInitCssRootElement;
-        "input-basic-root": HTMLInputBasicRootElement;
         "ion-child": HTMLIonChildElement;
         "ion-host": HTMLIonHostElement;
         "ion-parent": HTMLIonParentElement;
@@ -1021,9 +1011,6 @@ declare namespace LocalJSX {
         "user"?: string;
     }
     interface InitCssRoot {
-    }
-    interface InputBasicRoot {
-        "value"?: string;
     }
     interface IonChild {
     }
@@ -1240,7 +1227,6 @@ declare namespace LocalJSX {
         "host-attr-override": HostAttrOverride;
         "import-aliasing": ImportAliasing;
         "init-css-root": InitCssRoot;
-        "input-basic-root": InputBasicRoot;
         "ion-child": IonChild;
         "ion-host": IonHost;
         "ion-parent": IonParent;
@@ -1346,7 +1332,6 @@ declare module "@stencil/core" {
             "host-attr-override": LocalJSX.HostAttrOverride & JSXBase.HTMLAttributes<HTMLHostAttrOverrideElement>;
             "import-aliasing": LocalJSX.ImportAliasing & JSXBase.HTMLAttributes<HTMLImportAliasingElement>;
             "init-css-root": LocalJSX.InitCssRoot & JSXBase.HTMLAttributes<HTMLInitCssRootElement>;
-            "input-basic-root": LocalJSX.InputBasicRoot & JSXBase.HTMLAttributes<HTMLInputBasicRootElement>;
             "ion-child": LocalJSX.IonChild & JSXBase.HTMLAttributes<HTMLIonChildElement>;
             "ion-host": LocalJSX.IonHost & JSXBase.HTMLAttributes<HTMLIonHostElement>;
             "ion-parent": LocalJSX.IonParent & JSXBase.HTMLAttributes<HTMLIonParentElement>;
