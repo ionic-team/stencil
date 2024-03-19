@@ -1816,9 +1816,7 @@ export namespace JSXBase {
     onPointerCancel?: (event: PointerEvent) => void;
     onPointerCancelCapture?: (event: PointerEvent) => void;
     onPointerEnter?: (event: PointerEvent) => void;
-    onPointerEnterCapture?: (event: PointerEvent) => void;
     onPointerLeave?: (event: PointerEvent) => void;
-    onPointerLeaveCapture?: (event: PointerEvent) => void;
     onPointerOver?: (event: PointerEvent) => void;
     onPointerOverCapture?: (event: PointerEvent) => void;
     onPointerOut?: (event: PointerEvent) => void;
