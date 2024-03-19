@@ -65,8 +65,6 @@ export namespace Components {
         "str": string;
         "undef"?: string;
     }
-    interface RemoveChildPatch {
-    }
     interface ReparentStyleNoVars {
     }
     interface ReparentStyleWithVars {
@@ -368,12 +366,6 @@ declare global {
     var HTMLReflectToAttrElement: {
         prototype: HTMLReflectToAttrElement;
         new (): HTMLReflectToAttrElement;
-    };
-    interface HTMLRemoveChildPatchElement extends Components.RemoveChildPatch, HTMLStencilElement {
-    }
-    var HTMLRemoveChildPatchElement: {
-        prototype: HTMLRemoveChildPatchElement;
-        new (): HTMLRemoveChildPatchElement;
     };
     interface HTMLReparentStyleNoVarsElement extends Components.ReparentStyleNoVars, HTMLStencilElement {
     }
@@ -777,7 +769,6 @@ declare global {
         "parent-reflect-nan-attribute": HTMLParentReflectNanAttributeElement;
         "parent-with-reflect-child": HTMLParentWithReflectChildElement;
         "reflect-to-attr": HTMLReflectToAttrElement;
-        "remove-child-patch": HTMLRemoveChildPatchElement;
         "reparent-style-no-vars": HTMLReparentStyleNoVarsElement;
         "reparent-style-with-vars": HTMLReparentStyleWithVarsElement;
         "scoped-slot-child-insert-adjacent": HTMLScopedSlotChildInsertAdjacentElement;
@@ -902,8 +893,6 @@ declare namespace LocalJSX {
         "otherBool"?: boolean;
         "str"?: string;
         "undef"?: string;
-    }
-    interface RemoveChildPatch {
     }
     interface ReparentStyleNoVars {
     }
@@ -1076,7 +1065,6 @@ declare namespace LocalJSX {
         "parent-reflect-nan-attribute": ParentReflectNanAttribute;
         "parent-with-reflect-child": ParentWithReflectChild;
         "reflect-to-attr": ReflectToAttr;
-        "remove-child-patch": RemoveChildPatch;
         "reparent-style-no-vars": ReparentStyleNoVars;
         "reparent-style-with-vars": ReparentStyleWithVars;
         "scoped-slot-child-insert-adjacent": ScopedSlotChildInsertAdjacent;
@@ -1169,7 +1157,6 @@ declare module "@stencil/core" {
             "parent-reflect-nan-attribute": LocalJSX.ParentReflectNanAttribute & JSXBase.HTMLAttributes<HTMLParentReflectNanAttributeElement>;
             "parent-with-reflect-child": LocalJSX.ParentWithReflectChild & JSXBase.HTMLAttributes<HTMLParentWithReflectChildElement>;
             "reflect-to-attr": LocalJSX.ReflectToAttr & JSXBase.HTMLAttributes<HTMLReflectToAttrElement>;
-            "remove-child-patch": LocalJSX.RemoveChildPatch & JSXBase.HTMLAttributes<HTMLRemoveChildPatchElement>;
             "reparent-style-no-vars": LocalJSX.ReparentStyleNoVars & JSXBase.HTMLAttributes<HTMLReparentStyleNoVarsElement>;
             "reparent-style-with-vars": LocalJSX.ReparentStyleWithVars & JSXBase.HTMLAttributes<HTMLReparentStyleWithVarsElement>;
             "scoped-slot-child-insert-adjacent": LocalJSX.ScopedSlotChildInsertAdjacent & JSXBase.HTMLAttributes<HTMLScopedSlotChildInsertAdjacentElement>;
