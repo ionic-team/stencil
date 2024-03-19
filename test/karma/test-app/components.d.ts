@@ -183,10 +183,6 @@ export namespace Components {
     interface WatchNativeAttributes {
     }
 }
-export interface EsmImportCustomEvent<T> extends CustomEvent<T> {
-    detail: T;
-    target: HTMLEsmImportElement;
-}
 declare global {
     interface HTMLBadSharedJsxElement extends Components.BadSharedJsx, HTMLStencilElement {
     }
