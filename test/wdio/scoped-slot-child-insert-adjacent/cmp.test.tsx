@@ -2,7 +2,6 @@ import { Fragment, h } from '@stencil/core';
 import { render } from '@wdio/browser-runner/stencil';
 
 describe('scoped-slot-child-insert-adjacent', () => {
-  let app: HTMLElement | undefined;
   let host: HTMLElement | undefined;
   let parentDiv: HTMLDivElement | undefined;
 
