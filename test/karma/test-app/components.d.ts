@@ -52,8 +52,6 @@ export namespace Components {
     }
     interface LifecycleUnloadRoot {
     }
-    interface NodeResolution {
-    }
     interface ParentReflectNanAttribute {
     }
     interface ParentWithReflectChild {
@@ -376,12 +374,6 @@ declare global {
     var HTMLLifecycleUnloadRootElement: {
         prototype: HTMLLifecycleUnloadRootElement;
         new (): HTMLLifecycleUnloadRootElement;
-    };
-    interface HTMLNodeResolutionElement extends Components.NodeResolution, HTMLStencilElement {
-    }
-    var HTMLNodeResolutionElement: {
-        prototype: HTMLNodeResolutionElement;
-        new (): HTMLNodeResolutionElement;
     };
     interface HTMLParentReflectNanAttributeElement extends Components.ParentReflectNanAttribute, HTMLStencilElement {
     }
@@ -849,7 +841,6 @@ declare global {
         "lifecycle-unload-a": HTMLLifecycleUnloadAElement;
         "lifecycle-unload-b": HTMLLifecycleUnloadBElement;
         "lifecycle-unload-root": HTMLLifecycleUnloadRootElement;
-        "node-resolution": HTMLNodeResolutionElement;
         "parent-reflect-nan-attribute": HTMLParentReflectNanAttributeElement;
         "parent-with-reflect-child": HTMLParentWithReflectChildElement;
         "reflect-nan-attribute-hyphen": HTMLReflectNanAttributeHyphenElement;
@@ -972,8 +963,6 @@ declare namespace LocalJSX {
     interface LifecycleUnloadB {
     }
     interface LifecycleUnloadRoot {
-    }
-    interface NodeResolution {
     }
     interface ParentReflectNanAttribute {
     }
@@ -1177,7 +1166,6 @@ declare namespace LocalJSX {
         "lifecycle-unload-a": LifecycleUnloadA;
         "lifecycle-unload-b": LifecycleUnloadB;
         "lifecycle-unload-root": LifecycleUnloadRoot;
-        "node-resolution": NodeResolution;
         "parent-reflect-nan-attribute": ParentReflectNanAttribute;
         "parent-with-reflect-child": ParentWithReflectChild;
         "reflect-nan-attribute-hyphen": ReflectNanAttributeHyphen;
@@ -1279,7 +1267,6 @@ declare module "@stencil/core" {
             "lifecycle-unload-a": LocalJSX.LifecycleUnloadA & JSXBase.HTMLAttributes<HTMLLifecycleUnloadAElement>;
             "lifecycle-unload-b": LocalJSX.LifecycleUnloadB & JSXBase.HTMLAttributes<HTMLLifecycleUnloadBElement>;
             "lifecycle-unload-root": LocalJSX.LifecycleUnloadRoot & JSXBase.HTMLAttributes<HTMLLifecycleUnloadRootElement>;
-            "node-resolution": LocalJSX.NodeResolution & JSXBase.HTMLAttributes<HTMLNodeResolutionElement>;
             "parent-reflect-nan-attribute": LocalJSX.ParentReflectNanAttribute & JSXBase.HTMLAttributes<HTMLParentReflectNanAttributeElement>;
             "parent-with-reflect-child": LocalJSX.ParentWithReflectChild & JSXBase.HTMLAttributes<HTMLParentWithReflectChildElement>;
             "reflect-nan-attribute-hyphen": LocalJSX.ReflectNanAttributeHyphen & JSXBase.HTMLAttributes<HTMLReflectNanAttributeHyphenElement>;
