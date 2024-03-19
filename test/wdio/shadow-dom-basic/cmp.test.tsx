@@ -16,23 +16,23 @@ describe('shadow-dom-basic', () => {
 
     const elm = document.querySelector('shadow-dom-basic-root');
 
-    await expect(elm.shadowRoot).toBeDefined();
+    expect(elm.shadowRoot).toBeDefined();
 
     const shadowDomBasic = elm.shadowRoot.lastElementChild;
     const lightDiv = elm.shadowRoot.lastElementChild.children[0];
 
-    await expect(lightDiv.nodeName).toBe('DIV');
-    await expect(lightDiv.textContent.trim()).toBe('light');
+    expect(lightDiv.nodeName).toBe('DIV');
+    expect(lightDiv.textContent.trim()).toBe('light');
 
-    await expect(shadowDomBasic.nodeName).toBe('SHADOW-DOM-BASIC');
+    expect(shadowDomBasic.nodeName).toBe('SHADOW-DOM-BASIC');
     const shadowDiv = shadowDomBasic.shadowRoot.lastElementChild.previousElementSibling;
-    await expect(shadowDiv.nodeName).toBe('DIV');
-    await expect(shadowDiv.textContent.trim()).toBe('shadow');
+    expect(shadowDiv.nodeName).toBe('DIV');
+    expect(shadowDiv.textContent.trim()).toBe('shadow');
 
     const shadowBG = window.getComputedStyle(shadowDiv).backgroundColor;
-    await expect(shadowBG).toBe('rgb(0, 0, 0)');
+    expect(shadowBG).toBe('rgb(0, 0, 0)');
 
     const lightBG = window.getComputedStyle(shadowDomBasic.lastElementChild).backgroundColor;
-    await expect(lightBG).toBe('rgb(255, 255, 0)');
+    expect(lightBG).toBe('rgb(255, 255, 0)');
   });
 });
