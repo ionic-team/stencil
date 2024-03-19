@@ -17,6 +17,7 @@ describe('key-reorder', function () {
     let item3 = document.body.querySelector('#item-3') as any;
     let item4 = document.body.querySelector('#item-4') as any;
 
+    await browser.waitUntil(() => !item0.previousElementSibling);
     expect(item0.previousElementSibling).toBe(null);
     expect(item1.previousElementSibling).toBe(item0);
     expect(item2.previousElementSibling).toBe(item1);
