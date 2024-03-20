@@ -10,6 +10,7 @@ export async function compareScreenshot(
   emulateConfig: d.EmulateConfig,
   screenshotBuildData: d.ScreenshotBuildData,
   currentScreenshotBuf: Buffer,
+  screenshotTimeoutMs: number | null,
   desc: string,
   width: number,
   height: number,
@@ -115,6 +116,7 @@ export async function compareScreenshot(
       screenshot.diff.mismatchedPixels = await getMismatchedPixels(
         screenshotBuildData.pixelmatchModulePath,
         pixelMatchInput,
+        screenshotTimeoutMs,
       );
     }
   }
@@ -124,7 +126,7 @@ export async function compareScreenshot(
   return screenshot.diff;
 }
 
-async function getMismatchedPixels(pixelmatchModulePath: string, pixelMatchInput: d.PixelMatchInput) {
+async function getMismatchedPixels(pixelmatchModulePath: string, pixelMatchInput: d.PixelMatchInput, screenshotTimeoutMs: number | null) {
   return new Promise<number>((resolve, reject) => {
     /**
      * When using screenshot functionality in a runner that is not Jasmine (e.g. Jest Circus), we need to set a default
@@ -133,8 +135,9 @@ async function getMismatchedPixels(pixelmatchModulePath: string, pixelMatchInput
      *
      * The '2500' value that we default to is the value of `jasmine.DEFAULT_TIMEOUT_INTERVAL` (5000) divided by 2.
      */
-    const timeout =
-      typeof jasmine !== 'undefined' && jasmine.DEFAULT_TIMEOUT_INTERVAL
+    const timeout = screenshotTimeoutMs !== null
+      ? screenshotTimeoutMs
+      : typeof jasmine !== 'undefined' && jasmine.DEFAULT_TIMEOUT_INTERVAL
         ? jasmine.DEFAULT_TIMEOUT_INTERVAL * 0.5
         : 2500;
     const tmr = setTimeout(() => {

@@ -1985,6 +1985,11 @@ export interface TestingConfig extends JestConfig {
   screenshotConnector?: string;
 
   /**
+   * Some JSDoc, describing this field
+   */
+  screenshotTimeout?: number | null;
+
+  /**
    * Amount of time in milliseconds to wait before a screenshot is taken.
    */
   waitBeforeScreenshot?: number;
