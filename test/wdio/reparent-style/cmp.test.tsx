@@ -42,7 +42,6 @@ describe('reparent behavior (style)', () => {
     expect(window.getComputedStyle(novars).backgroundColor).toBe('rgb(0, 128, 128)');
   });
 
-  // This test fails in IE!
   it('should preserve styles after reparenting a component (with css vars)', async () => {
     const reparentButton = $('.reparent-vars');
     await reparentButton.click();
