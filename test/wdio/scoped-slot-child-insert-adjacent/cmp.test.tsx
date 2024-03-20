@@ -1,19 +1,97 @@
-import { setupDomTests, waitForChanges } from '../util';
+import { Fragment, h } from '@stencil/core';
+import { render } from '@wdio/browser-runner/stencil';
 
 describe('scoped-slot-child-insert-adjacent', () => {
-  const { setupDom, tearDownDom } = setupDomTests(document);
-
-  let app: HTMLElement | undefined;
   let host: HTMLElement | undefined;
   let parentDiv: HTMLDivElement | undefined;
 
   beforeEach(async () => {
-    app = await setupDom('/scoped-slot-child-insert-adjacent/index.html');
-    host = app.querySelector('scoped-slot-child-insert-adjacent');
+    render({
+      template: () => (
+        <>
+          <scoped-slot-child-insert-adjacent>
+            <p>I am slotted and will receive a red background</p>
+          </scoped-slot-child-insert-adjacent>
+
+          <button type="button" id="addInsertAdjacentHtmlBeforeEnd">
+            add via insertAdjacentHTML (beforeend)
+          </button>
+          <button type="button" id="addInsertAdjacentHtmlAfterBegin">
+            add via insertAdjacentHTML (afterbegin)
+          </button>
+
+          <button type="button" id="addInsertAdjacentTextBeforeEnd">
+            add via insertAdjacentText (beforeend)
+          </button>
+          <button type="button" id="addInsertAdjacentTextAfterBegin">
+            add via insertAdjacentText (afterbegin)
+          </button>
+
+          <button type="button" id="addInsertAdjacentElementBeforeEnd">
+            add via insertAdjacentElement (beforeend)
+          </button>
+          <button type="button" id="addInsertAdjacentElementAfterBegin">
+            add via insertAdjacentElement (afterbegin)
+          </button>
+        </>
+      ),
+    });
+
+    await $('scoped-slot-child-insert-adjacent').waitForExist();
+    const scopedSlotChildInsertAdjacent = document.querySelector('scoped-slot-child-insert-adjacent');
+
+    // Event listeners for `insertAdjacentHtml`
+    await $('#addInsertAdjacentHtmlBeforeEnd').waitForExist();
+    const addInsertAdjacentHtmlBeforeEnd = document.querySelector('#addInsertAdjacentHtmlBeforeEnd');
+    addInsertAdjacentHtmlBeforeEnd.addEventListener('click', () => {
+      scopedSlotChildInsertAdjacent.insertAdjacentHTML(
+        'beforeend',
+        `<p>Added via insertAdjacentHTMLBeforeEnd. I should have a red background.</p>`,
+      );
+    });
+    const addInsertAdjacentHtmlAfterBegin = document.querySelector('#addInsertAdjacentHtmlAfterBegin');
+    addInsertAdjacentHtmlAfterBegin.addEventListener('click', () => {
+      scopedSlotChildInsertAdjacent.insertAdjacentHTML(
+        'afterbegin',
+        `<p>Added via insertAdjacentHTMLAfterBegin. I should have a red background.</p>`,
+      );
+    });
+
+    // Event listeners for `insertAdjacentText`
+    const addInsertAdjacentTextBeforeEnd = document.querySelector('#addInsertAdjacentTextBeforeEnd');
+    addInsertAdjacentTextBeforeEnd.addEventListener('click', () => {
+      scopedSlotChildInsertAdjacent.insertAdjacentText(
+        'beforeend',
+        `Added via insertAdjacentTextBeforeEnd. I should have a red background.`,
+      );
+    });
+    const addInsertAdjacentTextAfterBegin = document.querySelector('#addInsertAdjacentTextAfterBegin');
+    addInsertAdjacentTextAfterBegin.addEventListener('click', () => {
+      scopedSlotChildInsertAdjacent.insertAdjacentText(
+        'afterbegin',
+        `Added via insertAdjacentTextAfterBegin. I should have a red background.`,
+      );
+    });
+
+    // Event listeners for `insertAdjacentElement`
+    const addInsertAdjacentElementBeforeEnd = document.querySelector('#addInsertAdjacentElementBeforeEnd');
+    addInsertAdjacentElementBeforeEnd.addEventListener('click', () => {
+      const el = document.createElement('span');
+      el.textContent = 'Added via insertAdjacentElementBeforeEnd. I should have a red background.';
+
+      scopedSlotChildInsertAdjacent.insertAdjacentElement('beforeend', el);
+    });
+    const addInsertAdjacentElementAfterBegin = document.querySelector('#addInsertAdjacentElementAfterBegin');
+    addInsertAdjacentElementAfterBegin.addEventListener('click', () => {
+      const el = document.createElement('span');
+      el.textContent = 'Added via insertAdjacentElementAfterBegin. I should have a red background.';
+
+      scopedSlotChildInsertAdjacent.insertAdjacentElement('afterbegin', el);
+    });
+
+    host = document.querySelector('scoped-slot-child-insert-adjacent');
     parentDiv = host.querySelector('#parentDiv');
   });
-
-  afterEach(tearDownDom);
 
   describe('insertAdjacentHtml', () => {
     it('slots elements w/ "beforeend" position', async () => {
@@ -27,9 +105,8 @@ describe('scoped-slot-child-insert-adjacent', () => {
       expect((getComputedStyle(parentDiv) as any)['background-color']).toBe('rgb(255, 0, 0)');
 
       // insert an additional <p> elm
-      const addButton = app.querySelector<HTMLButtonElement>('#addInsertAdjacentHtmlBeforeEnd');
-      addButton.click();
-      await waitForChanges();
+      const addButton = $('#addInsertAdjacentHtmlBeforeEnd');
+      await addButton.click();
 
       // now we should have 2 <p> elms
       paragraphElms = host.querySelectorAll('p');
@@ -57,9 +134,8 @@ describe('scoped-slot-child-insert-adjacent', () => {
       expect((getComputedStyle(parentDiv) as any)['background-color']).toBe('rgb(255, 0, 0)');
 
       // insert an additional <p> elm
-      const addButton = app.querySelector<HTMLButtonElement>('#addInsertAdjacentHtmlAfterBegin');
-      addButton.click();
-      await waitForChanges();
+      const addButton = $('#addInsertAdjacentHtmlAfterBegin');
+      await addButton.click();
 
       // now we should have 2 <p> elms
       paragraphElms = host.querySelectorAll('p');
@@ -81,18 +157,15 @@ describe('scoped-slot-child-insert-adjacent', () => {
     it('slots elements w/ "beforeend" position', async () => {
       expect(parentDiv).toBeDefined();
 
-      expect(parentDiv.textContent).toBe(
-        'Here is my slot. It is red.\n  I am slotted and will receive a red background\n',
-      );
+      expect(parentDiv.textContent).toBe('Here is my slot. It is red.I am slotted and will receive a red background');
       expect((getComputedStyle(parentDiv) as any)['background-color']).toBe('rgb(255, 0, 0)');
 
       // insert an additional text node
-      const addButton = app.querySelector<HTMLButtonElement>('#addInsertAdjacentTextBeforeEnd');
-      addButton.click();
-      await waitForChanges();
+      const addButton = $('#addInsertAdjacentTextBeforeEnd');
+      await addButton.click();
 
       expect(parentDiv.textContent).toBe(
-        'Here is my slot. It is red.\n  I am slotted and will receive a red background\nAdded via insertAdjacentTextBeforeEnd. I should have a red background.',
+        'Here is my slot. It is red.I am slotted and will receive a red backgroundAdded via insertAdjacentTextBeforeEnd. I should have a red background.',
       );
       expect((getComputedStyle(parentDiv) as any)['background-color']).toBe('rgb(255, 0, 0)');
     });
@@ -100,18 +173,15 @@ describe('scoped-slot-child-insert-adjacent', () => {
     it('slots elements w/ "afterbegin" position', async () => {
       expect(parentDiv).toBeDefined();
 
-      expect(parentDiv.textContent).toBe(
-        'Here is my slot. It is red.\n  I am slotted and will receive a red background\n',
-      );
+      expect(parentDiv.textContent).toBe('Here is my slot. It is red.I am slotted and will receive a red background');
       expect((getComputedStyle(parentDiv) as any)['background-color']).toBe('rgb(255, 0, 0)');
 
       // insert an additional text node
-      const addButton = app.querySelector<HTMLButtonElement>('#addInsertAdjacentTextAfterBegin');
-      addButton.click();
-      await waitForChanges();
+      const addButton = $('#addInsertAdjacentTextAfterBegin');
+      await addButton.click();
 
       expect(parentDiv.textContent).toBe(
-        'Here is my slot. It is red.Added via insertAdjacentTextAfterBegin. I should have a red background.\n  I am slotted and will receive a red background\n',
+        'Here is my slot. It is red.Added via insertAdjacentTextAfterBegin. I should have a red background.I am slotted and will receive a red background',
       );
       expect((getComputedStyle(parentDiv) as any)['background-color']).toBe('rgb(255, 0, 0)');
     });
@@ -126,9 +196,8 @@ describe('scoped-slot-child-insert-adjacent', () => {
       expect(children[0].textContent).toBe('I am slotted and will receive a red background');
       expect((getComputedStyle(parentDiv) as any)['background-color']).toBe('rgb(255, 0, 0)');
 
-      const addButton = app.querySelector<HTMLButtonElement>('#addInsertAdjacentElementBeforeEnd');
-      addButton.click();
-      await waitForChanges();
+      const addButton = $('#addInsertAdjacentElementBeforeEnd');
+      await addButton.click();
 
       children = parentDiv.children;
       expect(children.length).toBe(2);
@@ -144,9 +213,8 @@ describe('scoped-slot-child-insert-adjacent', () => {
       expect(children[0].textContent).toBe('I am slotted and will receive a red background');
       expect((getComputedStyle(parentDiv) as any)['background-color']).toBe('rgb(255, 0, 0)');
 
-      const addButton = app.querySelector<HTMLButtonElement>('#addInsertAdjacentElementAfterBegin');
-      addButton.click();
-      await waitForChanges();
+      const addButton = $('#addInsertAdjacentElementAfterBegin');
+      await addButton.click();
 
       children = parentDiv.children;
       expect(children.length).toBe(2);
