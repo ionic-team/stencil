@@ -45,6 +45,14 @@ export class MockNode {
     return this.children[0] || null;
   }
 
+  addEventListener(type: string, handler: (ev?: any) => void) {
+    addEventListener(this, type, handler);
+  }
+
+  dispatchEvent(ev: MockEvent) {
+    return dispatchEvent(this, ev);
+  }
+
   getElementsByTagName(tagName: string) {
     const results: MockElement[] = [];
     getElementsByTagName(this, tagName.toLowerCase(), results);
@@ -275,10 +283,6 @@ Testing components with ElementInternals is fully supported in e2e tests.`,
     this.__attributeMap = null;
   }
 
-  addEventListener(type: string, handler: (ev?: any) => void) {
-    addEventListener(this, type, handler);
-  }
-
   attachShadow(_opts: ShadowRootInit) {
     const shadowRoot = this.ownerDocument.createDocumentFragment();
     this.shadowRoot = shadowRoot;
@@ -359,7 +363,7 @@ Testing components with ElementInternals is fully supported in e2e tests.`,
   closest(selector: string) {
     let elm = this;
     while (elm != null) {
-      if (elm.matches(selector)) {
+      if ('matches' in elm && elm.matches(selector)) {
         return elm;
       }
       elm = elm.parentNode as any;
@@ -376,10 +380,6 @@ Testing components with ElementInternals is fully supported in e2e tests.`,
   }
   set dir(value: string) {
     this.setAttributeNS(null, 'dir', value);
-  }
-
-  dispatchEvent(ev: MockEvent) {
-    return dispatchEvent(this, ev);
   }
 
   focus(_options?: { preventScroll?: boolean }) {
