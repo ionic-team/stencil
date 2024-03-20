@@ -1,16 +1,28 @@
-import { setupDomTests, waitForChanges } from '../util';
+import { Fragment, h } from '@stencil/core';
+import { render } from '@wdio/browser-runner/stencil';
 
 describe('reflect-to-attr', function () {
-  const { setupDom, tearDownDom } = setupDomTests(document);
-  let app: HTMLElement;
-
   beforeEach(async () => {
-    app = await setupDom('/reflect-to-attr/index.html');
+    function toggleDisabled() {
+      const item = document.querySelector('reflect-to-attr');
+      item.disabled = !item.disabled;
+    }
+
+    render({
+      template: () => (
+        <>
+          <reflect-to-attr></reflect-to-attr>
+          <button id="toggle" onClick={toggleDisabled}>
+            Toggle disabled
+          </button>
+        </>
+      ),
+    });
   });
-  afterEach(tearDownDom);
 
   it('should have proper attributes', async () => {
-    const cmp = app.querySelector('reflect-to-attr') as any;
+    await $('reflect-to-attr').waitForExist();
+    const cmp = document.querySelector('reflect-to-attr');
 
     expect(cmp.getAttribute('str')).toEqual('single');
     expect(cmp.getAttribute('nu')).toEqual('2');
@@ -26,7 +38,7 @@ describe('reflect-to-attr', function () {
     cmp.bool = true;
     cmp.otherBool = false;
 
-    await waitForChanges();
+    await browser.pause();
 
     expect(cmp.getAttribute('str')).toEqual('second');
     expect(cmp.getAttribute('nu')).toEqual('-12.2');
@@ -40,16 +52,18 @@ describe('reflect-to-attr', function () {
   });
 
   it('should reflect booleans property', async () => {
-    const cmp = app.querySelector('reflect-to-attr') as any;
+    await $('reflect-to-attr').waitForExist();
+    const cmp = document.querySelector('reflect-to-attr');
     expect(cmp.disabled).toBe(false);
 
-    const toggle = app.querySelector('#toggle') as any;
-    toggle.click();
-    await waitForChanges();
+    const toggle = $('#toggle');
+    await toggle.click();
+
+    await browser.waitUntil(async () => cmp.disabled);
     expect(cmp.disabled).toBe(true);
 
-    toggle.click();
-    await waitForChanges();
+    await toggle.click();
+    await browser.waitUntil(async () => !cmp.disabled);
     expect(cmp.disabled).toBe(false);
   });
 });
