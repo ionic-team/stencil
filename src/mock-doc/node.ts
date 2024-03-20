@@ -33,6 +33,24 @@ export class MockNode {
     this.childNodes = [];
   }
 
+  get children(): MockElement[] {
+    return this.childNodes.filter((n) => n.nodeType === NODE_TYPES.ELEMENT_NODE) as MockElement[];
+  }
+
+  get childElementCount() {
+    return this.childNodes.filter((n) => n.nodeType === NODE_TYPES.ELEMENT_NODE).length;
+  }
+
+  get firstElementChild(): MockElement | null {
+    return this.children[0] || null;
+  }
+
+  getElementsByTagName(tagName: string) {
+    const results: MockElement[] = [];
+    getElementsByTagName(this, tagName.toLowerCase(), results);
+    return results;
+  }
+
   appendChild(newNode: MockNode) {
     if (newNode.nodeType === NODE_TYPES.DOCUMENT_FRAGMENT_NODE) {
       const nodes = newNode.childNodes.slice();
@@ -195,6 +213,14 @@ export class MockNode {
     return null;
   }
 
+  querySelector(selector: string) {
+    return selectOne(selector, this);
+  }
+
+  querySelectorAll(selector: string) {
+    return selectAll(selector, this);
+  }
+
   get textContent() {
     return this._nodeValue ?? '';
   }
@@ -309,14 +335,6 @@ Testing components with ElementInternals is fully supported in e2e tests.`,
     this.__attributeMap = attrs;
   }
 
-  get children() {
-    return this.childNodes.filter((n) => n.nodeType === NODE_TYPES.ELEMENT_NODE) as MockElement[];
-  }
-
-  get childElementCount() {
-    return this.childNodes.filter((n) => n.nodeType === NODE_TYPES.ELEMENT_NODE).length;
-  }
-
   get className() {
     return this.getAttributeNS(null, 'class') || '';
   }
@@ -362,10 +380,6 @@ Testing components with ElementInternals is fully supported in e2e tests.`,
 
   dispatchEvent(ev: MockEvent) {
     return dispatchEvent(this, ev);
-  }
-
-  get firstElementChild(): MockElement | null {
-    return this.children[0] || null;
   }
 
   focus(_options?: { preventScroll?: boolean }) {
@@ -611,20 +625,6 @@ Testing components with ElementInternals is fully supported in e2e tests.`,
     const results: MockElement[] = [];
     getElementsByClassName(this, classes, results);
     return results;
-  }
-
-  getElementsByTagName(tagName: string) {
-    const results: MockElement[] = [];
-    getElementsByTagName(this, tagName.toLowerCase(), results);
-    return results;
-  }
-
-  querySelector(selector: string) {
-    return selectOne(selector, this);
-  }
-
-  querySelectorAll(selector: string) {
-    return selectAll(selector, this);
   }
 
   removeAttribute(attrName: string) {
@@ -1059,7 +1059,7 @@ function getElementsByClassName(elm: MockElement, classNames: string[], foundElm
   }
 }
 
-function getElementsByTagName(elm: MockElement, tagName: string, foundElms: MockElement[]) {
+function getElementsByTagName(elm: MockNode, tagName: string, foundElms: MockElement[]) {
   const children = elm.children;
   for (let i = 0, ii = children.length; i < ii; i++) {
     const childElm = children[i];
