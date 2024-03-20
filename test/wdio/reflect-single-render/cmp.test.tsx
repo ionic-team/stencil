@@ -1,26 +1,21 @@
-import { setupDomTests } from '../util';
+import { h } from '@stencil/core';
+import { render } from '@wdio/browser-runner/stencil';
 
 describe('reflect-single-render', () => {
-  const { setupDom, tearDownDom } = setupDomTests(document);
-  let app: HTMLElement;
-
   beforeEach(async () => {
-    app = await setupDom('/reflect-single-render/index.html');
+    render({
+      template: () => <parent-with-reflect-child></parent-with-reflect-child>,
+    });
   });
-  afterEach(tearDownDom);
 
   it('renders the parent and child the correct number of times', async () => {
-    const parentShadowRoot = app.querySelector('parent-with-reflect-child')?.shadowRoot;
-    if (!parentShadowRoot) {
-      fail(`unable to find shadow root on component 'parent-with-reflect-child'`);
-    }
+    const parentShadowRoot = await $('parent-with-reflect-child');
+    await parentShadowRoot.waitForExist();
 
-    const childShadowRoot = parentShadowRoot.querySelector('child-with-reflection')?.shadowRoot;
-    if (!childShadowRoot) {
-      fail(`unable to find shadow root on component 'child-with-reflection'`);
-    }
+    const childShadowRoot = parentShadowRoot.shadow$('child-with-reflection');
+    await parentShadowRoot.waitForExist();
 
-    expect(parentShadowRoot.textContent).toEqual('Parent Render Count: 1');
-    expect(childShadowRoot.textContent).toEqual('Child Render Count: 1');
+    await expect(parentShadowRoot).toHaveText(expect.stringContaining('Parent Render Count: 1'));
+    await expect(childShadowRoot).toHaveText('Child Render Count: 1');
   });
 });

@@ -8,9 +8,6 @@ import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
     interface BadSharedJsx {
     }
-    interface ChildWithReflection {
-        "val": number | any;
-    }
     interface CustomElementChild {
     }
     interface CustomElementChildDifferentNameThanClass {
@@ -38,8 +35,6 @@ export namespace Components {
     interface LifecycleUnloadB {
     }
     interface LifecycleUnloadRoot {
-    }
-    interface ParentWithReflectChild {
     }
     interface ReparentStyleNoVars {
     }
@@ -200,12 +195,6 @@ declare global {
         prototype: HTMLBadSharedJsxElement;
         new (): HTMLBadSharedJsxElement;
     };
-    interface HTMLChildWithReflectionElement extends Components.ChildWithReflection, HTMLStencilElement {
-    }
-    var HTMLChildWithReflectionElement: {
-        prototype: HTMLChildWithReflectionElement;
-        new (): HTMLChildWithReflectionElement;
-    };
     interface HTMLCustomElementChildElement extends Components.CustomElementChild, HTMLStencilElement {
     }
     var HTMLCustomElementChildElement: {
@@ -294,12 +283,6 @@ declare global {
     var HTMLLifecycleUnloadRootElement: {
         prototype: HTMLLifecycleUnloadRootElement;
         new (): HTMLLifecycleUnloadRootElement;
-    };
-    interface HTMLParentWithReflectChildElement extends Components.ParentWithReflectChild, HTMLStencilElement {
-    }
-    var HTMLParentWithReflectChildElement: {
-        prototype: HTMLParentWithReflectChildElement;
-        new (): HTMLParentWithReflectChildElement;
     };
     interface HTMLReparentStyleNoVarsElement extends Components.ReparentStyleNoVars, HTMLStencilElement {
     }
@@ -681,7 +664,6 @@ declare global {
     };
     interface HTMLElementTagNameMap {
         "bad-shared-jsx": HTMLBadSharedJsxElement;
-        "child-with-reflection": HTMLChildWithReflectionElement;
         "custom-element-child": HTMLCustomElementChildElement;
         "custom-element-child-different-name-than-class": HTMLCustomElementChildDifferentNameThanClassElement;
         "custom-element-nested-child": HTMLCustomElementNestedChildElement;
@@ -695,7 +677,6 @@ declare global {
         "lifecycle-unload-a": HTMLLifecycleUnloadAElement;
         "lifecycle-unload-b": HTMLLifecycleUnloadBElement;
         "lifecycle-unload-root": HTMLLifecycleUnloadRootElement;
-        "parent-with-reflect-child": HTMLParentWithReflectChildElement;
         "reparent-style-no-vars": HTMLReparentStyleNoVarsElement;
         "reparent-style-with-vars": HTMLReparentStyleWithVarsElement;
         "scoped-slot-child-insert-adjacent": HTMLScopedSlotChildInsertAdjacentElement;
@@ -764,9 +745,6 @@ declare global {
 declare namespace LocalJSX {
     interface BadSharedJsx {
     }
-    interface ChildWithReflection {
-        "val"?: number | any;
-    }
     interface CustomElementChild {
     }
     interface CustomElementChildDifferentNameThanClass {
@@ -794,8 +772,6 @@ declare namespace LocalJSX {
     interface LifecycleUnloadB {
     }
     interface LifecycleUnloadRoot {
-    }
-    interface ParentWithReflectChild {
     }
     interface ReparentStyleNoVars {
     }
@@ -946,7 +922,6 @@ declare namespace LocalJSX {
     }
     interface IntrinsicElements {
         "bad-shared-jsx": BadSharedJsx;
-        "child-with-reflection": ChildWithReflection;
         "custom-element-child": CustomElementChild;
         "custom-element-child-different-name-than-class": CustomElementChildDifferentNameThanClass;
         "custom-element-nested-child": CustomElementNestedChild;
@@ -960,7 +935,6 @@ declare namespace LocalJSX {
         "lifecycle-unload-a": LifecycleUnloadA;
         "lifecycle-unload-b": LifecycleUnloadB;
         "lifecycle-unload-root": LifecycleUnloadRoot;
-        "parent-with-reflect-child": ParentWithReflectChild;
         "reparent-style-no-vars": ReparentStyleNoVars;
         "reparent-style-with-vars": ReparentStyleWithVars;
         "scoped-slot-child-insert-adjacent": ScopedSlotChildInsertAdjacent;
@@ -1031,7 +1005,6 @@ declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
             "bad-shared-jsx": LocalJSX.BadSharedJsx & JSXBase.HTMLAttributes<HTMLBadSharedJsxElement>;
-            "child-with-reflection": LocalJSX.ChildWithReflection & JSXBase.HTMLAttributes<HTMLChildWithReflectionElement>;
             "custom-element-child": LocalJSX.CustomElementChild & JSXBase.HTMLAttributes<HTMLCustomElementChildElement>;
             "custom-element-child-different-name-than-class": LocalJSX.CustomElementChildDifferentNameThanClass & JSXBase.HTMLAttributes<HTMLCustomElementChildDifferentNameThanClassElement>;
             "custom-element-nested-child": LocalJSX.CustomElementNestedChild & JSXBase.HTMLAttributes<HTMLCustomElementNestedChildElement>;
@@ -1045,7 +1018,6 @@ declare module "@stencil/core" {
             "lifecycle-unload-a": LocalJSX.LifecycleUnloadA & JSXBase.HTMLAttributes<HTMLLifecycleUnloadAElement>;
             "lifecycle-unload-b": LocalJSX.LifecycleUnloadB & JSXBase.HTMLAttributes<HTMLLifecycleUnloadBElement>;
             "lifecycle-unload-root": LocalJSX.LifecycleUnloadRoot & JSXBase.HTMLAttributes<HTMLLifecycleUnloadRootElement>;
-            "parent-with-reflect-child": LocalJSX.ParentWithReflectChild & JSXBase.HTMLAttributes<HTMLParentWithReflectChildElement>;
             "reparent-style-no-vars": LocalJSX.ReparentStyleNoVars & JSXBase.HTMLAttributes<HTMLReparentStyleNoVarsElement>;
             "reparent-style-with-vars": LocalJSX.ReparentStyleWithVars & JSXBase.HTMLAttributes<HTMLReparentStyleWithVarsElement>;
             "scoped-slot-child-insert-adjacent": LocalJSX.ScopedSlotChildInsertAdjacent & JSXBase.HTMLAttributes<HTMLScopedSlotChildInsertAdjacentElement>;
