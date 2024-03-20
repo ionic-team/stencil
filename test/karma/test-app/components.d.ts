@@ -8,13 +8,8 @@ import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
     interface BadSharedJsx {
     }
-    interface ChildReflectNanAttribute {
-        "val": number;
-    }
     interface ChildWithReflection {
         "val": number | any;
-    }
-    interface CmpLabel {
     }
     interface CustomElementChild {
     }
@@ -38,19 +33,11 @@ export namespace Components {
     }
     interface InitCssRoot {
     }
-    interface IonChild {
-    }
-    interface IonHost {
-    }
-    interface IonParent {
-    }
     interface LifecycleUnloadA {
     }
     interface LifecycleUnloadB {
     }
     interface LifecycleUnloadRoot {
-    }
-    interface ParentReflectNanAttribute {
     }
     interface ParentWithReflectChild {
     }
@@ -64,8 +51,6 @@ export namespace Components {
         "otherBool": boolean;
         "str": string;
         "undef"?: string;
-    }
-    interface RemoveChildPatch {
     }
     interface ReparentStyleNoVars {
     }
@@ -224,23 +209,11 @@ declare global {
         prototype: HTMLBadSharedJsxElement;
         new (): HTMLBadSharedJsxElement;
     };
-    interface HTMLChildReflectNanAttributeElement extends Components.ChildReflectNanAttribute, HTMLStencilElement {
-    }
-    var HTMLChildReflectNanAttributeElement: {
-        prototype: HTMLChildReflectNanAttributeElement;
-        new (): HTMLChildReflectNanAttributeElement;
-    };
     interface HTMLChildWithReflectionElement extends Components.ChildWithReflection, HTMLStencilElement {
     }
     var HTMLChildWithReflectionElement: {
         prototype: HTMLChildWithReflectionElement;
         new (): HTMLChildWithReflectionElement;
-    };
-    interface HTMLCmpLabelElement extends Components.CmpLabel, HTMLStencilElement {
-    }
-    var HTMLCmpLabelElement: {
-        prototype: HTMLCmpLabelElement;
-        new (): HTMLCmpLabelElement;
     };
     interface HTMLCustomElementChildElement extends Components.CustomElementChild, HTMLStencilElement {
     }
@@ -313,24 +286,6 @@ declare global {
         prototype: HTMLInitCssRootElement;
         new (): HTMLInitCssRootElement;
     };
-    interface HTMLIonChildElement extends Components.IonChild, HTMLStencilElement {
-    }
-    var HTMLIonChildElement: {
-        prototype: HTMLIonChildElement;
-        new (): HTMLIonChildElement;
-    };
-    interface HTMLIonHostElement extends Components.IonHost, HTMLStencilElement {
-    }
-    var HTMLIonHostElement: {
-        prototype: HTMLIonHostElement;
-        new (): HTMLIonHostElement;
-    };
-    interface HTMLIonParentElement extends Components.IonParent, HTMLStencilElement {
-    }
-    var HTMLIonParentElement: {
-        prototype: HTMLIonParentElement;
-        new (): HTMLIonParentElement;
-    };
     interface HTMLLifecycleUnloadAElement extends Components.LifecycleUnloadA, HTMLStencilElement {
     }
     var HTMLLifecycleUnloadAElement: {
@@ -349,12 +304,6 @@ declare global {
         prototype: HTMLLifecycleUnloadRootElement;
         new (): HTMLLifecycleUnloadRootElement;
     };
-    interface HTMLParentReflectNanAttributeElement extends Components.ParentReflectNanAttribute, HTMLStencilElement {
-    }
-    var HTMLParentReflectNanAttributeElement: {
-        prototype: HTMLParentReflectNanAttributeElement;
-        new (): HTMLParentReflectNanAttributeElement;
-    };
     interface HTMLParentWithReflectChildElement extends Components.ParentWithReflectChild, HTMLStencilElement {
     }
     var HTMLParentWithReflectChildElement: {
@@ -366,12 +315,6 @@ declare global {
     var HTMLReflectToAttrElement: {
         prototype: HTMLReflectToAttrElement;
         new (): HTMLReflectToAttrElement;
-    };
-    interface HTMLRemoveChildPatchElement extends Components.RemoveChildPatch, HTMLStencilElement {
-    }
-    var HTMLRemoveChildPatchElement: {
-        prototype: HTMLRemoveChildPatchElement;
-        new (): HTMLRemoveChildPatchElement;
     };
     interface HTMLReparentStyleNoVarsElement extends Components.ReparentStyleNoVars, HTMLStencilElement {
     }
@@ -747,9 +690,7 @@ declare global {
     };
     interface HTMLElementTagNameMap {
         "bad-shared-jsx": HTMLBadSharedJsxElement;
-        "child-reflect-nan-attribute": HTMLChildReflectNanAttributeElement;
         "child-with-reflection": HTMLChildWithReflectionElement;
-        "cmp-label": HTMLCmpLabelElement;
         "custom-element-child": HTMLCustomElementChildElement;
         "custom-element-child-different-name-than-class": HTMLCustomElementChildDifferentNameThanClassElement;
         "custom-element-nested-child": HTMLCustomElementNestedChildElement;
@@ -760,16 +701,11 @@ declare global {
         "esm-import": HTMLEsmImportElement;
         "factory-jsx": HTMLFactoryJsxElement;
         "init-css-root": HTMLInitCssRootElement;
-        "ion-child": HTMLIonChildElement;
-        "ion-host": HTMLIonHostElement;
-        "ion-parent": HTMLIonParentElement;
         "lifecycle-unload-a": HTMLLifecycleUnloadAElement;
         "lifecycle-unload-b": HTMLLifecycleUnloadBElement;
         "lifecycle-unload-root": HTMLLifecycleUnloadRootElement;
-        "parent-reflect-nan-attribute": HTMLParentReflectNanAttributeElement;
         "parent-with-reflect-child": HTMLParentWithReflectChildElement;
         "reflect-to-attr": HTMLReflectToAttrElement;
-        "remove-child-patch": HTMLRemoveChildPatchElement;
         "reparent-style-no-vars": HTMLReparentStyleNoVarsElement;
         "reparent-style-with-vars": HTMLReparentStyleWithVarsElement;
         "shadow-dom-mode": HTMLShadowDomModeElement;
@@ -837,13 +773,8 @@ declare global {
 declare namespace LocalJSX {
     interface BadSharedJsx {
     }
-    interface ChildReflectNanAttribute {
-        "val"?: number;
-    }
     interface ChildWithReflection {
         "val"?: number | any;
-    }
-    interface CmpLabel {
     }
     interface CustomElementChild {
     }
@@ -867,19 +798,11 @@ declare namespace LocalJSX {
     }
     interface InitCssRoot {
     }
-    interface IonChild {
-    }
-    interface IonHost {
-    }
-    interface IonParent {
-    }
     interface LifecycleUnloadA {
     }
     interface LifecycleUnloadB {
     }
     interface LifecycleUnloadRoot {
-    }
-    interface ParentReflectNanAttribute {
     }
     interface ParentWithReflectChild {
     }
@@ -893,8 +816,6 @@ declare namespace LocalJSX {
         "otherBool"?: boolean;
         "str"?: string;
         "undef"?: string;
-    }
-    interface RemoveChildPatch {
     }
     interface ReparentStyleNoVars {
     }
@@ -1043,9 +964,7 @@ declare namespace LocalJSX {
     }
     interface IntrinsicElements {
         "bad-shared-jsx": BadSharedJsx;
-        "child-reflect-nan-attribute": ChildReflectNanAttribute;
         "child-with-reflection": ChildWithReflection;
-        "cmp-label": CmpLabel;
         "custom-element-child": CustomElementChild;
         "custom-element-child-different-name-than-class": CustomElementChildDifferentNameThanClass;
         "custom-element-nested-child": CustomElementNestedChild;
@@ -1056,16 +975,11 @@ declare namespace LocalJSX {
         "esm-import": EsmImport;
         "factory-jsx": FactoryJsx;
         "init-css-root": InitCssRoot;
-        "ion-child": IonChild;
-        "ion-host": IonHost;
-        "ion-parent": IonParent;
         "lifecycle-unload-a": LifecycleUnloadA;
         "lifecycle-unload-b": LifecycleUnloadB;
         "lifecycle-unload-root": LifecycleUnloadRoot;
-        "parent-reflect-nan-attribute": ParentReflectNanAttribute;
         "parent-with-reflect-child": ParentWithReflectChild;
         "reflect-to-attr": ReflectToAttr;
-        "remove-child-patch": RemoveChildPatch;
         "reparent-style-no-vars": ReparentStyleNoVars;
         "reparent-style-with-vars": ReparentStyleWithVars;
         "shadow-dom-mode": ShadowDomMode;
@@ -1135,9 +1049,7 @@ declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
             "bad-shared-jsx": LocalJSX.BadSharedJsx & JSXBase.HTMLAttributes<HTMLBadSharedJsxElement>;
-            "child-reflect-nan-attribute": LocalJSX.ChildReflectNanAttribute & JSXBase.HTMLAttributes<HTMLChildReflectNanAttributeElement>;
             "child-with-reflection": LocalJSX.ChildWithReflection & JSXBase.HTMLAttributes<HTMLChildWithReflectionElement>;
-            "cmp-label": LocalJSX.CmpLabel & JSXBase.HTMLAttributes<HTMLCmpLabelElement>;
             "custom-element-child": LocalJSX.CustomElementChild & JSXBase.HTMLAttributes<HTMLCustomElementChildElement>;
             "custom-element-child-different-name-than-class": LocalJSX.CustomElementChildDifferentNameThanClass & JSXBase.HTMLAttributes<HTMLCustomElementChildDifferentNameThanClassElement>;
             "custom-element-nested-child": LocalJSX.CustomElementNestedChild & JSXBase.HTMLAttributes<HTMLCustomElementNestedChildElement>;
@@ -1148,16 +1060,11 @@ declare module "@stencil/core" {
             "esm-import": LocalJSX.EsmImport & JSXBase.HTMLAttributes<HTMLEsmImportElement>;
             "factory-jsx": LocalJSX.FactoryJsx & JSXBase.HTMLAttributes<HTMLFactoryJsxElement>;
             "init-css-root": LocalJSX.InitCssRoot & JSXBase.HTMLAttributes<HTMLInitCssRootElement>;
-            "ion-child": LocalJSX.IonChild & JSXBase.HTMLAttributes<HTMLIonChildElement>;
-            "ion-host": LocalJSX.IonHost & JSXBase.HTMLAttributes<HTMLIonHostElement>;
-            "ion-parent": LocalJSX.IonParent & JSXBase.HTMLAttributes<HTMLIonParentElement>;
             "lifecycle-unload-a": LocalJSX.LifecycleUnloadA & JSXBase.HTMLAttributes<HTMLLifecycleUnloadAElement>;
             "lifecycle-unload-b": LocalJSX.LifecycleUnloadB & JSXBase.HTMLAttributes<HTMLLifecycleUnloadBElement>;
             "lifecycle-unload-root": LocalJSX.LifecycleUnloadRoot & JSXBase.HTMLAttributes<HTMLLifecycleUnloadRootElement>;
-            "parent-reflect-nan-attribute": LocalJSX.ParentReflectNanAttribute & JSXBase.HTMLAttributes<HTMLParentReflectNanAttributeElement>;
             "parent-with-reflect-child": LocalJSX.ParentWithReflectChild & JSXBase.HTMLAttributes<HTMLParentWithReflectChildElement>;
             "reflect-to-attr": LocalJSX.ReflectToAttr & JSXBase.HTMLAttributes<HTMLReflectToAttrElement>;
-            "remove-child-patch": LocalJSX.RemoveChildPatch & JSXBase.HTMLAttributes<HTMLRemoveChildPatchElement>;
             "reparent-style-no-vars": LocalJSX.ReparentStyleNoVars & JSXBase.HTMLAttributes<HTMLReparentStyleNoVarsElement>;
             "reparent-style-with-vars": LocalJSX.ReparentStyleWithVars & JSXBase.HTMLAttributes<HTMLReparentStyleWithVarsElement>;
             "shadow-dom-mode": LocalJSX.ShadowDomMode & JSXBase.HTMLAttributes<HTMLShadowDomModeElement>;
