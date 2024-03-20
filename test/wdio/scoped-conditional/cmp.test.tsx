@@ -36,19 +36,12 @@ This div will be slotted in
     // toggle the 'Hello' message, which should insert a new <div/> into the DOM & _not_ remove the slotted content
     await $('#toggleHello').click();
     await $('scoped-conditional').waitForStable();
-    const hostDiv = await $('scoped-conditional div');
-    const outerDivChildren = (await browser.execute((el) => el.children, hostDiv)).map((elementReference) =>
-      $(elementReference),
-    );
 
-    expect(outerDivChildren).toBeElementsArrayOfSize(2);
-
-    await expect(outerDivChildren[0]).toHaveText('Hello');
-    await expect(outerDivChildren[1]).toHaveText(
-      `before slot->
-This div will be slotted in
-<-after slot`,
-    );
+    const host = document.body.querySelector('scoped-conditional');
+    const outerDivChildren = host.querySelector('div').childNodes;
+    expect(outerDivChildren.length).toBe(2);
+    expect(outerDivChildren[0].textContent).toBe('Hello');
+    expect(outerDivChildren[1].textContent).toBe(`before slot->This div will be slotted in<-after slot`);
   });
 
   it('renders the slotted content after toggling the twice message', async () => {

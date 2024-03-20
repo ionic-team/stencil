@@ -16,8 +16,6 @@ export namespace Components {
     }
     interface CmpLabel {
     }
-    interface CmpLabelWithSlotSibling {
-    }
     interface CustomElementChild {
     }
     interface CustomElementChildDifferentNameThanClass {
@@ -50,9 +48,6 @@ export namespace Components {
     }
     interface ParentWithReflectChild {
     }
-    interface ReflectNanAttributeHyphen {
-        "valNum": number;
-    }
     interface ReflectToAttr {
         "bool": boolean;
         "disabled": boolean;
@@ -71,15 +66,6 @@ export namespace Components {
     interface ReparentStyleWithVars {
     }
     interface ScopedSlotChildInsertAdjacent {
-    }
-    interface ShadowDomArray {
-        "values": number[];
-    }
-    interface ShadowDomArrayRoot {
-    }
-    interface ShadowDomBasic {
-    }
-    interface ShadowDomBasicRoot {
     }
     interface ShadowDomMode {
         /**
@@ -252,12 +238,6 @@ declare global {
         prototype: HTMLCmpLabelElement;
         new (): HTMLCmpLabelElement;
     };
-    interface HTMLCmpLabelWithSlotSiblingElement extends Components.CmpLabelWithSlotSibling, HTMLStencilElement {
-    }
-    var HTMLCmpLabelWithSlotSiblingElement: {
-        prototype: HTMLCmpLabelWithSlotSiblingElement;
-        new (): HTMLCmpLabelWithSlotSiblingElement;
-    };
     interface HTMLCustomElementChildElement extends Components.CustomElementChild, HTMLStencilElement {
     }
     var HTMLCustomElementChildElement: {
@@ -359,12 +339,6 @@ declare global {
         prototype: HTMLParentWithReflectChildElement;
         new (): HTMLParentWithReflectChildElement;
     };
-    interface HTMLReflectNanAttributeHyphenElement extends Components.ReflectNanAttributeHyphen, HTMLStencilElement {
-    }
-    var HTMLReflectNanAttributeHyphenElement: {
-        prototype: HTMLReflectNanAttributeHyphenElement;
-        new (): HTMLReflectNanAttributeHyphenElement;
-    };
     interface HTMLReflectToAttrElement extends Components.ReflectToAttr, HTMLStencilElement {
     }
     var HTMLReflectToAttrElement: {
@@ -394,30 +368,6 @@ declare global {
     var HTMLScopedSlotChildInsertAdjacentElement: {
         prototype: HTMLScopedSlotChildInsertAdjacentElement;
         new (): HTMLScopedSlotChildInsertAdjacentElement;
-    };
-    interface HTMLShadowDomArrayElement extends Components.ShadowDomArray, HTMLStencilElement {
-    }
-    var HTMLShadowDomArrayElement: {
-        prototype: HTMLShadowDomArrayElement;
-        new (): HTMLShadowDomArrayElement;
-    };
-    interface HTMLShadowDomArrayRootElement extends Components.ShadowDomArrayRoot, HTMLStencilElement {
-    }
-    var HTMLShadowDomArrayRootElement: {
-        prototype: HTMLShadowDomArrayRootElement;
-        new (): HTMLShadowDomArrayRootElement;
-    };
-    interface HTMLShadowDomBasicElement extends Components.ShadowDomBasic, HTMLStencilElement {
-    }
-    var HTMLShadowDomBasicElement: {
-        prototype: HTMLShadowDomBasicElement;
-        new (): HTMLShadowDomBasicElement;
-    };
-    interface HTMLShadowDomBasicRootElement extends Components.ShadowDomBasicRoot, HTMLStencilElement {
-    }
-    var HTMLShadowDomBasicRootElement: {
-        prototype: HTMLShadowDomBasicRootElement;
-        new (): HTMLShadowDomBasicRootElement;
     };
     interface HTMLShadowDomModeElement extends Components.ShadowDomMode, HTMLStencilElement {
     }
@@ -784,7 +734,6 @@ declare global {
         "child-reflect-nan-attribute": HTMLChildReflectNanAttributeElement;
         "child-with-reflection": HTMLChildWithReflectionElement;
         "cmp-label": HTMLCmpLabelElement;
-        "cmp-label-with-slot-sibling": HTMLCmpLabelWithSlotSiblingElement;
         "custom-element-child": HTMLCustomElementChildElement;
         "custom-element-child-different-name-than-class": HTMLCustomElementChildDifferentNameThanClassElement;
         "custom-element-nested-child": HTMLCustomElementNestedChildElement;
@@ -800,16 +749,11 @@ declare global {
         "lifecycle-unload-root": HTMLLifecycleUnloadRootElement;
         "parent-reflect-nan-attribute": HTMLParentReflectNanAttributeElement;
         "parent-with-reflect-child": HTMLParentWithReflectChildElement;
-        "reflect-nan-attribute-hyphen": HTMLReflectNanAttributeHyphenElement;
         "reflect-to-attr": HTMLReflectToAttrElement;
         "remove-child-patch": HTMLRemoveChildPatchElement;
         "reparent-style-no-vars": HTMLReparentStyleNoVarsElement;
         "reparent-style-with-vars": HTMLReparentStyleWithVarsElement;
         "scoped-slot-child-insert-adjacent": HTMLScopedSlotChildInsertAdjacentElement;
-        "shadow-dom-array": HTMLShadowDomArrayElement;
-        "shadow-dom-array-root": HTMLShadowDomArrayRootElement;
-        "shadow-dom-basic": HTMLShadowDomBasicElement;
-        "shadow-dom-basic-root": HTMLShadowDomBasicRootElement;
         "shadow-dom-mode": HTMLShadowDomModeElement;
         "shadow-dom-mode-root": HTMLShadowDomModeRootElement;
         "shadow-dom-slot-nested": HTMLShadowDomSlotNestedElement;
@@ -883,8 +827,6 @@ declare namespace LocalJSX {
     }
     interface CmpLabel {
     }
-    interface CmpLabelWithSlotSibling {
-    }
     interface CustomElementChild {
     }
     interface CustomElementChildDifferentNameThanClass {
@@ -917,9 +859,6 @@ declare namespace LocalJSX {
     }
     interface ParentWithReflectChild {
     }
-    interface ReflectNanAttributeHyphen {
-        "valNum"?: number;
-    }
     interface ReflectToAttr {
         "bool"?: boolean;
         "disabled"?: boolean;
@@ -938,15 +877,6 @@ declare namespace LocalJSX {
     interface ReparentStyleWithVars {
     }
     interface ScopedSlotChildInsertAdjacent {
-    }
-    interface ShadowDomArray {
-        "values"?: number[];
-    }
-    interface ShadowDomArrayRoot {
-    }
-    interface ShadowDomBasic {
-    }
-    interface ShadowDomBasicRoot {
     }
     interface ShadowDomMode {
         /**
@@ -1094,7 +1024,6 @@ declare namespace LocalJSX {
         "child-reflect-nan-attribute": ChildReflectNanAttribute;
         "child-with-reflection": ChildWithReflection;
         "cmp-label": CmpLabel;
-        "cmp-label-with-slot-sibling": CmpLabelWithSlotSibling;
         "custom-element-child": CustomElementChild;
         "custom-element-child-different-name-than-class": CustomElementChildDifferentNameThanClass;
         "custom-element-nested-child": CustomElementNestedChild;
@@ -1110,16 +1039,11 @@ declare namespace LocalJSX {
         "lifecycle-unload-root": LifecycleUnloadRoot;
         "parent-reflect-nan-attribute": ParentReflectNanAttribute;
         "parent-with-reflect-child": ParentWithReflectChild;
-        "reflect-nan-attribute-hyphen": ReflectNanAttributeHyphen;
         "reflect-to-attr": ReflectToAttr;
         "remove-child-patch": RemoveChildPatch;
         "reparent-style-no-vars": ReparentStyleNoVars;
         "reparent-style-with-vars": ReparentStyleWithVars;
         "scoped-slot-child-insert-adjacent": ScopedSlotChildInsertAdjacent;
-        "shadow-dom-array": ShadowDomArray;
-        "shadow-dom-array-root": ShadowDomArrayRoot;
-        "shadow-dom-basic": ShadowDomBasic;
-        "shadow-dom-basic-root": ShadowDomBasicRoot;
         "shadow-dom-mode": ShadowDomMode;
         "shadow-dom-mode-root": ShadowDomModeRoot;
         "shadow-dom-slot-nested": ShadowDomSlotNested;
@@ -1190,7 +1114,6 @@ declare module "@stencil/core" {
             "child-reflect-nan-attribute": LocalJSX.ChildReflectNanAttribute & JSXBase.HTMLAttributes<HTMLChildReflectNanAttributeElement>;
             "child-with-reflection": LocalJSX.ChildWithReflection & JSXBase.HTMLAttributes<HTMLChildWithReflectionElement>;
             "cmp-label": LocalJSX.CmpLabel & JSXBase.HTMLAttributes<HTMLCmpLabelElement>;
-            "cmp-label-with-slot-sibling": LocalJSX.CmpLabelWithSlotSibling & JSXBase.HTMLAttributes<HTMLCmpLabelWithSlotSiblingElement>;
             "custom-element-child": LocalJSX.CustomElementChild & JSXBase.HTMLAttributes<HTMLCustomElementChildElement>;
             "custom-element-child-different-name-than-class": LocalJSX.CustomElementChildDifferentNameThanClass & JSXBase.HTMLAttributes<HTMLCustomElementChildDifferentNameThanClassElement>;
             "custom-element-nested-child": LocalJSX.CustomElementNestedChild & JSXBase.HTMLAttributes<HTMLCustomElementNestedChildElement>;
@@ -1206,16 +1129,11 @@ declare module "@stencil/core" {
             "lifecycle-unload-root": LocalJSX.LifecycleUnloadRoot & JSXBase.HTMLAttributes<HTMLLifecycleUnloadRootElement>;
             "parent-reflect-nan-attribute": LocalJSX.ParentReflectNanAttribute & JSXBase.HTMLAttributes<HTMLParentReflectNanAttributeElement>;
             "parent-with-reflect-child": LocalJSX.ParentWithReflectChild & JSXBase.HTMLAttributes<HTMLParentWithReflectChildElement>;
-            "reflect-nan-attribute-hyphen": LocalJSX.ReflectNanAttributeHyphen & JSXBase.HTMLAttributes<HTMLReflectNanAttributeHyphenElement>;
             "reflect-to-attr": LocalJSX.ReflectToAttr & JSXBase.HTMLAttributes<HTMLReflectToAttrElement>;
             "remove-child-patch": LocalJSX.RemoveChildPatch & JSXBase.HTMLAttributes<HTMLRemoveChildPatchElement>;
             "reparent-style-no-vars": LocalJSX.ReparentStyleNoVars & JSXBase.HTMLAttributes<HTMLReparentStyleNoVarsElement>;
             "reparent-style-with-vars": LocalJSX.ReparentStyleWithVars & JSXBase.HTMLAttributes<HTMLReparentStyleWithVarsElement>;
             "scoped-slot-child-insert-adjacent": LocalJSX.ScopedSlotChildInsertAdjacent & JSXBase.HTMLAttributes<HTMLScopedSlotChildInsertAdjacentElement>;
-            "shadow-dom-array": LocalJSX.ShadowDomArray & JSXBase.HTMLAttributes<HTMLShadowDomArrayElement>;
-            "shadow-dom-array-root": LocalJSX.ShadowDomArrayRoot & JSXBase.HTMLAttributes<HTMLShadowDomArrayRootElement>;
-            "shadow-dom-basic": LocalJSX.ShadowDomBasic & JSXBase.HTMLAttributes<HTMLShadowDomBasicElement>;
-            "shadow-dom-basic-root": LocalJSX.ShadowDomBasicRoot & JSXBase.HTMLAttributes<HTMLShadowDomBasicRootElement>;
             "shadow-dom-mode": LocalJSX.ShadowDomMode & JSXBase.HTMLAttributes<HTMLShadowDomModeElement>;
             "shadow-dom-mode-root": LocalJSX.ShadowDomModeRoot & JSXBase.HTMLAttributes<HTMLShadowDomModeRootElement>;
             "shadow-dom-slot-nested": LocalJSX.ShadowDomSlotNested & JSXBase.HTMLAttributes<HTMLShadowDomSlotNestedElement>;

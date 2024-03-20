@@ -1,7 +1,7 @@
 module.exports = {
   root: true,
   parser: '@typescript-eslint/parser',
-  plugins: ['@typescript-eslint', 'jsdoc', 'jest', 'simple-import-sort'],
+  plugins: ['@typescript-eslint', 'jsdoc', 'jest', 'simple-import-sort', 'wdio'],
   extends: [
     'plugin:jest/recommended',
     // including prettier here ensures that we don't set any rules which will conflict
@@ -94,6 +94,7 @@ module.exports = {
       files: 'test/wdio/**/*.tsx',
       rules: {
         'jest/expect-expect': 'off',
+        'wdio/await-expect': 'error',
       },
     },
   ],
