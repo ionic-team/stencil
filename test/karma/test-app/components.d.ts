@@ -38,12 +38,6 @@ export namespace Components {
     }
     interface InitCssRoot {
     }
-    interface IonChild {
-    }
-    interface IonHost {
-    }
-    interface IonParent {
-    }
     interface LifecycleUnloadA {
     }
     interface LifecycleUnloadB {
@@ -314,24 +308,6 @@ declare global {
     var HTMLInitCssRootElement: {
         prototype: HTMLInitCssRootElement;
         new (): HTMLInitCssRootElement;
-    };
-    interface HTMLIonChildElement extends Components.IonChild, HTMLStencilElement {
-    }
-    var HTMLIonChildElement: {
-        prototype: HTMLIonChildElement;
-        new (): HTMLIonChildElement;
-    };
-    interface HTMLIonHostElement extends Components.IonHost, HTMLStencilElement {
-    }
-    var HTMLIonHostElement: {
-        prototype: HTMLIonHostElement;
-        new (): HTMLIonHostElement;
-    };
-    interface HTMLIonParentElement extends Components.IonParent, HTMLStencilElement {
-    }
-    var HTMLIonParentElement: {
-        prototype: HTMLIonParentElement;
-        new (): HTMLIonParentElement;
     };
     interface HTMLLifecycleUnloadAElement extends Components.LifecycleUnloadA, HTMLStencilElement {
     }
@@ -768,9 +744,6 @@ declare global {
         "esm-import": HTMLEsmImportElement;
         "factory-jsx": HTMLFactoryJsxElement;
         "init-css-root": HTMLInitCssRootElement;
-        "ion-child": HTMLIonChildElement;
-        "ion-host": HTMLIonHostElement;
-        "ion-parent": HTMLIonParentElement;
         "lifecycle-unload-a": HTMLLifecycleUnloadAElement;
         "lifecycle-unload-b": HTMLLifecycleUnloadBElement;
         "lifecycle-unload-root": HTMLLifecycleUnloadRootElement;
@@ -875,12 +848,6 @@ declare namespace LocalJSX {
     interface FactoryJsx {
     }
     interface InitCssRoot {
-    }
-    interface IonChild {
-    }
-    interface IonHost {
-    }
-    interface IonParent {
     }
     interface LifecycleUnloadA {
     }
@@ -1067,9 +1034,6 @@ declare namespace LocalJSX {
         "esm-import": EsmImport;
         "factory-jsx": FactoryJsx;
         "init-css-root": InitCssRoot;
-        "ion-child": IonChild;
-        "ion-host": IonHost;
-        "ion-parent": IonParent;
         "lifecycle-unload-a": LifecycleUnloadA;
         "lifecycle-unload-b": LifecycleUnloadB;
         "lifecycle-unload-root": LifecycleUnloadRoot;
@@ -1160,9 +1124,6 @@ declare module "@stencil/core" {
             "esm-import": LocalJSX.EsmImport & JSXBase.HTMLAttributes<HTMLEsmImportElement>;
             "factory-jsx": LocalJSX.FactoryJsx & JSXBase.HTMLAttributes<HTMLFactoryJsxElement>;
             "init-css-root": LocalJSX.InitCssRoot & JSXBase.HTMLAttributes<HTMLInitCssRootElement>;
-            "ion-child": LocalJSX.IonChild & JSXBase.HTMLAttributes<HTMLIonChildElement>;
-            "ion-host": LocalJSX.IonHost & JSXBase.HTMLAttributes<HTMLIonHostElement>;
-            "ion-parent": LocalJSX.IonParent & JSXBase.HTMLAttributes<HTMLIonParentElement>;
             "lifecycle-unload-a": LocalJSX.LifecycleUnloadA & JSXBase.HTMLAttributes<HTMLLifecycleUnloadAElement>;
             "lifecycle-unload-b": LocalJSX.LifecycleUnloadB & JSXBase.HTMLAttributes<HTMLLifecycleUnloadBElement>;
             "lifecycle-unload-root": LocalJSX.LifecycleUnloadRoot & JSXBase.HTMLAttributes<HTMLLifecycleUnloadRootElement>;

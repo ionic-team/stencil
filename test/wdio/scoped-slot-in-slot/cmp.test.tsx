@@ -1,24 +1,31 @@
-import { setupDomTests } from '../util';
+import { h } from '@stencil/core';
+import { render } from '@wdio/browser-runner/stencil';
 
 describe('scoped-slot-in-slot', () => {
-  const { setupDom, tearDownDom } = setupDomTests(document);
-
-  let app: HTMLElement | undefined;
   let host: HTMLElement | undefined;
 
   beforeEach(async () => {
-    app = await setupDom('/scoped-slot-in-slot/index.html');
-    host = app.querySelector('ion-host');
+    render({
+      template: () => (
+        <ion-host>
+          <span slot="label">Label text</span>
+          <span slot="suffix">Suffix text</span>
+          <span slot="message">Message text</span>
+        </ion-host>
+      ),
+    });
+    host = document.querySelector('ion-host');
   });
-
-  afterEach(tearDownDom);
 
   it('correctly renders content slotted through multiple levels of nested slots', async () => {
     expect(host).toBeDefined();
 
     // Check the parent content
+    await browser.waitUntil(async () => {
+      const parent = host.querySelector('ion-parent');
+      return parent && parent.firstElementChild;
+    });
     const parent = host.querySelector('ion-parent');
-    expect(parent).toBeDefined();
     expect(parent.firstElementChild.tagName).toBe('LABEL');
 
     // Ensure the label slot content made it through
@@ -36,6 +43,7 @@ describe('scoped-slot-in-slot', () => {
     expect(child).toBeDefined();
 
     // Ensure the suffix slot content made it through
+    await browser.waitUntil(async () => child.firstElementChild.firstElementChild);
     expect(child.firstElementChild.firstElementChild.tagName).toBe('SPAN');
     expect(child.firstElementChild.firstElementChild.textContent).toBe('Suffix text');
   });
