@@ -1,5 +1,6 @@
 import type { ConfigFlags } from '../cli/config-flags';
 import type { PrerenderUrlResults, PrintLine } from '../internal';
+import type { BuildCtx, CompilerCtx } from './stencil-private';
 import type { JsonDocs } from './stencil-public-docs';
 
 export * from './stencil-public-docs';
@@ -2239,8 +2240,15 @@ export interface OutputTargetHydrate extends OutputTargetBase {
 export interface OutputTargetCustom extends OutputTargetBase {
   type: 'custom';
   name: string;
+  /**
+   * Indicate in wich mode the output target has to be executed.
+   * By default if nothing is specified it run for both.
+   * - `"run"`: Executed in dev mode on every change in your code
+   * - `"build"`: Executed only on build
+   */
+  task?: 'run' | 'build';
   validate?: (config: Config, diagnostics: Diagnostic[]) => void;
-  generator: (config: Config, compilerCtx: any, buildCtx: any, docs: any) => Promise<void>;
+  generator: (config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, docs: JsonDocs) => Promise<void>;
   copy?: CopyTask[];
 }
 

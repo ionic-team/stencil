@@ -1,5 +1,4 @@
 import {
-  isOutputTargetCustom,
   isOutputTargetDocsCustom,
   isOutputTargetDocsJson,
   isOutputTargetDocsReadme,
@@ -12,7 +11,6 @@ import { generateDocData } from '../docs/generate-doc-data';
 import { generateJsonDocs } from '../docs/json';
 import { generateReadmeDocs } from '../docs/readme';
 import { generateVscodeDocs } from '../docs/vscode';
-import { outputCustom } from './output-custom';
 
 /**
  * Generate documentation-related output targets
@@ -30,7 +28,6 @@ export const outputDocs = async (
   }
   const docsOutputTargets = config.outputTargets.filter(
     (o) =>
-      isOutputTargetCustom(o) ||
       isOutputTargetDocsReadme(o) ||
       isOutputTargetDocsJson(o) ||
       isOutputTargetDocsCustom(o) ||
@@ -51,6 +48,5 @@ export const outputDocs = async (
     generateJsonDocs(config, compilerCtx, docsData, docsOutputTargets),
     generateVscodeDocs(compilerCtx, docsData, docsOutputTargets),
     generateCustomDocs(config, docsData, docsOutputTargets),
-    outputCustom(config, compilerCtx, buildCtx, docsData, docsOutputTargets),
   ]);
 };
