@@ -54,9 +54,6 @@ export namespace Components {
     }
     interface ParentWithReflectChild {
     }
-    interface ReflectNanAttributeHyphen {
-        "valNum": number;
-    }
     interface ReflectToAttr {
         "bool": boolean;
         "disabled": boolean;
@@ -374,12 +371,6 @@ declare global {
     var HTMLParentWithReflectChildElement: {
         prototype: HTMLParentWithReflectChildElement;
         new (): HTMLParentWithReflectChildElement;
-    };
-    interface HTMLReflectNanAttributeHyphenElement extends Components.ReflectNanAttributeHyphen, HTMLStencilElement {
-    }
-    var HTMLReflectNanAttributeHyphenElement: {
-        prototype: HTMLReflectNanAttributeHyphenElement;
-        new (): HTMLReflectNanAttributeHyphenElement;
     };
     interface HTMLReflectToAttrElement extends Components.ReflectToAttr, HTMLStencilElement {
     }
@@ -818,7 +809,6 @@ declare global {
         "lifecycle-unload-root": HTMLLifecycleUnloadRootElement;
         "parent-reflect-nan-attribute": HTMLParentReflectNanAttributeElement;
         "parent-with-reflect-child": HTMLParentWithReflectChildElement;
-        "reflect-nan-attribute-hyphen": HTMLReflectNanAttributeHyphenElement;
         "reflect-to-attr": HTMLReflectToAttrElement;
         "remove-child-patch": HTMLRemoveChildPatchElement;
         "reparent-style-no-vars": HTMLReparentStyleNoVarsElement;
@@ -938,9 +928,6 @@ declare namespace LocalJSX {
     interface ParentReflectNanAttribute {
     }
     interface ParentWithReflectChild {
-    }
-    interface ReflectNanAttributeHyphen {
-        "valNum"?: number;
     }
     interface ReflectToAttr {
         "bool"?: boolean;
@@ -1134,7 +1121,6 @@ declare namespace LocalJSX {
         "lifecycle-unload-root": LifecycleUnloadRoot;
         "parent-reflect-nan-attribute": ParentReflectNanAttribute;
         "parent-with-reflect-child": ParentWithReflectChild;
-        "reflect-nan-attribute-hyphen": ReflectNanAttributeHyphen;
         "reflect-to-attr": ReflectToAttr;
         "remove-child-patch": RemoveChildPatch;
         "reparent-style-no-vars": ReparentStyleNoVars;
@@ -1232,7 +1218,6 @@ declare module "@stencil/core" {
             "lifecycle-unload-root": LocalJSX.LifecycleUnloadRoot & JSXBase.HTMLAttributes<HTMLLifecycleUnloadRootElement>;
             "parent-reflect-nan-attribute": LocalJSX.ParentReflectNanAttribute & JSXBase.HTMLAttributes<HTMLParentReflectNanAttributeElement>;
             "parent-with-reflect-child": LocalJSX.ParentWithReflectChild & JSXBase.HTMLAttributes<HTMLParentWithReflectChildElement>;
-            "reflect-nan-attribute-hyphen": LocalJSX.ReflectNanAttributeHyphen & JSXBase.HTMLAttributes<HTMLReflectNanAttributeHyphenElement>;
             "reflect-to-attr": LocalJSX.ReflectToAttr & JSXBase.HTMLAttributes<HTMLReflectToAttrElement>;
             "remove-child-patch": LocalJSX.RemoveChildPatch & JSXBase.HTMLAttributes<HTMLRemoveChildPatchElement>;
             "reparent-style-no-vars": LocalJSX.ReparentStyleNoVars & JSXBase.HTMLAttributes<HTMLReparentStyleNoVarsElement>;
