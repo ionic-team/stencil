@@ -5,11 +5,10 @@ import { MockDocumentFragment } from './document-fragment';
 import { MockDocumentTypeNode } from './document-type-node';
 import { createElement, createElementNS, MockBaseElement } from './element';
 import { resetEventListeners } from './event';
-import { MockElement, MockHTMLElement, MockTextNode, resetElement } from './node';
+import { MockElement, MockHTMLElement, MockNode, MockTextNode, resetElement } from './node';
 import { parseHtmlToFragment } from './parse-html';
 import { parseDocumentUtil } from './parse-util';
 import { MockWindow } from './window';
-import { MockNode } from './node';
 
 export class MockDocument extends MockNode {
   defaultView: any;

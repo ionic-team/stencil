@@ -49,6 +49,10 @@ export class MockNode {
     addEventListener(this, type, handler);
   }
 
+  removeEventListener(type: string, handler: any) {
+    removeEventListener(this, type, handler);
+  }
+
   dispatchEvent(ev: MockEvent) {
     return dispatchEvent(this, ev);
   }
@@ -649,10 +653,6 @@ Testing components with ElementInternals is fully supported in e2e tests.`,
         attributeChanged(this, attrName, attr.value, null);
       }
     }
-  }
-
-  removeEventListener(type: string, handler: any) {
-    removeEventListener(this, type, handler);
   }
 
   setAttribute(attrName: string, value: any) {
