@@ -1,16 +1,17 @@
-import { setupDomTests, waitForChanges } from '../util';
+import { h } from '@stencil/core';
+import { render } from '@wdio/browser-runner/stencil';
 
 describe('slot-basic', function () {
-  const { setupDom, tearDownDom } = setupDomTests(document);
-  let app: HTMLElement;
-
-  beforeEach(async () => {
-    app = await setupDom('/slot-basic/index.html');
+  beforeEach(() => {
+    render({
+      template: () => <slot-basic-root></slot-basic-root>,
+    });
   });
-  afterEach(tearDownDom);
 
   it('button click rerenders', async () => {
-    function testValues(inc: number) {
+    const app = document.body;
+    async function testValues(inc: number) {
+      await $('slot-basic-root').waitForStable();
       let result = app.querySelector('.inc');
       expect(result.textContent).toEqual('Rendered: ' + inc);
 
@@ -91,15 +92,12 @@ describe('slot-basic', function () {
       expect(result.textContent).toEqual('B');
     }
 
-    testValues(1);
+    await testValues(1);
 
-    let button = app.querySelector('button');
-    button.click();
-    await waitForChanges();
-    testValues(2);
+    await $('button').click();
+    await testValues(2);
 
-    button.click();
-    await waitForChanges();
-    testValues(3);
+    await $('button').click();
+    await testValues(3);
   });
 });
