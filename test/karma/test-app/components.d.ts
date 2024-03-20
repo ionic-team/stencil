@@ -8,9 +8,6 @@ import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
     interface BadSharedJsx {
     }
-    interface ChildReflectNanAttribute {
-        "val": number;
-    }
     interface ChildWithReflection {
         "val": number | any;
     }
@@ -43,8 +40,6 @@ export namespace Components {
     interface LifecycleUnloadB {
     }
     interface LifecycleUnloadRoot {
-    }
-    interface ParentReflectNanAttribute {
     }
     interface ParentWithReflectChild {
     }
@@ -218,12 +213,6 @@ declare global {
         prototype: HTMLBadSharedJsxElement;
         new (): HTMLBadSharedJsxElement;
     };
-    interface HTMLChildReflectNanAttributeElement extends Components.ChildReflectNanAttribute, HTMLStencilElement {
-    }
-    var HTMLChildReflectNanAttributeElement: {
-        prototype: HTMLChildReflectNanAttributeElement;
-        new (): HTMLChildReflectNanAttributeElement;
-    };
     interface HTMLChildWithReflectionElement extends Components.ChildWithReflection, HTMLStencilElement {
     }
     var HTMLChildWithReflectionElement: {
@@ -324,12 +313,6 @@ declare global {
     var HTMLLifecycleUnloadRootElement: {
         prototype: HTMLLifecycleUnloadRootElement;
         new (): HTMLLifecycleUnloadRootElement;
-    };
-    interface HTMLParentReflectNanAttributeElement extends Components.ParentReflectNanAttribute, HTMLStencilElement {
-    }
-    var HTMLParentReflectNanAttributeElement: {
-        prototype: HTMLParentReflectNanAttributeElement;
-        new (): HTMLParentReflectNanAttributeElement;
     };
     interface HTMLParentWithReflectChildElement extends Components.ParentWithReflectChild, HTMLStencilElement {
     }
@@ -723,7 +706,6 @@ declare global {
     };
     interface HTMLElementTagNameMap {
         "bad-shared-jsx": HTMLBadSharedJsxElement;
-        "child-reflect-nan-attribute": HTMLChildReflectNanAttributeElement;
         "child-with-reflection": HTMLChildWithReflectionElement;
         "cmp-label": HTMLCmpLabelElement;
         "custom-element-child": HTMLCustomElementChildElement;
@@ -739,7 +721,6 @@ declare global {
         "lifecycle-unload-a": HTMLLifecycleUnloadAElement;
         "lifecycle-unload-b": HTMLLifecycleUnloadBElement;
         "lifecycle-unload-root": HTMLLifecycleUnloadRootElement;
-        "parent-reflect-nan-attribute": HTMLParentReflectNanAttributeElement;
         "parent-with-reflect-child": HTMLParentWithReflectChildElement;
         "reflect-to-attr": HTMLReflectToAttrElement;
         "reparent-style-no-vars": HTMLReparentStyleNoVarsElement;
@@ -810,9 +791,6 @@ declare global {
 declare namespace LocalJSX {
     interface BadSharedJsx {
     }
-    interface ChildReflectNanAttribute {
-        "val"?: number;
-    }
     interface ChildWithReflection {
         "val"?: number | any;
     }
@@ -845,8 +823,6 @@ declare namespace LocalJSX {
     interface LifecycleUnloadB {
     }
     interface LifecycleUnloadRoot {
-    }
-    interface ParentReflectNanAttribute {
     }
     interface ParentWithReflectChild {
     }
@@ -1010,7 +986,6 @@ declare namespace LocalJSX {
     }
     interface IntrinsicElements {
         "bad-shared-jsx": BadSharedJsx;
-        "child-reflect-nan-attribute": ChildReflectNanAttribute;
         "child-with-reflection": ChildWithReflection;
         "cmp-label": CmpLabel;
         "custom-element-child": CustomElementChild;
@@ -1026,7 +1001,6 @@ declare namespace LocalJSX {
         "lifecycle-unload-a": LifecycleUnloadA;
         "lifecycle-unload-b": LifecycleUnloadB;
         "lifecycle-unload-root": LifecycleUnloadRoot;
-        "parent-reflect-nan-attribute": ParentReflectNanAttribute;
         "parent-with-reflect-child": ParentWithReflectChild;
         "reflect-to-attr": ReflectToAttr;
         "reparent-style-no-vars": ReparentStyleNoVars;
@@ -1099,7 +1073,6 @@ declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
             "bad-shared-jsx": LocalJSX.BadSharedJsx & JSXBase.HTMLAttributes<HTMLBadSharedJsxElement>;
-            "child-reflect-nan-attribute": LocalJSX.ChildReflectNanAttribute & JSXBase.HTMLAttributes<HTMLChildReflectNanAttributeElement>;
             "child-with-reflection": LocalJSX.ChildWithReflection & JSXBase.HTMLAttributes<HTMLChildWithReflectionElement>;
             "cmp-label": LocalJSX.CmpLabel & JSXBase.HTMLAttributes<HTMLCmpLabelElement>;
             "custom-element-child": LocalJSX.CustomElementChild & JSXBase.HTMLAttributes<HTMLCustomElementChildElement>;
@@ -1115,7 +1088,6 @@ declare module "@stencil/core" {
             "lifecycle-unload-a": LocalJSX.LifecycleUnloadA & JSXBase.HTMLAttributes<HTMLLifecycleUnloadAElement>;
             "lifecycle-unload-b": LocalJSX.LifecycleUnloadB & JSXBase.HTMLAttributes<HTMLLifecycleUnloadBElement>;
             "lifecycle-unload-root": LocalJSX.LifecycleUnloadRoot & JSXBase.HTMLAttributes<HTMLLifecycleUnloadRootElement>;
-            "parent-reflect-nan-attribute": LocalJSX.ParentReflectNanAttribute & JSXBase.HTMLAttributes<HTMLParentReflectNanAttributeElement>;
             "parent-with-reflect-child": LocalJSX.ParentWithReflectChild & JSXBase.HTMLAttributes<HTMLParentWithReflectChildElement>;
             "reflect-to-attr": LocalJSX.ReflectToAttr & JSXBase.HTMLAttributes<HTMLReflectToAttrElement>;
             "reparent-style-no-vars": LocalJSX.ReparentStyleNoVars & JSXBase.HTMLAttributes<HTMLReparentStyleNoVarsElement>;
