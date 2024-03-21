@@ -4,7 +4,7 @@ import { render } from '@wdio/browser-runner/stencil';
 const CSS = `main {
   color: blue;
   font-weight: bold;
-}`
+}`;
 
 describe('shadow-dom-slot-nested', () => {
   beforeEach(async () => {
@@ -36,7 +36,7 @@ describe('shadow-dom-slot-nested', () => {
       }
     `);
 
-    const cmp = $('shadow-dom-slot-nested-root')
+    const cmp = $('shadow-dom-slot-nested-root');
     const section = cmp.shadow$('section');
     await expect(section.getCSSProperty('color')).toMatchInlineSnapshot(`
       {
@@ -49,7 +49,7 @@ describe('shadow-dom-slot-nested', () => {
         "property": "color",
         "value": "rgba(0,128,0,1)",
       }
-    `)
+    `);
 
     const article = cmp.shadow$('article');
     await expect(article.getCSSProperty('color')).toMatchInlineSnapshot(`
@@ -65,7 +65,7 @@ describe('shadow-dom-slot-nested', () => {
       }
     `);
 
-    const children = article.$$('*')
+    const children = article.$$('*');
     await expect(children).toBeElementsArrayOfSize(3);
 
     const testShadowNested = async function (i: number) {
@@ -84,7 +84,7 @@ describe('shadow-dom-slot-nested', () => {
           "property": "color",
           "value": "rgba(255,0,0,1)",
         }
-      `)
+      `);
 
       const footer = nestedElm.shadow$('footer');
       const footerSlot = footer.$('slot');
@@ -104,7 +104,7 @@ describe('shadow-dom-slot-nested', () => {
           "property": "color",
           "value": "rgba(0,128,0,1)",
         }
-      `)
+      `);
     };
 
     await testShadowNested(0);
