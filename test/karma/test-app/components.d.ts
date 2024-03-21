@@ -31,8 +31,6 @@ export namespace Components {
     }
     interface ShadowDomSlotNestedRoot {
     }
-    interface SlotArrayTop {
-    }
     interface SlotChildrenRoot {
     }
     interface SlotConditionalRendering {
@@ -186,12 +184,6 @@ declare global {
     var HTMLShadowDomSlotNestedRootElement: {
         prototype: HTMLShadowDomSlotNestedRootElement;
         new (): HTMLShadowDomSlotNestedRootElement;
-    };
-    interface HTMLSlotArrayTopElement extends Components.SlotArrayTop, HTMLStencilElement {
-    }
-    var HTMLSlotArrayTopElement: {
-        prototype: HTMLSlotArrayTopElement;
-        new (): HTMLSlotArrayTopElement;
     };
     interface HTMLSlotChildrenRootElement extends Components.SlotChildrenRoot, HTMLStencilElement {
     }
@@ -416,7 +408,6 @@ declare global {
         "reparent-style-with-vars": HTMLReparentStyleWithVarsElement;
         "shadow-dom-slot-nested": HTMLShadowDomSlotNestedElement;
         "shadow-dom-slot-nested-root": HTMLShadowDomSlotNestedRootElement;
-        "slot-array-top": HTMLSlotArrayTopElement;
         "slot-children-root": HTMLSlotChildrenRootElement;
         "slot-conditional-rendering": HTMLSlotConditionalRenderingElement;
         "slot-dynamic-scoped-list": HTMLSlotDynamicScopedListElement;
@@ -479,8 +470,6 @@ declare namespace LocalJSX {
         "i"?: number;
     }
     interface ShadowDomSlotNestedRoot {
-    }
-    interface SlotArrayTop {
     }
     interface SlotChildrenRoot {
     }
@@ -575,7 +564,6 @@ declare namespace LocalJSX {
         "reparent-style-with-vars": ReparentStyleWithVars;
         "shadow-dom-slot-nested": ShadowDomSlotNested;
         "shadow-dom-slot-nested-root": ShadowDomSlotNestedRoot;
-        "slot-array-top": SlotArrayTop;
         "slot-children-root": SlotChildrenRoot;
         "slot-conditional-rendering": SlotConditionalRendering;
         "slot-dynamic-scoped-list": SlotDynamicScopedList;
@@ -629,7 +617,6 @@ declare module "@stencil/core" {
             "reparent-style-with-vars": LocalJSX.ReparentStyleWithVars & JSXBase.HTMLAttributes<HTMLReparentStyleWithVarsElement>;
             "shadow-dom-slot-nested": LocalJSX.ShadowDomSlotNested & JSXBase.HTMLAttributes<HTMLShadowDomSlotNestedElement>;
             "shadow-dom-slot-nested-root": LocalJSX.ShadowDomSlotNestedRoot & JSXBase.HTMLAttributes<HTMLShadowDomSlotNestedRootElement>;
-            "slot-array-top": LocalJSX.SlotArrayTop & JSXBase.HTMLAttributes<HTMLSlotArrayTopElement>;
             "slot-children-root": LocalJSX.SlotChildrenRoot & JSXBase.HTMLAttributes<HTMLSlotChildrenRootElement>;
             "slot-conditional-rendering": LocalJSX.SlotConditionalRendering & JSXBase.HTMLAttributes<HTMLSlotConditionalRenderingElement>;
             "slot-dynamic-scoped-list": LocalJSX.SlotDynamicScopedList & JSXBase.HTMLAttributes<HTMLSlotDynamicScopedListElement>;
