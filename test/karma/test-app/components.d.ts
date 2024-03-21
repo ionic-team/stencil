@@ -6,8 +6,6 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
-    interface BadSharedJsx {
-    }
     interface CustomElementChild {
     }
     interface CustomElementChildDifferentNameThanClass {
@@ -21,8 +19,6 @@ export namespace Components {
     interface CustomElementsDelegatesFocus {
     }
     interface CustomElementsNoDelegatesFocus {
-    }
-    interface FactoryJsx {
     }
     interface InitCssRoot {
     }
@@ -179,12 +175,6 @@ export namespace Components {
     }
 }
 declare global {
-    interface HTMLBadSharedJsxElement extends Components.BadSharedJsx, HTMLStencilElement {
-    }
-    var HTMLBadSharedJsxElement: {
-        prototype: HTMLBadSharedJsxElement;
-        new (): HTMLBadSharedJsxElement;
-    };
     interface HTMLCustomElementChildElement extends Components.CustomElementChild, HTMLStencilElement {
     }
     var HTMLCustomElementChildElement: {
@@ -226,12 +216,6 @@ declare global {
     var HTMLCustomElementsNoDelegatesFocusElement: {
         prototype: HTMLCustomElementsNoDelegatesFocusElement;
         new (): HTMLCustomElementsNoDelegatesFocusElement;
-    };
-    interface HTMLFactoryJsxElement extends Components.FactoryJsx, HTMLStencilElement {
-    }
-    var HTMLFactoryJsxElement: {
-        prototype: HTMLFactoryJsxElement;
-        new (): HTMLFactoryJsxElement;
     };
     interface HTMLInitCssRootElement extends Components.InitCssRoot, HTMLStencilElement {
     }
@@ -630,7 +614,6 @@ declare global {
         new (): HTMLWatchNativeAttributesElement;
     };
     interface HTMLElementTagNameMap {
-        "bad-shared-jsx": HTMLBadSharedJsxElement;
         "custom-element-child": HTMLCustomElementChildElement;
         "custom-element-child-different-name-than-class": HTMLCustomElementChildDifferentNameThanClassElement;
         "custom-element-nested-child": HTMLCustomElementNestedChildElement;
@@ -638,7 +621,6 @@ declare global {
         "custom-element-root-different-name-than-class": HTMLCustomElementRootDifferentNameThanClassElement;
         "custom-elements-delegates-focus": HTMLCustomElementsDelegatesFocusElement;
         "custom-elements-no-delegates-focus": HTMLCustomElementsNoDelegatesFocusElement;
-        "factory-jsx": HTMLFactoryJsxElement;
         "init-css-root": HTMLInitCssRootElement;
         "lifecycle-unload-a": HTMLLifecycleUnloadAElement;
         "lifecycle-unload-b": HTMLLifecycleUnloadBElement;
@@ -708,8 +690,6 @@ declare global {
     }
 }
 declare namespace LocalJSX {
-    interface BadSharedJsx {
-    }
     interface CustomElementChild {
     }
     interface CustomElementChildDifferentNameThanClass {
@@ -723,8 +703,6 @@ declare namespace LocalJSX {
     interface CustomElementsDelegatesFocus {
     }
     interface CustomElementsNoDelegatesFocus {
-    }
-    interface FactoryJsx {
     }
     interface InitCssRoot {
     }
@@ -880,7 +858,6 @@ declare namespace LocalJSX {
     interface WatchNativeAttributes {
     }
     interface IntrinsicElements {
-        "bad-shared-jsx": BadSharedJsx;
         "custom-element-child": CustomElementChild;
         "custom-element-child-different-name-than-class": CustomElementChildDifferentNameThanClass;
         "custom-element-nested-child": CustomElementNestedChild;
@@ -888,7 +865,6 @@ declare namespace LocalJSX {
         "custom-element-root-different-name-than-class": CustomElementRootDifferentNameThanClass;
         "custom-elements-delegates-focus": CustomElementsDelegatesFocus;
         "custom-elements-no-delegates-focus": CustomElementsNoDelegatesFocus;
-        "factory-jsx": FactoryJsx;
         "init-css-root": InitCssRoot;
         "lifecycle-unload-a": LifecycleUnloadA;
         "lifecycle-unload-b": LifecycleUnloadB;
@@ -961,7 +937,6 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
-            "bad-shared-jsx": LocalJSX.BadSharedJsx & JSXBase.HTMLAttributes<HTMLBadSharedJsxElement>;
             "custom-element-child": LocalJSX.CustomElementChild & JSXBase.HTMLAttributes<HTMLCustomElementChildElement>;
             "custom-element-child-different-name-than-class": LocalJSX.CustomElementChildDifferentNameThanClass & JSXBase.HTMLAttributes<HTMLCustomElementChildDifferentNameThanClassElement>;
             "custom-element-nested-child": LocalJSX.CustomElementNestedChild & JSXBase.HTMLAttributes<HTMLCustomElementNestedChildElement>;
@@ -969,7 +944,6 @@ declare module "@stencil/core" {
             "custom-element-root-different-name-than-class": LocalJSX.CustomElementRootDifferentNameThanClass & JSXBase.HTMLAttributes<HTMLCustomElementRootDifferentNameThanClassElement>;
             "custom-elements-delegates-focus": LocalJSX.CustomElementsDelegatesFocus & JSXBase.HTMLAttributes<HTMLCustomElementsDelegatesFocusElement>;
             "custom-elements-no-delegates-focus": LocalJSX.CustomElementsNoDelegatesFocus & JSXBase.HTMLAttributes<HTMLCustomElementsNoDelegatesFocusElement>;
-            "factory-jsx": LocalJSX.FactoryJsx & JSXBase.HTMLAttributes<HTMLFactoryJsxElement>;
             "init-css-root": LocalJSX.InitCssRoot & JSXBase.HTMLAttributes<HTMLInitCssRootElement>;
             "lifecycle-unload-a": LocalJSX.LifecycleUnloadA & JSXBase.HTMLAttributes<HTMLLifecycleUnloadAElement>;
             "lifecycle-unload-b": LocalJSX.LifecycleUnloadB & JSXBase.HTMLAttributes<HTMLLifecycleUnloadBElement>;
