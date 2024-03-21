@@ -53,12 +53,6 @@ export namespace Components {
     interface SlotDynamicShadowList {
         "items": Array<string>;
     }
-    interface SlotHideContentOpen {
-        "enabled": boolean;
-    }
-    interface SlotHideContentScoped {
-        "enabled": boolean;
-    }
     interface SlotHtml {
         "inc": number;
     }
@@ -252,18 +246,6 @@ declare global {
     var HTMLSlotDynamicShadowListElement: {
         prototype: HTMLSlotDynamicShadowListElement;
         new (): HTMLSlotDynamicShadowListElement;
-    };
-    interface HTMLSlotHideContentOpenElement extends Components.SlotHideContentOpen, HTMLStencilElement {
-    }
-    var HTMLSlotHideContentOpenElement: {
-        prototype: HTMLSlotHideContentOpenElement;
-        new (): HTMLSlotHideContentOpenElement;
-    };
-    interface HTMLSlotHideContentScopedElement extends Components.SlotHideContentScoped, HTMLStencilElement {
-    }
-    var HTMLSlotHideContentScopedElement: {
-        prototype: HTMLSlotHideContentScopedElement;
-        new (): HTMLSlotHideContentScopedElement;
     };
     interface HTMLSlotHtmlElement extends Components.SlotHtml, HTMLStencilElement {
     }
@@ -478,8 +460,6 @@ declare global {
         "slot-conditional-rendering": HTMLSlotConditionalRenderingElement;
         "slot-dynamic-scoped-list": HTMLSlotDynamicScopedListElement;
         "slot-dynamic-shadow-list": HTMLSlotDynamicShadowListElement;
-        "slot-hide-content-open": HTMLSlotHideContentOpenElement;
-        "slot-hide-content-scoped": HTMLSlotHideContentScopedElement;
         "slot-html": HTMLSlotHtmlElement;
         "slot-light-dom-content": HTMLSlotLightDomContentElement;
         "slot-light-dom-root": HTMLSlotLightDomRootElement;
@@ -561,12 +541,6 @@ declare namespace LocalJSX {
     }
     interface SlotDynamicShadowList {
         "items"?: Array<string>;
-    }
-    interface SlotHideContentOpen {
-        "enabled"?: boolean;
-    }
-    interface SlotHideContentScoped {
-        "enabled"?: boolean;
     }
     interface SlotHtml {
         "inc"?: number;
@@ -661,8 +635,6 @@ declare namespace LocalJSX {
         "slot-conditional-rendering": SlotConditionalRendering;
         "slot-dynamic-scoped-list": SlotDynamicScopedList;
         "slot-dynamic-shadow-list": SlotDynamicShadowList;
-        "slot-hide-content-open": SlotHideContentOpen;
-        "slot-hide-content-scoped": SlotHideContentScoped;
         "slot-html": SlotHtml;
         "slot-light-dom-content": SlotLightDomContent;
         "slot-light-dom-root": SlotLightDomRoot;
@@ -721,8 +693,6 @@ declare module "@stencil/core" {
             "slot-conditional-rendering": LocalJSX.SlotConditionalRendering & JSXBase.HTMLAttributes<HTMLSlotConditionalRenderingElement>;
             "slot-dynamic-scoped-list": LocalJSX.SlotDynamicScopedList & JSXBase.HTMLAttributes<HTMLSlotDynamicScopedListElement>;
             "slot-dynamic-shadow-list": LocalJSX.SlotDynamicShadowList & JSXBase.HTMLAttributes<HTMLSlotDynamicShadowListElement>;
-            "slot-hide-content-open": LocalJSX.SlotHideContentOpen & JSXBase.HTMLAttributes<HTMLSlotHideContentOpenElement>;
-            "slot-hide-content-scoped": LocalJSX.SlotHideContentScoped & JSXBase.HTMLAttributes<HTMLSlotHideContentScopedElement>;
             "slot-html": LocalJSX.SlotHtml & JSXBase.HTMLAttributes<HTMLSlotHtmlElement>;
             "slot-light-dom-content": LocalJSX.SlotLightDomContent & JSXBase.HTMLAttributes<HTMLSlotLightDomContentElement>;
             "slot-light-dom-root": LocalJSX.SlotLightDomRoot & JSXBase.HTMLAttributes<HTMLSlotLightDomRootElement>;
