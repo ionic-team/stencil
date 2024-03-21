@@ -69,12 +69,6 @@ export namespace Components {
     }
     interface SlotConditionalRendering {
     }
-    interface SlotDynamicNameChangeScoped {
-        "slotName": string;
-    }
-    interface SlotDynamicNameChangeShadow {
-        "slotName": string;
-    }
     interface SlotDynamicScopedList {
         "items": Array<string>;
     }
@@ -352,18 +346,6 @@ declare global {
     var HTMLSlotConditionalRenderingElement: {
         prototype: HTMLSlotConditionalRenderingElement;
         new (): HTMLSlotConditionalRenderingElement;
-    };
-    interface HTMLSlotDynamicNameChangeScopedElement extends Components.SlotDynamicNameChangeScoped, HTMLStencilElement {
-    }
-    var HTMLSlotDynamicNameChangeScopedElement: {
-        prototype: HTMLSlotDynamicNameChangeScopedElement;
-        new (): HTMLSlotDynamicNameChangeScopedElement;
-    };
-    interface HTMLSlotDynamicNameChangeShadowElement extends Components.SlotDynamicNameChangeShadow, HTMLStencilElement {
-    }
-    var HTMLSlotDynamicNameChangeShadowElement: {
-        prototype: HTMLSlotDynamicNameChangeShadowElement;
-        new (): HTMLSlotDynamicNameChangeShadowElement;
     };
     interface HTMLSlotDynamicScopedListElement extends Components.SlotDynamicScopedList, HTMLStencilElement {
     }
@@ -659,8 +641,6 @@ declare global {
         "slot-basic-root": HTMLSlotBasicRootElement;
         "slot-children-root": HTMLSlotChildrenRootElement;
         "slot-conditional-rendering": HTMLSlotConditionalRenderingElement;
-        "slot-dynamic-name-change-scoped": HTMLSlotDynamicNameChangeScopedElement;
-        "slot-dynamic-name-change-shadow": HTMLSlotDynamicNameChangeShadowElement;
         "slot-dynamic-scoped-list": HTMLSlotDynamicScopedListElement;
         "slot-dynamic-shadow-list": HTMLSlotDynamicShadowListElement;
         "slot-dynamic-wrapper": HTMLSlotDynamicWrapperElement;
@@ -770,12 +750,6 @@ declare namespace LocalJSX {
     interface SlotChildrenRoot {
     }
     interface SlotConditionalRendering {
-    }
-    interface SlotDynamicNameChangeScoped {
-        "slotName"?: string;
-    }
-    interface SlotDynamicNameChangeShadow {
-        "slotName"?: string;
     }
     interface SlotDynamicScopedList {
         "items"?: Array<string>;
@@ -909,8 +883,6 @@ declare namespace LocalJSX {
         "slot-basic-root": SlotBasicRoot;
         "slot-children-root": SlotChildrenRoot;
         "slot-conditional-rendering": SlotConditionalRendering;
-        "slot-dynamic-name-change-scoped": SlotDynamicNameChangeScoped;
-        "slot-dynamic-name-change-shadow": SlotDynamicNameChangeShadow;
         "slot-dynamic-scoped-list": SlotDynamicScopedList;
         "slot-dynamic-shadow-list": SlotDynamicShadowList;
         "slot-dynamic-wrapper": SlotDynamicWrapper;
@@ -990,8 +962,6 @@ declare module "@stencil/core" {
             "slot-basic-root": LocalJSX.SlotBasicRoot & JSXBase.HTMLAttributes<HTMLSlotBasicRootElement>;
             "slot-children-root": LocalJSX.SlotChildrenRoot & JSXBase.HTMLAttributes<HTMLSlotChildrenRootElement>;
             "slot-conditional-rendering": LocalJSX.SlotConditionalRendering & JSXBase.HTMLAttributes<HTMLSlotConditionalRenderingElement>;
-            "slot-dynamic-name-change-scoped": LocalJSX.SlotDynamicNameChangeScoped & JSXBase.HTMLAttributes<HTMLSlotDynamicNameChangeScopedElement>;
-            "slot-dynamic-name-change-shadow": LocalJSX.SlotDynamicNameChangeShadow & JSXBase.HTMLAttributes<HTMLSlotDynamicNameChangeShadowElement>;
             "slot-dynamic-scoped-list": LocalJSX.SlotDynamicScopedList & JSXBase.HTMLAttributes<HTMLSlotDynamicScopedListElement>;
             "slot-dynamic-shadow-list": LocalJSX.SlotDynamicShadowList & JSXBase.HTMLAttributes<HTMLSlotDynamicShadowListElement>;
             "slot-dynamic-wrapper": LocalJSX.SlotDynamicWrapper & JSXBase.HTMLAttributes<HTMLSlotDynamicWrapperElement>;

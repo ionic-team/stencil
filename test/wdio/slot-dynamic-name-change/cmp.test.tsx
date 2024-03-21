@@ -1,40 +1,54 @@
-import { setupDomTests, waitForChanges } from '../util';
+import { Fragment, h } from '@stencil/core';
+import { render } from '@wdio/browser-runner/stencil';
 
 /**
  * Tests the case where a `slot` element in a component has its
  * `name` attribute changed dynamically via a property.
  */
 describe('slot dynamic name change', () => {
-  const { setupDom, tearDownDom } = setupDomTests(document);
-  let app: HTMLElement;
-
   beforeEach(async () => {
-    app = await setupDom('/slot-dynamic-name-change/index.html');
+    render({
+      template: () => (
+        <>
+          <slot-dynamic-name-change-shadow>
+            <p slot="greeting">Hello</p>
+            <p slot="farewell">Goodbye</p>
+          </slot-dynamic-name-change-shadow>
+          <slot-dynamic-name-change-scoped>
+            <p slot="greeting">Hello</p>
+            <p slot="farewell">Goodbye</p>
+          </slot-dynamic-name-change-scoped>
+
+          <button>Toggle slot name</button>
+        </>
+      ),
+    });
+
+    document.querySelector('button').addEventListener('click', () => {
+      document.querySelector('slot-dynamic-name-change-shadow').setAttribute('slot-name', 'farewell');
+      document.querySelector('slot-dynamic-name-change-scoped').setAttribute('slot-name', 'farewell');
+    });
   });
 
-  afterEach(tearDownDom);
-
   it('should change the slot name for a shadow component', async () => {
-    const cmp = app.querySelector('slot-dynamic-name-change-shadow');
-    expect(cmp.innerText).toBe('Hello');
-    expect(cmp.shadowRoot.querySelector('slot').getAttribute('name')).toBe('greeting');
+    const cmp = $('slot-dynamic-name-change-shadow');
+    await expect(cmp).toHaveText('Hello');
+    await expect(cmp.shadow$('slot')).toHaveAttribute('name', 'greeting');
 
-    app.querySelector('button').click();
-    await waitForChanges();
+    await $('button').click();
 
-    expect(cmp.innerText).toBe('Goodbye');
-    expect(cmp.shadowRoot.querySelector('slot').getAttribute('name')).toBe('farewell');
+    await expect(cmp).toHaveText('Goodbye');
+    await expect(cmp.shadow$('slot')).toHaveAttribute('name', 'farewell');
   });
 
   it('should change the slot name for a scoped component', async () => {
-    const cmp = app.querySelector('slot-dynamic-name-change-scoped');
-    expect(cmp.innerText).toBe('Hello');
-    expect(cmp.querySelector('p:not([hidden])').getAttribute('slot')).toBe('greeting');
+    const cmp = $('slot-dynamic-name-change-scoped');
+    await expect(cmp).toHaveText('Hello');
+    await expect(cmp.shadow$('p:not([hidden])')).toHaveAttribute('slot', 'greeting');
 
-    app.querySelector('button').click();
-    await waitForChanges();
+    await $('button').click();
 
-    expect(cmp.innerText).toBe('Goodbye');
-    expect(cmp.querySelector('p:not([hidden])').getAttribute('slot')).toBe('farewell');
+    await expect(cmp).toHaveText('Goodbye');
+    await expect(cmp.shadow$('p:not([hidden])')).toHaveAttribute('slot', 'farewell');
   });
 });
