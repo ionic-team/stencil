@@ -11,6 +11,6 @@ describe('reflect-nan-attribute', () => {
   });
 
   it('renders the component the correct number of times', async () => {
-    await expect($('reflect-nan-attribute').$('>>>div')).toHaveText('reflect-nan-attribute Render Count: 1');
+    await expect($('reflect-nan-attribute')).toHaveText('reflect-nan-attribute Render Count: 1');
   });
 });

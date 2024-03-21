@@ -33,15 +33,15 @@ describe('scoped-slot-text', () => {
   it('leaves the structure of the label intact', async () => {
     const cmpLabel: HTMLCmpLabelElement = await getCmpLabel();
     cmpLabel.textContent = 'New text for label structure testing';
-    const label: HTMLLabelElement = cmpLabel.querySelector('label');
+    const label: HTMLLabelElement = await browser.waitUntil(async () => cmpLabel.querySelector('label'));
 
     /**
      * Expect two child nodes in the label
      * - a content reference text node
      * - the slotted text node
      */
-    expect(label).toBeDefined();
-    await browser.waitUntil(async () => label.childNodes.length === 2);
+    expect(label).toBeTruthy();
+    expect(label.childNodes.length).toBe(2);
     expect((label.childNodes[0] as any)['s-cr'] as string).toBeDefined();
     expect(label.childNodes[1].textContent).toBe('New text for label structure testing');
   });

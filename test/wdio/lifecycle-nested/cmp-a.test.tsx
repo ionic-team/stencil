@@ -1,7 +1,7 @@
 import { Fragment, h } from '@stencil/core';
 import { render } from '@wdio/browser-runner/stencil';
 
-describe('lifecycle-nested', function () {
+describe('lifecycle-nested', () => {
   beforeEach(() => {
     render({
       // Component are nested in reverse alphabetical order
@@ -21,8 +21,8 @@ describe('lifecycle-nested', function () {
   it('fire load methods in order for nested elements', async () => {
     // the `li` elements we want are in the `ol`!
     await $('ol').waitForStable();
-    const loads = await $('.lifecycle-loads').$$('li');
-    expect(loads.length).toBe(6);
+    const loads = $('.lifecycle-loads').$$('li');
+    await expect(loads).toBeElementsArrayOfSize(6);
     await expect(loads[0]).toHaveText('componentWillLoad-c');
     await expect(loads[1]).toHaveText('componentWillLoad-b');
     await expect(loads[2]).toHaveText('componentWillLoad-a');

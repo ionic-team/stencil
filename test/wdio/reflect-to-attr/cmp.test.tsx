@@ -24,7 +24,7 @@ describe('reflect-to-attr', function () {
     await $('reflect-to-attr').waitForExist();
     const cmp = document.querySelector('reflect-to-attr');
 
-    expect(cmp.getAttribute('str')).toEqual('single');
+    await expect($(cmp)).toHaveAttr('str', 'single');
     expect(cmp.getAttribute('nu')).toEqual('2');
     expect(cmp.getAttribute('undef')).toEqual(null);
     expect(cmp.getAttribute('null')).toEqual(null);
