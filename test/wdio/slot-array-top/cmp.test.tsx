@@ -1,13 +1,23 @@
-import { h } from '@stencil/core';
+import { Fragment, h } from '@stencil/core';
 import { render } from '@wdio/browser-runner/stencil';
+
+const CSS = `p {
+  background: yellow;
+}
+span {
+  background: limegreen;
+}`
 
 describe('slot array top', () => {
   beforeEach(async () => {
     render({
       template: () => (
-        <slot-array-top>
-          <p>Slotted content should be on bottom</p>
-        </slot-array-top>
+        <>
+          <slot-array-top>
+            <p>Slotted content should be on bottom</p>
+          </slot-array-top>
+          <style>{CSS}</style>
+        </>
       ),
     });
   });
