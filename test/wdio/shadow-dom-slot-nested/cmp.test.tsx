@@ -1,19 +1,23 @@
-import { setupDomTests } from '../util';
+import { h } from '@stencil/core';
+import { render } from '@wdio/browser-runner/stencil';
 
 describe('shadow-dom-slot-nested', () => {
-  const { setupDom, tearDownDom } = setupDomTests(document);
-  let app: HTMLElement;
-
   beforeEach(async () => {
-    app = await setupDom('/shadow-dom-slot-nested/index.html');
+    render({
+      template: () => (
+        <main>
+          main content
+          <shadow-dom-slot-nested-root></shadow-dom-slot-nested-root>
+        </main>
+      ),
+    });
   });
-  afterEach(tearDownDom);
 
   it('renders children', async () => {
-    let elm = app.querySelector('main');
+    let elm = document.querySelector('main');
     expect(window.getComputedStyle(elm).color).toBe('rgb(0, 0, 255)');
 
-    elm = app.querySelector('shadow-dom-slot-nested-root');
+    elm = document.querySelector('shadow-dom-slot-nested-root');
     expect(elm.shadowRoot).toBeDefined();
 
     if ('attachShadow' in HTMLElement.prototype) {
