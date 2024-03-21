@@ -6,7 +6,7 @@ const CSS = `p {
 }
 span {
   background: limegreen;
-}`
+}`;
 
 describe('slot array top', () => {
   beforeEach(async () => {
