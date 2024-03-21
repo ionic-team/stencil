@@ -6,34 +6,19 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
-    interface SlotHtml {
-        "inc": number;
-    }
 }
 declare global {
-    interface HTMLSlotHtmlElement extends Components.SlotHtml, HTMLStencilElement {
-    }
-    var HTMLSlotHtmlElement: {
-        prototype: HTMLSlotHtmlElement;
-        new (): HTMLSlotHtmlElement;
-    };
     interface HTMLElementTagNameMap {
-        "slot-html": HTMLSlotHtmlElement;
     }
 }
 declare namespace LocalJSX {
-    interface SlotHtml {
-        "inc"?: number;
-    }
     interface IntrinsicElements {
-        "slot-html": SlotHtml;
     }
 }
 export { LocalJSX as JSX };
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
-            "slot-html": LocalJSX.SlotHtml & JSXBase.HTMLAttributes<HTMLSlotHtmlElement>;
         }
     }
 }
