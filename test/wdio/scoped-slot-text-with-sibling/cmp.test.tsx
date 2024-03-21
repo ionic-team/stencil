@@ -27,7 +27,13 @@ describe('scoped-slot-text-with-sibling', () => {
   it('sets the textContent in the slot location', async () => {
     const cmpLabel: HTMLCmpLabelElement = await getCmpLabel();
     cmpLabel.textContent = 'New text to go in the slot';
-    expect(cmpLabel.textContent.trim()).toBe('New text to go in the slot');
+    await browser.waitUntil(
+      async () => {
+        expect(cmpLabel.textContent.trim()).toBe('New text to go in the slot');
+        return true;
+      },
+      { timeoutMsg: 'textContent was not set' },
+    );
   });
 
   it("doesn't override all children when assigning textContent", async () => {
@@ -40,7 +46,7 @@ describe('scoped-slot-text-with-sibling', () => {
   it('leaves the structure of the label intact', async () => {
     const cmpLabel: HTMLCmpLabelElement = await getCmpLabel();
     cmpLabel.textContent = 'New text for label structure testing';
-    const label: HTMLLabelElement = cmpLabel.querySelector('label');
+    const label: HTMLLabelElement = await browser.waitUntil(async () => cmpLabel.querySelector('label'));
 
     /**
      * Expect three child nodes in the label
@@ -48,8 +54,8 @@ describe('scoped-slot-text-with-sibling', () => {
      * - the slotted text node
      * - the non-slotted text
      */
-    expect(label).toBeDefined();
-    await browser.waitUntil(() => label.childNodes.length === 3);
+    expect(label).toBeTruthy();
+    expect(label.childNodes.length).toBe(3);
     expect((label.childNodes[0] as any)['s-cr'] as string).toBeDefined();
     expect(label.childNodes[1].textContent).toBe('New text for label structure testing');
     expect(label.childNodes[2].textContent).toBe('Non-slotted text');

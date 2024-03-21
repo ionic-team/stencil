@@ -9,15 +9,13 @@ describe('key-reorder', function () {
   });
 
   it('uses same nodes after reorder', async () => {
-    const root = $('key-reorder');
-    await root.waitForExist();
+    await $('#item-0').waitForExist();
     let item0 = document.body.querySelector('#item-0') as any;
     let item1 = document.body.querySelector('#item-1') as any;
     let item2 = document.body.querySelector('#item-2') as any;
     let item3 = document.body.querySelector('#item-3') as any;
     let item4 = document.body.querySelector('#item-4') as any;
 
-    await browser.waitUntil(() => !item0.previousElementSibling);
     expect(item0.previousElementSibling).toBe(null);
     expect(item1.previousElementSibling).toBe(item0);
     expect(item2.previousElementSibling).toBe(item1);
@@ -30,7 +28,7 @@ describe('key-reorder', function () {
     item3.__orgItem = 3;
     item4.__orgItem = 4;
 
-    const button = root.$('button');
+    const button = $('button');
     await button.click();
     await $('#item-4').waitForExist();
 

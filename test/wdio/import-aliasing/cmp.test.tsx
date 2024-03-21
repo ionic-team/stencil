@@ -17,36 +17,38 @@ describe('import aliasing', function () {
   });
 
   it('should render correctly with aliased imports', async () => {
-    await $('import-aliasing').waitForExist();
-
     const host = document.querySelector('import-aliasing');
-
-    expect(host.children[0].textContent).toBe('My name is John');
-    expect(host.children[1].textContent).toBe('Name changed 0 time(s)');
-    expect(host.children[2].textContent).toBe('Method called 0 time(s)');
-    expect(host.children[3].textContent).toBe('Event triggered 0 time(s)');
+    const children = $$('import-aliasing > *');
+    await expect(children[0]).toHaveText('My name is John');
+    await expect(children[1]).toHaveText('Name changed 0 time(s)');
+    await expect(children[2]).toHaveText('Method called 0 time(s)');
+    await expect(children[3]).toHaveText('Event triggered 0 time(s)');
 
     host.setAttribute('user', 'Peter');
     await $('import-aliasing').waitForStable();
 
-    expect(host.children[0].textContent).toBe('My name is Peter');
-    expect(host.children[1].textContent).toBe('Name changed 1 time(s)');
-    expect(host.children[2].textContent).toBe('Method called 0 time(s)');
-    expect(host.children[3].textContent).toBe('Event triggered 0 time(s)');
+    await expect(children[0]).toHaveText('My name is Peter');
+    await expect(children[1]).toHaveText('Name changed 1 time(s)');
+    await expect(children[2]).toHaveText('Method called 0 time(s)');
+    await expect(children[3]).toHaveText('Event triggered 0 time(s)');
 
     const el = await host.myMethod();
-    await $('import-aliasing').waitForStable();
-
     expect(el).toBe(host);
-    expect(host.children[0].textContent).toBe('My name is Peter');
-    expect(host.children[1].textContent).toBe('Name changed 1 time(s)');
-    expect(host.children[2].textContent).toBe('Method called 1 time(s)');
-    expect(host.children[3].textContent).toBe('Event triggered 1 time(s)');
+    await expect(children[0]).toHaveText('My name is Peter');
+    await expect(children[1]).toHaveText('Name changed 1 time(s)');
+    await expect(children[2]).toHaveText('Method called 1 time(s)');
+    await expect(children[3]).toHaveText('Event triggered 1 time(s)');
   });
 
   it('should link up to the surrounding form', async () => {
-    await $('import-aliasing').waitForExist();
-    const formEl = document.querySelector('form');
-    expect(new FormData(formEl).get('test-input')).toBe('my default value');
+    await $('form').waitForExist();
+    await browser.waitUntil(
+      () => {
+        const formEl = document.querySelector('form');
+        expect(new FormData(formEl).get('test-input')).toBe('my default value');
+        return true;
+      },
+      { timeoutMsg: 'link to surrounding form not established' },
+    );
   });
 });
