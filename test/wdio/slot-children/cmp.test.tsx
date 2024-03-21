@@ -1,16 +1,23 @@
-import { setupDomTests } from '../util';
+import { h } from '@stencil/core';
+import { render } from '@wdio/browser-runner/stencil';
 
-describe('slot-children', function () {
-  const { setupDom, tearDownDom } = setupDomTests(document);
-  let app: HTMLElement;
-
-  beforeEach(async () => {
-    app = await setupDom('/slot-children/index.html');
+describe('slot-children', () => {
+  beforeEach(() => {
+    render({
+      template: () => (
+        <slot-children-root>
+          LightDomA
+          <header>LightDomB</header>
+          <main>LightDomC</main>
+          <footer>LightDomD</footer>
+          LightDomE
+        </slot-children-root>
+      ),
+    });
   });
-  afterEach(tearDownDom);
 
-  it('get shadow child nodes', async () => {
-    const elm = app.querySelector('slot-children-root');
+  it('get shadow child nodes', () => {
+    const elm = document.querySelector('slot-children-root');
     expect(elm.childElementCount).toBe(3);
   });
 });
