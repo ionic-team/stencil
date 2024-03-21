@@ -26,31 +26,6 @@ export namespace Components {
     }
     interface ReparentStyleWithVars {
     }
-<<<<<<< HEAD
-    interface ShadowDomMode {
-        /**
-          * The mode determines which platform styles to use.
-         */
-        "colormode"?: string;
-    }
-    interface ShadowDomModeRoot {
-=======
-    interface ScopedSlotAppendAndPrepend {
-    }
-    interface ScopedSlotChildInsertAdjacent {
-    }
-    interface ShadowDomArray {
-        "values": number[];
-    }
-    interface ShadowDomArrayRoot {
-    }
-    interface ShadowDomBasic {
-    }
-    interface ShadowDomBasicRoot {
-    }
-    interface ShadowDomSlotBasic {
->>>>>>> bf874f88d (update karma types)
-    }
     interface ShadowDomSlotNested {
         "i"?: number;
     }
@@ -201,62 +176,6 @@ declare global {
     var HTMLReparentStyleWithVarsElement: {
         prototype: HTMLReparentStyleWithVarsElement;
         new (): HTMLReparentStyleWithVarsElement;
-    };
-<<<<<<< HEAD
-    interface HTMLShadowDomModeElement extends Components.ShadowDomMode, HTMLStencilElement {
-    }
-    var HTMLShadowDomModeElement: {
-        prototype: HTMLShadowDomModeElement;
-        new (): HTMLShadowDomModeElement;
-    };
-    interface HTMLShadowDomModeRootElement extends Components.ShadowDomModeRoot, HTMLStencilElement {
-    }
-    var HTMLShadowDomModeRootElement: {
-        prototype: HTMLShadowDomModeRootElement;
-        new (): HTMLShadowDomModeRootElement;
-=======
-    interface HTMLScopedSlotAppendAndPrependElement extends Components.ScopedSlotAppendAndPrepend, HTMLStencilElement {
-    }
-    var HTMLScopedSlotAppendAndPrependElement: {
-        prototype: HTMLScopedSlotAppendAndPrependElement;
-        new (): HTMLScopedSlotAppendAndPrependElement;
-    };
-    interface HTMLScopedSlotChildInsertAdjacentElement extends Components.ScopedSlotChildInsertAdjacent, HTMLStencilElement {
-    }
-    var HTMLScopedSlotChildInsertAdjacentElement: {
-        prototype: HTMLScopedSlotChildInsertAdjacentElement;
-        new (): HTMLScopedSlotChildInsertAdjacentElement;
-    };
-    interface HTMLShadowDomArrayElement extends Components.ShadowDomArray, HTMLStencilElement {
-    }
-    var HTMLShadowDomArrayElement: {
-        prototype: HTMLShadowDomArrayElement;
-        new (): HTMLShadowDomArrayElement;
-    };
-    interface HTMLShadowDomArrayRootElement extends Components.ShadowDomArrayRoot, HTMLStencilElement {
-    }
-    var HTMLShadowDomArrayRootElement: {
-        prototype: HTMLShadowDomArrayRootElement;
-        new (): HTMLShadowDomArrayRootElement;
-    };
-    interface HTMLShadowDomBasicElement extends Components.ShadowDomBasic, HTMLStencilElement {
-    }
-    var HTMLShadowDomBasicElement: {
-        prototype: HTMLShadowDomBasicElement;
-        new (): HTMLShadowDomBasicElement;
-    };
-    interface HTMLShadowDomBasicRootElement extends Components.ShadowDomBasicRoot, HTMLStencilElement {
-    }
-    var HTMLShadowDomBasicRootElement: {
-        prototype: HTMLShadowDomBasicRootElement;
-        new (): HTMLShadowDomBasicRootElement;
-    };
-    interface HTMLShadowDomSlotBasicElement extends Components.ShadowDomSlotBasic, HTMLStencilElement {
-    }
-    var HTMLShadowDomSlotBasicElement: {
-        prototype: HTMLShadowDomSlotBasicElement;
-        new (): HTMLShadowDomSlotBasicElement;
->>>>>>> bf874f88d (update karma types)
     };
     interface HTMLShadowDomSlotNestedElement extends Components.ShadowDomSlotNested, HTMLStencilElement {
     }
@@ -503,18 +422,6 @@ declare global {
         "init-css-root": HTMLInitCssRootElement;
         "reparent-style-no-vars": HTMLReparentStyleNoVarsElement;
         "reparent-style-with-vars": HTMLReparentStyleWithVarsElement;
-<<<<<<< HEAD
-        "shadow-dom-mode": HTMLShadowDomModeElement;
-        "shadow-dom-mode-root": HTMLShadowDomModeRootElement;
-=======
-        "scoped-slot-append-and-prepend": HTMLScopedSlotAppendAndPrependElement;
-        "scoped-slot-child-insert-adjacent": HTMLScopedSlotChildInsertAdjacentElement;
-        "shadow-dom-array": HTMLShadowDomArrayElement;
-        "shadow-dom-array-root": HTMLShadowDomArrayRootElement;
-        "shadow-dom-basic": HTMLShadowDomBasicElement;
-        "shadow-dom-basic-root": HTMLShadowDomBasicRootElement;
-        "shadow-dom-slot-basic": HTMLShadowDomSlotBasicElement;
->>>>>>> bf874f88d (update karma types)
         "shadow-dom-slot-nested": HTMLShadowDomSlotNestedElement;
         "shadow-dom-slot-nested-root": HTMLShadowDomSlotNestedRootElement;
         "slot-array-basic": HTMLSlotArrayBasicElement;
@@ -576,31 +483,6 @@ declare namespace LocalJSX {
     interface ReparentStyleNoVars {
     }
     interface ReparentStyleWithVars {
-    }
-<<<<<<< HEAD
-    interface ShadowDomMode {
-        /**
-          * The mode determines which platform styles to use.
-         */
-        "colormode"?: string;
-    }
-    interface ShadowDomModeRoot {
-=======
-    interface ScopedSlotAppendAndPrepend {
-    }
-    interface ScopedSlotChildInsertAdjacent {
-    }
-    interface ShadowDomArray {
-        "values"?: number[];
-    }
-    interface ShadowDomArrayRoot {
-    }
-    interface ShadowDomBasic {
-    }
-    interface ShadowDomBasicRoot {
-    }
-    interface ShadowDomSlotBasic {
->>>>>>> bf874f88d (update karma types)
     }
     interface ShadowDomSlotNested {
         "i"?: number;
@@ -702,18 +584,6 @@ declare namespace LocalJSX {
         "init-css-root": InitCssRoot;
         "reparent-style-no-vars": ReparentStyleNoVars;
         "reparent-style-with-vars": ReparentStyleWithVars;
-<<<<<<< HEAD
-        "shadow-dom-mode": ShadowDomMode;
-        "shadow-dom-mode-root": ShadowDomModeRoot;
-=======
-        "scoped-slot-append-and-prepend": ScopedSlotAppendAndPrepend;
-        "scoped-slot-child-insert-adjacent": ScopedSlotChildInsertAdjacent;
-        "shadow-dom-array": ShadowDomArray;
-        "shadow-dom-array-root": ShadowDomArrayRoot;
-        "shadow-dom-basic": ShadowDomBasic;
-        "shadow-dom-basic-root": ShadowDomBasicRoot;
-        "shadow-dom-slot-basic": ShadowDomSlotBasic;
->>>>>>> bf874f88d (update karma types)
         "shadow-dom-slot-nested": ShadowDomSlotNested;
         "shadow-dom-slot-nested-root": ShadowDomSlotNestedRoot;
         "slot-array-basic": SlotArrayBasic;
@@ -769,18 +639,6 @@ declare module "@stencil/core" {
             "init-css-root": LocalJSX.InitCssRoot & JSXBase.HTMLAttributes<HTMLInitCssRootElement>;
             "reparent-style-no-vars": LocalJSX.ReparentStyleNoVars & JSXBase.HTMLAttributes<HTMLReparentStyleNoVarsElement>;
             "reparent-style-with-vars": LocalJSX.ReparentStyleWithVars & JSXBase.HTMLAttributes<HTMLReparentStyleWithVarsElement>;
-<<<<<<< HEAD
-            "shadow-dom-mode": LocalJSX.ShadowDomMode & JSXBase.HTMLAttributes<HTMLShadowDomModeElement>;
-            "shadow-dom-mode-root": LocalJSX.ShadowDomModeRoot & JSXBase.HTMLAttributes<HTMLShadowDomModeRootElement>;
-=======
-            "scoped-slot-append-and-prepend": LocalJSX.ScopedSlotAppendAndPrepend & JSXBase.HTMLAttributes<HTMLScopedSlotAppendAndPrependElement>;
-            "scoped-slot-child-insert-adjacent": LocalJSX.ScopedSlotChildInsertAdjacent & JSXBase.HTMLAttributes<HTMLScopedSlotChildInsertAdjacentElement>;
-            "shadow-dom-array": LocalJSX.ShadowDomArray & JSXBase.HTMLAttributes<HTMLShadowDomArrayElement>;
-            "shadow-dom-array-root": LocalJSX.ShadowDomArrayRoot & JSXBase.HTMLAttributes<HTMLShadowDomArrayRootElement>;
-            "shadow-dom-basic": LocalJSX.ShadowDomBasic & JSXBase.HTMLAttributes<HTMLShadowDomBasicElement>;
-            "shadow-dom-basic-root": LocalJSX.ShadowDomBasicRoot & JSXBase.HTMLAttributes<HTMLShadowDomBasicRootElement>;
-            "shadow-dom-slot-basic": LocalJSX.ShadowDomSlotBasic & JSXBase.HTMLAttributes<HTMLShadowDomSlotBasicElement>;
->>>>>>> bf874f88d (update karma types)
             "shadow-dom-slot-nested": LocalJSX.ShadowDomSlotNested & JSXBase.HTMLAttributes<HTMLShadowDomSlotNestedElement>;
             "shadow-dom-slot-nested-root": LocalJSX.ShadowDomSlotNestedRoot & JSXBase.HTMLAttributes<HTMLShadowDomSlotNestedRootElement>;
             "slot-array-basic": LocalJSX.SlotArrayBasic & JSXBase.HTMLAttributes<HTMLSlotArrayBasicElement>;
