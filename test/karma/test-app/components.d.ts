@@ -26,12 +26,6 @@ export namespace Components {
     }
     interface InitCssRoot {
     }
-    interface LifecycleUnloadA {
-    }
-    interface LifecycleUnloadB {
-    }
-    interface LifecycleUnloadRoot {
-    }
     interface ReparentStyleNoVars {
     }
     interface ReparentStyleWithVars {
@@ -51,25 +45,11 @@ export namespace Components {
     }
     interface SlotArrayBasic {
     }
-    interface SlotArrayComplex {
-    }
-    interface SlotArrayComplexRoot {
-    }
     interface SlotArrayTop {
-    }
-    interface SlotBasicOrder {
-    }
-    interface SlotBasicOrderRoot {
     }
     interface SlotChildrenRoot {
     }
     interface SlotConditionalRendering {
-    }
-    interface SlotDynamicNameChangeScoped {
-        "slotName": string;
-    }
-    interface SlotDynamicNameChangeShadow {
-        "slotName": string;
     }
     interface SlotDynamicScopedList {
         "items": Array<string>;
@@ -81,11 +61,6 @@ export namespace Components {
         "tag": string;
     }
     interface SlotDynamicWrapperRoot {
-    }
-    interface SlotFallback {
-        "inc": number;
-    }
-    interface SlotFallbackRoot {
     }
     interface SlotHideContentOpen {
         "enabled": boolean;
@@ -161,12 +136,6 @@ export namespace Components {
     }
     interface SvgAttr {
     }
-    interface SvgClass {
-    }
-    interface Tag3dComponent {
-    }
-    interface Tag88 {
-    }
     interface TextContentPatchScoped {
     }
     interface TextContentPatchScopedWithSlot {
@@ -235,24 +204,6 @@ declare global {
         prototype: HTMLInitCssRootElement;
         new (): HTMLInitCssRootElement;
     };
-    interface HTMLLifecycleUnloadAElement extends Components.LifecycleUnloadA, HTMLStencilElement {
-    }
-    var HTMLLifecycleUnloadAElement: {
-        prototype: HTMLLifecycleUnloadAElement;
-        new (): HTMLLifecycleUnloadAElement;
-    };
-    interface HTMLLifecycleUnloadBElement extends Components.LifecycleUnloadB, HTMLStencilElement {
-    }
-    var HTMLLifecycleUnloadBElement: {
-        prototype: HTMLLifecycleUnloadBElement;
-        new (): HTMLLifecycleUnloadBElement;
-    };
-    interface HTMLLifecycleUnloadRootElement extends Components.LifecycleUnloadRoot, HTMLStencilElement {
-    }
-    var HTMLLifecycleUnloadRootElement: {
-        prototype: HTMLLifecycleUnloadRootElement;
-        new (): HTMLLifecycleUnloadRootElement;
-    };
     interface HTMLReparentStyleNoVarsElement extends Components.ReparentStyleNoVars, HTMLStencilElement {
     }
     var HTMLReparentStyleNoVarsElement: {
@@ -295,35 +246,11 @@ declare global {
         prototype: HTMLSlotArrayBasicElement;
         new (): HTMLSlotArrayBasicElement;
     };
-    interface HTMLSlotArrayComplexElement extends Components.SlotArrayComplex, HTMLStencilElement {
-    }
-    var HTMLSlotArrayComplexElement: {
-        prototype: HTMLSlotArrayComplexElement;
-        new (): HTMLSlotArrayComplexElement;
-    };
-    interface HTMLSlotArrayComplexRootElement extends Components.SlotArrayComplexRoot, HTMLStencilElement {
-    }
-    var HTMLSlotArrayComplexRootElement: {
-        prototype: HTMLSlotArrayComplexRootElement;
-        new (): HTMLSlotArrayComplexRootElement;
-    };
     interface HTMLSlotArrayTopElement extends Components.SlotArrayTop, HTMLStencilElement {
     }
     var HTMLSlotArrayTopElement: {
         prototype: HTMLSlotArrayTopElement;
         new (): HTMLSlotArrayTopElement;
-    };
-    interface HTMLSlotBasicOrderElement extends Components.SlotBasicOrder, HTMLStencilElement {
-    }
-    var HTMLSlotBasicOrderElement: {
-        prototype: HTMLSlotBasicOrderElement;
-        new (): HTMLSlotBasicOrderElement;
-    };
-    interface HTMLSlotBasicOrderRootElement extends Components.SlotBasicOrderRoot, HTMLStencilElement {
-    }
-    var HTMLSlotBasicOrderRootElement: {
-        prototype: HTMLSlotBasicOrderRootElement;
-        new (): HTMLSlotBasicOrderRootElement;
     };
     interface HTMLSlotChildrenRootElement extends Components.SlotChildrenRoot, HTMLStencilElement {
     }
@@ -336,18 +263,6 @@ declare global {
     var HTMLSlotConditionalRenderingElement: {
         prototype: HTMLSlotConditionalRenderingElement;
         new (): HTMLSlotConditionalRenderingElement;
-    };
-    interface HTMLSlotDynamicNameChangeScopedElement extends Components.SlotDynamicNameChangeScoped, HTMLStencilElement {
-    }
-    var HTMLSlotDynamicNameChangeScopedElement: {
-        prototype: HTMLSlotDynamicNameChangeScopedElement;
-        new (): HTMLSlotDynamicNameChangeScopedElement;
-    };
-    interface HTMLSlotDynamicNameChangeShadowElement extends Components.SlotDynamicNameChangeShadow, HTMLStencilElement {
-    }
-    var HTMLSlotDynamicNameChangeShadowElement: {
-        prototype: HTMLSlotDynamicNameChangeShadowElement;
-        new (): HTMLSlotDynamicNameChangeShadowElement;
     };
     interface HTMLSlotDynamicScopedListElement extends Components.SlotDynamicScopedList, HTMLStencilElement {
     }
@@ -372,18 +287,6 @@ declare global {
     var HTMLSlotDynamicWrapperRootElement: {
         prototype: HTMLSlotDynamicWrapperRootElement;
         new (): HTMLSlotDynamicWrapperRootElement;
-    };
-    interface HTMLSlotFallbackElement extends Components.SlotFallback, HTMLStencilElement {
-    }
-    var HTMLSlotFallbackElement: {
-        prototype: HTMLSlotFallbackElement;
-        new (): HTMLSlotFallbackElement;
-    };
-    interface HTMLSlotFallbackRootElement extends Components.SlotFallbackRoot, HTMLStencilElement {
-    }
-    var HTMLSlotFallbackRootElement: {
-        prototype: HTMLSlotFallbackRootElement;
-        new (): HTMLSlotFallbackRootElement;
     };
     interface HTMLSlotHideContentOpenElement extends Components.SlotHideContentOpen, HTMLStencilElement {
     }
@@ -577,24 +480,6 @@ declare global {
         prototype: HTMLSvgAttrElement;
         new (): HTMLSvgAttrElement;
     };
-    interface HTMLSvgClassElement extends Components.SvgClass, HTMLStencilElement {
-    }
-    var HTMLSvgClassElement: {
-        prototype: HTMLSvgClassElement;
-        new (): HTMLSvgClassElement;
-    };
-    interface HTMLTag3dComponentElement extends Components.Tag3dComponent, HTMLStencilElement {
-    }
-    var HTMLTag3dComponentElement: {
-        prototype: HTMLTag3dComponentElement;
-        new (): HTMLTag3dComponentElement;
-    };
-    interface HTMLTag88Element extends Components.Tag88, HTMLStencilElement {
-    }
-    var HTMLTag88Element: {
-        prototype: HTMLTag88Element;
-        new (): HTMLTag88Element;
-    };
     interface HTMLTextContentPatchScopedElement extends Components.TextContentPatchScoped, HTMLStencilElement {
     }
     var HTMLTextContentPatchScopedElement: {
@@ -624,9 +509,6 @@ declare global {
         "custom-elements-no-delegates-focus": HTMLCustomElementsNoDelegatesFocusElement;
         "factory-jsx": HTMLFactoryJsxElement;
         "init-css-root": HTMLInitCssRootElement;
-        "lifecycle-unload-a": HTMLLifecycleUnloadAElement;
-        "lifecycle-unload-b": HTMLLifecycleUnloadBElement;
-        "lifecycle-unload-root": HTMLLifecycleUnloadRootElement;
         "reparent-style-no-vars": HTMLReparentStyleNoVarsElement;
         "reparent-style-with-vars": HTMLReparentStyleWithVarsElement;
         "shadow-dom-mode": HTMLShadowDomModeElement;
@@ -634,21 +516,13 @@ declare global {
         "shadow-dom-slot-nested": HTMLShadowDomSlotNestedElement;
         "shadow-dom-slot-nested-root": HTMLShadowDomSlotNestedRootElement;
         "slot-array-basic": HTMLSlotArrayBasicElement;
-        "slot-array-complex": HTMLSlotArrayComplexElement;
-        "slot-array-complex-root": HTMLSlotArrayComplexRootElement;
         "slot-array-top": HTMLSlotArrayTopElement;
-        "slot-basic-order": HTMLSlotBasicOrderElement;
-        "slot-basic-order-root": HTMLSlotBasicOrderRootElement;
         "slot-children-root": HTMLSlotChildrenRootElement;
         "slot-conditional-rendering": HTMLSlotConditionalRenderingElement;
-        "slot-dynamic-name-change-scoped": HTMLSlotDynamicNameChangeScopedElement;
-        "slot-dynamic-name-change-shadow": HTMLSlotDynamicNameChangeShadowElement;
         "slot-dynamic-scoped-list": HTMLSlotDynamicScopedListElement;
         "slot-dynamic-shadow-list": HTMLSlotDynamicShadowListElement;
         "slot-dynamic-wrapper": HTMLSlotDynamicWrapperElement;
         "slot-dynamic-wrapper-root": HTMLSlotDynamicWrapperRootElement;
-        "slot-fallback": HTMLSlotFallbackElement;
-        "slot-fallback-root": HTMLSlotFallbackRootElement;
         "slot-hide-content-open": HTMLSlotHideContentOpenElement;
         "slot-hide-content-scoped": HTMLSlotHideContentScopedElement;
         "slot-html": HTMLSlotHtmlElement;
@@ -681,9 +555,6 @@ declare global {
         "static-styles": HTMLStaticStylesElement;
         "stencil-sibling": HTMLStencilSiblingElement;
         "svg-attr": HTMLSvgAttrElement;
-        "svg-class": HTMLSvgClassElement;
-        "tag-3d-component": HTMLTag3dComponentElement;
-        "tag-88": HTMLTag88Element;
         "text-content-patch-scoped": HTMLTextContentPatchScopedElement;
         "text-content-patch-scoped-with-slot": HTMLTextContentPatchScopedWithSlotElement;
         "watch-native-attributes": HTMLWatchNativeAttributesElement;
@@ -710,12 +581,6 @@ declare namespace LocalJSX {
     }
     interface InitCssRoot {
     }
-    interface LifecycleUnloadA {
-    }
-    interface LifecycleUnloadB {
-    }
-    interface LifecycleUnloadRoot {
-    }
     interface ReparentStyleNoVars {
     }
     interface ReparentStyleWithVars {
@@ -735,25 +600,11 @@ declare namespace LocalJSX {
     }
     interface SlotArrayBasic {
     }
-    interface SlotArrayComplex {
-    }
-    interface SlotArrayComplexRoot {
-    }
     interface SlotArrayTop {
-    }
-    interface SlotBasicOrder {
-    }
-    interface SlotBasicOrderRoot {
     }
     interface SlotChildrenRoot {
     }
     interface SlotConditionalRendering {
-    }
-    interface SlotDynamicNameChangeScoped {
-        "slotName"?: string;
-    }
-    interface SlotDynamicNameChangeShadow {
-        "slotName"?: string;
     }
     interface SlotDynamicScopedList {
         "items"?: Array<string>;
@@ -765,11 +616,6 @@ declare namespace LocalJSX {
         "tag"?: string;
     }
     interface SlotDynamicWrapperRoot {
-    }
-    interface SlotFallback {
-        "inc"?: number;
-    }
-    interface SlotFallbackRoot {
     }
     interface SlotHideContentOpen {
         "enabled"?: boolean;
@@ -845,12 +691,6 @@ declare namespace LocalJSX {
     }
     interface SvgAttr {
     }
-    interface SvgClass {
-    }
-    interface Tag3dComponent {
-    }
-    interface Tag88 {
-    }
     interface TextContentPatchScoped {
     }
     interface TextContentPatchScopedWithSlot {
@@ -868,9 +708,6 @@ declare namespace LocalJSX {
         "custom-elements-no-delegates-focus": CustomElementsNoDelegatesFocus;
         "factory-jsx": FactoryJsx;
         "init-css-root": InitCssRoot;
-        "lifecycle-unload-a": LifecycleUnloadA;
-        "lifecycle-unload-b": LifecycleUnloadB;
-        "lifecycle-unload-root": LifecycleUnloadRoot;
         "reparent-style-no-vars": ReparentStyleNoVars;
         "reparent-style-with-vars": ReparentStyleWithVars;
         "shadow-dom-mode": ShadowDomMode;
@@ -878,21 +715,13 @@ declare namespace LocalJSX {
         "shadow-dom-slot-nested": ShadowDomSlotNested;
         "shadow-dom-slot-nested-root": ShadowDomSlotNestedRoot;
         "slot-array-basic": SlotArrayBasic;
-        "slot-array-complex": SlotArrayComplex;
-        "slot-array-complex-root": SlotArrayComplexRoot;
         "slot-array-top": SlotArrayTop;
-        "slot-basic-order": SlotBasicOrder;
-        "slot-basic-order-root": SlotBasicOrderRoot;
         "slot-children-root": SlotChildrenRoot;
         "slot-conditional-rendering": SlotConditionalRendering;
-        "slot-dynamic-name-change-scoped": SlotDynamicNameChangeScoped;
-        "slot-dynamic-name-change-shadow": SlotDynamicNameChangeShadow;
         "slot-dynamic-scoped-list": SlotDynamicScopedList;
         "slot-dynamic-shadow-list": SlotDynamicShadowList;
         "slot-dynamic-wrapper": SlotDynamicWrapper;
         "slot-dynamic-wrapper-root": SlotDynamicWrapperRoot;
-        "slot-fallback": SlotFallback;
-        "slot-fallback-root": SlotFallbackRoot;
         "slot-hide-content-open": SlotHideContentOpen;
         "slot-hide-content-scoped": SlotHideContentScoped;
         "slot-html": SlotHtml;
@@ -925,9 +754,6 @@ declare namespace LocalJSX {
         "static-styles": StaticStyles;
         "stencil-sibling": StencilSibling;
         "svg-attr": SvgAttr;
-        "svg-class": SvgClass;
-        "tag-3d-component": Tag3dComponent;
-        "tag-88": Tag88;
         "text-content-patch-scoped": TextContentPatchScoped;
         "text-content-patch-scoped-with-slot": TextContentPatchScopedWithSlot;
         "watch-native-attributes": WatchNativeAttributes;
@@ -947,9 +773,6 @@ declare module "@stencil/core" {
             "custom-elements-no-delegates-focus": LocalJSX.CustomElementsNoDelegatesFocus & JSXBase.HTMLAttributes<HTMLCustomElementsNoDelegatesFocusElement>;
             "factory-jsx": LocalJSX.FactoryJsx & JSXBase.HTMLAttributes<HTMLFactoryJsxElement>;
             "init-css-root": LocalJSX.InitCssRoot & JSXBase.HTMLAttributes<HTMLInitCssRootElement>;
-            "lifecycle-unload-a": LocalJSX.LifecycleUnloadA & JSXBase.HTMLAttributes<HTMLLifecycleUnloadAElement>;
-            "lifecycle-unload-b": LocalJSX.LifecycleUnloadB & JSXBase.HTMLAttributes<HTMLLifecycleUnloadBElement>;
-            "lifecycle-unload-root": LocalJSX.LifecycleUnloadRoot & JSXBase.HTMLAttributes<HTMLLifecycleUnloadRootElement>;
             "reparent-style-no-vars": LocalJSX.ReparentStyleNoVars & JSXBase.HTMLAttributes<HTMLReparentStyleNoVarsElement>;
             "reparent-style-with-vars": LocalJSX.ReparentStyleWithVars & JSXBase.HTMLAttributes<HTMLReparentStyleWithVarsElement>;
             "shadow-dom-mode": LocalJSX.ShadowDomMode & JSXBase.HTMLAttributes<HTMLShadowDomModeElement>;
@@ -957,21 +780,13 @@ declare module "@stencil/core" {
             "shadow-dom-slot-nested": LocalJSX.ShadowDomSlotNested & JSXBase.HTMLAttributes<HTMLShadowDomSlotNestedElement>;
             "shadow-dom-slot-nested-root": LocalJSX.ShadowDomSlotNestedRoot & JSXBase.HTMLAttributes<HTMLShadowDomSlotNestedRootElement>;
             "slot-array-basic": LocalJSX.SlotArrayBasic & JSXBase.HTMLAttributes<HTMLSlotArrayBasicElement>;
-            "slot-array-complex": LocalJSX.SlotArrayComplex & JSXBase.HTMLAttributes<HTMLSlotArrayComplexElement>;
-            "slot-array-complex-root": LocalJSX.SlotArrayComplexRoot & JSXBase.HTMLAttributes<HTMLSlotArrayComplexRootElement>;
             "slot-array-top": LocalJSX.SlotArrayTop & JSXBase.HTMLAttributes<HTMLSlotArrayTopElement>;
-            "slot-basic-order": LocalJSX.SlotBasicOrder & JSXBase.HTMLAttributes<HTMLSlotBasicOrderElement>;
-            "slot-basic-order-root": LocalJSX.SlotBasicOrderRoot & JSXBase.HTMLAttributes<HTMLSlotBasicOrderRootElement>;
             "slot-children-root": LocalJSX.SlotChildrenRoot & JSXBase.HTMLAttributes<HTMLSlotChildrenRootElement>;
             "slot-conditional-rendering": LocalJSX.SlotConditionalRendering & JSXBase.HTMLAttributes<HTMLSlotConditionalRenderingElement>;
-            "slot-dynamic-name-change-scoped": LocalJSX.SlotDynamicNameChangeScoped & JSXBase.HTMLAttributes<HTMLSlotDynamicNameChangeScopedElement>;
-            "slot-dynamic-name-change-shadow": LocalJSX.SlotDynamicNameChangeShadow & JSXBase.HTMLAttributes<HTMLSlotDynamicNameChangeShadowElement>;
             "slot-dynamic-scoped-list": LocalJSX.SlotDynamicScopedList & JSXBase.HTMLAttributes<HTMLSlotDynamicScopedListElement>;
             "slot-dynamic-shadow-list": LocalJSX.SlotDynamicShadowList & JSXBase.HTMLAttributes<HTMLSlotDynamicShadowListElement>;
             "slot-dynamic-wrapper": LocalJSX.SlotDynamicWrapper & JSXBase.HTMLAttributes<HTMLSlotDynamicWrapperElement>;
             "slot-dynamic-wrapper-root": LocalJSX.SlotDynamicWrapperRoot & JSXBase.HTMLAttributes<HTMLSlotDynamicWrapperRootElement>;
-            "slot-fallback": LocalJSX.SlotFallback & JSXBase.HTMLAttributes<HTMLSlotFallbackElement>;
-            "slot-fallback-root": LocalJSX.SlotFallbackRoot & JSXBase.HTMLAttributes<HTMLSlotFallbackRootElement>;
             "slot-hide-content-open": LocalJSX.SlotHideContentOpen & JSXBase.HTMLAttributes<HTMLSlotHideContentOpenElement>;
             "slot-hide-content-scoped": LocalJSX.SlotHideContentScoped & JSXBase.HTMLAttributes<HTMLSlotHideContentScopedElement>;
             "slot-html": LocalJSX.SlotHtml & JSXBase.HTMLAttributes<HTMLSlotHtmlElement>;
@@ -1004,9 +819,6 @@ declare module "@stencil/core" {
             "static-styles": LocalJSX.StaticStyles & JSXBase.HTMLAttributes<HTMLStaticStylesElement>;
             "stencil-sibling": LocalJSX.StencilSibling & JSXBase.HTMLAttributes<HTMLStencilSiblingElement>;
             "svg-attr": LocalJSX.SvgAttr & JSXBase.HTMLAttributes<HTMLSvgAttrElement>;
-            "svg-class": LocalJSX.SvgClass & JSXBase.HTMLAttributes<HTMLSvgClassElement>;
-            "tag-3d-component": LocalJSX.Tag3dComponent & JSXBase.HTMLAttributes<HTMLTag3dComponentElement>;
-            "tag-88": LocalJSX.Tag88 & JSXBase.HTMLAttributes<HTMLTag88Element>;
             "text-content-patch-scoped": LocalJSX.TextContentPatchScoped & JSXBase.HTMLAttributes<HTMLTextContentPatchScopedElement>;
             "text-content-patch-scoped-with-slot": LocalJSX.TextContentPatchScopedWithSlot & JSXBase.HTMLAttributes<HTMLTextContentPatchScopedWithSlotElement>;
             "watch-native-attributes": LocalJSX.WatchNativeAttributes & JSXBase.HTMLAttributes<HTMLWatchNativeAttributesElement>;
