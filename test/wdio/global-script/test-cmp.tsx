@@ -1,7 +1,7 @@
 import { Component, h } from '@stencil/core';
 
 @Component({
-  tag: 'test-cmp',
+  tag: 'global-script-test-cmp',
   scoped: true,
 })
 export class SiblingRoot {

@@ -6,32 +6,32 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
-    interface TestCmp {
+    interface GlobalScriptTestCmp {
     }
 }
 declare global {
-    interface HTMLTestCmpElement extends Components.TestCmp, HTMLStencilElement {
+    interface HTMLGlobalScriptTestCmpElement extends Components.GlobalScriptTestCmp, HTMLStencilElement {
     }
-    var HTMLTestCmpElement: {
-        prototype: HTMLTestCmpElement;
-        new (): HTMLTestCmpElement;
+    var HTMLGlobalScriptTestCmpElement: {
+        prototype: HTMLGlobalScriptTestCmpElement;
+        new (): HTMLGlobalScriptTestCmpElement;
     };
     interface HTMLElementTagNameMap {
-        "test-cmp": HTMLTestCmpElement;
+        "global-script-test-cmp": HTMLGlobalScriptTestCmpElement;
     }
 }
 declare namespace LocalJSX {
-    interface TestCmp {
+    interface GlobalScriptTestCmp {
     }
     interface IntrinsicElements {
-        "test-cmp": TestCmp;
+        "global-script-test-cmp": GlobalScriptTestCmp;
     }
 }
 export { LocalJSX as JSX };
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
-            "test-cmp": LocalJSX.TestCmp & JSXBase.HTMLAttributes<HTMLTestCmpElement>;
+            "global-script-test-cmp": LocalJSX.GlobalScriptTestCmp & JSXBase.HTMLAttributes<HTMLGlobalScriptTestCmpElement>;
         }
     }
 }
