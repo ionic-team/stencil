@@ -2,10 +2,36 @@ import { Fragment, h } from '@stencil/core';
 import { render } from '@wdio/browser-runner/stencil';
 
 describe('slot array basic', () => {
+  const style = `slot-array-basic {
+    display: block;
+    margin: 10px;
+    border: 2px solid black;
+  }
+  content-top {
+    display: block;
+    background: red;
+    color: white;
+    padding: 10px;
+  }
+  content-middle {
+    display: block;
+    background: purple;
+    color: white;
+    padding: 10px;
+  }
+  content-bottom {
+    display: block;
+    background: blue;
+    color: white;
+    padding: 10px;
+  }`;
+
   beforeEach(() => {
     render({
       template: () => (
         <>
+          <style>{style}</style>
+
           <slot-array-basic class="results1"></slot-array-basic>
 
           <slot-array-basic class="results2">
@@ -70,6 +96,6 @@ describe('slot array basic', () => {
     await expect(await children[4].getTagName()).toBe('footer');
     await expect(children[4]).toHaveText('Footer');
 
-    await $('[hidden]').waitForExist({ reverse: true });
+    await expect($('[hidden]')).not.toBeExisting();
   });
 });
