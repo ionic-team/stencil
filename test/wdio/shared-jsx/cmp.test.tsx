@@ -12,8 +12,10 @@ describe('shared-jsx', () => {
         </>
       ),
     });
-  })
+  });
   it('should not share JSX nodes', async () => {
-    await expect($('stencil-stage')).toMatchInlineSnapshot(`"<stencil-stage><bad-shared-jsx class="hydrated"><div><div>Do Not Share JSX Nodes!</div><div>Do Not Share JSX Nodes!</div></div></bad-shared-jsx><hr><factory-jsx class="hydrated"><div><div>Factory JSX</div><div>Factory JSX</div></div></factory-jsx></stencil-stage>"`)
-  })
-})
+    await expect($('stencil-stage')).toMatchInlineSnapshot(
+      `"<stencil-stage><bad-shared-jsx class="hydrated"><div><div>Do Not Share JSX Nodes!</div><div>Do Not Share JSX Nodes!</div></div></bad-shared-jsx><hr><factory-jsx class="hydrated"><div><div>Factory JSX</div><div>Factory JSX</div></div></factory-jsx></stencil-stage>"`,
+    );
+  });
+});
