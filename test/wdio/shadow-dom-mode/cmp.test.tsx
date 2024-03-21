@@ -18,12 +18,12 @@ describe('shadow-dom-mode', () => {
 
     const blueElm = document.querySelector('shadow-dom-mode[id="blue"]');
     const blueBg = window.getComputedStyle(blueElm).backgroundColor;
-    await expect(blueBg).toBe('rgb(0, 0, 255)');
+    expect(blueBg).toBe('rgb(0, 0, 255)');
 
     await $('shadow-dom-mode[id="red"]').waitForExist();
 
     const redElm = document.querySelector('shadow-dom-mode[id="red"]');
     const redBg = window.getComputedStyle(redElm).backgroundColor;
-    await expect(redBg).toBe('rgb(255, 0, 0)');
+    expect(redBg).toBe('rgb(255, 0, 0)');
   });
 });
