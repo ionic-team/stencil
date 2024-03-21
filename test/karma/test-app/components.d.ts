@@ -125,8 +125,6 @@ export namespace Components {
     }
     interface StencilSibling {
     }
-    interface SvgAttr {
-    }
     interface TextContentPatchScoped {
     }
     interface TextContentPatchScopedWithSlot {
@@ -439,12 +437,6 @@ declare global {
         prototype: HTMLStencilSiblingElement;
         new (): HTMLStencilSiblingElement;
     };
-    interface HTMLSvgAttrElement extends Components.SvgAttr, HTMLStencilElement {
-    }
-    var HTMLSvgAttrElement: {
-        prototype: HTMLSvgAttrElement;
-        new (): HTMLSvgAttrElement;
-    };
     interface HTMLTextContentPatchScopedElement extends Components.TextContentPatchScoped, HTMLStencilElement {
     }
     var HTMLTextContentPatchScopedElement: {
@@ -509,7 +501,6 @@ declare global {
         "static-members-separate-initializer": HTMLStaticMembersSeparateInitializerElement;
         "static-styles": HTMLStaticStylesElement;
         "stencil-sibling": HTMLStencilSiblingElement;
-        "svg-attr": HTMLSvgAttrElement;
         "text-content-patch-scoped": HTMLTextContentPatchScopedElement;
         "text-content-patch-scoped-with-slot": HTMLTextContentPatchScopedWithSlotElement;
     }
@@ -634,8 +625,6 @@ declare namespace LocalJSX {
     }
     interface StencilSibling {
     }
-    interface SvgAttr {
-    }
     interface TextContentPatchScoped {
     }
     interface TextContentPatchScopedWithSlot {
@@ -692,7 +681,6 @@ declare namespace LocalJSX {
         "static-members-separate-initializer": StaticMembersSeparateInitializer;
         "static-styles": StaticStyles;
         "stencil-sibling": StencilSibling;
-        "svg-attr": SvgAttr;
         "text-content-patch-scoped": TextContentPatchScoped;
         "text-content-patch-scoped-with-slot": TextContentPatchScopedWithSlot;
     }
@@ -752,7 +740,6 @@ declare module "@stencil/core" {
             "static-members-separate-initializer": LocalJSX.StaticMembersSeparateInitializer & JSXBase.HTMLAttributes<HTMLStaticMembersSeparateInitializerElement>;
             "static-styles": LocalJSX.StaticStyles & JSXBase.HTMLAttributes<HTMLStaticStylesElement>;
             "stencil-sibling": LocalJSX.StencilSibling & JSXBase.HTMLAttributes<HTMLStencilSiblingElement>;
-            "svg-attr": LocalJSX.SvgAttr & JSXBase.HTMLAttributes<HTMLSvgAttrElement>;
             "text-content-patch-scoped": LocalJSX.TextContentPatchScoped & JSXBase.HTMLAttributes<HTMLTextContentPatchScopedElement>;
             "text-content-patch-scoped-with-slot": LocalJSX.TextContentPatchScopedWithSlot & JSXBase.HTMLAttributes<HTMLTextContentPatchScopedWithSlotElement>;
         }

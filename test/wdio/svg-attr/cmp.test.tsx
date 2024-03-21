@@ -1,26 +1,24 @@
-import { setupDomTests, waitForChanges } from '../util';
+import { h } from '@stencil/core';
+import { render } from '@wdio/browser-runner/stencil';
 
 describe('svg attr', () => {
-  const { setupDom, tearDownDom } = setupDomTests(document);
-  let app: HTMLElement;
-
-  beforeEach(async () => {
-    app = await setupDom('/svg-attr/index.html');
+  beforeEach(() => {
+    render({
+      template: () => <svg-attr></svg-attr>,
+    });
   });
-  afterEach(tearDownDom);
 
   it('adds and removes attribute', async () => {
+    const app = document.body;
+    await $('svg-attr').waitForStable();
     let rect = app.querySelector('rect');
     expect(rect.getAttribute('transform')).toBe(null);
 
-    const button = app.querySelector('button');
-    button.click();
-    await waitForChanges();
+    await $('button').click();
     rect = app.querySelector('rect');
     expect(rect.getAttribute('transform')).toBe('rotate(45 27 27)');
 
-    button.click();
-    await waitForChanges();
+    await $('button').click();
     rect = app.querySelector('rect');
     expect(rect.getAttribute('transform')).toBe(null);
   });
