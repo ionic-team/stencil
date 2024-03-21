@@ -45,10 +45,6 @@ export namespace Components {
     }
     interface SlotArrayBasic {
     }
-    interface SlotArrayComplex {
-    }
-    interface SlotArrayComplexRoot {
-    }
     interface SlotArrayTop {
     }
     interface SlotBasicOrder {
@@ -261,18 +257,6 @@ declare global {
     var HTMLSlotArrayBasicElement: {
         prototype: HTMLSlotArrayBasicElement;
         new (): HTMLSlotArrayBasicElement;
-    };
-    interface HTMLSlotArrayComplexElement extends Components.SlotArrayComplex, HTMLStencilElement {
-    }
-    var HTMLSlotArrayComplexElement: {
-        prototype: HTMLSlotArrayComplexElement;
-        new (): HTMLSlotArrayComplexElement;
-    };
-    interface HTMLSlotArrayComplexRootElement extends Components.SlotArrayComplexRoot, HTMLStencilElement {
-    }
-    var HTMLSlotArrayComplexRootElement: {
-        prototype: HTMLSlotArrayComplexRootElement;
-        new (): HTMLSlotArrayComplexRootElement;
     };
     interface HTMLSlotArrayTopElement extends Components.SlotArrayTop, HTMLStencilElement {
     }
@@ -574,8 +558,6 @@ declare global {
         "shadow-dom-slot-nested": HTMLShadowDomSlotNestedElement;
         "shadow-dom-slot-nested-root": HTMLShadowDomSlotNestedRootElement;
         "slot-array-basic": HTMLSlotArrayBasicElement;
-        "slot-array-complex": HTMLSlotArrayComplexElement;
-        "slot-array-complex-root": HTMLSlotArrayComplexRootElement;
         "slot-array-top": HTMLSlotArrayTopElement;
         "slot-basic-order": HTMLSlotBasicOrderElement;
         "slot-basic-order-root": HTMLSlotBasicOrderRootElement;
@@ -664,10 +646,6 @@ declare namespace LocalJSX {
     interface ShadowDomSlotNestedRoot {
     }
     interface SlotArrayBasic {
-    }
-    interface SlotArrayComplex {
-    }
-    interface SlotArrayComplexRoot {
     }
     interface SlotArrayTop {
     }
@@ -796,8 +774,6 @@ declare namespace LocalJSX {
         "shadow-dom-slot-nested": ShadowDomSlotNested;
         "shadow-dom-slot-nested-root": ShadowDomSlotNestedRoot;
         "slot-array-basic": SlotArrayBasic;
-        "slot-array-complex": SlotArrayComplex;
-        "slot-array-complex-root": SlotArrayComplexRoot;
         "slot-array-top": SlotArrayTop;
         "slot-basic-order": SlotBasicOrder;
         "slot-basic-order-root": SlotBasicOrderRoot;
@@ -868,8 +844,6 @@ declare module "@stencil/core" {
             "shadow-dom-slot-nested": LocalJSX.ShadowDomSlotNested & JSXBase.HTMLAttributes<HTMLShadowDomSlotNestedElement>;
             "shadow-dom-slot-nested-root": LocalJSX.ShadowDomSlotNestedRoot & JSXBase.HTMLAttributes<HTMLShadowDomSlotNestedRootElement>;
             "slot-array-basic": LocalJSX.SlotArrayBasic & JSXBase.HTMLAttributes<HTMLSlotArrayBasicElement>;
-            "slot-array-complex": LocalJSX.SlotArrayComplex & JSXBase.HTMLAttributes<HTMLSlotArrayComplexElement>;
-            "slot-array-complex-root": LocalJSX.SlotArrayComplexRoot & JSXBase.HTMLAttributes<HTMLSlotArrayComplexRootElement>;
             "slot-array-top": LocalJSX.SlotArrayTop & JSXBase.HTMLAttributes<HTMLSlotArrayTopElement>;
             "slot-basic-order": LocalJSX.SlotBasicOrder & JSXBase.HTMLAttributes<HTMLSlotBasicOrderElement>;
             "slot-basic-order-root": LocalJSX.SlotBasicOrderRoot & JSXBase.HTMLAttributes<HTMLSlotBasicOrderRootElement>;
