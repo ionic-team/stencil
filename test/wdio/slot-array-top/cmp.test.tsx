@@ -13,9 +13,8 @@ describe('slot array top', () => {
   });
 
   it('renders slotted content in the right position', async () => {
-    const root = $('slot-array-top')
-    await expect(root).toHaveText(
-      'Content should be on top\nSlotted content should be on bottom');
+    const root = $('slot-array-top');
+    await expect(root).toHaveText('Content should be on top\nSlotted content should be on bottom');
     await expect($('[hidden]')).not.toBeExisting();
   });
 });
