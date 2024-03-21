@@ -57,13 +57,9 @@ export namespace Components {
     }
     interface SlotArrayTop {
     }
-    interface SlotBasic {
-    }
     interface SlotBasicOrder {
     }
     interface SlotBasicOrderRoot {
-    }
-    interface SlotBasicRoot {
     }
     interface SlotChildrenRoot {
     }
@@ -317,12 +313,6 @@ declare global {
         prototype: HTMLSlotArrayTopElement;
         new (): HTMLSlotArrayTopElement;
     };
-    interface HTMLSlotBasicElement extends Components.SlotBasic, HTMLStencilElement {
-    }
-    var HTMLSlotBasicElement: {
-        prototype: HTMLSlotBasicElement;
-        new (): HTMLSlotBasicElement;
-    };
     interface HTMLSlotBasicOrderElement extends Components.SlotBasicOrder, HTMLStencilElement {
     }
     var HTMLSlotBasicOrderElement: {
@@ -334,12 +324,6 @@ declare global {
     var HTMLSlotBasicOrderRootElement: {
         prototype: HTMLSlotBasicOrderRootElement;
         new (): HTMLSlotBasicOrderRootElement;
-    };
-    interface HTMLSlotBasicRootElement extends Components.SlotBasicRoot, HTMLStencilElement {
-    }
-    var HTMLSlotBasicRootElement: {
-        prototype: HTMLSlotBasicRootElement;
-        new (): HTMLSlotBasicRootElement;
     };
     interface HTMLSlotChildrenRootElement extends Components.SlotChildrenRoot, HTMLStencilElement {
     }
@@ -653,10 +637,8 @@ declare global {
         "slot-array-complex": HTMLSlotArrayComplexElement;
         "slot-array-complex-root": HTMLSlotArrayComplexRootElement;
         "slot-array-top": HTMLSlotArrayTopElement;
-        "slot-basic": HTMLSlotBasicElement;
         "slot-basic-order": HTMLSlotBasicOrderElement;
         "slot-basic-order-root": HTMLSlotBasicOrderRootElement;
-        "slot-basic-root": HTMLSlotBasicRootElement;
         "slot-children-root": HTMLSlotChildrenRootElement;
         "slot-conditional-rendering": HTMLSlotConditionalRenderingElement;
         "slot-dynamic-name-change-scoped": HTMLSlotDynamicNameChangeScopedElement;
@@ -759,13 +741,9 @@ declare namespace LocalJSX {
     }
     interface SlotArrayTop {
     }
-    interface SlotBasic {
-    }
     interface SlotBasicOrder {
     }
     interface SlotBasicOrderRoot {
-    }
-    interface SlotBasicRoot {
     }
     interface SlotChildrenRoot {
     }
@@ -903,10 +881,8 @@ declare namespace LocalJSX {
         "slot-array-complex": SlotArrayComplex;
         "slot-array-complex-root": SlotArrayComplexRoot;
         "slot-array-top": SlotArrayTop;
-        "slot-basic": SlotBasic;
         "slot-basic-order": SlotBasicOrder;
         "slot-basic-order-root": SlotBasicOrderRoot;
-        "slot-basic-root": SlotBasicRoot;
         "slot-children-root": SlotChildrenRoot;
         "slot-conditional-rendering": SlotConditionalRendering;
         "slot-dynamic-name-change-scoped": SlotDynamicNameChangeScoped;
@@ -984,10 +960,8 @@ declare module "@stencil/core" {
             "slot-array-complex": LocalJSX.SlotArrayComplex & JSXBase.HTMLAttributes<HTMLSlotArrayComplexElement>;
             "slot-array-complex-root": LocalJSX.SlotArrayComplexRoot & JSXBase.HTMLAttributes<HTMLSlotArrayComplexRootElement>;
             "slot-array-top": LocalJSX.SlotArrayTop & JSXBase.HTMLAttributes<HTMLSlotArrayTopElement>;
-            "slot-basic": LocalJSX.SlotBasic & JSXBase.HTMLAttributes<HTMLSlotBasicElement>;
             "slot-basic-order": LocalJSX.SlotBasicOrder & JSXBase.HTMLAttributes<HTMLSlotBasicOrderElement>;
             "slot-basic-order-root": LocalJSX.SlotBasicOrderRoot & JSXBase.HTMLAttributes<HTMLSlotBasicOrderRootElement>;
-            "slot-basic-root": LocalJSX.SlotBasicRoot & JSXBase.HTMLAttributes<HTMLSlotBasicRootElement>;
             "slot-children-root": LocalJSX.SlotChildrenRoot & JSXBase.HTMLAttributes<HTMLSlotChildrenRootElement>;
             "slot-conditional-rendering": LocalJSX.SlotConditionalRendering & JSXBase.HTMLAttributes<HTMLSlotConditionalRenderingElement>;
             "slot-dynamic-name-change-scoped": LocalJSX.SlotDynamicNameChangeScoped & JSXBase.HTMLAttributes<HTMLSlotDynamicNameChangeScopedElement>;
