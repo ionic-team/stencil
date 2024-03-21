@@ -1,93 +1,114 @@
-import { h } from '@stencil/core';
+import { Fragment, h } from '@stencil/core';
 import { render } from '@wdio/browser-runner/stencil';
+
+const CSS = `main {
+  color: blue;
+  font-weight: bold;
+}`
 
 describe('shadow-dom-slot-nested', () => {
   beforeEach(async () => {
     render({
       template: () => (
-        <main>
-          main content
-          <shadow-dom-slot-nested-root></shadow-dom-slot-nested-root>
-        </main>
+        <>
+          <main>
+            main content
+            <shadow-dom-slot-nested-root></shadow-dom-slot-nested-root>
+          </main>
+          <style>{CSS}</style>
+        </>
       ),
     });
   });
 
   it('renders children', async () => {
-    let elm = document.querySelector('main');
-    expect(window.getComputedStyle(elm).color).toBe('rgb(0, 0, 255)');
+    const elm = $('main');
+    await expect(elm.getCSSProperty('color')).toMatchInlineSnapshot(`
+      {
+        "parsed": {
+          "alpha": 1,
+          "hex": "#0000ff",
+          "rgba": "rgba(0,0,255,1)",
+          "type": "color",
+        },
+        "property": "color",
+        "value": "rgba(0,0,255,1)",
+      }
+    `);
 
-    elm = document.querySelector('shadow-dom-slot-nested-root');
-    expect(elm.shadowRoot).toBeDefined();
+    const cmp = $('shadow-dom-slot-nested-root')
+    const section = cmp.shadow$('section');
+    await expect(section.getCSSProperty('color')).toMatchInlineSnapshot(`
+      {
+        "parsed": {
+          "alpha": 1,
+          "hex": "#008000",
+          "rgba": "rgba(0,128,0,1)",
+          "type": "color",
+        },
+        "property": "color",
+        "value": "rgba(0,128,0,1)",
+      }
+    `)
 
-    if ('attachShadow' in HTMLElement.prototype) {
-      expect(elm.shadowRoot.nodeType).toBe(11);
+    const article = cmp.shadow$('article');
+    await expect(article.getCSSProperty('color')).toMatchInlineSnapshot(`
+      {
+        "parsed": {
+          "alpha": 1,
+          "hex": "#008000",
+          "rgba": "rgba(0,128,0,1)",
+          "type": "color",
+        },
+        "property": "color",
+        "value": "rgba(0,128,0,1)",
+      }
+    `);
 
-      const section = elm.shadowRoot.querySelector('section');
-      expect(window.getComputedStyle(section).color).toBe('rgb(0, 128, 0)');
+    const children = article.$$('*')
+    await expect(children).toBeElementsArrayOfSize(3);
 
-      const article = elm.shadowRoot.querySelector('article');
-      expect(window.getComputedStyle(article).color).toBe('rgb(0, 128, 0)');
+    const testShadowNested = async function (i: number) {
+      const nestedElm = children[i];
 
-      expect(article.children.length).toBe(3);
+      const header = nestedElm.shadow$('header');
+      await expect(header).toHaveText('shadow dom: ' + i);
+      await expect(header.getCSSProperty('color')).toMatchInlineSnapshot(`
+        {
+          "parsed": {
+            "alpha": 1,
+            "hex": "#ff0000",
+            "rgba": "rgba(255,0,0,1)",
+            "type": "color",
+          },
+          "property": "color",
+          "value": "rgba(255,0,0,1)",
+        }
+      `)
 
-      const testShadowNested = function (i: number) {
-        const nestedElm = article.children[i];
-        const shadowRoot = nestedElm.shadowRoot;
+      const footer = nestedElm.shadow$('footer');
+      const footerSlot = footer.$('slot');
+      await expect(children).toBeElementsArrayOfSize(3);
+      await expect(footerSlot.$$('*')).toBeElementsArrayOfSize(0);
+      await expect(footerSlot).toHaveText('');
 
-        const header = shadowRoot.querySelector('header');
-        expect(header.textContent.trim()).toBe('shadow dom: ' + i);
-        expect(window.getComputedStyle(header).color).toBe('rgb(255, 0, 0)');
+      await expect(nestedElm).toHaveText(expect.stringContaining('light dom: ' + i));
+      await expect(nestedElm.getCSSProperty('color')).toMatchInlineSnapshot(`
+        {
+          "parsed": {
+            "alpha": 1,
+            "hex": "#008000",
+            "rgba": "rgba(0,128,0,1)",
+            "type": "color",
+          },
+          "property": "color",
+          "value": "rgba(0,128,0,1)",
+        }
+      `)
+    };
 
-        const footer = shadowRoot.querySelector('footer');
-        const footerSlot = footer.firstElementChild;
-        expect(footerSlot.nodeName.toLowerCase()).toBe('slot');
-        expect(footerSlot.childNodes.length).toBe(0);
-        expect(footerSlot.textContent.trim()).toBe('');
-
-        expect(nestedElm.textContent.trim()).toBe('light dom: ' + i);
-        expect(window.getComputedStyle(nestedElm).color).toBe('rgb(0, 128, 0)');
-      };
-
-      testShadowNested(0);
-      testShadowNested(1);
-      testShadowNested(2);
-    } else {
-      expect(elm.shadowRoot).toBe(elm);
-      expect(elm.classList.contains('sc-shadow-dom-slot-nested-root-h')).toBe(true);
-
-      const section = elm.querySelector('section');
-      expect(section.classList.contains('sc-shadow-dom-slot-nested-root')).toBe(true);
-      expect(section.textContent.trim()).toBe('shadow-dom-slot-nested');
-      expect(window.getComputedStyle(section).color).toBe('rgb(0, 128, 0)');
-
-      const article = elm.querySelector('article');
-      expect(article.classList.contains('sc-shadow-dom-slot-nested-root')).toBe(true);
-      expect(window.getComputedStyle(article).color).toBe('rgb(0, 128, 0)');
-
-      expect(article.children.length).toBe(3);
-
-      const testSlotPolyfillNested = function (i: number) {
-        const nestedElm = article.children[i];
-        expect(nestedElm.classList.contains('sc-shadow-dom-slot-nested-root')).toBe(true);
-        expect(nestedElm.classList.contains('sc-shadow-dom-slot-nested-h')).toBe(true);
-
-        const header = nestedElm.querySelector('header');
-        expect(header.classList.contains('sc-shadow-dom-slot-nested')).toBe(true);
-        expect(header.classList.contains('sc-shadow-dom-slot-nested-s')).toBe(false);
-        expect(header.textContent.trim()).toBe('shadow dom: ' + i);
-        expect(window.getComputedStyle(header).color).toBe('rgb(255, 0, 0)');
-
-        const footer = nestedElm.querySelector('footer');
-        expect(footer.classList.contains('sc-shadow-dom-slot-nested')).toBe(true);
-        expect(footer.classList.contains('sc-shadow-dom-slot-nested-s')).toBe(true);
-        expect(footer.textContent.trim()).toBe('light dom: ' + i);
-        expect(window.getComputedStyle(footer).color).toBe('rgb(0, 128, 0)');
-      };
-
-      testSlotPolyfillNested(0);
-      testSlotPolyfillNested(1);
-      testSlotPolyfillNested(2);
-    }
+    await testShadowNested(0);
+    await testShadowNested(1);
+    await testShadowNested(2);
   });
 });
