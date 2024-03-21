@@ -35,6 +35,10 @@
     "./global.ts"
   ],
   "exclude": [
-    "./**/*.test.tsx"
+    "./**/*.test.tsx",
+    // we exclude the files in the global-script directory here since they're
+    // compiled separately
+    "./global-script/**/*.tsx",
+    "./global-script/**/*.ts"
   ]
 }
