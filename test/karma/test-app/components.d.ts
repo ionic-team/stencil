@@ -136,8 +136,6 @@ export namespace Components {
     }
     interface SvgAttr {
     }
-    interface SvgClass {
-    }
     interface TextContentPatchScoped {
     }
     interface TextContentPatchScopedWithSlot {
@@ -482,12 +480,6 @@ declare global {
         prototype: HTMLSvgAttrElement;
         new (): HTMLSvgAttrElement;
     };
-    interface HTMLSvgClassElement extends Components.SvgClass, HTMLStencilElement {
-    }
-    var HTMLSvgClassElement: {
-        prototype: HTMLSvgClassElement;
-        new (): HTMLSvgClassElement;
-    };
     interface HTMLTextContentPatchScopedElement extends Components.TextContentPatchScoped, HTMLStencilElement {
     }
     var HTMLTextContentPatchScopedElement: {
@@ -563,7 +555,6 @@ declare global {
         "static-styles": HTMLStaticStylesElement;
         "stencil-sibling": HTMLStencilSiblingElement;
         "svg-attr": HTMLSvgAttrElement;
-        "svg-class": HTMLSvgClassElement;
         "text-content-patch-scoped": HTMLTextContentPatchScopedElement;
         "text-content-patch-scoped-with-slot": HTMLTextContentPatchScopedWithSlotElement;
         "watch-native-attributes": HTMLWatchNativeAttributesElement;
@@ -700,8 +691,6 @@ declare namespace LocalJSX {
     }
     interface SvgAttr {
     }
-    interface SvgClass {
-    }
     interface TextContentPatchScoped {
     }
     interface TextContentPatchScopedWithSlot {
@@ -765,7 +754,6 @@ declare namespace LocalJSX {
         "static-styles": StaticStyles;
         "stencil-sibling": StencilSibling;
         "svg-attr": SvgAttr;
-        "svg-class": SvgClass;
         "text-content-patch-scoped": TextContentPatchScoped;
         "text-content-patch-scoped-with-slot": TextContentPatchScopedWithSlot;
         "watch-native-attributes": WatchNativeAttributes;
@@ -831,7 +819,6 @@ declare module "@stencil/core" {
             "static-styles": LocalJSX.StaticStyles & JSXBase.HTMLAttributes<HTMLStaticStylesElement>;
             "stencil-sibling": LocalJSX.StencilSibling & JSXBase.HTMLAttributes<HTMLStencilSiblingElement>;
             "svg-attr": LocalJSX.SvgAttr & JSXBase.HTMLAttributes<HTMLSvgAttrElement>;
-            "svg-class": LocalJSX.SvgClass & JSXBase.HTMLAttributes<HTMLSvgClassElement>;
             "text-content-patch-scoped": LocalJSX.TextContentPatchScoped & JSXBase.HTMLAttributes<HTMLTextContentPatchScopedElement>;
             "text-content-patch-scoped-with-slot": LocalJSX.TextContentPatchScopedWithSlot & JSXBase.HTMLAttributes<HTMLTextContentPatchScopedWithSlotElement>;
             "watch-native-attributes": LocalJSX.WatchNativeAttributes & JSXBase.HTMLAttributes<HTMLWatchNativeAttributesElement>;
