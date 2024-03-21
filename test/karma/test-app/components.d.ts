@@ -26,14 +26,6 @@ export namespace Components {
     }
     interface ReparentStyleWithVars {
     }
-    interface ShadowDomMode {
-        /**
-          * The mode determines which platform styles to use.
-         */
-        "colormode"?: string;
-    }
-    interface ShadowDomModeRoot {
-    }
     interface ShadowDomSlotNested {
         "i"?: number;
     }
@@ -184,18 +176,6 @@ declare global {
     var HTMLReparentStyleWithVarsElement: {
         prototype: HTMLReparentStyleWithVarsElement;
         new (): HTMLReparentStyleWithVarsElement;
-    };
-    interface HTMLShadowDomModeElement extends Components.ShadowDomMode, HTMLStencilElement {
-    }
-    var HTMLShadowDomModeElement: {
-        prototype: HTMLShadowDomModeElement;
-        new (): HTMLShadowDomModeElement;
-    };
-    interface HTMLShadowDomModeRootElement extends Components.ShadowDomModeRoot, HTMLStencilElement {
-    }
-    var HTMLShadowDomModeRootElement: {
-        prototype: HTMLShadowDomModeRootElement;
-        new (): HTMLShadowDomModeRootElement;
     };
     interface HTMLShadowDomSlotNestedElement extends Components.ShadowDomSlotNested, HTMLStencilElement {
     }
@@ -442,8 +422,6 @@ declare global {
         "init-css-root": HTMLInitCssRootElement;
         "reparent-style-no-vars": HTMLReparentStyleNoVarsElement;
         "reparent-style-with-vars": HTMLReparentStyleWithVarsElement;
-        "shadow-dom-mode": HTMLShadowDomModeElement;
-        "shadow-dom-mode-root": HTMLShadowDomModeRootElement;
         "shadow-dom-slot-nested": HTMLShadowDomSlotNestedElement;
         "shadow-dom-slot-nested-root": HTMLShadowDomSlotNestedRootElement;
         "slot-array-basic": HTMLSlotArrayBasicElement;
@@ -505,14 +483,6 @@ declare namespace LocalJSX {
     interface ReparentStyleNoVars {
     }
     interface ReparentStyleWithVars {
-    }
-    interface ShadowDomMode {
-        /**
-          * The mode determines which platform styles to use.
-         */
-        "colormode"?: string;
-    }
-    interface ShadowDomModeRoot {
     }
     interface ShadowDomSlotNested {
         "i"?: number;
@@ -614,8 +584,6 @@ declare namespace LocalJSX {
         "init-css-root": InitCssRoot;
         "reparent-style-no-vars": ReparentStyleNoVars;
         "reparent-style-with-vars": ReparentStyleWithVars;
-        "shadow-dom-mode": ShadowDomMode;
-        "shadow-dom-mode-root": ShadowDomModeRoot;
         "shadow-dom-slot-nested": ShadowDomSlotNested;
         "shadow-dom-slot-nested-root": ShadowDomSlotNestedRoot;
         "slot-array-basic": SlotArrayBasic;
@@ -671,8 +639,6 @@ declare module "@stencil/core" {
             "init-css-root": LocalJSX.InitCssRoot & JSXBase.HTMLAttributes<HTMLInitCssRootElement>;
             "reparent-style-no-vars": LocalJSX.ReparentStyleNoVars & JSXBase.HTMLAttributes<HTMLReparentStyleNoVarsElement>;
             "reparent-style-with-vars": LocalJSX.ReparentStyleWithVars & JSXBase.HTMLAttributes<HTMLReparentStyleWithVarsElement>;
-            "shadow-dom-mode": LocalJSX.ShadowDomMode & JSXBase.HTMLAttributes<HTMLShadowDomModeElement>;
-            "shadow-dom-mode-root": LocalJSX.ShadowDomModeRoot & JSXBase.HTMLAttributes<HTMLShadowDomModeRootElement>;
             "shadow-dom-slot-nested": LocalJSX.ShadowDomSlotNested & JSXBase.HTMLAttributes<HTMLShadowDomSlotNestedElement>;
             "shadow-dom-slot-nested-root": LocalJSX.ShadowDomSlotNestedRoot & JSXBase.HTMLAttributes<HTMLShadowDomSlotNestedRootElement>;
             "slot-array-basic": LocalJSX.SlotArrayBasic & JSXBase.HTMLAttributes<HTMLSlotArrayBasicElement>;
