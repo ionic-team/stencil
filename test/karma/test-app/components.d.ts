@@ -51,8 +51,6 @@ export namespace Components {
     }
     interface SlotNoDefault {
     }
-    interface SlotRef {
-    }
     interface SlotReorder {
         "reordered": boolean;
     }
@@ -199,12 +197,6 @@ declare global {
         prototype: HTMLSlotNoDefaultElement;
         new (): HTMLSlotNoDefaultElement;
     };
-    interface HTMLSlotRefElement extends Components.SlotRef, HTMLStencilElement {
-    }
-    var HTMLSlotRefElement: {
-        prototype: HTMLSlotRefElement;
-        new (): HTMLSlotRefElement;
-    };
     interface HTMLSlotReorderElement extends Components.SlotReorder, HTMLStencilElement {
     }
     var HTMLSlotReorderElement: {
@@ -275,7 +267,6 @@ declare global {
         "slot-nested-default-order-parent": HTMLSlotNestedDefaultOrderParentElement;
         "slot-ng-if": HTMLSlotNgIfElement;
         "slot-no-default": HTMLSlotNoDefaultElement;
-        "slot-ref": HTMLSlotRefElement;
         "slot-reorder": HTMLSlotReorderElement;
         "slot-reorder-root": HTMLSlotReorderRootElement;
         "slot-replace-wrapper": HTMLSlotReplaceWrapperElement;
@@ -332,8 +323,6 @@ declare namespace LocalJSX {
     }
     interface SlotNoDefault {
     }
-    interface SlotRef {
-    }
     interface SlotReorder {
         "reordered"?: boolean;
     }
@@ -374,7 +363,6 @@ declare namespace LocalJSX {
         "slot-nested-default-order-parent": SlotNestedDefaultOrderParent;
         "slot-ng-if": SlotNgIf;
         "slot-no-default": SlotNoDefault;
-        "slot-ref": SlotRef;
         "slot-reorder": SlotReorder;
         "slot-reorder-root": SlotReorderRoot;
         "slot-replace-wrapper": SlotReplaceWrapper;
@@ -410,7 +398,6 @@ declare module "@stencil/core" {
             "slot-nested-default-order-parent": LocalJSX.SlotNestedDefaultOrderParent & JSXBase.HTMLAttributes<HTMLSlotNestedDefaultOrderParentElement>;
             "slot-ng-if": LocalJSX.SlotNgIf & JSXBase.HTMLAttributes<HTMLSlotNgIfElement>;
             "slot-no-default": LocalJSX.SlotNoDefault & JSXBase.HTMLAttributes<HTMLSlotNoDefaultElement>;
-            "slot-ref": LocalJSX.SlotRef & JSXBase.HTMLAttributes<HTMLSlotRefElement>;
             "slot-reorder": LocalJSX.SlotReorder & JSXBase.HTMLAttributes<HTMLSlotReorderElement>;
             "slot-reorder-root": LocalJSX.SlotReorderRoot & JSXBase.HTMLAttributes<HTMLSlotReorderRootElement>;
             "slot-replace-wrapper": LocalJSX.SlotReplaceWrapper & JSXBase.HTMLAttributes<HTMLSlotReplaceWrapperElement>;
