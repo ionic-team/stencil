@@ -35,20 +35,12 @@ export namespace Components {
     }
     interface SlotConditionalRendering {
     }
-    interface SlotDynamicShadowList {
-        "items": Array<string>;
-    }
     interface SlotHtml {
         "inc": number;
     }
     interface SlotLightDomContent {
     }
     interface SlotLightDomRoot {
-    }
-    interface SlotLightList {
-    }
-    interface SlotListLightRoot {
-        "items": string[];
     }
     interface SlotNestedDefaultOrderChild {
         "state": boolean;
@@ -165,12 +157,6 @@ declare global {
         prototype: HTMLSlotConditionalRenderingElement;
         new (): HTMLSlotConditionalRenderingElement;
     };
-    interface HTMLSlotDynamicShadowListElement extends Components.SlotDynamicShadowList, HTMLStencilElement {
-    }
-    var HTMLSlotDynamicShadowListElement: {
-        prototype: HTMLSlotDynamicShadowListElement;
-        new (): HTMLSlotDynamicShadowListElement;
-    };
     interface HTMLSlotHtmlElement extends Components.SlotHtml, HTMLStencilElement {
     }
     var HTMLSlotHtmlElement: {
@@ -188,18 +174,6 @@ declare global {
     var HTMLSlotLightDomRootElement: {
         prototype: HTMLSlotLightDomRootElement;
         new (): HTMLSlotLightDomRootElement;
-    };
-    interface HTMLSlotLightListElement extends Components.SlotLightList, HTMLStencilElement {
-    }
-    var HTMLSlotLightListElement: {
-        prototype: HTMLSlotLightListElement;
-        new (): HTMLSlotLightListElement;
-    };
-    interface HTMLSlotListLightRootElement extends Components.SlotListLightRoot, HTMLStencilElement {
-    }
-    var HTMLSlotListLightRootElement: {
-        prototype: HTMLSlotListLightRootElement;
-        new (): HTMLSlotListLightRootElement;
     };
     interface HTMLSlotNestedDefaultOrderChildElement extends Components.SlotNestedDefaultOrderChild, HTMLStencilElement {
     }
@@ -294,12 +268,9 @@ declare global {
         "shadow-dom-slot-nested-root": HTMLShadowDomSlotNestedRootElement;
         "slot-children-root": HTMLSlotChildrenRootElement;
         "slot-conditional-rendering": HTMLSlotConditionalRenderingElement;
-        "slot-dynamic-shadow-list": HTMLSlotDynamicShadowListElement;
         "slot-html": HTMLSlotHtmlElement;
         "slot-light-dom-content": HTMLSlotLightDomContentElement;
         "slot-light-dom-root": HTMLSlotLightDomRootElement;
-        "slot-light-list": HTMLSlotLightListElement;
-        "slot-list-light-root": HTMLSlotListLightRootElement;
         "slot-nested-default-order-child": HTMLSlotNestedDefaultOrderChildElement;
         "slot-nested-default-order-parent": HTMLSlotNestedDefaultOrderParentElement;
         "slot-ng-if": HTMLSlotNgIfElement;
@@ -345,20 +316,12 @@ declare namespace LocalJSX {
     }
     interface SlotConditionalRendering {
     }
-    interface SlotDynamicShadowList {
-        "items"?: Array<string>;
-    }
     interface SlotHtml {
         "inc"?: number;
     }
     interface SlotLightDomContent {
     }
     interface SlotLightDomRoot {
-    }
-    interface SlotLightList {
-    }
-    interface SlotListLightRoot {
-        "items"?: string[];
     }
     interface SlotNestedDefaultOrderChild {
         "state"?: boolean;
@@ -404,12 +367,9 @@ declare namespace LocalJSX {
         "shadow-dom-slot-nested-root": ShadowDomSlotNestedRoot;
         "slot-children-root": SlotChildrenRoot;
         "slot-conditional-rendering": SlotConditionalRendering;
-        "slot-dynamic-shadow-list": SlotDynamicShadowList;
         "slot-html": SlotHtml;
         "slot-light-dom-content": SlotLightDomContent;
         "slot-light-dom-root": SlotLightDomRoot;
-        "slot-light-list": SlotLightList;
-        "slot-list-light-root": SlotListLightRoot;
         "slot-nested-default-order-child": SlotNestedDefaultOrderChild;
         "slot-nested-default-order-parent": SlotNestedDefaultOrderParent;
         "slot-ng-if": SlotNgIf;
@@ -443,12 +403,9 @@ declare module "@stencil/core" {
             "shadow-dom-slot-nested-root": LocalJSX.ShadowDomSlotNestedRoot & JSXBase.HTMLAttributes<HTMLShadowDomSlotNestedRootElement>;
             "slot-children-root": LocalJSX.SlotChildrenRoot & JSXBase.HTMLAttributes<HTMLSlotChildrenRootElement>;
             "slot-conditional-rendering": LocalJSX.SlotConditionalRendering & JSXBase.HTMLAttributes<HTMLSlotConditionalRenderingElement>;
-            "slot-dynamic-shadow-list": LocalJSX.SlotDynamicShadowList & JSXBase.HTMLAttributes<HTMLSlotDynamicShadowListElement>;
             "slot-html": LocalJSX.SlotHtml & JSXBase.HTMLAttributes<HTMLSlotHtmlElement>;
             "slot-light-dom-content": LocalJSX.SlotLightDomContent & JSXBase.HTMLAttributes<HTMLSlotLightDomContentElement>;
             "slot-light-dom-root": LocalJSX.SlotLightDomRoot & JSXBase.HTMLAttributes<HTMLSlotLightDomRootElement>;
-            "slot-light-list": LocalJSX.SlotLightList & JSXBase.HTMLAttributes<HTMLSlotLightListElement>;
-            "slot-list-light-root": LocalJSX.SlotListLightRoot & JSXBase.HTMLAttributes<HTMLSlotListLightRootElement>;
             "slot-nested-default-order-child": LocalJSX.SlotNestedDefaultOrderChild & JSXBase.HTMLAttributes<HTMLSlotNestedDefaultOrderChildElement>;
             "slot-nested-default-order-parent": LocalJSX.SlotNestedDefaultOrderParent & JSXBase.HTMLAttributes<HTMLSlotNestedDefaultOrderParentElement>;
             "slot-ng-if": LocalJSX.SlotNgIf & JSXBase.HTMLAttributes<HTMLSlotNgIfElement>;
