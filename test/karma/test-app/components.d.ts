@@ -38,10 +38,6 @@ export namespace Components {
     interface SlotHtml {
         "inc": number;
     }
-    interface SlotLightDomContent {
-    }
-    interface SlotLightDomRoot {
-    }
     interface SlotNestedDefaultOrderChild {
         "state": boolean;
     }
@@ -163,18 +159,6 @@ declare global {
         prototype: HTMLSlotHtmlElement;
         new (): HTMLSlotHtmlElement;
     };
-    interface HTMLSlotLightDomContentElement extends Components.SlotLightDomContent, HTMLStencilElement {
-    }
-    var HTMLSlotLightDomContentElement: {
-        prototype: HTMLSlotLightDomContentElement;
-        new (): HTMLSlotLightDomContentElement;
-    };
-    interface HTMLSlotLightDomRootElement extends Components.SlotLightDomRoot, HTMLStencilElement {
-    }
-    var HTMLSlotLightDomRootElement: {
-        prototype: HTMLSlotLightDomRootElement;
-        new (): HTMLSlotLightDomRootElement;
-    };
     interface HTMLSlotNestedDefaultOrderChildElement extends Components.SlotNestedDefaultOrderChild, HTMLStencilElement {
     }
     var HTMLSlotNestedDefaultOrderChildElement: {
@@ -269,8 +253,6 @@ declare global {
         "slot-children-root": HTMLSlotChildrenRootElement;
         "slot-conditional-rendering": HTMLSlotConditionalRenderingElement;
         "slot-html": HTMLSlotHtmlElement;
-        "slot-light-dom-content": HTMLSlotLightDomContentElement;
-        "slot-light-dom-root": HTMLSlotLightDomRootElement;
         "slot-nested-default-order-child": HTMLSlotNestedDefaultOrderChildElement;
         "slot-nested-default-order-parent": HTMLSlotNestedDefaultOrderParentElement;
         "slot-ng-if": HTMLSlotNgIfElement;
@@ -319,10 +301,6 @@ declare namespace LocalJSX {
     interface SlotHtml {
         "inc"?: number;
     }
-    interface SlotLightDomContent {
-    }
-    interface SlotLightDomRoot {
-    }
     interface SlotNestedDefaultOrderChild {
         "state"?: boolean;
     }
@@ -368,8 +346,6 @@ declare namespace LocalJSX {
         "slot-children-root": SlotChildrenRoot;
         "slot-conditional-rendering": SlotConditionalRendering;
         "slot-html": SlotHtml;
-        "slot-light-dom-content": SlotLightDomContent;
-        "slot-light-dom-root": SlotLightDomRoot;
         "slot-nested-default-order-child": SlotNestedDefaultOrderChild;
         "slot-nested-default-order-parent": SlotNestedDefaultOrderParent;
         "slot-ng-if": SlotNgIf;
@@ -404,8 +380,6 @@ declare module "@stencil/core" {
             "slot-children-root": LocalJSX.SlotChildrenRoot & JSXBase.HTMLAttributes<HTMLSlotChildrenRootElement>;
             "slot-conditional-rendering": LocalJSX.SlotConditionalRendering & JSXBase.HTMLAttributes<HTMLSlotConditionalRenderingElement>;
             "slot-html": LocalJSX.SlotHtml & JSXBase.HTMLAttributes<HTMLSlotHtmlElement>;
-            "slot-light-dom-content": LocalJSX.SlotLightDomContent & JSXBase.HTMLAttributes<HTMLSlotLightDomContentElement>;
-            "slot-light-dom-root": LocalJSX.SlotLightDomRoot & JSXBase.HTMLAttributes<HTMLSlotLightDomRootElement>;
             "slot-nested-default-order-child": LocalJSX.SlotNestedDefaultOrderChild & JSXBase.HTMLAttributes<HTMLSlotNestedDefaultOrderChildElement>;
             "slot-nested-default-order-parent": LocalJSX.SlotNestedDefaultOrderParent & JSXBase.HTMLAttributes<HTMLSlotNestedDefaultOrderParentElement>;
             "slot-ng-if": LocalJSX.SlotNgIf & JSXBase.HTMLAttributes<HTMLSlotNgIfElement>;
