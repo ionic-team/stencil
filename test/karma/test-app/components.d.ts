@@ -58,10 +58,6 @@ export namespace Components {
     interface SlotListLightScopedRoot {
         "items": string[];
     }
-    interface SlotMapOrder {
-    }
-    interface SlotMapOrderRoot {
-    }
     interface SlotNestedDefaultOrderChild {
         "state": boolean;
     }
@@ -235,18 +231,6 @@ declare global {
         prototype: HTMLSlotListLightScopedRootElement;
         new (): HTMLSlotListLightScopedRootElement;
     };
-    interface HTMLSlotMapOrderElement extends Components.SlotMapOrder, HTMLStencilElement {
-    }
-    var HTMLSlotMapOrderElement: {
-        prototype: HTMLSlotMapOrderElement;
-        new (): HTMLSlotMapOrderElement;
-    };
-    interface HTMLSlotMapOrderRootElement extends Components.SlotMapOrderRoot, HTMLStencilElement {
-    }
-    var HTMLSlotMapOrderRootElement: {
-        prototype: HTMLSlotMapOrderRootElement;
-        new (): HTMLSlotMapOrderRootElement;
-    };
     interface HTMLSlotNestedDefaultOrderChildElement extends Components.SlotNestedDefaultOrderChild, HTMLStencilElement {
     }
     var HTMLSlotNestedDefaultOrderChildElement: {
@@ -361,8 +345,6 @@ declare global {
         "slot-light-scoped-list": HTMLSlotLightScopedListElement;
         "slot-list-light-root": HTMLSlotListLightRootElement;
         "slot-list-light-scoped-root": HTMLSlotListLightScopedRootElement;
-        "slot-map-order": HTMLSlotMapOrderElement;
-        "slot-map-order-root": HTMLSlotMapOrderRootElement;
         "slot-nested-default-order-child": HTMLSlotNestedDefaultOrderChildElement;
         "slot-nested-default-order-parent": HTMLSlotNestedDefaultOrderParentElement;
         "slot-nested-order-child": HTMLSlotNestedOrderChildElement;
@@ -433,10 +415,6 @@ declare namespace LocalJSX {
     interface SlotListLightScopedRoot {
         "items"?: string[];
     }
-    interface SlotMapOrder {
-    }
-    interface SlotMapOrderRoot {
-    }
     interface SlotNestedDefaultOrderChild {
         "state"?: boolean;
     }
@@ -494,8 +472,6 @@ declare namespace LocalJSX {
         "slot-light-scoped-list": SlotLightScopedList;
         "slot-list-light-root": SlotListLightRoot;
         "slot-list-light-scoped-root": SlotListLightScopedRoot;
-        "slot-map-order": SlotMapOrder;
-        "slot-map-order-root": SlotMapOrderRoot;
         "slot-nested-default-order-child": SlotNestedDefaultOrderChild;
         "slot-nested-default-order-parent": SlotNestedDefaultOrderParent;
         "slot-nested-order-child": SlotNestedOrderChild;
@@ -540,8 +516,6 @@ declare module "@stencil/core" {
             "slot-light-scoped-list": LocalJSX.SlotLightScopedList & JSXBase.HTMLAttributes<HTMLSlotLightScopedListElement>;
             "slot-list-light-root": LocalJSX.SlotListLightRoot & JSXBase.HTMLAttributes<HTMLSlotListLightRootElement>;
             "slot-list-light-scoped-root": LocalJSX.SlotListLightScopedRoot & JSXBase.HTMLAttributes<HTMLSlotListLightScopedRootElement>;
-            "slot-map-order": LocalJSX.SlotMapOrder & JSXBase.HTMLAttributes<HTMLSlotMapOrderElement>;
-            "slot-map-order-root": LocalJSX.SlotMapOrderRoot & JSXBase.HTMLAttributes<HTMLSlotMapOrderRootElement>;
             "slot-nested-default-order-child": LocalJSX.SlotNestedDefaultOrderChild & JSXBase.HTMLAttributes<HTMLSlotNestedDefaultOrderChildElement>;
             "slot-nested-default-order-parent": LocalJSX.SlotNestedDefaultOrderParent & JSXBase.HTMLAttributes<HTMLSlotNestedDefaultOrderParentElement>;
             "slot-nested-order-child": LocalJSX.SlotNestedOrderChild & JSXBase.HTMLAttributes<HTMLSlotNestedOrderChildElement>;
