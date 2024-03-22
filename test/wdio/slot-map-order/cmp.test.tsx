@@ -4,9 +4,7 @@ import { render } from '@wdio/browser-runner/stencil';
 describe('slot-map-order', function () {
   beforeEach(async () => {
     render({
-      template: () => (
-        <slot-map-order-root></slot-map-order-root>
-      ),
+      template: () => <slot-map-order-root></slot-map-order-root>,
     });
   });
 
