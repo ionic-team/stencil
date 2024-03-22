@@ -1,20 +1,22 @@
-import { setupDomTests } from '../util';
+import { h } from '@stencil/core';
+import { render } from '@wdio/browser-runner/stencil';
 
 describe('slot-nested-order', function () {
-  const { setupDom, tearDownDom } = setupDomTests(document);
-  let app: HTMLElement;
-
   beforeEach(async () => {
-    app = await setupDom('/slot-nested-order/index.html');
+    render({
+      template: () => (
+        <slot-nested-order-parent>
+          <cmp-1>1</cmp-1>
+          <cmp-4 slot="italic-slot-name">4</cmp-4>
+          <cmp-2>2</cmp-2>
+        </slot-nested-order-parent>
+      ),
+    });
   });
-  afterEach(tearDownDom);
 
   it('correct nested order', async () => {
-    const root = app.querySelector('slot-nested-order-parent');
-
-    expect(root.textContent).toBe('123456');
-
-    const hiddenCmp = root.querySelector('[hidden]');
+    await expect($('slot-nested-order-parent')).toHaveText('123456');
+    const hiddenCmp = document.querySelector('[hidden]');
     expect(hiddenCmp).toBe(null);
   });
 });

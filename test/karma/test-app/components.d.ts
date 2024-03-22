@@ -69,10 +69,6 @@ export namespace Components {
     }
     interface SlotNestedDefaultOrderParent {
     }
-    interface SlotNestedOrderChild {
-    }
-    interface SlotNestedOrderParent {
-    }
     interface SlotNgIf {
     }
     interface SlotNoDefault {
@@ -283,18 +279,6 @@ declare global {
         prototype: HTMLSlotNestedDefaultOrderParentElement;
         new (): HTMLSlotNestedDefaultOrderParentElement;
     };
-    interface HTMLSlotNestedOrderChildElement extends Components.SlotNestedOrderChild, HTMLStencilElement {
-    }
-    var HTMLSlotNestedOrderChildElement: {
-        prototype: HTMLSlotNestedOrderChildElement;
-        new (): HTMLSlotNestedOrderChildElement;
-    };
-    interface HTMLSlotNestedOrderParentElement extends Components.SlotNestedOrderParent, HTMLStencilElement {
-    }
-    var HTMLSlotNestedOrderParentElement: {
-        prototype: HTMLSlotNestedOrderParentElement;
-        new (): HTMLSlotNestedOrderParentElement;
-    };
     interface HTMLSlotNgIfElement extends Components.SlotNgIf, HTMLStencilElement {
     }
     var HTMLSlotNgIfElement: {
@@ -432,8 +416,6 @@ declare global {
         "slot-map-order-root": HTMLSlotMapOrderRootElement;
         "slot-nested-default-order-child": HTMLSlotNestedDefaultOrderChildElement;
         "slot-nested-default-order-parent": HTMLSlotNestedDefaultOrderParentElement;
-        "slot-nested-order-child": HTMLSlotNestedOrderChildElement;
-        "slot-nested-order-parent": HTMLSlotNestedOrderParentElement;
         "slot-ng-if": HTMLSlotNgIfElement;
         "slot-no-default": HTMLSlotNoDefaultElement;
         "slot-parent-tag-change": HTMLSlotParentTagChangeElement;
@@ -518,10 +500,6 @@ declare namespace LocalJSX {
     }
     interface SlotNestedDefaultOrderParent {
     }
-    interface SlotNestedOrderChild {
-    }
-    interface SlotNestedOrderParent {
-    }
     interface SlotNgIf {
     }
     interface SlotNoDefault {
@@ -591,8 +569,6 @@ declare namespace LocalJSX {
         "slot-map-order-root": SlotMapOrderRoot;
         "slot-nested-default-order-child": SlotNestedDefaultOrderChild;
         "slot-nested-default-order-parent": SlotNestedDefaultOrderParent;
-        "slot-nested-order-child": SlotNestedOrderChild;
-        "slot-nested-order-parent": SlotNestedOrderParent;
         "slot-ng-if": SlotNgIf;
         "slot-no-default": SlotNoDefault;
         "slot-parent-tag-change": SlotParentTagChange;
@@ -645,8 +621,6 @@ declare module "@stencil/core" {
             "slot-map-order-root": LocalJSX.SlotMapOrderRoot & JSXBase.HTMLAttributes<HTMLSlotMapOrderRootElement>;
             "slot-nested-default-order-child": LocalJSX.SlotNestedDefaultOrderChild & JSXBase.HTMLAttributes<HTMLSlotNestedDefaultOrderChildElement>;
             "slot-nested-default-order-parent": LocalJSX.SlotNestedDefaultOrderParent & JSXBase.HTMLAttributes<HTMLSlotNestedDefaultOrderParentElement>;
-            "slot-nested-order-child": LocalJSX.SlotNestedOrderChild & JSXBase.HTMLAttributes<HTMLSlotNestedOrderChildElement>;
-            "slot-nested-order-parent": LocalJSX.SlotNestedOrderParent & JSXBase.HTMLAttributes<HTMLSlotNestedOrderParentElement>;
             "slot-ng-if": LocalJSX.SlotNgIf & JSXBase.HTMLAttributes<HTMLSlotNgIfElement>;
             "slot-no-default": LocalJSX.SlotNoDefault & JSXBase.HTMLAttributes<HTMLSlotNoDefaultElement>;
             "slot-parent-tag-change": LocalJSX.SlotParentTagChange & JSXBase.HTMLAttributes<HTMLSlotParentTagChangeElement>;
