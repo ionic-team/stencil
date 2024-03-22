@@ -83,10 +83,6 @@ export namespace Components {
     }
     interface StencilSibling {
     }
-    interface TextContentPatchScoped {
-    }
-    interface TextContentPatchScopedWithSlot {
-    }
 }
 declare global {
     interface HTMLCustomElementChildElement extends Components.CustomElementChild, HTMLStencilElement {
@@ -293,18 +289,6 @@ declare global {
         prototype: HTMLStencilSiblingElement;
         new (): HTMLStencilSiblingElement;
     };
-    interface HTMLTextContentPatchScopedElement extends Components.TextContentPatchScoped, HTMLStencilElement {
-    }
-    var HTMLTextContentPatchScopedElement: {
-        prototype: HTMLTextContentPatchScopedElement;
-        new (): HTMLTextContentPatchScopedElement;
-    };
-    interface HTMLTextContentPatchScopedWithSlotElement extends Components.TextContentPatchScopedWithSlot, HTMLStencilElement {
-    }
-    var HTMLTextContentPatchScopedWithSlotElement: {
-        prototype: HTMLTextContentPatchScopedWithSlotElement;
-        new (): HTMLTextContentPatchScopedWithSlotElement;
-    };
     interface HTMLElementTagNameMap {
         "custom-element-child": HTMLCustomElementChildElement;
         "custom-element-child-different-name-than-class": HTMLCustomElementChildDifferentNameThanClassElement;
@@ -340,8 +324,6 @@ declare global {
         "slot-replace-wrapper-root": HTMLSlotReplaceWrapperRootElement;
         "slotted-css": HTMLSlottedCssElement;
         "stencil-sibling": HTMLStencilSiblingElement;
-        "text-content-patch-scoped": HTMLTextContentPatchScopedElement;
-        "text-content-patch-scoped-with-slot": HTMLTextContentPatchScopedWithSlotElement;
     }
 }
 declare namespace LocalJSX {
@@ -422,10 +404,6 @@ declare namespace LocalJSX {
     }
     interface StencilSibling {
     }
-    interface TextContentPatchScoped {
-    }
-    interface TextContentPatchScopedWithSlot {
-    }
     interface IntrinsicElements {
         "custom-element-child": CustomElementChild;
         "custom-element-child-different-name-than-class": CustomElementChildDifferentNameThanClass;
@@ -461,8 +439,6 @@ declare namespace LocalJSX {
         "slot-replace-wrapper-root": SlotReplaceWrapperRoot;
         "slotted-css": SlottedCss;
         "stencil-sibling": StencilSibling;
-        "text-content-patch-scoped": TextContentPatchScoped;
-        "text-content-patch-scoped-with-slot": TextContentPatchScopedWithSlot;
     }
 }
 export { LocalJSX as JSX };
@@ -503,8 +479,6 @@ declare module "@stencil/core" {
             "slot-replace-wrapper-root": LocalJSX.SlotReplaceWrapperRoot & JSXBase.HTMLAttributes<HTMLSlotReplaceWrapperRootElement>;
             "slotted-css": LocalJSX.SlottedCss & JSXBase.HTMLAttributes<HTMLSlottedCssElement>;
             "stencil-sibling": LocalJSX.StencilSibling & JSXBase.HTMLAttributes<HTMLStencilSiblingElement>;
-            "text-content-patch-scoped": LocalJSX.TextContentPatchScoped & JSXBase.HTMLAttributes<HTMLTextContentPatchScopedElement>;
-            "text-content-patch-scoped-with-slot": LocalJSX.TextContentPatchScopedWithSlot & JSXBase.HTMLAttributes<HTMLTextContentPatchScopedWithSlotElement>;
         }
     }
 }
