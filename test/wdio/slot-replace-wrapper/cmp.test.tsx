@@ -8,6 +8,7 @@ describe('slot replace wrapper', () => {
     });
 
     await $('slot-replace-wrapper-root').waitForExist();
+    // Tests are flakey without this
     await browser.pause(100);
   });
 
