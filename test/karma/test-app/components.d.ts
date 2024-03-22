@@ -5,25 +5,7 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
-import { TestEventDetail } from "./event-custom-type/cmp";
-export { TestEventDetail } from "./event-custom-type/cmp";
 export namespace Components {
-    interface BadSharedJsx {
-    }
-    interface ChildReflectNanAttribute {
-        "val": number;
-    }
-    interface ChildWithReflection {
-        "val": number | any;
-    }
-    interface CmpLabel {
-    }
-    interface CmpLabelWithSlotSibling {
-    }
-    interface CssVariablesNoEncapsulation {
-    }
-    interface CssVariablesShadowDom {
-    }
     interface CustomElementChild {
     }
     interface CustomElementChildDifferentNameThanClass {
@@ -38,187 +20,24 @@ export namespace Components {
     }
     interface CustomElementsNoDelegatesFocus {
     }
-    interface DynamicImport {
-        "update": () => Promise<void>;
-    }
-    interface Es5AddclassSvg {
-    }
-    interface EsmImport {
-        "propVal": number;
-        "someMethod": () => Promise<void>;
-    }
-    interface EventCustomType {
-    }
-    interface EventListenerCapture {
-    }
-    interface ExternalImportA {
-    }
-    interface ExternalImportB {
-    }
-    interface ExternalImportC {
-    }
-    interface FactoryJsx {
-    }
-    interface HostAttrOverride {
-    }
-    interface ImportAliasing {
-        "myMethod": () => Promise<HTMLElement>;
-        "user": string;
-    }
     interface InitCssRoot {
-    }
-    interface InputBasicRoot {
-        "value"?: string;
-    }
-    interface IonChild {
-    }
-    interface IonHost {
-    }
-    interface IonParent {
-    }
-    interface LifecycleAsyncA {
-    }
-    interface LifecycleAsyncB {
-        "value": string;
-    }
-    interface LifecycleAsyncC {
-        "value": string;
-    }
-    interface LifecycleNestedA {
-    }
-    interface LifecycleNestedB {
-    }
-    interface LifecycleNestedC {
-    }
-    interface LifecycleUnloadA {
-    }
-    interface LifecycleUnloadB {
-    }
-    interface LifecycleUnloadRoot {
-    }
-    interface LifecycleUpdateA {
-    }
-    interface LifecycleUpdateB {
-        "value": number;
-    }
-    interface LifecycleUpdateC {
-        "value": number;
-    }
-    interface ListenJsx {
-    }
-    interface ListenJsxRoot {
-    }
-    interface ListenReattach {
-    }
-    interface NodeResolution {
-    }
-    interface ParentReflectNanAttribute {
-    }
-    interface ParentWithReflectChild {
-    }
-    interface ReflectNanAttribute {
-        "val": number;
-    }
-    interface ReflectNanAttributeHyphen {
-        "valNum": number;
-    }
-    interface ReflectToAttr {
-        "bool": boolean;
-        "disabled": boolean;
-        "dynamicNu"?: number;
-        "dynamicStr"?: string;
-        "nu": number;
-        "null": string | null;
-        "otherBool": boolean;
-        "str": string;
-        "undef"?: string;
-    }
-    interface RemoveChildPatch {
     }
     interface ReparentStyleNoVars {
     }
     interface ReparentStyleWithVars {
-    }
-    interface ScopedBasic {
-    }
-    interface ScopedBasicRoot {
-    }
-    interface ScopedConditional {
-        "renderHello": boolean;
-    }
-    interface ScopedSlotAppendAndPrepend {
-    }
-    interface ScopedSlotChildInsertAdjacent {
-    }
-    interface ShadowDomArray {
-        "values": number[];
-    }
-    interface ShadowDomArrayRoot {
-    }
-    interface ShadowDomBasic {
-    }
-    interface ShadowDomBasicRoot {
-    }
-    interface ShadowDomMode {
-        /**
-          * The mode determines which platform styles to use.
-         */
-        "colormode"?: string;
-    }
-    interface ShadowDomModeRoot {
-    }
-    interface ShadowDomSlotBasic {
     }
     interface ShadowDomSlotNested {
         "i"?: number;
     }
     interface ShadowDomSlotNestedRoot {
     }
-    interface SlotArrayBasic {
-    }
-    interface SlotArrayComplex {
-    }
-    interface SlotArrayComplexRoot {
-    }
-    interface SlotArrayTop {
-    }
-    interface SlotBasic {
-    }
-    interface SlotBasicOrder {
-    }
-    interface SlotBasicOrderRoot {
-    }
-    interface SlotBasicRoot {
-    }
     interface SlotChildrenRoot {
-    }
-    interface SlotDynamicNameChangeScoped {
-        "slotName": string;
-    }
-    interface SlotDynamicNameChangeShadow {
-        "slotName": string;
     }
     interface SlotDynamicScopedList {
         "items": Array<string>;
     }
     interface SlotDynamicShadowList {
         "items": Array<string>;
-    }
-    interface SlotDynamicWrapper {
-        "tag": string;
-    }
-    interface SlotDynamicWrapperRoot {
-    }
-    interface SlotFallback {
-        "inc": number;
-    }
-    interface SlotFallbackRoot {
-    }
-    interface SlotHideContentOpen {
-        "enabled": boolean;
-    }
-    interface SlotHideContentScoped {
-        "enabled": boolean;
     }
     interface SlotHtml {
         "inc": number;
@@ -280,88 +99,14 @@ export namespace Components {
     }
     interface StaticMembersSeparateInitializer {
     }
-    interface StaticStyles {
-    }
     interface StencilSibling {
-    }
-    interface SvgAttr {
-    }
-    interface SvgClass {
-    }
-    interface Tag3dComponent {
-    }
-    interface Tag88 {
     }
     interface TextContentPatchScoped {
     }
     interface TextContentPatchScopedWithSlot {
     }
-    interface WatchNativeAttributes {
-    }
-}
-export interface EsmImportCustomEvent<T> extends CustomEvent<T> {
-    detail: T;
-    target: HTMLEsmImportElement;
-}
-export interface EventCustomTypeCustomEvent<T> extends CustomEvent<T> {
-    detail: T;
-    target: HTMLEventCustomTypeElement;
-}
-export interface ImportAliasingCustomEvent<T> extends CustomEvent<T> {
-    detail: T;
-    target: HTMLImportAliasingElement;
-}
-export interface LifecycleAsyncBCustomEvent<T> extends CustomEvent<T> {
-    detail: T;
-    target: HTMLLifecycleAsyncBElement;
-}
-export interface LifecycleAsyncCCustomEvent<T> extends CustomEvent<T> {
-    detail: T;
-    target: HTMLLifecycleAsyncCElement;
 }
 declare global {
-    interface HTMLBadSharedJsxElement extends Components.BadSharedJsx, HTMLStencilElement {
-    }
-    var HTMLBadSharedJsxElement: {
-        prototype: HTMLBadSharedJsxElement;
-        new (): HTMLBadSharedJsxElement;
-    };
-    interface HTMLChildReflectNanAttributeElement extends Components.ChildReflectNanAttribute, HTMLStencilElement {
-    }
-    var HTMLChildReflectNanAttributeElement: {
-        prototype: HTMLChildReflectNanAttributeElement;
-        new (): HTMLChildReflectNanAttributeElement;
-    };
-    interface HTMLChildWithReflectionElement extends Components.ChildWithReflection, HTMLStencilElement {
-    }
-    var HTMLChildWithReflectionElement: {
-        prototype: HTMLChildWithReflectionElement;
-        new (): HTMLChildWithReflectionElement;
-    };
-    interface HTMLCmpLabelElement extends Components.CmpLabel, HTMLStencilElement {
-    }
-    var HTMLCmpLabelElement: {
-        prototype: HTMLCmpLabelElement;
-        new (): HTMLCmpLabelElement;
-    };
-    interface HTMLCmpLabelWithSlotSiblingElement extends Components.CmpLabelWithSlotSibling, HTMLStencilElement {
-    }
-    var HTMLCmpLabelWithSlotSiblingElement: {
-        prototype: HTMLCmpLabelWithSlotSiblingElement;
-        new (): HTMLCmpLabelWithSlotSiblingElement;
-    };
-    interface HTMLCssVariablesNoEncapsulationElement extends Components.CssVariablesNoEncapsulation, HTMLStencilElement {
-    }
-    var HTMLCssVariablesNoEncapsulationElement: {
-        prototype: HTMLCssVariablesNoEncapsulationElement;
-        new (): HTMLCssVariablesNoEncapsulationElement;
-    };
-    interface HTMLCssVariablesShadowDomElement extends Components.CssVariablesShadowDom, HTMLStencilElement {
-    }
-    var HTMLCssVariablesShadowDomElement: {
-        prototype: HTMLCssVariablesShadowDomElement;
-        new (): HTMLCssVariablesShadowDomElement;
-    };
     interface HTMLCustomElementChildElement extends Components.CustomElementChild, HTMLStencilElement {
     }
     var HTMLCustomElementChildElement: {
@@ -404,290 +149,11 @@ declare global {
         prototype: HTMLCustomElementsNoDelegatesFocusElement;
         new (): HTMLCustomElementsNoDelegatesFocusElement;
     };
-    interface HTMLDynamicImportElement extends Components.DynamicImport, HTMLStencilElement {
-    }
-    var HTMLDynamicImportElement: {
-        prototype: HTMLDynamicImportElement;
-        new (): HTMLDynamicImportElement;
-    };
-    interface HTMLEs5AddclassSvgElement extends Components.Es5AddclassSvg, HTMLStencilElement {
-    }
-    var HTMLEs5AddclassSvgElement: {
-        prototype: HTMLEs5AddclassSvgElement;
-        new (): HTMLEs5AddclassSvgElement;
-    };
-    interface HTMLEsmImportElementEventMap {
-        "someEvent": any;
-    }
-    interface HTMLEsmImportElement extends Components.EsmImport, HTMLStencilElement {
-        addEventListener<K extends keyof HTMLEsmImportElementEventMap>(type: K, listener: (this: HTMLEsmImportElement, ev: EsmImportCustomEvent<HTMLEsmImportElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
-        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
-        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
-        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-        removeEventListener<K extends keyof HTMLEsmImportElementEventMap>(type: K, listener: (this: HTMLEsmImportElement, ev: EsmImportCustomEvent<HTMLEsmImportElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
-        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
-        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
-        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
-    }
-    var HTMLEsmImportElement: {
-        prototype: HTMLEsmImportElement;
-        new (): HTMLEsmImportElement;
-    };
-    interface HTMLEventCustomTypeElementEventMap {
-        "testEvent": TestEventDetail;
-    }
-    interface HTMLEventCustomTypeElement extends Components.EventCustomType, HTMLStencilElement {
-        addEventListener<K extends keyof HTMLEventCustomTypeElementEventMap>(type: K, listener: (this: HTMLEventCustomTypeElement, ev: EventCustomTypeCustomEvent<HTMLEventCustomTypeElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
-        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
-        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
-        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-        removeEventListener<K extends keyof HTMLEventCustomTypeElementEventMap>(type: K, listener: (this: HTMLEventCustomTypeElement, ev: EventCustomTypeCustomEvent<HTMLEventCustomTypeElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
-        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
-        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
-        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
-    }
-    var HTMLEventCustomTypeElement: {
-        prototype: HTMLEventCustomTypeElement;
-        new (): HTMLEventCustomTypeElement;
-    };
-    interface HTMLEventListenerCaptureElement extends Components.EventListenerCapture, HTMLStencilElement {
-    }
-    var HTMLEventListenerCaptureElement: {
-        prototype: HTMLEventListenerCaptureElement;
-        new (): HTMLEventListenerCaptureElement;
-    };
-    interface HTMLExternalImportAElement extends Components.ExternalImportA, HTMLStencilElement {
-    }
-    var HTMLExternalImportAElement: {
-        prototype: HTMLExternalImportAElement;
-        new (): HTMLExternalImportAElement;
-    };
-    interface HTMLExternalImportBElement extends Components.ExternalImportB, HTMLStencilElement {
-    }
-    var HTMLExternalImportBElement: {
-        prototype: HTMLExternalImportBElement;
-        new (): HTMLExternalImportBElement;
-    };
-    interface HTMLExternalImportCElement extends Components.ExternalImportC, HTMLStencilElement {
-    }
-    var HTMLExternalImportCElement: {
-        prototype: HTMLExternalImportCElement;
-        new (): HTMLExternalImportCElement;
-    };
-    interface HTMLFactoryJsxElement extends Components.FactoryJsx, HTMLStencilElement {
-    }
-    var HTMLFactoryJsxElement: {
-        prototype: HTMLFactoryJsxElement;
-        new (): HTMLFactoryJsxElement;
-    };
-    interface HTMLHostAttrOverrideElement extends Components.HostAttrOverride, HTMLStencilElement {
-    }
-    var HTMLHostAttrOverrideElement: {
-        prototype: HTMLHostAttrOverrideElement;
-        new (): HTMLHostAttrOverrideElement;
-    };
-    interface HTMLImportAliasingElementEventMap {
-        "myEvent": void;
-    }
-    interface HTMLImportAliasingElement extends Components.ImportAliasing, HTMLStencilElement {
-        addEventListener<K extends keyof HTMLImportAliasingElementEventMap>(type: K, listener: (this: HTMLImportAliasingElement, ev: ImportAliasingCustomEvent<HTMLImportAliasingElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
-        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
-        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
-        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-        removeEventListener<K extends keyof HTMLImportAliasingElementEventMap>(type: K, listener: (this: HTMLImportAliasingElement, ev: ImportAliasingCustomEvent<HTMLImportAliasingElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
-        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
-        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
-        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
-    }
-    var HTMLImportAliasingElement: {
-        prototype: HTMLImportAliasingElement;
-        new (): HTMLImportAliasingElement;
-    };
     interface HTMLInitCssRootElement extends Components.InitCssRoot, HTMLStencilElement {
     }
     var HTMLInitCssRootElement: {
         prototype: HTMLInitCssRootElement;
         new (): HTMLInitCssRootElement;
-    };
-    interface HTMLInputBasicRootElement extends Components.InputBasicRoot, HTMLStencilElement {
-    }
-    var HTMLInputBasicRootElement: {
-        prototype: HTMLInputBasicRootElement;
-        new (): HTMLInputBasicRootElement;
-    };
-    interface HTMLIonChildElement extends Components.IonChild, HTMLStencilElement {
-    }
-    var HTMLIonChildElement: {
-        prototype: HTMLIonChildElement;
-        new (): HTMLIonChildElement;
-    };
-    interface HTMLIonHostElement extends Components.IonHost, HTMLStencilElement {
-    }
-    var HTMLIonHostElement: {
-        prototype: HTMLIonHostElement;
-        new (): HTMLIonHostElement;
-    };
-    interface HTMLIonParentElement extends Components.IonParent, HTMLStencilElement {
-    }
-    var HTMLIonParentElement: {
-        prototype: HTMLIonParentElement;
-        new (): HTMLIonParentElement;
-    };
-    interface HTMLLifecycleAsyncAElement extends Components.LifecycleAsyncA, HTMLStencilElement {
-    }
-    var HTMLLifecycleAsyncAElement: {
-        prototype: HTMLLifecycleAsyncAElement;
-        new (): HTMLLifecycleAsyncAElement;
-    };
-    interface HTMLLifecycleAsyncBElementEventMap {
-        "lifecycleLoad": any;
-        "lifecycleUpdate": any;
-    }
-    interface HTMLLifecycleAsyncBElement extends Components.LifecycleAsyncB, HTMLStencilElement {
-        addEventListener<K extends keyof HTMLLifecycleAsyncBElementEventMap>(type: K, listener: (this: HTMLLifecycleAsyncBElement, ev: LifecycleAsyncBCustomEvent<HTMLLifecycleAsyncBElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
-        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
-        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
-        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-        removeEventListener<K extends keyof HTMLLifecycleAsyncBElementEventMap>(type: K, listener: (this: HTMLLifecycleAsyncBElement, ev: LifecycleAsyncBCustomEvent<HTMLLifecycleAsyncBElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
-        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
-        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
-        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
-    }
-    var HTMLLifecycleAsyncBElement: {
-        prototype: HTMLLifecycleAsyncBElement;
-        new (): HTMLLifecycleAsyncBElement;
-    };
-    interface HTMLLifecycleAsyncCElementEventMap {
-        "lifecycleLoad": any;
-        "lifecycleUpdate": any;
-    }
-    interface HTMLLifecycleAsyncCElement extends Components.LifecycleAsyncC, HTMLStencilElement {
-        addEventListener<K extends keyof HTMLLifecycleAsyncCElementEventMap>(type: K, listener: (this: HTMLLifecycleAsyncCElement, ev: LifecycleAsyncCCustomEvent<HTMLLifecycleAsyncCElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
-        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
-        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
-        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
-        removeEventListener<K extends keyof HTMLLifecycleAsyncCElementEventMap>(type: K, listener: (this: HTMLLifecycleAsyncCElement, ev: LifecycleAsyncCCustomEvent<HTMLLifecycleAsyncCElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
-        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
-        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
-        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
-    }
-    var HTMLLifecycleAsyncCElement: {
-        prototype: HTMLLifecycleAsyncCElement;
-        new (): HTMLLifecycleAsyncCElement;
-    };
-    interface HTMLLifecycleNestedAElement extends Components.LifecycleNestedA, HTMLStencilElement {
-    }
-    var HTMLLifecycleNestedAElement: {
-        prototype: HTMLLifecycleNestedAElement;
-        new (): HTMLLifecycleNestedAElement;
-    };
-    interface HTMLLifecycleNestedBElement extends Components.LifecycleNestedB, HTMLStencilElement {
-    }
-    var HTMLLifecycleNestedBElement: {
-        prototype: HTMLLifecycleNestedBElement;
-        new (): HTMLLifecycleNestedBElement;
-    };
-    interface HTMLLifecycleNestedCElement extends Components.LifecycleNestedC, HTMLStencilElement {
-    }
-    var HTMLLifecycleNestedCElement: {
-        prototype: HTMLLifecycleNestedCElement;
-        new (): HTMLLifecycleNestedCElement;
-    };
-    interface HTMLLifecycleUnloadAElement extends Components.LifecycleUnloadA, HTMLStencilElement {
-    }
-    var HTMLLifecycleUnloadAElement: {
-        prototype: HTMLLifecycleUnloadAElement;
-        new (): HTMLLifecycleUnloadAElement;
-    };
-    interface HTMLLifecycleUnloadBElement extends Components.LifecycleUnloadB, HTMLStencilElement {
-    }
-    var HTMLLifecycleUnloadBElement: {
-        prototype: HTMLLifecycleUnloadBElement;
-        new (): HTMLLifecycleUnloadBElement;
-    };
-    interface HTMLLifecycleUnloadRootElement extends Components.LifecycleUnloadRoot, HTMLStencilElement {
-    }
-    var HTMLLifecycleUnloadRootElement: {
-        prototype: HTMLLifecycleUnloadRootElement;
-        new (): HTMLLifecycleUnloadRootElement;
-    };
-    interface HTMLLifecycleUpdateAElement extends Components.LifecycleUpdateA, HTMLStencilElement {
-    }
-    var HTMLLifecycleUpdateAElement: {
-        prototype: HTMLLifecycleUpdateAElement;
-        new (): HTMLLifecycleUpdateAElement;
-    };
-    interface HTMLLifecycleUpdateBElement extends Components.LifecycleUpdateB, HTMLStencilElement {
-    }
-    var HTMLLifecycleUpdateBElement: {
-        prototype: HTMLLifecycleUpdateBElement;
-        new (): HTMLLifecycleUpdateBElement;
-    };
-    interface HTMLLifecycleUpdateCElement extends Components.LifecycleUpdateC, HTMLStencilElement {
-    }
-    var HTMLLifecycleUpdateCElement: {
-        prototype: HTMLLifecycleUpdateCElement;
-        new (): HTMLLifecycleUpdateCElement;
-    };
-    interface HTMLListenJsxElement extends Components.ListenJsx, HTMLStencilElement {
-    }
-    var HTMLListenJsxElement: {
-        prototype: HTMLListenJsxElement;
-        new (): HTMLListenJsxElement;
-    };
-    interface HTMLListenJsxRootElement extends Components.ListenJsxRoot, HTMLStencilElement {
-    }
-    var HTMLListenJsxRootElement: {
-        prototype: HTMLListenJsxRootElement;
-        new (): HTMLListenJsxRootElement;
-    };
-    interface HTMLListenReattachElement extends Components.ListenReattach, HTMLStencilElement {
-    }
-    var HTMLListenReattachElement: {
-        prototype: HTMLListenReattachElement;
-        new (): HTMLListenReattachElement;
-    };
-    interface HTMLNodeResolutionElement extends Components.NodeResolution, HTMLStencilElement {
-    }
-    var HTMLNodeResolutionElement: {
-        prototype: HTMLNodeResolutionElement;
-        new (): HTMLNodeResolutionElement;
-    };
-    interface HTMLParentReflectNanAttributeElement extends Components.ParentReflectNanAttribute, HTMLStencilElement {
-    }
-    var HTMLParentReflectNanAttributeElement: {
-        prototype: HTMLParentReflectNanAttributeElement;
-        new (): HTMLParentReflectNanAttributeElement;
-    };
-    interface HTMLParentWithReflectChildElement extends Components.ParentWithReflectChild, HTMLStencilElement {
-    }
-    var HTMLParentWithReflectChildElement: {
-        prototype: HTMLParentWithReflectChildElement;
-        new (): HTMLParentWithReflectChildElement;
-    };
-    interface HTMLReflectNanAttributeElement extends Components.ReflectNanAttribute, HTMLStencilElement {
-    }
-    var HTMLReflectNanAttributeElement: {
-        prototype: HTMLReflectNanAttributeElement;
-        new (): HTMLReflectNanAttributeElement;
-    };
-    interface HTMLReflectNanAttributeHyphenElement extends Components.ReflectNanAttributeHyphen, HTMLStencilElement {
-    }
-    var HTMLReflectNanAttributeHyphenElement: {
-        prototype: HTMLReflectNanAttributeHyphenElement;
-        new (): HTMLReflectNanAttributeHyphenElement;
-    };
-    interface HTMLReflectToAttrElement extends Components.ReflectToAttr, HTMLStencilElement {
-    }
-    var HTMLReflectToAttrElement: {
-        prototype: HTMLReflectToAttrElement;
-        new (): HTMLReflectToAttrElement;
-    };
-    interface HTMLRemoveChildPatchElement extends Components.RemoveChildPatch, HTMLStencilElement {
-    }
-    var HTMLRemoveChildPatchElement: {
-        prototype: HTMLRemoveChildPatchElement;
-        new (): HTMLRemoveChildPatchElement;
     };
     interface HTMLReparentStyleNoVarsElement extends Components.ReparentStyleNoVars, HTMLStencilElement {
     }
@@ -701,78 +167,6 @@ declare global {
         prototype: HTMLReparentStyleWithVarsElement;
         new (): HTMLReparentStyleWithVarsElement;
     };
-    interface HTMLScopedBasicElement extends Components.ScopedBasic, HTMLStencilElement {
-    }
-    var HTMLScopedBasicElement: {
-        prototype: HTMLScopedBasicElement;
-        new (): HTMLScopedBasicElement;
-    };
-    interface HTMLScopedBasicRootElement extends Components.ScopedBasicRoot, HTMLStencilElement {
-    }
-    var HTMLScopedBasicRootElement: {
-        prototype: HTMLScopedBasicRootElement;
-        new (): HTMLScopedBasicRootElement;
-    };
-    interface HTMLScopedConditionalElement extends Components.ScopedConditional, HTMLStencilElement {
-    }
-    var HTMLScopedConditionalElement: {
-        prototype: HTMLScopedConditionalElement;
-        new (): HTMLScopedConditionalElement;
-    };
-    interface HTMLScopedSlotAppendAndPrependElement extends Components.ScopedSlotAppendAndPrepend, HTMLStencilElement {
-    }
-    var HTMLScopedSlotAppendAndPrependElement: {
-        prototype: HTMLScopedSlotAppendAndPrependElement;
-        new (): HTMLScopedSlotAppendAndPrependElement;
-    };
-    interface HTMLScopedSlotChildInsertAdjacentElement extends Components.ScopedSlotChildInsertAdjacent, HTMLStencilElement {
-    }
-    var HTMLScopedSlotChildInsertAdjacentElement: {
-        prototype: HTMLScopedSlotChildInsertAdjacentElement;
-        new (): HTMLScopedSlotChildInsertAdjacentElement;
-    };
-    interface HTMLShadowDomArrayElement extends Components.ShadowDomArray, HTMLStencilElement {
-    }
-    var HTMLShadowDomArrayElement: {
-        prototype: HTMLShadowDomArrayElement;
-        new (): HTMLShadowDomArrayElement;
-    };
-    interface HTMLShadowDomArrayRootElement extends Components.ShadowDomArrayRoot, HTMLStencilElement {
-    }
-    var HTMLShadowDomArrayRootElement: {
-        prototype: HTMLShadowDomArrayRootElement;
-        new (): HTMLShadowDomArrayRootElement;
-    };
-    interface HTMLShadowDomBasicElement extends Components.ShadowDomBasic, HTMLStencilElement {
-    }
-    var HTMLShadowDomBasicElement: {
-        prototype: HTMLShadowDomBasicElement;
-        new (): HTMLShadowDomBasicElement;
-    };
-    interface HTMLShadowDomBasicRootElement extends Components.ShadowDomBasicRoot, HTMLStencilElement {
-    }
-    var HTMLShadowDomBasicRootElement: {
-        prototype: HTMLShadowDomBasicRootElement;
-        new (): HTMLShadowDomBasicRootElement;
-    };
-    interface HTMLShadowDomModeElement extends Components.ShadowDomMode, HTMLStencilElement {
-    }
-    var HTMLShadowDomModeElement: {
-        prototype: HTMLShadowDomModeElement;
-        new (): HTMLShadowDomModeElement;
-    };
-    interface HTMLShadowDomModeRootElement extends Components.ShadowDomModeRoot, HTMLStencilElement {
-    }
-    var HTMLShadowDomModeRootElement: {
-        prototype: HTMLShadowDomModeRootElement;
-        new (): HTMLShadowDomModeRootElement;
-    };
-    interface HTMLShadowDomSlotBasicElement extends Components.ShadowDomSlotBasic, HTMLStencilElement {
-    }
-    var HTMLShadowDomSlotBasicElement: {
-        prototype: HTMLShadowDomSlotBasicElement;
-        new (): HTMLShadowDomSlotBasicElement;
-    };
     interface HTMLShadowDomSlotNestedElement extends Components.ShadowDomSlotNested, HTMLStencilElement {
     }
     var HTMLShadowDomSlotNestedElement: {
@@ -785,71 +179,11 @@ declare global {
         prototype: HTMLShadowDomSlotNestedRootElement;
         new (): HTMLShadowDomSlotNestedRootElement;
     };
-    interface HTMLSlotArrayBasicElement extends Components.SlotArrayBasic, HTMLStencilElement {
-    }
-    var HTMLSlotArrayBasicElement: {
-        prototype: HTMLSlotArrayBasicElement;
-        new (): HTMLSlotArrayBasicElement;
-    };
-    interface HTMLSlotArrayComplexElement extends Components.SlotArrayComplex, HTMLStencilElement {
-    }
-    var HTMLSlotArrayComplexElement: {
-        prototype: HTMLSlotArrayComplexElement;
-        new (): HTMLSlotArrayComplexElement;
-    };
-    interface HTMLSlotArrayComplexRootElement extends Components.SlotArrayComplexRoot, HTMLStencilElement {
-    }
-    var HTMLSlotArrayComplexRootElement: {
-        prototype: HTMLSlotArrayComplexRootElement;
-        new (): HTMLSlotArrayComplexRootElement;
-    };
-    interface HTMLSlotArrayTopElement extends Components.SlotArrayTop, HTMLStencilElement {
-    }
-    var HTMLSlotArrayTopElement: {
-        prototype: HTMLSlotArrayTopElement;
-        new (): HTMLSlotArrayTopElement;
-    };
-    interface HTMLSlotBasicElement extends Components.SlotBasic, HTMLStencilElement {
-    }
-    var HTMLSlotBasicElement: {
-        prototype: HTMLSlotBasicElement;
-        new (): HTMLSlotBasicElement;
-    };
-    interface HTMLSlotBasicOrderElement extends Components.SlotBasicOrder, HTMLStencilElement {
-    }
-    var HTMLSlotBasicOrderElement: {
-        prototype: HTMLSlotBasicOrderElement;
-        new (): HTMLSlotBasicOrderElement;
-    };
-    interface HTMLSlotBasicOrderRootElement extends Components.SlotBasicOrderRoot, HTMLStencilElement {
-    }
-    var HTMLSlotBasicOrderRootElement: {
-        prototype: HTMLSlotBasicOrderRootElement;
-        new (): HTMLSlotBasicOrderRootElement;
-    };
-    interface HTMLSlotBasicRootElement extends Components.SlotBasicRoot, HTMLStencilElement {
-    }
-    var HTMLSlotBasicRootElement: {
-        prototype: HTMLSlotBasicRootElement;
-        new (): HTMLSlotBasicRootElement;
-    };
     interface HTMLSlotChildrenRootElement extends Components.SlotChildrenRoot, HTMLStencilElement {
     }
     var HTMLSlotChildrenRootElement: {
         prototype: HTMLSlotChildrenRootElement;
         new (): HTMLSlotChildrenRootElement;
-    };
-    interface HTMLSlotDynamicNameChangeScopedElement extends Components.SlotDynamicNameChangeScoped, HTMLStencilElement {
-    }
-    var HTMLSlotDynamicNameChangeScopedElement: {
-        prototype: HTMLSlotDynamicNameChangeScopedElement;
-        new (): HTMLSlotDynamicNameChangeScopedElement;
-    };
-    interface HTMLSlotDynamicNameChangeShadowElement extends Components.SlotDynamicNameChangeShadow, HTMLStencilElement {
-    }
-    var HTMLSlotDynamicNameChangeShadowElement: {
-        prototype: HTMLSlotDynamicNameChangeShadowElement;
-        new (): HTMLSlotDynamicNameChangeShadowElement;
     };
     interface HTMLSlotDynamicScopedListElement extends Components.SlotDynamicScopedList, HTMLStencilElement {
     }
@@ -862,42 +196,6 @@ declare global {
     var HTMLSlotDynamicShadowListElement: {
         prototype: HTMLSlotDynamicShadowListElement;
         new (): HTMLSlotDynamicShadowListElement;
-    };
-    interface HTMLSlotDynamicWrapperElement extends Components.SlotDynamicWrapper, HTMLStencilElement {
-    }
-    var HTMLSlotDynamicWrapperElement: {
-        prototype: HTMLSlotDynamicWrapperElement;
-        new (): HTMLSlotDynamicWrapperElement;
-    };
-    interface HTMLSlotDynamicWrapperRootElement extends Components.SlotDynamicWrapperRoot, HTMLStencilElement {
-    }
-    var HTMLSlotDynamicWrapperRootElement: {
-        prototype: HTMLSlotDynamicWrapperRootElement;
-        new (): HTMLSlotDynamicWrapperRootElement;
-    };
-    interface HTMLSlotFallbackElement extends Components.SlotFallback, HTMLStencilElement {
-    }
-    var HTMLSlotFallbackElement: {
-        prototype: HTMLSlotFallbackElement;
-        new (): HTMLSlotFallbackElement;
-    };
-    interface HTMLSlotFallbackRootElement extends Components.SlotFallbackRoot, HTMLStencilElement {
-    }
-    var HTMLSlotFallbackRootElement: {
-        prototype: HTMLSlotFallbackRootElement;
-        new (): HTMLSlotFallbackRootElement;
-    };
-    interface HTMLSlotHideContentOpenElement extends Components.SlotHideContentOpen, HTMLStencilElement {
-    }
-    var HTMLSlotHideContentOpenElement: {
-        prototype: HTMLSlotHideContentOpenElement;
-        new (): HTMLSlotHideContentOpenElement;
-    };
-    interface HTMLSlotHideContentScopedElement extends Components.SlotHideContentScoped, HTMLStencilElement {
-    }
-    var HTMLSlotHideContentScopedElement: {
-        prototype: HTMLSlotHideContentScopedElement;
-        new (): HTMLSlotHideContentScopedElement;
     };
     interface HTMLSlotHtmlElement extends Components.SlotHtml, HTMLStencilElement {
     }
@@ -1055,41 +353,11 @@ declare global {
         prototype: HTMLStaticMembersSeparateInitializerElement;
         new (): HTMLStaticMembersSeparateInitializerElement;
     };
-    interface HTMLStaticStylesElement extends Components.StaticStyles, HTMLStencilElement {
-    }
-    var HTMLStaticStylesElement: {
-        prototype: HTMLStaticStylesElement;
-        new (): HTMLStaticStylesElement;
-    };
     interface HTMLStencilSiblingElement extends Components.StencilSibling, HTMLStencilElement {
     }
     var HTMLStencilSiblingElement: {
         prototype: HTMLStencilSiblingElement;
         new (): HTMLStencilSiblingElement;
-    };
-    interface HTMLSvgAttrElement extends Components.SvgAttr, HTMLStencilElement {
-    }
-    var HTMLSvgAttrElement: {
-        prototype: HTMLSvgAttrElement;
-        new (): HTMLSvgAttrElement;
-    };
-    interface HTMLSvgClassElement extends Components.SvgClass, HTMLStencilElement {
-    }
-    var HTMLSvgClassElement: {
-        prototype: HTMLSvgClassElement;
-        new (): HTMLSvgClassElement;
-    };
-    interface HTMLTag3dComponentElement extends Components.Tag3dComponent, HTMLStencilElement {
-    }
-    var HTMLTag3dComponentElement: {
-        prototype: HTMLTag3dComponentElement;
-        new (): HTMLTag3dComponentElement;
-    };
-    interface HTMLTag88Element extends Components.Tag88, HTMLStencilElement {
-    }
-    var HTMLTag88Element: {
-        prototype: HTMLTag88Element;
-        new (): HTMLTag88Element;
     };
     interface HTMLTextContentPatchScopedElement extends Components.TextContentPatchScoped, HTMLStencilElement {
     }
@@ -1103,20 +371,7 @@ declare global {
         prototype: HTMLTextContentPatchScopedWithSlotElement;
         new (): HTMLTextContentPatchScopedWithSlotElement;
     };
-    interface HTMLWatchNativeAttributesElement extends Components.WatchNativeAttributes, HTMLStencilElement {
-    }
-    var HTMLWatchNativeAttributesElement: {
-        prototype: HTMLWatchNativeAttributesElement;
-        new (): HTMLWatchNativeAttributesElement;
-    };
     interface HTMLElementTagNameMap {
-        "bad-shared-jsx": HTMLBadSharedJsxElement;
-        "child-reflect-nan-attribute": HTMLChildReflectNanAttributeElement;
-        "child-with-reflection": HTMLChildWithReflectionElement;
-        "cmp-label": HTMLCmpLabelElement;
-        "cmp-label-with-slot-sibling": HTMLCmpLabelWithSlotSiblingElement;
-        "css-variables-no-encapsulation": HTMLCssVariablesNoEncapsulationElement;
-        "css-variables-shadow-dom": HTMLCssVariablesShadowDomElement;
         "custom-element-child": HTMLCustomElementChildElement;
         "custom-element-child-different-name-than-class": HTMLCustomElementChildDifferentNameThanClassElement;
         "custom-element-nested-child": HTMLCustomElementNestedChildElement;
@@ -1124,79 +379,14 @@ declare global {
         "custom-element-root-different-name-than-class": HTMLCustomElementRootDifferentNameThanClassElement;
         "custom-elements-delegates-focus": HTMLCustomElementsDelegatesFocusElement;
         "custom-elements-no-delegates-focus": HTMLCustomElementsNoDelegatesFocusElement;
-        "dynamic-import": HTMLDynamicImportElement;
-        "es5-addclass-svg": HTMLEs5AddclassSvgElement;
-        "esm-import": HTMLEsmImportElement;
-        "event-custom-type": HTMLEventCustomTypeElement;
-        "event-listener-capture": HTMLEventListenerCaptureElement;
-        "external-import-a": HTMLExternalImportAElement;
-        "external-import-b": HTMLExternalImportBElement;
-        "external-import-c": HTMLExternalImportCElement;
-        "factory-jsx": HTMLFactoryJsxElement;
-        "host-attr-override": HTMLHostAttrOverrideElement;
-        "import-aliasing": HTMLImportAliasingElement;
         "init-css-root": HTMLInitCssRootElement;
-        "input-basic-root": HTMLInputBasicRootElement;
-        "ion-child": HTMLIonChildElement;
-        "ion-host": HTMLIonHostElement;
-        "ion-parent": HTMLIonParentElement;
-        "lifecycle-async-a": HTMLLifecycleAsyncAElement;
-        "lifecycle-async-b": HTMLLifecycleAsyncBElement;
-        "lifecycle-async-c": HTMLLifecycleAsyncCElement;
-        "lifecycle-nested-a": HTMLLifecycleNestedAElement;
-        "lifecycle-nested-b": HTMLLifecycleNestedBElement;
-        "lifecycle-nested-c": HTMLLifecycleNestedCElement;
-        "lifecycle-unload-a": HTMLLifecycleUnloadAElement;
-        "lifecycle-unload-b": HTMLLifecycleUnloadBElement;
-        "lifecycle-unload-root": HTMLLifecycleUnloadRootElement;
-        "lifecycle-update-a": HTMLLifecycleUpdateAElement;
-        "lifecycle-update-b": HTMLLifecycleUpdateBElement;
-        "lifecycle-update-c": HTMLLifecycleUpdateCElement;
-        "listen-jsx": HTMLListenJsxElement;
-        "listen-jsx-root": HTMLListenJsxRootElement;
-        "listen-reattach": HTMLListenReattachElement;
-        "node-resolution": HTMLNodeResolutionElement;
-        "parent-reflect-nan-attribute": HTMLParentReflectNanAttributeElement;
-        "parent-with-reflect-child": HTMLParentWithReflectChildElement;
-        "reflect-nan-attribute": HTMLReflectNanAttributeElement;
-        "reflect-nan-attribute-hyphen": HTMLReflectNanAttributeHyphenElement;
-        "reflect-to-attr": HTMLReflectToAttrElement;
-        "remove-child-patch": HTMLRemoveChildPatchElement;
         "reparent-style-no-vars": HTMLReparentStyleNoVarsElement;
         "reparent-style-with-vars": HTMLReparentStyleWithVarsElement;
-        "scoped-basic": HTMLScopedBasicElement;
-        "scoped-basic-root": HTMLScopedBasicRootElement;
-        "scoped-conditional": HTMLScopedConditionalElement;
-        "scoped-slot-append-and-prepend": HTMLScopedSlotAppendAndPrependElement;
-        "scoped-slot-child-insert-adjacent": HTMLScopedSlotChildInsertAdjacentElement;
-        "shadow-dom-array": HTMLShadowDomArrayElement;
-        "shadow-dom-array-root": HTMLShadowDomArrayRootElement;
-        "shadow-dom-basic": HTMLShadowDomBasicElement;
-        "shadow-dom-basic-root": HTMLShadowDomBasicRootElement;
-        "shadow-dom-mode": HTMLShadowDomModeElement;
-        "shadow-dom-mode-root": HTMLShadowDomModeRootElement;
-        "shadow-dom-slot-basic": HTMLShadowDomSlotBasicElement;
         "shadow-dom-slot-nested": HTMLShadowDomSlotNestedElement;
         "shadow-dom-slot-nested-root": HTMLShadowDomSlotNestedRootElement;
-        "slot-array-basic": HTMLSlotArrayBasicElement;
-        "slot-array-complex": HTMLSlotArrayComplexElement;
-        "slot-array-complex-root": HTMLSlotArrayComplexRootElement;
-        "slot-array-top": HTMLSlotArrayTopElement;
-        "slot-basic": HTMLSlotBasicElement;
-        "slot-basic-order": HTMLSlotBasicOrderElement;
-        "slot-basic-order-root": HTMLSlotBasicOrderRootElement;
-        "slot-basic-root": HTMLSlotBasicRootElement;
         "slot-children-root": HTMLSlotChildrenRootElement;
-        "slot-dynamic-name-change-scoped": HTMLSlotDynamicNameChangeScopedElement;
-        "slot-dynamic-name-change-shadow": HTMLSlotDynamicNameChangeShadowElement;
         "slot-dynamic-scoped-list": HTMLSlotDynamicScopedListElement;
         "slot-dynamic-shadow-list": HTMLSlotDynamicShadowListElement;
-        "slot-dynamic-wrapper": HTMLSlotDynamicWrapperElement;
-        "slot-dynamic-wrapper-root": HTMLSlotDynamicWrapperRootElement;
-        "slot-fallback": HTMLSlotFallbackElement;
-        "slot-fallback-root": HTMLSlotFallbackRootElement;
-        "slot-hide-content-open": HTMLSlotHideContentOpenElement;
-        "slot-hide-content-scoped": HTMLSlotHideContentScopedElement;
         "slot-html": HTMLSlotHtmlElement;
         "slot-light-dom-content": HTMLSlotLightDomContentElement;
         "slot-light-dom-root": HTMLSlotLightDomRootElement;
@@ -1223,34 +413,12 @@ declare global {
         "static-members": HTMLStaticMembersElement;
         "static-members-separate-export": HTMLStaticMembersSeparateExportElement;
         "static-members-separate-initializer": HTMLStaticMembersSeparateInitializerElement;
-        "static-styles": HTMLStaticStylesElement;
         "stencil-sibling": HTMLStencilSiblingElement;
-        "svg-attr": HTMLSvgAttrElement;
-        "svg-class": HTMLSvgClassElement;
-        "tag-3d-component": HTMLTag3dComponentElement;
-        "tag-88": HTMLTag88Element;
         "text-content-patch-scoped": HTMLTextContentPatchScopedElement;
         "text-content-patch-scoped-with-slot": HTMLTextContentPatchScopedWithSlotElement;
-        "watch-native-attributes": HTMLWatchNativeAttributesElement;
     }
 }
 declare namespace LocalJSX {
-    interface BadSharedJsx {
-    }
-    interface ChildReflectNanAttribute {
-        "val"?: number;
-    }
-    interface ChildWithReflection {
-        "val"?: number | any;
-    }
-    interface CmpLabel {
-    }
-    interface CmpLabelWithSlotSibling {
-    }
-    interface CssVariablesNoEncapsulation {
-    }
-    interface CssVariablesShadowDom {
-    }
     interface CustomElementChild {
     }
     interface CustomElementChildDifferentNameThanClass {
@@ -1265,191 +433,24 @@ declare namespace LocalJSX {
     }
     interface CustomElementsNoDelegatesFocus {
     }
-    interface DynamicImport {
-    }
-    interface Es5AddclassSvg {
-    }
-    interface EsmImport {
-        "onSomeEvent"?: (event: EsmImportCustomEvent<any>) => void;
-        "propVal"?: number;
-    }
-    interface EventCustomType {
-        "onTestEvent"?: (event: EventCustomTypeCustomEvent<TestEventDetail>) => void;
-    }
-    interface EventListenerCapture {
-    }
-    interface ExternalImportA {
-    }
-    interface ExternalImportB {
-    }
-    interface ExternalImportC {
-    }
-    interface FactoryJsx {
-    }
-    interface HostAttrOverride {
-    }
-    interface ImportAliasing {
-        "onMyEvent"?: (event: ImportAliasingCustomEvent<void>) => void;
-        "user"?: string;
-    }
     interface InitCssRoot {
-    }
-    interface InputBasicRoot {
-        "value"?: string;
-    }
-    interface IonChild {
-    }
-    interface IonHost {
-    }
-    interface IonParent {
-    }
-    interface LifecycleAsyncA {
-    }
-    interface LifecycleAsyncB {
-        "onLifecycleLoad"?: (event: LifecycleAsyncBCustomEvent<any>) => void;
-        "onLifecycleUpdate"?: (event: LifecycleAsyncBCustomEvent<any>) => void;
-        "value"?: string;
-    }
-    interface LifecycleAsyncC {
-        "onLifecycleLoad"?: (event: LifecycleAsyncCCustomEvent<any>) => void;
-        "onLifecycleUpdate"?: (event: LifecycleAsyncCCustomEvent<any>) => void;
-        "value"?: string;
-    }
-    interface LifecycleNestedA {
-    }
-    interface LifecycleNestedB {
-    }
-    interface LifecycleNestedC {
-    }
-    interface LifecycleUnloadA {
-    }
-    interface LifecycleUnloadB {
-    }
-    interface LifecycleUnloadRoot {
-    }
-    interface LifecycleUpdateA {
-    }
-    interface LifecycleUpdateB {
-        "value"?: number;
-    }
-    interface LifecycleUpdateC {
-        "value"?: number;
-    }
-    interface ListenJsx {
-    }
-    interface ListenJsxRoot {
-    }
-    interface ListenReattach {
-    }
-    interface NodeResolution {
-    }
-    interface ParentReflectNanAttribute {
-    }
-    interface ParentWithReflectChild {
-    }
-    interface ReflectNanAttribute {
-        "val"?: number;
-    }
-    interface ReflectNanAttributeHyphen {
-        "valNum"?: number;
-    }
-    interface ReflectToAttr {
-        "bool"?: boolean;
-        "disabled"?: boolean;
-        "dynamicNu"?: number;
-        "dynamicStr"?: string;
-        "nu"?: number;
-        "null"?: string | null;
-        "otherBool"?: boolean;
-        "str"?: string;
-        "undef"?: string;
-    }
-    interface RemoveChildPatch {
     }
     interface ReparentStyleNoVars {
     }
     interface ReparentStyleWithVars {
-    }
-    interface ScopedBasic {
-    }
-    interface ScopedBasicRoot {
-    }
-    interface ScopedConditional {
-        "renderHello"?: boolean;
-    }
-    interface ScopedSlotAppendAndPrepend {
-    }
-    interface ScopedSlotChildInsertAdjacent {
-    }
-    interface ShadowDomArray {
-        "values"?: number[];
-    }
-    interface ShadowDomArrayRoot {
-    }
-    interface ShadowDomBasic {
-    }
-    interface ShadowDomBasicRoot {
-    }
-    interface ShadowDomMode {
-        /**
-          * The mode determines which platform styles to use.
-         */
-        "colormode"?: string;
-    }
-    interface ShadowDomModeRoot {
-    }
-    interface ShadowDomSlotBasic {
     }
     interface ShadowDomSlotNested {
         "i"?: number;
     }
     interface ShadowDomSlotNestedRoot {
     }
-    interface SlotArrayBasic {
-    }
-    interface SlotArrayComplex {
-    }
-    interface SlotArrayComplexRoot {
-    }
-    interface SlotArrayTop {
-    }
-    interface SlotBasic {
-    }
-    interface SlotBasicOrder {
-    }
-    interface SlotBasicOrderRoot {
-    }
-    interface SlotBasicRoot {
-    }
     interface SlotChildrenRoot {
-    }
-    interface SlotDynamicNameChangeScoped {
-        "slotName"?: string;
-    }
-    interface SlotDynamicNameChangeShadow {
-        "slotName"?: string;
     }
     interface SlotDynamicScopedList {
         "items"?: Array<string>;
     }
     interface SlotDynamicShadowList {
         "items"?: Array<string>;
-    }
-    interface SlotDynamicWrapper {
-        "tag"?: string;
-    }
-    interface SlotDynamicWrapperRoot {
-    }
-    interface SlotFallback {
-        "inc"?: number;
-    }
-    interface SlotFallbackRoot {
-    }
-    interface SlotHideContentOpen {
-        "enabled"?: boolean;
-    }
-    interface SlotHideContentScoped {
-        "enabled"?: boolean;
     }
     interface SlotHtml {
         "inc"?: number;
@@ -1511,32 +512,13 @@ declare namespace LocalJSX {
     }
     interface StaticMembersSeparateInitializer {
     }
-    interface StaticStyles {
-    }
     interface StencilSibling {
-    }
-    interface SvgAttr {
-    }
-    interface SvgClass {
-    }
-    interface Tag3dComponent {
-    }
-    interface Tag88 {
     }
     interface TextContentPatchScoped {
     }
     interface TextContentPatchScopedWithSlot {
     }
-    interface WatchNativeAttributes {
-    }
     interface IntrinsicElements {
-        "bad-shared-jsx": BadSharedJsx;
-        "child-reflect-nan-attribute": ChildReflectNanAttribute;
-        "child-with-reflection": ChildWithReflection;
-        "cmp-label": CmpLabel;
-        "cmp-label-with-slot-sibling": CmpLabelWithSlotSibling;
-        "css-variables-no-encapsulation": CssVariablesNoEncapsulation;
-        "css-variables-shadow-dom": CssVariablesShadowDom;
         "custom-element-child": CustomElementChild;
         "custom-element-child-different-name-than-class": CustomElementChildDifferentNameThanClass;
         "custom-element-nested-child": CustomElementNestedChild;
@@ -1544,79 +526,14 @@ declare namespace LocalJSX {
         "custom-element-root-different-name-than-class": CustomElementRootDifferentNameThanClass;
         "custom-elements-delegates-focus": CustomElementsDelegatesFocus;
         "custom-elements-no-delegates-focus": CustomElementsNoDelegatesFocus;
-        "dynamic-import": DynamicImport;
-        "es5-addclass-svg": Es5AddclassSvg;
-        "esm-import": EsmImport;
-        "event-custom-type": EventCustomType;
-        "event-listener-capture": EventListenerCapture;
-        "external-import-a": ExternalImportA;
-        "external-import-b": ExternalImportB;
-        "external-import-c": ExternalImportC;
-        "factory-jsx": FactoryJsx;
-        "host-attr-override": HostAttrOverride;
-        "import-aliasing": ImportAliasing;
         "init-css-root": InitCssRoot;
-        "input-basic-root": InputBasicRoot;
-        "ion-child": IonChild;
-        "ion-host": IonHost;
-        "ion-parent": IonParent;
-        "lifecycle-async-a": LifecycleAsyncA;
-        "lifecycle-async-b": LifecycleAsyncB;
-        "lifecycle-async-c": LifecycleAsyncC;
-        "lifecycle-nested-a": LifecycleNestedA;
-        "lifecycle-nested-b": LifecycleNestedB;
-        "lifecycle-nested-c": LifecycleNestedC;
-        "lifecycle-unload-a": LifecycleUnloadA;
-        "lifecycle-unload-b": LifecycleUnloadB;
-        "lifecycle-unload-root": LifecycleUnloadRoot;
-        "lifecycle-update-a": LifecycleUpdateA;
-        "lifecycle-update-b": LifecycleUpdateB;
-        "lifecycle-update-c": LifecycleUpdateC;
-        "listen-jsx": ListenJsx;
-        "listen-jsx-root": ListenJsxRoot;
-        "listen-reattach": ListenReattach;
-        "node-resolution": NodeResolution;
-        "parent-reflect-nan-attribute": ParentReflectNanAttribute;
-        "parent-with-reflect-child": ParentWithReflectChild;
-        "reflect-nan-attribute": ReflectNanAttribute;
-        "reflect-nan-attribute-hyphen": ReflectNanAttributeHyphen;
-        "reflect-to-attr": ReflectToAttr;
-        "remove-child-patch": RemoveChildPatch;
         "reparent-style-no-vars": ReparentStyleNoVars;
         "reparent-style-with-vars": ReparentStyleWithVars;
-        "scoped-basic": ScopedBasic;
-        "scoped-basic-root": ScopedBasicRoot;
-        "scoped-conditional": ScopedConditional;
-        "scoped-slot-append-and-prepend": ScopedSlotAppendAndPrepend;
-        "scoped-slot-child-insert-adjacent": ScopedSlotChildInsertAdjacent;
-        "shadow-dom-array": ShadowDomArray;
-        "shadow-dom-array-root": ShadowDomArrayRoot;
-        "shadow-dom-basic": ShadowDomBasic;
-        "shadow-dom-basic-root": ShadowDomBasicRoot;
-        "shadow-dom-mode": ShadowDomMode;
-        "shadow-dom-mode-root": ShadowDomModeRoot;
-        "shadow-dom-slot-basic": ShadowDomSlotBasic;
         "shadow-dom-slot-nested": ShadowDomSlotNested;
         "shadow-dom-slot-nested-root": ShadowDomSlotNestedRoot;
-        "slot-array-basic": SlotArrayBasic;
-        "slot-array-complex": SlotArrayComplex;
-        "slot-array-complex-root": SlotArrayComplexRoot;
-        "slot-array-top": SlotArrayTop;
-        "slot-basic": SlotBasic;
-        "slot-basic-order": SlotBasicOrder;
-        "slot-basic-order-root": SlotBasicOrderRoot;
-        "slot-basic-root": SlotBasicRoot;
         "slot-children-root": SlotChildrenRoot;
-        "slot-dynamic-name-change-scoped": SlotDynamicNameChangeScoped;
-        "slot-dynamic-name-change-shadow": SlotDynamicNameChangeShadow;
         "slot-dynamic-scoped-list": SlotDynamicScopedList;
         "slot-dynamic-shadow-list": SlotDynamicShadowList;
-        "slot-dynamic-wrapper": SlotDynamicWrapper;
-        "slot-dynamic-wrapper-root": SlotDynamicWrapperRoot;
-        "slot-fallback": SlotFallback;
-        "slot-fallback-root": SlotFallbackRoot;
-        "slot-hide-content-open": SlotHideContentOpen;
-        "slot-hide-content-scoped": SlotHideContentScoped;
         "slot-html": SlotHtml;
         "slot-light-dom-content": SlotLightDomContent;
         "slot-light-dom-root": SlotLightDomRoot;
@@ -1643,28 +560,15 @@ declare namespace LocalJSX {
         "static-members": StaticMembers;
         "static-members-separate-export": StaticMembersSeparateExport;
         "static-members-separate-initializer": StaticMembersSeparateInitializer;
-        "static-styles": StaticStyles;
         "stencil-sibling": StencilSibling;
-        "svg-attr": SvgAttr;
-        "svg-class": SvgClass;
-        "tag-3d-component": Tag3dComponent;
-        "tag-88": Tag88;
         "text-content-patch-scoped": TextContentPatchScoped;
         "text-content-patch-scoped-with-slot": TextContentPatchScopedWithSlot;
-        "watch-native-attributes": WatchNativeAttributes;
     }
 }
 export { LocalJSX as JSX };
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
-            "bad-shared-jsx": LocalJSX.BadSharedJsx & JSXBase.HTMLAttributes<HTMLBadSharedJsxElement>;
-            "child-reflect-nan-attribute": LocalJSX.ChildReflectNanAttribute & JSXBase.HTMLAttributes<HTMLChildReflectNanAttributeElement>;
-            "child-with-reflection": LocalJSX.ChildWithReflection & JSXBase.HTMLAttributes<HTMLChildWithReflectionElement>;
-            "cmp-label": LocalJSX.CmpLabel & JSXBase.HTMLAttributes<HTMLCmpLabelElement>;
-            "cmp-label-with-slot-sibling": LocalJSX.CmpLabelWithSlotSibling & JSXBase.HTMLAttributes<HTMLCmpLabelWithSlotSiblingElement>;
-            "css-variables-no-encapsulation": LocalJSX.CssVariablesNoEncapsulation & JSXBase.HTMLAttributes<HTMLCssVariablesNoEncapsulationElement>;
-            "css-variables-shadow-dom": LocalJSX.CssVariablesShadowDom & JSXBase.HTMLAttributes<HTMLCssVariablesShadowDomElement>;
             "custom-element-child": LocalJSX.CustomElementChild & JSXBase.HTMLAttributes<HTMLCustomElementChildElement>;
             "custom-element-child-different-name-than-class": LocalJSX.CustomElementChildDifferentNameThanClass & JSXBase.HTMLAttributes<HTMLCustomElementChildDifferentNameThanClassElement>;
             "custom-element-nested-child": LocalJSX.CustomElementNestedChild & JSXBase.HTMLAttributes<HTMLCustomElementNestedChildElement>;
@@ -1672,79 +576,14 @@ declare module "@stencil/core" {
             "custom-element-root-different-name-than-class": LocalJSX.CustomElementRootDifferentNameThanClass & JSXBase.HTMLAttributes<HTMLCustomElementRootDifferentNameThanClassElement>;
             "custom-elements-delegates-focus": LocalJSX.CustomElementsDelegatesFocus & JSXBase.HTMLAttributes<HTMLCustomElementsDelegatesFocusElement>;
             "custom-elements-no-delegates-focus": LocalJSX.CustomElementsNoDelegatesFocus & JSXBase.HTMLAttributes<HTMLCustomElementsNoDelegatesFocusElement>;
-            "dynamic-import": LocalJSX.DynamicImport & JSXBase.HTMLAttributes<HTMLDynamicImportElement>;
-            "es5-addclass-svg": LocalJSX.Es5AddclassSvg & JSXBase.HTMLAttributes<HTMLEs5AddclassSvgElement>;
-            "esm-import": LocalJSX.EsmImport & JSXBase.HTMLAttributes<HTMLEsmImportElement>;
-            "event-custom-type": LocalJSX.EventCustomType & JSXBase.HTMLAttributes<HTMLEventCustomTypeElement>;
-            "event-listener-capture": LocalJSX.EventListenerCapture & JSXBase.HTMLAttributes<HTMLEventListenerCaptureElement>;
-            "external-import-a": LocalJSX.ExternalImportA & JSXBase.HTMLAttributes<HTMLExternalImportAElement>;
-            "external-import-b": LocalJSX.ExternalImportB & JSXBase.HTMLAttributes<HTMLExternalImportBElement>;
-            "external-import-c": LocalJSX.ExternalImportC & JSXBase.HTMLAttributes<HTMLExternalImportCElement>;
-            "factory-jsx": LocalJSX.FactoryJsx & JSXBase.HTMLAttributes<HTMLFactoryJsxElement>;
-            "host-attr-override": LocalJSX.HostAttrOverride & JSXBase.HTMLAttributes<HTMLHostAttrOverrideElement>;
-            "import-aliasing": LocalJSX.ImportAliasing & JSXBase.HTMLAttributes<HTMLImportAliasingElement>;
             "init-css-root": LocalJSX.InitCssRoot & JSXBase.HTMLAttributes<HTMLInitCssRootElement>;
-            "input-basic-root": LocalJSX.InputBasicRoot & JSXBase.HTMLAttributes<HTMLInputBasicRootElement>;
-            "ion-child": LocalJSX.IonChild & JSXBase.HTMLAttributes<HTMLIonChildElement>;
-            "ion-host": LocalJSX.IonHost & JSXBase.HTMLAttributes<HTMLIonHostElement>;
-            "ion-parent": LocalJSX.IonParent & JSXBase.HTMLAttributes<HTMLIonParentElement>;
-            "lifecycle-async-a": LocalJSX.LifecycleAsyncA & JSXBase.HTMLAttributes<HTMLLifecycleAsyncAElement>;
-            "lifecycle-async-b": LocalJSX.LifecycleAsyncB & JSXBase.HTMLAttributes<HTMLLifecycleAsyncBElement>;
-            "lifecycle-async-c": LocalJSX.LifecycleAsyncC & JSXBase.HTMLAttributes<HTMLLifecycleAsyncCElement>;
-            "lifecycle-nested-a": LocalJSX.LifecycleNestedA & JSXBase.HTMLAttributes<HTMLLifecycleNestedAElement>;
-            "lifecycle-nested-b": LocalJSX.LifecycleNestedB & JSXBase.HTMLAttributes<HTMLLifecycleNestedBElement>;
-            "lifecycle-nested-c": LocalJSX.LifecycleNestedC & JSXBase.HTMLAttributes<HTMLLifecycleNestedCElement>;
-            "lifecycle-unload-a": LocalJSX.LifecycleUnloadA & JSXBase.HTMLAttributes<HTMLLifecycleUnloadAElement>;
-            "lifecycle-unload-b": LocalJSX.LifecycleUnloadB & JSXBase.HTMLAttributes<HTMLLifecycleUnloadBElement>;
-            "lifecycle-unload-root": LocalJSX.LifecycleUnloadRoot & JSXBase.HTMLAttributes<HTMLLifecycleUnloadRootElement>;
-            "lifecycle-update-a": LocalJSX.LifecycleUpdateA & JSXBase.HTMLAttributes<HTMLLifecycleUpdateAElement>;
-            "lifecycle-update-b": LocalJSX.LifecycleUpdateB & JSXBase.HTMLAttributes<HTMLLifecycleUpdateBElement>;
-            "lifecycle-update-c": LocalJSX.LifecycleUpdateC & JSXBase.HTMLAttributes<HTMLLifecycleUpdateCElement>;
-            "listen-jsx": LocalJSX.ListenJsx & JSXBase.HTMLAttributes<HTMLListenJsxElement>;
-            "listen-jsx-root": LocalJSX.ListenJsxRoot & JSXBase.HTMLAttributes<HTMLListenJsxRootElement>;
-            "listen-reattach": LocalJSX.ListenReattach & JSXBase.HTMLAttributes<HTMLListenReattachElement>;
-            "node-resolution": LocalJSX.NodeResolution & JSXBase.HTMLAttributes<HTMLNodeResolutionElement>;
-            "parent-reflect-nan-attribute": LocalJSX.ParentReflectNanAttribute & JSXBase.HTMLAttributes<HTMLParentReflectNanAttributeElement>;
-            "parent-with-reflect-child": LocalJSX.ParentWithReflectChild & JSXBase.HTMLAttributes<HTMLParentWithReflectChildElement>;
-            "reflect-nan-attribute": LocalJSX.ReflectNanAttribute & JSXBase.HTMLAttributes<HTMLReflectNanAttributeElement>;
-            "reflect-nan-attribute-hyphen": LocalJSX.ReflectNanAttributeHyphen & JSXBase.HTMLAttributes<HTMLReflectNanAttributeHyphenElement>;
-            "reflect-to-attr": LocalJSX.ReflectToAttr & JSXBase.HTMLAttributes<HTMLReflectToAttrElement>;
-            "remove-child-patch": LocalJSX.RemoveChildPatch & JSXBase.HTMLAttributes<HTMLRemoveChildPatchElement>;
             "reparent-style-no-vars": LocalJSX.ReparentStyleNoVars & JSXBase.HTMLAttributes<HTMLReparentStyleNoVarsElement>;
             "reparent-style-with-vars": LocalJSX.ReparentStyleWithVars & JSXBase.HTMLAttributes<HTMLReparentStyleWithVarsElement>;
-            "scoped-basic": LocalJSX.ScopedBasic & JSXBase.HTMLAttributes<HTMLScopedBasicElement>;
-            "scoped-basic-root": LocalJSX.ScopedBasicRoot & JSXBase.HTMLAttributes<HTMLScopedBasicRootElement>;
-            "scoped-conditional": LocalJSX.ScopedConditional & JSXBase.HTMLAttributes<HTMLScopedConditionalElement>;
-            "scoped-slot-append-and-prepend": LocalJSX.ScopedSlotAppendAndPrepend & JSXBase.HTMLAttributes<HTMLScopedSlotAppendAndPrependElement>;
-            "scoped-slot-child-insert-adjacent": LocalJSX.ScopedSlotChildInsertAdjacent & JSXBase.HTMLAttributes<HTMLScopedSlotChildInsertAdjacentElement>;
-            "shadow-dom-array": LocalJSX.ShadowDomArray & JSXBase.HTMLAttributes<HTMLShadowDomArrayElement>;
-            "shadow-dom-array-root": LocalJSX.ShadowDomArrayRoot & JSXBase.HTMLAttributes<HTMLShadowDomArrayRootElement>;
-            "shadow-dom-basic": LocalJSX.ShadowDomBasic & JSXBase.HTMLAttributes<HTMLShadowDomBasicElement>;
-            "shadow-dom-basic-root": LocalJSX.ShadowDomBasicRoot & JSXBase.HTMLAttributes<HTMLShadowDomBasicRootElement>;
-            "shadow-dom-mode": LocalJSX.ShadowDomMode & JSXBase.HTMLAttributes<HTMLShadowDomModeElement>;
-            "shadow-dom-mode-root": LocalJSX.ShadowDomModeRoot & JSXBase.HTMLAttributes<HTMLShadowDomModeRootElement>;
-            "shadow-dom-slot-basic": LocalJSX.ShadowDomSlotBasic & JSXBase.HTMLAttributes<HTMLShadowDomSlotBasicElement>;
             "shadow-dom-slot-nested": LocalJSX.ShadowDomSlotNested & JSXBase.HTMLAttributes<HTMLShadowDomSlotNestedElement>;
             "shadow-dom-slot-nested-root": LocalJSX.ShadowDomSlotNestedRoot & JSXBase.HTMLAttributes<HTMLShadowDomSlotNestedRootElement>;
-            "slot-array-basic": LocalJSX.SlotArrayBasic & JSXBase.HTMLAttributes<HTMLSlotArrayBasicElement>;
-            "slot-array-complex": LocalJSX.SlotArrayComplex & JSXBase.HTMLAttributes<HTMLSlotArrayComplexElement>;
-            "slot-array-complex-root": LocalJSX.SlotArrayComplexRoot & JSXBase.HTMLAttributes<HTMLSlotArrayComplexRootElement>;
-            "slot-array-top": LocalJSX.SlotArrayTop & JSXBase.HTMLAttributes<HTMLSlotArrayTopElement>;
-            "slot-basic": LocalJSX.SlotBasic & JSXBase.HTMLAttributes<HTMLSlotBasicElement>;
-            "slot-basic-order": LocalJSX.SlotBasicOrder & JSXBase.HTMLAttributes<HTMLSlotBasicOrderElement>;
-            "slot-basic-order-root": LocalJSX.SlotBasicOrderRoot & JSXBase.HTMLAttributes<HTMLSlotBasicOrderRootElement>;
-            "slot-basic-root": LocalJSX.SlotBasicRoot & JSXBase.HTMLAttributes<HTMLSlotBasicRootElement>;
             "slot-children-root": LocalJSX.SlotChildrenRoot & JSXBase.HTMLAttributes<HTMLSlotChildrenRootElement>;
-            "slot-dynamic-name-change-scoped": LocalJSX.SlotDynamicNameChangeScoped & JSXBase.HTMLAttributes<HTMLSlotDynamicNameChangeScopedElement>;
-            "slot-dynamic-name-change-shadow": LocalJSX.SlotDynamicNameChangeShadow & JSXBase.HTMLAttributes<HTMLSlotDynamicNameChangeShadowElement>;
             "slot-dynamic-scoped-list": LocalJSX.SlotDynamicScopedList & JSXBase.HTMLAttributes<HTMLSlotDynamicScopedListElement>;
             "slot-dynamic-shadow-list": LocalJSX.SlotDynamicShadowList & JSXBase.HTMLAttributes<HTMLSlotDynamicShadowListElement>;
-            "slot-dynamic-wrapper": LocalJSX.SlotDynamicWrapper & JSXBase.HTMLAttributes<HTMLSlotDynamicWrapperElement>;
-            "slot-dynamic-wrapper-root": LocalJSX.SlotDynamicWrapperRoot & JSXBase.HTMLAttributes<HTMLSlotDynamicWrapperRootElement>;
-            "slot-fallback": LocalJSX.SlotFallback & JSXBase.HTMLAttributes<HTMLSlotFallbackElement>;
-            "slot-fallback-root": LocalJSX.SlotFallbackRoot & JSXBase.HTMLAttributes<HTMLSlotFallbackRootElement>;
-            "slot-hide-content-open": LocalJSX.SlotHideContentOpen & JSXBase.HTMLAttributes<HTMLSlotHideContentOpenElement>;
-            "slot-hide-content-scoped": LocalJSX.SlotHideContentScoped & JSXBase.HTMLAttributes<HTMLSlotHideContentScopedElement>;
             "slot-html": LocalJSX.SlotHtml & JSXBase.HTMLAttributes<HTMLSlotHtmlElement>;
             "slot-light-dom-content": LocalJSX.SlotLightDomContent & JSXBase.HTMLAttributes<HTMLSlotLightDomContentElement>;
             "slot-light-dom-root": LocalJSX.SlotLightDomRoot & JSXBase.HTMLAttributes<HTMLSlotLightDomRootElement>;
@@ -1771,15 +610,9 @@ declare module "@stencil/core" {
             "static-members": LocalJSX.StaticMembers & JSXBase.HTMLAttributes<HTMLStaticMembersElement>;
             "static-members-separate-export": LocalJSX.StaticMembersSeparateExport & JSXBase.HTMLAttributes<HTMLStaticMembersSeparateExportElement>;
             "static-members-separate-initializer": LocalJSX.StaticMembersSeparateInitializer & JSXBase.HTMLAttributes<HTMLStaticMembersSeparateInitializerElement>;
-            "static-styles": LocalJSX.StaticStyles & JSXBase.HTMLAttributes<HTMLStaticStylesElement>;
             "stencil-sibling": LocalJSX.StencilSibling & JSXBase.HTMLAttributes<HTMLStencilSiblingElement>;
-            "svg-attr": LocalJSX.SvgAttr & JSXBase.HTMLAttributes<HTMLSvgAttrElement>;
-            "svg-class": LocalJSX.SvgClass & JSXBase.HTMLAttributes<HTMLSvgClassElement>;
-            "tag-3d-component": LocalJSX.Tag3dComponent & JSXBase.HTMLAttributes<HTMLTag3dComponentElement>;
-            "tag-88": LocalJSX.Tag88 & JSXBase.HTMLAttributes<HTMLTag88Element>;
             "text-content-patch-scoped": LocalJSX.TextContentPatchScoped & JSXBase.HTMLAttributes<HTMLTextContentPatchScopedElement>;
             "text-content-patch-scoped-with-slot": LocalJSX.TextContentPatchScopedWithSlot & JSXBase.HTMLAttributes<HTMLTextContentPatchScopedWithSlotElement>;
-            "watch-native-attributes": LocalJSX.WatchNativeAttributes & JSXBase.HTMLAttributes<HTMLWatchNativeAttributesElement>;
         }
     }
 }

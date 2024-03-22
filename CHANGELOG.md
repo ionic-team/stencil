@@ -1,3 +1,24 @@
+# 🚞 [4.13.0](https://github.com/ionic-team/stencil/compare/v4.12.6...v4.13.0) (2024-03-18)
+
+
+### Bug Fixes
+
+* **compiler:** allow to set custom root directory ([#5446](https://github.com/ionic-team/stencil/issues/5446)) ([b6b9617](https://github.com/ionic-team/stencil/commit/b6b96175c5e6a7d3477ed5fc2d4ddfc17827dd63))
+* **compiler:** don't validate references for @Prop, @Method and @Event decorator ([#5475](https://github.com/ionic-team/stencil/issues/5475)) ([3e45a82](https://github.com/ionic-team/stencil/commit/3e45a823534a2e36ac51cbc701ecff074c7c842d)), closes [#1352](https://github.com/ionic-team/stencil/issues/1352)
+* **renderer:** fix conditional rendering issue ([#5365](https://github.com/ionic-team/stencil/issues/5365)) ([5aa886e](https://github.com/ionic-team/stencil/commit/5aa886eb52efb7f361d53672698e947390c4f6f0)), closes [#5335](https://github.com/ionic-team/stencil/issues/5335)
+* **renderer:** fix missing slot ref callback handling ([#5337](https://github.com/ionic-team/stencil/issues/5337)) ([41f877e](https://github.com/ionic-team/stencil/commit/41f877ec48200dee0483691b4e5e519073d392dd)), closes [#5335](https://github.com/ionic-team/stencil/issues/5335)
+* **runtime:** remove `forceUpdate` in `appendChild` patch ([#5437](https://github.com/ionic-team/stencil/issues/5437)) ([e03795b](https://github.com/ionic-team/stencil/commit/e03795b38e93dfc024425c11d08792a6f4b02bcb))
+* **sys:** fix expected types for `createNodeLogger` and `createNodeSys` ([#5375](https://github.com/ionic-team/stencil/issues/5375)) ([7a70281](https://github.com/ionic-team/stencil/commit/7a70281bb41697c2fe9f992af571d5b7af242a79))
+* **testing:** use viewport for Puppeteer screenshot clip dimensions ([#5359](https://github.com/ionic-team/stencil/issues/5359)) ([c879800](https://github.com/ionic-team/stencil/commit/c8798002aba05af0a4554351b6232ce714d9995b)), closes [#5353](https://github.com/ionic-team/stencil/issues/5353)
+
+
+### Features
+
+* **dev-server:** add "ping" route ([#5414](https://github.com/ionic-team/stencil/issues/5414)) ([b279858](https://github.com/ionic-team/stencil/commit/b279858e2fc242d5990817f5a3fa4181e2d49604))
+* **typescript:** Update dependency typescript to ~5.4.0 ([#5464](https://github.com/ionic-team/stencil/issues/5464)) ([0833dc4](https://github.com/ionic-team/stencil/commit/0833dc4929d9048edce435b8c205917775faad52))
+
+
+
 ## 🍍 [4.12.6](https://github.com/ionic-team/stencil/compare/v4.12.5...v4.12.6) (2024-03-11)
 
 

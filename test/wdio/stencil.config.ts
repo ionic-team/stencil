@@ -13,6 +13,7 @@ export const config: Config = {
   plugins: [sass()],
   buildDist: true,
   globalStyle: './style-plugin/global-sass-entry.scss',
+  globalScript: './global.ts',
   extras: {
     lifecycleDOMEvents: true,
     scriptDataOpts: true,

@@ -1,4 +1,4 @@
-import { h, Fragment } from '@stencil/core';
+import { h } from '@stencil/core';
 import { render } from '@wdio/browser-runner/stencil';
 
 describe('key-reorder', function () {
@@ -9,8 +9,7 @@ describe('key-reorder', function () {
   });
 
   it('uses same nodes after reorder', async () => {
-    const root = $('key-reorder');
-    await root.waitForExist();
+    await $('#item-0').waitForExist();
     let item0 = document.body.querySelector('#item-0') as any;
     let item1 = document.body.querySelector('#item-1') as any;
     let item2 = document.body.querySelector('#item-2') as any;
@@ -29,8 +28,9 @@ describe('key-reorder', function () {
     item3.__orgItem = 3;
     item4.__orgItem = 4;
 
-    const button = root.$('button');
+    const button = $('button');
     await button.click();
+    await $('#item-4').waitForExist();
 
     item0 = document.body.querySelector('#item-0') as any;
     item1 = document.body.querySelector('#item-1') as any;

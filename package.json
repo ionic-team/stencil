@@ -1,6 +1,6 @@
 {
   "name": "@stencil/core",
-  "version": "4.12.6",
+  "version": "4.13.0",
   "license": "MIT",
   "main": "./internal/stencil-core/index.cjs",
   "module": "./internal/stencil-core/index.js",
@@ -30,7 +30,7 @@
     "clean": "rm -rf build/ cli/ compiler/ dev-server/ internal/ mock-doc/ sys/ testing/ && npm run clean.scripts && npm run clean.screenshots",
     "clean.scripts": "rm -rf scripts/build",
     "clean.screenshots": "rm -rf test/end-to-end/screenshot/builds test/end-to-end/screenshot/images",
-    "lint": "eslint 'bin/*' 'scripts/*.ts' 'scripts/**/*.ts' 'src/*.ts' 'src/**/*.ts' 'src/**/*.tsx'",
+    "lint": "eslint 'bin/*' 'scripts/*.ts' 'scripts/**/*.ts' 'src/*.ts' 'src/**/*.ts' 'src/**/*.tsx' 'test/wdio/**/*.tsx'",
     "install.jest": "bash ./src/testing/jest/install-dependencies.sh",
     "prettier": "npm run prettier.base -- --write",
     "prettier.base": "prettier --cache \"./({bin,scripts,src,test}/**/*.{ts,tsx,js,jsx})|bin/stencil|.github/(**/)?*.(yml|yaml)|*.js\"",
@@ -94,6 +94,7 @@
     "eslint-plugin-jest": "^27.0.4",
     "eslint-plugin-jsdoc": "^48.0.0",
     "eslint-plugin-simple-import-sort": "^12.0.0",
+    "eslint-plugin-wdio": "^8.24.12",
     "execa": "8.0.1",
     "exit": "^0.1.2",
     "fs-extra": "^11.0.0",
@@ -120,7 +121,7 @@
     "rollup": "2.56.3",
     "rollup-plugin-sourcemaps": "^0.6.3",
     "semver": "^7.3.7",
-    "terser": "5.29.1",
+    "terser": "5.29.2",
     "typescript": "~5.4.0",
     "webpack": "^5.75.0",
     "ws": "8.16.0"
