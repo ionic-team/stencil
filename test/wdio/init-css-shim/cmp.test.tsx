@@ -1,17 +1,18 @@
-import { setupDomTests } from '../util';
+import { h } from '@stencil/core';
+import { render } from '@wdio/browser-runner/stencil';
 
 describe('init-css-shim', () => {
-  const { setupDom, tearDownDom } = setupDomTests(document);
-
-  let app: HTMLElement;
-
   beforeEach(async () => {
-    app = await setupDom('/init-css-shim/index.html');
+    render({
+      template: () => (
+        <init-css-root></init-css-root>
+      ),
+    });
+    await $('init-css-root > *').waitForExist();
   });
-  afterEach(tearDownDom);
 
   it('should not replace "relavive to root" paths', async () => {
-    const root = app.querySelector('init-css-root #relativeToRoot');
+    const root = document.querySelector('#relativeToRoot');
     let imagePath = window.getComputedStyle(root).getPropertyValue('background-image');
     imagePath = imagePath.replace(/\"/g, '');
     imagePath = imagePath.replace(/\'/g, '');
@@ -19,7 +20,7 @@ describe('init-css-shim', () => {
   });
 
   it('should not replace "absolute" paths', async () => {
-    const root = app.querySelector('init-css-root #absolute');
+    const root = document.querySelector('#absolute');
     let imagePath = window.getComputedStyle(root).getPropertyValue('background-image');
     imagePath = imagePath.replace(/\"/g, '');
     imagePath = imagePath.replace(/\'/g, '');
