@@ -95,14 +95,6 @@ export namespace Components {
     }
     interface SlottedCss {
     }
-    interface StaticDecoratedMembers {
-    }
-    interface StaticMembers {
-    }
-    interface StaticMembersSeparateExport {
-    }
-    interface StaticMembersSeparateInitializer {
-    }
     interface StencilSibling {
     }
     interface TextContentPatchScoped {
@@ -345,30 +337,6 @@ declare global {
         prototype: HTMLSlottedCssElement;
         new (): HTMLSlottedCssElement;
     };
-    interface HTMLStaticDecoratedMembersElement extends Components.StaticDecoratedMembers, HTMLStencilElement {
-    }
-    var HTMLStaticDecoratedMembersElement: {
-        prototype: HTMLStaticDecoratedMembersElement;
-        new (): HTMLStaticDecoratedMembersElement;
-    };
-    interface HTMLStaticMembersElement extends Components.StaticMembers, HTMLStencilElement {
-    }
-    var HTMLStaticMembersElement: {
-        prototype: HTMLStaticMembersElement;
-        new (): HTMLStaticMembersElement;
-    };
-    interface HTMLStaticMembersSeparateExportElement extends Components.StaticMembersSeparateExport, HTMLStencilElement {
-    }
-    var HTMLStaticMembersSeparateExportElement: {
-        prototype: HTMLStaticMembersSeparateExportElement;
-        new (): HTMLStaticMembersSeparateExportElement;
-    };
-    interface HTMLStaticMembersSeparateInitializerElement extends Components.StaticMembersSeparateInitializer, HTMLStencilElement {
-    }
-    var HTMLStaticMembersSeparateInitializerElement: {
-        prototype: HTMLStaticMembersSeparateInitializerElement;
-        new (): HTMLStaticMembersSeparateInitializerElement;
-    };
     interface HTMLStencilSiblingElement extends Components.StencilSibling, HTMLStencilElement {
     }
     var HTMLStencilSiblingElement: {
@@ -427,10 +395,6 @@ declare global {
         "slot-replace-wrapper": HTMLSlotReplaceWrapperElement;
         "slot-replace-wrapper-root": HTMLSlotReplaceWrapperRootElement;
         "slotted-css": HTMLSlottedCssElement;
-        "static-decorated-members": HTMLStaticDecoratedMembersElement;
-        "static-members": HTMLStaticMembersElement;
-        "static-members-separate-export": HTMLStaticMembersSeparateExportElement;
-        "static-members-separate-initializer": HTMLStaticMembersSeparateInitializerElement;
         "stencil-sibling": HTMLStencilSiblingElement;
         "text-content-patch-scoped": HTMLTextContentPatchScopedElement;
         "text-content-patch-scoped-with-slot": HTMLTextContentPatchScopedWithSlotElement;
@@ -526,14 +490,6 @@ declare namespace LocalJSX {
     }
     interface SlottedCss {
     }
-    interface StaticDecoratedMembers {
-    }
-    interface StaticMembers {
-    }
-    interface StaticMembersSeparateExport {
-    }
-    interface StaticMembersSeparateInitializer {
-    }
     interface StencilSibling {
     }
     interface TextContentPatchScoped {
@@ -580,10 +536,6 @@ declare namespace LocalJSX {
         "slot-replace-wrapper": SlotReplaceWrapper;
         "slot-replace-wrapper-root": SlotReplaceWrapperRoot;
         "slotted-css": SlottedCss;
-        "static-decorated-members": StaticDecoratedMembers;
-        "static-members": StaticMembers;
-        "static-members-separate-export": StaticMembersSeparateExport;
-        "static-members-separate-initializer": StaticMembersSeparateInitializer;
         "stencil-sibling": StencilSibling;
         "text-content-patch-scoped": TextContentPatchScoped;
         "text-content-patch-scoped-with-slot": TextContentPatchScopedWithSlot;
@@ -632,10 +584,6 @@ declare module "@stencil/core" {
             "slot-replace-wrapper": LocalJSX.SlotReplaceWrapper & JSXBase.HTMLAttributes<HTMLSlotReplaceWrapperElement>;
             "slot-replace-wrapper-root": LocalJSX.SlotReplaceWrapperRoot & JSXBase.HTMLAttributes<HTMLSlotReplaceWrapperRootElement>;
             "slotted-css": LocalJSX.SlottedCss & JSXBase.HTMLAttributes<HTMLSlottedCssElement>;
-            "static-decorated-members": LocalJSX.StaticDecoratedMembers & JSXBase.HTMLAttributes<HTMLStaticDecoratedMembersElement>;
-            "static-members": LocalJSX.StaticMembers & JSXBase.HTMLAttributes<HTMLStaticMembersElement>;
-            "static-members-separate-export": LocalJSX.StaticMembersSeparateExport & JSXBase.HTMLAttributes<HTMLStaticMembersSeparateExportElement>;
-            "static-members-separate-initializer": LocalJSX.StaticMembersSeparateInitializer & JSXBase.HTMLAttributes<HTMLStaticMembersSeparateInitializerElement>;
             "stencil-sibling": LocalJSX.StencilSibling & JSXBase.HTMLAttributes<HTMLStencilSiblingElement>;
             "text-content-patch-scoped": LocalJSX.TextContentPatchScoped & JSXBase.HTMLAttributes<HTMLTextContentPatchScopedElement>;
             "text-content-patch-scoped-with-slot": LocalJSX.TextContentPatchScopedWithSlot & JSXBase.HTMLAttributes<HTMLTextContentPatchScopedWithSlotElement>;
