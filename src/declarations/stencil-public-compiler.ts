@@ -1985,7 +1985,8 @@ export interface TestingConfig extends JestConfig {
   screenshotConnector?: string;
 
   /**
-   * Some JSDoc, describing this field
+   * Timeout for the pixelmatch worker to resolve (in ms).
+   * @default 2500
    */
   screenshotTimeout?: number | null;
 

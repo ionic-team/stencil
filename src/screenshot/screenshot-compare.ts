@@ -6,6 +6,11 @@ import { join, relative } from 'path';
 
 import { writeScreenshotData, writeScreenshotImage } from './screenshot-fs';
 
+/**
+ * @see {@link d.TestingConfig.screenshotTimeout}
+ */
+const DEFAULT_SCREENSHOT_TIMEOUT = 2500;
+
 export async function compareScreenshot(
   emulateConfig: d.EmulateConfig,
   screenshotBuildData: d.ScreenshotBuildData,
@@ -137,14 +142,15 @@ async function getMismatchedPixels(
      * value for timeouts. There are runtime errors that occur if we attempt to use optional chaining + nullish
      * coalescing with the `jasmine` global stating it's not defined. As a result, we use a ternary here.
      *
-     * The '2500' value that we default to is the value of `jasmine.DEFAULT_TIMEOUT_INTERVAL` (5000) divided by 2.
+     * For Jest environments that don't use Jest Circus we define the timeout based on the
+     * `jasmine.DEFAULT_TIMEOUT_INTERVAL` (5000) divided by 2. Otherwise we use {@link d.TestingConfig.screenshotTimeout}.
      */
     const timeout =
       screenshotTimeoutMs !== null
         ? screenshotTimeoutMs
         : typeof jasmine !== 'undefined' && jasmine.DEFAULT_TIMEOUT_INTERVAL
           ? jasmine.DEFAULT_TIMEOUT_INTERVAL * 0.5
-          : 2500;
+          : DEFAULT_SCREENSHOT_TIMEOUT;
     const tmr = setTimeout(() => {
       reject(`getMismatchedPixels timeout: ${timeout}ms`);
     }, timeout);
