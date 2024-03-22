@@ -71,8 +71,6 @@ export namespace Components {
     }
     interface SlotReplaceWrapperRoot {
     }
-    interface SlottedCss {
-    }
     interface StencilSibling {
     }
     interface TextContentPatchScoped {
@@ -255,12 +253,6 @@ declare global {
         prototype: HTMLSlotReplaceWrapperRootElement;
         new (): HTMLSlotReplaceWrapperRootElement;
     };
-    interface HTMLSlottedCssElement extends Components.SlottedCss, HTMLStencilElement {
-    }
-    var HTMLSlottedCssElement: {
-        prototype: HTMLSlottedCssElement;
-        new (): HTMLSlottedCssElement;
-    };
     interface HTMLStencilSiblingElement extends Components.StencilSibling, HTMLStencilElement {
     }
     var HTMLStencilSiblingElement: {
@@ -309,7 +301,6 @@ declare global {
         "slot-reorder-root": HTMLSlotReorderRootElement;
         "slot-replace-wrapper": HTMLSlotReplaceWrapperElement;
         "slot-replace-wrapper-root": HTMLSlotReplaceWrapperRootElement;
-        "slotted-css": HTMLSlottedCssElement;
         "stencil-sibling": HTMLStencilSiblingElement;
         "text-content-patch-scoped": HTMLTextContentPatchScopedElement;
         "text-content-patch-scoped-with-slot": HTMLTextContentPatchScopedWithSlotElement;
@@ -381,8 +372,6 @@ declare namespace LocalJSX {
     }
     interface SlotReplaceWrapperRoot {
     }
-    interface SlottedCss {
-    }
     interface StencilSibling {
     }
     interface TextContentPatchScoped {
@@ -419,7 +408,6 @@ declare namespace LocalJSX {
         "slot-reorder-root": SlotReorderRoot;
         "slot-replace-wrapper": SlotReplaceWrapper;
         "slot-replace-wrapper-root": SlotReplaceWrapperRoot;
-        "slotted-css": SlottedCss;
         "stencil-sibling": StencilSibling;
         "text-content-patch-scoped": TextContentPatchScoped;
         "text-content-patch-scoped-with-slot": TextContentPatchScopedWithSlot;
@@ -458,7 +446,6 @@ declare module "@stencil/core" {
             "slot-reorder-root": LocalJSX.SlotReorderRoot & JSXBase.HTMLAttributes<HTMLSlotReorderRootElement>;
             "slot-replace-wrapper": LocalJSX.SlotReplaceWrapper & JSXBase.HTMLAttributes<HTMLSlotReplaceWrapperElement>;
             "slot-replace-wrapper-root": LocalJSX.SlotReplaceWrapperRoot & JSXBase.HTMLAttributes<HTMLSlotReplaceWrapperRootElement>;
-            "slotted-css": LocalJSX.SlottedCss & JSXBase.HTMLAttributes<HTMLSlottedCssElement>;
             "stencil-sibling": LocalJSX.StencilSibling & JSXBase.HTMLAttributes<HTMLStencilSiblingElement>;
             "text-content-patch-scoped": LocalJSX.TextContentPatchScoped & JSXBase.HTMLAttributes<HTMLTextContentPatchScopedElement>;
             "text-content-patch-scoped-with-slot": LocalJSX.TextContentPatchScopedWithSlot & JSXBase.HTMLAttributes<HTMLTextContentPatchScopedWithSlotElement>;
