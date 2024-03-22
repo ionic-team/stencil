@@ -26,11 +26,6 @@ export namespace Components {
     }
     interface ReparentStyleWithVars {
     }
-    interface ShadowDomSlotNested {
-        "i"?: number;
-    }
-    interface ShadowDomSlotNestedRoot {
-    }
     interface SlotChildrenRoot {
     }
     interface SlotConditionalRendering {
@@ -123,18 +118,6 @@ declare global {
     var HTMLReparentStyleWithVarsElement: {
         prototype: HTMLReparentStyleWithVarsElement;
         new (): HTMLReparentStyleWithVarsElement;
-    };
-    interface HTMLShadowDomSlotNestedElement extends Components.ShadowDomSlotNested, HTMLStencilElement {
-    }
-    var HTMLShadowDomSlotNestedElement: {
-        prototype: HTMLShadowDomSlotNestedElement;
-        new (): HTMLShadowDomSlotNestedElement;
-    };
-    interface HTMLShadowDomSlotNestedRootElement extends Components.ShadowDomSlotNestedRoot, HTMLStencilElement {
-    }
-    var HTMLShadowDomSlotNestedRootElement: {
-        prototype: HTMLShadowDomSlotNestedRootElement;
-        new (): HTMLShadowDomSlotNestedRootElement;
     };
     interface HTMLSlotChildrenRootElement extends Components.SlotChildrenRoot, HTMLStencilElement {
     }
@@ -231,8 +214,6 @@ declare global {
         "init-css-root": HTMLInitCssRootElement;
         "reparent-style-no-vars": HTMLReparentStyleNoVarsElement;
         "reparent-style-with-vars": HTMLReparentStyleWithVarsElement;
-        "shadow-dom-slot-nested": HTMLShadowDomSlotNestedElement;
-        "shadow-dom-slot-nested-root": HTMLShadowDomSlotNestedRootElement;
         "slot-children-root": HTMLSlotChildrenRootElement;
         "slot-conditional-rendering": HTMLSlotConditionalRenderingElement;
         "slot-html": HTMLSlotHtmlElement;
@@ -269,11 +250,6 @@ declare namespace LocalJSX {
     interface ReparentStyleNoVars {
     }
     interface ReparentStyleWithVars {
-    }
-    interface ShadowDomSlotNested {
-        "i"?: number;
-    }
-    interface ShadowDomSlotNestedRoot {
     }
     interface SlotChildrenRoot {
     }
@@ -317,8 +293,6 @@ declare namespace LocalJSX {
         "init-css-root": InitCssRoot;
         "reparent-style-no-vars": ReparentStyleNoVars;
         "reparent-style-with-vars": ReparentStyleWithVars;
-        "shadow-dom-slot-nested": ShadowDomSlotNested;
-        "shadow-dom-slot-nested-root": ShadowDomSlotNestedRoot;
         "slot-children-root": SlotChildrenRoot;
         "slot-conditional-rendering": SlotConditionalRendering;
         "slot-html": SlotHtml;
@@ -349,8 +323,6 @@ declare module "@stencil/core" {
             "init-css-root": LocalJSX.InitCssRoot & JSXBase.HTMLAttributes<HTMLInitCssRootElement>;
             "reparent-style-no-vars": LocalJSX.ReparentStyleNoVars & JSXBase.HTMLAttributes<HTMLReparentStyleNoVarsElement>;
             "reparent-style-with-vars": LocalJSX.ReparentStyleWithVars & JSXBase.HTMLAttributes<HTMLReparentStyleWithVarsElement>;
-            "shadow-dom-slot-nested": LocalJSX.ShadowDomSlotNested & JSXBase.HTMLAttributes<HTMLShadowDomSlotNestedElement>;
-            "shadow-dom-slot-nested-root": LocalJSX.ShadowDomSlotNestedRoot & JSXBase.HTMLAttributes<HTMLShadowDomSlotNestedRootElement>;
             "slot-children-root": LocalJSX.SlotChildrenRoot & JSXBase.HTMLAttributes<HTMLSlotChildrenRootElement>;
             "slot-conditional-rendering": LocalJSX.SlotConditionalRendering & JSXBase.HTMLAttributes<HTMLSlotConditionalRenderingElement>;
             "slot-html": LocalJSX.SlotHtml & JSXBase.HTMLAttributes<HTMLSlotHtmlElement>;
