@@ -1,32 +1,25 @@
-import { setupDomTests } from '../util';
+import { h } from '@stencil/core';
+import { render } from '@wdio/browser-runner/stencil';
 
 describe('slot-nested-default-order', function () {
-  const { setupDom, tearDownDom } = setupDomTests(document);
-  let app: HTMLElement | undefined;
-  let host: HTMLElement | undefined;
-
   beforeEach(async () => {
-    app = await setupDom('/slot-nested-default-order/index.html');
-    host = app.querySelector('slot-nested-default-order-parent');
+    render({
+      template: () => (
+        <slot-nested-default-order-parent>
+          <p>Hello</p>
+        </slot-nested-default-order-parent>
+      ),
+    });
   });
 
-  afterEach(tearDownDom);
+  it('should render the slot content after the div', async () => {
+    const childCmps = $('slot-nested-default-order-parent').shadow$('slot-nested-default-order-child').shadow$$('*');
 
-  it('should render', () => {
-    expect(host).toBeDefined();
-  });
+    await expect(childCmps).toBeElementsArrayOfSize(2);
+    expect(await childCmps[0].getTagName()).toBe('div');
+    await expect(childCmps[0]).toHaveText('State: true');
 
-  it('should render the slot content after the div', () => {
-    const childCmp = host.querySelector('slot-nested-default-order-child');
-
-    expect(childCmp.children.length).toBe(2);
-
-    const firstChild = childCmp.children[0];
-    expect(firstChild.tagName).toBe('DIV');
-    expect(firstChild.textContent.trim()).toBe('State: true');
-
-    const secondChild = childCmp.children[1];
-    expect(secondChild.tagName).toBe('P');
-    expect(secondChild.textContent.trim()).toBe('Hello');
+    expect(await childCmps[1].getTagName()).toBe('p');
+    await expect(childCmps[1]).toHaveText('Hello');
   });
 });
