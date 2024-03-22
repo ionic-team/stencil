@@ -23,47 +23,17 @@ describe('shadow-dom-slot-nested', () => {
 
   it('renders children', async () => {
     const elm = $('main');
-    await expect(elm.getCSSProperty('color')).toMatchInlineSnapshot(`
-      {
-        "parsed": {
-          "alpha": 1,
-          "hex": "#0000ff",
-          "rgba": "rgba(0,0,255,1)",
-          "type": "color",
-        },
-        "property": "color",
-        "value": "rgba(0,0,255,1)",
-      }
-    `);
+    const { parsed: { hex: hexMain } } = await elm.getCSSProperty('color');
+    expect(hexMain).toBe('#0000ff');
 
     const cmp = $('shadow-dom-slot-nested-root');
     const section = cmp.shadow$('section');
-    await expect(section.getCSSProperty('color')).toMatchInlineSnapshot(`
-      {
-        "parsed": {
-          "alpha": 1,
-          "hex": "#008000",
-          "rgba": "rgba(0,128,0,1)",
-          "type": "color",
-        },
-        "property": "color",
-        "value": "rgba(0,128,0,1)",
-      }
-    `);
+    const { parsed: { hex: hexSection } } = await section.getCSSProperty('color');
+    expect(hexSection).toBe('#008000');
 
     const article = cmp.shadow$('article');
-    await expect(article.getCSSProperty('color')).toMatchInlineSnapshot(`
-      {
-        "parsed": {
-          "alpha": 1,
-          "hex": "#008000",
-          "rgba": "rgba(0,128,0,1)",
-          "type": "color",
-        },
-        "property": "color",
-        "value": "rgba(0,128,0,1)",
-      }
-    `);
+    const { parsed: { hex: hexArticle } } = await article.getCSSProperty('color');
+    expect(hexArticle).toBe('#008000');
 
     const children = article.$$('*');
     await expect(children).toBeElementsArrayOfSize(3);
@@ -73,18 +43,8 @@ describe('shadow-dom-slot-nested', () => {
 
       const header = nestedElm.shadow$('header');
       await expect(header).toHaveText('shadow dom: ' + i);
-      await expect(header.getCSSProperty('color')).toMatchInlineSnapshot(`
-        {
-          "parsed": {
-            "alpha": 1,
-            "hex": "#ff0000",
-            "rgba": "rgba(255,0,0,1)",
-            "type": "color",
-          },
-          "property": "color",
-          "value": "rgba(255,0,0,1)",
-        }
-      `);
+      const { parsed: { hex: hexHeader } } = await header.getCSSProperty('color');
+      expect(hexHeader).toBe('#ff0000');
 
       const footer = nestedElm.shadow$('footer');
       const footerSlot = footer.$('slot');
@@ -93,18 +53,8 @@ describe('shadow-dom-slot-nested', () => {
       await expect(footerSlot).toHaveText('');
 
       await expect(nestedElm).toHaveText(expect.stringContaining('light dom: ' + i));
-      await expect(nestedElm.getCSSProperty('color')).toMatchInlineSnapshot(`
-        {
-          "parsed": {
-            "alpha": 1,
-            "hex": "#008000",
-            "rgba": "rgba(0,128,0,1)",
-            "type": "color",
-          },
-          "property": "color",
-          "value": "rgba(0,128,0,1)",
-        }
-      `);
+      const { parsed: { hex: hexNestedElm } } = await nestedElm.getCSSProperty('color');
+      expect(hexNestedElm).toBe('#008000');
     };
 
     await testShadowNested(0);
