@@ -4,9 +4,7 @@ import { render } from '@wdio/browser-runner/stencil';
 describe('slot-light-dom', () => {
   beforeEach(async () => {
     render({
-      template: () => (
-        <slot-light-dom-root></slot-light-dom-root>
-      ),
+      template: () => <slot-light-dom-root></slot-light-dom-root>,
     });
   });
   it('renders light dom in correct slots', async () => {
