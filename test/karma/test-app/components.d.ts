@@ -42,8 +42,6 @@ export namespace Components {
     }
     interface SlotNgIf {
     }
-    interface SlotNoDefault {
-    }
     interface SlotReplaceWrapper {
         "href"?: string;
     }
@@ -159,12 +157,6 @@ declare global {
         prototype: HTMLSlotNgIfElement;
         new (): HTMLSlotNgIfElement;
     };
-    interface HTMLSlotNoDefaultElement extends Components.SlotNoDefault, HTMLStencilElement {
-    }
-    var HTMLSlotNoDefaultElement: {
-        prototype: HTMLSlotNoDefaultElement;
-        new (): HTMLSlotNoDefaultElement;
-    };
     interface HTMLSlotReplaceWrapperElement extends Components.SlotReplaceWrapper, HTMLStencilElement {
     }
     var HTMLSlotReplaceWrapperElement: {
@@ -213,7 +205,6 @@ declare global {
         "slot-nested-default-order-child": HTMLSlotNestedDefaultOrderChildElement;
         "slot-nested-default-order-parent": HTMLSlotNestedDefaultOrderParentElement;
         "slot-ng-if": HTMLSlotNgIfElement;
-        "slot-no-default": HTMLSlotNoDefaultElement;
         "slot-replace-wrapper": HTMLSlotReplaceWrapperElement;
         "slot-replace-wrapper-root": HTMLSlotReplaceWrapperRootElement;
         "stencil-sibling": HTMLStencilSiblingElement;
@@ -258,8 +249,6 @@ declare namespace LocalJSX {
     }
     interface SlotNgIf {
     }
-    interface SlotNoDefault {
-    }
     interface SlotReplaceWrapper {
         "href"?: string;
     }
@@ -289,7 +278,6 @@ declare namespace LocalJSX {
         "slot-nested-default-order-child": SlotNestedDefaultOrderChild;
         "slot-nested-default-order-parent": SlotNestedDefaultOrderParent;
         "slot-ng-if": SlotNgIf;
-        "slot-no-default": SlotNoDefault;
         "slot-replace-wrapper": SlotReplaceWrapper;
         "slot-replace-wrapper-root": SlotReplaceWrapperRoot;
         "stencil-sibling": StencilSibling;
@@ -318,7 +306,6 @@ declare module "@stencil/core" {
             "slot-nested-default-order-child": LocalJSX.SlotNestedDefaultOrderChild & JSXBase.HTMLAttributes<HTMLSlotNestedDefaultOrderChildElement>;
             "slot-nested-default-order-parent": LocalJSX.SlotNestedDefaultOrderParent & JSXBase.HTMLAttributes<HTMLSlotNestedDefaultOrderParentElement>;
             "slot-ng-if": LocalJSX.SlotNgIf & JSXBase.HTMLAttributes<HTMLSlotNgIfElement>;
-            "slot-no-default": LocalJSX.SlotNoDefault & JSXBase.HTMLAttributes<HTMLSlotNoDefaultElement>;
             "slot-replace-wrapper": LocalJSX.SlotReplaceWrapper & JSXBase.HTMLAttributes<HTMLSlotReplaceWrapperElement>;
             "slot-replace-wrapper-root": LocalJSX.SlotReplaceWrapperRoot & JSXBase.HTMLAttributes<HTMLSlotReplaceWrapperRootElement>;
             "stencil-sibling": LocalJSX.StencilSibling & JSXBase.HTMLAttributes<HTMLStencilSiblingElement>;
