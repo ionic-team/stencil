@@ -1,20 +1,29 @@
-import { setupDomTests, waitForChanges } from '../util';
+import { Fragment, h } from '@stencil/core';
+import { render } from '@wdio/browser-runner/stencil';
 
 describe('slot-reorder', () => {
-  const { setupDom, tearDownDom } = setupDomTests(document);
-  let app: HTMLElement;
+  const style = `.reordered {
+  background: yellow;
+}`;
 
   beforeEach(async () => {
-    app = await setupDom('/slot-reorder/index.html');
+    render({
+      template: () => (
+        <>
+          <style>{style}</style>
+          <slot-reorder-root></slot-reorder-root>
+        </>
+      ),
+    });
+
+    await $('slot-reorder-root').waitForExist();
   });
-  afterEach(tearDownDom);
 
   it('renders', async () => {
     let r: HTMLElement;
-    const button = app.querySelector('button');
 
     function ordered() {
-      r = app.querySelector('.results1 div');
+      r = document.querySelector('.results1 div');
       expect(r.children[0].textContent.trim()).toBe('fallback default');
       expect(r.children[0].hasAttribute('hidden')).toBe(false);
       expect(r.children[0].getAttribute('name')).toBe(null);
@@ -25,7 +34,7 @@ describe('slot-reorder', () => {
       expect(r.children[2].hasAttribute('hidden')).toBe(false);
       expect(r.children[2].getAttribute('name')).toBe('slot-b');
 
-      r = app.querySelector('.results2 div');
+      r = document.querySelector('.results2 div');
       expect(r.children[0].textContent.trim()).toBe('fallback default');
       expect(r.children[0].hasAttribute('hidden')).toBe(true);
       expect(r.children[0].getAttribute('name')).toBe(null);
@@ -37,7 +46,7 @@ describe('slot-reorder', () => {
       expect(r.children[3].hasAttribute('hidden')).toBe(false);
       expect(r.children[3].getAttribute('name')).toBe('slot-b');
 
-      r = app.querySelector('.results3 div');
+      r = document.querySelector('.results3 div');
       expect(r.children[0].textContent.trim()).toBe('fallback default');
       expect(r.children[0].hasAttribute('hidden')).toBe(true);
       expect(r.children[0].getAttribute('name')).toBe(null);
@@ -51,7 +60,7 @@ describe('slot-reorder', () => {
       expect(r.children[4].getAttribute('name')).toBe('slot-b');
       expect(r.children[5].textContent.trim()).toBe('slot-b content');
 
-      r = app.querySelector('.results4 div');
+      r = document.querySelector('.results4 div');
       expect(r.children[0].textContent.trim()).toBe('fallback default');
       expect(r.children[0].hasAttribute('hidden')).toBe(true);
       expect(r.children[0].getAttribute('name')).toBe(null);
@@ -67,7 +76,7 @@ describe('slot-reorder', () => {
     }
 
     function reordered() {
-      r = app.querySelector('.results1 div');
+      r = document.querySelector('.results1 div');
       expect(r.children[0].textContent.trim()).toBe('fallback slot-b');
       expect(r.children[0].hasAttribute('hidden')).toBe(false);
       expect(r.children[0].getAttribute('name')).toBe('slot-b');
@@ -78,7 +87,7 @@ describe('slot-reorder', () => {
       expect(r.children[2].hasAttribute('hidden')).toBe(false);
       expect(r.children[2].getAttribute('name')).toBe('slot-a');
 
-      r = app.querySelector('.results2 div');
+      r = document.querySelector('.results2 div');
       expect(r.children[0].textContent.trim()).toBe('fallback slot-b');
       expect(r.children[0].hasAttribute('hidden')).toBe(false);
       expect(r.children[0].getAttribute('name')).toBe('slot-b');
@@ -90,7 +99,7 @@ describe('slot-reorder', () => {
       expect(r.children[3].hasAttribute('hidden')).toBe(false);
       expect(r.children[3].getAttribute('name')).toBe('slot-a');
 
-      r = app.querySelector('.results3 div');
+      r = document.querySelector('.results3 div');
       expect(r.children[0].textContent.trim()).toBe('fallback slot-b');
       expect(r.children[0].hasAttribute('hidden')).toBe(true);
       expect(r.children[0].getAttribute('name')).toBe('slot-b');
@@ -104,7 +113,7 @@ describe('slot-reorder', () => {
       expect(r.children[4].getAttribute('name')).toBe('slot-a');
       expect(r.children[5].textContent.trim()).toBe('slot-a content');
 
-      r = app.querySelector('.results4 div');
+      r = document.querySelector('.results4 div');
       expect(r.children[0].textContent.trim()).toBe('fallback slot-b');
       expect(r.children[0].hasAttribute('hidden')).toBe(true);
       expect(r.children[0].getAttribute('name')).toBe('slot-b');
@@ -121,18 +130,24 @@ describe('slot-reorder', () => {
 
     ordered();
 
-    button.click();
-    await waitForChanges();
+    await $('button').click();
+    await browser.waitUntil(() => {
+      return document.querySelector('div.reordered');
+    });
 
     reordered();
 
-    button.click();
-    await waitForChanges();
+    await $('button').click();
+    await browser.waitUntil(() => {
+      return !document.querySelector('div.reordered');
+    });
 
     ordered();
 
-    button.click();
-    await waitForChanges();
+    await $('button').click();
+    await browser.waitUntil(() => {
+      return document.querySelector('div.reordered');
+    });
 
     reordered();
   });

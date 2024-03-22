@@ -51,11 +51,6 @@ export namespace Components {
     }
     interface SlotNoDefault {
     }
-    interface SlotReorder {
-        "reordered": boolean;
-    }
-    interface SlotReorderRoot {
-    }
     interface SlotReplaceWrapper {
         "href"?: string;
     }
@@ -197,18 +192,6 @@ declare global {
         prototype: HTMLSlotNoDefaultElement;
         new (): HTMLSlotNoDefaultElement;
     };
-    interface HTMLSlotReorderElement extends Components.SlotReorder, HTMLStencilElement {
-    }
-    var HTMLSlotReorderElement: {
-        prototype: HTMLSlotReorderElement;
-        new (): HTMLSlotReorderElement;
-    };
-    interface HTMLSlotReorderRootElement extends Components.SlotReorderRoot, HTMLStencilElement {
-    }
-    var HTMLSlotReorderRootElement: {
-        prototype: HTMLSlotReorderRootElement;
-        new (): HTMLSlotReorderRootElement;
-    };
     interface HTMLSlotReplaceWrapperElement extends Components.SlotReplaceWrapper, HTMLStencilElement {
     }
     var HTMLSlotReplaceWrapperElement: {
@@ -267,8 +250,6 @@ declare global {
         "slot-nested-default-order-parent": HTMLSlotNestedDefaultOrderParentElement;
         "slot-ng-if": HTMLSlotNgIfElement;
         "slot-no-default": HTMLSlotNoDefaultElement;
-        "slot-reorder": HTMLSlotReorderElement;
-        "slot-reorder-root": HTMLSlotReorderRootElement;
         "slot-replace-wrapper": HTMLSlotReplaceWrapperElement;
         "slot-replace-wrapper-root": HTMLSlotReplaceWrapperRootElement;
         "slotted-css": HTMLSlottedCssElement;
@@ -323,11 +304,6 @@ declare namespace LocalJSX {
     }
     interface SlotNoDefault {
     }
-    interface SlotReorder {
-        "reordered"?: boolean;
-    }
-    interface SlotReorderRoot {
-    }
     interface SlotReplaceWrapper {
         "href"?: string;
     }
@@ -363,8 +339,6 @@ declare namespace LocalJSX {
         "slot-nested-default-order-parent": SlotNestedDefaultOrderParent;
         "slot-ng-if": SlotNgIf;
         "slot-no-default": SlotNoDefault;
-        "slot-reorder": SlotReorder;
-        "slot-reorder-root": SlotReorderRoot;
         "slot-replace-wrapper": SlotReplaceWrapper;
         "slot-replace-wrapper-root": SlotReplaceWrapperRoot;
         "slotted-css": SlottedCss;
@@ -398,8 +372,6 @@ declare module "@stencil/core" {
             "slot-nested-default-order-parent": LocalJSX.SlotNestedDefaultOrderParent & JSXBase.HTMLAttributes<HTMLSlotNestedDefaultOrderParentElement>;
             "slot-ng-if": LocalJSX.SlotNgIf & JSXBase.HTMLAttributes<HTMLSlotNgIfElement>;
             "slot-no-default": LocalJSX.SlotNoDefault & JSXBase.HTMLAttributes<HTMLSlotNoDefaultElement>;
-            "slot-reorder": LocalJSX.SlotReorder & JSXBase.HTMLAttributes<HTMLSlotReorderElement>;
-            "slot-reorder-root": LocalJSX.SlotReorderRoot & JSXBase.HTMLAttributes<HTMLSlotReorderRootElement>;
             "slot-replace-wrapper": LocalJSX.SlotReplaceWrapper & JSXBase.HTMLAttributes<HTMLSlotReplaceWrapperElement>;
             "slot-replace-wrapper-root": LocalJSX.SlotReplaceWrapperRoot & JSXBase.HTMLAttributes<HTMLSlotReplaceWrapperRootElement>;
             "slotted-css": LocalJSX.SlottedCss & JSXBase.HTMLAttributes<HTMLSlottedCssElement>;
