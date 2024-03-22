@@ -35,9 +35,6 @@ export namespace Components {
     }
     interface SlotConditionalRendering {
     }
-    interface SlotDynamicScopedList {
-        "items": Array<string>;
-    }
     interface SlotDynamicShadowList {
         "items": Array<string>;
     }
@@ -50,12 +47,7 @@ export namespace Components {
     }
     interface SlotLightList {
     }
-    interface SlotLightScopedList {
-    }
     interface SlotListLightRoot {
-        "items": string[];
-    }
-    interface SlotListLightScopedRoot {
         "items": string[];
     }
     interface SlotNestedDefaultOrderChild {
@@ -173,12 +165,6 @@ declare global {
         prototype: HTMLSlotConditionalRenderingElement;
         new (): HTMLSlotConditionalRenderingElement;
     };
-    interface HTMLSlotDynamicScopedListElement extends Components.SlotDynamicScopedList, HTMLStencilElement {
-    }
-    var HTMLSlotDynamicScopedListElement: {
-        prototype: HTMLSlotDynamicScopedListElement;
-        new (): HTMLSlotDynamicScopedListElement;
-    };
     interface HTMLSlotDynamicShadowListElement extends Components.SlotDynamicShadowList, HTMLStencilElement {
     }
     var HTMLSlotDynamicShadowListElement: {
@@ -209,23 +195,11 @@ declare global {
         prototype: HTMLSlotLightListElement;
         new (): HTMLSlotLightListElement;
     };
-    interface HTMLSlotLightScopedListElement extends Components.SlotLightScopedList, HTMLStencilElement {
-    }
-    var HTMLSlotLightScopedListElement: {
-        prototype: HTMLSlotLightScopedListElement;
-        new (): HTMLSlotLightScopedListElement;
-    };
     interface HTMLSlotListLightRootElement extends Components.SlotListLightRoot, HTMLStencilElement {
     }
     var HTMLSlotListLightRootElement: {
         prototype: HTMLSlotListLightRootElement;
         new (): HTMLSlotListLightRootElement;
-    };
-    interface HTMLSlotListLightScopedRootElement extends Components.SlotListLightScopedRoot, HTMLStencilElement {
-    }
-    var HTMLSlotListLightScopedRootElement: {
-        prototype: HTMLSlotListLightScopedRootElement;
-        new (): HTMLSlotListLightScopedRootElement;
     };
     interface HTMLSlotNestedDefaultOrderChildElement extends Components.SlotNestedDefaultOrderChild, HTMLStencilElement {
     }
@@ -320,15 +294,12 @@ declare global {
         "shadow-dom-slot-nested-root": HTMLShadowDomSlotNestedRootElement;
         "slot-children-root": HTMLSlotChildrenRootElement;
         "slot-conditional-rendering": HTMLSlotConditionalRenderingElement;
-        "slot-dynamic-scoped-list": HTMLSlotDynamicScopedListElement;
         "slot-dynamic-shadow-list": HTMLSlotDynamicShadowListElement;
         "slot-html": HTMLSlotHtmlElement;
         "slot-light-dom-content": HTMLSlotLightDomContentElement;
         "slot-light-dom-root": HTMLSlotLightDomRootElement;
         "slot-light-list": HTMLSlotLightListElement;
-        "slot-light-scoped-list": HTMLSlotLightScopedListElement;
         "slot-list-light-root": HTMLSlotListLightRootElement;
-        "slot-list-light-scoped-root": HTMLSlotListLightScopedRootElement;
         "slot-nested-default-order-child": HTMLSlotNestedDefaultOrderChildElement;
         "slot-nested-default-order-parent": HTMLSlotNestedDefaultOrderParentElement;
         "slot-ng-if": HTMLSlotNgIfElement;
@@ -374,9 +345,6 @@ declare namespace LocalJSX {
     }
     interface SlotConditionalRendering {
     }
-    interface SlotDynamicScopedList {
-        "items"?: Array<string>;
-    }
     interface SlotDynamicShadowList {
         "items"?: Array<string>;
     }
@@ -389,12 +357,7 @@ declare namespace LocalJSX {
     }
     interface SlotLightList {
     }
-    interface SlotLightScopedList {
-    }
     interface SlotListLightRoot {
-        "items"?: string[];
-    }
-    interface SlotListLightScopedRoot {
         "items"?: string[];
     }
     interface SlotNestedDefaultOrderChild {
@@ -441,15 +404,12 @@ declare namespace LocalJSX {
         "shadow-dom-slot-nested-root": ShadowDomSlotNestedRoot;
         "slot-children-root": SlotChildrenRoot;
         "slot-conditional-rendering": SlotConditionalRendering;
-        "slot-dynamic-scoped-list": SlotDynamicScopedList;
         "slot-dynamic-shadow-list": SlotDynamicShadowList;
         "slot-html": SlotHtml;
         "slot-light-dom-content": SlotLightDomContent;
         "slot-light-dom-root": SlotLightDomRoot;
         "slot-light-list": SlotLightList;
-        "slot-light-scoped-list": SlotLightScopedList;
         "slot-list-light-root": SlotListLightRoot;
-        "slot-list-light-scoped-root": SlotListLightScopedRoot;
         "slot-nested-default-order-child": SlotNestedDefaultOrderChild;
         "slot-nested-default-order-parent": SlotNestedDefaultOrderParent;
         "slot-ng-if": SlotNgIf;
@@ -483,15 +443,12 @@ declare module "@stencil/core" {
             "shadow-dom-slot-nested-root": LocalJSX.ShadowDomSlotNestedRoot & JSXBase.HTMLAttributes<HTMLShadowDomSlotNestedRootElement>;
             "slot-children-root": LocalJSX.SlotChildrenRoot & JSXBase.HTMLAttributes<HTMLSlotChildrenRootElement>;
             "slot-conditional-rendering": LocalJSX.SlotConditionalRendering & JSXBase.HTMLAttributes<HTMLSlotConditionalRenderingElement>;
-            "slot-dynamic-scoped-list": LocalJSX.SlotDynamicScopedList & JSXBase.HTMLAttributes<HTMLSlotDynamicScopedListElement>;
             "slot-dynamic-shadow-list": LocalJSX.SlotDynamicShadowList & JSXBase.HTMLAttributes<HTMLSlotDynamicShadowListElement>;
             "slot-html": LocalJSX.SlotHtml & JSXBase.HTMLAttributes<HTMLSlotHtmlElement>;
             "slot-light-dom-content": LocalJSX.SlotLightDomContent & JSXBase.HTMLAttributes<HTMLSlotLightDomContentElement>;
             "slot-light-dom-root": LocalJSX.SlotLightDomRoot & JSXBase.HTMLAttributes<HTMLSlotLightDomRootElement>;
             "slot-light-list": LocalJSX.SlotLightList & JSXBase.HTMLAttributes<HTMLSlotLightListElement>;
-            "slot-light-scoped-list": LocalJSX.SlotLightScopedList & JSXBase.HTMLAttributes<HTMLSlotLightScopedListElement>;
             "slot-list-light-root": LocalJSX.SlotListLightRoot & JSXBase.HTMLAttributes<HTMLSlotListLightRootElement>;
-            "slot-list-light-scoped-root": LocalJSX.SlotListLightScopedRoot & JSXBase.HTMLAttributes<HTMLSlotListLightScopedRootElement>;
             "slot-nested-default-order-child": LocalJSX.SlotNestedDefaultOrderChild & JSXBase.HTMLAttributes<HTMLSlotNestedDefaultOrderChildElement>;
             "slot-nested-default-order-parent": LocalJSX.SlotNestedDefaultOrderParent & JSXBase.HTMLAttributes<HTMLSlotNestedDefaultOrderParentElement>;
             "slot-ng-if": LocalJSX.SlotNgIf & JSXBase.HTMLAttributes<HTMLSlotNgIfElement>;
