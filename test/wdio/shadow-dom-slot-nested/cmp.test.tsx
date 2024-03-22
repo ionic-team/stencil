@@ -23,16 +23,22 @@ describe('shadow-dom-slot-nested', () => {
 
   it('renders children', async () => {
     const elm = $('main');
-    const { parsed: { hex: hexMain } } = await elm.getCSSProperty('color');
+    const {
+      parsed: { hex: hexMain },
+    } = await elm.getCSSProperty('color');
     expect(hexMain).toBe('#0000ff');
 
     const cmp = $('shadow-dom-slot-nested-root');
     const section = cmp.shadow$('section');
-    const { parsed: { hex: hexSection } } = await section.getCSSProperty('color');
+    const {
+      parsed: { hex: hexSection },
+    } = await section.getCSSProperty('color');
     expect(hexSection).toBe('#008000');
 
     const article = cmp.shadow$('article');
-    const { parsed: { hex: hexArticle } } = await article.getCSSProperty('color');
+    const {
+      parsed: { hex: hexArticle },
+    } = await article.getCSSProperty('color');
     expect(hexArticle).toBe('#008000');
 
     const children = article.$$('*');
@@ -43,7 +49,9 @@ describe('shadow-dom-slot-nested', () => {
 
       const header = nestedElm.shadow$('header');
       await expect(header).toHaveText('shadow dom: ' + i);
-      const { parsed: { hex: hexHeader } } = await header.getCSSProperty('color');
+      const {
+        parsed: { hex: hexHeader },
+      } = await header.getCSSProperty('color');
       expect(hexHeader).toBe('#ff0000');
 
       const footer = nestedElm.shadow$('footer');
@@ -53,7 +61,9 @@ describe('shadow-dom-slot-nested', () => {
       await expect(footerSlot).toHaveText('');
 
       await expect(nestedElm).toHaveText(expect.stringContaining('light dom: ' + i));
-      const { parsed: { hex: hexNestedElm } } = await nestedElm.getCSSProperty('color');
+      const {
+        parsed: { hex: hexNestedElm },
+      } = await nestedElm.getCSSProperty('color');
       expect(hexNestedElm).toBe('#008000');
     };
 
