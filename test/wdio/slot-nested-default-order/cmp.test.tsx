@@ -13,7 +13,7 @@ describe('slot-nested-default-order', function () {
   });
 
   it('should render the slot content after the div', async () => {
-    const childCmps = $('slot-nested-default-order-parent').shadow$('slot-nested-default-order-child').shadow$$('*');
+    const childCmps = $$('slot-nested-default-order-parent slot-nested-default-order-child > *');
 
     await expect(childCmps).toBeElementsArrayOfSize(2);
     expect(await childCmps[0].getTagName()).toBe('div');
