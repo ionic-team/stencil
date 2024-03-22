@@ -101,8 +101,6 @@ export namespace Components {
     }
     interface StaticMembersSeparateInitializer {
     }
-    interface StaticStyles {
-    }
     interface StencilSibling {
     }
     interface TextContentPatchScoped {
@@ -363,12 +361,6 @@ declare global {
         prototype: HTMLStaticMembersSeparateInitializerElement;
         new (): HTMLStaticMembersSeparateInitializerElement;
     };
-    interface HTMLStaticStylesElement extends Components.StaticStyles, HTMLStencilElement {
-    }
-    var HTMLStaticStylesElement: {
-        prototype: HTMLStaticStylesElement;
-        new (): HTMLStaticStylesElement;
-    };
     interface HTMLStencilSiblingElement extends Components.StencilSibling, HTMLStencilElement {
     }
     var HTMLStencilSiblingElement: {
@@ -430,7 +422,6 @@ declare global {
         "static-members": HTMLStaticMembersElement;
         "static-members-separate-export": HTMLStaticMembersSeparateExportElement;
         "static-members-separate-initializer": HTMLStaticMembersSeparateInitializerElement;
-        "static-styles": HTMLStaticStylesElement;
         "stencil-sibling": HTMLStencilSiblingElement;
         "text-content-patch-scoped": HTMLTextContentPatchScopedElement;
         "text-content-patch-scoped-with-slot": HTMLTextContentPatchScopedWithSlotElement;
@@ -532,8 +523,6 @@ declare namespace LocalJSX {
     }
     interface StaticMembersSeparateInitializer {
     }
-    interface StaticStyles {
-    }
     interface StencilSibling {
     }
     interface TextContentPatchScoped {
@@ -583,7 +572,6 @@ declare namespace LocalJSX {
         "static-members": StaticMembers;
         "static-members-separate-export": StaticMembersSeparateExport;
         "static-members-separate-initializer": StaticMembersSeparateInitializer;
-        "static-styles": StaticStyles;
         "stencil-sibling": StencilSibling;
         "text-content-patch-scoped": TextContentPatchScoped;
         "text-content-patch-scoped-with-slot": TextContentPatchScopedWithSlot;
@@ -635,7 +623,6 @@ declare module "@stencil/core" {
             "static-members": LocalJSX.StaticMembers & JSXBase.HTMLAttributes<HTMLStaticMembersElement>;
             "static-members-separate-export": LocalJSX.StaticMembersSeparateExport & JSXBase.HTMLAttributes<HTMLStaticMembersSeparateExportElement>;
             "static-members-separate-initializer": LocalJSX.StaticMembersSeparateInitializer & JSXBase.HTMLAttributes<HTMLStaticMembersSeparateInitializerElement>;
-            "static-styles": LocalJSX.StaticStyles & JSXBase.HTMLAttributes<HTMLStaticStylesElement>;
             "stencil-sibling": LocalJSX.StencilSibling & JSXBase.HTMLAttributes<HTMLStencilSiblingElement>;
             "text-content-patch-scoped": LocalJSX.TextContentPatchScoped & JSXBase.HTMLAttributes<HTMLTextContentPatchScopedElement>;
             "text-content-patch-scoped-with-slot": LocalJSX.TextContentPatchScopedWithSlot & JSXBase.HTMLAttributes<HTMLTextContentPatchScopedWithSlotElement>;
