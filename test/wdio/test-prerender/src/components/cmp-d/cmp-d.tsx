@@ -1,5 +1,6 @@
-import { Component, Prop, h } from '@stencil/core';
-import { printLifecycle } from '../../global/util';
+import { Component, h, Prop } from '@stencil/core';
+
+import { printLifecycle } from '../../global/util.js';
 
 @Component({
   tag: 'cmp-d',

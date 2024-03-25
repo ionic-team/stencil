@@ -1,18 +1,17 @@
-import { Config } from '../../../internal';
-const { WWW_OUT_DIR } = require('../constants');
+import type { Config } from '../../internal/index.js';
 
 export const config: Config = {
   namespace: 'TestPrerender',
-  globalStyle: 'src/global/app.css',
+  globalStyle: 'test-prerender/src/global/app.css',
   tsconfig: 'tsconfig-prerender.json',
   outputTargets: [
     {
       type: 'www',
-      dir: `../${WWW_OUT_DIR}`,
+      dir: `www-prerender-script`,
       baseUrl: 'https://karma.stenciljs.com/prerender',
       serviceWorker: null,
       empty: false,
-      prerenderConfig: 'prerender.config.js',
+      prerenderConfig: './test-prerender/prerender.config.js',
     },
   ],
 };

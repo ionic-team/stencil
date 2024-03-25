@@ -1,4 +1,37 @@
-import { setupDomTests, waitForChanges } from '../util';
+/**
+ * Note: this file is meant to be run in the browser, not in Node.js. WebdriverIO
+ * injects some basic polyfills for Node.js to make the following possible.
+ */
+import path from 'node:path';
+
+async function setupTest(htmlFile: string): Promise<HTMLElement> {
+  if (document.querySelector('iframe')) {
+    document.body.removeChild(document.querySelector('iframe'));
+  }
+
+  const htmlFilePath = path.resolve(
+    path.dirname(globalThis.__wdioSpec__),
+    '..',
+    'www-prerender-script',
+    htmlFile.slice(htmlFile.startsWith('/') ? 1 : 0),
+  );
+  const iframe = document.createElement('iframe');
+
+  /**
+   * Note: prefixes the absolute path to the html file with `/@fs` is a ViteJS (https://vitejs.dev/)
+   * feature which allows to serve static content from files this way
+   */
+  iframe.src = `/@fs${htmlFilePath}`;
+  iframe.width = '600px';
+  iframe.height = '600px';
+  document.body.appendChild(iframe);
+
+  /**
+   * wait for the iframe to load
+   */
+  await new Promise((resolve) => (iframe.onload = resolve));
+  return iframe.contentDocument.body;
+}
 
 /**
  * This monkey-patches `window.console.error` in order to fail a test if that
@@ -21,63 +54,65 @@ function patchConsoleError() {
 }
 
 describe('prerender', () => {
-  const { setupDom, tearDownDom } = setupDomTests(document);
-  let app: HTMLElement;
-  afterEach(tearDownDom);
+  let iframe: HTMLElement;
+  before(async () => {
+    iframe = await setupTest('/prerender/index.html');
+  });
 
   it('server componentWillLoad Order', async () => {
-    app = await setupDom('/prerender/index.html', 500);
-    const elm = app.querySelector('#server-componentWillLoad');
-    expect(elm.children[0].textContent.trim()).toBe('CmpA server componentWillLoad');
-    expect(elm.children[1].textContent.trim()).toBe('CmpD - a1-child server componentWillLoad');
-    expect(elm.children[2].textContent.trim()).toBe('CmpD - a2-child server componentWillLoad');
-    expect(elm.children[3].textContent.trim()).toBe('CmpD - a3-child server componentWillLoad');
-    expect(elm.children[4].textContent.trim()).toBe('CmpD - a4-child server componentWillLoad');
-    expect(elm.children[5].textContent.trim()).toBe('CmpB server componentWillLoad');
-    expect(elm.children[6].textContent.trim()).toBe('CmpC server componentWillLoad');
-    expect(elm.children[7].textContent.trim()).toBe('CmpD - c-child server componentWillLoad');
+    const elm = await browser.waitUntil(async () => iframe.querySelector<HTMLElement>('#server-componentWillLoad'));
+    expect(elm.innerText).toMatchInlineSnapshot(`
+      "CmpA server componentWillLoad
+      CmpD - a1-child server componentWillLoad
+      CmpD - a2-child server componentWillLoad
+      CmpD - a3-child server componentWillLoad
+      CmpD - a4-child server componentWillLoad
+      CmpB server componentWillLoad
+      CmpC server componentWillLoad
+      CmpD - c-child server componentWillLoad"
+    `);
   });
 
   it('server componentDidLoad Order', async () => {
-    app = await setupDom('/prerender/index.html', 500);
-    const elm = app.querySelector('#server-componentDidLoad');
-    expect(elm.children[0].textContent.trim()).toBe('CmpD - a1-child server componentDidLoad');
-    expect(elm.children[1].textContent.trim()).toBe('CmpD - a2-child server componentDidLoad');
-    expect(elm.children[2].textContent.trim()).toBe('CmpD - a3-child server componentDidLoad');
-    expect(elm.children[3].textContent.trim()).toBe('CmpD - a4-child server componentDidLoad');
-    expect(elm.children[4].textContent.trim()).toBe('CmpD - c-child server componentDidLoad');
-    expect(elm.children[5].textContent.trim()).toBe('CmpC server componentDidLoad');
-    expect(elm.children[6].textContent.trim()).toBe('CmpB server componentDidLoad');
-    expect(elm.children[7].textContent.trim()).toBe('CmpA server componentDidLoad');
+    const elm = await browser.waitUntil(async () => iframe.querySelector<HTMLElement>('#server-componentDidLoad'));
+    expect(elm.innerText).toMatchInlineSnapshot(`
+      "CmpD - a1-child server componentDidLoad
+      CmpD - a2-child server componentDidLoad
+      CmpD - a3-child server componentDidLoad
+      CmpD - a4-child server componentDidLoad
+      CmpD - c-child server componentDidLoad
+      CmpC server componentDidLoad
+      CmpB server componentDidLoad
+      CmpA server componentDidLoad"
+    `);
   });
 
   it('correct scoped styles applied after scripts kick in', async () => {
-    app = await setupDom('/prerender/index.html', 500);
-    testScopedStyles(app);
+    const iframe = await setupTest('/prerender/index.html');
+    testScopedStyles(iframe);
   });
 
   it('no-script, correct scoped styles applied before scripts kick in', async () => {
-    app = await setupDom('/prerender/index-no-script.html', 500);
-    testScopedStyles(app);
+    const iframe = await setupTest('/prerender/index-no-script.html');
+    testScopedStyles(iframe);
   });
 
   it('root slots', async () => {
-    app = await setupDom('/prerender/index.html');
-    await waitForChanges(500);
+    const iframe = await setupTest('/prerender/index.html');
 
-    const scoped = app.querySelector('cmp-client-scoped');
+    const scoped = iframe.querySelector('cmp-client-scoped');
     const scopedStyle = getComputedStyle(scoped.querySelector('section'));
     expect(scopedStyle.color).toBe('rgb(255, 0, 0)');
 
-    const shadow = app.querySelector('cmp-client-shadow');
-    const shadowStyle = getComputedStyle(shadow.shadowRoot.querySelector('article'));
+    const shadow = iframe.querySelector('cmp-client-shadow');
+    const shadowStyle = getComputedStyle(shadow.querySelector('article'));
     expect(shadowStyle.color).toBe('rgb(0, 155, 0)');
 
-    const blueText = shadow.shadowRoot.querySelector('cmp-text-blue');
+    const blueText = shadow.querySelector('cmp-text-blue');
     const blueTextStyle = getComputedStyle(blueText.querySelector('text-blue'));
     expect(blueTextStyle.color).toBe('rgb(0, 0, 255)');
 
-    const greenText = shadow.shadowRoot.querySelector('cmp-text-green');
+    const greenText = shadow.querySelector('cmp-text-green');
     const greenTextStyle = getComputedStyle(greenText.querySelector('text-green'));
     expect(greenTextStyle.color).toBe('rgb(0, 255, 0)');
   });
@@ -86,14 +121,12 @@ describe('prerender', () => {
   // the test exits, whether or not it fails
   describe('should render an svg child', () => {
     const teardown = patchConsoleError();
-    afterAll(teardown);
+    after(teardown);
 
     it('should render an svg child', async () => {
-      app = await setupDom('/prerender/index.html');
-      await waitForChanges(500);
-
-      const testSvg = app.querySelector('test-svg');
-      expect(testSvg.className).toBe('hydrated');
+      const iframe = await setupTest('/prerender/index.html');
+      const testSvg = iframe.querySelector('test-svg');
+      expect(testSvg.className).toContain('hydrated');
     });
   });
 });
