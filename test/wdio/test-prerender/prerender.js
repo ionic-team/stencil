@@ -2,7 +2,6 @@ const fs = require('fs');
 const path = require('path');
 const hydrate = require('./dist/hydrate');
 
-console.log('YOOOO!');
 async function run() {
   const indexPath = path.join(__dirname, 'src', 'index.html');
   const html = fs.readFileSync(indexPath, 'utf8');
