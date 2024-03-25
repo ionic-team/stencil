@@ -1,7 +1,8 @@
 import * as d from '@stencil/core/declarations';
 
 /**
- * Generates a stub {@link TypesImportData}.
+ * Generates a stub {@link d.TypesImportData}.
+ *
  * @param overrides a partial implementation of `TypesImportData`. Any provided fields will override the defaults
  * provided by this function.
  * @returns the stubbed `TypesImportData`

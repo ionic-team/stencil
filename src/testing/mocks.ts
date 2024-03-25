@@ -1,4 +1,5 @@
 import { createWorkerContext } from '@stencil/core/compiler';
+import type * as d from '@stencil/core/declarations';
 import type {
   BuildCtx,
   Cache,
@@ -204,7 +205,7 @@ export function mockBuildCtx(config?: ValidatedConfig, compilerCtx?: CompilerCtx
   return buildCtx as BuildCtx;
 }
 
-function mockCache(config: ValidatedConfig, compilerCtx: CompilerCtx) {
+function mockCache(config: d.ValidatedConfig, compilerCtx: CompilerCtx) {
   config.enableCache = true;
   const cache = new CompilerCache(config, compilerCtx.fs);
   cache.initCacheDir();
@@ -216,11 +217,11 @@ export function mockLogger() {
 }
 
 /**
- * Create a {@link CompilerSystem} entity for testing the compiler.
+ * Create a {@link d.CompilerSystem} entity for testing the compiler.
  *
  * This function acts as a thin wrapper around a {@link TestingSystem} entity creation. It exists to provide a logical
  * place in the codebase where we might expect Stencil engineers to reach for when attempting to mock a
- * {@link CompilerSystem} base type. Should there prove to be usage of both this function and the one it wraps,
+ * {@link d.CompilerSystem} base type. Should there prove to be usage of both this function and the one it wraps,
  * reconsider if this wrapper is necessary.
  *
  * @returns a System instance for testing purposes.

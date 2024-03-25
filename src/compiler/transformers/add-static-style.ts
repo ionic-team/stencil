@@ -147,9 +147,9 @@ const createStyleLiteral = (cmp: d.ComponentCompilerMeta, style: d.StyleCompiler
 };
 
 /**
- * Helper method to create a style identifier for a component using {@link createStyleIdentifierFromUrl}.
- * The method ensures that duplicate styles are removed and that the order of the styles is preserved.
- * It also ensures that the style identifier is unique.
+ * Helper method to create a style identifier for a component. The method
+ * ensures that duplicate styles are removed and that the order of the styles is
+ * preserved. It also ensures that the style identifier is unique.
  *
  * @param cmp the metadata associated with the component being evaluated
  * @param style style meta data

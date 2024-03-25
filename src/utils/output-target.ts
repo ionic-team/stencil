@@ -103,7 +103,7 @@ export const isEligiblePrimaryPackageOutputTarget = (o: d.OutputTarget): o is d.
   isOutputTargetDistTypes(o);
 
 /**
- * Retrieve the Stencil component compiler metadata from a collection of Stencil {@link Module}s
+ * Retrieve the Stencil component compiler metadata from a collection of Stencil {@link d.Module}s
  * @param moduleFiles the collection of `Module`s to retrieve the metadata from
  * @returns the metadata, lexicographically sorted by the tag names of the components
  */
