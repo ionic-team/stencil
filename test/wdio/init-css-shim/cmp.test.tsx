@@ -4,9 +4,7 @@ import { render } from '@wdio/browser-runner/stencil';
 describe('init-css-shim', () => {
   beforeEach(async () => {
     render({
-      template: () => (
-        <init-css-root></init-css-root>
-      ),
+      template: () => <init-css-root></init-css-root>,
     });
     await $('init-css-root > *').waitForExist();
   });
