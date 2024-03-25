@@ -1,6 +1,12 @@
 import { Fragment, h } from '@stencil/core';
 import { render } from '@wdio/browser-runner/stencil';
 
+import { defineCustomElement } from '../test-components/custom-elements-delegates-focus.js';
+import { defineCustomElement as defineCustomElementNoFocus } from '../test-components/custom-elements-no-delegates-focus.js';
+
+defineCustomElement();
+defineCustomElementNoFocus();
+
 describe('custom-elements-delegates-focus', () => {
   before(() => {
     render({
@@ -11,6 +17,11 @@ describe('custom-elements-delegates-focus', () => {
         </>
       ),
     });
+  });
+
+  it('should have custom elements not to be defined', () => {
+    expect(customElements.get('custom-elements-delegates-focus')).toBeUndefined();
+    expect(customElements.get('custom-elements-no-delegates-focus')).toBeUndefined();
   });
 
   it('sets delegatesFocus correctly', () => {

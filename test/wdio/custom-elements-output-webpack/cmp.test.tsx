@@ -1,6 +1,10 @@
 import { Fragment, h } from '@stencil/core';
 import { render } from '@wdio/browser-runner/stencil';
 
+import { defineCustomElement as defineCustomElementChild } from '../test-components/custom-element-child.js';
+import { defineCustomElement as defineCustomElementNestedChild } from '../test-components/custom-element-nested-child.js';
+import { defineCustomElement } from '../test-components/custom-element-root.js';
+
 describe('custom-elements-output-webpack', () => {
   before(() => {
     render({
@@ -12,7 +16,17 @@ describe('custom-elements-output-webpack', () => {
     });
   });
 
+  it('should have custom elements not to be defined', () => {
+    expect(customElements.get('custom-element-root')).toBeUndefined();
+    expect(customElements.get('custom-element-child')).toBeUndefined();
+    expect(customElements.get('custom-element-nested-child')).toBeUndefined();
+  })
+
   it('defines components and their dependencies', async () => {
+    defineCustomElement();
+    defineCustomElementChild();
+    defineCustomElementNestedChild();
+
     expect(customElements.get('custom-element-root')).toBeDefined();
     expect(customElements.get('custom-element-child')).toBeDefined();
     expect(customElements.get('custom-element-nested-child')).toBeDefined();
