@@ -22,10 +22,6 @@ export namespace Components {
     }
     interface InitCssRoot {
     }
-    interface ReparentStyleNoVars {
-    }
-    interface ReparentStyleWithVars {
-    }
     interface SlotHtml {
         "inc": number;
     }
@@ -88,18 +84,6 @@ declare global {
         prototype: HTMLInitCssRootElement;
         new (): HTMLInitCssRootElement;
     };
-    interface HTMLReparentStyleNoVarsElement extends Components.ReparentStyleNoVars, HTMLStencilElement {
-    }
-    var HTMLReparentStyleNoVarsElement: {
-        prototype: HTMLReparentStyleNoVarsElement;
-        new (): HTMLReparentStyleNoVarsElement;
-    };
-    interface HTMLReparentStyleWithVarsElement extends Components.ReparentStyleWithVars, HTMLStencilElement {
-    }
-    var HTMLReparentStyleWithVarsElement: {
-        prototype: HTMLReparentStyleWithVarsElement;
-        new (): HTMLReparentStyleWithVarsElement;
-    };
     interface HTMLSlotHtmlElement extends Components.SlotHtml, HTMLStencilElement {
     }
     var HTMLSlotHtmlElement: {
@@ -139,8 +123,6 @@ declare global {
         "custom-elements-delegates-focus": HTMLCustomElementsDelegatesFocusElement;
         "custom-elements-no-delegates-focus": HTMLCustomElementsNoDelegatesFocusElement;
         "init-css-root": HTMLInitCssRootElement;
-        "reparent-style-no-vars": HTMLReparentStyleNoVarsElement;
-        "reparent-style-with-vars": HTMLReparentStyleWithVarsElement;
         "slot-html": HTMLSlotHtmlElement;
         "slot-nested-default-order-child": HTMLSlotNestedDefaultOrderChildElement;
         "slot-nested-default-order-parent": HTMLSlotNestedDefaultOrderParentElement;
@@ -165,10 +147,6 @@ declare namespace LocalJSX {
     }
     interface InitCssRoot {
     }
-    interface ReparentStyleNoVars {
-    }
-    interface ReparentStyleWithVars {
-    }
     interface SlotHtml {
         "inc"?: number;
     }
@@ -190,8 +168,6 @@ declare namespace LocalJSX {
         "custom-elements-delegates-focus": CustomElementsDelegatesFocus;
         "custom-elements-no-delegates-focus": CustomElementsNoDelegatesFocus;
         "init-css-root": InitCssRoot;
-        "reparent-style-no-vars": ReparentStyleNoVars;
-        "reparent-style-with-vars": ReparentStyleWithVars;
         "slot-html": SlotHtml;
         "slot-nested-default-order-child": SlotNestedDefaultOrderChild;
         "slot-nested-default-order-parent": SlotNestedDefaultOrderParent;
@@ -211,8 +187,6 @@ declare module "@stencil/core" {
             "custom-elements-delegates-focus": LocalJSX.CustomElementsDelegatesFocus & JSXBase.HTMLAttributes<HTMLCustomElementsDelegatesFocusElement>;
             "custom-elements-no-delegates-focus": LocalJSX.CustomElementsNoDelegatesFocus & JSXBase.HTMLAttributes<HTMLCustomElementsNoDelegatesFocusElement>;
             "init-css-root": LocalJSX.InitCssRoot & JSXBase.HTMLAttributes<HTMLInitCssRootElement>;
-            "reparent-style-no-vars": LocalJSX.ReparentStyleNoVars & JSXBase.HTMLAttributes<HTMLReparentStyleNoVarsElement>;
-            "reparent-style-with-vars": LocalJSX.ReparentStyleWithVars & JSXBase.HTMLAttributes<HTMLReparentStyleWithVarsElement>;
             "slot-html": LocalJSX.SlotHtml & JSXBase.HTMLAttributes<HTMLSlotHtmlElement>;
             "slot-nested-default-order-child": LocalJSX.SlotNestedDefaultOrderChild & JSXBase.HTMLAttributes<HTMLSlotNestedDefaultOrderChildElement>;
             "slot-nested-default-order-parent": LocalJSX.SlotNestedDefaultOrderParent & JSXBase.HTMLAttributes<HTMLSlotNestedDefaultOrderParentElement>;
