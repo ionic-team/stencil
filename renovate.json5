@@ -140,6 +140,11 @@
       matchPackagePrefixes: ['@rollup'],
       groupName: 'rollup,'
     },
+    {
+      matchPackageNames: ['expect-webdriverio'],
+      matchPackagePrefixes: ['@wdio'],
+      groupName: 'webdriverio,'
+    },
     // TODO(STENCIL-1088): remove once support for Node v16 is dropped
     {
       matchPackageNames: ['open'],

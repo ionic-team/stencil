@@ -266,6 +266,19 @@ Testing components with ElementInternals is fully supported in e2e tests.`,
     );
   }
 
+  get localName() {
+    /**
+     * The `localName` of an element should be always given, however the way
+     * MockDoc is constructed, it won't allow us to guarantee that. Let's throw
+     * and error we get into the situation where we don't have a `nodeName` set.
+     *
+     */
+    if (!this.nodeName) {
+      throw new Error(`Can't compute elements localName without nodeName`);
+    }
+    return this.nodeName.toLocaleLowerCase();
+  }
+
   get namespaceURI() {
     return this.__namespaceURI;
   }

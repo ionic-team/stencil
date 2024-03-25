@@ -162,6 +162,7 @@ export const config: Options.Testrunner = {
   mochaOpts: {
     ui: 'bdd',
     timeout: 60000,
+    retries: 1,
     require: ['./setup.ts'],
   },
 

@@ -1,4 +1,4 @@
-import { h, Fragment } from '@stencil/core';
+import { h } from '@stencil/core';
 import { render } from '@wdio/browser-runner/stencil';
 
 describe('form associated', function () {
@@ -50,10 +50,15 @@ describe('form associated', function () {
   });
 
   it('should link up to the surrounding form', async () => {
-    await $('form').waitForExist();
-    const formEl = document.body.querySelector('form');
     // this shows that the element has, through the `ElementInternals`
     // interface, been able to set a value in the surrounding form
-    expect(new FormData(formEl).get('test-input')).toBe('my default value');
+    await browser.waitUntil(
+      async () => {
+        const formEl = document.body.querySelector('form');
+        expect(new FormData(formEl).get('test-input')).toBe('my default value');
+        return true;
+      },
+      { timeoutMsg: 'form associated value never changed' },
+    );
   });
 });
