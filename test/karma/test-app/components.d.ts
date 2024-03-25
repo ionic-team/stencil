@@ -29,10 +29,6 @@ export namespace Components {
     interface SlotHtml {
         "inc": number;
     }
-    interface SlotLightDomContent {
-    }
-    interface SlotLightDomRoot {
-    }
     interface SlotNestedDefaultOrderChild {
         "state": boolean;
     }
@@ -110,18 +106,6 @@ declare global {
         prototype: HTMLSlotHtmlElement;
         new (): HTMLSlotHtmlElement;
     };
-    interface HTMLSlotLightDomContentElement extends Components.SlotLightDomContent, HTMLStencilElement {
-    }
-    var HTMLSlotLightDomContentElement: {
-        prototype: HTMLSlotLightDomContentElement;
-        new (): HTMLSlotLightDomContentElement;
-    };
-    interface HTMLSlotLightDomRootElement extends Components.SlotLightDomRoot, HTMLStencilElement {
-    }
-    var HTMLSlotLightDomRootElement: {
-        prototype: HTMLSlotLightDomRootElement;
-        new (): HTMLSlotLightDomRootElement;
-    };
     interface HTMLSlotNestedDefaultOrderChildElement extends Components.SlotNestedDefaultOrderChild, HTMLStencilElement {
     }
     var HTMLSlotNestedDefaultOrderChildElement: {
@@ -158,8 +142,6 @@ declare global {
         "reparent-style-no-vars": HTMLReparentStyleNoVarsElement;
         "reparent-style-with-vars": HTMLReparentStyleWithVarsElement;
         "slot-html": HTMLSlotHtmlElement;
-        "slot-light-dom-content": HTMLSlotLightDomContentElement;
-        "slot-light-dom-root": HTMLSlotLightDomRootElement;
         "slot-nested-default-order-child": HTMLSlotNestedDefaultOrderChildElement;
         "slot-nested-default-order-parent": HTMLSlotNestedDefaultOrderParentElement;
         "slot-ng-if": HTMLSlotNgIfElement;
@@ -190,10 +172,6 @@ declare namespace LocalJSX {
     interface SlotHtml {
         "inc"?: number;
     }
-    interface SlotLightDomContent {
-    }
-    interface SlotLightDomRoot {
-    }
     interface SlotNestedDefaultOrderChild {
         "state"?: boolean;
     }
@@ -215,8 +193,6 @@ declare namespace LocalJSX {
         "reparent-style-no-vars": ReparentStyleNoVars;
         "reparent-style-with-vars": ReparentStyleWithVars;
         "slot-html": SlotHtml;
-        "slot-light-dom-content": SlotLightDomContent;
-        "slot-light-dom-root": SlotLightDomRoot;
         "slot-nested-default-order-child": SlotNestedDefaultOrderChild;
         "slot-nested-default-order-parent": SlotNestedDefaultOrderParent;
         "slot-ng-if": SlotNgIf;
@@ -238,8 +214,6 @@ declare module "@stencil/core" {
             "reparent-style-no-vars": LocalJSX.ReparentStyleNoVars & JSXBase.HTMLAttributes<HTMLReparentStyleNoVarsElement>;
             "reparent-style-with-vars": LocalJSX.ReparentStyleWithVars & JSXBase.HTMLAttributes<HTMLReparentStyleWithVarsElement>;
             "slot-html": LocalJSX.SlotHtml & JSXBase.HTMLAttributes<HTMLSlotHtmlElement>;
-            "slot-light-dom-content": LocalJSX.SlotLightDomContent & JSXBase.HTMLAttributes<HTMLSlotLightDomContentElement>;
-            "slot-light-dom-root": LocalJSX.SlotLightDomRoot & JSXBase.HTMLAttributes<HTMLSlotLightDomRootElement>;
             "slot-nested-default-order-child": LocalJSX.SlotNestedDefaultOrderChild & JSXBase.HTMLAttributes<HTMLSlotNestedDefaultOrderChildElement>;
             "slot-nested-default-order-parent": LocalJSX.SlotNestedDefaultOrderParent & JSXBase.HTMLAttributes<HTMLSlotNestedDefaultOrderParentElement>;
             "slot-ng-if": LocalJSX.SlotNgIf & JSXBase.HTMLAttributes<HTMLSlotNgIfElement>;
