@@ -5,7 +5,7 @@ import { defineCustomElement as defineCustomElementChild } from '../test-compone
 import { defineCustomElement as defineCustomElementNestedChild } from '../test-components/custom-element-nested-child.js';
 import { defineCustomElement } from '../test-components/custom-element-root.js';
 
-describe('custom-elements-output-webpack', () => {
+describe('custom-elements-output', () => {
   before(() => {
     render({
       template: () => (
@@ -20,7 +20,7 @@ describe('custom-elements-output-webpack', () => {
     expect(customElements.get('custom-element-root')).toBeUndefined();
     expect(customElements.get('custom-element-child')).toBeUndefined();
     expect(customElements.get('custom-element-nested-child')).toBeUndefined();
-  })
+  });
 
   it('defines components and their dependencies', async () => {
     defineCustomElement();

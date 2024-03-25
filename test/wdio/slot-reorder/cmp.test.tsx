@@ -131,21 +131,21 @@ describe('slot-reorder', () => {
     ordered();
 
     await $('button').click();
-    await browser.waitUntil(() => {
+    await browser.waitUntil(async () => {
       return document.querySelector('div.reordered');
     });
 
     reordered();
 
     await $('button').click();
-    await browser.waitUntil(() => {
+    await browser.waitUntil(async () => {
       return !document.querySelector('div.reordered');
     });
 
     ordered();
 
     await $('button').click();
-    await browser.waitUntil(() => {
+    await browser.waitUntil(async () => {
       return document.querySelector('div.reordered');
     });
 

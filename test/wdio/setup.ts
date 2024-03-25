@@ -9,11 +9,10 @@ declare global {
 /**
  * load the testapp so that we don't have to import the components within the tests
  */
-const testRequiresManualSetup = (
+const testRequiresManualSetup =
   window.__wdioSpec__.includes('custom-elements-output-tag-class-different') ||
   window.__wdioSpec__.includes('custom-elements-delegates-focus') ||
-  window.__wdioSpec__.includes('custom-elements-output-webpack')
-);
+  window.__wdioSpec__.includes('custom-elements-output');
 
 /**
  * setup all components defined in tests except for those where we want ot manually setup

@@ -12,7 +12,7 @@ export const config: Config = {
     {
       type: 'dist-custom-elements',
       dir: 'test-components',
-    }
+    },
   ],
   plugins: [sass()],
   buildDist: true,
