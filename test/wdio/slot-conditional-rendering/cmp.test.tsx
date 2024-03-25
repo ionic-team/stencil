@@ -26,9 +26,6 @@ describe('slot-conditional-rendering', () => {
     await expect($('#slotted-header-element-id')).not.toHaveAttribute('hidden');
 
     await $('#header-visibility-toggle').click();
-    await browser.waitUntil(() => {
-      return document.querySelector('#slotted-header-element-id').hasAttribute('hidden');
-    });
 
     await expect($('#slotted-header-element-id')).toHaveAttribute('hidden');
   });
@@ -37,9 +34,6 @@ describe('slot-conditional-rendering', () => {
     await expect($('#slotted-content-element-id')).not.toHaveAttribute('hidden');
 
     await $('#content-visibility-toggle').click();
-    await browser.waitUntil(() => {
-      return document.querySelector('#slotted-content-element-id').hasAttribute('hidden');
-    });
 
     await expect($('#slotted-content-element-id')).toHaveAttribute('hidden');
   });
