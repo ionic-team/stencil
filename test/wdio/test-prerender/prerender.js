@@ -1,6 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const hydrate = require('./dist/hydrate');
+const hydrate = require('../dist/hydrate');
 
 async function run() {
   const indexPath = path.join(__dirname, 'src', 'index.html');
