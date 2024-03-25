@@ -9,7 +9,7 @@ describe('slot replace wrapper', () => {
 
     await $('slot-replace-wrapper-root').waitForExist();
     // Tests are flakey without this
-    await browser.pause(100);
+    await $('.results1 a').waitForExist();
   });
 
   it('renders A', async () => {
@@ -73,7 +73,7 @@ describe('slot replace wrapper', () => {
     await expect($('[hidden]')).not.toBeExisting();
   });
 
-  it('renders A1A2B1B2C1C2 from A1A2B1B2C1C2', async () => {
+  it('renders A1A2B1B2C1C2 from B1C1A1B2C2A2', async () => {
     const result = document.querySelector('.results8 a');
     expect(result.textContent.trim()).toBe('A1A2B1B2C1C2');
 
