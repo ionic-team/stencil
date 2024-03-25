@@ -26,19 +26,6 @@ export namespace Components {
     }
     interface ReparentStyleWithVars {
     }
-    interface ShadowDomSlotNested {
-        "i"?: number;
-    }
-    interface ShadowDomSlotNestedRoot {
-    }
-    interface SlotChildrenRoot {
-    }
-    interface SlotDynamicScopedList {
-        "items": Array<string>;
-    }
-    interface SlotDynamicShadowList {
-        "items": Array<string>;
-    }
     interface SlotHtml {
         "inc": number;
     }
@@ -46,64 +33,14 @@ export namespace Components {
     }
     interface SlotLightDomRoot {
     }
-    interface SlotLightList {
-    }
-    interface SlotLightScopedList {
-    }
-    interface SlotListLightRoot {
-        "items": string[];
-    }
-    interface SlotListLightScopedRoot {
-        "items": string[];
-    }
-    interface SlotMapOrder {
-    }
-    interface SlotMapOrderRoot {
-    }
     interface SlotNestedDefaultOrderChild {
         "state": boolean;
     }
     interface SlotNestedDefaultOrderParent {
     }
-    interface SlotNestedOrderChild {
-    }
-    interface SlotNestedOrderParent {
-    }
     interface SlotNgIf {
     }
-    interface SlotNoDefault {
-    }
-    interface SlotParentTagChange {
-        "element": string;
-    }
-    interface SlotParentTagChangeRoot {
-        "element": string;
-    }
-    interface SlotReorder {
-        "reordered": boolean;
-    }
-    interface SlotReorderRoot {
-    }
-    interface SlotReplaceWrapper {
-        "href"?: string;
-    }
-    interface SlotReplaceWrapperRoot {
-    }
-    interface SlottedCss {
-    }
-    interface StaticDecoratedMembers {
-    }
-    interface StaticMembers {
-    }
-    interface StaticMembersSeparateExport {
-    }
-    interface StaticMembersSeparateInitializer {
-    }
     interface StencilSibling {
-    }
-    interface TextContentPatchScoped {
-    }
-    interface TextContentPatchScopedWithSlot {
     }
 }
 declare global {
@@ -167,36 +104,6 @@ declare global {
         prototype: HTMLReparentStyleWithVarsElement;
         new (): HTMLReparentStyleWithVarsElement;
     };
-    interface HTMLShadowDomSlotNestedElement extends Components.ShadowDomSlotNested, HTMLStencilElement {
-    }
-    var HTMLShadowDomSlotNestedElement: {
-        prototype: HTMLShadowDomSlotNestedElement;
-        new (): HTMLShadowDomSlotNestedElement;
-    };
-    interface HTMLShadowDomSlotNestedRootElement extends Components.ShadowDomSlotNestedRoot, HTMLStencilElement {
-    }
-    var HTMLShadowDomSlotNestedRootElement: {
-        prototype: HTMLShadowDomSlotNestedRootElement;
-        new (): HTMLShadowDomSlotNestedRootElement;
-    };
-    interface HTMLSlotChildrenRootElement extends Components.SlotChildrenRoot, HTMLStencilElement {
-    }
-    var HTMLSlotChildrenRootElement: {
-        prototype: HTMLSlotChildrenRootElement;
-        new (): HTMLSlotChildrenRootElement;
-    };
-    interface HTMLSlotDynamicScopedListElement extends Components.SlotDynamicScopedList, HTMLStencilElement {
-    }
-    var HTMLSlotDynamicScopedListElement: {
-        prototype: HTMLSlotDynamicScopedListElement;
-        new (): HTMLSlotDynamicScopedListElement;
-    };
-    interface HTMLSlotDynamicShadowListElement extends Components.SlotDynamicShadowList, HTMLStencilElement {
-    }
-    var HTMLSlotDynamicShadowListElement: {
-        prototype: HTMLSlotDynamicShadowListElement;
-        new (): HTMLSlotDynamicShadowListElement;
-    };
     interface HTMLSlotHtmlElement extends Components.SlotHtml, HTMLStencilElement {
     }
     var HTMLSlotHtmlElement: {
@@ -215,42 +122,6 @@ declare global {
         prototype: HTMLSlotLightDomRootElement;
         new (): HTMLSlotLightDomRootElement;
     };
-    interface HTMLSlotLightListElement extends Components.SlotLightList, HTMLStencilElement {
-    }
-    var HTMLSlotLightListElement: {
-        prototype: HTMLSlotLightListElement;
-        new (): HTMLSlotLightListElement;
-    };
-    interface HTMLSlotLightScopedListElement extends Components.SlotLightScopedList, HTMLStencilElement {
-    }
-    var HTMLSlotLightScopedListElement: {
-        prototype: HTMLSlotLightScopedListElement;
-        new (): HTMLSlotLightScopedListElement;
-    };
-    interface HTMLSlotListLightRootElement extends Components.SlotListLightRoot, HTMLStencilElement {
-    }
-    var HTMLSlotListLightRootElement: {
-        prototype: HTMLSlotListLightRootElement;
-        new (): HTMLSlotListLightRootElement;
-    };
-    interface HTMLSlotListLightScopedRootElement extends Components.SlotListLightScopedRoot, HTMLStencilElement {
-    }
-    var HTMLSlotListLightScopedRootElement: {
-        prototype: HTMLSlotListLightScopedRootElement;
-        new (): HTMLSlotListLightScopedRootElement;
-    };
-    interface HTMLSlotMapOrderElement extends Components.SlotMapOrder, HTMLStencilElement {
-    }
-    var HTMLSlotMapOrderElement: {
-        prototype: HTMLSlotMapOrderElement;
-        new (): HTMLSlotMapOrderElement;
-    };
-    interface HTMLSlotMapOrderRootElement extends Components.SlotMapOrderRoot, HTMLStencilElement {
-    }
-    var HTMLSlotMapOrderRootElement: {
-        prototype: HTMLSlotMapOrderRootElement;
-        new (): HTMLSlotMapOrderRootElement;
-    };
     interface HTMLSlotNestedDefaultOrderChildElement extends Components.SlotNestedDefaultOrderChild, HTMLStencilElement {
     }
     var HTMLSlotNestedDefaultOrderChildElement: {
@@ -263,113 +134,17 @@ declare global {
         prototype: HTMLSlotNestedDefaultOrderParentElement;
         new (): HTMLSlotNestedDefaultOrderParentElement;
     };
-    interface HTMLSlotNestedOrderChildElement extends Components.SlotNestedOrderChild, HTMLStencilElement {
-    }
-    var HTMLSlotNestedOrderChildElement: {
-        prototype: HTMLSlotNestedOrderChildElement;
-        new (): HTMLSlotNestedOrderChildElement;
-    };
-    interface HTMLSlotNestedOrderParentElement extends Components.SlotNestedOrderParent, HTMLStencilElement {
-    }
-    var HTMLSlotNestedOrderParentElement: {
-        prototype: HTMLSlotNestedOrderParentElement;
-        new (): HTMLSlotNestedOrderParentElement;
-    };
     interface HTMLSlotNgIfElement extends Components.SlotNgIf, HTMLStencilElement {
     }
     var HTMLSlotNgIfElement: {
         prototype: HTMLSlotNgIfElement;
         new (): HTMLSlotNgIfElement;
     };
-    interface HTMLSlotNoDefaultElement extends Components.SlotNoDefault, HTMLStencilElement {
-    }
-    var HTMLSlotNoDefaultElement: {
-        prototype: HTMLSlotNoDefaultElement;
-        new (): HTMLSlotNoDefaultElement;
-    };
-    interface HTMLSlotParentTagChangeElement extends Components.SlotParentTagChange, HTMLStencilElement {
-    }
-    var HTMLSlotParentTagChangeElement: {
-        prototype: HTMLSlotParentTagChangeElement;
-        new (): HTMLSlotParentTagChangeElement;
-    };
-    interface HTMLSlotParentTagChangeRootElement extends Components.SlotParentTagChangeRoot, HTMLStencilElement {
-    }
-    var HTMLSlotParentTagChangeRootElement: {
-        prototype: HTMLSlotParentTagChangeRootElement;
-        new (): HTMLSlotParentTagChangeRootElement;
-    };
-    interface HTMLSlotReorderElement extends Components.SlotReorder, HTMLStencilElement {
-    }
-    var HTMLSlotReorderElement: {
-        prototype: HTMLSlotReorderElement;
-        new (): HTMLSlotReorderElement;
-    };
-    interface HTMLSlotReorderRootElement extends Components.SlotReorderRoot, HTMLStencilElement {
-    }
-    var HTMLSlotReorderRootElement: {
-        prototype: HTMLSlotReorderRootElement;
-        new (): HTMLSlotReorderRootElement;
-    };
-    interface HTMLSlotReplaceWrapperElement extends Components.SlotReplaceWrapper, HTMLStencilElement {
-    }
-    var HTMLSlotReplaceWrapperElement: {
-        prototype: HTMLSlotReplaceWrapperElement;
-        new (): HTMLSlotReplaceWrapperElement;
-    };
-    interface HTMLSlotReplaceWrapperRootElement extends Components.SlotReplaceWrapperRoot, HTMLStencilElement {
-    }
-    var HTMLSlotReplaceWrapperRootElement: {
-        prototype: HTMLSlotReplaceWrapperRootElement;
-        new (): HTMLSlotReplaceWrapperRootElement;
-    };
-    interface HTMLSlottedCssElement extends Components.SlottedCss, HTMLStencilElement {
-    }
-    var HTMLSlottedCssElement: {
-        prototype: HTMLSlottedCssElement;
-        new (): HTMLSlottedCssElement;
-    };
-    interface HTMLStaticDecoratedMembersElement extends Components.StaticDecoratedMembers, HTMLStencilElement {
-    }
-    var HTMLStaticDecoratedMembersElement: {
-        prototype: HTMLStaticDecoratedMembersElement;
-        new (): HTMLStaticDecoratedMembersElement;
-    };
-    interface HTMLStaticMembersElement extends Components.StaticMembers, HTMLStencilElement {
-    }
-    var HTMLStaticMembersElement: {
-        prototype: HTMLStaticMembersElement;
-        new (): HTMLStaticMembersElement;
-    };
-    interface HTMLStaticMembersSeparateExportElement extends Components.StaticMembersSeparateExport, HTMLStencilElement {
-    }
-    var HTMLStaticMembersSeparateExportElement: {
-        prototype: HTMLStaticMembersSeparateExportElement;
-        new (): HTMLStaticMembersSeparateExportElement;
-    };
-    interface HTMLStaticMembersSeparateInitializerElement extends Components.StaticMembersSeparateInitializer, HTMLStencilElement {
-    }
-    var HTMLStaticMembersSeparateInitializerElement: {
-        prototype: HTMLStaticMembersSeparateInitializerElement;
-        new (): HTMLStaticMembersSeparateInitializerElement;
-    };
     interface HTMLStencilSiblingElement extends Components.StencilSibling, HTMLStencilElement {
     }
     var HTMLStencilSiblingElement: {
         prototype: HTMLStencilSiblingElement;
         new (): HTMLStencilSiblingElement;
-    };
-    interface HTMLTextContentPatchScopedElement extends Components.TextContentPatchScoped, HTMLStencilElement {
-    }
-    var HTMLTextContentPatchScopedElement: {
-        prototype: HTMLTextContentPatchScopedElement;
-        new (): HTMLTextContentPatchScopedElement;
-    };
-    interface HTMLTextContentPatchScopedWithSlotElement extends Components.TextContentPatchScopedWithSlot, HTMLStencilElement {
-    }
-    var HTMLTextContentPatchScopedWithSlotElement: {
-        prototype: HTMLTextContentPatchScopedWithSlotElement;
-        new (): HTMLTextContentPatchScopedWithSlotElement;
     };
     interface HTMLElementTagNameMap {
         "custom-element-child": HTMLCustomElementChildElement;
@@ -382,40 +157,13 @@ declare global {
         "init-css-root": HTMLInitCssRootElement;
         "reparent-style-no-vars": HTMLReparentStyleNoVarsElement;
         "reparent-style-with-vars": HTMLReparentStyleWithVarsElement;
-        "shadow-dom-slot-nested": HTMLShadowDomSlotNestedElement;
-        "shadow-dom-slot-nested-root": HTMLShadowDomSlotNestedRootElement;
-        "slot-children-root": HTMLSlotChildrenRootElement;
-        "slot-dynamic-scoped-list": HTMLSlotDynamicScopedListElement;
-        "slot-dynamic-shadow-list": HTMLSlotDynamicShadowListElement;
         "slot-html": HTMLSlotHtmlElement;
         "slot-light-dom-content": HTMLSlotLightDomContentElement;
         "slot-light-dom-root": HTMLSlotLightDomRootElement;
-        "slot-light-list": HTMLSlotLightListElement;
-        "slot-light-scoped-list": HTMLSlotLightScopedListElement;
-        "slot-list-light-root": HTMLSlotListLightRootElement;
-        "slot-list-light-scoped-root": HTMLSlotListLightScopedRootElement;
-        "slot-map-order": HTMLSlotMapOrderElement;
-        "slot-map-order-root": HTMLSlotMapOrderRootElement;
         "slot-nested-default-order-child": HTMLSlotNestedDefaultOrderChildElement;
         "slot-nested-default-order-parent": HTMLSlotNestedDefaultOrderParentElement;
-        "slot-nested-order-child": HTMLSlotNestedOrderChildElement;
-        "slot-nested-order-parent": HTMLSlotNestedOrderParentElement;
         "slot-ng-if": HTMLSlotNgIfElement;
-        "slot-no-default": HTMLSlotNoDefaultElement;
-        "slot-parent-tag-change": HTMLSlotParentTagChangeElement;
-        "slot-parent-tag-change-root": HTMLSlotParentTagChangeRootElement;
-        "slot-reorder": HTMLSlotReorderElement;
-        "slot-reorder-root": HTMLSlotReorderRootElement;
-        "slot-replace-wrapper": HTMLSlotReplaceWrapperElement;
-        "slot-replace-wrapper-root": HTMLSlotReplaceWrapperRootElement;
-        "slotted-css": HTMLSlottedCssElement;
-        "static-decorated-members": HTMLStaticDecoratedMembersElement;
-        "static-members": HTMLStaticMembersElement;
-        "static-members-separate-export": HTMLStaticMembersSeparateExportElement;
-        "static-members-separate-initializer": HTMLStaticMembersSeparateInitializerElement;
         "stencil-sibling": HTMLStencilSiblingElement;
-        "text-content-patch-scoped": HTMLTextContentPatchScopedElement;
-        "text-content-patch-scoped-with-slot": HTMLTextContentPatchScopedWithSlotElement;
     }
 }
 declare namespace LocalJSX {
@@ -439,19 +187,6 @@ declare namespace LocalJSX {
     }
     interface ReparentStyleWithVars {
     }
-    interface ShadowDomSlotNested {
-        "i"?: number;
-    }
-    interface ShadowDomSlotNestedRoot {
-    }
-    interface SlotChildrenRoot {
-    }
-    interface SlotDynamicScopedList {
-        "items"?: Array<string>;
-    }
-    interface SlotDynamicShadowList {
-        "items"?: Array<string>;
-    }
     interface SlotHtml {
         "inc"?: number;
     }
@@ -459,64 +194,14 @@ declare namespace LocalJSX {
     }
     interface SlotLightDomRoot {
     }
-    interface SlotLightList {
-    }
-    interface SlotLightScopedList {
-    }
-    interface SlotListLightRoot {
-        "items"?: string[];
-    }
-    interface SlotListLightScopedRoot {
-        "items"?: string[];
-    }
-    interface SlotMapOrder {
-    }
-    interface SlotMapOrderRoot {
-    }
     interface SlotNestedDefaultOrderChild {
         "state"?: boolean;
     }
     interface SlotNestedDefaultOrderParent {
     }
-    interface SlotNestedOrderChild {
-    }
-    interface SlotNestedOrderParent {
-    }
     interface SlotNgIf {
     }
-    interface SlotNoDefault {
-    }
-    interface SlotParentTagChange {
-        "element"?: string;
-    }
-    interface SlotParentTagChangeRoot {
-        "element"?: string;
-    }
-    interface SlotReorder {
-        "reordered"?: boolean;
-    }
-    interface SlotReorderRoot {
-    }
-    interface SlotReplaceWrapper {
-        "href"?: string;
-    }
-    interface SlotReplaceWrapperRoot {
-    }
-    interface SlottedCss {
-    }
-    interface StaticDecoratedMembers {
-    }
-    interface StaticMembers {
-    }
-    interface StaticMembersSeparateExport {
-    }
-    interface StaticMembersSeparateInitializer {
-    }
     interface StencilSibling {
-    }
-    interface TextContentPatchScoped {
-    }
-    interface TextContentPatchScopedWithSlot {
     }
     interface IntrinsicElements {
         "custom-element-child": CustomElementChild;
@@ -529,40 +214,13 @@ declare namespace LocalJSX {
         "init-css-root": InitCssRoot;
         "reparent-style-no-vars": ReparentStyleNoVars;
         "reparent-style-with-vars": ReparentStyleWithVars;
-        "shadow-dom-slot-nested": ShadowDomSlotNested;
-        "shadow-dom-slot-nested-root": ShadowDomSlotNestedRoot;
-        "slot-children-root": SlotChildrenRoot;
-        "slot-dynamic-scoped-list": SlotDynamicScopedList;
-        "slot-dynamic-shadow-list": SlotDynamicShadowList;
         "slot-html": SlotHtml;
         "slot-light-dom-content": SlotLightDomContent;
         "slot-light-dom-root": SlotLightDomRoot;
-        "slot-light-list": SlotLightList;
-        "slot-light-scoped-list": SlotLightScopedList;
-        "slot-list-light-root": SlotListLightRoot;
-        "slot-list-light-scoped-root": SlotListLightScopedRoot;
-        "slot-map-order": SlotMapOrder;
-        "slot-map-order-root": SlotMapOrderRoot;
         "slot-nested-default-order-child": SlotNestedDefaultOrderChild;
         "slot-nested-default-order-parent": SlotNestedDefaultOrderParent;
-        "slot-nested-order-child": SlotNestedOrderChild;
-        "slot-nested-order-parent": SlotNestedOrderParent;
         "slot-ng-if": SlotNgIf;
-        "slot-no-default": SlotNoDefault;
-        "slot-parent-tag-change": SlotParentTagChange;
-        "slot-parent-tag-change-root": SlotParentTagChangeRoot;
-        "slot-reorder": SlotReorder;
-        "slot-reorder-root": SlotReorderRoot;
-        "slot-replace-wrapper": SlotReplaceWrapper;
-        "slot-replace-wrapper-root": SlotReplaceWrapperRoot;
-        "slotted-css": SlottedCss;
-        "static-decorated-members": StaticDecoratedMembers;
-        "static-members": StaticMembers;
-        "static-members-separate-export": StaticMembersSeparateExport;
-        "static-members-separate-initializer": StaticMembersSeparateInitializer;
         "stencil-sibling": StencilSibling;
-        "text-content-patch-scoped": TextContentPatchScoped;
-        "text-content-patch-scoped-with-slot": TextContentPatchScopedWithSlot;
     }
 }
 export { LocalJSX as JSX };
@@ -579,40 +237,13 @@ declare module "@stencil/core" {
             "init-css-root": LocalJSX.InitCssRoot & JSXBase.HTMLAttributes<HTMLInitCssRootElement>;
             "reparent-style-no-vars": LocalJSX.ReparentStyleNoVars & JSXBase.HTMLAttributes<HTMLReparentStyleNoVarsElement>;
             "reparent-style-with-vars": LocalJSX.ReparentStyleWithVars & JSXBase.HTMLAttributes<HTMLReparentStyleWithVarsElement>;
-            "shadow-dom-slot-nested": LocalJSX.ShadowDomSlotNested & JSXBase.HTMLAttributes<HTMLShadowDomSlotNestedElement>;
-            "shadow-dom-slot-nested-root": LocalJSX.ShadowDomSlotNestedRoot & JSXBase.HTMLAttributes<HTMLShadowDomSlotNestedRootElement>;
-            "slot-children-root": LocalJSX.SlotChildrenRoot & JSXBase.HTMLAttributes<HTMLSlotChildrenRootElement>;
-            "slot-dynamic-scoped-list": LocalJSX.SlotDynamicScopedList & JSXBase.HTMLAttributes<HTMLSlotDynamicScopedListElement>;
-            "slot-dynamic-shadow-list": LocalJSX.SlotDynamicShadowList & JSXBase.HTMLAttributes<HTMLSlotDynamicShadowListElement>;
             "slot-html": LocalJSX.SlotHtml & JSXBase.HTMLAttributes<HTMLSlotHtmlElement>;
             "slot-light-dom-content": LocalJSX.SlotLightDomContent & JSXBase.HTMLAttributes<HTMLSlotLightDomContentElement>;
             "slot-light-dom-root": LocalJSX.SlotLightDomRoot & JSXBase.HTMLAttributes<HTMLSlotLightDomRootElement>;
-            "slot-light-list": LocalJSX.SlotLightList & JSXBase.HTMLAttributes<HTMLSlotLightListElement>;
-            "slot-light-scoped-list": LocalJSX.SlotLightScopedList & JSXBase.HTMLAttributes<HTMLSlotLightScopedListElement>;
-            "slot-list-light-root": LocalJSX.SlotListLightRoot & JSXBase.HTMLAttributes<HTMLSlotListLightRootElement>;
-            "slot-list-light-scoped-root": LocalJSX.SlotListLightScopedRoot & JSXBase.HTMLAttributes<HTMLSlotListLightScopedRootElement>;
-            "slot-map-order": LocalJSX.SlotMapOrder & JSXBase.HTMLAttributes<HTMLSlotMapOrderElement>;
-            "slot-map-order-root": LocalJSX.SlotMapOrderRoot & JSXBase.HTMLAttributes<HTMLSlotMapOrderRootElement>;
             "slot-nested-default-order-child": LocalJSX.SlotNestedDefaultOrderChild & JSXBase.HTMLAttributes<HTMLSlotNestedDefaultOrderChildElement>;
             "slot-nested-default-order-parent": LocalJSX.SlotNestedDefaultOrderParent & JSXBase.HTMLAttributes<HTMLSlotNestedDefaultOrderParentElement>;
-            "slot-nested-order-child": LocalJSX.SlotNestedOrderChild & JSXBase.HTMLAttributes<HTMLSlotNestedOrderChildElement>;
-            "slot-nested-order-parent": LocalJSX.SlotNestedOrderParent & JSXBase.HTMLAttributes<HTMLSlotNestedOrderParentElement>;
             "slot-ng-if": LocalJSX.SlotNgIf & JSXBase.HTMLAttributes<HTMLSlotNgIfElement>;
-            "slot-no-default": LocalJSX.SlotNoDefault & JSXBase.HTMLAttributes<HTMLSlotNoDefaultElement>;
-            "slot-parent-tag-change": LocalJSX.SlotParentTagChange & JSXBase.HTMLAttributes<HTMLSlotParentTagChangeElement>;
-            "slot-parent-tag-change-root": LocalJSX.SlotParentTagChangeRoot & JSXBase.HTMLAttributes<HTMLSlotParentTagChangeRootElement>;
-            "slot-reorder": LocalJSX.SlotReorder & JSXBase.HTMLAttributes<HTMLSlotReorderElement>;
-            "slot-reorder-root": LocalJSX.SlotReorderRoot & JSXBase.HTMLAttributes<HTMLSlotReorderRootElement>;
-            "slot-replace-wrapper": LocalJSX.SlotReplaceWrapper & JSXBase.HTMLAttributes<HTMLSlotReplaceWrapperElement>;
-            "slot-replace-wrapper-root": LocalJSX.SlotReplaceWrapperRoot & JSXBase.HTMLAttributes<HTMLSlotReplaceWrapperRootElement>;
-            "slotted-css": LocalJSX.SlottedCss & JSXBase.HTMLAttributes<HTMLSlottedCssElement>;
-            "static-decorated-members": LocalJSX.StaticDecoratedMembers & JSXBase.HTMLAttributes<HTMLStaticDecoratedMembersElement>;
-            "static-members": LocalJSX.StaticMembers & JSXBase.HTMLAttributes<HTMLStaticMembersElement>;
-            "static-members-separate-export": LocalJSX.StaticMembersSeparateExport & JSXBase.HTMLAttributes<HTMLStaticMembersSeparateExportElement>;
-            "static-members-separate-initializer": LocalJSX.StaticMembersSeparateInitializer & JSXBase.HTMLAttributes<HTMLStaticMembersSeparateInitializerElement>;
             "stencil-sibling": LocalJSX.StencilSibling & JSXBase.HTMLAttributes<HTMLStencilSiblingElement>;
-            "text-content-patch-scoped": LocalJSX.TextContentPatchScoped & JSXBase.HTMLAttributes<HTMLTextContentPatchScopedElement>;
-            "text-content-patch-scoped-with-slot": LocalJSX.TextContentPatchScopedWithSlot & JSXBase.HTMLAttributes<HTMLTextContentPatchScopedWithSlotElement>;
         }
     }
 }

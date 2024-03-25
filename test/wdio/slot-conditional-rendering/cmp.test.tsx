@@ -1,13 +1,8 @@
 import { h } from '@stencil/core';
 import { render } from '@wdio/browser-runner/stencil';
 
-describe('slot-conditional-rendering', function () {
-  const getHeaderVisibilityToggle = () => $('#header-visibility-toggle');
-  const getContentVisibilityToggle = () => $('#content-visibility-toggle');
-  const getHeaderElementInLightDOM = () => $('#slotted-header-element-id');
-  const getContentElementInLightDOM = () => $('#slotted-content-element-id');
-
-  beforeEach(() => {
+describe('slot-conditional-rendering', () => {
+  beforeEach(async () => {
     render({
       template: () => (
         <slot-conditional-rendering>
@@ -18,24 +13,28 @@ describe('slot-conditional-rendering', function () {
         </slot-conditional-rendering>
       ),
     });
+
+    await $('slot-conditional-rendering').waitForExist();
   });
 
   it('slots are not hidden', async () => {
-    await expect(await getHeaderElementInLightDOM().getAttribute('hidden')).toBeNull();
-    await expect(await getContentElementInLightDOM().getAttribute('hidden')).toBeNull();
+    await expect($('#slotted-header-element-id')).not.toHaveAttribute('hidden');
+    await expect($('#slotted-content-element-id')).not.toHaveAttribute('hidden');
   });
 
   it('header slot becomes hidden after hit the toggle button', async () => {
-    await expect(await getHeaderElementInLightDOM().getAttribute('hidden')).toBeNull();
+    await expect($('#slotted-header-element-id')).not.toHaveAttribute('hidden');
 
-    await getHeaderVisibilityToggle()?.click();
-    await expect(await getHeaderElementInLightDOM().getAttribute('hidden')).not.toBeNull();
+    await $('#header-visibility-toggle').click();
+
+    await expect($('#slotted-header-element-id')).toHaveAttribute('hidden');
   });
 
   it('content slot becomes hidden after hit the toggle button', async () => {
-    await expect(await getContentElementInLightDOM().getAttribute('hidden')).toBeNull();
+    await expect($('#slotted-content-element-id')).not.toHaveAttribute('hidden');
 
-    await getContentVisibilityToggle()?.click();
-    await expect(await getContentElementInLightDOM().getAttribute('hidden')).not.toBeNull();
+    await $('#content-visibility-toggle').click();
+
+    await expect($('#slotted-content-element-id')).toHaveAttribute('hidden');
   });
 });

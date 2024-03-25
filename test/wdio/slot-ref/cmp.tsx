@@ -14,8 +14,8 @@ export class SlotRef {
         <slot
           name="title"
           ref={(el) => {
-            el && this.hostElement.setAttribute('data-ref-id', el.id);
-            el && this.hostElement.setAttribute('data-ref-tagname', el.tagName);
+            this.hostElement.setAttribute('data-ref-id', el!.id);
+            this.hostElement.setAttribute('data-ref-tagname', el!.tagName);
           }}
         />
       </Host>

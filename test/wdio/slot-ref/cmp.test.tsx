@@ -1,10 +1,9 @@
 import { h } from '@stencil/core';
 import { render } from '@wdio/browser-runner/stencil';
 
-describe('slot-ref', function () {
-  beforeEach(() => {
+describe('slot-ref', () => {
+  beforeEach(async () => {
     render({
-      flushQueue: true,
       template: () => (
         <slot-ref>
           <span slot="title" id="slotted-element-id">
@@ -13,11 +12,12 @@ describe('slot-ref', function () {
         </slot-ref>
       ),
     });
+
+    await $('slot-ref').waitForExist();
   });
 
   it('ref callback of slot is called', async () => {
-    const host = $('slot-ref');
-    await expect(await host.getAttribute('data-ref-id')).toBe('slotted-element-id');
-    await expect(await host.getAttribute('data-ref-tagname')).toBe('SPAN');
+    await expect($('slot-ref')).toHaveAttribute('data-ref-id', 'slotted-element-id');
+    await expect($('slot-ref')).toHaveAttribute('data-ref-tagname', 'SPAN');
   });
 });
