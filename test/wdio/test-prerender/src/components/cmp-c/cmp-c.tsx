@@ -1,4 +1,5 @@
 import { Component, h } from '@stencil/core';
+
 import { printLifecycle } from '../../global/util.js';
 
 @Component({

@@ -30,6 +30,6 @@
     }
   },
   "include": [
-    "src",
+    "test-prerender/src",
   ]
 }

@@ -105,14 +105,16 @@ describe('prerender', () => {
     expect(scopedStyle.color).toBe('rgb(255, 0, 0)');
 
     const shadow = iframe.querySelector('cmp-client-shadow');
-    const shadowStyle = getComputedStyle(shadow.querySelector('article'));
+    const shadowStyle = getComputedStyle(shadow.shadowRoot.querySelector('article'));
+    await browser.waitUntil(async () => shadowStyle.color === 'rgb(0, 155, 0)');
     expect(shadowStyle.color).toBe('rgb(0, 155, 0)');
 
-    const blueText = shadow.querySelector('cmp-text-blue');
+    const blueText = shadow.shadowRoot.querySelector('cmp-text-blue');
     const blueTextStyle = getComputedStyle(blueText.querySelector('text-blue'));
+    await browser.waitUntil(async () => blueTextStyle.color === 'rgb(0, 0, 255)');
     expect(blueTextStyle.color).toBe('rgb(0, 0, 255)');
 
-    const greenText = shadow.querySelector('cmp-text-green');
+    const greenText = shadow.shadowRoot.querySelector('cmp-text-green');
     const greenTextStyle = getComputedStyle(greenText.querySelector('text-green'));
     expect(greenTextStyle.color).toBe('rgb(0, 255, 0)');
   });
