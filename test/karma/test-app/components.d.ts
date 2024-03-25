@@ -26,8 +26,6 @@ export namespace Components {
     }
     interface ReparentStyleWithVars {
     }
-    interface SlotConditionalRendering {
-    }
     interface SlotHtml {
         "inc": number;
     }
@@ -106,12 +104,6 @@ declare global {
         prototype: HTMLReparentStyleWithVarsElement;
         new (): HTMLReparentStyleWithVarsElement;
     };
-    interface HTMLSlotConditionalRenderingElement extends Components.SlotConditionalRendering, HTMLStencilElement {
-    }
-    var HTMLSlotConditionalRenderingElement: {
-        prototype: HTMLSlotConditionalRenderingElement;
-        new (): HTMLSlotConditionalRenderingElement;
-    };
     interface HTMLSlotHtmlElement extends Components.SlotHtml, HTMLStencilElement {
     }
     var HTMLSlotHtmlElement: {
@@ -165,7 +157,6 @@ declare global {
         "init-css-root": HTMLInitCssRootElement;
         "reparent-style-no-vars": HTMLReparentStyleNoVarsElement;
         "reparent-style-with-vars": HTMLReparentStyleWithVarsElement;
-        "slot-conditional-rendering": HTMLSlotConditionalRenderingElement;
         "slot-html": HTMLSlotHtmlElement;
         "slot-light-dom-content": HTMLSlotLightDomContentElement;
         "slot-light-dom-root": HTMLSlotLightDomRootElement;
@@ -196,8 +187,6 @@ declare namespace LocalJSX {
     }
     interface ReparentStyleWithVars {
     }
-    interface SlotConditionalRendering {
-    }
     interface SlotHtml {
         "inc"?: number;
     }
@@ -225,7 +214,6 @@ declare namespace LocalJSX {
         "init-css-root": InitCssRoot;
         "reparent-style-no-vars": ReparentStyleNoVars;
         "reparent-style-with-vars": ReparentStyleWithVars;
-        "slot-conditional-rendering": SlotConditionalRendering;
         "slot-html": SlotHtml;
         "slot-light-dom-content": SlotLightDomContent;
         "slot-light-dom-root": SlotLightDomRoot;
@@ -249,7 +237,6 @@ declare module "@stencil/core" {
             "init-css-root": LocalJSX.InitCssRoot & JSXBase.HTMLAttributes<HTMLInitCssRootElement>;
             "reparent-style-no-vars": LocalJSX.ReparentStyleNoVars & JSXBase.HTMLAttributes<HTMLReparentStyleNoVarsElement>;
             "reparent-style-with-vars": LocalJSX.ReparentStyleWithVars & JSXBase.HTMLAttributes<HTMLReparentStyleWithVarsElement>;
-            "slot-conditional-rendering": LocalJSX.SlotConditionalRendering & JSXBase.HTMLAttributes<HTMLSlotConditionalRenderingElement>;
             "slot-html": LocalJSX.SlotHtml & JSXBase.HTMLAttributes<HTMLSlotHtmlElement>;
             "slot-light-dom-content": LocalJSX.SlotLightDomContent & JSXBase.HTMLAttributes<HTMLSlotLightDomContentElement>;
             "slot-light-dom-root": LocalJSX.SlotLightDomRoot & JSXBase.HTMLAttributes<HTMLSlotLightDomRootElement>;
