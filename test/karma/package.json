@@ -7,11 +7,10 @@
   "scripts": {
     "clean": "rm -rf test-output tmp-compiled-tests",
     "start": "node ../../bin/stencil build --dev --watch --serve --es5",
-    "build.all": "npm run clean && npm run build.invisible-prehydration.false && npm run build.app && npm run build.prerender",
+    "build.all": "npm run clean && npm run build.invisible-prehydration.false && npm run build.app",
     "build.app": "npm run compile.test-app && node ../../bin/stencil build --debug --es5",
     "compile.test-app": "node ../../node_modules/typescript/lib/tsc -p tsconfig.json",
     "build.invisible-prehydration.false": "node ../../bin/stencil build --config test-invisible-prehydration/stencil.invisiblePrehydrationFalse.config.ts --debug",
-    "build.prerender": "node ../../bin/stencil build --config test-prerender/stencil.config-prerender.ts --prerender --debug && node test-prerender/no-script-build.js",
     "karma": "karma start karma.config.js",
     "karma.prod": "npm run build.all && npm run karma",
     "karma.chrome": "karma start karma.config.js --browsers=Chrome --single-run=false",

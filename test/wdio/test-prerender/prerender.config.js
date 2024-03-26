@@ -1,5 +1,5 @@
 module.exports = {
-  beforeHydrate(doc, url) {
+  beforeHydrate(doc) {
     doc.documentElement.setAttribute('dir', 'ltr');
   },
 

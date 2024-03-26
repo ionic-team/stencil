@@ -1,20 +1,20 @@
 const fs = require('fs');
 const path = require('path');
-const { WWW_OUT_DIR } = require('../constants');
 const hydrate = require('../dist/hydrate');
 
 async function run() {
-  const indexPath = path.join(__dirname, 'index.html');
+  const indexPath = path.join(__dirname, 'src', 'index.html');
   const html = fs.readFileSync(indexPath, 'utf8');
 
   const results = await hydrate.renderToString(html, {
     prettyHtml: true,
   });
+  const filePath = path.join(__dirname, '..', 'www-prerender-script', 'prerender', 'index.html');
 
-  const filePath = path.join(__dirname, '..', WWW_OUT_DIR, 'prerender', 'index.html');
-  fs.writeFileSync(filePath, results.html);
-
-  console.log('prerendered karma test');
+  const updatedHTML = results.html.replace(/(href|src)="\/prerender\//g, (a) =>
+    a.replace('/prerender/', '/www-prerender-script/prerender/'),
+  );
+  fs.writeFileSync(filePath, updatedHTML);
 
   results.diagnostics.forEach((d) => {
     console.log(d.level, d.header, d.messageText);
