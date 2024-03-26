@@ -49,8 +49,8 @@ export class MockDocument extends MockHTMLElement {
     this.documentElement.dir = value;
   }
 
-  override get localName(): undefined {
-    return undefined;
+  override get localName(): never {
+    throw new Error('Unimplemented');
   }
 
   get location() {
