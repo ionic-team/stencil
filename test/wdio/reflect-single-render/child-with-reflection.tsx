@@ -6,8 +6,7 @@ import { Component, h, Prop } from '@stencil/core';
   shadow: true,
 })
 export class ChildWithReflection {
-  // counter to proxy the number of times a render has occurred, since we don't have access to those dev tools during
-  // karma tests
+  // counter to proxy the number of times a render has occurred
   renderCount = 0;
 
   // to properly replicate the issue:

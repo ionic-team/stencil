@@ -22,6 +22,12 @@ export namespace Components {
         "cars": CarData[];
         "selected": CarData;
     }
+    interface CmpA {
+    }
+    interface CmpB {
+    }
+    interface CmpC {
+    }
     interface DomApi {
     }
     interface DomInteraction {
@@ -139,6 +145,24 @@ declare global {
         prototype: HTMLCarListElement;
         new (): HTMLCarListElement;
     };
+    interface HTMLCmpAElement extends Components.CmpA, HTMLStencilElement {
+    }
+    var HTMLCmpAElement: {
+        prototype: HTMLCmpAElement;
+        new (): HTMLCmpAElement;
+    };
+    interface HTMLCmpBElement extends Components.CmpB, HTMLStencilElement {
+    }
+    var HTMLCmpBElement: {
+        prototype: HTMLCmpBElement;
+        new (): HTMLCmpBElement;
+    };
+    interface HTMLCmpCElement extends Components.CmpC, HTMLStencilElement {
+    }
+    var HTMLCmpCElement: {
+        prototype: HTMLCmpCElement;
+        new (): HTMLCmpCElement;
+    };
     interface HTMLDomApiElement extends Components.DomApi, HTMLStencilElement {
     }
     var HTMLDomApiElement: {
@@ -253,6 +277,9 @@ declare global {
         "build-data": HTMLBuildDataElement;
         "car-detail": HTMLCarDetailElement;
         "car-list": HTMLCarListElement;
+        "cmp-a": HTMLCmpAElement;
+        "cmp-b": HTMLCmpBElement;
+        "cmp-c": HTMLCmpCElement;
         "dom-api": HTMLDomApiElement;
         "dom-interaction": HTMLDomInteractionElement;
         "dom-visible": HTMLDomVisibleElement;
@@ -286,6 +313,12 @@ declare namespace LocalJSX {
         "cars"?: CarData[];
         "onCarSelected"?: (event: CarListCustomEvent<CarData>) => void;
         "selected"?: CarData;
+    }
+    interface CmpA {
+    }
+    interface CmpB {
+    }
+    interface CmpC {
     }
     interface DomApi {
     }
@@ -336,6 +369,9 @@ declare namespace LocalJSX {
         "build-data": BuildData;
         "car-detail": CarDetail;
         "car-list": CarList;
+        "cmp-a": CmpA;
+        "cmp-b": CmpB;
+        "cmp-c": CmpC;
         "dom-api": DomApi;
         "dom-interaction": DomInteraction;
         "dom-visible": DomVisible;
@@ -365,6 +401,9 @@ declare module "@stencil/core" {
              * Component that helps display a list of cars
              */
             "car-list": LocalJSX.CarList & JSXBase.HTMLAttributes<HTMLCarListElement>;
+            "cmp-a": LocalJSX.CmpA & JSXBase.HTMLAttributes<HTMLCmpAElement>;
+            "cmp-b": LocalJSX.CmpB & JSXBase.HTMLAttributes<HTMLCmpBElement>;
+            "cmp-c": LocalJSX.CmpC & JSXBase.HTMLAttributes<HTMLCmpCElement>;
             "dom-api": LocalJSX.DomApi & JSXBase.HTMLAttributes<HTMLDomApiElement>;
             "dom-interaction": LocalJSX.DomInteraction & JSXBase.HTMLAttributes<HTMLDomInteractionElement>;
             "dom-visible": LocalJSX.DomVisible & JSXBase.HTMLAttributes<HTMLDomVisibleElement>;

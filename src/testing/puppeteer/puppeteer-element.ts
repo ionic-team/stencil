@@ -615,11 +615,7 @@ async function findWithCssSelector(
  * @param selector the selector to query
  * @returns the element handle
  */
-async function shadowQuerySelector (
-  page: pd.E2EPageInternal,
-  rootHandle: puppeteer.ElementHandle,
-  selector: string,
-) {
+async function shadowQuerySelector(page: pd.E2EPageInternal, rootHandle: puppeteer.ElementHandle, selector: string) {
   const shadowHandle = await page.evaluateHandle(
     (elm: Element, shadowSelector: string) => {
       if (!elm.shadowRoot) {
