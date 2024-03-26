@@ -40,8 +40,6 @@
     "test-app/global.ts"
   ],
   "exclude": [
-    "test-prerender",
-    "test-sibling",
-    "test-global-script"
+    "test-prerender"
   ]
 }

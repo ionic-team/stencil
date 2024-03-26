@@ -26,8 +26,7 @@
     "baseUrl": ".",
     "paths": {
       "@stencil/core": ["../../internal"],
-      "@stencil/core/internal": ["../../internal"],
-      "@test-sibling": ["./test-sibling"]
+      "@stencil/core/internal": ["../../internal"]
     }
   },
   "include": [
@@ -38,7 +37,6 @@
     "test-app/global.ts"
   ],
   "exclude": [
-    "test-prerender",
-    "test-sibling"
+    "test-prerender"
   ]
 }

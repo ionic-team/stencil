@@ -1,4 +1,4 @@
-import { Config } from '../../../dist/declarations';
+import { Config } from '../../../src/declarations';
 
 export const config: Config = {
   namespace: 'TestSibling',
