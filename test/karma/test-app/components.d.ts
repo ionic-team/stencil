@@ -9,11 +9,6 @@ export namespace Components {
     interface SlotHtml {
         "inc": number;
     }
-    interface SlotNestedDefaultOrderChild {
-        "state": boolean;
-    }
-    interface SlotNestedDefaultOrderParent {
-    }
     interface SlotNgIf {
     }
 }
@@ -24,18 +19,6 @@ declare global {
         prototype: HTMLSlotHtmlElement;
         new (): HTMLSlotHtmlElement;
     };
-    interface HTMLSlotNestedDefaultOrderChildElement extends Components.SlotNestedDefaultOrderChild, HTMLStencilElement {
-    }
-    var HTMLSlotNestedDefaultOrderChildElement: {
-        prototype: HTMLSlotNestedDefaultOrderChildElement;
-        new (): HTMLSlotNestedDefaultOrderChildElement;
-    };
-    interface HTMLSlotNestedDefaultOrderParentElement extends Components.SlotNestedDefaultOrderParent, HTMLStencilElement {
-    }
-    var HTMLSlotNestedDefaultOrderParentElement: {
-        prototype: HTMLSlotNestedDefaultOrderParentElement;
-        new (): HTMLSlotNestedDefaultOrderParentElement;
-    };
     interface HTMLSlotNgIfElement extends Components.SlotNgIf, HTMLStencilElement {
     }
     var HTMLSlotNgIfElement: {
@@ -44,8 +27,6 @@ declare global {
     };
     interface HTMLElementTagNameMap {
         "slot-html": HTMLSlotHtmlElement;
-        "slot-nested-default-order-child": HTMLSlotNestedDefaultOrderChildElement;
-        "slot-nested-default-order-parent": HTMLSlotNestedDefaultOrderParentElement;
         "slot-ng-if": HTMLSlotNgIfElement;
     }
 }
@@ -53,17 +34,10 @@ declare namespace LocalJSX {
     interface SlotHtml {
         "inc"?: number;
     }
-    interface SlotNestedDefaultOrderChild {
-        "state"?: boolean;
-    }
-    interface SlotNestedDefaultOrderParent {
-    }
     interface SlotNgIf {
     }
     interface IntrinsicElements {
         "slot-html": SlotHtml;
-        "slot-nested-default-order-child": SlotNestedDefaultOrderChild;
-        "slot-nested-default-order-parent": SlotNestedDefaultOrderParent;
         "slot-ng-if": SlotNgIf;
     }
 }
@@ -72,8 +46,6 @@ declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
             "slot-html": LocalJSX.SlotHtml & JSXBase.HTMLAttributes<HTMLSlotHtmlElement>;
-            "slot-nested-default-order-child": LocalJSX.SlotNestedDefaultOrderChild & JSXBase.HTMLAttributes<HTMLSlotNestedDefaultOrderChildElement>;
-            "slot-nested-default-order-parent": LocalJSX.SlotNestedDefaultOrderParent & JSXBase.HTMLAttributes<HTMLSlotNestedDefaultOrderParentElement>;
             "slot-ng-if": LocalJSX.SlotNgIf & JSXBase.HTMLAttributes<HTMLSlotNgIfElement>;
         }
     }
