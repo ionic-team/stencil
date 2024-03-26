@@ -1,4 +1,4 @@
-import './assets/angular.min.js'
+import './assets/angular.min.js';
 
 /**
  * Note: this file is meant to be run in the browser, not in Node.js. WebdriverIO
