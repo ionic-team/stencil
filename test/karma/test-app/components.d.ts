@@ -6,20 +6,6 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
-    interface CustomElementChild {
-    }
-    interface CustomElementChildDifferentNameThanClass {
-    }
-    interface CustomElementNestedChild {
-    }
-    interface CustomElementRoot {
-    }
-    interface CustomElementRootDifferentNameThanClass {
-    }
-    interface CustomElementsDelegatesFocus {
-    }
-    interface CustomElementsNoDelegatesFocus {
-    }
     interface SlotHtml {
         "inc": number;
     }
@@ -32,48 +18,6 @@ export namespace Components {
     }
 }
 declare global {
-    interface HTMLCustomElementChildElement extends Components.CustomElementChild, HTMLStencilElement {
-    }
-    var HTMLCustomElementChildElement: {
-        prototype: HTMLCustomElementChildElement;
-        new (): HTMLCustomElementChildElement;
-    };
-    interface HTMLCustomElementChildDifferentNameThanClassElement extends Components.CustomElementChildDifferentNameThanClass, HTMLStencilElement {
-    }
-    var HTMLCustomElementChildDifferentNameThanClassElement: {
-        prototype: HTMLCustomElementChildDifferentNameThanClassElement;
-        new (): HTMLCustomElementChildDifferentNameThanClassElement;
-    };
-    interface HTMLCustomElementNestedChildElement extends Components.CustomElementNestedChild, HTMLStencilElement {
-    }
-    var HTMLCustomElementNestedChildElement: {
-        prototype: HTMLCustomElementNestedChildElement;
-        new (): HTMLCustomElementNestedChildElement;
-    };
-    interface HTMLCustomElementRootElement extends Components.CustomElementRoot, HTMLStencilElement {
-    }
-    var HTMLCustomElementRootElement: {
-        prototype: HTMLCustomElementRootElement;
-        new (): HTMLCustomElementRootElement;
-    };
-    interface HTMLCustomElementRootDifferentNameThanClassElement extends Components.CustomElementRootDifferentNameThanClass, HTMLStencilElement {
-    }
-    var HTMLCustomElementRootDifferentNameThanClassElement: {
-        prototype: HTMLCustomElementRootDifferentNameThanClassElement;
-        new (): HTMLCustomElementRootDifferentNameThanClassElement;
-    };
-    interface HTMLCustomElementsDelegatesFocusElement extends Components.CustomElementsDelegatesFocus, HTMLStencilElement {
-    }
-    var HTMLCustomElementsDelegatesFocusElement: {
-        prototype: HTMLCustomElementsDelegatesFocusElement;
-        new (): HTMLCustomElementsDelegatesFocusElement;
-    };
-    interface HTMLCustomElementsNoDelegatesFocusElement extends Components.CustomElementsNoDelegatesFocus, HTMLStencilElement {
-    }
-    var HTMLCustomElementsNoDelegatesFocusElement: {
-        prototype: HTMLCustomElementsNoDelegatesFocusElement;
-        new (): HTMLCustomElementsNoDelegatesFocusElement;
-    };
     interface HTMLSlotHtmlElement extends Components.SlotHtml, HTMLStencilElement {
     }
     var HTMLSlotHtmlElement: {
@@ -99,13 +43,6 @@ declare global {
         new (): HTMLSlotNgIfElement;
     };
     interface HTMLElementTagNameMap {
-        "custom-element-child": HTMLCustomElementChildElement;
-        "custom-element-child-different-name-than-class": HTMLCustomElementChildDifferentNameThanClassElement;
-        "custom-element-nested-child": HTMLCustomElementNestedChildElement;
-        "custom-element-root": HTMLCustomElementRootElement;
-        "custom-element-root-different-name-than-class": HTMLCustomElementRootDifferentNameThanClassElement;
-        "custom-elements-delegates-focus": HTMLCustomElementsDelegatesFocusElement;
-        "custom-elements-no-delegates-focus": HTMLCustomElementsNoDelegatesFocusElement;
         "slot-html": HTMLSlotHtmlElement;
         "slot-nested-default-order-child": HTMLSlotNestedDefaultOrderChildElement;
         "slot-nested-default-order-parent": HTMLSlotNestedDefaultOrderParentElement;
@@ -113,20 +50,6 @@ declare global {
     }
 }
 declare namespace LocalJSX {
-    interface CustomElementChild {
-    }
-    interface CustomElementChildDifferentNameThanClass {
-    }
-    interface CustomElementNestedChild {
-    }
-    interface CustomElementRoot {
-    }
-    interface CustomElementRootDifferentNameThanClass {
-    }
-    interface CustomElementsDelegatesFocus {
-    }
-    interface CustomElementsNoDelegatesFocus {
-    }
     interface SlotHtml {
         "inc"?: number;
     }
@@ -138,13 +61,6 @@ declare namespace LocalJSX {
     interface SlotNgIf {
     }
     interface IntrinsicElements {
-        "custom-element-child": CustomElementChild;
-        "custom-element-child-different-name-than-class": CustomElementChildDifferentNameThanClass;
-        "custom-element-nested-child": CustomElementNestedChild;
-        "custom-element-root": CustomElementRoot;
-        "custom-element-root-different-name-than-class": CustomElementRootDifferentNameThanClass;
-        "custom-elements-delegates-focus": CustomElementsDelegatesFocus;
-        "custom-elements-no-delegates-focus": CustomElementsNoDelegatesFocus;
         "slot-html": SlotHtml;
         "slot-nested-default-order-child": SlotNestedDefaultOrderChild;
         "slot-nested-default-order-parent": SlotNestedDefaultOrderParent;
@@ -155,13 +71,6 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
-            "custom-element-child": LocalJSX.CustomElementChild & JSXBase.HTMLAttributes<HTMLCustomElementChildElement>;
-            "custom-element-child-different-name-than-class": LocalJSX.CustomElementChildDifferentNameThanClass & JSXBase.HTMLAttributes<HTMLCustomElementChildDifferentNameThanClassElement>;
-            "custom-element-nested-child": LocalJSX.CustomElementNestedChild & JSXBase.HTMLAttributes<HTMLCustomElementNestedChildElement>;
-            "custom-element-root": LocalJSX.CustomElementRoot & JSXBase.HTMLAttributes<HTMLCustomElementRootElement>;
-            "custom-element-root-different-name-than-class": LocalJSX.CustomElementRootDifferentNameThanClass & JSXBase.HTMLAttributes<HTMLCustomElementRootDifferentNameThanClassElement>;
-            "custom-elements-delegates-focus": LocalJSX.CustomElementsDelegatesFocus & JSXBase.HTMLAttributes<HTMLCustomElementsDelegatesFocusElement>;
-            "custom-elements-no-delegates-focus": LocalJSX.CustomElementsNoDelegatesFocus & JSXBase.HTMLAttributes<HTMLCustomElementsNoDelegatesFocusElement>;
             "slot-html": LocalJSX.SlotHtml & JSXBase.HTMLAttributes<HTMLSlotHtmlElement>;
             "slot-nested-default-order-child": LocalJSX.SlotNestedDefaultOrderChild & JSXBase.HTMLAttributes<HTMLSlotNestedDefaultOrderChildElement>;
             "slot-nested-default-order-parent": LocalJSX.SlotNestedDefaultOrderParent & JSXBase.HTMLAttributes<HTMLSlotNestedDefaultOrderParentElement>;
