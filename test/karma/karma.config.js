@@ -16,18 +16,18 @@ const browserStackLaunchers = {
     os: 'Windows',
     os_version: '10',
   },
-  bs_firefox: {
-    base: 'BrowserStack',
-    browser: 'firefox',
-    os: 'Windows',
-    os_version: '10',
-  },
-  bs_edge: {
-    base: 'BrowserStack',
-    browser: 'edge',
-    os: 'Windows',
-    os_version: '10',
-  },
+  // bs_firefox: {
+  //   base: 'BrowserStack',
+  //   browser: 'firefox',
+  //   os: 'Windows',
+  //   os_version: '10',
+  // },
+  // bs_edge: {
+  //   base: 'BrowserStack',
+  //   browser: 'edge',
+  //   os: 'Windows',
+  //   os_version: '10',
+  // },
   // bs_ie: {
   //   base: 'BrowserStack',
   //   browser: 'ie',
