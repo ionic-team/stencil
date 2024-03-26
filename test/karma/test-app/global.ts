@@ -1,5 +1,4 @@
 import { setMode } from '@stencil/core';
-import '@test-sibling';
 
 const globalScript = () => {
   setMode((elm) => {

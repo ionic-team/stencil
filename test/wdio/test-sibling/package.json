@@ -6,5 +6,8 @@
   "types": "dist/types/components.d.ts",
   "volta": {
     "extends": "../package.json"
+  },
+  "scripts": {
+    "build": "node ../../../bin/stencil build --config ./stencil.config.ts --debug"
   }
 }

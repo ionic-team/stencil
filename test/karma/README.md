@@ -98,12 +98,6 @@ files may be added/removed as needed in order to create an effective test.
 `test-prerender/` is used to test and verify that pre-render builds are able to run to completion. The components used 
 in this directory are consumed by tests found in the `test-app/` directory.
 
-### `test-sibling/`
-
-`test-sibling/` is used to verify that more than one instance of Stencil can run in the context of an application. The
-components used in this directory are consumed by tests found in the `test-app/` directory.
-
-
 ### Creating a New Test
 
 First, create a replication page for your tests:
