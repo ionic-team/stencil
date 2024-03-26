@@ -1,31 +1,47 @@
 import './assets/angular.min.js'
 
+/**
+ * Note: this file is meant to be run in the browser, not in Node.js. WebdriverIO
+ * injects some basic polyfills for Node.js to make the following possible.
+ */
+import path from 'node:path';
+
+async function setupTest(htmlFile: string): Promise<HTMLElement> {
+  if (document.querySelector('iframe')) {
+    document.body.removeChild(document.querySelector('iframe'));
+  }
+
+  const htmlFilePath = path.resolve(
+    path.dirname(globalThis.__wdioSpec__),
+    '..',
+    htmlFile.slice(htmlFile.startsWith('/') ? 1 : 0),
+  );
+  const iframe = document.createElement('iframe');
+
+  /**
+   * Note: prefixes the absolute path to the html file with `/@fs` is a ViteJS (https://vitejs.dev/)
+   * feature which allows to serve static content from files this way
+   */
+  iframe.src = `/@fs${htmlFilePath}`;
+  iframe.width = '600px';
+  iframe.height = '600px';
+  document.body.appendChild(iframe);
+
+  /**
+   * wait for the iframe to load
+   */
+  await new Promise((resolve) => (iframe.onload = resolve));
+  return iframe.contentDocument.body;
+}
+
 describe('slot-ng-if', () => {
+  let iframe: HTMLElement;
   before(async () => {
-    const stage = document.createElement('div');
-    stage.innerHTML = `
-    <section id="demo">
-      <section ng-controller="homeCtrl as vm">
-        <div ng-if="vm.show">
-          <slot-ng-if><span>{{ vm.label }}</span></slot-ng-if>
-        </div>
-      </section>
-    </section>`;
-    document.body.appendChild(stage);
-
-    angular.module('demo', []).controller('homeCtrl', homeCtrl);
-    function homeCtrl() {
-      const vm = this;
-      console.log('YOO!');
-
-      vm.label = 'Angular Bound Label';
-      vm.show = true;
-    }
-    angular.bootstrap(document.querySelector('#demo'), ['demo']);
+    iframe = await setupTest('/slot-ng-if/index.html');
   });
 
   it('renders bound values in slots within ng-if context', async () => {
-    const root = document.querySelector('slot-ng-if');
+    const root = iframe.querySelector('slot-ng-if');
     expect(root.textContent).toBe('Angular Bound Label');
   });
 });
