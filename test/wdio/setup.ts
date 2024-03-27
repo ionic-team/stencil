@@ -28,9 +28,3 @@ if (!testRequiresManualSetup) {
 if (window.__wdioSpec__.includes('global-script.test.tsx')) {
   await import('./www-global-script/build/testglobalscript.esm.js');
 }
-/**
- * load the separate test app for the invisible prehydration tests, if appropriate to do so
- */
-if (window.__wdioSpec__.includes('invisible-prehydration.test.tsx')) {
-  await import('./www-invisible-prehydration/build/testinvisibleprehydrationfalse.esm.js');
-}
