@@ -20,6 +20,7 @@ export const config: Config = {
   },
 
   testing: {
+    browserHeadless: false,
     moduleNameMapper: {
       'lodash-es': 'lodash',
     },
