@@ -1,4 +1,4 @@
-import { MockElement } from './node';
+import { MockNode } from './node';
 import jQuery from './third-party/jquery';
 
 /**
@@ -8,7 +8,7 @@ import jQuery from './third-party/jquery';
  * @param elm an element within which to find matching elements
  * @returns whether the element matches the selector
  */
-export function matches(selector: string, elm: MockElement): boolean {
+export function matches(selector: string, elm: MockNode): boolean {
   try {
     const r = jQuery.find(selector, undefined, undefined, [elm]);
     return r.length > 0;
@@ -25,7 +25,7 @@ export function matches(selector: string, elm: MockElement): boolean {
  * @param elm the element within which to find a matching element
  * @returns the first matching element, or null if none is found
  */
-export function selectOne(selector: string, elm: MockElement) {
+export function selectOne(selector: string, elm: MockNode) {
   try {
     const r = jQuery.find(selector, elm, undefined, undefined);
     return r[0] || null;
@@ -42,7 +42,7 @@ export function selectOne(selector: string, elm: MockElement) {
  * @param elm an element within which to find matching elements
  * @returns all matching elements
  */
-export function selectAll(selector: string, elm: MockElement): any {
+export function selectAll(selector: string, elm: MockNode): any {
   try {
     return jQuery.find(selector, elm, undefined, undefined);
   } catch (e) {

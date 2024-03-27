@@ -238,7 +238,7 @@ describe('selector', () => {
 
     expect(() => doc.querySelector(selector)).toThrow(expectedMessage);
     expect(() => doc.querySelectorAll(selector)).toThrow(expectedMessage);
-    expect(() => doc.matches(selector)).toThrow(expectedMessage);
+    expect(() => doc.body.matches(selector)).toThrow(expectedMessage);
   });
 
   it('should error for combinations of problematic selectors', () => {

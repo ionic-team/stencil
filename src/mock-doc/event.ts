@@ -43,10 +43,10 @@ export class MockEvent {
    * @ref https://developer.mozilla.org/en-US/docs/Web/API/Event/composedPath
    * @returns a composed path of the event
    */
-  composedPath(): MockElement[] {
-    const composedPath: MockElement[] = [];
+  composedPath(): (MockElement | MockDocument)[] {
+    const composedPath: (MockElement | MockDocument)[] = [];
 
-    let currentElement = this.target;
+    let currentElement: MockElement | MockDocument = this.target;
 
     while (currentElement) {
       composedPath.push(currentElement);
@@ -63,7 +63,7 @@ export class MockEvent {
        * with the document object instead of the parent element since the parent element
        * is `null` for HTML elements.
        */
-      if (currentElement.parentElement == null && currentElement.tagName === 'HTML') {
+      if (currentElement.parentElement == null && 'tagName' in currentElement && currentElement.tagName === 'HTML') {
         currentElement = currentElement.ownerDocument;
       } else {
         currentElement = currentElement.parentElement;
