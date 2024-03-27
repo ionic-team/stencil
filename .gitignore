@@ -57,3 +57,4 @@ test/wdio/src/components.d.ts
 test/wdio/www-global-script/
 test/wdio/test-components
 test/wdio/www-prerender-script
+test/wdio/www-invisible-prehydration/
