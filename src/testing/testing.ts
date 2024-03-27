@@ -65,6 +65,9 @@ export const createTesting = async (config: ValidatedConfig): Promise<Testing> =
       doScreenshots = !!(opts.e2e && opts.screenshot);
       if (doScreenshots) {
         env.__STENCIL_SCREENSHOT__ = 'true';
+        if (config.testing.screenshotTimeout != null) {
+          env.__STENCIL_SCREENSHOT_TIMEOUT_MS__ = config.testing.screenshotTimeout.toString();
+        }
 
         if (opts.updateScreenshot) {
           config.logger.info(config.logger.magenta(`updating master screenshots`));

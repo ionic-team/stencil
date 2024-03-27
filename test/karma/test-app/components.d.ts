@@ -6,47 +6,19 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
-    interface SlotHtml {
-        "inc": number;
-    }
-    interface SlotNgIf {
-    }
 }
 declare global {
-    interface HTMLSlotHtmlElement extends Components.SlotHtml, HTMLStencilElement {
-    }
-    var HTMLSlotHtmlElement: {
-        prototype: HTMLSlotHtmlElement;
-        new (): HTMLSlotHtmlElement;
-    };
-    interface HTMLSlotNgIfElement extends Components.SlotNgIf, HTMLStencilElement {
-    }
-    var HTMLSlotNgIfElement: {
-        prototype: HTMLSlotNgIfElement;
-        new (): HTMLSlotNgIfElement;
-    };
     interface HTMLElementTagNameMap {
-        "slot-html": HTMLSlotHtmlElement;
-        "slot-ng-if": HTMLSlotNgIfElement;
     }
 }
 declare namespace LocalJSX {
-    interface SlotHtml {
-        "inc"?: number;
-    }
-    interface SlotNgIf {
-    }
     interface IntrinsicElements {
-        "slot-html": SlotHtml;
-        "slot-ng-if": SlotNgIf;
     }
 }
 export { LocalJSX as JSX };
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
-            "slot-html": LocalJSX.SlotHtml & JSXBase.HTMLAttributes<HTMLSlotHtmlElement>;
-            "slot-ng-if": LocalJSX.SlotNgIf & JSXBase.HTMLAttributes<HTMLSlotNgIfElement>;
         }
     }
 }
