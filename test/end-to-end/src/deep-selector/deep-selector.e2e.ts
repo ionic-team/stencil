@@ -39,7 +39,7 @@ describe('Shadow DOM piercing', () => {
     // we skip through the shadow dom
     const spanCmp = await page.find('cmp-a >>> cmp-c >>> span');
     expect(spanCmp.textContent).toBe('I am in component C');
-  })
+  });
 
   it('can pierce through shadow DOM via findAll', async () => {
     // create a new puppeteer page
@@ -68,5 +68,5 @@ describe('Shadow DOM piercing', () => {
     const spansCmp = await page.findAll('cmp-a >>> cmp-c >>> span');
     expect(spansCmp).toHaveLength(1);
     expect(spansCmp[0].textContent).toBe('I am in component C');
-  })
+  });
 });

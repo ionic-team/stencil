@@ -547,11 +547,11 @@ export async function find(page: pd.E2EPageInternal, rootHandle: puppeteer.Eleme
 
   let elmHandle: puppeteer.ElementHandle;
 
-  if (typeof selector === 'string' && selector.includes(">>>")) {
+  if (typeof selector === 'string' && selector.includes('>>>')) {
     const handle = await page.$(selector);
     const elm = new E2EElement(page, handle);
     await elm.e2eSync();
-    return elm
+    return elm;
   }
 
   if (typeof lightSelector === 'string') {
@@ -569,10 +569,7 @@ export async function find(page: pd.E2EPageInternal, rootHandle: puppeteer.Eleme
   return elm;
 }
 
-async function findWithCssSelector(
-  rootHandle: puppeteer.ElementHandle,
-  lightSelector: string,
-) {
+async function findWithCssSelector(rootHandle: puppeteer.ElementHandle, lightSelector: string) {
   const elmHandle = await rootHandle.$(lightSelector);
 
   if (!elmHandle) {
@@ -642,7 +639,7 @@ export async function findAll(
 ) {
   const foundElms: E2EElement[] = [];
 
-  if (typeof selector === 'string' && selector.includes(">>>")) {
+  if (typeof selector === 'string' && selector.includes('>>>')) {
     const handles = await page.$$(selector);
     for (let i = 0; i < handles.length; i++) {
       const elm = new E2EElement(page, handles[i]);
