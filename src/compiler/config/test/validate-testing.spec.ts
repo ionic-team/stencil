@@ -236,6 +236,33 @@ describe('validateTesting', () => {
     });
   });
 
+  describe('screenshotTimeout', () => {
+    it('sets screenshotTimeout to null if not provided', () => {
+      userConfig.flags = { ...flags, e2e: true };
+      userConfig.testing = {};
+
+      const { config } = validateConfig(userConfig, mockLoadConfigInit());
+      expect(config.testing.screenshotTimeout).toEqual(null);
+    });
+
+    it('sets screenshotTimeout to null if it has an unexpected value', () => {
+      userConfig.flags = { ...flags, e2e: true };
+      // @ts-expect-error - the nature of this test requires a non-string value
+      userConfig.testing = { screenshotTimeout: '4s' };
+
+      const { config } = validateConfig(userConfig, mockLoadConfigInit());
+      expect(config.testing.screenshotTimeout).toEqual(null);
+    });
+
+    it('keeps the value if set correctly', () => {
+      userConfig.flags = { ...flags, e2e: true };
+      userConfig.testing = { screenshotTimeout: 4000 };
+
+      const { config } = validateConfig(userConfig, mockLoadConfigInit());
+      expect(config.testing.screenshotTimeout).toEqual(4000);
+    });
+  });
+
   describe('testPathIgnorePatterns', () => {
     it('does not alter a provided testPathIgnorePatterns', () => {
       userConfig.flags = { ...flags, e2e: true };

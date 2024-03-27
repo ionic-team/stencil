@@ -55,3 +55,5 @@ unused-exports*.txt
 # TODO(STENCIL-1203): check in type files back into the repository after migration
 test/wdio/src/components.d.ts
 test/wdio/www-global-script/
+test/wdio/test-components
+test/wdio/www-prerender-script
