@@ -736,8 +736,9 @@ export const updateFallbackSlotVisibility = (elm: d.RenderNode) => {
               // this sibling node is from a different component OR is a named
               // fallback slot node
               if (
-                siblingNode.nodeType === NODE_TYPE.ElementNode &&
-                (slotName === siblingNode.getAttribute('slot') || slotName === siblingNode['s-sn'])
+                (siblingNode.nodeType === NODE_TYPE.ElementNode &&
+                  (slotName === siblingNode.getAttribute('slot') || slotName === siblingNode['s-sn'])) ||
+                (siblingNode.nodeType === NODE_TYPE.TextNode && slotName === siblingNode['s-sn'])
               ) {
                 childNode.hidden = true;
                 break;
