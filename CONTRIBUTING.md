@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for your interest in contributing to Stencil! :tada:
+Thanks for your interest in contributing to Stencil! 🎉
 
 
 ## Contributing Etiquette

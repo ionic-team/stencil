@@ -37,7 +37,7 @@ Example from ionic-core:
 ### HTML tag
 
 #### Prefix
-The prefix has a major role when you are creating a collection of components intended to be used across diferent projects, like [@ionic/core](https://www.npmjs.com/package/@ionic/core). Web Components are not scoped because they are globally declared within the webpage, which means an "unique" prefix is needed to prevent collisions. The prefix is also able help to quickly indentify the collection of a component. Additionally, web components are required to contain a "-" dash within the tag name, so using the first section to namespace your components is a natural fit.
+The prefix has a major role when you are creating a collection of components intended to be used across different projects, like [@ionic/core](https://www.npmjs.com/package/@ionic/core). Web Components are not scoped because they are globally declared within the webpage, which means an "unique" prefix is needed to prevent collisions. The prefix is also able help to quickly identify the collection of a component. Additionally, web components are required to contain a "-" dash within the tag name, so using the first section to namespace your components is a natural fit.
 
 We do not recommend using "stencil" as prefix, since Stencil DOES NOT emit stencil components, but rather the output is simply standards compliant web components.
 
@@ -111,9 +111,9 @@ onClick() {
 }
 ```
 
-4. **Use private variables and methods as much possible:** They are useful to detect deadcode and enforce encapsulation. Note that this is a feature which TypeScript provides to help harden your code, but using `private`, `public` or `protected` does not make a difference in the actual JavaScript output.
+4. **Use private variables and methods as much possible:** They are useful to detect dead code and enforce encapsulation. Note that this is a feature which TypeScript provides to help harden your code, but using `private`, `public` or `protected` does not make a difference in the actual JavaScript output.
 
-5. **Code with Method/Prop/Event/Component decorators should have jsdocs:** This allows for documentation generation and for better user experience in an editor that has TypeScript intellisense
+5. **Code with Method/Prop/Event/Component decorators should have JSDocs:** This allows for documentation generation and for better user experience in an editor that has TypeScript intellisense
 
 ## Code organization
 
