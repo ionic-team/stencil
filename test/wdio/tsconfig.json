@@ -29,7 +29,6 @@
     }
   },
   "include": [
-    ".",
-    "../karma/test-app/components.d.ts"
+    "."
   ]
 }
