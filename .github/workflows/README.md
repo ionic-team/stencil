@@ -117,17 +117,6 @@ When a `git push` is made to a branch, Stencil's CI is designed to stop existing
 branch.
 A new CI run (of each workflow) will begin upon stopping the existing job(s) using the new `HEAD` of the branch.
 
-### BrowserStack (`browserstack.yml`)
-
-This workflow is used to run a series of integration tests using [BrowserStack](https://www.browserstack.com).
-The exact details of which browsers are targeted can be found in the [karma directory](../../test/karma) of the project.
-
-Running this workflow requires a username + access key in order to access BrowserStack.
-These credentials are stored as secrets in GitHub.
-
-This workflow differs from most in that it is designed to run on `pull_request_target` triggers.
-This allows community provided pull requests to run BrowserStack tests. 
-
 ## Repository Configuration
 
 Each of the workflows described in the [workflows section](#workflows) of this document must be configured in the

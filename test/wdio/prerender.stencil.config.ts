@@ -8,7 +8,7 @@ export const config: Config = {
     {
       type: 'www',
       dir: `www-prerender-script`,
-      baseUrl: 'https://karma.stenciljs.com/prerender',
+      baseUrl: 'https://wdio.stenciljs.com/prerender',
       serviceWorker: null,
       empty: false,
       prerenderConfig: './test-prerender/prerender.config.js',
