@@ -91,16 +91,10 @@ export const performAutomaticKeyInsertion = (transformCtx: ts.TransformationCont
    * @returns the result of handling the node
    */
   function jsxElementVisitor(node: ts.Node): ts.VisitResult<ts.Node> {
-    if (ts.isJsxExpression(node)) {
-      // we don't have the static analysis chops to dive into a JSX expression
-      // (arbitrary JS code delimited by curly braces in JSX) in order to
-      // determine whether it's safe to add keys to JSX nodes within it, so we
-      // bail here instead.
-      return node;
-    } else if (ts.isConditionalExpression(node)) {
-      // we're going to encounter the same problem here that we encounter with
-      // multiple return statements, so we don't try to transform the arms of
-      // the conditional.
+    if (ts.isCallExpression(node) || ts.isPropertyAccessExpression(node) || ts.isConditionalExpression(node)) {
+      // we're going to encounter the same problems here that we encounter with
+      // multiple return statements, so we just return the node and don't recur into
+      // its children
       return node;
     } else if (isJSXElWithAttrs(node)) {
       return addKeyAttr(node);
