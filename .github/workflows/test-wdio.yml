@@ -13,9 +13,12 @@ jobs:
     uses: ./.github/workflows/build.yml
 
   run_wdio:
-    name: Run WebdriverIO Component Tests
+    name: Run WebdriverIO Component Tests (${{ matrix.browser }})
     runs-on: ubuntu-22.04
     needs: [build_core]
+    strategy:
+      matrix:
+        browser: [CHROME, FIREFOX, EDGE]
 
     steps:
       - name: Checkout Code
@@ -39,7 +42,7 @@ jobs:
           filename: stencil-core-build.zip
 
       - name: Run WebdriverIO Component Tests
-        run: npm run test.wdio
+        run: BROWSER=${{ matrix.browser }} npm run test.wdio
 
       - name: Check Git Context
         uses: ./.github/workflows/actions/check-git-context

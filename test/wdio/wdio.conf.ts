@@ -7,6 +7,30 @@ import type { Options } from '@wdio/types';
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const isCI = Boolean(process.env.CI);
 
+// browser usage
+//
+// - based on the `BROWSER` environment variable
+// - if `BROWSER` is set to 'all' then we use all browsers
+// - if `BROWSER` is not set, then we default to just chrome
+// - if `BROWSER` is set to a browser name ('CHROME', 'FIREFOX', 'EDGE') then
+//   we run on that browser
+const BROWSER_CONFIGURATION = (() => {
+  switch (process.env.BROWSER) {
+    case 'ALL':
+      return 'ALL';
+    case 'CHROME':
+      return 'CHROME';
+    case 'FIREFOX':
+      return 'FIREFOX';
+    case 'EDGE':
+      return 'EDGE';
+    // we default to chrome in the case where the `BROWSER` env var ins't set
+    // to something (handy for local dev in particular)
+    default:
+      return 'CHROME';
+  }
+})();
+
 export const config: Options.Testrunner = {
   //
   // ====================
@@ -73,16 +97,9 @@ export const config: Options.Testrunner = {
   //
   maxInstances: 10,
   //
-  // If you have trouble getting all important capabilities together, check out the
-  // Sauce Labs platform configurator - a great tool to configure your capabilities:
-  // https://saucelabs.com/platform/platform-configurator
+  // we set this to an empty array here and programmatically add configuration below
   //
-  capabilities: [
-    {
-      // capabilities for local browser web tests
-      browserName: 'chrome', // or "firefox", "microsoftedge", "safari"
-    },
-  ],
+  capabilities: [],
 
   //
   // ===================
@@ -323,16 +340,20 @@ export const config: Options.Testrunner = {
   // }
 };
 
-/**
- * run with more browser in CI
- */
-if (isCI) {
-  (config.capabilities as WebdriverIO.Capabilities[]).push(
-    {
-      browserName: 'firefox',
-    },
-    {
-      browserName: 'edge',
-    },
-  );
+if (['CHROME', 'ALL'].includes(BROWSER_CONFIGURATION)) {
+  (config.capabilities as WebdriverIO.Capabilities[]).push({
+    browserName: 'chrome',
+  });
+}
+
+if (['FIREFOX', 'ALL'].includes(BROWSER_CONFIGURATION)) {
+  (config.capabilities as WebdriverIO.Capabilities[]).push({
+    browserName: 'firefox',
+  });
+}
+
+if (['EDGE', 'ALL'].includes(BROWSER_CONFIGURATION)) {
+  (config.capabilities as WebdriverIO.Capabilities[]).push({
+    browserName: 'edge',
+  });
 }
