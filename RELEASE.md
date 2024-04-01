@@ -58,7 +58,7 @@ manual release was performed.
    1. Set the version title to `[VERMOJI] v[VERSION] ([yyyy.mm.dd])`.
       For example, v4.2.0 has a vermoji of 🌲, and was released on 2023.09.05.
       As a result, it was [released with the title](https://github.com/ionic-team/stencil/releases/tag/v4.2.0) of 🌲 4.2.0 (2023-09-05).
-   1. Copy the raw contents of (CHANGELOG.md)[./CHANGELOG.md] into the body
+   1. Copy the raw contents of [CHANGELOG.md](./CHANGELOG.md) into the body
    1. Ensure that the release is set as the latest (so long as we're not published a pre-release)
    1. If anyone from the community contributed commit(s) to this release,
       append the following to the end of the GitHub release notes:
