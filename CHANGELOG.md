@@ -3,8 +3,8 @@
 
 ### Bug Fixes
 
-* **mock-doc:** provide a local name ([#5480](https://github.com/ionic-team/stencil/issues/5480)) ([2f67b35](https://github.com/ionic-team/stencil/commit/2f67b3526c7160a0c9ac71727c401a438d282474))
-* **mock-doc:** resolve type issue for localName ([#5595](https://github.com/ionic-team/stencil/issues/5595)) ([d91af87](https://github.com/ionic-team/stencil/commit/d91af87d4e309a2da3cb145165cf7fe3c79ac1e7))
+* **mock-doc:** provide a local name ([#5480](https://github.com/ionic-team/stencil/issues/5480)) ([2f67b35](https://github.com/ionic-team/stencil/commit/2f67b3526c7160a0c9ac71727c401a438d282474)), closes [#5342](https://github.com/ionic-team/stencil/issues/5342)
+* **mock-doc:** resolve type issue for localName ([#5595](https://github.com/ionic-team/stencil/issues/5595)) ([d91af87](https://github.com/ionic-team/stencil/commit/d91af87d4e309a2da3cb145165cf7fe3c79ac1e7)), closes [#5342](https://github.com/ionic-team/stencil/issues/5342)
 
 
 ### Features
