@@ -16,7 +16,7 @@ describe('svg attr', () => {
 
     await $('button').click();
     rect = app.querySelector('rect');
-    expect(rect.getAttribute('transform')).toBe('rotate(45 27 27)');
+    await expect(rect).toHaveAttribute('transform', 'rotate(45 27 27)');
 
     await $('button').click();
     rect = app.querySelector('rect');

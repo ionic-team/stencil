@@ -2154,6 +2154,7 @@ export interface E2EProcessEnv {
 
   __STENCIL_SCREENSHOT__?: 'true';
   __STENCIL_SCREENSHOT_BUILD__?: string;
+  __STENCIL_SCREENSHOT_TIMEOUT_MS__?: string;
 
   __STENCIL_E2E_TESTS__?: 'true';
   __STENCIL_E2E_DEVTOOLS__?: 'true';

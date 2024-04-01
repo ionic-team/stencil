@@ -511,7 +511,6 @@ describe('element', () => {
     expect(doc.createElement('input').localName).toBe('input');
     expect(doc.createElement('a').localName).toBe('a');
     expect(doc.createElement('datalist').localName).toBe('datalist');
-    expect(doc.localName).toBe(undefined);
     expect(doc.createElement('svg').localName).toBe('svg');
     expect((document.childNodes[1] as any).localName).toBe('html');
   });

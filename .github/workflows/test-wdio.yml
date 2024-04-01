@@ -21,11 +21,11 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
 
-      - name: Use Node Version from Volta (Karma)
+      - name: Use Node Version from Volta
         uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
         with:
           # pull the version to use from the volta key in package.json
-          node-version-file: './test/karma/package.json'
+          node-version-file: './test/wdio/package.json'
           cache: 'npm'
 
       - name: Install dependencies

@@ -1,3 +1,20 @@
+# 🚡 [4.14.0](https://github.com/ionic-team/stencil/compare/v4.13.0...v4.14.0) (2024-04-01)
+
+
+### Bug Fixes
+
+* **mock-doc:** provide a local name ([#5480](https://github.com/ionic-team/stencil/issues/5480)) ([2f67b35](https://github.com/ionic-team/stencil/commit/2f67b3526c7160a0c9ac71727c401a438d282474)), closes [#5342](https://github.com/ionic-team/stencil/issues/5342)
+* **mock-doc:** resolve type issue for localName ([#5595](https://github.com/ionic-team/stencil/issues/5595)) ([d91af87](https://github.com/ionic-team/stencil/commit/d91af87d4e309a2da3cb145165cf7fe3c79ac1e7)), closes [#5342](https://github.com/ionic-team/stencil/issues/5342)
+
+
+### Features
+
+* **testing:** allow to set screenshot timeout option in Jest v28+ ([#5537](https://github.com/ionic-team/stencil/issues/5537)) ([6df12b2](https://github.com/ionic-team/stencil/commit/6df12b2a445ffe431f8412758f298a6e1c8fe3ac))
+* **testing:** support deep piercing with Puppeteer ([#5481](https://github.com/ionic-team/stencil/issues/5481)) ([13d5d41](https://github.com/ionic-team/stencil/commit/13d5d4188ac0d3d8d002ce93c4ec7abdde5c8086))
+* **typescript:** Update dependency typescript to v5.4.3 ([#5588](https://github.com/ionic-team/stencil/issues/5588)) ([9d489e4](https://github.com/ionic-team/stencil/commit/9d489e42a60391d2eb88cb0f7827a9368de18140))
+
+
+
 # 🚞 [4.13.0](https://github.com/ionic-team/stencil/compare/v4.12.6...v4.13.0) (2024-03-18)
 
 

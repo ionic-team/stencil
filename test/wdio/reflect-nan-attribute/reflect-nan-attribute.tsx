@@ -9,8 +9,7 @@ export class ReflectNanAttribute {
   // for this test, it's necessary that 'reflect' is true, the class member is not camel-cased, and is of type 'number'
   @Prop({ reflect: true }) val: number;
 
-  // counter to proxy the number of times a render has occurred, since we don't have access to those dev tools during
-  // karma tests
+  // counter to proxy the number of times a render has occurred
   renderCount = 0;
 
   render() {

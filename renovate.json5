@@ -100,13 +100,6 @@
       allowedVersions: '<=29'
     },
     {
-      // We intentionally run the karma tests against the oldest LTS of Node we support.
-      // Prevent renovate from trying to bump node
-      matchFileNames: ['test/karma/package.json'],
-      matchDepNames: ['node'],
-      allowedVersions: '<=16'
-    },
-    {
       // We intentionally run the WebdriverIO tests against the oldest LTS of Node we support.
       // Prevent renovate from trying to bump node
       matchFileNames: ['test/wdio/package.json'],
@@ -114,26 +107,19 @@
       allowedVersions: '<=16'
     },
     {
-      // We intentionally run the karma tests against the oldest LTS of Node we support.
+      // We intentionally run the WebdriverIO tests against the oldest LTS of Node we support.
       // Prevent renovate from trying to bump node
-      matchFileNames: ['test/karma/package.json'],
+      matchFileNames: ['test/wdio/package.json'],
       matchPackageNames: ['@types/node'],
       allowedVersions: '<=16'
     },
     {
-      // We intentionally run the karma tests against the oldest LTS of Node we support.
+      // We intentionally run the WebdriverIO tests against the oldest LTS of Node we support.
       // Prevent renovate from trying to bump npm and keep it in sync with a version that's supported by the version of
       // Node we run against.
-      matchFileNames: ['test/karma/package.json'],
+      matchFileNames: ['test/wdio/package.json'],
       matchDepNames: ['npm'],
       allowedVersions: '<=8'
-    },
-    {
-      // We intentionally run the karma tests against TypeScript v5.2 as an attempt to update has failed
-      // due to incompatibilities with `karma-typescript`. Prevent renovate from trying to bump TypeScript.
-      matchFileNames: ['test/karma/package.json'],
-      matchDepNames: ['typescript'],
-      allowedVersions: '<5.3'
     },
     {
       matchPackageNames: ['rollup'],
