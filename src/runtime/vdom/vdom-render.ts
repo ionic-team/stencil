@@ -1061,12 +1061,18 @@ render() {
             (insertBeforeNode && insertBeforeNode.nodeType === NODE_TYPE.ElementNode)
           ) {
             let orgLocationNode = nodeToRelocate['s-ol']?.previousSibling as d.RenderNode | null;
-
             while (orgLocationNode) {
               let refNode = orgLocationNode['s-nr'] ?? null;
 
               if (refNode && refNode['s-sn'] === nodeToRelocate['s-sn'] && parentNodeRef === refNode.parentNode) {
-                refNode = refNode.nextSibling as any;
+                refNode = refNode.nextSibling as d.RenderNode | null;
+
+                // If the refNode is the same node to be relocated or another element's slot reference, keep searching to find the
+                // correct relocation target
+                while (refNode === nodeToRelocate || refNode?.['s-sr']) {
+                  refNode = refNode?.nextSibling as d.RenderNode | null;
+                }
+
                 if (!refNode || !refNode['s-nr']) {
                   insertBeforeNode = refNode;
                   break;
