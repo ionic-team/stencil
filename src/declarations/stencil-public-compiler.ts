@@ -1985,6 +1985,12 @@ export interface TestingConfig extends JestConfig {
   screenshotConnector?: string;
 
   /**
+   * Timeout for the pixelmatch worker to resolve (in ms).
+   * @default 2500
+   */
+  screenshotTimeout?: number | null;
+
+  /**
    * Amount of time in milliseconds to wait before a screenshot is taken.
    */
   waitBeforeScreenshot?: number;

@@ -9,8 +9,7 @@ export class ReflectNanAttributeHyphen {
   // for this test, it's necessary that 'reflect' is true, the class member is camel-cased, and is of type 'number'
   @Prop({ reflect: true }) valNum: number;
 
-  // counter to proxy the number of times a render has occurred, since we don't have access to those dev tools during
-  // karma tests
+  // counter to proxy the number of times a render has occurred
   renderCount = 0;
 
   render() {

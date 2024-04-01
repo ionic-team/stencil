@@ -1,4 +1,3 @@
-import { sass } from '@stencil/sass';
 import type { Config } from '../../internal/index.js';
 
 /**
