@@ -6,7 +6,7 @@ import { Component, Fragment, h, State } from '@stencil/core';
   scoped: true,
 })
 export class MyComponent {
-  @State() shortName: string;
+  @State() shortName: null | string;
 
   render() {
     return (
