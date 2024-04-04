@@ -1,4 +1,4 @@
-import { isString, parsePackageJson } from '@utils';
+import { isString, normalizePath, parsePackageJson } from '@utils';
 import { dirname } from 'path';
 
 import type * as d from '../../../declarations';
@@ -38,7 +38,9 @@ export const addExternalImport = (
     pkgJsonFilePath = realPkgJsonFilePath.path;
   }
 
-  if (pkgJsonFilePath === config.packageJsonFilePath) {
+  // realpathSync may return a path that uses Windows path separators ('\').
+  // normalize it for the purposes of this comparison
+  if (normalizePath(pkgJsonFilePath) === config.packageJsonFilePath) {
     // same package silly!
     return;
   }
