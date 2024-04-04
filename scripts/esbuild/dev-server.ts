@@ -70,9 +70,17 @@ export async function buildDevServer(opts: BuildOptions) {
     bundleExternal(opts, opts.output.devServerDir, cachedDir, 'open-in-editor-api.js'),
   ]);
 
-  const devServerAliases = getEsbuildAliases();
-  const external = [...builtinModules, './ws.js', './open-in-editor-api'];
+  const external = [
+    ...builtinModules,
+    // ws.js is externally bundled
+    './ws.js',
+    // open-in-editor-api is externally bundled
+    './open-in-editor-api',
+    // prevent graceful-fs from being inlined in the bundle, saving us ~20kb
+    'graceful-fs',
+  ];
 
+  const devServerAliases = getEsbuildAliases();
   const devServerIndexEsbuildOptions = {
     ...getBaseEsbuildOptions(),
     alias: devServerAliases,
