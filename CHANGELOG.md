@@ -1,3 +1,14 @@
+## 🏋 [4.14.1](https://github.com/ionic-team/stencil/compare/v4.14.0...v4.14.1) (2024-04-04)
+
+
+### Bug Fixes
+
+* **compiler:** don't mistake aliased paths for collections imports ([#5620](https://github.com/ionic-team/stencil/issues/5620)) ([af22bb8](https://github.com/ionic-team/stencil/commit/af22bb858d64b60a97ce93c86f5585ef36b31c3f)), closes [#2319](https://github.com/ionic-team/stencil/issues/2319)
+* **runtime:** nested multiple default slot relocation ([#5403](https://github.com/ionic-team/stencil/issues/5403)) ([363c07b](https://github.com/ionic-team/stencil/commit/363c07b4723941954dc748189a744eec01d5b74c))
+* **runtime:** prevent ref callbacks from being called too early ([#5614](https://github.com/ionic-team/stencil/issues/5614)) ([81fa375](https://github.com/ionic-team/stencil/commit/81fa37587eb853d42bc7f92102318a3446cdea7b))
+
+
+
 # 🚡 [4.14.0](https://github.com/ionic-team/stencil/compare/v4.13.0...v4.14.0) (2024-04-01)
 
 
