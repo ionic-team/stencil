@@ -2,9 +2,9 @@ import type { BuildOptions as ESBuildOptions } from 'esbuild';
 import fs from 'fs-extra';
 import { join } from 'path';
 
+import { bundleMockDocDts } from '../bundles/mock-doc';
 import { bundleParse5 } from '../bundles/plugins/parse5-plugin';
 import { getBanner } from '../utils/banner';
-import { bundleDts } from '../utils/bundle-dts';
 import { BuildOptions, createReplaceData } from '../utils/options';
 import { writePkgJson } from '../utils/write-pkg-json';
 import { getBaseEsbuildOptions, getEsbuildAliases, runBuilds } from './util';
@@ -23,8 +23,7 @@ export async function buildMockDoc(opts: BuildOptions) {
   // clear out rollup stuff and ensure directory exists
   await fs.emptyDir(outputDir);
 
-  // bundle d.ts
-  await bundleMockDocDts(opts, inputDir, outputDir);
+  await bundleMockDocDts(inputDir, outputDir);
 
   writePkgJson(opts, outputDir, {
     name: '@stencil/core/mock-doc',
@@ -70,22 +69,4 @@ export async function buildMockDoc(opts: BuildOptions) {
   };
 
   return runBuilds([esmOptions, cjsOptions], opts);
-}
-
-async function bundleMockDocDts(opts: BuildOptions, inputDir: string, outputDir: string) {
-  const bundled = await bundleDts(
-    opts,
-    join(inputDir, 'index.ts'),
-    {
-      // we want to suppress the `dts-bundle-generator` banner here because we do
-      // our own later on
-      noBanner: true,
-      // we also don't want the types which are inlined into our bundled file to
-      // be re-exported, which will change the 'surface' of the module
-      exportReferencedTypes: false,
-    },
-    false,
-  );
-
-  await fs.writeFile(join(outputDir, 'index.d.ts'), bundled);
 }
