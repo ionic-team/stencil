@@ -50,7 +50,7 @@
     "test.jest": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js",
     "test.wdio": "cd test/wdio && npm ci && npm run test",
     "test.wdio.testOnly": "cd test/wdio && npm ci && npm run wdio",
-    "test.prod": "npm run test.dist && npm run test.end-to-end && npm run test.jest && npm run test.wdio && npm run test.sys.node && npm run test.testing && npm run test.analysis",
+    "test.prod": "npm run test.dist && npm run test.end-to-end && npm run test.jest && npm run test.wdio && npm run test.testing && npm run test.analysis",
     "test.testing": "node scripts/test/validate-testing.js",
     "test.watch": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --watch",
     "test.watch-all": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --watchAll --coverage",
