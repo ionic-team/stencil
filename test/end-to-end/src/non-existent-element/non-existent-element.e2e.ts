@@ -22,6 +22,6 @@ describe('Querying non-existent element(s)', () => {
     });
 
     const elm = await page.findAll('empty-cmp >>> .non-existent');
-    expect(elm).toBe([]);
+    expect(elm).toEqual([]);
   });
 });
