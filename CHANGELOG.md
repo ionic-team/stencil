@@ -1,3 +1,13 @@
+# 🎖 [4.15.0](https://github.com/ionic-team/stencil/compare/v4.14.1...v4.15.0) (2024-04-08)
+
+
+### Features
+
+* **compiler:** perform automatic key insertion in more situations ([#5594](https://github.com/ionic-team/stencil/issues/5594)) ([8ee071b](https://github.com/ionic-team/stencil/commit/8ee071bf3aae4b2240b50f7af433035c8bf8aa49))
+* **typescript:** Update dependency typescript to v5.4.4 ([#5636](https://github.com/ionic-team/stencil/issues/5636)) ([a463871](https://github.com/ionic-team/stencil/commit/a46387123082d1af9fc17b5909530597dc5b5c68))
+
+
+
 ## 🏋 [4.14.1](https://github.com/ionic-team/stencil/compare/v4.14.0...v4.14.1) (2024-04-04)
 
 
