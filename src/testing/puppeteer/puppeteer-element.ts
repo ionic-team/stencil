@@ -549,6 +549,11 @@ export async function find(page: pd.E2EPageInternal, rootHandle: puppeteer.Eleme
 
   if (typeof selector === 'string' && selector.includes('>>>')) {
     const handle = await page.$(selector);
+
+    if (!handle) {
+      return null;
+    }
+
     const elm = new E2EElement(page, handle);
     await elm.e2eSync();
     return elm;
