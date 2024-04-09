@@ -221,9 +221,10 @@ const setCLIArg = (flags: ConfigFlags, rawArg: string, normalizedArg: string, va
 
   // We're setting a boolean!
   if (readOnlyArrayHasStringMember(BOOLEAN_CLI_FLAGS, normalizedArg)) {
+    const parsed = value === 'true';
     flags[normalizedArg] =
       typeof value === 'string'
-        ? Boolean(value)
+        ? parsed
         : // no value was supplied, default to true
           true;
     flags.knownArgs.push(rawArg);

@@ -232,7 +232,7 @@ function setupTestingConfig(validatedConfig: ValidatedConfig): ValidatedConfig {
     }
   });
 
-  if (validatedConfig.flags.args.includes('--watchAll')) {
+  if (validatedConfig.flags.watchAll === true) {
     validatedConfig.watch = true;
   }
 
