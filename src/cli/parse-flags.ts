@@ -173,7 +173,7 @@ const parseCLITerm = (flags: ConfigFlags, args: string[]) => {
 
 /**
  * Normalize a 'negative' flag name, just to do a little pre-processing before
- * we pass it to `setCLIArg`.
+ * we pass it to {@link setCLIArg}.
  *
  * @param flagName the flag name to normalize
  * @returns a normalized flag name
@@ -221,12 +221,19 @@ const setCLIArg = (flags: ConfigFlags, rawArg: string, normalizedArg: string, va
 
   // We're setting a boolean!
   if (readOnlyArrayHasStringMember(BOOLEAN_CLI_FLAGS, normalizedArg)) {
-    flags[normalizedArg] =
+    const parsed =
       typeof value === 'string'
-        ? Boolean(value)
+        ? // check if the value is `'true'`
+          value === 'true'
         : // no value was supplied, default to true
           true;
+
+    flags[normalizedArg] = parsed;
     flags.knownArgs.push(rawArg);
+
+    if (typeof value === 'string' && value !== '') {
+      flags.knownArgs.push(value);
+    }
   }
 
   // We're setting a string!
