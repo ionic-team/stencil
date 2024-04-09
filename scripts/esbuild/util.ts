@@ -109,12 +109,23 @@ export function runBuilds(builds: ESBuildOptions[], opts: BuildOptions): Promise
  * @returns a base set of options
  */
 export function getBaseEsbuildOptions(): ESBuildOptions {
-  return {
+  const options: ESBuildOptions = {
     bundle: true,
     legalComments: 'inline',
     logLevel: 'info',
     target: getEsbuildTargets(),
   };
+
+  // if the `build` sub-command is called with the `DEBUG` env var, like
+  //
+  // DEBUG=true npm run build
+  //
+  // then we should produce sourcemaps.
+  if (process.env.DEBUG) {
+    options.sourcemap = 'linked';
+  }
+
+  return options;
 }
 
 /**

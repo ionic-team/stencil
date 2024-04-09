@@ -82,29 +82,18 @@ export async function buildCompiler(opts: BuildOptions) {
     banner: { js: getBanner(opts, 'Stencil Compiler', true) },
     entryPoints: [join(srcDir, 'index.ts')],
     platform: 'node',
-    sourcemap: 'linked',
     external,
     format: 'cjs',
     alias,
     plugins: [replace(replaceData)],
-  };
-
-  const compilerBuild = {
-    ...compilerEsbuildOptions,
     outfile: join(opts.output.compilerDir, compilerFileName),
-  };
-
-  const minifiedCompilerBuild = {
-    ...compilerEsbuildOptions,
-    outfile: join(opts.output.compilerDir, 'stencil.min.js'),
-    minify: true,
   };
 
   // copy typescript default lib dts files
   const tsLibNames = await getTypeScriptDefaultLibNames(opts);
   await Promise.all(tsLibNames.map((f) => fs.copy(join(opts.typescriptLibDir, f), join(opts.output.compilerDir, f))));
 
-  return runBuilds([compilerBuild, minifiedCompilerBuild], opts);
+  return runBuilds([compilerEsbuildOptions], opts);
 }
 
 /**

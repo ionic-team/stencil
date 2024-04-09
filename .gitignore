@@ -40,6 +40,7 @@ dist/
 /screenshot/index.js.map
 /screenshot/package.json
 /screenshot/pixel-match.js
+/screenshot/pixel-match.js.map
 /screenshot/*.d.ts
 
 test/**/www/*
