@@ -131,6 +131,17 @@ stuck, your debugger may not have switched to a worker process that has halted o
 avoid this altogether by setting `--max-workers=1` when you launch Stencil (with the possibility of not being able to
 reproduce timing issues between workers as a side effect).
 
+> [!NOTE]
+> If you want to have access to sourcemaps when debugging the compiler locally
+> you can run the `build` script in `package.json` with the `DEBUG` environment
+> variable set to `true` like so:
+>
+> ```sh
+> DEBUG=true npm run build
+> ```
+>
+> this will write a `.js.map` file to disk next to each JavaScript file.
+
 #### Debugging the Compiler in VSCode
 
 Two launch configurations for debugging the compiler can be found in the `.vscode/launch.json` configuration found in

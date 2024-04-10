@@ -149,7 +149,6 @@ export async function buildDevServer(opts: BuildOptions) {
     outfile: join(opts.output.devServerDir, 'client', 'index.js'),
     format: 'esm',
     platform: 'node',
-    sourcemap: false,
     plugins: [appErrorCssPlugin(opts), replace(createReplaceData(opts))],
     banner: {
       js: getBanner(opts, `Stencil Dev Server Client`, true),
