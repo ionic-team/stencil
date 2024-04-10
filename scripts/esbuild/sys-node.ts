@@ -6,7 +6,7 @@ import { sysNodeExternalBundles } from '../bundles/sys-node';
 import { getBanner } from '../utils/banner';
 import type { BuildOptions } from '../utils/options';
 import { writePkgJson } from '../utils/write-pkg-json';
-import { getBaseEsbuildOptions, getEsbuildAliases, getEsbuildExternalModules, runBuilds } from './util';
+import { externalAlias, getBaseEsbuildOptions, getEsbuildAliases, getEsbuildExternalModules, runBuilds } from './util';
 
 export async function buildSysNode(opts: BuildOptions) {
   const inputDir = join(opts.buildDir, 'sys', 'node');
@@ -52,6 +52,7 @@ export async function buildSysNode(opts: BuildOptions) {
     minify: true,
     alias: sysNodeAliases,
     banner: { js: getBanner(opts, `Stencil Node System`, true) },
+    plugins: [externalAlias('graceful-fs', './graceful-fs.js')],
   };
 
   // sys/node/worker.js bundle
