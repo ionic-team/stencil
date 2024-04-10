@@ -377,7 +377,10 @@ export const getNameText = (name: string, tags: d.JsonDocsTag[]) => {
  * @returns the user generated content that occurs before {@link AUTO_GENERATE_COMMENT}. If no user generated content
  * exists, or if there was an issue reading the file, return `undefined`
  */
-const getUserReadmeContent = async (compilerCtx: d.CompilerCtx, readmePath: string): Promise<string | undefined> => {
+export const getUserReadmeContent = async (
+  compilerCtx: d.CompilerCtx,
+  readmePath: string,
+): Promise<string | undefined> => {
   try {
     const existingContent = await compilerCtx.fs.readFile(readmePath);
     // subtract one to get everything up to, but not including the auto generated comment
