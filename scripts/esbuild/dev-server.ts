@@ -11,7 +11,7 @@ import { bundleExternal, sysNodeBundleCacheDir } from '../bundles/sys-node';
 import { getBanner } from '../utils/banner';
 import { type BuildOptions, createReplaceData } from '../utils/options';
 import { writePkgJson } from '../utils/write-pkg-json';
-import { getBaseEsbuildOptions, getEsbuildAliases, getFirstOutputFile, runBuilds } from './util';
+import { externalAlias, getBaseEsbuildOptions, getEsbuildAliases, getFirstOutputFile, runBuilds } from './util';
 
 const CONNECTOR_NAME = 'connector.html';
 
@@ -76,8 +76,6 @@ export async function buildDevServer(opts: BuildOptions) {
     './ws.js',
     // open-in-editor-api is externally bundled
     './open-in-editor-api',
-    // prevent graceful-fs from being inlined in the bundle, saving us ~20kb
-    'graceful-fs',
   ];
 
   const devServerAliases = getEsbuildAliases();
@@ -108,7 +106,12 @@ export async function buildDevServer(opts: BuildOptions) {
     format: 'cjs',
     platform: 'node',
     write: false,
-    plugins: [esm2CJSPlugin(), contentTypesPlugin(opts), replace(createReplaceData(opts))],
+    plugins: [
+      esm2CJSPlugin(),
+      contentTypesPlugin(opts),
+      replace(createReplaceData(opts)),
+      externalAlias('graceful-fs', '../sys/node/graceful-fs.js'),
+    ],
     banner: {
       js: getBanner(opts, `Stencil Dev Server Process`, true),
     },
