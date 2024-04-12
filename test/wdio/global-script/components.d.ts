@@ -7,6 +7,7 @@
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
     interface GlobalScriptTestCmp {
+        "renderDistCustomElementComponent": boolean;
     }
 }
 declare global {
@@ -22,6 +23,7 @@ declare global {
 }
 declare namespace LocalJSX {
     interface GlobalScriptTestCmp {
+        "renderDistCustomElementComponent"?: boolean;
     }
     interface IntrinsicElements {
         "global-script-test-cmp": GlobalScriptTestCmp;

@@ -12,6 +12,8 @@ export const config: Config = {
     {
       type: 'dist-custom-elements',
       dir: 'test-components',
+      customElementsExportBehavior: 'bundle',
+      isPrimaryPackageOutputTarget: true,
     },
   ],
   plugins: [sass()],

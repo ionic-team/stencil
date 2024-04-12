@@ -17,7 +17,9 @@ export class RefAttrOrder {
     return (
       <div
         ref={(el) => {
-          this.index = el.tabIndex;
+          if (el) {
+            this.index = el.tabIndex;
+          }
         }}
         tabIndex={0}
       >
