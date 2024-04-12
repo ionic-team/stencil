@@ -1,7 +1,6 @@
 import { generatePreamble, isOutputTargetDistLazyLoader, join, relative, relativeImport } from '@utils';
 
 import type * as d from '../../declarations';
-import { getClientPolyfill } from '../app-core/app-polyfills';
 
 export const outputLazyLoader = async (config: d.ValidatedConfig, compilerCtx: d.CompilerCtx) => {
   const outputTargets = config.outputTargets.filter(isOutputTargetDistLazyLoader);
@@ -26,8 +25,6 @@ const generateLoader = async (
     return;
   }
 
-  const es5HtmlElement = await getClientPolyfill(config, compilerCtx, 'es5-html-element.js');
-
   const packageJsonContent = JSON.stringify(
     {
       name: config.fsNamespace + '-loader',
@@ -46,16 +43,11 @@ const generateLoader = async (
 
   const es5EntryPoint = join(es5Dir, 'loader.js');
   const es2017EntryPoint = join(es2017Dir, 'loader.js');
-  const polyfillsEntryPoint = join(es2017Dir, 'polyfills/index.js');
   const cjsEntryPoint = join(cjsDir, 'loader.cjs.js');
-  const polyfillsExport = `export * from '${relative(loaderPath, polyfillsEntryPoint)}';`;
   const indexContent = `${generatePreamble(config)}
-${es5HtmlElement}
-${polyfillsExport}
 export * from '${relative(loaderPath, es5EntryPoint)}';
 `;
   const indexES2017Content = `${generatePreamble(config)}
-${polyfillsExport}
 export * from '${relative(loaderPath, es2017EntryPoint)}';
 `;
   const indexCjsContent = `${generatePreamble(config)}

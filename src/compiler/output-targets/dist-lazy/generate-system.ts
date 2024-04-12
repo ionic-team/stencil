@@ -2,7 +2,6 @@ import { generatePreamble, join, relativeImport } from '@utils';
 import type { OutputOptions, RollupBuild } from 'rollup';
 
 import type * as d from '../../../declarations';
-import { getAppBrowserCorePolyfills } from '../../app-core/app-polyfills';
 import { generateRollupOutput } from '../../app-core/bundle-app-core';
 import { generateLazyModules } from './generate-lazy-module';
 
@@ -69,22 +68,14 @@ const writeSystemLoader = async (
   if (outputTarget.systemLoaderFile) {
     const entryPointPath = join(outputTarget.systemDir, loaderFilename);
     const relativePath = relativeImport(outputTarget.systemLoaderFile, entryPointPath);
-    const loaderContent = await getSystemLoader(config, compilerCtx, relativePath, !!outputTarget.polyfills);
+    const loaderContent = await getSystemLoader(config, relativePath);
     await compilerCtx.fs.writeFile(outputTarget.systemLoaderFile, loaderContent, {
       outputTargetType: outputTarget.type,
     });
   }
 };
 
-const getSystemLoader = async (
-  config: d.ValidatedConfig,
-  compilerCtx: d.CompilerCtx,
-  corePath: string,
-  includePolyfills: boolean,
-): Promise<string> => {
-  const polyfills = includePolyfills
-    ? await getAppBrowserCorePolyfills(config, compilerCtx)
-    : '/* polyfills excluded */';
+const getSystemLoader = async (config: d.ValidatedConfig, corePath: string): Promise<string> => {
   return `
 'use strict';
 (function () {
@@ -92,8 +83,6 @@ const getSystemLoader = async (
 
   // Safari 10 support type="module" but still download and executes the nomodule script
   if (!currentScript || !currentScript.hasAttribute('nomodule') || !('onbeforeload' in currentScript)) {
-
-    ${polyfills}
 
     // Figure out currentScript (for IE11, since it does not support currentScript)
     var regex = /\\/${config.fsNamespace}(\\.esm)?\\.js($|\\?|#)/;
