@@ -63,11 +63,6 @@ export async function getInternalClientBundle(opts: BuildOptions): Promise<ESBui
 
   const patchBrowserAliases = getEsbuildAliases();
 
-  const polyfills = await fs.readdir(join(opts.srcDir, 'client', 'polyfills'));
-  for (const polyFillFile of polyfills) {
-    patchBrowserAliases[join('./polyfills', polyFillFile)] = join(opts.srcDir, 'client', 'polyfills');
-  }
-
   const patchBrowserExternal = [
     ...getEsbuildExternalModules(opts, opts.output.internalDir),
     '@stencil/core',

@@ -81,16 +81,6 @@ export async function internalClient(opts: BuildOptions) {
           }
         },
       },
-      {
-        name: 'internalClientRuntimePolyfills',
-        resolveId(importee) {
-          if (importee.startsWith('./polyfills')) {
-            const fileName = basename(importee);
-            return join(opts.srcDir, 'client', 'polyfills', fileName);
-          }
-          return null;
-        },
-      },
 
       aliasPlugin(opts),
       replacePlugin(opts),
