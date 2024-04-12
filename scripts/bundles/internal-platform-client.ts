@@ -13,12 +13,8 @@ import { loadModuleReplacePlugin, replacePlugin } from './plugins/replace-plugin
 export async function internalClient(opts: BuildOptions) {
   const inputClientDir = join(opts.buildDir, 'client');
   const outputInternalClientDir = join(opts.output.internalDir, 'client');
-  const outputInternalClientPolyfillsDir = join(outputInternalClientDir, 'polyfills');
 
   await fs.emptyDir(outputInternalClientDir);
-  await fs.emptyDir(outputInternalClientPolyfillsDir);
-
-  await copyPolyfills(opts, outputInternalClientPolyfillsDir);
 
   // write @stencil/core/internal/client/package.json
   writePkgJson(opts, outputInternalClientDir, {
@@ -103,18 +99,4 @@ export async function internalClient(opts: BuildOptions) {
   };
 
   return [internalClientBundle, internalClientPatchBrowserBundle];
-}
-
-async function copyPolyfills(opts: BuildOptions, outputInternalClientPolyfillsDir: string) {
-  const srcPolyfillsDir = join(opts.srcDir, 'client', 'polyfills');
-
-  const srcPolyfillFiles = glob.sync('*.js', { cwd: srcPolyfillsDir });
-
-  await Promise.all(
-    srcPolyfillFiles.map(async (fileName) => {
-      const src = join(srcPolyfillsDir, fileName);
-      const dest = join(outputInternalClientPolyfillsDir, fileName);
-      await fs.copyFile(src, dest);
-    }),
-  );
 }

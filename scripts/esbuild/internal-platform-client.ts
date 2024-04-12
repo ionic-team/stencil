@@ -20,12 +20,7 @@ import { externalAlias, getBaseEsbuildOptions, getEsbuildAliases, getEsbuildExte
 export async function getInternalClientBundle(opts: BuildOptions): Promise<ESBuildOptions[]> {
   const inputClientDir = join(opts.srcDir, 'client');
   const outputInternalClientDir = join(opts.output.internalDir, 'client');
-  const outputInternalClientPolyfillsDir = join(outputInternalClientDir, 'polyfills');
-
   await fs.emptyDir(outputInternalClientDir);
-  await fs.emptyDir(outputInternalClientPolyfillsDir);
-
-  await copyPolyfills(opts, outputInternalClientPolyfillsDir);
 
   // write @stencil/core/internal/client/package.json
   writePkgJson(opts, outputInternalClientDir, {
@@ -123,18 +118,4 @@ export function findAndReplaceLoadModule(): Plugin {
       });
     },
   };
-}
-
-async function copyPolyfills(opts: BuildOptions, outputInternalClientPolyfillsDir: string) {
-  const srcPolyfillsDir = join(opts.srcDir, 'client', 'polyfills');
-
-  const srcPolyfillFiles = glob.sync('*.js', { cwd: srcPolyfillsDir });
-
-  await Promise.all(
-    srcPolyfillFiles.map(async (fileName) => {
-      const src = join(srcPolyfillsDir, fileName);
-      const dest = join(outputInternalClientPolyfillsDir, fileName);
-      await fs.copyFile(src, dest);
-    }),
-  );
 }
