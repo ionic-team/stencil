@@ -1,3 +1,19 @@
+## 🏙 [4.15.1-0](https://github.com/ionic-team/stencil/compare/v4.15.0...v4.15.1-0) (2024-04-15)
+
+
+### Bug Fixes
+
+* **cli:** fix a bug in CLI argument parsing ([#5646](https://github.com/ionic-team/stencil/issues/5646)) ([1fdea63](https://github.com/ionic-team/stencil/commit/1fdea63acfa5a9c1081111d7d79e826a127ef3eb))
+* **testing:** prevent `find` from throwing error when query has no match ([#5641](https://github.com/ionic-team/stencil/issues/5641)) ([b3886aa](https://github.com/ionic-team/stencil/commit/b3886aa928c1025e636aee1466f26f15fc4dd3eb)), closes [#5639](https://github.com/ionic-team/stencil/issues/5639)
+
+
+### Features
+
+* **dev-server:** dark mode support ([#5642](https://github.com/ionic-team/stencil/issues/5642)) ([89a5e40](https://github.com/ionic-team/stencil/commit/89a5e40adfcd7dbad54928cad6525239778ab9cd))
+* **typescript:** Update dependency typescript to v5.4.5 ([#5663](https://github.com/ionic-team/stencil/issues/5663)) ([2596536](https://github.com/ionic-team/stencil/commit/25965364c3f513b845e44f1db029fab14fdfb68f))
+
+
+
 # 🎖 [4.15.0](https://github.com/ionic-team/stencil/compare/v4.14.1...v4.15.0) (2024-04-08)
 
 
