@@ -49,6 +49,10 @@ export async function buildTesting(opts: BuildOptions) {
     '../compiler/stencil.js',
   ];
 
+  const aliases = getEsbuildAliases();
+  // we want to point at the cjs module here because we're building cjs
+  aliases['@stencil/core/cli'] = './cli/index.cjs';
+
   const testingEsbuildOptions: ESBuildOptions = {
     ...getBaseEsbuildOptions(),
     entryPoints: [join(sourceDir, 'index.ts')],
@@ -63,7 +67,7 @@ export async function buildTesting(opts: BuildOptions) {
      * in `lazyRequirePlugin` and modify the imports
      */
     write: false,
-    alias: getEsbuildAliases(),
+    alias: aliases,
     banner: { js: getBanner(opts, `Stencil Testing`, true) },
     plugins: [
       externalAlias('@app-data', '@stencil/core/internal/app-data'),
