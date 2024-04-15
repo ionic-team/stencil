@@ -131,6 +131,30 @@ export const unique = <T, K>(array: T[], predicate: (item: T) => K = (i) => i as
 };
 
 /**
+ * Merge elements of an array into an existing array, using a predicate to
+ * determine uniqueness and only adding elements when they are not present in
+ * the first array.
+ *
+ * **Note**: this mutates the target array! This is intentional to avoid
+ * unnecessary array allocation, but be sure that it's what you want!
+ *
+ * @param target the target array, to which new unique items should be added
+ * @param newItems a list of new items, some (or all!) of which may be added
+ * @param mergeWith a predicate function which reduces the items in `target`
+ * and `newItems` to a value which can be equated with `===` for the purposes
+ * of determining uniqueness
+ */
+export function mergeIntoWith<T1, T2>(target: T1[], newItems: T1[], mergeWith: (item: T1) => T2) {
+  for (const item of newItems) {
+    const maybeItem = target.find((existingItem) => mergeWith(existingItem) === mergeWith(item));
+    if (!maybeItem) {
+      // this is a new item that isn't present in `target` yet
+      target.push(item);
+    }
+  }
+}
+
+/**
  * A utility for building an object from an iterable very similar to
  * `Object.fromEntries`
  *

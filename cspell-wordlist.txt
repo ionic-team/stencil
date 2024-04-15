@@ -112,6 +112,7 @@ stenciljs
 stnl
 stringification
 stringified
+styleurls
 subdir
 templating
 timespan
