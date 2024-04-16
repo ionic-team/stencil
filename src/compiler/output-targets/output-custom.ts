@@ -4,14 +4,15 @@ import type * as d from '../../declarations';
 import { generateDocData } from '../docs/generate-doc-data';
 
 export const outputCustom = async (config: d.ValidatedConfig, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
-  const task = config.devMode ? 'run' : 'build';
-  const docsData = await generateDocData(config, compilerCtx, buildCtx);
+  const task = config.watch ? 'always' : 'onBuildOnly';
   const customOutputTargets = config.outputTargets
     .filter(isOutputTargetCustom)
-    .filter((o) => (o.task === undefined ? true : o.task === task));
+    .filter((o) => (o.taskShouldRun === undefined ? true : o.taskShouldRun === task));
+
   if (customOutputTargets.length === 0) {
     return;
   }
+  const docsData = await generateDocData(config, compilerCtx, buildCtx);
 
   await Promise.all(
     customOutputTargets.map(async (o) => {
