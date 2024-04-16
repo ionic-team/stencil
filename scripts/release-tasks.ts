@@ -1,7 +1,7 @@
 import color from 'ansi-colors';
 import Listr, { ListrTask } from 'listr';
 
-import { bundleBuild } from './build';
+import { buildAll } from './esbuild/build';
 import { BuildOptions } from './utils/options';
 import { isPrereleaseVersion, isValidVersionInput, SEMVER_INCREMENTS, updateChangeLog } from './utils/release-utils';
 
@@ -104,7 +104,7 @@ export async function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<st
     },
     {
       title: `Bundle @stencil/core ${color.dim('(' + opts.buildId + ')')}`,
-      task: () => bundleBuild(opts),
+      task: () => buildAll(opts),
       // for pre-releases, this step will occur in GitHub after the PR has been created.
       // for actual releases, we'll need to build + bundle stencil in order to publish it to npm.
       skip: () => !opts.isPublishRelease,
