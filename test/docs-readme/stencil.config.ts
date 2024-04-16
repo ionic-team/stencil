@@ -9,5 +9,9 @@ export const config: Config = {
     {
       type: 'dist',
     },
+    {
+      type: 'docs-readme',
+      dir: 'custom-readme-output',
+    },
   ],
 };
