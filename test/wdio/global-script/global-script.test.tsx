@@ -19,6 +19,15 @@ describe('global script', () => {
   });
 
   it('logs error when component with invalid runtime is loaded', async () => {
+    /**
+     * Fetching logs like this only works in Chromium. Once WebdriverIO v9 is released there
+     * will be easier primitives to fetch logs in other browsers as well.
+     */
+    if (!browser.isChromium) {
+      console.warn('Skipping test because it only works in Chromium');
+      return;
+    }
+
     await setupIFrameTest('/global-script/index.html');
 
     const expectedErrorMessage = `Can't render component <attribute-basic /> with invalid Stencil runtime!`;
