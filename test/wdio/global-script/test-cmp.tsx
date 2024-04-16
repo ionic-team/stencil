@@ -10,6 +10,10 @@ export class GlobalScriptTestCmp {
   render() {
     return <section>
       <div>I am rendered after {Date.now() - window.__testStart}</div>
+      {/*
+        rendering this component will fail as `<attribute-basic /`> is compiled with
+        a `dist-custom-element` output target, which will break in a lazy load environment
+      */}
       {this.renderDistCustomElementComponent && <attribute-basic></attribute-basic>}
     </section>;
   }

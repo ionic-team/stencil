@@ -10,9 +10,10 @@ export default async function () {
   window.__testStart = Date.now();
 
   /**
-   * register custom elements in global script and test later in
-   * `test/wdio/global-script/global-script.test.tsx` if components
-   * can be loaded
+   * import components from the test-components package which are build using
+   * the `dist-custom-element` output target to validate if the rendering fails
+   * with proper error message as the global-script project is run within a
+   * lazy load environment.
    */
   defineCustomElements();
 
