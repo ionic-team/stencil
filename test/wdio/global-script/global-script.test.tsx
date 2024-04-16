@@ -21,13 +21,16 @@ describe('global script', () => {
   it('logs error when component with invalid runtime is loaded', async () => {
     await setupIFrameTest('/global-script/index.html');
 
-    const expectedErrorMessage = `Can't render component <attribute-basic /> with invalid Stencil runtime!`
-    await browser.waitUntil(async () => {
-      const logs = await browser.getLogs('browser') as ({ message: string })[];
-      expect(logs.find((log) => log.message.includes(expectedErrorMessage))).toBeTruthy();
-      return true;
-    }, {
-      timeoutMsg: 'Expected error message not found in console logs.'
-    });
-  })
+    const expectedErrorMessage = `Can't render component <attribute-basic /> with invalid Stencil runtime!`;
+    await browser.waitUntil(
+      async () => {
+        const logs = (await browser.getLogs('browser')) as { message: string }[];
+        expect(logs.find((log) => log.message.includes(expectedErrorMessage))).toBeTruthy();
+        return true;
+      },
+      {
+        timeoutMsg: 'Expected error message not found in console logs.',
+      },
+    );
+  });
 });

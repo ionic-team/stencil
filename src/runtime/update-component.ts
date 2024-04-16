@@ -61,8 +61,8 @@ const dispatchHooks = (hostRef: d.HostRef, isInitialLoad: boolean): Promise<void
   if (!instance) {
     throw new Error(
       `Can't render component <${elm.tagName.toLowerCase()} /> with invalid Stencil runtime! ` +
-      'Make sure this imported component is compiled with a `externalRuntime: true` flag.'
-    )
+        'Make sure this imported component is compiled with a `externalRuntime: true` flag.',
+    );
   }
 
   // We're going to use this variable together with `enqueue` to implement a
