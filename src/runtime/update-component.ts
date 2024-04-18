@@ -61,7 +61,8 @@ const dispatchHooks = (hostRef: d.HostRef, isInitialLoad: boolean): Promise<void
   if (!instance) {
     throw new Error(
       `Can't render component <${elm.tagName.toLowerCase()} /> with invalid Stencil runtime! ` +
-        'Make sure this imported component is compiled with a `externalRuntime: true` flag.',
+        'Make sure this imported component is compiled with a `externalRuntime: true` flag. ' +
+        'For more information, please refer to https://stenciljs.com/docs/custom-elements#externalruntime',
     );
   }
 
