@@ -51,7 +51,7 @@ Please see our [Contributor Code of Conduct](https://github.com/ionic-team/stenc
    1. There's no need to install a specific version of npm or Node right now, it shall be done automatically for you in
       the next step
 5. Run `npm ci`
-6. (Optional) If you are working on [Jest support](./src/testing/jest), [see the installation steps in that directory's README](./src/testing/jest/README.md#installing-dependencies).
+6. Run `npm install.jest` to install dependencies for Stencil's testing submodule
 
 
 ### Updates
@@ -130,6 +130,17 @@ Note that Stencil transpiles source code using multiple worker processes. If you
 stuck, your debugger may not have switched to a worker process that has halted on a breakpoint. You may be able to
 avoid this altogether by setting `--max-workers=1` when you launch Stencil (with the possibility of not being able to
 reproduce timing issues between workers as a side effect).
+
+> [!NOTE]
+> If you want to have access to sourcemaps when debugging the compiler locally
+> you can run the `build` script in `package.json` with the `DEBUG` environment
+> variable set to `true` like so:
+>
+> ```sh
+> DEBUG=true npm run build
+> ```
+>
+> this will write a `.js.map` file to disk next to each JavaScript file.
 
 #### Debugging the Compiler in VSCode
 

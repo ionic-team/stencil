@@ -67,6 +67,12 @@
       allowedVersions: '<28.0.0',
     },
     {
+      // TODO(STENCIL-1274): Remove this block
+      // disable eslint v9 updates until typescript-eslint supports it
+      matchPackageNames: ['eslint'],
+      allowedVersions: '<9.0.0',
+    },
+    {
       matchPackagePrefixes: ['@typescript-eslint'],
       groupName: 'TypeScript-ESLint',
       // these packages can be released often, let's look at them every week

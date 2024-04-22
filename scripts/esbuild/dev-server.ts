@@ -11,7 +11,7 @@ import { bundleExternal, sysNodeBundleCacheDir } from '../bundles/sys-node';
 import { getBanner } from '../utils/banner';
 import { type BuildOptions, createReplaceData } from '../utils/options';
 import { writePkgJson } from '../utils/write-pkg-json';
-import { getBaseEsbuildOptions, getEsbuildAliases, getFirstOutputFile, runBuilds } from './util';
+import { externalAlias, getBaseEsbuildOptions, getEsbuildAliases, getFirstOutputFile, runBuilds } from './util';
 
 const CONNECTOR_NAME = 'connector.html';
 
@@ -70,9 +70,15 @@ export async function buildDevServer(opts: BuildOptions) {
     bundleExternal(opts, opts.output.devServerDir, cachedDir, 'open-in-editor-api.js'),
   ]);
 
-  const devServerAliases = getEsbuildAliases();
-  const external = [...builtinModules, './ws.js', './open-in-editor-api'];
+  const external = [
+    ...builtinModules,
+    // ws.js is externally bundled
+    './ws.js',
+    // open-in-editor-api is externally bundled
+    './open-in-editor-api',
+  ];
 
+  const devServerAliases = getEsbuildAliases();
   const devServerIndexEsbuildOptions = {
     ...getBaseEsbuildOptions(),
     alias: devServerAliases,
@@ -100,7 +106,12 @@ export async function buildDevServer(opts: BuildOptions) {
     format: 'cjs',
     platform: 'node',
     write: false,
-    plugins: [esm2CJSPlugin(), contentTypesPlugin(opts), replace(createReplaceData(opts))],
+    plugins: [
+      esm2CJSPlugin(),
+      contentTypesPlugin(opts),
+      replace(createReplaceData(opts)),
+      externalAlias('graceful-fs', '../sys/node/graceful-fs.js'),
+    ],
     banner: {
       js: getBanner(opts, `Stencil Dev Server Process`, true),
     },
@@ -149,7 +160,6 @@ export async function buildDevServer(opts: BuildOptions) {
     outfile: join(opts.output.devServerDir, 'client', 'index.js'),
     format: 'esm',
     platform: 'node',
-    sourcemap: false,
     plugins: [appErrorCssPlugin(opts), replace(createReplaceData(opts))],
     banner: {
       js: getBanner(opts, `Stencil Dev Server Client`, true),

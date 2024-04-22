@@ -1,4 +1,4 @@
-import { hasError, isOutputTargetDistCollection, join, normalizeFsPath, relative } from '@utils';
+import { hasError, isOutputTargetDistCollection, join, mergeIntoWith, normalizeFsPath, relative } from '@utils';
 import type { Plugin } from 'rollup';
 
 import type * as d from '../../declarations';
@@ -163,7 +163,8 @@ export const extTransformsPlugin = (
 
         // Set style docs
         if (cmp) {
-          cmp.styleDocs = cssTransformResults.styleDocs;
+          cmp.styleDocs ||= [];
+          mergeIntoWith(cmp.styleDocs, cssTransformResults.styleDocs, (docs) => docs.name);
         }
 
         // Track dependencies

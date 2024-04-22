@@ -1,3 +1,40 @@
+# 🚛 [4.16.0](https://github.com/ionic-team/stencil/compare/v4.15.0...v4.16.0) (2024-04-15)
+
+
+### Bug Fixes
+
+* **cli:** fix a bug in CLI argument parsing ([#5646](https://github.com/ionic-team/stencil/issues/5646)) ([1fdea63](https://github.com/ionic-team/stencil/commit/1fdea63acfa5a9c1081111d7d79e826a127ef3eb)), refs [#5640](https://github.com/ionic-team/stencil/issues/5640)
+* **testing:** prevent `find` from throwing error when query has no match ([#5641](https://github.com/ionic-team/stencil/issues/5641)) ([b3886aa](https://github.com/ionic-team/stencil/commit/b3886aa928c1025e636aee1466f26f15fc4dd3eb)), closes [#5639](https://github.com/ionic-team/stencil/issues/5639)
+
+
+### Features
+
+* **dev-server:** dark mode support ([#5642](https://github.com/ionic-team/stencil/issues/5642)) ([89a5e40](https://github.com/ionic-team/stencil/commit/89a5e40adfcd7dbad54928cad6525239778ab9cd))
+* **typescript:** Update dependency typescript to v5.4.5 ([#5663](https://github.com/ionic-team/stencil/issues/5663)) ([2596536](https://github.com/ionic-team/stencil/commit/25965364c3f513b845e44f1db029fab14fdfb68f))
+
+
+
+# 🎖 [4.15.0](https://github.com/ionic-team/stencil/compare/v4.14.1...v4.15.0) (2024-04-08)
+
+
+### Features
+
+* **compiler:** perform automatic key insertion in more situations ([#5594](https://github.com/ionic-team/stencil/issues/5594)) ([8ee071b](https://github.com/ionic-team/stencil/commit/8ee071bf3aae4b2240b50f7af433035c8bf8aa49))
+* **typescript:** Update dependency typescript to v5.4.4 ([#5636](https://github.com/ionic-team/stencil/issues/5636)) ([a463871](https://github.com/ionic-team/stencil/commit/a46387123082d1af9fc17b5909530597dc5b5c68))
+
+
+
+## 🏋 [4.14.1](https://github.com/ionic-team/stencil/compare/v4.14.0...v4.14.1) (2024-04-04)
+
+
+### Bug Fixes
+
+* **compiler:** don't mistake aliased paths for collections imports ([#5620](https://github.com/ionic-team/stencil/issues/5620)) ([af22bb8](https://github.com/ionic-team/stencil/commit/af22bb858d64b60a97ce93c86f5585ef36b31c3f)), closes [#2319](https://github.com/ionic-team/stencil/issues/2319)
+* **runtime:** nested multiple default slot relocation ([#5403](https://github.com/ionic-team/stencil/issues/5403)) ([363c07b](https://github.com/ionic-team/stencil/commit/363c07b4723941954dc748189a744eec01d5b74c)), partially closes [#5335](https://github.com/ionic-team/stencil/issues/5335)
+* **runtime:** prevent ref callbacks from being called too early ([#5614](https://github.com/ionic-team/stencil/issues/5614)) ([81fa375](https://github.com/ionic-team/stencil/commit/81fa37587eb853d42bc7f92102318a3446cdea7b)), closes [#4074](https://github.com/ionic-team/stencil/issues/4074)
+
+
+
 # 🚡 [4.14.0](https://github.com/ionic-team/stencil/compare/v4.13.0...v4.14.0) (2024-04-01)
 
 

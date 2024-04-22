@@ -30,7 +30,6 @@ export function getEsbuildAliases(): Record<string, string> {
     // reference the same file
     prompts: './sys/node/prompts.js',
     glob: './sys/node/glob.js',
-    'graceful-fs': './sys/node/graceful-fs.js',
 
     // dev server related aliases
     ws: './ws.js',
@@ -109,12 +108,23 @@ export function runBuilds(builds: ESBuildOptions[], opts: BuildOptions): Promise
  * @returns a base set of options
  */
 export function getBaseEsbuildOptions(): ESBuildOptions {
-  return {
+  const options: ESBuildOptions = {
     bundle: true,
     legalComments: 'inline',
     logLevel: 'info',
     target: getEsbuildTargets(),
   };
+
+  // if the `build` sub-command is called with the `DEBUG` env var, like
+  //
+  // DEBUG=true npm run build
+  //
+  // then we should produce sourcemaps.
+  if (process.env.DEBUG) {
+    options.sourcemap = 'linked';
+  }
+
+  return options;
 }
 
 /**

@@ -36,7 +36,6 @@ export async function buildCli(opts: BuildOptions) {
     entryPoints: [join(inputDir, 'index.ts')],
     external,
     platform: 'node',
-    sourcemap: 'linked',
   } satisfies ESBuildOptions;
 
   // ESM build options

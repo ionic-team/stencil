@@ -143,7 +143,7 @@ export const createSystem = (c?: { logger?: Logger }): CompilerSystem => {
   const getCurrentDirectory = () => '/';
 
   const getCompilerExecutingPath = () => {
-    return sys.getRemoteModuleUrl({ moduleId: '@stencil/core', path: 'compiler/stencil.min.js' });
+    return sys.getRemoteModuleUrl({ moduleId: '@stencil/core', path: 'compiler/stencil.js' });
   };
 
   const isSymbolicLink = async (_p: string) => false;

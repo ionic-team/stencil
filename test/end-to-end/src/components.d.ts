@@ -36,6 +36,10 @@ export namespace Components {
     }
     interface ElementCmp {
     }
+    interface EmptyCmp {
+    }
+    interface EmptyCmpShadow {
+    }
     interface EnvData {
     }
     interface EventCmp {
@@ -187,6 +191,18 @@ declare global {
         prototype: HTMLElementCmpElement;
         new (): HTMLElementCmpElement;
     };
+    interface HTMLEmptyCmpElement extends Components.EmptyCmp, HTMLStencilElement {
+    }
+    var HTMLEmptyCmpElement: {
+        prototype: HTMLEmptyCmpElement;
+        new (): HTMLEmptyCmpElement;
+    };
+    interface HTMLEmptyCmpShadowElement extends Components.EmptyCmpShadow, HTMLStencilElement {
+    }
+    var HTMLEmptyCmpShadowElement: {
+        prototype: HTMLEmptyCmpShadowElement;
+        new (): HTMLEmptyCmpShadowElement;
+    };
     interface HTMLEnvDataElement extends Components.EnvData, HTMLStencilElement {
     }
     var HTMLEnvDataElement: {
@@ -284,6 +300,8 @@ declare global {
         "dom-interaction": HTMLDomInteractionElement;
         "dom-visible": HTMLDomVisibleElement;
         "element-cmp": HTMLElementCmpElement;
+        "empty-cmp": HTMLEmptyCmpElement;
+        "empty-cmp-shadow": HTMLEmptyCmpShadowElement;
         "env-data": HTMLEnvDataElement;
         "event-cmp": HTMLEventCmpElement;
         "import-assets": HTMLImportAssetsElement;
@@ -327,6 +345,10 @@ declare namespace LocalJSX {
     interface DomVisible {
     }
     interface ElementCmp {
+    }
+    interface EmptyCmp {
+    }
+    interface EmptyCmpShadow {
     }
     interface EnvData {
     }
@@ -376,6 +398,8 @@ declare namespace LocalJSX {
         "dom-interaction": DomInteraction;
         "dom-visible": DomVisible;
         "element-cmp": ElementCmp;
+        "empty-cmp": EmptyCmp;
+        "empty-cmp-shadow": EmptyCmpShadow;
         "env-data": EnvData;
         "event-cmp": EventCmp;
         "import-assets": ImportAssets;
@@ -408,6 +432,8 @@ declare module "@stencil/core" {
             "dom-interaction": LocalJSX.DomInteraction & JSXBase.HTMLAttributes<HTMLDomInteractionElement>;
             "dom-visible": LocalJSX.DomVisible & JSXBase.HTMLAttributes<HTMLDomVisibleElement>;
             "element-cmp": LocalJSX.ElementCmp & JSXBase.HTMLAttributes<HTMLElementCmpElement>;
+            "empty-cmp": LocalJSX.EmptyCmp & JSXBase.HTMLAttributes<HTMLEmptyCmpElement>;
+            "empty-cmp-shadow": LocalJSX.EmptyCmpShadow & JSXBase.HTMLAttributes<HTMLEmptyCmpShadowElement>;
             "env-data": LocalJSX.EnvData & JSXBase.HTMLAttributes<HTMLEnvDataElement>;
             "event-cmp": LocalJSX.EventCmp & JSXBase.HTMLAttributes<HTMLEventCmpElement>;
             "import-assets": LocalJSX.ImportAssets & JSXBase.HTMLAttributes<HTMLImportAssetsElement>;

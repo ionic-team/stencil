@@ -71,11 +71,33 @@ export const performAutomaticKeyInsertion = (transformCtx: ts.TransformationCont
    * @returns the result of handling the node
    */
   function findRenderMethodVisitor(node: ts.Node): ts.VisitResult<ts.Node> {
-    // we want to keep going (to drill down into JSX nodes and transform them) only in particular circumstances:
+    // we want to keep going (to drill down into JSX nodes and transform them)
+    // only in particular circumstances:
     //
     // 1. the syntax tree node is a method declaration
     // 2. this method's name is 'render'
     // 3. the method only has a single return statement
+    //
+    // We want to only keep going if there's a single return statement because
+    // if there are multiple return statements inserting keys could cause
+    // needless re-renders. If a `render` method looked like this, for
+    // instance:
+    //
+    // ```tsx
+    // render() {
+    //   if (foo) {
+    //     return <div>hey!</div>;
+    //   } else {
+    //     return <div>hay!</div>;
+    //   }
+    // }
+    // ```
+    //
+    // Since the `<div>` tags don't have `key` attributes the Stencil vdom will
+    // re-use the same div element between re-renders, and will just swap out
+    // the children (the text nodes in this case). If our key insertion
+    // transformer put unique keys onto each tag then this wouldn't happen any
+    // longer.
     if (ts.isMethodDeclaration(node) && node.name.getText() === 'render' && numReturnStatements(node) === 1) {
       return ts.visitEachChild(node, jsxElementVisitor, transformCtx);
     } else {
@@ -91,16 +113,15 @@ export const performAutomaticKeyInsertion = (transformCtx: ts.TransformationCont
    * @returns the result of handling the node
    */
   function jsxElementVisitor(node: ts.Node): ts.VisitResult<ts.Node> {
-    if (ts.isJsxExpression(node)) {
-      // we don't have the static analysis chops to dive into a JSX expression
-      // (arbitrary JS code delimited by curly braces in JSX) in order to
-      // determine whether it's safe to add keys to JSX nodes within it, so we
-      // bail here instead.
+    if (ts.isCallExpression(node)) {
+      // if there are any JSX nodes which are children of the call expression
+      // (i.e. arguments) we don't want to transform them since we can't know
+      // _a priori_ what could be done with them at runtime
       return node;
     } else if (ts.isConditionalExpression(node)) {
       // we're going to encounter the same problem here that we encounter with
-      // multiple return statements, so we don't try to transform the arms of
-      // the conditional.
+      // multiple return statements, so we just return the node and don't recur into
+      // its children
       return node;
     } else if (isJSXElWithAttrs(node)) {
       return addKeyAttr(node);
