@@ -1,7 +1,7 @@
 import color from 'ansi-colors';
 import Listr, { ListrTask } from 'listr';
 
-import { buildAll } from './esbuild/build';
+import { buildAll } from './build';
 import { BuildOptions } from './utils/options';
 import { isPrereleaseVersion, isValidVersionInput, SEMVER_INCREMENTS, updateChangeLog } from './utils/release-utils';
 

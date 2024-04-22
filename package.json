@@ -23,7 +23,6 @@
     "testing/"
   ],
   "scripts": {
-    "build.rollup": "npm run tsc.scripts && npm run tsc.prod && npm run rollup.prod.ci",
     "build": "npm run clean && npm run tsc.scripts && npm run tsc.prod && node scripts/build --prod --ci",
     "build.watch": "npm run build -- --watch",
     "build.updateSelectorEngine": "node scripts/build/updateSelectorEngine.js",

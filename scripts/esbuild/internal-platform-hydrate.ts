@@ -6,7 +6,7 @@ import { getBanner } from '../utils/banner';
 import { bundleDts } from '../utils/bundle-dts';
 import { BuildOptions } from '../utils/options';
 import { writePkgJson } from '../utils/write-pkg-json';
-import { externalAlias, getBaseEsbuildOptions, getEsbuildAliases, getEsbuildExternalModules } from './util';
+import { externalAlias, getBaseEsbuildOptions, getEsbuildAliases, getEsbuildExternalModules } from './utils';
 
 /**
  * Create objects containing ESbuild options for the two bundles comprising

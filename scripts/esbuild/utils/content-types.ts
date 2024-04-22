@@ -1,26 +1,7 @@
 import fs from 'fs-extra';
 import { join } from 'path';
-import type { Plugin } from 'rollup';
 
 import type { BuildOptions } from '../../utils/options';
-
-export function contentTypesPlugin(opts: BuildOptions): Plugin {
-  return {
-    name: 'contentTypesPlugin',
-    resolveId(id) {
-      if (id.endsWith('content-types-db.json')) {
-        return id;
-      }
-      return null;
-    },
-    load(id) {
-      if (id.endsWith('content-types-db.json')) {
-        return createContentTypeData(opts);
-      }
-      return null;
-    },
-  };
-}
 
 export async function createContentTypeData(opts: BuildOptions) {
   // create a focused content-type lookup object from

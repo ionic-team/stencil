@@ -6,12 +6,12 @@ import { replace } from 'esbuild-plugin-replace';
 import fs from 'fs-extra';
 import ts from 'typescript';
 
-import { createContentTypeData } from '../bundles/plugins/content-types-plugin';
-import { bundleExternal, sysNodeBundleCacheDir } from '../bundles/sys-node';
 import { getBanner } from '../utils/banner';
 import { type BuildOptions, createReplaceData } from '../utils/options';
 import { writePkgJson } from '../utils/write-pkg-json';
-import { externalAlias, getBaseEsbuildOptions, getEsbuildAliases, getFirstOutputFile, runBuilds } from './util';
+import { bundleExternal, sysNodeBundleCacheDir } from './sys-node';
+import { externalAlias, getBaseEsbuildOptions, getEsbuildAliases, getFirstOutputFile, runBuilds } from './utils';
+import { createContentTypeData } from './utils/content-types';
 
 const CONNECTOR_NAME = 'connector.html';
 

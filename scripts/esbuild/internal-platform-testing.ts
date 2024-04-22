@@ -4,7 +4,7 @@ import { join } from 'path';
 
 import { BuildOptions } from '../utils/options';
 import { writePkgJson } from '../utils/write-pkg-json';
-import { externalAlias, getBaseEsbuildOptions, getEsbuildAliases, getEsbuildExternalModules } from './util';
+import { externalAlias, getBaseEsbuildOptions, getEsbuildAliases, getEsbuildExternalModules } from './utils';
 
 /**
  * Get an ESBuild configuration object for the internal testing bundle. This

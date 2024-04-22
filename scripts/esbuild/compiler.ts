@@ -3,13 +3,13 @@ import { replace } from 'esbuild-plugin-replace';
 import fs from 'fs-extra';
 import { join } from 'path';
 
-import { bundleParse5 } from '../bundles/plugins/parse5-plugin';
-import { bundleTerser } from '../bundles/plugins/terser-plugin';
-import { bundleTypeScriptSource, tsCacheFilePath } from '../bundles/plugins/typescript-source-plugin';
 import { getBanner } from '../utils/banner';
 import { BuildOptions, createReplaceData } from '../utils/options';
 import { writePkgJson } from '../utils/write-pkg-json';
-import { getBaseEsbuildOptions, getEsbuildAliases, getEsbuildExternalModules, runBuilds } from './util';
+import { getBaseEsbuildOptions, getEsbuildAliases, getEsbuildExternalModules, runBuilds } from './utils';
+import { bundleParse5 } from './utils/parse5';
+import { bundleTerser } from './utils/terser';
+import { bundleTypeScriptSource, tsCacheFilePath } from './utils/typescript-source';
 
 export async function buildCompiler(opts: BuildOptions) {
   const inputDir = join(opts.buildDir, 'compiler');
