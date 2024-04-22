@@ -40,9 +40,12 @@ describe('textContent patch', () => {
 
     it('should overwrite the default slot content', async () => {
       const elm = await $('text-content-patch-scoped-with-slot');
-      await browser.execute((elm) => {
-        elm.textContent = 'New slot content'
-      }, elm as any as HTMLElement);
+      await browser.execute(
+        (elm) => {
+          elm.textContent = 'New slot content';
+        },
+        elm as any as HTMLElement,
+      );
 
       await expect(elm.getText()).toMatchInlineSnapshot(`
         "Top content
@@ -53,9 +56,12 @@ describe('textContent patch', () => {
 
     it('should not insert the text node if there is no default slot', async () => {
       const elm = await $('text-content-patch-scoped');
-      await browser.execute((elm) => {
-        elm.textContent = 'New slot content'
-      }, elm as any as HTMLElement);
+      await browser.execute(
+        (elm) => {
+          elm.textContent = 'New slot content';
+        },
+        elm as any as HTMLElement,
+      );
 
       await expect(elm.getText()).toMatchInlineSnapshot(`
         "Top content
