@@ -1,3 +1,35 @@
+# ♨️ [4.17.0](https://github.com/ionic-team/stencil/compare/v4.16.0...v4.17.0) (2024-04-22)
+
+### Internal
+
+* **Rollup to Esbuild Migration**
+  The Stencil team has been working on a migration from Rollup to Esbuild. This release (v4.17.0) is the first release we make in which the published Stencil code is compiled by Esbuild. We have done our due diligence to ensure that this will have no impact on Stencil users nor the output of your compiled components. If you experience any problems though, please [raise an issue](https://github.com/ionic-team/stencil/issues/new?assignees=&labels=&projects=&template=bug_report.yml&title=bug%3A+) and we will address it accordingly.
+
+### Bug Fixes
+
+* **docs:** merge together style docs from multiple CSS files ([#5653](https://github.com/ionic-team/stencil/issues/5653)) ([84e1a14](https://github.com/ionic-team/stencil/commit/84e1a14048bc34e64a866659d39376af605f8f9a))
+* **docs:** respect custom README content when writing to a custom path ([#5648](https://github.com/ionic-team/stencil/issues/5648)) ([6bfba1d](https://github.com/ionic-team/stencil/commit/6bfba1dda502f4ad67263b31b2945fa38a04b338)), fixes [#5400](https://github.com/ionic-team/stencil/issues/5400)
+* **slot-fallback:** fix hiding fallback slot content issue when the slotted element is a text node ([#5496](https://github.com/ionic-team/stencil/issues/5496)) ([29c69c4](https://github.com/ionic-team/stencil/commit/29c69c48a281f6bc02e8ab001c4ea98688b00d24)), fixes [#5335](https://github.com/ionic-team/stencil/issues/5335)
+* **testing:** perform string -> boolean type casting for Jest config ([#5672](https://github.com/ionic-team/stencil/issues/5672)) ([20f74fc](https://github.com/ionic-team/stencil/commit/20f74fce81597576f341f3a3dc663b6a204243bc)), fixes [#5640](https://github.com/ionic-team/stencil/issues/5640)
+
+
+
+# 🚛 [4.16.0](https://github.com/ionic-team/stencil/compare/v4.15.0...v4.16.0) (2024-04-15)
+
+
+### Bug Fixes
+
+* **cli:** fix a bug in CLI argument parsing ([#5646](https://github.com/ionic-team/stencil/issues/5646)) ([1fdea63](https://github.com/ionic-team/stencil/commit/1fdea63acfa5a9c1081111d7d79e826a127ef3eb)), refs [#5640](https://github.com/ionic-team/stencil/issues/5640)
+* **testing:** prevent `find` from throwing error when query has no match ([#5641](https://github.com/ionic-team/stencil/issues/5641)) ([b3886aa](https://github.com/ionic-team/stencil/commit/b3886aa928c1025e636aee1466f26f15fc4dd3eb)), closes [#5639](https://github.com/ionic-team/stencil/issues/5639)
+
+
+### Features
+
+* **dev-server:** dark mode support ([#5642](https://github.com/ionic-team/stencil/issues/5642)) ([89a5e40](https://github.com/ionic-team/stencil/commit/89a5e40adfcd7dbad54928cad6525239778ab9cd))
+* **typescript:** Update dependency typescript to v5.4.5 ([#5663](https://github.com/ionic-team/stencil/issues/5663)) ([2596536](https://github.com/ionic-team/stencil/commit/25965364c3f513b845e44f1db029fab14fdfb68f))
+
+
+
 # 🎖 [4.15.0](https://github.com/ionic-team/stencil/compare/v4.14.1...v4.15.0) (2024-04-08)
 
 

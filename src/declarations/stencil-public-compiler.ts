@@ -2266,6 +2266,11 @@ export interface OutputTargetDocsVscode extends OutputTargetBase {
 
 export interface OutputTargetDocsReadme extends OutputTargetBase {
   type: 'docs-readme';
+  /**
+   * The root directory where README files should be written
+   *
+   * defaults to {@link Config.srcDir}
+   */
   dir?: string;
   dependencies?: boolean;
   footer?: string;

@@ -30,6 +30,13 @@ jobs:
     with:
       build_name: stencil-core
 
+  docs_build_tests:
+    name: Docs Build Tests
+    needs: [build_core]
+    uses: ./.github/workflows/test-docs-build.yml
+    with:
+      build_name: stencil-core
+
   bundler_tests:
     name: Bundler Tests
     needs: [build_core]
