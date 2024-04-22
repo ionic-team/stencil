@@ -21,6 +21,7 @@ export function getEsbuildAliases(): Record<string, string> {
     '@stencil/core/dev-server': './dev-server/index.js',
     '@stencil/core/mock-doc': './mock-doc/index.cjs',
     '@stencil/core/internal/testing': './internal/testing/index.js',
+    '@stencil/core/cli': './cli/index.js',
     '@sys-api-node': './sys/node/index.js',
 
     // mapping node.js module names to `sys/node` "cache"

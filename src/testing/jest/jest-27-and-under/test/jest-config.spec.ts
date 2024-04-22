@@ -1,4 +1,5 @@
 import type { Config } from '@jest/types';
+import { BOOLEAN_CLI_FLAGS } from '@stencil/core/cli';
 import type * as d from '@stencil/core/declarations';
 import { mockValidatedConfig } from '@stencil/core/testing';
 import path from 'path';
@@ -18,6 +19,20 @@ describe('jest-config', () => {
     const jestArgv = buildJestArgv(config);
     expect(jestArgv.ci).toBe(true);
     expect(jestArgv.maxWorkers).toBe(2);
+  });
+
+  // the 'help' and 'version' flags are problematic with yargs (they cause a
+  // hang) and we intercept those flags and do our own thing before turning
+  // over to jest anyway
+  const cliFlagsToTest = BOOLEAN_CLI_FLAGS.filter((flag) => flag !== 'help' && flag !== 'version');
+  describe.each(cliFlagsToTest)('should deal with flag %s correctly', (cliArg) => {
+    it('converts boolean flag to boolean', () => {
+      const args = ['test', `--${cliArg}`];
+      const config = mockValidatedConfig();
+      config.flags = parseFlags(args);
+      const jestArgv = buildJestArgv(config);
+      expect(jestArgv[cliArg]).toBe(true);
+    });
   });
 
   it('marks outputFile as a Jest argument', () => {
