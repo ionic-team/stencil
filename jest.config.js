@@ -4,7 +4,7 @@ module.exports = {
     '@app-globals': '<rootDir>/internal/app-globals/index.cjs',
     '@platform': '<rootDir>/internal/testing/index.js',
     '@runtime': '<rootDir>/internal/testing/index.js',
-    '@stencil/core/cli': '<rootDir>/cli/index.js',
+    '@stencil/core/cli': '<rootDir>/cli/index.cjs',
     '@stencil/core/compiler': '<rootDir>/compiler/stencil.js',
     '@stencil/core/mock-doc': '<rootDir>/mock-doc/index.cjs',
     '@stencil/core/testing': '<rootDir>/testing/index.js',
