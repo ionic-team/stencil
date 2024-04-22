@@ -9,7 +9,7 @@ describe('slot-fallback-with-textnode', function () {
   });
 
   it('should hide fallback content when provided slot is text node', async () => {
-    await expect($('.container')).toHaveText('DEFAULT', { trim: true })
+    await expect($('.container')).toHaveText('DEFAULT', { trim: true });
     await $('#toggle-button').click();
 
     await expect($('.container')).not.toHaveText('DEFAULT', { trim: true });
