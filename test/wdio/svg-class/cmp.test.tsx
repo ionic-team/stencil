@@ -21,21 +21,20 @@ describe('svg class', () => {
   });
 
   it('toggles svg class', async () => {
-    const app = document.body;
     await $('svg-class').waitForExist();
-    const svg = app.querySelector('svg');
-    const circle = app.querySelector('circle');
-    const rect = app.querySelector('rect');
+    const svg = $('svg');
+    const circle = $('circle');
+    const rect = $('rect');
 
-    expect(svg.getAttribute('class')).toBe(null);
-    expect(circle.getAttribute('class')).toBe(null);
-    expect(rect.getAttribute('class')).toBe(null);
+    await expect(svg).not.toHaveElementClass('primary');
+    await expect(circle).not.toHaveElementClass('red');
+    await expect(rect).not.toHaveElementClass('blue');
 
     await $('button').click();
     await $('svg-class').waitForStable();
 
-    expect(svg.getAttribute('class')).toBe('primary');
-    expect(circle.getAttribute('class')).toBe('red');
-    expect(rect.getAttribute('class')).toBe('blue');
+    await expect(svg).toHaveElementClass('primary');
+    await expect(circle).toHaveElementClass('red');
+    await expect(rect).toHaveElementClass('blue');
   });
 });
