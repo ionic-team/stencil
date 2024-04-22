@@ -1,5 +1,9 @@
 # ♨️ [4.17.0](https://github.com/ionic-team/stencil/compare/v4.16.0...v4.17.0) (2024-04-22)
 
+### Internal
+
+* **Rollup to Esbuild Migration**
+  The Stencil team has been working on a migration from Rollup to Esbuild. This release (v4.17.0) is the first release we make in which the published Stencil code is compiled by Esbuild. We have done our due diligence to ensure that this will have no impact on Stencil users nor the output of your compiled components. If you experience any problems though, please [raise an issue](https://github.com/ionic-team/stencil/issues/new?assignees=&labels=&projects=&template=bug_report.yml&title=bug%3A+) and we will address it accordingly.
 
 ### Bug Fixes
 
