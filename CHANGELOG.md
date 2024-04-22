@@ -8,9 +8,9 @@
 ### Bug Fixes
 
 * **docs:** merge together style docs from multiple CSS files ([#5653](https://github.com/ionic-team/stencil/issues/5653)) ([84e1a14](https://github.com/ionic-team/stencil/commit/84e1a14048bc34e64a866659d39376af605f8f9a))
-* **docs:** respect custom README content when writing to a custom path ([#5648](https://github.com/ionic-team/stencil/issues/5648)) ([6bfba1d](https://github.com/ionic-team/stencil/commit/6bfba1dda502f4ad67263b31b2945fa38a04b338))
-* **slot-fallback:** fix hiding fallback slot content issue when the slotted element is a text node ([#5496](https://github.com/ionic-team/stencil/issues/5496)) ([29c69c4](https://github.com/ionic-team/stencil/commit/29c69c48a281f6bc02e8ab001c4ea98688b00d24))
-* **testing:** perform string -> boolean type casting for Jest config ([#5672](https://github.com/ionic-team/stencil/issues/5672)) ([20f74fc](https://github.com/ionic-team/stencil/commit/20f74fce81597576f341f3a3dc663b6a204243bc))
+* **docs:** respect custom README content when writing to a custom path ([#5648](https://github.com/ionic-team/stencil/issues/5648)) ([6bfba1d](https://github.com/ionic-team/stencil/commit/6bfba1dda502f4ad67263b31b2945fa38a04b338)), fixes [#5400](https://github.com/ionic-team/stencil/issues/5400)
+* **slot-fallback:** fix hiding fallback slot content issue when the slotted element is a text node ([#5496](https://github.com/ionic-team/stencil/issues/5496)) ([29c69c4](https://github.com/ionic-team/stencil/commit/29c69c48a281f6bc02e8ab001c4ea98688b00d24)), fixes [#5335](https://github.com/ionic-team/stencil/issues/5335)
+* **testing:** perform string -> boolean type casting for Jest config ([#5672](https://github.com/ionic-team/stencil/issues/5672)) ([20f74fc](https://github.com/ionic-team/stencil/commit/20f74fce81597576f341f3a3dc663b6a204243bc)), fixes [#5640](https://github.com/ionic-team/stencil/issues/5640)
 
 
 
