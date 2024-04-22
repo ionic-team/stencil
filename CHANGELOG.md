@@ -1,3 +1,13 @@
+## 🍻 [4.16.1-0](https://github.com/ionic-team/stencil/compare/v4.16.0...v4.16.1-0) (2024-04-22)
+
+
+### Bug Fixes
+
+* **docs:** merge together style docs from multiple CSS files ([#5653](https://github.com/ionic-team/stencil/issues/5653)) ([84e1a14](https://github.com/ionic-team/stencil/commit/84e1a14048bc34e64a866659d39376af605f8f9a))
+* **docs:** respect custom README content when writing to a custom path ([#5648](https://github.com/ionic-team/stencil/issues/5648)) ([6bfba1d](https://github.com/ionic-team/stencil/commit/6bfba1dda502f4ad67263b31b2945fa38a04b338))
+
+
+
 # 🚛 [4.16.0](https://github.com/ionic-team/stencil/compare/v4.15.0...v4.16.0) (2024-04-15)
 
 
