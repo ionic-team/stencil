@@ -14,6 +14,7 @@ import type * as d from '../../declarations';
 import { NODE_TYPE, PLATFORM_FLAGS, VNODE_FLAGS } from '../runtime-constants';
 import { h, isHost, newVNode } from './h';
 import { updateElement } from './update-element';
+import { toVNode } from './util';
 
 let scopeId: string;
 let contentRef: d.RenderNode | undefined;
@@ -646,11 +647,33 @@ const parentReferenceNode = (node: d.RenderNode) => (node['s-ol'] ? node['s-ol']
  */
 export const patch = (oldVNode: d.VNode, newVNode: d.VNode, isInitialRender = false) => {
   const elm = (newVNode.$elm$ = oldVNode.$elm$);
-  const oldChildren = oldVNode.$children$;
+  let oldChildren = oldVNode.$children$;
   const newChildren = newVNode.$children$;
   const tag = newVNode.$tag$;
   const text = newVNode.$text$;
   let defaultHolder: Comment;
+
+  if (BUILD.shadowDom && isInitialRender && oldVNode.$elm$.nodeType === NODE_TYPE.DocumentFragment) {
+    // TODO perhaps we should try to only do this when DSD has been used?
+    // although there may not be any harm in just doing it all the time.
+    //
+    // we need to create fake 'oldChildren' for any nodes that might be present
+    // in the shadow root because of DSD. We want to do this when:
+    //
+    // 1. this is the first render
+    // 2. the `$elm$` for the current old vdom node is a document fragment,
+    //    meaning the content node for a shadow root that was created by the
+    //    browser based on a `<template>` tag in the HTML
+    for (const child of oldVNode.$elm$.children) {
+      // TODO be more fine-grained about this
+      // 1. can I tell whether the style tag was added client-side or not?
+      if ((child as HTMLElement).tagName === 'STYLE' && child.getAttribute('sty-id')) {
+        continue;
+      }
+      (oldVNode.$children$ ||= []).push(toVNode(child));
+      oldChildren ||= oldVNode.$children$;
+    }
+  }
 
   if (!BUILD.vdomText || text === null) {
     if (BUILD.svg) {

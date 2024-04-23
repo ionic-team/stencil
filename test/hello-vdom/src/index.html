@@ -4,4 +4,9 @@
 <script type="module" src="build/hellovdom.esm.js"></script>
 <script nomodule src="build/hellovdom.js"></script>
 
-<hello-vdom></hello-vdom>
+<hello-vdom>
+  <template shadowrootmode="open">
+    <style>h1 { color: red }</style>
+    <h1>Hello, Declarative Shadow DOM!</h1>
+  </template>
+</hello-vdom>
