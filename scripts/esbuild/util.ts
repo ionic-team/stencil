@@ -26,10 +26,9 @@ export function getEsbuildAliases(): Record<string, string> {
 
     // mapping node.js module names to `sys/node` "cache"
     //
-    // these allow us to bundle and ship a dependency (like `prompts`) as part
+    // these allow us to bundle and ship a dependency (like `glob`) as part
     // of the Stencil distributable but also have our separate bundles
     // reference the same file
-    prompts: './sys/node/prompts.js',
     glob: './sys/node/glob.js',
 
     // dev server related aliases

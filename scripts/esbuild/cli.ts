@@ -27,6 +27,8 @@ export async function buildCli(opts: BuildOptions) {
   const dtsFilename = 'index.d.ts';
 
   const cliAliases = getEsbuildAliases();
+  // this isn't strictly necessary to alias - however, this minimizes cuts down the bundle size by ~70kb.
+  cliAliases['prompts'] = 'prompts/lib/index.js';
 
   const external = getEsbuildExternalModules(opts, opts.output.cliDir);
 
