@@ -1,3 +1,12 @@
+## 🚒 [4.17.1](https://github.com/ionic-team/stencil/compare/v4.17.0...v4.17.1) (2024-04-23)
+
+
+### Bug Fixes
+
+* **cli:** prevent generate task from crashing ([#5693](https://github.com/ionic-team/stencil/issues/5693)) ([9efbf4b](https://github.com/ionic-team/stencil/commit/9efbf4bffad36bf241c35d0be48a4f557c56c034)), closes [#5692](https://github.com/ionic-team/stencil/issues/5692)
+
+
+
 # ♨️ [4.17.0](https://github.com/ionic-team/stencil/compare/v4.16.0...v4.17.0) (2024-04-22)
 
 ### Internal
