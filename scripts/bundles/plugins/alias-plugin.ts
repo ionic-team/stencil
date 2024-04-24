@@ -10,7 +10,7 @@ import type { BuildOptions } from '../../utils/options';
  */
 export function aliasPlugin(opts: BuildOptions): Plugin {
   const alias = new Map([
-    ['@app-data', '@stencil/core/internal/app-data'],
+    ['@app-data', '@stencil/core/internal/app-data/index.js'],
     ['@app-globals', '@stencil/core/internal/app-globals'],
     ['@hydrate-factory', '@stencil/core/hydrate-factory'],
     ['@stencil/core/mock-doc', '@stencil/core/mock-doc'],

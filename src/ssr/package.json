@@ -1,0 +1,50 @@
+{
+  "name": "@stencil/ssr",
+  "version": "0.0.1",
+  "license": "MIT",
+  "main": "./dist/index.cjs",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "type": "module",
+  "types": "./dist/index.d.ts",
+  "scripts": {},
+  "peerDependencies": {
+    "@stencil/core": "^4.17.1"
+  },
+  "peerDependenciesMeta": {
+    "@stencil/core": {
+      "optional": false
+    }
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=7.10.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ionic-team/stencil.git"
+  },
+  "author": "Ionic Team",
+  "homepage": "https://stenciljs.com/",
+  "description": "An utility package to help render Stencil components on the server.",
+  "keywords": [
+    "web components",
+    "components",
+    "stencil",
+    "ionic",
+    "webapp",
+    "custom elements",
+    "pwa",
+    "ssr",
+    "progressive web app"
+  ],
+  "prettier": "@ionic/prettier-config",
+  "volta": {
+    "node": "20.12.2",
+    "npm": "10.5.2"
+  }
+}

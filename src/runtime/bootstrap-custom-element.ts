@@ -85,13 +85,15 @@ export const proxyCustomElement = (Cstr: any, compactMeta: d.ComponentRuntimeMet
     },
     __attachShadow() {
       if (supportsShadow) {
-        if (BUILD.shadowDelegatesFocus) {
-          this.attachShadow({
-            mode: 'open',
-            delegatesFocus: !!(cmpMeta.$flags$ & CMP_FLAGS.shadowDelegatesFocus),
-          });
-        } else {
-          this.attachShadow({ mode: 'open' });
+        if (!this.shadowRoot) {
+          if (BUILD.shadowDelegatesFocus) {
+            this.attachShadow({
+              mode: 'open',
+              delegatesFocus: !!(cmpMeta.$flags$ & CMP_FLAGS.shadowDelegatesFocus),
+            });
+          } else {
+            this.attachShadow({ mode: 'open' });
+          }
         }
       } else {
         (this as any).shadowRoot = this;

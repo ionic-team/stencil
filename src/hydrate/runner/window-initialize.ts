@@ -46,13 +46,6 @@ export function initializeWindow(
       doc.documentElement.setAttribute('data-stencil-build', opts.buildId);
     } catch (e) {}
   }
-
-  try {
-    // TODO(STENCIL-345) - Evaluate reconciling MockWindow, Window differences
-    // @ts-ignore
-    win.customElements = null;
-  } catch (e) {}
-
   if (opts.constrainTimeouts) {
     constrainTimeouts(win);
   }

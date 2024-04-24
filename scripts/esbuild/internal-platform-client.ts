@@ -57,7 +57,7 @@ export async function getInternalClientBundle(opts: BuildOptions): Promise<ESBui
     },
     plugins: [
       replace(createReplaceData(opts)),
-      externalAlias('@app-data', '@stencil/core/internal/app-data'),
+      externalAlias('@app-data', '@stencil/core/internal/app-data/index.js'),
       externalAlias('@utils/shadow-css', './shadow-css.js'),
       // we want to get the esm, not the cjs, since we're creating an esm
       // bundle here
@@ -93,7 +93,7 @@ export async function getInternalClientBundle(opts: BuildOptions): Promise<ESBui
     plugins: [
       replace(createReplaceData(opts)),
       externalAlias('@platform', '@stencil/core'),
-      externalAlias('@app-data', '@stencil/core/internal/app-data'),
+      externalAlias('@app-data', '@stencil/core/internal/app-data/index.js'),
     ],
   };
 

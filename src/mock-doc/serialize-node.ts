@@ -57,8 +57,15 @@ export function serializeNodeToHtml(elm: Node | MockNode, opts: SerializeNodeToH
     opts.removeHtmlComments = false;
   }
 
-  if (typeof opts.serializeShadowRoot !== 'boolean') {
+  if (typeof opts.serializeShadowRoot !== 'boolean' && typeof opts.serializeShadowRoot !== 'string') {
     opts.serializeShadowRoot = false;
+  }
+
+  if (opts.stream) {
+    /**
+     * todo(@christian-bromann): what if innerHTML is set?
+     */
+    return streamToHtml(elm as Node, opts, output, false);
   }
 
   if (opts.outerHtml) {
@@ -80,9 +87,10 @@ export function serializeNodeToHtml(elm: Node | MockNode, opts: SerializeNodeToH
   return output.text.join('');
 }
 
+const shadowRootTag = 'mock:shadow-root';
 function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: SerializeOutput, isShadowRoot: boolean) {
   if (node.nodeType === NODE_TYPES.ELEMENT_NODE || isShadowRoot) {
-    const tagName = isShadowRoot ? 'mock:shadow-root' : getTagName(node as Element);
+    const tagName = isShadowRoot ? shadowRootTag : getTagName(node as Element);
 
     if (tagName === 'body') {
       output.isWithinBody = true;
@@ -105,8 +113,19 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
         output.currentLineWidth += output.indent;
       }
 
-      output.text.push('<' + tagName);
-      output.currentLineWidth += tagName.length + 1;
+      const tag = tagName === shadowRootTag ? 'template' : tagName;
+      output.text.push('<' + tag);
+      output.currentLineWidth += tag.length + 1;
+
+      /**
+       * todo(@christian-bromann): the shadow root class is `#document-fragment`
+       * and has no mode attribute. We should consider adding a mode attribute.
+       */
+      if (tag === 'template') {
+        const mode = ` shadowrootmode="open"`;
+        output.text.push(mode);
+        output.currentLineWidth += mode.length;
+      }
 
       const attrsLength = (node as HTMLElement).attributes.length;
       const attributes =
@@ -209,6 +228,8 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
     if (EMPTY_ELEMENTS.has(tagName) === false) {
       if (opts.serializeShadowRoot && (node as HTMLElement).shadowRoot != null) {
         output.indent = output.indent + (opts.indentSpaces ?? 0);
+        console.log(2, (node as HTMLElement).shadowRoot.childNodes.length)
+
         serializeToHtml((node as HTMLElement).shadowRoot!, opts, output, true);
         output.indent = output.indent - (opts.indentSpaces ?? 0);
 
@@ -230,6 +251,7 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
       }
 
       if (opts.excludeTagContent == null || opts.excludeTagContent.includes(tagName) === false) {
+        const tag = tagName === shadowRootTag ? 'template' : tagName;
         const childNodes =
           tagName === 'template' ? ((node as any as HTMLTemplateElement).content.childNodes as any) : node.childNodes;
         const childNodeLength = childNodes.length;
@@ -271,8 +293,8 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
         }
 
         if (ignoreTag === false) {
-          output.text.push('</' + tagName + '>');
-          output.currentLineWidth += tagName.length + 3;
+          output.text.push('</' + tag + '>');
+          output.currentLineWidth += tag.length + 3;
         }
       }
     }
@@ -427,6 +449,384 @@ function serializeToHtml(node: Node, opts: SerializeNodeToHtmlOptions, output: S
     output.currentLineWidth += nodeValue.length + 7;
   } else if (node.nodeType === NODE_TYPES.DOCUMENT_TYPE_NODE) {
     output.text.push('<!doctype html>');
+  }
+}
+
+function* streamToHtml (node: Node, opts: SerializeNodeToHtmlOptions, output: Omit<SerializeOutput, 'text'>, isShadowRoot: boolean): Generator<string | Promise<string>, void, undefined> {
+  yield new Promise<string>((resolve) => setTimeout(() => resolve(''), 1500))
+  if (node.nodeType === NODE_TYPES.ELEMENT_NODE || isShadowRoot) {
+    const tagName = isShadowRoot ? shadowRootTag : getTagName(node as Element);
+
+    if (tagName === 'body') {
+      output.isWithinBody = true;
+    }
+
+    const ignoreTag = opts.excludeTags != null && opts.excludeTags.includes(tagName);
+
+    if (ignoreTag === false) {
+      const isWithinWhitespaceSensitiveNode =
+        opts.newLines || (opts.indentSpaces ?? 0) > 0 ? isWithinWhitespaceSensitive(node) : false;
+      if (opts.newLines && !isWithinWhitespaceSensitiveNode) {
+        yield '\n';
+        output.currentLineWidth = 0;
+      }
+
+      if ((opts.indentSpaces ?? 0) > 0 && !isWithinWhitespaceSensitiveNode) {
+        for (let i = 0; i < output.indent; i++) {
+          yield ' ';
+        }
+        output.currentLineWidth += output.indent;
+      }
+
+      const tag = tagName === shadowRootTag ? 'template' : tagName;
+
+      yield '<' + tag;
+      output.currentLineWidth += tag.length + 1;
+
+      /**
+       * todo(@christian-bromann): the shadow root class is `#document-fragment`
+       * and has no mode attribute. We should consider adding a mode attribute.
+       */
+      if (tag === 'template') {
+        const mode = ` shadowrootmode="open"`;
+        yield mode;
+        output.currentLineWidth += mode.length;
+      }
+
+      const attrsLength = (node as HTMLElement).attributes.length;
+      const attributes =
+        opts.prettyHtml && attrsLength > 1
+          ? cloneAttributes((node as HTMLElement).attributes as any, true)
+          : (node as Element).attributes;
+
+      for (let i = 0; i < attrsLength; i++) {
+        const attr = attributes.item(i)!;
+        const attrName = attr.name;
+
+        if (attrName === 'style') {
+          continue;
+        }
+
+        let attrValue = attr.value;
+        if (opts.removeEmptyAttributes && attrValue === '' && REMOVE_EMPTY_ATTR.has(attrName)) {
+          continue;
+        }
+
+        const attrNamespaceURI = attr.namespaceURI;
+        if (attrNamespaceURI == null) {
+          output.currentLineWidth += attrName.length + 1;
+          if (
+            opts.approximateLineWidth &&
+            opts.approximateLineWidth > 0 &&
+            output.currentLineWidth > opts.approximateLineWidth
+          ) {
+            yield '\n' + attrName;
+            output.currentLineWidth = 0;
+          } else {
+            yield ' ' + attrName;
+          }
+        } else if (attrNamespaceURI === 'http://www.w3.org/XML/1998/namespace') {
+          yield ' xml:' + attrName;
+          output.currentLineWidth += attrName.length + 5;
+        } else if (attrNamespaceURI === 'http://www.w3.org/2000/xmlns/') {
+          if (attrName !== 'xmlns') {
+            yield ' xmlns:' + attrName;
+            output.currentLineWidth += attrName.length + 7;
+          } else {
+            yield ' ' + attrName;
+            output.currentLineWidth += attrName.length + 1;
+          }
+        } else if (attrNamespaceURI === XLINK_NS) {
+          yield ' xlink:' + attrName;
+          output.currentLineWidth += attrName.length + 7;
+        } else {
+          yield ' ' + attrNamespaceURI + ':' + attrName;
+          output.currentLineWidth += attrNamespaceURI.length + attrName.length + 2;
+        }
+
+        if (opts.prettyHtml && attrName === 'class') {
+          attrValue = attr.value = attrValue
+            .split(' ')
+            .filter((t) => t !== '')
+            .sort()
+            .join(' ')
+            .trim();
+        }
+
+        if (attrValue === '') {
+          if (opts.removeBooleanAttributeQuotes && BOOLEAN_ATTR.has(attrName)) {
+            continue;
+          }
+          if (opts.removeEmptyAttributes && attrName.startsWith('data-')) {
+            continue;
+          }
+        }
+
+        if (opts.removeAttributeQuotes && CAN_REMOVE_ATTR_QUOTES.test(attrValue)) {
+          yield '=' + escapeString(attrValue, true);
+          output.currentLineWidth += attrValue.length + 1;
+        } else {
+          yield '="' + escapeString(attrValue, true) + '"';
+          output.currentLineWidth += attrValue.length + 3;
+        }
+      }
+
+      if ((node as Element).hasAttribute('style')) {
+        const cssText = (node as HTMLElement).style.cssText;
+
+        if (
+          opts.approximateLineWidth &&
+          opts.approximateLineWidth > 0 &&
+          output.currentLineWidth + cssText.length + 10 > opts.approximateLineWidth
+        ) {
+          yield `\nstyle="${cssText}">`;
+          output.currentLineWidth = 0;
+        } else {
+          yield ` style="${cssText}">`;
+          output.currentLineWidth += cssText.length + 10;
+        }
+      } else {
+        yield '>';
+        output.currentLineWidth += 1;
+      }
+
+      if (tag === 'template') {
+        if (tagName === 'mock:shadow-root') {
+        }
+      }
+    }
+
+    if (EMPTY_ELEMENTS.has(tagName) === false) {
+      const shadowRoot = (node as HTMLElement).shadowRoot
+      if (opts.serializeShadowRoot && shadowRoot != null) {
+        output.indent = output.indent + (opts.indentSpaces ?? 0);
+
+        /**
+         * wait for component to be rendered
+         */
+        if (shadowRoot.childNodes.length === 0) {
+          yield new Promise<string>((resolve) => requestAnimationFrame(() => resolve('')))
+        }
+
+        yield* streamToHtml(shadowRoot, opts, output, true);
+        output.indent = output.indent - (opts.indentSpaces ?? 0);
+
+        if (
+          opts.newLines &&
+          (node.childNodes.length === 0 ||
+            (node.childNodes.length === 1 &&
+              node.childNodes[0].nodeType === NODE_TYPES.TEXT_NODE &&
+              node.childNodes[0].nodeValue?.trim() === ''))
+        ) {
+          yield '\n';
+          output.currentLineWidth = 0;
+
+          for (let i = 0; i < output.indent; i++) {
+            yield ' ';
+          }
+          output.currentLineWidth += output.indent;
+        }
+      }
+
+      if (opts.excludeTagContent == null || opts.excludeTagContent.includes(tagName) === false) {
+        const tag = tagName === shadowRootTag ? 'template' : tagName;
+        const childNodes =
+          tagName === 'template' ? ((node as any as HTMLTemplateElement).content.childNodes as any) : node.childNodes;
+        const childNodeLength = childNodes.length;
+
+        if (childNodeLength > 0) {
+          if (
+            childNodeLength === 1 &&
+            childNodes[0].nodeType === NODE_TYPES.TEXT_NODE &&
+            (typeof childNodes[0].nodeValue !== 'string' || childNodes[0].nodeValue.trim() === '')
+          ) {
+            // skip over empty text nodes
+          } else {
+            const isWithinWhitespaceSensitiveNode =
+              opts.newLines || (opts.indentSpaces ?? 0) > 0 ? isWithinWhitespaceSensitive(node) : false;
+
+            if (!isWithinWhitespaceSensitiveNode && (opts.indentSpaces ?? 0) > 0 && ignoreTag === false) {
+              output.indent = output.indent + (opts.indentSpaces ?? 0);
+            }
+
+            for (let i = 0; i < childNodeLength; i++) {
+              yield* streamToHtml(childNodes[i], opts, output, false);
+            }
+
+            if (ignoreTag === false) {
+              if (opts.newLines && !isWithinWhitespaceSensitiveNode) {
+                yield '\n';
+                output.currentLineWidth = 0;
+              }
+
+              if ((opts.indentSpaces ?? 0) > 0 && !isWithinWhitespaceSensitiveNode) {
+                output.indent = output.indent - (opts.indentSpaces ?? 0);
+                for (let i = 0; i < output.indent; i++) {
+                  yield ' ';
+                }
+                output.currentLineWidth += output.indent;
+              }
+            }
+          }
+        }
+
+        if (ignoreTag === false) {
+          yield '</' + tag + '>';
+          output.currentLineWidth += tag.length + 3;
+        }
+      }
+    }
+
+    if ((opts.approximateLineWidth ?? 0) > 0 && STRUCTURE_ELEMENTS.has(tagName)) {
+      yield '\n';
+      output.currentLineWidth = 0;
+    }
+
+    if (tagName === 'body') {
+      output.isWithinBody = false;
+    }
+  } else if (node.nodeType === NODE_TYPES.TEXT_NODE) {
+    let textContent = node.nodeValue;
+
+    if (typeof textContent === 'string') {
+      const trimmedTextContent = textContent.trim();
+      if (trimmedTextContent === '') {
+        // this text node is whitespace only
+        if (isWithinWhitespaceSensitive(node)) {
+          // whitespace matters within this element
+          // just add the exact text we were given
+          yield textContent;
+          output.currentLineWidth += textContent.length;
+        } else if ((opts.approximateLineWidth ?? 0) > 0 && !output.isWithinBody) {
+          // do nothing if we're not in the <body> and we're tracking line width
+        } else if (!opts.prettyHtml) {
+          // this text node is only whitespace, and it's not
+          // within a whitespace sensitive element like <pre> or <code>
+          // so replace the entire white space with a single new line
+          output.currentLineWidth += 1;
+
+          if (
+            opts.approximateLineWidth &&
+            opts.approximateLineWidth > 0 &&
+            output.currentLineWidth > opts.approximateLineWidth
+          ) {
+            // good enough for a new line
+            // for perf these are all just estimates
+            // we don't care to ensure exact line lengths
+            yield '\n';
+            output.currentLineWidth = 0;
+          } else {
+            // let's keep it all on the same line yet
+            yield ' ';
+          }
+        }
+      } else {
+        // this text node has text content
+        const isWithinWhitespaceSensitiveNode =
+          opts.newLines || (opts.indentSpaces ?? 0) > 0 || opts.prettyHtml ? isWithinWhitespaceSensitive(node) : false;
+        if (opts.newLines && !isWithinWhitespaceSensitiveNode) {
+          yield '\n';
+          output.currentLineWidth = 0;
+        }
+
+        if ((opts.indentSpaces ?? 0) > 0 && !isWithinWhitespaceSensitiveNode) {
+          for (let i = 0; i < output.indent; i++) {
+            yield ' ';
+          }
+          output.currentLineWidth += output.indent;
+        }
+
+        let textContentLength = textContent.length;
+        if (textContentLength > 0) {
+          // this text node has text content
+
+          const parentTagName =
+            node.parentNode != null && node.parentNode.nodeType === NODE_TYPES.ELEMENT_NODE
+              ? node.parentNode.nodeName
+              : null;
+          if (typeof parentTagName === 'string' && NON_ESCAPABLE_CONTENT.has(parentTagName)) {
+            // this text node cannot have its content escaped since it's going
+            // into an element like <style> or <script>
+            if (isWithinWhitespaceSensitive(node)) {
+              yield textContent;
+            } else {
+              yield trimmedTextContent;
+              textContentLength = trimmedTextContent.length;
+            }
+            output.currentLineWidth += textContentLength;
+          } else {
+            // this text node is going into a normal element and html can be escaped
+            if (opts.prettyHtml && !isWithinWhitespaceSensitiveNode) {
+              // pretty print the text node
+              yield escapeString(textContent.replace(/\s\s+/g, ' ').trim(), false);
+              output.currentLineWidth += textContentLength;
+            } else {
+              // not pretty printing the text node
+              if (isWithinWhitespaceSensitive(node)) {
+                output.currentLineWidth += textContentLength;
+              } else {
+                // this element is not a whitespace sensitive one, like <pre> or <code> so
+                // any whitespace at the start and end can be cleaned up to just be one space
+                if (/\s/.test(textContent.charAt(0))) {
+                  textContent = ' ' + textContent.trimLeft();
+                }
+
+                textContentLength = textContent.length;
+                if (textContentLength > 1) {
+                  if (/\s/.test(textContent.charAt(textContentLength - 1))) {
+                    if (
+                      opts.approximateLineWidth &&
+                      opts.approximateLineWidth > 0 &&
+                      output.currentLineWidth + textContentLength > opts.approximateLineWidth
+                    ) {
+                      textContent = textContent.trimRight() + '\n';
+                      output.currentLineWidth = 0;
+                    } else {
+                      textContent = textContent.trimRight() + ' ';
+                    }
+                  }
+                }
+                output.currentLineWidth += textContentLength;
+              }
+
+              yield escapeString(textContent, false);
+            }
+          }
+        }
+      }
+    }
+  } else if (node.nodeType === NODE_TYPES.COMMENT_NODE) {
+    const nodeValue = node.nodeValue;
+
+    if (opts.removeHtmlComments) {
+      const isHydrateAnnotation =
+        nodeValue?.startsWith(CONTENT_REF_ID + '.') ||
+        nodeValue?.startsWith(ORG_LOCATION_ID + '.') ||
+        nodeValue?.startsWith(SLOT_NODE_ID + '.') ||
+        nodeValue?.startsWith(TEXT_NODE_ID + '.');
+      if (!isHydrateAnnotation) {
+        return;
+      }
+    }
+
+    const isWithinWhitespaceSensitiveNode =
+      opts.newLines || (opts.indentSpaces ?? 0) > 0 ? isWithinWhitespaceSensitive(node) : false;
+    if (opts.newLines && !isWithinWhitespaceSensitiveNode) {
+      yield '\n';
+      output.currentLineWidth = 0;
+    }
+
+    if ((opts.indentSpaces ?? 0) > 0 && !isWithinWhitespaceSensitiveNode) {
+      for (let i = 0; i < output.indent; i++) {
+        yield ' ';
+      }
+      output.currentLineWidth += output.indent;
+    }
+
+    yield '<!--' + nodeValue + '-->';
+    output.currentLineWidth += nodeValue.length + 7;
+  } else if (node.nodeType === NODE_TYPES.DOCUMENT_TYPE_NODE) {
+    yield '<!doctype html>';
   }
 }
 
@@ -598,5 +998,12 @@ export interface SerializeNodeToHtmlOptions {
   removeBooleanAttributeQuotes?: boolean;
   removeEmptyAttributes?: boolean;
   removeHtmlComments?: boolean;
-  serializeShadowRoot?: boolean;
+  /**
+   * Serialize shadow roots as part of the serialization process.
+   * If set to `declarative-shadow-dom`, shadow roots will be serialized as
+   * declarative shadow DOM.
+   * @default false
+   */
+  serializeShadowRoot?: boolean | 'legacy' | 'declarative-shadow-dom';
+  stream?: boolean;
 }

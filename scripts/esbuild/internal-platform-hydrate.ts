@@ -53,7 +53,7 @@ export async function getInternalPlatformHydrateBundles(opts: BuildOptions): Pro
     },
     plugins: [
       externalAlias('@utils/shadow-css', '../client/shadow-css.js'),
-      externalAlias('@app-data', '@stencil/core/internal/app-data'),
+      externalAlias('@app-data', '@stencil/core/internal/app-data/index.js'),
       // this needs to be externalized and also pointed at the esm version
       externalAlias('@stencil/core/mock-doc', '../../mock-doc/index.js'),
     ],
@@ -71,7 +71,7 @@ export async function getInternalPlatformHydrateBundles(opts: BuildOptions): Pro
     },
     plugins: [
       externalAlias('@utils/shadow-css', '../client/shadow-css.js'),
-      externalAlias('@app-data', '@stencil/core/internal/app-data'),
+      externalAlias('@app-data', '@stencil/core/internal/app-data/index.js'),
       externalAlias('@hydrate-factory', '@stencil/core/hydrate-factory'),
     ],
   };

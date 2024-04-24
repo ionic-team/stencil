@@ -76,6 +76,7 @@ export function getOptions(rootDir: string, inputOpts: Partial<BuildOptions> = {
       internalDir: join(rootDir, 'internal'),
       mockDocDir: join(rootDir, 'mock-doc'),
       screenshotDir: join(rootDir, 'screenshot'),
+      ssrDir: join(rootDir, 'ssr', 'dist'),
       sysNodeDir: join(rootDir, 'sys', 'node'),
       testingDir: join(rootDir, 'testing'),
     },
@@ -188,6 +189,7 @@ export interface BuildOptions {
     internalDir: string;
     mockDocDir: string;
     screenshotDir: string;
+    ssrDir: string;
     sysNodeDir: string;
     testingDir: string;
   };

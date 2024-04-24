@@ -42,6 +42,7 @@ describe('release options', () => {
           internalDir: path.join(ROOT_DIR, 'internal'),
           mockDocDir: path.join(ROOT_DIR, 'mock-doc'),
           screenshotDir: path.join(ROOT_DIR, 'screenshot'),
+          ssrDir: path.join(ROOT_DIR, 'ssr'),
           sysNodeDir: path.join(ROOT_DIR, 'sys', 'node'),
           testingDir: path.join(ROOT_DIR, 'testing'),
         },

@@ -46,7 +46,7 @@ export async function getInternalTestingBundle(opts: BuildOptions): Promise<ESBu
     external,
     alias: internalTestingAliases,
     plugins: [
-      externalAlias('@app-data', '@stencil/core/internal/app-data'),
+      externalAlias('@app-data', '@stencil/core/internal/app-data/index.js'),
       externalAlias('@utils/shadow-css', '../client/shadow-css.js'),
     ],
   };

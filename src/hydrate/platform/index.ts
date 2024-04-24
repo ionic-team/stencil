@@ -9,9 +9,9 @@ export const cmpModules = new Map<string, { [exportName: string]: d.ComponentCon
 const getModule = (tagName: string): d.ComponentConstructor => {
   if (typeof tagName === 'string') {
     tagName = tagName.toLowerCase();
-    const cmpModule = cmpModules.get(tagName);
+    const cmpModule = customElements.get(tagName) as d.ComponentConstructor;
     if (cmpModule != null) {
-      return cmpModule[tagName];
+      return cmpModule;
     }
   }
   return null;
@@ -41,9 +41,7 @@ export const registerComponents = (Cstrs: d.ComponentNativeConstructor[]) => {
   for (const Cstr of Cstrs) {
     // using this format so it follows exactly how client-side modules work
     const exportName = Cstr.cmpMeta.$tagName$;
-    cmpModules.set(exportName, {
-      [exportName]: Cstr,
-    });
+    customElements.define(exportName, Cstr as any);
   }
 };
 

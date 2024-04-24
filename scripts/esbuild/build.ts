@@ -7,6 +7,7 @@ import { buildDevServer } from './dev-server';
 import { buildInternal } from './internal';
 import { buildMockDoc } from './mock-doc';
 import { buildScreenshot } from './screenshot';
+import { buildSSR } from './ssr';
 import { buildSysNode } from './sys-node';
 import { buildTesting } from './testing';
 
@@ -42,6 +43,7 @@ export async function buildAll(opts: BuildOptions) {
     buildDevServer(opts),
     buildMockDoc(opts),
     buildScreenshot(opts),
+    buildSSR(opts),
     buildSysNode(opts),
     buildTesting(opts),
     buildInternal(opts),

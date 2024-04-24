@@ -3,8 +3,8 @@ import { SVG_NS } from '@utils';
 
 import type * as d from '../../../declarations';
 import { h, newVNode } from '../h';
+import { toVNode } from '../util';
 import { patch } from '../vdom-render';
-import { toVNode } from './to-vnode';
 
 describe('renderer', () => {
   let hostElm: any;

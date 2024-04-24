@@ -352,7 +352,7 @@ async function validateModuleTreeshake(opts: BuildOptions, moduleName: string, e
           if (id === '@stencil/core/internal/client' || id === '@stencil/core') {
             return join(opts.output.internalDir, 'client', 'index.js');
           }
-          if (id === '@stencil/core/internal/app-data') {
+          if (id === '@stencil/core/internal/app-data/index.js') {
             return join(opts.output.internalDir, 'app-data', 'index.js');
           }
           if (id === '@stencil/core/internal/app-globals') {
