@@ -69,6 +69,8 @@ export async function buildCompiler(opts: BuildOptions) {
   const tsFilePath = tsCacheFilePath(opts);
   alias['typescript'] = tsFilePath;
 
+  delete alias['@stencil/core/mock-doc']
+
   // same for terser
   const [, terserPath] = await bundleTerser(opts);
   alias['terser'] = terserPath;
