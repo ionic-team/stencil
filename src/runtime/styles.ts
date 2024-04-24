@@ -8,6 +8,17 @@ import { HYDRATED_STYLE_ID, NODE_TYPE, SLOT_FB_CSS } from './runtime-constants';
 
 const rootAppliedStyles: d.RootAppliedStyleMap = /*@__PURE__*/ new WeakMap();
 
+/**
+ * Register the styles for a component by creating a stylesheet and then
+ * registering it under the component's scope ID in a `WeakMap` for later use.
+ *
+ * If constructable stylesheet are not supported or `allowCS` is set to
+ * `false` then the styles will be registered as a string instead.
+ *
+ * @param scopeId the scope ID for the component of interest
+ * @param cssText styles for the component of interest
+ * @param allowCS whether or not to use a constructable stylesheet
+ */
 export const registerStyle = (scopeId: string, cssText: string, allowCS: boolean) => {
   let style = styles.get(scopeId);
   if (supportsConstructableStylesheets && allowCS) {
@@ -23,6 +34,19 @@ export const registerStyle = (scopeId: string, cssText: string, allowCS: boolean
   styles.set(scopeId, style);
 };
 
+/**
+ * Attach the styles for a given component to the DOM
+ *
+ * If the element uses shadow or is already attached to the DOM then we can
+ * create a stylesheet inside of its associated document fragment, otherwise
+ * we'll stick the stylesheet into the document head.
+ *
+ * @param styleContainerNode the node within which a style element for the
+ * component of interest should be added
+ * @param cmpMeta runtime metadata for the component of interest
+ * @param mode an optional current mode
+ * @returns the scope ID for the component of interest
+ */
 export const addStyle = (styleContainerNode: any, cmpMeta: d.ComponentRuntimeMeta, mode?: string) => {
   const scopeId = getScopeId(cmpMeta, mode);
   const style = styles.get(scopeId);
@@ -83,6 +107,12 @@ export const addStyle = (styleContainerNode: any, cmpMeta: d.ComponentRuntimeMet
   return scopeId;
 };
 
+/**
+ * Add styles for a given component to the DOM, optionally handling 'scoped'
+ * encapsulation by adding an appropriate class name to the host element.
+ *
+ * @param hostRef the host reference for the component of interest
+ */
 export const attachStyles = (hostRef: d.HostRef) => {
   const cmpMeta = hostRef.$cmpMeta$;
   const elm = hostRef.$hostElement$;
@@ -112,9 +142,42 @@ export const attachStyles = (hostRef: d.HostRef) => {
   endAttachStyles();
 };
 
+/**
+ * Get the scope ID for a given component
+ *
+ * @param cmp runtime metadata for the component of interest
+ * @param mode the current mode (optional)
+ * @returns a scope ID for the component of interest
+ */
 export const getScopeId = (cmp: d.ComponentRuntimeMeta, mode?: string) =>
   'sc-' + (BUILD.mode && mode && cmp.$flags$ & CMP_FLAGS.hasMode ? cmp.$tagName$ + '-' + mode : cmp.$tagName$);
 
+/**
+ * Convert a 'scoped' CSS string to one appropriate for use in the shadow DOM.
+ *
+ * Given a 'scoped' CSS string that looks like this:
+ *
+ * ```
+ * /*!@div*\/div.class-name { display: flex };
+ * ```
+ *
+ * Convert it to a 'shadow' appropriate string, like so:
+ *
+ * ```
+ *  /*!@div*\/div.class-name { display: flex }
+ *      ─┬─                  ────────┬────────
+ *       │                           │
+ *       │         ┌─────────────────┘
+ *       ▼         ▼
+ *      div{ display: flex }
+ * ```
+ *
+ * Note that forward-slashes in the above are escaped so they don't end the
+ * comment.
+ *
+ * @param css a CSS string to convert
+ * @returns the converted string
+ */
 export const convertScopedToShadow = (css: string) => css.replace(/\/\*!@([^\/]+)\*\/[^\{]+\{/g, '$1{');
 
 declare global {
