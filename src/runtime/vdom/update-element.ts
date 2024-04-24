@@ -5,12 +5,18 @@ import type * as d from '../../declarations';
 import { NODE_TYPE } from '../runtime-constants';
 import { setAccessor } from './set-accessor';
 
-export const updateElement = (
-  oldVnode: d.VNode | null,
-  newVnode: d.VNode,
-  isSvgMode: boolean,
-  memberName?: string,
-): void => {
+/**
+ * Handle updating attributes on the component element based on the current
+ * values present in the virtual DOM.
+ *
+ * If the component of interest uses shadow DOM these are added to the shadow
+ * root's host element.
+ *
+ * @param oldVnode an old virtual DOM node or null
+ * @param newVnode a new virtual DOM node
+ * @param isSvgMode whether or not we're in an SVG context
+ */
+export const updateElement = (oldVnode: d.VNode | null, newVnode: d.VNode, isSvgMode: boolean): void => {
   // if the element passed in is a shadow root, which is a document fragment
   // then we want to be adding attrs/props to the shadow root's "host" element
   // if it's not a shadow root, then we add attrs/props to the same element
@@ -23,7 +29,7 @@ export const updateElement = (
 
   if (BUILD.updatable) {
     // remove attributes no longer present on the vnode by setting them to undefined
-    for (memberName of sortedAttrNames(Object.keys(oldVnodeAttrs))) {
+    for (const memberName of sortedAttrNames(Object.keys(oldVnodeAttrs))) {
       if (!(memberName in newVnodeAttrs)) {
         setAccessor(elm, memberName, oldVnodeAttrs[memberName], undefined, isSvgMode, newVnode.$flags$);
       }
@@ -31,7 +37,7 @@ export const updateElement = (
   }
 
   // add new & update changed attributes
-  for (memberName of sortedAttrNames(Object.keys(newVnodeAttrs))) {
+  for (const memberName of sortedAttrNames(Object.keys(newVnodeAttrs))) {
     setAccessor(elm, memberName, oldVnodeAttrs[memberName], newVnodeAttrs[memberName], isSvgMode, newVnode.$flags$);
   }
 };
