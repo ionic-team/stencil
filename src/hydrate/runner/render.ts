@@ -225,7 +225,7 @@ function finalizeHydrate(
     }
 
     if (opts.serializeToHtml) {
-      results.html = serializeDocumentToString(doc, opts);
+      results.html = serializeDocumentToString(doc, opts) as any;
     }
   } catch (e) {
     renderCatchError(results, e);

@@ -93,7 +93,7 @@ export const generateTemplateHtml = async (
     let html = serializeNodeToHtml(doc);
 
     if (isFunction(prerenderConfig.afterSerializeTemplate)) {
-      const afterSerializeResults = prerenderConfig.afterSerializeTemplate(html);
+      const afterSerializeResults = prerenderConfig.afterSerializeTemplate(html as any);
       if (isPromise(afterSerializeResults)) {
         html = await afterSerializeResults;
       } else {

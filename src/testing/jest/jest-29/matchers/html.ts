@@ -32,20 +32,20 @@ export function compareHtml(
       removeHtmlComments: options.includeAnnotations === false,
       excludeTags: ['body'],
       serializeShadowRoot,
-    });
+    }) as any;
   } else if ((input as HTMLElement).nodeType === NODE_TYPES.DOCUMENT_FRAGMENT_NODE) {
     serializeA = serializeNodeToHtml(input as any, {
       prettyHtml: true,
       excludeTags: ['style'],
       excludeTagContent: ['style'],
       serializeShadowRoot,
-    });
+    }) as any;
   } else if (typeof input === 'string') {
     const parseA = parseHtmlToFragment(input);
     serializeA = serializeNodeToHtml(parseA, {
       prettyHtml: true,
       serializeShadowRoot,
-    });
+    }) as any;
   } else {
     throw new Error(`expect toEqualHtml() value should be an element, shadow root or string.`);
   }

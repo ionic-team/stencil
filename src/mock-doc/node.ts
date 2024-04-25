@@ -450,7 +450,7 @@ Testing components with ElementInternals is fully supported in e2e tests.`,
     return serializeNodeToHtml(this as any, {
       newLines: false,
       indentSpaces: 0,
-    });
+    }) as any;
   }
 
   set innerHTML(html: string) {

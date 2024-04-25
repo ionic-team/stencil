@@ -6,7 +6,7 @@ const print = (val: unknown): string => {
     serializeShadowRoot: true,
     prettyHtml: true,
     outerHtml: true,
-  });
+  }) as any;
 };
 
 const test = (val: any): boolean => {
