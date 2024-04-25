@@ -111,6 +111,16 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
       elm.classList.add((elm['s-si'] = scopeId));
     }
 
+    if (BUILD.shadowDom || BUILD.scoped) {
+      const rootScopeId =
+        newParentVNode.$elm$?.['s-rsc'] || newParentVNode.$elm$?.['s-si'] || newParentVNode.$elm$?.['s-sc'];
+
+      if (rootScopeId) {
+        elm['s-rsc'] = rootScopeId;
+        !elm.classList.contains(rootScopeId) && elm.classList.add(rootScopeId);
+      }
+    }
+
     if (newVNode.$children$) {
       for (i = 0; i < newVNode.$children$.length; ++i) {
         // create the node
