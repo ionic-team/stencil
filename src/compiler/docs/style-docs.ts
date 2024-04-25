@@ -15,9 +15,11 @@ export function parseStyleDocs(styleDocs: d.StyleDoc[], styleText: string | null
     return;
   }
 
-  let startIndex: number;
-  while ((startIndex = styleText.indexOf(CSS_DOC_START)) > -1) {
-    styleText = styleText.substring(startIndex + CSS_DOC_START.length);
+  // Using `match` allows us to know which substring matched the regex and the starting
+  // index at which the match was found
+  let match = styleText.match(CSS_DOC_START);
+  while (match !== null) {
+    styleText = styleText.substring(match.index + match[0].length);
 
     const endIndex = styleText.indexOf(CSS_DOC_END);
     if (endIndex === -1) {
@@ -28,6 +30,7 @@ export function parseStyleDocs(styleDocs: d.StyleDoc[], styleText: string | null
     parseCssComment(styleDocs, comment);
 
     styleText = styleText.substring(endIndex + CSS_DOC_END.length);
+    match = styleText.match(CSS_DOC_START);
   }
 }
 
@@ -83,9 +86,10 @@ function parseCssComment(styleDocs: d.StyleDoc[], comment: string): void {
 }
 
 /**
- * Opening syntax for a CSS docstring
+ * Opening syntax for a CSS docstring.
+ * This will match a traditional docstring or a "loud" comment in sass
  */
-const CSS_DOC_START = '/**';
+const CSS_DOC_START = /\/\*(\*|\!)/;
 /**
  * Closing syntax for a CSS docstring
  */
