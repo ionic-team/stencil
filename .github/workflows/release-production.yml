@@ -43,7 +43,7 @@ jobs:
         if: ${{ inputs.base != 'main' && inputs.tag == 'latest' }}
 
       - name: Checkout Code
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        uses: actions/checkout@1d96c772d19495a3b5c517cd2bc0cb401ea0529f # v4.1.3
         with:
           # A depth of 0 gets the entire git history, which we'll want for things like checking all git history/tags.
           # We need git history to generate the changelog; however, we don't know how deep to go.
