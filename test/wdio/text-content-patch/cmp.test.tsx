@@ -20,28 +20,53 @@ describe('textContent patch', () => {
   });
 
   describe('scoped encapsulation', () => {
-    it('should return the content of all slots', () => {
-      const elm = document.querySelector('text-content-patch-scoped-with-slot');
-      expect(elm.textContent.trim()).toBe('Slot content Suffix content');
+    it('should return the content of all slots', async () => {
+      const elm = $('text-content-patch-scoped-with-slot');
+      await expect(elm.getText()).toMatchInlineSnapshot(`
+        "Top content
+        Slot content
+        Bottom content
+        Suffix content"
+      `);
     });
 
-    it('should return an empty string if there is no slotted content', () => {
-      const elm = document.querySelector('text-content-patch-scoped');
-      expect(elm.textContent.trim()).toBe('');
+    it('should return an empty string if there is no slotted content', async () => {
+      const elm = $('text-content-patch-scoped');
+      await expect(elm.getText()).toMatchInlineSnapshot(`
+        "Top content
+        Bottom content"
+      `);
     });
 
-    it('should overwrite the default slot content', () => {
-      const elm = document.querySelector('text-content-patch-scoped-with-slot');
-      elm.textContent = 'New slot content';
+    it('should overwrite the default slot content', async () => {
+      const elm = await $('text-content-patch-scoped-with-slot');
+      await browser.execute(
+        (elm) => {
+          elm.textContent = 'New slot content';
+        },
+        elm as any as HTMLElement,
+      );
 
-      expect(elm.textContent.trim()).toBe('New slot content');
+      await expect(elm.getText()).toMatchInlineSnapshot(`
+        "Top content
+        New slot content
+        Bottom content"
+      `);
     });
 
-    it('should not insert the text node if there is no default slot', () => {
-      const elm = document.querySelector('text-content-patch-scoped');
-      elm.textContent = 'New slot content';
+    it('should not insert the text node if there is no default slot', async () => {
+      const elm = await $('text-content-patch-scoped');
+      await browser.execute(
+        (elm) => {
+          elm.textContent = 'New slot content';
+        },
+        elm as any as HTMLElement,
+      );
 
-      expect(elm.textContent.trim()).toBe('');
+      await expect(elm.getText()).toMatchInlineSnapshot(`
+        "Top content
+        Bottom content"
+      `);
     });
   });
 });
