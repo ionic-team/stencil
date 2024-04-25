@@ -164,7 +164,7 @@ export const extTransformsPlugin = (
         // Set style docs
         if (cmp) {
           cmp.styleDocs ||= [];
-          mergeIntoWith(cmp.styleDocs, cssTransformResults.styleDocs, (docs) => docs.name);
+          mergeIntoWith(cmp.styleDocs, cssTransformResults.styleDocs, (docs) => `${docs.name},${docs.mode}`);
         }
 
         // Track dependencies

@@ -1,8 +1,13 @@
 import { Component, h, Method } from '@stencil/core';
-import { importedInterface, ImportedInterface } from './imported-interface';
+
+import { ImportedInterface, importedInterface } from './imported-interface';
 
 @Component({
   tag: 'my-component',
+  styleUrls: {
+    ios: './my-component.ios.css',
+    md: './my-component.md.css',
+  },
   shadow: true,
 })
 export class MyComponent {

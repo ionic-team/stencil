@@ -9,8 +9,9 @@ import type * as d from '../../declarations';
  *
  * @param styleDocs the array to hold formatted CSS docstrings
  * @param styleText the CSS text we're working with
+ * @param mode a mode associated with the parsed style, if applicable (e.g. this is not applicable for global styles)
  */
-export function parseStyleDocs(styleDocs: d.StyleDoc[], styleText: string | null) {
+export function parseStyleDocs(styleDocs: d.StyleDoc[], styleText: string | null, mode?: string | undefined) {
   if (typeof styleText !== 'string') {
     return;
   }
@@ -27,7 +28,7 @@ export function parseStyleDocs(styleDocs: d.StyleDoc[], styleText: string | null
     }
 
     const comment = styleText.substring(0, endIndex);
-    parseCssComment(styleDocs, comment);
+    parseCssComment(styleDocs, comment, mode);
 
     styleText = styleText.substring(endIndex + CSS_DOC_END.length);
     match = styleText.match(CSS_DOC_START);
@@ -40,8 +41,9 @@ export function parseStyleDocs(styleDocs: d.StyleDoc[], styleText: string | null
  *
  * @param styleDocs an array which will be modified with the docstring
  * @param comment the comment string
+ * @param mode a mode associated with the parsed style, if applicable (e.g. this is not applicable for global styles)
  */
-function parseCssComment(styleDocs: d.StyleDoc[], comment: string): void {
+function parseCssComment(styleDocs: d.StyleDoc[], comment: string, mode: string | undefined): void {
   /**
    * @prop --max-width: Max width of the alert
    */
@@ -77,6 +79,7 @@ function parseCssComment(styleDocs: d.StyleDoc[], comment: string): void {
       name: splt[0].trim(),
       docs: (splt.shift() && splt.join(`:`)).trim(),
       annotation: 'prop',
+      mode,
     };
 
     if (!styleDocs.some((c) => c.name === cssDoc.name && c.annotation === 'prop')) {
