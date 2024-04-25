@@ -134,4 +134,17 @@ describe('style-docs', () => {
     parseStyleDocs(styleDocs, styleText);
     expect(styleDocs).toEqual([]);
   });
+
+  it('works with sass loud comments', () => {
+    const styleText = `
+      /*!
+       * @prop --max-width: Max width of the alert
+       */
+      body {
+        color: red;
+      }
+    `;
+    parseStyleDocs(styleDocs, styleText);
+    expect(styleDocs).toEqual([{ name: `--max-width`, docs: `Max width of the alert`, annotation: 'prop' }]);
+  });
 });
