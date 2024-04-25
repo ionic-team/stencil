@@ -6,7 +6,7 @@ import { copyStencilInternalDts } from '../bundles/internal';
 import type { BuildOptions } from '../utils/options';
 import { writePkgJson } from '../utils/write-pkg-json';
 import { getInternalAppDataBundles } from './internal-app-data';
-import { getInternalClientBundle } from './internal-platform-client';
+import { getInternalClientBundles } from './internal-platform-client';
 import { getInternalPlatformHydrateBundles } from './internal-platform-hydrate';
 import { getInternalTestingBundle } from './internal-platform-testing';
 import { getBaseEsbuildOptions, runBuilds } from './util';
@@ -53,13 +53,13 @@ export async function buildInternal(opts: BuildOptions) {
     platform: 'node',
   };
 
-  const clientPlatformBundle = await getInternalClientBundle(opts);
+  const clientPlatformBundles = await getInternalClientBundles(opts);
   const hydratePlatformBundles = await getInternalPlatformHydrateBundles(opts);
   const appDataBundles = await getInternalAppDataBundles(opts);
   const internalTestingBundle = await getInternalTestingBundle(opts);
 
   return runBuilds(
-    [shadowCSSBundle, ...clientPlatformBundle, ...hydratePlatformBundles, internalTestingBundle, ...appDataBundles],
+    [shadowCSSBundle, ...clientPlatformBundles, ...hydratePlatformBundles, internalTestingBundle, ...appDataBundles],
     opts,
   );
 }

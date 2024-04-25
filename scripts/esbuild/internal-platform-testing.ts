@@ -33,7 +33,7 @@ export async function getInternalTestingBundle(opts: BuildOptions): Promise<ESBu
     '@platform': inputTestingPlatform,
   };
 
-  const external = [...getEsbuildExternalModules(opts, opts.output.internalDir), '@stencil/core/mock-doc'];
+  const external = getEsbuildExternalModules(opts, opts.output.internalDir);
 
   const internalTestingBuildOptions: ESBuildOptions = {
     ...getBaseEsbuildOptions(),
