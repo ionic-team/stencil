@@ -17,7 +17,7 @@ import { externalAlias, getBaseEsbuildOptions, getEsbuildAliases, getEsbuildExte
  * @param opts build options
  * @returns an array of ESBuild option objects
  */
-export async function getInternalClientBundle(opts: BuildOptions): Promise<ESBuildOptions[]> {
+export async function getInternalClientBundles(opts: BuildOptions): Promise<ESBuildOptions[]> {
   const inputClientDir = join(opts.srcDir, 'client');
   const outputInternalClientDir = join(opts.output.internalDir, 'client');
   const outputInternalClientPolyfillsDir = join(outputInternalClientDir, 'polyfills');
@@ -59,9 +59,6 @@ export async function getInternalClientBundle(opts: BuildOptions): Promise<ESBui
       replace(createReplaceData(opts)),
       externalAlias('@app-data', '@stencil/core/internal/app-data'),
       externalAlias('@utils/shadow-css', './shadow-css.js'),
-      // we want to get the esm, not the cjs, since we're creating an esm
-      // bundle here
-      externalAlias('@stencil/core/mock-doc', '../../mock-doc/index.js'),
       findAndReplaceLoadModule(),
     ],
   };

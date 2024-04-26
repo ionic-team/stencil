@@ -231,3 +231,28 @@ export const VALID_CONFIG_OUTPUT_TARGETS = [
 ] as const;
 
 export const GENERATED_DTS = 'components.d.ts';
+
+/**
+ * DOM Node types
+ *
+ * See https://developer.mozilla.org/en-US/docs/Web/API/Node/nodeType
+ *
+ * Note: this is a duplicate of the `NODE_TYPES` enum in mock-doc, it's
+ * copied over here so that we do not need to introduce a dependency on the
+ * mock-doc bundle in the runtime. See
+ * https://github.com/ionic-team/stencil/pull/5705 for more details.
+ */
+export const enum NODE_TYPES {
+  ELEMENT_NODE = 1,
+  ATTRIBUTE_NODE = 2,
+  TEXT_NODE = 3,
+  CDATA_SECTION_NODE = 4,
+  ENTITY_REFERENCE_NODE = 5,
+  ENTITY_NODE = 6,
+  PROCESSING_INSTRUCTION_NODE = 7,
+  COMMENT_NODE = 8,
+  DOCUMENT_NODE = 9,
+  DOCUMENT_TYPE_NODE = 10,
+  DOCUMENT_FRAGMENT_NODE = 11,
+  NOTATION_NODE = 12,
+}

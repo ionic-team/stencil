@@ -40,6 +40,7 @@
       "@stencil/core/cli": ["src/cli/index.ts"],
       "@sys-api-node": ["src/sys/node/index.ts"],
       "@utils": ["src/utils/index.ts"],
+      "@utils/*": ["src/utils/*"],
       "@utils/shadow-css": ["src/utils/shadow-css"]
     },
     "pretty": true,
