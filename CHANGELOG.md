@@ -5,7 +5,6 @@
 
 * **build:** address @ionic/angular bundle size issue ([#5705](https://github.com/ionic-team/stencil/issues/5705)) ([0a7becc](https://github.com/ionic-team/stencil/commit/0a7beccb0a62a6a33a18b960aa5e59ada1b509fe))
 * **compiler:** recognize loud comments when generating style docs ([#5706](https://github.com/ionic-team/stencil/issues/5706)) ([a325f5c](https://github.com/ionic-team/stencil/commit/a325f5cd3f691fd3c10a2ab4c19a37d4617a4b79)), closes [#5623](https://github.com/ionic-team/stencil/issues/5623)
-* **test:** improve stability of some e2e tests ([#5691](https://github.com/ionic-team/stencil/issues/5691)) ([0d19c29](https://github.com/ionic-team/stencil/commit/0d19c29e0348042bb9ea4b1c6643c0a62c34632a))
 
 
 
