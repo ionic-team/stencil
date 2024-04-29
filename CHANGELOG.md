@@ -1,3 +1,13 @@
+## 🏊 [4.17.2](https://github.com/ionic-team/stencil/compare/v4.17.1...v4.17.2) (2024-04-29)
+
+
+### Bug Fixes
+
+* **build:** address @ionic/angular bundle size issue ([#5705](https://github.com/ionic-team/stencil/issues/5705)) ([0a7becc](https://github.com/ionic-team/stencil/commit/0a7beccb0a62a6a33a18b960aa5e59ada1b509fe))
+* **compiler:** recognize loud comments when generating style docs ([#5706](https://github.com/ionic-team/stencil/issues/5706)) ([a325f5c](https://github.com/ionic-team/stencil/commit/a325f5cd3f691fd3c10a2ab4c19a37d4617a4b79)), closes [#5623](https://github.com/ionic-team/stencil/issues/5623)
+
+
+
 ## 🚒 [4.17.1](https://github.com/ionic-team/stencil/compare/v4.17.0...v4.17.1) (2024-04-23)
 
 
