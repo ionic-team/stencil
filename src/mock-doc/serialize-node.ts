@@ -516,6 +516,7 @@ function isWithinWhitespaceSensitive(node: Node) {
   'param',
   'source',
   'trace',
+  'track',
   'wbr',
 ]);
 
