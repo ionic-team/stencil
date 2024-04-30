@@ -50,6 +50,8 @@ export const createCustomResolverAsync = (
 ): any => {
   return {
     async isFile(filePath: string, cb: (err: any, isFile: boolean) => void) {
+      console.log(`call isFile with ${filePath}`);
+
       const fsFilePath = normalizeFsPath(filePath);
 
       const stat = await inMemoryFs.stat(fsFilePath);
@@ -62,6 +64,8 @@ export const createCustomResolverAsync = (
     },
 
     async isDirectory(dirPath: string, cb: (err: any, isDirectory: boolean) => void) {
+      console.log(`call isDirectory with ${dirPath}`);
+
       const fsDirPath = normalizeFsPath(dirPath);
 
       const stat = await inMemoryFs.stat(fsDirPath);
@@ -74,6 +78,8 @@ export const createCustomResolverAsync = (
     },
 
     async readFile(p: string, cb: (err: any, data?: any) => void) {
+      console.log(`call readFile with ${p}`);
+
       const fsFilePath = normalizeFsPath(p);
 
       const data = await inMemoryFs.readFile(fsFilePath);
@@ -85,6 +91,8 @@ export const createCustomResolverAsync = (
     },
 
     async realpath(p: string, cb: (err: any, data?: any) => void) {
+      console.log(`call realpath with ${p}`);
+
       const fsFilePath = normalizeFsPath(p);
       const results = await sys.realpath(fsFilePath);
 
