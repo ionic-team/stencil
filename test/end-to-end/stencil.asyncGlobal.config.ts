@@ -7,10 +7,10 @@ export const config: Config = {
   globalScript: './async-global/globalAsync.ts',
   outputTargets: [
     {
-      type: 'dist-custom-elements'
+      type: 'dist-custom-elements',
     },
   ],
   testing: {
     roots: ['./async-global'],
-  }
+  },
 };

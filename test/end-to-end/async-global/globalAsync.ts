@@ -3,10 +3,9 @@ declare global {
   var globalAsyncSetup: boolean;
 }
 
-
 export default async function () {
   console.log('Start async global setup');
-  await new Promise(resolve => setTimeout(resolve, 500));
+  await new Promise((resolve) => setTimeout(resolve, 500));
   console.log('End async global setup');
   globalThis.globalAsyncSetup = true;
 }

@@ -5,10 +5,6 @@ import { Component, h, Host } from '@stencil/core';
 })
 export class MyCmp {
   render() {
-    return (
-      <Host>
-        Hello World!
-      </Host>
-    );
+    return <Host>Hello World!</Host>;
   }
 }
