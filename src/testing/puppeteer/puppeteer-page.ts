@@ -268,6 +268,12 @@ async function waitForStencil(page: E2EPage, options: WaitForOptions) {
   try {
     const timeout = typeof options.timeout === 'number' ? options.timeout : 4750;
     await page.waitForFunction('window.stencilAppLoaded', { timeout });
+
+    /**
+     * Wait for an element with a .hydrated class to be present as a signal that
+     * the app has loaded and any async global scripts have executed.
+     */
+    await page.waitForSelector('.hydrated');
   } catch (e) {
     throw new Error(`App did not load in allowed time. Please ensure the content loads a stencil application.`);
   }

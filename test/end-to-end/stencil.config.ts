@@ -1,14 +1,16 @@
-import { Config } from '../../internal';
-import builtins from 'rollup-plugin-node-builtins';
-import linaria from 'linaria/rollup';
-import css from 'rollup-plugin-css-only';
 import { reactOutputTarget } from '@stencil/react-output-target';
+import linaria from 'linaria/rollup';
 import path from 'path';
+import css from 'rollup-plugin-css-only';
+import builtins from 'rollup-plugin-node-builtins';
+
+import { Config } from '../../internal';
 
 export const config: Config = {
   namespace: 'EndToEnd',
   globalScript: './src/global.ts',
   globalStyle: './src/global.css',
+  srcDir: 'src',
   plugins: [builtins()],
   rollupPlugins: {
     after: [
