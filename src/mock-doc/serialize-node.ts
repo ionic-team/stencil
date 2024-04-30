@@ -474,6 +474,7 @@ function isWithinWhitespaceSensitive(node: Node) {
   return false;
 }
 
+// TODO(STENCIL-1299): Audit this list, remove unsupported/deprecated elements
 /*@__PURE__*/ export const NON_ESCAPABLE_CONTENT = new Set([
   'STYLE',
   'SCRIPT',
@@ -485,6 +486,7 @@ function isWithinWhitespaceSensitive(node: Node) {
   'PLAINTEXT',
 ]);
 
+// TODO(STENCIL-1299): Audit this list, remove unsupported/deprecated elements
 /**
  * A list of whitespace sensitive tag names, such as `code`, `pre`, etc.
  */
@@ -498,7 +500,8 @@ function isWithinWhitespaceSensitive(node: Node) {
   'TEXTAREA',
 ]);
 
-/*@__PURE__*/ const EMPTY_ELEMENTS = new Set([
+// TODO(STENCIL-1299): Audit this list, remove unsupported/deprecated elements
+/*@__PURE__*/ export const EMPTY_ELEMENTS = new Set([
   'area',
   'base',
   'basefont',
@@ -516,11 +519,14 @@ function isWithinWhitespaceSensitive(node: Node) {
   'param',
   'source',
   'trace',
+  'track',
   'wbr',
 ]);
 
+// TODO(STENCIL-1299): Audit this list, remove unsupported/deprecated attr
 /*@__PURE__*/ const REMOVE_EMPTY_ATTR = new Set(['class', 'dir', 'id', 'lang', 'name', 'title']);
 
+// TODO(STENCIL-1299): Audit this list, remove unsupported/deprecated attr
 /*@__PURE__*/ const BOOLEAN_ATTR = new Set([
   'allowfullscreen',
   'async',
