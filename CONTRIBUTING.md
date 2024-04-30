@@ -97,7 +97,7 @@ Afterwards, to clean up:
 2. In the directory of _stencil core_, run `npm unlink`
 
 > [!NOTE]  
-> Alternatively you can reference Stencil from a local directory in the `package.json`, e.g.
+> Instead of linking, you can reference Stencil from a local directory in the `package.json` after updating your project's `tsconfig.json` file, e.g.
 > ```patch
 > diff --git a/package.json b/package.json
 > index 1a8320a..bb1fa3a 100644
