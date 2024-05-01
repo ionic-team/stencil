@@ -79,7 +79,9 @@ Using `npm link` is beneficial to the development cycle in that consecutive buil
     "baseUrl": ".",
     "paths": {
       "@stencil/core/internal": ["node_modules/@stencil/core/internal"],
-      "@stencil/core/internal/*": ["node_modules/@stencil/core/internal/*"]
+      "@stencil/core/internal/*": ["node_modules/@stencil/core/internal/*"],
+      "@stencil/core/mock-doc": ["node_modules/@stencil/core/mock-doc"],
+      "@stencil/core/mock-doc/*": ["node_modules/@stencil/core/mock-doc/*"]
     }
   }
 }
@@ -93,6 +95,28 @@ Afterwards, to clean up:
     1. Run `npm unlink @stencil/core`
     2. Remove the modifications to your tsconfig.json
 2. In the directory of _stencil core_, run `npm unlink`
+
+> [!NOTE]  
+> Instead of linking, you can reference Stencil from a local directory in the `package.json` after updating your project's `tsconfig.json` file, e.g.
+> ```patch
+> diff --git a/package.json b/package.json
+> index 1a8320a..bb1fa3a 100644
+> --- a/package.json
+> +++ b/package.json
+> @@ -39,11 +39,12 @@
+>      "generate": "stencil generate"
+>    },
+>    "devDependencies": {
+> -    "@stencil/core": "^4.7.0",
+> +    "@stencil/core": "file:/path/to/local/stencil",
+>      "@types/jest": "^29.5.6",
+>      "@types/node": "^16.18.11",
+>      "jest": "^29.7.0",
+>      "jest-cli": "^29.7.0",
+>      "puppeteer": "^21.9.0"
+>    },
+>    "license": "MIT"
+> ```
 
 #### Testing with `npm pack`:
 
