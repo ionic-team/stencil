@@ -5,7 +5,7 @@ import { ClassComponent } from './__fixtures__/cmp';
 
 describe('testing function and class components', () => {
   it('can render a single functional component', async () => {
-    const MyFunctionalComponent = () => (<div>Hello World</div>)
+    const MyFunctionalComponent = () => <div>Hello World</div>;
     const page: SpecPage = await newSpecPage({
       components: [MyFunctionalComponent],
       template: () => <MyFunctionalComponent></MyFunctionalComponent>,
@@ -14,7 +14,7 @@ describe('testing function and class components', () => {
   });
 
   it('can render a single functional component with props', async () => {
-    const MyFunctionalComponent = (props: { foo: 'bar' }) => (<div>{props.foo}</div>)
+    const MyFunctionalComponent = (props: { foo: 'bar' }) => <div>{props.foo}</div>;
     const page: SpecPage = await newSpecPage({
       components: [MyFunctionalComponent],
       template: () => <MyFunctionalComponent foo="bar"></MyFunctionalComponent>,
@@ -23,7 +23,7 @@ describe('testing function and class components', () => {
   });
 
   it('can render a single functional component with children', async () => {
-    const MyFunctionalComponent = (props: never, children) => (<div>{children}</div>)
+    const MyFunctionalComponent = (props: never, children) => <div>{children}</div>;
     const page: SpecPage = await newSpecPage({
       components: [MyFunctionalComponent],
       template: () => <MyFunctionalComponent>Hello World</MyFunctionalComponent>,
@@ -32,7 +32,11 @@ describe('testing function and class components', () => {
   });
 
   it('can render a single functional component with children and props', async () => {
-    const MyFunctionalComponent = (props: { foo: 'bar' }, children) => (<div>{children} - {props.foo}</div>)
+    const MyFunctionalComponent = (props: { foo: 'bar' }, children) => (
+      <div>
+        {children} - {props.foo}
+      </div>
+    );
     const page: SpecPage = await newSpecPage({
       components: [MyFunctionalComponent],
       template: () => <MyFunctionalComponent foo="bar">Hello World</MyFunctionalComponent>,
@@ -41,12 +45,16 @@ describe('testing function and class components', () => {
   });
 
   it('can render a class component with a functional component', async () => {
-    const MyFunctionalComponent = (props: never, children: string) => (<div>I am a functional component - {children}</div>)
+    const MyFunctionalComponent = (props: never, children: string) => (
+      <div>I am a functional component - {children}</div>
+    );
     const page: SpecPage = await newSpecPage({
       components: [ClassComponent],
-      template: () => <class-component>
-        <MyFunctionalComponent>Yes I am!</MyFunctionalComponent>
-      </class-component>,
+      template: () => (
+        <class-component>
+          <MyFunctionalComponent>Yes I am!</MyFunctionalComponent>
+        </class-component>
+      ),
     });
     expect(page.bo).toEqualHtml(`<class-component>
   <mock:shadow-root>
@@ -65,15 +73,19 @@ describe('testing function and class components', () => {
   });
 
   it('can render a functional component within a class component', async () => {
-    const MyFunctionalComponent = (props: never, children: string) => (<div>
-      <h1>I am a functional component</h1>
-      {children}
-    </div>)
+    const MyFunctionalComponent = (props: never, children: string) => (
+      <div>
+        <h1>I am a functional component</h1>
+        {children}
+      </div>
+    );
     const page: SpecPage = await newSpecPage({
       components: [ClassComponent],
-      template: () => <MyFunctionalComponent>
-        <class-component>Yes I am!</class-component>
-      </MyFunctionalComponent>,
+      template: () => (
+        <MyFunctionalComponent>
+          <class-component>Yes I am!</class-component>
+        </MyFunctionalComponent>
+      ),
     });
     expect(page.body).toEqualHtml(`<div>
     <h1>
@@ -90,6 +102,6 @@ describe('testing function and class components', () => {
       </mock:shadow-root>
       Yes I am!
     </class-component>
-  </div>`)
+  </div>`);
   });
 });
