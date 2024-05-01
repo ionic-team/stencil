@@ -105,7 +105,7 @@ export async function startAutoApplyChanges(): Promise<void> {
  * @param Cstrs the component constructors to register
  */
 export const registerComponents = (Cstrs: d.ComponentTestingConstructor[]): void => {
-  Cstrs.forEach((Cstr) => {
+  Cstrs.filter((Cstr) => Cstr.COMPILER_META).forEach((Cstr) => {
     cstrs.set(Cstr.COMPILER_META.tagName, Cstr);
   });
 };

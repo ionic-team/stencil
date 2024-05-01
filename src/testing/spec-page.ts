@@ -85,8 +85,15 @@ export async function newSpecPage(opts: NewSpecPageOptions): Promise<SpecPage> {
   };
 
   const lazyBundles: LazyBundlesRuntimeData = opts.components.map((Cstr: ComponentTestingConstructor) => {
+    /**
+     * just pass through functional components that don't have styles nor any other metadata
+     */
     if (Cstr.COMPILER_META == null) {
-      throw new Error(`Invalid component class: Missing static "COMPILER_META" property.`);
+      /**
+       * the bundleId can be arbitrary, but must be unique
+       */
+      const arbitraryBundleId = `fc.${Math.round(Math.random() * 899999) + 100000}`;
+      return formatLazyBundleRuntimeMeta(arbitraryBundleId, []);
     }
 
     cmpTags.add(Cstr.COMPILER_META.tagName);
@@ -113,7 +120,9 @@ export async function newSpecPage(opts: NewSpecPageOptions): Promise<SpecPage> {
     return lazyBundleRuntimeMeta;
   });
 
-  const cmpCompilerMeta = opts.components.map((Cstr) => Cstr.COMPILER_META as ComponentCompilerMeta);
+  const cmpCompilerMeta = opts.components
+    .filter((Cstr) => Cstr.COMPILER_META != null)
+    .map((Cstr) => Cstr.COMPILER_META as ComponentCompilerMeta);
   const cmpBuild = getBuildFeatures(cmpCompilerMeta);
   if (opts.strictBuild) {
     Object.assign(BUILD, cmpBuild);
