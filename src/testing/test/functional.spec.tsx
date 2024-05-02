@@ -1,4 +1,4 @@
-import { h } from '@stencil/core';
+import { Fragment, h } from '@stencil/core';
 import { newSpecPage, SpecPage } from '@stencil/core/testing';
 
 import { ClassComponent } from './__fixtures__/cmp';
@@ -23,7 +23,7 @@ describe('testing function and class components', () => {
   });
 
   it('can render a single functional component with children', async () => {
-    const MyFunctionalComponent = (props: never, children) => <div>{children}</div>;
+    const MyFunctionalComponent: Fragment = (props: never, children: Fragment) => <div>{children}</div>;
     const page: SpecPage = await newSpecPage({
       components: [MyFunctionalComponent],
       template: () => <MyFunctionalComponent>Hello World</MyFunctionalComponent>,
@@ -32,7 +32,7 @@ describe('testing function and class components', () => {
   });
 
   it('can render a single functional component with children and props', async () => {
-    const MyFunctionalComponent = (props: { foo: 'bar' }, children) => (
+    const MyFunctionalComponent = (props: { foo: 'bar' }, children: Fragment) => (
       <div>
         {children} - {props.foo}
       </div>
@@ -45,7 +45,7 @@ describe('testing function and class components', () => {
   });
 
   it('can render a class component with a functional component', async () => {
-    const MyFunctionalComponent = (props: never, children: string) => (
+    const MyFunctionalComponent = (props: never, children: Fragment) => (
       <div>I am a functional component - {children}</div>
     );
     const page: SpecPage = await newSpecPage({
@@ -73,7 +73,7 @@ describe('testing function and class components', () => {
   });
 
   it('can render a functional component within a class component', async () => {
-    const MyFunctionalComponent = (props: never, children: string) => (
+    const MyFunctionalComponent = (props: never, children: Fragment) => (
       <div>
         <h1>I am a functional component</h1>
         {children}
