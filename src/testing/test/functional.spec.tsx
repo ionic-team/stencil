@@ -56,7 +56,7 @@ describe('testing function and class components', () => {
         </class-component>
       ),
     });
-    expect(page.bo).toEqualHtml(`<class-component>
+    expect(page.root).toEqualHtml(`<class-component>
   <mock:shadow-root>
     <div>
       <h1>
