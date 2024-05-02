@@ -883,7 +883,6 @@ export namespace JSXBase {
   }
 
   export interface ButtonHTMLAttributes<T> extends HTMLAttributes<T> {
-    autoFocus?: boolean;
     disabled?: boolean;
     form?: string;
     formAction?: string;
@@ -1026,8 +1025,6 @@ export namespace JSXBase {
     autocapitalize?: string;
     autoComplete?: string;
     autocomplete?: string;
-    autoFocus?: boolean;
-    autofocus?: boolean | string;
     capture?: string; // https://www.w3.org/TR/html-media-capture/#the-capture-attribute
     checked?: boolean;
     crossOrigin?: string;
@@ -1087,8 +1084,6 @@ export namespace JSXBase {
   }
 
   export interface KeygenHTMLAttributes<T> extends HTMLAttributes<T> {
-    autoFocus?: boolean;
-    autofocus?: boolean | string;
     challenge?: string;
     disabled?: boolean;
     form?: string;
@@ -1257,7 +1252,6 @@ export namespace JSXBase {
   }
 
   export interface SelectHTMLAttributes<T> extends HTMLAttributes<T> {
-    autoFocus?: boolean;
     disabled?: boolean;
     form?: string;
     multiple?: boolean;
@@ -1296,8 +1290,6 @@ export namespace JSXBase {
   export interface TextareaHTMLAttributes<T> extends HTMLAttributes<T> {
     autoComplete?: string;
     autocomplete?: string;
-    autoFocus?: boolean;
-    autofocus?: boolean | string;
     cols?: number;
     disabled?: boolean;
     form?: string;
@@ -1359,6 +1351,8 @@ export namespace JSXBase {
 
     // Standard HTML Attributes
     accessKey?: string;
+    autoFocus?: boolean;
+    autofocus?: boolean | string;
     class?: string | { [className: string]: boolean };
     contentEditable?: boolean | string;
     contenteditable?: boolean | string;
