@@ -42,7 +42,7 @@ export async function getInternalClientBundles(opts: BuildOptions): Promise<ESBu
   const clientExternal = getEsbuildExternalModules(opts, opts.output.internalDir);
 
   const internalClientBundle: ESBuildOptions = {
-    ...getBaseEsbuildOptions(),
+    ...getBaseEsbuildOptions(opts),
     entryPoints: [join(inputClientDir, 'index.ts')],
     format: 'esm',
     // we do 'write: false' here because we write the build to disk in our
@@ -77,7 +77,7 @@ export async function getInternalClientBundles(opts: BuildOptions): Promise<ESBu
   ];
 
   const internalClientPatchBrowserBundle: ESBuildOptions = {
-    ...getBaseEsbuildOptions(),
+    ...getBaseEsbuildOptions(opts),
     entryPoints: [join(inputClientDir, 'client-patch-browser.ts')],
     format: 'esm',
     outfile: join(outputInternalClientDir, 'patch-browser.js'),

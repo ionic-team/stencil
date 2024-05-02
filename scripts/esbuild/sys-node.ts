@@ -41,13 +41,12 @@ export async function buildSysNode(opts: BuildOptions) {
   const sysNodeAliases = getEsbuildAliases();
 
   const sysNodeOptions: ESBuildOptions = {
-    ...getBaseEsbuildOptions(),
+    ...getBaseEsbuildOptions(opts),
     entryPoints: [inputFile],
     bundle: true,
     format: 'cjs',
     outfile: outputFile,
     platform: 'node',
-    logLevel: 'info',
     external,
     minify: true,
     alias: sysNodeAliases,
@@ -60,13 +59,12 @@ export async function buildSysNode(opts: BuildOptions) {
   const outputWorkerFile = join(opts.output.sysNodeDir, 'worker.js');
 
   const workerOptions: ESBuildOptions = {
-    ...getBaseEsbuildOptions(),
+    ...getBaseEsbuildOptions(opts),
     entryPoints: [inputWorkerFile],
     bundle: true,
     format: 'cjs',
     outfile: outputWorkerFile,
     platform: 'node',
-    logLevel: 'info',
     external,
     minify: true,
     alias: sysNodeAliases,

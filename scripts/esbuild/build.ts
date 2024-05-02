@@ -1,3 +1,5 @@
+import * as esbuild from 'esbuild';
+
 import { release } from '../release';
 import { validateBuild } from '../test/validate-build';
 import { BuildOptions, getOptions } from '../utils/options';
@@ -16,6 +18,7 @@ export async function run(rootDir: string, args: ReadonlyArray<string>) {
     isProd: args.includes('--prod'),
     isCI: args.includes('--ci'),
     isWatch: args.includes('--watch'),
+    esbuildLogLevel: 'info',
   });
 
   try {
@@ -36,7 +39,7 @@ export async function run(rootDir: string, args: ReadonlyArray<string>) {
 }
 
 export async function buildAll(opts: BuildOptions) {
-  await Promise.all([
+  const builds = await Promise.all([
     buildCli(opts),
     buildCompiler(opts),
     buildDevServer(opts),
@@ -46,4 +49,25 @@ export async function buildAll(opts: BuildOptions) {
     buildTesting(opts),
     buildInternal(opts),
   ]);
+
+  if (opts.esbuildLogLevel === 'silent') {
+    // esbuild's own console messages were silenced, so we should instead
+    // log some messages here if there were errors or warnings
+    await Promise.all(
+      builds.flat().map(async (buildResult) => {
+        if (!buildResult) {
+          return;
+        }
+
+        if (buildResult.warnings) {
+          const output = await esbuild.formatMessages(buildResult.warnings, { kind: 'warning', color: true });
+          console.warn(output.join('\n'));
+        }
+        if (buildResult.errors) {
+          const output = await esbuild.formatMessages(buildResult.errors, { kind: 'error', color: true });
+          console.error(output.join('\n'));
+        }
+      }),
+    );
+  }
 }

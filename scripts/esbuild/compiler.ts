@@ -78,7 +78,7 @@ export async function buildCompiler(opts: BuildOptions) {
   alias['parse5'] = parse5path;
 
   const compilerEsbuildOptions: ESBuildOptions = {
-    ...getBaseEsbuildOptions(),
+    ...getBaseEsbuildOptions(opts),
     banner: { js: getBanner(opts, 'Stencil Compiler', true) },
     entryPoints: [join(srcDir, 'index.ts')],
     platform: 'node',

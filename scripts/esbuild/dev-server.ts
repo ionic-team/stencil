@@ -80,7 +80,7 @@ export async function buildDevServer(opts: BuildOptions) {
 
   const devServerAliases = getEsbuildAliases();
   const devServerIndexEsbuildOptions = {
-    ...getBaseEsbuildOptions(),
+    ...getBaseEsbuildOptions(opts),
     alias: devServerAliases,
     entryPoints: [join(inputDir, 'index.js')],
     outfile: join(opts.output.devServerDir, 'index.js'),
@@ -95,7 +95,7 @@ export async function buildDevServer(opts: BuildOptions) {
   } satisfies ESBuildOptions;
 
   const devServerProcessEsbuildOptions = {
-    ...getBaseEsbuildOptions(),
+    ...getBaseEsbuildOptions(opts),
     alias: {
       ...devServerAliases,
       '@sys-api-node': '../sys/node/index.js',
@@ -121,7 +121,7 @@ export async function buildDevServer(opts: BuildOptions) {
     '@stencil/core/dev-server/client': join(inputDir, 'client', 'index.js'),
   };
   const connectorEsbuildOptions = {
-    ...getBaseEsbuildOptions(),
+    ...getBaseEsbuildOptions(opts),
     alias: connectorAlias,
     entryPoints: [join(inputDir, 'dev-server-client', 'index.js')],
     outfile: join(opts.output.devServerDir, CONNECTOR_NAME),
@@ -155,7 +155,7 @@ export async function buildDevServer(opts: BuildOptions) {
   });
 
   const devServerClientEsbuildOptions = {
-    ...getBaseEsbuildOptions(),
+    ...getBaseEsbuildOptions(opts),
     entryPoints: [join(opts.buildDir, 'dev-server', 'client', 'index.js')],
     outfile: join(opts.output.devServerDir, 'client', 'index.js'),
     format: 'esm',

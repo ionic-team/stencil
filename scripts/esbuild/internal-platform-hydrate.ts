@@ -41,7 +41,7 @@ export async function getInternalPlatformHydrateBundles(opts: BuildOptions): Pro
   internalHydrateAliases['@platform'] = hydratePlatformInput;
 
   const internalHydratePlatformBundle: ESBuildOptions = {
-    ...getBaseEsbuildOptions(),
+    ...getBaseEsbuildOptions(opts),
     entryPoints: [hydratePlatformInput],
     format: 'esm',
     platform: 'node',
@@ -58,7 +58,7 @@ export async function getInternalPlatformHydrateBundles(opts: BuildOptions): Pro
   };
 
   const internalHydrateRunnerBundle: ESBuildOptions = {
-    ...getBaseEsbuildOptions(),
+    ...getBaseEsbuildOptions(opts),
     entryPoints: [join(hydrateSrcDir, 'runner', 'index.js')],
     external,
     format: 'esm',

@@ -54,13 +54,12 @@ export async function buildTesting(opts: BuildOptions) {
   aliases['@stencil/core/cli'] = './cli/index.cjs';
 
   const testingEsbuildOptions: ESBuildOptions = {
-    ...getBaseEsbuildOptions(),
+    ...getBaseEsbuildOptions(opts),
     entryPoints: [join(sourceDir, 'index.ts')],
     bundle: true,
     format: 'cjs',
     outfile: join(opts.output.testingDir, 'index.js'),
     platform: 'node',
-    logLevel: 'info',
     external,
     /**
      * set `write: false` so that we can run the `onEnd` hook

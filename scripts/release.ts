@@ -22,6 +22,9 @@ export async function release(rootDir: string, args: ReadonlyArray<string>): Pro
       isCI: true,
       isPublishRelease: false,
       isProd: true,
+      // we set the log level for esbuild to silent so it doesn't log its own
+      // messages and interfere with Listr's control of the terminal
+      esbuildLogLevel: 'silent',
     });
 
     const versionIdx = args.indexOf('--version');
@@ -77,6 +80,9 @@ export async function release(rootDir: string, args: ReadonlyArray<string>): Pro
       isPublishRelease: true,
       isProd: true,
       tag: newTag ?? undefined,
+      // we set the log level for esbuild to silent so it doesn't log its own
+      // messages and interfere with Listr's control of the terminal
+      esbuildLogLevel: 'silent',
     });
     return await publishRelease(publishOpts, args);
   }

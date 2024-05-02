@@ -33,7 +33,7 @@ export async function buildCli(opts: BuildOptions) {
   const external = getEsbuildExternalModules(opts, opts.output.cliDir);
 
   const cliEsbuildOptions = {
-    ...getBaseEsbuildOptions(),
+    ...getBaseEsbuildOptions(opts),
     alias: cliAliases,
     entryPoints: [join(inputDir, 'index.ts')],
     external,

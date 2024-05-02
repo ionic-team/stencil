@@ -46,7 +46,7 @@ export async function buildInternal(opts: BuildOptions) {
 
   // this is used in several of our bundles, so we bundle it here in one spot
   const shadowCSSBundle: ESBuildOptions = {
-    ...getBaseEsbuildOptions(),
+    ...getBaseEsbuildOptions(opts),
     entryPoints: [join(opts.srcDir, 'utils', 'shadow-css.ts')],
     format: 'esm',
     outfile: join(opts.output.internalDir, 'client', 'shadow-css.js'),

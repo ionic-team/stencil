@@ -47,11 +47,10 @@ export async function buildMockDoc(opts: BuildOptions) {
   mockDocAliases['parse5'] = parse5Path;
 
   const mockDocBuildOptions: ESBuildOptions = {
-    ...getBaseEsbuildOptions(),
+    ...getBaseEsbuildOptions(opts),
     entryPoints: [join(srcDir, 'index.ts')],
     bundle: true,
     alias: mockDocAliases,
-    logLevel: 'info',
   };
 
   const esmOptions: ESBuildOptions = {

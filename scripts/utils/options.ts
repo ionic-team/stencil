@@ -1,4 +1,5 @@
 import { execSync } from 'child_process';
+import type { BuildOptions as ESBuildOptions } from 'esbuild';
 import { readFileSync } from 'fs-extra';
 import { join } from 'path';
 
@@ -31,6 +32,7 @@ export function getOptions(rootDir: string, inputOpts: Partial<BuildOptions> = {
   const packageJson: PackageData = JSON.parse(readFileSync(packageJsonPath, 'utf8'));
   const buildId = inputOpts.buildId ?? getBuildId();
   const version = inputOpts.version ?? getDevVersionId({ buildId, semverVersion: packageJson?.version });
+  const logLevel: ESBuildOptions['logLevel'] = inputOpts.esbuildLogLevel ?? 'info';
 
   const vermoji =
     inputOpts.isProd && !inputOpts.vermoji
@@ -89,6 +91,7 @@ export function getOptions(rootDir: string, inputOpts: Partial<BuildOptions> = {
     tag: 'dev',
     jqueryVersion,
     parse5Version,
+    esbuildLogLevel: logLevel,
     rollupVersion,
     terserVersion,
     typescriptVersion,
@@ -180,6 +183,10 @@ export interface BuildOptions {
   srcDir: string;
   typescriptDir: string;
   typescriptLibDir: string;
+  /**
+   * The log level used when executing esbuild
+   */
+  esbuildLogLevel: ESBuildOptions['logLevel'];
 
   output: {
     cliDir: string;

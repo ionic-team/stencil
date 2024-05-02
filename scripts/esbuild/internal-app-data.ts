@@ -35,7 +35,7 @@ export async function getInternalAppDataBundles(opts: BuildOptions): Promise<ESB
   });
 
   const appDataBaseOptions: ESBuildOptions = {
-    ...getBaseEsbuildOptions(),
+    ...getBaseEsbuildOptions(opts),
     entryPoints: [join(appDataSrcDir, 'index.ts')],
     platform: 'node',
   };

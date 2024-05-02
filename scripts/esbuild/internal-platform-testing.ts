@@ -36,13 +36,12 @@ export async function getInternalTestingBundle(opts: BuildOptions): Promise<ESBu
   const external = getEsbuildExternalModules(opts, opts.output.internalDir);
 
   const internalTestingBuildOptions: ESBuildOptions = {
-    ...getBaseEsbuildOptions(),
+    ...getBaseEsbuildOptions(opts),
     entryPoints: [inputTestingPlatform],
     bundle: true,
     format: 'cjs',
     outfile: join(outputTestingPlatformDir, 'index.js'),
     platform: 'node',
-    logLevel: 'info',
     external,
     alias: internalTestingAliases,
     plugins: [

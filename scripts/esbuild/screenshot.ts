@@ -43,7 +43,7 @@ export async function buildScreenshot(opts: BuildOptions) {
   const external = getEsbuildExternalModules(opts, opts.output.screenshotDir);
 
   const baseScreenshotOptions = {
-    ...getBaseEsbuildOptions(),
+    ...getBaseEsbuildOptions(opts),
     alias: aliases,
     external,
     format: 'cjs',

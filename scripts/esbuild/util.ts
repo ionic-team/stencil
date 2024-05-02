@@ -88,7 +88,7 @@ export function getEsbuildExternalModules(opts: BuildOptions, ownEntryPoint: str
  * @param opts Stencil build options
  * @returns a Promise representing the execution of the builds
  */
-export function runBuilds(builds: ESBuildOptions[], opts: BuildOptions): Promise<(void | ESBuildResult)[]> {
+export async function runBuilds(builds: ESBuildOptions[], opts: BuildOptions): Promise<void[] | ESBuildResult[]> {
   if (opts.isWatch) {
     return Promise.all(
       builds.map(async (buildConfig) => {
@@ -105,13 +105,14 @@ export function runBuilds(builds: ESBuildOptions[], opts: BuildOptions): Promise
  * Get base esbuild options which we want to always have set for all of our
  * bundles
  *
+ * @param opts build options for the current build
  * @returns a base set of options
  */
-export function getBaseEsbuildOptions(): ESBuildOptions {
+export function getBaseEsbuildOptions(opts: BuildOptions): ESBuildOptions {
   const options: ESBuildOptions = {
     bundle: true,
     legalComments: 'inline',
-    logLevel: 'info',
+    logLevel: opts.esbuildLogLevel,
     target: getEsbuildTargets(),
   };
 
