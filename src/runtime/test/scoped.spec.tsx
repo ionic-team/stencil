@@ -42,7 +42,7 @@ describe('scoped', () => {
     <cmp-a class="hydrated sc-cmp-a-h sc-cmp-a-s">
       <cmp-b class="hydrated sc-cmp-a sc-cmp-b-h sc-cmp-b-s">
         <!---->
-        <div class="sc-cmp-b sc-cmp-b-s">
+        <div class="sc-cmp-a sc-cmp-b sc-cmp-b-s">
           <span class="sc-cmp-a">
             Hola
           </span>

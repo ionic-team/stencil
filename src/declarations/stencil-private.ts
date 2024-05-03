@@ -1119,6 +1119,13 @@ export interface HostElement extends HTMLElement {
   ['s-sc']?: string;
 
   /**
+   * Root Scope Id
+   * The scope id of the root component when using scoped css encapsulation
+   * or using shadow dom but the browser doesn't support it
+   */
+  ['s-rsc']?: string;
+
+  /**
    * Hot Module Replacement, dev mode only
    *
    * This function should be defined by the HMR-supporting runtime and should

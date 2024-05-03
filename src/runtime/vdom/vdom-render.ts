@@ -111,6 +111,19 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
       elm.classList.add((elm['s-si'] = scopeId));
     }
 
+    if (BUILD.scoped) {
+      // to be able to style the deep nested scoped component from the root component,
+      // root component's scope id needs to be added to the child nodes since sass compiler
+      // adds scope id to the nested selectors during compilation phase
+      const rootScopeId =
+        newParentVNode.$elm$?.['s-rsc'] || newParentVNode.$elm$?.['s-si'] || newParentVNode.$elm$?.['s-sc'];
+
+      if (rootScopeId) {
+        elm['s-rsc'] = rootScopeId;
+        !elm.classList.contains(rootScopeId) && elm.classList.add(rootScopeId);
+      }
+    }
+
     if (newVNode.$children$) {
       for (i = 0; i < newVNode.$children$.length; ++i) {
         // create the node
