@@ -55,7 +55,20 @@
       ],
       "events": [],
       "listeners": [],
-      "styles": [],
+      "styles": [
+        {
+          "name": "--background",
+          "annotation": "prop",
+          "docs": "the background color",
+          "mode": "ios"
+        },
+        {
+          "name": "--background",
+          "annotation": "prop",
+          "docs": "the background color",
+          "mode": "md"
+        }
+      ],
       "slots": [],
       "parts": [],
       "dependents": [],

@@ -1,4 +1,13 @@
-import { flatOne, isOutputTargetDocsJson, join, normalizePath, relative, sortBy, unique } from '@utils';
+import {
+  DEFAULT_STYLE_MODE,
+  flatOne,
+  isOutputTargetDocsJson,
+  join,
+  normalizePath,
+  relative,
+  sortBy,
+  unique,
+} from '@utils';
 import { basename, dirname } from 'path';
 
 import type * as d from '../../declarations';
@@ -316,15 +325,17 @@ export const getDocsStyles = (cmpMeta: d.ComponentCompilerMeta): d.JsonDocsStyle
     return [];
   }
 
-  return sortBy(cmpMeta.styleDocs, (compilerStyleDoc) => compilerStyleDoc.name.toLowerCase()).map(
-    (compilerStyleDoc) => {
-      return {
-        name: compilerStyleDoc.name,
-        annotation: compilerStyleDoc.annotation || '',
-        docs: compilerStyleDoc.docs || '',
-      };
-    },
-  );
+  return sortBy(
+    cmpMeta.styleDocs,
+    (compilerStyleDoc) => `${compilerStyleDoc.name.toLowerCase()},${compilerStyleDoc.mode.toLowerCase()}}`,
+  ).map((compilerStyleDoc) => {
+    return {
+      name: compilerStyleDoc.name,
+      annotation: compilerStyleDoc.annotation || '',
+      docs: compilerStyleDoc.docs || '',
+      mode: compilerStyleDoc.mode && compilerStyleDoc.mode !== DEFAULT_STYLE_MODE ? compilerStyleDoc.mode : undefined,
+    };
+  });
 };
 
 const getDocsListeners = (listeners: d.ComponentCompilerListener[]): d.JsonDocsListener[] => {

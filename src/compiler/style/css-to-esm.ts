@@ -107,7 +107,7 @@ const transformCssToEsmModule = (input: d.TransformCssToEsmInput): d.TransformCs
   };
 
   if (input.docs) {
-    parseStyleDocs(results.styleDocs, input.input);
+    parseStyleDocs(results.styleDocs, input.input, input.mode);
   }
 
   try {

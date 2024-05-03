@@ -849,10 +849,29 @@ export interface CompilerJsDocTagInfo {
   text?: string;
 }
 
+/**
+ * The (internal) representation of a CSS block comment in a CSS, Sass, etc. file. This data structure is used during
+ * the initial compilation phases of Stencil, as a piece of {@link ComponentCompilerMeta}.
+ */
 export interface CompilerStyleDoc {
+  /**
+   * The name of the CSS property
+   */
   name: string;
+  /**
+   * The user-defined description of the CSS property
+   */
   docs: string;
+  /**
+   * The JSDoc-style annotation (e.g. `@prop`) that was used in the block comment to detect the comment.
+   * Used to inform Stencil where the start of a new property's description starts (and where the previous description
+   * ends).
+   */
   annotation: 'prop';
+  /**
+   * The Stencil style-mode that is associated with this property.
+   */
+  mode: string;
 }
 
 export interface CompilerAssetDir {
@@ -1887,6 +1906,22 @@ export interface TransformCssToEsmInput {
   file?: string;
   tag?: string;
   encapsulation?: string;
+  /**
+   * The mode under which the CSS will be applied.
+   *
+   * Corresponds to a key used when `@Component`'s `styleUrls` field is an object:
+   * ```ts
+   * @Component({
+   *   tag: 'todo-list',
+   *   styleUrls: {
+   *      ios: 'todo-list.ios.scss',
+   *      md: 'todo-list.md.scss',
+   *   }
+   * })
+   * ```
+   * In the example above, two `TransformCssToEsmInput`s should be created, one for 'ios' and one for 'md' (this field
+   * is not shared by multiple fields, nor is it a composite of multiple modes).
+   */
   mode?: string;
   commentOriginalSelector?: boolean;
   sourceMap?: boolean;
