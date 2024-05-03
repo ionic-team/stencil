@@ -70,7 +70,7 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
     );
   }
 
-  if (BUILD.vdomText && newVNode.$text$ !== null) {
+  if (newVNode.$text$ !== null) {
     // create text node
     elm = newVNode.$elm$ = doc.createTextNode(newVNode.$text$) as any;
   } else if (BUILD.slotRelocation && newVNode.$flags$ & VNODE_FLAGS.isSlotReference) {
@@ -648,7 +648,7 @@ export const patch = (oldVNode: d.VNode, newVNode: d.VNode, isInitialRender = fa
   const text = newVNode.$text$;
   let defaultHolder: Comment;
 
-  if (!BUILD.vdomText || text === null) {
+  if (text === null) {
     if (BUILD.svg) {
       // test if we're rendering an svg element, or still rendering nodes inside of one
       // only add this to the when the compiler sees we're using an svg somewhere
@@ -675,7 +675,7 @@ export const patch = (oldVNode: d.VNode, newVNode: d.VNode, isInitialRender = fa
       updateChildren(elm, oldChildren, newVNode, newChildren, isInitialRender);
     } else if (newChildren !== null) {
       // no old child vnodes, but there are new child vnodes to add
-      if (BUILD.updatable && BUILD.vdomText && oldVNode.$text$ !== null) {
+      if (BUILD.updatable && oldVNode.$text$ !== null) {
         // the old vnode was text, so be sure to clear it out
         elm.textContent = '';
       }
@@ -689,10 +689,10 @@ export const patch = (oldVNode: d.VNode, newVNode: d.VNode, isInitialRender = fa
     if (BUILD.svg && isSvgMode && tag === 'svg') {
       isSvgMode = false;
     }
-  } else if (BUILD.vdomText && BUILD.slotRelocation && (defaultHolder = elm['s-cr'] as any)) {
+  } else if (BUILD.slotRelocation && (defaultHolder = elm['s-cr'] as any)) {
     // this element has slotted content
     defaultHolder.parentNode.textContent = text;
-  } else if (BUILD.vdomText && oldVNode.$text$ !== text) {
+  } else if (oldVNode.$text$ !== text) {
     // update the text content for the text only vnode
     // and also only if the text is different than before
     elm.data = text;
