@@ -2242,7 +2242,7 @@ export interface OutputTargetCustom extends OutputTargetBase {
   name: string;
   /**
    * Indicate when the output target should be executed.
-   * 
+   *
    * - `"onBuildOnly"`: Executed only when `stencil build` is called without `--watch`.
    * - `"always"`: Executed on every build, including in `watch` mode.
    *
