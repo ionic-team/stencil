@@ -31,6 +31,12 @@ import { getBuildFeatures } from '../compiler/app-core/app-data';
 import { resetBuildConditionals } from './reset-build-conditionals';
 
 /**
+ * Generates a random number for use in generating a bundle id
+ * @returns a random number between 100000 and 999999
+ */
+const generateRandBundleId = () => Math.round(Math.random() * 899999) + 100000;
+
+/**
  * Creates a new spec page for unit testing
  * @param opts the options to apply to the spec page that influence its configuration and operation
  * @returns the created spec page
@@ -92,7 +98,7 @@ export async function newSpecPage(opts: NewSpecPageOptions): Promise<SpecPage> {
       /**
        * the bundleId can be arbitrary, but must be unique
        */
-      const arbitraryBundleId = `fc.${Math.round(Math.random() * 899999) + 100000}`;
+      const arbitraryBundleId = `fc.${generateRandBundleId()}`;
       return formatLazyBundleRuntimeMeta(arbitraryBundleId, []);
     }
 
@@ -101,7 +107,7 @@ export async function newSpecPage(opts: NewSpecPageOptions): Promise<SpecPage> {
 
     proxyComponentLifeCycles(Cstr);
 
-    const bundleId = `${Cstr.COMPILER_META.tagName}.${Math.round(Math.random() * 899999) + 100000}`;
+    const bundleId = `${Cstr.COMPILER_META.tagName}.${generateRandBundleId()}`;
     const stylesMeta = Cstr.COMPILER_META.styles;
     if (Array.isArray(stylesMeta)) {
       if (stylesMeta.length > 1) {
