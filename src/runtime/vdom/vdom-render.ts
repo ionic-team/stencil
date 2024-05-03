@@ -111,7 +111,7 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
       elm.classList.add((elm['s-si'] = scopeId));
     }
 
-    if (BUILD.shadowDom || BUILD.scoped) {
+    if (BUILD.scoped) {
       // to be able to style the deep nested scoped component from the root component,
       // root component's scope id needs to be added to the child nodes since sass compiler
       // adds scope id to the nested selectors during compilation phase
