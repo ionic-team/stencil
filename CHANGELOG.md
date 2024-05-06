@@ -1,3 +1,19 @@
+# 🍵 [4.18.0](https://github.com/ionic-team/stencil/compare/v4.17.2...v4.18.0) (2024-05-06)
+
+
+### Bug Fixes
+
+* **hydrate:** output track elements as void elms ([#5720](https://github.com/ionic-team/stencil/issues/5720)) ([2082351](https://github.com/ionic-team/stencil/commit/20823518ecdea3a502eed69348fb6719d72af594)), closes [#2994](https://github.com/ionic-team/stencil/issues/2994)
+* **runtime:** add root scope id to the nested child as classname ([#5704](https://github.com/ionic-team/stencil/issues/5704)) ([b40ebb9](https://github.com/ionic-team/stencil/commit/b40ebb937869aa16f9adc672129639167406cd07))
+* **testing:** support functional components in unit tests ([#5722](https://github.com/ionic-team/stencil/issues/5722)) ([922a972](https://github.com/ionic-team/stencil/commit/922a97207dbe031d164a9b5e16fac4b004a5b7bf))
+
+
+### Features
+
+* **docs:** add style mode to `docs-json` output ([#5718](https://github.com/ionic-team/stencil/issues/5718)) ([44fcba1](https://github.com/ionic-team/stencil/commit/44fcba1a6cda2b45d83fe4101761f0ee8d82728a))
+
+
+
 ## 🏊 [4.17.2](https://github.com/ionic-team/stencil/compare/v4.17.1...v4.17.2) (2024-04-29)
 
 
