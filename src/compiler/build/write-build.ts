@@ -36,6 +36,43 @@ export const writeBuild = async (
     buildCtx.debug(`in-memory-fs: ${compilerCtx.fs.getMemoryStats()}`);
     buildCtx.debug(`cache: ${compilerCtx.cache.getMemoryStats()}`);
 
+    // TODO: this would need to account for other config values like output directory
+    // and checking which output targets are used in the build to know which exports to create
+    const namespace = buildCtx.config.fsNamespace;
+    const packageJsonExports: any = {
+      '.': {
+        import: `./dist/${namespace}/${namespace}.esm.js`,
+        require: `./dist/${namespace}/${namespace}.cjs.js`,
+      },
+      './loader': {
+        import: './loader/index.js',
+        require: './loader/index.cjs',
+        types: './loader/index.d.ts',
+      },
+    };
+    buildCtx.components.forEach((cmp) => {
+      packageJsonExports[`./${cmp.tagName}`] = {
+        import: `./dist/components/${cmp.tagName}.js`,
+        types: `./dist/components/${cmp.tagName}.d.ts`,
+      };
+    });
+
+    // Write updated `package.json` file
+    await compilerCtx.fs.writeFile(
+      config.packageJsonFilePath,
+      JSON.stringify(
+        {
+          ...buildCtx.packageJson,
+          exports: packageJsonExports,
+        },
+        null,
+        2,
+      ),
+      {
+        immediateWrite: true,
+      },
+    );
+
     await outputServiceWorkers(config, buildCtx);
     await validateBuildFiles(config, compilerCtx, buildCtx);
   } catch (e: any) {
