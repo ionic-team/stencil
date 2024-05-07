@@ -24,11 +24,11 @@ export const setValue = (ref: d.RuntimeRef, propName: string, newVal: any, cmpMe
   if (BUILD.lazyLoad && !hostRef) {
     throw new Error(
       `Couldn't find host element for "${cmpMeta.$tagName$}" as it is ` +
-      'unknown to this Stencil runtime. This usually happens when integrating ' +
-      'a 3rd party Stencil component with another Stencil component or application. ' +
-      'Please reach out to the maintainers of the 3rd party Stencil component or report ' +
-      'this on the Stencil Discord server (https://chat.stenciljs.com) or GitHub ' +
-      'repository (https://github.com/ionic-team/stencil).'
+        'unknown to this Stencil runtime. This usually happens when integrating ' +
+        'a 3rd party Stencil component with another Stencil component or application. ' +
+        'Please reach out to the maintainers of the 3rd party Stencil component or report ' +
+        'this on the Stencil Discord server (https://chat.stenciljs.com) or GitHub ' +
+        'repository (https://github.com/ionic-team/stencil).',
     );
   }
 
