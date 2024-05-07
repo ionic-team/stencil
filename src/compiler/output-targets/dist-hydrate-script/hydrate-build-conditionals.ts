@@ -34,6 +34,7 @@ export const getHydrateBuildConditionals = (cmps: d.ComponentCompilerMeta[]) => 
   build.shadowDomShim = true;
   build.hydratedAttribute = false;
   build.hydratedClass = true;
+  // TODO(STENCIL-1305): remove this option
   build.scriptDataOpts = false;
   build.attachStyles = true;
 
