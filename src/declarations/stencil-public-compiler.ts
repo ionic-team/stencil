@@ -328,6 +328,7 @@ interface ConfigExtrasBase {
    * It is possible to assign data to the actual `<script>` element's `data-opts` property,
    * which then gets passed to Stencil's initial bootstrap. This feature is only required
    * for very special cases and rarely needed. Defaults to `false`.
+   * @deprecated This option has been deprecated and will be removed in a future major version of Stencil.
    */
   scriptDataOpts?: boolean;
 
