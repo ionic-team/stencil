@@ -7,7 +7,7 @@ import { join } from 'path';
 import { getBanner } from '../utils/banner';
 import { BuildOptions, createReplaceData } from '../utils/options';
 import { writePkgJson } from '../utils/write-pkg-json';
-import { externalAlias, getBaseEsbuildOptions, getEsbuildAliases, getEsbuildExternalModules } from './util';
+import { externalAlias, getBaseEsbuildOptions, getEsbuildAliases, getEsbuildExternalModules } from './utils';
 
 /**
  * Create objects containing ESbuild options for the two bundles which need to

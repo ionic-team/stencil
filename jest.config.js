@@ -20,8 +20,6 @@ module.exports = {
   collectCoverageFrom: [
     '<rootDir>/scripts/**/*.{js,jsx,ts,tsx}',
     '!<rootDir>/scripts/build/**/*.{js,jsx,ts,tsx}',
-    '!<rootDir>/scripts/bundles/helpers/compiler-cjs-intro.js',
-    '!<rootDir>/scripts/bundles/helpers/compiler-cjs-outro.js',
     '<rootDir>/src/app-data/**/*.{js,jsx,ts,tsx}',
     '<rootDir>/src/app-globals/**/*.{js,jsx,ts,tsx}',
     '<rootDir>/src/cli/**/*.{js,jsx,ts,tsx}',

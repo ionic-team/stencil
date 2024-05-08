@@ -1,43 +1,7 @@
 import fs from 'fs-extra';
 import { join } from 'path';
-import type { Plugin } from 'rollup';
 
 import type { BuildOptions } from '../../utils/options';
-
-/**
- * Creates a rollup plugin to embed an optimized version of the TypeScript compiler into the Stencil compiler.
- * @param opts the options being used during a build of the Stencil compiler
- * @returns the plugin that adds a modified version of the TypeScript compiler into the generated output
- */
-export function typescriptSourcePlugin(opts: BuildOptions): Plugin {
-  const tsPath = require.resolve('typescript');
-  return {
-    name: 'typescriptSourcePlugin',
-    /**
-     * A rollup build hook for resolving TypeScript relative to this project
-     * [Source](https://rollupjs.org/guide/en/#resolveid)
-     * @param id the importee exactly as it is written in an import statement in the source code
-     * @returns an object that resolves an import to a different id
-     */
-    resolveId(id: string): string | null {
-      if (id === 'typescript') {
-        return tsPath;
-      }
-      return null;
-    },
-    /**
-     * A rollup build hook for loading the TypeScript compiler. [Source](https://rollupjs.org/guide/en/#load)
-     * @param id the path of the module to load
-     * @returns the TypeScript compiler source
-     */
-    load(id: string): Promise<string> | null {
-      if (id === tsPath) {
-        return bundleTypeScriptSource(tsPath, opts);
-      }
-      return null;
-    },
-  };
-}
 
 /**
  * Bundles the TypeScript compiler in the Stencil output. This function also performs several optimizations and

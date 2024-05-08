@@ -5,7 +5,7 @@ import { join } from 'path';
 import { getBanner } from '../utils/banner';
 import { BuildOptions } from '../utils/options';
 import { writePkgJson } from '../utils/write-pkg-json';
-import { getBaseEsbuildOptions, getEsbuildAliases, getEsbuildExternalModules, runBuilds } from './util';
+import { getBaseEsbuildOptions, getEsbuildAliases, getEsbuildExternalModules, runBuilds } from './utils';
 
 /**
  * Runs esbuild to bundle the `cli` submodule

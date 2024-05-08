@@ -2,7 +2,6 @@ import type { BuildOptions as ESBuildOptions, Plugin } from 'esbuild';
 import fs from 'fs-extra';
 import { join } from 'path';
 
-import { copyTestingInternalDts, writePatchedPuppeteerDts } from '../bundles/testing';
 import { getBanner } from '../utils/banner';
 import type { BuildOptions } from '../utils/options';
 import { writePkgJson } from '../utils/write-pkg-json';
@@ -13,7 +12,7 @@ import {
   getEsbuildExternalModules,
   getFirstOutputFile,
   runBuilds,
-} from './util';
+} from './utils';
 
 const EXTERNAL_TESTING_MODULES = [
   'constants',
@@ -132,4 +131,43 @@ function ignorePuppeteerDependency(opts: BuildOptions): Plugin {
       });
     },
   };
+}
+
+export async function copyTestingInternalDts(opts: BuildOptions, inputDir: string) {
+  // copy testing d.ts files
+
+  await fs.copy(join(inputDir), join(opts.output.testingDir), {
+    filter: (f) => {
+      if (f.endsWith('.d.ts')) {
+        return true;
+      }
+      if (fs.statSync(f).isDirectory() && !f.includes('platform')) {
+        return true;
+      }
+      return false;
+    },
+  });
+}
+
+/**
+ * Write a patched version of
+ * `src/testing/puppeteer/puppeteer-declarations.d.ts` which has a `@ts-ignore`
+ * added to prevent a type-checking error if a Stencil project does not have
+ * puppeteer installed.
+ *
+ * @param opts build options
+ */
+export async function writePatchedPuppeteerDts(opts: BuildOptions) {
+  const typeFilePath = join(opts.output.testingDir, 'puppeteer', 'puppeteer-declarations.d.ts');
+  const updatedFileContent = (await fs.readFile(typeFilePath, 'utf8'))
+    .split('\n')
+    .reduce((lines, line) => {
+      if (line.endsWith(`from 'puppeteer';`)) {
+        lines.push('// @ts-ignore - avoid requiring puppeteer as dependency');
+      }
+      lines.push(line);
+      return lines;
+    }, [] as string[])
+    .join('\n');
+  await fs.writeFile(typeFilePath, updatedFileContent);
 }

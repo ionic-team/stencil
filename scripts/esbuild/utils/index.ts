@@ -2,7 +2,7 @@ import type { BuildOptions as ESBuildOptions, BuildResult as ESBuildResult, Outp
 import * as esbuild from 'esbuild';
 import { join } from 'path';
 
-import { BuildOptions } from '../utils/options';
+import { BuildOptions } from '../../utils/options';
 
 /**
  * Aliases which map the module identifiers we set in `paths` in `tsconfig.json` to

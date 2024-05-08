@@ -26,7 +26,7 @@ describe('release options', () => {
         buildDir: path.join(ROOT_DIR, 'build'),
         // More focused tests for `buildId` can be found in another testing suite in this file
         buildId: expect.any(String),
-        bundleHelpersDir: path.join(ROOT_DIR, 'scripts', 'bundles', 'helpers'),
+        bundleHelpersDir: path.join(ROOT_DIR, 'scripts', 'esbuild', 'helpers'),
         changelogPath: path.join(ROOT_DIR, 'CHANGELOG.md'),
         ghRepoName: 'stencil',
         ghRepoOrg: 'ionic-team',
@@ -51,7 +51,7 @@ describe('release options', () => {
         packageLockJsonPath: path.join(ROOT_DIR, 'package-lock.json'),
         rootDir: ROOT_DIR,
         scriptsBuildDir: path.join(ROOT_DIR, 'scripts', 'build'),
-        scriptsBundlesDir: path.join(ROOT_DIR, 'scripts', 'bundles'),
+        scriptsBundlesDir: path.join(ROOT_DIR, 'scripts', 'esbuild'),
         scriptsDir: path.join(ROOT_DIR, 'scripts'),
         srcDir: path.join(ROOT_DIR, 'src'),
         tag: 'dev',

@@ -4,7 +4,7 @@ import { join } from 'path';
 
 import { BuildOptions } from '../utils/options';
 import { writePkgJson } from '../utils/write-pkg-json';
-import { getBaseEsbuildOptions } from './util';
+import { getBaseEsbuildOptions } from './utils';
 
 /**
  * Get an object containing ESbuild options to build the internal app data
