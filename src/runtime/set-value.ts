@@ -19,7 +19,7 @@ export const setValue = (ref: d.RuntimeRef, propName: string, newVal: any, cmpMe
    * as there are multiple runtimes being loaded and/or different components used with different
    * loading strategies, e.g. lazy vs implicitly loaded.
    *
-   * Todo(@christian-bromann): remove, once a solution for this was identified in https://outsystemsrd.atlassian.net/browse/STENCIL-1308 and implemented
+   * Todo(STENCIL-1308): remove, once a solution for this was identified and implemented
    */
   if (BUILD.lazyLoad && !hostRef) {
     throw new Error(
