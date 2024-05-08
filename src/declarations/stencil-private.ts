@@ -180,6 +180,7 @@ export interface BuildConditionals extends Partial<BuildFeatures> {
   cloneNodeFix?: boolean;
   hydratedAttribute?: boolean;
   hydratedClass?: boolean;
+  hydratedSelectorName?: string;
   initializeNextTick?: boolean;
   // TODO(STENCIL-1305): remove this option
   scriptDataOpts?: boolean;

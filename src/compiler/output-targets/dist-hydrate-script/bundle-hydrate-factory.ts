@@ -11,6 +11,16 @@ import { rewriteAliasedSourceFileImportPaths } from '../../transformers/rewrite-
 import { updateStencilCoreImports } from '../../transformers/update-stencil-core-import';
 import { getHydrateBuildConditionals } from './hydrate-build-conditionals';
 
+/**
+ * Marshall some Rollup options for the hydrate factory and then pass it to our
+ * {@link bundleOutput} helper
+ *
+ * @param config a validated Stencil configuration
+ * @param compilerCtx the current compiler context
+ * @param buildCtx the current build context
+ * @param appFactoryEntryCode an entry code for the app factory
+ * @returns a promise wrapping a rollup build object
+ */
 export const bundleHydrateFactory = async (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
@@ -21,7 +31,7 @@ export const bundleHydrateFactory = async (
     const bundleOpts: BundleOptions = {
       id: 'hydrate',
       platform: 'hydrate',
-      conditionals: getHydrateBuildConditionals(buildCtx.components),
+      conditionals: getHydrateBuildConditionals(config, buildCtx.components),
       customBeforeTransformers: getCustomBeforeTransformers(config, compilerCtx),
       inlineDynamicImports: true,
       inputs: {
