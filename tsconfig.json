@@ -45,6 +45,7 @@
     },
     "pretty": true,
     "resolveJsonModule": true,
+    "skipLibCheck": true,
     "sourceMap": true,
     "strictBindCallApply": true,
     "strictFunctionTypes": true,

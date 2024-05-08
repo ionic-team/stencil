@@ -52,7 +52,7 @@
   packageRules: [
     {
       matchPackageNames: ['@types/node'],
-      allowedVersions: '<21.0.0',
+      allowedVersions: '<23.0.0',
     },
     {
       // Increment this value as a part of updating TypeScript
