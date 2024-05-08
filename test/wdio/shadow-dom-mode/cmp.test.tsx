@@ -14,16 +14,14 @@ describe('shadow-dom-mode', () => {
   });
 
   it('renders', async () => {
-    await $('shadow-dom-mode[id="blue"]').waitForExist();
+    const blueElm = $('shadow-dom-mode[id="blue"]');
+    await expect(blueElm).toHaveStyle({
+      'background-color': browser.isChromium ? 'rgba(0,0,255,1)' : 'rgb(0,0,255)'
+    });
 
-    const blueElm = document.querySelector('shadow-dom-mode[id="blue"]');
-    const blueBg = window.getComputedStyle(blueElm).backgroundColor;
-    expect(blueBg).toBe('rgb(0, 0, 255)');
-
-    await $('shadow-dom-mode[id="red"]').waitForExist();
-
-    const redElm = document.querySelector('shadow-dom-mode[id="red"]');
-    const redBg = window.getComputedStyle(redElm).backgroundColor;
-    expect(redBg).toBe('rgb(255, 0, 0)');
+    const redElm = $('shadow-dom-mode[id="red"]');
+    await expect(redElm).toHaveStyle({
+      'background-color': browser.isChromium ? 'rgba(255,0,0,1)' : 'rgb(255,0,0)'
+    });
   });
 });
