@@ -5,14 +5,14 @@ import { isString } from '@utils';
 export function transpile(input: string, opts: TranspileOptions = {}): TranspileResults {
   opts = {
     ...opts,
-    componentExport: null,
+    componentExport: undefined,
     componentMetadata: 'compilerstatic',
     coreImportPath: isString(opts.coreImportPath) ? opts.coreImportPath : '@stencil/core/internal/testing',
     currentDirectory: opts.currentDirectory || process.cwd(),
     module: 'cjs', // always use commonjs since we're in a node environment
-    proxy: null,
+    proxy: undefined,
     sourceMap: 'inline',
-    style: null,
+    style: undefined,
     styleImportData: 'queryparams',
     target: 'es2015', // default to es2015
     transformAliasedImportPaths: parseStencilTranspilePaths(process.env.__STENCIL_TRANSPILE_PATHS__),
