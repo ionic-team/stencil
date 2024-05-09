@@ -481,13 +481,13 @@ Testing components with ElementInternals is fully supported in e2e tests.`,
   }
 
   insertAdjacentElement(position: 'beforebegin' | 'afterbegin' | 'beforeend' | 'afterend', elm: MockHTMLElement) {
-    if (position === 'beforebegin') {
+    if (position === 'beforebegin' && this.parentNode) {
       insertBefore(this.parentNode, elm, this);
     } else if (position === 'afterbegin') {
       this.prepend(elm);
     } else if (position === 'beforeend') {
       this.appendChild(elm);
-    } else if (position === 'afterend') {
+    } else if (position === 'afterend' && this.parentNode) {
       insertBefore(this.parentNode, elm, this.nextSibling);
     }
     return elm;
@@ -497,7 +497,9 @@ Testing components with ElementInternals is fully supported in e2e tests.`,
     const frag = parseFragmentUtil(this.ownerDocument, html);
     if (position === 'beforebegin') {
       while (frag.childNodes.length > 0) {
-        insertBefore(this.parentNode, frag.childNodes[0], this);
+        if (this.parentNode) {
+          insertBefore(this.parentNode, frag.childNodes[0], this);
+        }
       }
     } else if (position === 'afterbegin') {
       while (frag.childNodes.length > 0) {
@@ -509,20 +511,22 @@ Testing components with ElementInternals is fully supported in e2e tests.`,
       }
     } else if (position === 'afterend') {
       while (frag.childNodes.length > 0) {
-        insertBefore(this.parentNode, frag.childNodes[frag.childNodes.length - 1], this.nextSibling);
+        if (this.parentNode) {
+          insertBefore(this.parentNode, frag.childNodes[frag.childNodes.length - 1], this.nextSibling);
+        }
       }
     }
   }
 
   insertAdjacentText(position: 'beforebegin' | 'afterbegin' | 'beforeend' | 'afterend', text: string) {
     const elm = this.ownerDocument.createTextNode(text);
-    if (position === 'beforebegin') {
+    if (position === 'beforebegin' && this.parentNode) {
       insertBefore(this.parentNode, elm, this);
     } else if (position === 'afterbegin') {
       this.prepend(elm);
     } else if (position === 'beforeend') {
       this.appendChild(elm);
-    } else if (position === 'afterend') {
+    } else if (position === 'afterend' && this.parentNode) {
       insertBefore(this.parentNode, elm, this.nextSibling);
     }
   }
@@ -1077,7 +1081,7 @@ export function resetElement(elm: MockElement) {
   delete elm.__style;
 }
 
-function insertBefore(parentNode: MockNode, newNode: MockNode, referenceNode: MockNode) {
+function insertBefore(parentNode: MockNode, newNode: MockNode, referenceNode: MockNode | null) {
   if (newNode !== referenceNode) {
     newNode.remove();
     newNode.parentNode = parentNode;
@@ -1103,7 +1107,7 @@ function insertBefore(parentNode: MockNode, newNode: MockNode, referenceNode: Mo
 export class MockHTMLElement extends MockElement {
   override __namespaceURI = 'http://www.w3.org/1999/xhtml';
 
-  constructor(ownerDocument: any, nodeName: string) {
+  constructor(ownerDocument: any, nodeName: string | null) {
     super(ownerDocument, typeof nodeName === 'string' ? nodeName.toUpperCase() : null);
   }
 
