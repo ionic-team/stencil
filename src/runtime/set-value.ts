@@ -27,8 +27,8 @@ export const setValue = (ref: d.RuntimeRef, propName: string, newVal: any, cmpMe
         'unknown to this Stencil runtime. This usually happens when integrating ' +
         'a 3rd party Stencil component with another Stencil component or application. ' +
         'Please reach out to the maintainers of the 3rd party Stencil component or report ' +
-        'this on the Stencil Discord server (https://chat.stenciljs.com) or GitHub ' +
-        'repository (https://github.com/ionic-team/stencil).',
+        'this on the Stencil Discord server (https://chat.stenciljs.com) or comment ' +
+        'on this similar [GitHub issue](https://github.com/ionic-team/stencil/issues/5457).',
     );
   }
 
