@@ -111,15 +111,15 @@ export const transpileModule = (
   const program = ts.createProgram([sourceFilePath], tsCompilerOptions, compilerHost);
   const typeChecker = program.getTypeChecker();
 
-  const transformers: ts.CustomTransformers = {
+  const transformers = {
     before: [
       convertDecoratorsToStatic(config, buildCtx.diagnostics, typeChecker, program),
       performAutomaticKeyInsertion,
       updateStencilCoreImports(transformOpts.coreImportPath),
     ],
     after: [convertStaticToMeta(config, compilerCtx, buildCtx, typeChecker, null, transformOpts)],
-    afterDeclarations: [],
-  };
+    afterDeclarations: [] as (ts.CustomTransformerFactory | ts.TransformerFactory<ts.SourceFile | ts.Bundle>)[],
+  } satisfies ts.CustomTransformers;
 
   if (config.transformAliasedImportPaths) {
     transformers.before.push(rewriteAliasedSourceFileImportPaths);
@@ -146,7 +146,7 @@ export const transpileModule = (
 
   program.emit(undefined, undefined, undefined, false, transformers);
 
-  const tsDiagnostics = [...program.getSyntacticDiagnostics()];
+  const tsDiagnostics = [...program.getSyntacticDiagnostics()] as ts.Diagnostic[];
 
   if (config.validateTypes) {
     tsDiagnostics.push(...program.getOptionsDiagnostics());
@@ -156,15 +156,15 @@ export const transpileModule = (
 
   results.diagnostics.push(...buildCtx.diagnostics);
 
-  results.moduleFile = compilerCtx.moduleMap.get(results.sourceFilePath);
+  results.moduleFile = compilerCtx.moduleMap.get(results.sourceFilePath)!;
 
   return results;
 };
 
 const getScriptTargetKind = (transformOpts: d.TransformOptions) => {
   const target = transformOpts.target && transformOpts.target.toUpperCase();
-  if (isNumber((ts.ScriptTarget as any)[target])) {
-    return (ts.ScriptTarget as any)[target];
+  if (isNumber((ts.ScriptTarget as any)[target as string])) {
+    return (ts.ScriptTarget as any)[target as string];
   }
   // ESNext and Latest are the same
   return ts.ScriptTarget.Latest;
