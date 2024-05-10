@@ -13,7 +13,7 @@ export const convertStaticToMeta = (
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   typeChecker: ts.TypeChecker,
-  collection: d.CollectionCompilerMeta,
+  collection: d.CollectionCompilerMeta | null,
   transformOpts: d.TransformOptions,
 ): ts.TransformerFactory<ts.SourceFile> => {
   return (transformCtx) => {
