@@ -111,19 +111,6 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
       elm.classList.add((elm['s-si'] = scopeId));
     }
 
-    if (BUILD.scoped) {
-      // to be able to style the deep nested scoped component from the root component,
-      // root component's scope id needs to be added to the child nodes since sass compiler
-      // adds scope id to the nested selectors during compilation phase
-      const rootScopeId =
-        newParentVNode.$elm$?.['s-rsc'] || newParentVNode.$elm$?.['s-si'] || newParentVNode.$elm$?.['s-sc'];
-
-      if (rootScopeId) {
-        elm['s-rsc'] = rootScopeId;
-        !elm.classList.contains(rootScopeId) && elm.classList.add(rootScopeId);
-      }
-    }
-
     if (newVNode.$children$) {
       for (i = 0; i < newVNode.$children$.length; ++i) {
         // create the node
@@ -206,7 +193,7 @@ const relocateToHostRoot = (parentElm: Element) => {
     for (const childNode of contentRefNode ? childNodeArray.reverse() : childNodeArray) {
       // Only relocate nodes that were slotted in
       if (childNode['s-sh'] != null) {
-        host.insertBefore(childNode, contentRefNode ?? null);
+        insertBefore(host, childNode, contentRefNode ?? null);
 
         // Reset so we can correctly move the node around again.
         childNode['s-sh'] = undefined;
@@ -237,7 +224,7 @@ const putBackInOriginalLocation = (parentElm: d.RenderNode, recursive: boolean) 
     const childNode = oldSlotChildNodes[i] as any;
     if (childNode['s-hn'] !== hostTagName && childNode['s-ol']) {
       // and relocate it back to it's original location
-      parentReferenceNode(childNode).insertBefore(childNode, referenceNode(childNode));
+      insertBefore(parentReferenceNode(childNode), childNode, referenceNode(childNode));
 
       // remove the old original location comment entirely
       // later on the patch function will know what to do
@@ -293,7 +280,7 @@ const addVnodes = (
       childNode = createElm(null, parentVNode, startIdx, parentElm);
       if (childNode) {
         vnodes[startIdx].$elm$ = childNode as any;
-        containerElm.insertBefore(childNode, BUILD.slotRelocation ? referenceNode(before) : before);
+        insertBefore(containerElm, childNode, BUILD.slotRelocation ? referenceNode(before) : before);
       }
     }
   }
@@ -490,7 +477,7 @@ const updateChildren = (
       // `parentElm`. Luckily, `Node.nextSibling` will return `null` if there
       // aren't any siblings, and passing `null` to `Node.insertBefore` will
       // append it to the children of the parent element.
-      parentElm.insertBefore(oldStartVnode.$elm$, oldEndVnode.$elm$.nextSibling as any);
+      insertBefore(parentElm, oldStartVnode.$elm$, oldEndVnode.$elm$.nextSibling as any);
       oldStartVnode = oldCh[++oldStartIdx];
       newEndVnode = newCh[--newEndIdx];
     } else if (isSameVnode(oldEndVnode, newStartVnode, isInitialRender)) {
@@ -518,7 +505,7 @@ const updateChildren = (
       // can move the element for `oldEndVnode` _before_ the element for
       // `oldStartVnode`, leaving `oldStartVnode` to be reconciled in the
       // future.
-      parentElm.insertBefore(oldEndVnode.$elm$, oldStartVnode.$elm$);
+      insertBefore(parentElm, oldEndVnode.$elm$, oldStartVnode.$elm$);
       oldEndVnode = oldCh[--oldEndIdx];
       newStartVnode = newCh[++newStartIdx];
     } else {
@@ -569,9 +556,9 @@ const updateChildren = (
       if (node) {
         // if we created a new node then handle inserting it to the DOM
         if (BUILD.slotRelocation) {
-          parentReferenceNode(oldStartVnode.$elm$).insertBefore(node, referenceNode(oldStartVnode.$elm$));
+          insertBefore(parentReferenceNode(oldStartVnode.$elm$), node, referenceNode(oldStartVnode.$elm$));
         } else {
-          oldStartVnode.$elm$.parentNode.insertBefore(node, oldStartVnode.$elm$);
+          insertBefore(oldStartVnode.$elm$.parentNode, node, oldStartVnode.$elm$);
         }
       }
     }
@@ -925,6 +912,52 @@ export const nullifyVNodeRefs = (vNode: d.VNode) => {
 };
 
 /**
+ * Inserts a node before a reference node as a child of a specified parent node.
+ * Additionally, adds parent element's scope id as class to the new node.
+ *
+ * @param parent parent node
+ * @param newNode element to be inserted
+ * @param reference anchor element
+ * @returns inserted node
+ */
+export const insertBefore = (parent: Node, newNode: Node, reference?: Node): Node => {
+  const inserted = parent?.insertBefore(newNode, reference);
+
+  if (BUILD.scoped) {
+    setParentScopeIdAsClassName(newNode as d.RenderNode, parent as d.RenderNode);
+  }
+
+  return inserted;
+};
+
+const findParentScopeId = (element: any): any => {
+  return element
+    ? element['s-rsc'] || element['s-si'] || element['s-sc'] || findParentScopeId(element.parentElement)
+    : undefined;
+};
+
+/**
+ * to be able to style the deep nested scoped component from the root component,
+ * root component's scope id needs to be added to the child nodes since sass compiler
+ * adds scope id to the nested selectors during compilation phase
+ *
+ * @param element an element to be updated
+ * @param parent a parent element that scope id is retrieved
+ */
+export const setParentScopeIdAsClassName = (element: d.RenderNode, parent: d.RenderNode) => {
+  if (element && parent) {
+    const oldRootScopeId = element['s-rsc'];
+    const newRootScopeId = findParentScopeId(parent);
+
+    oldRootScopeId && element.classList?.contains(oldRootScopeId) && element.classList.remove(oldRootScopeId);
+    if (newRootScopeId) {
+      element['s-rsc'] = newRootScopeId;
+      !element.classList?.contains(newRootScopeId) && element.classList?.add(newRootScopeId);
+    }
+  }
+};
+
+/**
  * Information about nodes to be relocated in order to support
  * `<slot>` elements in scoped (i.e. non-shadow DOM) components
  */
@@ -1045,7 +1078,7 @@ render() {
               : (doc.createTextNode('') as any);
           orgLocationNode['s-nr'] = nodeToRelocate;
 
-          nodeToRelocate.parentNode.insertBefore((nodeToRelocate['s-ol'] = orgLocationNode), nodeToRelocate);
+          insertBefore(nodeToRelocate.parentNode, (nodeToRelocate['s-ol'] = orgLocationNode), nodeToRelocate);
         }
       }
 
@@ -1115,7 +1148,7 @@ render() {
               // If we get to this point and `insertBeforeNode` is `null`, that means
               // we're just going to append the node as the last child of the parent. Passing
               // `null` as the second arg here will trigger that behavior.
-              parentNodeRef.insertBefore(nodeToRelocate, insertBeforeNode);
+              insertBefore(parentNodeRef, nodeToRelocate, insertBeforeNode);
 
               // Reset the `hidden` value back to what it was defined as originally
               // This solves a problem where a `slot` is dynamically rendered and `hidden` may have

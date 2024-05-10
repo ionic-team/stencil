@@ -8,6 +8,10 @@ import { Component, h } from '@stencil/core';
 })
 export class CmpLevel1 {
   render() {
-    return <cmp-level-2></cmp-level-2>;
+    return (
+      <cmp-level-2>
+        <slot />
+      </cmp-level-2>
+    );
   }
 }
