@@ -353,7 +353,7 @@ export const patchTextContent = (hostElementPrototype: HTMLElement): void => {
           this.__textContent = value;
           const contentRefElm = this['s-cr'];
           if (contentRefElm) {
-            this.insertBefore(contentRefElm, this.firstChild);
+            insertBefore(this, contentRefElm, this.firstChild);
           }
         }
       },

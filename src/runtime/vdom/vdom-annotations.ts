@@ -10,6 +10,7 @@ import {
   SLOT_NODE_ID,
   TEXT_NODE_ID,
 } from '../runtime-constants';
+import { insertBefore } from './vdom-render';
 
 /**
  * Updates the DOM generated on the server with annotations such as node attributes and
@@ -58,7 +59,7 @@ export const insertVdomAnnotations = (doc: Document, staticComponents: string[])
             }
             const commentBeforeTextNode = doc.createComment(childId);
             commentBeforeTextNode.nodeValue = `${TEXT_NODE_ID}.${childId}`;
-            nodeRef.parentNode?.insertBefore(commentBeforeTextNode, nodeRef);
+            insertBefore(nodeRef.parentNode, commentBeforeTextNode, nodeRef);
           }
         }
 
@@ -220,7 +221,7 @@ const insertChildVNodeAnnotations = (
       const textNodeId = `${TEXT_NODE_ID}.${childId}`;
 
       const commentBeforeTextNode = doc.createComment(textNodeId);
-      parentNode?.insertBefore(commentBeforeTextNode, childElm);
+      insertBefore(parentNode, commentBeforeTextNode, childElm);
     }
   } else if (childElm.nodeType === NODE_TYPE.CommentNode) {
     if (childElm['s-sr']) {

@@ -930,7 +930,7 @@ export const insertBefore = (parent: Node, newNode: Node, reference?: Node): Nod
   return inserted;
 };
 
-const findParentScopeId = (element: any): any => {
+const findParentScopeId = (element: d.RenderNode): string | undefined => {
   return element
     ? element['s-rsc'] || element['s-si'] || element['s-sc'] || findParentScopeId(element.parentElement)
     : undefined;

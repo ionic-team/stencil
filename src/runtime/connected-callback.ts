@@ -9,6 +9,7 @@ import { createTime } from './profile';
 import { HYDRATE_ID, NODE_TYPE, PLATFORM_FLAGS } from './runtime-constants';
 import { addStyle } from './styles';
 import { attachToAncestor } from './update-component';
+import { insertBefore } from './vdom/vdom-render';
 
 export const connectedCallback = (elm: d.HostElement) => {
   if ((plt.$flags$ & PLATFORM_FLAGS.isTmpDisconnected) === 0) {
@@ -128,5 +129,5 @@ const setContentReference = (elm: d.HostElement) => {
     BUILD.isDebug ? `content-ref (host=${elm.localName})` : '',
   ) as any);
   contentRefElm['s-cn'] = true;
-  elm.insertBefore(contentRefElm, elm.firstChild);
+  insertBefore(elm, contentRefElm, elm.firstChild);
 };
