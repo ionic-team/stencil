@@ -1,4 +1,5 @@
 import { catchError } from '@utils';
+import { execSync } from 'child_process';
 
 import type * as d from '../../declarations';
 import { outputServiceWorkers } from '../output-targets/output-service-workers';
@@ -39,39 +40,51 @@ export const writeBuild = async (
     // TODO: this would need to account for other config values like output directory
     // and checking which output targets are used in the build to know which exports to create
     const namespace = buildCtx.config.fsNamespace;
-    const packageJsonExports: any = {
-      '.': {
-        import: `./dist/${namespace}/${namespace}.esm.js`,
-        require: `./dist/${namespace}/${namespace}.cjs.js`,
-      },
-      './loader': {
-        import: './loader/index.js',
-        require: './loader/index.cjs',
-        types: './loader/index.d.ts',
-      },
-    };
+    execSync(`npm pkg set "exports[.][import]"="./dist/${namespace}/${namespace}.esm.js"`);
+    execSync(`npm pkg set "exports[.][require]"="./dist/${namespace}/${namespace}.cjs.js"`);
+
+    execSync(`npm pkg set "exports[./loader][import]"="./loader/index.js"`);
+    execSync(`npm pkg set "exports[./loader][require]"="./loader/index.cjs"`);
+    execSync(`npm pkg set "exports[./loader][types]"="./loader/index.d.ts"`);
+
     buildCtx.components.forEach((cmp) => {
-      packageJsonExports[`./${cmp.tagName}`] = {
-        import: `./dist/components/${cmp.tagName}.js`,
-        types: `./dist/components/${cmp.tagName}.d.ts`,
-      };
+      execSync(`npm pkg set "exports[./${cmp.tagName}][import]"="./dist/components/${cmp.tagName}.js"`);
+      execSync(`npm pkg set "exports[./${cmp.tagName}][types]"="./dist/components/${cmp.tagName}.d.ts"`);
     });
 
-    // Write updated `package.json` file
-    await compilerCtx.fs.writeFile(
-      config.packageJsonFilePath,
-      JSON.stringify(
-        {
-          ...buildCtx.packageJson,
-          exports: packageJsonExports,
-        },
-        null,
-        2,
-      ),
-      {
-        immediateWrite: true,
-      },
-    );
+    // const packageJsonExports: any = {
+    //   '.': {
+    //     import: `./dist/${namespace}/${namespace}.esm.js`,
+    //     require: `./dist/${namespace}/${namespace}.cjs.js`,
+    //   },
+    //   './loader': {
+    //     import: './loader/index.js',
+    //     require: './loader/index.cjs',
+    //     types: './loader/index.d.ts',
+    //   },
+    // };
+    // buildCtx.components.forEach((cmp) => {
+    //   packageJsonExports[`./${cmp.tagName}`] = {
+    //     import: `./dist/components/${cmp.tagName}.js`,
+    //     types: `./dist/components/${cmp.tagName}.d.ts`,
+    //   };
+    // });
+
+    // // Write updated `package.json` file
+    // await compilerCtx.fs.writeFile(
+    //   config.packageJsonFilePath,
+    //   JSON.stringify(
+    //     {
+    //       ...buildCtx.packageJson,
+    //       exports: packageJsonExports,
+    //     },
+    //     null,
+    //     2,
+    //   ),
+    //   {
+    //     immediateWrite: true,
+    //   },
+    // );
 
     await outputServiceWorkers(config, buildCtx);
     await validateBuildFiles(config, compilerCtx, buildCtx);
