@@ -853,6 +853,7 @@ export namespace JSXBase {
     hrefLang?: string;
     hreflang?: string;
     media?: string;
+    ping?: string;
     rel?: string;
     target?: string;
     referrerPolicy?: ReferrerPolicy;
