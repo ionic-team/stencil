@@ -6,7 +6,7 @@ let customError: d.ErrorHandler;
 
 export const cmpModules = new Map<string, { [exportName: string]: d.ComponentConstructor }>();
 
-const getModule = (tagName: string): d.ComponentConstructor => {
+const getModule = (tagName: string): d.ComponentConstructor | null => {
   if (typeof tagName === 'string') {
     tagName = tagName.toLowerCase();
     const cmpModule = cmpModules.get(tagName);
@@ -17,7 +17,11 @@ const getModule = (tagName: string): d.ComponentConstructor => {
   return null;
 };
 
-export const loadModule = (cmpMeta: d.ComponentRuntimeMeta, _hostRef: d.HostRef, _hmrVersionId?: string): any => {
+export const loadModule = (
+  cmpMeta: d.ComponentRuntimeMeta,
+  _hostRef: d.HostRef,
+  _hmrVersionId?: string,
+): d.ComponentConstructor | null => {
   return getModule(cmpMeta.$tagName$);
 };
 
