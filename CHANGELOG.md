@@ -3,16 +3,11 @@
 
 ### Bug Fixes
 
-* **build:** do not copy polyfills to the `dist` OT unless building es5 ([#5725](https://github.com/ionic-team/stencil/issues/5725)) ([945df46](https://github.com/ionic-team/stencil/commit/945df46b72ec52bf348f10cb9bf58f337b11de7c))
-* **compiler:** Allow OutputTargetCustom to be called on devMode ([#5541](https://github.com/ionic-team/stencil/issues/5541)) ([b0a9f7b](https://github.com/ionic-team/stencil/commit/b0a9f7b559b2a8efd21674609f35f6a09c430f01))
+* **build:** do not copy polyfills to the `dist` OT unless building es5 ([#5725](https://github.com/ionic-team/stencil/issues/5725)) ([945df46](https://github.com/ionic-team/stencil/commit/945df46b72ec52bf348f10cb9bf58f337b11de7c)), closes [#5416](https://github.com/ionic-team/stencil/issues/5416)
+* **compiler:** Allow OutputTargetCustom to be called on devMode ([#5541](https://github.com/ionic-team/stencil/issues/5541)) ([b0a9f7b](https://github.com/ionic-team/stencil/commit/b0a9f7b559b2a8efd21674609f35f6a09c430f01)), closes [#5514](https://github.com/ionic-team/stencil/issues/5514)
 * **compiler:** deprecate `scriptDataOpts` ([#5737](https://github.com/ionic-team/stencil/issues/5737)) ([da25aaa](https://github.com/ionic-team/stencil/commit/da25aaa4f37df0fcedfc67a5dc063a60769fe2c1))
 * **declarations:** Attribute ping is missing on AnchorHTMLAttributes ([#5752](https://github.com/ionic-team/stencil/issues/5752)) ([d345412](https://github.com/ionic-team/stencil/commit/d345412302a05323a4f8922aa7388fd67a4e4944)), closes [#5751](https://github.com/ionic-team/stencil/issues/5751)
-* **runtime:** add root scope id to the user provided nested children as classname ([#5750](https://github.com/ionic-team/stencil/issues/5750)) ([e864132](https://github.com/ionic-team/stencil/commit/e8641322c3a6b08f31469312d5351d611aa05086))
-
-
-### Reverts
-
-* Revert "chore(deps): update dependency execa to v9 (#5758)" (#5764) ([adae151](https://github.com/ionic-team/stencil/commit/adae15128ae51735448c6aa17ae3a972e513e1c7))
+* **runtime:** add root scope id to the user provided nested children as classname ([#5750](https://github.com/ionic-team/stencil/issues/5750)) ([e864132](https://github.com/ionic-team/stencil/commit/e8641322c3a6b08f31469312d5351d611aa05086)), closes [#5749](https://github.com/ionic-team/stencil/issues/5749)
 
 
 
