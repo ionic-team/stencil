@@ -100,7 +100,6 @@ export const initializeComponent = async (
        * ```html
        * <script type="module">
        *   import { MyComponent } from 'my-stencil-component-library';
-       *   console.log(1, MyComponent, customElements);
        *   customElements.define('my-other-component', MyComponent);
        * </script>
        * ```
