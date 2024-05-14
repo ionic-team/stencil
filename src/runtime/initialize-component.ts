@@ -92,10 +92,25 @@ export const initializeComponent = async (
       // sync constructor component
       Cstr = elm.constructor as any;
 
+      /**
+       * Instead of using e.g. `cmpMeta.$tagName$` we use `elm.localName` to get the tag name of the component.
+       * This is because we can't guarantee that the component class is actually registered with the tag name
+       * defined in the component class as use can very well also do this:
+       *
+       * ```html
+       * <script type="module">
+       *   import { MyComponent } from 'my-stencil-component-library';
+       *   console.log(1, MyComponent, customElements);
+       *   customElements.define('my-other-component', MyComponent);
+       * </script>
+       * ```
+       */
+      const cmpTag = elm.localName;
+
       // wait for the CustomElementRegistry to mark the component as ready before setting `isWatchReady`. Otherwise,
       // watchers may fire prematurely if `customElements.get()`/`customElements.whenDefined()` resolves _before_
       // Stencil has completed instantiating the component.
-      customElements.whenDefined(cmpMeta.$tagName$).then(() => (hostRef.$flags$ |= HOST_FLAGS.isWatchReady));
+      customElements.whenDefined(cmpTag).then(() => (hostRef.$flags$ |= HOST_FLAGS.isWatchReady));
     }
 
     if (BUILD.style && Cstr && Cstr.style) {
