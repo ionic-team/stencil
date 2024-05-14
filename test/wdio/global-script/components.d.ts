@@ -6,10 +6,26 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
+    /**
+     * rendering this component will fail as `<attribute-basic /`> is compiled with
+     * a `dist-custom-element` output target, which will break in a lazy load environment
+     */
+    interface GlobalScriptDistCmp {
+    }
     interface GlobalScriptTestCmp {
     }
 }
 declare global {
+    /**
+     * rendering this component will fail as `<attribute-basic /`> is compiled with
+     * a `dist-custom-element` output target, which will break in a lazy load environment
+     */
+    interface HTMLGlobalScriptDistCmpElement extends Components.GlobalScriptDistCmp, HTMLStencilElement {
+    }
+    var HTMLGlobalScriptDistCmpElement: {
+        prototype: HTMLGlobalScriptDistCmpElement;
+        new (): HTMLGlobalScriptDistCmpElement;
+    };
     interface HTMLGlobalScriptTestCmpElement extends Components.GlobalScriptTestCmp, HTMLStencilElement {
     }
     var HTMLGlobalScriptTestCmpElement: {
@@ -17,13 +33,21 @@ declare global {
         new (): HTMLGlobalScriptTestCmpElement;
     };
     interface HTMLElementTagNameMap {
+        "global-script-dist-cmp": HTMLGlobalScriptDistCmpElement;
         "global-script-test-cmp": HTMLGlobalScriptTestCmpElement;
     }
 }
 declare namespace LocalJSX {
+    /**
+     * rendering this component will fail as `<attribute-basic /`> is compiled with
+     * a `dist-custom-element` output target, which will break in a lazy load environment
+     */
+    interface GlobalScriptDistCmp {
+    }
     interface GlobalScriptTestCmp {
     }
     interface IntrinsicElements {
+        "global-script-dist-cmp": GlobalScriptDistCmp;
         "global-script-test-cmp": GlobalScriptTestCmp;
     }
 }
@@ -31,6 +55,11 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
+            /**
+             * rendering this component will fail as `<attribute-basic /`> is compiled with
+             * a `dist-custom-element` output target, which will break in a lazy load environment
+             */
+            "global-script-dist-cmp": LocalJSX.GlobalScriptDistCmp & JSXBase.HTMLAttributes<HTMLGlobalScriptDistCmpElement>;
             "global-script-test-cmp": LocalJSX.GlobalScriptTestCmp & JSXBase.HTMLAttributes<HTMLGlobalScriptTestCmpElement>;
         }
     }

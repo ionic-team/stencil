@@ -47,6 +47,25 @@ const dispatchHooks = (hostRef: d.HostRef, isInitialLoad: boolean): Promise<void
   const endSchedule = createTime('scheduleUpdate', hostRef.$cmpMeta$.$tagName$);
   const instance = BUILD.lazyLoad ? hostRef.$lazyInstance$ : elm;
 
+  /**
+   * Given a user imports a component compiled with a `dist-custom-element`
+   * output target into a Stencil project compiled with a `dist` output target,
+   * then `instance` will be `undefined` as `hostRef` won't have a `lazyInstance`
+   * property. In this case, the component will fail to render in one of the
+   * subsequent functions.
+   *
+   * For this scenario to work the user needs to set the `externalRuntime` flag
+   * for the `dist-custom-element` component that is being imported into the `dist`
+   * Stencil project.
+   */
+  if (!instance) {
+    throw new Error(
+      `Can't render component <${elm.tagName.toLowerCase()} /> with invalid Stencil runtime! ` +
+        'Make sure this imported component is compiled with a `externalRuntime: true` flag. ' +
+        'For more information, please refer to https://stenciljs.com/docs/custom-elements#externalruntime',
+    );
+  }
+
   // We're going to use this variable together with `enqueue` to implement a
   // little promise-based queue. We start out with it `undefined`. When we add
   // the first function to the queue we'll set this variable to be that

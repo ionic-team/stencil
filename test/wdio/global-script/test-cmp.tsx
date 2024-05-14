@@ -4,8 +4,12 @@ import { Component, h } from '@stencil/core';
   tag: 'global-script-test-cmp',
   scoped: true,
 })
-export class SiblingRoot {
+export class GlobalScriptTestCmp {
   render() {
-    return <div>I am rendered after {Date.now() - window.__testStart}</div>;
+    return (
+      <section>
+        <div>I am rendered after {Date.now() - window.__testStart}</div>
+      </section>
+    );
   }
 }
