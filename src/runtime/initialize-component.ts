@@ -26,7 +26,7 @@ export const initializeComponent = async (
   cmpMeta: d.ComponentRuntimeMeta,
   hmrVersionId?: string,
 ) => {
-  let Cstr: any;
+  let Cstr: d.ComponentConstructor | undefined;
   // initializeComponent
   if ((hostRef.$flags$ & HOST_FLAGS.hasInitializedComponent) === 0) {
     // Let the runtime know that the component has been initialized
@@ -37,17 +37,19 @@ export const initializeComponent = async (
       // lazy loaded components
       // request the component's implementation to be
       // wired up with the host element
-      Cstr = loadModule(cmpMeta, hostRef, hmrVersionId);
-      if (Cstr.then) {
+      const CstrImport = loadModule(cmpMeta, hostRef, hmrVersionId);
+      if (CstrImport && 'then' in CstrImport) {
         // Await creates a micro-task avoid if possible
         const endLoad = uniqueTime(
           `st:load:${cmpMeta.$tagName$}:${hostRef.$modeName$}`,
           `[Stencil] Load module for <${cmpMeta.$tagName$}>`,
         );
-        Cstr = await Cstr;
+        Cstr = await CstrImport;
         endLoad();
+      } else {
+        Cstr = CstrImport as d.ComponentConstructor | undefined;
       }
-      if ((BUILD.isDev || BUILD.isDebug) && !Cstr) {
+      if (!Cstr) {
         throw new Error(`Constructor for "${cmpMeta.$tagName$}#${hostRef.$modeName$}" was not found`);
       }
       if (BUILD.member && !Cstr.isProxied) {
@@ -96,12 +98,16 @@ export const initializeComponent = async (
       customElements.whenDefined(cmpMeta.$tagName$).then(() => (hostRef.$flags$ |= HOST_FLAGS.isWatchReady));
     }
 
-    if (BUILD.style && Cstr.style) {
+    if (BUILD.style && Cstr && Cstr.style) {
       // this component has styles but we haven't registered them yet
       let style = Cstr.style;
 
       if (BUILD.mode && typeof style !== 'string') {
-        style = style[(hostRef.$modeName$ = computeMode(elm))];
+        hostRef.$modeName$ = computeMode(elm) as string | undefined;
+        if (hostRef.$modeName$) {
+          style = style[hostRef.$modeName$];
+        }
+
         if (BUILD.hydrateServerSide && hostRef.$modeName$) {
           elm.setAttribute('s-mode', hostRef.$modeName$);
         }

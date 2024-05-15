@@ -27,7 +27,7 @@ export const loadModule = (
   cmpMeta: d.ComponentRuntimeMeta,
   hostRef: d.HostRef,
   hmrVersionId?: string,
-): Promise<d.ComponentConstructor> | d.ComponentConstructor => {
+): Promise<d.ComponentConstructor | undefined> | d.ComponentConstructor => {
   // loadModuleImport
   const exportName = cmpMeta.$tagName$.replace(/-/g, '_');
   const bundleId = cmpMeta.$lazyBundleId$;
