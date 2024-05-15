@@ -95,7 +95,7 @@ export const initializeComponent = async (
       /**
        * Instead of using e.g. `cmpMeta.$tagName$` we use `elm.localName` to get the tag name of the component.
        * This is because we can't guarantee that the component class is actually registered with the tag name
-       * defined in the component class as use can very well also do this:
+       * defined in the component class as users can very well also do this:
        *
        * ```html
        * <script type="module">
