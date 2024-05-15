@@ -456,11 +456,17 @@ const emitLifecycleEvent = (elm: EventTarget, lifecycleName: string) => {
   }
 };
 
+/**
+ * Set the hydrated flag on a DOM element
+ *
+ * @param elm a reference to a DOM element
+ * @returns undefined
+ */
 const addHydratedFlag = (elm: Element) =>
   BUILD.hydratedClass
-    ? elm.classList.add('hydrated')
+    ? elm.classList.add(BUILD.hydratedSelectorName ?? 'hydrated')
     : BUILD.hydratedAttribute
-      ? elm.setAttribute('hydrated', '')
+      ? elm.setAttribute(BUILD.hydratedSelectorName ?? 'hydrated', '')
       : undefined;
 
 const serverSideConnected = (elm: any) => {

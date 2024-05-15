@@ -14,7 +14,7 @@ import { APP_DATA_CONDITIONAL, STENCIL_APP_DATA_ID, STENCIL_APP_GLOBALS_ID } fro
  * @param config the Stencil configuration for a particular project
  * @param compilerCtx the current compiler context
  * @param buildCtx the current build context
- * @param build the set build conditionals for the build
+ * @param buildConditionals the set build conditionals for the build
  * @param platform the platform that is being built
  * @returns a Rollup plugin which carries out the necessary work
  */
@@ -22,7 +22,7 @@ export const appDataPlugin = (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
-  build: d.BuildConditionals,
+  buildConditionals: d.BuildConditionals,
   platform: 'client' | 'hydrate' | 'worker',
 ): Plugin => {
   if (!platform) {
@@ -68,7 +68,7 @@ export const appDataPlugin = (
         // build custom app-data based off of component metadata
         const s = new MagicString(``);
         appendNamespace(config, s);
-        appendBuildConditionals(config, build, s);
+        appendBuildConditionals(config, buildConditionals, s);
         appendEnv(config, s);
         return s.toString();
       }
@@ -200,13 +200,17 @@ const appendGlobalScripts = (globalScripts: GlobalScript[], s: MagicString) => {
  * **This function mutates the provided {@link MagicString} argument**
  *
  * @param config the configuration associated with the Stencil project
- * @param build the build conditionals to serialize into a JS object
+ * @param buildConditionals the build conditionals to serialize into a JS object
  * @param s a `MagicString` to append the generated constant onto
  */
-const appendBuildConditionals = (config: d.ValidatedConfig, build: d.BuildConditionals, s: MagicString): void => {
-  const buildData = Object.keys(build)
+export const appendBuildConditionals = (
+  config: d.ValidatedConfig,
+  buildConditionals: d.BuildConditionals,
+  s: MagicString,
+): void => {
+  const buildData = Object.keys(buildConditionals)
     .sort()
-    .map((key) => key + ': ' + ((build as any)[key] ? 'true' : 'false'))
+    .map((key) => key + ': ' + JSON.stringify((buildConditionals as any)[key]))
     .join(', ');
 
   s.append(`export const BUILD = /* ${config.fsNamespace} */ { ${buildData} };\n`);
