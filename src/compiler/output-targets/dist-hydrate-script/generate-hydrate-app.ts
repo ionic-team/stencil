@@ -14,6 +14,14 @@ import { HYDRATE_FACTORY_INTRO, HYDRATE_FACTORY_OUTRO } from './hydrate-factory-
 import { updateToHydrateComponents } from './update-to-hydrate-components';
 import { writeHydrateOutputs } from './write-hydrate-outputs';
 
+/**
+ * Generate and build the hydrate app and then write it to disk
+ *
+ * @param config a validated Stencil configuration
+ * @param compilerCtx the current compiler context
+ * @param buildCtx the current build context
+ * @param outputTargets the output targets for the current build
+ */
 export const generateHydrateApp = async (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,

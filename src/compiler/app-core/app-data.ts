@@ -187,6 +187,7 @@ export const updateBuildConditionals = (config: ValidatedConfig, b: BuildConditi
   if (config.hydratedFlag) {
     b.hydratedAttribute = config.hydratedFlag.selector === 'attribute';
     b.hydratedClass = config.hydratedFlag.selector === 'class';
+    b.hydratedSelectorName = config.hydratedFlag.name;
   } else {
     b.hydratedAttribute = false;
     b.hydratedClass = false;
