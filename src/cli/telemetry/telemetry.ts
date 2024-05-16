@@ -99,7 +99,7 @@ export function hasAppTarget(config: d.ValidatedConfig): boolean {
 }
 
 export function isUsingYarn(sys: d.CompilerSystem) {
-  return sys.getEnvironmentVar('npm_execpath')?.includes('yarn') || false;
+  return sys.getEnvironmentVar?.('npm_execpath')?.includes('yarn') || false;
 }
 
 /**
@@ -347,12 +347,12 @@ async function npmPackages(sys: d.CompilerSystem, ionicPackages: [string, string
 async function yarnPackages(sys: d.CompilerSystem, ionicPackages: [string, string][]): Promise<string[]> {
   const appRootDir = sys.getCurrentDirectory();
   const yarnLock = sys.readFileSync(sys.resolvePath(appRootDir + '/yarn.lock'));
-  const yarnLockYml = sys.parseYarnLockFile(yarnLock);
+  const yarnLockYml = sys.parseYarnLockFile?.(yarnLock);
 
   return ionicPackages.map(([k, v]) => {
     const identifiedVersion = `${k}@${v}`;
-    let version = yarnLockYml.object[identifiedVersion]?.version;
-    version = version.includes('undefined') ? sanitizeDeclaredVersion(identifiedVersion) : version;
+    let version = yarnLockYml?.object[identifiedVersion]?.version;
+    version = version && version.includes('undefined') ? sanitizeDeclaredVersion(identifiedVersion) : version;
     return `${k}@${version}`;
   });
 }
@@ -424,6 +424,10 @@ async function sendTelemetry(sys: d.CompilerSystem, config: d.ValidatedConfig, d
       metrics: [data],
       sent_at: now,
     };
+
+    if (!sys.fetch) {
+      throw new Error('No fetch implementation available');
+    }
 
     // This request is only made if telemetry is on.
     const response = await sys.fetch('https://api.ionicjs.com/events/metrics', {

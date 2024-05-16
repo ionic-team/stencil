@@ -15,6 +15,10 @@ export const taskWatch = async (coreCompiler: CoreCompiler, config: ValidatedCon
     const compiler = await coreCompiler.createCompiler(config);
     const watcher = await compiler.createWatcher();
 
+    if (!config.sys.getDevServerExecutingPath || !config.sys.dynamicImport || !config.sys.onProcessInterrupt) {
+      throw new Error(`Environment doesn't provide required functions: getDevServerExecutingPath, dynamicImport, onProcessInterrupt`);
+    }
+
     if (config.flags.serve) {
       const devServerPath = config.sys.getDevServerExecutingPath();
       const { start }: typeof import('@stencil/core/dev-server') = await config.sys.dynamicImport(devServerPath);

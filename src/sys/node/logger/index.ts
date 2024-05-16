@@ -70,7 +70,7 @@ export function createNodeLoggerSys(): TerminalLoggerSys {
       return (promise = promise.then(() => {
         return new Promise<any>((resolve) => {
           readline.clearLine(process.stdout, 0);
-          readline.cursorTo(process.stdout, 0, null);
+          readline.cursorTo(process.stdout, 0, undefined);
           process.stdout.write(text, resolve);
         });
       }));

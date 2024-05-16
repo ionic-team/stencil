@@ -71,6 +71,7 @@ describe('generate task', () => {
 
   it('should exit with an error if no `srcDir` is supplied', async () => {
     const { config, errorSpy } = await setup();
+    // @ts-expect-error mocking environment
     config.srcDir = undefined;
     await taskGenerate(config);
     expect(config.sys.exit).toHaveBeenCalledWith(1);
