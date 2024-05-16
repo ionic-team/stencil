@@ -205,16 +205,16 @@ export const addCustomElementInputs = (
       const importAs = `$Cmp${exportName}`;
       const coreKey = `\0${exportName}`;
 
-    if (cmp.isPlain) {
-      exp.push(`export { ${importName} as ${exportName} } from '${cmp.sourceFilePath}';`);
-      indexExports.push(`export { ${exportName} } from '${coreKey}';`);
-    } else {
-      // the `importName` may collide with the `exportName`, alias it just in case it does with `importAs`
-      exp.push(
-        `import { ${importName} as ${importAs}, defineCustomElement as cmpDefCustomEle } from '${cmp.sourceFilePath}';`,
-      );
-      exp.push(`export const ${exportName} = ${importAs};`);
-      exp.push(`export const defineCustomElement = cmpDefCustomEle;`);
+      if (cmp.isPlain) {
+        exp.push(`export { ${importName} as ${exportName} } from '${cmp.sourceFilePath}';`);
+        indexExports.push(`export { ${exportName} } from '${coreKey}';`);
+      } else {
+        // the `importName` may collide with the `exportName`, alias it just in case it does with `importAs`
+        exp.push(
+          `import { ${importName} as ${importAs}, defineCustomElement as cmpDefCustomEle } from '${cmp.sourceFilePath}';`,
+        );
+        exp.push(`export const ${exportName} = ${importAs};`);
+        exp.push(`export const defineCustomElement = cmpDefCustomEle;`);
 
         // Here we push an export (with a rename for `defineCustomElement`) for
         // this component onto our array which references the `coreKey` (prefixed

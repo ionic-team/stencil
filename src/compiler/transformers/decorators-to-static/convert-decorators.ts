@@ -110,7 +110,14 @@ const visitClassDeclaration = (
   // parse component decorator (Component)
   const componentDecorator = retrieveTsDecorators(classNode)?.find(isDecoratorNamed(importAliasMap.get('Component')));
   if (componentDecorator) {
-    componentDecoratorToStatic(config, typeChecker, diagnostics, classNode, filteredMethodsAndFields, componentDecorator);
+    componentDecoratorToStatic(
+      config,
+      typeChecker,
+      diagnostics,
+      classNode,
+      filteredMethodsAndFields,
+      componentDecorator,
+    );
   }
 
   // stores a reference to fields that should be watched for changes
