@@ -47,7 +47,7 @@ export const patchCloneNode = (HostElementPrototype: HTMLElement) => {
         's-nr',
         's-si',
         's-rf',
-        's-rsc',
+        's-scs',
       ];
 
       for (; i < srcNode.childNodes.length; i++) {
