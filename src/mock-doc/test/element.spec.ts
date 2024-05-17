@@ -514,4 +514,11 @@ describe('element', () => {
     expect(doc.createElement('svg').localName).toBe('svg');
     expect((document.childNodes[1] as any).localName).toBe('html');
   });
+
+  it('has provides a canvas object with getContext', () => {
+    const canvas = doc.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    expect(ctx).toBeDefined();
+    expect(ctx.toDataURL()).toBe('data:,');
+  });
 });
