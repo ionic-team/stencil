@@ -14,7 +14,9 @@ export const taskServe = async (config: ValidatedConfig) => {
   config.devServer.root = isString(config.flags.root) ? config.flags.root : config.sys.getCurrentDirectory();
 
   if (!config.sys.getDevServerExecutingPath || !config.sys.dynamicImport || !config.sys.onProcessInterrupt) {
-    throw new Error(`Environment doesn't provide required functions: getDevServerExecutingPath, dynamicImport, onProcessInterrupt`);
+    throw new Error(
+      `Environment doesn't provide required functions: getDevServerExecutingPath, dynamicImport, onProcessInterrupt`,
+    );
   }
 
   const devServerPath = config.sys.getDevServerExecutingPath();

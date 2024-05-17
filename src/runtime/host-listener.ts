@@ -62,7 +62,8 @@ const getHostListenerTarget = (elm: Element, flags: number): EventTarget => {
   if (BUILD.hostListenerTargetDocument && flags & LISTENER_FLAGS.TargetDocument) return doc;
   if (BUILD.hostListenerTargetWindow && flags & LISTENER_FLAGS.TargetWindow) return win;
   if (BUILD.hostListenerTargetBody && flags & LISTENER_FLAGS.TargetBody) return doc.body;
-  if (BUILD.hostListenerTargetParent && flags & LISTENER_FLAGS.TargetParent && elm.parentElement) return elm.parentElement;
+  if (BUILD.hostListenerTargetParent && flags & LISTENER_FLAGS.TargetParent && elm.parentElement)
+    return elm.parentElement;
   return elm;
 };
 

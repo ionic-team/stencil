@@ -16,7 +16,9 @@ export const taskWatch = async (coreCompiler: CoreCompiler, config: ValidatedCon
     const watcher = await compiler.createWatcher();
 
     if (!config.sys.getDevServerExecutingPath || !config.sys.dynamicImport || !config.sys.onProcessInterrupt) {
-      throw new Error(`Environment doesn't provide required functions: getDevServerExecutingPath, dynamicImport, onProcessInterrupt`);
+      throw new Error(
+        `Environment doesn't provide required functions: getDevServerExecutingPath, dynamicImport, onProcessInterrupt`,
+      );
     }
 
     if (config.flags.serve) {
