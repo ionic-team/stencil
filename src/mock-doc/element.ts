@@ -514,9 +514,9 @@ export class CanvasRenderingContext {
     return;
   }
   clearRect() {}
-  getImageData() {
+  getImageData(_: number, __: number, w: number, h: number) {
     return {
-      data: new Array(10 * 10 * 4),
+      data: new Array(w * h * 4),
     };
   }
   toDataURL() {
