@@ -29,7 +29,7 @@ const WINDOW_MOCK = `{
 }`;
 
 async function run() {
-  console.log('updating JQuery Sel!ector engine...');
+  console.log('updating JQuery Selector engine...');
 
   await runCommand(`npm install --ignore-scripts`, jqueryDepDir);
   await runCommand(`npm run build -- --include=selector`, jqueryDepDir);
