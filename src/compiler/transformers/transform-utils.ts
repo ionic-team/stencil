@@ -2,6 +2,7 @@ import { normalizePath } from '@utils';
 import ts from 'typescript';
 
 import type * as d from '../../declarations';
+import { HOST_REF_ARG } from './component-lazy/constants';
 import { StencilStaticGetter } from './decorators-to-static/decorators-constants';
 import { addToLibrary, findTypeWithName, getHomeModule, getOriginalTypeName } from './type-library';
 
@@ -1071,7 +1072,9 @@ const needsSuper = (classDeclaration: ts.ClassDeclaration): boolean => {
  */
 const createConstructorBodyWithSuper = (): ts.ExpressionStatement => {
   return ts.factory.createExpressionStatement(
-    ts.factory.createCallExpression(ts.factory.createIdentifier('super'), undefined, undefined),
+    ts.factory.createCallExpression(ts.factory.createIdentifier('super'), undefined, [
+      ts.factory.createIdentifier(HOST_REF_ARG),
+    ]),
   );
 };
 

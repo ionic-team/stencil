@@ -26,11 +26,11 @@ export const updateLazyComponentConstructor = (
     ts.factory.createParameterDeclaration(undefined, undefined, ts.factory.createIdentifier(HOST_REF_ARG)),
   ];
 
-  const cstrStatements = [
-    registerInstanceStatement(moduleFile),
-    ...addCreateEvents(moduleFile, cmp),
-    ...createLazyAttachInternalsBinding(cmp),
-  ];
+  const cstrStatements: ts.Statement[] = [];
+  if (cmp.parentClassPath == null) {
+    cstrStatements.push(registerInstanceStatement(moduleFile));
+  }
+  cstrStatements.push(...addCreateEvents(moduleFile, cmp), ...createLazyAttachInternalsBinding(cmp));
 
   updateConstructor(classNode, classMembers, cstrStatements, cstrMethodArgs);
 };

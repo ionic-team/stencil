@@ -22,7 +22,10 @@ export const lazyComponentPlugin = (buildCtx: d.BuildCtx): Plugin => {
     load(id) {
       const entryModule = entrys.get(id);
       if (entryModule) {
-        return entryModule.cmps.map(createComponentExport).join('\n');
+        return entryModule.cmps
+          .filter((cmp) => cmp.tagName)
+          .map(createComponentExport)
+          .join('\n');
       }
       return null;
     },
