@@ -96,6 +96,15 @@ async function sysNodeExternalBundles(opts: BuildOptions) {
     bundleExternal(opts, opts.output.devServerDir, cachedDir, 'ws.js'),
   ]);
 
+  /**
+   * Some of globs dependencies are using imports with a `node:` prefix which
+   * is not supported by Jest v26. This is a workaround to remove the `node:`.
+   * TODO(STENCIL-1323): remove once we deprecated Jest v26 support
+   */
+  const globOutputPath = join(opts.output.sysNodeDir, 'glob.js');
+  const glob = fs.readFileSync(globOutputPath, 'utf8');
+  fs.writeFileSync(globOutputPath, glob.replace(/require\("node:/g, 'require("'))
+
   // open-in-editor's visualstudio.vbs file
   // TODO(STENCIL-1052): remove once Rollup -> esbuild migration is complete
   const visualstudioVbsSrc = join(opts.nodeModulesDir, 'open-in-editor', 'lib', 'editors', 'visualstudio.vbs');
