@@ -146,7 +146,12 @@
     {
       matchPackageNames: ['puppeteer'],
       allowedVersions: '<=21',
-    }
+    },
+    // TODO(STENCIL-1323): remove once we deprecated Jest v26 support
+    {
+      matchPackageNames: ['path-scurry'],
+      allowedVersions: '<=1.10.2',
+    },
   ],
   // Never rebase the branch or update it unless manually requested to avoid noisy PR emails
   rebaseWhen: 'never',
