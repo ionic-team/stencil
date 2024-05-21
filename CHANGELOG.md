@@ -1,3 +1,17 @@
+## ⛲️ [4.18.2](https://github.com/ionic-team/stencil/compare/v4.18.1...v4.18.2) (2024-05-20)
+
+
+### Bug Fixes
+
+* **e2e:** allow to fetch CSS variables assigned to host elements ([#5682](https://github.com/ionic-team/stencil/issues/5682)) ([e420eb6](https://github.com/ionic-team/stencil/commit/e420eb69ed8121a0b3e552ee331dffb5759cee32)), closes [#5681](https://github.com/ionic-team/stencil/issues/5681)
+* **hydrate:** respect `HydratedFlag` configuration in hydrate script ([#5741](https://github.com/ionic-team/stencil/issues/5741)) ([3538d06](https://github.com/ionic-team/stencil/commit/3538d06bdc4e1193c0032a228fa7571c0554e4df)), closes [#3606](https://github.com/ionic-team/stencil/issues/3606)
+* **runtime:** always throw if component can not be loaded ([#5762](https://github.com/ionic-team/stencil/issues/5762)) ([1d52b95](https://github.com/ionic-team/stencil/commit/1d52b9500e5b42b12e2ce24985bef4da34dd4e05)), closes [#5759](https://github.com/ionic-team/stencil/issues/5759)
+* **runtime:** support watch for components with custom tag names ([#5767](https://github.com/ionic-team/stencil/issues/5767)) ([f561e0f](https://github.com/ionic-team/stencil/commit/f561e0fdc323b6491c54badb83da4237f896d960)), closes [#3554](https://github.com/ionic-team/stencil/issues/3554)
+* **runtime:** throw proper error if component is loaded with invalid runtime ([#5675](https://github.com/ionic-team/stencil/issues/5675)) ([3cfbb8d](https://github.com/ionic-team/stencil/commit/3cfbb8d7be940f7db952d21510b1128679ec42a2)), closes [#5596](https://github.com/ionic-team/stencil/issues/5596)
+* **types:** move autofocus attr/prop definition to HTMLAttributes ([#5727](https://github.com/ionic-team/stencil/issues/5727)) ([3a33eff](https://github.com/ionic-team/stencil/commit/3a33eff4c810c5f87dee18634fb6e7b7f19e2eb6)), closes [#5726](https://github.com/ionic-team/stencil/issues/5726)
+
+
+
 ## 🏍 [4.18.1](https://github.com/ionic-team/stencil/compare/v4.18.0...v4.18.1) (2024-05-13)
 
 
