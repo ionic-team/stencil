@@ -9,10 +9,10 @@ describe('scope-id-in-nested-classname', function () {
     await expect($('cmp-level-3')).toHaveElementClass('sc-cmp-level-1');
     await expect($('cmp-level-3')).toHaveElementClass('sc-cmp-level-2');
 
-    const padding = await (await $('cmp-level-3')).getCSSProperty('padding');
+    const padding = await $('cmp-level-3').getCSSProperty('padding');
     await expect(padding.parsed.value).toBe(32);
 
-    const fontWeight = await (await $('cmp-level-3')).getCSSProperty('font-weight');
+    const fontWeight = await $('cmp-level-3').getCSSProperty('font-weight');
     await expect(fontWeight.parsed.value).toBe(800);
   });
 
@@ -27,10 +27,10 @@ describe('scope-id-in-nested-classname', function () {
     await expect($('#test-element')).toHaveElementClass('sc-cmp-level-1');
     await expect($('#test-element')).toHaveElementClass('sc-cmp-level-2');
 
-    const padding = await (await $('#test-element')).getCSSProperty('padding');
+    const padding = await $('#test-element').getCSSProperty('padding');
     await expect(padding.parsed.value).toBe(24);
 
-    const fontWeight = await (await $('#test-element')).getCSSProperty('font-weight');
+    const fontWeight = await $('#test-element').getCSSProperty('font-weight');
     await expect(fontWeight.parsed.value).toBe(600);
   });
 });
