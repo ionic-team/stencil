@@ -103,7 +103,7 @@ async function sysNodeExternalBundles(opts: BuildOptions) {
    */
   const globOutputPath = join(opts.output.sysNodeDir, 'glob.js');
   const glob = fs.readFileSync(globOutputPath, 'utf8');
-  fs.writeFileSync(globOutputPath, glob.replace(/require\("node:/g, 'require("'))
+  fs.writeFileSync(globOutputPath, glob.replace(/require\("node:/g, 'require("'));
 
   // open-in-editor's visualstudio.vbs file
   // TODO(STENCIL-1052): remove once Rollup -> esbuild migration is complete
