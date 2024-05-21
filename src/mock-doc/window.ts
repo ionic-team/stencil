@@ -28,6 +28,7 @@ const nativeClearTimeout = clearTimeout;
 const nativeSetInterval = setInterval;
 const nativeSetTimeout = setTimeout;
 const nativeURL = URL;
+const nativeWindow = globalThis.window;
 
 export class MockWindow {
   __timeouts: Set<any>;
@@ -109,11 +110,11 @@ export class MockWindow {
   }
 
   cancelAnimationFrame(id: any) {
-    this.__clearTimeout(id);
+    this.__clearTimeout.call(nativeWindow || this, id);
   }
 
   cancelIdleCallback(id: any) {
-    this.__clearTimeout(id);
+    this.__clearTimeout.call(nativeWindow || this, id);
   }
 
   get CharacterData() {
@@ -133,11 +134,11 @@ export class MockWindow {
   }
 
   clearInterval(id: any) {
-    this.__clearInterval(id);
+    this.__clearInterval.call(nativeWindow || this, id);
   }
 
   clearTimeout(id: any) {
-    this.__clearTimeout(id);
+    this.__clearTimeout.call(nativeWindow || this, id);
   }
 
   close() {
@@ -478,21 +479,25 @@ export class MockWindow {
       return intervalId;
     }
 
-    const timeoutId = this.__setTimeout(() => {
-      if (this.__timeouts) {
-        this.__timeouts.delete(timeoutId);
+    const timeoutId = this.__setTimeout.call(
+      nativeWindow || this,
+      () => {
+        if (this.__timeouts) {
+          this.__timeouts.delete(timeoutId);
 
-        try {
-          callback(...args);
-        } catch (e) {
-          if (this.console) {
-            this.console.error(e);
-          } else {
-            console.error(e);
+          try {
+            callback(...args);
+          } catch (e) {
+            if (this.console) {
+              this.console.error(e);
+            } else {
+              console.error(e);
+            }
           }
         }
-      }
-    }, ms) as any;
+      },
+      ms,
+    ) as any;
 
     if (this.__timeouts) {
       this.__timeouts.add(timeoutId);
@@ -508,21 +513,25 @@ export class MockWindow {
 
     ms = Math.min(ms, this.__maxTimeout);
 
-    const timeoutId = this.__setTimeout(() => {
-      if (this.__timeouts) {
-        this.__timeouts.delete(timeoutId);
+    const timeoutId = this.__setTimeout.call(
+      nativeWindow || this,
+      () => {
+        if (this.__timeouts) {
+          this.__timeouts.delete(timeoutId);
 
-        try {
-          callback(...args);
-        } catch (e) {
-          if (this.console) {
-            this.console.error(e);
-          } else {
-            console.error(e);
+          try {
+            callback(...args);
+          } catch (e) {
+            if (this.console) {
+              this.console.error(e);
+            } else {
+              console.error(e);
+            }
           }
         }
-      }
-    }, ms) as any as number;
+      },
+      ms,
+    ) as any as number;
 
     if (this.__timeouts) {
       this.__timeouts.add(timeoutId);

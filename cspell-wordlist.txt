@@ -106,6 +106,7 @@ runtimes
 searchbar
 shadowcsshost
 shadowcsshostcontext
+shadowroot
 sourcemaps
 specfile
 stenciljs

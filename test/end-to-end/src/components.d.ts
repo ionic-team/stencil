@@ -8,6 +8,16 @@ import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { CarData } from "./car-list/car-data";
 export { CarData } from "./car-list/car-data";
 export namespace Components {
+    interface AnotherCarDetail {
+        "car": CarData;
+    }
+    /**
+     * Component that helps display a list of cars
+     */
+    interface AnotherCarList {
+        "cars": CarData[];
+        "selected": CarData;
+    }
     interface AppRoot {
     }
     interface BuildData {
@@ -27,6 +37,11 @@ export namespace Components {
     interface CmpB {
     }
     interface CmpC {
+    }
+    interface CmpDsd {
+        "initialCounter": number;
+    }
+    interface CmpServerVsClient {
     }
     interface DomApi {
     }
@@ -102,6 +117,10 @@ export namespace Components {
     interface StateCmp {
     }
 }
+export interface AnotherCarListCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLAnotherCarListElement;
+}
 export interface CarListCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLCarListElement;
@@ -111,6 +130,32 @@ export interface EventCmpCustomEvent<T> extends CustomEvent<T> {
     target: HTMLEventCmpElement;
 }
 declare global {
+    interface HTMLAnotherCarDetailElement extends Components.AnotherCarDetail, HTMLStencilElement {
+    }
+    var HTMLAnotherCarDetailElement: {
+        prototype: HTMLAnotherCarDetailElement;
+        new (): HTMLAnotherCarDetailElement;
+    };
+    interface HTMLAnotherCarListElementEventMap {
+        "carSelected": CarData;
+    }
+    /**
+     * Component that helps display a list of cars
+     */
+    interface HTMLAnotherCarListElement extends Components.AnotherCarList, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLAnotherCarListElementEventMap>(type: K, listener: (this: HTMLAnotherCarListElement, ev: AnotherCarListCustomEvent<HTMLAnotherCarListElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLAnotherCarListElementEventMap>(type: K, listener: (this: HTMLAnotherCarListElement, ev: AnotherCarListCustomEvent<HTMLAnotherCarListElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLAnotherCarListElement: {
+        prototype: HTMLAnotherCarListElement;
+        new (): HTMLAnotherCarListElement;
+    };
     interface HTMLAppRootElement extends Components.AppRoot, HTMLStencilElement {
     }
     var HTMLAppRootElement: {
@@ -166,6 +211,18 @@ declare global {
     var HTMLCmpCElement: {
         prototype: HTMLCmpCElement;
         new (): HTMLCmpCElement;
+    };
+    interface HTMLCmpDsdElement extends Components.CmpDsd, HTMLStencilElement {
+    }
+    var HTMLCmpDsdElement: {
+        prototype: HTMLCmpDsdElement;
+        new (): HTMLCmpDsdElement;
+    };
+    interface HTMLCmpServerVsClientElement extends Components.CmpServerVsClient, HTMLStencilElement {
+    }
+    var HTMLCmpServerVsClientElement: {
+        prototype: HTMLCmpServerVsClientElement;
+        new (): HTMLCmpServerVsClientElement;
     };
     interface HTMLDomApiElement extends Components.DomApi, HTMLStencilElement {
     }
@@ -289,6 +346,8 @@ declare global {
         new (): HTMLStateCmpElement;
     };
     interface HTMLElementTagNameMap {
+        "another-car-detail": HTMLAnotherCarDetailElement;
+        "another-car-list": HTMLAnotherCarListElement;
         "app-root": HTMLAppRootElement;
         "build-data": HTMLBuildDataElement;
         "car-detail": HTMLCarDetailElement;
@@ -296,6 +355,8 @@ declare global {
         "cmp-a": HTMLCmpAElement;
         "cmp-b": HTMLCmpBElement;
         "cmp-c": HTMLCmpCElement;
+        "cmp-dsd": HTMLCmpDsdElement;
+        "cmp-server-vs-client": HTMLCmpServerVsClientElement;
         "dom-api": HTMLDomApiElement;
         "dom-interaction": HTMLDomInteractionElement;
         "dom-visible": HTMLDomVisibleElement;
@@ -317,6 +378,17 @@ declare global {
     }
 }
 declare namespace LocalJSX {
+    interface AnotherCarDetail {
+        "car"?: CarData;
+    }
+    /**
+     * Component that helps display a list of cars
+     */
+    interface AnotherCarList {
+        "cars"?: CarData[];
+        "onCarSelected"?: (event: AnotherCarListCustomEvent<CarData>) => void;
+        "selected"?: CarData;
+    }
     interface AppRoot {
     }
     interface BuildData {
@@ -337,6 +409,11 @@ declare namespace LocalJSX {
     interface CmpB {
     }
     interface CmpC {
+    }
+    interface CmpDsd {
+        "initialCounter"?: number;
+    }
+    interface CmpServerVsClient {
     }
     interface DomApi {
     }
@@ -387,6 +464,8 @@ declare namespace LocalJSX {
     interface StateCmp {
     }
     interface IntrinsicElements {
+        "another-car-detail": AnotherCarDetail;
+        "another-car-list": AnotherCarList;
         "app-root": AppRoot;
         "build-data": BuildData;
         "car-detail": CarDetail;
@@ -394,6 +473,8 @@ declare namespace LocalJSX {
         "cmp-a": CmpA;
         "cmp-b": CmpB;
         "cmp-c": CmpC;
+        "cmp-dsd": CmpDsd;
+        "cmp-server-vs-client": CmpServerVsClient;
         "dom-api": DomApi;
         "dom-interaction": DomInteraction;
         "dom-visible": DomVisible;
@@ -418,6 +499,11 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
+            "another-car-detail": LocalJSX.AnotherCarDetail & JSXBase.HTMLAttributes<HTMLAnotherCarDetailElement>;
+            /**
+             * Component that helps display a list of cars
+             */
+            "another-car-list": LocalJSX.AnotherCarList & JSXBase.HTMLAttributes<HTMLAnotherCarListElement>;
             "app-root": LocalJSX.AppRoot & JSXBase.HTMLAttributes<HTMLAppRootElement>;
             "build-data": LocalJSX.BuildData & JSXBase.HTMLAttributes<HTMLBuildDataElement>;
             "car-detail": LocalJSX.CarDetail & JSXBase.HTMLAttributes<HTMLCarDetailElement>;
@@ -428,6 +514,8 @@ declare module "@stencil/core" {
             "cmp-a": LocalJSX.CmpA & JSXBase.HTMLAttributes<HTMLCmpAElement>;
             "cmp-b": LocalJSX.CmpB & JSXBase.HTMLAttributes<HTMLCmpBElement>;
             "cmp-c": LocalJSX.CmpC & JSXBase.HTMLAttributes<HTMLCmpCElement>;
+            "cmp-dsd": LocalJSX.CmpDsd & JSXBase.HTMLAttributes<HTMLCmpDsdElement>;
+            "cmp-server-vs-client": LocalJSX.CmpServerVsClient & JSXBase.HTMLAttributes<HTMLCmpServerVsClientElement>;
             "dom-api": LocalJSX.DomApi & JSXBase.HTMLAttributes<HTMLDomApiElement>;
             "dom-interaction": LocalJSX.DomInteraction & JSXBase.HTMLAttributes<HTMLDomInteractionElement>;
             "dom-visible": LocalJSX.DomVisible & JSXBase.HTMLAttributes<HTMLDomVisibleElement>;

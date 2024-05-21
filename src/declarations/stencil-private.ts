@@ -1954,6 +1954,7 @@ export interface PackageJsonData {
   name?: string;
   version?: string;
   main?: string;
+  exports?: { [key: string]: string | { [key: string]: string } };
   description?: string;
   bin?: { [key: string]: string };
   browser?: string;

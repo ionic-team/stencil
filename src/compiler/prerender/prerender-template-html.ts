@@ -1,5 +1,5 @@
 import { createDocument, serializeNodeToHtml } from '@stencil/core/mock-doc';
-import { catchError, isFunction, isPromise, isString } from '@utils';
+import { catchError, isFunction, isString } from '@utils';
 
 import type * as d from '../../declarations';
 import {
@@ -28,11 +28,7 @@ export const generateTemplateHtml = async (
     let templateHtml: string;
     if (isFunction(prerenderConfig.loadTemplate)) {
       const loadTemplateResult = prerenderConfig.loadTemplate(srcIndexHtmlPath);
-      if (isPromise(loadTemplateResult)) {
-        templateHtml = await loadTemplateResult;
-      } else {
-        templateHtml = loadTemplateResult;
-      }
+      templateHtml = await loadTemplateResult;
     } else {
       templateHtml = await config.sys.readFile(srcIndexHtmlPath);
     }
@@ -83,22 +79,14 @@ export const generateTemplateHtml = async (
 
     if (isFunction(prerenderConfig.beforeSerializeTemplate)) {
       const beforeSerializeResults = prerenderConfig.beforeSerializeTemplate(doc);
-      if (isPromise(beforeSerializeResults)) {
-        doc = await beforeSerializeResults;
-      } else {
-        doc = beforeSerializeResults;
-      }
+      doc = await beforeSerializeResults;
     }
 
     let html = serializeNodeToHtml(doc);
 
     if (isFunction(prerenderConfig.afterSerializeTemplate)) {
       const afterSerializeResults = prerenderConfig.afterSerializeTemplate(html);
-      if (isPromise(afterSerializeResults)) {
-        html = await afterSerializeResults;
-      } else {
-        html = afterSerializeResults;
-      }
+      html = await afterSerializeResults;
     }
 
     return {

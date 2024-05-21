@@ -3,15 +3,12 @@ import { Component, h, Prop } from '@stencil/core';
 import { CarData } from '../car-list/car-data';
 
 @Component({
-  tag: 'car-detail',
-  assetsDirs: ['assets-a'],
+  tag: 'another-car-detail',
+  styleUrl: 'another-car-detail.css',
+  shadow: true,
 })
 export class CarDetail {
   @Prop() car: CarData;
-
-  componentWillLoad() {
-    return new Promise((resolve) => setTimeout(resolve, 20));
-  }
 
   render() {
     if (!this.car) {

@@ -199,5 +199,3 @@ export const isObject = (val: Object): val is Object =>
   val != null && typeof val === 'object' && Array.isArray(val) === false;
 export const isString = (v: any): v is string => typeof v === 'string';
 export const isIterable = <T>(v: any): v is Iterable<T> => isDefined(v) && isFunction(v[Symbol.iterator]);
-export const isPromise = <T = any>(v: any): v is Promise<T> =>
-  !!v && (typeof v === 'object' || typeof v === 'function') && typeof v.then === 'function';

@@ -1,18 +1,40 @@
+import { BUILD } from '@app-data';
 import { consoleError, getHostRef } from '@platform';
 import { getValue, parsePropertyValue, setValue } from '@runtime';
 import { CMP_FLAGS, MEMBER_FLAGS } from '@utils';
 
 import type * as d from '../../declarations';
 
-export function proxyHostElement(elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta): void {
+export function proxyHostElement(
+  elm: d.HostElement,
+  cmpMeta: d.ComponentRuntimeMeta,
+  opts: d.HydrateFactoryOptions,
+): void {
   if (typeof elm.componentOnReady !== 'function') {
     elm.componentOnReady = componentOnReady;
   }
   if (typeof elm.forceUpdate !== 'function') {
     elm.forceUpdate = forceUpdate;
   }
-  if (cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation) {
-    (elm as any).shadowRoot = elm;
+
+  /**
+   * Only attach shadow root if there isn't one already
+   */
+  if (!elm.shadowRoot && !!(cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation)) {
+    if (BUILD.shadowDelegatesFocus) {
+      elm.attachShadow({
+        mode: 'open',
+        delegatesFocus: !!(cmpMeta.$flags$ & CMP_FLAGS.shadowDelegatesFocus),
+      });
+    } else if (opts.serializeShadowRoot) {
+      elm.attachShadow({ mode: 'open' });
+    } else {
+      /**
+       * For hydration users may want to render the shadow component as scoped
+       * component, so we need to assign the element as shadowRoot.
+       */
+      (elm as any).shadowRoot = elm;
+    }
   }
 
   if (cmpMeta.$members$ != null) {
@@ -25,7 +47,25 @@ export function proxyHostElement(elm: d.HostElement, cmpMeta: d.ComponentRuntime
 
       if (memberFlags & MEMBER_FLAGS.Prop) {
         const attributeName = m[1] || memberName;
-        const attrValue = elm.getAttribute(attributeName);
+        let attrValue = elm.getAttribute(attributeName);
+
+        /**
+         * allow hydrate parameters that contain a simple object, e.g.
+         * ```ts
+         * import { renderToString } from 'component-library/hydrate';
+         * await renderToString(`<car-detail car=${JSON.stringify({ year: 1234 })}></car-detail>`);
+         * ```
+         */
+        if (
+          (attrValue?.startsWith('{') && attrValue.endsWith('}')) ||
+          (attrValue?.startsWith('[') && attrValue.endsWith(']'))
+        ) {
+          try {
+            attrValue = JSON.parse(attrValue);
+          } catch (e) {
+            /* ignore */
+          }
+        }
 
         if (attrValue != null) {
           const parsedAttrValue = parsePropertyValue(attrValue, memberFlags);

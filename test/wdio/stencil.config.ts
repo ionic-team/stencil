@@ -15,6 +15,10 @@ export const config: Config = {
       customElementsExportBehavior: 'bundle',
       isPrimaryPackageOutputTarget: true,
     },
+    {
+      type: 'dist-hydrate-script',
+      dir: 'hydrate',
+    },
   ],
   plugins: [sass()],
   buildDist: true,
