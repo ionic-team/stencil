@@ -505,8 +505,8 @@ export class MockUListElement extends MockHTMLElement {
 type CanvasContext = '2d' | 'webgl' | 'webgl2' | 'bitmaprenderer';
 export class CanvasRenderingContext {
   context: CanvasContext;
-  contextAttributes: any;
-  constructor(context: CanvasContext, contextAttributes?: any) {
+  contextAttributes: WebGLContextAttributes;
+  constructor(context: CanvasContext, contextAttributes?: WebGLContextAttributes) {
     this.context = context;
     this.contextAttributes = contextAttributes;
   }
@@ -523,8 +523,8 @@ export class CanvasRenderingContext {
     return 'data:,'; // blank image
   }
   putImageData() {}
-  createImageData(): any[] {
-    return [];
+  createImageData(): ImageData {
+    return {} as ImageData;
   }
   setTransform() {}
   drawImage() {}
@@ -553,7 +553,7 @@ export class MockCanvasElement extends MockHTMLElement {
   constructor(ownerDocument: any) {
     super(ownerDocument, 'canvas');
   }
-  getContext(context: CanvasContext, contextAttributes?: any): CanvasRenderingContext {
+  getContext(context: CanvasContext, contextAttributes?: WebGLContextAttributes): CanvasRenderingContext {
     return new CanvasRenderingContext(context, contextAttributes);
   }
 }
