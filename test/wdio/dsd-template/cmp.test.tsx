@@ -17,4 +17,6 @@ describe('dsd-template', () => {
   it('should render', async () => {
     await expect($('dsd-template')).toHaveText("Hello, World! I'm rendering!");
   });
+
+  // TODO add test that mismatched mode causes Stencil to throw
 });

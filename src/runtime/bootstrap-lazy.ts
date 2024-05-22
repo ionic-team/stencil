@@ -111,6 +111,8 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
             // adding the shadow root build conditionals to minimize runtime
             if (supportsShadow) {
               if (!self.shadowRoot) {
+                // we don't want to call `attachShadow` if there's already a shadow root
+                // attached to the
                 if (BUILD.shadowDelegatesFocus) {
                   self.attachShadow({
                     mode: 'open',
@@ -118,6 +120,15 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
                   });
                 } else {
                   self.attachShadow({ mode: 'open' });
+                }
+              } else {
+                // we want to check to make sure that the mode for the shadow
+                // root already attached to the element (i.e. created via DSD)
+                // is set to 'open' since that's the only mode we support
+                if (self.shadowRoot.mode !== 'open') {
+                  throw new Error(
+                    `Unable to re-use existing shadow root for ${cmpMeta.$tagName$}! Mode is set to ${self.shadowRoot.mode} but Stencil only supports open shadow roots.`,
+                  );
                 }
               }
             } else if (!BUILD.hydrateServerSide && !('shadowRoot' in self)) {

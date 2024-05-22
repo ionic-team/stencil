@@ -94,6 +94,15 @@ export const proxyCustomElement = (Cstr: any, compactMeta: d.ComponentRuntimeMet
           } else {
             this.attachShadow({ mode: 'open' });
           }
+        } else {
+          // we want to check to make sure that the mode for the shadow
+          // root already attached to the element (i.e. created via DSD)
+          // is set to 'open' since that's the only mode we support
+          if (this.shadowRoot.mode !== 'open') {
+            throw new Error(
+              `Unable to re-use existing shadow root for ${cmpMeta.$tagName$}! Mode is set to ${this.shadowRoot.mode} but Stencil only supports open shadow roots.`,
+            );
+          }
         }
       } else {
         (this as any).shadowRoot = this;
