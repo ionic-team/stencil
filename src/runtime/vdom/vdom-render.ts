@@ -653,17 +653,18 @@ export const patch = (oldVNode: d.VNode, newVNode: d.VNode, isInitialRender = fa
   const text = newVNode.$text$;
   let defaultHolder: Comment;
 
-  if (BUILD.shadowDom && isInitialRender && oldVNode.$elm$.nodeType === NODE_TYPE.DocumentFragment) {
-    // TODO perhaps we should try to only do this when DSD has been used?
-    // although there may not be any harm in just doing it all the time.
-    //
-    // we need to create fake 'oldChildren' for any nodes that might be present
+  if (!BUILD.hydrateServerSide && BUILD.shadowDom && isInitialRender && oldVNode.$elm$.nodeType === NODE_TYPE.DocumentFragment) {
+    // We need to create fake 'oldChildren' for any nodes that might be present
     // in the shadow root because of DSD. We want to do this when:
     //
     // 1. this is the first render
     // 2. the `$elm$` for the current old vdom node is a document fragment,
     //    meaning the content node for a shadow root that was created by the
     //    browser based on a `<template>` tag in the HTML
+    //
+    // This will allow the component rendering lifecycle to boot up with vdom
+    // nodes for the DOM nodes already present in the shadow root, allowing the
+    // vdom to re-use these nodes (if they are suitable, of course).
     for (const child of oldVNode.$elm$.children) {
       // TODO be more fine-grained about this
       // 1. can I tell whether the style tag was added client-side or not?

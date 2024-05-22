@@ -25,7 +25,7 @@ export function toVNode(node: Node): d.VNode {
     for (let i = 0, l = childNodes.length; i < l; i++) {
       childVnode = toVNode(childNodes[i]);
       if (childVnode) {
-        (vnode.$children$ ||= []).push(childVnode);
+        (vnode.$children$ = vnode.$children$ || []).push(childVnode);
       }
     }
     return vnode;
