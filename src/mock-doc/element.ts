@@ -502,47 +502,59 @@ export class MockUListElement extends MockHTMLElement {
   }
 }
 
+type CanvasContext = '2d' | 'webgl' | 'webgl2' | 'bitmaprenderer';
+export class CanvasRenderingContext {
+  context: CanvasContext;
+  contextAttributes: WebGLContextAttributes;
+  constructor(context: CanvasContext, contextAttributes?: WebGLContextAttributes) {
+    this.context = context;
+    this.contextAttributes = contextAttributes;
+  }
+  fillRect() {
+    return;
+  }
+  clearRect() {}
+  getImageData(_: number, __: number, w: number, h: number) {
+    return {
+      data: new Array(w * h * 4),
+    };
+  }
+  toDataURL() {
+    return 'data:,'; // blank image
+  }
+  putImageData() {}
+  createImageData(): ImageData {
+    return {} as ImageData;
+  }
+  setTransform() {}
+  drawImage() {}
+  save() {}
+  fillText() {}
+  restore() {}
+  beginPath() {}
+  moveTo() {}
+  lineTo() {}
+  closePath() {}
+  stroke() {}
+  translate() {}
+  scale() {}
+  rotate() {}
+  arc() {}
+  fill() {}
+  measureText() {
+    return { width: 0 };
+  }
+  transform() {}
+  rect() {}
+  clip() {}
+}
+
 export class MockCanvasElement extends MockHTMLElement {
   constructor(ownerDocument: any) {
     super(ownerDocument, 'canvas');
   }
-  getContext() {
-    return {
-      fillRect() {
-        return;
-      },
-      clearRect() {},
-      getImageData: function (_: number, __: number, w: number, h: number) {
-        return {
-          data: new Array(w * h * 4),
-        };
-      },
-      putImageData() {},
-      createImageData: function (): any[] {
-        return [];
-      },
-      setTransform() {},
-      drawImage() {},
-      save() {},
-      fillText() {},
-      restore() {},
-      beginPath() {},
-      moveTo() {},
-      lineTo() {},
-      closePath() {},
-      stroke() {},
-      translate() {},
-      scale() {},
-      rotate() {},
-      arc() {},
-      fill() {},
-      measureText() {
-        return { width: 0 };
-      },
-      transform() {},
-      rect() {},
-      clip() {},
-    };
+  getContext(context: CanvasContext, contextAttributes?: WebGLContextAttributes): CanvasRenderingContext {
+    return new CanvasRenderingContext(context, contextAttributes);
   }
 }
 
