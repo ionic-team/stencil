@@ -2643,9 +2643,9 @@ export interface ResolveModuleOptions {
 
 export interface PrerenderStartOptions {
   buildId?: string;
-  hydrateAppFilePath: string;
-  componentGraph: BuildResultsComponentGraph;
-  srcIndexHtmlPath: string;
+  hydrateAppFilePath?: string;
+  componentGraph?: BuildResultsComponentGraph;
+  srcIndexHtmlPath?: string;
 }
 
 export interface PrerenderResults {

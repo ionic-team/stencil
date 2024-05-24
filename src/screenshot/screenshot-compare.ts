@@ -27,7 +27,6 @@ export async function compareScreenshot(
   const currentImagePath = join(screenshotBuildData.imagesDir, currentImageName);
 
   await writeScreenshotImage(currentImagePath, currentScreenshotBuf);
-  currentScreenshotBuf = null;
 
   if (testPath) {
     testPath = normalizePath(relative(screenshotBuildData.rootDir, testPath));
@@ -179,7 +178,7 @@ async function getMismatchedPixels(
         reject(err);
       });
 
-      pixelMatchProcess.stderr.on('data', (data) => {
+      pixelMatchProcess.stderr?.on('data', (data) => {
         error = data.toString();
       });
 

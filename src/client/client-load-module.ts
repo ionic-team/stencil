@@ -27,7 +27,7 @@ export const loadModule = (
   cmpMeta: d.ComponentRuntimeMeta,
   hostRef: d.HostRef,
   hmrVersionId?: string,
-): Promise<d.ComponentConstructor | undefined> | d.ComponentConstructor => {
+): Promise<d.ComponentConstructor | undefined> | d.ComponentConstructor | undefined => {
   // loadModuleImport
   const exportName = cmpMeta.$tagName$.replace(/-/g, '_');
   const bundleId = cmpMeta.$lazyBundleId$;
@@ -35,6 +35,8 @@ export const loadModule = (
     consoleDevError(
       `Trying to lazily load component <${cmpMeta.$tagName$}> with style mode "${hostRef.$modeName$}", but it does not exist.`,
     );
+    return undefined;
+  } else if (!bundleId) {
     return undefined;
   }
   const module = !BUILD.hotModuleReplacement ? cmpModules.get(bundleId) : false;

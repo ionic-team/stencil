@@ -35,8 +35,8 @@ export const taskTest = async (config: ValidatedConfig): Promise<void> => {
   }
 
   // ensure we've got the required modules installed
-  const diagnostics = await config.sys.lazyRequire.ensure(config.rootDir, ensureModuleIds);
-  if (diagnostics.length > 0) {
+  const diagnostics = await config.sys.lazyRequire?.ensure(config.rootDir, ensureModuleIds);
+  if (diagnostics && diagnostics.length > 0) {
     config.logger.printDiagnostics(diagnostics);
     return config.sys.exit(1);
   }

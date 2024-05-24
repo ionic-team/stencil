@@ -110,7 +110,7 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys): Logger => {
     }
   };
 
-  const timespanStart = (startMsg: string, debug: boolean, appendTo: string[]) => {
+  const timespanStart = (startMsg: string, debug: boolean, appendTo?: string[]) => {
     const msg = [`${startMsg} ${dim('...')}`];
 
     if (debug) {
@@ -151,7 +151,7 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys): Logger => {
     textBold: boolean,
     newLineSuffix: boolean,
     debug: boolean,
-    appendTo: string[],
+    appendTo?: string[],
   ) => {
     let msg = finishMsg;
 
@@ -400,7 +400,7 @@ export const createTerminalLogger = (loggerSys: TerminalLoggerSys): Logger => {
    * @param errorLength the length of the error, how many characters should be highlighted
    * @returns the highlighted error
    */
-  const highlightError = (errorLine: string, errorCharStart: number, errorLength: number): string => {
+  const highlightError = (errorLine: string, errorCharStart: number, errorLength: number = 0): string => {
     let rightSideChars = errorLine.length - errorCharStart + errorLength - 1;
     while (errorLine.length + INDENT.length > loggerSys.getColumns()) {
       if (errorCharStart > errorLine.length - errorCharStart + errorLength && errorCharStart > 5) {

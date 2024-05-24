@@ -36,7 +36,7 @@ export const taskBuild = async (coreCompiler: CoreCompiler, config: d.ValidatedC
         config,
         results.hydrateAppFilePath,
         results.componentGraph,
-        null,
+        undefined,
       );
       config.logger.printDiagnostics(prerenderDiagnostics);
 
