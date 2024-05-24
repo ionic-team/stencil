@@ -111,6 +111,10 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
       elm.classList.add((elm['s-si'] = scopeId));
     }
 
+    if (BUILD.scoped) {
+      updateElementScopeIds(elm as d.RenderNode, parentElm as d.RenderNode);
+    }
+
     if (newVNode.$children$) {
       for (i = 0; i < newVNode.$children$.length; ++i) {
         // create the node
@@ -913,7 +917,7 @@ export const nullifyVNodeRefs = (vNode: d.VNode) => {
 
 /**
  * Inserts a node before a reference node as a child of a specified parent node.
- * Additionally, adds parent element's scope id as class to the new node.
+ * Additionally, adds parent elements' scope ids as class names to the new node.
  *
  * @param parent parent node
  * @param newNode element to be inserted
@@ -924,35 +928,50 @@ export const insertBefore = (parent: Node, newNode: Node, reference?: Node): Nod
   const inserted = parent?.insertBefore(newNode, reference);
 
   if (BUILD.scoped) {
-    setParentScopeIdAsClassName(newNode as d.RenderNode, parent as d.RenderNode);
+    updateElementScopeIds(newNode as d.RenderNode, parent as d.RenderNode);
   }
 
   return inserted;
 };
 
-const findParentScopeId = (element: d.RenderNode): string | undefined => {
-  return element
-    ? element['s-rsc'] || element['s-si'] || element['s-sc'] || findParentScopeId(element.parentElement)
-    : undefined;
+const findScopeIds = (element: d.RenderNode): string[] => {
+  const scopeIds: string[] = [];
+  if (element) {
+    scopeIds.push(
+      ...(element['s-scs'] || []),
+      element['s-si'],
+      element['s-sc'],
+      ...findScopeIds(element.parentElement),
+    );
+  }
+  return scopeIds;
 };
 
 /**
- * to be able to style the deep nested scoped component from the root component,
- * root component's scope id needs to be added to the child nodes since sass compiler
+ * To be able to style the deep nested scoped component from the parent components,
+ * all the scope ids of its parents need to be added to the child node since sass compiler
  * adds scope id to the nested selectors during compilation phase
  *
  * @param element an element to be updated
  * @param parent a parent element that scope id is retrieved
+ * @param iterateChildNodes iterate child nodes
  */
-export const setParentScopeIdAsClassName = (element: d.RenderNode, parent: d.RenderNode) => {
-  if (element && parent) {
-    const oldRootScopeId = element['s-rsc'];
-    const newRootScopeId = findParentScopeId(parent);
+const updateElementScopeIds = (element: d.RenderNode, parent: d.RenderNode, iterateChildNodes = false) => {
+  if (element && parent && element.nodeType === NODE_TYPE.ElementNode) {
+    const scopeIds = new Set(findScopeIds(parent).filter(Boolean));
+    if (scopeIds.size) {
+      element.classList?.add(...(element['s-scs'] = [...scopeIds]));
 
-    oldRootScopeId && element.classList?.contains(oldRootScopeId) && element.classList.remove(oldRootScopeId);
-    if (newRootScopeId) {
-      element['s-rsc'] = newRootScopeId;
-      !element.classList?.contains(newRootScopeId) && element.classList?.add(newRootScopeId);
+      if (element['s-ol'] || iterateChildNodes) {
+        /**
+         * If the element has an original location, this means element is relocated.
+         * So, we need to notify the child nodes to update their new scope ids since
+         * the DOM structure is changed.
+         */
+        for (const childNode of Array.from(element.childNodes)) {
+          updateElementScopeIds(childNode as d.RenderNode, element, true);
+        }
+      }
     }
   }
 };
