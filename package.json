@@ -23,9 +23,9 @@
     "testing/"
   ],
   "scripts": {
-    "build": "npm run clean && npm run tsc.prod && tsx scripts/index.ts --prod --ci",
+    "build": "npm run clean && npm run tsc.prod && npm run ts scripts/index.ts --prod --ci",
     "build.watch": "npm run build -- --watch",
-    "build.updateSelectorEngine": "tsx scripts/updateSelectorEngine.ts",
+    "build.updateSelectorEngine": "npm run ts scripts/updateSelectorEngine.ts",
     "clean": "rm -rf build/ cli/ compiler/ dev-server/ internal/ mock-doc/ sys/ testing/ && npm run clean:scripts && npm run clean.screenshots",
     "clean.screenshots": "rm -rf test/end-to-end/screenshot/builds test/end-to-end/screenshot/images",
     "clean:scripts": "rm -rf scripts/build",
@@ -34,17 +34,15 @@
     "prettier": "npm run prettier.base -- --write",
     "prettier.base": "prettier --cache \"./({bin,scripts,src,test}/**/*.{ts,tsx,js,jsx})|bin/stencil|.github/(**/)?*.(yml|yaml)|*.js\"",
     "prettier.dry-run": "npm run prettier.base -- --list-different",
-    "release.ci.prepare": "tsx scripts/index.ts --release --ci-prepare",
-    "release.ci": "NODE_OPTIONS=--max-old-space-size=4096 tsx scripts/index.ts --release --ci-publish",
-    "rollup.prod.ci": "rollup --config --config-prod --config-ci",
-    "rollup.watch": "rollup --watch --config",
+    "release.ci.prepare": "npm run ts scripts/index.ts --release --ci-prepare",
+    "release.ci": "NODE_OPTIONS=--max-old-space-size=4096 npm run ts scripts/index.ts --release --ci-publish",
     "spellcheck": "npm run spellcheck.code && npm run spellcheck.markdown",
     "spellcheck.code": "cspell --config cspell-code.json --no-progress \"src/**/*.ts\" \"src/**/*.tsx\" \"scripts/**/*.ts\"",
     "spellcheck.markdown": "cspell --config cspell-markdown.json --no-progress \"*.md\" \"**/*.md\"",
     "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --coverage",
     "test.analysis": "cd test && npm run analysis.build-and-analyze",
     "test.bundlers": "cd test && npm run bundlers",
-    "test.dist": "tsx scripts/index.ts --validate-build",
+    "test.dist": "npm run ts scripts/index.ts --validate-build",
     "test.end-to-end": "cd test/end-to-end && npm ci && npm test && npm run test.dist",
     "test.jest": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js",
     "test.wdio": "cd test/wdio && npm ci && npm run test",
@@ -54,7 +52,8 @@
     "test.docs-build": "cd test && npm run build.docs-json && npm run build.docs-readme",
     "test.watch": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --watch",
     "test.watch-all": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --watchAll --coverage",
-    "tsc.prod": "tsc"
+    "tsc.prod": "tsc",
+    "ts": "tsc --noEmit --project scripts/tsconfig.json && tsx"
   },
   "devDependencies": {
     "@ionic/prettier-config": "^4.0.0",
