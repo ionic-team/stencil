@@ -124,6 +124,7 @@ export const validateConfig = (
     devMode,
     extras: config.extras || {},
     flags,
+    generateExportMaps: isBoolean(config.generateExportMaps) ? config.generateExportMaps : false,
     hashFileNames,
     hashedFileNameLength: config.hashedFileNameLength ?? DEFAULT_HASHED_FILENAME_LENGTH,
     hydratedFlag: validateHydrated(config),

@@ -1,7 +1,8 @@
-import { catchError } from '@utils';
+import { catchError, isOutputTargetDistCustomElements, isOutputTargetDistLazyLoader } from '@utils';
+import { relative } from '@utils';
 import { execSync } from 'child_process';
 
-import type * as d from '../../declarations';
+import * as d from '../../declarations';
 import { outputServiceWorkers } from '../output-targets/output-service-workers';
 import { validateBuildFiles } from './validate-files';
 
@@ -37,54 +38,9 @@ export const writeBuild = async (
     buildCtx.debug(`in-memory-fs: ${compilerCtx.fs.getMemoryStats()}`);
     buildCtx.debug(`cache: ${compilerCtx.cache.getMemoryStats()}`);
 
-    // TODO: this would need to account for other config values like output directory
-    // and checking which output targets are used in the build to know which exports to create
-    const namespace = buildCtx.config.fsNamespace;
-    execSync(`npm pkg set "exports[.][import]"="./dist/${namespace}/${namespace}.esm.js"`);
-    execSync(`npm pkg set "exports[.][require]"="./dist/${namespace}/${namespace}.cjs.js"`);
-
-    execSync(`npm pkg set "exports[./loader][import]"="./loader/index.js"`);
-    execSync(`npm pkg set "exports[./loader][require]"="./loader/index.cjs"`);
-    execSync(`npm pkg set "exports[./loader][types]"="./loader/index.d.ts"`);
-
-    buildCtx.components.forEach((cmp) => {
-      execSync(`npm pkg set "exports[./${cmp.tagName}][import]"="./dist/components/${cmp.tagName}.js"`);
-      execSync(`npm pkg set "exports[./${cmp.tagName}][types]"="./dist/components/${cmp.tagName}.d.ts"`);
-    });
-
-    // const packageJsonExports: any = {
-    //   '.': {
-    //     import: `./dist/${namespace}/${namespace}.esm.js`,
-    //     require: `./dist/${namespace}/${namespace}.cjs.js`,
-    //   },
-    //   './loader': {
-    //     import: './loader/index.js',
-    //     require: './loader/index.cjs',
-    //     types: './loader/index.d.ts',
-    //   },
-    // };
-    // buildCtx.components.forEach((cmp) => {
-    //   packageJsonExports[`./${cmp.tagName}`] = {
-    //     import: `./dist/components/${cmp.tagName}.js`,
-    //     types: `./dist/components/${cmp.tagName}.d.ts`,
-    //   };
-    // });
-
-    // // Write updated `package.json` file
-    // await compilerCtx.fs.writeFile(
-    //   config.packageJsonFilePath,
-    //   JSON.stringify(
-    //     {
-    //       ...buildCtx.packageJson,
-    //       exports: packageJsonExports,
-    //     },
-    //     null,
-    //     2,
-    //   ),
-    //   {
-    //     immediateWrite: true,
-    //   },
-    // );
+    if (config.generateExportMaps) {
+      writeExportMaps(config, buildCtx);
+    }
 
     await outputServiceWorkers(config, buildCtx);
     await validateBuildFiles(config, compilerCtx, buildCtx);
@@ -93,4 +49,50 @@ export const writeBuild = async (
   }
 
   timeSpan.finish(`writeBuildFiles finished, files wrote: ${totalFilesWrote}`);
+};
+
+/**
+ * Create export map entry point definitions for the `package.json` file using the npm CLI.
+ * This will generate a root entry point for the package, as well as entry points for each component and
+ * the lazy loader (if applicable).
+ *
+ * @param config The validated Stencil config
+ * @param buildCtx The build context containing the components to generate export maps for
+ */
+const writeExportMaps = (config: d.ValidatedConfig, buildCtx: d.BuildCtx) => {
+  const namespace = buildCtx.config.fsNamespace;
+
+  execSync(`npm pkg set "exports[.][import]"="./dist/${namespace}/${namespace}.esm.js"`);
+  execSync(`npm pkg set "exports[.][require]"="./dist/${namespace}/${namespace}.cjs.js"`);
+
+  const distLazyLoader = config.outputTargets.find(isOutputTargetDistLazyLoader);
+  if (distLazyLoader != null) {
+    // Calculate relative path from project root to lazy-loader output directory
+    let outDir = relative(config.rootDir, distLazyLoader.dir);
+    if (!outDir.startsWith('.')) {
+      outDir = './' + outDir;
+    }
+
+    execSync(`npm pkg set "exports[./loader][import]"="${outDir}/index.js"`);
+    execSync(`npm pkg set "exports[./loader][require]"="${outDir}/index.cjs"`);
+    execSync(`npm pkg set "exports[./loader][types]"="${outDir}/index.d.ts"`);
+  }
+
+  const distCustomElements = config.outputTargets.find(isOutputTargetDistCustomElements);
+  if (distCustomElements != null) {
+    // Calculate relative path from project root to custom elements output directory
+    let outDir = relative(config.rootDir, distCustomElements.dir);
+    if (!outDir.startsWith('.')) {
+      outDir = './' + outDir;
+    }
+
+    buildCtx.components.forEach((cmp) => {
+      console.log('path', cmp.jsFilePath);
+      execSync(`npm pkg set "exports[./${cmp.tagName}][import]"="${outDir}/${cmp.tagName}.js"`);
+
+      if (distCustomElements.generateTypeDeclarations) {
+        execSync(`npm pkg set "exports[./${cmp.tagName}][types]"="${outDir}/${cmp.tagName}.d.ts"`);
+      }
+    });
+  }
 };

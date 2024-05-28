@@ -85,6 +85,14 @@ export interface StencilConfig {
   globalStyle?: string;
 
   /**
+   * Will generate {@link https://nodejs.org/api/packages.html#packages_exports export map} entry points
+   * for each component in the build when `true`.
+   *
+   * @default false
+   */
+  generateExportMaps?: boolean;
+
+  /**
    * When the hashFileNames config is set to true, and it is a production build,
    * the hashedFileNameLength config is used to determine how many characters the file name's hash should be.
    */
