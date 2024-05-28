@@ -125,7 +125,7 @@ jobs:
           name: unused-exports-pr
 
       - name: Set action output
-        run: npx tsx scripts/tech-debt-burndown-report.ts > $GITHUB_STEP_SUMMARY
+        run: npm run ts scripts/tech-debt-burndown-report.ts > $GITHUB_STEP_SUMMARY
 
         # for syntax information, see https://github.com/peter-evans/create-or-update-comment#setting-the-comment-body-from-a-file
       - name: Set comment body
@@ -133,7 +133,7 @@ jobs:
         # GitHub - "Warning: Make sure the delimiter you're using is randomly generated and unique for each run.
         # For more information, see https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions#understanding-the-risk-of-script-injections"
         run: |
-          body=$(npx scripts/tech-debt-burndown-report.ts)
+          body=$(npm run ts scripts/tech-debt-burndown-report.ts)
           EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
           echo "body<<$EOF" >> $GITHUB_OUTPUT
           echo "$body" >> $GITHUB_OUTPUT
