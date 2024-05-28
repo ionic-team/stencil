@@ -1,3 +1,19 @@
+## 😄 [4.18.3](https://github.com/ionic-team/stencil/compare/v4.18.2...v4.18.3) (2024-05-28)
+
+
+### Bug Fixes
+
+* **esbuild:** remove all `node:` imports from glob script to keep support for Jest v26 ([#5784](https://github.com/ionic-team/stencil/issues/5784)) ([5f4fcfa](https://github.com/ionic-team/stencil/commit/5f4fcfa12e701ece8884aa1e3b3143bd2221e0a0))
+* **mock-doc:** support toDataURL method in canvas ([#5773](https://github.com/ionic-team/stencil/issues/5773)) ([3830dad](https://github.com/ionic-team/stencil/commit/3830dad7c8bd78de2c59c087a291e3d954d70508))
+* **runtime:** add missing intermediate parents scope ids to the elements ([#5775](https://github.com/ionic-team/stencil/issues/5775)) ([56c60d4](https://github.com/ionic-team/stencil/commit/56c60d4af1227fb82abf9bb838abfc4f439bd32d))
+
+
+### Features
+
+* **ci:** remove need to compile scripts ([#5370](https://github.com/ionic-team/stencil/issues/5370)) ([a40cee1](https://github.com/ionic-team/stencil/commit/a40cee137101bf19f614db23407622e840051acd))
+
+
+
 ## ⛲️ [4.18.2](https://github.com/ionic-team/stencil/compare/v4.18.1...v4.18.2) (2024-05-20)
 
 
