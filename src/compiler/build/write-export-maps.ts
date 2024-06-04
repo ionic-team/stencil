@@ -18,8 +18,6 @@ export const writeExportMaps = (config: d.ValidatedConfig, buildCtx: d.BuildCtx)
   execSync(`npm pkg set "exports[.][import]"="./dist/${namespace}/${namespace}.esm.js"`);
   execSync(`npm pkg set "exports[.][require]"="./dist/${namespace}/${namespace}.cjs.js"`);
 
-  console.log('HERE');
-
   const distLazyLoader = config.outputTargets.find(isOutputTargetDistLazyLoader);
   if (distLazyLoader != null) {
     // Calculate relative path from project root to lazy-loader output directory
