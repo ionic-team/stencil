@@ -40,7 +40,6 @@ export const writeExportMaps = (config: d.ValidatedConfig, buildCtx: d.BuildCtx)
     }
 
     buildCtx.components.forEach((cmp) => {
-      console.log('path', cmp.jsFilePath);
       execSync(`npm pkg set "exports[./${cmp.tagName}][import]"="${outDir}/${cmp.tagName}.js"`);
 
       if (distCustomElements.generateTypeDeclarations) {
