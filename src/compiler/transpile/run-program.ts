@@ -43,16 +43,18 @@ export const runTsProgram = async (
   const typesOutputTarget = config.outputTargets.filter(isOutputTargetDistTypes);
   const emittedDts: string[] = [];
   const emitCallback: ts.WriteFileCallback = (emitFilePath, data, _w, _e, tsSourceFiles) => {
-    if (emitFilePath.endsWith('.js') || emitFilePath.endsWith('js.map')) {
-      updateModule(config, compilerCtx, buildCtx, tsSourceFiles[0], data, emitFilePath, tsTypeChecker, null);
-    } else if (
-      emitFilePath.endsWith('.e2e.d.ts') ||
-      emitFilePath.endsWith('.spec.d.ts') ||
-      emitFilePath === 'e2e.d.ts' ||
-      emitFilePath === 'spec.d.ts'
+    if (
+      emitFilePath.includes('e2e.') ||
+      emitFilePath.includes('spec.') ||
+      emitFilePath.endsWith('e2e.d.ts') ||
+      emitFilePath.endsWith('spec.d.ts')
     ) {
       // we don't want to write these to disk!
       return;
+    }
+
+    if (emitFilePath.endsWith('.js') || emitFilePath.endsWith('js.map')) {
+      updateModule(config, compilerCtx, buildCtx, tsSourceFiles[0], data, emitFilePath, tsTypeChecker, null);
     } else if (emitFilePath.endsWith('.d.ts')) {
       const srcDtsPath = normalizePath(tsSourceFiles[0].fileName);
       const relativeEmitFilepath = getRelativeDts(config, srcDtsPath, emitFilePath);
