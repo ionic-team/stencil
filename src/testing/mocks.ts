@@ -1,13 +1,5 @@
 import { createWorkerContext } from '@stencil/core/compiler';
-import type {
-  BuildCtx,
-  Cache,
-  CompilerCtx,
-  LoadConfigInit,
-  Module,
-  UnvalidatedConfig,
-  ValidatedConfig,
-} from '@stencil/core/internal';
+import type * as d from '@stencil/core/internal';
 import { MockWindow } from '@stencil/core/mock-doc';
 import { noop } from '@utils';
 import path from 'path';
@@ -27,7 +19,7 @@ import { createTestingSystem, TestingSystem } from './testing-sys';
  * provided by this function.
  * @returns the mock Stencil configuration
  */
-export function mockValidatedConfig(overrides: Partial<ValidatedConfig> = {}): ValidatedConfig {
+export function mockValidatedConfig(overrides: Partial<d.ValidatedConfig> = {}): d.ValidatedConfig {
   const baseConfig = mockConfig(overrides);
   const rootDir = path.resolve('/');
 
@@ -72,7 +64,7 @@ export function mockValidatedConfig(overrides: Partial<ValidatedConfig> = {}): V
  * provided by this function.
  * @returns the mock Stencil configuration
  */
-export function mockConfig(overrides: Partial<UnvalidatedConfig> = {}): UnvalidatedConfig {
+export function mockConfig(overrides: Partial<d.UnvalidatedConfig> = {}): d.UnvalidatedConfig {
   const rootDir = path.resolve('/');
 
   let { sys } = overrides;
@@ -127,8 +119,8 @@ export function mockConfig(overrides: Partial<UnvalidatedConfig> = {}): Unvalida
  * @param overrides the properties on the default entity to manually override
  * @returns the default configuration initialization object, with any overrides applied
  */
-export const mockLoadConfigInit = (overrides?: Partial<LoadConfigInit>): LoadConfigInit => {
-  const defaults: LoadConfigInit = {
+export const mockLoadConfigInit = (overrides?: Partial<d.LoadConfigInit>): d.LoadConfigInit => {
+  const defaults: d.LoadConfigInit = {
     config: {},
     configPath: undefined,
     initTsConfig: true,
@@ -139,9 +131,9 @@ export const mockLoadConfigInit = (overrides?: Partial<LoadConfigInit>): LoadCon
   return { ...defaults, ...overrides };
 };
 
-export function mockCompilerCtx(config?: ValidatedConfig) {
+export function mockCompilerCtx(config?: d.ValidatedConfig) {
   const innerConfig = config || mockValidatedConfig();
-  const compilerCtx: CompilerCtx = {
+  const compilerCtx: d.CompilerCtx = {
     version: 1,
     activeBuildId: 0,
     activeDirsAdded: [],
@@ -196,19 +188,19 @@ export function mockCompilerCtx(config?: ValidatedConfig) {
   return compilerCtx;
 }
 
-export function mockBuildCtx(config?: ValidatedConfig, compilerCtx?: CompilerCtx): BuildCtx {
+export function mockBuildCtx(config?: d.ValidatedConfig, compilerCtx?: d.CompilerCtx): d.BuildCtx {
   const validatedConfig = config || mockValidatedConfig();
   const validatedCompilerCtx = compilerCtx || mockCompilerCtx(validatedConfig);
 
   const buildCtx = new BuildContext(validatedConfig, validatedCompilerCtx);
-  return buildCtx as BuildCtx;
+  return buildCtx as d.BuildCtx;
 }
 
-function mockCache(config: ValidatedConfig, compilerCtx: CompilerCtx) {
+function mockCache(config: d.ValidatedConfig, compilerCtx: d.CompilerCtx) {
   config.enableCache = true;
   const cache = new CompilerCache(config, compilerCtx.fs);
   cache.initCacheDir();
-  return cache as Cache;
+  return cache as d.Cache;
 }
 
 export function mockLogger() {
@@ -216,11 +208,11 @@ export function mockLogger() {
 }
 
 /**
- * Create a {@link CompilerSystem} entity for testing the compiler.
+ * Create a {@link d.CompilerSystem} entity for testing the compiler.
  *
  * This function acts as a thin wrapper around a {@link TestingSystem} entity creation. It exists to provide a logical
  * place in the codebase where we might expect Stencil engineers to reach for when attempting to mock a
- * {@link CompilerSystem} base type. Should there prove to be usage of both this function and the one it wraps,
+ * {@link d.CompilerSystem} base type. Should there prove to be usage of both this function and the one it wraps,
  * reconsider if this wrapper is necessary.
  *
  * @returns a System instance for testing purposes.
@@ -247,7 +239,7 @@ export function mockWindow(html?: string) {
  * @param mod is an override module that you can supply to set particular values
  * @returns a module object ready to use in tests!
  */
-export const mockModule = (mod: Partial<Module> = {}): Module => ({
+export const mockModule = (mod: Partial<d.Module> = {}): d.Module => ({
   cmps: [],
   coreRuntimeApis: [],
   outputTargetCoreRuntimeApis: {},

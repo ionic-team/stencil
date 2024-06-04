@@ -26,7 +26,7 @@ export const RUNTIME_APIS = {
 /**
  * Update a Stencil Module entity to include a {@link RUNTIME_APIS} entry if it does not already exist.
  * This allows Stencil to keep `moduleFile` easily serializable, where this helper function treats the data structure
- * that stores {@link Module#coreRuntimeApis} similar to a JS `Set`.
+ * that stores {@link d.Module#coreRuntimeApis} similar to a JS `Set`.
  * @param moduleFile the Module entity to update
  * @param coreRuntimeApi the API to add to the provided module
  */
@@ -40,7 +40,7 @@ export const addCoreRuntimeApi = (moduleFile: d.Module, coreRuntimeApi: string):
  * Update a Stencil Module entity to include a {@link RUNTIME_APIS} entry for a specific output target, if it does not
  * already exist.
  * This allows Stencil to keep `moduleFile` easily serializable, where this helper function treats the data structure
- * that stores {@link Module#outputTargetCoreRuntimeApis} similar to a JS `Set`.
+ * that stores {@link d.Module#outputTargetCoreRuntimeApis} similar to a JS `Set`.
  * @param moduleFile the Module entity to update
  * @param outputTarget the output target to assign the provided runtime api under
  * @param coreRuntimeApi the API to add to the provided module
