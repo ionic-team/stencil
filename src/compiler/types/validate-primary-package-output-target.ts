@@ -17,7 +17,7 @@ export type PrimaryPackageOutputTargetRecommendedConfig = {
    * @param outputTargetDir The output directory for the output target's compiled code.
    * @returns The recommended path for the `module` property in a project's `package.json`
    */
-  getModulePath?: (rootDir: string, outputTargetDir: string) => string | null;
+  getModulePath: (rootDir: string, outputTargetDir: string) => string | null;
   /**
    * Generates the recommended path for the `types` property based on the output target type,
    * the project's root directory, and the output target's configuration.
@@ -26,7 +26,18 @@ export type PrimaryPackageOutputTargetRecommendedConfig = {
    * @param outputTargetConfig The output target's config.
    * @returns The recommended path for the `types` property in a project's `package.json`
    */
-  getTypesPath?: (rootDir: string, outputTargetConfig: any) => string | null;
+  getTypesPath: (rootDir: string, outputTargetConfig: any) => string | null;
+  /**
+   * Generates the recommended path for the `main` property based on the output target type,
+   * the project's root directory, and the output target's designated output location.
+   *
+   * Only used for generate export maps.
+   *
+   * @param rootDir The Stencil project's root directory pulled from the validated config.
+   * @param outputTargetDir The output directory for the output target's compiled code.
+   * @returns The recommended path for the `main` property in a project's `package.json`
+   */
+  getMainPath: (rootDir: string, outputTargetDir: string) => string | null;
 };
 
 /**
@@ -38,25 +49,32 @@ export const PRIMARY_PACKAGE_TARGET_CONFIGS = {
   dist: {
     getModulePath: (rootDir: string, outputTargetDir: string) =>
       normalizePath(relative(rootDir, join(outputTargetDir, 'index.js'))),
-    getTypesPath: (rootDir: string, outputTargetConfig: d.OutputTargetDist) =>
+    getTypesPath: (rootDir: string, outputTargetConfig: any) =>
       normalizePath(relative(rootDir, join(outputTargetConfig.typesDir!, 'index.d.ts'))),
+    getMainPath: (rootDir: string, outputTargetDir: string) =>
+      normalizePath(relative(rootDir, join(outputTargetDir, 'index.cjs.js'))),
   },
   'dist-collection': {
     getModulePath: (rootDir: string, outputTargetDir: string) =>
       normalizePath(relative(rootDir, join(outputTargetDir, 'index.js'))),
+    getTypesPath: () => null,
+    getMainPath: () => null,
   },
   'dist-custom-elements': {
     getModulePath: (rootDir: string, outputTargetDir: string) =>
       normalizePath(relative(rootDir, join(outputTargetDir, 'index.js'))),
-    getTypesPath: (rootDir: string, outputTargetConfig: d.OutputTargetDistCustomElements) => {
+    getTypesPath: (rootDir: string, outputTargetConfig: any) => {
       return outputTargetConfig.generateTypeDeclarations
         ? normalizePath(relative(rootDir, join(outputTargetConfig.dir!, 'index.d.ts')))
         : null;
     },
+    getMainPath: () => null,
   },
   'dist-types': {
-    getTypesPath: (rootDir: string, outputTargetConfig: d.OutputTargetDistTypes) =>
+    getModulePath: () => null,
+    getTypesPath: (rootDir: string, outputTargetConfig: any) =>
       normalizePath(relative(rootDir, join(outputTargetConfig.typesDir, 'index.d.ts'))),
+    getMainPath: () => null,
   },
 } satisfies Record<d.EligiblePrimaryPackageOutputTarget['type'], PrimaryPackageOutputTargetRecommendedConfig>;
 

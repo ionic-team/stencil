@@ -1,8 +1,13 @@
-import { isOutputTargetDistCustomElements, isOutputTargetDistLazyLoader } from '@utils';
+import {
+  isEligiblePrimaryPackageOutputTarget,
+  isOutputTargetDistCustomElements,
+  isOutputTargetDistLazyLoader,
+} from '@utils';
 import { relative } from '@utils';
 import { execSync } from 'child_process';
 
 import * as d from '../../declarations';
+import { PRIMARY_PACKAGE_TARGET_CONFIGS } from '../types/validate-primary-package-output-target';
 
 /**
  * Create export map entry point definitions for the `package.json` file using the npm CLI.
@@ -13,10 +18,36 @@ import * as d from '../../declarations';
  * @param buildCtx The build context containing the components to generate export maps for
  */
 export const writeExportMaps = (config: d.ValidatedConfig, buildCtx: d.BuildCtx) => {
-  const namespace = buildCtx.config.fsNamespace;
+  const eligiblePrimaryTargets = config.outputTargets.filter(isEligiblePrimaryPackageOutputTarget);
+  if (eligiblePrimaryTargets.length > 0) {
+    const primaryTarget =
+      eligiblePrimaryTargets.find((o) => o.isPrimaryPackageOutputTarget) ?? eligiblePrimaryTargets[0];
+    const outputTargetConfig = PRIMARY_PACKAGE_TARGET_CONFIGS[primaryTarget.type];
 
-  execSync(`npm pkg set "exports[.][import]"="./dist/${namespace}/${namespace}.esm.js"`);
-  execSync(`npm pkg set "exports[.][require]"="./dist/${namespace}/${namespace}.cjs.js"`);
+    if (outputTargetConfig.getModulePath) {
+      const importPath = outputTargetConfig.getModulePath(config.rootDir, primaryTarget.dir);
+
+      if (importPath) {
+        execSync(`npm pkg set "exports[.][import]"="${importPath}"`);
+      }
+    }
+
+    if (outputTargetConfig.getMainPath) {
+      const requirePath = outputTargetConfig.getMainPath(config.rootDir, primaryTarget.dir);
+
+      if (requirePath) {
+        execSync(`npm pkg set "exports[.][require]"="${requirePath}"`);
+      }
+    }
+
+    if (outputTargetConfig.getTypesPath) {
+      const typesPath = outputTargetConfig.getTypesPath(config.rootDir, primaryTarget);
+
+      if (typesPath) {
+        execSync(`npm pkg set "exports[.][types]"="${typesPath}"`);
+      }
+    }
+  }
 
   const distLazyLoader = config.outputTargets.find(isOutputTargetDistLazyLoader);
   if (distLazyLoader != null) {

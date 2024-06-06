@@ -21,16 +21,43 @@ describe('writeExportMaps', () => {
     jest.clearAllMocks();
   });
 
-  it('should always generate the default exports', () => {
+  it('should not generate any exports if there are no output targets', () => {
+    writeExportMaps(config, buildCtx);
+
+    expect(execSyncSpy).toHaveBeenCalledTimes(0);
+  });
+
+  it('should generate the default exports for the lazy build if present', () => {
+    config.outputTargets = [
+      {
+        type: 'dist',
+        dir: '/dist',
+        typesDir: '/dist/types',
+      },
+    ];
+
+    writeExportMaps(config, buildCtx);
+
+    expect(execSyncSpy).toHaveBeenCalledTimes(3);
+    expect(execSyncSpy).toHaveBeenCalledWith(`npm pkg set "exports[.][import]"="./dist/index.js"`);
+    expect(execSyncSpy).toHaveBeenCalledWith(`npm pkg set "exports[.][require]"="./dist/index.cjs.js"`);
+    expect(execSyncSpy).toHaveBeenCalledWith(`npm pkg set "exports[.][types]"="./dist/types/index.d.ts"`);
+  });
+
+  it('should generate the default exports for the custom elements build if present', () => {
+    config.outputTargets = [
+      {
+        type: 'dist-custom-elements',
+        dir: '/dist/components',
+        generateTypeDeclarations: true,
+      },
+    ];
+
     writeExportMaps(config, buildCtx);
 
     expect(execSyncSpy).toHaveBeenCalledTimes(2);
-    expect(execSyncSpy).toHaveBeenCalledWith(
-      `npm pkg set "exports[.][import]"="./dist/${config.fsNamespace}/${config.fsNamespace}.esm.js"`,
-    );
-    expect(execSyncSpy).toHaveBeenCalledWith(
-      `npm pkg set "exports[.][require]"="./dist/${config.fsNamespace}/${config.fsNamespace}.cjs.js"`,
-    );
+    expect(execSyncSpy).toHaveBeenCalledWith(`npm pkg set "exports[.][import]"="./dist/components/index.js"`);
+    expect(execSyncSpy).toHaveBeenCalledWith(`npm pkg set "exports[.][types]"="./dist/components/index.d.ts"`);
   });
 
   it('should generate the lazy loader exports if the output target is present', () => {
@@ -46,13 +73,7 @@ describe('writeExportMaps', () => {
 
     writeExportMaps(config, buildCtx);
 
-    expect(execSyncSpy).toHaveBeenCalledTimes(5);
-    expect(execSyncSpy).toHaveBeenCalledWith(
-      `npm pkg set "exports[.][import]"="./dist/${config.fsNamespace}/${config.fsNamespace}.esm.js"`,
-    );
-    expect(execSyncSpy).toHaveBeenCalledWith(
-      `npm pkg set "exports[.][require]"="./dist/${config.fsNamespace}/${config.fsNamespace}.cjs.js"`,
-    );
+    expect(execSyncSpy).toHaveBeenCalledTimes(3);
     expect(execSyncSpy).toHaveBeenCalledWith(`npm pkg set "exports[./loader][import]"="./dist/lazy-loader/index.js"`);
     expect(execSyncSpy).toHaveBeenCalledWith(`npm pkg set "exports[./loader][require]"="./dist/lazy-loader/index.cjs"`);
     expect(execSyncSpy).toHaveBeenCalledWith(`npm pkg set "exports[./loader][types]"="./dist/lazy-loader/index.d.ts"`);
@@ -76,12 +97,6 @@ describe('writeExportMaps', () => {
     writeExportMaps(config, buildCtx);
 
     expect(execSyncSpy).toHaveBeenCalledTimes(4);
-    expect(execSyncSpy).toHaveBeenCalledWith(
-      `npm pkg set "exports[.][import]"="./dist/${config.fsNamespace}/${config.fsNamespace}.esm.js"`,
-    );
-    expect(execSyncSpy).toHaveBeenCalledWith(
-      `npm pkg set "exports[.][require]"="./dist/${config.fsNamespace}/${config.fsNamespace}.cjs.js"`,
-    );
     expect(execSyncSpy).toHaveBeenCalledWith(
       `npm pkg set "exports[./my-component][import]"="./dist/components/my-component.js"`,
     );
@@ -112,12 +127,6 @@ describe('writeExportMaps', () => {
     writeExportMaps(config, buildCtx);
 
     expect(execSyncSpy).toHaveBeenCalledTimes(6);
-    expect(execSyncSpy).toHaveBeenCalledWith(
-      `npm pkg set "exports[.][import]"="./dist/${config.fsNamespace}/${config.fsNamespace}.esm.js"`,
-    );
-    expect(execSyncSpy).toHaveBeenCalledWith(
-      `npm pkg set "exports[.][require]"="./dist/${config.fsNamespace}/${config.fsNamespace}.cjs.js"`,
-    );
     expect(execSyncSpy).toHaveBeenCalledWith(
       `npm pkg set "exports[./my-component][import]"="./dist/components/my-component.js"`,
     );
