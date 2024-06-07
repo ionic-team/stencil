@@ -63,13 +63,18 @@ export const generateHydrateApp = async (
     };
 
     const rollupAppBuild = await rollup(rollupOptions);
-    const rollupOutput = await rollupAppBuild.generate({
+    const rollupCjsOutput = await rollupAppBuild.generate({
       banner: generatePreamble(config),
       format: 'cjs',
       file: 'index.js',
     });
+    const rollupEsmOutput = await rollupAppBuild.generate({
+      banner: generatePreamble(config),
+      format: 'esm',
+      file: 'index.mjs',
+    });
 
-    await writeHydrateOutputs(config, compilerCtx, buildCtx, outputTargets, rollupOutput);
+    await writeHydrateOutputs(config, compilerCtx, buildCtx, outputTargets, rollupCjsOutput, rollupEsmOutput);
   } catch (e: any) {
     if (!buildCtx.hasError) {
       // TODO(STENCIL-353): Implement a type guard that balances using our own copy of Rollup types (which are
