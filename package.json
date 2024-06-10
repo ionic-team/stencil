@@ -60,7 +60,7 @@
     "@rollup/plugin-commonjs": "21.1.0",
     "@rollup/plugin-json": "6.1.0",
     "@rollup/plugin-node-resolve": "9.0.0",
-    "@rollup/plugin-replace": "5.0.5",
+    "@rollup/plugin-replace": "5.0.7",
     "@rollup/pluginutils": "5.1.0",
     "@types/eslint": "^8.4.6",
     "@types/exit": "^0.1.31",
