@@ -116,7 +116,7 @@
     "puppeteer": "^21.0.0",
     "rollup": "2.56.3",
     "semver": "^7.3.7",
-    "terser": "5.31.0",
+    "terser": "5.31.1",
     "tsx": "^4.10.3",
     "typescript": "~5.4.0",
     "webpack": "^5.75.0",
