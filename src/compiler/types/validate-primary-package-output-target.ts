@@ -22,6 +22,9 @@ export type PrimaryPackageOutputTargetRecommendedConfig = {
    * Generates the recommended path for the `types` property based on the output target type,
    * the project's root directory, and the output target's configuration.
    *
+   * `outputTargetConfig` is typed as `any` because downstream consumers may run into type conflicts
+   * with the `type` property of all the different "eligible" output targets.
+   *
    * @param rootDir The Stencil project's root directory pulled from the validated config.
    * @param outputTargetConfig The output target's config.
    * @returns The recommended path for the `types` property in a project's `package.json`

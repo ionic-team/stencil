@@ -25,7 +25,7 @@ export const writeExportMaps = (config: d.ValidatedConfig, buildCtx: d.BuildCtx)
     const outputTargetConfig = PRIMARY_PACKAGE_TARGET_CONFIGS[primaryTarget.type];
 
     if (outputTargetConfig.getModulePath) {
-      const importPath = outputTargetConfig.getModulePath(config.rootDir, primaryTarget.dir);
+      const importPath = outputTargetConfig.getModulePath(config.rootDir, primaryTarget.dir!);
 
       if (importPath) {
         execSync(`npm pkg set "exports[.][import]"="${importPath}"`);
@@ -33,7 +33,7 @@ export const writeExportMaps = (config: d.ValidatedConfig, buildCtx: d.BuildCtx)
     }
 
     if (outputTargetConfig.getMainPath) {
-      const requirePath = outputTargetConfig.getMainPath(config.rootDir, primaryTarget.dir);
+      const requirePath = outputTargetConfig.getMainPath(config.rootDir, primaryTarget.dir!);
 
       if (requirePath) {
         execSync(`npm pkg set "exports[.][require]"="${requirePath}"`);
@@ -65,7 +65,7 @@ export const writeExportMaps = (config: d.ValidatedConfig, buildCtx: d.BuildCtx)
   const distCustomElements = config.outputTargets.find(isOutputTargetDistCustomElements);
   if (distCustomElements != null) {
     // Calculate relative path from project root to custom elements output directory
-    let outDir = relative(config.rootDir, distCustomElements.dir);
+    let outDir = relative(config.rootDir, distCustomElements.dir!);
     if (!outDir.startsWith('.')) {
       outDir = './' + outDir;
     }
