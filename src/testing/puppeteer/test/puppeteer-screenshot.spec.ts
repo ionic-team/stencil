@@ -11,6 +11,7 @@ describe('Puppeteer Screenshot', () => {
         width: 800,
         height: 600,
       });
+      expect(options.captureBeyondViewport).toBe(false);
     });
 
     it('should use clip options if provided', () => {
@@ -32,6 +33,7 @@ describe('Puppeteer Screenshot', () => {
         width: 100,
         height: 200,
       });
+      expect(options.captureBeyondViewport).toBe(true);
     });
   });
 });
