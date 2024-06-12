@@ -1,8 +1,9 @@
 import { catchError } from '@utils';
 
-import type * as d from '../../declarations';
+import * as d from '../../declarations';
 import { outputServiceWorkers } from '../output-targets/output-service-workers';
 import { validateBuildFiles } from './validate-files';
+import { writeExportMaps } from './write-export-maps';
 
 /**
  * Writes files to disk as a result of compilation
@@ -35,6 +36,10 @@ export const writeBuild = async (
     await compilerCtx.cache.commit();
     buildCtx.debug(`in-memory-fs: ${compilerCtx.fs.getMemoryStats()}`);
     buildCtx.debug(`cache: ${compilerCtx.cache.getMemoryStats()}`);
+
+    if (config.generateExportMaps) {
+      writeExportMaps(config, buildCtx);
+    }
 
     await outputServiceWorkers(config, buildCtx);
     await validateBuildFiles(config, compilerCtx, buildCtx);
