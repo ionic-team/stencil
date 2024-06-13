@@ -91,6 +91,33 @@ export function toHaveFirstReceivedEventDetail(eventSpy: d.EventSpy, eventDetail
 
   const pass = deepEqual(eventSpy.firstEvent.detail, eventDetail);
 
+  expect(eventSpy.firstEvent.detail).toEqual(eventDetail);
+
+  return {
+    message: () => `expected event "${eventSpy.eventName}" detail to ${pass ? 'not ' : ''}equal`,
+    pass: pass,
+  };
+}
+
+export function toHaveLastReceivedEventDetail(eventSpy: d.EventSpy, eventDetail: any) {
+  if (!eventSpy) {
+    throw new Error(`toHaveLastReceivedEventDetail event spy is null`);
+  }
+
+  if (typeof (eventSpy as any).then === 'function') {
+    throw new Error(`event spy must be a resolved value, not a promise, before it can be tested`);
+  }
+
+  if (!eventSpy.eventName) {
+    throw new Error(`toHaveLastReceivedEventDetail did not receive an event spy`);
+  }
+
+  if (!eventSpy.firstEvent) {
+    throw new Error(`event "${eventSpy.eventName}" was not received`);
+  }
+
+  const pass = deepEqual(eventSpy.lastEvent.detail, eventDetail);
+
   expect(eventSpy.lastEvent.detail).toEqual(eventDetail);
 
   return {
