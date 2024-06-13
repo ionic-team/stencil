@@ -151,18 +151,9 @@
   // Never rebase the branch or update it unless manually requested to avoid noisy PR emails
   rebaseWhen: 'never',
   /**
-   * Run every Monday and Thursday between midnight at 11 AM (in UTC)
-   *
-   * Monday and Thursday were chosen to:
-   * - Keep the `minimumReleaseAge` value in mind (three days)
-   * - Prevent spikes/bursts of PRs from Renovate on a single day of the week
-   *
-   * We use cron syntax here as it's more deterministic/easier to provide a value that we know that Renovate will
-   * accept, compared to the natural language syntax which is (subjectively) trickier to test without merging first.
-   *
-   * {@see https://crontab.guru} for debugging cron schedules
+   * Natural language syntax taken directly from renovate preset examples (with time adjusted).
    */
-  schedule: ['* 0-11 * * 1,4'],
+  schedule: ["before 8am on the first day of the month"],
   /**
    * Ensure semantic commits are enabled for commits + PR titles.
    *
