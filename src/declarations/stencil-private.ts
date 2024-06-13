@@ -1848,6 +1848,12 @@ export interface ScreenshotOptions {
    * more sensitive. Defaults to the testing config `pixelmatchThreshold` value;
    */
   pixelmatchThreshold?: number;
+  /**
+   * Capture the screenshot beyond the viewport.
+   *
+   * @defaultValue `false` if there is no `clip`. `true` otherwise.
+   */
+  captureBeyondViewport?: boolean;
 }
 
 export interface ScreenshotBoundingBox {
