@@ -112,7 +112,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
             if (supportsShadow) {
               if (!self.shadowRoot) {
                 // we don't want to call `attachShadow` if there's already a shadow root
-                // attached to the
+                // attached to the component
                 if (BUILD.shadowDelegatesFocus) {
                   self.attachShadow({
                     mode: 'open',
