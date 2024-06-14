@@ -124,6 +124,9 @@ const updateImportReferenceFactory = (
 
         const newTypeName = getIncrementTypeName(typeName);
         existingTypeImportData[importResolvedFile].push({
+          // Since we create a unique ID for each type for documentation generation purposes, we can parse
+          // that ID to get the original name for the export
+          originalName: typeReference.id.split('::').pop(),
           localName: typeName,
           importName: newTypeName,
         });
