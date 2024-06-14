@@ -86,10 +86,7 @@ export function createJestPuppeteerEnvironment(): JestPuppeteerEnvironmentConstr
     }
 
     async closeOpenPages() {
-      await Promise.all(this.pages
-        .filter((page) => !page.isClosed())
-        .map((page) => page.close())
-      );
+      await Promise.all(this.pages.filter((page) => !page.isClosed()).map((page) => page.close()));
       this.pages.length = 0;
     }
 
