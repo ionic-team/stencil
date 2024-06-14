@@ -33,7 +33,7 @@ export function renderToString(html: string | any, options?: SerializeDocumentOp
 export function renderToString(
   html: string | any,
   options?: SerializeDocumentOptions,
-  asStream?: true,
+  asStream?: boolean,
 ): Promise<HydrateResults> | Readable {
   const opts = normalizeHydrateOptions(options);
   /**
@@ -59,17 +59,17 @@ export function renderToString(
 export function hydrateDocument(
   doc: any | string,
   options: HydrateDocumentOptions | undefined,
-  asStream: true,
+  asStream?: boolean,
 ): Readable;
 export function hydrateDocument(doc: any | string, options?: HydrateDocumentOptions): Promise<HydrateResults>;
 export function hydrateDocument(
   doc: any | string,
   options?: HydrateDocumentOptions,
-  asStream?: true,
+  asStream?: boolean,
 ): Promise<HydrateResults> | Readable {
   const opts = normalizeHydrateOptions(options);
 
-  let win: Window & typeof globalThis;
+  let win: MockWindow | null = null;
   const results = generateHydrateResults(opts);
 
   if (hasError(results.diagnostics)) {
@@ -80,7 +80,7 @@ export function hydrateDocument(
     try {
       opts.destroyWindow = true;
       opts.destroyDocument = true;
-      win = new MockWindow(doc) as any;
+      win = new MockWindow(doc);
 
       if (!asStream) {
         return render(win, opts, results).then(() => results);
@@ -121,7 +121,7 @@ export function hydrateDocument(
   return Promise.resolve(results);
 }
 
-async function render(win: Window & typeof globalThis, opts: HydrateFactoryOptions, results: HydrateResults) {
+async function render(win: MockWindow, opts: HydrateFactoryOptions, results: HydrateResults) {
   if ('process' in globalThis && typeof process.on === 'function' && !(process as any).__stencilErrors) {
     (process as any).__stencilErrors = true;
     process.on('unhandledRejection', (e) => {
@@ -147,7 +147,7 @@ async function render(win: Window & typeof globalThis, opts: HydrateFactoryOptio
  * @param results render result object
  * @returns a Readable that can be passed into a response
  */
-function renderStream(win: Window & typeof globalThis, opts: HydrateFactoryOptions, results: HydrateResults) {
+function renderStream(win: MockWindow, opts: HydrateFactoryOptions, results: HydrateResults) {
   async function* processRender() {
     const renderResult = await render(win, opts, results);
     yield renderResult.html;
@@ -157,7 +157,7 @@ function renderStream(win: Window & typeof globalThis, opts: HydrateFactoryOptio
 }
 
 async function afterHydrate(
-  win: Window,
+  win: MockWindow,
   opts: HydrateFactoryOptions,
   results: HydrateResults,
   resolve: (results: HydrateResults) => void,
@@ -172,7 +172,7 @@ async function afterHydrate(
   }
 }
 
-function finalizeHydrate(win: Window, doc: Document, opts: HydrateFactoryOptions, results: HydrateResults) {
+function finalizeHydrate(win: MockWindow, doc: Document, opts: HydrateFactoryOptions, results: HydrateResults) {
   try {
     inspectElement(results, doc.documentElement, 0);
 
@@ -237,7 +237,7 @@ function finalizeHydrate(win: Window, doc: Document, opts: HydrateFactoryOptions
   return results;
 }
 
-function destroyWindow(win: Window, doc: Document, opts: HydrateFactoryOptions, results: HydrateResults) {
+function destroyWindow(win: MockWindow, doc: Document, opts: HydrateFactoryOptions, results: HydrateResults) {
   if (!opts.destroyWindow) {
     return;
   }

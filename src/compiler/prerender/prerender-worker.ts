@@ -101,7 +101,7 @@ export const prerenderWorker = async (sys: d.CompilerSystem, prerenderRequest: d
       }
 
       if (hydrateOpts.addModulePreloads) {
-        if (!prerenderRequest.isDebug) {
+        if (!prerenderRequest.isDebug && componentGraph) {
           addModulePreloads(doc, hydrateOpts, hydrateResults, componentGraph);
         }
       } else {

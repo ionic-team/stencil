@@ -1,8 +1,10 @@
+import { MockWindow } from '@stencil/core/mock-doc';
+
 import type * as d from '../../declarations';
 import { renderBuildDiagnostic, renderCatchError } from './render-utils';
 
 export function runtimeLogging(
-  win: Window & typeof globalThis,
+  win: MockWindow,
   opts: d.HydrateDocumentOptions,
   results: d.HydrateResults,
 ) {

@@ -21,7 +21,7 @@ export const generateTemplateHtml = async (
   manager: d.PrerenderManager,
 ) => {
   try {
-    if (!isString(srcIndexHtmlPath)) {
+    if (!isString(srcIndexHtmlPath) && outputTarget.indexHtml) {
       srcIndexHtmlPath = outputTarget.indexHtml;
     }
 
@@ -52,7 +52,7 @@ export const generateTemplateHtml = async (
 
     doc.documentElement.classList.add('hydrated');
 
-    if (hydrateOpts.inlineExternalStyleSheets && !isDebug) {
+    if (hydrateOpts.inlineExternalStyleSheets && !isDebug && outputTarget.appDir) {
       try {
         await inlineExternalStyleSheets(config.sys, outputTarget.appDir, doc);
       } catch (e: any) {
@@ -68,7 +68,7 @@ export const generateTemplateHtml = async (
       }
     }
 
-    if (hydrateOpts.minifyStyleElements && !isDebug) {
+    if (hydrateOpts.minifyStyleElements && !isDebug && outputTarget.baseUrl) {
       try {
         const baseUrl = new URL(outputTarget.baseUrl, manager.devServerHostUrl);
         await minifyStyleElements(config.sys, outputTarget.appDir, doc, baseUrl, true);

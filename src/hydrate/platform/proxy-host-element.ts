@@ -69,7 +69,7 @@ export function proxyHostElement(
 
         if (attrValue != null) {
           const parsedAttrValue = parsePropertyValue(attrValue, memberFlags);
-          hostRef.$instanceValues$.set(memberName, parsedAttrValue);
+          hostRef?.$instanceValues$?.set(memberName, parsedAttrValue);
         }
 
         const ownValue = (elm as any)[memberName];
@@ -77,7 +77,7 @@ export function proxyHostElement(
           // we've got an actual value already set on the host element
           // let's add that to our instance values and pull it off the element
           // so the getter/setter kicks in instead, but still getting this value
-          hostRef.$instanceValues$.set(memberName, ownValue);
+          hostRef?.$instanceValues$?.set(memberName, ownValue);
           delete (elm as any)[memberName];
         }
 
@@ -98,7 +98,7 @@ export function proxyHostElement(
         Object.defineProperty(elm, memberName, {
           value(this: d.HostElement, ...args: any[]) {
             const ref = getHostRef(this);
-            return ref.$onInstancePromise$.then(() => ref.$lazyInstance$[memberName](...args)).catch(consoleError);
+            return ref?.$onInstancePromise$?.then(() => ref?.$lazyInstance$?.[memberName](...args)).catch(consoleError);
           },
         });
       }
@@ -107,7 +107,7 @@ export function proxyHostElement(
 }
 
 function componentOnReady(this: d.HostElement) {
-  return getHostRef(this).$onReadyPromise$;
+  return getHostRef(this)?.$onReadyPromise$;
 }
 
 function forceUpdate(this: d.HostElement) {

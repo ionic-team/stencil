@@ -853,12 +853,12 @@ export function cloneWindow(srcWin: Window, opts: { customElementProxy?: boolean
 }
 
 export function cloneDocument(srcDoc: Document) {
-  if (srcDoc == null) {
+  if (srcDoc == null || !srcDoc.defaultView) {
     return null;
   }
 
   const dstWin = cloneWindow(srcDoc.defaultView);
-  return dstWin.document;
+  return dstWin?.document || null;
 }
 
 // TODO(STENCIL-345) - Evaluate reconciling MockWindow, Window differences

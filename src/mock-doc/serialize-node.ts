@@ -451,7 +451,10 @@ function* streamToHtml(
     }
 
     yield '<!--' + nodeValue + '-->';
-    output.currentLineWidth += nodeValue.length + 7;
+    if (nodeValue) {
+      output.currentLineWidth += nodeValue.length + 7;
+    }
+
   } else if (node.nodeType === NODE_TYPES.DOCUMENT_TYPE_NODE) {
     yield '<!doctype html>';
   }
@@ -492,7 +495,7 @@ function escapeString(str: string, attrMode: boolean) {
  */
 function isWithinWhitespaceSensitive(node: Node | MockNode) {
   let _node: Node | MockNode | null = node;
-  while (_node != null) {
+  while (_node?.nodeName) {
     if (WHITESPACE_SENSITIVE.has(_node.nodeName)) {
       return true;
     }

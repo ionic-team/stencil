@@ -29,6 +29,9 @@ const writeHydrateOutput = async (
   const hydratePackageName = await getHydratePackageName(config, compilerCtx);
 
   const hydrateAppDirPath = outputTarget.dir;
+  if (!hydrateAppDirPath) {
+    throw new Error(`outputTarget config missing the "dir" property`);
+  }
 
   const hydrateCoreIndexPath = join(hydrateAppDirPath, 'index.js');
   const hydrateCoreIndexPathESM = join(hydrateAppDirPath, 'index.mjs');
