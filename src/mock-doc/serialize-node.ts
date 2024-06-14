@@ -454,7 +454,6 @@ function* streamToHtml(
     if (nodeValue) {
       output.currentLineWidth += nodeValue.length + 7;
     }
-
   } else if (node.nodeType === NODE_TYPES.DOCUMENT_TYPE_NODE) {
     yield '<!doctype html>';
   }
