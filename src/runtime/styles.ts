@@ -47,7 +47,13 @@ export const registerStyle = (scopeId: string, cssText: string, allowCS: boolean
  * @param mode an optional current mode
  * @returns the scope ID for the component of interest
  */
-export const addStyle = (styleContainerNode: any, cmpMeta: d.ComponentRuntimeMeta, mode?: string) => {
+export const addStyle = (
+  styleContainerNode: Element | Document | ShadowRoot,
+  cmpMeta: d.ComponentRuntimeMeta,
+  mode?: string,
+) => {
+  const styleContainerDocument = styleContainerNode as Document;
+  const styleContainerShadowRoot = styleContainerNode as ShadowRoot;
   const scopeId = getScopeId(cmpMeta, mode);
   const style = styles.get(scopeId);
 
@@ -60,7 +66,7 @@ export const addStyle = (styleContainerNode: any, cmpMeta: d.ComponentRuntimeMet
 
   if (style) {
     if (typeof style === 'string') {
-      styleContainerNode = styleContainerNode.head || styleContainerNode;
+      styleContainerNode = styleContainerDocument.head || (styleContainerNode as HTMLElement);
       let appliedStyles = rootAppliedStyles.get(styleContainerNode);
       let styleElm;
       if (!appliedStyles) {
@@ -69,7 +75,7 @@ export const addStyle = (styleContainerNode: any, cmpMeta: d.ComponentRuntimeMet
       if (!appliedStyles.has(scopeId)) {
         if (
           BUILD.hydrateClientSide &&
-          styleContainerNode.host &&
+          styleContainerShadowRoot.host &&
           (styleElm = styleContainerNode.querySelector(`[${HYDRATED_STYLE_ID}="${scopeId}"]`))
         ) {
           // This is only happening on native shadow-dom, do not needs CSS var shim
@@ -100,8 +106,8 @@ export const addStyle = (styleContainerNode: any, cmpMeta: d.ComponentRuntimeMet
           appliedStyles.add(scopeId);
         }
       }
-    } else if (BUILD.constructableCSS && !styleContainerNode.adoptedStyleSheets.includes(style)) {
-      styleContainerNode.adoptedStyleSheets = [...styleContainerNode.adoptedStyleSheets, style];
+    } else if (BUILD.constructableCSS && !styleContainerDocument.adoptedStyleSheets.includes(style)) {
+      styleContainerDocument.adoptedStyleSheets = [...styleContainerDocument.adoptedStyleSheets, style];
     }
   }
   return scopeId;
@@ -119,7 +125,7 @@ export const attachStyles = (hostRef: d.HostRef) => {
   const flags = cmpMeta.$flags$;
   const endAttachStyles = createTime('attachStyles', cmpMeta.$tagName$);
   const scopeId = addStyle(
-    BUILD.shadowDom && supportsShadow && elm.shadowRoot ? elm.shadowRoot : elm.getRootNode(),
+    BUILD.shadowDom && supportsShadow && elm.shadowRoot ? elm.shadowRoot : (elm.getRootNode() as ShadowRoot),
     cmpMeta,
     hostRef.$modeName$,
   );
