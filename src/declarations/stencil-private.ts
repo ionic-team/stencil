@@ -2361,6 +2361,15 @@ export interface TypesImportData {
  */
 export interface TypesMemberNameData {
   /**
+   * The original name of the import before any aliasing was applied.
+   *
+   * i.e. if a component imports a type as follows:
+   * `import { MyType as MyCoolType } from './my-type';`
+   *
+   * the `originalName` would be 'MyType'. If the import is not aliased, then `originalName` and `localName` will be the same.
+   */
+  originalName: string;
+  /**
    * The name of the type as it's used within a file.
    */
   localName: string;
