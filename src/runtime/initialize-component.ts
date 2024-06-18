@@ -113,10 +113,35 @@ export const initializeComponent = async (
     }
 
     if (BUILD.style && Cstr && Cstr.style) {
-      // this component has styles but we haven't registered them yet
-      let style = Cstr.style;
+      /**
+       * this component has styles but we haven't registered them yet
+       */
+      let style: string | undefined
 
-      if (BUILD.mode && typeof style !== 'string') {
+      if (typeof Cstr.style === 'string') {
+        /**
+         * in case the component has a `styleUrl` defined, e.g.
+         * ```ts
+         * @Component({
+         *   tag: 'my-component',
+         *   styleUrl: 'my-component.css'
+         * })
+         * ```
+         */
+        style = Cstr.style
+      } else if (BUILD.mode && typeof style !== 'string') {
+        /**
+         * in case the component has a `styleUrl` object defined, e.g.
+         * ```ts
+         * @Component({
+         *   tag: 'my-component',
+         *   styleUrl: {
+         *     ios: 'my-component.ios.css',
+         *     md: 'my-component.md.css'
+         *   }
+         * })
+         * ```
+         */
         hostRef.$modeName$ = computeMode(elm) as string | undefined;
         if (hostRef.$modeName$) {
           style = style[hostRef.$modeName$];
