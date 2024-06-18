@@ -47,7 +47,11 @@ export const registerStyle = (scopeId: string, cssText: string, allowCS: boolean
  * @param mode an optional current mode
  * @returns the scope ID for the component of interest
  */
-export const addStyle = (styleContainerNode: Element | Document | ShadowRoot, cmpMeta: d.ComponentRuntimeMeta, mode?: string) => {
+export const addStyle = (
+  styleContainerNode: Element | Document | ShadowRoot,
+  cmpMeta: d.ComponentRuntimeMeta,
+  mode?: string,
+) => {
   const styleContainerDocument = styleContainerNode as Document;
   const styleContainerShadowRoot = styleContainerNode as ShadowRoot;
   const scopeId = getScopeId(cmpMeta, mode);
@@ -62,7 +66,7 @@ export const addStyle = (styleContainerNode: Element | Document | ShadowRoot, cm
 
   if (style) {
     if (typeof style === 'string') {
-      styleContainerNode = styleContainerDocument.head || styleContainerNode as HTMLElement;
+      styleContainerNode = styleContainerDocument.head || (styleContainerNode as HTMLElement);
       let appliedStyles = rootAppliedStyles.get(styleContainerNode);
       let styleElm;
       if (!appliedStyles) {
@@ -121,7 +125,7 @@ export const attachStyles = (hostRef: d.HostRef) => {
   const flags = cmpMeta.$flags$;
   const endAttachStyles = createTime('attachStyles', cmpMeta.$tagName$);
   const scopeId = addStyle(
-    BUILD.shadowDom && supportsShadow && elm.shadowRoot ? elm.shadowRoot : elm.getRootNode() as ShadowRoot,
+    BUILD.shadowDom && supportsShadow && elm.shadowRoot ? elm.shadowRoot : (elm.getRootNode() as ShadowRoot),
     cmpMeta,
     hostRef.$modeName$,
   );

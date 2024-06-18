@@ -116,7 +116,7 @@ export const initializeComponent = async (
       /**
        * this component has styles but we haven't registered them yet
        */
-      let style: string | undefined
+      let style: string | undefined;
 
       if (typeof Cstr.style === 'string') {
         /**
@@ -128,8 +128,8 @@ export const initializeComponent = async (
          * })
          * ```
          */
-        style = Cstr.style
-      } else if (BUILD.mode && typeof style !== 'string') {
+        style = Cstr.style;
+      } else if (BUILD.mode && typeof Cstr.style !== 'string') {
         /**
          * in case the component has a `styleUrl` object defined, e.g.
          * ```ts
@@ -144,7 +144,7 @@ export const initializeComponent = async (
          */
         hostRef.$modeName$ = computeMode(elm) as string | undefined;
         if (hostRef.$modeName$) {
-          style = style[hostRef.$modeName$];
+          style = Cstr.style[hostRef.$modeName$];
         }
 
         if (BUILD.hydrateServerSide && hostRef.$modeName$) {
