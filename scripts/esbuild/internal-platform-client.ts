@@ -34,6 +34,11 @@ export async function getInternalClientBundles(opts: BuildOptions): Promise<ESBu
       'Stencil internal client platform to be imported by the Stencil Compiler and internal runtime. Breaking changes can and will happen at any time.',
     main: 'index.js',
     sideEffects: false,
+    exports: {
+      '.': {
+        import: './index.js',
+      },
+    },
   });
 
   const internalClientAliases = getEsbuildAliases();
