@@ -115,7 +115,8 @@ export async function newE2EPage(opts: NewE2EPageOptions = {}): Promise<E2EPage>
 
     const failOnConsoleError = opts.failOnConsoleError === true;
     const failOnNetworkError = opts.failOnNetworkError === true;
-    const logFailingNetworkRequests = opts.logFailingNetworkRequests === true;
+    const logFailingNetworkRequests =
+      typeof opts.logFailingNetworkRequests === 'boolean' ? opts.logFailingNetworkRequests : true;
 
     page.on('console', (ev) => {
       if (ev.type() === 'error') {

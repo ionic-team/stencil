@@ -28,6 +28,7 @@ export interface NewE2EPageOptions extends WaitForOptions {
   failOnNetworkError?: boolean;
   /**
    * If set to `true`, Stencil will log failing network requests
+   * @default true
    */
   logFailingNetworkRequests?: boolean;
 }
