@@ -137,7 +137,12 @@ const dispatchHooks = (hostRef: d.HostRef, isInitialLoad: boolean): Promise<void
  * @returns either a `Promise` or the return value of the provided function
  */
 const enqueue = (maybePromise: Promise<void> | undefined, fn: () => Promise<void>): Promise<void> | undefined =>
-  isPromisey(maybePromise) ? maybePromise.then(fn) : fn();
+  isPromisey(maybePromise)
+    ? maybePromise.then(fn).catch((err) => {
+        console.error(err);
+        fn();
+      })
+    : fn();
 
 /**
  * Check that a value is a `Promise`. To check, we first see if the value is an

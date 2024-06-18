@@ -527,6 +527,14 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
 
     const rootElm = frag.firstElementChild;
 
+    /**
+     * in case the user called `newE2EPage` without any content `rootElm` will be undefined
+     * and further operations will fail. We need to check for this case and return early.
+     */
+    if (!rootElm) {
+      return;
+    }
+
     this.nodeName = rootElm.nodeName;
     this.attributes = cloneAttributes(rootElm.attributes);
 

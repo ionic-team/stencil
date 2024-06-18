@@ -1,3 +1,4 @@
+import { MockDocumentFragment } from './document-fragment';
 import {
   MockAnchorElement,
   MockBaseElement,
@@ -156,14 +157,16 @@ const WINDOW_PROPS = [
 
 const GLOBAL_CONSTRUCTORS: [string, any][] = [
   ['CustomEvent', MockCustomEvent],
+  ['DocumentFragment', MockDocumentFragment],
+  ['DOMParser', MockDOMParser],
   ['Event', MockEvent],
-  ['Headers', MockHeaders],
   ['FocusEvent', MockFocusEvent],
+  ['Headers', MockHeaders],
   ['KeyboardEvent', MockKeyboardEvent],
   ['MouseEvent', MockMouseEvent],
   ['Request', MockRequest],
   ['Response', MockResponse],
-  ['DOMParser', MockDOMParser],
+  ['ShadowRoot', MockDocumentFragment],
 
   ['HTMLAnchorElement', MockAnchorElement],
   ['HTMLBaseElement', MockBaseElement],
