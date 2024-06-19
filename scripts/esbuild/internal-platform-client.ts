@@ -35,7 +35,7 @@ export async function getInternalClientBundles(opts: BuildOptions): Promise<ESBu
     exports: './index.js',
     main: './index.js',
     type: 'module',
-    sideEffects: false
+    sideEffects: false,
   });
 
   const internalClientAliases = getEsbuildAliases();
