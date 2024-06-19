@@ -6,21 +6,21 @@ describe('resolve-utils', () => {
       'returns true for a file ending with .ts (%s)',
       (fileName) => {
         expect(isTsFile(fileName)).toEqual(true);
-      }
+      },
     );
 
     it.each(['.tsx', 'foo.tsx', 'foo.bar.tsx', 'foo/bar.tsx'])(
       'returns false for a file ending with .tsx (%s)',
       (fileName) => {
         expect(isTsFile(fileName)).toEqual(false);
-      }
+      },
     );
 
     it.each(['foo.js', 'foo.doc', 'foo.css', 'foo.html'])(
       'returns false for other a file with another extension (%s)',
       (fileName) => {
         expect(isTsFile(fileName)).toEqual(false);
-      }
+      },
     );
 
     it('returns false for .d.ts and .d.tsx files', () => {
@@ -40,7 +40,7 @@ describe('resolve-utils', () => {
       'returns false for non-lowercase extensions (%s)',
       (fileName) => {
         expect(isTsFile(fileName)).toEqual(false);
-      }
+      },
     );
   });
 
@@ -49,14 +49,14 @@ describe('resolve-utils', () => {
       'returns true for a file ending with .js (%s)',
       (fileName) => {
         expect(isJsFile(fileName)).toEqual(true);
-      }
+      },
     );
 
     it.each(['.jsx', 'foo.txt', 'foo/bar.css', 'foo.bar.html'])(
       'returns false for other a file with another extension (%s)',
       (fileName) => {
         expect(isJsFile(fileName)).toEqual(false);
-      }
+      },
     );
 
     it('returns true for a file named "spec.js"', () => {

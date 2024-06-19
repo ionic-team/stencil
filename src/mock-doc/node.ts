@@ -223,15 +223,28 @@ export class MockNodeList {
   }
 }
 
+type MockElementInternals = Record<keyof ElementInternals, null>;
+
 export class MockElement extends MockNode {
-  namespaceURI: string | null;
+  __namespaceURI: string | null;
   __attributeMap: MockAttributeMap | null | undefined;
   __shadowRoot: ShadowRoot | null | undefined;
   __style: MockCSSStyleDeclaration | null | undefined;
 
-  constructor(ownerDocument: any, nodeName: string | null) {
+  attachInternals(): MockElementInternals {
+    return new Proxy({} as unknown as MockElementInternals, {
+      get: function (_target, prop, _receiver) {
+        console.error(
+          `NOTE: Property ${String(prop)} was accessed on ElementInternals, but this property is not implemented.
+Testing components with ElementInternals is fully supported in e2e tests.`,
+        );
+      },
+    });
+  }
+
+  constructor(ownerDocument: any, nodeName: string | null, namespaceURI: string | null = null) {
     super(ownerDocument, NODE_TYPES.ELEMENT_NODE, typeof nodeName === 'string' ? nodeName : null, null);
-    this.namespaceURI = null;
+    this.__namespaceURI = namespaceURI;
     this.__shadowRoot = null;
     this.__attributeMap = null;
   }
@@ -249,8 +262,25 @@ export class MockElement extends MockNode {
   blur() {
     dispatchEvent(
       this,
-      new MockFocusEvent('blur', { relatedTarget: null, bubbles: true, cancelable: true, composed: true })
+      new MockFocusEvent('blur', { relatedTarget: null, bubbles: true, cancelable: true, composed: true }),
     );
+  }
+
+  get localName() {
+    /**
+     * The `localName` of an element should be always given, however the way
+     * MockDoc is constructed, it won't allow us to guarantee that. Let's throw
+     * and error we get into the situation where we don't have a `nodeName` set.
+     *
+     */
+    if (!this.nodeName) {
+      throw new Error(`Can't compute elements localName without nodeName`);
+    }
+    return this.nodeName.toLocaleLowerCase();
+  }
+
+  get namespaceURI() {
+    return this.__namespaceURI;
   }
 
   get shadowRoot() {
@@ -341,7 +371,7 @@ export class MockElement extends MockNode {
   focus(_options?: { preventScroll?: boolean }) {
     dispatchEvent(
       this,
-      new MockFocusEvent('focus', { relatedTarget: null, bubbles: true, cancelable: true, composed: true })
+      new MockFocusEvent('focus', { relatedTarget: null, bubbles: true, cancelable: true, composed: true }),
     );
   }
 
@@ -365,6 +395,14 @@ export class MockElement extends MockNode {
       return attr.value;
     }
     return null;
+  }
+
+  getAttributeNode(attrName: string): MockAttr | null {
+    if (!this.hasAttribute(attrName)) {
+      return null;
+    }
+
+    return new MockAttr(attrName, this.getAttribute(attrName));
   }
 
   getBoundingClientRect() {
@@ -443,13 +481,13 @@ export class MockElement extends MockNode {
   }
 
   insertAdjacentElement(position: 'beforebegin' | 'afterbegin' | 'beforeend' | 'afterend', elm: MockHTMLElement) {
-    if (position === 'beforebegin') {
+    if (position === 'beforebegin' && this.parentNode) {
       insertBefore(this.parentNode, elm, this);
     } else if (position === 'afterbegin') {
       this.prepend(elm);
     } else if (position === 'beforeend') {
       this.appendChild(elm);
-    } else if (position === 'afterend') {
+    } else if (position === 'afterend' && this.parentNode) {
       insertBefore(this.parentNode, elm, this.nextSibling);
     }
     return elm;
@@ -459,7 +497,9 @@ export class MockElement extends MockNode {
     const frag = parseFragmentUtil(this.ownerDocument, html);
     if (position === 'beforebegin') {
       while (frag.childNodes.length > 0) {
-        insertBefore(this.parentNode, frag.childNodes[0], this);
+        if (this.parentNode) {
+          insertBefore(this.parentNode, frag.childNodes[0], this);
+        }
       }
     } else if (position === 'afterbegin') {
       while (frag.childNodes.length > 0) {
@@ -471,20 +511,22 @@ export class MockElement extends MockNode {
       }
     } else if (position === 'afterend') {
       while (frag.childNodes.length > 0) {
-        insertBefore(this.parentNode, frag.childNodes[frag.childNodes.length - 1], this.nextSibling);
+        if (this.parentNode) {
+          insertBefore(this.parentNode, frag.childNodes[frag.childNodes.length - 1], this.nextSibling);
+        }
       }
     }
   }
 
   insertAdjacentText(position: 'beforebegin' | 'afterbegin' | 'beforeend' | 'afterend', text: string) {
     const elm = this.ownerDocument.createTextNode(text);
-    if (position === 'beforebegin') {
+    if (position === 'beforebegin' && this.parentNode) {
       insertBefore(this.parentNode, elm, this);
     } else if (position === 'afterbegin') {
       this.prepend(elm);
     } else if (position === 'beforeend') {
       this.appendChild(elm);
-    } else if (position === 'afterend') {
+    } else if (position === 'afterend' && this.parentNode) {
       insertBefore(this.parentNode, elm, this.nextSibling);
     }
   }
@@ -1039,7 +1081,7 @@ export function resetElement(elm: MockElement) {
   delete elm.__style;
 }
 
-function insertBefore(parentNode: MockNode, newNode: MockNode, referenceNode: MockNode) {
+function insertBefore(parentNode: MockNode, newNode: MockNode, referenceNode: MockNode | null) {
   if (newNode !== referenceNode) {
     newNode.remove();
     newNode.parentNode = parentNode;
@@ -1063,9 +1105,9 @@ function insertBefore(parentNode: MockNode, newNode: MockNode, referenceNode: Mo
 }
 
 export class MockHTMLElement extends MockElement {
-  override namespaceURI = 'http://www.w3.org/1999/xhtml';
+  override __namespaceURI = 'http://www.w3.org/1999/xhtml';
 
-  constructor(ownerDocument: any, nodeName: string) {
+  constructor(ownerDocument: any, nodeName: string | null) {
     super(ownerDocument, typeof nodeName === 'string' ? nodeName.toUpperCase() : null);
   }
 
@@ -1074,6 +1116,19 @@ export class MockHTMLElement extends MockElement {
   }
   override set tagName(value: string) {
     this.nodeName = value;
+  }
+
+  /**
+   * A node’s parent of type Element is known as its parent element.
+   * If the node has a parent of a different type, its parent element
+   * is null.
+   * @returns MockElement
+   */
+  override get parentElement() {
+    if (this.nodeName === 'HTML') {
+      return null;
+    }
+    return super.parentElement;
   }
 
   override get attributes(): MockAttributeMap {

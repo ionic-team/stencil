@@ -1,7 +1,7 @@
-import { isAbsolute, join } from 'path';
+import { isOutputTargetStats, join, STATS } from '@utils';
+import { isAbsolute } from 'path';
 
 import type * as d from '../../../declarations';
-import { isOutputTargetStats, STATS } from '../../output-targets/output-utils';
 
 export const validateStats = (userConfig: d.ValidatedConfig, userOutputs: d.OutputTarget[]) => {
   const outputTargets: d.OutputTargetStats[] = [];

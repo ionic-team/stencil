@@ -10,11 +10,14 @@ import type TypeScript from 'typescript';
 
 import { buildEvents } from '../../compiler/events';
 import type {
+  CompilerFileWatcher,
+  CompilerFileWatcherCallback,
   CompilerSystem,
   CompilerSystemCreateDirectoryResults,
   CompilerSystemRealpathResults,
   CompilerSystemRemoveFileResults,
   CompilerSystemWriteFileResults,
+  Logger,
 } from '../../declarations';
 import { asyncGlob, nodeCopyTasks } from './node-copy-tasks';
 import { NodeLazyRequire } from './node-lazy-require';
@@ -22,8 +25,18 @@ import { NodeResolveModule } from './node-resolve-module';
 import { checkVersion } from './node-stencil-version-checker';
 import { NodeWorkerController } from './node-worker-controller';
 
-export function createNodeSys(c: { process?: any } = {}) {
-  const prcs: NodeJS.Process = c.process || global.process;
+/**
+ * Create a node.js-specific {@link CompilerSystem} to be used when Stencil is
+ * run from the CLI or via the public API in a node context.
+ *
+ * This takes an optional param supplying a `process` object to be used.
+ *
+ * @param c an optional object wrapping `process` and `logger` objects
+ * @returns a node.js `CompilerSystem` object
+ */
+export function createNodeSys(c: { process?: any; logger?: Logger } = {}): CompilerSystem {
+  const prcs: NodeJS.Process = c?.process ?? global.process;
+  const logger: Logger | undefined = c?.logger;
   const destroys = new Set<() => Promise<void> | void>();
   const onInterruptsCallbacks: (() => void)[] = [];
 
@@ -67,10 +80,10 @@ export function createNodeSys(c: { process?: any } = {}) {
       } catch (e) {}
       return hasAccess;
     },
-    addDestory(cb) {
+    addDestroy(cb) {
       destroys.add(cb);
     },
-    removeDestory(cb) {
+    removeDestroy(cb) {
       destroys.delete(cb);
     },
     applyPrerenderGlobalPatch(opts) {
@@ -171,7 +184,7 @@ export function createNodeSys(c: { process?: any } = {}) {
       destroys.forEach((cb) => {
         try {
           const rtn = cb();
-          if (rtn && rtn.then) {
+          if (rtn && typeof rtn.then === 'function') {
             waits.push(rtn);
           }
         } catch (e) {
@@ -190,12 +203,19 @@ export function createNodeSys(c: { process?: any } = {}) {
       return Buffer.from(str).toString('base64');
     },
     async ensureDependencies() {
+      // TODO(STENCIL-727): Remove this from the sys interface
+      console.warn(`ensureDependencies will be removed in a future version of Stencil.`);
+      console.warn(`To get the stencilPath, please use getCompilerExecutingPath().`);
+
       return {
         stencilPath: sys.getCompilerExecutingPath(),
         diagnostics: [],
       };
     },
-    async ensureResources() {},
+    async ensureResources() {
+      // TODO(STENCIL-727): Remove this from the sys interface
+      console.warn(`ensureResources is a no-op, and will be removed in a future version of Stencil`);
+    },
     exit: async (exitCode) => {
       await runInterruptsCallbacks();
       exit(exitCode);
@@ -252,7 +272,7 @@ export function createNodeSys(c: { process?: any } = {}) {
             resolve(
               files.map((f) => {
                 return normalizePath(path.join(p, f));
-              })
+              }),
             );
           }
         });
@@ -345,7 +365,7 @@ export function createNodeSys(c: { process?: any } = {}) {
       return new Promise((resolve) => {
         const recursive = !!(opts && opts.recursive);
         if (recursive) {
-          fs.rmdir(p, { recursive: true }, (err) => {
+          fs.rm(p, { recursive: true, force: true }, (err) => {
             resolve({
               basename: path.basename(p),
               dirname: path.dirname(p),
@@ -373,7 +393,7 @@ export function createNodeSys(c: { process?: any } = {}) {
       try {
         const recursive = !!(opts && opts.recursive);
         if (recursive) {
-          fs.rmdirSync(p, { recursive: true });
+          fs.rmSync(p, { recursive: true, force: true });
         } else {
           fs.rmdirSync(p);
         }
@@ -423,6 +443,7 @@ export function createNodeSys(c: { process?: any } = {}) {
       return results;
     },
     setupCompiler(c) {
+      // save references to typescript utilities so that we can wrap them
       const ts: typeof TypeScript = c.ts;
       const tsSysWatchDirectory = ts.sys.watchDirectory;
       const tsSysWatchFile = ts.sys.watchFile;
@@ -432,51 +453,105 @@ export function createNodeSys(c: { process?: any } = {}) {
       sys.events = buildEvents();
 
       sys.watchDirectory = (p, callback, recursive) => {
+        logger?.debug(`NODE_SYS_DEBUG::watchDir ${p}`);
+
         const tsFileWatcher = tsSysWatchDirectory(
           p,
           (fileName) => {
+            logger?.debug(`NODE_SYS_DEBUG::watchDir:callback dir=${p} changedPath=${fileName}`);
             callback(normalizePath(fileName), 'fileUpdate');
           },
-          recursive
+          recursive,
         );
 
         const close = () => {
           tsFileWatcher.close();
         };
 
-        sys.addDestory(close);
+        sys.addDestroy(close);
 
         return {
           close() {
-            sys.removeDestory(close);
+            sys.removeDestroy(close);
             tsFileWatcher.close();
           },
         };
       };
 
-      sys.watchFile = (p, callback) => {
-        const tsFileWatcher = tsSysWatchFile(p, (fileName, tsEventKind) => {
-          fileName = normalizePath(fileName);
-          if (tsEventKind === ts.FileWatcherEventKind.Created) {
-            callback(fileName, 'fileAdd');
-            sys.events.emit('fileAdd', fileName);
-          } else if (tsEventKind === ts.FileWatcherEventKind.Changed) {
-            callback(fileName, 'fileUpdate');
-            sys.events.emit('fileUpdate', fileName);
-          } else if (tsEventKind === ts.FileWatcherEventKind.Deleted) {
-            callback(fileName, 'fileDelete');
-            sys.events.emit('fileDelete', fileName);
-          }
-        });
+      /**
+       * Wrap the TypeScript `watchFile` implementation in order to hook into the rest of the {@link CompilerSystem}
+       * implementation that is used when running Stencil's compiler in "watch mode" in Node.
+       *
+       * The wrapped function calls the default TypeScript `watchFile` implementation for the provided `path`. Based on
+       * the type of {@link ts.FileWatcherEventKind} emitted, invoke the provided callback and inform the rest of the
+       * `CompilerSystem` that the event occurred.
+       *
+       * This function does not perform any file watcher registration itself. Each `path` provided to it when called
+       * has already been registered as a file to watch.
+       *
+       * @param path the path to the file that is being watched
+       * @param callback a callback to invoke. The same callback is invoked for every `ts.FileWatcherEventKind`, only
+       * with a different event classifier string.
+       * @returns an object with a method for unhooking the file watcher from the system
+       */
+      sys.watchFile = (path: string, callback: CompilerFileWatcherCallback): CompilerFileWatcher => {
+        logger?.debug(`NODE_SYS_DEBUG::watchFile ${path}`);
+
+        const tsFileWatcher = tsSysWatchFile(
+          path,
+          (fileName: string, tsEventKind: TypeScript.FileWatcherEventKind) => {
+            fileName = normalizePath(fileName);
+            if (tsEventKind === ts.FileWatcherEventKind.Created) {
+              callback(fileName, 'fileAdd');
+              sys.events.emit('fileAdd', fileName);
+            } else if (tsEventKind === ts.FileWatcherEventKind.Changed) {
+              callback(fileName, 'fileUpdate');
+              sys.events.emit('fileUpdate', fileName);
+            } else if (tsEventKind === ts.FileWatcherEventKind.Deleted) {
+              callback(fileName, 'fileDelete');
+              sys.events.emit('fileDelete', fileName);
+            }
+          },
+
+          /**
+           * When setting up a watcher, a numeric polling interval (in milliseconds) must be set when using
+           * {@link ts.WatchFileKind.FixedPollingInterval}. Failing to do so may cause the watch process in the
+           * TypeScript compiler to crash when files are deleted.
+           *
+           * This is the value that was used for files in TypeScript 4.8.4. The value is hardcoded as TS does not
+           * export this value/make it publicly available.
+           */
+          250,
+
+          /**
+           * As of TypeScript v4.9, the default file watcher implementation is based on file system events, and moves
+           * away from the previous polling based implementation. When attempting to use the file system events-based
+           * implementation, issues with the dev server (which runs "watch mode") were reported, stating that the
+           * compiler was continuously recompiling and reloading the dev server. It was found that in some cases, this
+           * would be caused by the access time (`atime`) on a non-TypeScript file being update by some process on the
+           * user's machine. For now, we default back to the poll-based implementation to avoid such issues, and will
+           * revisit this functionality in the future.
+           *
+           * Ref: {@link https://www.typescriptlang.org/docs/handbook/release-notes/typescript-4-9.html#file-watching-now-uses-file-system-events|TS 4.9 Release Note}
+           *
+           * TODO(STENCIL-744): Revisit using file system events for watch mode
+           */
+          {
+            // TS 4.8 and under defaulted to this type of polling interval for polling-based watchers
+            watchFile: ts.WatchFileKind.FixedPollingInterval,
+            // set fallbackPolling so that directories are given the correct watcher variant
+            fallbackPolling: ts.PollingWatchKind.FixedInterval,
+          },
+        );
 
         const close = () => {
           tsFileWatcher.close();
         };
-        sys.addDestory(close);
+        sys.addDestroy(close);
 
         return {
           close() {
-            sys.removeDestory(close);
+            sys.removeDestroy(close);
             tsFileWatcher.close();
           },
         };
@@ -589,11 +664,11 @@ export function createNodeSys(c: { process?: any } = {}) {
   const nodeResolve = new NodeResolveModule();
 
   sys.lazyRequire = new NodeLazyRequire(nodeResolve, {
-    '@types/jest': { minVersion: '24.9.1', recommendedVersion: '27.0.3', maxVersion: '27.0.0' },
-    jest: { minVersion: '24.9.1', recommendedVersion: '27.0.3', maxVersion: '27.0.0' },
-    'jest-cli': { minVersion: '24.9.0', recommendedVersion: '27.4.5', maxVersion: '27.0.0' },
-    puppeteer: { minVersion: '1.19.0', recommendedVersion: '10.0.0' },
-    'puppeteer-core': { minVersion: '1.19.0', recommendedVersion: '5.2.1' },
+    '@types/jest': { minVersion: '24.9.1', recommendedVersion: '29', maxVersion: '29.0.0' },
+    jest: { minVersion: '24.9.0', recommendedVersion: '29', maxVersion: '29.0.0' },
+    'jest-cli': { minVersion: '24.9.0', recommendedVersion: '29', maxVersion: '29.0.0' },
+    puppeteer: { minVersion: '10.0.0', recommendedVersion: '20' },
+    'puppeteer-core': { minVersion: '10.0.0', recommendedVersion: '20' },
     'workbox-build': { minVersion: '4.3.1', recommendedVersion: '4.3.1' },
   });
 

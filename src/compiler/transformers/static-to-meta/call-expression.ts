@@ -22,7 +22,7 @@ export const parseCallExpression = (m: d.Module | d.ComponentCompilerMeta, node:
 const visitCallExpressionArgs = (
   m: d.Module | d.ComponentCompilerMeta,
   callExpressionName: ts.Identifier,
-  args: ts.NodeArray<ts.Expression>
+  args: ts.NodeArray<ts.Expression>,
 ) => {
   const fnName = callExpressionName.escapedText as string;
 

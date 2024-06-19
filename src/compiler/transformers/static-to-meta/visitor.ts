@@ -9,12 +9,12 @@ import { parseModuleImport } from './import';
 import { parseStringLiteral } from './string-literal';
 
 export const convertStaticToMeta = (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   typeChecker: ts.TypeChecker,
-  collection: d.CollectionCompilerMeta,
-  transformOpts: d.TransformOptions
+  collection: d.CollectionCompilerMeta | null,
+  transformOpts: d.TransformOptions,
 ): ts.TransformerFactory<ts.SourceFile> => {
   return (transformCtx) => {
     let dirPath: string;
@@ -35,7 +35,7 @@ export const convertStaticToMeta = (
 
     return (tsSourceFile) => {
       dirPath = dirname(tsSourceFile.fileName);
-      moduleFile = getModuleLegacy(config, compilerCtx, tsSourceFile.fileName);
+      moduleFile = getModuleLegacy(compilerCtx, tsSourceFile.fileName);
       resetModuleLegacy(moduleFile);
 
       if (collection != null) {

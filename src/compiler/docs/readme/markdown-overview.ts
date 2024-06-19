@@ -3,7 +3,7 @@
  * @param overview a component-level comment string to place in a markdown file
  * @returns The generated Overview section. If the provided overview is empty, return an empty list
  */
-export const overviewToMarkdown = (overview: string): ReadonlyArray<string> => {
+export const overviewToMarkdown = (overview: string | undefined): ReadonlyArray<string> => {
   if (!overview) {
     return [];
   }

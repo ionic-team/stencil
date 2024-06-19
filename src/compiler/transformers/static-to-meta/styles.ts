@@ -10,7 +10,7 @@ export const parseStaticStyles = (
   tagName: string,
   componentFilePath: string,
   isCollectionDependency: boolean,
-  staticMembers: ts.ClassElement[]
+  staticMembers: ts.ClassElement[],
 ) => {
   const styles: d.StyleCompiler[] = [];
   const styleUrlsProp = isCollectionDependency ? 'styleUrls' : 'originalStyleUrls';

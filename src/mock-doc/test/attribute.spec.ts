@@ -78,7 +78,7 @@ describe('attributes', () => {
     expect(element.getAttribute('prop6')).toBe('');
 
     expect(element).toEqualHtml(
-      `<div prop1=\"null\" prop2=\"undefined\" prop3=\"0\" prop4=\"1\" prop5=\"hola\" prop6></div>`
+      `<div prop1=\"null\" prop2=\"undefined\" prop3=\"0\" prop4=\"1\" prop5=\"hola\" prop6></div>`,
     );
   });
 
@@ -99,7 +99,7 @@ describe('attributes', () => {
     expect(element.getAttribute('prop6')).toBe('');
 
     expect(element).toEqualHtml(
-      `<div prop1=\"null\" prop2=\"undefined\" prop3=\"0\" prop4=\"1\" prop5=\"hola\" prop6></div>`
+      `<div prop1=\"null\" prop2=\"undefined\" prop3=\"0\" prop4=\"1\" prop5=\"hola\" prop6></div>`,
     );
   });
 
@@ -163,6 +163,24 @@ describe('attributes', () => {
     const img = doc.createElement('img');
     img.setAttribute('draggable', 'false');
     expect(img.draggable).toEqual(false);
+  });
+
+  describe('getAttributeNode', () => {
+    it('should return an attribute node if the attribute exists', () => {
+      const div = doc.createElement('div');
+      div.setAttribute('draggable', 'true');
+      expect(div.getAttributeNode('draggable')).toEqual({
+        _name: 'draggable',
+        _namespaceURI: null,
+        _value: 'true',
+      });
+    });
+
+    it('should return `null` if the attribute does not exist', () => {
+      const div = doc.createElement('div');
+      div.setAttribute('draggable', 'true');
+      expect(div.getAttributeNode('test')).toEqual(null);
+    });
   });
 
   function testNsAttributes(element: MockHTMLElement) {

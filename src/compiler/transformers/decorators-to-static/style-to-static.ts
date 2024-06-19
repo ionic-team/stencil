@@ -1,5 +1,5 @@
-import { DEFAULT_STYLE_MODE } from '@utils';
-import { basename, dirname, extname, join } from 'path';
+import { DEFAULT_STYLE_MODE, join } from '@utils';
+import { basename, dirname, extname } from 'path';
 import ts from 'typescript';
 
 import type * as d from '../../../declarations';
@@ -44,7 +44,7 @@ export const styleToStatic = (newMembers: ts.ClassElement[], componentOptions: d
       // @Component({
       //   styles: ":host {...}"
       // })
-      newMembers.push(createStaticGetter('styles', ts.createLiteral(styles)));
+      newMembers.push(createStaticGetter('styles', ts.factory.createStringLiteral(styles)));
     }
   } else if (componentOptions.styles) {
     const convertIdentifier = componentOptions.styles as any as ConvertIdentifier;

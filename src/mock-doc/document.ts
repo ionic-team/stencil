@@ -49,6 +49,10 @@ export class MockDocument extends MockHTMLElement {
     this.documentElement.dir = value;
   }
 
+  override get localName(): never {
+    throw new Error('Unimplemented');
+  }
+
   get location() {
     if (this.defaultView != null) {
       return (this.defaultView as Window).location;
@@ -198,7 +202,6 @@ export class MockDocument extends MockHTMLElement {
 
   createElementNS(namespaceURI: string, tagName: string) {
     const elmNs = createElementNS(this, namespaceURI, tagName);
-    elmNs.namespaceURI = namespaceURI;
     return elmNs;
   }
 

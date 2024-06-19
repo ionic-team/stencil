@@ -17,6 +17,7 @@ export const addHydrateRuntimeCmpMeta = (classMembers: ts.ClassElement[], cmp: d
   };
   // We always need shadow-dom shim in hydrate runtime
   if (cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation) {
+    // TODO(STENCIL-854): Remove code related to legacy shadowDomShim field
     cmpMeta.$flags$ |= CMP_FLAGS.needsShadowDomShim;
   }
   const staticMember = createStaticGetter('cmpMeta', convertValueToLiteral(cmpMeta));

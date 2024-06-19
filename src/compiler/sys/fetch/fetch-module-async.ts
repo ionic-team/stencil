@@ -9,7 +9,7 @@ export const fetchModuleAsync = async (
   inMemoryFs: InMemoryFileSystem,
   pkgVersions: Map<string, string>,
   url: string,
-  filePath: string
+  filePath: string,
 ) => {
   if (skipFilePathFetch(filePath) || known404Urls.has(url) || skipUrlFetch(url)) {
     return undefined;

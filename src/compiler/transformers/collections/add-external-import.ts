@@ -1,4 +1,4 @@
-import { isString, parsePackageJson } from '@utils';
+import { isString, normalizePath, parsePackageJson } from '@utils';
 import { dirname } from 'path';
 
 import type * as d from '../../../declarations';
@@ -6,13 +6,13 @@ import { tsResolveModuleNamePackageJsonPath } from '../../sys/typescript/typescr
 import { parseCollection } from './parse-collection-module';
 
 export const addExternalImport = (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   moduleFile: d.Module,
   containingFile: string,
   moduleId: string,
-  resolveCollections: boolean
+  resolveCollections: boolean,
 ) => {
   if (!moduleFile.externalImports.includes(moduleId)) {
     moduleFile.externalImports.push(moduleId);
@@ -38,7 +38,9 @@ export const addExternalImport = (
     pkgJsonFilePath = realPkgJsonFilePath.path;
   }
 
-  if (pkgJsonFilePath === config.packageJsonFilePath) {
+  // realpathSync may return a path that uses Windows path separators ('\').
+  // normalize it for the purposes of this comparison
+  if (normalizePath(pkgJsonFilePath) === config.packageJsonFilePath) {
     // same package silly!
     return;
   }
@@ -74,7 +76,7 @@ export const addExternalImport = (
     buildCtx,
     moduleId,
     parsedPkgJson.filePath,
-    parsedPkgJson.data
+    parsedPkgJson.data,
   );
   if (!collection) {
     return;
@@ -105,7 +107,7 @@ export const addExternalImport = (
         moduleFile,
         resolveFromDir,
         dependencyModuleId,
-        resolveCollections
+        resolveCollections,
       );
     });
   }

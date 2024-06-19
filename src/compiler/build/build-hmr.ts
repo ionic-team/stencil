@@ -1,13 +1,12 @@
-import { isGlob, normalizePath, sortBy } from '@utils';
-import minimatch from 'minimatch';
+import { isGlob, isOutputTargetWww, normalizePath, sortBy } from '@utils';
+import { minimatch } from 'minimatch';
 import { basename } from 'path';
 
 import type * as d from '../../declarations';
-import { isOutputTargetWww } from '../output-targets/output-utils';
 import { getScopeId } from '../style/scope-css';
 
 export const generateHmr = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
-  if (config.devServer == null || config.devServer.reloadStrategy == null) {
+  if (config.devServer?.reloadStrategy == null) {
     return null;
   }
 
@@ -53,7 +52,7 @@ export const generateHmr = (config: d.Config, compilerCtx: d.CompilerCtx, buildC
           styleText: s.styleText,
         } as d.HmrStyleUpdate;
       }),
-      (s) => s.styleId
+      (s) => s.styleId,
     );
   }
 
@@ -119,7 +118,7 @@ const addTsFileImporters = (
   filesToLookForImporters: string[],
   checkedFiles: Set<string>,
   changedScriptFiles: string[],
-  scriptFile: string
+  scriptFile: string,
 ) => {
   if (!changedScriptFiles.includes(scriptFile)) {
     // add it to our list of files to transpile

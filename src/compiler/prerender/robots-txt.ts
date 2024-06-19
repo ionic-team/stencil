@@ -1,5 +1,4 @@
-import { catchError } from '@utils';
-import { join } from 'path';
+import { catchError, join } from '@utils';
 
 import type * as d from '../../declarations';
 import { getSitemapUrls } from './sitemap-xml';

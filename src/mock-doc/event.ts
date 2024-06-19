@@ -39,6 +39,10 @@ export class MockEvent {
     this.cancelBubble = true;
   }
 
+  /**
+   * @ref https://developer.mozilla.org/en-US/docs/Web/API/Event/composedPath
+   * @returns a composed path of the event
+   */
   composedPath(): MockElement[] {
     const composedPath: MockElement[] = [];
 
@@ -54,7 +58,16 @@ export class MockEvent {
         break;
       }
 
-      currentElement = currentElement.parentElement;
+      /**
+       * bubble up the parent chain until we arrive to the HTML element. Here we continue
+       * with the document object instead of the parent element since the parent element
+       * is `null` for HTML elements.
+       */
+      if (currentElement.parentElement == null && currentElement.tagName === 'HTML') {
+        currentElement = currentElement.ownerDocument;
+      } else {
+        currentElement = currentElement.parentElement;
+      }
     }
 
     return composedPath;
@@ -202,6 +215,8 @@ function triggerEventListener(elm: any, ev: MockEvent) {
 
   if (elm.nodeName === NODE_NAMES.DOCUMENT_NODE) {
     triggerEventListener((elm as MockDocument).defaultView, ev);
+  } else if (elm.parentElement == null && elm.tagName === 'HTML') {
+    triggerEventListener(elm.ownerDocument, ev);
   } else {
     triggerEventListener(elm.parentElement, ev);
   }

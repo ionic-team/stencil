@@ -1,12 +1,12 @@
 import { MockDocument } from '../document';
-import { MockAnchorElement, MockMetaElement, MockSVGElement } from '../element';
+import { MockAnchorElement, MockMetaElement, MockSVGElement, MockUListElement } from '../element';
 import { MockElement, MockHTMLElement } from '../node';
 import { cloneWindow, MockWindow } from '../window';
 
 describe('element', () => {
   let doc: MockDocument;
   beforeEach(() => {
-    doc = new MockDocument();
+    doc = new MockDocument('');
   });
 
   it('document.documentElement dir', () => {
@@ -141,6 +141,10 @@ describe('element', () => {
 
     const clonedWin = cloneWindow(win as any);
 
+    if (!clonedWin) {
+      throw new Error('The Window was not successfully cloned!');
+    }
+
     const elm = clonedWin.document.getElementById('test') as any;
     expect((elm as HTMLMetaElement).content).toBe('');
     expect(elm).toEqualHtml(`<meta id="test">`);
@@ -153,7 +157,8 @@ describe('element', () => {
     const titleElm = clonedWin.document.head.querySelector('title');
     expect(titleElm).toEqualHtml(`<title>Hello Title!</title>`);
 
-    titleElm.text = 'Hello Text!';
+    // we just asserted that this object isn't falsy, allowing us to use the bang operator here
+    titleElm!.text = 'Hello Text!';
     expect(titleElm).toEqualHtml(`<title>Hello Text!</title>`);
   });
 
@@ -209,6 +214,11 @@ describe('element', () => {
       expect(document.title).toBe('Hello Title');
 
       const titleElm = document.head.querySelector('title');
+
+      if (!titleElm) {
+        throw new Error('Unable to find title element in the DOM.');
+      }
+
       expect(titleElm.textContent).toBe('Hello Title');
       expect(titleElm.text).toBe('Hello Title');
 
@@ -231,7 +241,8 @@ describe('element', () => {
       expect(win.document.URL).toBe('http://stenciljs.com/path/to/page');
       expect(win.document.location.href).toBe('http://stenciljs.com/path/to/page');
 
-      win.document.querySelector('base').remove();
+      // use the bang operator here to fail in case 'base' can't be found
+      win.document.querySelector('base')!.remove();
       expect(win.document.baseURI).toBe('http://stenciljs.com/path/to/page');
       expect(win.document.URL).toBe('http://stenciljs.com/path/to/page');
       expect(win.document.location.href).toBe('http://stenciljs.com/path/to/page');
@@ -327,11 +338,12 @@ describe('element', () => {
       const elm = doc.createElement('div') as Element;
       const child = doc.createElement('div') as Element;
 
-      elm.append('text', 12 as any, child, null);
+      elm.append('text', 12 as any, child, null as unknown as Node);
       expect(elm.childNodes.length).toEqual(4);
       expect((elm.childNodes[0] as Text).data).toEqual('text');
       expect((elm.childNodes[1] as Text).data).toEqual('12');
       expect(elm.childNodes[2]).toEqual(child);
+      // we used type assertions above to verify that `null`'s text reads a 'null'
       expect((elm.childNodes[3] as Text).data).toEqual('null');
     });
   });
@@ -444,6 +456,13 @@ describe('element', () => {
     });
   });
 
+  describe('parentElement', () => {
+    it('returns `null` for when accessing the parent element of an html node', () => {
+      const element = new MockHTMLElement(doc, 'myElement');
+      expect(element.parentElement).toEqual(null);
+    });
+  });
+
   describe('input', () => {
     it('list is readonly prop', () => {
       const input = doc.createElement('input');
@@ -478,5 +497,28 @@ describe('element', () => {
       elm.href = 'http://stenciljs.com/path/to/page';
       expect(elm.pathname).toBe('/path/to/page');
     });
+  });
+
+  describe('ul', () => {
+    it('textContent', () => {
+      const elm: MockUListElement = doc.createElement('ul');
+      elm.textContent = 'this is an item in an unordered list';
+      expect(elm.textContent).toBe('this is an item in an unordered list');
+    });
+  });
+
+  it('provides a localName', () => {
+    expect(doc.createElement('input').localName).toBe('input');
+    expect(doc.createElement('a').localName).toBe('a');
+    expect(doc.createElement('datalist').localName).toBe('datalist');
+    expect(doc.createElement('svg').localName).toBe('svg');
+    expect((document.childNodes[1] as any).localName).toBe('html');
+  });
+
+  it('has provides a canvas object with getContext', () => {
+    const canvas = doc.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    expect(ctx).toBeDefined();
+    expect(ctx.toDataURL()).toBe('data:,');
   });
 });

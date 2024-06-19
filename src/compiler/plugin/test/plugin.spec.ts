@@ -40,7 +40,7 @@ describe.skip('plugin', () => {
         }
       `,
       },
-      { clearFileCache: true }
+      { clearFileCache: true },
     );
     await compiler.fs.commit();
 
@@ -74,7 +74,7 @@ describe.skip('plugin', () => {
         }
       `,
       },
-      { clearFileCache: true }
+      { clearFileCache: true },
     );
     await compiler.fs.commit();
 
@@ -116,7 +116,7 @@ describe.skip('plugin', () => {
         }
       `,
       },
-      { clearFileCache: true }
+      { clearFileCache: true },
     );
     await compiler.fs.commit();
 
@@ -160,7 +160,7 @@ describe.skip('plugin', () => {
         }
       `,
       },
-      { clearFileCache: true }
+      { clearFileCache: true },
     );
     await compiler.fs.commit();
 

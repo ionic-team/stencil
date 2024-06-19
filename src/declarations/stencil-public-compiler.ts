@@ -1,5 +1,6 @@
 import type { ConfigFlags } from '../cli/config-flags';
-import type { PrerenderUrlResults } from '../internal';
+import type { PrerenderUrlResults, PrintLine } from '../internal';
+import type { BuildCtx, CompilerCtx } from './stencil-private';
 import type { JsonDocs } from './stencil-public-docs';
 
 export * from './stencil-public-docs';
@@ -42,6 +43,36 @@ export interface StencilConfig {
    * To disable this feature, set enableCache to false.
    */
   enableCache?: boolean;
+  /**
+   * The directory where sub-directories will be created for caching when `enableCache` is set
+   * `true` or if using Stencil's Screenshot Connector.
+   *
+   * @default '.stencil'
+   *
+   * @example
+   *
+   * A Stencil config like the following:
+   * ```ts
+   * export const config = {
+   *  ...,
+   *  enableCache: true,
+   *  cacheDir: '.cache',
+   *  testing: {
+   *    screenshotConnector: 'connector.js'
+   *  }
+   * }
+   * ```
+   *
+   * Will result in the following file structure:
+   * ```tree
+   * stencil-project-root
+   * └── .cache
+   *     ├── .build <-- Where build related file caching is written
+   *     |
+   *     └── screenshot-cache.json <-- Where screenshot caching is written
+   * ```
+   */
+  cacheDir?: string;
 
   /**
    * Stencil is traditionally used to compile many components into an app,
@@ -49,10 +80,18 @@ export interface StencilConfig {
    * However, it's still common to have styles which should be "global" across all components and the website.
    * A global CSS file is often useful to set CSS Variables.
    *
-   * Additionally, the globalStyle config can be used to precompile styles with Sass, PostCss, etc.
+   * Additionally, the globalStyle config can be used to precompile styles with Sass, PostCSS, etc.
    * Below is an example folder structure containing a webapp's global sass file, named app.css.
    */
   globalStyle?: string;
+
+  /**
+   * Will generate {@link https://nodejs.org/api/packages.html#packages_exports export map} entry points
+   * for each component in the build when `true`.
+   *
+   * @default false
+   */
+  generateExportMaps?: boolean;
 
   /**
    * When the hashFileNames config is set to true, and it is a production build,
@@ -89,7 +128,7 @@ export interface StencilConfig {
 
   /**
    * The plugins config can be used to add your own rollup plugins.
-   * By default, Stencil does not come with Sass or PostCss support.
+   * By default, Stencil does not come with Sass or PostCSS support.
    * However, either can be added using the plugin array.
    */
   plugins?: any[];
@@ -104,6 +143,19 @@ export interface StencilConfig {
    * for each component. The standard for Stencil apps is to use src, which is the default.
    */
   srcDir?: string;
+
+  /**
+   * Sets whether or not Stencil should transform path aliases set in a project's
+   * `tsconfig.json` from the assigned module aliases to resolved relative paths.
+   *
+   * This behavior defaults to `true`, but may be opted-out of by setting this flag to `false`.
+   */
+  transformAliasedImportPaths?: boolean;
+  /**
+   * When `true`, we will validate a project's `package.json` based on the output target the user has designated
+   * as `isPrimaryPackageOutputTarget: true` in their Stencil config.
+   */
+  validatePrimaryPackageOutputTarget?: boolean;
 
   /**
    * Passes custom configuration down to the "@rollup/plugin-commonjs" that Stencil uses under the hood.
@@ -173,14 +225,14 @@ export interface StencilConfig {
    * type of CSS properties and values are assigned before and after hydrating. This config
    * can also be used to not include the hydrated flag at all by setting it to `null`.
    */
-  hydratedFlag?: HydratedFlag;
+  hydratedFlag?: HydratedFlag | null;
 
   /**
    * Ionic prefers to hide all components prior to hydration with a style tag appended
    * to the head of the document containing some `visibility: hidden;` css rules.
    *
    * Disabling this will remove the style tag that sets `visibility: hidden;` on all
-   * unhydrated web components. This more closely follows the HTML spec, and allows
+   * un-hydrated web components. This more closely follows the HTML spec, and allows
    * you to set your own fallback content.
    *
    */
@@ -229,12 +281,17 @@ export interface StencilConfig {
   rollupPlugins?: { before?: any[]; after?: any[] };
 
   entryComponentsHint?: string[];
+  /**
+   * Sets whether Stencil will write files to `dist/` during the build or not.
+   *
+   * By default this value is set to the opposite value of {@link devMode},
+   * i.e. it will be `true` when building for production and `false` when
+   * building for development.
+   */
   buildDist?: boolean;
   buildLogFilePath?: string;
-  cacheDir?: string;
   devInspector?: boolean;
   devServer?: StencilDevServerConfig;
-  enableCacheStats?: boolean;
   sys?: CompilerSystem;
   tsconfig?: string;
   validateTypes?: boolean;
@@ -244,48 +301,31 @@ export interface StencilConfig {
    * is updated, it will not trigger a re-run of tests.
    */
   watchIgnoredRegex?: RegExp | RegExp[];
+  /**
+   * Set whether unused dependencies should be excluded from the built output.
+   */
   excludeUnusedDependencies?: boolean;
   stencilCoreResolvedId?: string;
 }
 
-export interface ConfigExtras {
-  /**
-   * By default, the slot polyfill does not update `appendChild()` so that it appends
-   * new child nodes into the correct child slot like how shadow dom works. This is an opt-in
-   * polyfill for those who need it when using `element.appendChild(node)` and expecting the
-   * child to be appended in the same location shadow dom would. This is not required for
-   * IE11 or Edge 18, but can be enabled if the app is using `appendChild()`. Defaults to `false`.
-   */
-  appendChildSlotFix?: boolean;
-
-  /**
-   * By default, the runtime does not polyfill `cloneNode()` when cloning a component
-   * that uses the slot polyfill. This is an opt-in polyfill for those who need it.
-   * This is not required for IE11 or Edge 18, but can be enabled if the app is using
-   * `cloneNode()` and unexpected node are being cloned due to the slot polyfill
-   * simulating shadow dom. Defaults to `false`.
-   */
-  cloneNodeFix?: boolean;
-
-  /**
-   * Include the CSS Custom Property polyfill/shim for legacy browsers. ESM builds will
-   * not include the css vars shim. Defaults to `false`
-   */
-  cssVarsShim?: boolean;
-
-  /**
-   * Dynamic `import()` shim. This is only needed for Edge 18 and below, and Firefox 67
-   * and below. Defaults to `false`.
-   */
-  dynamicImportShim?: boolean;
-
+interface ConfigExtrasBase {
   /**
    * Experimental flag. Projects that use a Stencil library built using the `dist` output target may have trouble lazily
    * loading components when using a bundler such as Vite or Parcel. Setting this flag to `true` will change how Stencil
    * lazily loads components in a way that works with additional bundlers. Setting this flag to `true` will increase
    * the size of the compiled output. Defaults to `false`.
+   * @deprecated This flag has been deprecated in favor of `enableImportInjection`, which provides the same
+   * functionality. `experimentalImportInjection` will be removed in a future major version of Stencil.
    */
   experimentalImportInjection?: boolean;
+
+  /**
+   * Projects that use a Stencil library built using the `dist` output target may have trouble lazily
+   * loading components when using a bundler such as Vite or Parcel. Setting this flag to `true` will change how Stencil
+   * lazily loads components in a way that works with additional bundlers. Setting this flag to `true` will increase
+   * the size of the compiled output. Defaults to `false`.
+   */
+  enableImportInjection?: boolean;
 
   /**
    * Dispatches component lifecycle events. Mainly used for testing. Defaults to `false`.
@@ -293,33 +333,12 @@ export interface ConfigExtras {
   lifecycleDOMEvents?: boolean;
 
   /**
-   * Safari 10 supports ES modules with `<script type="module">`, however, it did not implement
-   * `<script nomodule>`. When set to `true`, the runtime will patch support for Safari 10
-   * due to its lack of `nomodule` support.
-   * Defaults to `false`.
-   */
-  safari10?: boolean;
-
-  /**
    * It is possible to assign data to the actual `<script>` element's `data-opts` property,
    * which then gets passed to Stencil's initial bootstrap. This feature is only required
    * for very special cases and rarely needed. Defaults to `false`.
+   * @deprecated This option has been deprecated and will be removed in a future major version of Stencil.
    */
   scriptDataOpts?: boolean;
-
-  /**
-   * Experimental flag to align the behavior of invoking `textContent` on a scoped component to act more like a
-   * component that uses the shadow DOM. Defaults to `false`
-   */
-  scopedSlotTextContentFix?: boolean;
-
-  /**
-   * If enabled `true`, the runtime will check if the shadow dom shim is required. However,
-   * if it's determined that shadow dom is already natively supported by the browser then
-   * it does not request the shim. When set to `false` it will avoid all shadow dom tests.
-   * Defaults to `false`.
-   */
-  shadowDomShim?: boolean;
 
   /**
    * When a component is first attached to the DOM, this setting will wait a single tick before
@@ -330,19 +349,70 @@ export interface ConfigExtras {
   initializeNextTick?: boolean;
 
   /**
+   * Enables the tagNameTransform option of `defineCustomElements()`, so the component tagName
+   * can be customized at runtime. Defaults to `false`.
+   */
+  tagNameTransform?: boolean;
+
+  // TODO(STENCIL-1086): remove this option when it's the default behavior
+  /**
+   * Experimental flag.
+   * Updates the behavior of scoped components to align more closely with the behavior of the native
+   * Shadow DOM when using `slot`s.
+   *
+   * Defaults to `false`.
+   */
+  experimentalScopedSlotChanges?: boolean;
+}
+
+// TODO(STENCIL-914): delete this interface when `experimentalSlotFixes` is the default behavior
+type ConfigExtrasSlotFixes<ExperimentalFixesEnabled extends boolean, IndividualFlags extends boolean> = {
+  // TODO(STENCIL-914): remove this option when `experimentalSlotFixes` is the default behavior
+  /**
+   * By default, the slot polyfill does not update `appendChild()` so that it appends
+   * new child nodes into the correct child slot like how shadow dom works. This is an opt-in
+   * polyfill for those who need it when using `element.appendChild(node)` and expecting the
+   * child to be appended in the same location shadow dom would. This is not required for
+   * IE11 or Edge 18, but can be enabled if the app is using `appendChild()`. Defaults to `false`.
+   */
+  appendChildSlotFix?: IndividualFlags;
+
+  // TODO(STENCIL-914): remove this option when `experimentalSlotFixes` is the default behavior
+  /**
+   * By default, the runtime does not polyfill `cloneNode()` when cloning a component
+   * that uses the slot polyfill. This is an opt-in polyfill for those who need it.
+   * This is not required for IE11 or Edge 18, but can be enabled if the app is using
+   * `cloneNode()` and unexpected node are being cloned due to the slot polyfill
+   * simulating shadow dom. Defaults to `false`.
+   */
+  cloneNodeFix?: IndividualFlags;
+
+  // TODO(STENCIL-914): remove this option when `experimentalSlotFixes` is the default behavior
+  /**
+   * Experimental flag to align the behavior of invoking `textContent` on a scoped component to act more like a
+   * component that uses the shadow DOM. Defaults to `false`
+   */
+  scopedSlotTextContentFix?: IndividualFlags;
+
+  // TODO(STENCIL-914): remove this option when `experimentalSlotFixes` is the default behavior
+  /**
    * For browsers that do not support shadow dom (IE11 and Edge 18 and below), slot is polyfilled
    * to simulate the same behavior. However, the host element's `childNodes` and `children`
    * getters are not patched to only show the child nodes and elements of the default slot.
    * Defaults to `false`.
    */
-  slotChildNodesFix?: boolean;
+  slotChildNodesFix?: IndividualFlags;
 
+  // TODO(STENCIL-914): remove `experimentalSlotFixes` when it's the default behavior
   /**
-   * Enables the tagNameTransform option of `defineCustomElements()`, so the component tagName
-   * can be customized at runtime. Defaults to `false`.
+   * Enables all slot-related fixes such as {@link slotChildNodesFix}, and
+   * {@link scopedSlotTextContentFix}.
    */
-  tagNameTransform?: boolean;
-}
+  experimentalSlotFixes?: ExperimentalFixesEnabled;
+};
+
+export type ConfigExtras = ConfigExtrasBase &
+  (ConfigExtrasSlotFixes<true, true> | ConfigExtrasSlotFixes<false, boolean>);
 
 export interface Config extends StencilConfig {
   buildAppCore?: boolean;
@@ -410,7 +480,34 @@ type RequireFields<T, K extends keyof T> = T & { [P in K]-?: T[P] };
 /**
  * Fields in {@link Config} to make required for {@link ValidatedConfig}
  */
-type StrictConfigFields = 'flags' | 'logger' | 'outputTargets' | 'rootDir' | 'sys' | 'testing';
+type StrictConfigFields = keyof Pick<
+  Config,
+  | 'buildEs5'
+  | 'cacheDir'
+  | 'devMode'
+  | 'devServer'
+  | 'extras'
+  | 'flags'
+  | 'fsNamespace'
+  | 'hashFileNames'
+  | 'hashedFileNameLength'
+  | 'hydratedFlag'
+  | 'logLevel'
+  | 'logger'
+  | 'minifyCss'
+  | 'minifyJs'
+  | 'namespace'
+  | 'outputTargets'
+  | 'packageJsonFilePath'
+  | 'rollupConfig'
+  | 'rootDir'
+  | 'srcDir'
+  | 'srcIndexHtml'
+  | 'sys'
+  | 'testing'
+  | 'transformAliasedImportPaths'
+  | 'validatePrimaryPackageOutputTarget'
+>;
 
 /**
  * A version of {@link Config} that makes certain fields required. This type represents a valid configuration entity.
@@ -564,6 +661,15 @@ export interface DevServerConfig extends StencilDevServerConfig {
   prerenderConfig?: string;
   protocol?: 'http' | 'https';
   srcIndexHtml?: string;
+
+  /**
+   * Route to be used for the "ping" sub-route of the Stencil dev server.
+   * This route will return a 200 status code once the Stencil build has finished.
+   * Setting this to `null` will disable the ping route.
+   *
+   * Defaults to `/ping`
+   */
+  pingRoute?: string | null;
 }
 
 export interface HistoryApiFallback {
@@ -691,12 +797,12 @@ export interface PrerenderConfig {
   robotsTxt?(opts: RobotsTxtOpts): string | RobotsTxtResults;
   sitemapXml?(opts: SitemapXmpOpts): string | SitemapXmpResults;
   /**
-   * Static Site Generated (SSG). Does not include Stencil's clientside
+   * Static Site Generated (SSG). Does not include Stencil's client-side
    * JavaScript, custom elements or preload modules.
    */
   staticSite?: boolean;
   /**
-   * If the prerenndered URLs should have a trailing "/"" or not. Defaults to `false`.
+   * If the prerendered URLs should have a trailing "/"" or not. Defaults to `false`.
    */
   trailingSlash?: boolean;
 }
@@ -714,7 +820,7 @@ export interface HydrateDocumentOptions {
    */
   canonicalUrl?: string;
   /**
-   * Include the HTML comments and attributes used by the clientside
+   * Include the HTML comments and attributes used by the client-side
    * JavaScript to read the structure of the HTML and rebuild each
    * component. Defaults to `true`.
    */
@@ -735,7 +841,7 @@ export interface HydrateDocumentOptions {
   direction?: string;
   /**
    * Component tag names listed here will not be prerendered, nor will
-   * hydrated on the clientside. Components listed here will be ignored
+   * hydrated on the client-side. Components listed here will be ignored
    * as custom elements and treated no differently than a `<div>`.
    */
   excludeComponents?: string[];
@@ -768,11 +874,11 @@ export interface HydrateDocumentOptions {
    */
   runtimeLogging?: boolean;
   /**
-   * Component tags listed here will only be prerendered or serverside-rendered
-   * and will not be clientside hydrated. This is useful for components that
+   * Component tags listed here will only be prerendered or server-side-rendered
+   * and will not be client-side hydrated. This is useful for components that
    * are not dynamic and do not need to be defined as a custom element within the
    * browser. For example, a header or footer component would be a good example that
-   * may not require any clientside JavaScript.
+   * may not require any client-side JavaScript.
    */
   staticComponents?: string[];
   /**
@@ -921,7 +1027,7 @@ export interface CompilerSystem {
   /**
    * Add a callback which will be ran when destroy() is called.
    */
-  addDestory(cb: () => void): void;
+  addDestroy(cb: () => void): void;
   /**
    * Always returns a boolean, does not throw.
    */
@@ -933,6 +1039,7 @@ export interface CompilerSystem {
   applyGlobalPatch?(fromDir: string): Promise<void>;
   applyPrerenderGlobalPatch?(opts: { devServerHostUrl: string; window: any }): void;
   cacheStorage?: CacheStorage;
+  // TODO(STENCIL-898): Make this property non-optional, check for unnecessary null checks on it
   checkVersion?: (logger: Logger, currentVersion: string) => Promise<() => void>;
   copy?(copyTasks: Required<CopyTask>[], srcDir: string): Promise<CopyResults>;
   /**
@@ -957,19 +1064,32 @@ export interface CompilerSystem {
    */
   isTTY(): boolean;
   /**
-   * Each platform as a different way to dynamically import modules.
+   * Each platform has a different way to dynamically import modules.
    */
   dynamicImport?(p: string): Promise<any>;
   /**
    * Creates the worker controller for the current system.
+   *
+   * @param maxConcurrentWorkers the max number of concurrent workers to
+   * support
+   * @returns a worker controller appropriate for the current platform (node.js)
    */
   createWorkerController?(maxConcurrentWorkers: number): WorkerMainController;
   encodeToBase64(str: string): string;
+
+  // TODO(STENCIL-727): Remove this from the sys interface
+  /**
+   * @deprecated
+   */
   ensureDependencies?(opts: {
     rootDir: string;
     logger: Logger;
     dependencies: CompilerDependency[];
   }): Promise<{ stencilPath: string; diagnostics: Diagnostic[] }>;
+  // TODO(STENCIL-727): Remove this from the sys interface
+  /**
+   * @deprecated
+   */
   ensureResources?(opts: { rootDir: string; logger: Logger; dependencies: CompilerDependency[] }): Promise<void>;
   /**
    * process.exit()
@@ -1011,7 +1131,7 @@ export interface CompilerSystem {
    */
   getRemoteModuleUrl(opts: { moduleId: string; path?: string; version?: string }): string;
   /**
-   * Aync glob task. Only available in NodeJS compiler system.
+   * Async glob task. Only available in NodeJS compiler system.
    */
   glob?(pattern: string, options: { cwd?: string; nodir?: boolean; [key: string]: any }): Promise<string[]>;
   /**
@@ -1063,7 +1183,7 @@ export interface CompilerSystem {
   /**
    * Remove a callback which will be ran when destroy() is called.
    */
-  removeDestory(cb: () => void): void;
+  removeDestroy(cb: () => void): void;
   /**
    * Rename old path to new path. Does not throw.
    */
@@ -1098,7 +1218,24 @@ export interface CompilerSystem {
   statSync(p: string): CompilerFsStats;
   tmpDirSync(): string;
   watchDirectory?(p: string, callback: CompilerFileWatcherCallback, recursive?: boolean): CompilerFileWatcher;
-  watchFile?(p: string, callback: CompilerFileWatcherCallback): CompilerFileWatcher;
+
+  /**
+   * A `watchFile` implementation in order to hook into the rest of the {@link CompilerSystem} implementation that is
+   * used when running Stencil's compiler in "watch mode".
+   *
+   * It is analogous to TypeScript's `watchFile`  implementation.
+   *
+   * Note, this function may be called for full builds of Stencil projects by the TypeScript compiler. It should not
+   * assume that it will only be called in watch mode.
+   *
+   * This function should not perform any file watcher registration itself. Each `path` provided to it when called
+   * should already have been registered as a file to watch.
+   *
+   * @param path the path to the file that is being watched
+   * @param callback a callback to invoke when a file that is being watched has changed in some way
+   * @returns an object with a method for unhooking the file watcher from the system
+   */
+  watchFile?(path: string, callback: CompilerFileWatcherCallback): CompilerFileWatcher;
   /**
    * How many milliseconds to wait after a change before calling watch callbacks.
    */
@@ -1164,10 +1301,31 @@ export interface ResolveModuleIdResults {
   pkgDirPath: string;
 }
 
+// TODO(STENCIL-1005): improve the typing for this interface
+/**
+ * A controller which provides for communication and coordination between
+ * threaded workers.
+ */
 export interface WorkerMainController {
+  /**
+   * Send a given set of arguments to a worker
+   */
   send(...args: any[]): Promise<any>;
+  /**
+   * Handle a particular method
+   *
+   * @param name of the method to be passed to a worker
+   * @returns a Promise wrapping the results
+   */
   handler(name: string): (...args: any[]) => Promise<any>;
+  /**
+   * Destroy the worker represented by this instance, rejecting all outstanding
+   * tasks and killing the child process.
+   */
   destroy(): void;
+  /**
+   * The current setting for the max number of workers
+   */
   maxWorkers: number;
 }
 
@@ -1202,6 +1360,7 @@ export interface BuildOnEvents {
 }
 
 export interface BuildEmitEvents {
+  emit(eventName: CompilerEventName, path: string): void;
   emit(eventName: CompilerEventFileAdd, path: string): void;
   emit(eventName: CompilerEventFileDelete, path: string): void;
   emit(eventName: CompilerEventFileUpdate, path: string): void;
@@ -1299,8 +1458,17 @@ export interface CompilerBuildStart {
   timestamp: string;
 }
 
+/**
+ * A type describing a function to call when an event is emitted by a file watcher
+ * @param fileName the path of the file tied to event
+ * @param eventKind a variant describing the type of event that was emitter (added, edited, etc.)
+ */
 export type CompilerFileWatcherCallback = (fileName: string, eventKind: CompilerFileWatcherEvent) => void;
 
+/**
+ * A type describing the different types of events that Stencil expects may happen when a file being watched is altered
+ * in some way
+ */
 export type CompilerFileWatcherEvent =
   | CompilerEventFileAdd
   | CompilerEventFileDelete
@@ -1442,14 +1610,85 @@ export interface ConfigBundle {
   components: string[];
 }
 
+/**
+ * A file and/or directory copy operation that may be specified as part of
+ * certain output targets for Stencil (in particular `dist`,
+ * `dist-custom-elements`, and `www`).
+ */
 export interface CopyTask {
+  /**
+   * The source file path for a copy operation. This may be an absolute or
+   * relative path to a directory or a file, and may also include a glob
+   * pattern.
+   *
+   * If the path is a relative path it will be treated as relative to
+   * `Config.srcDir`.
+   */
   src: string;
+  /**
+   * An optional destination file path for a copy operation. This may be an
+   * absolute or relative path.
+   *
+   * If relative, this will be treated as relative to the output directory for
+   * the output target for which this copy operation is configured.
+   */
   dest?: string;
+  /**
+   * Whether or not Stencil should issue warnings if it cannot find the
+   * specified source files or directories. Defaults to `false`.
+   *
+   * To receive warnings if a copy task source can't be found set this to
+   * `true`.
+   */
   warn?: boolean;
+  /**
+   * Whether or not directory structure should be preserved when copying files
+   * from a source directory. Defaults to `true` if no `dest` path is supplied,
+   * else it defaults to `false`.
+   *
+   * If this is set to `false`, all the files from a source directory will be
+   * copied directly to the destination directory, but if it's set to `true` they
+   * will be copied to a new directory inside the destination directory with
+   * the same name as their original source directory.
+   *
+   * So if, for instance, `src` is set to `"images"` and `keepDirStructure` is
+   * set to `true` the copy task will then produce the following directory
+   * structure:
+   *
+   * ```
+   * images
+   * └── foo.png
+   * dist
+   * └── images
+   *     └── foo.png
+   * ```
+   *
+   * Conversely if `keepDirStructure` is set to `false` then files in `images/`
+   * will be copied to `dist` without first creating a new subdirectory,
+   * resulting in the following directory structure:
+   *
+   * ```
+   * images
+   * └── foo.png
+   * dist
+   * └── foo.png
+   * ```
+   *
+   * If a `dest` path is supplied then `keepDirStructure`
+   * will default to `false`, so that Stencil will write the
+   * copied files directly into the `dest` directory without creating a new
+   * subdirectory. This behavior can be overridden by setting
+   * `keepDirStructure` to `true`.
+   */
   keepDirStructure?: boolean;
 }
 
+// TODO(STENCIL-882): Remove this interface [BREAKING_CHANGE]
 export interface BundlingConfig {
+  /**
+   * @deprecated the `namedExports` field is no longer honored by `@rollup/plugin-commonjs` and is not used by Stencil.
+   * This field can be safely removed from your Stencil configuration file.
+   */
   namedExports?: {
     [key: string]: string[];
   };
@@ -1466,8 +1705,12 @@ export interface NodeResolveConfig {
   only?: Array<string | RegExp>;
   modulesOnly?: boolean;
 
+  // TODO(STENCIL-1107): Remove this field [BREAKING_CHANGE]
   /**
    * @see https://github.com/browserify/resolve#resolveid-opts-cb
+   * @deprecated the `customResolveOptions` field is no longer honored in future versions of
+   * `@rollup/plugin-node-resolve`. If you are currently using it, please open a new issue in the Stencil repo to
+   * describe your use case & provide input (https://github.com/ionic-team/stencil/issues/new/choose)
    */
   customResolveOptions?: {
     basedir?: string;
@@ -1504,10 +1747,25 @@ export interface Testing {
   destroy(): Promise<void>;
 }
 
+/**
+ * Options for initiating a run of Stencil tests (spec and/or end-to-end)
+ */
 export interface TestingRunOptions {
+  /**
+   * If true, run end-to-end tests
+   */
   e2e?: boolean;
+  /**
+   * If true, run screenshot tests
+   */
   screenshot?: boolean;
+  /**
+   * If true, run spec tests
+   */
   spec?: boolean;
+  /**
+   * If true, update 'golden' screenshots. Otherwise, compare against priori.
+   */
   updateScreenshot?: boolean;
 }
 
@@ -1566,7 +1824,7 @@ export interface JestConfig {
 
   /**
    * A list of reporter names that Jest uses when writing coverage reports. Any istanbul reporter can be used.
-   * Default: ["json", "lcov", "text"]
+   * Default: `["json", "lcov", "text"]`
    */
   coverageReporters?: any[];
 
@@ -1691,9 +1949,18 @@ export interface TestingConfig extends JestConfig {
   browserWSEndpoint?: string;
 
   /**
-   * Whether to run browser e2e tests in headless mode. Defaults to true.
+   * Whether to run browser e2e tests in headless mode.
+   *
+   * Starting with Chrome v112, a new headless mode was introduced.
+   * The new headless mode unifies the "headful" and "headless" code paths in the Chrome distributable.
+   *
+   * To enable the "new" headless mode, a string value of "new" must be provided.
+   * To use the "old" headless mode, a boolean value of `true` must be provided.
+   * To use "headful" mode, a boolean value of `false` must be provided.
+   *
+   * Defaults to true.
    */
-  browserHeadless?: boolean;
+  browserHeadless?: boolean | 'new';
 
   /**
    * Slows down e2e browser operations by the specified amount of milliseconds.
@@ -1714,8 +1981,11 @@ export interface TestingConfig extends JestConfig {
   browserDevtools?: boolean;
 
   /**
-   * Array of browser emulations to be using during e2e tests. A full e2e
+   * Array of browser emulations to be used during _screenshot_ tests. A full screenshot
    * test is ran for each emulation.
+   *
+   * To emulate a device display for your e2e tests, use the `setViewport` method on a test's E2E page.
+   * An example can be found in [the Stencil docs](https://stenciljs.com/docs/end-to-end-testing#emulate-a-display).
    */
   emulate?: EmulateConfig[];
 
@@ -1723,6 +1993,12 @@ export interface TestingConfig extends JestConfig {
    * Path to the Screenshot Connector module.
    */
   screenshotConnector?: string;
+
+  /**
+   * Timeout for the pixelmatch worker to resolve (in ms).
+   * @default 2500
+   */
+  screenshotTimeout?: number | null;
 
   /**
    * Amount of time in milliseconds to wait before a screenshot is taken.
@@ -1808,12 +2084,15 @@ export interface EmulateViewport {
  */
 export const LOG_LEVELS = ['debug', 'info', 'warn', 'error'] as const;
 
-export type LogLevel = typeof LOG_LEVELS[number];
+export type LogLevel = (typeof LOG_LEVELS)[number];
 
 /**
- * Common logger to be used by the compiler, dev-server and CLI. The CLI will use a
- * NodeJS based console logging and colors, and the web will use browser based
- * logs and colors.
+ * Abstract interface representing a logger with the capability to accept log
+ * messages at various levels (debug, info, warn, and error), set colors, log
+ * time spans, print diagnostic messages, and more.
+ *
+ * A Node.js-specific implementation of this interface is used when Stencil is
+ * building and compiling a project.
  */
 export interface Logger {
   enableColors: (useColors: boolean) => void;
@@ -1851,11 +2130,10 @@ export interface LoggerTimeSpan {
   finish(finishedMsg: string, color?: string, bold?: boolean, newLineSuffix?: boolean): number;
 }
 
-export interface OutputTargetDist extends OutputTargetBase {
+export interface OutputTargetDist extends OutputTargetValidationConfig {
   type: 'dist';
 
   buildDir?: string;
-  dir?: string;
 
   collectionDir?: string | null;
   /**
@@ -1863,7 +2141,7 @@ export interface OutputTargetDist extends OutputTargetBase {
    * a project's `tsconfig.json` to relative import paths in the compiled output's
    * `dist-collection` bundle if it is generated (i.e. `collectionDir` is set).
    *
-   * Paths will be left in aliased format if `false` or `undefined`.
+   * Paths will be left in aliased format if `false`.
    *
    * @example
    * // tsconfig.json
@@ -1881,6 +2159,14 @@ export interface OutputTargetDist extends OutputTargetBase {
   transformAliasedImportPathsInCollection?: boolean | null;
 
   typesDir?: string;
+
+  /**
+   * Provide a custom path for the ESM loader directory, containing files you can import
+   * in an initiation script within your application to register all your components for
+   * lazy loading.
+   *
+   * @default /dist/loader
+   */
   esmLoaderPath?: string;
   copy?: CopyTask[];
   polyfills?: boolean;
@@ -1888,7 +2174,7 @@ export interface OutputTargetDist extends OutputTargetBase {
   empty?: boolean;
 }
 
-export interface OutputTargetDistCollection extends OutputTargetBase {
+export interface OutputTargetDistCollection extends OutputTargetValidationConfig {
   type: 'dist-collection';
   empty?: boolean;
   dir: string;
@@ -1915,7 +2201,7 @@ export interface OutputTargetDistCollection extends OutputTargetBase {
   transformAliasedImportPaths?: boolean | null;
 }
 
-export interface OutputTargetDistTypes extends OutputTargetBase {
+export interface OutputTargetDistTypes extends OutputTargetValidationConfig {
   type: 'dist-types';
   dir: string;
   typesDir: string;
@@ -1971,8 +2257,17 @@ export interface OutputTargetHydrate extends OutputTargetBase {
 export interface OutputTargetCustom extends OutputTargetBase {
   type: 'custom';
   name: string;
+  /**
+   * Indicate when the output target should be executed.
+   *
+   * - `"onBuildOnly"`: Executed only when `stencil build` is called without `--watch`.
+   * - `"always"`: Executed on every build, including in `watch` mode.
+   *
+   * Defaults to "always".
+   */
+  taskShouldRun?: 'onBuildOnly' | 'always';
   validate?: (config: Config, diagnostics: Diagnostic[]) => void;
-  generator: (config: Config, compilerCtx: any, buildCtx: any, docs: any) => Promise<void>;
+  generator: (config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, docs: JsonDocs) => Promise<void>;
   copy?: CopyTask[];
 }
 
@@ -1998,6 +2293,11 @@ export interface OutputTargetDocsVscode extends OutputTargetBase {
 
 export interface OutputTargetDocsReadme extends OutputTargetBase {
   type: 'docs-readme';
+  /**
+   * The root directory where README files should be written
+   *
+   * defaults to {@link Config.srcDir}
+   */
   dir?: string;
   dependencies?: boolean;
   footer?: string;
@@ -2008,8 +2308,27 @@ export interface OutputTargetDocsJson extends OutputTargetBase {
   type: 'docs-json';
 
   file: string;
+  /**
+   * Set an optional file path where Stencil should write a `d.ts` file to disk
+   * at build-time containing type declarations for {@link JsonDocs} and related
+   * interfaces. If this is omitted or set to `null` Stencil will not write such
+   * a file.
+   */
   typesFile?: string | null;
   strict?: boolean;
+  /**
+   * An optional file path pointing to a public type library which should be
+   * included and documented in the same way as other types which are included
+   * in this output target.
+   *
+   * This could be useful if, for instance, there are some important interfaces
+   * used in a few places in a Stencil project which don't form part of the
+   * public API for any of the project's components. Such interfaces will not
+   * be included in the `docs-json` output by default, but if they're declared
+   * and exported from a 'supplemental' file designated with this property then
+   * they'll be included in the output, facilitating their documentation.
+   */
+  supplementalPublicTypes?: string;
 }
 
 export interface OutputTargetDocsCustom extends OutputTargetBase {
@@ -2030,34 +2349,58 @@ export interface OutputTargetBaseNext {
   dir?: string;
 }
 
-export interface OutputTargetDistCustomElements extends OutputTargetBaseNext {
+/**
+ * The collection of valid export behaviors.
+ * Used to generate a type for typed configs as well as output target validation
+ * for the `dist-custom-elements` output target.
+ *
+ * Adding a value to this const array will automatically add it as a valid option on the
+ * output target configuration for `customElementsExportBehavior`.
+ *
+ * - `default`: No additional export or definition behavior will happen.
+ * - `auto-define-custom-elements`: Enables the auto-definition of a component and its children (recursively) in the custom elements registry. This
+ * functionality allows consumers to bypass the explicit call to define a component, its children, its children's
+ * children, etc. Users of this flag should be aware that enabling this functionality may increase bundle size.
+ * - `bundle`: A `defineCustomElements` function will be exported from the distribution directory. This behavior was added to allow easy migration
+ * from `dist-custom-elements-bundle` to `dist-custom-elements`.
+ * - `single-export-module`: All components will be re-exported from the specified directory's root `index.js` file.
+ */
+export const CustomElementsExportBehaviorOptions = [
+  'default',
+  'auto-define-custom-elements',
+  'bundle',
+  'single-export-module',
+] as const;
+
+/**
+ * This type is auto-generated based on the values in `CustomElementsExportBehaviorOptions` array.
+ * This is used on the output target config for intellisense in typed configs.
+ */
+export type CustomElementsExportBehavior = (typeof CustomElementsExportBehaviorOptions)[number];
+
+export interface OutputTargetDistCustomElements extends OutputTargetValidationConfig {
   type: 'dist-custom-elements';
   empty?: boolean;
+  /**
+   * Triggers the following behaviors when enabled:
+   * 1. All `@stencil/core/*` module references are treated as external during bundling.
+   * 2. File names are not hashed.
+   * 3. File minification will follow the behavior defined at the root of the Stencil config.
+   */
   externalRuntime?: boolean;
   copy?: CopyTask[];
-  inlineDynamicImports?: boolean;
   includeGlobalScripts?: boolean;
   minify?: boolean;
-  /**
-   * Enables the auto-definition of a component and its children (recursively) in the custom elements registry. This
-   * functionality allows consumers to bypass the explicit call to define a component, its children, its children's
-   * children, etc. Users of this flag should be aware that enabling this functionality may increase bundle size.
-   */
-  autoDefineCustomElements?: boolean;
   /**
    * Enables the generation of type definition files for the output target.
    */
   generateTypeDeclarations?: boolean;
-}
-
-export interface OutputTargetDistCustomElementsBundle extends OutputTargetBaseNext {
-  type: 'dist-custom-elements-bundle';
-  empty?: boolean;
-  externalRuntime?: boolean;
-  copy?: CopyTask[];
-  inlineDynamicImports?: boolean;
-  includeGlobalScripts?: boolean;
-  minify?: boolean;
+  /**
+   * Define the export/definition behavior for the output target's generated output.
+   * This controls if/how custom elements will be defined or where components will be exported from.
+   * If omitted, no auto-definition behavior or re-exporting will happen.
+   */
+  customElementsExportBehavior?: CustomElementsExportBehavior;
 }
 
 /**
@@ -2070,17 +2413,21 @@ export interface OutputTargetBase {
   type: string;
 }
 
-export type OutputTargetBuild = OutputTargetDistCollection | OutputTargetDistLazy;
-
-export interface OutputTargetAngular extends OutputTargetBase {
-  type: 'angular';
-
-  componentCorePackage: string;
-  directivesProxyFile?: string;
-  directivesArrayFile?: string;
-  directivesUtilsFile?: string;
-  excludeComponents?: string[];
+/**
+ * Output targets that can have validation for common `package.json` field values
+ * (module, types, etc.). This allows them to be marked for validation in a project's Stencil config.
+ */
+interface OutputTargetValidationConfig extends OutputTargetBaseNext {
+  isPrimaryPackageOutputTarget?: boolean;
 }
+
+export type EligiblePrimaryPackageOutputTarget =
+  | OutputTargetDist
+  | OutputTargetDistCustomElements
+  | OutputTargetDistCollection
+  | OutputTargetDistTypes;
+
+export type OutputTargetBuild = OutputTargetDistCollection | OutputTargetDistLazy;
 
 export interface OutputTargetCopy extends OutputTargetBase {
   type: 'copy';
@@ -2165,22 +2512,20 @@ export interface OutputTargetWww extends OutputTargetBase {
 
   /**
    * Service worker config for production builds. During development builds
-   * service worker script will be injected to automatically unregister existing
+   * service worker script will be injected to automatically deregister existing
    * service workers. When set to `false` neither a service worker registration
-   * or unregistration will be added to the index.html.
+   * or deregistration will be added to the index.html.
    */
   serviceWorker?: ServiceWorkerConfig | null | false;
   appDir?: string;
 }
 
 export type OutputTarget =
-  | OutputTargetAngular
   | OutputTargetCopy
   | OutputTargetCustom
   | OutputTargetDist
   | OutputTargetDistCollection
   | OutputTargetDistCustomElements
-  | OutputTargetDistCustomElementsBundle
   | OutputTargetDistLazy
   | OutputTargetDistGlobalStyles
   | OutputTargetDistLazyLoader
@@ -2193,6 +2538,17 @@ export type OutputTarget =
   | OutputTargetStats
   | OutputTargetDistTypes;
 
+/**
+ * Our custom configuration interface for generated caching Service Workers
+ * using the Workbox library (see https://developer.chrome.com/docs/workbox/).
+ *
+ * Although we are using Workbox we are unfortunately unable to depend on the
+ * published types for the library because they must be compiled using the
+ * `webworker` lib for TypeScript, which cannot be used at the same time as
+ * the `dom` lib. So as a workaround we maintain our own interface here. See
+ * here to refer to the published version:
+ * https://github.com/DefinitelyTyped/DefinitelyTyped/blob/c7b4dadae5b320ad1311a8f82242b8f2f41b7b8c/types/workbox-build/generate-sw.d.ts#L3
+ */
 export interface ServiceWorkerConfig {
   // https://developers.google.com/web/tools/workbox/modules/workbox-build#full_generatesw_config
   unregister?: boolean;
@@ -2259,24 +2615,18 @@ export interface LoadConfigResults {
 }
 
 export interface Diagnostic {
-  level: 'error' | 'warn' | 'info' | 'log' | 'debug';
-  type: string;
+  absFilePath?: string | undefined;
+  code?: string;
+  columnNumber?: number | undefined;
+  debugText?: string;
   header?: string;
   language?: string;
+  level: 'error' | 'warn' | 'info' | 'log' | 'debug';
+  lineNumber?: number | undefined;
+  lines: PrintLine[];
   messageText: string;
-  debugText?: string;
-  code?: string;
-  absFilePath?: string;
-  relFilePath?: string;
-  lineNumber?: number;
-  columnNumber?: number;
-  lines?: {
-    lineIndex: number;
-    lineNumber: number;
-    text?: string;
-    errorCharStart: number;
-    errorLength?: number;
-  }[];
+  relFilePath?: string | undefined;
+  type: string;
 }
 
 export interface CacheStorage {
@@ -2309,9 +2659,9 @@ export interface ResolveModuleOptions {
 
 export interface PrerenderStartOptions {
   buildId?: string;
-  hydrateAppFilePath: string;
-  componentGraph: BuildResultsComponentGraph;
-  srcIndexHtmlPath: string;
+  hydrateAppFilePath?: string;
+  componentGraph?: BuildResultsComponentGraph;
+  srcIndexHtmlPath?: string;
 }
 
 export interface PrerenderResults {
@@ -2375,10 +2725,18 @@ export interface LazyRequire {
   getModulePath(fromDir: string, moduleId: string): string;
 }
 
+/**
+ * @deprecated This interface is no longer used by Stencil
+ * TODO(STENCIL-743): Remove this interface
+ */
 export interface FsWatcherItem {
   close(): void;
 }
 
+/**
+ * @deprecated This interface is no longer used by Stencil
+ * TODO(STENCIL-743): Remove this interface
+ */
 export interface MakeDirectoryOptions {
   /**
    * Indicates whether parent folders should be created.
@@ -2392,6 +2750,10 @@ export interface MakeDirectoryOptions {
   mode?: number;
 }
 
+/**
+ * @deprecated This interface is no longer used by Stencil
+ * TODO(STENCIL-743): Remove this interface
+ */
 export interface FsStats {
   isFile(): boolean;
   isDirectory(): boolean;
@@ -2448,6 +2810,9 @@ export interface CompilerRequestResponse {
   status: number;
 }
 
+/**
+ * Options for Stencil's string-to-string transpiler
+ */
 export interface TranspileOptions {
   /**
    * A component can be defined as a custom element by using `customelement`, or the
@@ -2524,6 +2889,11 @@ export interface TranspileOptions {
    * Passed in Stencil Compiler System, otherwise falls back to the internal in-memory only system.
    */
   sys?: CompilerSystem;
+  /**
+   * This option enables the same behavior as {@link Config.transformAliasedImportPaths}, transforming paths aliased in
+   * `tsconfig.json` to relative paths.
+   */
+  transformAliasedImportPaths?: boolean;
 }
 
 export type CompileTarget =

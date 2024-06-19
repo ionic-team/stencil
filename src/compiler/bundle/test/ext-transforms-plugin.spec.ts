@@ -33,7 +33,7 @@ describe('extTransformsPlugin', () => {
       compilerComponentMeta.sourceFilePath,
       mockModule({
         cmps: [compilerComponentMeta],
-      })
+      }),
     );
 
     const bundleOpts: BundleOptions = {
@@ -134,7 +134,7 @@ describe('extTransformsPlugin', () => {
           // @ts-ignore the Rollup plugins expect to be called in a Rollup context
           await plugin.transform('asdf', `/some/stubbed/path/foo.css?${queryParams}`);
           expect(transformCssToEsmSpy.mock.calls[0][0].commentOriginalSelector).toBe(false);
-        }
+        },
       );
     });
   });

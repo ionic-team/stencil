@@ -3,11 +3,9 @@ export { modeResolutionChain, styles } from './testing-constants';
 export { getHostRef, registerHost, registerInstance } from './testing-host-ref';
 export { consoleDevError, consoleDevInfo, consoleDevWarn, consoleError, setErrorHandler } from './testing-log';
 export {
-  Context,
   isMemberInElement,
   plt,
   registerComponents,
-  registerContext,
   registerModule,
   resetPlatform,
   setPlatformHelpers,

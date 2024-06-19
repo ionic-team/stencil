@@ -1,6 +1,7 @@
 name: Lint and Format Stencil (Check)
 
 on:
+  merge_group:
   workflow_call:
     # Make this a reusable workflow, no value needed
     # https://docs.github.com/en/actions/using-workflows/reusing-workflows
@@ -8,10 +9,10 @@ on:
 jobs:
   format:
     name: Check
-    runs-on: 'ubuntu-latest'
+    runs-on: 'ubuntu-22.04'
     steps:
       - name: Checkout Code
-        uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # v2.4.0
+        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
 
       - name: Get Core Dependencies
         uses: ./.github/workflows/actions/get-core-dependencies
@@ -22,3 +23,6 @@ jobs:
       - name: Prettier Check
         run: npm run prettier.dry-run
         shell: bash
+
+      - name: Spellcheck
+        run: npm run spellcheck

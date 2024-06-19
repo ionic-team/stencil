@@ -1,6 +1,6 @@
 import type * as d from '@stencil/core/declarations';
 import { mockConfig, mockLoadConfigInit } from '@stencil/core/testing';
-import { join, resolve } from 'path';
+import { join, resolve } from '@utils';
 
 import { validateConfig } from '../validate-config';
 
@@ -31,7 +31,7 @@ describe('validateDistCollectionOutputTarget', () => {
         empty: false,
         dir: defaultDir,
         collectionDir: null,
-        transformAliasedImportPaths: false,
+        transformAliasedImportPaths: true,
       },
     ]);
   });
@@ -53,7 +53,7 @@ describe('validateDistCollectionOutputTarget', () => {
         empty: false,
         dir: '/my-dist',
         collectionDir: null,
-        transformAliasedImportPaths: false,
+        transformAliasedImportPaths: true,
       },
     ]);
   });
@@ -82,7 +82,7 @@ describe('validateDistCollectionOutputTarget', () => {
             transformAliasedImportPaths,
           },
         ]);
-      }
+      },
     );
   });
 });

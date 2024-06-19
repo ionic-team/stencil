@@ -113,6 +113,36 @@ describe('setAccessor for custom elements', () => {
       expect(addEventSpy).toHaveBeenCalledWith('click', newValue, false);
       expect(removeEventSpy).not.toHaveBeenCalled();
     });
+
+    it('should add a capture style event listener', () => {
+      const addEventSpy = jest.spyOn(elm, 'addEventListener');
+      const removeEventSpy = jest.spyOn(elm, 'removeEventListener');
+
+      const newValue = () => {
+        /**/
+      };
+
+      setAccessor(elm, 'onClickCapture', undefined, newValue, false, 0);
+
+      expect(addEventSpy).toHaveBeenCalledWith('click', newValue, true);
+      expect(removeEventSpy).not.toHaveBeenCalled();
+    });
+
+    it('should remove a capture style event listener', () => {
+      const addEventSpy = jest.spyOn(elm, 'addEventListener');
+      const removeEventSpy = jest.spyOn(elm, 'removeEventListener');
+
+      const orgValue = () => {
+        /**/
+      };
+
+      setAccessor(elm, 'onClickCapture', undefined, orgValue, false, 0);
+      setAccessor(elm, 'onClickCapture', orgValue, undefined, false, 0);
+
+      expect(addEventSpy).toHaveBeenCalledTimes(1);
+      expect(addEventSpy).toHaveBeenCalledWith('click', orgValue, true);
+      expect(removeEventSpy).toHaveBeenCalledWith('click', orgValue, true);
+    });
   });
 
   it('should set object property to child', () => {
@@ -291,6 +321,13 @@ describe('setAccessor for custom elements', () => {
     setAccessor(elm, 'myprop', oldValue, newValue, false, 0);
     expect(elm.myprop).toBeUndefined();
     expect(elm).toEqualAttributes({ myprop: 'stringval' });
+  });
+
+  it('ignore when updating readonly properties', () => {
+    const readOnlyProp = 'namespaceURI';
+    const oldReadOnlyVal = 'http://www.w3.org/1999/xhtml';
+    setAccessor(elm, readOnlyProp, oldReadOnlyVal, 'foobar', false, 0);
+    expect(elm[readOnlyProp]).toBe(oldReadOnlyVal);
   });
 });
 
@@ -687,7 +724,7 @@ describe('setAccessor for standard html elements', () => {
               class2
        class3  `,
         false,
-        0
+        0,
       );
       expect(elm).toHaveClasses(['class1', 'class2', 'class3']);
     });
@@ -724,7 +761,7 @@ describe('setAccessor for standard html elements', () => {
            ion-color`,
         'icon2',
         false,
-        0
+        0,
       );
       expect(elm).toHaveClasses(['icon2']);
     });
@@ -775,7 +812,7 @@ describe('setAccessor for standard html elements', () => {
           marginRight: '55px',
         },
         false,
-        0
+        0,
       );
       expect(elm.style.cssText).toEqual('font-size: 12px; margin-right: 55px;');
 
@@ -791,7 +828,7 @@ describe('setAccessor for standard html elements', () => {
           'font-size': '20px',
         },
         false,
-        0
+        0,
       );
 
       expect(elm.style.cssText).toEqual('font-size: 20px;');
@@ -808,7 +845,7 @@ describe('setAccessor for standard html elements', () => {
         { color: 'blue', 'font-size': '12px', paddingLeft: '88px' },
         { color: 'blue', 'font-size': '12px', paddingLeft: '88px' },
         false,
-        0
+        0,
       );
       expect(elm.style.cssText).toEqual('');
 
@@ -827,7 +864,7 @@ describe('setAccessor for standard html elements', () => {
         { color: 'blue', padding: '20px', marginRight: '88px' },
         { color: 'blue', padding: '30px', marginRight: '55px' },
         false,
-        0
+        0,
       );
 
       expect(elm.style.cssText).toEqual('color: black; padding: 30px; margin-right: 55px;');

@@ -6,14 +6,14 @@ describe('url-paths', () => {
       "returns true for the http protocol '%s'",
       (url) => {
         expect(isRemoteUrl(url)).toBe(true);
-      }
+      },
     );
 
     it.each(['https://domain.com/file.txt', 'HTTPS://domain.com/file.txt'])(
       "returns true for the https protocol '%s'",
       (url) => {
         expect(isRemoteUrl(url)).toBe(true);
-      }
+      },
     );
 
     it.each(['C:/file.txt', 'C:\\file.txt', '/User/file.txt'])("returns false for file paths '%s'", (fileName) => {

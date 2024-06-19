@@ -1,4 +1,5 @@
-import { basename, join } from 'path';
+import { join } from '@utils';
+import { basename } from 'path';
 import type { RollupOutput } from 'rollup';
 
 import type * as d from '../../../declarations';
@@ -9,12 +10,12 @@ export const writeHydrateOutputs = (
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   outputTargets: d.OutputTargetHydrate[],
-  rollupOutput: RollupOutput
+  rollupOutput: RollupOutput,
 ) => {
   return Promise.all(
     outputTargets.map((outputTarget) => {
       return writeHydrateOutput(config, compilerCtx, buildCtx, outputTarget, rollupOutput);
-    })
+    }),
   );
 };
 
@@ -23,7 +24,7 @@ const writeHydrateOutput = async (
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   outputTarget: d.OutputTargetHydrate,
-  rollupOutput: RollupOutput
+  rollupOutput: RollupOutput,
 ) => {
   const hydratePackageName = await getHydratePackageName(config, compilerCtx);
 
@@ -37,7 +38,7 @@ const writeHydrateOutput = async (
     config,
     hydrateCoreIndexPath,
     hydrateCoreIndexDtsFilePath,
-    hydratePackageName
+    hydratePackageName,
   );
 
   await Promise.all([
@@ -55,7 +56,7 @@ const writeHydrateOutput = async (
         const filePath = join(hydrateAppDirPath, output.fileName);
         await compilerCtx.fs.writeFile(filePath, output.code, { immediateWrite: true });
       }
-    })
+    }),
   );
 };
 
@@ -63,7 +64,7 @@ const getHydratePackageJson = (
   config: d.ValidatedConfig,
   hydrateAppFilePath: string,
   hydrateDtsFilePath: string,
-  hydratePackageName: string
+  hydratePackageName: string,
 ) => {
   const pkg: d.PackageJsonData = {
     name: hydratePackageName,
@@ -88,7 +89,7 @@ const getHydratePackageName = async (config: d.ValidatedConfig, compilerCtx: d.C
 const copyHydrateRunnerDts = async (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
-  hydrateAppDirPath: string
+  hydrateAppDirPath: string,
 ) => {
   const packageDir = join(config.sys.getCompilerExecutingPath(), '..', '..');
   const srcHydrateDir = join(packageDir, 'internal', 'hydrate', 'runner.d.ts');

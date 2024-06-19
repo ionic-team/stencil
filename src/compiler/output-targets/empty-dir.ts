@@ -1,15 +1,14 @@
-import { isString } from '@utils';
-
-import type * as d from '../../declarations';
 import {
   isOutputTargetDist,
   isOutputTargetDistCustomElements,
-  isOutputTargetDistCustomElementsBundle,
   isOutputTargetDistLazy,
   isOutputTargetDistLazyLoader,
   isOutputTargetHydrate,
   isOutputTargetWww,
-} from './output-utils';
+  isString,
+} from '@utils';
+
+import type * as d from '../../declarations';
 
 type OutputTargetEmptiable =
   | d.OutputTargetDist
@@ -20,7 +19,6 @@ type OutputTargetEmptiable =
 const isEmptable = (o: d.OutputTarget): o is OutputTargetEmptiable =>
   isOutputTargetDist(o) ||
   isOutputTargetDistCustomElements(o) ||
-  isOutputTargetDistCustomElementsBundle(o) ||
   isOutputTargetWww(o) ||
   isOutputTargetDistLazy(o) ||
   isOutputTargetDistLazyLoader(o) ||
@@ -29,7 +27,7 @@ const isEmptable = (o: d.OutputTarget): o is OutputTargetEmptiable =>
 export const emptyOutputTargets = async (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
-  buildCtx: d.BuildCtx
+  buildCtx: d.BuildCtx,
 ) => {
   if (buildCtx.isRebuild) {
     return;

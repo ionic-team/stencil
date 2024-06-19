@@ -26,6 +26,21 @@ export function createRequestHandler(devServerConfig: d.DevServerConfig, serverC
           return serverCtx.serve302(req, res);
         }
 
+        if (devServerConfig.pingRoute !== null && req.pathname === devServerConfig.pingRoute) {
+          return serverCtx
+            .getBuildResults()
+            .then((result) => {
+              if (!result.hasSuccessfulBuild) {
+                return serverCtx.serve500(incomingReq, res, 'Build not successful', 'build error');
+              }
+
+              res.writeHead(200, 'OK');
+              res.write('OK');
+              res.end();
+            })
+            .catch(() => serverCtx.serve500(incomingReq, res, 'Error getting build results', 'ping error'));
+        }
+
         if (isDevClient(req.pathname) && devServerConfig.websocket) {
           return serveDevClient(devServerConfig, serverCtx, req, res);
         }
@@ -39,7 +54,7 @@ export function createRequestHandler(devServerConfig: d.DevServerConfig, serverC
             req,
             res,
             `invalid basePath`,
-            `404 File Not Found, base path: ${devServerConfig.basePath}`
+            `404 File Not Found, base path: ${devServerConfig.basePath}`,
           );
         }
 

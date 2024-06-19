@@ -38,7 +38,8 @@ export const setComponentBuildConditionals = (cmpMeta: d.ComponentCompilerMeta) 
     cmpMeta.hasListenerTarget = cmpMeta.listeners.some((l) => !!l.target);
   }
 
-  cmpMeta.hasMember = cmpMeta.hasProp || cmpMeta.hasState || cmpMeta.hasElement || cmpMeta.hasMethod;
+  cmpMeta.hasMember =
+    cmpMeta.hasProp || cmpMeta.hasState || cmpMeta.hasElement || cmpMeta.hasMethod || cmpMeta.formAssociated;
 
   cmpMeta.isUpdateable = cmpMeta.hasProp || cmpMeta.hasState;
   if (cmpMeta.styles.length > 0) {

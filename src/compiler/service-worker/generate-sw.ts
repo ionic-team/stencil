@@ -1,14 +1,13 @@
-import { buildWarn, catchError } from '@utils';
+import { buildWarn, catchError, isOutputTargetWww } from '@utils';
 import { basename } from 'path';
 
 import type * as d from '../../declarations';
-import { isOutputTargetWww } from '../output-targets/output-utils';
 
 export const generateServiceWorker = async (
   config: d.ValidatedConfig,
   buildCtx: d.BuildCtx,
   workbox: d.Workbox,
-  outputTarget: d.OutputTargetWww
+  outputTarget: d.OutputTargetWww,
 ): Promise<void[] | void> => {
   const serviceWorker = await getServiceWorker(outputTarget);
   if (serviceWorker.unregister) {

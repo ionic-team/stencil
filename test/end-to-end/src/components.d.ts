@@ -6,6 +6,7 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { CarData } from "./car-list/car-data";
+export { CarData } from "./car-list/car-data";
 export namespace Components {
     interface AppRoot {
     }
@@ -14,9 +15,18 @@ export namespace Components {
     interface CarDetail {
         "car": CarData;
     }
+    /**
+     * Component that helps display a list of cars
+     */
     interface CarList {
         "cars": CarData[];
         "selected": CarData;
+    }
+    interface CmpA {
+    }
+    interface CmpB {
+    }
+    interface CmpC {
     }
     interface DomApi {
     }
@@ -26,11 +36,28 @@ export namespace Components {
     }
     interface ElementCmp {
     }
+    interface EmptyCmp {
+    }
+    interface EmptyCmpShadow {
+    }
     interface EnvData {
     }
     interface EventCmp {
+        /**
+          * this is some method that fires an event with options
+          * @returns
+         */
         "methodThatFiresEventWithOptions": () => Promise<void>;
+        /**
+          * this is some method that fires a document event
+          * @returns
+         */
         "methodThatFiresMyDocumentEvent": () => Promise<void>;
+        /**
+          * this is some method that fires a window event
+          * @param value some value
+          * @returns
+         */
         "methodThatFiresMyWindowEvent": (value: number) => Promise<void>;
     }
     interface ImportAssets {
@@ -39,7 +66,17 @@ export namespace Components {
         "opened": boolean;
     }
     interface MethodCmp {
+        /**
+          * this is some method
+          * @returns some number
+         */
         "someMethod": () => Promise<number>;
+        /**
+          * this is some method with args
+          * @param unit some unit
+          * @param value some value
+          * @returns some string
+         */
         "someMethodWithArgs": (unit: string, value: number) => Promise<string>;
         "someProp": number;
     }
@@ -92,11 +129,43 @@ declare global {
         prototype: HTMLCarDetailElement;
         new (): HTMLCarDetailElement;
     };
+    interface HTMLCarListElementEventMap {
+        "carSelected": CarData;
+    }
+    /**
+     * Component that helps display a list of cars
+     */
     interface HTMLCarListElement extends Components.CarList, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLCarListElementEventMap>(type: K, listener: (this: HTMLCarListElement, ev: CarListCustomEvent<HTMLCarListElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLCarListElementEventMap>(type: K, listener: (this: HTMLCarListElement, ev: CarListCustomEvent<HTMLCarListElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
     var HTMLCarListElement: {
         prototype: HTMLCarListElement;
         new (): HTMLCarListElement;
+    };
+    interface HTMLCmpAElement extends Components.CmpA, HTMLStencilElement {
+    }
+    var HTMLCmpAElement: {
+        prototype: HTMLCmpAElement;
+        new (): HTMLCmpAElement;
+    };
+    interface HTMLCmpBElement extends Components.CmpB, HTMLStencilElement {
+    }
+    var HTMLCmpBElement: {
+        prototype: HTMLCmpBElement;
+        new (): HTMLCmpBElement;
+    };
+    interface HTMLCmpCElement extends Components.CmpC, HTMLStencilElement {
+    }
+    var HTMLCmpCElement: {
+        prototype: HTMLCmpCElement;
+        new (): HTMLCmpCElement;
     };
     interface HTMLDomApiElement extends Components.DomApi, HTMLStencilElement {
     }
@@ -122,13 +191,38 @@ declare global {
         prototype: HTMLElementCmpElement;
         new (): HTMLElementCmpElement;
     };
+    interface HTMLEmptyCmpElement extends Components.EmptyCmp, HTMLStencilElement {
+    }
+    var HTMLEmptyCmpElement: {
+        prototype: HTMLEmptyCmpElement;
+        new (): HTMLEmptyCmpElement;
+    };
+    interface HTMLEmptyCmpShadowElement extends Components.EmptyCmpShadow, HTMLStencilElement {
+    }
+    var HTMLEmptyCmpShadowElement: {
+        prototype: HTMLEmptyCmpShadowElement;
+        new (): HTMLEmptyCmpShadowElement;
+    };
     interface HTMLEnvDataElement extends Components.EnvData, HTMLStencilElement {
     }
     var HTMLEnvDataElement: {
         prototype: HTMLEnvDataElement;
         new (): HTMLEnvDataElement;
     };
+    interface HTMLEventCmpElementEventMap {
+        "myDocumentEvent": any;
+        "my-event-with-options": { mph: number };
+        "myWindowEvent": number;
+    }
     interface HTMLEventCmpElement extends Components.EventCmp, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLEventCmpElementEventMap>(type: K, listener: (this: HTMLEventCmpElement, ev: EventCmpCustomEvent<HTMLEventCmpElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLEventCmpElementEventMap>(type: K, listener: (this: HTMLEventCmpElement, ev: EventCmpCustomEvent<HTMLEventCmpElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
     var HTMLEventCmpElement: {
         prototype: HTMLEventCmpElement;
@@ -199,10 +293,15 @@ declare global {
         "build-data": HTMLBuildDataElement;
         "car-detail": HTMLCarDetailElement;
         "car-list": HTMLCarListElement;
+        "cmp-a": HTMLCmpAElement;
+        "cmp-b": HTMLCmpBElement;
+        "cmp-c": HTMLCmpCElement;
         "dom-api": HTMLDomApiElement;
         "dom-interaction": HTMLDomInteractionElement;
         "dom-visible": HTMLDomVisibleElement;
         "element-cmp": HTMLElementCmpElement;
+        "empty-cmp": HTMLEmptyCmpElement;
+        "empty-cmp-shadow": HTMLEmptyCmpShadowElement;
         "env-data": HTMLEnvDataElement;
         "event-cmp": HTMLEventCmpElement;
         "import-assets": HTMLImportAssetsElement;
@@ -225,10 +324,19 @@ declare namespace LocalJSX {
     interface CarDetail {
         "car"?: CarData;
     }
+    /**
+     * Component that helps display a list of cars
+     */
     interface CarList {
         "cars"?: CarData[];
         "onCarSelected"?: (event: CarListCustomEvent<CarData>) => void;
         "selected"?: CarData;
+    }
+    interface CmpA {
+    }
+    interface CmpB {
+    }
+    interface CmpC {
     }
     interface DomApi {
     }
@@ -237,6 +345,10 @@ declare namespace LocalJSX {
     interface DomVisible {
     }
     interface ElementCmp {
+    }
+    interface EmptyCmp {
+    }
+    interface EmptyCmpShadow {
     }
     interface EnvData {
     }
@@ -279,10 +391,15 @@ declare namespace LocalJSX {
         "build-data": BuildData;
         "car-detail": CarDetail;
         "car-list": CarList;
+        "cmp-a": CmpA;
+        "cmp-b": CmpB;
+        "cmp-c": CmpC;
         "dom-api": DomApi;
         "dom-interaction": DomInteraction;
         "dom-visible": DomVisible;
         "element-cmp": ElementCmp;
+        "empty-cmp": EmptyCmp;
+        "empty-cmp-shadow": EmptyCmpShadow;
         "env-data": EnvData;
         "event-cmp": EventCmp;
         "import-assets": ImportAssets;
@@ -304,11 +421,19 @@ declare module "@stencil/core" {
             "app-root": LocalJSX.AppRoot & JSXBase.HTMLAttributes<HTMLAppRootElement>;
             "build-data": LocalJSX.BuildData & JSXBase.HTMLAttributes<HTMLBuildDataElement>;
             "car-detail": LocalJSX.CarDetail & JSXBase.HTMLAttributes<HTMLCarDetailElement>;
+            /**
+             * Component that helps display a list of cars
+             */
             "car-list": LocalJSX.CarList & JSXBase.HTMLAttributes<HTMLCarListElement>;
+            "cmp-a": LocalJSX.CmpA & JSXBase.HTMLAttributes<HTMLCmpAElement>;
+            "cmp-b": LocalJSX.CmpB & JSXBase.HTMLAttributes<HTMLCmpBElement>;
+            "cmp-c": LocalJSX.CmpC & JSXBase.HTMLAttributes<HTMLCmpCElement>;
             "dom-api": LocalJSX.DomApi & JSXBase.HTMLAttributes<HTMLDomApiElement>;
             "dom-interaction": LocalJSX.DomInteraction & JSXBase.HTMLAttributes<HTMLDomInteractionElement>;
             "dom-visible": LocalJSX.DomVisible & JSXBase.HTMLAttributes<HTMLDomVisibleElement>;
             "element-cmp": LocalJSX.ElementCmp & JSXBase.HTMLAttributes<HTMLElementCmpElement>;
+            "empty-cmp": LocalJSX.EmptyCmp & JSXBase.HTMLAttributes<HTMLEmptyCmpElement>;
+            "empty-cmp-shadow": LocalJSX.EmptyCmpShadow & JSXBase.HTMLAttributes<HTMLEmptyCmpShadowElement>;
             "env-data": LocalJSX.EnvData & JSXBase.HTMLAttributes<HTMLEnvDataElement>;
             "event-cmp": LocalJSX.EventCmp & JSXBase.HTMLAttributes<HTMLEventCmpElement>;
             "import-assets": LocalJSX.ImportAssets & JSXBase.HTMLAttributes<HTMLImportAssetsElement>;

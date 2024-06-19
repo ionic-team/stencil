@@ -58,7 +58,7 @@ export const gatherVdomMeta = (m: d.Module | d.ComponentCompilerMeta, args: ts.N
               ...prop.initializer.text
                 .toLowerCase()
                 .split(' ')
-                .filter((part) => part.length > 0)
+                .filter((part) => part.length > 0),
             );
           }
           m.htmlAttrNames.push(attrName);

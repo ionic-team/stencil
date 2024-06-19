@@ -1,8 +1,9 @@
 import { catchError } from '@utils';
 
-import type * as d from '../../declarations';
+import * as d from '../../declarations';
 import { outputServiceWorkers } from '../output-targets/output-service-workers';
 import { validateBuildFiles } from './validate-files';
+import { writeExportMaps } from './write-export-maps';
 
 /**
  * Writes files to disk as a result of compilation
@@ -13,14 +14,14 @@ import { validateBuildFiles } from './validate-files';
 export const writeBuild = async (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
-  buildCtx: d.BuildCtx
+  buildCtx: d.BuildCtx,
 ): Promise<void> => {
   const timeSpan = buildCtx.createTimeSpan(`writeBuildFiles started`, true);
 
   let totalFilesWrote = 0;
 
   try {
-    // commit all the writeFiles, mkdirs, rmdirs and unlinks to disk
+    // commit all the `writeFile`, `mkdir`, `rmdir` and `unlink` operations to disk
     const commitResults = await compilerCtx.fs.commit();
 
     // get the results from the write to disk commit
@@ -32,7 +33,13 @@ export const writeBuild = async (
 
     // successful write
     // kick off writing the cached file stuff
+    await compilerCtx.cache.commit();
     buildCtx.debug(`in-memory-fs: ${compilerCtx.fs.getMemoryStats()}`);
+    buildCtx.debug(`cache: ${compilerCtx.cache.getMemoryStats()}`);
+
+    if (config.generateExportMaps) {
+      writeExportMaps(config, buildCtx);
+    }
 
     await outputServiceWorkers(config, buildCtx);
     await validateBuildFiles(config, compilerCtx, buildCtx);

@@ -26,7 +26,7 @@ export function initServerProcess(sendMsg: d.DevServerSendMessage) {
       devServerConfig.address,
       devServerConfig.port,
       devServerConfig.basePath,
-      '/'
+      '/',
     );
     devServerConfig.root = normalizePath(devServerConfig.root);
 
@@ -45,7 +45,7 @@ export function initServerProcess(sendMsg: d.DevServerSendMessage) {
         devServerConfig.address,
         devServerConfig.port,
         devServerConfig.basePath,
-        devServerConfig.initialLoadUrl || DEV_SERVER_INIT_URL
+        devServerConfig.initialLoadUrl || DEV_SERVER_INIT_URL,
       );
       openInBrowser({ url: initialLoadUrl });
     }
@@ -80,7 +80,7 @@ export function initServerProcess(sendMsg: d.DevServerSendMessage) {
             }
             resolve();
           });
-        })
+        }),
       );
     }
     Promise.all(promises).finally(() => {

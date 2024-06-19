@@ -1,6 +1,6 @@
 import ts from 'typescript';
 
-import { createStaticGetter } from '../transform-utils';
+import { createStaticGetter, retrieveTsDecorators, tsPropDeclNameAsString } from '../transform-utils';
 import { isDecoratorNamed } from './decorator-utils';
 
 /**
@@ -11,18 +11,20 @@ import { isDecoratorNamed } from './decorator-utils';
  * with which they can be replaced.
  *
  * @param decoratedProps TypeScript AST nodes representing class members
- * @param watchable set of names of fields which should be watched for changes
  * @param newMembers an out param containing new class members
+ * @param typeChecker a reference to the TypeScript type checker
+ * @param decoratorName the name of the decorator to look for
  */
 export const stateDecoratorsToStatic = (
   decoratedProps: ts.ClassElement[],
-  watchable: Set<string>,
-  newMembers: ts.ClassElement[]
+  newMembers: ts.ClassElement[],
+  typeChecker: ts.TypeChecker,
+  decoratorName: string,
 ) => {
   const states = decoratedProps
     .filter(ts.isPropertyDeclaration)
-    .map((prop) => stateDecoratorToStatic(prop, watchable))
-    .filter((state) => !!state);
+    .map((prop) => stateDecoratorToStatic(prop, typeChecker, decoratorName))
+    .filter((state): state is ts.PropertyAssignment => !!state);
 
   if (states.length > 0) {
     newMembers.push(createStaticGetter('states', ts.factory.createObjectLiteralExpression(states, true)));
@@ -38,20 +40,25 @@ export const stateDecoratorsToStatic = (
  * decorated with other decorators.
  *
  * @param prop A TypeScript AST node representing a class property declaration
- * @param watchable set of names of fields which should be watched for changes
+ * @param typeChecker a reference to the TypeScript type checker
+ * @param decoratorName the name of the decorator to look for
  * @returns a property assignment AST Node which maps the name of the state
  * prop to an empty object
  */
-const stateDecoratorToStatic = (prop: ts.PropertyDeclaration, watchable: Set<string>): ts.PropertyAssignment | null => {
-  const stateDecorator = prop.decorators.find(isDecoratorNamed('State'));
+const stateDecoratorToStatic = (
+  prop: ts.PropertyDeclaration,
+  typeChecker: ts.TypeChecker,
+  decoratorName: string,
+): ts.PropertyAssignment | null => {
+  const stateDecorator = retrieveTsDecorators(prop)?.find(isDecoratorNamed(decoratorName));
   if (stateDecorator == null) {
     return null;
   }
 
-  const stateName = prop.name.getText();
-  watchable.add(stateName);
+  const stateName = tsPropDeclNameAsString(prop, typeChecker);
+
   return ts.factory.createPropertyAssignment(
     ts.factory.createStringLiteral(stateName),
-    ts.factory.createObjectLiteralExpression([], true)
+    ts.factory.createObjectLiteralExpression([], true),
   );
 };

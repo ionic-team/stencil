@@ -1,8 +1,7 @@
-import { validateComponentTag } from '@utils';
+import { normalizePath, validateComponentTag } from '@utils';
+import { join, parse, relative } from 'path';
 
-import { IS_NODE_ENV } from '../compiler/sys/environment';
 import type { ValidatedConfig } from '../declarations';
-import type { CoreCompiler } from './load-compiler';
 
 /**
  * Task to generate component boilerplate and write it to disk. This task can
@@ -10,18 +9,10 @@ import type { CoreCompiler } from './load-compiler';
  * being called in an inappropriate place, being asked to overwrite files that
  * already exist, etc.
  *
- * @param coreCompiler the CoreCompiler we're using currently, here we're
- * mainly accessing the `path` module
  * @param config the user-supplied config, which we need here to access `.sys`.
+ * @returns a void promise
  */
-export const taskGenerate = async (coreCompiler: CoreCompiler, config: ValidatedConfig): Promise<void> => {
-  if (!IS_NODE_ENV) {
-    config.logger.error(`"generate" command is currently only implemented for a NodeJS environment`);
-    return config.sys.exit(1);
-  }
-
-  const path = coreCompiler.path;
-
+export const taskGenerate = async (config: ValidatedConfig): Promise<void> => {
   if (!config.configPath) {
     config.logger.error('Please run this command in your root directory (i. e. the one containing stencil.config.ts).');
     return config.sys.exit(1);
@@ -40,31 +31,41 @@ export const taskGenerate = async (coreCompiler: CoreCompiler, config: Validated
     config.flags.unknownArgs.find((arg) => !arg.startsWith('-')) ||
     ((await prompt({ name: 'tagName', type: 'text', message: 'Component tag name (dash-case):' })).tagName as string);
 
-  const { dir, base: componentName } = path.parse(input);
+  if (undefined === input) {
+    // in some shells (e.g. Windows PowerShell), hitting Ctrl+C results in a TypeError printed to the console.
+    // explicitly return here to avoid printing the error message.
+    return;
+  }
+  const { dir, base: componentName } = parse(input);
 
   const tagError = validateComponentTag(componentName);
   if (tagError) {
     config.logger.error(tagError);
     return config.sys.exit(1);
   }
-
-  const extensionsToGenerate: GenerableExtension[] = ['tsx', ...(await chooseFilesToGenerate())];
+  const filesToGenerateExt = await chooseFilesToGenerate();
+  if (undefined === filesToGenerateExt) {
+    // in some shells (e.g. Windows PowerShell), hitting Ctrl+C results in a TypeError printed to the console.
+    // explicitly return here to avoid printing the error message.
+    return;
+  }
+  const extensionsToGenerate: GenerableExtension[] = ['tsx', ...filesToGenerateExt];
 
   const testFolder = extensionsToGenerate.some(isTest) ? 'test' : '';
 
-  const outDir = path.join(absoluteSrcDir, 'components', dir, componentName);
-  await config.sys.createDir(path.join(outDir, testFolder), { recursive: true });
+  const outDir = join(absoluteSrcDir, 'components', dir, componentName);
+  await config.sys.createDir(normalizePath(join(outDir, testFolder)), { recursive: true });
 
   const filesToGenerate: readonly BoilerplateFile[] = extensionsToGenerate.map((extension) => ({
     extension,
-    path: getFilepathForFile(coreCompiler, outDir, componentName, extension),
+    path: getFilepathForFile(outDir, componentName, extension),
   }));
   await checkForOverwrite(filesToGenerate, config);
 
   const writtenFiles = await Promise.all(
     filesToGenerate.map((file) =>
-      getBoilerplateAndWriteFile(config, componentName, extensionsToGenerate.includes('css'), file)
-    )
+      getBoilerplateAndWriteFile(config, componentName, extensionsToGenerate.includes('css'), file),
+    ),
   ).catch((error) => config.logger.error(error));
 
   if (!writtenFiles) {
@@ -81,7 +82,7 @@ export const taskGenerate = async (coreCompiler: CoreCompiler, config: Validated
   console.log(config.logger.bold('The following files have been generated:'));
 
   const absoluteRootDir = config.rootDir;
-  writtenFiles.map((file) => console.log(`  - ${path.relative(absoluteRootDir, file)}`));
+  writtenFiles.map((file) => console.log(`  - ${relative(absoluteRootDir, file)}`));
 };
 
 /**
@@ -112,22 +113,16 @@ const chooseFilesToGenerate = async (): Promise<ReadonlyArray<GenerableExtension
  * The filepath for a given file depends on the path, the user-supplied
  * component name, the extension, and whether we're inside of a test directory.
  *
- * @param coreCompiler  the compiler we're using, here to acces the `.path` module
- * @param path          path to where we're going to generate the component
+ * @param filePath      path to where we're going to generate the component
  * @param componentName the user-supplied name for the generated component
  * @param extension     the file extension
  * @returns the full filepath to the component (with a possible `test` directory
  * added)
  */
-const getFilepathForFile = (
-  coreCompiler: CoreCompiler,
-  path: string,
-  componentName: string,
-  extension: GenerableExtension
-): string =>
+const getFilepathForFile = (filePath: string, componentName: string, extension: GenerableExtension): string =>
   isTest(extension)
-    ? coreCompiler.path.join(path, 'test', `${componentName}.${extension}`)
-    : coreCompiler.path.join(path, `${componentName}.${extension}`);
+    ? normalizePath(join(filePath, 'test', `${componentName}.${extension}`))
+    : normalizePath(join(filePath, `${componentName}.${extension}`));
 
 /**
  * Get the boilerplate for a file and write it to disk
@@ -143,10 +138,10 @@ const getBoilerplateAndWriteFile = async (
   config: ValidatedConfig,
   componentName: string,
   withCss: boolean,
-  file: BoilerplateFile
+  file: BoilerplateFile,
 ): Promise<string> => {
   const boilerplate = getBoilerplateByExtension(componentName, file.extension, withCss);
-  await config.sys.writeFile(file.path, boilerplate);
+  await config.sys.writeFile(normalizePath(file.path), boilerplate);
   return file.path;
 };
 
@@ -170,13 +165,13 @@ const checkForOverwrite = async (files: readonly BoilerplateFile[], config: Vali
       if ((await config.sys.readFile(path)) !== undefined) {
         alreadyPresent.push(path);
       }
-    })
+    }),
   );
 
   if (alreadyPresent.length > 0) {
     config.logger.error(
       'Generating code would overwrite the following files:',
-      ...alreadyPresent.map((path) => '\t' + path)
+      ...alreadyPresent.map((path) => '\t' + normalizePath(path)),
     );
     await config.sys.exit(1);
   }

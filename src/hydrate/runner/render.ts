@@ -108,7 +108,7 @@ function render(
   win: Window & typeof globalThis,
   opts: HydrateFactoryOptions,
   results: HydrateResults,
-  resolve: (results: HydrateResults) => void
+  resolve: (results: HydrateResults) => void,
 ) {
   if (!(process as any).__stencilErrors) {
     (process as any).__stencilErrors = true;
@@ -143,7 +143,7 @@ function afterHydrate(
   win: Window,
   opts: HydrateFactoryOptions,
   results: HydrateResults,
-  resolve: (results: HydrateResults) => void
+  resolve: (results: HydrateResults) => void,
 ) {
   if (typeof opts.afterHydrate === 'function') {
     try {
@@ -169,7 +169,7 @@ function finalizeHydrate(
   doc: Document,
   opts: HydrateFactoryOptions,
   results: HydrateResults,
-  resolve: (results: HydrateResults) => void
+  resolve: (results: HydrateResults) => void,
 ) {
   try {
     inspectElement(results, doc.documentElement, 0);

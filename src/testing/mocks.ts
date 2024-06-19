@@ -1,14 +1,5 @@
 import { createWorkerContext } from '@stencil/core/compiler';
-import type {
-  BuildCtx,
-  Cache,
-  CompilerCtx,
-  Config,
-  LoadConfigInit,
-  Module,
-  UnvalidatedConfig,
-  ValidatedConfig,
-} from '@stencil/core/internal';
+import type * as d from '@stencil/core/internal';
 import { MockWindow } from '@stencil/core/mock-doc';
 import { noop } from '@utils';
 import path from 'path';
@@ -28,17 +19,40 @@ import { createTestingSystem, TestingSystem } from './testing-sys';
  * provided by this function.
  * @returns the mock Stencil configuration
  */
-export function mockValidatedConfig(overrides: Partial<ValidatedConfig> = {}): ValidatedConfig {
+export function mockValidatedConfig(overrides: Partial<d.ValidatedConfig> = {}): d.ValidatedConfig {
   const baseConfig = mockConfig(overrides);
+  const rootDir = path.resolve('/');
 
   return {
     ...baseConfig,
+    buildEs5: false,
+    cacheDir: '.stencil',
+    devMode: true,
+    devServer: {},
+    extras: {},
     flags: createConfigFlags(),
+    fsNamespace: 'testing',
+    hashFileNames: false,
+    hashedFileNameLength: 8,
+    hydratedFlag: null,
+    logLevel: 'info',
     logger: mockLogger(),
+    minifyCss: false,
+    minifyJs: false,
+    namespace: 'Testing',
     outputTargets: baseConfig.outputTargets ?? [],
-    rootDir: path.resolve('/'),
+    packageJsonFilePath: path.join(rootDir, 'package.json'),
+    rootDir,
+    srcDir: '/src',
+    srcIndexHtml: 'src/index.html',
     sys: createTestingSystem(),
     testing: {},
+    transformAliasedImportPaths: true,
+    rollupConfig: {
+      inputOptions: {},
+      outputOptions: {},
+    },
+    validatePrimaryPackageOutputTarget: false,
     ...overrides,
   };
 }
@@ -50,7 +64,7 @@ export function mockValidatedConfig(overrides: Partial<ValidatedConfig> = {}): V
  * provided by this function.
  * @returns the mock Stencil configuration
  */
-export function mockConfig(overrides: Partial<UnvalidatedConfig> = {}): UnvalidatedConfig {
+export function mockConfig(overrides: Partial<d.UnvalidatedConfig> = {}): d.UnvalidatedConfig {
   const rootDir = path.resolve('/');
 
   let { sys } = overrides;
@@ -77,6 +91,8 @@ export function mockConfig(overrides: Partial<UnvalidatedConfig> = {}): Unvalida
     minifyJs: false,
     namespace: 'Testing',
     nodeResolve: {
+      // TODO(STENCIL-1107): Remove this field - it's currently overriding Stencil's default options to pass into
+      // the `@rollup/plugin-node-resolve` plugin.
       customResolveOptions: {},
     },
     outputTargets: null,
@@ -103,8 +119,8 @@ export function mockConfig(overrides: Partial<UnvalidatedConfig> = {}): Unvalida
  * @param overrides the properties on the default entity to manually override
  * @returns the default configuration initialization object, with any overrides applied
  */
-export const mockLoadConfigInit = (overrides?: Partial<LoadConfigInit>): LoadConfigInit => {
-  const defaults: LoadConfigInit = {
+export const mockLoadConfigInit = (overrides?: Partial<d.LoadConfigInit>): d.LoadConfigInit => {
+  const defaults: d.LoadConfigInit = {
     config: {},
     configPath: undefined,
     initTsConfig: true,
@@ -115,11 +131,9 @@ export const mockLoadConfigInit = (overrides?: Partial<LoadConfigInit>): LoadCon
   return { ...defaults, ...overrides };
 };
 
-export function mockCompilerCtx(config?: Config) {
-  if (!config) {
-    config = mockConfig();
-  }
-  const compilerCtx: CompilerCtx = {
+export function mockCompilerCtx(config?: d.ValidatedConfig) {
+  const innerConfig = config || mockValidatedConfig();
+  const compilerCtx: d.CompilerCtx = {
     version: 1,
     activeBuildId: 0,
     activeDirsAdded: [],
@@ -150,13 +164,13 @@ export function mockCompilerCtx(config?: Config) {
     rollupCacheLazy: null,
     rollupCacheNative: null,
     styleModeNames: new Set(),
-    worker: createWorkerContext(config.sys),
+    worker: createWorkerContext(innerConfig.sys),
   };
 
   Object.defineProperty(compilerCtx, 'fs', {
     get() {
       if (this._fs == null) {
-        this._fs = createInMemoryFs(config.sys);
+        this._fs = createInMemoryFs(innerConfig.sys);
       }
       return this._fs;
     },
@@ -165,7 +179,7 @@ export function mockCompilerCtx(config?: Config) {
   Object.defineProperty(compilerCtx, 'cache', {
     get() {
       if (this._cache == null) {
-        this._cache = mockCache(config, compilerCtx);
+        this._cache = mockCache(innerConfig, compilerCtx);
       }
       return this._cache;
     },
@@ -174,29 +188,19 @@ export function mockCompilerCtx(config?: Config) {
   return compilerCtx;
 }
 
-export function mockBuildCtx(config?: Config, compilerCtx?: CompilerCtx): BuildCtx {
-  if (!config) {
-    config = mockConfig();
-  }
-  if (!compilerCtx) {
-    compilerCtx = mockCompilerCtx(config);
-  }
-  const buildCtx = new BuildContext(config, compilerCtx);
+export function mockBuildCtx(config?: d.ValidatedConfig, compilerCtx?: d.CompilerCtx): d.BuildCtx {
+  const validatedConfig = config || mockValidatedConfig();
+  const validatedCompilerCtx = compilerCtx || mockCompilerCtx(validatedConfig);
 
-  return buildCtx as BuildCtx;
+  const buildCtx = new BuildContext(validatedConfig, validatedCompilerCtx);
+  return buildCtx as d.BuildCtx;
 }
 
-export function mockCache(config?: Config, compilerCtx?: CompilerCtx) {
-  if (!config) {
-    config = mockConfig();
-  }
-  if (!compilerCtx) {
-    compilerCtx = mockCompilerCtx(config);
-  }
+function mockCache(config: d.ValidatedConfig, compilerCtx: d.CompilerCtx) {
   config.enableCache = true;
   const cache = new CompilerCache(config, compilerCtx.fs);
   cache.initCacheDir();
-  return cache as Cache;
+  return cache as d.Cache;
 }
 
 export function mockLogger() {
@@ -204,11 +208,11 @@ export function mockLogger() {
 }
 
 /**
- * Create a {@link CompilerSystem} entity for testing the compiler.
+ * Create a {@link d.CompilerSystem} entity for testing the compiler.
  *
  * This function acts as a thin wrapper around a {@link TestingSystem} entity creation. It exists to provide a logical
  * place in the codebase where we might expect Stencil engineers to reach for when attempting to mock a
- * {@link CompilerSystem} base type. Should there prove to be usage of both this function and the one it wraps,
+ * {@link d.CompilerSystem} base type. Should there prove to be usage of both this function and the one it wraps,
  * reconsider if this wrapper is necessary.
  *
  * @returns a System instance for testing purposes.
@@ -217,12 +221,12 @@ export function mockCompilerSystem(): TestingSystem {
   return createTestingSystem();
 }
 
-export function mockDocument(html: string = null) {
+export function mockDocument(html: string | null = null) {
   const win = new MockWindow(html);
   return win.document as Document;
 }
 
-export function mockWindow(html: string = null) {
+export function mockWindow(html?: string) {
   const win = new MockWindow(html);
   return win as any as Window;
 }
@@ -235,9 +239,10 @@ export function mockWindow(html: string = null) {
  * @param mod is an override module that you can supply to set particular values
  * @returns a module object ready to use in tests!
  */
-export const mockModule = (mod: Partial<Module> = {}): Module => ({
+export const mockModule = (mod: Partial<d.Module> = {}): d.Module => ({
   cmps: [],
   coreRuntimeApis: [],
+  outputTargetCoreRuntimeApis: {},
   collectionName: '',
   dtsFilePath: '',
   excludeFromCollection: false,

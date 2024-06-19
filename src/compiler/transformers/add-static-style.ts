@@ -1,10 +1,10 @@
 import { dashToPascalCase, DEFAULT_STYLE_MODE } from '@utils';
+import { scopeCss } from '@utils/shadow-css';
 import ts from 'typescript';
 
 import type * as d from '../../declarations';
-import { scopeCss } from '../../utils/shadow-css';
 import { getScopeId } from '../style/scope-css';
-import { createStaticGetter } from './transform-utils';
+import { createStaticGetter, getExternalStyles } from './transform-utils';
 
 /**
  * Adds static "style" getter within the class
@@ -21,7 +21,7 @@ import { createStaticGetter } from './transform-utils';
 export const addStaticStyleGetterWithinClass = (
   classMembers: ts.ClassElement[],
   cmp: d.ComponentCompilerMeta,
-  commentOriginalSelector: boolean
+  commentOriginalSelector: boolean,
 ): void => {
   const styleLiteral = getStyleLiteral(cmp, commentOriginalSelector);
   if (styleLiteral) {
@@ -46,8 +46,8 @@ export const addStaticStylePropertyToClass = (styleStatements: ts.Statement[], c
     const statement = ts.factory.createExpressionStatement(
       ts.factory.createAssignment(
         ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier(cmp.componentClassName), 'style'),
-        styleLiteral
-      )
+        styleLiteral,
+      ),
     );
     styleStatements.push(statement);
   }
@@ -69,17 +69,30 @@ const getStyleLiteral = (cmp: d.ComponentCompilerMeta, commentOriginalSelector: 
 const getMultipleModeStyle = (
   cmp: d.ComponentCompilerMeta,
   styles: d.StyleCompiler[],
-  commentOriginalSelector: boolean
+  commentOriginalSelector: boolean,
 ) => {
   const styleModes: ts.ObjectLiteralElementLike[] = [];
 
   styles.forEach((style) => {
+    /**
+     * the order of these if statements must match with
+     * - {@link src/compiler/transformers/component-native/native-static-style.ts#addSingleStyleGetter}
+     * - {@link src/compiler/transformers/component-native/native-static-style.ts#addMultipleModeStyleGetter}
+     * - {@link src/compiler/transformers/add-static-style.ts#getMultipleModeStyle}
+     */
     if (typeof style.styleStr === 'string') {
       // inline the style string
       // static get style() { return { ios: "string" }; }
       const styleLiteral = createStyleLiteral(cmp, style, commentOriginalSelector);
       const propStr = ts.factory.createPropertyAssignment(style.modeName, styleLiteral);
       styleModes.push(propStr);
+    } else if (Array.isArray(style.externalStyles) && style.externalStyles.length > 0) {
+      // import generated from @Component() styleUrls option
+      // import myTagIosStyle from './import-path.css';
+      // static get style() { return { ios: myTagIosStyle }; }
+      const styleUrlIdentifier = createStyleIdentifier(cmp, style);
+      const propUrlIdentifier = ts.factory.createPropertyAssignment(style.modeName, styleUrlIdentifier);
+      styleModes.push(propUrlIdentifier);
     } else if (typeof style.styleIdentifier === 'string') {
       // direct import already written in the source code
       // import myTagIosStyle from './import-path.css';
@@ -87,13 +100,6 @@ const getMultipleModeStyle = (
       const styleIdentifier = ts.factory.createIdentifier(style.styleIdentifier);
       const propIdentifier = ts.factory.createPropertyAssignment(style.modeName, styleIdentifier);
       styleModes.push(propIdentifier);
-    } else if (Array.isArray(style.externalStyles) && style.externalStyles.length > 0) {
-      // import generated from @Component() styleUrls option
-      // import myTagIosStyle from './import-path.css';
-      // static get style() { return { ios: myTagIosStyle }; }
-      const styleUrlIdentifier = createStyleIdentifierFromUrl(cmp, style);
-      const propUrlIdentifier = ts.factory.createPropertyAssignment(style.modeName, styleUrlIdentifier);
-      styleModes.push(propUrlIdentifier);
     }
   });
 
@@ -101,10 +107,23 @@ const getMultipleModeStyle = (
 };
 
 const getSingleStyle = (cmp: d.ComponentCompilerMeta, style: d.StyleCompiler, commentOriginalSelector: boolean) => {
+  /**
+   * the order of these if statements must match with
+   * - {@link src/compiler/transformers/component-native/native-static-style.ts#addSingleStyleGetter}
+   * - {@link src/compiler/transformers/component-native/native-static-style.ts#addMultipleModeStyleGetter}
+   * - {@link src/compiler/transformers/add-static-style.ts#getSingleStyle}
+   */
   if (typeof style.styleStr === 'string') {
     // inline the style string
     // static get style() { return "string"; }
     return createStyleLiteral(cmp, style, commentOriginalSelector);
+  }
+
+  if (Array.isArray(style.externalStyles) && style.externalStyles.length > 0) {
+    // import generated from @Component() styleUrls option
+    // import myTagStyle from './import-path.css';
+    // static get style() { return myTagStyle; }
+    return createStyleIdentifier(cmp, style);
   }
 
   if (typeof style.styleIdentifier === 'string') {
@@ -112,13 +131,6 @@ const getSingleStyle = (cmp: d.ComponentCompilerMeta, style: d.StyleCompiler, co
     // import myTagStyle from './import-path.css';
     // static get style() { return myTagStyle; }
     return ts.factory.createIdentifier(style.styleIdentifier);
-  }
-
-  if (Array.isArray(style.externalStyles) && style.externalStyles.length > 0) {
-    // import generated from @Component() styleUrls option
-    // import myTagStyle from './import-path.css';
-    // static get style() { return myTagStyle; }
-    return createStyleIdentifierFromUrl(cmp, style);
   }
 
   return null;
@@ -134,16 +146,75 @@ const createStyleLiteral = (cmp: d.ComponentCompilerMeta, style: d.StyleCompiler
   return ts.factory.createStringLiteral(style.styleStr);
 };
 
-const createStyleIdentifierFromUrl = (cmp: d.ComponentCompilerMeta, style: d.StyleCompiler) => {
-  style.styleIdentifier = dashToPascalCase(cmp.tagName);
-  style.styleIdentifier = style.styleIdentifier.charAt(0).toLowerCase() + style.styleIdentifier.substring(1);
-
+/**
+ * Helper method to create a style identifier for a component. The method
+ * ensures that duplicate styles are removed and that the order of the styles is
+ * preserved. It also ensures that the style identifier is unique.
+ *
+ * @param cmp the metadata associated with the component being evaluated
+ * @param style style meta data
+ * @returns an assignment expression to be applied to the `style` property of a component class (e.g. `_myComponentCssStyle + _myComponentIosCssStyle` based on the example)
+ */
+export const createStyleIdentifier = (cmp: d.ComponentCompilerMeta, style: d.StyleCompiler) => {
+  const externalStyles = getExternalStyles(style);
+  /**
+   * Set a styleIdentifier which will be propagated to the component and
+   * later picked up by rollup when it injects the parsed CSS directly into
+   * the component, see `compilerCtx.worker.transformCssToEsm` in
+   * `src/compiler/bundle/ext-transforms-plugin.ts`
+   */
+  style.styleIdentifier = dashToPascalCase(cmp.tagName.charAt(0).toLowerCase() + cmp.tagName.substring(1));
   if (style.modeName !== DEFAULT_STYLE_MODE) {
     style.styleIdentifier += dashToPascalCase(style.modeName);
   }
-
   style.styleIdentifier += 'Style';
-  style.externalStyles = [style.externalStyles[0]];
+  return createIdentifierFromStyleIdentifier(style.styleIdentifier, Object.keys(externalStyles));
+};
 
-  return ts.factory.createIdentifier(style.styleIdentifier);
+/**
+ * Creates an expression to be assigned to the `style` property of a component class. For example
+ * given the following component:
+ *
+ * ```ts
+ * @Component({
+ *  styleUrls: ['my-component.css', 'my-component.ios.css']
+ *  tag: 'cmp',
+ * })
+ * export class MyComponent {
+ *   // ...
+ * }
+ * ```
+ *
+ * it would generate the following expression:
+ *
+ * ```ts
+ * import MyComponentStyle0 from './my-component.css';
+ * import MyComponentStyle1 from './my-component.ios.css';
+ * export class MyComponent {
+ *   // ...
+ * }
+ * MyComponent.style = MyComponentStyle0 + MyComponentStyle1;
+ * ```
+ *
+ * Note: style imports are made in [`createEsmStyleImport`](src/compiler/transformers/style-imports.ts).
+ *
+ * @param styleIdentifier identifier to be used for the style
+ * @param externalStyleIds numeric ids of the external styles
+ * @returns an assignment expression to be applied to the `style` property of a component class (e.g. `_myComponentCssStyle + _myComponentIosCssStyle` based on the example)
+ */
+const createIdentifierFromStyleIdentifier = (
+  styleIdentifier: string,
+  externalStyleIds: string[],
+): ts.Identifier | ts.BinaryExpression => {
+  const id = externalStyleIds[0];
+
+  if (externalStyleIds.length === 1) {
+    return ts.factory.createIdentifier(styleIdentifier + id);
+  }
+
+  return ts.factory.createBinaryExpression(
+    createIdentifierFromStyleIdentifier(styleIdentifier, [id]),
+    ts.SyntaxKind.PlusToken,
+    createIdentifierFromStyleIdentifier(styleIdentifier, externalStyleIds.slice(1)),
+  );
 };

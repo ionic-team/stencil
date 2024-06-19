@@ -1,7 +1,7 @@
 import type * as d from '../../declarations';
 import { caughtErrors } from './testing-constants';
 
-let customError: d.ErrorHandler;
+let customError: d.ErrorHandler | undefined;
 const LOG_LEVELS: string[] = ['warn', 'error'];
 
 const defaultConsoleError = (e: any) => {
@@ -28,7 +28,7 @@ export const consoleDevInfo = (..._: any[]) => {
   /* noop for testing */
 };
 
-export const setErrorHandler = (handler: d.ErrorHandler) => (customError = handler);
+export const setErrorHandler = (handler: d.ErrorHandler | undefined) => (customError = handler);
 
 function allowLog(log: string): boolean {
   return LOG_LEVELS.indexOf(log) >= LOG_LEVELS.indexOf(process.env.__STENCIL_TEST_LOGLEVEL ?? 'error');

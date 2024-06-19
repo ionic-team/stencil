@@ -1,5 +1,5 @@
-import { noop, normalizePath } from '@utils';
-import { basename, dirname, extname, join } from 'path';
+import { join, noop, normalizePath } from '@utils';
+import { basename, dirname, extname } from 'path';
 
 import type * as d from '../../declarations';
 import { buildEvents } from '../events';
@@ -62,7 +62,17 @@ export class CompilerContext implements d.CompilerCtx {
   }
 }
 
-export const getModuleLegacy = (_config: d.Config, compilerCtx: d.CompilerCtx, sourceFilePath: string) => {
+/**
+ * Get a {@link d.Module} from the current compiler context which corresponds
+ * to a supplied source file path. If a module record corresponding to the
+ * supplied path is not yet allocated, create one, save it in the compiler
+ * context, and then return the module record.
+ *
+ * @param compilerCtx the current compiler context
+ * @param sourceFilePath the path for which we want a module record
+ * @returns a module record corresponding to the supplied source file path
+ */
+export const getModuleLegacy = (compilerCtx: d.CompilerCtx, sourceFilePath: string): d.Module => {
   sourceFilePath = normalizePath(sourceFilePath);
 
   const moduleFile = compilerCtx.moduleMap.get(sourceFilePath);
@@ -79,6 +89,7 @@ export const getModuleLegacy = (_config: d.Config, compilerCtx: d.CompilerCtx, s
       jsFilePath: jsFilePath,
       cmps: [],
       coreRuntimeApis: [],
+      outputTargetCoreRuntimeApis: {},
       collectionName: null,
       dtsFilePath: null,
       excludeFromCollection: false,
@@ -113,6 +124,12 @@ export const getModuleLegacy = (_config: d.Config, compilerCtx: d.CompilerCtx, s
   }
 };
 
+/**
+ * Reset a module record, mutating the supplied object to reset values to
+ * defaults.
+ *
+ * @param moduleFile the module record to reset
+ */
 export const resetModuleLegacy = (moduleFile: d.Module) => {
   moduleFile.cmps.length = 0;
   moduleFile.coreRuntimeApis.length = 0;

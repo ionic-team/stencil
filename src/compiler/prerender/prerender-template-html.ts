@@ -11,14 +11,14 @@ import {
 } from './prerender-optimize';
 
 export const generateTemplateHtml = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   prerenderConfig: d.PrerenderConfig,
   diagnostics: d.Diagnostic[],
   isDebug: boolean,
   srcIndexHtmlPath: string,
   outputTarget: d.OutputTargetWww,
   hydrateOpts: d.PrerenderHydrateOptions,
-  manager: d.PrerenderManager
+  manager: d.PrerenderManager,
 ) => {
   try {
     if (!isString(srcIndexHtmlPath)) {
@@ -42,7 +42,7 @@ export const generateTemplateHtml = async (
     let staticSite = false;
 
     if (prerenderConfig.staticSite) {
-      // purposely do not want any clientside JS
+      // purposely do not want any client-side JS
       // go through the document and remove only stencil's scripts
       removeStencilScripts(doc);
       staticSite = true;

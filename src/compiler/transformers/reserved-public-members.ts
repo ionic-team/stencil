@@ -18,7 +18,7 @@ export const validatePublicName = (
   memberName: string,
   decorator: string,
   memberType: string,
-  node: ts.Node
+  node: ts.Node,
 ): void => {
   if (RESERVED_PUBLIC_MEMBERS.has(memberName.toLowerCase())) {
     const warn = buildWarn(diagnostics);

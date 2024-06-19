@@ -1,5 +1,5 @@
-import { buildError, normalizePath } from '@utils';
-import { basename, dirname, isAbsolute, join } from 'path';
+import { buildError, join, normalizePath } from '@utils';
+import { basename, dirname, isAbsolute } from 'path';
 
 import type * as d from '../../declarations';
 import { parseStyleDocs } from '../docs/style-docs';
@@ -21,13 +21,13 @@ import { stripCssComments } from './style-utils';
  * @returns an object with concatenated styleText and imports
  */
 export const parseCssImports = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   srcFilePath: string,
   resolvedFilePath: string,
   styleText: string,
-  styleDocs?: d.StyleDoc[]
+  styleDocs?: d.StyleDoc[],
 ): Promise<ParseCSSReturn> => {
   const isCssEntry = resolvedFilePath.toLowerCase().endsWith('.css');
   const allCssImports: string[] = [];
@@ -58,7 +58,7 @@ export const parseCssImports = async (
   async function resolveAndFlattenImports(
     srcFilePath: string,
     resolvedFilePath: string,
-    styleText: string
+    styleText: string,
   ): Promise<string> {
     // if we've seen this path before we early return
     if (resolvedFilePaths.has(resolvedFilePath)) {
@@ -93,7 +93,7 @@ export const parseCssImports = async (
           cssImportData.styleText = await resolveAndFlattenImports(
             cssImportData.filePath,
             cssImportData.filePath,
-            cssImportData.styleText
+            cssImportData.styleText,
           );
         } else {
           // we had some error loading the file from disk, so write a diagnostic
@@ -101,7 +101,7 @@ export const parseCssImports = async (
           err.messageText = `Unable to read css import: ${cssImportData.srcImport}`;
           err.absFilePath = srcFilePath;
         }
-      })
+      }),
     );
 
     // replace import statements with the actual CSS code in children modules
@@ -158,11 +158,11 @@ const loadStyleText = async (compilerCtx: d.CompilerCtx, cssImportData: d.CssImp
  * @returns a Promise wrapping a list of CSS import data objects
  */
 export const getCssImports = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   filePath: string,
-  styleText: string
+  styleText: string,
 ) => {
   const imports: d.CssImportData[] = [];
 
@@ -226,11 +226,11 @@ export const getCssImports = async (
 export const isCssNodeModule = (url: string) => url.startsWith('~');
 
 export const resolveCssNodeModule = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   diagnostics: d.Diagnostic[],
   filePath: string,
-  cssImportData: d.CssImportData
+  cssImportData: d.CssImportData,
 ) => {
   try {
     const m = getModuleId(cssImportData.url);

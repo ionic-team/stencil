@@ -1,13 +1,11 @@
-import { mockLoadConfigInit } from '@stencil/core/testing';
-import path from 'path';
+import { mockCompilerSystem, mockLoadConfigInit } from '@stencil/core/testing';
+import ts from 'typescript';
 
-import { createSystem } from '../../../compiler/sys/stencil-sys';
 import type * as d from '../../../declarations';
 import { loadConfig } from '../load-config';
 
 describe('stencil config - sourceMap option', () => {
   const configPath = require.resolve('./fixtures/stencil.config.ts');
-  const fixturesPath = path.dirname(configPath);
   let sys: d.CompilerSystem;
 
   /**
@@ -19,7 +17,7 @@ describe('stencil config - sourceMap option', () => {
    */
   const getLoadConfigForTests = (overrides?: Partial<d.LoadConfigInit>): d.LoadConfigInit => {
     const defaults: d.LoadConfigInit = {
-      configPath: configPath,
+      configPath,
       sys,
       config: {},
       initTsConfig: true,
@@ -28,14 +26,36 @@ describe('stencil config - sourceMap option', () => {
     return mockLoadConfigInit({ ...defaults, ...overrides });
   };
 
+  /**
+   * Test helper for mocking the {@link ts.getParsedCommandLineOfConfigFile} function. This function returns the appropriate
+   * `options` object based on the `sourceMap` argument.
+   *
+   * @param sourceMap The `sourceMap` option from the Stencil config.
+   */
+  const mockTsConfigParser = (sourceMap: boolean) => {
+    jest.spyOn(ts, 'getParsedCommandLineOfConfigFile').mockReturnValue({
+      options: {
+        target: ts.ScriptTarget.ES2017,
+        module: ts.ModuleKind.ESNext,
+        sourceMap,
+        inlineSources: sourceMap,
+      },
+      fileNames: [],
+      errors: [],
+    });
+  };
+
   beforeEach(() => {
-    sys = createSystem();
-    sys.writeFileSync(configPath, ``);
-    sys.createDirSync(fixturesPath);
+    sys = mockCompilerSystem();
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
   it('sets sourceMap options to true in tsconfig', async () => {
     const testConfig = getLoadConfigForTests({ config: { sourceMap: true } });
+    mockTsConfigParser(testConfig.config!.sourceMap!);
 
     const loadConfigResults = await loadConfig(testConfig);
 
@@ -46,6 +66,7 @@ describe('stencil config - sourceMap option', () => {
 
   it('sets sourceMap options to false in tsconfig', async () => {
     const testConfig = getLoadConfigForTests({ config: { sourceMap: false } });
+    mockTsConfigParser(testConfig.config!.sourceMap!);
 
     const loadConfigResults = await loadConfig(testConfig);
 
@@ -54,13 +75,14 @@ describe('stencil config - sourceMap option', () => {
     expect(inlineSources).toBe(false);
   });
 
-  it('sets the sourceMap options to false in tsconfig by default', async () => {
+  it('sets the sourceMap options to true in tsconfig by default', async () => {
     const testConfig = getLoadConfigForTests();
+    mockTsConfigParser(testConfig.config!.sourceMap!);
 
     const loadConfigResults = await loadConfig(testConfig);
 
     const { sourceMap, inlineSources } = loadConfigResults.config.tsCompilerOptions;
-    expect(sourceMap).toBe(false);
-    expect(inlineSources).toBe(false);
+    expect(sourceMap).toBe(true);
+    expect(inlineSources).toBe(true);
   });
 });

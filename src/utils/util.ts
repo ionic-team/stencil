@@ -2,7 +2,23 @@ import type * as d from '../declarations';
 import { dashToPascalCase, isString, toDashCase } from './helpers';
 import { buildError } from './message-utils';
 
-export const createJsVarName = (fileName: string) => {
+/**
+ * A set of JSDoc tags which should be excluded from JSDoc comments
+ * included in output typedefs.
+ */
+const SUPPRESSED_JSDOC_TAGS: ReadonlyArray<string> = ['virtualProp', 'slot', 'part', 'internal'];
+
+/**
+ * Create a stylistically-appropriate JS variable name from a filename
+ *
+ * If the filename has any of the special characters "?", "#", "&" and "=" it
+ * will take the string before the left-most instance of one of those
+ * characters.
+ *
+ * @param fileName the filename which serves as starting material
+ * @returns a JS variable name based on the filename
+ */
+export const createJsVarName = (fileName: string): string => {
   if (isString(fileName)) {
     fileName = fileName.split('?')[0];
     fileName = fileName.split('#')[0];
@@ -44,7 +60,7 @@ export const isDtsFile = (filePath: string): boolean => {
  * @param config the Stencil configuration file
  * @returns the generated preamble
  */
-export const generatePreamble = (config: d.Config): string => {
+export const generatePreamble = (config: d.ValidatedConfig): string => {
   const { preamble } = config;
 
   if (!preamble) {
@@ -73,16 +89,61 @@ ${docs.tags
 }
 
 /**
+ * Adds a doc block to a string
+ * @param str the string to add a doc block to
+ * @param docs the compiled JS docs
+ * @param indentation number of spaces to indent the block with
+ * @returns the doc block
+ */
+export function addDocBlock(str: string, docs?: d.CompilerJsDoc, indentation: number = 0): string {
+  if (!docs) {
+    return str;
+  }
+
+  return [formatDocBlock(docs, indentation), str].filter(Boolean).join(`\n`);
+}
+
+/**
+ * Formats the given compiled docs to a JavaScript doc block
+ * @param docs the compiled JS docs
+ * @param indentation number of spaces to indent the block with
+ * @returns the formatted doc block
+ */
+function formatDocBlock(docs: d.CompilerJsDoc, indentation: number = 0): string {
+  const textDocs = getDocBlockLines(docs);
+  if (!textDocs.filter(Boolean).length) {
+    return '';
+  }
+
+  const spaces = new Array(indentation + 1).join(' ');
+
+  return [spaces + '/**', ...textDocs.map((line) => spaces + ` * ${line}`), spaces + ' */'].join(`\n`);
+}
+
+/**
+ * Get all lines which are part of the doc block
+ *
+ * @param docs the compiled JS docs
+ * @returns list of lines part of the doc block
+ */
+function getDocBlockLines(docs: d.CompilerJsDoc): string[] {
+  return [
+    ...docs.text.split(lineBreakRegex),
+    ...docs.tags
+      .filter((tag) => !SUPPRESSED_JSDOC_TAGS.includes(tag.name))
+      .map((tag) => `@${tag.name} ${tag.text || ''}`.split(lineBreakRegex)),
+  ]
+    .flat()
+    .filter(Boolean);
+}
+
+/**
  * Retrieve a project's dependencies from the current build context
  * @param buildCtx the current build context to query for a specific package
  * @returns a list of package names the project is dependent on
  */
-const getDependencies = (buildCtx: d.BuildCtx): ReadonlyArray<string> => {
-  if (buildCtx.packageJson != null && buildCtx.packageJson.dependencies != null) {
-    return Object.keys(buildCtx.packageJson.dependencies).filter((pkgName) => !SKIP_DEPS.includes(pkgName));
-  }
-  return [];
-};
+const getDependencies = (buildCtx: d.BuildCtx): ReadonlyArray<string> =>
+  Object.keys(buildCtx?.packageJson?.dependencies ?? {}).filter((pkgName) => !SKIP_DEPS.includes(pkgName));
 
 /**
  * Utility to determine whether a project has a dependency on a package
@@ -93,8 +154,6 @@ const getDependencies = (buildCtx: d.BuildCtx): ReadonlyArray<string> => {
 export const hasDependency = (buildCtx: d.BuildCtx, depName: string): boolean => {
   return getDependencies(buildCtx).includes(depName);
 };
-
-export const getDynamicImportFunction = (namespace: string) => `__sc_import_${namespace.replace(/\s|-/g, '_')}`;
 
 export const readPackageJson = async (config: d.ValidatedConfig, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   try {
@@ -171,5 +230,5 @@ const SKIP_DEPS = ['@stencil/core'];
  */
 export const readOnlyArrayHasStringMember = <T extends string>(
   readOnlyArray: ReadonlyArray<T>,
-  maybeMember: T | string
-): boolean => readOnlyArray.includes(maybeMember as typeof readOnlyArray[number]);
+  maybeMember: T | string,
+): maybeMember is T => readOnlyArray.includes(maybeMember as (typeof readOnlyArray)[number]);

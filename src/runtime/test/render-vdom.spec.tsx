@@ -15,11 +15,11 @@ describe('render-vdom', () => {
 
       const { build } = await newSpecPage({ components: [CmpA], strictBuild: true });
       expect(build).toMatchObject({
-        vdomAttribute: false,
+        vdomAttribute: true,
         vdomXlink: false,
         vdomClass: false,
         vdomStyle: false,
-        vdomKey: false,
+        vdomKey: true,
         vdomRef: false,
         vdomListener: false,
         vdomFunctional: false,
@@ -38,11 +38,11 @@ describe('render-vdom', () => {
 
       const { build } = await newSpecPage({ components: [CmpA], strictBuild: true });
       expect(build).toMatchObject({
-        vdomAttribute: false,
+        vdomAttribute: true,
         vdomXlink: false,
         vdomClass: false,
         vdomStyle: false,
-        vdomKey: false,
+        vdomKey: true,
         vdomRef: false,
         vdomListener: false,
         vdomFunctional: false,
@@ -61,11 +61,11 @@ describe('render-vdom', () => {
 
       const { build } = await newSpecPage({ components: [CmpA], strictBuild: true });
       expect(build).toMatchObject({
-        vdomAttribute: false,
+        vdomAttribute: true,
         vdomXlink: false,
         vdomClass: false,
         vdomStyle: false,
-        vdomKey: false,
+        vdomKey: true,
         vdomRef: false,
         vdomListener: false,
         vdomFunctional: false,
@@ -84,11 +84,11 @@ describe('render-vdom', () => {
 
       const { build } = await newSpecPage({ components: [CmpA], strictBuild: true });
       expect(build).toMatchObject({
-        vdomAttribute: false,
+        vdomAttribute: true,
         vdomXlink: false,
         vdomClass: false,
         vdomStyle: false,
-        vdomKey: false,
+        vdomKey: true,
         vdomRef: false,
         vdomListener: false,
         vdomFunctional: false,
@@ -110,7 +110,7 @@ describe('render-vdom', () => {
         vdomXlink: false,
         vdomClass: true,
         vdomStyle: false,
-        vdomKey: false,
+        vdomKey: true,
         vdomRef: false,
         vdomListener: false,
         vdomFunctional: false,
@@ -132,7 +132,7 @@ describe('render-vdom', () => {
         vdomXlink: false,
         vdomClass: false,
         vdomStyle: true,
-        vdomKey: false,
+        vdomKey: true,
         vdomRef: false,
         vdomListener: false,
         vdomFunctional: false,
@@ -182,7 +182,7 @@ describe('render-vdom', () => {
         vdomXlink: false,
         vdomClass: false,
         vdomStyle: false,
-        vdomKey: false,
+        vdomKey: true,
         vdomRef: true,
         vdomListener: false,
         vdomFunctional: false,
@@ -210,7 +210,7 @@ describe('render-vdom', () => {
         vdomXlink: false,
         vdomClass: false,
         vdomStyle: false,
-        vdomKey: false,
+        vdomKey: true,
         vdomRef: false,
         vdomListener: true,
         vdomFunctional: false,
@@ -238,7 +238,7 @@ describe('render-vdom', () => {
         vdomXlink: false,
         vdomClass: false,
         vdomStyle: false,
-        vdomKey: false,
+        vdomKey: true,
         vdomRef: false,
         vdomListener: true,
         vdomFunctional: false,
@@ -337,7 +337,7 @@ describe('render-vdom', () => {
         vdomXlink: false,
         vdomClass: false,
         vdomStyle: false,
-        vdomKey: false,
+        vdomKey: true,
         vdomRef: false,
         vdomListener: false,
         vdomFunctional: false,
@@ -406,7 +406,7 @@ describe('render-vdom', () => {
       newSpecPage({
         components: [CmpA],
         html: `<cmp-a></cmp-a>`,
-      })
+      }),
     );
 
     expect(root).toEqualHtml(`
@@ -434,7 +434,7 @@ describe('render-vdom', () => {
       newSpecPage({
         components: [CmpA],
         html: `<cmp-a></cmp-a>`,
-      })
+      }),
     );
 
     expect(root).toEqualHtml(`
@@ -1073,8 +1073,10 @@ describe('render-vdom', () => {
       @Component({ tag: 'cmp-a' })
       class CmpA {
         counter = 0;
-        setRef = () => {
-          this.counter++;
+        setRef = (el: HTMLDivElement | null) => {
+          if (el !== null) {
+            this.counter++;
+          }
         };
         @Prop() state = true;
 

@@ -176,17 +176,17 @@ describe('listen', () => {
     a.dispatchEvent(
       new CustomEvent('event', {
         detail: getEventDetail(),
-      })
+      }),
     );
     a.dispatchEvent(
       new CustomEvent('event', {
         detail: getEventDetail(),
-      })
+      }),
     );
     a.dispatchEvent(
       new CustomEvent('event', {
         detail: getEventDetail(),
-      })
+      }),
     );
 
     await Promise.resolve();
@@ -195,7 +195,7 @@ describe('listen', () => {
 
     await waitForChanges();
     expect(log).toEqual(
-      `connectedCallback event0 event1 event2 event3 event4 event5 componentWillLoad event6 componentDidLoad `
+      `connectedCallback event0 event1 event2 event3 event4 event5 componentWillLoad event6 componentDidLoad `,
     );
     expect(a).toEqualHtml(`<cmp-a>1 7</cmp-a>`);
     await waitForChanges();

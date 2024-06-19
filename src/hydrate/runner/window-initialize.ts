@@ -8,7 +8,7 @@ export function initializeWindow(
   win: Window & typeof globalThis,
   doc: Document,
   opts: d.HydrateDocumentOptions,
-  results: d.HydrateResults
+  results: d.HydrateResults,
 ) {
   try {
     win.location.href = opts.url;

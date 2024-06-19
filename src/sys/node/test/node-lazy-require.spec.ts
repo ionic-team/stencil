@@ -43,7 +43,7 @@ describe('node-lazy-require', () => {
           readFSMock.mockReturnValue(mockPackageJson(testVersion));
           const diagnostics = await nodeLazyRequire.ensure('.', ['jest']);
           expect(diagnostics.length).toBe(0);
-        }
+        },
       );
 
       it.each(['2.0.7', '10.10.10', '36.0.1', '38.0.2', '38.5.17'])(
@@ -53,7 +53,7 @@ describe('node-lazy-require', () => {
           readFSMock.mockReturnValue(mockPackageJson(testVersion));
           const diagnostics = await nodeLazyRequire.ensure('.', ['jest']);
           expect(diagnostics.length).toBe(0);
-        }
+        },
       );
 
       it.each(['38', undefined])('should error w/ installed version too low and maxVersion=%p', async (maxVersion) => {
@@ -80,7 +80,7 @@ describe('node-lazy-require', () => {
             header: 'Please install supported versions of dev dependencies with either npm or yarn.',
             messageText: `npm install --save-dev jest@${range.jest.recommendedVersion}`,
           });
-        }
+        },
       );
     });
   });

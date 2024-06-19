@@ -1,5 +1,5 @@
 import { buildError, catchError, flatOne, isGlob, normalizePath } from '@utils';
-import glob from 'glob';
+import { glob } from 'glob';
 import path from 'path';
 
 import type * as d from '../../declarations';
@@ -90,7 +90,7 @@ async function processCopyTask(results: d.CopyResults, allCopyTasks: d.CopyTask[
     // get the stats for this src to see if it's a directory or not
     const stats = await stat(copyTask.src);
     if (stats.isDirectory()) {
-      // still a directory, keep diggin down
+      // still a directory, keep digging down
       if (!results.dirPaths.includes(copyTask.dest)) {
         results.dirPaths.push(copyTask.dest);
       }
@@ -127,7 +127,7 @@ async function processCopyTaskDirectory(results: d.CopyResults, allCopyTasks: d.
         };
 
         await processCopyTask(results, allCopyTasks, subCopyTask);
-      })
+      }),
     );
   } catch (e: any) {
     catchError(results.diagnostics, e);
@@ -177,14 +177,5 @@ function shouldIgnore(filePath: string) {
 const IGNORE = ['.ds_store', '.gitignore', 'desktop.ini', 'thumbs.db'];
 
 export function asyncGlob(pattern: string, opts: any) {
-  return new Promise<string[]>((resolve, reject) => {
-    const g: typeof glob = (glob as any).glob;
-    g(pattern, opts, (err: any, files: string[]) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(files);
-      }
-    });
-  });
+  return glob(pattern, opts);
 }

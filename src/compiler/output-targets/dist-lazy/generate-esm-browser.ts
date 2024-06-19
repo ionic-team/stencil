@@ -1,4 +1,4 @@
-import { generatePreamble, getDynamicImportFunction } from '@utils';
+import { generatePreamble } from '@utils';
 import type { OutputOptions, RollupBuild } from 'rollup';
 
 import type * as d from '../../../declarations';
@@ -10,7 +10,7 @@ export const generateEsmBrowser = async (
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   rollupBuild: RollupBuild,
-  outputTargets: d.OutputTargetDistLazy[]
+  outputTargets: d.OutputTargetDistLazy[],
 ): Promise<d.UpdatedLazyBuildCtx> => {
   const esmOutputs = outputTargets.filter((o) => !!o.esmDir && !!o.isBrowserBuild);
   if (esmOutputs.length) {
@@ -24,14 +24,13 @@ export const generateEsmBrowser = async (
       preferConst: true,
       sourcemap: config.sourceMap,
     };
-    if (config.extras.dynamicImportShim) {
-      // for Edge 16-18
-      esmOpts.dynamicImportFunction = getDynamicImportFunction(config.fsNamespace);
-    }
+
     const output = await generateRollupOutput(rollupBuild, esmOpts, config, buildCtx.entryModules);
 
     if (output != null) {
-      const es2017destinations = esmOutputs.map((o) => o.esmDir);
+      const es2017destinations = esmOutputs
+        .map((o) => o.esmDir)
+        .filter((esmDir): esmDir is string => typeof esmDir === 'string');
       buildCtx.esmBrowserComponentBundle = await generateLazyModules(
         config,
         compilerCtx,
@@ -41,7 +40,7 @@ export const generateEsmBrowser = async (
         output,
         'es2017',
         true,
-        ''
+        '',
       );
     }
   }
