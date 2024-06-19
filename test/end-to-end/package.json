@@ -33,5 +33,8 @@
     "rollup-plugin-node-builtins": "^2.1.2",
     "video.js": "^7.10.2",
     "why-is-node-running": "^2.2.0"
+  },
+  "volta": {
+    "extends": "../../package.json"
   }
 }

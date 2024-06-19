@@ -1,4 +1,10 @@
+import { catchError, isFunction, isPromise, isRootPath, join, normalizePath } from '@utils';
+import { dirname } from 'path';
+
 import type * as d from '../../declarations';
+import { crawlAnchorsForNextUrls } from './crawl-urls';
+import { getPrerenderConfig } from './prerender-config';
+import { getHydrateOptions } from './prerender-hydrate-options';
 import {
   addModulePreloads,
   excludeStaticComponents,
@@ -8,13 +14,7 @@ import {
   removeModulePreloads,
   removeStencilScripts,
 } from './prerender-optimize';
-import { catchError, isPromise, isRootPath, normalizePath, isFunction } from '@utils';
-import { crawlAnchorsForNextUrls } from './crawl-urls';
 import { getPrerenderCtx, PrerenderContext } from './prerender-worker-ctx';
-import { getHydrateOptions } from './prerender-hydrate-options';
-import { getPrerenderConfig } from './prerender-config';
-import { requireFunc } from '../sys/environment';
-import { dirname, join } from 'path';
 
 export const prerenderWorker = async (sys: d.CompilerSystem, prerenderRequest: d.PrerenderUrlRequest) => {
   // worker thread!
@@ -32,7 +32,7 @@ export const prerenderWorker = async (sys: d.CompilerSystem, prerenderRequest: d
     const componentGraph = getComponentGraph(sys, prerenderCtx, prerenderRequest.componentGraphPath);
 
     // webpack work-around/hack
-    const hydrateApp = requireFunc(prerenderRequest.hydrateAppFilePath);
+    const hydrateApp = require(prerenderRequest.hydrateAppFilePath);
 
     if (prerenderCtx.templateHtml == null) {
       // cache template html in this process
@@ -74,7 +74,7 @@ export const prerenderWorker = async (sys: d.CompilerSystem, prerenderRequest: d
         if (isPromise(rtn)) {
           await rtn;
         }
-      } catch (e) {
+      } catch (e: any) {
         catchError(results.diagnostics, e);
       }
     }
@@ -90,7 +90,7 @@ export const prerenderWorker = async (sys: d.CompilerSystem, prerenderRequest: d
         if (typeof userWriteToFilePath === 'string') {
           results.filePath = userWriteToFilePath;
         }
-      } catch (e) {
+      } catch (e: any) {
         catchError(results.diagnostics, e);
       }
     }
@@ -125,9 +125,9 @@ export const prerenderWorker = async (sys: d.CompilerSystem, prerenderRequest: d
     if (hydrateOpts.hashAssets && !prerenderRequest.isDebug) {
       try {
         docPromises.push(
-          hashAssets(sys, prerenderCtx, results.diagnostics, hydrateOpts, prerenderRequest.appDir, doc, url)
+          hashAssets(sys, prerenderCtx, results.diagnostics, hydrateOpts, prerenderRequest.appDir, doc, url),
         );
-      } catch (e) {
+      } catch (e: any) {
         catchError(results.diagnostics, e);
       }
     }
@@ -142,7 +142,7 @@ export const prerenderWorker = async (sys: d.CompilerSystem, prerenderRequest: d
         results.diagnostics,
         baseUrl,
         url,
-        hydrateResults.anchors
+        hydrateResults.anchors,
       );
     }
 
@@ -152,7 +152,7 @@ export const prerenderWorker = async (sys: d.CompilerSystem, prerenderRequest: d
         if (isPromise(rtn)) {
           await rtn;
         }
-      } catch (e) {
+      } catch (e: any) {
         catchError(results.diagnostics, e);
       }
     }
@@ -188,7 +188,7 @@ export const prerenderWorker = async (sys: d.CompilerSystem, prerenderRequest: d
             const contentFilePath = join(pageDir, contentFileName);
             await sys.writeFile(contentFilePath, s.content);
           }
-        })
+        }),
       );
     }
 
@@ -197,7 +197,7 @@ export const prerenderWorker = async (sys: d.CompilerSystem, prerenderRequest: d
     try {
       win.close();
     } catch (e) {}
-  } catch (e) {
+  } catch (e: any) {
     // ahh man! what happened!
     catchError(results.diagnostics, e);
   }

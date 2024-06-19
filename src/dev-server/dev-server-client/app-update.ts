@@ -2,12 +2,12 @@ import type * as d from '../../declarations';
 import {
   appError,
   clearAppErrorModal,
+  emitBuildStatus,
   hmrWindow,
   logBuild,
   logDiagnostic,
   logReload,
   logWarn,
-  emitBuildStatus,
   onBuildResults,
 } from '../client';
 import { OPEN_IN_EDITOR_URL } from '../dev-server-constants';
@@ -65,7 +65,7 @@ const appUpdate = (win: d.DevClientWindow, config: d.DevClientConfig, buildResul
       // then let's refresh the page from the root of the server
       appReset(win, config, () => {
         logReload(`Initial load`);
-        win.location.reload(true);
+        win.location.reload();
       });
       return;
     }
@@ -111,7 +111,7 @@ const appHmr = (win: Window, hmr: d.HotModuleReplacement) => {
   }
 
   if (shouldWindowReload) {
-    win.location.reload(true);
+    win.location.reload();
     return;
   }
 
@@ -119,7 +119,7 @@ const appHmr = (win: Window, hmr: d.HotModuleReplacement) => {
 
   if (results.updatedComponents.length > 0) {
     logBuild(
-      `Updated component${results.updatedComponents.length > 1 ? 's' : ''}: ${results.updatedComponents.join(', ')}`
+      `Updated component${results.updatedComponents.length > 1 ? 's' : ''}: ${results.updatedComponents.join(', ')}`,
     );
   }
 

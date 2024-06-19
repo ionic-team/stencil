@@ -1,12 +1,13 @@
+import { join, normalizePath, relative } from '@utils';
+import { dirname } from 'path';
+
 import type * as d from '../../../declarations';
-import { dirname, join, relative } from 'path';
-import { normalizePath } from '@utils';
 
 export const getComponentAssetsCopyTasks = (
-  config: d.Config,
+  config: d.ValidatedConfig,
   buildCtx: d.BuildCtx,
   dest: string,
-  collectionsPath: boolean
+  collectionsPath: boolean,
 ) => {
   if (!dest) {
     return [];
@@ -50,7 +51,7 @@ export const getComponentAssetsCopyTasks = (
 export const canSkipAssetsCopy = (
   compilerCtx: d.CompilerCtx,
   entryModules: d.EntryModule[],
-  filesChanged: string[]
+  filesChanged: string[],
 ) => {
   if (!compilerCtx.hasSuccessfulBuild) {
     // always copy assets if we haven't had a successful build yet

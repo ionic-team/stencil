@@ -1,12 +1,16 @@
-import type * as d from '../declarations';
 import type { SourceMap as RollupSourceMap } from 'rollup';
+
+import type * as d from '../declarations';
 
 /**
  * Converts a rollup provided source map to one that Stencil can easily understand
  * @param rollupSourceMap the sourcemap to transform
  * @returns the transformed sourcemap
  */
-export const rollupToStencilSourceMap = (rollupSourceMap: RollupSourceMap | undefined): d.SourceMap => {
+export function rollupToStencilSourceMap(rollupSourceMap: null): null;
+export function rollupToStencilSourceMap(rollupSourceMap: undefined): null;
+export function rollupToStencilSourceMap(rollupSourceMap: RollupSourceMap): d.SourceMap;
+export function rollupToStencilSourceMap(rollupSourceMap: RollupSourceMap | undefined | null): d.SourceMap | null {
   if (!rollupSourceMap) {
     return null;
   }
@@ -18,8 +22,8 @@ export const rollupToStencilSourceMap = (rollupSourceMap: RollupSourceMap | unde
     sources: rollupSourceMap.sources,
     sourcesContent: rollupSourceMap.sourcesContent,
     version: rollupSourceMap.version,
-  };
-};
+  } satisfies d.SourceMap;
+}
 
 /**
  * A JavaScript formatted string used to link generated code back to the original. This string follows the guidelines
@@ -36,7 +40,7 @@ const JS_SOURCE_MAPPING_URL_LINKER = '//# sourceMappingURL=';
  * @param filename the filename to encode
  * @returns the encoded URI
  */
-const encodeFilenameToRfc3986 = (filename: string): string => {
+const encodeToRfc3986 = (filename: string): string => {
   const encodedUri = encodeURIComponent(filename);
   // replace all '!', single quotes, '(', ')', and '*' with their hexadecimal values (UTF-16)
   return encodedUri.replace(/[!'()*]/g, (matchedCharacter) => {
@@ -51,7 +55,21 @@ const encodeFilenameToRfc3986 = (filename: string): string => {
  * @returns a linker string, of the format {@link JS_SOURCE_MAPPING_URL_LINKER}=<url>
  */
 export const getSourceMappingUrlLinker = (url: string): string => {
-  return `${JS_SOURCE_MAPPING_URL_LINKER}${encodeFilenameToRfc3986(url)}`;
+  return `${JS_SOURCE_MAPPING_URL_LINKER}${encodeToRfc3986(url)}`;
+};
+
+/**
+ * Generates a string used to link generated code with the original source, to be placed at the end of the generated
+ * code as an inline source map.
+ * @param sourceMapContents the sourceMapContents of the source map
+ * @returns a linker string, of the format {@link JS_SOURCE_MAPPING_URL_LINKER}<dataUriPrefixAndMime><sourceMapContents>
+ */
+export const getInlineSourceMappingUrlLinker = (sourceMapContents: string): string => {
+  const mapBase64 = Buffer.from(sourceMapContents, 'utf8').toString('base64');
+
+  // do not RFC-3986 encode an already valid base64 string. the sourcemaps will not resolve correctly when there is an
+  // allowed base64 character is encoded (because it is a disallowed RFC-3986 character)
+  return `${JS_SOURCE_MAPPING_URL_LINKER}data:application/json;charset=utf-8;base64,${mapBase64}`;
 };
 
 /**

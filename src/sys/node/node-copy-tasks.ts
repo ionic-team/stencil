@@ -1,8 +1,9 @@
-import type * as d from '../../declarations';
 import { buildError, catchError, flatOne, isGlob, normalizePath } from '@utils';
-import { copyFile, mkdir, readdir, stat } from './node-fs-promisify';
+import { glob } from 'glob';
 import path from 'path';
-import glob from 'glob';
+
+import type * as d from '../../declarations';
+import { copyFile, mkdir, readdir, stat } from './node-fs-promisify';
 
 export async function nodeCopyTasks(copyTasks: Required<d.CopyTask>[], srcDir: string) {
   const results: d.CopyResults = {
@@ -36,7 +37,7 @@ export async function nodeCopyTasks(copyTasks: Required<d.CopyTask>[], srcDir: s
 
       await Promise.all(tasks.map((copyTask) => copyFile(copyTask.src, copyTask.dest)));
     }
-  } catch (e) {
+  } catch (e: any) {
     catchError(results.diagnostics, e);
   }
 
@@ -89,7 +90,7 @@ async function processCopyTask(results: d.CopyResults, allCopyTasks: d.CopyTask[
     // get the stats for this src to see if it's a directory or not
     const stats = await stat(copyTask.src);
     if (stats.isDirectory()) {
-      // still a directory, keep diggin down
+      // still a directory, keep digging down
       if (!results.dirPaths.includes(copyTask.dest)) {
         results.dirPaths.push(copyTask.dest);
       }
@@ -106,7 +107,9 @@ async function processCopyTask(results: d.CopyResults, allCopyTasks: d.CopyTask[
   } catch (e) {
     if (copyTask.warn !== false) {
       const err = buildError(results.diagnostics);
-      err.messageText = e.message;
+      if (e instanceof Error) {
+        err.messageText = e.message;
+      }
     }
   }
 }
@@ -124,9 +127,9 @@ async function processCopyTaskDirectory(results: d.CopyResults, allCopyTasks: d.
         };
 
         await processCopyTask(results, allCopyTasks, subCopyTask);
-      })
+      }),
     );
-  } catch (e) {
+  } catch (e: any) {
     catchError(results.diagnostics, e);
   }
 }
@@ -174,14 +177,5 @@ function shouldIgnore(filePath: string) {
 const IGNORE = ['.ds_store', '.gitignore', 'desktop.ini', 'thumbs.db'];
 
 export function asyncGlob(pattern: string, opts: any) {
-  return new Promise<string[]>((resolve, reject) => {
-    const g: typeof glob = (glob as any).glob;
-    g(pattern, opts, (err: any, files: string[]) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(files);
-      }
-    });
-  });
+  return glob(pattern, opts);
 }

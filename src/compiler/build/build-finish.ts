@@ -1,11 +1,15 @@
+import { isFunction, isRemoteUrl, relative } from '@utils';
+
 import type * as d from '../../declarations';
 import { generateBuildResults } from './build-results';
 import { generateBuildStats, writeBuildStats } from './build-stats';
-import { isFunction, isRemoteUrl } from '@utils';
-import { IS_NODE_ENV } from '../sys/environment';
-import { relative } from 'path';
 
-export const buildFinish = async (buildCtx: d.BuildCtx) => {
+/**
+ * Finish a build as having completed successfully
+ * @param buildCtx the build context for the build being aborted
+ * @returns the build results
+ */
+export const buildFinish = async (buildCtx: d.BuildCtx): Promise<d.CompilerBuildResults> => {
   const results = await buildDone(buildCtx.config, buildCtx.compilerCtx, buildCtx, false);
 
   const buildLog: d.BuildLog = {
@@ -19,11 +23,30 @@ export const buildFinish = async (buildCtx: d.BuildCtx) => {
   return results;
 };
 
-export const buildAbort = (buildCtx: d.BuildCtx) => {
+/**
+ * Finish a build early due to failure. During the build process, a fatal error has occurred where the compiler cannot
+ * continue further
+ * @param buildCtx the build context for the build being aborted
+ * @returns the build results
+ */
+export const buildAbort = (buildCtx: d.BuildCtx): Promise<d.CompilerBuildResults> => {
   return buildDone(buildCtx.config, buildCtx.compilerCtx, buildCtx, true);
 };
 
-const buildDone = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, aborted: boolean) => {
+/**
+ * Mark a build as done
+ * @param config the Stencil configuration used for the build
+ * @param compilerCtx the compiler context associated with the build
+ * @param buildCtx the build context associated with the build to mark as done
+ * @param aborted true if the build ended early due to failure, false otherwise
+ * @returns the build results
+ */
+const buildDone = async (
+  config: d.ValidatedConfig,
+  compilerCtx: d.CompilerCtx,
+  buildCtx: d.BuildCtx,
+  aborted: boolean,
+): Promise<d.CompilerBuildResults> => {
   if (buildCtx.hasFinished && buildCtx.buildResults) {
     // we've already marked this build as finished and
     // already created the build results, just return these
@@ -45,7 +68,7 @@ const buildDone = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx:
   if (!buildCtx.hasFinished) {
     // haven't set this build as finished yet
     if (!buildCtx.hasPrintedResults) {
-      cleanDiagnostics(config, buildCtx.buildResults.diagnostics);
+      cleanDiagnosticsRelativePath(config, buildCtx.buildResults.diagnostics);
       config.logger.printDiagnostics(buildCtx.buildResults.diagnostics);
     }
 
@@ -53,10 +76,10 @@ const buildDone = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx:
     if (buildCtx.isRebuild && hasChanges && buildCtx.buildResults.hmr && !aborted) {
       // this is a rebuild, and we've got hmr data
       // and this build hasn't been aborted
-      logHmr(config.logger, buildCtx);
+      logHmr(config.logger, buildCtx.buildResults.hmr);
     }
 
-    // create a nice pretty message stating what happend
+    // create a nice pretty message stating what happened
     const buildText = buildCtx.isRebuild ? 'rebuild' : 'build';
     const watchText = config.watch ? ', watching for changes...' : '';
     let buildStatus = 'finished';
@@ -97,7 +120,7 @@ const buildDone = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx:
 
   if (!config.watch) {
     compilerCtx.reset();
-    if (IS_NODE_ENV && global.gc) {
+    if (global.gc) {
       buildCtx.debug(`triggering forced gc`);
       global.gc();
       buildCtx.debug(`forced gc finished`);
@@ -107,10 +130,12 @@ const buildDone = async (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx:
   return buildCtx.buildResults;
 };
 
-const logHmr = (logger: d.Logger, buildCtx: d.BuildCtx) => {
-  // this is a rebuild, and we've got hmr data
-  // and this build hasn't been aborted
-  const hmr = buildCtx.buildResults.hmr;
+/**
+ * In a Hot Module Replacement (HMR) context, log what changed between builds
+ * @param logger the instance of the logger to report what's changed
+ * @param hmr the HMR data, which includes what's changed between builds
+ */
+const logHmr = (logger: d.Logger, hmr: d.HotModuleReplacement): void => {
   if (hmr.componentsUpdated) {
     cleanupUpdateMsg(logger, `updated component`, hmr.componentsUpdated);
   }
@@ -156,9 +181,14 @@ const cleanupUpdateMsg = (logger: d.Logger, msg: string, fileNames: string[]) =>
   }
 };
 
-const cleanDiagnostics = (config: d.Config, diagnostics: d.Diagnostic[]) => {
+/**
+ * Update the relative file path for diagnostics. The updates are done in place.
+ * @param config the Stencil configuration associated with the current build
+ * @param diagnostics the diagnostics to update
+ */
+const cleanDiagnosticsRelativePath = (config: d.Config, diagnostics: ReadonlyArray<d.Diagnostic>): void => {
   diagnostics.forEach((diagnostic) => {
-    if (!diagnostic.relFilePath && !isRemoteUrl(diagnostic.absFilePath) && diagnostic.absFilePath && config.rootDir) {
+    if (!diagnostic.relFilePath && diagnostic.absFilePath && !isRemoteUrl(diagnostic.absFilePath) && config.rootDir) {
       diagnostic.relFilePath = relative(config.rootDir, diagnostic.absFilePath);
     }
   });

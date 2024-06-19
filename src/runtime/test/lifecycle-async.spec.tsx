@@ -94,7 +94,7 @@ describe('lifecycle async', () => {
 
     expect(root.textContent).toBe('connectedCallback componentWillLoad componentWillRender render');
     expect(log.trim()).toEqual(
-      'connectedCallback componentWillLoad componentWillRender render componentDidRender componentDidLoad'
+      'connectedCallback componentWillLoad componentWillRender render componentDidRender componentDidLoad',
     );
 
     log = '';
@@ -102,7 +102,7 @@ describe('lifecycle async', () => {
     await waitForChanges();
 
     expect(log.trim()).toBe(
-      'propDidChange componentWillUpdate componentWillRender render componentDidRender componentDidUpdate'
+      'propDidChange componentWillUpdate componentWillRender render componentDidRender componentDidUpdate',
     );
   });
 

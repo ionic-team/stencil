@@ -1,4 +1,5 @@
 import ts from 'typescript';
+
 import { STENCIL_CORE_ID } from '../bundle/entry-alias-ids';
 
 export const updateStencilCoreImports = (updatedCoreImportPath: string): ts.TransformerFactory<ts.SourceFile> => {
@@ -25,17 +26,20 @@ export const updateStencilCoreImports = (updatedCoreImportPath: string): ts.Tran
                 const keepImports = origImports.map((e) => e.getText()).filter((name) => KEEP_IMPORTS.has(name));
 
                 if (keepImports.length > 0) {
-                  const newImport = ts.updateImportDeclaration(
+                  const newImport = ts.factory.updateImportDeclaration(
                     s,
                     undefined,
-                    undefined,
-                    ts.createImportClause(
+                    ts.factory.createImportClause(
+                      false,
                       undefined,
-                      ts.createNamedImports(
-                        keepImports.map((name) => ts.createImportSpecifier(undefined, ts.createIdentifier(name)))
-                      )
+                      ts.factory.createNamedImports(
+                        keepImports.map((name) =>
+                          ts.factory.createImportSpecifier(false, undefined, ts.factory.createIdentifier(name)),
+                        ),
+                      ),
                     ),
-                    ts.createStringLiteral(updatedCoreImportPath)
+                    ts.factory.createStringLiteral(updatedCoreImportPath),
+                    undefined,
                   );
                   newStatements.push(newImport);
                 }
@@ -49,14 +53,14 @@ export const updateStencilCoreImports = (updatedCoreImportPath: string): ts.Tran
       });
 
       if (madeChanges) {
-        return ts.updateSourceFileNode(
+        return ts.factory.updateSourceFile(
           tsSourceFile,
           newStatements,
           tsSourceFile.isDeclarationFile,
           tsSourceFile.referencedFiles,
           tsSourceFile.typeReferenceDirectives,
           tsSourceFile.hasNoDefaultLib,
-          tsSourceFile.libReferenceDirectives
+          tsSourceFile.libReferenceDirectives,
         );
       }
 
@@ -65,6 +69,9 @@ export const updateStencilCoreImports = (updatedCoreImportPath: string): ts.Tran
   };
 };
 
+/**
+ * A set of imports which we don't want to remove from an output file
+ */
 const KEEP_IMPORTS = new Set([
   'h',
   'setMode',

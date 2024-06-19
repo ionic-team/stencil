@@ -47,7 +47,7 @@ export class MockCSSStyleDeclaration {
         const splt = rule.split(':');
         if (splt.length > 1) {
           const prop = splt[0].trim();
-          const value = splt[1].trim();
+          const value = splt.slice(1).join(':').trim();
           if (prop !== '' && value !== '') {
             this._styles.set(jsCaseToCssCase(prop), value);
           }
@@ -88,7 +88,7 @@ function cssCaseToJsCase(str: string) {
       .split('-')
       .map((segment) => segment.charAt(0).toUpperCase() + segment.slice(1))
       .join('');
-    str = str.substr(0, 1).toLowerCase() + str.substr(1);
+    str = str.slice(0, 1).toLowerCase() + str.slice(1);
   }
   return str;
 }

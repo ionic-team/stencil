@@ -1,5 +1,6 @@
-import type * as d from '../../declarations';
 import { catchError } from '@utils';
+
+import type * as d from '../../declarations';
 
 export const getHydrateOptions = (prerenderConfig: d.PrerenderConfig, url: URL, diagnostics: d.Diagnostic[]) => {
   const prerenderUrl = url.href;
@@ -23,7 +24,7 @@ export const getHydrateOptions = (prerenderConfig: d.PrerenderConfig, url: URL, 
   } else if (typeof prerenderConfig.canonicalUrl === 'function') {
     try {
       opts.canonicalUrl = prerenderConfig.canonicalUrl(url);
-    } catch (e) {
+    } catch (e: any) {
       catchError(diagnostics, e);
     }
   } else {
@@ -39,7 +40,7 @@ export const getHydrateOptions = (prerenderConfig: d.PrerenderConfig, url: URL, 
         }
         Object.assign(opts, userOpts);
       }
-    } catch (e) {
+    } catch (e: any) {
       catchError(diagnostics, e);
     }
   }

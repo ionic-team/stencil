@@ -1,13 +1,15 @@
-import type * as d from '../declarations';
-import { addHostEventListeners, doc, getHostRef, nextTick, plt, supportsShadow } from '@platform';
-import { addStyle } from './styles';
-import { attachToAncestor } from './update-component';
 import { BUILD } from '@app-data';
+import { addHostEventListeners, doc, getHostRef, nextTick, plt, supportsShadow } from '@platform';
 import { CMP_FLAGS, HOST_FLAGS, MEMBER_FLAGS } from '@utils';
+
+import type * as d from '../declarations';
+import { initializeClientHydrate } from './client-hydrate';
+import { fireConnectedCallback, initializeComponent } from './initialize-component';
 import { createTime } from './profile';
 import { HYDRATE_ID, NODE_TYPE, PLATFORM_FLAGS } from './runtime-constants';
-import { initializeClientHydrate } from './client-hydrate';
-import { initializeComponent, fireConnectedCallback } from './initialize-component';
+import { addStyle } from './styles';
+import { attachToAncestor } from './update-component';
+import { insertBefore } from './vdom/vdom-render';
 
 export const connectedCallback = (elm: d.HostElement) => {
   if ((plt.$flags$ & PLATFORM_FLAGS.isTmpDisconnected) === 0) {
@@ -46,6 +48,7 @@ export const connectedCallback = (elm: d.HostElement) => {
         if (
           BUILD.hydrateServerSide ||
           ((BUILD.slot || BUILD.shadowDom) &&
+            // TODO(STENCIL-854): Remove code related to legacy shadowDomShim field
             cmpMeta.$flags$ & (CMP_FLAGS.hasSlotRelocation | CMP_FLAGS.needsShadowDomShim))
         ) {
           setContentReference(elm);
@@ -104,7 +107,11 @@ export const connectedCallback = (elm: d.HostElement) => {
       addHostEventListeners(elm, hostRef, cmpMeta.$listeners$, false);
 
       // fire off connectedCallback() on component instance
-      fireConnectedCallback(hostRef.$lazyInstance$);
+      if (hostRef?.$lazyInstance$) {
+        fireConnectedCallback(hostRef.$lazyInstance$);
+      } else if (hostRef?.$onReadyPromise$) {
+        hostRef.$onReadyPromise$.then(() => fireConnectedCallback(hostRef.$lazyInstance$));
+      }
     }
 
     endConnected();
@@ -119,8 +126,8 @@ const setContentReference = (elm: d.HostElement) => {
   // create a node to represent where the original
   // content was first placed, which is useful later on
   const contentRefElm = (elm['s-cr'] = doc.createComment(
-    BUILD.isDebug ? `content-ref (host=${elm.localName})` : ''
+    BUILD.isDebug ? `content-ref (host=${elm.localName})` : '',
   ) as any);
   contentRefElm['s-cn'] = true;
-  elm.insertBefore(contentRefElm, elm.firstChild);
+  insertBefore(elm, contentRefElm, elm.firstChild);
 };

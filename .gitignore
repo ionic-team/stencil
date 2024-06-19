@@ -40,10 +40,21 @@ dist/
 /screenshot/index.js.map
 /screenshot/package.json
 /screenshot/pixel-match.js
+/screenshot/pixel-match.js.map
 /screenshot/*.d.ts
 
 test/**/www/*
 test/**/hydrate/*
 .stencil
-/dependencies.json
 coverage/**
+
+# TODO(STENCIL-446): Remove these once `strictNullChecks` is enabled
+null_errors*.json
+# TODO(STENCIL-454): Remove or change this up once we've eliminated unused exports
+unused-exports*.txt
+
+# wdio test output
+test/wdio/test-components
+test/wdio/www-global-script/
+test/wdio/www-prerender-script
+test/wdio/www-invisible-prehydration/

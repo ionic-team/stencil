@@ -1,13 +1,21 @@
-import type * as d from '../declarations';
-import { attachStyles, getScopeId, registerStyle } from './styles';
 import { BUILD } from '@app-data';
+import { forceUpdate, getHostRef, registerHost, styles, supportsShadow } from '@platform';
 import { CMP_FLAGS } from '@utils';
-import { computeMode } from './mode';
+
+import type * as d from '../declarations';
 import { connectedCallback } from './connected-callback';
 import { disconnectedCallback } from './disconnected-callback';
-import { forceUpdate, getHostRef, registerHost, styles, supportsShadow } from '@platform';
+import {
+  patchChildSlotNodes,
+  patchCloneNode,
+  patchPseudoShadowDom,
+  patchSlotAppendChild,
+  patchTextContent,
+} from './dom-extras';
+import { computeMode } from './mode';
 import { proxyComponent } from './proxy-component';
 import { PROXY_FLAGS } from './runtime-constants';
+import { attachStyles, getScopeId, registerStyle } from './styles';
 
 export const defineCustomElement = (Cstr: any, compactMeta: d.ComponentRuntimeMetaCompact) => {
   customElements.define(compactMeta[1], proxyCustomElement(Cstr, compactMeta) as CustomElementConstructor);
@@ -31,7 +39,30 @@ export const proxyCustomElement = (Cstr: any, compactMeta: d.ComponentRuntimeMet
     cmpMeta.$attrsToReflect$ = [];
   }
   if (BUILD.shadowDom && !supportsShadow && cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation) {
+    // TODO(STENCIL-854): Remove code related to legacy shadowDomShim field
     cmpMeta.$flags$ |= CMP_FLAGS.needsShadowDomShim;
+  }
+
+  // TODO(STENCIL-914): this check and `else` block can go away and be replaced by just the `scoped` check
+  if (BUILD.experimentalSlotFixes) {
+    if (BUILD.scoped && cmpMeta.$flags$ & CMP_FLAGS.scopedCssEncapsulation) {
+      // This check is intentionally not combined with the surrounding `experimentalSlotFixes` check
+      // since, moving forward, we only want to patch the pseudo shadow DOM when the component is scoped
+      patchPseudoShadowDom(Cstr.prototype, cmpMeta);
+    }
+  } else {
+    if (BUILD.slotChildNodesFix) {
+      patchChildSlotNodes(Cstr.prototype, cmpMeta);
+    }
+    if (BUILD.cloneNodeFix) {
+      patchCloneNode(Cstr.prototype);
+    }
+    if (BUILD.appendChildSlotFix) {
+      patchSlotAppendChild(Cstr.prototype);
+    }
+    if (BUILD.scopedSlotTextContentFix && cmpMeta.$flags$ & CMP_FLAGS.scopedCssEncapsulation) {
+      patchTextContent(Cstr.prototype);
+    }
   }
 
   const originalConnectedCallback = Cstr.prototype.connectedCallback;

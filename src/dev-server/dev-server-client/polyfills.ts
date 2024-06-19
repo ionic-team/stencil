@@ -1,3 +1,5 @@
+/* eslint-disable no-var -- shims will continue to use var while we support older browsers */
+// TODO(STENCIL-465): Investigate whether we can delete this file
 export const applyPolyfills = (win: any) => {
   applyObjectAssign();
   applyCustomEvent(win);
@@ -23,11 +25,10 @@ const applyCustomEvent = (win: any) => {
 const applyObjectAssign = () => {
   if (typeof Object.assign !== 'function') {
     Object.defineProperty(Object, 'assign', {
-      value: function assign(target: any) {
+      value: function assign(target: any, ...rest: any[]) {
         var to = Object(target);
 
-        for (var index = 1; index < arguments.length; index++) {
-          var nextSource = arguments[index];
+        for (var nextSource of rest) {
           if (nextSource != null) {
             for (var nextKey in nextSource) {
               if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {

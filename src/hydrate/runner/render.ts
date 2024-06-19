@@ -1,19 +1,20 @@
+import { hydrateFactory } from '@hydrate-factory';
+import { MockWindow, serializeNodeToHtml } from '@stencil/core/mock-doc';
+import { hasError, isPromise } from '@utils';
+
+import { updateCanonicalLink } from '../../compiler/html/canonical-link';
+import { relocateMetaCharset } from '../../compiler/html/relocate-meta-charset';
+import { removeUnusedStyles } from '../../compiler/html/remove-unused-styles';
 import type {
   HydrateDocumentOptions,
   HydrateFactoryOptions,
   HydrateResults,
   SerializeDocumentOptions,
 } from '../../declarations';
-import { generateHydrateResults, normalizeHydrateOptions, renderBuildError, renderCatchError } from './render-utils';
-import { hasError, isPromise } from '@utils';
-import { hydrateFactory } from '@hydrate-factory';
-import { initializeWindow } from './window-initialize';
 import { inspectElement } from './inspect-element';
-import { MockWindow, serializeNodeToHtml } from '@stencil/core/mock-doc';
 import { patchDomImplementation } from './patch-dom-implementation';
-import { relocateMetaCharset } from '../../compiler/html/relocate-meta-charset';
-import { removeUnusedStyles } from '../../compiler/html/remove-unused-styles';
-import { updateCanonicalLink } from '../../compiler/html/canonical-link';
+import { generateHydrateResults, normalizeHydrateOptions, renderBuildError, renderCatchError } from './render-utils';
+import { initializeWindow } from './window-initialize';
 
 export function renderToString(html: string | any, options?: SerializeDocumentOptions) {
   const opts = normalizeHydrateOptions(options);
@@ -107,7 +108,7 @@ function render(
   win: Window & typeof globalThis,
   opts: HydrateFactoryOptions,
   results: HydrateResults,
-  resolve: (results: HydrateResults) => void
+  resolve: (results: HydrateResults) => void,
 ) {
   if (!(process as any).__stencilErrors) {
     (process as any).__stencilErrors = true;
@@ -142,7 +143,7 @@ function afterHydrate(
   win: Window,
   opts: HydrateFactoryOptions,
   results: HydrateResults,
-  resolve: (results: HydrateResults) => void
+  resolve: (results: HydrateResults) => void,
 ) {
   if (typeof opts.afterHydrate === 'function') {
     try {
@@ -168,7 +169,7 @@ function finalizeHydrate(
   doc: Document,
   opts: HydrateFactoryOptions,
   results: HydrateResults,
-  resolve: (results: HydrateResults) => void
+  resolve: (results: HydrateResults) => void,
 ) {
   try {
     inspectElement(results, doc.documentElement, 0);
