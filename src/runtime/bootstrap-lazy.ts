@@ -1,5 +1,6 @@
 import { BUILD } from '@app-data';
 import { doc, getHostRef, plt, registerHost, supportsShadow, win } from '@platform';
+import { addHostEventListeners } from '@runtime';
 import { CMP_FLAGS, queryNonceMetaTagContent } from '@utils';
 
 import type * as d from '../declarations';
@@ -135,6 +136,9 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
           } else {
             plt.jmp(() => connectedCallback(this));
           }
+
+          const hostRef = getHostRef(this);
+          addHostEventListeners(this, hostRef, cmpMeta.$listeners$, false);
         }
 
         disconnectedCallback() {
