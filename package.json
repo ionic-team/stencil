@@ -27,8 +27,17 @@
       "import": "./internal/stencil-core/index.js",
       "require": "./internal/stencil-core/index.cjs"
     },
+    "./internal": {
+      "import": "./internal/index.js"
+    },
     "./internal/client": {
       "import": "./internal/client/index.js"
+    },
+    "./internal/testing": {
+      "import": "./internal/testing/index.js"
+    },
+    "./internal/testing/*": {
+      "import": "./internal/testing/*"
     },
     "./internal/app-data": {
       "import": "./internal/app-data/index.js",
