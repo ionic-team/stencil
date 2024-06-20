@@ -20,6 +20,8 @@ export const connectedCallback = (elm: d.HostElement) => {
     if (BUILD.hostListenerTargetParent) {
       // only run if we have listeners being attached to a parent
       addHostEventListeners(elm, hostRef, cmpMeta.$listeners$, true);
+    } else {
+      addHostEventListeners(elm, hostRef, cmpMeta.$listeners$, false);
     }
 
     if (!(hostRef.$flags$ & HOST_FLAGS.hasConnected)) {
