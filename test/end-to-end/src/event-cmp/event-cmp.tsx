@@ -36,10 +36,11 @@ export class EventCmp {
 
   /**
    * this is some method that fires an event with options
+   * @param mph some value
    * @returns {void}
    */
   @Method()
-  async methodThatFiresEventWithOptions() {
-    this.myEventWithOptions.emit({ mph: 88 });
+  async methodThatFiresEventWithOptions(mph: number) {
+    this.myEventWithOptions.emit({ mph });
   }
 }

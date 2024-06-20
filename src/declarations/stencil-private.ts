@@ -2091,6 +2091,12 @@ declare global {
       toHaveFirstReceivedEventDetail(eventDetail: any): void;
 
       /**
+       * When given an EventSpy, checks the last event has
+       * received the correct custom event `detail` data.
+       */
+      toHaveLastReceivedEventDetail(eventDetail: any): void;
+
+      /**
        * When given an EventSpy, checks the event at an index
        * has received the correct custom event `detail` data.
        */
