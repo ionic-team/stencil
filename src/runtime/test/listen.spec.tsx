@@ -206,7 +206,6 @@ describe('listen', () => {
     let events = 0;
     @Component({ tag: 'cmp-a' })
     class CmpA {
-
       @Listen('testEvent', { target: 'document' })
       buttonClick() {
         events++;
@@ -218,7 +217,7 @@ describe('listen', () => {
     }
 
     const { doc, waitForChanges } = await newSpecPage({
-      components: [CmpA]
+      components: [CmpA],
     });
 
     jest.spyOn(doc, 'addEventListener');
