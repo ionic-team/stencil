@@ -97,7 +97,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
       const HostElement = class extends HTMLElement {
         ['s-p']: Promise<void>[];
         ['s-rc']: (() => void)[];
-        hasRegisteredEventListeners = false
+        hasRegisteredEventListeners = false;
 
         // StencilLazyHost
         constructor(self: HTMLElement) {
