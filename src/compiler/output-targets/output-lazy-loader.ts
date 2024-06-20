@@ -93,6 +93,9 @@ export interface CustomElementsDefineOptions {
   rel?: (el: EventTarget, eventName: string, listener: EventListenerOrEventListenerObject, options: boolean | AddEventListenerOptions) => void;
 }
 export declare function defineCustomElements(win?: Window, opts?: CustomElementsDefineOptions): void;
+/**
+ * @deprecated
+ */
 export declare function applyPolyfills(): Promise<void>;
 
 /**
