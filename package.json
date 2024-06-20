@@ -42,6 +42,12 @@
     "./internal/app-data": {
       "import": "./internal/app-data/index.js",
       "require": "./internal/app-data/index.cjs"
+    },
+    "./compiler": {
+      "import": "./compiler/stencil.js"
+    },
+    "./compiler/*": {
+      "import": "./compiler/*"
     }
   },
   "scripts": {
