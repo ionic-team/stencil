@@ -1,5 +1,5 @@
 import { globalScripts } from '@app-globals';
-import { doc, getHostRef, loadModule, plt, registerHost } from '@platform';
+import { addHostEventListeners, doc, getHostRef, loadModule, plt, registerHost } from '@platform';
 import { connectedCallback, insertVdomAnnotations } from '@runtime';
 
 import type * as d from '../../declarations';
@@ -183,6 +183,9 @@ async function hydrateComponent(
 
     if (cmpMeta != null) {
       waitingElements.add(elm);
+      const hostRef = getHostRef(this);
+      addHostEventListeners(this, hostRef, cmpMeta.$listeners$, false);
+
       try {
         connectedCallback(elm);
         await elm.componentOnReady();
