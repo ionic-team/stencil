@@ -97,6 +97,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
       const HostElement = class extends HTMLElement {
         ['s-p']: Promise<void>[];
         ['s-rc']: (() => void)[];
+        hasRegisteredEventListeners = false
 
         // StencilLazyHost
         constructor(self: HTMLElement) {
@@ -126,6 +127,19 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
         }
 
         connectedCallback() {
+          const hostRef = getHostRef(this);
+
+          /**
+           * The `connectedCallback` lifecycle event can potentially be fired multiple times
+           * if the element is removed from the DOM and re-inserted. This is not a common use case,
+           * but it can happen in some scenarios. To prevent registering the same event listeners
+           * multiple times, we will only register them once.
+           */
+          if (!this.hasRegisteredEventListeners) {
+            this.hasRegisteredEventListeners = true;
+            addHostEventListeners(this, hostRef, cmpMeta.$listeners$, false);
+          }
+
           if (appLoadFallback) {
             clearTimeout(appLoadFallback);
             appLoadFallback = null;
@@ -136,9 +150,6 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
           } else {
             plt.jmp(() => connectedCallback(this));
           }
-
-          const hostRef = getHostRef(this);
-          addHostEventListeners(this, hostRef, cmpMeta.$listeners$, false);
         }
 
         disconnectedCallback() {
