@@ -45,9 +45,10 @@ export namespace Components {
     interface EventCmp {
         /**
           * this is some method that fires an event with options
+          * @param mph some value
           * @returns
          */
-        "methodThatFiresEventWithOptions": () => Promise<void>;
+        "methodThatFiresEventWithOptions": (mph: number) => Promise<void>;
         /**
           * this is some method that fires a document event
           * @returns

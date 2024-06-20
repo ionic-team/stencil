@@ -16,9 +16,15 @@
 
 ## Methods
 
-### `methodThatFiresEventWithOptions() => Promise<void>`
+### `methodThatFiresEventWithOptions(mph: number) => Promise<void>`
 
 this is some method that fires an event with options
+
+#### Parameters
+
+| Name  | Type     | Description |
+| ----- | -------- | ----------- |
+| `mph` | `number` | some value  |
 
 #### Returns
 
