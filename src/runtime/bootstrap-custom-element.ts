@@ -1,5 +1,5 @@
 import { BUILD } from '@app-data';
-import { forceUpdate, getHostRef, registerHost, styles, supportsShadow } from '@platform';
+import { addHostEventListeners, forceUpdate, getHostRef, registerHost, styles, supportsShadow } from '@platform';
 import { CMP_FLAGS } from '@utils';
 
 import type * as d from '../declarations';
@@ -72,6 +72,9 @@ export const proxyCustomElement = (Cstr: any, compactMeta: d.ComponentRuntimeMet
       registerHost(this, cmpMeta);
     },
     connectedCallback() {
+      const hostRef = getHostRef(this);
+      addHostEventListeners(this, hostRef, cmpMeta.$listeners$, false);
+
       connectedCallback(this);
       if (BUILD.connectedCallback && originalConnectedCallback) {
         originalConnectedCallback.call(this);

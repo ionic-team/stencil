@@ -1,5 +1,4 @@
 import { BUILD } from '@app-data';
-import { addHostEventListeners } from '@runtime';
 
 import type * as d from '../../declarations';
 
@@ -146,7 +145,6 @@ export const registerHost = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta
   hostRef.$onReadyPromise$ = new Promise((r) => (hostRef.$onReadyResolve$ = r));
   elm['s-p'] = [];
   elm['s-rc'] = [];
-  addHostEventListeners(elm, hostRef, cmpMeta.$listeners$, false);
   return hostRefs.set(elm, hostRef);
 };
 
