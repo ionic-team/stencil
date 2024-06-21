@@ -1,5 +1,4 @@
 import { BUILD } from '@app-data';
-import { addHostEventListeners } from '@runtime';
 
 import type * as d from '../../declarations';
 
