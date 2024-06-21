@@ -28,7 +28,7 @@ export function hydrateApp(
   let ranCompleted = false;
 
   function hydratedComplete() {
-    global.clearTimeout(tmrId);
+    globalThis.clearTimeout(tmrId);
     createdElements.clear();
     connectedElements.clear();
 
@@ -91,7 +91,7 @@ export function hydrateApp(
             registerHost(elm, Cstr.cmpMeta);
 
             // proxy the host element with the component's metadata
-            proxyHostElement(elm, Cstr.cmpMeta);
+            proxyHostElement(elm, Cstr.cmpMeta, opts);
           }
         }
       }
@@ -148,7 +148,7 @@ export function hydrateApp(
     } as (typeof window)['document']['createElementNS'];
 
     // ensure we use NodeJS's native setTimeout, not the mocked hydrate app scoped one
-    tmrId = global.setTimeout(timeoutExceeded, opts.timeout);
+    tmrId = globalThis.setTimeout(timeoutExceeded, opts.timeout);
 
     plt.$resourcesUrl$ = new URL(opts.resourcesUrl || './', doc.baseURI).href;
 

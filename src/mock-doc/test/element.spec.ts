@@ -151,7 +151,7 @@ describe('element', () => {
 
     (elm as HTMLMetaElement).content = 'value';
     expect((elm as HTMLMetaElement).content).toBe('value');
-    expect(elm).toEqualHtml(`<meta content="value" id="test">`);
+    expect(elm).toEqualHtml(`<meta id="test" content="value">`);
 
     clonedWin.document.title = 'Hello Title!';
     const titleElm = clonedWin.document.head.querySelector('title');

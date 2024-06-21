@@ -20,10 +20,8 @@ describe('slot-reorder', () => {
   });
 
   it('renders', async () => {
-    let r: HTMLElement;
-
     function ordered() {
-      r = document.querySelector('.results1 div');
+      let r = document.querySelector('.results1 div');
       expect(r.children[0].textContent.trim()).toBe('fallback default');
       expect(r.children[0].hasAttribute('hidden')).toBe(false);
       expect(r.children[0].getAttribute('name')).toBe(null);
@@ -76,7 +74,7 @@ describe('slot-reorder', () => {
     }
 
     function reordered() {
-      r = document.querySelector('.results1 div');
+      let r = document.querySelector('.results1 div');
       expect(r.children[0].textContent.trim()).toBe('fallback slot-b');
       expect(r.children[0].hasAttribute('hidden')).toBe(false);
       expect(r.children[0].getAttribute('name')).toBe('slot-b');
@@ -128,6 +126,7 @@ describe('slot-reorder', () => {
       expect(r.children[5].textContent.trim()).toBe('slot-a content');
     }
 
+    await $('.results1 div').waitForExist();
     ordered();
 
     await $('button').click();
@@ -135,6 +134,7 @@ describe('slot-reorder', () => {
       return document.querySelector('div.reordered');
     });
 
+    await $('.results1 div').waitForExist();
     reordered();
 
     await $('button').click();
@@ -142,6 +142,7 @@ describe('slot-reorder', () => {
       return !document.querySelector('div.reordered');
     });
 
+    await $('.results1 div').waitForExist();
     ordered();
 
     await $('button').click();
@@ -149,6 +150,7 @@ describe('slot-reorder', () => {
       return document.querySelector('div.reordered');
     });
 
+    await $('.results1 div').waitForExist();
     reordered();
   });
 });

@@ -105,7 +105,10 @@ describe('prerender', () => {
     expect(scopedStyle.color).toBe('rgb(255, 0, 0)');
 
     const shadow = iframe.querySelector('cmp-client-shadow');
-    const shadowStyle = getComputedStyle(shadow.shadowRoot.querySelector('article'));
+    await browser.waitUntil(async () => shadow.shadowRoot.querySelector('article'));
+    const article = shadow.shadowRoot.querySelector('article');
+
+    const shadowStyle = getComputedStyle(article);
     await browser.waitUntil(async () => shadowStyle.color === 'rgb(0, 155, 0)');
     expect(shadowStyle.color).toBe('rgb(0, 155, 0)');
 

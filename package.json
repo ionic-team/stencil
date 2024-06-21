@@ -22,6 +22,34 @@
     "sys/",
     "testing/"
   ],
+  "exports": {
+    ".": {
+      "import": "./internal/stencil-core/index.js",
+      "require": "./internal/stencil-core/index.cjs"
+    },
+    "./internal": {
+      "import": "./internal/index.js"
+    },
+    "./internal/client": {
+      "import": "./internal/client/index.js"
+    },
+    "./internal/testing": {
+      "import": "./internal/testing/index.js"
+    },
+    "./internal/testing/*": {
+      "import": "./internal/testing/*"
+    },
+    "./internal/app-data": {
+      "import": "./internal/app-data/index.js",
+      "require": "./internal/app-data/index.cjs"
+    },
+    "./compiler": {
+      "import": "./compiler/stencil.js"
+    },
+    "./compiler/*": {
+      "import": "./compiler/*"
+    }
+  },
   "scripts": {
     "build": "npm run clean && npm run tsc.prod && npm run ts scripts/index.ts -- --prod --ci",
     "build.watch": "npm run build -- --watch",

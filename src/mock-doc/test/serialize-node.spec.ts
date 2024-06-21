@@ -144,17 +144,11 @@ describe('serializeNodeToHtml', () => {
     expect(elm).toEqualHtml(`
       <cmp-a>
         <mock:shadow-root>
-          <article>
-            shadow top
-          </article>
+          <article>shadow top</article>
           <slot></slot>
-          <section>
-            shadow bottom
-          </section>
+          <section>shadow bottom</section>
         </mock:shadow-root>
-        <div>
-          light dom
-        </div>
+        <div>light dom</div>
       </cmp-a>
     `);
   });
@@ -172,7 +166,7 @@ describe('serializeNodeToHtml', () => {
     doc.body.innerHTML = input;
 
     const output = serializeNodeToHtml(doc.body);
-    expect(input).toBe(output);
+    expect(output).toBe(`<template shadowrootmode="open">text</template>`);
   });
 
   it('svg', () => {

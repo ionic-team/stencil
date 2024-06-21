@@ -1137,30 +1137,30 @@ export interface HostElement extends HTMLElement {
 
   ['s-p']?: Promise<void>[];
 
-  componentOnReady?: () => Promise<this>;
+  componentOnReady?: () => Promise<this> | undefined;
 }
 
 export interface HydrateResults {
   buildId: string;
   diagnostics: Diagnostic[];
   url: string;
-  host: string;
-  hostname: string;
-  href: string;
-  port: string;
-  pathname: string;
-  search: string;
-  hash: string;
-  html: string;
+  host: string | null;
+  hostname: string | null;
+  href: string | null;
+  port: string | null;
+  pathname: string | null;
+  search: string | null;
+  hash: string | null;
+  html: string | null;
   components: HydrateComponent[];
   anchors: HydrateAnchorElement[];
   imgs: HydrateImgElement[];
   scripts: HydrateScriptElement[];
   styles: HydrateStyleElement[];
   staticData: HydrateStaticData[];
-  title: string;
+  title: string | null;
   hydratedCount: number;
-  httpStatus: number;
+  httpStatus: number | null;
 }
 
 export interface HydrateComponent {
@@ -1960,6 +1960,7 @@ export interface PackageJsonData {
   name?: string;
   version?: string;
   main?: string;
+  exports?: { [key: string]: string | { [key: string]: string } };
   description?: string;
   bin?: { [key: string]: string };
   browser?: string;

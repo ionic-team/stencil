@@ -1,3 +1,6 @@
+import { BUILD } from '@app-data';
+import { addHostEventListeners } from '@runtime';
+
 import type * as d from '../../declarations';
 
 let customError: d.ErrorHandler;
@@ -118,7 +121,7 @@ export const setPlatformHelpers = (helpers: {
   Object.assign(plt, helpers);
 };
 
-export const supportsShadow = false;
+export const supportsShadow = BUILD.shadowDom;
 
 export const supportsListenerOptions = false;
 

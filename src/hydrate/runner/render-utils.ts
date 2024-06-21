@@ -1,6 +1,6 @@
 import type * as d from '../../declarations';
 
-export function normalizeHydrateOptions(inputOpts: d.HydrateDocumentOptions) {
+export function normalizeHydrateOptions(inputOpts?: d.HydrateDocumentOptions) {
   const outputOpts: d.HydrateFactoryOptions = Object.assign(
     {
       serializeToHtml: false,
@@ -144,12 +144,12 @@ export function renderBuildDiagnostic(
   return diagnostic;
 }
 
-export function renderBuildError(results: d.HydrateResults, msg: string) {
-  return renderBuildDiagnostic(results, 'error', 'Hydrate Error', msg);
+export function renderBuildError(results: d.HydrateResults, msg?: string) {
+  return renderBuildDiagnostic(results, 'error', 'Hydrate Error', msg || '');
 }
 
 export function renderCatchError(results: d.HydrateResults, err: any) {
-  const diagnostic = renderBuildError(results, null);
+  const diagnostic = renderBuildError(results);
 
   if (err != null) {
     if (err.stack != null) {

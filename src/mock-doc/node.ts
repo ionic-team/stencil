@@ -287,11 +287,25 @@ Testing components with ElementInternals is fully supported in e2e tests.`,
     return this.__shadowRoot || null;
   }
 
+  /**
+   * Set shadow root for element
+   * @param shadowRoot - ShadowRoot to set
+   */
   set shadowRoot(shadowRoot: any) {
     if (shadowRoot != null) {
       shadowRoot.host = this;
       this.__shadowRoot = shadowRoot;
     } else {
+      /**
+       * There are use cases where we want to render a component with `shadow: true` as
+       * a scoped component. In this case, we don't want to have a shadow root attached
+       * to the element. This is why we need to be able to remove the shadow root.
+       *
+       * For example:
+       * calling `renderToString('<my-component></my-component>', {
+       *   serializeShadowRoot: false
+       * })`
+       */
       delete this.__shadowRoot;
     }
   }
