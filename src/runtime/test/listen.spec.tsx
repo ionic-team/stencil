@@ -229,9 +229,8 @@ describe('listen', () => {
     // Event listener will never be called
     expect(events).toEqual(0);
 
-    // Ensure the number of calls to addEventListener matches removeEventListener
-    const aelCount = doc.addEventListener.mock.calls.length;
-    const relCount = doc.removeEventListener.mock.calls.length;
-    expect(aelCount).toEqual(relCount);
+    // no event listeners have been added as the element is not connected to the DOM
+    expect(doc.addEventListener.mock.calls.length).toBe(0);
+    expect(doc.removeEventListener.mock.calls.length).toBe(0);
   });
 });
