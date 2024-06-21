@@ -11,8 +11,8 @@ async function run() {
   });
   const filePath = path.join(__dirname, '..', 'www-prerender-script', 'prerender', 'index.html');
 
-  const updatedHTML = results.html.replace(/(href|src)="\/prerender\//g, (a) =>
-    a.replace('/prerender/', '/www-prerender-script/prerender/'),
+  const updatedHTML = results.html.replace(/(href|src)="\/prerender\//g, (html) =>
+    html.replace('/prerender/', '/www-prerender-script/prerender/'),
   );
   fs.writeFileSync(filePath, updatedHTML);
 

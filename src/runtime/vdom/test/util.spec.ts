@@ -1,4 +1,4 @@
-import { toVNode } from './to-vnode';
+import { toVNode } from '../util';
 
 describe('toVNode()', () => {
   it('should create element w/ child elements and text nodes', () => {

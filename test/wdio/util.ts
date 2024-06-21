@@ -13,11 +13,13 @@ export declare namespace SomeTypes {
 }
 
 export async function setupIFrameTest(htmlFile: string): Promise<HTMLElement> {
-  if (document.querySelector('iframe')) {
-    document.body.removeChild(document.querySelector('iframe'));
+  const oldFrame = document.querySelector('iframe');
+  if (oldFrame) {
+    document.body.removeChild(oldFrame);
   }
 
   const htmlFilePath = path.resolve(
+    // @ts-ignore globalThis is a WebdriverIO global variable
     path.dirname(globalThis.__wdioSpec__),
     '..',
     htmlFile.slice(htmlFile.startsWith('/') ? 1 : 0),
@@ -37,5 +39,5 @@ export async function setupIFrameTest(htmlFile: string): Promise<HTMLElement> {
    * wait for the iframe to load
    */
   await new Promise((resolve) => (iframe.onload = resolve));
-  return iframe.contentDocument.body;
+  return iframe.contentDocument!.body;
 }

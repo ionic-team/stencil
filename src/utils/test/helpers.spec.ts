@@ -1,36 +1,6 @@
-import { dashToPascalCase, isDef, isPromise, mergeIntoWith, toCamelCase, toDashCase } from '../helpers';
+import { dashToPascalCase, isDef, mergeIntoWith, toCamelCase, toDashCase } from '../helpers';
 
 describe('util helpers', () => {
-  describe('isPromise', () => {
-    it('is promise', () => {
-      const asyncFn = async () => 42;
-      const someFn = () => {};
-      someFn.then = () => {};
-      expect(isPromise(Promise.resolve())).toBe(true);
-      expect(isPromise(new Promise(() => {}))).toBe(true);
-      expect(isPromise(asyncFn())).toBe(true);
-      expect(isPromise({ then: function () {} })).toBe(true);
-      expect(isPromise(someFn)).toBe(true);
-    });
-
-    it('not promise', () => {
-      expect(isPromise('')).toBe(false);
-      expect(isPromise('then')).toBe(false);
-      expect(isPromise(true)).toBe(false);
-      expect(isPromise(false)).toBe(false);
-      expect(isPromise({})).toBe(false);
-      expect(isPromise({ then: true })).toBe(false);
-      expect(isPromise([])).toBe(false);
-      expect(isPromise([true])).toBe(false);
-      expect(isPromise(() => {})).toBe(false);
-      expect(isPromise(null)).toBe(false);
-      expect(isPromise(undefined)).toBe(false);
-      expect(isPromise(0)).toBe(false);
-      expect(isPromise(-88)).toBe(false);
-      expect(isPromise(88)).toBe(false);
-    });
-  });
-
   describe('dashToPascalCase', () => {
     it('my-3d-component => My3dComponent', () => {
       expect(dashToPascalCase('my-3d-component')).toBe('My3dComponent');

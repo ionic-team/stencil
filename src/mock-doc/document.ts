@@ -15,7 +15,7 @@ export class MockDocument extends MockHTMLElement {
   cookie: string;
   referrer: string;
 
-  constructor(html: string | boolean = null, win: any = null) {
+  constructor(html: string | boolean | null = null, win: any = null) {
     super(null, null);
     this.nodeName = NODE_NAMES.DOCUMENT_NODE;
     this.nodeType = NODE_TYPES.DOCUMENT_NODE;
