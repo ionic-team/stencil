@@ -57,6 +57,20 @@ export const runPluginLoad = async (pluginCtx: PluginCtx, id: string) => {
   return pluginCtx.fs.readFile(id);
 };
 
+/**
+ * returns a subset of the baseline array of strings
+ * @param baseline baseline of files
+ * @param superset files that were added by a transform
+ * @returns files that were added by a transform but haven't been part of the baseline
+ */
+const getDependencySubset = (baseline: string[] | undefined, superset: string[] = []) => {
+  if (!Array.isArray(baseline)) {
+    return [];
+  }
+
+  return baseline.filter((f) => !superset.includes(f));
+};
+
 export const runPluginTransforms = async (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
@@ -137,6 +151,13 @@ export const runPluginTransforms = async (
               if (isString(pluginTransformResults.id)) {
                 transformResults.id = pluginTransformResults.id;
               }
+
+              /**
+               * add dependencies from plugin transform results, e.g. transformed sass files
+               */
+              transformResults.dependencies.push(
+                ...getDependencySubset(pluginTransformResults.dependencies, transformResults.dependencies),
+              );
             }
           }
         }
@@ -166,7 +187,9 @@ export const runPluginTransforms = async (
         cmp.styleDocs,
       );
       transformResults.code = cssParseResults.styleText;
-      transformResults.dependencies = cssParseResults.imports;
+      transformResults.dependencies.push(
+        ...getDependencySubset(cssParseResults.imports, transformResults.dependencies),
+      );
     } else {
       const cssParseResults = await parseCssImports(
         config,
@@ -177,7 +200,9 @@ export const runPluginTransforms = async (
         transformResults.code,
       );
       transformResults.code = cssParseResults.styleText;
-      transformResults.dependencies = cssParseResults.imports;
+      transformResults.dependencies.push(
+        ...getDependencySubset(cssParseResults.imports, transformResults.dependencies),
+      );
     }
   }
 

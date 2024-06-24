@@ -7,8 +7,8 @@ import type * as d from '../declarations';
 export const addHostEventListeners = (
   elm: d.HostElement,
   hostRef: d.HostRef,
-  listeners: d.ComponentRuntimeHostListener[],
-  attachParentListeners: boolean,
+  listeners?: d.ComponentRuntimeHostListener[],
+  attachParentListeners?: boolean,
 ) => {
   if (BUILD.hostListener && listeners) {
     // this is called immediately within the element's constructor
@@ -46,7 +46,7 @@ const hostListenerProxy = (hostRef: d.HostRef, methodName: string) => (ev: Event
     if (BUILD.lazyLoad) {
       if (hostRef.$flags$ & HOST_FLAGS.isListenReady) {
         // instance is ready, let's call it's member method for this event
-        hostRef.$lazyInstance$[methodName](ev);
+        hostRef.$lazyInstance$?.[methodName](ev);
       } else {
         (hostRef.$queuedListeners$ = hostRef.$queuedListeners$ || []).push([methodName, ev]);
       }
@@ -62,7 +62,8 @@ const getHostListenerTarget = (elm: Element, flags: number): EventTarget => {
   if (BUILD.hostListenerTargetDocument && flags & LISTENER_FLAGS.TargetDocument) return doc;
   if (BUILD.hostListenerTargetWindow && flags & LISTENER_FLAGS.TargetWindow) return win;
   if (BUILD.hostListenerTargetBody && flags & LISTENER_FLAGS.TargetBody) return doc.body;
-  if (BUILD.hostListenerTargetParent && flags & LISTENER_FLAGS.TargetParent) return elm.parentElement;
+  if (BUILD.hostListenerTargetParent && flags & LISTENER_FLAGS.TargetParent && elm.parentElement)
+    return elm.parentElement;
   return elm;
 };
 

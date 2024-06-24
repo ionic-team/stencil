@@ -6,6 +6,7 @@ import { outputCollection } from './dist-collection';
 import { outputCustomElements } from './dist-custom-elements';
 import { outputHydrateScript } from './dist-hydrate-script';
 import { outputLazy } from './dist-lazy/lazy-output';
+import { outputCustom } from './output-custom';
 import { outputDocs } from './output-docs';
 import { outputLazyLoader } from './output-lazy-loader';
 import { outputTypes } from './output-types';
@@ -45,6 +46,7 @@ export const generateOutputTargets = async (
   // since it validates files were created
   await outputDocs(config, compilerCtx, buildCtx);
   await outputTypes(config, compilerCtx, buildCtx);
+  await outputCustom(config, compilerCtx, buildCtx);
 
   timeSpan.finish('generate outputs finished');
 };

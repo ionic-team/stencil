@@ -47,6 +47,25 @@ const dispatchHooks = (hostRef: d.HostRef, isInitialLoad: boolean): Promise<void
   const endSchedule = createTime('scheduleUpdate', hostRef.$cmpMeta$.$tagName$);
   const instance = BUILD.lazyLoad ? hostRef.$lazyInstance$ : elm;
 
+  /**
+   * Given a user imports a component compiled with a `dist-custom-element`
+   * output target into a Stencil project compiled with a `dist` output target,
+   * then `instance` will be `undefined` as `hostRef` won't have a `lazyInstance`
+   * property. In this case, the component will fail to render in one of the
+   * subsequent functions.
+   *
+   * For this scenario to work the user needs to set the `externalRuntime` flag
+   * for the `dist-custom-element` component that is being imported into the `dist`
+   * Stencil project.
+   */
+  if (!instance) {
+    throw new Error(
+      `Can't render component <${elm.tagName.toLowerCase()} /> with invalid Stencil runtime! ` +
+        'Make sure this imported component is compiled with a `externalRuntime: true` flag. ' +
+        'For more information, please refer to https://stenciljs.com/docs/custom-elements#externalruntime',
+    );
+  }
+
   // We're going to use this variable together with `enqueue` to implement a
   // little promise-based queue. We start out with it `undefined`. When we add
   // the first function to the queue we'll set this variable to be that
@@ -118,7 +137,12 @@ const dispatchHooks = (hostRef: d.HostRef, isInitialLoad: boolean): Promise<void
  * @returns either a `Promise` or the return value of the provided function
  */
 const enqueue = (maybePromise: Promise<void> | undefined, fn: () => Promise<void>): Promise<void> | undefined =>
-  isPromisey(maybePromise) ? maybePromise.then(fn) : fn();
+  isPromisey(maybePromise)
+    ? maybePromise.then(fn).catch((err) => {
+        console.error(err);
+        fn();
+      })
+    : fn();
 
 /**
  * Check that a value is a `Promise`. To check, we first see if the value is an
@@ -437,11 +461,17 @@ const emitLifecycleEvent = (elm: EventTarget, lifecycleName: string) => {
   }
 };
 
+/**
+ * Set the hydrated flag on a DOM element
+ *
+ * @param elm a reference to a DOM element
+ * @returns undefined
+ */
 const addHydratedFlag = (elm: Element) =>
   BUILD.hydratedClass
-    ? elm.classList.add('hydrated')
+    ? elm.classList.add(BUILD.hydratedSelectorName ?? 'hydrated')
     : BUILD.hydratedAttribute
-      ? elm.setAttribute('hydrated', '')
+      ? elm.setAttribute(BUILD.hydratedSelectorName ?? 'hydrated', '')
       : undefined;
 
 const serverSideConnected = (elm: any) => {

@@ -29,6 +29,11 @@ export function createJestPuppeteerEnvironment(): JestPuppeteerEnvironmentConstr
         this.browser = await connectBrowser();
       }
 
+      /**
+       * if the user had open pages before, close them all when creating a new one
+       */
+      await this.closeOpenPages();
+
       const page = await newBrowserPage(this.browser);
       this.pages.push(page);
       // during E2E tests, we can safely assume that the current environment is a `E2EProcessEnv`
@@ -40,7 +45,7 @@ export function createJestPuppeteerEnvironment(): JestPuppeteerEnvironmentConstr
     }
 
     async closeOpenPages() {
-      await Promise.all(this.pages.map((page) => page.close()));
+      await Promise.all(this.pages.filter((page) => !page.isClosed()).map((page) => page.close()));
       this.pages.length = 0;
     }
 

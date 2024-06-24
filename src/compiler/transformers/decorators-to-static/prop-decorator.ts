@@ -14,7 +14,6 @@ import {
   serializeSymbol,
   tsPropDeclNameAsString,
   typeToString,
-  validateReferences,
 } from '../transform-utils';
 import { getDecoratorParameters, isDecoratorNamed } from './decorator-utils';
 
@@ -102,7 +101,6 @@ const parsePropDecorator = (
     optional: prop.questionToken !== undefined,
     docs: serializeSymbol(typeChecker, symbol),
   };
-  validateReferences(diagnostics, propMeta.complexType.references, prop.type);
 
   // prop can have an attribute if type is NOT "unknown"
   if (typeStr !== 'unknown') {

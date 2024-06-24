@@ -1,5 +1,5 @@
 import { buildError, catchError, flatOne, isGlob, normalizePath } from '@utils';
-import glob from 'glob';
+import { glob } from 'glob';
 import path from 'path';
 
 import type * as d from '../../declarations';
@@ -177,14 +177,5 @@ function shouldIgnore(filePath: string) {
 const IGNORE = ['.ds_store', '.gitignore', 'desktop.ini', 'thumbs.db'];
 
 export function asyncGlob(pattern: string, opts: any) {
-  return new Promise<string[]>((resolve, reject) => {
-    const g: typeof glob = (glob as any).glob;
-    g(pattern, opts, (err: any, files: string[]) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(files);
-      }
-    });
-  });
+  return glob(pattern, opts);
 }

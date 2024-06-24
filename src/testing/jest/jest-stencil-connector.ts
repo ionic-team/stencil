@@ -43,13 +43,17 @@ const getJestFacade = (): JestFacade => {
     if (version <= 27) {
       JEST_STENCIL_FACADE = new Jest27Stencil();
     } else if (version === 28) {
-      JEST_STENCIL_FACADE = new Jest28Stencil();
+      JEST_STENCIL_FACADE = new Jest28Stencil() as JestFacade;
     } else if (version === 29) {
-      JEST_STENCIL_FACADE = new Jest29Stencil();
+      JEST_STENCIL_FACADE = new Jest29Stencil() as JestFacade;
     } else {
       // in Stencil 4.X, defaulting to jest 27 infrastructure is the default behavior.
       JEST_STENCIL_FACADE = new Jest27Stencil();
     }
+  }
+
+  if (!JEST_STENCIL_FACADE) {
+    throw new Error('Stencil could not determine the Jest version being used.');
   }
 
   return JEST_STENCIL_FACADE;

@@ -6,12 +6,12 @@ import { replace } from 'esbuild-plugin-replace';
 import fs from 'fs-extra';
 import ts from 'typescript';
 
-import { createContentTypeData } from '../bundles/plugins/content-types-plugin';
-import { bundleExternal, sysNodeBundleCacheDir } from '../bundles/sys-node';
 import { getBanner } from '../utils/banner';
 import { type BuildOptions, createReplaceData } from '../utils/options';
 import { writePkgJson } from '../utils/write-pkg-json';
-import { getBaseEsbuildOptions, getEsbuildAliases, runBuilds } from './util';
+import { bundleExternal, sysNodeBundleCacheDir } from './sys-node';
+import { externalAlias, getBaseEsbuildOptions, getEsbuildAliases, getFirstOutputFile, runBuilds } from './utils';
+import { createContentTypeData } from './utils/content-types';
 
 const CONNECTOR_NAME = 'connector.html';
 
@@ -70,9 +70,15 @@ export async function buildDevServer(opts: BuildOptions) {
     bundleExternal(opts, opts.output.devServerDir, cachedDir, 'open-in-editor-api.js'),
   ]);
 
-  const devServerAliases = getEsbuildAliases();
-  const external = [...builtinModules, './ws.js', './open-in-editor-api'];
+  const external = [
+    ...builtinModules,
+    // ws.js is externally bundled
+    './ws.js',
+    // open-in-editor-api is externally bundled
+    './open-in-editor-api',
+  ];
 
+  const devServerAliases = getEsbuildAliases();
   const devServerIndexEsbuildOptions = {
     ...getBaseEsbuildOptions(),
     alias: devServerAliases,
@@ -100,7 +106,12 @@ export async function buildDevServer(opts: BuildOptions) {
     format: 'cjs',
     platform: 'node',
     write: false,
-    plugins: [esm2CJSPlugin(), contentTypesPlugin(opts), replace(createReplaceData(opts))],
+    plugins: [
+      esm2CJSPlugin(),
+      contentTypesPlugin(opts),
+      replace(createReplaceData(opts)),
+      externalAlias('graceful-fs', '../sys/node/graceful-fs.js'),
+    ],
     banner: {
       js: getBanner(opts, `Stencil Dev Server Process`, true),
     },
@@ -149,7 +160,6 @@ export async function buildDevServer(opts: BuildOptions) {
     outfile: join(opts.output.devServerDir, 'client', 'index.js'),
     format: 'esm',
     platform: 'node',
-    sourcemap: false,
     plugins: [appErrorCssPlugin(opts), replace(createReplaceData(opts))],
     banner: {
       js: getBanner(opts, `Stencil Dev Server Client`, true),
@@ -199,7 +209,10 @@ function clientConnectorPlugin(opts: BuildOptions): Plugin {
     name: 'clientConnectorPlugin',
     setup(build) {
       build.onEnd(async (buildResult) => {
-        const bundle = buildResult.outputFiles.find((b) => b.path.endsWith(CONNECTOR_NAME));
+        const bundle = buildResult.outputFiles?.find((b) => b.path.endsWith(CONNECTOR_NAME));
+        if (!bundle) {
+          throw "Couldn't find build result!";
+        }
         let code = Buffer.from(bundle.contents).toString();
 
         const tsResults = ts.transpileModule(code, {
@@ -208,7 +221,7 @@ function clientConnectorPlugin(opts: BuildOptions): Plugin {
           },
         });
 
-        if (tsResults.diagnostics.length > 0) {
+        if (tsResults.diagnostics?.length) {
           throw new Error(tsResults.diagnostics as any);
         }
 
@@ -221,7 +234,9 @@ function clientConnectorPlugin(opts: BuildOptions): Plugin {
             compress: { hoist_vars: true, hoist_funs: true, ecma: 5 },
             format: { ecma: 5 },
           });
-          code = minifyResults.code;
+          if (minifyResults.code) {
+            code = minifyResults.code;
+          }
         }
 
         code = banner + code + footer;
@@ -243,7 +258,7 @@ function serverProcessAliasPlugin(): Plugin {
     name: 'serverProcessAlias',
     setup(build) {
       build.onEnd(async (buildResult) => {
-        const bundle = buildResult.outputFiles[0];
+        const bundle = getFirstOutputFile(buildResult);
         let code = Buffer.from(bundle.contents).toString();
         code = code.replace('await import("@dev-server-process")', '(await import("./server-process.js")).default');
         return fs.writeFile(bundle.path, code);
@@ -262,7 +277,7 @@ function esm2CJSPlugin(): Plugin {
     name: 'esm2CJS',
     setup(build) {
       build.onEnd(async (buildResult) => {
-        const bundle = buildResult.outputFiles[0];
+        const bundle = getFirstOutputFile(buildResult);
         let code = Buffer.from(bundle.contents).toString();
         code = code.replace('import_meta.url', 'new (require("url").URL)("file:" + __filename).href');
         return fs.writeFile(bundle.path, code);
@@ -276,7 +291,7 @@ function esm2CJSPlugin(): Plugin {
  * @param opts build options
  * @returns an esbuild plugin
  */
-function contentTypesPlugin(opts) {
+function contentTypesPlugin(opts: BuildOptions): Plugin {
   return {
     name: 'contentTypesPlugin',
     setup(build) {

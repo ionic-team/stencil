@@ -180,7 +180,9 @@ export interface BuildConditionals extends Partial<BuildFeatures> {
   cloneNodeFix?: boolean;
   hydratedAttribute?: boolean;
   hydratedClass?: boolean;
+  hydratedSelectorName?: string;
   initializeNextTick?: boolean;
+  // TODO(STENCIL-1305): remove this option
   scriptDataOpts?: boolean;
   // TODO(STENCIL-854): Remove code related to legacy shadowDomShim field
   shadowDomShim?: boolean;
@@ -849,10 +851,29 @@ export interface CompilerJsDocTagInfo {
   text?: string;
 }
 
+/**
+ * The (internal) representation of a CSS block comment in a CSS, Sass, etc. file. This data structure is used during
+ * the initial compilation phases of Stencil, as a piece of {@link ComponentCompilerMeta}.
+ */
 export interface CompilerStyleDoc {
+  /**
+   * The name of the CSS property
+   */
   name: string;
+  /**
+   * The user-defined description of the CSS property
+   */
   docs: string;
+  /**
+   * The JSDoc-style annotation (e.g. `@prop`) that was used in the block comment to detect the comment.
+   * Used to inform Stencil where the start of a new property's description starts (and where the previous description
+   * ends).
+   */
   annotation: 'prop';
+  /**
+   * The Stencil style-mode that is associated with this property.
+   */
+  mode: string;
 }
 
 export interface CompilerAssetDir {
@@ -1100,6 +1121,13 @@ export interface HostElement extends HTMLElement {
   ['s-sc']?: string;
 
   /**
+   * Scope Ids
+   * All the possible scope ids of this component when using scoped css encapsulation
+   * or using shadow dom but the browser doesn't support it
+   */
+  ['s-scs']?: string[];
+
+  /**
    * Hot Module Replacement, dev mode only
    *
    * This function should be defined by the HMR-supporting runtime and should
@@ -1116,23 +1144,23 @@ export interface HydrateResults {
   buildId: string;
   diagnostics: Diagnostic[];
   url: string;
-  host: string;
-  hostname: string;
-  href: string;
-  port: string;
-  pathname: string;
-  search: string;
-  hash: string;
-  html: string;
+  host: string | null;
+  hostname: string | null;
+  href: string | null;
+  port: string | null;
+  pathname: string | null;
+  search: string | null;
+  hash: string | null;
+  html: string | null;
   components: HydrateComponent[];
   anchors: HydrateAnchorElement[];
   imgs: HydrateImgElement[];
   scripts: HydrateScriptElement[];
   styles: HydrateStyleElement[];
   staticData: HydrateStaticData[];
-  title: string;
+  title: string | null;
   hydratedCount: number;
-  httpStatus: number;
+  httpStatus: number | null;
 }
 
 export interface HydrateComponent {
@@ -1332,6 +1360,12 @@ export interface RenderNode extends HostElement {
   host?: Element;
 
   /**
+   * On Ref Function:
+   * Callback function to be called when the slotted node ref is ready.
+   */
+  ['s-rf']?: (elm: Element) => unknown;
+
+  /**
    * Is initially hidden
    * Whether this node was originally rendered with the `hidden` attribute.
    *
@@ -1446,7 +1480,7 @@ export interface ComponentRuntimeMeta {
   /**
    * This number is used to hold a series of bitflags for various features we
    * support on components. The flags which this value is intended to store are
-   * documented in the {@link CMP_FLAGS} enum.
+   * documented in the `CMP_FLAGS` enum.
    */
   $flags$: number;
   /**
@@ -1492,7 +1526,7 @@ export interface ComponentRuntimeMembers {
  * The fields are:
  *
  * 1. A number used to hold bitflags for component members. The bit flags which
- * this is intended to store are documented in the {@link MEMBER_FLAGS} enum.
+ * this is intended to store are documented in the `MEMBER_FLAGS` enum.
  * 2. The attribute name to observe.
  */
 export type ComponentRuntimeMember = [number, string?];
@@ -1502,7 +1536,7 @@ export type ComponentRuntimeMember = [number, string?];
  * runtime. The field are:
  *
  * 1. A number used to hold bitflags for listeners. The bit flags which this is
- * intended to store are documented in the {@link LISTENER_FLAGS} enum.
+ * intended to store are documented in the `LISTENER_FLAGS` enum.
  * 2. The event name.
  * 3. The method name.
  */
@@ -1814,6 +1848,12 @@ export interface ScreenshotOptions {
    * more sensitive. Defaults to the testing config `pixelmatchThreshold` value;
    */
   pixelmatchThreshold?: number;
+  /**
+   * Capture the screenshot beyond the viewport.
+   *
+   * @defaultValue `false` if there is no `clip`. `true` otherwise.
+   */
+  captureBeyondViewport?: boolean;
 }
 
 export interface ScreenshotBoundingBox {
@@ -1881,6 +1921,22 @@ export interface TransformCssToEsmInput {
   file?: string;
   tag?: string;
   encapsulation?: string;
+  /**
+   * The mode under which the CSS will be applied.
+   *
+   * Corresponds to a key used when `@Component`'s `styleUrls` field is an object:
+   * ```ts
+   * @Component({
+   *   tag: 'todo-list',
+   *   styleUrls: {
+   *      ios: 'todo-list.ios.scss',
+   *      md: 'todo-list.md.scss',
+   *   }
+   * })
+   * ```
+   * In the example above, two `TransformCssToEsmInput`s should be created, one for 'ios' and one for 'md' (this field
+   * is not shared by multiple fields, nor is it a composite of multiple modes).
+   */
   mode?: string;
   commentOriginalSelector?: boolean;
   sourceMap?: boolean;
@@ -1904,6 +1960,7 @@ export interface PackageJsonData {
   name?: string;
   version?: string;
   main?: string;
+  exports?: { [key: string]: string | { [key: string]: string } };
   description?: string;
   bin?: { [key: string]: string };
   browser?: string;
@@ -2035,6 +2092,12 @@ declare global {
       toHaveFirstReceivedEventDetail(eventDetail: any): void;
 
       /**
+       * When given an EventSpy, checks the last event has
+       * received the correct custom event `detail` data.
+       */
+      toHaveLastReceivedEventDetail(eventDetail: any): void;
+
+      /**
        * When given an EventSpy, checks the event at an index
        * has received the correct custom event `detail` data.
        */
@@ -2148,6 +2211,7 @@ export interface E2EProcessEnv {
 
   __STENCIL_SCREENSHOT__?: 'true';
   __STENCIL_SCREENSHOT_BUILD__?: string;
+  __STENCIL_SCREENSHOT_TIMEOUT_MS__?: string;
 
   __STENCIL_E2E_TESTS__?: 'true';
   __STENCIL_E2E_DEVTOOLS__?: 'true';
@@ -2304,6 +2368,15 @@ export interface TypesImportData {
  */
 export interface TypesMemberNameData {
   /**
+   * The original name of the import before any aliasing was applied.
+   *
+   * i.e. if a component imports a type as follows:
+   * `import { MyType as MyCoolType } from './my-type';`
+   *
+   * the `originalName` would be 'MyType'. If the import is not aliased, then `originalName` and `localName` will be the same.
+   */
+  originalName: string;
+  /**
    * The name of the type as it's used within a file.
    */
   localName: string;
@@ -2365,7 +2438,7 @@ export interface CompilerWorkerContext {
 }
 
 /**
- * The methods that are supported on a {@link d.CompilerWorkerContext}
+ * The methods that are supported on a {@link CompilerWorkerContext}
  */
 export type WorkerContextMethod = keyof CompilerWorkerContext;
 

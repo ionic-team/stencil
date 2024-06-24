@@ -12,6 +12,7 @@ import ts from 'typescript';
 import type * as d from '../../declarations';
 import { updateComponentBuildConditionals } from '../app-core/app-data';
 import { resolveComponentDependencies } from '../entries/resolve-component-dependencies';
+import { performAutomaticKeyInsertion } from '../transformers/automatic-key-insertion';
 import { convertDecoratorsToStatic } from '../transformers/decorators-to-static/convert-decorators';
 import { rewriteAliasedDTSImportPaths } from '../transformers/rewrite-aliased-paths';
 import { updateModule } from '../transformers/static-to-meta/parse-static';
@@ -42,16 +43,18 @@ export const runTsProgram = async (
   const typesOutputTarget = config.outputTargets.filter(isOutputTargetDistTypes);
   const emittedDts: string[] = [];
   const emitCallback: ts.WriteFileCallback = (emitFilePath, data, _w, _e, tsSourceFiles) => {
-    if (emitFilePath.endsWith('.js') || emitFilePath.endsWith('js.map')) {
-      updateModule(config, compilerCtx, buildCtx, tsSourceFiles[0], data, emitFilePath, tsTypeChecker, null);
-    } else if (
-      emitFilePath.endsWith('.e2e.d.ts') ||
-      emitFilePath.endsWith('.spec.d.ts') ||
-      emitFilePath === 'e2e.d.ts' ||
-      emitFilePath === 'spec.d.ts'
+    if (
+      emitFilePath.includes('e2e.') ||
+      emitFilePath.includes('spec.') ||
+      emitFilePath.endsWith('e2e.d.ts') ||
+      emitFilePath.endsWith('spec.d.ts')
     ) {
       // we don't want to write these to disk!
       return;
+    }
+
+    if (emitFilePath.endsWith('.js') || emitFilePath.endsWith('js.map')) {
+      updateModule(config, compilerCtx, buildCtx, tsSourceFiles[0], data, emitFilePath, tsTypeChecker, null);
     } else if (emitFilePath.endsWith('.d.ts')) {
       const srcDtsPath = normalizePath(tsSourceFiles[0].fileName);
       const relativeEmitFilepath = getRelativeDts(config, srcDtsPath, emitFilePath);
@@ -66,7 +69,10 @@ export const runTsProgram = async (
   };
 
   const transformers: ts.CustomTransformers = {
-    before: [convertDecoratorsToStatic(config, buildCtx.diagnostics, tsTypeChecker, tsProgram)],
+    before: [
+      convertDecoratorsToStatic(config, buildCtx.diagnostics, tsTypeChecker, tsProgram),
+      performAutomaticKeyInsertion,
+    ],
     afterDeclarations: [],
   };
 

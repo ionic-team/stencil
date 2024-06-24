@@ -4,7 +4,7 @@ module.exports = {
     '@app-globals': '<rootDir>/internal/app-globals/index.cjs',
     '@platform': '<rootDir>/internal/testing/index.js',
     '@runtime': '<rootDir>/internal/testing/index.js',
-    '@stencil/core/cli': '<rootDir>/cli/index.js',
+    '@stencil/core/cli': '<rootDir>/cli/index.cjs',
     '@stencil/core/compiler': '<rootDir>/compiler/stencil.js',
     '@stencil/core/mock-doc': '<rootDir>/mock-doc/index.cjs',
     '@stencil/core/testing': '<rootDir>/testing/index.js',
@@ -20,8 +20,6 @@ module.exports = {
   collectCoverageFrom: [
     '<rootDir>/scripts/**/*.{js,jsx,ts,tsx}',
     '!<rootDir>/scripts/build/**/*.{js,jsx,ts,tsx}',
-    '!<rootDir>/scripts/bundles/helpers/compiler-cjs-intro.js',
-    '!<rootDir>/scripts/bundles/helpers/compiler-cjs-outro.js',
     '<rootDir>/src/app-data/**/*.{js,jsx,ts,tsx}',
     '<rootDir>/src/app-globals/**/*.{js,jsx,ts,tsx}',
     '<rootDir>/src/cli/**/*.{js,jsx,ts,tsx}',

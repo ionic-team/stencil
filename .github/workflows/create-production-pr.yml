@@ -35,7 +35,7 @@ jobs:
         shell: bash
 
       - name: Checkout Code
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
         with:
           # A depth of 0 gets the entire git history, which we'll want for things like checking all git history/tags.
           # We need git history to generate the changelog; however, we don't know how deep to go.
@@ -48,7 +48,7 @@ jobs:
 
       # TODO(STENCIL-927): Backport changes to the v3 branch
       - name: Run Publish Preparation Script
-        run: npm run release.ci.prepare -- --version ${{ inputs.version }} --any-branch
+        run: npm run release.ci.prepare -- --version ${{ inputs.version }}
         shell: bash
 
       - name: Log Generated Changes
@@ -70,7 +70,7 @@ jobs:
         shell: bash
 
       - name: Create the Pull Request
-        uses: peter-evans/create-pull-request@153407881ec5c347639a548ade7d8ad1d6740e38 # v5.0.2
+        uses: peter-evans/create-pull-request@6d6857d36972b65feb161a90e484f2984215f83e # v6.0.5
         with:
           # create a new pull request using the specified base branch
           base: ${{ inputs.base }}

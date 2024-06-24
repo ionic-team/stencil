@@ -119,10 +119,17 @@ export const validateTsConfig = async (config: d.ValidatedConfig, sys: d.Compile
   return tsconfig;
 };
 
-const getTsConfigPath = async (config: d.ValidatedConfig, sys: d.CompilerSystem, init: d.LoadConfigInit) => {
+const getTsConfigPath = async (
+  config: d.ValidatedConfig,
+  sys: d.CompilerSystem,
+  init: d.LoadConfigInit,
+): Promise<{
+  path: string;
+  content: string;
+} | null> => {
   const tsconfig = {
-    path: null as string,
-    content: null as string,
+    path: '',
+    content: '',
   };
 
   if (isString(config.tsconfig)) {

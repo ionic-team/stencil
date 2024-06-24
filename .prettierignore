@@ -34,8 +34,6 @@ node_modules/
 coverage/
 
 # output from compiling Stencil projects for testing purposes
-test/karma/test-sibling/
-test/karma/tmp-compiled-tests/
 test/**/dist/
 test/**/dist-react/
 test/**/hydrate/
@@ -49,7 +47,6 @@ test/docs-json/docs.d.ts
 test/docs-json/docs.json
 
 # minified angular that exists in the test directory
-test/karma/test-app/assets/angular.min.js
 
 # generated screenshot files
 /screenshot/index.js
@@ -59,3 +56,4 @@ test/karma/test-app/assets/angular.min.js
 
 # third party scripts
 src/mock-doc/third-party/jquery.ts
+test/wdio/slot-ng-if/assets/

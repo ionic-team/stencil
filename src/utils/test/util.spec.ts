@@ -160,7 +160,7 @@ describe('util', () => {
       const expectedDiagnostic: d.Diagnostic = stubDiagnostic({
         absFilePath: mockPackageJsonPath,
         header: 'Error Parsing JSON',
-        messageText: expect.stringMatching(/.*in JSON at position 13$/),
+        messageText: expect.stringMatching(/.*in JSON at position 13/),
         type: 'build',
       });
 

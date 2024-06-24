@@ -58,7 +58,7 @@ manual release was performed.
    1. Set the version title to `[VERMOJI] v[VERSION] ([yyyy.mm.dd])`.
       For example, v4.2.0 has a vermoji of 🌲, and was released on 2023.09.05.
       As a result, it was [released with the title](https://github.com/ionic-team/stencil/releases/tag/v4.2.0) of 🌲 4.2.0 (2023-09-05).
-   1. Copy the raw contents of (CHANGELOG.md)[./CHANGELOG.md] into the body
+   1. Copy the raw contents of [CHANGELOG.md](./CHANGELOG.md) into the body
    1. Ensure that the release is set as the latest (so long as we're not published a pre-release)
    1. If anyone from the community contributed commit(s) to this release,
       append the following to the end of the GitHub release notes:
@@ -69,10 +69,15 @@ manual release was performed.
       🎉 Thanks <GitHub_Usernames> for their contributions! 🎉
       ```
    1. Hit "Publish Release"    
-1. Navigate to the [Stencil Site](https://github.com/ionic-team/stencil-site/pulls) repository and merge PRs
-   containing documentation that has been approved, but not merged that is related to the release. Such PRs should be
-   labelled as `do not merge: waiting for next stencil release`. It's a good idea to review _all_ PRs though, just in
-   case.
+1. Navigate to the [Stencil Site](https://github.com/ionic-team/stencil-site/pulls) repository and:
+   1. Merge any open PRs containing documentation that has been approved, but
+      not merged that is related to the release. Such PRs should be labelled as
+      `do not merge: waiting for next stencil release`. It's a good idea to
+      review _all_ PRs though, just in case.
+   1. If the current release is a major or minor version, open a pull request
+     creating a new version of the docs by following the [guide in the
+     stencil-site
+     repo](https://github.com/ionic-team/stencil-site/blob/main/RELEASE.md#creating-a-new-version-section).
 1. If there are any 'next' branches in GitHub, say for a future major version of Stencil (e.g. `v5.0.0-dev`), now is a
    good time to rebase them against the `main` branch.
 1. End the code freeze in the Stencil team Slack channel.
@@ -88,10 +93,5 @@ manual release was performed.
       The fix for this issue has been released as a part of today's [Stencil
       vNUMBER release](https://github.com/ionic-team/stencil/releases/tag/TAG). 
       ```
-1. Let folks in Ionic know about the release:
-   1. Add a message to the `#whathappened` Slack channel with a link to the changelog.
-      1. Let the CS team know by 'at-ing' them  about any enterprise reported issues or feature requests that were included in the release in a thread on your #whathappened post. Jira
-         tickets related to enterprise requests should be marked with the "jira_escalated" label and/or the "Enterprise Support"
-         or "Enterprise Feature Requests" epic.
-   1. If there's a blog post to go out (either today or this week), let the folks in the `#devrel-stencil` channel know about the release and that the blog can go out.
-      1. When the blog goes out, put an announcement in the `#announcements` channel in Discord.
+1. If there's a blog post to go out (either today or this week), let the folks in the `#ask-ionic-devrel` channel know about the release and that the blog can go out.
+When the blog goes out, put an announcement in the `#announcements` channel in Discord.

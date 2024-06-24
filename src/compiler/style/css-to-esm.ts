@@ -1,9 +1,9 @@
 import { catchError, createJsVarName, DEFAULT_STYLE_MODE, hasError, isString, normalizePath, resolve } from '@utils';
+import { scopeCss } from '@utils/shadow-css';
 import MagicString from 'magic-string';
 import path from 'path';
 
 import type * as d from '../../declarations';
-import { scopeCss } from '../../utils/shadow-css';
 import { parseStyleDocs } from '../docs/style-docs';
 import { optimizeCss } from '../optimize/optimize-css';
 import { serializeImportPath } from '../transformers/stencil-import-path';
@@ -107,7 +107,7 @@ const transformCssToEsmModule = (input: d.TransformCssToEsmInput): d.TransformCs
   };
 
   if (input.docs) {
-    parseStyleDocs(results.styleDocs, input.input);
+    parseStyleDocs(results.styleDocs, input.input, input.mode);
   }
 
   try {

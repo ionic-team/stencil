@@ -2,12 +2,11 @@ import type { BuildOptions as ESBuildOptions } from 'esbuild';
 import fs from 'fs-extra';
 import { join } from 'path';
 
-import { bundleParse5 } from '../bundles/plugins/parse5-plugin';
 import { getBanner } from '../utils/banner';
-import { bundleDts } from '../utils/bundle-dts';
 import { BuildOptions, createReplaceData } from '../utils/options';
 import { writePkgJson } from '../utils/write-pkg-json';
-import { getBaseEsbuildOptions, getEsbuildAliases, runBuilds } from './util';
+import { getBaseEsbuildOptions, getEsbuildAliases, runBuilds } from './utils';
+import { bundleParse5 } from './utils/parse5';
 
 /**
  * Use esbuild to bundle the `mock-doc` submodule
@@ -23,8 +22,7 @@ export async function buildMockDoc(opts: BuildOptions) {
   // clear out rollup stuff and ensure directory exists
   await fs.emptyDir(outputDir);
 
-  // bundle d.ts
-  await bundleMockDocDts(opts, inputDir, outputDir);
+  await bundleMockDocDts(inputDir, outputDir);
 
   writePkgJson(opts, outputDir, {
     name: '@stencil/core/mock-doc',
@@ -72,20 +70,75 @@ export async function buildMockDoc(opts: BuildOptions) {
   return runBuilds([esmOptions, cjsOptions], opts);
 }
 
-async function bundleMockDocDts(opts: BuildOptions, inputDir: string, outputDir: string) {
-  const bundled = await bundleDts(
-    opts,
-    join(inputDir, 'index.ts'),
-    {
-      // we want to suppress the `dts-bundle-generator` banner here because we do
-      // our own later on
-      noBanner: true,
-      // we also don't want the types which are inlined into our bundled file to
-      // be re-exported, which will change the 'surface' of the module
-      exportReferencedTypes: false,
-    },
-    false,
+async function bundleMockDocDts(inputDir: string, outputDir: string) {
+  // only reason we can do this is because we already know the shape
+  // of mock-doc's dts files and how we want them to come together
+  const srcDtsFiles = (await fs.readdir(inputDir)).filter((f) => {
+    return f.endsWith('.d.ts') && !f.endsWith('index.d.ts') && !f.endsWith('index.d.ts-bundled.d.ts');
+  });
+
+  const output = await Promise.all(
+    srcDtsFiles.map((inputDtsFile) => {
+      return getDtsContent(inputDir, inputDtsFile);
+    }),
   );
 
-  await fs.writeFile(join(outputDir, 'index.d.ts'), bundled);
+  const srcIndexDts = await fs.readFile(join(inputDir, 'index.d.ts'), 'utf8');
+  output.push(getMockDocExports(srcIndexDts));
+
+  await fs.writeFile(join(outputDir, 'index.d.ts'), output.join('\n') + '\n');
+}
+
+async function getDtsContent(inputDir: string, inputDtsFile: string) {
+  const srcDtsText = await fs.readFile(join(inputDir, inputDtsFile), 'utf8');
+  const allLines = srcDtsText.split('\n');
+
+  const filteredLines = allLines.filter((ln) => {
+    if (ln.trim().startsWith('///')) {
+      return false;
+    }
+    if (ln.trim().startsWith('import ')) {
+      return false;
+    }
+    if (ln.trim().startsWith('__')) {
+      return false;
+    }
+    if (ln.trim().startsWith('private')) {
+      return false;
+    }
+    if (ln.replace(/ /g, '').startsWith('export{}')) {
+      return false;
+    }
+    return true;
+  });
+
+  let dtsContent = filteredLines
+    .map((ln) => {
+      if (ln.trim().startsWith('export ')) {
+        ln = ln.replace('export ', '');
+      }
+      return ln;
+    })
+    .join('\n')
+    .trim();
+
+  dtsContent = dtsContent.replace(/    /g, '  ');
+
+  return dtsContent;
+}
+
+function getMockDocExports(srcIndexDts: string) {
+  const exportLines = srcIndexDts.split('\n').filter((ln) => ln.trim().startsWith('export {'));
+  const dtsExports: string[] = [];
+
+  exportLines.forEach((ln) => {
+    const splt = ln.split('{')[1].split('}')[0].trim();
+    const exportNames = splt
+      .split(',')
+      .map((n) => n.trim())
+      .filter((n) => n.length > 0);
+    dtsExports.push(...exportNames);
+  });
+
+  return `export { ${dtsExports.sort().join(', ')} }`;
 }

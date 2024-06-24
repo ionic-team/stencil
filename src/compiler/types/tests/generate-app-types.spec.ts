@@ -206,7 +206,7 @@ declare module "@stencil/core" {
               resolved: '"wee" | "woo"',
               references: {
                 SecondUserImplementedEventType: {
-                  id: 'placeholder',
+                  id: './resources.ts::SecondUserImplementedEventType',
                   location: 'import',
                   path: './resources',
                 },
@@ -310,7 +310,7 @@ declare module "@stencil/core" {
               references: {
                 UserImplementedEventType: {
                   location: 'import',
-                  id: 'placeholder',
+                  id: './resources.ts::UserImplementedEventType',
                   path: './resources',
                 },
               },
@@ -479,7 +479,7 @@ declare module "@stencil/core" {
                 UserImplementedEventType: {
                   location: 'import',
                   path: './resources',
-                  id: 'placeholder',
+                  id: './resources::UserImplementedEventType',
                 },
               },
             },
@@ -502,7 +502,7 @@ declare module "@stencil/core" {
                 UserImplementedEventType: {
                   location: 'import',
                   path: './resources',
-                  id: 'placeholder',
+                  id: './resources::UserImplementedEventType',
                 },
               },
             },
@@ -649,7 +649,7 @@ declare module "@stencil/core" {
                 UserImplementedEventType: {
                   location: 'local',
                   path: '/some/stubbed/path/a/my-component.tsx',
-                  id: 'placeholder',
+                  id: '/some/stubbed/path/a/my-component.tsx::UserImplementedEventType',
                 },
               },
             },
@@ -671,7 +671,7 @@ declare module "@stencil/core" {
               references: {
                 UserImplementedEventType: {
                   location: 'local',
-                  id: 'placeholder',
+                  id: '/some/stubbed/path/b/my-new-component.tsx::UserImplementedEventType',
                   path: '/some/stubbed/path/b/my-new-component.tsx',
                 },
               },
@@ -819,7 +819,7 @@ declare module "@stencil/core" {
                 UserImplementedPropType: {
                   location: 'import',
                   path: './resources',
-                  id: 'placeholder',
+                  id: './resources::UserImplementedPropType',
                 },
               },
             },
@@ -907,7 +907,7 @@ declare module "@stencil/core" {
                 UserImplementedPropType: {
                   location: 'import',
                   path: './resources',
-                  id: 'placeholder',
+                  id: './resources::UserImplementedPropType',
                 },
               },
             },
@@ -921,7 +921,7 @@ declare module "@stencil/core" {
                 SecondUserImplementedPropType: {
                   location: 'import',
                   path: './resources',
-                  id: 'placeholder',
+                  id: './resources::SecondUserImplementedPropType',
                 },
               },
             },
@@ -1011,7 +1011,7 @@ declare module "@stencil/core" {
                 UserImplementedPropType: {
                   location: 'import',
                   path: './resources',
-                  id: 'placeholder',
+                  id: './resources::UserImplementedPropType',
                 },
               },
             },
@@ -1035,7 +1035,7 @@ declare module "@stencil/core" {
                 UserImplementedPropType: {
                   location: 'import',
                   path: '../resources',
-                  id: 'placeholder',
+                  id: '../resources::UserImplementedPropType',
                 },
               },
             },
@@ -1152,7 +1152,7 @@ declare module "@stencil/core" {
               references: {
                 UserImplementedPropType: {
                   location: 'import',
-                  id: 'placeholder',
+                  id: './resources.ts::UserImplementedPropType',
                   path: './resources',
                 },
               },
@@ -1177,7 +1177,7 @@ declare module "@stencil/core" {
                 UserImplementedPropType: {
                   location: 'import',
                   path: './resources',
-                  id: 'placeholder',
+                  id: './resources.ts::UserImplementedPropType',
                 },
               },
             },
@@ -1297,7 +1297,7 @@ declare module "@stencil/core" {
                 UserImplementedPropType: {
                   location: 'local',
                   path: '/some/stubbed/path/a/my-component.tsx',
-                  id: 'placeholder',
+                  id: '/some/stubbed/path/a/my-component.tsx::UserImplementedPropType',
                 },
               },
             },
@@ -1321,7 +1321,7 @@ declare module "@stencil/core" {
                 UserImplementedPropType: {
                   location: 'local',
                   path: '/some/stubbed/path/b/my-new-component.tsx',
-                  id: 'placeholder',
+                  id: '/some/stubbed/path/b/my-new-component.tsx::UserImplementedPropType',
                 },
               },
             },
@@ -1444,7 +1444,7 @@ declare module "@stencil/core" {
               UserImplementedPropType: {
                 location: 'import',
                 path: './resources',
-                id: 'placeholder',
+                id: './resources.ts::UserImplementedPropType',
               },
             },
           },
@@ -1676,6 +1676,98 @@ declare module "@stencil/core" {
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { UserImplementedPropType } from "@utils";
 export { UserImplementedPropType } from "@utils";
+export namespace Components {
+    /**
+     * docs
+     */
+    interface MyComponent {
+        "name": UserImplementedPropType;
+    }
+}
+declare global {
+    /**
+     * docs
+     */
+    interface HTMLMyComponentElement extends Components.MyComponent, HTMLStencilElement {
+    }
+    var HTMLMyComponentElement: {
+        prototype: HTMLMyComponentElement;
+        new (): HTMLMyComponentElement;
+    };
+    interface HTMLElementTagNameMap {
+        "my-component": HTMLMyComponentElement;
+    }
+}
+declare namespace LocalJSX {
+    /**
+     * docs
+     */
+    interface MyComponent {
+        "name"?: UserImplementedPropType;
+    }
+    interface IntrinsicElements {
+        "my-component": MyComponent;
+    }
+}
+export { LocalJSX as JSX };
+declare module "@stencil/core" {
+    export namespace JSX {
+        interface IntrinsicElements {
+            /**
+             * docs
+             */
+            "my-component": LocalJSX.MyComponent & JSXBase.HTMLAttributes<HTMLMyComponentElement>;
+        }
+    }
+}
+`,
+      {
+        immediateWrite: true,
+      },
+    );
+  });
+
+  it('should handle type import aliases', async () => {
+    const compilerComponentMeta = stubComponentCompilerMeta({
+      tagName: 'my-component',
+      componentClassName: 'MyComponent',
+      jsFilePath: '/some/stubbed/path/a/my-component.js',
+      sourceFilePath: '/some/stubbed/path/a/my-component.tsx',
+      sourceMapPath: '/some/stubbed/path/a/my-component.js.map',
+      hasProp: true,
+      properties: [
+        stubComponentCompilerProperty({
+          name: 'name',
+          complexType: {
+            original: 'UserImplementedPropType',
+            resolved: '"foo" | "bar"',
+            references: {
+              UserImplementedPropType: {
+                id: 'some-file.ts::MyType',
+                location: 'import',
+                path: '@utils',
+              },
+            },
+          },
+        }),
+      ],
+    });
+    buildCtx.components = [compilerComponentMeta];
+    config.tsCompilerOptions = {};
+
+    await generateAppTypes(config, compilerCtx, buildCtx, 'src');
+
+    expect(mockWriteFile).toHaveBeenCalledWith(
+      '/components.d.ts',
+      `/* eslint-disable */
+/* tslint:disable */
+/**
+ * This is an autogenerated file created by the Stencil compiler.
+ * It contains typing information for all components that exist in this project.
+ */
+import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
+import { MyType as UserImplementedPropType } from "@utils";
+export { MyType as UserImplementedPropType } from "@utils";
 export namespace Components {
     /**
      * docs

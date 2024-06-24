@@ -354,11 +354,9 @@ describe('hydrate, shadow in shadow', () => {
         <!--r.1-->
         <cmp-b class="hydrated" c-id="1.0.0.0" s-id="2">
           <!--r.2-->
-          <!--t.2.0.0.0-->
-          shadow-header
+          <!--t.2.0.0.0-->shadow-header
           <footer c-id="2.1.0.1">
-            <!--t.2.2.1.0-->
-            shadow-footer
+            <!--t.2.2.1.0-->shadow-footer
           </footer>
         </cmp-b>
       </cmp-a>
@@ -423,8 +421,7 @@ describe('hydrate, shadow in shadow', () => {
           <!--o.1.1.-->
           <header c-id="2.0.0.0"></header>
           <!--s.2.1.0.1.-->
-          <!--t.1.1.1.0-->
-          light-dom
+          <!--t.1.1.1.0-->light-dom
           <footer c-id="2.2.0.2"></footer>
         </cmp-b>
       </cmp-a>
@@ -446,8 +443,7 @@ describe('hydrate, shadow in shadow', () => {
             <slot></slot>
             <footer></footer>
           </mock:shadow-root>
-          <!---->
-          light-dom
+          <!---->light-dom
         </cmp-b>
       </cmp-a>
     `);

@@ -43,7 +43,7 @@ jobs:
         if: ${{ inputs.base != 'main' && inputs.tag == 'latest' }}
 
       - name: Checkout Code
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
         with:
           # A depth of 0 gets the entire git history, which we'll want for things like checking all git history/tags.
           # We need git history to generate the changelog; however, we don't know how deep to go.
@@ -63,5 +63,5 @@ jobs:
       - name: Run Publish Scripts
         # pass the generated version number instead of the input, since we've already incremented it in the prerelease
         # step
-        run: npm run release.ci -- --any-branch --tag ${{ inputs.tag }}
+        run: npm run release.ci -- --tag ${{ inputs.tag }}
         shell: bash

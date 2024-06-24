@@ -1,10 +1,10 @@
 import { mockBuildCtx, mockCompilerCtx, mockModule, mockValidatedConfig } from '@stencil/core/testing';
-import { getComponentsFromModules } from '@utils';
+import { DEFAULT_STYLE_MODE, getComponentsFromModules } from '@utils';
 
 import type * as d from '../../../declarations';
 import { stubComponentCompilerMeta } from '../../types/tests/ComponentCompilerMeta.stub';
 import { AUTO_GENERATE_COMMENT } from '../constants';
-import { generateDocData } from '../generate-doc-data';
+import { generateDocData, getDocsStyles } from '../generate-doc-data';
 
 describe('generate-doc-data', () => {
   describe('getDocsComponents', () => {
@@ -195,6 +195,217 @@ auto-generated content
         const componentDocData = generatedDocData.components[0];
         expect(componentDocData.docs).toBe('');
       });
+    });
+  });
+
+  describe('getDocsStyles', () => {
+    it('returns an empty array if no styleDocs exist on the compiler metadata', () => {
+      const compilerMeta = stubComponentCompilerMeta();
+      // @ts-ignore - the intent of this test is to verify allocation of a new array if for some reason this is missing
+      compilerMeta.styleDocs = null;
+
+      const actual = getDocsStyles(compilerMeta);
+
+      expect(actual).toEqual([]);
+    });
+
+    it('returns an empty array if empty styleDocs exist on the compiler metadata', () => {
+      const compilerMeta = stubComponentCompilerMeta({ styleDocs: [] });
+
+      const actual = getDocsStyles(compilerMeta);
+
+      expect(actual).toEqual([]);
+    });
+
+    it("returns a 'sorted' array of one CompilerStyleDoc", () => {
+      const compilerStyleDoc: d.CompilerStyleDoc = {
+        annotation: 'prop',
+        docs: 'these are the docs for this prop',
+        name: 'my-style-one',
+        mode: 'md',
+      };
+      const compilerMeta = stubComponentCompilerMeta({ styleDocs: [compilerStyleDoc] });
+
+      const actual = getDocsStyles(compilerMeta);
+
+      expect(actual).toEqual([compilerStyleDoc]);
+    });
+
+    it('returns a sorted array from multiple CompilerStyleDoc', () => {
+      const compilerStyleDocOne: d.CompilerStyleDoc = {
+        annotation: 'prop',
+        docs: 'these are the docs for my-style-a',
+        name: 'my-style-a',
+        mode: 'ios',
+      };
+      const compilerStyleDocTwo: d.CompilerStyleDoc = {
+        annotation: 'prop',
+        docs: 'these are more docs for my-style-b',
+        name: 'my-style-b',
+        mode: 'ios',
+      };
+      const compilerStyleDocThree: d.CompilerStyleDoc = {
+        annotation: 'prop',
+        docs: 'these are more docs for my-style-c',
+        name: 'my-style-c',
+        mode: 'ios',
+      };
+      const compilerMeta = stubComponentCompilerMeta({
+        styleDocs: [compilerStyleDocOne, compilerStyleDocThree, compilerStyleDocTwo],
+      });
+
+      const actual = getDocsStyles(compilerMeta);
+
+      expect(actual).toEqual([compilerStyleDocOne, compilerStyleDocTwo, compilerStyleDocThree]);
+    });
+
+    it('returns a sorted array from based on mode for the same name', () => {
+      const mdCompilerStyle: d.CompilerStyleDoc = {
+        annotation: 'prop',
+        docs: 'these are the docs for my-style-a',
+        name: 'my-style-a',
+        mode: 'md',
+      };
+      const iosCompilerStyle: d.CompilerStyleDoc = {
+        annotation: 'prop',
+        docs: 'these are the docs for my-style-a',
+        name: 'my-style-a',
+        mode: 'ios',
+      };
+      const compilerMeta = stubComponentCompilerMeta({
+        styleDocs: [mdCompilerStyle, iosCompilerStyle],
+      });
+
+      const actual = getDocsStyles(compilerMeta);
+
+      expect(actual).toEqual([iosCompilerStyle, mdCompilerStyle]);
+    });
+  });
+
+  it("returns CompilerStyleDoc with the same name in the order they're provided", () => {
+    const compilerStyleDocOne: d.CompilerStyleDoc = {
+      annotation: 'prop',
+      docs: 'these are the docs for my-style-a (first lowercase)',
+      name: 'my-style-a',
+      mode: 'ios',
+    };
+    const compilerStyleDocTwo: d.CompilerStyleDoc = {
+      annotation: 'prop',
+      docs: 'these are more docs for my-style-A (only capital)',
+      name: 'my-style-A',
+      mode: 'ios',
+    };
+    const compilerStyleDocThree: d.CompilerStyleDoc = {
+      annotation: 'prop',
+      docs: 'these are more docs for my-style-a (second lowercase)',
+      name: 'my-style-a',
+      mode: 'ios',
+    };
+    const compilerMeta = stubComponentCompilerMeta({
+      styleDocs: [compilerStyleDocOne, compilerStyleDocThree, compilerStyleDocTwo],
+    });
+
+    const actual = getDocsStyles(compilerMeta);
+
+    expect(actual).toEqual([compilerStyleDocOne, compilerStyleDocThree, compilerStyleDocTwo]);
+  });
+
+  describe('default values', () => {
+    it.each(['', null, undefined])(
+      "defaults the annotation to an empty string if '%s' is provided",
+      (annotationValue) => {
+        const compilerStyleDoc: d.CompilerStyleDoc = {
+          annotation: 'prop',
+          docs: 'these are the docs for this prop',
+          name: 'my-style-one',
+          mode: DEFAULT_STYLE_MODE,
+        };
+        // @ts-ignore the intent of this test to verify the fallback of this field if it's falsy
+        compilerStyleDoc.annotation = annotationValue;
+
+        const compilerMeta = stubComponentCompilerMeta({ styleDocs: [compilerStyleDoc] });
+
+        const actual = getDocsStyles(compilerMeta);
+
+        expect(actual).toEqual([
+          {
+            annotation: '',
+            docs: 'these are the docs for this prop',
+            name: 'my-style-one',
+          },
+        ]);
+      },
+    );
+
+    it.each(['', null, undefined])("defaults the docs to an empty string if '%s' is provided", (docsValue) => {
+      const compilerStyleDoc: d.CompilerStyleDoc = {
+        annotation: 'prop',
+        docs: 'these are the docs for this prop',
+        name: 'my-style-one',
+        mode: DEFAULT_STYLE_MODE,
+      };
+      // @ts-ignore the intent of this test to verify the fallback of this field if it's falsy
+      compilerStyleDoc.docs = docsValue;
+
+      const compilerMeta = stubComponentCompilerMeta({ styleDocs: [compilerStyleDoc] });
+
+      const actual = getDocsStyles(compilerMeta);
+
+      expect(actual).toEqual([
+        {
+          annotation: 'prop',
+          docs: '',
+          name: 'my-style-one',
+        },
+      ]);
+    });
+
+    it.each(['', undefined, null, DEFAULT_STYLE_MODE])(
+      "uses 'undefined' for the mode value when '%s' is provided",
+      (modeValue) => {
+        const compilerStyleDoc: d.CompilerStyleDoc = {
+          annotation: 'prop',
+          docs: 'these are the docs for this prop',
+          name: 'my-style-one',
+          // we intentionally set this to non-compliant types for the purpose of this test, hence the type assertion
+          mode: modeValue as unknown as string,
+        };
+
+        const compilerMeta = stubComponentCompilerMeta({ styleDocs: [compilerStyleDoc] });
+
+        const actual = getDocsStyles(compilerMeta);
+
+        expect(actual).toEqual([
+          {
+            annotation: 'prop',
+            docs: 'these are the docs for this prop',
+            name: 'my-style-one',
+            mode: undefined,
+          },
+        ]);
+      },
+    );
+
+    it('uses the mode value, when a valid string is provided', () => {
+      const compilerStyleDoc: d.CompilerStyleDoc = {
+        annotation: 'prop',
+        docs: 'these are the docs for this prop',
+        name: 'my-style-one',
+        mode: 'valid-string',
+      };
+
+      const compilerMeta = stubComponentCompilerMeta({ styleDocs: [compilerStyleDoc] });
+
+      const actual = getDocsStyles(compilerMeta);
+
+      expect(actual).toEqual([
+        {
+          annotation: 'prop',
+          docs: 'these are the docs for this prop',
+          name: 'my-style-one',
+          mode: 'valid-string',
+        },
+      ]);
     });
   });
 });

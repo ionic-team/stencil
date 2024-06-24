@@ -176,6 +176,7 @@ export const updateBuildConditionals = (config: ValidatedConfig, b: BuildConditi
   b.lifecycleDOMEvents = !!(b.isDebug || config._isTesting || config.extras.lifecycleDOMEvents);
   // TODO(STENCIL-914): remove this option when `experimentalSlotFixes` is the default behavior
   b.scopedSlotTextContentFix = !!config.extras.scopedSlotTextContentFix;
+  // TODO(STENCIL-1305): remove this option
   b.scriptDataOpts = config.extras.scriptDataOpts;
   b.attachStyles = true;
   b.invisiblePrehydration = typeof config.invisiblePrehydration === 'undefined' ? true : config.invisiblePrehydration;
@@ -186,6 +187,7 @@ export const updateBuildConditionals = (config: ValidatedConfig, b: BuildConditi
   if (config.hydratedFlag) {
     b.hydratedAttribute = config.hydratedFlag.selector === 'attribute';
     b.hydratedClass = config.hydratedFlag.selector === 'class';
+    b.hydratedSelectorName = config.hydratedFlag.name;
   } else {
     b.hydratedAttribute = false;
     b.hydratedClass = false;

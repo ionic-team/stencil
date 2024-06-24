@@ -6,10 +6,16 @@ import { join, relative } from 'path';
 
 import { writeScreenshotData, writeScreenshotImage } from './screenshot-fs';
 
+/**
+ * @see {@link d.TestingConfig.screenshotTimeout}
+ */
+const DEFAULT_SCREENSHOT_TIMEOUT = 2500;
+
 export async function compareScreenshot(
   emulateConfig: d.EmulateConfig,
   screenshotBuildData: d.ScreenshotBuildData,
   currentScreenshotBuf: Buffer,
+  screenshotTimeoutMs: number | null,
   desc: string,
   width: number,
   height: number,
@@ -21,7 +27,6 @@ export async function compareScreenshot(
   const currentImagePath = join(screenshotBuildData.imagesDir, currentImageName);
 
   await writeScreenshotImage(currentImagePath, currentScreenshotBuf);
-  currentScreenshotBuf = null;
 
   if (testPath) {
     testPath = normalizePath(relative(screenshotBuildData.rootDir, testPath));
@@ -104,21 +109,18 @@ export async function compareScreenshot(
       // compare the two images pixel by pixel to
       // figure out a mismatch value
 
-      // figure out the actual width and height of the screenshot
-      const naturalWidth = Math.round(emulateConfig.viewport.width * emulateConfig.viewport.deviceScaleFactor);
-      const naturalHeight = Math.round(emulateConfig.viewport.height * emulateConfig.viewport.deviceScaleFactor);
-
       const pixelMatchInput: d.PixelMatchInput = {
         imageAPath: join(screenshotBuildData.imagesDir, screenshot.diff.imageA),
         imageBPath: join(screenshotBuildData.imagesDir, screenshot.diff.imageB),
-        width: naturalWidth,
-        height: naturalHeight,
+        width: Math.round(width),
+        height: Math.round(height),
         pixelmatchThreshold: pixelmatchThreshold,
       };
 
       screenshot.diff.mismatchedPixels = await getMismatchedPixels(
         screenshotBuildData.pixelmatchModulePath,
         pixelMatchInput,
+        screenshotTimeoutMs,
       );
     }
   }
@@ -128,19 +130,26 @@ export async function compareScreenshot(
   return screenshot.diff;
 }
 
-async function getMismatchedPixels(pixelmatchModulePath: string, pixelMatchInput: d.PixelMatchInput) {
+async function getMismatchedPixels(
+  pixelmatchModulePath: string,
+  pixelMatchInput: d.PixelMatchInput,
+  screenshotTimeoutMs: number | null,
+) {
   return new Promise<number>((resolve, reject) => {
     /**
      * When using screenshot functionality in a runner that is not Jasmine (e.g. Jest Circus), we need to set a default
      * value for timeouts. There are runtime errors that occur if we attempt to use optional chaining + nullish
      * coalescing with the `jasmine` global stating it's not defined. As a result, we use a ternary here.
      *
-     * The '2500' value that we default to is the value of `jasmine.DEFAULT_TIMEOUT_INTERVAL` (5000) divided by 2.
+     * For Jest environments that don't use Jest Circus we define the timeout based on the
+     * `jasmine.DEFAULT_TIMEOUT_INTERVAL` (5000) divided by 2. Otherwise we use {@link d.TestingConfig.screenshotTimeout}.
      */
     const timeout =
-      typeof jasmine !== 'undefined' && jasmine.DEFAULT_TIMEOUT_INTERVAL
-        ? jasmine.DEFAULT_TIMEOUT_INTERVAL * 0.5
-        : 2500;
+      screenshotTimeoutMs !== null
+        ? screenshotTimeoutMs
+        : typeof jasmine !== 'undefined' && jasmine.DEFAULT_TIMEOUT_INTERVAL
+          ? jasmine.DEFAULT_TIMEOUT_INTERVAL * 0.5
+          : DEFAULT_SCREENSHOT_TIMEOUT;
     const tmr = setTimeout(() => {
       reject(`getMismatchedPixels timeout: ${timeout}ms`);
     }, timeout);
@@ -169,7 +178,7 @@ async function getMismatchedPixels(pixelmatchModulePath: string, pixelMatchInput
         reject(err);
       });
 
-      pixelMatchProcess.stderr.on('data', (data) => {
+      pixelMatchProcess.stderr?.on('data', (data) => {
         error = data.toString();
       });
 

@@ -127,11 +127,11 @@ describe('parseHtml', () => {
       <template>text</template>
     `);
 
-    expect(doc.head.innerHTML).toBe(`<template>text</template>`);
+    expect(doc.head.innerHTML).toBe(`<template shadowrootmode="open">text</template>`);
 
     const tmplElm: HTMLTemplateElement = doc.head.firstElementChild as any;
 
-    expect(tmplElm.outerHTML).toBe(`<template>text</template>`);
+    expect(tmplElm.outerHTML).toBe(`<template shadowrootmode="open">text</template>`);
     expect(tmplElm.content?.firstChild?.textContent).toBe(`text`);
     expect(tmplElm.childNodes).toHaveLength(0);
   });

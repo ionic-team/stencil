@@ -1,8 +1,19 @@
 import type * as d from '../../../declarations';
-import { getBuildFeatures } from '../../app-core/app-data';
+import { getBuildFeatures, updateBuildConditionals } from '../../app-core/app-data';
 
-export const getHydrateBuildConditionals = (cmps: d.ComponentCompilerMeta[]) => {
+/**
+ * Get the `BUILD` conditionals for the hydrate build based on the current
+ * project
+ *
+ * @param config a validated Stencil configuration
+ * @param cmps component metadata
+ * @returns a populated build conditional object
+ */
+export const getHydrateBuildConditionals = (config: d.ValidatedConfig, cmps: d.ComponentCompilerMeta[]) => {
   const build = getBuildFeatures(cmps) as d.BuildConditionals;
+  // we need to make sure that things like the hydratedClass and flag are
+  // set for the hydrate build
+  updateBuildConditionals(config, build);
 
   build.slotRelocation = true;
   build.lazyLoad = true;
@@ -32,8 +43,7 @@ export const getHydrateBuildConditionals = (cmps: d.ComponentCompilerMeta[]) => 
   build.cssAnnotations = true;
   // TODO(STENCIL-854): Remove code related to legacy shadowDomShim field
   build.shadowDomShim = true;
-  build.hydratedAttribute = false;
-  build.hydratedClass = true;
+  // TODO(STENCIL-1305): remove this option
   build.scriptDataOpts = false;
   build.attachStyles = true;
 

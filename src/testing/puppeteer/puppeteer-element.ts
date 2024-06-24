@@ -385,11 +385,29 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
 
         const computedStyle = window.getComputedStyle(elm, pseudoElt);
 
-        const keys = Object.keys(computedStyle);
+        const keys = [
+          ...Object.keys(computedStyle),
+          /**
+           * include CSS variables defined within the style attribute
+           * of an element, e.g.:
+           * ```
+           * <my-component style="--my-component-text-color: rgb(255, 0, 0);"></my-component>
+           * ```
+           */
+          ...Array.from((elm as HTMLElement).style),
+        ];
 
         keys.forEach((key) => {
           if (isNaN(key as any)) {
-            const value = computedStyle[key as any];
+            const value =
+              /**
+               * access property directly for any known css property
+               */
+              computedStyle[key as any] ||
+              /**
+               * use `getPropertyValue` for css variables
+               */
+              computedStyle.getPropertyValue(key);
             if (value != null) {
               rtn[key] = value;
             }
@@ -509,6 +527,14 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
 
     const rootElm = frag.firstElementChild;
 
+    /**
+     * in case the user called `newE2EPage` without any content `rootElm` will be undefined
+     * and further operations will fail. We need to check for this case and return early.
+     */
+    if (!rootElm) {
+      return;
+    }
+
     this.nodeName = rootElm.nodeName;
     this.attributes = cloneAttributes(rootElm.attributes);
 
@@ -543,12 +569,24 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
 }
 
 export async function find(page: pd.E2EPageInternal, rootHandle: puppeteer.ElementHandle, selector: pd.FindSelector) {
-  const { lightSelector, shadowSelector, text, contains } = getSelector(selector);
+  const { lightSelector, text, contains } = getSelector(selector);
 
   let elmHandle: puppeteer.ElementHandle;
 
+  if (typeof selector === 'string' && selector.includes('>>>')) {
+    const handle = await page.$(selector);
+
+    if (!handle) {
+      return null;
+    }
+
+    const elm = new E2EElement(page, handle);
+    await elm.e2eSync();
+    return elm;
+  }
+
   if (typeof lightSelector === 'string') {
-    elmHandle = await findWithCssSelector(page, rootHandle, lightSelector, shadowSelector);
+    elmHandle = await findWithCssSelector(rootHandle, lightSelector);
   } else {
     elmHandle = await findWithText(page, rootHandle, text, contains);
   }
@@ -562,38 +600,11 @@ export async function find(page: pd.E2EPageInternal, rootHandle: puppeteer.Eleme
   return elm;
 }
 
-async function findWithCssSelector(
-  page: pd.E2EPageInternal,
-  rootHandle: puppeteer.ElementHandle,
-  lightSelector: string,
-  shadowSelector: string,
-) {
-  let elmHandle = await rootHandle.$(lightSelector);
+async function findWithCssSelector(rootHandle: puppeteer.ElementHandle, lightSelector: string) {
+  const elmHandle = await rootHandle.$(lightSelector);
 
   if (!elmHandle) {
     return null;
-  }
-
-  if (shadowSelector) {
-    const shadowHandle = await page.evaluateHandle(
-      (elm: Element, shadowSelector: string) => {
-        if (!elm.shadowRoot) {
-          throw new Error(`shadow root does not exist for element: ${elm.tagName.toLowerCase()}`);
-        }
-
-        return elm.shadowRoot.querySelector(shadowSelector);
-      },
-      elmHandle,
-      shadowSelector,
-    );
-
-    await elmHandle.dispose();
-
-    if (!shadowHandle) {
-      return null;
-    }
-
-    elmHandle = shadowHandle.asElement() as puppeteer.ElementHandle<Element>;
   }
 
   return elmHandle;
@@ -659,50 +670,26 @@ export async function findAll(
 ) {
   const foundElms: E2EElement[] = [];
 
-  const { lightSelector, shadowSelector } = getSelector(selector);
+  if (typeof selector === 'string' && selector.includes('>>>')) {
+    const handles = await page.$$(selector);
+    for (let i = 0; i < handles.length; i++) {
+      const elm = new E2EElement(page, handles[i]);
+      await elm.e2eSync();
+      foundElms.push(elm);
+    }
+    return foundElms;
+  }
 
+  const { lightSelector } = getSelector(selector);
   const lightElmHandles = await rootHandle.$$(lightSelector);
   if (lightElmHandles.length === 0) {
     return foundElms;
   }
 
-  if (shadowSelector) {
-    // light dom selected, then shadow dom selected inside of light dom elements
-    for (let i = 0; i < lightElmHandles.length; i++) {
-      const executionContext = getPuppeteerExecution(lightElmHandles[i]);
-      const shadowJsHandle = await executionContext.evaluateHandle(
-        (elm: Element, shadowSelector: string) => {
-          if (!elm.shadowRoot) {
-            throw new Error(`shadow root does not exist for element: ${elm.tagName.toLowerCase()}`);
-          }
-
-          return elm.shadowRoot.querySelectorAll(shadowSelector);
-        },
-        lightElmHandles[i],
-        shadowSelector,
-      );
-
-      await lightElmHandles[i].dispose();
-
-      const shadowJsProperties = await shadowJsHandle.getProperties();
-      await shadowJsHandle.dispose();
-
-      for (const shadowJsProperty of shadowJsProperties.values()) {
-        const shadowElmHandle = shadowJsProperty.asElement() as puppeteer.ElementHandle;
-        if (shadowElmHandle) {
-          const elm = new E2EElement(page, shadowElmHandle);
-          await elm.e2eSync();
-          foundElms.push(elm);
-        }
-      }
-    }
-  } else {
-    // light dom only
-    for (let i = 0; i < lightElmHandles.length; i++) {
-      const elm = new E2EElement(page, lightElmHandles[i]);
-      await elm.e2eSync();
-      foundElms.push(elm);
-    }
+  for (let i = 0; i < lightElmHandles.length; i++) {
+    const elm = new E2EElement(page, lightElmHandles[i]);
+    await elm.e2eSync();
+    foundElms.push(elm);
   }
 
   return foundElms;
@@ -711,16 +698,12 @@ export async function findAll(
 function getSelector(selector: pd.FindSelector) {
   const rtn = {
     lightSelector: null as string,
-    shadowSelector: null as string,
     text: null as string,
     contains: null as string,
   };
 
   if (typeof selector === 'string') {
-    const splt = selector.split('>>>');
-
-    rtn.lightSelector = splt[0].trim();
-    rtn.shadowSelector = splt.length > 1 ? splt[1].trim() : null;
+    rtn.lightSelector = selector.trim();
   } else if (typeof selector.text === 'string') {
     rtn.text = selector.text.trim();
   } else if (typeof selector.contains === 'string') {

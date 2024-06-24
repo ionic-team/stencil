@@ -65,6 +65,16 @@ Those are handled by a [separate workflow](#browserstack-browserstackyml).
 
 This workflow is responsible for running the Stencil unit testing suite.
 
+### WebdriverIO Tests (`test-wdio.yml`)
+
+This workflow runs our integration tests which assert that various Stencil
+features work correctly when components using them are built and then rendered
+in actual browsers. We run these tests using
+[WebdriverIO](https://webdriver.io/) against Firefox, Chrome, and Edge.
+
+For more information on how those tests are set up please see the [WebdriverIO
+test README](../../test/wdio/README.md).
+
 ### Design
 
 #### Overview
@@ -116,17 +126,6 @@ all jobs' options in the GitHub Actions UI.
 When a `git push` is made to a branch, Stencil's CI is designed to stop existing job(s) associated with the workflow + 
 branch.
 A new CI run (of each workflow) will begin upon stopping the existing job(s) using the new `HEAD` of the branch.
-
-### BrowserStack (`browserstack.yml`)
-
-This workflow is used to run a series of integration tests using [BrowserStack](https://www.browserstack.com).
-The exact details of which browsers are targeted can be found in the [karma directory](../../test/karma) of the project.
-
-Running this workflow requires a username + access key in order to access BrowserStack.
-These credentials are stored as secrets in GitHub.
-
-This workflow differs from most in that it is designed to run on `pull_request_target` triggers.
-This allows community provided pull requests to run BrowserStack tests. 
 
 ## Repository Configuration
 

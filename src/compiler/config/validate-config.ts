@@ -1,5 +1,5 @@
 import { createNodeLogger, createNodeSys } from '@sys-api-node';
-import { buildError, isBoolean, isNumber, isString, sortBy } from '@utils';
+import { buildError, buildWarn, isBoolean, isNumber, isString, sortBy } from '@utils';
 
 import {
   ConfigBundle,
@@ -124,6 +124,7 @@ export const validateConfig = (
     devMode,
     extras: config.extras || {},
     flags,
+    generateExportMaps: isBoolean(config.generateExportMaps) ? config.generateExportMaps : false,
     hashFileNames,
     hashedFileNameLength: config.hashedFileNameLength ?? DEFAULT_HASHED_FILENAME_LENGTH,
     hydratedFlag: validateHydrated(config),
@@ -264,6 +265,15 @@ export const validateConfig = (
     }
     return arr;
   }, [] as RegExp[]);
+
+  // TODO(STENCIL-1107): Remove this check. It'll be unneeded (and raise a compilation error when we build Stencil) once
+  // this property is removed.
+  if (validatedConfig.nodeResolve?.customResolveOptions) {
+    const warn = buildWarn(diagnostics);
+    // this message is particularly long - let the underlying logger implementation take responsibility for breaking it
+    // up to fit in a terminal window
+    warn.messageText = `nodeResolve.customResolveOptions is a deprecated option in a Stencil Configuration file. If you need this option, please open a new issue in the Stencil repository (https://github.com/ionic-team/stencil/issues/new/choose)`;
+  }
 
   CACHED_VALIDATED_CONFIG = validatedConfig;
 

@@ -18,6 +18,16 @@ import { taskTelemetry } from './task-telemetry';
 import { taskTest } from './task-test';
 import { telemetryAction } from './telemetry/telemetry';
 
+/**
+ * Main entry point for the Stencil CLI
+ *
+ * Take care of parsing CLI arguments, initializing various components needed
+ * by the rest of the program, and kicking off the correct task (build, test,
+ * etc).
+ *
+ * @param init initial CLI options
+ * @returns an empty promise
+ */
 export const run = async (init: d.CliInitOptions) => {
   const { args, logger, sys } = init;
 
@@ -37,6 +47,16 @@ export const run = async (init: d.CliInitOptions) => {
       sys.applyGlobalPatch(sys.getCurrentDirectory());
     }
 
+    if ((task && task === 'version') || flags.version) {
+      // we need to load the compiler here to get the version, but we don't
+      // want to load it in the case that we're going to just log the help
+      // message and then exit below (if there's no `task` defined) so we load
+      // it just within our `if` scope here.
+      const coreCompiler = await loadCoreCompiler(sys);
+      console.log(coreCompiler.version);
+      return;
+    }
+
     if (!task || task === 'help' || flags.help) {
       await taskHelp(createConfigFlags({ task: 'help', args }), logger, sys);
 
@@ -52,11 +72,6 @@ export const run = async (init: d.CliInitOptions) => {
     }
 
     const coreCompiler = await loadCoreCompiler(sys);
-
-    if (task === 'version' || flags.version) {
-      console.log(coreCompiler.version);
-      return;
-    }
 
     startupLogVersion(logger, task, coreCompiler);
 
@@ -106,7 +121,7 @@ export const run = async (init: d.CliInitOptions) => {
  * @param coreCompiler an instance of a minimal, bootstrap compiler for running the specified task
  * @param config a configuration for the Stencil project to apply to the task run
  * @param task the task to run
- * @param sys the {@link CompilerSystem} for interacting with the operating system
+ * @param sys the {@link d.CompilerSystem} for interacting with the operating system
  * @public
  * @returns a void promise
  */

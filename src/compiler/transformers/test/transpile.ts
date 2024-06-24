@@ -2,6 +2,7 @@ import type * as d from '@stencil/core/declarations';
 import { mockBuildCtx, mockCompilerCtx, mockValidatedConfig } from '@stencil/core/testing';
 import ts from 'typescript';
 
+import { performAutomaticKeyInsertion } from '../automatic-key-insertion';
 import { convertDecoratorsToStatic } from '../decorators-to-static/convert-decorators';
 import { updateModule } from '../static-to-meta/parse-static';
 import { convertStaticToMeta } from '../static-to-meta/visitor';
@@ -109,7 +110,11 @@ export function transpileModule(
   };
 
   tsProgram.emit(undefined, undefined, undefined, undefined, {
-    before: [convertDecoratorsToStatic(config, buildCtx.diagnostics, tsTypeChecker, tsProgram), ...beforeTransformers],
+    before: [
+      convertDecoratorsToStatic(config, buildCtx.diagnostics, tsTypeChecker, tsProgram),
+      performAutomaticKeyInsertion,
+      ...beforeTransformers,
+    ],
     after: [
       convertStaticToMeta(config, compilerCtx, buildCtx, tsTypeChecker, null, transformOpts),
       ...afterTransformers,

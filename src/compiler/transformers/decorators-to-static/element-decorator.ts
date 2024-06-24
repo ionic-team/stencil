@@ -14,7 +14,7 @@ export const elementDecoratorsToStatic = (
   const elementRefs = decoratedMembers
     .filter(ts.isPropertyDeclaration)
     .map((prop) => parseElementDecorator(prop, decoratorName))
-    .filter((element) => !!element);
+    .filter((element): element is string => !!element);
 
   if (elementRefs.length > 0) {
     newMembers.push(createStaticGetter('elementRef', ts.factory.createStringLiteral(elementRefs[0])));

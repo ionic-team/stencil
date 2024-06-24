@@ -1,4 +1,5 @@
 import type { Config } from '@jest/types';
+import { BOOLEAN_CLI_FLAGS } from '@stencil/core/cli';
 import type * as d from '@stencil/core/internal';
 import { isString } from '@utils';
 
@@ -83,6 +84,12 @@ export function buildJestArgv(config: d.ValidatedConfig): Config.Argv {
 
   if (typeof jestArgv.ci === 'string') {
     jestArgv.ci = jestArgv.ci === 'true' || jestArgv.ci === '';
+  }
+
+  for (const flag of BOOLEAN_CLI_FLAGS) {
+    if (typeof jestArgv[flag] === 'string') {
+      jestArgv[flag] = jestArgv[flag] === 'true';
+    }
   }
 
   return jestArgv;

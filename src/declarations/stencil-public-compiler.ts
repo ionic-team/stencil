@@ -1,5 +1,6 @@
 import type { ConfigFlags } from '../cli/config-flags';
 import type { PrerenderUrlResults, PrintLine } from '../internal';
+import type { BuildCtx, CompilerCtx } from './stencil-private';
 import type { JsonDocs } from './stencil-public-docs';
 
 export * from './stencil-public-docs';
@@ -83,6 +84,14 @@ export interface StencilConfig {
    * Below is an example folder structure containing a webapp's global sass file, named app.css.
    */
   globalStyle?: string;
+
+  /**
+   * Will generate {@link https://nodejs.org/api/packages.html#packages_exports export map} entry points
+   * for each component in the build when `true`.
+   *
+   * @default false
+   */
+  generateExportMaps?: boolean;
 
   /**
    * When the hashFileNames config is set to true, and it is a production build,
@@ -272,6 +281,13 @@ export interface StencilConfig {
   rollupPlugins?: { before?: any[]; after?: any[] };
 
   entryComponentsHint?: string[];
+  /**
+   * Sets whether Stencil will write files to `dist/` during the build or not.
+   *
+   * By default this value is set to the opposite value of {@link devMode},
+   * i.e. it will be `true` when building for production and `false` when
+   * building for development.
+   */
   buildDist?: boolean;
   buildLogFilePath?: string;
   devInspector?: boolean;
@@ -320,6 +336,7 @@ interface ConfigExtrasBase {
    * It is possible to assign data to the actual `<script>` element's `data-opts` property,
    * which then gets passed to Stencil's initial bootstrap. This feature is only required
    * for very special cases and rarely needed. Defaults to `false`.
+   * @deprecated This option has been deprecated and will be removed in a future major version of Stencil.
    */
   scriptDataOpts?: boolean;
 
@@ -644,6 +661,15 @@ export interface DevServerConfig extends StencilDevServerConfig {
   prerenderConfig?: string;
   protocol?: 'http' | 'https';
   srcIndexHtml?: string;
+
+  /**
+   * Route to be used for the "ping" sub-route of the Stencil dev server.
+   * This route will return a 200 status code once the Stencil build has finished.
+   * Setting this to `null` will disable the ping route.
+   *
+   * Defaults to `/ping`
+   */
+  pingRoute?: string | null;
 }
 
 export interface HistoryApiFallback {
@@ -915,6 +941,19 @@ export interface SerializeDocumentOptions extends HydrateDocumentOptions {
    * Remove HTML comments. Defaults to `true`.
    */
   removeHtmlComments?: boolean;
+  /**
+   * If set to `false` Stencil will ignore the fact that a component has a `shadow: true`
+   * flag and serializes it as a scoped component. If set to `true` the component will
+   * be rendered within a Declarative Shadow DOM.
+   * @default false
+   */
+  serializeShadowRoot?: boolean;
+  /**
+   * The `fullDocument` flag determines the format of the rendered output. Set it to true to
+   * generate a complete HTML document, or false to render only the component.
+   * @default true
+   */
+  fullDocument?: boolean;
 }
 
 export interface HydrateFactoryOptions extends SerializeDocumentOptions {
@@ -1584,10 +1623,76 @@ export interface ConfigBundle {
   components: string[];
 }
 
+/**
+ * A file and/or directory copy operation that may be specified as part of
+ * certain output targets for Stencil (in particular `dist`,
+ * `dist-custom-elements`, and `www`).
+ */
 export interface CopyTask {
+  /**
+   * The source file path for a copy operation. This may be an absolute or
+   * relative path to a directory or a file, and may also include a glob
+   * pattern.
+   *
+   * If the path is a relative path it will be treated as relative to
+   * `Config.srcDir`.
+   */
   src: string;
+  /**
+   * An optional destination file path for a copy operation. This may be an
+   * absolute or relative path.
+   *
+   * If relative, this will be treated as relative to the output directory for
+   * the output target for which this copy operation is configured.
+   */
   dest?: string;
+  /**
+   * Whether or not Stencil should issue warnings if it cannot find the
+   * specified source files or directories. Defaults to `false`.
+   *
+   * To receive warnings if a copy task source can't be found set this to
+   * `true`.
+   */
   warn?: boolean;
+  /**
+   * Whether or not directory structure should be preserved when copying files
+   * from a source directory. Defaults to `true` if no `dest` path is supplied,
+   * else it defaults to `false`.
+   *
+   * If this is set to `false`, all the files from a source directory will be
+   * copied directly to the destination directory, but if it's set to `true` they
+   * will be copied to a new directory inside the destination directory with
+   * the same name as their original source directory.
+   *
+   * So if, for instance, `src` is set to `"images"` and `keepDirStructure` is
+   * set to `true` the copy task will then produce the following directory
+   * structure:
+   *
+   * ```
+   * images
+   * └── foo.png
+   * dist
+   * └── images
+   *     └── foo.png
+   * ```
+   *
+   * Conversely if `keepDirStructure` is set to `false` then files in `images/`
+   * will be copied to `dist` without first creating a new subdirectory,
+   * resulting in the following directory structure:
+   *
+   * ```
+   * images
+   * └── foo.png
+   * dist
+   * └── foo.png
+   * ```
+   *
+   * If a `dest` path is supplied then `keepDirStructure`
+   * will default to `false`, so that Stencil will write the
+   * copied files directly into the `dest` directory without creating a new
+   * subdirectory. This behavior can be overridden by setting
+   * `keepDirStructure` to `true`.
+   */
   keepDirStructure?: boolean;
 }
 
@@ -1613,8 +1718,12 @@ export interface NodeResolveConfig {
   only?: Array<string | RegExp>;
   modulesOnly?: boolean;
 
+  // TODO(STENCIL-1107): Remove this field [BREAKING_CHANGE]
   /**
    * @see https://github.com/browserify/resolve#resolveid-opts-cb
+   * @deprecated the `customResolveOptions` field is no longer honored in future versions of
+   * `@rollup/plugin-node-resolve`. If you are currently using it, please open a new issue in the Stencil repo to
+   * describe your use case & provide input (https://github.com/ionic-team/stencil/issues/new/choose)
    */
   customResolveOptions?: {
     basedir?: string;
@@ -1899,6 +2008,12 @@ export interface TestingConfig extends JestConfig {
   screenshotConnector?: string;
 
   /**
+   * Timeout for the pixelmatch worker to resolve (in ms).
+   * @default 2500
+   */
+  screenshotTimeout?: number | null;
+
+  /**
    * Amount of time in milliseconds to wait before a screenshot is taken.
    */
   waitBeforeScreenshot?: number;
@@ -1977,9 +2092,12 @@ export const LOG_LEVELS = ['debug', 'info', 'warn', 'error'] as const;
 export type LogLevel = (typeof LOG_LEVELS)[number];
 
 /**
- * Common logger to be used by the compiler, dev-server and CLI. The CLI will use a
- * NodeJS based console logging and colors, and the web will use browser based
- * logs and colors.
+ * Abstract interface representing a logger with the capability to accept log
+ * messages at various levels (debug, info, warn, and error), set colors, log
+ * time spans, print diagnostic messages, and more.
+ *
+ * A Node.js-specific implementation of this interface is used when Stencil is
+ * building and compiling a project.
  */
 export interface Logger {
   enableColors: (useColors: boolean) => void;
@@ -2046,6 +2164,14 @@ export interface OutputTargetDist extends OutputTargetValidationConfig {
   transformAliasedImportPathsInCollection?: boolean | null;
 
   typesDir?: string;
+
+  /**
+   * Provide a custom path for the ESM loader directory, containing files you can import
+   * in an initiation script within your application to register all your components for
+   * lazy loading.
+   *
+   * @default /dist/loader
+   */
   esmLoaderPath?: string;
   copy?: CopyTask[];
   polyfills?: boolean;
@@ -2136,8 +2262,17 @@ export interface OutputTargetHydrate extends OutputTargetBase {
 export interface OutputTargetCustom extends OutputTargetBase {
   type: 'custom';
   name: string;
+  /**
+   * Indicate when the output target should be executed.
+   *
+   * - `"onBuildOnly"`: Executed only when `stencil build` is called without `--watch`.
+   * - `"always"`: Executed on every build, including in `watch` mode.
+   *
+   * Defaults to "always".
+   */
+  taskShouldRun?: 'onBuildOnly' | 'always';
   validate?: (config: Config, diagnostics: Diagnostic[]) => void;
-  generator: (config: Config, compilerCtx: any, buildCtx: any, docs: any) => Promise<void>;
+  generator: (config: Config, compilerCtx: CompilerCtx, buildCtx: BuildCtx, docs: JsonDocs) => Promise<void>;
   copy?: CopyTask[];
 }
 
@@ -2163,6 +2298,11 @@ export interface OutputTargetDocsVscode extends OutputTargetBase {
 
 export interface OutputTargetDocsReadme extends OutputTargetBase {
   type: 'docs-readme';
+  /**
+   * The root directory where README files should be written
+   *
+   * defaults to {@link Config.srcDir}
+   */
   dir?: string;
   dependencies?: boolean;
   footer?: string;
@@ -2524,9 +2664,9 @@ export interface ResolveModuleOptions {
 
 export interface PrerenderStartOptions {
   buildId?: string;
-  hydrateAppFilePath: string;
-  componentGraph: BuildResultsComponentGraph;
-  srcIndexHtmlPath: string;
+  hydrateAppFilePath?: string;
+  componentGraph?: BuildResultsComponentGraph;
+  srcIndexHtmlPath?: string;
 }
 
 export interface PrerenderResults {

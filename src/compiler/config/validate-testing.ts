@@ -72,6 +72,14 @@ export const validateTesting = (config: d.ValidatedConfig, diagnostics: d.Diagno
     );
   }
 
+  /**
+   * We only allow numbers or null for the screenshotTimeout, so if we detect anything
+   * else, we set it to null.
+   */
+  if (typeof testing.screenshotTimeout != 'number') {
+    testing.screenshotTimeout = null;
+  }
+
   if (!Array.isArray(testing.testPathIgnorePatterns)) {
     testing.testPathIgnorePatterns = DEFAULT_IGNORE_PATTERNS.map((ignorePattern) => {
       return join(testing.rootDir!, ignorePattern);

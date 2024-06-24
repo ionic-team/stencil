@@ -58,7 +58,9 @@ export const generateEsm = async (
         '',
       );
 
-      await copyPolyfills(config, compilerCtx, esmOutputs);
+      if (config.buildEs5) {
+        await copyPolyfills(config, compilerCtx, esmOutputs);
+      }
       await generateShortcuts(config, compilerCtx, outputTargets, output);
     }
   }
@@ -66,6 +68,15 @@ export const generateEsm = async (
   return { name: 'esm', buildCtx };
 };
 
+/**
+ * Copy polyfills from `$INSTALL_DIR/internal/client/polyfills` to the lazy
+ * loader output directory where $INSTALL_DIR is the directory in which the
+ * `@stencil/core` package is installed.
+ *
+ * @param config a validated Stencil configuration
+ * @param compilerCtx the current compiler context
+ * @param outputTargets dist-lazy output targets
+ */
 const copyPolyfills = async (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,

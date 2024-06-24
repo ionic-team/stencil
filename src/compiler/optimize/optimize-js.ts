@@ -4,6 +4,15 @@ import { Config, OptimizeJsInput, OptimizeJsOutput } from '../../declarations';
 import { minifyJs } from './minify-js';
 import { getTerserOptions } from './optimize-module';
 
+/**
+ * Utility function used by the compiler to optimize JavaScript. Knowing the
+ * JavaScript target will further apply minification optimizations beyond usual
+ * minification.
+ *
+ * @param inputOpts options to control how the JS optimization should take
+ * place
+ * @returns a promise wrapping an output object
+ */
 export const optimizeJs = async (inputOpts: OptimizeJsInput) => {
   const result: OptimizeJsOutput = {
     output: inputOpts.input,

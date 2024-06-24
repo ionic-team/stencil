@@ -3,13 +3,13 @@ import { replace } from 'esbuild-plugin-replace';
 import fs from 'fs-extra';
 import { join } from 'path';
 
-import { bundleParse5 } from '../bundles/plugins/parse5-plugin';
-import { bundleTerser } from '../bundles/plugins/terser-plugin';
-import { bundleTypeScriptSource, tsCacheFilePath } from '../bundles/plugins/typescript-source-plugin';
 import { getBanner } from '../utils/banner';
 import { BuildOptions, createReplaceData } from '../utils/options';
 import { writePkgJson } from '../utils/write-pkg-json';
-import { getBaseEsbuildOptions, getEsbuildAliases, getEsbuildExternalModules, runBuilds } from './util';
+import { getBaseEsbuildOptions, getEsbuildAliases, getEsbuildExternalModules, runBuilds } from './utils';
+import { bundleParse5 } from './utils/parse5';
+import { bundleTerser } from './utils/terser';
+import { bundleTypeScriptSource, tsCacheFilePath } from './utils/typescript-source';
 
 export async function buildCompiler(opts: BuildOptions) {
   const inputDir = join(opts.buildDir, 'compiler');
@@ -82,29 +82,18 @@ export async function buildCompiler(opts: BuildOptions) {
     banner: { js: getBanner(opts, 'Stencil Compiler', true) },
     entryPoints: [join(srcDir, 'index.ts')],
     platform: 'node',
-    sourcemap: 'linked',
     external,
     format: 'cjs',
     alias,
     plugins: [replace(replaceData)],
-  };
-
-  const compilerBuild = {
-    ...compilerEsbuildOptions,
     outfile: join(opts.output.compilerDir, compilerFileName),
-  };
-
-  const minifiedCompilerBuild = {
-    ...compilerEsbuildOptions,
-    outfile: join(opts.output.compilerDir, 'stencil.min.js'),
-    minify: true,
   };
 
   // copy typescript default lib dts files
   const tsLibNames = await getTypeScriptDefaultLibNames(opts);
   await Promise.all(tsLibNames.map((f) => fs.copy(join(opts.typescriptLibDir, f), join(opts.output.compilerDir, f))));
 
-  return runBuilds([compilerBuild, minifiedCompilerBuild], opts);
+  return runBuilds([compilerEsbuildOptions], opts);
 }
 
 /**

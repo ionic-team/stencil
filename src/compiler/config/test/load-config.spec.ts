@@ -36,6 +36,7 @@ describe('load config', () => {
       sys,
       config: {
         hashedFileNameLength: 9,
+        rootDir: '/foo/bar',
       },
       initTsConfig: true,
     });
@@ -50,6 +51,8 @@ describe('load config', () => {
     expect<ConfigFlags>(actualConfig.flags).toEqual({ dev: true });
     expect(actualConfig.extras).toBeDefined();
     expect(actualConfig.extras!.enableImportInjection).toBe(true);
+    // respects custom root dir
+    expect(actualConfig.rootDir).toBe('/foo/bar');
   });
 
   it('uses the provided config path when no initial config provided', async () => {

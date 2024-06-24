@@ -119,6 +119,8 @@ const pkgs: TestPackage[] = [
 ];
 
 /**
+ * Validate that certain files were written to disk during the build, and that
+ * these files tree-shake correctly.
  *
  * @param rootDir the root of the Stencil repository
  */
@@ -172,7 +174,7 @@ function validatePackage(opts: BuildOptions, testPkg: TestPackage, dtsEntries: s
         fs.accessSync(pkgFile);
       });
       testPkg.packageJsonFiles.forEach((testPkgFile) => {
-        if (!pkgJson.files.includes(testPkgFile)) {
+        if (!pkgJson.files?.includes(testPkgFile)) {
           throw new Error(testPkg.packageJson + ' missing file ' + testPkgFile);
         }
 
@@ -187,8 +189,10 @@ function validatePackage(opts: BuildOptions, testPkg: TestPackage, dtsEntries: s
 
     if (pkgJson.bin) {
       Object.keys(pkgJson.bin).forEach((k) => {
-        const binExe = join(pkgDir, pkgJson.bin[k]);
-        fs.accessSync(binExe);
+        if (pkgJson.bin?.[k]) {
+          const binExe = join(pkgDir, pkgJson.bin[k]);
+          fs.accessSync(binExe);
+        }
       });
     }
 
@@ -264,7 +268,7 @@ async function validateCompiler(opts: BuildOptions): Promise<void> {
   const cli = await import(cliPath);
   const sysNodeApi = await import(sysNodePath);
 
-  const nodeLogger = sysNodeApi.createNodeLogger({ process });
+  const nodeLogger = sysNodeApi.createNodeLogger();
   const nodeSys = sysNodeApi.createNodeSys({ process });
 
   if (!nodeSys || nodeSys.name !== 'node' || nodeSys.version.length < 4) {
@@ -294,7 +298,7 @@ async function validateCompiler(opts: BuildOptions): Promise<void> {
   console.log(`🐋  Validated compiler.transpileSync()`);
 
   const orgConsoleLog = console.log;
-  let loggedVersion = null;
+  let loggedVersion = '';
   console.log = (value: string) => (loggedVersion = value);
 
   // this runTask is intentionally not wrapped in telemetry helpers

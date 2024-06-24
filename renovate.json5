@@ -13,9 +13,6 @@
     'rollup',
     '@rollup/plugin-commonjs',
     '@rollup/plugin-node-resolve',
-    // TODO(STENCIL-912): Upgrade these two dependencies
-    'glob',
-    'minimatch',
   ],
   ignorePaths: [
     'test/package.json',
@@ -55,12 +52,13 @@
   packageRules: [
     {
       matchPackageNames: ['@types/node'],
-      allowedVersions: '<21.0.0',
+      allowedVersions: '<23.0.0',
     },
     {
       // Increment this value as a part of updating TypeScript
       matchPackageNames: ['typescript'],
-      allowedVersions: '<5.4.0',
+      allowedVersions: '<5.5.0',
+      commitMessagePrefix: "feat(typescript):"
     },
     {
       // disable Jest updates until the new testing architecture is in place
@@ -68,15 +66,11 @@
       groupName: 'Jest',
       allowedVersions: '<28.0.0',
     },
-    // TODO(STENCIL-590): remove these once deps are removed
     {
-      matchPackageNames: ['@types/inquirer'],
-      allowedVersions: '<=7.3.1',
-    },
-    // TODO(STENCIL-590): remove these once deps are removed
-    {
-      matchPackageNames: ['inquirer'],
-      allowedVersions: '<=7.3.3',
+      // TODO(STENCIL-1274): Remove this block
+      // disable eslint v9 updates until typescript-eslint supports it
+      matchPackageNames: ['eslint'],
+      allowedVersions: '<9.0.0',
     },
     {
       matchPackagePrefixes: ['@typescript-eslint'],
@@ -112,55 +106,54 @@
       allowedVersions: '<=29'
     },
     {
-      // We intentionally run the karma tests against the oldest LTS of Node we support.
+      // We intentionally run the WebdriverIO tests against the oldest LTS of Node we support.
       // Prevent renovate from trying to bump node
-      matchFileNames: ['test/karma/package.json'],
+      matchFileNames: ['test/wdio/package.json'],
       matchDepNames: ['node'],
       allowedVersions: '<=16'
     },
     {
-      // We intentionally run the karma tests against the oldest LTS of Node we support.
+      // We intentionally run the WebdriverIO tests against the oldest LTS of Node we support.
       // Prevent renovate from trying to bump node
-      matchFileNames: ['test/karma/package.json'],
+      matchFileNames: ['test/wdio/package.json'],
       matchPackageNames: ['@types/node'],
       allowedVersions: '<=16'
     },
     {
-      // We intentionally run the karma tests against the oldest LTS of Node we support.
+      // We intentionally run the WebdriverIO tests against the oldest LTS of Node we support.
       // Prevent renovate from trying to bump npm and keep it in sync with a version that's supported by the version of
       // Node we run against.
-      matchFileNames: ['test/karma/package.json'],
+      matchFileNames: ['test/wdio/package.json'],
       matchDepNames: ['npm'],
       allowedVersions: '<=8'
-    },
-    {
-      // We intentionally run the karma tests against TypeScript v5.2 as an attempt to update has failed
-      // due to incompatibilities with `karma-typescript`. Prevent renovate from trying to bump TypeScript.
-      matchFileNames: ['test/karma/package.json'],
-      matchDepNames: ['typescript'],
-      allowedVersions: '<5.3'
     },
     {
       matchPackageNames: ['rollup'],
       matchPackagePrefixes: ['@rollup'],
       groupName: 'rollup,'
+    },
+    {
+      matchPackageNames: ['expect-webdriverio'],
+      matchPackagePrefixes: ['@wdio'],
+      groupName: 'webdriverio,'
+    },
+    // TODO(STENCIL-1088): remove once support for Node v16 is dropped
+    {
+      matchPackageNames: ['open'],
+      allowedVersions: '<10',
+    },
+    // TODO(STENCIL-1141): remove once support for Node v16 is dropped
+    {
+      matchPackageNames: ['puppeteer'],
+      allowedVersions: '<=21',
     }
   ],
   // Never rebase the branch or update it unless manually requested to avoid noisy PR emails
   rebaseWhen: 'never',
   /**
-   * Run every Monday and Thursday between midnight at 11 AM (in UTC)
-   *
-   * Monday and Thursday were chosen to:
-   * - Keep the `minimumReleaseAge` value in mind (three days)
-   * - Prevent spikes/bursts of PRs from Renovate on a single day of the week
-   *
-   * We use cron syntax here as it's more deterministic/easier to provide a value that we know that Renovate will
-   * accept, compared to the natural language syntax which is (subjectively) trickier to test without merging first.
-   *
-   * {@see https://crontab.guru} for debugging cron schedules
+   * Natural language syntax taken directly from renovate preset examples (with time adjusted).
    */
-  schedule: ['* 0-11 * * 1,4'],
+  schedule: ["before 8am on the first day of the month"],
   /**
    * Ensure semantic commits are enabled for commits + PR titles.
    *

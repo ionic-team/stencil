@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for your interest in contributing to Stencil! :tada:
+Thanks for your interest in contributing to Stencil! 🎉
 
 
 ## Contributing Etiquette
@@ -51,7 +51,7 @@ Please see our [Contributor Code of Conduct](https://github.com/ionic-team/stenc
    1. There's no need to install a specific version of npm or Node right now, it shall be done automatically for you in
       the next step
 5. Run `npm ci`
-6. (Optional) If you are working on [Jest support](./src/testing/jest), [see the installation steps in that directory's README](./src/testing/jest/README.md#installing-dependencies).
+6. Run `npm install.jest` to install dependencies for Stencil's testing submodule
 
 
 ### Updates
@@ -79,7 +79,9 @@ Using `npm link` is beneficial to the development cycle in that consecutive buil
     "baseUrl": ".",
     "paths": {
       "@stencil/core/internal": ["node_modules/@stencil/core/internal"],
-      "@stencil/core/internal/*": ["node_modules/@stencil/core/internal/*"]
+      "@stencil/core/internal/*": ["node_modules/@stencil/core/internal/*"],
+      "@stencil/core/mock-doc": ["node_modules/@stencil/core/mock-doc"],
+      "@stencil/core/mock-doc/*": ["node_modules/@stencil/core/mock-doc/*"]
     }
   }
 }
@@ -93,6 +95,28 @@ Afterwards, to clean up:
     1. Run `npm unlink @stencil/core`
     2. Remove the modifications to your tsconfig.json
 2. In the directory of _stencil core_, run `npm unlink`
+
+> [!NOTE]  
+> Instead of linking, you can reference Stencil from a local directory in the `package.json` after updating your project's `tsconfig.json` file, e.g.
+> ```patch
+> diff --git a/package.json b/package.json
+> index 1a8320a..bb1fa3a 100644
+> --- a/package.json
+> +++ b/package.json
+> @@ -39,11 +39,12 @@
+>      "generate": "stencil generate"
+>    },
+>    "devDependencies": {
+> -    "@stencil/core": "^4.7.0",
+> +    "@stencil/core": "file:/path/to/local/stencil",
+>      "@types/jest": "^29.5.6",
+>      "@types/node": "^16.18.11",
+>      "jest": "^29.7.0",
+>      "jest-cli": "^29.7.0",
+>      "puppeteer": "^21.9.0"
+>    },
+>    "license": "MIT"
+> ```
 
 #### Testing with `npm pack`:
 
@@ -130,6 +154,17 @@ Note that Stencil transpiles source code using multiple worker processes. If you
 stuck, your debugger may not have switched to a worker process that has halted on a breakpoint. You may be able to
 avoid this altogether by setting `--max-workers=1` when you launch Stencil (with the possibility of not being able to
 reproduce timing issues between workers as a side effect).
+
+> [!NOTE]
+> If you want to have access to sourcemaps when debugging the compiler locally
+> you can run the `build` script in `package.json` with the `DEBUG` environment
+> variable set to `true` like so:
+>
+> ```sh
+> DEBUG=true npm run build
+> ```
+>
+> this will write a `.js.map` file to disk next to each JavaScript file.
 
 #### Debugging the Compiler in VSCode
 

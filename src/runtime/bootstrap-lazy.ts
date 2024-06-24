@@ -1,5 +1,6 @@
 import { BUILD } from '@app-data';
 import { doc, getHostRef, plt, registerHost, supportsShadow, win } from '@platform';
+import { addHostEventListeners } from '@runtime';
 import { CMP_FLAGS, queryNonceMetaTagContent } from '@utils';
 
 import type * as d from '../declarations';
@@ -96,6 +97,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
       const HostElement = class extends HTMLElement {
         ['s-p']: Promise<void>[];
         ['s-rc']: (() => void)[];
+        hasRegisteredEventListeners = false;
 
         // StencilLazyHost
         constructor(self: HTMLElement) {
@@ -110,13 +112,26 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
             // add the read-only property "shadowRoot" to the host element
             // adding the shadow root build conditionals to minimize runtime
             if (supportsShadow) {
-              if (BUILD.shadowDelegatesFocus) {
-                self.attachShadow({
-                  mode: 'open',
-                  delegatesFocus: !!(cmpMeta.$flags$ & CMP_FLAGS.shadowDelegatesFocus),
-                });
+              if (!self.shadowRoot) {
+                // we don't want to call `attachShadow` if there's already a shadow root
+                // attached to the component
+                if (BUILD.shadowDelegatesFocus) {
+                  self.attachShadow({
+                    mode: 'open',
+                    delegatesFocus: !!(cmpMeta.$flags$ & CMP_FLAGS.shadowDelegatesFocus),
+                  });
+                } else {
+                  self.attachShadow({ mode: 'open' });
+                }
               } else {
-                self.attachShadow({ mode: 'open' });
+                // we want to check to make sure that the mode for the shadow
+                // root already attached to the element (i.e. created via DSD)
+                // is set to 'open' since that's the only mode we support
+                if (self.shadowRoot.mode !== 'open') {
+                  throw new Error(
+                    `Unable to re-use existing shadow root for ${cmpMeta.$tagName$}! Mode is set to ${self.shadowRoot.mode} but Stencil only supports open shadow roots.`,
+                  );
+                }
               }
             } else if (!BUILD.hydrateServerSide && !('shadowRoot' in self)) {
               (self as any).shadowRoot = self;
@@ -125,6 +140,19 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
         }
 
         connectedCallback() {
+          const hostRef = getHostRef(this);
+
+          /**
+           * The `connectedCallback` lifecycle event can potentially be fired multiple times
+           * if the element is removed from the DOM and re-inserted. This is not a common use case,
+           * but it can happen in some scenarios. To prevent registering the same event listeners
+           * multiple times, we will only register them once.
+           */
+          if (!this.hasRegisteredEventListeners) {
+            this.hasRegisteredEventListeners = true;
+            addHostEventListeners(this, hostRef, cmpMeta.$listeners$, false);
+          }
+
           if (appLoadFallback) {
             clearTimeout(appLoadFallback);
             appLoadFallback = null;
@@ -196,29 +224,33 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
     });
   });
 
-  // Add styles for `slot-fb` elements if any of our components are using slots outside the Shadow DOM
-  if (hasSlotRelocation) {
-    dataStyles.innerHTML += SLOT_FB_CSS;
-  }
-
-  // Add hydration styles
-  if (BUILD.invisiblePrehydration && (BUILD.hydratedClass || BUILD.hydratedAttribute)) {
-    dataStyles.innerHTML += cmpTags + HYDRATED_CSS;
-  }
-
-  // If we have styles, add them to the DOM
-  if (dataStyles.innerHTML.length) {
-    dataStyles.setAttribute('data-styles', '');
-
-    // Apply CSP nonce to the style tag if it exists
-    const nonce = plt.$nonce$ ?? queryNonceMetaTagContent(doc);
-    if (nonce != null) {
-      dataStyles.setAttribute('nonce', nonce);
+  // Only bother generating CSS if we have components
+  // TODO(STENCIL-1118): Add test cases for CSS content based on conditionals
+  if (cmpTags.length > 0) {
+    // Add styles for `slot-fb` elements if any of our components are using slots outside the Shadow DOM
+    if (hasSlotRelocation) {
+      dataStyles.textContent += SLOT_FB_CSS;
     }
 
-    // Insert the styles into the document head
-    // NOTE: this _needs_ to happen last so we can ensure the nonce (and other attributes) are applied
-    head.insertBefore(dataStyles, metaCharset ? metaCharset.nextSibling : head.firstChild);
+    // Add hydration styles
+    if (BUILD.invisiblePrehydration && (BUILD.hydratedClass || BUILD.hydratedAttribute)) {
+      dataStyles.textContent += cmpTags + HYDRATED_CSS;
+    }
+
+    // If we have styles, add them to the DOM
+    if (dataStyles.innerHTML.length) {
+      dataStyles.setAttribute('data-styles', '');
+
+      // Apply CSP nonce to the style tag if it exists
+      const nonce = plt.$nonce$ ?? queryNonceMetaTagContent(doc);
+      if (nonce != null) {
+        dataStyles.setAttribute('nonce', nonce);
+      }
+
+      // Insert the styles into the document head
+      // NOTE: this _needs_ to happen last so we can ensure the nonce (and other attributes) are applied
+      head.insertBefore(dataStyles, metaCharset ? metaCharset.nextSibling : head.firstChild);
+    }
   }
 
   // Process deferred connectedCallbacks now all components have been registered

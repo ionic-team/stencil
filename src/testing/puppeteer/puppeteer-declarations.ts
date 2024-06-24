@@ -18,8 +18,19 @@ export type PageCloseOptions = {
 export interface NewE2EPageOptions extends WaitForOptions {
   url?: string;
   html?: string;
+  /**
+   * If set to `true`, Stencil will throw an error if a console error occurs
+   */
   failOnConsoleError?: boolean;
+  /**
+   * If set to `true`, Stencil will throw an error if a network request fails
+   */
   failOnNetworkError?: boolean;
+  /**
+   * If set to `true`, Stencil will log failing network requests
+   * @default true
+   */
+  logFailingNetworkRequests?: boolean;
 }
 
 type Omit<T, K> = Pick<T, Exclude<keyof T, K>>;

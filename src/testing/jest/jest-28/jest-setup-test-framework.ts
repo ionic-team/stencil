@@ -34,9 +34,6 @@ export function jestSetupTestFramework() {
   });
 
   afterEach(async () => {
-    if (global.__CLOSE_OPEN_PAGES__) {
-      await global.__CLOSE_OPEN_PAGES__();
-    }
     stopAutoApplyChanges();
 
     // Remove each node from the mocked DOM
@@ -59,6 +56,12 @@ export function jestSetupTestFramework() {
 
     teardownGlobal(global);
     global.resourcesUrl = '/build';
+  });
+
+  afterAll(async () => {
+    if (global.__CLOSE_OPEN_PAGES__) {
+      await global.__CLOSE_OPEN_PAGES__();
+    }
   });
 
   global.screenshotDescriptions = new Set();

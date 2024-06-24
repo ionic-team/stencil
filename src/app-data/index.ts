@@ -88,6 +88,7 @@ export const BUILD: BuildConditionals = {
   cloneNodeFix: false,
   hydratedAttribute: false,
   hydratedClass: true,
+  // TODO(STENCIL-1305): remove this option
   scriptDataOpts: false,
   // TODO(STENCIL-914): remove this option when `experimentalSlotFixes` is the default behavior
   scopedSlotTextContentFix: false,

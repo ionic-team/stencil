@@ -1,13 +1,25 @@
 import { BUILD } from '@app-data';
-import { addHostEventListeners } from '@runtime';
 
 import type * as d from '../declarations';
 
 /**
  * A WeakMap mapping runtime component references to their corresponding host reference
  * instances.
+ *
+ * **Note**: If we're in an HMR context we need to store a reference to this
+ * value on `window` in order to maintain the mapping of {@link d.RuntimeRef}
+ * to {@link d.HostRef} across HMR updates.
+ *
+ * This is necessary because when HMR updates for a component are processed by
+ * the browser-side dev server client the JS bundle for that component is
+ * re-fetched. Since the module containing {@link hostRefs} is included in
+ * that bundle, if we do not store a reference to it the new iteration of the
+ * component will not have access to the previous hostRef map, leading to a
+ * bug where the new version of the component cannot properly initialize.
  */
-const hostRefs: WeakMap<d.RuntimeRef, d.HostRef> = /*@__PURE__*/ new WeakMap();
+const hostRefs: WeakMap<d.RuntimeRef, d.HostRef> = /*@__PURE__*/ BUILD.hotModuleReplacement
+  ? ((window as any).__STENCIL_HOSTREFS__ ||= new WeakMap())
+  : new WeakMap();
 
 /**
  * Given a {@link d.RuntimeRef} retrieve the corresponding {@link d.HostRef}
@@ -55,7 +67,6 @@ export const registerHost = (hostElement: d.HostElement, cmpMeta: d.ComponentRun
     hostElement['s-p'] = [];
     hostElement['s-rc'] = [];
   }
-  addHostEventListeners(hostElement, hostRef, cmpMeta.$listeners$, false);
   return hostRefs.set(hostElement, hostRef);
 };
 

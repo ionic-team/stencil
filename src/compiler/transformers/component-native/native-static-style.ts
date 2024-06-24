@@ -1,8 +1,8 @@
 import { DEFAULT_STYLE_MODE } from '@utils';
+import { scopeCss } from '@utils/shadow-css';
 import ts from 'typescript';
 
 import type * as d from '../../../declarations';
-import { scopeCss } from '../../../utils/shadow-css';
 import { getScopeId } from '../../style/scope-css';
 import { createStyleIdentifier } from '../add-static-style';
 import { createStaticGetter } from '../transform-utils';

@@ -2,8 +2,6 @@ import color from 'ansi-colors';
 import fs from 'fs-extra';
 import { join } from 'path';
 
-import { promptPrepareRelease } from './release-prepare-prompts';
-import { promptRelease } from './release-prompts';
 import { runReleaseTasks } from './release-tasks';
 import { BuildOptions, getOptions } from './utils/options';
 import { getNewVersion } from './utils/release-utils';
@@ -17,49 +15,6 @@ import { getLatestVermoji } from './utils/vermoji';
  */
 export async function release(rootDir: string, args: ReadonlyArray<string>): Promise<void> {
   const buildDir = join(rootDir, 'build');
-  const releaseDataPath = join(buildDir, 'release-data.json');
-
-  if (args.includes('--prepare')) {
-    await fs.emptyDir(buildDir);
-    const opts = getOptions(rootDir, {
-      isPublishRelease: false,
-      isProd: true,
-    });
-
-    const responses = await promptPrepareRelease(opts);
-    opts.version = responses.versionToUse;
-
-    if (!responses.confirm) {
-      console.log(`\n${color.bold.magenta('Publish preparation cancelled by user')}\n`);
-      return;
-    }
-
-    fs.writeJsonSync(releaseDataPath, opts, { spaces: 2 });
-    await prepareRelease(opts, args);
-    return;
-  }
-
-  if (args.includes('--publish')) {
-    const releaseData = await fs.readJson(releaseDataPath);
-    const opts = getOptions(rootDir, {
-      buildId: releaseData.buildId,
-      version: releaseData.version,
-      vermoji: releaseData.vermoji,
-      isCI: releaseData.isCI,
-      isPublishRelease: true,
-      isProd: true,
-    });
-    const responses = await promptRelease(opts);
-    opts.otp = responses.otp;
-    opts.tag = responses.npmTag;
-
-    if (!responses.confirm) {
-      console.log(`\n${color.bold.magenta('Publish cancelled by user')}\n`);
-      return;
-    }
-
-    return publishRelease(opts, args);
-  }
 
   if (args.includes('--ci-prepare')) {
     await fs.emptyDir(buildDir);
@@ -74,7 +29,9 @@ export async function release(rootDir: string, args: ReadonlyArray<string>): Pro
       console.log(`\n${color.bold.red('No `--version [VERSION]` argument was found. Exiting')}\n`);
       process.exit(1);
     }
-    prepareOpts.version = getNewVersion(prepareOpts.packageJson.version, args[versionIdx + 1]);
+    if (prepareOpts.packageJson.version) {
+      prepareOpts.version = getNewVersion(prepareOpts.packageJson.version, args[versionIdx + 1]);
+    }
 
     await prepareRelease(prepareOpts, args);
     console.log(`${color.bold.blue('Release Prepared!')}`);
@@ -87,7 +44,9 @@ export async function release(rootDir: string, args: ReadonlyArray<string>): Pro
       isProd: true,
     });
     // this was bumped already, we just need to copy it from package.json into this field
-    prepareOpts.version = prepareOpts.packageJson.version;
+    if (prepareOpts.packageJson.version) {
+      prepareOpts.version = prepareOpts.packageJson.version;
+    }
 
     // we generated a vermoji during the preparation step, let's grab it from the changelog
     prepareOpts.vermoji = getLatestVermoji(prepareOpts.changelogPath);
@@ -117,7 +76,7 @@ export async function release(rootDir: string, args: ReadonlyArray<string>): Pro
       isCI: prepareOpts.isCI,
       isPublishRelease: true,
       isProd: true,
-      tag: newTag,
+      tag: newTag ?? undefined,
     });
     return await publishRelease(publishOpts, args);
   }

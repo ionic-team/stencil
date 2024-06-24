@@ -8,7 +8,7 @@ import type { CompilerSystem, Diagnostic } from '../declarations';
  */
 export type FindConfigOptions = {
   sys: CompilerSystem;
-  configPath: string;
+  configPath?: string | null;
 };
 
 /**
@@ -38,7 +38,7 @@ export const findConfig = async (opts: FindConfigOptions): Promise<result.Result
       configPath = normalizePath(sys.platformPath.join(cwd, configPath));
     } else {
       // config path already an absolute path, we're good here
-      configPath = normalizePath(opts.configPath);
+      configPath = normalizePath(configPath);
     }
   } else {
     // nothing was passed in, use the current working directory

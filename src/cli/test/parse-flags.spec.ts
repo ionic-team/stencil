@@ -89,6 +89,12 @@ describe('parseFlags', () => {
       expect(flags.knownArgs).toEqual([]);
       expect(flags[cliArg]).toBe(undefined);
     });
+
+    it.each([true, false])(`should set the value with --${cliArg}=%p`, (value) => {
+      const flags = parseFlags([`--${cliArg}=${value}`]);
+      expect(flags.knownArgs).toEqual([`--${cliArg}`, String(value)]);
+      expect(flags[cliArg]).toBe(value);
+    });
   });
 
   describe.each(STRING_CLI_FLAGS)('should parse string flag %s', (cliArg) => {

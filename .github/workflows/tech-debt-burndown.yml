@@ -20,13 +20,13 @@ jobs:
     runs-on: 'ubuntu-22.04'
     steps:
       - name: Checkout main
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
         with:
           ref: main
         if: ${{ matrix.branch == 'main' }}
 
       - name: Checkout PR branch
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
         with:
           # the pull_request_target event will consider the HEAD of `main` to be the SHA to use.
           # attempt to use the SHA associated with a pull request and fallback to HEAD of `main`
@@ -44,7 +44,7 @@ jobs:
         run: npx tsc --strictNullChecks --noEmit --pretty false | npx tsc-output-parser > null_errors_${{ matrix.branch }}.json
 
       - name: Upload null_errors_${{ matrix.branch }}.json
-        uses: actions/upload-artifact@a8a3f3ad30e3422c9c7b888a15615d19a852ae32 # v3.1.3
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
         with:
           name: null_errors_${{ matrix.branch }}
           path: 'null_errors_${{ matrix.branch }}.json'
@@ -58,13 +58,13 @@ jobs:
     runs-on: 'ubuntu-22.04'
     steps:
       - name: Checkout main
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
         with:
           ref: main
         if: ${{ matrix.branch == 'main' }}
 
       - name: Checkout PR branch
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
         with:
           # the pull_request_target event will consider the HEAD of `main` to be the SHA to use.
           # attempt to use the SHA associated with a pull request and fallback to HEAD of `main`
@@ -79,7 +79,7 @@ jobs:
         run: npx ts-prune > unused-exports-${{ matrix.branch }}.txt
 
       - name: Upload unused exports
-        uses: actions/upload-artifact@a8a3f3ad30e3422c9c7b888a15615d19a852ae32 # v3.1.3
+        uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
         with:
           name: unused-exports-${{ matrix.branch }}
           path: 'unused-exports-${{ matrix.branch }}.txt'
@@ -90,7 +90,7 @@ jobs:
     runs-on: 'ubuntu-22.04'
     steps:
       - name: Checkout current branch
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
         with:
           # the pull_request_target event will consider the HEAD of `main` to be the SHA to use.
           # attempt to use the SHA associated with a pull request and fallback to HEAD of `main`
@@ -102,33 +102,30 @@ jobs:
 
       # TODO(STENCIL-446): Remove this workflow once `strictNullChecks` is enabled
       - name: Download null errors file for main branch
-        uses: actions/download-artifact@9bc31d5ccc31df68ecc42ccf4149144866c47d8a # v3.0.2
+        uses: actions/download-artifact@65a9edc5881444af0b9093a5e628f2fe47ea3b2e # v4.1.7
         with:
           name: null_errors_main
 
       # TODO(STENCIL-446): Remove this workflow once `strictNullChecks` is enabled
       - name: Download null errors file for PR
-        uses: actions/download-artifact@9bc31d5ccc31df68ecc42ccf4149144866c47d8a # v3.0.2
+        uses: actions/download-artifact@65a9edc5881444af0b9093a5e628f2fe47ea3b2e # v4.1.7
         with:
           name: null_errors_pr
 
       # TODO(STENCIL-454): Remove or change this up once we've eliminated unused exports
       - name: Download unused exports for main
-        uses: actions/download-artifact@9bc31d5ccc31df68ecc42ccf4149144866c47d8a # v3.0.2
+        uses: actions/download-artifact@65a9edc5881444af0b9093a5e628f2fe47ea3b2e # v4.1.7
         with:
           name: unused-exports-main
 
       # TODO(STENCIL-454): Remove or change this up once we've eliminated unused exports
       - name: Download unused exports for PR
-        uses: actions/download-artifact@9bc31d5ccc31df68ecc42ccf4149144866c47d8a # v3.0.2
+        uses: actions/download-artifact@65a9edc5881444af0b9093a5e628f2fe47ea3b2e # v4.1.7
         with:
           name: unused-exports-pr
 
-      - name: Compile scripts
-        run: npm run tsc.scripts
-
       - name: Set action output
-        run: node scripts/build/tech-debt-burndown-report.js > $GITHUB_STEP_SUMMARY
+        run: npm run ts scripts/tech-debt-burndown-report.ts > $GITHUB_STEP_SUMMARY
 
         # for syntax information, see https://github.com/peter-evans/create-or-update-comment#setting-the-comment-body-from-a-file
       - name: Set comment body
@@ -136,14 +133,14 @@ jobs:
         # GitHub - "Warning: Make sure the delimiter you're using is randomly generated and unique for each run.
         # For more information, see https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions#understanding-the-risk-of-script-injections"
         run: |
-          body=$(node scripts/build/tech-debt-burndown-report.js)
+          body=$(npm run ts scripts/tech-debt-burndown-report.ts)
           EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
           echo "body<<$EOF" >> $GITHUB_OUTPUT
           echo "$body" >> $GITHUB_OUTPUT
           echo "$EOF" >> $GITHUB_OUTPUT
 
       - name: Find Comment
-        uses: peter-evans/find-comment@a54c31d7fa095754bfef525c0c8e5e5674c4b4b1 # v2.4.0
+        uses: peter-evans/find-comment@3eae4d37986fb5a8592848f6a574fdf654e61f9e # v3.1.0
         id: fc
         with:
           issue-number: ${{ github.event.pull_request.number }}
@@ -151,7 +148,7 @@ jobs:
           body-includes: '### `--strictNullChecks` error report'
 
       - name: Create or update comment
-        uses: peter-evans/create-or-update-comment@23ff15729ef2fc348714a3bb66d2f655ca9066f2 # v3.1.0
+        uses: peter-evans/create-or-update-comment@71345be0265236311c031f5c7866368bd1eff043 # v4.0.0
         with:
           comment-id: ${{ steps.fc.outputs.comment-id }}
           issue-number: ${{ github.event.pull_request.number }}
