@@ -73,10 +73,7 @@ const generateLoader = async (
 
   await Promise.all([
     compilerCtx.fs.writeFile(join(loaderPath, 'package.json'), packageJsonContent),
-    compilerCtx.fs.writeFile(
-      join(loaderPath, 'index.d.ts'),
-      generateIndexDts(indexDtsPath, outputTarget.componentDts, config),
-    ),
+    compilerCtx.fs.writeFile(join(loaderPath, 'index.d.ts'), generateIndexDts(indexDtsPath, outputTarget.componentDts)),
     compilerCtx.fs.writeFile(join(loaderPath, 'index.js'), indexContent),
     compilerCtx.fs.writeFile(join(loaderPath, 'index.cjs.js'), indexCjsContent),
     compilerCtx.fs.writeFile(join(loaderPath, 'cdn.js'), indexCjsContent),
