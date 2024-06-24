@@ -1,16 +1,26 @@
-import type * as d from '../../../declarations';
-import { buildError, buildWarn, catchError, isString, loadTypeScriptDiagnostic, normalizePath } from '@utils';
-import { isAbsolute, join, relative } from 'path';
+import {
+  buildError,
+  buildWarn,
+  catchError,
+  isString,
+  join,
+  loadTypeScriptDiagnostic,
+  normalizePath,
+  relative,
+} from '@utils';
+import { isAbsolute } from 'path';
 import ts from 'typescript';
 
-export const validateTsConfig = async (config: d.Config, sys: d.CompilerSystem, init: d.LoadConfigInit) => {
+import type * as d from '../../../declarations';
+
+export const validateTsConfig = async (config: d.ValidatedConfig, sys: d.CompilerSystem, init: d.LoadConfigInit) => {
   const tsconfig = {
-    path: null as string,
-    compilerOptions: null as any,
-    files: null as string[],
-    include: null as string[],
-    exclude: null as string[],
-    extends: null as string,
+    path: '',
+    compilerOptions: {} as ts.CompilerOptions,
+    files: [] as string[],
+    include: [] as string[],
+    exclude: [] as string[],
+    extends: '',
     diagnostics: [] as d.Diagnostic[],
   };
 
@@ -24,21 +34,25 @@ export const validateTsConfig = async (config: d.Config, sys: d.CompilerSystem, 
       tsconfig.path = readTsConfig.path;
       const host: ts.ParseConfigFileHost = {
         ...ts.sys,
-        readFile: p => {
+        readFile: (p) => {
           if (p === tsconfig.path) {
             return readTsConfig.content;
           }
           return sys.readFileSync(p);
         },
-        readDirectory: p => sys.readDirSync(p),
-        fileExists: p => sys.accessSync(p),
+        readDirectory: (p) => sys.readDirSync(p),
+        fileExists: (p) => sys.accessSync(p),
         onUnRecoverableConfigFileDiagnostic: (e: any) => console.error(e),
       };
 
       const results = ts.getParsedCommandLineOfConfigFile(tsconfig.path, {}, host);
 
+      if (results === undefined) {
+        throw 'Encountered an error reading tsconfig!';
+      }
+
       if (results.errors && results.errors.length > 0) {
-        results.errors.forEach(configErr => {
+        results.errors.forEach((configErr) => {
           const tsDiagnostic = loadTypeScriptDiagnostic(configErr);
           if (tsDiagnostic.code === '18003') {
             // "No inputs were found in config file"
@@ -81,7 +95,9 @@ export const validateTsConfig = async (config: d.Config, sys: d.CompilerSystem, 
           tsconfig.compilerOptions = results.options;
 
           const target = tsconfig.compilerOptions.target ?? ts.ScriptTarget.ES5;
-          if ([ts.ScriptTarget.ES3, ts.ScriptTarget.ES5, ts.ScriptTarget.ES2015, ts.ScriptTarget.ES2016].includes(target)) {
+          if (
+            [ts.ScriptTarget.ES3, ts.ScriptTarget.ES5, ts.ScriptTarget.ES2015, ts.ScriptTarget.ES2016].includes(target)
+          ) {
             const warn = buildWarn(tsconfig.diagnostics);
             warn.messageText = `To improve bundling, it is always recommended to set the tsconfig.json “target” setting to "es2017". Note that the compiler will automatically handle transpilation for ES5-only browsers.`;
           }
@@ -90,20 +106,30 @@ export const validateTsConfig = async (config: d.Config, sys: d.CompilerSystem, 
             const warn = buildWarn(tsconfig.diagnostics);
             warn.messageText = `To improve bundling, it is always recommended to set the tsconfig.json “module” setting to “esnext”. Note that the compiler will automatically handle bundling both modern and legacy builds.`;
           }
+
+          tsconfig.compilerOptions.sourceMap = config.sourceMap;
+          tsconfig.compilerOptions.inlineSources = config.sourceMap;
         }
       }
     }
-  } catch (e) {
+  } catch (e: any) {
     catchError(tsconfig.diagnostics, e);
   }
 
   return tsconfig;
 };
 
-const getTsConfigPath = async (config: d.Config, sys: d.CompilerSystem, init: d.LoadConfigInit) => {
+const getTsConfigPath = async (
+  config: d.ValidatedConfig,
+  sys: d.CompilerSystem,
+  init: d.LoadConfigInit,
+): Promise<{
+  path: string;
+  content: string;
+} | null> => {
   const tsconfig = {
-    path: null as string,
-    content: null as string,
+    path: '',
+    content: '',
   };
 
   if (isString(config.tsconfig)) {
@@ -134,7 +160,7 @@ const getTsConfigPath = async (config: d.Config, sys: d.CompilerSystem, init: d.
   return tsconfig;
 };
 
-const createDefaultTsConfig = (config: d.Config) =>
+const createDefaultTsConfig = (config: d.ValidatedConfig) =>
   JSON.stringify(
     {
       compilerOptions: {
@@ -146,7 +172,9 @@ const createDefaultTsConfig = (config: d.Config) =>
         target: 'es2017',
         jsx: 'react',
         jsxFactory: 'h',
-        jsxFragmentFactory: 'Fragment'
+        jsxFragmentFactory: 'Fragment',
+        sourceMap: config.sourceMap,
+        inlineSources: config.sourceMap,
       },
       include: [relative(config.rootDir, config.srcDir)],
     },
@@ -154,6 +182,21 @@ const createDefaultTsConfig = (config: d.Config) =>
     2,
   );
 
-const hasSrcDirectoryInclude = (includeProp: string[], src: string) => Array.isArray(includeProp) && includeProp.includes(src);
+/**
+ * Determines if the included `src` argument belongs in `includeProp`.
+ *
+ * This function normalizes the paths found in both arguments, to catch cases where it's called with:
+ * ```ts
+ * hasSrcDirectoryInclude(['src'], './src'); // should return `true`
+ * ```
+ *
+ * @param includeProp the paths in `include` that should be tested
+ * @param src the path to find in `includeProp`
+ * @returns true if the provided `src` directory is found, `false` otherwise
+ */
+export const hasSrcDirectoryInclude = (includeProp: string[], src: string): boolean =>
+  Array.isArray(includeProp) &&
+  includeProp.some((included) => normalizePath(included, false) === normalizePath(src, false));
 
-const hasStencilConfigInclude = (includeProp: string[]) => Array.isArray(includeProp) && includeProp.includes('stencil.config.ts');
+const hasStencilConfigInclude = (includeProp: string[]) =>
+  Array.isArray(includeProp) && includeProp.includes('stencil.config.ts');

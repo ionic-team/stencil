@@ -1,4 +1,4 @@
-import { Component, Host, Prop, State, h } from '@stencil/core';
+import { Component, h, Host, Prop, State } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
 describe('hostData', () => {
@@ -9,10 +9,10 @@ describe('hostData', () => {
 
       hostData() {
         return {
-          'value': 'somevalue',
-          'role': 'alert',
+          value: 'somevalue',
+          role: 'alert',
           'aria-hidden': this.hidden ? 'true' : null,
-          'hidden': this.hidden,
+          hidden: this.hidden,
         };
       }
     }
@@ -39,14 +39,7 @@ describe('hostData', () => {
       @Prop() hidden = false;
 
       render() {
-        return (
-          <Host
-            value="hello"
-            role="alert"
-            aria-hidden={this.hidden ? 'true' : null}
-            hidden={this.hidden}
-          />
-        );
+        return <Host value="hello" role="alert" aria-hidden={this.hidden ? 'true' : null} hidden={this.hidden} />;
       }
     }
 

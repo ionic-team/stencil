@@ -1,51 +1,84 @@
-import type * as d from '../../../declarations';
 import { augmentDiagnosticWithNode, buildError, buildWarn, toDashCase } from '@utils';
+import ts from 'typescript';
+
+import type * as d from '../../../declarations';
+import { validatePublicName } from '../reserved-public-members';
 import {
   convertValueToLiteral,
   createStaticGetter,
   getAttributeTypeInfo,
   isMemberPrivate,
   resolveType,
+  retrieveTsDecorators,
+  retrieveTsModifiers,
   serializeSymbol,
+  tsPropDeclNameAsString,
   typeToString,
-  validateReferences,
 } from '../transform-utils';
-import { isDecoratorNamed, getDeclarationParameters } from './decorator-utils';
-import { validatePublicName } from '../reserved-public-members';
-import ts from 'typescript';
+import { getDecoratorParameters, isDecoratorNamed } from './decorator-utils';
 
+/**
+ * Parse a collection of class members decorated with `@Prop()`
+ *
+ * @param diagnostics a collection of compiler diagnostics. During the parsing process, any errors detected must be
+ * added to this collection
+ * @param decoratedProps a collection of class elements that may or may not my class members decorated with `@Prop`.
+ * Only those decorated with `@Prop()` will be parsed.
+ * @param typeChecker a reference to the TypeScript type checker
+ * @param program a {@link ts.Program} object
+ * @param newMembers a collection that parsed `@Prop` annotated class members should be pushed to as a side effect of calling this function
+ * @param decoratorName the name of the decorator to look for
+ */
 export const propDecoratorsToStatic = (
   diagnostics: d.Diagnostic[],
   decoratedProps: ts.ClassElement[],
   typeChecker: ts.TypeChecker,
-  watchable: Set<string>,
+  program: ts.Program,
   newMembers: ts.ClassElement[],
-) => {
+  decoratorName: string,
+): void => {
   const properties = decoratedProps
     .filter(ts.isPropertyDeclaration)
-    .map(prop => parsePropDecorator(diagnostics, typeChecker, prop, watchable))
-    .filter(prop => prop != null);
+    .map((prop) => parsePropDecorator(diagnostics, typeChecker, program, prop, decoratorName))
+    .filter((prop): prop is ts.PropertyAssignment => prop != null);
 
   if (properties.length > 0) {
-    newMembers.push(createStaticGetter('properties', ts.createObjectLiteral(properties, true)));
+    newMembers.push(createStaticGetter('properties', ts.factory.createObjectLiteralExpression(properties, true)));
   }
 };
 
-const parsePropDecorator = (diagnostics: d.Diagnostic[], typeChecker: ts.TypeChecker, prop: ts.PropertyDeclaration, watchable: Set<string>) => {
-  const propDecorator = prop.decorators.find(isDecoratorNamed('Prop'));
+/**
+ * Parse a single `@Prop` decorator annotated class member
+ * @param diagnostics a collection of compiler diagnostics. During the parsing process, any errors detected must be
+ * added to this collection
+ * @param typeChecker a reference to the TypeScript type checker
+ * @param program a {@link ts.Program} object
+ * @param prop the TypeScript `PropertyDeclaration` to parse
+ * @param decoratorName the name of the decorator to look for
+ * @returns a property assignment expression to be added to the Stencil component's class
+ */
+const parsePropDecorator = (
+  diagnostics: d.Diagnostic[],
+  typeChecker: ts.TypeChecker,
+  program: ts.Program,
+  prop: ts.PropertyDeclaration,
+  decoratorName: string,
+): ts.PropertyAssignment | null => {
+  const propDecorator = retrieveTsDecorators(prop)?.find(isDecoratorNamed(decoratorName));
   if (propDecorator == null) {
     return null;
   }
 
-  const decoratorParms = getDeclarationParameters<d.PropOptions>(propDecorator);
-  const propOptions: d.PropOptions = decoratorParms[0] || {};
+  const decoratorParams = getDecoratorParameters<d.PropOptions>(propDecorator, typeChecker);
+  const propOptions: d.PropOptions = decoratorParams[0] || {};
 
-  const propName = prop.name.getText();
+  const propName = tsPropDeclNameAsString(prop, typeChecker);
 
   if (isMemberPrivate(prop)) {
     const err = buildError(diagnostics);
-    err.messageText = 'Properties decorated with the @Prop() decorator cannot be "private" nor "protected". More info: https://stenciljs.com/docs/properties';
-    augmentDiagnosticWithNode(err, prop.modifiers[0]);
+    err.messageText =
+      'Properties decorated with the @Prop() decorator cannot be "private" nor "protected". More info: https://stenciljs.com/docs/properties';
+    augmentDiagnosticWithNode(err, retrieveTsModifiers(prop)![0]);
   }
 
   if (/^on(-|[A-Z])/.test(propName)) {
@@ -63,12 +96,11 @@ const parsePropDecorator = (diagnostics: d.Diagnostic[], typeChecker: ts.TypeChe
   const propMeta: d.ComponentCompilerStaticProperty = {
     type: typeStr,
     mutable: !!propOptions.mutable,
-    complexType: getComplexType(typeChecker, prop, type),
+    complexType: getComplexType(typeChecker, prop, type, program),
     required: prop.exclamationToken !== undefined && propName !== 'mode',
     optional: prop.questionToken !== undefined,
     docs: serializeSymbol(typeChecker, symbol),
   };
-  validateReferences(diagnostics, propMeta.complexType.references, prop.type);
 
   // prop can have an attribute if type is NOT "unknown"
   if (typeStr !== 'unknown') {
@@ -82,12 +114,21 @@ const parsePropDecorator = (diagnostics: d.Diagnostic[], typeChecker: ts.TypeChe
     propMeta.defaultValue = initializer.getText();
   }
 
-  const staticProp = ts.createPropertyAssignment(ts.createLiteral(propName), convertValueToLiteral(propMeta));
-  watchable.add(propName);
+  const staticProp = ts.factory.createPropertyAssignment(
+    ts.factory.createStringLiteral(propName),
+    convertValueToLiteral(propMeta),
+  );
+
   return staticProp;
 };
 
-const getAttributeName = (propName: string, propOptions: d.PropOptions) => {
+/**
+ * Format the attribute name provided as an argument to `@Prop({attribute: ''}`
+ * @param propName the prop's name, used as a fallback value
+ * @param propOptions the options passed in to the `@Prop` call expression
+ * @returns the formatted attribute name
+ */
+const getAttributeName = (propName: string, propOptions: d.PropOptions): string | undefined => {
   if (propOptions.attribute === null) {
     return undefined;
   }
@@ -99,7 +140,15 @@ const getAttributeName = (propName: string, propOptions: d.PropOptions) => {
   return toDashCase(propName);
 };
 
-const getReflect = (diagnostics: d.Diagnostic[], propDecorator: ts.Decorator, propOptions: d.PropOptions) => {
+/**
+ * Determines if the 'reflect' property should be applied to the class member decorated with `@Prop`
+ * @param diagnostics a collection of compiler diagnostics. Any errors detected with setting 'reflect' must be added to
+ * this collection
+ * @param propDecorator the AST containing the Prop decorator
+ * @param propOptions the options passed in to the `@Prop` call expression
+ * @returns `true` if the prop should be reflected in the DOM, `false` otherwise
+ */
+const getReflect = (diagnostics: d.Diagnostic[], propDecorator: ts.Decorator, propOptions: d.PropOptions): boolean => {
   if (typeof propOptions.reflect === 'boolean') {
     return propOptions.reflect;
   }
@@ -113,16 +162,42 @@ const getReflect = (diagnostics: d.Diagnostic[], propDecorator: ts.Decorator, pr
   return false;
 };
 
-const getComplexType = (typeChecker: ts.TypeChecker, node: ts.PropertyDeclaration, type: ts.Type): d.ComponentCompilerPropertyComplexType => {
+const getComplexType = (
+  typeChecker: ts.TypeChecker,
+  node: ts.PropertyDeclaration,
+  type: ts.Type,
+  program: ts.Program,
+): d.ComponentCompilerPropertyComplexType => {
   const nodeType = node.type;
   return {
     original: nodeType ? nodeType.getText() : typeToString(typeChecker, type),
     resolved: resolveType(typeChecker, type),
-    references: getAttributeTypeInfo(node, node.getSourceFile()),
+    references: getAttributeTypeInfo(
+      // If the node did not explicity have a type set (i.e. `name: string`), then
+      // we can generate a type node via the type checker to resolve references for inferred types.
+      //
+      // This is only a concern with non-primitive types such as a user-defined enum.
+      //
+      // For instance, a @Prop() defined as:
+      // @Prop() mode = ComponentModes.DEFAULT;
+      // Should be able to correctly infer the type to be `ComponentModes` and
+      // resolve the reference to this type for use in generated component type declarations.
+      nodeType ? node : typeChecker.typeToTypeNode(type, undefined, undefined),
+      node.getSourceFile(),
+      typeChecker,
+      program,
+    ),
   };
 };
 
-export const propTypeFromTSType = (type: ts.Type) => {
+/**
+ * Derives a Stencil-permitted prop type from the TypeScript compiler's output. This function may narrow the type of a
+ * prop, as the types that can be returned from the TypeScript compiler may be more complex than what Stencil can/should
+ * handle for props.
+ * @param type the prop type to narrow
+ * @returns a valid Stencil prop type
+ */
+export const propTypeFromTSType = (type: ts.Type): 'any' | 'boolean' | 'number' | 'string' | 'unknown' => {
   const isAnyType = checkType(type, isAny);
 
   if (isAnyType) {
@@ -151,38 +226,68 @@ export const propTypeFromTSType = (type: ts.Type) => {
   return 'unknown';
 };
 
-const checkType = (type: ts.Type, check: (type: ts.Type) => boolean) => {
+/**
+ * Determines if a TypeScript compiler given `Type` is of a particular type according to the provided `check` parameter.
+ * Union types (e.g. `boolean | number | string`) will be evaluated one type at a time.
+ * @param type the TypeScript `Type` entity to evaluate
+ * @param check a function that takes a TypeScript `Type` as its only argument and returns `true` if the `Type` conforms
+ * to a particular type
+ * @returns the result of the `check` argument. The result of `check` is `true` for one or more types in a union type,
+ * return `true`.
+ */
+const checkType = (type: ts.Type, check: (type: ts.Type) => boolean): boolean => {
   if (type.flags & ts.TypeFlags.Union) {
+    // if the type is a union, check each type in the union
     const union = type as ts.UnionType;
-    if (union.types.some(type => checkType(type, check))) {
+    if (union.types.some((type) => checkType(type, check))) {
       return true;
     }
   }
   return check(type);
 };
 
-const isBoolean = (t: ts.Type) => {
+/**
+ * Determine if a TypeScript compiler `Type` is a boolean
+ * @param t the `Type` to evaluate
+ * @returns `true` if the `Type` has any boolean-similar flags, `false` otherwise
+ */
+const isBoolean = (t: ts.Type): boolean => {
   if (t) {
-    return !!(t.flags & (ts.TypeFlags.Boolean | ts.TypeFlags.BooleanLike | ts.TypeFlags.BooleanLike));
+    return !!(t.flags & (ts.TypeFlags.Boolean | ts.TypeFlags.BooleanLike));
   }
   return false;
 };
 
-const isNumber = (t: ts.Type) => {
+/**
+ * Determine if a TypeScript compiler `Type` is a number
+ * @param t the `Type` to evaluate
+ * @returns `true` if the `Type` has any number-similar flags, `false` otherwise
+ */
+const isNumber = (t: ts.Type): boolean => {
   if (t) {
     return !!(t.flags & (ts.TypeFlags.Number | ts.TypeFlags.NumberLike | ts.TypeFlags.NumberLiteral));
   }
   return false;
 };
 
-const isString = (t: ts.Type) => {
+/**
+ * Determine if a TypeScript compiler `Type` is a string
+ * @param t the `Type` to evaluate
+ * @returns `true` if the `Type` has any string-similar flags, `false` otherwise
+ */
+const isString = (t: ts.Type): boolean => {
   if (t) {
     return !!(t.flags & (ts.TypeFlags.String | ts.TypeFlags.StringLike | ts.TypeFlags.StringLiteral));
   }
   return false;
 };
 
-const isAny = (t: ts.Type) => {
+/**
+ * Determine if a TypeScript compiler `Type` is of type any
+ * @param t the `Type` to evaluate
+ * @returns `true` if the `Type` has the `Any` flag set on it, `false` otherwise
+ */
+const isAny = (t: ts.Type): boolean => {
   if (t) {
     return !!(t.flags & ts.TypeFlags.Any);
   }

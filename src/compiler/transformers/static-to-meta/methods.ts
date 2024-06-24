@@ -1,6 +1,7 @@
+import ts from 'typescript';
+
 import type * as d from '../../../declarations';
 import { getStaticValue, isInternal } from '../transform-utils';
-import ts from 'typescript';
 
 export const parseStaticMethods = (staticMembers: ts.ClassElement[]): d.ComponentCompilerMethod[] => {
   const parsedMethods: { [key: string]: d.ComponentCompilerStaticMethod } = getStaticValue(staticMembers, 'methods');
@@ -13,7 +14,7 @@ export const parseStaticMethods = (staticMembers: ts.ClassElement[]): d.Componen
     return [];
   }
 
-  return methodNames.map(methodName => {
+  return methodNames.map((methodName) => {
     return {
       name: methodName,
       docs: parsedMethods[methodName].docs,

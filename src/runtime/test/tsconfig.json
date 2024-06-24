@@ -18,10 +18,12 @@
     "noUnusedParameters": true,
     "pretty": true,
     "target": "es2017",
+    "useUnknownInCatchVariables": true,
     "baseUrl": ".",
     "paths": {
       "@stencil/core": ["../../index.ts"],
-      "@stencil/core/testing": ["../../testing/index.ts"]
+      "@stencil/core/testing": ["../../testing/index.ts"],
+      "@platform": ["../../client/index.ts"]
     }
   }
 }

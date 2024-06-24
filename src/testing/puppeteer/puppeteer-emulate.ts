@@ -2,7 +2,7 @@ import type { E2EProcessEnv, EmulateConfig } from '@stencil/core/internal';
 import type * as puppeteer from 'puppeteer';
 
 export function setScreenshotEmulateData(userEmulateConfig: EmulateConfig, env: E2EProcessEnv) {
-  const screenshotEmulate: EmulateConfig = {
+  const screenshotEmulate = {
     userAgent: 'default',
     viewport: {
       width: 800,
@@ -11,14 +11,18 @@ export function setScreenshotEmulateData(userEmulateConfig: EmulateConfig, env: 
       isMobile: false,
       hasTouch: false,
       isLandscape: false,
-    },
-  };
+    } as puppeteer.Viewport,
+    device: undefined as string | undefined,
+  } satisfies EmulateConfig;
 
   if (typeof userEmulateConfig.device === 'string') {
     try {
       const deviceDescriptors = require(env.__STENCIL_PUPPETEER_MODULE__ + '/DeviceDescriptors');
 
-      const puppeteerEmulateOpts = deviceDescriptors[userEmulateConfig.device] as puppeteer.EmulateOptions;
+      const puppeteerEmulateOpts = deviceDescriptors[userEmulateConfig.device] as {
+        userAgent: string;
+        viewport: puppeteer.Viewport;
+      };
       if (!puppeteerEmulateOpts) {
         console.error(`invalid emulate device: ${userEmulateConfig.device}`);
         return;

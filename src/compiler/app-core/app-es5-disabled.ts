@@ -1,8 +1,12 @@
-import type * as d from '../../declarations';
-import { escapeHtml } from '@utils';
-import { join } from 'path';
+import { escapeHtml, generatePreamble, join } from '@utils';
 
-export const generateEs5DisabledMessage = async (config: d.Config, compilerCtx: d.CompilerCtx, outputTarget: d.OutputTargetWww) => {
+import type * as d from '../../declarations';
+
+export const generateEs5DisabledMessage = async (
+  config: d.ValidatedConfig,
+  compilerCtx: d.CompilerCtx,
+  outputTarget: d.OutputTargetWww,
+) => {
   // not doing an es5 right now
   // but it's possible during development the user
   // tests on a browser that doesn't support es2017
@@ -12,7 +16,7 @@ export const generateEs5DisabledMessage = async (config: d.Config, compilerCtx: 
   return fileName;
 };
 
-const getDisabledMessageScript = (config: d.Config) => {
+const getDisabledMessageScript = (config: d.ValidatedConfig) => {
   const style = `
 <style>
 body {
@@ -40,7 +44,7 @@ h2 {
   <ul>
     <li>ES5 builds are disabled <strong>during development</strong> to take advantage of 2x faster build times.</li>
     <li>Please see the example below or our <a href="https://stenciljs.com/docs/stencil-config" target="_blank" rel="noopener noreferrer">config docs</a> if you would like to develop on a browser that does not fully support ES2017 and custom elements.</li>
-    <li>Note that by default, ES5 builds and polyfills are enabled during production builds.</li>
+    <li>Note that as of Stencil v2, ES5 builds and polyfills are <strong>disabled</strong> during production builds. You can enable these <a href="https://stenciljs.com/docs/config#buildes5" target="_blank" rel="noopener noreferrer">in your stencil.config.ts file</a>.</li>
     <li>When testing browsers it is recommended to always test in production mode, and ES5 builds should always be enabled during production builds.</li>
     <li><em>This is only an experiment and if it slows down app development then we will revert this and enable ES5 builds during dev.</em></li>
   </ul>
@@ -100,13 +104,15 @@ h2 {
   For more info, please see <a href="https://developers.google.com/web/fundamentals/primers/modules#browser" target="_blank" rel="noopener noreferrer">Using JavaScript modules on the web</a>.
   </p>
   <pre>
-  <code>${escapeHtml(`<script`)} <span style="background:yellow">type="module"</span> src="/build/${config.fsNamespace}<span style="background:yellow">.esm</span>.js"${escapeHtml(
-    `></script>`,
-  )}
-  ${escapeHtml(`<script`)} <span style="background:yellow">nomodule</span> ${escapeHtml(`src="/build/${config.fsNamespace}.js"></script>`)}</code>
+  <code>${escapeHtml(`<script`)} <span style="background:yellow">type="module"</span> src="/build/${
+    config.fsNamespace
+  }<span style="background:yellow">.esm</span>.js"${escapeHtml(`></script>`)}
+  ${escapeHtml(`<script`)} <span style="background:yellow">nomodule</span> ${escapeHtml(
+    `src="/build/${config.fsNamespace}.js"></script>`,
+  )}</code>
     </pre>
   `;
-  return `
+  return `${generatePreamble(config)}
 (function() {
   function checkSupport() {
     if (!document.body) {

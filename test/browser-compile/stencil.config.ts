@@ -11,20 +11,19 @@ export const config: Config = {
         {
           src: '../../../compiler/',
           dest: './@stencil/core/compiler/',
-          warn: true
+          warn: true,
         },
         {
           src: '../../../internal/',
           dest: './@stencil/core/internal/',
-          warn: true
+          warn: true,
         },
         {
           src: 'preview.html',
-          warn: true
+          warn: true,
         },
-      ]
-    }
+      ],
+    },
   ],
-  enableCache: false
-
+  enableCache: false,
 };

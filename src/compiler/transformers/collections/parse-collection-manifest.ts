@@ -1,10 +1,10 @@
+import { join, normalizePath } from '@utils';
+
 import type * as d from '../../../declarations';
-import { join } from 'path';
-import { normalizePath } from '@utils';
 import { parseCollectionComponents, transpileCollectionModule } from './parse-collection-components';
 
 export const parseCollectionManifest = (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   collectionName: string,
@@ -18,6 +18,7 @@ export const parseCollectionManifest = (
   const collection: d.CollectionCompilerMeta = {
     collectionName: collectionName,
     moduleId: collectionName,
+    moduleDir: collectionDir,
     moduleFiles: [],
     dependencies: parseCollectionDependencies(collectionManifest),
     compiler: {
@@ -35,11 +36,11 @@ export const parseCollectionManifest = (
 };
 
 export const parseCollectionDependencies = (collectionManifest: d.CollectionManifest) => {
-  return (collectionManifest.collections || []).map(c => c.name);
+  return (collectionManifest.collections || []).map((c) => c.name);
 };
 
 export const parseGlobal = (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   collectionDir: string,
@@ -60,7 +61,7 @@ export const parseBundles = (collectionManifest: d.CollectionManifest) => {
     return [];
   }
 
-  return collectionManifest.bundles.map(b => {
+  return collectionManifest.bundles.map((b) => {
     return {
       components: b.components.slice().sort(),
     };

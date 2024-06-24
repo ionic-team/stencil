@@ -1,11 +1,36 @@
-import type * as d from '../declarations';
 import { BUILD } from '@app-data';
-import { CONTENT_REF_ID, HYDRATE_CHILD_ID, HYDRATE_ID, NODE_TYPE, ORG_LOCATION_ID, SLOT_NODE_ID, TEXT_NODE_ID } from './runtime-constants';
 import { doc, plt, supportsShadow } from '@platform';
-import { newVNode } from './vdom/h';
-import { createTime } from './profile';
 
-export const initializeClientHydrate = (hostElm: d.HostElement, tagName: string, hostId: string, hostRef: d.HostRef) => {
+import type * as d from '../declarations';
+import { createTime } from './profile';
+import {
+  CONTENT_REF_ID,
+  HYDRATE_CHILD_ID,
+  HYDRATE_ID,
+  NODE_TYPE,
+  ORG_LOCATION_ID,
+  SLOT_NODE_ID,
+  TEXT_NODE_ID,
+} from './runtime-constants';
+import { newVNode } from './vdom/h';
+
+/**
+ * Entrypoint of the client-side hydration process. Facilitates calls to hydrate the
+ * document and all its nodes.
+ *
+ * This process will also reconstruct the shadow root and slot DOM nodes for components using shadow DOM.
+ *
+ * @param hostElm The element to hydrate.
+ * @param tagName The element's tag name.
+ * @param hostId The host ID assigned to the element by the server.
+ * @param hostRef The host reference for the element.
+ */
+export const initializeClientHydrate = (
+  hostElm: d.HostElement,
+  tagName: string,
+  hostId: string,
+  hostRef: d.HostRef,
+) => {
   const endHydrate = createTime('hydrateClient', tagName);
   const shadowRoot = hostElm.shadowRoot;
   const childRenderNodes: RenderNodeData[] = [];
@@ -22,11 +47,13 @@ export const initializeClientHydrate = (hostElm: d.HostElement, tagName: string,
 
   clientHydrate(vnode, childRenderNodes, slotNodes, shadowRootNodes, hostElm, hostElm, hostId);
 
-  childRenderNodes.map(c => {
+  childRenderNodes.map((c) => {
     const orgLocationId = c.$hostId$ + '.' + c.$nodeId$;
     const orgLocationNode = plt.$orgLocNodes$.get(orgLocationId);
     const node = c.$elm$ as d.RenderNode;
 
+    // Put the node back in its original location since the native Shadow DOM
+    // can handle rendering it its correct location now
     if (orgLocationNode && supportsShadow && orgLocationNode['s-en'] === '') {
       orgLocationNode.parentNode.insertBefore(node, orgLocationNode.nextSibling);
     }
@@ -44,7 +71,7 @@ export const initializeClientHydrate = (hostElm: d.HostElement, tagName: string,
   });
 
   if (BUILD.shadowDom && shadowRoot) {
-    shadowRootNodes.map(shadowRootNode => {
+    shadowRootNodes.map((shadowRootNode) => {
       if (shadowRootNode) {
         shadowRoot.appendChild(shadowRootNode as any);
       }
@@ -53,6 +80,22 @@ export const initializeClientHydrate = (hostElm: d.HostElement, tagName: string,
   endHydrate();
 };
 
+/**
+ * Recursively constructs the virtual node tree for a host element and its children.
+ * The tree is constructed by parsing the annotations set on the nodes by the server.
+ *
+ * In addition to constructing the vNode tree, we also track information about the node's
+ * descendants like which are slots, which should exist in the shadow root, and which
+ * are nodes that should be rendered as children of the parent node.
+ *
+ * @param parentVNode The vNode representing the parent node.
+ * @param childRenderNodes An array of all child nodes in the parent's node tree.
+ * @param slotNodes An array of all slot nodes in the parent's node tree.
+ * @param shadowRootNodes An array all nodes that should be rendered in the shadow root in the parent's node tree.
+ * @param hostElm The parent element.
+ * @param node The node to construct the vNode tree for.
+ * @param hostId The host ID assigned to the element by the server.
+ */
 const clientHydrate = (
   parentVNode: d.VNode,
   childRenderNodes: RenderNodeData[],
@@ -113,13 +156,29 @@ const clientHydrate = (
 
     // recursively drill down, end to start so we can remove nodes
     for (i = node.childNodes.length - 1; i >= 0; i--) {
-      clientHydrate(parentVNode, childRenderNodes, slotNodes, shadowRootNodes, hostElm, node.childNodes[i] as any, hostId);
+      clientHydrate(
+        parentVNode,
+        childRenderNodes,
+        slotNodes,
+        shadowRootNodes,
+        hostElm,
+        node.childNodes[i] as any,
+        hostId,
+      );
     }
 
     if (node.shadowRoot) {
       // keep drilling down through the shadow root nodes
       for (i = node.shadowRoot.childNodes.length - 1; i >= 0; i--) {
-        clientHydrate(parentVNode, childRenderNodes, slotNodes, shadowRootNodes, hostElm, node.shadowRoot.childNodes[i] as any, hostId);
+        clientHydrate(
+          parentVNode,
+          childRenderNodes,
+          slotNodes,
+          shadowRootNodes,
+          hostElm,
+          node.shadowRoot.childNodes[i] as any,
+          hostId,
+        );
       }
     }
   } else if (node.nodeType === NODE_TYPE.CommentNode) {
@@ -164,7 +223,7 @@ const clientHydrate = (
           }
         }
       } else if (childVNode.$hostId$ === hostId) {
-        // this comment node is specifcally for this host id
+        // this comment node is specifically for this host id
 
         if (childNodeType === SLOT_NODE_ID) {
           // `${SLOT_NODE_ID}.${hostId}.${nodeId}.${depth}.${index}.${slotName}`;
@@ -224,7 +283,14 @@ const clientHydrate = (
   }
 };
 
-export const initializeDocumentHydrate = (node: d.RenderNode, orgLocNodes: Map<string, any>) => {
+/**
+ * Recursively locate any comments representing an original location for a node in a node's
+ * children or shadowRoot children.
+ *
+ * @param node The node to search.
+ * @param orgLocNodes A map of the original location annotation and the current node being searched.
+ */
+export const initializeDocumentHydrate = (node: d.RenderNode, orgLocNodes: d.PlatformRuntime['$orgLocNodes$']) => {
   if (node.nodeType === NODE_TYPE.ElementNode) {
     let i = 0;
     for (; i < node.childNodes.length; i++) {

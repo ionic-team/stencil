@@ -1,19 +1,24 @@
-import type * as d from '../../declarations';
-import { H, HOST, RUNTIME_APIS, addCoreRuntimeApi } from './core-runtime-apis';
 import ts from 'typescript';
 
+import type * as d from '../../declarations';
+import { addCoreRuntimeApi, H, HOST, RUNTIME_APIS } from './core-runtime-apis';
+import { retrieveModifierLike } from './transform-utils';
+
 export const transformHostData = (classElements: ts.ClassElement[], moduleFile: d.Module) => {
-  const hasHostData = classElements.some(e => ts.isMethodDeclaration(e) && (e.name as any).escapedText === 'hostData');
+  const hasHostData = classElements.some(
+    (e) => ts.isMethodDeclaration(e) && (e.name as any).escapedText === 'hostData',
+  );
   if (hasHostData) {
-    const renderIndex = classElements.findIndex(e => ts.isMethodDeclaration(e) && (e.name as any).escapedText === 'render');
+    const renderIndex = classElements.findIndex(
+      (e) => ts.isMethodDeclaration(e) && (e.name as any).escapedText === 'render',
+    );
     if (renderIndex >= 0) {
       const renderMethod = classElements[renderIndex] as ts.MethodDeclaration;
-      classElements[renderIndex] = ts.updateMethod(
+      classElements[renderIndex] = ts.factory.updateMethodDeclaration(
         renderMethod,
-        renderMethod.decorators,
-        renderMethod.modifiers,
+        retrieveModifierLike(renderMethod),
         renderMethod.asteriskToken,
-        ts.createIdentifier(INTERNAL_RENDER),
+        ts.factory.createIdentifier(INTERNAL_RENDER),
         renderMethod.questionToken,
         renderMethod.typeParameters,
         renderMethod.parameters,
@@ -31,14 +36,22 @@ const syntheticRender = (moduleFile: d.Module, hasRender: boolean) => {
 
   const hArguments = [
     // __stencil_Host
-    ts.createIdentifier(HOST),
+    ts.factory.createIdentifier(HOST),
     // this.hostData()
-    ts.createCall(ts.createPropertyAccess(ts.createThis(), 'hostData'), undefined, undefined),
+    ts.factory.createCallExpression(
+      ts.factory.createPropertyAccessExpression(ts.factory.createThis(), 'hostData'),
+      undefined,
+      undefined,
+    ),
   ];
   if (hasRender) {
     hArguments.push(
       // this.render()
-      ts.createCall(ts.createPropertyAccess(ts.createThis(), INTERNAL_RENDER), undefined, undefined),
+      ts.factory.createCallExpression(
+        ts.factory.createPropertyAccessExpression(ts.factory.createThis(), INTERNAL_RENDER),
+        undefined,
+        undefined,
+      ),
     );
   }
 
@@ -47,16 +60,19 @@ const syntheticRender = (moduleFile: d.Module, hasRender: boolean) => {
    *   return h(arguments);
    * }
    */
-  return ts.createMethod(
-    undefined,
+  return ts.factory.createMethodDeclaration(
     undefined,
     undefined,
     'render',
     undefined,
     undefined,
+    [],
     undefined,
-    undefined,
-    ts.createBlock([ts.createReturn(ts.createCall(ts.createIdentifier(H), undefined, hArguments))]),
+    ts.factory.createBlock([
+      ts.factory.createReturnStatement(
+        ts.factory.createCallExpression(ts.factory.createIdentifier(H), undefined, hArguments),
+      ),
+    ]),
   );
 };
 

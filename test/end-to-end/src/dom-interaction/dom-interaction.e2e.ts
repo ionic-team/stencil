@@ -1,12 +1,12 @@
 import { newE2EPage } from '@stencil/core/testing';
 
-
 describe('dom interaction e2e tests', () => {
-
   it('should click button in shadow root', async () => {
-    const page = await newE2EPage({ html: `
+    const page = await newE2EPage({
+      html: `
       <dom-interaction></dom-interaction>
-    `});
+    `,
+    });
 
     const button = await page.find('dom-interaction >>> .click');
 
@@ -17,11 +17,12 @@ describe('dom interaction e2e tests', () => {
     expect(button).toEqualText(`Was Clicked`);
   });
 
-
   it('should focus button in shadow root', async () => {
-    const page = await newE2EPage({ html: `
+    const page = await newE2EPage({
+      html: `
       <dom-interaction></dom-interaction>
-    `});
+    `,
+    });
 
     const button = await page.find('dom-interaction >>> .focus');
 
@@ -29,14 +30,15 @@ describe('dom interaction e2e tests', () => {
 
     await button.tap();
 
-    expect(button).toEqualText(`Has Focus`);;
+    expect(button).toEqualText(`Has Focus`);
   });
 
-
   it('should tap button in shadow root', async () => {
-    const page = await newE2EPage({ html: `
+    const page = await newE2EPage({
+      html: `
       <dom-interaction></dom-interaction>
-    `});
+    `,
+    });
 
     const button = await page.find('dom-interaction >>> .tap');
 
@@ -47,11 +49,12 @@ describe('dom interaction e2e tests', () => {
     expect(button).toEqualText(`Was Tapped`);
   });
 
-
   it('should use press() to enter text in an input in the shadow root', async () => {
-    const page = await newE2EPage({ html: `
+    const page = await newE2EPage({
+      html: `
       <dom-interaction></dom-interaction>
-    `});
+    `,
+    });
 
     const input = await page.find('dom-interaction >>> .input');
 
@@ -72,11 +75,12 @@ describe('dom interaction e2e tests', () => {
     expect(value).toBe('88 MPH');
   });
 
-
   it('should use type() to enter text in an input in the shadow root', async () => {
-    const page = await newE2EPage({ html: `
+    const page = await newE2EPage({
+      html: `
       <dom-interaction></dom-interaction>
-    `});
+    `,
+    });
 
     const input = await page.find('dom-interaction >>> .input');
 
@@ -88,5 +92,4 @@ describe('dom interaction e2e tests', () => {
     value = await input.getProperty('value');
     expect(value).toBe('88 MPH');
   });
-
 });

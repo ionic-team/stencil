@@ -1,5 +1,6 @@
 import { Component, h } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
+
 import { Prop } from '../../declarations';
 
 describe('SVG element', () => {
@@ -11,7 +12,7 @@ describe('SVG element', () => {
       render() {
         return (
           <svg viewBox="0 0 100 4">
-            {this.lines.map(a => {
+            {this.lines.map((a) => {
               return [<text>Hola {a}</text>];
             })}
           </svg>

@@ -1,11 +1,12 @@
-import type * as d from '../declarations';
-import type { ServerResponse } from 'http';
-import * as util from './dev-server-utils';
-import { version } from '../version';
-import path from 'path';
-import fs from 'graceful-fs';
-import * as zlib from 'zlib';
 import { Buffer } from 'buffer';
+import fs from 'graceful-fs';
+import type { ServerResponse } from 'http';
+import path from 'path';
+import * as zlib from 'zlib';
+
+import type * as d from '../declarations';
+import { version } from '../version';
+import * as util from './dev-server-utils';
 
 export async function serveFile(
   devServerConfig: d.DevServerConfig,
@@ -32,7 +33,7 @@ export async function serveFile(
           util.responseHeaders({
             'content-type': util.getContentType(req.filePath) + '; charset=utf-8',
             'content-encoding': 'gzip',
-            'vary': 'Accept-Encoding',
+            vary: 'Accept-Encoding',
           }),
         );
 
@@ -75,7 +76,7 @@ function updateStyleUrls(url: URL, oldCss: string) {
   const hmrUrls = url.searchParams.get('s-hmr-urls');
 
   if (versionId && hmrUrls) {
-    (hmrUrls as string).split(',').forEach(hmrUrl => {
+    (hmrUrls as string).split(',').forEach((hmrUrl) => {
       urlVersionIds.set(hmrUrl, versionId as string);
     });
   }

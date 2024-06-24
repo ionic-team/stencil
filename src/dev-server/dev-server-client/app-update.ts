@@ -2,18 +2,18 @@ import type * as d from '../../declarations';
 import {
   appError,
   clearAppErrorModal,
+  emitBuildStatus,
   hmrWindow,
   logBuild,
   logDiagnostic,
   logReload,
   logWarn,
-  emitBuildStatus,
   onBuildResults,
 } from '../client';
 import { OPEN_IN_EDITOR_URL } from '../dev-server-constants';
 
 export const initAppUpdate = (win: d.DevClientWindow, config: d.DevClientConfig) => {
-  onBuildResults(win, buildResults => {
+  onBuildResults(win, (buildResults) => {
     appUpdate(win, config, buildResults);
   });
 };
@@ -36,7 +36,7 @@ const appUpdate = (win: d.DevClientWindow, config: d.DevClientConfig, buildResul
         window: win,
         buildResults: buildResults,
         openInEditor: editorId
-          ? data => {
+          ? (data) => {
               const qs: d.OpenInEditorData = {
                 file: data.file,
                 line: data.line,
@@ -45,7 +45,7 @@ const appUpdate = (win: d.DevClientWindow, config: d.DevClientConfig, buildResul
               };
 
               const url = `${OPEN_IN_EDITOR_URL}?${Object.keys(qs)
-                .map(k => `${k}=${(qs as any)[k]}`)
+                .map((k) => `${k}=${(qs as any)[k]}`)
                 .join('&')}`;
               win.fetch(url);
             }
@@ -65,7 +65,7 @@ const appUpdate = (win: d.DevClientWindow, config: d.DevClientConfig, buildResul
       // then let's refresh the page from the root of the server
       appReset(win, config, () => {
         logReload(`Initial load`);
-        win.location.reload(true);
+        win.location.reload();
       });
       return;
     }
@@ -111,7 +111,7 @@ const appHmr = (win: Window, hmr: d.HotModuleReplacement) => {
   }
 
   if (shouldWindowReload) {
-    win.location.reload(true);
+    win.location.reload();
     return;
   }
 
@@ -150,9 +150,9 @@ export const appReset = (win: d.DevClientWindow, config: d.DevClientConfig, cb: 
     // let's ensure we entirely remove the service worker for this domain
     win.navigator.serviceWorker
       .getRegistration()
-      .then(swRegistration => {
+      .then((swRegistration) => {
         if (swRegistration) {
-          swRegistration.unregister().then(hasUnregistered => {
+          swRegistration.unregister().then((hasUnregistered) => {
             if (hasUnregistered) {
               logBuild(`unregistered service worker`);
             }
@@ -162,7 +162,7 @@ export const appReset = (win: d.DevClientWindow, config: d.DevClientConfig, cb: 
           cb();
         }
       })
-      .catch(err => {
+      .catch((err) => {
         logWarn('Service Worker', err);
         cb();
       });

@@ -19,6 +19,7 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "target": "es2017",
+    "useUnknownInCatchVariables": true,
     "baseUrl": ".",
     "paths": {
       "@stencil/core": [

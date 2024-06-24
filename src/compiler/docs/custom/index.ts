@@ -1,13 +1,18 @@
-import type * as d from '../../../declarations';
-import { isOutputTargetDocsCustom } from '../../output-targets/output-utils';
+import { isOutputTargetDocsCustom } from '@utils';
 
-export const generateCustomDocs = async (config: d.Config, docsData: d.JsonDocs, outputTargets: d.OutputTarget[]) => {
+import type * as d from '../../../declarations';
+
+export const generateCustomDocs = async (
+  config: d.ValidatedConfig,
+  docsData: d.JsonDocs,
+  outputTargets: d.OutputTarget[],
+) => {
   const customOutputTargets = outputTargets.filter(isOutputTargetDocsCustom);
   if (customOutputTargets.length === 0) {
     return;
   }
   await Promise.all(
-    customOutputTargets.map(async customOutput => {
+    customOutputTargets.map(async (customOutput) => {
       try {
         await customOutput.generator(docsData, config);
       } catch (e) {

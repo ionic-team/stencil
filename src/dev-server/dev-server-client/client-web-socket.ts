@@ -76,7 +76,7 @@ export const initClientWebSocket = (win: d.DevClientWindow, config: d.DevClientC
         clearInterval(requestBuildResultsTmrId);
 
         if (win['s-build-id'] !== msg.buildResults.buildId) {
-          win.location.reload(true);
+          win.location.reload();
         }
         win['s-build-id'] = msg.buildResults.buildId;
         return;

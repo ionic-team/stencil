@@ -10,6 +10,7 @@ export {
   readTask,
   setMode,
   setAssetPath,
+  setPlatformHelpers,
   writeTask,
   setErrorHandler,
 } from '../client/index.js';

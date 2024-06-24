@@ -1,4 +1,5 @@
 import { Component, h } from '@stencil/core';
+
 import styles from './prerender-cmp.css';
 
 @Component({
@@ -31,7 +32,7 @@ export class PrerenderCmp {
           ]}
         </div>
       </div>,
-      <a href="/some-link">Some Link</a>
+      <a href="/some-link">Some Link</a>,
     ];
   }
 }

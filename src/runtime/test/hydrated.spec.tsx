@@ -15,7 +15,7 @@ describe('globals', () => {
     });
     const html = page.doc.documentElement;
     expect(html.classList.contains('hydrated')).toBe(false);
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(() => {
         expect(html.classList.contains('hydrated')).toBe(true);
         resolve();

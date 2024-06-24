@@ -1,28 +1,28 @@
-import type * as d from '../../declarations';
-import { buildError, isString } from '@utils';
-import { isAbsolute, join, basename, dirname } from 'path';
-import { isLocalModule } from '../sys/resolve/resolve-utils';
-import { isOutputTargetDist, isOutputTargetWww } from '../output-targets/output-utils';
+import { buildError, isOutputTargetDist, isOutputTargetWww, isString, join, normalizePath } from '@utils';
+import { basename, dirname, isAbsolute } from 'path';
 
-export const validateTesting = (config: d.Config, diagnostics: d.Diagnostic[]) => {
+import type * as d from '../../declarations';
+import { isLocalModule } from '../sys/resolve/resolve-utils';
+
+export const validateTesting = (config: d.ValidatedConfig, diagnostics: d.Diagnostic[]) => {
   const testing = (config.testing = Object.assign({}, config.testing || {}));
 
-  if (!config.flags || (!config.flags.e2e && !config.flags.spec)) {
+  if (!config.flags.e2e && !config.flags.spec) {
     return;
   }
 
-  let configPathDir = config.configPath;
+  let configPathDir = config.configPath!;
   if (isString(configPathDir)) {
     if (basename(configPathDir).includes('.')) {
       configPathDir = dirname(configPathDir);
     }
   } else {
-    configPathDir = config.rootDir;
+    configPathDir = config.rootDir!;
   }
 
-  if (typeof config.flags.headless === 'boolean') {
+  if (typeof config.flags.headless === 'boolean' || config.flags.headless === 'new') {
     testing.browserHeadless = config.flags.headless;
-  } else if (typeof testing.browserHeadless !== 'boolean') {
+  } else if (typeof testing.browserHeadless !== 'boolean' && testing.browserHeadless !== 'new') {
     testing.browserHeadless = true;
   }
 
@@ -38,43 +38,64 @@ export const validateTesting = (config: d.Config, diagnostics: d.Diagnostic[]) =
     addTestingConfigOption(testing.browserArgs, '--no-sandbox');
     addTestingConfigOption(testing.browserArgs, '--disable-setuid-sandbox');
     addTestingConfigOption(testing.browserArgs, '--disable-dev-shm-usage');
-    testing.browserHeadless = true;
+    testing.browserHeadless = testing.browserHeadless === 'new' ? 'new' : true;
+  } else if (config.flags.devtools || testing.browserDevtools) {
+    testing.browserDevtools = true;
+    testing.browserHeadless = false;
   }
 
   if (typeof testing.rootDir === 'string') {
     if (!isAbsolute(testing.rootDir)) {
-      testing.rootDir = join(config.rootDir, testing.rootDir);
+      testing.rootDir = join(config.rootDir!, testing.rootDir);
     }
   } else {
     testing.rootDir = config.rootDir;
   }
 
-  if (config.flags && typeof config.flags.screenshotConnector === 'string') {
+  if (typeof config.flags.screenshotConnector === 'string') {
     testing.screenshotConnector = config.flags.screenshotConnector;
   }
 
   if (typeof testing.screenshotConnector === 'string') {
     if (!isAbsolute(testing.screenshotConnector)) {
-      testing.screenshotConnector = join(config.rootDir, testing.screenshotConnector);
+      testing.screenshotConnector = join(config.rootDir!, testing.screenshotConnector);
+    } else {
+      testing.screenshotConnector = normalizePath(testing.screenshotConnector);
     }
   } else {
-    testing.screenshotConnector = join(config.sys.getCompilerExecutingPath(), '..', '..', 'screenshot', 'local-connector.js');
+    testing.screenshotConnector = join(
+      config.sys!.getCompilerExecutingPath(),
+      '..',
+      '..',
+      'screenshot',
+      'local-connector.js',
+    );
+  }
+
+  /**
+   * We only allow numbers or null for the screenshotTimeout, so if we detect anything
+   * else, we set it to null.
+   */
+  if (typeof testing.screenshotTimeout != 'number') {
+    testing.screenshotTimeout = null;
   }
 
   if (!Array.isArray(testing.testPathIgnorePatterns)) {
-    testing.testPathIgnorePatterns = DEFAULT_IGNORE_PATTERNS.map(ignorePattern => {
-      return join(testing.rootDir, ignorePattern);
+    testing.testPathIgnorePatterns = DEFAULT_IGNORE_PATTERNS.map((ignorePattern) => {
+      return join(testing.rootDir!, ignorePattern);
     });
 
-    config.outputTargets
-      .filter(o => (isOutputTargetDist(o) || isOutputTargetWww(o)) && o.dir)
-      .forEach((outputTarget: d.OutputTargetWww) => {
-        testing.testPathIgnorePatterns.push(outputTarget.dir);
+    (config.outputTargets ?? [])
+      .filter(
+        (o): o is d.OutputTargetWww | d.OutputTargetDist => (isOutputTargetDist(o) || isOutputTargetWww(o)) && !!o.dir,
+      )
+      .forEach((outputTarget) => {
+        testing.testPathIgnorePatterns?.push(outputTarget.dir!);
       });
   }
 
   if (typeof testing.preset !== 'string') {
-    testing.preset = join(config.sys.getCompilerExecutingPath(), '..', '..', 'testing');
+    testing.preset = join(config.sys!.getCompilerExecutingPath(), '..', '..', 'testing');
   } else if (!isAbsolute(testing.preset)) {
     testing.preset = join(configPathDir, testing.preset);
   }
@@ -83,7 +104,9 @@ export const validateTesting = (config: d.Config, diagnostics: d.Diagnostic[]) =
     testing.setupFilesAfterEnv = [];
   }
 
-  testing.setupFilesAfterEnv.unshift(join(config.sys.getCompilerExecutingPath(), '..', '..', 'testing', 'jest-setuptestframework.js'));
+  testing.setupFilesAfterEnv.unshift(
+    join(config.sys!.getCompilerExecutingPath(), '..', '..', 'testing', 'jest-setuptestframework.js'),
+  );
 
   if (isString(testing.testEnvironment)) {
     if (!isAbsolute(testing.testEnvironment) && isLocalModule(testing.testEnvironment)) {
@@ -117,7 +140,18 @@ export const validateTesting = (config: d.Config, diagnostics: d.Diagnostic[]) =
   }
 
   if (testing.testRegex === undefined) {
-    testing.testRegex = '(/__tests__/.*|\\.?(test|spec|e2e))\\.(tsx?|ts?|jsx?|js?)$';
+    /**
+     * The test regex covers cases of:
+     * - files under a `__tests__` directory
+     * - the case where a test file has a name such as `test.ts`, `spec.ts` or `e2e.ts`.
+     *   - these files can use any of the following file extensions: .ts, .tsx, .js, .jsx.
+     *   - this regex only handles the entire path of a file, e.g. `/some/path/e2e.ts`
+     * - the case where a test file ends with `.test.ts`, `.spec.ts`, or `.e2e.ts`.
+     *   - these files can use any of the following file extensions: .ts, .tsx, .js, .jsx.
+     *   - this regex case shall match file names such as `my-cmp.spec.ts`, `test.spec.ts`
+     *   - this regex case shall not match file names such as `attest.ts`, `bespec.ts`
+     */
+    testing.testRegex = '(/__tests__/.*|(\\.|/)(test|spec|e2e))\\.[jt]sx?$';
   }
 
   if (Array.isArray(testing.testMatch)) {
@@ -127,7 +161,7 @@ export const validateTesting = (config: d.Config, diagnostics: d.Diagnostic[]) =
   }
 
   if (typeof testing.runner !== 'string') {
-    testing.runner = join(config.sys.getCompilerExecutingPath(), '..', '..', 'testing', 'jest-runner.js');
+    testing.runner = join(config.sys!.getCompilerExecutingPath(), '..', '..', 'testing', 'jest-runner.js');
   }
 
   if (typeof testing.waitBeforeScreenshot === 'number') {

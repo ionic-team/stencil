@@ -8,11 +8,10 @@ import { Component, h } from '@stencil/core';
   scoped: true,
   styleUrls: {
     buford: 'scoped-mode.buford.scss',
-    griff: 'scoped-mode.griff.css'
-  }
+    griff: 'scoped-mode.griff.css',
+  },
 })
 export class ScopedMode {
-
   render() {
     return (
       <section>

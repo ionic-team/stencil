@@ -1,0 +1,17 @@
+{
+  "name": "docs-readme-testbed",
+  "version": "1.0.0",
+  "description": "A test app for the docs-readme output target",
+  "files": [
+    "dist/"
+  ],
+  "scripts": {
+    "build": "node ../../bin/stencil build",
+    "build.dev": "node ../../bin/stencil build --dev",
+    "start": "node ../../bin/stencil build --dev --watch --serve",
+    "test": "node ../../bin/stencil test --spec --e2e",
+    "test.watch": "node ../../bin/stencil test --spec --e2e --watch",
+    "generate": "node ../../bin/stencil generate"
+  },
+  "license": "MIT"
+}

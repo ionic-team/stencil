@@ -2,9 +2,9 @@ import { createWindow } from '../window';
 
 describe('customElements', () => {
   it('attributeChangedCallback, removeAttribute', () => {
-    let attrName: string;
-    let oldValue: string;
-    let newValue: string;
+    let attrName: string = '';
+    let oldValue: string = '';
+    let newValue: string = '';
     let called = 0;
 
     customElements.define(
@@ -39,9 +39,9 @@ describe('customElements', () => {
   });
 
   it('attributeChangedCallback, setAttribute', () => {
-    let attrName: string;
-    let oldValue: string;
-    let newValue: string;
+    let attrName: string = '';
+    let oldValue: string = '';
+    let newValue: string = '';
     let called = 0;
 
     customElements.define(
@@ -61,7 +61,7 @@ describe('customElements', () => {
 
     const cmpA = document.createElement('cmp-a');
     document.body.appendChild(cmpA);
-    expect(attrName).toBe(undefined);
+    expect(attrName).toBe('');
     expect(called).toBe(0);
 
     cmpA.setAttribute('attr-a', 'value-a');

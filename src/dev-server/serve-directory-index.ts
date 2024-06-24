@@ -1,8 +1,9 @@
-import type * as d from '../declarations';
 import type { ServerResponse } from 'http';
+import path from 'path';
+
+import type * as d from '../declarations';
 import { responseHeaders } from './dev-server-utils';
 import { serveFile } from './serve-file';
-import path from 'path';
 
 export async function serveDirectoryIndex(
   devServerConfig: d.DevServerConfig,
@@ -68,7 +69,7 @@ async function getFiles(sys: d.CompilerSystem, baseUrl: URL, dirItemNames: strin
   }
 
   return items
-    .map(item => {
+    .map((item) => {
       return `
         <li class="${item.isDirectory ? 'directory' : 'file'}">
           <a href="${item.pathname}">
@@ -82,7 +83,7 @@ async function getFiles(sys: d.CompilerSystem, baseUrl: URL, dirItemNames: strin
 
 async function getDirectoryItems(sys: d.CompilerSystem, baseUrl: URL, dirFilePaths: string[]) {
   const items = await Promise.all(
-    dirFilePaths.map(async dirFilePath => {
+    dirFilePaths.map(async (dirFilePath) => {
       const fileName = path.basename(dirFilePath);
       const url = new URL(fileName, baseUrl);
       const stats = await sys.stat(dirFilePath);

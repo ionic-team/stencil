@@ -1,21 +1,19 @@
 import { Config } from '../../internal';
 
 export const config: Config = {
-
   hashFileNames: false,
   minifyJs: false,
   outputTargets: [
     {
       type: 'www',
       baseUrl: 'http://testing.stenciljs.com',
-      serviceWorker: null
+      serviceWorker: null,
     },
     {
       type: 'dist-hydrate-script',
-      dir: 'dist/hydrate'
-    }
+      dir: 'dist/hydrate',
+    },
   ],
 
-  enableCache: false
-
+  enableCache: false,
 };

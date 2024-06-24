@@ -1,20 +1,21 @@
-import type { Logger, PackageJsonData } from '../../declarations';
 import { isString, noop } from '@utils';
 import fs from 'graceful-fs';
-import path from 'path';
-import semiver from 'semiver';
 import { tmpdir } from 'os';
+import path from 'path';
+import semverLt from 'semver/functions/lt';
+
+import type { Logger, PackageJsonData } from '../../declarations';
 
 const REGISTRY_URL = `https://registry.npmjs.org/@stencil/core`;
 const CHECK_INTERVAL = 1000 * 60 * 60 * 24 * 7;
-const CHANGELOG = `https://github.com/ionic-team/stencil/blob/master/CHANGELOG.md`;
+const CHANGELOG = `https://github.com/ionic-team/stencil/blob/main/CHANGELOG.md`;
 
 export async function checkVersion(logger: Logger, currentVersion: string): Promise<() => void> {
   try {
     const latestVersion = await getLatestCompilerVersion(logger);
     if (latestVersion != null) {
       return () => {
-        if (semiver(currentVersion, latestVersion) < 0) {
+        if (semverLt(currentVersion, latestVersion)) {
           printUpdateMessage(logger, currentVersion, latestVersion);
         } else {
           console.debug(
@@ -65,7 +66,7 @@ async function requestUrl(url: string) {
   const https = await import('https');
 
   return new Promise<string>((resolve, reject) => {
-    const req = https.request(url, res => {
+    const req = https.request(url, (res) => {
       if (res.statusCode > 299) {
         reject(`url: ${url}, staus: ${res.statusCode}`);
         return;
@@ -78,7 +79,7 @@ async function requestUrl(url: string) {
         resolve(ret.join(''));
       });
 
-      res.on('data', data => {
+      res.on('data', (data) => {
         ret.push(data);
       });
     });
@@ -92,7 +93,7 @@ function requiresCheck(now: number, lastCheck: number, checkInterval: number) {
 }
 
 function getLastCheck() {
-  return new Promise<number>(resolve => {
+  return new Promise<number>((resolve) => {
     fs.readFile(getLastCheckStoragePath(), 'utf8', (err, data) => {
       if (!err && isString(data)) {
         try {
@@ -105,7 +106,7 @@ function getLastCheck() {
 }
 
 function setLastCheck() {
-  return new Promise<void>(resolve => {
+  return new Promise<void>((resolve) => {
     const now = JSON.stringify(Date.now());
     fs.writeFile(getLastCheckStoragePath(), now, () => {
       resolve();
@@ -137,7 +138,7 @@ function printUpdateMessage(logger: Logger, currentVersion: string, latestVersio
   top += BOX_TOP_RIGHT;
   o.push(top);
 
-  msg.forEach(m => {
+  msg.forEach((m) => {
     let line = BOX_VERTICAL;
     for (let i = 0; i < PADDING; i++) {
       line += ` `;

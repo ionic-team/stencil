@@ -1,5 +1,5 @@
-import { MockHTMLElement, MockNode } from './node';
 import { NODE_TYPES } from './constants';
+import { MockHTMLElement, MockNode } from './node';
 
 export class MockCustomElementRegistry implements CustomElementRegistry {
   private __registry: Map<string, { cstr: any; options: any }>;
@@ -9,7 +9,9 @@ export class MockCustomElementRegistry implements CustomElementRegistry {
 
   define(tagName: string, cstr: any, options?: any) {
     if (tagName.toLowerCase() !== tagName) {
-      throw new Error(`Failed to execute 'define' on 'CustomElementRegistry': "${tagName}" is not a valid custom element name`);
+      throw new Error(
+        `Failed to execute 'define' on 'CustomElementRegistry': "${tagName}" is not a valid custom element name`,
+      );
     }
 
     if (this.__registry == null) {
@@ -20,7 +22,7 @@ export class MockCustomElementRegistry implements CustomElementRegistry {
     if (this.__whenDefined != null) {
       const whenDefinedResolveFns = this.__whenDefined.get(tagName);
       if (whenDefinedResolveFns != null) {
-        whenDefinedResolveFns.forEach(whenDefinedResolveFn => {
+        whenDefinedResolveFns.forEach((whenDefinedResolveFn) => {
           whenDefinedResolveFn();
         });
         whenDefinedResolveFns.length = 0;
@@ -31,7 +33,7 @@ export class MockCustomElementRegistry implements CustomElementRegistry {
     const doc = this.win.document;
     if (doc != null) {
       const hosts = doc.querySelectorAll(tagName);
-      hosts.forEach(host => {
+      hosts.forEach((host) => {
         if (upgradedElements.has(host) === false) {
           tempDisableCallbacks.add(doc);
 
@@ -65,6 +67,15 @@ export class MockCustomElementRegistry implements CustomElementRegistry {
     return undefined;
   }
 
+  getName(cstr: CustomElementConstructor) {
+    for (const [tagName, def] of this.__registry.entries()) {
+      if (def.cstr === cstr) {
+        return tagName;
+      }
+    }
+    return undefined;
+  }
+
   upgrade(_rootNode: any) {
     //
   }
@@ -79,14 +90,14 @@ export class MockCustomElementRegistry implements CustomElementRegistry {
     }
   }
 
-  whenDefined(tagName: string) {
+  whenDefined(tagName: string): Promise<CustomElementConstructor> {
     tagName = tagName.toLowerCase();
 
     if (this.__registry != null && this.__registry.has(tagName) === true) {
-      return Promise.resolve();
+      return Promise.resolve<CustomElementConstructor>(this.__registry.get(tagName).cstr);
     }
 
-    return new Promise<void>(resolve => {
+    return new Promise<CustomElementConstructor>((resolve) => {
       if (this.__whenDefined == null) {
         this.__whenDefined = new Map();
       }
@@ -165,19 +176,19 @@ export function connectNode(ownerDocument: any, node: MockNode) {
         fireConnectedCallback(node);
       }
 
-      const shadowRoot = ((node as any) as Element).shadowRoot;
+      const shadowRoot = (node as any as Element).shadowRoot;
       if (shadowRoot != null) {
-        shadowRoot.childNodes.forEach(childNode => {
+        shadowRoot.childNodes.forEach((childNode) => {
           connectNode(ownerDocument, childNode as any);
         });
       }
     }
 
-    node.childNodes.forEach(childNode => {
+    node.childNodes.forEach((childNode) => {
       connectNode(ownerDocument, childNode);
     });
   } else {
-    node.childNodes.forEach(childNode => {
+    node.childNodes.forEach((childNode) => {
       childNode.ownerDocument = ownerDocument;
     });
   }
@@ -210,11 +221,14 @@ export function disconnectNode(node: MockNode) {
   }
 }
 
-export function attributeChanged(node: MockNode, attrName: string, oldValue: string, newValue: string) {
+export function attributeChanged(node: MockNode, attrName: string, oldValue: string | null, newValue: string | null) {
   attrName = attrName.toLowerCase();
 
   const observedAttributes = (node as any).constructor.observedAttributes as string[];
-  if (Array.isArray(observedAttributes) === true && observedAttributes.some(obs => obs.toLowerCase() === attrName) === true) {
+  if (
+    Array.isArray(observedAttributes) === true &&
+    observedAttributes.some((obs) => obs.toLowerCase() === attrName) === true
+  ) {
     try {
       (node as any).attributeChangedCallback(attrName, oldValue, newValue);
     } catch (e) {

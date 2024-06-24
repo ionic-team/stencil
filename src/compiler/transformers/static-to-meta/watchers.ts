@@ -1,6 +1,7 @@
+import ts from 'typescript';
+
 import type * as d from '../../../declarations';
 import { getStaticValue } from '../transform-utils';
-import ts from 'typescript';
 
 export const parseStaticWatchers = (staticMembers: ts.ClassElement[]): d.ComponentCompilerWatch[] => {
   const parsedWatchers: d.ComponentCompilerWatch[] = getStaticValue(staticMembers, 'watchers');
@@ -8,7 +9,7 @@ export const parseStaticWatchers = (staticMembers: ts.ClassElement[]): d.Compone
     return [];
   }
 
-  return parsedWatchers.map(parsedWatch => {
+  return parsedWatchers.map((parsedWatch) => {
     return {
       propName: parsedWatch.propName,
       methodName: parsedWatch.methodName,

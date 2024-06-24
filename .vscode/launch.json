@@ -3,8 +3,14 @@
   // Hover to view descriptions of existing attributes.
   // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
   "version": "0.2.0",
+  "inputs": [
+    {
+      "id": "stencilProject",
+      "description": "the location on disk of a stencil project use",
+      "type": "promptString"
+    }
+  ],
   "configurations": [
-
     {
       "type": "node",
       "request": "launch",
@@ -108,6 +114,29 @@
         "--max-workers=0",
         "--config",
         "${workspaceFolder}/test/ionic-app/stencil.config.ts"
+      ],
+      "protocol": "inspector"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "debug stencil compiler (default config)",
+      "args": [
+        "${workspaceFolder}/bin/stencil",
+        "build",
+        "--max-workers=1"
+      ],
+      "protocol": "inspector"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "debug stencil compiler with an existing stencil project",
+      "args": [
+        "${workspaceFolder}/bin/stencil",
+        "build",
+        "--config",
+        "${input:stencilProject}"
       ],
       "protocol": "inspector"
     },
@@ -224,29 +253,6 @@
         "--debug",
         "--config",
         "${workspaceFolder}/../ionic-docs/stencil.config.ts"
-      ],
-      "protocol": "inspector"
-    },
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "Karma",
-      "args": [
-        "${workspaceFolder}/bin/stencil",
-        "build",
-        "--max-workers=0",
-        "--dev",
-        "--config",
-        "${workspaceFolder}/test/karma/stencil.config.ts"
-      ],
-      "protocol": "inspector"
-    },
-    {
-      "type": "node",
-      "request": "launch",
-      "name": "Karma Prerender",
-      "args": [
-        "${workspaceFolder}/test/karma/test-prerender/prerender.js"
       ],
       "protocol": "inspector"
     }

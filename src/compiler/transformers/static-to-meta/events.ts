@@ -1,6 +1,7 @@
+import ts from 'typescript';
+
 import type * as d from '../../../declarations';
 import { getStaticValue, isInternal } from '../transform-utils';
-import ts from 'typescript';
 
 export const parseStaticEvents = (staticMembers: ts.ClassElement[]): d.ComponentCompilerEvent[] => {
   const parsedEvents: d.ComponentCompilerEvent[] = getStaticValue(staticMembers, 'events');
@@ -8,7 +9,7 @@ export const parseStaticEvents = (staticMembers: ts.ClassElement[]): d.Component
     return [];
   }
 
-  return parsedEvents.map(parsedEvent => {
+  return parsedEvents.map((parsedEvent) => {
     return {
       name: parsedEvent.name,
       method: parsedEvent.method,

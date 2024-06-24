@@ -9,6 +9,16 @@ export interface ComponentDecorator {
 }
 export interface ComponentOptions {
   /**
+   * When set to `true` this component will be form-associated. See
+   * https://stenciljs.com/docs/next/form-associated documentation on how to
+   * build form-associated Stencil components that integrate into forms like
+   * native browser elements such as `<input>` and `<textarea>`.
+   *
+   * The {@link AttachInternals} decorator allows for access to the
+   * `ElementInternals` object to modify the associated form.
+   */
+  formAssociated?: boolean;
+  /**
    * Tag name of the web component. Ideally, the tag name must be globally unique,
    * so it's recommended to choose an unique prefix for all your components within the same collection.
    *
@@ -74,7 +84,7 @@ export interface PropOptions {
   /**
    * The name of the associated DOM attribute.
    * Stencil uses different heuristics to determine the default name of the attribute,
-   * but using this property, you can override the default behaviour.
+   * but using this property, you can override the default behavior.
    */
   attribute?: string | null;
 
@@ -126,6 +136,10 @@ export interface EventOptions {
   composed?: boolean;
 }
 
+export interface AttachInternalsDecorator {
+  (): PropertyDecorator;
+}
+
 export interface ListenDecorator {
   (eventName: string, opts?: ListenOptions): CustomMethodDecorator<any>;
 }
@@ -149,7 +163,7 @@ export interface ListenOptions {
    * By default, Stencil uses several heuristics to determine if
    * it must attach a `passive` event listener or not.
    *
-   * Using the `passive` option can be used to change the default behaviour.
+   * Using the `passive` option can be used to change the default behavior.
    * Please see https://developers.google.com/web/updates/2016/06/passive-event-listeners for further information.
    */
   passive?: boolean;
@@ -181,7 +195,7 @@ export declare const Build: UserBuildConditionals;
 /**
  * The `Env` object provides access to the "env" object declared in the project's `stencil.config.ts`.
  */
-export declare const Env: {[prop: string]: string | undefined};
+export declare const Env: { [prop: string]: string | undefined };
 
 /**
  * The `@Component()` decorator is used to provide metadata about the component class.
@@ -203,6 +217,13 @@ export declare const Element: ElementDecorator;
  * https://stenciljs.com/docs/events
  */
 export declare const Event: EventDecorator;
+
+/**
+ * If the `formAssociated` option is set in options passed to the
+ * `@Component()` decorator then this decorator may be used to get access to the
+ * `ElementInternals` instance associated with the component.
+ */
+export declare const AttachInternals: AttachInternalsDecorator;
 
 /**
  * The `Listen()` decorator is for listening DOM events, including the ones
@@ -258,13 +279,26 @@ export type ErrorHandler = (err: any, element?: HTMLElement) => void;
 export declare const setMode: (handler: ResolutionHandler) => void;
 
 /**
- * getMode
+ * `getMode()` is used for libraries which provide multiple "modes" for styles.
+ * @param ref a reference to the node to get styles for
+ * @returns the current mode or undefined, if not found
  */
 export declare function getMode<T = string | undefined>(ref: any): T;
+
+export declare function setPlatformHelpers(helpers: {
+  jmp?: (c: any) => any;
+  raf?: (c: any) => number;
+  ael?: (el: any, eventName: string, listener: any, options: any) => void;
+  rel?: (el: any, eventName: string, listener: any, options: any) => void;
+  ce?: (eventName: string, opts?: any) => any;
+}): void;
 
 /**
  * Get the base path to where the assets can be found. Use `setAssetPath(path)`
  * if the path needs to be customized.
+ * @param path the path to use in calculating the asset path. this value will be
+ * used in conjunction with the base asset path
+ * @returns the base path
  */
 export declare function getAssetPath(path: string): string;
 
@@ -278,25 +312,42 @@ export declare function getAssetPath(path: string): string;
  * `setAssetPath(document.currentScript.src)`, or using a bundler's replace plugin to
  * dynamically set the path at build time, such as `setAssetPath(process.env.ASSET_PATH)`.
  * But do note that this configuration depends on how your script is bundled, or lack of
- * bunding, and where your assets can be loaded from. Additionally custom bundling
+ * bundling, and where your assets can be loaded from. Additionally custom bundling
  * will have to ensure the static assets are copied to its build directory.
+ * @param path the asset path to set
+ * @returns the set path
  */
 export declare function setAssetPath(path: string): string;
 
 /**
- * getElement
+ * Used to specify a nonce value that corresponds with an application's
+ * [Content Security Policy (CSP)](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP).
+ * When set, the nonce will be added to all dynamically created script and style tags at runtime.
+ * Alternatively, the nonce value can be set on a `meta` tag in the DOM head
+ * (<meta name="csp-nonce" content="{ nonce value here }" />) and will result in the same behavior.
+ * @param nonce The value to be used for the nonce attribute.
+ */
+export declare function setNonce(nonce: string): void;
+
+/**
+ * Retrieve a Stencil element for a given reference
+ * @param ref the ref to get the Stencil element for
+ * @returns a reference to the element
  */
 export declare function getElement(ref: any): HTMLStencilElement;
 
 /**
  * Schedules a new render of the given instance or element even if no state changed.
  *
- * Notice `forceUpdate()` is not syncronous and might perform the DOM render in the next frame.
+ * Notice `forceUpdate()` is not synchronous and might perform the DOM render in the next frame.
+ *
+ * @param ref the node/element to force the re-render of
  */
 export declare function forceUpdate(ref: any): void;
 
 /**
  * getRenderingRef
+ * @returns the rendering ref
  */
 export declare function getRenderingRef(): any;
 
@@ -309,6 +360,8 @@ export interface HTMLStencilElement extends HTMLElement {
  * in the best moment to perform DOM mutation without causing layout thrashing.
  *
  * For further information: https://developers.google.com/web/fundamentals/performance/rendering/avoid-large-complex-layouts-and-layout-thrashing
+ *
+ * @param task the DOM-write to schedule
  */
 export declare function writeTask(task: RafCallback): void;
 
@@ -317,6 +370,8 @@ export declare function writeTask(task: RafCallback): void;
  * in the best moment to perform DOM reads without causing layout thrashing.
  *
  * For further information: https://developers.google.com/web/fundamentals/performance/rendering/avoid-large-complex-layouts-and-layout-thrashing
+ *
+ * @param task the DOM-read to schedule
  */
 export declare function readTask(task: RafCallback): void;
 
@@ -465,7 +520,7 @@ export interface QueueApi {
 /**
  * Host
  */
-interface HostAttributes {
+export interface HostAttributes {
   class?: string | { [className: string]: boolean };
   style?: { [key: string]: string | undefined };
   ref?: (el: HTMLElement | null) => void;
@@ -473,8 +528,44 @@ interface HostAttributes {
   [prop: string]: any;
 }
 
+/**
+ * Utilities for working with functional Stencil components. An object
+ * conforming to this interface is passed by the Stencil runtime as the third
+ * argument to a functional component, allowing component authors to work with
+ * features like children.
+ *
+ * The children of a functional component will be passed as the second
+ * argument, so a functional component which uses these utils to transform its
+ * children might look like the following:
+ *
+ * ```ts
+ * export const AddClass: FunctionalComponent = (_, children, utils) => (
+ *  utils.map(children, child => ({
+ *    ...child,
+ *    vattrs: {
+ *      ...child.vattrs,
+ *      class: `${child.vattrs.class} add-class`
+ *    }
+ *  }))
+ * );
+ * ```
+ *
+ * For more see the Stencil documentation, here:
+ * https://stenciljs.com/docs/functional-components
+ */
 export interface FunctionalUtilities {
+  /**
+   * Utility for reading the children of a functional component at runtime.
+   * Since the Stencil runtime uses a different interface for children it is
+   * not recommended to read the children directly, and is preferable to use
+   * this utility to, for instance, perform a side effect for each child.
+   */
   forEach: (children: VNode[], cb: (vnode: ChildNode, index: number, array: ChildNode[]) => void) => void;
+  /**
+   * Utility for transforming the children of a functional component. Given an
+   * array of children and a callback this will return a list of the results of
+   * passing each child to the supplied callback.
+   */
   map: (children: VNode[], cb: (vnode: ChildNode, index: number, array: ChildNode[]) => ChildNode) => VNode[];
 }
 
@@ -482,6 +573,14 @@ export interface FunctionalComponent<T = {}> {
   (props: T, children: VNode[], utils: FunctionalUtilities): VNode | VNode[];
 }
 
+/**
+ * A Child VDOM node
+ *
+ * This has most of the same properties as {@link VNode} but friendlier names
+ * (i.e. `vtag` instead of `$tag$`, `vchildren` instead of `$children$`) in
+ * order to provide a friendlier public interface for users of the
+ * {@link FunctionalUtilities}).
+ */
 export interface ChildNode {
   vtag?: string | number | Function;
   vkey?: string | number;
@@ -504,6 +603,7 @@ export declare const Host: FunctionalComponent<HostAttributes>;
  */
 export declare const Fragment: FunctionalComponent<{}>;
 
+/* eslint-disable jsdoc/require-param, jsdoc/require-returns -- we don't want to JSDoc these overloads at this time */
 /**
  * The "h" namespace is used to import JSX types for elements and attributes.
  * It is imported in order to avoid conflicting global JSX issues.
@@ -525,6 +625,8 @@ export declare namespace h {
   }
 }
 
+/* eslint-enable jsdoc/require-param, jsdoc/require-returns -- we don't want to JSDoc these overloads at this time */
+
 export declare function h(sel: any): VNode;
 export declare function h(sel: Node, data: VNodeData | null): VNode;
 export declare function h(sel: any, data: VNodeData | null): VNode;
@@ -534,6 +636,9 @@ export declare function h(sel: any, data: VNodeData | null, text: string): VNode
 export declare function h(sel: any, data: VNodeData | null, children: Array<VNode | undefined | null>): VNode;
 export declare function h(sel: any, data: VNodeData | null, children: VNode): VNode;
 
+/**
+ * A virtual DOM node
+ */
 export interface VNode {
   $flags$: number;
   $tag$: string | number | Function;
@@ -736,7 +841,7 @@ export namespace JSXBase {
     view: JSXBase.SVGAttributes;
   }
 
-  export interface SlotAttributes {
+  export interface SlotAttributes extends JSXAttributes {
     name?: string;
     slot?: string;
     onSlotchange?: (event: Event) => void;
@@ -748,8 +853,10 @@ export namespace JSXBase {
     hrefLang?: string;
     hreflang?: string;
     media?: string;
+    ping?: string;
     rel?: string;
     target?: string;
+    referrerPolicy?: ReferrerPolicy;
   }
 
   export interface AudioHTMLAttributes<T> extends MediaHTMLAttributes<T> {}
@@ -777,7 +884,6 @@ export namespace JSXBase {
   }
 
   export interface ButtonHTMLAttributes<T> extends HTMLAttributes<T> {
-    autoFocus?: boolean;
     disabled?: boolean;
     form?: string;
     formAction?: string;
@@ -793,6 +899,11 @@ export namespace JSXBase {
     name?: string;
     type?: string;
     value?: string | string[] | number;
+
+    // popover
+    popoverTargetAction?: string;
+    popoverTargetElement?: Element | null;
+    popoverTarget?: string;
   }
 
   export interface CanvasHTMLAttributes<T> extends HTMLAttributes<T> {
@@ -820,6 +931,7 @@ export namespace JSXBase {
   }
 
   export interface DialogHTMLAttributes<T> extends HTMLAttributes<T> {
+    onCancel?: (event: Event) => void;
     onClose?: (event: Event) => void;
     open?: boolean;
     returnValue?: string;
@@ -885,6 +997,8 @@ export namespace JSXBase {
 
   export interface ImgHTMLAttributes<T> extends HTMLAttributes<T> {
     alt?: string;
+    crossOrigin?: string;
+    crossorigin?: string;
     decoding?: 'async' | 'auto' | 'sync';
     importance?: 'low' | 'auto' | 'high';
     height?: number | string;
@@ -908,12 +1022,10 @@ export namespace JSXBase {
     accept?: string;
     allowdirs?: boolean;
     alt?: string;
-    autoCapitalize?: any;
-    autocapitalize?: any;
+    autoCapitalize?: string;
+    autocapitalize?: string;
     autoComplete?: string;
     autocomplete?: string;
-    autoFocus?: boolean;
-    autofocus?: boolean | string;
     capture?: string; // https://www.w3.org/TR/html-media-capture/#the-capture-attribute
     checked?: boolean;
     crossOrigin?: string;
@@ -945,6 +1057,8 @@ export namespace JSXBase {
     minlength?: number | string;
     multiple?: boolean;
     name?: string;
+    onSelect?: (event: Event) => void;
+    onselect?: (event: Event) => void;
     pattern?: string;
     placeholder?: string;
     readOnly?: boolean;
@@ -963,11 +1077,14 @@ export namespace JSXBase {
     webkitdirectory?: boolean;
     webkitEntries?: any;
     width?: number | string;
+
+    // popover
+    popoverTargetAction?: string;
+    popoverTargetElement?: Element | null;
+    popoverTarget?: string;
   }
 
   export interface KeygenHTMLAttributes<T> extends HTMLAttributes<T> {
-    autoFocus?: boolean;
-    autofocus?: boolean | string;
     challenge?: string;
     disabled?: boolean;
     form?: string;
@@ -981,7 +1098,6 @@ export namespace JSXBase {
   export interface LabelHTMLAttributes<T> extends HTMLAttributes<T> {
     form?: string;
     htmlFor?: string;
-    htmlfor?: string;
   }
 
   export interface LiHTMLAttributes<T> extends HTMLAttributes<T> {
@@ -1136,7 +1252,6 @@ export namespace JSXBase {
   }
 
   export interface SelectHTMLAttributes<T> extends HTMLAttributes<T> {
-    autoFocus?: boolean;
     disabled?: boolean;
     form?: string;
     multiple?: boolean;
@@ -1148,11 +1263,13 @@ export namespace JSXBase {
   }
 
   export interface SourceHTMLAttributes<T> extends HTMLAttributes<T> {
+    height?: number;
     media?: string;
     sizes?: string;
     src?: string;
     srcSet?: string;
     type?: string;
+    width?: number;
   }
 
   export interface StyleHTMLAttributes<T> extends HTMLAttributes<T> {
@@ -1171,8 +1288,8 @@ export namespace JSXBase {
   }
 
   export interface TextareaHTMLAttributes<T> extends HTMLAttributes<T> {
-    autoFocus?: boolean;
-    autofocus?: boolean | string;
+    autoComplete?: string;
+    autocomplete?: string;
     cols?: number;
     disabled?: boolean;
     form?: string;
@@ -1181,6 +1298,8 @@ export namespace JSXBase {
     minLength?: number;
     minlength?: number | string;
     name?: string;
+    onSelect?: (event: Event) => void;
+    onselect?: (event: Event) => void;
     placeholder?: string;
     readOnly?: boolean;
     readonly?: boolean | string;
@@ -1232,6 +1351,8 @@ export namespace JSXBase {
 
     // Standard HTML Attributes
     accessKey?: string;
+    autoFocus?: boolean;
+    autofocus?: boolean | string;
     class?: string | { [className: string]: boolean };
     contentEditable?: boolean | string;
     contenteditable?: boolean | string;
@@ -1241,12 +1362,18 @@ export namespace JSXBase {
     draggable?: boolean;
     hidden?: boolean;
     id?: string;
+    inert?: boolean;
     lang?: string;
     spellcheck?: 'true' | 'false' | any;
     style?: { [key: string]: string | undefined };
     tabIndex?: number;
     tabindex?: number | string;
     title?: string;
+    // These types don't allow you to use popover as a boolean attribute
+    // so you can't write HTML like `<div popover>` and get the default value.
+    // Developer must explicitly specify one of the valid popover values or it will fallback
+    // to `manual` (following the HTML spec).
+    popover?: string | null;
 
     // Unknown
     inputMode?: string;
@@ -1271,8 +1398,8 @@ export namespace JSXBase {
     vocab?: string;
 
     // Non-standard Attributes
-    autoCapitalize?: any;
-    autocapitalize?: any;
+    autoCapitalize?: string;
+    autocapitalize?: string;
     autoCorrect?: string;
     autocorrect?: string;
     autoSave?: string;
@@ -1295,30 +1422,29 @@ export namespace JSXBase {
 
   export interface SVGAttributes<T = SVGElement> extends DOMAttributes<T> {
     // Attributes which also defined in HTMLAttributes
-    // See comment in SVGDOMPropertyConfig.js
-    'class'?: string | { [className: string]: boolean };
-    'color'?: string;
-    'height'?: number | string;
-    'id'?: string;
-    'lang'?: string;
-    'max'?: number | string;
-    'media'?: string;
-    'method'?: string;
-    'min'?: number | string;
-    'name'?: string;
-    'style'?: { [key: string]: string | undefined };
-    'target'?: string;
-    'type'?: string;
-    'width'?: number | string;
+    class?: string | { [className: string]: boolean };
+    color?: string;
+    height?: number | string;
+    id?: string;
+    lang?: string;
+    max?: number | string;
+    media?: string;
+    method?: string;
+    min?: number | string;
+    name?: string;
+    style?: { [key: string]: string | undefined };
+    target?: string;
+    type?: string;
+    width?: number | string;
 
     // Other HTML properties supported by SVG elements in browsers
-    'role'?: string;
-    'tabindex'?: number;
+    role?: string;
+    tabindex?: number;
 
     // SVG Specific attributes
     'accent-height'?: number | string;
-    'accumulate'?: 'none' | 'sum';
-    'additive'?: 'replace' | 'sum';
+    accumulate?: 'none' | 'sum';
+    additive?: 'replace' | 'sum';
     'alignment-baseline'?:
       | 'auto'
       | 'baseline'
@@ -1333,63 +1459,63 @@ export namespace JSXBase {
       | 'hanging'
       | 'mathematical'
       | 'inherit';
-    'allowReorder'?: 'no' | 'yes';
-    'alphabetic'?: number | string;
-    'amplitude'?: number | string;
+    allowReorder?: 'no' | 'yes';
+    alphabetic?: number | string;
+    amplitude?: number | string;
     'arabic-form'?: 'initial' | 'medial' | 'terminal' | 'isolated';
-    'ascent'?: number | string;
-    'attributeName'?: string;
-    'attributeType'?: string;
-    'autoReverse'?: number | string;
-    'azimuth'?: number | string;
-    'baseFrequency'?: number | string;
+    ascent?: number | string;
+    attributeName?: string;
+    attributeType?: string;
+    autoReverse?: number | string;
+    azimuth?: number | string;
+    baseFrequency?: number | string;
     'baseline-shift'?: number | string;
-    'baseProfile'?: number | string;
-    'bbox'?: number | string;
-    'begin'?: number | string;
-    'bias'?: number | string;
-    'by'?: number | string;
-    'calcMode'?: number | string;
+    baseProfile?: number | string;
+    bbox?: number | string;
+    begin?: number | string;
+    bias?: number | string;
+    by?: number | string;
+    calcMode?: number | string;
     'cap-height'?: number | string;
-    'clip'?: number | string;
+    clip?: number | string;
     'clip-path'?: string;
-    'clipPathUnits'?: number | string;
+    clipPathUnits?: number | string;
     'clip-rule'?: number | string;
     'color-interpolation'?: number | string;
-    'color-interpolation-filters'?: 'auto' | 's-rGB' | 'linear-rGB' | 'inherit';
+    'color-interpolation-filters'?: 'auto' | 'sRGB' | 'linearRGB';
     'color-profile'?: number | string;
     'color-rendering'?: number | string;
-    'contentScriptType'?: number | string;
-    'contentStyleType'?: number | string;
-    'cursor'?: number | string;
-    'cx'?: number | string;
-    'cy'?: number | string;
-    'd'?: string;
-    'decelerate'?: number | string;
-    'descent'?: number | string;
-    'diffuseConstant'?: number | string;
-    'direction'?: number | string;
-    'display'?: number | string;
-    'divisor'?: number | string;
+    contentScriptType?: number | string;
+    contentStyleType?: number | string;
+    cursor?: number | string;
+    cx?: number | string;
+    cy?: number | string;
+    d?: string;
+    decelerate?: number | string;
+    descent?: number | string;
+    diffuseConstant?: number | string;
+    direction?: number | string;
+    display?: number | string;
+    divisor?: number | string;
     'dominant-baseline'?: number | string;
-    'dur'?: number | string;
-    'dx'?: number | string;
-    'dy'?: number | string;
+    dur?: number | string;
+    dx?: number | string;
+    dy?: number | string;
     'edge-mode'?: number | string;
-    'elevation'?: number | string;
+    elevation?: number | string;
     'enable-background'?: number | string;
-    'end'?: number | string;
-    'exponent'?: number | string;
-    'externalResourcesRequired'?: number | string;
-    'fill'?: string;
+    end?: number | string;
+    exponent?: number | string;
+    externalResourcesRequired?: number | string;
+    fill?: string;
     'fill-opacity'?: number | string;
     'fill-rule'?: 'nonzero' | 'evenodd' | 'inherit';
-    'filter'?: string;
-    'filterRes'?: number | string;
-    'filterUnits'?: number | string;
+    filter?: string;
+    filterRes?: number | string;
+    filterUnits?: number | string;
     'flood-color'?: number | string;
     'flood-opacity'?: number | string;
-    'focusable'?: number | string;
+    focusable?: number | string;
     'font-family'?: string;
     'font-size'?: number | string;
     'font-size-adjust'?: number | string;
@@ -1397,113 +1523,113 @@ export namespace JSXBase {
     'font-style'?: number | string;
     'font-variant'?: number | string;
     'font-weight'?: number | string;
-    'format'?: number | string;
-    'from'?: number | string;
-    'fx'?: number | string;
-    'fy'?: number | string;
-    'g1'?: number | string;
-    'g2'?: number | string;
+    format?: number | string;
+    from?: number | string;
+    fx?: number | string;
+    fy?: number | string;
+    g1?: number | string;
+    g2?: number | string;
     'glyph-name'?: number | string;
     'glyph-orientation-horizontal'?: number | string;
     'glyph-orientation-vertical'?: number | string;
-    'glyphRef'?: number | string;
-    'gradientTransform'?: string;
-    'gradientUnits'?: string;
-    'hanging'?: number | string;
+    glyphRef?: number | string;
+    gradientTransform?: string;
+    gradientUnits?: string;
+    hanging?: number | string;
     'horiz-adv-x'?: number | string;
     'horiz-origin-x'?: number | string;
-    'href'?: string;
-    'ideographic'?: number | string;
+    href?: string;
+    ideographic?: number | string;
     'image-rendering'?: number | string;
-    'in2'?: number | string;
-    'in'?: string;
-    'intercept'?: number | string;
-    'k1'?: number | string;
-    'k2'?: number | string;
-    'k3'?: number | string;
-    'k4'?: number | string;
-    'k'?: number | string;
-    'kernelMatrix'?: number | string;
-    'kernelUnitLength'?: number | string;
-    'kerning'?: number | string;
-    'keyPoints'?: number | string;
-    'keySplines'?: number | string;
-    'keyTimes'?: number | string;
-    'lengthAdjust'?: number | string;
+    in2?: number | string;
+    in?: string;
+    intercept?: number | string;
+    k1?: number | string;
+    k2?: number | string;
+    k3?: number | string;
+    k4?: number | string;
+    k?: number | string;
+    kernelMatrix?: number | string;
+    kernelUnitLength?: number | string;
+    kerning?: number | string;
+    keyPoints?: number | string;
+    keySplines?: number | string;
+    keyTimes?: number | string;
+    lengthAdjust?: number | string;
     'letter-spacing'?: number | string;
     'lighting-color'?: number | string;
-    'limitingConeAngle'?: number | string;
-    'local'?: number | string;
+    limitingConeAngle?: number | string;
+    local?: number | string;
     'marker-end'?: string;
-    'markerHeight'?: number | string;
+    markerHeight?: number | string;
     'marker-mid'?: string;
     'marker-start'?: string;
-    'markerUnits'?: number | string;
-    'markerWidth'?: number | string;
-    'mask'?: string;
-    'maskContentUnits'?: number | string;
-    'maskUnits'?: number | string;
-    'mathematical'?: number | string;
-    'mode'?: number | string;
-    'numOctaves'?: number | string;
-    'offset'?: number | string;
-    'opacity'?: number | string;
-    'operator'?: number | string;
-    'order'?: number | string;
-    'orient'?: number | string;
-    'orientation'?: number | string;
-    'origin'?: number | string;
-    'overflow'?: number | string;
+    markerUnits?: number | string;
+    markerWidth?: number | string;
+    mask?: string;
+    maskContentUnits?: number | string;
+    maskUnits?: number | string;
+    mathematical?: number | string;
+    mode?: number | string;
+    numOctaves?: number | string;
+    offset?: number | string;
+    opacity?: number | string;
+    operator?: number | string;
+    order?: number | string;
+    orient?: number | string;
+    orientation?: number | string;
+    origin?: number | string;
+    overflow?: number | string;
     'overline-position'?: number | string;
     'overline-thickness'?: number | string;
     'paint-order'?: number | string;
-    'panose1'?: number | string;
-    'pathLength'?: number | string;
-    'patternContentUnits'?: string;
-    'patternTransform'?: number | string;
-    'patternUnits'?: string;
+    panose1?: number | string;
+    pathLength?: number | string;
+    patternContentUnits?: string;
+    patternTransform?: number | string;
+    patternUnits?: string;
     'pointer-events'?: number | string;
-    'points'?: string;
-    'pointsAtX'?: number | string;
-    'pointsAtY'?: number | string;
-    'pointsAtZ'?: number | string;
-    'preserveAlpha'?: number | string;
-    'preserveAspectRatio'?: string;
-    'primitiveUnits'?: number | string;
-    'r'?: number | string;
-    'radius'?: number | string;
-    'refX'?: number | string;
-    'refY'?: number | string;
+    points?: string;
+    pointsAtX?: number | string;
+    pointsAtY?: number | string;
+    pointsAtZ?: number | string;
+    preserveAlpha?: number | string;
+    preserveAspectRatio?: string;
+    primitiveUnits?: number | string;
+    r?: number | string;
+    radius?: number | string;
+    refX?: number | string;
+    refY?: number | string;
     'rendering-intent'?: number | string;
-    'repeatCount'?: number | string;
-    'repeatDur'?: number | string;
-    'requiredextensions'?: number | string;
-    'requiredFeatures'?: number | string;
-    'restart'?: number | string;
-    'result'?: string;
-    'rotate'?: number | string;
-    'rx'?: number | string;
-    'ry'?: number | string;
-    'scale'?: number | string;
-    'seed'?: number | string;
+    repeatCount?: number | string;
+    repeatDur?: number | string;
+    requiredextensions?: number | string;
+    requiredFeatures?: number | string;
+    restart?: number | string;
+    result?: string;
+    rotate?: number | string;
+    rx?: number | string;
+    ry?: number | string;
+    scale?: number | string;
+    seed?: number | string;
     'shape-rendering'?: number | string;
-    'slope'?: number | string;
-    'spacing'?: number | string;
-    'specularConstant'?: number | string;
-    'specularExponent'?: number | string;
-    'speed'?: number | string;
-    'spreadMethod'?: string;
-    'startOffset'?: number | string;
-    'stdDeviation'?: number | string;
-    'stemh'?: number | string;
-    'stemv'?: number | string;
-    'stitchTiles'?: number | string;
+    slope?: number | string;
+    spacing?: number | string;
+    specularConstant?: number | string;
+    specularExponent?: number | string;
+    speed?: number | string;
+    spreadMethod?: string;
+    startOffset?: number | string;
+    stdDeviation?: number | string;
+    stemh?: number | string;
+    stemv?: number | string;
+    stitchTiles?: number | string;
     'stop-color'?: string;
     'stop-opacity'?: number | string;
     'strikethrough-position'?: number | string;
     'strikethrough-thickness'?: number | string;
-    'string'?: number | string;
-    'stroke'?: string;
+    string?: number | string;
+    stroke?: string;
     'stroke-dasharray'?: string | number;
     'stroke-dashoffset'?: string | number;
     'stroke-linecap'?: 'butt' | 'round' | 'square' | 'inherit';
@@ -1511,70 +1637,66 @@ export namespace JSXBase {
     'stroke-miterlimit'?: string;
     'stroke-opacity'?: number | string;
     'stroke-width'?: number | string;
-    'surfaceScale'?: number | string;
-    'systemLanguage'?: number | string;
-    'tableValues'?: number | string;
-    'targetX'?: number | string;
-    'targetY'?: number | string;
+    surfaceScale?: number | string;
+    systemLanguage?: number | string;
+    tableValues?: number | string;
+    targetX?: number | string;
+    targetY?: number | string;
     'text-anchor'?: string;
     'text-decoration'?: number | string;
-    'textLength'?: number | string;
+    textLength?: number | string;
     'text-rendering'?: number | string;
-    'to'?: number | string;
-    'transform'?: string;
-    'u1'?: number | string;
-    'u2'?: number | string;
+    to?: number | string;
+    transform?: string;
+    u1?: number | string;
+    u2?: number | string;
     'underline-position'?: number | string;
     'underline-thickness'?: number | string;
-    'unicode'?: number | string;
+    unicode?: number | string;
     'unicode-bidi'?: number | string;
     'unicode-range'?: number | string;
     'units-per-em'?: number | string;
     'v-alphabetic'?: number | string;
-    'values'?: string;
+    values?: string;
     'vector-effect'?: number | string;
-    'version'?: string;
+    version?: string;
     'vert-adv-y'?: number | string;
     'vert-origin-x'?: number | string;
     'vert-origin-y'?: number | string;
     'v-hanging'?: number | string;
     'v-ideographic'?: number | string;
-    'viewBox'?: string;
-    'viewTarget'?: number | string;
-    'visibility'?: number | string;
+    viewBox?: string;
+    viewTarget?: number | string;
+    visibility?: number | string;
     'v-mathematical'?: number | string;
-    'widths'?: number | string;
+    widths?: number | string;
     'word-spacing'?: number | string;
     'writing-mode'?: number | string;
-    'x1'?: number | string;
-    'x2'?: number | string;
-    'x'?: number | string;
+    x1?: number | string;
+    x2?: number | string;
+    x?: number | string;
     'x-channel-selector'?: string;
     'x-height'?: number | string;
-    'xlinkActuate'?: string;
-    'xlinkArcrole'?: string;
-    'xlinkHref'?: string;
-    'xlinkRole'?: string;
-    'xlinkShow'?: string;
-    'xlinkTitle'?: string;
-    'xlinkType'?: string;
-    'xmlBase'?: string;
-    'xmlLang'?: string;
-    'xmlns'?: string;
-    'xmlSpace'?: string;
-    'y1'?: number | string;
-    'y2'?: number | string;
-    'y'?: number | string;
-    'yChannelSelector'?: string;
-    'z'?: number | string;
-    'zoomAndPan'?: string;
+    xlinkActuate?: string;
+    xlinkArcrole?: string;
+    xlinkHref?: string;
+    xlinkRole?: string;
+    xlinkShow?: string;
+    xlinkTitle?: string;
+    xlinkType?: string;
+    xmlBase?: string;
+    xmlLang?: string;
+    xmlns?: string;
+    xmlSpace?: string;
+    y1?: number | string;
+    y2?: number | string;
+    y?: number | string;
+    yChannelSelector?: string;
+    z?: number | string;
+    zoomAndPan?: string;
   }
 
-  export interface DOMAttributes<T = Element> {
-    // vdom specific
-    key?: string | number;
-
-    ref?: (elm?: T) => void;
+  export interface DOMAttributes<T> extends JSXAttributes<T> {
     slot?: string;
     part?: string;
     exportparts?: string;
@@ -1588,12 +1710,12 @@ export namespace JSXBase {
     onPasteCapture?: (event: ClipboardEvent) => void;
 
     // Composition Events
-    onCompositionEnd?: (event: CompositionEvent) => void;
-    onCompositionEndCapture?: (event: CompositionEvent) => void;
-    onCompositionStart?: (event: CompositionEvent) => void;
-    onCompositionStartCapture?: (event: CompositionEvent) => void;
-    onCompositionUpdate?: (event: CompositionEvent) => void;
-    onCompositionUpdateCapture?: (event: CompositionEvent) => void;
+    onCompositionend?: (event: CompositionEvent) => void;
+    onCompositionendCapture?: (event: CompositionEvent) => void;
+    onCompositionstart?: (event: CompositionEvent) => void;
+    onCompositionstartCapture?: (event: CompositionEvent) => void;
+    onCompositionupdate?: (event: CompositionEvent) => void;
+    onCompositionupdateCapture?: (event: CompositionEvent) => void;
 
     // Focus Events
     onFocus?: (event: FocusEvent) => void;
@@ -1608,8 +1730,8 @@ export namespace JSXBase {
     // Form Events
     onChange?: (event: Event) => void;
     onChangeCapture?: (event: Event) => void;
-    onInput?: (event: Event) => void;
-    onInputCapture?: (event: Event) => void;
+    onInput?: (event: InputEvent) => void;
+    onInputCapture?: (event: InputEvent) => void;
     onReset?: (event: Event) => void;
     onResetCapture?: (event: Event) => void;
     onSubmit?: (event: Event) => void;
@@ -1717,9 +1839,21 @@ export namespace JSXBase {
     onAnimationIterationCapture?: (event: AnimationEvent) => void;
 
     // Transition Events
+    onTransitionCancel?: (event: TransitionEvent) => void;
+    onTransitionCancelCapture?: (event: TransitionEvent) => void;
     onTransitionEnd?: (event: TransitionEvent) => void;
     onTransitionEndCapture?: (event: TransitionEvent) => void;
+    onTransitionRun?: (event: TransitionEvent) => void;
+    onTransitionRunCapture?: (event: TransitionEvent) => void;
+    onTransitionStart?: (event: TransitionEvent) => void;
+    onTransitionStartCapture?: (event: TransitionEvent) => void;
   }
+}
+
+export interface JSXAttributes<T = Element> {
+  // vdom specific
+  key?: string | number;
+  ref?: (elm?: T) => void;
 }
 
 export interface CustomElementsDefineOptions {

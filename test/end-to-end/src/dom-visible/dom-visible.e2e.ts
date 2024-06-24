@@ -1,12 +1,12 @@
 import { newE2EPage } from '@stencil/core/testing';
 
-
 describe('dom visible e2e tests', () => {
-
   it('isVisible()', async () => {
-    const page = await newE2EPage({ html: `
+    const page = await newE2EPage({
+      html: `
       <dom-visible></dom-visible>
-    `});
+    `,
+    });
 
     const article = await page.find('article');
     let isVisible = await article.isVisible();
@@ -20,9 +20,11 @@ describe('dom visible e2e tests', () => {
   });
 
   it('waitForVisible()', async () => {
-    const page = await newE2EPage({ html: `
+    const page = await newE2EPage({
+      html: `
       <dom-visible></dom-visible>
-    `});
+    `,
+    });
 
     const article = await page.find('article');
 
@@ -39,5 +41,4 @@ describe('dom visible e2e tests', () => {
     isVisible = await article.isVisible();
     expect(isVisible).toBe(true);
   });
-
 });

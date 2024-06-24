@@ -1,12 +1,12 @@
 import { newE2EPage } from '@stencil/core/testing';
 
-
 describe('@Method', () => {
-
   it('should pass method args', async () => {
-    const page = await newE2EPage({ html: `
+    const page = await newE2EPage({
+      html: `
       <method-cmp></method-cmp>
-    `});
+    `,
+    });
 
     const elm = await page.find('method-cmp');
 
@@ -16,9 +16,11 @@ describe('@Method', () => {
   });
 
   it('should set property thats used in a method', async () => {
-    const page = await newE2EPage({ html: `
+    const page = await newE2EPage({
+      html: `
       <method-cmp></method-cmp>
-    `});
+    `,
+    });
 
     const elm = await page.find('method-cmp');
 
@@ -28,5 +30,4 @@ describe('@Method', () => {
 
     expect(methodRtnValue).toBe(88);
   });
-
 });

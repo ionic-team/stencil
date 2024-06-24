@@ -1,5 +1,6 @@
 import fs from 'fs-extra';
 import path from 'path';
+
 import { BuildOptions } from './options';
 
 export function writePkgJson(opts: BuildOptions, pkgDir: string, pkgData: PackageData) {
@@ -26,16 +27,30 @@ export function writePkgJson(opts: BuildOptions, pkgDir: string, pkgData: Packag
 
   // idk, i just like a nice pretty standardized order of package.json properties
   const formatedPkg: any = {};
-  PROPS_ORDER.forEach(pkgProp => {
+  PROPS_ORDER.forEach((pkgProp) => {
     if (pkgProp in pkgData) {
-      formatedPkg[pkgProp] = pkgData[pkgProp];
+      formatedPkg[pkgProp] = pkgData[pkgProp as keyof PackageData];
     }
   });
 
   fs.writeFileSync(path.join(pkgDir, 'package.json'), JSON.stringify(formatedPkg, null, 2) + '\n');
 }
 
-const PROPS_ORDER = ['name', 'version', 'description', 'bin', 'main', 'module', 'browser', 'types', 'exports', 'type', 'files', 'private', 'sideEffects'];
+const PROPS_ORDER = [
+  'name',
+  'version',
+  'description',
+  'bin',
+  'main',
+  'module',
+  'browser',
+  'types',
+  'exports',
+  'type',
+  'files',
+  'private',
+  'sideEffects',
+];
 
 export interface PackageData {
   name: string;

@@ -1,4 +1,4 @@
-import { MockHeaders, MockRequestInfo, MockResponse } from '../mock-doc';
+import { MockHeaders, MockRequestInfo, MockResponse } from '@stencil/core/mock-doc';
 
 const mockedResponses = new Map<string, MockedResponseData>();
 
@@ -103,7 +103,7 @@ export function mockFetchReset() {
 }
 
 export const mockFetch = {
-  json(data: any, url?: string) {
+  json(data: any, url: string) {
     const rsp = new MockResponse(JSON.stringify(data, null, 2), {
       headers: new MockHeaders({
         'Content-Type': 'application/json',
@@ -112,7 +112,7 @@ export const mockFetch = {
     setMockedResponse(rsp, url, false);
   },
 
-  text(data: string, url?: string) {
+  text(data: string, url: string) {
     const rsp = new MockResponse(data, {
       headers: new MockHeaders({
         'Content-Type': 'text/plain',
@@ -121,11 +121,11 @@ export const mockFetch = {
     setMockedResponse(rsp, url, false);
   },
 
-  response(rsp: MockResponse, url?: string) {
+  response(rsp: MockResponse, url: string) {
     setMockedResponse(rsp, url, false);
   },
 
-  reject(rsp?: MockResponse, url?: string) {
+  reject(rsp: MockResponse, url: string) {
     setMockedResponse(rsp, url, true);
   },
 
@@ -133,9 +133,9 @@ export const mockFetch = {
 };
 
 class MockResponse404 extends MockResponse {
-  ok = false;
-  status = 404;
-  statusText = 'Not Found';
+  override ok = false;
+  override status = 404;
+  override statusText = 'Not Found';
   constructor() {
     super('', {
       headers: new MockHeaders({
@@ -143,10 +143,10 @@ class MockResponse404 extends MockResponse {
       }),
     });
   }
-  async json() {
+  override async json() {
     return { status: 404, statusText: 'Not Found' };
   }
-  async text() {
+  override async text() {
     return 'Not Found';
   }
 }
@@ -158,4 +158,11 @@ interface MockedResponseData {
 
 const FETCH_DEFAULT_PATH = '/mock-fetch-data';
 
-export { MockHeaders, MockRequest, MockRequestInit, MockRequestInfo, MockResponse, MockResponseInit } from '../mock-doc';
+export {
+  MockHeaders,
+  MockRequest,
+  MockRequestInfo,
+  MockRequestInit,
+  MockResponse,
+  MockResponseInit,
+} from '@stencil/core/mock-doc';

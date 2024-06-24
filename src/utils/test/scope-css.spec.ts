@@ -11,10 +11,10 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { scopeCss } from '../shadow-css';
 import { convertScopedToShadow } from '../../runtime/styles';
+import { scopeCss } from '../shadow-css';
 
-describe('ShadowCss', function() {
+describe('ShadowCss', function () {
   function s(cssText: string, scopeId: string, commentOriginalSelector = false) {
     const shim = scopeCss(cssText, scopeId, commentOriginalSelector);
 
@@ -59,7 +59,7 @@ describe('ShadowCss', function() {
     expect(s(css, 'a')).toEqual(expected);
   });
 
-  it('should support newlines in the selector and content ', () => {
+  it('should support newlines in the selector and content', () => {
     const css = 'one, \ntwo {\ncolor: red;}';
     const expected = 'one.a, two.a {color:red;}';
     expect(s(css, 'a')).toEqual(expected);
@@ -107,7 +107,7 @@ describe('ShadowCss', function() {
     expect(s(css, 'a')).toEqual(expected);
   });
 
-  // Check that the browser supports unprefixed CSS animation
+  // Check that the browser supports un-prefixed CSS animation
   it('should handle keyframes rules', () => {
     const css = '@keyframes foo {0% {transform:translate(-50%) scaleX(0);}}';
     expect(s(css, 'a')).toEqual(css);
@@ -143,6 +143,15 @@ describe('ShadowCss', function() {
     expect(s('[is="one"] {}', 'a')).toEqual('[is="one"].a {}');
   });
 
+  it('should handle escaped ":" in selector', () => {
+    expect(s('\\:one {}', 'a')).toEqual('\\:one.a {}');
+    expect(s('one\\:two {}', 'a')).toEqual('one\\:two.a {}');
+    expect(s('one\\:two:hover {}', 'a')).toEqual('one\\:two.a:hover {}');
+    expect(s('one\\:two::before {}', 'a')).toEqual('one\\:two.a::before {}');
+    expect(s('one\\:two::before:hover {}', 'a')).toEqual('one\\:two.a::before:hover {}');
+    expect(s('one\\:two:not(.three\\:four) {}', 'a')).toEqual('one\\:two.a:not(.three\\:four) {}');
+  });
+
   describe(':host', () => {
     it('should handle no context, commentOriginalSelector', () => {
       expect(s(':host {}', 'a', true)).toEqual('/*!@:host*/.a-h {}');
@@ -165,7 +174,7 @@ describe('ShadowCss', function() {
       expect(s(':host([a=b]) {}', 'a')).toEqual('[a="b"].a-h {}');
     });
 
-    it('should handle multiple tag selectors', () => {
+    it('should handle multiple tag selectors, commenting the original selector', () => {
       expect(s(':host(ul,li) {}', 'a', true)).toEqual('/*!@:host(ul,li)*/ul.a-h, li.a-h {}');
       expect(s(':host(ul,li) > .z {}', 'a', true)).toEqual('/*!@:host(ul,li) > .z*/ul.a-h > .z.a, li.a-h > .z.a {}');
     });
@@ -188,10 +197,6 @@ describe('ShadowCss', function() {
       expect(s(':host([a="b"],[c=d]) {}', 'a', true)).toEqual('/*!@:host([a="b"],[c=d])*/[a="b"].a-h, [c="d"].a-h {}');
     });
 
-    it('should handle multiple attribute selectors, commentOriginalSelector', () => {
-      expect(s(':host([a="b"],[c=d]) {}', 'a', true)).toEqual('/*!@:host([a="b"],[c=d])*/[a="b"].a-h, [c="d"].a-h {}');
-    });
-
     it('should handle pseudo selectors', () => {
       expect(s(':host(:before) {}', 'a')).toEqual('.a-h:before {}');
       expect(s(':host:before {}', 'a')).toEqual('.a-h:before {}');
@@ -201,12 +206,20 @@ describe('ShadowCss', function() {
       expect(s(':host.class:before {}', 'a')).toEqual('.class.a-h:before {}');
       expect(s(':host(:not(p)):before {}', 'a')).toEqual('.a-h:not(p):before {}');
     });
+
+    it('should not replace the selector in a `@supports` rule', () => {
+      expect(s('@supports selector(:host()) {:host {color: red; }}', 'a')).toEqual(
+        '@supports selector(:host()) {.a-h {color:red;}}',
+      );
+    });
   });
 
   describe(':host-context', () => {
     it('should handle tag selector, commentOriginalSelector', () => {
       expect(s(':host-context(div) {}', 'a', true)).toEqual('/*!@:host-context(div)*/div.a-h, div .a-h {}');
-      expect(s(':host-context(ul) > .y {}', 'a', true)).toEqual('/*!@:host-context(ul) > .y*/ul.a-h > .y.a, ul .a-h > .y.a {}');
+      expect(s(':host-context(ul) > .y {}', 'a', true)).toEqual(
+        '/*!@:host-context(ul) > .y*/ul.a-h > .y.a, ul .a-h > .y.a {}',
+      );
     });
 
     it('should handle tag selector', () => {
@@ -224,6 +237,13 @@ describe('ShadowCss', function() {
       expect(s(':host-context([a="b"]) {}', 'a')).toEqual('[a="b"].a-h, [a="b"] .a-h {}');
       expect(s(':host-context([a=b]) {}', 'a')).toEqual('[a=b].a-h, [a="b"] .a-h {}');
     });
+
+    it('should not replace the selector in a `@supports` rule', () => {
+      expect(s('@supports selector(:host-context(.class1)) {:host-context(.class1) {color: red; }}', 'a')).toEqual(
+        '@supports selector(:host-context(.class1)) {.class1.a-h, .class1 .a-h {color:red;}}',
+      );
+    });
+    ``;
   });
 
   describe('::slotted', () => {
@@ -244,12 +264,16 @@ describe('ShadowCss', function() {
 
     it('should handle :host complex selector', () => {
       const r = s(':host > ::slotted(*:nth-of-type(2n - 1)) {}', 'sc-ion-tag');
-      expect(r).toEqual('.sc-ion-tag-h > .sc-ion-tag-s > *:nth-of-type(2n - 1) {}');
+      expect(r).toEqual(
+        '.sc-ion-tag-h >.sc-ion-tag-s > *:nth-of-type(2n - 1), .sc-ion-tag-h > .sc-ion-tag-s > *:nth-of-type(2n - 1) {}',
+      );
     });
 
     it('should handle host-context complex selector', () => {
       const r = s(':host-context(.red) > ::slotted(*:nth-of-type(2n - 1)) {}', 'sc-ion-tag');
-      expect(r).toEqual('.sc-ion-tag-h.red > .sc-ion-tag-s > *:nth-of-type(2n - 1), .red .sc-ion-tag-h > .sc-ion-tag-s > *:nth-of-type(2n - 1) {}');
+      expect(r).toEqual(
+        '.sc-ion-tag-h.red >.sc-ion-tag-s > *:nth-of-type(2n - 1), .sc-ion-tag-h.red > .sc-ion-tag-s > *:nth-of-type(2n - 1), .red .sc-ion-tag-h >.sc-ion-tag-s > *:nth-of-type(2n - 1), .red .sc-ion-tag-h > .sc-ion-tag-s > *:nth-of-type(2n - 1) {}',
+      );
     });
 
     it('should handle left side selector', () => {
@@ -284,7 +308,9 @@ describe('ShadowCss', function() {
 
     it('same selectors, commentOriginalSelector', () => {
       const r = s('::slotted(*) {}, ::slotted(*) {}, ::slotted(*) {}', 'sc-ion-tag', true);
-      expect(r).toEqual('/*!@::slotted(*)*/.sc-ion-tag-s > * {}/*!@, ::slotted(*)*/.sc-ion-tag, .sc-ion-tag-s > * {}/*!@, ::slotted(*)*/.sc-ion-tag, .sc-ion-tag-s > * {}');
+      expect(r).toEqual(
+        '/*!@::slotted(*)*/.sc-ion-tag-s > * {}/*!@, ::slotted(*)*/.sc-ion-tag, .sc-ion-tag-s > * {}/*!@, ::slotted(*)*/.sc-ion-tag, .sc-ion-tag-s > * {}',
+      );
     });
 
     it('should combine parent selector when comma', () => {
@@ -295,6 +321,12 @@ describe('ShadowCss', function() {
     it('should handle multiple selector, commentOriginalSelector', () => {
       const r = s('::slotted(ul), ::slotted(li) {}', 'sc-ion-tag', true);
       expect(r).toEqual('/*!@::slotted(ul), ::slotted(li)*/.sc-ion-tag-s > ul, .sc-ion-tag-s > li {}');
+    });
+
+    it('should not replace the selector in a `@supports` rule', () => {
+      expect(s('@supports selector(::slotted(*)) {::slotted(*) {color: red; }}', 'sc-cmp')).toEqual(
+        '@supports selector(::slotted(*)) {.sc-cmp-s > * {color:red;}}',
+      );
     });
   });
 

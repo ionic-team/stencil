@@ -1,9 +1,9 @@
-import type * as d from '../../declarations';
-import { buildError, buildJsonFileError } from '@utils';
-import { dirname, join } from 'path';
-import { isOutputTargetWww } from '../output-targets/output-utils';
+import { buildError, buildJsonFileError, isOutputTargetWww, join } from '@utils';
+import { dirname } from 'path';
 
-export const validateManifestJson = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
+import type * as d from '../../declarations';
+
+export const validateManifestJson = (config: d.ValidatedConfig, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   if (config.devMode) {
     return null;
   }
@@ -11,7 +11,7 @@ export const validateManifestJson = (config: d.Config, compilerCtx: d.CompilerCt
   const outputTargets = config.outputTargets.filter(isOutputTargetWww);
 
   return Promise.all(
-    outputTargets.map(async outputsTarget => {
+    outputTargets.map(async (outputsTarget) => {
       const manifestFilePath = join(outputsTarget.dir, 'manifest.json');
 
       try {
@@ -31,7 +31,12 @@ export const validateManifestJson = (config: d.Config, compilerCtx: d.CompilerCt
   );
 };
 
-const validateManifestJsonData = async (compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, manifestFilePath: string, manifestData: any) => {
+const validateManifestJsonData = async (
+  compilerCtx: d.CompilerCtx,
+  buildCtx: d.BuildCtx,
+  manifestFilePath: string,
+  manifestData: any,
+) => {
   if (Array.isArray(manifestData.icons)) {
     await Promise.all(
       manifestData.icons.map((manifestIcon: any) => {
@@ -41,7 +46,12 @@ const validateManifestJsonData = async (compilerCtx: d.CompilerCtx, buildCtx: d.
   }
 };
 
-const validateManifestJsonIcon = async (compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, manifestFilePath: string, manifestIcon: any) => {
+const validateManifestJsonIcon = async (
+  compilerCtx: d.CompilerCtx,
+  buildCtx: d.BuildCtx,
+  manifestFilePath: string,
+  manifestIcon: any,
+) => {
   let iconSrc = manifestIcon.src;
   if (typeof iconSrc !== 'string') {
     const msg = `Manifest icon missing "src"`;
@@ -50,7 +60,7 @@ const validateManifestJsonIcon = async (compilerCtx: d.CompilerCtx, buildCtx: d.
   }
 
   if (iconSrc.startsWith('/')) {
-    iconSrc = iconSrc.substr(1);
+    iconSrc = iconSrc.slice(1);
   }
 
   const manifestDir = dirname(manifestFilePath);

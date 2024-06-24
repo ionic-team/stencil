@@ -1,5 +1,3 @@
-import type * as d from '../../../declarations';
-
 export class MarkdownTable {
   private rows: RowData[] = [];
 
@@ -10,7 +8,7 @@ export class MarkdownTable {
   addRow(data: string[], isHeader = false) {
     const colData: ColumnData[] = [];
 
-    data.forEach(text => {
+    data.forEach((text) => {
       const col: ColumnData = {
         text: escapeMarkdownTableColumn(text),
         width: text.length,
@@ -44,15 +42,15 @@ const createTable = (rows: RowData[]) => {
   normalizeColumCount(rows);
   normalizeColumnWidth(rows);
 
-  const th = rows.find(r => r.isHeader);
+  const th = rows.find((r) => r.isHeader);
   if (th) {
     const headerRow = createRow(th);
     content.push(headerRow);
     content.push(createBorder(th));
   }
 
-  const tds = rows.filter(r => !r.isHeader);
-  tds.forEach(td => {
+  const tds = rows.filter((r) => !r.isHeader);
+  tds.forEach((td) => {
     content.push(createRow(td));
   });
 
@@ -65,7 +63,7 @@ const createBorder = (th: RowData) => {
     isHeader: false,
   };
 
-  th.columns.forEach(c => {
+  th.columns.forEach((c) => {
     const borderCol: ColumnData = {
       text: '',
       width: c.width,
@@ -82,7 +80,7 @@ const createBorder = (th: RowData) => {
 const createRow = (row: RowData) => {
   const content: string[] = ['| '];
 
-  row.columns.forEach(c => {
+  row.columns.forEach((c) => {
     content.push(c.text);
     content.push(' | ');
   });
@@ -93,13 +91,13 @@ const createRow = (row: RowData) => {
 const normalizeColumCount = (rows: RowData[]) => {
   let columnCount = 0;
 
-  rows.forEach(r => {
+  rows.forEach((r) => {
     if (r.columns.length > columnCount) {
       columnCount = r.columns.length;
     }
   });
 
-  rows.forEach(r => {
+  rows.forEach((r) => {
     while (r.columns.length < columnCount) {
       r.columns.push({
         text: ``,
@@ -115,14 +113,14 @@ const normalizeColumnWidth = (rows: RowData[]) => {
   for (let columnIndex = 0; columnIndex < columnCount; columnIndex++) {
     let longestText = 0;
 
-    rows.forEach(r => {
+    rows.forEach((r) => {
       const col = r.columns[columnIndex];
       if (col.text.length > longestText) {
         longestText = col.text.length;
       }
     });
 
-    rows.forEach(r => {
+    rows.forEach((r) => {
       const col = r.columns[columnIndex];
       col.width = longestText;
       while (col.text.length < longestText) {
@@ -141,50 +139,3 @@ interface RowData {
   columns: ColumnData[];
   isHeader?: boolean;
 }
-
-export const getEventDetailType = (eventType: d.JsDoc) => {
-  if (eventType && eventType.type && typeof eventType.type === 'string' && eventType.type !== 'void') {
-    return eventType.type.trim();
-  }
-  return 'void';
-};
-
-export const getMemberDocumentation = (jsDoc: d.JsDoc) => {
-  if (jsDoc && typeof jsDoc.documentation === 'string') {
-    return jsDoc.documentation.trim();
-  }
-  return '';
-};
-
-export const getPlatform = (jsDoc: d.JsDoc) => {
-  const tag = jsDoc.tags.find(t => t.name === 'platform');
-  return tag.text || 'all';
-};
-
-export const getMemberType = (jsDoc: d.JsDoc) => {
-  if (jsDoc && typeof jsDoc.type === 'string') {
-    return jsDoc.type.trim();
-  }
-  return '';
-};
-
-export const getMethodParameters = ({ parameters }: d.JsDoc): d.JsonDocMethodParameter[] => {
-  if (parameters) {
-    return parameters.map(({ name, type, documentation }) => ({
-      name,
-      type,
-      docs: documentation,
-    }));
-  }
-  return [];
-};
-
-export const getMethodReturns = ({ returns }: d.JsDoc): d.JsonDocsMethodReturn => {
-  if (returns) {
-    return {
-      type: returns.type,
-      docs: returns.documentation,
-    };
-  }
-  return null;
-};

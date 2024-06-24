@@ -8,11 +8,34 @@
  */
 
 import { BUILD } from '@app-data';
-import { isComplexType } from '@utils';
 import { isMemberInElement, plt, win } from '@platform';
+import { isComplexType } from '@utils';
+
 import { VNODE_FLAGS, XLINK_NS } from '../runtime-constants';
 
-export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any, newValue: any, isSvg: boolean, flags: number) => {
+/**
+ * When running a VDom render set properties present on a VDom node onto the
+ * corresponding HTML element.
+ *
+ * Note that this function has special functionality for the `class`,
+ * `style`, `key`, and `ref` attributes, as well as event handlers (like
+ * `onClick`, etc). All others are just passed through as-is.
+ *
+ * @param elm the HTMLElement onto which attributes should be set
+ * @param memberName the name of the attribute to set
+ * @param oldValue the old value for the attribute
+ * @param newValue the new value for the attribute
+ * @param isSvg whether we're in an svg context or not
+ * @param flags bitflags for Vdom variables
+ */
+export const setAccessor = (
+  elm: HTMLElement,
+  memberName: string,
+  oldValue: any,
+  newValue: any,
+  isSvg: boolean,
+  flags: number,
+) => {
   if (oldValue !== newValue) {
     let isProp = isMemberInElement(elm, memberName);
     let ln = memberName.toLowerCase();
@@ -21,8 +44,8 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
       const classList = elm.classList;
       const oldClasses = parseClassList(oldValue);
       const newClasses = parseClassList(newValue);
-      classList.remove(...oldClasses.filter(c => c && !newClasses.includes(c)));
-      classList.add(...newClasses.filter(c => c && !oldClasses.includes(c)));
+      classList.remove(...oldClasses.filter((c) => c && !newClasses.includes(c)));
+      classList.add(...newClasses.filter((c) => c && !oldClasses.includes(c)));
     } else if (BUILD.vdomStyle && memberName === 'style') {
       // update style attribute, css properties and values
       if (BUILD.updatable) {
@@ -53,7 +76,12 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
       if (newValue) {
         newValue(elm);
       }
-    } else if (BUILD.vdomListener && (BUILD.lazyLoad ? !isProp : !(elm as any).__lookupSetter__(memberName)) && memberName[0] === 'o' && memberName[1] === 'n') {
+    } else if (
+      BUILD.vdomListener &&
+      (BUILD.lazyLoad ? !isProp : !(elm as any).__lookupSetter__(memberName)) &&
+      memberName[0] === 'o' &&
+      memberName[1] === 'n'
+    ) {
       // Event Handlers
       // so if the member name starts with "on" and the 3rd characters is
       // a capital letter, and it's not already a member on the element,
@@ -81,11 +109,20 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
         // except for the first character, we keep the event name case
         memberName = ln[2] + memberName.slice(3);
       }
-      if (oldValue) {
-        plt.rel(elm, memberName, oldValue, false);
-      }
-      if (newValue) {
-        plt.ael(elm, memberName, newValue, false);
+      if (oldValue || newValue) {
+        // Need to account for "capture" events.
+        // If the event name ends with "Capture", we'll update the name to remove
+        // the "Capture" suffix and make sure the event listener is setup to handle the capture event.
+        const capture = memberName.endsWith(CAPTURE_EVENT_SUFFIX);
+        // Make sure we only replace the last instance of "Capture"
+        memberName = memberName.replace(CAPTURE_EVENT_REGEX, '');
+
+        if (oldValue) {
+          plt.rel(elm, memberName, oldValue, capture);
+        }
+        if (newValue) {
+          plt.ael(elm, memberName, newValue, capture);
+        }
       }
     } else if (BUILD.vdomPropOrAttr) {
       // Set property if it exists and it's not a SVG
@@ -93,19 +130,22 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
       if ((isProp || (isComplex && newValue !== null)) && !isSvg) {
         try {
           if (!elm.tagName.includes('-')) {
-            let n = newValue == null ? '' : newValue;
+            const n = newValue == null ? '' : newValue;
 
             // Workaround for Safari, moving the <input> caret when re-assigning the same valued
             if (memberName === 'list') {
               isProp = false;
-              // tslint:disable-next-line: triple-equals
             } else if (oldValue == null || (elm as any)[memberName] != n) {
               (elm as any)[memberName] = n;
             }
           } else {
             (elm as any)[memberName] = newValue;
           }
-        } catch (e) { }
+        } catch (e) {
+          /**
+           * in case someone tries to set a read-only property, e.g. "namespaceURI", we just ignore it
+           */
+        }
       }
 
       /**
@@ -141,5 +181,13 @@ export const setAccessor = (elm: HTMLElement, memberName: string, oldValue: any,
     }
   }
 };
+
 const parseClassListRegex = /\s/;
+/**
+ * Parsed a string of classnames into an array
+ * @param value className string, e.g. "foo bar baz"
+ * @returns list of classes, e.g. ["foo", "bar", "baz"]
+ */
 const parseClassList = (value: string | undefined | null): string[] => (!value ? [] : value.split(parseClassListRegex));
+const CAPTURE_EVENT_SUFFIX = 'Capture';
+const CAPTURE_EVENT_REGEX = new RegExp(CAPTURE_EVENT_SUFFIX + '$');

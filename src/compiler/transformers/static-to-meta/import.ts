@@ -1,11 +1,12 @@
-import type * as d from '../../../declarations';
-import { addExternalImport } from '../collections/add-external-import';
-import { isAbsolute, resolve } from 'path';
-import { normalizePath } from '@utils';
+import { normalizePath, resolve } from '@utils';
+import { isAbsolute } from 'path';
 import ts from 'typescript';
 
+import type * as d from '../../../declarations';
+import { addExternalImport } from '../collections/add-external-import';
+
 export const parseModuleImport = (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   moduleFile: d.Module,
@@ -30,7 +31,15 @@ export const parseModuleImport = (
       moduleFile.localImports.push(importPath);
     } else {
       // node resolve side effect import
-      addExternalImport(config, compilerCtx, buildCtx, moduleFile, moduleFile.sourceFilePath, importPath, resolveCollections);
+      addExternalImport(
+        config,
+        compilerCtx,
+        buildCtx,
+        moduleFile,
+        moduleFile.sourceFilePath,
+        importPath,
+        resolveCollections,
+      );
     }
   }
 };

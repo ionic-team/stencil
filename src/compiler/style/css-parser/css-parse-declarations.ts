@@ -6,7 +6,7 @@ export interface ParseCssResults {
   stylesheet: CssNode;
 }
 
-export const enum  CssNodeType  {
+export const enum CssNodeType {
   Charset,
   Comment,
   CustomMedia,

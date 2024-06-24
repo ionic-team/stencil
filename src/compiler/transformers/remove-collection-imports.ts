@@ -1,5 +1,6 @@
-import type * as d from '../../declarations';
 import ts from 'typescript';
+
+import type * as d from '../../declarations';
 
 export const removeCollectionImports = (compilerCtx: d.CompilerCtx): ts.TransformerFactory<ts.SourceFile> => {
   /*
@@ -11,7 +12,7 @@ export const removeCollectionImports = (compilerCtx: d.CompilerCtx): ts.Transfor
     import { asdf } '@ionic/core';
   */
   return () => {
-    return tsSourceFile => {
+    return (tsSourceFile) => {
       let madeUpdates = false;
       const statements = tsSourceFile.statements.slice();
 
@@ -25,14 +26,14 @@ export const removeCollectionImports = (compilerCtx: d.CompilerCtx): ts.Transfor
             const importPath = n.moduleSpecifier.text;
 
             // test if this side effect import is a collection
-            const isCollectionImport = compilerCtx.collections.some(c => {
+            const isCollectionImport = compilerCtx.collections.some((c) => {
               return c.collectionName === importPath || c.moduleId === importPath;
             });
 
             if (isCollectionImport) {
               // turns out this is a side effect import is a collection,
               // we actually don't want to include this in the JS output
-              // we've already gather the types we needed, kthxbai
+              // we've already gathered the types we needed, kthxbai
               madeUpdates = true;
               statements.splice(i, 1);
             }
@@ -41,7 +42,7 @@ export const removeCollectionImports = (compilerCtx: d.CompilerCtx): ts.Transfor
       }
 
       if (madeUpdates) {
-        return ts.updateSourceFileNode(tsSourceFile, statements);
+        return ts.factory.updateSourceFile(tsSourceFile, statements);
       }
       return tsSourceFile;
     };

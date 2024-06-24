@@ -8,11 +8,10 @@ import { Component, h } from '@stencil/core';
   shadow: true,
   styleUrls: {
     buford: 'shadow-mode.buford.scss',
-    griff: 'shadow-mode.griff.css'
-  }
+    griff: 'shadow-mode.griff.css',
+  },
 })
 export class ShadowMode {
-
   render() {
     return (
       <section>

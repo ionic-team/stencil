@@ -1,13 +1,11 @@
 import { EnvData } from './env-data';
 import { newSpecPage } from '@stencil/core/testing';
 
-
 describe('env-data', () => {
-
   it('should be a test', async () => {
-    const {root} = await newSpecPage({
+    const { root } = await newSpecPage({
       components: [EnvData],
-      html: `<env-data></env-data>`
+      html: `<env-data></env-data>`,
     });
     expect(root).toEqualHtml(`
       <env-data>
@@ -16,5 +14,4 @@ describe('env-data', () => {
       </env-data>
     `);
   });
-
 });

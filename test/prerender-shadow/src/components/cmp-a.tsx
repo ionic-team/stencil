@@ -1,14 +1,10 @@
 import { Component, h } from '@stencil/core';
 
 @Component({
-  tag: 'cmp-a'
+  tag: 'cmp-a',
 })
 export class CmpA {
   render() {
-    return (
-      <cmp-b>
-        CmpALightDom
-      </cmp-b>
-    );
+    return <cmp-b>CmpALightDom</cmp-b>;
   }
 }

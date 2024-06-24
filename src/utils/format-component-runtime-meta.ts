@@ -1,11 +1,25 @@
 import type * as d from '../declarations';
 import { CMP_FLAGS, LISTENER_FLAGS, MEMBER_FLAGS } from './constants';
 
-export const formatLazyBundleRuntimeMeta = (bundleId: any, cmps: d.ComponentCompilerMeta[]): d.LazyBundleRuntimeData => {
-  return [bundleId, cmps.map(cmp => formatComponentRuntimeMeta(cmp, true))];
+export const formatLazyBundleRuntimeMeta = (
+  bundleId: any,
+  cmps: d.ComponentCompilerMeta[],
+): d.LazyBundleRuntimeData => {
+  return [bundleId, cmps.map((cmp) => formatComponentRuntimeMeta(cmp, true))];
 };
 
-export const formatComponentRuntimeMeta = (compilerMeta: d.ComponentCompilerMeta, includeMethods: boolean): d.ComponentRuntimeMetaCompact => {
+/**
+ * Transform metadata about a component from the compiler to a compact form for
+ * use at runtime.
+ *
+ * @param compilerMeta component metadata gathered during compilation
+ * @param includeMethods include methods in the component's members or not
+ * @returns a compact format for component metadata, intended for runtime use
+ */
+export const formatComponentRuntimeMeta = (
+  compilerMeta: d.ComponentCompilerMeta,
+  includeMethods: boolean,
+): d.ComponentRuntimeMetaCompact => {
   let flags = 0;
   if (compilerMeta.encapsulation === 'shadow') {
     flags |= CMP_FLAGS.shadowDomEncapsulation;
@@ -14,6 +28,9 @@ export const formatComponentRuntimeMeta = (compilerMeta: d.ComponentCompilerMeta
     }
   } else if (compilerMeta.encapsulation === 'scoped') {
     flags |= CMP_FLAGS.scopedCssEncapsulation;
+  }
+  if (compilerMeta.formAssociated) {
+    flags |= CMP_FLAGS.formAssociated;
   }
   if (compilerMeta.encapsulation !== 'shadow' && compilerMeta.htmlTagNames.includes('slot')) {
     flags |= CMP_FLAGS.hasSlotRelocation;
@@ -24,7 +41,14 @@ export const formatComponentRuntimeMeta = (compilerMeta: d.ComponentCompilerMeta
 
   const members = formatComponentRuntimeMembers(compilerMeta, includeMethods);
   const hostListeners = formatHostListeners(compilerMeta);
-  return trimFalsy([flags, compilerMeta.tagName, Object.keys(members).length > 0 ? members : undefined, hostListeners.length > 0 ? hostListeners : undefined]);
+  const watchers = formatComponentRuntimeWatchers(compilerMeta);
+  return trimFalsy([
+    flags,
+    compilerMeta.tagName,
+    Object.keys(members).length > 0 ? members : undefined,
+    hostListeners.length > 0 ? hostListeners : undefined,
+    Object.keys(watchers).length > 0 ? watchers : undefined,
+  ]);
 };
 
 export const stringifyRuntimeData = (data: any) => {
@@ -37,7 +61,29 @@ export const stringifyRuntimeData = (data: any) => {
   return json;
 };
 
-const formatComponentRuntimeMembers = (compilerMeta: d.ComponentCompilerMeta, includeMethods = true): d.ComponentRuntimeMembers => {
+/**
+ * Transforms Stencil compiler metadata into a {@link d.ComponentCompilerMeta} object.
+ * This handles processing any compiler metadata transformed from components' uses of `@Watch()`.
+ * The map of watched attributes to their callback(s) will be immediately available
+ * to the runtime at bootstrap.
+ *
+ * @param compilerMeta Component metadata gathered during compilation
+ * @returns An object mapping watched attributes to their respective callback(s)
+ */
+const formatComponentRuntimeWatchers = (compilerMeta: d.ComponentCompilerMeta) => {
+  const watchers: d.ComponentConstructorWatchers = {};
+
+  compilerMeta.watchers.forEach(({ propName, methodName }) => {
+    watchers[propName] = [...(watchers[propName] ?? []), methodName];
+  });
+
+  return watchers;
+};
+
+const formatComponentRuntimeMembers = (
+  compilerMeta: d.ComponentCompilerMeta,
+  includeMethods = true,
+): d.ComponentRuntimeMembers => {
   return {
     ...formatPropertiesRuntimeMember(compilerMeta.properties),
     ...formatStatesRuntimeMember(compilerMeta.states),
@@ -48,7 +94,7 @@ const formatComponentRuntimeMembers = (compilerMeta: d.ComponentCompilerMeta, in
 const formatPropertiesRuntimeMember = (properties: d.ComponentCompilerProperty[]) => {
   const runtimeMembers: d.ComponentRuntimeMembers = {};
 
-  properties.forEach(member => {
+  properties.forEach((member) => {
     runtimeMembers[member.name] = trimFalsy([
       /**
        * [0] member type
@@ -109,7 +155,7 @@ const formatPropType = (type: d.ComponentCompilerPropertyType) => {
 const formatStatesRuntimeMember = (states: d.ComponentCompilerState[]) => {
   const runtimeMembers: d.ComponentRuntimeMembers = {};
 
-  states.forEach(member => {
+  states.forEach((member) => {
     runtimeMembers[member.name] = [
       /**
        * [0] member flags
@@ -123,7 +169,7 @@ const formatStatesRuntimeMember = (states: d.ComponentCompilerState[]) => {
 const formatMethodsRuntimeMember = (methods: d.ComponentCompilerMethod[]) => {
   const runtimeMembers: d.ComponentRuntimeMembers = {};
 
-  methods.forEach(member => {
+  methods.forEach((member) => {
     runtimeMembers[member.name] = [
       /**
        * [0] member flags
@@ -135,8 +181,12 @@ const formatMethodsRuntimeMember = (methods: d.ComponentCompilerMethod[]) => {
 };
 
 const formatHostListeners = (compilerMeta: d.ComponentCompilerMeta) => {
-  return compilerMeta.listeners.map(compilerListener => {
-    const hostListener: d.ComponentRuntimeHostListener = [computeListenerFlags(compilerListener), compilerListener.name, compilerListener.method];
+  return compilerMeta.listeners.map((compilerListener) => {
+    const hostListener: d.ComponentRuntimeHostListener = [
+      computeListenerFlags(compilerListener),
+      compilerListener.name,
+      compilerListener.method,
+    ];
     return hostListener;
   });
 };
@@ -168,7 +218,7 @@ const computeListenerFlags = (listener: d.ComponentCompilerListener) => {
 
 const trimFalsy = (data: any): any => {
   const arr = data as any[];
-  for (var i = arr.length - 1; i >= 0; i--) {
+  for (let i = arr.length - 1; i >= 0; i--) {
     if (arr[i]) {
       break;
     }

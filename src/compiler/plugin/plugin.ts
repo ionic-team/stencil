@@ -1,12 +1,12 @@
+import { buildError, catchError, isFunction, isOutputTargetDocs, isString, relative } from '@utils';
+import { basename } from 'path';
+
 import type * as d from '../../declarations';
-import { basename, relative } from 'path';
-import { buildError, catchError, isFunction, isString } from '@utils';
-import { isOutputTargetDocs } from '../output-targets/output-utils';
-import { parseCssImports } from '../style/css-imports';
 import { PluginCtx, PluginTransformResults } from '../../declarations';
+import { parseCssImports } from '../style/css-imports';
 
 export const runPluginResolveId = async (pluginCtx: PluginCtx, importee: string) => {
-  for (const plugin of pluginCtx.config.plugins) {
+  for (const plugin of pluginCtx.config?.plugins ?? []) {
     if (isFunction(plugin.resolveId)) {
       try {
         const results = plugin.resolveId(importee, null, pluginCtx);
@@ -21,7 +21,7 @@ export const runPluginResolveId = async (pluginCtx: PluginCtx, importee: string)
             return results;
           }
         }
-      } catch (e) {
+      } catch (e: any) {
         catchError(pluginCtx.diagnostics, e);
       }
     }
@@ -32,7 +32,7 @@ export const runPluginResolveId = async (pluginCtx: PluginCtx, importee: string)
 };
 
 export const runPluginLoad = async (pluginCtx: PluginCtx, id: string) => {
-  for (const plugin of pluginCtx.config.plugins) {
+  for (const plugin of pluginCtx.config?.plugins ?? []) {
     if (isFunction(plugin.load)) {
       try {
         const results = plugin.load(id, pluginCtx);
@@ -47,7 +47,7 @@ export const runPluginLoad = async (pluginCtx: PluginCtx, id: string) => {
             return results;
           }
         }
-      } catch (e) {
+      } catch (e: any) {
         catchError(pluginCtx.diagnostics, e);
       }
     }
@@ -57,13 +57,27 @@ export const runPluginLoad = async (pluginCtx: PluginCtx, id: string) => {
   return pluginCtx.fs.readFile(id);
 };
 
+/**
+ * returns a subset of the baseline array of strings
+ * @param baseline baseline of files
+ * @param superset files that were added by a transform
+ * @returns files that were added by a transform but haven't been part of the baseline
+ */
+const getDependencySubset = (baseline: string[] | undefined, superset: string[] = []) => {
+  if (!Array.isArray(baseline)) {
+    return [];
+  }
+
+  return baseline.filter((f) => !superset.includes(f));
+};
+
 export const runPluginTransforms = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   id: string,
   cmp?: d.ComponentCompilerMeta,
-) => {
+): Promise<PluginTransformResults | null> => {
   const pluginCtx: PluginCtx = {
     config: config,
     sys: config.sys,
@@ -81,10 +95,11 @@ export const runPluginTransforms = async (
     return null;
   }
 
-  const transformResults: PluginTransformResults = {
+  const transformResults = {
     code: sourceText,
     id: id,
-  };
+    dependencies: [] as string[],
+  } satisfies PluginTransformResults;
 
   const isRawCssFile = transformResults.id.toLowerCase().endsWith('.css');
   const shouldParseCssDocs = cmp != null && config.outputTargets.some(isOutputTargetDocs);
@@ -113,7 +128,7 @@ export const runPluginTransforms = async (
     }
   }
 
-  for (const plugin of pluginCtx.config.plugins) {
+  for (const plugin of pluginCtx.config?.plugins ?? []) {
     if (isFunction(plugin.transform)) {
       try {
         let pluginTransformResults: PluginTransformResults | string;
@@ -136,10 +151,17 @@ export const runPluginTransforms = async (
               if (isString(pluginTransformResults.id)) {
                 transformResults.id = pluginTransformResults.id;
               }
+
+              /**
+               * add dependencies from plugin transform results, e.g. transformed sass files
+               */
+              transformResults.dependencies.push(
+                ...getDependencySubset(pluginTransformResults.dependencies, transformResults.dependencies),
+              );
             }
           }
         }
-      } catch (e) {
+      } catch (e: any) {
         catchError(buildCtx.diagnostics, e);
       }
     }
@@ -165,7 +187,9 @@ export const runPluginTransforms = async (
         cmp.styleDocs,
       );
       transformResults.code = cssParseResults.styleText;
-      transformResults.dependencies = cssParseResults.imports;
+      transformResults.dependencies.push(
+        ...getDependencySubset(cssParseResults.imports, transformResults.dependencies),
+      );
     } else {
       const cssParseResults = await parseCssImports(
         config,
@@ -176,7 +200,9 @@ export const runPluginTransforms = async (
         transformResults.code,
       );
       transformResults.code = cssParseResults.styleText;
-      transformResults.dependencies = cssParseResults.imports;
+      transformResults.dependencies.push(
+        ...getDependencySubset(cssParseResults.imports, transformResults.dependencies),
+      );
     }
   }
 
@@ -184,7 +210,7 @@ export const runPluginTransforms = async (
 };
 
 export const runPluginTransformsEsmImports = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   code: string,
@@ -198,13 +224,13 @@ export const runPluginTransformsEsmImports = async (
     diagnostics: [],
   };
 
-  const transformResults: PluginTransformResults = {
+  const transformResults = {
     code,
     id,
-    map: null,
-    diagnostics: [],
-    dependencies: [],
-  };
+    map: undefined as string | undefined,
+    diagnostics: [] as d.Diagnostic[],
+    dependencies: [] as string[],
+  } satisfies PluginTransformResults;
 
   const isRawCssFile = id.toLowerCase().endsWith('.css');
   if (isRawCssFile) {
@@ -218,7 +244,7 @@ export const runPluginTransformsEsmImports = async (
     }
   }
 
-  for (const plugin of pluginCtx.config.plugins) {
+  for (const plugin of pluginCtx.config?.plugins ?? []) {
     if (isFunction(plugin.transform)) {
       try {
         let pluginTransformResults: PluginTransformResults | string;
@@ -242,14 +268,14 @@ export const runPluginTransformsEsmImports = async (
               }
               if (Array.isArray(pluginTransformResults.dependencies)) {
                 const imports = pluginTransformResults.dependencies.filter(
-                  f => !transformResults.dependencies.includes(f),
+                  (f) => !transformResults.dependencies.includes(f),
                 );
                 transformResults.dependencies.push(...imports);
               }
             }
           }
         }
-      } catch (e) {
+      } catch (e: any) {
         catchError(transformResults.diagnostics, e);
       }
     }
@@ -273,7 +299,7 @@ export const runPluginTransformsEsmImports = async (
     );
     transformResults.code = cssParseResults.styleText;
     if (Array.isArray(cssParseResults.imports)) {
-      const imports = cssParseResults.imports.filter(f => !transformResults.dependencies.includes(f));
+      const imports = cssParseResults.imports.filter((f) => !transformResults.dependencies.includes(f));
       transformResults.dependencies.push(...imports);
     }
   }

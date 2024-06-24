@@ -1,7 +1,12 @@
 import type * as d from '../../../declarations';
 import { MarkdownTable } from './docs-util';
 
-export const slotsToMarkdown = (slots: d.JsonDocsSlot[]) => {
+/**
+ * Converts a list of Slots metadata to a table written in Markdown
+ * @param slots the Slots metadata to convert
+ * @returns a list of strings that make up the Markdown table
+ */
+export const slotsToMarkdown = (slots: d.JsonDocsSlot[]): ReadonlyArray<string> => {
   const content: string[] = [];
   if (slots.length === 0) {
     return content;
@@ -13,7 +18,7 @@ export const slotsToMarkdown = (slots: d.JsonDocsSlot[]) => {
   const table = new MarkdownTable();
   table.addHeader(['Slot', 'Description']);
 
-  slots.forEach(style => {
+  slots.forEach((style) => {
     table.addRow([style.name === '' ? '' : `\`"${style.name}"\``, style.docs]);
   });
 

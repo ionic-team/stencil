@@ -1,7 +1,8 @@
 import type * as d from '@stencil/core/internal';
-import { emptyDir, fileExists, mkDir, readDir, readFile, readFileBuffer, rmDir, writeFile } from './screenshot-fs';
-import { join } from 'path';
 import { tmpdir } from 'os';
+import { join } from 'path';
+
+import { emptyDir, fileExists, mkDir, readDir, readFile, readFileBuffer, rmDir, writeFile } from './screenshot-fs';
 
 export class ScreenshotConnector implements d.ScreenshotConnector {
   rootDir: string;
@@ -15,9 +16,9 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
   logger: d.Logger;
   buildId: string;
   buildMessage: string;
-  buildAuthor: string;
-  buildUrl: string;
-  previewUrl: string;
+  buildAuthor: string | undefined;
+  buildUrl: string | undefined;
+  previewUrl: string | undefined;
   buildTimestamp: number;
   appNamespace: string;
   screenshotDir: string;
@@ -27,11 +28,11 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
   screenshotCacheFilePath: string;
   currentBuildDir: string;
   updateMaster: boolean;
-  allowableMismatchedRatio: number;
-  allowableMismatchedPixels: number;
-  pixelmatchThreshold: number;
-  waitBeforeScreenshot: number;
-  pixelmatchModulePath: string;
+  allowableMismatchedRatio: number | undefined;
+  allowableMismatchedPixels: number | undefined;
+  pixelmatchThreshold: number | undefined;
+  waitBeforeScreenshot: number | undefined;
+  pixelmatchModulePath: string | undefined;
 
   async initBuild(opts: d.ScreenshotConnectorOptions) {
     this.logger = opts.logger;
@@ -41,7 +42,8 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
     this.buildAuthor = opts.buildAuthor;
     this.buildUrl = opts.buildUrl;
     this.previewUrl = opts.previewUrl;
-    (this.buildTimestamp = typeof opts.buildTimestamp === 'number' ? opts.buildTimestamp : Date.now()), (this.cacheDir = opts.cacheDir);
+    this.buildTimestamp = typeof opts.buildTimestamp === 'number' ? opts.buildTimestamp : Date.now();
+    this.cacheDir = opts.cacheDir;
     this.packageDir = opts.packageDir;
     this.rootDir = opts.rootDir;
     this.appNamespace = opts.appNamespace;
@@ -105,7 +107,12 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
 
     await mkDir(this.screenshotDir);
 
-    await Promise.all([mkDir(this.imagesDir), mkDir(this.buildsDir), mkDir(this.currentBuildDir), mkDir(this.cacheDir)]);
+    await Promise.all([
+      mkDir(this.imagesDir),
+      mkDir(this.buildsDir),
+      mkDir(this.currentBuildDir),
+      mkDir(this.cacheDir),
+    ]);
   }
 
   async pullMasterBuild() {
@@ -113,18 +120,19 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
   }
 
   async getMasterBuild() {
-    let masterBuild: d.ScreenshotBuild = null;
-
     try {
-      masterBuild = JSON.parse(await readFile(this.masterBuildFilePath));
+      const masterBuild = JSON.parse(await readFile(this.masterBuildFilePath));
+      return masterBuild;
     } catch (e) {}
 
-    return masterBuild;
+    return null;
   }
 
   async completeBuild(masterBuild: d.ScreenshotBuild) {
-    const filePaths = (await readDir(this.currentBuildDir)).map(f => join(this.currentBuildDir, f)).filter(f => f.endsWith('.json'));
-    const screenshots = await Promise.all(filePaths.map(async f => JSON.parse(await readFile(f)) as d.Screenshot));
+    const filePaths = (await readDir(this.currentBuildDir))
+      .map((f) => join(this.currentBuildDir, f))
+      .filter((f) => f.endsWith('.json'));
+    const screenshots = await Promise.all(filePaths.map(async (f) => JSON.parse(await readFile(f)) as d.Screenshot));
 
     this.sortScreenshots(screenshots);
 
@@ -177,7 +185,7 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
       },
     };
 
-    results.currentBuild.screenshots.forEach(screenshot => {
+    results.currentBuild.screenshots.forEach((screenshot) => {
       screenshot.diff.device = screenshot.diff.device || screenshot.diff.userAgent;
       results.compare.diffs.push(screenshot.diff);
       delete screenshot.diff;
@@ -207,7 +215,9 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
         if (!jsonpExists) {
           const imageFilePath = join(this.imagesDir, screenshot.image);
           const imageBuf = await readFileBuffer(imageFilePath);
-          const jsonpContent = `loadScreenshot("${screenshot.image}","data:image/png;base64,${imageBuf.toString('base64')}");`;
+          const jsonpContent = `loadScreenshot("${screenshot.image}","data:image/png;base64,${imageBuf.toString(
+            'base64',
+          )}");`;
           await writeFile(jsonFilePath, jsonpContent);
         }
       }
@@ -226,7 +236,7 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
     screenshotCache.items = screenshotCache.items || [];
 
     if (buildResults && buildResults.compare && Array.isArray(buildResults.compare.diffs)) {
-      buildResults.compare.diffs.forEach(diff => {
+      buildResults.compare.diffs.forEach((diff) => {
         if (typeof diff.cacheKey !== 'string') {
           return;
         }
@@ -236,7 +246,7 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
           return;
         }
 
-        const existingItem = screenshotCache.items.find(i => i.key === diff.cacheKey);
+        const existingItem = screenshotCache.items.find((i) => i.key === diff.cacheKey);
         if (existingItem) {
           // already have this cached, but update its timestamp
           existingItem.ts = this.buildTimestamp;
@@ -271,14 +281,14 @@ export class ScreenshotConnector implements d.ScreenshotConnector {
   toJson(masterBuild: d.ScreenshotBuild, screenshotCache: d.ScreenshotCache) {
     const masterScreenshots: { [screenshotId: string]: string } = {};
     if (masterBuild && Array.isArray(masterBuild.screenshots)) {
-      masterBuild.screenshots.forEach(masterScreenshot => {
+      masterBuild.screenshots.forEach((masterScreenshot) => {
         masterScreenshots[masterScreenshot.id] = masterScreenshot.image;
       });
     }
 
     const mismatchCache: { [cacheKey: string]: number } = {};
     if (screenshotCache && Array.isArray(screenshotCache.items)) {
-      screenshotCache.items.forEach(cacheItem => {
+      screenshotCache.items.forEach((cacheItem) => {
         mismatchCache[cacheItem.key] = cacheItem.mp;
       });
     }

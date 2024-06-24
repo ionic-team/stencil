@@ -5,16 +5,12 @@ export const config: Config = {
   outputTargets: [
     {
       type: 'www',
-      serviceWorker: null
-    }
+      serviceWorker: null,
+    },
   ],
   hashFileNames: false,
   hydratedFlag: null,
   extras: {
-    cssVarsShim: false,
-    dynamicImportShim: false,
-    safari10: false,
     scriptDataOpts: false,
-    shadowDomShim: false,
-  }
+  },
 };

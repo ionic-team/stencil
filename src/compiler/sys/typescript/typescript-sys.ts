@@ -1,14 +1,20 @@
-import type * as d from '../../../declarations';
-import { basename, resolve } from 'path';
-import { isRemoteUrl, isString, normalizePath, noop } from '@utils';
-import { fetchUrlSync } from '../fetch/fetch-module-sync';
-import { getCurrentDirectory, IS_CASE_SENSITIVE_FILE_NAMES, IS_WEB_WORKER_ENV } from '../environment';
-import { patchTypeScriptResolveModule } from './typescript-resolve-module';
+import { isRemoteUrl, isString, noop, normalizePath, resolve } from '@utils';
+import { basename } from 'path';
 import ts from 'typescript';
 
-export const patchTsSystemFileSystem = (config: d.Config, stencilSys: d.CompilerSystem, inMemoryFs: d.InMemoryFileSystem, tsSys: ts.System) => {
+import type * as d from '../../../declarations';
+import { IS_CASE_SENSITIVE_FILE_NAMES } from '../environment';
+import { InMemoryFileSystem } from '../in-memory-fs';
+
+// TODO(STENCIL-728): fix typing of `inMemoryFs` parameter in `patchTypescript`, related functions
+export const patchTsSystemFileSystem = (
+  config: d.ValidatedConfig,
+  compilerSys: d.CompilerSystem,
+  inMemoryFs: InMemoryFileSystem,
+  tsSys: ts.System,
+): ts.System => {
   const realpath = (path: string) => {
-    const rp = stencilSys.realpathSync(path);
+    const rp = compilerSys.realpathSync(path);
     if (isString(rp)) {
       return rp;
     }
@@ -17,7 +23,7 @@ export const patchTsSystemFileSystem = (config: d.Config, stencilSys: d.Compiler
 
   const getAccessibleFileSystemEntries = (path: string) => {
     try {
-      const entries = stencilSys.readDirSync(path || '.').sort();
+      const entries = compilerSys.readDirSync(path || '.').sort();
       const files: string[] = [];
       const directories: string[] = [];
 
@@ -42,79 +48,93 @@ export const patchTsSystemFileSystem = (config: d.Config, stencilSys: d.Compiler
     }
   };
 
-  tsSys.createDirectory = p => {
-    stencilSys.createDirSync(p, { recursive: true });
+  tsSys.createDirectory = (p) => {
+    compilerSys.createDirSync(p, { recursive: true });
   };
 
-  tsSys.directoryExists = p => {
-    const s = inMemoryFs.statSync(p);
-    return s.isDirectory;
+  tsSys.directoryExists = (p) => {
+    // At present the typing for `inMemoryFs` in this function is not accurate
+    // TODO(STENCIL-728): fix typing of `inMemoryFs` parameter in `patchTypescript`, related functions
+    if (inMemoryFs) {
+      const s = inMemoryFs.statSync(p);
+      return s.isDirectory;
+    } else {
+      const s = compilerSys.statSync(p);
+      return s.isDirectory;
+    }
   };
 
-  tsSys.exit = stencilSys.exit;
+  tsSys.exit = compilerSys.exit;
 
-  tsSys.fileExists = p => {
+  tsSys.fileExists = (p) => {
     let filePath = p;
 
     if (isRemoteUrl(p)) {
       filePath = getTypescriptPathFromUrl(config, tsSys.getExecutingFilePath(), p);
     }
 
-    const s = inMemoryFs.statSync(filePath);
-    return !!(s && s.isFile);
+    // At present the typing for `inMemoryFs` in this function is not accurate
+    // TODO(STENCIL-728): fix typing of `inMemoryFs` parameter in `patchTypescript`, related functions
+    if (inMemoryFs) {
+      const s = inMemoryFs.statSync(filePath);
+      return !!(s && s.isFile);
+    } else {
+      const s = compilerSys.statSync(filePath);
+      return !!(s && s.isFile);
+    }
   };
 
-  tsSys.getCurrentDirectory = stencilSys.getCurrentDirectory;
+  tsSys.getCurrentDirectory = compilerSys.getCurrentDirectory;
 
-  tsSys.getExecutingFilePath = stencilSys.getCompilerExecutingPath;
+  tsSys.getExecutingFilePath = compilerSys.getCompilerExecutingPath;
 
-  tsSys.getDirectories = p => {
-    const items = stencilSys.readDirSync(p);
-    return items.filter(itemPath => {
-      const s = inMemoryFs.statSync(itemPath);
-      return !!(s && s.exists && s.isDirectory);
+  tsSys.getDirectories = (p) => {
+    const items = compilerSys.readDirSync(p);
+    return items.filter((itemPath) => {
+      // At present the typing for `inMemoryFs` in this function is not accurate
+      // TODO(STENCIL-728): fix typing of `inMemoryFs` parameter in `patchTypescript`, related functions
+      if (inMemoryFs) {
+        const s = inMemoryFs.statSync(itemPath);
+        return !!(s && s.exists && s.isDirectory);
+      } else {
+        const s = compilerSys.statSync(itemPath);
+        return !!(s && s.isDirectory);
+      }
     });
   };
 
   tsSys.readDirectory = (path, extensions, exclude, include, depth) => {
-    const cwd = stencilSys.getCurrentDirectory();
-    return (ts as any).matchFiles(path, extensions, exclude, include, IS_CASE_SENSITIVE_FILE_NAMES, cwd, depth, getAccessibleFileSystemEntries, realpath);
+    const cwd = compilerSys.getCurrentDirectory();
+    // TODO(STENCIL-344): Replace `matchFiles` with a function that is publicly exposed
+    return (ts as any).matchFiles(
+      path,
+      extensions,
+      exclude,
+      include,
+      IS_CASE_SENSITIVE_FILE_NAMES,
+      cwd,
+      depth,
+      getAccessibleFileSystemEntries,
+      realpath,
+    );
   };
 
-  tsSys.readFile = p => {
-    let filePath = p;
-    const isUrl = isRemoteUrl(p);
-
-    if (isUrl) {
-      filePath = getTypescriptPathFromUrl(config, tsSys.getExecutingFilePath(), p);
-    }
-
-    let content = inMemoryFs.readFileSync(filePath, { useCache: isUrl });
-
-    if (typeof content !== 'string' && isUrl) {
-      if (IS_WEB_WORKER_ENV) {
-        content = fetchUrlSync(p);
-        if (typeof content === 'string') {
-          inMemoryFs.writeFile(filePath, content);
-        }
-      } else {
-        config.logger.error(`ts.sys can only request http resources from within a web worker: ${p}`);
-      }
-    }
-
-    return content;
+  tsSys.readFile = (filePath) => {
+    return inMemoryFs ? inMemoryFs.readFileSync(filePath, { useCache: false }) : compilerSys.readFileSync(filePath);
   };
 
-  tsSys.writeFile = (p, data) => inMemoryFs.writeFile(p, data);
+  // At present the typing for `inMemoryFs` in this function is not accurate
+  // TODO(STENCIL-728): fix typing of `inMemoryFs` parameter in `patchTypescript`, related functions
+  tsSys.writeFile = (p, data) => (inMemoryFs ? inMemoryFs.writeFile(p, data) : compilerSys.writeFile(p, data));
 
   return tsSys;
 };
 
-const patchTsSystemWatch = (stencilSys: d.CompilerSystem, tsSys: ts.System) => {
+const patchTsSystemWatch = (compilerSystem: d.CompilerSystem, tsSys: ts.System) => {
   tsSys.watchDirectory = (p, cb, recursive) => {
-    const watcher = stencilSys.watchDirectory(
+    const watcher = compilerSystem.watchDirectory(
       p,
-      filePath => {
+      (filePath) => {
         cb(filePath);
       },
       recursive,
@@ -127,7 +147,7 @@ const patchTsSystemWatch = (stencilSys: d.CompilerSystem, tsSys: ts.System) => {
   };
 
   tsSys.watchFile = (p, cb) => {
-    const watcher = stencilSys.watchFile(p, (filePath, eventKind) => {
+    const watcher = compilerSystem.watchFile(p, (filePath, eventKind) => {
       if (eventKind === 'fileAdd') {
         cb(filePath, ts.FileWatcherEventKind.Created);
       } else if (eventKind === 'fileUpdate') {
@@ -144,14 +164,11 @@ const patchTsSystemWatch = (stencilSys: d.CompilerSystem, tsSys: ts.System) => {
   };
 };
 
-export const patchTypescript = (config: d.Config, inMemoryFs: d.InMemoryFileSystem) => {
+// TODO(STENCIL-728): fix typing of `inMemoryFs` parameter in `patchTypescript`, related functions
+export const patchTypescript = (config: d.ValidatedConfig, inMemoryFs: InMemoryFileSystem) => {
   if (!(ts as any).__patched) {
-    if (config.sys) {
-      patchTsSystemFileSystem(config, config.sys, inMemoryFs, ts.sys);
-      patchTsSystemWatch(config.sys, ts.sys);
-    }
-    patchTypeScriptResolveModule(config, inMemoryFs);
-    patchTypeScriptGetParsedCommandLineOfConfigFile();
+    patchTsSystemFileSystem(config, config.sys, inMemoryFs, ts.sys);
+    patchTsSystemWatch(config.sys, ts.sys);
     (ts as any).__patched = true;
   }
 };
@@ -160,7 +177,7 @@ const patchTypeScriptSysMinimum = () => {
   if (!ts.sys) {
     // patches just the bare minimum
     // if ts.sys already exists then it must be node ts.sys
-    // otherwise we're either browser or deno
+    // otherwise we're browser
     // will be updated later on with the stencil sys
     ts.sys = {
       args: [],
@@ -168,7 +185,7 @@ const patchTypeScriptSysMinimum = () => {
       directoryExists: () => false,
       exit: noop,
       fileExists: () => false,
-      getCurrentDirectory,
+      getCurrentDirectory: process.cwd,
       getDirectories: () => [],
       getExecutingFilePath: () => './',
       readDirectory: () => [],
@@ -183,35 +200,16 @@ const patchTypeScriptSysMinimum = () => {
 };
 patchTypeScriptSysMinimum();
 
-export const getTypescriptPathFromUrl = (config: d.Config, tsExecutingUrl: string, url: string) => {
+export const getTypescriptPathFromUrl = (config: d.ValidatedConfig, tsExecutingUrl: string, url: string) => {
   const tsBaseUrl = new URL('..', tsExecutingUrl).href;
   if (url.startsWith(tsBaseUrl)) {
     const tsFilePath = url.replace(tsBaseUrl, '/');
-    const tsNodePath = config.sys.getLocalModulePath({ rootDir: config.rootDir, moduleId: '@stencil/core', path: tsFilePath });
+    const tsNodePath = config.sys.getLocalModulePath({
+      rootDir: config.rootDir,
+      moduleId: '@stencil/core',
+      path: tsFilePath,
+    });
     return normalizePath(tsNodePath);
   }
   return url;
-};
-
-export const patchTypeScriptGetParsedCommandLineOfConfigFile = () => {
-  const orgGetParsedCommandLineOfConfigFile = ts.getParsedCommandLineOfConfigFile;
-
-  ts.getParsedCommandLineOfConfigFile = (configFileName, optionsToExtend, host, extendedConfigCache) => {
-    const results = orgGetParsedCommandLineOfConfigFile(configFileName, optionsToExtend, host, extendedConfigCache);
-
-    // manually filter out any .spec or .e2e files
-    results.fileNames = results.fileNames.filter(f => {
-      // filter e2e tests
-      if (f.includes('.e2e.') || f.includes('/e2e.')) {
-        return false;
-      }
-      // filter spec tests
-      if (f.includes('.spec.') || f.includes('/spec.')) {
-        return false;
-      }
-      return true;
-    });
-
-    return results;
-  };
 };

@@ -1,4 +1,5 @@
-import { Component, Prop, h } from '@stencil/core';
+import { Component, h, Prop } from '@stencil/core';
+
 import { CarData } from '../car-list/car-data';
 
 @Component({
@@ -9,7 +10,7 @@ export class CarDetail {
   @Prop() car: CarData;
 
   componentWillLoad() {
-    return new Promise(resolve => setTimeout(resolve, 20));
+    return new Promise((resolve) => setTimeout(resolve, 20));
   }
 
   render() {

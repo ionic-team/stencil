@@ -1,8 +1,9 @@
+import { BUILD } from '@app-data';
+
 import type * as d from '../declarations';
+import { PLATFORM_FLAGS } from '../runtime/runtime-constants';
 import { consoleError } from './client-log';
 import { plt, promiseResolve } from './client-window';
-import { PLATFORM_FLAGS } from '../runtime/runtime-constants';
-import { BUILD } from '@app-data';
 
 let queueCongestion = 0;
 let queuePending = false;
@@ -65,7 +66,10 @@ const flush = () => {
 
   // DOM WRITES!!!
   if (BUILD.asyncQueue) {
-    const timeout = (plt.$flags$ & PLATFORM_FLAGS.queueMask) === PLATFORM_FLAGS.appLoaded ? performance.now() + 14 * Math.ceil(queueCongestion * (1.0 / 10.0)) : Infinity;
+    const timeout =
+      (plt.$flags$ & PLATFORM_FLAGS.queueMask) === PLATFORM_FLAGS.appLoaded
+        ? performance.now() + 14 * Math.ceil(queueCongestion * (1.0 / 10.0))
+        : Infinity;
 
     consumeTimeout(queueDomWrites, timeout);
     consumeTimeout(queueDomWritesLow, timeout);
@@ -92,7 +96,7 @@ const flush = () => {
   }
 };
 
-export const nextTick = /*@__PURE__*/ (cb: () => void) => promiseResolve().then(cb);
+export const nextTick = (cb: () => void) => promiseResolve().then(cb);
 
 export const readTask = /*@__PURE__*/ queueTask(queueDomReads, false);
 

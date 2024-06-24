@@ -1,13 +1,15 @@
-import type * as d from '../declarations';
-import { addHostEventListeners, doc, getHostRef, nextTick, plt, supportsShadow } from '@platform';
-import { addStyle } from './styles';
-import { attachToAncestor } from './update-component';
 import { BUILD } from '@app-data';
+import { addHostEventListeners, doc, getHostRef, nextTick, plt, supportsShadow } from '@platform';
 import { CMP_FLAGS, HOST_FLAGS, MEMBER_FLAGS } from '@utils';
+
+import type * as d from '../declarations';
+import { initializeClientHydrate } from './client-hydrate';
+import { fireConnectedCallback, initializeComponent } from './initialize-component';
 import { createTime } from './profile';
 import { HYDRATE_ID, NODE_TYPE, PLATFORM_FLAGS } from './runtime-constants';
-import { initializeClientHydrate } from './client-hydrate';
-import { initializeComponent, fireConnectedCallback } from './initialize-component';
+import { addStyle } from './styles';
+import { attachToAncestor } from './update-component';
+import { insertBefore } from './vdom/vdom-render';
 
 export const connectedCallback = (elm: d.HostElement) => {
   if ((plt.$flags$ & PLATFORM_FLAGS.isTmpDisconnected) === 0) {
@@ -29,7 +31,9 @@ export const connectedCallback = (elm: d.HostElement) => {
         hostId = elm.getAttribute(HYDRATE_ID);
         if (hostId) {
           if (BUILD.shadowDom && supportsShadow && cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation) {
-            const scopeId = BUILD.mode ? addStyle(elm.shadowRoot, cmpMeta, elm.getAttribute('s-mode')) : addStyle(elm.shadowRoot, cmpMeta);
+            const scopeId = BUILD.mode
+              ? addStyle(elm.shadowRoot, cmpMeta, elm.getAttribute('s-mode'))
+              : addStyle(elm.shadowRoot, cmpMeta);
             elm.classList.remove(scopeId + '-h', scopeId + '-s');
           }
           initializeClientHydrate(elm, cmpMeta.$tagName$, hostId, hostRef);
@@ -41,7 +45,12 @@ export const connectedCallback = (elm: d.HostElement) => {
         // if the slot polyfill is required we'll need to put some nodes
         // in here to act as original content anchors as we move nodes around
         // host element has been connected to the DOM
-        if (BUILD.hydrateServerSide || ((BUILD.slot || BUILD.shadowDom) && cmpMeta.$flags$ & (CMP_FLAGS.hasSlotRelocation | CMP_FLAGS.needsShadowDomShim))) {
+        if (
+          BUILD.hydrateServerSide ||
+          ((BUILD.slot || BUILD.shadowDom) &&
+            // TODO(STENCIL-854): Remove code related to legacy shadowDomShim field
+            cmpMeta.$flags$ & (CMP_FLAGS.hasSlotRelocation | CMP_FLAGS.needsShadowDomShim))
+        ) {
           setContentReference(elm);
         }
       }
@@ -55,7 +64,10 @@ export const connectedCallback = (elm: d.HostElement) => {
           // climb up the ancestors looking for the first
           // component that hasn't finished its lifecycle update yet
           if (
-            (BUILD.hydrateClientSide && ancestorComponent.nodeType === NODE_TYPE.ElementNode && ancestorComponent.hasAttribute('s-id') && ancestorComponent['s-p']) ||
+            (BUILD.hydrateClientSide &&
+              ancestorComponent.nodeType === NODE_TYPE.ElementNode &&
+              ancestorComponent.hasAttribute('s-id') &&
+              ancestorComponent['s-p']) ||
             ancestorComponent['s-p']
           ) {
             // we found this components first ancestor component
@@ -68,7 +80,7 @@ export const connectedCallback = (elm: d.HostElement) => {
 
       // Lazy properties
       // https://developers.google.com/web/fundamentals/web-components/best-practices#lazy-properties
-      if (BUILD.prop && BUILD.lazyLoad && !BUILD.hydrateServerSide && cmpMeta.$members$) {
+      if (BUILD.prop && !BUILD.hydrateServerSide && cmpMeta.$members$) {
         Object.entries(cmpMeta.$members$).map(([memberName, [memberFlags]]) => {
           if (memberFlags & MEMBER_FLAGS.Prop && elm.hasOwnProperty(memberName)) {
             const value = (elm as any)[memberName];
@@ -95,7 +107,11 @@ export const connectedCallback = (elm: d.HostElement) => {
       addHostEventListeners(elm, hostRef, cmpMeta.$listeners$, false);
 
       // fire off connectedCallback() on component instance
-      fireConnectedCallback(hostRef.$lazyInstance$);
+      if (hostRef?.$lazyInstance$) {
+        fireConnectedCallback(hostRef.$lazyInstance$);
+      } else if (hostRef?.$onReadyPromise$) {
+        hostRef.$onReadyPromise$.then(() => fireConnectedCallback(hostRef.$lazyInstance$));
+      }
     }
 
     endConnected();
@@ -109,7 +125,9 @@ const setContentReference = (elm: d.HostElement) => {
   // let's pick out the inner content for slot projection
   // create a node to represent where the original
   // content was first placed, which is useful later on
-  const contentRefElm = (elm['s-cr'] = doc.createComment(BUILD.isDebug ? `content-ref (host=${elm.localName})` : '') as any);
+  const contentRefElm = (elm['s-cr'] = doc.createComment(
+    BUILD.isDebug ? `content-ref (host=${elm.localName})` : '',
+  ) as any);
   contentRefElm['s-cn'] = true;
-  elm.insertBefore(contentRefElm, elm.firstChild);
+  insertBefore(elm, contentRefElm, elm.firstChild);
 };
