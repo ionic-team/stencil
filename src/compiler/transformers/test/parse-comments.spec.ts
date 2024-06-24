@@ -61,8 +61,9 @@ describe('parse comments', () => {
       complexType: {
         parameters: [
           {
-            tags: [],
-            text: '',
+            name: 'prop',
+            type: 'string',
+            docs: '',
           },
         ],
         return: 'unknown',

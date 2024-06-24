@@ -1,16 +1,17 @@
+import { generatePreamble, hasError, normalizeFsPath } from '@utils';
+import type { Plugin, PluginContext, TransformResult } from 'rollup';
+
 import type * as d from '../../declarations';
-import type { Plugin, TransformResult, PluginContext } from 'rollup';
-import { bundleOutput } from './bundle-output';
-import { normalizeFsPath, hasError, generatePreamble } from '@utils';
 import { optimizeModule } from '../optimize/optimize-module';
+import { bundleOutput } from './bundle-output';
 import { STENCIL_INTERNAL_ID } from './entry-alias-ids';
 
 export const workerPlugin = (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   platform: string,
-  inlineWorkers: boolean
+  inlineWorkers: boolean,
 ): Plugin => {
   if (platform === 'worker' || platform === 'hydrate') {
     return {
@@ -65,7 +66,7 @@ export const workerPlugin = (
           buildCtx,
           this,
           workersMap,
-          workerEntryPath
+          workerEntryPath,
         );
         const referenceId = this.emitFile({
           type: 'asset',
@@ -86,7 +87,7 @@ export const workerPlugin = (
           buildCtx,
           this,
           workersMap,
-          workerEntryPath
+          workerEntryPath,
         );
         const referenceId = this.emitFile({
           type: 'asset',
@@ -138,12 +139,12 @@ interface WorkerMeta {
 }
 
 const getWorker = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   ctx: PluginContext,
   workersMap: Map<string, WorkerMeta>,
-  workerEntryPath: string
+  workerEntryPath: string,
 ): Promise<WorkerMeta> => {
   let worker = workersMap.get(workerEntryPath);
   if (!worker) {
@@ -160,11 +161,11 @@ const getWorkerName = (id: string) => {
 };
 
 const buildWorker = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   ctx: PluginContext,
-  workerEntryPath: string
+  workerEntryPath: string,
 ) => {
   const workerName = getWorkerName(workerEntryPath);
   const workerMsgId = `stencil.${workerName}`;

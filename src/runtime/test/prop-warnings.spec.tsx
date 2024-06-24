@@ -1,4 +1,4 @@
-import { Component, Prop, Method, h } from '@stencil/core';
+import { Component, h, Method, Prop } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
 describe('prop', () => {
