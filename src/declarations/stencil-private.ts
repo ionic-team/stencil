@@ -1137,7 +1137,7 @@ export interface HostElement extends HTMLElement {
 
   ['s-p']?: Promise<void>[];
 
-  componentOnReady?: () => Promise<this> | undefined;
+  componentOnReady?: () => Promise<this>;
 }
 
 export interface HydrateResults {
