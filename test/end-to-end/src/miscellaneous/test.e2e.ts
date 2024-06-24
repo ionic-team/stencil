@@ -36,8 +36,10 @@ describe('sorts hydrated component styles', () => {
       .replace(/\}/g, '}\n')
       .trim()
       .split('\n')
-      .map((c) => c.slice(0, c.indexOf('{'))
-    ).find((c) => c.includes('app-root'))
-    expect(classSelector).toBe('another-car-detail,another-car-list,app-root,build-data,car-detail,car-list,cmp-a,cmp-b,cmp-c,cmp-dsd,cmp-server-vs-client,dom-api,dom-interaction,dom-visible,element-cmp,empty-cmp,empty-cmp-shadow,env-data,event-cmp,import-assets,listen-cmp,method-cmp,path-alias-cmp,prerender-cmp,prop-cmp,slot-cmp,slot-cmp-container,slot-parent-cmp,state-cmp');
+      .map((c) => c.slice(0, c.indexOf('{')))
+      .find((c) => c.includes('app-root'));
+    expect(classSelector).toBe(
+      'another-car-detail,another-car-list,app-root,build-data,car-detail,car-list,cmp-a,cmp-b,cmp-c,cmp-dsd,cmp-server-vs-client,dom-api,dom-interaction,dom-visible,element-cmp,empty-cmp,empty-cmp-shadow,env-data,event-cmp,import-assets,listen-cmp,method-cmp,path-alias-cmp,prerender-cmp,prop-cmp,slot-cmp,slot-cmp-container,slot-parent-cmp,state-cmp',
+    );
   });
-})
+});
