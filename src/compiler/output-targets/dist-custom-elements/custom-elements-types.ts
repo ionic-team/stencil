@@ -186,7 +186,7 @@ const generateCustomElementsTypesOutput = async (
  * @returns the contents of the type declaration file for the provided `cmp`
  */
 const generateCustomElementType = (componentsDtsRelPath: string, cmp: d.ComponentCompilerMeta): string => {
-  const stencilPublicRuntime = join(dirname(componentsDtsRelPath), 'stencil-public-runtime.d.ts')
+  const stencilPublicRuntime = join(dirname(componentsDtsRelPath), 'stencil-public-runtime.d.ts');
   const tagNameAsPascal = dashToPascalCase(cmp.tagName);
   const o: string[] = [
     `import type { Components, JSX } from "${componentsDtsRelPath}";`,
