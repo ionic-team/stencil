@@ -234,7 +234,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
 
     // Add hydration styles
     if (BUILD.invisiblePrehydration && (BUILD.hydratedClass || BUILD.hydratedAttribute)) {
-      dataStyles.textContent += cmpTags + HYDRATED_CSS;
+      dataStyles.textContent += cmpTags.sort() + HYDRATED_CSS;
     }
 
     // If we have styles, add them to the DOM
