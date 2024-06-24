@@ -107,7 +107,6 @@ export const BUILD: BuildConditionals = {
   initializeNextTick: false,
   asyncLoading: false,
   asyncQueue: false,
-  transformTagName: false,
   attachStyles: true,
   // TODO(STENCIL-914): remove this option when `experimentalSlotFixes` is the default behavior
   experimentalSlotFixes: false,

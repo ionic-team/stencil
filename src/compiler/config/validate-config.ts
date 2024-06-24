@@ -147,7 +147,6 @@ export const validateConfig = (
   validatedConfig.extras.lifecycleDOMEvents = !!validatedConfig.extras.lifecycleDOMEvents;
   validatedConfig.extras.scriptDataOpts = !!validatedConfig.extras.scriptDataOpts;
   validatedConfig.extras.initializeNextTick = !!validatedConfig.extras.initializeNextTick;
-  validatedConfig.extras.tagNameTransform = !!validatedConfig.extras.tagNameTransform;
 
   // TODO(STENCIL-914): remove when `experimentalSlotFixes` is the default behavior
   // If the user set `experimentalSlotFixes` and any individual slot fix flags to `false`, we need to log a warning

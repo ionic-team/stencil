@@ -348,12 +348,6 @@ interface ConfigExtrasBase {
    */
   initializeNextTick?: boolean;
 
-  /**
-   * Enables the tagNameTransform option of `defineCustomElements()`, so the component tagName
-   * can be customized at runtime. Defaults to `false`.
-   */
-  tagNameTransform?: boolean;
-
   // TODO(STENCIL-1086): remove this option when it's the default behavior
   /**
    * Experimental flag.

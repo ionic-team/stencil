@@ -187,7 +187,6 @@ export interface BuildConditionals extends Partial<BuildFeatures> {
   // TODO(STENCIL-854): Remove code related to legacy shadowDomShim field
   shadowDomShim?: boolean;
   asyncQueue?: boolean;
-  transformTagName?: boolean;
   attachStyles?: boolean;
 
   // TODO(STENCIL-914): remove this option when `experimentalSlotFixes` is the default behavior

@@ -186,9 +186,11 @@ const generateCustomElementsTypesOutput = async (
  * @returns the contents of the type declaration file for the provided `cmp`
  */
 const generateCustomElementType = (componentsDtsRelPath: string, cmp: d.ComponentCompilerMeta): string => {
+  const stencilPublicRuntime = join(dirname(componentsDtsRelPath), 'stencil-public-runtime.d.ts')
   const tagNameAsPascal = dashToPascalCase(cmp.tagName);
   const o: string[] = [
     `import type { Components, JSX } from "${componentsDtsRelPath}";`,
+    `import type { CustomElementsDefineOptions } from "${stencilPublicRuntime}";`,
     ``,
     `interface ${tagNameAsPascal} extends Components.${tagNameAsPascal}, HTMLElement {}`,
     `export const ${tagNameAsPascal}: {`,
@@ -198,7 +200,7 @@ const generateCustomElementType = (componentsDtsRelPath: string, cmp: d.Componen
     `/**`,
     ` * Used to define this component and all nested components recursively.`,
     ` */`,
-    `export const defineCustomElement: () => void;`,
+    `export const defineCustomElement: (options?: CustomElementsDefineOptions) => void;`,
     ``,
   ];
 
