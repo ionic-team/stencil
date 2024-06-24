@@ -90,7 +90,7 @@ export interface CustomElementsDefineOptions {
   exclude?: string[];
   resourcesUrl?: string;
   syncQueue?: boolean;
-  ${config.extras.tagNameTransform ? '\n  transformTagName?: (tagName: string) => string;' : ''}
+  ${config.extras.tagNameTransform ? 'transformTagName?: (tagName: string) => string;' : ''}
   jmp?: (c: Function) => any;
   raf?: (c: FrameRequestCallback) => number;
   ael?: (el: EventTarget, eventName: string, listener: EventListenerOrEventListenerObject, options: boolean | AddEventListenerOptions) => void;
