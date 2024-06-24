@@ -1,77 +1,49 @@
-import { BuildOptions } from './utils/options';
-import { cli } from './bundles/cli';
-import { compiler } from './bundles/compiler';
-import { updateDependenciesJson } from './utils/dependencies-json';
-import { createLicense } from './license';
-import { devServer } from './bundles/dev-server';
-import { emptyDir } from 'fs-extra';
-import { internal } from './bundles/internal';
-import { mockDoc } from './bundles/mock-doc';
+import { buildCli } from './esbuild/cli';
+import { buildCompiler } from './esbuild/compiler';
+import { buildDevServer } from './esbuild/dev-server';
+import { buildInternal } from './esbuild/internal';
+import { buildMockDoc } from './esbuild/mock-doc';
+import { buildScreenshot } from './esbuild/screenshot';
+import { buildSysNode } from './esbuild/sys-node';
+import { buildTesting } from './esbuild/testing';
 import { release } from './release';
-import { screenshot } from './bundles/screenshot';
-import { sysDeno } from './bundles/sys-deno';
-import { sysNode, sysNodeExternalBundles } from './bundles/sys-node';
-import { testing } from './bundles/testing';
 import { validateBuild } from './test/validate-build';
-import { rollup } from 'rollup';
+import { BuildOptions, getOptions } from './utils/options';
 
-export async function run(rootDir: string, args: string[]) {
+// the main entry point for the build
+export async function run(rootDir: string, args: ReadonlyArray<string>) {
+  const opts = getOptions(process.cwd(), {
+    isProd: args.includes('--prod'),
+    isCI: args.includes('--ci'),
+    isWatch: args.includes('--watch'),
+  });
+
   try {
     if (args.includes('--release')) {
       await release(rootDir, args);
-    }
-
-    if (args.includes('--license')) {
-      createLicense(rootDir);
+      return;
     }
 
     if (args.includes('--validate-build')) {
       await validateBuild(rootDir);
+      return;
     }
+    await buildAll(opts);
   } catch (e) {
     console.error(e);
     process.exit(1);
   }
 }
 
-export async function createBuild(opts: BuildOptions) {
+export async function buildAll(opts: BuildOptions) {
   await Promise.all([
-    emptyDir(opts.output.cliDir),
-    emptyDir(opts.output.compilerDir),
-    emptyDir(opts.output.devServerDir),
-    emptyDir(opts.output.internalDir),
-    emptyDir(opts.output.mockDocDir),
-    emptyDir(opts.output.sysDenoDir),
-    emptyDir(opts.output.sysNodeDir),
-    emptyDir(opts.output.testingDir),
-    updateDependenciesJson(opts),
+    buildCli(opts),
+    buildCompiler(opts),
+    buildDevServer(opts),
+    buildMockDoc(opts),
+    buildScreenshot(opts),
+    buildSysNode(opts),
+    buildTesting(opts),
+    buildInternal(opts),
   ]);
-
-  await sysNodeExternalBundles(opts);
-
-  const bundles = await Promise.all([cli(opts), compiler(opts), devServer(opts), internal(opts), mockDoc(opts), screenshot(opts), testing(opts), sysDeno(opts), sysNode(opts)]);
-
-  return bundles.flat();
-}
-
-export async function bundleBuild(opts: BuildOptions) {
-  const bundles = await createBuild(opts);
-
-  await Promise.all(
-    bundles.map(async rollupOption => {
-      rollupOption.onwarn = () => {};
-
-      const bundle = await rollup(rollupOption);
-
-      if (Array.isArray(rollupOption.output)) {
-        await Promise.all(
-          rollupOption.output.map(async output => {
-            await bundle.write(output);
-          }),
-        );
-      } else {
-        await bundle.write(rollupOption.output);
-      }
-    }),
-  );
 }

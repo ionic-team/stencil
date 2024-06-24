@@ -29,7 +29,7 @@ function toDataAttribute(str: string) {
   return (
     'data-' +
     String(str)
-      .replace(/([A-Z0-9])/g, g => ' ' + g[0])
+      .replace(/([A-Z0-9])/g, (g) => ' ' + g[0])
       .trim()
       .replace(/ /g, '-')
       .toLowerCase()
@@ -37,7 +37,7 @@ function toDataAttribute(str: string) {
 }
 
 function dashToPascalCase(str: string) {
-  str = String(str).substr(5);
+  str = String(str).slice(5);
   return str
     .split('-')
     .map((segment, index) => {

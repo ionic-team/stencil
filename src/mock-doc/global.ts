@@ -1,3 +1,4 @@
+import { MockDocumentFragment } from './document-fragment';
 import {
   MockAnchorElement,
   MockBaseElement,
@@ -12,9 +13,11 @@ import {
   MockStyleElement,
   MockTemplateElement,
   MockTitleElement,
+  MockUListElement,
 } from './element';
-import { MockCustomEvent, MockEvent, MockKeyboardEvent, MockMouseEvent } from './event';
+import { MockCustomEvent, MockEvent, MockFocusEvent, MockKeyboardEvent, MockMouseEvent } from './event';
 import { MockHeaders } from './headers';
+import { MockDOMParser } from './parser';
 import { MockRequest, MockResponse } from './request-response';
 import { MockWindow } from './window';
 
@@ -22,13 +25,13 @@ export function setupGlobal(gbl: any) {
   if (gbl.window == null) {
     const win: any = (gbl.window = new MockWindow());
 
-    WINDOW_FUNCTIONS.forEach(fnName => {
+    WINDOW_FUNCTIONS.forEach((fnName) => {
       if (!(fnName in gbl)) {
         gbl[fnName] = win[fnName].bind(win);
       }
     });
 
-    WINDOW_PROPS.forEach(propName => {
+    WINDOW_PROPS.forEach((propName) => {
       if (!(propName in gbl)) {
         Object.defineProperty(gbl, propName, {
           get() {
@@ -61,13 +64,13 @@ export function teardownGlobal(gbl: any) {
 export function patchWindow(winToBePatched: any) {
   const mockWin: any = new MockWindow(false);
 
-  WINDOW_FUNCTIONS.forEach(fnName => {
+  WINDOW_FUNCTIONS.forEach((fnName) => {
     if (typeof winToBePatched[fnName] !== 'function') {
       winToBePatched[fnName] = mockWin[fnName].bind(mockWin);
     }
   });
 
-  WINDOW_PROPS.forEach(propName => {
+  WINDOW_PROPS.forEach((propName) => {
     if (winToBePatched === undefined) {
       Object.defineProperty(winToBePatched, propName, {
         get() {
@@ -147,18 +150,23 @@ const WINDOW_PROPS = [
   'HTMLElement',
   'Node',
   'NodeList',
+  'FocusEvent',
   'KeyboardEvent',
   'MouseEvent',
 ];
 
 const GLOBAL_CONSTRUCTORS: [string, any][] = [
   ['CustomEvent', MockCustomEvent],
+  ['DocumentFragment', MockDocumentFragment],
+  ['DOMParser', MockDOMParser],
   ['Event', MockEvent],
+  ['FocusEvent', MockFocusEvent],
   ['Headers', MockHeaders],
   ['KeyboardEvent', MockKeyboardEvent],
   ['MouseEvent', MockMouseEvent],
   ['Request', MockRequest],
   ['Response', MockResponse],
+  ['ShadowRoot', MockDocumentFragment],
 
   ['HTMLAnchorElement', MockAnchorElement],
   ['HTMLBaseElement', MockBaseElement],
@@ -173,4 +181,5 @@ const GLOBAL_CONSTRUCTORS: [string, any][] = [
   ['HTMLStyleElement', MockStyleElement],
   ['HTMLTemplateElement', MockTemplateElement],
   ['HTMLTitleElement', MockTitleElement],
+  ['HTMLUListElement', MockUListElement],
 ];

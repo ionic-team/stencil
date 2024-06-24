@@ -1,9 +1,10 @@
-import type * as d from '../declarations';
-import type { ServerResponse } from 'http';
-import { responseHeaders, getSsrStaticDataPath } from './dev-server-utils';
-import { appendDevServerClientScript } from './serve-file';
 import { catchError, isFunction, isString } from '@utils';
+import type { ServerResponse } from 'http';
 import path from 'path';
+
+import type * as d from '../declarations';
+import { getSsrStaticDataPath, responseHeaders } from './dev-server-utils';
+import { appendDevServerClientScript } from './serve-file';
 
 export async function ssrPageRequest(
   devServerConfig: d.DevServerConfig,
@@ -17,7 +18,7 @@ export async function ssrPageRequest(
 
     const { hydrateApp, srcIndexHtml, diagnostics } = await setupHydrateApp(devServerConfig, serverCtx);
 
-    if (!diagnostics.some(diagnostic => diagnostic.level === 'error')) {
+    if (!diagnostics.some((diagnostic) => diagnostic.level === 'error')) {
       try {
         const opts = getSsrHydrateOptions(devServerConfig, serverCtx, req.url);
 
@@ -26,12 +27,12 @@ export async function ssrPageRequest(
         diagnostics.push(...ssrResults.diagnostics);
         status = ssrResults.httpStatus;
         content = ssrResults.html;
-      } catch (e) {
+      } catch (e: any) {
         catchError(diagnostics, e);
       }
     }
 
-    if (diagnostics.some(diagnostic => diagnostic.level === 'error')) {
+    if (diagnostics.some((diagnostic) => diagnostic.level === 'error')) {
       content = getSsrErrorContent(diagnostics);
       status = 500;
     }
@@ -68,7 +69,7 @@ export async function ssrStaticDataRequest(
 
     const { hydrateApp, srcIndexHtml, diagnostics } = await setupHydrateApp(devServerConfig, serverCtx);
 
-    if (!diagnostics.some(diagnostic => diagnostic.level === 'error')) {
+    if (!diagnostics.some((diagnostic) => diagnostic.level === 'error')) {
       try {
         const { ssrPath, hasQueryString } = getSsrStaticDataPath(req);
         const url = new URL(ssrPath, req.url);
@@ -79,16 +80,16 @@ export async function ssrStaticDataRequest(
 
         diagnostics.push(...ssrResults.diagnostics);
 
-        ssrResults.staticData.forEach(s => {
+        ssrResults.staticData.forEach((s) => {
           if (s.type === 'application/json') {
             data[s.id] = JSON.parse(s.content);
           } else {
             data[s.id] = s.content;
           }
         });
-        data.components = ssrResults.components.map(c => c.tag).sort();
+        data.components = ssrResults.components.map((c) => c.tag).sort();
         httpCache = hasQueryString;
-      } catch (e) {
+      } catch (e: any) {
         catchError(diagnostics, e);
       }
     }
@@ -97,7 +98,7 @@ export async function ssrStaticDataRequest(
       data.diagnostics = diagnostics;
     }
 
-    const status = diagnostics.some(diagnostic => diagnostic.level === 'error') ? 500 : 200;
+    const status = diagnostics.some((diagnostic) => diagnostic.level === 'error') ? 500 : 200;
     const content = JSON.stringify(data);
     serverCtx.logRequest(req, status);
 
@@ -136,22 +137,23 @@ async function setupHydrateApp(devServerConfig: d.DevServerConfig, serverCtx: d.
   }
 
   if (!isString(buildResults.hydrateAppFilePath)) {
-    diagnostics.push({ messageText: `Missing hydrateAppFilePath`, level: `error`, type: `ssr` });
+    diagnostics.push({ messageText: `Missing hydrateAppFilePath`, level: `error`, type: `ssr`, lines: [] });
   } else if (!isString(devServerConfig.srcIndexHtml)) {
-    diagnostics.push({ messageText: `Missing srcIndexHtml`, level: `error`, type: `ssr` });
+    diagnostics.push({ messageText: `Missing srcIndexHtml`, level: `error`, type: `ssr`, lines: [] });
   } else {
     srcIndexHtml = await serverCtx.sys.readFile(devServerConfig.srcIndexHtml);
     if (!isString(srcIndexHtml)) {
       diagnostics.push({
-        messageText: `Unable to load src index html: ${devServerConfig.srcIndexHtml}`,
         level: `error`,
+        lines: [],
+        messageText: `Unable to load src index html: ${devServerConfig.srcIndexHtml}`,
         type: `ssr`,
       });
     } else {
       // ensure we cleared out node's internal require() cache for this file
       const hydrateAppFilePath = path.resolve(buildResults.hydrateAppFilePath);
 
-      // brute force way of clearning node's module cache
+      // brute force way of clearing node's module cache
       // not using `delete require.cache[id]` since it'll cause memory leaks
       require.cache = {};
       const Module = require('module');
@@ -226,7 +228,7 @@ function getSsrErrorContent(diagnostics: d.Diagnostic[]) {
 <body>
   <h1>SSR Dev Error</h1>
   ${diagnostics.map(
-    diagnostic => `
+    (diagnostic) => `
   <p>
     ${diagnostic.messageText}
   </p>

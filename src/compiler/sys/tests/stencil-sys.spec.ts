@@ -70,7 +70,7 @@ describe('stencil system', () => {
     expect(newStat.isFile).toBe(true);
 
     const content = await sys.readFile('/dir/file-new');
-    expect('content').toBe('content');
+    expect(content).toBe('content');
   });
 
   it('rename directory', async () => {
@@ -135,6 +135,11 @@ describe('stencil system', () => {
     expect(newABCStat.isDirectory).toBe(true);
   });
 
+  it('get home directory', async () => {
+    const homedir = sys.homeDir();
+    expect(typeof homedir).toBe('string');
+  });
+
   it('rename directory, with files/subfolders', async () => {
     await sys.createDir('/x/y/z', { recursive: true });
     await sys.createDir('/x/y/y1-dir', { recursive: true });
@@ -186,9 +191,29 @@ describe('stencil system', () => {
 
     expect(results.error).toBe(null);
     expect(results.oldDirs).toEqual(['/x/y/y1-dir', '/x/y/y2-dir', '/x/y/z', '/x/y', '/x']);
-    expect(results.oldFiles).toEqual(['/x/x1-file', '/x/x2-file', '/x/y/y1-dir/y1-file', '/x/y/y2-dir/y2-file', '/x/y/z/z1-file']);
-    expect(results.newDirs).toEqual(['/a', '/a/b', '/a/b/c', '/a/b/c/y', '/a/b/c/y/y1-dir', '/a/b/c/y/y2-dir', '/a/b/c/y/z']);
-    expect(results.newFiles).toEqual(['/a/b/c/x1-file', '/a/b/c/x2-file', '/a/b/c/y/y1-dir/y1-file', '/a/b/c/y/y2-dir/y2-file', '/a/b/c/y/z/z1-file']);
+    expect(results.oldFiles).toEqual([
+      '/x/x1-file',
+      '/x/x2-file',
+      '/x/y/y1-dir/y1-file',
+      '/x/y/y2-dir/y2-file',
+      '/x/y/z/z1-file',
+    ]);
+    expect(results.newDirs).toEqual([
+      '/a',
+      '/a/b',
+      '/a/b/c',
+      '/a/b/c/y',
+      '/a/b/c/y/y1-dir',
+      '/a/b/c/y/y2-dir',
+      '/a/b/c/y/z',
+    ]);
+    expect(results.newFiles).toEqual([
+      '/a/b/c/x1-file',
+      '/a/b/c/x2-file',
+      '/a/b/c/y/y1-dir/y1-file',
+      '/a/b/c/y/y2-dir/y2-file',
+      '/a/b/c/y/z/z1-file',
+    ]);
 
     expect(results.renamed).toEqual([
       {

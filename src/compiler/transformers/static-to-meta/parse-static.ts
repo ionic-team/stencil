@@ -1,15 +1,16 @@
-import type * as d from '../../../declarations';
-import { createModule, getModule } from '../../transpile/transpiled-module';
-import { dirname, basename, join } from 'path';
-import { normalizePath } from '@utils';
-import { parseCallExpression } from './call-expression';
-import { parseModuleImport } from './import';
-import { parseStaticComponentMeta } from './component';
-import { parseStringLiteral } from './string-literal';
+import { join, normalizePath } from '@utils';
+import { basename, dirname } from 'path';
 import ts from 'typescript';
 
+import type * as d from '../../../declarations';
+import { createModule, getModule } from '../../transpile/transpiled-module';
+import { parseCallExpression } from './call-expression';
+import { parseStaticComponentMeta } from './component';
+import { parseModuleImport } from './import';
+import { parseStringLiteral } from './string-literal';
+
 export const updateModule = (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   tsSourceFile: ts.SourceFile,
@@ -17,7 +18,7 @@ export const updateModule = (
   emitFilePath: string,
   typeChecker: ts.TypeChecker,
   collection: d.CollectionCompilerMeta,
-) => {
+): d.Module => {
   const sourceFilePath = normalizePath(tsSourceFile.fileName);
   const prevModuleFile = getModule(compilerCtx, sourceFilePath);
 
@@ -30,13 +31,21 @@ export const updateModule = (
   emitFilePath = normalizePath(join(srcDirPath, emitFileName));
 
   const moduleFile = createModule(tsSourceFile, sourceFileText, emitFilePath);
+
+  if (emitFilePath.endsWith('.js.map')) {
+    moduleFile.sourceMapPath = emitFilePath;
+    moduleFile.sourceMapFileText = sourceFileText;
+  } else if (prevModuleFile && prevModuleFile.sourceMapPath) {
+    moduleFile.sourceMapPath = prevModuleFile.sourceMapPath;
+    moduleFile.sourceMapFileText = prevModuleFile.sourceMapFileText;
+  }
   const moduleFileKey = normalizePath(moduleFile.sourceFilePath);
   compilerCtx.moduleMap.set(moduleFileKey, moduleFile);
   compilerCtx.changedModules.add(moduleFile.sourceFilePath);
 
   const visitNode = (node: ts.Node) => {
     if (ts.isClassDeclaration(node)) {
-      parseStaticComponentMeta(compilerCtx, typeChecker, node, moduleFile, compilerCtx.nodeMap);
+      parseStaticComponentMeta(compilerCtx, typeChecker, node, moduleFile);
       return;
     } else if (ts.isImportDeclaration(node)) {
       parseModuleImport(config, compilerCtx, buildCtx, moduleFile, srcDirPath, node, true);
@@ -59,7 +68,13 @@ export const updateModule = (
   // TODO: workaround around const enums
   // find better way
   if (moduleFile.cmps.length > 0) {
-    moduleFile.staticSourceFile = ts.createSourceFile(sourceFilePath, sourceFileText, tsSourceFile.languageVersion, true, ts.ScriptKind.JS);
+    moduleFile.staticSourceFile = ts.createSourceFile(
+      sourceFilePath,
+      sourceFileText,
+      tsSourceFile.languageVersion,
+      true,
+      ts.ScriptKind.JS,
+    );
   }
   return moduleFile;
 };

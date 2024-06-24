@@ -1,11 +1,12 @@
 import type * as d from '@stencil/core/internal';
-import { fileExists, readFile, writeFile } from './screenshot-fs';
-import { join, relative } from 'path';
 import { normalizePath } from '@utils';
+import { join, relative } from 'path';
+
 import { ScreenshotConnector } from './connector-base';
+import { fileExists, readFile, writeFile } from './screenshot-fs';
 
 export class ScreenshotLocalConnector extends ScreenshotConnector {
-  async publishBuild(results: d.ScreenshotBuildResults) {
+  override async publishBuild(results: d.ScreenshotBuildResults) {
     if (this.updateMaster || !results.masterBuild) {
       results.masterBuild = {
         id: 'master',
@@ -16,8 +17,8 @@ export class ScreenshotLocalConnector extends ScreenshotConnector {
       };
     }
 
-    results.currentBuild.screenshots.forEach(currentScreenshot => {
-      const masterHasScreenshot = results.masterBuild.screenshots.some(masterScreenshot => {
+    results.currentBuild.screenshots.forEach((currentScreenshot) => {
+      const masterHasScreenshot = results.masterBuild.screenshots.some((masterScreenshot) => {
         return currentScreenshot.id === masterScreenshot.id;
       });
 
@@ -37,7 +38,14 @@ export class ScreenshotLocalConnector extends ScreenshotConnector {
     const imagesUrl = normalizePath(relative(this.screenshotDir, this.imagesDir));
     const jsonpUrl = normalizePath(relative(this.screenshotDir, this.cacheDir));
 
-    const compareAppHtml = createLocalCompareApp(this.appNamespace, appSrcUrl, imagesUrl, jsonpUrl, results.masterBuild, results.currentBuild);
+    const compareAppHtml = createLocalCompareApp(
+      this.appNamespace,
+      appSrcUrl,
+      imagesUrl,
+      jsonpUrl,
+      results.masterBuild,
+      results.currentBuild,
+    );
 
     const compareAppFileName = 'compare.html';
     const compareAppFilePath = join(this.screenshotDir, compareAppFileName);
@@ -57,7 +65,7 @@ export class ScreenshotLocalConnector extends ScreenshotConnector {
     return results;
   }
 
-  async getScreenshotCache() {
+  override async getScreenshotCache() {
     let screenshotCache: d.ScreenshotCache = null;
 
     try {
@@ -67,7 +75,7 @@ export class ScreenshotLocalConnector extends ScreenshotConnector {
     return screenshotCache;
   }
 
-  async updateScreenshotCache(cache: d.ScreenshotCache, buildResults: d.ScreenshotBuildResults) {
+  override async updateScreenshotCache(cache: d.ScreenshotCache, buildResults: d.ScreenshotBuildResults) {
     cache = await super.updateScreenshotCache(cache, buildResults);
 
     await writeFile(this.screenshotCacheFilePath, JSON.stringify(cache, null, 2));
@@ -76,7 +84,14 @@ export class ScreenshotLocalConnector extends ScreenshotConnector {
   }
 }
 
-function createLocalCompareApp(namespace: string, appSrcUrl: string, imagesUrl: string, jsonpUrl: string, a: d.ScreenshotBuild, b: d.ScreenshotBuild) {
+function createLocalCompareApp(
+  namespace: string,
+  appSrcUrl: string,
+  imagesUrl: string,
+  jsonpUrl: string,
+  a: d.ScreenshotBuild,
+  b: d.ScreenshotBuild,
+) {
   return `<!doctype html>
 <html dir="ltr" lang="en">
 <head>
@@ -86,7 +101,7 @@ function createLocalCompareApp(namespace: string, appSrcUrl: string, imagesUrl: 
   <meta http-equiv="x-ua-compatible" content="IE=Edge">
   <link href="${appSrcUrl}/build/app.css" rel="stylesheet">
   <script type="module" src="${appSrcUrl}/build/app.esm.js"></script>
-  <script nomodule src="${appSrcUrl}/build/app.js"></script>  
+  <script nomodule src="${appSrcUrl}/build/app.js"></script>
   <link rel="icon" type="image/x-icon" href="${appSrcUrl}/assets/favicon.ico">
 </head>
 <body>

@@ -1,8 +1,8 @@
-import { Component, Listen, State, h } from '@stencil/core';
+import { Component, h, Listen, State } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
 describe('vdom-relocation', () => {
-  it('', async () => {
+  it('vdom-relocation', async () => {
     @Component({
       tag: 'my-root',
     })
@@ -16,7 +16,7 @@ describe('vdom-relocation', () => {
       render() {
         return (
           <my-child>
-            {this.data.map(a => (
+            {this.data.map((a) => (
               <div>{a}</div>
             ))}
           </my-child>

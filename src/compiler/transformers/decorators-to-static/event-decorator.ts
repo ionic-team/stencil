@@ -1,22 +1,55 @@
-import type * as d from '../../../declarations';
 import { augmentDiagnosticWithNode, buildWarn } from '@utils';
-import { convertValueToLiteral, createStaticGetter, getAttributeTypeInfo, resolveType, serializeSymbol, validateReferences } from '../transform-utils';
-import { getDeclarationParameters, isDecoratorNamed } from './decorator-utils';
 import ts from 'typescript';
 
-export const eventDecoratorsToStatic = (diagnostics: d.Diagnostic[], decoratedProps: ts.ClassElement[], typeChecker: ts.TypeChecker, newMembers: ts.ClassElement[]) => {
+import type * as d from '../../../declarations';
+import {
+  convertValueToLiteral,
+  createStaticGetter,
+  getAttributeTypeInfo,
+  resolveType,
+  retrieveTsDecorators,
+  serializeSymbol,
+} from '../transform-utils';
+import { getDecoratorParameters, isDecoratorNamed } from './decorator-utils';
+
+export const eventDecoratorsToStatic = (
+  diagnostics: d.Diagnostic[],
+  decoratedProps: ts.ClassElement[],
+  typeChecker: ts.TypeChecker,
+  program: ts.Program,
+  newMembers: ts.ClassElement[],
+  decoratorName: string,
+) => {
   const events = decoratedProps
     .filter(ts.isPropertyDeclaration)
-    .map(prop => parseEventDecorator(diagnostics, typeChecker, prop))
-    .filter(ev => !!ev);
+    .map((prop) => parseEventDecorator(diagnostics, typeChecker, program, prop, decoratorName))
+    .filter((ev) => !!ev);
 
   if (events.length > 0) {
     newMembers.push(createStaticGetter('events', convertValueToLiteral(events)));
   }
 };
 
-const parseEventDecorator = (diagnostics: d.Diagnostic[], typeChecker: ts.TypeChecker, prop: ts.PropertyDeclaration): d.ComponentCompilerStaticEvent => {
-  const eventDecorator = prop.decorators.find(isDecoratorNamed('Event'));
+/**
+ * Parse a single instance of Stencil's `@Event()` decorator and generate metadata for the class member that is
+ * decorated
+ * @param diagnostics a list of diagnostics used as a part of the parsing process. Any parse errors/warnings shall be
+ * added to this collection
+ * @param typeChecker an instance of the TypeScript type checker, used to generate information about the `@Event()` and
+ * @param program a {@link ts.Program} object
+ * its surrounding context in the AST
+ * @param prop the property on the Stencil component class that is decorated with `@Event()`
+ * @param decoratorName the name of the decorator to look for
+ * @returns generated metadata for the class member decorated by `@Event()`, or `null` if none could be derived
+ */
+const parseEventDecorator = (
+  diagnostics: d.Diagnostic[],
+  typeChecker: ts.TypeChecker,
+  program: ts.Program,
+  prop: ts.PropertyDeclaration,
+  decoratorName: string,
+): d.ComponentCompilerStaticEvent | null => {
+  const eventDecorator = retrieveTsDecorators(prop)?.find(isDecoratorNamed(decoratorName));
 
   if (eventDecorator == null) {
     return null;
@@ -27,7 +60,7 @@ const parseEventDecorator = (diagnostics: d.Diagnostic[], typeChecker: ts.TypeCh
     return null;
   }
 
-  const [eventOpts] = getDeclarationParameters<d.EventOptions>(eventDecorator);
+  const [eventOpts] = getDecoratorParameters<d.EventOptions>(eventDecorator, typeChecker);
   const symbol = typeChecker.getSymbolAtLocation(prop.name);
   const eventName = getEventName(eventOpts, memberName);
 
@@ -40,9 +73,8 @@ const parseEventDecorator = (diagnostics: d.Diagnostic[], typeChecker: ts.TypeCh
     cancelable: eventOpts && typeof eventOpts.cancelable === 'boolean' ? eventOpts.cancelable : true,
     composed: eventOpts && typeof eventOpts.composed === 'boolean' ? eventOpts.composed : true,
     docs: serializeSymbol(typeChecker, symbol),
-    complexType: getComplexType(typeChecker, prop),
+    complexType: getComplexType(typeChecker, program, prop),
   };
-  validateReferences(diagnostics, eventMeta.complexType.references, prop.type);
   return eventMeta;
 };
 
@@ -54,24 +86,57 @@ export const getEventName = (eventOptions: d.EventOptions, memberName: string) =
   return memberName;
 };
 
-const getComplexType = (typeChecker: ts.TypeChecker, node: ts.PropertyDeclaration): d.ComponentCompilerPropertyComplexType => {
+/**
+ * Derive Stencil's class member type metadata from a node in the AST
+ * @param typeChecker the TypeScript type checker
+ * @param program a {@link ts.Program} object
+ * @param node the node in the AST to generate metadata for
+ * @returns the generated metadata
+ */
+const getComplexType = (
+  typeChecker: ts.TypeChecker,
+  program: ts.Program,
+  node: ts.PropertyDeclaration,
+): d.ComponentCompilerPropertyComplexType => {
   const sourceFile = node.getSourceFile();
   const eventType = node.type ? getEventType(node.type) : null;
   return {
     original: eventType ? eventType.getText() : 'any',
     resolved: eventType ? resolveType(typeChecker, typeChecker.getTypeFromTypeNode(eventType)) : 'any',
-    references: eventType ? getAttributeTypeInfo(eventType, sourceFile) : {},
+    references: eventType ? getAttributeTypeInfo(eventType, sourceFile, typeChecker, program) : {},
   };
 };
 
+/**
+ * Derive the type of the event from the typings of `EventEmitter`
+ * @param type the AST node containing the `EventEmitter` typing
+ * @returns the type taken from `EventEmitter`, or `null` if the type cannot be derived
+ */
 const getEventType = (type: ts.TypeNode): ts.TypeNode | null => {
-  if (ts.isTypeReferenceNode(type) && ts.isIdentifier(type.typeName) && type.typeName.text === 'EventEmitter' && type.typeArguments && type.typeArguments.length > 0) {
+  if (
+    ts.isTypeReferenceNode(type) &&
+    ts.isIdentifier(type.typeName) &&
+    type.typeName.text === 'EventEmitter' &&
+    type.typeArguments &&
+    type.typeArguments.length > 0
+  ) {
     return type.typeArguments[0];
   }
   return null;
 };
 
-const validateEventName = (diagnostics: d.Diagnostic[], node: ts.Node, eventName: string) => {
+/**
+ * Helper function for validating the name of the event
+ *
+ * This function assumes that the name of the event has been determined prior to calling it
+ *
+ * @param diagnostics a list of diagnostics used as a part of the validation process. Any parse errors/warnings shall be
+ * added to this collection
+ * @param node the node in the AT containing the class member decorated with `@Event()`
+ * @param eventName the name of the event
+ */
+const validateEventName = (diagnostics: d.Diagnostic[], node: ts.Node, eventName: string): void => {
+  // this regex checks for a string that begins with a capital letter - e.g. 'AskJeeves', 'Zoo', 'Spotify'
   if (/^[A-Z]/.test(eventName)) {
     const diagnostic = buildWarn(diagnostics);
     diagnostic.messageText = [
@@ -83,6 +148,7 @@ const validateEventName = (diagnostics: d.Diagnostic[], node: ts.Node, eventName
     return;
   }
 
+  // this regex checks for a string that begins 'on', followed by a capital letter - e.g. 'onAbout', 'onZing', 'onBlur'
   if (/^on[A-Z]/.test(eventName)) {
     const warn = buildWarn(diagnostics);
     const suggestedEventName = eventName[2].toLowerCase() + eventName.slice(3);
@@ -360,5 +426,5 @@ const DOM_EVENT_NAMES: Set<string> = new Set(
     'vrdisplaypresentchange',
     'waiting',
     'wheel',
-  ].map(e => e.toLowerCase()),
+  ].map((e) => e.toLowerCase()),
 );

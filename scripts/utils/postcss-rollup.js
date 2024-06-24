@@ -1,5 +1,5 @@
-import path from 'path';
 import fs from 'fs-extra';
+import path from 'path';
 
 const input = require.resolve('postcss');
 const output = path.join(__dirname, '..', 'bundles', 'helpers', 'postcss.js');
@@ -21,7 +21,7 @@ export default {
             return path.join(dir, importee + '.es6');
           }
         }
-      }
-    }
-  ]
+      },
+    },
+  ],
 };

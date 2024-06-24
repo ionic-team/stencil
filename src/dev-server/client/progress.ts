@@ -79,7 +79,7 @@ export const initBuildProgress = (data: { window: Window }) => {
 
   reset();
 
-  onBuildLog(win, buildLog => {
+  onBuildLog(win, (buildLog) => {
     currentProgress = buildLog.progress;
 
     if (currentProgress >= 0 && currentProgress < 1) {
@@ -89,7 +89,7 @@ export const initBuildProgress = (data: { window: Window }) => {
     }
   });
 
-  onBuildResults(win, buildResults => {
+  onBuildResults(win, (buildResults) => {
     if (buildResults.hasError) {
       const progressBar = getProgressBar();
       if (progressBar) {
@@ -100,7 +100,7 @@ export const initBuildProgress = (data: { window: Window }) => {
     reset();
   });
 
-  onBuildStatus(win, buildStatus => {
+  onBuildStatus(win, (buildStatus) => {
     if (buildStatus === 'disabled') {
       reset();
     }

@@ -1,10 +1,16 @@
-import type * as d from '../../declarations';
-import { buildWarn } from '../message-utils';
-import { isString, toTitleCase } from '../helpers';
-import { splitLineBreaks } from './logger-utils';
 import type { RollupError } from 'rollup';
 
-export const loadRollupDiagnostics = (config: d.Config, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx, rollupError: RollupError) => {
+import type * as d from '../../declarations';
+import { isString, toTitleCase } from '../helpers';
+import { buildWarn } from '../message-utils';
+import { splitLineBreaks } from './logger-utils';
+
+export const loadRollupDiagnostics = (
+  config: d.ValidatedConfig,
+  compilerCtx: d.CompilerCtx,
+  buildCtx: d.BuildCtx,
+  rollupError: RollupError,
+) => {
   const formattedCode = formatErrorCode(rollupError.code);
 
   const diagnostic: d.Diagnostic = {
@@ -14,8 +20,8 @@ export const loadRollupDiagnostics = (config: d.Config, compilerCtx: d.CompilerC
     code: rollupError.code,
     header: `Rollup${formattedCode.length > 0 ? ': ' + formattedCode : ''}`,
     messageText: formattedCode,
-    relFilePath: null,
-    absFilePath: null,
+    relFilePath: undefined,
+    absFilePath: undefined,
     lines: [],
   };
 
@@ -41,18 +47,18 @@ export const loadRollupDiagnostics = (config: d.Config, compilerCtx: d.CompilerC
           try {
             const srcLines = splitLineBreaks(sourceText);
 
-            const errorLine: d.PrintLine = {
+            const errorLine = {
               lineIndex: loc.line - 1,
               lineNumber: loc.line,
               text: srcLines[loc.line - 1],
               errorCharStart: loc.column,
               errorLength: 0,
-            };
+            } satisfies d.PrintLine;
 
             diagnostic.lineNumber = errorLine.lineNumber;
             diagnostic.columnNumber = errorLine.errorCharStart;
 
-            const highlightLine = errorLine.text.substr(loc.column);
+            const highlightLine = errorLine.text?.slice(loc.column) ?? '';
             for (let i = 0; i < highlightLine.length; i++) {
               if (charBreak.has(highlightLine.charAt(i))) {
                 break;
@@ -107,12 +113,18 @@ export const loadRollupDiagnostics = (config: d.Config, compilerCtx: d.CompilerC
 export const createOnWarnFn = (diagnostics: d.Diagnostic[], bundleModulesFiles?: d.Module[]) => {
   const previousWarns = new Set<string>();
 
-  return function onWarningMessage(warning: { code: string; importer: string; message: string }) {
-    if (warning == null || ignoreWarnCodes.has(warning.code) || previousWarns.has(warning.message)) {
+  return function onWarningMessage(warning: { code?: string; importer?: string; message?: string }) {
+    if (
+      warning == null ||
+      (warning.code && ignoreWarnCodes.has(warning.code)) ||
+      (warning.message && previousWarns.has(warning.message))
+    ) {
       return;
     }
 
-    previousWarns.add(warning.message);
+    if (warning.message) {
+      previousWarns.add(warning.message);
+    }
 
     let label = '';
     if (bundleModulesFiles) {
@@ -135,7 +147,13 @@ export const createOnWarnFn = (diagnostics: d.Diagnostic[], bundleModulesFiles?:
   };
 };
 
-const ignoreWarnCodes = new Set(['THIS_IS_UNDEFINED', 'NON_EXISTENT_EXPORT', 'CIRCULAR_DEPENDENCY', 'EMPTY_BUNDLE', 'UNUSED_EXTERNAL_IMPORT']);
+const ignoreWarnCodes = new Set([
+  'THIS_IS_UNDEFINED',
+  'NON_EXISTENT_EXPORT',
+  'CIRCULAR_DEPENDENCY',
+  'EMPTY_BUNDLE',
+  'UNUSED_EXTERNAL_IMPORT',
+]);
 
 const charBreak = new Set([' ', '=', '.', ',', '?', ':', ';', '(', ')', '{', '}', '[', ']', '|', `'`, `"`, '`']);
 
@@ -143,7 +161,7 @@ const formatErrorCode = (errorCode: any) => {
   if (typeof errorCode === 'string') {
     return errorCode
       .split('_')
-      .map(c => {
+      .map((c) => {
         return toTitleCase(c.toLowerCase());
       })
       .join(' ');

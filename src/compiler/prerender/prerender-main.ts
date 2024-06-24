@@ -1,19 +1,19 @@
+import { buildError, catchError, hasError, isOutputTargetWww, isString, join } from '@utils';
+import { isAbsolute } from 'path';
+
 import type * as d from '../../declarations';
-import { buildError, catchError, hasError, isString } from '@utils';
 import { createHydrateBuildId } from '../../hydrate/runner/render-utils';
-import { createWorkerContext } from '../worker/worker-thread';
+import { getAbsoluteBuildDir } from '../html/html-utils';
 import { createWorkerMainContext } from '../worker/main-thread';
+import { createWorkerContext } from '../worker/worker-thread';
+import { getPrerenderConfig } from './prerender-config';
+import { getHydrateOptions } from './prerender-hydrate-options';
 import { drainPrerenderQueue, initializePrerenderEntryUrls } from './prerender-queue';
+import { generateTemplateHtml } from './prerender-template-html';
 import { generateRobotsTxt } from './robots-txt';
 import { generateSitemapXml } from './sitemap-xml';
-import { generateTemplateHtml } from './prerender-template-html';
-import { getAbsoluteBuildDir } from '../html/html-utils';
-import { getHydrateOptions } from './prerender-hydrate-options';
-import { getPrerenderConfig } from './prerender-config';
-import { isAbsolute, join } from 'path';
-import { isOutputTargetWww } from '../output-targets/output-utils';
 
-export const createPrerenderer = async (config: d.Config) => {
+export const createPrerenderer = async (config: d.ValidatedConfig) => {
   const start = (opts: d.PrerenderStartOptions) => {
     return runPrerender(config, opts.hydrateAppFilePath, opts.componentGraph, opts.srcIndexHtmlPath, opts.buildId);
   };
@@ -23,7 +23,7 @@ export const createPrerenderer = async (config: d.Config) => {
 };
 
 const runPrerender = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   hydrateAppFilePath: string,
   componentGraph: d.BuildResultsComponentGraph,
   srcIndexHtmlPath: string,
@@ -38,7 +38,7 @@ const runPrerender = async (
     duration: 0,
     average: 0,
   };
-  const outputTargets = config.outputTargets.filter(isOutputTargetWww).filter(o => isString(o.indexHtml));
+  const outputTargets = config.outputTargets.filter(isOutputTargetWww).filter((o) => isString(o.indexHtml));
 
   if (!isString(results.buildId)) {
     results.buildId = createHydrateBuildId();
@@ -70,8 +70,15 @@ const runPrerender = async (
     let workerCtrl: d.WorkerMainController;
 
     if (config.sys.createWorkerController == null || config.maxConcurrentWorkers < 1) {
+      // we don't have a `maxConcurrentWorkers` setting which makes it
+      // necessary to actually use threaded workers, so we create a
+      // single-threaded worker context here
       workerCtx = createWorkerContext(config.sys);
     } else {
+      // we want to stand up the full threaded worker setup, so we first need
+      // to build a worker controller and then we create an appropriate worker
+      // context for it (this will mean that when methods are called on
+      // `workerCtx` they're dispatched to workers in other threads)
       workerCtrl = config.sys.createWorkerController(config.maxConcurrentWorkers);
       workerCtx = createWorkerMainContext(workerCtrl);
     }
@@ -88,7 +95,7 @@ const runPrerender = async (
 
     try {
       await Promise.all(
-        outputTargets.map(outputTarget => {
+        outputTargets.map((outputTarget) => {
           return runPrerenderOutputTarget(
             workerCtx,
             results,
@@ -102,7 +109,7 @@ const runPrerender = async (
           );
         }),
       );
-    } catch (e) {
+    } catch (e: any) {
       catchError(diagnostics, e);
     }
 
@@ -126,7 +133,7 @@ const runPrerenderOutputTarget = async (
   workerCtx: d.CompilerWorkerContext,
   results: d.PrerenderResults,
   diagnostics: d.Diagnostic[],
-  config: d.Config,
+  config: d.ValidatedConfig,
   devServer: d.DevServer,
   hydrateAppFilePath: string,
   componentGraph: d.BuildResultsComponentGraph,
@@ -202,13 +209,13 @@ const runPrerenderOutputTarget = async (
     manager.staticSite = templateData.staticSite;
     manager.componentGraphPath = await createComponentGraphPath(config, componentGraph, outputTarget);
 
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       manager.resolve = resolve;
       config.sys.nextTick(() => drainPrerenderQueue(results, manager));
     });
 
     if (manager.isDebug) {
-      const debugDiagnostics = prerenderDiagnostics.filter(d => d.level === 'debug');
+      const debugDiagnostics = prerenderDiagnostics.filter((d) => d.level === 'debug');
       if (debugDiagnostics.length > 0) {
         config.logger.printDiagnostics(debugDiagnostics);
       }
@@ -219,8 +226,8 @@ const runPrerenderOutputTarget = async (
     const sitemapResults = await generateSitemapXml(manager);
     await generateRobotsTxt(manager, sitemapResults);
 
-    const prerenderBuildErrors = prerenderDiagnostics.filter(d => d.level === 'error');
-    const prerenderRuntimeErrors = prerenderDiagnostics.filter(d => d.type === 'runtime');
+    const prerenderBuildErrors = prerenderDiagnostics.filter((d) => d.level === 'error');
+    const prerenderRuntimeErrors = prerenderDiagnostics.filter((d) => d.type === 'runtime');
 
     if (prerenderBuildErrors.length > 0) {
       // convert to just runtime errors so the other build files still write
@@ -247,12 +254,12 @@ const runPrerenderOutputTarget = async (
     const statusColor = prerenderBuildErrors.length > 0 ? 'red' : 'green';
 
     timeSpan.finish(`prerendering ${statusMessage}`, statusColor, true);
-  } catch (e) {
+  } catch (e: any) {
     catchError(diagnostics, e);
   }
 };
 
-const createPrerenderTemplate = async (config: d.Config, templateHtml: string) => {
+const createPrerenderTemplate = async (config: d.ValidatedConfig, templateHtml: string) => {
   const hash = await config.sys.generateContentHash(templateHtml, 12);
   const templateFileName = `prerender-${hash}.html`;
   const templateId = join(config.sys.tmpDirSync(), templateFileName);
@@ -262,7 +269,7 @@ const createPrerenderTemplate = async (config: d.Config, templateHtml: string) =
 };
 
 const createComponentGraphPath = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   componentGraph: d.BuildResultsComponentGraph,
   outputTarget: d.OutputTargetWww,
 ) => {
@@ -282,7 +289,7 @@ const getComponentPathContent = (componentGraph: { [scopeId: string]: string[] }
   const object: { [key: string]: string[] } = {};
   const entries = Object.entries(componentGraph);
   for (const [key, chunks] of entries) {
-    object[key] = chunks.map(filename => join(buildDir, filename));
+    object[key] = chunks.map((filename) => join(buildDir, filename));
   }
   return JSON.stringify(object);
 };

@@ -1,0 +1,62 @@
+name: 🐛 Bug Report
+description: Create a report to help us improve Stencil
+title: 'bug: '
+body:
+  - type: checkboxes
+    attributes:
+      label: Prerequisites
+      description: Please ensure you have completed all of the following.
+      options:
+        - label: I have read the [Contributing Guidelines](https://github.com/ionic-team/stencil/blob/main/CONTRIBUTING.md).
+          required: true
+        - label: I agree to follow the [Code of Conduct](https://github.com/ionic-team/stencil/blob/main/CODE_OF_CONDUCT.md).
+          required: true
+        - label: I have searched for [existing issues](https://github.com/ionic-team/stencil/issues) that already report this problem, without success.
+          required: true
+  - type: input
+    attributes:
+      label: Stencil Version
+      description: The version number of Stencil where the issue is occurring.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Current Behavior
+      description: A clear description of what the bug is and how it manifests.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Expected Behavior
+      description: A clear description of what you expected to happen.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: System Info
+      description: |
+        Output of `npx stencil info`.
+        Please provide any additional information, such as npm version, browser(s) & version(s) as well
+      render: shell
+      placeholder: System, Environment, Browsers. At minimum, please include `npx stencil info` output.
+  - type: textarea
+    attributes:
+      label: Steps to Reproduce
+      description: Please explain the steps required to duplicate this issue.
+    validations:
+      required: true
+  - type: input
+    attributes:
+      label: Code Reproduction URL
+      description: |
+        Please reproduce this issue in a blank Stencil starter application and provide a link to the repo.
+        Run `npm init stencil@latest` to quickly spin up a Stencil project.
+        This is the best way to ensure this issue is triaged quickly.
+        Issues that do not include a code reproduction are likely to be be closed without any investigation.
+      placeholder: https://github.com/...
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Additional Information
+      description: List any other information that is relevant to your issue. Stack traces, related issues, suggestions on how to fix, Stack Overflow links, forum links, etc.

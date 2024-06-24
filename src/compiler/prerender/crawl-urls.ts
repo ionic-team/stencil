@@ -1,5 +1,6 @@
-import type * as d from '../../declarations';
 import { catchError } from '@utils';
+
+import type * as d from '../../declarations';
 
 export const crawlAnchorsForNextUrls = (
   prerenderConfig: d.PrerenderConfig,
@@ -20,7 +21,7 @@ export const crawlAnchorsForNextUrls = (
   // normalizeHref(): normalize URL objects into href strings
 
   return parsedAnchors
-    .filter(anchor => {
+    .filter((anchor) => {
       // filter which anchors to actually crawl
       if (typeof prerenderConfig.filterAnchor === 'function') {
         // user filterAnchor()
@@ -29,7 +30,7 @@ export const crawlAnchorsForNextUrls = (
           if (userFilterAnchor === false) {
             return false;
           }
-        } catch (e) {
+        } catch (e: any) {
           // user filterAnchor() error
           catchError(diagnostics, e);
           return false;
@@ -40,7 +41,7 @@ export const crawlAnchorsForNextUrls = (
       return standardFilterAnchor(diagnostics, anchor, currentUrl);
     })
 
-    .map(anchor => {
+    .map((anchor) => {
       // normalize href strings into URL objects
       if (typeof prerenderConfig.normalizeUrl === 'function') {
         try {
@@ -49,7 +50,7 @@ export const crawlAnchorsForNextUrls = (
 
           // standard normalizeUrl(), after user normalized
           return standardNormalizeUrl(diagnostics, userNormalizedUrl.href, currentUrl);
-        } catch (e) {
+        } catch (e: any) {
           // user normalizeUrl() error
           catchError(diagnostics, e);
         }
@@ -59,7 +60,7 @@ export const crawlAnchorsForNextUrls = (
       return standardNormalizeUrl(diagnostics, anchor.href, currentUrl);
     })
 
-    .filter(url => {
+    .filter((url) => {
       // filter which urls to actually crawl
       if (typeof prerenderConfig.filterUrl === 'function') {
         // user filterUrl()
@@ -68,7 +69,7 @@ export const crawlAnchorsForNextUrls = (
           if (userFilterUrl === false) {
             return false;
           }
-        } catch (e) {
+        } catch (e: any) {
           // user filterUrl() error
           catchError(diagnostics, e);
           return false;
@@ -79,7 +80,7 @@ export const crawlAnchorsForNextUrls = (
       return standardFilterUrl(diagnostics, url, currentUrl, basePathParts);
     })
 
-    .map(url => {
+    .map((url) => {
       // standard normalize href
       // normalize URL objects into href strings
       return standardNormalizeHref(prerenderConfig, diagnostics, url);
@@ -123,7 +124,7 @@ const standardFilterAnchor = (diagnostics: d.Diagnostic[], attrs: { [attrName: s
         return true;
       }
     }
-  } catch (e) {
+  } catch (e: any) {
     catchError(diagnostics, e);
   }
 
@@ -146,7 +147,7 @@ const standardNormalizeUrl = (diagnostics: d.Diagnostic[], href: string, current
       }
 
       return outputUrl;
-    } catch (e) {
+    } catch (e: any) {
       catchError(diagnostics, e);
     }
   }
@@ -183,7 +184,7 @@ const standardFilterUrl = (diagnostics: d.Diagnostic[], url: URL, currentUrl: UR
     }
 
     return true;
-  } catch (e) {
+  } catch (e: any) {
     catchError(diagnostics, e);
   }
   return false;
@@ -208,13 +209,13 @@ export const standardNormalizeHref = (prerenderConfig: d.PrerenderConfig, diagno
         // url should NOT have a trailing slash
         if (href.endsWith('/') && url.pathname !== '/') {
           // this has a trailing slash and it's not the root path
-          href = href.substr(0, href.length - 1);
+          href = href.slice(0, -1);
         }
       }
 
       return href;
     }
-  } catch (e) {
+  } catch (e: any) {
     catchError(diagnostics, e);
   }
 

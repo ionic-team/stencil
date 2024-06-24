@@ -369,9 +369,9 @@ describe('h()', () => {
     it('utils.forEach should loop over items and get the ChildNode data', () => {
       const output: any = [];
       const FunctionalCmp: d.FunctionalComponent = (_nodeData, children, util) => {
-        util.forEach(children, element => {
+        util.forEach(children, (element) => {
           output.push(element);
-          util.forEach(element.vchildren, el => {
+          util.forEach(element.vchildren, (el) => {
             output.push(el);
           });
         });
@@ -413,7 +413,7 @@ describe('h()', () => {
 
     it('replaceAttributes should return the attributes for the node', () => {
       const FunctionalCmp: d.FunctionalComponent = (_nodeData, children, util) => {
-        return util.map(children, child => {
+        return util.map(children, (child) => {
           return {
             ...child,
             vattrs: {
@@ -458,7 +458,7 @@ describe('h()', () => {
         return h('article', nodeData, h('p', null, ...children));
       };
       const FunctionalCmp: d.FunctionalComponent = (_nodeData, children, util) => {
-        return util.map(children, child => {
+        return util.map(children, (child) => {
           return {
             ...child,
             vtag: child.vtag === 'div' ? ReplacementCmp : child.vtag,

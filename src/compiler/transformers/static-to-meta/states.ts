@@ -1,6 +1,7 @@
+import ts from 'typescript';
+
 import type * as d from '../../../declarations';
 import { getStaticValue } from '../transform-utils';
-import ts from 'typescript';
 
 export const parseStaticStates = (staticMembers: ts.ClassElement[]): d.ComponentCompilerState[] => {
   const parsedStates = getStaticValue(staticMembers, 'states');
@@ -13,7 +14,7 @@ export const parseStaticStates = (staticMembers: ts.ClassElement[]): d.Component
     return [];
   }
 
-  return stateNames.map(stateName => {
+  return stateNames.map((stateName) => {
     return {
       name: stateName,
     };

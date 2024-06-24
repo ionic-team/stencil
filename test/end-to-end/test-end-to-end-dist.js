@@ -9,15 +9,12 @@ fs.accessSync(path.join(distDir, 'loader'));
 fs.accessSync(path.join(distDir, 'index.cjs.js'));
 fs.accessSync(path.join(distDir, 'index.js'));
 
-const customElementsDir = path.join(distDir, 'custom-elements');
-fs.accessSync(path.join(customElementsDir, 'index.d.ts'));
-fs.accessSync(path.join(customElementsDir, 'index.js'));
-
 const collectionDir = path.join(distDir, 'collection');
 fs.accessSync(path.join(collectionDir, 'car-list', 'car-data.js'));
+fs.accessSync(path.join(collectionDir, 'car-list', 'car-data.js.map'));
 fs.accessSync(path.join(collectionDir, 'car-list', 'car-list.css'));
 fs.accessSync(path.join(collectionDir, 'car-list', 'car-list.js'));
-fs.accessSync(path.join(collectionDir, 'car-list', 'car-list.js'));
+fs.accessSync(path.join(collectionDir, 'car-list', 'car-list.js.map'));
 fs.accessSync(path.join(collectionDir, 'prop-cmp', 'prop-cmp.ios.css'));
 fs.accessSync(path.join(collectionDir, 'prop-cmp', 'prop-cmp.md.css'));
 fs.accessSync(path.join(collectionDir, 'global.js'));
@@ -34,6 +31,7 @@ fs.accessSync(path.join(typesDir, 'car-list', 'car-list.d.ts'));
 const wwwDir = path.join(__dirname, 'www');
 fs.accessSync(path.join(wwwDir, 'build', 'endtoend.js'));
 fs.accessSync(path.join(wwwDir, 'build', 'endtoend.esm.js'));
+fs.accessSync(path.join(wwwDir, 'build', 'endtoend.esm.js.map'));
 fs.accessSync(path.join(wwwDir, 'build', 'endtoend.css'));
 fs.accessSync(path.join(wwwDir, 'build', 'assets-a/file-1.txt'));
 fs.accessSync(path.join(wwwDir, 'build', 'assets-a/file-2.txt'));

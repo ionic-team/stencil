@@ -13,7 +13,7 @@ export class MyCmp {
 var output = testing.transpile(input);
 
 if (output.diagnostics.length > 0) {
-  var msg = output.diagnostics.map(d => d.messageText).join('\n');
+  var msg = output.diagnostics.map((d) => d.messageText).join('\n');
   throw new Error('Testing transpile error: \n' + msg);
 }
 

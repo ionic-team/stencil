@@ -1,3 +1,9 @@
+import { createNodeLogger } from '@sys-api-node';
+import { isRootPath, join, normalizePath } from '@utils';
+import * as os from 'os';
+import path, { basename, dirname } from 'path';
+import * as process from 'process';
+
 import type {
   CompilerFileWatcherCallback,
   CompilerFsStats,
@@ -14,32 +20,38 @@ import type {
   CopyTask,
   Logger,
 } from '../../declarations';
-import platformPath from 'path-browserify';
-import { basename, dirname, join } from 'path';
-import { buildEvents } from '../events';
-import { createLogger } from './logger/console-logger';
-import { createWebWorkerMainController } from './worker/web-worker-main';
-import { HAS_WEB_WORKER, IS_BROWSER_ENV, IS_WEB_WORKER_ENV } from './environment';
-import { isRootPath, normalizePath } from '@utils';
-import { resolveModuleIdAsync } from './resolve/resolve-module-async';
 import { version } from '../../version';
+import { buildEvents } from '../events';
+import { resolveModuleIdAsync } from './resolve/resolve-module-async';
 
-export const createSystem = (c?: { logger?: Logger }) => {
-  const logger = c && c.logger ? c.logger : createLogger();
+/**
+ * Create an in-memory `CompilerSystem` object, optionally using a supplied
+ * logger instance
+ *
+ * This particular system being an 'in-memory' `CompilerSystem` is intended for
+ * use in the browser. In most cases, for instance when using Stencil through
+ * the CLI, a Node.js-specific `CompilerSystem` will be used instead. See
+ * {@link CompilerSystem} for more details.
+ *
+ * @param c an object wrapping a logger instance
+ * @returns a complete CompilerSystem, ready for use!
+ */
+export const createSystem = (c?: { logger?: Logger }): CompilerSystem => {
+  const logger = c?.logger ?? createNodeLogger();
   const items = new Map<string, FsItem>();
   const destroys = new Set<() => Promise<void> | void>();
 
-  const addDestory = (cb: () => void) => destroys.add(cb);
-  const removeDestory = (cb: () => void) => destroys.delete(cb);
+  const addDestroy = (cb: () => void) => destroys.add(cb);
+  const removeDestroy = (cb: () => void) => destroys.delete(cb);
   const events = buildEvents();
-  const hardwareConcurrency = (IS_BROWSER_ENV && navigator.hardwareConcurrency) || 1;
+  const hardwareConcurrency = 1;
 
   const destroy = async () => {
     const waits: Promise<void>[] = [];
-    destroys.forEach(cb => {
+    destroys.forEach((cb) => {
       try {
         const rtn = cb();
-        if (rtn && rtn.then) {
+        if (rtn && typeof rtn.then === 'function') {
           waits.push(rtn);
         }
       } catch (e) {
@@ -72,6 +84,14 @@ export const createSystem = (c?: { logger?: Logger }) => {
   const copyFile = async (src: string, dest: string) => {
     writeFileSync(dest, readFileSync(src));
     return true;
+  };
+
+  const isTTY = (): boolean => {
+    return !!process?.stdout?.isTTY;
+  };
+
+  const homeDir = () => {
+    return os.homedir();
   };
 
   const createDirSync = (p: string, opts?: CompilerSystemCreateDirectoryOptions) => {
@@ -123,10 +143,7 @@ export const createSystem = (c?: { logger?: Logger }) => {
   const getCurrentDirectory = () => '/';
 
   const getCompilerExecutingPath = () => {
-    if (IS_WEB_WORKER_ENV) {
-      return location.href;
-    }
-    return sys.getRemoteModuleUrl({ moduleId: '@stencil/core', path: 'compiler/stencil.min.js' });
+    return sys.getRemoteModuleUrl({ moduleId: '@stencil/core', path: 'compiler/stencil.js' });
   };
 
   const isSymbolicLink = async (_p: string) => false;
@@ -278,12 +295,12 @@ export const createSystem = (c?: { logger?: Logger }) => {
       error: null,
     };
 
-    remoreDirSyncRecursive(p, opts, results);
+    removeDirSyncRecursive(p, opts, results);
 
     return results;
   };
 
-  const remoreDirSyncRecursive = (
+  const removeDirSyncRecursive = (
     p: string,
     opts: CompilerSystemRemoveDirectoryOptions,
     results: CompilerSystemRemoveDirectoryResults,
@@ -298,7 +315,7 @@ export const createSystem = (c?: { logger?: Logger }) => {
           const item = items.get(dirItemPath);
           if (item) {
             if (item.isDirectory) {
-              remoreDirSyncRecursive(dirItemPath, opts, results);
+              removeDirSyncRecursive(dirItemPath, opts, results);
             } else if (item.isFile) {
               const removeFileResults = removeFileSync(dirItemPath);
               if (removeFileResults.error) {
@@ -384,7 +401,7 @@ export const createSystem = (c?: { logger?: Logger }) => {
       }
     };
 
-    addDestory(close);
+    addDestroy(close);
 
     if (item) {
       item.isDirectory = true;
@@ -404,7 +421,7 @@ export const createSystem = (c?: { logger?: Logger }) => {
 
     return {
       close() {
-        removeDestory(close);
+        removeDestroy(close);
         close();
       },
     };
@@ -424,7 +441,7 @@ export const createSystem = (c?: { logger?: Logger }) => {
       }
     };
 
-    addDestory(close);
+    addDestroy(close);
 
     if (item) {
       item.isDirectory = false;
@@ -444,7 +461,7 @@ export const createSystem = (c?: { logger?: Logger }) => {
 
     return {
       close() {
-        removeDestory(close);
+        removeDestroy(close);
         close();
       },
     };
@@ -495,6 +512,23 @@ export const createSystem = (c?: { logger?: Logger }) => {
     return results;
   };
 
+  /**
+   * `self` is the global namespace object used within a web worker.
+   * `window` is the browser's global namespace object (I reorganized this to check the reference on that second)
+   * `global` is Node's global namespace object. https://nodejs.org/api/globals.html#globals_global
+   *
+   * loading in this order should allow workers, which are most common, then browser,
+   * then Node to grab the reference to fetch correctly.
+   */
+  const fetch =
+    typeof self !== 'undefined'
+      ? self?.fetch
+      : typeof window !== 'undefined'
+        ? window?.fetch
+        : typeof global !== 'undefined'
+          ? global?.fetch
+          : undefined;
+
   const writeFile = async (p: string, data: string) => writeFileSync(p, data);
 
   const tmpDirSync = () => '/.tmp';
@@ -506,9 +540,9 @@ export const createSystem = (c?: { logger?: Logger }) => {
   const generateContentHash = async (content: string, hashLength: number) => {
     const arrayBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(content));
     const hashArray = Array.from(new Uint8Array(arrayBuffer)); // convert buffer to byte array
-    let hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join(''); // convert bytes to hex string
+    let hashHex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join(''); // convert bytes to hex string
     if (typeof hashLength === 'number') {
-      hashHex = hashHex.substr(0, hashLength);
+      hashHex = hashHex.slice(0, hashLength);
     }
     return hashHex;
   };
@@ -521,6 +555,10 @@ export const createSystem = (c?: { logger?: Logger }) => {
     };
     logger.info('todo, copy task', copyTasks.length, srcDir);
     return results;
+  };
+
+  const getEnvironmentVar = (key: string) => {
+    return process?.env[key];
   };
 
   const getLocalModulePath = (opts: { rootDir: string; moduleId: string; path: string }) =>
@@ -542,13 +580,16 @@ export const createSystem = (c?: { logger?: Logger }) => {
     events,
     access,
     accessSync,
-    addDestory,
+    addDestroy,
     copyFile,
     createDir,
     createDirSync,
+    homeDir,
+    isTTY,
+    getEnvironmentVar,
     destroy,
     encodeToBase64,
-    exit: async exitCode => logger.warn(`exit ${exitCode}`),
+    exit: async (exitCode) => logger.warn(`exit ${exitCode}`),
     getCurrentDirectory,
     getCompilerExecutingPath,
     getLocalModulePath,
@@ -557,15 +598,16 @@ export const createSystem = (c?: { logger?: Logger }) => {
     isSymbolicLink,
     nextTick,
     normalizePath: normalize,
-    platformPath,
+    platformPath: path,
     readDir,
     readDirSync,
     readFile,
     readFileSync,
     realpath,
     realpathSync,
-    removeDestory,
+    removeDestroy,
     rename,
+    fetch,
     resolvePath,
     removeDir,
     removeDirSync,
@@ -580,9 +622,8 @@ export const createSystem = (c?: { logger?: Logger }) => {
     writeFile,
     writeFileSync,
     generateContentHash,
-    createWorkerController: HAS_WEB_WORKER
-      ? maxConcurrentWorkers => createWebWorkerMainController(sys, maxConcurrentWorkers)
-      : null,
+    // no threading when we're running in-memory
+    createWorkerController: null,
     details: {
       cpuModel: '',
       freemem: () => 0,
@@ -593,7 +634,7 @@ export const createSystem = (c?: { logger?: Logger }) => {
     copy,
   };
 
-  sys.resolveModuleId = opts => resolveModuleIdAsync(sys, null, opts);
+  sys.resolveModuleId = (opts) => resolveModuleIdAsync(sys, null, opts);
 
   return sys;
 };

@@ -1,9 +1,14 @@
-import type * as d from '../../declarations';
+import { buildWarn, catchError, isOutputTargetWww } from '@utils';
 import { basename } from 'path';
-import { buildWarn, catchError } from '@utils';
-import { isOutputTargetWww } from '../output-targets/output-utils';
 
-export const generateServiceWorker = async (config: d.Config, buildCtx: d.BuildCtx, workbox: d.Workbox, outputTarget: d.OutputTargetWww) => {
+import type * as d from '../../declarations';
+
+export const generateServiceWorker = async (
+  config: d.ValidatedConfig,
+  buildCtx: d.BuildCtx,
+  workbox: d.Workbox,
+  outputTarget: d.OutputTargetWww,
+): Promise<void[] | void> => {
   const serviceWorker = await getServiceWorker(outputTarget);
   if (serviceWorker.unregister) {
     await config.sys.writeFile(serviceWorker.swDest, SELF_UNREGISTER_SW);
@@ -33,7 +38,7 @@ const generateSW = async (buildCtx: d.BuildCtx, serviceWorker: d.ServiceWorkerCo
   try {
     await workbox.generateSW(serviceWorker);
     timeSpan.finish(`generate service worker finished`);
-  } catch (e) {
+  } catch (e: any) {
     catchError(buildCtx.diagnostics, e);
   }
 };
@@ -44,20 +49,22 @@ const injectManifest = async (buildCtx: d.BuildCtx, serviceWorker: d.ServiceWork
   try {
     await workbox.injectManifest(serviceWorker);
     timeSpan.finish('inject manifest into service worker finished');
-  } catch (e) {
+  } catch (e: any) {
     catchError(buildCtx.diagnostics, e);
   }
 };
 
-export const hasServiceWorkerChanges = (config: d.Config, buildCtx: d.BuildCtx) => {
+export const hasServiceWorkerChanges = (config: d.ValidatedConfig, buildCtx: d.BuildCtx) => {
   if (config.devMode && !config.flags.serviceWorker) {
     return false;
   }
 
-  const wwwServiceOutputs = config.outputTargets.filter(isOutputTargetWww).filter(o => o.serviceWorker && o.serviceWorker.swSrc);
+  const wwwServiceOutputs = config.outputTargets
+    .filter(isOutputTargetWww)
+    .filter((o) => o.serviceWorker && o.serviceWorker.swSrc);
 
-  return wwwServiceOutputs.some(outputTarget => {
-    return buildCtx.filesChanged.some(fileChanged => {
+  return wwwServiceOutputs.some((outputTarget) => {
+    return buildCtx.filesChanged.some((fileChanged) => {
       if (outputTarget.serviceWorker) {
         return basename(fileChanged).toLowerCase() === basename(outputTarget.serviceWorker.swSrc).toLowerCase();
       }

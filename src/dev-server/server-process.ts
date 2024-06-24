@@ -1,13 +1,14 @@
-import type * as d from '../declarations';
-import type { Server } from 'http';
-import { createServerContext, BuildRequestResolve, CompilerRequestResolve } from './server-context';
-import { createHttpServer, findClosestOpenPort } from './server-http';
 import { createNodeSys } from '@sys-api-node';
-import { createWebSocket, DevWebSocket } from './server-web-socket';
+import { normalizePath } from '@utils';
+import type { Server } from 'http';
+
+import type * as d from '../declarations';
 import { DEV_SERVER_INIT_URL } from './dev-server-constants';
 import { getBrowserUrl } from './dev-server-utils';
-import { normalizePath } from '@utils';
 import { openInBrowser } from './open-in-browser';
+import { BuildRequestResolve, CompilerRequestResolve, createServerContext } from './server-context';
+import { createHttpServer, findClosestOpenPort } from './server-http';
+import { createWebSocket, DevWebSocket } from './server-web-socket';
 
 export function initServerProcess(sendMsg: d.DevServerSendMessage) {
   let server: Server = null;
@@ -55,10 +56,10 @@ export function initServerProcess(sendMsg: d.DevServerSendMessage) {
   const closeServer = () => {
     const promises: Promise<any>[] = [];
 
-    buildResultsResolves.forEach(r => r.reject('dev server closed'));
+    buildResultsResolves.forEach((r) => r.reject('dev server closed'));
     buildResultsResolves.length = 0;
 
-    compilerRequestResolves.forEach(r => r.reject('dev server closed'));
+    compilerRequestResolves.forEach((r) => r.reject('dev server closed'));
     compilerRequestResolves.length = 0;
 
     if (serverCtx) {
@@ -72,8 +73,8 @@ export function initServerProcess(sendMsg: d.DevServerSendMessage) {
     }
     if (server) {
       promises.push(
-        new Promise<void>(resolve => {
-          server.close(err => {
+        new Promise<void>((resolve) => {
+          server.close((err) => {
             if (err) {
               console.error(`close error: ${err}`);
             }
@@ -107,7 +108,7 @@ export function initServerProcess(sendMsg: d.DevServerSendMessage) {
           }
         } else if (serverCtx) {
           if (msg.buildResults && !msg.isActivelyBuilding) {
-            buildResultsResolves.forEach(r => r.resolve(msg.buildResults));
+            buildResultsResolves.forEach((r) => r.resolve(msg.buildResults));
             buildResultsResolves.length = 0;
           }
           if (webSocket) {
@@ -116,8 +117,12 @@ export function initServerProcess(sendMsg: d.DevServerSendMessage) {
         }
       }
     } catch (e) {
+      let stack: string | null = null;
+      if (e instanceof Error) {
+        stack = e.stack;
+      }
       sendMsg({
-        error: { message: e + '', stack: e?.stack ? e.stack : null },
+        error: { message: e + '', stack },
       });
     }
   };

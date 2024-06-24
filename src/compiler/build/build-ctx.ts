@@ -1,5 +1,7 @@
+import { hasError, hasWarning, result } from '@utils';
+
 import type * as d from '../../declarations';
-import { hasError, hasWarning } from '@utils';
+import { validateConfig } from '../config/validate-config';
 
 /**
  * A new BuildCtx object is created for every build
@@ -10,13 +12,19 @@ export class BuildContext implements d.BuildCtx {
   buildMessages: string[] = [];
   buildResults: d.CompilerBuildResults = null;
   bundleBuildCount = 0;
-  collections: d.Collection[] = [];
+  collections: d.CollectionCompilerMeta[] = [];
   completedTasks: d.BuildTask[] = [];
   compilerCtx: d.CompilerCtx;
   components: d.ComponentCompilerMeta[] = [];
   componentGraph = new Map<string, string[]>();
-  config: d.Config;
+  config: d.ValidatedConfig;
   data: any = {};
+  buildStats?: result.Result<d.CompilerBuildStats, { diagnostics: d.Diagnostic[] }> = undefined;
+  esmBrowserComponentBundle: d.BundleModule[];
+  esmComponentBundle: d.BundleModule[];
+  es5ComponentBundle: d.BundleModule[];
+  systemComponentBundle: d.BundleModule[];
+  commonJsComponentBundle: d.BundleModule[];
   diagnostics: d.Diagnostic[] = [];
   dirsAdded: string[] = [];
   dirsDeleted: string[] = [];
@@ -56,7 +64,7 @@ export class BuildContext implements d.BuildCtx {
   validateTypesPromise: Promise<d.ValidateTypesResults>;
 
   constructor(config: d.Config, compilerCtx: d.CompilerCtx) {
-    this.config = config;
+    this.config = validateConfig(config, {}).config;
     this.compilerCtx = compilerCtx;
     this.buildId = ++this.compilerCtx.activeBuildId;
 
@@ -66,7 +74,9 @@ export class BuildContext implements d.BuildCtx {
   start() {
     // get the build id from the incremented activeBuildId
     // print out a good message
-    const msg = `${this.isRebuild ? 'rebuild' : 'build'}, ${this.config.fsNamespace}, ${this.config.devMode ? 'dev' : 'prod'} mode, started`;
+    const msg = `${this.isRebuild ? 'rebuild' : 'build'}, ${this.config.fsNamespace}, ${
+      this.config.devMode ? 'dev' : 'prod'
+    } mode, started`;
 
     const buildLog: d.BuildLog = {
       buildId: this.buildId,
@@ -187,6 +197,11 @@ export class BuildContext implements d.BuildCtx {
   }
 }
 
+/**
+ * Generate a timestamp of the format `YYYY-MM-DDThh:mm:ss`, using the number of seconds that have elapsed since
+ * January 01, 1970, and the time this function was called
+ * @returns the generated timestamp
+ */
 export const getBuildTimestamp = () => {
   const d = new Date();
 

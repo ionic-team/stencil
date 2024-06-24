@@ -1,11 +1,9 @@
-import type * as d from '../../declarations';
-import { renderCatchError, renderBuildDiagnostic } from './render-utils';
+import { MockWindow } from '@stencil/core/mock-doc';
 
-export function runtimeLogging(
-  win: Window & typeof globalThis,
-  opts: d.HydrateDocumentOptions,
-  results: d.HydrateResults,
-) {
+import type * as d from '../../declarations';
+import { renderBuildDiagnostic, renderCatchError } from './render-utils';
+
+export function runtimeLogging(win: MockWindow, opts: d.HydrateDocumentOptions, results: d.HydrateResults) {
   try {
     const pathname = win.location.pathname;
 
@@ -42,7 +40,7 @@ export function runtimeLogging(
     };
 
     if (opts.runtimeLogging) {
-      ['log', 'warn', 'assert', 'info', 'trace'].forEach(type => {
+      ['log', 'warn', 'assert', 'info', 'trace'].forEach((type) => {
         (win.console as any)[type] = (...msgs: any[]) => {
           runtimeLog(pathname, type, msgs);
         };

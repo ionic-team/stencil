@@ -1,13 +1,13 @@
 import { newE2EPage } from '@stencil/core/testing';
 
-
 describe('@Listen', () => {
-
   it('host listener toggles "opened" from "click" event', async () => {
     // create a new puppeteer page
-    const page = await newE2EPage({ html: `
+    const page = await newE2EPage({
+      html: `
       <listen-cmp></listen-cmp>
-    `});
+    `,
+    });
 
     // select the "event-cmp" element within the page (same as querySelector)
     // and return the value from the component's "opened" @Prop
@@ -39,5 +39,4 @@ describe('@Listen', () => {
     // let's get the value of "opened" again
     expect(await elm.getProperty('opened')).toEqual(false);
   });
-
 });

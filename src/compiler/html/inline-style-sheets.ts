@@ -1,10 +1,16 @@
-import type * as d from '../../declarations';
-import { join } from 'path';
+import { join } from '@utils';
 
-export const inlineStyleSheets = (compilerCtx: d.CompilerCtx, doc: Document, maxSize: number, outputTarget: d.OutputTargetWww) => {
+import type * as d from '../../declarations';
+
+export const inlineStyleSheets = (
+  compilerCtx: d.CompilerCtx,
+  doc: Document,
+  maxSize: number,
+  outputTarget: d.OutputTargetWww,
+) => {
   const globalLinks = Array.from(doc.querySelectorAll('link[rel=stylesheet]')) as HTMLLinkElement[];
   return Promise.all(
-    globalLinks.map(async link => {
+    globalLinks.map(async (link) => {
       const href = link.getAttribute('href');
       if (typeof href !== 'string' || !href.startsWith('/') || link.getAttribute('media') !== null) {
         return;

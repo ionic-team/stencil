@@ -1,10 +1,10 @@
 import { cloneAttributes } from './attribute';
+import { getStyleElementText, MockCSSStyleSheet, setStyleElementText } from './css-style-sheet';
 import { createCustomElement } from './custom-element-registry';
-import { MockCSSStyleSheet, getStyleElementText, setStyleElementText } from './css-style-sheet';
 import { MockDocumentFragment } from './document-fragment';
 import { MockElement, MockHTMLElement } from './node';
 
-export function createElement(ownerDocument: any, tagName: string) {
+export function createElement(ownerDocument: any, tagName: string): any {
   if (typeof tagName !== 'string' || tagName === '' || !/^[a-z0-9-_:]+$/i.test(tagName)) {
     throw new Error(`The tag name provided (${tagName}) is not a valid name.`);
   }
@@ -49,6 +49,9 @@ export function createElement(ownerDocument: any, tagName: string) {
 
     case 'title':
       return new MockTitleElement(ownerDocument);
+
+    case 'ul':
+      return new MockUListElement(ownerDocument);
   }
 
   if (ownerDocument != null && tagName.includes('-')) {
@@ -65,9 +68,30 @@ export function createElementNS(ownerDocument: any, namespaceURI: string, tagNam
   if (namespaceURI === 'http://www.w3.org/1999/xhtml') {
     return createElement(ownerDocument, tagName);
   } else if (namespaceURI === 'http://www.w3.org/2000/svg') {
-    return new MockSVGElement(ownerDocument, tagName);
+    switch (tagName.toLowerCase()) {
+      case 'text':
+      case 'tspan':
+      case 'tref':
+      case 'altglyph':
+      case 'textpath':
+        return new MockSVGTextContentElement(ownerDocument, tagName);
+      case 'circle':
+      case 'ellipse':
+      case 'image':
+      case 'line':
+      case 'path':
+      case 'polygon':
+      case 'polyline':
+      case 'rect':
+      case 'use':
+        return new MockSVGGraphicsElement(ownerDocument, tagName);
+      case 'svg':
+        return new MockSVGSVGElement(ownerDocument, tagName);
+      default:
+        return new MockSVGElement(ownerDocument, tagName);
+    }
   } else {
-    return new MockElement(ownerDocument, tagName);
+    return new MockElement(ownerDocument, tagName, namespaceURI);
   }
 }
 
@@ -81,6 +105,9 @@ export class MockAnchorElement extends MockHTMLElement {
   }
   set href(value: string) {
     this.setAttribute('href', value);
+  }
+  get pathname() {
+    return new URL(this.href).pathname;
   }
 }
 
@@ -104,10 +131,10 @@ export class MockImageElement extends MockHTMLElement {
     super(ownerDocument, 'img');
   }
 
-  get draggable() {
+  override get draggable() {
     return this.getAttributeNS(null, 'draggable') !== 'false';
   }
-  set draggable(value: boolean) {
+  override set draggable(value: boolean) {
     this.setAttributeNS(null, 'draggable', value);
   }
 
@@ -206,6 +233,8 @@ patchPropAttributes(MockLinkElement.prototype, {
 });
 
 export class MockMetaElement extends MockHTMLElement {
+  content: string;
+
   constructor(ownerDocument: any) {
     super(ownerDocument, 'meta');
   }
@@ -232,6 +261,95 @@ patchPropAttributes(MockScriptElement.prototype, {
   type: String,
 });
 
+export class MockDOMMatrix {
+  static fromMatrix() {
+    return new MockDOMMatrix();
+  }
+  a: number = 1;
+  b: number = 0;
+  c: number = 0;
+  d: number = 1;
+  e: number = 0;
+  f: number = 0;
+  m11: number = 1;
+  m12: number = 0;
+  m13: number = 0;
+  m14: number = 0;
+  m21: number = 0;
+  m22: number = 1;
+  m23: number = 0;
+  m24: number = 0;
+  m31: number = 0;
+  m32: number = 0;
+  m33: number = 1;
+  m34: number = 0;
+  m41: number = 0;
+  m42: number = 0;
+  m43: number = 0;
+  m44: number = 1;
+  is2D: boolean = true;
+  isIdentity: boolean = true;
+  inverse() {
+    return new MockDOMMatrix();
+  }
+  flipX() {
+    return new MockDOMMatrix();
+  }
+  flipY() {
+    return new MockDOMMatrix();
+  }
+  multiply() {
+    return new MockDOMMatrix();
+  }
+  rotate() {
+    return new MockDOMMatrix();
+  }
+  rotateAxisAngle() {
+    return new MockDOMMatrix();
+  }
+  rotateFromVector() {
+    return new MockDOMMatrix();
+  }
+  scale() {
+    return new MockDOMMatrix();
+  }
+  scaleNonUniform() {
+    return new MockDOMMatrix();
+  }
+  skewX() {
+    return new MockDOMMatrix();
+  }
+  skewY() {
+    return new MockDOMMatrix();
+  }
+  toJSON() {}
+  toString() {}
+  transformPoint() {
+    return new MockDOMPoint();
+  }
+  translate() {
+    return new MockDOMMatrix();
+  }
+}
+
+export class MockDOMPoint {
+  w: number = 1;
+  x: number = 0;
+  y: number = 0;
+  z: number = 0;
+  toJSON() {}
+  matrixTransform() {
+    return new MockDOMMatrix();
+  }
+}
+
+export class MockSVGRect {
+  height: number = 10;
+  width: number = 10;
+  x: number = 0;
+  y: number = 0;
+}
+
 export class MockStyleElement extends MockHTMLElement {
   sheet: MockCSSStyleSheet;
 
@@ -240,39 +358,36 @@ export class MockStyleElement extends MockHTMLElement {
     this.sheet = new MockCSSStyleSheet(this);
   }
 
-  get innerHTML() {
+  override get innerHTML() {
     return getStyleElementText(this);
   }
-  set innerHTML(value: string) {
+  override set innerHTML(value: string) {
     setStyleElementText(this, value);
   }
 
-  get innerText() {
+  override get innerText() {
     return getStyleElementText(this);
   }
-  set innerText(value: string) {
+  override set innerText(value: string) {
     setStyleElementText(this, value);
   }
 
-  get textContent() {
+  override get textContent() {
     return getStyleElementText(this);
   }
-  set textContent(value: string) {
+  override set textContent(value: string) {
     setStyleElementText(this, value);
   }
 }
-
 export class MockSVGElement extends MockElement {
+  override __namespaceURI = 'http://www.w3.org/2000/svg';
+
   // SVGElement properties and methods
   get ownerSVGElement(): SVGSVGElement {
     return null;
   }
   get viewportElement(): SVGElement {
     return null;
-  }
-
-  focus() {
-    /**/
   }
   onunload() {
     /**/
@@ -290,6 +405,30 @@ export class MockSVGElement extends MockElement {
     return false;
   }
   getTotalLength(): number {
+    return 0;
+  }
+}
+
+export class MockSVGGraphicsElement extends MockSVGElement {
+  getBBox(_options?: { clipped: boolean; fill: boolean; markers: boolean; stroke: boolean }): MockSVGRect {
+    return new MockSVGRect();
+  }
+  getCTM(): MockDOMMatrix {
+    return new MockDOMMatrix();
+  }
+  getScreenCTM(): MockDOMMatrix {
+    return new MockDOMMatrix();
+  }
+}
+
+export class MockSVGSVGElement extends MockSVGGraphicsElement {
+  createSVGPoint(): MockDOMPoint {
+    return new MockDOMPoint();
+  }
+}
+
+export class MockSVGTextContentElement extends MockSVGGraphicsElement {
+  getComputedTextLength(): number {
     return 0;
   }
 }
@@ -315,14 +454,14 @@ export class MockTemplateElement extends MockHTMLElement {
     this.content = new MockDocumentFragment(ownerDocument);
   }
 
-  get innerHTML() {
+  override get innerHTML() {
     return this.content.innerHTML;
   }
-  set innerHTML(html: string) {
+  override set innerHTML(html: string) {
     this.content.innerHTML = html;
   }
 
-  cloneNode(deep?: boolean) {
+  override cloneNode(deep?: boolean) {
     const cloned = new MockTemplateElement(null);
     cloned.attributes = cloneAttributes(this.attributes);
 
@@ -357,47 +496,65 @@ export class MockTitleElement extends MockHTMLElement {
   }
 }
 
+export class MockUListElement extends MockHTMLElement {
+  constructor(ownerDocument: any) {
+    super(ownerDocument, 'ul');
+  }
+}
+
+type CanvasContext = '2d' | 'webgl' | 'webgl2' | 'bitmaprenderer';
+export class CanvasRenderingContext {
+  context: CanvasContext;
+  contextAttributes: WebGLContextAttributes;
+  constructor(context: CanvasContext, contextAttributes?: WebGLContextAttributes) {
+    this.context = context;
+    this.contextAttributes = contextAttributes;
+  }
+  fillRect() {
+    return;
+  }
+  clearRect() {}
+  getImageData(_: number, __: number, w: number, h: number) {
+    return {
+      data: new Array(w * h * 4),
+    };
+  }
+  toDataURL() {
+    return 'data:,'; // blank image
+  }
+  putImageData() {}
+  createImageData(): ImageData {
+    return {} as ImageData;
+  }
+  setTransform() {}
+  drawImage() {}
+  save() {}
+  fillText() {}
+  restore() {}
+  beginPath() {}
+  moveTo() {}
+  lineTo() {}
+  closePath() {}
+  stroke() {}
+  translate() {}
+  scale() {}
+  rotate() {}
+  arc() {}
+  fill() {}
+  measureText() {
+    return { width: 0 };
+  }
+  transform() {}
+  rect() {}
+  clip() {}
+}
+
 export class MockCanvasElement extends MockHTMLElement {
   constructor(ownerDocument: any) {
     super(ownerDocument, 'canvas');
   }
-  getContext() {
-    return {
-      fillRect() {
-        return;
-      },
-      clearRect() {},
-      getImageData: function (_: number, __: number, w: number, h: number) {
-        return {
-          data: new Array(w * h * 4),
-        };
-      },
-      putImageData() {},
-      createImageData: function (): any[] {
-        return [];
-      },
-      setTransform() {},
-      drawImage() {},
-      save() {},
-      fillText() {},
-      restore() {},
-      beginPath() {},
-      moveTo() {},
-      lineTo() {},
-      closePath() {},
-      stroke() {},
-      translate() {},
-      scale() {},
-      rotate() {},
-      arc() {},
-      fill() {},
-      measureText() {
-        return { width: 0 };
-      },
-      transform() {},
-      rect() {},
-      clip() {},
-    };
+  getContext(context: CanvasContext, contextAttributes?: WebGLContextAttributes): CanvasRenderingContext {
+    return new CanvasRenderingContext(context, contextAttributes);
   }
 }
 
@@ -411,7 +568,7 @@ function fullUrl(elm: MockElement, attrName: string) {
         try {
           const url = new URL(val, loc.href);
           return url.href;
-        } catch (e) { }
+        } catch (e) {}
       }
     }
   }
@@ -419,7 +576,7 @@ function fullUrl(elm: MockElement, attrName: string) {
 }
 
 function patchPropAttributes(prototype: any, attrs: any, defaults: any = {}) {
-  Object.keys(attrs).forEach(propName => {
+  Object.keys(attrs).forEach((propName) => {
     const attr = attrs[propName];
     const defaultValue = defaults[propName];
 

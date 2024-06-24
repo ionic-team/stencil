@@ -1,11 +1,12 @@
-import type { Config } from '../declarations';
+import type * as d from '../declarations';
+import { printCheckVersionResults, startCheckVersion } from './check-version';
 import type { CoreCompiler } from './load-compiler';
-import { runPrerenderTask } from './task-prerender';
-import { startCheckVersion, printCheckVersionResults } from './check-version';
 import { startupCompilerLog } from './logs';
+import { runPrerenderTask } from './task-prerender';
 import { taskWatch } from './task-watch';
+import { telemetryBuildFinishedAction } from './telemetry/telemetry';
 
-export const taskBuild = async (coreCompiler: CoreCompiler, config: Config) => {
+export const taskBuild = async (coreCompiler: CoreCompiler, config: d.ValidatedConfig) => {
   if (config.flags.watch) {
     // watch build
     await taskWatch(coreCompiler, config);
@@ -23,6 +24,8 @@ export const taskBuild = async (coreCompiler: CoreCompiler, config: Config) => {
     const compiler = await coreCompiler.createCompiler(config);
     const results = await compiler.build();
 
+    await telemetryBuildFinishedAction(config.sys, config, coreCompiler, results);
+
     await compiler.destroy();
 
     if (results.hasError) {
@@ -33,11 +36,11 @@ export const taskBuild = async (coreCompiler: CoreCompiler, config: Config) => {
         config,
         results.hydrateAppFilePath,
         results.componentGraph,
-        null,
+        undefined,
       );
       config.logger.printDiagnostics(prerenderDiagnostics);
 
-      if (prerenderDiagnostics.some(d => d.level === 'error')) {
+      if (prerenderDiagnostics.some((d) => d.level === 'error')) {
         exitCode = 1;
       }
     }

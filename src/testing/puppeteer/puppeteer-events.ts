@@ -1,6 +1,7 @@
 import type { SerializedEvent } from '@stencil/core/internal';
-import type * as pd from './puppeteer-declarations';
 import type * as puppeteer from 'puppeteer';
+
+import type * as pd from './puppeteer-declarations';
 
 export async function initPageEvents(page: pd.E2EPageInternal) {
   page._e2eEvents = new Map();
@@ -22,7 +23,7 @@ async function pageSpyOnEvent(page: pd.E2EPageInternal, eventName: string, selec
 
   const handle = await page.evaluateHandle(handler);
 
-  await addE2EListener(page, handle, eventName, ev => {
+  await addE2EListener(page, handle, eventName, (ev) => {
     eventSpy.push(ev);
   });
 
@@ -34,7 +35,15 @@ export async function waitForEvent(
   eventName: string,
   elementHandle: puppeteer.ElementHandle,
 ) {
-  const timeoutMs = jasmine.DEFAULT_TIMEOUT_INTERVAL * 0.5;
+  /**
+   * When using screenshot functionality in a runner that is not Jasmine (e.g. Jest Circus), we need to set a default
+   * value for timeouts. There are runtime errors that occur if we attempt to use optional chaining + nullish
+   * coalescing with the `jasmine` global stating it's not defined. As a result, we use a ternary here.
+   *
+   * The '2500' value that we default to is the value of `jasmine.DEFAULT_TIMEOUT_INTERVAL` (5000) divided by 2.
+   */
+  const timeoutMs =
+    typeof jasmine !== 'undefined' && jasmine.DEFAULT_TIMEOUT_INTERVAL ? jasmine.DEFAULT_TIMEOUT_INTERVAL * 0.5 : 2500;
   const ev = await page.evaluate(
     (element: Element, eventName: string, timeoutMs: number) => {
       return new Promise<any>((resolve, reject) => {
@@ -44,9 +53,9 @@ export async function waitForEvent(
 
         element.addEventListener(
           eventName,
-          ev => {
+          (ev) => {
             clearTimeout(tmr);
-            resolve(((window as unknown) as pd.BrowserWindow).stencilSerializeEvent(ev as any));
+            resolve((window as unknown as pd.BrowserWindow).stencilSerializeEvent(ev as any));
           },
           { once: true },
         );
@@ -90,7 +99,7 @@ export class EventSpy implements EventSpy {
       });
     } else {
       let resolve: () => void;
-      const promise = new Promise<void>(r => (resolve = r));
+      const promise = new Promise<void>((r) => (resolve = r));
       this.queuedHandler.push(resolve);
       return promise.then(() => ({
         done: false,
@@ -121,19 +130,16 @@ export async function addE2EListener(
     callback,
   });
 
-  const executionContext = elmHandle.executionContext();
-
   // add element event listener
-  await executionContext.evaluate(
+  await elmHandle.evaluate(
     (elm: any, id: number, eventName: string) => {
       elm.addEventListener(eventName, (ev: any) => {
-        ((window as unknown) as pd.BrowserWindow).stencilOnEvent(
+        (window as unknown as pd.BrowserWindow).stencilOnEvent(
           id,
-          ((window as unknown) as pd.BrowserWindow).stencilSerializeEvent(ev),
+          (window as unknown as pd.BrowserWindow).stencilSerializeEvent(ev),
         );
       });
     },
-    elmHandle,
     id,
     eventName,
   );
@@ -150,7 +156,7 @@ function nodeContextEvents(waitForEvents: Map<number, pd.WaitForEvent>, eventId:
 function browserContextEvents() {
   // BROWSER CONTEXT
   const waitFrame = () => {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       requestAnimationFrame(resolve);
     });
   };
@@ -171,7 +177,7 @@ function browserContextEvents() {
 
     waitForDidLoad(promises, window.document.documentElement);
 
-    return Promise.all(promises).catch(e => console.error(e));
+    return Promise.all(promises).catch((e) => console.error(e));
   };
 
   const stencilReady = () => {
@@ -179,11 +185,11 @@ function browserContextEvents() {
       .then(() => waitFrame())
       .then(() => allReady())
       .then(() => {
-        ((window as unknown) as pd.BrowserWindow).stencilAppLoaded = true;
+        (window as unknown as pd.BrowserWindow).stencilAppLoaded = true;
       });
   };
 
-  ((window as unknown) as pd.BrowserWindow).stencilSerializeEventTarget = (target: any) => {
+  (window as unknown as pd.BrowserWindow).stencilSerializeEventTarget = (target: any) => {
     // BROWSER CONTEXT
     if (!target) {
       return null;
@@ -209,21 +215,21 @@ function browserContextEvents() {
     return null;
   };
 
-  ((window as unknown) as pd.BrowserWindow).stencilSerializeEvent = (orgEv: any) => {
+  (window as unknown as pd.BrowserWindow).stencilSerializeEvent = (orgEv: any) => {
     // BROWSER CONTEXT
     const serializedEvent: SerializedEvent = {
       bubbles: orgEv.bubbles,
       cancelBubble: orgEv.cancelBubble,
       cancelable: orgEv.cancelable,
       composed: orgEv.composed,
-      currentTarget: ((window as unknown) as pd.BrowserWindow).stencilSerializeEventTarget(orgEv.currentTarget),
+      currentTarget: (window as unknown as pd.BrowserWindow).stencilSerializeEventTarget(orgEv.currentTarget),
       defaultPrevented: orgEv.defaultPrevented,
       detail: orgEv.detail,
       eventPhase: orgEv.eventPhase,
       isTrusted: orgEv.isTrusted,
       returnValue: orgEv.returnValue,
-      srcElement: ((window as unknown) as pd.BrowserWindow).stencilSerializeEventTarget(orgEv.srcElement),
-      target: ((window as unknown) as pd.BrowserWindow).stencilSerializeEventTarget(orgEv.target),
+      srcElement: (window as unknown as pd.BrowserWindow).stencilSerializeEventTarget(orgEv.srcElement),
+      target: (window as unknown as pd.BrowserWindow).stencilSerializeEventTarget(orgEv.target),
       timeStamp: orgEv.timeStamp,
       type: orgEv.type,
       isSerializedEvent: true,

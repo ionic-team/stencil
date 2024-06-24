@@ -1,11 +1,11 @@
+import { catchError, flatOne, isString, join, unique } from '@utils';
+
 import type * as d from '../../declarations';
-import { catchError, flatOne, isString, unique } from '@utils';
-import { getScopeId } from '../style/scope-css';
 import { injectModulePreloads } from '../html/inject-module-preloads';
+import { minifyCss } from '../optimize/minify-css';
 import { optimizeCss } from '../optimize/optimize-css';
 import { optimizeJs } from '../optimize/optimize-js';
-import { join } from 'path';
-import { minifyCss } from '../optimize/minify-css';
+import { getScopeId } from '../style/scope-css';
 import { PrerenderContext } from './prerender-worker-ctx';
 
 export const inlineExternalStyleSheets = async (sys: d.CompilerSystem, appDir: string, doc: Document) => {
@@ -15,7 +15,7 @@ export const inlineExternalStyleSheets = async (sys: d.CompilerSystem, appDir: s
   }
 
   await Promise.all(
-    documentLinks.map(async link => {
+    documentLinks.map(async (link) => {
       const href = link.getAttribute('href');
       if (!href.startsWith('/') || link.getAttribute('media') !== null) {
         return;
@@ -29,6 +29,7 @@ export const inlineExternalStyleSheets = async (sys: d.CompilerSystem, appDir: s
         const optimizeResults = await optimizeCss({
           input: styles,
         });
+
         styles = optimizeResults.output;
 
         // insert inline <style>
@@ -37,7 +38,7 @@ export const inlineExternalStyleSheets = async (sys: d.CompilerSystem, appDir: s
         link.parentNode.insertBefore(inlinedStyles, link);
         link.remove();
 
-        // mark inlinedStyle as treeshakable
+        // mark inlinedStyle as tree-shakable
         inlinedStyles.setAttribute('data-styles', '');
 
         // since it's no longer a critical resource
@@ -53,7 +54,7 @@ export const inlineExternalStyleSheets = async (sys: d.CompilerSystem, appDir: s
 };
 
 export const minifyScriptElements = async (doc: Document, addMinifiedAttr: boolean) => {
-  const scriptElms = Array.from(doc.querySelectorAll('script')).filter(scriptElm => {
+  const scriptElms = Array.from(doc.querySelectorAll('script')).filter((scriptElm) => {
     if (scriptElm.hasAttribute('src') || scriptElm.hasAttribute(dataMinifiedAttr)) {
       return false;
     }
@@ -69,7 +70,7 @@ export const minifyScriptElements = async (doc: Document, addMinifiedAttr: boole
   }
 
   await Promise.all(
-    scriptElms.map(async scriptElm => {
+    scriptElms.map(async (scriptElm) => {
       const content = scriptElm.innerHTML.trim();
       if (content.length > 0) {
         const opts: d.OptimizeJsInput = {
@@ -103,7 +104,7 @@ export const minifyStyleElements = async (
   currentUrl: URL,
   addMinifiedAttr: boolean,
 ) => {
-  const styleElms = Array.from(doc.querySelectorAll('style')).filter(styleElm => {
+  const styleElms = Array.from(doc.querySelectorAll('style')).filter((styleElm) => {
     if (styleElm.hasAttribute(dataMinifiedAttr)) {
       return false;
     }
@@ -111,7 +112,7 @@ export const minifyStyleElements = async (
   });
 
   await Promise.all(
-    styleElms.map(async styleElm => {
+    styleElms.map(async (styleElm) => {
       const content = styleElm.innerHTML.trim();
       if (content.length > 0) {
         const optimizeResults = await optimizeCss({
@@ -140,8 +141,8 @@ export const excludeStaticComponents = (
   hydrateOpts: d.PrerenderHydrateOptions,
   hydrateResults: d.HydrateResults,
 ) => {
-  const staticComponents = hydrateOpts.staticComponents.filter(tag => {
-    return hydrateResults.components.some(cmp => cmp.tag === tag);
+  const staticComponents = hydrateOpts.staticComponents.filter((tag) => {
+    return hydrateResults.components.some((cmp) => cmp.tag === tag);
   });
 
   if (staticComponents.length > 0) {
@@ -181,10 +182,10 @@ export const addModulePreloads = (
 
   const staticComponents = hydrateOpts.staticComponents || [];
 
-  const cmpTags = hydrateResults.components.filter(cmp => !staticComponents.includes(cmp.tag));
+  const cmpTags = hydrateResults.components.filter((cmp) => !staticComponents.includes(cmp.tag));
 
   const modulePreloads = unique(
-    flatOne(cmpTags.map(cmp => getScopeId(cmp.tag, cmp.mode)).map(scopeId => componentGraph.get(scopeId) || [])),
+    flatOne(cmpTags.map((cmp) => getScopeId(cmp.tag, cmp.mode)).map((scopeId) => componentGraph.get(scopeId) || [])),
   );
 
   injectModulePreloads(doc, modulePreloads);
@@ -252,7 +253,7 @@ export const hashAssets = async (
             });
             sys.writeFileSync(filePath, css);
           }
-        } catch (e) {
+        } catch (e: any) {
           catchError(diagnostics, e);
         }
       }
@@ -275,7 +276,7 @@ export const hashAssets = async (
   ) as HTMLScriptElement[];
   if (pageStates.length > 0) {
     await Promise.all(
-      pageStates.map(async pageStateScript => {
+      pageStates.map(async (pageStateScript) => {
         const pageState = JSON.parse(pageStateScript.textContent);
         if (pageState && Array.isArray(pageState.ast)) {
           for (const node of pageState.ast) {
@@ -373,9 +374,9 @@ export const getAttrUrls = (attrName: string, attrValue: string) => {
     if (attrName.toLowerCase() === 'srcset') {
       attrValue
         .split(',')
-        .map(a => a.trim())
-        .filter(a => a.length > 0)
-        .forEach(src => {
+        .map((a) => a.trim())
+        .filter((a) => a.length > 0)
+        .forEach((src) => {
           const spaceSplt = src.split(' ');
           if (spaceSplt[0].length > 0) {
             srcValues.push({ src: spaceSplt[0], descriptor: spaceSplt[1] });

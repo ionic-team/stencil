@@ -1,16 +1,17 @@
+import path from 'path';
+
 import type {
   BuildOnEventRemove,
+  CompilerBuildResults,
   CompilerWatcher,
+  DevServer,
   DevServerConfig,
+  DevServerMessage,
+  InitServerProcess,
   Logger,
   StencilDevServerConfig,
-  DevServer,
-  CompilerBuildResults,
-  InitServerProcess,
-  DevServerMessage,
 } from '../declarations';
 import { initServerProcessWorkerProxy } from './server-worker-main';
-import path from 'path';
 
 export function start(stencilDevServerConfig: StencilDevServerConfig, logger: Logger, watcher?: CompilerWatcher) {
   return new Promise<DevServer>(async (resolve, reject) => {
@@ -61,7 +62,7 @@ function startServer(
 
   let isActivelyBuilding = false;
   let lastBuildResults: CompilerBuildResults = null;
-  let devServer: DevServer = null;
+  let devServer: DevServer | null = null;
   let removeWatcher: BuildOnEventRemove = null;
   let closeResolve: () => void = null;
   let hasStarted = false;
@@ -69,7 +70,7 @@ function startServer(
 
   let sendToWorker: (msg: DevServerMessage) => void = null;
 
-  const closePromise = new Promise<void>(resolve => (closeResolve = resolve));
+  const closePromise = new Promise<void>((resolve) => (closeResolve = resolve));
 
   const close = async () => {
     clearTimeout(startupTimeout);

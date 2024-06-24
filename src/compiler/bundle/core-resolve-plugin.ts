@@ -1,25 +1,29 @@
+import { isRemoteUrl, join, normalizeFsPath, normalizePath } from '@utils';
+import { dirname } from 'path';
+import type { Plugin } from 'rollup';
+
 import type * as d from '../../declarations';
-import { dirname, join } from 'path';
+import { HYDRATED_CSS } from '../../runtime/runtime-constants';
 import { fetchModuleAsync } from '../sys/fetch/fetch-module-async';
 import { getStencilModuleUrl, packageVersions } from '../sys/fetch/fetch-utils';
-import { HYDRATED_CSS } from '../../runtime/runtime-constants';
-import { isRemoteUrl, normalizePath, normalizeFsPath } from '@utils';
 import {
   APP_DATA_CONDITIONAL,
   STENCIL_CORE_ID,
-  STENCIL_INTERNAL_ID,
   STENCIL_INTERNAL_CLIENT_ID,
   STENCIL_INTERNAL_CLIENT_PATCH_BROWSER_ID,
-  STENCIL_INTERNAL_CLIENT_PATCH_ESM_ID,
   STENCIL_INTERNAL_HYDRATE_ID,
+  STENCIL_INTERNAL_ID,
 } from './entry-alias-ids';
-import type { Plugin } from 'rollup';
 
-export const coreResolvePlugin = (config: d.Config, compilerCtx: d.CompilerCtx, platform: 'client' | 'hydrate' | 'worker', externalRuntime: boolean): Plugin => {
+export const coreResolvePlugin = (
+  config: d.ValidatedConfig,
+  compilerCtx: d.CompilerCtx,
+  platform: 'client' | 'hydrate' | 'worker',
+  externalRuntime: boolean,
+): Plugin => {
   const compilerExe = config.sys.getCompilerExecutingPath();
   const internalClient = getStencilInternalModule(config, compilerExe, 'client/index.js');
   const internalClientPatchBrowser = getStencilInternalModule(config, compilerExe, 'client/patch-browser.js');
-  const internalClientPatchEsm = getStencilInternalModule(config, compilerExe, 'client/patch-esm.js');
   const internalHydrate = getStencilInternalModule(config, compilerExe, 'hydrate/index.js');
 
   return {
@@ -44,7 +48,7 @@ export const coreResolvePlugin = (config: d.Config, compilerCtx: d.CompilerCtx, 
       }
       if (id === STENCIL_INTERNAL_CLIENT_ID) {
         if (externalRuntime) {
-          // not bunding the client runtime and the user's component together this
+          // not bundling the client runtime and the user's component together this
           // must be the custom elements build, where @stencil/core/internal/client
           // is an import, rather than bundling
           return {
@@ -64,15 +68,6 @@ export const coreResolvePlugin = (config: d.Config, compilerCtx: d.CompilerCtx, 
           };
         }
         return internalClientPatchBrowser;
-      }
-      if (id === STENCIL_INTERNAL_CLIENT_PATCH_ESM_ID) {
-        if (externalRuntime) {
-          return {
-            id: STENCIL_INTERNAL_CLIENT_PATCH_ESM_ID,
-            external: true,
-          };
-        }
-        return internalClientPatchEsm;
       }
       if (id === STENCIL_INTERNAL_HYDRATE_ID) {
         return internalHydrate;
@@ -124,19 +119,18 @@ export const Build = {
       }
       return null;
     },
-
-    resolveImportMeta(prop, { format }) {
-      if (config.extras.dynamicImportShim && prop === 'url' && format === 'es') {
-        return '""';
-      }
-      return null;
-    },
   };
 };
 
-export const getStencilInternalModule = (config: d.Config, compilerExe: string, internalModule: string) => {
+export const getStencilInternalModule = (config: d.ValidatedConfig, compilerExe: string, internalModule: string) => {
   if (isRemoteUrl(compilerExe)) {
-    return normalizePath(config.sys.getLocalModulePath({ rootDir: config.rootDir, moduleId: '@stencil/core', path: 'internal/' + internalModule }));
+    return normalizePath(
+      config.sys.getLocalModulePath({
+        rootDir: config.rootDir,
+        moduleId: '@stencil/core',
+        path: 'internal/' + internalModule,
+      }),
+    );
   }
 
   const compilerExeDir = dirname(compilerExe);

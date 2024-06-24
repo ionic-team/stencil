@@ -1,13 +1,14 @@
-import type * as d from '../../declarations';
-import { basename } from 'path';
 import { createJsVarName, normalizeFsPathQuery } from '@utils';
-import type { Plugin, TransformPluginContext } from 'rollup';
+import { basename } from 'path';
+import type { Plugin, TransformPluginContext, TransformResult } from 'rollup';
 
-export const extFormatPlugin = (config: d.Config): Plugin => {
+import type * as d from '../../declarations';
+
+export const extFormatPlugin = (config: d.ValidatedConfig): Plugin => {
   return {
     name: 'extFormatPlugin',
 
-    transform(code, importPath) {
+    transform(code: string, importPath: string): TransformResult {
       if (/\0/.test(importPath)) {
         return null;
       }
@@ -17,19 +18,19 @@ export const extFormatPlugin = (config: d.Config): Plugin => {
       // ?format= param takes precedence before file extension
       switch (format) {
         case 'url':
-          return formatUrl(config, this, code, filePath, ext);
+          return { code: formatUrl(config, this, code, filePath, ext), map: null };
         case 'text':
-          return formatText(code, filePath);
+          return { code: formatText(code, filePath), map: null };
       }
 
       // didn't provide a ?format= param
       // check if it's a known extension we should format
-      if (FORMAT_TEXT_EXTS.includes(ext)) {
-        return formatText(code, filePath);
+      if (ext != null && FORMAT_TEXT_EXTS.includes(ext)) {
+        return { code: formatText(code, filePath), map: null };
       }
 
-      if (FORMAT_URL_MIME[ext]) {
-        return formatUrl(config, this, code, filePath, ext);
+      if (ext != null && FORMAT_URL_MIME[ext]) {
+        return { code: formatUrl(config, this, code, filePath, ext), map: null };
       }
 
       return null;
@@ -50,8 +51,14 @@ const formatText = (code: string, filePath: string) => {
   return `const ${varName} = ${JSON.stringify(code)};export default ${varName};`;
 };
 
-const formatUrl = (config: d.Config, pluginCtx: TransformPluginContext, code: string, filePath: string, ext: string) => {
-  const mime = FORMAT_URL_MIME[ext];
+const formatUrl = (
+  config: d.ValidatedConfig,
+  pluginCtx: TransformPluginContext,
+  code: string,
+  filePath: string,
+  ext: string | null,
+) => {
+  const mime = ext != null ? FORMAT_URL_MIME[ext] : null;
   if (!mime) {
     pluginCtx.warn(`Unsupported url format for "${ext}" extension.`);
     return formatText('', filePath);

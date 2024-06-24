@@ -1,8 +1,13 @@
 import type * as d from '../../declarations';
+import { getRegisterSW, UNREGISTER_SW } from '../service-worker/generate-sw';
 import { generateServiceWorkerUrl } from '../service-worker/service-worker-util';
-import { UNREGISTER_SW, getRegisterSW } from '../service-worker/generate-sw';
 
-export const updateIndexHtmlServiceWorker = async (config: d.Config, buildCtx: d.BuildCtx, doc: Document, outputTarget: d.OutputTargetWww) => {
+export const updateIndexHtmlServiceWorker = async (
+  config: d.ValidatedConfig,
+  buildCtx: d.BuildCtx,
+  doc: Document,
+  outputTarget: d.OutputTargetWww,
+) => {
   const serviceWorker = outputTarget.serviceWorker;
 
   if (serviceWorker !== false) {

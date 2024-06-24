@@ -1,17 +1,40 @@
-import type * as d from '../../declarations';
+import { BUILD } from '@app-data';
 import { consoleError, getHostRef } from '@platform';
 import { getValue, parsePropertyValue, setValue } from '@runtime';
 import { CMP_FLAGS, MEMBER_FLAGS } from '@utils';
 
-export function proxyHostElement(elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta) {
+import type * as d from '../../declarations';
+
+export function proxyHostElement(
+  elm: d.HostElement,
+  cmpMeta: d.ComponentRuntimeMeta,
+  opts: d.HydrateFactoryOptions,
+): void {
   if (typeof elm.componentOnReady !== 'function') {
     elm.componentOnReady = componentOnReady;
   }
   if (typeof elm.forceUpdate !== 'function') {
     elm.forceUpdate = forceUpdate;
   }
-  if (cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation) {
-    (elm as any).shadowRoot = elm;
+
+  /**
+   * Only attach shadow root if there isn't one already
+   */
+  if (!elm.shadowRoot && !!(cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation)) {
+    if (BUILD.shadowDelegatesFocus) {
+      elm.attachShadow({
+        mode: 'open',
+        delegatesFocus: !!(cmpMeta.$flags$ & CMP_FLAGS.shadowDelegatesFocus),
+      });
+    } else if (opts.serializeShadowRoot) {
+      elm.attachShadow({ mode: 'open' });
+    } else {
+      /**
+       * For hydration users may want to render the shadow component as scoped
+       * component, so we need to assign the element as shadowRoot.
+       */
+      (elm as any).shadowRoot = elm;
+    }
   }
 
   if (cmpMeta.$members$ != null) {
@@ -24,11 +47,29 @@ export function proxyHostElement(elm: d.HostElement, cmpMeta: d.ComponentRuntime
 
       if (memberFlags & MEMBER_FLAGS.Prop) {
         const attributeName = m[1] || memberName;
-        const attrValue = elm.getAttribute(attributeName);
+        let attrValue = elm.getAttribute(attributeName);
+
+        /**
+         * allow hydrate parameters that contain a simple object, e.g.
+         * ```ts
+         * import { renderToString } from 'component-library/hydrate';
+         * await renderToString(`<car-detail car=${JSON.stringify({ year: 1234 })}></car-detail>`);
+         * ```
+         */
+        if (
+          (attrValue?.startsWith('{') && attrValue.endsWith('}')) ||
+          (attrValue?.startsWith('[') && attrValue.endsWith(']'))
+        ) {
+          try {
+            attrValue = JSON.parse(attrValue);
+          } catch (e) {
+            /* ignore */
+          }
+        }
 
         if (attrValue != null) {
           const parsedAttrValue = parsePropertyValue(attrValue, memberFlags);
-          hostRef.$instanceValues$.set(memberName, parsedAttrValue);
+          hostRef?.$instanceValues$?.set(memberName, parsedAttrValue);
         }
 
         const ownValue = (elm as any)[memberName];
@@ -36,7 +77,7 @@ export function proxyHostElement(elm: d.HostElement, cmpMeta: d.ComponentRuntime
           // we've got an actual value already set on the host element
           // let's add that to our instance values and pull it off the element
           // so the getter/setter kicks in instead, but still getting this value
-          hostRef.$instanceValues$.set(memberName, ownValue);
+          hostRef?.$instanceValues$?.set(memberName, ownValue);
           delete (elm as any)[memberName];
         }
 
@@ -55,10 +96,9 @@ export function proxyHostElement(elm: d.HostElement, cmpMeta: d.ComponentRuntime
         });
       } else if (memberFlags & MEMBER_FLAGS.Method) {
         Object.defineProperty(elm, memberName, {
-          value(this: d.HostElement) {
+          value(this: d.HostElement, ...args: any[]) {
             const ref = getHostRef(this);
-            const args = arguments;
-            return ref.$onInstancePromise$.then(() => ref.$lazyInstance$[memberName].apply(ref.$lazyInstance$, args)).catch(consoleError);
+            return ref?.$onInstancePromise$?.then(() => ref?.$lazyInstance$?.[memberName](...args)).catch(consoleError);
           },
         });
       }
@@ -67,7 +107,7 @@ export function proxyHostElement(elm: d.HostElement, cmpMeta: d.ComponentRuntime
 }
 
 function componentOnReady(this: d.HostElement) {
-  return getHostRef(this).$onReadyPromise$;
+  return getHostRef(this)?.$onReadyPromise$;
 }
 
 function forceUpdate(this: d.HostElement) {

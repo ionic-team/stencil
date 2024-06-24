@@ -1,72 +1,45 @@
-import type * as d from '../../declarations';
 import ts from 'typescript';
 
-export const addImports = (transformOpts: d.TransformOptions, tsSourceFile: ts.SourceFile, importFnNames: string[], importPath: string) => {
+import type * as d from '../../declarations';
+import { createImportStatement, createRequireStatement } from './transform-utils';
+
+/**
+ * Create a new import statement, and update the provided source file with the newly created statement.
+ *
+ * The generated import statement will be placed at the beginning of the source file.
+ *
+ * The generated import statement will be either a commonjs require statement or esm import statement, based on the
+ * provided transform options.
+ *
+ * The import statement may include more than one named imports (identifiers) for the provided import path.
+ *
+ * @param transformOpts transform options configured for the current output target transpilation
+ * @param tsSourceFile the TypeScript source file that is being updated
+ * @param importFnNames a collection of named imports to add to the generated import statement
+ * @param importPath the path to the module that the collection of named imports should be imported from
+ * @returns the updated TypeScript source file
+ */
+export const addImports = (
+  transformOpts: d.TransformOptions,
+  tsSourceFile: ts.SourceFile,
+  importFnNames: string[],
+  importPath: string,
+): ts.SourceFile => {
   if (importFnNames.length === 0) {
     return tsSourceFile;
   }
 
   if (transformOpts.module === 'cjs') {
     // CommonJS require()
-    return addCjsRequires(tsSourceFile, importFnNames, importPath);
+    const newRequire = createRequireStatement(importFnNames, importPath);
+    const statements = tsSourceFile.statements.slice();
+    statements.splice(2, 0, newRequire);
+    return ts.factory.updateSourceFile(tsSourceFile, statements);
   }
 
   // ESM Imports
-  return addEsmImports(tsSourceFile, importFnNames, importPath);
-};
-
-const addEsmImports = (tsSourceFile: ts.SourceFile, importFnNames: string[], importPath: string) => {
-  // ESM Imports
-  // import { importNames } from 'importPath';
-
-  const importSpecifiers = importFnNames.map(importKey => {
-    const splt = importKey.split(' as ');
-    let importAs = importKey;
-    let importFnName = importKey;
-
-    if (splt.length > 1) {
-      importAs = splt[1];
-      importFnName = splt[0];
-    }
-
-    return ts.createImportSpecifier(typeof importFnName === 'string' && importFnName !== importAs ? ts.createIdentifier(importFnName) : undefined, ts.createIdentifier(importAs));
-  });
-
+  const newImport = createImportStatement(importFnNames, importPath);
   const statements = tsSourceFile.statements.slice();
-  const newImport = ts.createImportDeclaration(undefined, undefined, ts.createImportClause(undefined, ts.createNamedImports(importSpecifiers)), ts.createLiteral(importPath));
   statements.unshift(newImport);
-  return ts.updateSourceFileNode(tsSourceFile, statements);
-};
-
-const addCjsRequires = (tsSourceFile: ts.SourceFile, importFnNames: string[], importPath: string) => {
-  // CommonJS require()
-  // const { a, b, c } = require(importPath);
-
-  const importBinding = ts.createObjectBindingPattern(
-    importFnNames.map(importKey => {
-      const splt = importKey.split(' as ');
-      let importAs = importKey;
-      let importFnName = importKey;
-
-      if (splt.length > 1) {
-        importAs = splt[1];
-        importFnName = splt[0];
-      }
-      return ts.createBindingElement(undefined, importFnName, importAs);
-    }),
-  );
-
-  const requireStatement = ts.createVariableStatement(
-    undefined,
-    ts.createVariableDeclarationList(
-      [ts.createVariableDeclaration(importBinding, undefined, ts.createCall(ts.createIdentifier('require'), [], [ts.createLiteral(importPath)]))],
-      ts.NodeFlags.Const,
-    ),
-  );
-
-  const statements = tsSourceFile.statements.slice();
-
-  statements.splice(2, 0, requireStatement);
-
-  return ts.updateSourceFileNode(tsSourceFile, statements);
+  return ts.factory.updateSourceFile(tsSourceFile, statements);
 };

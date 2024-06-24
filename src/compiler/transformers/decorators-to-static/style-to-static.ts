@@ -1,8 +1,9 @@
-import type * as d from '../../../declarations';
-import { basename, dirname, extname, join } from 'path';
-import { ConvertIdentifier, convertValueToLiteral, createStaticGetter } from '../transform-utils';
-import { DEFAULT_STYLE_MODE } from '@utils';
+import { DEFAULT_STYLE_MODE, join } from '@utils';
+import { basename, dirname, extname } from 'path';
 import ts from 'typescript';
+
+import type * as d from '../../../declarations';
+import { ConvertIdentifier, convertValueToLiteral, createStaticGetter } from '../transform-utils';
 
 export const styleToStatic = (newMembers: ts.ClassElement[], componentOptions: d.ComponentOptions) => {
   const defaultModeStyles = [];
@@ -43,17 +44,17 @@ export const styleToStatic = (newMembers: ts.ClassElement[], componentOptions: d
       // @Component({
       //   styles: ":host {...}"
       // })
-      newMembers.push(createStaticGetter('styles', ts.createLiteral(styles)));
+      newMembers.push(createStaticGetter('styles', ts.factory.createStringLiteral(styles)));
     }
   } else if (componentOptions.styles) {
-    const convertIdentifier = (componentOptions.styles as any) as ConvertIdentifier;
+    const convertIdentifier = componentOptions.styles as any as ConvertIdentifier;
     if (convertIdentifier.__identifier) {
       // import styles from './styles.css';
       // @Component({
       //   styles
       // })
       const stylesIdentifier = convertIdentifier.__escapedText;
-      newMembers.push(createStaticGetter('styles', ts.createIdentifier(stylesIdentifier)));
+      newMembers.push(createStaticGetter('styles', ts.factory.createIdentifier(stylesIdentifier)));
     } else if (typeof convertIdentifier === 'object') {
       // import ios from './ios.css';
       // import md from './md.css';
@@ -72,8 +73,8 @@ export const styleToStatic = (newMembers: ts.ClassElement[], componentOptions: d
 
 const normalizeExtension = (styleUrls: d.CompilerModeStyles) => {
   const compilerStyleUrls: d.CompilerModeStyles = {};
-  Object.keys(styleUrls).forEach(key => {
-    compilerStyleUrls[key] = styleUrls[key].map(s => useCss(s));
+  Object.keys(styleUrls).forEach((key) => {
+    compilerStyleUrls[key] = styleUrls[key].map((s) => useCss(s));
   });
   return compilerStyleUrls;
 };
@@ -87,7 +88,7 @@ const useCss = (stylePath: string) => {
 
 const normalizeStyleUrls = (styleUrls: d.ModeStyles): d.CompilerModeStyles => {
   const compilerStyleUrls: d.CompilerModeStyles = {};
-  Object.keys(styleUrls).forEach(key => {
+  Object.keys(styleUrls).forEach((key) => {
     compilerStyleUrls[key] = normalizeStyleUrl(styleUrls[key]);
   });
   return compilerStyleUrls;

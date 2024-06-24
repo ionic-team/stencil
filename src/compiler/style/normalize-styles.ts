@@ -1,9 +1,10 @@
+import { DEFAULT_STYLE_MODE, join, normalizePath, relative } from '@utils';
+import { dirname, isAbsolute } from 'path';
+
 import type * as d from '../../declarations';
-import { DEFAULT_STYLE_MODE, normalizePath } from '@utils';
-import { dirname, isAbsolute, join, relative } from 'path';
 
 export const normalizeStyles = (tagName: string, componentFilePath: string, styles: d.StyleCompiler[]) => {
-  styles.forEach(style => {
+  styles.forEach((style) => {
     if (style.modeName === DEFAULT_STYLE_MODE) {
       style.styleId = tagName.toUpperCase();
     } else {
@@ -11,7 +12,7 @@ export const normalizeStyles = (tagName: string, componentFilePath: string, styl
     }
 
     if (Array.isArray(style.externalStyles)) {
-      style.externalStyles.forEach(externalStyle => {
+      style.externalStyles.forEach((externalStyle) => {
         normalizeExternalStyle(componentFilePath, externalStyle);
       });
     }
@@ -19,7 +20,10 @@ export const normalizeStyles = (tagName: string, componentFilePath: string, styl
 };
 
 const normalizeExternalStyle = (componentFilePath: string, externalStyle: d.ExternalStyleCompiler) => {
-  if (typeof externalStyle.originalComponentPath !== 'string' || externalStyle.originalComponentPath.trim().length === 0) {
+  if (
+    typeof externalStyle.originalComponentPath !== 'string' ||
+    externalStyle.originalComponentPath.trim().length === 0
+  ) {
     return;
   }
 

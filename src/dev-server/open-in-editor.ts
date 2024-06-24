@@ -1,5 +1,6 @@
-import type * as d from '../declarations';
 import type { ServerResponse } from 'http';
+
+import type * as d from '../declarations';
 import { responseHeaders } from './dev-server-utils';
 import openInEditorApi from './open-in-editor-api';
 
@@ -66,7 +67,7 @@ async function parseData(
   let editor = qs.get('editor');
   if (typeof editor === 'string') {
     editor = editor.trim().toLowerCase();
-    if (editors.some(e => e.id === editor)) {
+    if (editors.some((e) => e.id === editor)) {
       data.editor = editor;
     } else {
       data.error = `invalid editor: ${editor}`;
@@ -90,7 +91,7 @@ async function openDataInEditor(data: d.OpenInEditorData) {
       editor: data.editor,
     };
 
-    const editor = openInEditorApi.configure(opts, err => (data.error = err + ''));
+    const editor = openInEditorApi.configure(opts, (err) => (data.error = err + ''));
 
     if (data.error) {
       return;
@@ -108,12 +109,12 @@ let editors: Promise<d.DevServerEditor[]> = null;
 
 export function getEditors() {
   if (!editors) {
-    editors = new Promise(async resolve => {
+    editors = new Promise(async (resolve) => {
       const editors: d.DevServerEditor[] = [];
 
       try {
         await Promise.all(
-          Object.keys(openInEditorApi.editors).map(async editorId => {
+          Object.keys(openInEditorApi.editors).map(async (editorId) => {
             const isSupported = await isEditorSupported(editorId);
 
             editors.push({
@@ -127,13 +128,13 @@ export function getEditors() {
 
       resolve(
         editors
-          .filter(e => e.supported)
+          .filter((e) => e.supported)
           .sort((a, b) => {
             if (a.priority < b.priority) return -1;
             if (a.priority > b.priority) return 1;
             return 0;
           })
-          .map(e => {
+          .map((e) => {
             return {
               id: e.id,
               name: EDITORS[e.id],

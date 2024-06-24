@@ -10,7 +10,7 @@ export const methodsToMarkdown = (methods: d.JsonDocsMethod[]) => {
   content.push(`## Methods`);
   content.push(``);
 
-  methods.forEach(method => {
+  methods.forEach((method) => {
     content.push(`### \`${method.signature}\``);
     content.push(``);
     content.push(getDocsField(method));
@@ -47,5 +47,9 @@ export const methodsToMarkdown = (methods: d.JsonDocsMethod[]) => {
 };
 
 const getDocsField = (prop: d.JsonDocsMethod) => {
-  return `${prop.deprecation !== undefined ? `<span style="color:red">**[DEPRECATED]**</span> ${prop.deprecation}<br/><br/>` : ''}${prop.docs}`;
+  return `${
+    prop.deprecation !== undefined
+      ? `<span style="color:red">**[DEPRECATED]**</span> ${prop.deprecation}<br/><br/>`
+      : ''
+  }${prop.docs}`;
 };

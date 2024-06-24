@@ -1,7 +1,8 @@
-import type * as d from '../../../declarations';
-import { gatherVdomMeta } from './vdom';
-import { H } from '../core-runtime-apis';
 import ts from 'typescript';
+
+import type * as d from '../../../declarations';
+import { H } from '../core-runtime-apis';
+import { gatherVdomMeta } from './vdom';
 
 export const parseCallExpression = (m: d.Module | d.ComponentCompilerMeta, node: ts.CallExpression) => {
   if (node.arguments != null && node.arguments.length > 0) {
@@ -18,7 +19,11 @@ export const parseCallExpression = (m: d.Module | d.ComponentCompilerMeta, node:
   }
 };
 
-const visitCallExpressionArgs = (m: d.Module | d.ComponentCompilerMeta, callExpressionName: ts.Identifier, args: ts.NodeArray<ts.Expression>) => {
+const visitCallExpressionArgs = (
+  m: d.Module | d.ComponentCompilerMeta,
+  callExpressionName: ts.Identifier,
+  args: ts.NodeArray<ts.Expression>,
+) => {
   const fnName = callExpressionName.escapedText as string;
 
   if (fnName === 'h' || fnName === H || fnName === 'createElement') {

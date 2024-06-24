@@ -1,9 +1,10 @@
 import ts from 'typescript';
+
 import { STENCIL_CORE_ID } from '../bundle/entry-alias-ids';
 
 export const updateStencilCoreImports = (updatedCoreImportPath: string): ts.TransformerFactory<ts.SourceFile> => {
   return () => {
-    return tsSourceFile => {
+    return (tsSourceFile) => {
       if (STENCIL_CORE_ID === updatedCoreImportPath) {
         return tsSourceFile;
       }
@@ -11,22 +12,34 @@ export const updateStencilCoreImports = (updatedCoreImportPath: string): ts.Tran
       let madeChanges = false;
       const newStatements: ts.Statement[] = [];
 
-      tsSourceFile.statements.forEach(s => {
+      tsSourceFile.statements.forEach((s) => {
         if (ts.isImportDeclaration(s)) {
           if (s.moduleSpecifier != null && ts.isStringLiteral(s.moduleSpecifier)) {
             if (s.moduleSpecifier.text === STENCIL_CORE_ID) {
-              if (s.importClause && s.importClause.namedBindings && s.importClause.namedBindings.kind === ts.SyntaxKind.NamedImports) {
+              if (
+                s.importClause &&
+                s.importClause.namedBindings &&
+                s.importClause.namedBindings.kind === ts.SyntaxKind.NamedImports
+              ) {
                 const origImports = s.importClause.namedBindings.elements;
 
-                const keepImports = origImports.map(e => e.getText()).filter(name => KEEP_IMPORTS.has(name));
+                const keepImports = origImports.map((e) => e.getText()).filter((name) => KEEP_IMPORTS.has(name));
 
                 if (keepImports.length > 0) {
-                  const newImport = ts.updateImportDeclaration(
+                  const newImport = ts.factory.updateImportDeclaration(
                     s,
                     undefined,
+                    ts.factory.createImportClause(
+                      false,
+                      undefined,
+                      ts.factory.createNamedImports(
+                        keepImports.map((name) =>
+                          ts.factory.createImportSpecifier(false, undefined, ts.factory.createIdentifier(name)),
+                        ),
+                      ),
+                    ),
+                    ts.factory.createStringLiteral(updatedCoreImportPath),
                     undefined,
-                    ts.createImportClause(undefined, ts.createNamedImports(keepImports.map(name => ts.createImportSpecifier(undefined, ts.createIdentifier(name))))),
-                    ts.createStringLiteral(updatedCoreImportPath),
                   );
                   newStatements.push(newImport);
                 }
@@ -40,7 +53,7 @@ export const updateStencilCoreImports = (updatedCoreImportPath: string): ts.Tran
       });
 
       if (madeChanges) {
-        return ts.updateSourceFileNode(
+        return ts.factory.updateSourceFile(
           tsSourceFile,
           newStatements,
           tsSourceFile.isDeclarationFile,
@@ -56,10 +69,14 @@ export const updateStencilCoreImports = (updatedCoreImportPath: string): ts.Tran
   };
 };
 
+/**
+ * A set of imports which we don't want to remove from an output file
+ */
 const KEEP_IMPORTS = new Set([
   'h',
   'setMode',
   'getMode',
+  'setPlatformHelpers',
   'Build',
   'Env',
   'Host',
@@ -71,5 +88,5 @@ const KEEP_IMPORTS = new Set([
   'forceUpdate',
   'getRenderingRef',
   'forceModeUpdate',
-  'setErrorHandler'
+  'setErrorHandler',
 ]);

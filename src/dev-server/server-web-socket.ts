@@ -1,7 +1,8 @@
-import type * as d from '../declarations';
-import type { Server } from 'http';
-import * as ws from 'ws';
 import { noop } from '@utils';
+import type { Server } from 'http';
+import ws from 'ws';
+
+import type * as d from '../declarations';
 
 export function createWebSocket(
   httpServer: Server,
@@ -13,12 +14,15 @@ export function createWebSocket(
 
   const wsServer: ws.Server = new ws.Server(wsConfig);
 
-  function heartbeat(this: DevWS) {
-    this.isAlive = true;
+  function heartbeat(this: ws) {
+    // we need to coerce the `ws` type to our custom `DevWS` type here, since
+    // this function is going to be passed in to `ws.on('pong'` which expects
+    // to be passed a function where `this` is bound to `ws`.
+    (this as DevWS).isAlive = true;
   }
 
   wsServer.on('connection', (ws: DevWS) => {
-    ws.on('message', data => {
+    ws.on('message', (data) => {
       // the server process has received a message from the browser
       // pass the message received from the browser to the main cli process
       try {
@@ -31,10 +35,13 @@ export function createWebSocket(
     ws.isAlive = true;
 
     ws.on('pong', heartbeat);
+
+    // ignore invalid close frames sent by Safari 15
+    ws.on('error', console.error);
   });
 
-  const pingInternval = setInterval(() => {
-    wsServer.clients.forEach((ws: DevWS) => {
+  const pingInterval = setInterval(() => {
+    (wsServer.clients as Set<DevWS>).forEach((ws: DevWS) => {
       if (!ws.isAlive) {
         return ws.close(1000);
       }
@@ -47,7 +54,7 @@ export function createWebSocket(
     sendToBrowser: (msg: d.DevServerMessage) => {
       if (msg && wsServer && wsServer.clients) {
         const data = JSON.stringify(msg);
-        wsServer.clients.forEach(ws => {
+        wsServer.clients.forEach((ws) => {
           if (ws.readyState === ws.OPEN) {
             ws.send(data);
           }
@@ -56,11 +63,11 @@ export function createWebSocket(
     },
     close: () => {
       return new Promise((resolve, reject) => {
-        clearInterval(pingInternval);
-        wsServer.clients.forEach(ws => {
+        clearInterval(pingInterval);
+        wsServer.clients.forEach((ws) => {
           ws.close(1000);
         });
-        wsServer.close(err => {
+        wsServer.close((err) => {
           if (err) {
             reject(err);
           } else {

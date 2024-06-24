@@ -1,6 +1,7 @@
+import { NODE_NAMES } from './constants';
 import { MockDocument } from './document';
 import { MockElement } from './node';
-import { NODE_NAMES } from './constants';
+import { MockWindow } from './window';
 
 export class MockEvent {
   bubbles = false;
@@ -36,6 +37,40 @@ export class MockEvent {
 
   stopImmediatePropagation() {
     this.cancelBubble = true;
+  }
+
+  /**
+   * @ref https://developer.mozilla.org/en-US/docs/Web/API/Event/composedPath
+   * @returns a composed path of the event
+   */
+  composedPath(): MockElement[] {
+    const composedPath: MockElement[] = [];
+
+    let currentElement = this.target;
+
+    while (currentElement) {
+      composedPath.push(currentElement);
+
+      if (!currentElement.parentElement && currentElement.nodeName === NODE_NAMES.DOCUMENT_NODE) {
+        // the current element doesn't have a parent, but we've detected it's our root document node. push the window
+        // object associated with the document onto the path
+        composedPath.push((currentElement as MockDocument).defaultView);
+        break;
+      }
+
+      /**
+       * bubble up the parent chain until we arrive to the HTML element. Here we continue
+       * with the document object instead of the parent element since the parent element
+       * is `null` for HTML elements.
+       */
+      if (currentElement.parentElement == null && currentElement.tagName === 'HTML') {
+        currentElement = currentElement.ownerDocument;
+      } else {
+        currentElement = currentElement.parentElement;
+      }
+    }
+
+    return composedPath;
   }
 }
 
@@ -92,6 +127,31 @@ export class MockMouseEvent extends MockEvent {
   }
 }
 
+export class MockUIEvent extends MockEvent {
+  detail: number | null = null;
+  view: MockWindow | null = null;
+
+  constructor(type: string, uiEventInitDic?: UIEventInit) {
+    super(type);
+
+    if (uiEventInitDic != null) {
+      Object.assign(this, uiEventInitDic);
+    }
+  }
+}
+
+export class MockFocusEvent extends MockUIEvent {
+  relatedTarget: EventTarget | null = null;
+
+  constructor(type: 'blur' | 'focus', focusEventInitDic?: FocusEventInit) {
+    super(type);
+
+    if (focusEventInitDic != null) {
+      Object.assign(this, focusEventInitDic);
+    }
+  }
+}
+
 export class MockEventListener {
   type: string;
   handler: (ev?: any) => void;
@@ -116,7 +176,7 @@ export function removeEventListener(elm: any, type: string, handler: any) {
   const target: EventTarget = elm;
 
   if (target != null && Array.isArray(target.__listeners) === true) {
-    const elmListener = target.__listeners.find(e => e.type === type && e.handler === handler);
+    const elmListener = target.__listeners.find((e) => e.type === type && e.handler === handler);
     if (elmListener != null) {
       const index = target.__listeners.indexOf(elmListener);
       target.__listeners.splice(index, 1);
@@ -139,8 +199,8 @@ function triggerEventListener(elm: any, ev: MockEvent) {
   ev.currentTarget = elm;
 
   if (Array.isArray(target.__listeners) === true) {
-    const listeners = target.__listeners.filter(e => e.type === ev.type);
-    listeners.forEach(listener => {
+    const listeners = target.__listeners.filter((e) => e.type === ev.type);
+    listeners.forEach((listener) => {
       try {
         listener.handler.call(target, ev);
       } catch (err) {
@@ -155,6 +215,8 @@ function triggerEventListener(elm: any, ev: MockEvent) {
 
   if (elm.nodeName === NODE_NAMES.DOCUMENT_NODE) {
     triggerEventListener((elm as MockDocument).defaultView, ev);
+  } else if (elm.parentElement == null && elm.tagName === 'HTML') {
+    triggerEventListener(elm.ownerDocument, ev);
   } else {
     triggerEventListener(elm.parentElement, ev);
   }

@@ -1,4 +1,4 @@
-import { Component, Element, Prop, h, Host } from '@stencil/core';
+import { Component, Element, h, Host, Prop } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
 describe('attribute', () => {
@@ -291,8 +291,8 @@ describe('attribute', () => {
         <cmp-a str="second" nu="-12.2" undef="no undef" null="no null" bool dynamic-str="value" dynamic-nu="123"></cmp-a>
       `);
     });
-    it('should reflect properties as attributes', async () => {
 
+    it('should reflect properties as attributes with strict build', async () => {
       @Component({ tag: 'cmp-a', shadow: true })
       class CmpA {
         @Prop({ reflect: true }) foo = 'bar';
@@ -320,7 +320,6 @@ describe('attribute', () => {
     });
 
     it('should reflect draggable', async () => {
-
       @Component({ tag: 'cmp-draggable', shadow: true })
       class CmpABC {
         @Prop() foo = false;
@@ -360,8 +359,6 @@ describe('attribute', () => {
         </mock:shadow-root>
       </cmp-draggable>
     `);
-
     });
-
   });
 });

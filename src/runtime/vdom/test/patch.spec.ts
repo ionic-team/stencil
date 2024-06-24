@@ -1,9 +1,10 @@
-import type * as d from '../../../declarations';
-import { h, newVNode } from '../h';
-import { patch } from '../vdom-render';
 import { shuffleArray } from '@stencil/core/testing';
 import { SVG_NS } from '@utils';
-import { toVNode } from './to-vnode';
+
+import type * as d from '../../../declarations';
+import { h, newVNode } from '../h';
+import { toVNode } from '../util';
+import { patch } from '../vdom-render';
 
 describe('renderer', () => {
   let hostElm: any;
@@ -225,7 +226,7 @@ describe('renderer', () => {
         const text = document.createTextNode('Foobar');
         (<any>text).testProperty = function () {
           /**/
-        }; // ensures we dont recreate the Text Node
+        }; // ensures we don't recreate the Text Node
         prevElm.appendChild(text);
         prevElm.appendChild(h2);
 

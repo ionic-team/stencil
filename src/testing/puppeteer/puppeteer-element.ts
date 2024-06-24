@@ -1,8 +1,9 @@
-import type { EventInitDict, HostElement, SerializedEvent } from '@stencil/core/internal';
-import type * as pd from './puppeteer-declarations';
+import type { EventInitDict, SerializedEvent } from '@stencil/core/internal';
+import { cloneAttributes, MockHTMLElement, parseHtmlToFragment } from '@stencil/core/mock-doc';
 import type * as puppeteer from 'puppeteer';
-import { EventSpy, addE2EListener, waitForEvent } from './puppeteer-events';
-import { MockHTMLElement, cloneAttributes, parseHtmlToFragment } from '@stencil/core/mock-doc';
+
+import type * as pd from './puppeteer-declarations';
+import { addE2EListener, EventSpy, waitForEvent } from './puppeteer-events';
 
 export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal {
   private _queuedActions: ElementAction[] = [];
@@ -11,7 +12,10 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
     this._queuedActions.push(action);
   }
 
-  constructor(private _page: pd.E2EPageInternal, private _elmHandle: puppeteer.ElementHandle) {
+  constructor(
+    private _page: pd.E2EPageInternal,
+    private _elmHandle: puppeteer.ElementHandle,
+  ) {
     super(null, null);
     _page._e2eElements.push(this);
   }
@@ -50,12 +54,12 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
     return eventSpy;
   }
 
-  async click(options?: puppeteer.ClickOptions) {
+  override async click(options?: puppeteer.ClickOptions) {
     await this._elmHandle.click(options);
     await this._page.waitForChanges();
   }
 
-  async focus() {
+  override async focus() {
     await this._elmHandle.focus();
     await this._page.waitForChanges();
   }
@@ -71,14 +75,14 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
     let isVisible = false;
 
     try {
-      const executionContext = this._elmHandle.executionContext();
-
-      isVisible = await executionContext.evaluate((elm: HostElement) => {
-        return new Promise<boolean>(resolve => {
+      const executionContext = getPuppeteerExecution(this._elmHandle);
+      isVisible = await executionContext.evaluate((elm: Element) => {
+        return new Promise<boolean>((resolve) => {
           window.requestAnimationFrame(() => {
             if (elm.isConnected) {
               const style = window.getComputedStyle(elm);
-              const isVisible = !!style && style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0';
+              const isVisible =
+                !!style && style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0';
 
               if (isVisible) {
                 window.requestAnimationFrame(() => {
@@ -114,7 +118,17 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
         }
       };
       const resolveTmr = setInterval(checkVisible, 10);
-      const timeout = jasmine.DEFAULT_TIMEOUT_INTERVAL * 0.5;
+      /**
+       * When using screenshot functionality in a runner that is not Jasmine (e.g. Jest Circus), we need to set a
+       * default value for timeouts. There are runtime errors that occur if we attempt to use optional chaining +
+       * nullish coalescing with the `jasmine` global stating it's not defined. As a result, we use a ternary here.
+       *
+       * The '2500' value that we default to is the value of `jasmine.DEFAULT_TIMEOUT_INTERVAL` (5000) divided by 2.
+       */
+      const timeout =
+        typeof jasmine !== 'undefined' && jasmine.DEFAULT_TIMEOUT_INTERVAL
+          ? jasmine.DEFAULT_TIMEOUT_INTERVAL * 0.5
+          : 2500;
       const timeoutError = new Error(`waitForVisible timed out: ${timeout}ms`);
       const rejectTmr = setTimeout(() => {
         clearTimeout(resolveTmr);
@@ -134,7 +148,17 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
         }
       };
       const resolveTmr = setInterval(checkVisible, 10);
-      const timeout = jasmine.DEFAULT_TIMEOUT_INTERVAL * 0.5;
+      /**
+       * When using screenshot functionality in a runner that is not Jasmine (e.g. Jest Circus), we need to set a
+       * default value for timeouts. There are runtime errors that occur if we attempt to use optional chaining +
+       * nullish coalescing with the `jasmine` global stating it's not defined. As a result, we use a ternary here.
+       *
+       * The '2500' value that we default to is the value of `jasmine.DEFAULT_TIMEOUT_INTERVAL` (5000) divided by 2.
+       */
+      const timeout =
+        typeof jasmine !== 'undefined' && jasmine.DEFAULT_TIMEOUT_INTERVAL
+          ? jasmine.DEFAULT_TIMEOUT_INTERVAL * 0.5
+          : 2500;
       const timeoutError = new Error(`waitForNotVisible timed out: ${timeout}ms`);
       const rejectTmr = setTimeout(() => {
         clearTimeout(resolveTmr);
@@ -147,7 +171,7 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
     return this._elmHandle.isIntersectingViewport();
   }
 
-  async press(key: string, options?: { text?: string; delay?: number }) {
+  async press(key: puppeteer.KeyInput, options?: { text?: string; delay?: number }) {
     await this._elmHandle.press(key, options);
     await this._page.waitForChanges();
   }
@@ -165,8 +189,7 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
   async getProperty(propertyName: string) {
     this._validate();
 
-    const executionContext = this._elmHandle.executionContext();
-
+    const executionContext = getPuppeteerExecution(this._elmHandle);
     const propValue = await executionContext.evaluate(
       (elm: any, propertyName: string) => {
         return elm[propertyName];
@@ -185,19 +208,19 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
     });
   }
 
-  getAttribute(name: string) {
+  override getAttribute(name: string) {
     this._validate();
     return super.getAttribute(name);
   }
 
-  setAttribute(name: string, value: any) {
+  override setAttribute(name: string, value: any) {
     this._queueAction({
       setAttributeName: name,
       setAttributeValue: value,
     });
   }
 
-  removeAttribute(name: string) {
+  override removeAttribute(name: string) {
     this._queueAction({
       removeAttribute: name,
     });
@@ -210,17 +233,17 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
     });
   }
 
-  get classList() {
+  override get classList() {
     const api: any = {
       add: (...classNames: string[]) => {
-        classNames.forEach(className => {
+        classNames.forEach((className) => {
           this._queueAction({
             classAdd: className,
           });
         });
       },
       remove: (...classNames: string[]) => {
-        classNames.forEach(className => {
+        classNames.forEach((className) => {
           this._queueAction({
             classRemove: className,
           });
@@ -239,60 +262,60 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
     return api;
   }
 
-  get className() {
+  override get className() {
     this._validate();
     return super.className;
   }
 
-  set className(value: string) {
+  override set className(value: string) {
     this._queueAction({
       setPropertyName: 'className',
       setPropertyValue: value,
     });
   }
 
-  get id() {
+  override get id() {
     this._validate();
     return super.id;
   }
 
-  set id(value: string) {
+  override set id(value: string) {
     this._queueAction({
       setPropertyName: 'id',
       setPropertyValue: value,
     });
   }
 
-  get innerHTML() {
+  override get innerHTML() {
     this._validate();
     return super.innerHTML;
   }
 
-  set innerHTML(value: string) {
+  override set innerHTML(value: string) {
     this._queueAction({
       setPropertyName: 'innerHTML',
       setPropertyValue: value,
     });
   }
 
-  get innerText() {
+  override get innerText() {
     this._validate();
     return super.innerText;
   }
 
-  set innerText(value: string) {
+  override set innerText(value: string) {
     this._queueAction({
       setPropertyName: 'innerText',
       setPropertyValue: value,
     });
   }
 
-  get nodeValue() {
+  override get nodeValue() {
     this._validate();
     return super.nodeValue;
   }
 
-  set nodeValue(value: string) {
+  override set nodeValue(value: string) {
     if (typeof value === 'string') {
       this._queueAction({
         setPropertyName: 'nodeValue',
@@ -301,54 +324,54 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
     }
   }
 
-  get outerHTML() {
+  override get outerHTML() {
     this._validate();
     return super.outerHTML;
   }
 
-  set outerHTML(_: any) {
+  override set outerHTML(_: any) {
     throw new Error(`outerHTML is read-only`);
   }
 
-  get shadowRoot() {
+  override get shadowRoot() {
     this._validate();
     return super.shadowRoot;
   }
 
-  set shadowRoot(value: any) {
+  override set shadowRoot(value: any) {
     super.shadowRoot = value;
   }
 
-  get tabIndex() {
+  override get tabIndex() {
     this._validate();
     return super.tabIndex;
   }
 
-  set tabIndex(value: number) {
+  override set tabIndex(value: number) {
     this._queueAction({
       setPropertyName: 'tabIndex',
       setPropertyValue: value,
     });
   }
 
-  get textContent() {
+  override get textContent() {
     this._validate();
     return super.textContent;
   }
 
-  set textContent(value: string) {
+  override set textContent(value: string) {
     this._queueAction({
       setPropertyName: 'textContent',
       setPropertyValue: value,
     });
   }
 
-  get title() {
+  override get title() {
     this._validate();
     return super.title;
   }
 
-  set title(value: string) {
+  override set title(value: string) {
     this._queueAction({
       setPropertyName: 'title',
       setPropertyValue: value,
@@ -357,16 +380,34 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
 
   async getComputedStyle(pseudoElt?: string | null) {
     const style = await this._page.evaluate(
-      (elm: HTMLElement, pseudoElt: string) => {
+      (elm: Element, pseudoElt: string) => {
         const rtn: any = {};
 
         const computedStyle = window.getComputedStyle(elm, pseudoElt);
 
-        const keys = Object.keys(computedStyle);
+        const keys = [
+          ...Object.keys(computedStyle),
+          /**
+           * include CSS variables defined within the style attribute
+           * of an element, e.g.:
+           * ```
+           * <my-component style="--my-component-text-color: rgb(255, 0, 0);"></my-component>
+           * ```
+           */
+          ...Array.from((elm as HTMLElement).style),
+        ];
 
-        keys.forEach(key => {
+        keys.forEach((key) => {
           if (isNaN(key as any)) {
-            const value = computedStyle[key as any];
+            const value =
+              /**
+               * access property directly for any known css property
+               */
+              computedStyle[key as any] ||
+              /**
+               * use `getPropertyValue` for css variables
+               */
+              computedStyle.getPropertyValue(key);
             if (value != null) {
               rtn[key] = value;
             }
@@ -399,16 +440,15 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
       return;
     }
 
-    const executionContext = this._elmHandle.executionContext();
-
+    const executionContext = getPuppeteerExecution(this._elmHandle);
     const rtn = await executionContext.evaluate(
-      (elm: HTMLElement, queuedActions: ElementAction[]) => {
+      (elm: Element, queuedActions: ElementAction[]) => {
         // BROWSER CONTEXT
         // cannot use async/await in here cuz typescript transpiles it in the node context
         return (elm as any).componentOnReady().then(() => {
           let rtn: any = null;
 
-          queuedActions.forEach(queuedAction => {
+          queuedActions.forEach((queuedAction) => {
             if (queuedAction.methodName) {
               rtn = (elm as any)[queuedAction.methodName].apply(elm, queuedAction.methodArgs);
             } else if (queuedAction.setPropertyName) {
@@ -468,9 +508,8 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
   }
 
   async e2eSync() {
-    const executionContext = this._elmHandle.executionContext();
-
-    const { outerHTML, shadowRootHTML } = await executionContext.evaluate((elm: HTMLElement) => {
+    const executionContext = getPuppeteerExecution(this._elmHandle);
+    const { outerHTML, shadowRootHTML } = await executionContext.evaluate((elm: Element) => {
       return {
         outerHTML: elm.outerHTML,
         shadowRootHTML: elm.shadowRoot ? elm.shadowRoot.innerHTML : null,
@@ -487,6 +526,14 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
     const frag = parseHtmlToFragment(outerHTML);
 
     const rootElm = frag.firstElementChild;
+
+    /**
+     * in case the user called `newE2EPage` without any content `rootElm` will be undefined
+     * and further operations will fail. We need to check for this case and return early.
+     */
+    if (!rootElm) {
+      return;
+    }
 
     this.nodeName = rootElm.nodeName;
     this.attributes = cloneAttributes(rootElm.attributes);
@@ -522,12 +569,24 @@ export class E2EElement extends MockHTMLElement implements pd.E2EElementInternal
 }
 
 export async function find(page: pd.E2EPageInternal, rootHandle: puppeteer.ElementHandle, selector: pd.FindSelector) {
-  const { lightSelector, shadowSelector, text, contains } = getSelector(selector);
+  const { lightSelector, text, contains } = getSelector(selector);
 
   let elmHandle: puppeteer.ElementHandle;
 
+  if (typeof selector === 'string' && selector.includes('>>>')) {
+    const handle = await page.$(selector);
+
+    if (!handle) {
+      return null;
+    }
+
+    const elm = new E2EElement(page, handle);
+    await elm.e2eSync();
+    return elm;
+  }
+
   if (typeof lightSelector === 'string') {
-    elmHandle = await findWithCssSelector(page, rootHandle, lightSelector, shadowSelector);
+    elmHandle = await findWithCssSelector(rootHandle, lightSelector);
   } else {
     elmHandle = await findWithText(page, rootHandle, text, contains);
   }
@@ -541,42 +600,25 @@ export async function find(page: pd.E2EPageInternal, rootHandle: puppeteer.Eleme
   return elm;
 }
 
-async function findWithCssSelector(page: pd.E2EPageInternal, rootHandle: puppeteer.ElementHandle, lightSelector: string, shadowSelector: string) {
-  let elmHandle = await rootHandle.$(lightSelector);
+async function findWithCssSelector(rootHandle: puppeteer.ElementHandle, lightSelector: string) {
+  const elmHandle = await rootHandle.$(lightSelector);
 
   if (!elmHandle) {
     return null;
   }
 
-  if (shadowSelector) {
-    const shadowHandle = await page.evaluateHandle(
-      (elm: HTMLElement, shadowSelector: string) => {
-        if (!elm.shadowRoot) {
-          throw new Error(`shadow root does not exist for element: ${elm.tagName.toLowerCase()}`);
-        }
-
-        return elm.shadowRoot.querySelector(shadowSelector);
-      },
-      elmHandle,
-      shadowSelector,
-    );
-
-    await elmHandle.dispose();
-
-    if (!shadowHandle) {
-      return null;
-    }
-
-    elmHandle = shadowHandle.asElement();
-  }
-
   return elmHandle;
 }
 
-async function findWithText(page: pd.E2EPageInternal, rootHandle: puppeteer.ElementHandle, text: string, contains: string) {
+async function findWithText(
+  page: pd.E2EPageInternal,
+  rootHandle: puppeteer.ElementHandle,
+  text: string,
+  contains: string,
+) {
   const jsHandle = await page.evaluateHandle(
-    (rootElm: HTMLElement, text: string, contains: string) => {
-      let foundElm: any = null;
+    (rootElm: Element, text: string, contains: string) => {
+      let foundElm: HTMLElement | null = null;
 
       function checkContent(elm: Node) {
         if (!elm || foundElm) {
@@ -615,60 +657,39 @@ async function findWithText(page: pd.E2EPageInternal, rootHandle: puppeteer.Elem
   );
 
   if (jsHandle) {
-    return jsHandle.asElement();
+    return jsHandle.asElement() as puppeteer.ElementHandle<Element>;
   }
 
   return null;
 }
 
-export async function findAll(page: pd.E2EPageInternal, rootHandle: puppeteer.ElementHandle, selector: pd.FindSelector) {
+export async function findAll(
+  page: pd.E2EPageInternal,
+  rootHandle: puppeteer.ElementHandle,
+  selector: pd.FindSelector,
+) {
   const foundElms: E2EElement[] = [];
 
-  const { lightSelector, shadowSelector } = getSelector(selector);
+  if (typeof selector === 'string' && selector.includes('>>>')) {
+    const handles = await page.$$(selector);
+    for (let i = 0; i < handles.length; i++) {
+      const elm = new E2EElement(page, handles[i]);
+      await elm.e2eSync();
+      foundElms.push(elm);
+    }
+    return foundElms;
+  }
 
+  const { lightSelector } = getSelector(selector);
   const lightElmHandles = await rootHandle.$$(lightSelector);
   if (lightElmHandles.length === 0) {
     return foundElms;
   }
 
-  if (shadowSelector) {
-    // light dom selected, then shadow dom selected inside of light dom elements
-    for (let i = 0; i < lightElmHandles.length; i++) {
-      const executionContext = lightElmHandles[i].executionContext();
-
-      const shadowJsHandle = await executionContext.evaluateHandle(
-        (elm, shadowSelector) => {
-          if (!elm.shadowRoot) {
-            throw new Error(`shadow root does not exist for element: ${elm.tagName.toLowerCase()}`);
-          }
-
-          return elm.shadowRoot.querySelectorAll(shadowSelector);
-        },
-        lightElmHandles[i],
-        shadowSelector,
-      );
-
-      await lightElmHandles[i].dispose();
-
-      const shadowJsProperties = await shadowJsHandle.getProperties();
-      await shadowJsHandle.dispose();
-
-      for (const shadowJsProperty of shadowJsProperties.values()) {
-        const shadowElmHandle = shadowJsProperty.asElement();
-        if (shadowElmHandle) {
-          const elm = new E2EElement(page, shadowElmHandle);
-          await elm.e2eSync();
-          foundElms.push(elm);
-        }
-      }
-    }
-  } else {
-    // light dom only
-    for (let i = 0; i < lightElmHandles.length; i++) {
-      const elm = new E2EElement(page, lightElmHandles[i]);
-      await elm.e2eSync();
-      foundElms.push(elm);
-    }
+  for (let i = 0; i < lightElmHandles.length; i++) {
+    const elm = new E2EElement(page, lightElmHandles[i]);
+    await elm.e2eSync();
+    foundElms.push(elm);
   }
 
   return foundElms;
@@ -677,16 +698,12 @@ export async function findAll(page: pd.E2EPageInternal, rootHandle: puppeteer.El
 function getSelector(selector: pd.FindSelector) {
   const rtn = {
     lightSelector: null as string,
-    shadowSelector: null as string,
     text: null as string,
     contains: null as string,
   };
 
   if (typeof selector === 'string') {
-    const splt = selector.split('>>>');
-
-    rtn.lightSelector = splt[0].trim();
-    rtn.shadowSelector = splt.length > 1 ? splt[1].trim() : null;
+    rtn.lightSelector = selector.trim();
   } else if (typeof selector.text === 'string') {
     rtn.text = selector.text.trim();
   } else if (typeof selector.contains === 'string') {
@@ -696,6 +713,32 @@ function getSelector(selector: pd.FindSelector) {
   }
 
   return rtn;
+}
+
+/**
+ * A helper function for retrieving an execution context from a Puppeteer handle entity. The way that these objects can
+ * be retrieved changed in Puppeteer v17, requiring a check of the version of the library that is installed at runtime.
+ *
+ * This function expects that the {@link E2EProcessEnv#__STENCIL_PUPPETEER_VERSION__} be set prior to invocation. If
+ * it is not set, the function assumes an older version of Puppeteer is used.
+ *
+ * @param elmHandle the Puppeteer handle to an element
+ * @returns the execution context from the handle
+ */
+function getPuppeteerExecution(elmHandle: puppeteer.ElementHandle) {
+  const puppeteerMajorVersion = parseInt(process.env.__STENCIL_PUPPETEER_VERSION__, 10);
+  if (puppeteerMajorVersion >= 17) {
+    // in puppeteer v17, a context for executing JS can be retrieved from a frame
+    // the `any` type assertion is necessary for backwards compatibility with the type checker
+    return (elmHandle as any).frame;
+  } else {
+    // in puppeteer v16 and lower, an execution context could be retrieved from a handle to execute JS
+    // the `any` type assertion is necessary for backwards compatibility with the type checker
+    //
+    // if the result of `parseInt` on the puppeteer version is NaN, assume that the user is on a lower version of
+    // puppeteer
+    return (elmHandle as any).executionContext();
+  }
 }
 
 interface ElementAction {
