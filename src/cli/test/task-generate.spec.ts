@@ -11,13 +11,14 @@ jest.mock('prompts', () => ({
   prompt: promptMock,
 }));
 
-const setup = async () => {
+const setup = async (plugins: any[] = []) => {
   const sys = mockCompilerSystem();
   const config: d.ValidatedConfig = mockValidatedConfig({
     configPath: '/testing-path',
     flags: createConfigFlags({ task: 'generate' }),
     srcDir: '/src',
     sys,
+    plugins
   });
 
   // set up some mocks / spies

@@ -356,7 +356,7 @@ export type GeneratableExtension = 'tsx' | 'spec.tsx' | 'e2e.ts' | GeneratableSt
 /**
  * Extensions available to generate.
  */
-export type GeneratableStylingExtension = 'css' | 'sass' | 'less';
+export type GeneratableStylingExtension = 'css' | 'sass' | 'scss' | 'less';
 
 /**
  * A little interface to wrap up the info we need to pass around for generating
