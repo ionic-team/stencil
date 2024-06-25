@@ -115,10 +115,7 @@ const parseVNodeAnnotations = (
      * we need to insert the vnode annotations on the host element childrens as well
      * as on the children from its shadowRoot if there is one
      */
-    const childNodes = [
-      ...Array.from(node.childNodes),
-      ...Array.from(node.shadowRoot?.childNodes || [])
-    ];
+    const childNodes = [...Array.from(node.childNodes), ...Array.from(node.shadowRoot?.childNodes || [])];
     childNodes.forEach((childNode) => {
       const hostRef = getHostRef(childNode);
       if (hostRef != null && !docData.staticComponents.has(childNode.nodeName.toLowerCase())) {

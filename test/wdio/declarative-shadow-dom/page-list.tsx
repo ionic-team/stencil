@@ -6,7 +6,6 @@ import { Component, h, Prop, State } from '@stencil/core';
   shadow: true,
 })
 export class PatternlibPagination {
-
   @Prop({ mutable: true }) lastPage: number | null = null;
   @State() pages: Array<number> = [];
 
@@ -29,7 +28,7 @@ export class PatternlibPagination {
       <div>
         <div class="pagination">
           <div class="pagination-pages pagination-notation">
-            {this.pages.map(i => (
+            {this.pages.map((i) => (
               <page-list-item label={i}></page-list-item>
             ))}
           </div>

@@ -10,12 +10,13 @@ describe('renderToString', () => {
   });
 
   beforeEach(async () => {
-    const { html } = await renderToString(
-      `<page-list last-page="5" current-page="1"></page-list>`,
-      { serializeShadowRoot: true, prettyHtml: true, fullDocument: false },
-    );
+    const { html } = await renderToString(`<page-list last-page="5" current-page="1"></page-list>`, {
+      serializeShadowRoot: true,
+      prettyHtml: true,
+      fullDocument: false,
+    });
     const stage = document.createElement('div');
-    stage.setAttribute('id', 'stage')
+    stage.setAttribute('id', 'stage');
     stage.setHTMLUnsafe(html);
     document.body.appendChild(stage);
   });
@@ -25,7 +26,7 @@ describe('renderToString', () => {
   });
 
   it('can hydrate a nested shadow component', async () => {
-    expect(typeof customElements.get('page-list-item')).toBe('undefined')
+    expect(typeof customElements.get('page-list-item')).toBe('undefined');
 
     // @ts-expect-error resolved through WDIO
     const { defineCustomElements } = await import('/dist/loader/index.js');
@@ -33,7 +34,7 @@ describe('renderToString', () => {
 
     // wait for Stencil to take over and reconcile
     await browser.waitUntil(async () => customElements.get('page-list-item'));
-    expect(typeof customElements.get('page-list-item')).toBe('function')
+    expect(typeof customElements.get('page-list-item')).toBe('function');
     await expect($('page-list')).toHaveText('0\n1\n2\n3\n4');
   });
 });

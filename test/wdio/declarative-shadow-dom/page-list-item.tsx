@@ -7,8 +7,8 @@ import { Component, h, Prop } from '@stencil/core';
 })
 export class MyOtherComponent {
   /**
-     * Set the number to be displayed.
-     */
+   * Set the number to be displayed.
+   */
   @Prop() label!: number;
 
   /**
@@ -19,7 +19,7 @@ export class MyOtherComponent {
   render() {
     const paginationItemClass: any = {
       'pagination-item': true,
-      'active': this.active,
+      active: this.active,
     };
 
     return (
