@@ -44,11 +44,11 @@ export const taskGenerate = async (config: ValidatedConfig): Promise<void> => {
     return config.sys.exit(1);
   }
 
-  let cssExtension: GeneratableStylingExtension = "css";
-  if (!!config.plugins.find(plugin => plugin.name === "sass")) {
+  let cssExtension: GeneratableStylingExtension = 'css';
+  if (!!config.plugins.find((plugin) => plugin.name === 'sass')) {
     cssExtension = await chooseSassExtension();
-  } else if (!!config.plugins.find(plugin => plugin.name === "less")) {
-    cssExtension = "less";
+  } else if (!!config.plugins.find((plugin) => plugin.name === 'less')) {
+    cssExtension = 'less';
   }
   const filesToGenerateExt = await chooseFilesToGenerate(cssExtension);
   if (!filesToGenerateExt) {
@@ -120,14 +120,15 @@ const chooseSassExtension = async () => {
     await prompt({
       name: 'filesToGenerate',
       type: 'select',
-      message: 'Which Sass format would you like to use? (More info: https://sass-lang.com/documentation/syntax/#the-indented-syntax)',
+      message:
+        'Which Sass format would you like to use? (More info: https://sass-lang.com/documentation/syntax/#the-indented-syntax)',
       choices: [
         { value: 'sass', title: `*.sass Format`, selected: true },
         { value: 'scss', title: '*.scss Format' },
       ],
     })
   ).filesToGenerate;
-}
+};
 
 /**
  * Get a filepath for a file we want to generate!
@@ -220,7 +221,12 @@ const isTest = (extension: GeneratableExtension): boolean => {
  * @param styleExtension extension used for styles
  * @returns a string container the file boilerplate for the supplied extension
  */
-export const getBoilerplateByExtension = (tagName: string, extension: GeneratableExtension, withCss: boolean, styleExtension: GeneratableStylingExtension,): string => {
+export const getBoilerplateByExtension = (
+  tagName: string,
+  extension: GeneratableExtension,
+  withCss: boolean,
+  styleExtension: GeneratableStylingExtension,
+): string => {
   switch (extension) {
     case 'tsx':
       return getComponentBoilerplate(tagName, withCss, styleExtension);
@@ -246,7 +252,11 @@ export const getBoilerplateByExtension = (tagName: string, extension: Generatabl
  * @param styleExtension extension used for styles
  * @returns the contents of a file that defines a component
  */
-const getComponentBoilerplate = (tagName: string, hasStyle: boolean, styleExtension: GeneratableStylingExtension): string => {
+const getComponentBoilerplate = (
+  tagName: string,
+  hasStyle: boolean,
+  styleExtension: GeneratableStylingExtension,
+): string => {
   const decorator = [`{`];
   decorator.push(`  tag: '${tagName}',`);
   if (hasStyle) {
@@ -275,14 +285,15 @@ export class ${toPascalCase(tagName)} {
  * @param ext extension used for styles
  * @returns a boilerplate CSS block
  */
-const getStyleUrlBoilerplate = (ext: GeneratableExtension): string => (
+const getStyleUrlBoilerplate = (ext: GeneratableExtension): string =>
   ext === 'sass'
     ? `:host
   display: block
-` : `:host {
+`
+    : `:host {
   display: block;
 }
-`);
+`;
 
 /**
  * Get the boilerplate for a file containing a spec (unit) test for a component
