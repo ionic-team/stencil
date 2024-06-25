@@ -117,7 +117,7 @@ describe('generate task', () => {
     userChoices.forEach((file) => {
       expect(writeFileSpy).toHaveBeenCalledWith(
         file.path,
-        getBoilerplateByExtension('my-component', file.extension, true),
+        getBoilerplateByExtension('my-component', file.extension, true, 'css'),
       );
     });
   });
