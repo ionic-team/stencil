@@ -112,7 +112,7 @@ const parseVNodeAnnotations = (
 
   if (node.nodeType === NODE_TYPE.ElementNode) {
     /**
-     * we need to insert the vnode annotations on the host element childrens as well
+     * we need to insert the vnode annotations on the host element children as well
      * as on the children from its shadowRoot if there is one
      */
     const childNodes = [...Array.from(node.childNodes), ...Array.from(node.shadowRoot?.childNodes || [])];
