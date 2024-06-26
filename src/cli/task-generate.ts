@@ -73,14 +73,12 @@ export const taskGenerate = async (config: ValidatedConfig): Promise<void> => {
       getBoilerplateAndWriteFile(
         config,
         componentName,
-        (
-          extensionsToGenerate.includes('css') ||
+        extensionsToGenerate.includes('css') ||
           extensionsToGenerate.includes('sass') ||
           extensionsToGenerate.includes('scss') ||
-          extensionsToGenerate.includes('less')
-        ),
+          extensionsToGenerate.includes('less'),
         file,
-        cssExtension
+        cssExtension,
       ),
     ),
   ).catch((error) => config.logger.error(error));

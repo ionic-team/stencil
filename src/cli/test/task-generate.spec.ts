@@ -20,7 +20,7 @@ const setup = async (plugins: any[] = []) => {
     flags: createConfigFlags({ task: 'generate' }),
     srcDir: '/src',
     sys,
-    plugins
+    plugins,
   });
 
   // set up some mocks / spies
@@ -40,7 +40,7 @@ const setup = async (plugins: any[] = []) => {
     return {
       tagName: 'my-component',
       filesToGenerate: [format, 'spec.tsx', 'e2e.ts'],
-    }
+    };
   });
 
   return { config, errorSpy, validateTagSpy };
@@ -164,10 +164,10 @@ describe('generate task', () => {
         getBoilerplateByExtension('my-component', file.extension, true, 'sass'),
       );
     });
-  })
+  });
 
   it('should generate files for less projects', async () => {
-    formatToPick = 'less'
+    formatToPick = 'less';
     const { config } = await setup([{ name: 'less' }]);
     const writeFileSpy = jest.spyOn(config.sys, 'writeFile');
     await silentGenerate(config);
@@ -184,5 +184,5 @@ describe('generate task', () => {
         getBoilerplateByExtension('my-component', file.extension, true, 'less'),
       );
     });
-  })
+  });
 });
